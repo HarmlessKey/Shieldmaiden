@@ -62,7 +62,18 @@ export default {
     },
     deleteCampaign(key) {
       const userId = firebase.auth().currentUser.uid;
-      db.ref('campaigns/'+userId).child(key).remove();
+        const campaignId = this.$route.params.id;
+        var vm = this;
+
+        vm.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
+        timeout: 5000,
+        closeOnClick: true,
+        pauseOnHover: true,
+        buttons: [
+            {text: 'Yes', action: (toast) => {db.ref('campaigns/'+userId).child(key).remove(); vm.$snotify.remove(toast.id); }, bold: false},
+            {text: 'No', action: (toast) => {console.log('Clicked: No'); vm.$snotify.remove(toast.id); }, bold: true},        ]
+        });
+      
     },
     getPlayer(playerId) {
       player = db.ref('players/'+userId+'/'+playerId)

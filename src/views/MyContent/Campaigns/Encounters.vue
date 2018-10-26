@@ -105,15 +105,13 @@ export default {
         const campaignId = this.$route.params.id;
         var vm = this;
 
-        vm.$snotify.confirm('Are you sure you want to delete the encounter?', 'Delete encounter', {
+        vm.$snotify.error('Are you sure you want to delete the encounter?', 'Delete encounter', {
         timeout: 5000,
-        showProgressBar: true,
-        closeOnClick: false,
+        closeOnClick: true,
         pauseOnHover: true,
         buttons: [
-            {text: 'Yes', action: () => db.ref('encounters/' + userId + '/' + campaignId).child(key).remove(), bold: false},
-            {text: 'No', action: () => console.log('Clicked: No')},
-        ]
+            {text: 'Yes', action: (toast) => {db.ref('encounters/' + userId + '/' + campaignId).child(key).remove(); vm.$snotify.remove(toast.id); }, bold: false},
+            {text: 'No', action: (toast) => {console.log('Clicked: No'); vm.$snotify.remove(toast.id); }, bold: true},        ]
         });
         
 

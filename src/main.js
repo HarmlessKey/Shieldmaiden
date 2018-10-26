@@ -13,13 +13,12 @@ import Snotify, { SnotifyPosition } from 'vue-snotify'
 
 const options = {
   toast: {
-    position: SnotifyPosition.centerTop
+    position: SnotifyPosition.centerTop,
+    showProgressBar: false
   }
 }
 
 Vue.use(Snotify, options)
-
-
 Vue.use(VeeValidate);
 Vue.use(VueFire);
 

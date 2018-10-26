@@ -37,23 +37,22 @@ export default {
   name: 'Campaigns',
   data() {
     return {
-      user: this.$store.getters.getUser,
       newCampaign: '',
+      userId: firebase.auth().currentUser.uid,
+
     }
   },
   firebase() {
-    const userId = firebase.auth().currentUser.uid
     return {
-      campaigns: db.ref('campaigns/'+ userId),
-      getPlayers: db.ref('players/'+ userId)
+      campaigns: db.ref('campaigns/'+ this.userId),
+      getPlayers: db.ref('players/'+ this.userId)
     }
   },
   methods: {
     addCampaign() {
-      const userId = firebase.auth().currentUser.uid;
       this.$validator.validateAll().then((result) => {
         if (result) {
-          db.ref('campaigns/'+userId).push({campaign: this.newCampaign});
+          db.ref('campaigns/'+this.userId).push({campaign: this.newCampaign});
           this.newCampaign = '';
         } else {
           console.log('Not valid');
@@ -61,11 +60,10 @@ export default {
       })
     },
     deleteCampaign(key) {
-      const userId = firebase.auth().currentUser.uid;
-      db.ref('campaigns/'+userId).child(key).remove();
+      db.ref('campaigns/'+this.userId).child(key).remove();
     },
     getPlayer(playerId) {
-      player = db.ref('players/'+userId+'/'+playerId)
+      player = db.ref('players/'+this.userId+'/'+playerId)
       return player
     }
   }

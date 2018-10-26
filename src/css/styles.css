@@ -1,0 +1,176 @@
+@import "https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css";
+@import "~vue-snotify/styles/material.css";
+/* 
+	Table of content
+	1. Defaults
+	2. Headings
+	3. Classes
+	4. Links
+	5. Bootstrap overrides
+
+ */
+/* 1. Defaults */
+/*********************************************/
+body {
+	background:#191919 !important;
+    color:#b2b2b2 !important;
+	font-size:12px !important;
+}
+.view {
+    padding: 5px;
+    height: calc(100vh - 100px);
+    /*width: 100vw;*/
+}
+.container-fluid {
+	padding:0 !important;
+}
+header {
+	display:block;
+	height:80px;
+	line-height:40px;
+	padding:20px 10px;
+	width:100%;
+	background:#000;
+	border-bottom:solid 1px #b2b2b2;
+}
+
+
+/* 2. Headings */
+/*********************************************/
+h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }
+h1 {
+	text-transform:uppercase;
+    font-size:15px !important;
+}
+h2 {
+	text-transform:uppercase;
+	font-size:15px !important;
+    margin-bottom:20px !important;
+}
+h3 {
+	font-size:15px !important;
+	margin-bottom:15px !important;
+}
+/* 3. Classes */
+/*********************************************/
+.gray { color:#262626 !important; }
+.green { color:#83b547 !important; }
+.blue { color:#2c97de !important; }
+.red { color:#cc3e4a !important; }
+.orange { color:#e76d3b !important; }
+.yellow { color:#b3b547 !important; }
+
+.bg-gray { background-color:#262626 !important; }
+.bg-green { background-color:#83b547 !important; }
+.bg-blue { background-color:#2c97de !important; }
+.bg-red { background-color:#cc3e4a !important; }
+.bg-orange { background-color:#e76d3b !important; }
+.bg-yellow { background-color:#cad14b !important; }
+
+.validate {
+	color:#fff;
+	padding:10px;
+  }
+  .error, .error:focus {
+	border-color:#cc3e4a !important;
+  }
+
+/* 4. Buttons and Links */
+/*********************************************/
+button.bg-green:hover { background-color:#6e993b !important; }
+button.bg-red:hover { background-color:#a3303a !important; }
+
+a.logout { 
+	color:#b2b2b2 !important;
+	font-size:20px;
+	cursor:pointer;
+}
+a.logout:hover { color:#2c97de !important; }
+
+/* 5. Bootstrap overrides*/
+/*********************************************/
+.btn {
+	border-radius:0 !important;
+	background:#2c97de;
+	color:#fff !important;
+	border:none;
+}
+.btn:focus {
+	box-shadow:none;
+}
+a {
+	color:#2c97de !important;
+	cursor:pointer !important;
+}
+.progress {
+	border-radius:0 !important;
+}
+.dropdown-menu {
+	border-radius:0;
+	background:#191919;
+	color:#b2b2b2; 
+}
+.dropdown-menu a { color:#b2b2b2; }
+
+.dropdown-menu a:hover { color:#2c97de; background:none; }
+
+hr { background:#000; }
+
+.form-control, .custom-select { 
+	border-radius:0 !important;
+	background:#191919 !important;
+	border:solid 1px #b2b2b2 !important;
+	color:#b2b2b2 !important;
+}
+.form-control:focus, .custom-select:focus { 
+	background:#191919 !important;
+	border:solid 1px #FFF !important;
+	box-shadow:none !important;
+}
+.custom-select optgroup {
+	background:#000 !important;
+}
+.custom-checkbox .custom-control-label::before {
+	border-radius:0 !important;
+}
+ul.nav {
+	border:none;
+}
+.nav-tabs .nav-link {
+	border:none !important;
+	border-radius:0 !important;
+}
+.nav-link.active {
+    color:#b2b2b2 !important;
+    background-color:#262626 !important;
+}
+.btn.disabled {
+	cursor:not-allowed !important;
+	opacity:.3;
+	color:#fff !important;
+}
+.modal-content {
+	border-radius:0 !important;
+	border:none;
+	background:#191919 !important;
+	color:#b2b2b2 !important; 
+}
+.modal-content .btn {
+	color:#fff !important;
+}
+.modal-header, .modal-footer {
+	border-color:#000 !important;
+}
+.modal .close {
+	color:#cc3e4a;
+	text-shadow:none;
+	opacity:1;
+}
+.modal .close:hover {
+	color:#a3303a;
+}
+.dropdown-menu {
+	border-radius:0 !important;
+	background:#262626 !important;
+	padding:0 !important;
+}

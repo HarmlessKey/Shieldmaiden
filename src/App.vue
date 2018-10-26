@@ -1,28 +1,34 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  
+    <div id="app" class="container-fluid">
+      <nav-main/>
+      <router-view/>
+      <vue-snotify></vue-snotify>
+    </div>
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from './components/Header.vue';
 
 export default {
-  name: 'app',
   components: {
-    HelloWorld
+    navMain: Header
+  },
+  methods: {
+    setUser: function() {
+      this.$store.dispatch('setUser');
+    }
+  },
+  created() {
+    // when the app is created run the set user method
+    // this uses Vuex to check if a user is signed in
+    // check out mutations in the store.js file
+    this.setUser();
   }
-}
+};
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="css" src="./css/styles.css">
+
 </style>

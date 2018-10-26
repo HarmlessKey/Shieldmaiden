@@ -60,7 +60,12 @@ export default {
       })
     },
     deleteCampaign(key) {
-      db.ref('campaigns/'+this.userId).child(key).remove();
+      this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
+      buttons: [
+          {text: 'Yes', action: (toast) => {db.ref('campaigns/'+this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+          {text: 'No', action: (toast) => {console.log('Clicked: No'); this.$snotify.remove(toast.id); }, bold: true},        ]
+      });
+      
     },
     getPlayer(playerId) {
       player = db.ref('players/'+this.userId+'/'+playerId)

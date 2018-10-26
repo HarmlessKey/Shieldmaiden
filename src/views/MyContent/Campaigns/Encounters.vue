@@ -113,9 +113,6 @@ export default {
             {text: 'Yes', action: (toast) => {db.ref('encounters/' + userId + '/' + campaignId).child(key).remove(); vm.$snotify.remove(toast.id); }, bold: false},
             {text: 'No', action: (toast) => {console.log('Clicked: No'); vm.$snotify.remove(toast.id); }, bold: true},        ]
         });
-        
-
-        
     }
   }
 }

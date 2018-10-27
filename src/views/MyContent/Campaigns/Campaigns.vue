@@ -12,17 +12,18 @@
       <p class="validate bg-red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 
       <h2 class="mt-3">My campaigns</h2>
+      <div v-if="loading == true" class="loader"><span>Loading Campaigns...</span></div>
       <ul id="campaigns" class="mt-3">
         <transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
           <li class="bg-gray" v-for="(campaign, index) in campaigns" :key="index">
-            <h2>{{ campaign.campaign }} <a class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
+            <h2>{{ campaign.campaign }} <a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
             <router-link :to="'/my-content/edit-campaign/'+campaign['.key']"> Edit</router-link>
             <router-link :to="'/my-content/encounters/'+campaign['.key']"> Encounters</router-link>
             <!-- <router-link :to="{ name: 'EditCampaign', params: {campaign-id: campaign['.key']} }"> Edit</router-link> -->
             <!-- PLAYERS IN CAMPAIGN -->
-            <p v-for="(player, index) in campaign.players" :key="player['.key']">
+            <!-- <p v-for="(player, index) in campaign.players" :key="player['.key']">
               <span v-for="players in getPlayers" v-if="players['.key'] == index">{{ players.character_name }}</span>
-            </p>
+            </p> -->
           </li>
         </transition-group>
       </ul>
@@ -30,55 +31,48 @@
 </template>
 
 <script>
-import firebase from 'firebase'
 import { db } from '@/firebase'
 
 export default {
   name: 'Campaigns',
   data() {
     return {
-      user: this.$store.getters.getUser,
+      userId: this.$store.getters.getUser.uid,
       newCampaign: '',
+      loading: true,
     }
   },
   firebase() {
-    const userId = firebase.auth().currentUser.uid
     return {
-      campaigns: db.ref('campaigns/'+ userId),
-      getPlayers: db.ref('players/'+ userId)
+      getPlayers: db.ref('players/' + this.userId),
+      campaigns: {
+        source: db.ref('campaigns/' + this.userId),
+        readyCallback: () => this.loading = false
+      }
     }
   },
   methods: {
     addCampaign() {
-      const userId = firebase.auth().currentUser.uid;
       this.$validator.validateAll().then((result) => {
         if (result) {
-          db.ref('campaigns/'+userId).push({campaign: this.newCampaign});
+          db.ref('campaigns/' + this.userId).push({campaign: this.newCampaign});
           this.newCampaign = '';
         } else {
-          console.log('Not valid');
+          //console.log('Not valid');
         }
       })
     },
     deleteCampaign(key) {
-      const userId = firebase.auth().currentUser.uid;
-        const campaignId = this.$route.params.id;
-        var vm = this;
-
-        vm.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
-        timeout: 5000,
-        closeOnClick: true,
-        pauseOnHover: true,
+        this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
         buttons: [
-            {text: 'Yes', action: (toast) => {db.ref('campaigns/'+userId).child(key).remove(); vm.$snotify.remove(toast.id); }, bold: false},
-            {text: 'No', action: (toast) => {console.log('Clicked: No'); vm.$snotify.remove(toast.id); }, bold: true},        ]
+            {text: 'Yes', action: (toast) => {db.ref('campaigns/'+ this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+            {text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},        ]
         });
-      
     },
-    getPlayer(playerId) {
-      player = db.ref('players/'+userId+'/'+playerId)
-      return player
-    }
+    // getPlayer(playerId) {
+    //   player = db.ref('players/' + this.userId + '/' + playerId)
+    //   return player
+    // }
   }
 }
 </script>

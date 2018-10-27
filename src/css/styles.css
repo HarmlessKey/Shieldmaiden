@@ -70,10 +70,45 @@ h3 {
 .validate {
 	color:#fff;
 	padding:10px;
-  }
-  .error, .error:focus {
+}
+.error, .error:focus {
 	border-color:#cc3e4a !important;
-  }
+}
+
+.loader {
+	position:relative;
+	text-align:center;
+	line-height:27px;
+	height:27px;
+}
+.loader span {
+	animation: fadeinout .9s linear infinite;
+}
+@keyframes fadeinout {
+	0%,100% { opacity: 0; }
+	50% { opacity: 1; }
+}
+.loader:before {
+	content: '';
+	box-sizing: border-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 30px;
+	height: 30px;
+	margin-top: -15px;
+	margin-left: -15px;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	border-top-color: #07d;
+	border-bottom-color: #07d;
+	animation: spinner .8s ease infinite;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* 4. Buttons and Links */
 /*********************************************/
@@ -173,4 +208,41 @@ ul.nav {
 	border-radius:0 !important;
 	background:#262626 !important;
 	padding:0 !important;
+}
+
+/* 5. Snotife overrides */
+/*********************************************/
+.snotifyToast {
+	border-radius:0 !important;
+}
+.snotify-leftTop, .snotify-centerTop, .snotify-rightTop {
+	top:90px !important;
+}
+.snotifyToast__title {
+	font-weight:normal;
+	text-transform:uppercase;
+	font-size:15px !important;
+}
+.snotifyToast__body {
+	font-size:12px !important;
+}
+.snotifyToast__buttons {
+	border-top:2px solid rgba(0, 0, 0, 0.1);
+}
+.snotify-error .snotifyToast__inner {
+	background-color:#cc3e4a;
+}
+.snotify-error .snotifyToast__buttons {
+	background-color:#cc3e4a;
+}
+.snotify-icon.snotify-icon--error {
+	background-image:url('../assets/_img/styles/sword-break.png');
+	background-size:cover;
+}
+.snotify-succes {
+	background-color:#83b547;
+}
+.snotify-icon.snotify-icon--success {
+	background-image:url('../assets/_img/styles/d20-white.png');
+	background-size:cover;
 }

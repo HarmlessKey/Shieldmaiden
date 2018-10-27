@@ -5,18 +5,17 @@
 
     <a class="btn btn-block mb-3" v-b-modal.addModal><i class="fas fa-plus-square"></i> Add player</a>
 
+    <div v-if="loading == true" class="loader"><span>Loading Players...</span></div>
     <ul class="players">
         <transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
             <li class="bg-gray" v-for="(player, index) in players" :key="index">
             <span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
             <div class="info">
                 <h3>{{ player.character_name }}</h3>
-                <p>
-                    AC: {{ player.ac }} | HP: {{ player.maxhp }}
-                </p>
+                <p>AC: {{ player.ac }} | HP: {{ player.maxhp }}</p>
                 <a href="#">Edit</a>
             </div>
-            <a class="red delete" v-b-modal.deleteModal><i class="fas fa-trash-alt"></i></a>
+            <a class="red" v-b-tooltip.hover title="Delete" @click="deletePlayer(player['.key'], player.character_name)"><i class="fas fa-trash-alt"></i></a>
         </li>
         </transition-group>
     </ul>
@@ -42,45 +41,39 @@
 
         <button class="btn btn-block mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
     </b-modal>
-
-    <b-modal id="deleteModal" size="sm" title="Delete Character" ok-title="Delete">
-        Are you sure you want to delete this character?
-    </b-modal>
-
-    
-
   </div>
 </template>
 
 <script>
-import firebase from 'firebase'
 import { db } from '@/firebase'
 
 export default {
   name: 'Players',
   data() {
     return {
-      user: this.$store.getters.getUser,
+      userId: this.$store.getters.getUser.uid,
       player_name: '',
       character_name: '',
       ac: '',
       maxhp: '',
       avatar: '',
-      beyond: ''
+      beyond: '',
+      loading: true,
     }
   },
   firebase() {
-    const userId = firebase.auth().currentUser.uid
     return {
-      players: db.ref('players/'+ userId).orderByChild('character_name')
+      players: {
+        source: db.ref('players/'+ this.userId).orderByChild('character_name'),
+        readyCallback: () => this.loading = false
+      }
     }
   },
   methods: {
     addPlayer() {
-      const userId = firebase.auth().currentUser.uid;
       this.$validator.validateAll().then((result) => {
         if (result) {
-          db.ref('players/'+userId).push({
+          db.ref('players/' + this.userId).push({
               player_name: this.player_name,
               character_name: this.character_name,
               maxhp: this.maxhp,
@@ -96,14 +89,18 @@ export default {
           this.beyond = '';
           
         } else {
-          console.log('Not valid');
+          //console.log('Not valid');
         }
       })
     },
-    deletePlayer(key) {
-      const userId = firebase.auth().currentUser.uid;
-      db.ref('players/'+userId).child(key).remove();
-    }
+    deletePlayer(key, player) {
+      this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
+        timeout: false,
+        buttons: [
+            {text: 'Yes', action: (toast) => { db.ref('players/' + this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+            {text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},        ]
+        });
+      }
   }
 }
 </script>

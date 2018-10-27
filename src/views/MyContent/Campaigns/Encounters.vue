@@ -1,7 +1,7 @@
 <template>
     <div id="my-content" class="container">
-      <h1>Campaign: {{ newCampaign.campaign }}</h1>
-      <p>Manage the encounters in your campaign "{{ newCampaign.campaign }}".</p>
+      <h1>Encounters</h1>
+      <p>Manage the encounters in your campaign.</p>
       
       <div class="input-group">
         <input type="text" class="form-control" :class="{'input': true, 'error': errors.has('newEncounter') }" v-model="newEncounter" v-validate="'required'" name="newEncounter" placeholder="Encounter Title" />
@@ -19,18 +19,19 @@
             <th>Encounter</th>
             <th></th>
         </thead>
-        <tbody>
-            <tr v-for="(encounter, index) in encounters" :key="encounter['.key']" v-if="encounter.finished == false">
+        <tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+            <tr v-for="(encounter, index) in encounters" :key="encounter['.key']">
                 <td>{{ index + 1 }}</td>
                 <td>{{ encounter.encounter }}</td>
                 <td class="text-right">
                     <router-link class="green" :to="'/my-content/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
                     <router-link class="mx-2" :to="'/my-content/encounter/'+encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
-                    <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'])"><i class="fas fa-trash-alt"></i></a>
+                    <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
                 </td>
             </tr>
         </tbody>
       </table>
+      <div v-if="loading == true" class="loader"><span>Loading encounters...</span></div>
 
       <h2>Finished Encounters</h2>
       <table class="table">
@@ -39,17 +40,19 @@
             <th>Encounter</th>
             <th></th>
         </thead>
-        <tbody>
-            <tr v-for="(encounter, index) in encounters" :key="encounter['.key']" v-if="encounter.finished == true">
+        <tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+            
+            <tr v-for="(encounter, index) in encounters_finished" :key="encounter['.key']">
                 <td>{{ index + 1 }}</td>
                 <td>{{ encounter.encounter }}</td>
                 <td class="text-right">
                     <router-link class="mx-2" :to="'/my-content/encounter-statistics/'+encounter['.key']" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
-                    <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'])"><i class="fas fa-trash-alt"></i></a>
+                    <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
                 </td>
             </tr>
         </tbody>
       </table>
+      <div v-if="loading == true" class="loader"><span>Loading encounters...</span></div>
     </div>
 </template>
 
@@ -59,59 +62,47 @@ import { db } from '@/firebase'
 
 export default {
   name: 'EditCampaign',
-  firebase() {
-    const userId = firebase.auth().currentUser.uid;
-    const campaignId = this.$route.params.id
-
-    return {
-      campaigns: db.ref('campaigns/'+userId),
-      campaignsObj: {
-        source: db.ref('campaigns/'+userId),
-        asObject: true
-      },
-      encounters: db.ref('encounters/'+userId).child(campaignId)
-    }
-  },
   data() {
     return {
         newEncounter: '',
         campaignId: this.$route.params.id,
-      newCampaign: {}
+        userId: firebase.auth().currentUser.uid,
+        newCampaign: {},
+        loading: true,
     }
   },
-  created() {
-    let campaign = this.campaignsObj[this.$route.params.id]
-    this.newCampaign = {
-       campaign: campaign.campaign
+  firebase() {
+    return {
+      encounters: {
+        source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(false),
+        readyCallback: () => this.loading = false
+      },
+      encounters_finished: {
+        source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(true),
+        readyCallback: () => this.loading = false
+      }
     }
   },
   methods: {
     addEncounter() {
-      const userId = firebase.auth().currentUser.uid;
-      const campaignId = this.$route.params.id;
-
       this.$validator.validateAll().then((result) => {
         if (result) {
-          db.ref('encounters/'+userId+'/'+campaignId).push({encounter: this.newEncounter, round: 0, turn: 0, finished: false});
+          db.ref('encounters/'+ this.userId +'/'+ this.campaignId).push({encounter: this.newEncounter, round: 0, turn: 0, finished: false});
           this.newEncounter = '';
-          this.$snotify.success('Succes!');
+          this.$snotify.success('Encounter added.', 'Critical hit!', {
+            position: "rightTop"
+          });
         } else {
-          console.log('Not valid');
+          //console.log('Not valid');
         }
       })
     },
-    deleteEncounter(key) {
-        const userId = firebase.auth().currentUser.uid;
-        const campaignId = this.$route.params.id;
-        var vm = this;
-
-        vm.$snotify.error('Are you sure you want to delete the encounter?', 'Delete encounter', {
+    deleteEncounter(key, encounter) {
+        this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
         timeout: 5000,
-        closeOnClick: true,
-        pauseOnHover: true,
         buttons: [
-            {text: 'Yes', action: (toast) => {db.ref('encounters/' + userId + '/' + campaignId).child(key).remove(); vm.$snotify.remove(toast.id); }, bold: false},
-            {text: 'No', action: (toast) => {console.log('Clicked: No'); vm.$snotify.remove(toast.id); }, bold: true},        ]
+            {text: 'Yes', action: (toast) => { db.ref('encounters/' + this.userId + '/' + this.campaignId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+            {text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},        ]
         });
     }
   }

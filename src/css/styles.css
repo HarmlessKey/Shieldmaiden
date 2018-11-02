@@ -68,12 +68,47 @@ h3 {
 .bg-yellow { background-color:#cad14b !important; }
 
 .validate {
-	color:#fff;
-	padding:10px;
-  }
-  .error, .error:focus {
+	margin-top:5px;
+	font-size:11px;
+}
+.error, .error:focus {
 	border-color:#cc3e4a !important;
-  }
+}
+
+.loader {
+	position:relative;
+	text-align:center;
+	line-height:27px;
+	height:27px;
+}
+.loader span {
+	animation: fadeinout .9s linear infinite;
+}
+@keyframes fadeinout {
+	0%,100% { opacity: 0; }
+	50% { opacity: 1; }
+}
+.loader:before {
+	content: '';
+	box-sizing: border-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 30px;
+	height: 30px;
+	margin-top: -15px;
+	margin-left: -15px;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	border-top-color: #07d;
+	border-bottom-color: #07d;
+	animation: spinner .8s ease infinite;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* 4. Buttons and Links */
 /*********************************************/
@@ -86,6 +121,53 @@ a.logout {
 	cursor:pointer;
 }
 a.logout:hover { color:#2c97de !important; }
+
+/* 5. Components*/
+/*********************************************/
+#hasSide {
+	height: calc(100vh - 80px);
+	display: grid;
+    grid-template-rows: auto;
+    grid-template-columns:200px 1fr;
+    grid-gap: 0;
+    grid-template-areas: 
+    "sidebar content";
+}
+#sidebar {
+	padding-top:10px;
+	grid-area:sidebar;
+	background:#262626;
+}
+#sidebar ul {
+	list-style:none;
+	padding:0;
+}
+#sidebar ul li a {
+	padding:10px;
+	width:200px;
+	display: block;
+	font-size:15px;
+	line-height:20px;
+}
+#sidebar ul li a span {
+	color:#b2b2b2 !important;
+}
+#sidebar ul li a:hover, #sidebar ul li a.active:hover {
+	background-color:#494747;
+	text-decoration:none;
+}
+#sidebar ul li a.active {
+	background-color:#302f2f;
+}
+#sidebar svg {
+	margin-right:15px;
+	color:#b2b2b2 !important;
+	font-size:20px;
+	line-height:20px;
+}
+#sidebar ul li a.active svg {
+	color:#2c97de !important;
+}
 
 /* 5. Bootstrap overrides*/
 /*********************************************/
@@ -123,8 +205,6 @@ hr { background:#000; }
 	color:#b2b2b2 !important;
 }
 .form-control:focus, .custom-select:focus { 
-	background:#191919 !important;
-	border:solid 1px #FFF !important;
 	box-shadow:none !important;
 }
 .custom-select optgroup {
@@ -173,4 +253,41 @@ ul.nav {
 	border-radius:0 !important;
 	background:#262626 !important;
 	padding:0 !important;
+}
+
+/* 5. Snotife overrides */
+/*********************************************/
+.snotifyToast {
+	border-radius:0 !important;
+}
+.snotify-leftTop, .snotify-centerTop, .snotify-rightTop {
+	top:90px !important;
+}
+.snotifyToast__title {
+	font-weight:normal;
+	text-transform:uppercase;
+	font-size:15px !important;
+}
+.snotifyToast__body {
+	font-size:12px !important;
+}
+.snotifyToast__buttons {
+	border-top:2px solid rgba(0, 0, 0, 0.1);
+}
+.snotify-error .snotifyToast__inner {
+	background-color:#cc3e4a;
+}
+.snotify-error .snotifyToast__buttons {
+	background-color:#cc3e4a;
+}
+.snotify-icon.snotify-icon--error {
+	background-image:url('../assets/_img/styles/sword-break.png');
+	background-size:cover;
+}
+.snotify-succes {
+	background-color:#83b547;
+}
+.snotify-icon.snotify-icon--success {
+	background-image:url('../assets/_img/styles/d20-white.png');
+	background-size:cover;
 }

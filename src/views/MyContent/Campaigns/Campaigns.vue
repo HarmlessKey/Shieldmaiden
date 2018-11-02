@@ -1,76 +1,89 @@
 <template>
+  <div id="hasSide">
+    <Sidebar/>
     <div id="my-content" class="container">
       <h1>My content</h1>
       <p>Welcome to your personal content.</p>
       
       <div class="input-group">
-        <input type="text" class="form-control" :class="{'input': true, 'error': errors.has('newCampaign') }" v-model="newCampaign" v-validate="'min:5|required'" name="newCampaign" placeholder="Add new campaign" />
+        <input type="text" class="form-control" :class="{'input': true, 'error': errors.has('newCampaign') }" v-model="newCampaign" v-validate="'required'" name="newCampaign" placeholder="Add new campaign" />
           <div class="input-group-append">
             <button class="btn" @click="addCampaign()"><i class="fas fa-plus"></i> Add</button>
           </div>        
       </div>
-      <p class="validate bg-red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+      <p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 
       <h2 class="mt-3">My campaigns</h2>
+      <div v-if="loading == true" class="loader"><span>Loading Campaigns...</span></div>
       <ul id="campaigns" class="mt-3">
         <transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
           <li class="bg-gray" v-for="(campaign, index) in campaigns" :key="index">
-            <h2>{{ campaign.campaign }} <a class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
-            <router-link :to="'/my-content/edit-campaign/'+campaign['.key']"> Edit</router-link>
-            <router-link :to="'/my-content/encounters/'+campaign['.key']"> Encounters</router-link>
+            <h2>{{ campaign.campaign }} <a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
+            <router-link :to="'/campaigns/'+campaign['.key']"> Edit</router-link>
+            <router-link :to="'/encounters/'+campaign['.key']"> Encounters</router-link>
             <!-- <router-link :to="{ name: 'EditCampaign', params: {campaign-id: campaign['.key']} }"> Edit</router-link> -->
             <!-- PLAYERS IN CAMPAIGN -->
-            <p v-for="(player, index) in campaign.players" :key="player['.key']">
+            <!-- <p v-for="(player, index) in campaign.players" :key="player['.key']">
               <span v-for="players in getPlayers" v-if="players['.key'] == index">{{ players.character_name }}</span>
-            </p>
+            </p> -->
           </li>
         </transition-group>
       </ul>
     </div>
+  </div>
 </template>
 
 <script>
-import firebase from 'firebase'
+import Sidebar from '@/components/SidebarMyContent.vue'
 import { db } from '@/firebase'
 
 export default {
   name: 'Campaigns',
+  components: {
+    Sidebar,
+  },
   data() {
     return {
+      userId: this.$store.getters.getUser.uid,
       newCampaign: '',
-      userId: firebase.auth().currentUser.uid,
-
+      loading: true,
     }
   },
   firebase() {
     return {
-      campaigns: db.ref('campaigns/'+ this.userId),
-      getPlayers: db.ref('players/'+ this.userId)
+      getPlayers: db.ref('players/' + this.userId),
+      campaigns: {
+        source: db.ref('campaigns/' + this.userId),
+        readyCallback: () => this.loading = false
+      }
     }
   },
   methods: {
     addCampaign() {
       this.$validator.validateAll().then((result) => {
         if (result) {
-          db.ref('campaigns/'+this.userId).push({campaign: this.newCampaign});
+          db.ref('campaigns/' + this.userId).push({campaign: this.newCampaign});
           this.newCampaign = '';
+          this.$snotify.success('Campaign added.', 'Critical hit!', {
+            position: "rightTop"
+          });
         } else {
-          console.log('Not valid');
+          //console.log('Not valid');
         }
       })
     },
     deleteCampaign(key) {
-      this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
-      buttons: [
-          {text: 'Yes', action: (toast) => {db.ref('campaigns/'+this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
-          {text: 'No', action: (toast) => {console.log('Clicked: No'); this.$snotify.remove(toast.id); }, bold: true},        ]
-      });
-      
+        this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
+          buttons: [
+              {text: 'Yes', action: (toast) => {db.ref('campaigns/'+ this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+              {text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+          ]
+        });
     },
-    getPlayer(playerId) {
-      player = db.ref('players/'+this.userId+'/'+playerId)
-      return player
-    }
+    // getPlayer(playerId) {
+    //   player = db.ref('players/' + this.userId + '/' + playerId)
+    //   return player
+    // }
   }
 }
 </script>

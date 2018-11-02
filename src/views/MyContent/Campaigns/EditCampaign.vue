@@ -1,22 +1,29 @@
 <template>
-  <div id="my-content" class="container">
-    <h2>Edit your campaign</h2>
-    <div class="input-group mb-4">
-      <input class="form-control" type="text" v-model="newCampaign.campaign" />
-      <div class="input-group-append">
-        <button class="btn" @click="changeName()">Change Name</button>
+<div id="hasSide">
+    <Sidebar/>
+    <div id="my-content" class="container">
+      <h2>Edit your campaign</h2>
+      <div class="input-group mb-4">
+        <input class="form-control" type="text" v-model="newCampaign.campaign" />
+        <div class="input-group-append">
+          <button class="btn" @click="changeName()">Change Name</button>
+        </div>
       </div>
+      <router-link to="/my-content">Back to campaign overview</router-link>
     </div>
-    <router-link to="/my-content">Back to campaign overview</router-link>
-  </div>
+</div>
 </template>
 
 <script>
+import Sidebar from '@/components/SidebarMyContent.vue'
 import firebase from 'firebase'
 import { db } from '@/firebase'
 
 export default {
   name: 'EditCampaign',
+  components: {
+    Sidebar,
+  },
   firebase() {
     const userId = firebase.auth().currentUser.uid;
 
@@ -42,7 +49,7 @@ export default {
   methods: {
     changeName() {
       this.$firebaseRefs.campaigns.child(this.$route.params.id).set(this.newCampaign);
-      //this.$router.push('/my-content')
+      this.$router.push('/campaigns')
     }
   }
 }

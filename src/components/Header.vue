@@ -5,7 +5,8 @@
         <span class="mr-3">Logo</span>
         <nav>
           <router-link to="/">Home</router-link> |
-          <router-link v-if="user" to="/combat">Combat </router-link>
+          <router-link to="/upcoming">Upcoming</router-link> |
+          <router-link to="/feedback">Feedback</router-link>
         </nav>
       </div>
       <div class="d-flex justify-content-right">
@@ -16,7 +17,7 @@
           </a>
           <div class="dropdown-menu dropdown-menu-right">
             <router-link to="/profile" class="dropdown-item" type="button"><i class="fas fa-user-circle"></i> Profile</router-link>
-            <router-link to="/my-content" class="dropdown-item" type="button"><i class="fas fa-book-dead"></i> My Content</router-link>
+            <router-link to="/campaigns" class="dropdown-item" type="button"><i class="fas fa-book-dead"></i> My Content</router-link>
             <div class="dropdown-divider"></div>
             <button class="dropdown-item" type="button" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
           </div>
@@ -65,7 +66,7 @@ header .dropdown-menu button, header .dropdown-menu a {
   cursor:pointer;
   font-size:15px;
 }
-header .dropdown-menu button:hover, header .dropdown-menu a:hover {
+header .dropdown-menu button:hover, header .dropdown-menu a:hover, header .dropdown-menu button.active, header .dropdown-menu a.active {
   color:#2c97de !important;
   background:none;
 }

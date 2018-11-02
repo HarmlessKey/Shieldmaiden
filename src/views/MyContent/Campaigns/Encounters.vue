@@ -79,12 +79,7 @@ export default {
       newCampaign: {}
     }
   },
-  created() {
-    let campaign = this.campaignsObj[this.$route.params.id]
-    this.newCampaign = {
-       campaign: campaign.campaign
-    }
-  },
+
   methods: {
     addEncounter() {
       const userId = firebase.auth().currentUser.uid;

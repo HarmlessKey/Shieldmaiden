@@ -5,7 +5,10 @@ import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
 import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
 import Encounters from '@/views/MyContent/Campaigns/Encounters.vue';
-import Players from '@/views/MyContent/Players.vue';
+import EditEncounter from '@/views/MyContent/Campaigns/EditEncounter.vue';
+import Players from '@/views/MyContent/Players/Players.vue';
+import AddPlayer from '@/views/MyContent/Players/AddPlayer.vue';
+import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
 import RunEncounter from '@/views/MyContent/RunEncounter.vue';
 
 // This is where you add all your site routes
@@ -29,7 +32,7 @@ export const routes = [{
     component: SignUp
   },
   {
-    path: '/my-content',
+    path: '/campaigns',
     name: 'myContent',
     component: MyContent,
     props: (route) => ({
@@ -40,7 +43,7 @@ export const routes = [{
     }
   },
   {
-    path: '/my-content/edit-campaign/:id',
+    path: '/campaigns/:id',
     name: 'EditCampaign',
     component: EditCampaign,
     props: (route) => ({
@@ -51,7 +54,7 @@ export const routes = [{
     }
   },
   {
-    path: '/my-content/players',
+    path: '/players',
     name: 'Players',
     component: Players,
     meta: {
@@ -59,7 +62,23 @@ export const routes = [{
     }
   },
   {
-    path: '/my-content/encounters/:id',
+    path: '/players/add-player',
+    name: 'AddPlayers',
+    component: AddPlayer,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/players/:id',
+    name: 'EditPlayers',
+    component: EditPlayer,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/encounters/:id',
     name: 'Encounters',
     component: Encounters,
     meta: {
@@ -67,7 +86,15 @@ export const routes = [{
     }
   },
   {
-    path: '/my-content/run-encounter/:id/:id',
+    path: '/encounters/:campid/:encid',
+    name: 'EditEncounter',
+    component: EditEncounter,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/run-encounter/:campid/:encid',
     name: 'RunEncounter',
     component: RunEncounter,
     meta: {

@@ -68,8 +68,8 @@ h3 {
 .bg-yellow { background-color:#cad14b !important; }
 
 .validate {
-	color:#fff;
-	padding:10px;
+	margin-top:5px;
+	font-size:11px;
 }
 .error, .error:focus {
 	border-color:#cc3e4a !important;
@@ -122,6 +122,53 @@ a.logout {
 }
 a.logout:hover { color:#2c97de !important; }
 
+/* 5. Components*/
+/*********************************************/
+#hasSide {
+	height: calc(100vh - 80px);
+	display: grid;
+    grid-template-rows: auto;
+    grid-template-columns:200px 1fr;
+    grid-gap: 0;
+    grid-template-areas: 
+    "sidebar content";
+}
+#sidebar {
+	padding-top:10px;
+	grid-area:sidebar;
+	background:#262626;
+}
+#sidebar ul {
+	list-style:none;
+	padding:0;
+}
+#sidebar ul li a {
+	padding:10px;
+	width:200px;
+	display: block;
+	font-size:15px;
+	line-height:20px;
+}
+#sidebar ul li a span {
+	color:#b2b2b2 !important;
+}
+#sidebar ul li a:hover, #sidebar ul li a.active:hover {
+	background-color:#494747;
+	text-decoration:none;
+}
+#sidebar ul li a.active {
+	background-color:#302f2f;
+}
+#sidebar svg {
+	margin-right:15px;
+	color:#b2b2b2 !important;
+	font-size:20px;
+	line-height:20px;
+}
+#sidebar ul li a.active svg {
+	color:#2c97de !important;
+}
+
 /* 5. Bootstrap overrides*/
 /*********************************************/
 .btn {
@@ -158,8 +205,6 @@ hr { background:#000; }
 	color:#b2b2b2 !important;
 }
 .form-control:focus, .custom-select:focus { 
-	background:#191919 !important;
-	border:solid 1px #FFF !important;
 	box-shadow:none !important;
 }
 .custom-select optgroup {

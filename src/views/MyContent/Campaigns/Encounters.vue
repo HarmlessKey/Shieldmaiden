@@ -1,4 +1,6 @@
 <template>
+  <div id="hasSide">
+    <Sidebar/>
     <div id="my-content" class="container">
       <h1>Encounters</h1>
       <p>Manage the encounters in your campaign.</p>
@@ -9,7 +11,7 @@
             <button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
           </div>        
       </div>
-      <p class="validate bg-red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+      <p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
       <!-- SHOW ENCOUNTERS -->
       <h2 class="mt-3">Encounters</h2>
@@ -24,8 +26,8 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ encounter.encounter }}</td>
                 <td class="text-right">
-                    <router-link class="green" :to="'/my-content/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
-                    <router-link class="mx-2" :to="'/my-content/encounter/'+encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
+                    <router-link class="green" :to="'/encounters/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
+                    <router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
                     <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
                 </td>
             </tr>
@@ -46,7 +48,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ encounter.encounter }}</td>
                 <td class="text-right">
-                    <router-link class="mx-2" :to="'/my-content/encounter-statistics/'+encounter['.key']" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
+                    <router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
                     <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
                 </td>
             </tr>
@@ -54,14 +56,19 @@
       </table>
       <div v-if="loading == true" class="loader"><span>Loading encounters...</span></div>
     </div>
+  </div>
 </template>
 
 <script>
+import Sidebar from '@/components/SidebarMyContent.vue'
 import firebase from 'firebase'
 import { db } from '@/firebase'
 
 export default {
   name: 'EditCampaign',
+  components: {
+    Sidebar,
+  },
   data() {
     return {
         newEncounter: '',

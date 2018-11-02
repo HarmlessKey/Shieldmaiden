@@ -39,6 +39,8 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
   routes: routes,
+  linkActiveClass: "active", // active class for non-exact links.
+  linkExactActiveClass: "exact-active", // active class for *exact* links.
   mode: 'history'
 });
 

@@ -23,7 +23,7 @@
             <input type="text" class="form-control" :class="{'input': true, 'error': errors.has('beyond') }" v-model="beyond" v-validate="'url'" name="beyond" placeholder="DnD Beyond URL" />
             <p class="validate red" v-if="errors.has('beyond')">{{ errors.first('beyond') }}</p>
             
-            <router-link to="/my-content/players" class="btn bg-gray mr-2">Cancel</router-link>
+            <router-link to="/players" class="btn bg-gray mr-2">Cancel</router-link>
             <button class="btn" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
         </div>
     </div>
@@ -61,7 +61,7 @@ export default {
               avatar: "'" + this.avatar + "'",
               beyond: this.beyond
             });
-            this.$router.replace('/my-content/players')
+            this.$router.replace('/players')
         } else {
           //console.log('Not valid');
         }

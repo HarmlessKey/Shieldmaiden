@@ -20,7 +20,7 @@ export default {
     login: function() {
       firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
         (user) => {
-          this.$router.replace('my-content')
+          this.$router.replace('campaigns')
         },
         (err) => {
           console.log('Something went wrong: ' + err.message)
@@ -30,7 +30,7 @@ export default {
   },
   mounted() {
     var uiConfig = {
-      signInSuccessUrl: '/my-content',
+      signInSuccessUrl: '/campaigns',
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebase.auth.EmailAuthProvider.PROVIDER_ID

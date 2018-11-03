@@ -214,8 +214,8 @@ ul.entities li a {
 	padding:15px;
 	position:fixed;
 	right:0;
-	top:0;
-	height:100vh;
+	top:80px;
+	height: calc(100vh - 80px);
 	width:330px;
 	z-index:99;
 	overflow: scroll;

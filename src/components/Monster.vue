@@ -12,29 +12,35 @@
             <b>Hit Points</b> {{ monster.hit_points }} ({{ monster.hit_dice }})<br/>
             <b>Speed</b> {{ monster.speed }}
         </p>
-        <hr>
+        <hr class="mb-4">
         <div class="abilities">
-            <span class="ability str">
+            <span class="ability str" @click="rollAbility('Strength', monster.strength)">
+                <span class="abilityName">STR</span>
                 {{ modifier(monster.strength) }}
                 <span class="score bg-gray">{{ monster.strength }}</span>
             </span>
-            <span class="ability dex">
+            <span class="ability dex" @click="rollAbility('Dexterity', monster.dexterity)">
+                <span class="abilityName">DEX</span>
                 {{ modifier(monster.dexterity) }}
                 <span class="score bg-gray">{{ monster.dexterity }}</span>
             </span>
-            <span class="ability con">
+            <span class="ability con" @click="rollAbility('Constitution', monster.constitution)">
+                <span class="abilityName">CON</span>
                 {{ modifier(monster.constitution) }}
                 <span class="score bg-gray">{{ monster.constitution }}</span>
             </span>
-            <span class="ability int">
+            <span class="ability int" @click="rollAbility('Intelligence', monster.intelligence)">
+                <span class="abilityName">INT</span>
                 {{ modifier(monster.intelligence) }}
                 <span class="score bg-gray">{{ monster.intelligence }}</span>
             </span>
-            <span class="ability wis">
+            <span class="ability wis" @click="rollAbility('Wisdom', monster.wisdom)">
+                <span class="abilityName">WIS</span>
                 {{ modifier(monster.wisdom) }}
                 <span class="score bg-gray">{{ monster.wisdom }}</span>
             </span>
-            <span class="ability cha">
+            <span class="ability cha" @click="rollAbility('Charisma', monster.charisma)">
+                <span class="abilityName">CHA</span>
                 {{ modifier(monster.charisma) }}
                 <span class="score bg-gray">{{ monster.charisma }}</span>
             </span>
@@ -46,8 +52,12 @@
             <b>Skills</b>
             <span v-if="monster.perception"> Perception +{{ monster.perception }},</span>
             <span v-if="monster.stealth"> Stealth +{{ monster.stealth }}</span>
+            <br/>
+            <b>Senses</b> {{ monster.senses }}<br/>
+            <b>Languages</b> {{ monster.languages }}<br/>
+            <b>Challenge Rating</b> {{ monster.challenge_rating }}<br/>
         </p>
-
+        <hr>
         <div class="mb-3" v-for="(ability, index) in monster.special_abilities" :key="index">
             <a data-toggle="collapse" v-bind:href="'#ability-'+index" role="button" aria-expanded="false">{{ ability.name }} <i class="fas fa-caret-down"></i></a>
             <p class="collapse" v-bind:id="'ability-'+index">{{ ability.desc }}</p>
@@ -76,6 +86,15 @@ export default {
             else {
                 return mod
             }
+        },
+        rollAbility(ability, score) {
+            var mod = parseInt(Math.floor((score - 10) / 2));
+            var roll = (Math.floor(Math.random() * 20) + 1);
+            var total = roll + mod;
+            
+            this.$snotify.success(ability + ' roll.', roll + ' + ' + mod + ' = ' + total, {
+            position: "centerTop"
+            });
         }
     }
 };
@@ -100,6 +119,7 @@ h2 {
 	text-align:center;
     font-size:20px;
     position:relative;
+    cursor:pointer;
 }
 .ability .score {
     position: absolute;
@@ -112,5 +132,13 @@ h2 {
     border-radius: 15px / 10px;
     height:20px;
     width:30px;
+}
+.ability .abilityName {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size:12px;
+    text-align: center;
 }
 </style>

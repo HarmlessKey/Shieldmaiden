@@ -12,6 +12,7 @@
 /* 1. Defaults */
 /*********************************************/
 body {
+	padding-top:80px;
 	background:#191919 !important;
     color:#b2b2b2 !important;
 	font-size:12px !important;
@@ -32,6 +33,9 @@ header {
 	width:100%;
 	background:#000;
 	border-bottom:solid 1px #b2b2b2;
+	position:fixed !important;
+	top:0;
+	z-index:999;
 }
 
 

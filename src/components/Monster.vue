@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pb-5">
        <h2>{{ monster.name }}</h2>
         <i>
             {{ monster.size }} {{ monster.type }}

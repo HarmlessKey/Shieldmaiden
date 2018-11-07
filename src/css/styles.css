@@ -129,18 +129,17 @@ a.logout:hover { color:#2c97de !important; }
 /* 5. Components*/
 /*********************************************/
 #hasSide {
-	height: calc(100vh - 80px);
-	display: grid;
-    grid-template-rows: auto;
-    grid-template-columns:200px 1fr;
-    grid-gap: 0;
-    grid-template-areas: 
-    "sidebar content";
+	padding-left:200px;
 }
 #sidebar {
+	width:200px;
+	position:fixed;
+	left:0;
+	top:80px;
+	height: calc(100vh - 80px);
 	padding-top:10px;
-	grid-area:sidebar;
 	background:#262626;
+	overflow: scroll;
 }
 #sidebar ul {
 	list-style:none;

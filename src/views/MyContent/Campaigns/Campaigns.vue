@@ -18,14 +18,15 @@
       <ul id="campaigns" class="mt-3">
         <transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
           <li class="bg-gray" v-for="(campaign, index) in campaigns" :key="index">
-            <h2>{{ campaign.campaign }} <a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
+            <h2>{{ index + 1 }}. {{ campaign.campaign }} <a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
             <router-link :to="'/campaigns/'+campaign['.key']"> Edit</router-link>
             <router-link :to="'/encounters/'+campaign['.key']"> Encounters</router-link>
-            <!-- <router-link :to="{ name: 'EditCampaign', params: {campaign-id: campaign['.key']} }"> Edit</router-link> -->
+
             <!-- PLAYERS IN CAMPAIGN -->
-            <!-- <p v-for="(player, index) in campaign.players" :key="player['.key']">
-              <span v-for="players in getPlayers" v-if="players['.key'] == index">{{ players.character_name }}</span>
-            </p> -->
+            <h2 class="players">Players</h2>
+            <div class="d-flex justify-content-center">
+              <span v-for="player in campaign.players" :key="player['.key']" v-b-tooltip.hover :title="getPlayer(player.player).character_name" class="img" :style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }"></span>
+            </div>
           </li>
         </transition-group>
       </ul>
@@ -51,7 +52,7 @@ export default {
   },
   firebase() {
     return {
-      getPlayers: db.ref('players/' + this.userId),
+      players: db.ref('players/' + this.userId),
       campaigns: {
         source: db.ref('campaigns/' + this.userId),
         readyCallback: () => this.loading = false
@@ -80,10 +81,12 @@ export default {
           ]
         });
     },
-    // getPlayer(playerId) {
-    //   player = db.ref('players/' + this.userId + '/' + playerId)
-    //   return player
-    // }
+    getPlayer(participantKey) {
+      var player = this.players.find(function(element) {
+        return element['.key'] == participantKey
+      });
+      return player
+		}
   }
 }
 </script>
@@ -102,5 +105,20 @@ ul#campaigns li {
 }
 a {
   cursor:pointer;
+}
+.img {
+		width: 50px;
+		height: 50px;
+		display: block;
+		background-size: cover;
+		background-position: top center;
+		border: solid 1px #b2b2b2;
+		background-color: #000;
+    margin-right: 10px;
+    margin:2px;
+}
+h2.players {
+  margin-bottom: 5px !important;
+  text-align: center;
 }
 </style>

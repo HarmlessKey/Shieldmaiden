@@ -26,7 +26,7 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ encounter.encounter }}</td>
                 <td class="text-right">
-                    <router-link class="green" :to="'/encounters/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
+                    <router-link class="green" :to="'/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
                     <router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
                     <a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
                 </td>

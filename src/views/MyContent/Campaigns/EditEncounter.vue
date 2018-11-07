@@ -21,10 +21,14 @@
 						<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 								<div v-if="loading == true" class="loader"><span>Loading Players...</span></div>
 								<ul class="entities">
-										<li v-for="player in players" :key="player['.key']" class="d-flex justify-content-between">
-												<span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
-												{{ player.character_name }}
-												<a class="green" v-b-tooltip.hover title="Add Character" @click="add(player['.key'], 'player', player.character_name)"><i class="fas fa-plus-circle"></i></a>
+										<li v-for="player in campaignPlayers" :key="player['.key']" class="d-flex justify-content-between" :class="{ 'faded' : checkParticipant(player.player) }">
+												<div class="d-flex justify-content-left">
+													<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }"></span>
+													{{ getPlayer(player.player).character_name }}
+												</div>
+												
+												<a v-if="!checkParticipant(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', getPlayer(player.player).character_name)"><i class="fas fa-plus-circle"></i></a>
+												<span v-else>Added</span>
 										</li>
 								</ul>
 						</div>
@@ -36,10 +40,13 @@
 								</div>
 							</div>
 							<ul class="entities">
+								<p v-if="noResult" class="red">{{ noResult }}</p>
 								<li v-for="monster in searchResults" class="d-flex justify-content-between">
-									<a @click="showMonster(monster)"><i class="fas fa-info-circle"></i></a>
-									{{ monster.name }}
-									<a class="green" v-b-tooltip.hover title="Add Character" @click="add(monster._id, 'monster', monster.name)"><i class="fas fa-plus-circle"></i></a>
+									<div class="d-flex justify-content-left">
+										<a @click="showMonster(monster)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+										{{ monster.name }}
+									</div>
+									<a class="green" v-b-tooltip.hover title="Add Monster" @click="add(monster._id, 'monster', monster.name)"><i class="fas fa-plus-circle"></i></a>
 								</li>
 							</ul>
 						</div>
@@ -50,9 +57,11 @@
 					<div v-if="loadingParticipants == true" class="loader"><span>Loading Participants...</span></div>
 					<ul class="entities">
 						<li v-for="participant in participants" :key="participant['.key']" class="d-flex justify-content-between">
-							<span v-if="participant.type == 'player'" class="img" :style="{ backgroundImage: 'url(' + getPlayer(participant).avatar + ')' }"></span>
-							<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
-							{{ participant.name }}
+							<div class="d-flex justify-content-left">
+								<span v-if="participant.type == 'player'" class="img" :style="{ backgroundImage: 'url(' + getPlayer(participant.participant).avatar + ')' }"></span>
+								<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
+								{{ participant.name }}
+							</div>
 							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(participant['.key'], participant.name)"><i class="fas fa-minus-circle"></i></a>
 						</li>
 					</ul>
@@ -89,6 +98,7 @@ export default {
 				loadingParticipants: true,
 				search: '',
 				searchResults: [],
+				noResult: '',
 				monsters: [],
 				auto_monsters: [],
 				viewMonster: [],
@@ -105,6 +115,10 @@ export default {
 			players: {
 				source: db.ref('players/' + this.userId),
 				readyCallback: () => this.loading = false
+			},
+			campaignPlayers: {
+				source: db.ref('campaigns/' + this.userId + '/' + this.campaignId + '/players'),
+				readyCallback: () => this.loadingCampPlayers = false
 			},
 			participants: {
 				source: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants').orderByChild('name'),
@@ -135,8 +149,12 @@ export default {
 				var m = this.monsters[i]
 				if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
 					axios.get(m.url).then(response => {
+						this.noResult = ''
 						this.searchResults.push(response.data)
 					})
+				}
+				if(this.searchResults == '') {
+					this.noResult = 'No results for "' + this.search + '"';
 				}
 			}
 		},
@@ -148,15 +166,17 @@ export default {
 		hideSide() {
 			this.showSide = false;
 		},
-		getPlayer(participant) {
-			if (participant.type == 'player') {
-				var player = this.players.find(function(element) {
-					return element['.key'] == participant.participant
-				});
-				// console.log(player)
-				return player
-			} 
-			return false
+		getPlayer(participantKey) {
+			var player = this.players.find(function(element) {
+				return element['.key'] == participantKey
+			});
+			return player
+		},
+		checkParticipant(playerKey) {
+			var participant = this.participants.find(function(element) {
+				return element.participant == playerKey
+			});
+			return participant
 		}
 	}
 }
@@ -199,13 +219,14 @@ ul.entities li {
 		margin-bottom:5px;
 }
 ul.entities .img {
-		width:30px;
-		height:30px;
-		display:block;
-		background-size:cover;
-		background-position:top center;
-		border:solid 1px #b2b2b2;
-		background-color:#000;
+		width: 30px;
+		height: 30px;
+		display: block;
+		background-size: cover;
+		background-position: top center;
+		border: solid 1px #b2b2b2;
+		background-color: #000;
+		margin-right: 10px;
 }
 ul.entities li a {
 		font-size:18px;
@@ -229,5 +250,8 @@ ul.entities li a {
 
 .slideOutRight {
 	transition-duration: 0.1s;
+}
+.faded {
+	opacity: .3;
 }
 </style>

@@ -1,5 +1,7 @@
 <template>
   <div>
+    {{ newEncounter.round }}
+    {{encounters}}
     <Turns />
     <div id="combat">
       <Current />
@@ -16,6 +18,8 @@ import Turns from '@/components/combat/Turns.vue'
 import Current from '@/components/combat/Current.vue'
 import Targets from '@/components/combat/Targets.vue'
 import Side from '@/components/combat/Side.vue'
+import firebase from 'firebase'
+import { db } from '@/firebase'
 
 export default {
   name: 'app',
@@ -26,31 +30,28 @@ export default {
     Targets,
     Side,
   },
-  firebase() {
-    const userId = firebase.auth().currentUser.uid;
-    const campaignId = this.$route.params.id
-    const encounterId = this.$route.params.id.id
-
+  data() {
     return {
-      encounters: db.ref('encounters/'+userId),
-      cencountersObj: {
-        source: db.ref('encounters/'+userId),
+      newEncounter: '',
+      userId: firebase.auth().currentUser.uid,
+      campaignId: this.$route.params.campid,
+      encounterId: this.$route.params.encid,
+      newEncounter: {}
+    }
+  },
+  firebase() {
+    return {
+      encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
+      encountersObj: {
+        source: db.ref('encounters/' + this.userId + '/' + this.campaignId),
         asObject: true
       }
     }
   },
-  data() {
-    return {
-        newEncounter: '',
-        encounterId: this.$route.params.id.id,
-      newEncounter: {}
-    }
-  },
   created() {
-    let encounter = this.encountersObj[this.$route.params.id.id]
-    this.newEncounter = {
-       encounter: encounter.encounter
-    }
+    console.log(this.encounters)
+    let encounter = this.encountersObj[this.encounterId]
+    this.newEncounter = encounter
   },
 }
 </script>

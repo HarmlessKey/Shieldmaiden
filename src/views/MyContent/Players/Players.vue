@@ -14,7 +14,7 @@
               <div class="info">
                   <h3>{{ player.character_name }}</h3>
                   <p>AC: {{ player.ac }} | HP: {{ player.maxhp }}</p>
-                  <router-link :to="'/players/'+player['.key']"></i> Edit</router-link>
+                  <router-link :to="'/players/'+player['.key']">Edit</router-link>
               </div>
               <a class="red" v-b-tooltip.hover title="Delete" @click="deletePlayer(player['.key'], player.character_name)"><i class="fas fa-trash-alt"></i></a>
           </div>

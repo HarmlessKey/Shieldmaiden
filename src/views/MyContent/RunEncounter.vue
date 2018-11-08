@@ -1,13 +1,21 @@
 <template>
   <div>
-    {{ newEncounter.round }}
-    {{encounters}}
-    <Turns />
-    <div id="combat">
-      <Current />
-      <Targets />
-      <Actions />
-      <Side />
+    <div class="container" v-if="encountersObj[encounterId].round == 0">
+      <h2>Set Initiative</h2>
+      <ul>
+        <li v-for="player in participants">
+          {{ player.name }}
+        </li>
+      </ul>
+    </div>
+    <div v-else>
+      <Turns :round="encountersObj[encounterId].round"/>
+      <div id="combat">
+        <Current />
+        <Targets />
+        <Actions />
+        <Side />
+      </div>
     </div>
   </div>
 </template>
@@ -30,29 +38,35 @@ export default {
     Targets,
     Side,
   },
-  data() {
-    return {
-      newEncounter: '',
-      userId: firebase.auth().currentUser.uid,
-      campaignId: this.$route.params.campid,
-      encounterId: this.$route.params.encid,
-      newEncounter: {}
-    }
-  },
   firebase() {
     return {
       encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
+      participants: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants'),
       encountersObj: {
         source: db.ref('encounters/' + this.userId + '/' + this.campaignId),
         asObject: true
       }
     }
   },
-  created() {
-    console.log(this.encounters)
-    let encounter = this.encountersObj[this.encounterId]
-    this.newEncounter = encounter
+  data() {
+    return {
+      userId: firebase.auth().currentUser.uid,
+      campaignId: this.$route.params.campid,
+      encounterId: this.$route.params.encid,
+    }
   },
+  created() {
+    // let encounter = this.encountersObj[this.encounterId];
+    // this.newEncounter = encounter
+  },
+  methods: {
+    setAll() {
+
+    },
+    setInitiative() {
+      
+    }
+  }
 }
 </script>
 

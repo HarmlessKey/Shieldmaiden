@@ -16,11 +16,14 @@
 $gray: #262626;
 $gray-dark: #191919;
 $gray-light: #b2b2b2;
+$gray-hover: #494747;
+$gray-active: #302f2f;
 $black: #000;
 $white: #FFF;
 $green: #83b547;
 $green-hover: #6e993b;
 $blue: #2c97de;
+$blue-hover: #247db7;
 $red: #cc3e4a;
 $red-hover: #a3303a;
 $orange: #e76d3b;
@@ -175,11 +178,11 @@ a.logout {
                 line-height:20px;
                 
                 &:hover, &.active:hover {
-                    background-color:#494747;
+                    background-color:$gray-hover;
 	                text-decoration:none;
                 }
                 &.active {
-                    background-color:#302f2f;
+                    background-color:$gray-active;
 
                     svg {
                         color:$blue !important;
@@ -187,11 +190,11 @@ a.logout {
                 }
 
                 span {
-                    color:#b2b2b2 !important;
+                    color:$gray-light !important;
                 }
                 svg {
                     margin-right:15px;
-                    color:#b2b2b2 !important;
+                    color:$gray-light !important;
                     font-size:20px;
                     line-height:20px;
                 }
@@ -211,14 +214,17 @@ a.logout {
         box-shadow:none;
     }
     &.disabled {
-        cursor:not-allowed !important;
-        opacity:.3;
-        color:$white !important;
-    }
+        cursor: not-allowed !important;
+        opacity: .3;
+        color: $white !important;
+	}
+	&:hover {
+		background-color: $blue-hover;
+	}
 }
 a {
-	color:$blue !important;
-	cursor:pointer !important;
+	color: $blue !important;
+	cursor: pointer !important;
 }
 .progress {
 	border-radius:0 !important;
@@ -249,7 +255,7 @@ hr { background:$black; }
         box-shadow:none !important;
     }
     optgroup {
-        background:#000 !important;
+        background:$black !important;
     }
 }
 .custom-checkbox .custom-control-label::before {

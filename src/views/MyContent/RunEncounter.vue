@@ -1,6 +1,6 @@
 <template>
   <div v-if="encounterId in encountersObj">
-    <div class="container" v-if="encountersObj[encounterId].round == 0">
+    <div v-if="encountersObj[encounterId].round == 0">
       <SetInitiative :participants="encountersObj[encounterId].participants" />
     </div>
     <div v-else>

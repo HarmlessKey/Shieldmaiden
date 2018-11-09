@@ -1,12 +1,7 @@
 <template>
   <div v-if="encounterId in encountersObj">
     <div class="container" v-if="encountersObj[encounterId].round == 0">
-      <h2>Set Initiative</h2>
-      <ul>
-        <li v-for="player in participants">
-          {{ player.name }}
-        </li>
-      </ul>
+      <SetInitiative :participants="encountersObj[encounterId].participants" />
     </div>
     <div v-else>
       <Turns :round="encountersObj[encounterId].round"/>
@@ -26,6 +21,7 @@ import Turns from '@/components/combat/Turns.vue'
 import Current from '@/components/combat/Current.vue'
 import Targets from '@/components/combat/Targets.vue'
 import Side from '@/components/combat/Side.vue'
+import SetInitiative from '@/components/combat/SetInitiative.vue'
 import firebase from 'firebase'
 import { db } from '@/firebase'
 
@@ -37,6 +33,7 @@ export default {
     Current,
     Targets,
     Side,
+    SetInitiative,
   },
   firebase() {
     console.log('FIREBASE')
@@ -55,8 +52,6 @@ export default {
       userId: firebase.auth().currentUser.uid,
       campaignId: this.$route.params.campid,
       encounterId: this.$route.params.encid,
-      newEncounter: null
-      
     }
   },
   created() {

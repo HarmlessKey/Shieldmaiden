@@ -82,7 +82,7 @@ export default {
         });
     },
     getPlayer(participantKey) {
-      var player = this.players.find(function(element) {
+      let player = this.players.find(function(element) {
         return element['.key'] == participantKey
       });
       return player

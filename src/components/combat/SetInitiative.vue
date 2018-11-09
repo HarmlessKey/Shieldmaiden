@@ -3,20 +3,24 @@
 		<div class="players bg-gray">
 			<h2>Players</h2>
 			<ul>
-				<li class="d-flex justify-content-between" v-for="entity, key in players" @click="setInitiative(key, entity, 10)">
+				<li class="d-flex justify-content-between" v-for="entity, key in players">
 					<div class="d-flex justify-content-left">
-						<span :class="[entity.initiative != 0 ? 'green' : 'black' ]"><i class="fas fa-check"></i></span>
+						<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 						<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.participant).avatar + ')' }"></span>
 						{{ entity.name }}
 					</div>
-					<input type="text" class="form-control" />
+					<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
 				</li>
 			</ul>
 		</div>
 		<div class="monsters bg-gray">
 			<h2>Monsters</h2>
 			<ul>
-				<li v-for="entity, key in monsters" @click="setInitiative(key, entity, 10)">{{ entity.name }}</li>
+				<li v-for="entity, key in monsters">
+					<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
+					{{ entity.name }}
+					<a @click="setInitiative(key, entity)">Roll</a>
+				</li>
 			</ul>
 			<a class="btn btn-block"><i class="fas fa-dice-d20"></i> Roll all</a>
 		</div>
@@ -24,7 +28,7 @@
 		<div class="set bg-gray">
 			<h2>Turn order</h2>
 			<ul>
-				<li v-for="entity, key in initiatives">{{ entity.initiative }} {{ entity.name }}</li>
+				<li v-for="entity, key in initiatives" v-if="entity.initiative != 0">{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
 			<a class="btn btn-block disabled">Start encounter</a>
 		</div>
@@ -74,8 +78,8 @@ export default {
     	players: playersObj,
     	monsters: monstersObj,
     	userId: firebase.auth().currentUser.uid,
-      campaignId: this.$route.params.campid,
-      encounterId: this.$route.params.encid,
+      	campaignId: this.$route.params.campid,
+		encounterId: this.$route.params.encid,
     }
   },
   methods: {
@@ -93,29 +97,25 @@ export default {
   		let dexMod = Math.floor((dex - 10) / 2)
 			return this.rollD20() + dexMod
   	},
-  	async setInitiative(key, entity, val) {
-  		var initiative = val
+  	async setInitiative(key, entity) {
   		if (entity.type == 'monster') {
-  			initiative = await this.rollMonster(entity)
-  		}
-
+			var initiative = await this.rollMonster(entity)
 			entity.initiative = initiative
-			entity.order = 1
-			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants/' + key).set({
-        name: entity.name,
-        participant: entity.participant,
-        type: entity.type,
-        initiative: initiative,
+		}
+		entity.order = 1
+		db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants/' + key).update({
+        initiative: entity.initiative,
         order: entity.order,
       })
   		this.initiatives[key] = entity
   	},
-	  getPlayer(participantKey) {
-			var player = this.allPlayers.find(function(element) {
-				return element['.key'] == participantKey
-			});
-			return player
-		}
+	getPlayer(participantKey) {
+		console.log(participantKey)
+		var player = this.allPlayers.find(function(element) {
+			return element['.key'] == participantKey
+		});
+		return player
+	}
   }
 }
 </script>

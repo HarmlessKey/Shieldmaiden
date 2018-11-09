@@ -12,14 +12,14 @@
       <div class="d-flex justify-content-right">
         <a class="roll-dice" href="#"><i class="fas fa-dice-d20"></i></a>
         <div v-if="user">
-          <a type="button" class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-user"></i>
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <router-link to="/profile" class="dropdown-item" type="button"><i class="fas fa-user-circle"></i> Profile</router-link>
-            <router-link to="/campaigns" class="dropdown-item" type="button"><i class="fas fa-book-dead"></i> My Content</router-link>
+            <router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
+            <router-link to="/campaigns" class="dropdown-item"><i class="fas fa-book-dead"></i> My Content</router-link>
             <div class="dropdown-divider"></div>
-            <button class="dropdown-item" type="button" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            <button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
           </div>
         </div>
       </div>

@@ -108,7 +108,6 @@ export default {
 	mounted() {
 		axios.get("http://www.dnd5eapi.co/api/monsters/")
 				.then(response => {this.monsters = response.data.results})
-
 	},
 	firebase() {
 		return {

@@ -29,6 +29,6 @@ export default {
 };
 </script>
 
-<style lang="css" src="./css/styles.css">
+<style lang="scss" src="./css/styles.scss">
 
 </style>

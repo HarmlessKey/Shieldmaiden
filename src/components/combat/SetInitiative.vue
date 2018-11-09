@@ -88,11 +88,13 @@ export default {
   		let monster = await this.getMonster(entity.participant)
   		let dex = monster.dexterity
   		let dexMod = Math.floor((dex - 10) / 2)
-  		console.log(dexMod)
 			return this.rollD20() + dexMod
   	},
   	async setInitiative(key, entity, val) {
-  		var initiative = await this.rollMonster(entity)
+  		var initiative = val
+  		if (entity.type == 'monster') {
+  			initiative = await this.rollMonster(entity)
+  		}
 
 			entity.initiative = initiative
 			entity.order = 1
@@ -105,18 +107,12 @@ export default {
       })
   		this.initiatives[key] = entity
   	},
-  	test() {
-  		for (var key in this.participants) {
-  			this.participants[key].initiative = Math.ceil(Math.random() * 20);
-  			console.log(this.participants[key].initiative)
-  		}
-	  },
 	  getPlayer(participantKey) {
-		var player = this.allPlayers.find(function(element) {
-			return element['.key'] == participantKey
-		});
-		return player
-	}
+			var player = this.allPlayers.find(function(element) {
+				return element['.key'] == participantKey
+			});
+			return player
+		}
   }
 }
 </script>

@@ -105,18 +105,12 @@ export default {
       })
   		this.initiatives[key] = entity
   	},
-  	test() {
-  		for (var key in this.participants) {
-  			this.participants[key].initiative = Math.ceil(Math.random() * 20);
-  			console.log(this.participants[key].initiative)
-  		}
-	  },
 	  getPlayer(participantKey) {
-		var player = this.allPlayers.find(function(element) {
-			return element['.key'] == participantKey
-		});
-		return player
-	}
+			var player = this.allPlayers.find(function(element) {
+				return element['.key'] == participantKey
+			});
+			return player
+		}
   }
 }
 </script>

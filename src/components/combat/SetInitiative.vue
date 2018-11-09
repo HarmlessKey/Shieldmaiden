@@ -36,18 +36,24 @@ import firebase from 'firebase'
 import axios from 'axios'
 import { db } from '@/firebase'
 
+import { test_mixin } from '@/mixins/mixin.js'
+
+// import myMixin from '@components/mixins.vue'
+
 export default {
 
   name: 'SetInitiative',
   props: [
   	'participants'
   ],
+  mixins: [test_mixin],
   firebase() {
     return {
       allPlayers: db.ref('players/' + this.userId)
     }
   },
   data () {
+  	this.test()
   	var playersObj = {}
   	var monstersObj = {}
   	var initiativesObj = {}
@@ -71,9 +77,6 @@ export default {
       campaignId: this.$route.params.campid,
       encounterId: this.$route.params.encid,
     }
-  },
-  created() {
-  	console.log("CREATED")
   },
   methods: {
   	rollD20() {

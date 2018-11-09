@@ -36,7 +36,6 @@ export default {
     SetInitiative,
   },
   firebase() {
-    console.log('FIREBASE')
     return {
       participants: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants'),
       encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
@@ -47,26 +46,14 @@ export default {
     }
   },
   data() {
-    console.log("DATA")
     return {
       userId: firebase.auth().currentUser.uid,
       campaignId: this.$route.params.campid,
       encounterId: this.$route.params.encid,
     }
   },
-  created() {
-    console.log("CREATED")
-  },
   methods: {
-    setMonsters() {
-      // for monster in monsters
-    },
-    setPlayers() {
-
-    },
-    setInitiative(entity, value) {
-      
-    },
+    
   }
 }
 </script>

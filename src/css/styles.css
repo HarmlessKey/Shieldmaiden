@@ -139,7 +139,6 @@ a.logout:hover { color:#2c97de !important; }
 	height: calc(100vh - 80px);
 	padding-top:10px;
 	background:#262626;
-	overflow: scroll;
 }
 #sidebar ul {
 	list-style:none;

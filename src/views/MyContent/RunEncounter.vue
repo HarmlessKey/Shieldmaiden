@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="encounterId in encountersObj">
     <div class="container" v-if="encountersObj[encounterId].round == 0">
       <h2>Set Initiative</h2>
       <ul>
@@ -39,9 +39,10 @@ export default {
     Side,
   },
   firebase() {
+    console.log('FIREBASE')
     return {
-      encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
       participants: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants'),
+      encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
       encountersObj: {
         source: db.ref('encounters/' + this.userId + '/' + this.campaignId),
         asObject: true
@@ -49,23 +50,28 @@ export default {
     }
   },
   data() {
+    console.log("DATA")
     return {
       userId: firebase.auth().currentUser.uid,
       campaignId: this.$route.params.campid,
       encounterId: this.$route.params.encid,
+      newEncounter: null
+      
     }
   },
   created() {
-    // let encounter = this.encountersObj[this.encounterId];
-    // this.newEncounter = encounter
+    console.log("CREATED")
   },
   methods: {
-    setAll() {
+    setMonsters() {
+      // for monster in monsters
+    },
+    setPlayers() {
 
     },
-    setInitiative() {
+    setInitiative(entity, value) {
       
-    }
+    },
   }
 }
 </script>

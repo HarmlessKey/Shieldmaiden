@@ -46,7 +46,7 @@
 										<a @click="showMonster(monster)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 										{{ monster.name }}
 									</div>
-									<a class="green" v-b-tooltip.hover title="Add Monster" @click="add(monster._id, 'monster', monster.name)"><i class="fas fa-plus-circle"></i></a>
+									<a class="green" v-b-tooltip.hover title="Add Monster" @click="add(monster.index, 'monster', monster.name)"><i class="fas fa-plus-circle"></i></a>
 								</li>
 							</ul>
 						</div>
@@ -131,7 +131,8 @@ export default {
 			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants').push({
 				participant: id,
 				name: name,
-				type: type
+				type: type,
+				initiative: 0
 			});
 			this.$snotify.success(name + ' added.', 'Critical hit!', {
 					position: "rightTop"
@@ -239,7 +240,7 @@ ul.entities li a {
 	height: calc(100vh - 80px);
 	width:330px;
 	z-index:99;
-	overflow: scroll;
+	overflow: auto;
 	border-left:solid 1px #000;
 	box-shadow: 0 10px 8px #000;
 }

@@ -4,7 +4,6 @@ export const dice = {
 	},
 	methods: {
 		rollD(d=20,n=1,m=0) {
-			n=3
 			const add = (a, b) => a + b
 			let throws = []
 			for (var i=0; i < n; i++) {

@@ -7,7 +7,7 @@
 					<li class="d-flex justify-content-between" v-for="entity, key in players">
 						<div class="d-flex justify-content-left">
 							<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.participant).avatar + ')' }"></span>
+								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
 							{{ entity.name }}
 						</div>
 						<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
@@ -18,14 +18,14 @@
 				<div class="loader"><span>Loading Players...</span></div>
 			</template>
 		</div>
-		<div class="monsters bg-gray">
-			<h2>Monsters</h2>
+		<div class="npcs bg-gray">
+			<h2>NPC's</h2>
 			<ul>
-				<li class="d-flex justify-content-between" v-for="entity, key in monsters">
+				<li class="d-flex justify-content-between" v-for="entity, key in npcs">
 					<div class="d-flex justify-content-left">
 						<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 						{{ entity.name }}
-						<a class="ml-3" @click="setInitiative(key, entity)" v-b-tooltip.hover :title="'1d20+'+entity.dexMod"><i class="fas fa-dice-d20"></i></a>
+						<a class="ml-3" @click="setInitiative(key, entity)" v-b-tooltip.hover :title="'1d20+'+this.calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
 					</div>
 					<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
 				</li>
@@ -54,7 +54,7 @@ export default {
 
   name: 'SetInitiative',
   props: [
-  	'participants'
+  	'entities'
   ],
   mixins: [dice],
   firebase() {
@@ -65,18 +65,16 @@ export default {
   },
   data () {
   	console.log('data')
-  	// test mixin
-  	// this.test()
   	var playersObj = {}
-  	var monstersObj = {}
+  	var npcsObj = {}
   	var initiativesObj = {}
-  	for (let key in this.participants) {
-  		let entity = this.participants[key]
+  	for (let key in this.entities) {
+  		let entity = this.entities[key]
   		if (entity.type == "player") {
   			playersObj[key] = entity
   		}
-  		else if (entity.type == "monster") {
-  			monstersObj[key] = entity
+  		else if (entity.type == "npc") {
+  			npcsObj[key] = entity
   		}
   		if (entity.initiative != 0) {
   			initiativesObj[key] = entity
@@ -85,7 +83,7 @@ export default {
     return {
     	initiatives: initiativesObj,
     	players: playersObj,
-    	monsters: monstersObj,
+    	npcs: npcsObj,
     	userId: firebase.auth().currentUser.uid,
       	campaignId: this.$route.params.campid,
 		encounterId: this.$route.params.encid,
@@ -98,39 +96,22 @@ export default {
   	console.log('mounted')
   },
   methods: {
-  	calculateModifier(val) {
+  	calcMod(val) {
   		return Math.floor((val - 10) / 2)
   	},
-  	async getMonster(id) {
-			const monster = await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
-				.then(response => { return response.data });
-			return monster
-  	},
-  	async rollMonster(entity) {
-  		let monster = await this.getMonster(entity.participant)
-  		let dex = monster.dexterity
-  		let dexMod = this.calculateModifier(dex)
-  		entity.dexMod = dexMod
-			return this.rollD20(1,dexMod)
-  	},
-  	async setInitiative(key, entity) {
-  		if (entity.type == 'monster') {
-			var initiative = await this.rollMonster(entity)
-			entity.initiative = initiative
-		}
-		entity.order = 1
-		db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants/' + key).update({
+  	setInitiative(key, entity) {
+			entity.initiative = rollD(20,1,calcMod(entity.dex))
+			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
         initiative: parseInt(entity.initiative),
-        order: entity.order,
       })
   		this.initiatives[key] = entity
-  	},
-	getPlayer(participantKey) {
-		var player = this.allPlayers.find(function(element) {
-			return element['.key'] == participantKey
-		});
-		return player
-	}
+	  },
+		getPlayer(entityKey) {
+			var player = this.allPlayers.find(function(element) {
+				return element['.key'] == entityKey
+			});
+			return player
+		}
   }
 }
 </script>
@@ -145,16 +126,16 @@ export default {
 	grid-template-rows: 1fr;
 	grid-gap: 10px;
 	grid-template-areas: 
-		"players monsters set";
+		"players npcs set";
 	
-	.players, .monsters, .set {
+	.players, .npcs, .set {
 		padding:15px 10px;
 	}
 	.players {
 		grid-area: players;
 	}
-	.monsters {
-		grid-area: monsters;
+	.npcs {
+		grid-area: npcs;
 	}
 	.set {
 		grid-area: set;

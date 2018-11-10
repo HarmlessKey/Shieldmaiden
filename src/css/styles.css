@@ -1,26 +1,26 @@
 @import "https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css";
 @import "~vue-snotify/styles/material.css";
 /* 
-	Table of content
-	1. Defaults
-	2. Headings
-	3. Classes
-	4. Links
-	5. Bootstrap overrides
+Table of content
+1. Defaults
+2. Headings
+3. Classes
+4. Links
+5. Bootstrap overrides
 
- */
+*/
 /* 1. Defaults */
 /*********************************************/
 body {
 	padding-top:80px;
 	background:#191919 !important;
-		color:#b2b2b2 !important;
+	color:#b2b2b2 !important;
 	font-size:12px !important;
 }
 .view {
-		padding: 5px;
-		height: calc(100vh - 100px);
-		/*width: 100vw;*/
+	padding: 5px;
+	height: calc(100vh - 100px);
+	/*width: 100vw;*/
 }
 .container-fluid {
 	padding:0 !important;
@@ -44,12 +44,12 @@ header {
 h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }
 h1 {
 	text-transform:uppercase;
-		font-size:15px !important;
+	font-size:15px !important;
 }
 h2 {
 	text-transform:uppercase;
 	font-size:15px !important;
-		margin-bottom:20px !important;
+	margin-bottom:20px !important;
 }
 h3 {
 	font-size:15px !important;
@@ -110,8 +110,8 @@ h3 {
 }
 
 @keyframes spinner {
-		0% { transform: rotate(0deg); }
-		100% { transform: rotate(360deg); }
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
 }
 
 /* 4. Buttons and Links */
@@ -223,8 +223,8 @@ ul.nav {
 	border-radius:0 !important;
 }
 .nav-link.active {
-		color:#b2b2b2 !important;
-		background-color:#262626 !important;
+	color:#b2b2b2 !important;
+	background-color:#262626 !important;
 }
 .btn.disabled {
 	cursor:not-allowed !important;

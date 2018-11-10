@@ -2,27 +2,35 @@
 	<div id="container">
 		<div class="players bg-gray">
 			<h2>Players</h2>
-			<ul>
-				<li class="d-flex justify-content-between" v-for="entity, key in players">
-					<div class="d-flex justify-content-left">
-						<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-						<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.participant).avatar + ')' }"></span>
-						{{ entity.name }}
-					</div>
-					<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
-				</li>
-			</ul>
+			<template v-if="allPlayers.length">
+				<ul>
+					<li class="d-flex justify-content-between" v-for="entity, key in players">
+						<div class="d-flex justify-content-left">
+							<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
+								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.participant).avatar + ')' }"></span>
+							{{ entity.name }}
+						</div>
+						<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
+					</li>
+				</ul>
+			</template>
+			<template v-else>
+				<div class="loader"><span>Loading Players...</span></div>
+			</template>
 		</div>
 		<div class="monsters bg-gray">
 			<h2>Monsters</h2>
 			<ul>
-				<li v-for="entity, key in monsters">
-					<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-					{{ entity.name }}
-					<a @click="setInitiative(key, entity)">Roll</a>
+				<li class="d-flex justify-content-between" v-for="entity, key in monsters">
+					<div class="d-flex justify-content-left">
+						<span :class="[entity.initiative != 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
+						{{ entity.name }}
+						<a class="ml-3" @click="setInitiative(key, entity)" v-b-tooltip.hover :title="'1d20+'+entity.dexMod"><i class="fas fa-dice-d20"></i></a>
+					</div>
+					<input type="text" class="form-control" v-model="entity.initiative" @change="setInitiative(key, entity)" />
 				</li>
 			</ul>
-			<a class="btn btn-block"><i class="fas fa-dice-d20"></i> Roll all</a>
+			<a class="btn btn-block"><i class="fas fa-dice-d20"></i>Roll all</a>
 		</div>
 		{{ initiatives.length }}
 		<div class="set bg-gray">
@@ -40,9 +48,7 @@ import firebase from 'firebase'
 import axios from 'axios'
 import { db } from '@/firebase'
 
-import { test_mixin } from '@/mixins/mixin.js'
-
-// import myMixin from '@components/mixins.vue'
+import { dice } from '@/mixins/dice.js'
 
 export default {
 
@@ -50,14 +56,17 @@ export default {
   props: [
   	'participants'
   ],
-  mixins: [test_mixin],
+  mixins: [dice],
   firebase() {
+  	console.log("firebase")
     return {
-      allPlayers: db.ref('players/' + this.userId)
+      allPlayers: db.ref('players/' + this.userId),
     }
   },
   data () {
-  	this.test()
+  	console.log('data')
+  	// test mixin
+  	// this.test()
   	var playersObj = {}
   	var monstersObj = {}
   	var initiativesObj = {}
@@ -82,9 +91,15 @@ export default {
 		encounterId: this.$route.params.encid,
     }
   },
+  created() {
+  	console.log('created')
+  },
+  mounted() {
+  	console.log('mounted')
+  },
   methods: {
-  	rollD20() {
-  		return Math.ceil(Math.random() * 20)
+  	calculateModifier(val) {
+  		return Math.floor((val - 10) / 2)
   	},
   	async getMonster(id) {
 			const monster = await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
@@ -94,8 +109,9 @@ export default {
   	async rollMonster(entity) {
   		let monster = await this.getMonster(entity.participant)
   		let dex = monster.dexterity
-  		let dexMod = Math.floor((dex - 10) / 2)
-			return this.rollD20() + dexMod
+  		let dexMod = this.calculateModifier(dex)
+  		entity.dexMod = dexMod
+			return this.rollD20(1,dexMod)
   	},
   	async setInitiative(key, entity) {
   		if (entity.type == 'monster') {
@@ -104,13 +120,12 @@ export default {
 		}
 		entity.order = 1
 		db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants/' + key).update({
-        initiative: entity.initiative,
+        initiative: parseInt(entity.initiative),
         order: entity.order,
       })
   		this.initiatives[key] = entity
   	},
 	getPlayer(participantKey) {
-		console.log(participantKey)
 		var player = this.allPlayers.find(function(element) {
 			return element['.key'] == participantKey
 		});

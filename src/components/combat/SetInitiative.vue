@@ -52,6 +52,7 @@ import axios from 'axios'
 import { db } from '@/firebase'
 
 import { dice } from '@/mixins/dice.js'
+import { attributes } from '@/mixins/attributes.js'
 
 export default {
 
@@ -59,7 +60,7 @@ export default {
 	props: [
 		'entities'
 	],
-	mixins: [dice],
+	mixins: [dice, attributes],
 	firebase() {
 		console.log("firebase")
 		return {
@@ -99,9 +100,6 @@ export default {
 		console.log('mounted')
 	},
 	methods: {
-		calcMod(val) {
-			return Math.floor((val - 10) / 2)
-		},
 		storeInitiative(key, entity) {
 			if (!entity.initiative) {
 				entity.initiative = 0

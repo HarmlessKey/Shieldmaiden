@@ -41,22 +41,22 @@ body {
 	padding: 5px;
 	height: calc(100vh - 100px);
 		/*width: 100vw;*/
-	}
-	.container-fluid {
-		padding:0 !important;
-	}
-	header {
-		display:block;
-		height:80px;
-		line-height:40px;
-		padding:20px 10px;
-		width:100%;
-		background:$black;
-		border-bottom:solid 1px $gray-light;
-		position:fixed !important;
-		top:0;
-		z-index:999;
-	}
+}
+.container-fluid {
+	padding:0 !important;
+}
+header {
+	display:block;
+	height:80px;
+	line-height:40px;
+	padding:20px 10px;
+	width:100%;
+	background:$black;
+	border-bottom:solid 1px $gray-light;
+	position:fixed !important;
+	top:0;
+	z-index:999;
+}
 /* 3. Heading */
 /*********************************************/
 h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }

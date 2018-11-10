@@ -12,10 +12,10 @@ import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 
 const options = {
-  toast: {
-    position: SnotifyPosition.centerTop,
-    showProgressBar: false
-  }
+	toast: {
+		position: SnotifyPosition.centerTop,
+		showProgressBar: false
+	}
 }
 
 Vue.use(Snotify, options)
@@ -38,10 +38,10 @@ Vue.use(BootstrapVue);
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-  routes: routes,
-  linkActiveClass: "active", // active class for non-exact links.
-  linkExactActiveClass: "exact-active", // active class for *exact* links.
-  mode: 'history'
+	routes: routes,
+	linkActiveClass: "active", // active class for non-exact links.
+	linkExactActiveClass: "exact-active", // active class for *exact* links.
+	mode: 'history'
 });
 
 // Check before each page load whether the page requires authentication/
@@ -49,16 +49,16 @@ const router = new VueRouter({
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
 
-  const currentUser = firebase.auth().currentUser;
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+	const currentUser = firebase.auth().currentUser;
+	const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-  if (requiresAuth && !currentUser) {
-    next('/sign-in');
-  } else if (requiresAuth && currentUser) {
-    next();
-  } else {
-    next();
-  }
+	if (requiresAuth && !currentUser) {
+		next('/sign-in');
+	} else if (requiresAuth && currentUser) {
+		next();
+	} else {
+		next();
+	}
 
 });
 
@@ -67,11 +67,11 @@ router.beforeEach((to, from, next) => {
 // method until the Firebase initialization ends
 firebase.auth().onAuthStateChanged(function (user) {
 
-  window.App = new Vue({
-    el: '#app',
-    store: store,
-    router: router,
-    render: h => h(App)
-  });
+	window.App = new Vue({
+		el: '#app',
+		store: store,
+		router: router,
+		render: h => h(App)
+	});
 
 });

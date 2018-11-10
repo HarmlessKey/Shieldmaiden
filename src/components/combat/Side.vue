@@ -1,37 +1,37 @@
 <template>
 	<div id="side_container" class="bg-gray">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
-		<li class="nav-item">
-			<a class="nav-link dmg active" id="damage-tab" data-toggle="tab" href="#damage" role="tab" aria-controls="damage" aria-selected="true">Damage Meters</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" id="log-tab" data-toggle="tab" href="#log" role="tab" aria-controls="log" aria-selected="false"><i class="fas fa-list"></i></a>
-		</li>
+			<li class="nav-item">
+				<a class="nav-link dmg active" id="damage-tab" data-toggle="tab" href="#damage" role="tab" aria-controls="damage" aria-selected="true">Damage Meters</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" id="log-tab" data-toggle="tab" href="#log" role="tab" aria-controls="log" aria-selected="false"><i class="fas fa-list"></i></a>
+			</li>
 		</ul>
-		  
-    	<div class="tab-content">
+		
+		<div class="tab-content">
 			<Dmg/>
 			<Log/>	
-      </div>
+		</div>
 	</div>
 </template>
 
 <script>
-import Dmg from '@/components/combat/Dmg.vue'
-import Log from '@/components/combat/Log.vue'
+	import Dmg from '@/components/combat/Dmg.vue'
+	import Log from '@/components/combat/Log.vue'
 
-export default {
-  name: 'Side',
-  components: {
-	  Dmg,
-	  Log
-  },
-  data () {
-    return {
+	export default {
+		name: 'Side',
+		components: {
+			Dmg,
+			Log
+		},
+		data () {
+			return {
 
-    }
-  }
-}
+			}
+		}
+	}
 </script>
 
 <style lang="css" scoped>

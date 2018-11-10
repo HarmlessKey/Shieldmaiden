@@ -17,97 +17,97 @@ import RunEncounter from '@/views/MyContent/RunEncounter.vue';
 // the path & component to load
 
 export const routes = [{
-    path: '',
-    name: 'home',
-    component: Home
-  },
-  {
-    path: '/sign-in',
-    name: 'signIn',
-    component: SignIn
-  },
-  {
-    path: '/sign-up',
-    name: 'signUp',
-    component: SignUp
-  },
-  {
-    path: '/campaigns',
-    name: 'myContent',
-    component: MyContent,
-    props: (route) => ({
-      id: route.query.id
-    }),
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/campaigns/:id',
-    name: 'EditCampaign',
-    component: EditCampaign,
-    props: (route) => ({
-      id: route.query.id
-    }),
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/players',
-    name: 'Players',
-    component: Players,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/players/add-player',
-    name: 'AddPlayers',
-    component: AddPlayer,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/players/:id',
-    name: 'EditPlayers',
-    component: EditPlayer,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/encounters/:id',
-    name: 'Encounters',
-    component: Encounters,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/encounters/:campid/:encid',
-    name: 'EditEncounter',
-    component: EditEncounter,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/run-encounter/:campid/:encid',
-    name: 'RunEncounter',
-    component: RunEncounter,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/404',
-    name: '404',
-    component: Error404
-  },
-  {
-    path: '*',
-    redirect: '/404'
-  }
+	path: '',
+	name: 'home',
+	component: Home
+},
+{
+	path: '/sign-in',
+	name: 'signIn',
+	component: SignIn
+},
+{
+	path: '/sign-up',
+	name: 'signUp',
+	component: SignUp
+},
+{
+	path: '/campaigns',
+	name: 'myContent',
+	component: MyContent,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/campaigns/:id',
+	name: 'EditCampaign',
+	component: EditCampaign,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/players',
+	name: 'Players',
+	component: Players,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/players/add-player',
+	name: 'AddPlayers',
+	component: AddPlayer,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/players/:id',
+	name: 'EditPlayers',
+	component: EditPlayer,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/encounters/:id',
+	name: 'Encounters',
+	component: Encounters,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/encounters/:campid/:encid',
+	name: 'EditEncounter',
+	component: EditEncounter,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/run-encounter/:campid/:encid',
+	name: 'RunEncounter',
+	component: RunEncounter,
+	meta: {
+		requiresAuth: true
+	}
+},
+{
+	path: '/404',
+	name: '404',
+	component: Error404
+},
+{
+	path: '*',
+	redirect: '/404'
+}
 ]

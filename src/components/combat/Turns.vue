@@ -1,6 +1,6 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between bg-gray">
-    <h1>Combat title</h1>
+		<h1>Combat title</h1>
 		<div class="round-info">
 			<span id="round">Round <span class="number mx-2">{{ round }}</span></span>
 			<span id="turn">Turn <span class="number ml-2">0</span></span>
@@ -11,17 +11,17 @@
 </template>
 
 <script>
-export default {
-	name: 'Turns',
-	props: [
+	export default {
+		name: 'Turns',
+		props: [
 		'round'
-	],
-  data () {
-    return {
+		],
+		data () {
+			return {
 
-    }
-  }
-}
+			}
+		}
+	}
 </script>
 
 <style lang="css" scoped>

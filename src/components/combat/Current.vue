@@ -6,30 +6,30 @@
 </template>
 
 <script>
-import Player from './Player.vue'
+	import Player from './Player.vue'
 
-export default {
+	export default {
 
-  name: 'Current',
+		name: 'Current',
 
-  components: {
-  	Player,
-  },
-  data: function() {
-    return {
-    	
-    }
-  },
-  
-  methods: {
-  	nextTurn: function() {
-  		this.$data.turn += 1;
-  		if (this.$data.turn > this.$data.players.length - 1) {
-  			this.$data.turn = 0;
-  		}
-  	}
-  }
-}
+		components: {
+			Player,
+		},
+		data: function() {
+			return {
+				
+			}
+		},
+		
+		methods: {
+			nextTurn: function() {
+				this.$data.turn += 1;
+				if (this.$data.turn > this.$data.players.length - 1) {
+					this.$data.turn = 0;
+				}
+			}
+		}
+	}
 </script>
 
 <style lang="css" scoped>

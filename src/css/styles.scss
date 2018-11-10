@@ -2,8 +2,8 @@
 @import "~vue-snotify/styles/material.css";
 
 /* 
-    Table of content
-    1. Variables
+		Table of content
+		1. Variables
 	2. Defaults
 	3. Headings
 	4. Classes
@@ -34,40 +34,40 @@ $yellow: #b3b547;
 body {
 	padding-top:80px;
 	background:$gray-dark !important;
-    color:$gray-light !important;
+	color:$gray-light !important;
 	font-size:12px !important;
 }
 .view {
-    padding: 5px;
-    height: calc(100vh - 100px);
-    /*width: 100vw;*/
-}
-.container-fluid {
-	padding:0 !important;
-}
-header {
-	display:block;
-	height:80px;
-	line-height:40px;
-	padding:20px 10px;
-	width:100%;
-	background:$black;
-	border-bottom:solid 1px $gray-light;
-	position:fixed !important;
-	top:0;
-	z-index:999;
-}
+	padding: 5px;
+	height: calc(100vh - 100px);
+		/*width: 100vw;*/
+	}
+	.container-fluid {
+		padding:0 !important;
+	}
+	header {
+		display:block;
+		height:80px;
+		line-height:40px;
+		padding:20px 10px;
+		width:100%;
+		background:$black;
+		border-bottom:solid 1px $gray-light;
+		position:fixed !important;
+		top:0;
+		z-index:999;
+	}
 /* 3. Heading */
 /*********************************************/
 h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }
 h1 {
 	text-transform:uppercase;
-    font-size:15px !important;
+	font-size:15px !important;
 }
 h2 {
 	text-transform:uppercase;
 	font-size:15px !important;
-    margin-bottom:20px !important;
+	margin-bottom:20px !important;
 }
 h3 {
 	font-size:15px !important;
@@ -103,11 +103,11 @@ h3 {
 	position:relative;
 	text-align:center;
 	line-height:27px;
-    height:27px;
+	height:27px;
 
-    span {
-        animation: fadeinout .9s linear infinite;
-    }
+	span {
+		animation: fadeinout .9s linear infinite;
+	}
 }
 
 @keyframes fadeinout {
@@ -132,24 +132,24 @@ h3 {
 }
 
 @keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
 }
 
 /* 4. Buttons and Links */
 /*********************************************/
 button {
-    &.bg-green:hover { background-color:$green-hover !important; }
-    &.bg-red:hover { background-color:$red-hover !important; }
+	&.bg-green:hover { background-color:$green-hover !important; }
+	&.bg-red:hover { background-color:$red-hover !important; }
 }
 
 a.logout { 
 	color:$gray-light!important;
 	font-size:20px;
-    cursor:pointer;
-    &:hover {
-        color:$blue !important;
-    }
+	cursor:pointer;
+	&:hover {
+		color:$blue !important;
+	}
 }
 
 /* 5. Components*/
@@ -158,50 +158,50 @@ a.logout {
 	padding-left:200px;
 }
 #sidebar {
-    width:200px;
+	width:200px;
 	position:fixed;
 	left:0;
 	top:80px;
 	height: calc(100vh - 80px);
 	padding-top:10px;
-    background:$gray;
-    
-    ul {
-        list-style:none;
-        padding:0;
+	background:$gray;
+	
+	ul {
+		list-style:none;
+		padding:0;
 
-        li {
-            a {
-                padding:10px;
-                width:200px;
-                display: block;
-                font-size:15px;
-                line-height:20px;
-                
-                &:hover, &.active:hover {
-                    background-color:$gray-hover;
-	                text-decoration:none;
-                }
-                &.active {
-                    background-color:$gray-active;
+		li {
+			a {
+				padding:10px;
+				width:200px;
+				display: block;
+				font-size:15px;
+				line-height:20px;
+				
+				&:hover, &.active:hover {
+					background-color:$gray-hover;
+					text-decoration:none;
+				}
+				&.active {
+					background-color:$gray-active;
 
-                    svg {
-                        color:$blue !important;
-                    }
-                }
+					svg {
+						color:$blue !important;
+					}
+				}
 
-                span {
-                    color:$gray-light !important;
-                }
-                svg {
-                    margin-right:15px;
-                    color:$gray-light !important;
-                    font-size:20px;
-                    line-height:20px;
-                }
-            }
-        }
-    }
+				span {
+					color:$gray-light !important;
+				}
+				svg {
+					margin-right:15px;
+					color:$gray-light !important;
+					font-size:20px;
+					line-height:20px;
+				}
+			}
+		}
+	}
 }
 /* 6. Bootstrap overrides*/
 /*********************************************/
@@ -209,15 +209,15 @@ a.logout {
 	border-radius:0 !important;
 	background:$blue;
 	color:$white !important;
-    border:none;
-    
-    &:focus {
-        box-shadow:none;
-    }
-    &.disabled {
-        cursor: not-allowed !important;
-        opacity: .3;
-        color: $white !important;
+	border:none;
+	
+	&:focus {
+		box-shadow:none;
+	}
+	&.disabled {
+		cursor: not-allowed !important;
+		opacity: .3;
+		color: $white !important;
 	}
 	&:hover {
 		background-color: $blue-hover;
@@ -233,15 +233,15 @@ a {
 .dropdown-menu {
 	border-radius:0;
 	background:$gray-dark;
-    color:$gray-light;
-    
-    a { 
-        color:$gray-light;
-        &:hover { 
-            color:$blue;
-            background:none;
-        }
-    }
+	color:$gray-light;
+	
+	a { 
+		color:$gray-light;
+		&:hover { 
+			color:$blue;
+			background:none;
+		}
+	}
 }
 
 hr { background:$black; }
@@ -250,14 +250,14 @@ hr { background:$black; }
 	border-radius:0 !important;
 	background:$gray-dark !important;
 	border:solid 1px $gray-light !important;
-    color:$gray-light !important;
-    
-    &:focus {
-        box-shadow:none !important;
-    }
-    optgroup {
-        background:$black !important;
-    }
+	color:$gray-light !important;
+	
+	&:focus {
+		box-shadow:none !important;
+	}
+	optgroup {
+		background:$black !important;
+	}
 }
 .custom-checkbox .custom-control-label::before {
 	border-radius:0 !important;
@@ -266,15 +266,15 @@ ul.nav {
 	border:none;
 }
 .nav-tabs { 
-    .nav-link {
-        border:none !important;
-        border-radius:0 !important;
+	.nav-link {
+		border:none !important;
+		border-radius:0 !important;
 
-        &.active {
-            color:$gray-light !important;
-            background-color:$gray !important;
-        }
-    }
+		&.active {
+			color:$gray-light !important;
+			background-color:$gray !important;
+		}
+	}
 }
 .modal-content {
 	border-radius:0 !important;

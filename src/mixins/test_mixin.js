@@ -1,10 +1,10 @@
 export const test_mixin = {
 	created() {
-		console.log("CREATED MIXIN")
+		// console.log("CREATED MIXIN")
 	},
 	methods: {
 		test() {
-			console.log("TEST MIXIN")
+			// console.log("TEST MIXIN")
 		}
 	}
 }

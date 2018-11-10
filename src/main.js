@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
 // method until the Firebase initialization ends
 firebase.auth().onAuthStateChanged(function (user) {
 
-  new Vue({
+  window.App = new Vue({
     el: '#app',
     store: store,
     router: router,

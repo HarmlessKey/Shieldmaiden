@@ -62,7 +62,10 @@
 							<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
 							{{ entity.name }}
 						</div>
-						<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(entity['.key'], entity.name)"><i class="fas fa-minus-circle"></i></a>
+						<span>
+							<a v-if="entity.type == 'npc'" class="mr-2" v-b-tooltip.hover title="Edit (Coming Soon)"><i class="fas fa-pencil-alt"></i></a>
+							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(entity['.key'], entity.name)"><i class="fas fa-minus-circle"></i></a>
+						</span>
 					</li>
 				</ul>
 			</div>
@@ -101,7 +104,7 @@
 				noResult: '',
 				npcs: [],
 				auto_npcs: [],
-				viewMNPC: [],
+				viewNPC: [],
 				showSide: false
 			} 
 		},

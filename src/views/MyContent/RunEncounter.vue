@@ -1,7 +1,7 @@
 <template>
   <div v-if="encounterId in encountersObj">
     <div v-if="encountersObj[encounterId].round == 0">
-      <SetInitiative :participants="encountersObj[encounterId].participants" />
+      <SetInitiative :entities="encountersObj[encounterId].entities" />
     </div>
     <div v-else>
       <Turns :round="encountersObj[encounterId].round"/>
@@ -37,7 +37,7 @@ export default {
   },
   firebase() {
     return {
-      participants: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/participants'),
+      entities: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities'),
       encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
       encountersObj: {
         source: db.ref('encounters/' + this.userId + '/' + this.campaignId),

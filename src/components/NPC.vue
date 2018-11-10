@@ -1,48 +1,48 @@
 <template>
     <div class="pb-5">
-       <h2>{{ monster.name }}</h2>
+       <h2>{{ npc.name }}</h2>
         <i>
-            {{ monster.size }} {{ monster.type }}
-            <span v-if="monster.subtype != ''">({{ monster.subtype }})</span>,
-            {{ monster.alignment }}
+            {{ npc.size }} {{ npc.type }}
+            <span v-if="npc.subtype != ''">({{ npc.subtype }})</span>,
+            {{ npc.alignment }}
         </i>
         <hr>
         <p>
-            <b>Armor Class</b> {{ monster.armor_class }}<br/>
-            <b>Hit Points</b> {{ monster.hit_points }} ({{ monster.hit_dice }})<br/>
-            <b>Speed</b> {{ monster.speed }}
+            <b>Armor Class</b> {{ npc.armor_class }}<br/>
+            <b>Hit Points</b> {{ npc.hit_points }} ({{ npc.hit_dice }})<br/>
+            <b>Speed</b> {{ npc.speed }}
         </p>
         <hr class="mb-4">
         <div class="abilities">
-            <span class="ability str" @click="rollAbility('Strength', monster.strength)">
+            <span class="ability str" @click="rollAbility('Strength', npc.strength)">
                 <span class="abilityName">STR</span>
-                {{ modifier(monster.strength) }}
-                <span class="score bg-gray">{{ monster.strength }}</span>
+                {{ modifier(npc.strength) }}
+                <span class="score bg-gray">{{ npc.strength }}</span>
             </span>
-            <span class="ability dex" @click="rollAbility('Dexterity', monster.dexterity)">
+            <span class="ability dex" @click="rollAbility('Dexterity', npc.dexterity)">
                 <span class="abilityName">DEX</span>
-                {{ modifier(monster.dexterity) }}
-                <span class="score bg-gray">{{ monster.dexterity }}</span>
+                {{ modifier(npc.dexterity) }}
+                <span class="score bg-gray">{{ npc.dexterity }}</span>
             </span>
-            <span class="ability con" @click="rollAbility('Constitution', monster.constitution)">
+            <span class="ability con" @click="rollAbility('Constitution', npc.constitution)">
                 <span class="abilityName">CON</span>
-                {{ modifier(monster.constitution) }}
-                <span class="score bg-gray">{{ monster.constitution }}</span>
+                {{ modifier(npc.constitution) }}
+                <span class="score bg-gray">{{ npc.constitution }}</span>
             </span>
-            <span class="ability int" @click="rollAbility('Intelligence', monster.intelligence)">
+            <span class="ability int" @click="rollAbility('Intelligence', npc.intelligence)">
                 <span class="abilityName">INT</span>
-                {{ modifier(monster.intelligence) }}
-                <span class="score bg-gray">{{ monster.intelligence }}</span>
+                {{ modifier(npc.intelligence) }}
+                <span class="score bg-gray">{{ npc.intelligence }}</span>
             </span>
-            <span class="ability wis" @click="rollAbility('Wisdom', monster.wisdom)">
+            <span class="ability wis" @click="rollAbility('Wisdom', npc.wisdom)">
                 <span class="abilityName">WIS</span>
-                {{ modifier(monster.wisdom) }}
-                <span class="score bg-gray">{{ monster.wisdom }}</span>
+                {{ modifier(npc.wisdom) }}
+                <span class="score bg-gray">{{ npc.wisdom }}</span>
             </span>
-            <span class="ability cha" @click="rollAbility('Charisma', monster.charisma)">
+            <span class="ability cha" @click="rollAbility('Charisma', npc.charisma)">
                 <span class="abilityName">CHA</span>
-                {{ modifier(monster.charisma) }}
-                <span class="score bg-gray">{{ monster.charisma }}</span>
+                {{ modifier(npc.charisma) }}
+                <span class="score bg-gray">{{ npc.charisma }}</span>
             </span>
         </div>
         <hr>
@@ -50,21 +50,21 @@
         <!-- SKILLS -->
         <p>
             <b>Skills</b>
-            <span v-if="monster.perception"> Perception +{{ monster.perception }},</span>
-            <span v-if="monster.stealth"> Stealth +{{ monster.stealth }}</span>
+            <span v-if="npc.perception"> Perception +{{ npc.perception }},</span>
+            <span v-if="npc.stealth"> Stealth +{{ npc.stealth }}</span>
             <br/>
-            <b>Senses</b> {{ monster.senses }}<br/>
-            <b>Languages</b> {{ monster.languages }}<br/>
-            <b>Challenge Rating</b> {{ monster.challenge_rating }}<br/>
+            <b>Senses</b> {{ npc.senses }}<br/>
+            <b>Languages</b> {{ npc.languages }}<br/>
+            <b>Challenge Rating</b> {{ npc.challenge_rating }}<br/>
         </p>
         <hr>
-        <div class="mb-3" v-for="(ability, index) in monster.special_abilities" :key="index">
+        <div class="mb-3" v-for="(ability, index) in npc.special_abilities" :key="index">
             <a data-toggle="collapse" v-bind:href="'#ability-'+index" role="button" aria-expanded="false">{{ ability.name }} <i class="fas fa-caret-down"></i></a>
             <p class="collapse" v-bind:id="'ability-'+index">{{ ability.desc }}</p>
         </div>
         <hr>
         <h2>Actions</h2>
-        <div v-for="(action, key) in monster.actions" :key="key">
+        <div v-for="(action, key) in npc.actions" :key="key">
             <a data-toggle="collapse" v-bind:href="'#action-'+key" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
             <p class="collapse" v-bind:id="'action-'+key">{{ action.desc }}</p>
         </div>
@@ -73,9 +73,9 @@
 
 <script>
 export default {
-  name: 'Monster',
+  name: 'NPC',
 	props: [
-		'monster'
+		'npc'
     ],
     methods: {
         modifier(score) {

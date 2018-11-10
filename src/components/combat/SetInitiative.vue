@@ -10,9 +10,10 @@
 								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
 							{{ entity.name }}
 						</div>
-						<input type="text" class="form-control" v-model="entity.initiative" @change="storeInitiative(key, entity)" />
+						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @change="storeInitiative(key, entity)" />
 					</li>
 				</ul>
+				<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('playerInit') }}</p>
 			</template>
 			<template v-else>
 				<div class="loader"><span>Loading Players...</span></div>
@@ -25,12 +26,14 @@
 					<div class="d-flex justify-content-left">
 						<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 						{{ entity.name }}
-						<a class="ml-3" @click="rollMonster(key, entity)" v-b-tooltip.hover :title="'1d20+'+calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
+						<a class="ml-3" @click="rollMonster(key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
 					</div>
-					<input type="text" class="form-control" v-model="entity.initiative" @change="storeInitiative(key, entity)" />
+					<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @change="storeInitiative(key, entity)" />
 				</li>
 			</ul>
-			<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i>Roll all</a>
+			<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('npcInit') }}</p>
+			<a class="btn btn-block mb-4" v-b-tooltip.hover title="Coming Soon"><i class="fas fa-dice-d20"></i> Roll as group</a>
+			<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
 		</div>
 		<!-- {{ initiatives.length }} -->
 		<div class="set bg-gray">

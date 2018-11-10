@@ -32,11 +32,11 @@
 			</ul>
 			<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i>Roll all</a>
 		</div>
-		{{ initiatives.length }}
+		<!-- {{ initiatives.length }} -->
 		<div class="set bg-gray">
 			<h2>Turn order</h2>
 			<ul>
-				<li v-for="entity, key in initiatives">{{ entity.initiative }} {{ entity.name }}</li>
+				<li v-for="entity, key in entities" v-if='entity.initiative > 0'>{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
 			<a class="btn btn-block disabled">Start encounter</a>
 		</div>
@@ -100,6 +100,9 @@ export default {
 			return Math.floor((val - 10) / 2)
 		},
 		storeInitiative(key, entity) {
+			if (!entity.initiative) {
+				entity.initiative = 0
+			}
 			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
 				initiative: parseInt(entity.initiative),
 			})

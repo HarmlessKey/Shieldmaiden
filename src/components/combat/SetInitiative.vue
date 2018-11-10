@@ -52,62 +52,62 @@ import { dice } from '@/mixins/dice.js'
 
 export default {
 
-  name: 'SetInitiative',
-  props: [
-  	'entities'
-  ],
-  mixins: [dice],
-  firebase() {
-  	console.log("firebase")
-    return {
-      allPlayers: db.ref('players/' + this.userId),
-    }
-  },
-  data () {
-  	console.log('data')
-  	var playersObj = {}
-  	var npcsObj = {}
-  	var initiativesObj = {}
-  	for (let key in this.entities) {
-  		let entity = this.entities[key]
-  		if (entity.type == "player") {
-  			playersObj[key] = entity
-  		}
-  		else if (entity.type == "npc") {
-  			npcsObj[key] = entity
-  		}
-  		if (entity.initiative > 0) {
-  			initiativesObj[key] = entity
-  		}
-  	}
-    return {
-    	initiatives: initiativesObj,
-    	players: playersObj,
-    	npcs: npcsObj,
-    	userId: firebase.auth().currentUser.uid,
-      	campaignId: this.$route.params.campid,
+	name: 'SetInitiative',
+	props: [
+		'entities'
+	],
+	mixins: [dice],
+	firebase() {
+		console.log("firebase")
+		return {
+			allPlayers: db.ref('players/' + this.userId),
+		}
+	},
+	data () {
+		console.log('data')
+		var playersObj = {}
+		var npcsObj = {}
+		var initiativesObj = {}
+		for (let key in this.entities) {
+			let entity = this.entities[key]
+			if (entity.type == "player") {
+				playersObj[key] = entity
+			}
+			else if (entity.type == "npc") {
+				npcsObj[key] = entity
+			}
+			if (entity.initiative > 0) {
+				initiativesObj[key] = entity
+			}
+		}
+		return {
+			initiatives: initiativesObj,
+			players: playersObj,
+			npcs: npcsObj,
+			userId: firebase.auth().currentUser.uid,
+				campaignId: this.$route.params.campid,
 		encounterId: this.$route.params.encid,
-    }
-  },
-  created() {
-  	console.log('created')
-  },
-  mounted() {
-  	console.log('mounted')
-  },
-  methods: {
-  	calcMod(val) {
-  		return Math.floor((val - 10) / 2)
-  	},
-  	storeInitiative(key, entity) {
+		}
+	},
+	created() {
+		console.log('created')
+	},
+	mounted() {
+		console.log('mounted')
+	},
+	methods: {
+		calcMod(val) {
+			return Math.floor((val - 10) / 2)
+		},
+		storeInitiative(key, entity) {
 			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
-        initiative: parseInt(entity.initiative),
-      })
-  		this.initiatives[key] = entity
-  		if (entity.initiative <= 0) {
-  			delete this.initiatives[key]
-  		}
-	  },
+				initiative: parseInt(entity.initiative),
+			})
+			this.initiatives[key] = entity
+			if (entity.initiative <= 0) {
+				delete this.initiatives[key]
+			}
+		},
 		getPlayer(entityKey) {
 			var player = this.allPlayers.find(function(element) {
 				return element['.key'] == entityKey
@@ -123,7 +123,7 @@ export default {
 				this.rollMonster(key, this.npcs[key])
 			}
 		}
-  }
+	}
 }
 </script>
 
@@ -180,7 +180,7 @@ export default {
 }
 .name {
 	white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+		overflow: hidden;
+		text-overflow: ellipsis;
 }
 </style>

@@ -28,7 +28,7 @@
 								</div>
 								
 								<a v-if="!checkEntity(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', getPlayer(player.player).character_name)"><i class="fas fa-plus-circle"></i></a>
-								<span v-else>Added</span>
+								<span v-else><i class="fas fa-check"></i></span>
 							</li>
 						</ul>
 					</div>
@@ -258,11 +258,11 @@ ul.entities li a {
 }
 
 .slideInRight {
-	transition-duration: 0.1s;
+	animation-duration: 0.5s;
 }
 
 .slideOutRight {
-	transition-duration: 0.1s;
+	animation-duration: 0.5s;
 }
 .faded {
 	opacity: .3;

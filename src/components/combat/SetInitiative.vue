@@ -37,9 +37,13 @@
 		</div>
 		<!-- {{ initiatives.length }} -->
 		<div class="set bg-gray">
-			<h2>Turn order</h2>
+			<h2>Active entities</h2>
 			<ul>
-				<li v-for="entity, key in entities" v-if='entity.initiative > 0'>{{ entity.initiative }} {{ entity.name }}</li>
+				<li v-for="entity, key in active_entities" :key="key">{{ entity.initiative }} {{ entity.name }}</li>
+			</ul>
+			<h2>Inactive</h2>
+			<ul>
+				<li v-for="entity, key in inactive_entities">{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
 			<a class="btn btn-block disabled">Start encounter</a>
 		</div>
@@ -72,6 +76,8 @@ export default {
 		var playersObj = {}
 		var npcsObj = {}
 		var initiativesObj = {}
+		var active_entities = {}
+		var inactive_entities = {}
 		for (let key in this.entities) {
 			let entity = this.entities[key]
 			if (entity.type == "player") {
@@ -81,17 +87,41 @@ export default {
 				npcsObj[key] = entity
 			}
 			if (entity.initiative > 0) {
-				initiativesObj[key] = entity
+				active_entities[key] = entity
+			}
+			else {
+				inactive_entities[key] = entity
 			}
 		}
 		return {
 			initiatives: initiativesObj,
 			players: playersObj,
 			npcs: npcsObj,
+			active_entities: active_entities,
+			inactive_entities: inactive_entities,
+
 			userId: firebase.auth().currentUser.uid,
-				campaignId: this.$route.params.campid,
-		encounterId: this.$route.params.encid,
+			campaignId: this.$route.params.campid,
+			encounterId: this.$route.params.encid,
 		}
+	},
+	watch: {
+		active_entities: function(val, oldVal) {
+			console.log(`active: newVal ${val} oldVal ${oldVal}`)
+		},
+		inactive_entities: function(val, oldVal) {
+			console.log(`inactive: newVal ${val} oldVal ${oldVal}`)
+		}
+	},
+	computed: {
+	  orderedActive: function() {
+	  	console.log('order')
+	  	let ordered_list = _.orderBy(this.active_entities, 'initiative')
+	    return ordered_list
+	  },
+	  orderedInactive: function() {
+	    return _.orderBy(this.inactive_entities, 'initiative')
+	  }
 	},
 	created() {
 		console.log('created')
@@ -107,10 +137,15 @@ export default {
 			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
 				initiative: parseInt(entity.initiative),
 			})
-			this.initiatives[key] = entity
-			if (entity.initiative <= 0) {
-				delete this.initiatives[key]
+			if (entity.initiative > 0) {
+				this.$set(this.active_entities, key, entity)
+				this.$delete(this.inactive_entities, key)
 			}
+			else {
+				this.$set(this.inactive_entities, key, entity)
+				this.$delete(this.active_entities, key)
+			}
+			console.log(Object.keys(this.active_entities).length)
 		},
 		getPlayer(entityKey) {
 			var player = this.allPlayers.find(function(element) {

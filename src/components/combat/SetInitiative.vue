@@ -10,7 +10,7 @@
 								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
 							{{ entity.name }}
 						</div>
-						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @change="storeInitiative(key, entity)" />
+						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @input="storeInitiative(key, entity)" />
 					</li>
 				</ul>
 				<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('playerInit') }}</p>
@@ -28,7 +28,7 @@
 						{{ entity.name }}
 						<a class="ml-3" @click="rollMonster(key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
 					</div>
-					<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @change="storeInitiative(key, entity)" />
+					<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(key, entity)" />
 				</li>
 			</ul>
 			<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('npcInit') }}</p>
@@ -39,11 +39,11 @@
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
 			<ul>
-				<li v-for="entity, key in active_entities" :key="key">{{ entity.initiative }} {{ entity.name }}</li>
+				<li v-for="entity, key in orderedActive" :key="key">{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
 			<h2>Inactive</h2>
 			<ul>
-				<li v-for="entity, key in inactive_entities">{{ entity.initiative }} {{ entity.name }}</li>
+				<li v-for="entity, key in orderedInactive">{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
 			<a class="btn btn-block disabled">Start encounter</a>
 		</div>
@@ -53,6 +53,7 @@
 <script>
 import firebase from 'firebase'
 import axios from 'axios'
+import _ from 'lodash'
 import { db } from '@/firebase'
 
 import { dice } from '@/mixins/dice.js'
@@ -73,58 +74,48 @@ export default {
 	},
 	data () {
 		console.log('data')
-		var playersObj = {}
-		var npcsObj = {}
-		var initiativesObj = {}
-		var active_entities = {}
-		var inactive_entities = {}
-		for (let key in this.entities) {
-			let entity = this.entities[key]
-			if (entity.type == "player") {
-				playersObj[key] = entity
-			}
-			else if (entity.type == "npc") {
-				npcsObj[key] = entity
-			}
-			if (entity.initiative > 0) {
-				active_entities[key] = entity
-			}
-			else {
-				inactive_entities[key] = entity
-			}
-		}
+		// var playersObj = {}
+		// var npcsObj = {}
+		// var initiativesObj = {}
+		// var active_entities = {}
+		// var inactive_entities = {}
 		return {
-			initiatives: initiativesObj,
-			players: playersObj,
-			npcs: npcsObj,
-			active_entities: active_entities,
-			inactive_entities: inactive_entities,
+			// initiatives: initiativesObj,
+			players: {},
+			npcs: {},
+			active_entities: {},
+			inactive_entities: {},
 
 			userId: firebase.auth().currentUser.uid,
 			campaignId: this.$route.params.campid,
 			encounterId: this.$route.params.encid,
 		}
 	},
-	watch: {
-		active_entities: function(val, oldVal) {
-			console.log(`active: newVal ${val} oldVal ${oldVal}`)
-		},
-		inactive_entities: function(val, oldVal) {
-			console.log(`inactive: newVal ${val} oldVal ${oldVal}`)
-		}
-	},
 	computed: {
 	  orderedActive: function() {
-	  	console.log('order')
-	  	let ordered_list = _.orderBy(this.active_entities, 'initiative')
-	    return ordered_list
+	    return _.orderBy(this.active_entities, 'initiative', 'desc')
 	  },
 	  orderedInactive: function() {
-	    return _.orderBy(this.inactive_entities, 'initiative')
+	    return _.orderBy(this.inactive_entities, 'initiative', 'desc')
 	  }
 	},
 	created() {
 		console.log('created')
+		for (let key in this.entities) {
+			let entity = this.entities[key]
+			if (entity.type == "player") {
+				this.players[key] = entity
+			}
+			else if (entity.type == "npc") {
+				this.npcs[key] = entity
+			}
+			if (entity.initiative > 0) {
+				this.active_entities[key] = entity
+			}
+			else {
+				this.inactive_entities[key] = entity
+			}
+		}
 	},
 	mounted() {
 		console.log('mounted')
@@ -145,7 +136,6 @@ export default {
 				this.$set(this.inactive_entities, key, entity)
 				this.$delete(this.active_entities, key)
 			}
-			console.log(Object.keys(this.active_entities).length)
 		},
 		getPlayer(entityKey) {
 			var player = this.allPlayers.find(function(element) {

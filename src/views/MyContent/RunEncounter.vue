@@ -1,15 +1,15 @@
 <template>
-	<div v-if="encounterId in encountersObj">
-		<div v-if="encountersObj[encounterId].round == 0">
+	<!-- Check if encounter exists -->
+	<div v-if="encounter">
+		<div v-if="encounter.round == 0">
 			<SetInitiative 
-				:entities="encountersObj[encounterId].entities" 
+				:entities="encounter.entities" 
 				:data="data"
-				:round="encountersObj[encounterId].round"
+				:round="encounter.round"
 			/>
 		</div>
 		<div v-else>
-			{{ data.active_entities }}
-			<Turns :round="encountersObj[encounterId].round"/>
+			<Turns :round="encounter.round"/>
 			<div id="combat">
 				<Current />
 				<Targets />
@@ -42,24 +42,20 @@
 		},
 		firebase() {
 			return {
-				entities: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities'),
-				encounters: db.ref('encounters/' + this.userId + '/' + this.campaignId),
-				encountersObj: {
-					source: db.ref('encounters/' + this.userId + '/' + this.campaignId),
-					asObject: true
+				encounter: {
+					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`),
+					asObject: true,
 				}
 			}
 		},
+
 		data() {
+			console.log('data')
 			return {
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 
-				// players: {},
-				// npcs: {},
-				// active_entities: {},
-				// inactive_entities: {},
 				data: {players:{}, npcs:{}, active_entities:{}, inactive_entities:{}},
 			}
 		},

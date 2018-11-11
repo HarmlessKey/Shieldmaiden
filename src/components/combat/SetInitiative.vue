@@ -122,11 +122,17 @@ export default {
 	},
 	methods: {
 		storeInitiative(key, entity) {
-			if (!entity.initiative) {
-				entity.initiative = 0
-			}
-			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
-				initiative: parseInt(entity.initiative),
+			this.$validator.validateAll().then((result) => {
+				if (!entity.initiative) {
+					entity.initiative = 0
+				}
+				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
+					initiative: parseInt(entity.initiative),
+				})
+				this.initiatives[key] = entity
+				if (entity.initiative <= 0) {
+					delete this.initiatives[key]
+				}
 			})
 			if (entity.initiative > 0) {
 				this.$set(this.active_entities, key, entity)

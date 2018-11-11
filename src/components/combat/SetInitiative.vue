@@ -37,12 +37,18 @@
 		</div>
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
-			<ul>
-				<li v-for="entity, key in orderedActive" :key="key">{{ entity.initiative }} {{ entity.name }}</li>
-			</ul>
+			<transition-group name="initiative" tag="ul">
+				<li v-for="entity, key in orderedActive" :key="key">
+					{{ entity.initiative }}
+					<!-- {{ entity.name }} -->
+				</li>
+			</transition-group>
 			<h2>Inactive</h2>
-			<ul>
-				<li v-for="entity, key in orderedInactive">{{ entity.initiative }} {{ entity.name }}</li>
+			<ul name="inactive" tag="ul">
+				<li v-for="entity, key in orderedInactive">
+					{{ entity.initiative }}
+					{{ entity.name }}
+				</li>
 			</ul>
 			<a class="btn btn-block" @click="start()">Start encounter</a>
 		</div>
@@ -203,5 +209,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+.initiative-move {
+  transition: transform 1s;
 }
 </style>

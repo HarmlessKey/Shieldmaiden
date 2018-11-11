@@ -4,13 +4,13 @@
 			<h2>Players</h2>
 			<template v-if="allPlayers.length">
 				<ul>
-					<li class="d-flex justify-content-between" v-for="entity, key in _players">
+					<li class="d-flex justify-content-between" v-for="entity in _players" :key="entity.key">
 						<div class="d-flex justify-content-left">
 							<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 							<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
 							{{ entity.name }}
 						</div>
-						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @input="storeInitiative(key, entity)" />
+						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @input="storeInitiative(entity.key, entity)" />
 					</li>
 				</ul>
 				<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('playerInit') }}</p>
@@ -22,13 +22,15 @@
 		<div class="npcs bg-gray">
 			<h2>NPC's</h2>
 			<ul>
-				<li class="d-flex justify-content-between" v-for="entity, key in _npcs">
+				<li class="d-flex justify-content-between" v-for="entity in _npcs" :key="entity.key" :class="{selected:selected.includes(entity.key)}">
 					<div class="d-flex justify-content-left">
 						<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-						{{ entity.name }}
-						<a class="ml-3" @click="rollMonster(key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
+						<span class="ml-1 pointer" @click="selected.includes(entity.key) ? selected.splice(selected.indexOf(entity.key), 1) : selected.push(entity.key)">{{ entity.name }}</span>
 					</div>
-					<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(key, entity)" />
+					<div class="d-flex justify-content-right">
+						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
+						<a class="roll" @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dex)"><i class="fas fa-dice-d20"></i></a>
+					</div>
 				</li>
 			</ul>
 			<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('npcInit') }}</p>
@@ -37,19 +39,28 @@
 		</div>
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
-			<transition-group name="initiative" tag="ul">
-				<li v-for="entity, key in _active" :key="key" @click="toggleActive(entity)">
-					{{ entity.initiative }}
-					<!-- {{ entity.name }} -->
+			<transition-group name="initiative" tag="ul" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+				<li v-for="(entity) in _active" v-bind:key="entity.key" class="d-flex justify-content-between">
+					<span class="d-flex justify-content-left">
+						<span v-if="entity.type == 'player' && allPlayers.length" class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
+						<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
+						{{ entity.name }}
+					</span>
+					<span>{{ entity.initiative }}</span>
 				</li>
 			</transition-group>
-			<h2>Inactive</h2>
-			<ul name="inactive" tag="ul">
-				<li v-for="entity, key in _idle" :key="key" @click="toggleActive(entity)">
-					{{ entity.initiative }}
-					{{ entity.name }}
+
+			<span class="d-flex justify-content-between">
+				<h2>Inactive</h2>
+				<a v-b-popover.hover="'These can have their initiative allready set, but will not join combat until you set them active.'" title="Inactive entities"><i class="fas fa-info-circle"></i></a>
+			</span>
+
+			<transition-group name="initiative" tag="ul" enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp">
+				<li v-for="(entity) in _idle" v-bind:key="entity.key" class="d-flex justify-content-between">
+					<span>{{ entity.name }}</span>
+					<span>{{ entity.initiative }}</span>
 				</li>
-			</ul>
+			</transition-group>
 			<a class="btn btn-block" @click="start()">Start encounter</a>
 		</div>
 	</div>
@@ -84,12 +95,14 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				selected: [],
 			}
 		},
 		computed: {
 			_players: function() {
 				return _.chain(this.entities)
-								.filter(function(entity) {
+								.filter(function(entity, key) {
+									entity.key = key
 									return entity.type == 'player';
 								})
 								.sortBy('name' , 'desc')
@@ -97,7 +110,8 @@
 			},
 			_npcs: function() {
 				return _.chain(this.entities)
-								.filter(function(entity) {
+								.filter(function(entity, key) {
+									entity.key = key
 									return entity.type == 'npc';
 								})
 								.sortBy('name' , 'desc')
@@ -113,44 +127,32 @@
 			},
 			_idle: function() {
 				return _.chain(this.entities)
-								// .filter(function(entity) {
-								// 	return entity.active == false;
-								// })
+								.filter(function(entity) {
+									return entity.active == false;
+								})
 								.sortBy({'initiative': Number} , 'desc')
 								.value()
 			},
-			// orderedActive: function() {
-			// 	return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
-			// },
-			// orderedInactive: function() {
-			// 	return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
-			// }
+			orderedActive: function() {
+				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
+			},
+			orderedInactive: function() {
+				return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
+			}
 		},
 		created() {
-			for (let key in this.entities) {
-				let entity = this.entities[key]
-				if (entity.type == "player") {
-					this.players[key] = entity
-				}
-				else if (entity.type == "npc") {
-					this.npcs[key] = entity
-				}
-				if (entity.initiative > 0) {
-					this.active_entities[key] = entity
-				}
-				else {
-					this.inactive_entities[key] = entity
-				}
-			}
+
 		},
 		methods: {
 			storeInitiative(key, entity) {
+				console.log("STORE")
+				console.log(key)
+				console.log(entity)
 				if (!entity.initiative) {
 					entity.initiative = 0
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
-					active: true
 				})
 				if (entity.initiative > 0) {
 					this.$set(this.active_entities, key, entity)
@@ -217,13 +219,20 @@
 		li {
 			margin-bottom: 8px;
 			line-height: 40px;
+			background-color: #494747;
+			padding:2px 5px;
+			border: solid 1px #494747;
 
+			&.selected {
+				border-color: #2c97de;
+			}
 			input {
 				width: 45px;
 				text-align: center;
 			}
-			svg {
-				margin:13px 5px 0 0;
+			.roll {
+				font-size: 17px;
+				margin-left: 10px;
 			}
 		}
 	}
@@ -235,7 +244,7 @@
 	background-size: cover;
 	background-position: center top;
 	border: solid 1px #b2b2b2;
-	margin:4px 10px 4px 4px;
+	margin:6px 10px 0 4px;
 }
 .name {
 	white-space: nowrap;
@@ -243,6 +252,9 @@
 	text-overflow: ellipsis;
 }
 .initiative-move {
-  transition: transform 1s;
+  transition: transform .6s;
+}
+.fadeInUp, .fadeInDown {
+	animation-delay: .6s;
 }
 </style>

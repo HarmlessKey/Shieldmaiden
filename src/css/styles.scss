@@ -91,6 +91,10 @@ h3 {
 .bg-orange { background-color:$orange !important; }
 .bg-yellow { background-color:$yellow !important; }
 
+.pointer {
+	cursor: pointer !important;
+}
+
 .validate {
 	margin-top:5px;
 	font-size:11px;

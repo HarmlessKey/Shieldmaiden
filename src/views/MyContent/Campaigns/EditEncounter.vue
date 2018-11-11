@@ -28,7 +28,7 @@
 								</div>
 								
 								<a v-if="!checkEntity(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', getPlayer(player.player).character_name)"><i class="fas fa-plus-circle"></i></a>
-								<span v-else>Added</span>
+								<span v-else><i class="fas fa-check"></i></span>
 							</li>
 						</ul>
 					</div>
@@ -138,7 +138,8 @@
 					id: id,
 					name: name,
 					type: type,
-					initiative: 0
+					initiative: 0,
+					active: true,
 				}
 				if(type == 'npc') {
 					var npc_data = await this.getNPC(id);
@@ -150,6 +151,7 @@
 					entity.cha = npc_data.charisma
 					entity.maxhp = npc_data.hit_points
 					entity.ac = npc_data.armor_class
+					entity.active = false
 				}
 				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 			},
@@ -258,11 +260,11 @@ ul.entities li a {
 }
 
 .slideInRight {
-	transition-duration: 0.1s;
+	animation-duration: 0.5s;
 }
 
 .slideOutRight {
-	transition-duration: 0.1s;
+	animation-duration: 0.5s;
 }
 .faded {
 	opacity: .3;

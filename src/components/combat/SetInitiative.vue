@@ -122,16 +122,22 @@
 								.filter(function(entity) {
 									return entity.active == true;
 								})
-								.sortBy({'initiative': Number} , 'desc')
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
 								.value()
 			},
 			_idle: function() {
-				return _.chain(this.entities)
+				let idle = _.chain(this.entities)
 								.filter(function(entity) {
 									return entity.active == false;
 								})
-								.sortBy({'initiative': Number} , 'desc')
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
 								.value()
+				console.log(idle)
+				return idle
 			},
 			orderedActive: function() {
 				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
@@ -145,9 +151,9 @@
 		},
 		methods: {
 			storeInitiative(key, entity) {
-				console.log("STORE")
-				console.log(key)
-				console.log(entity)
+				// console.log("STORE")
+				// console.log(key)
+				// console.log(entity)
 				if (!entity.initiative) {
 					entity.initiative = 0
 				}

@@ -1,9 +1,14 @@
 <template>
 	<div v-if="encounterId in encountersObj">
 		<div v-if="encountersObj[encounterId].round == 0">
-			<SetInitiative :entities="encountersObj[encounterId].entities" />
+			<SetInitiative 
+				:entities="encountersObj[encounterId].entities" 
+				:data="data"
+				:round="encountersObj[encounterId].round"
+			/>
 		</div>
 		<div v-else>
+			{{ data.active_entities }}
 			<Turns :round="encountersObj[encounterId].round"/>
 			<div id="combat">
 				<Current />
@@ -50,6 +55,12 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+
+				// players: {},
+				// npcs: {},
+				// active_entities: {},
+				// inactive_entities: {},
+				data: {players:{}, npcs:{}, active_entities:{}, inactive_entities:{}},
 			}
 		},
 		methods: {

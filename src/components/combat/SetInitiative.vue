@@ -7,7 +7,7 @@
 					<li class="d-flex justify-content-between" v-for="entity, key in players">
 						<div class="d-flex justify-content-left">
 							<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-								<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
+							<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
 							{{ entity.name }}
 						</div>
 						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @input="storeInitiative(key, entity)" />
@@ -35,7 +35,6 @@
 			<a class="btn btn-block mb-4" v-b-tooltip.hover title="Coming Soon"><i class="fas fa-dice-d20"></i> Roll as group</a>
 			<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
 		</div>
-		<!-- {{ initiatives.length }} -->
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
 			<ul>
@@ -45,115 +44,108 @@
 			<ul>
 				<li v-for="entity, key in orderedInactive">{{ entity.initiative }} {{ entity.name }}</li>
 			</ul>
-			<a class="btn btn-block disabled">Start encounter</a>
+			<a class="btn btn-block" @click="start()">Start encounter</a>
 		</div>
 	</div>
 </template>
 
 <script>
-import firebase from 'firebase'
-import axios from 'axios'
-import _ from 'lodash'
-import { db } from '@/firebase'
+	import firebase from 'firebase'
+	import axios from 'axios'
+	import _ from 'lodash'
+	import { db } from '@/firebase'
 
-import { dice } from '@/mixins/dice.js'
-import { attributes } from '@/mixins/attributes.js'
+	import { dice } from '@/mixins/dice.js'
+	import { attributes } from '@/mixins/attributes.js'
 
-export default {
+	export default {
 
-	name: 'SetInitiative',
-	props: [
-		'entities'
-	],
-	mixins: [dice, attributes],
-	firebase() {
-		console.log("firebase")
-		return {
-			allPlayers: db.ref('players/' + this.userId),
-		}
-	},
-	data () {
-		console.log('data')
-		// var playersObj = {}
-		// var npcsObj = {}
-		// var initiativesObj = {}
-		// var active_entities = {}
-		// var inactive_entities = {}
-		return {
-			// initiatives: initiativesObj,
-			players: {},
-			npcs: {},
-			active_entities: {},
-			inactive_entities: {},
-
-			userId: firebase.auth().currentUser.uid,
-			campaignId: this.$route.params.campid,
-			encounterId: this.$route.params.encid,
-		}
-	},
-	computed: {
-	  orderedActive: function() {
-	    return _.orderBy(this.active_entities, 'initiative', 'desc')
-	  },
-	  orderedInactive: function() {
-	    return _.orderBy(this.inactive_entities, 'initiative', 'desc')
-	  }
-	},
-	created() {
-		console.log('created')
-		for (let key in this.entities) {
-			let entity = this.entities[key]
-			if (entity.type == "player") {
-				this.players[key] = entity
-			}
-			else if (entity.type == "npc") {
-				this.npcs[key] = entity
-			}
-			if (entity.initiative > 0) {
-				this.active_entities[key] = entity
-			}
-			else {
-				this.inactive_entities[key] = entity
-			}
-		}
-	},
-	mounted() {
-		console.log('mounted')
-	},
-	methods: {
-		storeInitiative(key, entity) {
-			if (!entity.initiative) {
-				entity.initiative = 0
-			}
-			db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities/' + key).update({
-				initiative: parseInt(entity.initiative),
-			})
-			if (entity.initiative > 0) {
-				this.$set(this.active_entities, key, entity)
-				this.$delete(this.inactive_entities, key)
-			}
-			else {
-				this.$set(this.inactive_entities, key, entity)
-				this.$delete(this.active_entities, key)
+		name: 'SetInitiative',
+		props: ['entities', 'data', 'round'],
+		mixins: [dice, attributes],
+		firebase() {
+			return {
+				allPlayers: db.ref('players/' + this.userId),
 			}
 		},
-		getPlayer(entityKey) {
-			var player = this.allPlayers.find(function(element) {
-				return element['.key'] == entityKey
-			});
-			return player
+		data () {
+			console.log(this.data)
+			return {
+				players: this.data.players,
+				npcs: this.data.npcs,
+				active_entities: this.data.active_entities,
+				inactive_entities: this.data.inactive_entities,
+
+				userId: firebase.auth().currentUser.uid,
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+			}
 		},
-		rollMonster(key, entity) {
-			entity.initiative = this.rollD(20,1,this.calcMod(entity.dex))
-			this.storeInitiative(key, entity)
+		computed: {
+			orderedActive: function() {
+				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)} , 'desc')
+			},
+			orderedInactive: function() {
+				return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
+			}
 		},
-		rollAll() {
-			for (let key in this.npcs) {
-				this.rollMonster(key, this.npcs[key])
+		created() {
+			for (let key in this.entities) {
+				let entity = this.entities[key]
+				if (entity.type == "player") {
+					this.players[key] = entity
+				}
+				else if (entity.type == "npc") {
+					this.npcs[key] = entity
+				}
+				if (entity.initiative > 0) {
+					this.active_entities[key] = entity
+				}
+				else {
+					this.inactive_entities[key] = entity
+				}
+			}
+		},
+		methods: {
+			storeInitiative(key, entity) {
+				if (!entity.initiative) {
+					entity.initiative = 0
+				}
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+					initiative: parseInt(entity.initiative),
+				})
+				if (entity.initiative > 0) {
+					this.$set(this.active_entities, key, entity)
+					this.$delete(this.inactive_entities, key)
+				}
+				else {
+					this.$set(this.inactive_entities, key, entity)
+					this.$delete(this.active_entities, key)
+				}
+			},
+			getPlayer(entityKey) {
+				var player = this.allPlayers.find(function(element) {
+					return element['.key'] == entityKey
+				});
+				return player
+			},
+			rollMonster(key, entity) {
+				entity.initiative = this.rollD(20,1,this.calcMod(entity.dex))
+				this.storeInitiative(key, entity)
+			},
+			rollAll() {
+				for (let key in this.npcs) {
+					this.rollMonster(key, this.npcs[key])
+				}
+			},
+			start() {
+				console.log("start")
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
+					round: 1
+				})
 			}
 		}
 	}
-}
 </script>
 
 <style lang="scss" scoped>
@@ -166,7 +158,7 @@ export default {
 	grid-template-rows: 1fr;
 	grid-gap: 10px;
 	grid-template-areas: 
-		"players npcs set";
+	"players npcs set";
 	
 	.players, .npcs, .set {
 		padding:15px 10px;
@@ -209,7 +201,7 @@ export default {
 }
 .name {
 	white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 </style>

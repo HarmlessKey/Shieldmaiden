@@ -4,7 +4,7 @@
 			<h2>Players</h2>
 			<template v-if="allPlayers.length">
 				<ul>
-					<li class="d-flex justify-content-between" v-for="entity, key in players">
+					<li class="d-flex justify-content-between" v-for="entity, key in _players">
 						<div class="d-flex justify-content-left">
 							<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 							<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
@@ -22,7 +22,7 @@
 		<div class="npcs bg-gray">
 			<h2>NPC's</h2>
 			<ul>
-				<li class="d-flex justify-content-between" v-for="entity, key in npcs">
+				<li class="d-flex justify-content-between" v-for="entity, key in _npcs">
 					<div class="d-flex justify-content-left">
 						<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
 						{{ entity.name }}
@@ -38,14 +38,14 @@
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
 			<transition-group name="initiative" tag="ul">
-				<li v-for="entity, key in orderedActive" :key="key">
+				<li v-for="entity, key in _active" :key="key" @click="toggleActive(entity)">
 					{{ entity.initiative }}
 					<!-- {{ entity.name }} -->
 				</li>
 			</transition-group>
 			<h2>Inactive</h2>
 			<ul name="inactive" tag="ul">
-				<li v-for="entity, key in orderedInactive">
+				<li v-for="entity, key in _idle" :key="key" @click="toggleActive(entity)">
 					{{ entity.initiative }}
 					{{ entity.name }}
 				</li>
@@ -67,7 +67,7 @@
 	export default {
 
 		name: 'SetInitiative',
-		props: ['entities', 'data', 'round'],
+		props: ['entities'],
 		mixins: [dice, attributes],
 		firebase() {
 			return {
@@ -75,12 +75,11 @@
 			}
 		},
 		data () {
-			console.log(this.data)
 			return {
-				players: this.data.players,
-				npcs: this.data.npcs,
-				active_entities: this.data.active_entities,
-				inactive_entities: this.data.inactive_entities,
+				players: {},
+				npcs: {},
+				active_entities: {},
+				inactive_entities: {},
 
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
@@ -88,12 +87,44 @@
 			}
 		},
 		computed: {
-			orderedActive: function() {
-				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)} , 'desc')
+			_players: function() {
+				return _.chain(this.entities)
+								.filter(function(entity) {
+									return entity.type == 'player';
+								})
+								.sortBy('name' , 'desc')
+								.value()
 			},
-			orderedInactive: function() {
-				return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
-			}
+			_npcs: function() {
+				return _.chain(this.entities)
+								.filter(function(entity) {
+									return entity.type == 'npc';
+								})
+								.sortBy('name' , 'desc')
+								.value()
+			},
+			_active: function() {
+				return _.chain(this.entities)
+								.filter(function(entity) {
+									return entity.active == true;
+								})
+								.sortBy({'initiative': Number} , 'desc')
+								.value()
+			},
+			_idle: function() {
+				return _.chain(this.entities)
+								// .filter(function(entity) {
+								// 	return entity.active == false;
+								// })
+								.sortBy({'initiative': Number} , 'desc')
+								.value()
+			},
+			// orderedActive: function() {
+			// 	return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
+			// },
+			// orderedInactive: function() {
+			// 	return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
+			// }
 		},
 		created() {
 			for (let key in this.entities) {
@@ -119,6 +150,7 @@
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
+					active: true
 				})
 				if (entity.initiative > 0) {
 					this.$set(this.active_entities, key, entity)

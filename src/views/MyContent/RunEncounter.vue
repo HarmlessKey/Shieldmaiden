@@ -4,8 +4,6 @@
 		<div v-if="encounter.round == 0">
 			<SetInitiative 
 				:entities="encounter.entities" 
-				:data="data"
-				:round="encounter.round"
 			/>
 		</div>
 		<div v-else>
@@ -55,8 +53,6 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-
-				data: {players:{}, npcs:{}, active_entities:{}, inactive_entities:{}},
 			}
 		},
 		methods: {

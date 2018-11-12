@@ -22,6 +22,7 @@
 					:players="players"
 					:_active="_active"
 					:_idle="_idle"
+					@target="log_target"
 				/>
 				<Actions />
 				<Side />
@@ -95,7 +96,9 @@
 			},
 		},
 		methods: {
-			
+			log_target: function(target) {
+				console.log(target)
+			}
 		}
 	}
 </script>

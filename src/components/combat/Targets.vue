@@ -2,7 +2,7 @@
 	<div id="targets" class="bg-gray">
 		<h2>Targets</h2>
 		<ul class="targets">
-			<li class="target" v-for="entity in _targets">
+			<li class="target" v-for="entity in _targets" @click="setTarget(entity)">
 				<span class="initiative">{{ entity.initiative }}</span>
 				<span v-if="entity.type=='player'" class="img" :style="{'background-image': 'url(' + players[entity.id].avatar + ')'}"></span>
 				<span v-else class="img" :style="{'background-image': 'url(' + require('@/assets/logo.png') + ')'}"></span>
@@ -14,7 +14,7 @@
 			</li>
 			<hr>
 			<h2>IDLE</h2>
-			<li class="target" v-for="entity in _idle">
+			<li class="target" v-for="entity in _idle" >
 				<span class="initiative">{{ entity.initiative }}</span>
 				<span v-if="entity.type=='player'" class="img" :style="{'background-image': 'url(' + players[entity.id].avatar + ')'}"></span>
 				<span v-else class="img" :style="{'background-image': 'url(' + require('@/assets/logo.png') + ')'}"></span>
@@ -41,6 +41,7 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				currentTarget: undefined,
 			}
 		},
 		computed: {
@@ -64,6 +65,23 @@
 					round: round,
 				})
 			},
+			setTarget(entity) {
+				console.log('setTarget')
+				
+				if (this.currentTarget == entity) {
+					this.currentTarget = undefined
+				} 
+				else {
+					this.currentTarget = entity	
+				}
+				this.$emit("target", this.currentTarget)
+			}
+			// getPlayer(entity) {
+
+			// },
+			// getNpc(entity) {
+
+			// }
 		},
 	}
 </script>

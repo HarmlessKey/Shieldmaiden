@@ -6,9 +6,7 @@
 </template>
 
 <script>
-
 	export default {
-
 		name: 'Current',
 
 		data: function() {

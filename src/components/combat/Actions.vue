@@ -80,15 +80,9 @@
 </template>
 
 <script>
-	// import Player from './Player.vue'
-
 	export default {
 
 		name: 'Actions',
-
-		// components: {
-		// 	Player
-		// },
 		data: function() {
 			return {
 

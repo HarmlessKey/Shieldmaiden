@@ -3,7 +3,7 @@
 		<h1>{{ title }}</h1>
 		<div class="round-info">
 			<span id="round">Round <span class="number mx-2">{{ round }}</span></span>
-			<span id="turn">Turn <span class="number ml-2">0</span></span>
+			<span id="turn">Turn <span class="number ml-2">{{ turn + 1 }}</span></span>
 			<span class="current-name"></span>
 		</div>
 		<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
@@ -17,10 +17,7 @@
 
 	export default {
 		name: 'Turns',
-		props: [
-		'round',
-		'title'
-		],
+		props: ['round','title','turn'],
 		data () {
 			return {
 				userId: firebase.auth().currentUser.uid,

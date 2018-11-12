@@ -1,7 +1,7 @@
 <template>
 	<!-- Check if encounter exists -->
-	<div v-if="encounter.round != undefined">
-		<Turns :round="encounter.round" :title="encounter.encounter"/>
+	<div v-if="encounter.round != undefined && Object.keys(players).length">
+		<Turns :round="encounter.round" :title="encounter.encounter" :turn="encounter.turn"/>
 		<div v-if="encounter.round == 0">
 			<SetInitiative 
 				:entities="encounter.entities" 
@@ -22,13 +22,15 @@
 </template>
 
 <script>
+	import _ from 'lodash'
+	import firebase from 'firebase'
+
 	import Actions from '@/components/combat/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
 	import Current from '@/components/combat/Current.vue'
 	import Targets from '@/components/combat/Targets.vue'
 	import Side from '@/components/combat/Side.vue'
 	import SetInitiative from '@/components/combat/SetInitiative.vue'
-	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
 	export default {

@@ -1,6 +1,6 @@
 <template>
 	<!-- Check if encounter exists -->
-	<div v-if="encounter">
+	<div v-if="encounter.round != undefined">
 		<div v-if="encounter.round == 0">
 			<SetInitiative 
 				:entities="encounter.entities" 
@@ -46,7 +46,6 @@
 				}
 			}
 		},
-
 		data() {
 			console.log('data')
 			return {

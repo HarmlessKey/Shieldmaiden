@@ -2,8 +2,7 @@
 	<div id="targets" class="bg-gray">
 		<h2>Targets</h2>
 		<ul class="targets">
-			<li class="target" v-for="entity in _target_order">
-				<!-- <span v-if="entity.type=='player'">entity.key</span> -->
+			<li class="target" v-for="entity in _targets">
 				<span class="initiative">{{ entity.initiative }}</span>
 				<span v-if="entity.type=='player'" class="img" :style="{'background-image': 'url(' + players[entity.id].avatar + ')'}"></span>
 				<span v-else class="img" :style="{'background-image': 'url(' + require('@/assets/logo.png') + ')'}"></span>
@@ -13,8 +12,18 @@
 				</div>
 				<span class="hp"><span class="green current mr-1">{{ entity.maxhp }}</span>/<span class="max ml-1">{{ entity.maxhp }}</span></span>
 			</li>
-			<button @click='nextTurn()'>next turn</button>
-			<!-- {{_target_order}} -->
+			<hr>
+			<h2>IDLE</h2>
+			<li class="target" v-for="entity in _idle">
+				<span class="initiative">{{ entity.initiative }}</span>
+				<span v-if="entity.type=='player'" class="img" :style="{'background-image': 'url(' + players[entity.id].avatar + ')'}"></span>
+				<span v-else class="img" :style="{'background-image': 'url(' + require('@/assets/logo.png') + ')'}"></span>
+				<span class="ac">{{ entity.ac }}</span>
+				<div class="progress health-bar">
+					<div class="progress-bar bg-green" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ entity.name }}</div>
+				</div>
+				<span class="hp"><span class="green current mr-1">{{ entity.maxhp }}</span>/<span class="max ml-1">{{ entity.maxhp }}</span></span>
+			</li>
 		</ul>
 	</div>
 </template>
@@ -25,8 +34,9 @@
 
 	export default {
 		name: 'Targets',
-		props: ['encounter','players'],
+		props: ['encounter','players','_active','_idle'],
 		data() {
+			// console.log(this._active)
 			return {
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
@@ -34,30 +44,11 @@
 			}
 		},
 		computed: {
-			_active: function() {
-				return _.chain(this.encounter.entities)
-								.filter(function(entity) {
-									return entity.active == true;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
-			_idle: function() {
-				return _.chain(this.encounter.entities)
-								.filter(function(entity) {
-									return entity.active == false;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
-			_target_order: function() {
+			_targets: function() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._active)
-				return Array.from(turns.slice(t).concat(turns.slice(0,t)), i => this._active[i])
+				let turn_order = turns.slice(t).concat(turns.slice(0,t))
+				return Array.from(turn_order, i => this._active[i])
 			},
 		},
 		methods: {

@@ -1,10 +1,17 @@
 <template>
 	<!-- Check if encounter exists -->
 	<div v-if="encounter.round != undefined && Object.keys(players).length">
-		<Turns :round="encounter.round" :title="encounter.encounter" :turn="encounter.turn"/>
+		<Turns 
+			:round="encounter.round" 
+			:title="encounter.encounter" 
+			:turn="encounter.turn"
+			:active_len="_active.length"
+		/>
 		<div v-if="encounter.round == 0">
 			<SetInitiative 
-				:entities="encounter.entities" 
+				:entities="encounter.entities"
+				:_active="_active"
+				:_idle="_idle"
 			/>
 		</div>
 		<div v-else>
@@ -13,6 +20,8 @@
 				<Targets 
 					:encounter="encounter"
 					:players="players"
+					:_active="_active"
+					:_idle="_idle"
 				/>
 				<Actions />
 				<Side />
@@ -62,6 +71,28 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 			}
+		},
+		computed: {
+			_active: function() {
+				return _.chain(this.encounter.entities)
+								.filter(function(entity) {
+									return entity.active == true;
+								})
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
+								.value()
+			},
+			_idle: function() {
+				return _.chain(this.encounter.entities)
+								.filter(function(entity) {
+									return entity.active == false;
+								})
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
+								.value()
+			},
 		},
 		methods: {
 			

@@ -7,7 +7,7 @@
 			<span class="current-name"></span>
 		</div>
 		<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
-		<a v-else class="btn">Next turn <i class="fas fa-arrow-right"></i></a>
+		<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
 	</div>
 </template>
 
@@ -17,7 +17,7 @@
 
 	export default {
 		name: 'Turns',
-		props: ['round','title','turn'],
+		props: ['round','title','turn', 'active_len'],
 		data () {
 			return {
 				userId: firebase.auth().currentUser.uid,
@@ -30,7 +30,19 @@
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
 					round: 1
 				})
-			}
+			},
+			nextTurn() {
+				let turn = this.turn + 1
+				let round = this.round
+				if (turn >= this.active_len) {
+					turn = 0
+					round++
+				}
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
+					turn: turn,
+					round: round,
+				})
+			},
 		}
 	}
 </script>

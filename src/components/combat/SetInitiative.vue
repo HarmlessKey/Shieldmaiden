@@ -81,7 +81,7 @@
 	export default {
 
 		name: 'SetInitiative',
-		props: ['entities'],
+		props: ['entities','_active','_idle'],
 		mixins: [dice, attributes],
 		firebase() {
 			return {
@@ -119,28 +119,6 @@
 								})
 								.sortBy('name' , 'desc')
 								.value()
-			},
-			_active: function() {
-				return _.chain(this.entities)
-								.filter(function(entity) {
-									return entity.active == true;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
-			_idle: function() {
-				let idle = _.chain(this.entities)
-								.filter(function(entity) {
-									return entity.active == false;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-				console.log(idle)
-				return idle
 			},
 			orderedActive: function() {
 				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')

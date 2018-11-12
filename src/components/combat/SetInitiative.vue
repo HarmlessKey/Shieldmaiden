@@ -22,10 +22,10 @@
 		<div class="npcs bg-gray">
 			<h2>NPC's</h2>
 			<ul>
-				<li class="d-flex justify-content-between" v-for="entity in _npcs" :key="entity.key" :class="{selected:selected.includes(entity.key)}">
+				<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="{selected:selected.includes(i)}">
 					<div class="d-flex justify-content-left">
 						<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-						<span class="ml-1 pointer" @click="selected.includes(entity.key) ? selected.splice(selected.indexOf(entity.key), 1) : selected.push(entity.key)">{{ entity.name }}</span>
+						<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
 					</div>
 					<div class="d-flex justify-content-right">
 						<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
@@ -34,7 +34,7 @@
 				</li>
 			</ul>
 			<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('npcInit') }}</p>
-			<a class="btn btn-block mb-4" v-b-tooltip.hover title="Coming Soon"><i class="fas fa-dice-d20"></i> Roll as group</a>
+			<a class="btn btn-block mb-4" :class="{'disabled' : selected.length == 0 }" @click="rollGroup()"><i class="fas fa-dice-d20"></i> Roll as group</a>
 			<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
 		</div>
 		<div class="set bg-gray">
@@ -47,6 +47,7 @@
 						{{ entity.name }}
 					</span>
 					<span>{{ entity.initiative }}</span>
+					<a class="red" v-b-tooltip.hover title="Set Inactive" @click="setActive(entity.key, false)"><i class="fas fa-minus-circle"></i></a>
 				</li>
 			</transition-group>
 
@@ -57,8 +58,11 @@
 
 			<transition-group name="initiative" tag="ul" enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp">
 				<li v-for="(entity) in _idle" v-bind:key="entity.key" class="d-flex justify-content-between">
-					<span>{{ entity.name }}</span>
-					<span>{{ entity.initiative }}</span>
+					<span class="d-flex justify-content-left">
+						<span>{{ entity.name }}</span>
+						<span>{{ entity.initiative }}</span>
+					</span>
+					<a class="green" v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus-circle"></i></a>
 				</li>
 			</transition-group>
 			<a class="btn btn-block" @click="start()">Start encounter</a>
@@ -151,23 +155,12 @@
 		},
 		methods: {
 			storeInitiative(key, entity) {
-				// console.log("STORE")
-				// console.log(key)
-				// console.log(entity)
 				if (!entity.initiative) {
 					entity.initiative = 0
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
 				})
-				if (entity.initiative > 0) {
-					this.$set(this.active_entities, key, entity)
-					this.$delete(this.inactive_entities, key)
-				}
-				else {
-					this.$set(this.inactive_entities, key, entity)
-					this.$delete(this.active_entities, key)
-				}
 			},
 			getPlayer(entityKey) {
 				var player = this.allPlayers.find(function(element) {
@@ -180,9 +173,42 @@
 				this.storeInitiative(key, entity)
 			},
 			rollAll() {
-				for (let key in this.npcs) {
-					this.rollMonster(key, this.npcs[key])
+				for (let i in this._npcs) {
+					let key = this._npcs[i].key
+					this.rollMonster(key, this._npcs[i])
 				}
+			},
+			rollGroup() {
+				let dex = Infinity
+				let i
+				let key
+				let entity
+				for(i in this.selected) {
+					key = this.selected[i]
+					entity = this._npcs[key]
+
+					//Find lowest Dex
+					if(entity.dex < dex) {
+						dex = entity.dex;
+					}
+				}
+				let roll = this.rollD(20,1,this.calcMod(dex));
+
+				for(let i in this.selected) {
+					key = this.selected[i]
+					entity = this._npcs[key]
+					entity.initiative = roll
+
+					this.storeInitiative(entity.key, entity)
+				}
+				this.selected = []
+			},
+			setActive(key, active) {
+				console.log('key: ' + key)
+				console.log('active: ' + active)
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+					active: active
+				})
 			},
 			start() {
 				console.log("start")

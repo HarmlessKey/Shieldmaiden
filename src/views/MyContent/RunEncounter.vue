@@ -10,7 +10,10 @@
 			<Turns :round="encounter.round"/>
 			<div id="combat">
 				<Current />
-				<Targets />
+				<Targets 
+					:encounter="encounter"
+					:players="players"
+				/>
 				<Actions />
 				<Side />
 			</div>
@@ -42,6 +45,10 @@
 			return {
 				encounter: {
 					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`),
+					asObject: true,
+				},
+				players: {
+					source:db.ref(`players/${this.userId}`),
 					asObject: true,
 				}
 			}

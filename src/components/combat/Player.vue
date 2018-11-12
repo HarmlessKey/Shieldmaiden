@@ -1,7 +1,8 @@
 <template>
 	<div id="target">
 		<span class="initiative">{{ p.initiative }}</span>
-		<span class="img" :style="{'background-image': 'url(' + require('@/assets/_img/tharim.jpg') + ')'}"></span>
+		<span v-if="p.type=='player'" class="img" :style="{'background-image': 'url(' + require('@/assets/_img/tharim.jpg') + ')'}"></span>
+		<span v-else class="img" :style="{'background-image': 'url('+ p.avatar +')'}"></span>
 		<span class="ac">{{ p.ac }}</span>
 		<div class="progress health-bar">
 			<div class="progress-bar bg-green" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ p.character_name }}</div>

@@ -150,8 +150,12 @@
 					entity.wis = npc_data.wisdom
 					entity.cha = npc_data.charisma
 					entity.maxhp = npc_data.hit_points
+					entity.curhp = npc_data.hit_points
 					entity.ac = npc_data.armor_class
 					entity.active = false
+				}
+				else if (type == 'player') {
+					entity.curHp = getPlayer(id)[maxhp]
 				}
 				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 			},

@@ -80,15 +80,15 @@
 </template>
 
 <script>
-	import Player from './Player.vue'
+	// import Player from './Player.vue'
 
 	export default {
 
 		name: 'Actions',
 
-		components: {
-			Player
-		},
+		// components: {
+		// 	Player
+		// },
 		data: function() {
 			return {
 

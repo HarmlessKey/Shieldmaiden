@@ -6,15 +6,11 @@
 </template>
 
 <script>
-	import Player from './Player.vue'
 
 	export default {
 
 		name: 'Current',
 
-		components: {
-			Player,
-		},
 		data: function() {
 			return {
 				

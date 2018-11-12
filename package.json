@@ -1,14 +1,14 @@
 {
 	"name": "dnd_combat_emulator",
 	"version": "0.1.0",
-	"engines": {
-		"node": "8.10.0",
-	},
 	"private": true,
 	"scripts": {
 		"serve": "vue-cli-service serve",
 		"build": "vue-cli-service build",
 		"lint": "vue-cli-service lint"
+	},
+	"engines": {
+		"node": "8.10.0",
 	},
 	"dependencies": {
 		"axios": "^0.18.0",

@@ -1,24 +1,38 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between bg-gray">
-		<h1>Combat title</h1>
+		<h1>{{ title }}</h1>
 		<div class="round-info">
 			<span id="round">Round <span class="number mx-2">{{ round }}</span></span>
 			<span id="turn">Turn <span class="number ml-2">0</span></span>
 			<span class="current-name"></span>
 		</div>
-		<button class="btn">Next turn <i class="fas fa-arrow-right"></i></button>
+		<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
+		<a v-else class="btn">Next turn <i class="fas fa-arrow-right"></i></a>
 	</div>
 </template>
 
 <script>
+	import firebase from 'firebase'
+	import { db } from '@/firebase'
+
 	export default {
 		name: 'Turns',
 		props: [
-		'round'
+		'round',
+		'title'
 		],
 		data () {
 			return {
-
+				userId: firebase.auth().currentUser.uid,
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+			}
+		},
+		methods: {
+			start() {
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
+					round: 1
+				})
 			}
 		}
 	}
@@ -31,7 +45,10 @@
 	font-size:20px;
 	text-transform:uppercase;
 	grid-area: header;
-	margin-bottom:10px;
+	position: fixed;
+	top: 80px;
+	width: 100vw;
+	border-bottom: solid 1px #191919;
 }
 h1 {
 	line-height:44px;

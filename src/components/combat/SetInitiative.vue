@@ -65,7 +65,6 @@
 					<a class="green" v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus-circle"></i></a>
 				</li>
 			</transition-group>
-			<a class="btn btn-block" @click="start()">Start encounter</a>
 		</div>
 	</div>
 </template>
@@ -209,12 +208,6 @@
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					active: active
 				})
-			},
-			start() {
-				console.log("start")
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
-					round: 1
-				})
 			}
 		}
 	}
@@ -222,7 +215,7 @@
 
 <style lang="scss" scoped>
 #container {
-	padding:10px;
+	padding:72px 10px 10px 10px;
 	width: 100vw;
 	height: calc(100vh - 80px);
 	display: grid;

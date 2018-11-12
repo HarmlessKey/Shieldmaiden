@@ -1,13 +1,13 @@
 <template>
 	<!-- Check if encounter exists -->
 	<div v-if="encounter.round != undefined">
+		<Turns :round="encounter.round" :title="encounter.encounter"/>
 		<div v-if="encounter.round == 0">
 			<SetInitiative 
 				:entities="encounter.entities" 
 			/>
 		</div>
 		<div v-else>
-			<Turns :round="encounter.round"/>
 			<div id="combat">
 				<Current />
 				<Targets 
@@ -69,8 +69,9 @@
 
 <style>
 #combat {
-	width: calc(100vw - 10px);
-	height: calc(100vh - 185px);
+	padding:72px 10px 10px 10px;
+	width: 100vw;
+	height: calc(100vh - 85px);
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 	grid-template-rows: auto;

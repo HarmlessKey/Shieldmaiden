@@ -12,17 +12,21 @@
 			<h2>Actions</h2>
 			<div class="tab-content">
 				<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-					<p>Manual damage or healing</p>
+					<p v-if="!target" class="red">No target selected</p>
+					<template v-else>
+						<p>Target: <b class="blue">{{ target.name }}</b></p>
+						<p>Manual damage or healing</p>
 
-					<div class="custom-control custom-checkbox mb-2">
-						<input type="checkbox" class="custom-control-input" checked="checked" id="lethal">
-						<label class="custom-control-label" for="lethal">Lethal damage</label>
-					</div>
-					<div class="manual">
-						<input type="phone" class="form-control">
-						<button class="btn dmg bg-red"><i class="fas fa-minus-square"></i></button>
-						<button class="btn heal bg-green"><i class="fas fa-plus-square"></i></button>
-					</div>
+						<!-- <div class="custom-control custom-checkbox mb-2">
+							<input type="checkbox" class="custom-control-input" checked="checked" id="lethal">
+							<label class="custom-control-label" for="lethal">Lethal damage</label>
+						</div> -->
+						<div class="manual">
+							<input type="phone" v-model="manualAmount" class="form-control">
+							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
+							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
+						</div>
+					</template>
 				</div>
 				<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 					<div class="row">
@@ -80,12 +84,58 @@
 </template>
 
 <script>
+	import firebase from 'firebase'
+	import { db } from '@/firebase'
+
 	export default {
 
 		name: 'Actions',
+		props: ['target'],
 		data: function() {
 			return {
+				userId: firebase.auth().currentUser.uid,
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+				manualAmount: ''
+			}
+		},
+		methods: {
+			setManual(target, type) {
+				// console.log('MaxHP: ' + target.maxHp);
+				// console.log('Type: ' + type);
+				// console.log('Amount: ' + this.manualAmount);
 
+				let amount = parseInt(this.manualAmount);
+				let maxHp = parseInt(target.maxHp);
+				let curHp = parseInt(target.curHp);
+
+				if(type == 'damage') {
+					let newhp = parseInt(curHp - amount);
+
+	        if(newhp < 0) { 
+						newhp = 0;
+						let over = amount - curHp; //overkill
+						amount = curHp;
+	        }
+					
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+						curhp: newhp,
+					})
+				}
+				else {
+					let newhp = parseInt(curHp + amount);
+				
+	        if(newhp > maxHp) { 
+						newhp = maxHp;
+						let over = amount - maxHp + curHp; //overhealing
+						amount = maxHp - curHp;
+	        }
+					
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+						curhp: newhp,
+					})
+				}
+				this.manualAmount = '';
 			}
 		}
 	}

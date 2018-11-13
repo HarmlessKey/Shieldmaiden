@@ -1,16 +1,25 @@
 <template>
-	<div class="target">
-		<span class="initiative">{{ item.initiative }}</span>
+	<div class="target" >
+		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ item.initiative }}</span>
 		<span class="img" :style="{'background-image': 'url(' + item.img + ')'}"></span>
-		<span class="ac">{{ item.ac }}</span>
+		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ item.ac }}</span>
 		<div class="progress health-bar">
-			<div class="progress-bar bg-green" role="progressbar" style="width: 100%" 
-					 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+			<div class="progress-bar" :class="{ 
+				'bg-red': percentage(item.curHp, item.maxHp) < 33, 
+				'bg-orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
+				'bg-green': percentage(item.curHp, item.maxHp) > 7
+				}" 
+				role="progressbar" 
+				:style="{width: percentage(item.curHp, item.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 				{{ item.name }}
 			</div>
 		</div>
-		<span class="hp">
-			<span class="green current mr-1">{{ item.curHp }}</span>
+		<span class="hp" v-b-tooltip.hover title="Current / Max HP">
+			<span class="current mr-1" :class="{ 
+				'red': percentage(item.curHp, item.maxHp) < 33, 
+				'orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
+				'green': percentage(item.curHp, item.maxHp) > 7
+				}">{{ item.curHp }}</span>
 			/<span class="max ml-1">{{ item.maxHp }}</span>
 		</span>
 	</div>
@@ -23,9 +32,15 @@ export default {
   props: ['item'],
   data () {
     return {
-
+			target: ''
     }
-  }
+	},
+	methods: {
+		percentage(current, max) {
+			var hp_percentage = Math.floor(current / max * 100)
+			return hp_percentage
+		}
+	}
 }
 </script>
 
@@ -38,18 +53,9 @@ export default {
 	grid-template-areas: 
 	"initiative img ac hp-bar hp-bar hp-bar hp hp";
 	
-	line-height:30px;
-	margin-bottom:8px;
-	border:solid 1px #262626;
-	cursor:pointer;
+	line-height: 30px;
 }
-.target:hover {
-	border:solid 1px #2c97de;
-}
-.active {
-	border-color:#2c97de !important;
-	box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
-}
+
 .progress { 
 	height:30px;
 	background-color:#4c4c4c;
@@ -65,18 +71,19 @@ export default {
 }
 .initiative, .ac, .img {
 	text-align:center;
+	height: 30px;
 }
 .initiative {
 	grid-area: initiative;
 }
 .img {
-	background-color:#191919;
-	background-position:center top;
-	background-repeat:no-repeat;
-	background-size:cover;
-	color:#cc3e4a;
-	font-size:20px;
-	line-height:30px;
+	background-color: #191919;
+	background-position: center top;
+	background-repeat: no-repeat;
+	background-size: cover;
+	color: #cc3e4a;
+	font-size: 20px;
+	line-height: 30px;
 	grid-area: img;
 }
 .ac {

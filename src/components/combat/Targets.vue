@@ -2,19 +2,39 @@
 	<div id="targets" class="bg-gray">
 		<h2>Targets</h2>
 		<ul class="targets">
-			<li v-for="entity in _targets" @click="setTarget(entity)">
-				<TargetItem v-if="entity.type == 'npc'" :item="getNpc(entity)" />
-				<TargetItem v-if="entity.type == 'player'" :item="getPlayer(entity)" />
-			</li>
+			<template v-for="entity in _targets">
+				<template v-if="entity.type == 'npc'">
+					<li @click="setTarget(getNpc(entity))" :class="{ targeted : currentTarget == entity }">
+						<TargetItem :item="getNpc(entity)" />
+					</li>
+				</template>
+				<template v-if="entity.type == 'player'">
+					<li @click="setTarget(getPlayer(entity))" :class="{ targeted : currentTarget == entity }">
+						<TargetItem :item="getPlayer(entity)" />
+					</li>
+				</template>
+			</template>
 		</ul>
+		<template v-if="_idle.length">
+			<hr>
+			<h2>IDLE</h2>
+			<ul class="targets">
+				<template v-for="entity in _idle">
+				<template v-if="entity.type == 'npc'">
+					<li @click="setTarget(getNpc(entity))" :class="{ targeted : currentTarget == entity }">
+						<TargetItem :item="getNpc(entity)" />
+					</li>
+				</template>
+				<template v-if="entity.type == 'player'">
+					<li @click="setTarget(getPlayer(entity))" :class="{ targeted : currentTarget == entity }">
+						<TargetItem :item="getPlayer(entity)" />
+					</li>
+				</template>
+			</template>
+			</ul>
+		</template>
 		<hr>
-		<h2>IDLE</h2>
-		<ul class="targets">
-			<li v-for="entity in _idle" >
-				<TargetItem v-if="entity.type == 'npc'" :item="getNpc(entity)" />
-				<TargetItem v-if="entity.type == 'player'" :item="getPlayer(entity)" />
-			</li>
-		</ul>
+		<h2>Down</h2>
 	</div>
 </template>
 
@@ -57,7 +77,7 @@
 				})
 			},
 			setTarget(entity) {
-				console.log('setTarget')
+				//console.log('setTarget')
 				
 				if (this.currentTarget == entity) {
 					this.currentTarget = undefined
@@ -69,33 +89,37 @@
 			},
 			getPlayer(entity) {
 				let item = {
+					key: entity.key,
+					id: entity.id,
 					initiative: entity.initiative,
 					img: this.players[entity.id].avatar,
 					ac: this.players[entity.id].ac,
 					maxHp: parseInt(this.players[entity.id].maxhp),
-					curHp: parseInt(this.players[entity.id].maxhp),
+					curHp: parseInt(entity.curhp),
 					name: entity.name,
 				}
-				console.log(item)
+				//console.log(item)
 				return item
 			},
 			getNpc(entity) {
 				let item = {
+					key: entity.key,
+					id: entity.id,
 					initiative: entity.initiative,
 					img: require('@/assets/_img/styles/monster.svg'),
 					ac: entity.ac,
-					maxHp: entity.maxhp,
-					curHp: entity.maxhp,
+					maxHp: parseInt(entity.maxhp),
+					curHp: parseInt(entity.curhp),
 					name: entity.name,			
 				}
-				console.log(item)
+				//console.log(item)
 				return item
 			}
 		},
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 
 #targets {
 	padding:15px 10px;
@@ -104,5 +128,22 @@
 ul.targets {
 	list-style:none;
 	padding:0;
+
+	li {
+		height: 32px;
+		margin-bottom: 8px;
+		border: solid 1px #262626;
+		cursor: pointer;
+		padding-right: 5px;
+
+		&:hover {
+			border-color: #2c97de;
+		}
+		&.targeted {
+			border-color: #2c97de !important;
+			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
+		}
+	}
 }
+
 </style>

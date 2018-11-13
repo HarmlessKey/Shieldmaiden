@@ -24,7 +24,7 @@
 					:_idle="_idle"
 					@target="log_target"
 				/>
-				<Actions />
+				<Actions :target="target" />
 				<Side />
 			</div>
 		</div>
@@ -66,17 +66,19 @@
 			}
 		},
 		data() {
-			console.log('data')
+			//console.log('data')
 			return {
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				target: ''
 			}
 		},
 		computed: {
 			_active: function() {
 				return _.chain(this.encounter.entities)
-								.filter(function(entity) {
+								.filter(function(entity, key) {
+									entity.key = key
 									return entity.active == true;
 								})
 								.orderBy(function(entity){
@@ -86,7 +88,8 @@
 			},
 			_idle: function() {
 				return _.chain(this.encounter.entities)
-								.filter(function(entity) {
+								.filter(function(entity, key) {
+									entity.key = key
 									return entity.active == false;
 								})
 								.orderBy(function(entity){
@@ -97,7 +100,8 @@
 		},
 		methods: {
 			log_target: function(target) {
-				console.log(target)
+				//console.log(target)
+				this.target = target
 			}
 		}
 	}

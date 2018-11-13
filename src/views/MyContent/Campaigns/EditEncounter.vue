@@ -155,7 +155,7 @@
 					entity.active = false
 				}
 				else if (type == 'player') {
-					entity.curHp = getPlayer(id)[maxhp]
+					entity.curhp = this.getPlayer(id).maxhp
 				}
 				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 			},

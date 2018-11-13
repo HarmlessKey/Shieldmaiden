@@ -49,13 +49,13 @@
 
 <style lang="css" scoped>
 #turns {
-	padding:10px;
-	height:62px;
-	font-size:20px;
-	text-transform:uppercase;
+	padding: 10px;
+	height: 62px;
+	font-size: 20px;
+	text-transform: uppercase;
 	grid-area: header;
 	position: fixed;
-	top: 80px;
+	top: 50px;
 	width: 100vw;
 	border-bottom: solid 1px #191919;
 }

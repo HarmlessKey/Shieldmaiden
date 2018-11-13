@@ -1,23 +1,23 @@
 <template>
 	<div id="targets" class="bg-gray">
-		<h2>Targets</h2>
-		<ul class="targets">
+		<h2>Targets ({{ _targets.length }})</h2>
+		<transition-group tag="ul" class="targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
 			<template v-for="entity in _targets">
 				<template v-if="entity.type == 'npc'">
-					<li @click="setTarget(getNpc(entity))" :class="{ targeted : currentTarget == entity }">
+					<li @click="setTarget(getNpc(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
 						<TargetItem :item="getNpc(entity)" />
 					</li>
 				</template>
 				<template v-if="entity.type == 'player'">
-					<li @click="setTarget(getPlayer(entity))" :class="{ targeted : currentTarget == entity }">
+					<li @click="setTarget(getPlayer(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
 						<TargetItem :item="getPlayer(entity)" />
 					</li>
 				</template>
 			</template>
-		</ul>
+		</transition-group>
 		<template v-if="_idle.length">
 			<hr>
-			<h2>IDLE</h2>
+			<h2>IDLE ({{ _idle.length }})</h2>
 			<ul class="targets">
 				<template v-for="entity in _idle">
 				<template v-if="entity.type == 'npc'">
@@ -52,7 +52,7 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				currentTarget: undefined,
+				currentTarget: {},
 			}
 		},
 		computed: {
@@ -143,7 +143,15 @@ ul.targets {
 			border-color: #2c97de !important;
 			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
 		}
+		&:first-child {
+			margin-bottom:15px;
+		}
 	}
 }
-
+.targets-move {
+  transition: transform .6s;
+}
+.fadeInUp, .fadeInDown {
+	animation-delay: .6s;
+}
 </style>

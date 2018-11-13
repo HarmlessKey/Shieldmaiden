@@ -49,29 +49,29 @@
 
 <style>
 header a.user, header a.roll-dice	{
-	cursor:pointer;
-	font-size:15px;
-	padding:0 10px;
-	color:#b2b2b2 !important;
+	cursor: pointer;
+	font-size: 15px;
+	padding: 0 10px;
+	color: #b2b2b2 !important;
 }
 header a.user:hover, header a.roll-dice:hover {
-	color:#2c97de !important;
+	color: #2c97de !important;
 }
 header .dropdown-menu {
-	top:28px !important;
-	left:10px !important;
+	top: 13px !important;
+	left: 10px !important;
 }
 header .dropdown-menu button, header .dropdown-menu a {
-	color:#b2b2b2 !important;
-	cursor:pointer;
-	font-size:15px;
+	color: #b2b2b2 !important;
+	cursor: pointer;
+	font-size: 15px;
 }
 header .dropdown-menu button:hover, header .dropdown-menu a:hover, header .dropdown-menu button.active, header .dropdown-menu a.active {
-	color:#2c97de !important;
+	color: #2c97de !important;
 	background:none;
 }
 header .dropdown-divider {
-	border-color:#b2b2b2;
-	margin:0;
+	border-color: #b2b2b2;
+	margin: 0;
 }
 </style>

@@ -251,22 +251,20 @@ ul.entities li a {
 	font-size:18px;
 }
 .npc {
-	padding:15px;
-	position:fixed;
-	right:0;
-	top:80px;
-	height: calc(100vh - 80px);
-	width:330px;
-	z-index:99;
+	padding: 15px;
+	position: fixed;
+	right: 0;
+	top: 50px;
+	height: calc(100vh - 50px);
+	width: 330px;
+	z-index: 99;
 	overflow: auto;
-	border-left:solid 1px #000;
+	border-left: solid 1px #000;
 	box-shadow: 0 10px 8px #000;
 }
-
 .slideInRight {
 	animation-duration: 0.5s;
 }
-
 .slideOutRight {
 	animation-duration: 0.5s;
 }

@@ -22,7 +22,7 @@
 							<label class="custom-control-label" for="lethal">Lethal damage</label>
 						</div> -->
 						<div class="manual">
-							<input type="phone" v-model="manualAmount" v-validate="'required|numeric'" name="Manual Input" class="form-control">
+							<input type="number" min="0" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
 							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
 							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
@@ -101,7 +101,7 @@
 								amount + ' ' + type + 'done to ' + target.name, 
 								'Healing done!', 
 								{
-									position: "centerTop"
+									position: "centerTop",
 								}
 							);
 						}
@@ -143,5 +143,11 @@
 }
 .dmg {
 	grid-area: btn-dmg;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
 }
 </style>

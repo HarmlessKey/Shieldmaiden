@@ -19,12 +19,23 @@
 				<thead>
 					<th>#</th>
 					<th>Encounter</th>
+					<th>Status</th>
+					<th>Round</th>
+					<th>Turn</th>
 					<th></th>
 				</thead>
 				<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
 					<tr v-for="(encounter, index) in encounters" :key="encounter['.key']">
 						<td>{{ index + 1 }}</td>
 						<td>{{ encounter.encounter }}</td>
+						<template v-if="encounter.round != 0">
+							<td class="red">In progress</td>
+							<td>{{ encounter.round }}</td>
+							<td>{{ encounter.turn }}</td>
+						</template>
+						<template v-else>
+							<td colspan="3">Not started</td>
+						</template>
 						<td class="text-right">
 							<router-link class="green" :to="'/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
 							<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>

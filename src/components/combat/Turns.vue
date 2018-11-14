@@ -6,8 +6,11 @@
 			<span id="turn">Turn <span class="number ml-2">{{ turn + 1 }}</span></span>
 			<span class="current-name"></span>
 		</div>
-		<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
-		<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
+		<div>
+			<a v-if="round > 0" class="btn" @click="prevTurn()">Prev turn <i class="fas fa-arrow-left"></i></a>
+			<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
+			<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
+		</div>
 	</div>
 </template>
 
@@ -37,6 +40,18 @@
 				if (turn >= this.active_len) {
 					turn = 0
 					round++
+				}
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
+					turn: turn,
+					round: round,
+				})
+			},
+			prevTurn() {
+				let turn = this.turn - 1
+				let round = this.round
+				if (turn < 0) {
+					turn = this.active_len - 1
+					round--
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
 					turn: turn,

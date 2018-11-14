@@ -1,28 +1,20 @@
 <template>
 	<div id="targets" class="bg-gray">
 		<h2>Targets ({{ _targets.length }})</h2>
-		<transition-group tag="ul" class="targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+		<transition-group tag="ul" class="targets active_targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
 			<template v-for="(entity,_,i) in _targets">
-				<!-- <template v-if="entity.type == 'npc'"> -->
-				<li @click="setTarget(getTarget(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
-					<TargetItem :item="getTarget(entity)" />
+				<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
+					<TargetItem :item="getTargetData(entity)" />
 				</li>
-				<!-- </template> -->
-				<!-- <template v-if="entity.type == 'player'"> -->
-					<!-- <li @click="setTarget(getPlayer(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }"> -->
-						<!-- <TargetItem :item="getPlayer(entity)" /> -->
-					<!-- </li> -->
-				<!-- </template> -->
-				<!-- <hr v-if="i==0"> -->
 			</template>
 		</transition-group>
 		<template v-if="_idle.length">
 			<hr>
 			<h2>IDLE ({{ _idle.length }})</h2>
-			<ul class="targets">
+			<ul class="targets idle_targets">
 				<template v-for="entity in _idle">
-					<li @click="setTarget(getTarget(entity))" :class="{ targeted : currentTarget == entity }">
-						<TargetItem :item="getTarget(entity)" />
+					<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
+						<TargetItem :item="getTargetData(entity)" />
 					</li>
 				</template>
 			</ul>
@@ -58,18 +50,6 @@
 			},
 		},
 		methods: {
-			nextTurn() {
-				let turn = this.encounter.turn + 1
-				let round = this.encounter.round
-				if (turn >= this._active.length) {
-					turn = 0
-					round++
-				}
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
-					turn: turn,
-					round: round,
-				})
-			},
 			setTarget(entity) {				
 				if (this.currentTarget == entity) {
 					this.currentTarget = undefined
@@ -79,7 +59,7 @@
 				}
 				this.$emit("target", this.currentTarget)
 			},
-			getTarget(entity) {
+			getTargetData(entity) {
 				let item = {
 					name: entity.name,
 					key: entity.key,
@@ -128,12 +108,11 @@ ul.targets {
 			border-color: #2c97de !important;
 			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
 		}
-		&:first-child {
-			// padding-bottom: 15px;
-			// margin-bottom:15px;
-			// border-bottom: 1px solid black;
-
-		}
+	}
+	&.active_targets li:first-child {
+		margin-bottom: 20px;
+		border-color: rgb(124,252,0);
+		box-shadow: 0px 0px 10px rgba(124, 252, 0, .5);
 	}
 }
 .targets-move {

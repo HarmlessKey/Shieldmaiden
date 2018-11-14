@@ -10,8 +10,8 @@
 		</ul>
 		
 		<div class="tab-content">
-			<Dmg/>
-			<Log/>	
+			<Dmg />
+			<Log :log="log" />	
 		</div>
 	</div>
 </template>
@@ -26,6 +26,7 @@
 			Dmg,
 			Log
 		},
+		props: ['log', 'dmg'],
 		data () {
 			return {
 

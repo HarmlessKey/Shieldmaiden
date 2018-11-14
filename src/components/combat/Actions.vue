@@ -16,7 +16,6 @@
 					<template v-else>
 						<p>Target: <b class="blue">{{ target.name }}</b></p>
 						<p>Manual damage or healing</p>
-
 						<!-- <div class="custom-control custom-checkbox mb-2">
 							<input type="checkbox" class="custom-control-input" checked="checked" id="lethal">
 							<label class="custom-control-label" for="lethal">Lethal damage</label>
@@ -44,13 +43,16 @@
 	export default {
 
 		name: 'Actions',
-		props: ['target'],
+		props: ['target', 'round', 'turn'],
 		data: function() {
 			return {
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				manualAmount: ''
+				manualAmount: '',
+				log: [],
+				currentRound: this.round,
+				currentTurn: this.turn + 1,
 			}
 		},
 		methods: {
@@ -60,13 +62,18 @@
 						let amount = parseInt(this.manualAmount);
 						let maxHp = parseInt(target.maxHp);
 						let curHp = parseInt(target.curHp);
+						let over = 0
+
+						//time for log
+						var d = new Date();
+						var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 						if(type == 'damage') {
 						let newhp = parseInt(curHp - amount);
 
 						if(newhp < 0) { 
 							newhp = 0;
-							//let over = amount - curHp; //overkill
+							over = amount - curHp; //overkill
 							amount = curHp;
 						}
 							
@@ -82,13 +89,23 @@
 									position: "centerTop"
 								}
 							);
+							//Add to log
+							this.log.unshift({
+								round: this.currentRound,
+								turn: this.currentTurn,
+								time: time,
+								type: type,
+								target: target.name,
+								amount: amount,
+								over: over
+							})	
 						}
 						else {
 							let newhp = parseInt(curHp + amount);
 
 							if(newhp > maxHp) { 
 								newhp = maxHp;
-								//let over = amount - maxHp + curHp; //overhealing
+								over = amount - maxHp + curHp; //overhealing
 								amount = maxHp - curHp;
 							}
 							
@@ -104,8 +121,20 @@
 									position: "centerTop",
 								}
 							);
+							//Add to log
+							this.log.unshift({
+								round: this.currentRound,
+								turn: this.currentTurn,
+								time: time,
+								type: type,
+								target: target.name,
+								amount: amount,
+								over: over
+							})	
 						}
+						
 						this.manualAmount = '';
+						this.$emit("log", this.log);
 					}
 					else {
 						//console.log('Not Valid');

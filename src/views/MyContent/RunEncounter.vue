@@ -24,8 +24,13 @@
 					:_idle="_idle"
 					@target="log_target"
 				/>
-				<Actions :target="target" />
-				<Side />
+				<Actions 
+				:target="target"
+				:round="encounter.round" 
+				:turn="encounter.turn" 
+				@log="sendLog"
+				/>
+				<Side :log="log" />
 			</div>
 		</div>
 	</div>
@@ -71,7 +76,8 @@
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				target: ''
+				target: '',
+				log: []
 			}
 		},
 		computed: {
@@ -102,31 +108,32 @@
 			log_target: function(target) {
 				//console.log(target)
 				this.target = target
+			},
+			sendLog: function(log) {
+				this.log = log
 			}
 		}
 	}
 </script>
 
-<style>
+<style lang="scss">
 #combat {
 	padding:72px 10px 10px 10px;
 	width: 100vw;
 	height: calc(100vh - 85px);
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-columns: 3fr 3fr 2fr 2fr;
 	grid-template-rows: auto;
 	grid-gap: 10px;
 	grid-template-areas: 
 	"current targets actions side";
 }
-
 @media only screen and (max-width: 600px) {
 	#combat {
 		grid-template-rows: 1fr 3fr 3fr 3fr 3fr;
 		grid-template-columns: auto;
 		grid-gap: 5px;
 		grid-template-areas: 
-		"header"
 		"current"
 		"targets"
 		"actions"

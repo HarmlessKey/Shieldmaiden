@@ -1,27 +1,21 @@
 <template>
 	<div id="current" class="bg-gray">
 		<h2>Current</h2>
-		<p>Current player</p>
+		<p>{{ current }}</p>
 	</div>
 </template>
 
 <script>
 	export default {
 		name: 'Current',
-
+		props: ['current'],
 		data: function() {
 			return {
 				
 			}
 		},
-		
 		methods: {
-			nextTurn: function() {
-				this.$data.turn += 1;
-				if (this.$data.turn > this.$data.players.length - 1) {
-					this.$data.turn = 0;
-				}
-			}
+		
 		}
 	}
 </script>

@@ -4,6 +4,7 @@
 		<span class="img" :style="{'background-image': 'url(' + item.img + ')'}"></span>
 		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ item.ac }}</span>
 		<div class="progress health-bar">
+			<span>{{ item.name }}</span>
 			<div class="progress-bar" :class="{ 
 				'bg-red': percentage(item.curHp, item.maxHp) < 33, 
 				'bg-orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
@@ -11,15 +12,16 @@
 				}" 
 				role="progressbar" 
 				:style="{width: percentage(item.curHp, item.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-				{{ item.name }}
 			</div>
 		</div>
+		{{ setNumber(item.curHp) }}
+		<input v-model.number="number" type="hidden">
 		<span class="hp" v-b-tooltip.hover title="Current / Max HP">
 			<span class="current mr-1" :class="{ 
 				'red': percentage(item.curHp, item.maxHp) < 33, 
 				'orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
 				'green': percentage(item.curHp, item.maxHp) > 7
-				}">{{ item.curHp }}</span>
+				}">{{ animatedNumber }}</span>
 			/<span class="max ml-1">{{ item.maxHp }}</span>
 		</span>
 	</div>
@@ -32,19 +34,34 @@ export default {
   props: ['item'],
   data () {
     return {
-			target: ''
+			target: '',
+			number: 20,
+    	tweenedNumber: 0
     }
 	},
+	computed: {
+    animatedNumber: function() {
+      return this.tweenedNumber.toFixed(0);
+    }
+  },
+  watch: {
+    number: function(newValue) {
+      TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
+    }
+  },
 	methods: {
 		percentage(current, max) {
 			var hp_percentage = Math.floor(current / max * 100)
 			return hp_percentage
+		},
+		setNumber(value) {
+			this.number = value
 		}
 	}
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 .target {
 	display: grid;
 	grid-template-columns: 30px 30px 30px 3fr 2fr;
@@ -57,17 +74,18 @@ export default {
 }
 
 .progress { 
-	height:30px;
-	background-color:#4c4c4c;
-	margin-right:5px;
+	height: 30px;
+	background-color: #4c4c4c;
+	margin-right: 5px;
+	position: relative;
 }
-.progress div { 
+.progress span { 
 	color:#191919;
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow: ellipsis;
-	text-align:left;
-	padding-left:10px;
+	position: absolute;
+	left: 5px;
+	white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
 }
 .initiative, .ac, .img {
 	text-align:center;
@@ -94,5 +112,8 @@ export default {
 }
 .hp {
 	text-align:right;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis !important;
 }
 </style>

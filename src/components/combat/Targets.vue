@@ -51,16 +51,12 @@
 		},
 		methods: {
 			setTarget(entity) {
-				console.log("---set target---")
-				console.log(entity.key)
-				console.log(this.currentTarget.key)
-				if (this.currentTarget != undefined && this.currentTarget.key == entity.key) {
+				if (this.currentTarget.key == entity.key) {
 					this.currentTarget = {}
 				} 
 				else {
 					this.currentTarget = entity
 				}
-				console.log(this.currentTarget)
 				this.$emit("target", this.currentTarget)
 			},
 			getTargetData(entity) {

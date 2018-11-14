@@ -22,10 +22,10 @@
 							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
-						<div v-if="target.type == 'player'">
-							{{ target.type }}
+						<!-- <div v-if="target.type == 'player'"> -->
+							<!-- {{ target.type }} -->
 							{{ getPlayer(target.id).player_name }}
-						</div>
+						<!-- </div> -->
 					</template>
 				</div>
 				<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">

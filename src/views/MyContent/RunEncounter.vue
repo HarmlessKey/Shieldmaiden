@@ -17,7 +17,7 @@
 		<div v-else>
 			<div id="combat">
 				<Current
-					:current="currentEntity"
+					:current="_active[encounter.turn]"
 				/>
 				<Targets 
 					:encounter="encounter"
@@ -105,14 +105,14 @@
 								} , 'desc')
 								.value()
 			},
-			currentEntity: function() {
-				console.log(this._active[this.encounter.turn].name)
-				return this._active[this.encounter.turn]
-			}
+			// currentEntity: function() {
+			// 	return 
+			// }
 		},
 		methods: {
 			log_target: function(target) {
-				this.target = _.find(this._active, {'key':target.key})
+				this.target = target
+				// this.target = _.find(this._active, {'key':target.key})
 			},
 			sendLog: function(log) {
 				this.log = log

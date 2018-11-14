@@ -25,8 +25,11 @@
 							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
 							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
-						<span>{{ test }}</span>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+						{{ target.type }}
+						<div v-if="target.type == 'player'">
+							{{ getPlayer(target.id) }}
+						</div>
 					</template>
 				</div>
 				<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
@@ -41,10 +44,13 @@
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
+	import { getters } from '@/mixins/getters'
+
 	export default {
 
 		name: 'Actions',
 		props: ['target', 'round', 'turn'],
+		mixins: [getters],
 		data: function() {
 			return {
 				userId: firebase.auth().currentUser.uid,

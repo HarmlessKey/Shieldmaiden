@@ -112,7 +112,7 @@
 		},
 		methods: {
 			log_target: function(target) {
-				this.target = target
+				this.target = _.find(this._active, {'key':target.key})
 			},
 			sendLog: function(log) {
 				this.log = log

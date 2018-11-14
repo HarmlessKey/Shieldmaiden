@@ -20,8 +20,6 @@ export const getters = {
 			var player = this.allPlayers.find(function(element) {
 				return element['.key'] == entityKey
 			});
-			console.log(this.allPlayers)
-			console.log(player)
 			return player
 		},
 	}

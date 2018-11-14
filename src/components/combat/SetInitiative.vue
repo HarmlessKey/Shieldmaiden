@@ -77,17 +77,18 @@
 
 	import { dice } from '@/mixins/dice.js'
 	import { attributes } from '@/mixins/attributes.js'
+	import { getters } from '@/mixins/getters.js'
 
 	export default {
 
 		name: 'SetInitiative',
 		props: ['entities','_active','_idle'],
-		mixins: [dice, attributes],
-		firebase() {
-			return {
-				allPlayers: db.ref('players/' + this.userId),
-			}
-		},
+		mixins: [dice, attributes, getters],
+		// firebase() {
+		// 	return {
+		// 		allPlayers: db.ref('players/' + this.userId),
+		// 	}
+		// },
 		data () {
 			return {
 				players: {},
@@ -138,14 +139,6 @@
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
 				})
-			},
-			getPlayer(entityKey) {
-				var player = this.allPlayers.find(function(element) {
-					return element['.key'] == entityKey
-				});
-				console.log(this.allPlayers)
-				console.log(player)
-				return player
 			},
 			rollMonster(key, entity) {
 				entity.initiative = this.rollD(20,1,this.calcMod(entity.dex))

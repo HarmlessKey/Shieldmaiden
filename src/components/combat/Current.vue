@@ -15,7 +15,6 @@
 		props: ['current'],
 		mixins: [getters],
 		data: function() {
-			// console.log(this.current)
 			return {
 				
 			}

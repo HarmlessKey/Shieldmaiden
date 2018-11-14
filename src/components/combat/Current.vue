@@ -1,7 +1,7 @@
 <template>
 	<div id="current" class="bg-gray">
 		<h2>Current</h2>
-		<p>{{ current }}</p>
+		<p>{{ current.name }}</p>
 	</div>
 </template>
 
@@ -10,6 +10,7 @@
 		name: 'Current',
 		props: ['current'],
 		data: function() {
+			// console.log(this.current)
 			return {
 				
 			}

@@ -25,6 +25,7 @@
 							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
 							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
+						<span>{{ test }}</span>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 					</template>
 				</div>
@@ -55,6 +56,12 @@
 				currentTurn: this.turn + 1,
 			}
 		},
+		computed: {
+			test: function() {
+
+				console.log(this.target)
+			}
+		} ,
 		methods: {
 			setManual(target, type) {
 				this.$validator.validateAll().then((result) => {

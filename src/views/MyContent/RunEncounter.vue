@@ -16,7 +16,9 @@
 		</div>
 		<div v-else>
 			<div id="combat">
-				<Current />
+				<Current
+					:current="currentEntity"
+				/>
 				<Targets 
 					:encounter="encounter"
 					:players="players"
@@ -71,17 +73,17 @@
 			}
 		},
 		data() {
-			//console.log('data')
 			return {
 				userId: firebase.auth().currentUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				target: '',
+				target: undefined,
 				log: []
 			}
 		},
 		computed: {
 			_active: function() {
+				// console.log(this._active[this.turn])
 				return _.chain(this.encounter.entities)
 								.filter(function(entity, key) {
 									entity.key = key
@@ -103,10 +105,13 @@
 								} , 'desc')
 								.value()
 			},
+			currentEntity: function() {
+				console.log(this._active[this.encounter.turn].name)
+				return this._active[this.encounter.turn]
+			}
 		},
 		methods: {
 			log_target: function(target) {
-				//console.log(target)
 				this.target = target
 			},
 			sendLog: function(log) {

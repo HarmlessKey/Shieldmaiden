@@ -16,19 +16,15 @@
 					<template v-else>
 						<p>Target: <b class="blue">{{ target.name }}</b></p>
 						<p>Manual damage or healing</p>
-						<!-- <div class="custom-control custom-checkbox mb-2">
-							<input type="checkbox" class="custom-control-input" checked="checked" id="lethal">
-							<label class="custom-control-label" for="lethal">Lethal damage</label>
-						</div> -->
 						<div class="manual">
 							<input type="number" min="0" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
 							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
 							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
-						{{ target.type }}
 						<div v-if="target.type == 'player'">
-							{{ getPlayer(target.id) }}
+							{{ target.type }}
+							{{ getPlayer(target.id).player_name }}
 						</div>
 					</template>
 				</div>

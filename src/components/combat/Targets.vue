@@ -50,13 +50,17 @@
 			},
 		},
 		methods: {
-			setTarget(entity) {				
-				if (this.currentTarget == entity) {
-					this.currentTarget = undefined
+			setTarget(entity) {
+				console.log("---set target---")
+				console.log(entity.key)
+				console.log(this.currentTarget.key)
+				if (this.currentTarget != undefined && this.currentTarget.key == entity.key) {
+					this.currentTarget = {}
 				} 
 				else {
-					this.currentTarget = entity	
+					this.currentTarget = entity
 				}
+				console.log(this.currentTarget)
 				this.$emit("target", this.currentTarget)
 			},
 			getTargetData(entity) {
@@ -111,8 +115,8 @@ ul.targets {
 	}
 	&.active_targets li:first-child {
 		margin-bottom: 20px;
-		border-color: rgb(124,252,0);
-		box-shadow: 0px 0px 10px rgba(124, 252, 0, .5);
+		border-color: #83b547;
+		box-shadow: 0px 0px 10px rgba(131, 181, 71, .5);
 	}
 }
 .targets-move {

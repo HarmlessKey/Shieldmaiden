@@ -188,9 +188,7 @@
 
 <style lang="scss" scoped>
 #container {
-	padding:72px 10px 10px 10px;
-	width: 100vw;
-	height: calc(100vh - 80px);
+	width: calc(100vw - 30px);
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 1fr;

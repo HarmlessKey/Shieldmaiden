@@ -156,6 +156,11 @@
 </script>
 
 <style lang="css" scoped>
+#actions {
+	grid-area: actions;
+	overflow: auto;
+	max-height: 100%;
+}
 .nav { 
 	background:#191919;
 }

@@ -1,41 +1,41 @@
 <template>
-	<!-- Check if encounter exists -->
-	<div v-if="encounter.round != undefined && Object.keys(players).length">
-		<Turns 
-			:round="encounter.round" 
-			:title="encounter.encounter" 
-			:turn="encounter.turn"
-			:active_len="_active.length"
-		/>
-		<div v-if="encounter.round == 0">
-			<SetInitiative 
-				:entities="encounter.entities"
-				:_active="_active"
-				:_idle="_idle"
+	<div id="combat">
+		<!-- Check if encounter exists -->
+		<template v-if="encounter.round != undefined && Object.keys(players).length">
+			<Turns 
+				:round="encounter.round" 
+				:title="encounter.encounter" 
+				:turn="encounter.turn"
+				:active_len="_active.length"
 			/>
-		</div>
-		<div v-else>
-			<div id="combat">
-				<Current
-					:current="_active[encounter.turn]"
-				/>
-				<Targets 
-					:encounter="encounter"
-					:players="players"
+			<div v-if="encounter.round == 0">
+				<SetInitiative 
+					:entities="encounter.entities"
 					:_active="_active"
 					:_idle="_idle"
-					@target="log_target"
 				/>
-				<Actions 
-				:target="target"
-				:round="encounter.round" 
-				:turn="encounter.turn"
-				:current="_active[encounter.turn]"
-				@log="sendLog"
-				/>
-				<Side :log="log" />
 			</div>
-		</div>
+			<template v-else>
+					<Current
+						:current="_active[encounter.turn]"
+					/>
+					<Targets 
+						:encounter="encounter"
+						:players="players"
+						:_active="_active"
+						:_idle="_idle"
+						@target="log_target"
+					/>
+					<Actions 
+					:target="target"
+					:round="encounter.round" 
+					:turn="encounter.turn"
+					:current="_active[encounter.turn]"
+					@log="sendLog"
+					/>
+					<Side :log="log" />
+			</template>
+		</template>
 	</div>
 </template>
 
@@ -116,7 +116,7 @@
 				// this.target = _.find(this._active, {'key':target.key})
 			},
 			sendLog: function(log) {
-				this.log = log
+				this.log = log;
 			}
 		}
 	}
@@ -124,15 +124,17 @@
 
 <style lang="scss">
 #combat {
-	padding:72px 10px 10px 10px;
+	padding:10px;
 	width: 100vw;
-	height: calc(100vh - 85px);
+	height: calc(100% - 50px);
 	display: grid;
 	grid-template-columns: 3fr 3fr 2fr 2fr;
-	grid-template-rows: auto;
+	grid-template-rows: 60px auto;
 	grid-gap: 10px;
-	grid-template-areas: 
+	grid-template-areas:
+	"turns turns turns turns"
 	"current targets actions side";
+	position: absolute;
 }
 @media only screen and (max-width: 600px) {
 	#combat {

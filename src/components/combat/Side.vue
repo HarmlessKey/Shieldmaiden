@@ -39,6 +39,8 @@
 
 #side_container {
 	grid-area:side;
+	overflow: auto;
+	max-height: 100%;
 }
 .tab-content { 
 	padding:15px 10px;

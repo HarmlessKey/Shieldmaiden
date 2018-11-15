@@ -65,15 +65,9 @@
 <style lang="css" scoped>
 #turns {
 	padding: 10px;
-	height: 62px;
 	font-size: 20px;
 	text-transform: uppercase;
-	grid-area: header;
-	position: fixed;
-	top: 50px;
-	width: 100vw;
-	border-bottom: solid 1px #191919;
-	z-index: 99;
+	grid-area: turns;
 }
 h1 {
 	line-height:44px;

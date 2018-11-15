@@ -90,6 +90,8 @@
 #targets {
 	padding:15px 10px;
 	grid-area: targets;
+	overflow: auto;
+	max-height: 100%;
 }
 ul.targets {
 	list-style:none;

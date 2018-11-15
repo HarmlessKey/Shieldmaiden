@@ -7,7 +7,7 @@
 			<span class="current-name"></span>
 		</div>
 		<div>
-			<a v-if="round > 0" class="btn" @click="prevTurn()">Prev turn <i class="fas fa-arrow-left"></i></a>
+			<a v-if="round > 0" class="btn mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> Prev turn</a>
 			<a v-if="round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
 			<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
 		</div>

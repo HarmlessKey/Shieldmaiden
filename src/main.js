@@ -10,6 +10,8 @@ import VueRouter from 'vue-router';
 import { store } from './store/store';
 import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
+import VueCookies from 'vue-cookies'
+
 
 const options = {
 	toast: {
@@ -18,9 +20,10 @@ const options = {
 	}
 }
 
-Vue.use(Snotify, options)
+Vue.use(Snotify, options);
 Vue.use(VeeValidate);
 Vue.use(VueFire);
+Vue.use(VueCookies);
 
 //Bootstrap
 global.$ = jQuery

@@ -29,7 +29,8 @@
 				<Actions 
 				:target="target"
 				:round="encounter.round" 
-				:turn="encounter.turn" 
+				:turn="encounter.turn"
+				:current="_active[encounter.turn]"
 				@log="sendLog"
 				/>
 				<Side :log="log" />
@@ -145,5 +146,4 @@
 		"side";
 	}
 }
-
 </style>

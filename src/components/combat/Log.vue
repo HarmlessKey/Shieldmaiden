@@ -2,7 +2,7 @@
 	<div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">
 		<h2>Combat log</h2>
 		<transition-group tag="ul" name="log" enter-active-class="anitmated slideInDown">
-			<li v-for="item in log" :key="item.time">
+			<li v-for="(item, key) in cookieLog" :key="key">
 				<div class="d-flex justify-content-between head">
 					<span>
 						Round: {{ item.round }}
@@ -10,7 +10,8 @@
 					</span>
 					{{ item.time }}
 				</div>
-				<span :class="{green: item.type == 'healing', red: item.type == 'damage'}">{{ item.amount }}</span>
+				{{ item.by }} did
+				<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
 				{{ item.type }} to {{ item.target }}
 				<span v-if="item.over != 0">
 					({{ item.over }}
@@ -28,7 +29,11 @@
 		props: ['log'],
 		data() {
 			return {
+				cookieLog: JSON.parse(this.$cookies.get(this.$route.params.encid)),
 			}
+		},
+		methods: {
+			
 		}
 	}
 </script>
@@ -48,5 +53,9 @@ ul {
 			font-style: italic;
 		}
 	}
+}
+.tab-pane {
+	height: 100vh;
+	overflow: auto;
 }
 </style>

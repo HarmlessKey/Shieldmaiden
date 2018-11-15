@@ -1,26 +1,26 @@
 <template>
 	<div id="targets" class="bg-gray">
-		<h2>Targets ({{ _targets.length }})</h2>
-		<transition-group tag="ul" class="targets active_targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
-			<template v-for="(entity,_,i) in _targets">
-				<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
-					<TargetItem :item="getTargetData(entity)" />
-				</li>
-			</template>
-		</transition-group>
-		<template v-if="_idle.length">
-			<hr>
-			<h2>IDLE ({{ _idle.length }})</h2>
-			<ul class="targets idle_targets">
-				<template v-for="entity in _idle">
-					<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
+			<h2>Targets ({{ _targets.length }})</h2>
+			<transition-group tag="ul" class="targets active_targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+				<template v-for="(entity,_,i) in _targets">
+					<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
 						<TargetItem :item="getTargetData(entity)" />
 					</li>
 				</template>
-			</ul>
-		</template>
-		<hr>
-		<h2>Down</h2>
+			</transition-group>
+			<template v-if="_idle.length">
+				<hr>
+				<h2>IDLE ({{ _idle.length }})</h2>
+				<ul class="targets idle_targets">
+					<template v-for="entity in _idle">
+						<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
+							<TargetItem :item="getTargetData(entity)" />
+						</li>
+					</template>
+				</ul>
+			</template>
+			<hr>
+			<h2>Down</h2>
 	</div>
 </template>
 
@@ -65,6 +65,7 @@
 					key: entity.key,
 					id: entity.id,
 					initiative: entity.initiative,
+					type: entity.type
 				}
 				if (entity.type == 'player') {
 					item.img = this.players[entity.id].avatar

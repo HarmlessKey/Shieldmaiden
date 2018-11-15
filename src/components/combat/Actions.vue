@@ -22,10 +22,9 @@
 							<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
-						<!-- <div v-if="target.type == 'player'"> -->
-							<!-- {{ target.type }} -->
-							{{ getPlayer(target.id).player_name }}
-						<!-- </div> -->
+						<div v-if="target.type == 'player'">
+							{{ getPlayer(target.id).character_name }}
+						</div>
 					</template>
 				</div>
 				<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
@@ -45,7 +44,7 @@
 	export default {
 
 		name: 'Actions',
-		props: ['target', 'round', 'turn'],
+		props: ['target', 'round', 'turn', 'current'],
 		mixins: [getters],
 		data: function() {
 			return {
@@ -53,102 +52,104 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				manualAmount: '',
-				log: [],
 				currentRound: this.round,
 				currentTurn: this.turn + 1,
 			}
 		},
-		computed: {
-			test: function() {
-
-				console.log(this.target)
-			}
-		} ,
 		methods: {
 			setManual(target, type) {
 				this.$validator.validateAll().then((result) => {
-					if(result) {
+					if(result && this.manualAmount != '') {
 						let amount = parseInt(this.manualAmount);
 						let maxHp = parseInt(target.maxHp);
 						let curHp = parseInt(target.curHp);
-						let over = 0
-
-						//time for log
-						var d = new Date();
-						var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 						if(type == 'damage') {
-						let newhp = parseInt(curHp - amount);
-
-						if(newhp < 0) { 
-							newhp = 0;
-							over = amount - curHp; //overkill
-							amount = curHp;
-						}
-							
-							target.curHp = newhp
-							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
-								curhp: newhp,
-							})
-							//Notification
-							this.$snotify.error(
-								amount + ' ' + type + 'done to ' + target.name, 
-								'Damage done!', 
-								{
-									position: "centerTop"
-								}
-							);
-							//Add to log
-							this.log.unshift({
-								round: this.currentRound,
-								turn: this.currentTurn,
-								time: time,
-								type: type,
-								target: target.name,
-								amount: amount,
-								over: over
-							})	
+							this.isDamage(target, amount, curHp, maxHp)
 						}
 						else {
-							let newhp = parseInt(curHp + amount);
-
-							if(newhp > maxHp) { 
-								newhp = maxHp;
-								over = amount - maxHp + curHp; //overhealing
-								amount = maxHp - curHp;
-							}
-							
-							target.curHp = newhp
-							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
-								curhp: newhp,
-							})
-							//Notification
-							this.$snotify.success(
-								amount + ' ' + type + 'done to ' + target.name, 
-								'Healing done!', 
-								{
-									position: "centerTop",
-								}
-							);
-							//Add to log
-							this.log.unshift({
-								round: this.currentRound,
-								turn: this.currentTurn,
-								time: time,
-								type: type,
-								target: target.name,
-								amount: amount,
-								over: over
-							})	
+							this.isHealing(target, amount, curHp, maxHp)
 						}
-						
 						this.manualAmount = '';
-						this.$emit("log", this.log);
 					}
 					else {
 						//console.log('Not Valid');
 					}
 				})
+			},
+			isDamage(target, amount, curHp, maxHp) {
+				let newhp = parseInt(curHp - amount);
+				let type = 'damage'
+				let over = 0
+
+				if(newhp < 0) { 
+					newhp = 0;
+					over = amount - curHp; //overkill
+					amount = curHp;
+				}
+				
+				target.curHp = newhp
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+					curhp: newhp,
+				})
+				//Notification
+				this.$snotify.error(
+					this.current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
+					'Damage done!', 
+					{
+						position: "centerTop"
+					}
+				);
+				//Add to log
+				this.addLog(type, target.name, amount, over)
+			},
+			isHealing(target, amount, curHp, maxHp) {
+				let newhp = parseInt(curHp + amount);
+				let type = 'healing'
+				let over = 0
+
+				if(newhp > maxHp) { 
+					newhp = maxHp;
+					over = amount - maxHp + curHp; //overhealing
+					amount = maxHp - curHp;
+				}
+				
+				target.curHp = newhp
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+					curhp: newhp,
+				})
+				//Notification
+				this.$snotify.success(
+					this.current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 
+					'Healing done!', 
+					{
+						position: "centerTop",
+					}
+				);
+				//Add to log
+				this.addLog(type, target.name, amount, over)
+			},
+			addLog(type, target, amount, over) {
+				var d = new Date();
+				var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+
+				if(this.$cookies.isKey(this.encounterId) == true) {
+					var log = JSON.parse(this.$cookies.get(this.encounterId));
+				}
+				else {
+					var log = []
+				}
+				log.unshift({
+					round: this.currentRound,
+					turn: this.currentTurn,
+					by: this.current.name,
+					time: time,
+					type: type,
+					target: target,
+					amount: amount,
+					over: over
+				})
+				this.$cookies.set(this.encounterId, JSON.stringify(log), "1d")
 			}
 		}
 	}

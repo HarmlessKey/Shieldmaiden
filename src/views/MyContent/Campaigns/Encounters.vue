@@ -31,7 +31,7 @@
 						<template v-if="encounter.round != 0">
 							<td class="red">In progress</td>
 							<td>{{ encounter.round }}</td>
-							<td>{{ encounter.turn }}</td>
+							<td>{{ encounter.turn + 1 }}</td>
 						</template>
 						<template v-else>
 							<td colspan="3">Not started</td>

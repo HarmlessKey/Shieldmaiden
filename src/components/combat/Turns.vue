@@ -73,6 +73,7 @@
 	top: 50px;
 	width: 100vw;
 	border-bottom: solid 1px #191919;
+	z-index: 99;
 }
 h1 {
 	line-height:44px;

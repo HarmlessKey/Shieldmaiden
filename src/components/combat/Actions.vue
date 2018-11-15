@@ -17,9 +17,9 @@
 						<p>Target: <b class="blue">{{ target.name }}</b></p>
 						<p>Manual damage or healing</p>
 						<div class="manual">
-							<input type="number" min="0" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
-							<button class="btn dmg bg-red" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
-							<button class="btn heal bg-green" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
+							<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
+							<button class="btn dmg bg-red" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
+							<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 						</div>
 						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 						<!-- <div v-if="target.type == 'player'"> -->
@@ -183,9 +183,4 @@
 	grid-area: btn-dmg;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
--webkit-appearance: none;
-margin: 0;
-}
 </style>

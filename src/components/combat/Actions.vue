@@ -8,27 +8,29 @@
 				<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Select</a>
 			</li>
 		</ul>
-		<div class="actions">
-			<h2>Actions</h2>
-			<div class="tab-content">
-				<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-					<p v-if="!target" class="red">No target selected</p>
-					<template v-else>
-						<p>Target: <b class="blue">{{ target.name }}</b></p>
-						<p>Manual damage or healing</p>
-						<div class="manual">
-							<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
-							<button class="btn dmg bg-red" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
-							<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
-						</div>
-						<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
-						<div v-if="target.type == 'player'">
-							{{ getPlayer(target.id).character_name }}
-						</div>
-					</template>
-				</div>
-				<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
-					Coming soon
+		<div class="actions scroll" v-bar>
+			<div>
+				<h2>Actions</h2>
+				<div class="tab-content">
+					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+						<p v-if="!target" class="red">No target selected</p>
+						<template v-else>
+							<p>Target: <b class="blue">{{ target.name }}</b></p>
+							<p>Manual damage or healing</p>
+							<div class="manual">
+								<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
+								<button class="btn dmg bg-red" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
+								<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
+							</div>
+							<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+							<div v-if="target.type == 'player'">
+								{{ getPlayer(target.id).character_name }}
+							</div>
+						</template>
+					</div>
+					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+						Coming soon
+					</div>
 				</div>
 			</div>
 		</div>
@@ -158,14 +160,15 @@
 <style lang="css" scoped>
 #actions {
 	grid-area: actions;
-	overflow: auto;
-	max-height: 100%;
+	overflow: hidden;
 }
 .nav { 
-	background:#191919;
+	background: #191919;
+	margin-bottom: 20px;
 }
 .actions {
-	padding:15px 10px;
+	padding: 0 10px;
+	height: calc(100% - 55px);
 }
 .manual {
 	display:grid;

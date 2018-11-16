@@ -1,5 +1,5 @@
 <template>
-	<div class="target" >
+	<div class="target">
 		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ item.initiative }}</span>
 		<span class="img" :style="{'background-image': 'url(' + item.img + ')'}"></span>
 		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ item.ac }}</span>

@@ -79,7 +79,7 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				target: undefined,
-				log: []
+				log: undefined
 			}
 		},
 		computed: {

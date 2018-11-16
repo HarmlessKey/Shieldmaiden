@@ -11,8 +11,8 @@
 		<div class="actions scroll" v-bar>
 			<div>
 				<div class="tab-content">
-						<Dmg />
-						<Log :log="log" />	
+					<Dmg />
+					<Log :log="log" />	
 				</div>
 			</div>
 		</div>
@@ -38,12 +38,11 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 #side_container {
 	grid-area: side;
 	overflow: hidden;
 }
-
 .nav {
 	background: #191919;
 	margin-bottom: 20px;
@@ -59,7 +58,7 @@
 	background-repeat:no-repeat;
 	background-size:24px;
 	color:#b2b2b2;
-	/*background-image:url('@/assets/_img/styles/dmg.png');*/
+	// background-image: url('@/assets/_img/styles/dmg.png');
 	text-indent:-9999px;
 }
 .nav a.dmg:hover, .nav a.active.dmg {

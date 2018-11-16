@@ -360,7 +360,6 @@ ul.nav {
 	width: 5px;
 	right: 0;
 }
-
 .vb > .vb-dragger > .vb-dragger-styler {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
@@ -374,29 +373,25 @@ ul.nav {
 			background-color 100ms ease-out,
 			margin 100ms ease-out,
 			height 100ms ease-out;
-	background-color: $gray-hover;
+	background-color: $gray-active;
 	margin: 0;
 	border-radius: 0;
-	height: calc(100% - 10px);
+	height: 100%;
 	display: block;
 }
-
 .vb.vb-scrolling-phantom > .vb-dragger > .vb-dragger-styler {
-	background-color: $gray-light;
+	background-color: $gray-hover;
 }
-
 .vb > .vb-dragger:hover > .vb-dragger-styler {
-	background-color: $gray-light;
+	background-color: $gray-hover;
 	margin: 0px;
 	height: 100%;
 }
-
 .vb.vb-dragging > .vb-dragger > .vb-dragger-styler {
-	background-color: $gray-light;
+	background-color: $gray-hover;
 	margin: 0px;
 	height: 100%;
 }
-
 .vb.vb-dragging-phantom > .vb-dragger > .vb-dragger-styler {
-	background-color: $gray-light;
+	background-color: $gray-hover;
 }

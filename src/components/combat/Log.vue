@@ -2,7 +2,7 @@
 		<div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">
 			<h2>Combat log</h2>
 			<transition-group tag="ul" name="log" enter-active-class="anitmated slideInDown">
-				<li v-for="(item, key) in cookieLog" :key="key">
+				<li v-for="(item, key) in returnLog()" :key="key">
 					<div class="d-flex justify-content-between head">
 						<span>
 							Round: {{ item.round }}
@@ -33,14 +33,23 @@
 			}
 		},
 		methods: {
-			
+			returnLog() {
+				if(this.log == undefined) {
+					console.log('Cookie log')
+					return this.cookieLog
+				}
+				else {
+					console.log('Normal log')
+					return this.log
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 ul {
-	padding: 0;
+	padding: 0 5px 0 0;
 	list-style: none;
 
 	li {

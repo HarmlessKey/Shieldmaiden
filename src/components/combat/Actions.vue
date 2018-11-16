@@ -56,6 +56,7 @@
 				manualAmount: '',
 				currentRound: this.round,
 				currentTurn: this.turn + 1,
+				log: undefined
 			}
 		},
 		methods: {
@@ -103,7 +104,7 @@
 					}
 				);
 				//Add to log
-				this.addLog(type, target.name, amount, over)
+				this.addLog(type, target.name, amount, over);
 			},
 			isHealing(target, amount, curHp, maxHp) {
 				let newhp = parseInt(curHp + amount);
@@ -136,12 +137,12 @@
 				var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 				if(this.$cookies.isKey(this.encounterId) == true) {
-					var log = JSON.parse(this.$cookies.get(this.encounterId));
+					this.log = JSON.parse(this.$cookies.get(this.encounterId));
 				}
 				else {
-					var log = []
+					this.log = []
 				}
-				log.unshift({
+				this.log.unshift({
 					round: this.currentRound,
 					turn: this.currentTurn,
 					by: this.current.name,
@@ -151,7 +152,9 @@
 					amount: amount,
 					over: over
 				})
-				this.$cookies.set(this.encounterId, JSON.stringify(log), "1d")
+				this.$cookies.set(this.encounterId, JSON.stringify(this.log), "1d");
+				this.$emit("log", this.log)
+				//console.log(this.log)
 			}
 		}
 	}

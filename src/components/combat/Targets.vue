@@ -33,22 +33,27 @@
 <script>
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
+	import { mapGetters } from 'vuex'
 	import TargetItem from '@/components/combat/TargetItem.vue'
 
 	export default {
 		name: 'Targets',
 		components: {TargetItem},
-		props: ['encounter','players','_active','_idle'],
+		props: ['_active','_idle'],
 		data() {
 			return {
 				userId: firebase.auth().currentUser.uid,
-				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
 				currentTarget: {},
 				setShadow: 0,
 			}
 		},
 		computed: {
+			...mapGetters([
+				'campaignId',
+				'encounterId',
+				'encounter',
+				'players',
+			]),
 			_targets: function() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._active)

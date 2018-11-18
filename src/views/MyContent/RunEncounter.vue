@@ -1,7 +1,7 @@
 <template>
 	<div id="combat">
 		<!-- Check if encounter exists -->
-		<template v-if="encounter.round != undefined && Object.keys(players).length">
+		<template v-if="encounter && Object.keys(players).length">
 			<Turns 
 				:round="encounter.round" 
 				:title="encounter.encounter" 
@@ -20,8 +20,6 @@
 						:current="_active[encounter.turn]"
 					/>
 					<Targets 
-						:encounter="encounter"
-						:players="players"
 						:_active="_active"
 						:_idle="_idle"
 						@target="log_target"
@@ -41,7 +39,8 @@
 
 <script>
 	import _ from 'lodash'
-	import firebase from 'firebase'
+	// import firebase from 'firebase'
+	import { mapGetters } from 'vuex'
 
 	import Actions from '@/components/combat/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
@@ -61,30 +60,26 @@
 			Side,
 			SetInitiative,
 		},
-		firebase() {
-			return {
-				encounter: {
-					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`),
-					asObject: true,
-				},
-				players: {
-					source:db.ref(`players/${this.userId}`),
-					asObject: true,
-				}
-			}
-		},
 		data() {
+			// Dispatch route parameters to store
+			this.$store.dispatch('setCampaignId', this.$route.params.campid)
+			this.$store.dispatch('setEncounterId', this.$route.params.encid)
+			this.$store.dispatch('fetchEncounter')
+			this.$store.dispatch('fetchPlayers')
 			return {
-				userId: firebase.auth().currentUser.uid,
-				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
+				userId: this.$store.getters.getUser.uid,
 				target: undefined,
-				log: []
+				log: [],
 			}
 		},
 		computed: {
+			...mapGetters([
+				'campaignId',
+				'encounterId',
+				'encounter',
+				'players',
+			]),
 			_active: function() {
-				// console.log(this._active[this.turn])
 				return _.chain(this.encounter.entities)
 								.filter(function(entity, key) {
 									entity.key = key

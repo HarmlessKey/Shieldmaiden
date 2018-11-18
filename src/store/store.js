@@ -11,9 +11,10 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
 	state: {
-		user: null,
-		encounter: null,
-		entities: null,
+		user: {},
+		encounter: {},
+		entities: {},
+		players: {},
 
 		campaignId: null,
 		encounterId: null,
@@ -48,7 +49,6 @@ export const store = new Vuex.Store({
 		},
 		SET_ENCOUNTER(state, payload) {
 			state.encounter = payload
-			console.log(state.encounter)
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
@@ -57,9 +57,6 @@ export const store = new Vuex.Store({
 	actions: {
 		setUser({ commit }) {
 			commit('setUser');
-		},
-		setEncounter({ commit }) {
-			db.ref('encounters')
 		},
 		setCampaignId({ commit }, value) {
 			commit('SET_CAMPAIGN_ID', value)

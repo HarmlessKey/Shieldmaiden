@@ -20,8 +20,6 @@
 						:current="_active[encounter.turn]"
 					/>
 					<Targets 
-						:encounter="encounter"
-						:players="players"
 						:_active="_active"
 						:_idle="_idle"
 						@target="log_target"
@@ -62,21 +60,6 @@
 			Side,
 			SetInitiative,
 		},
-		firebase() {
-			return {
-				// encounter: {
-				// 	source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`),
-				// 	asObject: true,
-				// },
-				// players: {
-				// 	source:db.ref(`players/${this.userId}`),
-				// 	asObject: true,
-				// }
-			}
-		},
-		created() {
-
-		},
 		data() {
 			// Dispatch route parameters to store
 			this.$store.dispatch('setCampaignId', this.$route.params.campid)
@@ -97,7 +80,6 @@
 				'players',
 			]),
 			_active: function() {
-				// console.log(this._active[this.turn])
 				return _.chain(this.encounter.entities)
 								.filter(function(entity, key) {
 									entity.key = key

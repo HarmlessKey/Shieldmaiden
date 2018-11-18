@@ -74,6 +74,7 @@
 	import axios from 'axios'
 	import _ from 'lodash'
 	import { db } from '@/firebase'
+	import { mapGetters } from 'vuex'
 
 	import { dice } from '@/mixins/dice.js'
 	import { attributes } from '@/mixins/attributes.js'
@@ -84,11 +85,6 @@
 		name: 'SetInitiative',
 		props: ['entities','_active','_idle'],
 		mixins: [dice, attributes, getters],
-		// firebase() {
-		// 	return {
-		// 		allPlayers: db.ref('players/' + this.userId),
-		// 	}
-		// },
 		data () {
 			return {
 				players: {},
@@ -96,13 +92,15 @@
 				active_entities: {},
 				inactive_entities: {},
 
-				userId: firebase.auth().currentUser.uid,
-				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
+				userId: this.$store.getters.getUser.uid,
 				selected: [],
 			}
 		},
 		computed: {
+			...mapGetters([
+				'campaignId',
+				'encounterId',
+			]),
 			_players: function() {
 				return _.chain(this.entities)
 								.filter(function(entity, key) {
@@ -176,8 +174,6 @@
 				this.selected = []
 			},
 			setActive(key, active) {
-				console.log('key: ' + key)
-				console.log('active: ' + active)
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					active: active
 				})

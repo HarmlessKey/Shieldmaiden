@@ -217,6 +217,22 @@ a.logout {
 		}
 	}
 }
+ul.crumble {
+	list-style: none;
+	padding: 0;
+	// background-color: $gray;
+	display: inline-flex !important;
+
+	li {
+		margin-right: 10px;
+
+		a {
+			color: $gray-light !important;
+		}
+	}
+}
+
+
 /* 6. Bootstrap overrides*/
 /*********************************************/
 .btn {

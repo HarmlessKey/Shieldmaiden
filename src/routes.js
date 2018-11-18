@@ -1,6 +1,7 @@
 import Home from '@/views/Home.vue';
 import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
+import Profile from '@/views/Profile.vue';
 import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
 import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
@@ -32,6 +33,11 @@ export const routes = [{
 	component: SignUp
 },
 {
+	path: '/profile',
+	name: 'profile',
+	component: Profile
+},
+{
 	path: '/campaigns',
 	name: 'myContent',
 	component: MyContent,
@@ -39,17 +45,21 @@ export const routes = [{
 		id: route.query.id
 	}),
 	meta: {
+		basePath: '/campaigns',
+		title: 'Campaigns',
 		requiresAuth: true
 	}
 },
 {
-	path: '/campaigns/:id',
-	name: 'EditCampaign',
+	path: '/campaigns/:campid',
+	name: 'Edit Campaign',
 	component: EditCampaign,
 	props: (route) => ({
-		id: route.query.id
+		id: route.query.campid
 	}),
 	meta: {
+		basePath: '/campaigns',
+		title: 'Campaigns',
 		requiresAuth: true
 	}
 },
@@ -58,6 +68,8 @@ export const routes = [{
 	name: 'Players',
 	component: Players,
 	meta: {
+		basePath: '/players',
+		title: 'Players',
 		requiresAuth: true
 	}
 },
@@ -66,6 +78,8 @@ export const routes = [{
 	name: 'AddPlayers',
 	component: AddPlayer,
 	meta: {
+		basePath: '/players',
+		title: 'Players',
 		requiresAuth: true
 	}
 },
@@ -74,22 +88,28 @@ export const routes = [{
 	name: 'EditPlayers',
 	component: EditPlayer,
 	meta: {
+		basePath: '/players',
+		title: 'Players',
 		requiresAuth: true
 	}
 },
 {
-	path: '/encounters/:id',
+	path: '/encounters/:campid',
 	name: 'Encounters',
 	component: Encounters,
 	meta: {
+		basePath: '/campaigns',
+		title: 'Campaigns',
 		requiresAuth: true
 	}
 },
 {
 	path: '/encounters/:campid/:encid',
-	name: 'EditEncounter',
+	name: 'Encounters',
 	component: EditEncounter,
 	meta: {
+		basePath: '/campaigns',
+		title: 'Campaigns',
 		requiresAuth: true
 	}
 },
@@ -98,6 +118,8 @@ export const routes = [{
 	name: 'RunEncounter',
 	component: RunEncounter,
 	meta: {
+		basePath: '/campaigns',
+		title: 'Campaigns',
 		requiresAuth: true
 	}
 },

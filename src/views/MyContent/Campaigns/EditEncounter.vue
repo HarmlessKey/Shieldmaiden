@@ -3,6 +3,7 @@
 		<Sidebar/>
 		<div id="my-content" class="container">
 			<div class="info">
+				<Crumble />
 				<h1>Edit Encounters</h1>
 				<p>Add players and NPC's to your encounter.</p>
 			</div>
@@ -81,6 +82,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import Crumble from '@/components/CrumbleMyContent.vue'
 	import NPC from '@/components/NPC.vue'
 	import firebase from 'firebase'
 	import axios from 'axios'
@@ -90,6 +92,7 @@
 		name: 'EditCampaign',
 		components: {
 			Sidebar,
+			Crumble,
 			NPC
 		},
 		data() {
@@ -206,7 +209,7 @@
 	padding-top:20px;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	grid-template-rows:60px 1fr;
+	grid-template-rows:auto 1fr;
 	grid-gap: 20px;
 	grid-template-areas: 
 	"info info"

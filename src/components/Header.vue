@@ -12,8 +12,9 @@
 			<div class="d-flex justify-content-right">
 				<a class="roll-dice" href="#"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">
-					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<i class="fas fa-user"></i>
+					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
+						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<i v-else class="fas fa-user"></i>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right">
 						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
@@ -30,9 +31,9 @@
 <script>
 	import firebase from "firebase";
 	export default {
-		computed: {
-			user() {
-				return this.$store.getters.getUser;
+		data() {
+			return {
+				user: this.$store.getters.getUser
 			}
 		},
 		methods: {
@@ -47,31 +48,46 @@
 	};
 </script>
 
-<style>
-header a.user, header a.roll-dice	{
+<style lang="scss" scoped>
+a.user, a.roll-dice	{
 	cursor: pointer;
 	font-size: 15px;
 	padding: 0 10px;
 	color: #b2b2b2 !important;
+
+	&:hover {
+		color: #2c97de !important;
+	}
+	.img {
+		margin-top: 3px;
+		width: 25px;
+		height: 25px;
+		border-radius: 50%;
+		display: inline-block;
+		background-size: cover;
+		background-position: center top;
+	}
 }
-header a.user:hover, header a.roll-dice:hover {
-	color: #2c97de !important;
-}
-header .dropdown-menu {
-	top: 13px !important;
+.dropdown-menu {
+	top: 8px !important;
 	left: 10px !important;
+
+	button, a {
+		color: #b2b2b2 !important;
+		cursor: pointer;
+		font-size: 15px;
+
+		&:hover, &.active {
+			color: #2c97de !important;
+			background:none;
+		}
+	}
+	.dropdown-divider {
+		border-color: #b2b2b2;
+		margin: 0;
+	}
 }
-header .dropdown-menu button, header .dropdown-menu a {
-	color: #b2b2b2 !important;
-	cursor: pointer;
-	font-size: 15px;
-}
-header .dropdown-menu button:hover, header .dropdown-menu a:hover, header .dropdown-menu button.active, header .dropdown-menu a.active {
-	color: #2c97de !important;
-	background:none;
-}
-header .dropdown-divider {
-	border-color: #b2b2b2;
-	margin: 0;
-}
+
+
+
 </style>

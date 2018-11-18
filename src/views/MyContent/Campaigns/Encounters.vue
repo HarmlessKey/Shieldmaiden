@@ -2,6 +2,7 @@
 	<div id="hasSide">
 		<Sidebar/>
 		<div id="my-content" class="container">
+			<Crumble />
 			<h1>Encounters</h1>
 			<p>Manage the encounters in your campaign.</p>
 			
@@ -72,6 +73,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import Crumble from '@/components/CrumbleMyContent.vue'
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
@@ -79,11 +81,12 @@
 		name: 'EditCampaign',
 		components: {
 			Sidebar,
+			Crumble,
 		},
 		data() {
 			return {
 				newEncounter: '',
-				campaignId: this.$route.params.id,
+				campaignId: this.$route.params.campid,
 				userId: firebase.auth().currentUser.uid,
 				newCampaign: {},
 				loading: true,

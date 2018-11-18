@@ -3,6 +3,7 @@
 		<Sidebar/>
 		<div id="my-content" class="container">
 			<div class="info">
+				<Crumble />
 				<h2>Edit your campaign</h2>
 				<div class="input-group mb-4">
 					<input class="form-control" type="text" />
@@ -51,6 +52,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import Crumble from '@/components/CrumbleMyContent.vue'
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
@@ -58,11 +60,12 @@
 		name: 'EditCampaign',
 		components: {
 			Sidebar,
+			Crumble,
 		},
 		data() {
 			return {
 				newCampaign: '',
-				campaignId: this.$route.params.id,
+				campaignId: this.$route.params.campid,
 				loading: true,
 				loadingCampPlayers: true,
 				userId: firebase.auth().currentUser.uid
@@ -120,7 +123,7 @@
 	padding-top:20px;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	grid-template-rows:120px 1fr;
+	grid-template-rows:auto 1fr;
 	grid-gap: 20px;
 	grid-template-areas: 
 	"info info"

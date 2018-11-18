@@ -2,6 +2,7 @@
 	<div id="hasSide">
 		<Sidebar/>
 		<div id="my-content" class="container">
+			<Crumble />
 			<h1>My content</h1>
 			<p>Welcome to your personal content.</p>
 			
@@ -18,7 +19,13 @@
 			<ul id="campaigns" class="mt-3">
 				<transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
 					<li class="bg-gray" v-for="(campaign, index) in campaigns" :key="index">
-						<h2>{{ index + 1 }}. {{ campaign.campaign }} <a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])"><i class="fas fa-trash-alt"></i></a></h2>
+						<h2>
+							{{ index + 1 }}. 
+							{{ campaign.campaign }} 
+							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+						</h2>
 						<router-link :to="'/campaigns/'+campaign['.key']"> Edit</router-link>
 						<router-link :to="'/encounters/'+campaign['.key']"> Encounters</router-link>
 
@@ -36,12 +43,14 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import Crumble from '@/components/CrumbleMyContent.vue'
 	import { db } from '@/firebase'
 
 	export default {
 		name: 'Campaigns',
 		components: {
 			Sidebar,
+			Crumble,
 		},
 		data() {
 			return {
@@ -76,7 +85,7 @@
 			deleteCampaign(key) {
 				this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
 					buttons: [
-					{text: 'Yes', action: (toast) => {db.ref('campaigns/'+ this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
+					{text: 'Yes', action: (toast) => { db.ref('campaigns/'+ this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
 					{text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});

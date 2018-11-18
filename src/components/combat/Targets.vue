@@ -1,26 +1,32 @@
 <template>
 	<div id="targets" class="bg-gray">
-			<h2>Targets ({{ _targets.length }})</h2>
-			<transition-group tag="ul" class="targets active_targets" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
-				<template v-for="(entity,_,i) in _targets">
-					<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
-						<TargetItem :item="getTargetData(entity)" />
-					</li>
-				</template>
-			</transition-group>
-			<template v-if="_idle.length">
-				<hr>
-				<h2>IDLE ({{ _idle.length }})</h2>
-				<ul class="targets idle_targets">
-					<template v-for="entity in _idle">
-						<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
-							<TargetItem :item="getTargetData(entity)" />
-						</li>
-					</template>
-				</ul>
-			</template>
-			<hr>
-			<h2>Down</h2>
+			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Targets ({{ _targets.length }})</h2>
+			<div class="scroll" v-bar>
+				<div v-on:scroll="shadow()" ref="scroll">
+					<div>
+						<transition-group tag="ul" class="targets active_targets pt-3" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+							<template v-for="(entity,_,i) in _targets">
+								<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
+									<TargetItem :item="getTargetData(entity)" />
+								</li>
+							</template>
+						</transition-group>
+						<template v-if="_idle.length">
+							<hr>
+							<h2>IDLE ({{ _idle.length }})</h2>
+							<ul class="targets idle_targets">
+								<template v-for="entity in _idle">
+									<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
+										<TargetItem :item="getTargetData(entity)" />
+									</li>
+								</template>
+							</ul>
+						</template>
+						<hr>
+						<h2>Down</h2>
+					</div>
+				</div>
+			</div>
 	</div>
 </template>
 
@@ -39,6 +45,7 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				currentTarget: {},
+				setShadow: 0,
 			}
 		},
 		computed: {
@@ -80,22 +87,36 @@
 					item.curHp = parseInt(entity.curhp)
 				}
 				return item
-			}
-		},
+			},
+			shadow() {
+				this.setShadow = this.$refs.scroll.scrollTop
+ 			}		
+ 		},
 	}
 </script>
 
 <style lang="scss" scoped>
 
 #targets {
-	padding:15px 10px;
 	grid-area: targets;
-	overflow: auto;
-	max-height: 100%;
+	overflow: hidden;
+
+	h2.componentHeader {
+		padding: 10px 15px !important;
+		margin-bottom: 0 !important;
+
+		&.shadow {
+			box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+		}
+	}
+}
+.scroll {
+	padding:0 10px 10px 10px;
+	height: calc(100% - 20px);
 }
 ul.targets {
 	list-style:none;
-	padding:0;
+	padding:0 5px 0 0;
 
 	li {
 		height: 32px;

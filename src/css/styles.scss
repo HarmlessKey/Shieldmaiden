@@ -9,6 +9,8 @@
 	4. Classes
 	5. Links
 	6. Bootstrap overrides
+	7. Snotify overrides
+	8. Custom scrollbars
  */
 
  /* 1. Variables */
@@ -95,6 +97,12 @@ h3 {
 
 .pointer {
 	cursor: pointer !important;
+}
+
+.scroll {
+	overflow: auto;
+	max-height: 100%;
+	word-wrap: break-word;
 }
 
 .validate {
@@ -308,7 +316,7 @@ ul.nav {
 	padding: 0 !important;
 }
 
-/* 6. Snotife overrides */
+/* 7. Snotify overrides */
 /*********************************************/
 .snotifyToast {
 	border-radius: 0 !important;
@@ -343,4 +351,52 @@ ul.nav {
 .snotify-icon.snotify-icon--success {
 	background-image: url('../assets/_img/styles/d20-white.png');
 	background-size: cover;
+}
+
+/* 8. Custom scrollbars */
+/*********************************************/
+.vb > .vb-dragger {
+	z-index: 5;
+	width: 5px;
+	right: 0;
+}
+
+.vb > .vb-dragger > .vb-dragger-styler {
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-transform: rotate3d(0,0,0,0);
+	transform: rotate3d(0,0,0,0);
+	-webkit-transition:
+			background-color 100ms ease-out,
+			margin 100ms ease-out,
+			height 100ms ease-out;
+	transition:
+			background-color 100ms ease-out,
+			margin 100ms ease-out,
+			height 100ms ease-out;
+	background-color: $gray-hover;
+	margin: 0;
+	border-radius: 0;
+	height: calc(100% - 10px);
+	display: block;
+}
+
+.vb.vb-scrolling-phantom > .vb-dragger > .vb-dragger-styler {
+	background-color: $gray-light;
+}
+
+.vb > .vb-dragger:hover > .vb-dragger-styler {
+	background-color: $gray-light;
+	margin: 0px;
+	height: 100%;
+}
+
+.vb.vb-dragging > .vb-dragger > .vb-dragger-styler {
+	background-color: $gray-light;
+	margin: 0px;
+	height: 100%;
+}
+
+.vb.vb-dragging-phantom > .vb-dragger > .vb-dragger-styler {
+	background-color: $gray-light;
 }

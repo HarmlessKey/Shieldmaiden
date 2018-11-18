@@ -8,10 +8,13 @@
 				<a class="nav-link" id="log-tab" data-toggle="tab" href="#log" role="tab" aria-controls="log" aria-selected="false"><i class="fas fa-list"></i></a>
 			</li>
 		</ul>
-		
-		<div class="tab-content">
-			<Dmg />
-			<Log :log="log" />	
+		<div class="actions scroll" v-bar>
+			<div>
+				<div class="tab-content">
+						<Dmg />
+						<Log :log="log" />	
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -36,19 +39,19 @@
 </script>
 
 <style lang="css" scoped>
-
 #side_container {
-	grid-area:side;
-	overflow: auto;
-	max-height: 100%;
-}
-.tab-content { 
-	padding:15px 10px;
-}
-.nav {
-	background:#191919;
+	grid-area: side;
+	overflow: hidden;
 }
 
+.nav {
+	background: #191919;
+	margin-bottom: 20px;
+}
+.scroll { 
+	padding:0 10px;
+	height: calc(100% - 50px);
+}
 .nav a.dmg {
 	height:34px;
 	width:34px;

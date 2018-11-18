@@ -11,6 +11,7 @@ import { store } from './store/store';
 import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
+import Vuebar from 'vuebar';
 
 
 const options = {
@@ -24,6 +25,7 @@ Vue.use(Snotify, options);
 Vue.use(VeeValidate);
 Vue.use(VueFire);
 Vue.use(VueCookies);
+Vue.use(Vuebar);
 
 //Bootstrap
 global.$ = jQuery

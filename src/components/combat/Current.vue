@@ -1,11 +1,15 @@
 <template>
 	<div id="current" class="bg-gray">
 		<h2>Current</h2>
-		<!-- <p>{{ getNPC(current.id) }}</p> -->
-		<div v-if="current.type == 'player'">
-			{{ getPlayer(current.id) }}
+		<div class="scroll" v-bar>
+			<div>
+				<!-- <p>{{ getNPC(current.id) }}</p> -->
+				<div v-if="current.type == 'player'">
+					{{ getPlayer(current.id) }}
+				</div>
+				<!-- <NPC v-if="current.type == 'npc'" :npc="getNPC(current.id)" /> -->
+			</div>
 		</div>
-		<!-- <NPC v-if="current.type == 'npc'" :npc="getNPC(current.id)" /> -->
 	</div>
 </template>
 
@@ -36,9 +40,19 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 #current {
-	padding:15px 10px;
+	padding-top: 15px;
 	grid-area: current;
+	overflow: hidden;
+	
+	h2 {
+		padding-left: 10px !important;
+		margin-bottom: 10px !important;
+	}
+}
+.scroll {
+	padding:10px 10px;
+	height: calc(100% - 30px);
 }
 </style>

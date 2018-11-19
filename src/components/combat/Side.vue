@@ -48,7 +48,6 @@
 	margin-bottom: 20px;
 }
 .scroll { 
-	padding:0 10px;
 	height: calc(100% - 50px);
 }
 .nav a.dmg {
@@ -63,5 +62,8 @@
 }
 .nav a.dmg:hover, .nav a.active.dmg {
 	/*background-image:url('@/assets/_img/styles/dmg-hover.png');*/
+}
+.tab-content {
+	padding: 0 10px 15px 10px;
 }
 </style>

@@ -8,13 +8,13 @@
 				<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Select</a>
 			</li>
 		</ul>
-		<div class="actions scroll" v-bar>
+		<div class="scroll" v-bar>
 			<div>
-				<h2>Actions</h2>
 				<div class="tab-content">
 					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 						<p v-if="!target" class="red">No target selected</p>
 						<template v-else>
+							<h2>Manual</h2>
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
 							<p>Manual damage or healing</p>
 							<div class="manual">
@@ -29,6 +29,7 @@
 						</template>
 					</div>
 					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+						<h2>Select</h2>
 						Coming soon
 					</div>
 				</div>
@@ -152,7 +153,7 @@
 					amount: amount,
 					over: over
 				})
-				this.$cookies.set(this.encounterId, JSON.stringify(this.log), "1d");
+				this.$cookies.set(this.encounterId, JSON.stringify(this.log), "2m");
 				this.$emit("log", this.log)
 				//console.log(this.log)
 			}
@@ -170,7 +171,7 @@
 	margin-bottom: 20px;
 }
 .actions {
-	padding: 0 10px;
+	padding:0 10px 10px 15px;
 	height: calc(100% - 55px);
 }
 .manual {
@@ -194,5 +195,7 @@
 .dmg {
 	grid-area: btn-dmg;
 }
-
+.tab-content {
+	padding: 0 10px 15px 10px;
+}
 </style>

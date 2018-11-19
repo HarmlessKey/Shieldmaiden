@@ -116,12 +116,12 @@
 	}
 }
 .scroll {
-	padding:0 10px 10px 10px;
+	padding:0 0 15px 10px;
 	height: calc(100% - 20px);
 }
 ul.targets {
 	list-style:none;
-	padding:0 5px 0 0;
+	padding:0 15px 0 0;
 
 	li {
 		height: 32px;

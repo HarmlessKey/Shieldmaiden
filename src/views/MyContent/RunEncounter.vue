@@ -39,7 +39,6 @@
 
 <script>
 	import _ from 'lodash'
-	// import firebase from 'firebase'
 	import { mapGetters } from 'vuex'
 
 	import Actions from '@/components/combat/Actions.vue'
@@ -48,7 +47,6 @@
 	import Targets from '@/components/combat/Targets.vue'
 	import Side from '@/components/combat/Side.vue'
 	import SetInitiative from '@/components/combat/SetInitiative.vue'
-	import { db } from '@/firebase'
 
 	export default {
 		name: 'app',
@@ -76,8 +74,6 @@
 		},
 		computed: {
 			...mapGetters([
-				'campaignId',
-				'encounterId',
 				'encounter',
 				'players',
 				'campaigns',

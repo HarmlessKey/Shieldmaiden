@@ -26,7 +26,7 @@
 					/>
 					<Actions 
 					:target="target"
-					:round="encounter.round" 
+					:round="encounter.round"
 					:turn="encounter.turn"
 					:current="_active[encounter.turn]"
 					@log="sendLog"
@@ -62,10 +62,12 @@
 		},
 		data() {
 			// Dispatch route parameters to store
-			this.$store.dispatch('setCampaignId', this.$route.params.campid)
-			this.$store.dispatch('setEncounterId', this.$route.params.encid)
-			this.$store.dispatch('fetchEncounter')
+			this.$store.dispatch('fetchEncounter', {
+				cid: this.$route.params.campid, 
+				eid: this.$route.params.encid
+			})
 			this.$store.dispatch('fetchPlayers')
+			this.$store.dispatch('fetchCampaigns')
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,
@@ -78,6 +80,7 @@
 				'encounterId',
 				'encounter',
 				'players',
+				'campaigns',
 			]),
 			_active: function() {
 				return _.chain(this.encounter.entities)

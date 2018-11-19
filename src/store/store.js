@@ -6,15 +6,19 @@ import { db } from '@/firebase'
 
 Vue.use(Vuex);
 
-// const encounters = db.ref('encounters')
-// const players = db.ref('players')
+const campaigns_ref = db.ref('campaigns/')
+const encounters_ref = db.ref('encounters')
+const players_ref = db.ref('players')
 
 export const store = new Vuex.Store({
 	state: {
 		user: {},
+
+		campaigns: {},
 		encounter: {},
-		entities: {},
 		players: {},
+
+		entities: {},
 
 		campaignId: null,
 		encounterId: null,
@@ -35,6 +39,9 @@ export const store = new Vuex.Store({
 		},
 		players: function( state ) {
 			return state.players
+		},
+		campaigns: function( state ) {
+			return state.campaigns
 		}
 	},
 	mutations: {
@@ -52,6 +59,9 @@ export const store = new Vuex.Store({
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
+		},
+		SET_CAMPAIGNS(state, payload) {
+			state.campaigns = payload
 		}
 	},
 	actions: {
@@ -64,20 +74,29 @@ export const store = new Vuex.Store({
 		setEncounterId({ commit }, value) {
 			commit('SET_ENCOUNTER_ID', value)
 		},
-		fetchEncounter({ commit, state }) {
-			const uid = state.user.uid
-			const cid = state.campaignId
-			const eid = state.encounterId
-			const encounter = db.ref(`encounters/${uid}/${cid}/${eid}`)
+		fetchEncounter({ commit, state }, { cid, eid }) {
+			commit("SET_CAMPAIGN_ID", cid)
+			commit("SET_ENCOUNTER_ID", eid)
+			
+			const uid = state.user.uid;
+			const path = `${uid}/${cid}/${eid}`;
+			const encounter = encounters_ref.child(path);
 			encounter.on('value', snapshot => {
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
 		},
 		fetchPlayers({ commit, state }) {
 			const uid = state.user.uid
-			const players = db.ref(`players/${uid}`)
+			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
+			})
+		},
+		fetchCampaigns({ commit, state }) {
+			const uid = state.user.uid
+			let campaigns = campaigns_ref.child(uid)
+			campaigns.on('value', snapshot => {
+				commit('SET_CAMPAIGNS', snapshot.val())
 			})
 		}
 	}

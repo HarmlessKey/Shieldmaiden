@@ -52,7 +52,6 @@
 	}
 }
 .scroll {
-	padding:10px 10px;
 	height: calc(100% - 30px);
 }
 </style>

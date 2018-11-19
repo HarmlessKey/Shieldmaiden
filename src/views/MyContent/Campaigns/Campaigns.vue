@@ -3,18 +3,30 @@
 		<Sidebar/>
 		<div id="my-content" class="container">
 			<Crumble />
-			<h1>My content</h1>
-			<p>Welcome to your personal content.</p>
+			<h1>Campaigns</h1>
+			<p>Welcome to your campaigns overview.</p>
 			
-			<div class="input-group">
-				<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('newCampaign') }" v-model="newCampaign" v-validate="'required'" name="newCampaign" placeholder="Add new campaign" />
-				<div class="input-group-append">
-					<button class="btn" @click="addCampaign()"><i class="fas fa-plus"></i> Add</button>
-				</div>				
-			</div>
-			<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-
-			<h2 class="mt-3">My campaigns</h2>
+			<template v-if="players.length > 0">
+				<div class="input-group">
+					<input type="text" 
+						class="form-control" 
+						:class="{'input': true, 'error': errors.has('newCampaign') }" 
+						v-model="newCampaign" 
+						v-validate="'required'" 
+						name="newCampaign" 
+						placeholder="Add new campaign"
+					/>
+					<div class="input-group-append">
+						<button class="btn" @click="addCampaign()"><i class="fas fa-plus"></i> Add</button>
+					</div>				
+				</div>
+				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+			</template>
+			<template v-else>
+				<h2 class="red">No players yet</h2>
+				<p>Let's start with making some players that can join your campaigns.</p>
+				<router-link class="btn" to="/players/add-player">Create player</router-link>
+			</template>
 			<div v-if="loading == true" class="loader"><span>Loading Campaigns...</span></div>
 			<ul id="campaigns" class="mt-3">
 				<transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
@@ -32,7 +44,13 @@
 						<!-- PLAYERS IN CAMPAIGN -->
 						<h2 class="players">Players</h2>
 						<div class="d-flex justify-content-center">
-							<span v-for="player in campaign.players" :key="player['.key']" v-b-tooltip.hover :title="getPlayer(player.player).character_name" class="img" :style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }"></span>
+							<span v-for="player in campaign.players" 
+								:key="player['.key']"
+								v-b-tooltip.hover
+								:title="getPlayer(player.player).character_name"
+								class="img"
+								:style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }">
+							</span>
 						</div>
 					</li>
 				</transition-group>

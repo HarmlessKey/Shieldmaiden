@@ -18,8 +18,6 @@ export const store = new Vuex.Store({
 		encounter: {},
 		players: {},
 
-		entities: {},
-
 		campaignId: null,
 		encounterId: null,
 
@@ -42,6 +40,9 @@ export const store = new Vuex.Store({
 		},
 		campaigns: function( state ) {
 			return state.campaigns
+		},
+		entities: function( state ) {
+			return state.encounter.entities
 		}
 
 	},

@@ -72,8 +72,8 @@
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
 			})
-			this.fetchPlayers()
 			this.fetchCampaigns()
+			this.fetchPlayers()
 		},
 		computed: {
 			...mapGetters([

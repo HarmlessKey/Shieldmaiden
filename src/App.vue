@@ -10,21 +10,23 @@
 
 <script>
 	import Header from './components/Header.vue';
+	import { mapActions } from 'vuex';
 
 	export default {
-		components: {
-			navMain: Header
-		},
-		methods: {
-			setUser: function() {
-				this.$store.dispatch('setUser');
-			}
-		},
-		created() {
-		// when the app is created run the set user method
-		// this uses Vuex to check if a user is signed in
-		// check out mutations in the store.js file
+	components: {
+		navMain: Header
+	},
+	created() {
 		this.setUser();
+		this.fetchCampaigns();
+		this.fetchPlayers();
+	},
+	methods: {
+		...mapActions([
+			'fetchCampaigns',
+			'fetchPlayers',
+			'setUser',
+		])
 	}
 };
 </script>

@@ -45,7 +45,7 @@ export const store = new Vuex.Store({
 		}
 	},
 	mutations: {
-		setUser: state => {
+		setUser(state) {
 			state.user = Firebase.auth().currentUser;
 		},
 		SET_CAMPAIGN_ID(state, value) {

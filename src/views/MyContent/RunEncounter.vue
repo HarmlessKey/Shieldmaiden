@@ -39,7 +39,7 @@
 
 <script>
 	import _ from 'lodash'
-	import { mapGetters } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 
 	import Actions from '@/components/combat/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
@@ -60,17 +60,20 @@
 		},
 		data() {
 			// Dispatch route parameters to store
-			this.$store.dispatch('fetchEncounter', {
-				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid
-			})
-			this.$store.dispatch('fetchPlayers')
-			this.$store.dispatch('fetchCampaigns')
+			
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,
 				log: undefined
 			}
+		},
+		mounted() {
+			this.fetchEncounter({
+				cid: this.$route.params.campid, 
+				eid: this.$route.params.encid
+			})
+			this.fetchPlayers()
+			this.fetchCampaigns()
 		},
 		computed: {
 			...mapGetters([
@@ -100,14 +103,15 @@
 								} , 'desc')
 								.value()
 			},
-			// currentEntity: function() {
-			// 	return 
-			// }
 		},
 		methods: {
+			...mapActions([
+				'fetchEncounter',
+				'fetchCampaigns',
+				'fetchPlayers',
+			]),
 			log_target: function(target) {
 				this.target = target
-				// this.target = _.find(this._active, {'key':target.key})
 			},
 			sendLog: function(log) {
 				this.log = log;

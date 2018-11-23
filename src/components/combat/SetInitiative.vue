@@ -244,9 +244,6 @@
 	text-overflow: ellipsis;
 }
 .initiative-move {
-  transition: transform .6s;
-}
-.fadeInUp, .fadeInDown {
-	animation-delay: .6s;
+  transition: transform .5s;
 }
 </style>

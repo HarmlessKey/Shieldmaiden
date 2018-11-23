@@ -20,18 +20,19 @@
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-						<div v-if="loading == true" class="loader"><span>Loading Players...</span></div>
-						<ul class="entities">
-							<li v-for="player in campaignPlayers" :key="player['.key']" class="d-flex justify-content-between" :class="{ 'faded' : checkEntity(player.player) }">
+						<!-- <a class="btn btn-block" @click="addAllPlayers()">Add all</a> -->
+						<ul class="entities" v-if="campaign && players && encounter">
+							<li v-for="(player, key) in campaign.players" :key="player.player" class="d-flex justify-content-between" :class="{ 'faded' : player.key }">
 								<div class="d-flex justify-content-left">
-									<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }"></span>
-									{{ getPlayer(player.player).character_name }}
+									<span v-if="players[player.player].character_name" class="img" :style="{ backgroundImage: 'url(' + players[player.player].character_name + ')' }"></span>
+									{{ players[player.player].character_name }}
+									{{ player.player }}
 								</div>
-								
-								<a v-if="!checkEntity(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', getPlayer(player.player).character_name)"><i class="fas fa-plus-circle"></i></a>
+								<a v-if="!checkEntity(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', players[player.player].character_name)"><i class="fas fa-plus-circle"></i></a>
 								<span v-else><i class="fas fa-check"></i></span>
 							</li>
 						</ul>
+						<div v-else class="loader"><span>Loading players...</span></div>
 					</div>
 					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 						<div class="input-group mb-3">
@@ -55,20 +56,20 @@
 			</div>
 
 			<div id="added" class="bg-gray">
-				<div v-if="loadingEntities == true" class="loader"><span>Loading Entities...</span></div>
-				<ul class="entities">
-					<li v-for="entity in entities" :key="entity['.key']" class="d-flex justify-content-between">
+				<ul class="entities" v-if="encounter">
+					<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<span v-if="entity.type == 'player'" class="img" :style="{ backgroundImage: 'url(' + getPlayer(entity.id).avatar + ')' }"></span>
+							<span v-if="entity.type == 'player'" class="img" :style="{ backgroundImage: 'url(' + players[entity.id].avatar + ')' }"></span>
 							<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
 							{{ entity.name }}
 						</div>
 						<span>
 							<a v-if="entity.type == 'npc'" class="mr-2" v-b-tooltip.hover title="Edit (Coming Soon)"><i class="fas fa-pencil-alt"></i></a>
-							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(entity['.key'], entity.name)"><i class="fas fa-minus-circle"></i></a>
+							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
 						</span>
 					</li>
 				</ul>
+				<div v-else class="loader"><span>Loading entities...</span></div>
 			</div>
 			<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
 				<div v-if="showSide == true" class="npc bg-gray" >
@@ -84,6 +85,7 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
 	import NPC from '@/components/NPC.vue'
+	import { mapGetters, mapActions } from 'vuex'
 	import firebase from 'firebase'
 	import axios from 'axios'
 	import { db } from '@/firebase'
@@ -99,9 +101,7 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				userId: firebase.auth().currentUser.uid,
-				loading: true,
-				loadingEntities: true,
+				user: this.$store.getters.getUser,
 				search: '',
 				searchResults: [],
 				noResult: '',
@@ -111,27 +111,30 @@
 				showSide: false
 			} 
 		},
+		computed: {
+			...mapGetters([
+				'encounter',
+				'campaign',
+				'players',
+			]),
+		},
 		mounted() {
+			this.fetchEncounter({
+				cid: this.campaignId, 
+				eid: this.encounterId, 
+			}),
+			this.fetchCampaign({
+				cid: this.campaignId, 
+			}),
 			axios.get("http://www.dnd5eapi.co/api/monsters/")
 			.then(response => {this.npcs = response.data.results})
 		},
-		firebase() {
-			return {
-				players: {
-					source: db.ref('players/' + this.userId),
-					readyCallback: () => this.loading = false
-				},
-				campaignPlayers: {
-					source: db.ref('campaigns/' + this.userId + '/' + this.campaignId + '/players'),
-					readyCallback: () => this.loadingCampPlayers = false
-				},
-				entities: {
-					source: db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').orderByChild('name'),
-					readyCallback: () => this.loadingEntities = false
-				}
-			}
-		},
 		methods: {
+			...mapActions([
+				'fetchEncounter',
+				'fetchCampaign',
+				'fetchPlayers',
+			]),
 			async getNPC(id) {
 				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
 				.then(response => {return response.data})
@@ -158,12 +161,13 @@
 					entity.active = false
 				}
 				else if (type == 'player') {
-					entity.curhp = this.getPlayer(id).maxhp
+					var player_data = await this.players;
+					entity.curhp = player_data[id].maxhp
 				}
-				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
+				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 			},
 			remove(id, name) {
-				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
 			},
 			searchNPC() {
 				this.searchResults = []
@@ -188,16 +192,13 @@
 			hideSide() {
 				this.showSide = false;
 			},
-			getPlayer(entityKey) {
-				var player = this.players.find(function(element) {
-					return element['.key'] == entityKey
-				});
-				return player
-			},
 			checkEntity(playerKey) {
-				var entity = this.entities.find(function(element) {
+				var entities = this.encounter.entities
+				var arr = Object.values(entities)
+				var entity = arr.find(function(element) {
 					return element.id == playerKey
 				});
+				// console.log(entity)
 				return entity
 			}
 		}

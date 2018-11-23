@@ -7,7 +7,14 @@
 			<p>Manage the encounters in your campaign.</p>
 			
 			<div class="input-group">
-				<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('newEncounter') }" v-model="newEncounter" v-validate="'required'" name="newEncounter" placeholder="Encounter Title" />
+				<input type="text" 
+					class="form-control"
+					:class="{'input': true, 'error': errors.has('newEncounter') }"
+					v-model="newEncounter"
+					v-validate="'required'" 
+					name="newEncounter" 
+					placeholder="Encounter Title"
+					@change="addEncounter()" />
 				<div class="input-group-append">
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</div>				
@@ -15,58 +22,71 @@
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- SHOW ENCOUNTERS -->
-			<h2 class="mt-3">Encounters</h2>
-			<table class="table">
-				<thead>
-					<th>#</th>
-					<th>Encounter</th>
-					<th>Status</th>
-					<th>Round</th>
-					<th>Turn</th>
-					<th></th>
-				</thead>
-				<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
-					<tr v-for="(encounter, index) in encounters" :key="encounter['.key']">
-						<td>{{ index + 1 }}</td>
-						<td>{{ encounter.encounter }}</td>
-						<template v-if="encounter.round != 0">
-							<td class="red">In progress</td>
-							<td>{{ encounter.round }}</td>
-							<td>{{ encounter.turn + 1 }}</td>
-						</template>
-						<template v-else>
-							<td colspan="3">Not started</td>
-						</template>
-						<td class="text-right">
-							<router-link class="green" :to="'/run-encounter/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
-							<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
-							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div v-if="loading == true" class="loader"><span>Loading encounters...</span></div>
+			<template v-if="encounters">
+				<h2 class="mt-3">Encounters ( {{ Object.keys(encounters).length }} )</h2>
+				<table class="table">
+					<thead>
+						<th>#</th>
+						<th>Encounter</th>
+						<th>Entities</th>
+						<th>Status</th>
+						<th>Round</th>
+						<th>Turn</th>
+						<th></th>
+					</thead>
+					<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+						<tr v-for="(encounter, index) in _active" :key="encounter.key">
+							<td>{{ index + 1 }}</td>
+							<td>{{ encounter.encounter }}</td>
+							<td>
+								<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+									<template v-if="encounter.entities">
+										{{ Object.keys(encounter.entities).length }}
+									</template>
+									<template v-else>Add</template>
+								</router-link>
+							</td>
+							<template v-if="encounter.round != 0">
+								<td class="red">In progress</td>
+								<td>{{ encounter.round }}</td>
+								<td>{{ encounter.turn + 1 }}</td>
+							</template>
+							<template v-else>
+								<td colspan="3">Not started</td>
+							</template>
+							<td class="text-right actions">
+								<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
+								<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
+								<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
+								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 
-			<h2>Finished Encounters</h2>
-			<table class="table">
-				<thead>
-					<th>#</th>
-					<th>Encounter</th>
-					<th></th>
-				</thead>
-				<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
-					
-					<tr v-for="(encounter, index) in encounters_finished" :key="encounter['.key']">
-						<td>{{ index + 1 }}</td>
-						<td>{{ encounter.encounter }}</td>
-						<td class="text-right">
-							<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter['.key']" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
-							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter['.key'], encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div v-if="loading == true" class="loader"><span>Loading encounters...</span></div>
+				<template v-if="_finished != 0">
+					<h2>Finished Encounters</h2>
+					<table class="table">
+						<thead>
+							<th>#</th>
+							<th>Encounter</th>
+							<th></th>
+						</thead>
+						<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+							
+							<tr v-for="(encounter, index) in _finished" :key="encounter.key">
+								<td>{{ index + 1 }}</td>
+								<td>{{ encounter.encounter }}</td>
+								<td class="text-right">
+									<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
+									<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</template>
+			</template>
+			<div v-else class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>
 </template>
@@ -74,6 +94,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
+	import { mapGetters, mapActions } from 'vuex'
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
@@ -85,30 +106,69 @@
 		},
 		data() {
 			return {
-				newEncounter: '',
+				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
-				userId: firebase.auth().currentUser.uid,
-				newCampaign: {},
-				loading: true,
+				newEncounter: '',
 			}
+		},
+		mounted() {
+			this.fetchEncounters({
+				cid: this.campaignId, 
+			})
+		},
+		computed: {
+			...mapGetters([
+				'encounters'
+			]),
+			_active: function() {
+				return _.chain(this.encounters)
+				.filter(function(encounter, key) {
+					encounter.key = key
+					return encounter.finished == false;
+				})
+				.orderBy(function(encounter){
+					return parseInt(encounter.timestamp)
+				} , 'desc')
+				.value()
+			},
+			_finished: function() {
+				return _.chain(this.encounters)
+				.filter(function(encounter, key) {
+					encounter.key = key
+					return encounter.finished == true;
+				})
+				.orderBy(function(encounter){
+					return parseInt(encounter.timestamp)
+				} , 'desc')
+				.value()
+			},
 		},
 		firebase() {
-			return {
-				encounters: {
-					source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(false),
-					readyCallback: () => this.loading = false
-				},
-				encounters_finished: {
-					source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(true),
-					readyCallback: () => this.loading = false
-				}
-			}
+			// return {
+			// 	encounters: {
+			// 		source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(false),
+			// 		readyCallback: () => this.loading = false
+			// 	},
+			// 	encounters_finished: {
+			// 		source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(true),
+			// 		readyCallback: () => this.loading = false
+			// 	}
+			// }
 		},
 		methods: {
+			...mapActions([
+				'fetchEncounters',
+			]),
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref('encounters/'+ this.userId +'/'+ this.campaignId).push({encounter: this.newEncounter, round: 0, turn: 0, finished: false});
+						db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
+							encounter: this.newEncounter, 
+							round: 0, 
+							turn: 0, 
+							finished: false,
+							timestamp: Date.now()
+						});
 						this.newEncounter = '';
 						this.$snotify.success('Encounter added.', 'Critical hit!', {
 							position: "rightTop"
@@ -122,22 +182,53 @@
 				this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
 					timeout: 5000,
 					buttons: [
-					{text: 'Yes', action: (toast) => { db.ref('encounters/' + this.userId + '/' + this.campaignId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
-					{text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},				]
+					{
+						text: 'Yes', action: (toast) => { 
+							db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove(); 
+							this.$snotify.remove(toast.id); 
+						}, bold: false 
+					},
+					{
+						text: 'No', action: (toast) => { 
+							this.$snotify.remove(toast.id); 
+						}, 
+						bold: false },
+					]
 				});
 			}
 		}
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 .container {
-	padding-top:20px;
+	padding-top: 20px;
 }
-table router-link, table a {
-	font-size:15px;
+table {
+	td, th {
+		border: none !important;
+	}
+	td {
+		background-color: #262626;
+		border-bottom: solid 2px #191919 !important;
+	}
+	thead, tr {
+		margin-bottom: 1px !important;
+	}
+	td.actions {
+		router-link, a, .disabled {
+			font-size: 15px;
+			line-height: 0px;
+		}
+		.disabled {
+			opacity: .3;
+		}
+	}
+	th:first-child, td:first-child {
+		width:10px;
+	}
 }
-th:first-child, td:first-child {
-	width:10px;
+.loader {
+	margin-top: 20px;
 }
 </style>

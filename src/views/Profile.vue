@@ -9,11 +9,11 @@
 		<h2>Data</h2>
 		<p>
 			Campaigns: 
-			<span :class="{ 'green': true, 'red': campaigns.length == 2 }">{{ campaigns.length }} </span>
+			<span :class="{ 'green': true, 'red': Object.keys(campaigns).length == 2 }">{{ Object.keys(campaigns).length }} </span>
 			/ 2
 		</p>
 		<p>Players:
-			<span :class="{ 'green': true, 'red': players.length == 2 }">{{ players.length }} </span>
+			<span :class="{ 'green': true, 'red': Object.keys(players).length == 2 }">{{ Object.keys(players).length }} </span>
 				/ 6
 		</p>
 		<p>NPC's: / 10</p>
@@ -25,21 +25,24 @@
 <script>
 	import firebase from 'firebase'
 	import { db } from '@/firebase'	
+	import { mapGetters } from 'vuex'
 
 export default {
 		name: 'Profile',
 		data() {
 			return {
-				user: this.$store.getters.getUser,
 				auth: firebase.auth(),
 				error: ''
 			}
 		},
-		firebase() {
-			return {
-				players: db.ref('players/' + this.userId),
-				campaigns: db.ref('campaigns/' + this.userId),
-			}
+		computed: {
+			...mapGetters([
+				'campaigns',
+				'players',
+			]),
+			...mapGetters({
+				user: 'getUser'
+			})
 		},
 		created() {
 			// console.log(this.user)
@@ -80,8 +83,6 @@ export default {
 				.then(() => {
 					
 				});
-				
-
 				this.user.delete().then(function() {
 					this.$router.replace('/');
 				}).catch(function(error) {

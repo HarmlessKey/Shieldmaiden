@@ -278,8 +278,8 @@ hr { background: $black; }
 
 .form-control, .custom-select { 
 	border-radius: 0 !important;
-	background: $gray-dark !important;
-	border: solid 1px $gray-light !important;
+	background: $black !important;
+	border: solid 1px $gray !important;
 	color: $gray-light !important;
 	
 	&:focus {

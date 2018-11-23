@@ -14,9 +14,11 @@ export const store = new Vuex.Store({
 	state: {
 		user: {},
 
-		campaigns: {},
-		encounter: {},
-		players: {},
+		campaign: undefined,
+		campaigns: undefined,
+		encounters: undefined,
+		encounter: undefined,
+		players: undefined,
 
 		entities: {},
 
@@ -37,8 +39,14 @@ export const store = new Vuex.Store({
 		encounter: function( state ) {
 			return state.encounter
 		},
+		encounters: function( state ) {
+			return state.encounters
+		},
 		players: function( state ) {
 			return state.players
+		},
+		campaign: function( state ) {
+			return state.campaign
 		},
 		campaigns: function( state ) {
 			return state.campaigns
@@ -61,8 +69,14 @@ export const store = new Vuex.Store({
 		SET_PLAYERS(state, payload) {
 			state.players = payload
 		},
+		SET_CAMPAIGN(state, payload) {
+			state.campaign = payload
+		},
 		SET_CAMPAIGNS(state, payload) {
 			state.campaigns = payload
+		},
+		SET_ENCOUNTERS(state, payload) {
+			state.encounters = payload
 		}
 	},
 	actions: {
@@ -86,11 +100,29 @@ export const store = new Vuex.Store({
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
 		},
+		fetchEncounters({ commit, state }, { cid }) {
+			const uid = state.user.uid
+			const path = `${uid}/${cid}`;
+			let encounters = encounters_ref.child(path)
+			encounters.on('value', snapshot => {
+				commit('SET_ENCOUNTERS', snapshot.val())
+			})
+		},
 		fetchPlayers({ commit, state }) {
 			const uid = state.user.uid
 			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
+			})
+		},
+		fetchCampaign({ commit, state }, { cid }) {
+			commit("SET_CAMPAIGN_ID", cid)
+			
+			const uid = state.user.uid;
+			const path = `${uid}/${cid}`;
+			const campaign = campaigns_ref.child(path);
+			campaign.on('value', snapshot => {
+				commit('SET_CAMPAIGN', snapshot.val())
 			})
 		},
 		fetchCampaigns({ commit, state }) {

@@ -25,7 +25,7 @@ export const store = new Vuex.Store({
 
 	},
 	getters: {
-		getUser: state => {
+		getUser: function(state) {
 			return state.user;
 		},
 		campaignId: function( state ) {
@@ -43,6 +43,7 @@ export const store = new Vuex.Store({
 		campaigns: function( state ) {
 			return state.campaigns
 		}
+
 	},
 	mutations: {
 		setUser(state) {

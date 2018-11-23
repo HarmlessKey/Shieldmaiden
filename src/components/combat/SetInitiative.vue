@@ -92,7 +92,6 @@
 				active_entities: {},
 				inactive_entities: {},
 
-				// userId: this.$store.getters.getUser.uid,
 				selected: [],
 			}
 		},

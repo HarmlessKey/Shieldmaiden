@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Firebase from 'firebase';
+import { entitiesModule } from '@/store/entities'
 
 import { db } from '@/firebase'
 
@@ -101,5 +102,8 @@ export const store = new Vuex.Store({
 				commit('SET_CAMPAIGNS', snapshot.val())
 			})
 		}
+	},
+	modules: {
+		entities: entitiesModule
 	}
 });

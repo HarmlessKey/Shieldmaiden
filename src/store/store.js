@@ -16,6 +16,7 @@ export const store = new Vuex.Store({
 
 		campaign: undefined,
 		campaigns: undefined,
+		allEncounters: undefined,
 		encounters: undefined,
 		encounter: undefined,
 		players: undefined,
@@ -42,6 +43,9 @@ export const store = new Vuex.Store({
 		encounters: function( state ) {
 			return state.encounters
 		},
+		allEncounters: function( state ) {
+			return state.allEncounters
+		},
 		players: function( state ) {
 			return state.players
 		},
@@ -51,7 +55,6 @@ export const store = new Vuex.Store({
 		campaigns: function( state ) {
 			return state.campaigns
 		}
-
 	},
 	mutations: {
 		setUser(state) {
@@ -77,6 +80,9 @@ export const store = new Vuex.Store({
 		},
 		SET_ENCOUNTERS(state, payload) {
 			state.encounters = payload
+		},
+		SET_ALLENCOUNTERS(state, payload) {
+			state.allEncounters = payload
 		}
 	},
 	actions: {
@@ -106,6 +112,13 @@ export const store = new Vuex.Store({
 			let encounters = encounters_ref.child(path)
 			encounters.on('value', snapshot => {
 				commit('SET_ENCOUNTERS', snapshot.val())
+			})
+		},
+		fetchAllEncounters({ commit, state }) {
+			const uid = state.user.uid
+			let encounters = encounters_ref.child(uid)
+			encounters.on('value', snapshot => {
+				commit('SET_ALLENCOUNTERS', snapshot.val())
 			})
 		},
 		fetchPlayers({ commit, state }) {

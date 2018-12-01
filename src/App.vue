@@ -19,11 +19,13 @@
 	created() {
 		this.setUser();
 		this.fetchCampaigns();
+		this.fetchAllEncounters();
 		this.fetchPlayers();
 	},
 	methods: {
 		...mapActions([
 			'fetchCampaigns',
+			'fetchAllEncounters',
 			'fetchPlayers',
 			'setUser',
 		])

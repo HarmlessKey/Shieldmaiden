@@ -34,7 +34,7 @@
 						<th>Turn</th>
 						<th></th>
 					</thead>
-					<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+					<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
 						<tr v-for="(encounter, index) in _active" :key="encounter.key">
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
@@ -72,7 +72,7 @@
 							<th>Encounter</th>
 							<th></th>
 						</thead>
-						<tbody name="table-row" is="transition-group" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
+						<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
 							
 							<tr v-for="(encounter, index) in _finished" :key="encounter.key">
 								<td>{{ index + 1 }}</td>
@@ -92,6 +92,7 @@
 </template>
 
 <script>
+	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
@@ -143,18 +144,6 @@
 				.value()
 			},
 		},
-		firebase() {
-			// return {
-			// 	encounters: {
-			// 		source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(false),
-			// 		readyCallback: () => this.loading = false
-			// 	},
-			// 	encounters_finished: {
-			// 		source: db.ref('encounters/'+ this.userId).child(this.campaignId).orderByChild('finished').equalTo(true),
-			// 		readyCallback: () => this.loading = false
-			// 	}
-			// }
-		},
 		methods: {
 			...mapActions([
 				'fetchEncounters',
@@ -173,10 +162,11 @@
 						this.$snotify.success('Encounter added.', 'Critical hit!', {
 							position: "rightTop"
 						});
-					} else {
-					//console.log('Not valid');
-				}
-			})
+					} 
+					else {
+						//console.log('Not valid');
+					}
+				})
 			},
 			deleteEncounter(key, encounter) {
 				this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
@@ -203,30 +193,6 @@
 <style lang="scss" scoped>
 .container {
 	padding-top: 20px;
-}
-table {
-	td, th {
-		border: none !important;
-	}
-	td {
-		background-color: #262626;
-		border-bottom: solid 2px #191919 !important;
-	}
-	thead, tr {
-		margin-bottom: 1px !important;
-	}
-	td.actions {
-		router-link, a, .disabled {
-			font-size: 15px;
-			line-height: 0px;
-		}
-		.disabled {
-			opacity: .3;
-		}
-	}
-	th:first-child, td:first-child {
-		width:10px;
-	}
 }
 .loader {
 	margin-top: 20px;

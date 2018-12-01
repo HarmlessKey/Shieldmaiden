@@ -13,7 +13,7 @@
 			/ 2
 		</p>
 		<p>Players:
-			<span :class="{ 'green': true, 'red': Object.keys(players).length == 2 }">{{ Object.keys(players).length }} </span>
+			<span :class="{ 'green': true, 'red': Object.keys(players).length == 6 }">{{ Object.keys(players).length }} </span>
 				/ 6
 		</p>
 		<p>NPC's: / 10</p>

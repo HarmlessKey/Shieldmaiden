@@ -1,4 +1,5 @@
 @import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P|Raleway');
 @import "~vue-snotify/styles/material.css";
 
 /* 
@@ -40,6 +41,7 @@ body {
 	background: $gray-dark !important;
 	color: $gray-light !important;
 	font-size: 12px !important;
+	font-family: 'Raleway', sans-serif;
 }
 .view {
 	padding: 5px;
@@ -63,15 +65,17 @@ header {
 }
 /* 3. Heading */
 /*********************************************/
-h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }
+h1, h2, h3, h4, h5, h6 { font-weight:normal !important;  }
 h1 {
 	text-transform:uppercase;
 	font-size: 15px !important;
+	font-family: 'Press Start 2P', cursive;
 }
 h2 {
 	text-transform:uppercase;
 	font-size: 15px !important;
 	margin-bottom: 20px !important;
+	font-family: 'Press Start 2P', cursive;
 }
 h3 {
 	font-size: 15px !important;
@@ -231,7 +235,42 @@ ul.crumble {
 		}
 	}
 }
+table {
+	td, th {
+		border: none !important;
+	}
+	td {
+		background-color: #262626;
+		border-bottom: solid 1px #191919 !important;
+	}
+	thead, tr {
+		margin-bottom: 1px !important;
+	}
+	td.actions {
+		router-link, a, .disabled {
+			font-size: 15px;
+			line-height: 0px;
+		}
+		.disabled {
+			opacity: .3;
+		}
+	}
+	th:first-child, td:first-child {
+		width:10px;
+	}
+	td.img {
+		padding: 1px;
+		width: 38px;
+		height: 38px;
+		background-size:cover;
+		background-position:top center;
 
+		img {
+			width: 38px;
+			height: 38px;
+		}
+	}
+}
 
 /* 6. Bootstrap overrides*/
 /*********************************************/

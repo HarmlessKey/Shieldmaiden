@@ -22,14 +22,15 @@
 					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 						<!-- <a class="btn btn-block" @click="addAllPlayers()">Add all</a> -->
 						<ul class="entities" v-if="campaign && players && encounter">
-							<li v-for="(player, key) in campaign.players" :key="player.player" class="d-flex justify-content-between" :class="{ 'faded' : player.key }">
+							<li v-for="(player, key) in campaign.players" 
+							:key="player.player" 
+							class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
-									<span v-if="players[player.player].character_name" class="img" :style="{ backgroundImage: 'url(' + players[player.player].character_name + ')' }"></span>
-									{{ players[player.player].character_name }}
-									{{ player.player }}
+									<span v-if="players[key].character_name" class="img" :style="{ backgroundImage: 'url(' + players[key].character_name + ')' }"></span>
+									{{ players[key].character_name }}
 								</div>
-								<a v-if="!checkEntity(player.player)" class="green" v-b-tooltip.hover title="Add Character" @click="add(player.player, 'player', players[player.player].character_name)"><i class="fas fa-plus-circle"></i></a>
-								<span v-else><i class="fas fa-check"></i></span>
+								<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'player', players[key].character_name)"><i class="fas fa-plus-circle"></i></a>
+								<!-- <span v-else><i class="fas fa-check"></i></span> -->
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading players...</span></div>
@@ -193,13 +194,13 @@
 				this.showSide = false;
 			},
 			checkEntity(playerKey) {
-				var entities = this.encounter.entities
-				var arr = Object.values(entities)
-				var entity = arr.find(function(element) {
-					return element.id == playerKey
-				});
-				// console.log(entity)
-				return entity
+				// var entities = this.encounter.entities
+				// var arr = Object.values(entities)
+				// var entity = arr.find(function(element) {
+				// 	return element.id == playerKey
+				// });
+				// // console.log(entity)
+				// return entity
 			}
 		}
 	}

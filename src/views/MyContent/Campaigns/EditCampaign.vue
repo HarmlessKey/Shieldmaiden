@@ -1,51 +1,71 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="my-content" class="container">
-			<div class="info">
-				<Crumble />
-				<h2>Edit your campaign</h2>
-				<div class="input-group mb-4">
-					<input class="form-control" type="text" />
-					<div class="input-group-append">
-						<button class="btn" @click="changeName()">Change Name</button>
+	<div>
+		<div class="hasSide">
+			<Sidebar/>
+			<div id="my-content" class="container">
+				<div class="info">
+					<Crumble />
+					<h2>Edit your campaign</h2>
+					<div class="input-group mb-4" v-if="campaign">
+						<input class="form-control" v-validate="'required'" type="text" name="newCampaign" v-model="campaign.campaign" @change="changeName()"/>
+						<div class="input-group-append">
+							<button class="btn">Change Name</button>
+						</div>
 					</div>
+					<div v-else class="loader"><span>...</span></div>
 				</div>
-				<router-link to="/campaigns">Back to campaign overview</router-link>
+				
+				<div id="add" class="bg-gray">
+					<h2>All players</h2>
+					<ul class="entities" v-if="players && campaign">
+						<!-- <li v-for="(player, key) in players" 
+						:key="key" 
+						class="d-flex justify-content-between"
+						:class="{ 'faded': campaign.players[key] }"> -->
+						<li v-for="(player, key) in players" 
+						:key="key" 
+						class="d-flex justify-content-between">
+							<div class="d-flex justify-content-left">
+								<span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
+								{{ player.character_name }}
+							</div>
+							<!-- <a v-if="campaign.players[key] == true" class="green" 
+								v-b-tooltip.hover 
+								title="Add Character" 
+								@click="addPlayer(key, player.character_name)">
+									<i class="fas fa-plus-circle"></i>
+							</a>
+							<span v-else><i class="fas fa-check"></i></span> -->
+							<a class="green" 
+								v-b-tooltip.hover 
+								title="Add Character" 
+								@click="addPlayer(key, player.character_name)">
+									<i class="fas fa-plus-circle"></i>
+							</a>
+						</li>
+					</ul>
+					<div v-else class="loader"><span>Loading Players...</span></div>
+				</div>
+
+				<div id="added" class="bg-gray">
+					<template v-if="players && campaign">
+						<h2>Players in campaign</h2>
+						<ul class="entities" v-if="campaign.players">
+							<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
+								<div class="d-flex justify-content-left">
+									<!-- <span class="img" :style="{ backgroundImage: 'url(' + players[key].avatar + ')' }"></span> -->
+									{{ players[key].character_name }}
+								</div>
+								
+								<a class="red" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)"><i class="fas fa-minus-circle"></i></a>
+							</li>
+						</ul>
+					</template>
+					<div v-else class="loader"><span>Loading Players...</span></div>
+				</div>
+
+
 			</div>
-
-			<div id="add" class="bg-gray">
-				<h2>All players</h2>
-				<div v-if="loading == true" class="loader"><span>Loading Players...</span></div>
-				<ul class="entities">
-					<li v-for="player in players" :key="player['.key']" class="d-flex justify-content-between" :class="{ 'faded' : checkPlayer(player['.key']) }">
-						<div class="d-flex justify-content-left">
-							<span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
-							{{ player.character_name }}
-						</div>
-						
-						<a v-if="!checkPlayer(player['.key'])" class="green" v-b-tooltip.hover title="Add Character" @click="addPlayer(player['.key'], player.character_name)"><i class="fas fa-plus-circle"></i></a>
-						<span v-else>Added</span>
-					</li>
-				</ul>
-			</div>
-
-			<div id="added" class="bg-gray">
-				<h2>{{ campaignPlayers.length }} Players in campaign</h2>
-				<div v-if="loadingCampPlayers == true" class="loader"><span>Loading Players...</span></div>
-				<ul class="entities">
-					<li v-for="player in campaignPlayers" :key="player['.key']" class="d-flex justify-content-between">
-						<div class="d-flex justify-content-left">
-							<span class="img" :style="{ backgroundImage: 'url(' + getPlayer(player).avatar + ')' }"></span>
-							{{ getPlayer(player).character_name }}
-						</div>
-						
-						<a class="red" v-b-tooltip.hover title="Remove Character" @click="removePlayer(player['.key'], getPlayer(player).character_name)"><i class="fas fa-minus-circle"></i></a>
-					</li>
-				</ul>
-			</div>
-
-
 		</div>
 	</div>
 </template>
@@ -53,6 +73,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
+	import { mapGetters, mapActions } from 'vuex'
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
@@ -64,61 +85,55 @@
 		},
 		data() {
 			return {
-				newCampaign: '',
+				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
-				loading: true,
-				loadingCampPlayers: true,
-				userId: firebase.auth().currentUser.uid
+				newCampaign: '',
 			}
 		},
-		firebase() {
-			return {
-				campaign: db.ref('campaigns/' + this.userId + '/' + this.campaignId),
-				players: {
-					source: db.ref('players/' + this.userId),
-					readyCallback: () => this.loading = false
-				},
-				campaignPlayers: {
-					source: db.ref('campaigns/' + this.userId + '/' + this.campaignId + '/players'),
-					readyCallback: () => this.loadingCampPlayers = false
-				}
-			}
+		computed: {
+			...mapGetters([
+				'campaign',
+				'players',
+				'playerInCampaign',
+			]),
+		},
+		mounted() {
+			this.fetchCampaign({
+				cid: this.campaignId, 
+			})
 		},
 		methods: {
+			...mapActions([
+				'fetchCampaign',
+				'fetchPlayers',
+			]),
 			changeName() {
-				this.$firebaseRefs.campaign.child(campaignId).set(this.newCampaign);
+				db.ref('campaigns/' + this.user.uid).child(this.campaignId).set({
+					campaign: this.campaign.campaign
+				});
+				this.$snotify.success('Name changed.', 'Critical hit!', {
+					position: "rightTop"
+				});
 			},
 			addPlayer(id, name) {
-				db.ref('campaigns/' + this.userId + '/' + this.campaignId + '/players').push({
-					player: id
-				});
-				this.$snotify.success(name + ' added.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				db.ref('campaigns/' + this.user.uid + '/' + this.campaignId + '/players').child(id).set(
+					'true'
+				);
 			},
 			removePlayer(id, name) {
-				db.ref('campaigns/' + this.userId + '/' + this.campaignId + '/players').child(id).remove();
-				this.$snotify.success(name + ' removed.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				db.ref('campaigns/' + this.user.uid + '/' + this.campaignId + '/players').child(id).remove();
 			},
-			getPlayer(participant) {
-				var player = this.players.find(function(element) {
-					return element['.key'] == participant.player
-				});
-				return player
-			},
-			checkPlayer(playerKey) {
-				var participant = this.campaignPlayers.find(function(element) {
-					return element.player == playerKey
-				});
-				return participant
+			checkPlayer(id) {
+				return (id in this.campaign.players)
 			}
 		}
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+.hasSide {
+	padding-left: 200px !important;
+}
 .container {
 	padding-top:20px;
 	display: grid;

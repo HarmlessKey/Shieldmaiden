@@ -259,15 +259,17 @@ table {
 		width:10px;
 	}
 	td.img {
-		padding: 1px;
-		width: 38px;
-		height: 38px;
+		padding: 3px;
+		width: 34px;
+		height: 34px;
 		background-size:cover;
 		background-position:top center;
+		background-color: $black;
+		// border: solid 1px $gray-light !important;
 
 		img {
-			width: 38px;
-			height: 38px;
+			width: 34px;
+			height: 34px;
 		}
 	}
 }

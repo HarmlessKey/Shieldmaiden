@@ -92,7 +92,6 @@
 				active_entities: {},
 				inactive_entities: {},
 
-				userId: this.$store.getters.getUser.uid,
 				selected: [],
 			}
 		},
@@ -101,6 +100,9 @@
 				'campaignId',
 				'encounterId',
 			]),
+			...mapGetters({
+				user: 'getUser',
+			}),
 			_players: function() {
 				return _.chain(this.entities)
 								.filter(function(entity, key) {
@@ -134,7 +136,7 @@
 				if (!entity.initiative) {
 					entity.initiative = 0
 				}
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
 				})
 			},
@@ -174,7 +176,7 @@
 				this.selected = []
 			},
 			setActive(key, active) {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					active: active
 				})
 			}

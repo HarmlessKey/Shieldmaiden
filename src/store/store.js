@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Firebase from 'firebase';
+import Entity from '@/models/Entity'
+import { encounter_module } from '@/store/modules/encounter'
+// import { entitiesModule } from '@/store/modules/entities'
 
 import { db } from '@/firebase'
 
@@ -22,7 +25,7 @@ export const store = new Vuex.Store({
 		encounter: undefined,
 		players: undefined,
 
-		entities: {},
+		entities: null,
 
 		campaignId: null,
 		encounterId: null,
@@ -58,10 +61,10 @@ export const store = new Vuex.Store({
 		},
 		campaigns: function( state ) {
 			return state.campaigns
-		}
+		},
 	},
 	mutations: {
-		setUser(state) {
+		SET_USER(state) {
 			state.user = Firebase.auth().currentUser;
 		},
 		setSlide(state, value) {
@@ -75,6 +78,7 @@ export const store = new Vuex.Store({
 		},
 		SET_ENCOUNTER(state, payload) {
 			state.encounter = payload
+			store.commit('GEN_ENTITIES')
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
@@ -85,16 +89,27 @@ export const store = new Vuex.Store({
 		SET_CAMPAIGNS(state, payload) {
 			state.campaigns = payload
 		},
+		GEN_ENTITIES(state) {
+			if (!state.encounter) {
+				console.log("encounter not set")
+				return false
+			}
+			const uid = state.user.uid
+			const enc_entities = state.encounter.entities
+			for (let i in enc_entities) {
+				console.log(enc_entities[i].id)
+			}
+		},
 		SET_ENCOUNTERS(state, payload) {
 			state.encounters = payload
 		},
 		SET_ALLENCOUNTERS(state, payload) {
 			state.allEncounters = payload
-		}
+		},
 	},
 	actions: {
 		setUser({ commit }) {
-			commit('setUser');
+			commit('SET_USER');
 		},
 		setSlide({ commit }, value) {
 			commit('setSlide', value);
@@ -154,6 +169,9 @@ export const store = new Vuex.Store({
 			campaigns.on('value', snapshot => {
 				commit('SET_CAMPAIGNS', snapshot.val())
 			})
-		}
+		},
+	},
+	modules: {
+		encounter: encounter_module
 	}
 });

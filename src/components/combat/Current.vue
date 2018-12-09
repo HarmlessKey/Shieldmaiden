@@ -1,7 +1,7 @@
 <template>
 	<div id="current" class="bg-gray">
 		<h2>Current</h2>
-		<div class="scroll" v-bar>
+		<div class="scroll" v-bar v-if="current">
 			<div>
 				<!-- <p>{{ getNPC(current.id) }}</p> -->
 				<div v-if="current.type == 'player'">

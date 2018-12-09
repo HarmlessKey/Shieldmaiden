@@ -72,8 +72,6 @@
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
 			})
-			this.fetchPlayers()
-			this.fetchCampaigns()
 		},
 		computed: {
 			...mapGetters([
@@ -107,8 +105,7 @@
 		methods: {
 			...mapActions([
 				'fetchEncounter',
-				'fetchCampaigns',
-				'fetchPlayers',
+				// 'generateEntities',
 			]),
 			log_target: function(target) {
 				this.target = target

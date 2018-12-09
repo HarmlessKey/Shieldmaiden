@@ -11,12 +11,19 @@ export const dice = {
 			}
 
 			let s = ''
-			if (Math.sign(m) > 0) {
+			if (Math.sign(m) >= 0) {
 				s = '+'
 			}
-			let sum = throws.reduce(add) + m * n
-			console.log(`Rolled ${n}d${d}${s}${m}: [${throws}] ${s}${m} -> ${sum}`)
-			return sum
+			let sum = throws.reduce(add) + parseInt(m)
+			// console.log(`Rolled ${n}d${d}${s}${m}: [${throws}] ${s}${m} -> ${sum}`)
+
+			let roll = {
+				roll: n + 'd' + d + s + m,
+				mod: s + ' ' + m,
+				throws: throws,
+				total: sum,
+			}
+			return roll
 		},
 		rollD6(n=1,m=0) {
 			return this.rollD(6,n,m)

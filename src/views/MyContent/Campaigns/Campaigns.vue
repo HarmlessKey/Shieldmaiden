@@ -1,67 +1,96 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="my-content" class="container">
-			<Crumble />
-			<h1>Campaigns</h1>
-			<p>Welcome to your campaigns overview.</p>
-			
-			<template v-if="players.length > 0">
-				<div class="input-group">
-					<input type="text" 
-						class="form-control" 
-						:class="{'input': true, 'error': errors.has('newCampaign') }" 
-						v-model="newCampaign" 
-						v-validate="'required'" 
-						name="newCampaign" 
-						placeholder="Add new campaign"
-					/>
-					<div class="input-group-append">
-						<button class="btn" @click="addCampaign()"><i class="fas fa-plus"></i> Add</button>
-					</div>				
-				</div>
-				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-			</template>
-			<template v-else>
-				<h2 class="red">No players yet</h2>
-				<p>Let's start with making some players that can join your campaigns.</p>
-				<router-link class="btn" to="/players/add-player">Create player</router-link>
-			</template>
-			<div v-if="loading == true" class="loader"><span>Loading Campaigns...</span></div>
-			<ul id="campaigns" class="mt-3">
-				<transition-group name="list" enter-active-class="animated pulse" leave-active-class="animated bounceOutLeft">
-					<li class="bg-gray" v-for="(campaign, index) in campaigns" :key="index">
-						<h2>
-							{{ index + 1 }}. 
-							{{ campaign.campaign }} 
-							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteCampaign(campaign['.key'])">
-								<i class="fas fa-trash-alt"></i>
-							</a>
-						</h2>
-						<router-link :to="'/campaigns/'+campaign['.key']"> Edit</router-link>
-						<router-link :to="'/encounters/'+campaign['.key']"> Encounters</router-link>
-
-						<!-- PLAYERS IN CAMPAIGN -->
-						<h2 class="players">Players</h2>
-						<div class="d-flex justify-content-center">
-							<span v-for="player in campaign.players" 
-								:key="player['.key']"
-								v-b-tooltip.hover
-								:title="getPlayer(player.player).character_name"
-								class="img"
-								:style="{ backgroundImage: 'url(' + getPlayer(player.player).avatar + ')' }">
-							</span>
+	<div>
+		<div id="hasSide">
+			<Sidebar/>
+			<div id="my-content" class="container">
+				<Crumble />
+				<h1>Campaigns</h1>
+				<p>Welcome to your campaigns overview.</p>
+				
+				<template v-if="players">
+					<template v-if="Object.keys(players).length > 0">
+						<div class="input-group">
+							<input type="text" 
+								class="form-control" 
+								:class="{'input': true, 'error': errors.has('newCampaign') }" 
+								v-model="newCampaign" 
+								v-validate="'required'" 
+								name="newCampaign"
+								@change="addCampaign()"
+								placeholder="Add new campaign"
+							/>
+							<div class="input-group-append">
+								<button class="btn"><i class="fas fa-plus"></i> Add</button>
+							</div>				
 						</div>
-					</li>
-				</transition-group>
-			</ul>
+						<!-- <div class="red" v-else="">You have 2/2 campaigns.</div> -->
+						<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+					</template>
+					<template v-else>
+						<h2 class="red">No players yet</h2>
+						<p>Let's start with making some players that can join your campaigns.</p>
+						<router-link class="btn" to="/players/add-player">Create player</router-link>
+					</template>
+					<template v-if="campaigns">
+						
+						<h2 class="mt-3">Campaigns ( {{ Object.keys(campaigns).length }} )</h2>
+						<table class="table">
+							<thead>
+								<th>#</th>
+								<th>Campaign</th>
+								<th>Players</th>
+								<th>Encounters</th>
+								<th></th>
+							</thead>
+							<tbody name="table-row" 
+								is="transition-group"
+								enter-active-class="animated flash"
+								leave-active-class="animated bounceOutLeft">
+								<tr v-for="(campaign, index) in _campaigns" :key="campaign.key">
+									<td>{{ index + 1 }}</td>
+									<td>{{ campaign.campaign }}</td>
+									<td>
+										<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Edit">
+											<template v-if="campaign.players">{{ Object.keys(campaign.players).length }}</template>
+											<template v-else>Add</template>
+										</router-link>
+									</td>
+									<td>
+										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Edit">
+											<template v-if="allEncounters[campaign.key]">
+												{{ Object.keys(allEncounters[campaign.key]).length }}
+											</template>
+											<template v-else>Edit</template>
+										</router-link>
+									</td>
+									<td class="text-right actions">
+										<router-link class="mx-2" 
+											:to="'/campaigns/' + campaign.key" 
+											v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i>
+										</router-link>
+										<a v-b-tooltip.hover 
+											title="Delete" 
+											class="red"
+											@click="confirmDelete(campaign.key, campaign.campaign)">
+												<i class="fas fa-trash-alt"></i>
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</template>
+				</template>
+				<div v-else class="loader"><span>Loading campaigns...</span></div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
+	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 
 	export default {
@@ -72,47 +101,59 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
 				newCampaign: '',
-				loading: true,
 			}
 		},
-		firebase() {
-			return {
-				players: db.ref('players/' + this.userId),
-				campaigns: {
-					source: db.ref('campaigns/' + this.userId),
-					readyCallback: () => this.loading = false
-				}
-			}
+		computed: {
+			...mapGetters([
+				'campaigns',
+				'allEncounters',
+				'players',
+			]),
+			...mapGetters({
+				user: 'getUser'
+			}),
+			_campaigns: function() {
+				return _.chain(this.campaigns)
+				.filter(function(campaign, key) {
+					campaign.key = key
+					return campaign
+				})
+				.orderBy(function(campaign){
+					return parseInt(campaign.timestamp)
+				} , 'desc')
+				.value()
+			},
 		},
 		methods: {
 			addCampaign() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref('campaigns/' + this.userId).push({campaign: this.newCampaign});
+						db.ref('campaigns/' + this.user.uid).push({
+							campaign: this.newCampaign,
+							timestamp: Date.now(),
+						});
 						this.newCampaign = '';
 						this.$snotify.success('Campaign added.', 'Critical hit!', {
 							position: "rightTop"
 						});
-					} else {
-					//console.log('Not valid');
-				}
-			})
+					} 
+					else {
+						//console.log('Not valid');
+					}
+				})
 			},
-			deleteCampaign(key) {
-				this.$snotify.error('Are you sure you want to delete the campaign?', 'Delete campaign', {
+			confirmDelete(key, name) {
+				this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
 					buttons: [
-					{text: 'Yes', action: (toast) => { db.ref('campaigns/'+ this.userId).child(key).remove(); this.$snotify.remove(toast.id); }, bold: false},
-					{text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					{ text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			getPlayer(participantKey) {
-				let player = this.players.find(function(element) {
-					return element['.key'] == participantKey
-				});
-				return player
+			deleteCampaign(key) {
+				db.ref('campaigns/'+ this.user.uid).child(key).remove();
+				db.ref('encounters/'+ this.user.uid).child(key).remove();
 			}
 		}
 	}

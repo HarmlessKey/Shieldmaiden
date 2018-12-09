@@ -15,11 +15,15 @@ const players_ref = db.ref('players')
 
 export const store = new Vuex.Store({
 	state: {
-		user: null,
+		user: {},
+		slide: {},
 
-		campaigns: null,
-		encounter: null,
-		players: null,
+		campaign: undefined,
+		campaigns: undefined,
+		allEncounters: undefined,
+		encounters: undefined,
+		encounter: undefined,
+		players: undefined,
 
 		entities: null,
 
@@ -31,6 +35,9 @@ export const store = new Vuex.Store({
 		getUser: function(state) {
 			return state.user;
 		},
+		getSlide: function(state) {
+			return state.slide;
+		},
 		campaignId: function( state ) {
 			return state.campaignId
 		},
@@ -40,8 +47,17 @@ export const store = new Vuex.Store({
 		encounter: function( state ) {
 			return state.encounter
 		},
+		encounters: function( state ) {
+			return state.encounters
+		},
+		allEncounters: function( state ) {
+			return state.allEncounters
+		},
 		players: function( state ) {
 			return state.players
+		},
+		campaign: function( state ) {
+			return state.campaign
 		},
 		campaigns: function( state ) {
 			return state.campaigns
@@ -50,6 +66,9 @@ export const store = new Vuex.Store({
 	mutations: {
 		SET_USER(state) {
 			state.user = Firebase.auth().currentUser;
+		},
+		setSlide(state, value) {
+			state.slide = value;
 		},
 		SET_CAMPAIGN_ID(state, value) {
 			state.campaignId = value
@@ -64,6 +83,9 @@ export const store = new Vuex.Store({
 		SET_PLAYERS(state, payload) {
 			state.players = payload
 		},
+		SET_CAMPAIGN(state, payload) {
+			state.campaign = payload
+		},
 		SET_CAMPAIGNS(state, payload) {
 			state.campaigns = payload
 		},
@@ -77,11 +99,20 @@ export const store = new Vuex.Store({
 			for (let i in enc_entities) {
 				console.log(enc_entities[i].id)
 			}
-		}
+		},
+		SET_ENCOUNTERS(state, payload) {
+			state.encounters = payload
+		},
+		SET_ALLENCOUNTERS(state, payload) {
+			state.allEncounters = payload
+		},
 	},
 	actions: {
 		setUser({ commit }) {
 			commit('SET_USER');
+		},
+		setSlide({ commit }, value) {
+			commit('setSlide', value);
 		},
 		setCampaignId({ commit }, value) {
 			commit('SET_CAMPAIGN_ID', value)
@@ -100,11 +131,36 @@ export const store = new Vuex.Store({
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
 		},
+		fetchEncounters({ commit, state }, { cid }) {
+			const uid = state.user.uid
+			const path = `${uid}/${cid}`;
+			let encounters = encounters_ref.child(path)
+			encounters.on('value', snapshot => {
+				commit('SET_ENCOUNTERS', snapshot.val())
+			})
+		},
+		fetchAllEncounters({ commit, state }) {
+			const uid = state.user.uid
+			let encounters = encounters_ref.child(uid)
+			encounters.on('value', snapshot => {
+				commit('SET_ALLENCOUNTERS', snapshot.val())
+			})
+		},
 		fetchPlayers({ commit, state }) {
 			const uid = state.user.uid
 			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
+			})
+		},
+		fetchCampaign({ commit, state }, { cid }) {
+			commit("SET_CAMPAIGN_ID", cid)
+			
+			const uid = state.user.uid;
+			const path = `${uid}/${cid}`;
+			const campaign = campaigns_ref.child(path);
+			campaign.on('value', snapshot => {
+				commit('SET_CAMPAIGN', snapshot.val())
 			})
 		},
 		fetchCampaigns({ commit, state }) {

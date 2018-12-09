@@ -1,4 +1,5 @@
 @import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P|Raleway');
 @import "~vue-snotify/styles/material.css";
 
 /* 
@@ -40,6 +41,7 @@ body {
 	background: $gray-dark !important;
 	color: $gray-light !important;
 	font-size: 12px !important;
+	font-family: 'Raleway', sans-serif;
 }
 .view {
 	padding: 5px;
@@ -63,15 +65,17 @@ header {
 }
 /* 3. Heading */
 /*********************************************/
-h1, h2, h3, h4, h5, h6 { font-weight:normal !important; }
+h1, h2, h3, h4, h5, h6 { font-weight:normal !important;  }
 h1 {
 	text-transform:uppercase;
 	font-size: 15px !important;
+	font-family: 'Press Start 2P', cursive;
 }
 h2 {
 	text-transform:uppercase;
 	font-size: 15px !important;
 	margin-bottom: 20px !important;
+	font-family: 'Press Start 2P', cursive;
 }
 h3 {
 	font-size: 15px !important;
@@ -82,6 +86,8 @@ h3 {
 /*********************************************/
 .gray { color: $gray !important; }
 .gray-dark { color: $gray-dark !important; }
+.gray-hover { color: $gray-hover !important; }
+.gray-active { color: $gray-active !important; }
 .green { color: $green !important; }
 .blue { color: $blue!important; }
 .red { color: $red !important; }
@@ -231,7 +237,72 @@ ul.crumble {
 		}
 	}
 }
+table {
+	td, th {
+		border: none !important;
+	}
+	td {
+		background-color: #262626;
+		border-bottom: solid 1px #191919 !important;
+	}
+	thead, tr {
+		margin-bottom: 1px !important;
+	}
+	td.actions {
+		router-link, a, .disabled {
+			font-size: 15px;
+			line-height: 0px;
+		}
+		.disabled {
+			opacity: .3;
+		}
+	}
+	th:first-child, td:first-child {
+		width:10px;
+	}
+	td.img {
+		padding: 3px;
+		width: 34px;
+		height: 34px;
+		background-size:cover;
+		background-position:top center;
+		background-color: $black;
+		// border: solid 1px $gray-light !important;
 
+		img {
+			width: 34px;
+			height: 34px;
+		}
+	}
+}
+
+.slide {
+	padding: 15px;
+	position: fixed;
+	right: 0;
+	top: 50px;
+	height: calc(100vh - 50px);
+	width: 330px;
+	z-index: 99;
+	overflow: auto;
+	border-left: solid 1px #000;
+	box-shadow: 0 10px 8px #000;
+
+	a.hide {
+		font-size: 20px;
+		position: absolute;
+		left: -10px;
+		top: -10px;
+		z-index: 1000;
+	}
+}
+
+.slideInRight {
+	animation-duration: 0.5s;
+}
+.slideOutRight {
+	animation-duration: 0.5s;
+}
 
 /* 6. Bootstrap overrides*/
 /*********************************************/
@@ -274,12 +345,12 @@ a {
 	}
 }
 
-hr { background: $black; }
+hr { background: $gray-dark; }
 
 .form-control, .custom-select { 
 	border-radius: 0 !important;
-	background: $gray-dark !important;
-	border: solid 1px $gray-light !important;
+	background: $black !important;
+	border: solid 1px $gray !important;
 	color: $gray-light !important;
 	
 	&:focus {

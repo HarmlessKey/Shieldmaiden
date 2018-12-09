@@ -1,7 +1,7 @@
 <template>
 	<div id="combat">
 		<!-- Check if encounter exists -->
-		<template v-if="encounter && Object.keys(players).length">
+		<template v-if="encounter && players">
 			<Turns 
 				:round="encounter.round" 
 				:title="encounter.encounter" 
@@ -68,10 +68,11 @@
 			}
 		},
 		mounted() {
-			this.fetchEncounter({
+			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
 			})
+			this.track_Encounter()
 		},
 		computed: {
 			...mapGetters([
@@ -104,7 +105,8 @@
 		},
 		methods: {
 			...mapActions([
-				'fetchEncounter',
+				'init_Encounter',
+				'track_Encounter',
 				// 'generateEntities',
 			]),
 			log_target: function(target) {

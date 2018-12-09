@@ -105,7 +105,6 @@
 		methods: {
 			...mapActions([
 				'fetchCampaign',
-				'fetchPlayers',
 			]),
 			changeName() {
 				db.ref('campaigns/' + this.user.uid).child(this.campaignId).set({

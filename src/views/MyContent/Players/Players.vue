@@ -72,7 +72,7 @@
 				player_name: '',
 				character_name: '',
 				ac: '',
-				maxhp: '',
+				maxHp: '',
 				avatar: '',
 				beyond: '',
 				loading: true,

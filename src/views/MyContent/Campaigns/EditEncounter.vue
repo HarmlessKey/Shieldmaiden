@@ -134,7 +134,6 @@
 			...mapActions([
 				'fetchEncounter',
 				'fetchCampaign',
-				'fetchPlayers',
 			]),
 			async getNPC(id) {
 				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
@@ -156,15 +155,15 @@
 					entity.int = npc_data.intelligence
 					entity.wis = npc_data.wisdom
 					entity.cha = npc_data.charisma
-					entity.maxhp = npc_data.hit_points
-					entity.curhp = npc_data.hit_points
+					entity.maxHp = npc_data.hit_points
+					entity.curHp = npc_data.hit_points
 					entity.ac = npc_data.armor_class
 					entity.active = false
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
-					var player_data = await this.players;
-					entity.curhp = player_data[id].maxhp
+					var player_data = this.players;
+					entity.curHp = player_data[id].maxHp
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 			},

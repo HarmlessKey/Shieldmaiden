@@ -32,9 +32,10 @@
 	},
 	created() {
 		this.setUser();
+		// players need prio!
+		this.fetchPlayers();
 		this.fetchCampaigns();
 		this.fetchAllEncounters();
-		this.fetchPlayers();
 	},
 	methods: {
 		...mapActions([

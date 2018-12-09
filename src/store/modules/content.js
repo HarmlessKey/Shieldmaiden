@@ -1,9 +1,5 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
 import Firebase from 'firebase';
 import { db } from '@/firebase'
-
-Vue.use(Vuex);
 
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
@@ -16,15 +12,10 @@ export const content_module = {
 
 		campaign: undefined,
 		campaigns: undefined,
+		// encounter: undefined,
 		allEncounters: undefined,
 		encounters: undefined,
-		encounter: undefined,
 		players: undefined,
-
-		entities: null,
-
-		campaignId: null,
-		encounterId: null,
 
 	},
 	getters: {
@@ -34,15 +25,9 @@ export const content_module = {
 		getSlide: function(state) {
 			return state.slide;
 		},
-		campaignId: function( state ) {
-			return state.campaignId
-		},
-		encounterId: function( state ) {
-			return state.encounterId
-		},
-		encounter: function( state ) {
-			return state.encounter
-		},
+		// encounter: function( state ) {
+		// 	return state.encounters
+		// },
 		encounters: function( state ) {
 			return state.encounters
 		},
@@ -50,7 +35,6 @@ export const content_module = {
 			return state.allEncounters
 		},
 		players: function( state ) {
-			console.log("players (getter)",state.players)
 			return state.players
 		},
 		campaign: function( state ) {
@@ -67,16 +51,6 @@ export const content_module = {
 		setSlide(state, value) {
 			state.slide = value;
 		},
-		SET_CAMPAIGN_ID(state, value) {
-			state.campaignId = value
-		},
-		SET_ENCOUNTER_ID(state, value) {
-			state.encounterId = value
-		},
-		SET_ENCOUNTER(state, payload) {
-			state.encounter = payload
-			// store.commit('GEN_ENTITIES')
-		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
 		},
@@ -86,17 +60,6 @@ export const content_module = {
 		SET_CAMPAIGNS(state, payload) {
 			state.campaigns = payload
 		},
-		// GEN_ENTITIES(state) {
-		// 	if (!state.encounter) {
-		// 		console.log("encounter not set")
-		// 		return false
-		// 	}
-		// 	const uid = state.user.uid
-		// 	const enc_entities = state.encounter.entities
-		// 	for (let i in enc_entities) {
-		// 		console.log(enc_entities[i].id)
-		// 	}
-		// },
 		SET_ENCOUNTERS(state, payload) {
 			state.encounters = payload
 		},
@@ -117,10 +80,9 @@ export const content_module = {
 		setEncounterId({ commit }, value) {
 			commit('SET_ENCOUNTER_ID', value)
 		},
-		fetchEncounter({ commit, state }, { cid, eid }) {
+		fetchEncounter({ commit, state}, { cid, eid }) {
 			commit("SET_CAMPAIGN_ID", cid)
 			commit("SET_ENCOUNTER_ID", eid)
-			
 			const uid = state.user.uid;
 			const path = `${uid}/${cid}/${eid}`;
 			const encounter = encounters_ref.child(path);

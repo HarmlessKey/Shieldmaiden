@@ -11,8 +11,8 @@
 			<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
 
 			<h2 class="mt-4">Stats</h2>
-			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('maxhp') }" v-model="maxhp" v-validate="'numeric|required'" name="maxhp" placeholder="Maximum Hit Points" />
-			<p class="validate red" v-if="errors.has('maxhp')">{{ errors.first('maxhp') }}</p>
+			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('maxHp') }" v-model="maxHp" v-validate="'numeric|required'" name="maxHp" placeholder="Maximum Hit Points" />
+			<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 
 			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('ac') }" v-model="ac" v-validate="'numeric|required'" name="ac" placeholder="Armor Class" />
 			<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
@@ -44,7 +44,7 @@
 				player_name: '',
 				character_name: '',
 				ac: '',
-				maxhp: '',
+				maxHp: '',
 				avatar: '',
 				beyond: '',
 			}
@@ -56,7 +56,7 @@
 						db.ref('players/' + this.userId).push({
 							player_name: this.player_name,
 							character_name: this.character_name,
-							maxhp: this.maxhp,
+							maxHp: this.maxHp,
 							ac: this.ac,
 							avatar: "'" + this.avatar + "'",
 							beyond: this.beyond

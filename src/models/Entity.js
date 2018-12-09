@@ -14,7 +14,7 @@ export function Entity(key) {
 			let db_player = this.players[this.id]
 			this.img = db_player.avatar
 			this.ac = db_player.ac
-			this.maxHp = db_player.maxhp
+			this.maxHp = db_player.maxHp
 			this.str = db_player.str
 			this.dex = db_player.dex
 			this.con = db_player.con
@@ -25,7 +25,7 @@ export function Entity(key) {
 		case 'npc':
 			this.img = require('@/assets/_img/styles/monster.svg')
 			this.ac = db_entity.ac
-			this.maxHp = db_entity.maxhp
+			this.maxHp = db_entity.maxHp
 			this.str = db_entity.str
 			this.dex = db_entity.dex
 			this.con = db_entity.con

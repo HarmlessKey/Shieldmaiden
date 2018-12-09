@@ -82,14 +82,14 @@
 				if (entity.type == 'player') {
 					item.img = this.players[entity.id].avatar
 					item.ac = this.players[entity.id].ac
-					item.maxHp = parseInt(this.players[entity.id].maxhp)
-					item.curHp = parseInt(entity.curhp)
+					item.maxHp = parseInt(this.players[entity.id].maxHp)
+					item.curHp = parseInt(entity.curHp)
 				}
 				else {
 					item.img = require('@/assets/_img/styles/monster.svg')
 					item.ac = entity.ac
-					item.maxHp = parseInt(entity.maxhp)
-					item.curHp = parseInt(entity.curhp)
+					item.maxHp = parseInt(entity.maxHp)
+					item.curHp = parseInt(entity.curHp)
 				}
 				return item
 			},

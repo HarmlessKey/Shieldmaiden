@@ -94,7 +94,7 @@
 				
 				target.curHp = newhp
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
-					curhp: newhp,
+					curHp: newhp,
 				})
 				//Notification
 				this.$snotify.error(
@@ -120,7 +120,7 @@
 				
 				target.curHp = newhp
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
-					curhp: newhp,
+					curHp: newhp,
 				})
 				//Notification
 				this.$snotify.success(

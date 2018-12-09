@@ -40,10 +40,11 @@
 							<td>{{ encounter.encounter }}</td>
 							<td>
 								<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+									<i class="fas fa-users"></i>
 									<template v-if="encounter.entities">
 										{{ Object.keys(encounter.entities).length }}
 									</template>
-									<template v-else>Add</template>
+									<template v-else> Add</template>
 								</router-link>
 							</td>
 							<template v-if="encounter.round != 0">
@@ -57,7 +58,7 @@
 							<td class="text-right actions">
 								<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
 								<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
-								<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i></router-link>
+								<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></router-link>
 								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>

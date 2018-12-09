@@ -70,7 +70,7 @@
 							{{ entity.name }}
 						</div>
 						<span>
-							<a v-if="entity.type == 'npc'" class="mr-2" v-b-tooltip.hover title="Edit (Coming Soon)"><i class="fas fa-pencil-alt"></i></a>
+							<a v-if="entity.type == 'npc'" class="mr-2" v-b-tooltip.hover title="Edit (Coming Soon)"><i class="fas fa-hammer-war"></i></a>
 							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
 						</span>
 					</li>

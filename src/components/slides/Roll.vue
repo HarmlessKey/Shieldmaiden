@@ -43,13 +43,13 @@
 				result: '',
 				log: [],
 				dice: {
-					4:{ n: 1, mod: undefined, result: undefined },
-					6:{ n: 1, mod: undefined, result: undefined },
-					8: { n: 1, mod: undefined, result: undefined },
-					10: { n: 1, mod: undefined, result: undefined },
-					12: { n: 1, mod: undefined, result: undefined },
-					20: { icon: 'fas fa-dice-d20', n: 1, mod: undefined, result: undefined },
-					100: { n: 1, mod: undefined, result: undefined },
+					4:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d4' },
+					6:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d6' },
+					8: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d8' },
+					10: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
+					12: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d12' },
+					20: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d20' },
+					100: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
 					X: { n: 1, mod: undefined, result: undefined, x: undefined }
 				},
 			}

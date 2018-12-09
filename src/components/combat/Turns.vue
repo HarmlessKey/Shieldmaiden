@@ -3,7 +3,7 @@
 		<h1>{{ title }}</h1>
 		<div class="round-info">
 			<span id="round">Round <span class="number mx-2">{{ round }}</span></span>
-			<span id="turn">Turn <span class="number ml-2">{{ turn + 1 }}</span></span>
+			<span v-if="round" id="turn">Turn <span class="number ml-2">{{ turn + 1 }}</span></span>
 			<span class="current-name"></span>
 		</div>
 		<div>
@@ -52,6 +52,9 @@
 				if (turn < 0) {
 					turn = this.active_len - 1
 					round--
+				}
+				if (round == 0) {
+					turn = 0
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}`).update({
 					turn: turn,

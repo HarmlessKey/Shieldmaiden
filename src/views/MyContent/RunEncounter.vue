@@ -70,12 +70,14 @@
 				eid: this.$route.params.encid
 			})
 			this.track_Encounter()
+			console.log(this.entities)
 		},
 		computed: {
 			...mapGetters([
 				'encounter',
 				'players',
 				'campaigns',
+				'entities',
 			]),
 			_active: function() {
 				return _.chain(this.encounter.entities)

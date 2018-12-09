@@ -15,8 +15,8 @@ export const encounter_module = {
 		path: undefined,
 	},
 	getters: {
-		entities: function() {
-			// console.log('entities (getter)')
+		entities: function( state ) {
+			return state.entities
 		},
 		campaignId: function( state ) {
 			return state.campaignId
@@ -87,7 +87,16 @@ export const encounter_module = {
 		},
 		SET_PATH(state, path) {
 			state.path = path
+		},
+		SET_ACTIVE(state, {key, active}) {
+			console.log("SET_ACTIVE")
+			state.entities[key].active = active
+			console.log('entity',state.entities[key])
+			encounters_ref.child(`${state.path}/entities/${key}`).update({
+				active: active
+			})
 		}
+
 	},
 	actions: {
 		init_Encounter({ dispatch, commit, state, rootState }, { cid, eid }) {
@@ -112,9 +121,9 @@ export const encounter_module = {
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
 		},
-		startEncounter({ commit }) {
-			console.log('hoi')
-			commit('START_ENCOUNTER')
+		set_active({ commit }, payload) {
+			console.log("payload",payload)
+			commit("SET_ACTIVE", payload)
 		}
 	}
 }

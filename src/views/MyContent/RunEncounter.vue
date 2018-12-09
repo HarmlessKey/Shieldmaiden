@@ -3,9 +3,6 @@
 		<!-- Check if encounter exists -->
 		<template v-if="encounter && players">
 			<Turns 
-				:round="encounter.round" 
-				:title="encounter.encounter" 
-				:turn="encounter.turn"
 				:active_len="_active.length"
 			/>
 			<div v-if="encounter.round == 0">

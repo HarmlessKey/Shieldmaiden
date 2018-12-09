@@ -10,7 +10,7 @@
 				</nav>
 			</div>
 			<div class="d-flex justify-content-right">
-				<a class="roll-dice" href="#"><i class="fas fa-dice-d20"></i></a>
+				<a class="roll-dice" @click="showSlide()"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
 						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
@@ -30,6 +30,8 @@
 
 <script>
 	import firebase from "firebase";
+	import { mapActions } from 'vuex';
+
 	export default {
 		data() {
 			return {
@@ -37,6 +39,15 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
+			showSlide() {
+				this.setSlide({
+					show: true,
+					type: 'roll',
+				})
+			},
 			signOut: function() {
 				firebase.auth()
 				.signOut()

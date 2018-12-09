@@ -11,23 +11,6 @@
 				<i class="fas fa-plus-square"></i> Add player
 			</router-link>
 
-			<!-- {{ allEncounters }} -->
-			<!-- <div class="row">
-				<div class="col bg-gray" v-for="(player, index) in players" :key="index">
-					<span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
-					<div class="info">
-						<h3>{{ player.character_name }}</h3>
-						<p>AC: {{ player.ac }} | HP: {{ player.maxhp }}</p>
-						<router-link :to="'/players/'+player['.key']">Edit</router-link>
-					</div>
-					<a class="red" 
-						v-b-tooltip.hover
-						title="Delete"
-						@click="deletePlayer(player['.key'], player.character_name)">
-						<i class="fas fa-trash-alt"></i>
-					</a>
-				</div>
-			</div> -->
 			<template v-if="players">
 				<h2 class="mt-3">Players ( {{ Object.keys(players).length }} )</h2>
 				<table class="table">

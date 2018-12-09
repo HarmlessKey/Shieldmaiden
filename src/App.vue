@@ -1,20 +1,33 @@
 <template>
-	
 	<div id="app" class="container-fluid">
 		<nav-main/>
 		<router-view/>
+
+		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
+			<div v-if="slide.show == true" class="slide bg-gray">
+				<a @click="hideSlide()" class="hide"><i class="fas fa-chevron-circle-right"></i></a>
+				<Slide />
+			</div>
+		</transition>
+		
 		<vue-snotify></vue-snotify>
 	</div>
-
 </template>
 
 <script>
 	import Header from './components/Header.vue';
-	import { mapActions } from 'vuex';
+	import Slide from './components/Slide.vue';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 	components: {
-		navMain: Header
+		navMain: Header,
+		Slide: Slide,
+	},
+	computed: {
+		...mapGetters({
+				slide: 'getSlide'
+			}),
 	},
 	created() {
 		this.setUser();
@@ -28,7 +41,11 @@
 			'fetchAllEncounters',
 			'fetchPlayers',
 			'setUser',
-		])
+			'setSlide',
+		]),
+		hideSlide() {
+				this.setSlide(false)
+			},
 	}
 };
 </script>

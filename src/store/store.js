@@ -13,6 +13,7 @@ const players_ref = db.ref('players')
 export const store = new Vuex.Store({
 	state: {
 		user: {},
+		slide: {},
 
 		campaign: undefined,
 		campaigns: undefined,
@@ -30,6 +31,9 @@ export const store = new Vuex.Store({
 	getters: {
 		getUser: function(state) {
 			return state.user;
+		},
+		getSlide: function(state) {
+			return state.slide;
 		},
 		campaignId: function( state ) {
 			return state.campaignId
@@ -60,6 +64,9 @@ export const store = new Vuex.Store({
 		setUser(state) {
 			state.user = Firebase.auth().currentUser;
 		},
+		setSlide(state, value) {
+			state.slide = value;
+		},
 		SET_CAMPAIGN_ID(state, value) {
 			state.campaignId = value
 		},
@@ -88,6 +95,9 @@ export const store = new Vuex.Store({
 	actions: {
 		setUser({ commit }) {
 			commit('setUser');
+		},
+		setSlide({ commit }, value) {
+			commit('setSlide', value);
 		},
 		setCampaignId({ commit }, value) {
 			commit('SET_CAMPAIGN_ID', value)

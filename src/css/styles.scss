@@ -86,6 +86,8 @@ h3 {
 /*********************************************/
 .gray { color: $gray !important; }
 .gray-dark { color: $gray-dark !important; }
+.gray-hover { color: $gray-hover !important; }
+.gray-active { color: $gray-active !important; }
 .green { color: $green !important; }
 .blue { color: $blue!important; }
 .red { color: $red !important; }
@@ -274,6 +276,34 @@ table {
 	}
 }
 
+.slide {
+	padding: 15px;
+	position: fixed;
+	right: 0;
+	top: 50px;
+	height: calc(100vh - 50px);
+	width: 330px;
+	z-index: 99;
+	overflow: auto;
+	border-left: solid 1px #000;
+	box-shadow: 0 10px 8px #000;
+
+	a.hide {
+		font-size: 20px;
+		position: absolute;
+		left: -10px;
+		top: -10px;
+		z-index: 1000;
+	}
+}
+
+.slideInRight {
+	animation-duration: 0.5s;
+}
+.slideOutRight {
+	animation-duration: 0.5s;
+}
+
 /* 6. Bootstrap overrides*/
 /*********************************************/
 .btn {
@@ -315,7 +345,7 @@ a {
 	}
 }
 
-hr { background: $black; }
+hr { background: $gray-dark; }
 
 .form-control, .custom-select { 
 	border-radius: 0 !important;

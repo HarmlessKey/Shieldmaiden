@@ -49,10 +49,13 @@ const router = new VueRouter({
 	mode: 'history'
 });
 
+
+
 // Check before each page load whether the page requires authentication/
 // if it does check whether the user is signed into the web app or
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
+	store.dispatch('setSlide', false); //Always hide slide
 
 	const currentUser = firebase.auth().currentUser;
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
@@ -64,7 +67,7 @@ router.beforeEach((to, from, next) => {
 	} else {
 		next();
 	}
-
+	
 });
 
 // Wrap the vue instance in a Firebase onAuthStateChanged method

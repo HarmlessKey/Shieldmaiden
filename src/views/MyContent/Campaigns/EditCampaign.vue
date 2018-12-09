@@ -107,20 +107,20 @@
 				'fetchCampaign',
 			]),
 			changeName() {
-				db.ref('campaigns/' + this.user.uid).child(this.campaignId).set({
-					campaign: this.campaign.campaign
-				});
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/campaign`).set(
+					this.campaign.campaign
+				);
 				this.$snotify.success('Name changed.', 'Critical hit!', {
 					position: "rightTop"
 				});
 			},
 			addPlayer(id, name) {
-				db.ref('campaigns/' + this.user.uid + '/' + this.campaignId + '/players').child(id).set(
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set(
 					'true'
 				);
 			},
 			removePlayer(id, name) {
-				db.ref('campaigns/' + this.user.uid + '/' + this.campaignId + '/players').child(id).remove();
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
 			},
 			checkPlayer(id) {
 				return (id in this.campaign.players)

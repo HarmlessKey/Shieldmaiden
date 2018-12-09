@@ -86,7 +86,7 @@
 					</table>
 				</template>
 			</template>
-			<h2 v-else-if="encounters === null" class="mt-3">Add your first encounter</h2>
+			<h2 v-else-if="encounters === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i></h2>
 			<div v-else class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>
@@ -163,6 +163,7 @@
 						this.$snotify.success('Encounter added.', 'Critical hit!', {
 							position: "rightTop"
 						});
+						this.$validator.reset();
 					} 
 					else {
 						//console.log('Not valid');

@@ -44,8 +44,9 @@
 									<td>{{ campaign.campaign }}</td>
 									<td>
 										<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Edit">
-											<template v-if="campaign.players">{{ Object.keys(campaign.players).length }}</template>
-											<template v-else>Add</template>
+											<i class="fas fa-users"></i>
+											<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
+											<template v-else> Add</template>
 										</router-link>
 									</td>
 									<td>
@@ -72,7 +73,7 @@
 							</tbody>
 						</table>
 					</template>
-					<h2 v-else-if="campaigns === null" class="mt-3">Add your first campaign</h2>
+					<h2 v-else-if="campaigns === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i></h2>
 					<div v-else class="loader"><span>Loading campaigns...</span></div>
 				</template>
 				<template v-else-if="players === null">
@@ -80,7 +81,7 @@
 					<p>Let's start with making some players that can join your campaigns.</p>
 					<router-link class="btn" to="/players/add-player">Create player</router-link>
 				</template>
-				<div v-else class="loader"><span>Loading</span></div>
+				<div v-else class="loader"><span>Loading...</span></div>
 				<!-- </template> -->
 			</div>
 		</div>
@@ -138,6 +139,7 @@
 						this.$snotify.success('Campaign added.', 'Critical hit!', {
 							position: "rightTop"
 						});
+						this.$validator.reset();
 					} 
 					else {
 						//console.log('Not valid');

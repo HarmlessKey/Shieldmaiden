@@ -12,7 +12,7 @@
 			<div id="add" class="bg-gray">
 				<ul class="nav nav-tabs" id="myTab" role="tablist">
 					<li class="nav-item">
-						<a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Add Player</a>
+						<a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Add Players</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Add NPC's</a>
@@ -34,6 +34,11 @@
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading players...</span></div>
+						<div v-if="campaign && campaign.players === undefined">
+							<h3><i class="fas fa-users red"></i> No Players Yet</h3>
+							<p>Add players to your campaign first.</p>
+							<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+						</div>
 					</div>
 					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 						<div class="input-group mb-3">
@@ -158,7 +163,7 @@
 					entity.maxHp = npc_data.hit_points
 					entity.curHp = npc_data.hit_points
 					entity.ac = npc_data.armor_class
-					entity.active = false
+					entity.active = true
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {

@@ -105,6 +105,7 @@
 		methods: {
 			...mapActions([
 				'fetchEncounter',
+				// 'generateEntities',
 			]),
 			log_target: function(target) {
 				this.target = target

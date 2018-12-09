@@ -43,6 +43,7 @@
 				'setSlide'
 			]),
 			showSlide() {
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'roll',

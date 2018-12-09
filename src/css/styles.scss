@@ -307,13 +307,13 @@ table {
 /* 6. Bootstrap overrides*/
 /*********************************************/
 .btn {
-	border-radius:0 !important;
-	background:$blue;
-	color:$white !important;
-	border:none;
+	border-radius: 0 !important;
+	background: $blue;
+	color: $white !important;
+	border: none;
 	
 	&:focus {
-		box-shadow:none;
+		box-shadow: none;
 	}
 	&.disabled {
 		cursor: not-allowed !important;

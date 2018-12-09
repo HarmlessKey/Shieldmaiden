@@ -25,62 +25,63 @@
 						</div>
 						<!-- <div class="red" v-else="">You have 2/2 campaigns.</div> -->
 						<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+						<template v-if="campaigns">
+							<h2 class="mt-3">Campaigns ( {{ Object.keys(campaigns).length }} )</h2>
+							<table class="table">
+								<thead>
+									<th>#</th>
+									<th>Campaign</th>
+									<th>Players</th>
+									<th>Encounters</th>
+									<th></th>
+								</thead>
+								<tbody name="table-row" 
+									is="transition-group"
+									enter-active-class="animated flash"
+									leave-active-class="animated bounceOutLeft">
+									<tr v-for="(campaign, index) in _campaigns" :key="campaign.key">
+										<td>{{ index + 1 }}</td>
+										<td>{{ campaign.campaign }}</td>
+										<td>
+											<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Edit">
+												<template v-if="campaign.players">{{ Object.keys(campaign.players).length }}</template>
+												<template v-else>Add</template>
+											</router-link>
+										</td>
+										<td>
+											<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Edit">
+												<template v-if="allEncounters && allEncounters[campaign.key]">
+													{{ Object.keys(allEncounters[campaign.key]).length }}
+												</template>
+												<template v-else>Edit</template>
+											</router-link>
+										</td>
+										<td class="text-right actions">
+											<router-link class="mx-2" 
+												:to="'/campaigns/' + campaign.key" 
+												v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i>
+											</router-link>
+											<a v-b-tooltip.hover 
+												title="Delete" 
+												class="red"
+												@click="confirmDelete(campaign.key, campaign.campaign)">
+													<i class="fas fa-trash-alt"></i>
+											</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</template>
+						<h2 v-else-if="campaigns === null" class="mt-3">Add your first campaign</h2>
+						<div v-else class="loader"><span>Loading campaigns...</span></div>
 					</template>
 					<template v-else>
 						<h2 class="red">No players yet</h2>
 						<p>Let's start with making some players that can join your campaigns.</p>
 						<router-link class="btn" to="/players/add-player">Create player</router-link>
 					</template>
-					<template v-if="campaigns">
-						
-						<h2 class="mt-3">Campaigns ( {{ Object.keys(campaigns).length }} )</h2>
-						<table class="table">
-							<thead>
-								<th>#</th>
-								<th>Campaign</th>
-								<th>Players</th>
-								<th>Encounters</th>
-								<th></th>
-							</thead>
-							<tbody name="table-row" 
-								is="transition-group"
-								enter-active-class="animated flash"
-								leave-active-class="animated bounceOutLeft">
-								<tr v-for="(campaign, index) in _campaigns" :key="campaign.key">
-									<td>{{ index + 1 }}</td>
-									<td>{{ campaign.campaign }}</td>
-									<td>
-										<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Edit">
-											<template v-if="campaign.players">{{ Object.keys(campaign.players).length }}</template>
-											<template v-else>Add</template>
-										</router-link>
-									</td>
-									<td>
-										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Edit">
-											<template v-if="allEncounters[campaign.key]">
-												{{ Object.keys(allEncounters[campaign.key]).length }}
-											</template>
-											<template v-else>Edit</template>
-										</router-link>
-									</td>
-									<td class="text-right actions">
-										<router-link class="mx-2" 
-											:to="'/campaigns/' + campaign.key" 
-											v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i>
-										</router-link>
-										<a v-b-tooltip.hover 
-											title="Delete" 
-											class="red"
-											@click="confirmDelete(campaign.key, campaign.campaign)">
-												<i class="fas fa-trash-alt"></i>
-										</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</template>
 				</template>
-				<div v-else class="loader"><span>Loading campaigns...</span></div>
+				<div v-else class="loader"><span>Loading</span></div>
 			</div>
 		</div>
 	</div>

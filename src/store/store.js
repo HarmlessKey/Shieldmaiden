@@ -60,6 +60,7 @@ export const store = new Vuex.Store({
 			return state.campaign
 		},
 		campaigns: function( state ) {
+			console.log(state.campaigns)
 			return state.campaigns
 		},
 	},
@@ -171,7 +172,7 @@ export const store = new Vuex.Store({
 			})
 		},
 	},
-	modules: {
-		encounter: encounter_module
-	}
+	// modules: {
+	// 	encounter: encounter_module
+	// }
 });

@@ -86,6 +86,7 @@
 					</table>
 				</template>
 			</template>
+			<h2 v-else-if="encounters === null" class="mt-3">Add your first encounter</h2>
 			<div v-else class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>

@@ -49,7 +49,8 @@
 					</tbody>
 				</table>
 			</template>
-			<div v-else="loading == true" class="loader"><span>Loading Players...</span></div>
+			<h2 v-else-if="players === null" class="mt-3">Add your first player</h2>
+			<div v-else="loading" class="loader"><span>Loading Players...</span></div>
 		</div>
 	</div>
 </template>
@@ -121,18 +122,21 @@
 					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
 
 					//Go over all encounters of the campaign
-					for(let enc in this.allEncounters[campaign]) {
+					console.log("encounters",this.allEncounters)
+					if (this.allEncounters && campaign in this.allEncounters.keys()) {
+						for(let enc in this.allEncounters[campaign]) {
 
-						let entities = this.allEncounters[campaign][enc].entities;
+							let entities = this.allEncounters[campaign][enc].entities;
 
-						//Go over all entities in the encounter
-						for(let entity in entities) {
-							
-							console.log(entities[entity].id, key)
+							//Go over all entities in the encounter
+							for(let entity in entities) {
+								
+								console.log(entities[entity].id, key)
 
-							if(entities[entity].id == key) {
-								//Remove player from entities
-								db.ref('encounters/' + this.userId + '/' + campaign + '/' + enc + '/entities').child(entity).remove();
+								if(entities[entity].id == key) {
+									//Remove player from entities
+									db.ref('encounters/' + this.userId + '/' + campaign + '/' + enc + '/entities').child(entity).remove();
+								}
 							}
 						}
 					}

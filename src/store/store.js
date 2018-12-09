@@ -54,13 +54,13 @@ export const store = new Vuex.Store({
 			return state.allEncounters
 		},
 		players: function( state ) {
+			console.log("players (getter)",state.players)
 			return state.players
 		},
 		campaign: function( state ) {
 			return state.campaign
 		},
 		campaigns: function( state ) {
-			console.log(state.campaigns)
 			return state.campaigns
 		},
 	},
@@ -79,7 +79,7 @@ export const store = new Vuex.Store({
 		},
 		SET_ENCOUNTER(state, payload) {
 			state.encounter = payload
-			store.commit('GEN_ENTITIES')
+			// store.commit('GEN_ENTITIES')
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
@@ -90,17 +90,17 @@ export const store = new Vuex.Store({
 		SET_CAMPAIGNS(state, payload) {
 			state.campaigns = payload
 		},
-		GEN_ENTITIES(state) {
-			if (!state.encounter) {
-				console.log("encounter not set")
-				return false
-			}
-			const uid = state.user.uid
-			const enc_entities = state.encounter.entities
-			for (let i in enc_entities) {
-				console.log(enc_entities[i].id)
-			}
-		},
+		// GEN_ENTITIES(state) {
+		// 	if (!state.encounter) {
+		// 		console.log("encounter not set")
+		// 		return false
+		// 	}
+		// 	const uid = state.user.uid
+		// 	const enc_entities = state.encounter.entities
+		// 	for (let i in enc_entities) {
+		// 		console.log(enc_entities[i].id)
+		// 	}
+		// },
 		SET_ENCOUNTERS(state, payload) {
 			state.encounters = payload
 		},

@@ -122,22 +122,11 @@
 					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
 
 					//Go over all encounters of the campaign
-					console.log("encounters",this.allEncounters)
-					if (this.allEncounters && campaign in this.allEncounters.keys()) {
+					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
 						for(let enc in this.allEncounters[campaign]) {
 
-							let entities = this.allEncounters[campaign][enc].entities;
-
 							//Go over all entities in the encounter
-							for(let entity in entities) {
-								
-								console.log(entities[entity].id, key)
-
-								if(entities[entity].id == key) {
-									//Remove player from entities
-									db.ref('encounters/' + this.userId + '/' + campaign + '/' + enc + '/entities').child(entity).remove();
-								}
-							}
+							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
 						}
 					}
 				}

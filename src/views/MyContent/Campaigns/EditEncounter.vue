@@ -160,12 +160,13 @@
 					entity.curhp = npc_data.hit_points
 					entity.ac = npc_data.armor_class
 					entity.active = false
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
 					var player_data = await this.players;
 					entity.curhp = player_data[id].maxhp
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 			},
 			remove(id, name) {
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();

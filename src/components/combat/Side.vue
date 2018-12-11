@@ -2,10 +2,10 @@
 	<div id="side_container" class="bg-gray">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
-				<a class="nav-link dmg active" id="damage-tab" data-toggle="tab" href="#damage" role="tab" aria-controls="damage" aria-selected="true">Damage Meters</a>
+				<a class="nav-link dmg active" id="damage-tab" data-toggle="tab" href="#damage" role="tab" aria-controls="damage" aria-selected="true"><i class="fas fa-swords"></i></a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" id="log-tab" data-toggle="tab" href="#log" role="tab" aria-controls="log" aria-selected="false"><i class="fas fa-list"></i></a>
+				<a class="nav-link" id="log-tab" data-toggle="tab" href="#log" role="tab" aria-controls="log" aria-selected="false"><i class="fas fa-book-dead"></i></a>
 			</li>
 		</ul>
 		<div class="actions scroll" v-bar>
@@ -50,19 +50,7 @@
 .scroll { 
 	height: calc(100% - 50px);
 }
-.nav a.dmg {
-	height:34px;
-	width:34px;
-	background-position:center; 
-	background-repeat:no-repeat;
-	background-size:24px;
-	color:#b2b2b2;
-	// background-image: url('@/assets/_img/styles/dmg.png');
-	text-indent:-9999px;
-}
-.nav a.dmg:hover, .nav a.active.dmg {
-	/*background-image:url('@/assets/_img/styles/dmg-hover.png');*/
-}
+
 .tab-content {
 	padding: 0 10px 15px 10px;
 }

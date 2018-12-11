@@ -25,7 +25,17 @@
 			<h2>Your rolls</h2>
 			<ul class="log">
 				<li v-for="item in log">
-					<h3 class="gray-hover">{{ item.roll }}: <b class="blue">{{ item.total }}</b></h3>
+					<h3 v-if="item.total == 'Natural 1' || item.total == 'Natural 20'" 
+						class="font-weight-bold"
+						:class="[{
+							'red': item.total == 'Natural 1',
+							'green': item.total == 'Natural 20'}]
+					">
+						{{ item.total }}!
+					</h3>
+					<h3 v-else class="gray-hover">{{ item.roll }}: 
+						<b class="blue">{{ item.total }}</b>
+					</h3>
 					<p>{{ item.throws }} {{ item.mod }}</p>
 				</li>
 			</ul>
@@ -66,9 +76,25 @@
 				let roll = this.rollD(die, item.n, item.mod);
 				item.result = roll.total;
 
+				let snotifyTitle = 'You rolled: ' + roll.total;
+
+				//Show Natural 1 or Natural 20
+				if(item.n == 1 && die == 20) {
+					let throws = '"'+roll.throws+'"'
+					if(throws.substring(5, 0) == '"1"') {
+						roll.total = 'Natural 1';
+						snotifyTitle = roll.total;
+					}
+					else if(throws.substring(5, 0) == '"20"') {
+						roll.total = 'Natural 20';
+						snotifyTitle = roll.total;
+					}
+					
+				}
+
 				this.log.unshift(roll);
 
-				this.$snotify.success(roll.roll, 'You rolled: ' + roll.total, {
+				this.$snotify.success(roll.roll, snotifyTitle, {
 					position: "centerTop"
 				});
 

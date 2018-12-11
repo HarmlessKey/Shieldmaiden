@@ -10,8 +10,9 @@ export const encounter_module = {
 		entities: {},
 		encounter: undefined,
 
-		campaignId: null,
-		encounterId: null,
+		campaignId: undefined,
+		encounterId: undefined,
+		path: undefined,
 	},
 	getters: {
 		entities: function() {
@@ -26,6 +27,9 @@ export const encounter_module = {
 		encounter: function( state ) {
 			return state.encounter
 		},
+		path: function( state ) {
+			return state.path
+		}
 	},
 	mutations: {
 		add_entity(state, {rootState, key}) {
@@ -75,6 +79,15 @@ export const encounter_module = {
 		SET_ENCOUNTER(state, payload) {
 			state.encounter = payload
 		},
+		START_ENCOUNTER(state) {
+			// console.log(state.path)
+			encounters_ref.child(state.path).update({
+				round: 1
+			})
+		},
+		SET_PATH(state, path) {
+			state.path = path
+		}
 	},
 	actions: {
 		init_Encounter({ dispatch, commit, state, rootState }, { cid, eid }) {
@@ -82,6 +95,7 @@ export const encounter_module = {
 			commit("SET_ENCOUNTER_ID", eid)
 			const uid = rootState.content.user.uid;
 			const path = `${uid}/${cid}/${eid}`;
+			commit("SET_PATH", path)
 			const encounter = encounters_ref.child(path);
 			encounter.once('value', snapshot => {
 				commit('SET_ENCOUNTER', snapshot.val())
@@ -92,14 +106,15 @@ export const encounter_module = {
 		},
 
 		track_Encounter({ commit, state, rootState }) {
-			const uid = rootState.content.user.uid;
-			const cid = state.campaignId
-			const eid = state.encounterId
-			const path = `${uid}/${cid}/${eid}`;
+			const path = state.path
 			const encounter = encounters_ref.child(path);
 			encounter.on('value', snapshot => {
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
+		},
+		startEncounter({ commit }) {
+			console.log('hoi')
+			commit('START_ENCOUNTER')
 		}
 	}
 }

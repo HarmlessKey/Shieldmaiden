@@ -13,9 +13,7 @@
 				/>
 			</div>
 			<template v-else>
-					<Current
-						:current="_active[encounter.turn]"
-					/>
+					<Current />
 					<Targets 
 						:_active="_active"
 						:_idle="_idle"
@@ -57,7 +55,7 @@
 		},
 		data() {
 			// Dispatch route parameters to store
-			
+
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,

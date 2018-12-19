@@ -12,11 +12,12 @@
 					</div>
 					{{ item.by }} did
 					<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
+					<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
 					{{ item.type }} to {{ item.target }}
 					<span v-if="item.over != 0">
 						({{ item.over }}
-						<span v-if="item.type == 'damage'">overkill</span>
-						<span v-else>overhealing</span>)
+						<template v-if="item.type == 'damage'">overkill</template>
+						<template v-else>overhealing</template>)
 					</span>
 				</li>
 			</transition-group>
@@ -35,11 +36,9 @@
 		methods: {
 			returnLog() {
 				if(this.log == undefined) {
-					console.log('Cookie log')
 					return this.cookieLog
 				}
 				else {
-					console.log('Normal log')
 					return this.log
 				}
 			}

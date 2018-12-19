@@ -2,15 +2,18 @@
 	<div>
 		<!-- {{ slide }} -->
 		<Roll v-if="slide.type == 'roll'"/>
+		<NPC v-if="slide.type == 'npc'" :npc="slide.npc" />
 	</div>
 </template>
 
 <script>
 	import Roll from '@/components/slides/Roll.vue';
+	import NPC from '@/components/slides/NPC.vue';
 
 	export default {
 		components: {
-			Roll: Roll
+			Roll: Roll,
+			NPC: NPC
 		},
 		data() {
 			return {

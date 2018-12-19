@@ -51,7 +51,7 @@
 							<p v-if="noResult" class="red">{{ noResult }}</p>
 							<li v-for="npc in searchResults" class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
-									<a @click="showNPC(npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+									<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 									{{ npc.name }}
 								</div>
 								<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
@@ -77,12 +77,12 @@
 				</ul>
 				<div v-else class="loader"><span>Loading entities...</span></div>
 			</div>
-			<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
+			<!-- <transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
 				<div v-if="showSide == true" class="npc bg-gray" >
 					<a @click="hideSide()">Hide</a>
 					<NPC :npc="viewNPC[0]" />
 				</div>
-			</transition>
+			</transition> -->
 		</div>
 	</div>
 </template>
@@ -90,7 +90,6 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
-	import NPC from '@/components/NPC.vue'
 	import { mapGetters, mapActions } from 'vuex'
 	import firebase from 'firebase'
 	import axios from 'axios'
@@ -101,7 +100,6 @@
 		components: {
 			Sidebar,
 			Crumble,
-			NPC
 		},
 		data() {
 			return {
@@ -114,7 +112,7 @@
 				npcs: [],
 				auto_npcs: [],
 				viewNPC: [],
-				showSide: false
+				slide: this.$store.getters.getSlide
 			} 
 		},
 		computed: {
@@ -139,7 +137,16 @@
 			...mapActions([
 				'fetchEncounter',
 				'fetchCampaign',
+				'setSlide'
 			]),
+			showSlide(npc) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'npc',
+					npc: npc
+				})
+			},
 			async getNPC(id) {
 				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
 				.then(response => {return response.data})

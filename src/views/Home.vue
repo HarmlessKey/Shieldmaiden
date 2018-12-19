@@ -2,7 +2,11 @@
 	<div class="grid">
 		<div id="home" class="container">
 			<h1>D&D 5e Combat Service</h1>
-			<p>Use our app to run your encounters, so you can give your players the attention they deserve.</p>
+			<p>
+				When running encounters in Dungeons & Dragons, there is alot to keep track of. 
+				Our app keeps track of everything you need to know and displays it in a structured overview.
+				This way we make running encounters alot simpler, making sure that you can give your players the attention they deserve.
+			</p>
 			
 			<router-link v-if="!user" to="/sign-up" class="btn mr-2">Sign Up</router-link>
 			<router-link v-if="!user" to="/sign-in" class="btn">Sign In</router-link>

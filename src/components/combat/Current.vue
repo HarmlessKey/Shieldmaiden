@@ -14,7 +14,7 @@
 </template>
 
 <script>
-	import NPC from '@/components/NPC.vue'
+	import NPC from '@/components/slides/NPC.vue'
 	import { getters } from '@/mixins/getters.js'
 	import axios from 'axios'
 

@@ -17,8 +17,26 @@
 							<h2>Manual</h2>
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
 							<p>Manual damage or healing</p>
+
+							<select class="form-control mb-2" v-model="damageType" name="damageType">
+								<option value="">Type of damage...</option>
+								<option value="acid">Acid</option>
+								<option value="bludgeoning">Bludgeoning</option>
+								<option value="cold">Cold</option>
+								<option value="fire">Fire</option>
+								<option value="force">Force</option>
+								<option value="lightning">Lightning</option>
+								<option value="necrotic">Necrotic</option>
+								<option value="piercing">Piercing</option>
+								<option value="poison">Poison</option>
+								<option value="psychic">Psychic</option>
+								<option value="radiant">Radiant</option>
+								<option value="slashing">Slashing</option>
+								<option value="thunder">Thunder</option>
+							</select>
+
 							<div class="manual">
-								<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control">
+								<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control manual-input">
 								<button class="btn dmg bg-red" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
 								<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
 							</div>
@@ -41,24 +59,29 @@
 <script>
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
+	import { mapGetters } from 'vuex'
 
 	import { getters } from '@/mixins/getters'
 
 	export default {
 
 		name: 'Actions',
-		props: ['target', 'round', 'turn', 'current'],
+		props: ['target', 'turn', 'current'],
 		mixins: [getters],
 		data: function() {
 			return {
-				userId: firebase.auth().currentUser.uid,
+				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				manualAmount: '',
-				currentRound: this.round,
-				currentTurn: this.turn + 1,
+				damageType: '',
 				log: undefined
 			}
+		},
+		computed: {
+			...mapGetters([
+				'encounter',
+			]),
 		},
 		methods: {
 			setManual(target, type) {
@@ -75,6 +98,7 @@
 							this.isHealing(target, amount, curHp, maxHp)
 						}
 						this.manualAmount = '';
+						this.damageType = '';
 					}
 					else {
 						//console.log('Not Valid');
@@ -106,6 +130,9 @@
 				);
 				//Add to log
 				this.addLog(type, target.name, amount, over);
+
+				//Add to damagemeters
+				this.damageMeters(type, amount, over);
 			},
 			isHealing(target, amount, curHp, maxHp) {
 				let newhp = parseInt(curHp + amount);
@@ -132,6 +159,9 @@
 				);
 				//Add to log
 				this.addLog(type, target.name, amount, over)
+				
+				//Add to damagemeters
+				this.damageMeters(type, amount, over);
 			},
 			addLog(type, target, amount, over) {
 				var d = new Date();
@@ -144,18 +174,29 @@
 					this.log = []
 				}
 				this.log.unshift({
-					round: this.currentRound,
-					turn: this.currentTurn,
+					round: this.encounter.round,
+					turn: this.encounter.turn + 1,
 					by: this.current.name,
 					time: time,
 					type: type,
+					damageType: this.damageType,
 					target: target,
 					amount: amount,
 					over: over
 				})
 				this.$cookies.set(this.encounterId, JSON.stringify(this.log), "2m");
 				this.$emit("log", this.log)
-				//console.log(this.log)
+			},
+			damageMeters(type, amount, over) {
+				if(amount > 0) {
+					db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.current.key}`).push({
+						amount: amount,
+						round: this.encounter.round,
+						target: this.target.key,
+						damageType: this.damageType,
+						over: over,
+					});
+				}
 			}
 		}
 	}
@@ -183,7 +224,7 @@
 	"input btn-dmg"
 	"input btn-heal";
 }
-.form-control {
+.manual-input {
 	height:90px;
 	font-size:50px;
 	text-align: center;

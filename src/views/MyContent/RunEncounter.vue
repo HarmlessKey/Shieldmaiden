@@ -23,8 +23,6 @@
 					/>
 					<Actions 
 					:target="target"
-					:round="encounter.round"
-					:turn="encounter.turn"
 					:current="_active[encounter.turn]"
 					@log="sendLog"
 					/>

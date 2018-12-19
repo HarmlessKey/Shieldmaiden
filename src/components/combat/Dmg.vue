@@ -1,6 +1,9 @@
 <template>
 	<div class="tab-pane fade show active" id="damage" role="tabpanel" aria-labelledby="damage-tab">
 		<h2>Damage Meters</h2>
+		<ul>
+			<li></li>
+		</ul>
 	</div>
 </template>
 

@@ -1,47 +1,45 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="players" class="container">
-			<h1>Your players</h1>
-			<p>These are the players that you can use in your campaigns.</p>
+		<div id="npcs" class="container">
+			<h1>Your NPC's</h1>
+			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
-			<router-link to="/players/add-player" 
+			<router-link to="/npcs/add-npc" 
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
-				<i class="fas fa-plus-square"></i> Add player
+				<i class="fas fa-plus-square"></i> Add NPC
 			</router-link>
 
-			<template v-if="players">
-				<h2 class="mt-3">Players ( {{ Object.keys(players).length }} )</h2>
+			<template v-if="npcs">
+				<h2 class="mt-3">NPC's ( {{ Object.keys(npcs).length }} )</h2>
 				<table class="table">
 					<thead>
 						<th></th>
 						<th>#</th>
-						<th>Player name</th>
-						<th>Character name</th>
+						<th>Name</th>
 						<th></th>
 					</thead>
 					<tbody name="table-row" 
 						is="transition-group"
 						enter-active-class="animated flash"
 						leave-active-class="animated bounceOutLeft">
-						<tr v-for="(player, index) in _players" :key="player.key">
-							<td class="img" v-if="player.avatar != ''" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
+						<tr v-for="(npc, index) in _npcs" :key="npc.key">
+							<td class="img" v-if="npc.avatar != ''" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></td>
 							<td class="img" v-else>
-								<img src="@/assets/_img/styles/player.svg" />
+								<img src="@/assets/_img/styles/monster.svg" />
 							</td>
 							<td>{{ index + 1 }}</td>
-							<td>{{ player.player_name }}</td>
-							<td>{{ player.character_name }}</td>
+							<td>{{ npc.name }}</td>
 							<td class="text-right actions">
 								<router-link class="mx-2" 
-									:to="'/players/' + player.key" 
+									:to="'/npcs/' + npc.key" 
 									v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i>
 								</router-link>
 								<a v-b-tooltip.hover 
 									title="Delete" 
 									class="red"
-									@click="confirmDelete(player.key, player.player)">
+									@click="confirmDelete(npc.key, npc.name)">
 										<i class="fas fa-trash-alt"></i>
 								</a>
 							</td>
@@ -49,8 +47,8 @@
 					</tbody>
 				</table>
 			</template>
-			<h2 v-else-if="players === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first player <i class="fas fa-arrow-up gray-hover"></i></h2>
-			<div v-else="loading" class="loader"><span>Loading Players...</span></div>
+			<h2 v-else-if="npcs === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first NPC <i class="fas fa-arrow-up gray-hover"></i></h2>
+			<div v-else class="loader"><span>Loading NPC's...</span></div>
 		</div>
 	</div>
 </template>
@@ -62,47 +60,40 @@
 	import { db } from '@/firebase'
 
 	export default {
-		name: 'Players',
+		name: 'Npcs',
 		components: {
 			Sidebar
 		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				player_name: '',
-				character_name: '',
-				ac: '',
-				maxHp: '',
-				avatar: '',
-				beyond: '',
-				loading: true,
 			}
 		},
 		computed: {
 			...mapGetters([
-				'players',
+				'npcs',
 				'campaigns',
 				'allEncounters',
 			]),
-			_players: function() {
+			_npcs: function() {
 				// console.log('yo')
-				return _.chain(this.players)
-				.filter(function(player, key) {
-					player.key = key
-					return player
+				return _.chain(this.npcs)
+				.filter(function(npc, key) {
+					npc.key = key
+					return npc
 				})
-				.orderBy("character_name", 'asc')
+				.orderBy("name", 'asc')
 				.value()
 			},
 		},
 		methods: {
-			confirmDelete(key, player) {
-				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
+			confirmDelete(key, npc) {
+				this.$snotify.error('Are you sure you want to delete ' + npc + '?', 'Delete NPC', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key)
+							this.deleteNpc(key)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -116,22 +107,11 @@
 					]
 				});
 			},
-			deletePlayer(key) {
-				for(let campaign in this.campaigns) {
-					//Remove player from campaigns
-					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
+			deleteNpc(key) {
+				//REMEMBER TO DELETE FROM ALL CAMPAIGNS!!
 
-					//Go over all encounters of the campaign
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-						for(let enc in this.allEncounters[campaign]) {
-
-							//Go over all entities in the encounter
-							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
-						}
-					}
-				}
-				//Remove player
-				db.ref('players/' + this.userId).child(key).remove(); 
+				//Remove NPC
+				db.ref('npcs/' + this.userId).child(key).remove(); 
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import { db } from '@/firebase'
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
+const npcs_ref = db.ref('npcs')
 
 export const content_module = {
 	state: {
@@ -16,6 +17,7 @@ export const content_module = {
 		allEncounters: undefined,
 		encounters: undefined,
 		players: undefined,
+		npcs: undefined,
 
 	},
 	getters: {
@@ -37,6 +39,9 @@ export const content_module = {
 		players: function( state ) {
 			return state.players
 		},
+		npcs: function( state ) {
+			return state.npcs
+		},
 		campaign: function( state ) {
 			return state.campaign
 		},
@@ -53,6 +58,9 @@ export const content_module = {
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload
+		},
+		SET_NPCS(state, payload) {
+			state.npcs = payload
 		},
 		SET_CAMPAIGN(state, payload) {
 			state.campaign = payload
@@ -110,6 +118,13 @@ export const content_module = {
 			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
+			})
+		},
+		fetchNpcs({ commit, state }) {
+			const uid = state.user.uid
+			const npcs = npcs_ref.child(uid)
+			npcs.on('value', snapshot => {
+				commit('SET_NPCS', snapshot.val())
 			})
 		},
 		fetchCampaign({ commit, state }, { cid }) {

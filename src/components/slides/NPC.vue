@@ -68,6 +68,15 @@
 			<a data-toggle="collapse" v-bind:href="'#action-'+key" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
 			<p class="collapse" v-bind:id="'action-'+key">{{ action.desc }}</p>
 		</div>
+
+		<template v-if="npc.legendary_actions">
+			<hr>
+			<h2>Legendary Actions</h2>
+			<div v-for="(legendary_action, key) in npc.legendary_actions" :key="key">
+				<a data-toggle="collapse" v-bind:href="'#legendary-action-'+key" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" v-bind:id="'legendary-action-'+key">{{ legendary_action.desc }}</p>
+			</div>
+		</template>
 	</div>
 </template>
 

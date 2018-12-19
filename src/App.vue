@@ -34,6 +34,7 @@
 		this.setUser();
 		// players need prio!
 		this.fetchPlayers();
+		this.fetchNpcs();
 		this.fetchCampaigns();
 		this.fetchAllEncounters();
 	},
@@ -42,6 +43,7 @@
 			'fetchCampaigns',
 			'fetchAllEncounters',
 			'fetchPlayers',
+			'fetchNpcs',
 			'setUser',
 			'setSlide',
 		]),

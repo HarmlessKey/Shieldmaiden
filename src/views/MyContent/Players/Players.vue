@@ -69,13 +69,6 @@
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				player_name: '',
-				character_name: '',
-				ac: '',
-				maxHp: '',
-				avatar: '',
-				beyond: '',
-				loading: true,
 			}
 		},
 		computed: {

@@ -2,56 +2,102 @@
 	<div id="hasSide">
 		<Sidebar/>
 		
-		<div id="players" class="container" v-if="player || $route.name == 'AddPlayers'">
+		<div id="npcs" class="container" v-if="npc || $route.name == 'AddNpc'">
 			
 			<h1>Basic info</h1>
-			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('player_name') }" v-model="player.player_name" v-validate="'alpha_spaces|required'" name="player_name" placeholder="Player Name*" />
-			<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
+			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('name') }" v-model="npc.name" v-validate="'alpha_spaces|required'" name="name" placeholder="Name*" />
+			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('character_name') }" v-model="player.character_name" v-validate="'alpha_spaces|required'" name="character_name" placeholder="Character Name*" />
-			<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
+			<div class="row">
+				<div class="col-lg">
+					<input type="text" class="form-control" v-model="npc.size" name="size" placeholder="Size" />
+				</div>
+				<div class="col-lg">
+					<input type="text" class="form-control" v-model="npc.type" name="type" placeholder="Type" />
 
-			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('avatar') }" v-model="player.avatar" v-validate="'url'" name="avatar" placeholder="Image URL" />
+					<input type="text" class="form-control" v-model="npc.subtype" name="subtype" placeholder="Subtype" />
+				</div>
+			</div>
+
+			<input type="number" class="form-control" :class="{'input': true, 'error': errors.has('ac') }" v-model="npc.ac" v-validate="'required'" name="ac" placeholder="Armor Class" />
+					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+
+			<div class="row">
+				<div class="col-lg">
+					<input type="number" class="form-control" :class="{'input': true, 'error': errors.has('Hit Points') }" v-model="npc.maxHp" v-validate="'required'" name="Hit Points" placeholder="Hit Points" />
+					<p class="validate red" v-if="errors.has('Hit Points')">{{ errors.first('Hit Points') }}</p>
+				</div>
+				<div class="col-lg">
+					<input type="text" class="form-control" v-model="npc.hit_dice"  name="Hit Dice" placeholder="Hit Dice" />
+				</div>
+			</div>
+
+			<input type="text" class="form-control" v-model="npc.speed" name="speed" placeholder="Speed" />
+
+			<input type="text" class="form-control" :class="{'input': true, 'error': errors.has('avatar') }" v-model="npc.avatar" v-validate="'url'" name="avatar" placeholder="Image URL" />
 			<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 
-			<h2 class="mt-4">Stats</h2>
-			<input type="number" class="form-control" :class="{'input': true, 'error': errors.has('maxHp') }" v-model="player.maxHp" v-validate="'numeric|required'" name="maxHp" placeholder="Maximum Hit Points*" />
-			<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-
-			<input type="number" class="form-control" :class="{'input': true, 'error': errors.has('ac') }" v-model="player.ac" v-validate="'numeric|required'" name="ac" placeholder="Armor Class*" />
-			<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-
+			<hr>
 			<h2 class="my-4">Ability Scores</h2>
 			<div class="abilities">
 				<span class="ability str">
 					<span class="abilityName">STR</span>
-					<input type="number" class="form-control" v-model="player.strength" name="strength" placeholder="STR" />
+					<input type="number" class="form-control" v-model="npc.strength" name="strength" placeholder="STR" />
 				</span>
 				<span class="ability dex">
 					<span class="abilityName">DEX</span>
-					<input type="number" class="form-control" v-model="player.dexterity" name="dexterity" placeholder="DEX" />
+					<input type="number" class="form-control" v-model="npc.dexterity" name="dexterity" placeholder="DEX" />
 				</span>
 				<span class="ability con">
 					<span class="abilityName">CON</span>
-					<input type="number" class="form-control" v-model="player.constitution" name="constitution" placeholder="CON" />
+					<input type="number" class="form-control" v-model="npc.constitution" name="constitution" placeholder="CON" />
 				</span>
 				<span class="ability int">
 					<span class="abilityName">INT</span>
-					<input type="number" class="form-control" v-model="player.intelligence" name="intelligence" placeholder="INT" />
+					<input type="number" class="form-control" v-model="npc.intelligence" name="intelligence" placeholder="INT" />
 				</span>
 				<span class="ability wis">
 					<span class="abilityName">WIS</span>
-					<input type="number" class="form-control" v-model="player.wisdom" name="wisdom" placeholder="WIS" />
+					<input type="number" class="form-control" v-model="npc.wisdom" name="wisdom" placeholder="WIS" />
 				</span>
 				<span class="ability cha">
 					<span class="abilityName">CHA</span>
-					<input type="number" class="form-control" v-model="player.charisma" name="charisma" placeholder="CHA" />
+					<input type="number" class="form-control" v-model="npc.charisma" name="charisma" placeholder="CHA" />
 				</span>
 			</div>
+
+			<hr>
+
+			<h2 class="my-4">Skills <a class="green" v-b-tooltip.hover title="Add Skill" @click="addSkill()"><i class="fas fa-plus-circle"></i></a></h2>
 			
-			<router-link to="/players" class="btn bg-gray mr-2">Cancel</router-link>
-			<button v-if="$route.name == 'AddPlayers'" class="btn" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
-			<button v-else class="btn" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
+			<div class="row skills" v-for="npcSkill, index in npcSkills" :key="index">
+				<div class="col-3 d-flex justify-content-left">
+					<span class="mr-2">{{ index + 1 }}. </span>
+					<select class="form-control">
+						<option v-for="skill in skills">
+							{{ skill }}
+						</option>
+					</select>
+				</div>
+				<div class="col-3 d-flex justify-content-left">
+					<input type="number" class="form-control mr-2" name="skill" placeholder="modifier" />
+					<a class="red" @click="removeSkill(index)" v-b-tooltip.hover title="Remove Skill"><i class="fas fa-minus-circle"></i></a>
+				</div>
+			</div>
+			<hr>
+
+			<input type="text" class="form-control" v-model="npc.damage_vulnerabilities" name="damage_vulnerabilities" placeholder="Damage Vulnerabilities" />
+			<input type="text" class="form-control" v-model="npc.damage_resistances" name="damage_resistances" placeholder="Damage Resistances" />
+			<input type="text" class="form-control" v-model="npc.damage_immunities" name="damage_immunities" placeholder="Damage Immunities" />
+			<input type="text" class="form-control" v-model="npc.condition_immunities" name="condition_immunities" placeholder="Condition Immunities" />
+			<input type="text" class="form-control" v-model="npc.senses" name="senses" placeholder="Senses" />
+			<input type="text" class="form-control" v-model="npc.languages" name="senses" placeholder="Languages" />
+			<input type="text" class="form-control" v-model="npc.challenge_rating" name="senses" placeholder="Challenge Rating" />
+			
+			<hr>
+			<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
+			<button v-if="$route.name == 'AddNpcs'" class="btn" @click="addNpc()"><i class="fas fa-plus"></i> Add NPC</button>
+			<button v-else class="btn" @click="editNpc()"><i class="fas fa-check"></i> Save</button>
 		</div>
 	</div>
 </template>
@@ -59,72 +105,79 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import { db } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
-		name: 'Players',
+		name: 'Npcs',
 		components: {
 			Sidebar,
 		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				playerId: this.$route.params.id,
+				npcId: this.$route.params.id,
+				npcSkills: [],
+				skills: [
+					'Acrobatics',
+					'Animal Handling',
+					'Arcana',
+					'Athletics',
+					'Deception',
+					'History',
+					'Insight',
+					'Intimidation',
+					'Investigation',
+					'Medicine',
+					'Nature',
+					'Perception',
+					'Performance',
+					'Persuasion',
+					'Religion',
+					'Sleight of Hand',
+					'Stealth',
+					'Survival',
+				]
 			}
 		},
 		firebase() {
 			return {
-				player: {
-					source: db.ref(`players/${this.userId}/${this.playerId}`),
+				npc: {
+					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true
 				}
 			}
 		},
 		methods: {
-			addPlayer() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref('players/' + this.userId).push({
-							player_name: this.player.player_name,
-							character_name: this.player.character_name,
-							maxHp: this.player.maxHp,
-							ac: this.player.ac,
-							avatar: this.player.avatar,
-							strength: this.player.strength,
-							dexterity: this.player.dexterity,
-							constitution: this.player.constitution,
-							intelligence: this.player.intelligence,
-							wisdom: this.player.wisdom,
-							charisma: this.player.charisma,
-						});
-						this.$router.replace('/players')
-					} else {
-						//console.log('Not valid');
-					}
-				})
+			addNpc() {
+				console.log('npc: ', this.npc)
+				// this.$validator.validateAll().then((result) => {
+				// 	if (result) {
+				// 		db.ref('npcs/' + this.userId).push(this.npc);
+				// 		this.$router.replace('/npcs')
+				// 	} else {
+				// 		//console.log('Not valid');
+				// 	}
+				// })
 			},
-			editPlayer() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`players/${this.userId}/${this.playerId}`).set({
-							player_name: this.player.player_name,
-							character_name: this.player.character_name,
-							maxHp: this.player.maxHp,
-							ac: this.player.ac,
-							avatar: this.player.avatar,
-							strength: this.player.strength,
-							dexterity: this.player.dexterity,
-							constitution: this.player.constitution,
-							intelligence: this.player.intelligence,
-							wisdom: this.player.wisdom,
-							charisma: this.player.charisma,
-						});
-						this.$router.replace('/players')
-					} else {
-						//console.log('Not valid');
-					}
-				})
-			}
+			editNpc() {
+				console.log('npc: ', this.npc)
+				// this.$validator.validateAll().then((result) => {
+				// 	if (result) {
+				// 		db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
+				// 		this.$router.replace('/npcs')
+				// 	} else {
+				// 		//console.log('Not valid');
+				// 	}
+				// })
+			},
+			addSkill() {
+				this.npcSkills.push({
+					skill: '',
+					mod: ''
+				});
+			},
+			removeSkill(index) {
+				this.$delete(this.npcSkills, index);
+			},
 		}
 	}
 </script>
@@ -138,6 +191,12 @@
 	}
 	input {
 		margin-top: 15px;
+	}
+	.skills {
+		line-height: 40px;
+		input {
+			margin-top: 0;
+		}
 	}
 
 	.abilities {

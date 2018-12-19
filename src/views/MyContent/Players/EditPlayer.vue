@@ -82,21 +82,14 @@
 		},
 		methods: {
 			addPlayer() {
+				console.log(this.player)
+				// THIS IS UGLY
+				delete this.player['.value']
+				delete this.player['.key']
+				// UGLY ENDS HERE
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref('players/' + this.userId).push({
-							player_name: this.player.player_name,
-							character_name: this.player.character_name,
-							maxHp: this.player.maxHp,
-							ac: this.player.ac,
-							avatar: this.player.avatar,
-							strength: this.player.strength,
-							dexterity: this.player.dexterity,
-							constitution: this.player.constitution,
-							intelligence: this.player.intelligence,
-							wisdom: this.player.wisdom,
-							charisma: this.player.charisma,
-						});
+						db.ref('players/' + this.userId).push(this.player);
 						this.$router.replace('/players')
 					} else {
 						//console.log('Not valid');
@@ -104,21 +97,12 @@
 				})
 			},
 			editPlayer() {
+				// THIS IS UGLY
+				delete this.player['.key']
+				// UGLY ENDS HERE
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref(`players/${this.userId}/${this.playerId}`).set({
-							player_name: this.player.player_name,
-							character_name: this.player.character_name,
-							maxHp: this.player.maxHp,
-							ac: this.player.ac,
-							avatar: this.player.avatar,
-							strength: this.player.strength,
-							dexterity: this.player.dexterity,
-							constitution: this.player.constitution,
-							intelligence: this.player.intelligence,
-							wisdom: this.player.wisdom,
-							charisma: this.player.charisma,
-						});
+						db.ref(`players/${this.userId}/${this.playerId}`).set(this.player);
 						this.$router.replace('/players')
 					} else {
 						//console.log('Not valid');

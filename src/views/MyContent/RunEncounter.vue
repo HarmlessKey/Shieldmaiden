@@ -13,9 +13,7 @@
 				/>
 			</div>
 			<template v-else>
-					<Current
-						:current="_active[encounter.turn]"
-					/>
+					<Current />
 					<Targets 
 						:_active="_active"
 						:_idle="_idle"
@@ -55,7 +53,7 @@
 		},
 		data() {
 			// Dispatch route parameters to store
-			
+
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,
@@ -68,12 +66,14 @@
 				eid: this.$route.params.encid
 			})
 			this.track_Encounter()
+			console.log(this.entities)
 		},
 		computed: {
 			...mapGetters([
 				'encounter',
 				'players',
 				'campaigns',
+				'entities',
 			]),
 			_active: function() {
 				return _.chain(this.encounter.entities)

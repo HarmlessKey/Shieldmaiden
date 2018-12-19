@@ -74,7 +74,7 @@
 	import axios from 'axios'
 	import _ from 'lodash'
 	import { db } from '@/firebase'
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 
 	import { dice } from '@/mixins/dice.js'
 	import { attributes } from '@/mixins/attributes.js'
@@ -83,7 +83,7 @@
 	export default {
 
 		name: 'SetInitiative',
-		props: ['entities','_active','_idle'],
+		props: ['_active','_idle'],
 		mixins: [dice, attributes, getters],
 		data () {
 			return {
@@ -99,6 +99,8 @@
 			...mapGetters([
 				'campaignId',
 				'encounterId',
+				'entities',
+				'path'
 			]),
 			...mapGetters({
 				user: 'getUser',
@@ -132,11 +134,14 @@
 
 		},
 		methods: {
+			...mapActions([
+				'set_active'
+			]),
 			storeInitiative(key, entity) {
 				if (!entity.initiative) {
 					entity.initiative = 0
 				}
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+				db.ref(`encounters/${this.path}/entities/${key}`).update({
 					initiative: parseInt(entity.initiative),
 				})
 			},
@@ -176,7 +181,8 @@
 				this.selected = []
 			},
 			setActive(key, active) {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+				this.set_active({
+					key: key,
 					active: active
 				})
 			}

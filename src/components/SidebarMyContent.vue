@@ -7,9 +7,9 @@
 			<li>
 				<router-link to="/players"><i class="fas fa-users blue"></i><span>Players</span></router-link>
 			</li>
-			<!-- <li>
+			<li>
 				<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
-			</li> -->
+			</li>
 		</ul>
 	</div>
 </template>

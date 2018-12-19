@@ -8,8 +8,9 @@ import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
 import Encounters from '@/views/MyContent/Campaigns/Encounters.vue';
 import EditEncounter from '@/views/MyContent/Campaigns/EditEncounter.vue';
 import Players from '@/views/MyContent/Players/Players.vue';
-import AddPlayer from '@/views/MyContent/Players/AddPlayer.vue';
 import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
+import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
+import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
 import RunEncounter from '@/views/MyContent/RunEncounter.vue';
 
 // This is where you add all your site routes
@@ -76,7 +77,7 @@ export const routes = [{
 {
 	path: '/players/add-player',
 	name: 'AddPlayers',
-	component: AddPlayer,
+	component: EditPlayer,
 	meta: {
 		basePath: '/players',
 		title: 'Players',
@@ -90,6 +91,36 @@ export const routes = [{
 	meta: {
 		basePath: '/players',
 		title: 'Players',
+		requiresAuth: true
+	}
+},
+{
+	path: '/npcs',
+	name: 'Npcs',
+	component: Npcs,
+	meta: {
+		basePath: '/npcs',
+		title: 'NPCs',
+		requiresAuth: true
+	}
+},
+{
+	path: '/npcs/add-npc',
+	name: 'AddNPC',
+	component: EditNpc,
+	meta: {
+		basePath: '/npcs',
+		title: 'NPCs',
+		requiresAuth: true
+	}
+},
+{
+	path: '/npcs/:id',
+	name: 'EditNPC',
+	component: EditNpc,
+	meta: {
+		basePath: '/npcs',
+		title: 'NPCs',
 		requiresAuth: true
 	}
 },

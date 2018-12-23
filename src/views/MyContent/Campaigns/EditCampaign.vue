@@ -26,17 +26,19 @@
 						:key="key" 
 						class="d-flex justify-content-between">
 							<div class="d-flex justify-content-left">
-								<span class="img" :style="{ backgroundImage: 'url(' + player.avatar + ')' }"></span>
+								<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
 								{{ player.character_name }}
 							</div>
-							<!-- <a v-if="campaign.players[key] == true" class="green" 
+							<template v-if="campaign.players">
+								<a v-if="checkPlayer(key) < 0" class="green" 
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
-									<i class="fas fa-plus-circle"></i>
+									<i class="fas fa-plus-circle"></i></a>
+								<span v-else class="green"><i class="fas fa-check"></i></span>
 							</a>
-							<span v-else><i class="fas fa-check"></i></span> -->
-							<a class="green" 
+							</template>	
+							<a v-else class="green" 
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
@@ -53,7 +55,7 @@
 						<ul class="entities" v-if="campaign.players">
 							<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
-									<!-- <span class="img" :style="{ backgroundImage: 'url(' + players[key].avatar + ')' }"></span> -->
+									<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
 									{{ players[key].character_name }}
 								</div>
 								
@@ -123,8 +125,8 @@
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
 			},
 			checkPlayer(id) {
-				return (id in this.campaign.players)
-			}
+				return (Object.keys(this.campaign.players).indexOf(id))
+			},
 		}
 	}
 </script>

@@ -4,8 +4,8 @@
 		<div id="my-content" class="container">
 			<div class="info">
 				<Crumble />
-				<h1>Edit Encounters</h1>
-				<p>Add players and NPC's to your encounter.</p>
+				<h1>Encounter: <span class="blue">{{ encounter.encounter }}</span></h1>
+				<p>Add players and NPC's to this encounter.</p>
 			</div>
 
 			<!-- ADD PLAYERS AND NPC'S -->
@@ -20,17 +20,30 @@
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-						<!-- <a class="btn btn-block" @click="addAllPlayers()">Add all</a> -->
+						<a class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
 						<ul class="entities" v-if="campaign && players && encounter">
 							<li v-for="(player, key) in campaign.players" 
-							:key="key" 
-							class="d-flex justify-content-between">
+								:key="key" 
+								class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
 									<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
 									{{ players[key].character_name }}
 								</div>
-								<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'player', players[key].character_name)"><i class="fas fa-plus-circle"></i></a>
-								<!-- <span v-else><i class="fas fa-check"></i></span> -->
+								<template v-if="encounter.entities">
+									<a v-if="checkPlayer(key) < 0" class="green" 
+									v-b-tooltip.hover 
+									title="Add Character" 
+									@click="add(key, 'player', players[key].character_name)">
+										<i class="fas fa-plus-circle"></i></a>
+									<span v-else class="green"><i class="fas fa-check"></i></span>
+									</a>
+								</template>	
+								<a v-else class="green" 
+									v-b-tooltip.hover 
+									title="Add Character" 
+									@click="add(key, 'player', players[key].character_name)">
+										<i class="fas fa-plus-circle"></i>
+								</a>
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading players...</span></div>
@@ -80,7 +93,7 @@
 				<ul class="entities" v-if="encounter">
 					<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<span v-if="entity.type == 'player'" class="img" :style="{ backgroundImage: 'url(' + players[entity.id].avatar + ')' }"></span>
+							<span v-if="entity.type == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
 							<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
 							{{ entity.name }}
 						</div>
@@ -213,6 +226,12 @@
 					}
 				}
 			},
+			addAllPlayers() {
+				for(let player in this.campaign.players) {
+					let name = this.players[player].character_name;
+					this.add(player, 'player', name)
+				}
+			},
 			showNPC(npc) {
 				this.viewNPC = []
 				this.viewNPC.push(npc)
@@ -221,15 +240,9 @@
 			hideSide() {
 				this.showSide = false;
 			},
-			checkEntity(playerKey) {
-				// var entities = this.encounter.entities
-				// var arr = Object.values(entities)
-				// var entity = arr.find(function(element) {
-				// 	return element.id == playerKey
-				// });
-				// // console.log(entity)
-				// return entity
-			}
+			checkPlayer(id) {
+				return (Object.keys(this.encounter.entities).indexOf(id))
+			},
 		}
 	}
 </script>

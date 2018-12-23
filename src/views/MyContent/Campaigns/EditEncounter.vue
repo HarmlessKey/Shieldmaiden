@@ -23,10 +23,10 @@
 						<!-- <a class="btn btn-block" @click="addAllPlayers()">Add all</a> -->
 						<ul class="entities" v-if="campaign && players && encounter">
 							<li v-for="(player, key) in campaign.players" 
-							:key="player.player" 
+							:key="key" 
 							class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
-									<span v-if="players[key].character_name" class="img" :style="{ backgroundImage: 'url(' + players[key].character_name + ')' }"></span>
+									<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
 									{{ players[key].character_name }}
 								</div>
 								<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'player', players[key].character_name)"><i class="fas fa-plus-circle"></i></a>
@@ -57,6 +57,21 @@
 								<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
 							</li>
 						</ul>
+						<template v-if="npcs">
+							<h2>Custom NPC's</h2>
+							<ul class="entities">
+								<li v-for="(npc, key) in npcs" 
+									:key="key" 
+									class="d-flex justify-content-between">
+									<div class="d-flex justify-content-left">
+										<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
+										{{ npc.name }}
+									</div>
+									<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+									<!-- <span v-else><i class="fas fa-check"></i></span> -->
+								</li>
+							</ul>
+						</template>
 					</div>
 				</div>
 			</div>
@@ -77,12 +92,6 @@
 				</ul>
 				<div v-else class="loader"><span>Loading entities...</span></div>
 			</div>
-			<!-- <transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
-				<div v-if="showSide == true" class="npc bg-gray" >
-					<a @click="hideSide()">Hide</a>
-					<NPC :npc="viewNPC[0]" />
-				</div>
-			</transition> -->
 		</div>
 	</div>
 </template>
@@ -109,7 +118,7 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				npcs: [],
+				allnpcs: [],
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide
@@ -120,6 +129,7 @@
 				'encounter',
 				'campaign',
 				'players',
+				'npcs',
 			]),
 		},
 		mounted() {
@@ -131,7 +141,7 @@
 				cid: this.campaignId, 
 			}),
 			axios.get("http://www.dnd5eapi.co/api/monsters/")
-			.then(response => {this.npcs = response.data.results})
+			.then(response => {this.allnpcs = response.data.results})
 		},
 		methods: {
 			...mapActions([
@@ -151,7 +161,7 @@
 				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
 				.then(response => {return response.data})
 			},
-			async add(id, type, name) {
+			async add(id, type, name, custom = false) {
 				var entity = {
 					id: id,
 					name: name,
@@ -160,17 +170,23 @@
 					active: true,
 				}
 				if(type == 'npc') {
-					var npc_data = await this.getNPC(id);
-					entity.str = npc_data.strength
-					entity.dex = npc_data.dexterity
-					entity.con = npc_data.constitution
-					entity.int = npc_data.intelligence
-					entity.wis = npc_data.wisdom
-					entity.cha = npc_data.charisma
-					entity.maxHp = npc_data.hit_points
-					entity.curHp = npc_data.hit_points
-					entity.ac = npc_data.armor_class
-					entity.active = true
+					if(custom == false) {
+						var npc_data = await this.getNPC(id);
+						entity.str = npc_data.strength
+						entity.dex = npc_data.dexterity
+						entity.con = npc_data.constitution
+						entity.int = npc_data.intelligence
+						entity.wis = npc_data.wisdom
+						entity.cha = npc_data.charisma
+						entity.maxHp = npc_data.hit_points
+						entity.curHp = npc_data.hit_points
+						entity.ac = npc_data.armor_class
+						entity.active = true
+					}
+					else {
+						var npc_data = this.npcs;
+						entity.curHp = npc_data[id].maxHp
+					}
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
@@ -184,8 +200,8 @@
 			},
 			searchNPC() {
 				this.searchResults = []
-				for (var i in this.npcs) {
-					var m = this.npcs[i]
+				for (var i in this.allnpcs) {
+					var m = this.allnpcs[i]
 					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
 						axios.get(m.url).then(response => {
 							this.noResult = ''

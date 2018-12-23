@@ -403,6 +403,17 @@ ul.nav {
 	padding: 0 !important;
 }
 
+.card {
+	background-color: $gray !important;
+	border-radius: 0 !important;
+	border: none !important;
+	margin-bottom: 20px !important;
+
+	.card-header {
+		text-transform: uppercase !important;
+	}
+}
+
 /* 7. Snotify overrides */
 /*********************************************/
 .snotifyToast {

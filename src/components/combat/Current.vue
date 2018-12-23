@@ -18,7 +18,6 @@
 
 	export default {
 		name: 'Current',
-		components: { NPC },
 		computed: {
 			...mapGetters([
 				'entities',

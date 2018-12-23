@@ -10,7 +10,7 @@
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add NPC
 			</router-link>
-
+		
 			<template v-if="npcs">
 				<h2 class="mt-3">NPC's ( {{ Object.keys(npcs).length }} )</h2>
 				<table class="table">

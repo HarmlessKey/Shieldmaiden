@@ -7,7 +7,8 @@
 					<div class="health">
 						<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
 						<div class="progress health-bar">
-							<span>{{ current.curHp }} / {{ current.maxHp }}</span>
+							<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
+							<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
 							<div class="progress-bar" :class="{ 
 								'bg-red': percentage(current.curHp, current.maxHp) < 33, 
 								'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
@@ -18,14 +19,18 @@
 							</div>
 						</div>
 					</div>
-					<b-row class="conditions">
-						<b-col sm="1" v-for="condition, key in current.conditions" :key="key">
-							<svg v-b-popover.hover="conditions[key].condition" :title="key" class="icon text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					<b-row class="conditions" v-if="conditions">
+						<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(conditions[key])">
+							<svg 
+							v-b-popover.hover="conditions[key].condition" 
+							:title="key" 
+							class="icon text" 
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 512 512">
 								<path :d="conditions[key].icon" fill-opacity="1"></path>
 							</svg>
 						</b-col>
 					</b-row>
-					<!-- {{ current.type }} -->
 					<NPC class="mt-3" :npc="current" />
 				</div>
 				
@@ -64,6 +69,18 @@
 			},
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
+			showCondition(show) {
+				// console.log(show)
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'condition',
+					condition: show
+				})
+			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
@@ -110,13 +127,20 @@
 			background-color: #4c4c4c;
 			position: relative;
 
-			span { 
+			span.hp, span.percentage {
+				
 				color:#191919;
 				position: absolute;
-				left: 5px;
 				white-space: nowrap;
 				overflow: hidden;
-				text-overflow: ellipsis !important;
+				text-overflow: ellipsis;
+			}
+			span.hp {
+				text-align: right;
+				right: 5px;
+			}
+			span.percentage {
+				left: 5px;
 			}
 		}
 	}

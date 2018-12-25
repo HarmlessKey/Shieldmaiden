@@ -17,7 +17,8 @@
 			<template v-if="npc.speed"><br/><b>Speed</b> {{ npc.speed }}</template>
 		</p>
 		<div class="abilities">
-			<span v-for="ability, index in abilities" 
+			<span v-for="ability, index in abilities"
+				v-b-tooltip.hover title="Roll"
 				:key="index" 
 				class="ability" 
 				@click="rollAbility(ability, npc[ability])"

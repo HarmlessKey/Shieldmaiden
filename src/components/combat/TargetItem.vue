@@ -16,51 +16,79 @@
 				:style="{width: percentage(item.curHp, item.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 			</div>
 		</div>
-		{{ setNumber(item.curHp) }}
-		<input v-model.number="number" type="hidden">
-		<span class="hp" v-b-tooltip.hover title="Current / Max HP">
-			<span class="current mr-1" :class="{ 
-				'red': percentage(item.curHp, item.maxHp) < 33, 
-				'orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
-				'green': percentage(item.curHp, item.maxHp) > 7
-				}">{{ animatedNumber }}</span>
-			/<span class="max ml-1">{{ item.maxHp }}</span>
+		<span class="d-flex justify-content-end">
+			<span>
+				{{ setNumber(item.curHp) }}
+				<input v-model.number="number" type="hidden">
+				<span class="hp" v-b-tooltip.hover title="Current / Max HP">
+					<span class="current mr-1" :class="{ 
+						'red': percentage(item.curHp, item.maxHp) < 33, 
+						'orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
+						'green': percentage(item.curHp, item.maxHp) > 7
+						}">{{ animatedNumber }}</span>
+					/<span class="max ml-1">{{ item.maxHp }}</span>
+				</span>
+			</span>
+			<span>
+				<a class="options" id="actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<i class="fas fa-ellipsis-v"></i>
+				</a>
+				<div class="dropdown-menu" aria-labelledby="actions">
+					<a class="dropdown-item">Initiative</a>
+					<a class="dropdown-item" @click="conditions(item.key)">Conditions</a>
+					<a class="dropdown-item">Do damage/healing</a>
+					<div class="dropdown-divider"></div>
+					<a class="dropdown-item">Remove</a>
+				</div>
+			</span>
 		</span>
 	</div>
 </template>
 
 <script>
-export default {
+	import { mapGetters, mapActions } from 'vuex'
 
-  name: 'TargetItem',
-  props: ['item'],
-  data () {
-    return {
-			target: '',
-			number: 20,
-    	tweenedNumber: 0
-    }
-	},
-	computed: {
-    animatedNumber: function() {
-      return this.tweenedNumber.toFixed(0);
-    }
-  },
-  watch: {
-    number: function(newValue) {
-      TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
-    }
-  },
-	methods: {
-		percentage(current, max) {
-			var hp_percentage = Math.floor(current / max * 100)
-			return hp_percentage
+	export default {
+		name: 'TargetItem',
+		props: ['item'],
+		data () {
+			return {
+				target: '',
+				number: 20,
+				tweenedNumber: 0
+			}
 		},
-		setNumber(value) {
-			this.number = value
+		computed: {
+			animatedNumber: function() {
+				return this.tweenedNumber.toFixed(0);
+			}
+		},
+		watch: {
+			number: function(newValue) {
+				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
+			}
+		},
+		methods: {
+			...mapActions([
+					'setSlide'
+				]),
+			percentage(current, max) {
+				var hp_percentage = Math.floor(current / max * 100)
+				return hp_percentage
+			},
+			setNumber(value) {
+				this.number = value
+			},
+			conditions(key) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'conditions',
+					key: key
+				})
+			},
 		}
 	}
-}
 </script>
 
 <style lang="scss" scoped>
@@ -74,7 +102,17 @@ export default {
 	
 	line-height: 30px;
 }
+a.options {
+	padding: 0 5px;
+	color: #b2b2b2 !important;
 
+	&hover {
+		color: #2c97de;
+	}
+}
+.dropdown-menu {
+	
+}
 .progress { 
 	height: 30px;
 	background-color: #4c4c4c;

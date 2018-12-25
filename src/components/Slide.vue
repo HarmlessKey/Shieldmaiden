@@ -3,17 +3,23 @@
 		<!-- {{ slide }} -->
 		<Roll v-if="slide.type == 'roll'"/>
 		<NPC v-if="slide.type == 'npc'" :npc="slide.npc" />
+		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
+		<Conditions v-if="slide.type == 'conditions'" :entityKey="slide.key" />
 	</div>
 </template>
 
 <script>
 	import Roll from '@/components/slides/Roll.vue';
 	import NPC from '@/components/slides/NPC.vue';
+	import EditNpc from '@/components/slides/EditNpc.vue';
+	import Conditions from '@/components/slides/Conditions.vue';
 
 	export default {
 		components: {
 			Roll: Roll,
-			NPC: NPC
+			NPC: NPC,
+			EditNpc: EditNpc,
+			Conditions: Conditions,
 		},
 		data() {
 			return {

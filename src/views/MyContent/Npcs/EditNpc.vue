@@ -19,13 +19,15 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="npc in searchResults" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
+								<i class="fas fa-info-circle"></i></a>
 							{{ npc.name }}
 						</div>
 						<a class="" 
 							v-b-tooltip.hover title="Copy NPC" 
 							@click="copy(npc)">
-							Copy</a>
+							<i class="fas fa-copy"></i>
+						</a>
 					</li>
 				</ul>
 			</b-card>
@@ -75,6 +77,15 @@
 						</b-row>
 
 						<b-form-input 
+							v-if="quick == false"
+							v-b-tooltip.hover title="Alignment"
+							type="text" 
+							class="form-control mb-2" 
+							v-model="npc.alignment" 
+							name="alignment" 
+							placeholder="Alignment"></b-form-input>
+
+						<b-form-input 
 							v-b-tooltip.hover title="Speed"
 							type="text" 
 							class="form-control mb-2" 
@@ -83,6 +94,7 @@
 							placeholder="Speed"></b-form-input>
 
 						<b-form-input 
+							v-if="quick == false"
 							v-b-tooltip.hover title="Senses" 
 							type="text" 
 							class="form-control mb-2" 
@@ -91,6 +103,7 @@
 							placeholder="Senses"></b-form-input>
 
 						<b-form-input
+							v-if="quick == false"
 							v-b-tooltip.hover title="Languages" 
 							type="text" 
 							class="form-control mb-2" 
@@ -166,104 +179,34 @@
 			<b-row>
 				<b-col>
 					<b-card header="Ability Scores">
-						<b-row class="mb-2">
+						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
 							<b-col sm="2">
-								<label for="strength">STR</label>
+								<label :for="ability">{{ ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
 							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.strength" name="strength" placeholder="STR"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">DEX</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.dexterity" name="dexterity" placeholder="DEX"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">CON</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.constitution" name="constitution" placeholder="CON"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">INT</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.intelligence" name="intelligence" placeholder="INT"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">WIS</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.wisdom" name="wisdom" placeholder="WIS"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">CHA</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.charisma" name="charisma" placeholder="CHA"></b-form-input>
+								<b-form-input 
+									:id="ability" 
+									type="number" 
+									v-model="npc[ability]" 
+									:name="ability" 
+									:placeholder="ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
 					</b-card>
 				</b-col>
-				<b-col v-if="quick == false">
-					<b-card header="Saving Throwes">
-						<b-row class="mb-2">
+				<b-col>
+					<b-card header="Saving Throws" v-if="quick == false">
+						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
 							<b-col sm="2">
-								<label for="strength_save">STR</label>
+								<label :for="ability+'_save'">{{ ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
 							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.strength_save" name="strength_save" placeholder="STR"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="dexterity_save">DEX</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.dexterity_save" name="dexterity_save" placeholder="DEX"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">CON</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.constitution_save" name="constitution_save" placeholder="CON"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">INT</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.intelligence_save" name="intelligence_save" placeholder="INT"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">WIS</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.wisdom_save" name="wisdom_save" placeholder="WIS"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="">CHA</label>
-							</b-col>
-							<b-col sm="8">
-								<b-form-input type="number" v-model="npc.charisma_save" name="charisma_save" placeholder="CHA"></b-form-input>
+								<b-form-input 
+									:id="ability+'_save'" 
+									type="number" 
+									v-model="npc[ability+'_save']" 
+									:name="ability" 
+									:placeholder="ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
 					</b-card>
@@ -271,17 +214,19 @@
 			</b-row>
 
 			<div class="card" v-if="quick == false">
-				<div class="card-header">
-					Skills 
-					</div>
+				<div class="card-header">Skills</div>
 					<div class="card-body">
 						<b-row class="skills" v-for="skill, index in skills" :key="index">
 								<b-col sm="2">
 									<label class="text-capitalize">{{ skill }}</label>
 								</b-col>
 								<b-col sm="4">
-									<input type="number" class="form-control mr-2 text-capitalize" v-model="npc[skill]" name="skill" :placeholder="skill" />
-									<!-- <a class="red" @click="removeSkill(index)" v-b-tooltip.hover title="Remove Skill"><i class="fas fa-minus-circle"></i></a> -->
+									<input 
+										type="number" 
+										class="form-control mr-2 text-capitalize" 
+										v-model="npc[skill]" 
+										name="skill" 
+										:placeholder="skill" />
 								</b-col>
 						</b-row>
 					</div>
@@ -317,19 +262,27 @@
 					placeholder="Condition Immunities"></b-form-input>
 			</b-card>
 
-			<!-- SPECIAL ABILITIES -->
-			<div class="card" v-if="quick == false">
-				<div class="card-header">
-					Special Abilities
+			<!-- ACTIONS / ABILITIES -->
+			<div class="card" v-for="action, index in actions" :key="index" v-if="quick == false">
+				<div class="card-header d-flex justify-content-between">
+					{{ action.name }}
 					<a 
 					class="green" 
 					v-b-tooltip.hover title="Add Skill" 
-					@click="add('special')">
+					@click="add(action.type)">
 						<i class="fas fa-plus-circle"></i>
 					</a>
 				</div>
 				<div class="card-body">
-					<div v-for="ability in npc.special_abilities">
+					<div v-for="ability, index in npc[action.type]" :key="index">
+						<h2 class="d-flex justify-content-between">
+							{{ index + 1 }}. {{ ability.name }}
+							<a @click="remove(index, action.type)" 
+								class="red"
+								v-b-tooltip.hover title="Remove">
+								<i class="fas fa-minus-circle"></i>
+							</a>
+						</h2>
 						<b-row class="mb-2">
 							<b-col sm="2">
 								<label for="name">Name</label>
@@ -344,8 +297,8 @@
 									placeholder="Name"></b-form-input>
 							</b-col>
 						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
+						<b-row>
+							<b-col sm="2" class="mb-2">
 								<label for="damage_dice">Damage Dice</label>
 							</b-col>
 							<b-col sm="10">
@@ -357,7 +310,7 @@
 									name="damage_dice" 
 									placeholder="Damage Dice"></b-form-input>
 							</b-col>
-							<b-col sm="2">
+							<b-col sm="2" class="mb-2">
 								<label for="damage_bonus">Damage Bonus</label>
 							</b-col>
 							<b-col sm="10">
@@ -403,179 +356,7 @@
 				</div>
 			</div>
 
-			<!-- ACTIONS -->
-			<div class="card" v-if="quick == false">
-				<div class="card-header">
-					Actions
-					<a 
-					class="green" 
-					v-b-tooltip.hover title="Add Skill" 
-					@click="add('action')">
-						<i class="fas fa-plus-circle"></i>
-					</a>
-				</div>
-				<div class="card-body">
-					<div v-for="action in npc.actions">
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="name">Name</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="name"
-									type="text" 
-									class="form-control" 
-									v-model="action.name" 
-									name="name" 
-									placeholder="Name"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="damage_dice">Damage Dice</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="damage_dice"
-									type="text" 
-									class="form-control" 
-									v-model="action.damage_dice" 
-									name="damage_dice" 
-									placeholder="Damage Dice"></b-form-input>
-							</b-col>
-							<b-col sm="2">
-								<label for="damage_bonus">Damage Bonus</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="damage_bonus"
-									type="number" 
-									class="form-control" 
-									v-model="action.damage_bonus" 
-									name="damage_bonus" 
-									placeholder="Damage Bonus"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="attack_bonus">Attack Bonus</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="attack_bonus"
-									type="number" 
-									class="form-control" 
-									v-model="action.attack_bonus" 
-									name="attack_bonus" 
-									placeholder="Attack Bonus"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="desc">Description</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-textarea
-									id="desc"
-									class="form-control" 
-									v-model="action.desc" 
-									rows="4"
-									name="desc" 
-									placeholder="Description"></b-form-textarea>
-							</b-col>
-						</b-row>
-						<hr>
-					</div>
-				</div>
-			</div>
-			
-			<!-- LEGENDARY ACTIONS -->
-			<div class="card" v-if="quick == false">
-				<div class="card-header">
-					Legendary Actions
-					<a 
-					class="green" 
-					v-b-tooltip.hover title="Add Skill" 
-					@click="add('legendary')">
-						<i class="fas fa-plus-circle"></i>
-					</a>
-				</div>
-				<div class="card-body">
-					<div v-for="legendary_action in npc.legendary_actions">
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="name">Name</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input
-										id="name"
-										type="text" 
-										class="form-control" 
-										v-model="legendary_action.name" 
-										name="name" 
-										placeholder="Name"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="damage_dice">Damage Dice</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input
-										id="damage_dice"
-										type="text" 
-										class="form-control" 
-										v-model="legendary_action.damage_dice" 
-										name="damage_dice" 
-										placeholder="Damage Dice"></b-form-input>
-								</b-col>
-								<b-col sm="2">
-									<label for="damage_bonus">Damage Bonus</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input
-										id="damage_bonus"
-										type="number" 
-										class="form-control" 
-										v-model="legendary_action.damage_bonus" 
-										name="damage_bonus" 
-										placeholder="Damage Bonus"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="attack_bonus">Attack Bonus</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input
-										id="attack_bonus"
-										type="number" 
-										class="form-control" 
-										v-model="legendary_action.attack_bonus" 
-										name="attack_bonus" 
-										placeholder="Attack Bonus"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="desc">Description</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-textarea
-										id="desc"
-										class="form-control" 
-										v-model="legendary_action.desc" 
-										rows="4"
-										name="desc" 
-										placeholder="Description"></b-form-textarea>
-								</b-col>
-							</b-row>
-							<hr>
-						</div>
-					</div>
-				</div>
-
-				<div class="mt-2">
+			<div class="mt-2">
 				<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
 				<button v-if="$route.name == 'AddNPC'" class="btn" @click="addNpc()"><i class="fas fa-plus"></i> Add NPC</button>
 				<button v-else class="btn" @click="editNpc()"><i class="fas fa-check"></i> Save</button>
@@ -605,6 +386,14 @@
 				noResult: '',
 				npcs: [],
 				npcSkills: [],
+				abilities: [
+					'strength',
+					'dexterity',
+					'constitution',
+					'intelligence',
+					'wisdom',
+					'charisma',
+				],
 				skills: [
 					'acrobatics',
 					'animal Handling',
@@ -624,7 +413,12 @@
 					'sleight of Hand',
 					'stealth',
 					'survival',
-				]
+				],
+				actions: [
+					{ type: 'special_abilities', name: 'Special Abilities' },
+					{ type: 'actions', name: 'Actions' },
+					{ type: 'legendary_actions', name: 'Legendary Actions' }
+				],
 			}
 		},
 		firebase() {
@@ -711,46 +505,43 @@
 				})
 			},
 			add(type) {
-				if(type == 'action') {
+				if(type == 'actions') {
 					if(this.npc.actions == undefined) {
 						this.npc.actions = [];
-						console.log(this.npc.actions)
 					}
 					this.npc.actions.push({
 						name: 'New Action',
-						attack_bonus: '',
-						damage_dice: '',
-						damage_bonus: '',
-						desc: '',
 					});
 				}
-				else if(type == 'legendary') {
+				else if(type == 'legendary_actions') {
 					if(this.npc.legendary_actions == undefined) {
 						this.npc.legendary_actions = [];
 					}
 					this.npc.legendary_actions.push({
 						name: 'New Legendary Action',
-						attack_bonus: '',
-						damage_dice: '',
-						damage_bonus: '',
-						desc: '',
 					});
 				}
-				else if(type == 'special') {
+				else if(type == 'special_abilities') {
 					if(this.npc.special_abilities == undefined) {
 						this.npc.special_abilities = [];
 					}
 					this.npc.special_abilities.push({
 						name: 'New Special Ability',
-						attack_bonus: '',
-						damage_dice: '',
-						damage_bonus: '',
-						desc: '',
 					});
 				}
+				this.$forceUpdate(); //IMPORTANT
 			},
-			removeSkill(index) {
-				this.$delete(this.npcSkills, index);
+			remove(index, type) {
+				if(type == 'actions'){
+					this.$delete(this.npc.actions, index);
+				}
+				else if(type == 'special_abilities'){
+					this.$delete(this.npc.special_abilities, index);
+				}
+				else if(type == 'legendary_actions'){
+					this.$delete(this.npc.legendary_actions, index);
+				}
+				this.$forceUpdate(); //IMPORTANT
 			},
 			setQuick(input) {
 				if(input == 0) {
@@ -768,6 +559,9 @@
 .container {
 	padding:20px;
 
+	ul{
+		padding: 0;
+	}
 	a.tab {
 		display: inline-block;
 		padding: 10px;
@@ -778,15 +572,8 @@
 			color: #b2b2b2 !important;
 		}
 	}
-	// ul.entities {
-	// 	padding: 0;
-	// }
-	.img-container {
+	.img-container, img {
 		width: 100%;
-
-		img {
-			width: 100%;
-		}
 	}
 	label {
 		line-height: 30px;

@@ -4,7 +4,7 @@
 		<div id="my-content" class="container">
 			<div class="info">
 				<Crumble />
-				<h1>Encounter: <span class="blue">{{ encounter.encounter }}</span></h1>
+				<h1 v-if="encounter">Encounter: <span class="blue">{{ encounter.encounter }}</span></h1>
 				<p>Add players and NPC's to this encounter.</p>
 			</div>
 
@@ -64,7 +64,7 @@
 							<p v-if="noResult" class="red">{{ noResult }}</p>
 							<li v-for="npc in searchResults" class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
-									<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+									<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 									{{ npc.name }}
 								</div>
 								<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
@@ -81,7 +81,6 @@
 										{{ npc.name }}
 									</div>
 									<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
-									<!-- <span v-else><i class="fas fa-check"></i></span> -->
 								</li>
 							</ul>
 						</template>
@@ -98,7 +97,7 @@
 							{{ entity.name }}
 						</div>
 						<span>
-							<a v-if="entity.type == 'npc'" class="mr-2" v-b-tooltip.hover title="Edit (Coming Soon)"><i class="fas fa-hammer-war"></i></a>
+							<a v-if="entity.type == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
 							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
 						</span>
 					</li>
@@ -162,13 +161,23 @@
 				'fetchCampaign',
 				'setSlide'
 			]),
-			showSlide(npc) {
+			showSlide(type, npc, key) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'npc',
-					npc: npc
-				})
+				if(type == 'info') {
+					this.setSlide({
+						show: true,
+						type: 'npc',
+						npc: npc
+					})
+				}
+				else if(type == 'edit') {
+					this.setSlide({
+						show: true,
+						type: 'editNpc',
+						npc: npc,
+						key: key,
+					})
+				}
 			},
 			async getNPC(id) {
 				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
@@ -183,6 +192,8 @@
 					active: true,
 				}
 				if(type == 'npc') {
+					entity.active = true
+					
 					if(custom == false) {
 						var npc_data = await this.getNPC(id);
 						entity.str = npc_data.strength
@@ -194,11 +205,12 @@
 						entity.maxHp = npc_data.hit_points
 						entity.curHp = npc_data.hit_points
 						entity.ac = npc_data.armor_class
-						entity.active = true
 					}
 					else {
 						var npc_data = this.npcs;
 						entity.curHp = npc_data[id].maxHp
+						entity.maxHp = npc_data[id].maxHp
+						entity.ac = npc_data[id].ac
 					}
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
@@ -231,14 +243,6 @@
 					let name = this.players[player].character_name;
 					this.add(player, 'player', name)
 				}
-			},
-			showNPC(npc) {
-				this.viewNPC = []
-				this.viewNPC.push(npc)
-				this.showSide = true;
-			},
-			hideSide() {
-				this.showSide = false;
 			},
 			checkPlayer(id) {
 				return (Object.keys(this.encounter.entities).indexOf(id))

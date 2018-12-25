@@ -63,6 +63,12 @@ const mutations = {
 			curHp: db_entity.curHp,
 			active: db_entity.active,
 		}
+		if (db_entity.conditions) {
+			entity.conditions = db_entity.conditions
+		}
+		else {
+			entity.conditions = {}
+		}
 		switch(entity.type) {
 			case 'player':
 				let db_player = rootState.content.players[key]

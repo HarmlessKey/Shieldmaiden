@@ -14,35 +14,10 @@
 		</p>
 		<hr class="mb-4">
 		<div class="abilities">
-			<span class="ability str" @click="rollAbility('Strength', npc.strength)">
-				<span class="abilityName">STR</span>
-				{{ modifier(npc.strength) }}
-				<span class="score bg-gray">{{ npc.strength }}</span>
-			</span>
-			<span class="ability dex" @click="rollAbility('Dexterity', npc.dexterity)">
-				<span class="abilityName">DEX</span>
-				{{ modifier(npc.dexterity) }}
-				<span class="score bg-gray">{{ npc.dexterity }}</span>
-			</span>
-			<span class="ability con" @click="rollAbility('Constitution', npc.constitution)">
-				<span class="abilityName">CON</span>
-				{{ modifier(npc.constitution) }}
-				<span class="score bg-gray">{{ npc.constitution }}</span>
-			</span>
-			<span class="ability int" @click="rollAbility('Intelligence', npc.intelligence)">
-				<span class="abilityName">INT</span>
-				{{ modifier(npc.intelligence) }}
-				<span class="score bg-gray">{{ npc.intelligence }}</span>
-			</span>
-			<span class="ability wis" @click="rollAbility('Wisdom', npc.wisdom)">
-				<span class="abilityName">WIS</span>
-				{{ modifier(npc.wisdom) }}
-				<span class="score bg-gray">{{ npc.wisdom }}</span>
-			</span>
-			<span class="ability cha" @click="rollAbility('Charisma', npc.charisma)">
-				<span class="abilityName">CHA</span>
-				{{ modifier(npc.charisma) }}
-				<span class="score bg-gray">{{ npc.charisma }}</span>
+			<span v-for="ability, index in abilities" :key="index" class="ability" @click="rollAbility(ability, npc[ability])">
+				<span class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</span>
+				{{ modifier(npc[ability]) }}
+				<span class="score bg-gray">{{ npc[ability] }}</span>
 			</span>
 		</div>
 		<hr>
@@ -50,8 +25,9 @@
 		<!-- SKILLS -->
 		<p>
 			<b>Skills</b>
-			<span v-if="npc.perception"> Perception +{{ npc.perception }},</span>
-			<span v-if="npc.stealth"> Stealth +{{ npc.stealth }}</span>
+			<span v-for="skill, index in skills" :key="index" v-if="npc[skill]">
+				{{ skill }} {{ npc[skill] }},
+			</span>
 			<br/>
 			<b>Senses</b> {{ npc.senses }}<br/>
 			<b>Languages</b> {{ npc.languages }}<br/>
@@ -64,17 +40,17 @@
 		</div>
 		<hr>
 		<h2>Actions</h2>
-		<div v-for="(action, key) in npc.actions" :key="key">
-			<a data-toggle="collapse" v-bind:href="'#action-'+key" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
-			<p class="collapse" v-bind:id="'action-'+key">{{ action.desc }}</p>
+		<div v-for="(action, index) in npc.actions" :key="index">
+			<a data-toggle="collapse" v-bind:href="'#action-'+index" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
+			<p class="collapse" v-bind:id="'action-'+index">{{ action.desc }}</p>
 		</div>
 
 		<template v-if="npc.legendary_actions">
 			<hr>
 			<h2>Legendary Actions</h2>
-			<div v-for="(legendary_action, key) in npc.legendary_actions" :key="key">
-				<a data-toggle="collapse" v-bind:href="'#legendary-action-'+key" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
-				<p class="collapse" v-bind:id="'legendary-action-'+key">{{ legendary_action.desc }}</p>
+			<div v-for="(legendary_action, index) in npc.legendary_actions" :key="index">
+				<a data-toggle="collapse" v-bind:href="'#legendary-action-'+index" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" v-bind:id="'legendary-action-'+index">{{ legendary_action.desc }}</p>
 			</div>
 		</template>
 	</div>
@@ -86,6 +62,38 @@
 		props: [
 		'npc'
 		],
+		data() {
+			return {
+				abilities: [
+					'strength',
+					'dexterity',
+					'constitution',
+					'intelligence',
+					'wisdom',
+					'charisma',
+				],
+				skills: [
+					'acrobatics',
+					'animal Handling',
+					'arcana',
+					'athletics',
+					'deception',
+					'history',
+					'insight',
+					'intimidation',
+					'investigation',
+					'medicine',
+					'nature',
+					'perception',
+					'performance',
+					'persuasion',
+					'religion',
+					'sleight of Hand',
+					'stealth',
+					'survival',
+				],
+			}
+		},
 		methods: {
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)

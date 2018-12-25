@@ -15,23 +15,23 @@ export function Entity(key) {
 			this.img = db_player.avatar
 			this.ac = db_player.ac
 			this.maxHp = db_player.maxHp
-			this.str = db_player.str
-			this.dex = db_player.dex
-			this.con = db_player.con
-			this.int = db_player.int
-			this.wis = db_player.wis
-			this.cha = db_player.cha
+			this.strengt = db_player.strength
+			this.dexterity = db_player.dexterity
+			this.constitution = db_player.constitution
+			this.intelligence = db_player.intelligence
+			this.wisdom = db_player.wisdom
+			this.charisma = db_player.charisma
 			break
 		case 'npc':
 			this.img = require('@/assets/_img/styles/monster.svg')
 			this.ac = db_entity.ac
 			this.maxHp = db_entity.maxHp
-			this.str = db_entity.str
-			this.dex = db_entity.dex
-			this.con = db_entity.con
-			this.int = db_entity.int
-			this.wis = db_entity.wis
-			this.cha = db_entity.cha
+			this.strength = db_entity.strength
+			this.dexterity = db_entity.dex
+			this.constitution = db_entity.constitution
+			this.intelligence = db_entity.intelligence
+			this.wisdom = db_entity.wisdom
+			this.charisma = db_entity.charisma
 			//TODO: get npc data
 			break
 	}

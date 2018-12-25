@@ -1,13 +1,44 @@
 <template>
 	<div id="targets" class="bg-gray">
-			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Targets ({{ _targets.length }})</h2>
+			<h2 
+				class="componentHeader" 
+				:class="{ shadow : setShadow > 0 }">
+				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 					<div>
-						<transition-group tag="ul" class="targets active_targets pt-3" name="targets" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+						<transition-group 
+							tag="ul" 
+							class="targets active_targets pt-3" 
+							name="targets" 
+							enter-active-class="animated fadeInUp" 
+							leave-active-class="animated fadeOutDown">
 							<template v-for="(entity,_,i) in _targets">
-								<li @click="setTarget(getTargetData(entity))" v-bind:key="entity.key" :class="{ targeted : currentTarget.key == entity.key }">
-									<TargetItem :item="getTargetData(entity)" />
+								<li 
+									class="d-flex justify-content-between" 
+									v-bind:key="entity.key" 
+									:class="{ targeted : currentTarget.key == entity.key }">
+									<div class="target" @click="setTarget(getTargetData(entity))">
+										<TargetItem :item="getTargetData(entity)" />
+									</div>
+									<span>
+										<a class="options"
+											id="options"
+											data-toggle="dropdown" 
+											aria-haspopup="true" 
+											aria-expanded="false">
+											<i class="fas fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu" aria-labelledby="options">	
+											<div class="dropdown-header">{{ entity.name }}</div>
+											<a class="dropdown-item"><i class="fas fa-dice-d20"></i> Initiative</a>
+											<a class="dropdown-item" @click="conditions(entity)">Conditions</a>
+											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item">Remove</a>
+										</div>
+									</span>
 								</li>
 							</template>
 						</transition-group>
@@ -23,7 +54,7 @@
 							</ul>
 						</template>
 						<hr>
-						<h2>Down</h2>
+						<h2><i class="fas fa-skull-crossbones"></i> Down</h2>
 					</div>
 				</div>
 			</div>
@@ -33,7 +64,7 @@
 <script>
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 	import TargetItem from '@/components/combat/TargetItem.vue'
 
 	export default {
@@ -62,6 +93,17 @@
 			},
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
+			conditions(entity) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'conditions',
+					entity: entity
+				})
+			},
 			setTarget(entity) {
 				if (this.currentTarget.key == entity.key) {
 					this.currentTarget = {}
@@ -106,6 +148,10 @@
 	grid-area: targets;
 	overflow: hidden;
 
+	.target {
+		width: 100%;
+	}
+
 	h2.componentHeader {
 		padding: 10px 15px !important;
 		margin-bottom: 0 !important;
@@ -113,6 +159,21 @@
 		&.shadow {
 			box-shadow: 0 0 10px rgba(0,0,0,0.5); 
 		}
+	}
+	a.options {
+		display: inline-block;
+		height: 30px;
+		line-height: 30px;
+		padding: 0 5px 0 15px;
+		color: #b2b2b2 !important;
+
+		&:hover {
+			color: #2c97de !important;
+		}
+	}
+	.dropdown-menu {
+		left: -30px !important;
+		top: 0px !important;
 	}
 }
 .scroll {
@@ -128,7 +189,6 @@ ul.targets {
 		margin-bottom: 8px;
 		border: solid 1px #262626;
 		cursor: pointer;
-		padding-right: 5px;
 
 		&:hover {
 			border-color: #2c97de;

@@ -75,23 +75,23 @@ const mutations = {
 				entity.img = db_player.avatar
 				entity.ac = db_player.ac
 				entity.maxHp = db_player.maxHp
-				entity.str = db_player.str
-				entity.dex = db_player.dex
-				entity.con = db_player.con
-				entity.int = db_player.int
-				entity.wis = db_player.wis
-				entity.cha = db_player.cha
+				entity.strength = db_player.strength
+				entity.dexterity = db_player.dexterity
+				entity.constitution = db_player.constitution
+				entity.intelligence = db_player.intelligence
+				entity.wisdom = db_player.wisdom
+				entity.charisma = db_player.charisma
 				break
 			case 'npc':
 				entity.img = require('@/assets/_img/styles/monster.svg')
 				entity.ac = db_entity.ac
 				entity.maxHp = db_entity.maxHp
-				entity.str = db_entity.str
-				entity.dex = db_entity.dex
-				entity.con = db_entity.con
-				entity.int = db_entity.int
-				entity.wis = db_entity.wis
-				entity.cha = db_entity.cha
+				entity.strength = db_entity.str
+				entity.dexterity = db_entity.dexterity
+				entity.constitution = db_entity.constitution
+				entity.intelligence = db_entity.eintelligence
+				entity.wisdom = db_entity.wisdom
+				entity.charisma = db_entity.charisma
 				//TODO: get npc data
 				break
 		}

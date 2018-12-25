@@ -334,21 +334,29 @@ a {
 }
 .dropdown-menu {
 	border-radius: 0;
+	border: none !important;
 	background: $gray-dark;
 	color: $gray-light;
+	font-size: 12px !important;
 	
 	a { 
-		color: $gray-light;
+		color: $gray-light !important;
 		&:hover { 
-			color: $blue;
+			color: $blue !important;
 			background: none;
 		}
+	}
+	.dropdown-header {
+		padding-bottom: 5px !important;
+		color: $gray-light;
+		font-size: 13px;
 	}
 }
 
 hr { background: $gray-dark; }
 
 .form-control, .custom-select { 
+	-webkit-appearance: none;
 	border-radius: 0 !important;
 	background: $black !important;
 	border: solid 1px $gray !important;
@@ -403,7 +411,19 @@ ul.nav {
 	background: $gray-dark !important;
 	padding: 0 !important;
 }
+.popover {
+	border-radius: 0 !important;
 
+	.popover-header {
+		margin-bottom: 0 !important;
+		color: $gray-dark;
+		text-transform: capitalize;
+	}
+	// .popover-body {
+	// 	background-color: $gray-dark;
+	// 	color: $gray-light;
+	// }
+}
 .card {
 	background-color: $gray !important;
 	border-radius: 0 !important;

@@ -1,7 +1,7 @@
 <template>
 	<div class="grid">
 		<div id="home" class="container">
-			<h1>D&D 5e Combat Service</h1>
+			<h1>Give your players the attention they deserve!</h1>
 			<p>
 				When running encounters in Dungeons & Dragons, there is alot to keep track of. 
 				Our app keeps track of everything you need to know and displays it in a structured overview.

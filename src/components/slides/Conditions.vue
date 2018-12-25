@@ -1,10 +1,17 @@
 <template>
 	<div class="pb-5">
-		<h2>Conditions {{ entityKey }}</h2>
+		<h2>Conditions {{ entity.name }}</h2>
 		<ul class="conditions">
 			<li v-for="condition, index in conditions" :key="index">
-				<div class="d-flex justify-content-between">
-					<span class="text-capitalize" :class="{ 'gray-light': check(condition['.key']) == true }">{{ condition['.key'] }}</span>
+				<div class="d-flex justify-content-between" :class="{ 'status': check(condition['.key']) == true }">
+					<span class="d-flex justify-content-left">	
+						<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+							<path :d="condition.icon" fill-opacity="1"></path>
+						</svg>
+						<span class="text-capitalize">
+							{{ condition['.key'] }}
+						</span>
+					</span>
 					<span>
 						<a v-if="check(condition['.key']) == false" class="mr-3" @click="set(condition['.key'])"><i class="fas fa-plus-circle"></i></a>
 						<a v-else class="gray-light mr-3" @click="remove(condition['.key'])"><i class="fas fa-minus-circle"></i></a>
@@ -18,6 +25,7 @@
 					</span>
 				</div>
 				<p class="collapse shown" v-bind:id="'cond_'+index">
+					{{ condition.condition }}
 					<ul>
 						<li v-for="effect, index in condition.effects" :key="index">
 							{{ effect }}
@@ -36,7 +44,7 @@
 	export default {
 		name: 'Conditions',
 		props: [
-		'entityKey',
+		'entity',
 		],
 		data() {
 			return {
@@ -49,7 +57,7 @@
 			return {
 				conditions: db.ref('conditions'),
 				entityConditions: {
-					 source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+					 source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}`),
 					 asObject: true
 				}
 			}
@@ -64,13 +72,13 @@
 				'setSlide'
 			]),
 			set(condition) {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/conditions/${condition}`).set('true');
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/conditions/${condition}`).set('true');
 			},
 			remove(condition) {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/conditions/${condition}`).remove();
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/conditions/${condition}`).remove();
 			},
 			check(condition) {
-				return this.entities[this.entityKey].conditions.hasOwnProperty(condition)
+				return this.entities[this.entity.key].conditions.hasOwnProperty(condition)
 			},
 		}
 	};
@@ -81,9 +89,16 @@
 		list-style: none;
 		padding: 0;
 		color: #494747;
+		line-height: 20px;
 
 		a {
 			color: #494747 !important;
+		}
+		svg.icon {
+			width: 20px;
+			height: 20px;
+			margin-right: 5px;
+			fill: #494747;
 		}
 
 		li {
@@ -97,6 +112,14 @@
 					margin: 0;
 				}
 				margin: 10px 0;				
+			}
+		}
+		.status {
+			color: #b2b2b2;
+
+			svg {
+				color: #b2b2b2;
+				fill: #b2b2b2;
 			}
 		}
 	}

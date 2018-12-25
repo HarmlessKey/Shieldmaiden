@@ -34,7 +34,7 @@
 							<td class="text-right actions">
 								<router-link class="mx-2" 
 									:to="'/npcs/' + npc.key" 
-									v-b-tooltip.hover title="Edit"><i class="fas fa-edit"></i>
+									v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i>
 								</router-link>
 								<a v-b-tooltip.hover 
 									title="Delete" 

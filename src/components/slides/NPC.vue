@@ -2,19 +2,26 @@
 	<div class="pb-5">
 		<h2>{{ npc.name }}</h2>
 		<i>
-			{{ npc.size }} {{ npc.type }}
-			<span v-if="npc.subtype != ''">({{ npc.subtype }})</span>,
-			{{ npc.alignment }}
+			<template v-if="npc.size">{{ npc.size }}</template>
+			<template v-if="npc.type"> {{ npc.type }}</template>
+			<span v-if="npc.subtype">({{ npc.subtype }})</span>
+			<template v-if="npc.alignment">, {{ npc.alignment }}</template>
 		</i>
 		<hr>
 		<p>
-			<b>Armor Class</b> {{ npc.armor_class }}<br/>
-			<b>Hit Points</b> {{ npc.hit_points }} ({{ npc.hit_dice }})<br/>
-			<b>Speed</b> {{ npc.speed }}
+			<template v-if="npc.armor_class"><b>Armor Class</b> {{ npc.armor_class }}<br/></template>
+			<template v-else><b>Armor Class</b> {{ npc.ac }}<br/></template>
+			<template v-if="npc.hit_points"><b>Hit Points</b> {{ npc.hit_points }}</template>
+			<template v-else><b>Hit Points</b> {{ npc.maxHp }}</template>
+			<template v-if="npc.hit_dice">({{ npc.hit_dice }})</template>
+			<template v-if="npc.speed"><br/><b>Speed</b> {{ npc.speed }}</template>
 		</p>
-		<hr class="mb-4">
 		<div class="abilities">
-			<span v-for="ability, index in abilities" :key="index" class="ability" @click="rollAbility(ability, npc[ability])">
+			<span v-for="ability, index in abilities" 
+				:key="index" 
+				class="ability" 
+				@click="rollAbility(ability, npc[ability])"
+				v-if="npc[ability]">
 				<span class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</span>
 				{{ modifier(npc[ability]) }}
 				<span class="score bg-gray">{{ npc[ability] }}</span>
@@ -24,26 +31,34 @@
 
 		<!-- SKILLS -->
 		<p>
-			<b>Skills</b>
-			<span v-for="skill, index in skills" :key="index" v-if="npc[skill]">
-				{{ skill }} {{ npc[skill] }},
-			</span>
-			<br/>
-			<b>Senses</b> {{ npc.senses }}<br/>
-			<b>Languages</b> {{ npc.languages }}<br/>
-			<b>Challenge Rating</b> {{ npc.challenge_rating }}<br/>
+			<template v-if="npc.skills">
+				<b>Skills</b>
+				<span v-for="skill, index in skills" :key="index" v-if="npc[skill]">
+					{{ skill }} {{ npc[skill] }},
+				</span>
+				<br/>
+			</template>
+			<template v-if="npc.senses"><b>Senses</b> {{ npc.senses }}<br/></template>
+			<template v-if="npc.languages"><b>Languages</b> {{ npc.languages }}<br/></template>
+			<template v-if="npc.challenge_rating"><b>Challenge Rating</b> {{ npc.challenge_rating }}</template>
 		</p>
-		<hr>
-		<div class="mb-3" v-for="(ability, index) in npc.special_abilities" :key="index">
-			<a data-toggle="collapse" v-bind:href="'#ability-'+index" role="button" aria-expanded="false">{{ ability.name }} <i class="fas fa-caret-down"></i></a>
-			<p class="collapse" v-bind:id="'ability-'+index">{{ ability.desc }}</p>
-		</div>
-		<hr>
-		<h2>Actions</h2>
-		<div v-for="(action, index) in npc.actions" :key="index">
-			<a data-toggle="collapse" v-bind:href="'#action-'+index" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
-			<p class="collapse" v-bind:id="'action-'+index">{{ action.desc }}</p>
-		</div>
+
+		<template v-if="npc.special_abilities">
+			<hr>
+			<div class="mb-3" v-for="(ability, index) in npc.special_abilities" :key="index">
+				<a data-toggle="collapse" v-bind:href="'#ability-'+index" role="button" aria-expanded="false">{{ ability.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" v-bind:id="'ability-'+index">{{ ability.desc }}</p>
+			</div>
+		</template>
+
+		<template v-if="npc.actions">
+			<hr>
+			<h2>Actions</h2>
+			<div v-for="(action, index) in npc.actions" :key="index">
+				<a data-toggle="collapse" v-bind:href="'#action-'+index" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" v-bind:id="'action-'+index">{{ action.desc }}</p>
+			</div>
+		</template>
 
 		<template v-if="npc.legendary_actions">
 			<hr>
@@ -122,12 +137,15 @@ h2 {
 	margin-bottom:5px !important;
 }
 .abilities {
+	padding-top: 30px;
 	display: grid;
-	grid-template-columns: 42px 42px 42px 42px 42px 42px;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 	grid-template-rows: auto;
 	grid-gap: 10px;
 	grid-template-areas: 
 	"str dex con int wis cha";
+
+	border-top: solid 1px #191919;
 }
 .ability {
 	width: 42px;

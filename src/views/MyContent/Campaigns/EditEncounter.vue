@@ -196,12 +196,12 @@
 					
 					if(custom == false) {
 						var npc_data = await this.getNPC(id);
-						entity.str = npc_data.strength
-						entity.dex = npc_data.dexterity
-						entity.con = npc_data.constitution
-						entity.int = npc_data.intelligence
-						entity.wis = npc_data.wisdom
-						entity.cha = npc_data.charisma
+						entity.strength = npc_data.strength
+						entity.dexterity = npc_data.dexterity
+						entity.constitution = npc_data.constitution
+						entity.intelligence = npc_data.intelligence
+						entity.wisdom = npc_data.wisdom
+						entity.charisma = npc_data.charisma
 						entity.maxHp = npc_data.hit_points
 						entity.curHp = npc_data.hit_points
 						entity.ac = npc_data.armor_class

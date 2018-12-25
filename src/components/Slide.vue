@@ -4,7 +4,7 @@
 		<Roll v-if="slide.type == 'roll'"/>
 		<NPC v-if="slide.type == 'npc'" :npc="slide.npc" />
 		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
-		<Conditions v-if="slide.type == 'conditions'" :entityKey="slide.key" />
+		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
 	</div>
 </template>
 

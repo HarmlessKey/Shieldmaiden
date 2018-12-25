@@ -1,23 +1,57 @@
 <template>
-	<div id="current" class="bg-gray">
+	<div id="current" class="bg-gray" v-if="current">
 		<h2>Current</h2>
-		<div class="scroll" v-bar v-if="current">
+		<div class="scroll" v-bar>
 			<div>
-				<!-- <p>{{ getNPC(current.id) }}</p> -->
-				<div>
-					{{ this.current }}
+				<div class="current">
+					<div class="health">
+						<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
+						<div class="progress health-bar">
+							<span>{{ current.curHp }} / {{ current.maxHp }}</span>
+							<div class="progress-bar" :class="{ 
+								'bg-red': percentage(current.curHp, current.maxHp) < 33, 
+								'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
+								'bg-green': percentage(current.curHp, current.maxHp) > 7
+								}" 
+								role="progressbar" 
+								:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+							</div>
+						</div>
+					</div>
+					<b-row class="conditions">
+						<b-col sm="1" v-for="condition, key in current.conditions" :key="key">
+							<svg v-b-popover.hover="conditions[key].condition" :title="key" class="icon text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path :d="conditions[key].icon" fill-opacity="1"></path>
+							</svg>
+						</b-col>
+					</b-row>
+					<!-- {{ current.type }} -->
+					<NPC class="mt-3" :npc="current" />
 				</div>
-				<!-- <NPC v-if="current.type == 'npc'" :npc="getNPC(current.id)" /> -->
+				
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
+	import NPC from '@/components/slides/NPC.vue';
 
 	export default {
 		name: 'Current',
+		components: {
+			NPC: NPC,
+		},
+		firebase() {
+			return {
+				conditions: {
+					source: db.ref('conditions'),
+					asObject: true
+				}
+			}
+		},
 		computed: {
 			...mapGetters([
 				'entities',
@@ -27,8 +61,14 @@
 			current: function() {
 				let current_key = this.active[this.turn].key
 				return this.entities[current_key]
-			}
+			},
 		},
+		methods: {
+			percentage(current, max) {
+				var hp_percentage = Math.floor(current / max * 100)
+				return hp_percentage
+			},
+		}
 	}
 </script>
 
@@ -38,12 +78,59 @@
 	grid-area: current;
 	overflow: hidden;
 	
+	.current {
+		padding: 0 10px;
+	}
+	.scroll {
+		height: calc(100% - 30px);
+	}
 	h2 {
 		padding-left: 10px !important;
-		margin-bottom: 10px !important;
+	}
+	.health {
+		display: grid;
+		grid-template-columns: 30px 1fr;
+		grid-template-rows: auto;
+		grid-gap: 0;
+		grid-template-areas: 
+		"img hp-bar";
+
+		margin-bottom: 10px;
+
+		.img {
+			background-color: #191919;
+			background-position: center top;
+			background-repeat: no-repeat;
+			background-size: cover;
+			grid-area: img;
+		}
+		.progress { 
+			height: 30px;
+			line-height: 30px;
+			background-color: #4c4c4c;
+			position: relative;
+
+			span { 
+				color:#191919;
+				position: absolute;
+				left: 5px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis !important;
+			}
+		}
+	}
+	.conditions {
+		margin-bottom: 10px;
+
+		svg {
+			width: 30px;
+			height: 30px;
+			fill: #cc3e4a;
+			background-color: #302f2f;
+			padding: 2px;
+		}
 	}
 }
-.scroll {
-	height: calc(100% - 30px);
-}
+
 </style>

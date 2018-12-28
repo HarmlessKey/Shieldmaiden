@@ -5,6 +5,7 @@ import _ from 'lodash'
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
+const npcs_ref = db.ref('npcs')
 
 // export const encounter_module = {
 const state = {
@@ -59,9 +60,12 @@ const mutations = {
 			name: db_entity.name,
 			id: db_entity.id,
 			initiative: db_entity.initiative,
-			type: db_entity.type,
+			entityType: db_entity.entityType,
+			maxHp: db_entity.maxHp,
 			curHp: db_entity.curHp,
+			ac: db_entity.ac,
 			active: db_entity.active,
+			npc: db_entity.npc,
 		}
 		if (db_entity.conditions) {
 			entity.conditions = db_entity.conditions
@@ -69,8 +73,8 @@ const mutations = {
 		else {
 			entity.conditions = {}
 		}
-		switch(entity.type) {
-			case 'player':
+		switch(true) {
+			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
 				entity.img = db_player.avatar
 				entity.ac = db_player.ac
@@ -82,17 +86,48 @@ const mutations = {
 				entity.wisdom = db_player.wisdom
 				entity.charisma = db_player.charisma
 				break
-			case 'npc':
-				entity.img = require('@/assets/_img/styles/monster.svg')
-				entity.ac = db_entity.ac
-				entity.maxHp = db_entity.maxHp
-				entity.strength = db_entity.str
-				entity.dexterity = db_entity.dexterity
-				entity.constitution = db_entity.constitution
-				entity.intelligence = db_entity.eintelligence
-				entity.wisdom = db_entity.wisdom
-				entity.charisma = db_entity.charisma
-				//TODO: get npc data
+			case ((entity.entityType == 'npc') && (entity.npc == 'custom')):
+				let db_npc = rootState.content.npcs[entity.id]
+				if(db_npc.avatar) {
+					entity.img = db_npc.avatar;
+				}
+				else {
+					entity.img = require('@/assets/_img/styles/monster.svg');
+				}
+				entity.size = db_npc.size
+				entity.type = db_npc.type
+				entity.subtype = db_npc.subtype
+				entity.alignment = db_npc.alignment
+				entity.challenge_rating = db_npc.challenge_rating
+				entity.hit_dice = db_npc.hit_dice
+				entity.speed = db_npc.speed
+				entity.senses = db_npc.senses
+				entity.languages = db_npc.languages
+
+				entity.strength = db_npc.strength
+				entity.dexterity = db_npc.dexterity
+				entity.constitution = db_npc.constitution
+				entity.intelligence = db_npc.intelligence
+				entity.wisdom = db_npc.wisdom
+				entity.charisma = db_npc.charisma
+
+				entity.strength_save = db_npc.strength_save
+				entity.dexterity_save = db_npc.dexterity_save
+				entity.constitution_save = db_npc.constitution_save
+				entity.intelligence_save = db_npc.intelligence_save
+				entity.wisdom_save = db_npc.wisdom_save
+				entity.charisma_save = db_npc.charisma_save
+
+				entity.damage_vulnerabilities = db_npc.damage_vulnerabilities
+				entity.damage_resistances = db_npc.damage_resistances
+				entity.damage_immunities = db_npc.damage_immunities
+				entity.condition_immunities = db_npc.condition_immunities
+
+				entity.special_abilities = db_npc.special_abilities
+				entity.actions = db_npc.actions
+				entity.legendary_actions = db_npc.legendary_actions
+				break
+			case ((entity.entityType == 'npc') && (entity.npc == 'api')):
 				break
 		}
 		state.entities[key] = entity

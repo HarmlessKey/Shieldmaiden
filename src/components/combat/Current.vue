@@ -1,41 +1,44 @@
 <template>
-	<div id="current" class="bg-gray" v-if="current">
-		<h2>Current</h2>
-		<div class="scroll" v-bar>
-			<div>
-				<div class="current">
-					<div class="health">
-						<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
-						<div class="progress health-bar">
-							<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
-							<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
-							<div class="progress-bar" :class="{ 
-								'bg-red': percentage(current.curHp, current.maxHp) < 33, 
-								'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
-								'bg-green': percentage(current.curHp, current.maxHp) > 7
-								}" 
-								role="progressbar" 
-								:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+	<div id="current" class="bg-gray">
+		<template v-if="current">
+			<h2>Current</h2>
+			<div class="scroll" v-bar>
+				<div>
+					<div class="current">
+						<div class="health">
+							<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
+							<div class="progress health-bar">
+								<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
+								<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
+								<div class="progress-bar" :class="{ 
+									'bg-red': percentage(current.curHp, current.maxHp) < 33, 
+									'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
+									'bg-green': percentage(current.curHp, current.maxHp) > 7
+									}" 
+									role="progressbar" 
+									:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+								</div>
 							</div>
 						</div>
+						<b-row class="conditions">
+							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(conditions[key])">
+								<svg 
+								v-if="conditions[key]"
+								v-b-popover.hover="conditions[key].condition" 
+								:title="key" 
+								class="icon text" 
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 512 512">
+									<path :d="conditions[key].icon" fill-opacity="1"></path>
+								</svg>
+							</b-col>
+						</b-row>
+						<NPC class="mt-3" :npc="current" />
 					</div>
-					<b-row class="conditions" v-if="conditions">
-						<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(conditions[key])">
-							<svg 
-							v-b-popover.hover="conditions[key].condition" 
-							:title="key" 
-							class="icon text" 
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 512 512">
-								<path :d="conditions[key].icon" fill-opacity="1"></path>
-							</svg>
-						</b-col>
-					</b-row>
-					<NPC class="mt-3" :npc="current" />
 				</div>
-				
 			</div>
-		</div>
+		</template>
+		<div v-else class="loader"><span>Loading current...</span></div>
 	</div>
 </template>
 
@@ -73,8 +76,7 @@
 				'setSlide'
 			]),
 			showCondition(show) {
-				// console.log(show)
-				event.stopPropagation();
+				// event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'condition',
@@ -153,6 +155,7 @@
 			fill: #cc3e4a;
 			background-color: #302f2f;
 			padding: 2px;
+			cursor: pointer;
 		}
 	}
 }

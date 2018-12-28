@@ -13,7 +13,7 @@
 			<template v-else><b>Armor Class</b> {{ npc.ac }}<br/></template>
 			<template v-if="npc.hit_points"><b>Hit Points</b> {{ npc.hit_points }}</template>
 			<template v-else><b>Hit Points</b> {{ npc.maxHp }}</template>
-			<template v-if="npc.hit_dice">({{ npc.hit_dice }})</template>
+			<template v-if="npc.hit_dice"> ({{ npc.hit_dice }})</template>
 			<template v-if="npc.speed"><br/><b>Speed</b> {{ npc.speed }}</template>
 		</p>
 		<div class="abilities">
@@ -21,11 +21,11 @@
 				v-b-tooltip.hover title="Roll"
 				:key="index" 
 				class="ability" 
-				@click="rollAbility(ability, npc[ability])"
-				v-if="npc[ability]">
-				<span class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</span>
-				{{ modifier(npc[ability]) }}
-				<span class="score bg-gray">{{ npc[ability] }}</span>
+				@click="rollAbility(ability.ability, npc[ability.ability])"
+				v-if="npc[ability.ability]">
+				<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
+				{{ modifier(npc[ability.ability]) }}
+				<span class="score bg-gray">{{ npc[ability.ability] }}</span>
 			</span>
 		</div>
 		<hr>
@@ -39,6 +39,10 @@
 				</span>
 				<br/>
 			</template>
+			<template v-if="npc.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ npc.damage_vulnerabilities }}<br/></template>
+			<template v-if="npc.damage_resistances"><b>Damage resistances</b> {{ npc.damage_resistances }}<br/></template>
+			<template v-if="npc.damage_immunities"><b>Damage immunities</b> {{ npc.damage_immunities }}<br/></template>
+			<template v-if="npc.condition_immunities"><b>Condition immunities</b> {{ npc.condition_immunities }}<br/></template>
 			<template v-if="npc.senses"><b>Senses</b> {{ npc.senses }}<br/></template>
 			<template v-if="npc.languages"><b>Languages</b> {{ npc.languages }}<br/></template>
 			<template v-if="npc.challenge_rating"><b>Challenge Rating</b> {{ npc.challenge_rating }}</template>
@@ -46,33 +50,34 @@
 
 		<template v-if="npc.special_abilities">
 			<hr>
-			<div class="mb-3" v-for="(ability, index) in npc.special_abilities" :key="index">
-				<a data-toggle="collapse" v-bind:href="'#ability-'+index" role="button" aria-expanded="false">{{ ability.name }} <i class="fas fa-caret-down"></i></a>
-				<p class="collapse" v-bind:id="'ability-'+index">{{ ability.desc }}</p>
+			<div class="mb-3" v-for="ability, index in npc.special_abilities">
+				<a data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">{{ index + 1 }}. {{ ability.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" :id="'ability-'+index">{{ ability.desc }}</p>
 			</div>
 		</template>
 
 		<template v-if="npc.actions">
 			<hr>
 			<h2>Actions</h2>
-			<div v-for="(action, index) in npc.actions" :key="index">
-				<a data-toggle="collapse" v-bind:href="'#action-'+index" role="button" aria-expanded="false">{{ action.name }} <i class="fas fa-caret-down"></i></a>
-				<p class="collapse" v-bind:id="'action-'+index">{{ action.desc }}</p>
+			<div v-for="action, index in npc.actions">
+				<a data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">{{ index + 1 }}. {{ action.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" :id="'action-'+index">{{ action.desc }}</p>
 			</div>
 		</template>
 
 		<template v-if="npc.legendary_actions">
 			<hr>
 			<h2>Legendary Actions</h2>
-			<div v-for="(legendary_action, index) in npc.legendary_actions" :key="index">
-				<a data-toggle="collapse" v-bind:href="'#legendary-action-'+index" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
-				<p class="collapse" v-bind:id="'legendary-action-'+index">{{ legendary_action.desc }}</p>
+			<div v-for="(legendary_action, index) in npc.legendary_actions">
+				<a data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
+				<p class="collapse" :id="'legendary-action-'+index">{{ legendary_action.desc }}</p>
 			</div>
 		</template>
 	</div>
 </template>
 
 <script>
+	import { db } from '@/firebase'
 	export default {
 		name: 'NPC',
 		props: [
@@ -80,14 +85,6 @@
 		],
 		data() {
 			return {
-				abilities: [
-					'strength',
-					'dexterity',
-					'constitution',
-					'intelligence',
-					'wisdom',
-					'charisma',
-				],
 				skills: [
 					'acrobatics',
 					'animal Handling',
@@ -108,6 +105,11 @@
 					'stealth',
 					'survival',
 				],
+			}
+		},
+		firebase() {
+			return {
+				abilities: db.ref('abilities')
 			}
 		},
 		methods: {

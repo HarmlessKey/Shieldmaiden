@@ -2,10 +2,26 @@
 	<div id="actions" class="bg-gray">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
-				<a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Manual</a>
+				<a class="nav-link active" 
+					id="manual-tab" 
+					data-toggle="tab" 
+					href="#manual" 
+					role="tab" 
+					aria-controls="manual" 
+					aria-selected="true">
+					Manual
+				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Select</a>
+				<a class="nav-link" 
+					id="select-tab" 
+					data-toggle="tab" 
+					href="#select" 
+					role="tab" 
+					aria-controls="select" 
+					aria-selected="false">
+					Select
+				</a>
 			</li>
 		</ul>
 		<div class="scroll" v-bar>
@@ -36,9 +52,22 @@
 							</select>
 
 							<div class="manual">
-								<input type="phone" v-model="manualAmount" v-validate="'numeric'" name="Manual Input" class="form-control manual-input">
-								<button class="btn dmg bg-red" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'damage')"><i class="fas fa-minus-square"></i></button>
-								<button class="btn heal bg-green" :class="{disabled: errors.has('Manual Input') || manualAmount == ''}" @click="setManual(target, 'healing')"><i class="fas fa-plus-square"></i></button>
+								<input type="number" 
+									v-model="manualAmount" 
+									v-validate="'numeric'" 
+									name="Manual Input" 
+									min="0"
+									class="form-control manual-input">
+								<button class="btn dmg bg-red" 
+									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+									@click="setManual(target, 'damage')">
+									<i class="fas fa-minus-square"></i>
+								</button>
+								<button class="btn heal bg-green" 
+									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+									@click="setManual(target, 'healing')">
+									<i class="fas fa-plus-square"></i>
+								</button>
 							</div>
 							<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 							<div v-if="target.type == 'player'">

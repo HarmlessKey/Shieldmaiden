@@ -5,7 +5,9 @@ export function Entity(key) {
 	this.id = db_entity.id
 	this.initiative = db_entity.initiative
 	this.type = db_entity.type
+	this.maxHp = db_entity.maxHp
 	this.curHp = db_entity.curHp
+	this.ac = db_entity.ac
 	this.active = db_entity.active
 
 	//Get type specific data

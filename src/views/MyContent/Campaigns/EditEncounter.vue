@@ -92,12 +92,13 @@
 				<ul class="entities" v-if="encounter">
 					<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<span v-if="entity.type == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-							<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
+							<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+							<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+							<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
 							{{ entity.name }}
 						</div>
 						<span>
-							<a v-if="entity.type == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
+							<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
 							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
 						</span>
 					</li>
@@ -187,7 +188,7 @@
 				var entity = {
 					id: id,
 					name: name,
-					type: type,
+					entityType: type,
 					initiative: 0,
 					active: true,
 				}
@@ -196,18 +197,14 @@
 					
 					if(custom == false) {
 						var npc_data = await this.getNPC(id);
-						entity.strength = npc_data.strength
-						entity.dexterity = npc_data.dexterity
-						entity.constitution = npc_data.constitution
-						entity.intelligence = npc_data.intelligence
-						entity.wisdom = npc_data.wisdom
-						entity.charisma = npc_data.charisma
-						entity.maxHp = npc_data.hit_points
+						entity.npc = 'api'
 						entity.curHp = npc_data.hit_points
+						entity.maxHp = npc_data.hit_points
 						entity.ac = npc_data.armor_class
 					}
 					else {
 						var npc_data = this.npcs;
+						entity.npc = 'custom'
 						entity.curHp = npc_data[id].maxHp
 						entity.maxHp = npc_data[id].maxHp
 						entity.ac = npc_data[id].ac
@@ -217,6 +214,8 @@
 				else if (type == 'player') {
 					var player_data = this.players;
 					entity.curHp = player_data[id].maxHp
+					entity.maxHp = player_data[id].maxHp
+					entity.ac = player_data[id].ac
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 			},

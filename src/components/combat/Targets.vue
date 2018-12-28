@@ -32,11 +32,11 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
-											<a class="dropdown-item"><i class="fas fa-dice-d20"></i> Initiative</a>
-											<a class="dropdown-item" @click="conditions(entity)">Conditions</a>
+											<a class="dropdown-item"><i class="fas fa-hammer-war"></i> Edit</a>
+											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
 											<div class="dropdown-divider"></div>
-											<a class="dropdown-item">Remove</a>
+											<a class="dropdown-item"><i class="fas fa-times"></i> Remove</a>
 										</div>
 									</span>
 								</li>
@@ -119,9 +119,9 @@
 					key: entity.key,
 					id: entity.id,
 					initiative: entity.initiative,
-					type: entity.type
+					type: entity.entityType
 				}
-				if (entity.type == 'player') {
+				if (entity.entityType == 'player') {
 					item.img = this.players[entity.id].avatar
 					item.ac = this.players[entity.id].ac
 					item.maxHp = parseInt(this.players[entity.id].maxHp)

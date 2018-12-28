@@ -181,15 +181,20 @@
 					<b-card header="Ability Scores">
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
 							<b-col sm="2">
-								<label :for="ability">{{ ability.substring(0,3).toUpperCase() }}</label>
+								<label :for="ability.ability">
+									<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+										<path :d="ability.icon"></path>
+									</svg>
+									{{ ability.ability.substring(0,3).toUpperCase() }}
+								</label>
 							</b-col>
 							<b-col sm="8">
 								<b-form-input 
-									:id="ability" 
+									:id="ability.ability" 
 									type="number" 
-									v-model="npc[ability]" 
-									:name="ability" 
-									:placeholder="ability.substring(0,3).toUpperCase()"></b-form-input>
+									v-model="npc[ability.ability]" 
+									:name="ability.ability" 
+									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
 					</b-card>
@@ -198,15 +203,15 @@
 					<b-card header="Saving Throws" v-if="quick == false">
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
 							<b-col sm="2">
-								<label :for="ability+'_save'">{{ ability.substring(0,3).toUpperCase() }}</label>
+								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
 							<b-col sm="8">
 								<b-form-input 
-									:id="ability+'_save'" 
+									:id="ability.ability+'_save'" 
 									type="number" 
-									v-model="npc[ability+'_save']" 
-									:name="ability" 
-									:placeholder="ability.substring(0,3).toUpperCase()"></b-form-input>
+									v-model="npc[ability.ability+'_save']" 
+									:name="ability.ability" 
+									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
 					</b-card>
@@ -386,14 +391,6 @@
 				noResult: '',
 				npcs: [],
 				npcSkills: [],
-				abilities: [
-					'strength',
-					'dexterity',
-					'constitution',
-					'intelligence',
-					'wisdom',
-					'charisma',
-				],
 				skills: [
 					'acrobatics',
 					'animal Handling',
@@ -423,6 +420,7 @@
 		},
 		firebase() {
 			return {
+				abilities: db.ref('abilities'),
 				npc: {
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true
@@ -576,7 +574,14 @@
 		width: 100%;
 	}
 	label {
-		line-height: 30px;
+		line-height: 37px;
+		margin-bottom: 0;
+
+		svg {
+			fill: #b2b2b2;
+			width: 20px;
+			height: 20px;
+		}
 	}
 	.skills {
 		line-height: 40px;

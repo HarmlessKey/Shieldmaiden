@@ -84,7 +84,7 @@ a.user, a.roll-dice	{
 	}
 }
 .dropdown-menu {
-	top: 8px !important;
+	top: 7px !important;
 	left: 10px !important;
 
 	button, a {
@@ -102,7 +102,4 @@ a.user, a.roll-dice	{
 		margin: 0;
 	}
 }
-
-
-
 </style>

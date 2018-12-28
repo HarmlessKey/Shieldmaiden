@@ -93,55 +93,25 @@
 					</b-row>
 				</b-card>
 				<b-card header="Ability Scores">
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="strength">STR</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.strength" name="strength" placeholder="STR"></b-form-input>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="">DEX</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.dexterity" name="dexterity" placeholder="DEX"></b-form-input>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="">CON</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.constitution" name="constitution" placeholder="CON"></b-form-input>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="">INT</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.intelligence" name="intelligence" placeholder="INT"></b-form-input>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="">WIS</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.wisdom" name="wisdom" placeholder="WIS"></b-form-input>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="">CHA</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input type="number" v-model="player.charisma" name="charisma" placeholder="CHA"></b-form-input>
-						</b-col>
-					</b-row>
-				</b-card>
+						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
+							<b-col sm="2">
+								<label :for="ability.ability">
+									<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+										<path :d="ability.icon"></path>
+									</svg>
+									{{ ability.ability.substring(0,3).toUpperCase() }}
+								</label>
+							</b-col>
+							<b-col sm="8">
+								<b-form-input 
+									:id="ability.ability" 
+									type="number" 
+									v-model="player[ability.ability]" 
+									:name="ability.ability" 
+									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
+							</b-col>
+						</b-row>
+					</b-card>
 			
 			<router-link to="/players" class="btn bg-gray mr-2">Cancel</router-link>
 			<button v-if="$route.name == 'AddPlayers'" class="btn" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
@@ -168,6 +138,7 @@
 		},
 		firebase() {
 			return {
+				abilities: db.ref('abilities'),
 				player: {
 					source: db.ref(`players/${this.userId}/${this.playerId}`),
 					asObject: true
@@ -215,7 +186,14 @@
 	margin-top:20px;
 	}
 	label {
-		line-height: 30px;
+		line-height: 37px;
+		margin-bottom: 0;
+
+		svg {
+			fill: #b2b2b2;
+			width: 20px;
+			height: 20px;
+		}
 	}
 	.img-container {
 		width: 100%;

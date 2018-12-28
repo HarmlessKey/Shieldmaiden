@@ -1,6 +1,6 @@
 <template>
 	<div id="app" class="container-fluid">
-		<div @click="hideSlide()">
+		<div @click="">
 			<nav-main/>
 			<router-view/>
 		</div>
@@ -48,8 +48,8 @@
 			'setSlide',
 		]),
 		hideSlide() {
-				this.setSlide(false)
-			},
+			this.setSlide(false)
+		},
 	}
 };
 </script>

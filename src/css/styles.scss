@@ -333,21 +333,21 @@ a {
 	border-radius: 0 !important;
 }
 .dropdown-menu {
-	border-radius: 0;
+	border-radius: 0 !important;
 	border: none !important;
 	background: $gray-dark;
-	color: $gray-light;
+	color: $gray-dark !important;
 	font-size: 12px !important;
 	
 	a { 
-		color: $gray-light !important;
+		color: $gray-dark !important;
 		&:hover { 
 			color: $blue !important;
 			background: none;
 		}
 	}
 	.dropdown-header {
-		padding-bottom: 5px !important;
+		padding-bottom: 10px !important;
 		color: $gray-light;
 		font-size: 13px;
 	}
@@ -405,11 +405,6 @@ ul.nav {
 }
 .modal .close:hover {
 	color: $red;
-}
-.dropdown-menu {
-	border-radius: 0 !important;
-	background: $gray-dark !important;
-	padding: 0 !important;
 }
 .popover {
 	border-radius: 0 !important;

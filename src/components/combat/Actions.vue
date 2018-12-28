@@ -30,9 +30,7 @@
 					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 						<p v-if="!target" class="red">No target selected</p>
 						<template v-else>
-							<h2>Manual</h2>
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
-							<p>Manual damage or healing</p>
 
 							<select class="form-control mb-2" v-model="damageType" name="damageType">
 								<option value="">Type of damage...</option>
@@ -60,24 +58,43 @@
 									class="form-control manual-input">
 								<button class="btn dmg bg-red" 
 									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-									@click="setManual(target, 'damage')">
+									@click="setManual(targeted, target, 'damage')">
 									<i class="fas fa-minus-square"></i>
 								</button>
 								<button class="btn heal bg-green" 
 									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-									@click="setManual(target, 'healing')">
+									@click="setManual(targeted, target, 'healing')">
 									<i class="fas fa-plus-square"></i>
 								</button>
 							</div>
 							<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
-							<div v-if="target.type == 'player'">
-								{{ getPlayer(target.id).character_name }}
-							</div>
 						</template>
 					</div>
-					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
-						<h2>Select</h2>
-						Coming soon
+					<div v-if="current" class="tab-pane select fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+						<p v-if="!target" class="red">No target selected</p>
+						<template v-else>
+							<p>Target: <b class="blue">{{ target.name }}</b></p>
+							<template v-if="current.actions">
+								<h2>Actions</h2>
+								<div v-for="action, index in current.actions">
+									<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
+										<span>{{ index + 1 }}. {{ action.name }}</span>
+										<i class="fas fa-caret-down"></i>
+									</a>
+									<p class="collapse" :id="'action-'+index">{{ action.desc }}</p>
+								</div>
+							</template>
+							<template v-if="current.legendary_actions">
+								<h2>Legendary Actions</h2>
+								<div v-for="action, index in current.legendary_actions">
+									<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
+										<span>{{ index + 1 }}. {{ action.name }}</span>
+										<i class="fas fa-caret-down"></i>
+									</a>
+									<p class="collapse" :id="'action-'+index">{{ action.desc }}</p>
+								</div>
+							</template>
+						</template>
 					</div>
 				</div>
 			</div>
@@ -95,7 +112,6 @@
 	export default {
 
 		name: 'Actions',
-		props: ['target', 'turn', 'current'],
 		mixins: [getters],
 		data: function() {
 			return {
@@ -110,10 +126,21 @@
 		computed: {
 			...mapGetters([
 				'encounter',
+				'active',
+				'entities',
+				'turn',
+				'targeted',
 			]),
+			current: function() {
+				let current_key = this.active[this.turn].key
+				return this.entities[current_key]
+			},
+			target: function() {
+				return this.entities[this.targeted]
+			}
 		},
 		methods: {
-			setManual(target, type) {
+			setManual(key, target, type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 						let amount = parseInt(this.manualAmount);
@@ -121,10 +148,10 @@
 						let curHp = parseInt(target.curHp);
 
 						if(type == 'damage') {
-							this.isDamage(target, amount, curHp, maxHp)
+							this.isDamage(key, target, amount, curHp, maxHp)
 						}
 						else {
-							this.isHealing(target, amount, curHp, maxHp)
+							this.isHealing(key, target, amount, curHp, maxHp)
 						}
 						this.manualAmount = '';
 						this.damageType = '';
@@ -134,7 +161,7 @@
 					}
 				})
 			},
-			isDamage(target, amount, curHp, maxHp) {
+			isDamage(key, target, amount, curHp, maxHp) {
 				let newhp = parseInt(curHp - amount);
 				let type = 'damage'
 				let over = 0
@@ -146,9 +173,10 @@
 				}
 				
 				target.curHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					curHp: newhp,
 				})
+
 				//Notification
 				this.$snotify.error(
 					this.current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
@@ -163,7 +191,7 @@
 				//Add to damagemeters
 				this.damageMeters(type, amount, over);
 			},
-			isHealing(target, amount, curHp, maxHp) {
+			isHealing(key, target, amount, curHp, maxHp) {
 				let newhp = parseInt(curHp + amount);
 				let type = 'healing'
 				let over = 0
@@ -175,7 +203,7 @@
 				}
 				
 				target.curHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${target.key}`).update({
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
 					curHp: newhp,
 				})
 				//Notification
@@ -218,10 +246,10 @@
 			},
 			damageMeters(type, amount, over) {
 				if(amount > 0) {
-					db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.current.key}`).push({
+					db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.active[this.turn].key}`).push({
 						amount: amount,
 						round: this.encounter.round,
-						target: this.target.key,
+						target: this.targeted,
 						damageType: this.damageType,
 						over: over,
 					});
@@ -231,7 +259,7 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 #actions {
 	grid-area: actions;
 	overflow: hidden;
@@ -267,5 +295,10 @@
 }
 .tab-content {
 	padding: 0 10px 15px 10px;
+}
+.select {
+	h2 {
+		margin-bottom: 5px !important;
+	}
 }
 </style>

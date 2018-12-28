@@ -14,6 +14,7 @@ const state = {
 	idle: [],
 	down: [],
 
+	targeted: undefined,
 	encounter: undefined,
 	campaignId: undefined,
 	encounterId: undefined,
@@ -32,6 +33,9 @@ const getters = {
 	},
 	down: function( state ) {
 		return state.down
+	},
+	targeted: function( state ) {
+		return state.targeted
 	},
 	encounter: function( state ) {
 		return state.encounter
@@ -141,6 +145,9 @@ const mutations = {
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
 	},
+	SET_TARGETED(state, payload) {
+		state.targeted = payload
+	},
 	START_ENCOUNTER(state) {
 		encounters_ref.child(state.path).update({
 			round: 1
@@ -161,7 +168,7 @@ const mutations = {
 			if (entity.curHp <= 0) {
 				state.down.push({'key':key, 'init': entity.initiative})
 			}
-			else if (entity.active) {
+			else if (entity.active == true) {
 				state.active.push({'key':key, 'init': entity.initiative})
 			}
 			else {
@@ -207,7 +214,10 @@ const actions = {
 	},
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)
-	}
+	},
+	set_targeted({ commit }, value) {
+		commit('SET_TARGETED', value);
+	},
 }
 
 export const encounter_module = {

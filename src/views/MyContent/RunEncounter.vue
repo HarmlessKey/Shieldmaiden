@@ -14,13 +14,8 @@
 			</div>
 			<template v-else>
 					<Current />
-					<Targets 
-						:_active="_active"
-						:_idle="_idle"
-						@target="log_target"
-					/>
+					<Targets/>
 					<Actions 
-					:target="target"
 					:current="_active[encounter.turn]"
 					@log="sendLog"
 					/>
@@ -104,9 +99,6 @@
 				'track_Encounter',
 				// 'generateEntities',
 			]),
-			log_target: function(target) {
-				this.target = target
-			},
 			sendLog: function(log) {
 				this.log = log;
 			}

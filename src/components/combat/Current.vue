@@ -1,9 +1,9 @@
 <template>
 	<div id="current" class="bg-gray">
 		<template v-if="current">
-			<h2>Current</h2>
+			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
 			<div class="scroll" v-bar>
-				<div>
+				<div v-on:scroll="shadow()" ref="scroll">
 					<div class="current">
 						<div class="health">
 							<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
@@ -52,11 +52,16 @@
 		components: {
 			NPC: NPC,
 		},
+		data() {
+			return {
+				setShadow: 0,
+			}
+		},
 		firebase() {
 			return {
 				conditions: {
 					source: db.ref('conditions'),
-					asObject: true
+					asObject: true,
 				}
 			}
 		},
@@ -87,24 +92,31 @@
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
 			},
+			shadow() {
+				this.setShadow = this.$refs.scroll.scrollTop
+ 			}	
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 #current {
-	padding-top: 15px;
 	grid-area: current;
 	overflow: hidden;
 	
 	.current {
-		padding: 0 10px;
+		padding: 15px 10px;
 	}
 	.scroll {
 		height: calc(100% - 30px);
 	}
-	h2 {
-		padding-left: 10px !important;
+	h2.componentHeader {
+		padding: 10px 15px !important;
+		margin-bottom: 0 !important;
+
+		&.shadow {
+			box-shadow: 0 0 10px rgba(0,0,0,0.8); 
+		}
 	}
 	.health {
 		display: grid;

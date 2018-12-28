@@ -18,9 +18,9 @@
 								<li 
 									class="d-flex justify-content-between" 
 									v-bind:key="entity.key" 
-									:class="{ targeted : currentTarget.key == entity.key }">
-									<div class="target" @click="setTarget(getTargetData(entity))">
-										<TargetItem :item="getTargetData(entity)" />
+									:class="{ targeted : targeted == entity.key }">
+									<div class="target" @click="set_targeted(entity.key)">
+										<TargetItem :item="entity.key" />
 									</div>
 									<span>
 										<a class="options"
@@ -42,13 +42,13 @@
 								</li>
 							</template>
 						</transition-group>
-						<template v-if="_idle.length">
+						<template v-if="idle.length">
 							<hr>
-							<h2>IDLE ({{ _idle.length }})</h2>
+							<h2>IDLE ({{ idle.length }})</h2>
 							<ul class="targets idle_targets">
-								<template v-for="entity in _idle">
-									<li @click="setTarget(getTargetData(entity))" :class="{ targeted : currentTarget == entity }">
-										<TargetItem :item="getTargetData(entity)" />
+								<template v-for="entity in idle">
+									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
+										<TargetItem :item="entity.key" />
 									</li>
 								</template>
 							</ul>
@@ -70,7 +70,6 @@
 	export default {
 		name: 'Targets',
 		components: {TargetItem},
-		props: ['_active','_idle'],
 		data() {
 			return {
 				userId: firebase.auth().currentUser.uid,
@@ -84,17 +83,21 @@
 				'encounterId',
 				'encounter',
 				'players',
+				'targeted',
+				'active',
+				'idle',
 			]),
 			_targets: function() {
 				let t = this.encounter.turn
-				let turns = Object.keys(this._active)
+				let turns = Object.keys(this.active)
 				let order = turns.slice(t).concat(turns.slice(0,t))
-				return Array.from(order, i => this._active[i])
+				return Array.from(order, i => this.active[i])
 			},
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'set_targeted',
 			]),
 			conditions(entity) {
 				event.stopPropagation();
@@ -104,37 +107,37 @@
 					entity: entity
 				})
 			},
-			setTarget(entity) {
-				if (this.currentTarget.key == entity.key) {
-					this.currentTarget = {}
-				} 
-				else {
-					this.currentTarget = entity
-				}
-				this.$emit("target", this.currentTarget)
-			},
-			getTargetData(entity) {
-				let item = {
-					name: entity.name,
-					key: entity.key,
-					id: entity.id,
-					initiative: entity.initiative,
-					type: entity.entityType
-				}
-				if (entity.entityType == 'player') {
-					item.img = this.players[entity.id].avatar
-					item.ac = this.players[entity.id].ac
-					item.maxHp = parseInt(this.players[entity.id].maxHp)
-					item.curHp = parseInt(entity.curHp)
-				}
-				else {
-					item.img = require('@/assets/_img/styles/monster.svg')
-					item.ac = entity.ac
-					item.maxHp = parseInt(entity.maxHp)
-					item.curHp = parseInt(entity.curHp)
-				}
-				return item
-			},
+			// setTarget(entity) {
+			// 	if (this.currentTarget.key == entity.key) {
+			// 		this.currentTarget = {}
+			// 	} 
+			// 	else {
+			// 		this.currentTarget = entity
+			// 	}
+			// 	this.$emit("target", this.currentTarget)
+			// },
+			// getTargetData(entity) {
+			// 	let item = {
+			// 		name: entity.name,
+			// 		key: entity.key,
+			// 		id: entity.id,
+			// 		initiative: entity.initiative,
+			// 		type: entity.entityType
+			// 	}
+			// 	if (entity.entityType == 'player') {
+			// 		item.img = this.players[entity.id].avatar
+			// 		item.ac = this.players[entity.id].ac
+			// 		item.maxHp = parseInt(this.players[entity.id].maxHp)
+			// 		item.curHp = parseInt(entity.curHp)
+			// 	}
+			// 	else {
+			// 		item.img = require('@/assets/_img/styles/monster.svg')
+			// 		item.ac = entity.ac
+			// 		item.maxHp = parseInt(entity.maxHp)
+			// 		item.curHp = parseInt(entity.curHp)
+			// 	}
+			// 	return item
+			// },
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
  			}		
@@ -152,12 +155,16 @@
 		width: 100%;
 	}
 
-	h2.componentHeader {
-		padding: 10px 15px !important;
-		margin-bottom: 0 !important;
+	h2 {
+		padding-left: 10px;
 
-		&.shadow {
-			box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+		&.componentHeader {
+			padding: 10px 15px !important;
+			margin-bottom: 0 !important;
+
+			&.shadow {
+				box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+			}
 		}
 	}
 	a.options {
@@ -177,12 +184,12 @@
 	}
 }
 .scroll {
-	padding:0 0 15px 10px;
+	padding:0 0 15px 0;
 	height: calc(100% - 20px);
 }
 ul.targets {
 	list-style:none;
-	padding:0 15px 0 0;
+	padding:0 15px 0 10px;
 
 	li {
 		height: 32px;

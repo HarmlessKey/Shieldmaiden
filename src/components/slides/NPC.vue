@@ -50,8 +50,11 @@
 
 		<template v-if="npc.special_abilities">
 			<hr>
-			<div class="mb-3" v-for="ability, index in npc.special_abilities">
-				<a data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">{{ index + 1 }}. {{ ability.name }} <i class="fas fa-caret-down"></i></a>
+			<div v-for="ability, index in npc.special_abilities">
+				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">
+					<span>{{ index + 1 }}. {{ ability.name }}</span>
+					<i class="fas fa-caret-down"></i>
+				</a>
 				<p class="collapse" :id="'ability-'+index">{{ ability.desc }}</p>
 			</div>
 		</template>
@@ -60,7 +63,10 @@
 			<hr>
 			<h2>Actions</h2>
 			<div v-for="action, index in npc.actions">
-				<a data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">{{ index + 1 }}. {{ action.name }} <i class="fas fa-caret-down"></i></a>
+				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
+					<span>{{ index + 1 }}. {{ action.name }}</span>
+					<i class="fas fa-caret-down"></i>
+				</a>
 				<p class="collapse" :id="'action-'+index">{{ action.desc }}</p>
 			</div>
 		</template>
@@ -69,7 +75,10 @@
 			<hr>
 			<h2>Legendary Actions</h2>
 			<div v-for="(legendary_action, index) in npc.legendary_actions">
-				<a data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">{{ legendary_action.name }} <i class="fas fa-caret-down"></i></a>
+				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">
+					<span>{{ index + 1}}. {{ legendary_action.name }}</span>
+					<i class="fas fa-caret-down"></i>
+				</a>
 				<p class="collapse" :id="'legendary-action-'+index">{{ legendary_action.desc }}</p>
 			</div>
 		</template>
@@ -135,9 +144,12 @@
 	};
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 h2 {
 	margin-bottom:5px !important;
+}
+a {
+	color: #b2b2b2 !important;
 }
 .abilities {
 	padding-top: 30px;
@@ -149,34 +161,37 @@ h2 {
 	"str dex con int wis cha";
 
 	border-top: solid 1px #191919;
+
+	.ability {
+		width: 42px;
+		height: 44px;
+		border:solid 1px #000;
+		text-align:center;
+		font-size:20px;
+		position:relative;
+		cursor:pointer;
+
+		.score {
+			position: absolute;
+			bottom: -10px;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size:12px;
+			border: solid 1px #000;
+			text-align: center;
+			border-radius: 15px / 10px;
+			height:20px;
+			width:30px;
+		}
+		.abilityName {
+			position: absolute;
+			top: -20px;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size:12px;
+			text-align: center;
+		}
+	}
 }
-.ability {
-	width: 42px;
-	height: 44px;
-	border:solid 1px #000;
-	text-align:center;
-	font-size:20px;
-	position:relative;
-	cursor:pointer;
-}
-.ability .score {
-	position: absolute;
-	bottom: -10px;
-	left: 50%;
-	transform: translateX(-50%);
-	font-size:12px;
-	border: solid 1px #000;
-	text-align: center;
-	border-radius: 15px / 10px;
-	height:20px;
-	width:30px;
-}
-.ability .abilityName {
-	position: absolute;
-	top: -20px;
-	left: 50%;
-	transform: translateX(-50%);
-	font-size:12px;
-	text-align: center;
-}
+
 </style>

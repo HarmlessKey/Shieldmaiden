@@ -1,30 +1,30 @@
 <template>
 	<div class="target">
-		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ item.initiative }}</span>
-		<span class="img" :style="{'background-image': 'url(' + item.img + ')'}"></span>
-		<span class="img" v-if="item.img != ''" :style="{ backgroundImage: 'url(\'' + item.img + '\')' }"></span>
+		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ entity.initiative }}</span>
+		<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}"></span>
+		<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ item.ac }}</span>
+		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ entity.ac }}</span>
 		<div class="progress health-bar">
-			<span>{{ item.name }}</span>
+			<span>{{ entity.name }}</span>
 			<div class="progress-bar" :class="{ 
-				'bg-red': percentage(item.curHp, item.maxHp) < 33, 
-				'bg-orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
-				'bg-green': percentage(item.curHp, item.maxHp) > 7
+				'bg-red': percentage(entity.curHp, entity.maxHp) < 33, 
+				'bg-orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
+				'bg-green': percentage(entity.curHp, entity.maxHp) > 7
 				}" 
 				role="progressbar" 
-				:style="{width: percentage(item.curHp, item.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+				:style="{width: percentage(entity.curHp, entity.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 			</div>
 		</div>
-		{{ setNumber(item.curHp) }}
+		{{ setNumber(entity.curHp) }}
 		<input v-model.number="number" type="hidden">
 		<span class="hp" v-b-tooltip.hover title="Current / Max HP">
 			<span class="current mr-1" :class="{ 
-				'red': percentage(item.curHp, item.maxHp) < 33, 
-				'orange': percentage(item.curHp, item.maxHp) > 33 && percentage(item.curHp, item.maxHp) < 76, 
-				'green': percentage(item.curHp, item.maxHp) > 7
+				'red': percentage(entity.curHp, entity.maxHp) < 33, 
+				'orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
+				'green': percentage(entity.curHp, entity.maxHp) > 7
 				}">{{ animatedNumber }}</span>
-			/<span class="max ml-1">{{ item.maxHp }}</span>
+			/<span class="max ml-1">{{ entity.maxHp }}</span>
 		</span>
 	</div>
 </template>
@@ -43,10 +43,16 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+				'entities',
+			]),
 			animatedNumber: function() {
 				return this.tweenedNumber.toFixed(0);
+			},
+			entity: function() {
+				return this.entities[this.item]
 			}
-		},
+ 		},
 		watch: {
 			number: function(newValue) {
 				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });

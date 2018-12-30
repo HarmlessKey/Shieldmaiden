@@ -32,7 +32,7 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
-											<a class="dropdown-item"><i class="fas fa-hammer-war"></i> Edit</a>
+											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
 											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
 											<div class="dropdown-divider"></div>
@@ -53,8 +53,17 @@
 								</template>
 							</ul>
 						</template>
-						<hr>
-						<h2><i class="fas fa-skull-crossbones"></i> Down</h2>
+						<template v-if="down.length">
+							<hr>
+							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ down.length }})</h2>
+							<ul class="targets down_targets">
+								<template v-for="entity in down">
+									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
+										<TargetItem :item="entity.key" />
+									</li>
+								</template>
+							</ul>
+						</template>
 					</div>
 				</div>
 			</div>
@@ -86,6 +95,7 @@
 				'targeted',
 				'active',
 				'idle',
+				'down',
 			]),
 			_targets: function() {
 				let t = this.encounter.turn
@@ -94,17 +104,34 @@
 				return Array.from(order, i => this.active[i])
 			},
 		},
+		firebase() {
+			return {
+				encounterEntities: {
+					 source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities`),
+					 asObject: true
+				}
+			}
+		},
 		methods: {
 			...mapActions([
 				'setSlide',
 				'set_targeted',
 			]),
 			conditions(entity) {
-				event.stopPropagation();
+				// event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'conditions',
 					entity: entity
+				})
+			},
+			edit(key, entity) {
+				// event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'edit',
+					key: key,
+					entity: entity,
 				})
 			},
 			// setTarget(entity) {

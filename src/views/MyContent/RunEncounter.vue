@@ -29,11 +29,11 @@
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex'
 
-	import Actions from '@/components/combat/Actions.vue'
+	import Actions from '@/components/combat/actions/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
 	import Current from '@/components/combat/Current.vue'
 	import Targets from '@/components/combat/Targets.vue'
-	import Side from '@/components/combat/Side.vue'
+	import Side from '@/components/combat/side/Side.vue'
 	import SetInitiative from '@/components/combat/SetInitiative.vue'
 
 	export default {
@@ -120,16 +120,14 @@
 	"current targets actions side";
 	position: absolute;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1000px) {
 	#combat {
-		grid-template-rows: 1fr 3fr 3fr 3fr 3fr;
-		grid-template-columns: auto;
-		grid-gap: 5px;
-		grid-template-areas: 
-		"current"
-		"targets"
-		"actions"
-		"side";
+		grid-template-columns: 3fr 3fr 2fr;
+		grid-template-rows: 60px auto;
+		grid-gap: 10px;
+		grid-template-areas:
+		"turns turns turns turns"
+		"current targets actions";
 	}
 }
 </style>

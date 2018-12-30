@@ -66,8 +66,10 @@ const mutations = {
 			initiative: db_entity.initiative,
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
+			tempHp: db_entity.tempHp,
 			curHp: db_entity.curHp,
 			ac: db_entity.ac,
+			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 			npc: db_entity.npc,
 		}
@@ -77,12 +79,31 @@ const mutations = {
 		else {
 			entity.conditions = {}
 		}
+		if(entity.curHp > entity.maxHp && !entity.tempHp) {
+			entity.curHp = entity.maxHp
+		}
+		if(entity.tempHp) {
+			entity.maxHp = parseInt(entity.maxHp) + parseInt(entity.tempHp)
+		}
+		if(entity.ac_bonus) {
+			entity.ac = parseInt(entity.ac) + parseInt(entity.ac_bonus)
+		}
 		switch(true) {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
 				entity.img = db_player.avatar
-				entity.ac = db_player.ac
-				entity.maxHp = db_player.maxHp
+				if(entity.ac_bonus) {
+					entity.ac = parseInt(db_player.ac) + parseInt(entity.ac_bonus)
+				}
+				else {
+					entity.ac = parseInt(db_player.ac)
+				}
+				if(entity.tempHp) {
+					entity.maxHp = parseInt(db_player.maxHp) + parseInt(entity.tempHp)
+				}
+				else {
+					entity.maxHp = parseInt(db_player.maxHp)
+				}
 				entity.strength = db_player.strength
 				entity.dexterity = db_player.dexterity
 				entity.constitution = db_player.constitution

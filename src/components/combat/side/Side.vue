@@ -36,8 +36,8 @@
 </template>
 
 <script>
-	import Dmg from '@/components/combat/Dmg.vue'
-	import Log from '@/components/combat/Log.vue'
+	import Dmg from '@/components/combat/side/Dmg.vue'
+	import Log from '@/components/combat/side/Log.vue'
 
 	export default {
 		name: 'Side',
@@ -69,5 +69,10 @@
 
 .tab-content {
 	padding: 0 10px 15px 10px;
+}
+@media only screen and (max-width: 1000px) {
+	#side_container {
+		display: none;
+	}
 }
 </style>

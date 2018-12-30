@@ -72,7 +72,7 @@
 					</div>
 					<div v-if="current" class="tab-pane select fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 						<p v-if="!target" class="red">No target selected</p>
-						<template v-else>
+						<template v-else-if="current.entityType == 'npc'">
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
 							<template v-if="current.actions">
 								<h2>Actions</h2>
@@ -95,6 +95,7 @@
 								</div>
 							</template>
 						</template>
+						<p v-else>Players want to roll their own attacks, don't take that away from them.</p>
 					</div>
 				</div>
 			</div>
@@ -126,6 +127,7 @@
 		computed: {
 			...mapGetters([
 				'encounter',
+				'current',
 				'active',
 				'entities',
 				'turn',

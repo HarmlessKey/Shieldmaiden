@@ -33,7 +33,7 @@
 					:class="{'input': true, 'error': errors.has('maxHp') }"
 					v-validate="'required'"
 					placeholder="Hit Points"></b-form-input>
-					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('maxHp') }}</p>
+					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 			</b-col>
 		</b-row>
 		<button class="btn btn-block mb-2" @click="edit()">Save</button>

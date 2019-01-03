@@ -37,7 +37,7 @@
 			</b-col>
 		</b-row>
 		<button class="btn btn-block mb-2" @click="edit()">Save</button>
-		<small>Slightly tweek your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
+		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
 	</div>
 </template>
 

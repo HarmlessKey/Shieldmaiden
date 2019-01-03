@@ -132,11 +132,17 @@
 				}
 			},
 			rollAbility(ability, score) {
-				var mod = parseInt(Math.floor((score - 10) / 2));
+				var modifier = parseInt(Math.floor((score - 10) / 2));
 				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + mod;
+				var total = roll + modifier;
+				if(modifier >= 0) {
+					var mod = '+' + modifier
+				}
+				else {
+					var mod = modifier
+				}
 				
-				this.$snotify.success(ability + ' roll.', roll + ' + ' + mod + ' = ' + total, {
+				this.$snotify.success(ability + ' roll.', roll + '' + mod + ' = ' + total, {
 					position: "centerTop"
 				});
 			}

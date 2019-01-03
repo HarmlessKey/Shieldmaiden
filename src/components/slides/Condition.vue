@@ -43,6 +43,8 @@
 
 <style lang="scss" scoped>
 	ul {
+		padding-left: 20px;
+
 		li {
 			margin-bottom: 10px;
 		}

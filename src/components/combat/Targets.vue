@@ -1,9 +1,10 @@
 <template>
 	<div id="targets" class="bg-gray">
 			<h2 
-				class="componentHeader" 
+				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
-				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
+				<a @click="addNpc()" class="green" v-b-tooltip.hover title="Add NPC"><i class="fas fa-plus-circle"></i></a>
 			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
@@ -36,7 +37,7 @@
 											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
 											<div class="dropdown-divider"></div>
-											<a class="dropdown-item"><i class="fas fa-times"></i> Remove</a>
+											<a class="dropdown-item" @click="remove(entity.key)"><i class="fas fa-times"></i> Remove</a>
 										</div>
 									</span>
 								</li>
@@ -125,6 +126,13 @@
 					entity: entity
 				})
 			},
+			addNpc(entity) {
+				// event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'addNpc',
+				})
+			},
 			edit(key, entity) {
 				// event.stopPropagation();
 				this.setSlide({
@@ -167,7 +175,10 @@
 			// },
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
- 			}		
+			},
+			remove(id) {
+				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+			},
  		},
 	}
 </script>

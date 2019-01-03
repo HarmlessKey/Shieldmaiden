@@ -167,7 +167,12 @@ const mutations = {
 		state.encounter = payload
 	},
 	SET_TARGETED(state, payload) {
-		state.targeted = payload
+		if(state.targeted == undefined || state.targeted != payload) {
+			state.targeted = payload
+		}
+		else {
+			state.targeted = undefined
+		}
 	},
 	START_ENCOUNTER(state) {
 		encounters_ref.child(state.path).update({

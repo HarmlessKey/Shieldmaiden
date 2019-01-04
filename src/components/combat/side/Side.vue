@@ -2,33 +2,33 @@
 	<div id="side_container" class="bg-gray">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
-				<a class="nav-link dmg active" 	
-					id="damage-tab" 
-					data-toggle="tab" 
-					href="#damage" 
-					role="tab" 
-					aria-controls="damage" 
-					aria-selected="true">
-					<i class="fas fa-swords"></i>
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 
+				<a class="nav-link active" 
 					id="log-tab" 
 					data-toggle="tab" 
 					href="#log" 
 					role="tab" 
 					aria-controls="log" 
-					aria-selected="false">
+					aria-selected="true">
 					<i class="fas fa-scroll-old"></i>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" 	
+					id="damage-tab" 
+					data-toggle="tab" 
+					href="#damage" 
+					role="tab" 
+					aria-controls="damage" 
+					aria-selected="false">
+					<i class="fas fa-swords"></i>
 				</a>
 			</li>
 		</ul>
 		<div class="actions scroll" v-bar>
 			<div>
 				<div class="tab-content">
-					<Dmg />
 					<Log :log="log" />	
+					<Dmg />
 				</div>
 			</div>
 		</div>

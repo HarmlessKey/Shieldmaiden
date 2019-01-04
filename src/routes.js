@@ -12,6 +12,7 @@ import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
 import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
 import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
 import RunEncounter from '@/views/MyContent/RunEncounter.vue';
+import TrackEncounter from '@/views/TrackEncounter.vue';
 
 // This is where you add all your site routes
 // Each route is set as an obect in the array
@@ -152,6 +153,15 @@ export const routes = [{
 		basePath: '/campaigns',
 		title: 'Campaigns',
 		requiresAuth: true
+	}
+},
+{
+	path: '/track-encounter/:userid',
+	name: 'Track Encounter',
+	component: TrackEncounter,
+	meta: {
+		basePath: '/track-encounter',
+		title: 'Track Encounter',
 	}
 },
 {

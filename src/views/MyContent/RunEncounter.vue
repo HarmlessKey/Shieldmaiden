@@ -1,5 +1,5 @@
 <template>
-	<div id="combat">
+	<div id="combat">	
 		<!-- Check if encounter exists -->
 		<template v-if="encounter && players">
 			<Turns 
@@ -28,6 +28,7 @@
 <script>
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase'
 
 	import Actions from '@/components/combat/actions/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
@@ -61,7 +62,6 @@
 				eid: this.$route.params.encid
 			})
 			this.track_Encounter()
-			console.log(this.entities)
 		},
 		computed: {
 			...mapGetters([
@@ -97,11 +97,21 @@
 			...mapActions([
 				'init_Encounter',
 				'track_Encounter',
-				// 'generateEntities',
 			]),
 			sendLog: function(log) {
 				this.log = log;
+			},
+			track() {
+				var track = {
+					campaign: this.$route.params.campid,
+					encounter: this.$route.params.encid,
+				}
+				console.log(track)
+				db.ref('track/' + this.userId).set(track);
 			}
+		},
+		beforeMount() {
+			this.track()
 		}
 	}
 </script>

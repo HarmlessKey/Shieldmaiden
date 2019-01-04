@@ -1,5 +1,5 @@
 <template>
-		<div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">
+		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
 			<h2>Combat log</h2>
 			<transition-group tag="ul" name="log" enter-active-class="anitmated slideInDown">
 				<li v-for="(item, key) in returnLog()" :key="key">

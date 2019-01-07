@@ -16,8 +16,9 @@
 			<template v-if="npc.hit_dice"> ({{ npc.hit_dice }})</template>
 			<template v-if="npc.speed"><br/><b>Speed</b> {{ npc.speed }}</template>
 		</p>
-		<div class="abilities">
-			<span v-for="ability, index in abilities"
+		<hr>
+		<div class="abilities d-flex justify-content-between">
+			<div sm="2" v-for="ability, index in abilities"
 				v-b-tooltip.hover title="Roll"
 				:key="index" 
 				class="ability" 
@@ -26,7 +27,7 @@
 				<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
 				{{ modifier(npc[ability.ability]) }}
 				<span class="score bg-gray">{{ npc[ability.ability] }}</span>
-			</span>
+			</div>
 		</div>
 		<hr>
 
@@ -158,43 +159,41 @@ a {
 	color: #b2b2b2 !important;
 }
 .abilities {
-	padding-top: 30px;
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-	grid-template-rows: auto;
-	grid-gap: 10px;
-	grid-template-areas: 
-	"str dex con int wis cha";
-
-	border-top: solid 1px #191919;
+	margin: 30px 0;
+	white-space: nowrap;
 
 	.ability {
-		width: 42px;
-		height: 44px;
+		height: 48px;
 		border:solid 1px #000;
 		text-align:center;
 		font-size:20px;
+		font-size: calc( 20px + (23 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
 		position:relative;
 		cursor:pointer;
+		margin-right: 10px;
+		width: 16.6%;
+
+		&:last-child {
+			margin: 0;
+		}
 
 		.score {
 			position: absolute;
 			bottom: -10px;
 			left: 50%;
 			transform: translateX(-50%);
-			font-size:12px;
+			font-size: calc( 11px + (13 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
 			border: solid 1px #000;
 			text-align: center;
 			border-radius: 15px / 10px;
 			height:20px;
-			width:30px;
+			width: 60%;
 		}
 		.abilityName {
 			position: absolute;
-			top: -20px;
-			left: 50%;
-			transform: translateX(-50%);
-			font-size:12px;
+			top: -24px;
+	
+			font-size: calc( 11px + (13 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
 			text-align: center;
 		}
 	}

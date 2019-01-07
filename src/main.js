@@ -12,6 +12,7 @@ import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
+import Meta from 'vue-meta'
 
 
 const options = {
@@ -26,6 +27,7 @@ Vue.use(VeeValidate);
 Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);
+Vue.use(Meta);
 
 //Bootstrap
 global.$ = jQuery

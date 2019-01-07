@@ -1,7 +1,7 @@
 <template>
-	<div id="track">
+	<div id="track" v-if="track">
 		<div class="turns">
-			Encounter
+			Encounter 
 		</div>
 		<div class="current">
 			<ul>
@@ -11,7 +11,7 @@
 			</ul>
 		</div>
 		<div class="entities">
-			{{ encounter }}
+			{{ encounter() }}
 		</div>
 	</div>
 </template>
@@ -28,40 +28,41 @@
 
 		},
 		data() {
-			// Dispatch route parameters to store
-
 			return {
 				userId: this.$route.params.userid,
 			}
 		},
 		firebase() {
 			return {
-				encounter: db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`),
+				track: {
+					source: db.ref(`track/${this.userId}`),
+					asObject: true,
+				},
+				// encounter: db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`),
 			}
 		},
 		created() {
-			this.fetch_track(this.userId)
+			// this.fetch_trackEncounter(this.userId)
+			// this.fetch_track(this.userId)
 		},
  		computed: {
 			...mapGetters([
-				'track',
+				// 'track',
+				// 'trackEncounter',
 			]),
-			// _active: function() {
-			// 	return _.chain(this.encounter.entities)
-			// 					.filter(function(entity, key) {
-			// 						entity.key = key
-			// 						return entity.active == true;
-			// 					})
-			// 					.orderBy(function(entity){
-			// 						return parseInt(entity.initiative)
-			// 					} , 'desc')
-			// 					.value()
-			// },
 		},
 		methods: {
 			...mapActions([
 				'fetch_track',
+				// 'fetch_trackEncounter',
 			]),
+			encounter() {
+				var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`);
+				// encounter.on('value', function(snapshot) {
+				// 	showEncounter(encElement, snapshot.val());
+				// });
+				return encounter
+			},
 		},
 	}
 </script>

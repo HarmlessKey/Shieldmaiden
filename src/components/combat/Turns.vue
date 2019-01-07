@@ -21,9 +21,9 @@
 			<span class="current-name"></span>
 		</div>
 		<div>
-			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> Prev turn</a>
-			<a v-if="encounter.round == 0" class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
-			<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
+			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> <span>Prev turn</span></a>
+			<a v-if="encounter.round == 0" class="btn" @click="start()"><span>Start encounter</span> <i class="fas fa-arrow-right"></i></a>
+			<a v-else class="btn" @click="nextTurn()"><span>Next turn</span> <i class="fas fa-arrow-right"></i></a>
 		</div>
 	</div>
 </template>
@@ -111,5 +111,12 @@ h1 {
 	padding:0 15px;
 	font-weight:bold;
 	font-size:30px;
+}
+@media only screen and (max-width: 360px) {
+	.btn {
+		span {
+			display: none;
+		}
+	}
 }
 </style>

@@ -378,6 +378,9 @@
 
 	export default {
 		name: 'Npcs',
+		metaInfo: {
+			title: 'NPC\'s'
+		},
 		components: {
 			Sidebar,
 		},

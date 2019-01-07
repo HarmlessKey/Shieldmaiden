@@ -81,6 +81,9 @@
 
 	export default {
 		name: 'EditCampaign',
+		metaInfo: {
+			title: 'Campaigns'
+		},
 		components: {
 			Sidebar,
 			Crumble,

@@ -23,6 +23,9 @@
 		components: {
 			Footer,
 		},
+		metaInfo: {
+			title: 'Home'
+		},
 		computed: {
 			user() {
 				return this.$store.getters.getUser;

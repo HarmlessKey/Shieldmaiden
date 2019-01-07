@@ -127,6 +127,9 @@
 
 	export default {
 		name: 'Players',
+		metaInfo: {
+			title: 'Players'
+		},
 		components: {
 			Sidebar,
 		},

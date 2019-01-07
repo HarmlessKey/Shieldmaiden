@@ -39,6 +39,9 @@
 
 	export default {
 		name: 'app',
+		metaInfo: {
+			title: 'Run Encounter'
+		},
 		components: {
 			Actions,
 			Turns,
@@ -136,8 +139,31 @@
 		grid-template-rows: 60px auto;
 		grid-gap: 10px;
 		grid-template-areas:
-		"turns turns turns turns"
+		"turns turns turns"
 		"current targets actions";
+	}
+}
+@media only screen and (max-width: 600px) {
+	#combat {
+		grid-template-columns: 3fr 3fr;
+		grid-template-rows: 60px 1fr 2fr;
+		grid-gap: 10px;
+		grid-template-areas:
+		"turns turns"
+		"current targets"
+		"actions actions";
+	}
+}
+@media only screen and (max-width: 360px) {
+	#combat {
+		grid-template-columns: 1fr;
+		grid-template-rows: 60px auto;
+		grid-gap: 10px;
+		grid-template-areas:
+		"turns"
+		"current"
+		"targets"
+		"actions";
 	}
 }
 </style>

@@ -103,6 +103,9 @@
 
 	export default {
 		name: 'EditCampaign',
+		metaInfo: {
+			title: 'Encounters'
+		},
 		components: {
 			Sidebar,
 			Crumble,

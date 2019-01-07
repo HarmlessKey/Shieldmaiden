@@ -84,12 +84,13 @@
 }
 .progress { 
 	height: 30px;
-	background-color: #4c4c4c;
+	background-color: #302f2f;
 	margin-right: 5px;
 	position: relative;
 
 	span { 
 		color:#191919;
+		font-size: calc( 8px + (11 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 		position: absolute;
 		left: 5px;
 		white-space: nowrap;
@@ -121,6 +122,7 @@
 	grid-area: ac;
 }
 .hp {
+	font-size: calc( 8px + (11 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 	text-align:right;
 	white-space: nowrap;
 	overflow: hidden;

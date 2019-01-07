@@ -98,6 +98,9 @@
 
 	export default {
 		name: 'Campaigns',
+		metaInfo: {
+			title: 'Campaigns'
+		},
 		components: {
 			Sidebar,
 			Crumble,

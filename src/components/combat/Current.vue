@@ -138,7 +138,7 @@
 		.progress { 
 			height: 30px;
 			line-height: 30px;
-			background-color: #4c4c4c;
+			background-color: #302f2f;
 			position: relative;
 
 			span.hp, span.percentage {

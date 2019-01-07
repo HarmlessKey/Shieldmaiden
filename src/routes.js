@@ -1,4 +1,5 @@
 import Home from '@/views/Home.vue';
+import Privacy from '@/views/Privacy.vue';
 import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
 import Profile from '@/views/Profile.vue';
@@ -23,6 +24,11 @@ export const routes = [{
 	path: '',
 	name: 'home',
 	component: Home
+},
+{
+	path: '/privacy-policy',
+	name: 'Privacy Policy',
+	component: Privacy
 },
 {
 	path: '/sign-in',

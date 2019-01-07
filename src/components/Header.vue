@@ -88,7 +88,7 @@ a.user, a.roll-dice	{
 	left: 10px !important;
 
 	button, a {
-		color: #b2b2b2 !important;
+		// color: #b2b2b2 !important;
 		cursor: pointer;
 		font-size: 15px;
 

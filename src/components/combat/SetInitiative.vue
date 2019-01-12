@@ -161,7 +161,7 @@
 				})
 			},
 			rollMonster(key, entity) {
-				entity.initiative = this.rollD(20, 1, dex).total
+				entity.initiative = this.rollD(20, 1, this.calcMod(entity.dex)).total
 				this.storeInitiative(key, entity)
 			},
 			rollAll() {

@@ -52,7 +52,7 @@
 		components: {
 			NPC: NPC,
 		},
-		props: ['_active'],
+		props: ['current'],
 		data() {
 			return {
 				setShadow: 0,
@@ -71,10 +71,6 @@
 				'entities',
 				'turn',
 			]),
-			current: function() {
-				let current_key = this._active[this.turn].key
-				return this.entities[current_key]
-			},
 		},
 		methods: {
 			...mapActions([

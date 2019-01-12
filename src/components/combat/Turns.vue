@@ -45,9 +45,13 @@
 			...mapGetters([
 				'encounter',
 				'path',
+				'entities'
 			]),
 		},
 		methods: {
+			...mapActions([
+					'set_down',
+				]),
 			start() {
 				db.ref(`encounters/${this.path}`).update({
 					round: 1
@@ -59,6 +63,12 @@
 				if (turn >= this.active_len) {
 					turn = 0
 					round++
+					for (let key in this.entities) {
+						let e = this.entities[key]
+						if (e.curHp <= 0 && e.entityType != 'player') {
+							this.set_down({key:key})
+						}
+					}
 				}
 				db.ref(`encounters/${this.path}`).update({
 					turn: turn,

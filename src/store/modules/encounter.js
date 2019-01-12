@@ -80,6 +80,12 @@ const mutations = {
 			active: db_entity.active,
 			npc: db_entity.npc,
 		}
+		if (db_entity.down) {
+			entity.down = db_entity.down
+		}
+		else {
+			entity.down = false
+		}
 		if (db_entity.conditions) {
 			entity.conditions = db_entity.conditions
 		}
@@ -204,6 +210,10 @@ const mutations = {
 			initiative: parseInt(initiative),
 		})
 	},
+	SET_DOWN(state, {key}) {
+		state.entities[key].down = true
+		encounters_ref.child(`${state.path}/entities/${key}/down`).set(true)
+	},
 	DEVIDE_BY_STATUS(state, payload) {
 		for (let key in state.entities) {
 			let entity = state.entities[key]
@@ -263,6 +273,9 @@ const actions = {
 	},
 	set_initiative({ commit }, payload) {
 		commit('SET_INITIATIVE', payload)
+	},
+	set_down({ commit }, payload) {
+		commit('SET_DOWN', payload)
 	}
 }
 

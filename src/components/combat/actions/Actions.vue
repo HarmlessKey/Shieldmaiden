@@ -114,6 +114,7 @@
 
 		name: 'Actions',
 		mixins: [getters],
+		props: ['current'],
 		data: function() {
 			return {
 				userId: this.$store.getters.getUser.uid,
@@ -127,16 +128,10 @@
 		computed: {
 			...mapGetters([
 				'encounter',
-				'current',
-				'active',
 				'entities',
 				'turn',
 				'targeted',
 			]),
-			current: function() {
-				let current_key = this.active[this.turn].key
-				return this.entities[current_key]
-			},
 			target: function() {
 				return this.entities[this.targeted]
 			}
@@ -248,7 +243,7 @@
 			},
 			damageMeters(type, amount, over) {
 				if(amount > 0) {
-					db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.active[this.turn].key}`).push({
+					db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.current.key}`).push({
 						amount: amount,
 						round: this.encounter.round,
 						target: this.targeted,

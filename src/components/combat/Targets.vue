@@ -54,11 +54,11 @@
 								</template>
 							</ul>
 						</template>
-						<template v-if="down.length">
+						<template v-if="_down.length">
 							<hr>
-							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ down.length }})</h2>
+							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ _down.length }})</h2>
 							<ul class="targets down_targets">
-								<template v-for="entity in down">
+								<template v-for="entity in _down">
 									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
 										<TargetItem :item="entity.key" />
 									</li>
@@ -73,6 +73,7 @@
 
 <script>
 	import firebase from 'firebase'
+	import _ from 'lodash'
 	import { db } from '@/firebase'
 	import { mapGetters, mapActions } from 'vuex'
 	import TargetItem from '@/components/combat/TargetItem.vue'
@@ -93,8 +94,9 @@
 				'campaignId',
 				'encounterId',
 				'encounter',
+				'entities',
 				'targeted',
-				'down',
+				// 'down',
 			]),
 			_targets: function() {
 				let t = this.encounter.turn
@@ -102,6 +104,17 @@
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._active[i])
 			},
+			_down: function() {
+				return _.chain(this.entities)
+								.filter(function(entity, key) {
+									entity.key = key
+									return entity.down == true;
+								})
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
+								.value()
+			}
 		},
 		firebase() {
 			return {

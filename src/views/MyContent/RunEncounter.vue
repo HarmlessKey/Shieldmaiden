@@ -13,7 +13,7 @@
 			</div>
 			<template v-else>
 					<Current 
-						:_active="_active"
+						:current="_active[encounter.turn]"
 					/>
 					<Targets 
 						:_active = "_active"
@@ -78,10 +78,10 @@
 				'entities',
 			]),
 			_active: function() {
-				return _.chain(this.encounter.entities)
+				return _.chain(this.entities)
 								.filter(function(entity, key) {
 									entity.key = key
-									return entity.active == true;
+									return entity.active && !entity.down;
 								})
 								.orderBy(function(entity){
 									return parseInt(entity.initiative)
@@ -89,10 +89,10 @@
 								.value()
 			},
 			_idle: function() {
-				return _.chain(this.encounter.entities)
+				return _.chain(this.entities)
 								.filter(function(entity, key) {
 									entity.key = key
-									return entity.active == false;
+									return !entity.active && !entity.down;
 								})
 								.orderBy(function(entity){
 									return parseInt(entity.initiative)

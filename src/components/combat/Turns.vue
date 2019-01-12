@@ -50,7 +50,7 @@
 		},
 		methods: {
 			...mapActions([
-					'set_down',
+					'update_round',
 				]),
 			start() {
 				db.ref(`encounters/${this.path}`).update({
@@ -63,12 +63,7 @@
 				if (turn >= this.active_len) {
 					turn = 0
 					round++
-					for (let key in this.entities) {
-						let e = this.entities[key]
-						if (e.curHp <= 0 && e.entityType != 'player') {
-							this.set_down({key:key})
-						}
-					}
+					this.update_round()
 				}
 				db.ref(`encounters/${this.path}`).update({
 					turn: turn,

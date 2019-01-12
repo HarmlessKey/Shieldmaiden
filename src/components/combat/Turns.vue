@@ -45,9 +45,13 @@
 			...mapGetters([
 				'encounter',
 				'path',
+				'entities'
 			]),
 		},
 		methods: {
+			...mapActions([
+					'update_round',
+				]),
 			start() {
 				db.ref(`encounters/${this.path}`).update({
 					round: 1
@@ -59,6 +63,7 @@
 				if (turn >= this.active_len) {
 					turn = 0
 					round++
+					this.update_round()
 				}
 				db.ref(`encounters/${this.path}`).update({
 					turn: turn,

@@ -8,12 +8,8 @@ const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
 
-// export const encounter_module = {
 const state = {
 	entities: {},
-	active: [],
-	idle: [],
-	down: [],
 
 	targeted: undefined,
 	encounter: undefined,
@@ -79,6 +75,12 @@ const mutations = {
 			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 			npc: db_entity.npc,
+		}
+		if (db_entity.down) {
+			entity.down = db_entity.down
+		}
+		else {
+			entity.down = false
 		}
 		if (db_entity.conditions) {
 			entity.conditions = db_entity.conditions
@@ -203,29 +205,14 @@ const mutations = {
 
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
-	DEVIDE_BY_STATUS(state, payload) {
-		for (let key in state.entities) {
-			let entity = state.entities[key]
-			if (entity.curHp <= 0) {
-				state.down.push({'key':key, 'init': entity.initiative})
-			}
-			else if (entity.active == true) {
-				state.active.push({'key':key, 'init': entity.initiative})
-			}
-			else {
-				state.idle.push({'key':key, 'init': entity.initiative})
-			}
+	SET_DOWN(state, {key, value}) {
+		state.entities[key].down = value
+		if (value) {
+			encounters_ref.child(`${state.path}/entities/${key}/down`).set(true)
+		} else {
+			encounters_ref.child(`${state.path}/entities/${key}/down`).remove()
 		}
-		state.active = state.active.sort(function(a, b) {
-			return b.init - a.init
-		})
-		state.idle = state.idle.sort(function(a, b) {
-			return b.init - a.init
-		})
-		state.down = state.down.sort(function(a, b) {
-			return b.init - a.init
-		})
-	}
+	},
 }
 
 const actions = {
@@ -242,7 +229,6 @@ const actions = {
 			for (let key in snapshot.val().entities) {
 				commit('ADD_ENTITY', {rootState, key})
 			}
-			commit('DEVIDE_BY_STATUS', snapshot.val())
 		})
 	},
 
@@ -262,6 +248,17 @@ const actions = {
 	},
 	set_initiative({ commit }, payload) {
 		commit('SET_INITIATIVE', payload)
+	},
+	update_round({ commit, state}) {
+		for (let key in state.entities) {
+			let e = state.entities[key]
+			if (e.curHp <= 0 && e.entityType != 'player') {
+				commit('SET_DOWN', {key:key, value:true})
+			}
+			if (e.curHp > 0 && e.down == true) {
+				commit('SET_DOWN', {key:key, value:false})
+			}
+		}
 	},
 	set_condition({ commit }, payload) {
 		commit('SET_CONDITION', payload)

@@ -7,14 +7,18 @@
 			/>
 			<div v-if="encounter.round == 0">
 				<SetInitiative 
-					:entities="encounter.entities"
-					:_active="_active"
-					:_idle="_idle"
+					:_active = "_active"
+					:_idle = "_idle"
 				/>
 			</div>
 			<template v-else>
-					<Current />
-					<Targets/>
+					<Current 
+						:current="_active[encounter.turn]"
+					/>
+					<Targets 
+						:_active = "_active"
+						:_idle = "_idle"
+					/>
 					<Actions 
 					:current="_active[encounter.turn]"
 					@log="sendLog"
@@ -74,10 +78,10 @@
 				'entities',
 			]),
 			_active: function() {
-				return _.chain(this.encounter.entities)
+				return _.chain(this.entities)
 								.filter(function(entity, key) {
 									entity.key = key
-									return entity.active == true;
+									return entity.active && !entity.down;
 								})
 								.orderBy(function(entity){
 									return parseInt(entity.initiative)
@@ -85,10 +89,10 @@
 								.value()
 			},
 			_idle: function() {
-				return _.chain(this.encounter.entities)
+				return _.chain(this.entities)
 								.filter(function(entity, key) {
 									entity.key = key
-									return entity.active == false;
+									return !entity.active && !entity.down;
 								})
 								.orderBy(function(entity){
 									return parseInt(entity.initiative)

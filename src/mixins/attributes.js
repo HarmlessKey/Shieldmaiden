@@ -4,7 +4,12 @@ export const attributes = {
 	},
 	methods: {
 		calcMod(val) {
-			return Math.floor((val - 10) / 2)
+			if(val) {
+				return Math.floor((val - 10) / 2)
+			}
+			else {
+				return 0;
+			}	
 		}
 	}
 }

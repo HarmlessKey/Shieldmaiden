@@ -11,7 +11,7 @@
 								<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
 								<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
 								<div class="progress-bar" :class="{ 
-									'bg-red': percentage(current.curHp, current.maxHp) < 33, 
+									'bg-red': percentage(current.curHp, current.maxHp) <= 33, 
 									'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
 									'bg-green': percentage(current.curHp, current.maxHp) > 7
 									}" 

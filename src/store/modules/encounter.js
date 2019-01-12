@@ -7,7 +7,7 @@ const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
-console.log("ENCOUNTER STORE")
+
 // export const encounter_module = {
 const state = {
 	entities: {},

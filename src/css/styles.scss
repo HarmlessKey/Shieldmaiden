@@ -39,6 +39,8 @@ $header-hight: 50px;
 body {
 	padding-top: $header-hight;
 	background: $gray-dark !important;
+	// background-image: url('../assets/_img/styles/game_table.png');
+	background-size: cover;
 	color: $gray-light !important;
 	font-size: 12px !important;
 	font-family: 'Raleway', sans-serif;

@@ -40,7 +40,8 @@
 		</div>
 		<div class="set bg-gray">
 			<h2>Active entities</h2>
-			<transition-group name="initiative" tag="ul" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown">
+			<!-- <transition-group name="initiative" tag="ul" enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown"> -->
+			<ul>
 				<li v-for="(entity) in _active" v-bind:key="entity.key" class="d-flex justify-content-between">
 					<span class="d-flex justify-content-left">
 						<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
@@ -49,14 +50,16 @@
 					<span>{{ entity.initiative }}</span>
 					<a class="red" v-b-tooltip.hover title="Set Inactive" @click="setActive(entity.key, false)"><i class="fas fa-minus-circle"></i></a>
 				</li>
-			</transition-group>
+			</ul>
+			<!-- </transition-group> -->
 
 			<span class="d-flex justify-content-between">
 				<h2>Inactive</h2>
 				<a v-b-popover.hover="'These can have their initiative allready set, but will not join combat until you set them active.'" title="Inactive entities"><i class="fas fa-info-circle"></i></a>
 			</span>
 
-			<transition-group name="initiative" tag="ul" enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp">
+			<!-- <transition-group name="initiative" tag="ul" enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp"> -->
+			<ul>
 				<li v-for="(entity) in _idle" v-bind:key="entity.key" class="d-flex justify-content-between">
 					<span class="d-flex justify-content-left">
 						<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
@@ -65,7 +68,8 @@
 					</span>
 					<a class="green" v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus-circle"></i></a>
 				</li>
-			</transition-group>
+			</ul>
+			<!-- </transition-group> -->
 		</div>
 	</div>
 </template>
@@ -124,7 +128,9 @@
 									entity.key = key
 									return entity.active == true;
 								})
-								.sortBy('name' , 'desc')
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
 								.value()
 			},
 			_idle: function() {
@@ -133,7 +139,9 @@
 									entity.key = key
 									return entity.active == false;
 								})
-								.sortBy('name' , 'desc')
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
 								.value()
 			},
 		},
@@ -153,7 +161,7 @@
 				})
 			},
 			rollMonster(key, entity) {
-				entity.initiative = this.rollD(20,1,this.calcMod(entity.dexterity)).total
+				entity.initiative = this.rollD(20, 1, dex).total
 				this.storeInitiative(key, entity)
 			},
 			rollAll() {

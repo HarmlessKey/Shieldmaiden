@@ -89,6 +89,7 @@
 
 		name: 'SetInitiative',
 		mixins: [dice, attributes, getters],
+		props: ['_active', '_idle'],
 		data () {
 			return {
 				selected: [],
@@ -120,28 +121,6 @@
 									return entity.entityType == 'npc';
 								})
 								.sortBy('name' , 'desc')
-								.value()
-			},
-			_active: function() {
-				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.active == true;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
-			_idle: function() {
-				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.active == false;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
 								.value()
 			},
 		},

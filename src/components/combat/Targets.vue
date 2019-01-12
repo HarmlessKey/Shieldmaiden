@@ -43,11 +43,11 @@
 								</li>
 							</template>
 						</transition-group>
-						<template v-if="idle.length">
+						<template v-if="_idle.length">
 							<hr>
-							<h2>IDLE ({{ idle.length }})</h2>
+							<h2>IDLE ({{ _idle.length }})</h2>
 							<ul class="targets idle_targets">
-								<template v-for="entity in idle">
+								<template v-for="entity in _idle">
 									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
 										<TargetItem :item="entity.key" />
 									</li>
@@ -80,6 +80,7 @@
 	export default {
 		name: 'Targets',
 		components: {TargetItem},
+		props: ['_active','_idle'],
 		data() {
 			return {
 				userId: firebase.auth().currentUser.uid,
@@ -92,34 +93,9 @@
 				'campaignId',
 				'encounterId',
 				'encounter',
-				// 'players',
 				'targeted',
-				'active',
-				'idle',
 				'down',
 			]),
-			_active: function() {
-				return _.chain(this.encounter.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.active == true;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
-			_idle: function() {
-				return _.chain(this.encounter.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.active == false;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
-			},
 			_targets: function() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._active)

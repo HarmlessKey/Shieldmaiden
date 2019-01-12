@@ -7,14 +7,18 @@
 			/>
 			<div v-if="encounter.round == 0">
 				<SetInitiative 
-					:entities="encounter.entities"
-					:_active="_active"
-					:_idle="_idle"
+					:_active = "_active"
+					:_idle = "_idle"
 				/>
 			</div>
 			<template v-else>
-					<Current />
-					<Targets/>
+					<Current 
+						:_active="_active"
+					/>
+					<Targets 
+						:_active = "_active"
+						:_idle = "_idle"
+					/>
 					<Actions 
 					:current="_active[encounter.turn]"
 					@log="sendLog"

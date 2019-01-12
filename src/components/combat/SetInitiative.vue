@@ -87,11 +87,6 @@
 		mixins: [dice, attributes, getters],
 		data () {
 			return {
-				players: {},
-				npcs: {},
-				active_entities: {},
-				inactive_entities: {},
-
 				selected: [],
 			}
 		},
@@ -141,12 +136,6 @@
 								.sortBy('name' , 'desc')
 								.value()
 			},
-			orderedActive: function() {
-				return _.orderBy(this.active_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
-			},
-			orderedInactive: function() {
-				return _.orderBy(this.inactive_entities, function(obj) {return parseInt(obj.initiative)}, 'desc')
-			}
 		},
 		created() {
 

@@ -1,12 +1,13 @@
 import Firebase from 'firebase'
 import { db } from '@/firebase'
 import _ from 'lodash'
+import Vue from 'vue'
 
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
-
+console.log("ENCOUNTER STORE")
 // export const encounter_module = {
 const state = {
 	entities: {},
@@ -50,10 +51,16 @@ const getters = {
 		return state.path
 	},
 	turn: function( state ) {
-		return state.encounter.turn
+		if (state.encounter) {
+			return state.encounter.turn
+		}
+		return undefined
 	},
 	round: function( state ) {
-		return state.encounter.round
+		if (state.encounter) {
+			return state.encounter.round
+		}
+		return undefined
 	},
 }
 
@@ -155,7 +162,7 @@ const mutations = {
 			case ((entity.entityType == 'npc') && (entity.npc == 'api')):
 				break
 		}
-		state.entities[key] = entity
+		Vue.set(state.entities, key, entity)
 	},
 	CLEAR_ENTITIES(state) {
 		state.entities = {}

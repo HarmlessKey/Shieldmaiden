@@ -13,8 +13,11 @@
 						</span>
 					</span>
 					<span>
-						<a v-if="check(condition['.key']) == false" class="mr-3" @click="set(condition['.key'])"><i class="fas fa-plus-circle"></i></a>
-						<a v-else class="gray-light mr-3" @click="remove(condition['.key'])"><i class="fas fa-minus-circle"></i></a>
+						<a class="mr-3 plus" @click="set(entity.key, condition['.key'])" :key="condition['.key']">
+							<!-- yes, these icons need a to within a span... without they will not update on change -->
+							<span v-show="check(condition['.key']) == false"><i class="fas fa-plus-circle" key="false"></i></span>
+							<span v-show="check(condition['.key']) == true"><i class="fas fa-minus-circle" key="true"></i></span>
+						</a>
 						<a 
 							data-toggle="collapse"
 							v-bind:href="'#cond_'+index"
@@ -56,10 +59,6 @@
 		firebase() {
 			return {
 				conditions: db.ref('conditions'),
-				entityConditions: {
-					 source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}`),
-					 asObject: true
-				}
 			}
 		},
 		computed: {
@@ -69,13 +68,17 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'set_condition',
 			]),
-			set(condition) {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/conditions/${condition}`).set('true');
-			},
-			remove(condition) {
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entity.key}/conditions/${condition}`).remove();
+			set(key, condition) {
+				if(this.check(condition) == true) {
+					var action = 'remove';
+				}
+				else {
+					var action = 'add';
+				}
+				this.set_condition({action: action, key: key, condition: condition});
 			},
 			check(condition) {
 				return this.entities[this.entity.key].conditions.hasOwnProperty(condition)
@@ -120,6 +123,9 @@
 			svg {
 				color: #b2b2b2;
 				fill: #b2b2b2;
+			}
+			.hide {
+				display: none;
 			}
 		}
 	}

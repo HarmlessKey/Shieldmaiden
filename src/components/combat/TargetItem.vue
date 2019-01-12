@@ -4,7 +4,10 @@
 		<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}"></span>
 		<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-		<span class="ac" v-b-tooltip.hover title="Armor Class">{{ entity.ac }}</span>
+		<span class="ac" v-b-tooltip.hover title="Armor Class">
+			<template v-if="entity.ac_bonus">{{ entity.ac + entity.ac_bonus}}</template>
+			<template v-else>{{ entity.ac }}</template>
+		</span>
 		<div class="progress health-bar">
 			<span>{{ entity.name }}</span>
 			<div class="progress-bar" :class="{ 
@@ -18,13 +21,16 @@
 		</div>
 		{{ setNumber(entity.curHp) }}
 		<input v-model.number="number" type="hidden">
-		<span class="hp" v-b-tooltip.hover title="Current / Max HP">
-			<span class="current mr-1" :class="{ 
+		<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+			<span class="current" :class="{ 
 				'red': percentage(entity.curHp, entity.maxHp) < 33, 
 				'orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
 				'green': percentage(entity.curHp, entity.maxHp) > 7
 				}">{{ animatedNumber }}</span>
-			/<span class="max ml-1">{{ entity.maxHp }}</span>
+				<span class="gray-hover">/</span>{{ entity.maxHp }}
+			<template v-if="entity.tempHp">
+				<span class="gray-hover">+{{ entity.tempHp }}</span>
+			</template>
 		</span>
 	</div>
 </template>
@@ -74,7 +80,7 @@
 .target {
 	width: 100%;
 	display: grid;
-	grid-template-columns: 30px 30px 30px 3fr 2fr;
+	grid-template-columns: 30px 30px 30px 2fr 2fr;
 	grid-template-rows: 1fr;
 	grid-gap: 0;
 	grid-template-areas: 
@@ -127,5 +133,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis !important;
+}
+.temp {
+	color: #494747;
 }
 </style>

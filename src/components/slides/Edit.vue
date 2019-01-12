@@ -72,14 +72,21 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'edit_entity',
 			]),
 			edit() {
 				this.$validator.validateAll().then((result) => {
-					if (result) {	
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`).set(
-							this.entity
-						);
+					if (result) {
+						this.entity.initiative = parseInt(this.entity.initiative)
+						if(this.entity.ac_bonus) {
+							this.entity.ac_bonus = parseInt(this.entity.ac_bonus)
+						} 
+						if(this.entity.tempHp) {
+							this.entity.tempHp = parseInt(this.entity.tempHp)
+						}
+
+						this.edit_entity({key: this.entityKey, entity: this.entity})
 						this.setSlide(false);
 					}
 					else {

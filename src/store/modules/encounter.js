@@ -75,7 +75,7 @@ const mutations = {
 			maxHp: db_entity.maxHp,
 			tempHp: db_entity.tempHp,
 			curHp: db_entity.curHp,
-			ac: db_entity.ac,
+			ac: parseInt(db_entity.ac),
 			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 			npc: db_entity.npc,
@@ -86,31 +86,12 @@ const mutations = {
 		else {
 			entity.conditions = {}
 		}
-		if(entity.curHp > entity.maxHp && !entity.tempHp) {
-			entity.curHp = entity.maxHp
-		}
-		if(entity.tempHp) {
-			entity.maxHp = parseInt(entity.maxHp) + parseInt(entity.tempHp)
-		}
-		if(entity.ac_bonus) {
-			entity.ac = parseInt(entity.ac) + parseInt(entity.ac_bonus)
-		}
 		switch(true) {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
 				entity.img = db_player.avatar
-				if(entity.ac_bonus) {
-					entity.ac = parseInt(db_player.ac) + parseInt(entity.ac_bonus)
-				}
-				else {
-					entity.ac = parseInt(db_player.ac)
-				}
-				if(entity.tempHp) {
-					entity.maxHp = parseInt(db_player.maxHp) + parseInt(entity.tempHp)
-				}
-				else {
-					entity.maxHp = parseInt(db_player.maxHp)
-				}
+				entity.ac = parseInt(db_player.ac)
+				entity.maxHp = parseInt(db_player.maxHp)
 				entity.strength = db_player.strength
 				entity.dexterity = db_player.dexterity
 				entity.constitution = db_player.constitution
@@ -204,6 +185,24 @@ const mutations = {
 			initiative: parseInt(initiative),
 		})
 	},
+	SET_CONDITION(state, {action, key, condition}) {
+		if(action == 'add') {
+			Vue.set(state.entities[key].conditions, condition, true)
+			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
+		}
+		else if(action == 'remove') {
+			Vue.delete(state.entities[key].conditions, condition)
+			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).remove();
+		}
+	},
+	EDIT_ENTITY(state, {key, entity}) {
+		state.entities[key].name = entity.name
+		state.entities[key].initiative = entity.initiative
+		state.entities[key].ac_bonus = entity.ac_bonus
+		state.entities[key].tempHp = entity.tempHp
+
+		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
+	},
 	DEVIDE_BY_STATUS(state, payload) {
 		for (let key in state.entities) {
 			let entity = state.entities[key]
@@ -263,7 +262,13 @@ const actions = {
 	},
 	set_initiative({ commit }, payload) {
 		commit('SET_INITIATIVE', payload)
-	}
+	},
+	set_condition({ commit }, payload) {
+		commit('SET_CONDITION', payload)
+	},
+	edit_entity({ commit }, payload) {
+		commit('EDIT_ENTITY', payload)
+	},
 }
 
 export const encounter_module = {

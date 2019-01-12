@@ -157,6 +157,9 @@ const mutations = {
 		}
 		state.entities[key] = entity
 	},
+	CLEAR_ENTITIES(state) {
+		state.entities = {}
+	},
 	SET_CAMPAIGN_ID(state, value) {
 		state.campaignId = value
 	},
@@ -217,15 +220,20 @@ const actions = {
 	init_Encounter({ dispatch, commit, state, rootState }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
+		commit("CLEAR_ENTITIES")
 		const uid = rootState.content.user.uid;
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path)
 		const encounter = encounters_ref.child(path);
 		encounter.once('value', snapshot => {
 			commit('SET_ENCOUNTER', snapshot.val())
-			for (let key in snapshot.val().entities) {
-				commit('ADD_ENTITY', {rootState, key})
+			console.log("Entities in init", Object.keys(state.entities))
+			if (!state.entities.length) {
+				for (let key in snapshot.val().entities) {
+					commit('ADD_ENTITY', {rootState, key})
+				}
 			}
+			console.log("Entities after init", Object.keys(state.entities))
 			commit('DEVIDE_BY_STATUS', snapshot.val())
 		})
 	},

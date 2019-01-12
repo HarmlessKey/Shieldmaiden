@@ -92,17 +92,39 @@
 				'campaignId',
 				'encounterId',
 				'encounter',
-				'players',
+				// 'players',
 				'targeted',
 				'active',
 				'idle',
 				'down',
 			]),
+			_active: function() {
+				return _.chain(this.encounter.entities)
+								.filter(function(entity, key) {
+									entity.key = key
+									return entity.active == true;
+								})
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
+								.value()
+			},
+			_idle: function() {
+				return _.chain(this.encounter.entities)
+								.filter(function(entity, key) {
+									entity.key = key
+									return entity.active == false;
+								})
+								.orderBy(function(entity){
+									return parseInt(entity.initiative)
+								} , 'desc')
+								.value()
+			},
 			_targets: function() {
 				let t = this.encounter.turn
-				let turns = Object.keys(this.active)
+				let turns = Object.keys(this._active)
 				let order = turns.slice(t).concat(turns.slice(0,t))
-				return Array.from(order, i => this.active[i])
+				return Array.from(order, i => this._active[i])
 			},
 		},
 		firebase() {

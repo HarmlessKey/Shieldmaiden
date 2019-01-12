@@ -159,7 +159,7 @@ const mutations = {
 	},
 	CLEAR_ENTITIES(state) {
 		state.entities = {}
-	},
+	},	
 	SET_CAMPAIGN_ID(state, value) {
 		state.campaignId = value
 	},
@@ -227,13 +227,9 @@ const actions = {
 		const encounter = encounters_ref.child(path);
 		encounter.once('value', snapshot => {
 			commit('SET_ENCOUNTER', snapshot.val())
-			console.log("Entities in init", Object.keys(state.entities))
-			if (!state.entities.length) {
-				for (let key in snapshot.val().entities) {
-					commit('ADD_ENTITY', {rootState, key})
-				}
+			for (let key in snapshot.val().entities) {
+				commit('ADD_ENTITY', {rootState, key})
 			}
-			console.log("Entities after init", Object.keys(state.entities))
 			commit('DEVIDE_BY_STATUS', snapshot.val())
 		})
 	},

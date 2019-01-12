@@ -59,13 +59,7 @@
 				log: undefined
 			}
 		},
-		created() {
-			console.log("CREATED")
-			console.log(Object.keys(this.entities))
-		},
 		mounted() {
-			console.log("MOUNTED")
-			console.log("Entities before init:", Object.keys(this.entities))
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
@@ -115,7 +109,6 @@
 					campaign: this.$route.params.campid,
 					encounter: this.$route.params.encid,
 				}
-				console.log("track",track)
 				db.ref('track/' + this.userId).set(track);
 			}
 		},

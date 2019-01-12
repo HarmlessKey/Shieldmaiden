@@ -198,6 +198,12 @@ const mutations = {
 			active: active
 		})
 	},
+	SET_INITIATIVE(sate, {key, initiative}) {
+		state.entities[key].initiative = initiative
+		encounters_ref.child(`${state.path}/entities/${key}`).update({
+			initiative: parseInt(initiative),
+		})
+	},
 	DEVIDE_BY_STATUS(state, payload) {
 		for (let key in state.entities) {
 			let entity = state.entities[key]
@@ -252,9 +258,12 @@ const actions = {
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)
 	},
-	set_targeted({ commit }, value) {
-		commit('SET_TARGETED', value);
+	set_targeted({ commit }, payload) {
+		commit('SET_TARGETED', payload);
 	},
+	set_initiative({ commit }, payload) {
+		commit('SET_INITIATIVE', payload)
+	}
 }
 
 export const encounter_module = {

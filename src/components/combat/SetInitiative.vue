@@ -142,14 +142,19 @@
 		},
 		methods: {
 			...mapActions([
-				'set_active'
+				'set_active',
+				'set_initiative'
 			]),
+			setActive(key, active) {
+				this.set_active({
+					key: key,
+					active: active
+				})
+			},
 			storeInitiative(key, entity) {
-				if (!entity.initiative) {
-					entity.initiative = 0
-				}
-				db.ref(`encounters/${this.path}/entities/${key}`).update({
-					initiative: parseInt(entity.initiative),
+				this.set_initiative({
+					key: key,
+					initiative: entity.initiative
 				})
 			},
 			rollMonster(key, entity) {
@@ -187,12 +192,6 @@
 				}
 				this.selected = []
 			},
-			setActive(key, active) {
-				this.set_active({
-					key: key,
-					active: active
-				})
-			}
 		}
 	}
 </script>

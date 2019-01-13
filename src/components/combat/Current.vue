@@ -7,7 +7,8 @@
 					<div class="current">
 
 						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable">
-								<div class="px-1 mb-3 d-flex justify-content-between">
+								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
+								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5">
 										<template v-if="Object.keys(current.saves).length == n">
 											<a v-show="current.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
@@ -112,6 +113,12 @@
 					show: true,
 					type: 'condition',
 					condition: show
+				})
+			},
+			deathInfo() {
+				this.setSlide({
+					show: true,
+					type: 'deathSaves',
 				})
 			},
 			percentage(current, max) {

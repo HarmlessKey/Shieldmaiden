@@ -31,6 +31,7 @@
 						<p v-if="!target" class="red">No target selected</p>
 						<template v-else>
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
+							<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
 
 							<!-- <select class="form-control mb-2" v-model="damageType" name="damageType">
 								<option value="">Type of damage...</option>
@@ -74,6 +75,7 @@
 						<p v-if="!target" class="red">No target selected</p>
 						<template v-else-if="current.entityType == 'npc'">
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
+							
 							<template v-if="current.actions">
 								<h2>Actions</h2>
 								<div v-for="action, index in current.actions">
@@ -122,6 +124,7 @@
 				encounterId: this.$route.params.encid,
 				manualAmount: '',
 				damageType: '',
+				crit: false,
 				log: undefined
 			}
 		},
@@ -154,6 +157,7 @@
 						}
 						this.manualAmount = '';
 						this.damageType = '';
+						this.crit = false;
 					}
 					else {
 						//console.log('Not Valid');
@@ -167,6 +171,26 @@
 				var type = 'damage'
 				var over = 0
 				var rest_amount = amount
+
+				//Death saves at 0 hp
+				if(curHp == 0) {
+					var n = parseInt(Object.keys(target.saves).length)
+					
+					this.set_save({
+					 key: this.current.key,
+					 check: 'fail',
+					 number: n
+					})
+					if(this.crit) {
+						n = parseInt(Object.keys(target.saves).length)
+
+						this.set_save({
+						key: this.current.key,
+						check: 'fail',
+						number: n
+						})
+					}
+				}
 
 				//First check if there is tempHp and put damage in there first.
 				if(tempHp) {
@@ -313,6 +337,10 @@
 #actions {
 	grid-area: actions;
 	overflow: hidden;
+
+	.custom-control-label {
+		line-height: 25px !important;
+	}
 }
 .nav { 
 	background: #191919;

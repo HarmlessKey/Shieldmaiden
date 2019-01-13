@@ -36,6 +36,8 @@
 
 <style lang="css">
 .grid {
+	background-image: url('../assets/_img/styles/game_table.png');
+	background-size: cover;
 	height: calc(100vh - 50px) !important;
 	display: grid;
 	grid-template-columns: auto;

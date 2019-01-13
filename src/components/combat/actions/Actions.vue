@@ -32,7 +32,7 @@
 						<template v-else>
 							<p>Target: <b class="blue">{{ target.name }}</b></p>
 
-							<select class="form-control mb-2" v-model="damageType" name="damageType">
+							<!-- <select class="form-control mb-2" v-model="damageType" name="damageType">
 								<option value="">Type of damage...</option>
 								<option value="acid">Acid</option>
 								<option value="bludgeoning">Bludgeoning</option>
@@ -47,7 +47,7 @@
 								<option value="radiant">Radiant</option>
 								<option value="slashing">Slashing</option>
 								<option value="thunder">Thunder</option>
-							</select>
+							</select> -->
 
 							<div class="manual">
 								<input type="number" 
@@ -141,14 +141,12 @@
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 						let amount = parseInt(this.manualAmount);
-						let maxHp = parseInt(target.maxHp);
-						let curHp = parseInt(target.curHp);
 
 						if(type == 'damage') {
-							this.isDamage(key, target, amount, curHp, maxHp)
+							this.isDamage(key, target, amount)
 						}
 						else {
-							this.isHealing(key, target, amount, curHp, maxHp)
+							this.isHealing(key, target, amount)
 						}
 						this.manualAmount = '';
 						this.damageType = '';
@@ -158,21 +156,55 @@
 					}
 				})
 			},
-			isDamage(key, target, amount, curHp, maxHp) {
-				let newhp = parseInt(curHp - amount);
-				let type = 'damage'
-				let over = 0
+			isDamage(key, target, amount) {
+				var maxHp = parseInt(target.maxHp);
+				var curHp = parseInt(target.curHp);
+				var tempHp = parseInt(target.tempHp)
+				var type = 'damage'
+				var over = 0
+				var rest_amount = amount
 
-				if(newhp < 0) { 
-					newhp = 0;
-					over = amount - curHp; //overkill
-					amount = curHp;
+				//First check if there is tempHp and put damage in there first.
+				if(tempHp) {
+					var newtemp = parseInt(tempHp - amount);
+					
+					//if the damage was higher then the amount of tempHp, remove the tempHp and remember the rest damage
+					if(newtemp < 0) {
+						rest_amount = parseInt(amount - tempHp);
+						target.tempHp = undefined;
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/tempHp`).remove()
+					}
+					//if the damage was lower than the amount of tempHp, set a new tempHp and set rest damage to 0
+					else {
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+							tempHp: newtemp,
+						})
+						target.tempHp = newtemp;
+						rest_amount = 0;
+					}
 				}
+				//If there is damage left after taking it from the tempHp
+				if(rest_amount > 0) {
+					var newhp = parseInt(curHp - rest_amount);
 				
-				target.curHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
-					curHp: newhp,
-				})
+					if(newhp < 0) { 
+						newhp = 0;
+
+						if(tempHp) {
+							over = parseInt(rest_amount + tempHp - curHp); //overkill
+							amount = parseInt(curHp + tempHp);
+						}
+						else {
+							over = parseInt(rest_amount - curHp); //overkill
+							amount = curHp;
+						}
+					}
+					target.curHp = newhp
+
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+						curHp: newhp,
+					})
+				}
 
 				//Notification
 				this.$snotify.error(
@@ -188,7 +220,9 @@
 				//Add to damagemeters
 				this.damageMeters(type, amount, over);
 			},
-			isHealing(key, target, amount, curHp, maxHp) {
+			isHealing(key, target, amount) {
+				let maxHp = parseInt(target.maxHp);
+				let curHp = parseInt(target.curHp);
 				let newhp = parseInt(curHp + amount);
 				let type = 'healing'
 				let over = 0

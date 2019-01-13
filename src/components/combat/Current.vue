@@ -5,21 +5,49 @@
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 					<div class="current">
-						<div class="health">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
-							<div class="progress health-bar">
-								<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
-								<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
-								<div class="progress-bar" :class="{ 
-									'bg-red': percentage(current.curHp, current.maxHp) <= 33, 
-									'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
-									'bg-green': percentage(current.curHp, current.maxHp) > 7
-									}" 
-									role="progressbar" 
-									:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+
+						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable">
+								<div class="px-1 mb-3 d-flex justify-content-between">
+									<div v-for="(n, index) in 5">
+										<template v-if="Object.keys(current.saves).length == n">
+											<a v-show="current.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
+											<a v-show="current.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-times"></i></a>
+										</template>
+										<template v-else>
+											<span v-show="current.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
+											<span v-show="current.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
+										</template>
+										<span v-show="!current.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+									</div>
+								</div>
+								<div v-if="Object.keys(current.saves).length < 5" class="d-flex justify-content-between">
+									<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
+									<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
+								</div>
+								<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
+						</template>
+						
+						<template v-else>
+							<div class="health">
+								<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
+								<div class="progress health-bar">
+									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+									<div v-show="!current.stable">
+										<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
+										<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
+									</div>
+									<div class="progress-bar" :class="{ 
+										'bg-red': percentage(current.curHp, current.maxHp) <= 33, 
+										'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
+										'bg-green': percentage(current.curHp, current.maxHp) > 7
+										}" 
+										role="progressbar" 
+										:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+									</div>
 								</div>
 							</div>
-						</div>
+						</template>
+
 						<b-row class="conditions">
 							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(conditions[key])">
 								<svg 
@@ -74,7 +102,9 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'set_save',
+				'set_stable',
 			]),
 			showCondition(show) {
 				// event.stopPropagation();
@@ -90,7 +120,20 @@
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
- 			}	
+			 },
+			 save(check, number) {
+				 this.set_save({
+					 key: this.current.key,
+					 check: check,
+					 number: number
+					})
+			 },
+			 stabilize(key) {
+				this.set_stable({
+					 key: this.current.key,
+					 action: 'set',
+					})
+			 },
 		}
 	}
 </script>
@@ -113,6 +156,9 @@
 		&.shadow {
 			box-shadow: 0 0 10px rgba(0,0,0,0.8); 
 		}
+	}
+	.btn.save {
+		width: 49.5%;
 	}
 	.health {
 		display: grid;

@@ -106,7 +106,7 @@
 <script>
 	import firebase from 'firebase'
 	import { db } from '@/firebase'
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 
 	import { getters } from '@/mixins/getters'
 
@@ -137,6 +137,10 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'set_save',
+				'set_stable',
+			]),
 			setManual(key, target, type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
@@ -186,6 +190,13 @@
 				//If there is damage left after taking it from the tempHp
 				if(rest_amount > 0) {
 					var newhp = parseInt(curHp - rest_amount);
+
+					if(newhp <= 0) {
+						this.set_stable({
+							key: target.key,
+							action: 'unset',
+						});
+					}
 				
 					if(newhp < 0) { 
 						newhp = 0;
@@ -226,6 +237,14 @@
 				let newhp = parseInt(curHp + amount);
 				let type = 'healing'
 				let over = 0
+
+				//If the target is a player and the curHp was 0, saves need to be reset
+				if(target.entityType == 'player' && curHp == 0) {
+					this.set_save({
+						key: key,
+						check: 'reset'
+					})
+				}
 
 				if(newhp > maxHp) { 
 					newhp = maxHp;

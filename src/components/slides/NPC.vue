@@ -163,13 +163,14 @@ a {
 	white-space: nowrap;
 
 	.ability {
-		height: 48px;
+		height: 60px;
+		line-height: 45px;
 		border:solid 1px #000;
 		text-align:center;
 		font-size:20px;
-		font-size: calc( 20px + (23 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
+		font-size: calc( 20px + (21 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
 		position:relative;
-		cursor:pointer;
+		cursor: pointer;
 		margin-right: 10px;
 		width: 16.6%;
 
@@ -182,18 +183,21 @@ a {
 			bottom: -10px;
 			left: 50%;
 			transform: translateX(-50%);
-			font-size: calc( 11px + (13 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
+			font-size: calc( 11px + (12 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
 			border: solid 1px #000;
 			text-align: center;
 			border-radius: 15px / 10px;
-			height:20px;
-			width: 60%;
+			line-height: 25px;
+			height:25px;
+			width: 35px;
 		}
 		.abilityName {
 			position: absolute;
-			top: -24px;
+			top: -34px;
+			left: 50%;
+			transform: translateX(-50%);
 	
-			font-size: calc( 11px + (13 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
+			font-size: calc( 11px + (12 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
 			text-align: center;
 		}
 	}

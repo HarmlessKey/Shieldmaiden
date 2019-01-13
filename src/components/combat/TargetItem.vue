@@ -8,30 +8,48 @@
 			<template v-if="entity.ac_bonus">{{ entity.ac + entity.ac_bonus}}</template>
 			<template v-else>{{ entity.ac }}</template>
 		</span>
-		<div class="progress health-bar">
-			<span>{{ entity.name }}</span>
-			<div class="progress-bar" :class="{ 
-				'bg-red': percentage(entity.curHp, entity.maxHp) < 33, 
-				'bg-orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
-				'bg-green': percentage(entity.curHp, entity.maxHp) > 7
-				}" 
-				role="progressbar" 
-				:style="{width: percentage(entity.curHp, entity.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+
+		<template v-if="entity.curHp > 0">
+			<div class="progress health-bar">
+				<span>{{ entity.name }}</span>
+				<div class="progress-bar" :class="{ 
+					'bg-red': percentage(entity.curHp, entity.maxHp) < 33, 
+					'bg-orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
+					'bg-green': percentage(entity.curHp, entity.maxHp) > 7
+					}" 
+					role="progressbar" 
+					:style="{width: percentage(entity.curHp, entity.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+				</div>
 			</div>
-		</div>
-		{{ setNumber(entity.curHp) }}
-		<input v-model.number="number" type="hidden">
-		<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
-			<span class="current" :class="{ 
-				'red': percentage(entity.curHp, entity.maxHp) < 33, 
-				'orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
-				'green': percentage(entity.curHp, entity.maxHp) > 7
-				}">{{ animatedNumber }}</span>
-				<span class="gray-hover">/</span>{{ entity.maxHp }}
-			<template v-if="entity.tempHp">
-				<span class="gray-hover">+{{ entity.tempHp }}</span>
+
+			<!-- HEALTH -->
+			{{ setNumber(entity.curHp) }}
+			<input v-model.number="number" type="hidden">
+			<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+				<span class="current" :class="{ 
+					'red': percentage(entity.curHp, entity.maxHp) < 33, 
+					'orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
+					'green': percentage(entity.curHp, entity.maxHp) > 7
+					}">{{ animatedNumber }}</span>
+					<span class="gray-hover">/</span>{{ entity.maxHp }}
+				<template v-if="entity.tempHp">
+					<span class="gray-hover">+{{ entity.tempHp }}</span>
+				</template>
+			</span>
+		</template>
+
+		<!-- PLAYER DOWN -->
+		<div v-else class="saves text-left d-flex justify-content-left">
+			<div v-if="entity.stable" class="green saves">
+				<span><i class="fas fa-fist-raised"></i> Stable</span>
+			</div>
+			<template v-else>
+				<div v-for="check, key in entity.saves" :key="key">
+					<span v-show="check == 'succes'" class="green"><i class="fas fa-check"></i></span> 
+					<span v-show="check == 'fail'" class="red"><i class="fas fa-times"></i></span>
+				</div>
 			</template>
-		</span>
+		</div>
 	</div>
 </template>
 
@@ -96,7 +114,7 @@
 
 	span { 
 		color:#191919;
-		font-size: calc( 8px + (11 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
+		font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 		position: absolute;
 		left: 5px;
 		white-space: nowrap;
@@ -128,7 +146,7 @@
 	grid-area: ac;
 }
 .hp {
-	font-size: calc( 8px + (11 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
+	font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 	text-align:right;
 	white-space: nowrap;
 	overflow: hidden;
@@ -136,5 +154,15 @@
 }
 .temp {
 	color: #494747;
+}
+.saves {
+	background: #302f2f;
+	padding-left: 5px;
+	display: block;
+	grid-area: hp-bar;
+
+	span {
+		margin-right: 5px;
+	}
 }
 </style>

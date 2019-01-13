@@ -33,6 +33,7 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
+											<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
 											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
@@ -128,6 +129,7 @@
 			...mapActions([
 				'setSlide',
 				'set_targeted',
+				'set_stable',
 			]),
 			conditions(entity) {
 				// event.stopPropagation();

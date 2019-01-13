@@ -82,6 +82,18 @@ const mutations = {
 		else {
 			entity.down = false
 		}
+		if (db_entity.saves) {
+			entity.saves = db_entity.saves
+		}
+		else {
+			entity.saves = {}
+		}
+		if (db_entity.stable) {
+			entity.stable = db_entity.stable
+		}
+		else {
+			entity.stable = false
+		}
 		if (db_entity.conditions) {
 			entity.conditions = db_entity.conditions
 		}
@@ -197,6 +209,41 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).remove();
 		}
 	},
+	SET_SAVE(state, {key, check, number}) {
+		if(check == 'reset') {
+			//RESET SAVES
+			Vue.set(state.entities[key], 'saves', {})
+			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
+
+			//REMOVE STABLE
+			Vue.set(state.entities[key], 'stable', false)
+			encounters_ref.child(`${state.path}/entities/${key}/stable`).remove();
+		}
+		else if(check == 'unset') {
+			Vue.delete(state.entities[key].saves, number)
+			encounters_ref.child(`${state.path}/entities/${key}/saves/${number}`).remove();
+		}
+		else {
+			var n = parseInt(number + 1);
+			Vue.set(state.entities[key].saves, n, check)
+			encounters_ref.child(`${state.path}/entities/${key}/saves/${n}`).set(check);
+		}
+	},
+	SET_STABLE(state, {key, action}) {
+		if(action == 'set') {
+			//RESET SAVES
+			Vue.set(state.entities[key], 'saves', {})
+			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
+
+			//SET STABLE
+			Vue.set(state.entities[key], 'stable', 'true')
+			encounters_ref.child(`${state.path}/entities/${key}/stable`).set('true');
+		}
+		else if(action == 'unset') {
+			Vue.delete(state.entities[key], 'stable')
+			encounters_ref.child(`${state.path}/entities/${key}/stable`).remove();
+		}
+	},
 	EDIT_ENTITY(state, {key, entity}) {
 		state.entities[key].name = entity.name
 		state.entities[key].initiative = entity.initiative
@@ -262,6 +309,12 @@ const actions = {
 	},
 	set_condition({ commit }, payload) {
 		commit('SET_CONDITION', payload)
+	},
+	set_save({ commit }, payload) {
+		commit('SET_SAVE', payload)
+	},
+	set_stable({ commit }, payload) {
+		commit('SET_STABLE', payload)
 	},
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)

@@ -174,10 +174,11 @@
 
 				//Death saves at 0 hp
 				if(curHp == 0) {
+					console.log('yo')
 					var n = parseInt(Object.keys(target.saves).length)
 					
 					this.set_save({
-					 key: this.current.key,
+					 key: key,
 					 check: 'fail',
 					 number: n
 					})
@@ -185,7 +186,7 @@
 						n = parseInt(Object.keys(target.saves).length)
 
 						this.set_save({
-						key: this.current.key,
+						key: key,
 						check: 'fail',
 						number: n
 						})

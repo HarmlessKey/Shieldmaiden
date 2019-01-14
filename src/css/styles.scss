@@ -277,7 +277,7 @@ table {
 }
 
 .slide {
-	padding: 15px;
+	padding: 45px 15px 15px 15px;
 	position: fixed;
 	right: 0;
 	top: 50px;
@@ -289,11 +289,15 @@ table {
 	box-shadow: 0 10px 8px #000;
 
 	a.hide {
-		font-size: 20px;
+		padding: 0 10px;
+		font-size: 15px;
+		line-height: 30px;
 		position: absolute;
-		left: -10px;
-		top: -10px;
+		left:0px;
+		top: 0px;
 		z-index: 1000;
+		background: $blue;
+		color: $white !important;
 	}
 }
 

@@ -1,12 +1,12 @@
 <template>
 	<div id="app" class="container-fluid">
-		<div @click="hideSlide()">
+		<div @click="">
 			<nav-main/>
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
 			<div v-if="slide.show == true" class="slide bg-gray">
-				<a @click="hideSlide()" class="hide"><i class="fas fa-chevron-circle-right"></i></a>
+				<a @click="hideSlide()" class="hide"><i class="fas fa-chevron-right"></i></a>
 				<Slide />
 			</div>
 		</transition>

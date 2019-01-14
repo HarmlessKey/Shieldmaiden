@@ -55,8 +55,13 @@ export const content_module = {
 			state.user = Firebase.auth().currentUser;
 		},
 		setSlide(state, value) {
-			Vue.set(state, 'slide', false)
-			setTimeout(() => Vue.set(state, 'slide', value), 100);
+			if(state.slide.type != value.type) {
+				state.slide = false
+				setTimeout(() => state.slide = value, 100);
+			}
+			else {
+				state.slide = false
+			}
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload

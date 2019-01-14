@@ -38,7 +38,7 @@
 											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
 											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" @click="remove(entity.key)"><i class="fas fa-times"></i> Remove</a>
+											<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
 										</div>
 									</span>
 								</li>
@@ -49,8 +49,30 @@
 							<h2>IDLE ({{ _idle.length }})</h2>
 							<ul class="targets idle_targets">
 								<template v-for="entity in _idle">
-									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
-										<TargetItem :item="entity.key" />
+									<li class="d-flex justify-content-between" 
+										v-bind:key="entity.key" 
+										:class="{ targeted : targeted == entity.key }">
+										<div class="target" @click="set_targeted(entity.key)">
+											<TargetItem :item="entity.key" />
+										</div>
+										<span>
+										<a class="options"
+											id="options"
+											data-toggle="dropdown" 
+											aria-haspopup="true" 
+											aria-expanded="false">
+											<i class="fas fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu" aria-labelledby="options">	
+											<div class="dropdown-header">{{ entity.name }}</div>
+											<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
+											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
+											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
+											<a class="dropdown-item"><i class="fas fa-swords"></i> Do damage/healing</a>
+											<div class="dropdown-divider"></div>
+											<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
+										</div>
+									</span>
 									</li>
 								</template>
 							</ul>
@@ -130,6 +152,7 @@
 				'setSlide',
 				'set_targeted',
 				'set_stable',
+				'remove_entity',
 			]),
 			conditions(entity) {
 				// event.stopPropagation();
@@ -147,7 +170,6 @@
 				})
 			},
 			edit(key, entity) {
-				// event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'edit',
@@ -155,42 +177,16 @@
 					entity: entity,
 				})
 			},
-			// setTarget(entity) {
-			// 	if (this.currentTarget.key == entity.key) {
-			// 		this.currentTarget = {}
-			// 	} 
-			// 	else {
-			// 		this.currentTarget = entity
-			// 	}
-			// 	this.$emit("target", this.currentTarget)
-			// },
-			// getTargetData(entity) {
-			// 	let item = {
-			// 		name: entity.name,
-			// 		key: entity.key,
-			// 		id: entity.id,
-			// 		initiative: entity.initiative,
-			// 		type: entity.entityType
-			// 	}
-			// 	if (entity.entityType == 'player') {
-			// 		item.img = this.players[entity.id].avatar
-			// 		item.ac = this.players[entity.id].ac
-			// 		item.maxHp = parseInt(this.players[entity.id].maxHp)
-			// 		item.curHp = parseInt(entity.curHp)
-			// 	}
-			// 	else {
-			// 		item.img = require('@/assets/_img/styles/monster.svg')
-			// 		item.ac = entity.ac
-			// 		item.maxHp = parseInt(entity.maxHp)
-			// 		item.curHp = parseInt(entity.curHp)
-			// 	}
-			// 	return item
-			// },
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
 			},
-			remove(id) {
-				db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+			remove(key, name) {
+				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
+					buttons: [
+					{ text: 'Yes', action: (toast) => { this.remove_entity({key: key}); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
 			},
  		},
 	}

@@ -252,6 +252,10 @@ const mutations = {
 
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
+	REMOVE_ENTITY(state, {key}) {
+		Vue.delete(state.entities, key)
+		encounters_ref.child(`${state.path}/entities/${key}`).remove();
+	},
 	SET_DOWN(state, {key, value}) {
 		state.entities[key].down = value
 		if (value) {
@@ -318,6 +322,12 @@ const actions = {
 	},
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)
+	},
+	add_entity({ commit, rootState }, key) {
+		commit('ADD_ENTITY', {rootState, key})
+	},
+	remove_entity({ commit }, payload) {
+		commit('REMOVE_ENTITY', payload)
 	},
 }
 

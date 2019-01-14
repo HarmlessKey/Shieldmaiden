@@ -54,6 +54,7 @@ export const content_module = {
 			state.user = Firebase.auth().currentUser;
 		},
 		setSlide(state, value) {
+			console.log(value)
 			state.slide = value;
 		},
 		SET_PLAYERS(state, payload) {

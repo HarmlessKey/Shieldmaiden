@@ -19,7 +19,7 @@
 					min="0"
 					v-model="entity.initiative"
 					:class="{'input': true, 'error': errors.has('initiative') }"
-					v-validate="'numeric|required'"
+					v-validate="'required'"
 					placeholder="Initiative"></b-form-input>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
@@ -34,7 +34,7 @@
 					min="1"
 					v-model="entity.ac"
 					:class="{'input': true, 'error': errors.has('ac') }"
-					v-validate="'numeric|required'"
+					v-validate="'required'"
 					placeholder="Armor Class"></b-form-input>
 					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 			</b-col>
@@ -47,7 +47,7 @@
 					name="maxHp"
 					min="1"
 					:class="{'input': true, 'error': errors.has('maxHp') }"
-					v-validate="'numeric|required'"
+					v-validate="'required'"
 					v-model="entity.maxHp"
 					placeholder="Hit Points"></b-form-input>
 					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
@@ -180,7 +180,6 @@
 					this.entity.maxHp = npc_data.hit_points
 					this.entity.ac = npc_data.armor_class
 					this.entity.name = npc_data.name
-					this.$forceUpdate()
 				}
 				else if(type == 'custom') {
 					var npc_data = this.npcs;
@@ -189,6 +188,7 @@
 					this.entity.ac = npc_data[id].ac
 					this.entity.name = npc_data[id].name
 				}
+				this.$forceUpdate()
 			},
 			add() {
 				this.$validator.validateAll().then((result) => {

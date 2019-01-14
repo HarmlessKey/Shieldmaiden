@@ -155,7 +155,7 @@
 				'remove_entity',
 			]),
 			conditions(entity) {
-				// event.stopPropagation();
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'conditions',
@@ -163,13 +163,14 @@
 				})
 			},
 			addNpc(entity) {
-				// event.stopPropagation();
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'addNpc',
 				})
 			},
 			edit(key, entity) {
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'edit',

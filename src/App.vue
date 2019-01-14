@@ -1,6 +1,6 @@
 <template>
 	<div id="app" class="container-fluid">
-		<div @click="">
+		<div @click="hideSlide()">
 			<nav-main/>
 			<router-view/>
 		</div>

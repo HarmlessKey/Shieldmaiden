@@ -1,4 +1,5 @@
 import Firebase from 'firebase';
+import Vue from 'vue'
 import { db } from '@/firebase'
 
 const campaigns_ref = db.ref('campaigns/')
@@ -54,8 +55,8 @@ export const content_module = {
 			state.user = Firebase.auth().currentUser;
 		},
 		setSlide(state, value) {
-			console.log(value)
-			state.slide = value;
+			Vue.set(state, 'slide', false)
+			setTimeout(() => Vue.set(state, 'slide', value), 100);
 		},
 		SET_PLAYERS(state, payload) {
 			state.players = payload

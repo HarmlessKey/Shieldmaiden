@@ -108,7 +108,7 @@
 				'set_stable',
 			]),
 			showCondition(show) {
-				// event.stopPropagation();
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'condition',
@@ -116,6 +116,7 @@
 				})
 			},
 			deathInfo() {
+				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'deathSaves',

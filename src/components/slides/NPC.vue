@@ -1,20 +1,20 @@
 <template>
 	<div class="pb-5">
-		<h2>{{ npc.name }}</h2>
+		<h2>{{ entity.name }}</h2>
 		<i>
-			<template v-if="npc.size">{{ npc.size }}</template>
-			<template v-if="npc.type"> {{ npc.type }}</template>
-			<span v-if="npc.subtype">({{ npc.subtype }})</span>
-			<template v-if="npc.alignment">, {{ npc.alignment }}</template>
+			<template v-if="entity.size">{{ entity.size }}</template>
+			<template v-if="entity.type"> {{ entity.type }}</template>
+			<span v-if="entity.subtype">({{ entity.subtype }})</span>
+			<template v-if="entity.alignment">, {{ entity.alignment }}</template>
 		</i>
 		<hr>
 		<p>
-			<template v-if="npc.armor_class"><b>Armor Class</b> {{ npc.armor_class }}<br/></template>
-			<template v-else><b>Armor Class</b> {{ npc.ac }}<br/></template>
-			<template v-if="npc.hit_points"><b>Hit Points</b> {{ npc.hit_points }}</template>
-			<template v-else><b>Hit Points</b> {{ npc.maxHp }}</template>
-			<template v-if="npc.hit_dice"> ({{ npc.hit_dice }})</template>
-			<template v-if="npc.speed"><br/><b>Speed</b> {{ npc.speed }}</template>
+			<template v-if="entity.armor_class"><b>Armor Class</b> {{ entity.armor_class }}<br/></template>
+			<template v-else><b>Armor Class</b> {{ entity.ac }}<br/></template>
+			<template v-if="entity.hit_points"><b>Hit Points</b> {{ entity.hit_points }}</template>
+			<template v-else><b>Hit Points</b> {{ entity.maxHp }}</template>
+			<template v-if="entity.hit_dice"> ({{ entity.hit_dice }})</template>
+			<template v-if="entity.speed"><br/><b>Speed</b> {{ entity.speed }}</template>
 		</p>
 		<hr>
 		<div class="abilities d-flex justify-content-between">
@@ -22,36 +22,36 @@
 				v-b-tooltip.hover title="Roll"
 				:key="index" 
 				class="ability" 
-				@click="rollAbility(ability.ability, npc[ability.ability])"
-				v-if="npc[ability.ability]">
+				@click="rollAbility(ability.ability, entity[ability.ability])"
+				v-if="entity[ability.ability]">
 				<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
-				{{ modifier(npc[ability.ability]) }}
-				<span class="score bg-gray">{{ npc[ability.ability] }}</span>
+				{{ modifier(entity[ability.ability]) }}
+				<span class="score bg-gray">{{ entity[ability.ability] }}</span>
 			</div>
 		</div>
 		<hr>
 
 		<!-- SKILLS -->
 		<p>
-			<template v-if="npc.skills">
+			<template v-if="entity.skills">
 				<b>Skills</b>
 				<span v-for="skill, index in skills" :key="index" v-if="npc[skill]">
 					{{ skill }} {{ npc[skill] }},
 				</span>
 				<br/>
 			</template>
-			<template v-if="npc.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ npc.damage_vulnerabilities }}<br/></template>
-			<template v-if="npc.damage_resistances"><b>Damage resistances</b> {{ npc.damage_resistances }}<br/></template>
-			<template v-if="npc.damage_immunities"><b>Damage immunities</b> {{ npc.damage_immunities }}<br/></template>
-			<template v-if="npc.condition_immunities"><b>Condition immunities</b> {{ npc.condition_immunities }}<br/></template>
-			<template v-if="npc.senses"><b>Senses</b> {{ npc.senses }}<br/></template>
-			<template v-if="npc.languages"><b>Languages</b> {{ npc.languages }}<br/></template>
-			<template v-if="npc.challenge_rating"><b>Challenge Rating</b> {{ npc.challenge_rating }}</template>
+			<template v-if="entity.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities }}<br/></template>
+			<template v-if="entity.damage_resistances"><b>Damage resistances</b> {{ entity.damage_resistances }}<br/></template>
+			<template v-if="entity.damage_immunities"><b>Damage immunities</b> {{ entity.damage_immunities }}<br/></template>
+			<template v-if="entity.condition_immunities"><b>Condition immunities</b> {{ entity.condition_immunities }}<br/></template>
+			<template v-if="entity.senses"><b>Senses</b> {{ entity.senses }}<br/></template>
+			<template v-if="entity.languages"><b>Languages</b> {{ entity.languages }}<br/></template>
+			<template v-if="entity.challenge_rating"><b>Challenge Rating</b> {{ entity.challenge_rating }}</template>
 		</p>
 
-		<template v-if="npc.special_abilities">
+		<template v-if="entity.special_abilities">
 			<hr>
-			<div v-for="ability, index in npc.special_abilities">
+			<div v-for="ability, index in entity.special_abilities">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ ability.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -60,10 +60,10 @@
 			</div>
 		</template>
 
-		<template v-if="npc.actions">
+		<template v-if="entity.actions">
 			<hr>
 			<h2>Actions</h2>
-			<div v-for="action, index in npc.actions">
+			<div v-for="action, index in entity.actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ action.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -72,10 +72,10 @@
 			</div>
 		</template>
 
-		<template v-if="npc.legendary_actions">
+		<template v-if="entity.legendary_actions">
 			<hr>
 			<h2>Legendary Actions</h2>
-			<div v-for="(legendary_action, index) in npc.legendary_actions">
+			<div v-for="(legendary_action, index) in entity.legendary_actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1}}. {{ legendary_action.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -91,7 +91,7 @@
 	export default {
 		name: 'NPC',
 		props: [
-		'npc'
+		'entity'
 		],
 		data() {
 			return {

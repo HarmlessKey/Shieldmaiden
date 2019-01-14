@@ -460,7 +460,7 @@
 				this.setSlide({
 					show: true,
 					type: 'npc',
-					npc: npc
+					entity: npc
 				})
 			},
 			copy(npc) {

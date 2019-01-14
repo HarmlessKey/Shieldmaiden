@@ -171,7 +171,7 @@
 					this.setSlide({
 						show: true,
 						type: 'npc',
-						npc: npc
+						entity: npc
 					})
 				}
 				else if(type == 'edit') {

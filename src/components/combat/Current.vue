@@ -62,7 +62,7 @@
 								</svg>
 							</b-col>
 						</b-row>
-						<NPC class="mt-3" :npc="current" />
+						<NPC class="mt-3" :entity="current" />
 					</div>
 				</div>
 			</div>

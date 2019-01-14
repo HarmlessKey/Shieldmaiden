@@ -2,7 +2,7 @@
 	<div>
 		<!-- {{ slide }} -->
 		<Roll v-if="slide.type == 'roll'"/>
-		<NPC v-if="slide.type == 'npc'" :npc="slide.npc" />
+		<NPC v-if="slide.type == 'npc'" :entity="slide.entity" />
 		<AddNpc v-if="slide.type == 'addNpc'" />
 		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
 		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" />

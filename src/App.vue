@@ -5,9 +5,11 @@
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
-			<div v-if="slide.show == true" class="slide bg-gray">
-				<a @click="hideSlide()" class="hide"><i class="fas fa-chevron-right"></i></a>
-				<Slide />
+			<div v-if="slide.show == true" class="slide">
+				<div>
+					<a @click="hideSlide()" class="hide" v-b-tooltip:hover title="Hide"><i class="fas fa-chevron-right"></i></a>
+					<Slide />
+				</div>
 			</div>
 		</transition>
 		

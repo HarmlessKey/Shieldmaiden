@@ -285,18 +285,19 @@ table {
 	width: 330px;
 	z-index: 99;
 	overflow: auto;
-	border-left: solid 1px #000;
-	box-shadow: 0 10px 8px #000;
+	box-shadow: 0 10px 15px $gray-dark;
+	background: $gray;
 
 	a.hide {
-		padding: 0 10px;
+		padding-left: 10px;
+		width: 100%;
 		font-size: 15px;
 		line-height: 30px;
 		position: absolute;
-		left:0px;
+		right: 0px;
 		top: 0px;
 		z-index: 1000;
-		background: $blue;
+		background: $gray-dark;
 		color: $white !important;
 	}
 }

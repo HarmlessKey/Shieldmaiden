@@ -12,6 +12,9 @@
 		<template v-if="entity.curHp > 0">
 			<div class="progress health-bar">
 				<span>{{ entity.name }}</span>
+				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
+					<div class="condition bg-red" v-for="condition, key in entity.conditions" :key="key" v-b-tooltip.hover :title="key"></div>
+				</div>
 				<div class="progress-bar" :class="{ 
 					'bg-red': percentage(entity.curHp, entity.maxHp) < 33, 
 					'bg-orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
@@ -120,6 +123,19 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis !important;
+	}
+	.conditions {
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		.condition {
+			display: block;
+			width: 12px;
+			height: 12px;
+			border: solid 1px #fff;
+			margin-left: 1px;
+		}
 	}
 }
 .initiative, .ac, .img {

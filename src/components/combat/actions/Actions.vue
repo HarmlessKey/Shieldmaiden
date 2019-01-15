@@ -165,12 +165,12 @@
 				})
 			},
 			isDamage(key, target, amount) {
-				var maxHp = parseInt(target.maxHp);
 				var curHp = parseInt(target.curHp);
-				var tempHp = parseInt(target.tempHp)
-				var type = 'damage'
-				var over = 0
-				var rest_amount = amount
+				var tempHp = parseInt(target.tempHp);
+				var transCurHp = parseInt(target.transformedCurHp);
+				var type = 'damage';
+				var over = 0;
+				var rest_amount = amount;
 
 				//Death saves at 0 hp
 				if(curHp == 0) {
@@ -211,7 +211,26 @@
 						rest_amount = 0;
 					}
 				}
-				//If there is damage left after taking it from the tempHp
+				//Then check if the target is transformed and put rest damage in the transformation
+				if(target.transformed == true) {
+					var newtrans = parseInt(transCurHp - rest_amount);
+
+					//if the damage was higher then the amount of CurHp, remove the transformation and remember the rest damage
+					if(newtrans < 0) {
+						rest_amount = parseInt(amount - transCurHp);
+						target.transformed = false;
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).remove()
+					}
+					//if the damage was lower than the amount of tempHp, set a new tempHp and set rest damage to 0
+					else {
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).update({
+							curHp: newtrans,
+						})
+						target.transformedCurHp = newtrans;
+						rest_amount = 0;
+					}
+				}
+				//If there is damage left after taking it from the tempHp and/or the transformation
 				if(rest_amount > 0) {
 					var newhp = parseInt(curHp - rest_amount);
 
@@ -256,11 +275,17 @@
 				this.damageMeters(type, amount, over);
 			},
 			isHealing(key, target, amount) {
-				let maxHp = parseInt(target.maxHp);
-				let curHp = parseInt(target.curHp);
-				let newhp = parseInt(curHp + amount);
-				let type = 'healing'
-				let over = 0
+				if(target.transformed == true) {
+					var maxHp = parseInt(target.transformedMaxHp);
+					var curHp = parseInt(target.transformedCurHp);
+				}
+				else {
+					var maxHp = parseInt(target.maxHp);
+					var curHp = parseInt(target.curHp);
+				}
+				var newhp = parseInt(curHp + amount);
+				var type = 'healing'
+				var over = 0
 
 				//If the target is a player and the curHp was 0, saves need to be reset
 				if(target.entityType == 'player' && curHp == 0) {
@@ -276,10 +301,19 @@
 					amount = maxHp - curHp;
 				}
 				
-				target.curHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
-					curHp: newhp,
-				})
+				//If the target is transformed, heal the transformation
+				if(target.transformed == true) {
+					target.transformedCurHp = newhp
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).update({
+						curHp: newhp,
+					})
+				}
+				else {
+					target.curHp = newhp
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
+						curHp: newhp,
+					})
+				}
 				//Notification
 				this.$snotify.success(
 					this.current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 

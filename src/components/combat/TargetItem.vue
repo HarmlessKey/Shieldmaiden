@@ -1,40 +1,46 @@
 <template>
 	<div class="target">
 		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ entity.initiative }}</span>
-		<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}"></span>
-		<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
-		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-		<span class="ac" v-b-tooltip.hover title="Armor Class">
-			<template v-if="entity.ac_bonus">{{ entity.ac + entity.ac_bonus}}</template>
-			<template v-else>{{ entity.ac }}</template>
+		<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
+			<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
+				<i class="fas fa-paw-claws"></i>
+			</span>
 		</span>
+		<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }">
+			<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
+				<i class="fas fa-paw-claws"></i>
+			</span>
+		</span>
+		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
+		<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">{{ displayStats().ac + entity.ac_bonus}}</span>
+		<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
 
-		<template v-if="entity.curHp > 0">
+		<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
 			<div class="progress health-bar">
 				<span>{{ entity.name }}</span>
 				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
 					<div class="condition bg-red" v-for="condition, key in entity.conditions" :key="key" v-b-tooltip.hover :title="key"></div>
 				</div>
 				<div class="progress-bar" :class="{ 
-					'bg-red': percentage(entity.curHp, entity.maxHp) < 33, 
-					'bg-orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
-					'bg-green': percentage(entity.curHp, entity.maxHp) > 7
+					'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+					'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+					'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
 					}" 
 					role="progressbar" 
-					:style="{width: percentage(entity.curHp, entity.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+					:style="{width: percentage(displayStats().curHp, displayStats().maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 				</div>
 			</div>
 
 			<!-- HEALTH -->
-			{{ setNumber(entity.curHp) }}
+			{{ setNumber(displayStats().curHp) }}
 			<input v-model.number="number" type="hidden">
 			<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
 				<span class="current" :class="{ 
-					'red': percentage(entity.curHp, entity.maxHp) < 33, 
-					'orange': percentage(entity.curHp, entity.maxHp) > 33 && percentage(entity.curHp, entity.maxHp) < 76, 
-					'green': percentage(entity.curHp, entity.maxHp) > 7
+					'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+					'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+					'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
 					}">{{ animatedNumber }}</span>
-					<span class="gray-hover">/</span>{{ entity.maxHp }}
+					<span class="gray-hover">/</span>{{ displayStats().maxHp }}
 				<template v-if="entity.tempHp">
 					<span class="gray-hover">+{{ entity.tempHp }}</span>
 				</template>
@@ -65,7 +71,7 @@
 		data () {
 			return {
 				target: '',
-				number: 20,
+				number: 0,
 				tweenedNumber: 0
 			}
 		},
@@ -92,6 +98,23 @@
 			},
 			setNumber(value) {
 				this.number = value
+			},
+			displayStats() {
+				if(this.entity.transformed == true) {
+					var stats = {
+						ac: this.entity.transformedAc,
+						maxHp: this.entity.transformedMaxHp,
+						curHp: this.entity.transformedCurHp,
+					}
+				}
+				else {
+					var stats = {
+						ac: this.entity.ac,
+						maxHp: this.entity.maxHp,
+						curHp: this.entity.curHp,
+					}
+				}
+				return stats
 			},
 		}
 	}
@@ -146,6 +169,9 @@
 	grid-area: initiative;
 }
 .img {
+	display: block;
+	width: 30px;
+	height: 30px;
 	background-color: #191919;
 	background-position: center top;
 	background-repeat: no-repeat;
@@ -154,6 +180,11 @@
 	font-size: 20px;
 	line-height: 30px;
 	grid-area: img;
+	overflow: hidden;
+
+	span {
+		position: relative;
+	}
 }
 .ac {
 	background-color:#4c4c4c;

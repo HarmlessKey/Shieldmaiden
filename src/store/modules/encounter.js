@@ -100,6 +100,15 @@ const mutations = {
 		else {
 			entity.conditions = {}
 		}
+		if(db_entity.transformed) {
+			entity.transformed = true
+			entity.transformedMaxHp = db_entity.transformed.maxHp
+			entity.transformedCurHp = db_entity.transformed.curHp
+			entity.transformedAc = db_entity.transformed.ac
+		}
+		else {
+			entity.transformed = false
+		}
 		switch(true) {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]

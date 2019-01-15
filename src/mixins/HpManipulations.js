@@ -14,6 +14,7 @@ export const setHP = {
 		...mapActions([
 			'set_save',
 			'set_stable',
+			'set_hp',
 		]),
 		setHP(amount, key, target, current, type) {
 			amount = parseInt(amount);
@@ -56,40 +57,36 @@ export const setHP = {
 			//First check if there is tempHp and put damage in there first.
 			if(tempHp) {
 				var newtemp = parseInt(tempHp - amount);
-				
-				//if the damage was higher then the amount of tempHp, remove the tempHp and remember the rest damage
-				if(newtemp < 0) {
+
+				//Adjust the rest amount
+				rest_amount = 0;
+				if(newtemp <= 0) {
 					rest_amount = parseInt(amount - tempHp);
-					target.tempHp = undefined;
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/tempHp`).remove()
 				}
-				//if the damage was lower than the amount of tempHp, set a new tempHp and set rest damage to 0
-				else {
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
-						tempHp: newtemp,
-					})
-					target.tempHp = newtemp;
-					rest_amount = 0;
-				}
+
+				//Set the new HP
+				this.set_hp({
+					key: key,
+					pool: 'temp',
+					newHp: newtemp,
+				});
 			}
 			//Then check if the target is transformed and put rest damage in the transformation
 			if(target.transformed == true) {
 				var newtrans = parseInt(transCurHp - rest_amount);
 
-				//if the damage was higher then the amount of CurHp, remove the transformation and remember the rest damage
-				if(newtrans < 0) {
+				//Adjust the rest amount
+				rest_amount = 0;
+				if(newtrans <= 0) {
 					rest_amount = parseInt(amount - transCurHp);
-					target.transformed = false;
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).remove()
 				}
-				//if the damage was lower than the amount of tempHp, set a new tempHp and set rest damage to 0
-				else {
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).update({
-						curHp: newtrans,
-					})
-					target.transformedCurHp = newtrans;
-					rest_amount = 0;
-				}
+
+				//Set the new HP
+				this.set_hp({
+					key: key,
+					pool: 'transformed',
+					newHp: newtrans,
+				});
 			}
 			//If there is damage left after taking it from the tempHp and/or the transformation
 			if(rest_amount > 0) {
@@ -102,6 +99,7 @@ export const setHP = {
 					});
 				}
 			
+				//When there is an overkill
 				if(newhp < 0) { 
 					newhp = 0;
 
@@ -114,10 +112,9 @@ export const setHP = {
 						amount = curHp;
 					}
 				}
-				target.curHp = newhp
-
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
-					curHp: newhp,
+				this.set_hp({
+					key: key,
+					newHp: newhp,
 				})
 			}
 
@@ -139,10 +136,12 @@ export const setHP = {
 			if(target.transformed == true) {
 				var maxHp = parseInt(target.transformedMaxHp);
 				var curHp = parseInt(target.transformedCurHp);
+				var pool = 'transformed';
 			}
 			else {
 				var maxHp = parseInt(target.maxHp);
 				var curHp = parseInt(target.curHp);
+				var pool = '';
 			}
 			var newhp = parseInt(curHp + amount);
 			var type = 'healing'
@@ -162,19 +161,13 @@ export const setHP = {
 				amount = maxHp - curHp;
 			}
 			
-			//If the target is transformed, heal the transformation
-			if(target.transformed == true) {
-				target.transformedCurHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}/transformed`).update({
-					curHp: newhp,
-				})
-			}
-			else {
-				target.curHp = newhp
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).update({
-					curHp: newhp,
-				})
-			}
+			//Heal the target
+			this.set_hp({
+				key: key,
+				pool: pool,
+				newHp: newhp,
+			})
+
 			//Notification
 			this.$snotify.success(
 				current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 

@@ -289,6 +289,34 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove()
 		}
 	},
+	SET_HP(state, {key, pool, newHp}) {
+		if(pool == 'temp') {
+			//if the damage was higher then the amount of tempHp, remove the tempHp
+			if(newHp <= 0) {
+				state.entities[key].tempHp = undefined
+				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove()
+			}
+			//if the damage was lower than the amount of tempHp, set a new tempHp
+			else {
+				state.entities[key].tempHp = newHp
+				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+			}
+		}
+		else if(pool == 'transformed') {
+			if(newHp <= 0) {
+				state.entities[key].transformed = false;
+				encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove()
+			}
+			else {
+				state.entities[key].transformedCurHp = newHp;
+				encounters_ref.child(`${state.path}/entities/${key}/transformed/curHp`).set(newHp);
+			}
+		}
+		else {
+			state.entities[key].curHp = newHp
+			encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+		}
+	},
 }
 
 const actions = {
@@ -358,8 +386,11 @@ const actions = {
 		commit('REMOVE_ENTITY', payload)
 	},
 	add_next_round({ commit }, payload) {
-		event.stopPropagation();
+		event.stopPropagation(); //So target is not unselected when clicked
 		commit('ADD_NEXT_ROUND', payload)
+	},
+	set_hp({ commit }, payload) {
+		commit('SET_HP', payload)
 	},
 }
 

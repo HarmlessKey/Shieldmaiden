@@ -51,6 +51,7 @@
 		methods: {
 			...mapActions([
 					'update_round',
+					'set_targeted',
 				]),
 			start() {
 				db.ref(`encounters/${this.path}`).update({
@@ -69,6 +70,7 @@
 					turn: turn,
 					round: round,
 				})
+				this.set_targeted(undefined);
 			},
 			prevTurn() {
 				let turn = this.encounter.turn - 1
@@ -84,6 +86,7 @@
 					turn: turn,
 					round: round,
 				})
+				this.set_targeted(undefined);
 			},
 		}
 	}

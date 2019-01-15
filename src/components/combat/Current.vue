@@ -50,7 +50,7 @@
 						</template>
 
 						<b-row class="conditions">
-							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(conditions[key])">
+							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)">
 								<svg 
 								v-if="conditions[key]"
 								v-b-popover.hover="conditions[key].condition" 

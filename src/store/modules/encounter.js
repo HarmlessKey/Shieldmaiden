@@ -82,6 +82,12 @@ const mutations = {
 		else {
 			entity.down = false
 		}
+		if (db_entity.addNextRound) {
+			entity.addNextRound = db_entity.addNextRound
+		}
+		else {
+			entity.addNextRound = false
+		}
 		if (db_entity.saves) {
 			entity.saves = db_entity.saves
 		}
@@ -273,6 +279,16 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/down`).remove()
 		}
 	},
+	ADD_NEXT_ROUND(state, {key, action, value}) {
+		if(action == 'tag') {
+			state.entities[key].addNextRound = value
+		}
+		else if(action == 'set') {
+			Vue.set(state.entities[key], 'active', true)
+			encounters_ref.child(`${state.path}/entities/${key}/active`).set(true)
+			encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove()
+		}
+	},
 }
 
 const actions = {
@@ -318,6 +334,9 @@ const actions = {
 			if (e.curHp > 0 && e.down == true) {
 				commit('SET_DOWN', {key:key, value:false})
 			}
+			if(e.addNextRound == true) {
+				commit('ADD_NEXT_ROUND', {key:key, action: 'set'})
+			}
 		}
 	},
 	set_condition({ commit }, payload) {
@@ -337,6 +356,10 @@ const actions = {
 	},
 	remove_entity({ commit }, payload) {
 		commit('REMOVE_ENTITY', payload)
+	},
+	add_next_round({ commit }, payload) {
+		event.stopPropagation();
+		commit('ADD_NEXT_ROUND', payload)
 	},
 }
 

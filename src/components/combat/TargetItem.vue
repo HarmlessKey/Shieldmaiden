@@ -19,7 +19,11 @@
 			<div class="progress health-bar">
 				<span>{{ entity.name }}</span>
 				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
-					<div class="condition bg-red" v-for="condition, key in entity.conditions" :key="key" v-b-tooltip.hover :title="key"></div>
+					<div class="condition bg-red" 
+						v-for="condition, key in entity.conditions" 
+						:key="key" 
+						v-b-tooltip.hover :title="key"
+						@click="showCondition(key)"></div>
 				</div>
 				<div class="progress-bar" :class="{ 
 					'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
@@ -32,19 +36,35 @@
 			</div>
 
 			<!-- HEALTH -->
-			{{ setNumber(displayStats().curHp) }}
-			<input v-model.number="number" type="hidden">
-			<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
-				<span class="current" :class="{ 
-					'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
-					'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-					'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
-					}">{{ animatedNumber }}</span>
-					<span class="gray-hover">/</span>{{ displayStats().maxHp }}
-				<template v-if="entity.tempHp">
-					<span class="gray-hover">+{{ entity.tempHp }}</span>
-				</template>
-			</span>
+			<template v-if="entity.active == true">
+				{{ setNumber(displayStats().curHp) }}
+				<input v-model.number="number" type="hidden">
+				<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+					<span class="current" :class="{ 
+						'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+						'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+						'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+						}">{{ animatedNumber }}</span>
+						<span class="gray-hover">/</span>{{ displayStats().maxHp }}
+					<template v-if="entity.tempHp">
+						<span class="gray-hover">+{{ entity.tempHp }}</span>
+					</template>
+				</span>
+			</template>
+			<div v-else class="text-right">
+				<span class="green" 
+					v-if="entity.addNextRound == true"
+					v-b-tooltip.hover title="Will be added next round"
+					@click="add_next_round({key: entity.key, action: 'tag', value: false})">
+					<i class="fas fa-check"></i>
+				</span>
+				<span class="gray-hover" 
+					v-if="entity.addNextRound == false"
+					v-b-tooltip.hover title="Click to add next round"
+					@click="add_next_round({key: entity.key, action: 'tag', value: true})">
+					<i class="fas fa-check"></i>
+				</span>
+			</div>
 		</template>
 
 		<!-- PLAYER DOWN -->
@@ -92,6 +112,10 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide',
+				'add_next_round',
+			]),
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
@@ -115,6 +139,14 @@
 					}
 				}
 				return stats
+			},
+			showCondition(show) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'condition',
+					condition: show
+				})
 			},
 		}
 	}

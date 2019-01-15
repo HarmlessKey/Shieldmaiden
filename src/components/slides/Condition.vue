@@ -1,16 +1,16 @@
 <template>
 	<div class="pb-5">
 		<h2>
-			<svg :title="condition.condition" 
+			<svg :title="cond['.key']" 
 				class="icon text" 
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 512 512">
-					<path :d="condition.icon" fill-opacity="1"></path>
+					<path :d="cond.icon" fill-opacity="1"></path>
 			</svg>
-			 {{ condition.condition }}
+			 {{ cond['.key'] }}
 		</h2>
 		<ul>
-			<li v-for="effect in condition.effects">
+			<li v-for="effect in cond.effects">
 				{{ effect }}
 			</li>
 		</ul>
@@ -31,13 +31,14 @@
 				
 			}
 		},
-
-		computed: {
-			
+		firebase() {
+			return {
+				cond: {
+					source: db.ref(`conditions/${this.condition}`),
+					asObject: true
+				}
+			}
 		},
-		methods: {
-			
-		}
 	};
 </script>
 

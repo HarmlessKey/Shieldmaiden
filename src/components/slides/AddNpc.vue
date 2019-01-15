@@ -53,7 +53,7 @@
 					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 			</b-col>
 		</b-row>
-		<b-form-checkbox name="nextRound" checked="checked" v-model="entity.nextRound">Add next round</b-form-checkbox>
+		<b-form-checkbox name="nextRound" checked="checked" v-model="entity.addNextRound">Add next round</b-form-checkbox>
 		<hr>
 		<button class="btn btn-block mb-3" @click="add()">Add</button>
 

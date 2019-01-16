@@ -186,19 +186,21 @@
 	grid-template-areas: 
 	"input btn-dmg"
 	"input btn-heal";
+
+	.manual-input {
+		height:90px;
+		font-size:50px;
+		text-align: center;
+		grid-area: input;
+	}
+	.heal {
+		grid-area: btn-heal;
+	}
+	.dmg {
+		grid-area: btn-dmg;
+	}
 }
-.manual-input {
-	height:90px;
-	font-size:50px;
-	text-align: center;
-	grid-area: input;
-}
-.heal {
-	grid-area: btn-heal;
-}
-.dmg {
-	grid-area: btn-dmg;
-}
+
 .tab-content {
 	padding: 0 10px 15px 10px;
 }

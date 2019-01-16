@@ -1,8 +1,13 @@
 <template>
 		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
-			<h2>Combat log</h2>
+			<h2 class="d-flex justify-content-between">
+				Combat log
+				<span class="blue" 
+					v-b-popover.hover.left="'The combat log is stored localy in your browser'" 
+					title="Log storage"><i class="fas fa-info"></i></span>
+			</h2>
 			<transition-group tag="ul" name="log" enter-active-class="anitmated slideInDown">
-				<li v-for="(item, key) in returnLog()" :key="key">
+				<li v-for="(item, key) in storageLog" :key="key">
 					<div class="d-flex justify-content-between head">
 						<span>
 							Round: {{ item.round }}
@@ -30,13 +35,25 @@
 		props: ['log'],
 		data() {
 			return {
-				cookieLog: JSON.parse(this.$cookies.get(this.$route.params.encid)),
+				// cookieLog: JSON.parse(this.$cookies.get(this.$route.params.encid)),
+				storageLog: ''
+			}
+		},
+		mounted() {
+			if (localStorage.getItem(this.$route.params.encid)) {
+				this.storageLog = JSON.parse(localStorage.getItem(this.$route.params.encid));
+			}
+		},
+		watch: {
+			storageLog(newValue) {
+				this.storageLog = newValue;
+				console.log('Watch: ', newValue)
 			}
 		},
 		methods: {
 			returnLog() {
 				if(this.log == undefined) {
-					return this.cookieLog
+					return this.storageLog
 				}
 				else {
 					return this.log

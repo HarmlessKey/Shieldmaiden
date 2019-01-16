@@ -9,6 +9,7 @@
 		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
 		<Edit v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
+		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
 	</div>
 </template>
 
@@ -21,6 +22,7 @@
 	import Conditions from '@/components/slides/Conditions.vue';
 	import Edit from '@/components/slides/Edit.vue';
 	import DeathSaves from '@/components/slides/DeathSaves.vue';
+	import DamageHealing from '@/components/slides/DamageHealing.vue';
 
 	export default {
 		components: {
@@ -32,6 +34,7 @@
 			Conditions: Conditions,
 			Edit: Edit,
 			DeathSaves: DeathSaves,
+			DamageHealing: DamageHealing,
 		},
 		data() {
 			return {

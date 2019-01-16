@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export const setHP = {
 	created() {
@@ -9,6 +9,11 @@ export const setHP = {
 		return {
 			
 		}
+	},
+	computed: {
+		...mapGetters([
+			'encounter',
+		]),
 	},
 	methods: {
 		...mapActions([
@@ -186,9 +191,12 @@ export const setHP = {
 			var d = new Date();
 			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
-			if(this.$cookies.isKey(this.encounterId) == true) {
-				this.log = JSON.parse(this.$cookies.get(this.encounterId));
+			if(localStorage.getItem(this.encounterId)) {
+				this.log = JSON.parse(localStorage.getItem(this.encounterId));
 			}
+			// if(this.$cookies.isKey(this.encounterId) == true) {
+			// 	this.log = JSON.parse(this.$cookies.get(this.encounterId));
+			// }
 			else {
 				this.log = []
 			}
@@ -203,8 +211,11 @@ export const setHP = {
 				amount: amount,
 				over: over
 			})
-			this.$cookies.set(this.encounterId, JSON.stringify(this.log), "2m");
-			this.$emit("log", this.log)
+			
+			const parsed = JSON.stringify(this.log);
+			localStorage.setItem(this.encounterId, parsed);
+			// this.$cookies.set(this.encounterId, JSON.stringify(this.log), "2m");
+			// this.$emit("log", this.log)
 		},
 		damageMeters(type, amount, over) {
 			// if(amount > 0) {

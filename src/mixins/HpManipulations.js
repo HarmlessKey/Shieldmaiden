@@ -20,6 +20,7 @@ export const setHP = {
 			'set_save',
 			'set_stable',
 			'set_hp',
+			'set_dead',
 		]),
 		setHP(amount, key, target, current, type) {
 			amount = parseInt(amount);
@@ -32,6 +33,7 @@ export const setHP = {
 			}
 		},
 		isDamage(key, target, current, amount) {
+			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
 			var transCurHp = parseInt(target.transformedCurHp);
@@ -116,6 +118,13 @@ export const setHP = {
 						over = parseInt(rest_amount - curHp); //overkill
 						amount = curHp;
 					}
+					//Character dies if the overkill is >= maxHp
+					if(over >= maxHp && target.entityType == 'player') {
+						this.set_dead({
+							key: key,
+							action: 'set',
+						})
+					}
 				}
 				this.set_hp({
 					key: key,
@@ -157,6 +166,10 @@ export const setHP = {
 				this.set_save({
 					key: key,
 					check: 'reset'
+				})
+				this.set_dead({
+					key: key,
+					action: 'unset',
 				})
 			}
 

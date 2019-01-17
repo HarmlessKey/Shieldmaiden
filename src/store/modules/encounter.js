@@ -100,6 +100,12 @@ const mutations = {
 		else {
 			entity.stable = false
 		}
+		if (db_entity.dead) {
+			entity.dead = db_entity.dead
+		}
+		else {
+			entity.dead = false
+		}
 		if (db_entity.conditions) {
 			entity.conditions = db_entity.conditions
 		}
@@ -250,6 +256,10 @@ const mutations = {
 			Vue.set(state.entities[key], 'saves', {})
 			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
 
+			//REMOVE DEAD
+			Vue.delete(state.entities[key], 'dead')
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
+
 			//SET STABLE
 			Vue.set(state.entities[key], 'stable', 'true')
 			encounters_ref.child(`${state.path}/entities/${key}/stable`).set('true');
@@ -315,6 +325,17 @@ const mutations = {
 		else {
 			state.entities[key].curHp = newHp
 			encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+		}
+	},
+	SET_DEAD(state, {key, action}) {
+		if(action == 'set') {
+			//SET DEAD
+			state.entities[key].dead = true
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).set(true);
+		}
+		else if(action == 'unset') {
+			Vue.delete(state.entities[key], 'dead')
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
 		}
 	},
 }
@@ -391,6 +412,9 @@ const actions = {
 	},
 	set_hp({ commit }, payload) {
 		commit('SET_HP', payload)
+	},
+	set_dead({ commit }, payload) {
+		commit('SET_DEAD', payload)
 	},
 }
 

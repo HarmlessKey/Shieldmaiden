@@ -15,7 +15,7 @@
 		<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">{{ displayStats().ac + entity.ac_bonus}}</span>
 		<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
 
-		<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
+		<template>
 			<div class="progress health-bar">
 				<span>{{ entity.name }}</span>
 				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
@@ -37,19 +37,37 @@
 
 			<!-- HEALTH -->
 			<template v-if="entity.active == true">
-				{{ setNumber(displayStats().curHp) }}
-				<input v-model.number="number" type="hidden">
-				<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
-					<span class="current" :class="{ 
-						'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
-						'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-						'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
-						}">{{ animatedNumber }}</span>
-						<span class="gray-hover">/</span>{{ displayStats().maxHp }}
-					<template v-if="entity.tempHp">
-						<span class="gray-hover">+{{ entity.tempHp }}</span>
-					</template>
-				</span>
+				<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
+					{{ setNumber(displayStats().curHp) }}
+					<input v-model.number="number" type="hidden">
+					<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+						<span class="current" :class="{ 
+							'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+							'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+							'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+							}">{{ animatedNumber }}</span>
+							<span class="gray-hover">/</span>{{ displayStats().maxHp }}
+						<template v-if="entity.tempHp">
+							<span class="gray-hover">+{{ entity.tempHp }}</span>
+						</template>
+					</span>
+				</template>
+				<template v-else>
+					<div class="hp">
+						<div v-if="entity.stable" class="green">
+							<span><i class="fas fa-fist-raised"></i> Stable</span>
+						</div>
+						<div v-if="entity.dead && !entity.stable" class="red">
+							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+						</div>
+						<div v-else class="hp d-flex justify-content-end">
+							<div v-for="check, key in entity.saves" :key="key">
+								<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
+								<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+							</div>
+						</div>
+					</div>
+				</template>
 			</template>
 			<div v-else class="text-right">
 				<span class="green" 
@@ -66,19 +84,6 @@
 				</span>
 			</div>
 		</template>
-
-		<!-- PLAYER DOWN -->
-		<div v-else class="saves text-left d-flex justify-content-left">
-			<div v-if="entity.stable" class="green saves">
-				<span><i class="fas fa-fist-raised"></i> Stable</span>
-			</div>
-			<template v-else>
-				<div v-for="check, key in entity.saves" :key="key">
-					<span v-show="check == 'succes'" class="green"><i class="fas fa-check"></i></span> 
-					<span v-show="check == 'fail'" class="red"><i class="fas fa-times"></i></span>
-				</div>
-			</template>
-		</div>
 	</div>
 </template>
 
@@ -226,22 +231,16 @@
 }
 .hp {
 	font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
-	text-align:right;
+	text-align: right;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis !important;
+	
+	.save {
+		margin-right: 4px;
+	}
 }
 .temp {
 	color: #494747;
-}
-.saves {
-	background: #302f2f;
-	padding-left: 5px;
-	display: block;
-	grid-area: hp-bar;
-
-	span {
-		margin-right: 5px;
-	}
 }
 </style>

@@ -6,7 +6,7 @@
 				<div v-on:scroll="shadow()" ref="scroll">
 					<div class="current">
 
-						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable">
+						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable && !current.dead">
 								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5">
@@ -33,7 +33,8 @@
 								<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
 								<div class="progress health-bar">
 									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<div v-show="!current.stable">
+									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+									<div v-show="!current.stable && !current.dead">
 										<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
 										<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
 									</div>

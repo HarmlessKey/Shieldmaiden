@@ -19,6 +19,7 @@
 					<div class="dropdown-menu dropdown-menu-right">
 						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
 						<router-link to="/campaigns" class="dropdown-item"><i class="fas fa-treasure-chest"></i> My Content</router-link>
+						<router-link to="/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</router-link>
 						<div class="dropdown-divider"></div>
 						<button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
 					</div>

@@ -1,12 +1,7 @@
-import Firebase from 'firebase'
 import { db } from '@/firebase'
-import _ from 'lodash'
 import Vue from 'vue'
 
-const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
-const players_ref = db.ref('players')
-const npcs_ref = db.ref('npcs')
 
 const state = {
 	entities: {},
@@ -124,7 +119,13 @@ const mutations = {
 		switch(true) {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
-				entity.img = db_player.avatar
+
+				if(db_player.avatar) {
+					entity.img = db_player.avatar;
+				}
+				else {
+					entity.img = require('@/assets/_img/styles/player.svg');
+				}
 				entity.ac = parseInt(db_player.ac)
 				entity.maxHp = parseInt(db_player.maxHp)
 				entity.strength = db_player.strength
@@ -341,7 +342,7 @@ const mutations = {
 }
 
 const actions = {
-	init_Encounter({ dispatch, commit, state, rootState }, { cid, eid }) {
+	init_Encounter({ commit, rootState }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
@@ -357,7 +358,7 @@ const actions = {
 		})
 	},
 
-	track_Encounter({ commit, state, rootState }) {
+	track_Encounter({ commit, state }) {
 		const path = state.path
 		const encounter = encounters_ref.child(path);
 		encounter.on('value', snapshot => {

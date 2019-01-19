@@ -238,12 +238,14 @@ ul.crumble {
 	}
 }
 table {
+	border-collapse:separate; 
+	border-spacing:0 1px;
+
 	td, th {
 		border: none !important;
 	}
 	td {
 		background-color: #262626;
-		border-bottom: solid 1px #191919 !important;
 	}
 	thead, tr {
 		margin-bottom: 1px !important;

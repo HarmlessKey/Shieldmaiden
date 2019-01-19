@@ -11,6 +11,7 @@
 				</a>
 				<div class="dropdown-menu" aria-labelledby="edit">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
+					<a class="dropdown-item" @click="showTrack()"><i class="far fa-desktop"></i> Track Settings</a>
 					<a class="dropdown-item" @click=""><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 			</h1>
@@ -50,9 +51,17 @@
 		},
 		methods: {
 			...mapActions([
-					'update_round',
-					'set_targeted',
-				]),
+				'update_round',
+				'set_targeted',
+				'setSlide',
+			]),
+			showTrack() {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'track',
+				})
+			},
 			start() {
 				db.ref(`encounters/${this.path}`).update({
 					round: 1

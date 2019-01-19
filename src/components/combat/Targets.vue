@@ -15,35 +15,36 @@
 							name="targets" 
 							enter-active-class="animated fadeInUp" 
 							leave-active-class="animated fadeOutDown">
-							<template v-for="(entity,_,i) in _targets">
-								<li 
-									class="d-flex justify-content-between" 
-									v-bind:key="entity.key" 
-									:class="{ targeted : targeted == entity.key }">
-									<div class="target" @click="set_targeted(entity.key)">
-										<TargetItem :item="entity.key" />
+							
+							<li 
+								v-for="(entity, key) in _targets"
+								class="d-flex justify-content-between" 
+								:key="entity.key" 
+								:class="{ targeted : targeted == entity.key }">
+								<div class="target" @click="set_targeted(entity.key)">
+									<TargetItem :item="entity.key" />
+								</div>
+								<span>
+									<a class="options"
+										id="options"
+										data-toggle="dropdown" 
+										aria-haspopup="true" 
+										aria-expanded="false">
+										<i class="fas fa-ellipsis-v"></i>
+									</a>
+									<div class="dropdown-menu" aria-labelledby="options">	
+										<div class="dropdown-header">{{ entity.name }}</div>
+										<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
+										<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
+										<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
+										<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
+										<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
+										<div class="dropdown-divider"></div>
+										<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
 									</div>
-									<span>
-										<a class="options"
-											id="options"
-											data-toggle="dropdown" 
-											aria-haspopup="true" 
-											aria-expanded="false">
-											<i class="fas fa-ellipsis-v"></i>
-										</a>
-										<div class="dropdown-menu" aria-labelledby="options">	
-											<div class="dropdown-header">{{ entity.name }}</div>
-											<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
-											<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
-											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
-											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
-											<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
-										</div>
-									</span>
-								</li>
-							</template>
+								</span>
+							</li>
+							
 						</transition-group>
 						<template v-if="_idle.length">
 							<hr>
@@ -144,8 +145,8 @@
 		firebase() {
 			return {
 				encounterEntities: {
-					 source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities`),
-					 asObject: true
+					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities`),
+					asObject: true
 				}
 			}
 		},
@@ -172,7 +173,7 @@
 					entity: entity
 				})
 			},
-			addNpc(entity) {
+			addNpc() {
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
@@ -207,7 +208,7 @@
 					]
 				});
 			},
- 		},
+		},
 	}
 </script>
 

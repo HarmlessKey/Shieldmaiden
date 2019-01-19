@@ -10,6 +10,7 @@
 		<Edit v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
+		<Track v-if="slide.type == 'track'" />
 	</div>
 </template>
 
@@ -23,6 +24,7 @@
 	import Edit from '@/components/slides/Edit.vue';
 	import DeathSaves from '@/components/slides/DeathSaves.vue';
 	import DamageHealing from '@/components/slides/DamageHealing.vue';
+	import Track from '@/components/slides/Track.vue';
 
 	export default {
 		components: {
@@ -35,6 +37,7 @@
 			Edit: Edit,
 			DeathSaves: DeathSaves,
 			DamageHealing: DamageHealing,
+			Track: Track,
 		},
 		data() {
 			return {

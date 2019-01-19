@@ -53,12 +53,12 @@
 						<b-row class="conditions">
 							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)">
 								<svg 
-								v-if="conditions[key]"
-								v-b-popover.hover="conditions[key].condition" 
-								:title="key" 
-								class="icon text" 
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 512 512">
+									v-if="conditions[key]"
+									v-b-popover.hover="conditions[key].condition" 
+									:title="key" 
+									class="icon text" 
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 512 512">
 									<path :d="conditions[key].icon" fill-opacity="1"></path>
 								</svg>
 							</b-col>

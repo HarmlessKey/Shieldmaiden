@@ -20,7 +20,7 @@
 				<span>{{ entity.name }}</span>
 				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
 					<div class="condition bg-red" 
-						v-for="condition, key in entity.conditions" 
+						v-for="(condition, key) in entity.conditions" 
 						:key="key" 
 						v-b-tooltip.hover :title="key"
 						@click="showCondition(key)"></div>
@@ -31,7 +31,7 @@
 					'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
 					}" 
 					role="progressbar" 
-					:style="{width: percentage(displayStats().curHp, displayStats().maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+					:style="{ width: percentage(displayStats().curHp, displayStats().maxHp) + '%' }" aria-valuemin="0" aria-valuemax="100">
 				</div>
 			</div>
 
@@ -61,7 +61,7 @@
 							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 						</div>
 						<div v-else class="hp d-flex justify-content-end">
-							<div v-for="check, key in entity.saves" :key="key">
+							<div v-for="check in entity.saves" :key="check">
 								<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 								<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 							</div>
@@ -110,7 +110,7 @@
 			entity: function() {
 				return this.entities[this.item]
 			}
- 		},
+		},
 		watch: {
 			number: function(newValue) {
 				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
@@ -129,15 +129,16 @@
 				this.number = value
 			},
 			displayStats() {
+				var stats = '';
 				if(this.entity.transformed == true) {
-					var stats = {
+					stats = {
 						ac: this.entity.transformedAc,
 						maxHp: this.entity.transformedMaxHp,
 						curHp: this.entity.transformedCurHp,
 					}
 				}
 				else {
-					var stats = {
+					stats = {
 						ac: this.entity.ac,
 						maxHp: this.entity.maxHp,
 						curHp: this.entity.curHp,

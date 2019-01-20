@@ -2,6 +2,7 @@ import { db } from '@/firebase'
 import Vue from 'vue'
 
 const encounters_ref = db.ref('encounters')
+const track_ref = db.ref('track')
 
 const state = {
 	entities: {},
@@ -11,11 +12,15 @@ const state = {
 	campaignId: undefined,
 	encounterId: undefined,
 	path: undefined,
+	track: undefined,
 }
 
 const getters = {
 	entities: function( state ) {
 		return state.entities
+	},
+	track: function( state ) {
+		return state.track
 	},
 	active: function( state ) {
 		return state.active
@@ -184,6 +189,9 @@ const mutations = {
 	CLEAR_ENTITIES(state) {
 		state.entities = {}
 	},	
+	TRACK(state, value) {
+		state.track = value
+	},
 	SET_CAMPAIGN_ID(state, value) {
 		state.campaignId = value
 	},
@@ -278,6 +286,14 @@ const mutations = {
 
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
+	TRANSFORM_ENTITY(state, {key, entity}) {
+		state.entities[key].transformed = true
+		state.entities[key].transformedMaxHp = entity.maxHp
+		state.entities[key].transformedCurHp = entity.curHp
+		state.entities[key].transformedAc = entity.ac
+
+		encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+	},
 	REMOVE_ENTITY(state, {key}) {
 		Vue.delete(state.entities, key)
 		encounters_ref.child(`${state.path}/entities/${key}`).remove();
@@ -357,7 +373,13 @@ const actions = {
 			}
 		})
 	},
-
+	set_track({ commit, rootState }) {
+		const uid = rootState.content.user.uid;
+		const track = track_ref.child(uid);
+		track.on('value', snapshot => {
+			commit('TRACK', snapshot.val())
+		})
+	},
 	track_Encounter({ commit, state }) {
 		const path = state.path
 		const encounter = encounters_ref.child(path);
@@ -400,6 +422,9 @@ const actions = {
 	},
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)
+	},
+	transform_entity({ commit }, payload) {
+		commit('TRANSFORM_ENTITY', payload)
 	},
 	add_entity({ commit, rootState }, key) {
 		commit('ADD_ENTITY', {rootState, key})

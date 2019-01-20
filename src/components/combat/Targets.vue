@@ -37,6 +37,7 @@
 										<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
 										<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 										<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
+										<a class="dropdown-item" @click="transform(entity.key, encounterEntities[entity.key])"><i class="fas fa-paw-claws"></i> Transform</a>
 										<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 										<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
 										<div class="dropdown-divider"></div>
@@ -70,6 +71,7 @@
 											<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
 											<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
+											<a class="dropdown-item" @click="transform(entity.key, encounterEntities[entity.key])"><i class="fas fa-paw-claws"></i> Transform</a>
 											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
 											<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
 											<div class="dropdown-divider"></div>
@@ -185,6 +187,15 @@
 				this.setSlide({
 					show: true,
 					type: 'edit',
+					key: key,
+					entity: entity,
+				})
+			},
+			transform(key, entity) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'transform',
 					key: key,
 					entity: entity,
 				})

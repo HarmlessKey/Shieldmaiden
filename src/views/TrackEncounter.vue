@@ -1,5 +1,5 @@
 <template>
-	<div class="track" v-if="encounter" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+	<div class="track" v-if="encounter && track" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 		<div class="not-started" v-if="encounter.round == 0">
 			<h2>Encounter has not started yet.</h2>
 			<div class="loader"></div>
@@ -42,7 +42,7 @@
 								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 							</div>
 							<div v-else class="hp d-flex justify-content-start">
-								<div v-for="(check,_,i) in _targets[0].saves" :key="i">
+								<div v-for="(check,_,i) in _targets[0].saves" :key="i" class="mr-1">
 									<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 									<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 								</div>
@@ -118,7 +118,7 @@
 														<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 													</div>
 													<div v-else class="hp d-flex justify-content-start">
-														<div v-for="(check, key) in entity.saves" v-bind:key="key">
+														<div v-for="(check, key) in entity.saves" v-bind:key="key" class="mr-1">
 															<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 															<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 														</div>
@@ -161,6 +161,7 @@
 <script>
 	import _ from 'lodash'
 	import { db } from '@/firebase'
+	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
 		name: 'app',
@@ -176,6 +177,7 @@
 			}
 		},
 		firebase() {
+			console.log('FIREBASE')
 			return {
 				track: {
 					source: db.ref(`track/${this.userId}`),
@@ -203,10 +205,18 @@
 				},
 			}
 		},
+		mounted() {
+			console.log('MOUNTED')
+		},
 		beforeMount() {
+			console.log('BEFOREMOUNT')
+			// this.set_track()
 			this.fetch_encounter()
 		},
 		computed: {
+			// ...mapGetters([
+			// 	'track',
+			// ]),
 			_active: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -234,11 +244,17 @@
 			}
 		},
 		methods: {
+			// ...mapActions([
+			// 	'set_track',
+			// ]),
 			fetch_encounter() {
 				var vw = this;
-				var encounter = db.ref(`encounters/${this.userId}/-LTJ4hqxr1T0q_3CbiCK/-LURHm90y8pk5SsQfUEW`);
-				encounter.on('value', function(snapshot) {
-					vw.showEnc(snapshot.val())
+
+				// var encounter = db.ref(`encounters/${this.userId}/-LTJ4hqxr1T0q_3CbiCK/-LURHm90y8pk5SsQfUEW`);
+				var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`)
+				encounter.on('value' , (snapshot) => {
+						console.log(snapshot)
+						vw.showEnc(snapshot.val())
 				});
 			},
 			showEnc(payload) {

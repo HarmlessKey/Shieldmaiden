@@ -153,7 +153,15 @@
 						<a class="green" @click="addItem()"><i class="fas fa-plus-circle"></i></a>
 					</h2>
 					<hr>
-					<div v-for="item in loot.items">
+					<div v-for="item, index in loot.items">
+						<h2 class="d-flex justify-content-between">
+							{{ index + 1 }}. {{ item.name }}
+							<a @click="removeItem(index)" 
+								class="red"
+								v-b-tooltip.hover title="Remove">
+								<i class="fas fa-minus-circle"></i>
+							</a>
+						</h2>
 						<b-row class="mb-2">
 							<b-col sm="2">
 								<label for="name">Name</label>
@@ -366,6 +374,10 @@
 				this.loot.items.push({
 					name: 'New Item',
 				});
+				this.$forceUpdate(); //IMPORTANT
+			},
+			removeItem(index) {
+				this.$delete(this.loot.items, index);
 				this.$forceUpdate(); //IMPORTANT
 			},
  		}

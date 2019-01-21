@@ -30,7 +30,7 @@ $blue-hover: #247db7;
 $red: #cc3e4a;
 $red-hover: #a3303a;
 $orange: #e76d3b;
-$yellow: #b3b547;
+$yellow: #c1b947;
 
 $header-hight: 50px;
 
@@ -58,7 +58,7 @@ header {
 	padding: 10px;
 	width: 100%;
 	background: $black;
-	border-bottom:solid 1px $gray-light;
+	border-bottom:solid 1px transparent;
 	position:fixed !important;
 	top: 0;
 	z-index: 999;

@@ -1,5 +1,5 @@
 <template>
-	<div id="current" class="bg-gray">
+	<div id="current">
 		<template v-if="current">
 			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
 			<div class="scroll" v-bar>
@@ -149,6 +149,7 @@
 
 <style lang="scss" scoped>
 #current {
+	background: rgba(38, 38, 38, .9);
 	grid-area: current;
 	overflow: hidden;
 	

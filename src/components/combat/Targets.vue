@@ -1,5 +1,5 @@
 <template>
-	<div id="targets" class="bg-gray">
+	<div id="targets">
 			<h2 
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
@@ -226,6 +226,7 @@
 <style lang="scss" scoped>
 
 #targets {
+	background: rgba(38, 38, 38, .9);
 	grid-area: targets;
 	overflow: hidden;
 
@@ -272,7 +273,7 @@ ul.targets {
 	li {
 		height: 32px;
 		margin-bottom: 8px;
-		border: solid 1px #262626;
+		border: solid 1px transparent;
 		cursor: pointer;
 
 		&:hover {

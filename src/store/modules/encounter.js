@@ -355,6 +355,10 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
 		}
 	},
+	FINISH(state) {
+		state.encounter.finished = true
+		encounters_ref.child(`${state.path}/finished`).set(true);
+	},
 }
 
 const actions = {
@@ -441,6 +445,9 @@ const actions = {
 	},
 	set_dead({ commit }, payload) {
 		commit('SET_DEAD', payload)
+	},
+	set_finished({ commit }) {
+		commit('FINISH')
 	},
 }
 

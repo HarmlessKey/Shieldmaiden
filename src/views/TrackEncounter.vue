@@ -1,6 +1,9 @@
 <template>
 	<div class="track" v-if="encounter && track" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
-		<div class="not-started" v-if="encounter.round == 0">
+		<div class="not-started" v-if="encounter.finished == true">
+			<h2>Encounter Finished</h2>
+		</div>
+		<div class="not-started" v-else-if="encounter.round == 0">
 			<h2>Encounter has not started yet.</h2>
 			<div class="loader"></div>
 		</div>
@@ -177,7 +180,7 @@
 			}
 		},
 		firebase() {
-			console.log('FIREBASE')
+			// console.log('FIREBASE')
 			return {
 				track: {
 					source: db.ref(`track/${this.userId}`),
@@ -206,10 +209,10 @@
 			}
 		},
 		mounted() {
-			console.log('MOUNTED')
+			// console.log('MOUNTED')
 		},
 		beforeMount() {
-			console.log('BEFOREMOUNT')
+			// console.log('BEFOREMOUNT')
 			// this.set_track()
 			this.fetch_encounter()
 		},
@@ -250,10 +253,10 @@
 			fetch_encounter() {
 				var vw = this;
 
-				// var encounter = db.ref(`encounters/${this.userId}/-LTJ4hqxr1T0q_3CbiCK/-LURHm90y8pk5SsQfUEW`);
-				var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`)
+				var encounter = db.ref(`encounters/${this.userId}/-LTJ4hqxr1T0q_3CbiCK/-LURHm90y8pk5SsQfUEW`);
+				// var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`)
 				encounter.on('value' , (snapshot) => {
-						console.log(snapshot)
+						// console.log(snapshot)
 						vw.showEnc(snapshot.val())
 				});
 			},
@@ -325,7 +328,7 @@
 		height: calc(100vh - 50px);
 		background-size: cover;
 		background-position: center bottom;
-		background: #fff;
+		background-color: #191919;
 
 		.not-started {
 			text-align: center;
@@ -369,7 +372,7 @@
 			}
 		}
 		.container-fluid {
-			background-color:rgba(0, 0, 0, 0.5);
+			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
 		}
 		.table {

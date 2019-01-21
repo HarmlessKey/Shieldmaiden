@@ -1,5 +1,5 @@
 <template>
-	<div id="actions" class="bg-gray">
+	<div id="actions">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
 				<a class="nav-link active" 
@@ -169,10 +169,18 @@
 	.custom-control-label {
 		line-height: 25px !important;
 	}
+	.scroll { 
+		padding-top: 20px;
+		height: calc(100% - 30px);
+		background: rgba(38, 38, 38, .9);
+	}
 }
-.nav { 
-	background: #191919;
-	margin-bottom: 20px;
+.nav-link {
+	background: rgba(25, 25, 25, .9);
+
+	&.active {
+		background: rgba(38, 38, 38, .9) !important;
+	}
 }
 .actions {
 	padding:0 10px 10px 15px;

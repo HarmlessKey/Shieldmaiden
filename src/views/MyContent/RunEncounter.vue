@@ -1,7 +1,10 @@
 <template>
-	<div id="combat">	
-		<!-- Check if encounter exists -->
-		<template v-if="encounter && players">
+	<div class="container-fluid" v-if="encounter && players"  :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">	
+		<div class="container" v-if="encounter.finished == true">
+			<h2>Encounter Finished</h2>
+			<router-link class="btn" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
+		</div>
+		<div v-else id="combat">
 			<Turns 
 				:active_len="_active.length"
 			/>
@@ -12,6 +15,7 @@
 				/>
 			</div>
 			<template v-else>
+					{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there alive NPC's -->
 					<Current 
 						:current="_active[encounter.turn]"
 					/>
@@ -25,7 +29,7 @@
 					/>
 					<Side :log="log" />
 			</template>
-		</template>
+		</div>
 	</div>
 </template>
 
@@ -60,7 +64,8 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,
-				log: undefined
+				log: undefined,
+				alive: undefined,
 			}
 		},
 		mounted() {
@@ -79,31 +84,51 @@
 			]),
 			_active: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.active && !entity.down;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.active && !entity.down;
+					})
+					.orderBy(function(entity){
+						return parseInt(entity.initiative)
+					} , 'desc')
+					.value()
 			},
 			_idle: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return !entity.active && !entity.down;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return !entity.active && !entity.down;
+					})
+					.orderBy(function(entity){
+						return parseInt(entity.initiative)
+					} , 'desc')
+					.value()
 			},
+			_alive: function() {
+				return _.chain(this.entities)
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.active && entity.curHp > 0 && entity.entityType == 'npc';
+					})
+					.orderBy(function(entity){
+						return parseInt(entity.initiative)
+					} , 'desc')
+					.value()
+			},
+		},
+		watch: {
+			alive(newVal, oldVal) {
+				console.log(`old: ${oldVal}, new: ${newVal}`)
+				if(newVal == 0) {
+					this.confirmFinish()
+				}
+			}
 		},
 		methods: {
 			...mapActions([
 				'init_Encounter',
 				'track_Encounter',
+				'set_finished',
 			]),
 			sendLog: function(log) {
 				this.log = log;
@@ -114,7 +139,23 @@
 					encounter: this.$route.params.encid,
 				}
 				db.ref('track/' + this.userId).set(track);
-			}
+			},
+			setAlive(n) {
+				this.alive = n;
+			},
+			confirmFinish() {
+				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
+					position: "centerCenter",
+					timeout: 0,
+					buttons: [
+					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
+			finish() {
+				this.set_finished();
+			},
 		},
 		beforeMount() {
 			this.track()
@@ -123,6 +164,12 @@
 </script>
 
 <style lang="scss">
+.container-fluid {
+	background-size: cover;
+	background-position: center bottom;
+	background-color: #191919;
+	height: calc(100vh - 50px);
+}
 #combat {
 	padding:10px;
 	width: 100vw;

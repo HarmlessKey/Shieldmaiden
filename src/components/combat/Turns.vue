@@ -1,5 +1,5 @@
 <template>
-	<div id="turns" class="d-flex justify-content-between bg-gray">
+	<div id="turns" class="d-flex justify-content-between">
 			<h1>
 				{{ encounter.encounter }}
 				<a class="edit"
@@ -103,22 +103,25 @@
 
 <style lang="scss" scoped>
 #turns {
+	background: rgba(38, 38, 38, .9);
 	padding: 10px;
 	font-size: 20px;
 	text-transform: uppercase;
 	grid-area: turns;
-}
-h1 {
-	line-height:44px;
 
-	a {
-		margin-left: 5px;
-		font-size: 12px;
+	span {
+		line-height:30px;
+	}
+	h1 {
+		line-height:44px;
+
+		a {
+			margin-left: 5px;
+			font-size: 12px;
+		}
 	}
 }
-#turns span {
-	line-height:30px;
-}
+
 .number { 
 	display:inline-block; 
 	border:solid 1px #2c97de;

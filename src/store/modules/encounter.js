@@ -11,6 +11,7 @@ const state = {
 	encounter: undefined,
 	campaignId: undefined,
 	encounterId: undefined,
+	log: [],
 	path: undefined,
 	track: undefined,
 }
@@ -42,6 +43,9 @@ const getters = {
 	},
 	encounterId: function( state ) {
 		return state.encounterId
+	},
+	log: function( state ) {
+		return state.log
 	},
 	path: function( state ) {
 		return state.path
@@ -197,6 +201,23 @@ const mutations = {
 	},
 	SET_ENCOUNTER_ID(state, value) {
 		state.encounterId = value
+	},
+	SET_LOG(state, {action, value}) {
+		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
+			state.log = JSON.parse(localStorage.getItem(state.encounterId))
+		}
+		if(action == 'set') {
+			state.log.unshift(value)
+
+			const parsed = JSON.stringify(state.log);
+			localStorage.setItem(state.encounterId, parsed);
+		}
+		if(action == 'unset') {
+			Vue.delete(state.log, value)
+
+			const parsed = JSON.stringify(state.log);
+			localStorage.setItem(state.encounterId, parsed);
+		}
 	},
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
@@ -391,6 +412,9 @@ const actions = {
 			commit('SET_ENCOUNTER', snapshot.val())
 			// commit('DEVIDE_BY_STATUS', snapshot.val())
 		})
+	},
+	set_log({ commit }, payload) {
+		commit("SET_LOG", payload)
 	},
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)

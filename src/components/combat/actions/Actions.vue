@@ -59,12 +59,12 @@
 									class="form-control manual-input">
 								<button class="btn dmg bg-red" 
 									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-									@click="setManual(targeted, target, 'damage')">
+									@click="setManual(target, 'damage')">
 									<i class="fas fa-minus-square"></i>
 								</button>
 								<button class="btn heal bg-green" 
 									:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-									@click="setManual(targeted, target, 'healing')">
+									@click="setManual(target, 'healing')">
 									<i class="fas fa-plus-square"></i>
 								</button>
 							</div>
@@ -140,12 +140,12 @@
 			}
 		},
 		methods: {
-			setManual(key, target, type) {
+			setManual(target, type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, key, target, this.current, type)
+						this.setHP(this.manualAmount, target, this.current, type)
 
 						//Reset input fields
 						this.manualAmount = '';

@@ -87,20 +87,5 @@ a.user, a.roll-dice	{
 .dropdown-menu {
 	top: 7px !important;
 	left: 10px !important;
-
-	button, a {
-		// color: #b2b2b2 !important;
-		cursor: pointer;
-		font-size: 15px;
-
-		&:hover, &.active {
-			color: #2c97de !important;
-			background:none;
-		}
-	}
-	.dropdown-divider {
-		border-color: #b2b2b2;
-		margin: 0;
-	}
 }
 </style>

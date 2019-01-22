@@ -28,7 +28,7 @@
 					<p>At the moment only one action is dependent on the automate function.</p>
 
 					<p><b>Death Saving Throws</b><br/>
-						When a down player receives damage, it will automatically get a failed death savind throw. 
+						When a down player receives damage, it will automatically get a failed death saving throw. 
 						If the "critical hit" checkbox is checked, two death saves will be failed.<br/>
 						Even a character that is stable at 0 hit points will automatically fail saves when taking damage.
 					</p>

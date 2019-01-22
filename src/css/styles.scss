@@ -350,23 +350,36 @@ a {
 	border-radius: 0 !important;
 }
 .dropdown-menu {
+	padding: 0 !important;
 	border-radius: 0 !important;
 	border: none !important;
 	background: $gray-dark;
 	color: $gray-dark !important;
 	font-size: 12px !important;
 	
-	a { 
+	button, a { 
+		margin: 0 !important;
 		color: $gray-dark !important;
+		cursor: pointer;
+		font-size: 15px;
+		padding: 5px 15px;
+		line-height: 30px;
+
 		&:hover { 
 			color: $blue !important;
 			background: none;
 		}
 	}
 	.dropdown-header {
-		padding-bottom: 10px !important;
+		padding: 10px 15px !important;
+		line-height: 20px;
+		margin: 0 !important;
 		color: $gray-light;
 		font-size: 13px;
+	}
+	.dropdown-divider {
+		border-color: #b2b2b2;
+		margin: 0;
 	}
 }
 

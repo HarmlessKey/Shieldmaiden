@@ -9,11 +9,11 @@
 					aria-expanded="false">
 					<i class="fas fa-cog"></i>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="edit">	
+				<div class="dropdown-menu">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
 					<a class="dropdown-item" @click="slide('settings')"><i class="fas fa-cogs"></i> Settings</a>
 					<a class="dropdown-item" @click="slide('track')"><i class="far fa-desktop"></i> Track Settings</a>
-					<a class="dropdown-item" @click=""><i class="fas fa-times"></i> End Encounter</a>
+					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 			</h1>
 
@@ -58,6 +58,7 @@
 				'update_round',
 				'set_targeted',
 				'setSlide',
+				'set_finished',
 			]),
 			slide(type) {
 				event.stopPropagation();
@@ -100,6 +101,19 @@
 					round: round,
 				})
 				this.set_targeted(undefined);
+			},
+			confirmFinish() {
+				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {
+					position: "centerCenter",
+					timeout: 0,
+					buttons: [
+					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
+			finish() {
+				this.set_finished();
 			},
 		}
 	}

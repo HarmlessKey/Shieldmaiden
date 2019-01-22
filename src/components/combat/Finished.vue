@@ -76,6 +76,7 @@
 <style lang="scss" scoped>
 	.container {
 		h2.head {
+			color: #fff;
 			margin-top: 20px;
 			text-shadow: 0 0 8px #000;
 			font-size: 25px !important;

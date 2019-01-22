@@ -5,20 +5,22 @@
 			<div class="info mb-4">
 				<Crumble />
 
-					<b-row>
-						<b-col>
-							<input class="form-control" v-validate="'required'" type="text" name="name" v-model="encounter.encounter"/>
-							<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
 
-							<input class="form-control mt-2" v-validate="'url'" type="text" name="backbround" v-model="encounter.background" placeholder="Background URL"/>
-							<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+				<b-row class="mt-3">
+					<b-col>
+						<input class="form-control" v-validate="'required'" type="text" name="name" v-model="encounter.encounter"/>
+						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-							<button class="btn mt-2" @click="edit()">Save</button>
-						</b-col>
-						<b-col v-if="encounter.background">
-							<div class="img-container"><img :src="encounter.background" /></div>
-						</b-col>
-					</b-row>
+						<input class="form-control mt-2" v-validate="'url'" type="text" name="backbround" v-model="encounter.background" placeholder="Background URL"/>
+						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+
+						<button class="btn mt-2" @click="edit()">Save</button>
+					</b-col>
+					<b-col v-if="encounter.background">
+						<div class="img-container"><img :src="encounter.background" /></div>
+					</b-col>
+				</b-row>
 			</div>
 
 			<!-- ADD PLAYERS AND NPC'S -->
@@ -356,9 +358,10 @@
 				return (Object.keys(this.encounter.entities).indexOf(id))
 			},
 			setLoot() {
-				console.log(this.loot)
-
 				delete this.loot['.key'];
+				delete this.loot['.value'];
+
+				console.log(this.loot)
 
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).set(
 					this.loot

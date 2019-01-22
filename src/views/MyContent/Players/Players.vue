@@ -49,7 +49,11 @@
 					</tbody>
 				</table>
 			</template>
-			<h2 v-else-if="players === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first player <i class="fas fa-arrow-up gray-hover"></i></h2>
+			<h2 v-else-if="players === null" class="mt-4 px-2 d-flex justify-content-between">
+				<i class="fas fa-arrow-up gray-hover"></i> 
+				Add your first player 
+				<i class="fas fa-arrow-up gray-hover"></i>
+			</h2>
 			<div v-else="loading" class="loader"><span>Loading Players...</span></div>
 		</div>
 	</div>

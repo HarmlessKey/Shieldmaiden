@@ -3,7 +3,10 @@
 		<Sidebar/>
 		<div id="my-content" class="container">
 			<Crumble />
-			<h1>Encounters</h1>
+
+			<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
+
+			<h1 class="mt-3">Encounters</h1>
 			<p>Manage the encounters in your campaign.</p>
 			
 			<div class="input-group">
@@ -20,75 +23,84 @@
 				</div>				
 			</div>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+			
+			<!-- <h2 v-show="encounters === null" class="mt-3 d-flex justify-content-between">
+				<i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i>
+			</h2> -->
 
 			<!-- SHOW ENCOUNTERS -->
-			<template v-if="encounters">
-				<h2 class="mt-3">Encounters ( {{ Object.keys(encounters).length }} )</h2>
+			<h2 class="mt-3">
+				Your Encounters 
+				<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
+			</h2>
+
+			<table class="table">
+				<thead>
+					<th>#</th>
+					<th>Encounter</th>
+					<th>Entities</th>
+					<th>Status</th>
+					<th>Round</th>
+					<th>Turn</th>
+					<th></th>
+				</thead>
+				<tbody v-if="encounters"
+					name="table-row" 
+					is="transition-group" 
+					enter-active-class="animated flash" 
+					leave-active-class="animated bounceOutLeft">
+					<tr v-for="(encounter, index) in _active" :key="encounter.key">
+						<td>{{ index + 1 }}</td>
+						<td>{{ encounter.encounter }}</td>
+						<td>
+							<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-users"></i>
+								<template v-if="encounter.entities">
+									{{ Object.keys(encounter.entities).length }}
+								</template>
+								<template v-else> Add</template>
+							</router-link>
+						</td>
+						<template v-if="encounter.round != 0">
+							<td class="red">In progress</td>
+							<td>{{ encounter.round }}</td>
+							<td>{{ encounter.turn + 1 }}</td>
+						</template>
+						<template v-else>
+							<td colspan="3">Not started</td>
+						</template>
+						<td class="text-right actions">
+							<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
+							<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
+							<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></router-link>
+							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<template v-if="_finished != 0">
+				<h2>Finished Encounters</h2>
 				<table class="table">
 					<thead>
 						<th>#</th>
 						<th>Encounter</th>
-						<th>Entities</th>
-						<th>Status</th>
-						<th>Round</th>
-						<th>Turn</th>
 						<th></th>
 					</thead>
 					<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-						<tr v-for="(encounter, index) in _active" :key="encounter.key">
+						
+						<tr v-for="(encounter, index) in _finished" :key="encounter.key">
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
-							<td>
-								<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-									<i class="fas fa-users"></i>
-									<template v-if="encounter.entities">
-										{{ Object.keys(encounter.entities).length }}
-									</template>
-									<template v-else> Add</template>
-								</router-link>
-							</td>
-							<template v-if="encounter.round != 0">
-								<td class="red">In progress</td>
-								<td>{{ encounter.round }}</td>
-								<td>{{ encounter.turn + 1 }}</td>
-							</template>
-							<template v-else>
-								<td colspan="3">Not started</td>
-							</template>
-							<td class="text-right actions">
-								<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
-								<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
-								<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></router-link>
+							<td class="text-right">
+								<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
 								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
 					</tbody>
 				</table>
-
-				<template v-if="_finished != 0">
-					<h2>Finished Encounters</h2>
-					<table class="table">
-						<thead>
-							<th>#</th>
-							<th>Encounter</th>
-							<th></th>
-						</thead>
-						<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-							
-							<tr v-for="(encounter, index) in _finished" :key="encounter.key">
-								<td>{{ index + 1 }}</td>
-								<td>{{ encounter.encounter }}</td>
-								<td class="text-right">
-									<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
-									<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</template>
 			</template>
-			<h2 v-else-if="encounters === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i></h2>
-			<div v-else class="loader"><span>Loading encounters...</span></div>
+			<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>
 </template>

@@ -5,7 +5,10 @@
 			<div id="my-content" class="container">
 				<div class="info">
 					<Crumble />
-					<h2>Edit your campaign</h2>
+
+					<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
+
+					<h2 class="mt-3">Edit your campaign</h2>
 					<div class="input-group mb-4" v-if="campaign">
 						<input class="form-control" v-validate="'required'" type="text" name="newCampaign" v-model="campaign.campaign" @change="changeName()"/>
 						<div class="input-group-append">
@@ -18,10 +21,6 @@
 				<div id="add" class="bg-gray">
 					<h2>All players</h2>
 					<ul class="entities" v-if="players && campaign">
-						<!-- <li v-for="(player, key) in players" 
-						:key="key" 
-						class="d-flex justify-content-between"
-						:class="{ 'faded': campaign.players[key] }"> -->
 						<li v-for="(player, key) in players" 
 						:key="key" 
 						class="d-flex justify-content-between">
@@ -65,7 +64,6 @@
 					</template>
 					<div v-else class="loader"><span>Loading Players...</span></div>
 				</div>
-
 
 			</div>
 		</div>
@@ -135,78 +133,78 @@
 </script>
 
 <style lang="scss" scoped>
-.hasSide {
-	padding-left: 200px !important;
-}
-.container {
-	padding-top:20px;
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows:auto 1fr;
-	grid-gap: 20px;
-	grid-template-areas: 
-	"info info"
-	"add added";
-}
-.info {
-	grid-area:info;
-}
-.nav { 
-	background:#191919;
-}
-#add {
-	padding: 15px 10px;
-	grid-area: add;
-}
-.tab-content {
-	padding:15px 10px;
-}
-#added {
-	padding: 15px 10px;
-	grid-area:added;
-}
-ul.entities {
-	list-style:none;
-	padding:0;
-	line-height:30px;
-}
-ul.entities li {
-	margin-bottom:5px;
-}
-ul.entities .img {
-	width: 30px;
-	height: 30px;
-	display: block;
-	background-size: cover;
-	background-position: top center;
-	border: solid 1px #b2b2b2;
-	background-color: #000;
-	margin-right: 10px;
-}
-ul.entities li a {
-	font-size:18px;
-}
-.monster {
-	padding:15px;
-	position:fixed;
-	right:0;
-	top:80px;
-	height: calc(100vh - 80px);
-	width:330px;
-	z-index:99;
-	overflow: scroll;
-	border-left:solid 1px #000;
-	box-shadow: 0 10px 8px #000;
-}
+	.hasSide {
+		padding-left: 200px !important;
+	}
+	.container {
+		padding-top:20px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows:auto 1fr;
+		grid-gap: 20px;
+		grid-template-areas: 
+		"info info"
+		"add added";
+	}
+	.info {
+		grid-area:info;
+	}
+	.nav { 
+		background:#191919;
+	}
+	#add {
+		padding: 15px 10px;
+		grid-area: add;
+	}
+	.tab-content {
+		padding:15px 10px;
+	}
+	#added {
+		padding: 15px 10px;
+		grid-area:added;
+	}
+	ul.entities {
+		list-style:none;
+		padding:0;
+		line-height:30px;
+	}
+	ul.entities li {
+		margin-bottom:5px;
+	}
+	ul.entities .img {
+		width: 30px;
+		height: 30px;
+		display: block;
+		background-size: cover;
+		background-position: top center;
+		border: solid 1px #b2b2b2;
+		background-color: #000;
+		margin-right: 10px;
+	}
+	ul.entities li a {
+		font-size:18px;
+	}
+	.monster {
+		padding:15px;
+		position:fixed;
+		right:0;
+		top:80px;
+		height: calc(100vh - 80px);
+		width:330px;
+		z-index:99;
+		overflow: scroll;
+		border-left:solid 1px #000;
+		box-shadow: 0 10px 8px #000;
+	}
 
-.slideInRight {
-	transition-duration: 0.1s;
-}
+	.slideInRight {
+		transition-duration: 0.1s;
+	}
 
-.slideOutRight {
-	transition-duration: 0.1s;
-}
-.faded {
-	opacity: .3;
-}
+	.slideOutRight {
+		transition-duration: 0.1s;
+	}
+	.faded {
+		opacity: .3;
+	}
 </style>

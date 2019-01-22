@@ -17,6 +17,7 @@
  /* 1. Variables */
 /*********************************************/
 $gray: #262626;
+$gray-darker: #232222;
 $gray-dark: #191919;
 $gray-light: #b2b2b2;
 $gray-hover: #494747;
@@ -84,6 +85,7 @@ h3 {
 /*********************************************/
 .gray { color: $gray !important; }
 .gray-light { color: $gray-light !important; }
+.gray-darker { color: $gray-darker !important; }
 .gray-dark { color: $gray-dark !important; }
 .gray-hover { color: $gray-hover !important; }
 .gray-active { color: $gray-active !important; }
@@ -94,6 +96,7 @@ h3 {
 .yellow { color: $yellow !important; }
 
 .bg-gray { background-color: $gray !important; }
+.bg-gray-darker { background-color: $gray-darker !important; }
 .bg-gray-dark { background-color: $gray-dark !important; }
 .bg-green { background-color: $green !important; }
 .bg-blue { background-color: $blue !important; }
@@ -211,11 +214,11 @@ a.logout {
 				}
 
 				span {
-					color:$gray-light !important;
+					color: $gray-light !important;
 				}
 				svg {
 					margin-right:15px;
-					color:$gray-light !important;
+					color: $gray-light !important;
 					font-size:20px;
 					line-height:20px;
 				}
@@ -225,9 +228,10 @@ a.logout {
 }
 ul.crumble {
 	list-style: none;
-	padding: 0;
+	padding: 0 0 15px 0;
 	// background-color: $gray;
-	display: inline-flex !important;
+	// display: inline-flex !important;
+	border-bottom: solid 1px $gray-active;
 
 	li {
 		margin-right: 10px;
@@ -235,6 +239,13 @@ ul.crumble {
 		a {
 			color: $gray-light !important;
 		}
+		// &:last-child {
+		// 	color: $blue !important;
+
+		// 	svg {
+		// 		color: $gray-light !important;
+		// 	}
+		// }
 	}
 }
 table {
@@ -432,6 +443,7 @@ ul.nav {
 	margin-bottom: 20px !important;
 
 	.card-header {
+		border-radius: 0 !important;
 		text-transform: uppercase !important;
 	}
 }
@@ -454,6 +466,10 @@ ul.nav {
 }
 .snotifyToast__buttons {
 	border-top: 2px solid rgba(0, 0, 0, 0.1);
+
+	button {
+		cursor: pointer;
+	}
 }
 .snotify-error .snotifyToast__inner {
 	background-color: $red !important;

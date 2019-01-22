@@ -11,7 +11,8 @@
 				</a>
 				<div class="dropdown-menu" aria-labelledby="edit">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a class="dropdown-item" @click="showTrack()"><i class="far fa-desktop"></i> Track Settings</a>
+					<a class="dropdown-item" @click="slide('settings')"><i class="fas fa-cogs"></i> Settings</a>
+					<a class="dropdown-item" @click="slide('track')"><i class="far fa-desktop"></i> Track Settings</a>
 					<a class="dropdown-item" @click=""><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 			</h1>
@@ -23,7 +24,10 @@
 		</div>
 		<div>
 			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> <span>Prev turn</span></a>
-			<a v-if="encounter.round == 0" class="btn" @click="start()"><span>Start encounter</span> <i class="fas fa-arrow-right"></i></a>
+			<template v-if="encounter.round == 0"> 
+				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2"><i class="fas fa-arrow-left"></i> <span>Back</span></router-link>
+				<a class="btn" @click="start()"><span>Start encounter</span> <i class="fas fa-arrow-right"></i></a>
+			</template>
 			<a v-else class="btn" @click="nextTurn()"><span>Next turn</span> <i class="fas fa-arrow-right"></i></a>
 		</div>
 	</div>
@@ -46,7 +50,7 @@
 			...mapGetters([
 				'encounter',
 				'path',
-				'entities'
+				'entities',
 			]),
 		},
 		methods: {
@@ -55,11 +59,11 @@
 				'set_targeted',
 				'setSlide',
 			]),
-			showTrack() {
+			slide(type) {
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
-					type: 'track',
+					type: type,
 				})
 			},
 			start() {

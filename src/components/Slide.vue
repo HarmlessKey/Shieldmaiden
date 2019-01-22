@@ -12,6 +12,7 @@
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
 		<Track v-if="slide.type == 'track'" />
+		<Settings v-if="slide.type == 'settings'" />
 	</div>
 </template>
 
@@ -27,6 +28,7 @@
 	import DeathSaves from '@/components/slides/DeathSaves.vue';
 	import DamageHealing from '@/components/slides/DamageHealing.vue';
 	import Track from '@/components/slides/Track.vue';
+	import Settings from '@/components/slides/Settings.vue';
 
 	export default {
 		components: {
@@ -41,6 +43,7 @@
 			DeathSaves: DeathSaves,
 			DamageHealing: DamageHealing,
 			Track: Track,
+			Settings: Settings,
 		},
 		data() {
 			return {

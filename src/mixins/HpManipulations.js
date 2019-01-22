@@ -7,7 +7,15 @@ export const setHP = {
 	},
 	data() {
 		return {
-			
+			userId: this.$store.getters.getUser.uid,
+		}
+	},
+	firebase() {
+		return {
+			settings: {
+				source: db.ref(`settings/${this.userId}/encounter`),
+				asObject: true,
+			},
 		}
 	},
 	computed: {
@@ -42,7 +50,7 @@ export const setHP = {
 			var rest_amount = amount;
 
 			//Death saves at 0 hp
-			if(curHp == 0) {
+			if(curHp == 0 && this.settings.automate !== false) {
 				var n = parseInt(Object.keys(target.saves).length)
 				
 				this.set_save({

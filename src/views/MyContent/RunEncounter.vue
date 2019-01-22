@@ -1,35 +1,31 @@
 <template>
-	<div class="container-fluid" v-if="encounter && players"  :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">	
-		<div class="container" v-if="encounter.finished == true">
-			<h2>Encounter Finished</h2>
-			<router-link class="btn" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
-		</div>
-		<div v-else id="combat">
-			<Turns 
-				:active_len="_active.length"
+	<div class="container-fluid" v-if="encounter && players"  
+		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
+		
+		<Finished v-if="encounter.finished == true"/>
+
+		<template v-else>
+			<SetInitiative 
+				v-if="encounter.round == 0"
+				:_active = "_active"
+				:_idle = "_idle"
 			/>
-			<div v-if="encounter.round == 0">
-				<SetInitiative 
+			<div v-else class="combat">
+				<Turns />
+				{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
+				<Current 
+					:current="_active[encounter.turn]"
+				/>
+				<Targets 
 					:_active = "_active"
 					:_idle = "_idle"
 				/>
-			</div>
-			<template v-else>
-					{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there alive NPC's -->
-					<Current 
-						:current="_active[encounter.turn]"
-					/>
-					<Targets 
-						:_active = "_active"
-						:_idle = "_idle"
-					/>
-					<Actions 
+				<Actions 
 					:current="_active[encounter.turn]"
-					@log="sendLog"
-					/>
-					<Side :log="log" />
-			</template>
-		</div>
+				/>
+				<Side />
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -38,6 +34,7 @@
 	import { mapActions, mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
+	import Finished from '@/components/combat/Finished.vue'
 	import Actions from '@/components/combat/actions/Actions.vue'
 	import Turns from '@/components/combat/Turns.vue'
 	import Current from '@/components/combat/Current.vue'
@@ -51,6 +48,7 @@
 			title: 'Run Encounter'
 		},
 		components: {
+			Finished,
 			Actions,
 			Turns,
 			Current,
@@ -64,8 +62,15 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 				target: undefined,
-				log: undefined,
 				alive: undefined,
+			}
+		},
+		firebase() {
+			return {
+				settings: {
+					source: db.ref(`settings/${this.userId}/encounter`),
+					asObject: true,
+				},
 			}
 		},
 		mounted() {
@@ -118,7 +123,7 @@
 		},
 		watch: {
 			alive(newVal, oldVal) {
-				console.log(`old: ${oldVal}, new: ${newVal}`)
+				// console.log(`old: ${oldVal}, new: ${newVal}`)
 				if(newVal == 0) {
 					this.confirmFinish()
 				}
@@ -130,9 +135,6 @@
 				'track_Encounter',
 				'set_finished',
 			]),
-			sendLog: function(log) {
-				this.log = log;
-			},
 			track() {
 				var track = {
 					campaign: this.$route.params.campid,
@@ -163,25 +165,30 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .container-fluid {
 	background-size: cover;
 	background-position: center bottom;
 	background-color: #191919;
 	height: calc(100vh - 50px);
-}
-#combat {
-	padding:10px;
-	width: 100vw;
-	height: calc(100% - 50px);
-	display: grid;
-	grid-template-columns: 3fr 3fr 2fr 2fr;
-	grid-template-rows: 60px auto;
-	grid-gap: 10px;
-	grid-template-areas:
-	"turns turns turns turns"
-	"current targets actions side";
-	position: absolute;
+
+	.finished {
+		margin-top: 30px;
+		background: rgba(38, 38, 38, .9) !important;
+	}
+	.combat {
+		padding:10px;
+		width: 100vw;
+		height: calc(100% - 50px);
+		display: grid;
+		grid-template-columns: 3fr 3fr 2fr 2fr;
+		grid-template-rows: 60px auto;
+		grid-gap: 10px;
+		grid-template-areas:
+		"turns turns turns turns"
+		"current targets actions side";
+		position: absolute;
+	}
 }
 @media only screen and (max-width: 1000px) {
 	#combat {

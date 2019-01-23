@@ -7,7 +7,6 @@
 				<h1>Campaigns</h1>
 				<p>Welcome to your campaigns overview.</p>
 				
-				<!-- <template v-if="players !== undefined"> -->
 				<template v-if="players">
 					<div class="input-group">
 						<input type="text" 
@@ -30,16 +29,20 @@
 						</i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i>
 					</h2> -->
 
-					<template v-if="campaigns != null">
-						<h2 class="mt-3">Campaigns ( {{ Object.keys(campaigns).length }} )</h2>
+					<h2 class="mt-3">
+						Your Campaigns 
+						<span v-if="campaigns">( {{ Object.keys(campaigns).length }} )</span>
+					</h2>
 
-						<transition-group 
-							tag="div" 
-							class="" 
-							name="campaigns" 
-							enter-active-class="animated flash" 
-							leave-active-class="animated bounceOutLeft">
-							<div class="card" v-for="(campaign, index) in _campaigns" :key="campaign.key">
+					<transition-group 
+						v-if="campaigns"
+						tag="div" 
+						class="row" 
+						name="campaigns" 
+						enter-active-class="animated flash" 
+						leave-active-class="animated bounceOutLeft">
+						<b-col lg="6" v-for="(campaign, index) in _campaigns" :key="campaign.key">
+							<div class="card">
 								<div class="card-header d-flex justify-content-between">
 									<span>
 										<i class="fas fa-dungeon"></i>
@@ -82,16 +85,15 @@
 								</div>
 								<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
 							</div>
-						</transition-group>
-					</template>
+						</b-col>
+					</transition-group>
 
-					</template>
-					<b-card header="No players" class="warning" v-else-if="players === null">
-						<p>There are no players to join in your campaigns yet, let's create some first.</p>
-						<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
-					</b-card>
-					<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
-				<!-- </template> -->
+				</template>
+				<b-card header="No players" class="warning" v-else-if="players === null">
+					<p>There are no players to join in your campaigns yet, let's create some first.</p>
+					<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
+				</b-card>
+				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 			</div>
 		</div>
 	</div>

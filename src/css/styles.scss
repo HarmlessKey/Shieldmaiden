@@ -43,6 +43,7 @@ body {
 	color: $gray-light !important;
 	font-size: 12px !important;
 	font-family: 'Raleway', sans-serif;
+	position: relative;
 }
 .view {
 	padding: 5px;
@@ -200,6 +201,7 @@ a.logout {
 				display: block;
 				font-size:15px;
 				line-height:20px;
+				color: $gray-light !important;
 				
 				&:hover, &.active:hover {
 					background-color:$gray-hover;
@@ -415,6 +417,36 @@ ul.nav {
 			background-color: $gray !important;
 		}
 	}
+}
+.navbar {
+	padding: 0 !important;
+
+	.nav {
+		.nav {
+			
+			.nav-link {
+				padding-left: 20px !important;
+				font-size: 13px !important;
+				line-height: 15px !important;
+			}
+		}
+	}
+}
+.list-group-item {
+	background: none !important;
+	border: none !important;
+	color: $gray-light !important;
+	
+	&:hover, &.active:hover {
+		background-color:$gray-hover !important;
+		text-decoration:none;
+	}
+	&.active {
+		background-color:$gray-active !important;
+	}
+}
+.list-group-item:first-child, .list-group-item:last-child {
+	border-radius: 0 !important;
 }
 .modal-content {
 	border-radius: 0 !important;

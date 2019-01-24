@@ -86,6 +86,24 @@ const mutations = {
 		else {
 			entity.down = false
 		}
+		if (db_entity.meters) {
+			if (db_entity.meters.healing) {
+				entity.healing = db_entity.meters.healing
+			}
+			else {
+				entity.healing = 0
+			}
+			if (db_entity.meters.damage) {
+				entity.damage = db_entity.meters.damage
+			}
+			else {
+				entity.damage = 0
+			}
+		}
+		else {
+			entity.damage = 0
+			entity.healing = 0
+		}
 		if (db_entity.addNextRound) {
 			entity.addNextRound = db_entity.addNextRound
 		}
@@ -208,16 +226,24 @@ const mutations = {
 		}
 		if(action == 'set') {
 			state.log.unshift(value)
-
+			
 			const parsed = JSON.stringify(state.log);
 			localStorage.setItem(state.encounterId, parsed);
 		}
 		if(action == 'unset') {
 			Vue.delete(state.log, value)
-
+			
 			const parsed = JSON.stringify(state.log);
 			localStorage.setItem(state.encounterId, parsed);
 		}
+	},
+	SET_METERS(state, {key, type, amount}) {
+		var newVal = state.entities[key][type] + amount;
+
+		if(newVal < 0) { newVal = 0 }
+
+		encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
+		state.entities[key][type] = newVal;
 	},
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
@@ -415,6 +441,9 @@ const actions = {
 	},
 	set_log({ commit }, payload) {
 		commit("SET_LOG", payload)
+	},
+	set_meters({ commit }, payload) {
+		commit("SET_METERS", payload)
 	},
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)

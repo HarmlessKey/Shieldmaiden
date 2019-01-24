@@ -8,7 +8,6 @@
 			<div v-if="slide.show == true" class="slide">
 				<div>
 					<a @click="hideSlide()" class="hide" v-b-tooltip:hover title="Hide"><i class="fas fa-chevron-right"></i></a>
-					{{auth}}
 					<Slide />
 				</div>
 			</div>

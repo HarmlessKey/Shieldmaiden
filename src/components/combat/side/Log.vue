@@ -1,35 +1,37 @@
 <template>
 		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
-			<h2 class="d-flex justify-content-between">
-				Combat log
-				<span class="blue" 
-					v-b-popover.hover.left="'The combat log is stored localy in your browser'" 
-					title="Log storage"><i class="fas fa-info"></i></span>
-			</h2>
-			<transition-group v-if="entities && Object.keys(returnLog()).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
-				<li v-for="(item, key) in returnLog()" :key="key">
-					<div class="d-flex justify-content-between head">
-						<span>
-							Round: {{ item.round }}
-							Turn: {{ item.turn }}
+			<template v-if="returnLog()">
+				<h2 class="d-flex justify-content-between">
+					Combat log
+					<span class="blue" 
+						v-b-popover.hover.left="'The combat log is stored localy in your browser'" 
+						title="Log storage"><i class="fas fa-info"></i></span>
+				</h2>
+				<transition-group v-if="entities && Object.keys(returnLog()).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
+					<li v-for="(item, key) in returnLog()" :key="key">
+						<div class="d-flex justify-content-between head">
+							<span>
+								Round: {{ item.round }}
+								Turn: {{ item.turn }}
+							</span>
+							{{ item.time }}
+						</div>
+						{{ entities[item.by].name }} did
+						<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
+						<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
+						{{ item.type }} to {{ entities[item.target].name }}
+						<span v-if="item.over != 0">
+							({{ item.over }}
+							<template v-if="item.type == 'damage'">overkill</template>
+							<template v-else>overhealing</template>)
 						</span>
-						{{ item.time }}
-					</div>
-					{{ entities[item.by].name }} did
-					<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
-					<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
-					{{ item.type }} to {{ entities[item.target].name }}
-					<span v-if="item.over != 0">
-						({{ item.over }}
-						<template v-if="item.type == 'damage'">overkill</template>
-						<template v-else>overhealing</template>)
-					</span>
-					<div class="undo" v-if="key == 0">
-						<a @click="undo(key, item.amount, item.target, item.by, item.type)">Undo</a>
-					</div>
-				</li>
-			</transition-group>
-			<p v-else>No log yet.</p>
+						<div class="undo" v-if="key == 0">
+							<a @click="undo(key, item.amount, item.target, item.by, item.type)">Undo</a>
+						</div>
+					</li>
+				</transition-group>
+				<p v-else>No log yet.</p>
+			</template>
 		</div>
 </template>
 
@@ -67,7 +69,7 @@
 				else if(type == 'healing') {
 					type = 'damage'
 				}
-				this.setHP(amount, this.entities[target], this.entities[by], type, false, false)
+				this.setHP(amount, this.entities[target], this.entities[by], type, false, false, true)
 				this.set_log({
 					action: 'unset',
 					value: key

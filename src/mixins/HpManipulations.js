@@ -27,18 +27,19 @@ export const setHP = {
 			'set_hp',
 			'set_dead',
 			'set_log',
+			'set_meters',
 		]),
-		setHP(amount, target, current, type, log = true, notify = true) {
+		setHP(amount, target, current, type, log = true, notify = true, undo = false) {
 			amount = parseInt(amount);
 
 			if(type == 'damage') {
-				this.isDamage(target, current, amount, log, notify)
+				this.isDamage(target, current, amount, log, notify, undo)
 			}
 			else {
-				this.isHealing(target, current, amount, log, notify)
+				this.isHealing(target, current, amount, log, notify, undo)
 			}
 		},
-		isDamage(target, current, amount, log, notify) {
+		isDamage(target, current, amount, log, notify, undo) {
 			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
@@ -155,9 +156,17 @@ export const setHP = {
 			}
 
 			//Add to damagemeters
-			// this.damageMeters(type, amount, over);
+			if(undo == true) {
+				amount = -amount
+				type = 'healing'
+			}
+			this.set_meters({
+				key: current.key,
+				type: type,
+				amount: amount,
+			})
 		},
-		isHealing(target, current, amount, log, notify) {
+		isHealing(target, current, amount, log, notify, undo) {
 			if(target.transformed == true) {
 				var maxHp = parseInt(target.transformedMaxHp);
 				var curHp = parseInt(target.transformedCurHp);
@@ -213,7 +222,15 @@ export const setHP = {
 			}
 			
 			//Add to damagemeters
-			// this.damageMeters(type, amount, current.name, over);
+			if(undo == true) {
+				amount = -amount
+				type = 'damage'
+			}
+			this.set_meters({
+				key: current.key,
+				type: type,
+				amount: amount,
+			})
 		},
 		addLog(type, target, current, amount, over) {
 			var d = new Date();
@@ -242,17 +259,6 @@ export const setHP = {
 				action: 'set',
 				value: newLog
 			})
-		},
-		damageMeters(type, amount, over) {
-			// if(amount > 0) {
-			// 	db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.current.key}`).push({
-			// 		amount: amount,
-			// 		round: this.encounter.round,
-			// 		target: this.targeted,
-			// 		damageType: this.damageType,
-			// 		over: over,
-			// 	});
-			// }
 		},
 	}
 }

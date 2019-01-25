@@ -12,7 +12,9 @@
 			</span>
 		</span>
 		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-		<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">{{ displayStats().ac + entity.ac_bonus}}</span>
+		<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">
+			{{ displayStats().ac + entity.ac_bonus}}
+		</span>
 		<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
 
 		<template>
@@ -23,7 +25,7 @@
 						v-for="(condition, key) in entity.conditions" 
 						:key="key" 
 						v-b-tooltip.hover :title="key"
-						@click="showCondition(key)"></div>
+						@click="showCondition(key, entity)"></div>
 				</div>
 				<div class="progress-bar" :class="{ 
 					'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
@@ -38,8 +40,7 @@
 			<!-- HEALTH -->
 			<template v-if="entity.active == true">
 				<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
-					{{ setNumber(displayStats().curHp) }}
-					<input v-model.number="number" type="hidden">
+					{{ setNumber(displayStats().curHp) }} 
 					<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
 						<span class="current" :class="{ 
 							'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
@@ -146,12 +147,13 @@
 				}
 				return stats
 			},
-			showCondition(show) {
+			showCondition(show, entity) {
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: 'condition',
-					condition: show
+					condition: show,
+					entity, entity
 				})
 			},
 		}

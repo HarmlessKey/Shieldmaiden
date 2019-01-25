@@ -276,10 +276,16 @@ const mutations = {
 			initiative: parseInt(initiative),
 		})
 	},
-	SET_CONDITION(state, {action, key, condition}) {
+	SET_CONDITION(state, {action, key, condition, level}) {
 		if(action == 'add') {
-			Vue.set(state.entities[key].conditions, condition, true)
-			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
+			if(condition == 'exhaustion') {
+				Vue.set(state.entities[key].conditions, condition, level)
+				encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set(level);
+			}
+			else {
+				Vue.set(state.entities[key].conditions, condition, true)
+				encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
+			}
 		}
 		else if(action == 'remove') {
 			Vue.delete(state.entities[key].conditions, condition)

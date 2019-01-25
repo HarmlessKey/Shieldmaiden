@@ -85,7 +85,7 @@ ul {
 	list-style: none;
 
 	li {
-		padding:10px 0;
+		padding:10px 3px;
 		border-bottom: solid 1px #000;
 		position: relative;
 

@@ -1,16 +1,16 @@
 <template>
 	<div id="sidebar">
-		<ul>
-			<li>
+		<b-list-group>
+			<b-list-group-item>
 				<router-link to="/campaigns"><i class="fas fa-dungeon blue"></i><span>Campaigns</span></router-link>
-			</li>
-			<li>
+			</b-list-group-item>
+			<b-list-group-item>
 				<router-link to="/players"><i class="fas fa-users blue"></i><span>Players</span></router-link>
-			</li>
-			<li>
+			</b-list-group-item>
+			<b-list-group-item>
 				<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
-			</li>
-		</ul>
+			</b-list-group-item>
+		</b-list-group>
 	</div>
 </template>
 

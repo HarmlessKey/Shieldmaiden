@@ -40,7 +40,7 @@
 				</template>
 				<h2 v-else class="red"><i class="fas fa-times"></i> No loot</h2>
 			</div>
-			<router-link class="btn btn-block" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
+			<router-link v-if="$route.name == 'RunEncounter'" class="btn btn-block" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
 		</div>
 	</div>
 </template>
@@ -51,22 +51,16 @@
 
 	export default {
 		name: 'app',
-		metaInfo: {
-			title: 'Run Encounter'
-		},
+		props: [
+			'encounter'
+		],
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				target: undefined,
-				log: undefined,
-				alive: undefined,
 			}
 		},
 		computed: {
-			...mapGetters([
-				'encounter',
-				'campaigns',
-			]),
+
 		},
 		methods: {
 		},
@@ -75,6 +69,8 @@
 
 <style lang="scss" scoped>
 	.container {
+		max-width: 400px;
+
 		h2.head {
 			color: #fff;
 			margin-top: 20px;
@@ -83,8 +79,6 @@
 		}
 
 		.finished {
-			width: 400px;
-			margin: auto;
 			background: rgba(38, 38, 38, .9) !important;
 
 			.currency {

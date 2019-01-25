@@ -2,7 +2,7 @@
 	<div class="container-fluid" v-if="encounter && players"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
 		
-		<Finished v-if="encounter.finished == true"/>
+		<Finished v-if="encounter.finished == true" :encounter="encounter"/>
 
 		<template v-else>
 			<SetInitiative 

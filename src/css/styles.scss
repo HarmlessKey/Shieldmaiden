@@ -99,6 +99,7 @@ h3 {
 .bg-gray { background-color: $gray !important; }
 .bg-gray-darker { background-color: $gray-darker !important; }
 .bg-gray-dark { background-color: $gray-dark !important; }
+.bg-black { background-color: $black !important; }
 .bg-green { background-color: $green !important; }
 .bg-blue { background-color: $blue !important; }
 .bg-red { background-color: $red !important; }
@@ -190,42 +191,8 @@ a.logout {
 	padding-top:10px;
 	background:$gray;
 	
-	ul {
-		list-style:none;
-		padding:0;
-
-		li {
-			a {
-				padding:10px;
-				width:200px;
-				display: block;
-				font-size:15px;
-				line-height:20px;
-				color: $gray-light !important;
-				
-				&:hover, &.active:hover {
-					background-color:$gray-hover;
-					text-decoration:none;
-				}
-				&.active {
-					background-color:$gray-active;
-
-					svg {
-						color:$blue !important;
-					}
-				}
-
-				span {
-					color: $gray-light !important;
-				}
-				svg {
-					margin-right:15px;
-					color: $gray-light !important;
-					font-size:20px;
-					line-height:20px;
-				}
-			}
-		}
+	.list-group-item {
+		padding: 0 !important;
 	}
 }
 ul.crumble {
@@ -367,7 +334,7 @@ a {
 		padding: 5px 15px;
 		line-height: 30px;
 
-		&:hover { 
+		&:hover, &.active { 
 			color: $blue !important;
 			background: none;
 		}
@@ -422,6 +389,14 @@ ul.nav {
 	padding: 0 !important;
 
 	.nav {
+		.nav-item {
+			width: 100%; 
+			display: block;
+			
+			.nav-link {
+				color: $gray-light !important;
+			}
+		}
 		.nav {
 			
 			.nav-link {
@@ -436,13 +411,42 @@ ul.nav {
 	background: none !important;
 	border: none !important;
 	color: $gray-light !important;
+
+	a {
+		padding: 10px 15px;
+		display: block;
+		font-size: 15px;
+		line-height: 20px;
+		color: $gray-light !important;
+		
+		&:hover, &.active:hover {
+			background-color: $gray-hover;
+			text-decoration: none;
+		}
+		&.active {
+			background-color: $gray-active;
+
+			svg {
+				color: $blue !important;
+			}
+		}
+		span {
+			color: $gray-light !important;
+		}
+		svg {
+			margin-right:15px;
+			color: $gray-light !important;
+			font-size:20px;
+			line-height:20px;
+		}
+	}
 	
 	&:hover, &.active:hover {
 		background-color:$gray-hover !important;
-		text-decoration:none;
+		text-decoration: none;
 	}
 	&.active {
-		background-color:$gray-active !important;
+		background-color: $gray-active !important;
 	}
 }
 .list-group-item:first-child, .list-group-item:last-child {

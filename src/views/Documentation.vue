@@ -13,6 +13,8 @@
 						<b-nav-item href="#run-encounter-track-in">Track Initiative</b-nav-item>
 						<b-nav-item href="#run-encounter-manual">Manual Damage</b-nav-item>
 						<b-nav-item href="#run-encounter-select">Select Damage</b-nav-item>
+						<b-nav-item href="#run-encounter-log">Combat Log</b-nav-item>
+						<b-nav-item href="#run-encounter-meters">Damage Meters</b-nav-item>
 					</b-nav>
 				</b-nav>
 			</b-navbar>
@@ -114,8 +116,12 @@
 							This happens only if you have the automate setting on.<br/>
 							NPC's that reach zero hit points are handled differently. When an NPC reaches zero hit points they will be marked as down.
 							As soon as the next round begins, the down NPC's will be moved to a seperate "down list" and they wont be in the turn order anymore.
-							For an explaination on why it is not immediatly moved to the "down list" list, check the section on <u>tracking initiavive</u>.
+							For an explaination on why it is not immediatly moved to the "down list" list, check the section on <a href="#run-encounter-track-in">tracking initiavive</a>.
 						</p>
+
+						<p><b>Type of damage.</b> At this moment we do need keep track of the type of damage, 
+						because we are not able to when you roll the damage of a spell. 
+						Check the documention on <a href="#run-encounter-select">selected damage</a> for more information.</p>
 
 						<p><b>Critical hits.</b> When you input manual damage, you can select if it was a critical hit. This has no effect on the the amount you submitted. 
 						We don't divide it by two or do any sort of manipulation to it, it's up to you input the right amount of damage. 
@@ -133,11 +139,32 @@
 							In this last case the transformation is automitically removed from the target and it falls back into it's old form.
 						</p>
 
-						<h2 class="pt-5" id="run-encounter-select">Selected damage and healing</h2>
+						<h2 class="pt-5" id="run-encounter-select">Selected damage</h2>
 						<p>When the current entity is an NPC, you can choose to roll the attacks automatically. 
 							A d20 plus their to hit modifier will be rolled and the damage of the attack. 
 							A notification will pop up showing you te results of the roll and asking you if you want to apply the damage or cancel.
 							If you apply the damage, it is handled exactly the same as manual damage.
+						</p>
+
+						<p><b>Type of damage.</b> Because of the way monsters are stored in the <a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a> 
+						it is not possible for us to keep track of type of damage. 
+						We might store monsters in our own database someday so we will be able to format it a little different, 
+						allowing us to keep track of this aswell.</p>
+
+						<h2 class="pt-5" id="run-encounter-log">Combat Log</h2>
+						<p>
+							Some actions in an encounter are saved in the combat log. 
+
+							It is stored in your browser and not in our database. 
+							The log shows who did damage or healing and who they did it to. 
+							The log allows to keep track of what happened during an encounter and to undo mistakes you made.
+							The last entry in the log can always be undone, 
+							the health will be restored to the status it was before and the log entry will be removed. 
+						</p>
+
+						<h2 class="pt-5" id="run-encounter-meters">Damage Meters</h2>
+						<p>
+							The damage meters are stored a total number for each entity.
 						</p>
 					</b-card>
 				</section>
@@ -167,7 +194,7 @@
 	#sidebar {
 		.navbar {
 			.nav-link {
-
+				width: 100% !important;
 				&:hover, &.active {
 					background: none;
 					color: #2c97de !important;

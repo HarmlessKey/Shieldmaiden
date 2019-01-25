@@ -8,6 +8,38 @@
 				Below you can determine what should be visible on the track encounter screen.
 			</p>
 
+			<h3>General</h3>
+			<ul class="settings">
+				<li class="d-flex justify-content-between">
+					<span><i class="fas fa-swords"></i> Damage Meters</span>
+
+					<div>
+						<div v-show="player.meters === false">
+							<span v-b-tooltip.hover title="Hidden" class="red mr-2"><i class="fas fa-eye-slash"></i></span>
+							<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'meters')" class="gray-light"><i class="fas fa-eye"></i></a>
+						</div>
+						<div v-show="player.meters === undefined">
+							<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'meters', false)" class="gray-light mr-2"><i class="fas fa-eye-slash"></i></a>
+							<span v-b-tooltip.hover title="Shown" class="green"><i class="fas fa-eye"></i></span>
+						</div>
+					</div>
+				</li>
+				<li class="d-flex justify-content-between">
+					<span><i class="fas fa-treasure-chest"></i> Loot</span>
+
+					<div>
+						<div v-show="!player.loot">
+							<span v-b-tooltip.hover title="Hidden" class="red mr-2"><i class="fas fa-eye-slash"></i></span>
+							<a v-b-tooltip.hover title="Show" @click="set('set', 'player', 'loot', true)" class="gray-light"><i class="fas fa-eye"></i></a>
+						</div>
+						<div v-show="player.loot == true">
+							<a v-b-tooltip.hover title="Hide" @click="set('unset', 'player', 'loot')" class="gray-light mr-2"><i class="fas fa-eye-slash"></i></a>
+							<span v-b-tooltip.hover title="Shown" class="green"><i class="fas fa-eye"></i></span>
+						</div>
+					</div>
+				</li>
+			</ul>
+
 			<h3>NPC settings</h3>
 			<ul class="settings">
 				<li class="d-flex justify-content-between">
@@ -99,6 +131,7 @@
 					</div>
 				</li>
 			</ul>
+
 
 			<a class="btn" @click="setDefault()">Set default</a>
 		</b-card>

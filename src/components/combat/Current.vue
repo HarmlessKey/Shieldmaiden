@@ -51,16 +51,19 @@
 						</template>
 
 						<b-row class="conditions">
-							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)">
-								<svg 
-									v-if="conditions[key]"
-									v-b-popover.hover="conditions[key].condition" 
-									:title="key" 
-									class="icon text" 
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 512 512">
-									<path :d="conditions[key].icon" fill-opacity="1"></path>
-								</svg>
+							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
+								<span class="n" v-if="key == 'exhaustion'">
+									{{ current.conditions[key] }}
+								</span>
+								<template v-else>
+									<svg v-b-popover.hover="conditions[key].condition" 
+										:title="key" 
+										class="icon text" 
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 512 512">
+										<path :d="conditions[key].icon" fill-opacity="1"></path>
+									</svg>
+								</template>
 							</b-col>
 						</b-row>
 						<NPC class="mt-3" :entity="current" />
@@ -113,7 +116,8 @@
 				this.setSlide({
 					show: true,
 					type: 'condition',
-					condition: show
+					condition: show,
+					entity: this.current
 				})
 			},
 			deathInfo() {
@@ -213,10 +217,15 @@
 	.conditions {
 		margin-bottom: 10px;
 
-		svg {
+		svg, .n {
+			display: block;
+			font-size: 16px;
 			width: 30px;
 			height: 30px;
+			line-height: 26px;
+			text-align: center;
 			fill: #cc3e4a;
+			color: #cc3e4a;
 			background-color: #302f2f;
 			padding: 2px;
 			cursor: pointer;

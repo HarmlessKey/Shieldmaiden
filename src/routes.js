@@ -4,7 +4,8 @@ import Documentation from '@/views/Documentation.vue';
 import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
 import Settings from '@/views/Settings.vue';
-import Profile from '@/views/Profile.vue';
+import Profile from '@/views/profile/Profile.vue';
+import DeleteAccount from '@/views/profile/DeleteAccount.vue';
 import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
 import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
@@ -51,6 +52,11 @@ export const routes = [{
 	path: '/profile',
 	name: 'profile',
 	component: Profile
+},
+{
+	path: '/profile/delete-account',
+	name: 'deleteAccount',
+	component: DeleteAccount
 },
 {
 	path: '/settings',

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<section id="track">
 		<b-card header="Track Encounter Settings">
 			<p class="mb-5">Track encounter is what we call the link you can share with your party, 
 				or put up on a second screen for your party to see. 
@@ -135,7 +135,7 @@
 
 			<a class="btn" @click="setDefault()">Set default</a>
 		</b-card>
-	</div>
+	</section>
 </template>
 
 <script>

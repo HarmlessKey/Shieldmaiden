@@ -42,14 +42,18 @@
 						</span>
 					</td>
 
-					<td class="conditions" v-if="conditions != undefined">
+					<td class="conditions">
 						<div class="d-flex justify-content-right" v-if="
 						entity.conditions &&
 						((entity.entityType == 'player' && playerSettings.conditions === undefined) 
 							|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
 						">
-							<div v-for="(condition, key) in entity.conditions" v-bind:key="key">
+							<div v-for="(condition, key) in entity.conditions" v-bind:key="key" v-if="conditions[key]">
+									<span class="n" v-if="key == 'exhaustion'">
+										{{ entity.conditions[key] }}
+									</span>
 									<svg
+										v-else
 										v-b-popover.hover="conditions[key].condition" 
 										:title="key" 
 										class="icon text" 
@@ -208,13 +212,17 @@
 	.conditions {
 		padding: 9px 10px;
 
-		svg {
+		svg, .n {
 			width: 24px;
 			height: 24px;
+			line-height: 20px;
 			fill: #cc3e4a;
 			padding: 2px;
-			cursor: pointer;
 			margin: 0;
+			display: block;
+			font-size: 16px;
+			text-align: center;
+			color: #cc3e4a;
 		}
 	}
 	.entities-move {

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<section id="encounter">
 		<b-card header="Run Encounter Settings">
 			<ul class="settings">
 				<li class="d-flex justify-content-between">
@@ -51,7 +51,7 @@
 			</ul>
 			<a class="btn" @click="setDefault()">Set default</a>
 		</b-card>
-	</div>
+	</section>
 </template>
 
 <script>

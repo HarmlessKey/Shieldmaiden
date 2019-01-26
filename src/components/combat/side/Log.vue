@@ -1,14 +1,14 @@
 <template>
 		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
-			<template v-if="returnLog()">
+			<template v-if="log">
 				<h2 class="d-flex justify-content-between">
 					Combat log
 					<span class="blue" 
 						v-b-popover.hover.left="'The combat log is stored localy in your browser'" 
 						title="Log storage"><i class="fas fa-info"></i></span>
 				</h2>
-				<transition-group v-if="entities && Object.keys(returnLog()).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
-					<li v-for="(item, key) in returnLog()" :key="key">
+				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
+					<li v-for="(item, key) in log" :key="key">
 						<div class="d-flex justify-content-between head">
 							<span>
 								Round: {{ item.round }}
@@ -16,10 +16,11 @@
 							</span>
 							{{ item.time }}
 						</div>
+						<b class="blue" v-if="item.crit">Critical hit! </b class="blue">
 						{{ entities[item.by].name }} did
 						<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
 						<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
-						{{ item.type }} to {{ entities[item.target].name }}
+							{{ item.type }} to {{ entities[item.target].name }}
 						<span v-if="item.over != 0">
 							({{ item.over }}
 							<template v-if="item.type == 'damage'">overkill</template>
@@ -44,7 +45,7 @@
 		mixins: [setHP],
 		data() {
 			return {
-				storageLog: JSON.parse(localStorage.getItem(this.$route.params.encid))
+				storageLog: JSON.parse(localStorage.getItem(this.$route.params.encid)),
 			}
 		},
 		computed: {
@@ -53,13 +54,13 @@
 				'entities',
 			]),
 		},
+		beforeMount() {
+			// this.setLog()
+		},
 		methods: {
-			returnLog() {
+			setLog() {
 				if(Object.keys(this.log).length == 0) {
-					return this.storageLog
-				}
-				else {
-					return this.log
+					this.log = this.storageLog
 				}
 			},
 			undo(key, amount, target, by, type) {
@@ -69,7 +70,7 @@
 				else if(type == 'healing') {
 					type = 'damage'
 				}
-				this.setHP(amount, this.entities[target], this.entities[by], type, false, false, true)
+				this.setHP(amount, false, this.entities[target], this.entities[by], type, false, false, true)
 				this.set_log({
 					action: 'unset',
 					value: key
@@ -86,7 +87,7 @@ ul {
 
 	li {
 		padding:10px 3px;
-		border-bottom: solid 1px #000;
+		border-bottom: solid 1px #494747;
 		position: relative;
 
 		.head {
@@ -101,13 +102,13 @@ ul {
 			position: absolute;
 			top: 0;
 			left: 0;
-			display:none;
+			display: none;
 
 			a {
 				background: #cc3e4a;
 				text-align: center;
 				color: #fff !important;
-				display:block;
+				display: block;
 				position: absolute;
 				line-height: 28px;
 				height: 28px;

@@ -29,17 +29,17 @@ export const setHP = {
 			'set_log',
 			'set_meters',
 		]),
-		setHP(amount, target, current, type, log = true, notify = true, undo = false) {
+		setHP(amount, crit, target, current, type, log = true, notify = true, undo = false) {
 			amount = parseInt(amount);
 
 			if(type == 'damage') {
-				this.isDamage(target, current, amount, log, notify, undo)
+				this.isDamage(target, crit, current, amount, log, notify, undo)
 			}
 			else {
 				this.isHealing(target, current, amount, log, notify, undo)
 			}
 		},
-		isDamage(target, current, amount, log, notify, undo) {
+		isDamage(target, crit, current, amount, log, notify, undo) {
 			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
@@ -53,17 +53,17 @@ export const setHP = {
 				var n = parseInt(Object.keys(target.saves).length)
 				
 				this.set_save({
-				 key: target.key,
-				 check: 'fail',
-				 number: n
-				})
-				if(this.crit) {
-					n = parseInt(Object.keys(target.saves).length)
-
-					this.set_save({
 					key: target.key,
 					check: 'fail',
 					number: n
+				})
+				if(crit) {
+					n = parseInt(Object.keys(target.saves).length)
+
+					this.set_save({
+						key: target.key,
+						check: 'fail',
+						number: n
 					})
 				}
 			}
@@ -152,7 +152,7 @@ export const setHP = {
 
 			//Add to log
 			if(log == true) {
-				this.addLog(type, target, current, amount, over);
+				this.addLog(type, crit, target, current, amount, over);
 			}
 
 			//Add to damagemeters
@@ -218,7 +218,7 @@ export const setHP = {
 			}
 			//Add to log
 			if(log == true) {
-				this.addLog(type, target, current, amount, over)
+				this.addLog(type, false, target, current, amount, over)
 			}
 			
 			//Add to damagemeters
@@ -232,7 +232,7 @@ export const setHP = {
 				amount: amount,
 			})
 		},
-		addLog(type, target, current, amount, over) {
+		addLog(type, crit, target, current, amount, over) {
 			var d = new Date();
 			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
@@ -249,6 +249,7 @@ export const setHP = {
 				by: current.key,
 				time: time,
 				type: type,
+				crit, crit,
 				damageType: this.damageType,
 				target: target.key,
 				amount: amount,

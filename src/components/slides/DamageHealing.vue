@@ -83,7 +83,7 @@
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, target, this.doneBy, type, this.log)
+						this.setHP(this.manualAmount, this.crit, target, this.doneBy, type, this.log)
 
 						//Reset input fields
 						this.manualAmount = '';

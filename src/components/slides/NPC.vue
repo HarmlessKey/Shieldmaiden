@@ -21,7 +21,7 @@
 			<div sm="2" v-for="ability, index in abilities"
 				v-b-tooltip.hover title="Roll"
 				:key="index" 
-				class="ability" 
+				class="ability bg-gray" 
 				@click="rollAbility(ability.ability, entity[ability.ability])"
 				v-if="entity[ability.ability]">
 				<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
@@ -165,11 +165,11 @@ a {
 	.ability {
 		height: 60px;
 		line-height: 45px;
-		border:solid 1px #000;
-		text-align:center;
-		font-size:20px;
+		border:solid 1px #494747;
+		text-align: center;
+		font-size: 20px;
 		font-size: calc( 20px + (21 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
-		position:relative;
+		position: relative;
 		cursor: pointer;
 		margin-right: 10px;
 		width: 16.6%;
@@ -184,11 +184,11 @@ a {
 			left: 50%;
 			transform: translateX(-50%);
 			font-size: calc( 11px + (12 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
-			border: solid 1px #000;
+			border: solid 1px #494747;
 			text-align: center;
 			border-radius: 15px / 10px;
 			line-height: 25px;
-			height:25px;
+			height: 25px;
 			width: 35px;
 		}
 		.abilityName {

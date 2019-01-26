@@ -145,7 +145,7 @@
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, target, this.current, type)
+						this.setHP(this.manualAmount, this.crit, target, this.current, type)
 
 						//Reset input fields
 						this.manualAmount = '';

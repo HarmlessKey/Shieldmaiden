@@ -45,6 +45,10 @@ const getters = {
 		return state.encounterId
 	},
 	log: function( state ) {
+		//If there is a storage log, set it in the store
+		if(localStorage.getItem(state.encounterId)) {
+			state.log = JSON.parse(localStorage.getItem(state.encounterId))
+		}
 		return state.log
 	},
 	path: function( state ) {

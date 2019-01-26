@@ -339,13 +339,20 @@ const mutations = {
 
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
-	TRANSFORM_ENTITY(state, {key, entity}) {
-		state.entities[key].transformed = true
-		state.entities[key].transformedMaxHp = entity.maxHp
-		state.entities[key].transformedCurHp = entity.curHp
-		state.entities[key].transformedAc = entity.ac
+	TRANSFORM_ENTITY(state, {key, entity, remove}) {
+		if(remove) {
+			Vue.delete(state.entities[key], 'transformed')
 
-		encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+			encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+		}
+		else {
+			state.entities[key].transformed = true
+			state.entities[key].transformedMaxHp = entity.maxHp
+			state.entities[key].transformedCurHp = entity.curHp
+			state.entities[key].transformedAc = entity.ac
+
+			encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+		}
 	},
 	REMOVE_ENTITY(state, {key}) {
 		Vue.delete(state.entities, key)

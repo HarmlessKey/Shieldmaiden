@@ -62,7 +62,7 @@
 							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 						</div>
 						<div v-else class="hp d-flex justify-content-end">
-							<div v-for="check in entity.saves" :key="check">
+							<div v-for="check, index in entity.saves" :key="index">
 								<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 								<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 							</div>

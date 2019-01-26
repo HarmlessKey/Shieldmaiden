@@ -84,59 +84,20 @@ const mutations = {
 			active: db_entity.active,
 			npc: db_entity.npc,
 		}
-		if (db_entity.down) {
-			entity.down = db_entity.down
-		}
-		else {
-			entity.down = false
-		}
+		entity.down = (db_entity.down) ? db_entity.down : false;
+		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
+		entity.saves = (db_entity.saves) ? db_entity.saves : {};
+		entity.stable = (db_entity.stable) ? db_entity.stable : false;
+		entity.dead = (db_entity.dead) ? db_entity.dead : false;
+		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
+
 		if (db_entity.meters) {
-			if (db_entity.meters.healing) {
-				entity.healing = db_entity.meters.healing
-			}
-			else {
-				entity.healing = 0
-			}
-			if (db_entity.meters.damage) {
-				entity.damage = db_entity.meters.damage
-			}
-			else {
-				entity.damage = 0
-			}
+			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
+			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
 		}
 		else {
 			entity.damage = 0
 			entity.healing = 0
-		}
-		if (db_entity.addNextRound) {
-			entity.addNextRound = db_entity.addNextRound
-		}
-		else {
-			entity.addNextRound = false
-		}
-		if (db_entity.saves) {
-			entity.saves = db_entity.saves
-		}
-		else {
-			entity.saves = {}
-		}
-		if (db_entity.stable) {
-			entity.stable = db_entity.stable
-		}
-		else {
-			entity.stable = false
-		}
-		if (db_entity.dead) {
-			entity.dead = db_entity.dead
-		}
-		else {
-			entity.dead = false
-		}
-		if (db_entity.conditions) {
-			entity.conditions = db_entity.conditions
-		}
-		else {
-			entity.conditions = {}
 		}
 		if(db_entity.transformed) {
 			entity.transformed = true

@@ -6,22 +6,48 @@
 
 			<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
 
-			<h1 class="mt-3">Encounters</h1>
-			<p>Manage the encounters in your campaign.</p>
+			<b-row class="mt-3">
+				<b-col sm="6">
+					<h1>Encounters</h1>
+					<p>Manage the encounters in your campaign.</p>
+				</b-col>
+				<b-col>
+					<h2>Track encounter</h2>
+					<p class="d-flex justify-content-between">
+						<span>Let your players follow your encounters.</span>
+						<a data-toggle="collapse" :href="'#track'" 
+							role="button" aria-expanded="false">
+							<i class="fas fa-info"></i>
+						</a>
+					</p>
+					<span class="mb-3 d-flex justify-content-between">
+						<p class="blue mb-0">{{ copy }}</p>
+						<a class="btn" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
+						<input type="hidden" id="copy" :value="copy">
+					</span>
+
+					<p class="collapse mb-3" id="track">
+						With this link your active encounter can be followed on different devices. 
+						Send it to your players so they can see it on their tablets or phones, 
+						or put it up on a second screen that everyone can see. 
+						You control what is dispayed on the link through the <router-link to="/settings#track">settings</router-link>.
+					</p>
+				</b-col>
+			</b-row>
 			
-			<div class="input-group">
-				<input type="text" 
-					class="form-control"
+			<b-input-group>
+				<b-form-input 
+					type="text" 
 					:class="{'input': true, 'error': errors.has('newEncounter') }"
 					v-model="newEncounter"
 					v-validate="'required'" 
 					name="newEncounter" 
 					placeholder="Encounter Title"
-					@change="addEncounter()" />
-				<div class="input-group-append">
+					@change="addEncounter()" /></b-form-input>
+				<b-input-group-append>
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
-				</div>				
-			</div>
+				</b-input-group-append>				
+			</b-input-group>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 			
 			<!-- <h2 v-show="encounters === null" class="mt-3 d-flex justify-content-between">
@@ -127,6 +153,7 @@
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
+				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 			}
 		},
 		mounted() {
@@ -165,6 +192,27 @@
 			...mapActions([
 				'fetchEncounters',
 			]),
+			copyLink() {
+
+				let toCopy = document.querySelector('#copy')
+				toCopy.setAttribute('type', 'text')    //hidden
+				toCopy.select()
+
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'Successful' : 'Unsuccessful';
+
+					this.$snotify.success(msg, 'Link Copied!', {
+						position: "rightTop"
+					});
+				} catch (err) {
+					alert('Something went wrong, unable to copy');
+				}
+
+				/* unselect the range */
+				toCopy.setAttribute('type', 'hidden')
+				window.getSelection().removeAllRanges()
+			},
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {

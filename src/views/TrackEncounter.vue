@@ -1,5 +1,5 @@
 <template>
-	<div class="track" v-if="encounter && track" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+	<div class="track" v-if="encounter" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 		<div class="not-started" v-if="encounter.finished == true">
 			<Finished v-if="playerSettings.loot == true" :encounter="encounter"/>
 			<h2 v-else class="padding">Encounter Finished</h2>
@@ -43,7 +43,6 @@
 <script>
 	import _ from 'lodash'
 	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
 	import { attributes } from '@/mixins/attributes.js'
 
 	import Finished from '@/components/combat/Finished.vue'
@@ -67,12 +66,7 @@
 			}
 		},
 		firebase() {
-			// console.log('FIREBASE')
 			return {
-				track: {
-					source: db.ref(`track/${this.userId}`),
-					asObject: true,
-				},
 				players: {
 					source: db.ref(`players/${this.userId}`),
 					asObject: true,
@@ -91,18 +85,10 @@
 				},
 			}
 		},
-		mounted() {
-			// console.log('MOUNTED')
-		},
 		beforeMount() {
-			// console.log('BEFOREMOUNT')
-			// this.set_track()
 			this.fetch_encounter()
 		},
 		computed: {
-			// ...mapGetters([
-			// 	'track',
-			// ]),
 			_active: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -122,22 +108,21 @@
 			},
 		},
 		methods: {
-			// ...mapActions([
-			// 	'set_track',
-			// ]),
 			fetch_encounter() {
 				var vw = this;
 
-				var encounter = db.ref(`encounters/${this.userId}/-LWpzAB_5Dn4k32zvFgD/-LWq8umg5mF6F3dfL8EY`);
-				// var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`)
-				encounter.on('value' , (snapshot) => {
-						// console.log(snapshot)
-						vw.showEnc(snapshot.val())
+				var track = db.ref(`track/${this.userId}`);
+				track.on('value' , (snapshot) => {
+					let campId = snapshot.val().campaign
+					let encId = snapshot.val().encounter
+
+					let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
+
+					encounter.on('value' , (snapshot) => {
+						this.encounter = snapshot.val()
+					});
 				});
 			},
-			showEnc(payload) {
-				this.encounter = payload
-			},	
 		},
 	}
 </script>

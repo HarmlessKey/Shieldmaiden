@@ -164,7 +164,7 @@
 
 						<h2 class="pt-5" id="run-encounter-meters">Damage Meters</h2>
 						<p>
-							The damage meters are stored a total number for each entity.
+							The damage meters are stored as a total number for each entity.
 						</p>
 					</b-card>
 				</section>
@@ -207,6 +207,10 @@
 		height: calc(100vh -50px);
 		overflow-y: scroll;
 		padding-bottom: 50px !important;
+
+		&::-webkit-scrollbar { 
+			display: none; 
+		}
 	}
 
 	section {

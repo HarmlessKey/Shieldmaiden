@@ -16,7 +16,7 @@
 				<table class="table">
 					<thead>
 						<th></th>
-						<th>#</th>
+						<th class="n">#</th>
 						<th>Name</th>
 						<th></th>
 					</thead>
@@ -29,7 +29,7 @@
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/monster.svg" />
 							</td>
-							<td>{{ index + 1 }}</td>
+							<td class="n">{{ index + 1 }}</td>
 							<td>{{ npc.name }}</td>
 							<td class="text-right actions">
 								<router-link class="mx-2" 

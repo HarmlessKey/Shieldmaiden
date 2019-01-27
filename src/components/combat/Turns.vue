@@ -1,7 +1,7 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 			<h1>
-				{{ encounter.encounter }}
+				<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
 				<a class="edit"
 					id="edit"
 					data-toggle="dropdown" 
@@ -23,12 +23,18 @@
 			<span class="current-name"></span>
 		</div>
 		<div>
-			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> Prev turn</a>
+			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()">
+				<i class="fas fa-arrow-left"></i> 
+				<span class="ml-1 d-none d-md-inline">Prev turn</span>
+			</a>
 			<template v-if="encounter.round == 0"> 
-				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2"><i class="fas fa-arrow-left"></i> Back</router-link>
+				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
+					<i class="fas fa-arrow-left"></i> 
+					<span class="ml-1 d-none d-md-inline">Back</span>
+				</router-link>
 				<a class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>
-			<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
+			<a v-else class="btn" @click="nextTurn()"><span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i></a>
 		</div>
 	</div>
 </template>
@@ -121,40 +127,31 @@
 
 <style lang="scss" scoped>
 #turns {
-	background: rgba(38, 38, 38, .9);
+	height: 65px;
 	padding: 10px;
+	font-size: 15px;
+	line-height: 45px;
+	background: rgba(38, 38, 38, .9);
 	font-size: 20px;
 	text-transform: uppercase;
 	grid-area: turns;
 
-	span {
-		line-height:30px;
-	}
+
 	h1 {
-		line-height:44px;
+		line-height:45px;
 
 		a {
 			margin-left: 5px;
-			font-size: 12px;
 		}
 	}
 }
 
 .number { 
-	display:inline-block; 
-	border:solid 1px #2c97de;
-	height:42px;
-	line-height:42px !important;
-	margin-top:2px;
-	padding:0 15px;
-	font-weight:bold;
-	font-size:30px;
-}
-@media only screen and (max-width: 360px) {
-	.btn {
-		span {
-			display: none;
-		}
-	}
+	display: inline-block; 
+	border: solid 1px #2c97de;
+	height: 45px;
+	padding: 0 15px;
+	font-weight: bold;
+	font-size: 30px;
 }
 </style>

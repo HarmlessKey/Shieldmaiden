@@ -1,19 +1,21 @@
 <template>
 	<div class="footer">
 		<div class="top container">
-			<h2>Logo</h2>
-
 			<b-row class="d-flex justify-content-between">
+				<b-col>
+					<h2>Harmless Key <span class="gray-light">BETA</span></h2>
+				</b-col>
+
 				<b-col sm="">
-					<h2>Quick Links</h2>
+					<h2 class="gray-light">Quick Links</h2>
 					<ul>
-						<li><router-link to="/updates">Updates</router-link></li>
+						<!-- <li><router-link to="/updates">Updates</router-link></li> -->
 						<li><router-link to="/documentation">Documentation</router-link></li>
-						<li><router-link to="/about-us">About us</router-link></li>
+						<!-- <li><router-link to="/about-us">About us</router-link></li> -->
 					</ul>
 				</b-col>
 				<b-col sm="" v-if="user">
-					<h2>Your content</h2>
+					<h2 class="gray-light">Your content</h2>
 					<ul>
 						<li><router-link to="/settings">Settings</router-link></li>
 						<li><router-link to="/campaigns">Campaigns</router-link></li>
@@ -56,11 +58,23 @@
 		background-color: #494747;
 
 		.top {
-			padding: 20px;
+			padding: 30px 20px;
+
+			h2 {
+				font-weight: bold !important;
+				font-size: 20px !important;
+				color: #fff !important;
+			}
 
 			ul {
 				padding: 0;
 				list-style: none;
+
+				a {
+					font-size: 15px;
+					color: #191919 !important;
+					text-transform: uppercase;
+				}
 			}
 		}
 		.bottom {

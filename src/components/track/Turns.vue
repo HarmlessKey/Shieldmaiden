@@ -1,24 +1,22 @@
 <template>
 	<div class="turns d-flex justify-content-center">
-				Round <span class="number mx-2">{{ encounter.round }}</span>
-				Turn <span class="number ml-2">{{ encounter.turn + 1 }}</span>
+			Round <span class="number mx-2">{{ encounter.round }}</span>
+			Turn <span class="number ml-2">{{ encounter.turn + 1 }}</span>
 
-				<div class="img" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
-
-				<h1 class="d-flex justify-content-start">
+				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
+				<h1 class="d-none d-md-flex justify-content-start">
 					<span class="mr-3">{{ current.name }}</span>
 
-					<div v-if="
-							(current.entityType == 'player' && playerSettings.health === undefined)
-							|| (current.entityType == 'npc' && npcSettings.health == true)
-					">
-						<Health	:entity="current"/>
-					</div>
+						<Health 
+							v-if="(current.entityType == 'player' && playerSettings.health === undefined)
+							|| (current.entityType == 'npc' && npcSettings.health == true)"
+							:entity="current
+						"/>
 					<span v-else class="gray-hover">
 						? ? ?
 					</span>
 				</h1>
-			</div>
+		</div>
 	
 </template>
 

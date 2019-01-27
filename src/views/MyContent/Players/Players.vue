@@ -16,7 +16,7 @@
 				<table class="table">
 					<thead>
 						<th></th>
-						<th>#</th>
+						<th class="n">#</th>
 						<th>Player name</th>
 						<th>Character name</th>
 						<th></th>
@@ -30,7 +30,7 @@
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/player.svg" />
 							</td>
-							<td>{{ index + 1 }}</td>
+							<td class="n">{{ index + 1 }}</td>
 							<td>{{ player.player_name }}</td>
 							<td>{{ player.character_name }}</td>
 							<td class="text-right actions">

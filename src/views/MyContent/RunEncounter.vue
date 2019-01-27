@@ -190,38 +190,39 @@
 		"current targets actions side";
 		position: absolute;
 	}
-}
-@media only screen and (max-width: 1000px) {
-	#combat {
-		grid-template-columns: 3fr 3fr 2fr;
-		grid-template-rows: 60px auto;
-		grid-gap: 10px;
-		grid-template-areas:
-		"turns turns turns"
-		"current targets actions";
+	@media only screen and (max-width: 1000px) {
+		.combat {
+			grid-template-columns: 3fr 3fr 2fr;
+			grid-template-rows: 60px auto;
+			grid-gap: 10px;
+			grid-template-areas:
+			"turns turns turns"
+			"current targets actions";
+		}
 	}
-}
-@media only screen and (max-width: 600px) {
-	#combat {
-		grid-template-columns: 3fr 3fr;
-		grid-template-rows: 60px 1fr 2fr;
-		grid-gap: 10px;
-		grid-template-areas:
-		"turns turns"
-		"current targets"
-		"actions actions";
+	@media only screen and (max-width: 600px) {
+		.combat {
+			grid-template-columns: auto;
+			grid-template-rows: 60px 1fr 2fr;
+			grid-gap: 10px;
+			grid-template-areas:
+			"turns"
+			"current"
+			"targets"
+			"actions";
+		}
 	}
-}
-@media only screen and (max-width: 360px) {
-	#combat {
-		grid-template-columns: 1fr;
-		grid-template-rows: 60px auto;
-		grid-gap: 10px;
-		grid-template-areas:
-		"turns"
-		"current"
-		"targets"
-		"actions";
+	@media only screen and (max-width: 360px) {
+		.combat {
+			grid-template-columns: 1fr;
+			grid-template-rows: 60px auto;
+			grid-gap: 10px;
+			grid-template-areas:
+			"turns"
+			"current"
+			"targets"
+			"actions";
+		}
 	}
 }
 </style>

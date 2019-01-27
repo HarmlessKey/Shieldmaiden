@@ -2,10 +2,7 @@
 	<header>
 		<div id="header" class="d-flex justify-content-between">
 			<div class="d-flex justify-content-left">
-				<router-link to="/">Logo</router-link>
-				<!-- <nav>
-					<router-link to="/">Home</router-link> |
-				</nav> -->
+				<router-link to="/">Harmless Key <span class="gray-hover">BETA</span></router-link>
 			</div>
 			<div class="d-flex justify-content-right">
 				<!-- <router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link> -->

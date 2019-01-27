@@ -135,6 +135,10 @@
 		background-color: #191919;
 		overflow-y: scroll;
 
+		&::-webkit-scrollbar { 
+			display: none; 
+		}
+
 		.not-started {
 
 			h2.padding {
@@ -158,6 +162,9 @@
 			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
 			overflow-y: scroll;
+			&::-webkit-scrollbar { 
+				display: none; 
+			}
 		}
 		.damage {
 			max-width: 370px;

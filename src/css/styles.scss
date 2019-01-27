@@ -1,5 +1,5 @@
 @import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
-@import url('https://fonts.googleapis.com/css?family=Press+Start+2P|Raleway');
+@import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
 
 /* 
@@ -42,7 +42,7 @@ body {
 	background: $gray-dark !important;
 	color: $gray-light !important;
 	font-size: 12px !important;
-	font-family: 'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif !important;
 	position: relative;
 }
 .view {
@@ -187,19 +187,26 @@ a.logout {
 	position: fixed;
 	left: 0;
 	top: $header-hight;
-	height: calc(100vh - 50px);
+	height: calc(100% - 50px);
 	padding-top:10px;
 	background:$gray;
 	
 	.list-group-item {
 		padding: 0 !important;
+
+		span { 
+			margin-left: 10px;
+		}
+		a.active {
+			i::before {
+				color: $blue !important;
+			}
+		}
 	}
 }
 ul.crumble {
 	list-style: none;
 	padding: 0 0 15px 0;
-	// background-color: $gray;
-	// display: inline-flex !important;
 	border-bottom: solid 1px $gray-active;
 
 	li {
@@ -208,13 +215,6 @@ ul.crumble {
 		a {
 			color: $gray-light !important;
 		}
-		// &:last-child {
-		// 	color: $blue !important;
-
-		// 	svg {
-		// 		color: $gray-light !important;
-		// 	}
-		// }
 	}
 }
 table {
@@ -239,6 +239,10 @@ table {
 			opacity: .3;
 		}
 	}
+	td.n, th.n {
+		width: 30px;
+		text-align: center;
+	}
 	th:first-child, td:first-child {
 		width:10px;
 	}
@@ -249,7 +253,6 @@ table {
 		background-size:cover;
 		background-position:top center;
 		background-color: $black;
-		// border: solid 1px $gray-light !important;
 
 		img {
 			width: 34px;
@@ -289,6 +292,19 @@ table {
 }
 .slideOutRight {
 	animation-duration: 0.5s;
+}
+
+@media only screen and (max-width: 1200px) {
+	#hasSide {
+		padding-left: 50px;
+	}
+	#sidebar {
+		width: 50px;
+
+		span {
+			display: none;
+		}
+	}
 }
 
 /* 6. Bootstrap overrides*/

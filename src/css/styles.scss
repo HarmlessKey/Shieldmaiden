@@ -520,6 +520,23 @@ ul.nav {
 		cursor: pointer;
 	}
 }
+.snotify-simple {
+	.snotifyToast__inner {
+		background-color: $gray-dark !important;
+		.snotifyToast__title, .snotifyToast__body {
+			color: $gray-light !important;
+		}
+		.snotifyToast__body {
+			h2 {
+				text-transform: none !important;
+				margin-bottom: 5px !important;
+			}
+		}
+	}
+	.snotifyToast__buttons {
+		background: $gray-darker !important;
+	}
+}
 .snotify-error .snotifyToast__inner {
 	background-color: $red !important;
 }

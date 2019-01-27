@@ -123,7 +123,7 @@
 					var img = '';
 
 					if(entity.entityType == 'player') {
-						var playerImg = this.players[entity.id].avatar;
+						let playerImg = this.players[entity.id].avatar;
 
 						if(playerImg) {
 							img = playerImg
@@ -133,10 +133,10 @@
 						}
 					}
 					if(entity.entityType == 'npc') {
-						var npcImg = this.npcs[entity.id].avatar;
+						if(entity.npc == 'custom') {
+							let npcImg = this.npcs[entity.id].avatar;
 
-						if(npcImg && entity.npc == 'custom') {
-							img = npcImg
+							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
 						}
 						else {
 							img = require('@/assets/_img/styles/monster.svg');

@@ -123,7 +123,8 @@
 		},
 		watch: {
 			alive(newVal, oldVal) {
-				// console.log(`old: ${oldVal}, new: ${newVal}`)
+				console.log("ALIVE WATCH")
+				console.log(`old: ${oldVal}, new: ${newVal}`)
 				if(newVal == 0) {
 					this.confirmFinish()
 				}

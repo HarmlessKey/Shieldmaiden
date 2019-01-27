@@ -39,12 +39,14 @@
 			}),
 	},
 	created() {
-		this.setUser();
-		// players need prio!
-		this.fetchPlayers();
-		this.fetchNpcs();
-		this.fetchCampaigns();
-		this.fetchAllEncounters();
+		if(this.auth.currentUser !== null){
+			this.setUser();
+			// players need prio!
+			this.fetchPlayers();
+			this.fetchNpcs();
+			this.fetchCampaigns();
+			this.fetchAllEncounters();
+		}
 	},
 	methods: {
 		...mapActions([

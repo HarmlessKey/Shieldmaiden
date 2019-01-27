@@ -27,6 +27,7 @@
 </template>
 
 <script>
+	import firebase from 'firebase'
 	import Footer from '@/components/Footer.vue'
 
 	export default {
@@ -39,7 +40,7 @@
 		},
 		computed: {
 			user() {
-				return this.$store.getters.getUser;
+				return firebase.auth().currentUser
 			}
 		}
 	}

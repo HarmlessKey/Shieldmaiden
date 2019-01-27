@@ -1,12 +1,7 @@
 <template>
 		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
 			<template v-if="log">
-				<h2 class="d-flex justify-content-between">
-					Combat log
-					<span class="blue" 
-						v-b-popover.hover.left="'The combat log is stored localy in your browser'" 
-						title="Log storage"><i class="fas fa-info"></i></span>
-				</h2>
+				<h2>Combat log</h2>
 				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
 					<li v-for="(item, key) in log" :key="key">
 						<div class="d-flex justify-content-between head">

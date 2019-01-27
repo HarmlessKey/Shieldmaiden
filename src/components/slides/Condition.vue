@@ -21,19 +21,14 @@
 				<th>Effect</th>
 			</thead>
 			<tbody>
-				<tr v-for="index in 6" :key="index">
-					<td><a :class="{'active': entity.conditions['exhaustion'] == index}" @click="setExhausted(index)">{{ index }}</a></td>
-					<td v-if="index == 1">Disadvantage on ability checks</td>
-					<td v-if="index == 2">Speed halved</td>
-					<td v-if="index == 3">Disadvantage on attack rolls and saving throws</td>
-					<td v-if="index == 4">Hit point maximum halved</td>
-					<td v-if="index == 5">Speed reduced to 0</td>
-					<td v-if="index == 6">Death</td>
+				<tr v-for="effect, index in effects" :key="index">
+					<td><a :class="{'active': entity.conditions['exhaustion'] == index + 1}" @click="setExhausted(index + 1)">{{ index + 1 }}</a></td>
+					<td>{{ effect }}</td>
 				</tr>
 			</tbody>
 		</table>
 
-		<ul>
+		<ul :class="cond['.key']">
 			<li v-for="effect in cond.effects">
 				{{ effect }}
 			</li>
@@ -53,7 +48,14 @@
 		],
 		data() {
 			return {
-				
+				effects: [
+					"Disadvantage on ability checks",
+					"Speed halved",
+					"Disadvantage on attack rolls and saving throws",
+					"Hit point maximum halved",
+					"Speed reduced to 0",
+					"Death",
+				]
 			}
 		},
 		firebase() {
@@ -90,6 +92,11 @@
 <style lang="scss" scoped>
 	ul {
 		padding-left: 20px;
+
+		&.exhaustion {
+			list-style: none !important;
+			padding-left: 5px;
+		}
 
 		li {
 			margin-bottom: 10px;

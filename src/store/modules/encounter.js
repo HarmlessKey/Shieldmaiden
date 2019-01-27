@@ -1,4 +1,5 @@
 import { db } from '@/firebase'
+import axios from 'axios'
 import Vue from 'vue'
 
 const encounters_ref = db.ref('encounters')
@@ -69,7 +70,7 @@ const getters = {
 }
 
 const mutations = {
-	ADD_ENTITY(state, {rootState, key}) {
+	async ADD_ENTITY(state, {rootState, key}) {
 		let db_entity = state.encounter.entities[key]
 		let entity = {
 			name: db_entity.name,
@@ -127,48 +128,59 @@ const mutations = {
 				entity.wisdom = db_player.wisdom
 				entity.charisma = db_player.charisma
 				break
-			case ((entity.entityType == 'npc') && (entity.npc == 'custom')):
-				let db_npc = rootState.content.npcs[entity.id]
-				if(db_npc.avatar) {
-					entity.img = db_npc.avatar;
+			case ((entity.entityType == 'npc')):
+				//Fetch data from API
+				if(entity.npc == 'api') {
+					data_npc = await axios.get("http://www.dnd5eapi.co/api/monsters/" + entity.id)
+					.then(response => { 
+						// console.log('API data', response.data.type)
+						return response.data
+					})
+				}
+				else {
+					var data_npc = rootState.content.npcs[entity.id]
+				}
+
+				if(data_npc.avatar) {
+					entity.img = data_npc.avatar;
 				}
 				else {
 					entity.img = require('@/assets/_img/styles/monster.svg');
 				}
-				entity.size = db_npc.size
-				entity.type = db_npc.type
-				entity.subtype = db_npc.subtype
-				entity.alignment = db_npc.alignment
-				entity.challenge_rating = db_npc.challenge_rating
-				entity.hit_dice = db_npc.hit_dice
-				entity.speed = db_npc.speed
-				entity.senses = db_npc.senses
-				entity.languages = db_npc.languages
+				entity.size = data_npc.size
+				entity.type = data_npc.type
+				entity.subtype = data_npc.subtype
+				entity.alignment = data_npc.alignment
+				entity.challenge_rating = data_npc.challenge_rating
+				entity.hit_dice = data_npc.hit_dice
+				entity.speed = data_npc.speed
+				entity.senses = data_npc.senses
+				entity.languages = data_npc.languages
 
-				entity.strength = db_npc.strength
-				entity.dexterity = db_npc.dexterity
-				entity.constitution = db_npc.constitution
-				entity.intelligence = db_npc.intelligence
-				entity.wisdom = db_npc.wisdom
-				entity.charisma = db_npc.charisma
+				entity.strength = data_npc.strength
+				entity.dexterity = data_npc.dexterity
+				entity.constitution = data_npc.constitution
+				entity.intelligence = data_npc.intelligence
+				entity.wisdom = data_npc.wisdom
+				entity.charisma = data_npc.charisma
 
-				entity.strength_save = db_npc.strength_save
-				entity.dexterity_save = db_npc.dexterity_save
-				entity.constitution_save = db_npc.constitution_save
-				entity.intelligence_save = db_npc.intelligence_save
-				entity.wisdom_save = db_npc.wisdom_save
-				entity.charisma_save = db_npc.charisma_save
+				entity.strength_save = data_npc.strength_save
+				entity.dexterity_save = data_npc.dexterity_save
+				entity.constitution_save = data_npc.constitution_save
+				entity.intelligence_save = data_npc.intelligence_save
+				entity.wisdom_save = data_npc.wisdom_save
+				entity.charisma_save = data_npc.charisma_save
 
-				entity.damage_vulnerabilities = db_npc.damage_vulnerabilities
-				entity.damage_resistances = db_npc.damage_resistances
-				entity.damage_immunities = db_npc.damage_immunities
-				entity.condition_immunities = db_npc.condition_immunities
+				entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
+				entity.damage_resistances = data_npc.damage_resistances
+				entity.damage_immunities = data_npc.damage_immunities
+				entity.condition_immunities = data_npc.condition_immunities
 
-				entity.special_abilities = db_npc.special_abilities
-				entity.actions = db_npc.actions
-				entity.legendary_actions = db_npc.legendary_actions
+				entity.special_abilities = data_npc.special_abilities
+				entity.actions = data_npc.actions
+				entity.legendary_actions = data_npc.legendary_actions
 				break
-			case ((entity.entityType == 'npc') && (entity.npc == 'api')):
+			case ((entity.entityType == 'npc') && (entity.npc == 'adpi')):
 				break
 		}
 		Vue.set(state.entities, key, entity)

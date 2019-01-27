@@ -12,10 +12,14 @@
 							{{ item.time }}
 						</div>
 						<b class="blue" v-if="item.crit">Critical hit! </b class="blue">
-						{{ entities[item.by].name }} did
+						<template v-if="entities[item.by]">
+							{{ entities[item.by].name }} did
+						</template>
 						<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
 						<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
-							{{ item.type }} to {{ entities[item.target].name }}
+							<template v-if="entities[item.target]">
+								{{ item.type }} to {{ entities[item.target].name }}
+							</template>
 						<span v-if="item.over != 0">
 							({{ item.over }}
 							<template v-if="item.type == 'damage'">overkill</template>

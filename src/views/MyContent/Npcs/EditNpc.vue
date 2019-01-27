@@ -42,6 +42,7 @@
 							:class="{'input': true, 'error': errors.has('name') }" 
 							v-model="npc.name" 
 							v-validate="'alpha_spaces|required'" 
+							data-vv-as="Name"
 							name="name" 
 							placeholder="Name*"></b-form-input>
 						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
@@ -126,6 +127,7 @@
 							:class="{'input': true, 'error': errors.has('avatar') }" 
 							v-model="npc.avatar" 
 							v-validate="'url'" 
+							data-vv-as="Avatar"
 							name="avatar" 
 							placeholder="Image URL"></b-form-input>
 						<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
@@ -149,6 +151,7 @@
 							v-model="npc.ac" 
 							v-validate="'required'" 
 							name="ac" 
+							data-vv-as="Armor Class"
 							placeholder="Armor Class"></b-form-input>
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 					</b-col>
@@ -160,9 +163,10 @@
 							:class="{'input': true, 'error': errors.has('Hit Points') }" 
 							v-model="npc.maxHp" 
 							v-validate="'required'" 
-							name="Hit Points" 
+							name="hp" 
+							data-vv-as="Hit Points"
 							placeholder="Hit Points"></b-form-input>
-						<p class="validate red" v-if="errors.has('Hit Points')">{{ errors.first('Hit Points') }}</p>
+						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</b-col>
 					<b-col md="" v-if="quick == false">
 						<b-form-input
@@ -312,8 +316,15 @@
 									type="text" 
 									class="form-control" 
 									v-model="ability.damage_dice" 
-									name="damage_dice" 
-									placeholder="Damage Dice"></b-form-input>
+									:name="'damage_dice_'+action.type+index"
+									data-vv-as="Damage Dice"
+									placeholder="Damage Dice"
+									v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"></b-form-input>
+									<p class="validate red" 
+										v-if="errors.has('damage_dice_'+action.type+index.toString())">
+										{{ errors.first('damage_dice_'+action.type+index.toString()) }}
+										Allowed format: "2d6" or "2d6+1d8".
+									</p>
 							</b-col>
 							<b-col sm="2" class="mb-2">
 								<label for="damage_bonus">Damage Bonus</label>
@@ -501,7 +512,8 @@
 						db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
 						this.$router.replace('/npcs')
 					} else {
-						//console.log('Not valid');
+						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
+						});
 					}
 				})
 			},
@@ -552,6 +564,10 @@
 					this.quick = true
 				}
 			},
+			returnString(name) {
+				var str = name.toString()
+				return str
+			}
 		}
 	}
 </script>

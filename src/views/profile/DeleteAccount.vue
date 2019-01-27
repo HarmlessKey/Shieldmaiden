@@ -55,12 +55,12 @@ export default {
 
 				user.delete().then(function() {
 					//REMOVE ALL USER DATA
-					// db.ref(`campaigns/${userId}`).remove();
-					// db.ref(`encounters/${userId}`).remove();
-					// db.ref(`players/${userId}`).remove();
-					// db.ref(`npcs/${userId}`).remove();
-					// db.ref(`settings/${userId}`).remove();
-					// db.ref(`track/${userId}`).remove();
+					db.ref(`campaigns/${userId}`).remove();
+					db.ref(`encounters/${userId}`).remove();
+					db.ref(`players/${userId}`).remove();
+					db.ref(`npcs/${userId}`).remove();
+					db.ref(`settings/${userId}`).remove();
+					db.ref(`track/${userId}`).remove();
 
 					// this.$router.replace('/');
 				}).catch(function(error) {

@@ -62,7 +62,7 @@ export default {
 					db.ref(`settings/${user.uid}`).remove();
 					db.ref(`track/${user.uid}`).remove();
 
-					// this.$router.replace('/');
+					this.$router.replace('/');
 				}).catch(function(error) {
 					vm.error = error.message
 					vm.credentials = true

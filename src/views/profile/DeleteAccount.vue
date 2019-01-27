@@ -48,19 +48,19 @@ export default {
 					}
 					);
 			},
-			deleteUser(userId) {
+			deleteUser() {
 				var vm = this;
 				var user = firebase.auth().currentUser;
 				var credential;
 
 				user.delete().then(function() {
 					//REMOVE ALL USER DATA
-					db.ref(`campaigns/${userId}`).remove();
-					db.ref(`encounters/${userId}`).remove();
-					db.ref(`players/${userId}`).remove();
-					db.ref(`npcs/${userId}`).remove();
-					db.ref(`settings/${userId}`).remove();
-					db.ref(`track/${userId}`).remove();
+					db.ref(`campaigns/${user.uid}`).remove();
+					db.ref(`encounters/${user.uid}`).remove();
+					db.ref(`players/${user.uid}`).remove();
+					db.ref(`npcs/${user.uid}`).remove();
+					db.ref(`settings/${user.uid}`).remove();
+					db.ref(`track/${user.uid}`).remove();
 
 					// this.$router.replace('/');
 				}).catch(function(error) {

@@ -14,6 +14,7 @@
 		<p class="mt-3">Target: <b class="blue">{{ target.name }}</b><br/>
 		Target AC: <b class="blue">{{ target.ac }}</b></p>
 		<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
+		<b-form-checkbox class="mb-2" name="log" v-model="log">Log</b-form-checkbox>
 
 		<div class="manual">
 			<input type="number" 
@@ -24,12 +25,12 @@
 				class="form-control manual-input">
 			<button class="btn dmg bg-red" 
 				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="setManual(target.key, target, 'damage')">
+				@click="setManual(target, 'damage')">
 				<i class="fas fa-minus-square"></i>
 			</button>
 			<button class="btn heal bg-green" 
 				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="setManual(target.key, target, 'healing')">
+				@click="setManual(target, 'healing')">
 				<i class="fas fa-plus-square"></i>
 			</button>
 		</div>
@@ -56,6 +57,7 @@
 				manualAmount: '',
 				damageType: '',
 				crit: false,
+				log: true,
 			}
 		},
 		computed: {
@@ -76,12 +78,12 @@
 			...mapActions([
 				'set_hp',
 			]),
-			setManual(key, target, type) {
+			setManual(target, type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, key, target, this.doneBy, type)
+						this.setHP(this.manualAmount, this.crit, target, this.doneBy, type, this.log)
 
 						//Reset input fields
 						this.manualAmount = '';

@@ -111,8 +111,25 @@
 				});
 			},
 			deleteNpc(key) {
-				//REMEMBER TO DELETE FROM ALL CAMPAIGNS!!
+				//Remove the NPC from all encounters
+				for(let campaign in this.campaigns) {
+					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
+						//Go over all encounters of the campaign
+						for(let enc in this.allEncounters[campaign]) {
+							var entities = this.allEncounters[campaign][enc].entities;
 
+							//Go over all entites in the encounter
+							for(let entityKey in entities) {
+								let npcId = entities[entityKey].id;
+								
+								//If the entity has the same id, delete it
+								if(npcId == key) {
+									db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities/${entityKey}`).remove();
+								}
+							}
+						}
+					}
+				}
 				//Remove NPC
 				db.ref('npcs/' + this.userId).child(key).remove(); 
 			}

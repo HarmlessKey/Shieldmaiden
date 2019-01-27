@@ -1,84 +1,168 @@
 <template>
-	<div id="track" v-if="track">
-		<div class="turns">
-			Encounter 
+	<div class="track" v-if="encounter" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+		<div class="not-started" v-if="encounter.finished == true">
+			<Finished v-if="playerSettings.loot == true" :encounter="encounter"/>
+			<h2 v-else class="padding">Encounter Finished</h2>
+			<div class="container damage">
+				
+			
+				<Meters :encounter="encounter" />
+
+			</div>
 		</div>
-		<div class="current">
-			<ul>
-				<!-- <li v-for="entity in _active">
-					{{ entity }}
-				</li> -->
-			</ul>
+
+		<div class="not-started" v-else-if="encounter.round == 0">
+			<h2 class="padding">Encounter has not started yet.</h2>
+			<div class="loader"></div>
 		</div>
-		<div class="entities">
-			{{ encounter() }}
-		</div>
+
+		<template v-else>
+			<Turns 
+				:encounter="encounter" 
+				:current="_targets[0]"
+			/>
+			<div class="container-fluid">
+				<div class="container entities">
+					<b-row>
+						<b-col>
+							<Initiative 
+								:encounter="encounter" 
+								:targets="_targets"
+							/>
+						</b-col>
+						<b-col md="3" v-if="playerSettings.meters === undefined">
+							<Meters :encounter="encounter"	/>
+						</b-col>
+					</b-row>
+				</div>
+			</div>
+		</template>
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash'
 	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { attributes } from '@/mixins/attributes.js'
 
+	import Finished from '@/components/combat/Finished.vue'
+	import Turns from '@/components/track/Turns.vue'
+	import Initiative from '@/components/track/Initiative.vue'
+	import Meters from '@/components/track/Meters.vue'
 
 	export default {
 		name: 'app',
+		mixins: [attributes],
 		components: {
-
+			Finished,
+			Turns,
+			Initiative,
+			Meters,
 		},
 		data() {
 			return {
 				userId: this.$route.params.userid,
+				encounter: undefined,
 			}
 		},
 		firebase() {
 			return {
-				track: {
-					source: db.ref(`track/${this.userId}`),
+				players: {
+					source: db.ref(`players/${this.userId}`),
 					asObject: true,
 				},
-				// encounter: db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`),
+				npcs: {
+					source: db.ref(`npcs/${this.userId}`),
+					asObject: true,
+				},
+				npcSettings: {
+					source: db.ref(`settings/${this.userId}/track/npc`),
+					asObject: true,
+				},
+				playerSettings: {
+					source: db.ref(`settings/${this.userId}/track/player`),
+					asObject: true,
+				},
 			}
 		},
-		created() {
-			// this.fetch_trackEncounter(this.userId)
-			// this.fetch_track(this.userId)
+		beforeMount() {
+			this.fetch_encounter()
 		},
- 		computed: {
-			...mapGetters([
-				// 'track',
-				// 'trackEncounter',
-			]),
+		computed: {
+			_active: function() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down;
+				})
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
+			_targets: function() {
+				let t = this.encounter.turn
+				let turns = Object.keys(this._active)
+				let order = turns.slice(t).concat(turns.slice(0,t))
+				return Array.from(order, i => this._active[i])
+			},
 		},
 		methods: {
-			...mapActions([
-				'fetch_track',
-				// 'fetch_trackEncounter',
-			]),
-			encounter() {
-				var encounter = db.ref(`encounters/${this.userId}/${this.track.campaign}/${this.track.encounter}`);
-				// encounter.on('value', function(snapshot) {
-				// 	showEncounter(encElement, snapshot.val());
-				// });
-				return encounter
+			fetch_encounter() {
+				var vw = this;
+
+				var track = db.ref(`track/${this.userId}`);
+				track.on('value' , (snapshot) => {
+					let campId = snapshot.val().campaign
+					let encId = snapshot.val().encounter
+
+					let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
+
+					encounter.on('value' , (snapshot) => {
+						this.encounter = snapshot.val()
+					});
+				});
 			},
 		},
 	}
 </script>
 
-<style lang="scss">
-#track {
-	padding:10px;
-	width: 100vw;
-	height: calc(100% - 50px);
-	display: grid;
-	grid-template-columns: 2fr 3fr;
-	grid-template-rows: 60px auto;
-	grid-gap: 10px;
-	grid-template-areas:
-	"turns turns turns turns"
-	"current entities";
-	position: absolute;
-}
+<style lang="scss" scoped>
+	.track {
+		height: calc(100vh - 50px);
+		background-size: cover;
+		background-position: center bottom;
+		background-color: #191919;
+		overflow-y: scroll;
+
+		.not-started {
+
+			h2.padding {
+				font-size:25px !important;
+				line-height: 25px !important;
+				text-align: center;
+				padding-top: 50px;
+				text-shadow: 0 0 8px #000;
+			}
+
+			.loader:before {
+				width: 80px;
+				height: 80px;
+				margin-top: -85px;
+				margin-left: -40px;
+				border-width: 5px;
+				animation-duration: 1.5s;
+			}
+		}
+		.container-fluid {
+			background-color:rgba(0, 0, 0, 0.3);
+			height: calc(100vh - 115px);
+			overflow-y: scroll;
+		}
+		.damage {
+			max-width: 370px;
+			padding: 20px;
+			background: rgba(80, 80, 80, .5) !important;
+		}
+	}
 </style>

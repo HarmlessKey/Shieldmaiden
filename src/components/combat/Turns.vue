@@ -1,5 +1,5 @@
 <template>
-	<div id="turns" class="d-flex justify-content-between bg-gray">
+	<div id="turns" class="d-flex justify-content-between">
 			<h1>
 				{{ encounter.encounter }}
 				<a class="edit"
@@ -9,9 +9,11 @@
 					aria-expanded="false">
 					<i class="fas fa-cog"></i>
 				</a>
-				<div class="dropdown-menu" aria-labelledby="edit">	
+				<div class="dropdown-menu">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a class="dropdown-item" @click=""><i class="fas fa-times"></i> End Encounter</a>
+					<a class="dropdown-item" @click="slide('settings')"><i class="fas fa-cogs"></i> Settings</a>
+					<a class="dropdown-item" @click="slide('track')"><i class="far fa-desktop"></i> Track Settings</a>
+					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 			</h1>
 
@@ -21,9 +23,12 @@
 			<span class="current-name"></span>
 		</div>
 		<div>
-			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> <span>Prev turn</span></a>
-			<a v-if="encounter.round == 0" class="btn" @click="start()"><span>Start encounter</span> <i class="fas fa-arrow-right"></i></a>
-			<a v-else class="btn" @click="nextTurn()"><span>Next turn</span> <i class="fas fa-arrow-right"></i></a>
+			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()"><i class="fas fa-arrow-left"></i> Prev turn</a>
+			<template v-if="encounter.round == 0"> 
+				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2"><i class="fas fa-arrow-left"></i> Back</router-link>
+				<a class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
+			</template>
+			<a v-else class="btn" @click="nextTurn()">Next turn <i class="fas fa-arrow-right"></i></a>
 		</div>
 	</div>
 </template>
@@ -45,14 +50,23 @@
 			...mapGetters([
 				'encounter',
 				'path',
-				'entities'
+				'entities',
 			]),
 		},
 		methods: {
 			...mapActions([
-					'update_round',
-					'set_targeted',
-				]),
+				'update_round',
+				'set_targeted',
+				'setSlide',
+				'set_finished',
+			]),
+			slide(type) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: type,
+				})
+			},
 			start() {
 				db.ref(`encounters/${this.path}`).update({
 					round: 1
@@ -88,28 +102,44 @@
 				})
 				this.set_targeted(undefined);
 			},
+			confirmFinish() {
+				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {
+					position: "centerCenter",
+					timeout: 0,
+					buttons: [
+					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
+			finish() {
+				this.set_finished();
+			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 #turns {
+	background: rgba(38, 38, 38, .9);
 	padding: 10px;
 	font-size: 20px;
 	text-transform: uppercase;
 	grid-area: turns;
-}
-h1 {
-	line-height:44px;
 
-	a {
-		margin-left: 5px;
-		font-size: 12px;
+	span {
+		line-height:30px;
+	}
+	h1 {
+		line-height:44px;
+
+		a {
+			margin-left: 5px;
+			font-size: 12px;
+		}
 	}
 }
-#turns span {
-	line-height:30px;
-}
+
 .number { 
 	display:inline-block; 
 	border:solid 1px #2c97de;

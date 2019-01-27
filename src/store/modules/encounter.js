@@ -1,12 +1,8 @@
-import Firebase from 'firebase'
 import { db } from '@/firebase'
-import _ from 'lodash'
 import Vue from 'vue'
 
-const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
-const players_ref = db.ref('players')
-const npcs_ref = db.ref('npcs')
+const track_ref = db.ref('track')
 
 const state = {
 	entities: {},
@@ -15,12 +11,17 @@ const state = {
 	encounter: undefined,
 	campaignId: undefined,
 	encounterId: undefined,
+	log: [],
 	path: undefined,
+	track: undefined,
 }
 
 const getters = {
 	entities: function( state ) {
 		return state.entities
+	},
+	track: function( state ) {
+		return state.track
 	},
 	active: function( state ) {
 		return state.active
@@ -42,6 +43,13 @@ const getters = {
 	},
 	encounterId: function( state ) {
 		return state.encounterId
+	},
+	log: function( state ) {
+		//If there is a storage log, set it in the store
+		if(localStorage.getItem(state.encounterId)) {
+			state.log = JSON.parse(localStorage.getItem(state.encounterId))
+		}
+		return state.log
 	},
 	path: function( state ) {
 		return state.path
@@ -76,35 +84,20 @@ const mutations = {
 			active: db_entity.active,
 			npc: db_entity.npc,
 		}
-		if (db_entity.down) {
-			entity.down = db_entity.down
+		entity.down = (db_entity.down) ? db_entity.down : false;
+		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
+		entity.saves = (db_entity.saves) ? db_entity.saves : {};
+		entity.stable = (db_entity.stable) ? db_entity.stable : false;
+		entity.dead = (db_entity.dead) ? db_entity.dead : false;
+		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
+
+		if (db_entity.meters) {
+			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
+			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
 		}
 		else {
-			entity.down = false
-		}
-		if (db_entity.addNextRound) {
-			entity.addNextRound = db_entity.addNextRound
-		}
-		else {
-			entity.addNextRound = false
-		}
-		if (db_entity.saves) {
-			entity.saves = db_entity.saves
-		}
-		else {
-			entity.saves = {}
-		}
-		if (db_entity.stable) {
-			entity.stable = db_entity.stable
-		}
-		else {
-			entity.stable = false
-		}
-		if (db_entity.conditions) {
-			entity.conditions = db_entity.conditions
-		}
-		else {
-			entity.conditions = {}
+			entity.damage = 0
+			entity.healing = 0
 		}
 		if(db_entity.transformed) {
 			entity.transformed = true
@@ -118,7 +111,13 @@ const mutations = {
 		switch(true) {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
-				entity.img = db_player.avatar
+
+				if(db_player.avatar) {
+					entity.img = db_player.avatar;
+				}
+				else {
+					entity.img = require('@/assets/_img/styles/player.svg');
+				}
 				entity.ac = parseInt(db_player.ac)
 				entity.maxHp = parseInt(db_player.maxHp)
 				entity.strength = db_player.strength
@@ -177,11 +176,39 @@ const mutations = {
 	CLEAR_ENTITIES(state) {
 		state.entities = {}
 	},	
+	TRACK(state, value) {
+		state.track = value
+	},
 	SET_CAMPAIGN_ID(state, value) {
 		state.campaignId = value
 	},
 	SET_ENCOUNTER_ID(state, value) {
 		state.encounterId = value
+	},
+	SET_LOG(state, {action, value}) {
+		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
+			state.log = JSON.parse(localStorage.getItem(state.encounterId))
+		}
+		if(action == 'set') {
+			state.log.unshift(value)
+			
+			const parsed = JSON.stringify(state.log);
+			localStorage.setItem(state.encounterId, parsed);
+		}
+		if(action == 'unset') {
+			Vue.delete(state.log, value)
+			
+			const parsed = JSON.stringify(state.log);
+			localStorage.setItem(state.encounterId, parsed);
+		}
+	},
+	SET_METERS(state, {key, type, amount}) {
+		var newVal = state.entities[key][type] + amount;
+
+		if(newVal < 0) { newVal = 0 }
+
+		encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
+		state.entities[key][type] = newVal;
 	},
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
@@ -214,10 +241,16 @@ const mutations = {
 			initiative: parseInt(initiative),
 		})
 	},
-	SET_CONDITION(state, {action, key, condition}) {
+	SET_CONDITION(state, {action, key, condition, level}) {
 		if(action == 'add') {
-			Vue.set(state.entities[key].conditions, condition, true)
-			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
+			if(condition == 'exhaustion') {
+				Vue.set(state.entities[key].conditions, condition, level)
+				encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set(level);
+			}
+			else {
+				Vue.set(state.entities[key].conditions, condition, true)
+				encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
+			}
 		}
 		else if(action == 'remove') {
 			Vue.delete(state.entities[key].conditions, condition)
@@ -250,6 +283,10 @@ const mutations = {
 			Vue.set(state.entities[key], 'saves', {})
 			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
 
+			//REMOVE DEAD
+			Vue.delete(state.entities[key], 'dead')
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
+
 			//SET STABLE
 			Vue.set(state.entities[key], 'stable', 'true')
 			encounters_ref.child(`${state.path}/entities/${key}/stable`).set('true');
@@ -266,6 +303,21 @@ const mutations = {
 		state.entities[key].tempHp = entity.tempHp
 
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
+	},
+	TRANSFORM_ENTITY(state, {key, entity, remove}) {
+		if(remove) {
+			Vue.delete(state.entities[key], 'transformed')
+
+			encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+		}
+		else {
+			state.entities[key].transformed = true
+			state.entities[key].transformedMaxHp = entity.maxHp
+			state.entities[key].transformedCurHp = entity.curHp
+			state.entities[key].transformedAc = entity.ac
+
+			encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+		}
 	},
 	REMOVE_ENTITY(state, {key}) {
 		Vue.delete(state.entities, key)
@@ -317,10 +369,25 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
 		}
 	},
+	SET_DEAD(state, {key, action}) {
+		if(action == 'set') {
+			//SET DEAD
+			state.entities[key].dead = true
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).set(true);
+		}
+		else if(action == 'unset') {
+			Vue.delete(state.entities[key], 'dead')
+			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
+		}
+	},
+	FINISH(state) {
+		state.encounter.finished = true
+		encounters_ref.child(`${state.path}/finished`).set(true);
+	},
 }
 
 const actions = {
-	init_Encounter({ dispatch, commit, state, rootState }, { cid, eid }) {
+	init_Encounter({ commit, rootState }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
@@ -335,14 +402,26 @@ const actions = {
 			}
 		})
 	},
-
-	track_Encounter({ commit, state, rootState }) {
+	set_track({ commit, rootState }) {
+		const uid = rootState.content.user.uid;
+		const track = track_ref.child(uid);
+		track.on('value', snapshot => {
+			commit('TRACK', snapshot.val())
+		})
+	},
+	track_Encounter({ commit, state }) {
 		const path = state.path
 		const encounter = encounters_ref.child(path);
 		encounter.on('value', snapshot => {
 			commit('SET_ENCOUNTER', snapshot.val())
 			// commit('DEVIDE_BY_STATUS', snapshot.val())
 		})
+	},
+	set_log({ commit }, payload) {
+		commit("SET_LOG", payload)
+	},
+	set_meters({ commit }, payload) {
+		commit("SET_METERS", payload)
 	},
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)
@@ -379,6 +458,9 @@ const actions = {
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)
 	},
+	transform_entity({ commit }, payload) {
+		commit('TRANSFORM_ENTITY', payload)
+	},
 	add_entity({ commit, rootState }, key) {
 		commit('ADD_ENTITY', {rootState, key})
 	},
@@ -391,6 +473,12 @@ const actions = {
 	},
 	set_hp({ commit }, payload) {
 		commit('SET_HP', payload)
+	},
+	set_dead({ commit }, payload) {
+		commit('SET_DEAD', payload)
+	},
+	set_finished({ commit }) {
+		commit('FINISH')
 	},
 }
 

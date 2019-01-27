@@ -8,7 +8,7 @@
 				</nav> -->
 			</div>
 			<div class="d-flex justify-content-right">
-				<router-link to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
+				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
 				<a href="#" v-b-tooltip.hover title="Facebook" ><i class="fab fa-facebook-f"></i></a>
 				<a class="roll-dice" v-b-tooltip.hover title="Dice Roller"  @click="showSlide()"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">
@@ -19,10 +19,12 @@
 					<div class="dropdown-menu dropdown-menu-right">
 						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
 						<router-link to="/campaigns" class="dropdown-item"><i class="fas fa-treasure-chest"></i> My Content</router-link>
+						<router-link to="/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</router-link>
 						<div class="dropdown-divider"></div>
 						<button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
 					</div>
 				</div>
+				<router-link v-else to="/sign-in">Sign in</router-link>
 			</div>
 		</div>
 	</header>
@@ -86,20 +88,5 @@ a.user, a.roll-dice	{
 .dropdown-menu {
 	top: 7px !important;
 	left: 10px !important;
-
-	button, a {
-		// color: #b2b2b2 !important;
-		cursor: pointer;
-		font-size: 15px;
-
-		&:hover, &.active {
-			color: #2c97de !important;
-			background:none;
-		}
-	}
-	.dropdown-divider {
-		border-color: #b2b2b2;
-		margin: 0;
-	}
 }
 </style>

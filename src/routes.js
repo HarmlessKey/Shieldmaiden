@@ -1,8 +1,11 @@
 import Home from '@/views/Home.vue';
 import Privacy from '@/views/Privacy.vue';
+import Documentation from '@/views/Documentation.vue';
 import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
-import Profile from '@/views/Profile.vue';
+import Settings from '@/views/Settings.vue';
+import Profile from '@/views/profile/Profile.vue';
+import DeleteAccount from '@/views/profile/DeleteAccount.vue';
 import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
 import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
@@ -31,6 +34,11 @@ export const routes = [{
 	component: Privacy
 },
 {
+	path: '/documentation',
+	name: 'Documentation',
+	component: Documentation
+},
+{
 	path: '/sign-in',
 	name: 'signIn',
 	component: SignIn
@@ -44,6 +52,21 @@ export const routes = [{
 	path: '/profile',
 	name: 'profile',
 	component: Profile
+},
+{
+	path: '/profile/delete-account',
+	name: 'deleteAccount',
+	component: DeleteAccount
+},
+{
+	path: '/settings',
+	name: 'settings',
+	component: Settings,
+	meta: {
+		basePath: '/settings',
+		title: 'Settings',
+		requiresAuth: true
+	}
 },
 {
 	path: '/campaigns',

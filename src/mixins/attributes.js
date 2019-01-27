@@ -10,6 +10,10 @@ export const attributes = {
 			else {
 				return 0;
 			}	
-		}
+		},
+		percentage(current, max) {
+			var percentage = Math.floor(current / max * 100)
+			return percentage
+		},
 	}
 }

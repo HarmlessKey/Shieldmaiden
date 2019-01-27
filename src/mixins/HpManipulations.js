@@ -2,12 +2,17 @@ import { db } from '@/firebase'
 import { mapActions, mapGetters } from 'vuex'
 
 export const setHP = {
-	created() {
-		
-	},
 	data() {
 		return {
-			
+			userId: this.$store.getters.getUser.uid,
+		}
+	},
+	firebase() {
+		return {
+			settings: {
+				source: db.ref(`settings/${this.userId}/encounter`),
+				asObject: true,
+			},
 		}
 	},
 	computed: {
@@ -20,18 +25,22 @@ export const setHP = {
 			'set_save',
 			'set_stable',
 			'set_hp',
+			'set_dead',
+			'set_log',
+			'set_meters',
 		]),
-		setHP(amount, key, target, current, type) {
+		setHP(amount, crit, target, current, type, log = true, notify = true, undo = false) {
 			amount = parseInt(amount);
 
 			if(type == 'damage') {
-				this.isDamage(key, target, current, amount)
+				this.isDamage(target, crit, current, amount, log, notify, undo)
 			}
 			else {
-				this.isHealing(key, target, current, amount)
+				this.isHealing(target, current, amount, log, notify, undo)
 			}
 		},
-		isDamage(key, target, current, amount) {
+		isDamage(target, crit, current, amount, log, notify, undo) {
+			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
 			var transCurHp = parseInt(target.transformedCurHp);
@@ -39,22 +48,22 @@ export const setHP = {
 			var over = 0;
 			var rest_amount = amount;
 
-			//Death saves at 0 hp
-			if(curHp == 0) {
+			//Death saves at 0 hp, if automate is on
+			if(curHp == 0 && this.settings.automate !== false) {
 				var n = parseInt(Object.keys(target.saves).length)
 				
 				this.set_save({
-				 key: key,
-				 check: 'fail',
-				 number: n
+					key: target.key,
+					check: 'fail',
+					number: n
 				})
-				if(this.crit) {
+				if(crit) {
 					n = parseInt(Object.keys(target.saves).length)
 
 					this.set_save({
-					key: key,
-					check: 'fail',
-					number: n
+						key: target.key,
+						check: 'fail',
+						number: n
 					})
 				}
 			}
@@ -71,7 +80,7 @@ export const setHP = {
 
 				//Set the new HP
 				this.set_hp({
-					key: key,
+					key: target.key,
 					pool: 'temp',
 					newHp: newtemp,
 				});
@@ -88,7 +97,7 @@ export const setHP = {
 
 				//Set the new HP
 				this.set_hp({
-					key: key,
+					key: target.key,
 					pool: 'transformed',
 					newHp: newtrans,
 				});
@@ -116,28 +125,48 @@ export const setHP = {
 						over = parseInt(rest_amount - curHp); //overkill
 						amount = curHp;
 					}
+					//Character dies if the overkill is >= maxHp
+					if(over >= maxHp && target.entityType == 'player') {
+						this.set_dead({
+							key: target.key,
+							action: 'set',
+						})
+					}
 				}
 				this.set_hp({
-					key: key,
+					key: target.key,
 					newHp: newhp,
 				})
 			}
 
 			//Notification
-			this.$snotify.error(
-				current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
-				'Damage done!', 
-				{
-					position: "centerTop"
-				}
-			);
+			if(notify) {
+				this.$snotify.error(
+					current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
+					'Damage done!', 
+					{
+						position: "centerTop"
+					}
+				);
+			}
+
 			//Add to log
-			this.addLog(type, target.name, current.name, amount, over);
+			if(log == true) {
+				this.addLog(type, crit, target, current, amount, over);
+			}
 
 			//Add to damagemeters
-			this.damageMeters(type, amount, over);
+			if(undo == true) {
+				amount = -amount
+				type = 'healing'
+			}
+			this.set_meters({
+				key: current.key,
+				type: type,
+				amount: amount,
+			})
 		},
-		isHealing(key, target, current, amount) {
+		isHealing(target, current, amount, log, notify, undo) {
 			if(target.transformed == true) {
 				var maxHp = parseInt(target.transformedMaxHp);
 				var curHp = parseInt(target.transformedCurHp);
@@ -155,8 +184,12 @@ export const setHP = {
 			//If the target is a player and the curHp was 0, saves need to be reset
 			if(target.entityType == 'player' && curHp == 0) {
 				this.set_save({
-					key: key,
+					key: target.key,
 					check: 'reset'
+				})
+				this.set_dead({
+					key: target.key,
+					action: 'unset',
 				})
 			}
 
@@ -168,65 +201,65 @@ export const setHP = {
 			
 			//Heal the target
 			this.set_hp({
-				key: key,
+				key: target.key,
 				pool: pool,
 				newHp: newhp,
 			})
 
 			//Notification
-			this.$snotify.success(
-				current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 
-				'Healing done!', 
-				{
-					position: "centerTop",
-				}
-			);
+			if(notify) {
+				this.$snotify.success(
+					current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 
+					'Healing done!', 
+					{
+						position: "centerTop",
+					}
+				);
+			}
 			//Add to log
-			this.addLog(type, target.name, current.name, amount, over)
+			if(log == true) {
+				this.addLog(type, false, target, current, amount, over)
+			}
 			
 			//Add to damagemeters
-			this.damageMeters(type, amount, current.name, over);
+			if(undo == true) {
+				amount = -amount
+				type = 'damage'
+			}
+			this.set_meters({
+				key: current.key,
+				type: type,
+				amount: amount,
+			})
 		},
-		addLog(type, target, current, amount, over) {
+		addLog(type, crit, target, current, amount, over) {
 			var d = new Date();
 			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
 			if(localStorage.getItem(this.encounterId)) {
 				this.log = JSON.parse(localStorage.getItem(this.encounterId));
 			}
-			// if(this.$cookies.isKey(this.encounterId) == true) {
-			// 	this.log = JSON.parse(this.$cookies.get(this.encounterId));
-			// }
 			else {
 				this.log = []
 			}
-			this.log.unshift({
+
+			var newLog = {
 				round: this.encounter.round,
 				turn: this.encounter.turn + 1,
-				by: current,
+				by: current.key,
 				time: time,
 				type: type,
+				crit, crit,
 				damageType: this.damageType,
-				target: target,
+				target: target.key,
 				amount: amount,
 				over: over
-			})
+			}
 			
-			const parsed = JSON.stringify(this.log);
-			localStorage.setItem(this.encounterId, parsed);
-			// this.$cookies.set(this.encounterId, JSON.stringify(this.log), "2m");
-			// this.$emit("log", this.log)
-		},
-		damageMeters(type, amount, over) {
-			// if(amount > 0) {
-			// 	db.ref(`meters/${this.userId}/${this.encounterId}/${type}/${this.current.key}`).push({
-			// 		amount: amount,
-			// 		round: this.encounter.round,
-			// 		target: this.targeted,
-			// 		damageType: this.damageType,
-			// 		over: over,
-			// 	});
-			// }
+			this.set_log({
+				action: 'set',
+				value: newLog
+			})
 		},
 	}
 }

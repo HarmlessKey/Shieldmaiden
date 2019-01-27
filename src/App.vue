@@ -18,6 +18,7 @@
 </template>
 
 <script>
+	import firebase from 'firebase'
 	import Header from './components/Header.vue';
 	import Slide from './components/Slide.vue';
 	import { mapActions, mapGetters } from 'vuex';
@@ -26,6 +27,11 @@
 	components: {
 		navMain: Header,
 		Slide: Slide,
+	},
+	data() {
+		return {
+			auth: firebase.auth(),
+		}
 	},
 	computed: {
 		...mapGetters({

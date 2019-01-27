@@ -3,92 +3,130 @@
 		<Sidebar/>
 		<div id="my-content" class="container">
 			<Crumble />
-			<h1>Encounters</h1>
-			<p>Manage the encounters in your campaign.</p>
+
+			<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
+
+			<b-row class="mt-3">
+				<b-col sm="6">
+					<h1>Encounters</h1>
+					<p>Manage the encounters in your campaign.</p>
+				</b-col>
+				<b-col>
+					<h2>Track encounter</h2>
+					<p class="d-flex justify-content-between">
+						<span>Let your players follow your encounters.</span>
+						<a data-toggle="collapse" :href="'#track'" 
+							role="button" aria-expanded="false">
+							<i class="fas fa-info"></i>
+						</a>
+					</p>
+					<span class="mb-3 d-flex justify-content-between">
+						<p class="blue mb-0">{{ copy }}</p>
+						<a class="btn" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
+						<input type="hidden" id="copy" :value="copy">
+					</span>
+
+					<p class="collapse mb-3" id="track">
+						With this link your active encounter can be followed on different devices. 
+						Send it to your players so they can see it on their tablets or phones, 
+						or put it up on a second screen that everyone can see. 
+						You control what is dispayed on the link through the <router-link to="/settings#track">settings</router-link>.
+					</p>
+				</b-col>
+			</b-row>
 			
-			<div class="input-group">
-				<input type="text" 
-					class="form-control"
+			<b-input-group>
+				<b-form-input 
+					type="text" 
 					:class="{'input': true, 'error': errors.has('newEncounter') }"
 					v-model="newEncounter"
 					v-validate="'required'" 
 					name="newEncounter" 
 					placeholder="Encounter Title"
-					@change="addEncounter()" />
-				<div class="input-group-append">
+					@change="addEncounter()" /></b-form-input>
+				<b-input-group-append>
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
-				</div>				
-			</div>
+				</b-input-group-append>				
+			</b-input-group>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+			
+			<!-- <h2 v-show="encounters === null" class="mt-3 d-flex justify-content-between">
+				<i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i>
+			</h2> -->
 
 			<!-- SHOW ENCOUNTERS -->
-			<template v-if="encounters">
-				<h2 class="mt-3">Encounters ( {{ Object.keys(encounters).length }} )</h2>
+			<h2 class="mt-3">
+				Your Encounters 
+				<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
+			</h2>
+
+			<table class="table">
+				<thead>
+					<th>#</th>
+					<th>Encounter</th>
+					<th>Entities</th>
+					<th>Status</th>
+					<th>Round</th>
+					<th>Turn</th>
+					<th></th>
+				</thead>
+				<tbody v-if="encounters"
+					name="table-row" 
+					is="transition-group" 
+					enter-active-class="animated flash" 
+					leave-active-class="animated bounceOutLeft">
+					<tr v-for="(encounter, index) in _active" :key="encounter.key">
+						<td>{{ index + 1 }}</td>
+						<td>{{ encounter.encounter }}</td>
+						<td>
+							<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-users"></i>
+								<template v-if="encounter.entities">
+									{{ Object.keys(encounter.entities).length }}
+								</template>
+								<template v-else> Add</template>
+							</router-link>
+						</td>
+						<template v-if="encounter.round != 0">
+							<td class="red">In progress</td>
+							<td>{{ encounter.round }}</td>
+							<td>{{ encounter.turn + 1 }}</td>
+						</template>
+						<template v-else>
+							<td colspan="3">Not started</td>
+						</template>
+						<td class="text-right actions">
+							<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
+							<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
+							<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></router-link>
+							<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<template v-if="_finished != 0">
+				<h2>Finished Encounters</h2>
 				<table class="table">
 					<thead>
 						<th>#</th>
 						<th>Encounter</th>
-						<th>Entities</th>
-						<th>Status</th>
-						<th>Round</th>
-						<th>Turn</th>
 						<th></th>
 					</thead>
 					<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-						<tr v-for="(encounter, index) in _active" :key="encounter.key">
+						
+						<tr v-for="(encounter, index) in _finished" :key="encounter.key">
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
-							<td>
-								<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-									<i class="fas fa-users"></i>
-									<template v-if="encounter.entities">
-										{{ Object.keys(encounter.entities).length }}
-									</template>
-									<template v-else> Add</template>
-								</router-link>
-							</td>
-							<template v-if="encounter.round != 0">
-								<td class="red">In progress</td>
-								<td>{{ encounter.round }}</td>
-								<td>{{ encounter.turn + 1 }}</td>
-							</template>
-							<template v-else>
-								<td colspan="3">Not started</td>
-							</template>
-							<td class="text-right actions">
-								<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>
-								<span v-else class="disabled"><i class="fas fa-play-circle"></i></span>
-								<router-link class="mx-2" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></router-link>
+							<td class="text-right">
+								<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
 								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
 					</tbody>
 				</table>
-
-				<template v-if="_finished != 0">
-					<h2>Finished Encounters</h2>
-					<table class="table">
-						<thead>
-							<th>#</th>
-							<th>Encounter</th>
-							<th></th>
-						</thead>
-						<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-							
-							<tr v-for="(encounter, index) in _finished" :key="encounter.key">
-								<td>{{ index + 1 }}</td>
-								<td>{{ encounter.encounter }}</td>
-								<td class="text-right">
-									<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
-									<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</template>
 			</template>
-			<h2 v-else-if="encounters === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i></h2>
-			<div v-else class="loader"><span>Loading encounters...</span></div>
+			<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>
 </template>
@@ -115,6 +153,7 @@
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
+				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 			}
 		},
 		mounted() {
@@ -153,6 +192,27 @@
 			...mapActions([
 				'fetchEncounters',
 			]),
+			copyLink() {
+
+				let toCopy = document.querySelector('#copy')
+				toCopy.setAttribute('type', 'text')    //hidden
+				toCopy.select()
+
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'Successful' : 'Unsuccessful';
+
+					this.$snotify.success(msg, 'Link Copied!', {
+						position: "rightTop"
+					});
+				} catch (err) {
+					alert('Something went wrong, unable to copy');
+				}
+
+				/* unselect the range */
+				toCopy.setAttribute('type', 'hidden')
+				window.getSelection().removeAllRanges()
+			},
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {

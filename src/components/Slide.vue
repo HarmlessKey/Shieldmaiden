@@ -5,11 +5,14 @@
 		<NPC v-if="slide.type == 'npc'" :entity="slide.entity" />
 		<AddNpc v-if="slide.type == 'addNpc'" />
 		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
-		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" />
+		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" :entity="slide.entity" />
 		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
 		<Edit v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
+		<Transform v-if="slide.type == 'transform'" :entityKey="slide.key" :entity="slide.entity" />
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
+		<Track v-if="slide.type == 'track'" />
+		<Settings v-if="slide.type == 'settings'" />
 	</div>
 </template>
 
@@ -21,8 +24,11 @@
 	import Condition from '@/components/slides/Condition.vue';
 	import Conditions from '@/components/slides/Conditions.vue';
 	import Edit from '@/components/slides/Edit.vue';
+	import Transform from '@/components/slides/Transform.vue';
 	import DeathSaves from '@/components/slides/DeathSaves.vue';
 	import DamageHealing from '@/components/slides/DamageHealing.vue';
+	import Track from '@/components/slides/Track.vue';
+	import Settings from '@/components/slides/Settings.vue';
 
 	export default {
 		components: {
@@ -33,8 +39,11 @@
 			Condition: Condition,
 			Conditions: Conditions,
 			Edit: Edit,
+			Transform: Transform,
 			DeathSaves: DeathSaves,
 			DamageHealing: DamageHealing,
+			Track: Track,
+			Settings: Settings,
 		},
 		data() {
 			return {

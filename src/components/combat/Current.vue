@@ -1,15 +1,15 @@
 <template>
-	<div id="current" class="bg-gray">
+	<div id="current">
 		<template v-if="current">
 			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 					<div class="current">
 
-						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable">
+						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable && !current.dead">
 								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
-									<div v-for="(n, index) in 5">
+									<div v-for="(n, index) in 5" :key="index">
 										<template v-if="Object.keys(current.saves).length == n">
 											<a v-show="current.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
 											<a v-show="current.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-times"></i></a>
@@ -33,7 +33,8 @@
 								<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
 								<div class="progress health-bar">
 									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<div v-show="!current.stable">
+									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+									<div v-show="!current.stable && !current.dead">
 										<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
 										<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
 									</div>
@@ -50,16 +51,19 @@
 						</template>
 
 						<b-row class="conditions">
-							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)">
-								<svg 
-								v-if="conditions[key]"
-								v-b-popover.hover="conditions[key].condition" 
-								:title="key" 
-								class="icon text" 
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 512 512">
-									<path :d="conditions[key].icon" fill-opacity="1"></path>
-								</svg>
+							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
+								<span class="n" v-if="key == 'exhaustion'">
+									{{ current.conditions[key] }}
+								</span>
+								<template v-else>
+									<svg v-b-popover.hover="conditions[key].condition" 
+										:title="key" 
+										class="icon text" 
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 512 512">
+										<path :d="conditions[key].icon" fill-opacity="1"></path>
+									</svg>
+								</template>
 							</b-col>
 						</b-row>
 						<NPC class="mt-3" :entity="current" />
@@ -112,7 +116,8 @@
 				this.setSlide({
 					show: true,
 					type: 'condition',
-					condition: show
+					condition: show,
+					entity: this.current
 				})
 			},
 			deathInfo() {
@@ -148,6 +153,7 @@
 
 <style lang="scss" scoped>
 #current {
+	background: rgba(38, 38, 38, .9);
 	grid-area: current;
 	overflow: hidden;
 	
@@ -211,10 +217,15 @@
 	.conditions {
 		margin-bottom: 10px;
 
-		svg {
+		svg, .n {
+			display: block;
+			font-size: 16px;
 			width: 30px;
 			height: 30px;
+			line-height: 26px;
+			text-align: center;
 			fill: #cc3e4a;
+			color: #cc3e4a;
 			background-color: #302f2f;
 			padding: 2px;
 			cursor: pointer;

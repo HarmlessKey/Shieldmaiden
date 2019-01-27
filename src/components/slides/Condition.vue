@@ -9,6 +9,30 @@
 			</svg>
 			 {{ cond['.key'] }}
 		</h2>
+
+		<a v-if="entity.conditions[cond['.key']]" 
+			class="btn btn-block bg-red mb-3"
+			@click="remove(cond['.key'])">
+			Remove condition</a>
+
+		<table v-if="cond['.key'] == 'exhaustion'" class="table">
+			<thead>
+				<th>Current</th>
+				<th>Effect</th>
+			</thead>
+			<tbody>
+				<tr v-for="index in 6" :key="index">
+					<td><a :class="{'active': entity.conditions['exhaustion'] == index}" @click="setExhausted(index)">{{ index }}</a></td>
+					<td v-if="index == 1">Disadvantage on ability checks</td>
+					<td v-if="index == 2">Speed halved</td>
+					<td v-if="index == 3">Disadvantage on attack rolls and saving throws</td>
+					<td v-if="index == 4">Hit point maximum halved</td>
+					<td v-if="index == 5">Speed reduced to 0</td>
+					<td v-if="index == 6">Death</td>
+				</tr>
+			</tbody>
+		</table>
+
 		<ul>
 			<li v-for="effect in cond.effects">
 				{{ effect }}
@@ -24,6 +48,7 @@
 	export default {
 		name: 'Condition',
 		props: [
+		'entity',
 		'condition',
 		],
 		data() {
@@ -38,6 +63,26 @@
 					asObject: true
 				}
 			}
+		},
+		methods: {
+			...mapActions([
+				'set_condition',
+			]),
+			remove(condition) {
+				this.set_condition({
+					action: 'remove', 
+					key: this.entity.key, 
+					condition: condition
+				});
+			},
+			setExhausted(level) {
+				this.set_condition({
+					action: 'add', 
+					key: this.entity.key, 
+					condition: 'exhaustion',
+					level: level
+				});
+			},
 		},
 	};
 </script>
@@ -55,6 +100,26 @@
 		height: 23px;
 		color: #b2b2b2;
 		fill: #b2b2b2;
+	}
+	.table {
+
+		td {
+			background: #302f2f;
+
+			a {
+				color: #b2b2b2 !important;
+				background: #494747;
+				line-height: 30px;
+				height: 30px;
+				display: block;
+				text-align: center;
+
+				&.active {
+					background: #b2b2b2;
+					color: #302f2f !important;
+				}
+			}
+		}
 	}
 
 </style>

@@ -7,7 +7,6 @@
 				<h1>Campaigns</h1>
 				<p>Welcome to your campaigns overview.</p>
 				
-				<!-- <template v-if="players !== undefined"> -->
 				<template v-if="players">
 					<div class="input-group">
 						<input type="text" 
@@ -25,40 +24,32 @@
 					</div>
 					<!-- <div class="red" v-else="">You have 2/2 campaigns.</div> -->
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-					<template v-if="campaigns">
-						<h2 class="mt-3">Campaigns ( {{ Object.keys(campaigns).length }} )</h2>
-						<table class="table">
-							<thead>
-								<th>#</th>
-								<th>Campaign</th>
-								<th>Players</th>
-								<th>Encounters</th>
-								<th></th>
-							</thead>
-							<tbody name="table-row" 
-								is="transition-group"
-								enter-active-class="animated flash"
-								leave-active-class="animated bounceOutLeft">
-								<tr v-for="(campaign, index) in _campaigns" :key="campaign.key">
-									<td>{{ index + 1 }}</td>
-									<td>{{ campaign.campaign }}</td>
-									<td>
-										<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-users"></i>
-											<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
-											<template v-else> Add</template>
-										</router-link>
-									</td>
-									<td>
-										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-swords"></i>
-											<template v-if="allEncounters && allEncounters[campaign.key]">
-												{{ Object.keys(allEncounters[campaign.key]).length }}
-											</template>
-											<template v-else> Edit</template>
-										</router-link>
-									</td>
-									<td class="text-right actions">
+
+					<!-- <h2 v-show="campaigns === null" class="mt-3 px-2 d-flex justify-content-between"><i class="fas fa-arrow-up gray-hover">
+						</i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i>
+					</h2> -->
+
+					<h2 class="mt-3">
+						Your Campaigns 
+						<span v-if="campaigns">( {{ Object.keys(campaigns).length }} )</span>
+					</h2>
+
+					<transition-group 
+						v-if="campaigns"
+						tag="div" 
+						class="row" 
+						name="campaigns" 
+						enter-active-class="animated flash" 
+						leave-active-class="animated bounceOutLeft">
+						<b-col lg="6" v-for="(campaign, index) in _campaigns" :key="campaign.key">
+							<div class="card">
+								<div class="card-header d-flex justify-content-between">
+									<span>
+										<i class="fas fa-dungeon"></i>
+										{{ campaign.campaign }}
+									</span>
+
+									<span>
 										<router-link class="mx-2" 
 											:to="'/campaigns/' + campaign.key" 
 											v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i>
@@ -69,21 +60,40 @@
 											@click="confirmDelete(campaign.key, campaign.campaign)">
 												<i class="fas fa-trash-alt"></i>
 										</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</template>
-					<h2 v-else-if="campaigns === null" class="mt-3 text-center"><i class="fas fa-arrow-up gray-hover"></i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i></h2>
-					<div v-else class="loader"><span>Loading campaigns...</span></div>
+									</span>
+								</div>
+								<div class="card-body">
+									<b-row>
+										<b-col>
+											<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
+												<i class="fas fa-users"></i><br/>
+												<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
+												<template v-else> Add</template>
+											</router-link>
+										</b-col>
+
+										<b-col>
+												<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
+												<i class="fas fa-swords"></i><br/>
+												<template v-if="allEncounters && allEncounters[campaign.key]">
+													{{ Object.keys(allEncounters[campaign.key]).length }}
+												</template>
+												<template v-else> Create</template>
+											</router-link>
+										</b-col>
+									</b-row>
+								</div>
+								<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
+							</div>
+						</b-col>
+					</transition-group>
+
 				</template>
-				<template v-else-if="players === null">
-					<h2 class="red">No players yet</h2>
-					<p>Let's start with making some players that can join your campaigns.</p>
-					<router-link class="btn" to="/players/add-player">Create player</router-link>
-				</template>
-				<div v-else class="loader"><span>Loading...</span></div>
-				<!-- </template> -->
+				<b-card header="No players" class="warning" v-else-if="players === null">
+					<p>There are no players to join in your campaigns yet, let's create some first.</p>
+					<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
+				</b-card>
+				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 			</div>
 		</div>
 	</div>
@@ -127,7 +137,7 @@
 				})
 				.orderBy(function(campaign){
 					return parseInt(campaign.timestamp)
-				} , 'desc')
+				} , 'asc')
 				.value()
 			},
 		},
@@ -153,8 +163,8 @@
 			confirmDelete(key, name) {
 				this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -166,34 +176,45 @@
 	}
 </script>
 
-<style lang="css" scoped>
-.container {
-	padding-top:20px;
-}
-ul#campaigns {
-	list-style:none;
-	padding:0;
-}
-ul#campaigns li {
-	padding:10px;
-	margin-bottom:15px
-}
-a {
-	cursor:pointer;
-}
-.img {
-	width: 50px;
-	height: 50px;
-	display: block;
-	background-size: cover;
-	background-position: top center;
-	border: solid 1px #b2b2b2;
-	background-color: #000;
-	margin-right: 10px;
-	margin:2px;
-}
-h2.players {
-	margin-bottom: 5px !important;
-	text-align: center;
-}
+<style lang="scss" scoped>
+	.container {
+		padding-top:20px;
+
+		a {
+			cursor:pointer;
+		}
+		h2.players {
+			margin-bottom: 5px !important;
+			text-align: center;
+		}
+		.card {
+			&.warning {
+				.card-header {
+					background-color: #cc3e4a;
+					color: #fff;
+				}
+			}
+			.card-body {
+				.col {
+					text-align: center;
+					font-size: 25px;
+
+					a {
+						width: 100%;
+						display: block;
+						color: #b2b2b2 !important;
+
+						&:hover {
+							text-decoration: none;
+							color: #2c97de !important;
+						}
+					}
+					svg {
+						font-size: 50px;
+					}
+				}
+			}
+		}
+	}
+	
 </style>

@@ -1,109 +1,201 @@
 <template>
-	<div id="hasSide">
+	<div id="hasSide" v-if="encounter">
 		<Sidebar/>
-		<div id="my-content" class="container">
-			<div class="info">
+		<div class="container">
+			<div class="info mb-4">
 				<Crumble />
-				<h1 v-if="encounter">Encounter: <span class="blue">{{ encounter.encounter }}</span></h1>
-				<p>Add players and NPC's to this encounter.</p>
+
+				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
+
+				<b-row class="mt-3">
+					<b-col>
+						<input class="form-control" v-validate="'required'" type="text" name="name" v-model="encounter.encounter"/>
+						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+
+						<input class="form-control mt-2" v-validate="'url'" type="text" name="backbround" v-model="encounter.background" placeholder="Background URL"/>
+						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+
+						<button class="btn mt-2" @click="edit()">Save</button>
+					</b-col>
+					<b-col v-if="encounter.background">
+						<div class="img-container"><img :src="encounter.background" /></div>
+					</b-col>
+				</b-row>
 			</div>
 
 			<!-- ADD PLAYERS AND NPC'S -->
-			<div id="add" class="bg-gray">
-				<ul class="nav nav-tabs" id="myTab" role="tablist">
-					<li class="nav-item">
-						<a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Add Players</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Add NPC's</a>
-					</li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-						<a class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
-						<ul class="entities" v-if="campaign && players && encounter">
-							<li v-for="(player, key) in campaign.players" 
-								:key="key" 
-								class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
-									{{ players[key].character_name }}
-								</div>
-								<template v-if="encounter.entities">
-									<a v-if="checkPlayer(key) < 0" class="green" 
-									v-b-tooltip.hover 
-									title="Add Character" 
-									@click="add(key, 'player', players[key].character_name)">
-										<i class="fas fa-plus-circle"></i></a>
-									<span v-else class="green"><i class="fas fa-check"></i></span>
-									</a>
-								</template>	
-								<a v-else class="green" 
-									v-b-tooltip.hover 
-									title="Add Character" 
-									@click="add(key, 'player', players[key].character_name)">
-										<i class="fas fa-plus-circle"></i>
-								</a>
-							</li>
-						</ul>
-						<div v-else class="loader"><span>Loading players...</span></div>
-						<div v-if="campaign && campaign.players === undefined">
-							<h3><i class="fas fa-users red"></i> No Players Yet</h3>
-							<p>Add players to your campaign first.</p>
-							<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
-						</div>
-					</div>
-					<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
-						<div class="input-group mb-3">
-							<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
-							<div class="input-group-append">
-								<button class="btn"><i class="fas fa-search"></i></button>
-							</div>
-						</div>
-						<ul class="entities">
-							<p v-if="noResult" class="red">{{ noResult }}</p>
-							<li v-for="npc in searchResults" class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
-									{{ npc.name }}
-								</div>
-								<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
-							</li>
-						</ul>
-						<template v-if="npcs">
-							<h2>Custom NPC's</h2>
-							<ul class="entities">
-								<li v-for="(npc, key) in npcs" 
-									:key="key" 
-									class="d-flex justify-content-between">
-									<div class="d-flex justify-content-left">
-										<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
-										{{ npc.name }}
-									</div>
-									<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+			<b-card header="Entiies">
+				<b-row>
+					<b-col>
+						<div id="add" class="bg-gray">
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								<li class="nav-item">
+									<a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Add Players</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" id="select-tab" data-toggle="tab" href="#select" role="tab" aria-controls="select" aria-selected="false">Add NPC's</a>
 								</li>
 							</ul>
-						</template>
-					</div>
-				</div>
-			</div>
-
-			<div id="added" class="bg-gray">
-				<ul class="entities" v-if="encounter">
-					<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
-						<div class="d-flex justify-content-left">
-							<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-							<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-							<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
-							{{ entity.name }}
+							<div class="tab-content">
+								<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+									<a class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
+									<ul class="entities" v-if="campaign && players && encounter">
+										<li v-for="(player, key) in campaign.players" 
+											:key="key" 
+											class="d-flex justify-content-between">
+											<div class="d-flex justify-content-left">
+												<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
+												{{ players[key].character_name }}
+											</div>
+											<template v-if="encounter.entities">
+												<a v-if="checkPlayer(key) < 0" class="green" 
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="add(key, 'player', players[key].character_name)">
+													<i class="fas fa-plus-circle"></i></a>
+												<span v-else class="green"><i class="fas fa-check"></i></span>
+												</a>
+											</template>	
+											<a v-else class="green" 
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="add(key, 'player', players[key].character_name)">
+													<i class="fas fa-plus-circle"></i>
+											</a>
+										</li>
+									</ul>
+									<div v-else class="loader"><span>Loading players...</span></div>
+									<div v-if="campaign && campaign.players === undefined">
+										<h3><i class="fas fa-users red"></i> No Players Yet</h3>
+										<p>Add players to your campaign first.</p>
+										<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+									</div>
+								</div>
+								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+									<div class="input-group mb-3">
+										<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
+										<div class="input-group-append">
+											<button class="btn"><i class="fas fa-search"></i></button>
+										</div>
+									</div>
+									<ul class="entities">
+										<p v-if="noResult" class="red">{{ noResult }}</p>
+										<li v-for="npc in searchResults" class="d-flex justify-content-between">
+											<div class="d-flex justify-content-left">
+												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+												{{ npc.name }}
+											</div>
+											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+										</li>
+									</ul>
+									<template v-if="npcs">
+										<h2>Custom NPC's</h2>
+										<ul class="entities">
+											<li v-for="(npc, key) in npcs" 
+												:key="key" 
+												class="d-flex justify-content-between">
+												<div class="d-flex justify-content-left">
+													<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
+													{{ npc.name }}
+												</div>
+												<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+											</li>
+										</ul>
+									</template>
+								</div>
+							</div>
 						</div>
-						<span>
-							<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
-							<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
-						</span>
-					</li>
-				</ul>
-				<div v-else class="loader"><span>Loading entities...</span></div>
+					</b-col>
+					
+					<b-col>
+						<div id="added" class="bg-gray">
+							<ul class="entities" v-if="encounter">
+								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
+									<div class="d-flex justify-content-left">
+										<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+										<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+										<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
+										{{ entity.name }}
+									</div>
+									<span>
+										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
+										<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
+									</span>
+								</li>
+							</ul>
+							<div v-else class="loader"><span>Loading entities...</span></div>
+						</div>
+					</b-col>
+				</b-row>
+			</b-card>
+
+			<div class="card loot">
+				<div class="card-header">
+					<i class="fas fa-treasure-chest"></i> Loot
+				</div>
+				<div class="card-body">
+					<h2>Currency</h2>
+					<b-row class="mb-5">
+						<b-col class="d-flex justify-content-between">
+							<span class="coins mr-2 yellow"><i class="fas fa-coins"></i></span>
+							<input class="form-control" type="number" min="0" name="name" v-model="loot.gp" placeholder="GP"/>
+						</b-col>
+						<b-col class="d-flex justify-content-between">
+							<span class="coins mr-2"><i class="fas fa-coins"></i></span> 
+							<input class="form-control" type="number" min="0" name="name" v-model="loot.sp" placeholder="SP"/>
+						</b-col>
+						<b-col class="d-flex justify-content-between">
+							<span class="coins mr-2 orange"><i class="fas fa-coins"></i></span>
+							<input class="form-control" type="number" min="0" name="name" v-model="loot.cp" placeholder="CP"/>
+						</b-col>
+					</b-row>
+
+					<h2 class="d-flex justify-content-between">
+						Items
+						<a class="green" @click="addItem()"><i class="fas fa-plus-circle"></i></a>
+					</h2>
+					<hr>
+					<div v-for="item, index in loot.items">
+						<h2 class="d-flex justify-content-between">
+							{{ index + 1 }}. {{ item.name }}
+							<a @click="removeItem(index)" 
+								class="red"
+								v-b-tooltip.hover title="Remove">
+								<i class="fas fa-minus-circle"></i>
+							</a>
+						</h2>
+						<b-row class="mb-2">
+							<b-col sm="2">
+								<label for="name">Name</label>
+							</b-col>
+							<b-col sm="10">
+								<b-form-input
+									id="name"
+									type="text" 
+									class="form-control" 
+									v-model="item.name" 
+									name="name" 
+									placeholder="Name"></b-form-input>
+							</b-col>
+						</b-row>
+						<b-row class="mb-2">
+							<b-col sm="2">
+								<label for="desc">Description</label>
+							</b-col>
+							<b-col sm="10">
+								<b-form-textarea
+									id="desc"
+									class="form-control" 
+									v-model="item.desc" 
+									rows="4"
+									name="desc" 
+									placeholder="Description"></b-form-textarea>
+							</b-col>
+						</b-row>
+					</div>
+
+					<button class="btn mt-2" @click="setLoot()">Save</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -141,6 +233,14 @@
 				searching: false,
 			} 
 		},
+		firebase() {
+			return {
+				loot: {
+					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
+					asObject: true
+				}
+			}
+		},
 		computed: {
 			...mapGetters([
 				'encounter',
@@ -166,6 +266,14 @@
 				'fetchCampaign',
 				'setSlide'
 			]),
+			edit() {
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
+					this.encounter
+				);
+				this.$snotify.success('Saved.', 'Critical hit!', {
+					position: "rightTop"
+				});
+			},
 			showSlide(type, npc, key) {
 				event.stopPropagation();
 				if(type == 'info') {
@@ -251,37 +359,55 @@
 			checkPlayer(id) {
 				return (Object.keys(this.encounter.entities).indexOf(id))
 			},
-		}
+			setLoot() {
+				delete this.loot['.key'];
+				delete this.loot['.value'];
+
+				console.log(this.loot)
+
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).set(
+					this.loot
+				);
+				this.$snotify.success('Loot saved.', 'Critical hit!', {
+					position: "rightTop"
+				});
+			},
+			addItem() {
+				if(this.loot.items == undefined) {
+					this.loot.items = [];
+				}
+				this.loot.items.push({
+					name: 'New Item',
+				});
+				this.$forceUpdate(); //IMPORTANT
+			},
+			removeItem(index) {
+				this.$delete(this.loot.items, index);
+				this.$forceUpdate(); //IMPORTANT
+			},
+ 		}
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 .container {
 	padding-top:20px;
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-template-rows:auto 1fr;
-	grid-gap: 20px;
-	grid-template-areas: 
-	"info info"
-	"add added";
+
 }
-.info {
-	grid-area:info;
-}
-.nav { 
-	background:#191919;
-}
-#add {
-	grid-area: add;
+ul.nav {
+	a.nav-link {
+		&.active {
+			background: #302f2f !important;
+		}
+	}
 }
 .tab-content {
-	padding:15px 10px;
+	background: #302f2f !important;
+	padding: 15px;
 }
 #added {
 	margin-top:33px;
 	padding:15px 10px;
-	grid-area:added;
 }
 ul.entities {
 	list-style:none;
@@ -316,13 +442,19 @@ ul.entities li a {
 	border-left: solid 1px #000;
 	box-shadow: 0 10px 8px #000;
 }
-.slideInRight {
-	animation-duration: 0.5s;
-}
-.slideOutRight {
-	animation-duration: 0.5s;
+.img-container {
+	width: 100%;
+
+	img {
+		width: 100%;
+	}
 }
 .faded {
 	opacity: .3;
 }
+.coins {
+	line-height: 40px !important;
+	font-size: 20px;
+}
+
 </style>

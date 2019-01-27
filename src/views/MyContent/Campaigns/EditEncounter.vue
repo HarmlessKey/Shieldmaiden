@@ -137,7 +137,8 @@
 				allnpcs: [],
 				auto_npcs: [],
 				viewNPC: [],
-				slide: this.$store.getters.getSlide
+				slide: this.$store.getters.getSlide,
+				searching: false,
 			} 
 		},
 		computed: {
@@ -227,6 +228,7 @@
 			},
 			searchNPC() {
 				this.searchResults = []
+				this.searching = true
 				for (var i in this.allnpcs) {
 					var m = this.allnpcs[i]
 					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
@@ -235,9 +237,9 @@
 							this.searchResults.push(response.data)
 						})
 					}
-					if(this.searchResults == '') {
-						this.noResult = 'No results for "' + this.search + '"';
-					}
+				}
+				if(this.searchResults == '') {
+					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},
 			addAllPlayers() {

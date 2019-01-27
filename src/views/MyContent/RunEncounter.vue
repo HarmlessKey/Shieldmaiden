@@ -2,7 +2,7 @@
 	<div class="container-fluid" v-if="encounter && players"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
 		
-		<Finished v-if="encounter.finished == true" :encounter="encounter"/>
+		<Finished v-if="encounter.finished" :encounter="encounter"/>
 
 		<template v-else>
 			<SetInitiative 
@@ -86,6 +86,7 @@
 				'players',
 				'campaigns',
 				'entities',
+				'initialized'
 			]),
 			_active: function() {
 				return _.chain(this.entities)
@@ -123,9 +124,7 @@
 		},
 		watch: {
 			alive(newVal, oldVal) {
-				console.log("ALIVE WATCH")
-				console.log(`old: ${oldVal}, new: ${newVal}`)
-				if(newVal == 0) {
+				if(newVal == 0 && this.initialized) {
 					this.confirmFinish()
 				}
 			}

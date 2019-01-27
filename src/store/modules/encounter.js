@@ -15,6 +15,7 @@ const state = {
 	log: [],
 	path: undefined,
 	track: undefined,
+	initialized: false,
 }
 
 const getters = {
@@ -67,6 +68,9 @@ const getters = {
 		}
 		return undefined
 	},
+	initialized: function( state ) {
+		return state.initialized
+	}
 }
 
 const mutations = {
@@ -133,7 +137,6 @@ const mutations = {
 				if(entity.npc == 'api') {
 					data_npc = await axios.get("http://www.dnd5eapi.co/api/monsters/" + entity.id)
 					.then(response => { 
-						// console.log('API data', response.data.type)
 						return response.data
 					})
 				}
@@ -396,23 +399,27 @@ const mutations = {
 		state.encounter.finished = true
 		encounters_ref.child(`${state.path}/finished`).set(true);
 	},
+	INITIALIZED(state) {
+		state.initialized = true
+	}
 }
 
 const actions = {
-	init_Encounter({ commit, rootState }, { cid, eid }) {
+	async init_Encounter({ commit, rootState }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
 		const uid = rootState.content.user.uid;
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path)
-		const encounter = encounters_ref.child(path);
-		encounter.once('value', snapshot => {
+		const encounter = await encounters_ref.child(path);
+		await encounter.once('value', snapshot => {
 			commit('SET_ENCOUNTER', snapshot.val())
 			for (let key in snapshot.val().entities) {
 				commit('ADD_ENTITY', {rootState, key})
 			}
 		})
+		commit('INITIALIZED')
 	},
 	set_track({ commit, rootState }) {
 		const uid = rootState.content.user.uid;

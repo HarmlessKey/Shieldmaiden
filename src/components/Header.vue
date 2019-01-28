@@ -65,6 +65,7 @@ a {
 
 	&:hover {
 		color: #2c97de !important;
+		text-decoration: none;
 	}
 }
 a.user, a.roll-dice	{

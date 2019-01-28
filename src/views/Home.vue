@@ -60,12 +60,11 @@
 				</div>
 			</section>
 
-			<section v-if="!user" class="bg-gray">
+			<section v-if="!user">
 				<div class="container">
-					<h2 class="text-center">Start giving your players the attention they deserve!</h2>
-					<div class="d-flex justify-content-center">
-						<router-link to="/sign-up" class="btn mr-2">Sign Up</router-link>
-						<router-link to="/sign-in" class="btn">Sign In</router-link>
+					<h2 class="text-center mb-5">Start giving your players the attention they deserve!</h2>
+					<div class="btn-group d-flex" role="group">
+						<router-link to="/sign-in" class="btn btn-lg btn-block mb-5">Sign Up</router-link>
 					</div>
 				</div>
 			</section>
@@ -149,9 +148,6 @@
 			}
 		}
 	}
-}
-.container {
-	
 }
 iframe, img {
 	background-size: cover;

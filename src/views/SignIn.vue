@@ -1,5 +1,6 @@
 <template>
 	<div id="login">
+		<h2>Start using Harmless Key!</h2>
 		<div id="firebaseui-auth-container"></div>
 	</div>
 </template>
@@ -42,11 +43,16 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 #login {
-	padding-top:50px;
-	width: 300px;
-	margin:auto;
+	padding-top: 50px;
+	width: 350px;
+	margin: auto;
+
+	h2 {
+		text-align: center;
+		font-size: 25px !important;
+	}
 }
 input {
 	margin-bottom:15px;

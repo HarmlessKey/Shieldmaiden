@@ -20,7 +20,7 @@
 			</b-navbar>
 		</div>
 		<div class="container-fluid">
-			<h1>Documentation</h1>
+			<h1>Documentation <span class="gray-hover">(INCOMPLETE)</span></h1>
 			<p>Here we will explain why we made certain choices and how solved some issues we came across. 
 				If you wonder why some actions work a certain way, you will probably find answers here.
 			</p>

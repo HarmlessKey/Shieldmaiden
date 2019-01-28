@@ -8,14 +8,15 @@
 					<hr class="mt-5">
 					<b-row class=my-5>
 						<b-col md="7">
+							<p class="img-header bg-gray-darker">Your new DM screen</p>
 							<img src="@/assets/_img/screenshot.png" />
 						</b-col>
 						<b-col md="5">
-							<h2>Our app in action</h2>
-							<p class="mb-5">Like what you see?<br/> Create an account now.</p>
+							<h2>A sneak peak</h2>
+							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
 								<router-link v-if="!user" to="/sign-up" class="btn btn-lg btn-block">Create Account</router-link>
-								<router-link else to="/campaigns" class="btn btn-lg btn-block">My Content</router-link>
+								<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block">My Content</router-link>
 							</div>
 						</b-col>
 					</b-row>
@@ -33,6 +34,7 @@
 						</p>
 					 </b-col>
 					 <b-col md="7">
+						 <p class="img-header bg-gray-darker">Your new DM screen</p>
 						 <img src="@/assets/_img/screenshot-track.png" />
 					 </b-col>
 					</b-row>
@@ -114,6 +116,12 @@
 
 	section {
 		padding-top: 40px;
+
+		p.img-header {
+			margin-bottom: 0;
+			font-size: 12px;
+			padding-left: 10px;
+		}
 
 		h1, h2 {
 			font-size: 35px !important;

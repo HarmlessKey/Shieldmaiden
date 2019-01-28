@@ -123,7 +123,6 @@
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
 							<td class="text-right">
-								<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
 								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>

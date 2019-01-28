@@ -182,9 +182,9 @@
 <script>
 
 	export default {
-		name: 'PrivacyPolicy',
+		name: 'Documentation',
 		metaInfo: {
-			title: 'Privacy Policy'
+			title: 'Documentation'
 		},
 	}
 </script>

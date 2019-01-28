@@ -8,6 +8,16 @@
 				Below you can determine what should be visible on the track encounter screen.
 			</p>
 
+			<b-row class="mb-3 copy">
+				<b-col sm="8">
+					<a @click="copyLink()">{{ copy }}</a>
+				</b-col>
+				<b-col sm="4">
+					<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
+					<input type="hidden" id="copy" :value="copy">
+				</b-col>
+			</b-row>
+
 			<h3>General</h3>
 			<ul class="settings">
 				<li class="d-flex justify-content-between">
@@ -146,6 +156,7 @@
 		data(){
 			return {
 				userId: this.$store.getters.getUser.uid,
+				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 			}
 		},
 		firebase() {
@@ -171,7 +182,27 @@
 			},
 			setDefault() {
 				db.ref(`settings/${this.userId}/track`).remove();
-			}
+			},
+			copyLink() {
+				let toCopy = document.querySelector('#copy')
+				toCopy.setAttribute('type', 'text')    //hidden
+				toCopy.select()
+
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'Successful' : 'Unsuccessful';
+
+					this.$snotify.success(msg, 'Link Copied!', {
+						position: "rightTop"
+					});
+				} catch (err) {
+					alert('Something went wrong, unable to copy');
+				}
+
+				/* unselect the range */
+				toCopy.setAttribute('type', 'hidden')
+				window.getSelection().removeAllRanges()
+			},
 		}
 	}
 </script>

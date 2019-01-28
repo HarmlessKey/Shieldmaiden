@@ -50,10 +50,8 @@
 						Say your group has recruited a mighty hero to fight with them in an upcomming battle, 
 						you can add this hero as an NPC that you can control and keep track of during the encounter.</p>
 
-						<p><b>Why can't I find the monster I'm looking for?</b> We use an API for the monsters you can use 
-						(<a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a>). 
-						We're not allowed to use anything outside of the SRD, so if you can't find your monster, 
-						it's probably because of that.</p>
+						<p><b>Why can't I find the monster I'm looking for?</b> We're not allowed to use anything outside of the SRD, so if you can't find your monster, 
+						it's probably because of that. We only stored the monsters from the SRD in our database, but we do give you the opportunity to create your own.</p>
 					</b-card>
 				</section>
 
@@ -139,17 +137,15 @@
 							In this last case the transformation is automitically removed from the target and it falls back into it's old form.
 						</p>
 
-						<h2 class="pt-5" id="run-encounter-select">Selected damage</h2>
+						<h2 class="pt-5" id="run-encounter-select">Roll damage abilities</h2>
 						<p>When the current entity is an NPC, you can choose to roll the attacks automatically. 
-							A d20 plus their to hit modifier will be rolled and the damage of the attack. 
+							A d20 plus their to hit modifier and the damage of the attack will be rolled at the same time. 
 							A notification will pop up showing you te results of the roll and asking you if you want to apply the damage or cancel.
 							If you apply the damage, it is handled exactly the same as manual damage.
 						</p>
 
-						<p><b>Type of damage.</b> Because of the way monsters are stored in the <a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a> 
-						it is not possible for us to keep track of type of damage. 
-						We might store monsters in our own database someday so we will be able to format it a little different, 
-						allowing us to keep track of this aswell.</p>
+						<p><b>Type of damage.</b> Because of how we stored the monsters in our database it is currently not possible to keep track of type of damage. 
+						We do plan to add this feature in the future.</p>
 
 						<h2 class="pt-5" id="run-encounter-log">Combat Log</h2>
 						<p>

@@ -226,6 +226,15 @@
 		top: -50px;
 		visibility: hidden;
 	}
+
+	@media only screen and (max-width: 1200px) {
+		#hasSide {
+			padding-left: 0;
+		}
+		#sidebar {
+			display: none;
+		}
+	}
 }
 
 </style>

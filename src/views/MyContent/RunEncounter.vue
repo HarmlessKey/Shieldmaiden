@@ -73,7 +73,7 @@
 				},
 			}
 		},
-		mounted() {
+	 	mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
@@ -86,7 +86,7 @@
 				'players',
 				'campaigns',
 				'entities',
-				'initialized'
+				'initialized',
 			]),
 			_active: function() {
 				return _.chain(this.entities)

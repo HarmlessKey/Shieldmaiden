@@ -3,7 +3,7 @@ import axios from 'axios'
 import Vue from 'vue'
 
 const encounters_ref = db.ref('encounters')
-const track_ref = db.ref('track')
+const monsters_ref = db.ref('monsters')
 
 const state = {
 	entities: {},
@@ -135,9 +135,10 @@ const mutations = {
 			case ((entity.entityType == 'npc')):
 				//Fetch data from API
 				if(entity.npc == 'api') {
-					data_npc = await axios.get("http://www.dnd5eapi.co/api/monsters/" + entity.id)
-					.then(response => { 
-						return response.data
+					let monsters = monsters_ref.child(entity.id);
+
+					var data_npc = await monsters.once('value').then(function(snapshot) {
+						return snapshot.val()
 					})
 				}
 				else {

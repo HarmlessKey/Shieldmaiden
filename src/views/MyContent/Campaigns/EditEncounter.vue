@@ -73,7 +73,7 @@
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">
-										<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
+										<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
 											<button class="btn"><i class="fas fa-search"></i></button>
 										</div>
@@ -226,7 +226,6 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				allnpcs: [],
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
@@ -238,7 +237,8 @@
 				loot: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
-				}
+				},
+				monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -256,9 +256,7 @@
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			}),
-			axios.get("http://www.dnd5eapi.co/api/monsters/")
-			.then(response => {this.allnpcs = response.data.results})
+			})
 		},
 		methods: {
 			...mapActions([
@@ -292,11 +290,7 @@
 					})
 				}
 			},
-			async getNPC(id) {
-				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
-				.then(response => {return response.data})
-			},
-			async add(id, type, name, custom = false) {
+			add(id, type, name, custom = false) {
 				var entity = {
 					id: id,
 					name: name,
@@ -308,7 +302,7 @@
 					entity.active = true
 					
 					if(custom == false) {
-						var npc_data = await this.getNPC(id);
+						var npc_data = this.monsters[id];
 						entity.npc = 'api'
 						entity.curHp = npc_data.hit_points
 						entity.maxHp = npc_data.hit_points
@@ -337,16 +331,14 @@
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
-				for (var i in this.allnpcs) {
-					var m = this.allnpcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
-						axios.get(m.url).then(response => {
-							this.noResult = ''
-							this.searchResults.push(response.data)
-						})
+				for (var i in this.monsters) {
+					var m = this.monsters[i]
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
 					}
 				}
-				if(this.searchResults == '') {
+				if(this.searchResults == '' && this.search != '') {
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},

@@ -89,6 +89,7 @@ const mutations = {
 			active: db_entity.active,
 			npc: db_entity.npc,
 		}
+		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
 		entity.down = (db_entity.down) ? db_entity.down : false;
 		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
 		entity.saves = (db_entity.saves) ? db_entity.saves : {};
@@ -117,12 +118,8 @@ const mutations = {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
 
-				if(db_player.avatar) {
-					entity.img = db_player.avatar;
-				}
-				else {
-					entity.img = require('@/assets/_img/styles/player.svg');
-				}
+				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.svg');
+				
 				entity.ac = parseInt(db_player.ac)
 				entity.maxHp = parseInt(db_player.maxHp)
 				entity.strength = db_player.strength
@@ -145,11 +142,11 @@ const mutations = {
 					var data_npc = rootState.content.npcs[entity.id]
 				}
 
-				if(data_npc.avatar) {
-					entity.img = data_npc.avatar;
+				if(!entity.avatar) {
+					entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.svg');
 				}
 				else {
-					entity.img = require('@/assets/_img/styles/monster.svg');
+					entity.img = entity.avatar;
 				}
 				entity.size = data_npc.size
 				entity.type = data_npc.type
@@ -183,8 +180,6 @@ const mutations = {
 				entity.special_abilities = data_npc.special_abilities
 				entity.actions = data_npc.actions
 				entity.legendary_actions = data_npc.legendary_actions
-				break
-			case ((entity.entityType == 'npc') && (entity.npc == 'adpi')):
 				break
 		}
 		Vue.set(state.entities, key, entity)

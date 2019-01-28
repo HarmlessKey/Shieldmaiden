@@ -85,7 +85,7 @@
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 												{{ npc.name }}
 											</div>
-											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
 										</li>
 									</ul>
 									<template v-if="npcs">

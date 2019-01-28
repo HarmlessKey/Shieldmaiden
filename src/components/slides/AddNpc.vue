@@ -169,7 +169,7 @@
 				this.entity.id = id;
 
 				if(type == 'api') {
-					var npc_data = this.monsters[id - 1]; //NO IDEA WHY I HAVE TO SUBSTRACT 2
+					var npc_data = this.monsters[id - 1]; //NO IDEA WHY I HAVE TO SUBSTRACT 1
 					this.entity.npc = 'api'
 					this.entity.maxHp = npc_data.hit_points
 					this.entity.ac = npc_data.armor_class

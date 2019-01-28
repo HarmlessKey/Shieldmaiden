@@ -12,7 +12,7 @@
 						<b-nav-item href="#run-encounter-set-in">Setting Initiative</b-nav-item>
 						<b-nav-item href="#run-encounter-track-in">Track Initiative</b-nav-item>
 						<b-nav-item href="#run-encounter-manual">Manual Damage</b-nav-item>
-						<b-nav-item href="#run-encounter-select">Select Damage</b-nav-item>
+						<b-nav-item href="#run-encounter-select">Roll Damage</b-nav-item>
 						<b-nav-item href="#run-encounter-log">Combat Log</b-nav-item>
 						<b-nav-item href="#run-encounter-meters">Damage Meters</b-nav-item>
 					</b-nav>
@@ -64,6 +64,9 @@
 
 				<section id="encounters">
 					<b-card header="Encounters">
+						<p>Encounters is what our app is all about. Here we'll talk about creating one, 
+							if you want to know what happens when running an encounter check the section <a href="#run-encounter">Run Encounter</a>.
+						</p>
 					</b-card>
 				</section>
 

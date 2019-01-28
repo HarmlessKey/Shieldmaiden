@@ -39,7 +39,14 @@
 
 				<section id="players">
 					<b-card header="Players">
+						<p>Our app is not aimed at character sheets, this is why the options for players is limited. 
+							For players you only have the add the information essential for running an encounter, 
+							a name, maximum hit points and an armor class.
+							We do give you the option to add ability scores, but that is optional.</p>
 
+						<p>Players have to be added to a campaign and only the players in the campaign can be added to encounters.
+							We did this so players can be added to encounter with a single click of a button.
+						</p>
 					</b-card>
 
 				</section>

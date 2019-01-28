@@ -30,7 +30,7 @@
 										data-toggle="dropdown" 
 										aria-haspopup="true" 
 										aria-expanded="false">
-										<i class="fas fa-ellipsis-v"></i>
+										<i class="far fa-ellipsis-v"></i>
 									</a>
 									<div class="dropdown-menu" aria-labelledby="options">	
 										<div class="dropdown-header">{{ entity.name }}</div>
@@ -64,7 +64,7 @@
 											data-toggle="dropdown" 
 											aria-haspopup="true" 
 											aria-expanded="false">
-											<i class="fas fa-ellipsis-v"></i>
+											<i class="far fa-ellipsis-v"></i>
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>

@@ -8,7 +8,7 @@
 					<hr class="mt-5">
 					<b-row class=my-5>
 						<b-col md="7">
-							<iframe src="https://www.youtube.com/embed/B9FzVhw8_bY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+							<img src="@/assets/_img/screenshot.png" />
 						</b-col>
 						<b-col md="5">
 							<h2>Our app in action</h2>
@@ -24,11 +24,18 @@
 			</section>
 			<section>
 				<div class="container">
-					<h2>Run encounters like never before.</h2>
-					<p>
-						Our app keeps track of everything you need to know and displays it in a structured overview.
-						This way we make running encounters alot simpler, making sure that you can give your players the attention they deserve.
-					</p>
+					<b-row>
+					 <b-col>
+						<h2>Run encounters like never before.</h2>
+						<p>
+							Our app keeps track of everything you need to know and displays it in a structured overview.
+							This way we make running encounters alot simpler, making sure that you can give your players the attention they deserve.
+						</p>
+					 </b-col>
+					 <b-col md="7">
+						 <img src="@/assets/_img/screenshot-track.png" />
+					 </b-col>
+					</b-row>
 				</div>
 			</section>
 			<section>
@@ -146,9 +153,11 @@
 .container {
 	
 }
-iframe {
+iframe, img {
+	background-size: cover;
+	background-position: center top;
+	display: block;
 	width: 100%;
-	height: 350px;
 	margin-bottom: 40px;
 }
 

@@ -96,6 +96,7 @@
 
 <style scoped>
 	.img-container, img {
+		margin-top: 10px;
 		width: 100%;
 	}
 </style>

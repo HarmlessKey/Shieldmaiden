@@ -9,10 +9,19 @@
 
 				<b-row class="mt-3">
 					<b-col>
-						<input class="form-control" v-validate="'required'" type="text" name="name" v-model="encounter.encounter"/>
+						<input class="form-control" 
+							v-validate="'required'" 
+							data-vv-as="Encounter Name" 
+							type="text" name="name" 
+							v-model="encounter.encounter"/>
 						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2" v-validate="'url'" type="text" name="backbround" v-model="encounter.background" placeholder="Background URL"/>
+						<input class="form-control mt-2" 
+							v-validate="'url'" type="text" 
+							name="backbround" 
+							data-vv-as="Background"
+							v-model="encounter.background" 
+							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
 						<button class="btn mt-2" @click="edit()">Save</button>
@@ -269,12 +278,19 @@
 				'setSlide'
 			]),
 			edit() {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
-					this.encounter
-				);
-				this.$snotify.success('Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
+							this.encounter
+						);
+						this.$snotify.success('Saved.', 'Critical hit!', {
+							position: "rightTop"
+						});
+					}
+					else {
+
+					}
+				})
 			},
 			showSlide(type, npc, key) {
 				event.stopPropagation();

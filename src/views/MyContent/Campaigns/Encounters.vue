@@ -45,6 +45,7 @@
 					:class="{'input': true, 'error': errors.has('newEncounter') }"
 					v-model="newEncounter"
 					v-validate="'required'" 
+					data-vv-as="New Encounter"
 					name="newEncounter" 
 					placeholder="Encounter Title"
 					@change="addEncounter()" /></b-form-input>

@@ -186,7 +186,7 @@
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
 							<b-col sm="2">
 								<label :for="ability.ability">
-									<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+									<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
 										<path :d="ability.icon"></path>
 									</svg>
 									{{ ability.ability.substring(0,3).toUpperCase() }}
@@ -442,7 +442,7 @@
 			}
 		},
 		mounted() {
-			axios.get("http://www.dnd5eapi.co/api/monsters/")
+			axios.get("https://www.dnd5eapi.co/api/monsters/")
 			.then(response => {this.npcs = response.data.results})
 		},
 		methods: {

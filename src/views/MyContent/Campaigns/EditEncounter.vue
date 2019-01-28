@@ -257,7 +257,7 @@
 			this.fetchCampaign({
 				cid: this.campaignId, 
 			}),
-			axios.get("http://www.dnd5eapi.co/api/monsters/")
+			axios.get("https://www.dnd5eapi.co/api/monsters/")
 			.then(response => {this.allnpcs = response.data.results})
 		},
 		methods: {
@@ -293,7 +293,7 @@
 				}
 			},
 			async getNPC(id) {
-				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
+				return await axios.get("https://www.dnd5eapi.co/api/monsters/" + id)
 				.then(response => {return response.data})
 			},
 			async add(id, type, name, custom = false) {

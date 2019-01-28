@@ -139,7 +139,7 @@
 			}
 		},
 		mounted() {
-			axios.get("http://www.dnd5eapi.co/api/monsters/")
+			axios.get("https://www.dnd5eapi.co/api/monsters/")
 			.then(response => {this.allnpcs = response.data.results})
 		},
 		computed: {
@@ -153,7 +153,7 @@
 				'add_entity',
 			]),
 			async getNPC(id) {
-				return await axios.get("http://www.dnd5eapi.co/api/monsters/" + id)
+				return await axios.get("https://www.dnd5eapi.co/api/monsters/" + id)
 				.then(response => {return response.data})
 			},
 			searchNPC() {

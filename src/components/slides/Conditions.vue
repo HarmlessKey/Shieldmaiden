@@ -5,7 +5,7 @@
 			<li v-for="condition, index in conditions" :key="index" v-if="condition['.key'] != 'exhaustion'">
 				<div class="d-flex justify-content-between" :class="{ 'status': check(condition['.key']) == true }">
 					<span class="d-flex justify-content-left">	
-						<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
 							<path :d="condition.icon" fill-opacity="1"></path>
 						</svg>
 						<span class="text-capitalize">
@@ -41,7 +41,7 @@
 			<li :class="{ 'status': entities[entity.key].conditions['exhaustion'] }">
 				<div class="d-flex justify-content-between">
 					<span class="d-flex justify-content-left">	
-						<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
 							<path :d="conditions[3].icon" fill-opacity="1"></path>
 						</svg>
 						<span class="text-capitalize">

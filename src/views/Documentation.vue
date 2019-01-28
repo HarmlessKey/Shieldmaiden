@@ -51,7 +51,7 @@
 						you can add this hero as an NPC that you can control and keep track of during the encounter.</p>
 
 						<p><b>Why can't I find the monster I'm looking for?</b> We use an API for the monsters you can use 
-						(<a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a>). 
+						(<a href="https://www.dnd5eapi.co/" target="_blank">D&D 5e API</a>). 
 						We're not allowed to use anything outside of the SRD, so if you can't find your monster, 
 						it's probably because of that.</p>
 					</b-card>
@@ -146,7 +146,7 @@
 							If you apply the damage, it is handled exactly the same as manual damage.
 						</p>
 
-						<p><b>Type of damage.</b> Because of the way monsters are stored in the <a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a> 
+						<p><b>Type of damage.</b> Because of the way monsters are stored in the <a href="https://www.dnd5eapi.co/" target="_blank">D&D 5e API</a> 
 						it is not possible for us to keep track of type of damage. 
 						We might store monsters in our own database someday so we will be able to format it a little different, 
 						allowing us to keep track of this aswell.</p>

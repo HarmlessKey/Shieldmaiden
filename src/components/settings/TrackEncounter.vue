@@ -8,9 +8,10 @@
 				Below you can determine what should be visible on the track encounter screen.
 			</p>
 
+			<h3>Your unique link</h3>
 			<b-row class="mb-3 copy">
 				<b-col sm="8">
-					<a @click="copyLink()">{{ copy }}</a>
+					<a @click="copyLink()" class="mb-2">{{ copy }}</a>
 				</b-col>
 				<b-col sm="4">
 					<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
@@ -128,7 +129,6 @@
 				</li>
 				<li class="d-flex justify-content-between">
 					Conditions
-
 					<div>
 						<div v-show="player.conditions === false">
 							<span v-b-tooltip.hover title="Hidden" class="red mr-2"><i class="fas fa-eye-slash"></i></span>

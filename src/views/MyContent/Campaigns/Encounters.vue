@@ -22,7 +22,7 @@
 					</p>
 					<b-row class="mb-3 copy">
 						<b-col sm="8">
-							<a @click="copyLink()">{{ copy }}</a>
+							<a @click="copyLink()" class="mb-2">{{ copy }}</a>
 						</b-col>
 						<b-col sm="4">
 							<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>

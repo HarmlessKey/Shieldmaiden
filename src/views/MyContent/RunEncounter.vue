@@ -73,7 +73,7 @@
 				},
 			}
 		},
-		mounted() {
+	 	mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
@@ -86,7 +86,7 @@
 				'players',
 				'campaigns',
 				'entities',
-				'initialized'
+				'initialized',
 			]),
 			_active: function() {
 				return _.chain(this.entities)
@@ -217,18 +217,6 @@
 		.combat {
 			grid-template-columns: auto;
 			grid-template-rows: 60px 1fr 2fr;
-			grid-gap: 10px;
-			grid-template-areas:
-			"turns"
-			"current"
-			"targets"
-			"actions";
-		}
-	}
-	@media only screen and (max-width: 360px) {
-		.combat {
-			grid-template-columns: 1fr;
-			grid-template-rows: 60px auto;
 			grid-gap: 10px;
 			grid-template-areas:
 			"turns"

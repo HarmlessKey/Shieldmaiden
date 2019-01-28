@@ -82,17 +82,19 @@
 				//Damage
 				for(let roll in rolls) {
 					let dice = rolls[roll].split('d');
-					let damage = this.rollD(dice[1], dice[0], action['damage_bonus']).total;
+					let damage = this.rollD(dice[1], dice[0]).total;
 
 					total = parseInt(total) + parseInt(damage);
 				}
 				
+				let totalDamage = parseInt(total) + parseInt(action['damage_bonus']);
+
 				if(toHit.throws[0] == '20') {
-					toHit.total = '<span class="green">NATURAL 20</span>';
+					toHit.totalDamage = '<span class="green">NATURAL 20</span>';
 					crit = true;
 				}
 				else if(toHit.throws[0] == '1') {
-					toHit.total = '<span class="red">NATURAL 1</span>';
+					toHit.totalDamage = '<span class="red">NATURAL 1</span>';
 				}
 				else {
 					if(toHit.total >= this.target.ac) {
@@ -109,7 +111,7 @@
 					</div>
 					<div class="snotifyToast__body">
 						<h2>${toHit.total} ${hits}</h2>
-						<h2 class="red">${total} <span class="gray-hover">damage</span></h2>
+						<h2 class="red">${totalDamage} <span class="gray-hover">damage</span></h2>
 					</div> `, {
 					timeout: 0,
 					closeOnClick: false,
@@ -117,7 +119,7 @@
 						{ 
 							text: 'Apply', 
 							action: (toast) => { 
-								this.setHP(total, crit, this.target, this.current, 'damage')
+								this.setHP(totalDamage, crit, this.target, this.current, 'damage')
 								this.$snotify.remove(toast.id); }, 
 								bold: false
 							},

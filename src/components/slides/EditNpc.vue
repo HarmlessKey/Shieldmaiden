@@ -8,11 +8,23 @@
 			:class="{'input': true, 'error': errors.has('name') }"
 			v-validate="'required'"
 			placeholder="Name"></b-form-input>
-			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+		<hr>
+		<b-form-input 
+			v-b-tooltip.hover title="Avatar"
+			type="text" 
+			class="form-control" 
+			:class="{'input': true, 'error': errors.has('avatar') }" 
+			v-model="npc.avatar" 
+			v-validate="'url'" 
+			data-vv-as="Avatar"
+			name="avatar" 
+			placeholder="Image URL"></b-form-input>
+		<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 		<hr>
 		<b-row class="mb-2">
-			<b-col sm="2"><label>AC</label></b-col>
-			<b-col>
+				<b-col sm="2"><label>AC</label></b-col>
+				<b-col>
 				<b-form-input 
 					type="text" 
 					name="ac" 
@@ -38,6 +50,7 @@
 		</b-row>
 		<button class="btn btn-block mb-2" @click="edit()">Save</button>
 		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
+		<div class="img-container"><img :src="npc.avatar" /></div>
 	</div>
 </template>
 
@@ -82,5 +95,8 @@
 </script>
 
 <style scoped>
-
+	.img-container, img {
+		margin-top: 10px;
+		width: 100%;
+	}
 </style>

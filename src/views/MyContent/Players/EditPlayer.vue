@@ -18,6 +18,7 @@
 									:class="{'input': true, 'error': errors.has('player_name') }" 
 									v-model="player.player_name" 
 									v-validate="'alpha_spaces|required'" 
+									data-vv-as="Name"
 									name="player_name" 
 									placeholder="Player Name"></b-form-input>
 								<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
@@ -35,6 +36,7 @@
 									:class="{'input': true, 'error': errors.has('character_name') }" 
 									v-model="player.character_name" 
 									v-validate="'alpha_spaces|required'" 
+									data-vv-as="Character Name"
 									name="character_name" 
 									placeholder="Character Name"></b-form-input>
 								<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
@@ -52,6 +54,7 @@
 									:class="{'input': true, 'error': errors.has('avatar') }"
 									v-model="player.avatar"
 									v-validate="'url'"
+									data-vv-as="Avatar"
 									name="avatar"
 									placeholder="Image URL"></b-form-input>
 								<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
@@ -71,7 +74,14 @@
 							<label for="maxHp">HP</label>
 						</b-col>
 						<b-col sm="3">
-							<b-form-input id="maxHp" type="number" :class="{'input': true, 'error': errors.has('maxHp') }" v-model="player.maxHp" v-validate="'numeric|required'" name="maxHp" placeholder="Maximum Hit Points*" />
+							<b-form-input id="maxHp" 
+								type="number" 
+								:class="{'input': true, 'error': errors.has('maxHp') }" 
+								v-model="player.maxHp" 
+								v-validate="'numeric|required'" 
+								data-vv-as="Maxium Hit Points"
+								name="maxHp" 
+								placeholder="Maximum Hit Points*" />
 							<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 						</b-col>
 					</b-row>
@@ -86,6 +96,7 @@
 								:class="{'input': true, 'error': errors.has('ac') }" 
 								v-model="player.ac" 
 								v-validate="'numeric|required'" 
+								data-vv-as="Armor Class"
 								name="ac" 
 								placeholder="Armor Class" />
 							<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>

@@ -55,6 +55,9 @@
 
 export default {
 		name: 'Profile',
+		metaInfo: {
+			title: 'Profile'
+		},
 		data() {
 			return {
 				auth: firebase.auth(),
@@ -111,7 +114,7 @@ export default {
 	}
 	.info {
 		span {
-			width: 70px;
+			width: 80px;
 			display: inline-block;
 		}
 	}

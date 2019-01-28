@@ -20,11 +20,15 @@
 							<i class="fas fa-info"></i>
 						</a>
 					</p>
-					<span class="mb-3 d-flex justify-content-between">
-						<p class="blue mb-0">{{ copy }}</p>
-						<a class="btn" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
-						<input type="hidden" id="copy" :value="copy">
-					</span>
+					<b-row class="mb-3 copy">
+						<b-col sm="8">
+							<a @click="copyLink()" class="mb-2">{{ copy }}</a>
+						</b-col>
+						<b-col sm="4">
+							<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
+							<input type="hidden" id="copy" :value="copy">
+						</b-col>
+					</b-row>
 
 					<p class="collapse mb-3" id="track">
 						With this link your active encounter can be followed on different devices. 
@@ -41,6 +45,7 @@
 					:class="{'input': true, 'error': errors.has('newEncounter') }"
 					v-model="newEncounter"
 					v-validate="'required'" 
+					data-vv-as="New Encounter"
 					name="newEncounter" 
 					placeholder="Encounter Title"
 					@change="addEncounter()" /></b-form-input>
@@ -119,7 +124,6 @@
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
 							<td class="text-right">
-								<router-link class="mx-2" :to="'/encounters/encounter-statistics/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="View Statistics"><i class="fas fa-chart-area"></i></router-link>
 								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
@@ -262,5 +266,8 @@
 }
 .loader {
 	margin-top: 20px;
+}
+.copy {
+	word-wrap: break-word;
 }
 </style>

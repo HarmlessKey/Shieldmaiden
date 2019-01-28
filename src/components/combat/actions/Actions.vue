@@ -9,7 +9,8 @@
 					role="tab" 
 					aria-controls="manual" 
 					aria-selected="true">
-					<i class="fas fa-keyboard"></i> Manual
+					<i class="fas fa-keyboard"></i> 
+					<span class="d-none d-md-inline ml-1">Manual</span>
 				</a>
 			</li>
 			<li class="nav-item">
@@ -20,7 +21,8 @@
 					role="tab" 
 					aria-controls="roll" 
 					aria-selected="false">
-					<i class="fas fa-dice-d20"></i> Roll
+					<i class="fas fa-dice-d20"></i> 
+					<span class="d-none d-md-inline ml-1">Roll</span>
 				</a>
 			</li>
 		</ul>

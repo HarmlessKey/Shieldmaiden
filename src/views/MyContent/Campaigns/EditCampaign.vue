@@ -10,11 +10,18 @@
 
 					<h2 class="mt-3">Edit your campaign</h2>
 					<div class="input-group mb-4" v-if="campaign">
-						<input class="form-control" v-validate="'required'" type="text" name="newCampaign" v-model="campaign.campaign" @change="changeName()"/>
+						<input class="form-control" 
+							v-validate="'required'" 
+							type="text" 
+							name="newCampaign" 
+							v-model="campaign.campaign" 
+							data-vv-as="Campaign Name"
+							@change="changeName()"/>
 						<div class="input-group-append">
 							<button class="btn">Change Name</button>
 						</div>
 					</div>
+					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 					<div v-else class="loader"><span>...</span></div>
 				</div>
 				
@@ -110,12 +117,19 @@
 				'fetchCampaign',
 			]),
 			changeName() {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/campaign`).set(
-					this.campaign.campaign
-				);
-				this.$snotify.success('Name changed.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/campaign`).set(
+							this.campaign.campaign
+						);
+						this.$snotify.success('Name changed.', 'Critical hit!', {
+							position: "rightTop"
+						});
+					}
+					else {
+
+					}
+				})
 			},
 			addPlayer(id, name) {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set(

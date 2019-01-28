@@ -10,14 +10,15 @@
 			<b-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
 				
 				<div class="input-group mb-3">
-					<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
+					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 					<div class="input-group-append">
 						<button class="btn"><i class="fas fa-search"></i></button>
 					</div>
 				</div>
 				<ul class="entities">
 					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<li v-for="npc in searchResults" class="d-flex justify-content-between">
+					<li v-for="npc, index in searchResults" class="d-flex justify-content-between">
+						<!-- <a v-if="index == 0" @click="save(searchResults)">Save</a> -->
 						<div class="d-flex justify-content-left">
 							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
 								<i class="fas fa-info-circle"></i></a>
@@ -403,7 +404,6 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				npcs: [],
 				npcSkills: [],
 				skills: [
 					'acrobatics',
@@ -438,17 +438,9 @@
 				npc: {
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true
-				}
+				},
+				npcs: db.ref(`monsters`),
 			}
-		},
-		mounted() {
-			axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/", {
-				headers: {
-					"Access-Control-Allow-Origin": "*",
-					'Content-Type': 'application/json',
-				}
-			})
-			.then(response => {this.npcs = response.data.results})
 		},
 		methods: {
 			...mapActions([
@@ -458,17 +450,16 @@
 			]),
 			searchNPC() {
 				this.searchResults = []
+				this.searching = true
 				for (var i in this.npcs) {
 					var m = this.npcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
-						axios.get(m.url).then(response => {
-							this.noResult = ''
-							this.searchResults.push(response.data)
-						})
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
 					}
-					if(this.searchResults == '') {
-						this.noResult = 'No results for "' + this.search + '"';
-					}
+				}
+				if(this.searchResults == '' && this.search != '') {
+					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},
 			showSlide(npc) {
@@ -572,7 +563,17 @@
 			returnString(name) {
 				var str = name.toString()
 				return str
-			}
+			},
+			// save(results) {
+			// 	for(let npc in results) {
+				
+
+			// 		db.ref(`monsters`).child(results[npc].index).set(
+			// 			results[npc]
+			// 		);
+			// 		console.log('saved', results[npc].index)
+			// 	}
+			// }
 		}
 	}
 </script>

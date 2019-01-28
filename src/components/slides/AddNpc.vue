@@ -86,7 +86,7 @@
 		<div class="tab-content">
 			<div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-tab">
 				<div class="input-group mb-3">
-					<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
+					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 					<div class="input-group-append">
 						<button class="btn"><i class="fas fa-search"></i></button>
 					</div>
@@ -95,7 +95,7 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="npc in searchResults" class="d-flex justify-content-between">
 						{{ npc.name }}
-						<a v-b-tooltip.hover title="Copy NPC" @click="set(npc.index, 'api')"><i class="fas fa-copy"></i></a>
+						<a v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], 'api')"><i class="fas fa-copy"></i></a>
 					</li>
 				</ul>
 			</div>
@@ -122,7 +122,6 @@
 <script>
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import axios from 'axios'
 
 	export default {
 		name: 'AddEntity',
@@ -135,17 +134,12 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				allnpcs: [],
 			}
 		},
-		mounted() {
-			axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/", {
-				headers: {
-					"Access-Control-Allow-Origin": "*",
-					'Content-Type': 'application/json',
-				}
-			})
-			.then(response => {this.allnpcs = response.data.results})
+		firebase() {
+			return {
+				monsters: db.ref(`monsters`),
+			}
 		},
 		computed: {
 			...mapGetters([
@@ -157,35 +151,25 @@
 				'setSlide',
 				'add_entity',
 			]),
-			async getNPC(id) {
-				return await axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/" + id, {
-					headers: {
-						"Access-Control-Allow-Origin": "*",
-						'Content-Type': 'application/json',
-					}
-				})
-				.then(response => {return response.data})
-			},
 			searchNPC() {
 				this.searchResults = []
-				for (var i in this.allnpcs) {
-					var m = this.allnpcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
-						axios.get(m.url).then(response => {
-							this.noResult = ''
-							this.searchResults.push(response.data)
-						})
-					}
-					if(this.searchResults == '') {
-						this.noResult = 'No results for "' + this.search + '"';
+				this.searching = true
+				for (var i in this.monsters) {
+					var m = this.monsters[i]
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
 					}
 				}
+				if(this.searchResults == '' && this.search != '') {
+					this.noResult = 'No results for "' + this.search + '"';
+				}
 			},
-			async set(id, type) {
+			set(id, type) {
 				this.entity.id = id;
 
 				if(type == 'api') {
-					var npc_data = await this.getNPC(id);
+					var npc_data = this.monsters[id - 1]; //NO IDEA WHY I HAVE TO SUBSTRACT 1
 					this.entity.npc = 'api'
 					this.entity.maxHp = npc_data.hit_points
 					this.entity.ac = npc_data.armor_class

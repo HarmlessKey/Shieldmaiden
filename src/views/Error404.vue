@@ -45,9 +45,9 @@
 				top: 50%;
 				left: 50%;
 				margin-left: -12px;
-				margin-top: -19px;
+				margin-top: -24px;
 			}
-			svg {
+			i {
 				font-size: 150px;
 			}
 		}

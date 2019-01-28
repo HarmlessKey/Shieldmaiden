@@ -9,10 +9,19 @@
 
 				<b-row class="mt-3">
 					<b-col>
-						<input class="form-control" v-validate="'required'" type="text" name="name" v-model="encounter.encounter"/>
+						<input class="form-control" 
+							v-validate="'required'" 
+							data-vv-as="Encounter Name" 
+							type="text" name="name" 
+							v-model="encounter.encounter"/>
 						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2" v-validate="'url'" type="text" name="backbround" v-model="encounter.background" placeholder="Background URL"/>
+						<input class="form-control mt-2" 
+							v-validate="'url'" type="text" 
+							name="backbround" 
+							data-vv-as="Background"
+							v-model="encounter.background" 
+							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
 						<button class="btn mt-2" @click="edit()">Save</button>
@@ -73,7 +82,7 @@
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">
-										<input type="text" v-model="search" @change="searchNPC()" placeholder="Search NPC" class="form-control"/>
+										<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
 											<button class="btn"><i class="fas fa-search"></i></button>
 										</div>
@@ -85,7 +94,7 @@
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 												{{ npc.name }}
 											</div>
-											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc.index, 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
 										</li>
 									</ul>
 									<template v-if="npcs">
@@ -113,8 +122,12 @@
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
 										<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-										<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-										<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
+										
+										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
+										<template v-else>
+											<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
+										</template>
 										{{ entity.name }}
 									</div>
 									<span>
@@ -226,7 +239,6 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				allnpcs: [],
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
@@ -238,7 +250,8 @@
 				loot: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
-				}
+				},
+				monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -256,14 +269,7 @@
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			}),
-			axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/", {
-				headers: {
-					"Access-Control-Allow-Origin": "*",
-					'Content-Type': 'application/json',
-				}
 			})
-			.then(response => {this.allnpcs = response.data.results})
 		},
 		methods: {
 			...mapActions([
@@ -272,12 +278,19 @@
 				'setSlide'
 			]),
 			edit() {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
-					this.encounter
-				);
-				this.$snotify.success('Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
+							this.encounter
+						);
+						this.$snotify.success('Saved.', 'Critical hit!', {
+							position: "rightTop"
+						});
+					}
+					else {
+
+					}
+				})
 			},
 			showSlide(type, npc, key) {
 				event.stopPropagation();
@@ -297,16 +310,7 @@
 					})
 				}
 			},
-			async getNPC(id) {
-				return await axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/" + id, {
-					headers: {
-						"Access-Control-Allow-Origin": "*",
-						'Content-Type': 'application/json',
-					}
-				})
-				.then(response => {return response.data})
-			},
-			async add(id, type, name, custom = false) {
+			add(id, type, name, custom = false) {
 				var entity = {
 					id: id,
 					name: name,
@@ -318,7 +322,7 @@
 					entity.active = true
 					
 					if(custom == false) {
-						var npc_data = await this.getNPC(id);
+						var npc_data = this.monsters[id];
 						entity.npc = 'api'
 						entity.curHp = npc_data.hit_points
 						entity.maxHp = npc_data.hit_points
@@ -347,16 +351,14 @@
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
-				for (var i in this.allnpcs) {
-					var m = this.allnpcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase())) {
-						axios.get(m.url).then(response => {
-							this.noResult = ''
-							this.searchResults.push(response.data)
-						})
+				for (var i in this.monsters) {
+					var m = this.monsters[i]
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
 					}
 				}
-				if(this.searchResults == '') {
+				if(this.searchResults == '' && this.search != '') {
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},

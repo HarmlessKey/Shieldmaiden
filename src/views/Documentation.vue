@@ -12,7 +12,7 @@
 						<b-nav-item href="#run-encounter-set-in">Setting Initiative</b-nav-item>
 						<b-nav-item href="#run-encounter-track-in">Track Initiative</b-nav-item>
 						<b-nav-item href="#run-encounter-manual">Manual Damage</b-nav-item>
-						<b-nav-item href="#run-encounter-select">Select Damage</b-nav-item>
+						<b-nav-item href="#run-encounter-select">Roll Damage</b-nav-item>
 						<b-nav-item href="#run-encounter-log">Combat Log</b-nav-item>
 						<b-nav-item href="#run-encounter-meters">Damage Meters</b-nav-item>
 					</b-nav>
@@ -39,7 +39,14 @@
 
 				<section id="players">
 					<b-card header="Players">
+						<p>Our app is not aimed at character sheets, this is why the options for players is limited. 
+							For players you only have the add the information essential for running an encounter, 
+							a name, maximum hit points and an armor class.
+							We do give you the option to add ability scores, but that is optional.</p>
 
+						<p>Players have to be added to a campaign and only the players in the campaign can be added to encounters.
+							We did this so players can be added to encounter with a single click of a button.
+						</p>
 					</b-card>
 
 				</section>
@@ -50,15 +57,16 @@
 						Say your group has recruited a mighty hero to fight with them in an upcomming battle, 
 						you can add this hero as an NPC that you can control and keep track of during the encounter.</p>
 
-						<p><b>Why can't I find the monster I'm looking for?</b> We use an API for the monsters you can use 
-						(<a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a>). 
-						We're not allowed to use anything outside of the SRD, so if you can't find your monster, 
-						it's probably because of that.</p>
+						<p><b>Why can't I find the monster I'm looking for?</b> We're not allowed to use anything outside of the SRD, so if you can't find your monster, 
+						it's probably because of that. We only stored the monsters from the SRD in our database, but we do give you the opportunity to create your own.</p>
 					</b-card>
 				</section>
 
 				<section id="encounters">
 					<b-card header="Encounters">
+						<p>Encounters is what our app is all about. Here we'll talk about creating one, 
+							if you want to know what happens when running an encounter check the section <a href="#run-encounter">Run Encounter</a>.
+						</p>
 					</b-card>
 				</section>
 
@@ -139,17 +147,15 @@
 							In this last case the transformation is automitically removed from the target and it falls back into it's old form.
 						</p>
 
-						<h2 class="pt-5" id="run-encounter-select">Selected damage</h2>
+						<h2 class="pt-5" id="run-encounter-select">Roll damage abilities</h2>
 						<p>When the current entity is an NPC, you can choose to roll the attacks automatically. 
-							A d20 plus their to hit modifier will be rolled and the damage of the attack. 
+							A d20 plus their to hit modifier and the damage of the attack will be rolled at the same time. 
 							A notification will pop up showing you te results of the roll and asking you if you want to apply the damage or cancel.
 							If you apply the damage, it is handled exactly the same as manual damage.
 						</p>
 
-						<p><b>Type of damage.</b> Because of the way monsters are stored in the <a href="http://www.dnd5eapi.co/" target="_blank">D&D 5e API</a> 
-						it is not possible for us to keep track of type of damage. 
-						We might store monsters in our own database someday so we will be able to format it a little different, 
-						allowing us to keep track of this aswell.</p>
+						<p><b>Type of damage.</b> Because of how we stored the monsters in our database it is currently not possible to keep track of type of damage. 
+						We do plan to add this feature in the future.</p>
 
 						<h2 class="pt-5" id="run-encounter-log">Combat Log</h2>
 						<p>
@@ -176,9 +182,9 @@
 <script>
 
 	export default {
-		name: 'PrivacyPolicy',
+		name: 'Documentation',
 		metaInfo: {
-			title: 'Privacy Policy'
+			title: 'Documentation'
 		},
 	}
 </script>
@@ -225,6 +231,15 @@
 		position: relative;
 		top: -50px;
 		visibility: hidden;
+	}
+
+	@media only screen and (max-width: 1200px) {
+		#hasSide {
+			padding-left: 0;
+		}
+		#sidebar {
+			display: none;
+		}
 	}
 }
 

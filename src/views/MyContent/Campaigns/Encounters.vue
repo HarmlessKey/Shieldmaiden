@@ -20,11 +20,15 @@
 							<i class="fas fa-info"></i>
 						</a>
 					</p>
-					<span class="mb-3 d-flex justify-content-between">
-						<p class="blue mb-0">{{ copy }}</p>
-						<a class="btn" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
-						<input type="hidden" id="copy" :value="copy">
-					</span>
+					<b-row class="mb-3 copy">
+						<b-col sm="8">
+							<a @click="copyLink()">{{ copy }}</a>
+						</b-col>
+						<b-col sm="4">
+							<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
+							<input type="hidden" id="copy" :value="copy">
+						</b-col>
+					</b-row>
 
 					<p class="collapse mb-3" id="track">
 						With this link your active encounter can be followed on different devices. 
@@ -262,5 +266,8 @@
 }
 .loader {
 	margin-top: 20px;
+}
+.copy {
+	word-wrap: break-word;
 }
 </style>

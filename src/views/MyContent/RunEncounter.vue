@@ -225,17 +225,5 @@
 			"actions";
 		}
 	}
-	@media only screen and (max-width: 360px) {
-		.combat {
-			grid-template-columns: 1fr;
-			grid-template-rows: 60px auto;
-			grid-gap: 10px;
-			grid-template-areas:
-			"turns"
-			"current"
-			"targets"
-			"actions";
-		}
-	}
 }
 </style>

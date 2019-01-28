@@ -5,6 +5,13 @@
 				<div class="container">
 					<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker <span class="gray-hover">BETA</span></h1>
 					<h3>The encounter tracker for D&D 5e.</h3>
+
+					<div v-if="user" class="d-flex justify-content-center mt-5">
+						<router-link class="btn" to="/campaigns">Campaigns</router-link>
+						<router-link class="btn mx-2" to="/players">Players</router-link>
+						<router-link class="btn" to="/npcs">NPC's</router-link>
+					</div>
+
 					<hr class="mt-5">
 					<b-row class=my-5>
 						<b-col md="7">
@@ -34,7 +41,7 @@
 						</p>
 					 </b-col>
 					 <b-col md="7">
-						 <p class="img-header bg-gray-darker">Your new DM screen</p>
+						 <p class="img-header bg-gray-darker">Info for your players</p>
 						 <img src="@/assets/_img/screenshot-track.png" />
 					 </b-col>
 					</b-row>
@@ -61,10 +68,10 @@
 					</b-row>
 				</div>
 			</section>
-
 			<section v-if="!user">
 				<div class="container">
-					<h2 class="text-center mb-5">Start giving your players the attention they deserve!</h2>
+					<hr class="mb-5">
+					<h2 class="text-center my-5">Start giving your players the attention they deserve!</h2>
 					<div class="btn-group d-flex" role="group">
 						<router-link to="/sign-in" class="btn btn-lg btn-block mb-5">Sign Up</router-link>
 					</div>

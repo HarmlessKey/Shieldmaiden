@@ -295,4 +295,16 @@
 .initiative-move {
   transition: transform .5s;
 }
+@media only screen and (max-width: 600px) {
+	#container {
+		grid-template-columns: auto;
+		grid-template-rows: 60px 1fr 1fr 1fr;
+		grid-gap: 10px;
+		grid-template-areas:
+		"turns"
+		"players"
+		"npcs"
+		"set";
+	}
+}
 </style>

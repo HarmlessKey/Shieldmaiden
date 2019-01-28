@@ -56,10 +56,11 @@
 	}
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
 
 .container {
 	padding-top:20px;
+	/*font-size: 14px;*/
 }
 
 </style>

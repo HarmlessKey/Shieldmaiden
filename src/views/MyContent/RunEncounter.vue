@@ -188,6 +188,20 @@
 		"turns turns turns turns"
 		"current targets actions side";
 		position: absolute;
+		font-size: 12px;
+		h1 {
+			text-transform:uppercase;
+			font-size: 15px !important;
+		}
+		h2 {
+			text-transform:uppercase;
+			font-size: 15px !important;
+			margin-bottom: 20px !important;
+		}
+		h3 {
+			font-size: 15px !important;
+			margin-bottom: 15px !important;
+		}
 	}
 	@media only screen and (max-width: 1000px) {
 		.combat {

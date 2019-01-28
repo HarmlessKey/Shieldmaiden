@@ -37,49 +37,52 @@ $header-hight: 50px;
 
 /* 2. Defaults */
 /*********************************************/
-body {
+html body {
 	padding-top: $header-hight;
-	background: $gray-dark !important;
-	color: $gray-light !important;
-	font-size: 12px !important;
-	font-family: 'Raleway', sans-serif !important;
+	background: $gray-dark;
+	color: $gray-light;
+	font-size: 15px;
+	font-family: 'Raleway', sans-serif;
 	position: relative;
-}
-.view {
-	padding: 5px;
-	height: calc(100vh - 100px);
-		/*width: 100vw;*/
-}
-.container-fluid {
-	padding: 0 !important;
-}
-header {
-	display: block;
-	height: $header-hight;
-	line-height: 30px;
-	padding: 10px;
-	width: 100%;
-	background: $black;
-	border-bottom:solid 1px transparent;
-	position:fixed !important;
-	top: 0;
-	z-index: 999;
-}
+	
+	.view {
+		padding: 5px;
+		height: calc(100vh - 100px);
+			/*width: 100vw;*/
+	}
+	.container-fluid {
+		padding: 0;
+	}
+	header {
+		display: block;
+		height: $header-hight;
+		line-height: 30px;
+		padding: 10px;
+		width: 100%;
+		background: $black;
+		border-bottom:solid 1px transparent;
+		position:fixed;
+		top: 0;
+		z-index: 999;
+	}
 /* 3. Heading */
 /*********************************************/
-h1, h2, h3, h4, h5, h6 { font-weight:normal !important;  }
-h1 {
-	text-transform:uppercase;
-	font-size: 15px !important;
-}
-h2 {
-	text-transform:uppercase;
-	font-size: 15px !important;
-	margin-bottom: 20px !important;
-}
-h3 {
-	font-size: 15px !important;
-	margin-bottom: 15px !important;
+	.container, .container-fluid {
+		h1, h2, h3, h4, h5, h6 { font-weight:normal;  }
+		h1 {
+			text-transform:uppercase;
+			font-size: 18px;
+		}
+		h2 {
+			text-transform:uppercase;
+			font-size: 18px;
+			margin-bottom: 20px;
+		}
+		h3 {
+			font-size: 18px;
+			margin-bottom: 15px;
+		}
+	}
 }
 
 /* 4. Classes */

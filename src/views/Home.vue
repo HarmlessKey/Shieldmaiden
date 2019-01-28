@@ -22,7 +22,7 @@
 							<h2>A sneak peak</h2>
 							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
-								<router-link v-if="!user" to="/sign-up" class="btn btn-lg btn-block">Create Account</router-link>
+								<router-link v-if="!user" to="/sign-in" class="btn btn-lg btn-block">Create Account</router-link>
 								<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block">My Content</router-link>
 							</div>
 						</b-col>

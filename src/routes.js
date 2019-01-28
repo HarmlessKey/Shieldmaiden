@@ -2,7 +2,6 @@ import Home from '@/views/Home.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
 import SignIn from '@/views/SignIn.vue';
-import SignUp from '@/views/SignUp.vue';
 import Settings from '@/views/Settings.vue';
 import Profile from '@/views/profile/Profile.vue';
 import DeleteAccount from '@/views/profile/DeleteAccount.vue';
@@ -42,11 +41,6 @@ export const routes = [{
 	path: '/sign-in',
 	name: 'signIn',
 	component: SignIn
-},
-{
-	path: '/sign-up',
-	name: 'signUp',
-	component: SignUp
 },
 {
 	path: '/profile',

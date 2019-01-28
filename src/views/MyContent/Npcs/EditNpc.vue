@@ -442,7 +442,12 @@
 			}
 		},
 		mounted() {
-			axios.get("https://www.dnd5eapi.co/api/monsters/")
+			axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/", {
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					'Content-Type': 'application/json',
+				}
+			})
 			.then(response => {this.npcs = response.data.results})
 		},
 		methods: {

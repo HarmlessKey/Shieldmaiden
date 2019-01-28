@@ -139,7 +139,12 @@
 			}
 		},
 		mounted() {
-			axios.get("https://www.dnd5eapi.co/api/monsters/")
+			axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/", {
+				headers: {
+					"Access-Control-Allow-Origin": "*",
+					'Content-Type': 'application/json',
+				}
+			})
 			.then(response => {this.allnpcs = response.data.results})
 		},
 		computed: {
@@ -153,7 +158,12 @@
 				'add_entity',
 			]),
 			async getNPC(id) {
-				return await axios.get("https://www.dnd5eapi.co/api/monsters/" + id)
+				return await axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/" + id, {
+					headers: {
+						"Access-Control-Allow-Origin": "*",
+						'Content-Type': 'application/json',
+					}
+				})
 				.then(response => {return response.data})
 			},
 			searchNPC() {

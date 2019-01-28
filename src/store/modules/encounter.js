@@ -135,7 +135,12 @@ const mutations = {
 			case ((entity.entityType == 'npc')):
 				//Fetch data from API
 				if(entity.npc == 'api') {
-					data_npc = await axios.get("https://www.dnd5eapi.co/api/monsters/" + entity.id)
+					data_npc = await axios.get("https://crossorigin.me/http://www.dnd5eapi.co/api/monsters/" + entity.id, {
+						headers: {
+							"Access-Control-Allow-Origin": "*",
+							'Content-Type': 'application/json',
+						}
+					})
 					.then(response => { 
 						return response.data
 					})

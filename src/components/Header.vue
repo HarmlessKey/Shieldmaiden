@@ -52,7 +52,7 @@
 				firebase.auth()
 				.signOut()
 				.then(() => {
-					this.$router.replace('sign-in');
+					this.$router.replace('/');
 				});
 			}
 		}

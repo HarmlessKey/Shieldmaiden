@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
 		<h1>Privacy Policy</h1>
-		<p>First, thank you for using the Harmless Key Encounter Tracker!</p>
+		<h3>First, thank you for using the Harmless Key Encounter Tracker!</h3>
 		<p>This policy is to help you understand what information we collect, how we use it, and what choices you have.</p>
 
 		<h3>How We Collect Your Information</h3>

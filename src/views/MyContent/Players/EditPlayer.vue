@@ -71,11 +71,30 @@
 				<b-card header="Health & Armor Class">
 					<b-row class="mb-2">
 						<b-col sm="2">
-							<label for="maxHp">HP</label>
+							<label for="level">Level</label>
+						</b-col>
+						<b-col sm="3">
+							<b-form-input id="level" 
+								type="number" 
+								min="1"
+								max="20"
+								:class="{'input': true, 'error': errors.has('level') }" 
+								v-model="player.level" 
+								v-validate="'numeric'" 
+								data-vv-as="Level"
+								name="level" 
+								placeholder="Level" />
+							<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+						</b-col>
+					</b-row>
+					<b-row class="mb-2">
+						<b-col sm="2">
+							<label for="maxHp">HP *</label>
 						</b-col>
 						<b-col sm="3">
 							<b-form-input id="maxHp" 
 								type="number" 
+								min="1"
 								:class="{'input': true, 'error': errors.has('maxHp') }" 
 								v-model="player.maxHp" 
 								v-validate="'numeric|required'" 
@@ -92,6 +111,7 @@
 						<b-col sm="3">
 							<b-form-input 
 								id="ac" 
+								min="1"
 								type="number" 
 								:class="{'input': true, 'error': errors.has('ac') }" 
 								v-model="player.ac" 

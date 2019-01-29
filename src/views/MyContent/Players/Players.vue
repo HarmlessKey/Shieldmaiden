@@ -17,8 +17,9 @@
 					<thead>
 						<th></th>
 						<th class="n">#</th>
-						<th class="d-none d-md-table-cell">Player name</th>
 						<th>Character name</th>
+						<th class="d-none d-md-table-cell">Player name</th>
+						<th>Level</th>
 						<th></th>
 					</thead>
 					<tbody name="table-row" 
@@ -31,8 +32,14 @@
 								<img src="@/assets/_img/styles/player.svg" />
 							</td>
 							<td class="n">{{ index + 1 }}</td>
+							<td>
+								<router-link class="mx-2" 
+									:to="'/players/' + player.key" 
+									v-b-tooltip.hover title="Edit">{{ player.character_name }}
+								</router-link>
+							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
-							<td>{{ player.character_name }}</td>
+							<td>{{ player.level }}</td>
 							<td class="text-right actions">
 								<router-link class="mx-2" 
 									:to="'/players/' + player.key" 

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="hasSide">
+		<div id="hasSide">
 			<Sidebar/>
 			<div id="my-content" class="container">
 				<div class="info">
@@ -22,7 +22,6 @@
 						</div>
 					</div>
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-					<div v-else class="loader"><span>...</span></div>
 				</div>
 				
 				<div id="add" class="bg-gray">
@@ -147,9 +146,6 @@
 </script>
 
 <style lang="scss" scoped>
-	.hasSide {
-		padding-left: 200px !important;
-	}
 	.container {
 		padding-top:20px;
 		display: grid;

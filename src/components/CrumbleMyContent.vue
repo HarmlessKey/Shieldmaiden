@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="d-none d-md-block">
 		<ul class="crumble d-flex justify-content-left">
 			<li>
 				<router-link to="/">Logo</router-link>

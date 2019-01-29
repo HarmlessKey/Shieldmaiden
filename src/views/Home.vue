@@ -37,7 +37,7 @@
 						<h2>Run encounters like never before.</h2>
 						<p>
 							Our app keeps track of everything you need to know and displays it in a structured overview.
-							This way we make running encounters alot simpler, making sure that you can give your players the attention they deserve.
+							This way we make running encounters a lot simpler, making sure that you can give your players the attention they deserve.
 						</p>
 					 </b-col>
 					 <b-col md="7">

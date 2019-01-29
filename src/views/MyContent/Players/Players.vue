@@ -17,7 +17,7 @@
 					<thead>
 						<th></th>
 						<th class="n">#</th>
-						<th>Player name</th>
+						<th class="d-none d-md-table-cell">Player name</th>
 						<th>Character name</th>
 						<th></th>
 					</thead>
@@ -31,7 +31,7 @@
 								<img src="@/assets/_img/styles/player.svg" />
 							</td>
 							<td class="n">{{ index + 1 }}</td>
-							<td>{{ player.player_name }}</td>
+							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.character_name }}</td>
 							<td class="text-right actions">
 								<router-link class="mx-2" 

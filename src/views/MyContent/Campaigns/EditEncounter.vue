@@ -35,7 +35,7 @@
 			<!-- ADD PLAYERS AND NPC'S -->
 			<b-card header="Entiies">
 				<b-row>
-					<b-col>
+					<b-col md="6">
 						<div id="add" class="bg-gray">
 							<ul class="nav nav-tabs" id="myTab" role="tablist">
 								<li class="nav-item">
@@ -116,7 +116,7 @@
 						</div>
 					</b-col>
 					
-					<b-col>
+					<b-col sm="6">
 						<div id="added" class="bg-gray">
 							<ul class="entities" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
@@ -344,6 +344,9 @@
 					entity.ac = player_data[id].ac
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
+				this.$snotify.success('', 'Added', {
+					position: "centerTop"
+				});
 			},
 			remove(id, name) {
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();

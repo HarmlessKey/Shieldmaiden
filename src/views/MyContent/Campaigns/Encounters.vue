@@ -67,12 +67,12 @@
 
 			<table class="table">
 				<thead>
-					<th class="n">#</th>
+					<th class="n d-none d-md-table-cell">#</th>
 					<th>Encounter</th>
 					<th>Entities</th>
-					<th class="d-none d-md-table-cell ">Status</th>
-					<th class="d-none d-md-table-cell ">Round</th>
-					<th class="d-none d-md-table-cell ">Turn</th>
+					<th class="d-none d-md-table-cell">Status</th>
+					<th class="d-none d-md-table-cell">Round</th>
+					<th class="d-none d-md-table-cell">Turn</th>
 					<th></th>
 				</thead>
 				<tbody v-if="encounters"
@@ -81,7 +81,7 @@
 					enter-active-class="animated flash" 
 					leave-active-class="animated bounceOutLeft">
 					<tr v-for="(encounter, index) in _active" :key="encounter.key">
-						<td class="n">{{ index + 1 }}</td>
+						<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
 						<td>{{ encounter.encounter }}</td>
 						<td>
 							<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
@@ -93,12 +93,12 @@
 							</router-link>
 						</td>
 						<template v-if="encounter.round != 0">
-							<td class="red d-none d-md-table-cell ">In progress</td>
-							<td class="d-none d-md-table-cell ">{{ encounter.round }}</td>
-							<td class="d-none d-md-table-cell ">{{ encounter.turn + 1 }}</td>
+							<td class="red d-none d-md-table-cell">In progress</td>
+							<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
+							<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
 						</template>
 						<template v-else>
-							<td colspan="3" class="d-none d-md-table-cell ">Not started</td>
+							<td colspan="3" class="d-none d-md-table-cell">Not started</td>
 						</template>
 						<td class="text-right actions">
 							<router-link v-if="encounter.entities" class="green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter"><i class="fas fa-play-circle"></i></router-link>

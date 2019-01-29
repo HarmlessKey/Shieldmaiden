@@ -2,7 +2,7 @@
 	<div id="hasSide">
 		<Sidebar/>
 		
-		<div id="players" class="container" v-if="player || $route.name == 'AddPlayers'">
+		<div id="players" class="container-fluid" v-if="player || $route.name == 'AddPlayers'">
 			
 			<b-card header="Basic Info">
 				<b-row>
@@ -213,8 +213,8 @@
 </script>
 
 <style lang="scss" scoped>
-.container {
-	padding-top:20px;
+.container-fluid {
+	padding: 20px;
 
 	.btn {
 	margin-top:20px;

@@ -10,7 +10,7 @@
 			</li>
 			<li v-if="campaignId">
 				<i class="fas fa-chevron-right mr-2"></i>
-				<router-link v-if="$route.name == 'Encounters'" :to="'/encounters/' + campaignId">Encounters</router-link>
+				<router-link v-if="$route.name == 'EditEncounter' || $route.name == 'Encounters'" :to="'/encounters/' + campaignId">Encounters</router-link>
 				<span v-if="$route.name == 'Edit Campaign'">{{ $route.name }}</span>
 			</li>
 			<li v-if="encounterId">

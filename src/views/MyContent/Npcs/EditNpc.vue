@@ -2,7 +2,7 @@
 	<div id="hasSide">
 		<Sidebar/>
 		
-		<div id="npcs" class="container" v-if="npc || $route.name == 'AddNPC'">
+		<div id="npcs" class="container-fluid" v-if="npc || $route.name == 'AddNPC'">
 			
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
@@ -579,8 +579,8 @@
 </script>
 
 <style lang="scss" scoped>
-.container {
-	padding:20px;
+.container-fluid {
+	padding: 20px;
 
 	ul{
 		padding: 0;

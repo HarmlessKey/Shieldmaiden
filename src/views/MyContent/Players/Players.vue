@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="players" class="container">
+		<div id="players" class="container-fluid">
 			<h1>Your players</h1>
 			<p>These are the players that you can use in your campaigns.</p>
 
@@ -145,8 +145,8 @@
 </script>
 
 <style lang="css" scoped>
-	.container {
-		padding-top:20px;
+	.container-fluid {
+		padding: 20px;
 	}
 	.col {
 		margin:10px;

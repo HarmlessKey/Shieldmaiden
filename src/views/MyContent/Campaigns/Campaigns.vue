@@ -2,7 +2,7 @@
 	<div>
 		<div id="hasSide">
 			<Sidebar/>
-			<div id="my-content" class="container">
+			<div id="my-content" class="container-fluid">
 				<Crumble />
 				<h1>Campaigns</h1>
 				<p>Welcome to your campaigns overview.</p>
@@ -178,8 +178,8 @@
 </script>
 
 <style lang="scss" scoped>
-	.container {
-		padding-top:20px;
+	.container-fluid {
+		padding:20px;
 
 		a {
 			cursor:pointer;

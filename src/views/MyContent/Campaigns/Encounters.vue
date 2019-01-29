@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="my-content" class="container">
+		<div id="my-content" class="container-fluid">
 			<Crumble />
 
 			<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
@@ -261,8 +261,8 @@
 </script>
 
 <style lang="scss" scoped>
-.container {
-	padding-top: 20px;
+.container-fluid {
+	padding: 20px;
 }
 .loader {
 	margin-top: 20px;

@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="npcs" class="container">
+		<div id="npcs" class="container-fluid">
 			<h1>Your NPC's</h1>
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
@@ -138,8 +138,8 @@
 </script>
 
 <style lang="css" scoped>
-	.container {
-		padding-top:20px;
+	.container-fluid {
+		padding: 20px;
 	}
 	.col {
 		margin:10px;

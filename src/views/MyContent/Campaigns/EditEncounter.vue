@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide" v-if="encounter">
 		<Sidebar/>
-		<div class="container">
+		<div class="container-fluid">
 			<div class="info mb-4">
 				<Crumble />
 
@@ -33,7 +33,7 @@
 			</div>
 
 			<!-- ADD PLAYERS AND NPC'S -->
-			<b-card header="Entiies">
+			<b-card header="Entities">
 				<b-row>
 					<b-col md="6">
 						<div id="add" class="bg-gray">
@@ -120,6 +120,7 @@
 											<div class="d-flex justify-content-left">
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 												{{ npc.name }}
+												{{ npc.challenge_rating }}
 											</div>
 											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
 										</li>
@@ -144,8 +145,35 @@
 					</b-col>
 					
 					<b-col sm="6">
-						<div id="added" class="bg-gray">
-							<ul class="entities" v-if="encounter">
+						{{ setEntities(Object.keys(encounter.entities).length) }} <!-- Keeps track of changes in entities for watcher to execute function -->
+						<div id="added" class="bg-gray" v-if="encounter && encDifficulty">
+								<div class="diff d-flex justify-content-between">
+									<span>
+										Difficulty: 
+										<span class="text-capitalize" :class="{ 
+											'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
+											'orange':  encDifficulty[0] == 'hard', 
+											'yellow':  encDifficulty[0] == 'medium', 
+											'green':  encDifficulty[0] == 'easy'}">
+											{{ encDifficulty[0] }}
+										</span>
+									</span>
+									<a data-toggle="collapse" href="#info" role="button" aria-expanded="false"><i class="fas fa-caret-down"></i></a>
+								</div>
+								<div class="diff-info collapse" id="info">
+									{{ encDifficulty[1] }}
+									<template v-if="encDifficulty['easy']">
+										<p>
+											<b>Party XP tresholds</b><br/>
+											<span class="left">Easy:</span> <span :class="{ 'blue': encDifficulty[0] == 'easy'}">{{ encDifficulty['easy'] }}</span><br/>
+											<span class="left">Medium:</span> <span :class="{ 'blue': encDifficulty[0] == 'medium'}">{{ encDifficulty['medium'] }}</span><br/>
+											<span class="left">Hard:</span> <span :class="{ 'blue': encDifficulty[0] == 'hard'}">{{ encDifficulty['hard'] }}</span><br/>
+											<span class="left">Deadly:</span> <span :class="{ 'blue': encDifficulty[0] == 'deadly'}">{{ encDifficulty['deadly'] }}</span>
+										</p>
+										Total encounter XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+									</template>
+								</div>
+							<ul class="entities mt-4" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
 										<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
@@ -248,9 +276,11 @@
 	import firebase from 'firebase'
 	import axios from 'axios'
 	import { db } from '@/firebase'
+	import { difficulty } from '@/mixins/difficulty.js'
 
 	export default {
 		name: 'EditCampaign',
+		mixins: [difficulty],
 		metaInfo: {
 			title: 'Encounters'
 		},
@@ -270,6 +300,8 @@
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
 				searching: false,
+				encDifficulty: undefined,
+				entitiesAmount: 0,
 			} 
 		},
 		firebase() {
@@ -279,6 +311,10 @@
 					asObject: true
 				},
 				monsters: db.ref(`monsters`),
+				challenge: {
+					source: db.ref(`challenge`),
+					asObject: true,
+				},
 			}
 		},
 		computed: {
@@ -288,6 +324,13 @@
 				'players',
 				'npcs',
 			]),
+		},
+		watch: {
+			entitiesAmount(newVal, oldVal) {
+				if(newVal != oldVal) {
+					this.setDifficulty()
+				}
+			}
 		},
 		mounted() {
 			this.fetchEncounter({
@@ -372,12 +415,12 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {
-					this.$snotify.success('', 'Added', {
+					this.$snotify.success(entity.name, 'NPC added', {
 						position: "centerTop"
 					});
 				}
 			},
-			remove(id, name) {
+			remove(id) {
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
 			},
 			searchNPC() {
@@ -407,8 +450,6 @@
 				delete this.loot['.key'];
 				delete this.loot['.value'];
 
-				console.log(this.loot)
-
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).set(
 					this.loot
 				);
@@ -429,13 +470,19 @@
 				this.$delete(this.loot.items, index);
 				this.$forceUpdate(); //IMPORTANT
 			},
- 		}
+			setDifficulty() {
+				this.encDifficulty = this.difficulty(this.encounter.entities)
+			},
+			setEntities(n) {
+				this.entitiesAmount = n;
+			}
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.container {
-	padding-top:20px;
+.container-fluid {
+	padding: 20px;
 
 }
 ul.nav {
@@ -452,6 +499,18 @@ ul.nav {
 #added {
 	margin-top:33px;
 	padding:15px 10px;
+}
+
+.diff-info {
+	background: #302f2f;
+	padding: 10px;
+	margin-top: 10px;
+	display: block;
+
+	span.left {
+		width: 80px;
+		display: inline-block;
+	}
 }
 ul.entities {
 	list-style:none;

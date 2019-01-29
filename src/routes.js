@@ -1,6 +1,7 @@
 import Home from '@/views/Home.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
+import Updates from '@/views/Updates.vue';
 import SignIn from '@/views/SignIn.vue';
 import Settings from '@/views/Settings.vue';
 import Profile from '@/views/profile/Profile.vue';
@@ -36,6 +37,11 @@ export const routes = [{
 	path: '/documentation',
 	name: 'Documentation',
 	component: Documentation
+},
+{
+	path: '/updates',
+	name: 'Updates',
+	component: Updates
 },
 {
 	path: '/sign-in',
@@ -160,7 +166,7 @@ export const routes = [{
 },
 {
 	path: '/encounters/:campid/:encid',
-	name: 'Encounters',
+	name: 'EditEncounter',
 	component: EditEncounter,
 	meta: {
 		basePath: '/campaigns',

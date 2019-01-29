@@ -144,8 +144,8 @@
 						</div>
 					</b-col>
 					
+					{{ setEntities(Object.keys(encounter.entities).length) }} <!-- Keeps track of changes in entities for watcher to execute function -->
 					<b-col sm="6">
-						{{ setEntities(Object.keys(encounter.entities).length) }} <!-- Keeps track of changes in entities for watcher to execute function -->
 						<div id="added" class="bg-gray" v-if="encounter && encDifficulty">
 								<div class="diff d-flex justify-content-between">
 									<span>
@@ -311,10 +311,10 @@
 					asObject: true
 				},
 				monsters: db.ref(`monsters`),
-				challenge: {
-					source: db.ref(`challenge`),
-					asObject: true,
-				},
+				// challenge: {
+				// 	source: db.ref(`challenge`),
+				// 	asObject: true,
+				// },
 			}
 		},
 		computed: {
@@ -327,9 +327,8 @@
 		},
 		watch: {
 			entitiesAmount(newVal, oldVal) {
-				if(newVal != oldVal) {
+				console.log()
 					this.setDifficulty()
-				}
 			}
 		},
 		mounted() {

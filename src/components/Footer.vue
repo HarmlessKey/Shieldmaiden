@@ -29,7 +29,7 @@
 		<div class="bottom">
 			<div class="container">
 				<small class="d-flex justify-content-between mb-3">
-					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" href="http://game-icons.net">http://game-icons.net</a>.</span>
+					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" href="https://game-icons.net">https://game-icons.net</a>.</span>
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>

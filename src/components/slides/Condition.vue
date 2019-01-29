@@ -3,7 +3,7 @@
 		<h2>
 			<svg :title="cond['.key']" 
 				class="icon text" 
-				xmlns="http://www.w3.org/2000/svg"
+				xmlns="https://www.w3.org/2000/svg"
 				viewBox="0 0 512 512">
 					<path :d="cond.icon" fill-opacity="1"></path>
 			</svg>

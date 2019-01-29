@@ -120,9 +120,11 @@
 											<div class="d-flex justify-content-left">
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
 												{{ npc.name }}
-												{{ npc.challenge_rating }}
 											</div>
-											<a class="green" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+											<span>
+												CR: {{ npc.challenge_rating }}
+												<a class="green ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+											</span>
 										</li>
 									</ul>
 									<template v-if="npcs">
@@ -135,7 +137,10 @@
 													<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
 													{{ npc.name }}
 												</div>
-												<a class="green" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+												<span>
+													CR: {{ npc.challenge_rating }}
+													<a class="green ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+												</span>
 											</li>
 										</ul>
 									</template>
@@ -144,9 +149,11 @@
 						</div>
 					</b-col>
 					
-					{{ setEntities(Object.keys(encounter.entities).length) }} <!-- Keeps track of changes in entities for watcher to execute function -->
+					 <!-- Keeps track of changes in entities for watcher to execute function -->
+					 <!-- {{ setEntities(Object.keys(encounter.entities).length) }} -->
 					<b-col sm="6">
-						<div id="added" class="bg-gray" v-if="encounter && encDifficulty">
+						<div id="added" class="bg-gray" v-if="encounter">
+							<!-- <template v-if="encDifficulty">
 								<div class="diff d-flex justify-content-between">
 									<span>
 										Difficulty: 
@@ -160,7 +167,7 @@
 									</span>
 									<a data-toggle="collapse" href="#info" role="button" aria-expanded="false"><i class="fas fa-caret-down"></i></a>
 								</div>
-								<div class="diff-info collapse" id="info">
+								<div class="collapse diff-info" id="info">
 									{{ encDifficulty[1] }}
 									<template v-if="encDifficulty['easy']">
 										<p>
@@ -173,15 +180,16 @@
 										Total encounter XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
 									</template>
 								</div>
+							</template> -->
 							<ul class="entities mt-4" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
 										<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
 										
 										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-										<template v-else>
-											<span v-if="entity.npc == 'custom'" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-											<img v-else-if="entity.npc == 'api'" src="@/assets/_img/styles/monster.svg" class="img" />
+										<template v-else-if="entity.entityType == 'npc'">
+											<span v-if="entity.npc == 'custom' && npcs[entity.id].avatar != ''" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
 										</template>
 										{{ entity.name }}
 									</div>
@@ -310,11 +318,6 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
-				monsters: db.ref(`monsters`),
-				// challenge: {
-				// 	source: db.ref(`challenge`),
-				// 	asObject: true,
-				// },
 			}
 		},
 		computed: {

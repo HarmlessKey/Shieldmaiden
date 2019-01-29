@@ -1,12 +1,13 @@
 import { mapGetters } from 'vuex'
+import { db } from '@/firebase'
 
 export const difficulty = {
 
-	// firebase() {
-	// 	return {
-			
-	// 	}
-	// },
+	firebase() {
+		return {
+			monsters: db.ref(`monsters`),
+		}
+	},
 	data() {
 		return {
 			difficulties: [
@@ -144,7 +145,6 @@ export const difficulty = {
 						}
 						return error;
 					}
-
 					let type = entities[entity].npc
 					let rating = (type == 'custom') ? this.npcs[entities[entity].id].challenge_rating : this.monsters[entities[entity].id].challenge_rating ;
 

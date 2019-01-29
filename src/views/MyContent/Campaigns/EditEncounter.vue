@@ -47,6 +47,7 @@
 							</ul>
 							<div class="tab-content">
 								<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+									<h2>In Campaign</h2>
 									<a class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
 									<ul class="entities" v-if="campaign && players && encounter">
 										<li v-for="(player, key) in campaign.players" 
@@ -79,6 +80,32 @@
 										<p>Add players to your campaign first.</p>
 										<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
 									</div>
+									<h2>Not in Campaign</h2>
+									<ul class="entities">
+											<li v-for="(player, key) in players" 
+											:key="key" 
+											class="d-flex justify-content-between" v-if="Object.keys(campaign.players).indexOf(key) < 0">
+												<div class="d-flex justify-content-left">
+													<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+													{{ player.character_name }}
+												</div>
+											<template v-if="encounter.entities">
+												<a v-if="checkPlayer(key) < 0" class="green" 
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="add(key, 'player', player.character_name)">
+													<i class="fas fa-plus-circle"></i></a>
+												<span v-else class="green"><i class="fas fa-check"></i></span>
+												</a>
+											</template>	
+											<a v-else class="green" 
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="add(key, 'player', player.character_name)">
+													<i class="fas fa-plus-circle"></i>
+											</a>
+											</li>
+									</ul>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">
@@ -344,9 +371,11 @@
 					entity.ac = player_data[id].ac
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
-				this.$snotify.success('', 'Added', {
-					position: "centerTop"
-				});
+				if(type == 'npc') {
+					this.$snotify.success('', 'Added', {
+						position: "centerTop"
+					});
+				}
 			},
 			remove(id, name) {
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();

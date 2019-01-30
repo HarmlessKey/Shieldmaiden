@@ -7,17 +7,16 @@
 			<template v-if="current.actions">
 				<h2>Actions</h2>
 				<div v-for="action, index in current.actions">
-					<a class="d-flex justify-content-between" 
-						data-toggle="collapse" :href="'#act-'+index" 
-						role="button" 
-						aria-expanded="false"
-						v-if="action['damage_dice']">
-						<span>{{ action.name }}</span>
-						<span class="d-flex justify-content-end">
-							<a @click="roll(action)" class="mr-2"><i class="fas fa-dice-d20"></i></a>
-							<i class="fas fa-caret-down"></i>
-						</span>
-					</a>
+					<span class="d-flex justify-content-between" v-if="action['damage_dice']">
+						<a class="d-flex justify-content-between"
+							data-toggle="collapse" :href="'#act-'+index" 
+							role="button" 
+							aria-expanded="false">
+							<span>{{ action.name }}</span>
+							<span class="ml-2"><i class="fas fa-caret-down"></i></span>
+						</a>
+						<a @click="roll(action)" v-b-tooltip.hover :title="'Roll ' + action.name" class="ml-2"><i class="fas fa-dice-d20"></i></a>
+					</span>
 					<p class="collapse" :id="'act-'+index">{{ action.desc }}</p>
 				</div>
 			</template>

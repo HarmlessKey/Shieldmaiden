@@ -5,7 +5,6 @@ if [ $? -ne 0 ]; then
 fi
 npm run build
 if [ $? -ne 0 ]; then
-	echo ""
 	echo "> npm run build failed"
 	exit 1
 fi

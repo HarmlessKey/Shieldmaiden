@@ -184,12 +184,14 @@
 							<ul class="entities mt-4" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
-										<span v-if="entity.entityType == 'player'" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-										
+										<template v-if="entity.entityType == 'player'">
+											<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+											<img v-else src="@/assets/_img/styles/player.png" class="img" />
+										</template>
 										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
 										<template v-else-if="entity.entityType == 'npc'">
 											<span v-if="entity.npc == 'custom' && npcs[entity.id].avatar != ''" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-											<img v-else src="@/assets/_img/styles/monster.svg" class="img" />
+											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
 										{{ entity.name }}
 									</div>

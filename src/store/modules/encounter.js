@@ -118,7 +118,7 @@ const mutations = {
 			case (entity.entityType == 'player'):
 				let db_player = rootState.content.players[key]
 
-				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.svg');
+				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
 				
 				entity.ac = parseInt(db_player.ac)
 				entity.maxHp = parseInt(db_player.maxHp)
@@ -143,7 +143,7 @@ const mutations = {
 				}
 
 				if(!entity.avatar) {
-					entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.svg');
+					entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
 				}
 				else {
 					entity.img = entity.avatar;

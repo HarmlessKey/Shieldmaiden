@@ -90,11 +90,11 @@
 				let totalDamage = parseInt(total) + parseInt(action['damage_bonus']);
 
 				if(toHit.throws[0] == '20') {
-					toHit.totalDamage = '<span class="green">NATURAL 20</span>';
+					toHit.total = '<span class="green">NATURAL 20</span>';
 					crit = true;
 				}
 				else if(toHit.throws[0] == '1') {
-					toHit.totalDamage = '<span class="red">NATURAL 1</span>';
+					toHit.total = '<span class="red">NATURAL 1</span>';
 				}
 				else {
 					if(toHit.total >= this.target.ac) {
@@ -117,11 +117,17 @@
 					closeOnClick: false,
 					buttons: [
 						{ 
-							text: 'Apply', 
+							text: 'Hit', 
 							action: (toast) => { 
 								this.setHP(totalDamage, crit, this.target, this.current, 'damage')
 								this.$snotify.remove(toast.id); }, 
 								bold: false
+							},
+						{ 
+							text: 'Miss', 
+							action: (toast) => { 
+								this.$snotify.remove(toast.id); }, 
+								bold: true
 							},
 						{ 
 							text: 'Cancel', 

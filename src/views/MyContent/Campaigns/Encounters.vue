@@ -124,7 +124,8 @@
 							<td>{{ index + 1 }}</td>
 							<td>{{ encounter.encounter }}</td>
 							<td class="text-right">
-								<a v-b-tooltip.hover title="Delete" class="red" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+								<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
+								<a v-b-tooltip.hover title="Delete" class="red ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
 					</tbody>
@@ -255,7 +256,35 @@
 						bold: false },
 					]
 				});
-			}
+			},
+			reset(id) {
+				for(let key in this.encounters[id].entities) {
+					let entity = this.encounters[id].entities[key]
+
+					//Remove values
+					delete entity.tempHp
+					delete entity.transformed
+					delete entity.stabilized
+					delete entity.down
+					delete entity.ac_bonuc
+					delete entity.meters
+
+					entity.curHp = entity.maxHp
+					entity.initiative = 0
+
+					// console.log(this.encounters[id].entities[key])
+
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(
+						entity
+					)
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0)
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0)
+
+					//CLEAR LOG
+					localStorage.removeItem(id);
+				}
+			},
 		}
 	}
 </script>

@@ -3,17 +3,6 @@
 	<h2>Planned updates</h2>
 	<ul class="updates">
 		<li>
-			<a data-toggle="collapse" href="#reset" 
-				role="button" aria-expanded="false"
-				class="d-flex justify-content-between">
-				Reset an encounter
-				<span><i class="fas fa-caret-down"></i></span>
-			</a>
-			<div class="collapse desc bg-gray-darker" id="reset">
-				We will make it possible to reset an encounter that was finished.
-			</div>
-		</li>
-		<li>
 			<a data-toggle="collapse" href="#difficulty" 
 				role="button" aria-expanded="false"
 				class="d-flex justify-content-between">

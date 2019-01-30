@@ -9,8 +9,8 @@
 				<b-col sm="">
 					<h2 class="gray-light">Quick Links</h2>
 					<ul>
-						<!-- <li><router-link to="/updates">Updates</router-link></li> -->
 						<li><router-link to="/planned">Planned</router-link></li>
+						<li><router-link to="/updates">Updates</router-link></li>
 						<li><router-link to="/documentation">Documentation</router-link></li>
 						<!-- <li><router-link to="/about-us">About us</router-link></li> -->
 					</ul>

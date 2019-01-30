@@ -2,6 +2,7 @@ import Home from '@/views/Home.vue';
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
+import Planned from '@/views/Planned.vue';
 import Updates from '@/views/Updates.vue';
 import SignIn from '@/views/SignIn.vue';
 import Settings from '@/views/Settings.vue';
@@ -48,6 +49,11 @@ export const routes = [{
 	path: '/updates',
 	name: 'Updates',
 	component: Updates
+},
+{
+	path: '/planned',
+	name: 'Planned',
+	component: Planned
 },
 {
 	path: '/sign-in',

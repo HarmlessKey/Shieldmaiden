@@ -286,6 +286,8 @@
 	background-position: center top;
 	border: solid 1px #b2b2b2;
 	margin:6px 10px 0 4px;
+
+	background-color: #000;
 }
 .name {
 	white-space: nowrap;

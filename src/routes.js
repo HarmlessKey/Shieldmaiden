@@ -1,4 +1,5 @@
 import Home from '@/views/Home.vue';
+import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
 import Updates from '@/views/Updates.vue';
@@ -27,6 +28,11 @@ export const routes = [{
 	path: '',
 	name: 'home',
 	component: Home
+},
+{
+	path: '/sitemap',
+	name: 'Sitemap',
+	component: Sitemap
 },
 {
 	path: '/privacy-policy',

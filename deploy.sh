@@ -36,4 +36,4 @@ if [ $? -ne 0 ]; then
 	printf "\n${RED}>> DEPLOY TO SERVER FAILED!${NC}\n"
 	exit 1
 fi
-printf "\n${GREEN}> DEPLOY TO SERVER${NC}\n"
+printf "\n${GREEN}> DEPLOYED TO SERVER${NC}\n"

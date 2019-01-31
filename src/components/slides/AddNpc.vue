@@ -95,9 +95,9 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="npc in searchResults" class="d-flex justify-content-between">
 						{{ npc.name }}
-						<a class="btn btn-sm" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], 'api')">
-							<span class="d-none d-md-inline mr-1">Copy</span>
-							<i class="fas fa-copy"></i>
+						<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], 'api')">
+							<i class="fas fa-copy blue"></i>
+							<span class="d-none d-md-inline ml-1">Copy</span>
 						</a>
 					</li>
 				</ul>
@@ -113,9 +113,9 @@
 								<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
 								{{ npc.name }}
 							</div>
-							<a class="btn btn-sm" v-b-tooltip.hover title="Copy NPC" @click="set(key, 'custom')">
-								<span class="d-none d-md-inline mr-1">Copy</span>
-								<i class="fas fa-copy"></i>
+							<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(key, 'custom')">
+								<i class="fas fa-copy blue"></i>
+								<span class="d-none d-md-inline ml-1">Copy</span>
 							</a>
 						</li>
 					</ul>

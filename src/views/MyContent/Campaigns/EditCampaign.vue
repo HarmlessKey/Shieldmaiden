@@ -36,25 +36,25 @@
 							</div>
 							<template v-if="campaign.players">
 								<a v-if="checkPlayer(key) < 0" 
-								class="btn btn-sm bg-green"
+								class="gray-hover"
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
-									<span class="d-none d-md-inline mr-1">Add</span>
-									<i class="fas fa-plus"></i>
+									<i class="fas fa-plus green"></i>
+									<span class="d-none d-md-inline ml-1">Add</span>
 								</a>
 								<span v-else>
-									<small><span class="d-none d-md-inline mr-1 gray-hover">Added</span></small>
 									<i class="fas fa-check green"></i>
+									<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
 								</span>
 							</a>
 							</template>	
-							<a v-else class="btn btn-sm bg-green" 
+							<a v-else class="gray-hover" 
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
-									<span class="d-none d-md-inline mr-1">Add</span>
-									<i class="fas fa-plus"></i>
+									<i class="fas fa-plus green"></i>
+									<span class="d-none d-md-inline ml-1">Add</span>
 							</a>
 						</li>
 					</ul>
@@ -71,9 +71,9 @@
 									{{ players[key].character_name }}
 								</div>
 								
-								<a class="btn btn-sm bg-red" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
-									<span class="d-none d-md-inline mr-1">Remove</span>
-									<i class="fas fa-minus"></i>
+								<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
+									<i class="fas fa-minus red"></i>
+									<span class="d-none d-md-inline ml-1">Remove</span>
 								</a>
 							</li>
 						</ul>
@@ -200,9 +200,6 @@
 		border: solid 1px #b2b2b2;
 		background-color: #000;
 		margin-right: 10px;
-	}
-	ul.entities li a {
-		font-size:18px;
 	}
 	.monster {
 		padding:15px;

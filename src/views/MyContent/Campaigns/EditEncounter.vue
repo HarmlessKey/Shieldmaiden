@@ -58,24 +58,24 @@
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="btn btn-sm bg-green" 
+												<a v-if="checkPlayer(key) < 0" class="gray-hover" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', players[key].character_name)">
-													<span class="d-none d-md-inline mr-1">Add</span>
-													<i class="fas fa-plus"></i>
+													<i class="fas fa-plus green"></i>
+													<span class="d-none d-md-inline ml-1">Add</span>
 												</a>
 												<span v-else>
-													<small class="d-none d-md-inline mr-1">Added</small>
 													<i class="fas fa-check green"></i>
+													<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
 												</span>
 											</template>	
-											<a v-else class="btn btn-sm bg-green" 
+											<a v-else class="gray-hover" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', players[key].character_name)">
-												<span class="d-none d-md-inline mr-1">Add</span>
-												<i class="fas fa-plus"></i>
+												<i class="fas fa-plus green"></i>
+												<span class="d-none d-md-inline ml-1">Add</span>
 											</a>
 										</li>
 									</ul>
@@ -95,25 +95,25 @@
 													{{ player.character_name }}
 												</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="btn btn-sm bg-green" 
+												<a v-if="checkPlayer(key) < 0" class="gray-hover" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', player.character_name)">
-													<span class="d-none d-md-inline mr-1">Add</span>
-													<i class="fas fa-plus"></i>
+													<i class="fas fa-plus green"></i>
+													<span class="d-none d-md-inline ml-1">Add</span>
 												</a>
 													<span v-else>
-														<small class="d-none d-md-inline mr-1">Added</small>
 														<i class="fas fa-check green"></i>
+														<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
 													</span>
 												</a>
 											</template>	
-											<a v-else class="btn btn-sm bg-green" 
+											<a v-else class="gray-hover" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', player.character_name)">
-													<span class="d-none d-md-inline mr-1">Add</span>
-													<i class="fas fa-plus"></i>
+													<i class="fas fa-plus green"></i>
+													<span class="d-none d-md-inline ml-1">Add</span>
 											</a>
 											</li>
 									</ul>
@@ -136,9 +136,9 @@
 											</div>
 											<span>
 												CR: {{ npc.challenge_rating }}
-												<a class="btn btn-sm bg-green ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)">
-													<span class="d-none d-md-inline mr-1">Add</span>
-													<i class="fas fa-plus"></i>
+												<a class="gray-hover ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)">
+													<i class="fas fa-plus green"></i>
+													<span class="d-none d-md-inline ml-1">Add</span>
 												</a>
 											</span>
 										</li>
@@ -155,9 +155,9 @@
 												</div>
 												<span>
 													CR: {{ npc.challenge_rating }}
-													<a class="btn btn-sm bg-green ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)">
-														<span class="d-none d-md-inline mr-1">Add</span>
-														<i class="fas fa-plus"></i>
+													<a class="gray-hover ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)">
+														<i class="fas fa-plus green"></i>
+														<span class="d-none d-md-inline ml-1">Add</span>
 													</a>
 												</span>
 											</li>
@@ -215,13 +215,13 @@
 										{{ entity.name }}
 									</div>
 									<span>
-										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="btn btn-sm mr-2" v-b-tooltip.hover title="Edit">
-											<span class="d-none d-md-inline mr-1">Edit</span>
-											<i class="fas fa-hammer-war"></i>
+										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+											<i class="fas fa-hammer-war blue"></i>
+											<span class="d-none d-md-inline ml-1">Edit</span>
 										</a>
-										<a class="btn btn-sm bg-red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
-											<span class="d-none d-md-inline mr-1">Remove</span>
-											<i class="fas fa-minus"></i>
+										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
+											<i class="fas fa-minus red"></i>
+											<span class="d-none d-md-inline ml-1">Remove</span>
 										</a>
 									</span>
 								</li>
@@ -255,9 +255,9 @@
 
 					<h2 class="d-flex justify-content-between">
 						Items
-						<a class="btn btn-sm bg-green" @click="addItem()">
-							<span class="d-none d-md-inline mr-1">Add</span>
-							<i class="fas fa-plus"></i>
+						<a class="gray-hover" @click="addItem()">
+							<i class="fas fa-plus green"></i>
+							<span class="d-none d-md-inline ml-1">Add</span>
 						</a>
 					</h2>
 					<hr>
@@ -265,10 +265,10 @@
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ item.name }}
 							<a @click="removeItem(index)" 
-								class="btn btn-sm bg-red"
+								class="gray-hover"
 								v-b-tooltip.hover title="Remove">
-								<span class="d-none d-md-inline mr-1">Remove</span>
-								<i class="fas fa-minus"></i>
+								<i class="fas fa-minus red"></i>
+								<span class="d-none d-md-inline ml-1">Remove</span>
 							</a>
 						</h2>
 						<b-row class="mb-2">
@@ -563,9 +563,6 @@ ul.entities .img {
 	background-color: #000;
 	margin-right: 10px;
 }
-ul.entities li a {
-	font-size:18px;
-}
 .npc {
 	padding: 15px;
 	position: fixed;
@@ -583,6 +580,13 @@ ul.entities li a {
 
 	img {
 		width: 100%;
+	}
+}
+.loot {
+	h2 {
+		a {
+			font-size: 15px;
+		}
 	}
 }
 .faded {

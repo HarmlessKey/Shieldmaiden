@@ -4,9 +4,9 @@
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
-				<a @click="addNpc()" class="btn btn-sm bg-green" v-b-tooltip.hover title="Add NPC">
-					<span class="d-none d-md-inline mr-1">Add</span>
-					<i class="fas fa-plus"></i>
+				<a @click="addNpc()" class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
+					<i class="fas fa-plus green"></i>
+					<span class="d-none d-md-inline ml-1">Add</span>
 				</a>
 			</h2>
 			<div class="scroll" v-bar>

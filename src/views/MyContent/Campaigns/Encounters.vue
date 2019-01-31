@@ -101,21 +101,21 @@
 							<td colspan="3" class="d-none d-md-table-cell">Not started</td>
 						</template>
 						<td class="text-right actions">
-							<router-link v-if="encounter.entities" class="btn btn-sm bg-green" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-								<span class="d-none d-md-inline mr-1">Play</span>
-								<i class="fas fa-play"></i>
+							<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+								<i class="fas fa-play green"></i>
+								<span class="d-none d-md-inline ml-1">Play</span>
 							</router-link>
-							<span v-else class="disabled btn btn-sm bg-gray-hover">
-								<span class="d-none d-md-inline mr-1">Play</span>
+							<span v-else class="disabled gray-hover">
 								<i class="fas fa-play"></i>
+								<span class="d-none d-md-inline ml-1">Play</span>
 							</span>
-							<router-link class="mx-2 btn btn-sm" :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-								<span class="d-none d-md-inline mr-1">Edit</span>
-								<i class="fas fa-hammer-war"></i>
+							<router-link class="mx-3 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-hammer-war blue"></i>
+								<span class="d-none d-md-inline ml-1">Edit</span>
 							</router-link>
-							<a v-b-tooltip.hover title="Delete" class="btn btn-sm bg-red" @click="deleteEncounter(encounter.key, encounter.encounter)">
-								<span class="d-none d-md-inline mr-1">Delete</span>
-								<i class="fas fa-trash-alt"></i>
+							<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
+								<i class="fas fa-trash-alt red"></i>
+								<span class="d-none d-md-inline ml-1">Delete</span>
 							</a>
 						</td>
 					</tr>
@@ -302,6 +302,19 @@
 </script>
 
 <style lang="scss" scoped>
+table {
+	tr {
+		td.actions {
+			a {
+				color: #494747 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
+	}
+}
 .container-fluid {
 	padding: 20px;
 }

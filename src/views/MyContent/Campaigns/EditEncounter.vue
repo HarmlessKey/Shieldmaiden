@@ -277,7 +277,6 @@
 								<b-form-input
 									id="name"
 									type="text" 
-									class="form-control" 
 									v-model="item.name" 
 									name="name" 
 									placeholder="Name"></b-form-input>
@@ -288,13 +287,13 @@
 								<label for="desc">Description</label>
 							</b-col>
 							<b-col sm="10">
-								<b-form-textarea
+								<textarea
 									id="desc"
 									class="form-control" 
 									v-model="item.desc" 
 									rows="4"
 									name="desc" 
-									placeholder="Description"></b-form-textarea>
+									placeholder="Description"></textarea>
 							</b-col>
 						</b-row>
 					</div>

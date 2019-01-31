@@ -277,7 +277,7 @@
 				<div class="card-header d-flex justify-content-between">
 					{{ action.name }}
 					<a 
-					class="gray-hover" 
+					class="gray-hover text-capitalize" 
 					v-b-tooltip.hover title="Add Skill" 
 					@click="add(action.type)">
 						<i class="fas fa-plus green"></i>
@@ -289,7 +289,7 @@
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ ability.name }}
 							<a @click="remove(index, action.type)" 
-								class="gray-hover"
+								class="gray-hover text-capitalize"
 								v-b-tooltip.hover title="Remove">
 								<i class="fas fa-minus red"></i>
 								<span class="d-none d-md-inline ml-1">Remove</span>
@@ -361,13 +361,13 @@
 								<label for="desc">Description</label>
 							</b-col>
 							<b-col sm="10">
-								<b-form-textarea
+								<textarea
 									id="desc"
 									class="form-control" 
 									v-model="ability.desc" 
 									rows="4"
 									name="desc" 
-									placeholder="Description"></b-form-textarea>
+									placeholder="Description"></textarea>
 							</b-col>
 						</b-row>
 						<hr>

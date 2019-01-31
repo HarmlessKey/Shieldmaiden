@@ -25,11 +25,6 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-printf "> Committing to git\n"
-git commit -am "DEPLOY AUTO COMMIT"
-printf "> Pushing to ${BRANCH}\n"
-git push
-
 printf "\n${YELLOW}> DEPLOYING TO ${REMOTE_IP}${NC}\n"
 scp -r ${LOCAL_PATH} ${USER}@${REMOTE_IP}:${REMOTE_PATH}
 if [ $? -ne 0 ]; then

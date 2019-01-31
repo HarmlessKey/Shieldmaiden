@@ -1,7 +1,10 @@
 <template>
 <div class="container">
 	<h2>Updates</h2>
-	<ul class="updates">
+	<p>Check our latest updates on Trello.</p>
+	<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
+
+	<!-- <ul class="updates">
 		<li v-for="update, index in updates" :key="index">
 			<span class="date gray-hover">{{ makeDate(update['.key']) }}</span>
 			<a data-toggle="collapse" :href="'#upd-'+update['.key'].toString()" 
@@ -15,7 +18,7 @@
 			</div>
 		</li>
 		
-	</ul>
+	</ul> -->
 </div>
 </template>
 

@@ -6,33 +6,47 @@
 			
 			<template v-if="current.actions">
 				<h2>Actions</h2>
-				<div v-for="action, index in current.actions">
-					<a class="d-flex justify-content-between" 
-						data-toggle="collapse" :href="'#act-'+index" 
-						role="button" 
-						aria-expanded="false"
-						v-if="action['damage_dice']">
-						<span>{{ action.name }}</span>
-						<span class="d-flex justify-content-end">
-							<a @click="roll(action)" class="mr-2"><i class="fas fa-dice-d20"></i></a>
-							<i class="fas fa-caret-down"></i>
+				<ul class="roll">
+					<li v-for="action, index in current.actions" v-if="action['damage_dice']" class="bg-gray-active">
+						<span class="d-flex justify-content-between">
+							<a class="d-flex justify-content-between gray-light"
+								data-toggle="collapse" :href="'#act-'+index" 
+								role="button" 
+								aria-expanded="false">
+								<span>{{ action.name }}</span>
+								<i class="fas fa-caret-down"></i>
+							</a>
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
+								<span class="d-none d-md-inline mr-1">Roll</span>
+								<i class="fas fa-dice-d20"></i>
+							</button>
 						</span>
-					</a>
-					<p class="collapse" :id="'act-'+index">{{ action.desc }}</p>
-				</div>
+						<p class="collapse py-2 pr-1" :id="'act-'+index">{{ action.desc }}</p>
+					</li>
+				</ul>
 			</template>
 			<template v-if="current.legendary_actions">
 				<h2>Legendary Actions</h2>
-				<div v-for="action, index in current.legendary_actions">
-					<a class="d-flex justify-content-between" 
-						data-toggle="collapse" 
-						:href="'#leg-'+index" role="button" 
-						aria-expanded="false">
-						<span>{{ index + 1 }}. {{ action.name }}</span>
-						<i class="fas fa-caret-down"></i>
-					</a>
-					<p class="collapse" :id="'leg-'+index">{{ action.desc }}</p>
-				</div>
+
+				<ul class="roll">
+					<li v-for="action, index in current.legendary_actions" v-if="action['damage_dice']" class="bg-gray-active">
+						<span class="d-flex justify-content-between">
+							<a class="d-flex justify-content-between gray-light"
+								data-toggle="collapse" 
+								:href="'#leg-'+index" role="button" 
+								aria-expanded="false">
+								<span>{{ action.name }}</span>
+								<i class="fas fa-caret-down"></i>
+							</a>
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
+								<span class="d-none d-md-inline mr-1">Roll</span>
+								<i class="fas fa-dice-d20"></i>
+							</button>
+						</span>
+						<p class="collapse py-2 pr-1" :id="'leg-'+index">{{ action.desc }}</p>
+					</li>
+				</ul>
+
 			</template>
 		</template>
 		<p v-else>Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
@@ -146,6 +160,29 @@
 	.select {
 		h2 {
 			margin-bottom: 5px !important;
+		}
+	}
+	ul.roll {
+		margin-bottom: 30px;
+		padding: 0;
+		list-style: none;
+
+		li {
+			padding-left: 5px;
+			margin-bottom: 2px;
+
+			a {
+				width: 100%;
+				padding: 5px;
+
+				&:hover {
+					text-decoration: none;
+				}
+
+				i {
+					margin-top: 3px;
+				}
+			}
 		}
 	}
 </style>

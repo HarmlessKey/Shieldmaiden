@@ -32,15 +32,18 @@
 							<td class="n">{{ index + 1 }}</td>
 							<td>{{ npc.name }}</td>
 							<td class="text-right actions">
-								<router-link class="mx-2" 
+								<router-link class="btn btn-sm mx-2" 
 									:to="'/npcs/' + npc.key" 
-									v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i>
+									v-b-tooltip.hover title="Edit">
+									<span class="d-none d-md-inline mr-1">Edit</span>
+									<i class="fas fa-hammer-war"></i>
 								</router-link>
 								<a v-b-tooltip.hover 
 									title="Delete" 
-									class="red"
+									class="btn btn-sm bg-red"
 									@click="confirmDelete(npc.key, npc.name)">
-										<i class="fas fa-trash-alt"></i>
+									<span class="d-none d-md-inline mr-1">Delete</span>
+									<i class="fas fa-trash-alt"></i>
 								</a>
 							</td>
 						</tr>

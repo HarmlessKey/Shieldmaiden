@@ -10,6 +10,7 @@
 					aria-controls="log" 
 					aria-selected="true">
 					<i class="fas fa-scroll-old"></i>
+					<span class="d-none d-md-inline ml-1">Log</span>
 				</a>
 			</li>
 			<li class="nav-item">
@@ -21,6 +22,7 @@
 					aria-controls="damage" 
 					aria-selected="false">
 					<i class="fas fa-swords"></i>
+					<span class="d-none d-md-inline ml-1">Meters</span>
 				</a>
 			</li>
 		</ul>

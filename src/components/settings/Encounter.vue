@@ -13,12 +13,24 @@
 
 					<div>
 						<div v-show="settings.automate === false">
-							<span v-b-tooltip.hover title="Not Automated" class="red mr-2"><i class="fas fa-times"></i></span>
-							<a v-b-tooltip.hover title="Automate" @click="set('unset', 'automate')" class="gray-light"><i class="fas fa-check"></i></a>
+							<span v-b-tooltip.hover title="Not Automated" class="red mr-2">
+								<span class="d-none d-md-inline mr-1">Not Automated</span>
+								<i class="fas fa-times"></i>
+							</span>
+							<a v-b-tooltip.hover title="Automate" @click="set('unset', 'automate')" class="btn btn-sm bg-gray">
+								<span class="d-none d-md-inline mr-1">Automate</span>
+								<i class="fas fa-check"></i>
+							</a>
 						</div>
 						<div v-show="settings.automate === undefined">
-							<a v-b-tooltip.hover title="Don't Automate" @click="set('set', 'automate', false)" class="gray-light mr-2"><i class="fas fa-times"></i></a>
-							<span v-b-tooltip.hover title="Automated" class="green"><i class="fas fa-check"></i></span>
+							<a v-b-tooltip.hover title="Don't Automate" @click="set('set', 'automate', false)" class="btn btn-sm bg-gray mr-2">
+								<span class="d-none d-md-inline mr-1">Don't Automate</span>
+								<i class="fas fa-times"></i>
+							</a>
+							<span v-b-tooltip.hover title="Automated" class="green">
+								<span class="d-none d-md-inline mr-1">Automated</span>
+								<i class="fas fa-check"></i>
+							</span>
 						</div>
 					</div>
 				</li>
@@ -39,12 +51,24 @@
 
 					<div>
 						<div v-show="!settings.background">
-							<span v-b-tooltip.hover title="Hidden" class="red mr-2"><i class="fas fa-eye-slash"></i></span>
-							<a v-b-tooltip.hover title="Show" @click="set('set', 'background', true)" class="gray-light"><i class="fas fa-eye"></i></a>
+							<span v-b-tooltip.hover title="Hidden" class="red mr-2">
+								<span class="d-none d-md-inline mr-1">Hidden</span>
+								<i class="fas fa-eye-slash"></i>
+							</span>
+							<a v-b-tooltip.hover title="Show" @click="set('set', 'background', true)" class="btn btn-sm bg-gray">
+								<span class="d-none d-md-inline mr-1">Show</span>
+								<i class="fas fa-eye"></i>
+							</a>
 						</div>
 						<div v-show="settings.background == true">
-							<a v-b-tooltip.hover title="Hide" @click="set('unset', 'background')" class="gray-light mr-2"><i class="fas fa-eye-slash"></i></a>
-							<span v-b-tooltip.hover title="Shown" class="green"><i class="fas fa-eye"></i></span>
+							<a v-b-tooltip.hover title="Hide" @click="set('unset', 'background')" class="btn btn-sm bg-gray mr-2">
+								<span class="d-none d-md-inline mr-1">Hide</span>
+								<i class="fas fa-eye-slash"></i>
+							</a>
+							<span v-b-tooltip.hover title="Shown" class="green">
+								<span class="d-none d-md-inline mr-1">Shown</span>
+								<i class="fas fa-eye"></i>
+							</span>
 						</div>
 					</div>
 				</li>
@@ -99,6 +123,10 @@
 			font-size: 13px;
 			padding: 15px 5px;
 			border-bottom: solid 1px #302f2f;
+
+			.btn {
+				color: #b2b2b2 !important;
+			}
 		}
 	}
 </style>

@@ -24,9 +24,10 @@
 								<i class="fas fa-info-circle"></i></a>
 							{{ npc.name }}
 						</div>
-						<a class="" 
+						<a class="btn btn-sm" 
 							v-b-tooltip.hover title="Copy NPC" 
 							@click="copy(npc)">
+							<span class="d-none d-md-inline mr-1">Copy</span>
 							<i class="fas fa-copy"></i>
 						</a>
 					</li>
@@ -277,10 +278,11 @@
 				<div class="card-header d-flex justify-content-between">
 					{{ action.name }}
 					<a 
-					class="green" 
+					class="btn btn-sm bg-green" 
 					v-b-tooltip.hover title="Add Skill" 
 					@click="add(action.type)">
-						<i class="fas fa-plus-circle"></i>
+						<span class="d-none d-md-inline mr-1">Add</span>
+						<i class="fas fa-plus"></i>
 					</a>
 				</div>
 				<div class="card-body">
@@ -288,8 +290,9 @@
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ ability.name }}
 							<a @click="remove(index, action.type)" 
-								class="red"
+								class="btn btn-sm bg-red"
 								v-b-tooltip.hover title="Remove">
+								<span class="d-none d-md-inline mr-1">Remove</span>
 								<i class="fas fa-minus-circle"></i>
 							</a>
 						</h2>
@@ -584,6 +587,12 @@
 
 	ul{
 		padding: 0;
+
+		&.entities {
+			li {
+				margin-bottom: 3px;
+			}
+		}
 	}
 	a.tab {
 		display: inline-block;

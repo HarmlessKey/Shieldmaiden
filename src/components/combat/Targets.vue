@@ -4,7 +4,10 @@
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
-				<a @click="addNpc()" class="green" v-b-tooltip.hover title="Add NPC"><i class="fas fa-plus-circle"></i></a>
+				<a @click="addNpc()" class="btn btn-sm bg-green" v-b-tooltip.hover title="Add NPC">
+					<span class="d-none d-md-inline mr-1">Add</span>
+					<i class="fas fa-plus"></i>
+				</a>
 			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">

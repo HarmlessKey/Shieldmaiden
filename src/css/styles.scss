@@ -100,8 +100,11 @@ html body {
 .yellow { color: $yellow !important; }
 
 .bg-gray { background-color: $gray !important; }
+.bg-gray-light { background-color: $gray-light !important; }
 .bg-gray-darker { background-color: $gray-darker !important; }
 .bg-gray-dark { background-color: $gray-dark !important; }
+.bg-gray-hover { background-color: $gray-hover !important; }
+.bg-gray-active { background-color: $gray-active !important; }
 .bg-black { background-color: $black !important; }
 .bg-green { background-color: $green !important; }
 .bg-blue { background-color: $blue !important; }
@@ -166,7 +169,7 @@ html body {
 
 /* 4. Buttons and Links */
 /*********************************************/
-button {
+button, a {
 	&.bg-green:hover { background-color:$green-hover !important; }
 	&.bg-red:hover { background-color:$red-hover !important; }
 }
@@ -328,6 +331,15 @@ table {
 	}
 	&:hover {
 		background-color: $blue-hover;
+	}
+	&.btn-sm {
+		font-size: 12px !important;
+		// line-height: 22px;
+	}
+}
+button {
+	&:focus {
+		box-shadow: none;
 	}
 }
 a {

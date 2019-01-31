@@ -23,7 +23,7 @@
 			</select> -->
 
 			<div class="manual">
-				<input type="number" 
+				<input type="text" 
 					v-model="manualAmount" 
 					v-validate="'numeric'" 
 					name="Manual Input" 
@@ -32,15 +32,18 @@
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual(target, 'damage')">
-					<i class="fas fa-minus-square"></i>
+					Attack
+					<img src="@/assets/_img/styles/sword-break.png" />
 				</button>
 				<button class="btn heal bg-green" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual(target, 'healing')">
-					<i class="fas fa-plus-square"></i>
+					Heal
+					<img src="@/assets/_img/styles/heal.png" />
 				</button>
 			</div>
 			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+			<h2 class="mt-2 text-center">{{ manualAmount }}</h2>
 		</template>
 	</div>
 </template>
@@ -120,6 +123,16 @@
 	}
 	.dmg {
 		grid-area: btn-dmg;
+	}
+	.dmg, .heal {
+		position: relative;
+		padding: 5px 35px 5px 5px;
+
+		img {
+			position: absolute;
+			height: 25px;
+			right: 5px;
+		}
 	}
 }
 </style>

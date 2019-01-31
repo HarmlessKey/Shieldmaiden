@@ -58,19 +58,24 @@
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="green" 
+												<a v-if="checkPlayer(key) < 0" class="btn btn-sm bg-green" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', players[key].character_name)">
-													<i class="fas fa-plus-circle"></i></a>
-												<span v-else class="green"><i class="fas fa-check"></i></span>
+													<span class="d-none d-md-inline mr-1">Add</span>
+													<i class="fas fa-plus"></i>
 												</a>
+												<span v-else>
+													<small class="d-none d-md-inline mr-1">Added</small>
+													<i class="fas fa-check green"></i>
+												</span>
 											</template>	
-											<a v-else class="green" 
+											<a v-else class="btn btn-sm bg-green" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', players[key].character_name)">
-													<i class="fas fa-plus-circle"></i>
+												<span class="d-none d-md-inline mr-1">Add</span>
+												<i class="fas fa-plus"></i>
 											</a>
 										</li>
 									</ul>
@@ -90,19 +95,25 @@
 													{{ player.character_name }}
 												</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="green" 
+												<a v-if="checkPlayer(key) < 0" class="btn btn-sm bg-green" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', player.character_name)">
-													<i class="fas fa-plus-circle"></i></a>
-												<span v-else class="green"><i class="fas fa-check"></i></span>
+													<span class="d-none d-md-inline mr-1">Add</span>
+													<i class="fas fa-plus"></i>
+												</a>
+													<span v-else>
+														<small class="d-none d-md-inline mr-1">Added</small>
+														<i class="fas fa-check green"></i>
+													</span>
 												</a>
 											</template>	
-											<a v-else class="green" 
+											<a v-else class="btn btn-sm bg-green" 
 												v-b-tooltip.hover 
 												title="Add Character" 
 												@click="add(key, 'player', player.character_name)">
-													<i class="fas fa-plus-circle"></i>
+													<span class="d-none d-md-inline mr-1">Add</span>
+													<i class="fas fa-plus"></i>
 											</a>
 											</li>
 									</ul>
@@ -118,12 +129,17 @@
 										<p v-if="noResult" class="red">{{ noResult }}</p>
 										<li v-for="npc in searchResults" class="d-flex justify-content-between">
 											<div class="d-flex justify-content-left">
-												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info"><i class="fas fa-info-circle"></i></a>
+												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
+													<i class="fas fa-info-circle"></i>
+												</a>
 												{{ npc.name }}
 											</div>
 											<span>
 												CR: {{ npc.challenge_rating }}
-												<a class="green ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)"><i class="fas fa-plus-circle"></i></a>
+												<a class="btn btn-sm bg-green ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)">
+													<span class="d-none d-md-inline mr-1">Add</span>
+													<i class="fas fa-plus"></i>
+												</a>
 											</span>
 										</li>
 									</ul>
@@ -139,7 +155,10 @@
 												</div>
 												<span>
 													CR: {{ npc.challenge_rating }}
-													<a class="green ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)"><i class="fas fa-plus-circle"></i></a>
+													<a class="btn btn-sm bg-green ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)">
+														<span class="d-none d-md-inline mr-1">Add</span>
+														<i class="fas fa-plus"></i>
+													</a>
 												</span>
 											</li>
 										</ul>
@@ -196,8 +215,14 @@
 										{{ entity.name }}
 									</div>
 									<span>
-										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2" v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i></a>
-										<a class="red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)"><i class="fas fa-minus-circle"></i></a>
+										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="btn btn-sm mr-2" v-b-tooltip.hover title="Edit">
+											<span class="d-none d-md-inline mr-1">Edit</span>
+											<i class="fas fa-hammer-war"></i>
+										</a>
+										<a class="btn btn-sm bg-red" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
+											<span class="d-none d-md-inline mr-1">Remove</span>
+											<i class="fas fa-minus"></i>
+										</a>
 									</span>
 								</li>
 							</ul>
@@ -230,16 +255,20 @@
 
 					<h2 class="d-flex justify-content-between">
 						Items
-						<a class="green" @click="addItem()"><i class="fas fa-plus-circle"></i></a>
+						<a class="btn btn-sm bg-green" @click="addItem()">
+							<span class="d-none d-md-inline mr-1">Add</span>
+							<i class="fas fa-plus"></i>
+						</a>
 					</h2>
 					<hr>
 					<div v-for="item, index in loot.items">
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ item.name }}
 							<a @click="removeItem(index)" 
-								class="red"
+								class="btn btn-sm bg-red"
 								v-b-tooltip.hover title="Remove">
-								<i class="fas fa-minus-circle"></i>
+								<span class="d-none d-md-inline mr-1">Remove</span>
+								<i class="fas fa-minus"></i>
 							</a>
 						</h2>
 						<b-row class="mb-2">

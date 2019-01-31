@@ -35,19 +35,26 @@
 								{{ player.character_name }}
 							</div>
 							<template v-if="campaign.players">
-								<a v-if="checkPlayer(key) < 0" class="green" 
+								<a v-if="checkPlayer(key) < 0" 
+								class="btn btn-sm bg-green"
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
-									<i class="fas fa-plus-circle"></i></a>
-								<span v-else class="green"><i class="fas fa-check"></i></span>
+									<span class="d-none d-md-inline mr-1">Add</span>
+									<i class="fas fa-plus"></i>
+								</a>
+								<span v-else>
+									<small><span class="d-none d-md-inline mr-1 gray-hover">Added</span></small>
+									<i class="fas fa-check green"></i>
+								</span>
 							</a>
 							</template>	
-							<a v-else class="green" 
+							<a v-else class="btn btn-sm bg-green" 
 								v-b-tooltip.hover 
 								title="Add Character" 
 								@click="addPlayer(key, player.character_name)">
-									<i class="fas fa-plus-circle"></i>
+									<span class="d-none d-md-inline mr-1">Add</span>
+									<i class="fas fa-plus"></i>
 							</a>
 						</li>
 					</ul>
@@ -64,7 +71,10 @@
 									{{ players[key].character_name }}
 								</div>
 								
-								<a class="red" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)"><i class="fas fa-minus-circle"></i></a>
+								<a class="btn btn-sm bg-red" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
+									<span class="d-none d-md-inline mr-1">Remove</span>
+									<i class="fas fa-minus"></i>
+								</a>
 							</li>
 						</ul>
 					</template>

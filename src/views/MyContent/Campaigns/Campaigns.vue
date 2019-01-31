@@ -51,14 +51,17 @@
 									</span>
 
 									<span>
-										<router-link class="mx-2" 
+										<router-link class="btn btn-sm mx-2" 
 											:to="'/campaigns/' + campaign.key" 
-											v-b-tooltip.hover title="Edit"><i class="fas fa-hammer-war"></i>
+											v-b-tooltip.hover title="Edit">
+												<span class="d-none d-md-inline mr-1">Edit</span>
+												<i class="fas fa-hammer-war"></i>
 										</router-link>
 										<a v-b-tooltip.hover 
 											title="Delete" 
-											class="red"
+											class="btn btn-sm bg-red"
 											@click="confirmDelete(campaign.key, campaign.campaign)">
+												<span class="d-none d-md-inline mr-1">Delete</span>
 												<i class="fas fa-trash-alt"></i>
 										</a>
 									</span>

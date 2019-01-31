@@ -18,17 +18,16 @@
 				<ul class="entities">
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="npc, index in searchResults" class="d-flex justify-content-between">
-						<!-- <a v-if="index == 0" @click="save(searchResults)">Save</a> -->
 						<div class="d-flex justify-content-left">
 							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
 								<i class="fas fa-info-circle"></i></a>
 							{{ npc.name }}
 						</div>
-						<a class="btn btn-sm" 
+						<a class="gray-hover" 
 							v-b-tooltip.hover title="Copy NPC" 
 							@click="copy(npc)">
-							<span class="d-none d-md-inline mr-1">Copy</span>
-							<i class="fas fa-copy"></i>
+							<i class="fas fa-copy blue"></i>
+							<span class="d-none d-md-inline ml-1">Copy</span>
 						</a>
 					</li>
 				</ul>
@@ -278,11 +277,11 @@
 				<div class="card-header d-flex justify-content-between">
 					{{ action.name }}
 					<a 
-					class="btn btn-sm bg-green" 
+					class="gray-hover" 
 					v-b-tooltip.hover title="Add Skill" 
 					@click="add(action.type)">
-						<span class="d-none d-md-inline mr-1">Add</span>
-						<i class="fas fa-plus"></i>
+						<i class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
 					</a>
 				</div>
 				<div class="card-body">
@@ -290,10 +289,10 @@
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ ability.name }}
 							<a @click="remove(index, action.type)" 
-								class="btn btn-sm bg-red"
+								class="gray-hover"
 								v-b-tooltip.hover title="Remove">
-								<span class="d-none d-md-inline mr-1">Remove</span>
-								<i class="fas fa-minus-circle"></i>
+								<i class="fas fa-minus red"></i>
+								<span class="d-none d-md-inline ml-1">Remove</span>
 							</a>
 						</h2>
 						<b-row class="mb-2">

@@ -17,8 +17,8 @@
 								<i class="fas fa-caret-down"></i>
 							</a>
 							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
-								<span class="d-none d-md-inline mr-1">Roll</span>
 								<i class="fas fa-dice-d20"></i>
+								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
 						</span>
 						<p class="collapse py-2 pr-1" :id="'act-'+index">{{ action.desc }}</p>
@@ -39,8 +39,8 @@
 								<i class="fas fa-caret-down"></i>
 							</a>
 							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
-								<span class="d-none d-md-inline mr-1">Roll</span>
 								<i class="fas fa-dice-d20"></i>
+								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
 						</span>
 						<p class="collapse py-2 pr-1" :id="'leg-'+index">{{ action.desc }}</p>

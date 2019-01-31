@@ -5,11 +5,12 @@ export const difficulty = {
 
 	firebase() {
 		return {
-			monsters: db.ref(`monsters`),
+			
 		}
 	},
 	data() {
 		return {
+			monsters_ref: db.ref(`monsters`),
 			difficulties: [
 				'easy',
 				'medium',
@@ -114,8 +115,7 @@ export const difficulty = {
 				},
 				20: {
 					'easy': 2800,'medium': 5700, 'hard': 8500, 'deadly': 12700,
-				},
-				
+				},	
 			}
 		}
 	},
@@ -126,7 +126,7 @@ export const difficulty = {
 		]),
 	},
 	methods: {
-		difficulty(entities) {
+		async difficulty(entities) {
 			var totalXp = 0;
 			var nMonsters = 0;
 			var nPlayers = 0;
@@ -134,20 +134,27 @@ export const difficulty = {
 
 			var diff = [];
 
-			for(let entity in entities) {
-
+			for(let key in entities) {
+				let entity = entities[key]
 				//Calculate Monsters XP
-				if(entities[entity].entityType == 'npc') {
-					if(!this.npcs[entities[entity].id].challenge_rating) {
+				if(entity.entityType == 'npc') {
+					if(entity.npc == 'npc' && !this.npcs[entity.id].challenge_rating) {
 						let error = {
 							0: 'error',
 							1: 'An NPC with no challenge rating is added.',
 						}
 						return error;
 					}
-					let type = entities[entity].npc
-					let rating = (type == 'custom') ? this.npcs[entities[entity].id].challenge_rating : this.monsters[entities[entity].id].challenge_rating ;
-
+					let rating = 0
+					if (entity.npc == 'custom') {
+						rating = this.npcs[entity.id].challenge_rating
+					} 
+					else {
+						let monsters = this.monsters_ref.child(entity.id);
+						rating = await monsters.once('value').then(function(snapshot) {
+							return snapshot.val().challenge_rating
+						})
+					}
 					//Ratings below 1 are keyed as -x (0.125 = -125)
 					if(rating < 1) {
 						if(rating.toString().charAt(0) == '0') {
@@ -157,7 +164,6 @@ export const difficulty = {
 							rating = '-'+rating.toString().substr(1);
 						}
 					}
-					
 					let xp = this.challenge[rating]
 
 					totalXp = parseInt(totalXp) + xp;
@@ -165,8 +171,8 @@ export const difficulty = {
 				}
 
 				//Calculate Player tresholds
-				if(entities[entity].entityType == 'player') {
-					if(!this.players[entities[entity].id].level) {
+				if(entity.entityType == 'player') {
+					if(!this.players[entity.id].level) {
 						let error = {
 							0: 'error',
 							1: 'A player with no level set was added.',
@@ -174,7 +180,7 @@ export const difficulty = {
 						return error;
 					}
 					for(let key in this.difficulties) {
-						let level = this.players[entities[entity].id].level
+						let level = this.players[entity.id].level
 						let difficulty = this.difficulties[key]
 						let treshold = this.tresholds[level][difficulty]
 						
@@ -198,9 +204,7 @@ export const difficulty = {
 
 					var diffic;
 					if(compare >= totalTreshold[difficulty]) {
-						diffic = difficulty
-						// console.log(diff)
-						
+						diffic = difficulty						
 					}
 				}
 				if(diffic) {

@@ -1,7 +1,11 @@
 <template>
 <div class="container">
 	<h2>Planned updates</h2>
-	<ul class="updates">
+	<p>Follow our planned updates on Trello.</p>
+
+	<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
+
+	<!-- <ul class="updates">
 		<li>
 			<a data-toggle="collapse" href="#difficulty" 
 				role="button" aria-expanded="false"
@@ -13,8 +17,7 @@
 				The difficulty of an encounter will be calculated based on the amount of players and their levels, amount of monsters and the monsters challenge ratings.
 			</div>
 		</li>
-		
-	</ul>
+	</ul> -->
 </div>
 </template>
 

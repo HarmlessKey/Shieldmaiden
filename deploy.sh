@@ -5,8 +5,10 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 YELLOW="\033[0;33m"
 
+USER="harm"
 REMOTE_IP="37.97.150.110"
 REMOTE_PATH="/var/www/harmlesskey.com/public_html"
+LOCAL_PATH="dist/*"
 BRANCH="master"
 
 printf "\n${GREEN}> STARTING DEPLOYMENT\n"
@@ -28,6 +30,10 @@ git commit -am "DEPLOY AUTO COMMIT"
 printf "${NC}> Pushing to ${BRANCH}\n"
 git push
 
-printf "\n${NC}> DEPLOYING TO ${REMOTE_IP}"
-scp -r dist/* harm@${REMOTE_IP}:${REMOTE_PATH}
+printf "\n${YELLOW}> DEPLOYING TO ${REMOTE_IP}"
+scp -r ${LOCAL_PATH} ${USER}@${REMOTE_IP}:${REMOTE_PATH}
+if [ $? -ne 0 ]; then
+	printf "\n${RED}>> DEPLOY TO SERVER FAILED!\n"
+	exit 1
+fi
 printf "\n${GREEN}> DEPLOY TO SERVER"

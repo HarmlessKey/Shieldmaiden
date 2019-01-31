@@ -1,22 +1,29 @@
+#!/bin/bash
+
+NC="\033[0m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+
+REMOTE_IP="37.97.150.110"
+REMOTE_PATH="/var/www/harmlesskey.com/public_html"
+BRANCH="master"
+
+printf "\n${GREEN}Starting deployment\n"
+printf "${NC}Checking out master\n"
 git checkout master
 if [ $? -ne 0 ]; then
-	echo "> git checkout master failed"
+	printf "\n${RED}git checkout master failed\n"
 	exit 1
 fi
 npm run build
 if [ $? -ne 0 ]; then
-	echo "> npm run build failed"
+	printf "\n${RED}npm run build failed\n"
 	exit 1
 fi
+
 git commit -am "DEPLOY AUTO COMMIT"
-if [ $? -ne 0 ]; then
-	echo "> git commit failed"
-	exit 1
-fi
 git push
-if [ $? -ne 0 ]; then
-	echo "> git push failed"
-	exit 1
-fi
-echo "DEPLOY TO SERVER"
+
+printf "\n${GREEN}DEPLOYED TO SERVER\n"
 # scp -r dist/* harm@37.97.150.110:/var/www/harmlesskey.com/public_html

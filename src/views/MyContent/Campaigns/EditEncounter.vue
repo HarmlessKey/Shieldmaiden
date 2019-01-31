@@ -168,15 +168,13 @@
 						</div>
 					</b-col>
 					
-					 <!-- Keeps track of changes in entities for watcher to execute function -->
-					 <!-- {{ setEntities(Object.keys(encounter.entities).length) }} -->
 					<b-col sm="6">
 						<div id="added" class="bg-gray" v-if="encounter">
-							<!-- <template v-if="encDifficulty">
+							<template>
 								<div class="diff d-flex justify-content-between">
 									<span>
 										Difficulty: 
-										<span class="text-capitalize" :class="{ 
+										<span v-if="encDifficulty" class="text-capitalize" :class="{ 
 											'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
 											'orange':  encDifficulty[0] == 'hard', 
 											'yellow':  encDifficulty[0] == 'medium', 
@@ -186,7 +184,7 @@
 									</span>
 									<a data-toggle="collapse" href="#info" role="button" aria-expanded="false"><i class="fas fa-caret-down"></i></a>
 								</div>
-								<div class="collapse diff-info" id="info">
+								<div class="collapse diff-info" id="info" v-if="encDifficulty">
 									{{ encDifficulty[1] }}
 									<template v-if="encDifficulty['easy']">
 										<p>
@@ -199,7 +197,7 @@
 										Total encounter XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
 									</template>
 								</div>
-							</template> -->
+							</template>
 							<ul class="entities mt-4" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
@@ -340,7 +338,6 @@
 				slide: this.$store.getters.getSlide,
 				searching: false,
 				encDifficulty: undefined,
-				entitiesAmount: 0,
 			} 
 		},
 		firebase() {
@@ -349,6 +346,7 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
+				monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -358,11 +356,16 @@
 				'players',
 				'npcs',
 			]),
+			entitiesAmount: function() {
+				if (this.encounter) {
+					return Object.keys(this.encounter.entities).length
+				}
+				return 0
+			}
 		},
 		watch: {
 			entitiesAmount(newVal, oldVal) {
-				console.log()
-					this.setDifficulty()
+				this.setDifficulty()
 			}
 		},
 		mounted() {
@@ -503,12 +506,9 @@
 				this.$delete(this.loot.items, index);
 				this.$forceUpdate(); //IMPORTANT
 			},
-			setDifficulty() {
-				this.encDifficulty = this.difficulty(this.encounter.entities)
+			async setDifficulty() {
+				this.encDifficulty = await this.difficulty(this.encounter.entities)
 			},
-			setEntities(n) {
-				this.entitiesAmount = n;
-			}
 		}
 	}
 </script>

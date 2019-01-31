@@ -15,6 +15,7 @@ import Vuebar from 'vuebar';
 import Meta from 'vue-meta'
 
 
+
 const options = {
 	toast: {
 		position: SnotifyPosition.centerTop,

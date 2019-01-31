@@ -129,11 +129,16 @@
 				}
 			}
 		},
+		beforeRouteLeave (to, from, next) {
+	    this.reset_store()
+	    next()
+	  },
 		methods: {
 			...mapActions([
 				'init_Encounter',
 				'track_Encounter',
 				'set_finished',
+				'reset_store',
 			]),
 			track() {
 				var track = {

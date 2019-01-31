@@ -5,18 +5,21 @@ import Vue from 'vue'
 const encounters_ref = db.ref('encounters')
 const monsters_ref = db.ref('monsters')
 
-const state = {
-	entities: {},
-
-	targeted: undefined,
-	encounter: undefined,
-	campaignId: undefined,
-	encounterId: undefined,
-	log: [],
-	path: undefined,
-	track: undefined,
-	initialized: false,
+const getDefaultState = () => {
+	return {
+		entities: {},
+		targeted: undefined,
+		encounter: undefined,
+		campaignId: undefined,
+		encounterId: undefined,
+		log: [],
+		path: undefined,
+		track: undefined,
+		initialized: false,
+	}
 }
+
+const state = getDefaultState()
 
 const getters = {
 	entities: function( state ) {
@@ -397,11 +400,17 @@ const mutations = {
 	},
 	INITIALIZED(state) {
 		state.initialized = true
+	},
+	UNINITIALIZED(state) {
+		state.initialized = false
+	},
+	RESET_STORE(state) {
+		Object.assign(state, getDefaultState())
 	}
 }
 
 const actions = {
-	async init_Encounter({ commit, rootState }, { cid, eid }) {
+	async init_Encounter({ commit, rootState, state }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
@@ -495,6 +504,9 @@ const actions = {
 	set_finished({ commit }) {
 		commit('FINISH')
 	},
+	reset_store({ commit }) {
+		commit("RESET_STORE")
+	}
 }
 
 export const encounter_module = {

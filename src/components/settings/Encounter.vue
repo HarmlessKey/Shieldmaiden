@@ -113,20 +113,5 @@
 </script>
 
 <style lang="scss" scoped>
-	ul.settings {
-		border-top: solid 1px #302f2f;;
-		padding: 0;
-		list-style: none;
-		margin-bottom: 60px;
-
-		li {
-			font-size: 13px;
-			padding: 15px 5px;
-			border-bottom: solid 1px #302f2f;
-
-			.btn {
-				color: #b2b2b2 !important;
-			}
-		}
-	}
+	
 </style>

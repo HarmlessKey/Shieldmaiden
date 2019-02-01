@@ -1,11 +1,11 @@
 <template>
 	<div id="current">
-		<template v-if="current">
-			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
-			<div class="scroll" v-bar>
-				<div v-on:scroll="shadow()" ref="scroll">
-					<div class="current">
+		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
+		<div class="scroll" v-bar>
+			<div v-on:scroll="shadow()" ref="scroll">
+				<div class="current">
 
+					<template v-if="current">
 						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable && !current.dead">
 								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
@@ -67,11 +67,11 @@
 							</b-col>
 						</b-row>
 						<NPC class="mt-3" :entity="current" />
-					</div>
+					</template>
+					<div v-else class="loader"><span>Loading current...</span></div>
 				</div>
 			</div>
-		</template>
-		<div v-else class="loader"><span>Loading current...</span></div>
+		</div>
 	</div>
 </template>
 
@@ -159,6 +159,7 @@
 	
 	.current {
 		padding: 15px 10px;
+		width: calc(100% - 5px);
 	}
 	.scroll {
 		height: calc(100% - 30px);

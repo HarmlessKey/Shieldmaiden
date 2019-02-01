@@ -427,7 +427,7 @@
 					entity.active = true
 					
 					if(custom == false) {
-						var npc_data = this.monsters[id];
+						var npc_data = this.monsters[id - 1];
 						entity.npc = 'api'
 						entity.curHp = npc_data.hit_points
 						entity.maxHp = npc_data.hit_points

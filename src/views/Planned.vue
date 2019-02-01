@@ -1,31 +1,38 @@
 <template>
-<div class="container">
-	<h2>Planned updates</h2>
-	<p>Follow our planned updates on Trello.</p>
+<div class="grid">
+	<div class="container">
+		<h1>Planned updates</h1>
+		<p>Follow our planned updates on Trello.</p>
 
-	<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
+		<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
 
-	<!-- <ul class="updates">
-		<li>
-			<a data-toggle="collapse" href="#difficulty" 
-				role="button" aria-expanded="false"
-				class="d-flex justify-content-between">
-				Encounter difficulty
-				<span><i class="fas fa-caret-down"></i></span>
-			</a>
-			<div class="collapse desc bg-gray-darker" id="difficulty">
-				The difficulty of an encounter will be calculated based on the amount of players and their levels, amount of monsters and the monsters challenge ratings.
-			</div>
-		</li>
-	</ul> -->
+		<!-- <ul class="updates">
+			<li>
+				<a data-toggle="collapse" href="#difficulty" 
+					role="button" aria-expanded="false"
+					class="d-flex justify-content-between">
+					Encounter difficulty
+					<span><i class="fas fa-caret-down"></i></span>
+				</a>
+				<div class="collapse desc bg-gray-darker" id="difficulty">
+					The difficulty of an encounter will be calculated based on the amount of players and their levels, amount of monsters and the monsters challenge ratings.
+				</div>
+			</li>
+		</ul> -->
+	</div>
+	<Footer />
 </div>
 </template>
 
 <script>
 	import { db } from '@/firebase'
+	import Footer from '@/components/Footer.vue'
 
 	export default {
 		name: 'Planned',
+		components: {
+			Footer,
+		},
 		metaInfo: {
 			title: 'Planned'
 		},
@@ -48,6 +55,16 @@
 </script>
 
 <style lang="scss" scoped>
+.grid {
+	background-size: cover;
+	height: calc(100vh - 50px) !important;
+	display: grid;
+	grid-template-columns: auto;
+	grid-template-rows: 3fr 1fr;
+	grid-gap: 0;
+	grid-template-areas: 
+	"container"
+	"footer";
 
 	.container {
 		padding-top: 30px;
@@ -79,4 +96,5 @@
 			}
 		}
 	}
+}
 </style>

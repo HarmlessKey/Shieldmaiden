@@ -1,4 +1,4 @@
-# dnd_combat_emulator
+# Harmless Key Encounter Tracker
 
 ## Project setup
 ```

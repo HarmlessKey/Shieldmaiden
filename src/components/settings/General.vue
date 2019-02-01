@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<b-card header="General Settings">
+		<b-card header="General Settings" id="general">
 			<ul class="settings">
 				<li class="d-flex justify-content-between">
 					<span>
@@ -12,18 +12,18 @@
 					</span>
 
 					<div>
-						<div v-show="settings.setHp === false">
+						<div v-show="settings.rollHp === true">
 							<span v-b-tooltip.hover title="Roll" class="green mr-2">
 								<span class="d-none d-md-inline mr-1">Roll</span>
 								<i class="fas fa-check"></i>
 							</span>
-							<a v-b-tooltip.hover title="Average" @click="set('unset', 'setHp')" class="btn btn-sm bg-gray">
+							<a v-b-tooltip.hover title="Average" @click="set('unset', 'rollHp')" class="btn btn-sm bg-gray">
 								<span class="d-none d-md-inline mr-1">Average</span>
 								<i class="fas fa-check"></i>
 							</a>
 						</div>
-						<div v-show="settings.setHp === undefined">
-							<a v-b-tooltip.hover title="Roll" @click="set('set', 'setHp', false)" class="btn btn-sm bg-gray mr-2">
+						<div v-show="settings.rollHp === undefined">
+							<a v-b-tooltip.hover title="Roll" @click="set('set', 'rollHp', true)" class="btn btn-sm bg-gray mr-2">
 								<span class="d-none d-md-inline mr-1">Roll</span>
 								<i class="fas fa-check"></i>
 							</a>

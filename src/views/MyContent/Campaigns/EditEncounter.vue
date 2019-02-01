@@ -119,6 +119,11 @@
 									</ul>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+									<p v-if="settings.rollHp" class="d-flex justify-content-between">
+										<span><i class="fas fa-exclamation-triangle red"></i> NPC Hit Points are rolled</span>
+										<router-link to="/settings">Change</router-link>
+									</p>
+									<hr>
 									<div class="input-group mb-3">
 										<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
@@ -132,7 +137,7 @@
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info-circle"></i>
 												</a>
-												{{ npc.name }}
+												{{ npc.hit_dice }}
 											</div>
 											<span>
 												CR: {{ npc.challenge_rating }}
@@ -313,10 +318,12 @@
 	import axios from 'axios'
 	import { db } from '@/firebase'
 	import { difficulty } from '@/mixins/difficulty.js'
+	import { dice } from '@/mixins/dice.js'
+	import { attributes } from '@/mixins/attributes.js'
 
 	export default {
 		name: 'EditCampaign',
-		mixins: [difficulty],
+		mixins: [difficulty, attributes, dice],
 		metaInfo: {
 			title: 'Encounters'
 		},
@@ -343,6 +350,10 @@
 			return {
 				loot: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
+					asObject: true
+				},
+				settings: {
+					source: db.ref(`settings/${this.user.uid}/general`),
 					asObject: true
 				},
 				monsters: db.ref(`monsters`),
@@ -423,22 +434,49 @@
 					initiative: 0,
 					active: true,
 				}
+				var HP = undefined;
+
 				if(type == 'npc') {
 					entity.active = true
 					
 					if(custom == false) {
-						var npc_data = this.monsters[id];
+						var npc_data = this.monsters[id - 1];
 						entity.npc = 'api'
-						entity.curHp = npc_data.hit_points
-						entity.maxHp = npc_data.hit_points
+						if(this.settings.rollHp && npc_data.hit_dice) {
+							let dice = npc_data.hit_dice.split('d');
+							let mod = dice[0] * this.calcMod(npc_data.constitution)
+
+							HP = this.rollD(dice[1], dice[0], mod)
+
+							entity.curHp = HP.total
+							entity.maxHp = HP.total
+						}
+						else {
+							entity.curHp = npc_data.hit_points
+							entity.maxHp = npc_data.hit_points
+						}
 						entity.ac = npc_data.armor_class
 					}
 					else {
-						var npc_data = this.npcs;
+						var npc_data = this.npcs[id];
 						entity.npc = 'custom'
-						entity.curHp = npc_data[id].maxHp
-						entity.maxHp = npc_data[id].maxHp
-						entity.ac = npc_data[id].ac
+						entity.ac = npc_data.ac
+
+						console.log(npc_data)
+
+						if(this.settings.rollHp && npc_data.hit_dice) {
+							let dice = npc_data.hit_dice.split('d');
+							let mod = dice[0] * this.calcMod(npc_data.constitution)
+
+							HP = this.rollD(dice[1], dice[0], mod)
+							
+							entity.curHp = HP.total
+							entity.maxHp = HP.total
+						}
+						else {
+							entity.curHp = npc_data.maxHp
+							entity.maxHp = npc_data.maxHp
+						}
 					}
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
@@ -450,7 +488,20 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {
-					this.$snotify.success(entity.name, 'NPC added', {
+					let notifyHP = [];
+
+					if(HP) {
+						notifyHP.total = HP.total
+						notifyHP.throws = ' [' + HP.throws + '] '
+						notifyHP.mod = HP.mod
+					}
+					else {
+						notifyHP.total = entity.maxHp;
+						notifyHP.throws = ''
+						notifyHP.mod = ''
+					}
+
+					this.$snotify.success('HP: ' + notifyHP.total + notifyHP.throws + notifyHP.mod, 'NPC added', {
 						position: "centerTop"
 					});
 				}

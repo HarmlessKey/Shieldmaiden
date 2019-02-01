@@ -19,7 +19,7 @@
 							<img src="@/assets/_img/screenshot.png" />
 						</b-col>
 						<b-col md="5">
-							<h2>A sneak peak</h2>
+							<h2>A sneak peek</h2>
 							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
 								<router-link v-if="!user" to="/sign-in" class="btn btn-lg btn-block">Create Account</router-link>

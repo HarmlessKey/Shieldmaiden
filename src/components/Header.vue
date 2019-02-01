@@ -5,7 +5,7 @@
 				<router-link to="/">Harmless Key <span class="gray-hover">BETA</span></router-link>
 			</div>
 			<div class="d-flex justify-content-right">
-				<!-- <router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link> -->
+				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
 				<!-- <a href="#" v-b-tooltip.hover title="Facebook" ><i class="fab fa-facebook-f"></i></a> -->
 				<a class="roll-dice" v-b-tooltip.hover title="Dice Roller"  @click="showSlide()"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">

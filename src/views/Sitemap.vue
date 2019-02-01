@@ -5,7 +5,9 @@
 			<li><router-link to="/">Home</router-link></li>
 			<li><router-link to="/sign-in">Sign In</router-link></li>
 			<li><router-link to="/documentation">Documentation</router-link></li>
+			<li><router-link to="/feedback">Feedback</router-link></li>
 			<li><router-link to="/updates">Updates</router-link></li>
+			<li><router-link to="/planned">Planned</router-link></li>
 			<li><router-link to="/privacy-policy">Privacy Policy</router-link></li>
 		</ul>
 	</div>

@@ -3,6 +3,7 @@ import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
 import Planned from '@/views/Planned.vue';
+import Feedback from '@/views/Feedback.vue';
 import Updates from '@/views/Updates.vue';
 import SignIn from '@/views/SignIn.vue';
 import Settings from '@/views/Settings.vue';
@@ -44,6 +45,11 @@ export const routes = [{
 	path: '/documentation',
 	name: 'Documentation',
 	component: Documentation
+},
+{
+	path: '/feedback',
+	name: 'Feedback',
+	component: Feedback
 },
 {
 	path: '/updates',

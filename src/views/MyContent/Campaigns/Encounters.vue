@@ -98,7 +98,7 @@
 							<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
 						</template>
 						<template v-else>
-							<td colspan="3" class="d-none d-md-table-cell">Not started</td>
+							<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
 						</template>
 						<td class="text-right actions">
 							<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">

@@ -175,8 +175,15 @@
 							type="text" 
 							class="form-control" 
 							v-model="npc.hit_dice"  
-							name="Hit Dice" 
+							v-validate="{ regex:/^[0-9]+d[0-9]+$/ }"
+							name="hit_dice" 
+							data-vv-as="Hit Dice"
 							placeholder="Hit Dice"></b-form-input>
+							<p class="validate red" 
+								v-if="errors.has('hit_dice')">
+								{{ errors.first('hit_dice') }}
+								Allowed format: "2d6".
+							</p>
 					</b-col>
 				</b-row>
 			</b-card>

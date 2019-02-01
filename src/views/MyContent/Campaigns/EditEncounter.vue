@@ -137,7 +137,7 @@
 												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info-circle"></i>
 												</a>
-												{{ npc.hit_dice }}
+												{{ npc.name }}
 											</div>
 											<span>
 												CR: {{ npc.challenge_rating }}
@@ -461,8 +461,6 @@
 						var npc_data = this.npcs[id];
 						entity.npc = 'custom'
 						entity.ac = npc_data.ac
-
-						console.log(npc_data)
 
 						if(this.settings.rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');

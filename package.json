@@ -30,6 +30,7 @@
 		"vue-cookies": "^1.5.7",
 		"vue-meta": "^1.5.8",
 		"vue-router": "^3.0.1",
+		"vue-shortkey": "^3.1.6",
 		"vue-snotify": "^3.2.1",
 		"vuebar": "0.0.20",
 		"vuefire": "^1.4.5",

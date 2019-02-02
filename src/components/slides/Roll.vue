@@ -12,12 +12,12 @@
 			<input v-if="die == 'X'" class="form-control" min="0" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
-				<span class="ml-1">d{{die}}</span>
+				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
 			<input class="form-control" min="0" type="number" v-model="item.n" name="N" />
 			<input class="form-control" type="number" v-model="item.mod" name="mod" />
 			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
-			{{ item.result }}
+			<span class="blue">{{ item.result }}</span>
 		</div>
 		<template v-if="log">
 			<hr>

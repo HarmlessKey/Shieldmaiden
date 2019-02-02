@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<h2>Track encounter settings</h2>
 		<Track />
 	</div>
 </template>

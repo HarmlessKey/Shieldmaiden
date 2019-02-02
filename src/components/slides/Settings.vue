@@ -1,5 +1,7 @@
 <template>
 	<div>
+		<h2>Settings</h2>
+		<p>Settings for running an encounter.</p>
 		<Encounter />
 	</div>
 </template>
@@ -15,6 +17,8 @@
 	}
 </script>
 
-<style lang="scss">
-
+<style lang="scss" scoped>
+	.card-body {
+		padding: 0 !important;
+	}
 </style>

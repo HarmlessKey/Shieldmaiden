@@ -19,7 +19,10 @@
 
 		<template>
 			<div class="progress health-bar">
-				<span>{{ entity.name }}</span>
+				<span>
+					<template v-if="entity.active && showKeybinds.keyBinds === undefined">[{{ i }}]</template>
+					{{ entity.name }}
+				</span>
 				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
 					<div class="condition bg-red" 
 						v-for="(condition, key) in entity.conditions" 
@@ -90,15 +93,25 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex'
+	import { db } from '@/firebase'
 
 	export default {
 		name: 'TargetItem',
-		props: ['item'],
+		props: ['item', 'i'],
 		data () {
 			return {
+				user: this.$store.getters.getUser,
 				target: '',
 				number: 0,
 				tweenedNumber: 0
+			}
+		},
+		firebase() {
+			return {
+				showKeybinds: {
+					source: db.ref(`settings/${this.user.uid}/general`),
+					asObject: true
+				}
 			}
 		},
 		computed: {

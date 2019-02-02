@@ -38,6 +38,7 @@ import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 
 Vue.use(BootstrapVue);
+Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 // Set-up and use the Vue Router
 // Pass in your routes and then

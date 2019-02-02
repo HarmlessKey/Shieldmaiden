@@ -22,17 +22,20 @@
 				v-validate="'numeric'" 
 				name="Manual Input" 
 				min="0"
-				class="form-control manual-input">
+				class="form-control manual-input"
+				v-shortkey.avoid>
 			<button class="btn dmg bg-red" 
-				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="setManual(target, 'damage')">
-				<i class="fas fa-minus-square"></i>
-			</button>
-			<button class="btn heal bg-green" 
-				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="setManual(target, 'healing')">
-				<i class="fas fa-plus-square"></i>
-			</button>
+					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+					@click="setManual(target, 'damage')">
+					Attack
+					<img src="@/assets/_img/styles/sword-break.png" />
+				</button>
+				<button class="btn heal bg-green" 
+					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+					@click="setManual(target, 'healing')">
+					Heal
+					<img src="@/assets/_img/styles/heal.png" />
+				</button>
 		</div>
 	</div>
 </template>
@@ -122,6 +125,16 @@
 		}
 		.dmg {
 			grid-area: btn-dmg;
+		}
+		.dmg, .heal {
+			position: relative;
+			padding: 5px 35px 5px 5px;
+
+			img {
+				position: absolute;
+				height: 25px;
+				right: 5px;
+			}
 		}
 	}
 	

@@ -7,7 +7,11 @@
 			<div class="d-flex justify-content-right">
 				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
 				<!-- <a href="#" v-b-tooltip.hover title="Facebook" ><i class="fab fa-facebook-f"></i></a> -->
-				<a class="roll-dice" v-b-tooltip.hover title="Dice Roller"  @click="showSlide()"><i class="fas fa-dice-d20"></i></a>
+				<a class="roll-dice" 
+					v-b-tooltip.hover 
+					title="Dice Roller"  
+					v-shortkey="['r']" @shortkey="showSlide()"
+					@click="showSlide()"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
 						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>

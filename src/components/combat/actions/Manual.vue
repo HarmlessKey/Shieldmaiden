@@ -28,7 +28,8 @@
 					v-validate="'numeric'" 
 					name="Manual Input" 
 					min="0"
-					class="form-control manual-input">
+					class="form-control manual-input"
+					v-shortkey.avoid>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual(target, 'damage')">

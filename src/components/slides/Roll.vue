@@ -1,11 +1,10 @@
 <template>
 	<div>
-		<h2>Dice Roller</h2>
+		<h2 v-b-tooltip.hover title="press [r] to show/hide">Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span></h2>
 		<div class="roller">
-			<span></span>
-			<span>Number</span>
 			<span>Die</span>
-			<span>Mod</span>
+			<span>#</span>
+			<span>Mod.</span>
 			<span>Roll</span>
 			<span>Result</span>
 		</div>
@@ -13,11 +12,11 @@
 			<input v-if="die == 'X'" class="form-control" min="0" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
+				<span class="ml-1">d{{die}}</span>
 			</div>
 			<input class="form-control" min="0" type="number" v-model="item.n" name="N" />
-			<span>d{{ die }}</span>
 			<input class="form-control" type="number" v-model="item.mod" name="mod" />
-			<button class="btn" @click="roll(die, item)"><i class="fas fa-dice-d20"></i></button>
+			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
 			{{ item.result }}
 		</div>
 		<template v-if="log">
@@ -60,7 +59,7 @@
 					12: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d12' },
 					20: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d20' },
 					100: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
-					X: { n: 1, mod: undefined, result: undefined, x: undefined }
+					X: { n: 1, mod: undefined, result: undefined, x: undefined, icon: 'fas fa-dice-d20' }
 				},
 			}
 		},
@@ -111,11 +110,11 @@
 	}
 	.roller {
 		display: grid;
-		grid-template-columns: 50px 50px 30px 50px 40px auto;
+		grid-template-columns: 50px 50px 50px 40px auto;
 		grid-template-rows: auto;
 		grid-gap: 10px;
 		grid-template-areas:
-		"icon nmbr die mod btn result";
+		"icon nmbr mod btn result";
 
 		margin-bottom: 2px;
 		line-height: 35px;

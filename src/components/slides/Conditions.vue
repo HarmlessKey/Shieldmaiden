@@ -1,6 +1,6 @@
 <template>
 	<div class="pb-5">
-		<h2>Conditions {{ entity.name }}</h2>
+		<h2>Conditions <span class="blue">{{ entity.name }}</span></h2>
 		<ul class="conditions">
 			<li v-for="condition, index in conditions" :key="index" v-if="condition['.key'] != 'exhaustion'">
 				<div class="d-flex justify-content-between" :class="{ 'status': check(condition['.key']) == true }">

@@ -34,7 +34,12 @@
 				</router-link>
 				<a class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>
-			<a v-else class="btn" @click="nextTurn()"><span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i></a>
+			<a v-else class="btn" 
+				@click="nextTurn()" 
+				v-b-tooltip.hover title="[shift]+[arrowright]"
+				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
+				<span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i>
+			</a>
 		</div>
 	</div>
 </template>

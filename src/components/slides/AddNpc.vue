@@ -20,7 +20,8 @@
 					v-model="entity.initiative"
 					:class="{'input': true, 'error': errors.has('initiative') }"
 					v-validate="'required'"
-					placeholder="Initiative"></b-form-input>
+					placeholder="Initiative"
+					></b-form-input>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
 		</b-row>
@@ -86,7 +87,7 @@
 		<div class="tab-content">
 			<div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-tab">
 				<div class="input-group mb-3">
-					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control" />
 					<div class="input-group-append">
 						<button class="btn"><i class="fas fa-search"></i></button>
 					</div>

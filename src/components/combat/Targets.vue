@@ -4,9 +4,14 @@
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
-				<a @click="addNpc()" class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
+				<a @click="addNpc()"
+					v-shortkey="['a']" @shortkey="addNpc()"
+					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
 					<i class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">Add</span>
+					<span class="d-none d-md-inline ml-1">
+						Add
+						<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
+					</span>
 				</a>
 			</h2>
 			<div class="scroll" v-bar>
@@ -20,12 +25,14 @@
 							leave-active-class="animated fadeOutDown">
 							
 							<li 
-								v-for="(entity, key) in _targets"
+								v-for="(entity, i, key) in _targets"
 								class="d-flex justify-content-between" 
 								:key="entity.key" 
 								:class="{ targeted : targeted == entity.key }">
-								<div class="target" @click="set_targeted(entity.key)">
-									<TargetItem :item="entity.key" />
+								<div class="target" 
+									@click="set_targeted(entity.key)"
+									v-shortkey="[i]" @shortkey="set_targeted(entity.key)">
+									<TargetItem :item="entity.key" :i="i" />
 								</div>
 								<span>
 									<a class="options"
@@ -37,17 +44,42 @@
 									</a>
 									<div class="dropdown-menu" aria-labelledby="options">	
 										<div class="dropdown-header">{{ entity.name }}</div>
-										<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
-										<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
-										<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
-										<a class="dropdown-item" @click="transform(entity.key, encounterEntities[entity.key])"><i class="fas fa-paw-claws"></i> Transform</a>
-										<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
-										<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
+										<a class="dropdown-item" 
+											@click="info(entity)"
+											v-shortkey="['i']" @shortkey="info(entities[targeted])">
+											<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
+										</a>
+										<a v-if="entity.curHp == 0 && !entity.stable" 
+											class="dropdown-item" 
+											v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
+											@click="set_stable({key: entity.key, action: 'set'})">
+											<i class="fas fa-hand-holding-magic"></i> [s] Stabilize
+										</a>
+										<a class="dropdown-item" 
+										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted])"
+										@click="edit(entity.key, entities[entity.key])">
+											<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
+										</a>
+										<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
+											v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
+											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
+										</a>
+										<a class="dropdown-item" @click="conditions(entity)"
+											v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
+											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
+										</a>
+										<a class="dropdown-item" @click="damageHeal(entity)"
+											v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
+											<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
+										</a>
 										<div class="dropdown-divider"></div>
-										<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
+										<a class="dropdown-item" @click="remove(entity.key, entity.name)">
+											<i class="fas fa-times"></i> Remove
+										</a>
 									</div>
 								</span>
 							</li>
+								
 							
 						</transition-group>
 						<template v-if="_idle.length">
@@ -71,14 +103,38 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
-											<a class="dropdown-item" @click="info(entity)"><i class="fas fa-info"></i> Info</a>
-											<a v-if="entity.curHp == 0 && !entity.stable" class="dropdown-item" @click="set_stable({key: entity.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
-											<a class="dropdown-item" @click="edit(entity.key, encounterEntities[entity.key])"><i class="fas fa-hammer-war"></i> Edit</a>
-											<a class="dropdown-item" @click="transform(entity.key, encounterEntities[entity.key])"><i class="fas fa-paw-claws"></i> Transform</a>
-											<a class="dropdown-item" @click="conditions(entity)"><i class="fas fa-eye-slash"></i> Conditions</a>
-											<a class="dropdown-item" @click="damageHeal(entity)"><i class="fas fa-swords"></i> Do damage/healing</a>
+											<a class="dropdown-item" 
+												@click="info(entity)"
+												v-shortkey="['i']" @shortkey="info(entities[targeted])">
+												<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
+											</a>
+											<a v-if="entity.curHp == 0 && !entity.stable" 
+												class="dropdown-item" 
+												v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
+												@click="set_stable({key: entity.key, action: 'set'})">
+												<i class="fas fa-hand-holding-magic"></i> <span v-if="showKeybinds.keyBinds === undefined">[s]</span> Stabilize
+											</a>
+											<a class="dropdown-item" 
+											v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted])"
+											@click="edit(entity.key, entities[entity.key])">
+												<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
+											</a>
+											<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
+												v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
+												<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
+											</a>
+											<a class="dropdown-item" @click="conditions(entity)"
+												v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
+												<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
+											</a>
+											<a class="dropdown-item" @click="damageHeal(entity)"
+												v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
+												<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
+											</a>
 											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" @click="remove(entity.key, entity.name)"><i class="fas fa-times"></i> Remove</a>
+											<a class="dropdown-item" @click="remove(entity.key, entity.name)">
+												<i class="fas fa-times"></i> Remove
+											</a>
 										</div>
 									</span>
 									</li>
@@ -149,8 +205,8 @@
 		},
 		firebase() {
 			return {
-				encounterEntities: {
-					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities`),
+				showKeybinds: {
+					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
 				}
 			}
@@ -164,19 +220,31 @@
 			]),
 			conditions(entity) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'conditions',
-					entity: entity
-				})
+				if(entity) {
+					this.setSlide({
+						show: true,
+						type: 'conditions',
+						entity: entity
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Show conditions', {
+					});
+				}
 			},
 			info(entity) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'npc',
-					entity: entity
-				})
+				if(entity) {
+					this.setSlide({
+						show: true,
+						type: 'npc',
+						entity: entity
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Show info', {
+					});
+				}
 			},
 			addNpc() {
 				event.stopPropagation();
@@ -187,29 +255,47 @@
 			},
 			edit(key, entity) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'edit',
-					key: key,
-					entity: entity,
-				})
+				if(key) {
+					this.setSlide({
+						show: true,
+						type: 'edit',
+						key: key,
+						entity: entity,
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Edit entity', {
+					});
+				}
 			},
 			transform(key, entity) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'transform',
-					key: key,
-					entity: entity,
-				})
+				if(key) {
+					this.setSlide({
+						show: true,
+						type: 'transform',
+						key: key,
+						entity: entity,
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Transform entity', {
+					});
+				}
 			},
 			damageHeal(entity) {
 				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'damageHealing',
-					target: entity,
-				})
+				if(entity) {
+					this.setSlide({
+						show: true,
+						type: 'damageHealing',
+						target: entity,
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Do damage', {
+					});
+				}
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
@@ -263,6 +349,12 @@
 	.dropdown-menu {
 		left: -30px !important;
 		top: 0px !important;
+
+		i {
+			width: 18px;
+			padding-right: 3px;
+			text-align: center;
+		}
 	}
 }
 .scroll {

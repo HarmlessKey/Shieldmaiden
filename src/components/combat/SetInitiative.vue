@@ -15,7 +15,10 @@
 								<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 								{{ entity.name }}
 							</div>
-							<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="playerInit" @input="storeInitiative(entity.key, entity)" />
+							<span class="d-flex justify-content-end">
+								<!-- <input type="number" class="form-control mr-2" v-model="entity.curHp" v-validate="'numeric'" name="playerCurHp" @change="setCurHp(entity.key, entity)" /> -->
+								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="storeInitiative(entity.key, entity)" />
+							</span>
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -36,7 +39,7 @@
 								<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
 							</div>
 							<div class="d-flex justify-content-right">
-								<input type="text" class="form-control" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
+								<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
 								<a class="roll" @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
 							</div>
 						</li>
@@ -205,6 +208,9 @@
 				}
 				this.selected = []
 			},
+			setCurHp() {
+
+			}
 		}
 	}
 </script>
@@ -267,9 +273,14 @@
 			&.selected {
 				border-color: #2c97de;
 			}
-			input {
-				width: 45px;
+			.form-control {
 				text-align: center;
+				width: 50px;
+				padding: 0;
+				
+				&.init {
+					width: 40px;
+				}
 			}
 			.roll {
 				font-size: 17px;

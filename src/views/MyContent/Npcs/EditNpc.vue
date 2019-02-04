@@ -12,7 +12,7 @@
 				<div class="input-group mb-3">
 					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 					<div class="input-group-append">
-						<button class="btn"><i class="fas fa-search"></i></button>
+						<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
 					</div>
 				</div>
 				<ul class="entities">
@@ -35,115 +35,178 @@
 			
 			<b-card header="Basic Info">
 				<b-row>
-					<b-col>
-						<b-form-input 
-							v-b-tooltip.hover title="Name"
-							type="text" 
-							class="form-control mb-2" 
-							:class="{'input': true, 'error': errors.has('name') }" 
-							v-model="npc.name" 
-							v-validate="'alpha_spaces|required'" 
-							data-vv-as="Name"
-							name="name" 
-							placeholder="Name*"></b-form-input>
-						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-
-						<b-form-input
-							v-if="quick == false"
-							v-b-tooltip.hover title="Size"
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.size" 
-							name="size" 
-							placeholder="Size"></b-form-input>
-
-						<b-row v-if="quick == false">
-							<b-col sm="6">
-								<b-form-input
-									v-b-tooltip.hover title="Type"
+					<b-col md="9" class="mb-3">
+						<!-- NAME -->
+						<b-row>
+							<b-col sm="2"><label for="name">Name *</label></b-col>
+							<b-col>
+								<b-form-input 
+									v-b-tooltip.hover title="Name"
 									type="text" 
 									class="form-control mb-2" 
-									v-model="npc.type" 
-									name="type" 
-									placeholder="Type"></b-form-input>
-							</b-col>
-							<b-col sm="6">
-								<b-form-input
-									v-b-tooltip.hover title="Subtype"
-									type="text"
-									class="form-control mb-2"
-									v-model="npc.subtype" 
-									name="subtype" 
-									placeholder="Subtype"></b-form-input>
+									:class="{'input': true, 'error': errors.has('name') }" 
+									v-model="npc.name" 
+									v-validate="'alpha_spaces|required'" 
+									data-vv-as="Name"
+									id="name"
+									name="name" 
+									placeholder="Name*"></b-form-input>
+								<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 							</b-col>
 						</b-row>
 
-						<b-form-input 
-							v-if="quick == false"
-							v-b-tooltip.hover title="Alignment"
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.alignment" 
-							name="alignment" 
-							placeholder="Alignment"></b-form-input>
+						<!-- SIZE -->
+						<b-row v-if="quick == false">
+							<b-col sm="2"><label for="size">Size</label></b-col>
+								<b-col>
+									<b-form-input
+										v-b-tooltip.hover title="Size"
+										type="text" 
+										class="form-control mb-2" 
+										v-model="npc.size"
+										id="size"
+										name="size" 
+										placeholder="Size"></b-form-input>
+								</b-col>
+						</b-row>
+						
+						<!-- TYPE -->
+						<b-row v-if="quick == false">
+							<b-col sm="6">
+								<b-row>
+									<b-col sm="4"><label for="type">Type</label></b-col>
+									<b-col sm="8">
+										<b-form-input
+											v-b-tooltip.hover title="Type"
+											type="text" 
+											class="form-control mb-2" 
+											v-model="npc.type" 
+											name="type" 
+											id="type"
+											placeholder="Type"></b-form-input>
+									</b-col>
+								</b-row>
+							</b-col>
 
-						<b-form-input 
-							v-b-tooltip.hover title="Speed"
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.speed" 
-							name="speed" 
-							placeholder="Speed"></b-form-input>
+							<b-col sm="6">
+								<b-row>
+									<b-col sm="4"><label for="subtype">Subtype</label></b-col>
+									<b-col sm="8">
+										<b-form-input
+											v-b-tooltip.hover title="Subtype"
+											type="text"
+											class="form-control mb-2"
+											v-model="npc.subtype" 
+											name="subtype" 
+											id="subtype"
+											placeholder="Subtype"></b-form-input>
+									</b-col>
+								</b-row>
+							</b-col>
+						</b-row>
 
-						<b-form-input 
-							v-if="quick == false"
-							v-b-tooltip.hover title="Senses" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.senses" 
-							name="senses" 
-							placeholder="Senses"></b-form-input>
+						<!-- ALIGNMENT -->
+						<b-row v-if="quick == false">
+							<b-col sm="2"><label for="alignment">Alignment</label></b-col>
+							<b-col>
+								<b-form-input v-b-tooltip.hover title="Alignment"
+									type="text" 
+									class="form-control mb-2" 
+									v-model="npc.alignment" 
+									name="alignment" 
+									id="alignment"
+									placeholder="Alignment"></b-form-input>
+							</b-col>
+						</b-row>
 
-						<b-form-input
-							v-if="quick == false"
-							v-b-tooltip.hover title="Languages" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.languages" 
-							name="Languages" 
-							placeholder="Languages"></b-form-input>
+						<!-- SPEED -->
+						<b-row>
+							<b-col sm="2"><label for="speed">Speed</label></b-col>
+							<b-col>
+								<b-form-input 
+									v-b-tooltip.hover title="Speed"
+									type="text" 
+									class="form-control mb-2" 
+									v-model="npc.speed" 
+									name="speed" 
+									id="speed"
+									placeholder="Speed"></b-form-input>
+							</b-col>
+						</b-row>
 
-						<b-form-input 
-							v-b-tooltip.hover title="Challenge Rating" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.challenge_rating" 
-							name="Challenge Rating" 
-							placeholder="Challenge Rating"></b-form-input>
+						<!-- SENSES -->
+						<b-row v-if="quick == false">
+							<b-col sm="2"><label for="senses">Senses</label></b-col>
+							<b-col>
+								<b-form-input v-b-tooltip.hover title="Senses" 
+									type="text" 
+									class="form-control mb-2" 
+									v-model="npc.senses" 
+									name="senses" 
+									id="senses"
+									placeholder="Senses"></b-form-input>
+							</b-col>
+						</b-row>
 
-						<b-form-input 
-							v-b-tooltip.hover title="Avatar"
-							type="text" 
-							class="form-control" 
-							:class="{'input': true, 'error': errors.has('avatar') }" 
-							v-model="npc.avatar" 
-							v-validate="'url'" 
-							data-vv-as="Avatar"
-							name="avatar" 
-							placeholder="Image URL"></b-form-input>
-						<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+						<!-- LANGUAGES -->
+						<b-row v-if="quick == false">
+							<b-col sm="2"><label for="languages">Languages</label></b-col>
+							<b-col>
+								<b-form-input v-b-tooltip.hover title="Languages" 
+									type="text" 
+									class="form-control mb-2" 
+									v-model="npc.languages" 
+									name="Languages" 
+									id="languages"
+									placeholder="Languages"></b-form-input>
+							</b-col>
+						</b-row>
+
+						<!-- CR -->
+						<b-row>
+							<b-col sm="2"><label for="cr">Challenge rating</label></b-col>
+							<b-col>
+								<b-form-input 
+									v-b-tooltip.hover title="Challenge Rating" 
+									type="text" 
+									class="form-control mb-2" 
+									v-model="npc.challenge_rating" 
+									name="Challenge Rating" 
+									id="cr"
+									placeholder="Challenge Rating"></b-form-input>
+							</b-col>
+						</b-row>
+
+						<!-- AVATAR -->
+						<b-row>
+							<b-col sm="2"><label for="avatar">Avatar</label></b-col>
+							<b-col>
+								<b-form-input 
+									v-b-tooltip.hover title="Avatar"
+									type="text" 
+									class="form-control" 
+									:class="{'input': true, 'error': errors.has('avatar') }" 
+									v-model="npc.avatar" 
+									v-validate="'url'" 
+									data-vv-as="Avatar"
+									name="avatar" 
+									id="avatar"
+									placeholder="Image URL"></b-form-input>
+								<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+							</b-col>
+						</b-row>
 					</b-col>
 
-					<b-col sm="3" v-if="npc.avatar">
+					<b-col md="3" v-if="npc.avatar">
 						<div class="img-container"><img :src="npc.avatar" /></div>
 					</b-col>
-
 				</b-row>
 			</b-card>
 
 			<b-card header="Health & Armor Class">
 				<b-row>
-					<b-col md="">
+					<b-col class="col">
+						<label for="ac">Armor Class *</label>
 						<b-form-input 
 							v-b-tooltip.hover title="Armor Class"
 							type="number" 
@@ -152,11 +215,13 @@
 							v-model="npc.ac" 
 							v-validate="'required'" 
 							name="ac" 
+							id="ac"
 							data-vv-as="Armor Class"
 							placeholder="Armor Class"></b-form-input>
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 					</b-col>
-					<b-col md="">
+					<b-col class="col">
+						<label for="hp">Hit Points *</label>
 						<b-form-input 
 							v-b-tooltip.hover title="Hit Points"
 							type="number" 
@@ -165,11 +230,13 @@
 							v-model="npc.maxHp" 
 							v-validate="'required'" 
 							name="hp" 
+							id="hp"
 							data-vv-as="Hit Points"
 							placeholder="Hit Points"></b-form-input>
 						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</b-col>
-					<b-col md="" v-if="quick == false">
+					<b-col class="col" v-if="quick == false">
+						<label for="hitdice">Hit Dice</label>
 						<b-form-input
 							v-b-tooltip.hover title="Hit Dice"
 							type="text" 
@@ -177,6 +244,7 @@
 							v-model="npc.hit_dice"  
 							v-validate="{ regex:/^[0-9]+d[0-9]+$/ }"
 							name="hit_dice" 
+							id="hitdice"
 							data-vv-as="Hit Dice"
 							placeholder="Hit Dice"></b-form-input>
 							<p class="validate red" 
@@ -189,18 +257,18 @@
 			</b-card>
 
 			<b-row>
-				<b-col>
+				<b-col sm="6">
 					<b-card header="Ability Scores">
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
-							<b-col sm="2">
+							<b-col class="col-3">
 								<label :for="ability.ability">
-									<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
+									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
 										<path :d="ability.icon"></path>
-									</svg>
+									</svg> -->
 									{{ ability.ability.substring(0,3).toUpperCase() }}
 								</label>
 							</b-col>
-							<b-col sm="8">
+							<b-col class="col-9">
 								<b-form-input 
 									:id="ability.ability" 
 									type="number" 
@@ -211,13 +279,13 @@
 						</b-row>
 					</b-card>
 				</b-col>
-				<b-col>
+				<b-col sm="6">
 					<b-card header="Saving Throws" v-if="quick == false">
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
-							<b-col sm="2">
+							<b-col class="col-3">
 								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
-							<b-col sm="8">
+							<b-col class="col-9">
 								<b-form-input 
 									:id="ability.ability+'_save'" 
 									type="number" 
@@ -233,50 +301,98 @@
 			<div class="card" v-if="quick == false">
 				<div class="card-header">Skills</div>
 					<div class="card-body">
-						<b-row class="skills" v-for="skill, index in skills" :key="index">
-								<b-col sm="2">
-									<label class="text-capitalize">{{ skill }}</label>
-								</b-col>
-								<b-col sm="4">
-									<input 
-										type="number" 
-										class="form-control mr-2 text-capitalize" 
-										v-model="npc[skill]" 
-										name="skill" 
-										:placeholder="skill" />
-								</b-col>
+						<b-row>
+							<b-col md="6">
+								<b-row class="skills" v-for="skill, index in skills.slice(0,9)" :key="index">
+										<b-col class="col-5">
+											<label class="text-capitalize" :for="skill">{{ skill }}</label>
+										</b-col>
+										<b-col class="col-7">
+											<input 
+												type="number" 
+												class="form-control mr-2 text-capitalize" 
+												v-model="npc[skill]" 
+												name="skill" 
+												:id="skill"
+												:placeholder="skill" />
+										</b-col>
+								</b-row>
+							</b-col>
+							<b-col md="6">
+								<b-row class="skills" v-for="skill, index in skills.slice(10,18)" :key="index">
+										<b-col class="col-5">
+											<label class="text-capitalize" :for="skill">{{ skill }}</label>
+										</b-col>
+										<b-col class="col-7">
+											<input 
+												type="number" 
+												class="form-control mr-2 text-capitalize" 
+												v-model="npc[skill]" 
+												name="skill" 
+												:id="skill"
+												:placeholder="skill" />
+										</b-col>
+								</b-row>
+							</b-col>
 						</b-row>
 					</div>
 			</div>
 			
 			<b-card header="Resistances & Vulnerabilities" v-if="quick == false">
-				<b-form-input type="text"
-					v-b-tooltip.hover title="Damage Vulnerabilities" 
-					class="form-control mb-2" 
-					v-model="npc.damage_vulnerabilities" 
-					name="damage_vulnerabilities" 
-					placeholder="Damage Vulnerabilities"></b-form-input>
-				<b-form-input 
-					v-b-tooltip.hover title="Damage Resistances" 
-					type="text" 
-					class="form-control mb-2" 
-					v-model="npc.damage_resistances" 
-					name="damage_resistances" 
-					placeholder="Damage Resistances"></b-form-input>
-				<b-form-input 
-					v-b-tooltip.hover title="Damage Immunities" 
-					type="text" 
-					class="form-control mb-2" 
-					v-model="npc.damage_immunities" 
-					name="damage_immunities" 
-					placeholder="Damage Immunities"></b-form-input>
-				<b-form-input 
-					v-b-tooltip.hover title="Condition Immnunities" 
-					type="text" 
-					class="form-control mb-2" 
-					v-model="npc.condition_immunities" 
-					name="condition_immunities" 
-					placeholder="Condition Immunities"></b-form-input>
+				<b-row>
+					<b-col md="4"><label for="dmg_vul">Damage Vulerabilities</label></b-col>
+					<b-col>
+						<b-form-input type="text"
+							v-b-tooltip.hover title="Damage Vulnerabilities" 
+							class="form-control mb-2" 
+							v-model="npc.damage_vulnerabilities" 
+							name="damage_vulnerabilities" 
+							id="dmg_vul"
+							placeholder="Damage Vulnerabilities"></b-form-input>
+					</b-col>
+				</b-row>
+				
+				<b-row>
+					<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
+					<b-col>
+						<b-form-input 
+							v-b-tooltip.hover title="Damage Resistances" 
+							type="text" 
+							class="form-control mb-2" 
+							v-model="npc.damage_resistances" 
+							name="damage_resistances" 
+							id="dmg_res"
+							placeholder="Damage Resistances"></b-form-input>
+					</b-col>
+				</b-row>
+
+				<b-row>
+					<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
+					<b-col>
+						<b-form-input 
+							v-b-tooltip.hover title="Damage Immunities" 
+							type="text" 
+							class="form-control mb-2" 
+							v-model="npc.damage_immunities" 
+							name="damage_immunities"
+							id="dmg_im" 
+							placeholder="Damage Immunities"></b-form-input>
+					</b-col>
+				</b-row>
+
+				<b-row>
+					<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
+					<b-col>	
+						<b-form-input 
+							v-b-tooltip.hover title="Condition Immnunities" 
+							type="text" 
+							class="form-control mb-2" 
+							v-model="npc.condition_immunities" 
+							name="condition_immunities" 
+							id="con_im"
+							placeholder="Condition Immunities"></b-form-input>
+					</b-col>
+				</b-row>
 			</b-card>
 
 			<!-- ACTIONS / ABILITIES -->

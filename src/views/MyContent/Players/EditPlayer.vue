@@ -6,7 +6,7 @@
 			
 			<b-card header="Basic Info">
 				<b-row>
-					<b-col sm="">
+					<b-col sm="9" class="mb-3">
 						<b-row class="mb-2">
 							<b-col sm="2">
 								<label for="player_name">Player *</label>
@@ -69,71 +69,61 @@
 			</b-card>
 
 				<b-card header="Health & Armor Class">
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="level">Level</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input id="level" 
-								type="number" 
-								min="1"
-								max="20"
-								:class="{'input': true, 'error': errors.has('level') }" 
-								v-model="player.level" 
-								v-validate="'numeric'" 
-								data-vv-as="Level"
-								name="level" 
-								placeholder="Level" />
-							<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="maxHp">HP *</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input id="maxHp" 
-								type="number" 
-								min="1"
-								:class="{'input': true, 'error': errors.has('maxHp') }" 
-								v-model="player.maxHp" 
-								v-validate="'numeric|required'" 
-								data-vv-as="Maxium Hit Points"
-								name="maxHp" 
-								placeholder="Maximum Hit Points*" />
-							<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-						</b-col>
-					</b-row>
-					<b-row class="mb-2">
-						<b-col sm="2">
-							<label for="ac">AC *</label>
-						</b-col>
-						<b-col sm="3">
-							<b-form-input 
-								id="ac" 
-								min="1"
-								type="number" 
-								:class="{'input': true, 'error': errors.has('ac') }" 
-								v-model="player.ac" 
-								v-validate="'numeric|required'" 
-								data-vv-as="Armor Class"
-								name="ac" 
-								placeholder="Armor Class" />
-							<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-						</b-col>
+					<b-row>
+							<b-col class="col-4">
+								<label for="level">Level</label>
+								<b-form-input id="level" 
+									type="number" 
+									min="1"
+									max="20"
+									:class="{'input': true, 'error': errors.has('level') }" 
+									v-model="player.level" 
+									v-validate="'numeric'" 
+									data-vv-as="Level"
+									name="level" 
+									placeholder="Level" />
+								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+							</b-col>
+							<b-col class="col-4">
+								<label for="maxHp">HP *</label>
+								<b-form-input id="maxHp" 
+									type="number" 
+									min="1"
+									:class="{'input': true, 'error': errors.has('maxHp') }" 
+									v-model="player.maxHp" 
+									v-validate="'numeric|required'" 
+									data-vv-as="Maxium Hit Points"
+									name="maxHp" 
+									placeholder="Maximum Hit Points*" />
+								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+							</b-col>
+							<b-col class="col-4">
+								<label for="ac">AC *</label>
+								<b-form-input 
+									id="ac" 
+									min="1"
+									type="number" 
+									:class="{'input': true, 'error': errors.has('ac') }" 
+									v-model="player.ac" 
+									v-validate="'numeric|required'" 
+									data-vv-as="Armor Class"
+									name="ac" 
+									placeholder="Armor Class" />
+								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+							</b-col>
 					</b-row>
 				</b-card>
 				<b-card header="Ability Scores">
 						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
-							<b-col sm="2">
+							<b-col class="col-3">
 								<label :for="ability.ability">
-									<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
+									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
 										<path :d="ability.icon"></path>
-									</svg>
+									</svg> -->
 									{{ ability.ability.substring(0,3).toUpperCase() }}
 								</label>
 							</b-col>
-							<b-col sm="8">
+							<b-col class="col-9">
 								<b-form-input 
 									:id="ability.ability" 
 									type="number" 

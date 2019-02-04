@@ -37,7 +37,9 @@
 				<p><b>Setting NPC's HP</b> 
 					When adding an NPC to an encounter, it can either have the average of their hit dice set as maximum health, 
 					or we can roll the hit dice for you. 
-					If you change this setting to "roll" we will always roll the hit dice of an NPC to set the maximum health points. 
+					If you change this setting to "roll" we will always roll the hit dice of an NPC to set the maximum health points.
+					When we roll the hit points, we add the amount of dice times the constitution modifier. 
+					So for a monster with 2d8 hit dice and a constition modifier of 2 we roll 2 d8 and add 4. 
 				</p>
 			</li>
 

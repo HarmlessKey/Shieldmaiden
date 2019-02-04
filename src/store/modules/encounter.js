@@ -90,8 +90,8 @@ const mutations = {
 			ac: parseInt(db_entity.ac),
 			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
-			npc: db_entity.npc,
 		}
+		entity.npc = (db_entity.npc) ? db_entity.npc : false;
 		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
 		entity.down = (db_entity.down) ? db_entity.down : false;
 		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
@@ -313,9 +313,12 @@ const mutations = {
 	EDIT_ENTITY(state, {key, entity}) {
 		state.entities[key].name = entity.name
 		state.entities[key].initiative = entity.initiative
+		state.entities[key].ac = entity.ac
+		state.entities[key].maxHp = entity.maxHp
+		state.entities[key].curHp = entity.curHp
 		state.entities[key].ac_bonus = entity.ac_bonus
 		state.entities[key].tempHp = entity.tempHp
-
+		
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
 	TRANSFORM_ENTITY(state, {key, entity, remove}) {

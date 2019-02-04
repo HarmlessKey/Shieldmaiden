@@ -53,7 +53,7 @@
 
 				<section id="npcs">
 					<b-card header="NPC's">
-						<p><b>Why call them NPC's?</b> We decided to name it NPC's and not monsters, because friendlies can be added aswell. 
+						<p><b>Why call them NPC's?</b><br/> We decided to name it NPC's and not monsters, because friendlies can be added aswell. 
 						Say your group has recruited a mighty hero to fight with them in an upcomming battle, 
 						you can add this hero as an NPC that you can control and keep track of during the encounter.</p>
 
@@ -66,6 +66,42 @@
 					<b-card header="Encounters">
 						<p>Encounters is what our app is all about. Here we'll talk about creating one, 
 							if you want to know what happens when running an encounter check the section <a href="#run-encounter">Run Encounter</a>.
+						</p>
+						<p>There are some steps for creating an encounter. Some are optional and some are not.</p>
+
+						<p><b>Name</b></br>
+							Every encouner of course needs to have a name. 
+						</p>
+
+						<p><b>Background</b></br>
+							A background image can added to an encounter, this image is shown on the background (if you choose so) when you run the encounter. 
+							It is also shown on the background of the track encounter screen where your players can follow your active encounter. 
+							It is mainly for this purpose we added the option of adding a background. It can really give some atmosphere to your encounters.
+						</p>
+
+						<p><b>Loot</b></br>
+							Loot is nothing more than a reminder that shows when you finish an encounter. 
+							You probably have thought of some loot your players might find if they manage to defeat your encounter. 
+							This will give you a simple overview when the encounter has ended. 
+							In your <router-link to="/settings">settings</router-link> you can even choose to you show it to your party on the track encounter screen. This is set as hidden by default though.
+						</p>
+
+						<p><b>Players and NPC's</b><br/>
+							Every encounter needs entities to fight each other. Below we'll talk about how these entities are stored in an encounter.
+						</p>
+						<p><b>Players</b><br/>
+							When you add a player the current hit points are set to the maximum. 
+							We keep track of current hit points in the encounter, not under the player itself.
+						</p>
+						<p><b>NPC's</b><br/>
+							Adding an NPC copies the some of the values to the encounter. 
+							Name, maximum hit points and armor class are kept track of in the encounter, not under the NPC.
+							This is done so manipulations can be made without changing the original values.<br/>
+							You can choose how the hit points of an NPC are set. 
+							We can either set the average of their hit dice, or we can roll the hit dice for you. 
+							You can choose how you want it in your <router-link to="/settings">settings</router-link>. 
+							When we roll the hit points, we add the amount of dice times the constitution modifier. 
+							So for a monster with 2d8 hit dice and a constition modifier of 2 we roll 2 d8 and add 4.
 						</p>
 					</b-card>
 				</section>
@@ -115,7 +151,7 @@
 							The rest amount will be set as overhealing in the combat log.
 						</p>
 						<p>
-							<b>Dead or Down.</b> If the target is a player and the overkill was equal to or higher than the target's maximum hit points, they will be marked as <u>dead</u>. 
+							<b>Dead or Down.</b><br/> If the target is a player and the overkill was equal to or higher than the target's maximum hit points, they will be marked as <u>dead</u>. 
 							If a player reaches zero hit points they will be prompted to roll a death saving throw when their turn comes up. 
 							With one click you can set if the player succeeded or failed their death save. 
 							When a player is down and they either receive healing, or they are stabilized (a single click of a button let's you stabilize a player), 
@@ -127,21 +163,21 @@
 							For an explaination on why it is not immediatly moved to the "down list" list, check the section on <a href="#run-encounter-track-in">tracking initiavive</a>.
 						</p>
 
-						<p><b>Type of damage.</b> At this moment we do need keep track of the type of damage, 
-						because we are not able to when you roll the damage of a spell. 
-						Check the documention on <a href="#run-encounter-select">selected damage</a> for more information.</p>
+						<p><b>Type of damage.</b><br/> At this moment we do need keep track of the type of damage, 
+						because we are not able to when you roll the damage of a action. 
+						Check the documention on <a href="#run-encounter-select">roll damage</a> for more information.</p>
 
-						<p><b>Critical hits.</b> When you input manual damage, you can select if it was a critical hit. This has no effect on the the amount you submitted. 
+						<p><b>Critical hits.</b><br/> When you input manual damage, you can select if it was a critical hit. This has no effect on the the amount you submitted. 
 						We don't divide it by two or do any sort of manipulation to it, it's up to you input the right amount of damage. 
 						The critical hit checkbox has only two purposes. 
 						First to keep track of in the combat log and second to let a player that is down automitically fail two death saving throws.</p>
 
-						<p><b>Temporary Hit Points.</b> During an encounter entities can be given temporary hit points through the edit function. 
+						<p><b>Temporary Hit Points.</b><br/> During an encounter entities can be given temporary hit points through the edit function. 
 							Temporary hit points are handled as the SRD describes. They serve as an extra pool for damage, but healing will not be put in the temporary pool.
 							When damage received is larger than the termporary hit points pool, the damage carries over into the current hit points of the target.
 						</p>
 
-						<p><b>Transformed targets.</b> If a target is transformed, like a druid in Wild Shape, they get new hit points and a new armor class. 
+						<p><b>Transformed targets.</b><br/> If a target is transformed, like a druid in Wild Shape, they get new hit points and a new armor class. 
 							The new hit points are handled as the SRD describes for Wild Shape and Polymorph. Damage and healing will be done in the new health pool, 
 							and when damage is higher than the current hit points in the transformation, the rest damage is carried over into the old current hit points. 
 							In this last case the transformation is automitically removed from the target and it falls back into it's old form.
@@ -154,7 +190,7 @@
 							If you apply the damage, it is handled exactly the same as manual damage.
 						</p>
 
-						<p><b>Type of damage.</b> Because of how we stored the monsters in our database it is currently not possible to keep track of type of damage. 
+						<p><b>Type of damage.</b><br/> Because of how we stored the monsters in our database it is currently not possible to keep track of type of damage. 
 						We do plan to add this feature in the future.</p>
 
 						<h2 class="pt-5" id="run-encounter-log">Combat Log</h2>

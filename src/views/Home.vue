@@ -3,8 +3,8 @@
 		<div id="home">
 			<section>
 				<div class="container">
-					<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker <span class="gray-hover">BETA</span></h1>
-					<h3>The encounter tracker for D&D 5e.</h3>
+					<h1><i class="fas fa-swords"></i> Harmless Key <strong>Encounter </strong> <strong>Tracker</strong>. <span class="gray-hover">BETA</span></h1>
+					<h3>The <strong>combat </strong> <strong>tracker</strong> for <strong>D&D </strong> <strong>5e.</strong></h3>
 
 					<div v-if="user" class="d-flex justify-content-center mt-5">
 						<router-link class="btn" to="/campaigns">Campaigns</router-link>
@@ -58,12 +58,12 @@
 						<b-col md="4" class="mb-5">
 							<span class="icon"><i class="fas fa-gamepad"></i></span>
 							<h2>Full control</h2>
-							<p>The DM has full control over everything in the encounter. Just like in D&D you make up the rules.</p>
+							<p>The <strong>DM</strong> has full control over everything in the <strong>encounter</strong>. Just like in <strong>DnD</strong> you make up the rules.</p>
 						</b-col>
 						<b-col md="4" class="mb-5">
 							<span class="icon"><i class="fas fa-desktop"></i></span>
 							<h2>For DM and Party</h2>
-							<p>Through a unique link players can follow the encounter. Of course the DM has control over what is shown on the second screen.</p>
+							<p>Through a unique link players can follow the <strong>encounter</strong>. Of course the DM has control over what is shown on the second screen.</p>
 						</b-col>
 					</b-row>
 				</div>
@@ -170,6 +170,9 @@ iframe, img {
 	display: block;
 	width: 100%;
 	margin-bottom: 40px;
+}
+strong {
+	font-weight: normal;
 }
 
 </style>

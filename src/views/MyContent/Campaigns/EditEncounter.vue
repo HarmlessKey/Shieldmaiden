@@ -48,7 +48,14 @@
 							<div class="tab-content">
 								<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 									<h2>In Campaign</h2>
-									<a class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
+									
+									<div v-if="campaign && campaign.players === undefined">
+										<h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
+										<p>Add players to your campaign first.</p>
+										<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+									</div>
+									<a v-else class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
+
 									<ul class="entities" v-if="campaign && players && encounter">
 										<li v-for="(player, key) in campaign.players" 
 											:key="key" 
@@ -80,13 +87,8 @@
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
-									<div v-if="campaign && campaign.players === undefined">
-										<h3><i class="fas fa-users red"></i> No Players Yet</h3>
-										<p>Add players to your campaign first.</p>
-										<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
-									</div>
 									<h2>Not in Campaign</h2>
-									<ul class="entities">
+									<ul class="entities" v-if="campaign.players">
 											<li v-for="(player, key) in players" 
 											:key="key" 
 											class="d-flex justify-content-between" v-if="Object.keys(campaign.players).indexOf(key) < 0">
@@ -368,7 +370,12 @@
 			]),
 			entitiesAmount: function() {
 				if (this.encounter) {
-					return Object.keys(this.encounter.entities).length
+					if(this.encounter.entities) {
+						return Object.keys(this.encounter.entities).length
+					}
+					else {
+						return 0
+					}
 				}
 				return 0
 			}

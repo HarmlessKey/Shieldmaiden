@@ -51,7 +51,7 @@
 
 	export default {
 		name: 'Turns',
-		props: ['active_len'],
+		props: ['active_len', 'current', 'next'],
 		data () {
 			return {
 				// none
@@ -70,6 +70,7 @@
 				'set_targeted',
 				'setSlide',
 				'set_finished',
+				'set_targetReminder',
 			]),
 			slide(type) {
 				event.stopPropagation();
@@ -86,6 +87,7 @@
 			nextTurn() {
 				let turn = this.encounter.turn + 1
 				let round = this.encounter.round
+
 				if (turn >= this.active_len) {
 					turn = 0
 					round++
@@ -96,6 +98,57 @@
 					round: round,
 				})
 				this.set_targeted(undefined);
+
+				this.reminders(this.current, 'endTurn')
+				this.reminders(this.next, 'startTurn')
+			},
+			reminders(target, trigger){
+				for(let key in target.reminders) {
+					if(target.reminders[key].trigger == trigger) {
+
+						//Buttons to remove or keep reminder
+						if(!target.reminders[key].action) {
+							var buttons = [
+								{ 
+									text: 'Keep Reminder', 
+									action: (toast) => { 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+								{ 
+									text: 'Remove', 
+									action: (toast) => { 
+										this.set_targetReminder({
+											action: 'remove',
+											entity: target.key,
+											key: key,
+										}); 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+							]
+						}
+						else {
+							var buttons = ''
+						}
+
+						this.$snotify.warning(
+							target.name + ': ' + target.reminders[key].notify,
+							target.reminders[key].title, 
+							{
+								position: "centerCenter",
+								timeout: 0,
+								buttons
+							}
+						);
+						if(target.reminders[key].action == 'remove')
+						this.set_targetReminder({
+							action: 'remove',
+							entity: target.key,
+							key: key,
+						}); 
+					}
+				}
 			},
 			prevTurn() {
 				let turn = this.encounter.turn - 1

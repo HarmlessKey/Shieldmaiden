@@ -153,7 +153,7 @@ export const setHP = {
 										text: 'Keep Reminder', 
 										action: (toast) => { 
 											this.$snotify.remove(toast.id); 
-										}, bold: true
+										}, bold: false
 									},
 									{ 
 										text: 'Remove', 

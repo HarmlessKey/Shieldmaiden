@@ -584,11 +584,21 @@ ul.nav {
 		background: $gray-darker !important;
 	}
 }
-.snotify-error .snotifyToast__inner {
-	background-color: $red !important;
+.snotify-error {
+	.snotifyToast__inner {
+		background-color: $red !important;
+	}
+	.snotifyToast__buttons {
+		background-color: $red !important;
+	}
 }
-.snotify-error .snotifyToast__buttons {
-	background-color: $red !important;
+.snotify-warning {
+	.snotifyToast__inner {
+		background-color: $orange !important;
+	}
+	.snotifyToast__buttons {
+		background-color: $orange !important;
+	}
 }
 .snotify-icon.snotify-icon--error {
 	background-image: url('../assets/_img/styles/sword-break.png');

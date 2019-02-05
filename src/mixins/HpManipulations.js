@@ -28,6 +28,7 @@ export const setHP = {
 			'set_dead',
 			'set_log',
 			'set_meters',
+			'set_targetReminder',
 		]),
 		setHP(amount, crit, target, current, type, log = true, notify = true, undo = false) {
 			amount = parseInt(amount);
@@ -137,6 +138,39 @@ export const setHP = {
 					key: target.key,
 					newHp: newhp,
 				})
+
+				//Check if there a reminder is triggered on damage taken
+				for(let key in target.reminders) {
+					if(target.reminders[key].trigger == 'damage') {
+						this.$snotify.warning(
+							target.reminders[key].notify,
+							target.reminders[key].title, 
+							{
+								position: "centerCenter",
+								timeout: 0,
+								buttons: [
+									{ 
+										text: 'Keep Reminder', 
+										action: (toast) => { 
+											this.$snotify.remove(toast.id); 
+										}, bold: true
+									},
+									{ 
+										text: 'Remove', 
+										action: (toast) => { 
+											this.set_targetReminder({
+												action: 'remove',
+												entity: target.key,
+												key: key,
+											}); 
+											this.$snotify.remove(toast.id); 
+										}, bold: false
+									},
+								]
+							}
+						);
+					}
+				}
 			}
 
 			//Notification

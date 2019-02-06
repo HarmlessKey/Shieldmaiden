@@ -13,6 +13,7 @@
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
 		<Track v-if="slide.type == 'track'" />
 		<Settings v-if="slide.type == 'settings'" />
+		<TargetReminders v-if="slide.type == 'targetReminders'" :entityKey="slide.key" />
 	</div>
 </template>
 
@@ -29,6 +30,7 @@
 	import DamageHealing from '@/components/slides/DamageHealing.vue';
 	import Track from '@/components/slides/Track.vue';
 	import Settings from '@/components/slides/Settings.vue';
+	import TargetReminders from '@/components/slides/TargetReminders.vue';
 
 	export default {
 		components: {
@@ -44,6 +46,7 @@
 			DamageHealing: DamageHealing,
 			Track: Track,
 			Settings: Settings,
+			TargetReminders: TargetReminders,
 		},
 		data() {
 			return {

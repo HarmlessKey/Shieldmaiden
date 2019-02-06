@@ -60,6 +60,10 @@
 										@click="edit(entity.key, entities[entity.key])">
 											<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
 										</a>
+										<a class="dropdown-item" @click="reminders(entity.key)"
+											v-shortkey="['m']" @shortkey="reminders(targeted)">
+											<i class="fas fa-stopwatch"></i> <span v-if="showKeybinds.keyBinds === undefined">[m]</span> Reminders
+										</a>
 										<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
 											v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
 											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
@@ -283,6 +287,20 @@
 					});
 				}
 			},
+			reminders(key) {
+				event.stopPropagation();
+				if(key) {
+					this.setSlide({
+						show: true,
+						type: 'targetReminders',
+						key: key,
+					})
+				}
+				else {
+					this.$snotify.error('Select a target', 'Reminders', {
+					});
+				}
+			},
 			damageHeal(entity) {
 				event.stopPropagation();
 				if(entity) {
@@ -366,13 +384,13 @@ ul.targets {
 	padding:0 15px 0 10px;
 
 	li {
-		height: 32px;
+		// height: 32px;
 		margin-bottom: 8px;
 		border: solid 1px transparent;
 		cursor: pointer;
 
 		&:hover {
-			border-color: #2c97de;
+			border-color: #b2b2b2;
 		}
 		&.targeted {
 			border-color: #2c97de !important;

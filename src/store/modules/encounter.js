@@ -99,6 +99,7 @@ const mutations = {
 		entity.stable = (db_entity.stable) ? db_entity.stable : false;
 		entity.dead = (db_entity.dead) ? db_entity.dead : false;
 		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
+		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
 
 		if (db_entity.meters) {
 			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
@@ -409,7 +410,30 @@ const mutations = {
 	},
 	RESET_STORE(state) {
 		Object.assign(state, getDefaultState())
-	}
+	},
+	SET_TARGETREMINDER(state, {action, entity, key, reminder, type}) {
+		if(action == 'add') {
+			if(type == 'premade') {
+				encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder)
+				Vue.set(state.entities[entity].reminders, key, reminder)
+			}
+			if(type == 'custom') {
+				encounters_ref.child(`${state.path}/entities/${entity}/reminders`).push(reminder)
+				.then(res => {
+					//Returns the key of the added entry
+					Vue.set(state.entities[entity].reminders, res.getKey(), reminder)
+				});
+			}
+		}
+		else if(action == 'remove') {
+			Vue.delete(state.entities[entity].reminders, key)
+			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove()
+		}
+		else if(action == 'update') {
+			Vue.set(state.entities[entity].reminders[key], 'rounds', reminder)
+			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder)
+		}
+	},
 }
 
 const actions = {
@@ -509,7 +533,10 @@ const actions = {
 	},
 	reset_store({ commit }) {
 		commit("RESET_STORE")
-	}
+	},
+	set_targetReminder({ commit }, payload) {
+		commit('SET_TARGETREMINDER', payload)
+	},
 }
 
 export const encounter_module = {

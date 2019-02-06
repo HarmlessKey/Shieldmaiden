@@ -11,7 +11,11 @@
 				:_idle = "_idle"
 			/>
 			<div v-else class="combat">
-				<Turns :active_len="Object.keys(_active).length"/>
+				<Turns 
+					:active_len="Object.keys(_active).length"
+					:current="_active[encounter.turn]"
+					:next="_active[encounter.turn + 1]"
+				/>
 				{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
 				<Current 
 					:current="_active[encounter.turn]"

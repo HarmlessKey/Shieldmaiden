@@ -32,6 +32,12 @@ $red: #cc3e4a;
 $red-hover: #a3303a;
 $orange: #e76d3b;
 $yellow: #c1b947;
+$purple: #9b7aba;
+$blue-light: #88b3ce;
+$green-light: #9ac16a;
+$orange-light: #db815e;
+$red-light: #c45e66;
+$yellow-light: #e2da5f;
 
 $header-hight: 50px;
 
@@ -98,6 +104,12 @@ html body {
 .red { color: $red !important; }
 .orange { color: $orange !important; }
 .yellow { color: $yellow !important; }
+.purple { color: $purple !important; }
+.blue-light { color: $blue-light !important; }
+.green-light { color: $green-light !important; }
+.orange-light { color: $orange-light !important; }
+.red-light { color: $red-light !important; }
+.yellow-light { color: $yellow-light !important; }
 
 .bg-gray { background-color: $gray !important; }
 .bg-gray-light { background-color: $gray-light !important; }
@@ -111,6 +123,12 @@ html body {
 .bg-red { background-color: $red !important; }
 .bg-orange { background-color: $orange !important; }
 .bg-yellow { background-color: $yellow !important; }
+.bg-purple { background-color: $purple !important; }
+.bg-blue-light { background-color: $blue-light !important; }
+.bg-green-light { background-color: $green-light !important; }
+.bg-orange-light { background-color: $orange-light !important; }
+.bg-red-light { background-color: $red-light !important; }
+.bg-yellow-light { background-color: $yellow-light !important; }
 
 .pointer {
 	cursor: pointer !important;
@@ -584,11 +602,21 @@ ul.nav {
 		background: $gray-darker !important;
 	}
 }
-.snotify-error .snotifyToast__inner {
-	background-color: $red !important;
+.snotify-error {
+	.snotifyToast__inner {
+		background-color: $red !important;
+	}
+	.snotifyToast__buttons {
+		background-color: $red !important;
+	}
 }
-.snotify-error .snotifyToast__buttons {
-	background-color: $red !important;
+.snotify-warning {
+	.snotifyToast__inner {
+		background-color: $orange !important;
+	}
+	.snotifyToast__buttons {
+		background-color: $orange !important;
+	}
 }
 .snotify-icon.snotify-icon--error {
 	background-image: url('../assets/_img/styles/sword-break.png');

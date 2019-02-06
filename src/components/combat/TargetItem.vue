@@ -1,93 +1,101 @@
 <template>
-	<div class="target">
-		<span class="initiative" v-b-tooltip.hover title="Initiative">{{ entity.initiative }}</span>
-		<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
-			<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
-				<i class="fas fa-paw-claws"></i>
-			</span>
-		</span>
-		<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }">
-			<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
-				<i class="fas fa-paw-claws"></i>
-			</span>
-		</span>
-		<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-		<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">
-			{{ displayStats().ac + entity.ac_bonus}}
-		</span>
-		<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
-
-		<template>
-			<div class="progress health-bar">
-				<span>
-					<template v-if="entity.active && showKeybinds.keyBinds === undefined">[{{ i }}]</template>
-					{{ entity.name }}
+	<div>
+		<div class="target">
+			<span class="initiative" v-b-tooltip.hover title="Initiative">{{ entity.initiative }}</span>
+			<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
+				<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
+					<i class="fas fa-paw-claws"></i>
 				</span>
-				<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
-					<div class="condition bg-red" 
-						v-for="(condition, key) in entity.conditions" 
-						:key="key" 
-						v-b-tooltip.hover :title="key"
-						@click="showCondition(key, entity)"></div>
-				</div>
-				<div class="progress-bar" :class="{ 
-					'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
-					'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-					'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
-					}" 
-					role="progressbar" 
-					:style="{ width: percentage(displayStats().curHp, displayStats().maxHp) + '%' }" aria-valuemin="0" aria-valuemax="100">
-				</div>
-			</div>
+			</span>
+			<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }">
+				<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
+					<i class="fas fa-paw-claws"></i>
+				</span>
+			</span>
+			<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
+			<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">
+				{{ displayStats().ac + entity.ac_bonus}}
+			</span>
+			<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
 
-			<!-- HEALTH -->
-			<template v-if="entity.active == true">
-				<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
-					{{ setNumber(displayStats().curHp) }} 
-					<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
-						<span class="current" :class="{ 
-							'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
-							'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-							'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
-							}">{{ animatedNumber }}</span>
-							<span class="gray-hover">/</span>{{ displayStats().maxHp }}
-						<template v-if="entity.tempHp">
-							<span class="gray-hover">+{{ entity.tempHp }}</span>
-						</template>
+			<template>
+				<div class="progress health-bar">
+					<span>
+						<template v-if="entity.active && showKeybinds.keyBinds === undefined">[{{ i }}]</template>
+						{{ entity.name }}
 					</span>
-				</template>
-				<template v-else>
-					<div class="hp">
-						<div v-if="entity.stable" class="green">
-							<span><i class="fas fa-fist-raised"></i> Stable</span>
-						</div>
-						<div v-if="entity.dead && !entity.stable" class="red">
-							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
-						</div>
-						<div v-else class="hp d-flex justify-content-end">
-							<div v-for="check, index in entity.saves" :key="index">
-								<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
-								<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+					<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
+						<div class="condition bg-red" 
+							v-for="(condition, key) in entity.conditions" 
+							:key="key" 
+							v-b-tooltip.hover :title="key"
+							@click="showCondition(key, entity)"></div>
+					</div>
+					<div class="progress-bar" :class="{ 
+						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+						'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+						'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+						}" 
+						role="progressbar" 
+						:style="{ width: percentage(displayStats().curHp, displayStats().maxHp) + '%' }" aria-valuemin="0" aria-valuemax="100">
+					</div>
+				</div>
+
+				<!-- HEALTH -->
+				<template v-if="entity.active == true">
+					<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
+						{{ setNumber(displayStats().curHp) }} 
+						<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+							<span class="current" :class="{ 
+								'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+								'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+								'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+								}">{{ animatedNumber }}</span>
+								<span class="gray-hover">/</span>{{ displayStats().maxHp }}
+							<template v-if="entity.tempHp">
+								<span class="gray-hover">+{{ entity.tempHp }}</span>
+							</template>
+						</span>
+					</template>
+					<template v-else>
+						<div class="hp">
+							<div v-if="entity.stable" class="green">
+								<span><i class="fas fa-fist-raised"></i> Stable</span>
+							</div>
+							<div v-if="entity.dead && !entity.stable" class="red">
+								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+							</div>
+							<div v-else class="hp d-flex justify-content-end">
+								<div v-for="check, index in entity.saves" :key="index">
+									<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
+									<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+								</div>
 							</div>
 						</div>
-					</div>
+					</template>
 				</template>
+				<div v-else class="text-right">
+					<span class="green" 
+						v-if="entity.addNextRound == true"
+						v-b-tooltip.hover title="Will be added next round"
+						@click="add_next_round({key: entity.key, action: 'tag', value: false})">
+						<i class="fas fa-check"></i>
+					</span>
+					<span class="gray-hover" 
+						v-if="entity.addNextRound == false"
+						v-b-tooltip.hover title="Click to add next round"
+						@click="add_next_round({key: entity.key, action: 'tag', value: true})">
+						<i class="fas fa-check"></i>
+					</span>
+				</div>
 			</template>
-			<div v-else class="text-right">
-				<span class="green" 
-					v-if="entity.addNextRound == true"
-					v-b-tooltip.hover title="Will be added next round"
-					@click="add_next_round({key: entity.key, action: 'tag', value: false})">
-					<i class="fas fa-check"></i>
-				</span>
-				<span class="gray-hover" 
-					v-if="entity.addNextRound == false"
-					v-b-tooltip.hover title="Click to add next round"
-					@click="add_next_round({key: entity.key, action: 'tag', value: true})">
-					<i class="fas fa-check"></i>
-				</span>
-			</div>
-		</template>
+		</div>
+
+		<!-- REMINDERS -->
+		<ul v-if="entity.reminders" class="reminders d-flex justify-content-start">
+			<li v-for="reminder, index in entity.reminders" v-b-tooltip.hover :title="reminder.title" :class="'bg-'+reminder.color">
+			</li>
+		</ul>
 	</div>
 </template>
 
@@ -258,5 +266,16 @@
 }
 .temp {
 	color: #494747;
+}
+ul.reminders {
+	padding-left: 30px;
+	list-style: none;
+
+	li {
+		width: 20px;
+		height: 7px;
+		// border: solid 1px #fff;
+		margin: 1px 1px 1px 0;
+	}
 }
 </style>

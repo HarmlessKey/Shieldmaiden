@@ -50,7 +50,7 @@
 							</div>
 						</template>
 
-						<b-row class="conditions">
+						<b-row class="conditions" v-if="Object.keys(current.conditions).length > 0">
 							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
 								<span class="n" v-if="key == 'exhaustion'">
 									{{ current.conditions[key] }}
@@ -64,6 +64,15 @@
 										<path :d="conditions[key].icon" fill-opacity="1"></path>
 									</svg>
 								</template>
+							</b-col>
+						</b-row>
+
+						<b-row v-if="current.reminders" class="reminders justify-content-start px-2">
+							<b-col class="col-3 p-1" v-for="reminder, key in current.reminders" :key="key">
+								<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
+									{{ reminder.title }}
+									<span class="delete"><i class="fas fa-times"></i></span>
+								</a>
 							</b-col>
 						</b-row>
 						<NPC class="mt-3" :entity="current" />
@@ -99,6 +108,14 @@
 				}
 			}
 		},
+		watch: {
+			//Watch current to trigger reminders when an entity starts their turn
+			current(newVal, oldVal) {
+				if(newVal.id != oldVal.id) {
+					this.reminders()
+				}
+			}
+		},
 		computed: {
 			...mapGetters([
 				'entities',
@@ -110,6 +127,7 @@
 				'setSlide',
 				'set_save',
 				'set_stable',
+				'set_targetReminder',
 			]),
 			showCondition(show) {
 				event.stopPropagation();
@@ -147,6 +165,88 @@
 					 action: 'set',
 					})
 			 },
+			 removeReminder(key) {
+				this.set_targetReminder({
+					action: 'remove',
+					entity: this.current.key,
+					key: key,
+				})
+			},
+			reminders(){
+				for(let key in this.current.reminders) {
+					var notify = false
+
+					//TIMED REMINDERS
+					if(this.current.reminders[key].trigger == 'timed') {
+						if(this.current.reminders[key].rounds > 1) {
+							console.log('round - 1')
+							let rounds = parseInt(this.current.reminders[key].rounds) - 1
+
+							this.set_targetReminder({
+								action: 'update',
+								entity: this.current.key,
+								key: key,
+								reminder: rounds
+							}); 
+						}
+						else {
+							notify = true;
+						}
+					}
+
+					//START OF TURN REMINDERS
+					if(this.current.reminders[key].trigger == 'startTurn') {
+						notify = true;
+					}
+					
+					// NOTIFY
+					if(notify) {
+						//Buttons to remove or keep reminder
+						if(this.current.reminders[key].action != 'remove') {
+							var buttons = [
+								{ 
+									text: 'Keep Reminder', 
+									action: (toast) => { 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+								{ 
+									text: 'Remove', 
+									action: (toast) => { 
+										this.set_targetReminder({
+											action: 'remove',
+											entity: this.current.key,
+											key: key,
+										}); 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+							]
+						}
+						else {
+							var buttons = ''
+						}
+
+						// NOTIFICATION
+						this.$snotify.warning(
+							this.current.name + ': ' + this.current.reminders[key].notify,
+							this.current.reminders[key].title, 
+							{
+								position: "centerCenter",
+								timeout: 0,
+								buttons
+							}
+						);
+						if(this.current.reminders[key].action == 'remove') {
+							this.set_targetReminder({
+								action: 'remove',
+								entity: this.current.key,
+								key: key,
+							}); 
+						}
+					}
+				}
+			},
 		}
 	}
 </script>
@@ -230,6 +330,34 @@
 			background-color: #302f2f;
 			padding: 2px;
 			cursor: pointer;
+		}
+	}
+	.reminders {
+		margin-bottom: 20px;
+		font-size: 11px;
+
+		.col {
+			a {
+				color: #fff !important;
+				position: relative;
+				padding: 3px;
+
+				.delete {
+					display: none;
+				}
+
+				&:hover {
+					.delete {
+						position: absolute;
+						right: 5px;
+						color: #fff !important;
+						font-size: 12px;
+						display: inline-block;
+						
+					}
+					padding-right: 15px;
+				}
+			}
 		}
 	}
 }

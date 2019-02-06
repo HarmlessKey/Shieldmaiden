@@ -139,36 +139,52 @@ export const setHP = {
 					newHp: newhp,
 				})
 
-				//Check if there a reminder is triggered on damage taken
+				//Check if a reminder is triggered on damage taken
 				for(let key in target.reminders) {
 					if(target.reminders[key].trigger == 'damage') {
+						//Buttons to remove or keep reminder
+						if(this.current.reminders[key].action != 'remove') {
+							var buttons = [
+								{ 
+									text: 'Keep Reminder', 
+									action: (toast) => { 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+								{ 
+									text: 'Remove', 
+									action: (toast) => { 
+										this.set_targetReminder({
+											action: 'remove',
+											entity: this.current.key,
+											key: key,
+										}); 
+										this.$snotify.remove(toast.id); 
+									}, bold: false
+								},
+							]
+						}
+						else {
+							var buttons = ''
+						}
+
+						// NOTIFICATION
 						this.$snotify.warning(
-							target.reminders[key].notify,
-							target.reminders[key].title, 
+							this.current.name + ': ' + this.current.reminders[key].notify,
+							this.current.reminders[key].title, 
 							{
 								position: "centerCenter",
 								timeout: 0,
-								buttons: [
-									{ 
-										text: 'Keep Reminder', 
-										action: (toast) => { 
-											this.$snotify.remove(toast.id); 
-										}, bold: false
-									},
-									{ 
-										text: 'Remove', 
-										action: (toast) => { 
-											this.set_targetReminder({
-												action: 'remove',
-												entity: target.key,
-												key: key,
-											}); 
-											this.$snotify.remove(toast.id); 
-										}, bold: false
-									},
-								]
+								buttons
 							}
 						);
+						if(this.current.reminders[key].action == 'remove') {
+							this.set_targetReminder({
+								action: 'remove',
+								entity: this.current.key,
+								key: key,
+							}); 
+						}
 					}
 				}
 			}

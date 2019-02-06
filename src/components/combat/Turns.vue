@@ -51,7 +51,7 @@
 
 	export default {
 		name: 'Turns',
-		props: ['active_len', 'current', 'next'],
+		props: ['active_len', 'current'],
 		data () {
 			return {
 				// none
@@ -100,14 +100,13 @@
 				this.set_targeted(undefined);
 
 				this.reminders(this.current, 'endTurn')
-				this.reminders(this.next, 'startTurn')
 			},
 			reminders(target, trigger){
 				for(let key in target.reminders) {
 					if(target.reminders[key].trigger == trigger) {
 
 						//Buttons to remove or keep reminder
-						if(!target.reminders[key].action) {
+						if(target.reminders[key].action != 'remove') {
 							var buttons = [
 								{ 
 									text: 'Keep Reminder', 

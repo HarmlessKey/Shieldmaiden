@@ -425,9 +425,13 @@ const mutations = {
 				});
 			}
 		}
-		else {
+		else if(action == 'remove') {
 			Vue.delete(state.entities[entity].reminders, key)
 			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove()
+		}
+		else if(action == 'update') {
+			Vue.set(state.entities[entity].reminders[key], 'rounds', reminder)
+			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder)
 		}
 	},
 }

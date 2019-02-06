@@ -390,7 +390,7 @@ ul.targets {
 		cursor: pointer;
 
 		&:hover {
-			border-color: #2c97de;
+			border-color: #b2b2b2;
 		}
 		&.targeted {
 			border-color: #2c97de !important;

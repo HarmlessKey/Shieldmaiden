@@ -111,7 +111,7 @@
 		watch: {
 			//Watch current to trigger reminders when an entity starts their turn
 			current(newVal, oldVal) {
-				if(newVal.id != oldVal.id) {
+				if(newVal != oldVal) {
 					this.reminders()
 				}
 			}

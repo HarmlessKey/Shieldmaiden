@@ -143,7 +143,7 @@ export const setHP = {
 				for(let key in target.reminders) {
 					if(target.reminders[key].trigger == 'damage') {
 						//Buttons to remove or keep reminder
-						if(this.current.reminders[key].action != 'remove') {
+						if(target.reminders[key].action != 'remove') {
 							var buttons = [
 								{ 
 									text: 'Keep Reminder', 
@@ -156,7 +156,7 @@ export const setHP = {
 									action: (toast) => { 
 										this.set_targetReminder({
 											action: 'remove',
-											entity: this.current.key,
+											entity: target.key,
 											key: key,
 										}); 
 										this.$snotify.remove(toast.id); 
@@ -170,18 +170,18 @@ export const setHP = {
 
 						// NOTIFICATION
 						this.$snotify.warning(
-							this.current.name + ': ' + this.current.reminders[key].notify,
-							this.current.reminders[key].title, 
+							target.name + ': ' + target.reminders[key].notify,
+							target.reminders[key].title, 
 							{
 								position: "centerCenter",
 								timeout: 0,
 								buttons
 							}
 						);
-						if(this.current.reminders[key].action == 'remove') {
+						if(target.reminders[key].action == 'remove') {
 							this.set_targetReminder({
 								action: 'remove',
-								entity: this.current.key,
+								entity: target.key,
 								key: key,
 							}); 
 						}

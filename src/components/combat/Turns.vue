@@ -19,7 +19,7 @@
 
 		<div class="round-info">
 			<span v-if="encounter.round" id="round">Round <span class="number mx-2">{{ encounter.round }}</span></span>
-			<span v-if="encounter.round" id="turn">Turn <span class="number ml-2">{{ encounter.turn + 1 }}</span></span>
+			<span v-if="encounter.round" id="turn">Turn <span class="number ml-2">{{ encounter.turn + 1 }}<span class="small gray-hover"> /{{ active_len }}</span></span></span>
 			<span class="current-name"></span>
 		</div>
 		<div>

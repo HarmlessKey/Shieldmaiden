@@ -20,22 +20,15 @@
 							<i class="fas fa-info"></i>
 						</a>
 					</p>
-					<b-row class="mb-3 copy">
-						<b-col sm="8">
-							<a @click="copyLink()" class="mb-2">{{ copy }}</a>
-						</b-col>
-						<b-col sm="4">
-							<a class="btn btn-block" @click="copyLink()">Copy <i class="fas fa-copy"></i></a>
-							<input type="hidden" id="copy" :value="copy">
-						</b-col>
-					</b-row>
-
 					<p class="collapse mb-3" id="track">
 						With this link your active encounter can be followed on different devices. 
 						Send it to your players so they can see it on their tablets or phones, 
 						or put it up on a second screen that everyone can see. 
 						You control what is dispayed on the link through the <router-link to="/settings#track">settings</router-link>.
 					</p>
+				
+					<p><a @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a></p>
+					<input type="hidden" id="copy" :value="copy">
 				</b-col>
 			</b-row>
 			

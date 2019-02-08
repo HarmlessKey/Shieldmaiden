@@ -16,13 +16,13 @@
 							<span class="d-none d-md-inline mr-1">Roll</span>
 							<i class="fas fa-check"></i>
 						</span>
-						<a v-b-tooltip.hover title="Average" @click="set('unset', 'rollHp')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Average" @click="set('unset', 'rollHp')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Average</span>
 							<i class="fas fa-check"></i>
 						</a>
 					</div>
 					<div v-show="settings.rollHp === undefined">
-						<a v-b-tooltip.hover title="Roll" @click="set('set', 'rollHp', true)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Roll" @click="set('set', 'rollHp', true)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Roll</span>
 							<i class="fas fa-check"></i>
 						</a>
@@ -45,7 +45,7 @@
 
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-heart"></i> Show keybinds
+					<i class="fas fa-keyboard"></i> Show keybinds
 					<a data-toggle="collapse" class="ml-1" :href="'#hotkeys'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -58,13 +58,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'keyBinds')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'keyBinds')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="settings.keyBinds === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'keyBinds', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'keyBinds', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>

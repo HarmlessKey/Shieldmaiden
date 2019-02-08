@@ -89,5 +89,11 @@
 .tab-content {
 	padding: 0 10px 15px 10px;
 }
+@media only screen and (max-width: 600px) {
+	#actions, .scroll {
+		overflow: visible !important;
+		padding-bottom: 0;
+	}
+}
 
 </style>

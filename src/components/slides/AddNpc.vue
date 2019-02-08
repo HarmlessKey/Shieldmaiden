@@ -11,8 +11,8 @@
 			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
 		<b-row class="mb-2">
-			<b-col sm="2"><label>INT</label></b-col>
-			<b-col>
+			<b-col class="text-center">
+				<label>Init.</label>
 				<b-form-input 
 					type="number" 
 					name="initiative"
@@ -24,11 +24,8 @@
 					></b-form-input>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
-		</b-row>
-		<hr>
-		<b-row class="mb-2">
-			<b-col sm="2"><label>AC</label></b-col>
-			<b-col>
+			<b-col class="text-center">
+				<label>AC</label>
 				<b-form-input 
 					type="number" 
 					name="ac"
@@ -39,10 +36,8 @@
 					placeholder="Armor Class"></b-form-input>
 					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 			</b-col>
-		</b-row>
-		<b-row class="mb-2">
-			<b-col sm="2"><label>HP</label></b-col>
-			<b-col>
+			<b-col class="text-center">
+				<label >Hit Points</label>
 				<b-form-input 
 					type="number" 
 					name="maxHp"

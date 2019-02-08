@@ -409,4 +409,10 @@ ul.targets {
 .fadeInUp, .fadeInDown {
 	animation-delay: .6s;
 }
+@media only screen and (max-width: 600px) {
+	#targets, .scroll {
+		overflow: visible !important;
+		padding-bottom: 0;
+	}
+}
 </style>

@@ -74,6 +74,7 @@
 
 	.container {
 		padding-top: 30px;
+		padding-bottom: 50px;
 		line-height: 25px;
 		font-size: 15px; 
 		font-weight: lighter;

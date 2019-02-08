@@ -75,7 +75,7 @@
 								</a>
 							</b-col>
 						</b-row>
-						<NPC class="mt-3" :entity="current" />
+						<NPC class="mt-3 hide" :entity="current" />
 					</template>
 					<div v-else class="loader"><span>Loading current...</span></div>
 				</div>
@@ -359,6 +359,14 @@
 				}
 			}
 		}
+	}
+}
+@media only screen and (max-width: 600px) {
+	#current, .scroll, .current {
+		overflow: visible !important;
+	}
+	.hide {
+		display: none;
 	}
 }
 

@@ -3,7 +3,7 @@
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-calculator"></i> Automate
+					<i class="fas fa-calculator gray-hover"></i> Automate
 					<a data-toggle="collapse" class="ml-1" :href="'#automate'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -46,7 +46,7 @@
 			</li>
 
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-image"></i> Background Image</span>
+				<span><i class="fas fa-image gray-hover"></i> Background Image</span>
 
 				<div>
 					<div v-show="!settings.background">

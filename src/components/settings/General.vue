@@ -3,7 +3,7 @@
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-heart"></i> Roll HP
+					<i class="fas fa-heart gray-hover"></i> Roll HP
 					<a data-toggle="collapse" class="ml-1" :href="'#rollhp'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -45,7 +45,7 @@
 
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-keyboard"></i> Show keybinds
+					<i class="fas fa-keyboard gray-hover"></i> Show keybinds
 					<a data-toggle="collapse" class="ml-1" :href="'#hotkeys'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>

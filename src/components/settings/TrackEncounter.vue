@@ -8,7 +8,7 @@
 		<h3>General</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-swords"></i> Damage Meters</span>
+				<span><i class="fas fa-swords gray-hover"></i> Damage Meters</span>
 
 				<div>
 					<div v-show="player.meters === false">
@@ -34,7 +34,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-treasure-chest"></i> Loot</span>
+				<span><i class="fas fa-treasure-chest gray-hover"></i> Loot</span>
 
 				<div>
 					<div v-show="!player.loot">
@@ -64,7 +64,7 @@
 		<h3>NPC settings</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart"></i> Health</span>
+				<span><i class="fas fa-heart gray-hover"></i> Health</span>
 
 				<div>
 					<div v-show="!npc.health">
@@ -90,7 +90,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield"></i> Armor Class</span>
+				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
 
 				<div>
 					<div v-show="!npc.ac">
@@ -116,7 +116,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span>Conditions</span>
+				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
 
 				<div>
 					<div v-show="npc.conditions === false">
@@ -146,7 +146,7 @@
 		<h3>Player settings</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart"></i> Health</span>
+				<span><i class="fas fa-heart gray-hover"></i> Health</span>
 
 				<div>
 					<div v-show="player.health === false">
@@ -172,7 +172,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield"></i> Armor Class</span>
+				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
 
 				<div>
 					<div v-show="player.ac === false">
@@ -198,7 +198,8 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				Conditions
+				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
+
 				<div>
 					<div v-show="player.conditions === false">
 						<span v-b-tooltip.hover title="Hidden" class="red mr-2">

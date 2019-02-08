@@ -48,7 +48,7 @@
 			<h2 class="mb-0">Override</h2>
 			<p><small>Only for this encounter.</small></p>
 			<b-row class="my-2">
-				<b-col>
+				<b-col class="text-center">
 					<label>AC</label>
 					<b-form-input 
 						type="number" 
@@ -61,7 +61,7 @@
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 				</b-col>
 
-				<b-col>
+				<b-col class="text-center">
 					<label>Max HP</label>
 					<b-form-input 
 						type="number" 
@@ -74,7 +74,7 @@
 						<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 				</b-col>
 
-				<b-col>
+				<b-col class="text-center">
 					<label>Cur HP</label>
 					<b-form-input 
 						type="number" 

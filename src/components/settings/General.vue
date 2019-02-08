@@ -3,7 +3,7 @@
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-heart"></i> Maximum HP
+					<i class="fas fa-heart gray-hover"></i> Roll HP
 					<a data-toggle="collapse" class="ml-1" :href="'#rollhp'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -16,13 +16,13 @@
 							<span class="d-none d-md-inline mr-1">Roll</span>
 							<i class="fas fa-check"></i>
 						</span>
-						<a v-b-tooltip.hover title="Average" @click="set('unset', 'rollHp')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Average" @click="set('unset', 'rollHp')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Average</span>
 							<i class="fas fa-check"></i>
 						</a>
 					</div>
 					<div v-show="settings.rollHp === undefined">
-						<a v-b-tooltip.hover title="Roll" @click="set('set', 'rollHp', true)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Roll" @click="set('set', 'rollHp', true)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Roll</span>
 							<i class="fas fa-check"></i>
 						</a>
@@ -34,7 +34,7 @@
 				</div>
 			</li>
 			<li class="collapse px-4 bg-gray-darker" id="rollhp">
-				<p><b>Setting NPC's HP</b> 
+				<p><b>Setting NPC's HP</b><br/> 
 					When adding an NPC to an encounter, it can either have the average of their hit dice set as maximum health, 
 					or we can roll the hit dice for you. 
 					If you change this setting to "roll" we will always roll the hit dice of an NPC to set the maximum health points.
@@ -45,7 +45,7 @@
 
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-heart"></i> Show keybinds
+					<i class="fas fa-keyboard gray-hover"></i> Show keybinds
 					<a data-toggle="collapse" class="ml-1" :href="'#hotkeys'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -58,13 +58,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'keyBinds')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'keyBinds')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="settings.keyBinds === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'keyBinds', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'keyBinds', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>

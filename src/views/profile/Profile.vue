@@ -76,17 +76,21 @@ export default {
 		},
 		methods: {
 			makeDate(input) {
-				var monthNames = [
+				let monthNames = [
 					"January", "February", "March",
 					"April", "May", "June", "July",
 					"August", "September", "October",
 					"November", "December"
 				];
 
-				var d = new Date(input)
-				var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-				var date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				return date + " at " + time;
+				let d = new Date(input)
+				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
+				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
+				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
+
+				let time = hours + ":" + minutes + ":" + seconds;
+				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
+				return date + " - " + time;
 			},
 			resetPassword() {
 				var emailAddress = this.user.email;

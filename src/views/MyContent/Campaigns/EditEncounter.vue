@@ -8,7 +8,7 @@
 				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
 
 				<b-row class="mt-3">
-					<b-col>
+					<b-col class="mb-2">
 						<input class="form-control" 
 							v-validate="'required'" 
 							data-vv-as="Encounter Name" 
@@ -24,9 +24,9 @@
 							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
-						<button class="btn mt-2" @click="edit()">Save</button>
+						<button class="btn mt-2" @click="edit()">Save Name & Avatar</button>
 					</b-col>
-					<b-col v-if="encounter.background">
+					<b-col sm="3" v-if="encounter.background">
 						<div class="img-container"><img :src="encounter.background" /></div>
 					</b-col>
 				</b-row>
@@ -305,7 +305,7 @@
 						</b-row>
 					</div>
 
-					<button class="btn mt-2" @click="setLoot()">Save</button>
+					<button class="btn mt-2" @click="setLoot()">Save loot</button>
 				</div>
 			</div>
 		</div>

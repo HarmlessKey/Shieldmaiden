@@ -8,7 +8,7 @@
 		<h3>General</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-swords"></i> Damage Meters</span>
+				<span><i class="fas fa-swords gray-hover"></i> Damage Meters</span>
 
 				<div>
 					<div v-show="player.meters === false">
@@ -16,13 +16,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'meters')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'meters')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="player.meters === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'meters', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'meters', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -34,7 +34,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-treasure-chest"></i> Loot</span>
+				<span><i class="fas fa-treasure-chest gray-hover"></i> Loot</span>
 
 				<div>
 					<div v-show="!player.loot">
@@ -42,13 +42,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'player', 'loot', true)" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('set', 'player', 'loot', true)" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="player.loot == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'player', 'loot')" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'player', 'loot')" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -64,7 +64,7 @@
 		<h3>NPC settings</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart"></i> Health</span>
+				<span><i class="fas fa-heart gray-hover"></i> Health</span>
 
 				<div>
 					<div v-show="!npc.health">
@@ -72,13 +72,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="npc.health == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -90,7 +90,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield"></i> Armor Class</span>
+				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
 
 				<div>
 					<div v-show="!npc.ac">
@@ -98,13 +98,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'ac', true)" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'ac', true)" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="npc.ac == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'ac')" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'ac')" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -116,7 +116,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span>Conditions</span>
+				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
 
 				<div>
 					<div v-show="npc.conditions === false">
@@ -124,13 +124,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'npc', 'conditions')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'npc', 'conditions')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="npc.conditions === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'npc', 'conditions', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'npc', 'conditions', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -146,7 +146,7 @@
 		<h3>Player settings</h3>
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart"></i> Health</span>
+				<span><i class="fas fa-heart gray-hover"></i> Health</span>
 
 				<div>
 					<div v-show="player.health === false">
@@ -154,13 +154,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="player.health === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'health', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'health', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -172,7 +172,7 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield"></i> Armor Class</span>
+				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
 
 				<div>
 					<div v-show="player.ac === false">
@@ -180,13 +180,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'ac')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'ac')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="player.ac === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'ac', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'ac', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
@@ -198,20 +198,21 @@
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
-				Conditions
+				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
+
 				<div>
 					<div v-show="player.conditions === false">
 						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'conditions')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'conditions')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="player.conditions === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'conditions', false)" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'conditions', false)" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>

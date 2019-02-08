@@ -3,7 +3,7 @@
 		<ul class="settings">
 			<li class="d-flex justify-content-between">
 				<span>
-					<i class="fas fa-calculator"></i> Automate
+					<i class="fas fa-calculator gray-hover"></i> Automate
 					<a data-toggle="collapse" class="ml-1" :href="'#automate'" 
 						role="button" aria-expanded="false">
 						<i class="fas fa-info"></i>
@@ -16,13 +16,13 @@
 							<span class="d-none d-md-inline mr-1">Not Automated</span>
 							<i class="fas fa-times"></i>
 						</span>
-						<a v-b-tooltip.hover title="Automate" @click="set('unset', 'automate')" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Automate" @click="set('unset', 'automate')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Automate</span>
 							<i class="fas fa-check"></i>
 						</a>
 					</div>
 					<div v-show="settings.automate === undefined">
-						<a v-b-tooltip.hover title="Don't Automate" @click="set('set', 'automate', false)" class="btn btn-sm bg-gray mr-1">
+						<a v-b-tooltip.hover title="Don't Automate" @click="set('set', 'automate', false)" class="gray-light mr-1">
 							<span class="d-none d-md-inline mr-1">Don't</span>
 							<i class="fas fa-times"></i>
 						</a>
@@ -46,7 +46,7 @@
 			</li>
 
 			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-image"></i> Background Image</span>
+				<span><i class="fas fa-image gray-hover"></i> Background Image</span>
 
 				<div>
 					<div v-show="!settings.background">
@@ -54,13 +54,13 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'background', true)" class="btn btn-sm bg-gray">
+						<a v-b-tooltip.hover title="Show" @click="set('set', 'background', true)" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
 					<div v-show="settings.background == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'background')" class="btn btn-sm bg-gray mr-2">
+						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'background')" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>

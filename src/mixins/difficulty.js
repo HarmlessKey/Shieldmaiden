@@ -27,9 +27,10 @@ export const difficulty = {
 				6: 4
 			},
 			challenge: {
-				'-125': 25,
-				'-25': 50,
-				'-5': 100,
+				0: 10,
+				'0.125': 25,
+				'0.25': 50,
+				'0.5': 100,
 				1: 200,
 				2: 450,
 				3: 700,
@@ -154,15 +155,6 @@ export const difficulty = {
 						rating = await monsters.once('value').then(function(snapshot) {
 							return snapshot.val().challenge_rating
 						})
-					}
-					//Ratings below 1 are keyed as -x (0.125 = -125)
-					if(rating < 1) {
-						if(rating.toString().charAt(0) == '0') {
-							rating = '-'+rating.toString().substr(2);
-						}
-						else {
-							rating = '-'+rating.toString().substr(1);
-						}
 					}
 					let xp = this.challenge[rating]
 

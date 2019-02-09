@@ -24,7 +24,7 @@
 							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
-						<button class="btn mt-2" @click="edit()">Save Name & Avatar</button>
+						<button class="btn mt-2" @click="edit()">Save Name & Background</button>
 					</b-col>
 					<b-col sm="3" v-if="encounter.background">
 						<div class="img-container"><img :src="encounter.background" /></div>

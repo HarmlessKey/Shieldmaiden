@@ -175,7 +175,7 @@
 									id="cr"
 									placeholder="Challenge Rating"></b-form-input> -->
 									<b-form-select v-model="npc.challenge_rating">
-										<option value="undefined">- Select CR -</option>
+										<option value="undefined" disabled selected>- Select CR -</option>
 										<option value="0">0</option>
 										<option value="0.125">1/8</option>
 										<option value="0.25">1/4</option>

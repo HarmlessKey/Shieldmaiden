@@ -166,14 +166,24 @@
 						<b-row>
 							<b-col sm="2"><label for="cr">Challenge rating</label></b-col>
 							<b-col>
-								<b-form-input 
+								<!-- <b-form-input 
 									v-b-tooltip.hover title="Challenge Rating" 
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.challenge_rating" 
 									name="Challenge Rating" 
 									id="cr"
-									placeholder="Challenge Rating"></b-form-input>
+									placeholder="Challenge Rating"></b-form-input> -->
+									<b-form-select v-model="npc.challenge_rating">
+										<option value="undefined">- Select CR -</option>
+										<option value="0">0</option>
+										<option value="0.125">1/8</option>
+										<option value="0.25">1/4</option>
+										<option value="0.5">1/2</option>
+										<option v-for="index in 24" :value="index">{{ index }}</option>
+										<option value="30">30</option>
+									</b-form-select>
+									
 							</b-col>
 						</b-row>
 

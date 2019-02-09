@@ -337,10 +337,16 @@ ul.settings {
 
 @media only screen and (max-width: 1200px) {
 	#hasSide {
-		padding-left: 50px;
+		padding-left: 30px;
 	}
 	#sidebar {
-		width: 50px;
+		width: 30px;
+
+		.list-group-item {
+			a {
+				padding-left: 6px;
+			}
+		}
 
 		span {
 			display: none;

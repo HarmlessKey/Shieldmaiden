@@ -7,9 +7,9 @@
 					<h3>The <strong>combat </strong> <strong>tracker</strong> for <strong>D&D </strong> <strong>5e.</strong></h3>
 
 					<div v-if="user" class="d-flex justify-content-center mt-5">
-						<router-link class="btn" to="/campaigns">Campaigns</router-link>
-						<router-link class="btn mx-2" to="/players">Players</router-link>
-						<router-link class="btn" to="/npcs">NPC's</router-link>
+						<router-link class="btn" to="/campaigns"><i class="fas fa-dungeon"></i> Campaigns</router-link>
+						<router-link class="btn mx-2" to="/players"><i class="fas fa-users"></i> Players</router-link>
+						<router-link class="btn" to="/npcs"><i class="fas fa-dragon"></i> NPC's</router-link>
 					</div>
 
 					<hr class="mt-5">
@@ -22,8 +22,8 @@
 							<h2>A sneak peek</h2>
 							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
-								<router-link v-if="!user" to="/sign-in" class="btn btn-lg btn-block">Create Account</router-link>
-								<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block">My Content</router-link>
+								<router-link v-if="!user" to="/sign-in" class="btn btn-lg btn-block"><i class="fas fa-user-plus"></i> Create Account</router-link>
+								<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block"><i class="fas fa-treasure-chest"></i> My Content</router-link>
 							</div>
 						</b-col>
 					</b-row>
@@ -73,7 +73,7 @@
 					<hr class="mb-5">
 					<h2 class="text-center my-5">Start giving your players the attention they deserve!</h2>
 					<div class="btn-group d-flex" role="group">
-						<router-link to="/sign-in" class="btn btn-lg btn-block mb-5">Sign Up</router-link>
+						<router-link to="/sign-in" class="btn btn-lg btn-block mb-5"><i class="fas fa-user-plus"></i> Sign Up</router-link>
 					</div>
 				</div>
 			</section>

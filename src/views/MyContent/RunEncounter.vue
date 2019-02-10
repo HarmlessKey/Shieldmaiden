@@ -176,8 +176,8 @@
 
 <style lang="scss" scoped>
 .container-fluid {
-	background-size: cover;
-	background-position: center bottom;
+	background-size: cover !important;
+	background-position: center bottom !important;
 	background-color: #191919;
 	height: calc(100vh - 50px);
 

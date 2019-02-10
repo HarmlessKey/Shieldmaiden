@@ -3,8 +3,8 @@
 		<div id="home">
 			<section>
 				<div class="container">
-					<h1><i class="fas fa-swords"></i> Harmless Key <strong>Encounter </strong> <strong>Tracker</strong>. <span class="gray-hover">BETA</span></h1>
-					<h3>The <strong>combat </strong> <strong>tracker</strong> for <strong>D&D </strong> <strong>5e.</strong></h3>
+					<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker. <span class="gray-hover">BETA</span></h1>
+					<h2 class="text-center">The initiative tracker for D&D 5e.</h2>
 
 					<div v-if="user" class="d-flex justify-content-center mt-5">
 						<router-link class="btn" to="/campaigns"><i class="fas fa-dungeon"></i> Campaigns</router-link>
@@ -16,10 +16,10 @@
 					<b-row class=my-5>
 						<b-col md="7">
 							<p class="img-header bg-gray-darker">Your new DM screen</p>
-							<img src="@/assets/_img/screenshot.png" />
+							<img src="@/assets/_img/harmless-key-encounter-tracker.png" alt="Your new Dungeon Master screen. An overview of our dungeons and dragons combat runner."/>
 						</b-col>
 						<b-col md="5">
-							<h2>A sneak peek</h2>
+							<h3>A sneak peek of our combat tracker</h3>
 							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
 								<router-link v-if="!user" to="/sign-up" class="btn btn-lg btn-block"><i class="fas fa-user-plus"></i> Create Account</router-link>
@@ -34,15 +34,15 @@
 				<div class="container">
 					<b-row>
 					 <b-col>
-						<h2>Run encounters like never before.</h2>
+						<h3>Run encounters like never before.</h3>
 						<p>
-							Our app keeps track of everything you need to know and displays it in a structured overview.
-							This way we make running encounters a lot simpler, making sure that you can give your players the attention they deserve.
+							Our app keeps track of everything you need to know in encounters and displays it in a structured overview.
+							This way we make tracking initiative in Dungeons and Dragons a lot simpler, making sure that you can give your players the attention they deserve.
 						</p>
 					 </b-col>
 					 <b-col md="7">
 						 <p class="img-header bg-gray-darker">Info for your players</p>
-						 <img src="@/assets/_img/screenshot-track.png" />
+						 <img src="@/assets/_img/follow-encounters-harmless-key.png" alt="A link your players can follow for our D&D encounter runner."/>
 					 </b-col>
 					</b-row>
 				</div>
@@ -52,18 +52,19 @@
 					<b-row class="mt-5">
 						<b-col md="4" class="mb-5">
 							<span class="icon"><i class="fas fa-calculator-alt"></i></span>
-							<h2>Easy to use</h2>
-							<p>Our app is intuitive and very easy to use.</p>
+							<h3>Run encounters easy</h3>
+							<p>Our app is intuitive and very easy to use. 
+								Making sure you can divide your attention among your players.</p>
 						</b-col>
 						<b-col md="4" class="mb-5">
 							<span class="icon"><i class="fas fa-gamepad"></i></span>
-							<h2>Full control</h2>
-							<p>The <strong>DM</strong> has full control over everything in the <strong>encounter</strong>. Just like in <strong>DnD</strong> you make up the rules.</p>
+							<h3>Full control for the DM</h3>
+							<p>The Dungeon Master has full control over everything in the encounter. Just like in DnD you make up the rules.</p>
 						</b-col>
 						<b-col md="4" class="mb-5">
 							<span class="icon"><i class="fas fa-desktop"></i></span>
-							<h2>For DM and Party</h2>
-							<p>Through a unique link players can follow the <strong>encounter</strong>. Of course the DM has control over what is shown on the second screen.</p>
+							<h3>For DM and Party</h3>
+							<p>Through a unique link players can follow the encounters. Of course the Dungeon Master has control over what is shown on the second screen.</p>
 						</b-col>
 					</b-row>
 				</div>
@@ -71,7 +72,7 @@
 			<section v-if="!user">
 				<div class="container">
 					<hr class="mb-5">
-					<h2 class="text-center my-5">Start giving your players the attention they deserve!</h2>
+					<h3 class="text-center my-5">Start giving your players the attention they deserve!</h3>
 					<div class="btn-group d-flex" role="group">
 						<router-link to="/sign-up" class="btn btn-lg btn-block mb-5"><i class="fas fa-user-plus"></i> Sign Up</router-link>
 					</div>
@@ -133,12 +134,13 @@
 		h1, h2 {
 			font-size: 35px !important;
 			text-transform: none;
-		}
-		h1, h3 {
 			text-align: center;
 		}
-		h3 {
+		h2 {
 			font-size: 20px !important;
+		}
+		h3 {
+			font-size: 30px !important;
 		}
 		.info {
 			text-align: center;

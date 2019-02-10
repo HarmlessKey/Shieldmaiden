@@ -158,6 +158,7 @@
 												class="d-flex justify-content-between">
 												<div class="d-flex justify-content-left">
 													<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
+													<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 													{{ npc.name }}
 												</div>
 												<span>
@@ -212,9 +213,9 @@
 											<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
 											<img v-else src="@/assets/_img/styles/player.png" class="img" />
 										</template>
-										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
 										<template v-else-if="entity.entityType == 'npc'">
-											<span v-if="entity.npc == 'custom' && npcs[entity.id].avatar != ''" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
+											<span v-else-if="entity.npc == 'custom' && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
 											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
 										{{ entity.name }}

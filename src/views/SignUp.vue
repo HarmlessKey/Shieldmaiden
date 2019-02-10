@@ -1,47 +1,53 @@
 <template>
-	<div id="signin">
-		<h2>Sign in to Your Account</h2>
+	<div id="login">
+		<h1>Harmless Key</h1>
+		<h2>Create an account</h2>
+		<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 		<form v-on:submit.prevent>
-			<input class="form-control" type="email" placeholder="Email" v-model="email">
-			<input class="form-control" type="password" placeholder="Password" v-model="password">
-			<button type="submit" class="btn btn-block" v-on:click="signUp">Sign Up</button>
+			<b-form-input class="email" type="email" placeholder="Email" v-model="email"></b-form-input>
+			<b-form-input type="password" placeholder="Password" v-model="password" name="password"></b-form-input>
+
+			<button type="submit" class="btn btn-block mt-3" v-on:click="signUp">Create account</button>
+			<a class="btn btn-block google mt-4" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign up with Google</a>
 		</form>
 	</div>
 </template>
 
 <script>
-	import Firebase from "firebase";
+	import firebase from "firebase";
+
 	export default {
 		data: function() {
 			return {
-				email: "",
-				password: ""
+				email: undefined,
+				password: undefined,
+				error: undefined,
 			};
 		},
 		methods: {
 			signUp: function() {
-				Firebase.auth()
-				.createUserWithEmailAndPassword(this.email, this.password)
-				.then(
+				firebase.auth()
+				.createUserWithEmailAndPassword(this.email, this.password).then(
 					user => {
-						this.$router.replace('my-content');
+						this.$router.replace('campaigns');
 					},
-					error => {
-						alert(error.message);
-					}
-					);
-			}
+					err => {
+						this.error = err.message;
+					});
+			},
+			googleSignIn() {
+				const provider = new firebase.auth.GoogleAuthProvider();
+
+				firebase.auth().signInWithPopup(provider).then((restult) => {
+					this.$router.replace('campaigns');
+				}).catch((err) => {
+					this.error = err.message;
+				});
+			},
 		}
 	};
 </script>
 
 <style lang="css" scoped>
-#login {
-	padding-top:50px;
-	width: 300px;
-	margin:auto;
-}
-input {
-	margin-bottom:15px;
-}
+
 </style>

@@ -42,6 +42,8 @@
 		</b-card>
 
 		<b-card header="Actions">
+			<p v-if="resetError" class="red"><i class="fas fa-exclamation-triangle"></i> {{ resetError }}</p>
+			<p v-if="resetSuccess" class="green"><i class="fas fa-check"></i> {{ resetSuccess }}</p>
 			<p><a @click="resetPassword()"><i class="fas fa-redo-alt"></i> Reset Password</a></p>
 			<p><router-link to="/profile/delete-account" class="red"><i class="fas fa-trash-alt"></i> Delete account</router-link></p>
 		</b-card>
@@ -61,7 +63,9 @@ export default {
 		data() {
 			return {
 				auth: firebase.auth(),
-				error: ''
+				error: '',
+				resetError: undefined,
+				resetSuccess: undefined,
 			}
 		},
 		computed: {
@@ -93,13 +97,16 @@ export default {
 				return date + " - " + time;
 			},
 			resetPassword() {
+				var vm = this;
 				var emailAddress = this.user.email;
 
 				this.auth.sendPasswordResetEmail(emailAddress).then(function() {
 					// Email sent.
-					console.log('Sent')
+					vm.resetSuccess = 'An email was sent to ' + emailAddress + ' with a link to reset your password.';
+					vm.resetError = undefined;
 				}).catch(function(error) {
 					// An error happened.
+					vm.error = err.message;
 				});
 			},
 		}

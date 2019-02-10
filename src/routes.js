@@ -6,6 +6,8 @@ import Planned from '@/views/Planned.vue';
 import Feedback from '@/views/Feedback.vue';
 import Updates from '@/views/Updates.vue';
 import SignIn from '@/views/SignIn.vue';
+import SignUp from '@/views/SignUp.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
 import Settings from '@/views/Settings.vue';
 import Profile from '@/views/profile/Profile.vue';
 import DeleteAccount from '@/views/profile/DeleteAccount.vue';
@@ -65,6 +67,16 @@ export const routes = [{
 	path: '/sign-in',
 	name: 'signIn',
 	component: SignIn
+},
+{
+	path: '/sign-up',
+	name: 'signUp',
+	component: SignUp
+},
+{
+	path: '/forgot-password',
+	name: 'resetPassword',
+	component: ResetPassword
 },
 {
 	path: '/profile',

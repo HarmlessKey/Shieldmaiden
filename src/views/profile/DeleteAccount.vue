@@ -2,8 +2,16 @@
 	<div class="container">
 		<h2>Are you sure you want to delete your account?</h2>
 		<p>All your data will permanently be deleted.</p>
-		<h2 v-if="error" class="warning bg-red">{{ error }}</h2>
-		<div v-show="credentials" id="firebaseui-auth-container"></div>
+		<p v-if="error" class="red">{{ error }}</p>
+
+		<div id="login" v-show="credentials">
+			<form v-on:submit.prevent>
+			<b-form-input type="text" v-model="email" name="email" placeholder="Email" class="email"></b-form-input>
+			<b-form-input type="password" v-model="password" placeholder="password" name="password"></b-form-input>
+			<button class="btn btn-block mt-3" @click="signIn()">Sign In <i class="fas fa-sign-in-alt"></i></button>
+		</form>
+		<a class="btn btn-block google my-3" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
+		</div>
 
 		<div class="d-flex justify-content-center">
 			<router-link class="btn bg-gray mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
@@ -20,33 +28,32 @@ export default {
 		name: 'Profile',
 		data() {
 			return {
-				auth: firebase.auth(),
+				email: undefined,
+				password: undefined,
 				error: '',
 				credentials: undefined,
 			}
 		},
-		mounted() {
-			var uiConfig = {
-				signInSuccessUrl: '',
-				signInOptions: [
-				firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-				firebase.auth.EmailAuthProvider.PROVIDER_ID
-				]
-			};
-			var ui = new firebaseui.auth.AuthUI(firebase.auth());
-			ui.start('#firebaseui-auth-container', uiConfig);
-		},
 		methods: {
-			login: function() {
+			signIn: function() {
 				firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
 					(user) => {
-						// this.$router.replace('campaigns')
+
 					},
 					(err) => {
-						// console.log('Something went wrong: ' + err.message)
-						this.error = err.message
+						this.error = err.message;
 					}
-					);
+				);
+			},
+			googleSignIn() {
+				const provider = new firebase.auth.GoogleAuthProvider();
+
+				firebase.auth().signInWithPopup(provider).then((restult) => {
+					this.credentials = undefined;
+					this.error = undefined;
+				}).catch((err) => {
+					this.error = err.message;
+				});
 			},
 			deleteUser() {
 				var vm = this;
@@ -79,6 +86,9 @@ export default {
 		.warning {
 			color: #fff;
 			padding: 10px;
+		}
+		#login {
+			padding: 0;
 		}
 	}
 </style>

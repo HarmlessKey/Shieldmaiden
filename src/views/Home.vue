@@ -22,7 +22,7 @@
 							<h2>A sneak peek</h2>
 							<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
 							<div>
-								<router-link v-if="!user" to="/sign-in" class="btn btn-lg btn-block"><i class="fas fa-user-plus"></i> Create Account</router-link>
+								<router-link v-if="!user" to="/sign-up" class="btn btn-lg btn-block"><i class="fas fa-user-plus"></i> Create Account</router-link>
 								<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block"><i class="fas fa-treasure-chest"></i> My Content</router-link>
 							</div>
 						</b-col>
@@ -73,7 +73,7 @@
 					<hr class="mb-5">
 					<h2 class="text-center my-5">Start giving your players the attention they deserve!</h2>
 					<div class="btn-group d-flex" role="group">
-						<router-link to="/sign-in" class="btn btn-lg btn-block mb-5"><i class="fas fa-user-plus"></i> Sign Up</router-link>
+						<router-link to="/sign-up" class="btn btn-lg btn-block mb-5"><i class="fas fa-user-plus"></i> Sign Up</router-link>
 					</div>
 				</div>
 			</section>

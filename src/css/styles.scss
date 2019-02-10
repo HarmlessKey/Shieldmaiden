@@ -193,16 +193,44 @@ button, a {
 }
 
 a.logout { 
-	color:$gray-light!important;
-	font-size:20px;
-	cursor:pointer;
+	color: $gray-light!important;
+	font-size: 20px;
+	cursor: pointer;
+	
 	&:hover {
-		color:$blue !important;
+		color: $blue !important;
 	}
 }
 
 /* 5. Components*/
 /*********************************************/
+#login {
+	padding-top: 50px;
+	max-width: 300px;
+	margin: auto;
+
+	h1, h2 {
+		text-transform: none !important;
+		text-align: center;
+		margin-bottom: 20px;
+	}
+	input {
+		height: 45px;
+
+		&.email {
+			margin-bottom: 0;
+			border-bottom: none !important;
+		}
+	}
+	.google {
+		background-color: #b2b2b2 !important;
+		color: #262626 !important;
+		img {
+			height: 23px;
+		}
+	}
+}
+
 #hasSide {
 	padding-left: 200px;
 }

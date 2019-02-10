@@ -1,66 +1,56 @@
 <template>
 	<div id="login">
-		<h2>Start using Harmless Key!</h2>
-		<div id="firebaseui-auth-container"></div>
+		<h1>Harmless Key</h1>
+		<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+
+		<form v-on:submit.prevent>
+			<b-form-input type="text" v-model="email" name="email" placeholder="Email" class="email"></b-form-input>
+			<b-form-input type="password" v-model="password" placeholder="password" name="password"></b-form-input>
+			<button class="btn btn-block mt-3" @click="signIn()">Sign In <i class="fas fa-sign-in-alt"></i></button>
+		</form>
+		<a class="btn btn-block google my-3" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
+
+		<p class="text-center mb-1"><small><router-link to="/forgot-password">Forgot password?</router-link></small></p>
+		<p class="text-center"><small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small></p>
 	</div>
 </template>
 
 <script>
 	import firebase from 'firebase'
-	import firebaseui from 'firebaseui'
 
 	export default {
 		name: 'login',
 		data() {
 			return {
 				email: '',
-				password: ''
+				password: '',
+				error: '',
 			}
 		},
 		methods: {
-			login: function() {
+			signIn: function() {
 				firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
 					(user) => {
 						this.$router.replace('campaigns')
 					},
 					(err) => {
-						console.log('Something went wrong: ' + err.message)
+						this.error = err.message;
 					}
 					);
-			}
+			},
+			googleSignIn() {
+				const provider = new firebase.auth.GoogleAuthProvider();
+
+				firebase.auth().signInWithPopup(provider).then((restult) => {
+					this.$router.replace('campaigns');
+				}).catch((err) => {
+					this.error = err.message;
+				});
+			},
 		},
-		mounted() {
-			var uiConfig = {
-				signInSuccessUrl: '/campaigns',
-				signInOptions: [
-				firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-				firebase.auth.EmailAuthProvider.PROVIDER_ID
-				]
-			};
-			if (firebaseui.auth.AuthUI.getInstance()) {
-				const ui = firebaseui.auth.AuthUI.getInstance();
-				ui.start('#firebaseui-auth-container', uiConfig);
-			}
-			else {
-				const ui = new firebaseui.auth.AuthUI(firebase.auth());
-				ui.start('#firebaseui-auth-container', uiConfig);
-			}
-		}
 	}
 </script>
 
 <style lang="scss" scoped>
-#login {
-	padding-top: 50px;
-	width: 350px;
-	margin: auto;
 
-	h2 {
-		text-align: center;
-		font-size: 25px !important;
-	}
-}
-input {
-	margin-bottom:15px;
-}
 </style>

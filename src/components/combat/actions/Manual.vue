@@ -1,8 +1,16 @@
 <template>
 	<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-		<p v-if="!target" class="red">No target selected</p>
+		<p v-if="!target">No target selected</p>
 		<template v-else>
-			<p>Target: <b class="blue">{{ target.name }}</b></p>
+			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+				<i class="fas fa-shield gray-hover"></i> Armor Class: 
+				<b class="blue">
+					<span class="green" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
+						{{ displayStats(target).ac + target.ac_bonus}}
+					</span>
+					<span v-else>{{ displayStats(target).ac }}</span>
+				</b>
+			</p>
 			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
 
 			<!-- <select class="form-control mb-2" v-model="damageType" name="damageType">
@@ -82,6 +90,24 @@
 			}
 		},
 		methods: {
+			displayStats(entity) {
+				var stats;
+				if(entity.transformed == true) {
+					stats = {
+						ac: entity.transformedAc,
+						maxHp: entity.transformedMaxHp,
+						curHp: entity.transformedCurHp,
+					}
+				}
+				else {
+					stats = {
+						ac: entity.ac,
+						maxHp: entity.maxHp,
+						curHp: entity.curHp,
+					}
+				}
+				return stats
+			},
 			setManual(target, type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {

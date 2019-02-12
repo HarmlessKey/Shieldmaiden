@@ -17,18 +17,20 @@
 			<template v-if="entity.speed"><br/><b>Speed</b> {{ entity.speed }}</template>
 		</p>
 		<hr>
-		<div class="abilities d-flex justify-content-between">
-			<div sm="2" v-for="ability, index in abilities"
+		<b-row class="abilities">
+			<b-col sm="6" md="6" lg="4" v-for="ability, index in abilities"
 				v-b-tooltip.hover title="Roll"
 				:key="index" 
-				class="ability bg-gray" 
+				class="mb-5" 
 				@click="rollAbility(ability.ability, entity[ability.ability])"
 				v-if="entity[ability.ability]">
-				<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
-				{{ modifier(entity[ability.ability]) }}
-				<span class="score bg-gray">{{ entity[ability.ability] }}</span>
-			</div>
-		</div>
+					<div class="ability bg-gray">
+						<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
+						{{ modifier(entity[ability.ability]) }}
+						<span class="score bg-gray">{{ entity[ability.ability] }}</span>
+					</div>
+			</b-col>
+		</b-row>
 		<hr>
 
 		<!-- SKILLS -->
@@ -159,7 +161,7 @@ a {
 	color: #b2b2b2 !important;
 }
 .abilities {
-	margin: 30px 0;
+	margin-top: 30px;
 	white-space: nowrap;
 
 	.ability {
@@ -171,9 +173,6 @@ a {
 		font-size: calc( 20px + (21 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
 		position: relative;
 		cursor: pointer;
-		margin-right: 10px;
-		width: 16.6%;
-
 		&:last-child {
 			margin: 0;
 		}

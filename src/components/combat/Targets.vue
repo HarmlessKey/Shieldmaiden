@@ -44,11 +44,11 @@
 									</a>
 									<div class="dropdown-menu" aria-labelledby="options">	
 										<div class="dropdown-header">{{ entity.name }}</div>
-										<a class="dropdown-item" 
+										<!-- <a class="dropdown-item" 
 											@click="info(entity)"
 											v-shortkey="['i']" @shortkey="info(entities[targeted])">
 											<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
-										</a>
+										</a> -->
 										<a v-if="entity.curHp == 0 && !entity.stable" 
 											class="dropdown-item" 
 											v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
@@ -107,11 +107,11 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
-											<a class="dropdown-item" 
+											<!-- <a class="dropdown-item" 
 												@click="info(entity)"
 												v-shortkey="['i']" @shortkey="info(entities[targeted])">
 												<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
-											</a>
+											</a> -->
 											<a v-if="entity.curHp == 0 && !entity.stable" 
 												class="dropdown-item" 
 												v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
@@ -376,7 +376,7 @@
 	}
 }
 .scroll {
-	padding:0 0 15px 0;
+	padding:0 0 30px 0;
 	height: calc(100% - 20px);
 }
 ul.targets {

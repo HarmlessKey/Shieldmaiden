@@ -99,7 +99,7 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { mapActions } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
 		name: 'EditEntity',
@@ -115,10 +115,18 @@
 		},
 		firebase() {
 			return {
-				entity: {
-					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
-					asObject: true
-				}
+				// entity: {
+				// 	source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+				// 	asObject: true
+				// }
+			}
+		},
+		computed: {
+			...mapGetters([
+				'entities',
+			]),
+			entity: function() {
+				return this.entities[this.entityKey]
 			}
 		},
 		methods: {
@@ -161,6 +169,6 @@
 	};
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>

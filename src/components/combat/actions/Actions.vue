@@ -63,23 +63,27 @@
 
 <style lang="scss" scoped>
 #actions {
-	grid-area: actions;
-	overflow: hidden;
+	// grid-area: actions;
+	// overflow: hidden;
+
 
 	.custom-control-label {
 		line-height: 25px !important;
 	}
 	.scroll { 
-		padding-top: 20px;
+		padding: 20px 0;
 		height: calc(100% - 30px);
-		background: rgba(38, 38, 38, .9);
+		background: rgba(38, 38, 38, .9) !important;
 	}
 }
-.nav-link {
-	background: rgba(25, 25, 25, .9);
+ul.nav-tabs {
 
-	&.active {
-		background: rgba(38, 38, 38, .9) !important;
+	.nav-link {
+		background: rgba(25, 25, 25, .9);
+
+		&.active {
+			background: rgba(38, 38, 38, .9) !important;
+		}
 	}
 }
 .actions {

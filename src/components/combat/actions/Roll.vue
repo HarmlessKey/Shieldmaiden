@@ -1,13 +1,21 @@
 <template>
 	<div v-if="current" class="tab-pane roll fade" id="roll" role="tabpanel" aria-labelledby="roll-tab">
-		<p v-if="!target" class="red">No target selected</p>
+		<p v-if="!target">No target selected</p>
 		<template v-else-if="current.entityType == 'npc'">
-			<p>Target: <b class="blue">{{ target.name }}</b></p>
+			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+				<i class="fas fa-shield gray-hover"></i> Armor Class: 
+				<b class="blue">
+					<span class="green" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
+						{{ displayStats(target).ac + target.ac_bonus}}
+					</span>
+					<span v-else>{{ displayStats(target).ac }}</span>
+				</b>
+			</p>
 			
 			<template v-if="current.actions">
 				<h2>Actions</h2>
 				<ul class="roll">
-					<li v-for="action, index in current.actions" v-if="action['damage_dice']" class="bg-gray-active">
+					<li v-for="action, index in current.actions" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
 							<a class="d-flex justify-content-between gray-light"
 								data-toggle="collapse" :href="'#act-'+index" 
@@ -29,7 +37,7 @@
 				<h2>Legendary Actions</h2>
 
 				<ul class="roll">
-					<li v-for="action, index in current.legendary_actions" v-if="action['damage_dice']" class="bg-gray-active">
+					<li v-for="action, index in current.legendary_actions" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
 							<a class="d-flex justify-content-between gray-light"
 								data-toggle="collapse" 
@@ -84,15 +92,40 @@
 			}
 		},
 		methods: {
+			displayStats(entity) {
+				var stats;
+				if(entity.transformed == true) {
+					stats = {
+						ac: entity.transformedAc,
+						maxHp: entity.transformedMaxHp,
+						curHp: entity.transformedCurHp,
+					}
+				}
+				else {
+					stats = {
+						ac: entity.ac,
+						maxHp: entity.maxHp,
+						curHp: entity.curHp,
+					}
+				}
+				return stats
+			},
 			roll(action) {
 				event.stopPropagation();
-				var rolls = action['damage_dice'].split('+');
+				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
+				rolls = rolls.split('+');
 				let crit = false;
 				let hits = '';
 				var total = 0;
 
-				let toHit =  this.rollD(20, 1, action['attack_bonus'])
+				var ac = parseInt(this.displayStats(this.target).ac);
+
+				if(this.target.ac_bonus) {
+					ac = parseInt(this.target.ac_bonus) + ac;
+				}
 				
+				let toHit =  this.rollD(20, 1, action['attack_bonus'])
+
 				//Damage
 				for(let roll in rolls) {
 					let dice = rolls[roll].split('d');
@@ -101,7 +134,17 @@
 					total = parseInt(total) + parseInt(damage);
 				}
 				
-				let totalDamage = parseInt(total) + parseInt(action['damage_bonus']);
+				if(action['damage_bonus']) {
+					var bonus = ' + '+action['damage_bonus'];
+					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']);
+					var showTotal = ' = <span class="red">' + totalDamage + '</span>';
+				}
+				else {
+					var bonus = '';
+					var showTotal = ''
+					var totalDamage = total;
+					var total = '<span class="red">' + total + '</span>';
+				}
 
 				if(toHit.throws[0] == '20') {
 					toHit.total = '<span class="green">NATURAL 20</span>';
@@ -111,11 +154,11 @@
 					toHit.total = '<span class="red">NATURAL 1</span>';
 				}
 				else {
-					if(toHit.total >= this.target.ac) {
-						hits = `<span class="green">HIT!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${this.target.ac})</span>`;
+					if(toHit.total >= ac) {
+						hits = `<span class="green">HIT!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
 					else {
-						hits = `<span class="red">MISS!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${this.target.ac})</span>`;
+						hits = `<span class="red">MISS!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
 				}
 
@@ -125,7 +168,7 @@
 					</div>
 					<div class="snotifyToast__body">
 						<h2>${toHit.total} ${hits}</h2>
-						<h2 class="red">${totalDamage} <span class="gray-hover">damage</span></h2>
+						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
 					</div> `, {
 					timeout: 0,
 					closeOnClick: false,

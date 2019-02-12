@@ -1,7 +1,10 @@
 <template>
 	<div>
 		<div class="target">
-			<span class="initiative" v-b-tooltip.hover title="Initiative">{{ entity.initiative }}</span>
+			<span class="initiative" v-b-tooltip.hover title="Initiative">
+				<i v-if="targeted == entity.key" class="fas fa-crosshairs blue"></i>
+				<template v-else>{{ entity.initiative }}</template>
+			</span>
 			<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
 				<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
 					<i class="fas fa-paw-claws"></i>
@@ -125,6 +128,7 @@
 		computed: {
 			...mapGetters([
 				'entities',
+				'targeted',
 			]),
 			animatedNumber: function() {
 				return this.tweenedNumber.toFixed(0);
@@ -223,7 +227,7 @@
 	}
 }
 .initiative, .ac, .img {
-	text-align:center;
+	text-align: center;
 	height: 30px;
 }
 .initiative {
@@ -248,9 +252,9 @@
 	}
 }
 .ac {
-	background-color:#4c4c4c;
-	font-weight:bold;
-	color:#191919;
+	background-color: #4c4c4c;
+	font-weight: bold;
+	color: #191919;
 	grid-area: ac;
 }
 .hp {

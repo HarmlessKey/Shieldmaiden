@@ -1,6 +1,6 @@
 <template>
 	<div id="current">
-		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">Current</h2>
+		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">{{ current.name }}</h2>
 		<div class="scroll" v-bar>
 			<div v-on:scroll="shadow()" ref="scroll">
 				<div class="current">
@@ -35,22 +35,47 @@
 									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
 									<div v-show="!current.stable && !current.dead">
-										<span class="percentage">{{ percentage(current.curHp, current.maxHp) }}%</span>
-										<span class="hp">{{ current.curHp }} / {{ current.maxHp }}</span>
+										<span class="percentage">{{ current.name }}</span>
+										<span class="hp">{{ displayStats(current).curHp }} / {{ displayStats(current).maxHp }}</span>
 									</div>
 									<div class="progress-bar" :class="{ 
-										'bg-red': percentage(current.curHp, current.maxHp) <= 33, 
-										'bg-orange': percentage(current.curHp, current.maxHp) > 33 && percentage(current.curHp, current.maxHp) < 76, 
-										'bg-green': percentage(current.curHp, current.maxHp) > 7
+										'bg-red': percentage(displayStats(current).curHp, displayStats(current).maxHp) <= 33, 
+										'bg-orange': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 33 && percentage(displayStats(current).curHp, displayStats(current).maxHp) < 76, 
+										'bg-green': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 7
 										}" 
 										role="progressbar" 
-										:style="{width: percentage(current.curHp, current.maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+										:style="{width: percentage(displayStats(current).curHp, displayStats(current).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 									</div>
 								</div>
 							</div>
+
+							<div class="health target px-2" v-if="targeted">
+								<span class="img" :style="{ backgroundImage: 'url(\'' + target.img + '\')' }"></span>
+								<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
+									{{ displayStats(target).ac + target.ac_bonus}}
+								</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(target).ac }}</span>
+								<div class="progress health-bar">
+									<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+									<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+									<div v-show="!target.stable && !target.dead">
+										<span class="percentage">{{ target.name }}</span>
+										<span class="hp">{{ displayStats(target).curHp }} / {{ displayStats(target).maxHp }}</span>
+									</div>
+									<div class="progress-bar" :class="{ 
+										'bg-red': percentage(displayStats(target).curHp, displayStats(target).maxHp) <= 33, 
+										'bg-orange': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 33 && percentage(displayStats(target).curHp, displayStats(target).maxHp) < 76, 
+										'bg-green': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 7
+										}" 
+										role="progressbar" 
+										:style="{width: percentage(displayStats(target).curHp, displayStats(target).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+									</div>
+								</div>
+							</div>
+							<h2 v-else class="red">No Target</h2>
 						</template>
 
-						<b-row class="conditions" v-if="Object.keys(current.conditions).length > 0">
+						<!-- <b-row class="conditions" v-if="Object.keys(current.conditions).length > 0">
 							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
 								<span class="n" v-if="key == 'exhaustion'">
 									{{ current.conditions[key] }}
@@ -65,20 +90,20 @@
 									</svg>
 								</template>
 							</b-col>
-						</b-row>
+						</b-row> -->
 
-						<b-row v-if="current.reminders" class="reminders justify-content-start px-2">
+						<!-- <b-row v-if="current.reminders" class="reminders justify-content-start px-2">
 							<b-col class="col-3 p-1" v-for="reminder, key in current.reminders" :key="key">
 								<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
 									{{ reminder.title }}
 									<span class="delete"><i class="fas fa-times"></i></span>
 								</a>
 							</b-col>
-						</b-row>
-						<NPC class="mt-3 hide" :entity="current" />
+						</b-row> -->
 					</template>
 					<div v-else class="loader"><span>Loading current...</span></div>
 				</div>
+				<Actions :current="current"/>
 			</div>
 		</div>
 	</div>
@@ -88,11 +113,13 @@
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 	import NPC from '@/components/slides/NPC.vue';
+	import Actions from '@/components/combat/actions/Actions.vue';
 
 	export default {
 		name: 'Current',
 		components: {
 			NPC: NPC,
+			Actions: Actions,
 		},
 		props: ['current'],
 		data() {
@@ -120,7 +147,11 @@
 			...mapGetters([
 				'entities',
 				'turn',
+				'targeted',
 			]),
+			target: function() {
+				return this.entities[this.targeted]
+			}
 		},
 		methods: {
 			...mapActions([
@@ -172,6 +203,24 @@
 					key: key,
 				})
 			},
+			displayStats(entity) {
+				var stats;
+				if(entity.transformed == true) {
+					stats = {
+						ac: entity.transformedAc,
+						maxHp: entity.transformedMaxHp,
+						curHp: entity.transformedCurHp,
+					}
+				}
+				else {
+					stats = {
+						ac: entity.ac,
+						maxHp: entity.maxHp,
+						curHp: entity.curHp,
+					}
+				}
+				return stats
+			},
 			reminders(){
 				for(let key in this.current.reminders) {
 					var notify = false
@@ -179,7 +228,6 @@
 					//TIMED REMINDERS
 					if(this.current.reminders[key].trigger == 'timed') {
 						if(this.current.reminders[key].rounds > 1) {
-							console.log('round - 1')
 							let rounds = parseInt(this.current.reminders[key].rounds) - 1
 
 							this.set_targetReminder({
@@ -285,12 +333,26 @@
 
 		margin-bottom: 10px;
 
+		&.target {
+			grid-template-columns: 30px 30px 1fr;
+			grid-template-areas: 
+			"img ac hp-bar";
+		}
+
 		.img {
 			background-color: #191919;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
 			grid-area: img;
+		}
+		.ac {
+			text-align:center;
+			line-height: 30px;
+			background-color:#4c4c4c;
+			font-weight:bold;
+			color:#191919;
+			grid-area: ac;
 		}
 		.progress { 
 			height: 30px;

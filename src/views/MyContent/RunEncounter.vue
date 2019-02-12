@@ -24,9 +24,10 @@
 					:_active = "_active"
 					:_idle = "_idle"
 				/>
-				<Actions 
+				<Targeted />
+				<!-- <Actions 
 					:current="_active[encounter.turn]"
-				/>
+				/> -->
 				<Side />
 			</div>
 		</template>
@@ -43,6 +44,7 @@
 	import Turns from '@/components/combat/Turns.vue'
 	import Current from '@/components/combat/Current.vue'
 	import Targets from '@/components/combat/Targets.vue'
+	import Targeted from '@/components/combat/Targeted.vue'
 	import Side from '@/components/combat/side/Side.vue'
 	import SetInitiative from '@/components/combat/SetInitiative.vue'
 
@@ -57,6 +59,7 @@
 			Turns,
 			Current,
 			Targets,
+			Targeted,
 			Side,
 			SetInitiative,
 		},
@@ -77,7 +80,7 @@
 				},
 			}
 		},
-	 	mounted() {
+		mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid
@@ -127,16 +130,16 @@
 			},
 		},
 		watch: {
-			alive(newVal, oldVal) {
+			alive(newVal) {
 				if(newVal == 0 && this.initialized) {
 					this.confirmFinish()
 				}
 			}
 		},
 		beforeRouteLeave (to, from, next) {
-	    this.reset_store()
-	    next()
-	  },
+			this.reset_store()
+			next()
+		},
 		methods: {
 			...mapActions([
 				'init_Encounter',
@@ -190,12 +193,12 @@
 		width: 100vw;
 		height: calc(100% - 50px);
 		display: grid;
-		grid-template-columns: 3fr 3fr 2fr 2fr;
+		grid-template-columns: 3fr 4fr 3fr 2fr;
 		grid-template-rows: 60px auto;
 		grid-gap: 10px;
 		grid-template-areas:
 		"turns turns turns turns"
-		"current targets actions side";
+		"current targets targeted side";
 		position: absolute;
 		font-size: 12px;
 		h1 {
@@ -219,7 +222,7 @@
 			grid-gap: 10px;
 			grid-template-areas:
 			"turns turns turns"
-			"current targets actions";
+			"current targeted";
 		}
 	}
 	@media only screen and (max-width: 600px) {
@@ -231,7 +234,7 @@
 			"turns"
 			"current"
 			"targets"
-			"actions";
+			"targeted";
 		}
 	}
 }

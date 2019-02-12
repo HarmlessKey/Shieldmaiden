@@ -1,7 +1,7 @@
 <template>
 	<div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
 		<ul v-for="type in types" v-if="entities">
-			<h2>{{ type }} done</h2>
+			<h2>{{ type }}</h2>
 			<li v-for="entity in _meters[type]" class="health">
 				<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 				<div class="progress health-bar">

@@ -329,7 +329,7 @@
 								</b-row>
 							</b-col>
 							<b-col md="6">
-								<b-row class="skills" v-for="skill, index in skills.slice(10,18)" :key="index">
+								<b-row class="skills" v-for="skill, index in skills.slice(9,18)" :key="index">
 										<b-col class="col-5">
 											<label class="text-capitalize" :for="skill">{{ skill }}</label>
 										</b-col>

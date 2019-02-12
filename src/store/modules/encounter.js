@@ -124,6 +124,7 @@ const mutations = {
 
 				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
 				
+				entity.name = db_player.character_name
 				entity.ac = parseInt(db_player.ac)
 				entity.maxHp = parseInt(db_player.maxHp)
 				entity.strength = db_player.strength
@@ -312,27 +313,30 @@ const mutations = {
 		}
 	},
 	EDIT_ENTITY(state, {key, entity}) {
-		state.entities[key].name = entity.name
-		state.entities[key].initiative = entity.initiative
-		state.entities[key].ac = entity.ac
-		state.entities[key].maxHp = entity.maxHp
-		state.entities[key].curHp = entity.curHp
-		state.entities[key].ac_bonus = entity.ac_bonus
-		state.entities[key].tempHp = entity.tempHp
+		Vue.set(state.entities[key], 'name', entity.name)
+		Vue.set(state.entities[key], 'initiative', entity.initiative)
+		Vue.set(state.entities[key], 'ac', entity.ac)
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
+		Vue.set(state.entities[key], 'curHp', entity.maxHp)
+		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
+		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
 		
 		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
 	},
 	TRANSFORM_ENTITY(state, {key, entity, remove}) {
 		if(remove) {
-			Vue.delete(state.entities[key], 'transformed')
+			state.entities[key].transformed = false
+			Vue.delete(state.entities[key], 'transformedMaxHp')
+			Vue.delete(state.entities[key], 'transformedCurHp')
+			Vue.delete(state.entities[key], 'transformedAc')
 
 			encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
 		}
 		else {
 			state.entities[key].transformed = true
-			state.entities[key].transformedMaxHp = entity.maxHp
-			state.entities[key].transformedCurHp = entity.curHp
-			state.entities[key].transformedAc = entity.ac
+			Vue.set(state.entities[key], 'transformedMaxHp', entity.maxHp)
+			Vue.set(state.entities[key], 'transformedCurHp', entity.maxHp)
+			Vue.set(state.entities[key], 'transformedAc', entity.ac)
 
 			encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
 		}
@@ -378,7 +382,8 @@ const mutations = {
 				encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove()
 			}
 			else {
-				state.entities[key].transformedCurHp = newHp;
+				Vue.set(state.entities[key], 'transformedCurHp', newHp)
+
 				encounters_ref.child(`${state.path}/entities/${key}/transformed/curHp`).set(newHp);
 			}
 		}

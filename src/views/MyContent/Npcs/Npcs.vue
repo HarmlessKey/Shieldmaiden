@@ -30,7 +30,13 @@
 								<img src="@/assets/_img/styles/monster.svg" />
 							</td>
 							<td class="n">{{ index + 1 }}</td>
-							<td>{{ npc.name }}</td>
+							<td>
+								<router-link class="gray-light mx-2" 
+									:to="'/npcs/' + npc.key" 
+									v-b-tooltip.hover title="Edit">
+									{{ npc.name }}
+								</router-link>
+							</td>
 							<td class="text-right actions">
 								<router-link class="gray-hover mx-2" 
 									:to="'/npcs/' + npc.key" 

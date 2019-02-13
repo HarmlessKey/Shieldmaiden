@@ -33,7 +33,7 @@
 							</td>
 							<td class="n">{{ index + 1 }}</td>
 							<td>
-								<router-link class="mx-2" 
+								<router-link class="mx-2 gray-light" 
 									:to="'/players/' + player.key" 
 									v-b-tooltip.hover title="Edit">{{ player.character_name }}
 								</router-link>

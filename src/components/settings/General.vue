@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ul class="settings">
-			<li class="d-flex justify-content-between">
+			<!-- <li class="d-flex justify-content-between">
 				<span>
 					<i class="fas fa-heart gray-hover"></i> Roll HP
 					<a data-toggle="collapse" class="ml-1" :href="'#rollhp'" 
@@ -41,7 +41,7 @@
 					When we roll the hit points, we add the amount of dice times the constitution modifier. 
 					So for a monster with 2d8 hit dice and a constition modifier of 2 we roll 2 d8 and add 4. 
 				</p>
-			</li>
+			</li> -->
 
 			<li class="d-flex justify-content-between">
 				<span>

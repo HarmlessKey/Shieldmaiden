@@ -26,7 +26,7 @@
 				
 				<div id="add" class="bg-gray">
 					<h2>All players</h2>
-					<ul class="entities" v-if="players && campaign">
+					<ul class="entities hasImg" v-if="players && campaign">
 						<li v-for="(player, key) in players" 
 						:key="key" 
 						class="d-flex justify-content-between">
@@ -66,7 +66,7 @@
 				<div id="added" class="bg-gray">
 					<template v-if="players && campaign">
 						<h2>Players in campaign</h2>
-						<ul class="entities" v-if="campaign.players">
+						<ul class="entities hasImg" v-if="campaign.players">
 							<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
 								<div class="d-flex justify-content-left">
 									<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
@@ -185,68 +185,6 @@
 	#added {
 		padding: 15px 10px;
 		grid-area:added;
-	}
-	ul.entities {
-		list-style:none;
-		padding:0;
-		line-height:30px;
-		
-		li {
-			border: solid 1px transparent;
-			padding: 2px;
-			margin-bottom:5px;
-			position: relative;
-
-			.actions {
-				right: 0;
-				top: 0;
-				position: absolute;
-				padding: 3px;
-				display: none;
-
-				a {
-					color: #b2b2b2 !important;
-					width: 28px;
-					height: 28px;
-					display: block;
-					line-height: 28px;
-					text-align: center;
-					border-radius: 50%;
-
-					&:hover {
-						text-decoration: none;
-						background: #494747;
-					}
-				}
-			}
-			&:hover {
-				border-color: #494747; 
-
-				.actions {
-					display: flex;
-				}
-			}
-			.img {
-				width: 30px;
-				height: 30px;
-				display: block;
-				background-size: cover;
-				background-position: top center;
-				border: solid 1px #b2b2b2;
-				background-color: #000;
-				margin-right: 10px;
-			}
-		}
-		.img {
-			width: 30px;
-			height: 30px;
-			display: block;
-			background-size: cover;
-			background-position: top center;
-			border: solid 1px #b2b2b2;
-			background-color: #000;
-			margin-right: 10px;
-		}
 	}
 	.monster {
 		padding:15px;

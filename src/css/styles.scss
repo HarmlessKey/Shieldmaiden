@@ -289,7 +289,7 @@ table {
 		border: none !important;
 	}
 	td {
-		background-color: #262626;
+		background-color: $gray;
 	}
 	thead, tr {
 		margin-bottom: 1px !important;
@@ -325,9 +325,7 @@ table {
 	}
 	tr {
 		td.actions {
-			padding-top: 5px;
-			padding-bottom: 5px;
-			display: flex;
+			padding: 5px 0.75rem;
 
 			a {
 				visibility: hidden;
@@ -342,7 +340,6 @@ table {
 				&:hover {
 					text-decoration: none;
 					background: #302f2f;
-					// color: #b2b2b2 !important;
 				}
 			}
 		}
@@ -369,6 +366,81 @@ ul.settings {
 
 		.btn {
 			color: #b2b2b2 !important;
+		}
+	}
+}
+
+ul.entities {
+	list-style: none;
+	padding: 0;
+
+	li {
+		position: relative;
+		padding: 0.75rem;
+		background: $gray;
+		margin-bottom: 1px;
+		vertical-align: center;
+
+		.actions {
+			background: $gray;
+			right: 0;
+			top: 0;
+			position: absolute;
+			padding: 9px 5px;
+			display: none;
+			height: 100%;
+
+			a {
+				color: $gray-light !important;
+				width: 28px;
+				height: 28px;
+				display: block;
+				line-height: 28px;
+				text-align: center;
+				border-radius: 50%;
+
+				&:hover {
+					text-decoration: none;
+					background: $gray-active;
+				}
+			}
+		}
+		&:hover {
+			.actions {
+				display: flex;
+			}
+			.hover-hide {
+				display: none;
+			}
+		}
+		.img {
+			position: absolute;
+			left: 0;
+			top: 0;
+
+			width: 46px;
+			height: 46px;
+			display: block;
+			background-size: cover;
+			background-position: top center;
+			border: solid 1px $gray-light;
+			background-color: $black;
+		}
+	}
+	&.hasImg {
+		li {
+			padding-left: 55px;
+		}
+	}
+}
+.card {
+	ul.entities {
+		li {
+			background: $gray-darker;
+
+			.actions {
+				background: $gray-darker;
+			}
 		}
 	}
 }

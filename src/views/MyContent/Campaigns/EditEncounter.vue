@@ -56,7 +56,7 @@
 									</div>
 									<a v-else class="btn btn-block mb-3" @click="addAllPlayers()">Add all</a>
 
-									<ul class="entities" v-if="campaign && players && encounter">
+									<ul class="entities hasImg" v-if="campaign && players && encounter">
 										<li v-for="(player, key) in campaign.players" 
 											:key="key" 
 											class="d-flex justify-content-between">
@@ -65,7 +65,7 @@
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
-												<div class="actions pl-5 bg-gray-active">
+												<div class="actions pl-5">
 													<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
@@ -98,7 +98,7 @@
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
 									<h2>Not in Campaign</h2>
-									<ul class="entities" v-if="campaign.players">
+									<ul class="entities hasImg" v-if="campaign.players">
 											<li v-for="(player, key) in players" 
 											:key="key" 
 											class="d-flex justify-content-between" v-if="Object.keys(campaign.players).indexOf(key) < 0">
@@ -107,7 +107,7 @@
 													{{ player.character_name }}
 												</div>
 											<template v-if="encounter.entities">
-												<div class="actions pl-5 bg-gray-active">
+												<div class="actions pl-5">
 													<a @click="showSlide('info', player)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
@@ -155,7 +155,7 @@
 												CR: {{ npc.challenge_rating }}
 												<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 											</span>
-											<div class="actions bg-gray-active justify-content-end">
+											<div class="actions justify-content-end">
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
@@ -170,7 +170,7 @@
 									</ul>
 									<template v-if="npcs">
 										<h2>Custom NPC's</h2>
-										<ul class="entities">
+										<ul class="entities hasImg">
 											<li v-for="(npc, key) in npcs" 
 												:key="key" 
 												class="d-flex justify-content-between">
@@ -183,7 +183,7 @@
 													CR: {{ npc.challenge_rating }}
 													<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 												</span>
-												<div class="actions bg-gray-active justify-content-end">
+												<div class="actions justify-content-end">
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
@@ -232,7 +232,7 @@
 									</template>
 								</div>
 							</template>
-							<ul class="entities mt-4" v-if="encounter">
+							<ul class="entities hasImg mt-4" v-if="encounter">
 								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
 										<template v-if="entity.entityType == 'player'">
@@ -246,7 +246,7 @@
 										</template>
 										{{ entity.name }}
 									</div>
-									<div class="actions bg-gray">
+									<div class="actions">
 										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
 											<i class="fas fa-pencil"></i>
 										</a>
@@ -622,58 +622,20 @@ ul.nav {
 		display: inline-block;
 	}
 }
-ul.entities {
-	list-style: none;
-	padding: 0;
-	line-height: 30px;
+// ul.entities {
+// 	list-style: none;
+// 	padding: 0;
+// 	line-height: 30px;
 
-	li {
-		border: solid 1px transparent;
-		padding: 2px;
-		margin-bottom:5px;
-		position: relative;
-
-		.actions {
-			right: 0;
-			top: 0;
-			position: absolute;
-			padding: 3px;
-			display: none;
-
-			a {
-				color: #b2b2b2 !important;
-				width: 28px;
-				height: 28px;
-				display: block;
-				line-height: 28px;
-				text-align: center;
-				border-radius: 50%;
-
-				&:hover {
-					text-decoration: none;
-					background: #494747;
-				}
-			}
-		}
-		&:hover {
-			border-color: #494747; 
-
-			.actions {
-				display: flex;
-			}
-		}
-		.img {
-			width: 30px;
-			height: 30px;
-			display: block;
-			background-size: cover;
-			background-position: top center;
-			border: solid 1px #b2b2b2;
-			background-color: #000;
-			margin-right: 10px;
-		}
-	}
-}
+// 	li {
+// 		border: solid 1px transparent;
+// 		padding: 2px;
+// 		margin-bottom:5px;
+// 		position: relative;
+		
+		
+// 	}
+// }
 .npc {
 	padding: 15px;
 	position: fixed;

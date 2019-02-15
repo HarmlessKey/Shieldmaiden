@@ -17,7 +17,8 @@
 									type="text" 
 									:class="{'input': true, 'error': errors.has('player_name') }" 
 									v-model="player.player_name" 
-									v-validate="'alpha_spaces|required'" 
+									v-validate="'max:15|required'" 
+									maxlength="15"
 									data-vv-as="Name"
 									name="player_name" 
 									placeholder="Player Name"></b-form-input>
@@ -35,7 +36,8 @@
 									type="text" 
 									:class="{'input': true, 'error': errors.has('character_name') }" 
 									v-model="player.character_name" 
-									v-validate="'alpha_spaces|required'" 
+									v-validate="'max:35|required'" 
+									maxlength="35"
 									data-vv-as="Character Name"
 									name="character_name" 
 									placeholder="Character Name"></b-form-input>

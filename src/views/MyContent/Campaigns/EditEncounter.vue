@@ -65,25 +65,35 @@
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="gray-hover" 
-												v-b-tooltip.hover 
-												title="Add Character" 
-												@click="add(key, 'player', players[key].character_name)">
-													<i class="fas fa-plus green"></i>
-													<span class="d-none d-md-inline ml-1">Add</span>
-												</a>
-												<span v-else>
-													<i class="fas fa-check green"></i>
+												<div class="actions pl-5 bg-gray-active">
+													<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
+														<i class="fas fa-info"></i>
+													</a>
+													<a v-if="checkPlayer(key) < 0" class="gray-hover" 
+													v-b-tooltip.hover 
+													title="Add Character" 
+													@click="add(key, 'player', players[key].character_name)">
+														<i class="fas fa-plus"></i>
+													</a>
+												</div>
+												<span v-if="checkPlayer(key) >= 0">
+													<i class="fas fa-check"></i>
 													<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
 												</span>
 											</template>	
-											<a v-else class="gray-hover" 
-												v-b-tooltip.hover 
-												title="Add Character" 
-												@click="add(key, 'player', players[key].character_name)">
-												<i class="fas fa-plus green"></i>
-												<span class="d-none d-md-inline ml-1">Add</span>
-											</a>
+											<div v-else class="actions">
+												<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
+													<i class="fas fa-info"></i>
+												</a>
+												<a class="gray-hover" 
+													v-b-tooltip.hover 
+													title="Add Character" 
+													@click="add(key, 'player', players[key].character_name)">
+													<i class="fas fa-plus"></i>
+													<span class="d-none d-md-inline ml-1">Add</span>
+												</a>
+											</div>
+											<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
@@ -97,35 +107,38 @@
 													{{ player.character_name }}
 												</div>
 											<template v-if="encounter.entities">
-												<a v-if="checkPlayer(key) < 0" class="gray-hover" 
-												v-b-tooltip.hover 
-												title="Add Character" 
-												@click="add(key, 'player', player.character_name)">
-													<i class="fas fa-plus green"></i>
-													<span class="d-none d-md-inline ml-1">Add</span>
-												</a>
-													<span v-else>
-														<i class="fas fa-check green"></i>
-														<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
-													</span>
-												</a>
+												<div class="actions pl-5 bg-gray-active">
+													<a @click="showSlide('info', player)" v-b-tooltip.hover title="Show Info">
+														<i class="fas fa-info"></i>
+													</a>
+													<a v-if="checkPlayer(key) < 0" class="gray-hover" 
+													v-b-tooltip.hover 
+													title="Add Character" 
+													@click="add(key, 'player', player.character_name)">
+														<i class="fas fa-plus"></i>
+													</a>
+												</div>
+												<span v-if="checkPlayer(key) >= 0">
+													<i class="fas fa-check"></i>
+													<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
+												</span>
 											</template>	
-											<a v-else class="gray-hover" 
-												v-b-tooltip.hover 
-												title="Add Character" 
-												@click="add(key, 'player', player.character_name)">
-													<i class="fas fa-plus green"></i>
-													<span class="d-none d-md-inline ml-1">Add</span>
-											</a>
+											<div v-else class="actions">
+												<a @click="showSlide('info', players)" v-b-tooltip.hover title="Show Info">
+													<i class="fas fa-info"></i>
+												</a>
+												<a class="gray-hover" 
+													v-b-tooltip.hover 
+													title="Add Character" 
+													@click="add(key, 'player', player.character_name)">
+														<i class="fas fa-plus"></i>
+												</a>
+											</div>
+											<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 											</li>
 									</ul>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
-									<p v-if="settings.rollHp" class="d-flex justify-content-between">
-										<span><i class="fas fa-exclamation-triangle red"></i> NPC Hit Points are rolled</span>
-										<router-link to="/settings">Change</router-link>
-									</p>
-									<hr>
 									<div class="input-group mb-3">
 										<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
@@ -136,18 +149,23 @@
 										<p v-if="noResult" class="red">{{ noResult }}</p>
 										<li v-for="npc in searchResults" class="d-flex justify-content-between">
 											<div class="d-flex justify-content-left">
-												<a @click="showSlide('info', npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
-													<i class="fas fa-info-circle"></i>
-												</a>
 												{{ npc.name }}
 											</div>
 											<span>
 												CR: {{ npc.challenge_rating }}
-												<a class="gray-hover ml-2" v-b-tooltip.hover title="Add NPC" @click="add(npc['.key'], 'npc', npc.name)">
-													<i class="fas fa-plus green"></i>
-													<span class="d-none d-md-inline ml-1">Add</span>
-												</a>
+												<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 											</span>
+											<div class="actions bg-gray-active justify-content-end">
+												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
+													<i class="fas fa-info"></i>
+												</a>
+												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(npc['.key'], 'npc', npc.name)">
+													<i class="fas fa-plus"></i>
+												</a>
+												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(npc['.key'], 'npc', npc.name, false, true)">
+													<i class="fas fa-dice-d20"></i>
+												</a>
+											</div>
 										</li>
 									</ul>
 									<template v-if="npcs">
@@ -163,11 +181,19 @@
 												</div>
 												<span>
 													CR: {{ npc.challenge_rating }}
-													<a class="gray-hover ml-2" v-b-tooltip.hover title="Add Character" @click="add(key, 'npc', npc.name, true)">
-														<i class="fas fa-plus green"></i>
-														<span class="d-none d-md-inline ml-1">Add</span>
-													</a>
+													<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 												</span>
+												<div class="actions bg-gray-active justify-content-end">
+													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
+														<i class="fas fa-info"></i>
+													</a>
+													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(key, 'npc', npc.name, true)">
+														<i class="fas fa-plus"></i>
+													</a>
+													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(key, 'npc', npc.name, true, true)">
+														<i class="fas fa-dice-d20"></i>
+													</a>
+												</div>
 											</li>
 										</ul>
 									</template>
@@ -220,16 +246,15 @@
 										</template>
 										{{ entity.name }}
 									</div>
-									<span>
+									<div class="actions bg-gray">
 										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-hammer-war blue"></i>
-											<span class="d-none d-md-inline ml-1">Edit</span>
+											<i class="fas fa-pencil"></i>
 										</a>
 										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
-											<i class="fas fa-minus red"></i>
-											<span class="d-none d-md-inline ml-1">Remove</span>
+											<i class="fas fa-minus"></i>
 										</a>
-									</span>
+									</div>
+									<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 								</li>
 							</ul>
 							<div v-else class="loader"><span>Loading entities...</span></div>
@@ -355,10 +380,6 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
-				settings: {
-					source: db.ref(`settings/${this.user.uid}/general`),
-					asObject: true
-				},
 				monsters: db.ref(`monsters`),
 			}
 		},
@@ -434,7 +455,7 @@
 					})
 				}
 			},
-			add(id, type, name, custom = false) {
+			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
 					id: id,
 					name: name,
@@ -450,7 +471,7 @@
 					if(custom == false) {
 						var npc_data = this.monsters[id - 1];
 						entity.npc = 'api'
-						if(this.settings.rollHp && npc_data.hit_dice) {
+						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution)
 
@@ -470,7 +491,7 @@
 						entity.npc = 'custom'
 						entity.ac = npc_data.ac
 
-						if(this.settings.rollHp && npc_data.hit_dice) {
+						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution)
 
@@ -602,22 +623,56 @@ ul.nav {
 	}
 }
 ul.entities {
-	list-style:none;
-	padding:0;
-	line-height:30px;
-}
-ul.entities li {
-	margin-bottom:5px;
-}
-ul.entities .img {
-	width: 30px;
-	height: 30px;
-	display: block;
-	background-size: cover;
-	background-position: top center;
-	border: solid 1px #b2b2b2;
-	background-color: #000;
-	margin-right: 10px;
+	list-style: none;
+	padding: 0;
+	line-height: 30px;
+
+	li {
+		border: solid 1px transparent;
+		padding: 2px;
+		margin-bottom:5px;
+		position: relative;
+
+		.actions {
+			right: 0;
+			top: 0;
+			position: absolute;
+			padding: 3px;
+			display: none;
+
+			a {
+				color: #b2b2b2 !important;
+				width: 28px;
+				height: 28px;
+				display: block;
+				line-height: 28px;
+				text-align: center;
+				border-radius: 50%;
+
+				&:hover {
+					text-decoration: none;
+					background: #494747;
+				}
+			}
+		}
+		&:hover {
+			border-color: #494747; 
+
+			.actions {
+				display: flex;
+			}
+		}
+		.img {
+			width: 30px;
+			height: 30px;
+			display: block;
+			background-size: cover;
+			background-position: top center;
+			border: solid 1px #b2b2b2;
+			background-color: #000;
+			margin-right: 10px;
+		}
+	}
 }
 .npc {
 	padding: 15px;

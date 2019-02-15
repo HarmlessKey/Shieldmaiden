@@ -30,20 +30,24 @@
 								<img src="@/assets/_img/styles/monster.svg" />
 							</td>
 							<td class="n">{{ index + 1 }}</td>
-							<td>{{ npc.name }}</td>
-							<td class="text-right actions">
-								<router-link class="gray-hover mx-2" 
+							<td>
+								<router-link class="gray-light mx-2" 
 									:to="'/npcs/' + npc.key" 
 									v-b-tooltip.hover title="Edit">
-									<i class="fas fa-hammer-war blue"></i>
-									<span class="d-none d-md-inline ml-1">Edit</span>
+									{{ npc.name }}
+								</router-link>
+							</td>
+							<td class="text-right actions justify-content-end">
+								<router-link class="gray-hover mx-1" 
+									:to="'/npcs/' + npc.key" 
+									v-b-tooltip.hover title="Edit">
+									<i class="fas fa-pencil"></i>
 								</router-link>
 								<a v-b-tooltip.hover 
 									title="Delete" 
 									class="gray-hover"
 									@click="confirmDelete(npc.key, npc.name)">
-									<i class="fas fa-trash-alt red"></i>
-									<span class="d-none d-md-inline ml-1">Delete</span>
+									<i class="fas fa-trash-alt"></i>
 								</a>
 							</td>
 						</tr>

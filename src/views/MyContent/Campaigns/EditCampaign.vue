@@ -35,27 +35,29 @@
 								{{ player.character_name }}
 							</div>
 							<template v-if="campaign.players">
-								<a v-if="checkPlayer(key) < 0" 
-								class="gray-hover"
-								v-b-tooltip.hover 
-								title="Add Character" 
-								@click="addPlayer(key, player.character_name)">
-									<i class="fas fa-plus green"></i>
-									<span class="d-none d-md-inline ml-1">Add</span>
-								</a>
-								<span v-else>
-									<i class="fas fa-check green"></i>
+								<div class="actions bg-gray">
+									<a v-if="checkPlayer(key) < 0" 
+									class="gray-hover"
+									v-b-tooltip.hover 
+									title="Add Character" 
+									@click="addPlayer(key, player.character_name)">
+										<i class="fas fa-plus"></i>
+									</a>
+								</div>
+								<span v-if="checkPlayer(key) >= 0">
+									<i class="fas fa-check"></i>
 									<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
 								</span>
 							</a>
 							</template>	
-							<a v-else class="gray-hover" 
-								v-b-tooltip.hover 
-								title="Add Character" 
-								@click="addPlayer(key, player.character_name)">
-									<i class="fas fa-plus green"></i>
-									<span class="d-none d-md-inline ml-1">Add</span>
-							</a>
+							<div v-else class="actions bg-gray">
+								<a class="gray-hover" 
+									v-b-tooltip.hover 
+									title="Add Character" 
+									@click="addPlayer(key, player.character_name)">
+										<i class="fas fa-plus"></i>
+								</a>
+							</div>
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -71,10 +73,11 @@
 									{{ players[key].character_name }}
 								</div>
 								
-								<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
-									<i class="fas fa-minus red"></i>
-									<span class="d-none d-md-inline ml-1">Remove</span>
-								</a>
+								<div class="actions bg-gray">
+									<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
+										<i class="fas fa-minus"></i>
+									</a>
+								</div>
 							</li>
 						</ul>
 					</template>
@@ -187,19 +190,63 @@
 		list-style:none;
 		padding:0;
 		line-height:30px;
-	}
-	ul.entities li {
-		margin-bottom:5px;
-	}
-	ul.entities .img {
-		width: 30px;
-		height: 30px;
-		display: block;
-		background-size: cover;
-		background-position: top center;
-		border: solid 1px #b2b2b2;
-		background-color: #000;
-		margin-right: 10px;
+		
+		li {
+			border: solid 1px transparent;
+			padding: 2px;
+			margin-bottom:5px;
+			position: relative;
+
+			.actions {
+				right: 0;
+				top: 0;
+				position: absolute;
+				padding: 3px;
+				display: none;
+
+				a {
+					color: #b2b2b2 !important;
+					width: 28px;
+					height: 28px;
+					display: block;
+					line-height: 28px;
+					text-align: center;
+					border-radius: 50%;
+
+					&:hover {
+						text-decoration: none;
+						background: #494747;
+					}
+				}
+			}
+			&:hover {
+				border-color: #494747; 
+
+				.actions {
+					display: flex;
+				}
+			}
+			.img {
+				width: 30px;
+				height: 30px;
+				display: block;
+				background-size: cover;
+				background-position: top center;
+				border: solid 1px #b2b2b2;
+				background-color: #000;
+				margin-right: 10px;
+			}
+		}
+		.img {
+			width: 30px;
+			height: 30px;
+			display: block;
+			background-size: cover;
+			background-position: top center;
+			border: solid 1px #b2b2b2;
+			background-color: #000;
+			margin-right: 10px;
+		}
 	}
 	.monster {
 		padding:15px;

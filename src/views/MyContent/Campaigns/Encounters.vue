@@ -58,7 +58,7 @@
 				<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
 			</h2>
 
-			<table class="table">
+			<table class="table table-hover">
 				<thead>
 					<th class="n d-none d-md-table-cell">#</th>
 					<th>Encounter</th>
@@ -75,7 +75,14 @@
 					leave-active-class="animated bounceOutLeft">
 					<tr v-for="(encounter, index) in _active" :key="encounter.key">
 						<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-						<td>{{ encounter.encounter }}</td>
+						<td>
+							<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+								{{ encounter.encounter }}
+							</router-link>
+							<template v-else>
+								{{ encounter.encounter }}
+							</template>
+						</td>
 						<td>
 							<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
 								<i class="fas fa-users"></i>
@@ -93,22 +100,18 @@
 						<template v-else>
 							<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
 						</template>
-						<td class="text-right actions">
+						<td class="text-right actions justify-content-end">
 							<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-								<i class="fas fa-play green"></i>
-								<span class="d-none d-md-inline ml-1">Play</span>
-							</router-link>
-							<span v-else class="disabled gray-hover">
 								<i class="fas fa-play"></i>
-								<span class="d-none d-md-inline ml-1">Play</span>
+							</router-link>
+							<span v-else class="disabled">
+								<i class="fas fa-play"></i>
 							</span>
-							<router-link class="mx-3 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-								<i class="fas fa-hammer-war blue"></i>
-								<span class="d-none d-md-inline ml-1">Edit</span>
+							<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-pencil-alt"></i>
 							</router-link>
 							<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-								<i class="fas fa-trash-alt red"></i>
-								<span class="d-none d-md-inline ml-1">Delete</span>
+								<i class="fas fa-trash-alt"></i>
 							</a>
 						</td>
 					</tr>
@@ -295,19 +298,6 @@
 </script>
 
 <style lang="scss" scoped>
-table {
-	tr {
-		td.actions {
-			a {
-				color: #494747 !important;
-
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
-}
 .container-fluid {
 	padding: 20px;
 }

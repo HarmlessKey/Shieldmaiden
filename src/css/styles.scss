@@ -185,6 +185,18 @@ html body {
 	100% { transform: rotate(360deg); }
 }
 
+.grow {
+	&:hover {
+		animation-name: grow;
+		animation-duration: .5s;
+	}
+}
+
+@keyframes grow {
+	0% { width: 0; }
+	100% { width: 100%; }
+}
+
 /* 4. Buttons and Links */
 /*********************************************/
 button, a {
@@ -309,6 +321,37 @@ table {
 		img {
 			width: 34px;
 			height: 34px;
+		}
+	}
+	tr {
+		td.actions {
+			padding-top: 5px;
+			padding-bottom: 5px;
+			display: flex;
+
+			a {
+				visibility: hidden;
+				color: #b2b2b2 !important;
+				width: 36px;
+				height: 36px;
+				display: block;
+				line-height: 36px;
+				text-align: center;
+				border-radius: 50%;
+
+				&:hover {
+					text-decoration: none;
+					background: #302f2f;
+					// color: #b2b2b2 !important;
+				}
+			}
+		}
+		&:hover {
+			td.actions {
+				a {
+					visibility: visible;
+				}
+			}
 		}
 	}
 }

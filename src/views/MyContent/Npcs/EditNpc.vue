@@ -46,7 +46,8 @@
 									class="form-control mb-2" 
 									:class="{'input': true, 'error': errors.has('name') }" 
 									v-model="npc.name" 
-									v-validate="'alpha_spaces|required'" 
+									v-validate="'max:35|required'" 
+									maxlength="35"
 									data-vv-as="Name"
 									id="name"
 									name="name" 
@@ -64,6 +65,7 @@
 										type="text" 
 										class="form-control mb-2" 
 										v-model="npc.size"
+										maxlenght="30"
 										id="size"
 										name="size" 
 										placeholder="Size"></b-form-input>
@@ -437,6 +439,7 @@
 									id="name"
 									type="text" 
 									class="form-control" 
+									maxlength="30"
 									v-model="ability.name" 
 									name="name" 
 									placeholder="Name"></b-form-input>

@@ -33,26 +33,24 @@
 							</td>
 							<td class="n">{{ index + 1 }}</td>
 							<td>
-								<router-link class="mx-2" 
+								<router-link class="mx-2 gray-light" 
 									:to="'/players/' + player.key" 
 									v-b-tooltip.hover title="Edit">{{ player.character_name }}
 								</router-link>
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td class="text-right actions">
-								<router-link class="gray-hover mx-2" 
+							<td class="text-right actions justify-content-end">
+								<router-link class="gray-hover mx-1" 
 									:to="'/players/' + player.key" 
 									v-b-tooltip.hover title="Edit">
-									<i class="fas fa-hammer-war blue"></i>
-									<span class="d-none d-md-inline ml-1">Edit</span>
+									<i class="fas fa-pencil"></i>
 								</router-link>
 								<a v-b-tooltip.hover 
 									title="Delete" 
 									class="gray-hover"
 									@click="confirmDelete(player.key, player.player)">
-										<i class="fas fa-trash-alt red"></i>
-										<span class="d-none d-md-inline ml-1">Delete</span>
+										<i class="fas fa-trash-alt"></i>
 								</a>
 							</td>
 						</tr>

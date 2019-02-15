@@ -317,7 +317,7 @@ const mutations = {
 		Vue.set(state.entities[key], 'initiative', entity.initiative)
 		Vue.set(state.entities[key], 'ac', entity.ac)
 		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
-		Vue.set(state.entities[key], 'curHp', entity.maxHp)
+		Vue.set(state.entities[key], 'curHp', entity.curHp)
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
 		

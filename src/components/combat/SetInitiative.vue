@@ -8,17 +8,19 @@
 			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
-					<ul v-if="entities">
-						<li class="d-flex justify-content-between" v-for="entity in _players" :key="entity.key">
-							<div class="d-flex justify-content-left">
-								<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-								<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+					<ul v-if="entities" class="entities hasImg">
+						<li v-for="entity in _players" :key="entity.key">
+							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<div class="d-flex justify-content-between">
+								<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-hover' ]"><i class="fas fa-check"></i></span> -->
 								{{ entity.name }}
+								<span class="pr-5 hover-hide">{{ entity.curHp}}<span class="gray-active">/{{entity.maxHp}}</span></span>
 							</div>
-							<span class="d-flex justify-content-end">
+							<div class="actions">
+								<a @click="edit(entity.key, entities[entity.key])"><i class="fas fa-pencil"></i></a>
+							</div>
 								<!-- <input type="number" class="form-control mr-2" v-model="entity.curHp" v-validate="'numeric'" name="playerCurHp" @change="setCurHp(entity.key, entity)" /> -->
 								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="storeInitiative(entity.key, entity)" />
-							</span>
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -31,17 +33,17 @@
 			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
-					<ul>
-						<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="{selected:selected.includes(i)}">
-							<div class="d-flex justify-content-left">
-								<span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span>
-								<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
-								<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
+					<ul class="entities hasImg">
+						<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="	{selected:selected.includes(i)}">
+							<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span> -->
+							<span class="img pointer" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"  @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"></span>
+							<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
+							
+							<div class="actions">
+								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
 							</div>
-							<div class="d-flex justify-content-right">
-								<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
-								<a class="roll" @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
-							</div>
+
+							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
@@ -59,16 +61,16 @@
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 			
-					<ul>
-						<li v-for="(entity) in _active" v-bind:key="entity.key" class="d-flex justify-content-between">
-							<span class="d-flex justify-content-left">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+					<ul class="entities hasImg">
+						<li v-for="(entity) in _active" v-bind:key="entity.key">
+							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<div class="d-flex justify-content-between">
 								{{ entity.name }}
-							</span>
-							<span class="d-flex justify-content-end">
-								<span class="mr-4">{{ entity.initiative }}</span>
-								<a class="red" v-b-tooltip.hover title="Set Inactive" @click="setActive(entity.key, false)"><i class="fas fa-minus-circle"></i></a>
-							</span>
+								<span>{{ entity.initiative }}</span>
+							</div>
+							<div class="actions">
+								<a v-b-tooltip.hover title="Set Inactive" @click="setActive(entity.key, false)"><i class="fas fa-minus"></i></a>
+							</div>
 						</li>
 					</ul>
 				
@@ -77,16 +79,16 @@
 						<a v-b-popover.hover="'These can have their initiative allready set, but will not join combat until you set them active.'" title="Inactive entities"><i class="fas fa-info-circle"></i></a>
 					</span>
 
-					<ul>
-						<li v-for="(entity) in _idle" v-bind:key="entity.key" class="d-flex justify-content-between">
-							<span class="d-flex justify-content-start">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
-								<span>{{ entity.name }}</span>
+					<ul class="entities hasImg">
+						<li v-for="(entity) in _idle" v-bind:key="entity.key">
+							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<span class="d-flex justify-content-between">
+								{{ entity.name }}
+								<span>{{ entity.initiative }}</span>
 							</span>
-							<span class="d-flex justify-content-end">
-								<span class="mr-4">{{ entity.initiative }}</span>
-								<a class="green" v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus-circle"></i></a>
-							</span>
+							<div class="actions">
+								<a v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus"></i></a>
+							</div>
 						</li>
 					</ul>
 				</div>
@@ -155,6 +157,7 @@
 		},
 		methods: {
 			...mapActions([
+				'setSlide',
 				'set_active',
 				'set_initiative'
 			]),
@@ -208,9 +211,15 @@
 				}
 				this.selected = []
 			},
-			setCurHp() {
-
-			}
+			edit(key, entity) {
+				event.stopPropagation();
+				this.setSlide({
+					show: true,
+					type: 'edit',
+					key: key,
+					entity: entity,
+				})
+			},
 		}
 	}
 </script>
@@ -259,28 +268,33 @@
 	.set {
 		grid-area: set;
 	}
-	ul {
-		list-style:none;
+	ul.entities {
 		padding:0 15px 0 10px;
 
 		li {
-			margin-bottom: 8px;
-			line-height: 40px;
-			background-color: #494747;
-			padding:2px 5px;
-			border: solid 1px #494747;
+			border: solid 1px transparent;
+			background: #191919;
 
 			&.selected {
 				border-color: #2c97de;
 			}
 			.form-control {
+				position: absolute;
+				right: 4px;
+				top: 4px;
+				border: none !important;
 				text-align: center;
 				width: 50px;
 				padding: 0;
+				margin: 0;
 				
 				&.init {
 					width: 40px;
 				}
+			}
+			.actions {
+				background: #191919;
+				right: 50px;
 			}
 			.roll {
 				font-size: 17px;
@@ -288,22 +302,6 @@
 			}
 		}
 	}
-}
-.img {
-	display: block;
-	width: 30px;
-	height: 30px;
-	background-size: cover;
-	background-position: center top;
-	border: solid 1px #b2b2b2;
-	margin:6px 10px 0 4px;
-
-	background-color: #000;
-}
-.name {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 .initiative-move {
   transition: transform .5s;

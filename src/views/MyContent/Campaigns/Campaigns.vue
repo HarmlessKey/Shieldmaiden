@@ -54,15 +54,13 @@
 										<router-link class="mx-2 text-capitalize gray-hover" 
 											:to="'/campaigns/' + campaign.key" 
 											v-b-tooltip.hover title="Edit">
-												<i class="fas fa-hammer-war blue"></i>
-												<span class="d-none d-md-inline ml-1">Edit</span>
+												<i class="fas fa-pencil"></i>
 										</router-link>
 										<a v-b-tooltip.hover 
 											title="Delete" 
 											class="gray-hover text-capitalize"
 											@click="confirmDelete(campaign.key, campaign.campaign)">
-												<i class="fas fa-trash-alt red"></i>
-												<span class="d-none d-md-inline ml-1">Delete</span>
+												<i class="fas fa-trash-alt"></i>
 										</a>
 									</span>
 								</div>
@@ -200,10 +198,10 @@
 
 <style lang="scss" scoped>
 	.container-fluid {
-		padding:20px;
+		padding: 20px;
 
 		a {
-			cursor:pointer;
+			cursor: pointer;
 		}
 		h2.players {
 			margin-bottom: 5px !important;
@@ -214,6 +212,11 @@
 				.card-header {
 					background-color: #cc3e4a;
 					color: #fff;
+				}
+			}
+			.card-header {
+				a:hover {
+					color: #b2b2b2 !important;
 				}
 			}
 			.card-body {

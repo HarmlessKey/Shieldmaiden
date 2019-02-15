@@ -100,19 +100,21 @@
 						<template v-else>
 							<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
 						</template>
-						<td class="text-right actions justify-content-end">
-							<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-								<i class="fas fa-play"></i>
-							</router-link>
-							<span v-else class="disabled">
-								<i class="fas fa-play"></i>
-							</span>
-							<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-								<i class="fas fa-pencil-alt"></i>
-							</router-link>
-							<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-								<i class="fas fa-trash-alt"></i>
-							</a>
+						<td class="actions">
+							<div class="d-flex justify-content-end">
+								<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+									<i class="fas fa-play"></i>
+								</router-link>
+								<span v-else class="disabled">
+									<i class="fas fa-play"></i>
+								</span>
+								<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+									<i class="fas fa-pencil-alt"></i>
+								</router-link>
+								<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
 						</td>
 					</tr>
 				</tbody>

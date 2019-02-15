@@ -14,6 +14,7 @@
 			<b-col>
 				<label class="text-center">Init.</label>
 				<b-form-input 
+					class="text-center"
 					type="number" 
 					name="initiative"
 					min="0"
@@ -27,6 +28,7 @@
 			<b-col>
 				<label class="text-center">AC Bonus</label>
 				<b-form-input 
+					class="text-center"
 					type="number" 
 					name="ac_bonus" 
 					v-model="entity.ac_bonus"
@@ -36,6 +38,7 @@
 			<b-col>
 				<label class="text-center">Temp HP</label>
 				<b-form-input 
+					class="text-center"
 					type="number" 
 					name="tempHp" 
 					v-model="entity.tempHp"
@@ -43,14 +46,15 @@
 			</b-col>
 		</b-row>
 
-		<template v-if="entity.npc">
+		<template>
 			<hr>
 			<h2 class="mb-0">Override</h2>
 			<p><small>Only for this encounter.</small></p>
 			<b-row class="my-2">
-				<b-col class="text-center">
+				<b-col class="text-center" v-if="entity.npc">
 					<label>AC</label>
 					<b-form-input 
+						class="text-center"
 						type="number" 
 						name="ac" 
 						min="1"
@@ -61,9 +65,10 @@
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 				</b-col>
 
-				<b-col class="text-center">
+				<b-col class="text-center" v-if="entity.npc">
 					<label>Max HP</label>
 					<b-form-input 
+						class="text-center"
 						type="number" 
 						name="maxHp" 
 						min="1"
@@ -77,6 +82,7 @@
 				<b-col class="text-center">
 					<label>Cur HP</label>
 					<b-form-input 
+					 	class="text-center"
 						type="number" 
 						name="maxHp" 
 						min="1"
@@ -156,7 +162,7 @@
 						if(this.entity.curHp > this.entity.maxHp) {
 							this.entity.curHp = this.entity.maxHp
 						}
-
+						
 						this.edit_entity({key: this.entityKey, entity: this.entity})
 						this.setSlide(false);
 					}

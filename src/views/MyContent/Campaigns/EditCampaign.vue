@@ -93,7 +93,6 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
-	import firebase from 'firebase'
 	import { db } from '@/firebase'
 
 	export default {

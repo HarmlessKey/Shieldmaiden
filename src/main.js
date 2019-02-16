@@ -1,11 +1,9 @@
-import 'firebase'
 import Vue from 'vue';
 import App from './App.vue';
 import jQuery from 'jquery'
 import VueFire from 'vuefire'
-import firebaseui from 'firebaseui'
 import VeeValidate from 'vee-validate';
-import firebase from 'firebase';
+import { auth } from './firebase';
 import VueRouter from 'vue-router';
 import { store } from './store/store';
 import { routes } from './routes';
@@ -13,8 +11,6 @@ import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta'
-
-
 
 const options = {
 	toast: {
@@ -61,7 +57,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 	store.dispatch('setSlide', false); //Always hide slide
 
-	const currentUser = firebase.auth().currentUser;
+	const currentUser = auth.currentUser;
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
 	if (requiresAuth && !currentUser) {
@@ -77,7 +73,7 @@ router.beforeEach((to, from, next) => {
 // Wrap the vue instance in a Firebase onAuthStateChanged method
 // This stops the execution of the navigation guard 'beforeEach'
 // method until the Firebase initialization ends
-firebase.auth().onAuthStateChanged(function (user) {
+auth.onAuthStateChanged(function (user) {
 
 	window.App = new Vue({
 		el: '#app',

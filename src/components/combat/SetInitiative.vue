@@ -98,7 +98,6 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
 	import axios from 'axios'
 	import _ from 'lodash'
 	import { db } from '@/firebase'
@@ -106,13 +105,12 @@
 
 	import { dice } from '@/mixins/dice.js'
 	import { attributes } from '@/mixins/attributes.js'
-	import { getters } from '@/mixins/getters.js'
 	import Turns from '@/components/combat/Turns.vue'
 
 	export default {
 
 		name: 'SetInitiative',
-		mixins: [dice, attributes, getters],
+		mixins: [dice, attributes],
 		props: ['_active', '_idle'],
 		components: {
 			Turns,

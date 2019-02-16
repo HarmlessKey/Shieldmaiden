@@ -342,7 +342,6 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
-	import firebase from 'firebase'
 	import axios from 'axios'
 	import { db } from '@/firebase'
 	import { difficulty } from '@/mixins/difficulty.js'

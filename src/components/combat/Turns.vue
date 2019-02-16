@@ -45,7 +45,6 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 

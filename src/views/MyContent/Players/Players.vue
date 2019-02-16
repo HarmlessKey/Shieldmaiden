@@ -40,18 +40,20 @@
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td class="text-right actions justify-content-end">
-								<router-link class="gray-hover mx-1" 
-									:to="'/players/' + player.key" 
-									v-b-tooltip.hover title="Edit">
-									<i class="fas fa-pencil"></i>
-								</router-link>
-								<a v-b-tooltip.hover 
-									title="Delete" 
-									class="gray-hover"
-									@click="confirmDelete(player.key, player.player)">
-										<i class="fas fa-trash-alt"></i>
-								</a>
+							<td class="actions">
+								<div class="d-flex justify-content-end">
+									<router-link class="gray-hover mx-1" 
+										:to="'/players/' + player.key" 
+										v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+									</router-link>
+									<a v-b-tooltip.hover 
+										title="Delete" 
+										class="gray-hover"
+										@click="confirmDelete(player.key, player.player)">
+											<i class="fas fa-trash-alt"></i>
+									</a>
+								</div>
 							</td>
 						</tr>
 					</tbody>

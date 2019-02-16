@@ -32,13 +32,13 @@
 </template>
 
 <script>
-	import firebase from "firebase";
+	import { auth } from '@/firebase';
 	import { mapActions } from 'vuex';
 
 	export default {
 		data() {
 			return {
-				user: firebase.auth().currentUser
+				user: auth.currentUser
 			}
 		},
 		methods: {
@@ -53,8 +53,7 @@
 				})
 			},
 			signOut: function() {
-				firebase.auth()
-				.signOut()
+				auth.signOut()
 				.then(() => {
 					this.$router.replace('/');
 				});

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
+	import { firebase, auth } from '@/firebase'
 
 	export default {
 		name: 'login',
@@ -29,7 +29,7 @@
 		},
 		methods: {
 			signIn: function() {
-				firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
+				auth.signInWithEmailAndPassword(this.email, this.password).then(
 					(user) => {
 						this.$router.replace('campaigns')
 					},
@@ -41,7 +41,7 @@
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				firebase.auth().signInWithPopup(provider).then((restult) => {
+				auth.signInWithPopup(provider).then((restult) => {
 					this.$router.replace('campaigns');
 				}).catch((err) => {
 					this.error = err.message;

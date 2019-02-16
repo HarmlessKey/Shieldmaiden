@@ -84,7 +84,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
+	import { auth } from '@/firebase.js'
 	import Footer from '@/components/Footer.vue'
 
 	export default {
@@ -97,7 +97,7 @@
 		},
 		computed: {
 			user() {
-				return firebase.auth().currentUser
+				return auth.currentUser
 			}
 		}
 	}

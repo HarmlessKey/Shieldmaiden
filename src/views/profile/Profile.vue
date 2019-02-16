@@ -51,8 +51,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
-	import { db } from '@/firebase'	
+	import { db, auth } from '@/firebase'	
 	import { mapGetters } from 'vuex'
 
 export default {
@@ -62,7 +61,6 @@ export default {
 		},
 		data() {
 			return {
-				auth: firebase.auth(),
 				error: '',
 				resetError: undefined,
 				resetSuccess: undefined,
@@ -100,7 +98,7 @@ export default {
 				var vm = this;
 				var emailAddress = this.user.email;
 
-				this.auth.sendPasswordResetEmail(emailAddress).then(function() {
+				auth.sendPasswordResetEmail(emailAddress).then(function() {
 					// Email sent.
 					vm.resetSuccess = 'An email was sent to ' + emailAddress + ' with a link to reset your password.';
 					vm.resetError = undefined;

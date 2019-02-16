@@ -33,8 +33,8 @@
 		</table>
 
 		<ul :class="cond['.key']">
-			<li v-for="effect in cond.effects">
-				{{ effect }}
+			<li v-for="effect, index in cond.effects" :key="index">
+				{{ index }}
 			</li>
 		</ul>
 	</div>
@@ -42,7 +42,7 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { mapActions } from 'vuex'
 
 	export default {
 		name: 'Condition',

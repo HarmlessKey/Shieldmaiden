@@ -64,7 +64,7 @@
 				Add your first player 
 				<i class="fas fa-arrow-up gray-hover"></i>
 			</h2>
-			<div v-else="loading" class="loader"><span>Loading Players...</span></div>
+			<div v-else class="loader"><span>Loading Players...</span></div>
 		</div>
 	</div>
 </template>

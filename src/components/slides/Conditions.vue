@@ -2,46 +2,48 @@
 	<div class="pb-5">
 		<h2>Conditions <span class="blue">{{ entity.name }}</span></h2>
 		<ul class="conditions">
-			<li v-for="condition, index in conditions" :key="index" v-if="condition['.key'] != 'exhaustion'">
-				<div class="d-flex justify-content-between" :class="{ 'status': check(condition['.key']) == true }">
-					<span class="d-flex justify-content-left">	
-						<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
-							<path :d="condition.icon" fill-opacity="1"></path>
-						</svg>
-						<span class="text-capitalize">
-							{{ condition['.key'] }}
+			<template v-for="(condition, index) in conditions">
+				<li :key="index" v-if="condition['.key'] != 'exhaustion'">
+					<div class="d-flex justify-content-between" :class="{ 'status': check(condition['.key']) == true }">
+						<span class="d-flex justify-content-left">	
+							<svg class="icon" viewBox="0 0 512 512">
+								<path :d="condition.icon" fill-opacity="1"></path>
+							</svg>
+							<span class="text-capitalize">
+								{{ condition['.key'] }}
+							</span>
 						</span>
-					</span>
-					<span>
-						<a class="mr-3 plus" @click="set(condition['.key'])" :key="condition['.key']">
-							<!-- yes, these icons need to be within a span... without they will not update on change -->
-							<span v-show="check(condition['.key']) == false"><i class="fas fa-plus-circle" key="false"></i></span>
-							<span v-show="check(condition['.key']) == true"><i class="fas fa-minus-circle" key="true"></i></span>
-						</a>
-						<a 
-							data-toggle="collapse"
-							v-bind:href="'#cond_'+index"
-							role="button"
-							aria-expanded="false">
-								<i class="fas fa-caret-down"></i>
-						</a>
-					</span>
-				</div>
-				<p class="collapse shown" v-bind:id="'cond_'+index">
-					{{ condition.condition }}
-					<ul>
-						<li v-for="effect, index in condition.effects" :key="index">
-							{{ effect }}
-						</li>
-					</ul>
-				</p>
-			</li>
+						<span>
+							<a class="mr-3 plus" @click="set(condition['.key'])" :key="condition['.key']">
+								<!-- yes, these icons need to be within a span... without they will not update on change -->
+								<span v-show="check(condition['.key']) == false"><i class="fas fa-plus-circle" key="false"></i></span>
+								<span v-show="check(condition['.key']) == true"><i class="fas fa-minus-circle" key="true"></i></span>
+							</a>
+							<a 
+								data-toggle="collapse"
+								v-bind:href="'#cond_'+index"
+								role="button"
+								aria-expanded="false">
+									<i class="fas fa-caret-down"></i>
+							</a>
+						</span>
+					</div>
+					<p class="collapse shown" v-bind:id="'cond_'+index">
+						{{ condition.condition }}
+						<ul>
+							<li v-for="(effect, index) in condition.effects" :key="index">
+								{{ effect }}
+							</li>
+						</ul>
+					</p>
+				</li>
+			</template>
 			<hr>
 			<!-- EXHAUSTION -->
 			<li :class="{ 'status': entities[entity.key].conditions['exhaustion'] }">
 				<div class="d-flex justify-content-between">
 					<span class="d-flex justify-content-left">	
-						<svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
+						<svg class="icon" viewBox="0 0 512 512">
 							<path :d="conditions[3].icon" fill-opacity="1"></path>
 						</svg>
 						<span class="text-capitalize">
@@ -67,7 +69,7 @@
 				<p class="collapse shown" v-bind:id="'cond_'+conditions[3]['.key']">
 					{{ conditions[3].condition }}
 					<ul class="exhausted">
-						<li v-for="effect, index in conditions[3].effects" :key="index">
+						<li v-for="(effect, index) in conditions[3].effects" :key="index">
 							{{ effect }}
 						</li>
 					</ul>

@@ -116,7 +116,7 @@
 					</b-row>
 				</b-card>
 				<b-card header="Ability Scores">
-						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
+						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
 							<b-col class="col-3">
 								<label :for="ability.ability">
 									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -146,7 +146,6 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import { db } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
 		name: 'Players',
@@ -173,17 +172,15 @@
 		},
 		methods: {
 			addPlayer() {
-				console.log(this.player)
 				// THIS IS UGLY
 				delete this.player['.value']
 				delete this.player['.key']
+
 				// UGLY ENDS HERE
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref('players/' + this.userId).push(this.player);
 						this.$router.replace('/players')
-					} else {
-						//console.log('Not valid');
 					}
 				})
 			},

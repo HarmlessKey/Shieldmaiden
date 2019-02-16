@@ -25,7 +25,7 @@
 							leave-active-class="animated fadeOutDown">
 							
 							<li 
-								v-for="(entity, i, key) in _targets"
+								v-for="(entity, i) in _targets"
 								class="d-flex justify-content-between" 
 								:key="entity.key" 
 								:class="{ targeted : targeted == entity.key }">
@@ -149,11 +149,9 @@
 							<hr>
 							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ _down.length }})</h2>
 							<ul class="targets down_targets">
-								<template v-for="entity in _down">
-									<li @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
-										<TargetItem :item="entity.key" />
-									</li>
-								</template>
+								<li v-for="(entity, index) in _down" :key="index" @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
+									<TargetItem :item="entity.key" />
+								</li>
 							</ul>
 						</template>
 					</div>

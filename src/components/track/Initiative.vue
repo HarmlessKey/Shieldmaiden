@@ -15,7 +15,7 @@
 				is="transition-group"
 				enter-active-class="animated flash"
 				leave-active-class="animated bounceOutLeft">
-				<tr v-for="(entity, key) in targets" :key="entity.key">
+				<tr v-for="entity in targets" :key="entity.key">
 					<td>{{ entity.initiative }}</td>
 				
 					<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
@@ -48,20 +48,21 @@
 						((entity.entityType == 'player' && playerSettings.conditions === undefined) 
 							|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
 						">
-							<div v-for="(condition, key) in entity.conditions" v-bind:key="key" v-if="conditions[key]">
-									<span class="n" v-if="key == 'exhaustion'">
-										{{ entity.conditions[key] }}
-									</span>
-									<svg
-										v-else
-										v-b-popover.hover="conditions[key].condition" 
-										:title="key" 
-										class="icon text" 
-										xmlns="https://www.w3.org/2000/svg"
-										viewBox="0 0 512 512">
-										<path :d="conditions[key].icon" fill-opacity="1"></path>
-									</svg>
-							</div>
+							<template v-for="(condition, key) in entity.conditions">
+								<div :key="key" v-if="conditions[key]">
+										<span class="n" v-if="key == 'exhaustion'">
+											{{ entity.conditions[key] }}
+										</span>
+										<svg
+											v-else
+											v-b-popover.hover="conditions[key].condition" 
+											:title="key" 
+											class="icon text" 
+											viewBox="0 0 512 512">
+											<path :d="conditions[key].icon" fill-opacity="1"></path>
+										</svg>
+								</div>
+							</template>
 						</div>
 					</td>
 				</tr>
@@ -121,7 +122,7 @@
 						var ac = parseInt(entity.transformed.ac)
 				}
 				else {
-						var ac = parseInt(entity.ac)
+						ac = parseInt(entity.ac)
 				}
 				return ac
 			},
@@ -190,9 +191,6 @@
 			td.name {
 				width: 1%;
 				white-space: nowrap;
-			}
-			td.hp {
-
 			}
 			td.img {
 				width: 45px;

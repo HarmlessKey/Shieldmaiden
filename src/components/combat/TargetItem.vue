@@ -69,7 +69,7 @@
 								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 							</div>
 							<div v-else class="hp d-flex justify-content-end">
-								<div v-for="check, index in entity.saves" :key="index">
+								<div v-for="(check, index) in entity.saves" :key="index">
 									<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 									<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 								</div>
@@ -96,7 +96,7 @@
 
 		<!-- REMINDERS -->
 		<ul v-if="entity.reminders" class="reminders d-flex justify-content-start">
-			<li v-for="reminder, index in entity.reminders" v-b-tooltip.hover :title="reminder.title" :class="'bg-'+reminder.color">
+			<li v-for="(reminder, index) in entity.reminders" :key="index" v-b-tooltip.hover :title="reminder.title" :class="'bg-'+reminder.color">
 			</li>
 		</ul>
 	</div>

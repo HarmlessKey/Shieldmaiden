@@ -42,7 +42,7 @@
 						name="campaigns" 
 						enter-active-class="animated flash" 
 						leave-active-class="animated bounceOutLeft">
-						<b-col lg="4" md="6" v-for="(campaign, index) in _campaigns" :key="campaign.key">
+						<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
 							<div class="card">
 								<div class="card-header d-flex justify-content-between">
 									<span>
@@ -106,7 +106,7 @@
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
 	export default {

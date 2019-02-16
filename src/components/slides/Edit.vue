@@ -82,7 +82,7 @@
 				<b-col class="text-center">
 					<label>Cur HP</label>
 					<b-form-input 
-					 	class="text-center"
+						class="text-center"
 						type="number" 
 						name="maxHp" 
 						min="1"
@@ -104,7 +104,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
@@ -117,14 +116,6 @@
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-			}
-		},
-		firebase() {
-			return {
-				// entity: {
-				// 	source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
-				// 	asObject: true
-				// }
 			}
 		},
 		computed: {

@@ -15,7 +15,7 @@
 			<template v-if="current.actions">
 				<h2>Actions</h2>
 				<ul class="roll">
-					<li v-for="action, index in current.actions" class="bg-gray-active">
+					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
 							<a class="d-flex justify-content-between gray-light"
 								data-toggle="collapse" :href="'#act-'+index" 
@@ -37,7 +37,7 @@
 				<h2>Legendary Actions</h2>
 
 				<ul class="roll">
-					<li v-for="action, index in current.legendary_actions" class="bg-gray-active">
+					<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
 							<a class="d-flex justify-content-between gray-light"
 								data-toggle="collapse" 
@@ -62,8 +62,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters } from 'vuex'
 	import { dice } from '@/mixins/dice.js'
 	import { setHP } from '@/mixins/HpManipulations.js'
 
@@ -139,10 +138,10 @@
 					var showTotal = ' = <span class="red">' + totalDamage + '</span>';
 				}
 				else {
-					var bonus = '';
-					var showTotal = ''
-					var totalDamage = total;
-					var total = '<span class="red">' + total + '</span>';
+					bonus = '';
+					showTotal = ''
+					totalDamage = total;
+					total = '<span class="red">' + total + '</span>';
 				}
 
 				if(toHit.throws[0] == '20') {

@@ -1,5 +1,4 @@
 import { db } from '@/firebase'
-import axios from 'axios'
 import Vue from 'vue'
 
 const encounters_ref = db.ref('encounters')
@@ -118,8 +117,8 @@ const mutations = {
 		else {
 			entity.transformed = false
 		}
-		switch(true) {
-			case (entity.entityType == 'player'):
+		switch(entity.entityType) {
+			case 'player': {
 				let db_player = rootState.content.players[key]
 
 				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
@@ -134,7 +133,8 @@ const mutations = {
 				entity.wisdom = db_player.wisdom
 				entity.charisma = db_player.charisma
 				break
-			case ((entity.entityType == 'npc')):
+			}
+			case 'npc': {
 				//Fetch data from API
 				if(entity.npc == 'api') {
 					let monsters = monsters_ref.child(entity.id);
@@ -144,7 +144,7 @@ const mutations = {
 					})
 				}
 				else {
-					var data_npc = rootState.content.npcs[entity.id]
+					data_npc = rootState.content.npcs[entity.id]
 				}
 
 				if(!entity.avatar) {
@@ -186,6 +186,7 @@ const mutations = {
 				entity.actions = data_npc.actions
 				entity.legendary_actions = data_npc.legendary_actions
 				break
+			}
 		}
 		Vue.set(state.entities, key, entity)
 	},
@@ -442,7 +443,7 @@ const mutations = {
 }
 
 const actions = {
-	async init_Encounter({ commit, rootState, state }, { cid, eid }) {
+	async init_Encounter({ commit, rootState }, { cid, eid }) {
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
@@ -458,13 +459,13 @@ const actions = {
 		})
 		commit('INITIALIZED')
 	},
-	set_track({ commit, rootState }) {
-		const uid = rootState.content.user.uid;
-		const track = track_ref.child(uid);
-		track.on('value', snapshot => {
-			commit('TRACK', snapshot.val())
-		})
-	},
+	// set_track({ commit, rootState }) {
+	// 	const uid = rootState.content.user.uid;
+	// 	const track = track_ref.child(uid);
+	// 	track.on('value', snapshot => {
+	// 		commit('TRACK', snapshot.val())
+	// 	})
+	// },
 	track_Encounter({ commit, state }) {
 		const path = state.path
 		const encounter = encounters_ref.child(path);

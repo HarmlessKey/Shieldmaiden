@@ -7,7 +7,7 @@
 			name="doneBy"
 			v-validate="'required'">
 			<option value="">Done by...</option>
-			<option v-for="entity in _active" :value="entity">{{ entity.name }}</option>
+			<option v-for="(entity, index) in _active" :value="entity" :key="index">{{ entity.name }}</option>
 		</select>
 		<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
 
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex'
 	import { setHP } from '@/mixins/HpManipulations.js'
 

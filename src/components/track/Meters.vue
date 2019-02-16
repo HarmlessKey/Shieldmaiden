@@ -1,9 +1,8 @@
 <template>
 	<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['damage']).length >0)" class="meters">
-		<template v-for="type in types">
+		<div v-for="(type, index) in types" :key="index">
 			<h3>{{ type }} done</h3>
-			<transition-group 
-				tag="ul" 
+			<transition-group tag="ul" 
 				class="entities" 
 				name="entities" 
 				enter-active-class="animated fadeInUp" 
@@ -34,11 +33,12 @@
 					</li>
 				</template>
 			</transition-group>
-		</template>
+		</div>
 	</div>
 </template>
 
 <script>
+	import _ from 'lodash'
 	import { db } from '@/firebase'
 
 	export default {
@@ -78,7 +78,7 @@
 								var damage = entity.meters.damage
 							}
 							else {
-								var damage = 0
+								damage = 0
 							}
 							return damage > 0;
 						})
@@ -87,7 +87,7 @@
 								var damage = entity.meters.damage
 							}
 							else {
-								var damage = 0
+								damage = 0
 							}
 							return parseInt(damage)
 						} , 'desc')
@@ -100,7 +100,7 @@
 								var healing = entity.meters.healing
 							}
 							else {
-								var healing = 0
+								healing = 0
 							}
 							return healing > 0;
 						})
@@ -109,7 +109,7 @@
 								var healing = entity.meters.healing
 							}
 							else {
-								var healing = 0
+								healing = 0
 							}
 							return parseInt(healing)
 						} , 'desc')

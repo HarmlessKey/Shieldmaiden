@@ -11,7 +11,7 @@
 							</span>
 							{{ item.time }}
 						</div>
-						<b class="blue" v-if="item.crit">Critical hit! </b class="blue">
+						<b class="blue" v-if="item.crit">Critical hit! </b>
 						<template v-if="entities[item.by]">
 							{{ entities[item.by].name }} did
 						</template>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from 'vuex'
+	import { mapGetters } from 'vuex'
 	import { setHP } from '@/mixins/HpManipulations.js'
 
 	export default {
@@ -75,7 +75,7 @@
 					value: key
 				})
 			}
- 		}
+		}
 	}
 </script>
 

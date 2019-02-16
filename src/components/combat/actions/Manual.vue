@@ -58,8 +58,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters } from 'vuex'
 
 	import { setHP } from '@/mixins/HpManipulations.js'
 

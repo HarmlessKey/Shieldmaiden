@@ -99,43 +99,43 @@
 									<div v-else class="loader"><span>Loading players...</span></div>
 									<h2>Not in Campaign</h2>
 									<ul class="entities hasImg" v-if="campaign.players">
-											<li v-for="(player, key) in players" 
-											:key="key" 
-											class="d-flex justify-content-between" v-if="Object.keys(campaign.players).indexOf(key) < 0">
+										<template v-for="(player, key) in players">
+											<li :key="key" v-if="Object.keys(campaign.players).indexOf(key) < 0" class="d-flex justify-content-between">
 												<div class="d-flex justify-content-left">
 													<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
 													{{ player.character_name }}
 												</div>
-											<template v-if="encounter.entities">
-												<div class="actions pl-5">
-													<a @click="showSlide('info', player)" v-b-tooltip.hover title="Show Info">
+												<template v-if="encounter.entities">
+													<div class="actions pl-5">
+														<a @click="showSlide('info', player)" v-b-tooltip.hover title="Show Info">
+															<i class="fas fa-info"></i>
+														</a>
+														<a v-if="checkPlayer(key) < 0" class="gray-hover" 
+														v-b-tooltip.hover 
+														title="Add Character" 
+														@click="add(key, 'player', player.character_name)">
+															<i class="fas fa-plus"></i>
+														</a>
+													</div>
+													<span v-if="checkPlayer(key) >= 0">
+														<i class="fas fa-check"></i>
+														<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
+													</span>
+												</template>	
+												<div v-else class="actions">
+													<a @click="showSlide('info', players)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
-													<a v-if="checkPlayer(key) < 0" class="gray-hover" 
-													v-b-tooltip.hover 
-													title="Add Character" 
-													@click="add(key, 'player', player.character_name)">
-														<i class="fas fa-plus"></i>
+													<a class="gray-hover" 
+														v-b-tooltip.hover 
+														title="Add Character" 
+														@click="add(key, 'player', player.character_name)">
+															<i class="fas fa-plus"></i>
 													</a>
 												</div>
-												<span v-if="checkPlayer(key) >= 0">
-													<i class="fas fa-check"></i>
-													<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
-												</span>
-											</template>	
-											<div v-else class="actions">
-												<a @click="showSlide('info', players)" v-b-tooltip.hover title="Show Info">
-													<i class="fas fa-info"></i>
-												</a>
-												<a class="gray-hover" 
-													v-b-tooltip.hover 
-													title="Add Character" 
-													@click="add(key, 'player', player.character_name)">
-														<i class="fas fa-plus"></i>
-												</a>
-											</div>
-											<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
+												<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 											</li>
+										</template>
 									</ul>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
@@ -147,7 +147,7 @@
 									</div>
 									<ul class="entities">
 										<p v-if="noResult" class="red">{{ noResult }}</p>
-										<li v-for="npc in searchResults" class="d-flex justify-content-between">
+										<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 											<div class="d-flex justify-content-left">
 												{{ npc.name }}
 											</div>
@@ -292,7 +292,7 @@
 						</a>
 					</h2>
 					<hr>
-					<div v-for="item, index in loot.items">
+					<div v-for="(item, index) in loot.items" :key="index">
 						<h2 class="d-flex justify-content-between">
 							{{ index + 1 }}. {{ item.name }}
 							<a @click="removeItem(index)" 
@@ -342,7 +342,6 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
-	import axios from 'axios'
 	import { db } from '@/firebase'
 	import { difficulty } from '@/mixins/difficulty.js'
 	import { dice } from '@/mixins/dice.js'
@@ -402,7 +401,7 @@
 			}
 		},
 		watch: {
-			entitiesAmount(newVal, oldVal) {
+			entitiesAmount() {
 				this.setDifficulty()
 			}
 		},
@@ -430,9 +429,6 @@
 						this.$snotify.success('Saved.', 'Critical hit!', {
 							position: "rightTop"
 						});
-					}
-					else {
-
 					}
 				})
 			},
@@ -486,7 +482,7 @@
 						entity.ac = npc_data.armor_class
 					}
 					else {
-						var npc_data = this.npcs[id];
+						npc_data = this.npcs[id];
 						entity.npc = 'custom'
 						entity.ac = npc_data.ac
 

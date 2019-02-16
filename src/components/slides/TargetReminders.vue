@@ -2,7 +2,7 @@
 	<div class="pb-5" v-if="entities">
 		<h2>Reminders <span class="blue">{{ entities[entityKey].name }}</span></h2>
 		<b-row v-if="entities[entityKey].reminders" class="current justify-content-start px-3">
-			<b-col class="col-3 p-1" v-for="reminder, key in entities[entityKey].reminders" :key="key">
+			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[entityKey].reminders" :key="key">
 				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ reminder.title }}
 					<span class="delete"><i class="fas fa-times"></i></span>
@@ -37,9 +37,9 @@
 		<div class="tab-content">
 			<div class="tab-pane fade show active" id="premade" role="tabpanel" aria-labelledby="premade-tab">
 				<ul class="premade">
-					<li v-for="reminder, key in premade" :key="key"
+					<li v-for="(reminder, key) in premade" :key="key"
 						class="d-flex justify-content-between"
-					 	:class="'bg-'+reminder.color">
+						:class="'bg-'+reminder.color">
 						<div>{{ reminder.title }}</div>
 						<a class="green" v-b-tooltip.hover title="Set" @click="addReminder('premade', reminder)"><i class="fas fa-plus"></i></a>
 					</li>
@@ -65,7 +65,7 @@
 					<b-col class="col-3">Color</b-col>
 					<b-col>
 						<div class="colors d-flex justify-content-between bg-gray-hover">
-							<a v-for="color in colors" :class="'bg-'+color" @click="setColor(color)">
+							<a v-for="(color, index) in colors" :key="index" :class="'bg-'+color" @click="setColor(color)">
 								<span v-show="color == selectedColor"><i class="fas fa-check"></i></span>
 							</a>
 						</div>
@@ -82,7 +82,7 @@
 						id="trigger"
 						name="trigger">
 							<option selected="selected" value="">Select the trigger</option>
-							<option v-for="trigger, key in triggers" :value="key">{{ trigger }}</option>
+							<option v-for="(trigger, key) in triggers" :value="key" :key="key">{{ trigger }}</option>
 						</b-form-select>
 						<p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>
 					</b-col>
@@ -224,9 +224,6 @@
 								type: 'custom',
 								reminder: setReminder
 							})
-						}
-						else {
-							console.log('Not valid');
 						}
 					})
 				}

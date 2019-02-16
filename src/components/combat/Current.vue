@@ -1,5 +1,5 @@
 <template>
-	<div id="current">
+	<div id="current" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">{{ current.name }}</h2>
 		<div class="scroll" v-bar>
 			<div v-on:scroll="shadow()" ref="scroll">
@@ -182,21 +182,21 @@
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
-			 },
-			 save(check, number) {
-				 this.set_save({
-					 key: this.current.key,
-					 check: check,
-					 number: number
-					})
-			 },
-			 stabilize(key) {
+			},
+			save(check, number) {
+				this.set_save({
+					key: this.current.key,
+					check: check,
+					number: number
+				})
+			},
+			stabilize() {
 				this.set_stable({
-					 key: this.current.key,
-					 action: 'set',
-					})
-			 },
-			 removeReminder(key) {
+					key: this.current.key,
+					action: 'set',
+				})
+			},
+			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
 					entity: this.current.key,
@@ -272,7 +272,7 @@
 							]
 						}
 						else {
-							var buttons = ''
+							buttons = ''
 						}
 
 						// NOTIFICATION
@@ -290,7 +290,7 @@
 								action: 'remove',
 								entity: this.current.key,
 								key: key,
-							}); 
+							});
 						}
 					}
 				}

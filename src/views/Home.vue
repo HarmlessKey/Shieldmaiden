@@ -33,17 +33,17 @@
 			<section>
 				<div class="container">
 					<b-row>
-					 <b-col>
+						<b-col>
 						<h3>Run encounters like never before.</h3>
 						<p>
 							Our app keeps track of everything you need to know in encounters and displays it in a structured overview.
 							This way we make tracking initiative in Dungeons and Dragons a lot simpler, making sure that you can give your players the attention they deserve.
 						</p>
-					 </b-col>
-					 <b-col md="7">
-						 <p class="img-header bg-gray-darker">Info for your players</p>
-						 <img src="@/assets/_img/follow-encounters-harmless-key.png" alt="A link your players can follow for our D&D encounter runner."/>
-					 </b-col>
+						</b-col>
+						<b-col md="7">
+							<p class="img-header bg-gray-darker">Info for your players</p>
+							<img src="@/assets/_img/follow-encounters-harmless-key.png" alt="A link your players can follow for our D&D encounter runner."/>
+						</b-col>
 					</b-row>
 				</div>
 			</section>

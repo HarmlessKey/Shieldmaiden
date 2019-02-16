@@ -27,7 +27,7 @@
 					<template v-if="encounter.loot.items">
 						<h3 class="text-center">Items</h3>
 						<ul>
-							<li v-for="item in encounter.loot.items" class="d-flex justify-content-start">
+							<li v-for="(item, index) in encounter.loot.items" :key="index" class="d-flex justify-content-start">
 								<span class="icon"><i class="fas fa-ring"></i></span>
 
 								<span>
@@ -46,9 +46,6 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from 'vuex'
-	import { db } from '@/firebase'
-
 	export default {
 		name: 'app',
 		props: [
@@ -58,11 +55,6 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 			}
-		},
-		computed: {
-
-		},
-		methods: {
 		},
 	}
 </script>

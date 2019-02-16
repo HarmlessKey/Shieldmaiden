@@ -127,7 +127,7 @@
 							]
 						}
 						else {
-							var buttons = ''
+							buttons = ''
 						}
 
 						this.$snotify.warning(

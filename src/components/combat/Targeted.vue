@@ -69,10 +69,11 @@
 										<span class="percentage">{{ percentage(displayStats().curHp, displayStats().maxHp) }}%</span>
 										<span class="hp">{{ displayStats().curHp }} / {{ displayStats().maxHp }}</span>
 									</div>
-									<div class="progress-bar" :class="{ 
-										'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
-										'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-										'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+									<div class="progress-bar" 
+										:class="{ 
+											'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
+											'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
+											'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
 										}" 
 										role="progressbar" 
 										:style="{width: percentage(displayStats().curHp, displayStats().maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
@@ -234,21 +235,21 @@
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
-			 },
-			 save(check, number) {
-				 this.set_save({
-					 key: this.target.key,
-					 check: check,
-					 number: number
-					})
-			 },
-			 stabilize(key) {
+			},
+			save(check, number) {
+				this.set_save({
+					key: this.target.key,
+					check: check,
+					number: number
+				})
+			},
+			stabilize() {
 				this.set_stable({
-					 key: this.target.key,
-					 action: 'set',
-					})
-			 },
-			 removeReminder(key) {
+					key: this.target.key,
+					action: 'set',
+				})
+			},
+			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
 					entity: this.target.key,

@@ -141,6 +141,69 @@
 					</tbody>
 				</table>
 			</template>
+			<!-- <ul v-sortable>
+				<li v-for="item in list">
+					{{ list.name }}
+					{{ list.order }}
+				</li>
+			</ul> -->
+			<!-- <table class="table table-hover">
+				<thead>
+					<th class="n d-none d-md-table-cell">#</th>
+					<th>Encounter</th>
+					<th>Entities</th>
+					<th class="d-none d-md-table-cell">Status</th>
+					<th class="d-none d-md-table-cell">Round</th>
+					<th class="d-none d-md-table-cell">Turn</th>
+					<th></th>
+				</thead>
+				<draggable :move="onMove" :list="_active" :element="'tbody'">
+					<tr v-for="(encounter, index) in _active">
+						<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
+						<td>
+							<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+								{{ encounter.encounter }}
+							</router-link>
+							<template v-else>
+								{{ encounter.encounter }}
+							</template>
+						</td>
+						<td>
+							<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-users"></i>
+								<template v-if="encounter.entities">
+									{{ Object.keys(encounter.entities).length }}
+								</template>
+								<template v-else> Add</template>
+							</router-link>
+						</td>
+						<template v-if="encounter.round != 0">
+							<td class="red d-none d-md-table-cell">In progress</td>
+							<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
+							<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
+						</template>
+						<template v-else>
+							<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
+						</template>
+						<td class="actions">
+							<div class="d-flex justify-content-end">
+								<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+									<i class="fas fa-play"></i>
+								</router-link>
+								<span v-else class="disabled">
+									<i class="fas fa-play"></i>
+								</span>
+								<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+									<i class="fas fa-pencil-alt"></i>
+								</router-link>
+								<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
+						</td>
+					</tr>
+				</draggable>
+			</table> -->
 			<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 		</div>
 	</div>
@@ -150,6 +213,8 @@
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
+	import draggable from 'vuedraggable'
+
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -161,9 +226,20 @@
 		components: {
 			Sidebar,
 			Crumble,
+			draggable,
 		},
 		data() {
 			return {
+				list: [
+					{
+						"name": "harm",
+						"order": 0
+					},
+					{
+						"name": "key",
+						"order": 1
+					},
+				],
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
@@ -179,6 +255,9 @@
 			...mapGetters([
 				'encounters'
 			]),
+			_active_drag: function() {
+
+			},
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -186,8 +265,11 @@
 					return encounter.finished == false;
 				})
 				.orderBy(function(encounter){
+					if (encounter.order == undefined) {
+						encounter.order = 0
+					}
 					return parseInt(encounter.timestamp)
-				} , 'desc')
+				} , 'asc')
 				.value()
 			},
 			_finished: function() {
@@ -198,7 +280,7 @@
 				})
 				.orderBy(function(encounter){
 					return parseInt(encounter.timestamp)
-				} , 'desc')
+				} , 'asc')
 				.value()
 			},
 		},
@@ -294,6 +376,13 @@
 					localStorage.removeItem(id);
 				}
 			},
+			// onMove(evt, originalEvent) {
+			// 	var index = evt.draggedContext.index
+			// 	var future = evt.draggedContext.futureIndex
+			// 	console.log(evt)
+			// 	console.log(evt.draggedContext.index, '->', evt.draggedContext.futureIndex)
+			// 	console.log("MOVED")
+			// }
 		}
 	}
 </script>

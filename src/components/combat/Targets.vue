@@ -164,7 +164,7 @@
 
 <script>
 	import _ from 'lodash'
-	import { db } from '@/firebase'
+	import { db, auth } from '@/firebase'
 	import { mapGetters, mapActions } from 'vuex'
 	import TargetItem from '@/components/combat/TargetItem.vue'
 
@@ -174,7 +174,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: firebase.auth().currentUser.uid,
+				userId: auth.currentUser.uid,
 				currentTarget: {},
 				setShadow: 0,
 			}

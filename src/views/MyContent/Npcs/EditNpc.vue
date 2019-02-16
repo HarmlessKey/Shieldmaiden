@@ -582,7 +582,6 @@
 		},
 		methods: {
 			...mapActions([
-				'fetchEncounter',
 				'fetchCampaign',
 				'setSlide'
 			]),

@@ -18,18 +18,20 @@
 		</p>
 		<hr>
 		<b-row class="abilities">
-			<b-col sm="6" md="6" lg="4" v-for="ability, index in abilities"
-				v-b-tooltip.hover title="Roll"
-				:key="index" 
-				class="mb-5" 
-				@click="rollAbility(ability.ability, entity[ability.ability])"
-				v-if="entity[ability.ability]">
-					<div class="ability bg-gray">
-						<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
-						{{ modifier(entity[ability.ability]) }}
-						<span class="score bg-gray">{{ entity[ability.ability] }}</span>
-					</div>
-			</b-col>
+			<template v-for="(ability, index) in abilities">
+				<b-col sm="6" md="6" lg="4"
+					v-b-tooltip.hover title="Roll"
+					:key="index" 
+					class="mb-5" 
+					@click="rollAbility(ability.ability, entity[ability.ability])"
+					v-if="entity[ability.ability]">
+						<div class="ability bg-gray">
+							<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
+							{{ modifier(entity[ability.ability]) }}
+							<span class="score bg-gray">{{ entity[ability.ability] }}</span>
+						</div>
+				</b-col>
+			</template>
 		</b-row>
 		<hr>
 
@@ -37,9 +39,11 @@
 		<p>
 			<template v-if="entity.skills">
 				<b>Skills</b>
-				<span v-for="skill, index in skills" :key="index" v-if="npc[skill]">
-					{{ skill }} {{ npc[skill] }},
-				</span>
+				<template v-for="(skill, index) in skills">
+					<span :key="index" v-if="npc[skill]">
+						{{ skill }} {{ npc[skill] }},
+					</span>
+				</template>
 				<br/>
 			</template>
 			<template v-if="entity.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities }}<br/></template>
@@ -53,7 +57,8 @@
 
 		<template v-if="entity.special_abilities">
 			<hr>
-			<div v-for="ability, index in entity.special_abilities">
+			<!-- eslint-disable-next-line -->
+			<div v-for="(ability, index) in entity.special_abilities">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ ability.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -65,7 +70,8 @@
 		<template v-if="entity.actions">
 			<hr>
 			<h2>Actions</h2>
-			<div v-for="action, index in entity.actions">
+			<!-- eslint-disable-next-line -->
+			<div v-for="(action, index) in entity.actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ action.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -77,6 +83,7 @@
 		<template v-if="entity.legendary_actions">
 			<hr>
 			<h2>Legendary Actions</h2>
+			<!-- eslint-disable-next-line -->
 			<div v-for="(legendary_action, index) in entity.legendary_actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1}}. {{ legendary_action.name }}</span>
@@ -90,6 +97,7 @@
 
 <script>
 	import { db } from '@/firebase'
+
 	export default {
 		name: 'NPC',
 		props: [
@@ -142,7 +150,7 @@
 					var mod = '+' + modifier
 				}
 				else {
-					var mod = modifier
+					mod = modifier
 				}
 				
 				this.$snotify.success(ability + ' roll.', roll + '' + mod + ' = ' + total, {

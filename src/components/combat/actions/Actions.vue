@@ -38,8 +38,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
 	import { setHP } from '@/mixins/HpManipulations.js'
 
 	import Manual from '@/components/combat/actions/Manual.vue'

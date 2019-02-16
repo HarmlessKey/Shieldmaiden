@@ -89,7 +89,7 @@
 				</div>
 				<ul class="entities">
 					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<li v-for="npc in searchResults" class="d-flex justify-content-between">
+					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						{{ npc.name }}
 						<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], 'api')">
 							<i class="fas fa-copy blue"></i>
@@ -178,7 +178,7 @@
 					this.entity.name = npc_data.name
 				}
 				else if(type == 'custom') {
-					var npc_data = this.npcs;
+					npc_data = this.npcs;
 					this.entity.npc = 'custom'
 					this.entity.maxHp = npc_data[id].maxHp
 					this.entity.ac = npc_data[id].ac

@@ -3,11 +3,10 @@
 		<h2>
 			<svg :title="cond['.key']" 
 				class="icon text" 
-				xmlns="https://www.w3.org/2000/svg"
 				viewBox="0 0 512 512">
 					<path :d="cond.icon" fill-opacity="1"></path>
 			</svg>
-			 {{ cond['.key'] }}
+			{{ cond['.key'] }}
 		</h2>
 
 		<a v-if="entity.conditions[cond['.key']]" 
@@ -21,7 +20,7 @@
 				<th>Effect</th>
 			</thead>
 			<tbody>
-				<tr v-for="effect, index in effects" :key="index">
+				<tr v-for="(effect, index) in effects" :key="index">
 					<td><a :class="{'active': entity.conditions['exhaustion'] >= index + 1}" 
 					@click="setExhausted(index + 1)">
 					<span v-if="entity.conditions['exhaustion'] > index + 1"><i class="fas fa-check"></i></span>
@@ -33,8 +32,8 @@
 		</table>
 
 		<ul :class="cond['.key']">
-			<li v-for="effect, index in cond.effects" :key="index">
-				{{ index }}
+			<li v-for="(effect, index) in cond.effects" :key="index">
+				{{ effect }}
 			</li>
 		</ul>
 	</div>

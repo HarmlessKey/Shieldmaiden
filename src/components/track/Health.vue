@@ -121,9 +121,6 @@
 				width: 1%;
 				white-space: nowrap;
 			}
-			td.hp {
-
-			}
 			td.img {
 				width: 45px;
 				background-size: cover;

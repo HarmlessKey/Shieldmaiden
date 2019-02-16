@@ -8,7 +8,7 @@
 			<span>Roll</span>
 			<span>Result</span>
 		</div>
-		<div v-for="item, die in dice" class="roller" :key="die">
+		<div v-for="(item, die) in dice" class="roller" :key="die">
 			<input v-if="die == 'X'" class="form-control" min="0" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
@@ -23,7 +23,7 @@
 			<hr>
 			<h2>Your rolls</h2>
 			<ul class="log">
-				<li v-for="item in log">
+				<li v-for="(item, index) in log" :key="index">
 					<h3 v-if="item.total == 'Natural 1' || item.total == 'Natural 20'" 
 						class="font-weight-bold"
 						:class="[{
@@ -70,7 +70,7 @@
 					var die = item.x
 				}
 				else {
-					var die = d
+					die = d
 				}
 				let roll = this.rollD(die, item.n, item.mod);
 				item.result = roll.total;
@@ -100,7 +100,7 @@
 				item.mod = undefined
 				item.n = 1
 			}
- 		}
+		}
 	};
 </script>
 
@@ -131,7 +131,7 @@
 		.icon {
 			height: 100%;
 			display: flex;
-  		align-items: center;
+			align-items: center;
 
 			svg {
 				margin: 0 auto;

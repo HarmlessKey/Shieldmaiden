@@ -29,7 +29,7 @@ Vue.use(Meta);
 //Bootstrap
 global.$ = jQuery
 global.jQuery = jQuery
-let Bootstrap = require('bootstrap')
+Vue.use(require('bootstrap'))
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 
@@ -73,7 +73,7 @@ router.beforeEach((to, from, next) => {
 // Wrap the vue instance in a Firebase onAuthStateChanged method
 // This stops the execution of the navigation guard 'beforeEach'
 // method until the Firebase initialization ends
-auth.onAuthStateChanged(function (user) {
+auth.onAuthStateChanged(function () {
 
 	window.App = new Vue({
 		el: '#app',

@@ -48,7 +48,6 @@
 									<i class="fas fa-check"></i>
 									<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
 								</span>
-							</a>
 							</template>	
 							<div v-else class="actions bg-gray">
 								<a class="gray-hover" 
@@ -137,17 +136,14 @@
 							position: "rightTop"
 						});
 					}
-					else {
-
-					}
 				})
 			},
-			addPlayer(id, name) {
+			addPlayer(id) {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set(
 					'true'
 				);
 			},
-			removePlayer(id, name) {
+			removePlayer(id) {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
 			},
 			checkPlayer(id) {

@@ -41,7 +41,7 @@
 					data-vv-as="New Encounter"
 					name="newEncounter" 
 					placeholder="Encounter Title"
-					@change="addEncounter()" /></b-form-input>
+					@change="addEncounter()"></b-form-input>
 				<b-input-group-append>
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</b-input-group-append>				

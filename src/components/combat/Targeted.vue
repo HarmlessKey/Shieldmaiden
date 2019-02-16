@@ -82,24 +82,25 @@
 						</template>
 
 						<b-row class="conditions" v-if="Object.keys(target.conditions).length > 0">
-							<b-col sm="1" v-for="condition, key in target.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
-								<span class="n" v-if="key == 'exhaustion'">
-									{{ target.conditions[key] }}
-								</span>
-								<template v-else>
-									<svg v-b-popover.hover="conditions[key].condition" 
-										:title="key" 
-										class="icon text" 
-										xmlns="https://www.w3.org/2000/svg"
-										viewBox="0 0 512 512">
-										<path :d="conditions[key].icon" fill-opacity="1"></path>
-									</svg>
-								</template>
-							</b-col>
+							<template v-for="(condition, key) in target.conditions">
+								<b-col sm="1" :key="key" @click="showCondition(key)" v-if="conditions[key]">
+									<span class="n" v-if="key == 'exhaustion'">
+										{{ target.conditions[key] }}
+									</span>
+									<template v-else>
+										<svg v-b-popover.hover="conditions[key].condition" 
+											:title="key" 
+											class="icon text" 
+											viewBox="0 0 512 512">
+											<path :d="conditions[key].icon" fill-opacity="1"></path>
+										</svg>
+									</template>
+								</b-col>
+							</template>
 						</b-row>
 
 						<b-row v-if="target.reminders" class="reminders justify-content-start px-2">
-							<b-col class="col-3 p-1" v-for="reminder, key in target.reminders" :key="key">
+							<b-col class="col-3 p-1" v-for="(reminder, key) in target.reminders" :key="key">
 								<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
 									{{ reminder.title }}
 									<span class="delete"><i class="fas fa-times"></i></span>

@@ -1,8 +1,8 @@
 <template>
-	<div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
-		<ul v-for="type in types" v-if="entities">
+	<div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab" v-if="entities">
+		<ul v-for="(type, index) in types" :key="index">
 			<h2>{{ type }}</h2>
-			<li v-for="entity in _meters[type]" class="health">
+			<li v-for="(entity, index) in _meters[type]" :key="index" class="health">
 				<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 				<div class="progress health-bar">
 					<div>
@@ -30,7 +30,7 @@
 
 <script>
 	import _ from 'lodash'
-	import { mapActions, mapGetters } from 'vuex'
+	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'Dmg',

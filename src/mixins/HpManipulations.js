@@ -165,7 +165,7 @@ export const setHP = {
 							]
 						}
 						else {
-							var buttons = ''
+							buttons = ''
 						}
 
 						// NOTIFICATION
@@ -223,9 +223,9 @@ export const setHP = {
 				var pool = 'transformed';
 			}
 			else {
-				var maxHp = parseInt(target.maxHp);
-				var curHp = parseInt(target.curHp);
-				var pool = '';
+				maxHp = parseInt(target.maxHp);
+				curHp = parseInt(target.curHp);
+				pool = '';
 			}
 			var newhp = parseInt(curHp + amount);
 			var type = 'healing'
@@ -299,7 +299,7 @@ export const setHP = {
 				by: current.key,
 				time: time,
 				type: type,
-				crit, crit,
+				crit: crit,
 				damageType: this.damageType,
 				target: target.key,
 				amount: amount,

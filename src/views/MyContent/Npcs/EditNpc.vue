@@ -17,7 +17,7 @@
 				</div>
 				<ul class="entities">
 					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<li v-for="npc, index in searchResults" class="d-flex justify-content-between">
+					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
 							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
 								<i class="fas fa-info-circle"></i></a>
@@ -168,24 +168,15 @@
 						<b-row>
 							<b-col sm="2"><label for="cr">Challenge rating</label></b-col>
 							<b-col>
-								<!-- <b-form-input 
-									v-b-tooltip.hover title="Challenge Rating" 
-									type="text" 
-									class="form-control mb-2" 
-									v-model="npc.challenge_rating" 
-									name="Challenge Rating" 
-									id="cr"
-									placeholder="Challenge Rating"></b-form-input> -->
 									<b-form-select v-model="npc.challenge_rating">
 										<option value="undefined" disabled selected>- Select CR -</option>
 										<option value="0">0</option>
 										<option value="0.125">1/8</option>
 										<option value="0.25">1/4</option>
 										<option value="0.5">1/2</option>
-										<option v-for="index in 24" :value="index">{{ index }}</option>
+										<option v-for="index in 24" :value="index" :key="index">{{ index }}</option>
 										<option value="30">30</option>
 									</b-form-select>
-									
 							</b-col>
 						</b-row>
 
@@ -271,7 +262,7 @@
 			<b-row>
 				<b-col sm="6">
 					<b-card header="Ability Scores">
-						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
+						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
 							<b-col class="col-3">
 								<label :for="ability.ability">
 									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -293,7 +284,7 @@
 				</b-col>
 				<b-col sm="6">
 					<b-card header="Saving Throws" v-if="quick == false">
-						<b-row class="mb-2" v-for="ability, index in abilities" :key="index">
+						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
 							<b-col class="col-3">
 								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
@@ -315,7 +306,7 @@
 					<div class="card-body">
 						<b-row>
 							<b-col md="6">
-								<b-row class="skills" v-for="skill, index in skills.slice(0,9)" :key="index">
+								<b-row class="skills" v-for="(skill, index) in skills.slice(0,9)" :key="index">
 										<b-col class="col-5">
 											<label class="text-capitalize" :for="skill">{{ skill }}</label>
 										</b-col>
@@ -331,7 +322,7 @@
 								</b-row>
 							</b-col>
 							<b-col md="6">
-								<b-row class="skills" v-for="skill, index in skills.slice(9,18)" :key="index">
+								<b-row class="skills" v-for="(skill, index) in skills.slice(9,18)" :key="index">
 										<b-col class="col-5">
 											<label class="text-capitalize" :for="skill">{{ skill }}</label>
 										</b-col>
@@ -350,166 +341,170 @@
 					</div>
 			</div>
 			
-			<b-card header="Resistances & Vulnerabilities" v-if="quick == false">
-				<b-row>
-					<b-col md="4"><label for="dmg_vul">Damage Vulerabilities</label></b-col>
-					<b-col>
-						<b-form-input type="text"
-							v-b-tooltip.hover title="Damage Vulnerabilities" 
-							class="form-control mb-2" 
-							v-model="npc.damage_vulnerabilities" 
-							name="damage_vulnerabilities" 
-							id="dmg_vul"
-							placeholder="Damage Vulnerabilities"></b-form-input>
-					</b-col>
-				</b-row>
-				
-				<b-row>
-					<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
-					<b-col>
-						<b-form-input 
-							v-b-tooltip.hover title="Damage Resistances" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.damage_resistances" 
-							name="damage_resistances" 
-							id="dmg_res"
-							placeholder="Damage Resistances"></b-form-input>
-					</b-col>
-				</b-row>
+			<template v-if="quick == false">
+				<b-card header="Resistances & Vulnerabilities">
+					<b-row>
+						<b-col md="4"><label for="dmg_vul">Damage Vulerabilities</label></b-col>
+						<b-col>
+							<b-form-input type="text"
+								v-b-tooltip.hover title="Damage Vulnerabilities" 
+								class="form-control mb-2" 
+								v-model="npc.damage_vulnerabilities" 
+								name="damage_vulnerabilities" 
+								id="dmg_vul"
+								placeholder="Damage Vulnerabilities"></b-form-input>
+						</b-col>
+					</b-row>
+					
+					<b-row>
+						<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
+						<b-col>
+							<b-form-input 
+								v-b-tooltip.hover title="Damage Resistances" 
+								type="text" 
+								class="form-control mb-2" 
+								v-model="npc.damage_resistances" 
+								name="damage_resistances" 
+								id="dmg_res"
+								placeholder="Damage Resistances"></b-form-input>
+						</b-col>
+					</b-row>
 
-				<b-row>
-					<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
-					<b-col>
-						<b-form-input 
-							v-b-tooltip.hover title="Damage Immunities" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.damage_immunities" 
-							name="damage_immunities"
-							id="dmg_im" 
-							placeholder="Damage Immunities"></b-form-input>
-					</b-col>
-				</b-row>
+					<b-row>
+						<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
+						<b-col>
+							<b-form-input 
+								v-b-tooltip.hover title="Damage Immunities" 
+								type="text" 
+								class="form-control mb-2" 
+								v-model="npc.damage_immunities" 
+								name="damage_immunities"
+								id="dmg_im" 
+								placeholder="Damage Immunities"></b-form-input>
+						</b-col>
+					</b-row>
 
-				<b-row>
-					<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
-					<b-col>	
-						<b-form-input 
-							v-b-tooltip.hover title="Condition Immnunities" 
-							type="text" 
-							class="form-control mb-2" 
-							v-model="npc.condition_immunities" 
-							name="condition_immunities" 
-							id="con_im"
-							placeholder="Condition Immunities"></b-form-input>
-					</b-col>
-				</b-row>
-			</b-card>
+					<b-row>
+						<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
+						<b-col>	
+							<b-form-input 
+								v-b-tooltip.hover title="Condition Immnunities" 
+								type="text" 
+								class="form-control mb-2" 
+								v-model="npc.condition_immunities" 
+								name="condition_immunities" 
+								id="con_im"
+								placeholder="Condition Immunities"></b-form-input>
+						</b-col>
+					</b-row>
+				</b-card>
+			</template>
 
 			<!-- ACTIONS / ABILITIES -->
-			<div class="card" v-for="action, index in actions" :key="index" v-if="quick == false">
-				<div class="card-header d-flex justify-content-between">
-					{{ action.name }}
-					<a 
-					class="gray-hover text-capitalize" 
-					v-b-tooltip.hover title="Add Skill" 
-					@click="add(action.type)">
-						<i class="fas fa-plus green"></i>
-						<span class="d-none d-md-inline ml-1">Add</span>
-					</a>
-				</div>
-				<div class="card-body">
-					<div v-for="ability, index in npc[action.type]" :key="index">
-						<h2 class="d-flex justify-content-between">
-							{{ index + 1 }}. {{ ability.name }}
-							<a @click="remove(index, action.type)" 
-								class="gray-hover text-capitalize"
-								v-b-tooltip.hover title="Remove">
-								<i class="fas fa-minus red"></i>
-								<span class="d-none d-md-inline ml-1">Remove</span>
-							</a>
-						</h2>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="name">Name</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="name"
-									type="text" 
-									class="form-control" 
-									maxlength="30"
-									v-model="ability.name" 
-									name="name" 
-									placeholder="Name"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row>
-							<b-col sm="2" class="mb-2">
-								<label for="damage_dice">Damage Dice</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="damage_dice"
-									type="text" 
-									class="form-control" 
-									v-model="ability.damage_dice" 
-									:name="'damage_dice_'+action.type+index"
-									data-vv-as="Damage Dice"
-									placeholder="Damage Dice"
-									v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"></b-form-input>
-									<p class="validate red" 
-										v-if="errors.has('damage_dice_'+action.type+index.toString())">
-										{{ errors.first('damage_dice_'+action.type+index.toString()) }}
-										Allowed format: "2d6" or "2d6+1d8".
-									</p>
-							</b-col>
-							<b-col sm="2" class="mb-2">
-								<label for="damage_bonus">Damage Bonus</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="damage_bonus"
-									type="number" 
-									class="form-control" 
-									v-model="ability.damage_bonus" 
-									name="damage_bonus" 
-									placeholder="Damage Bonus"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="attack_bonus">Attack Bonus</label>
-							</b-col>
-							<b-col sm="10">
-								<b-form-input
-									id="attack_bonus"
-									type="number" 
-									class="form-control" 
-									v-model="ability.attack_bonus" 
-									name="attack_bonus" 
-									placeholder="Attack Bonus"></b-form-input>
-							</b-col>
-						</b-row>
-						<b-row class="mb-2">
-							<b-col sm="2">
-								<label for="desc">Description</label>
-							</b-col>
-							<b-col sm="10">
-								<textarea
-									id="desc"
-									class="form-control" 
-									v-model="ability.desc" 
-									rows="4"
-									name="desc" 
-									placeholder="Description"></textarea>
-							</b-col>
-						</b-row>
-						<hr>
+			<template v-if="quick == false">
+				<div class="card" v-for="(action, index) in actions" :key="index">
+					<div class="card-header d-flex justify-content-between">
+						{{ action.name }}
+						<a 
+						class="gray-hover text-capitalize" 
+						v-b-tooltip.hover title="Add Skill" 
+						@click="add(action.type)">
+							<i class="fas fa-plus green"></i>
+							<span class="d-none d-md-inline ml-1">Add</span>
+						</a>
+					</div>
+					<div class="card-body">
+						<div v-for="(ability, index) in npc[action.type]" :key="index">
+							<h2 class="d-flex justify-content-between">
+								{{ index + 1 }}. {{ ability.name }}
+								<a @click="remove(index, action.type)" 
+									class="gray-hover text-capitalize"
+									v-b-tooltip.hover title="Remove">
+									<i class="fas fa-minus red"></i>
+									<span class="d-none d-md-inline ml-1">Remove</span>
+								</a>
+							</h2>
+							<b-row class="mb-2">
+								<b-col sm="2">
+									<label for="name">Name</label>
+								</b-col>
+								<b-col sm="10">
+									<b-form-input
+										id="name"
+										type="text" 
+										class="form-control" 
+										maxlength="30"
+										v-model="ability.name" 
+										name="name" 
+										placeholder="Name"></b-form-input>
+								</b-col>
+							</b-row>
+							<b-row>
+								<b-col sm="2" class="mb-2">
+									<label for="damage_dice">Damage Dice</label>
+								</b-col>
+								<b-col sm="10">
+									<b-form-input
+										id="damage_dice"
+										type="text" 
+										class="form-control" 
+										v-model="ability.damage_dice" 
+										:name="'damage_dice_'+action.type+index"
+										data-vv-as="Damage Dice"
+										placeholder="Damage Dice"
+										v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"></b-form-input>
+										<p class="validate red" 
+											v-if="errors.has('damage_dice_'+action.type+index.toString())">
+											{{ errors.first('damage_dice_'+action.type+index.toString()) }}
+											Allowed format: "2d6" or "2d6+1d8".
+										</p>
+								</b-col>
+								<b-col sm="2" class="mb-2">
+									<label for="damage_bonus">Damage Bonus</label>
+								</b-col>
+								<b-col sm="10">
+									<b-form-input
+										id="damage_bonus"
+										type="number" 
+										class="form-control" 
+										v-model="ability.damage_bonus" 
+										name="damage_bonus" 
+										placeholder="Damage Bonus"></b-form-input>
+								</b-col>
+							</b-row>
+							<b-row class="mb-2">
+								<b-col sm="2">
+									<label for="attack_bonus">Attack Bonus</label>
+								</b-col>
+								<b-col sm="10">
+									<b-form-input
+										id="attack_bonus"
+										type="number" 
+										class="form-control" 
+										v-model="ability.attack_bonus" 
+										name="attack_bonus" 
+										placeholder="Attack Bonus"></b-form-input>
+								</b-col>
+							</b-row>
+							<b-row class="mb-2">
+								<b-col sm="2">
+									<label for="desc">Description</label>
+								</b-col>
+								<b-col sm="10">
+									<textarea
+										id="desc"
+										class="form-control" 
+										v-model="ability.desc" 
+										rows="4"
+										name="desc" 
+										placeholder="Description"></textarea>
+								</b-col>
+							</b-row>
+							<hr>
+						</div>
 					</div>
 				</div>
-			</div>
+			</template>
 
 			<div class="mt-2">
 				<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
@@ -523,8 +518,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import { db } from '@/firebase'
-	import axios from 'axios'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapActions } from 'vuex'
 
 	export default {
 		name: 'Npcs',
@@ -702,16 +696,6 @@
 				var str = name.toString()
 				return str
 			},
-			// save(results) {
-			// 	for(let npc in results) {
-				
-
-			// 		db.ref(`monsters`).child(results[npc].index).set(
-			// 			results[npc]
-			// 		);
-			// 		console.log('saved', results[npc].index)
-			// 	}
-			// }
 		}
 	}
 </script>

@@ -163,7 +163,6 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
 	import _ from 'lodash'
 	import { db } from '@/firebase'
 	import { mapGetters, mapActions } from 'vuex'

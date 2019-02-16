@@ -23,7 +23,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
+	import { auth } from './firebase'
 	import Header from './components/Header.vue';
 	import Slide from './components/Slide.vue';
 	import { mapActions, mapGetters } from 'vuex';
@@ -33,18 +33,13 @@
 		navMain: Header,
 		Slide: Slide,
 	},
-	data() {
-		return {
-			auth: firebase.auth(),
-		}
-	},
 	computed: {
 		...mapGetters({
 				slide: 'getSlide'
 			}),
 	},
 	created() {
-		if(this.auth.currentUser !== null){
+		if(auth.currentUser !== null){
 			this.setUser();
 			// players need prio!
 			this.fetchPlayers();

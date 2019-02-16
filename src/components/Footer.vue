@@ -43,12 +43,12 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
+	import { auth } from '@/firebase.js'
 
 	export default {
 		data() {
 			return {
-				user: firebase.auth().currentUser,
+				user: auth.currentUser,
 				year: (new Date()).getFullYear(),
 			}
 		},

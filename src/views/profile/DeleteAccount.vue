@@ -21,8 +21,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
-	import { db } from '@/firebase'	
+	import { firebase, db, auth } from '@/firebase'	
 
 export default {
 		name: 'Profile',
@@ -36,7 +35,7 @@ export default {
 		},
 		methods: {
 			signIn: function() {
-				firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
+				auth.signInWithEmailAndPassword(this.email, this.password).then(
 					(user) => {
 
 					},
@@ -48,7 +47,7 @@ export default {
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				firebase.auth().signInWithPopup(provider).then((restult) => {
+				auth.signInWithPopup(provider).then((restult) => {
 					this.credentials = undefined;
 					this.error = undefined;
 				}).catch((err) => {
@@ -57,7 +56,7 @@ export default {
 			},
 			deleteUser() {
 				var vm = this;
-				var user = firebase.auth().currentUser;
+				var user = auth.currentUser;
 				var credential;
 
 				user.delete().then(function() {

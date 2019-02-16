@@ -12,7 +12,7 @@
 </template>
 
 <script>
-	import firebase from 'firebase'
+	import { auth } from '@/firebase'
 
 	export default {
 		name: 'login',
@@ -28,7 +28,7 @@
 			resetPassword() {
 				var vm = this;
 
-				firebase.auth().sendPasswordResetEmail(this.email).then(function() {
+				auth.sendPasswordResetEmail(this.email).then(function() {
 					// Email sent.
 					vm.success = 'An email was sent to ' + vm.email + ' with a link to reset your password.';
 					vm.error = undefined;

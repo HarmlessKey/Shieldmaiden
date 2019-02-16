@@ -1,6 +1,4 @@
-import Firebase from 'firebase';
-import Vue from 'vue'
-import { db } from '@/firebase'
+import { db, auth } from '@/firebase'
 
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
@@ -52,7 +50,7 @@ export const content_module = {
 	},
 	mutations: {
 		SET_USER(state) {
-			state.user = Firebase.auth().currentUser;
+			state.user = auth.currentUser;
 		},
 		setSlide(state, value) {
 			if(state.slide.type != value.type) {

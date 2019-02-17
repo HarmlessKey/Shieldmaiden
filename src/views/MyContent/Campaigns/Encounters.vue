@@ -66,7 +66,7 @@
 					<th class="d-none d-md-table-cell">Status</th>
 					<th class="d-none d-md-table-cell">Round</th>
 					<th class="d-none d-md-table-cell">Turn</th>
-					<th></th>
+					<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 				</thead>
 				<tbody v-if="encounters"
 					name="table-row" 

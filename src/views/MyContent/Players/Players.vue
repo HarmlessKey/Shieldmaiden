@@ -20,7 +20,7 @@
 						<th>Character name</th>
 						<th class="d-none d-md-table-cell">Player name</th>
 						<th>Level</th>
-						<th></th>
+						<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 					</thead>
 					<tbody name="table-row" 
 						is="transition-group"

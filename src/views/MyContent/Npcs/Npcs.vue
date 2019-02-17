@@ -18,7 +18,7 @@
 						<th></th>
 						<th class="n">#</th>
 						<th>Name</th>
-						<th></th>
+						<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 					</thead>
 					<tbody name="table-row" 
 						is="transition-group"

@@ -313,5 +313,8 @@
 		"npcs"
 		"set";
 	}
+	.players, .npcs, .set, .scroll {
+		overflow: visible !important;
+	}
 }
 </style>

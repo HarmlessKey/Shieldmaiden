@@ -30,6 +30,7 @@
 		methods: {
 			signIn: function() {
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
+					// eslint-disable-next-line
 					(user) => {
 						this.$router.replace('campaigns')
 					},
@@ -41,7 +42,7 @@
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				auth.signInWithPopup(provider).then((restult) => {
+				auth.signInWithPopup(provider).then(() => {
 					this.$router.replace('campaigns');
 				}).catch((err) => {
 					this.error = err.message;

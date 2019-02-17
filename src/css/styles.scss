@@ -342,6 +342,9 @@ table {
 					background: #302f2f;
 				}
 			}
+			.fa-ellipsis-v {
+				line-height: 36px;
+			}
 		}
 		&:hover {
 			td.actions {
@@ -413,6 +416,9 @@ ul.entities {
 				display: none;
 			}
 		}
+		.fa-ellipsis-v {
+			line-height: 22px !important;
+		}
 		.img {
 			position: absolute;
 			left: 0;
@@ -478,6 +484,20 @@ ul.entities {
 	animation-duration: 0.5s;
 }
 
+@media only screen and (max-width: 575px) {
+	ul.entities li .actions {
+		margin-right: 20px;
+
+		a {
+			background: $gray-active;
+		}
+	}
+	table tr td.actions {
+		a {
+			background: $gray-active;
+		}
+	}
+}
 @media only screen and (max-width: 1200px) {
 	#hasSide {
 		padding-left: 30px;

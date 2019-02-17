@@ -102,18 +102,21 @@
 						</template>
 						<td class="actions">
 							<div class="d-flex justify-content-end">
-								<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-									<i class="fas fa-play"></i>
-								</router-link>
-								<span v-else class="disabled">
-									<i class="fas fa-play"></i>
-								</span>
-								<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-									<i class="fas fa-pencil-alt"></i>
-								</router-link>
-								<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-									<i class="fas fa-trash-alt"></i>
-								</a>
+								<div class="d-flex justify-content-end">
+									<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+										<i class="fas fa-play"></i>
+									</router-link>
+									<span v-else class="disabled">
+										<i class="fas fa-play"></i>
+									</span>
+									<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil-alt"></i>
+									</router-link>
+									<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
+										<i class="fas fa-trash-alt"></i>
+									</a>
+								</div>
+								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 							</div>
 						</td>
 					</tr>

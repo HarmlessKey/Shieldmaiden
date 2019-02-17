@@ -35,27 +35,33 @@
 								{{ player.character_name }}
 							</div>
 							<template v-if="campaign.players">
-								<div class="actions bg-gray">
-									<a v-if="checkPlayer(key) < 0" 
-									class="gray-hover"
-									v-b-tooltip.hover 
-									title="Add Character" 
-									@click="addPlayer(key, player.character_name)">
-										<i class="fas fa-plus"></i>
-									</a>
-								</div>
-								<span v-if="checkPlayer(key) >= 0">
-									<i class="fas fa-check"></i>
-									<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
+									<div class="actions bg-gray">
+										<a v-if="checkPlayer(key) < 0" 
+										class="gray-hover"
+										v-b-tooltip.hover 
+										title="Add Character" 
+										@click="addPlayer(key, player.character_name)">
+											<i class="fas fa-plus"></i>
+										</a>
+									</div>
+								<span>
+									<span v-if="checkPlayer(key) >= 0">
+										<i class="fas fa-check"></i>
+										<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
+									</span>
+									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 								</span>
 							</template>	
-							<div v-else class="actions bg-gray">
-								<a class="gray-hover" 
-									v-b-tooltip.hover 
-									title="Add Character" 
-									@click="addPlayer(key, player.character_name)">
-										<i class="fas fa-plus"></i>
-								</a>
+							<div v-else class="d-flex justify-content-end">
+								<div class="actions">
+									<a class="gray-hover" 
+										v-b-tooltip.hover 
+										title="Add Character" 
+										@click="addPlayer(key, player.character_name)">
+											<i class="fas fa-plus"></i>
+									</a>
+								</div>
+								<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 							</div>
 						</li>
 					</ul>
@@ -77,6 +83,7 @@
 										<i class="fas fa-minus"></i>
 									</a>
 								</div>
+								<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 							</li>
 						</ul>
 					</template>

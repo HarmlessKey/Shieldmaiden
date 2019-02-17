@@ -148,9 +148,6 @@
 								.value()
 			},
 		},
-		created() {
-
-		},
 		methods: {
 			...mapActions([
 				'setSlide',
@@ -173,7 +170,8 @@
 				})
 			},
 			rollMonster(key, entity) {
-				entity.initiative = this.rollD(20, 1, this.calcMod(entity.dex)).total
+				let roll = this.rollD(20, 1, this.calcMod(entity.dexterity));
+				entity.initiative = roll.total
 				this.storeInitiative(key, entity)
 			},
 			rollAll() {
@@ -271,6 +269,10 @@
 			border: solid 1px transparent;
 			background: #191919;
 
+			&:hover {
+				background: #141414 !important;
+			}
+
 			&.selected {
 				border-color: #2c97de;
 			}
@@ -289,7 +291,7 @@
 				}
 			}
 			.actions {
-				background: #191919;
+				background: #141414 !important;
 				right: 50px;
 			}
 			.roll {

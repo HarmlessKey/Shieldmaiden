@@ -17,7 +17,7 @@
  /* 1. Variables */
 /*********************************************/
 $gray: #262626;
-$gray-darker: #232222;
+$gray-darker: #232323;
 $gray-dark: #191919;
 $gray-light: #b2b2b2;
 $gray-hover: #494747;
@@ -235,7 +235,7 @@ a.logout {
 		}
 	}
 	.google {
-		background-color: #b2b2b2 !important;
+		background-color: $gray-light !important;
 		color: #262626 !important;
 		img {
 			height: 23px;
@@ -331,14 +331,14 @@ table {
 
 			.actions {
 				display: none !important;
-				background: $gray;
+				background: $gray-darker;
 				position: absolute;
 				padding: 5px 0.75rem;
 				top: 0;
 				right: 0;
 
 				a {
-					color: #b2b2b2 !important;
+					color: $gray-light !important;
 					width: 36px;
 					height: 36px;
 					display: block;
@@ -348,7 +348,7 @@ table {
 
 					&:hover {
 						text-decoration: none;
-						background: #302f2f;
+						background: $gray-active;
 					}
 				}
 			}
@@ -357,6 +357,9 @@ table {
 			}
 		}
 		&:hover {
+			td {
+				background: $gray-darker;
+			}
 			.actions {
 				display: flex !important;
 			}
@@ -365,7 +368,7 @@ table {
 }
 
 ul.settings {
-	border-top: solid 1px #302f2f;
+	border-top: solid 1px $gray-active;
 	padding: 0 !important;
 	list-style: none;
 	margin-bottom: 60px;
@@ -373,10 +376,10 @@ ul.settings {
 	li {
 		font-size: 13px;
 		padding: 15px 5px;
-		border-bottom: solid 1px #302f2f;
+		border-bottom: solid 1px $gray-active;
 
 		.btn {
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 		}
 	}
 }
@@ -393,7 +396,7 @@ ul.entities {
 		vertical-align: center;
 
 		.actions {
-			background: $gray;
+			background: $gray-darker !important;
 			right: 0;
 			top: 0;
 			position: absolute;
@@ -417,6 +420,8 @@ ul.entities {
 			}
 		}
 		&:hover {
+			background: $gray-darker;
+			
 			.actions {
 				display: flex;
 			}
@@ -453,7 +458,10 @@ ul.entities {
 			background: $gray-darker;
 
 			.actions {
-				background: $gray-darker;
+				background: $gray-dark !important;
+			}
+			&:hover {
+				background: $gray-dark;
 			}
 		}
 	}
@@ -590,7 +598,7 @@ a {
 		font-size: 13px;
 	}
 	.dropdown-divider {
-		border-color: #b2b2b2;
+		border-color: $gray-light;
 		margin: 0;
 	}
 }

@@ -324,33 +324,41 @@ table {
 		}
 	}
 	tr {
-		td.actions {
-			padding: 5px 0.75rem;
+	
 
-			a {
-				visibility: hidden;
-				color: #b2b2b2 !important;
-				width: 36px;
-				height: 36px;
-				display: block;
-				line-height: 36px;
-				text-align: center;
-				border-radius: 50%;
+		td {
+			position: relative;
 
-				&:hover {
-					text-decoration: none;
-					background: #302f2f;
+			.actions {
+				display: none !important;
+				background: $gray;
+				position: absolute;
+				padding: 5px 0.75rem;
+				top: 0;
+				right: 0;
+
+				a {
+					color: #b2b2b2 !important;
+					width: 36px;
+					height: 36px;
+					display: block;
+					line-height: 36px;
+					text-align: center;
+					border-radius: 50%;
+
+					&:hover {
+						text-decoration: none;
+						background: #302f2f;
+					}
 				}
 			}
 			.fa-ellipsis-v {
-				line-height: 36px;
+				line-height: 22px;
 			}
 		}
 		&:hover {
-			td.actions {
-				a {
-					visibility: visible;
-				}
+			.actions {
+				display: flex !important;
 			}
 		}
 	}
@@ -492,7 +500,8 @@ ul.entities {
 			background: $gray-active;
 		}
 	}
-	table tr td.actions {
+	table tr td .actions {
+		right: 20px;
 		a {
 			background: $gray-active;
 		}

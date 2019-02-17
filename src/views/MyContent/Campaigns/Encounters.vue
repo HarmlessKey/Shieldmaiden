@@ -100,9 +100,9 @@
 						<template v-else>
 							<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
 						</template>
-						<td class="actions">
+						<td>
 							<div class="d-flex justify-content-end">
-								<div class="d-flex justify-content-end">
+								<div class="d-flex justify-content-end actions">
 									<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
 										<i class="fas fa-play"></i>
 									</router-link>

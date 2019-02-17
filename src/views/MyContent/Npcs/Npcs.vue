@@ -37,9 +37,9 @@
 									{{ npc.name }}
 								</router-link>
 							</td>
-							<td class="actions">
+							<td>
 								<div class="d-flex justify-content-end">
-									<div class="d-flex justify-content-end">
+									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 
 											:to="'/npcs/' + npc.key" 
 											v-b-tooltip.hover title="Edit">

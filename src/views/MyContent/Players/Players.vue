@@ -40,9 +40,9 @@
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td class="actions">
+							<td>
 								<div class="d-flex justify-content-end">
-									<div class="d-flex justify-content-end">
+									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 
 											:to="'/players/' + player.key" 
 											v-b-tooltip.hover title="Edit">

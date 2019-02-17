@@ -65,7 +65,7 @@
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
-												<div class="actions pl-5">
+												<div class="actions">
 													<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
@@ -76,9 +76,12 @@
 														<i class="fas fa-plus"></i>
 													</a>
 												</div>
-												<span v-if="checkPlayer(key) >= 0">
-													<i class="fas fa-check"></i>
-													<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
+												<span>
+													<span v-if="checkPlayer(key) >= 0" class="hover-hide">
+														<i class="fas fa-check"></i>
+														<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
+													</span>
+													<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 												</span>
 											</template>	
 											<div v-else class="actions">
@@ -93,7 +96,6 @@
 													<span class="d-none d-md-inline ml-1">Add</span>
 												</a>
 											</div>
-											<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
@@ -133,7 +135,7 @@
 															<i class="fas fa-plus"></i>
 													</a>
 												</div>
-												<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
+												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 											</li>
 										</template>
 									</ul>
@@ -152,8 +154,8 @@
 												{{ npc.name }}
 											</div>
 											<span>
-												CR: {{ npc.challenge_rating }}
-												<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
+												<span class="hover-hide">CR: {{ npc.challenge_rating }}</span>
+												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 											</span>
 											<div class="actions justify-content-end">
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
@@ -180,8 +182,8 @@
 													{{ npc.name }}
 												</div>
 												<span>
-													CR: {{ npc.challenge_rating }}
-													<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
+													<span class="hover-hide">CR: {{ npc.challenge_rating }}</span>
+													<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 												</span>
 												<div class="actions justify-content-end">
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
@@ -254,7 +256,7 @@
 											<i class="fas fa-minus"></i>
 										</a>
 									</div>
-									<i class="far fa-ellipsis-v blue ml-1 d-inline d-sm-none"></i>
+									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 								</li>
 							</ul>
 							<div v-else class="loader"><span>Loading entities...</span></div>

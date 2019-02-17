@@ -10,7 +10,7 @@ import { routes } from './routes';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
-import Meta from 'vue-meta'
+import Meta from 'vue-meta';
 
 const options = {
 	toast: {

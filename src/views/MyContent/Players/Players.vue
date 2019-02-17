@@ -42,17 +42,20 @@
 							<td>{{ player.level }}</td>
 							<td class="actions">
 								<div class="d-flex justify-content-end">
-									<router-link class="gray-hover mx-1" 
-										:to="'/players/' + player.key" 
-										v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil"></i>
-									</router-link>
-									<a v-b-tooltip.hover 
-										title="Delete" 
-										class="gray-hover"
-										@click="confirmDelete(player.key, player.player)">
-											<i class="fas fa-trash-alt"></i>
-									</a>
+									<div class="d-flex justify-content-end">
+										<router-link class="gray-hover mx-1" 
+											:to="'/players/' + player.key" 
+											v-b-tooltip.hover title="Edit">
+											<i class="fas fa-pencil"></i>
+										</router-link>
+										<a v-b-tooltip.hover 
+											title="Delete" 
+											class="gray-hover"
+											@click="confirmDelete(player.key, player.player)">
+												<i class="fas fa-trash-alt"></i>
+										</a>
+									</div>
+									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 								</div>
 							</td>
 						</tr>

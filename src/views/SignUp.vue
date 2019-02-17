@@ -14,7 +14,7 @@
 </template>
 
 <script>
-	import { auth } from '@/firebase';
+	import { firebase, auth } from '@/firebase';
 
 	export default {
 		data: function() {
@@ -27,6 +27,7 @@
 		methods: {
 			signUp: function() {
 				auth.createUserWithEmailAndPassword(this.email, this.password).then(
+					// eslint-disable-next-line
 					user => {
 						this.$router.replace('campaigns');
 					},
@@ -37,7 +38,7 @@
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				auth.signInWithPopup(provider).then((restult) => {
+				auth.signInWithPopup(provider).then(() => {
 					this.$router.replace('campaigns');
 				}).catch((err) => {
 					this.error = err.message;

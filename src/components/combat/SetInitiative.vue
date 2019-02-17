@@ -98,9 +98,7 @@
 </template>
 
 <script>
-	import axios from 'axios'
 	import _ from 'lodash'
-	import { db } from '@/firebase'
 	import { mapGetters, mapActions } from 'vuex'
 
 	import { dice } from '@/mixins/dice.js'
@@ -314,6 +312,9 @@
 		"players"
 		"npcs"
 		"set";
+	}
+	.players, .npcs, .set, .scroll {
+		overflow: visible !important;
 	}
 }
 </style>

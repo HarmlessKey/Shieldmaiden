@@ -109,8 +109,6 @@
 		},
 		methods: {
 			fetch_encounter() {
-				var vw = this;
-
 				var track = db.ref(`track/${this.userId}`);
 				track.on('value' , (snapshot) => {
 					let campId = snapshot.val().campaign

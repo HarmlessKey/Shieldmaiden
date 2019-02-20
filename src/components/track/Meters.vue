@@ -3,7 +3,6 @@
 		<div v-for="(type, index) in types" :key="index">
 			<h3>{{ type }} done</h3>
 			<transition-group tag="ul" 
-				class="entities" 
 				name="entities" 
 				enter-active-class="animated fadeInUp" 
 				leave-active-class="animated fadeOutDown">
@@ -197,6 +196,7 @@
 					height: 30px;
 				}
 				.progress { 
+					width: 100% !important;
 					height: 30px;
 					line-height: 30px;
 					background-color: rgba(38, 38, 38, .8);

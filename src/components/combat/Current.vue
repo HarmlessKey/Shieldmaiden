@@ -51,7 +51,12 @@
 
 							<div class="health target px-2" v-if="targeted">
 								<span class="img" :style="{ backgroundImage: 'url(\'' + target.img + '\')' }"></span>
-								<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
+								<span class="ac"
+									:class="{ 
+										'green': target.ac_bonus > 0, 
+										'red': target.ac_bonus < 0 
+									}" 
+									v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
 									{{ displayStats(target).ac + target.ac_bonus}}
 								</span>
 								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(target).ac }}</span>

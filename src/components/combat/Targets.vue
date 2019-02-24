@@ -23,12 +23,21 @@
 							name="targets" 
 							enter-active-class="animated fadeInUp" 
 							leave-active-class="animated fadeOutDown">
-							
 							<li 
 								v-for="(entity, i) in _targets"
 								class="d-flex justify-content-between" 
 								:key="entity.key" 
-								:class="{ targeted : targeted == entity.key }">
+								:class="{ 'targeted' : targeted == entity.key, 'top': _active[0].key == entity.key && encounter.turn != 0}">
+
+								<span class="topinfo d-flex justify-content-between gray-hover" v-if="_active[0].key == entity.key && encounter.turn != 0">
+									Top of the round
+									<div>
+										<span class="green" v-b-tooltip.hover title="Added next round">+ {{ Object.keys(_addedNextRound).length }}</span>
+										<span class="gray-hover mx-1">|</span>
+										<span class="red" v-b-tooltip.hover title="Removed next round">- {{ Object.keys(_activeDown).length }}</span>
+									</div>
+								</span>
+
 								<div class="target" 
 									@click="set_targeted(entity.key)"
 									v-shortkey="[i]" @shortkey="set_targeted(entity.key)">
@@ -44,11 +53,6 @@
 									</a>
 									<div class="dropdown-menu" aria-labelledby="options">	
 										<div class="dropdown-header">{{ entity.name }}</div>
-										<!-- <a class="dropdown-item" 
-											@click="info(entity)"
-											v-shortkey="['i']" @shortkey="info(entities[targeted])">
-											<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
-										</a> -->
 										<a v-if="entity.curHp == 0 && !entity.stable" 
 											class="dropdown-item" 
 											v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
@@ -202,7 +206,24 @@
 									return parseInt(entity.initiative)
 								} , 'desc')
 								.value()
-			}
+			},
+			//Count NPC's that are down but still in active list
+			_activeDown: function() {
+				return _.chain(this._targets)
+					.filter(function(entity) {
+						return entity.curHp == 0 && entity.entityType == 'npc';
+					})
+					.sortBy('name' , 'desc')
+					.value()
+			},
+			_addedNextRound: function() {
+				return _.chain(this._idle)
+					.filter(function(entity) {
+						return entity.addNextRound == true;
+					})
+					.sortBy('name' , 'desc')
+					.value()
+			},
 		},
 		firebase() {
 			return {
@@ -398,6 +419,19 @@ ul.targets {
 		margin-bottom: 20px;
 		border-color: #83b547;
 		box-shadow: 0px 0px 10px rgba(131, 181, 71, .5);
+	}
+	li.top {
+		position: relative;
+		margin-top: 30px;
+
+		.topinfo {
+			text-transform: uppercase;
+			font-size: 11px;
+			width: 100%;
+			position: absolute;
+			top: -25px;
+			border-bottom: solid 1px #fff;
+		}
 	}
 }
 .targets-move {

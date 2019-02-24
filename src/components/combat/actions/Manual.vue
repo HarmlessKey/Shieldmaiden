@@ -5,7 +5,10 @@
 			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
-					<span class="green" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
+					<span :class="{ 
+							'green': target.ac_bonus > 0, 
+							'red': target.ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
 						{{ displayStats(target).ac + target.ac_bonus}}
 					</span>
 					<span v-else>{{ displayStats(target).ac }}</span>

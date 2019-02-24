@@ -61,6 +61,7 @@
 		},
 		watch: {
 			number: function(newValue) {
+				// eslint-disable-next-line
 				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			},
 		},

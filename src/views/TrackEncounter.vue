@@ -4,10 +4,7 @@
 			<Finished v-if="playerSettings.loot == true" :encounter="encounter"/>
 			<h2 v-else class="padding">Encounter Finished</h2>
 			<div class="container damage">
-				
-			
 				<Meters :encounter="encounter" />
-
 			</div>
 		</div>
 
@@ -20,6 +17,7 @@
 			<Turns 
 				:encounter="encounter" 
 				:current="_targets[0]"
+				:entities_len="Object.keys(_allEntities).length"
 			/>
 			<div class="container-fluid">
 				<div class="container entities">
@@ -28,6 +26,7 @@
 							<Initiative 
 								:encounter="encounter" 
 								:targets="_targets"
+								:allEntities="_allEntities"
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
@@ -89,7 +88,7 @@
 			this.fetch_encounter()
 		},
 		computed: {
-			_active: function() {
+			_allEntities: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
 					entity.key = key
@@ -102,9 +101,9 @@
 			},
 			_targets: function() {
 				let t = this.encounter.turn
-				let turns = Object.keys(this._active)
+				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
-				return Array.from(order, i => this._active[i])
+				return Array.from(order, i => this._allEntities[i])
 			},
 		},
 		methods: {

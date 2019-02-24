@@ -16,7 +16,13 @@
 				</span>
 			</span>
 			<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
-			<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">
+			<span class="ac" 
+				:class="{ 
+						'green': entity.ac_bonus > 0, 
+						'red': entity.ac_bonus < 0 
+				}" 
+				v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
+				v-if="entity.ac_bonus">
 				{{ displayStats().ac + entity.ac_bonus}}
 			</span>
 			<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>

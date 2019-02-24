@@ -76,8 +76,7 @@
 						maxHp: parseInt(entity.transformed.maxHp),
 						curHp: parseInt(entity.transformed.curHp),
 					}
-				}
-				else {
+				} else {
 					stats = {
 						maxHp: parseInt(entity.maxHp),
 						curHp: parseInt(entity.curHp),

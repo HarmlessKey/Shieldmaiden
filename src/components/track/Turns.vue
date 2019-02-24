@@ -1,11 +1,18 @@
 <template>
 	<div class="turns d-flex justify-content-center">
 			Round <span class="number mx-2">{{ encounter.round }}</span>
-			Turn <span class="number ml-2">{{ encounter.turn + 1 }}</span>
+			Turn 
+			<span class="number ml-2">
+				{{ encounter.turn + 1 }}
+				<span class="small gray-hover"> /{{ entities_len }}</span>
+			</span>
 
 				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
 				<h1 class="d-none d-md-flex justify-content-start">
-					<span class="mr-3">{{ current.name }}</span>
+					<span class="mr-3">
+						<template v-if="current.entityType == 'npc'">{{ current.name }}</template>
+						<template v-else>{{ players[current.key].character_name }}</template>
+					</span>
 
 						<Health 
 							v-if="(current.entityType == 'player' && playerSettings.health === undefined)
@@ -34,6 +41,7 @@
 		props: [
 			'encounter',
 			'current',
+			'entities_len',
 		],
 		data() {
 			return {
@@ -62,32 +70,34 @@
 		},
 		methods: {
 			img(entity) {
-				if(entity.id) {
-					var img = '';
+				//Check what image should be displayed
+				let encounterImg = entity.avatar; //img linked within the encounter
 
-					if(entity.entityType == 'player') {
-						let playerImg = this.players[entity.id].avatar;
+				if(encounterImg) {
+					var img = encounterImg;
+				} else {
+					if(entity.id) {
+						if(entity.entityType == 'player') {
+							let playerImg = this.players[entity.id].avatar;
 
-						if(playerImg) {
-							img = playerImg
+							if(playerImg) {
+								img = playerImg
+							} else {
+								img = require('@/assets/_img/styles/player.svg');
+							}
 						}
-						else {
-							img = require('@/assets/_img/styles/player.svg');
+						if(entity.entityType == 'npc') {						
+							if(entity.npc == 'custom') {
+								let npcImg = this.npcs[entity.id].avatar;
+
+								img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
+							} else {
+								img = require('@/assets/_img/styles/monster.svg');
+							}
 						}
+					} else {
+						img = require('@/assets/_img/styles/monster.svg');
 					}
-					if(entity.entityType == 'npc') {
-						if(entity.npc == 'custom') {
-							let npcImg = this.npcs[entity.id].avatar;
-
-							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-						}
-						else {
-							img = require('@/assets/_img/styles/monster.svg');
-						}
-					}
-				}
-				else {
-					img = require('@/assets/_img/styles/monster.svg');
 				}
 				return img
 			},

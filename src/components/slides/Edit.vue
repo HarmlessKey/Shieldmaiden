@@ -105,7 +105,7 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { mapActions } from 'vuex'
 
 	export default {
 		name: 'EditEntity',

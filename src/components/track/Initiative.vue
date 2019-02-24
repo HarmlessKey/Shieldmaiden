@@ -13,59 +13,77 @@
 				class="entities"
 				name="entities"
 				is="transition-group"
-				enter-active-class="animated flash"
-				leave-active-class="animated bounceOutLeft">
-				<tr v-for="entity in targets" :key="entity.key">
-					<td>{{ entity.initiative }}</td>
-				
-					<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
+				enter-active-class="animated fadeIn"
+				leave-active-class="animated fadeOut">
+				<template v-for="(entity, index) in targets">
+					<tr v-if="allEntities[0].key == entity.key && encounter.turn != 0" :key="index" class="top">
+						<td colspan="6">Top of the round</td>
+					</tr>
+					<tr :key="entity.key">
+						<td>{{ entity.initiative }}</td>
+					
+						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
 
-					<td class="ac">
-						<template v-if="(entity.entityType == 'player' && playerSettings.ac === undefined) || (entity.entityType == 'npc' && npcSettings.ac == true)">
-							<span class="ac green" v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" v-if="entity.ac_bonus">{{ displayAc(entity) + parseInt(entity.ac_bonus) }}</span>
-							<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity) }}</span>
-						</template>
-						<span v-else class="gray-hover">?</span>
-					</td>
-
-					<td class="name">{{ entity.name }}</td>
-
-					<td class="hp">
-						<template v-if="
-							(entity.entityType == 'player' && playerSettings.health === undefined)
-							|| (entity.entityType == 'npc' && npcSettings.health == true)
-						">
-							<Health	:entity="entity"/>
-						</template>
-						<span v-else class="gray-hover">
-							? ? ?
-						</span>
-					</td>
-
-					<td class="conditions">
-						<div class="d-flex justify-content-right" v-if="
-						entity.conditions &&
-						((entity.entityType == 'player' && playerSettings.conditions === undefined) 
-							|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
-						">
-							<template v-for="(condition, key) in entity.conditions">
-								<div :key="key" v-if="conditions[key]">
-										<span class="n" v-if="key == 'exhaustion'">
-											{{ entity.conditions[key] }}
-										</span>
-										<svg
-											v-else
-											v-b-popover.hover="conditions[key].condition" 
-											:title="key" 
-											class="icon text" 
-											viewBox="0 0 512 512">
-											<path :d="conditions[key].icon" fill-opacity="1"></path>
-										</svg>
-								</div>
+						<td class="ac">
+							<template v-if="(entity.entityType == 'player' && playerSettings.ac === undefined) || (entity.entityType == 'npc' && npcSettings.ac == true)">
+								<span class="ac" :class="{ 
+										'green': entity.ac_bonus > 0, 
+										'red': entity.ac_bonus < 0 
+									}"  
+									v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
+									v-if="entity.ac_bonus">
+									{{ displayAc(entity) + parseInt(entity.ac_bonus) }}
+								</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity) }}</span>
 							</template>
-						</div>
-					</td>
-				</tr>
+							<span v-else class="gray-hover">?</span>
+						</td>
+
+						<td class="name">
+							<template v-if="entity.entityType == 'npc'">{{ entity.name }}</template>
+							<template v-else>{{ players[entity.key].character_name }}</template>
+						</td>
+
+						<td class="hp">
+							<template v-if="
+								(entity.entityType == 'player' && playerSettings.health === undefined)
+								|| (entity.entityType == 'npc' && npcSettings.health == true)
+							">
+								<Health	:entity="entity"/>
+							</template>
+							<span v-else class="gray-hover">
+								<template v-if="entity.curHp == 0">
+									<i class="fas fa-skull-crossbones red"></i>
+								</template>
+								<template v-else>? ? ?</template>
+							</span>
+						</td>
+
+						<td class="conditions">
+							<div class="d-flex justify-content-right" v-if="
+							entity.conditions &&
+							((entity.entityType == 'player' && playerSettings.conditions === undefined) 
+								|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
+							">
+								<template v-for="(condition, key) in entity.conditions">
+									<div :key="key" v-if="conditions[key]">
+											<span class="n" v-if="key == 'exhaustion'">
+												{{ entity.conditions[key] }}
+											</span>
+											<svg
+												v-else
+												v-b-popover.hover="conditions[key].condition" 
+												:title="key" 
+												class="icon text" 
+												viewBox="0 0 512 512">
+												<path :d="conditions[key].icon" fill-opacity="1"></path>
+											</svg>
+									</div>
+								</template>
+							</div>
+						</td>
+					</tr>
+				</template>
 			</tbody>
 		</table>
 	</div>
@@ -86,6 +104,7 @@
 		props: [
 			'encounter',
 			'targets',
+			'allEntities',
 		],
 		data() {
 			return {
@@ -127,32 +146,34 @@
 				return ac
 			},
 			img(entity) {
-				if(entity.id) {
-					var img = '';
+				//Check what image should be displayed
+				let encounterImg = entity.avatar; //img linked within the encounter
 
-					if(entity.entityType == 'player') {
-						let playerImg = this.players[entity.id].avatar;
+				if(encounterImg) {
+					var img = encounterImg;
+				} else {
+					if(entity.id) {
+						if(entity.entityType == 'player') {
+							let playerImg = this.players[entity.id].avatar;
 
-						if(playerImg) {
-							img = playerImg
+							if(playerImg) {
+								img = playerImg
+							} else {
+								img = require('@/assets/_img/styles/player.svg');
+							}
 						}
-						else {
-							img = require('@/assets/_img/styles/player.svg');
+						if(entity.entityType == 'npc') {						
+							if(entity.npc == 'custom') {
+								let npcImg = this.npcs[entity.id].avatar;
+
+								img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
+							} else {
+								img = require('@/assets/_img/styles/monster.svg');
+							}
 						}
+					} else {
+						img = require('@/assets/_img/styles/monster.svg');
 					}
-					if(entity.entityType == 'npc') {
-						if(entity.npc == 'custom') {
-							let npcImg = this.npcs[entity.id].avatar;
-
-							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-						}
-						else {
-							img = require('@/assets/_img/styles/monster.svg');
-						}
-					}
-				}
-				else {
-					img = require('@/assets/_img/styles/monster.svg');
 				}
 				return img
 			},
@@ -175,6 +196,14 @@
 			}
 			td:last-child {
 				border-right: solid 1px #2c97de !important;
+			}
+		}
+		tr.top {
+			td {
+				font-size: 12px;
+				padding: 10px 0 5px 0;
+				border: none !important;
+				border-bottom: solid 1px #fff !important;
 			}
 		}
 		tr {

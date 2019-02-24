@@ -104,6 +104,7 @@
 </template>
 
 <script>
+	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
@@ -118,13 +119,21 @@
 				encounterId: this.$route.params.encid,
 			}
 		},
-		computed: {
-			...mapGetters([
-				'entities',
-			]),
-			entity: function() {
-				return this.entities[this.entityKey]
+		firebase() {
+			return {
+				entity: {
+					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+					asObject: true
+				}
 			}
+		},
+		computed: {
+			// ...mapGetters([
+			// 	'entities',
+			// ]),
+			// entity: function() {
+			// 	return this.entities[this.entityKey]
+			// }
 		},
 		methods: {
 			...mapActions([

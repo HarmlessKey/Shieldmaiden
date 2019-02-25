@@ -259,9 +259,8 @@
 	}
 }
 .ac {
-	background-color: #4c4c4c;
 	font-weight: bold;
-	color: #191919;
+	color: #b2b2b2;
 	grid-area: ac;
 }
 .hp {

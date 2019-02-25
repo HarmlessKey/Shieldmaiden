@@ -354,9 +354,9 @@
 		.ac {
 			text-align:center;
 			line-height: 30px;
-			background-color:#4c4c4c;
+			background-color:#191919;
 			font-weight:bold;
-			color:#191919;
+			color:#b2b2b2;
 			grid-area: ac;
 		}
 		.progress { 

@@ -406,8 +406,10 @@ ul.targets {
 		margin-bottom: 8px;
 		border: solid 1px transparent;
 		cursor: pointer;
+		background: #191919;
 
 		&:hover {
+			background: #000;
 			border-color: #b2b2b2;
 		}
 		&.targeted {

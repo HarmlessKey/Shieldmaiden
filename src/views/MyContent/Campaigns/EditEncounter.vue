@@ -478,7 +478,7 @@
 						}
 					}
 					if (last > 0) {
-						entity.name = `${entity.name} (${last++})`
+						entity.name = `${entity.name} (${++last})`
 					} else if (n > 0) {
 						entity.name = `${entity.name} (${n})`
 						

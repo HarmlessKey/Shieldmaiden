@@ -161,6 +161,7 @@
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
+												<input class="" type="number" min="1" name="name" placeholder="1" value="1" />
 												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(npc['.key'], 'npc', npc.name)">
 													<i class="fas fa-plus"></i>
 												</a>
@@ -464,6 +465,24 @@
 
 				if(type == 'npc') {
 					entity.active = true
+					let last = -1
+					let n = 0
+					for (let i in this.encounter.entities) {
+						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
+						let id = this.encounter.entities[i].id
+						if (match[1].trim() == entity.name) {
+							n++
+							if (parseInt(match[3]) > last) {
+								last = parseInt(match[3])
+							}
+						}
+					}
+					if (last > 0) {
+						entity.name = `${entity.name} (${last++})`
+					} else if (n > 0) {
+						entity.name = `${entity.name} (${n})`
+						
+					}
 					
 					if(custom == false) {
 						var npc_data = this.monsters[id - 1];

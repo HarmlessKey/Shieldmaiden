@@ -29,12 +29,11 @@
 								:key="entity.key" 
 								:class="{ 'targeted' : targeted == entity.key, 'top': _active[0].key == entity.key && encounter.turn != 0}">
 
-								<span class="topinfo d-flex justify-content-between gray-hover" v-if="_active[0].key == entity.key && encounter.turn != 0">
+								<span class="topinfo d-flex justify-content-between" v-if="_active[0].key == entity.key && encounter.turn != 0">
 									Top of the round
 									<div>
-										<span class="green" v-b-tooltip.hover title="Added next round">+ {{ Object.keys(_addedNextRound).length }}</span>
-										<span class="gray-hover mx-1">|</span>
-										<span class="red" v-b-tooltip.hover title="Removed next round">- {{ Object.keys(_activeDown).length }}</span>
+										<span class="green" v-if="Object.keys(_addedNextRound).length > 0" v-b-tooltip.hover title="Added next round">+ {{ Object.keys(_addedNextRound).length }}</span>
+										<span class="red" v-if="Object.keys(_activeDown).length > 0" v-b-tooltip.hover title="Removed next round"><span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}</span>
 									</div>
 								</span>
 
@@ -87,8 +86,6 @@
 									</div>
 								</span>
 							</li>
-								
-							
 						</transition-group>
 						<template v-if="_idle.length">
 							<hr>
@@ -432,7 +429,7 @@ ul.targets {
 			width: 100%;
 			position: absolute;
 			top: -25px;
-			border-bottom: solid 1px #fff;
+			border-bottom: solid 1px #b2b2b2;
 		}
 	}
 }

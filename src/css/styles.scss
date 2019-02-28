@@ -331,7 +331,7 @@ table {
 
 			.actions {
 				display: none !important;
-				background: $gray-darker;
+				background-color: $gray-darker;
 				position: absolute;
 				padding: 5px 0.75rem;
 				top: 0;
@@ -348,7 +348,7 @@ table {
 
 					&:hover {
 						text-decoration: none;
-						background: $gray-active;
+						background-color: $gray-active;
 					}
 				}
 			}
@@ -358,7 +358,7 @@ table {
 		}
 		&:hover {
 			td {
-				background: $gray-darker;
+				background-color: $gray-darker;
 			}
 			.actions {
 				display: flex !important;
@@ -391,12 +391,12 @@ ul.entities {
 	li {
 		position: relative;
 		padding: 0.75rem;
-		background: $gray;
+		background-color: $gray;
 		margin-bottom: 1px;
 		vertical-align: center;
 
 		.actions {
-			background: $gray-darker !important;
+			background-color: $gray-darker !important;
 			right: 0;
 			top: 0;
 			position: absolute;
@@ -415,12 +415,12 @@ ul.entities {
 
 				&:hover {
 					text-decoration: none;
-					background: $gray-active;
+					background-color: $gray-active;
 				}
 			}
 		}
 		&:hover {
-			background: $gray-darker;
+			background-color: $gray-darker;
 			
 			.actions {
 				display: flex;
@@ -455,13 +455,13 @@ ul.entities {
 .card {
 	ul.entities {
 		li {
-			background: $gray-darker;
+			background-color: $gray-darker;
 
 			.actions {
-				background: $gray-dark !important;
+				background-color: $gray-dark !important;
 			}
 			&:hover {
-				background: $gray-dark;
+				background-color: $gray-dark;
 			}
 		}
 	}

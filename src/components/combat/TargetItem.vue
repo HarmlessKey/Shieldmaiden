@@ -206,7 +206,7 @@
 }
 .progress { 
 	height: 30px;
-	background-color: #302f2f;
+	background-color: #232323;
 	margin-right: 5px;
 	position: relative;
 

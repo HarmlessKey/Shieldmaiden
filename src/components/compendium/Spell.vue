@@ -1,5 +1,7 @@
 <template>
 	<div>
+		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
+
 		<h1 class="spellTitle">{{ spell.name }}</h1>
 		<i class="mb-3 d-block">
 			{{ levels[spell.level] }}
@@ -90,4 +92,9 @@
  .spellTitle {
 		margin-bottom: 5px;
  }
+ .url {
+	display: block;
+	margin-bottom: 15px;
+	word-break: break-all;
+}
 </style>

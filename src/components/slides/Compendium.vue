@@ -8,7 +8,7 @@
 				@click="setType(name)"
 				class="mr-2"
 				:class="{ 'active': current == name}"
-				v-b-tooltip.hover title="Monsters">
+				v-b-tooltip.hover :title="name">
 				<span class="icon"><i :class="type.icon"></i></span>
 			</a>
 		</div>

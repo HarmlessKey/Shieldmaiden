@@ -71,6 +71,9 @@ export const routes = [{
 	props: (route) => ({
 		id: route.query.id
 	}),
+	meta: {
+		basePath: '/compendium',
+	}
 },
 
 //STAND ALONE PAGES

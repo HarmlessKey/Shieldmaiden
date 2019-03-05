@@ -1,5 +1,7 @@
 <template>
 	<div>
+		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/monsters/'+id" target="_blank">https://harmlesskey.com/compendium/monsters/{{ id }}</a></small>
+
 		<h1 class="d-none">{{ monster.name }}</h1>
 		<ViewEntity :entity="monster" />
 	</div>
@@ -47,5 +49,9 @@
 </script>
 
 <style lang="scss" scoped>
-
+	.url {
+		display: block;
+		margin-bottom: 15px;
+		word-break: break-all;
+	}
 </style>

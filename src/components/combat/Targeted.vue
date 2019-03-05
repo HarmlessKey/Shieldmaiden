@@ -108,7 +108,7 @@
 								</a>
 							</b-col>
 						</b-row>
-						<NPC class="mt-3 hide" :entity="target" />
+						<ViewEntity class="mt-3 hide" :entity="target" />
 					</template>
 					<h2 v-else class="red">No target</h2>
 				</div>
@@ -120,12 +120,12 @@
 <script>
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import NPC from '@/components/slides/NPC.vue';
+	import ViewEntity from '@/components/ViewEntity.vue';
 
 	export default {
 		name: 'Current',
 		components: {
-			NPC: NPC,
+			ViewEntity: ViewEntity,
 		},
 		props: ['current'],
 		data() {

@@ -542,8 +542,9 @@ ul.entities {
 	color: $white !important;
 	border: none;
 	
-	&:focus {
-		box-shadow: none;
+	&:focus, &.active {
+		outline: none !important;
+		box-shadow: none !important;
 	}
 	&.disabled {
 		cursor: not-allowed !important;
@@ -558,14 +559,19 @@ ul.entities {
 		// line-height: 22px;
 	}
 }
-button {
-	&:focus {
-		box-shadow: none;
-	}
-}
 a {
 	color: $blue !important;
 	cursor: pointer !important;
+}
+table {
+	tr {
+		th {
+			&:focus, &.active {
+				outline: none !important;
+				box-shadow: none !important;
+			}
+		}
+	}
 }
 .progress {
 	border-radius: 0 !important;
@@ -601,6 +607,37 @@ a {
 		border-color: $gray-light;
 		margin: 0;
 	}
+}
+
+ul.pagination {
+	li.page-item {
+		
+
+		.page-link {
+			border-color: $gray-dark !important;
+			background-color: $gray !important;
+			color: $gray-light !important;
+
+			.bnt-primary {
+				color: $blue;
+			}
+
+			&:focus {
+				box-shadow: none;
+			}
+		}
+		&.active {
+			.page-link {
+				color: $blue !important;
+			}
+		}
+		&.disabled {
+			.page-link {
+				color: $gray-hover !important;
+			}
+		}
+	}
+
 }
 
 hr { background: $gray-hover; }

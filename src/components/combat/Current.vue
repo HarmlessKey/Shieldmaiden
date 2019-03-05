@@ -117,13 +117,11 @@
 <script>
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import NPC from '@/components/slides/NPC.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 
 	export default {
 		name: 'Current',
 		components: {
-			NPC: NPC,
 			Actions: Actions,
 		},
 		props: ['current'],

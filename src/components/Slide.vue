@@ -2,7 +2,7 @@
 	<div>
 		<!-- {{ slide }} -->
 		<Roll v-if="slide.type == 'roll'"/>
-		<NPC v-if="slide.type == 'npc'" :entity="slide.entity" />
+		<ViewEntity v-if="slide.type == 'npc'" :entity="slide.entity" />
 		<AddNpc v-if="slide.type == 'addNpc'" />
 		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
 		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" :entity="slide.entity" />
@@ -19,7 +19,7 @@
 
 <script>
 	import Roll from '@/components/slides/Roll.vue';
-	import NPC from '@/components/slides/NPC.vue';
+	import ViewEntity from '@/components/ViewEntity.vue';
 	import AddNpc from '@/components/slides/AddNpc.vue';
 	import EditNpc from '@/components/slides/EditNpc.vue';
 	import Condition from '@/components/slides/Condition.vue';
@@ -35,7 +35,7 @@
 	export default {
 		components: {
 			Roll: Roll,
-			NPC: NPC,
+			ViewEntity: ViewEntity,
 			AddNpc: AddNpc,
 			EditNpc: EditNpc,
 			Condition: Condition,

@@ -1,4 +1,7 @@
 import Home from '@/views/Home.vue';
+import Compendium from '@/views/Compendium/Overview.vue';
+import Monsters from '@/views/Compendium/Monsters.vue';
+import Spells from '@/views/Compendium/Spells.vue';
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
@@ -33,6 +36,44 @@ export const routes = [{
 	name: 'home',
 	component: Home
 },
+
+//COMPENDIUM
+{
+	path: '/compendium',
+	name: 'Compendium',
+	component: Compendium
+},
+{
+	path: '/compendium/monsters',
+	name: 'Monsters',
+	component: Monsters
+},
+{
+	path: '/compendium/monsters/:id',
+	name: 'Monster',
+	component: Monsters,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/compendium',
+	}
+},
+{
+	path: '/compendium/spells',
+	name: 'Spells',
+	component: Spells
+},
+{
+	path: '/compendium/spells/:id',
+	name: 'Spell',
+	component: Spells,
+	props: (route) => ({
+		id: route.query.id
+	}),
+},
+
+//STAND ALONE PAGES
 {
 	path: '/sitemap',
 	name: 'Sitemap',
@@ -78,6 +119,8 @@ export const routes = [{
 	name: 'resetPassword',
 	component: ResetPassword
 },
+
+//PROFILE
 {
 	path: '/profile',
 	name: 'profile',
@@ -98,6 +141,8 @@ export const routes = [{
 		requiresAuth: true
 	}
 },
+
+//USER CONTENT
 {
 	path: '/campaigns',
 	name: 'myContent',

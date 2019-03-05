@@ -19,7 +19,7 @@
 		<hr>
 		<b-row class="abilities">
 			<template v-for="(ability, index) in abilities">
-				<b-col sm="6" md="6" lg="4"
+				<b-col :sm="sm" :md="md" :lg="lg"
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
 					class="mb-5" 
@@ -125,6 +125,31 @@
 					'stealth',
 					'survival',
 				],
+			}
+		},
+		computed: {
+			//Depending on where this is shown
+			//they layout needs be adjusted slightly
+			sm: function() {
+				if(this.$route.meta.basePath == '/compendium') {
+					return 4
+				} else {
+					return 6
+				}
+			},
+			md: function() {
+				if(this.$route.meta.basePath == '/compendium') {
+					return 4
+				} else {
+					return 6
+				}
+			},
+			lg: function() {
+				if(this.$route.meta.basePath == '/compendium') {
+					return 2
+				} else {
+					return 4
+				}
 			}
 		},
 		firebase() {

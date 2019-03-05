@@ -138,7 +138,7 @@
 
 					spell.url = encodeURI(spell.name)
 
-					console.log(key, spell.name, 'Added')
+					//console.log(key, spell.name, 'Added')
 
 					db.ref('spells/' + id).set(spell);
 				}

@@ -47,7 +47,5 @@
 </script>
 
 <style lang="scss" scoped>
- .spellTitle {
-	 margin-bottom: 5px;
- }
+
 </style>

@@ -93,7 +93,10 @@
 			Footer,
 		},
 		metaInfo: {
-			title: 'Home'
+			title: 'Harmless Key',
+			meta: [
+				{ vmid: 'description', name: 'description', content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
+			]
 		},
 		computed: {
 			user() {

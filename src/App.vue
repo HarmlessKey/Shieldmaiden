@@ -33,6 +33,11 @@
 		navMain: Header,
 		Slide: Slide,
 	},
+	metaInfo: {
+		meta: [
+			{ charset: 'utf-8' }
+		]
+	},
 	computed: {
 		...mapGetters({
 				slide: 'getSlide'

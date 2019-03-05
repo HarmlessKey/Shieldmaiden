@@ -20,7 +20,7 @@ const options = {
 }
 
 Vue.use(Snotify, options);
-Vue.use(VeeValidate);
+Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);

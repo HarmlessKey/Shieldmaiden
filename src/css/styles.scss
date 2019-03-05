@@ -331,7 +331,7 @@ table {
 
 			.actions {
 				display: none !important;
-				background: $gray-darker;
+				background-color: $gray-darker;
 				position: absolute;
 				padding: 5px 0.75rem;
 				top: 0;
@@ -348,7 +348,7 @@ table {
 
 					&:hover {
 						text-decoration: none;
-						background: $gray-active;
+						background-color: $gray-active;
 					}
 				}
 			}
@@ -358,7 +358,7 @@ table {
 		}
 		&:hover {
 			td {
-				background: $gray-darker;
+				background-color: $gray-darker;
 			}
 			.actions {
 				display: flex !important;
@@ -391,12 +391,12 @@ ul.entities {
 	li {
 		position: relative;
 		padding: 0.75rem;
-		background: $gray;
+		background-color: $gray;
 		margin-bottom: 1px;
 		vertical-align: center;
 
 		.actions {
-			background: $gray-darker !important;
+			background-color: $gray-darker !important;
 			right: 0;
 			top: 0;
 			position: absolute;
@@ -415,12 +415,12 @@ ul.entities {
 
 				&:hover {
 					text-decoration: none;
-					background: $gray-active;
+					background-color: $gray-active;
 				}
 			}
 		}
 		&:hover {
-			background: $gray-darker;
+			background-color: $gray-darker;
 			
 			.actions {
 				display: flex;
@@ -455,13 +455,13 @@ ul.entities {
 .card {
 	ul.entities {
 		li {
-			background: $gray-darker;
+			background-color: $gray-darker;
 
 			.actions {
-				background: $gray-dark !important;
+				background-color: $gray-dark !important;
 			}
 			&:hover {
-				background: $gray-dark;
+				background-color: $gray-dark;
 			}
 		}
 	}
@@ -542,8 +542,9 @@ ul.entities {
 	color: $white !important;
 	border: none;
 	
-	&:focus {
-		box-shadow: none;
+	&:focus, &.active {
+		outline: none !important;
+		box-shadow: none !important;
 	}
 	&.disabled {
 		cursor: not-allowed !important;
@@ -558,14 +559,19 @@ ul.entities {
 		// line-height: 22px;
 	}
 }
-button {
-	&:focus {
-		box-shadow: none;
-	}
-}
 a {
 	color: $blue !important;
 	cursor: pointer !important;
+}
+table {
+	tr {
+		th {
+			&:focus, &.active {
+				outline: none !important;
+				box-shadow: none !important;
+			}
+		}
+	}
 }
 .progress {
 	border-radius: 0 !important;
@@ -601,6 +607,37 @@ a {
 		border-color: $gray-light;
 		margin: 0;
 	}
+}
+
+ul.pagination {
+	li.page-item {
+		
+
+		.page-link {
+			border-color: $gray-dark !important;
+			background-color: $gray !important;
+			color: $gray-light !important;
+
+			.bnt-primary {
+				color: $blue;
+			}
+
+			&:focus {
+				box-shadow: none;
+			}
+		}
+		&.active {
+			.page-link {
+				color: $blue !important;
+			}
+		}
+		&.disabled {
+			.page-link {
+				color: $gray-hover !important;
+			}
+		}
+	}
+
 }
 
 hr { background: $gray-hover; }

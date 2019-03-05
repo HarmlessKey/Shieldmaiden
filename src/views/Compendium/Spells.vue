@@ -4,7 +4,7 @@
 
 		<!-- SPELL OVERVIEW -->
 		<template v-if="!$route.params.id">
-			<h1>Spells</h1>
+			<h1><i class="fas fa-wand-magic"></i> Spells</h1>
 			<p>
 				If you can't find a spell, 
 				it is because we are only allowed to store 

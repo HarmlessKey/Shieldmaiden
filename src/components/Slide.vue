@@ -2,6 +2,7 @@
 	<div>
 		<!-- {{ slide }} -->
 		<Roll v-if="slide.type == 'roll'"/>
+		<Compendium v-if="slide.type == 'compendium'"/>
 		<ViewEntity v-if="slide.type == 'npc'" :entity="slide.entity" />
 		<AddNpc v-if="slide.type == 'addNpc'" />
 		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
@@ -19,6 +20,7 @@
 
 <script>
 	import Roll from '@/components/slides/Roll.vue';
+	import Compendium from '@/components/slides/Compendium.vue';
 	import ViewEntity from '@/components/ViewEntity.vue';
 	import AddNpc from '@/components/slides/AddNpc.vue';
 	import EditNpc from '@/components/slides/EditNpc.vue';
@@ -35,6 +37,7 @@
 	export default {
 		components: {
 			Roll: Roll,
+			Compendium: Compendium,
 			ViewEntity: ViewEntity,
 			AddNpc: AddNpc,
 			EditNpc: EditNpc,

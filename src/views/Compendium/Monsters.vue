@@ -2,7 +2,7 @@
 <div class="grid">
 	<div class="container">
 		<template v-if="!$route.params.id">
-		<h1>Monsters</h1>
+		<h1><i class="fas fa-dragon"></i> Monsters</h1>
 			<p>
 				If you can't find a monster, 
 				it is because we are only allowed to store 

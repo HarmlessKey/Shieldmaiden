@@ -5,13 +5,18 @@
 				<router-link to="/">Harmless Key <span class="gray-hover">BETA</span></router-link>
 			</div>
 			<div class="d-flex justify-content-right">
-				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
 				<!-- <a href="#" v-b-tooltip.hover title="Facebook" ><i class="fab fa-facebook-f"></i></a> -->
+				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
+				<a class="roll-dice" 
+					v-b-tooltip.hover 
+					title="Compendium"  
+					v-shortkey="['r']" @shortkey="showSlide('compendium')"
+					@click="showSlide('compendium')"><i class="fas fa-book-spells"></i></a>
 				<a class="roll-dice" 
 					v-b-tooltip.hover 
 					title="Dice Roller"  
-					v-shortkey="['r']" @shortkey="showSlide()"
-					@click="showSlide()"><i class="fas fa-dice-d20"></i></a>
+					v-shortkey="['r']" @shortkey="showSlide('roll')"
+					@click="showSlide('roll')"><i class="fas fa-dice-d20"></i></a>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
 						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
@@ -45,11 +50,10 @@
 			...mapActions([
 				'setSlide'
 			]),
-			showSlide() {
-				event.stopPropagation();
+			showSlide(type) {
 				this.setSlide({
 					show: true,
-					type: 'roll',
+					type,
 				})
 			},
 			signOut: function() {

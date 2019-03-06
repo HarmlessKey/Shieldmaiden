@@ -2,6 +2,7 @@ import Home from '@/views/Home.vue';
 import Compendium from '@/views/Compendium/Overview.vue';
 import Monsters from '@/views/Compendium/Monsters.vue';
 import Spells from '@/views/Compendium/Spells.vue';
+import Conditions from '@/views/Compendium/Conditions.vue';
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
@@ -71,6 +72,25 @@ export const routes = [{
 	props: (route) => ({
 		id: route.query.id
 	}),
+	meta: {
+		basePath: '/compendium',
+	}
+},
+{
+	path: '/compendium/conditions',
+	name: 'Conditions',
+	component: Conditions
+},
+{
+	path: '/compendium/conditions/:id',
+	name: 'Condition',
+	component: Conditions,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/compendium',
+	}
 },
 
 //STAND ALONE PAGES

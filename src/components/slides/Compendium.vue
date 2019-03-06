@@ -8,7 +8,7 @@
 				@click="setType(name)"
 				class="mr-2"
 				:class="{ 'active': current == name}"
-				v-b-tooltip.hover title="Monsters">
+				v-b-tooltip.hover :title="name">
 				<span class="icon"><i :class="type.icon"></i></span>
 			</a>
 		</div>
@@ -36,6 +36,7 @@
 			<template v-if="show">
 				<Monster v-if="current == 'monsters'" :id="show" />
 				<Spell v-if="current == 'spells'" :id="show" />
+				<Condition v-if="current == 'conditions'" :id="show" />
 			</template>
 
 		</template>
@@ -47,17 +48,20 @@
 
 	import Monster from '@/components/compendium/Monster.vue'
 	import Spell from '@/components/compendium/Spell.vue'
+	import Condition from '@/components/compendium/Condition.vue'
 
 	export default {
 		components: {
 			Monster,
 			Spell,
+			Condition,
 		},
 		data() {
 			return {
 				types: {
 					'monsters': { icon: 'fas fa-dragon' },
 					'spells': { icon: 'fas fa-wand-magic' },
+					'conditions': { icon: 'fas fa-skull-crossbones' },
 				},
 				current: undefined,
 				show: undefined,
@@ -71,6 +75,7 @@
 			return {
 				monsters: db.ref('monsters'),
 				spells: db.ref('spells'),
+				conditions: db.ref('conditions'),
 			}
 		},
 		methods: {

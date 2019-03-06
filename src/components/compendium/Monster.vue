@@ -1,5 +1,9 @@
 <template>
 	<div>
+		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/monsters/'+id" target="_blank">https://harmlesskey.com/compendium/monsters/{{ id }}</a></small>
+
+		<div v-if="loading" class="loader"> <span>Loading monster....</span></div>
+
 		<h1 class="d-none">{{ monster.name }}</h1>
 		<ViewEntity :entity="monster" />
 	</div>
@@ -18,7 +22,7 @@
 		props: ['id'],
 		metaInfo() {
 			return {
-				title: this.monster.name,
+				title: this.monster.name + ' | D&D 5th Edition',
 				meta: [
           { vmid: 'description', name: 'description', content: 'D&D 5th Edition Monster: ' + this.monster.name }
         ]
@@ -31,6 +35,7 @@
 		},
 		data() {
 			return {
+				loading: true,
 			}
 		},
 		firebase() {
@@ -38,6 +43,7 @@
 				monster: {
 					source: db.ref(`monsters/${this.id}`),
 					asObject: true,
+					readyCallback: () => this.loading = false
 				}
 			}
 		},
@@ -47,5 +53,9 @@
 </script>
 
 <style lang="scss" scoped>
-
+	.url {
+		display: block;
+		margin-bottom: 15px;
+		word-break: break-all;
+	}
 </style>

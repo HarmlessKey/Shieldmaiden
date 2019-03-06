@@ -2,6 +2,7 @@
 <div class="grid">
 	<div class="container">
 		<template v-if="!$route.params.id">
+		<Crumble />
 		<h1><i class="fas fa-dragon"></i> Monsters</h1>
 			<p>
 				If you can't find a monster, 
@@ -10,7 +11,7 @@
 			</p>
 
 			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchMonster()" placeholder="Search" />
+				<input class="form-control" type="text" v-model="search" @keyup="searchMonster()" placeholder="Search monsters" />
 				<b-input-group-append>
 					<button class="btn" @click="searchMonster()"><i class="fas fa-search"></i></button>
 				</b-input-group-append>
@@ -38,7 +39,6 @@
 
 		<!-- SHOW MONSTER -->
 		<template v-else>
-			<router-link class="mb-3 d-block" to="/compendium/monsters"><i class="fas fa-arrow-left"></i> Back</router-link>
 			<Monster :id="$route.params.id" />
 		</template>
 	</div>
@@ -48,6 +48,7 @@
 
 <script>
 	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
 	import Monster from '@/components/compendium/Monster.vue'
 	import { mapActions } from 'vuex'
@@ -55,6 +56,7 @@
 	export default {
 		name: 'Error',
 		components: {
+			Crumble,
 			Footer,
 			Monster,
 		},

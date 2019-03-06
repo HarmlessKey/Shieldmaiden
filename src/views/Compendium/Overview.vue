@@ -1,6 +1,7 @@
 <template>
 <div class="grid">
 	<div class="container">
+		<Crumble />
 		<h1>Compendium</h1>
 		<p>If you can't find something, 
 			it is because we are only allowed to store 
@@ -19,10 +20,12 @@
 <script>
 	import { db } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
+	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Compendium',
 		components: {
+			Crumble,
 			Footer,
 		},
 		metaInfo: {

@@ -29,7 +29,10 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 			}
-		}
+		},
+		methods: {
+			
+		},
 	}
 </script>
 

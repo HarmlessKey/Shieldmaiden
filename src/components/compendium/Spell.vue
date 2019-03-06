@@ -1,7 +1,8 @@
 <template>
 	<div>
 		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
-		
+		<Crumble v-else :name="spell.name"/>
+
 		<div v-if="loading" class="loader"> <span>Loading spell....</span></div>
 
 		<h1 class="spellTitle">{{ spell.name }}</h1>
@@ -43,9 +44,13 @@
 
 <script>
 	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Spell',
+		components: {
+			Crumble,
+		},
 		props: ['id'],
 		metaInfo() {
 			return {

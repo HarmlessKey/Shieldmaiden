@@ -97,7 +97,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import Crumble from '@/components/CrumbleMyContent.vue'
+	import Crumble from '@/components/crumble/MyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 

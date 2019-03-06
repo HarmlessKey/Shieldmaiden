@@ -4,6 +4,7 @@
 
 		<!-- SPELL OVERVIEW -->
 		<template v-if="!$route.params.id">
+			<Crumble />
 			<h1><i class="fas fa-wand-magic"></i> Spells</h1>
 			<p>
 				If you can't find a spell, 
@@ -12,7 +13,7 @@
 			</p>
 
 			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchSpell()" placeholder="Search" />
+				<input class="form-control" type="text" v-model="search" @keyup="searchSpell()" placeholder="Search spells" />
 				<b-input-group-append>
 					<button class="btn" @click="searchSpell()"><i class="fas fa-search"></i></button>
 				</b-input-group-append>
@@ -47,7 +48,6 @@
 
 			<!-- WHEN A SPELL IS SELECTED -->
 			<template v-else>
-				<router-link class="mb-3 d-block" to="/compendium/spells"><i class="fas fa-arrow-left"></i> Back</router-link>
 				<Spell :id="$route.params.id" />
 			</template>
 	</div>
@@ -57,6 +57,7 @@
 
 <script>
 	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
 	import { mapActions } from 'vuex'
 	import Spell from '@/components/compendium/Spell.vue'
@@ -65,6 +66,7 @@
 	export default {
 		name: 'Error',
 		components: {
+			Crumble,
 			Footer,
 			Spell,
 		},

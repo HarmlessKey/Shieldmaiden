@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/conditions/'+id" target="_blank">https://harmlesskey.com/compendium/conditions/{{ id }}</a></small>
+		<Crumble v-else :name="condition.name" />
 
 		<div v-if="loading" class="loader"> <span>Loading condition....</span></div>
 
@@ -32,9 +33,13 @@
 
 <script>
 	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Condition',
+		components: {
+			Crumble
+		},
 		props: ['id'],
 		metaInfo() {
 			return {

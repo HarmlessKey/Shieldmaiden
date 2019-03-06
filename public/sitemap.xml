@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> 
   <url>
-    <loc>http://www.harmlesskey.com</loc>
-    <lastmod>2019-01-29</lastmod>
-  </url>
-  <url>
     <loc>http://harmlesskey.com</loc>
-    <lastmod>2019-01-29</lastmod>
-  </url>
-  <url>
-    <loc>http://www.harmlesskey.com/documentation</loc>
     <lastmod>2019-01-29</lastmod>
   </url>
   <url>
@@ -17,15 +9,11 @@
     <lastmod>2019-01-29</lastmod>
   </url>
   <url>
-    <loc>http://www.harmlesskey.com/sign-in</loc>
-    <lastmod>2019-01-29</lastmod>
+    <loc>http://harmlesskey.com/sign-up</loc>
+    <lastmod>2019-02-09</lastmod>
   </url>
   <url>
     <loc>http://harmlesskey.com/sign-in</loc>
-    <lastmod>2019-01-29</lastmod>
-  </url>
-  <url>
-    <loc>http://www.harmlesskey.com/privacy-policy</loc>
     <lastmod>2019-01-29</lastmod>
   </url>
   <url>
@@ -33,15 +21,7 @@
     <lastmod>2019-01-29</lastmod>
   </url>
   <url>
-    <loc>http://www.harmlesskey.com/planned</loc>
-    <lastmod>2019-01-30</lastmod>
-  </url>
-  <url>
     <loc>http://harmlesskey.com/planned</loc>
-    <lastmod>2019-01-30</lastmod>
-  </url>
-  <url>
-    <loc>http://www.harmlesskey.com/updates</loc>
     <lastmod>2019-01-30</lastmod>
   </url>
   <url>
@@ -49,11 +29,23 @@
     <lastmod>2019-01-30</lastmod>
   </url>
   <url>
-    <loc>http://www.harmlesskey.com/feedback</loc>
+    <loc>http://harmlesskey.com/feedback</loc>
     <lastmod>2019-02-01</lastmod>
   </url>
   <url>
-    <loc>http://harmlesskey.com/feedback</loc>
-    <lastmod>2019-02-01</lastmod>
+    <loc>http://harmlesskey.com/compendium</loc>
+    <lastmod>2019-03-06</lastmod>
+  </url>
+  <url>
+    <loc>http://harmlesskey.com/compendium/conditions</loc>
+    <lastmod>2019-03-06</lastmod>
+  </url>
+  <url>
+    <loc>http://harmlesskey.com/compendium/monsters</loc>
+    <lastmod>2019-03-06</lastmod>
+  </url>
+  <url>
+    <loc>http://harmlesskey.com/compendium/spells</loc>
+    <lastmod>2019-03-06</lastmod>
   </url>
 </urlset>

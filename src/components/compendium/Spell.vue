@@ -1,6 +1,8 @@
 <template>
 	<div>
 		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
+		
+		<div v-if="loading" class="loader"> <span>Loading spell....</span></div>
 
 		<h1 class="spellTitle">{{ spell.name }}</h1>
 		<i class="mb-3 d-block">
@@ -47,7 +49,7 @@
 		props: ['id'],
 		metaInfo() {
 			return {
-				title: this.spell.name,
+				title: this.spell.name + ' | D&D 5th Edition',
 				meta: [
           { vmid: 'description', name: 'description', content: 'D&D 5th Edition Spell: ' + this.spell.name }
         ]
@@ -60,6 +62,7 @@
 		},
 		data() {
 			return {
+				loading: true,
 				levels: {
 					'-1': 'Cantrip',
 					0: 'Cantrip',
@@ -80,6 +83,7 @@
 				spell: {
 					source: db.ref(`spells/${this.id}`),
 					asObject: true,
+					readyCallback: () => this.loading = false
 				}
 			}
 		},

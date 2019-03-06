@@ -465,6 +465,16 @@ ul.entities {
 			}
 		}
 	}
+	table {
+		tr {
+			td {
+				background-color: $gray-darker;
+			}
+			&:hover td {
+				background-color: $gray-dark;
+			}
+		}
+	}
 }
 
 .slide {

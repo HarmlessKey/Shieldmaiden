@@ -7,15 +7,9 @@
 			data from the <span v-b-tooltip.hover title="Systems Reference Document">SRD</span>.
 		</p>
 		<ul class="entities hasImg">
-			<li>
-				<i class="img fas fa-dragon mr-2"></i> <router-link :to="$route.path+'/monsters'">Monsters</router-link>
+			<li v-for="(item, index) in items" :key="index">
+				<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
 			</li>
-			<li>
-				<i class="img fas fa-wand-magic mr-2"></i> <router-link :to="$route.path+'/spells'">Spells</router-link>
-			</li>
-			<!-- <li>
-				<i class="fas fa-skull-crossbones mr-2"></i> <router-link :to="$route.path+'/conditions'">Conditions</router-link>
-			</li> -->
 		</ul>
 	</div>
 	<Footer />
@@ -25,10 +19,9 @@
 <script>
 	import { db } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
-	import { mapActions } from 'vuex'
 
 	export default {
-		name: 'Error',
+		name: 'Compendium',
 		components: {
 			Footer,
 		},
@@ -37,72 +30,27 @@
 		},
 		data() {
 			return {
-				monsters: undefined,
-				current: 1,
-				fields: {
-          index: {
-            label: '#',
+				items: {
+					'conditions': { 
+						name: 'Conditions',
+						url: 'conditions',
+						icon: 'fas fa-skull-crossbones',
 					},
-          name: {
-            label: 'Name',
-            sortable: true
+					'monsters': { 
+						name: 'Monsters',
+						url: 'monsters',
+						icon: 'fas fa-dragon',
 					},
-					challenge_rating: {
-						label: 'CR',
-						sortable: true
-					},
-					type: {
-						label: 'Type',
-						sortable: true
+					'spells': { 
+						name: 'Spells',
+						url: 'spells',
+						icon: 'fas fa-wand-magic',
 					},
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
-				isBusy: true,
 			}
-		},
-		firebase() {
-			return {
-				monsters: {
-					source: db.ref('monsters'),
-					readyCallback: () => this.isBusy = false
-				}
-			}
-		},
-		beforeMount() {
-			this.searchResults = this.monsters
 		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchMonster() {
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = this.monsters
-					this.searching = false
-				}
-			},
-			showSlide(monster) {
-				this.setSlide({
-					show: true,
-					type: 'npc',
-					entity: monster
-				})
-			},
+
 		}
 	}
 </script>

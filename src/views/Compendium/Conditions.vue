@@ -2,6 +2,7 @@
 <div class="grid">
 	<div class="container">
 		<template v-if="!$route.params.id">
+		<Crumble />
 		<h1><i class="fas fa-skull-crossbones"></i> conditions</h1>
 			<p>
 				If you can't find a condition, 
@@ -38,7 +39,6 @@
 
 		<!-- SHOW CONDITION -->
 		<template v-else>
-			<router-link class="mb-3 d-block" to="/compendium/conditions"><i class="fas fa-arrow-left"></i> Back</router-link>
 			<Condition :id="$route.params.id" />
 		</template>
 	</div>
@@ -48,6 +48,7 @@
 
 <script>
 	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
 	import Condition from '@/components/compendium/Condition.vue'
 	import { mapActions } from 'vuex'
@@ -55,6 +56,7 @@
 	export default {
 		name: 'Error',
 		components: {
+			Crumble,
 			Footer,
 			Condition,
 		},

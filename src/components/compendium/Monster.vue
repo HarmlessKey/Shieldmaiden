@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/monsters/'+id" target="_blank">https://harmlesskey.com/compendium/monsters/{{ id }}</a></small>
+		<Crumble v-else :name="monster.name"/>
 
 		<div v-if="loading" class="loader"> <span>Loading monster....</span></div>
 
@@ -13,11 +14,13 @@
 	import { db } from '@/firebase'
 
 	import ViewEntity from '@/components/ViewEntity.vue';
+	import Crumble from '@/components/crumble/Compendium.vue'
 
 	export default {
 		name: 'Monster',
 		components: {
-			ViewEntity: ViewEntity,
+			Crumble,
+			ViewEntity,
 		},
 		props: ['id'],
 		metaInfo() {

@@ -215,7 +215,7 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import Crumble from '@/components/CrumbleMyContent.vue'
+	import Crumble from '@/components/crumble/MyContent.vue'
 	import draggable from 'vuedraggable'
 
 	import { mapGetters, mapActions } from 'vuex'

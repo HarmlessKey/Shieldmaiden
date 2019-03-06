@@ -47,7 +47,10 @@ export const routes = [{
 {
 	path: '/compendium/monsters',
 	name: 'Monsters',
-	component: Monsters
+	component: Monsters,
+	meta: {
+		baseName: 'Monsters',
+	}
 },
 {
 	path: '/compendium/monsters/:id',
@@ -58,12 +61,16 @@ export const routes = [{
 	}),
 	meta: {
 		basePath: '/compendium',
+		baseName: 'Monsters',
 	}
 },
 {
 	path: '/compendium/spells',
 	name: 'Spells',
-	component: Spells
+	component: Spells,
+	meta: {
+		baseName: 'Spells',
+	}
 },
 {
 	path: '/compendium/spells/:id',
@@ -74,12 +81,16 @@ export const routes = [{
 	}),
 	meta: {
 		basePath: '/compendium',
+		baseName: 'Spells',
 	}
 },
 {
 	path: '/compendium/conditions',
 	name: 'Conditions',
-	component: Conditions
+	component: Conditions,
+	meta: {
+		baseName: 'Conditions',
+	}
 },
 {
 	path: '/compendium/conditions/:id',
@@ -90,6 +101,7 @@ export const routes = [{
 	}),
 	meta: {
 		basePath: '/compendium',
+		baseName: 'Conditions',
 	}
 },
 

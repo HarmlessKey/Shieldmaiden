@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<table class="table targets">
+		<table class="table targets" :class="{'table-sm': windowWidth <= 360}">
 			<thead>
 				<th>In.</th>
 				<th></th>
 				<th class="ac"><i class="fas fa-shield"></i></th>
 				<th>Name</th>
 				<th class="hp"><i class="fas fa-heart"></i></th>
-				<th>Conditions</th>
+				<th class="d-none d-md-table-cell">Conditions</th>
 			</thead>
 			<tbody 
 				class="entities"
@@ -59,7 +59,7 @@
 							</span>
 						</td>
 
-						<td class="conditions">
+						<td class="conditions d-none d-md-table-cell">
 							<div class="d-flex justify-content-right" v-if="
 							entity.conditions &&
 							((entity.entityType == 'player' && playerSettings.conditions === undefined) 
@@ -109,6 +109,7 @@
 		data() {
 			return {
 				userId: this.$route.params.userid,
+				windowWidth: 0,
 			}
 		},
 		firebase() {
@@ -135,7 +136,22 @@
 				},
 			}
 		},
+		mounted() {
+			//For a responsive window size
+			//in the html we bind a class based on that
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.getWindowWidth);
+
+				//Init
+				this.getWindowWidth()
+			})
+		},
 		methods: {
+			getWindowWidth(event) {
+				//Return the window width
+				//used in the html to bind a class for small tables
+        this.windowWidth = document.documentElement.clientWidth;
+      },
 			displayAc(entity) {
 				if(entity.transformed) {
 						var ac = parseInt(entity.transformed.ac)
@@ -178,6 +194,9 @@
 				return img
 			},
 		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.getWindowWidth);
+		}
 	}
 </script>
 
@@ -218,13 +237,20 @@
 				font-weight: bold;
 			}
 			td.name {
-				width: 1%;
+				overflow: hidden;
 				white-space: nowrap;
+				text-overflow: ellipsis;
+				max-width:0;
 			}
 			td.img {
 				width: 45px;
 				background-size: cover;
 				background-position: center top;
+
+				@media only screen and (max-width: 575px) {
+					height: 32px;
+					width: 32px;
+				}
 			}
 		}
 		tr td:first-child, thead th {

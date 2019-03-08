@@ -4,10 +4,12 @@ const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
+const users_ref = db.ref('users')
 
 export const content_module = {
 	state: {
 		user: {},
+		userInfo: undefined,
 		slide: {},
 
 		campaign: undefined,
@@ -22,6 +24,9 @@ export const content_module = {
 	getters: {
 		getUser: function(state) {
 			return state.user;
+		},
+		userInfo: function(state) {
+			return state.userInfo;
 		},
 		getSlide: function(state) {
 			return state.slide;
@@ -51,6 +56,9 @@ export const content_module = {
 	mutations: {
 		SET_USER(state) {
 			state.user = auth.currentUser;
+		},
+		SET_USERINFO(state, payload) {
+			state.userInfo = payload;
 		},
 		setSlide(state, value) {
 			if(state.slide.type != value.type) {
@@ -83,6 +91,12 @@ export const content_module = {
 	actions: {
 		setUser({ commit }) {
 			commit('SET_USER');
+		},
+		setUserInfo({ commit, state }) {
+			let user = users_ref.child(state.user.uid)
+			user.on('value', snapshot => {
+				commit('SET_USERINFO', snapshot.val())
+			})
 		},
 		setSlide({ commit }, value) {
 			commit('setSlide', value);

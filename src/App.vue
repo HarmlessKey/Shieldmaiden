@@ -38,14 +38,20 @@
 			{ charset: 'utf-8' }
 		]
 	},
+	data() {
+		return {
+			user: auth.currentUser,
+		}
+	},
 	computed: {
 		...mapGetters({
-				slide: 'getSlide'
+				slide: 'getSlide',
 			}),
 	},
 	created() {
 		if(auth.currentUser !== null){
 			this.setUser();
+			this.setUserInfo();
 			// players need prio!
 			this.fetchPlayers();
 			this.fetchNpcs();
@@ -60,6 +66,7 @@
 			'fetchPlayers',
 			'fetchNpcs',
 			'setUser',
+			'setUserInfo',
 			'setSlide',
 		]),
 		hideSlide() {

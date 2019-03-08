@@ -57,13 +57,20 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 	store.dispatch('setSlide', false); //Always hide slide
 
+	const user = store.getters.userInfo;
+
 	const currentUser = auth.currentUser;
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
 	if (requiresAuth && !currentUser) {
 		next('/sign-in');
 	} else if (requiresAuth && currentUser) {
-		next();
+		//Force to input a username
+		if(!user) {
+			next('/profile');
+		} else {
+			next();
+		}
 	} else {
 		next();
 	}

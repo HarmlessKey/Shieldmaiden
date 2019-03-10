@@ -16,6 +16,7 @@ import ResetPassword from '@/views/ResetPassword.vue';
 import Settings from '@/views/Settings.vue';
 
 import Admin from '@/views/Admin/Overview.vue';
+import Users from '@/views/Admin/Users.vue';
 
 import Profile from '@/views/profile/Profile.vue';
 import Username from '@/views/profile/SetUsername.vue';
@@ -198,6 +199,30 @@ export const routes = [{
 	meta: {
 		basePath: '/admin',
 		title: 'admin',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/users',
+	name: 'Users',
+	component: Users,
+	meta: {
+		baseName: 'Users',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/users/:id',
+	name: 'User',
+	component: Users,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/admin',
+		baseName: 'Users',
 		requiresAuth: true,
 		requiresAdmin: true
 	}

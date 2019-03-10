@@ -58,7 +58,7 @@
 	import { mapActions } from 'vuex'
 
 	export default {
-		name: 'Error',
+		name: 'Users',
 		components: {
 			Crumble,
 			User,

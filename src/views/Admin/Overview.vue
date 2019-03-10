@@ -4,7 +4,11 @@
 		<h1>Admin</h1>
 		<ul class="entities hasImg">
 			<li v-for="(item, index) in items" :key="index">
-				<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
+				<i class="img mr-2" :class="item.icon"></i>
+				<div class="d-flex justify-content-between">
+					<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
+					<span v-if="item.name == 'Users'">( {{ Object.keys(users).length }} )</span>
+				</div>
 			</li>
 		</ul>
 	</div>
@@ -30,6 +34,14 @@
 						url: 'users',
 						icon: 'fas fa-users',
 					},
+				},
+			}
+		},
+		firebase() {
+			return {
+				users: {
+					source: db.ref('users'),
+					readyCallback: () => this.isBusy = false
 				},
 			}
 		},

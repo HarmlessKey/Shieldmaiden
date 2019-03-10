@@ -17,22 +17,31 @@
 
 		<b-card header="Data">
 			<b-row>
-				<b-col md="4" v-if="campaigns">
-					<h2>
-						Campaigns: 
-						<span :class="{ 'green': true, 'red': Object.keys(campaigns).length == 2 }">{{ Object.keys(campaigns).length }} </span>
+				<b-col class="text-center">
+					<h2 class="mb-0">
+						<div v-if="campaigns" :class="{ 'green': true, 'red': Object.keys(campaigns).length == 2 }">
+						{{ Object.keys(campaigns).length }}
+						</div>
+						<div v-else>0</div>
+						<router-link to="/campaigns" class="gray-hover">Campaigns</router-link>
 					</h2>
 				</b-col>
-				<b-col md="4" v-if="players">
-					<h2>
-						Players:
-						<span :class="{ 'green': true, 'red': Object.keys(players).length == 6 }">{{ Object.keys(players).length }} </span>
+				<b-col class="text-center">
+					<h2 class="mb-0">
+						<div v-if="players" :class="{ 'green': true, 'red': Object.keys(players).length == 6 }">
+							{{ Object.keys(players).length }}
+						</div>
+						<div v-else>0</div>
+						<router-link to="/players" class="gray-hover">Players</router-link>
 					</h2>
 				</b-col>
-				<b-col md="4" v-if="npcs">
-					<h2>
-						NPC's: 
-						<span :class="{ 'green': true, 'red': Object.keys(npcs).length == 6 }">{{ Object.keys(npcs).length }} </span>
+				<b-col class="text-center">
+					<h2 class="mb-0">
+						<div v-if="npcs" :class="{ 'green': true, 'red': Object.keys(npcs).length == 6 }">
+							{{ Object.keys(npcs).length }}
+						</div>
+						<div v-else>0</div>
+						<router-link to="/npcs" class="gray-hover">NPC's</router-link>
 					</h2>
 				</b-col>
 			</b-row>
@@ -41,8 +50,8 @@
 		<b-card header="Actions">
 			<p v-if="resetError" class="red"><i class="fas fa-exclamation-triangle"></i> {{ resetError }}</p>
 			<p v-if="resetSuccess" class="green"><i class="fas fa-check"></i> {{ resetSuccess }}</p>
-			<p><a @click="resetPassword()"><i class="fas fa-redo-alt"></i> Reset Password</a></p>
-			<p><router-link to="/profile/delete-account" class="red"><i class="fas fa-trash-alt"></i> Delete account</router-link></p>
+			<p><a @click="resetPassword()" class="gray-hover"><i class="fas fa-redo-alt blue"></i> Reset Password</a></p>
+			<p><router-link to="/profile/delete-account" class="gray-hover"><i class="fas fa-trash-alt red"></i> Delete account</router-link></p>
 		</b-card>
 	</div>
 </template>

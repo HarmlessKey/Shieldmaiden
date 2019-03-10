@@ -54,7 +54,7 @@
 	import { mapActions } from 'vuex'
 
 	export default {
-		name: 'Error',
+		name: 'Conditions',
 		components: {
 			Crumble,
 			Footer,

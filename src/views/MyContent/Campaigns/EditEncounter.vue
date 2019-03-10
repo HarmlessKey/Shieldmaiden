@@ -161,7 +161,7 @@
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
-												<input class="" type="number" min="1" name="name" placeholder="1" value="1" />
+												<input class="" type="number" min="1" name="name" placeholder="1" value="1"  />
 												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(npc['.key'], 'npc', npc.name)">
 													<i class="fas fa-plus"></i>
 												</a>
@@ -174,7 +174,7 @@
 									<template v-if="npcs">
 										<h2>Custom NPC's</h2>
 										<ul class="entities hasImg">
-											<li v-for="(npc, key) in npcs" 
+											<li v-for="(npc, key) in npcs"
 												:key="key" 
 												class="d-flex justify-content-between">
 												<div class="d-flex justify-content-left">
@@ -190,7 +190,8 @@
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
-													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(key, 'npc', npc.name, true)">
+													<input class="" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[npc.id]" />
+													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
 														<i class="fas fa-plus"></i>
 													</a>
 													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(key, 'npc', npc.name, true, true)">
@@ -344,6 +345,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/CrumbleMyContent.vue'
+	import _ from 'lodash'
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 	import { difficulty } from '@/mixins/difficulty.js'
@@ -373,6 +375,7 @@
 				slide: this.$store.getters.getSlide,
 				searching: false,
 				encDifficulty: undefined,
+				to_add: {}
 			} 
 		},
 		firebase() {
@@ -452,6 +455,11 @@
 						key: key,
 					})
 				}
+			},
+			multi_add(id,type,name,custom=false,rollHp=false) {
+
+				console.log(this.to_add[id])
+				this.add(id,type,name,custom,rollHp)
 			},
 			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {

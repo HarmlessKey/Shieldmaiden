@@ -157,7 +157,11 @@
 						var ac = parseInt(entity.transformed.ac)
 				}
 				else {
-						ac = parseInt(entity.ac)
+						if(entity.entityType == 'player') {
+							ac = parseInt(this.players[entity.key].ac)
+						} else {
+							ac = parseInt(entity.ac)
+						}
 				}
 				return ac
 			},

@@ -12,7 +12,7 @@
 					<p>Manage the encounters in your campaign.</p>
 				</b-col>
 				<b-col>
-					<h2>Track encounter</h2>
+					<h2>Player View</h2>
 					<p class="d-flex justify-content-between">
 						<span>Let your players follow your encounters.</span>
 						<a data-toggle="collapse" :href="'#track'" 
@@ -135,10 +135,20 @@
 						
 						<tr v-for="(encounter, index) in _finished" :key="encounter.key">
 							<td>{{ index + 1 }}</td>
-							<td>{{ encounter.encounter }}</td>
-							<td class="text-right">
-								<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
-								<a v-b-tooltip.hover title="Delete" class="red ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+							<td>
+								<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+									{{ encounter.encounter }}
+								</router-link>
+							</td>
+							<td>
+								<div class="d-flex justify-content-end">
+									<div class="d-flex justify-content-end actions">
+										<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
+										<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+									</div>
+									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+								</div>
+							
 							</td>
 						</tr>
 					</tbody>

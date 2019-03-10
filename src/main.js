@@ -3,7 +3,7 @@ import App from './App.vue';
 import jQuery from 'jquery'
 import VueFire from 'vuefire'
 import VeeValidate from 'vee-validate';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
 import VueRouter from 'vue-router';
 import { store } from './store/store';
 import { routes } from './routes';
@@ -49,25 +49,53 @@ const router = new VueRouter({
 	mode: 'history'
 });
 
-
-
 // Check before each page load whether the page requires authentication/
 // if it does check whether the user is signed into the web app or
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
 	store.dispatch('setSlide', false); //Always hide slide
 
-	const currentUser = auth.currentUser;
-	const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+	const currentUser = auth.currentUser; //Check if there is a user
+	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
+	const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
 
+	//Check if someone is logged in and if Auth is needed
 	if (requiresAuth && !currentUser) {
-		next('/sign-in');
+		next('/sign-in'); //no user, but auth is needed
 	} else if (requiresAuth && currentUser) {
-		next();
+		//Auth is needed and there is a user
+
+		//GET USER
+		//DOESN'T SEEM TO WORK TROUGHT STORE, SO DIRECTLY FROM FIREBASE
+		var user = db.ref(`users/${currentUser.uid}`);
+		user.on('value' , (snapshot) => {
+
+			//Check if user data exists
+			if(snapshot.val()) {
+				let admin = snapshot.val().admin
+				let username = snapshot.val().username
+
+				//Force to input a username
+				if(!username) {
+					next('/set-username');
+				} else {
+					//CHECK FOR ADMIN
+					if(requiresAdmin && !admin) {
+						next('/404');
+					} else if(requiresAdmin && admin) {
+						next();
+					} else {
+						next(); //No admin pages can be visited
+					}
+				}
+			} else {
+				//Force to create userdata
+				next('/set-username');
+			}
+		});
 	} else {
-		next();
+		next(); //No Auth is needed
 	}
-	
 });
 
 // Wrap the vue instance in a Firebase onAuthStateChanged method

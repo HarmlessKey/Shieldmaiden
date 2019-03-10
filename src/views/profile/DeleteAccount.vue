@@ -67,6 +67,7 @@ export default {
 					db.ref(`npcs/${user.uid}`).remove();
 					db.ref(`settings/${user.uid}`).remove();
 					db.ref(`track/${user.uid}`).remove();
+					db.ref(`users/${user.uid}`).remove();
 
 					vm.$router.replace('/');
 				}).catch(function(error) {

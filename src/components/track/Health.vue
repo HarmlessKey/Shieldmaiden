@@ -35,6 +35,7 @@
 </template>
 
 <script>
+	import { db } from '@/firebase'
 	import { attributes } from '@/mixins/attributes.js'
 
 	export default {
@@ -45,13 +46,17 @@
 		],
 		data() {
 			return {
+				userId: this.$route.params.userid,
 				number: 0,
 				tweenedNumber: 0,
 			}
 		},
 		firebase() {
 			return {
-				
+				players: {
+					source: db.ref(`players/${this.userId}`),
+					asObject: true,
+				},
 			}
 		},
 		computed: {
@@ -71,6 +76,7 @@
 			},
 			displayHp(entity) {
 				var stats = {};
+				var key = entity.key
 
 				if(entity.transformed) {
 					stats = {
@@ -78,9 +84,17 @@
 						curHp: parseInt(entity.transformed.curHp),
 					}
 				} else {
-					stats = {
-						maxHp: parseInt(entity.maxHp),
-						curHp: parseInt(entity.curHp),
+					//FOR PLAYER GET MAXHP FORM PLAYER NOT ENCOUNTER
+					if(entity.entityType == 'player') {
+						stats = {
+							maxHp: parseInt(this.players[key].maxHp),
+							curHp: parseInt(entity.curHp),
+						}
+					} else {
+						stats = {
+							maxHp: parseInt(entity.maxHp),
+							curHp: parseInt(entity.curHp),
+						}
 					}
 				}
 				return stats

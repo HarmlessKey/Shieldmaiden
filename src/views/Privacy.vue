@@ -40,7 +40,7 @@
 		<p>We may change this policy from time to time, and if we do we'll post any changes on this page. If you continue to use Harmless Key after those changes are in effect, you agree to the revised policy. If the changes are significant, we may provide more prominent notice or get your consent as required by law.</p>
 		
 		<p>How can you contact us?<br/>
-		You can contact us by emailing <a href="mailto:keyroos@gmail.com">keyroos@gmail.com</a></p>
+		You can contact us by emailing <a href="mailto:harmlesskey@gmail.com">harmlesskey@gmail.com</a></p>
 	</div>
 </template>
 

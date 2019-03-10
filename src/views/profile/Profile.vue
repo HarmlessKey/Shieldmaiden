@@ -6,7 +6,7 @@
 					<div class="img" :style="{'background-image': 'url(' + user.photoURL + ')'}"></div>
 				</b-col>
 				<b-col>
-					<h2>{{ user.displayName}}</h2>
+					<h2 v-if="userInfo">{{ userInfo.username }}</h2>
 					<p class="info">
 						<span class="gray-hover">Created:</span> {{ makeDate(user.metadata.creationTime) }}<br/>
 						<span class="gray-hover">Last login:</span> {{ makeDate(user.metadata.lastSignInTime) }}
@@ -16,26 +16,23 @@
 		</b-card>
 
 		<b-card header="Data">
-			<b-row v-if="campaigns && players && npcs">
-				<b-col md="4">
+			<b-row>
+				<b-col md="4" v-if="campaigns">
 					<h2>
 						Campaigns: 
 						<span :class="{ 'green': true, 'red': Object.keys(campaigns).length == 2 }">{{ Object.keys(campaigns).length }} </span>
-						<!-- / 2 -->
 					</h2>
 				</b-col>
-				<b-col md="4">
+				<b-col md="4" v-if="players">
 					<h2>
 						Players:
 						<span :class="{ 'green': true, 'red': Object.keys(players).length == 6 }">{{ Object.keys(players).length }} </span>
-						<!-- / 6 -->
 					</h2>
 				</b-col>
-				<b-col md="4">
+				<b-col md="4" v-if="npcs">
 					<h2>
 						NPC's: 
 						<span :class="{ 'green': true, 'red': Object.keys(npcs).length == 6 }">{{ Object.keys(npcs).length }} </span>
-						<!-- / 10 -->
 					</h2>
 				</b-col>
 			</b-row>
@@ -71,6 +68,7 @@ export default {
 				'campaigns',
 				'players',
 				'npcs',
+				'userInfo',
 			]),
 			...mapGetters({
 				user: 'getUser'

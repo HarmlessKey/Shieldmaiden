@@ -3,6 +3,7 @@ import Compendium from '@/views/Compendium/Overview.vue';
 import Monsters from '@/views/Compendium/Monsters.vue';
 import Spells from '@/views/Compendium/Spells.vue';
 import Conditions from '@/views/Compendium/Conditions.vue';
+
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import Documentation from '@/views/Documentation.vue';
@@ -13,7 +14,12 @@ import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 import Settings from '@/views/Settings.vue';
+
+import Admin from '@/views/Admin/Overview.vue';
+import Users from '@/views/Admin/Users.vue';
+
 import Profile from '@/views/profile/Profile.vue';
+import Username from '@/views/profile/SetUsername.vue';
 import DeleteAccount from '@/views/profile/DeleteAccount.vue';
 import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
@@ -156,12 +162,18 @@ export const routes = [{
 {
 	path: '/profile',
 	name: 'profile',
-	component: Profile
+	component: Profile,
+	meta: {
+		requiresAuth: true
+	}
 },
 {
 	path: '/profile/delete-account',
 	name: 'deleteAccount',
-	component: DeleteAccount
+	component: DeleteAccount,
+	meta: {
+		requiresAuth: true
+	}
 },
 {
 	path: '/settings',
@@ -171,6 +183,48 @@ export const routes = [{
 		basePath: '/settings',
 		title: 'Settings',
 		requiresAuth: true
+	}
+},
+{
+	path: '/set-username',
+	name: 'Username',
+	component: Username,
+},
+
+//ADMIN
+{
+	path: '/admin',
+	name: 'Admin',
+	component: Admin,
+	meta: {
+		basePath: '/admin',
+		title: 'admin',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/users',
+	name: 'Users',
+	component: Users,
+	meta: {
+		baseName: 'Users',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/users/:id',
+	name: 'User',
+	component: Users,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/admin',
+		baseName: 'Users',
+		requiresAuth: true,
+		requiresAdmin: true
 	}
 },
 

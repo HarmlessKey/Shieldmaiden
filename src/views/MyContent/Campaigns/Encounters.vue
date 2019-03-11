@@ -47,10 +47,19 @@
 				</b-input-group-append>				
 			</b-input-group>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
-			
-			<!-- <h2 v-show="encounters === null" class="mt-3 d-flex justify-content-between">
-				<i class="fas fa-arrow-up gray-hover"></i> Add your first encounter <i class="fas fa-arrow-up gray-hover"></i>
-			</h2> -->
+
+			<!-- BROADCAST -->
+			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'] == true, 'bg-gray': broadcasting['.value'] == false }">
+				<template v-if="broadcasting['.value'] == true">
+					<h3><i class="fas fa-play"></i> Broadcasting (click to stop)</h3>
+					<p class="mb-0">You are broadcasting your encounters. Anyone with the track encounter link, can follow your encounter.</p>
+					<i>Turn this off when you are not running a session and building/testing your encounters.</i>
+				</template>
+				<template v-else>
+					<h3><i class="fas fa-stop"></i> Not Broadcasting <span class="gray-hover">(click to start)</span></h3>
+					<p class="mb-0">Start broadcasting to share your encounters with your players. They can follow your encounters through your personalised link above.</p>
+				</template>
+			</div>
 
 			<!-- SHOW ENCOUNTERS -->
 			<h2 class="mt-3">
@@ -259,6 +268,14 @@
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 			}
 		},
+		firebase() {
+			return {
+				broadcasting: {
+					source: db.ref(`track/${this.user.uid}/broadcast`),
+					asObject: true
+				}
+			}
+		},
 		mounted() {
 			this.fetchEncounters({
 				cid: this.campaignId, 
@@ -396,6 +413,12 @@
 			// 	console.log(evt.draggedContext.index, '->', evt.draggedContext.futureIndex)
 			// 	console.log("MOVED")
 			// }
+			broadcast(broadcast) {
+				if(broadcast == false) { broadcast = true }
+				else { broadcast = false }
+
+				db.ref(`track/${this.user.uid}/broadcast`).set(broadcast)
+			},
 		}
 	}
 </script>
@@ -403,11 +426,30 @@
 <style lang="scss" scoped>
 .container-fluid {
 	padding: 20px;
-}
-.loader {
-	margin-top: 20px;
-}
-.copy {
-	word-wrap: break-word;
+
+	.loader {
+		margin-top: 20px;
+	}
+	.copy {
+		word-wrap: break-word;
+	}
+	.broadcast {
+		cursor: pointer;
+		margin: 20px 0;
+		padding: 20px;
+
+		&.bg-green {
+			color: #fff;
+			animation: blink normal 3s infinite ease-in-out;
+		}
+		h3 {
+			margin-bottom: 5px;
+		}
+	}
+	@keyframes blink {
+    0% { background-color: rgba(131, 181, 71, 1) }
+    50% { background-color: rgba(131, 181, 71, 0.5) }
+    100% { background-color: rgba(131, 181, 71, 1) }
+	}
 }
 </style>

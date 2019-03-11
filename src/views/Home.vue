@@ -3,7 +3,7 @@
 		<div id="home">
 			<section>
 				<div class="container">
-					<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker. <span class="gray-hover">BETA</span></h1>
+					<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker.</h1>
 					<h2 class="text-center">The initiative tracker for D&D 5e.</h2>
 
 					<div v-if="user" class="d-flex justify-content-center mt-5">

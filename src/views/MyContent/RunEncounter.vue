@@ -148,11 +148,10 @@
 				'reset_store',
 			]),
 			track() {
-				var track = {
+				db.ref('track/' + this.userId).update({
 					campaign: this.$route.params.campid,
 					encounter: this.$route.params.encid,
-				}
-				db.ref('track/' + this.userId).set(track);
+				});
 			},
 			setAlive(n) {
 				this.alive = n;

@@ -17,6 +17,17 @@
 						<!-- <li><router-link to="/about-us">About us</router-link></li> -->
 					</ul>
 				</b-col>
+				<b-col sm="">
+					<h2 class="gray-light">Folluow us</h2>
+					<ul>
+						<li>
+							<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon">Facebook</a>
+						</li>
+						<li>
+							<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" v-b-tooltip.hover title="Reddit" class="icon">Reddit</a>
+						</li>
+					</ul>
+				</b-col>
 				<b-col sm="" v-if="user">
 					<h2 class="gray-light">Your content</h2>
 					<ul>

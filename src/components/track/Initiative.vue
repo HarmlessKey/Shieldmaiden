@@ -61,6 +61,9 @@
 								<template v-else-if="percentage(entity.curHp, entity.maxHp) <= 33 ">
 									<span class="red"><i class="fas fa-heartbeat"></i></span>
 								</template>
+								<template v-else-if="percentage(entity.curHp, entity.maxHp) < 100 ">
+									<span class="orange"><i class="fas fa-heart"></i></span>
+								</template>
 								<template v-else>
 									<span class="green"><i class="fas fa-heart"></i></i></span>
 								</template>

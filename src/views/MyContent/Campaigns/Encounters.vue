@@ -49,8 +49,8 @@
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- BROADCAST -->
-			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'] == true, 'bg-gray': broadcasting['.value'] == false }">
-				<template v-if="broadcasting['.value'] == true">
+			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'], 'bg-gray': !broadcasting['.value'] }">
+				<template v-if="broadcasting['.value']">
 					<h3><i class="fas fa-play"></i> Broadcasting (click to stop)</h3>
 					<p class="mb-0">You are broadcasting your encounters. Anyone with the track encounter link, can follow your encounter.</p>
 					<i>Turn this off when you are not running a session and building/testing your encounters.</i>

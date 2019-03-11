@@ -1,10 +1,10 @@
 <template>
 <div>
-	<div class="text-center p-5" v-if="broadcasting['.value'] == false">
+	<div class="text-center p-5" v-if="!broadcasting['.value']">
 		<h2>User is currently not broadcasting.</h2>
 		<p>Were you sneaky trying to meta game? Taking a quick peek at what your DM is doing?<br/> Don't ruin the game for yourself...</p>
 	</div>
-	<div class="track" v-if="encounter && broadcasting['.value'] == true" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+	<div class="track" v-if="encounter && broadcasting['.value']" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 		<div class="not-started" v-if="encounter.finished == true">
 			<Finished v-if="playerSettings.loot == true" :encounter="encounter"/>
 			<h2 v-else class="padding">Encounter Finished</h2>

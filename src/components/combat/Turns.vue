@@ -15,6 +15,12 @@
 					<a class="dropdown-item" @click="slide('track')"><i class="far fa-desktop"></i> Track Settings</a>
 					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
+
+				<!-- BROADCASTING -->
+				<a @click="broadcast(broadcasting['.value'])">
+					<i v-show="!broadcasting['.value']" v-b-tooltip.hover title="Start broadcasting" class="fas fa-play gray-light ml-2"></i>
+					<i v-show="broadcasting['.value']" v-b-tooltip.hover title="Stop broadcasting" class="fas fa-stop gray-light ml-2"></i>
+				</a>
 			</h1>
 
 		<div class="round-info">
@@ -62,7 +68,15 @@
 		props: ['active_len', 'current'],
 		data () {
 			return {
-				// none
+				userId: this.$store.getters.getUser.uid,
+			}
+		},
+		firebase() {
+			return {
+				broadcasting: {
+					source: db.ref(`track/${this.userId}/broadcast`),
+					asObject: true
+				}
 			}
 		},
 		computed: {
@@ -185,6 +199,12 @@
 			},
 			finish() {
 				this.set_finished();
+			},
+			broadcast(broadcast) {
+				if(broadcast == false) { broadcast = true }
+				else { broadcast = false }
+
+				db.ref(`track/${this.userId}/broadcast`).set(broadcast)
 			},
 		}
 	}

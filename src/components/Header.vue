@@ -4,19 +4,25 @@
 			<div class="d-flex justify-content-left">
 				<router-link to="/">Harmless Key <span class="gray-hover">BETA</span></router-link>
 			</div>
-			<div class="d-flex justify-content-right">
-				<!-- <a href="#" v-b-tooltip.hover title="Facebook" ><i class="fab fa-facebook-f"></i></a> -->
-				<router-link v-if="user" to="/feedback" v-b-tooltip.hover title="Give Feedback" class="mx-2"><i class="fas fa-comment-alt"></i></router-link>
-				<a class="roll-dice" 
-					v-b-tooltip.hover 
-					title="Compendium"  
-					v-shortkey="['r']" @shortkey="showSlide('compendium')"
-					@click="showSlide('compendium')"><i class="fas fa-book-spells"></i></a>
-				<a class="roll-dice" 
-					v-b-tooltip.hover 
-					title="Dice Roller"  
-					v-shortkey="['r']" @shortkey="showSlide('roll')"
-					@click="showSlide('roll')"><i class="fas fa-dice-d20"></i></a>
+			<div class="d-flex justify-content-end">
+				<div class="area d-flex justify-content-end">
+					<!-- <a href="https://www.patreon.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Patreon" class="icon patreon"><i class="fab fa-patreon"></i></a> -->
+					<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon"><i class="fab fa-facebook-f"></i></a>
+					<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" v-b-tooltip.hover title="Reddit" class="icon"><i class="fab fa-reddit-alien"></i></a>
+					<router-link v-if="user" class="icon" to="/feedback" v-b-tooltip.hover title="Give Feedback"><i class="fas fa-comment-alt"></i></router-link>
+				</div>
+				<div class="area d-flex justify-content-end">
+					<a class="icon" 
+						v-b-tooltip.hover 
+						title="Compendium"  
+						v-shortkey="['r']" @shortkey="showSlide('compendium')"
+						@click="showSlide('compendium')"><i class="fas fa-book-spells"></i></a>
+					<a class="icon" 
+						v-b-tooltip.hover 
+						title="Dice Roller"  
+						v-shortkey="['r']" @shortkey="showSlide('roll')"
+						@click="showSlide('roll')"><i class="fas fa-dice-d20"></i></a>
+				</div>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
 						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
@@ -75,10 +81,30 @@ a {
 		text-decoration: none;
 	}
 }
-a.user, a.roll-dice	{
+a.icon {
+	cursor: pointer;
+	font-size: 13px;
+	text-align: center;
+	height: 24px;
+	width: 24px;
+	margin-left: 3px;
+	line-height: 24px !important;
+	border-radius: 50%;
+
+	&.patreon {
+		color: rgb(232, 91, 70) !important;
+	}
+	&:hover {
+		color: #fff !important;
+		background: #262626;
+	}
+}
+a.user	{
 	cursor: pointer;
 	font-size: 15px;
-	padding: 0 10px;
+	padding: 0 5px 5px 10px;
+	line-height: 25px !important;
+	display: block;
 
 	.img {
 		margin-top: 3px;
@@ -90,8 +116,13 @@ a.user, a.roll-dice	{
 		background-position: center top;
 	}
 }
+.area {
+	padding: 3px 10px;
+	border-right: solid 1px #494747;
+	height: 30px;
+}
 .dropdown-menu {
-	top: 7px !important;
+	top: -2px !important;
 	left: 10px !important;
 }
 </style>

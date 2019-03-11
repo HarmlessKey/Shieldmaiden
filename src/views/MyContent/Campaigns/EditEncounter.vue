@@ -161,11 +161,11 @@
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
-												<input class="" type="number" min="1" name="name" placeholder="1" value="1"  />
-												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(npc['.key'], 'npc', npc.name)">
+												<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
+												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, false)">
 													<i class="fas fa-plus"></i>
 												</a>
-												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(npc['.key'], 'npc', npc.name, false, true)">
+												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, false, true)">
 													<i class="fas fa-dice-d20"></i>
 												</a>
 											</div>
@@ -190,11 +190,11 @@
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
-													<input class="" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[npc.id]" />
+													<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
 													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
 														<i class="fas fa-plus"></i>
 													</a>
-													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(key, 'npc', npc.name, true, true)">
+													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(key, 'npc', npc.name, true, true)">
 														<i class="fas fa-dice-d20"></i>
 													</a>
 												</div>
@@ -457,9 +457,12 @@
 				}
 			},
 			multi_add(id,type,name,custom=false,rollHp=false) {
-
-				console.log(this.to_add[id])
-				this.add(id,type,name,custom,rollHp)
+				if (!this.to_add[id]) {
+					this.to_add[id] = 1
+				}
+				for (let i = 0; i < this.to_add[id]; i++ ) {
+					this.add(id,type,name,custom,rollHp)
+				}
 			},
 			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
@@ -660,6 +663,21 @@ ul.nav {
 		
 // 	}
 // }
+
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.multi_nr {
+	width: 45px;
+	height: 30px;
+}
 .npc {
 	padding: 15px;
 	position: fixed;

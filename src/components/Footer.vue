@@ -18,7 +18,7 @@
 					</ul>
 				</b-col>
 				<b-col sm="">
-					<h2 class="gray-light">Folluow us</h2>
+					<h2 class="gray-light">Follow us</h2>
 					<ul>
 						<li>
 							<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon">Facebook</a>

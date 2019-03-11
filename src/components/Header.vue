@@ -2,7 +2,7 @@
 	<header>
 		<div id="header" class="d-flex justify-content-between">
 			<div class="d-flex justify-content-left">
-				<router-link to="/">Harmless Key <span class="gray-hover">BETA</span></router-link>
+				<router-link to="/">Harmless Key <span class="gray-hover d-none d-md-inline">BETA</span></router-link>
 			</div>
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">

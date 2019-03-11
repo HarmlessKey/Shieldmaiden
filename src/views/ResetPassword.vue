@@ -4,7 +4,7 @@
 		<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 		<p v-if="success" class="green"><i class="fas fa-check"></i> {{ success }}</p>
 		
-		<b-form-input type="text" v-model="email" name="email" placeholder="Email" class="email"></b-form-input>
+		<b-form-input autocomplete="off" type="text" v-model="email" name="email" placeholder="Email" class="email"></b-form-input>
 		<button class="btn btn-block mt-3" @click="resetPassword()">Reset password <i class="fas fa-redo fa-flip-horizontal"></i></button>
 
 		<p class="text-center mt-3"><small><router-link to="/sign-in">Sign in.</router-link></small></p>

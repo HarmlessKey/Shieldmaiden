@@ -12,7 +12,7 @@
 								<label for="player_name">Player *</label>
 							</b-col>
 							<b-col sm="10">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									id="player_name" 
 									type="text" 
 									:class="{'input': true, 'error': errors.has('player_name') }" 
@@ -31,7 +31,7 @@
 								<label for="character_name">Character *</label>
 							</b-col>
 							<b-col sm="10">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									id="character_name" 
 									type="text" 
 									:class="{'input': true, 'error': errors.has('character_name') }" 
@@ -50,7 +50,7 @@
 								<label for="avatar">Avatar</label>
 							</b-col>
 							<b-col sm="10">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									id="avatar" 
 									type="text" 
 									:class="{'input': true, 'error': errors.has('avatar') }"
@@ -74,7 +74,7 @@
 					<b-row>
 							<b-col class="col-4">
 								<label for="level">Level</label>
-								<b-form-input id="level" 
+								<b-form-input autocomplete="off"  id="level" 
 									type="number" 
 									min="1"
 									max="20"
@@ -88,7 +88,7 @@
 							</b-col>
 							<b-col class="col-4">
 								<label for="maxHp">HP *</label>
-								<b-form-input id="maxHp" 
+								<b-form-input autocomplete="off"  id="maxHp" 
 									type="number" 
 									min="1"
 									:class="{'input': true, 'error': errors.has('maxHp') }" 
@@ -101,7 +101,7 @@
 							</b-col>
 							<b-col class="col-4">
 								<label for="ac">AC *</label>
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									id="ac" 
 									min="1"
 									type="number" 
@@ -126,7 +126,7 @@
 								</label>
 							</b-col>
 							<b-col class="col-9">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									:id="ability.ability" 
 									type="number" 
 									v-model="player[ability.ability]" 

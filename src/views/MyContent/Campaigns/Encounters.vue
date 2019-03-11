@@ -28,12 +28,13 @@
 					</p>
 				
 					<p><a @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a></p>
-					<input type="hidden" id="copy" :value="copy">
+					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</b-col>
 			</b-row>
 			
 			<b-input-group>
-				<b-form-input 
+				<b-form-input
+					autocomplete="off" 
 					type="text" 
 					:class="{'input': true, 'error': errors.has('newEncounter') }"
 					v-model="newEncounter"

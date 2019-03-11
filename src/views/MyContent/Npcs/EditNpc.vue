@@ -10,7 +10,7 @@
 			<b-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
 				
 				<div class="input-group mb-3">
-					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+					<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 					<div class="input-group-append">
 						<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
 					</div>
@@ -40,7 +40,7 @@
 						<b-row>
 							<b-col sm="2"><label for="name">Name *</label></b-col>
 							<b-col>
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									v-b-tooltip.hover title="Name"
 									type="text" 
 									class="form-control mb-2" 
@@ -60,7 +60,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="size">Size</label></b-col>
 								<b-col>
-									<b-form-input
+									<b-form-input autocomplete="off" 
 										v-b-tooltip.hover title="Size"
 										type="text" 
 										class="form-control mb-2" 
@@ -78,7 +78,7 @@
 								<b-row>
 									<b-col sm="4"><label for="type">Type</label></b-col>
 									<b-col sm="8">
-										<b-form-input
+										<b-form-input autocomplete="off" 
 											v-b-tooltip.hover title="Type"
 											type="text" 
 											class="form-control mb-2" 
@@ -94,7 +94,7 @@
 								<b-row>
 									<b-col sm="4"><label for="subtype">Subtype</label></b-col>
 									<b-col sm="8">
-										<b-form-input
+										<b-form-input autocomplete="off" 
 											v-b-tooltip.hover title="Subtype"
 											type="text"
 											class="form-control mb-2"
@@ -111,7 +111,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="alignment">Alignment</label></b-col>
 							<b-col>
-								<b-form-input v-b-tooltip.hover title="Alignment"
+								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Alignment"
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.alignment" 
@@ -125,7 +125,7 @@
 						<b-row>
 							<b-col sm="2"><label for="speed">Speed</label></b-col>
 							<b-col>
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									v-b-tooltip.hover title="Speed"
 									type="text" 
 									class="form-control mb-2" 
@@ -140,7 +140,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="senses">Senses</label></b-col>
 							<b-col>
-								<b-form-input v-b-tooltip.hover title="Senses" 
+								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Senses" 
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.senses" 
@@ -154,7 +154,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="languages">Languages</label></b-col>
 							<b-col>
-								<b-form-input v-b-tooltip.hover title="Languages" 
+								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Languages" 
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.languages" 
@@ -184,7 +184,7 @@
 						<b-row>
 							<b-col sm="2"><label for="avatar">Avatar</label></b-col>
 							<b-col>
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									v-b-tooltip.hover title="Avatar"
 									type="text" 
 									class="form-control" 
@@ -210,7 +210,7 @@
 				<b-row>
 					<b-col class="col">
 						<label for="ac">Armor Class *</label>
-						<b-form-input 
+						<b-form-input autocomplete="off"  
 							v-b-tooltip.hover title="Armor Class"
 							type="number" 
 							class="form-control" 
@@ -225,7 +225,7 @@
 					</b-col>
 					<b-col class="col">
 						<label for="hp">Hit Points *</label>
-						<b-form-input 
+						<b-form-input autocomplete="off"  
 							v-b-tooltip.hover title="Hit Points"
 							type="number" 
 							class="form-control" 
@@ -240,7 +240,7 @@
 					</b-col>
 					<b-col class="col" v-if="quick == false">
 						<label for="hitdice">Hit Dice</label>
-						<b-form-input
+						<b-form-input autocomplete="off" 
 							v-b-tooltip.hover title="Hit Dice"
 							type="text" 
 							class="form-control" 
@@ -272,7 +272,7 @@
 								</label>
 							</b-col>
 							<b-col class="col-9">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									:id="ability.ability" 
 									type="number" 
 									v-model="npc[ability.ability]" 
@@ -289,7 +289,7 @@
 								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
 							</b-col>
 							<b-col class="col-9">
-								<b-form-input 
+								<b-form-input autocomplete="off"  
 									:id="ability.ability+'_save'" 
 									type="number" 
 									v-model="npc[ability.ability+'_save']" 
@@ -312,6 +312,7 @@
 										</b-col>
 										<b-col class="col-7">
 											<input 
+												autocomplete="off"
 												type="number" 
 												class="form-control mr-2 text-capitalize" 
 												v-model="npc[skill]" 
@@ -328,6 +329,7 @@
 										</b-col>
 										<b-col class="col-7">
 											<input 
+												autocomplete="off"
 												type="number" 
 												class="form-control mr-2 text-capitalize" 
 												v-model="npc[skill]" 
@@ -346,7 +348,7 @@
 					<b-row>
 						<b-col md="4"><label for="dmg_vul">Damage Vulerabilities</label></b-col>
 						<b-col>
-							<b-form-input type="text"
+							<b-form-input autocomplete="off"  type="text"
 								v-b-tooltip.hover title="Damage Vulnerabilities" 
 								class="form-control mb-2" 
 								v-model="npc.damage_vulnerabilities" 
@@ -359,7 +361,7 @@
 					<b-row>
 						<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
 						<b-col>
-							<b-form-input 
+							<b-form-input autocomplete="off"  
 								v-b-tooltip.hover title="Damage Resistances" 
 								type="text" 
 								class="form-control mb-2" 
@@ -373,7 +375,7 @@
 					<b-row>
 						<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
 						<b-col>
-							<b-form-input 
+							<b-form-input autocomplete="off"  
 								v-b-tooltip.hover title="Damage Immunities" 
 								type="text" 
 								class="form-control mb-2" 
@@ -387,7 +389,7 @@
 					<b-row>
 						<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
 						<b-col>	
-							<b-form-input 
+							<b-form-input autocomplete="off"  
 								v-b-tooltip.hover title="Condition Immnunities" 
 								type="text" 
 								class="form-control mb-2" 
@@ -429,7 +431,7 @@
 									<label for="name">Name</label>
 								</b-col>
 								<b-col sm="10">
-									<b-form-input
+									<b-form-input autocomplete="off" 
 										id="name"
 										type="text" 
 										class="form-control" 
@@ -444,7 +446,7 @@
 									<label for="damage_dice">Damage Dice</label>
 								</b-col>
 								<b-col sm="10">
-									<b-form-input
+									<b-form-input autocomplete="off" 
 										id="damage_dice"
 										type="text" 
 										class="form-control" 
@@ -463,7 +465,7 @@
 									<label for="damage_bonus">Damage Bonus</label>
 								</b-col>
 								<b-col sm="10">
-									<b-form-input
+									<b-form-input autocomplete="off" 
 										id="damage_bonus"
 										type="number" 
 										class="form-control" 
@@ -477,7 +479,7 @@
 									<label for="attack_bonus">Attack Bonus</label>
 								</b-col>
 								<b-col sm="10">
-									<b-form-input
+									<b-form-input autocomplete="off" 
 										id="attack_bonus"
 										type="number" 
 										class="form-control" 

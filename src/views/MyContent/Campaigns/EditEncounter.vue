@@ -10,13 +10,15 @@
 				<b-row class="mt-3">
 					<b-col class="mb-2">
 						<input class="form-control" 
+							autocomplete="off"
 							v-validate="'required'" 
 							data-vv-as="Encounter Name" 
 							type="text" name="name" 
 							v-model="encounter.encounter"/>
 						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2" 
+						<input class="form-control mt-2"
+							autocomplete="off" 
 							v-validate="'url'" type="text" 
 							name="backbround" 
 							data-vv-as="Background"
@@ -142,7 +144,7 @@
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">
-										<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+										<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
 											<button class="btn"><i class="fas fa-search"></i></button>
 										</div>
@@ -161,7 +163,7 @@
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
-												<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
+												<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
 												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, false)">
 													<i class="fas fa-plus"></i>
 												</a>
@@ -190,7 +192,7 @@
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
-													<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
+													<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
 													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
 														<i class="fas fa-plus"></i>
 													</a>
@@ -276,15 +278,15 @@
 					<b-row class="mb-5">
 						<b-col class="d-flex justify-content-between">
 							<span class="coins mr-2 yellow"><i class="fas fa-coins"></i></span>
-							<input class="form-control" type="number" min="0" name="name" v-model="loot.gp" placeholder="GP"/>
+							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.gp" placeholder="GP"/>
 						</b-col>
 						<b-col class="d-flex justify-content-between">
 							<span class="coins mr-2"><i class="fas fa-coins"></i></span> 
-							<input class="form-control" type="number" min="0" name="name" v-model="loot.sp" placeholder="SP"/>
+							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.sp" placeholder="SP"/>
 						</b-col>
 						<b-col class="d-flex justify-content-between">
 							<span class="coins mr-2 orange"><i class="fas fa-coins"></i></span>
-							<input class="form-control" type="number" min="0" name="name" v-model="loot.cp" placeholder="CP"/>
+							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.cp" placeholder="CP"/>
 						</b-col>
 					</b-row>
 

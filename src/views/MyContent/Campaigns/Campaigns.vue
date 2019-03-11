@@ -11,6 +11,7 @@
 					<div class="input-group">
 						<input type="text" 
 							class="form-control" 
+							autocomplete="off"
 							:class="{'input': true, 'error': errors.has('newCampaign') }" 
 							v-model="newCampaign" 
 							v-validate="'required'"

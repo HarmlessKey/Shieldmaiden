@@ -7,7 +7,7 @@
 			<b-row>
 				<b-col sm="8">
 					<b-input-group class="mb-3">
-						<input class="form-control" type="text" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
+						<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
 						<b-input-group-append>
 							<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
 						</b-input-group-append>

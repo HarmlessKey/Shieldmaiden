@@ -11,7 +11,7 @@
 			</p>
 
 			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchMonster()" placeholder="Search monsters" />
+				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchMonster()" placeholder="Search monsters" />
 				<b-input-group-append>
 					<button class="btn" @click="searchMonster()"><i class="fas fa-search"></i></button>
 				</b-input-group-append>

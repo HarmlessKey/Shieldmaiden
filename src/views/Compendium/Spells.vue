@@ -13,7 +13,7 @@
 			</p>
 
 			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchSpell()" placeholder="Search spells" />
+				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchSpell()" placeholder="Search spells" />
 				<b-input-group-append>
 					<button class="btn" @click="searchSpell()"><i class="fas fa-search"></i></button>
 				</b-input-group-append>

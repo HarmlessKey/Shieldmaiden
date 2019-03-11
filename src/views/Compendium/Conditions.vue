@@ -11,7 +11,7 @@
 			</p>
 
 			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchCondition()" placeholder="Search conditions" />
+				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchCondition()" placeholder="Search conditions" />
 				<b-input-group-append>
 					<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
 				</b-input-group-append>

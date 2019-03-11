@@ -12,6 +12,7 @@
 					<div class="input-group mb-4" v-if="campaign">
 						<input class="form-control" 
 							v-validate="'required'" 
+							autocomplete="off"
 							type="text" 
 							name="newCampaign" 
 							v-model="campaign.campaign" 

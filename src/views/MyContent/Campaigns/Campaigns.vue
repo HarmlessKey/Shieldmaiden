@@ -219,6 +219,11 @@
 				a:hover {
 					color: #b2b2b2 !important;
 				}
+				span {
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 			}
 			.card-body {
 				.col {

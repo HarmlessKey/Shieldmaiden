@@ -101,6 +101,9 @@
 						entity.key = key
 						return entity.active && !entity.down;
 					})
+					.orderBy(function(entity) {
+						return entity.name
+					}, 'asc')
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
 					} , 'desc')

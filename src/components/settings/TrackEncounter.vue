@@ -67,26 +67,50 @@
 				<span><i class="fas fa-heart gray-hover"></i> Health</span>
 
 				<div>
+
 					<div v-show="!npc.health">
 						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
+						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'npc', 'health', 'obscured')" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
+						</a>
 						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
 						</a>
 					</div>
-					<div v-show="npc.health == true">
+					<div v-show="npc.health === true">
 						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="gray-light mr-2">
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
+						</a>
+						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'npc', 'health', 'obscured')" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
 						</a>
 						<span v-b-tooltip.hover title="Shown" class="green">
 							<span class="d-none d-md-inline mr-1">Shown</span>
 							<i class="fas fa-eye"></i>
 						</span>
 					</div>
+					<div v-show="npc.health === 'obscured'">
+						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Hide</span>
+							<i class="fas fa-eye-slash"></i>
+						</a>
+						<span v-b-tooltip.hover title="Obscured" class="orange mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
+						</span>
+						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="gray-light">
+							<span class="d-none d-md-inline mr-1">Show</span>
+							<i class="fas fa-eye"></i>
+						</a>
+					</div>
+
 				</div>
 			</li>
 			<li class="d-flex justify-content-between">
@@ -154,6 +178,10 @@
 							<span class="d-none d-md-inline mr-1">Hidden</span>
 							<i class="fas fa-eye-slash"></i>
 						</span>
+						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'player', 'health', 'obscured')" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
+						</a>
 						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="gray-light">
 							<span class="d-none d-md-inline mr-1">Show</span>
 							<i class="fas fa-eye"></i>
@@ -164,10 +192,28 @@
 							<span class="d-none d-md-inline mr-1">Hide</span>
 							<i class="fas fa-eye-slash"></i>
 						</a>
+						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'player', 'health', 'obscured')" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
+						</a>
 						<span v-b-tooltip.hover title="Shown" class="green">
 							<span class="d-none d-md-inline mr-1">Shown</span>
 							<i class="fas fa-eye"></i>
 						</span>
+					</div>
+					<div v-show="player.health === 'obscured'">
+						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'health', false)" class="gray-light mr-2">
+							<span class="d-none d-md-inline mr-1">Hide</span>
+							<i class="fas fa-eye-slash"></i>
+						</a>
+						<span v-b-tooltip.hover title="Obscured" class="orange mr-2">
+							<span class="d-none d-md-inline mr-1">Obsc</span>
+							<i class="fas fa-question-circle"></i>
+						</span>
+						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="gray-light">
+							<span class="d-none d-md-inline mr-1">Show</span>
+							<i class="fas fa-eye"></i>
+						</a>
 					</div>
 				</div>
 			</li>
@@ -255,6 +301,7 @@
 		},
 		methods: {
 			set(action, entity, type, value) {
+				console.log(value)
 				if(action == 'set') {
 					db.ref(`settings/${this.userId}/track/${entity}/${type}`).set(value);
 				}

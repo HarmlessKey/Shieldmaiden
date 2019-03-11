@@ -161,10 +161,11 @@
 												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
-												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(npc['.key'], 'npc', npc.name)">
+												<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
+												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, false)">
 													<i class="fas fa-plus"></i>
 												</a>
-												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(npc['.key'], 'npc', npc.name, false, true)">
+												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, false, true)">
 													<i class="fas fa-dice-d20"></i>
 												</a>
 											</div>
@@ -173,7 +174,7 @@
 									<template v-if="npcs">
 										<h2>Custom NPC's</h2>
 										<ul class="entities hasImg">
-											<li v-for="(npc, key) in npcs" 
+											<li v-for="(npc, key) in npcs"
 												:key="key" 
 												class="d-flex justify-content-between">
 												<div class="d-flex justify-content-left">
@@ -189,10 +190,11 @@
 													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
-													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="add(key, 'npc', npc.name, true)">
+													<b-form-input class="multi_nr" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
+													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
 														<i class="fas fa-plus"></i>
 													</a>
-													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="add(key, 'npc', npc.name, true, true)">
+													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(key, 'npc', npc.name, true, true)">
 														<i class="fas fa-dice-d20"></i>
 													</a>
 												</div>
@@ -343,6 +345,8 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
+	import _ from 'lodash'
+
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 	import { difficulty } from '@/mixins/difficulty.js'
@@ -372,6 +376,7 @@
 				slide: this.$store.getters.getSlide,
 				searching: false,
 				encDifficulty: undefined,
+				to_add: {}
 			} 
 		},
 		firebase() {
@@ -452,6 +457,15 @@
 					})
 				}
 			},
+			multi_add(id,type,name,custom=false,rollHp=false) {
+				if (!this.to_add[id]) {
+					this.to_add[id] = 1
+				}
+				for (let i = 0; i < this.to_add[id]; i++ ) {
+					this.add(id,type,name,custom,rollHp)
+				}
+				this.to_add[id] = 1
+			},
 			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
 					id: id,
@@ -464,6 +478,24 @@
 
 				if(type == 'npc') {
 					entity.active = true
+					let last = -1
+					let n = 0
+					for (let i in this.encounter.entities) {
+						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
+						let id = this.encounter.entities[i].id
+						if (match[1].trim() == entity.name) {
+							n++
+							if (parseInt(match[3]) > last) {
+								last = parseInt(match[3])
+							}
+						}
+					}
+					if (last > 0) {
+						entity.name = `${entity.name} (${++last})`
+					} else if (n > 0) {
+						entity.name = `${entity.name} (${n})`
+						
+					}
 					
 					if(custom == false) {
 						var npc_data = this.monsters[id - 1];
@@ -633,6 +665,23 @@ ul.nav {
 		
 // 	}
 // }
+
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.multi_nr {
+	width: 45px;
+	height: 30px;
+	text-align: center;
+	margin-left: 4px;
+}
 .npc {
 	padding: 15px;
 	position: fixed;

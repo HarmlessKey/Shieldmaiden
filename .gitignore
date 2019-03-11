@@ -24,3 +24,6 @@ yarn-error.log*
 
 # Firebase
 firebase.js
+
+# Deploy script
+deploy.sh

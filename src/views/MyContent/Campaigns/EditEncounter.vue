@@ -463,6 +463,7 @@
 				for (let i = 0; i < this.to_add[id]; i++ ) {
 					this.add(id,type,name,custom,rollHp)
 				}
+				this.to_add[id] = 1
 			},
 			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
@@ -677,6 +678,8 @@ input[type='number'] {
 .multi_nr {
 	width: 45px;
 	height: 30px;
+	text-align: center;
+	margin-left: 4px;
 }
 .npc {
 	padding: 15px;

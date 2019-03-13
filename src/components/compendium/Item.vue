@@ -1,0 +1,216 @@
+<template>
+	<div>
+		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/items/'+id" target="_blank">https://harmlesskey.com/compendium/items/{{ id }}</a></small>
+		<Crumble v-else :name="item.name"/>
+
+		<div v-if="loading" class="loader"> <span>Loading item....</span></div>
+
+		<h1 class="itemTitle">
+			{{ item.name }}
+			<a v-if="userInfo && userInfo.admin && !edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit"><i class="fas fa-pencil-alt"></i></a>
+			<a v-if="userInfo && userInfo.admin && edit" @click="setEdit(false)" v-b-tooltip.hover title="Cancel"><i class="fas fa-times"></i></a>
+		</h1>
+
+		<!-- EDIT -->
+		<template v-if="userInfo && userInfo.admin && edit">
+			<b-row class="mb-2 mt-3">
+				<b-col sm="2"><label>Name</label></b-col>
+				<b-col>
+					<b-form-input type="text" placeholder="Item name" v-model="item.name" :value="item.name"/>
+				</b-col>
+			</b-row>
+			<b-row class="mb-2">
+				<b-col sm="2"><label>Type</label></b-col>
+				<b-col>
+					<b-form-input type="text" placeholder="Item type" v-model="item.type" :value="item.type"/>
+				</b-col>
+			</b-row>
+			<b-row class="mb-2">
+				<b-col sm="2"><label>Rarity</label></b-col>
+				<b-col>
+					<b-form-input type="text" placeholder="Rarity" v-model="item.rarity" :value="item.rarity"/>
+				</b-col>
+			</b-row>
+			<b-row class="mb-2">
+				<b-col sm="2"><label>Attunement</label></b-col>
+				<b-col>
+					<b-form-input type="text" placeholder="Attunement" v-model="item.requires_attunement" :value="item.requires_attunement"/>
+				</b-col>
+			</b-row>
+			<b-row class="mb-2">
+				<b-col sm="2"><label>Description</label></b-col>
+				<b-col>
+					<textarea type="text" class="form-control" rows="10" placeholder="Description" v-model="item.desc"></textarea>
+				</b-col>
+			</b-row>
+
+			<!-- TABLE -->
+			<h2>Info Table</h2>
+			<template v-if="item.table">
+				<b-row class="table-row">
+					<b-col v-for="(col, i) in item.table.columns" :key="i">
+						<b-form-input v-model="item.table.header[i]" placeholder="Column header"/>
+					</b-col>
+				</b-row>
+				<b-row v-for="(row, i) in item.table.rows" :key="i" class="table-row">
+					<b-col v-for="(col, index) in item.table.rows[i].columns" :key="index">
+						<b-form-input v-model="item.table.rows[i].columns[index]" placeholder=""/>
+					</b-col>
+				</b-row>
+				<a @click="addRow()" class="btn btn-block mt-4">Add Row</a>
+			</template>
+			<b-row v-else>
+				<b-col sm="2">
+					<b-form-select name="columns" v-model="columns">
+						<option >Columns</option>
+						<option v-for="i in 5" :value="i" :key="i">{{ i }}</option>
+					</b-form-select>
+				</b-col>
+				<b-col>
+					<a @click="addTable()">Add table</a>
+				</b-col>
+			</b-row>
+
+			<a @click="editItem()" class="btn btn-block mt-4">Save</a>
+
+		</template>
+
+		<!-- VIEW -->
+		<template v-else>
+			<i class="mb-3 d-block">
+				{{ item.type }}, 
+				<span :class="{ 
+					'white': item.rarity == 'common',
+					'green': item.rarity == 'uncommon',
+					'blue': item.rarity == 'rare',
+					'purple': item.rarity == 'very rare',
+					'orange': item.rarity == 'legendary',
+					'red-light': item.rarity == 'artifact',
+					}">
+					{{ item.rarity }}
+				</span>
+				<template v-if="item.requires_attunement"> ( {{ item.requires_attunement }} )</template>
+			</i>
+
+			<p style="white-space: pre-line">{{ item.desc }}</p>
+			<table class="table" v-if="item.table">
+				<thead>
+					<th v-for="head in item.table.header" :key="head">{{ head }}</th>
+				</thead>
+				<tbody>
+					<tr v-for="(row, i) in item.table.rows" :key="i">
+						<td v-for="(col, i) in item.table.rows[i].columns" :key="i">
+							{{ col }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+	</div>
+</template>
+
+<script>
+	import { db } from '@/firebase'
+	import Crumble from '@/components/crumble/Compendium.vue'
+	import { mapGetters } from 'vuex';
+
+	export default {
+		name: 'Item',
+		components: {
+			Crumble,
+		},
+		props: ['id'],
+		metaInfo() {
+			return {
+				title: this.item.name + ' | D&D 5th Edition',
+				meta: [
+          { vmid: 'description', name: 'description', content: 'D&D 5th Edition Item: ' + this.item.name }
+        ]
+			}
+		},
+		beforeMount() {
+			//Because the component is loaded
+			//in another view, the scroll needs to be reset to 0
+			window.scrollTo(0,0);
+		},
+		data() {
+			return {
+				loading: true,
+				edit: false,
+				columns: undefined,
+			}
+		},
+		computed: {
+			...mapGetters([
+				'userInfo'
+			]),
+		},
+		firebase() {
+			return {
+				item: {
+					source: db.ref(`items/${this.id}`),
+					asObject: true,
+					readyCallback: () => this.loading = false
+				}
+			}
+		},
+		methods: {
+			setEdit(value) {
+				this.edit = value
+			},
+			addTable() {
+				if(this.columns !== undefined) {
+					if(this.item.table == undefined) {
+						this.item.table = [];
+					}
+					this.item.table.columns = this.columns
+					this.item.table.header = []
+					this.item.table.rows = []
+				}
+				this.$forceUpdate();
+			},
+			addRow() {
+				var cols = []
+
+				for(let i = 1; i <= this.item.table.columns; i++) {
+					cols.push('column '+ i)
+				}
+				this.item.table.rows.push({
+					columns: cols
+				})
+				this.$forceUpdate();
+			},
+			editItem() {
+				this.$validator.validateAll().then((result) => {
+					delete this.item['.key']
+					if (result) {
+						db.ref(`items/${this.id}/`).set(this.item);
+						this.edit = false;
+					} else {
+						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
+						});
+					}
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+ .itemTitle {
+		margin-bottom: 5px;
+
+		i {
+			font-size: 15px;
+		}
+ }
+	.table-row {
+		padding: 10px 0;
+		border-bottom: solid 1px #494747;
+	}
+	table {
+		th:first-child, td:first-child {
+			width: 0%;
+		}
+	}
+</style>

@@ -22,7 +22,16 @@
 				<h2>Tier: {{ tier.name }}</h2>
 				<p>Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</p>
 
-				<h3>Benefits:</h3>
+				<h3>Your benefits:</h3>
+				<ul>
+					<li v-for="(benefit, key) in tier.benefits" :key="key">
+						<template v-if="key == 'adds'">Adds are removed</template>
+						<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
+						<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
+						<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>
+						<template v-if="key == 'npcs'"><span class="green">{{ benefit }}</span> NPC slots</template>
+					</li>
+				</ul>
 			</div>
 		</div>
 

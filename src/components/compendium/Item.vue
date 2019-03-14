@@ -7,8 +7,11 @@
 
 		<h1 class="itemTitle">
 			{{ item.name }}
-			<a v-if="userInfo && userInfo.admin && !edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit"><i class="fas fa-pencil-alt"></i></a>
-			<a v-if="userInfo && userInfo.admin && edit" @click="setEdit(false)" v-b-tooltip.hover title="Cancel"><i class="fas fa-times"></i></a>
+			<span v-if="userInfo && userInfo.admin ">
+				<a v-if="!edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit"><i class="fas fa-pencil-alt"></i></a>
+				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel"><i class="fas fa-times"></i></a>
+				<a @click="checked()" :class="{'gray-hover': !item.checked, 'green': item.checked}">Item checked</a>
+			</span>
 		</h1>
 
 		<!-- EDIT -->
@@ -191,6 +194,9 @@
 						});
 					}
 				})
+			},
+			checked() {
+				db.ref(`items/${this.id}/checked`).set(true);
 			}
 		}
 	}

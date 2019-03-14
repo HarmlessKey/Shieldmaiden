@@ -21,6 +21,5 @@ yarn-error.log*
 *.sln
 *.sw*
 
-
-# Firebase
-firebase.js
+# SECRET KEYS
+secret.js

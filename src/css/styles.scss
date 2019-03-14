@@ -30,6 +30,7 @@ $blue: #2c97de;
 $blue-hover: #247db7;
 $red: #cc3e4a;
 $red-hover: #a3303a;
+$patreon-red: #e85b46;
 $orange: #e76d3b;
 $yellow: #c1b947;
 $purple: #9b7aba;
@@ -102,6 +103,7 @@ html body {
 .green { color: $green !important; }
 .blue { color: $blue!important; }
 .red { color: $red !important; }
+.patreon-red { color: $patreon-red !important; }
 .orange { color: $orange !important; }
 .yellow { color: $yellow !important; }
 .purple { color: $purple !important; }
@@ -121,6 +123,7 @@ html body {
 .bg-green { background-color: $green !important; }
 .bg-blue { background-color: $blue !important; }
 .bg-red { background-color: $red !important; }
+.bg-patreon-red { background-color: $patreon-red !important; }
 .bg-orange { background-color: $orange !important; }
 .bg-yellow { background-color: $yellow !important; }
 .bg-purple { background-color: $purple !important; }

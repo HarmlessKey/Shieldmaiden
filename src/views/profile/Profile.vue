@@ -15,6 +15,13 @@
 			</b-row>
 		</b-card>
 
+		<div class="card" v-if="userInfo">
+			<div class="card-header"><i class="fab fa-patreon patreon-red"></i> Patreon</div>
+			<div class="card-body">
+				<button v-if="!userInfo.patronId" @click="linkPatreon()" class="btn btn-block bg-patreon-red">Link your Patreon</button>
+			</div>
+		</div>
+
 		<b-card header="Data">
 			<b-row>
 				<b-col class="text-center">
@@ -72,6 +79,11 @@ export default {
 				resetSuccess: undefined,
 			}
 		},
+		firebase() {
+			return {
+				patron: db.ref('patrons').orderByChild('email').equalTo(this.user.email)
+			}
+		},
 		computed: {
 			...mapGetters([
 				'campaigns',
@@ -114,6 +126,9 @@ export default {
 					vm.error = err.message;
 				});
 			},
+			linkPatreon() {
+				db.ref(`users/${this.user.uid}/patronId`).set(this.patron[0]['.key'])
+			}
 		}
 	}
 </script>

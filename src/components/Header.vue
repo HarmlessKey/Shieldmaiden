@@ -55,10 +55,10 @@
 			}
 		},
 		computed: {
-		...mapGetters([
-			'userInfo'
-		]),
-	},
+			...mapGetters([
+				'userInfo'
+			]),
+		},
 		methods: {
 			...mapActions([
 				'setSlide'

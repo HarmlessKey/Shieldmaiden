@@ -1,8 +1,10 @@
 import Home from '@/views/Home.vue';
+
 import Compendium from '@/views/Compendium/Overview.vue';
 import Monsters from '@/views/Compendium/Monsters.vue';
 import Spells from '@/views/Compendium/Spells.vue';
 import Conditions from '@/views/Compendium/Conditions.vue';
+import Items from '@/views/Compendium/Items.vue';
 
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
@@ -108,6 +110,26 @@ export const routes = [{
 	meta: {
 		basePath: '/compendium',
 		baseName: 'Conditions',
+	}
+},
+{
+	path: '/compendium/items',
+	name: 'Items',
+	component: Items,
+	meta: {
+		baseName: 'items',
+	}
+},
+{
+	path: '/compendium/items/:id',
+	name: 'Item',
+	component: Items,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/compendium',
+		baseName: 'items',
 	}
 },
 

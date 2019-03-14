@@ -39,6 +39,11 @@
 						url: 'conditions',
 						icon: 'fas fa-skull-crossbones',
 					},
+					// 'items': { 
+					// 	name: 'Items',
+					// 	url: 'items',
+					// 	icon: 'fas fa-treasure-chest',
+					// },
 					'monsters': { 
 						name: 'Monsters',
 						url: 'monsters',
@@ -79,9 +84,11 @@
 		ul.entities {
 			li {
 				.img {
+					border: none;
+					background: none;
 					text-align: center;
 					font-size: 20px;
-					line-height: 46px;
+					line-height: 48px;
 				}
 			}
 		}

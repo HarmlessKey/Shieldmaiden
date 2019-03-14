@@ -29,6 +29,7 @@
 						<i v-else class="fas fa-user"></i>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right">
+						<router-link v-if="userInfo && userInfo.admin" to="/admin" class="dropdown-item"><i class="fas fa-crown"></i> Admin</router-link>
 						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
 						<router-link to="/campaigns" class="dropdown-item"><i class="fas fa-treasure-chest"></i> My Content</router-link>
 						<router-link to="/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</router-link>
@@ -44,13 +45,19 @@
 
 <script>
 	import { auth } from '@/firebase';
-	import { mapActions } from 'vuex';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		data() {
 			return {
-				user: auth.currentUser
+				user: auth.currentUser,
+				// admin: this.$store.getters.userInfo.admin
 			}
+		},
+		computed: {
+			...mapGetters([
+				'userInfo'
+			]),
 		},
 		methods: {
 			...mapActions([

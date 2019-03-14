@@ -64,6 +64,9 @@
 			Initiative,
 			Meters,
 		},
+		metaInfo: {
+			title: 'Harmless Key'
+		},
 		data() {
 			return {
 				userId: this.$route.params.userid,

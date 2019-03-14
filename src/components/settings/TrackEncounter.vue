@@ -7,266 +7,63 @@
 
 		<h3>General</h3>
 		<ul class="settings">
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-swords gray-hover"></i> Damage Meters</span>
-
+			<li v-for="(setting, key) in general" class="d-flex justify-content-between" :key="key">
+				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
-					<div v-show="player.meters === false">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'meters')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="player.meters === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'meters', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
-				</div>
-			</li>
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-treasure-chest gray-hover"></i> Loot</span>
-
-				<div>
-					<div v-show="!player.loot">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'player', 'loot', true)" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="player.loot == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'player', 'loot')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
+					<a v-for="option in setting.options" 
+						v-b-tooltip.hover 
+						:title="[ option.value == player[key] ? option.name : option.action ]" 
+						:key="option.name" 
+						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
+						:class="[ option.value == player[key] ? option.color : 'gray-light' ]">
+							<span class="d-none d-md-inline mr-1">
+								<template v-if="option.value == player[key]">{{ option.name }}</template>
+								<template v-if="option.value != player[key]">{{ option.action }}</template>
+							</span>
+							<i :class="option.icon"></i>
+					</a>
 				</div>
 			</li>
 		</ul>
 
 		<h3>NPC settings</h3>
 		<ul class="settings">
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart gray-hover"></i> Health</span>
-
+			<li v-for="(setting, key) in npcs" class="d-flex justify-content-between" :key="key">
+				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
-
-					<div v-show="!npc.health">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'npc', 'health', 'obscured')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</a>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="npc.health === true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'npc', 'health', 'obscured')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
-					<div v-show="npc.health === 'obscured'">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'health')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Obscured" class="orange mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'health', true)" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-
-				</div>
-			</li>
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
-
-				<div>
-					<div v-show="!npc.ac">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'npc', 'ac', true)" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="npc.ac == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'npc', 'ac')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
-				</div>
-			</li>
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
-
-				<div>
-					<div v-show="npc.conditions === false">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'npc', 'conditions')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="npc.conditions === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'npc', 'conditions', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
+					<a v-for="option in setting.options" 
+						v-b-tooltip.hover 
+						:title="[ option.value == npc[key] ? option.name : option.action ]" 
+						:key="option.name" 
+						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
+						:class="[ option.value == npc[key] ? option.color : 'gray-light' ]">
+							<span class="d-none d-md-inline mr-1">
+								<template v-if="option.value == npc[key]">{{ option.name }}</template>
+								<template v-if="option.value != npc[key]">{{ option.action }}</template>
+							</span>
+							<i :class="option.icon"></i>
+					</a>
 				</div>
 			</li>
 		</ul>
 
 		<h3>Player settings</h3>
 		<ul class="settings">
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-heart gray-hover"></i> Health</span>
-
+			<li v-for="(setting, key) in players" class="d-flex justify-content-between" :key="key">
+				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
-					<div v-show="player.health === false">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'player', 'health', 'obscured')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</a>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="player.health === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'health', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<a v-b-tooltip.hover title="Obscure" @click="set('set', 'player', 'health', 'obscured')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
-					<div v-show="player.health === 'obscured'">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'health', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Obscured" class="orange mr-2">
-							<span class="d-none d-md-inline mr-1">Obsc</span>
-							<i class="fas fa-question-circle"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'health')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-				</div>
-			</li>
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-shield gray-hover"></i> Armor Class</span>
-
-				<div>
-					<div v-show="player.ac === false">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'ac')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="player.ac === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'ac', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
-				</div>
-			</li>
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-skull-crossbones gray-hover"></i> Conditions</span>
-
-				<div>
-					<div v-show="player.conditions === false">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('unset', 'player', 'conditions')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="player.conditions === undefined">
-						<a v-b-tooltip.hover title="Hide" @click="set('set', 'player', 'conditions', false)" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
+					<a v-for="option in setting.options" 
+						v-b-tooltip.hover 
+						:title="[ option.value == player[key] ? option.name : option.action ]" 
+						:key="option.name" 
+						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
+						:class="[ option.value == player[key] ? option.color : 'gray-light' ]">
+							<span class="d-none d-md-inline mr-1">
+								<template v-if="option.value == player[key]">{{ option.name }}</template>
+								<template v-if="option.value != player[key]">{{ option.action }}</template>
+							</span>
+							<i :class="option.icon"></i>
+					</a>
 				</div>
 			</li>
 		</ul>
@@ -285,6 +82,86 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
+				general: {
+					'meters': { 
+						entity: 'player',
+						name: 'Damage Meters', 
+						icon: 'fas fa-swords',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'loot': { 
+						entity: 'player',
+						name: 'Loot', 
+						icon: 'fas fa-treasure-chest',
+						options: {
+							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+				},
+				npcs: {
+					'health': { 
+						entity: 'npc',
+						name: 'Health', 
+						icon: 'fas fa-heart',
+						options: {
+							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
+							2: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'ac': { 
+						entity: 'npc',
+						name: 'Armor Class', 
+						icon: 'fas fa-shield',
+						options: {
+							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'conditions': { 
+						entity: 'npc',
+						name: 'Conditions', 
+						icon: 'fas fa-skull-crossbones',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+				},
+				players: {
+					'health': { 
+						entity: 'player',
+						name: 'Health', 
+						icon: 'fas fa-heart',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
+							2: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'ac': { 
+						entity: 'player',
+						name: 'Armor Class', 
+						icon: 'fas fa-shield',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'conditions': { 
+						entity: 'player',
+						name: 'Conditions', 
+						icon: 'fas fa-skull-crossbones',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+				}
 			}
 		},
 		firebase() {
@@ -300,13 +177,11 @@
 			}
 		},
 		methods: {
-			set(action, entity, type, value) {
-				console.log(value)
-				if(action == 'set') {
-					db.ref(`settings/${this.userId}/track/${entity}/${type}`).set(value);
-				}
-				if(action == 'unset') {
+			setSetting(entity, type, value) {
+				if(value == undefined) {
 					db.ref(`settings/${this.userId}/track/${entity}/${type}`).remove();
+				} else {
+					db.ref(`settings/${this.userId}/track/${entity}/${type}`).set(value);
 				}
 			},
 			setDefault() {

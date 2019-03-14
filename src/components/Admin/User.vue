@@ -5,7 +5,26 @@
 		<div v-if="loading" class="loader"> <span>Loading user....</span></div>
 
 		<h1>{{ user.username }}</h1>
-		<i class="gray-hover">{{ user['.key'] }}</i>
+		<p class="mb-5"><i class="gray-hover">{{ user['.key'] }}</i></p>
+
+		<h2>Data</h2>
+		<p class="data">
+			<span class="type gray-hover">Campaigns: </span> 
+			<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
+			<template v-else>0</template></br>
+			
+			<span class="type gray-hover">Encounters: </span>
+			<template v-if="encounters">{{ encounter_count }}</template>
+			<template v-else>0</template></br>
+
+			<span class="type gray-hover">Players: </span> 
+			<template v-if="players">{{ Object.keys(players).length }}</template>
+			<template v-else>0</template></br>
+
+			<span class="type gray-hover">NPC's: </span> 
+			<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
+			<template v-else>0</template></br>
+		</p>
 
 
 	</div>
@@ -42,7 +61,23 @@
 					source: db.ref(`users/${this.id}`),
 					asObject: true,
 					readyCallback: () => this.loading = false
+				},
+				campaigns: db.ref(`campaigns/${this.id}`),
+				encounters: db.ref(`encounters/${this.id}`),
+				players: db.ref(`players/${this.id}`),
+				npcs: db.ref(`npcs/${this.id}`),
+			}
+		},
+		computed: {
+			encounter_count() {
+				var count = 0;
+				
+				for(let cKey in this.campaigns) {
+					for(let eKey in this.encounters[cKey]) {
+						if(eKey != '.key') { count++ }
+					}
 				}
+				return count
 			}
 		},
 		methods: {
@@ -51,25 +86,15 @@
 </script>
 
 <style lang="scss" scoped>
-	h1 {
+	h1, h2 {
 		margin-bottom: 5px !important;
 	}
-	.url {
-		display: block;
-		margin-bottom: 15px;
-		word-break: break-all;
-	}
-	ul {
-		margin-top: 20px;
-		padding: 20px;
+	.data {
+		line-height: 25px;
 
-		li {
-			margin-bottom: 20px;
-		}
-
-		&.exhaustion {
-			list-style: none;
-			padding: 0;
+		.type {
+			display: inline-block;
+			width: 150px;
 		}
 	}
 </style>

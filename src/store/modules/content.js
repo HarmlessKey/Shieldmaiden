@@ -10,6 +10,7 @@ export const content_module = {
 	state: {
 		user: {},
 		userInfo: undefined,
+		tier: undefined,
 		slide: {},
 
 		campaign: undefined,
@@ -27,6 +28,9 @@ export const content_module = {
 		},
 		userInfo: function(state) {
 			return state.userInfo;
+		},
+		tier: function(state) {
+			return state.tier;
 		},
 		getSlide: function(state) {
 			return state.slide;
@@ -59,6 +63,9 @@ export const content_module = {
 		},
 		SET_USERINFO(state, payload) {
 			state.userInfo = payload;
+		},
+		SET_TIER(state, payload) {
+			state.tier = payload;
 		},
 		setSlide(state, value) {
 			if(state.slide.type != value.type) {
@@ -96,7 +103,21 @@ export const content_module = {
 			let user = users_ref.child(state.user.uid)
 			user.on('value', snapshot => {
 				commit('SET_USERINFO', snapshot.val())
-			})
+				
+				//Fetch patron info with email
+				let email = snapshot.val().email
+				let patrons = db.ref('patrons').orderByChild('email').equalTo(email)
+
+				patrons.on('value' , (snapshot) => {
+					//Fetch tier info with patron info
+					for(let key in snapshot.val()) {
+						let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
+						tiers.on('value' , (snapshot) => {
+							commit('SET_TIER', snapshot.val())
+						});
+					}
+				});
+			});
 		},
 		setSlide({ commit }, value) {
 			commit('setSlide', value);

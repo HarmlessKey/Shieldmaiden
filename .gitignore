@@ -22,8 +22,8 @@ yarn-error.log*
 *.sw*
 
 
-# Firebase
-firebase.js
-
 # Deploy script
 deploy.sh
+
+# SECRET KEYS
+secret.js

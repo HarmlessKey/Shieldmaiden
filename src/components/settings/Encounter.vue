@@ -1,74 +1,40 @@
 <template>
 	<div>
 		<ul class="settings">
-			<li class="d-flex justify-content-between">
-				<span>
-					<i class="fas fa-calculator gray-hover"></i> Automate
-					<a data-toggle="collapse" class="ml-1" :href="'#automate'" 
-						role="button" aria-expanded="false">
-						<i class="fas fa-info"></i>
-					</a>
-				</span>
-
-				<div>
-					<div v-show="settings.automate === false">
-						<span v-b-tooltip.hover title="Not Automated" class="red mr-1">
-							<span class="d-none d-md-inline mr-1">Not Automated</span>
-							<i class="fas fa-times"></i>
-						</span>
-						<a v-b-tooltip.hover title="Automate" @click="set('unset', 'automate')" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Automate</span>
-							<i class="fas fa-check"></i>
+			<li v-for="(setting, key) in general" :key="key">
+				<div class="d-flex justify-content-between">
+					<span>
+						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+						<a v-if="key == 'automate'" data-toggle="collapse" class="ml-1" :href="'#'+key" 
+							role="button" aria-expanded="false">
+							<i class="fas fa-info"></i>
 						</a>
-					</div>
-					<div v-show="settings.automate === undefined">
-						<a v-b-tooltip.hover title="Don't Automate" @click="set('set', 'automate', false)" class="gray-light mr-1">
-							<span class="d-none d-md-inline mr-1">Don't</span>
-							<i class="fas fa-times"></i>
+					</span>
+					<div>
+						<a v-for="option in setting.options" 
+							v-b-tooltip.hover 
+							:title="[ option.value == settings[key] ? option.name : option.action ]" 
+							:key="option.name" 
+							@click="setSetting(key, option.value)" class="ml-2"
+							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]">
+								<span class="d-none d-md-inline mr-1">
+									<template v-if="option.value == settings[key]">{{ option.name }}</template>
+									<template v-if="option.value != settings[key]">{{ option.action }}</template>
+								</span>
+								<i :class="option.icon"></i>
 						</a>
-						<span v-b-tooltip.hover title="Automated" class="green">
-							<span class="d-none d-md-inline mr-1">Automated</span>
-							<i class="fas fa-check"></i>
-						</span>
 					</div>
 				</div>
-			</li>
-			<li class="collapse px-4 bg-gray-darker" id="automate">
-				<p><b>Automate.</b> When you check the automate setting, some actions in an encounter will be done automatically.</p>
+				<div v-if="key == 'automate'" class="collapse px-4 bg-gray-darker" id="automate">
+					<p><b>Automate.</b> When you check the automate setting, some actions in an encounter will be done automatically.</p>
 
-				<p>At the moment only one action is dependent on the automate function.</p>
+					<p>At the moment only one action is dependent on the automate function.</p>
 
-				<p><b>Death Saving Throws</b><br/>
-					When a down player receives damage, it will automatically get a failed death saving throw. 
-					If the "critical hit" checkbox is checked, two death saves will be failed.<br/>
-					Even a character that is stable at 0 hit points will automatically fail saves when taking damage.
-				</p>
-			</li>
-
-			<li class="d-flex justify-content-between">
-				<span><i class="fas fa-image gray-hover"></i> Background Image</span>
-
-				<div>
-					<div v-show="!settings.background">
-						<span v-b-tooltip.hover title="Hidden" class="red mr-2">
-							<span class="d-none d-md-inline mr-1">Hidden</span>
-							<i class="fas fa-eye-slash"></i>
-						</span>
-						<a v-b-tooltip.hover title="Show" @click="set('set', 'background', true)" class="gray-light">
-							<span class="d-none d-md-inline mr-1">Show</span>
-							<i class="fas fa-eye"></i>
-						</a>
-					</div>
-					<div v-show="settings.background == true">
-						<a v-b-tooltip.hover title="Hide" @click="set('unset', 'background')" class="gray-light mr-2">
-							<span class="d-none d-md-inline mr-1">Hide</span>
-							<i class="fas fa-eye-slash"></i>
-						</a>
-						<span v-b-tooltip.hover title="Shown" class="green">
-							<span class="d-none d-md-inline mr-1">Shown</span>
-							<i class="fas fa-eye"></i>
-						</span>
-					</div>
+					<p><b>Death Saving Throws</b><br/>
+						When a down player receives damage, it will automatically get a failed death saving throw. 
+						If the "critical hit" checkbox is checked, two death saves will be failed.<br/>
+						Even a character that is stable at 0 hit points will automatically fail saves when taking damage.
+					</p>
 				</div>
 			</li>
 		</ul>
@@ -84,6 +50,24 @@
 		data(){
 			return {
 				userId: this.$store.getters.getUser.uid,
+				general: {
+					'automate': { 
+						name: 'Automate', 
+						icon: 'fas fa-calculator',
+						options: {
+							0: { value: false, name: 'Not Automated', action: 'Don\'t', icon: 'fas fa-times', color: 'red' },
+							1: { value: undefined, name: 'Automate', action: 'Automate', icon: 'fas fa-check', color: 'green' },
+						}
+					},
+					'background': { 
+						name: 'Bakcground Image', 
+						icon: 'fas fa-image',
+						options: {
+							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+				},
 			}
 		},
 		firebase() {
@@ -95,12 +79,11 @@
 			}
 		},
 		methods: {
-			set(action, type, value) {
-				if(action == 'set') {
-					db.ref(`settings/${this.userId}/encounter/${type}`).set(value);
-				}
-				if(action == 'unset') {
+			setSetting(type, value) {
+				if(value == undefined) {
 					db.ref(`settings/${this.userId}/encounter/${type}`).remove();
+				} else {
+					db.ref(`settings/${this.userId}/encounter/${type}`).set(value);
 				}
 			},
 			setDefault() {
@@ -111,5 +94,9 @@
 </script>
 
 <style lang="scss" scoped>
-	
+	.collapse {
+		border-top: solid 1px #494747;
+		margin-top: 20px;
+		padding: 20px;
+	}
 </style>

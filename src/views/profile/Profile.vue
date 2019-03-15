@@ -15,23 +15,25 @@
 			</b-row>
 		</b-card>
 
-		<div class="card" v-if="tier">
+		<div class="card">
 			<div class="card-header"><i class="fab fa-patreon patreon-red"></i> Patreon</div>
 			<div class="card-body">
-				<!-- <button v-if="!userInfo.patronId" @click="linkPatreon()" class="btn btn-block bg-patreon-red">Link your Patreon</button> -->
-				<h2>Tier: {{ tier.name }}</h2>
-				<p>Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</p>
+				<a v-if="!tier" href="https://www.patreon.com/harmlesskey" target="_blank" class="btn btn-block bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
+				<template v-else>
+					<h2>Tier: {{ tier.name }}</h2>
+					<p>Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</p>
 
-				<h3>Your benefits:</h3>
-				<ul>
-					<li v-for="(benefit, key) in tier.benefits" :key="key">
-						<template v-if="key == 'adds'">Adds are removed</template>
-						<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
-						<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
-						<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>
-						<template v-if="key == 'npcs'"><span class="green">{{ benefit }}</span> NPC slots</template>
-					</li>
-				</ul>
+					<h3>Your benefits:</h3>
+					<ul>
+						<li v-for="(benefit, key) in tier.benefits" :key="key">
+							<template v-if="key == 'adds'">Adds are removed</template>
+							<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
+							<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
+							<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>
+							<template v-if="key == 'npcs'"><span class="green">{{ benefit }}</span> NPC slots</template>
+						</li>
+					</ul>
+				</template>
 			</div>
 		</div>
 

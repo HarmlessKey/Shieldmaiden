@@ -58,12 +58,11 @@
 								<template v-if="entity.curHp == 0">
 									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
 								</template>
-								<template v-else-if="percentage(entity.curHp, entity.maxHp) <= 33 ">
-									<span class="red"><i class="fas fa-heartbeat"></i></span>
-								</template>
-								<template v-else>
-									<span class="green"><i class="fas fa-heart"></i></i></span>
-								</template>
+								<i v-else class="fas" :class="{
+										'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+										'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
+										'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+									}"></i>
 							</template>
 							<template v-else>
 								<span class="gray-hover">

@@ -520,7 +520,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import { db } from '@/firebase'
-	import { mapActions } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
 		name: 'Npcs',
@@ -576,6 +576,12 @@
 				npcs: db.ref(`monsters`),
 			}
 		},
+		computed: {
+			...mapGetters([
+				'tier',
+				'npcs',
+			]),
+		},
 		methods: {
 			...mapActions([
 				'fetchCampaign',
@@ -619,18 +625,22 @@
 				this.search = '';
 			},
 			addNpc() {
-				// THIS IS UGLY
-				delete this.npc['.value']
-				delete this.npc['.key']
-				// UGLY ENDS HERE
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref('npcs/' + this.userId).push(this.npc);
-						this.$router.replace('/npcs')
-					} else {
-						//console.log('Not valid');
-					}
-				})
+				if(Object.keys(this.npcs).length >= this.tier.benefits.npcs) {
+					this.$snotify.error('You have too many NPC\'s.', 'Error');
+				} else {
+					// THIS IS UGLY
+					delete this.npc['.value']
+					delete this.npc['.key']
+					// UGLY ENDS HERE
+					this.$validator.validateAll().then((result) => {
+						if (result) {
+							db.ref('npcs/' + this.userId).push(this.npc);
+							this.$router.replace('/npcs')
+						} else {
+							//console.log('Not valid');
+						}
+					})
+				}
 			},
 			editNpc() {
 				// THIS IS UGLY

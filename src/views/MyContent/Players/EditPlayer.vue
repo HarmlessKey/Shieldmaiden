@@ -145,6 +145,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
 	export default {
@@ -170,19 +171,29 @@
 				}
 			}
 		},
+		computed: {
+			...mapGetters([
+				'tier',
+				'players',
+			]),
+		},
 		methods: {
 			addPlayer() {
-				// THIS IS UGLY
-				delete this.player['.value']
-				delete this.player['.key']
+				if(Object.keys(this.players).length >= this.tier.benefits.players) {
+					this.$snotify.error('You have too many player.', 'Error');
+				} else {
+					// THIS IS UGLY
+					delete this.player['.value']
+					delete this.player['.key']
 
-				// UGLY ENDS HERE
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref('players/' + this.userId).push(this.player);
-						this.$router.replace('/players')
-					}
-				})
+					// UGLY ENDS HERE
+					this.$validator.validateAll().then((result) => {
+						if (result) {
+							db.ref('players/' + this.userId).push(this.player);
+							this.$router.replace('/players')
+						}
+					})
+				}
 			},
 			editPlayer() {
 				// THIS IS UGLY

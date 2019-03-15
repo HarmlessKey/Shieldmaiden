@@ -32,7 +32,7 @@
 				</b-col>
 			</b-row>
 			
-			<b-input-group>
+			<b-input-group v-if="!encounters || Object.keys(encounters).length < tier.benefits.encounters">
 				<b-form-input
 					autocomplete="off" 
 					type="text" 
@@ -47,6 +47,10 @@
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</b-input-group-append>				
 			</b-input-group>
+			<div class="red" v-else>
+				You have {{ Object.keys(encounters).length }} / {{ tier.benefits.encounters }} encounters.
+				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more encounters?</a>
+			</div>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- BROADCAST -->
@@ -65,7 +69,10 @@
 			<!-- SHOW ENCOUNTERS -->
 			<h2 class="mt-3">
 				Your Encounters 
-				<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
+				<span v-if="encounters">( 
+					<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
+					/ {{ tier.benefits.encounters }} )
+				</span>
 			</h2>
 
 			<table class="table table-hover">
@@ -284,6 +291,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'tier',
 				'encounters'
 			]),
 			_active_drag: function() {

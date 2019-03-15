@@ -6,13 +6,21 @@
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
 			<router-link to="/npcs/add-npc" 
+				v-if="!npcs || Object.keys(npcs).length < tier.benefits.npcs"
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add NPC
 			</router-link>
+			<div class="red" v-else>
+				You have {{ Object.keys(npcs).length }} / {{ tier.benefits.npcs }} NPC's.
+				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more NPC's?</a>
+			</div>
 		
-			<template v-if="npcs">
-				<h2 class="mt-3">NPC's ( {{ Object.keys(npcs).length }} )</h2>
+			<template v-if="npcs && tier">
+				<h2 class="mt-3">NPC's ( 
+					<span :class="{ 'green': true, 'red': Object.keys(npcs).length >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+							/ {{ tier.benefits.npcs }} )
+				</h2>
 				<table class="table">
 					<thead>
 						<th></th>
@@ -25,7 +33,7 @@
 						enter-active-class="animated flash"
 						leave-active-class="animated bounceOutLeft">
 						<tr v-for="(npc, index) in _npcs" :key="npc.key">
-							<td class="img" v-if="npc.avatar != ''" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></td>
+							<td class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></td>
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/monster.svg" />
 							</td>
@@ -86,6 +94,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'tier',
 				'npcs',
 				'campaigns',
 				'allEncounters',

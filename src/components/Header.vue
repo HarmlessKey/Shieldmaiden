@@ -37,7 +37,7 @@
 						<button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
 					</div>
 				</div>
-				<router-link v-else to="/sign-in">Sign in</router-link>
+				<router-link v-else to="/sign-in" class="ml-2">Sign in</router-link>
 			</div>
 		</div>
 	</header>

@@ -110,8 +110,18 @@ export const content_module = {
 
 				patrons.on('value' , (snapshot) => {
 					//Fetch tier info with patron info
-					for(let key in snapshot.val()) {
-						let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
+
+					//PATRONS
+					if(snapshot.val()) {
+						for(let key in snapshot.val()) {
+							let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
+							tiers.on('value' , (snapshot) => {
+								commit('SET_TIER', snapshot.val())
+							});
+						}
+					} else {
+						//NO PATRON
+						let tiers = db.ref(`tiers/basic`)
 						tiers.on('value' , (snapshot) => {
 							commit('SET_TIER', snapshot.val())
 						});

@@ -1,18 +1,25 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="players" class="container-fluid">
+		<div id="players" class="container-fluid" v-if="tier">
 			<h1>Your players</h1>
 			<p>These are the players that you can use in your campaigns.</p>
 
 			<router-link to="/players/add-player" 
+				v-if="!players || Object.keys(players).length < tier.benefits.players"
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add player
 			</router-link>
+			<div class="red" v-else>
+				You have {{ Object.keys(players).length }} / {{ tier.benefits.players }} players.
+				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more players?</a>
+			</div>
 
 			<template v-if="players">
-				<h2 class="mt-3">Players ( {{ Object.keys(players).length }} )</h2>
+				<h2 class="mt-3">Players ( 
+					<span :class="{ 'green': true, 'red': Object.keys(players).length >= tier.benefits.players }">{{ Object.keys(players).length }}</span>
+						 / {{ tier.benefits.players }} )</h2>
 				<table class="table">
 					<thead>
 						<th></th>
@@ -27,7 +34,7 @@
 						enter-active-class="animated flash"
 						leave-active-class="animated bounceOutLeft">
 						<tr v-for="(player, index) in _players" :key="player.key">
-							<td class="img" v-if="player.avatar != ''" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
+							<td class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/player.svg" />
 							</td>
@@ -93,6 +100,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'tier',
 				'players',
 				'campaigns',
 				'allEncounters',

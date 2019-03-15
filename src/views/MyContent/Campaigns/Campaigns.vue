@@ -7,8 +7,8 @@
 				<h1>Campaigns</h1>
 				<p>Welcome to your campaigns overview.</p>
 				
-				<template v-if="players">
-					<div class="input-group">
+				<template v-if="players && tier">
+					<div class="input-group" v-if="!campaigns || Object.keys(campaigns).length < tier.benefits.campaigns">
 						<input type="text" 
 							class="form-control" 
 							autocomplete="off"
@@ -24,16 +24,17 @@
 							<button class="btn"><i class="fas fa-plus"></i> Add</button>
 						</div>				
 					</div>
-					<!-- <div class="red" v-else="">You have 2/2 campaigns.</div> -->
+					<div class="red" v-else>
+						You have {{ Object.keys(campaigns).length }} / {{ tier.benefits.campaigns }} campaigns.
+						<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more campaigns?</a>
+					</div>
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-
-					<!-- <h2 v-show="campaigns === null" class="mt-3 px-2 d-flex justify-content-between"><i class="fas fa-arrow-up gray-hover">
-						</i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i>
-					</h2> -->
 
 					<h2 class="mt-3">
 						Your Campaigns 
-						<span v-if="campaigns">( {{ Object.keys(campaigns).length }} )</span>
+						<span v-if="campaigns && tier">( 
+							<span :class="{ 'green': true, 'red': Object.keys(campaigns).length >= tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
+							/ {{ tier.benefits.campaigns }} )</span>
 					</h2>
 
 					<transition-group 
@@ -79,7 +80,10 @@
 												<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
 												<i class="fas fa-swords"></i><br/>
 												<template v-if="allEncounters && allEncounters[campaign.key]">
-													{{ Object.keys(allEncounters[campaign.key]).length }}
+													<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
+														{{ Object.keys(allEncounters[campaign.key]).length }}
+													</span> 
+													/ {{ tier.benefits.encounters }}
 												</template>
 												<template v-else> Create</template>
 											</router-link>
@@ -126,6 +130,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'tier',
 				'campaigns',
 				'allEncounters',
 				'players',

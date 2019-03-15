@@ -33,7 +33,27 @@
 						</li>
 					</ul>
 				</template>
-				<a v-else href="https://www.patreon.com/harmlesskey" target="_blank" class="btn btn-block bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
+				<template v-else>
+					<b-row>
+						<b-col v-for="(tier, key) in tiers" :key="key">
+							<b-card :header="tier.name">
+								<h2>{{ tier.price }}</h2>
+								<i v-if="tier.price != 'Free'" class="gray-hover">per month</i>
+								<ul>
+									<li v-for="(benefit, key) in tier.benefits" :key="key">
+										<template v-if="key == 'adds'">Adds are removed</template>
+										<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
+										<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
+										<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>
+										<template v-if="key == 'npcs'"><span class="green">{{ benefit }}</span> NPC slots</template>
+									</li>
+								</ul>
+								<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+tier['.key']" target="_blank" class="btn btn-block bg-patreon-red">Join {{ tier.price }} tier</a>
+							</b-card>
+						</b-col>
+					</b-row>
+					<!-- <a href="https://www.patreon.com/harmlesskey" target="_blank" class="btn btn-block bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a> -->
+				</template>
 			</div>
 		</div>
 
@@ -97,11 +117,11 @@ export default {
 				resetSuccess: undefined,
 			}
 		},
-		// firebase() {
-		// 	return {
-		// 		patron: db.ref('patrons').orderByChild('email').equalTo(this.user.email),
-		// 	}
-		// },
+		firebase() {
+			return {
+				tiers: db.ref('tiers').orderByChild('order'),
+			}
+		},
 		computed: {
 			...mapGetters([
 				'campaigns',
@@ -145,9 +165,6 @@ export default {
 					vm.error = err.message;
 				});
 			},
-			// linkPatreon() {
-			// 	db.ref(`users/${this.user.uid}/patronId`).set(this.patron[0]['.key'])
-			// }
 		}
 	}
 </script>
@@ -166,6 +183,14 @@ export default {
 		span {
 			width: 80px;
 			display: inline-block;
+		}
+	}
+	.card {
+		.card {
+			ul {
+				list-style: none;
+				padding: 0;
+			}
 		}
 	}
 </style>

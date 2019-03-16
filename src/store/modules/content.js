@@ -135,6 +135,7 @@ export const content_module = {
 				else
 					state.overencumbered = false
 			}
+			console.log("TIER",state.tier)
 		},
 	},
 	actions: {
@@ -143,34 +144,47 @@ export const content_module = {
 		},
 		setUserInfo({ commit, state }) {
 			let user = users_ref.child(state.user.uid)
-			user.on('value', snapshot => {
-				commit('SET_USERINFO', snapshot.val())
+			user.on('value', user_snapshot => {
+				let user_info = user_snapshot.val()
+				commit('SET_USERINFO', user_info)
 				
 				//Fetch patron info with email
-				let email = snapshot.val().email
-				let patrons = db.ref('patrons').orderByChild('email').equalTo(email)
+				let email = user_info.email
 
-				patrons.on('value' , (snapshot) => {
-					//Fetch tier info with patron info
-
-					//PATRONS
-					if(snapshot.val()) {
-						let key = Object.keys(snapshot.val())[0]
-						let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
-						tiers.on('value', (snapshot) => {
-							commit('SET_TIER', snapshot.val())
+				// User always basic reward tier
+				let path = `tiers/basic`
+				// If user has voucher use this
+				if (user_info.voucher) {
+					path = `tiers/${user_info.voucher}`
+				}
+				let vouch_tiers = db.ref(`tiers/${user_info.voucher}`)
+				vouch_tiers.on('value', voucher_snap => {
+					// Get the order of voucher/basic
+					let voucher_order = voucher_snap.val().order
+					// Search email in patrons
+					let patrons = db.ref('patrons').orderByChild('email').equalTo(email)
+					patrons.on('value' , patron_snapshot => {
+						// If user patron check if patron tier is higher then voucher/basic tier
+						if(patron_snapshot.val()) {
+							let key = Object.keys(patron_snapshot.val())[0]
+							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
+							patron_tier.on('value' , tier_snapshot => {
+								if (tier_snapshot.val().order >= voucher_order) {
+									commit('SET_TIER', tier_snapshot.val())
+								} else {
+									commit('SET_TIER', voucher_snap.val())
+								}
+								commit('CHECK_ENCUMBRANCE');
+							});
+						}
+						// If not patron use voucher/basic tier
+						else {
+							commit('SET_TIER', voucher_snap.val())
 							commit('CHECK_ENCUMBRANCE');
-						})
-					} else {
-						//NO PATRON
-						let tiers = db.ref(`tiers/basic`)
-						tiers.on('value' , (snapshot) => {
-							commit('SET_TIER', snapshot.val())
-							commit('CHECK_ENCUMBRANCE');
-						});
-					}
-
+						}
+					})
 				})
+					
 
 				
 			});

@@ -151,20 +151,20 @@ export const content_module = {
 				//Fetch patron info with email
 				let email = user_info.email
 
+				// User always basic reward tier
 				let path = `tiers/basic`
+				// If user has voucher use this
 				if (user_info.voucher) {
 					path = `tiers/${user_info.voucher}`
 				}
 				let vouch_tiers = db.ref(`tiers/${user_info.voucher}`)
 				vouch_tiers.on('value', voucher_snap => {
+					// Get the order of voucher/basic
 					let voucher_order = voucher_snap.val().order
-					console.log("voucher", voucher_order)
-
+					// Search email in patrons
 					let patrons = db.ref('patrons').orderByChild('email').equalTo(email)
 					patrons.on('value' , patron_snapshot => {
-						//Fetch tier info with patron info
-
-						//PATRONS
+						// If user patron check if patron tier is higher then voucher/basic tier
 						if(patron_snapshot.val()) {
 							let key = Object.keys(patron_snapshot.val())[0]
 							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
@@ -177,6 +177,7 @@ export const content_module = {
 								commit('CHECK_ENCUMBRANCE');
 							});
 						}
+						// If not patron use voucher/basic tier
 						else {
 							commit('SET_TIER', voucher_snap.val())
 							commit('CHECK_ENCUMBRANCE');

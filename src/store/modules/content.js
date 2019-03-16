@@ -20,6 +20,8 @@ export const content_module = {
 		players: undefined,
 		npcs: undefined,
 
+		poster: undefined,
+
 	},
 	getters: {
 		getUser: function(state) {
@@ -97,6 +99,11 @@ export const content_module = {
 			user.on('value', snapshot => {
 				commit('SET_USERINFO', snapshot.val())
 			})
+			// if (state.poster) {
+			// 	user.poster = true
+			// 	console.log(user)
+			// 	// users_ref.child(state.user.uid).set(user)
+			// }
 		},
 		setSlide({ commit }, value) {
 			commit('setSlide', value);
@@ -163,12 +170,14 @@ export const content_module = {
 				commit('SET_CAMPAIGNS', snapshot.val())
 			})
 		},
-		setPoster({ commit }) {
+		setPoster({ commit, state }) {
 			db.ref('posters').once('value', snapshot => {
 				let count = snapshot.val()
 				console.log(count)
 				let new_count = count + 1
+
 				db.ref('posters').set(new_count)
+				state.poster = true
 			})
 			
 			console.log('commit poster')

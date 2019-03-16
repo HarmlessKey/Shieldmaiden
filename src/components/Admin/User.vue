@@ -32,7 +32,7 @@
 			<b-row>
 				<b-col class="col-3">
 					<b-form-group label="Tier">
-						<b-select v-model="user.voucher.id">
+						<b-select v-if="user.voucher" v-model="user.voucher.id">
 							<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
 						</b-select>
 					</b-form-group>

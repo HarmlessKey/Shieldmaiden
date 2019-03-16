@@ -26,6 +26,37 @@
 			<template v-else>0</template></br>
 		</p>
 
+		<b-card header="Voucher" class="mt-5">
+			<p>Gift user a subscription</p>
+		
+			<b-row>
+				<b-col class="col-3">
+					<b-form-group label="Tier">
+						<b-select v-model="user.voucher.id">
+							<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
+						</b-select>
+					</b-form-group>
+				</b-col>
+				<b-col class="col-3">
+					<b-form-group label="Duration">
+						<b-radio-group name="duration" v-model="duration">
+							<b-form-radio value="date">Till date</b-form-radio><br/>
+							<b-form-radio value="infinite">Till cancelled</b-form-radio>
+						</b-radio-group>
+					</b-form-group>
+				</b-col>
+				<b-col v-if="duration == 'date'">
+					<label>Date</label>
+					<b-form-input type="text"
+					v-validate="'required'"
+					data-vv-as="Date" 
+					name="date" 
+					placeholder="mm/dd/yyyy"/>
+					<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
+				</b-col>
+			</b-row>
+			<a class="btn" @click="setVoucher()">Save</a>
+		</b-card>
 
 	</div>
 </template>
@@ -53,6 +84,8 @@
 		data() {
 			return {
 				loading: true,
+				duration: 'date',
+				date: 'undefined'
 			}
 		},
 		firebase() {
@@ -62,6 +95,7 @@
 					asObject: true,
 					readyCallback: () => this.loading = false
 				},
+				tiers: db.ref('tiers').orderByChild('order'),
 				campaigns: db.ref(`campaigns/${this.id}`),
 				encounters: db.ref(`encounters/${this.id}`),
 				players: db.ref(`players/${this.id}`),
@@ -81,6 +115,16 @@
 			}
 		},
 		methods: {
+			setVoucher() {
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref(`users/${this.id}/voucher`).set({
+							id: this.user.voucher.id,
+							date: this.date
+						})
+					}
+				});
+			}
 		}
 	}
 </script>

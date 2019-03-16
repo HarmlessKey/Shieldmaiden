@@ -29,7 +29,7 @@
 		<p>Anyone that has the link, can follow your encounters. Other than that none of your information is shared with anyone.</p>
 		
 		<h3>What choices do you have about your information?</h3>
-		<p>You may close your account at any time, you can delete it under "you profile". All your data will be removed from our database.</p>
+		<p>You may close your account at any time, you can delete it under "your profile". All your data will be removed from our database.</p>
 				
 		<p>Our policy on children's information</p>
 		

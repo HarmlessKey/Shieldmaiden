@@ -14,7 +14,7 @@
 						<li><router-link to="/planned">Planned</router-link></li>
 						<li><router-link to="/updates">Updates</router-link></li>
 						<li><router-link to="/documentation">Documentation</router-link></li>
-						<!-- <li><router-link to="/about-us">About us</router-link></li> -->
+						<li><router-link to="/about-us">About us</router-link></li>
 					</ul>
 				</b-col>
 				<b-col sm="">

@@ -8,6 +8,7 @@ import Items from '@/views/Compendium/Items.vue';
 
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
+import AboutUs from '@/views/AboutUs.vue';
 import Documentation from '@/views/Documentation.vue';
 import Planned from '@/views/Planned.vue';
 import Feedback from '@/views/Feedback.vue';
@@ -145,6 +146,11 @@ export const routes = [{
 	path: '/privacy-policy',
 	name: 'Privacy Policy',
 	component: Privacy
+},
+{
+	path: '/about-us',
+	name: 'About Us',
+	component: AboutUs
 },
 {
 	path: '/documentation',

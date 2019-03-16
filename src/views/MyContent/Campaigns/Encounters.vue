@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="my-content" class="container-fluid">
+		<div id="my-content" class="container-fluid" v-if="tier">
 			<Crumble />
 
 			<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
@@ -31,7 +31,6 @@
 					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</b-col>
 			</b-row>
-			
 			<b-input-group v-if="!encounters || Object.keys(encounters).length < tier.benefits.encounters">
 				<b-form-input
 					autocomplete="off" 

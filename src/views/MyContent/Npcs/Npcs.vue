@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="npcs" class="container-fluid">
+		<div id="npcs" class="container-fluid" v-if="tier">
 			<h1>Your NPC's</h1>
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
@@ -16,7 +16,7 @@
 				<router-link to="/patreon">Need more NPC's?</router-link>
 			</div>
 		
-			<template v-if="npcs && tier">
+			<template v-if="npcs">
 				<h2 class="mt-3">NPC's ( 
 					<span :class="{ 'green': true, 'red': Object.keys(npcs).length >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
 							/ {{ tier.benefits.npcs }} )

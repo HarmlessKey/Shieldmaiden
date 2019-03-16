@@ -49,7 +49,7 @@
 			</b-input-group>
 			<div class="red" v-else>
 				You have {{ Object.keys(encounters).length }} / {{ tier.benefits.encounters }} encounters.
-				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more encounters?</a>
+				<router-link to="/patreon">Need more encounters?</router-link>
 			</div>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 

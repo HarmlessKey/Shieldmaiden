@@ -14,8 +14,9 @@ import Feedback from '@/views/Feedback.vue';
 import Updates from '@/views/Updates.vue';
 import SignIn from '@/views/SignIn.vue';
 import SignUp from '@/views/SignUp.vue';
-import ResetPassword from '@/views/ResetPassword.vue';
 import Settings from '@/views/Settings.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
+import Patreon from '@/views/Patreon.vue';
 
 import Admin from '@/views/Admin/Overview.vue';
 import Users from '@/views/Admin/Users.vue';
@@ -178,6 +179,11 @@ export const routes = [{
 	path: '/forgot-password',
 	name: 'resetPassword',
 	component: ResetPassword
+},
+{
+	path: '/patreon',
+	name: 'Patreon',
+	component: Patreon
 },
 
 //PROFILE

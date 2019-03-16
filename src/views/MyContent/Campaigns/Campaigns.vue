@@ -26,7 +26,7 @@
 					</div>
 					<div class="red" v-else>
 						You have {{ Object.keys(campaigns).length }} / {{ tier.benefits.campaigns }} campaigns.
-						<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more campaigns?</a>
+						<router-link to="/patreon">Need more campaigns?</router-link>
 					</div>
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 

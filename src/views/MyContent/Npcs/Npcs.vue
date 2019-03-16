@@ -13,7 +13,7 @@
 			</router-link>
 			<div class="red" v-else>
 				You have {{ Object.keys(npcs).length }} / {{ tier.benefits.npcs }} NPC's.
-				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more NPC's?</a>
+				<router-link to="/patreon">Need more NPC's?</router-link>
 			</div>
 		
 			<template v-if="npcs && tier">

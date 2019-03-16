@@ -13,7 +13,7 @@
 			</router-link>
 			<div class="red" v-else>
 				You have {{ Object.keys(players).length }} / {{ tier.benefits.players }} players.
-				<a href="https://www.patreon.com/harmlesskey" target="_blank">Need more players?</a>
+				<router-link to="/patreon">Need more players?</router-link>
 			</div>
 
 			<template v-if="players">

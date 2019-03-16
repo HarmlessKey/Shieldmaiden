@@ -34,24 +34,8 @@
 					</ul>
 				</template>
 				<template v-else>
-					<b-row>
-						<b-col v-for="(tier, key) in tiers" :key="key">
-							<b-card :header="tier.name">
-								<h2>{{ tier.price }}</h2>
-								<i v-if="tier.price != 'Free'" class="gray-hover">per month</i>
-								<ul>
-									<li v-for="(benefit, key) in tier.benefits" :key="key">
-										<template v-if="key == 'adds'">Adds are removed</template>
-										<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
-										<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
-										<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>
-										<template v-if="key == 'npcs'"><span class="green">{{ benefit }}</span> NPC slots</template>
-									</li>
-								</ul>
-								<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+tier['.key']" target="_blank" class="btn btn-block bg-patreon-red">Join {{ tier.price }} tier</a>
-							</b-card>
-						</b-col>
-					</b-row>
+					<h2>Support us on Patreon</h2>
+					<Tiers />
 					<!-- <a href="https://www.patreon.com/harmlesskey" target="_blank" class="btn btn-block bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a> -->
 				</template>
 			</div>
@@ -102,11 +86,15 @@
 </template>
 
 <script>
+	import Tiers from '@/components/Tiers.vue'
 	import { db, auth } from '@/firebase'	
 	import { mapGetters } from 'vuex'
 
 export default {
 		name: 'Profile',
+		components: {
+			Tiers,
+		},
 		metaInfo: {
 			title: 'Profile'
 		},
@@ -183,14 +171,6 @@ export default {
 		span {
 			width: 80px;
 			display: inline-block;
-		}
-	}
-	.card {
-		.card {
-			ul {
-				list-style: none;
-				padding: 0;
-			}
 		}
 	}
 </style>

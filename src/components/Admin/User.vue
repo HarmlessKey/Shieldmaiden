@@ -32,7 +32,7 @@
 			<b-row>
 				<b-col class="col-3">
 					<b-form-group label="Tier">
-						<b-select v-if="user.voucher" v-model="user.voucher.id">
+						<b-select v-model="voucher.id">
 							<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
 						</b-select>
 					</b-form-group>
@@ -85,7 +85,6 @@
 			return {
 				loading: true,
 				duration: 'date',
-				date: 'undefined'
 			}
 		},
 		firebase() {
@@ -112,16 +111,20 @@
 					}
 				}
 				return count
+			},
+			voucher() {
+				if (this.user.voucher) {
+					return this.user.voucher
+				} else {
+					return {}
+				}
 			}
 		},
 		methods: {
 			setVoucher() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref(`users/${this.id}/voucher`).set({
-							id: this.user.voucher.id,
-							date: this.date
-						})
+						db.ref(`users/${this.id}/voucher`).set(this.voucher)
 					}
 				});
 			}

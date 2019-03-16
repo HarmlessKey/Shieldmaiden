@@ -154,13 +154,17 @@ export const content_module = {
 				let path = `tiers/basic`
 				// If user has voucher use this
 				if (user_info.voucher){
-					let end_date = new Date(user_info.voucher.date)
-					let today = new Date()
-					if (today > end_date) {
-						dispatch("remove_voucher", state.user.uid)
-					}
-					if (user_info.voucher && today <= end_date) {
+					if (user_info.voucher.date === undefined){
 						path = `tiers/${user_info.voucher.id}`
+					} else {
+						let end_date = new Date(user_info.voucher.date)
+						let today = new Date()
+						if (today > end_date) {
+							dispatch("remove_voucher", state.user.uid)
+						}
+						if (user_info.voucher && today <= end_date) {
+							path = `tiers/${user_info.voucher.id}`
+						}
 					}
 				}
 				let vouch_tiers = db.ref(path)

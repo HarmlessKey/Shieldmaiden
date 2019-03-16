@@ -135,14 +135,13 @@ export const content_module = {
 				else
 					state.overencumbered = false
 			}
-			console.log("TIER",state.tier)
 		},
 	},
 	actions: {
 		setUser({ commit }) {
 			commit('SET_USER');
 		},
-		setUserInfo({ commit, state }) {
+		setUserInfo({ commit, dispatch, state }) {
 			let user = users_ref.child(state.user.uid)
 			user.on('value', user_snapshot => {
 				let user_info = user_snapshot.val()
@@ -154,10 +153,17 @@ export const content_module = {
 				// User always basic reward tier
 				let path = `tiers/basic`
 				// If user has voucher use this
-				if (user_info.voucher) {
-					path = `tiers/${user_info.voucher}`
+				if (user_info.voucher){
+					let end_date = new Date(user_info.voucher.date)
+					let today = new Date()
+					if (today > end_date) {
+						dispatch("remove_voucher", state.user.uid)
+					}
+					if (user_info.voucher && today <= end_date) {
+						path = `tiers/${user_info.voucher.id}`
+					}
 				}
-				let vouch_tiers = db.ref(`tiers/${user_info.voucher}`)
+				let vouch_tiers = db.ref(path)
 				vouch_tiers.on('value', voucher_snap => {
 					// Get the order of voucher/basic
 					let voucher_order = voucher_snap.val().order
@@ -258,5 +264,10 @@ export const content_module = {
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
+		remove_voucher( { commit, state }) {
+			let user = users_ref.child(state.user.uid)
+			db.ref(`users/${state.user.uid}/voucher`).remove()
+			console.log("Removed voucher")
+		}
 	},
 };

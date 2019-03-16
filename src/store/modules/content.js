@@ -54,6 +54,9 @@ export const content_module = {
 		campaigns: function( state ) {
 			return state.campaigns
 		},
+		poster: function( state ) {
+			return state.poster
+		}
 	},
 	mutations: {
 		SET_USER(state) {
@@ -99,11 +102,6 @@ export const content_module = {
 			user.on('value', snapshot => {
 				commit('SET_USERINFO', snapshot.val())
 			})
-			// if (state.poster) {
-			// 	user.poster = true
-			// 	console.log(user)
-			// 	// users_ref.child(state.user.uid).set(user)
-			// }
 		},
 		setSlide({ commit }, value) {
 			commit('setSlide', value);
@@ -173,14 +171,10 @@ export const content_module = {
 		setPoster({ commit, state }) {
 			db.ref('posters').once('value', snapshot => {
 				let count = snapshot.val()
-				console.log(count)
 				let new_count = count + 1
-
 				db.ref('posters').set(new_count)
 				state.poster = true
 			})
-			
-			console.log('commit poster')
 		}
 	},
 };

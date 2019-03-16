@@ -16,12 +16,12 @@ export const content_module = {
 		
 		slide: {},
 
-		campaign: undefined,
-		campaigns: undefined,
-		allEncounters: undefined,
-		encounters: undefined,
-		players: undefined,
-		npcs: undefined,
+		campaign: {},
+		campaigns: {},
+		allEncounters: {},
+		encounters: {},
+		players: {},
+		npcs: {},
 
 	},
 	getters: {
@@ -83,24 +83,31 @@ export const content_module = {
 			}
 		},
 		SET_PLAYERS(state, payload) {
-			state.players = payload
+			if (payload)
+				state.players = payload
 		},
 		SET_NPCS(state, payload) {
-			state.npcs = payload
+			if (payload)
+				state.npcs = payload
 		},
 		SET_CAMPAIGN(state, payload) {
-			state.campaign = payload
+			if (payload)
+				state.campaign = payload
 		},
 		SET_CAMPAIGNS(state, payload) {
-			state.campaigns = payload
+			if (payload)
+				state.campaigns = payload
 		},
 		SET_ENCOUNTERS(state, payload) {
-			state.encounters = payload
+			if (payload)
+				state.encounters = payload
 		},
 		SET_ALLENCOUNTERS(state, payload) {
-			state.allEncounters = payload
+			if (payload)
+				state.allEncounters = payload
 		},
 		CHECK_ENCUMBRANCE(state) {
+			console.log(state.npcs)
 			let campaign_keys = Object.keys(state.allEncounters)
 			let count = {}
 			count.campaigns = campaign_keys.length

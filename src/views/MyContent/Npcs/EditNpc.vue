@@ -1,8 +1,10 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		
-		<div id="npcs" class="container-fluid" v-if="npc || $route.name == 'AddNPC'">
+		<template v-if="overencumbered">
+			<OverEncumbered/>
+		</template>
+		<div id="npcs" class="container-fluid" v-else-if="npc || $route.name == 'AddNPC'">
 			
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
@@ -519,6 +521,8 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 
@@ -529,6 +533,7 @@
 		},
 		components: {
 			Sidebar,
+			OverEncumbered,
 		},
 		data() {
 			return {
@@ -579,7 +584,7 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'npcs',
+				'overencumbered',
 			]),
 		},
 		methods: {
@@ -625,22 +630,18 @@
 				this.search = '';
 			},
 			addNpc() {
-				if(Object.keys(this.npcs).length >= this.tier.benefits.npcs) {
-					this.$snotify.error('You have too many NPC\'s.', 'Error');
-				} else {
-					// THIS IS UGLY
-					delete this.npc['.value']
-					delete this.npc['.key']
-					// UGLY ENDS HERE
-					this.$validator.validateAll().then((result) => {
-						if (result) {
-							db.ref('npcs/' + this.userId).push(this.npc);
-							this.$router.replace('/npcs')
-						} else {
-							//console.log('Not valid');
-						}
-					})
-				}
+				// THIS IS UGLY
+				delete this.npc['.value']
+				delete this.npc['.key']
+				// UGLY ENDS HERE
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref('npcs/' + this.userId).push(this.npc);
+						this.$router.replace('/npcs')
+					} else {
+						//console.log('Not valid');
+					}
+				})
 			},
 			editNpc() {
 				// THIS IS UGLY

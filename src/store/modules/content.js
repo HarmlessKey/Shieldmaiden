@@ -13,6 +13,7 @@ export const content_module = {
 		
 		tier: undefined,
 		overencumbered: undefined,
+		content_count: {},
 		
 		slide: {},
 
@@ -61,6 +62,10 @@ export const content_module = {
 		overencumbered: function( state ) {
 			return state.overencumbered
 		},
+		content_count: function( state ) {
+			return state.content_count
+		},
+		
 
 	},
 	mutations: {
@@ -119,6 +124,7 @@ export const content_module = {
 					count.encounters = n
 				}
 			}
+			state.content_count = count
 			let benefits = state.tier.benefits
 			if (count.campaigns > benefits.campaigns ||
 					count.encounters > benefits.encounters ||

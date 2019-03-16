@@ -6,15 +6,12 @@
 			<p>These are the players that you can use in your campaigns.</p>
 
 			<router-link to="/players/add-player" 
-				v-if="!players || Object.keys(players).length < tier.benefits.players"
+				v-if="!players || !overencumbered"
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add player
 			</router-link>
-			<div class="red" v-else>
-				You have {{ Object.keys(players).length }} / {{ tier.benefits.players }} players.
-				<router-link to="/patreon">Need more players?</router-link>
-			</div>
+			<OverEncumberedNotice v-else/>
 
 			<template v-if="players">
 				<h2 class="mt-3">Players ( 
@@ -82,6 +79,7 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -91,7 +89,8 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar
+			Sidebar,
+			OverEncumberedNotice,
 		},
 		data() {
 			return {
@@ -104,6 +103,7 @@
 				'players',
 				'campaigns',
 				'allEncounters',
+				'overencumbered',
 			]),
 			_players: function() {
 				// console.log('yo')

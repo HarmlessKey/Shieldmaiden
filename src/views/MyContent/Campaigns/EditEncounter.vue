@@ -1,5 +1,8 @@
 <template>
-	<div id="hasSide" v-if="encounter">
+	<div v-if="overencumbered">
+		<OverEncumbered/>
+	</div>
+	<div id="hasSide" v-else-if="encounter">
 		<Sidebar/>
 		<div class="container-fluid">
 			<div class="info mb-4">
@@ -347,6 +350,8 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+
 	import _ from 'lodash'
 
 	import { mapGetters, mapActions } from 'vuex'
@@ -364,6 +369,7 @@
 		components: {
 			Sidebar,
 			Crumble,
+			OverEncumbered,
 		},
 		data() {
 			return {
@@ -396,6 +402,7 @@
 				'campaign',
 				'players',
 				'npcs',
+				'overencumbered',
 			]),
 			entitiesAmount: function() {
 				if (this.encounter) {

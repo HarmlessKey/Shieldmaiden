@@ -1,6 +1,9 @@
 <template>
-	<div>
-		You are overencumbered
+	<div class="container">
+		<b-card	header="It seems you are over encumbered">
+
+		</b-card>
+		
 	</div>
 </template>
 

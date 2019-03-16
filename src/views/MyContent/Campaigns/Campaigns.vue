@@ -24,10 +24,7 @@
 							<button class="btn"><i class="fas fa-plus"></i> Add</button>
 						</div>				
 					</div>
-					<div class="red" v-else>
-						You have {{ Object.keys(campaigns).length }} / {{ tier.benefits.campaigns }} campaigns.
-						<router-link to="/patreon">Need more campaigns?</router-link>
-					</div>
+					<OverEncumberedNotice v-else />
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 
 					<h2 class="mt-3">
@@ -110,6 +107,7 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
@@ -122,6 +120,7 @@
 		components: {
 			Sidebar,
 			Crumble,
+			OverEncumberedNotice,
 		},
 		data() {
 			return {

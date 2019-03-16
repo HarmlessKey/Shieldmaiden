@@ -17,6 +17,7 @@ import SignUp from '@/views/SignUp.vue';
 import Settings from '@/views/Settings.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 import Patreon from '@/views/Patreon.vue';
+import ManageContent from '@/views/ManageContent.vue';
 
 import Admin from '@/views/Admin/Overview.vue';
 import Users from '@/views/Admin/Users.vue';
@@ -184,6 +185,11 @@ export const routes = [{
 	path: '/patreon',
 	name: 'Patreon',
 	component: Patreon
+},
+{
+	path: '/manage-content',
+	name: 'manageContent',
+	component: ManageContent
 },
 
 //PROFILE

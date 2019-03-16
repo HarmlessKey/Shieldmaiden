@@ -1,8 +1,11 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
+		<div v-if="overencumbered">
+			<OverEncumbered/>
+		</div>
 		
-		<div id="players" class="container-fluid" v-if="player || $route.name == 'AddPlayers'">
+		<div id="players" class="container-fluid" v-else-if="player || $route.name == 'AddPlayers'">
 			
 			<b-card header="Basic Info">
 				<b-row>
@@ -145,6 +148,7 @@
 
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -155,6 +159,7 @@
 		},
 		components: {
 			Sidebar,
+			OverEncumbered,
 		},
 		data() {
 			return {
@@ -175,6 +180,7 @@
 			...mapGetters([
 				'tier',
 				'players',
+				'overencumbered',
 			]),
 		},
 		methods: {

@@ -11,10 +11,7 @@
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add NPC
 			</router-link>
-			<div class="red" v-else>
-				You have {{ Object.keys(npcs).length }} / {{ tier.benefits.npcs }} NPC's.
-				<router-link to="/patreon">Need more NPC's?</router-link>
-			</div>
+			<OverEncumberedNotice v-else/>
 		
 			<template v-if="npcs">
 				<h2 class="mt-3">NPC's ( 
@@ -76,6 +73,7 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -85,7 +83,8 @@
 			title: 'NPC\'s'
 		},
 		components: {
-			Sidebar
+			Sidebar,
+			OverEncumberedNotice,
 		},
 		data() {
 			return {

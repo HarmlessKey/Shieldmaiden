@@ -2,7 +2,10 @@
 	<div>
 		<div id="hasSide">
 			<Sidebar/>
-			<div id="my-content" class="container">
+			<div v-if="overencumbered">
+				<OverEncumbered/>
+			</div>
+			<div id="my-content" class="container" v-else>
 				<div class="info">
 					<Crumble />
 
@@ -99,6 +102,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -110,6 +114,7 @@
 		components: {
 			Sidebar,
 			Crumble,
+			OverEncumbered,
 		},
 		data() {
 			return {
@@ -123,6 +128,7 @@
 				'campaign',
 				'players',
 				'playerInCampaign',
+				'overencumbered'
 			]),
 		},
 		mounted() {

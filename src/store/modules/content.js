@@ -107,7 +107,6 @@ export const content_module = {
 				state.allEncounters = payload
 		},
 		CHECK_ENCUMBRANCE(state) {
-			console.log(state.npcs)
 			let campaign_keys = Object.keys(state.allEncounters)
 			let count = {}
 			count.campaigns = campaign_keys.length

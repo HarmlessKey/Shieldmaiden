@@ -6,7 +6,10 @@
 			<p>These are the players that you can use in your campaigns.</p>
 
 			<OverEncumbered v-if="overencumbered"/>
-			<OutOfSlots v-else-if="content_count.players >= tier.benefits.players"/>
+			<OutOfSlots 
+				v-else-if="content_count.players >= tier.benefits.players"
+				type = 'players'
+			/>
 			<router-link v-else to="/players/add-player" 
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>

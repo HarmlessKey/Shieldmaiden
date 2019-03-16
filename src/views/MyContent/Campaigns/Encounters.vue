@@ -32,7 +32,10 @@
 				</b-col>
 			</b-row>
 			<OverEncumbered v-if="overencumbered" />
-			<OutOfSlots v-else-if="content_count.encounters >= tier.benefits.encounters"/>
+			<OutOfSlots 
+				v-else-if="content_count.encounters >= tier.benefits.encounters"
+				type = 'encounters'
+			/>
 			<b-input-group v-else>
 				<b-form-input
 					autocomplete="off" 

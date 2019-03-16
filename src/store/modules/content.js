@@ -205,6 +205,7 @@ export const content_module = {
 			let encounters = encounters_ref.child(uid)
 			encounters.on('value', snapshot => {
 				commit('SET_ALLENCOUNTERS', snapshot.val())
+				commit('CHECK_ENCUMBRANCE');
 			})
 		},
 		fetchPlayers({ commit, state }) {
@@ -212,6 +213,7 @@ export const content_module = {
 			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
+				commit('CHECK_ENCUMBRANCE');
 			})
 		},
 		fetchNpcs({ commit, state }) {
@@ -219,6 +221,7 @@ export const content_module = {
 			const npcs = npcs_ref.child(uid)
 			npcs.on('value', snapshot => {
 				commit('SET_NPCS', snapshot.val())
+				commit('CHECK_ENCUMBRANCE');
 			})
 		},
 		fetchCampaign({ commit, state }, { cid }) {
@@ -236,6 +239,7 @@ export const content_module = {
 			let campaigns = campaigns_ref.child(uid)
 			campaigns.on('value', snapshot => {
 				commit('SET_CAMPAIGNS', snapshot.val())
+				commit('CHECK_ENCUMBRANCE');
 			})
 		},
 	},

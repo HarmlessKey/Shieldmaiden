@@ -9,7 +9,10 @@
 				
 				<template v-if="players && tier">
 					<OverEncumbered v-if="overencumbered" />
-					<OutOfSlots v-else-if="content_count.campaigns >= tier.benefits.campaigns"/>
+					<OutOfSlots 
+						v-else-if="content_count.campaigns >= tier.benefits.campaigns"
+						type = 'campaigns'
+					/>
 					
 					<div v-else class="input-group" >
 						<input type="text" 

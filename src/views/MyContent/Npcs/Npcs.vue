@@ -6,7 +6,10 @@
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
 			<OverEncumbered v-if="overencumbered"/>
-			<OutOfSlots v-else-if="content_count.npcs >= tier.benefits.npcs"/>
+			<OutOfSlots 
+				v-else-if="content_count.npcs >= tier.benefits.npcs"
+				type = 'npcs'
+			/>
 			<router-link v-else to="/npcs/add-npc" 
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>

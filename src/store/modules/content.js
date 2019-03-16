@@ -11,11 +11,11 @@ export const content_module = {
 		user: {},
 		userInfo: undefined,
 		tier: undefined,
+		overencumbered: undefined,
 		slide: {},
 
 		campaign: undefined,
 		campaigns: undefined,
-		// encounter: undefined,
 		allEncounters: undefined,
 		encounters: undefined,
 		players: undefined,
@@ -94,6 +94,28 @@ export const content_module = {
 		SET_ALLENCOUNTERS(state, payload) {
 			state.allEncounters = payload
 		},
+		CHECK_ENCUMBRANCE(state) {
+			let campaign_keys = Object.keys(state.allEncounters)
+			let count = {}
+			count.campaigns = campaign_keys.length
+			count.players = Object.keys(state.players).length
+			count.npcs = Object.keys(state.npcs).length
+			count.encounters = 0
+			for (let key in state.allEncounters) {
+				let n = Object.keys(state.allEncounters[key]).length
+				if (n > count.encounters) {
+					count.encounters = n
+				}
+			}
+			let benefits = state.tier.benefits
+			if (count.campaigns > benefits.campaigns ||
+					count.encounters > benefits.encounters ||
+					count.npcs > benefits.npcs ||
+					count.players > benefits.players )
+				state.overencumbered = true
+			else
+				state.overencumbered = false
+		},
 	},
 	actions: {
 		setUser({ commit }) {
@@ -113,20 +135,24 @@ export const content_module = {
 
 					//PATRONS
 					if(snapshot.val()) {
-						for(let key in snapshot.val()) {
-							let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
-							tiers.on('value' , (snapshot) => {
-								commit('SET_TIER', snapshot.val())
-							});
-						}
+						let key = Object.keys(snapshot.val())[0]
+						let tiers = db.ref(`tiers/${snapshot.val()[key].tier_id}`)
+						tiers.on('value', (snapshot) => {
+							commit('SET_TIER', snapshot.val())
+							commit('CHECK_ENCUMBRANCE');
+						})
 					} else {
 						//NO PATRON
 						let tiers = db.ref(`tiers/basic`)
 						tiers.on('value' , (snapshot) => {
 							commit('SET_TIER', snapshot.val())
+							commit('CHECK_ENCUMBRANCE');
 						});
 					}
-				});
+
+				})
+
+				
 			});
 		},
 		setSlide({ commit }, value) {

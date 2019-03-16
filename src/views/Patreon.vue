@@ -74,6 +74,8 @@
 		margin-bottom: 10px !important;
 	}
 	p {
+		font-size: 17px;
+		line-height: 30px;
 		margin-bottom: 40px;
 	}
 }

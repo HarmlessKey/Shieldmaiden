@@ -26,7 +26,7 @@
 			</div>
 
 			<!-- ENCOUNTERS -->
-			<div class="card" v-if="allEncounters">
+			<div class="card encounters" v-if="allEncounters">
 				<div class="card-header"><i class="fas fa-swords"></i> Encounters</div>
 
 				<template v-for="(campaign, cKey) in campaigns">
@@ -205,5 +205,13 @@
 				border-bottom: solid 1px #191919 !important;
 			}
 		}
+		&.encounters {
+			a.btn {
+				margin-bottom: 20px;
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}	
 	}
 </style>

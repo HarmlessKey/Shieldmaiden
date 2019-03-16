@@ -31,7 +31,7 @@
 					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</b-col>
 			</b-row>
-			<b-input-group v-if="!encounters || Object.keys(encounters).length < tier.benefits.encounters">
+			<b-input-group v-if="!encounters || !overencumbered">
 				<b-form-input
 					autocomplete="off" 
 					type="text" 
@@ -46,10 +46,7 @@
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</b-input-group-append>				
 			</b-input-group>
-			<div class="red" v-else>
-				You have {{ Object.keys(encounters).length }} / {{ tier.benefits.encounters }} encounters.
-				<router-link to="/patreon">Need more encounters?</router-link>
-			</div>
+			<OverEncumberedNotice v-else />
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- BROADCAST -->
@@ -241,6 +238,7 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import draggable from 'vuedraggable'
 
@@ -256,6 +254,7 @@
 			Sidebar,
 			Crumble,
 			draggable,
+			OverEncumberedNotice,
 		},
 		data() {
 			return {
@@ -291,7 +290,8 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'encounters'
+				'encounters',
+				'overencumbered',
 			]),
 			_active_drag: function() {
 

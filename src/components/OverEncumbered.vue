@@ -21,5 +21,7 @@
 </script>
 
 <style lang="scss" scoped>
-
+.container {
+	display: block !important;
+}
 </style>

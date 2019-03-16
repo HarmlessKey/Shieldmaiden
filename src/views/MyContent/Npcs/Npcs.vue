@@ -6,7 +6,7 @@
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
 			<router-link to="/npcs/add-npc" 
-				v-if="!npcs || Object.keys(npcs).length < tier.benefits.npcs"
+				v-if="!npcs || !overencumbered"
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add NPC
@@ -97,6 +97,7 @@
 				'npcs',
 				'campaigns',
 				'allEncounters',
+				'overencumbered',
 			]),
 			_npcs: function() {
 				// console.log('yo')

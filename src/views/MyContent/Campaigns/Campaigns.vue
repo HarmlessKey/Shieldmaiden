@@ -8,7 +8,7 @@
 				<p>Welcome to your campaigns overview.</p>
 				
 				<template v-if="players && tier">
-					<div class="input-group" v-if="!campaigns || Object.keys(campaigns).length < tier.benefits.campaigns">
+					<div class="input-group" v-if="!campaigns || !overencumbered">
 						<input type="text" 
 							class="form-control" 
 							autocomplete="off"
@@ -22,7 +22,7 @@
 						/>
 						<div class="input-group-append">
 							<button class="btn"><i class="fas fa-plus"></i> Add</button>
-						</div>				
+						</div>
 					</div>
 					<OverEncumberedNotice v-else />
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
@@ -133,6 +133,7 @@
 				'campaigns',
 				'allEncounters',
 				'players',
+				'overencumbered',
 			]),
 			...mapGetters({
 				user: 'getUser'

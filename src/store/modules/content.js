@@ -163,5 +163,15 @@ export const content_module = {
 				commit('SET_CAMPAIGNS', snapshot.val())
 			})
 		},
+		setPoster({ commit }) {
+			db.ref('posters').once('value', snapshot => {
+				let count = snapshot.val()
+				console.log(count)
+				let new_count = count + 1
+				db.ref('posters').set(new_count)
+			})
+			
+			console.log('commit poster')
+		}
 	},
 };

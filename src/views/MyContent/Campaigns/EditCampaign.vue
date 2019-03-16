@@ -2,7 +2,9 @@
 	<div>
 		<div id="hasSide">
 			<Sidebar/>
-			<OverEncumbered v-if="overencumbered" />
+			<div v-if="overencumbered" class='container' style="display: block;">
+				<OverEncumbered/>
+			</div>
 			<div id="my-content" class="container" v-else>
 				<div class="info">
 					<Crumble />

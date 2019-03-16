@@ -31,7 +31,9 @@
 					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</b-col>
 			</b-row>
-			<b-input-group v-if="!encounters || !overencumbered">
+			<OverEncumbered v-if="overencumbered" />
+			<OutOfSlots v-else-if="content_count.encounters >= tier.benefits.encounters"/>
+			<b-input-group v-else>
 				<b-form-input
 					autocomplete="off" 
 					type="text" 
@@ -46,7 +48,6 @@
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</b-input-group-append>				
 			</b-input-group>
-			<OverEncumberedNotice v-else />
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- BROADCAST -->
@@ -66,7 +67,7 @@
 			<h2 class="mt-3">
 				Your Encounters 
 				<span v-if="encounters">( 
-					<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
+					<span :class="{ 'green': true, 'red': content_count.encounters >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
 					/ {{ tier.benefits.encounters }} )
 				</span>
 			</h2>
@@ -238,7 +239,8 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import draggable from 'vuedraggable'
 
@@ -254,7 +256,8 @@
 			Sidebar,
 			Crumble,
 			draggable,
-			OverEncumberedNotice,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -292,6 +295,7 @@
 				'tier',
 				'encounters',
 				'overencumbered',
+				'content_count',
 			]),
 			_active_drag: function() {
 

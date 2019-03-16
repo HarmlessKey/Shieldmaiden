@@ -5,17 +5,17 @@
 			<h1>Your players</h1>
 			<p>These are the players that you can use in your campaigns.</p>
 
-			<router-link to="/players/add-player" 
-				v-if="!players || !overencumbered"
+			<OverEncumbered v-if="overencumbered"/>
+			<OutOfSlots v-else-if="content_count.players >= tier.benefits.players"/>
+			<router-link v-else to="/players/add-player" 
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add player
 			</router-link>
-			<OverEncumberedNotice v-else/>
 
 			<template v-if="players">
 				<h2 class="mt-3">Players ( 
-					<span :class="{ 'green': true, 'red': Object.keys(players).length >= tier.benefits.players }">{{ Object.keys(players).length }}</span>
+					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span>
 						 / {{ tier.benefits.players }} )</h2>
 				<table class="table">
 					<thead>
@@ -79,7 +79,8 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -90,7 +91,8 @@
 		},
 		components: {
 			Sidebar,
-			OverEncumberedNotice,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -104,6 +106,7 @@
 				'campaigns',
 				'allEncounters',
 				'overencumbered',
+				'content_count',
 			]),
 			_players: function() {
 				// console.log('yo')

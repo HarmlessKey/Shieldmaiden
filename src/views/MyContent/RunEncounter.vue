@@ -1,5 +1,8 @@
 <template>
-	<div class="container-fluid" v-if="encounter && players"  
+	<div v-if="overencumbered">
+		<OverEncumbered/>
+	</div>
+	<div class="container-fluid" v-else-if="encounter && players"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
 		
 		<Finished v-if="encounter.finished" :encounter="encounter"/>
@@ -32,6 +35,7 @@
 			</div>
 		</template>
 	</div>
+
 </template>
 
 <script>
@@ -47,6 +51,7 @@
 	import Targeted from '@/components/combat/Targeted.vue'
 	import Side from '@/components/combat/side/Side.vue'
 	import SetInitiative from '@/components/combat/SetInitiative.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
 
 	export default {
 		name: 'app',
@@ -62,6 +67,7 @@
 			Targeted,
 			Side,
 			SetInitiative,
+			OverEncumbered,
 		},
 		data() {
 			// Dispatch route parameters to store
@@ -94,6 +100,7 @@
 				'campaigns',
 				'entities',
 				'initialized',
+				'overencumbered',
 			]),
 			_active: function() {
 				return _.chain(this.entities)

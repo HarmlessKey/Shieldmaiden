@@ -10,8 +10,10 @@ export const content_module = {
 	state: {
 		user: {},
 		userInfo: undefined,
+		
 		tier: undefined,
 		overencumbered: undefined,
+		
 		slide: {},
 
 		campaign: undefined,
@@ -35,9 +37,6 @@ export const content_module = {
 		getSlide: function(state) {
 			return state.slide;
 		},
-		// encounter: function( state ) {
-		// 	return state.encounters
-		// },
 		encounters: function( state ) {
 			return state.encounters
 		},
@@ -56,6 +55,13 @@ export const content_module = {
 		campaigns: function( state ) {
 			return state.campaigns
 		},
+		tier: function( state ) {
+			return state.tier
+		},
+		overencumbered: function( state ) {
+			return state.overencumbered
+		},
+
 	},
 	mutations: {
 		SET_USER(state) {

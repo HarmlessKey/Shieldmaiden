@@ -125,14 +125,16 @@ export const content_module = {
 				}
 			}
 			state.content_count = count
-			let benefits = state.tier.benefits
-			if (count.campaigns > benefits.campaigns ||
-					count.encounters > benefits.encounters ||
-					count.npcs > benefits.npcs ||
-					count.players > benefits.players )
-				state.overencumbered = true
-			else
-				state.overencumbered = false
+			if (state.tier) {
+				let benefits = state.tier.benefits
+				if (count.campaigns > benefits.campaigns ||
+						count.encounters > benefits.encounters ||
+						count.npcs > benefits.npcs ||
+						count.players > benefits.players )
+					state.overencumbered = true
+				else
+					state.overencumbered = false
+			}
 		},
 	},
 	actions: {

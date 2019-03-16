@@ -31,7 +31,12 @@
 					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</b-col>
 			</b-row>
-			<b-input-group v-if="!encounters || Object.keys(encounters).length < tier.benefits.encounters">
+			<OverEncumbered v-if="overencumbered" />
+			<OutOfSlots 
+				v-else-if="content_count.encounters >= tier.benefits.encounters"
+				type = 'encounters'
+			/>
+			<b-input-group v-else>
 				<b-form-input
 					autocomplete="off" 
 					type="text" 
@@ -46,10 +51,6 @@
 					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
 				</b-input-group-append>				
 			</b-input-group>
-			<div class="red" v-else>
-				You have {{ Object.keys(encounters).length }} / {{ tier.benefits.encounters }} encounters.
-				<router-link to="/patreon">Need more encounters?</router-link>
-			</div>
 			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 			<!-- BROADCAST -->
@@ -69,7 +70,7 @@
 			<h2 class="mt-3">
 				Your Encounters 
 				<span v-if="encounters">( 
-					<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
+					<span :class="{ 'green': true, 'red': content_count.encounters >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
 					/ {{ tier.benefits.encounters }} )
 				</span>
 			</h2>
@@ -241,6 +242,8 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import draggable from 'vuedraggable'
 
@@ -256,6 +259,8 @@
 			Sidebar,
 			Crumble,
 			draggable,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -291,7 +296,9 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'encounters'
+				'encounters',
+				'overencumbered',
+				'content_count',
 			]),
 			_active_drag: function() {
 

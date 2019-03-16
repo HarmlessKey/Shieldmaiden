@@ -8,7 +8,13 @@
 				<p>Welcome to your campaigns overview.</p>
 				
 				<template v-if="players && tier">
-					<div class="input-group" v-if="!campaigns || Object.keys(campaigns).length < tier.benefits.campaigns">
+					<OverEncumbered v-if="overencumbered" />
+					<OutOfSlots 
+						v-else-if="content_count.campaigns >= tier.benefits.campaigns"
+						type = 'campaigns'
+					/>
+					
+					<div v-else class="input-group" >
 						<input type="text" 
 							class="form-control" 
 							autocomplete="off"
@@ -22,15 +28,14 @@
 						/>
 						<div class="input-group-append">
 							<button class="btn"><i class="fas fa-plus"></i> Add</button>
-						</div>				
+						</div>
 					</div>
-					<OverEncumberedNotice v-else />
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 
 					<h2 class="mt-3">
 						Your Campaigns 
 						<span v-if="campaigns && tier">( 
-							<span :class="{ 'green': true, 'red': Object.keys(campaigns).length >= tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
+							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
 							/ {{ tier.benefits.campaigns }} )</span>
 					</h2>
 
@@ -107,7 +112,8 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
@@ -120,7 +126,8 @@
 		components: {
 			Sidebar,
 			Crumble,
-			OverEncumberedNotice,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -133,6 +140,8 @@
 				'campaigns',
 				'allEncounters',
 				'players',
+				'overencumbered',
+				'content_count',
 			]),
 			...mapGetters({
 				user: 'getUser'

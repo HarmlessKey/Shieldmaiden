@@ -5,17 +5,20 @@
 			<h1>Your NPC's</h1>
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 
-			<router-link to="/npcs/add-npc" 
-				v-if="!npcs || Object.keys(npcs).length < tier.benefits.npcs"
+			<OverEncumbered v-if="overencumbered"/>
+			<OutOfSlots 
+				v-else-if="content_count.npcs >= tier.benefits.npcs"
+				type = 'npcs'
+			/>
+			<router-link v-else to="/npcs/add-npc" 
 				class="btn btn-block mb-3"
 				v-b-modal.addModal>
 				<i class="fas fa-plus-square"></i> Add NPC
 			</router-link>
-			<OverEncumberedNotice v-else/>
 		
 			<template v-if="npcs">
 				<h2 class="mt-3">NPC's ( 
-					<span :class="{ 'green': true, 'red': Object.keys(npcs).length >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
 							/ {{ tier.benefits.npcs }} )
 				</h2>
 				<table class="table">
@@ -73,7 +76,8 @@
 <script>
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumberedNotice from '@/components/OverEncumberedNotice.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -84,7 +88,8 @@
 		},
 		components: {
 			Sidebar,
-			OverEncumberedNotice,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -97,6 +102,8 @@
 				'npcs',
 				'campaigns',
 				'allEncounters',
+				'overencumbered',
+				'content_count',
 			]),
 			_npcs: function() {
 				// console.log('yo')

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="overencumbered">
+	<div v-if="overencumbered" class='container-fluid'>
 		<OverEncumbered/>
 	</div>
 	<div id="hasSide" v-else-if="encounter">

@@ -1,9 +1,9 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<template v-if="overencumbered">
+		<div v-if="overencumbered" class='container'>
 			<OverEncumbered/>
-		</template>
+		</div>
 		<div id="npcs" class="container-fluid" v-else-if="npc || $route.name == 'AddNPC'">
 			
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>

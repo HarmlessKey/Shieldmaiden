@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div v-if="overencumbered">
+		<div v-if="overencumbered" class='container'>
 			<OverEncumbered/>
 		</div>
 		

@@ -1,6 +1,6 @@
 <template>
 	<div class="red" v-else>
-		It seems you are currently overencumbered
+		It seems you don't have any slots left to add more content
 		<br>
 		<router-link to="/manage-content">Manage your content</router-link>
 		<br>
@@ -9,7 +9,6 @@
 </template>
 
 <script>
-
 	export default {
 		
 		computed: {
@@ -22,5 +21,4 @@
 </script>
 
 <style lang="scss" scoped>
-
 </style>

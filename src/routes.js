@@ -195,7 +195,10 @@ export const routes = [{
 {
 	path: '/manage-content',
 	name: 'manageContent',
-	component: ManageContent
+	component: ManageContent,
+	meta: {
+		requiresAuth: true
+	}
 },
 
 //PROFILE

@@ -1,80 +1,209 @@
 <template>
-	<div>
-		<div class="grid">
-			<div class="container">
-				<h1><i class="fab fa-patreon patreon-red"></i> Support us on Patreon <i class="fas fa-heart"></i></h1>
-				<Tiers class="my-4" />
-				<h2>Why do I have to pay?</h2>
-				<p>
-					We wish we could offer the app for free. This is why we do have a free tier 
-					that should be sufficient for most users. If you manage your data well, 
-					you can get complete use out of our app without having to pay anything. 
-					All the features we develop will always be accessible for all users, without cost. You only pay for more storage.<br/>
-					Unfortunately creating an app brings some costs with it. 
-					We need to invest a lot of time in maintaining and expanding the app. 
-					And there are the costs of hosting Harmless Key, as our user base expands, the costs increase.
-				</p>
+	<div class="container">
+		<h1>Manage your content</h1>
 
-				<h2>Building together</h2>
-				<p>
-					Our goal is not to earn money, our goal is to create an app that is useful for the entire community. <br/>
-					To reach this goal, we will need support. This is why have set up a Patreon. 
-					This way you can help us in achieving this goal.
-				</p>
+		<b-card-group deck v-if="tier">
+			<!-- CAMPAIGNS -->
+			<div class="card" v-if="campaigns">
+				<div class="card-header">
+					<i class="fas fa-dungeon"></i> Campaigns
+				</div>
 
-				<a class="btn bg-patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon black"></i> Support us</a>
+				<div class="card-body">
+					<div class="p-2">
+						( <span :class="{ 'green': true, 'red': Object.keys(campaigns).length > tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
+						/ {{ tier.benefits.campaigns }} )
+					</div>
+
+					<b-list-group>
+						<b-list-group-item v-for="(campaign, key) in campaigns" :key="key" class="d-flex justify-content-between">
+							{{ campaign.campaign }}
+							<span @click="confirmDelete(key, 'campaign', campaign.campaign)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+						</b-list-group-item>
+					</b-list-group>
+				</div>
+				<router-link class="btn" to="/campaigns">Show all</router-link>
 			</div>
-		<Footer class="mt-5" />
-		</div>
+
+			<!-- ENCOUNTERS -->
+			<div class="card" v-if="allEncounters">
+				<div class="card-header"><i class="fas fa-swords"></i> Encounters</div>
+
+				<template v-for="(campaign, cKey) in campaigns">
+						<div class="card-body">
+							<div class="p-2">
+								<span class="gray-hover">Campaign:</span> {{ campaign.campaign }}
+								( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
+								/ {{ tier.benefits.encounters }} )
+							</div>
+							<b-list-group :key="cKey">
+								<b-list-group-item v-for="(encounter, key) in allEncounters[cKey]" :key="key" class="d-flex justify-content-between">
+									{{ encounter.encounter }}
+									<span @click="confirmDelete({ campKey: cKey, encKey: key }, 'encounter', encounter.encounter)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+								</b-list-group-item>
+							</b-list-group>
+						</div>
+					<router-link class="btn" :to="'/encounters/' + cKey">Show all</router-link>
+				</template>
+			</div>
+
+			<!-- PLAYERS -->
+			<div class="card" v-if="players">
+				<div class="card-header">
+					<i class="fas fa-users"></i> Players
+				</div>
+
+				<div class="card-body">
+					<div class="p-2">
+						( <span :class="{ 'green': true, 'red': Object.keys(players).length > tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+						/ {{ tier.benefits.players }} )
+					</div>
+
+					<b-list-group>
+						<b-list-group-item v-for="(player, key) in players" :key="key" class="d-flex justify-content-between">
+							{{ player.character_name }}
+							<span @click="confirmDelete(key, 'player', player.character_name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+						</b-list-group-item>
+					</b-list-group>
+				</div>
+				<router-link class="btn" to="/players">Show all</router-link>
+			</div>
+
+			<!-- NPCS -->
+			<div class="card" v-if="npcs">
+				<div class="card-header">
+					<i class="fas fa-dragon"></i> NPC's
+				</div>
+
+				<div class="card-body">
+					<div class="p-2">
+						( <span :class="{ 'green': true, 'red': Object.keys(npcs).length > tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+						/ {{ tier.benefits.npcs }} )
+					</div>
+
+					<b-list-group>
+						<b-list-group-item v-for="(npc, key) in npcs" :key="key" class="d-flex justify-content-between">
+							{{ npc.name }}
+							<span @click="confirmDelete(key, 'NPC', npc.name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+						</b-list-group-item>
+					</b-list-group>
+				</div>
+				<router-link class="btn" to="/npcs">Show all</router-link>
+			</div>
+		</b-card-group>
+
 	</div>
 </template>
 
 <script>
-	import { auth } from '@/firebase.js'
-	import Tiers from '@/components/Tiers.vue'
-	import Footer from '@/components/Footer.vue'
+	import { db } from '@/firebase.js'
+	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
 		name: 'home',
-		components: {
-			Tiers,
-			Footer,
-		},
 		metaInfo: {
-			title: 'Patreon',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
-			]
+			title: 'Manage Content',
+		},
+		data() {
+			return {
+		
+			}
 		},
 		computed: {
-			user() {
-				return auth.currentUser
-			}
+			...mapGetters([
+				'tier',
+				'campaigns',
+				'allEncounters',
+				'players',
+				'npcs',
+			]),
+			...mapGetters({
+				user: 'getUser'
+			}),
+		},
+		methods: {
+			confirmDelete(key, type, name) {
+				this.$snotify.error('Are you sure you want to delete the "' + type + '" "' + name + '"?', 'Delete "' + type + '"', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { this.delete(key, type); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
+			delete(key, type) {
+				if(type == 'campaign') {
+					this.deleteCampaign(key)
+				} else if(type == 'encounter') {
+					this.deleteEncounter(key)
+				} else if(type == 'player') {
+					this.deletePlayer(key)
+				} else if(type == 'NPC') {
+					this.deleteNPC(key)
+				}
+				this.$forceUpdate
+			},
+			deleteCampaign(key) {
+				db.ref('campaigns/'+ this.user.uid).child(key).remove();
+				db.ref('encounters/'+ this.user.uid).child(key).remove();
+			},
+			deletePlayer(key) {
+				for(let campaign in this.campaigns) {
+					//Remove player from campaigns
+					db.ref('campaigns/' + this.user.uid + '/' + campaign + '/players').child(key).remove();
+
+					//Go over all encounters of the campaign
+					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
+						for(let enc in this.allEncounters[campaign]) {
+
+							//Go over all entities in the encounter
+							db.ref(`encounters/${this.user.uid}/${campaign}/${enc}/entities`).child(key).remove();
+						}
+					}
+				}
+				//Remove player
+				db.ref('players/' + this.user.uid).child(key).remove(); 
+			},
+			deleteNPC(key) {
+				//Remove the NPC from all encounters
+				for(let campaign in this.campaigns) {
+					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
+						//Go over all encounters of the campaign
+						for(let enc in this.allEncounters[campaign]) {
+							var entities = this.allEncounters[campaign][enc].entities;
+
+							//Go over all entites in the encounter
+							for(let entityKey in entities) {
+								let npcId = entities[entityKey].id;
+								
+								//If the entity has the same id, delete it
+								if(npcId == key) {
+									db.ref(`encounters/${this.user.uid}/${campaign}/${enc}/entities/${entityKey}`).remove();
+								}
+							}
+						}
+					}
+				}
+				//Remove NPC
+				db.ref('npcs/' + this.user.uid).child(key).remove(); 
+			},
+			deleteEncounter(key) {
+				db.ref('encounters/' + this.user.uid + '/' + key.campKey).child(key.encKey).remove();
+			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.grid {
-	padding-top: 30px;
-	background-size: cover;
-	height: calc(100vh - 50px) !important;
-	display: grid;
-	grid-template-columns: auto;
-	grid-template-rows: 3fr 1fr;
-	grid-gap: 0;
-	grid-template-areas: 
-	"container"
-	"footer";
+	.card {
+		.card-body {
+			padding: 0;
+		}
+		.list-group {
+			border-top: solid 1px #191919 !important;
 
-	h1 {
-		margin-bottom: 40px;
+			.list-group-item {
+				border-bottom: solid 1px #191919 !important;
+			}
+		}
 	}
-	h2 {
-		margin-bottom: 10px !important;
-	}
-	p {
-		margin-bottom: 40px;
-	}
-}
 </style>

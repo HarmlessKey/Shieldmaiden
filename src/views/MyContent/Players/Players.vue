@@ -27,7 +27,7 @@
 						enter-active-class="animated flash"
 						leave-active-class="animated bounceOutLeft">
 						<tr v-for="(player, index) in _players" :key="player.key">
-							<td class="img" v-if="player.avatar != ''" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
+							<td class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/player.svg" />
 							</td>

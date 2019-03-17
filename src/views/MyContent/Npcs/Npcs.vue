@@ -19,7 +19,10 @@
 			<template v-if="npcs">
 				<h2 class="mt-3">NPC's ( 
 					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
-							/ {{ tier.benefits.npcs }} )
+							/ 
+							<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
+							<template v-else>{{ tier.benefits.npcs }}</template>
+							)
 				</h2>
 				<table class="table">
 					<thead>

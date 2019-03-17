@@ -19,7 +19,10 @@
 			<template v-if="players">
 				<h2 class="mt-3">Players ( 
 					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span>
-						 / {{ tier.benefits.players }} )</h2>
+						 / 
+						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i>
+						<template v-else>{{ tier.benefits.players }}</template>	
+						 )</h2>
 				<table class="table">
 					<thead>
 						<th></th>

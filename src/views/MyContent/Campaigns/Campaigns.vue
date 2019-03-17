@@ -35,8 +35,12 @@
 					<h2 class="mt-3">
 						Your Campaigns 
 						<span v-if="campaigns && tier">( 
-							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
-							/ {{ tier.benefits.campaigns }} )</span>
+							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
+								{{ Object.keys(campaigns).length }}
+							</span> / 
+							<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
+							<template v-else>{{ tier.benefits.campaigns }}</template>
+						) </span>
 					</h2>
 
 					<transition-group 
@@ -85,7 +89,9 @@
 													<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
 														{{ Object.keys(allEncounters[campaign.key]).length }}
 													</span> 
-													/ {{ tier.benefits.encounters }}
+													/
+													<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+													<template v-else>{{ tier.benefits.encounters }}</template>
 												</template>
 												<template v-else> Create</template>
 											</router-link>

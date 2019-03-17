@@ -70,8 +70,13 @@
 			<h2 class="mt-3">
 				Your Encounters 
 				<span v-if="encounters">( 
-					<span :class="{ 'green': true, 'red': content_count.encounters >= tier.benefits.encounters }">{{ Object.keys(encounters).length }}</span> 
-					/ {{ tier.benefits.encounters }} )
+					<span :class="{ 'green': true, 'red': content_count.encounters >= tier.benefits.encounters }">
+						{{ Object.keys(encounters).length }}
+					</span> 
+					/ 
+					<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+					<template v-else>{{ tier.benefits.encounters }}</template>
+					)
 				</span>
 			</h2>
 

@@ -380,7 +380,7 @@ export const routes = [{
 		basePath: '/campaigns',
 		title: 'Campaigns',
 		requiresAuth: true
-	}
+	},
 },
 {
 	path: '/encounters/:campid/:encid',
@@ -400,7 +400,7 @@ export const routes = [{
 		basePath: '/campaigns',
 		title: 'Campaigns',
 		requiresAuth: true
-	}
+	},
 },
 {
 	path: '/track-encounter/:userid',

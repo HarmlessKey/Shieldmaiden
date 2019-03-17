@@ -69,7 +69,7 @@ export const content_module = {
 		},
 		poster: function( state ) {
 			return state.poster
-		}
+		},
 	},
 	mutations: {
 		SET_USER(state) {
@@ -139,6 +139,9 @@ export const content_module = {
 					state.overencumbered = false
 			}
 		},
+		CLEAR_ENCOUNTERS(state) {
+			state.encounters = {}
+		}
 	},
 	actions: {
 		setUser({ commit }) {
@@ -283,6 +286,9 @@ export const content_module = {
 				db.ref('posters').set(new_count)
 				state.poster = true
 			})
+		},
+		clearEncounters({ commit }) {
+			commit("CLEAR_ENCOUNTERS")
 		}
 	},
 };

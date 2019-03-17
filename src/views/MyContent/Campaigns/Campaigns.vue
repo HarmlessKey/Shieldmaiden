@@ -121,7 +121,7 @@
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 
 	export default {
@@ -139,6 +139,10 @@
 			return {
 				newCampaign: '',
 			}
+		},
+		mounted() {
+			console.log('clearEncounters')
+			this.clearEncounters()
 		},
 		computed: {
 			...mapGetters([
@@ -165,6 +169,9 @@
 			},
 		},
 		methods: {
+			...mapActions([
+				'clearEncounters'
+			]),
 			addCampaign() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {

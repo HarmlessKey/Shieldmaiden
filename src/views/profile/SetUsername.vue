@@ -50,6 +50,7 @@ export default {
 		computed: {
 			...mapGetters([
 				'userInfo',
+				'poster',
 			]),
 			...mapGetters({
 				user: 'getUser'
@@ -73,10 +74,13 @@ export default {
 			setUsername() {
 				this.$validator.validateAll().then((result) => {
 					if (result && this.check == 'available') {
-						db.ref(`users/${this.user.uid}`).set({
+						let user = {
 							username: this.username,
-							email: this.user.email,
-						});
+							email: this.user.email
+						}
+						if (this.poster)
+							user.poster = true
+						db.ref(`users/${this.user.uid}`).set(user);
 						this.$snotify.success('Username saved.', 'Critical hit!', {
 							position: "centerTop"
 						});

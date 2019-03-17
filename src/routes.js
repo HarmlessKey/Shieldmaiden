@@ -1,3 +1,8 @@
+
+import { store } from './store/store'
+import { db } from './firebase';
+
+
 import Home from '@/views/Home.vue';
 
 import Compendium from '@/views/Compendium/Overview.vue';
@@ -198,6 +203,15 @@ export const routes = [{
 	component: ManageContent,
 	meta: {
 		requiresAuth: true
+	}
+},
+{
+	path: '/poster',
+	name: 'poster',
+	component: Home,
+	beforeEnter(to, from, next) {
+		store.dispatch("setPoster")
+		next('/')
 	}
 },
 

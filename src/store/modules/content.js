@@ -24,6 +24,8 @@ export const content_module = {
 		players: {},
 		npcs: {},
 
+		poster: undefined,
+
 	},
 	getters: {
 		getUser: function(state) {
@@ -65,8 +67,9 @@ export const content_module = {
 		content_count: function( state ) {
 			return state.content_count
 		},
-		
-
+		poster: function( state ) {
+			return state.poster
+		}
 	},
 	mutations: {
 		SET_USER(state) {
@@ -272,6 +275,14 @@ export const content_module = {
 			let user = users_ref.child(state.user.uid)
 			db.ref(`users/${state.user.uid}/voucher`).remove()
 			console.log("Removed voucher")
+		},
+		setPoster({ commit, state }) {
+			db.ref('posters').once('value', snapshot => {
+				let count = snapshot.val()
+				let new_count = count + 1
+				db.ref('posters').set(new_count)
+				state.poster = true
+			})
 		}
 	},
 };

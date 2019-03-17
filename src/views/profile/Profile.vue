@@ -25,7 +25,7 @@
 					<h3>Your benefits:</h3>
 					<ul>
 						<li v-for="(benefit, key) in tier.benefits" :key="key">
-							<template v-if="key == 'adds'">Adds are removed</template>
+							<template v-if="key == 'adds'">Ads are removed</template>
 							<template v-if="key == 'campaigns'"><span class="green">{{ benefit }}</span> campaign slots</template>
 							<template v-if="key == 'encounters'"><span class="green">{{ benefit }}</span> encounter slots</template>
 							<template v-if="key == 'players'"><span class="green">{{ benefit }}</span> player slots</template>

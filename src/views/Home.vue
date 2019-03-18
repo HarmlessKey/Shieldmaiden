@@ -13,6 +13,16 @@
 					</div>
 
 					<hr class="mt-5">
+					<!-- Home banner -->
+					<div align="center">
+						<ins class="adsbygoogle"
+						     style="display:block"
+						     data-ad-client="ca-pub-2711721977927243"
+						     data-ad-slot="6300414114"
+						     data-ad-format="link"
+						     data-full-width-responsive="true"></ins>
+					</div>
+					<!-- End ad -->
 					<b-row class=my-5>
 						<b-col md="7">
 							<p class="img-header bg-gray-darker">Your new DM screen</p>
@@ -102,6 +112,11 @@
 			user() {
 				return auth.currentUser
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				(adsbygoogle = window.adsbygoogle || []).push({});
+			})
 		}
 	}
 </script>

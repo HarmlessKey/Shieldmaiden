@@ -22,7 +22,8 @@
 			<Turns 
 				:encounter="encounter" 
 				:current="_targets[0]"
-				:entities_len="Object.keys(_allEntities).length"
+				:entities_len="Object.keys(_turnCount).length"
+				:turn="turn"
 			/>
 			<div class="container-fluid">
 				<div class="container entities">
@@ -31,7 +32,8 @@
 							<Initiative 
 								:encounter="encounter" 
 								:targets="_targets"
-								:allEntities="_allEntities"
+								:allEntities="_turnCount"
+								:turn="turn"
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
@@ -42,14 +44,6 @@
 			</div>
 		</template>
 	</div>
-	
-	<!-- AD -->
-	<ins class="adsbygoogle"
-		style="display:block"
-		data-ad-client="ca-pub-2711721977927243"
-		data-ad-slot="6300414114"
-		data-ad-format="link"
-		data-full-width-responsive="true"></ins>
 </div>
 </template>
 
@@ -105,20 +99,24 @@
 				},
 			}
 		},
-		// mounted() {
-		// 	let adScript = document.createElement('script')
-		// 	adScript.setAttribute('src', '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
-		// 	adScript.setAttribute('async', true)
-		// 	document.head.appendChild(adScript)
-
-		// 	let adScript2 = document.createElement('script')
-		// 	adScript2.innerHTML = '(adsbygoogle = window.adsbygoogle || []).push({google_ad_client: "ca-pub-2711721977927243", enable_page_level_ads: true });'
-		// 	document.head.appendChild(adScript2)
-		// },
 		beforeMount() {
 			this.fetch_encounter()
 		},
 		computed: {
+			_turnCount() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && !entity.hidden;
+				})
+				.orderBy(function(entity) {
+					return entity.name
+				}, 'asc')
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
 			_allEntities: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -138,6 +136,25 @@
 				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
+			},
+			turn() {
+				for(let key in this._allEntities) {
+					let init = this._allEntities[key].initiative
+					
+					if(init > this._targets[0].initiative) {
+						if(this.encounter.turn >= Object.keys(this._turnCount).length) {
+								return Object.keys(this._turnCount).length -1
+							} else {
+								return this.encounter.turn -1
+							}
+					} else {
+						if(this.encounter.turn >= Object.keys(this._turnCount).length) {
+							return Object.keys(this._turnCount).length -1
+						} else {
+							return this.encounter.turn
+						}
+					}
+				}
 			},
 		},
 		methods: {

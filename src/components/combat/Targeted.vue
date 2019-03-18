@@ -25,7 +25,7 @@
 				</a>
 				<a @click="showConditions(target)"
 					v-b-tooltip.hover title="[c] Conditions">
-					<span class="icon"><i class="fas fa-eye-slash"></i></span>
+					<span class="icon"><i class="fas fa-flame"></i></span>
 				</a>
 				<a @click="damageHeal(target)"
 					v-b-tooltip.hover title="[d] Do Damage / Healing">

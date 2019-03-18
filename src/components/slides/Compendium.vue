@@ -129,8 +129,7 @@
 		updated: function() {
 			this.$nextTick(function() {
 				
-				if ($('ins').length > 0) {
-					console.log($('ins').length)
+				if ($('ins').length == 1) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}
 			})

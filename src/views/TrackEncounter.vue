@@ -42,6 +42,14 @@
 			</div>
 		</template>
 	</div>
+	
+	<!-- AD -->
+	<ins class="adsbygoogle"
+		style="display:block"
+		data-ad-client="ca-pub-2711721977927243"
+		data-ad-slot="6300414114"
+		data-ad-format="link"
+		data-full-width-responsive="true"></ins>
 </div>
 </template>
 

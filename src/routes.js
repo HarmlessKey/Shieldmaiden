@@ -1,3 +1,8 @@
+
+import { store } from './store/store'
+import { db } from './firebase';
+
+
 import Home from '@/views/Home.vue';
 
 import Compendium from '@/views/Compendium/Overview.vue';
@@ -178,6 +183,15 @@ export const routes = [{
 	path: '/forgot-password',
 	name: 'resetPassword',
 	component: ResetPassword
+},
+{
+	path: '/poster',
+	name: 'poster',
+	component: Home,
+	beforeEnter(to, from, next) {
+		store.dispatch("setPoster")
+		next('/')
+	}
 },
 
 //PROFILE

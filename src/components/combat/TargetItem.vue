@@ -41,7 +41,7 @@
 							@click="showCondition(key, entity)"></div>
 					</div>
 					<div class="progress-bar" :class="{ 
-						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
+						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
 						'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
 						'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
 						}" 

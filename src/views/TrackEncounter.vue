@@ -42,6 +42,19 @@
 			</div>
 		</template>
 	</div>
+	<div align='center'>
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<!-- Standard -->
+		<ins class="adsbygoogle"
+		     style="display:block"
+		     data-ad-client="ca-pub-2711721977927243"
+		     data-ad-slot="6300414114"
+		     data-ad-format="link"
+		     data-full-width-responsive="true"></ins>
+		<script>
+		(adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+	</div>
 </div>
 </template>
 

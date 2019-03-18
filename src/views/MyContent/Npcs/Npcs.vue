@@ -25,7 +25,7 @@
 						enter-active-class="animated flash"
 						leave-active-class="animated bounceOutLeft">
 						<tr v-for="(npc, index) in _npcs" :key="npc.key">
-							<td class="img" v-if="npc.avatar != ''" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></td>
+							<td class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></td>
 							<td class="img" v-else>
 								<img src="@/assets/_img/styles/monster.svg" />
 							</td>

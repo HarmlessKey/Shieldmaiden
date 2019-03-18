@@ -42,15 +42,6 @@
 			</div>
 		</template>
 	</div>
-	<div align='center'>
-		<!-- Standard -->
-		<ins class="adsbygoogle"
-		     style="display:block"
-		     data-ad-client="ca-pub-2711721977927243"
-		     data-ad-slot="6300414114"
-		     data-ad-format="link"
-		     data-full-width-responsive="true"></ins>
-	</div>
 </div>
 </template>
 
@@ -105,16 +96,6 @@
 					asObject: true
 				},
 			}
-		},
-		mounted() {
-			// let adScript = document.createElement('script')
-			// adScript.setAttribute('src', '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
-			// adScript.setAttribute('async', true)
-			// document.head.appendChild(adScript)
-
-			// let adScript2 = document.createElement('script')
-			// adScript2.innerHTML = '(adsbygoogle = window.adsbygoogle || []).push({google_ad_client: "ca-pub-2711721977927243", enable_page_level_ads: true });'
-			// document.head.appendChild(adScript2)
 		},
 		beforeMount() {
 			this.fetch_encounter()

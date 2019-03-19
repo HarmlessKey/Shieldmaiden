@@ -51,6 +51,7 @@
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.</small>
 			</div>
 		</div>
+
 	</div>
 </template>
 

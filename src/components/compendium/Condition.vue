@@ -65,6 +65,13 @@
         ],
 			}
 		},
+		mounted() {
+			this.$nextTick(function() {
+				if ($('ins').length == 1) {
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				}
+			})
+		},
 		beforeMount() {
 			//Because the component is loaded in another view, 
 			//the scroll needs to be reset to 0

@@ -57,7 +57,6 @@
 		},
 		updated: function() {
 			this.$nextTick(function() {
-				
 				if ($('ins').length == 1) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}

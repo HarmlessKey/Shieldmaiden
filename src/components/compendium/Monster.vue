@@ -10,13 +10,15 @@
 		</template>
 		<template v-else>
 			<Crumble :name="monster.name"/>
-			<ins class="adsbygoogle"
-			     style="display:block; margin-bottom:20px;"
-			     data-ad-client="ca-pub-2711721977927243"
-			     data-ad-slot="4341848074"
-			     data-ad-format="auto"
-			     data-full-width-responsive="true">
-			 </ins>
+			<div align="center">
+				<ins class="adsbygoogle"
+				     style="display:block; margin-bottom:20px;"
+				     data-ad-client="ca-pub-2711721977927243"
+				     data-ad-slot="4341848074"
+				     data-ad-format="auto"
+				     data-full-width-responsive="true">
+				 </ins>
+			</div>
 		</template>
 
 		<div v-if="loading" class="loader"> <span>Loading monster....</span></div>

@@ -42,6 +42,15 @@
 					</b-row>
 				</div>
 			</div>
+			<div align="center">
+				<ins class="adsbygoogle"
+				     style="display:block; width: 100%; height: 90px;"
+				     data-ad-client="ca-pub-2711721977927243"
+				     data-ad-slot="6525158287"
+				     data-ad-format="auto"
+				     data-full-width-responsive="true">     	
+				</ins>
+			</div>
 		</template>
 	</div>
 </div>
@@ -102,6 +111,13 @@
 		},
 		beforeMount() {
 			this.fetch_encounter()
+		},
+		updated() {
+			this.$nextTick(function() {
+				if ($('ins').length == 1) {
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				}
+			})
 		},
 		computed: {
 			//All entities, without hidden entities
@@ -233,6 +249,7 @@
 			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
 			overflow-y: scroll;
+			padding-bottom: 90px;
 			&::-webkit-scrollbar { 
 				display: none; 
 			}
@@ -241,6 +258,10 @@
 			max-width: 370px;
 			padding: 20px;
 			background: rgba(80, 80, 80, .5) !important;
+		}
+		.adsbygoogle {
+			position: fixed;
+			bottom: 0;
 		}
 	}
 </style>

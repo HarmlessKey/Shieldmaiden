@@ -5,16 +5,18 @@
 			<ins class="adsbygoogle"
 				style="display:inline-block;width:285px;height:100px"
 				data-ad-client="ca-pub-2711721977927243"
-				data-ad-slot="5263800080"></ins>
+				data-ad-slot="5263800080">
+			</ins>
 		</template>
 		<template v-else>
 			<Crumble :name="monster.name"/>
 			<ins class="adsbygoogle"
-				style="display:block"
-				data-ad-client="ca-pub-2711721977927243"
-				data-ad-slot="6300414114"
-				data-ad-format="link"
-				data-full-width-responsive="true"></ins>
+			     style="display:block; margin-bottom:20px;"
+			     data-ad-client="ca-pub-2711721977927243"
+			     data-ad-slot="4341848074"
+			     data-ad-format="auto"
+			     data-full-width-responsive="true">
+			 </ins>
 		</template>
 
 		<div v-if="loading" class="loader"> <span>Loading monster....</span></div>
@@ -55,7 +57,7 @@
 				loading: true,
 			}
 		},
-		updated: function() {
+		mounted() {
 			this.$nextTick(function() {
 				if ($('ins').length == 1) {
 					(adsbygoogle = window.adsbygoogle || []).push({});

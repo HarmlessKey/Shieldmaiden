@@ -34,11 +34,6 @@
 
 			<!-- SHOW SELECTED RESULT -->
 			<template v-if="show">
-				<ins class="adsbygoogle"
-			     style="display:inline-block;width:285px;height:100px"
-			     data-ad-client="ca-pub-2711721977927243"
-			     data-ad-slot="5263800080"></ins>
-
 				<Monster v-if="current == 'monsters'" :id="show" />
 				<Spell v-if="current == 'spells'" :id="show" />
 				<Condition v-if="current == 'conditions'" :id="show" />
@@ -125,14 +120,6 @@
 					this.searching = false
 				}
 			},
-		},
-		updated: function() {
-			this.$nextTick(function() {
-				
-				if ($('ins').length == 1) {
-					(adsbygoogle = window.adsbygoogle || []).push({});
-				}
-			})
 		},
 	};
 </script>

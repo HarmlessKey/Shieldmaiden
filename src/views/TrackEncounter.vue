@@ -22,7 +22,8 @@
 			<Turns 
 				:encounter="encounter" 
 				:current="_targets[0]"
-				:entities_len="Object.keys(_allEntities).length"
+				:entities_len="Object.keys(_turnCount).length"
+				:turn="turn"
 			/>
 			<div class="container-fluid">
 				<div class="container entities">
@@ -30,8 +31,9 @@
 						<b-col>
 							<Initiative 
 								:encounter="encounter" 
-								:targets="_targets"
-								:allEntities="_allEntities"
+								:targets="_non_hidden_targets"
+								:allEntities="_turnCount"
+								:turn="turn"
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
@@ -71,6 +73,7 @@
 			return {
 				userId: this.$route.params.userid,
 				encounter: undefined,
+				counter: 0,
 			}
 		},
 		firebase() {
@@ -101,6 +104,21 @@
 			this.fetch_encounter()
 		},
 		computed: {
+			//All entities, without hidden entities
+			_turnCount() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && !entity.hidden;
+				})
+				.orderBy(function(entity) {
+					return entity.name
+				}, 'asc')
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
 			_allEntities: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -120,6 +138,46 @@
 				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
+			},
+			_non_hidden: function() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && !entity.hidden;
+				})
+				.orderBy(function(entity) {
+					return entity.name
+				}, 'asc')
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
+			_hidden_count: function() {
+				return _.filter(this.encounter.entities, function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && entity.hidden;
+				}).length
+			},
+			_non_hidden_targets: function() {
+				let t = this.turn
+				let turns = Object.keys(this._non_hidden)
+				let order = turns.slice(t).concat(turns.slice(0,t))
+				return Array.from(order, i => this._non_hidden[i])
+			},
+			turn() {	
+				let t = this.encounter.turn
+				let hidden = 0
+				for (let i = 0; i <= t; i++) {
+					if (this._allEntities[i].hidden) {
+						hidden++;
+					}
+				}
+				// If more hidden then turn it's still turn 0
+				if (t - hidden < 0) {
+					return 0
+				}
+				return t - hidden
 			},
 		},
 		methods: {

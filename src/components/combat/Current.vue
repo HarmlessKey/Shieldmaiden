@@ -1,6 +1,9 @@
 <template>
 	<div id="current" v-if="current">
-		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">{{ current.name }}</h2>
+		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
+			<i v-if="current.hidden" class="fas fa-eye-slash red"></i> 
+			{{ current.name }}
+		</h2>
 		<div class="scroll" v-bar>
 			<div v-on:scroll="shadow()" ref="scroll">
 				<div class="current">
@@ -30,7 +33,8 @@
 						
 						<template v-else>
 							<div class="health">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
+								<span v-if="current.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
+								<span v-else class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
 								<div class="progress health-bar">
 									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
@@ -347,6 +351,9 @@
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
+			font-size: 20px;
+			line-height: 30px;
+			text-align: center;
 			grid-area: img;
 		}
 		.ac {

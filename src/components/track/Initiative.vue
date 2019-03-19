@@ -16,7 +16,7 @@
 				enter-active-class="animated fadeIn"
 				leave-active-class="animated fadeOut">
 				<template v-for="(entity, index) in targets">
-					<tr v-if="allEntities[0].key == entity.key && encounter.turn != 0" :key="index" class="top">
+					<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
 						<td colspan="6">Top of the round</td>
 					</tr>
 					<tr :key="entity.key">
@@ -120,6 +120,7 @@
 			'encounter',
 			'targets',
 			'allEntities',
+			'turn',
 		],
 		data() {
 			return {

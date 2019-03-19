@@ -3,7 +3,7 @@
 			Round <span class="number mx-2">{{ encounter.round }}</span>
 			Turn 
 			<span class="number ml-2">
-				{{ encounter.turn + 1 }}
+				{{ turn + 1 }}
 				<span class="small gray-hover"> /{{ entities_len }}</span>
 			</span>
 
@@ -42,6 +42,7 @@
 			'encounter',
 			'current',
 			'entities_len',
+			'turn',
 		],
 		data() {
 			return {

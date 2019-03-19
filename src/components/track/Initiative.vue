@@ -16,10 +16,10 @@
 				enter-active-class="animated fadeIn"
 				leave-active-class="animated fadeOut">
 				<template v-for="(entity, index) in targets">
-					<tr v-if="allEntities[0].key == entity.key && turn != 0 && turn+1 != Object.keys(allEntities).length" :key="index" class="top">
+					<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
 						<td colspan="6">Top of the round</td>
 					</tr>
-					<tr :key="entity.key" v-if="!entity.hidden">
+					<tr :key="entity.key">
 						<td>{{ entity.initiative }}</td>
 					
 						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>

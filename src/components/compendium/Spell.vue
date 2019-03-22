@@ -1,7 +1,23 @@
 <template>
 	<div>
-		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
-		<Crumble v-else :name="spell.name"/>
+		<template v-if="$route.meta.basePath != '/compendium'">
+			<small class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
+			<ins class="adsbygoogle"
+				style="display:inline-block;width:285px;height:100px"
+				data-ad-client="ca-pub-2711721977927243"
+				data-ad-slot="5263800080">
+			</ins>
+		</template>
+		<template v-else>
+			<Crumble :name="spell.name"/>
+			<ins class="adsbygoogle"
+					style="display:block; margin-bottom:20px;"
+					data-ad-client="ca-pub-2711721977927243"
+					data-ad-slot="4341848074"
+					data-ad-format="auto"
+					data-full-width-responsive="true">
+			</ins>
+		</template>
 
 		<div v-if="loading" class="loader"> <span>Loading spell....</span></div>
 
@@ -82,6 +98,13 @@
 					9: '9th level',
 				},
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				if ($('ins').length == 1) {
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				}
+			})
 		},
 		firebase() {
 			return {

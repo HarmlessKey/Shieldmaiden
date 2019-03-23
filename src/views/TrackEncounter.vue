@@ -1,6 +1,7 @@
 <template>
 <div>
 	<div class="text-center p-5" v-if="!broadcasting['.value']">
+		<Follow />
 		<h2>User is currently not broadcasting.</h2>
 		<p>Were you sneakily trying to meta game? Taking a quick peek at what your DM is doing?<br/> Don't ruin the game for yourself...</p>
 	</div>
@@ -14,6 +15,7 @@
 		</div>
 
 		<div class="not-started" v-else-if="encounter.round == 0">
+			<Follow />
 			<h2 class="padding">Encounter has not started yet.</h2>
 			<div class="loader"></div>
 		</div>
@@ -26,6 +28,7 @@
 				:turn="turn"
 			/>
 			<div class="container-fluid">
+					<Follow />
 				<div class="container entities">
 					<b-row>
 						<b-col>
@@ -37,7 +40,7 @@
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
-							<Meters :encounter="encounter"	/>
+							<Meters :encounter="encounter" />
 						</b-col>
 					</b-row>
 				</div>
@@ -61,6 +64,7 @@
 	import { db } from '@/firebase'
 	import { attributes } from '@/mixins/attributes.js'
 
+	import Follow from '@/components/track/Follow.vue'
 	import Finished from '@/components/combat/Finished.vue'
 	import Turns from '@/components/track/Turns.vue'
 	import Initiative from '@/components/track/Initiative.vue'
@@ -70,6 +74,7 @@
 		name: 'app',
 		mixins: [attributes],
 		components: {
+			Follow,
 			Finished,
 			Turns,
 			Initiative,
@@ -80,6 +85,7 @@
 		},
 		data() {
 			return {
+				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				encounter: undefined,
 				counter: 0,
@@ -225,7 +231,6 @@
 		&::-webkit-scrollbar { 
 			display: none; 
 		}
-
 		.not-started {
 
 			h2.padding {

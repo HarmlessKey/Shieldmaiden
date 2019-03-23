@@ -42,13 +42,20 @@
 					</b-row>
 				</div>
 			</div>
-			<div align="center">
+			<div class="desktop d-none d-md-block" align="center">
 				<ins class="adsbygoogle"
-				     style="display:block; width: 100%; height: 90px;"
+				     style="display:block"
 				     data-ad-client="ca-pub-2711721977927243"
 				     data-ad-slot="6525158287"
 				     data-ad-format="auto"
 				     data-full-width-responsive="true">     	
+				</ins>
+			</div>
+			<div class="mobile d-block d-md-none" align="center">
+				<ins class="adsbygoogle"
+				     style="display:inline-block;width:320px;height:100px"
+				     data-ad-client="ca-pub-2711721977927243"
+				     data-ad-slot="8698049578">
 				</ins>
 			</div>
 		</template>
@@ -114,6 +121,11 @@
 		},
 		updated() {
 			this.$nextTick(function() {
+				let ins = $('ins')
+				for (let i = 0; i < ins.length; i++) {
+					console.log(ins[i])
+					// console.log(ins[i].attr('data-adsbygoogle-status'))
+				}
 				if ($('ins').length == 1) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}

@@ -38,7 +38,10 @@
 			<span class="current-name"></span>
 		</div>
 		<div>
-			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" @click="prevTurn()">
+			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
+				@click="prevTurn()"
+				v-b-tooltip.hover title="[shift]+[arrowleft]"
+				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()">
 				<i class="fas fa-arrow-left"></i> 
 				<span class="ml-1 d-none d-md-inline">Prev turn</span>
 			</a>

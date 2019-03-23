@@ -61,7 +61,7 @@
 		},
 		mounted() {
 			this.$nextTick(function() {
-				if ($('ins').length == 1) {
+				if ($('ins').length > 0) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}
 			})

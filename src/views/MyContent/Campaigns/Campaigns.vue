@@ -98,6 +98,22 @@
 					<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
 				</b-card>
 				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
+
+				<h2>Following</h2>
+				<template v-if="userInfo && users">
+					<ul v-if="userInfo.follow" class="entities">
+						<li v-for="(following, key) in userInfo.follow" :key="key" class="d-flex justify-content-between">
+							<router-link :to="'/track-encounter/' + key" v-if="users[key]">
+								{{ users[key].username }}
+							</router-link>
+							<template v-if="track[key]">
+								<i v-show="track[key].broadcast" v-b-tooltip.hover title="Broadcasting" class="fas fa-play green"></i>
+								<i v-show="!track[key].broadcast" v-b-tooltip.hover title="Not Broadcasting" class="fas fa-stop red"></i>
+							</template>
+						</li>
+					</ul>
+					<p v-else>You are currently not following other users.</p>
+				</template>
 			</div>
 		</div>
 	</div>
@@ -124,9 +140,22 @@
 				newCampaign: '',
 			}
 		},
+		firebase() {
+			return {
+				users: {
+					source: db.ref(`users`),
+					asObject: true
+				},
+				track: {
+					source: db.ref(`track`),
+					asObject: true
+				}
+			}
+		},
 		computed: {
 			...mapGetters([
 				'campaigns',
+				'userInfo',
 				'allEncounters',
 				'players',
 			]),
@@ -243,6 +272,13 @@
 					svg {
 						font-size: 50px;
 					}
+				}
+			}
+		}
+		ul.entities {
+			li {
+				i {
+				 margin-top: 5px;
 				}
 			}
 		}

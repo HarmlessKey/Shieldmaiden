@@ -45,18 +45,9 @@
 					</b-row>
 				</div>
 			</div>
-			<div class="desktop d-none d-md-block" align="center">
-				<!-- <ins class="adsbygoogle"
-				     style="display:block"
-				     data-ad-client="ca-pub-2711721977927243"
-				     data-ad-slot="6525158287"
-				     data-ad-format="auto"
-				     data-full-width-responsive="true">     	
-				</ins> -->
-			</div>
-			<div class="" align="center">
-				<ins class="adsbygoogle"
-				     style="display:inline-block;width:320px;height:100px"
+			<div class="d-flex justify-content-center">
+				<ins class="adsbygoogle bg-gray-dark"
+				     style="display:inline-block;width:100%;height:100px"
 				     data-ad-client="ca-pub-2711721977927243"
 				     data-ad-slot="8698049578">
 				</ins>
@@ -130,9 +121,9 @@
 				let ins = $('ins')
 				for (let i = 0; i < ins.length; i++) {
 					console.log(ins[i])
-					// console.log(ins[i].attr('data-adsbygoogle-status'))
+					console.log(ins[i].getAttribute('data-adsbygoogle-status'))
 				}
-				if ($('ins').length == 1) {
+				if ($('ins').length > 0) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}
 			})
@@ -266,7 +257,7 @@
 			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
 			overflow-y: scroll;
-			padding-bottom: 90px;
+			padding-bottom: 110px;
 			&::-webkit-scrollbar { 
 				display: none; 
 			}

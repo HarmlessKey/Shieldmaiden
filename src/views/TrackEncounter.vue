@@ -23,7 +23,7 @@
 		<template v-else>
 			<Turns 
 				:encounter="encounter" 
-				:current="_targets[0]"
+				:current="_non_hidden_targets[0]"
 				:entities_len="Object.keys(_turnCount).length"
 				:turn="turn"
 			/>

@@ -71,13 +71,11 @@
 											v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
 											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
 										</a>
-										<a v-if="!entity.hidden" class="dropdown-item" @click="setHidden(entity.key, true)"
-											v-shortkey="['h']" @shortkey="setHidden(targeted, true)">
-											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Hide
-										</a>
-										<a v-else class="dropdown-item" @click="setHidden(entity.key, false)"
-											v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
-											<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
+										<a class="dropdown-item" @click="setHidden(entity.key, !entity.hidden)"
+											v-shortkey="['h']" @shortkey="setHidden(targeted, !entities[targeted].hidden)">
+											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> 
+											<template v-if="!entity.hidden"> Hide</template>
+											<template v-else> Show</template>
 										</a>
 
 

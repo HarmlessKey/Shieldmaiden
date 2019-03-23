@@ -46,15 +46,15 @@
 				</div>
 			</div>
 			<div class="desktop d-none d-md-block" align="center">
-				<ins class="adsbygoogle"
+				<!-- <ins class="adsbygoogle"
 				     style="display:block"
 				     data-ad-client="ca-pub-2711721977927243"
 				     data-ad-slot="6525158287"
 				     data-ad-format="auto"
 				     data-full-width-responsive="true">     	
-				</ins>
+				</ins> -->
 			</div>
-			<div class="mobile d-block d-md-none" align="center">
+			<div class="" align="center">
 				<ins class="adsbygoogle"
 				     style="display:inline-block;width:320px;height:100px"
 				     data-ad-client="ca-pub-2711721977927243"

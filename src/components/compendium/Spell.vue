@@ -10,13 +10,15 @@
 		</template>
 		<template v-else>
 			<Crumble :name="spell.name"/>
-			<ins class="adsbygoogle"
-					style="display:block; margin-bottom:20px;"
-					data-ad-client="ca-pub-2711721977927243"
-					data-ad-slot="4341848074"
-					data-ad-format="auto"
-					data-full-width-responsive="true">
-			</ins>
+			<div v-if="!tier.benefits.ads" align="center">
+				<ins class="adsbygoogle"
+						style="display:block; margin-bottom:20px;"
+						data-ad-client="ca-pub-2711721977927243"
+						data-ad-slot="4341848074"
+						data-ad-format="auto"
+						data-full-width-responsive="true">
+				</ins>
+			</div>
 		</template>
 
 		<div v-if="loading" class="loader"> <span>Loading spell....</span></div>
@@ -61,6 +63,7 @@
 <script>
 	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
+	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'Spell',
@@ -98,6 +101,11 @@
 					9: '9th level',
 				},
 			}
+		},
+		computed: {
+			...mapGetters([
+				'tier',
+			]),
 		},
 		mounted() {
 			this.$nextTick(function() {

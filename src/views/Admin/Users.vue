@@ -21,24 +21,26 @@
 			<p v-if="noResult" class="red">{{ noResult }}</p>
 			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} users found</p>
 
-			<b-table 
-				:busy="isBusy"
-				:items="searchResults" 
-				:fields="fields"
-				:per-page="15"
-				:current-page="current"
-			>	
-				<!-- USERNAME -->
-				<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">{{ data.value }}</router-link>
-				
-				<!-- SUBSCRIPTION -->
-				<!-- <span slot="campaigns" slot-scope="data"></span> -->
+			<div class="table-responsive">
+				<b-table 
+					:busy="isBusy"
+					:items="searchResults" 
+					:fields="fields"
+					:per-page="15"
+					:current-page="current"
+				>	
+					<!-- USERNAME -->
+					<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">{{ data.value }}</router-link>
+					
+					<!-- SUBSCRIPTION -->
+					<!-- <span slot="campaigns" slot-scope="data"></span> -->
 
-				<!-- LOADER -->
-				<div slot="table-busy" class="loader">
-					<span>Loading users....</span>
-				</div>
-			</b-table>
+					<!-- LOADER -->
+					<div slot="table-busy" class="loader">
+						<span>Loading users....</span>
+					</div>
+				</b-table>
+			</div>
 			<div v-if="isBusy" class="loader"> <span>Loading users....</span></div>
 		
 			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />

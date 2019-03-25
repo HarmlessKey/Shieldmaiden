@@ -1,6 +1,6 @@
 <template>
 <div>
-	<div class="text-center p-5" v-if="!broadcasting['.value']">
+	<div class="text-center p-5 no-broadcast" v-if="!broadcasting['.value']">
 		<Follow />
 		<h2>User is currently not broadcasting.</h2>
 		<p>Were you sneakily trying to meta game? Taking a quick peek at what your DM is doing?<br/> Don't ruin the game for yourself...</p>
@@ -45,14 +45,14 @@
 					</b-row>
 				</div>
 			</div>
-			<div class="d-flex justify-content-center">
-				<ins class="adsbygoogle bg-gray-dark"
-				     style="display:inline-block;width:100%;height:100px"
-				     data-ad-client="ca-pub-2711721977927243"
-				     data-ad-slot="8698049578">
-				</ins>
-			</div>
 		</template>
+	</div>
+	<div class="d-flex justify-content-center">
+		<ins class="adsbygoogle bg-gray-dark"
+					style="display:inline-block;width:100%;height:100px"
+					data-ad-client="ca-pub-2711721977927243"
+					data-ad-slot="8698049578">
+		</ins>
 	</div>
 </div>
 </template>
@@ -235,6 +235,7 @@
 			display: none; 
 		}
 		.not-started {
+			padding-bottom: 110px;
 
 			h2.padding {
 				font-size:25px !important;
@@ -258,6 +259,7 @@
 			height: calc(100vh - 115px);
 			overflow-y: scroll;
 			padding-bottom: 110px;
+
 			&::-webkit-scrollbar { 
 				display: none; 
 			}
@@ -267,9 +269,12 @@
 			padding: 20px;
 			background: rgba(80, 80, 80, .5) !important;
 		}
-		.adsbygoogle {
-			position: fixed;
-			bottom: 0;
-		}
+	}
+	.no-broadcast {
+		padding-bottom: 110px !important;
+	}
+	.adsbygoogle {
+		position: fixed;
+		bottom: 0;
 	}
 </style>

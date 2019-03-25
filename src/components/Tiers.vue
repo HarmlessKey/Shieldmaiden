@@ -7,7 +7,7 @@
 				<i v-else class="gray-hover sub">per month</i>
 				<ul>
 					<li v-for="(benefit, key) in t.benefits" :key="key">
-						<template v-if="key == 'adds'">Ads are removed</template>
+						<template v-if="key == 'ads'">Ads are removed</template>
 						<template v-if="key == 'campaigns'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
 							<span v-else class="green">{{ benefit }}</span> campaign slots

@@ -18,8 +18,8 @@
 				<h2>Building together</h2>
 				<p>
 					Our goal is not to earn money, our goal is to create an app that is useful for the entire community. <br/>
-					To reach this goal, we will need support. This is why have set up a Patreon. 
-					This way you can help us in achieving this goal.
+					To reach this goal, we will need support. This is why we have set up a Patreon. 
+					This way you can help us in achieving this goal and benifit from the extra's that come with it.
 				</p>
 
 				<a class="btn bg-patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon black"></i> Support us</a>

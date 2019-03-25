@@ -63,13 +63,16 @@
 			
 					<ul class="entities hasImg">
 						<li v-for="(entity) in _active" v-bind:key="entity.key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
+							<span v-else class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 							<div class="d-flex justify-content-between">
 								{{ entity.name }}
 								<span>{{ entity.initiative }}</span>
 							</div>
 							<div class="actions">
-								<a v-b-tooltip.hover title="Set Inactive" @click="setActive(entity.key, false)"><i class="fas fa-minus"></i></a>
+								<a v-if="!entity.hidden" v-b-tooltip.hover title="Set Hidden" class="pointer" @click="setHidden(entity.key, true)"><i class="fas fa-eye-slash"></i></a>
+								<a v-else v-b-tooltip.hover title="Unhide" class="pointer" @click="setHidden(entity.key, false)"><i class="fas fa-eye"></i></a>
+								<a v-b-tooltip.hover title="Set Inactive" class="pointer" @click="setActive(entity.key, false)"><i class="fas fa-minus"></i></a>
 							</div>
 						</li>
 					</ul>
@@ -152,6 +155,7 @@
 			...mapActions([
 				'setSlide',
 				'set_active',
+				'set_hidden',
 				'set_initiative'
 			]),
 			shadow() {
@@ -161,6 +165,12 @@
 				this.set_active({
 					key: key,
 					active: active
+				})
+			},
+			setHidden(key, hidden) {
+				this.set_hidden({
+					key: key,
+					hidden: hidden
 				})
 			},
 			storeInitiative(key, entity) {
@@ -275,6 +285,11 @@
 
 			&.selected {
 				border-color: #2c97de;
+			}
+			.img {
+				font-size: 20px;
+				line-height: 44px;
+				text-align: center;
 			}
 			.form-control {
 				position: absolute;

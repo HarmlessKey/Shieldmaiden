@@ -90,6 +90,7 @@ const mutations = {
 			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 		}
+		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
 		entity.npc = (db_entity.npc) ? db_entity.npc : false;
 		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
 		entity.down = (db_entity.down) ? db_entity.down : false;
@@ -250,6 +251,12 @@ const mutations = {
 		state.entities[key].active = active
 		encounters_ref.child(`${state.path}/entities/${key}`).update({
 			active: active
+		})
+	},
+	SET_HIDDEN(state, {key, hidden}) {
+		state.entities[key].hidden = hidden
+		encounters_ref.child(`${state.path}/entities/${key}`).update({
+			hidden: hidden
 		})
 	},
 	SET_INITIATIVE(sate, {key, initiative}) {
@@ -482,6 +489,9 @@ const actions = {
 	},
 	set_active({ commit }, payload) {
 		commit("SET_ACTIVE", payload)
+	},
+	set_hidden({ commit }, payload) {
+		commit("SET_HIDDEN", payload)
 	},
 	set_targeted({ commit }, payload) {
 		commit('SET_TARGETED', payload);

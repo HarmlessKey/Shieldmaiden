@@ -67,6 +67,7 @@
 											class="d-flex justify-content-between">
 											<div class="d-flex justify-content-left">
 												<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
+												<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 												{{ players[key].character_name }}
 											</div>
 											<template v-if="encounter.entities">
@@ -110,6 +111,7 @@
 											<li :key="key" v-if="Object.keys(campaign.players).indexOf(key) < 0" class="d-flex justify-content-between">
 												<div class="d-flex justify-content-left">
 													<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+													<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 													{{ player.character_name }}
 												</div>
 												<template v-if="encounter.entities">
@@ -279,15 +281,15 @@
 				<div class="card-body">
 					<h2>Currency</h2>
 					<b-row class="mb-5">
-						<b-col class="d-flex justify-content-between">
+						<b-col md="4" class="d-flex justify-content-between">
 							<span class="coins mr-2 yellow"><i class="fas fa-coins"></i></span>
 							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.gp" placeholder="GP"/>
 						</b-col>
-						<b-col class="d-flex justify-content-between">
+						<b-col md="4" class="d-flex justify-content-between">
 							<span class="coins mr-2"><i class="fas fa-coins"></i></span> 
 							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.sp" placeholder="SP"/>
 						</b-col>
-						<b-col class="d-flex justify-content-between">
+						<b-col md="4" class="d-flex justify-content-between">
 							<span class="coins mr-2 orange"><i class="fas fa-coins"></i></span>
 							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.cp" placeholder="CP"/>
 						</b-col>

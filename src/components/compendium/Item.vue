@@ -1,7 +1,25 @@
 <template>
 	<div>
-		<small v-if="$route.meta.basePath != '/compendium'" class="url">url: <a :href="'https://harmlesskey.com/compendium/items/'+id" target="_blank">https://harmlesskey.com/compendium/items/{{ id }}</a></small>
-		<Crumble v-else :name="item.name"/>
+		<template v-if="$route.meta.basePath != '/compendium'">
+			<small class="url">url: <a :href="'https://harmlesskey.com/compendium/items/'+id" target="_blank">https://harmlesskey.com/compendium/items/{{ id }}</a></small>
+			<ins class="adsbygoogle"
+				style="display:inline-block;width:285px;height:100px"
+				data-ad-client="ca-pub-2711721977927243"
+				data-ad-slot="5263800080">
+			</ins>
+		</template>
+		<template v-else>
+			<Crumble :name="item.name"/>
+			<div align="center">
+				<ins class="adsbygoogle"
+						style="display:block; margin-bottom:20px;"
+						data-ad-client="ca-pub-2711721977927243"
+						data-ad-slot="4341848074"
+						data-ad-format="auto"
+						data-full-width-responsive="true">
+				</ins>
+			</div>
+		</template>
 
 		<div v-if="loading" class="loader"> <span>Loading item....</span></div>
 
@@ -156,6 +174,13 @@
 					readyCallback: () => this.loading = false
 				}
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				if ($('ins').length > 0) {
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				}
+			})
 		},
 		methods: {
 			setEdit(value) {

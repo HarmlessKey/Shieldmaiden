@@ -71,9 +71,17 @@
 											v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
 											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
 										</a>
+										<a class="dropdown-item" @click="setHidden(entity.key, !entity.hidden)"
+											v-shortkey="['h']" @shortkey="setHidden(targeted, !entities[targeted].hidden)">
+											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> 
+											<template v-if="!entity.hidden"> Hide</template>
+											<template v-else> Show</template>
+										</a>
+
+
 										<a class="dropdown-item" @click="conditions(entity)"
 											v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
-											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
+											<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 										</a>
 										<a class="dropdown-item" @click="damageHeal(entity)"
 											v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
@@ -128,9 +136,17 @@
 												v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
 												<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
 											</a>
+											<a v-if="!entity.hidden" class="dropdown-item" @click="setHidden(entity.key, true)"
+												v-shortkey="['h']" @shortkey="setHidden(targeted, true)">
+												<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Hide
+											</a>
+											<a v-else class="dropdown-item" @click="setHidden(entity.key, false)"
+												v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
+												<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
+											</a>
 											<a class="dropdown-item" @click="conditions(entity)"
 												v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
-												<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
+												<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 											</a>
 											<a class="dropdown-item" @click="damageHeal(entity)"
 												v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
@@ -233,6 +249,7 @@
 		methods: {
 			...mapActions([
 				'setSlide',
+				'set_hidden',
 				'set_targeted',
 				'set_stable',
 				'remove_entity',
@@ -299,6 +316,17 @@
 				}
 				else {
 					this.$snotify.error('Select a target', 'Transform entity', {
+					});
+				}
+			},
+			setHidden(key, hidden) {
+				if(key) {
+					this.set_hidden({
+						key: key,
+						hidden: hidden
+					})
+				} else {
+					this.$snotify.error('Select a target', 'Hide entity', {
 					});
 				}
 			},

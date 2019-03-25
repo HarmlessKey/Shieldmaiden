@@ -5,17 +5,12 @@
 				<i v-if="targeted == entity.key" class="fas fa-crosshairs blue"></i>
 				<template v-else>{{ entity.initiative }}</template>
 			</span>
-			<span class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
-				<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
-					<i class="fas fa-paw-claws"></i>
-				</span>
+			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
+			<span v-else-if="entity.transformed == true" class="img" v-b-tooltip.hover title="Transformed">
+				<i class="fas fa-paw-claws green"></i>
 			</span>
-			<span class="img" v-if="entity.img != ''" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }">
-				<span v-if="entity.transformed == true" v-b-tooltip.hover title="Transformed">
-					<i class="fas fa-paw-claws"></i>
-				</span>
+			<span v-else class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
 			</span>
-			<span class="img" v-else><img src="@/assets/_img/styles/player.svg" /></span>
 			<span class="ac" 
 				:class="{ 
 						'green': entity.ac_bonus > 0, 
@@ -42,8 +37,8 @@
 					</div>
 					<div class="progress-bar" :class="{ 
 						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
-						'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-						'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+						'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) <= 76, 
+						'bg-green': true
 						}" 
 						role="progressbar" 
 						:style="{ width: percentage(displayStats().curHp, displayStats().maxHp) + '%' }" aria-valuemin="0" aria-valuemax="100">
@@ -56,9 +51,9 @@
 						{{ setNumber(displayStats().curHp) }} 
 						<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
 							<span class="current" :class="{ 
-								'red': percentage(displayStats().curHp, displayStats().maxHp) < 33, 
-								'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-								'green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+								'red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
+								'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) <= 76, 
+								'green': true
 								}">{{ animatedNumber }}</span>
 								<span class="gray-hover">/</span>{{ displayStats().maxHp }}
 							<template v-if="entity.tempHp">

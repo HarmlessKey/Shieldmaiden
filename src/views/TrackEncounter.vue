@@ -1,6 +1,7 @@
 <template>
 <div>
 	<div class="text-center p-5" v-if="!broadcasting['.value']">
+		<Follow />
 		<h2>User is currently not broadcasting.</h2>
 		<p>Were you sneakily trying to meta game? Taking a quick peek at what your DM is doing?<br/> Don't ruin the game for yourself...</p>
 	</div>
@@ -14,6 +15,7 @@
 		</div>
 
 		<div class="not-started" v-else-if="encounter.round == 0">
+			<Follow />
 			<h2 class="padding">Encounter has not started yet.</h2>
 			<div class="loader"></div>
 		</div>
@@ -21,24 +23,34 @@
 		<template v-else>
 			<Turns 
 				:encounter="encounter" 
-				:current="_targets[0]"
-				:entities_len="Object.keys(_allEntities).length"
+				:current="_non_hidden_targets[0]"
+				:entities_len="Object.keys(_turnCount).length"
+				:turn="turn"
 			/>
 			<div class="container-fluid">
+					<Follow />
 				<div class="container entities">
 					<b-row>
 						<b-col>
 							<Initiative 
 								:encounter="encounter" 
-								:targets="_targets"
-								:allEntities="_allEntities"
+								:targets="_non_hidden_targets"
+								:allEntities="_turnCount"
+								:turn="turn"
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
-							<Meters :encounter="encounter"	/>
+							<Meters :encounter="encounter" />
 						</b-col>
 					</b-row>
 				</div>
+			</div>
+			<div class="d-flex justify-content-center">
+				<ins class="adsbygoogle bg-gray-dark"
+				     style="display:inline-block;width:100%;height:100px"
+				     data-ad-client="ca-pub-2711721977927243"
+				     data-ad-slot="8698049578">
+				</ins>
 			</div>
 		</template>
 	</div>
@@ -50,6 +62,7 @@
 	import { db } from '@/firebase'
 	import { attributes } from '@/mixins/attributes.js'
 
+	import Follow from '@/components/track/Follow.vue'
 	import Finished from '@/components/combat/Finished.vue'
 	import Turns from '@/components/track/Turns.vue'
 	import Initiative from '@/components/track/Initiative.vue'
@@ -59,6 +72,7 @@
 		name: 'app',
 		mixins: [attributes],
 		components: {
+			Follow,
 			Finished,
 			Turns,
 			Initiative,
@@ -69,8 +83,10 @@
 		},
 		data() {
 			return {
+				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				encounter: undefined,
+				counter: 0,
 			}
 		},
 		firebase() {
@@ -97,20 +113,37 @@
 				},
 			}
 		},
-		mounted() {
-			let adScript = document.createElement('script')
-			adScript.setAttribute('src', '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
-			adScript.setAttribute('async', true)
-			document.head.appendChild(adScript)
-
-			let adScript2 = document.createElement('script')
-			adScript2.innerHTML = '(adsbygoogle = window.adsbygoogle || []).push({google_ad_client: "ca-pub-2711721977927243", enable_page_level_ads: true });'
-			document.head.appendChild(adScript2)
-		},
 		beforeMount() {
 			this.fetch_encounter()
 		},
+		updated() {
+			this.$nextTick(function() {
+				let ins = $('ins')
+				for (let i = 0; i < ins.length; i++) {
+					console.log(ins[i])
+					console.log(ins[i].getAttribute('data-adsbygoogle-status'))
+				}
+				if ($('ins').length > 0) {
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				}
+			})
+		},
 		computed: {
+			//All entities, without hidden entities
+			_turnCount() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && !entity.hidden;
+				})
+				.orderBy(function(entity) {
+					return entity.name
+				}, 'asc')
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
 			_allEntities: function() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
@@ -130,6 +163,46 @@
 				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
+			},
+			_non_hidden: function() {
+				return _.chain(this.encounter.entities)
+				.filter(function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && !entity.hidden;
+				})
+				.orderBy(function(entity) {
+					return entity.name
+				}, 'asc')
+				.orderBy(function(entity){
+					return parseInt(entity.initiative)
+				} , 'desc')
+				.value()
+			},
+			_hidden_count: function() {
+				return _.filter(this.encounter.entities, function(entity, key) {
+					entity.key = key
+					return entity.active && !entity.down && entity.hidden;
+				}).length
+			},
+			_non_hidden_targets: function() {
+				let t = this.turn
+				let turns = Object.keys(this._non_hidden)
+				let order = turns.slice(t).concat(turns.slice(0,t))
+				return Array.from(order, i => this._non_hidden[i])
+			},
+			turn() {	
+				let t = this.encounter.turn
+				let hidden = 0
+				for (let i = 0; i <= t; i++) {
+					if (this._allEntities[i].hidden) {
+						hidden++;
+					}
+				}
+				// If more hidden then turn it's still turn 0
+				if (t - hidden < 0) {
+					return 0
+				}
+				return t - hidden
 			},
 		},
 		methods: {
@@ -161,7 +234,6 @@
 		&::-webkit-scrollbar { 
 			display: none; 
 		}
-
 		.not-started {
 
 			h2.padding {
@@ -185,6 +257,7 @@
 			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
 			overflow-y: scroll;
+			padding-bottom: 110px;
 			&::-webkit-scrollbar { 
 				display: none; 
 			}
@@ -193,6 +266,10 @@
 			max-width: 370px;
 			padding: 20px;
 			background: rgba(80, 80, 80, .5) !important;
+		}
+		.adsbygoogle {
+			position: fixed;
+			bottom: 0;
 		}
 	}
 </style>

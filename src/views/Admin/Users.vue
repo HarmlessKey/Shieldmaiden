@@ -96,7 +96,7 @@
 		firebase() {
 			return {
 				users: {
-					source: db.ref('users'),
+					source: db.ref('users').orderByChild('username'),
 					readyCallback: () => this.isBusy = false
 				},
 				campaigns: db.ref('users'),

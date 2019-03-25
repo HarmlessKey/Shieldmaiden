@@ -109,7 +109,12 @@
 			user() {
 				return auth.currentUser
 			}
-		}
+		},
+		// updated() {
+		// 	this.$nextTick(function() {
+		// 		(adsbygoogle = window.adsbygoogle || []).push({});
+		// 	})
+		// },
 	}
 </script>
 

@@ -120,7 +120,7 @@
 					this.searching = false
 				}
 			},
-		}
+		},
 	};
 </script>
 

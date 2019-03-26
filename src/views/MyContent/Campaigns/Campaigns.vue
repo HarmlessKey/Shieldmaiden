@@ -4,8 +4,7 @@
 			<Sidebar/>
 			<div id="my-content" class="container-fluid">
 				<Crumble />
-				<h1>Campaigns</h1>
-				<p>Welcome to your campaigns overview.</p>
+				<PlayerLink />
 				
 				<template v-if="players">
 					<div class="input-group">
@@ -123,6 +122,7 @@
 	import _ from 'lodash'
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
+	import PlayerLink from '@/components/PlayerLink.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -134,6 +134,7 @@
 		components: {
 			Sidebar,
 			Crumble,
+			PlayerLink,
 		},
 		data() {
 			return {

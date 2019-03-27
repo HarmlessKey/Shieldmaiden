@@ -2,7 +2,7 @@
 	<div>
 		<b-card header="Player link">
 			<div class="d-flex justify-content-start">
-				<vue-qr  :text="copy" qid="testid" :size="120"></vue-qr>
+				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="100" colorLight="true" margin="5"></vue-qr>
 
 				<div class="ml-3">
 					<p class="d-flex justify-content-between">
@@ -19,7 +19,7 @@
 						You control what is dispayed on the link through the <router-link to="/settings#track">settings</router-link>.
 					</p>
 				
-					<a @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a>
+					<a class="copy" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a>
 					<input type="hidden" autocomplete="off" id="copy" :value="copy">
 				</div>
 			</div>
@@ -69,6 +69,6 @@
 <style lang="scss" scoped>
 
 	.copy {
-		word-wrap: break-word;
+		word-break: break-all;
 	}
 </style>

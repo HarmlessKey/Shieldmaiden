@@ -7,8 +7,17 @@
 				<PlayerLink />
 				
 				<template v-if="players">
-					<div class="input-group">
-						<input type="text" 
+
+					<h2 class="mt-3 d-flex justify-content-between">
+						<span>
+							Your Campaigns 
+							<span v-if="campaigns">( {{ Object.keys(campaigns).length }} )</span>
+						</span>
+						<a class="green" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus"></i></a>
+					</h2>
+
+					<div class="input-group" v-if="add">
+					<input type="text" 
 							class="form-control" 
 							autocomplete="off"
 							:class="{'input': true, 'error': errors.has('newCampaign') }" 
@@ -23,22 +32,12 @@
 							<button class="btn"><i class="fas fa-plus"></i> Add</button>
 						</div>				
 					</div>
-					<!-- <div class="red" v-else="">You have 2/2 campaigns.</div> -->
-					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-
-					<!-- <h2 v-show="campaigns === null" class="mt-3 px-2 d-flex justify-content-between"><i class="fas fa-arrow-up gray-hover">
-						</i> Add your first campaign <i class="fas fa-arrow-up gray-hover"></i>
-					</h2> -->
-
-					<h2 class="mt-3">
-						Your Campaigns 
-						<span v-if="campaigns">( {{ Object.keys(campaigns).length }} )</span>
-					</h2>
+					<p class="validate red" v-if="add && errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 
 					<transition-group 
 						v-if="campaigns"
 						tag="div" 
-						class="row" 
+						class="row mt-3" 
 						name="campaigns" 
 						enter-active-class="animated flash" 
 						leave-active-class="animated bounceOutLeft">
@@ -139,6 +138,7 @@
 		data() {
 			return {
 				newCampaign: '',
+				add: false,
 			}
 		},
 		firebase() {
@@ -176,6 +176,9 @@
 			},
 		},
 		methods: {
+			setAdd(value) {
+				this.add = value
+			},
 			addCampaign() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {

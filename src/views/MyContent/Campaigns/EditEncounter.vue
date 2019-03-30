@@ -541,10 +541,6 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
-					var player_data = this.players;
-					entity.curHp = player_data[id].maxHp
-					entity.maxHp = player_data[id].maxHp
-					entity.ac = player_data[id].ac
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {

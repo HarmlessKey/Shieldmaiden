@@ -147,9 +147,9 @@
 				})
 			},
 			addPlayer(id) {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set(
-					'true'
-				);
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
+					curHp: this.players[id].maxHp
+				});
 			},
 			removePlayer(id) {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();

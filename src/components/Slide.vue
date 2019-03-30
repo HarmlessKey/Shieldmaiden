@@ -5,10 +5,10 @@
 		<Compendium v-if="slide.type == 'compendium'"/>
 		<ViewEntity v-if="slide.type == 'npc'" :entity="slide.entity" />
 		<AddNpc v-if="slide.type == 'addNpc'" />
-		<EditNpc v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
+		<Edit v-if="slide.type == 'editNpc'" :npc="slide.npc" :npcKey="slide.key" />
 		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" :entity="slide.entity" />
 		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
-		<Edit v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
+		<EditNpc v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
 		<Transform v-if="slide.type == 'transform'" :entityKey="slide.key" :entity="slide.entity" />
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />

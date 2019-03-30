@@ -2,7 +2,7 @@
 	<div>
 		<b-card header="Player link">
 			<div class="d-flex justify-content-start">
-				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="100" colorLight="true" margin="5"></vue-qr>
+				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="100" colorLight="true" :margin="5"></vue-qr>
 
 				<div class="ml-3">
 					<p class="d-flex justify-content-between">

@@ -1,4 +1,4 @@
-<!-- EDIT NPC DURING AN ENCOUNTER -->
+<!-- EDIT PLAYER DURING AN ENCOUNTER -->
 
 <template>
 	<div class="pb-5" v-if="entity">
@@ -52,7 +52,7 @@
 			<hr>
 			<h2 class="mb-0">Override</h2>
 			<b-row class="my-2">
-				<b-col class="text-center" v-if="entity.npc">
+				<b-col class="text-center">
 					<label>AC</label>
 					<b-form-input 
 						class="text-center"
@@ -66,7 +66,7 @@
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 				</b-col>
 
-				<b-col class="text-center" v-if="entity.npc">
+				<b-col class="text-center">
 					<label>Max HP</label>
 					<b-form-input 
 						class="text-center"
@@ -122,19 +122,11 @@
 		},
 		firebase() {
 			return {
-				entity: {
-					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+				player: {
+					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
 					asObject: true
 				}
 			}
-		},
-		computed: {
-			// ...mapGetters([
-			// 	'entities',
-			// ]),
-			// entity: function() {
-			// 	return this.entities[this.entityKey]
-			// }
 		},
 		methods: {
 			...mapActions([
@@ -146,22 +138,17 @@
 					if (result) {
 						delete this.entity['.key']
 
+						//Parse to INT
 						this.entity.initiative = parseInt(this.entity.initiative)
-						if(this.entity.ac_bonus) {
-							this.entity.ac_bonus = parseInt(this.entity.ac_bonus)
-						}
-						else { this.entity.ac_bonus = false }
-						if(this.entity.tempHp) {
-							this.entity.tempHp = parseInt(this.entity.tempHp)
-						}
-						else { this.entity.tempHp = false }
-
+						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus): false;
+						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp): false;
 						this.entity.ac = parseInt(this.entity.ac)
 						this.entity.maxHp = parseInt(this.entity.maxHp)
 						this.entity.curHp = parseInt(this.entity.curHp)
 
+						// curHp can never be larger than maxHp
 						if(this.entity.curHp > this.entity.maxHp) {
-							this.entity.curHp = this.entity.maxHp
+							 = this.entity.maxHp
 						}
 						
 						this.edit_entity({key: this.entityKey, entity: this.entity})

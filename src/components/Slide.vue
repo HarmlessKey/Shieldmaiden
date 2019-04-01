@@ -9,6 +9,7 @@
 		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" :entity="slide.entity" />
 		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
 		<EditNpc v-if="slide.type == 'edit'" :entityKey="slide.key" :entity="slide.entity" />
+		<EditPlayer v-if="slide.type == 'editPlayer'" :entityKey="slide.key" />
 		<Transform v-if="slide.type == 'transform'" :entityKey="slide.key" :entity="slide.entity" />
 		<DeathSaves v-if="slide.type == 'deathSaves'" />
 		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
@@ -23,10 +24,11 @@
 	import Compendium from '@/components/slides/Compendium.vue';
 	import ViewEntity from '@/components/ViewEntity.vue';
 	import AddNpc from '@/components/slides/AddNpc.vue';
-	import EditNpc from '@/components/slides/EditNpc.vue';
+	import Edit from '@/components/slides/Edit.vue';
 	import Condition from '@/components/slides/Condition.vue';
 	import Conditions from '@/components/slides/Conditions.vue';
-	import Edit from '@/components/slides/Edit.vue';
+	import EditNpc from '@/components/slides/EditNpc.vue';
+	import EditPlayer from '@/components/slides/EditPlayer.vue';
 	import Transform from '@/components/slides/Transform.vue';
 	import DeathSaves from '@/components/slides/DeathSaves.vue';
 	import DamageHealing from '@/components/slides/DamageHealing.vue';
@@ -40,10 +42,11 @@
 			Compendium: Compendium,
 			ViewEntity: ViewEntity,
 			AddNpc: AddNpc,
-			EditNpc: EditNpc,
+			Edit: Edit,
 			Condition: Condition,
 			Conditions: Conditions,
-			Edit: Edit,
+			EditNpc: EditNpc,
+			EditPlayer: EditPlayer,
 			Transform: Transform,
 			DeathSaves: DeathSaves,
 			DamageHealing: DamageHealing,

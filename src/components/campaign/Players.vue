@@ -11,7 +11,7 @@
 						{{ player.curHp }}/{{ players[key].maxHp }}
 					
 					<div class="actions bg-gray">
-						<a class="gray-hover" v-b-tooltip.hover title="Edit player" @click="editPlayer(key, players[key].character_name)">
+						<a class="gray-hover" v-b-tooltip.hover title="Edit player" @click="edit(key)">
 							<i class="fas fa-pencil"></i>
 						</a>
 					</div>
@@ -50,7 +50,15 @@
 		methods: {
 			...mapActions([
 				'fetchCampaign',
+				'setSlide',
 			]),
+			edit(key) {
+				this.setSlide({
+					show: true,
+					type: 'editPlayer',
+					key: key,
+				})
+			},
 		}
 	}
 </script>

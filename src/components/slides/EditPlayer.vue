@@ -1,17 +1,8 @@
-<!-- EDIT PLAYER DURING AN ENCOUNTER -->
+<!-- EDIT PLAYER -->
 
 <template>
 	<div class="pb-5" v-if="entity">
 		<h2>Edit <span class="blue">{{ entity.name }}</span></h2>
-		<b-form-input 
-			type="text" 
-			name="name" 
-			v-model="entity.name"
-			:class="{'input': true, 'error': errors.has('name') }"
-			v-validate="'required'"
-			placeholder="Name"></b-form-input>
-			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-		<hr>
 		<b-row class="mb-2">
 			<b-col>
 				<label class="text-center">Init.</label>
@@ -122,8 +113,8 @@
 		},
 		firebase() {
 			return {
-				player: {
-					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
+				entity: {
+					source:	db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`),
 					asObject: true
 				}
 			}
@@ -140,15 +131,15 @@
 
 						//Parse to INT
 						this.entity.initiative = parseInt(this.entity.initiative)
-						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus): false;
-						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp): false;
+						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : false;
+						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : false;
 						this.entity.ac = parseInt(this.entity.ac)
 						this.entity.maxHp = parseInt(this.entity.maxHp)
 						this.entity.curHp = parseInt(this.entity.curHp)
 
 						// curHp can never be larger than maxHp
 						if(this.entity.curHp > this.entity.maxHp) {
-							 = this.entity.maxHp
+							this.entity.curHp = this.entity.maxHp
 						}
 						
 						this.edit_entity({key: this.entityKey, entity: this.entity})

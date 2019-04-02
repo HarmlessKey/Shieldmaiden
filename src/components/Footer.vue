@@ -48,7 +48,8 @@
 				</small>
 				<small>
 					©{{ year }} Harmless Key | All Rights Reserved<br/>
-					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.</small>
+					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
+					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a></small>
 			</div>
 		</div>
 

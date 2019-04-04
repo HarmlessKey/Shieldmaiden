@@ -301,6 +301,7 @@
 						show: true,
 						type: editType,
 						key: key,
+						location: 'encounter'
 					})
 				}
 				else {

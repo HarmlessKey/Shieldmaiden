@@ -196,6 +196,7 @@
 					show: true,
 					type: editType,
 					key: key,
+					location: 'encounter'
 				})
 			},
 			transform(key, entity) {

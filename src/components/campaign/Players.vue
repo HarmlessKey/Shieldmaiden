@@ -21,7 +21,16 @@
 					<td class="img" v-else>
 						<img src="@/assets/_img/styles/player.svg" />
 					</td>
-					<td class="ac">{{ players[key].ac }}</td>
+					<td class="ac">
+						<span :class="{ 
+								'green': player.ac_bonus > 0, 
+								'red': player.ac_bonus < 0 
+							}" 
+							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
+							{{ players[key].ac + player.ac_bonus}}
+						</span>
+						<span v-else class="ac">{{ players[key].ac }}</span>
+					</td>
 					<td class="pp">{{ players[key].passive_perception }}</td>
 					<td class="pinv">{{ players[key].passive_investigation }}</td>
 					<td class="pins">{{ players[key].passive_insight }}</td>
@@ -51,7 +60,7 @@
 		</table>
 		<div v-else class="loader"><span>Loading Players...</span></div>
 
-		<button class="btn btn-block"><i class="fas fa-undo-alt"></i> Reset Hit Points</button>
+		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Stats</button>
 	</div>
 </template>
 
@@ -96,6 +105,13 @@
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
 			},
+			reset() {
+				for(var key in this.campaign.players) {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).set({
+						curHp: this.players[key].maxHp
+					})
+				}
+			}
 		}
 	}
 </script>

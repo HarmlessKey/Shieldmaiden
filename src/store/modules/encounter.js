@@ -346,6 +346,18 @@ const mutations = {
 		
 		encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},
+	EDIT_PLAYER(state, {key, entity}) {
+		console.log(entity.initiative)
+		Vue.set(state.entities[key], 'initiative', entity.initiative)
+		Vue.set(state.entities[key], 'ac', entity.ac)
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
+		Vue.set(state.entities[key], 'curHp', entity.curHp)
+		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
+		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+
+		//INIT needs to be updated in firebase
+		encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);
+	},
 	TRANSFORM_ENTITY(state, {key, entity, remove}) {
 		if(remove) {
 			state.entities[key].transformed = false
@@ -555,6 +567,9 @@ const actions = {
 	},
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)
+	},
+	edit_player({ commit }, payload) {
+		commit('EDIT_PLAYER', payload)
 	},
 	transform_entity({ commit }, payload) {
 		commit('TRANSFORM_ENTITY', payload)

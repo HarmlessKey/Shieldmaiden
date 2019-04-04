@@ -11,7 +11,7 @@
 					type="number" 
 					name="initiative"
 					min="0"
-					v-model="entity.initiative"
+					v-model="initiative['.value']"
 					:class="{'input': true, 'error': errors.has('initiative') }"
 					v-validate="'numeric|required'"
 					placeholder="Initiative"></b-form-input>
@@ -117,6 +117,10 @@
 				playerBase: {
 					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
 					asObject: true
+				},
+				initiative: {
+					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/initiative`),
+					asObject: true
 				}
 			}
 		},
@@ -132,13 +136,10 @@
 						delete this.playerBase['.key'] // can't be entered in Firebase
 
 						if(this.location == 'encounter') {
-							this.entity.initiative = parseInt(this.entity.initiative);
-						} else {
-							delete this.entity.initiative
+							this.initiative['.value'] = parseInt(this.initiative['.value']);
 						}
 
 						//Parse to INT
-						this.entity.initiative = (this.entity.initiative) ? parseInt(this.entity.initiative) : false;
 						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : false;
 						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : false;
 						this.playerBase.ac = parseInt(this.playerBase.ac)
@@ -154,8 +155,18 @@
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity)
 						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase)
 
-						//Update store
-						// this.edit_player({key: this.entityKey, entity: this.entity})
+						//Only update in and encounter
+						if(this.location == 'encounter') {
+							
+							//create full object to send to store
+							this.entity.initiative = this.initiative['.value']
+							this.entity.ac = this.playerBase.ac;
+							this.entity.maxHp = this.playerBase.maxHp;
+
+							//Update store
+							this.edit_player({key: this.entityKey, entity: this.entity});
+						}
+						
 						this.setSlide(false);
 					}
 					else {

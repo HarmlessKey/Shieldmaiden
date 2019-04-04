@@ -122,12 +122,12 @@
 		methods: {
 			...mapActions([
 				'setSlide',
-				'edit_entity',
+				'edit_player',
 			]),
 			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						delete this.entity['.key']
+						delete this.entity['.key'] // can't be entered in Firebase
 
 						//Parse to INT
 						this.entity.initiative = parseInt(this.entity.initiative)
@@ -142,7 +142,7 @@
 							this.entity.curHp = this.entity.maxHp
 						}
 						
-						this.edit_entity({key: this.entityKey, entity: this.entity})
+						// this.edit_player({key: this.entityKey, entity: this.entity})
 						this.setSlide(false);
 					}
 					else {

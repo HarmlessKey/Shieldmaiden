@@ -293,8 +293,6 @@
 			edit(key, entity, entityType) {
 				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
 
-				console.log(entityType)
-
 				event.stopPropagation();
 				if(key) {
 					this.setSlide({

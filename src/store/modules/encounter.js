@@ -347,7 +347,6 @@ const mutations = {
 		encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},
 	EDIT_PLAYER(state, {key, entity}) {
-		console.log(entity.initiative)
 		Vue.set(state.entities[key], 'initiative', entity.initiative)
 		Vue.set(state.entities[key], 'ac', entity.ac)
 		Vue.set(state.entities[key], 'maxHp', entity.maxHp)

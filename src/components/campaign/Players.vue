@@ -4,12 +4,12 @@
 			<thead>
 				<th></th>
 				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
+				<th class="name"></th>
 				<th class="pp"><i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i></th>
 				<th class="pinv"><i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i></th>
 				<th class="pins"><i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i></th>
 				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
-
-				<!-- <th class="text-right"><i class="far fa-ellipsis-h"></i></th> -->
+				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 			</thead>
 			<tbody
 				name="table-row" 
@@ -31,6 +31,7 @@
 						</span>
 						<span v-else class="ac">{{ players[key].ac }}</span>
 					</td>
+					<td class="name">{{ players[key].character_name }}</td>
 					<td class="pp">{{ players[key].passive_perception }}</td>
 					<td class="pinv">{{ players[key].passive_investigation }}</td>
 					<td class="pins">{{ players[key].passive_insight }}</td>
@@ -130,6 +131,12 @@
 			}
 			td.img {
 				background-color: #000 !important;
+			}
+			td.name {
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				max-width:0;
 			}
 		}
 	}

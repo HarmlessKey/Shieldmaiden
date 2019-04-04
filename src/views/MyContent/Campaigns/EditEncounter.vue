@@ -102,7 +102,7 @@
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
-									<h2>Not in Campaign</h2>
+									<!-- <h2>Not in Campaign</h2>
 									<ul class="entities hasImg" v-if="campaign.players">
 										<template v-for="(player, key) in players">
 											<li :key="key" v-if="Object.keys(campaign.players).indexOf(key) < 0" class="d-flex justify-content-between">
@@ -142,7 +142,8 @@
 												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 											</li>
 										</template>
-									</ul>
+									</ul> -->
+									<p>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</p>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">

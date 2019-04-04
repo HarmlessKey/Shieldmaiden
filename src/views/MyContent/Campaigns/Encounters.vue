@@ -17,81 +17,187 @@
 					<p class="mb-0">Start broadcasting to share your encounters with your players. They can follow your encounters through your personalised link above.</p>
 				</template>
 			</div>
-			
-			<b-row>
-				<b-col sm="7">
 
+			<template v-if="noCurHp">
+				<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
+
+				<h3>Why am I seeing this?</h3>
+				<p>
+					We changed where the current HP and other stats of players are stored so players have to be readded to your campaigns, 
+					one click on the button above will do this for you.
+				</p>
+			</template>
+			<template v-else>
+				<b-row>
 					<!-- SHOW ENCOUNTERS -->
-					<h2 class="d-flex justify-content-between">
-						<span>
-							Your Encounters 
-							<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
-						</span>
-						<a class="green" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus"></i></a>
-					</h2>
+					<b-col md="7">
+						<h2 class="d-flex justify-content-between">
+							<span>
+								Your Encounters 
+								<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
+							</span>
+							<a class="green" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus"></i></a>
+						</h2>
 
-					<b-input-group v-if="add" class="mb-2">
-						<b-form-input
-							autocomplete="off" 
-							type="text" 
-							:class="{'input': true, 'error': errors.has('newEncounter') }"
-							v-model="newEncounter"
-							v-validate="'required'" 
-							data-vv-as="New Encounter"
-							name="newEncounter" 
-							placeholder="Encounter Title"
-							@change="addEncounter()"></b-form-input>
-						<b-input-group-append>
-							<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
-						</b-input-group-append>				
-					</b-input-group>
-					<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+						<b-input-group v-if="add" class="mb-2">
+							<b-form-input
+								autocomplete="off" 
+								type="text" 
+								:class="{'input': true, 'error': errors.has('newEncounter') }"
+								v-model="newEncounter"
+								v-validate="'required'" 
+								data-vv-as="New Encounter"
+								name="newEncounter" 
+								placeholder="Encounter Title"
+								@change="addEncounter()"></b-form-input>
+							<b-input-group-append>
+								<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
+							</b-input-group-append>				
+						</b-input-group>
+						<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
-					<table class="table table-hover">
-						<thead>
-							<th class="n d-none d-md-table-cell">#</th>
-							<th>Encounter</th>
-							<th>Entities</th>
-							<th class="d-none d-lg-table-cell">Status</th>
-							<th class="d-none d-lg-table-cell">Round</th>
-							<th class="d-none d-lg-table-cell">Turn</th>
-							<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-						</thead>
-						<tbody v-if="encounters"
-							name="table-row" 
-							is="transition-group" 
-							enter-active-class="animated flash" 
-							leave-active-class="animated bounceOutLeft">
-							<tr v-for="(encounter, index) in _active" :key="encounter.key">
-								<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-								<td>
-									<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-										{{ encounter.encounter }}
-									</router-link>
-									<template v-else>
-										{{ encounter.encounter }}
-									</template>
-								</td>
-								<td>
-									<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-										<i class="fas fa-users"></i>
-										<template v-if="encounter.entities">
-											{{ Object.keys(encounter.entities).length }}
+						<table class="table table-hover">
+							<thead>
+								<th class="n d-none d-md-table-cell">#</th>
+								<th>Encounter</th>
+								<th>Entities</th>
+								<th class="d-none d-lg-table-cell">Status</th>
+								<th class="d-none d-lg-table-cell">Round</th>
+								<th class="d-none d-lg-table-cell">Turn</th>
+								<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
+							</thead>
+							<tbody v-if="encounters"
+								name="table-row" 
+								is="transition-group" 
+								enter-active-class="animated flash" 
+								leave-active-class="animated bounceOutLeft">
+								<tr v-for="(encounter, index) in _active" :key="encounter.key">
+									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
+									<td>
+										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+											{{ encounter.encounter }}
+										</router-link>
+										<template v-else>
+											{{ encounter.encounter }}
 										</template>
-										<template v-else> Add</template>
-									</router-link>
-								</td>
-								<template v-if="encounter.round != 0">
-									<td class="red d-none d-lg-table-cell">In progress</td>
-									<td class="d-none d-lg-table-cell">{{ encounter.round }}</td>
-									<td class="d-none d-lg-table-cell">{{ encounter.turn + 1 }}</td>
-								</template>
-								<template v-else>
-									<td colspan="3" class="gray-hover d-none d-lg-table-cell">Not started</td>
-								</template>
-								<td>
-									<div class="d-flex justify-content-end">
-										<div class="d-flex justify-content-end actions">
+									</td>
+									<td>
+										<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+											<i class="fas fa-users"></i>
+											<template v-if="encounter.entities">
+												{{ Object.keys(encounter.entities).length }}
+											</template>
+											<template v-else> Add</template>
+										</router-link>
+									</td>
+									<template v-if="encounter.round != 0">
+										<td class="red d-none d-lg-table-cell">In progress</td>
+										<td class="d-none d-lg-table-cell">{{ encounter.round }}</td>
+										<td class="d-none d-lg-table-cell">{{ encounter.turn + 1 }}</td>
+									</template>
+									<template v-else>
+										<td colspan="3" class="gray-hover d-none d-lg-table-cell">Not started</td>
+									</template>
+									<td>
+										<div class="d-flex justify-content-end">
+											<div class="d-flex justify-content-end actions">
+												<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+													<i class="fas fa-play"></i>
+												</router-link>
+												<span v-else class="disabled">
+													<i class="fas fa-play"></i>
+												</span>
+												<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+													<i class="fas fa-pencil-alt"></i>
+												</router-link>
+												<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
+													<i class="fas fa-trash-alt"></i>
+												</a>
+											</div>
+											<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<template v-if="_finished != 0">
+							<h2>Finished Encounters</h2>
+							<table class="table">
+								<thead>
+									<th>#</th>
+									<th>Encounter</th>
+									<th></th>
+								</thead>
+								<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
+									
+									<tr v-for="(encounter, index) in _finished" :key="encounter.key">
+										<td>{{ index + 1 }}</td>
+										<td>
+											<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+												{{ encounter.encounter }}
+											</router-link>
+										</td>
+										<td>
+											<div class="d-flex justify-content-end">
+												<div class="d-flex justify-content-end actions">
+													<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
+													<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
+												</div>
+												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+											</div>
+										
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</template>
+						<!-- <ul v-sortable>
+							<li v-for="item in list">
+								{{ list.name }}
+								{{ list.order }}
+							</li>
+						</ul> -->
+						<!-- <table class="table table-hover">
+							<thead>
+								<th class="n d-none d-md-table-cell">#</th>
+								<th>Encounter</th>
+								<th>Entities</th>
+								<th class="d-none d-md-table-cell">Status</th>
+								<th class="d-none d-md-table-cell">Round</th>
+								<th class="d-none d-md-table-cell">Turn</th>
+								<th></th>
+							</thead>
+							<draggable :move="onMove" :list="_active" :element="'tbody'">
+								<tr v-for="(encounter, index) in _active">
+									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
+									<td>
+										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
+											{{ encounter.encounter }}
+										</router-link>
+										<template v-else>
+											{{ encounter.encounter }}
+										</template>
+									</td>
+									<td>
+										<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
+											<i class="fas fa-users"></i>
+											<template v-if="encounter.entities">
+												{{ Object.keys(encounter.entities).length }}
+											</template>
+											<template v-else> Add</template>
+										</router-link>
+									</td>
+									<template v-if="encounter.round != 0">
+										<td class="red d-none d-md-table-cell">In progress</td>
+										<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
+										<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
+									</template>
+									<template v-else>
+										<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
+									</template>
+									<td class="actions">
+										<div class="d-flex justify-content-end">
 											<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
 												<i class="fas fa-play"></i>
 											</router-link>
@@ -105,116 +211,20 @@
 												<i class="fas fa-trash-alt"></i>
 											</a>
 										</div>
-										<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-
-					<template v-if="_finished != 0">
-						<h2>Finished Encounters</h2>
-						<table class="table">
-							<thead>
-								<th>#</th>
-								<th>Encounter</th>
-								<th></th>
-							</thead>
-							<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-								
-								<tr v-for="(encounter, index) in _finished" :key="encounter.key">
-									<td>{{ index + 1 }}</td>
-									<td>
-										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-											{{ encounter.encounter }}
-										</router-link>
-									</td>
-									<td>
-										<div class="d-flex justify-content-end">
-											<div class="d-flex justify-content-end actions">
-												<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
-												<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-											</div>
-											<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-										</div>
-									
 									</td>
 								</tr>
-							</tbody>
-						</table>
-					</template>
-					<!-- <ul v-sortable>
-						<li v-for="item in list">
-							{{ list.name }}
-							{{ list.order }}
-						</li>
-					</ul> -->
-					<!-- <table class="table table-hover">
-						<thead>
-							<th class="n d-none d-md-table-cell">#</th>
-							<th>Encounter</th>
-							<th>Entities</th>
-							<th class="d-none d-md-table-cell">Status</th>
-							<th class="d-none d-md-table-cell">Round</th>
-							<th class="d-none d-md-table-cell">Turn</th>
-							<th></th>
-						</thead>
-						<draggable :move="onMove" :list="_active" :element="'tbody'">
-							<tr v-for="(encounter, index) in _active">
-								<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-								<td>
-									<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-										{{ encounter.encounter }}
-									</router-link>
-									<template v-else>
-										{{ encounter.encounter }}
-									</template>
-								</td>
-								<td>
-									<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-										<i class="fas fa-users"></i>
-										<template v-if="encounter.entities">
-											{{ Object.keys(encounter.entities).length }}
-										</template>
-										<template v-else> Add</template>
-									</router-link>
-								</td>
-								<template v-if="encounter.round != 0">
-									<td class="red d-none d-md-table-cell">In progress</td>
-									<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
-									<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
-								</template>
-								<template v-else>
-									<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
-								</template>
-								<td class="actions">
-									<div class="d-flex justify-content-end">
-										<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-											<i class="fas fa-play"></i>
-										</router-link>
-										<span v-else class="disabled">
-											<i class="fas fa-play"></i>
-										</span>
-										<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-pencil-alt"></i>
-										</router-link>
-										<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-											<i class="fas fa-trash-alt"></i>
-										</a>
-									</div>
-								</td>
-							</tr>
-						</draggable>
-					</table> -->
-					<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
-				</b-col>
+							</draggable>
+						</table> -->
+						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+					</b-col>
 
-				<!-- PLAYERS -->
-				<b-col>
-					<h2>Players</h2>
-					<Players />
-				</b-col>
-			</b-row>
+					<!-- PLAYERS -->
+					<b-col md="5">
+						<h2>Players</h2>
+						<Players />
+					</b-col>
+				</b-row>
+			</template>
 		</div>
 	</div>
 </template>
@@ -258,7 +268,7 @@
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
-				add: false
+				add: false,
 			}
 		},
 		firebase() {
@@ -312,6 +322,19 @@
 				} , 'asc')
 				.value()
 			},
+			noCurHp() {
+				//Checks if all players have their curHp set
+				//If not, a button  appears that sets it
+				if(this.campaign) {
+					for(var key in this.campaign.players) {
+						if(!this.campaign.players[key].curHp) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+				}
+			}
 		},
 		methods: {
 			...mapActions([
@@ -423,6 +446,15 @@
 
 				db.ref(`track/${this.user.uid}/broadcast`).set(broadcast)
 			},
+			setCurHp() {
+				//Stores player with curHp under campaign
+				for(var key in this.campaign.players) {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).set({
+						curHp: this.players[key].maxHp
+					})
+				}
+				this.noCurHp = false;
+			}
 		}
 	}
 </script>

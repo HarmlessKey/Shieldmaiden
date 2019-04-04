@@ -89,6 +89,7 @@
 					show: true,
 					type: 'editPlayer',
 					key: key,
+					location: 'overview',
 				})
 			},
 			percentage(current, max) {
@@ -110,6 +111,9 @@
 			}
 			th.ac, td.ac, th.pins, td.pins {
 				padding-right: 20px;
+			}
+			td.img {
+				background-color: #000 !important;
 			}
 		}
 	}

@@ -128,14 +128,6 @@
 				}
 			}
 		},
-		computed: {
-			// ...mapGetters([
-			// 	'entities',
-			// ]),
-			// entity: function() {
-			// 	return this.entities[this.entityKey]
-			// }
-		},
 		methods: {
 			...mapActions([
 				'setSlide',

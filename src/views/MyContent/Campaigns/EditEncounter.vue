@@ -455,7 +455,7 @@
 				else if(type == 'edit') {
 					this.setSlide({
 						show: true,
-						type: 'editNpc',
+						type: 'edit',
 						npc: npc,
 						key: key,
 					})

@@ -59,9 +59,10 @@
 											<i class="fas fa-hand-holding-magic"></i> [s] Stabilize
 										</a>
 										<a class="dropdown-item" 
-										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted])"
-										@click="edit(entity.key, entities[entity.key])">
+										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"
+										@click="edit(entity.key, entities[entity.key], entity.entityType)">
 											<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
+											{{ entity.entityType }}
 										</a>
 										<a class="dropdown-item" @click="reminders(entity.key)"
 											v-shortkey="['m']" @shortkey="reminders(targeted)">
@@ -128,8 +129,8 @@
 												<i class="fas fa-hand-holding-magic"></i> <span v-if="showKeybinds.keyBinds === undefined">[s]</span> Stabilize
 											</a>
 											<a class="dropdown-item" 
-											v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted])"
-											@click="edit(entity.key, entities[entity.key])">
+											v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"
+											@click="edit(entity.key, entities[entity.key], entity.entityType)">
 												<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
 											</a>
 											<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
@@ -289,14 +290,17 @@
 					type: 'addNpc',
 				})
 			},
-			edit(key, entity) {
+			edit(key, entity, entityType) {
+				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
+
+				console.log(entityType)
+
 				event.stopPropagation();
 				if(key) {
 					this.setSlide({
 						show: true,
-						type: 'edit',
+						type: editType,
 						key: key,
-						entity: entity,
 					})
 				}
 				else {

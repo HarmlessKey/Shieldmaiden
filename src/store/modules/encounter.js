@@ -89,9 +89,7 @@ const mutations = {
 			initiative: db_entity.initiative,
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
-			tempHp: db_entity.tempHp,
 			ac: parseInt(db_entity.ac),
-			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 		}
 		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
@@ -124,9 +122,10 @@ const mutations = {
 		}
 		switch(entity.entityType) {
 			case 'player': {
-				//get the curHp from the campaign
+				//get the curHp & tempHP & AC Bonus from the campaign
 				entity.curHp = rootState.content.campaigns[state.campaignId].players[key].curHp
-				// console.log(rootState.content.campaigns[state.campaignId])
+				entity.tempHp = rootState.content.campaigns[state.campaignId].players[key].tempHp
+				entity.ac_bonus = rootState.content.campaigns[state.campaignId].players[key].ac_bonus
 
 				//get other values from the player
 				let db_player = rootState.content.players[key]
@@ -146,6 +145,8 @@ const mutations = {
 			}
 			case 'npc': {
 				entity.curHp = db_entity.curHp
+				entity.tempHp = db_entity.tempHp
+				entity.ac_bonus = db_entity.ac_bonus
 
 				//Fetch data from API
 				if(entity.npc == 'api') {
@@ -390,12 +391,20 @@ const mutations = {
 			//if the damage was higher than the amount of tempHp, remove the tempHp
 			if(newHp <= 0) {
 				state.entities[key].tempHp = undefined
-				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove()
+				if(state.entities[key].entityType == 'player') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
+				} else {
+					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
+				}
 			}
 			//if the damage was lower than the amount of tempHp, set a new tempHp
 			else {
 				state.entities[key].tempHp = newHp
-				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+				if(state.entities[key].entityType == 'player') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
+				} else {
+					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+				}
 			}
 		}
 		else if(pool == 'transformed') {

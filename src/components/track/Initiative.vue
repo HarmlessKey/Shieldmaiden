@@ -27,14 +27,14 @@
 						<td class="ac">
 							<template v-if="(entity.entityType == 'player' && playerSettings.ac === undefined) || (entity.entityType == 'npc' && npcSettings.ac == true)">
 								<span class="ac" :class="{ 
-										'green': entity.ac_bonus > 0, 
-										'red': entity.ac_bonus < 0 
+										'green': displayAc(entity).bonus > 0, 
+										'red': displayAc(entity).bonus < 0 
 									}"  
-									v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
-									v-if="entity.ac_bonus">
-									{{ displayAc(entity) + parseInt(entity.ac_bonus) }}
+									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity).bonus" 
+									v-if="displayAc(entity).bonus">
+									{{ displayAc(entity).ac + displayAc(entity).bonus }}
 								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity) }}</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity).ac }}</span>
 							</template>
 							<span v-else class="gray-hover">?</span>
 						</td>
@@ -49,7 +49,7 @@
 								(entity.entityType == 'player' && playerSettings.health === undefined)
 								|| (entity.entityType == 'npc' && npcSettings.health == true)
 							">
-								<Health	:entity="entity"/>
+								<Health	:entity="entity" :campPlayers="campPlayers" />
 							</template>
 							<template v-else-if="
 								(entity.entityType == 'player' && playerSettings.health === 'obscured')
@@ -121,6 +121,7 @@
 			'targets',
 			'allEntities',
 			'turn',
+			'campPlayers',
 		],
 		data() {
 			return {
@@ -169,17 +170,27 @@
         this.windowWidth = document.documentElement.clientWidth;
       },
 			displayAc(entity) {
+				var stats = {}
+				var key = entity.key
+
 				if(entity.transformed) {
-						var ac = parseInt(entity.transformed.ac)
+						stats.ac = parseInt(entity.transformed.ac);
+						stats.bonus = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].ac_bonus) : parseInt(entity.ac_bonus);
 				}
 				else {
 						if(entity.entityType == 'player') {
-							ac = parseInt(this.players[entity.key].ac)
+							stats = {
+								ac: parseInt(this.players[key].ac),
+								bonus: parseInt(this.campPlayers[key].ac_bonus),
+							}
 						} else {
-							ac = parseInt(entity.ac)
+							stats = {
+								ac: parseInt(entity.ac),
+								bonus: parseInt(entity.ac_bonus),
+							}
 						}
 				}
-				return ac
+				return stats
 			},
 			img(entity) {
 				//Check what image should be displayed

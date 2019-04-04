@@ -70,71 +70,119 @@
 				</b-row>
 			</b-card>
 
-				<b-card header="Health & Armor Class">
-					<b-row>
-							<b-col class="col-4">
-								<label for="level">Level</label>
-								<b-form-input autocomplete="off"  id="level" 
-									type="number" 
-									min="1"
-									max="20"
-									:class="{'input': true, 'error': errors.has('level') }" 
-									v-model="player.level" 
-									v-validate="'numeric'" 
-									data-vv-as="Level"
-									name="level" 
-									placeholder="Level" />
-								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-							</b-col>
-							<b-col class="col-4">
-								<label for="maxHp">HP *</label>
-								<b-form-input autocomplete="off"  id="maxHp" 
-									type="number" 
-									min="1"
-									:class="{'input': true, 'error': errors.has('maxHp') }" 
-									v-model="player.maxHp" 
-									v-validate="'numeric|required'" 
-									data-vv-as="Maxium Hit Points"
-									name="maxHp" 
-									placeholder="Maximum Hit Points*" />
-								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-							</b-col>
-							<b-col class="col-4">
-								<label for="ac">AC *</label>
-								<b-form-input autocomplete="off"  
-									id="ac" 
-									min="1"
-									type="number" 
-									:class="{'input': true, 'error': errors.has('ac') }" 
-									v-model="player.ac" 
-									v-validate="'numeric|required'" 
-									data-vv-as="Armor Class"
-									name="ac" 
-									placeholder="Armor Class" />
-								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-							</b-col>
-					</b-row>
-				</b-card>
-				<b-card header="Ability Scores">
-						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
-							<b-col class="col-3">
-								<label :for="ability.ability">
-									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
-										<path :d="ability.icon"></path>
-									</svg> -->
-									{{ ability.ability.substring(0,3).toUpperCase() }}
-								</label>
-							</b-col>
-							<b-col class="col-9">
-								<b-form-input autocomplete="off"  
-									:id="ability.ability" 
-									type="number" 
-									v-model="player[ability.ability]" 
-									:name="ability.ability" 
-									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-							</b-col>
-						</b-row>
-					</b-card>
+			<b-card header="Health & Armor Class">
+				<b-row>
+						<b-col class="col-4">
+							<label for="level">Level</label>
+							<b-form-input autocomplete="off"  id="level" 
+								type="number" 
+								min="1"
+								max="20"
+								:class="{'input': true, 'error': errors.has('level') }" 
+								v-model="player.level" 
+								v-validate="'numeric'" 
+								data-vv-as="Level"
+								name="level" 
+								placeholder="Level" />
+							<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+						</b-col>
+						<b-col class="col-4">
+							<label for="maxHp">HP *</label>
+							<b-form-input autocomplete="off"  id="maxHp" 
+								type="number" 
+								min="1"
+								:class="{'input': true, 'error': errors.has('maxHp') }" 
+								v-model="player.maxHp" 
+								v-validate="'numeric|required'" 
+								data-vv-as="Maxium Hit Points"
+								name="maxHp" 
+								placeholder="Maximum Hit Points*" />
+							<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+						</b-col>
+						<b-col class="col-4">
+							<label for="ac">AC *</label>
+							<b-form-input autocomplete="off"  
+								id="ac" 
+								min="1"
+								type="number" 
+								:class="{'input': true, 'error': errors.has('ac') }" 
+								v-model="player.ac" 
+								v-validate="'numeric|required'" 
+								data-vv-as="Armor Class"
+								name="ac" 
+								placeholder="Armor Class" />
+							<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+						</b-col>
+				</b-row>
+			</b-card>
+			<b-card header="Ability Scores">
+				<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
+					<b-col class="col-3">
+						<label :for="ability.ability">
+							<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
+								<path :d="ability.icon"></path>
+							</svg> -->
+							{{ ability.ability.substring(0,3).toUpperCase() }}
+						</label>
+					</b-col>
+					<b-col class="col-9">
+						<b-form-input autocomplete="off"  
+							:id="ability.ability" 
+							type="number" 
+							v-model="player[ability.ability]" 
+							:name="ability.ability" 
+							:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
+					</b-col>
+				</b-row>
+			</b-card>
+
+			<!-- SENSES -->
+			<b-card header="Senses">
+				<b-row>
+					<b-col class="col-4">
+						<label for="pper">Passive Perception</label>
+						<b-form-input autocomplete="off"  id="pper" 
+							type="number" 
+							min="1"
+							max="20"
+							:class="{'input': true, 'error': errors.has('pper') }" 
+							v-model="player.passive_perception" 
+							v-validate="'numeric'" 
+							data-vv-as="Passive Perception"
+							name="pper" 
+							placeholder="Perception" />
+						<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
+					</b-col>
+					<b-col class="col-4">
+						<label for="pinv">Passive Investigation</label>
+						<b-form-input autocomplete="off"  id="pinv" 
+							type="number" 
+							min="1"
+							max="20"
+							:class="{'input': true, 'error': errors.has('pinv') }" 
+							v-model="player.passive_investigation" 
+							v-validate="'numeric'" 
+							data-vv-as="Passive Investigation"
+							name="pinv" 
+							placeholder="Investigation" />
+						<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
+					</b-col>
+					<b-col class="col-4">
+						<label for="pins">Passive Insight</label>
+						<b-form-input autocomplete="off"  id="pins" 
+							type="number" 
+							min="1"
+							max="20"
+							:class="{'input': true, 'error': errors.has('pins') }" 
+							v-model="player.passive_insight" 
+							v-validate="'numeric'" 
+							data-vv-as="pins"
+							name="pins" 
+							placeholder="Insight" />
+						<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
+					</b-col>
+				</b-row>
+			</b-card>
 			
 			<router-link to="/players" class="btn bg-gray mr-2">Cancel</router-link>
 			<button v-if="$route.name == 'AddPlayers'" class="btn" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>

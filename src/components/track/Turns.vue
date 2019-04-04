@@ -17,8 +17,9 @@
 						<Health 
 							v-if="(current.entityType == 'player' && playerSettings.health === undefined)
 							|| (current.entityType == 'npc' && npcSettings.health == true)"
-							:entity="current
-						"/>
+							:entity="current"
+							:campPlayers="campPlayers"
+						/>
 					<span v-else class="gray-hover">
 						? ? ?
 					</span>
@@ -43,6 +44,7 @@
 			'current',
 			'entities_len',
 			'turn',
+			'campPlayers',
 		],
 		data() {
 			return {

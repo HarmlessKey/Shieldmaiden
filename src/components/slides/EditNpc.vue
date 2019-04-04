@@ -1,73 +1,106 @@
+<!-- EDIT NPC DURING AN ENCOUNTER -->
+
 <template>
-	<div class="pb-5">
-		<h2>Edit <span class="blue">{{ npc.name }}</span></h2>
-		<b-row>
-			<b-col class="col-2">
-				<label for="name">Name</label>
-			</b-col>
-			<b-col>
-				<b-form-input 
-					type="text" 
-					name="name" 
-					id="name" 
-					v-model="npc.name"
-					:class="{'input': true, 'error': errors.has('name') }"
-					v-validate="'required'"
-					placeholder="Name"></b-form-input>
-				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-			</b-col>
-		</b-row>
-		<hr>
-		<b-row>
-			<b-col class="col-2">
-				<label for="avatar">Avatar</label>
-			</b-col>
-			<b-col>
-				<b-form-input 
-					v-b-tooltip.hover title="Avatar"
-					type="text" 
-					class="form-control" 
-					:class="{'input': true, 'error': errors.has('avatar') }" 
-					v-model="npc.avatar" 
-					v-validate="'url'" 
-					data-vv-as="Avatar"
-					name="avatar" 
-					id="avatar" 
-					placeholder="Image URL"></b-form-input>
-				<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-			</b-col>
-		</b-row>
+	<div class="pb-5" v-if="entity">
+		<h2>Edit <span class="blue">{{ entity.name }}</span></h2>
+		<b-form-input 
+			type="text" 
+			name="name" 
+			v-model="entity.name"
+			:class="{'input': true, 'error': errors.has('name') }"
+			v-validate="'required'"
+			placeholder="Name"></b-form-input>
+			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
 		<b-row class="mb-2">
-			<b-col class="text-center">
-				<label for="ac">Armor Class</label>
+			<b-col>
+				<label class="text-center">Init.</label>
 				<b-form-input 
-					type="text" 
-					name="ac" 
-					data-vv-as="Armor Class"
-					v-model="npc.ac"
-					:class="{'input': true, 'error': errors.has('ac') }"
-					v-validate="'required'"
-					placeholder="Armor Class"></b-form-input>
-				<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+					class="text-center"
+					type="number" 
+					name="initiative"
+					min="0"
+					v-model="entity.initiative"
+					:class="{'input': true, 'error': errors.has('initiative') }"
+					v-validate="'numeric|required'"
+					placeholder="Initiative"></b-form-input>
+					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
-			<b-col class="text-center">
-				<label for="maxHp">Hit Points</label>
+
+			<b-col>
+				<label class="text-center">AC Bonus</label>
 				<b-form-input 
-					type="text" 
-					name="maxHp" 
-					id="maxHp" 
-					data-vv-as="Hit Points"
-					v-model="npc.maxHp"
-					:class="{'input': true, 'error': errors.has('maxHp') }"
-					v-validate="'required'"
-					placeholder="Hit Points"></b-form-input>
-					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+					class="text-center"
+					type="number" 
+					name="ac_bonus" 
+					v-model="entity.ac_bonus"
+					placeholder="AC Bonus"></b-form-input>
+			</b-col>
+
+			<b-col>
+				<label class="text-center">Temp HP</label>
+				<b-form-input 
+					class="text-center"
+					type="number" 
+					name="tempHp" 
+					v-model="entity.tempHp"
+					placeholder="Temporary Hit Points"></b-form-input>
 			</b-col>
 		</b-row>
-		<button class="btn btn-block mb-2" @click="edit()">Save</button>
-		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
-		<div class="img-container"><img :src="npc.avatar" /></div>
+
+		<template>
+			<hr>
+			<h2 class="mb-0">Override</h2>
+			<b-row class="my-2">
+				<b-col class="text-center" v-if="entity.npc">
+					<label>AC</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="ac" 
+						min="1"
+						v-model="entity.ac"
+						v-validate="'required|numeric'"
+						data-vv-as="Amor Class"
+						placeholder="Armor Class"></b-form-input>
+						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+				</b-col>
+
+				<b-col class="text-center" v-if="entity.npc">
+					<label>Max HP</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="maxHp" 
+						min="1"
+						v-model="entity.maxHp"
+						v-validate="'required|numeric'"
+						data-vv-as="Maximum HP"
+						placeholder="Maximum Hit Points"></b-form-input>
+						<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+				</b-col>
+
+				<b-col class="text-center">
+					<label>Cur HP</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="maxHp" 
+						min="1"
+						v-model="entity.curHp"
+						v-validate="'required|numeric'"
+						data-vv-as="Current HP"
+						placeholder="Current Hit Points"></b-form-input>
+						<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
+				</b-col>
+			</b-row>
+		</template>
+
+		<button class="btn btn-block my-3" @click="edit()">Save</button>
+		<small>
+			Edit this entity only for the current encounter.<br/>
+			<span class="red">Warning!</span> only change the initiative if you really have to. It can mess up the order during a game so stay away from it as much as possible.
+		</small>
 	</div>
 </template>
 
@@ -76,10 +109,9 @@
 	import { mapActions } from 'vuex'
 
 	export default {
-		name: 'EditNpc',
+		name: 'EditEntity',
 		props: [
-		'npc',
-		'npcKey'
+			'entityKey',
 		],
 		data() {
 			return {
@@ -88,18 +120,43 @@
 				encounterId: this.$route.params.encid,
 			}
 		},
+		firebase() {
+			return {
+				entity: {
+					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+					asObject: true
+				}
+			}
+		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'edit_entity',
 			]),
 			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						this.npc.curHp = this.npc.maxHp;
+						delete this.entity['.key']
+
+						this.entity.initiative = parseInt(this.entity.initiative)
+						if(this.entity.ac_bonus) {
+							this.entity.ac_bonus = parseInt(this.entity.ac_bonus)
+						}
+						else { this.entity.ac_bonus = false }
+						if(this.entity.tempHp) {
+							this.entity.tempHp = parseInt(this.entity.tempHp)
+						}
+						else { this.entity.tempHp = false }
+
+						this.entity.ac = parseInt(this.entity.ac)
+						this.entity.maxHp = parseInt(this.entity.maxHp)
+						this.entity.curHp = parseInt(this.entity.curHp)
+
+						if(this.entity.curHp > this.entity.maxHp) {
+							this.entity.curHp = this.entity.maxHp
+						}
 						
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.npcKey}`).set(
-							this.npc
-						);
+						this.edit_entity({key: this.entityKey, entity: this.entity})
 						this.setSlide(false);
 					}
 					else {
@@ -111,9 +168,6 @@
 	};
 </script>
 
-<style scoped>
-	.img-container, img {
-		margin-top: 10px;
-		width: 100%;
-	}
+<style lang="scss" scoped>
+
 </style>

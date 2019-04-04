@@ -2,10 +2,12 @@ import { db } from '@/firebase'
 import Vue from 'vue'
 
 const encounters_ref = db.ref('encounters')
+const campaigns_ref = db.ref('campaigns')
 const monsters_ref = db.ref('monsters')
 
 const getDefaultState = () => {
 	return {
+		uid: undefined,
 		entities: {},
 		targeted: undefined,
 		encounter: undefined,
@@ -41,6 +43,9 @@ const getters = {
 	},
 	encounter: function( state ) {
 		return state.encounter
+	},
+	uid: function( state ) {
+		return state.uid
 	},
 	campaignId: function( state ) {
 		return state.campaignId
@@ -84,10 +89,7 @@ const mutations = {
 			initiative: db_entity.initiative,
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
-			tempHp: db_entity.tempHp,
-			curHp: db_entity.curHp,
 			ac: parseInt(db_entity.ac),
-			ac_bonus: db_entity.ac_bonus,
 			active: db_entity.active,
 		}
 		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
@@ -120,6 +122,12 @@ const mutations = {
 		}
 		switch(entity.entityType) {
 			case 'player': {
+				//get the curHp & tempHP & AC Bonus from the campaign
+				entity.curHp = rootState.content.campaigns[state.campaignId].players[key].curHp
+				entity.tempHp = rootState.content.campaigns[state.campaignId].players[key].tempHp
+				entity.ac_bonus = rootState.content.campaigns[state.campaignId].players[key].ac_bonus
+
+				//get other values from the player
 				let db_player = rootState.content.players[key]
 
 				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
@@ -136,6 +144,10 @@ const mutations = {
 				break
 			}
 			case 'npc': {
+				entity.curHp = db_entity.curHp
+				entity.tempHp = db_entity.tempHp
+				entity.ac_bonus = db_entity.ac_bonus
+
 				//Fetch data from API
 				if(entity.npc == 'api') {
 					let monsters = monsters_ref.child(entity.id);
@@ -196,6 +208,9 @@ const mutations = {
 	},	
 	TRACK(state, value) {
 		state.track = value
+	},
+	SET_UID(state, value) {
+		state.uid = value
 	},
 	SET_CAMPAIGN_ID(state, value) {
 		state.campaignId = value
@@ -329,7 +344,19 @@ const mutations = {
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
 		
-		encounters_ref.child(`${state.path}/entities/${key}`).set(entity);
+		encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
+	},
+	EDIT_PLAYER(state, {key, entity}) {
+		console.log(entity.initiative)
+		Vue.set(state.entities[key], 'initiative', entity.initiative)
+		Vue.set(state.entities[key], 'ac', entity.ac)
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
+		Vue.set(state.entities[key], 'curHp', entity.curHp)
+		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
+		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+
+		//INIT needs to be updated in firebase
+		encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);
 	},
 	TRANSFORM_ENTITY(state, {key, entity, remove}) {
 		if(remove) {
@@ -373,15 +400,23 @@ const mutations = {
 	},
 	SET_HP(state, {key, pool, newHp}) {
 		if(pool == 'temp') {
-			//if the damage was higher then the amount of tempHp, remove the tempHp
+			//if the damage was higher than the amount of tempHp, remove the tempHp
 			if(newHp <= 0) {
 				state.entities[key].tempHp = undefined
-				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove()
+				if(state.entities[key].entityType == 'player') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
+				} else {
+					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
+				}
 			}
 			//if the damage was lower than the amount of tempHp, set a new tempHp
 			else {
 				state.entities[key].tempHp = newHp
-				encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+				if(state.entities[key].entityType == 'player') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
+				} else {
+					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+				}
 			}
 		}
 		else if(pool == 'transformed') {
@@ -397,7 +432,14 @@ const mutations = {
 		}
 		else {
 			state.entities[key].curHp = newHp
-			encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+
+			//Players curHp is stored under the campaign
+			if(state.entities[key].entityType == 'player') {
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
+			} else {
+				//NPC curHp is stored under the encounter
+				encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+			}
 		}
 	},
 	SET_DEAD(state, {key, action}) {
@@ -451,6 +493,7 @@ const mutations = {
 
 const actions = {
 	async init_Encounter({ commit, rootState }, { cid, eid }) {
+		commit("SET_UID", rootState.content.user.uid)
 		commit("SET_CAMPAIGN_ID", cid)
 		commit("SET_ENCOUNTER_ID", eid)
 		commit("CLEAR_ENTITIES")
@@ -524,6 +567,9 @@ const actions = {
 	},
 	edit_entity({ commit }, payload) {
 		commit('EDIT_ENTITY', payload)
+	},
+	edit_player({ commit }, payload) {
+		commit('EDIT_PLAYER', payload)
 	},
 	transform_entity({ commit }, payload) {
 		commit('TRANSFORM_ENTITY', payload)

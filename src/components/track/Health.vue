@@ -1,5 +1,5 @@
 <template>
-	<div v-if="entity.curHp > 0 || entity.entityType == 'npc'">
+	<div v-if="displayHp(entity).curHp > 0 || entity.entityType == 'npc'">
 		{{ setNumber(displayHp(entity).curHp) }}
 		<span class="hp">
 			<span v-if="entity.transformed" v-b-tooltip.hover title="Transformed" class="mr-1">
@@ -13,8 +13,8 @@
 					{{ animatedNumber }}
 				</span>
 				<span class="gray-hover">/</span>{{ displayHp(entity).maxHp }}
-			<template v-if="entity.tempHp">
-				+{{ entity.tempHp }}
+			<template v-if="displayHp(entity).tempHp">
+				+{{ displayHp(entity).tempHp }}
 			</template>
 		</span>
 	</div>
@@ -43,6 +43,7 @@
 		mixins: [attributes],
 		props: [
 			'entity',
+			'campPlayers',
 		],
 		data() {
 			return {
@@ -83,17 +84,20 @@
 						maxHp: parseInt(entity.transformed.maxHp),
 						curHp: parseInt(entity.transformed.curHp),
 					}
+					stats.tempHp = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].tempHp) : parseInt(entity.curHp);
 				} else {
 					//FOR PLAYER GET MAXHP FORM PLAYER NOT ENCOUNTER
 					if(entity.entityType == 'player') {
 						stats = {
 							maxHp: parseInt(this.players[key].maxHp),
-							curHp: parseInt(entity.curHp),
+							curHp: parseInt(this.campPlayers[key].curHp),
+							tempHp: parseInt(this.campPlayers[key].tempHp),
 						}
 					} else {
 						stats = {
 							maxHp: parseInt(entity.maxHp),
 							curHp: parseInt(entity.curHp),
+							tempHp: parseInt(entity.curHp),
 						}
 					}
 				}

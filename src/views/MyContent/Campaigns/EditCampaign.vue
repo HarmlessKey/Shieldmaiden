@@ -28,71 +28,77 @@
 					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 				</div>
 				
-				<div id="add" class="bg-gray">
-					<h2>All players</h2>
-					<ul class="entities hasImg" v-if="players && campaign">
-						<li v-for="(player, key) in players" 
-						:key="key" 
-						class="d-flex justify-content-between">
-							<div class="d-flex justify-content-left">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-								{{ player.character_name }}
-							</div>
-							<template v-if="campaign.players">
-									<div class="actions bg-gray">
-										<a v-if="checkPlayer(key) < 0" 
-										class="gray-hover"
-										v-b-tooltip.hover 
-										title="Add Character" 
-										@click="addPlayer(key, player.character_name)">
-											<i class="fas fa-plus"></i>
-										</a>
+				<b-row>
+					<b-col md="6">
+						<b-card header="All Players">
+							<ul class="entities hasImg" v-if="players && campaign">
+								<li v-for="(player, key) in players" 
+								:key="key" 
+								class="d-flex justify-content-between">
+									<div class="d-flex justify-content-left">
+										<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+										{{ player.character_name }}
 									</div>
-								<span>
-									<span v-if="checkPlayer(key) >= 0">
-										<i class="fas fa-check"></i>
-										<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
-									</span>
-									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-								</span>
-							</template>	
-							<div v-else class="d-flex justify-content-end">
-								<div class="actions">
-									<a class="gray-hover" 
-										v-b-tooltip.hover 
-										title="Add Character" 
-										@click="addPlayer(key, player.character_name)">
-											<i class="fas fa-plus"></i>
-									</a>
-								</div>
-								<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-							</div>
-						</li>
-					</ul>
-					<div v-else class="loader"><span>Loading Players...</span></div>
-				</div>
+									<template v-if="campaign.players">
+											<div class="actions bg-gray">
+												<a v-if="checkPlayer(key) < 0" 
+												class="gray-hover"
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="addPlayer(key, player.character_name)">
+													<i class="fas fa-plus"></i>
+												</a>
+											</div>
+										<span>
+											<span v-if="checkPlayer(key) >= 0">
+												<i class="fas fa-check"></i>
+												<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
+											</span>
+											<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+										</span>
+									</template>	
+									<div v-else class="d-flex justify-content-end">
+										<div class="actions">
+											<a class="gray-hover" 
+												v-b-tooltip.hover 
+												title="Add Character" 
+												@click="addPlayer(key, player.character_name)">
+													<i class="fas fa-plus"></i>
+											</a>
+										</div>
+										<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+									</div>
+								</li>
+							</ul>
+							<div v-else class="loader"><span>Loading Players...</span></div>
+						</b-card>
+					</b-col>
 
-				<div id="added" class="bg-gray">
-					<template v-if="players && campaign">
-						<h2>Players in campaign</h2>
-						<ul class="entities hasImg" v-if="campaign.players">
-							<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
-									{{ players[key].character_name }}
-								</div>
-								
-								<div class="actions bg-gray">
-									<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
-										<i class="fas fa-minus"></i>
-									</a>
-								</div>
-								<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-							</li>
-						</ul>
-					</template>
-					<div v-else class="loader"><span>Loading Players...</span></div>
-				</div>
+					<b-col md="6">
+						<b-card header="Players in Campaign">
+							<template v-if="players && campaign">
+								<ul class="entities hasImg" v-if="campaign.players">
+									<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
+										<div class="d-flex justify-content-left">
+											<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
+											<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+											{{ players[key].character_name }}
+										</div>
+										
+										<div class="actions bg-gray">
+											<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
+												<i class="fas fa-minus"></i>
+											</a>
+										</div>
+										<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+									</li>
+								</ul>
+							</template>
+							<div v-else class="loader"><span>Loading Players...</span></div>
+						</b-card>
+					</b-col>
+				</b-row>
 
 			</div>
 		</div>
@@ -153,9 +159,9 @@
 				})
 			},
 			addPlayer(id) {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set(
-					'true'
-				);
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
+					curHp: this.players[id].maxHp
+				});
 			},
 			removePlayer(id) {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
@@ -169,17 +175,9 @@
 
 <style lang="scss" scoped>
 	.container {
-		padding-top:20px;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows:auto 1fr;
-		grid-gap: 20px;
-		grid-template-areas: 
-		"info info"
-		"add added";
+	
 	}
 	.info {
-		grid-area:info;
 	}
 	.nav { 
 		background:#191919;

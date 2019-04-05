@@ -33,7 +33,7 @@
 					<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">{{ data.value }}</router-link>
 					
 					<!-- SUBSCRIPTION -->
-					<!-- <span slot="campaigns" slot-scope="data"></span> -->
+					<!-- <span slot="subscription" slot-scope="data"></span> -->
 
 					<!-- LOADER -->
 					<div slot="table-busy" class="loader">

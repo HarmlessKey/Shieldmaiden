@@ -4,8 +4,7 @@
 			<Sidebar/>
 			<div id="my-content" class="container-fluid">
 				<Crumble />
-				<h1>Campaigns</h1>
-				<p>Welcome to your campaigns overview.</p>
+				<PlayerLink />
 				
 				<template v-if="players && tier">
 					<OverEncumbered v-if="overencumbered" />
@@ -13,7 +12,7 @@
 						v-else-if="content_count.campaigns >= tier.benefits.campaigns"
 						type = 'campaigns'
 					/>
-					
+					<div class="input-group" v-if="add">
 					<div v-else class="input-group" >
 						<input type="text" 
 							class="form-control" 
@@ -46,7 +45,7 @@
 					<transition-group 
 						v-if="campaigns"
 						tag="div" 
-						class="row" 
+						class="row mt-3" 
 						name="campaigns" 
 						enter-active-class="animated flash" 
 						leave-active-class="animated bounceOutLeft">
@@ -138,6 +137,7 @@
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import { mapGetters, mapActions } from 'vuex'
+	import PlayerLink from '@/components/PlayerLink.vue'
 	import { db } from '@/firebase'
 
 	export default {
@@ -148,12 +148,11 @@
 		components: {
 			Sidebar,
 			Crumble,
-			OverEncumbered,
-			OutOfSlots,
 		},
 		data() {
 			return {
 				newCampaign: '',
+				add: false,
 			}
 		},
 		firebase() {
@@ -201,6 +200,9 @@
 			...mapActions([
 				'clearEncounters'
 			]),
+			setAdd(value) {
+				this.add = value
+			},
 			addCampaign() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {

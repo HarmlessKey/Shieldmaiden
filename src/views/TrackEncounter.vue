@@ -26,6 +26,7 @@
 				:current="_non_hidden_targets[0]"
 				:entities_len="Object.keys(_turnCount).length"
 				:turn="turn"
+				:campPlayers="campaignPlayers"
 			/>
 			<div class="container-fluid">
 					<Follow />
@@ -37,6 +38,7 @@
 								:targets="_non_hidden_targets"
 								:allEntities="_turnCount"
 								:turn="turn"
+								:campPlayers="campaignPlayers"
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
@@ -86,6 +88,7 @@
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				encounter: undefined,
+				campaignPlayers: undefined,
 				counter: 0,
 			}
 		},
@@ -120,8 +123,8 @@
 			this.$nextTick(function() {
 				let ins = $('ins')
 				for (let i = 0; i < ins.length; i++) {
-					console.log(ins[i])
-					console.log(ins[i].getAttribute('data-adsbygoogle-status'))
+					// console.log(ins[i])
+					// console.log(ins[i].getAttribute('data-adsbygoogle-status'))
 				}
 				if ($('ins').length > 0) {
 					(adsbygoogle = window.adsbygoogle || []).push({});
@@ -216,6 +219,13 @@
 
 					encounter.on('value' , (snapshot) => {
 						this.encounter = snapshot.val()
+					});
+
+					//Get campaign for player curHP/tempHP/ACBonus
+					let campaign = db.ref(`campaigns/${this.userId}/${campId}/players`)
+
+					campaign.on('value' , (snapshot) => {
+						this.campaignPlayers = snapshot.val()
 					});
 				});
 			},

@@ -9,7 +9,7 @@
 			<p>
 				If you can't find a spell, 
 				it is because we are only allowed to store 
-				spells from the <span v-b-tooltip.hover title="Systems Reference Document">SRD</span>.
+				spells from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
 			<b-input-group class="mb-3">

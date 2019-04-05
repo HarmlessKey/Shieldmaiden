@@ -105,7 +105,7 @@
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
-									<h2>Not in Campaign</h2>
+									<!-- <h2>Not in Campaign</h2>
 									<ul class="entities hasImg" v-if="campaign.players">
 										<template v-for="(player, key) in players">
 											<li :key="key" v-if="Object.keys(campaign.players).indexOf(key) < 0" class="d-flex justify-content-between">
@@ -145,7 +145,8 @@
 												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 											</li>
 										</template>
-									</ul>
+									</ul> -->
+									<p>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</p>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
 									<div class="input-group mb-3">
@@ -462,7 +463,7 @@
 				else if(type == 'edit') {
 					this.setSlide({
 						show: true,
-						type: 'editNpc',
+						type: 'edit',
 						npc: npc,
 						key: key,
 					})
@@ -548,10 +549,6 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
-					var player_data = this.players;
-					entity.curHp = player_data[id].maxHp
-					entity.maxHp = player_data[id].maxHp
-					entity.ac = player_data[id].ac
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {

@@ -11,9 +11,9 @@
 			</div>
 
 			<div class="options d-flex justify-content-between" v-if="target">
-				<a @click="edit(target.key, target)"
+				<a @click="edit(target.key, target.entityType)"
 					v-b-tooltip.hover title="[e] Edit">
-					<span class="icon"><i class="fas fa-hammer-war"></i></span>
+					<span class="icon"><i class="fas fa-pencil"></i></span>
 				</a>
 				<a @click="reminders(target.key)"
 					v-b-tooltip.hover title="[m] Reminders">
@@ -188,13 +188,15 @@
 					entity: this.target
 				})
 			},
-			edit(key, entity) {
+			edit(key, entityType) {
+				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
+
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
-					type: 'edit',
+					type: editType,
 					key: key,
-					entity: entity,
+					location: 'encounter'
 				})
 			},
 			transform(key, entity) {

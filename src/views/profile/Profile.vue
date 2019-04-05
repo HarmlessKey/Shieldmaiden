@@ -47,7 +47,7 @@
 					<h2 class="mb-0">
 						<div v-if="campaigns">
 						<span :class="{ 'green': true, 'red': Object.keys(campaigns).length >= tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span>
-						 / {{ tier.benefits.campaigns }}
+							/ {{ tier.benefits.campaigns }}
 						</div>
 						<div v-else><span class="green">0</span> / {{ tier.benefits.campaigns }}</div>
 						<router-link to="/campaigns" class="gray-hover">Campaigns</router-link>
@@ -150,7 +150,7 @@ export default {
 					vm.resetError = undefined;
 				}).catch(function(error) {
 					// An error happened.
-					vm.error = err.message;
+					vm.error = error.message;
 				});
 			},
 		}

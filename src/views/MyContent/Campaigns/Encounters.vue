@@ -10,22 +10,7 @@
 				v-else-if="content_count.encounters >= tier.benefits.encounters"
 				type = 'encounters'
 			/>
-			<b-input-group v-else>
-				<b-form-input
-					autocomplete="off" 
-					type="text" 
-					:class="{'input': true, 'error': errors.has('newEncounter') }"
-					v-model="newEncounter"
-					v-validate="'required'" 
-					data-vv-as="New Encounter"
-					name="newEncounter" 
-					placeholder="Encounter Title"
-					@change="addEncounter()"></b-form-input>
-				<b-input-group-append>
-					<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add Encounter</button>
-				</b-input-group-append>				
-			</b-input-group>
-			<p class="validate red" v-if="errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+
 			<!-- BROADCAST -->
 			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'], 'bg-gray': !broadcasting['.value'] }">
 				<template v-if="broadcasting['.value']">
@@ -54,13 +39,21 @@
 					<b-col md="7">
 						<h2 class="d-flex justify-content-between">
 							<span>
-								Your Encounters 
-								<span v-if="encounters">( {{ Object.keys(encounters).length }} )</span>
+								<span>
+								Your Encounters
+								<span v-if="encounters && tier">( 
+									<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
+										{{ Object.keys(encounters).length }}
+									</span> / 
+									<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+									<template v-else>{{ tier.benefits.encounters }}</template>
+								) </span>
 							</span>
-							<a class="green" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus"></i></a>
+							</span>
+							<a v-if="Object.keys(encounters).length < tier.benefits.encounters" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 						</h2>
 
-						<b-input-group v-if="add" class="mb-2">
+						<b-input-group v-if="add && Object.keys(encounters).length < tier.benefits.encounters" class="mb-2">
 							<b-form-input
 								autocomplete="off" 
 								type="text" 

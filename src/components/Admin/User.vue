@@ -11,19 +11,19 @@
 		<p class="data">
 			<span class="type gray-hover">Campaigns: </span> 
 			<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
-			<template v-else>0</template></br>
+			<template v-else>0</template><br/>
 			
 			<span class="type gray-hover">Encounters: </span>
 			<template v-if="encounters">{{ encounter_count }}</template>
-			<template v-else>0</template></br>
+			<template v-else>0</template><br/>
 
 			<span class="type gray-hover">Players: </span> 
 			<template v-if="players">{{ Object.keys(players).length }}</template>
-			<template v-else>0</template></br>
+			<template v-else>0</template><br/>
 
 			<span class="type gray-hover">NPC's: </span> 
 			<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
-			<template v-else>0</template></br>
+			<template v-else>0</template><br/>
 		</p>
 
 		<b-card header="Voucher" class="mt-5">

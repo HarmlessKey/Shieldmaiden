@@ -4,43 +4,50 @@
 			<Sidebar/>
 			<div id="my-content" class="container-fluid">
 				<Crumble />
-				<PlayerLink />
 				
-				<template v-if="players && tier">
-					<OverEncumbered v-if="overencumbered" />
-					<OutOfSlots 
-						v-else-if="content_count.campaigns >= tier.benefits.campaigns"
-						type = 'campaigns'
-					/>
-					<div class="input-group" v-if="add">
-					<div v-else class="input-group" >
-						<input type="text" 
-							class="form-control" 
-							autocomplete="off"
-							:class="{'input': true, 'error': errors.has('newCampaign') }" 
-							v-model="newCampaign" 
-							v-validate="'required'"
-							data-vv-as="New Campaign" 
-							name="newCampaign"
-							@change="addCampaign()"
-							placeholder="Add new campaign"
-						/>
-						<div class="input-group-append">
-							<button class="btn"><i class="fas fa-plus"></i> Add</button>
-						</div>
-					</div>
-					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+				<OverEncumbered v-if="overencumbered" />
+				<OutOfSlots 
+					v-else-if="content_count.campaigns >= tier.benefits.campaigns"
+					type = 'campaigns'
+				/>
 
-					<h2 class="mt-3">
-						Your Campaigns 
-						<span v-if="campaigns && tier">( 
-							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
-								{{ Object.keys(campaigns).length }}
-							</span> / 
-							<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
-							<template v-else>{{ tier.benefits.campaigns }}</template>
-						) </span>
+				<PlayerLink />
+
+				<template v-if="players && tier">
+
+					<h2 class="mt-3 d-flex justify-content-between">
+						<span>
+							Your Campaigns 
+							<span v-if="campaigns && tier">( 
+								<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
+									{{ Object.keys(campaigns).length }}
+								</span> / 
+								<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
+								<template v-else>{{ tier.benefits.campaigns }}</template>
+							) </span>
+						</span>
+						<a v-if="content_count.campaigns < tier.benefits.campaigns" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 					</h2>
+
+					<div class="input-group" v-if="add && content_count.campaigns < tier.benefits.campaigns">
+						<div class="input-group" >
+							<input type="text" 
+								class="form-control" 
+								autocomplete="off"
+								:class="{'input': true, 'error': errors.has('newCampaign') }" 
+								v-model="newCampaign" 
+								v-validate="'required'"
+								data-vv-as="New Campaign" 
+								name="newCampaign"
+								@change="addCampaign()"
+								placeholder="Add new campaign"
+							/>
+							<div class="input-group-append">
+								<button class="btn"><i class="fas fa-plus"></i> Add</button>
+							</div>
+						</div>
+						<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+					</div>
 
 					<transition-group 
 						v-if="campaigns"
@@ -148,6 +155,9 @@
 		components: {
 			Sidebar,
 			Crumble,
+			PlayerLink,
+			OverEncumbered,
+			OutOfSlots,
 		},
 		data() {
 			return {
@@ -168,7 +178,6 @@
 			}
 		},
 		mounted() {
-			console.log('clearEncounters')
 			this.clearEncounters()
 		},
 		computed: {
@@ -306,7 +315,7 @@
 		ul.entities {
 			li {
 				i {
-				 margin-top: 5px;
+					margin-top: 5px;
 				}
 			}
 		}

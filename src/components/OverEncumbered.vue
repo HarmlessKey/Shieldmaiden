@@ -1,6 +1,6 @@
 <template>
 	<div class="">
-		<h2 class='orange'><i class="far fa-sad-tear"></i> It seems that you are over encumbered!</h2>
+		<h2 class='orange'><i class="fas fa-sad-tear"></i> It seems that you are over encumbered!</h2>
 		<p>If you want to add more content consider one of these options</p>
 		<b-card-group deck>
 			<b-card header="Manage your content">

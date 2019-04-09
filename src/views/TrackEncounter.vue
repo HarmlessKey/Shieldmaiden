@@ -123,8 +123,7 @@
 			this.$nextTick(function() {
 				let ins = $('ins')
 				for (let i = 0; i < ins.length; i++) {
-					// console.log(ins[i])
-					// console.log(ins[i].getAttribute('data-adsbygoogle-status'))
+					
 				}
 				if ($('ins').length > 0) {
 					(adsbygoogle = window.adsbygoogle || []).push({});

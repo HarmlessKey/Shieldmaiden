@@ -5,9 +5,9 @@
 				<th></th>
 				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
 				<th class="name"></th>
-				<th class="pp"><i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i></th>
-				<th class="pinv"><i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i></th>
-				<th class="pins"><i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i></th>
+				<th class="pp d-none d-md-table-cell"><i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i></th>
+				<th class="pinv d-none d-md-table-cell"><i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i></th>
+				<th class="pins d-none d-md-table-cell"><i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i></th>
 				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
 				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 			</thead>
@@ -31,10 +31,10 @@
 						</span>
 						<span v-else class="ac">{{ players[key].ac }}</span>
 					</td>
-					<td class="name">{{ players[key].character_name }}</td>
-					<td class="pp">{{ players[key].passive_perception }}</td>
-					<td class="pinv">{{ players[key].passive_investigation }}</td>
-					<td class="pins">{{ players[key].passive_insight }}</td>
+					<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
+					<td class="pp d-none d-md-table-cell">{{ players[key].passive_perception }}</td>
+					<td class="pinv d-none d-md-table-cell">{{ players[key].passive_investigation }}</td>
+					<td class="pins d-none d-md-table-cell">{{ players[key].passive_insight }}</td>
 					<td>
 						<span class="current" :class="{ 
 							'red': percentage(player.curHp, players[key].maxHp) <= 33, 

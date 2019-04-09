@@ -206,14 +206,17 @@ export const setHP = {
 			}
 
 			//Add to damagemeters
-			if(undo == true) {
+			//undo holds the value of ovherhealing, is there was any
+			if(undo) {
 				amount = -amount
+				over = (undo !== true) ? -undo : 0;
 				type = 'healing'
 			}
 			this.set_meters({
 				key: current.key,
-				type: type,
-				amount: amount,
+				type,
+				amount,
+				over,
 			})
 		},
 		isHealing(target, current, amount, log, notify, undo) {
@@ -272,14 +275,17 @@ export const setHP = {
 			}
 			
 			//Add to damagemeters
-			if(undo == true) {
+			//undo holds the value of overdamage, is there was any
+			if(undo) {
 				amount = -amount
+				over = (undo !== true) ? -undo : 0;
 				type = 'damage'
 			}
 			this.set_meters({
 				key: current.key,
-				type: type,
-				amount: amount,
+				type,
+				amount,
+				over,
 			})
 		},
 		addLog(type, crit, target, current, amount, over) {

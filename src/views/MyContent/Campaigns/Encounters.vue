@@ -127,7 +127,7 @@
 								<thead>
 									<th>#</th>
 									<th>Encounter</th>
-									<th></th>
+									<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 								</thead>
 								<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
 									

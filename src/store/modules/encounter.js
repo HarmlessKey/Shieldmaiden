@@ -106,6 +106,8 @@ const mutations = {
 		if (db_entity.meters) {
 			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
 			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
+			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
+			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
 		}
 		else {
 			entity.damage = 0
@@ -235,13 +237,20 @@ const mutations = {
 			localStorage.setItem(state.encounterId, parsed);
 		}
 	},
-	SET_METERS(state, {key, type, amount}) {
-		var newVal = state.entities[key][type] + amount;
+	SET_METERS(state, {key, type, amount, over}) {
+		if(key != 'environment') {
+			let newVal = state.entities[key][type] + amount;
+			let overType = (type == 'damage') ? 'overkill' : 'overhealing';
+			let newOver = state.entities[key][overType] + over;
 
-		if(newVal < 0) { newVal = 0 }
+			if(newVal < 0) { newVal = 0 }
+			if(newOver < 0) { newOver = 0 }
 
-		encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
-		state.entities[key][type] = newVal;
+			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
+			encounters_ref.child(`${state.path}/entities/${key}/meters/${overType}`).set(newOver);
+			state.entities[key][type] = newVal;
+			state.entities[key][overType] = newOver;
+		}
 	},
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload

@@ -1,26 +1,27 @@
 <template>
 	<div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab" v-if="entities">
 		<ul v-for="(type, index) in types" :key="index">
-			<h2>{{ type }}</h2>
-			<li v-for="(entity, index) in _meters[type]" :key="index" class="health">
+			<h2>{{ type.name }}</h2>
+			<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
 				<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 				<div class="progress health-bar">
 					<div>
 						<span class="name">
-							{{ entity.name }}
+							{{ entity.name }}.
 						</span>
-						<span class="numbers">
-							{{ entity[type] }}
-							({{ percentage(entity[type], type) }}%)
-						</span>
+						<b class="numbers">
+							{{ entity[type.name] }}
+							<!-- ({{ percentage(entity[type], type) }}%) -->
+							<template v-if="entity[type.over]"> ({{ entity[type.over] }} <small>over</small>)</template>
+						</b>
 					</div>
 					<div class="progress-bar" 
 						:class="{ 
-							'bg-red': type == 'damage', 
-							'bg-green': type == 'healing'
+							'bg-red': type.name == 'damage', 
+							'bg-green': type.name == 'healing'
 						}" 
 						role="progressbar" 
-						:style="{width: percentage(entity[type], type) + '%'}" aria-valuemin="0" aria-valuemax="100">
+						:style="{width: percentage(entity[type.name], type.name) + '%'}" aria-valuemin="0" aria-valuemax="100">
 					</div>
 				</div>
 			</li>
@@ -37,10 +38,10 @@
 
 		data() {
 			return {
-				types: [
-					'damage',
-					'healing',
-				]
+				types: {
+					'damage': { name: 'damage', over: 'overkill' },
+					'healing': { name: 'healing', over: 'overhealing'},
+				}
 			}
 		},
 		computed: {
@@ -119,7 +120,7 @@ ul {
 			background-color: #494747;
 			position: relative;
 
-			span.name, span.numbers {
+			span.name, .numbers {
 				color:#191919;
 				position: absolute;
 				white-space: nowrap;
@@ -127,11 +128,12 @@ ul {
 				text-overflow: ellipsis;
 
 			}
-			span.numbers {
+			.numbers {
 				text-align: right;
 				right: 5px;
 			}
 			span.name {
+				font-weight: bold !important;
 				left: 5px;
 			}
 		}

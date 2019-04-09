@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="targets">
 		<table class="table targets" :class="{'table-sm': windowWidth <= 360}">
 			<thead>
 				<th>In.</th>

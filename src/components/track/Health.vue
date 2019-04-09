@@ -77,7 +77,7 @@
 			},
 			displayHp(entity) {
 				var stats = {};
-				var key = entity.key
+				var key = entity.key;
 
 				if(entity.transformed) {
 					stats = {

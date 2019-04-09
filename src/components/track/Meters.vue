@@ -1,13 +1,13 @@
 <template>
-	<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['damage']).length >0)" class="meters">
+	<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length >0)" class="meters">
 		<div v-for="(type, index) in types" :key="index">
-			<h3>{{ type }} done</h3>
+			<h3>{{ type.name }} done</h3>
 			<transition-group tag="ul" 
 				name="entities" 
 				enter-active-class="animated fadeInUp" 
 				leave-active-class="animated fadeOutDown">
-				<template v-if="Object.keys(_meters[type]).length > 0">
-					<li v-for="entity in _meters[type]" class="health" :key="entity.key">
+				<template v-if="Object.keys(_meters[type.name]).length > 0">
+					<li v-for="entity in _meters[type.name]" class="health" :key="entity.key">
 						<span class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></span>
 						<div class="progress health-bar">
 							<div>
@@ -16,15 +16,16 @@
 								</span>
 								<span class="numbers">
 									<span :class="{
-										'red' : type == 'damage',
-										'green' : type == 'healing'
-									}">{{ entity.meters[type] }}</span>
-									({{ percentageMeters(entity.meters[type], type) }}%)
+										'red' : type.name == 'damage',
+										'green' : type.name == 'healing'
+									}">{{ entity.meters[type.name] }}</span>
+									<template v-if="entity.meters[type.over]"> ({{ entity.meters[type.over] }} <small>over</small>)</template>
+									<!-- ({{ percentageMeters(entity.meters[type.name], type.name) }}%) -->
 								</span>
 							</div>
 							<div class="progress-bar bg-black" 
 								role="progressbar" 
-								:style="{width: percentageMeters(entity.meters[type], type) + '%'}" 
+								:style="{width: percentageMeters(entity.meters[type.name], type.name) + '%'}" 
 								aria-valuemin="0" 
 								aria-valuemax="100">
 							</div>
@@ -49,10 +50,10 @@
 		data() {
 			return {
 				userId: this.$route.params.userid,
-				types: [
-					'damage',
-					'healing',
-				]
+				types: {
+					'damage': { name: 'damage', over: 'overkill' },
+					'healing': { name: 'healing', over: 'overhealing'},
+				}
 			}
 		},
 		firebase() {

@@ -7,6 +7,7 @@
 			name="doneBy"
 			v-validate="'required'">
 			<option value="">Done by...</option>
+			<option :value="environment">Environment</option>
 			<option v-for="(entity, index) in _active" :value="entity" :key="index">{{ entity.name }}</option>
 		</select>
 		<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
@@ -61,6 +62,9 @@
 				damageType: '',
 				crit: false,
 				log: true,
+				environment: {
+					key: 'environment'
+				},
 			}
 		},
 		computed: {

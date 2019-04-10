@@ -33,7 +33,7 @@
 					one click on the button above will do this for you.
 				</p>
 			</template>
-			<template v-else>
+			<template v-else-if="tier">
 				<b-row>
 					<!-- SHOW ENCOUNTERS -->
 					<b-col md="7">
@@ -41,7 +41,7 @@
 							<span>
 								<span>
 								Your Encounters
-								<span v-if="encounters && tier">( 
+								<span v-if="encounters">( 
 									<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
 										{{ Object.keys(encounters).length }}
 									</span> / 
@@ -50,10 +50,10 @@
 								) </span>
 							</span>
 							</span>
-							<a v-if="tier && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+							<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 						</h2>
 
-						<b-input-group v-if="add && tier && Object.keys(encounters).length < tier.benefits.encounters" class="mb-2">
+						<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
 							<b-form-input
 								autocomplete="off" 
 								type="text" 

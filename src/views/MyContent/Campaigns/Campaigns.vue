@@ -29,7 +29,7 @@
 						<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 					</h2>
 
-					<div class="input-group" v-if="add && content_count.campaigns < tier.benefits.campaigns">
+					<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
 						<div class="input-group" >
 							<input type="text" 
 								class="form-control" 

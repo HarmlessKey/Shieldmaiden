@@ -15,7 +15,7 @@
 				<span class="gray-hover">/</span>{{ displayHp(entity).maxHp }}
 			<template v-if="displayHp(entity).tempHp">
 				+{{ displayHp(entity).tempHp }}
-			</template>
+			</template> 
 		</span>
 	</div>
 	<div v-else>

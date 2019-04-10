@@ -28,16 +28,13 @@ export const content_module = {
 
 	},
 	getters: {
-		getUser: function(state) {
+		getUser: function( state ) {
 			return state.user;
 		},
-		userInfo: function(state) {
+		userInfo: function( state ) {
 			return state.userInfo;
 		},
-		tier: function(state) {
-			return state.tier;
-		},
-		getSlide: function(state) {
+		getSlide: function( state ) {
 			return state.slide;
 		},
 		encounters: function( state ) {
@@ -200,9 +197,6 @@ export const content_module = {
 						}
 					})
 				})
-					
-
-				
 			});
 		},
 		setSlide({ commit }, value) {

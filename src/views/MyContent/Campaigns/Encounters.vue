@@ -50,6 +50,7 @@
 								) </span>
 							</span>
 							</span>
+							{{tier.benefits.encounters}}
 							<a v-if="Object.keys(encounters).length < tier.benefits.encounters" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 						</h2>
 

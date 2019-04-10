@@ -3,6 +3,7 @@
 		<template v-if="$route.meta.basePath != '/compendium'">
 			<small class="url">url: <a :href="'https://harmlesskey.com/compendium/conditions/'+id" target="_blank">https://harmlesskey.com/compendium/conditions/{{ id }}</a></small>
 			<ins class="adsbygoogle"
+				v-if="!tier.benefits.ads"
 				style="display:inline-block;width:285px;height:100px"
 				data-ad-client="ca-pub-2711721977927243"
 				data-ad-slot="5263800080">

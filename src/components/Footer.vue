@@ -4,7 +4,7 @@
 			<b-row class="d-flex justify-content-between">
 				<b-col>
 					<h2>Harmless Key <span class="gray-light">BETA</span></h2>
-					<a href="https://www.patreon.com/harmlesskey" class="btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us</a>
+					<a href="https://www.patreon.com/harmlesskey" target="_blank" class="btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us</a>
 				</b-col>
 
 				<b-col sm="">

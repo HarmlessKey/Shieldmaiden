@@ -114,7 +114,7 @@ export const content_module = {
 		CHECK_ENCUMBRANCE(state) {
 			let campaign_keys = Object.keys(state.allEncounters)
 			let count = {}
-			count.campaigns = campaign_keys.length
+			count.campaigns = Object.keys(state.campaigns).length
 			count.players = Object.keys(state.players).length
 			count.npcs = Object.keys(state.npcs).length
 			count.encounters = 0

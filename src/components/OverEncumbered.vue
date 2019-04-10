@@ -12,7 +12,7 @@
 			<b-card header="Need more content slots?">
 				<p>If you want more slots consider joining our patreon</p>
 				<div slot='footer'>
-					<router-link class="btn btn-block bg-patreon-red" to="/patreon">Support us!</router-link>
+					<router-link class="btn btn-block bg-patreon-red" to="/patreon"><i class="fab fas-patreon"></i>Support us!</router-link>
 				</div>
 			</b-card>
 		</b-card-group>

@@ -13,7 +13,7 @@
 			<b-card-group deck>
 				<b-card header="The Harmless">
 					<div class="d-flex justify-content-start">
-						<div class="img" :style="{'background-image': 'url()'}"></div>
+						<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
 						<div>
 							Harm Manders<br/>
 							<small><i class="gray-hover">Male human drunkard</i><br/>
@@ -24,11 +24,20 @@
 					<b-row>
 						<b-col>
 							<h3>Abillity Scores</h3>
+							<ul class="abillities">
+								<li class="d-flex justify-content-between">Assembly <span class="score">10</span></li>
+								<li class="d-flex justify-content-between">CSS <span class="score">18</span></li>
+								<li class="d-flex justify-content-between">JS <span class="score">15</span></li>
+								<li class="d-flex justify-content-between">PHP <span class="score">12</span></li>
+								<li class="d-flex justify-content-between">Python <span class="score">19</span></li>
+								<li class="d-flex justify-content-between">R <span class="score">11</span></li>
+							</ul>
 						</b-col>
 						<b-col>
 							<h3>Skills</h3>
 							<ul class="skills">
-								<li class="d-flex justify-content-between"><span></span> <span></span></li>
+								<li class="d-flex justify-content-between"><span><i class="fas fa-circle"></i> Bug Creation</span> <span>+5</span></li>
+								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Bug Fixing</span> <span>+2</span></li>
 							</ul>
 						</b-col>
 					</b-row>
@@ -46,13 +55,21 @@
 					<b-row>
 						<b-col>
 							<h3>Abillity Scores</h3>
+							<ul class="abillities">
+								<li class="d-flex justify-content-between">Assembly <span class="score">9</span></li>
+								<li class="d-flex justify-content-between">CSS <span class="score">18</span></li>
+								<li class="d-flex justify-content-between">JS <span class="score">14</span></li>
+								<li class="d-flex justify-content-between">PHP <span class="score">16</span></li>
+								<li class="d-flex justify-content-between">Python <span class="score">10</span></li>
+								<li class="d-flex justify-content-between">R <span class="score">11</span></li>
+							</ul>
 						</b-col>
 						<b-col>
 							<h3>Skills</h3>
 							<ul class="skills">
-								<li class="d-flex justify-content-between"><span>Concentrating</span> <span>-1</span></li>
-								<li class="d-flex justify-content-between"><span>Whining</span> <span>+8</span></li>
-								<li class="d-flex justify-content-between"><span>Guitar</span> <span>+1</span></li>
+								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Concentrating</span> <span>+2</span></li>
+								<li class="d-flex justify-content-between"><span><i class="fas fa-circle"></i> Whining</span> <span>+8</span></li>
+								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Guitar</span> <span>+1</span></li>
 							</ul>
 						</b-col>
 					</b-row>
@@ -137,6 +154,15 @@
 						li {
 							padding: 5px 0;
 							border-bottom: solid 1px #494747;
+						}
+					}
+					&.abillities {
+						li {
+							line-height: 40px;
+
+							span.score {
+								font-size: 25px;
+							}
 						}
 					}
 				}

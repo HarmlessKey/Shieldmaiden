@@ -4,6 +4,7 @@
 			<b-row class="d-flex justify-content-between">
 				<b-col>
 					<h2>Harmless Key <span class="gray-light">BETA</span></h2>
+					<a href="https://www.patreon.com/harmlesskey" class="btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us</a>
 				</b-col>
 
 				<b-col sm="">
@@ -21,10 +22,13 @@
 					<h2 class="gray-light">Follow us</h2>
 					<ul>
 						<li>
-							<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon">Facebook</a>
+							<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
 						</li>
 						<li>
-							<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" v-b-tooltip.hover title="Reddit" class="icon">Reddit</a>
+							<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
+						</li>
+						<li>
+							<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
 						</li>
 					</ul>
 				</b-col>

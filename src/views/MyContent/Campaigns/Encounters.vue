@@ -6,10 +6,6 @@
 			<h1 v-if="campaign" class="mb-3">{{ campaign.campaign }}</h1>
 
 			<OverEncumbered v-if="overencumbered" />
-			<OutOfSlots 
-				v-else-if="tier && content_count.encounters >= tier.benefits.encounters"
-				type = 'encounters'
-			/>
 
 			<!-- BROADCAST -->
 			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'], 'bg-gray': !broadcasting['.value'] }">
@@ -69,6 +65,11 @@
 							</b-input-group-append>				
 						</b-input-group>
 						<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+
+						<OutOfSlots 
+							v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
+							type = 'encounters'
+						/>
 
 						<table class="table table-hover">
 							<thead>
@@ -388,7 +389,7 @@
 			},
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
-					if (result) {
+					if (result && (Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
 						db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
 							encounter: this.newEncounter, 
 							round: 0, 

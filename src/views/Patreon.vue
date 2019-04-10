@@ -2,7 +2,7 @@
 	<div>
 		<div class="grid">
 			<div class="container">
-				<h1><i class="fab fa-patreon patreon-red"></i> Support us on Patreon <i class="fas fa-heart"></i></h1>
+				<h1><i class="fab fa-patreon patreon-red"></i> Support us on Patreon <i class="fas fa-heart patreon-red"></i></h1>
 				<Tiers class="my-4" />
 				<h2>Why do I have to pay?</h2>
 				<p>

@@ -6,10 +6,6 @@
 				<Crumble />
 				
 				<OverEncumbered v-if="overencumbered" />
-				<OutOfSlots 
-					v-else-if="tier && content_count.campaigns >= tier.benefits.campaigns"
-					type = 'campaigns'
-				/>
 
 				<PlayerLink />
 
@@ -48,6 +44,11 @@
 						</div>
 						<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 					</div>
+
+					<OutOfSlots 
+						v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
+						type = 'campaigns'
+					/>
 
 					<transition-group 
 						v-if="campaigns"
@@ -214,7 +215,7 @@
 			},
 			addCampaign() {
 				this.$validator.validateAll().then((result) => {
-					if (result) {
+					if (result && (this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
 						db.ref('campaigns/' + this.user.uid).push({
 							campaign: this.newCampaign,
 							timestamp: Date.now(),

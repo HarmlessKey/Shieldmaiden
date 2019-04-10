@@ -1,9 +1,8 @@
 <template>
-	<div class="red" v-else>
-		It seems you don't have any slots left to add more {{type}}
-		<br>
+	<p class="red" v-else>
+		It seems you don't have any slots left to add more {{type}} 
 		<router-link to="/patreon">Need more slots?</router-link>
-	</div>
+	</p>
 </template>
 
 <script>

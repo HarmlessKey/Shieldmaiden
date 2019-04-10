@@ -19,7 +19,7 @@
 			<div class="card-header"><i class="fab fa-patreon patreon-red"></i> Patreon</div>
 			<div class="card-body">
 				<template v-if="tier && tier.name != 'Free'">
-					<h2 class="text-center"></i> Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</h2>
+					<h2 class="text-center">Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</h2>
 
 					<p class="text-center"><i class="patreon-red fas fa-heart"></i></p>
 
@@ -96,7 +96,6 @@
 		<b-card header="Actions">
 			<p v-if="resetError" class="red text-center"><i class="fas fa-exclamation-triangle"></i> {{ resetError }}</p>
 			<p v-if="resetSuccess" class="green text-center"><i class="fas fa-check"></i> {{ resetSuccess }}</p>
-			</p>
 			<b-row class="text-center">
 				<b-col>
 					<a @click="resetPassword()" class="gray-hover"><i class="fas fa-redo-alt blue"></i><br/>Reset Password</a>

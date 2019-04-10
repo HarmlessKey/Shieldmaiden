@@ -3,7 +3,7 @@
 		<template v-if="$route.meta.basePath != '/compendium'">
 			<small class="url">url: <a :href="'https://harmlesskey.com/compendium/spells/'+id" target="_blank">https://harmlesskey.com/compendium/spells/{{ id }}</a></small>
 			<ins class="adsbygoogle"
-				v-if="!tier.benefits.ads"
+				v-if="(tier && !tier.benefits.ads) || tier == undefined"
 				style="display:inline-block;width:285px;height:100px"
 				data-ad-client="ca-pub-2711721977927243"
 				data-ad-slot="5263800080">
@@ -11,7 +11,7 @@
 		</template>
 		<template v-else>
 			<Crumble :name="spell.name"/>
-			<div v-if="!tier.benefits.ads" align="center">
+			<div v-if="(tier && !tier.benefits.ads) || tier == undefined" align="center">
 				<ins class="adsbygoogle"
 						style="display:block; margin-bottom:20px;"
 						data-ad-client="ca-pub-2711721977927243"

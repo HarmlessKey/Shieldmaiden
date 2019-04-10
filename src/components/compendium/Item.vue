@@ -23,12 +23,12 @@
 
 		<div v-if="loading" class="loader"> <span>Loading item....</span></div>
 
-		<h1 class="itemTitle">
+		<h1 class="itemTitle d-flex justify-content-between">
 			{{ item.name }}
 			<span v-if="userInfo && userInfo.admin ">
-				<a v-if="!edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit"><i class="fas fa-pencil-alt"></i></a>
-				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel"><i class="fas fa-times"></i></a>
-				<a @click="checked()" :class="{'gray-hover': !item.checked, 'green': item.checked}">Item checked</a>
+				<a v-if="!edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a>
+				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a>
+				<a @click="checked(!item.checked)" :class="{'gray-hover': !item.checked, 'green': item.checked}"><i class="fas fa-check"></i> Item checked</a>
 			</span>
 		</h1>
 
@@ -220,8 +220,8 @@
 					}
 				})
 			},
-			checked() {
-				db.ref(`items/${this.id}/checked`).set(true);
+			checked(value) {
+				db.ref(`items/${this.id}/checked`).set(value);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="displayHp(entity).curHp > 0 || entity.entityType == 'npc'">
+	<div v-if="campPlayers && players && (displayHp(entity).curHp > 0 || entity.entityType == 'npc')">
 		{{ setNumber(displayHp(entity).curHp) }}
 		<span class="hp">
 			<span v-if="entity.transformed" v-b-tooltip.hover title="Transformed" class="mr-1">
@@ -15,7 +15,7 @@
 				<span class="gray-hover">/</span>{{ displayHp(entity).maxHp }}
 			<template v-if="displayHp(entity).tempHp">
 				+{{ displayHp(entity).tempHp }}
-			</template> 
+			</template>
 		</span>
 	</div>
 	<div v-else>

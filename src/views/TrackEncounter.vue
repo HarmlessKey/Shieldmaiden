@@ -19,7 +19,6 @@
 			<h2 class="padding">Encounter has not started yet.</h2>
 			<div class="loader"></div>
 		</div>
-
 		<template v-else>
 			<Turns 
 				:encounter="encounter" 
@@ -51,6 +50,7 @@
 	</div>
 	<div class="d-flex justify-content-center">
 		<ins class="adsbygoogle bg-gray-dark"
+					v-if="tier && !tier.benefits.ads"
 					style="display:inline-block;width:100%;height:100px"
 					data-ad-client="ca-pub-2711721977927243"
 					data-ad-slot="8698049578">
@@ -90,6 +90,7 @@
 				encounter: undefined,
 				campaignPlayers: undefined,
 				counter: 0,
+				tier: undefined,
 			}
 		},
 		firebase() {
@@ -118,6 +119,7 @@
 		},
 		beforeMount() {
 			this.fetch_encounter()
+			this.fetch_tier()
 		},
 		updated() {
 			this.$nextTick(function() {
@@ -228,6 +230,50 @@
 					});
 				});
 			},
+			fetch_tier() {
+
+				// return this.user
+				let ret = undefined
+
+				let path = 'tiers/basic'
+
+				db.ref(`users/${this.userId}`).once('value', user_snap => {
+					let user = user_snap.val()
+					if (user.voucher) {
+						if (user.voucher.date === undefined) {
+							path = `tiers/${user.voucher.id}`
+						} else {
+							let end_date = new Date(user.voucher.date)
+							let today = new Date()
+							if (user.voucher && today <= end_date) {
+								path = `tiers/${user.voucher.id}`
+							}
+						}
+					}
+					let vouch_tiers = db.ref(path)
+					vouch_tiers.once('value', voucher_snap => {
+						let voucher_order = voucher_snap.val().order
+						let patrons = db.ref('patrons').orderByChild('email').equalTo(user.email)
+						patrons.on('value', patron_snapshot => {
+
+							if (patron_snapshot.val()) {
+								let key = Object.keys(patron_snapshot.val())[0]
+								let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
+								patron_tier.once('value', tier_snapshot =>  {
+									if (tier_snapshot.val().order >= voucher_order) {
+										this.tier = tier_snapshot.val()
+									} else {
+										this.tier = voucher_snap.val()
+									}
+								})
+							}
+							else {
+								this.tier = voucher_snap.val()
+							}
+						})
+					})
+				})
+			}
 		},
 	}
 </script>

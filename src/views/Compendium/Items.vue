@@ -51,6 +51,11 @@
 						{{ data.value }}
 				</span>
 
+				<!-- CHECKED -->
+				<span :class="{ 'green': data.value }" slot="checked" slot-scope="data">
+						<i v-if="data.value" class="fas fa-check"></i>
+				</span>
+
 				<!-- LOADER -->
 				<div slot="table-busy" class="loader">
 					<span>Loading items....</span>
@@ -113,6 +118,10 @@
 					},
           rarity: {
             label: 'Rarity',
+            sortable: true
+					},
+          checked: {
+            label: 'Checked',
             sortable: true
 					},
 				},

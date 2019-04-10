@@ -7,7 +7,7 @@
 
 			<OverEncumbered v-if="overencumbered" />
 			<OutOfSlots 
-				v-else-if="content_count.encounters >= tier.benefits.encounters"
+				v-else-if="tier && content_count.encounters >= tier.benefits.encounters"
 				type = 'encounters'
 			/>
 
@@ -50,10 +50,10 @@
 								) </span>
 							</span>
 							</span>
-							<a v-if="Object.keys(encounters).length < tier.benefits.encounters" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+							<a v-if="tier && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 						</h2>
 
-						<b-input-group v-if="add && Object.keys(encounters).length < tier.benefits.encounters" class="mb-2">
+						<b-input-group v-if="add && tier && Object.keys(encounters).length < tier.benefits.encounters" class="mb-2">
 							<b-form-input
 								autocomplete="off" 
 								type="text" 

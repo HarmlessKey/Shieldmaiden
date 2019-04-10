@@ -7,7 +7,7 @@
 				
 				<OverEncumbered v-if="overencumbered" />
 				<OutOfSlots 
-					v-else-if="content_count.campaigns >= tier.benefits.campaigns"
+					v-else-if="tier && content_count.campaigns >= tier.benefits.campaigns"
 					type = 'campaigns'
 				/>
 
@@ -26,7 +26,7 @@
 								<template v-else>{{ tier.benefits.campaigns }}</template>
 							) </span>
 						</span>
-						<a v-if="content_count.campaigns < tier.benefits.campaigns" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+						<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 					</h2>
 
 					<div class="input-group" v-if="add && content_count.campaigns < tier.benefits.campaigns">

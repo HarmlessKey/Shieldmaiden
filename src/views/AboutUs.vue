@@ -16,7 +16,7 @@
 						<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
 						<div>
 							Harm Manders<br/>
-							<small><i class="gray-hover">Male human drunkard</i><br/>
+							<small><i class="gray-hover">Male human developer</i><br/>
 							<i>Level {{ getAge('1992-03-29') }}</i></small>
 						</div>
 					</div>

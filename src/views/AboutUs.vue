@@ -4,7 +4,7 @@
 			<h1>About us</h1>
 			<p>
 				Harmless Key is created by two experienced Dungeons & Dragons players from Amsterdam. 
-				We were missing a good encounter tracker so we decided to build it ourselves.<br/> 
+				We were missing an encounter tracker that tended to all our needs, so we decided to build one ourselves.<br/> 
 				After some positive feedback from our fellow D&D players, we decided to share it with the public. 
 				Now it's out there for everyone to enjoy and we hope you get as much use out of it as we do.
 			</p>
@@ -36,8 +36,8 @@
 						<b-col>
 							<h3>Skills</h3>
 							<ul class="skills">
-								<li class="d-flex justify-content-between"><span><i class="fas fa-circle"></i> Bug Creation</span> <span>+5</span></li>
-								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Bug Fixing</span> <span>+2</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="fas fa-circle"></i> Bug Creation</span> <span>+5</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Bug Fixing</span> <span>+2</span></li>
 							</ul>
 						</b-col>
 					</b-row>
@@ -67,9 +67,11 @@
 						<b-col>
 							<h3>Skills</h3>
 							<ul class="skills">
-								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Concentrating</span> <span>+2</span></li>
-								<li class="d-flex justify-content-between"><span><i class="fas fa-circle"></i> Whining</span> <span>+8</span></li>
-								<li class="d-flex justify-content-between"><span><i class="far fa-circle"></i> Guitar</span> <span>+1</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Concentrating</span> <span>+2</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="fas fa-circle"></i> Whining</span> <span>+8</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Guitar</span> <span>+1</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="fas fa-circle"></i> Drinking</span> <span>+9</span></li>
+								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Sleeping</span> <span>-2</span></li>
 							</ul>
 						</b-col>
 					</b-row>
@@ -99,6 +101,11 @@
 			user() {
 				return auth.currentUser
 			}
+		},
+		beforeMount() {
+			//Because the component is loaded in another view, 
+			//the scroll needs to be reset to 0
+			window.scrollTo(0,0);
 		},
 		methods: {
 			getAge(dateString) {
@@ -154,14 +161,26 @@
 						li {
 							padding: 5px 0;
 							border-bottom: solid 1px #494747;
+							line-height: 20px;
+
+							.skill {
+								font-size: 13px;
+							}
 						}
 					}
 					&.abillities {
 						li {
+							text-transform: uppercase;
 							line-height: 40px;
+							margin-bottom: 3px;
 
 							span.score {
 								font-size: 25px;
+								width: 45px;
+								text-align: center;
+								display: inline-block;
+
+								border: solid 1px #494747;
 							}
 						}
 					}

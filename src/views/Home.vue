@@ -85,7 +85,7 @@
 		</div>
 		<div class="patreon bg-black d-flex justify-content-end">
 			Like what we do?
-			<a href="https://www.patreon.com/harmlesskey" target="_blank" class="ml-2 btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
+			<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="ml-2 btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
 		</div>
 	</div>
 </template>
@@ -110,11 +110,6 @@
 				return auth.currentUser
 			}
 		},
-		// updated() {
-		// 	this.$nextTick(function() {
-		// 		(adsbygoogle = window.adsbygoogle || []).push({});
-		// 	})
-		// },
 	}
 </script>
 

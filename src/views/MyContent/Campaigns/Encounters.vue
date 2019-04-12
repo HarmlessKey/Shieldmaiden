@@ -439,10 +439,10 @@
 					delete entity.ac_bonuc
 					delete entity.meters
 
-					entity.curHp = entity.maxHp
+					if(entity.entityType == 'npc') {
+						entity.curHp = entity.maxHp
+					}
 					entity.initiative = 0
-
-					// console.log(this.encounters[id].entities[key])
 
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(
 						entity

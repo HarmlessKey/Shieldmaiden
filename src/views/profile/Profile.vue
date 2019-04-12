@@ -19,10 +19,15 @@
 			<div class="card-header"><i class="fab fa-patreon patreon-red"></i> Patreon</div>
 			<div class="card-body">
 				<template v-if="tier && tier.name != 'Free'">
-					<h2 class="text-center">Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</h2>
-
-					<p class="text-center"><i class="patreon-red fas fa-heart"></i></p>
-
+					<template v-if="!voucher">
+						<h2 class="text-center">Thanks for supporting us on Patreon, you really are a <b>{{ tier.name }}</b>!</h2>
+						<p class="text-center"><i class="patreon-red fas fa-heart"></i></p>
+					</template>
+					<div class="text-center" v-else>
+						<h3>You got a free subscription!</h3>
+						<p v-if="voucher.message" class="green">{{ voucher.message }}</p>
+						<p v-if="voucher.date">Your subscribtion ends on <span class="red">{{ makeDate(voucher.date, false) }}</span>.</p>
+					</div>
 					<div class="text-center">
 						<h2 class="mb-1">Your tier: <span class="patreon-red">{{ tier.name }}</span></h2>
 						<p v-if="tier.name == 'Deity'" class="gray-hover">You have unlimited power.</p>
@@ -52,7 +57,6 @@
 				<template v-else>
 					<h2>Support us on Patreon</h2>
 					<Tiers />
-					<!-- <a href="https://www.patreon.com/harmlesskey" target="_blank" class="btn btn-block bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a> -->
 				</template>
 			</div>
 		</div>
@@ -140,13 +144,14 @@ export default {
 				'npcs',
 				'userInfo',
 				'tier',
+				'voucher',
 			]),
 			...mapGetters({
 				user: 'getUser'
 			})
 		},
 		methods: {
-			makeDate(input) {
+			makeDate(input, showTime = true) {
 				let monthNames = [
 					"January", "February", "March",
 					"April", "May", "June", "July",
@@ -161,7 +166,9 @@ export default {
 
 				let time = hours + ":" + minutes + ":" + seconds;
 				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				return date + " - " + time;
+				
+				if(showTime) { return date + " - " + time; }
+				return date
 			},
 			resetPassword() {
 				var vm = this;

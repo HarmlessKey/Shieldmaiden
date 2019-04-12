@@ -117,7 +117,9 @@
 				this.searching = true
 				for (var i in this.users) {
 					var u = this.users[i]
-					if (u.username.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+					if ((u.username.toLowerCase().includes(this.search.toLowerCase()) || 
+						u.email.toLowerCase().includes(this.search.toLowerCase())) 
+						&& this.search != '') {
 						this.noResult = ''
 						this.searchResults.push(u)
 					}

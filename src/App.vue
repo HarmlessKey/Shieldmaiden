@@ -2,6 +2,7 @@
 	<div id="app" class="container-fluid">
 		<div>
 			<nav-main/>
+			<FreeSub />
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
@@ -26,12 +27,14 @@
 	import { auth } from './firebase'
 	import Header from './components/Header.vue';
 	import Slide from './components/Slide.vue';
+	import FreeSub from './components/FreeSub.vue';
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 	components: {
 		navMain: Header,
-		Slide: Slide,
+		Slide,
+		FreeSub,
 	},
 	metaInfo: {
 		meta: [

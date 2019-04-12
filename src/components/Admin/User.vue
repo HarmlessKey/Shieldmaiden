@@ -51,10 +51,14 @@
 					v-validate="'required'"
 					data-vv-as="Date" 
 					name="date" 
-					placeholder="mm/dd/yyyy"/>
+					placeholder="mm/dd/yyyy"
+					v-model="voucher.date"/>
 					<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
 				</b-col>
 			</b-row>
+			<b-form-group label="Message">
+				<b-form-input type="text" v-model="voucher.message" name="message" placeholder="message" />
+			</b-form-group>
 			<a class="btn" @click="setVoucher()">Save</a>
 		</b-card>
 
@@ -124,7 +128,18 @@
 			setVoucher() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref(`users/${this.id}/voucher`).set(this.voucher)
+						if(this.voucher.id == 'basic') {
+							db.ref(`users/${this.id}/voucher`).remove()
+						}
+						else {
+							if(this.duration == 'infinite') {
+								delete this.voucher.date
+							}
+							db.ref(`users/${this.id}/voucher`).set(this.voucher)
+						}
+						this.$snotify.success('Voucher given.', 'Voucher set!', {
+							position: "rightTop"
+						});
 					}
 				});
 			}

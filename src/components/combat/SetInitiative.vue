@@ -14,7 +14,12 @@
 							<div class="d-flex justify-content-between">
 								<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-hover' ]"><i class="fas fa-check"></i></span> -->
 								{{ entity.name }}
-								<span class="pr-5 hover-hide">{{ entity.curHp}}<span class="gray-active">/{{entity.maxHp}}</span></span>
+								<span class="pr-5 hover-hide">
+									{{ entity.curHp}}
+									<span class="gray-active">/{{entity.maxHp}}
+									<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
+									</span>
+									</span>
 							</div>
 							<div class="actions">
 								<a @click="edit(entity.key, entities[entity.key], 'player')"><i class="fas fa-pencil"></i></a>

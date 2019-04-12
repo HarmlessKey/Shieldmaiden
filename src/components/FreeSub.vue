@@ -17,7 +17,7 @@
 			return {
 				today: new Date(),
 				offerEnd: new Date('05/01/2019'),
-				betaEnd: new Date('04/13/2019'),
+				betaEnd: new Date('04/12/2019'),
 			}
 		},
 		firebase() {

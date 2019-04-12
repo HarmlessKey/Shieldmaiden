@@ -17,7 +17,7 @@
 								<span class="pr-5 hover-hide">{{ entity.curHp}}<span class="gray-active">/{{entity.maxHp}}</span></span>
 							</div>
 							<div class="actions">
-								<a @click="edit(entity.key, entities[entity.key])"><i class="fas fa-pencil"></i></a>
+								<a @click="edit(entity.key, entities[entity.key], 'player')"><i class="fas fa-pencil"></i></a>
 							</div>
 								<!-- <input type="number" class="form-control mr-2" v-model="entity.curHp" v-validate="'numeric'" name="playerCurHp" @change="setCurHp(entity.key, entity)" /> -->
 								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="storeInitiative(entity.key, entity)" />
@@ -215,13 +215,15 @@
 				}
 				this.selected = []
 			},
-			edit(key, entity) {
+			edit(key, entity, entityType) {
+				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
+
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
-					type: 'edit',
+					type: editType,
 					key: key,
-					entity: entity,
+					location: 'encounter'
 				})
 			},
 		}

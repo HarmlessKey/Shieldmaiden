@@ -114,62 +114,99 @@
 			roll(action) {
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
-				rolls = rolls.split('+');
+				rolls = rolls.split('+'); //seperate the rolls
 				let crit = false;
 				let hits = '';
 				var total = 0;
+				var allDamageRolls = [];
+				var critInfo = '';
 
 				var ac = parseInt(this.displayStats(this.target).ac);
 
+				//Add bonus AC if there is any
 				if(this.target.ac_bonus) {
 					ac = parseInt(this.target.ac_bonus) + ac;
 				}
 				
+				//Roll the to hit, d20 + attack bonus
 				let toHit =  this.rollD(20, 1, action['attack_bonus'])
 
-				//Damage
+				//Roll the damage for all seperated rolls
 				for(let roll in rolls) {
-					let dice = rolls[roll].split('d');
-					let damage = this.rollD(dice[1], dice[0]).total;
+					let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[5]
+					let rolled = this.rollD(dice[1], dice[0]) //roll the dice
+					let damage = rolled.total; //roll the dice
 
-					total = parseInt(total) + parseInt(damage);
+					allDamageRolls.push(rolled.throws);
+					total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+				}
+
+				//Check if it was a critical hit
+				if(toHit.throws[0] == '20') {
+					//Form HTML for snotify
+					critInfo = `<small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small>`;
+					
+					//Double the rolled damage
+					total = parseInt(total*2);
 				}
 				
+				//Add the damage modifier
 				if(action['damage_bonus']) {
-					var bonus = ' + '+action['damage_bonus'];
-					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']);
-					var showTotal = ' = <span class="red">' + totalDamage + '</span>';
+					var bonus = ' + '+action['damage_bonus']; //form HTML for snotify
+					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']); //Add it to the total damage
+					var showTotal = ' = <span class="red">' + totalDamage + '</span>'; //form HTML for snotify
 				}
 				else {
+					//If there was no modifier
 					bonus = '';
 					showTotal = ''
 					totalDamage = total;
 					total = '<span class="red">' + total + '</span>';
 				}
 
+				//If the to hit roll is a 20, it is a critical hit
 				if(toHit.throws[0] == '20') {
-					toHit.total = '<span class="green">NATURAL 20</span>';
+					hits = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
 					crit = true;
 				}
+				//If the to hit roll is a 1, it is a critical fail
 				else if(toHit.throws[0] == '1') {
-					toHit.total = '<span class="red">NATURAL 1</span>';
+					hits = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
 				}
 				else {
+					//If the to hit is higher than or equal to target's AC, it hits
 					if(toHit.total >= ac) {
-						hits = `<span class="green">HIT!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
+						//Form HTML for snotify
+						hits = `<span class="gray-hover">${toHit.throws[0]} ${toHit.mod} = </span>${toHit.total}
+										<span class="green">HIT!</span> 
+										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
+					//If the to hit is lower than the target's ac, it misses
 					else {
-						hits = `<span class="red">MISS!</span> <span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
+						//Form HTML for snotify
+						hits = `<span class="gray-hover">${toHit.throws[0]} ${toHit.mod} = </span>${toHit.total}
+										<span class="red">MISS!</span> 
+										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
 				}
 
+				//BUILD SNOTIFY POPUP
 				this.$snotify.html(
 					`<div class="snotifyToast__title">
 						<b>${action.name}</b>
 					</div>
 					<div class="snotifyToast__body">
-						<h2>${toHit.total} ${hits}</h2>
+						<h2>${hits}</h2>
 						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
+						${critInfo}
+
+						<a data-toggle="collapse" href="#rolls" role="button" >
+							<small>Show Rolls <i class="fal fa-chevron-down"></i></small>
+						</a>
+						<p id="rolls" class="collapse">
+							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
+							Your rolls: ${allDamageRolls}
+						</p>
 					</div> `, {
 					timeout: 0,
 					closeOnClick: false,
@@ -178,21 +215,35 @@
 							text: 'Hit', 
 							action: (toast) => { 
 								this.setHP(totalDamage, crit, this.target, this.current, 'damage')
-								this.$snotify.remove(toast.id); }, 
-								bold: false
-							},
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false
+						},
+						{ 
+							//Does half of the damage rounded down
+							text: 'Half', 
+							action: (toast) => { 
+								this.setHP(Math.floor(totalDamage/2), crit, this.target, this.current, 'damage')
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false
+						},
+						{ 
+							//Does double of the damage
+							text: 'Double', 
+							action: (toast) => { 
+								this.setHP(parseInt(totalDamage*2), crit, this.target, this.current, 'damage')
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false
+						},
 						{ 
 							text: 'Miss', 
 							action: (toast) => { 
-								this.$snotify.remove(toast.id); }, 
-								bold: true
-							},
-						{ 
-							text: 'Cancel', 
-							action: (toast) => { 
-								this.$snotify.remove(toast.id); }, 
-								bold: true
-							},
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false
+						},
 					]
 				});
 			},

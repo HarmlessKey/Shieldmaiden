@@ -238,14 +238,19 @@ const mutations = {
 		}
 	},
 	SET_METERS(state, {key, type, amount, over}) {
-		if(key != 'environment') {
-			let newVal = state.entities[key][type] + amount;
-			let overType = (type == 'damage') ? 'overkill' : 'overhealing';
-			let newOver = state.entities[key][overType] + over;
 
-			if(newVal < 0) { newVal = 0 }
+		//DON'T put environment damage in meters
+		if(key != 'environment') {
+			let newVal = state.entities[key][type] + amount; //set the new amount
+			let overType = (type == 'damage') ? 'overkill' : 'overhealing'; //set the over type overhealing
+			let newOver = state.entities[key][overType] + over; //set the new over amount
+			
+			//You can't do minus damage, so set to 0 if lower
+			//This can happen when a logged action is undone
+			if(newVal < 0) { newVal = 0 } 
 			if(newOver < 0) { newOver = 0 }
 
+			//Safe the new values in Firebase and the store
 			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
 			encounters_ref.child(`${state.path}/entities/${key}/meters/${overType}`).set(newOver);
 			state.entities[key][type] = newVal;
@@ -407,10 +412,19 @@ const mutations = {
 		}
 	},
 	SET_HP(state, {key, pool, newHp}) {
+
+		//Check where the damage/healing should be done first
+		//First put damage in the tempHP
+		//Second in transformed HP
+		//And last in the actual current HP
 		if(pool == 'temp') {
 			//if the damage was higher than the amount of tempHp, remove the tempHp
+			//Save the rest amount to put into transformed or curHp later
 			if(newHp <= 0) {
-				state.entities[key].tempHp = undefined
+				state.entities[key].tempHp = undefined //update store
+
+				//Player tempHp is stored under campaign
+				//NPC tempHp is stored under encounter
 				if(state.entities[key].entityType == 'player') {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
 				} else {
@@ -419,7 +433,10 @@ const mutations = {
 			}
 			//if the damage was lower than the amount of tempHp, set a new tempHp
 			else {
-				state.entities[key].tempHp = newHp
+				state.entities[key].tempHp = newHp //Update store
+
+				//Player tempHp is stored under campaign
+				//NPC tempHp is stored under encounter
 				if(state.entities[key].entityType == 'player') {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
 				} else {
@@ -427,19 +444,22 @@ const mutations = {
 				}
 			}
 		}
+		//If the target is transformed do damage in that health pool first
 		else if(pool == 'transformed') {
 			if(newHp <= 0) {
-				state.entities[key].transformed = false;
+				state.entities[key].transformed = false; //Update store
 				encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove()
 			}
 			else {
-				Vue.set(state.entities[key], 'transformedCurHp', newHp)
+				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
 
 				encounters_ref.child(`${state.path}/entities/${key}/transformed/curHp`).set(newHp);
 			}
 		}
+		//when target has no tempHp or is not transformed, set curHP
+		//Also put rest damage here
 		else {
-			state.entities[key].curHp = newHp
+			state.entities[key].curHp = newHp //Update store
 
 			//Players curHp is stored under the campaign
 			if(state.entities[key].entityType == 'player') {

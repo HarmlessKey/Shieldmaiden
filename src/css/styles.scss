@@ -827,7 +827,9 @@ ul.nav {
 }
 .snotify-simple {
 	.snotifyToast__inner {
+		padding-top: 13px !important;
 		background-color: $gray-dark !important;
+
 		.snotifyToast__title, .snotifyToast__body {
 			color: $gray-light !important;
 		}
@@ -835,6 +837,10 @@ ul.nav {
 			h2 {
 				text-transform: none !important;
 				margin-bottom: 5px !important;
+			}
+			small {
+				display: inline-block;
+				line-height: 12px !important;
 			}
 		}
 	}

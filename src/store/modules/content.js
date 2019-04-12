@@ -12,6 +12,7 @@ export const content_module = {
 		userInfo: undefined,
 		
 		tier: undefined,
+		voucher: undefined,
 		overencumbered: undefined,
 		content_count: {},
 		
@@ -58,6 +59,9 @@ export const content_module = {
 		tier: function( state ) {
 			return state.tier
 		},
+		voucher: function( state ) {
+			return state.voucher
+		},
 		overencumbered: function( state ) {
 			return state.overencumbered
 		},
@@ -77,6 +81,9 @@ export const content_module = {
 		},
 		SET_TIER(state, payload) {
 			state.tier = payload;
+		},
+		SET_VOUCHER(state, payload) {
+			state.voucher = payload;
 		},
 		setSlide(state, value) {
 			if(state.slide.type != value.type) {
@@ -154,9 +161,12 @@ export const content_module = {
 				let email = user_info.email
 
 				// User always basic reward tier
-				let path = `tiers/basic`
+				let path = `tiers/basic`				
+
 				// If user has voucher use this
 				if (user_info.voucher){
+					let voucher = user_info.voucher
+
 					if (user_info.voucher.date === undefined){
 						path = `tiers/${user_info.voucher.id}`
 					} else {
@@ -164,11 +174,13 @@ export const content_module = {
 						let today = new Date()
 						if (today > end_date) {
 							dispatch("remove_voucher", state.user.uid)
+							voucher = undefined
 						}
 						if (user_info.voucher && today <= end_date) {
 							path = `tiers/${user_info.voucher.id}`
 						}
 					}
+					commit('SET_VOUCHER', voucher);
 				}
 				let vouch_tiers = db.ref(path)
 				vouch_tiers.on('value', voucher_snap => {

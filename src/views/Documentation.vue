@@ -20,7 +20,7 @@
 			</b-navbar>
 		</div>
 		<div class="container-fluid">
-			<h1>Documentation <span class="gray-hover">(INCOMPLETE)</span></h1>
+			<h1>Documentation</h1>
 			<p>Here we will explain why we made certain choices and how solved some issues we came across. 
 				If you wonder why some actions work a certain way, you will probably find answers here.
 			</p>
@@ -90,8 +90,8 @@
 							Every encounter needs entities to fight each other. Below we'll talk about how these entities are stored in an encounter.
 						</p>
 						<p><b>Players</b><br/>
-							When you add a player the current hit points are set to the maximum. 
-							We keep track of current hit points in the encounter, not under the player itself.
+							When you add a player to an encounter, only their ID is copied to that encounter. 
+							We keep track of hit points and Armor Class under the campaign. We do this so hit points don't reset after an encounter.
 						</p>
 						<p><b>NPC's</b><br/>
 							Adding an NPC copies the some of the values to the encounter. 
@@ -167,10 +167,14 @@
 						because we are not able to when you roll the damage of a action. 
 						Check the documention on <a href="#run-encounter-select">roll damage</a> for more information.</p>
 
-						<p><b>Critical hits.</b><br/> When you input manual damage, you can select if it was a critical hit. This has no effect on the the amount you submitted. 
-						We don't divide it by two or do any sort of manipulation to it, it's up to you input the right amount of damage. 
-						The critical hit checkbox has only two purposes. 
-						First to keep track of in the combat log and second to let a player that is down automitically fail two death saving throws.</p>
+						<p>
+							<b>Critical hits.</b><br/> When you input <b>manual damage</b>, you can select if it was a critical hit. This has no effect on the the amount you submitted. 
+							We don't divide it by two or do any sort of manipulation to it, it's up to you input the right amount of damage. 
+							The critical hit checkbox at manual damagage has only two purposes. 
+							First to keep track of in the combat log and second to let a player that is down automitically fail two death saving throws.<br/>
+							When you <b>roll damage</b>, if it is a critical hit, we double the damage dice rolls. 
+							So if the roll is 2d8 + 6 and you rolled a 6 and a 2, we make that 16 damage and then we add the + 6, resulting in 22 damage for that attack.
+						</p>
 
 						<p><b>Temporary Hit Points.</b><br/> During an encounter entities can be given temporary hit points through the edit function. 
 							Temporary hit points are handled as the SRD describes. They serve as an extra pool for damage, but healing will not be put in the temporary pool.
@@ -186,8 +190,9 @@
 						<h2 class="pt-5" id="run-encounter-select">Roll damage abilities</h2>
 						<p>When the current entity is an NPC, you can choose to roll the attacks automatically. 
 							A d20 plus their to hit modifier and the damage of the attack will be rolled at the same time. 
-							A notification will pop up showing you te results of the roll and asking you if you want to apply the damage or cancel.
-							If you apply the damage, it is handled exactly the same as manual damage.
+							A notification will pop up showing you te results of the roll and asking you if you want to count the roll as a hit and apply the damage or as miss and cancel.
+							If you count it as a hit, the damage is handled exactly the same as manual damage. You can also choose to either double or half the damage. 
+							When halved, the outcome is rounded down.
 						</p>
 
 						<p><b>Type of damage.</b><br/> Because of how we stored the monsters in our database it is currently not possible to keep track of type of damage. 
@@ -206,7 +211,9 @@
 
 						<h2 class="pt-5" id="run-encounter-meters">Damage Meters</h2>
 						<p>
-							The damage meters are stored as a total number for each entity.
+							The damage meters are stored as a total number for each entity. 
+							If the damage done was higher than the targets current hit points, we store the rest damage as an overkill. 
+							Healing for more than a targets maximum hit points results is stored as overhealing.
 						</p>
 					</b-card>
 				</section>

@@ -112,6 +112,8 @@ const mutations = {
 		else {
 			entity.damage = 0
 			entity.healing = 0
+			entity.overkill = 0
+			entity.overhealing = 0
 		}
 		if(db_entity.transformed) {
 			entity.transformed = true

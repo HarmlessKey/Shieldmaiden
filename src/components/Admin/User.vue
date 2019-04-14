@@ -16,6 +16,13 @@
 		</p>
 		<p v-else>Unknown</p>
 
+		<h2>Broadcasting</h2>
+		<p> 
+			<router-link :to="'/track-encounter/' + user['.key']">
+				<i :class="{ 'fas fa-play green': track.broadcast, 'fas fa-stop red': !track.broadcast }"></i> View
+			</router-link>
+		</p>
+
 		<h2>Data</h2>
 		<p class="data">
 			<span class="type gray-hover">Campaigns: </span> 
@@ -36,26 +43,28 @@
 		</p>
 
 		<b-card header="Voucher" class="mt-5">
-			<p>Gift user a subscription</p>
+			<h3>Gift user a subscription</h3>
 		
-			<b-row>
-				<b-col class="col-3">
-					<b-form-group label="Tier">
-						<b-select v-model="voucher.id">
-							<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
-						</b-select>
-					</b-form-group>
+			<b-row class="mb-3">
+				<label class="col-md-2">Tier</label>
+				<b-col md="3">
+					<b-select v-model="voucher.id">
+						<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
+					</b-select>
 				</b-col>
-				<b-col class="col-3">
-					<b-form-group label="Duration">
-						<b-radio-group name="duration" v-model="duration">
-							<b-form-radio value="date">Till date</b-form-radio><br/>
-							<b-form-radio value="infinite">Till cancelled</b-form-radio>
-						</b-radio-group>
-					</b-form-group>
+			</b-row>
+			<b-row class="mb-3">
+				<label class="col-md-2">Duration</label>
+				<b-col md="3">
+					<b-radio-group name="duration" v-model="duration">
+						<b-form-radio value="date">Till date</b-form-radio><br/>
+						<b-form-radio value="infinite">Till cancelled</b-form-radio>
+					</b-radio-group>
 				</b-col>
-				<b-col v-if="duration == 'date'">
-					<label>Date</label>
+			</b-row>
+			<b-row class="mb-3">
+				<label class="col-md-2">Date</label>
+				<b-col md="3" v-if="duration == 'date'">
 					<b-form-input type="text"
 					v-validate="'required'"
 					data-vv-as="Date" 
@@ -65,9 +74,12 @@
 					<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
 				</b-col>
 			</b-row>
-			<b-form-group label="Message">
-				<b-form-input type="text" v-model="voucher.message" name="message" placeholder="message" />
-			</b-form-group>
+			<b-row class="mb-3">
+				<label class="col-md-2">Message</label>
+				<b-col>
+					<b-form-textarea rows="3" v-model="voucher.message" name="message" placeholder="message" />
+				</b-col>
+			</b-row>
 			<a class="btn" @click="setVoucher()">Save</a>
 		</b-card>
 
@@ -110,6 +122,10 @@
 				status: {
 					source: db.ref(`status/${this.id}`),
 					asObject: true,
+				},
+				track: {
+					source: db.ref(`track/${this.id}`),
+					asObject: true
 				},
 				tiers: db.ref('tiers').orderByChild('order'),
 				campaigns: db.ref(`campaigns/${this.id}`),

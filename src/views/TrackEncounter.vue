@@ -30,6 +30,36 @@
 			<div class="container-fluid">
 					<Follow />
 				<div class="container entities">
+
+					<!-- LAST ROLL -->
+					<div v-if="encounter.lastRoll" class="lastRoll text-center">
+						<i class="fas fa-dice-d20"></i> 
+
+						<!-- To hit -->
+						<span v-if="encounter.lastRoll.toHitTotal">
+							To hit: 
+							<span v-if="encounter.lastRoll.toHitTotal == 'Natural 1' || encounter.lastRoll.toHitTotal == 'Natural 20'"
+								:class="{ 'red': encounter.lastRoll.toHitTotal == 'Natural 1', 'green': encounter.lastRoll.toHitTotal == 'Natural 20' }">
+								{{ encounter.lastRoll.toHitTotal }}
+							</span>
+							<template v-else>
+								<span v-if="encounter.lastRoll.hitMod">
+									{{ encounter.lastRoll.toHit }} + {{ encounter.lastRoll.hitMod }} =
+								</span>
+								<span class="blue">{{ encounter.lastRoll.toHitTotal }}</span>
+							</template>.
+						</span>
+
+						<!-- Damage -->
+						<span v-if="encounter.lastRoll.damageTotal">
+							Damage: 
+							<span v-if="encounter.lastRoll.damageMod">
+								{{ encounter.lastRoll.damage }} + {{ encounter.lastRoll.damageMod }} =
+							</span>
+							<span class="red">{{ encounter.lastRoll.damageTotal }}</span>.
+						</span>
+					</div>
+
 					<b-row>
 						<b-col>
 							<Initiative 
@@ -317,6 +347,10 @@
 
 			&::-webkit-scrollbar { 
 				display: none; 
+			}
+			.lastRoll {
+				background: rgba(0, 0, 0, .6);
+				padding: 5px;
 			}
 		}
 		.damage {

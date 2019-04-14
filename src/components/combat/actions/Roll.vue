@@ -17,6 +17,23 @@
 			
 			<template v-if="current.actions">
 				<h2>Actions</h2>
+
+				<div class="d-flex justify-content-between">
+					<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
+					<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
+				</div>
+				<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
+					<b-form-group label="Options open roll">
+						<b-form-checkbox-group
+							v-model="rollOptions"
+							:options="options"
+							name="flavour-2a"
+							stacked
+						></b-form-checkbox-group>
+					</b-form-group>
+					<small>Open rolls are shown on the player screen.</small>
+				</div>
+
 				<div class="advantage d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
@@ -75,6 +92,7 @@
 </template>
 
 <script>
+	import { db } from '@/firebase'
 	import { mapGetters } from 'vuex'
 	import { dice } from '@/mixins/dice.js'
 	import { setHP } from '@/mixins/HpManipulations.js'
@@ -90,6 +108,13 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				advantage: false,
+				openRoll: false,
+				rollOptions: ['toHit', 'damage'],
+        options: [
+          { text: 'To hit', value: 'toHit' },
+          { text: 'Damage', value: 'damage' },
+          { text: 'Modifiers', value: 'modifiers' },
+        ]
 			}
 		},
 		computed: {
@@ -168,7 +193,6 @@
 					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
 					toHit[highest] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
 				}
-				console.log(toHit);
 
 				//Roll the damage for all seperated rolls
 				for(let roll in rolls) {
@@ -233,6 +257,13 @@
 					}
 				}
 
+				//If it was an open roll
+				if(this.openRoll) {
+					this.rollOpenly(toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus'])
+				} else {
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false)
+				}
+
 				//BUILD SNOTIFY POPUP
 				this.$snotify.html(
 					`<div class="snotifyToast__title">
@@ -292,6 +323,38 @@
 				});
 				this.advantage = false; //turn advantage off
 			},
+			rollOpenly(toHit, damage, hitMod, damageMod) {
+				var showRoll = [];
+
+				//Show to hit roll
+				if (Object.values(this.rollOptions).indexOf('toHit') > -1) {
+					if(toHit == '20') {
+						showRoll.toHitTotal = 'Natural 20'
+					} else if(toHit == '1') {
+						showRoll.toHitTotal = 'Natural 1'
+					} else {
+						showRoll.toHitTotal = toHit + hitMod;
+					}
+
+					//Show Modifier
+					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
+						showRoll.toHit = toHit;
+						showRoll.hitMod = hitMod;
+					}
+				}
+
+				//Show damage roll
+				if (Object.values(this.rollOptions).indexOf('damage') > -1) {
+					showRoll.damageTotal = damage + damageMod;
+
+					//Show Modifier
+					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
+						showRoll.damage = damage;
+						showRoll.damageMod = damageMod;
+					}
+				}
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
+			}
 		},
 	}
 </script>

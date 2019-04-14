@@ -17,6 +17,16 @@
 			
 			<template v-if="current.actions">
 				<h2>Actions</h2>
+				<div class="advantage d-flex justify-content-between">
+					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
+						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
+						Advantage
+					</button>
+					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
+						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
+						Disadvantage
+					</button>
+				</div>
 				<ul class="roll">
 					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
@@ -27,7 +37,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action, advantage)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
@@ -49,7 +59,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action, advantage)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
@@ -79,6 +89,7 @@
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				advantage: false,
 			}
 		},
 		computed: {
@@ -111,7 +122,14 @@
 				}
 				return stats
 			},
-			roll(action) {
+			setAdvantage(value) {
+				if(this.advantage == value) {
+					this.advantage = false;
+				} else {
+					this.advantage = value;
+				}
+			},
+			roll(action, advantage) {
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
@@ -120,6 +138,7 @@
 				var total = 0;
 				var allDamageRolls = [];
 				var critInfo = '';
+				var highest = 0;
 
 				var ac = parseInt(this.displayStats(this.target).ac);
 
@@ -127,9 +146,29 @@
 				if(this.target.ac_bonus) {
 					ac = parseInt(this.target.ac_bonus) + ac;
 				}
-				
-				//Roll the to hit, d20 + attack bonus
-				let toHit =  this.rollD(20, 1, action['attack_bonus'])
+
+				let toHit = [];
+				let adv = ""
+				//If there is advantage roll twice
+				if(advantage) {
+					for(let i = 0; i <= 1; i++) {
+						toHit[i] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+					}
+					
+					//Check which roll was highest
+					highest = (toHit[0].total >= toHit[1].total) ? 0 : 1;
+					
+					//Set advantage message for snotify
+					let color = (advantage == 'advantage') ? 'green' : 'red'; 
+					adv = `<small class="${color}">${advantage}</small>`;
+					
+				} 
+				//Roll once where there is no advantage/disadvantage
+				else {
+					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
+					toHit[highest] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+				}
+				console.log(toHit);
 
 				//Roll the damage for all seperated rolls
 				for(let roll in rolls) {
@@ -141,8 +180,12 @@
 					total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
 				}
 
+				//If there was disadvantage, it cannot crit
+				if(advantage == 'disadvantage') {
+					highest = (highest == 0) ? 1 : 0;
+				}
 				//Check if it was a critical hit
-				if(toHit.throws[0] == '20') {
+				if(toHit[highest].throws[0] == '20') {
 					//Form HTML for snotify
 					critInfo = `<small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small>`;
 					
@@ -165,26 +208,26 @@
 				}
 
 				//If the to hit roll is a 20, it is a critical hit
-				if(toHit.throws[0] == '20') {
+				if(toHit[highest].throws[0] == '20') {
 					hits = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
 					crit = true;
 				}
 				//If the to hit roll is a 1, it is a critical fail
-				else if(toHit.throws[0] == '1') {
+				else if(toHit[highest].throws[0] == '1') {
 					hits = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
 				}
 				else {
 					//If the to hit is higher than or equal to target's AC, it hits
-					if(toHit.total >= ac) {
+					if(toHit[highest].total >= ac) {
 						//Form HTML for snotify
-						hits = `<span class="gray-hover">${toHit.throws[0]} ${toHit.mod} = </span>${toHit.total}
+						hits = `<span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
 										<span class="green">HIT!</span> 
 										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
 					//If the to hit is lower than the target's ac, it misses
 					else {
 						//Form HTML for snotify
-						hits = `<span class="gray-hover">${toHit.throws[0]} ${toHit.mod} = </span>${toHit.total}
+						hits = `<span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
 										<span class="red">MISS!</span> 
 										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
 					}
@@ -196,6 +239,7 @@
 						<b>${action.name}</b>
 					</div>
 					<div class="snotifyToast__body">
+						${adv}
 						<h2>${hits}</h2>
 						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
 						${critInfo}
@@ -246,6 +290,7 @@
 						},
 					]
 				});
+				false; //turn advantage off
 			},
 		},
 	}
@@ -278,6 +323,11 @@
 					margin-top: 3px;
 				}
 			}
+		}
+	}
+	.advantage {
+		.btn {
+			width: 48%;
 		}
 	}
 </style>

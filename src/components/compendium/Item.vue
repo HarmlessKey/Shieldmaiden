@@ -66,22 +66,22 @@
 				</b-col>
 			</b-row>
 
+			<table class="table" v-if="item.table">
+				<thead>
+					<th v-for="head in item.table.header" :key="head">{{ head }}</th>
+				</thead>
+				<tbody>
+					<tr v-for="(row, i) in item.table.rows" :key="i">
+						<td v-for="(col, i) in item.table.rows[i].columns" :key="i">
+							{{ col }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
 			<!-- TABLE -->
 			<h2>Info Table</h2>
-			<template v-if="item.table">
-				<b-row class="table-row">
-					<b-col v-for="(col, i) in item.table.columns" :key="i">
-						<b-form-input v-model="item.table.header[i]" placeholder="Column header"/>
-					</b-col>
-				</b-row>
-				<b-row v-for="(row, i) in item.table.rows" :key="i" class="table-row">
-					<b-col v-for="(col, index) in item.table.rows[i].columns" :key="index">
-						<b-form-input v-model="item.table.rows[i].columns[index]" placeholder=""/>
-					</b-col>
-				</b-row>
-				<a @click="addRow()" class="btn btn-block mt-4">Add Row</a>
-			</template>
-			<b-row v-else>
+			<b-row class="mb-3">
 				<b-col sm="2">
 					<b-form-select name="columns" v-model="columns">
 						<option >Columns</option>
@@ -89,11 +89,36 @@
 					</b-form-select>
 				</b-col>
 				<b-col>
-					<a @click="addTable()">Add table</a>
+					<a class="btn" @click="addTable()"><i class="fas fa-plus"></i> Add table</a>
 				</b-col>
 			</b-row>
 
-			<a @click="editItem()" class="btn btn-block mt-4">Save</a>
+			<template v-if="item.tables">
+				<div v-for="(table, index) in item.tables" :key="index" class="mb-5">
+					<h3 class="d-flex justify-content-between">
+						<span>Table {{ index }}</span>
+						<a class="red" @click="removeTable(index)"><i class="fas fa-trash-alt"></i></a>
+					</h3>	
+					<b-row class="table-row">
+						<b-col>
+							<b-form-input v-model="table.name" placeholder="Table name"/>
+						</b-col>
+					</b-row>
+					<b-row class="table-row">
+						<b-col v-for="(col, i) in table.columns" :key="i">
+							<b-form-input v-model="table.header[i]" placeholder="Column header"/>
+						</b-col>
+					</b-row>
+					<b-row v-for="(row, i) in table.rows" :key="i" class="table-row">
+						<b-col v-for="(col, index) in table.rows[i].columns" :key="index">
+							<b-form-input v-model="table.rows[i].columns[index]" placeholder=""/>
+						</b-col>
+					</b-row>
+					<a @click="addRow(index)" class="btn btn-block mt-4">Add Row</a>
+				</div>
+			</template>
+
+			<a @click="editItem()" class="btn btn-block mt-4 bg-green">Save</a>
 
 		</template>
 
@@ -115,18 +140,21 @@
 			</i>
 
 			<p style="white-space: pre-line">{{ item.desc }}</p>
-			<table class="table" v-if="item.table">
-				<thead>
-					<th v-for="head in item.table.header" :key="head">{{ head }}</th>
-				</thead>
-				<tbody>
-					<tr v-for="(row, i) in item.table.rows" :key="i">
-						<td v-for="(col, i) in item.table.rows[i].columns" :key="i">
-							{{ col }}
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<div v-for="(table, index) in item.tables" :key="index">
+				<h6 v-if="table.name">{{ table.name }}</h6>
+				<table class="table mb-5">
+					<thead>
+						<th v-for="head in table.header" :key="head">{{ head }}</th>
+					</thead>
+					<tbody>
+						<tr v-for="(row, i) in table.rows" :key="i">
+							<td v-for="(col, i) in table.rows[i].columns" :key="i">
+								{{ col }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</template>
 	</div>
 </template>
@@ -150,11 +178,6 @@
         ]
 			}
 		},
-		computed: {
-			...mapGetters([
-				'tier',
-			]),
-		},
 		beforeMount() {
 			//Because the component is loaded
 			//in another view, the scroll needs to be reset to 0
@@ -169,7 +192,8 @@
 		},
 		computed: {
 			...mapGetters([
-				'userInfo'
+				'userInfo',
+				'tier'
 			]),
 		},
 		firebase() {
@@ -194,22 +218,24 @@
 			},
 			addTable() {
 				if(this.columns !== undefined) {
-					if(this.item.table == undefined) {
-						this.item.table = [];
+					if(this.item.tables == undefined) {
+						this.item.tables = [];
 					}
-					this.item.table.columns = this.columns
-					this.item.table.header = []
-					this.item.table.rows = []
+					this.item.tables.push({
+						columns: this.columns,
+						header: [],
+						rows: [],
+					})
 				}
 				this.$forceUpdate();
 			},
-			addRow() {
+			addRow(key) {
 				var cols = []
 
-				for(let i = 1; i <= this.item.table.columns; i++) {
+				for(let i = 1; i <= this.item.tables[key].columns; i++) {
 					cols.push('column '+ i)
 				}
-				this.item.table.rows.push({
+				this.item.tables[key].rows.push({
 					columns: cols
 				})
 				this.$forceUpdate();
@@ -225,6 +251,10 @@
 						});
 					}
 				})
+			},
+			removeTable(key) {
+				this.$delete(this.item.tables, key)
+				this.$forceUpdate(); //IMPORTANT
 			},
 			checked(value) {
 				db.ref(`items/${this.id}/checked`).set(value);

@@ -290,7 +290,7 @@
 						},
 					]
 				});
-				false; //turn advantage off
+				this.advantage = false; //turn advantage off
 			},
 		},
 	}

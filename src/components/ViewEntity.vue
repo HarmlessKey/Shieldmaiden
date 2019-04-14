@@ -9,12 +9,27 @@
 		</i>
 		<hr>
 		<p>
-			<template v-if="entity.armor_class"><b>Armor Class</b> {{ entity.armor_class }}<br/></template>
-			<template v-else><b>Armor Class</b> {{ entity.ac }}<br/></template>
-			<template v-if="entity.hit_points"><b>Hit Points</b> {{ entity.hit_points }}</template>
-			<template v-else><b>Hit Points</b> {{ entity.maxHp }}</template>
+			<template v-if="entity.armor_class">
+				<b><i class="fas fa-shield gray-hover"></i>Armor Class</b>: 
+				<span class="blue"> {{ entity.armor_class }}</span><br/>
+			</template>
+			<template v-else>
+				<b><i class="fas fa-shield gray-hover"></i> Armor Class</b>: 
+				<span class="blue"> {{ entity.ac }}</span><br/>
+			</template>
+			<template v-if="entity.hit_points">
+				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
+				<span class="blue"> {{ entity.hit_points }}</span>
+			</template>
+			<template v-else>
+				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
+				<span class="blue"> {{ entity.maxHp }}</span>
+			</template>
 			<template v-if="entity.hit_dice"> ({{ entity.hit_dice }})</template>
-			<template v-if="entity.speed"><br/><b>Speed</b> {{ entity.speed }}</template>
+			<template v-if="entity.speed">
+				<br/><b><i class="fas fa-angle-double-right gray-hover"></i> Speed</b>: 
+				<span class="blue"> {{ entity.speed }}</span>
+			</template>
 		</p>
 		<hr>
 		<b-row class="abilities">

@@ -30,7 +30,9 @@
 				:per-page="15"
 				:current-page="current"
 			>
-				<router-link :to="'/compendium/items/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
+				<router-link :to="'/compendium/items/' + data.item['.key']" slot="name" slot-scope="data">
+					{{ data.value }}
+				</router-link>
 				
 				<!-- ATTUNEMENT -->
 				<span slot="requires_attunement" slot-scope="data">

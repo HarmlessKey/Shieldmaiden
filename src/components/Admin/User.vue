@@ -5,7 +5,16 @@
 		<div v-if="loading" class="loader"> <span>Loading user....</span></div>
 
 		<h1>{{ user.username }}</h1>
-		<p class="mb-5"><i class="gray-hover">{{ user['.key'] }}</i></p>
+		<p><i class="gray-hover">{{ user['.key'] }}</i></p>
+
+		
+		<h2>Status</h2>
+		<p v-if="status.state">
+			<i :class="{ 'green': status.state == 'online', 'gray-hover': status.state == 'offline' }" class="fas fa-circle"></i>
+			{{ status.state }}<br/>
+			<span v-if="status.state == 'offline'">Last online: {{ makeDate(status.last_changed) }}</span>
+		</p>
+		<p v-else>Unknown</p>
 
 		<h2>Data</h2>
 		<p class="data">
@@ -98,6 +107,10 @@
 					asObject: true,
 					readyCallback: () => this.loading = false
 				},
+				status: {
+					source: db.ref(`status/${this.id}`),
+					asObject: true,
+				},
 				tiers: db.ref('tiers').orderByChild('order'),
 				campaigns: db.ref(`campaigns/${this.id}`),
 				encounters: db.ref(`encounters/${this.id}`),
@@ -142,7 +155,25 @@
 						});
 					}
 				});
-			}
+			},
+			makeDate(input) {
+				let monthNames = [
+					"January", "February", "March",
+					"April", "May", "June", "July",
+					"August", "September", "October",
+					"November", "December"
+				];
+
+				let d = new Date(input)
+				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
+				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
+				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
+
+				let time = hours + ":" + minutes + ":" + seconds;
+				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
+				
+				return date + " - " + time;
+			},
 		}
 	}
 </script>

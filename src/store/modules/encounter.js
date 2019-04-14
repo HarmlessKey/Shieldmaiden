@@ -108,22 +108,22 @@ const mutations = {
 			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
 			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
 			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
-		}
-		else {
+		} else {
 			entity.damage = 0
 			entity.healing = 0
 			entity.overkill = 0
 			entity.overhealing = 0
 		}
+
 		if(db_entity.transformed) {
 			entity.transformed = true
 			entity.transformedMaxHp = db_entity.transformed.maxHp
 			entity.transformedCurHp = db_entity.transformed.curHp
 			entity.transformedAc = db_entity.transformed.ac
-		}
-		else {
+		} else {
 			entity.transformed = false
 		}
+		
 		switch(entity.entityType) {
 			case 'player': {
 				//get the curHp & tempHP & AC Bonus from the campaign

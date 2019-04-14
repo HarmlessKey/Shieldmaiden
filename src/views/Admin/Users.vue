@@ -2,7 +2,7 @@
 	<div class="container-fluid">
 		<template v-if="!$route.params.id">
 		<Crumble />
-		<h1 class="mb-3"><i class="fas fa-users"></i> Users ( {{ Object.keys(users).length }} )</h1>
+		<h1 class="mb-3"><i class="fas fa-users"></i> Users ( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )</h1>
 
 			<b-row>
 				<b-col sm="8">
@@ -29,11 +29,21 @@
 					:per-page="15"
 					:current-page="current"
 				>	
+					<!-- STATUS -->
+					<span slot=".key" slot-scope="data">
+						<template v-if="status[data.value]">
+							<i :class="{ 'green': status[data.value].state == 'online', 'gray-hover': status[data.value].state == 'offline' }" class="fas fa-circle"></i>
+						</template>
+						<span v-else><i class="fas fa-circle gray-hover"></i></span>
+					</span>
+
 					<!-- USERNAME -->
 					<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">{{ data.value }}</router-link>
 					
 					<!-- SUBSCRIPTION -->
-					<!-- <span slot="subscription" slot-scope="data"></span> -->
+					<span slot="voucher" slot-scope="data" v-if="data.value">
+						<template v-if="tiers[data.value.id]">{{ tiers[data.value.id].name }}</template>
+					</span>
 
 					<!-- LOADER -->
 					<div slot="table-busy" class="loader">
@@ -73,8 +83,8 @@
 				id: this.$route.params.id,
 				current: 1,
 				fields: {
-          index: {
-            label: '#',
+          '.key': {
+						label: 'State',
 					},
           username: {
             label: 'Username',
@@ -84,8 +94,9 @@
             label: 'Email',
             sortable: true
 					},
-					subscription: {
-						label: 'Subscription'
+					voucher: {
+						label: 'Subscription',
+						sortable: true
 					}
 				},
 				search: '',
@@ -101,7 +112,19 @@
 					source: db.ref('users').orderByChild('username'),
 					readyCallback: () => this.isBusy = false
 				},
+				status: {
+					source: db.ref('status'),
+					asObject: true,
+				},
+				online: {
+					source: db.ref('status').orderByChild('state').equalTo('online'),
+					readyCallback: () => this.isBusy = false
+				},
 				campaigns: db.ref('users'),
+				tiers: {
+					source: db.ref('tiers'),
+					asObject: true,
+				},
 			}
 		},
 		beforeMount() {
@@ -131,6 +154,14 @@
 					this.searchResults = this.users
 					this.searching = false
 				}
+			},
+			patreon(email) {
+				var patron = db.ref(`patrons`).orderByChild("email").equalTo(email);
+				var isPatron = patron.once('value').then(function(snapshot) {
+					// return snapshot.val()
+					console.log(snapshot.val())
+				});
+				// return patron
 			},
 		}
 	}

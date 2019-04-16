@@ -333,7 +333,7 @@
 					} else if(toHit == '1') {
 						showRoll.toHitTotal = 'Natural 1'
 					} else {
-						showRoll.toHitTotal = toHit + hitMod;
+						showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
 					}
 
 					//Show Modifier
@@ -345,7 +345,7 @@
 
 				//Show damage roll
 				if (Object.values(this.rollOptions).indexOf('damage') > -1) {
-					showRoll.damageTotal = damage + damageMod;
+					showRoll.damageTotal = parseInt(damage) + parseInt(damageMod);
 
 					//Show Modifier
 					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {

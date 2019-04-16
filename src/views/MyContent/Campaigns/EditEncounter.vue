@@ -105,47 +105,7 @@
 										</li>
 									</ul>
 									<div v-else class="loader"><span>Loading players...</span></div>
-									<!-- <h2>Not in Campaign</h2>
-									<ul class="entities hasImg" v-if="campaign.players">
-										<template v-for="(player, key) in players">
-											<li :key="key" v-if="Object.keys(campaign.players).indexOf(key) < 0" class="d-flex justify-content-between">
-												<div class="d-flex justify-content-left">
-													<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-													<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
-													{{ player.character_name }}
-												</div>
-												<template v-if="encounter.entities">
-													<div class="actions pl-5">
-														<a @click="showSlide('info', player)" v-b-tooltip.hover title="Show Info">
-															<i class="fas fa-info"></i>
-														</a>
-														<a v-if="checkPlayer(key) < 0" class="gray-hover" 
-														v-b-tooltip.hover 
-														title="Add Character" 
-														@click="add(key, 'player', player.character_name)">
-															<i class="fas fa-plus"></i>
-														</a>
-													</div>
-													<span v-if="checkPlayer(key) >= 0">
-														<i class="fas fa-check"></i>
-														<small class="d-none d-md-inline ml-1 gray-hover">Added</small>
-													</span>
-												</template>	
-												<div v-else class="actions">
-													<a @click="showSlide('info', players)" v-b-tooltip.hover title="Show Info">
-														<i class="fas fa-info"></i>
-													</a>
-													<a class="gray-hover" 
-														v-b-tooltip.hover 
-														title="Add Character" 
-														@click="add(key, 'player', player.character_name)">
-															<i class="fas fa-plus"></i>
-													</a>
-												</div>
-												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-											</li>
-										</template>
-									</ul> -->
+									
 									<p>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</p>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
@@ -214,6 +174,7 @@
 						</div>
 					</b-col>
 					
+					<!-- ADDED -->
 					<b-col sm="6">
 						<div id="added" class="bg-gray" v-if="encounter">
 							<template>
@@ -254,9 +215,10 @@
 										<template v-else-if="entity.entityType == 'npc'">
 											<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
 											<span v-else-if="entity.npc == 'custom' && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
 											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
-										{{ entity.name }}
+										<i v-if="entity.friendly" class="fas fa-heart green mr-2"></i> {{ entity.name }}
 									</div>
 									<div class="actions">
 										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
@@ -659,20 +621,7 @@ ul.nav {
 		display: inline-block;
 	}
 }
-// ul.entities {
-// 	list-style: none;
-// 	padding: 0;
-// 	line-height: 30px;
 
-// 	li {
-// 		border: solid 1px transparent;
-// 		padding: 2px;
-// 		margin-bottom:5px;
-// 		position: relative;
-		
-		
-// 	}
-// }
 
 // Remove arrows from number field
 input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {

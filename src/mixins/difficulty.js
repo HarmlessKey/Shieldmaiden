@@ -131,14 +131,18 @@ export const difficulty = {
 			var totalXp = 0;
 			var nMonsters = 0;
 			var nPlayers = 0;
-			var totalTreshold = [];
+			var totalTreshold = []; //Party difficulty treshold
 
-			var diff = [];
-
+			var diff = []; //Object that will hold values to return.
+			
+			//Loop over all entities
 			for(let key in entities) {
 				let entity = entities[key]
+
 				//Calculate Monsters XP
 				if(entity.entityType == 'npc') {
+					
+					//If an entity has no CR, return an error
 					if(entity.npc == 'npc' && !this.npcs[entity.id].challenge_rating) {
 						let error = {
 							0: 'error',
@@ -147,23 +151,32 @@ export const difficulty = {
 						return error;
 					}
 					let rating = 0
+
+					//Custom NPC CR
 					if (entity.npc == 'custom') {
 						rating = this.npcs[entity.id].challenge_rating
 					} 
+
+					//SRD monster CR
 					else {
 						let monsters = this.monsters_ref.child(entity.id);
 						rating = await monsters.once('value').then(function(snapshot) {
 							return snapshot.val().challenge_rating
 						})
 					}
+					//Get the XP
 					let xp = this.challenge[rating]
-
-					totalXp = parseInt(totalXp) + xp;
-					nMonsters++;
+					
+					//Only add the NPC to the difficulty, if it's not friendly
+					if(!entity.friendly) {
+						totalXp = parseInt(totalXp) + xp;
+						nMonsters++;
+					}
 				}
 
 				//Calculate Player tresholds
 				if(entity.entityType == 'player') {
+					//If there is a player without a level, return an error
 					if(!this.players[entity.id].level) {
 						let error = {
 							0: 'error',
@@ -171,6 +184,8 @@ export const difficulty = {
 						}
 						return error;
 					}
+					
+					//Loop over all difficulties
 					for(let key in this.difficulties) {
 						let level = this.players[entity.id].level
 						let difficulty = this.difficulties[key]
@@ -182,63 +197,95 @@ export const difficulty = {
 						totalTreshold[difficulty] = parseInt(totalTreshold[difficulty]) + parseInt(treshold);
 						
 					}
-					nPlayers++;
+					nPlayers++; //total player
 				}
 			}
-			//CALCULATE 
+			//Calculate the total XP with the right multiplier
+			//This value is compared with the party tresholds, to show the difficulty
 			let compare = this.multiply(nMonsters, nPlayers, totalXp);
-			diff['compare'] = compare;
+			diff['compare'] = compare; //the XP value that you compare to the tresholds
 
+			//Return the right difficulty for the encounter
 			if(compare != undefined) {
+
+				//Loop over all difficulties
 				for(let key in this.difficulties) {
 					let difficulty = this.difficulties[key];
 					diff[difficulty] = totalTreshold[difficulty];
 
 					var diffic;
+					//Return the difficulty.
+					//if the total XP value for the encounter is >= than a treshold,
+					//set the difficulty to the difficulty matching that treshold
 					if(compare >= totalTreshold[difficulty]) {
 						diffic = difficulty						
 					}
 				}
+
+				//If the difficulty is set
+				//set it in the object (diff[]) that is returned 
 				if(diffic) {
 					diff[0] = diffic
 				}
+				//if the total xp was lower than the lowest treshold,
+				//the encounter is trivial
 				else {
 					diff[0] = 'trivial'
 				}
 			}
+			//When no NPC's are added yet
 			else {
 				diff[0] = 'add NPC\'s'
 			}
+
+			//return the object that holds the tresholds, total XP and the difficulty
+			//diff[0] = difficulty (trivial, easy, medium, hard, deadly)
+			//diff['compare'] = total XP value
+			//diff['easy', 'medium', 'hard', 'deadly'] = party tresholds
 			return diff
 		},
 		multiply(nMonsters, nPlayers, totalXp) {
+			//The total XP is multiplied based on the amount of monsters
+
 			var multiplier = 0;
+
+			//1 monster - x1
 			if(nMonsters == 1) {
 				multiplier = 1
 			}
+			//2 monsters - x1.5
 			if(nMonsters == 2) {
 				multiplier = 2
 			}
+			//3-6 monsters - x2
 			if(nMonsters >= 3 && nMonsters <= 6) {
 				multiplier = 3
 			}
+			//7-10 monsters - x2.5
 			if(nMonsters >= 7 && nMonsters <= 10) {
 				multiplier = 4
 			}
+			//11-14 monsters - x3
 			if(nMonsters >= 11 && nMonsters <= 14) {
 				multiplier = 5
 			}
+			//>14 monsters - x4
 			if(nMonsters >= 15) {
 				multiplier = 6
 			}
 
 			//Adjest multipliers for big or small groups
+			//Group smaller than 3, the multiplier is 1 higher
+			//So for 1 monster you do totalXp*1.5 instead of totalXp*1
 			if(nPlayers < 3) {
 				multiplier = multiplier + 1;
 			}
+			//For groups larger than 6, you use 1 multiplier lower.
 			if(nPlayers > 6) {
 				multiplier = multiplier - 1;
 			}
+
+			//Multiply the XP and return the new total
 			totalXp = totalXp * this.multipliers[multiplier]
 			return totalXp
 		}

@@ -40,6 +40,10 @@
 			</b-col>
 		</b-row>
 		<hr>
+
+		<b-form-checkbox name="friendly" v-model="npc.friendly">Friendly NPC</b-form-checkbox>
+
+		<hr>
 		<b-row class="mb-2">
 			<b-col class="text-center">
 				<label for="ac">Armor Class</label>

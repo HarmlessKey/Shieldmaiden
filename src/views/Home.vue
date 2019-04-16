@@ -17,7 +17,8 @@
 						<b-row class=my-5>
 							<b-col md="7">
 								<p class="img-header bg-gray-darker">Your new DM screen</p>
-								<img src="@/assets/_img/harmless-key-encounter-tracker.png" alt="Your new Dungeon Master screen. An overview of our dungeons and dragons combat runner."/>
+								<!-- <img src="@/assets/_img/harmless-key-encounter-tracker.png" alt="Your new Dungeon Master screen. An overview of our dungeons and dragons combat runner."/> -->
+								<iframe width="560" height="315" src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 							</b-col>
 							<b-col md="5">
 								<h3>A sneak peek of our combat tracker</h3>

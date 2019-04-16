@@ -1,7 +1,5 @@
 
 import { store } from './store/store'
-import { db } from './firebase';
-
 
 import Home from '@/views/Home.vue';
 
@@ -27,6 +25,7 @@ import ManageContent from '@/views/ManageContent.vue';
 
 import Admin from '@/views/Admin/Overview.vue';
 import Users from '@/views/Admin/Users.vue';
+import Patrons from '@/views/Admin/Patrons.vue';
 
 import Profile from '@/views/profile/Profile.vue';
 import Username from '@/views/profile/SetUsername.vue';
@@ -280,6 +279,30 @@ export const routes = [{
 	meta: {
 		basePath: '/admin',
 		baseName: 'Users',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/patrons',
+	name: 'Patrons',
+	component: Patrons,
+	meta: {
+		baseName: 'Patrons',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/patrons/:id',
+	name: 'Patron',
+	component: Patrons,
+	props: (route) => ({
+		id: route.query.id
+	}),
+	meta: {
+		basePath: '/admin',
+		baseName: 'Patrons',
 		requiresAuth: true,
 		requiresAdmin: true
 	}

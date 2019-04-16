@@ -30,6 +30,10 @@
 				:per-page="15"
 				:current-page="current"
 			>
+				<template slot="index" slot-scope="data">
+					{{ data.index + 1 }}
+				</template>
+
 				<router-link :to="'/compendium/items/' + data.item['.key']" slot="name" slot-scope="data">
 					{{ data.value }}
 				</router-link>
@@ -91,7 +95,7 @@
 	import Footer from '@/components/Footer.vue'
 	import { mapActions } from 'vuex'
 	import Item from '@/components/compendium/Item.vue'
-	import axios from 'axios'
+	// import axios from 'axios'
 
 	export default {
 		name: 'Error',

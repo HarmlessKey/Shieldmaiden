@@ -8,6 +8,7 @@
 				<div class="d-flex justify-content-between">
 					<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
 					<span v-if="item.name == 'Users'">( {{ Object.keys(users).length }} )</span>
+					<span v-if="item.name == 'Patrons'">( {{ Object.keys(patrons).length }} )</span>
 				</div>
 			</li>
 		</ul>
@@ -34,6 +35,11 @@
 						url: 'users',
 						icon: 'fas fa-users',
 					},
+					'patrons': { 
+						name: 'Patrons',
+						url: 'patrons',
+						icon: 'fab fa-patreon',
+					},
 				},
 			}
 		},
@@ -41,6 +47,10 @@
 			return {
 				users: {
 					source: db.ref('users'),
+					readyCallback: () => this.isBusy = false
+				},
+				patrons: {
+					source: db.ref('patrons'),
 					readyCallback: () => this.isBusy = false
 				},
 			}

@@ -369,14 +369,18 @@
 				'npcs',
 				'overencumbered',
 			]),
-			_excludeFriendlies: function() {
-				return _.chain(this.encounter.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return !entity.friendly;
-								})
-								.sortBy('name' , 'asc')
-								.value()
+			async _excludeFriendlies() {
+				if(this.encounter) {
+					var entities = await _.chain(this.encounter.entities)
+									.filter(function(entity, key) {
+										entity.key = key
+										return !entity.friendly;
+									})
+									.sortBy('name' , 'asc')
+									.value();
+
+					return entities;
+				}
 			}
 		},
 		watch: {

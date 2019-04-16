@@ -173,6 +173,7 @@ export const difficulty = {
 						nMonsters++;
 					}
 				}
+				diff['nMonsters'] = nMonsters;
 
 				//Calculate Player tresholds
 				if(entity.entityType == 'player') {
@@ -200,6 +201,8 @@ export const difficulty = {
 					nPlayers++; //total player
 				}
 			}
+			diff['nPlayers'] = nPlayers;
+
 			//Calculate the total XP with the right multiplier
 			//This value is compared with the party tresholds, to show the difficulty
 			let compare = this.multiply(nMonsters, nPlayers, totalXp);
@@ -240,6 +243,8 @@ export const difficulty = {
 
 			//return the object that holds the tresholds, total XP and the difficulty
 			//diff[0] = difficulty (trivial, easy, medium, hard, deadly)
+			//diff['Nplayers'] = N players
+			//diff['Nmonsters'] = N monsters
 			//diff['compare'] = total XP value
 			//diff['easy', 'medium', 'hard', 'deadly'] = party tresholds
 			return diff

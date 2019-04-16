@@ -27,6 +27,10 @@
 				:per-page="15"
 				:current-page="current"
 			>
+				<template slot="index" slot-scope="data">
+					{{ data.index + 1 }}
+				</template>
+
 				<router-link :to="'/compendium/conditions/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
 				<div slot="table-busy" class="loader">
 					<span>Loading conditions....</span>

@@ -180,7 +180,7 @@
 							<template>
 								<div class="diff d-flex justify-content-between">
 									<span>
-										Difficulty: 
+										Difficulty:
 										<span v-if="encDifficulty" class="text-capitalize" :class="{ 
 											'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
 											'orange':  encDifficulty[0] == 'hard', 
@@ -369,20 +369,22 @@
 				'npcs',
 				'overencumbered',
 			]),
-			entitiesAmount: function() {
-				if (this.encounter) {
-					if(this.encounter.entities) {
-						return Object.keys(this.encounter.entities).length
-					}
-					else {
-						return 0
-					}
+			async _excludeFriendlies() {
+				if(this.encounter) {
+					var entities = await _.chain(this.encounter.entities)
+									.filter(function(entity, key) {
+										entity.key = key
+										return !entity.friendly;
+									})
+									.sortBy('name' , 'asc')
+									.value();
+
+					return entities;
 				}
-				return 0
 			}
 		},
 		watch: {
-			entitiesAmount() {
+			_excludeFriendlies() {
 				this.setDifficulty()
 			}
 		},

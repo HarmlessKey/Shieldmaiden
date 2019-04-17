@@ -5,6 +5,7 @@ export const setHP = {
 	data() {
 		return {
 			userId: this.$store.getters.getUser.uid,
+			campaignId: this.$route.params.campid,
 		}
 	},
 	firebase() {
@@ -13,6 +14,10 @@ export const setHP = {
 				source: db.ref(`settings/${this.userId}/encounter`),
 				asObject: true,
 			},
+			players: {
+				source: db.ref(`campaigns/${this.userId}/${this.campaignId}/players`),
+				asObject: true,
+			}
 		}
 	},
 	computed: {
@@ -218,6 +223,30 @@ export const setHP = {
 				amount,
 				over,
 			})
+
+		
+			//Campaign wide damage meters (no need to go through store)
+			if(!undo) {
+				if(current.entityType == 'player') {
+					this.damageMeters(current.key, 'damage', amount); //Damage done
+					this.damageMeters(current.key, 'overkill', over); //Over damage done
+				}
+				if(target.entityType == 'player') {
+					this.damageMeters(target.key, 'damageTaken', amount); //damage taken
+					this.damageMeters(target.key, 'overkillTaken', over); //Over damage taken
+				}
+			} 
+			//To undo, run same function with opposite types 
+			else {
+				if(current.entityType == 'player') {
+					this.damageMeters(current.key, 'healing', amount); //Undo Damage done
+					this.damageMeters(current.key, 'overhealing', over); //Undo Over damage done
+				}
+				if(target.entityType == 'player') {
+					this.damageMeters(target.key, 'healingTaken', amount); //Undo damage taken
+					this.damageMeters(target.key, 'overhealingTaken', over); //Undo Over damage taken
+				}
+			}
 		},
 		isHealing(target, current, amount, log, notify, undo) {
 			if(target.transformed == true) {
@@ -287,6 +316,29 @@ export const setHP = {
 				amount,
 				over,
 			})
+
+			//Campaign wide healing meters (no need to go through store)
+			if(!undo) {
+				if(current.entityType == 'player') {
+					this.damageMeters(current.key, 'healing', amount); //Healing done
+					this.damageMeters(current.key, 'overhealing', over); //Over healing done
+				}
+				if(target.entityType == 'player') {
+					this.damageMeters(target.key, 'healingTaken', amount); //Healing taken
+					this.damageMeters(target.key, 'overhealingTaken', over); //Over healing taken
+				}
+			}
+			//To undo, run same function with opposite types 
+			else {
+				if(current.entityType == 'player') {
+					this.damageMeters(current.key, 'damage', amount); //Undo Healing done
+					this.damageMeters(current.key, 'overkill', over); //Undo Over healing done
+				}
+				if(target.entityType == 'player') {
+					this.damageMeters(target.key, 'damageTaken', amount); //Undo Healing taken
+					this.damageMeters(target.key, 'overkillTaken', over); //Undo overhealing taken
+				}
+			}
 		},
 		addLog(type, crit, target, current, amount, over) {
 			var d = new Date();
@@ -317,5 +369,17 @@ export const setHP = {
 				value: newLog
 			})
 		},
+		async damageMeters(playerKey, type, amount) {
+			//Get the current healing done/taken
+			let targetMeters = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/${type}`);
+			let currentAmount = await targetMeters.once('value').then(function(snapshot) {
+				return snapshot.val()
+			})
+			if(currentAmount === null) { currentAmount = 0; } //if there is no healing done/taken yet
+			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
+
+			//Set the new amount
+			db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/${type}`).set(newAmount);
+		}
 	}
 }

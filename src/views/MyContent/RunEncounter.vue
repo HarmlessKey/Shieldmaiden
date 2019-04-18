@@ -103,6 +103,8 @@
 				'overencumbered',
 			]),
 			_active: function() {
+				let order = (this.settings.initOrder) ? 'asc' : 'desc'; 
+
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
@@ -113,10 +115,12 @@
 					}, 'asc')
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
-					} , 'desc')
+					} , order)
 					.value()
 			},
 			_idle: function() {
+				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
@@ -124,10 +128,12 @@
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
-					} , 'desc')
+					} , order)
 					.value()
 			},
 			_alive: function() {
+				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
 						entity.key = key
@@ -135,7 +141,7 @@
 					})
 					.orderBy(function(entity){
 						return parseInt(entity.initiative)
-					} , 'desc')
+					} , order)
 					.value()
 			},
 		},

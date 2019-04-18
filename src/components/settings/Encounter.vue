@@ -67,6 +67,14 @@
 							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
 						}
 					},
+					'initOrder': { 
+						name: 'Initiative order', 
+						icon: 'fas fa-arrows-alt-v',
+						options: {
+							0: { value: undefined, name: 'Descend', action: 'Descend', icon: 'fas fa-long-arrow-alt-down', color: 'green' },
+							1: { value: true, name: 'Ascend', action: 'Ascend', icon: 'fas fa-long-arrow-alt-up', color: 'green' },
+						}
+					},
 				},
 			}
 		},

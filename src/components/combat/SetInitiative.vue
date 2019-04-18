@@ -109,6 +109,7 @@
 	import _ from 'lodash'
 	import { mapGetters, mapActions } from 'vuex'
 
+	import { db } from '@/firebase'
 	import { dice } from '@/mixins/dice.js'
 	import { attributes } from '@/mixins/attributes.js'
 	import Turns from '@/components/combat/Turns.vue'
@@ -125,6 +126,14 @@
 			return {
 				selected: [],
 				setShadow: 0,
+			}
+		},
+		firebase() {
+			return {
+				initOrder: {
+					source: db.ref(`settings/${this.userId}/encounter/initOrder`),
+					asObject: true,
+				},
 			}
 		},
 		computed: {

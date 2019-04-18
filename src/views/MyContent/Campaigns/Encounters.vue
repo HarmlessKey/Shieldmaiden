@@ -438,15 +438,15 @@
 					delete entity.down
 					delete entity.ac_bonuc
 					delete entity.meters
+					delete entity.hidden
 
 					if(entity.entityType == 'npc') {
 						entity.curHp = entity.maxHp
 					}
 					entity.initiative = 0
 
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(
-						entity
-					)
+
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0)
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0)

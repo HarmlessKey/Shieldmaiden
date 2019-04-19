@@ -1,6 +1,6 @@
 <template>
 	<div class="container">	
-		<h2 class="text-center head">Encounter Finished</h2>
+		<!-- <h2 class="text-center head">Encounter Finished</h2> -->
 
 		<div class="card finished">
 			<div class="card-header"><i class="fas fa-treasure-chest"></i> Loot</div>
@@ -25,14 +25,14 @@
 					</template>
 					
 					<template v-if="encounter.loot.items">
-						<h3 class="text-center">Items</h3>
-						<ul>
-							<li v-for="(item, index) in encounter.loot.items" :key="index" class="d-flex justify-content-start">
-								<span class="icon"><i class="fas fa-ring"></i></span>
+						<h3><i class="fas fa-wand-magic"></i> Items</h3>
+						<ul class="entities hasImg">
+							<li v-for="(item, index) in encounter.loot.items" :key="index">
+								<span class="img"><i class="fas fa-ring"></i></span>
 
 								<span>
-									<h3>{{ item.name }}</h3>
-									<p>{{ item.desc }}</p>
+									<h4>{{ item.name }}</h4>
+									{{ item.desc }}
 								</span>
 							</li>
 						</ul>
@@ -61,7 +61,6 @@
 
 <style lang="scss" scoped>
 	.container {
-		max-width: 400px;
 
 		h2.head {
 			color: #fff;
@@ -82,32 +81,16 @@
 					font-size: 15px;
 				}
 			}
-			ul {
-				padding: 0;
-				list-style: none;
-				border-top: solid 1px #000;
-
-				li {
-					padding: 10px 0;
-					border-bottom: solid 1px #000;
-
-					h3 {
-						margin-bottom: 5px !important;
-					}
-					p {
-						margin-bottom: 0;
-					}
-					.icon {
-						background: rgba(0, 0, 0, .8) !important;
-						display: block;
-						height: 40px;
-						width: 40px;
-						line-height: 40px;
-						border: solid 1px #fff;
-						font-size: 20px;
-						margin-right: 20px;
-						text-align: center;
-					}
+			ul.entities {
+				.img {
+					background: none;
+					border: none;
+					font-size: 25px;
+					padding: 8px 15px;
+				}
+				h4 {
+					font-size: 20px;
+					margin-bottom: 5px;
 				}
 			}
 		}

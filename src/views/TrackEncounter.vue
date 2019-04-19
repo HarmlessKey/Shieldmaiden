@@ -1,25 +1,43 @@
 <template>
 <div>
-	<div v-if="!broadcasting['.value']">
-		<Follow />
-		<h2>User is currently not broadcasting.</h2>
-		<CampaignOverview :players="campaignPlayers" />		
+	<!-- NOT BROADCASTING -->
+	<div class="track" v-if="!broadcasting['.value']">
+		<div class="not-started">
+			<Follow />
+			<h2 class="padding">User is currently not broadcasting.</h2>
+			<CampaignOverview :players="campaignPlayers" />
+		</div>
 	</div>
+
+	<!-- BROADCASTING -->
 	<div class="track" v-if="encounter && broadcasting['.value']" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
-		<div class="not-started" v-if="encounter.finished == true">
-			<Finished v-if="playerSettings.loot == true" :encounter="encounter"/>
-			<h2 v-else class="padding">Encounter Finished</h2>
-			<div class="container damage">
-				<Meters :encounter="encounter" />
-			</div>
+		
+		<!-- FINISHED -->
+		<div class="not-started container" v-if="encounter.finished == true">
+			<h2 class="padding">Encounter Finished</h2>
+			<b-row>
+				<b-col v-if="playerSettings.loot == true" md="8">
+					<Finished :encounter="encounter"/>
+				</b-col>
+				<b-col md="4">
+					<div>
+						<Meters :encounter="encounter" />
+					</div>
+				</b-col>
+			</b-row>
 		</div>
 
+		<!-- ROLL FOR INITIATIVE -->
 		<div class="not-started" v-else-if="encounter.round == 0">
 			<Follow />
-			<h2 class="padding">Roll for initiative.</h2>
-			<div class="loader"></div>
+			<h2 class="padding">
+				<i class="fas fa-dice-d20 blue spin"></i>
+				Roll for initiative!
+			</h2>
 			<CampaignOverview :players="campaignPlayers" />	
 		</div>
+
+		<!-- ACTIVE ENCOUNTER -->
 		<template v-else>
 			<Turns 
 				:encounter="encounter" 
@@ -79,6 +97,8 @@
 			</div>
 		</template>
 	</div>
+
+	<!-- ADDS -->
 	<div class="d-flex justify-content-center">
 		<ins class="adsbygoogle bg-gray-dark"
 					v-if="tier && !tier.benefits.ads"
@@ -368,5 +388,15 @@
 	.adsbygoogle {
 		position: fixed;
 		bottom: 0;
+	}
+	.spin {
+		margin-right: 10px;
+		vertical-align: -5px;
+		font-size: 40px;
+		animation: spin 1.5s ease infinite;
+	}
+	@keyframes spin {
+		0%, 30% { transform: rotate(0deg); }
+		70%, 100% { transform: rotate(360deg); }
 	}
 </style>

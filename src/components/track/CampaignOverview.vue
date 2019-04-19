@@ -2,7 +2,7 @@
 <div class="container">
 	<b-row>
 		<b-col md="8">
-			Campaign Players
+			<h3>Campaign Players</h3>
 			<table class="table table-hover">
 				<thead>
 					<th></th>
@@ -52,7 +52,7 @@
 			<!-- <div v-else class="loader"><span>Loading Players...</span></div> -->
 		</b-col>
 		<b-col md="4">
-			Campaign wide meters
+			<h3>Campaign wide meters</h3>
 			<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length > 0)" class="meters">
 				<div v-for="(type, index) in types" :key="index">
 					<h3>{{ type.name }} done</h3>
@@ -180,6 +180,9 @@
 </script>
 
 <style lang="scss" scoped>
+	h3 {
+		color: #fff;
+	}
 	table {
 		// font-size: 12px;
 
@@ -212,7 +215,7 @@
 			text-shadow: 0 0 3px  #000;
 			font-size: 12px !important;
 			font-weight: bold !important;
-			line-height: 52px;
+			line-height: 48px;
 			margin: 0 !important;
 		}
 		ul {

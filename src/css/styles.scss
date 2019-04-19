@@ -319,15 +319,16 @@ table {
 	}
 	td.img {
 		padding: 3px;
-		width: 34px;
-		height: 34px;
+		width: 46px;
+		height: 46px;
 		background-size:cover;
 		background-position:top center;
 		background-color: $black;
+		border: solid 1px $gray-light !important;
 
 		img {
-			width: 34px;
-			height: 34px;
+			width: 46px;
+			height: 46px;
 		}
 	}
 	tr {

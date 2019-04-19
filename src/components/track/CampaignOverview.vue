@@ -4,7 +4,7 @@
 		<b-col md="8">
 			<h3>Campaign Players</h3>
 			<table class="table table-hover">
-				<thead>
+				<thead >
 					<th></th>
 					<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
 					<th class="name"></th>
@@ -52,7 +52,13 @@
 			<!-- <div v-else class="loader"><span>Loading Players...</span></div> -->
 		</b-col>
 		<b-col md="4">
-			<h3>Campaign wide meters</h3>
+			<h3 class="d-flex justify-content-between">
+				Campaign wide meters
+				<span>
+					<a>+</a>
+					<a>-</a>
+				</span>
+			</h3>
 			<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length > 0)" class="meters">
 				<div v-for="(type, index) in types" :key="index">
 					<h3>{{ type.name }} done</h3>
@@ -136,11 +142,11 @@
 					'damage': _.chain(this.players)
 						.filter(function(entity, key) {
 							entity.key = key
-							let damage = (entity.damage) ? entity.damage : 0;
+							let damage = (entity.meters) ? entity.meters.damage : 0;
 							return damage > 0;
 						})
 						.orderBy(function(entity){
-							let damage = (entity.damage) ? entity.damage : 0;
+							let damage = (entity.meters) ? entity.meters.damage : 0;
 							return parseInt(damage)
 						} , 'desc')
 						.value(),
@@ -148,11 +154,11 @@
 						.filter(function(entity, key) {
 							entity.key = key
 
-							let healing = (entity.healing) ? entity.healing : 0;
+							let healing = (entity.meters) ? entity.meters.healing : 0;
 							return healing > 0;
 						})
 						.orderBy(function(entity){
-							let healing = (entity.healing) ? entity.healing : 0;
+							let healing = (entity.meters) ? entity.meters.healing : 0;
 							
 							return parseInt(healing)
 						} , 'desc')
@@ -184,7 +190,11 @@
 		color: #fff;
 	}
 	table {
-		// font-size: 12px;
+		thead th {
+			color: #fff;
+			background: none;
+			text-shadow: 0 0 3px  #000;
+		}
 
 		tr {
 			td {

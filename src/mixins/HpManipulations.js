@@ -371,7 +371,7 @@ export const setHP = {
 		},
 		async damageMeters(playerKey, type, amount) {
 			//Get the current healing done/taken
-			let targetMeters = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/${type}`);
+			let targetMeters = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/meters/${type}`);
 			let currentAmount = await targetMeters.once('value').then(function(snapshot) {
 				return snapshot.val()
 			})
@@ -379,7 +379,7 @@ export const setHP = {
 			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
 			//Set the new amount
-			db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/${type}`).set(newAmount);
+			db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/meters/${type}`).set(newAmount);
 		}
 	}
 }

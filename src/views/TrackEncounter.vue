@@ -351,6 +351,7 @@
 				text-align: center;
 				padding-top: 50px;
 				text-shadow: 0 0 8px #000;
+				color: #fff;
 			}
 
 			.loader:before {

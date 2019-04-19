@@ -5,9 +5,9 @@
 				<i class="fas fa-user-plus mr-1"></i> 
 				<a @click="follow(true)">Follow campaign</a>
 			</small>
-			<small v-else class="gray-light shadow">
+			<small v-else class="shadow">
 				<span class="show"><i class="fas fa-user-check green"></i> Following campaign</span>
-				<a class="hover-show gray-light" @click="follow(false)"><i class="fas fa-user-minus red"></i> Unfollow</a>
+				<a class="hover-show" @click="follow(false)"><i class="fas fa-user-minus red"></i> Unfollow</a>
 			</small>
 		</div>
 		<small v-else class="bg-gray p-2">
@@ -52,6 +52,8 @@
 
 <style lang="scss" scoped>
 	.follow {
+		color: #fff;
+
 		.shadow {
 			text-shadow: 0 0 8px #000;
 		}

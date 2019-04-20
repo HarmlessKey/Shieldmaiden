@@ -11,9 +11,8 @@
 						<span class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></span>
 						<div class="progress health-bar">
 							<div>
-								<span class="name">
-									{{ entity.name }}
-								</span>
+								<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
+								<span v-else class="name">{{ entity.name }}</span>
 								<span class="numbers">
 									<span :class="{
 										'red' : type.name == 'damage',
@@ -44,8 +43,8 @@
 	export default {
 		name: 'app',
 		props: [
-			'encounter',
-			'targets',
+			'entities',
+			'campaign'
 		],
 		data() {
 			return {
@@ -71,46 +70,26 @@
 		computed: {
 			_meters: function() {
 				return {
-					'damage': _.chain(this.encounter.entities)
+					'damage': _.chain(this.entities)
 						.filter(function(entity, key) {
 							entity.key = key
-							if(entity.meters) {
-								var damage = entity.meters.damage
-							}
-							else {
-								damage = 0
-							}
+							let damage = (entity.meters) ? entity.meters.damage : 0;
 							return damage > 0;
 						})
 						.orderBy(function(entity){
-							if(entity.meters) {
-								var damage = entity.meters.damage
-							}
-							else {
-								damage = 0
-							}
+							let damage = (entity.meters) ? entity.meters.damage : 0;
 							return parseInt(damage)
 						} , 'desc')
 						.value(),
-					'healing': _.chain(this.encounter.entities)
+					'healing': _.chain(this.entities)
 						.filter(function(entity, key) {
 							entity.key = key
 
-							if(entity.meters) {
-								var healing = entity.meters.healing
-							}
-							else {
-								healing = 0
-							}
+							let healing = (entity.meters) ? entity.meters.healing : 0;
 							return healing > 0;
 						})
 						.orderBy(function(entity){
-							if(entity.meters) {
-								var healing = entity.meters.healing
-							}
-							else {
-								healing = 0
-							}
+							let healing = (entity.meters) ? entity.meters.healing : 0;
 							return parseInt(healing)
 						} , 'desc')
 						.value()
@@ -119,7 +98,21 @@
 		},
 		methods: {
 			img(entity) {
-				if(entity.id) {
+
+				//In campaign overview image is obtained different
+				if(this.campaign == true) {
+					let playerImg = this.players[entity.key].avatar;
+
+					if(playerImg) {
+						img = playerImg
+					}
+					else {
+						img = require('@/assets/_img/styles/player.svg');
+					}
+				}
+
+				//Encounter overview image
+				else if(entity.id) {
 					var img = '';
 
 					if(entity.entityType == 'player') {

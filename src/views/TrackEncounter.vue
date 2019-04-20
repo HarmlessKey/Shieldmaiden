@@ -90,7 +90,7 @@
 							/>
 						</b-col>
 						<b-col md="3" v-if="playerSettings.meters === undefined">
-							<Meters :encounter="encounter" />
+							<Meters :entities="encounter.entities" />
 						</b-col>
 					</b-row>
 				</div>

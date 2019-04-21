@@ -327,8 +327,8 @@ table {
 		border: solid 1px $gray-light !important;
 
 		img {
-			width: 46px;
-			height: 46px;
+			width: 40px;
+			height: 40px;
 		}
 	}
 	tr {
@@ -869,8 +869,13 @@ ul.nav {
 	background-image: url('../assets/_img/styles/sword-break.png');
 	background-size: cover;
 }
-.snotify-success .snotifyToast__inner {
-	background-color: $green !important;
+.snotify-success {
+	.snotifyToast__inner {
+		background-color: $green !important;
+	}
+	.snotifyToast__buttons {
+		background-color: $green !important;
+	}
 }
 .snotify-icon.snotify-icon--success {
 	background-image: url('../assets/_img/styles/d20-white.png');

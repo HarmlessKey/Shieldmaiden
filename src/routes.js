@@ -366,6 +366,16 @@ export const routes = [{
 	}
 },
 {
+	path: '/character/:id',
+	name: 'Edit Character',
+	component: EditPlayer,
+	meta: {
+		basePath: '/players',
+		title: 'Character',
+		requiresAuth: true
+	}
+},
+{
 	path: '/npcs',
 	name: 'Npcs',
 	component: Npcs,

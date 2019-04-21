@@ -23,7 +23,7 @@
 						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
 						<template v-else>{{ tier.benefits.players }}</template>	
 						)</h2>
-				<table class="table">
+				<table class="table mb-5">
 					<thead>
 						<th></th>
 						<th class="n">#</th>
@@ -43,7 +43,7 @@
 							</td>
 							<td class="n">{{ index + 1 }}</td>
 							<td>
-								<router-link class="mx-2 gray-light" 
+								<router-link class="mx-2" 
 									:to="'/players/' + player.key" 
 									v-b-tooltip.hover title="Edit">{{ player.character_name }}
 								</router-link>
@@ -61,7 +61,7 @@
 										<a v-b-tooltip.hover 
 											title="Delete" 
 											class="gray-hover"
-											@click="confirmDelete(player.key, player.player)">
+											@click="confirmDelete(player.key, player.player, player.control)">
 												<i class="fas fa-trash-alt"></i>
 										</a>
 									</div>
@@ -78,6 +78,49 @@
 				<i class="fas fa-arrow-up gray-hover"></i>
 			</h2>
 			<div v-else class="loader"><span>Loading Players...</span></div>
+
+			<!-- CONTROLLED PLAYERS -->
+			<h2 class="mb-1">Your Characters</h2>
+			<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
+			
+			<table class="table" v-if="controlledCharacters">
+				<thead>
+					<th></th>
+					<th class="n">#</th>
+					<th>Character name</th>
+					<th>Level</th>
+					<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
+				</thead>
+				<tbody name="table-row">
+					<tr v-for="(character, index) in controlledCharacters" :key="character.key">
+						<td class="img" v-if="character.character.avatar" :style="{ backgroundImage: 'url(\'' + character.character.avatar + '\')' }"></td>
+						<td class="img" v-else>
+							<img src="@/assets/_img/styles/player.svg" />
+						</td>
+						<td class="n">{{ index + 1 }}</td>
+						<td>
+							<router-link class="mx-2" 
+								:to="'/character/' + character.key" 
+								v-b-tooltip.hover title="Edit">{{ character.character.character_name }}
+							</router-link>
+						</td>
+						<td>{{ character.character.level }}</td>
+						<td>
+							<div class="d-flex justify-content-end">
+								<div class="d-flex justify-content-end actions">
+									<router-link class="gray-hover mx-1" 
+										:to="'/character/' + character.key" 
+										v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+									</router-link>
+								</div>
+								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<p v-else>You have no control over other characters.</p>
 		</div>
 	</div>
 </template>
@@ -103,6 +146,7 @@
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
+				controlledCharacters: undefined
 			}
 		},
 		computed: {
@@ -125,14 +169,42 @@
 				.value()
 			},
 		},
+		beforeMount() {
+			this.fetch_controlled()
+		},
 		methods: {
-			confirmDelete(key, player) {
+			async fetch_controlled() {
+				//All controlled characters by this user
+				var controlled = await db.ref(`character_control/${this.userId}`);
+				controlled.on('value' , (snapshot) => {
+					let key = snapshot.val();
+					var returnArr = [];
+
+					
+
+					for(key in snapshot.val()) {
+						let item = snapshot.val()[key];
+						item.key = key;
+
+						var character = db.ref(`players/${item.user}/${key}`)
+
+						character.on('value' , (snapshot) => {
+							item.character = snapshot.val();
+
+							returnArr.push(item); //push to array
+						});
+					}
+
+					this.controlledCharacters = returnArr;
+				});
+			},
+			confirmDelete(key, player, control) {
 				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key)
+							this.deletePlayer(key, control)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -146,7 +218,12 @@
 					]
 				});
 			},
-			deletePlayer(key) {
+			deletePlayer(key, control) {
+				//Remove from character control
+				if(control) {
+					db.ref(`character_control/${control}`).child(key).remove(); 
+				}
+
 				for(let campaign in this.campaigns) {
 					//Remove player from campaigns
 					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();

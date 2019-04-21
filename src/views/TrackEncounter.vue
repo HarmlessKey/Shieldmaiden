@@ -19,9 +19,9 @@
 				<b-col v-if="playerSettings.loot == true" md="8">
 					<Finished :encounter="encounter"/>
 				</b-col>
-				<b-col md="4">
+				<b-col>
 					<div>
-						<Meters :encounter="encounter" />
+						<Meters :entities="encounter.entities" />
 					</div>
 				</b-col>
 			</b-row>

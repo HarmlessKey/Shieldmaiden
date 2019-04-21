@@ -177,12 +177,9 @@
 				//All controlled characters by this user
 				var controlled = await db.ref(`character_control/${this.userId}`);
 				controlled.on('value' , (snapshot) => {
-					let key = snapshot.val();
 					var returnArr = [];
 
-					
-
-					for(key in snapshot.val()) {
+					for(let key in snapshot.val()) {
 						let item = snapshot.val()[key];
 						item.key = key;
 

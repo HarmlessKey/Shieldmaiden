@@ -8,6 +8,7 @@
 				<th class="pp d-none d-md-table-cell"><i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i></th>
 				<th class="pinv d-none d-md-table-cell"><i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i></th>
 				<th class="pins d-none d-md-table-cell"><i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i></th>
+				<th class="save d-none d-md-table-cell"><i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Spell Save DC"></i></i></th>
 				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
 				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 			</thead>
@@ -35,6 +36,7 @@
 					<td class="pp d-none d-md-table-cell">{{ players[key].passive_perception }}</td>
 					<td class="pinv d-none d-md-table-cell">{{ players[key].passive_investigation }}</td>
 					<td class="pins d-none d-md-table-cell">{{ players[key].passive_insight }}</td>
+					<td class="save d-none d-md-table-cell">{{ players[key].spell_save_dc }}</td>
 					<td>
 						<span class="current" :class="{ 
 							'red': percentage(player.curHp, players[key].maxHp) <= 33, 
@@ -122,11 +124,11 @@
 		// font-size: 12px;
 
 		tr {
-			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins {
+			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins, th.save {
 				text-align: center;
 				width: 20px;
 			}
-			th.ac, td.ac, th.pins, td.pins {
+			th.ac, td.ac {
 				padding-right: 20px;
 			}
 			td.img {

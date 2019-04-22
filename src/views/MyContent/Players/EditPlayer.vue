@@ -108,7 +108,7 @@
 
 				<b-card header="Health & Armor Class">
 					<b-row>
-							<b-col class="col-4">
+							<b-col class="col-3">
 								<label for="level">Level</label>
 								<b-form-input autocomplete="off"  id="level" 
 									type="number" 
@@ -122,7 +122,7 @@
 									placeholder="Level" />
 								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
 							</b-col>
-							<b-col class="col-4">
+							<b-col class="col-3">
 								<label for="maxHp">HP *</label>
 								<b-form-input autocomplete="off"  id="maxHp" 
 									type="number" 
@@ -135,7 +135,7 @@
 									placeholder="Maximum Hit Points*" />
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 							</b-col>
-							<b-col class="col-4">
+							<b-col class="col-3">
 								<label for="ac">AC *</label>
 								<b-form-input autocomplete="off"  
 									id="ac" 
@@ -148,6 +148,20 @@
 									name="ac" 
 									placeholder="Armor Class" />
 								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+							</b-col>
+							<b-col class="col-3">
+								<label for="save_dc">Spell Save DC</label>
+								<b-form-input autocomplete="off"  
+									id="save_dc" 
+									min="0"
+									type="number" 
+									:class="{'input': true, 'error': errors.has('save_dc') }" 
+									v-model="player.spell_save_dc" 
+									v-validate="'numeric|required'" 
+									data-vv-as="Save DC"
+									name="save_dc" 
+									placeholder="Save DC" />
+								<p class="validate red" v-if="errors.has('save_dc')">{{ errors.first('save_dc') }}</p>
 							</b-col>
 					</b-row>
 				</b-card>

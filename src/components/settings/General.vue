@@ -102,6 +102,35 @@
 				</div>
 			</li>
 		</ul>
+
+		<h3>Player overview</h3>
+		<ul class="settings">
+			<li v-for="(setting, key) in player" :key="key">
+				<div class="d-flex justify-content-between">
+					<span>
+						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+						<a v-if="key == 'keyBinds'" data-toggle="collapse" class="ml-1" :href="'#'+key" 
+							role="button" aria-expanded="false">
+							<i class="fas fa-info"></i>
+						</a>
+					</span>
+					<div>
+						<a v-for="option in setting.options" 
+							v-b-tooltip.hover 
+							:title="[ option.value == settings[key] ? option.name : option.action ]" 
+							:key="option.name" 
+							@click="setSetting(key, option.value)" class="ml-2"
+							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]">
+								<span class="d-none d-md-inline mr-1">
+									<template v-if="option.value == settings[key]">{{ option.name }}</template>
+									<template v-if="option.value != settings[key]">{{ option.action }}</template>
+								</span>
+								<i :class="option.icon"></i>
+						</a>
+					</div>
+				</div>
+			</li>
+		</ul>
 		<a class="btn" @click="setDefault()">Set default</a>
 	</div>
 </template>
@@ -118,6 +147,40 @@
 					'keyBinds': { 
 						name: 'Show Keybinds', 
 						icon: 'fas fa-keyboard',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+				},
+				player: {
+					'passive_perception': { 
+						name: 'Passive Perception', 
+						icon: 'fas fa-eye',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'passive_investigation': { 
+						name: 'Passive Invastigation', 
+						icon: 'fas fa-search',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'passive_insight': { 
+						name: 'Passive Insight', 
+						icon: 'fas fa-lightbulb-on',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					'save_dc': { 
+						name: 'Save DC', 
+						icon: 'fas fa-hand-holding-magic',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },

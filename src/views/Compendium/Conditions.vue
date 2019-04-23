@@ -36,7 +36,6 @@
 					<span>Loading conditions....</span>
 				</div>
 			</b-table>
-			<div v-if="isBusy" class="loader"> <span>Loading conditions....</span></div>
 		
 			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
 		</template>

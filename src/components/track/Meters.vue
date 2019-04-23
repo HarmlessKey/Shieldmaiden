@@ -19,7 +19,6 @@
 										'green' : type.name == 'healing'
 									}">{{ entity.meters[type.name] }}</span>
 									<template v-if="entity.meters[type.over]"> ({{ entity.meters[type.over] }} <small>over</small>)</template>
-									<!-- ({{ percentageMeters(entity.meters[type.name], type.name) }}%) -->
 								</span>
 							</div>
 							<div class="progress-bar bg-black" 
@@ -98,41 +97,29 @@
 		},
 		methods: {
 			img(entity) {
+				var img = '';
 
 				//In campaign overview image is obtained different
 				if(this.campaign == true) {
 					let playerImg = this.players[entity.key].avatar;
-
-					if(playerImg) {
-						img = playerImg
-					}
-					else {
-						img = require('@/assets/_img/styles/player.svg');
-					}
+					img = (playerImg) ? playerImg : require('@/assets/_img/styles/player.svg');
 				}
 
 				//Encounter overview image
 				else if(entity.id) {
-					var img = '';
-
 					if(entity.entityType == 'player') {
 						let playerImg = this.players[entity.id].avatar;
-
-						if(playerImg) {
-							img = playerImg
-						}
-						else {
-							img = require('@/assets/_img/styles/player.svg');
-						}
+						img = (playerImg) ? playerImg : require('@/assets/_img/styles/player.svg');
 					}
 					if(entity.entityType == 'npc') {
 						if(entity.npc == 'custom') {
 							let npcImg = this.npcs[entity.id].avatar;
-
 							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
 						}
 						else {
-							img = require('@/assets/_img/styles/monster.svg');
+							let npcImg = entity.avatar;
+
+							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
 						}
 					}
 				}

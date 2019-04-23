@@ -5,9 +5,18 @@
 				<th></th>
 				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
 				<th class="name"></th>
-				<th class="pp d-none d-md-table-cell"><i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i></th>
-				<th class="pinv d-none d-md-table-cell"><i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i></th>
-				<th class="pins d-none d-md-table-cell"><i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i></th>
+				<th class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
+					<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
+				</th>
+				<th class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
+					<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
+				</th>
+				<th class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
+					<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
+				</th>
+				<th class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
+					<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i></i>
+				</th>
 				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
 				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
 			</thead>
@@ -32,9 +41,18 @@
 						<span v-else class="ac">{{ players[key].ac }}</span>
 					</td>
 					<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
-					<td class="pp d-none d-md-table-cell">{{ players[key].passive_perception }}</td>
-					<td class="pinv d-none d-md-table-cell">{{ players[key].passive_investigation }}</td>
-					<td class="pins d-none d-md-table-cell">{{ players[key].passive_insight }}</td>
+					<td class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
+						{{ players[key].passive_perception }}
+					</td>
+					<td class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
+						{{ players[key].passive_investigation }}
+					</td>
+					<td class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
+						{{ players[key].passive_insight }}
+					</td>
+					<td class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
+						{{ players[key].spell_save_dc }}
+					</td>
 					<td>
 						<span class="current" :class="{ 
 							'red': percentage(player.curHp, players[key].maxHp) <= 33, 
@@ -75,6 +93,14 @@
 			return {
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
+			}
+		},
+		firebase() {
+			return {
+				settings: {
+					source: db.ref(`settings/${this.user.uid}/general`),
+					asObject: true
+				}
 			}
 		},
 		computed: {
@@ -122,11 +148,11 @@
 		// font-size: 12px;
 
 		tr {
-			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins {
+			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins, th.save {
 				text-align: center;
 				width: 20px;
 			}
-			th.ac, td.ac, th.pins, td.pins {
+			th.ac, td.ac {
 				padding-right: 20px;
 			}
 			td.img {

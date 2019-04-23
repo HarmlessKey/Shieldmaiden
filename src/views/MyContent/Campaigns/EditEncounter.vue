@@ -616,7 +616,6 @@ ul.nav {
 	background: #302f2f;
 	padding: 10px;
 	margin-top: 10px;
-	display: block;
 
 	span.left {
 		width: 80px;

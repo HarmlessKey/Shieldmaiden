@@ -2,7 +2,7 @@
 	<header>
 		<div id="header" class="d-flex justify-content-between">
 			<div class="d-flex justify-content-left">
-				<router-link to="/">Harmless Key</router-link>
+				<router-link to="/" class="logo"></router-link>
 			</div>
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">
@@ -80,6 +80,15 @@
 </script>
 
 <style lang="scss" scoped>
+.logo {
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	background-image: url('../assets/_img/logo/logo-icon-cyan.svg');
+	background-size: cover;
+	height: 40px;
+	width: 40px;
+}
 a {
 	color: #b2b2b2 !important;
 

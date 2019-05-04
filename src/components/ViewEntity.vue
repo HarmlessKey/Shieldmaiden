@@ -37,7 +37,7 @@
 				<b-col :sm="sm" :md="md" :lg="lg"
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
-					class="mb-5" 
+					class="mb-5 col-4" 
 					@click="rollAbility(ability.ability, entity[ability.ability])"
 					v-if="entity[ability.ability]">
 						<div class="ability bg-gray">

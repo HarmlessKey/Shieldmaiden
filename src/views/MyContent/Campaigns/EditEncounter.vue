@@ -243,18 +243,22 @@
 				</div>
 				<div class="card-body">
 					<h2>Currency</h2>
-					<b-row class="mb-5">
-						<b-col md="4" class="d-flex justify-content-between">
-							<span class="coins mr-2 yellow"><i class="fas fa-coins"></i></span>
-							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.gp" placeholder="GP"/>
+					<b-row class="mb-5 text-center">
+						<b-col>
+							<label class="coins mr-2 white" v-b-tooltip.hover title="Platinum"><i class="fas fa-coins"></i></label>
+							<input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.pp" placeholder="Platinum"/>
 						</b-col>
-						<b-col md="4" class="d-flex justify-content-between">
-							<span class="coins mr-2"><i class="fas fa-coins"></i></span> 
-							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.sp" placeholder="SP"/>
+						<b-col>
+							<label class="coins mr-2 yellow" v-b-tooltip.hover title="Gold"><i class="fas fa-coins"></i></label>
+							<input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.gp" placeholder="Gold"/>
 						</b-col>
-						<b-col md="4" class="d-flex justify-content-between">
-							<span class="coins mr-2 orange"><i class="fas fa-coins"></i></span>
-							<input class="form-control" autocomplete="off" type="number" min="0" name="name" v-model="loot.cp" placeholder="CP"/>
+						<b-col>
+							<label class="coins mr-2" v-b-tooltip.hover title="Silver"><i class="fas fa-coins"></i></label> 
+							<input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.sp" placeholder="Silver"/>
+						</b-col>
+						<b-col>
+							<label class="coins mr-2 orange" v-b-tooltip.hover title="Copper"><i class="fas fa-coins"></i></label>
+							<input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.cp" placeholder="Copper"/>
 						</b-col>
 					</b-row>
 
@@ -616,7 +620,6 @@ ul.nav {
 	background: #302f2f;
 	padding: 10px;
 	margin-top: 10px;
-	display: block;
 
 	span.left {
 		width: 80px;

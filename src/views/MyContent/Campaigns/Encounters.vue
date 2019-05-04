@@ -349,7 +349,7 @@
 				//If not, a button  appears that sets it
 				if(this.campaign) {
 					for(var key in this.campaign.players) {
-						if(!this.campaign.players[key].curHp) {
+						if(this.campaign.players[key].curHp == undefined) {
 							return true;
 						} else {
 							return false;

@@ -6,7 +6,7 @@
 					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
 				</b-col>
 
-				<b-col sm="4" lg="3">
+				<b-col>
 					<h2 class="gray-light">Quick Links</h2>
 					<ul>
 						<li><router-link to="/compendium">Compendium</router-link></li>
@@ -17,7 +17,7 @@
 						<li><router-link to="/about-us">About us</router-link></li>
 					</ul>
 				</b-col>
-				<b-col sm="4" lg="3">
+				<b-col>
 					<h2 class="gray-light">Follow us</h2>
 					<ul>
 						<li>
@@ -30,9 +30,9 @@
 							<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
 						</li>
 					</ul>
-					<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a>
+					<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
 				</b-col>
-				<b-col sm="4" v-if="user" lg="3">
+				<b-col v-if="user">
 					<h2 class="gray-light">Your content</h2>
 					<ul>
 						<li><router-link to="/settings">Settings</router-link></li>
@@ -89,7 +89,7 @@
 			}
 			h2 {
 				font-weight: bold !important;
-				font-size: 20px !important;
+				font-size: 16px !important;
 				color: #fff !important;
 			}
 
@@ -98,7 +98,7 @@
 				list-style: none;
 
 				a {
-					font-size: 15px;
+					font-size: 12px;
 					color: #191919 !important;
 					text-transform: uppercase;
 				}

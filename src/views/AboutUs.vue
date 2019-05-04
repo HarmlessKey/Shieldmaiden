@@ -77,6 +77,33 @@
 					</b-row>
 				</b-card>
 			</b-card-group>
+
+			<b-card header="Special thanks">
+				<h2>Patrick Teunissen</h2>
+				<h3>For designing our logo!</h3>
+				<p class="mb-5">This guy was nice enough to lend us his time and design the awesome logo for us. We couldn't be happier!</p>
+				<b-row>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-green.svg"/>
+					</b-col>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-blue.svg"/>
+					</b-col>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-red.svg"/>
+					</b-col>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-orange.svg"/>
+					</b-col>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg"/>
+					</b-col>
+					<b-col class="d-flex justify-content-center" style="height:120px;">
+						<img class="icon" src="../assets/_img/logo/logo-icon-yellow.svg"/>
+					</b-col>
+				</b-row>
+			</b-card>
+
 		</div>
 		<Footer />
 	</div>
@@ -141,6 +168,10 @@
 				font-size: 17px;
 				line-height: 30px;
 				margin-bottom: 40px;
+			}
+
+			.icon {
+				width: 100px;
 			}
 
 			.card {

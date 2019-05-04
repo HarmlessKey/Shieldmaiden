@@ -471,7 +471,7 @@
 			setCurHp() {
 				//Stores player with curHp under campaign
 				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).set({
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
 						curHp: this.players[key].maxHp
 					})
 				}

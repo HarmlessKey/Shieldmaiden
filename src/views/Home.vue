@@ -4,10 +4,18 @@
 			<div id="home">
 				<section>
 					<div class="container">
-						<h1><i class="fas fa-swords"></i> Harmless Key Encounter Tracker.</h1>
-						<h2 class="text-center">The initiative tracker for D&D 5e.</h2>
+						<b-row class=my-5 id="title">
+							<b-col md="5">
+								<!-- <img id="logo" src="@/assets/_img/logo/logo-cyan.svg"> -->
+								<img id="logo" src="@/assets/_img/logo/logo-icon-cyan.svg">
+							</b-col>
+							<b-col md="7">
+								<h1 class="mt-4">Dungeons & Dragons Encounter Tracker.</h1>
+								<h2 class="">The initiative tracker for D&D 5e.</h2>								
+							</b-col>
+						</b-row>
 
-						<div v-if="user" class="d-flex justify-content-center mt-5">
+						<div v-if="user" class="user-links d-flex justify-content-center">
 							<router-link class="btn" to="/campaigns"><i class="fas fa-dungeon"></i> Campaigns</router-link>
 							<router-link class="btn mx-2" to="/players"><i class="fas fa-users"></i> Players</router-link>
 							<router-link class="btn" to="/npcs"><i class="fas fa-dragon"></i> NPC's</router-link>
@@ -15,11 +23,6 @@
 
 						<hr class="mt-5">
 						<b-row class=my-5>
-							<b-col md="7">
-								<p class="img-header bg-gray-darker">Your new DM screen</p>
-								<!-- <img src="@/assets/_img/harmless-key-encounter-tracker.png" alt="Your new Dungeon Master screen. An overview of our dungeons and dragons combat runner."/> -->
-								<iframe width="560" height="315" src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-							</b-col>
 							<b-col md="5">
 								<h3>A sneak peek of our combat tracker</h3>
 								<p class="mb-5">Like what you see?<br/> Create an account now and get full access to all our features.</p>
@@ -28,6 +31,11 @@
 									<router-link v-if="user" to="/campaigns" class="btn btn-lg btn-block"><i class="fas fa-treasure-chest"></i> My Content</router-link>
 								</div>
 							</b-col>
+							<b-col md="7">
+								<p class="img-header bg-gray-darker">Your new DM screen</p>
+								<!-- <img src="@/assets/_img/harmless-key-encounter-tracker.png" alt="Your new Dungeon Master screen. An overview of our dungeons and dragons combat runner."/> -->
+								<iframe width="560" height="315" src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+							</b-col>
 						</b-row>
 						<hr>
 					</div>
@@ -35,16 +43,16 @@
 				<section>
 					<div class="container">
 						<b-row>
+							<b-col md="7">
+								<p class="img-header bg-gray-darker">Info for your players</p>
+								<img src="@/assets/_img/follow-encounters-harmless-key.png" alt="A link your players can follow for our D&D encounter runner."/>
+							</b-col>
 							<b-col>
 							<h3>Run encounters like never before.</h3>
 							<p>
 								Our app keeps track of everything you need to know in encounters and displays it in a structured overview.
 								This way we make tracking initiative in Dungeons and Dragons a lot simpler, making sure that you can give your players the attention they deserve.
 							</p>
-							</b-col>
-							<b-col md="7">
-								<p class="img-header bg-gray-darker">Info for your players</p>
-								<img src="@/assets/_img/follow-encounters-harmless-key.png" alt="A link your players can follow for our D&D encounter runner."/>
 							</b-col>
 						</b-row>
 					</div>
@@ -177,6 +185,30 @@
 				transform: translateX(-50%);
 				i {
 					width: 126px;
+					text-align: center;
+				}
+			}
+		}
+
+		#title {
+			img {
+				max-width: 200px;
+				margin: auto;
+				float: right
+			}
+			h1,h2 {
+				text-align: left;
+			}
+		}
+		.user-links {
+			margin-top: 5rem !important
+		}
+		@media (max-width: 767.98px) {
+			#title {
+				img {
+					float: none;
+				}
+				h1,h2 {
 					text-align: center;
 				}
 			}

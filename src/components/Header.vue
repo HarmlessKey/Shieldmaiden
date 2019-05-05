@@ -17,11 +17,11 @@
 						title="Compendium"  
 						v-shortkey="['r']" @shortkey="showSlide('compendium')"
 						@click="showSlide('compendium')"><i class="fas fa-book-spells"></i></a>
-					<a class="icon" 
+					<a class="icon roll" 
 						v-b-tooltip.hover 
 						title="Dice Roller"  
 						v-shortkey="['r']" @shortkey="showSlide('roll')"
-						@click="showSlide('roll')"><i class="fas fa-dice-d20"></i></a>
+						@click="showSlide('roll')"></a>
 				</div>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
@@ -110,6 +110,12 @@ a.icon {
 	&:hover {
 		color: #fff !important;
 		background: #262626;
+	}
+	&.roll {
+		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-no-border.svg');
+		background-size: 16px 16px;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 }
 a.user	{

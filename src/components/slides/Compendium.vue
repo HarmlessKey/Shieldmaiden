@@ -40,6 +40,7 @@
 			</template>
 
 		</template>
+		<router-link v-else to="/compendium">View entire compendium</router-link>
 	</div>
 </template>
 

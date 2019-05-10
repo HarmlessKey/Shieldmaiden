@@ -85,12 +85,11 @@ export const content_module = {
 		SET_VOUCHER(state, payload) {
 			state.voucher = payload;
 		},
-		setSlide(state, value) {
-			if(state.slide.type != value.type) {
+		setSlide(state, payload) {
+			if(state.slide.type != payload.type) {
 				state.slide = false
-				setTimeout(() => state.slide = value, 100);
-			}
-			else {
+				setTimeout(() => state.slide = payload, 100);
+			} else {
 				state.slide = false
 			}
 		},
@@ -211,8 +210,8 @@ export const content_module = {
 				})
 			});
 		},
-		setSlide({ commit }, value) {
-			commit('setSlide', value);
+		setSlide({ commit }, payload) {
+			commit('setSlide', payload);
 		},
 		setCampaignId({ commit }, value) {
 			commit('SET_CAMPAIGN_ID', value)

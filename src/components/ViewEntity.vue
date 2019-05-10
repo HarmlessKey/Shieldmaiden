@@ -116,10 +116,11 @@
 	export default {
 		name: 'NPC',
 		props: [
-		'entity'
+		'data'
 		],
 		data() {
 			return {
+				entity: this.data,
 				skills: [
 					'acrobatics',
 					'animal Handling',

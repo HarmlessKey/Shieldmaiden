@@ -132,10 +132,11 @@
 	export default {
 		name: 'TargetReminders',
 		props: [
-			'entityKey',
+			'data',
 		],
 		data() {
 			return {
+				entityKey: this.data,
 				triggers: {
 					'startTurn': 'Start of turn',
 					'endTurn': 'End of turn',

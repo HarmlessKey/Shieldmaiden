@@ -22,10 +22,17 @@
 									</span>
 							</div>
 							<div class="actions">
-								<a @click="edit(entity.key, entities[entity.key], 'player')"><i class="fas fa-pencil"></i></a>
+								<a @click="setSlide({
+									show: true,
+									type: 'slides/EditPlayer',
+									data: {
+										key: entity.key,
+										location: 'encounter'
+									}
+								})"><i class="fas fa-pencil"></i></a>
 							</div>
 								<!-- <input type="number" class="form-control mr-2" v-model="entity.curHp" v-validate="'numeric'" name="playerCurHp" @change="setCurHp(entity.key, entity)" /> -->
-								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="storeInitiative(entity.key, entity)" />
+								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -48,7 +55,7 @@
 								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
 							</div>
 
-							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="storeInitiative(entity.key, entity)" />
+							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
@@ -75,9 +82,9 @@
 								<span>{{ entity.initiative }}</span>
 							</div>
 							<div class="actions">
-								<a v-if="!entity.hidden" v-b-tooltip.hover title="Set Hidden" class="pointer" @click="setHidden(entity.key, true)"><i class="fas fa-eye-slash"></i></a>
-								<a v-else v-b-tooltip.hover title="Unhide" class="pointer" @click="setHidden(entity.key, false)"><i class="fas fa-eye"></i></a>
-								<a v-b-tooltip.hover title="Set Inactive" class="pointer" @click="setActive(entity.key, false)"><i class="fas fa-minus"></i></a>
+								<a v-if="!entity.hidden" v-b-tooltip.hover title="Set Hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})"><i class="fas fa-eye-slash"></i></a>
+								<a v-else v-b-tooltip.hover title="Unhide" class="pointer" @click="set_hidden({key: entity.key, hidden: false})"><i class="fas fa-eye"></i></a>
+								<a v-b-tooltip.hover title="Set Inactive" class="pointer" @click="set_active({key: entity.key, active: false})"><i class="fas fa-minus"></i></a>
 							</div>
 						</li>
 					</ul>
@@ -95,7 +102,7 @@
 								<span>{{ entity.initiative }}</span>
 							</span>
 							<div class="actions">
-								<a v-b-tooltip.hover title="Set Active" @click="setActive(entity.key, true)"><i class="fas fa-plus"></i></a>
+								<a v-b-tooltip.hover title="Set Active" @click="set_active({key: entity.key, active: true})"><i class="fas fa-plus"></i></a>
 							</div>
 						</li>
 					</ul>
@@ -166,28 +173,13 @@
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollTop
 			},
-			setActive(key, active) {
-				this.set_active({
-					key: key,
-					active: active
-				})
-			},
-			setHidden(key, hidden) {
-				this.set_hidden({
-					key: key,
-					hidden: hidden
-				})
-			},
-			storeInitiative(key, entity) {
+			rollMonster(key, entity) {
+				let roll = this.rollD(20, 1, this.calcMod(entity.dexterity));
+				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
 					initiative: entity.initiative
 				})
-			},
-			rollMonster(key, entity) {
-				let roll = this.rollD(20, 1, this.calcMod(entity.dexterity));
-				entity.initiative = roll.total
-				this.storeInitiative(key, entity)
 			},
 			rollAll() {
 				for (let i in this._npcs) {
@@ -216,20 +208,12 @@
 					entity = this._npcs[key]
 					entity.initiative = roll
 
-					this.storeInitiative(entity.key, entity)
+					this.set_initiative({
+						key: entity.key,
+						initiative: entity.initiative
+					})
 				}
 				this.selected = []
-			},
-			edit(key, entity, entityType) {
-				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
-
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: editType,
-					key: key,
-					location: 'encounter'
-				})
 			},
 		}
 	}

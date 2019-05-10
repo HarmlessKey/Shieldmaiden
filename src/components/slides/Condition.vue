@@ -46,11 +46,12 @@
 	export default {
 		name: 'Condition',
 		props: [
-		'entity',
-		'condition',
+		'data',
 		],
 		data() {
 			return {
+				entity: this.data.entity,
+				condition: this.data.condition,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",

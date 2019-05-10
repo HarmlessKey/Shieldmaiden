@@ -10,7 +10,7 @@
 
 					<template v-if="current">
 						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable && !current.dead">
-								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
+								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
 										<template v-if="Object.keys(current.saves).length == n">
@@ -174,13 +174,6 @@
 					type: 'condition',
 					condition: show,
 					entity: this.current
-				})
-			},
-			deathInfo() {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'deathSaves',
 				})
 			},
 			percentage(current, max) {

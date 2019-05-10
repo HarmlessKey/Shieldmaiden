@@ -111,10 +111,11 @@
 	export default {
 		name: 'EditEntity',
 		props: [
-			'entityKey',
+			'data',
 		],
 		data() {
 			return {
+				entityKey: this.data.key,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -142,11 +143,11 @@
 						if(this.entity.ac_bonus) {
 							this.entity.ac_bonus = parseInt(this.entity.ac_bonus)
 						}
-						else { this.entity.ac_bonus = false }
+						else { this.entity.ac_bonus = 0 }
 						if(this.entity.tempHp) {
 							this.entity.tempHp = parseInt(this.entity.tempHp)
 						}
-						else { this.entity.tempHp = false }
+						else { this.entity.tempHp = 0 }
 
 						this.entity.ac = parseInt(this.entity.ac)
 						this.entity.maxHp = parseInt(this.entity.maxHp)

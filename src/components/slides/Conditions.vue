@@ -86,10 +86,11 @@
 	export default {
 		name: 'Conditions',
 		props: [
-		'entity',
+		'data',
 		],
 		data() {
 			return {
+				entity: this.data,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,

@@ -50,10 +50,11 @@
 		name: 'damageHealing',
 		mixins: [setHP],
 		props: [
-		'target',
+		'data',
 		],
 		data() {
 			return {
+				target: this.data,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,

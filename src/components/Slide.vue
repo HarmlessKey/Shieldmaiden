@@ -1,65 +1,34 @@
 <template>
-	<div>
-		<!-- {{ slide }} -->
-		<Roll v-if="slide.type == 'roll'"/>
-		<Compendium v-if="slide.type == 'compendium'"/>
-		<ViewEntity v-if="slide.type == 'npc'" :entity="slide.entity" />
-		<AddNpc v-if="slide.type == 'addNpc'" />
-		<Edit v-if="slide.type == 'edit'" :npc="slide.npc" :npcKey="slide.key" />
-		<Condition v-if="slide.type == 'condition'" :condition="slide.condition" :entity="slide.entity" />
-		<Conditions v-if="slide.type == 'conditions'" :entity="slide.entity" />
-		<EditNpc v-if="slide.type == 'editNpc'" :entityKey="slide.key" />
-		<EditPlayer v-if="slide.type == 'editPlayer'" :entityKey="slide.key" :location="slide.location" />
-		<Transform v-if="slide.type == 'transform'" :entityKey="slide.key" :entity="slide.entity" />
-		<DeathSaves v-if="slide.type == 'deathSaves'" />
-		<DamageHealing v-if="slide.type == 'damageHealing'" :target="slide.target" />
-		<Track v-if="slide.type == 'track'" />
-		<Settings v-if="slide.type == 'settings'" />
-		<TargetReminders v-if="slide.type == 'targetReminders'" :entityKey="slide.key" />
-	</div>
+	<component :is="component" :data="slide.data" :type="slide.type" v-if="component" />
 </template>
 
 <script>
-	import Roll from '@/components/slides/Roll.vue';
-	import Compendium from '@/components/slides/Compendium.vue';
-	import ViewEntity from '@/components/ViewEntity.vue';
-	import AddNpc from '@/components/slides/AddNpc.vue';
-	import Edit from '@/components/slides/Edit.vue';
-	import Condition from '@/components/slides/Condition.vue';
-	import Conditions from '@/components/slides/Conditions.vue';
-	import EditNpc from '@/components/slides/EditNpc.vue';
-	import EditPlayer from '@/components/slides/EditPlayer.vue';
-	import Transform from '@/components/slides/Transform.vue';
-	import DeathSaves from '@/components/slides/DeathSaves.vue';
-	import DamageHealing from '@/components/slides/DamageHealing.vue';
-	import Track from '@/components/slides/Track.vue';
-	import Settings from '@/components/slides/Settings.vue';
-	import TargetReminders from '@/components/slides/TargetReminders.vue';
-
-	export default {
-		components: {
-			Roll: Roll,
-			Compendium: Compendium,
-			ViewEntity: ViewEntity,
-			AddNpc: AddNpc,
-			Edit: Edit,
-			Condition: Condition,
-			Conditions: Conditions,
-			EditNpc: EditNpc,
-			EditPlayer: EditPlayer,
-			Transform: Transform,
-			DeathSaves: DeathSaves,
-			DamageHealing: DamageHealing,
-			Track: Track,
-			Settings: Settings,
-			TargetReminders: TargetReminders,
-		},
-		data() {
+export default {
+    name: 'Slide',
+    data() {
 			return {
 				slide: this.$store.getters.getSlide,
+				component: null,
 			}
-		},
-	};
+    },
+    computed: {
+			loader() {
+				if (!this.slide.type) {
+					return null
+				}
+				return () => import(`./${this.slide.type}.vue`)
+			}
+    },
+    mounted() {
+      this.loader()
+				.then(() => {
+						this.component = () => this.loader()
+				})
+				.catch(() => {
+						this.component = () => import('./slides/Error.vue')
+				})
+    },
+}
 </script>
 
 <style lang="scss" scoped>

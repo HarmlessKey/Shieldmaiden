@@ -15,19 +15,19 @@
 					v-b-tooltip.hover title="[e] Edit">
 					<span class="icon"><i class="fas fa-pencil"></i></span>
 				</a>
-				<a @click="reminders(target.key)"
+				<a @click="setSlide({show: true, type: 'slides/TargetReminders', data: target.key})"
 					v-b-tooltip.hover title="[m] Reminders">
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
 				</a>
-				<a @click="transform(target.key, target)"
+				<a @click="setSlide({show: true, type: 'slides/Transform', data: target})"
 					v-b-tooltip.hover title="[t] Transform">
 					<span class="icon"><i class="fas fa-paw-claws"></i></span>
 				</a>
-				<a @click="showConditions(target)"
+				<a @click="setSlide({show: true, type: 'slides/Conditions', data: target})"
 					v-b-tooltip.hover title="[c] Conditions">
 					<span class="icon"><i class="fas fa-flame"></i></span>
 				</a>
-				<a @click="damageHeal(target)"
+				<a @click="setSlide({show: true, type: 'slides/DamageHealing', data: target})"
 					v-b-tooltip.hover title="[d] Do Damage / Healing">
 					<span class="icon"><i class="fas fa-swords"></i></span>
 				</a>
@@ -38,7 +38,7 @@
 				<div class="current">
 					<template v-if="target">
 						<template v-if="target.entityType == 'player' && target.curHp == 0 && !target.stable && !target.dead">
-								<a @click="deathInfo()">What is this <i class="fas fa-question"></i></a>
+								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
 										<template v-if="Object.keys(target.saves).length == n">
@@ -84,7 +84,15 @@
 
 						<b-row class="conditions" v-if="Object.keys(target.conditions).length > 0">
 							<template v-for="(condition, key) in target.conditions">
-								<b-col sm="1" :key="key" @click="showCondition(key)" v-if="conditions[key]">
+								<b-col sm="1" :key="key" 
+									@click="setSlide({
+										show: true, 
+										type: 'slides/Condition',
+										data: {
+											condition: key,
+											entity: target
+										}})" 
+										v-if="conditions[key]">
 									<span class="n" v-if="key == 'exhaustion'">
 										{{ target.conditions[key] }}
 									</span>
@@ -108,7 +116,7 @@
 								</a>
 							</b-col>
 						</b-row>
-						<ViewEntity class="mt-3 hide" :entity="target" />
+						<ViewEntity class="mt-3 hide" :data="target" />
 					</template>
 					<h2 v-else class="red">No target</h2>
 				</div>
@@ -171,14 +179,6 @@
 				'set_stable',
 				'set_targetReminder',
 			]),
-			showConditions(entity) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'conditions',
-					entity: entity
-				})
-			},
 			showCondition(show) {
 				event.stopPropagation();
 				this.setSlide({
@@ -189,46 +189,16 @@
 				})
 			},
 			edit(key, entityType) {
-				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
+				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
 
 				event.stopPropagation();
 				this.setSlide({
 					show: true,
 					type: editType,
-					key: key,
-					location: 'encounter'
-				})
-			},
-			transform(key, entity) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'transform',
-					key: key,
-					entity: entity,
-				})
-			},
-			reminders(key) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'targetReminders',
-					key: key,
-				})
-			},
-			damageHeal(entity) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'damageHealing',
-					target: entity,
-				})
-			},
-			deathInfo() {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'deathSaves',
+					data: {
+						key: key,
+						location: 'encounter'
+					}
 				})
 			},
 			percentage(current, max) {

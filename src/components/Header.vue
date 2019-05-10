@@ -15,13 +15,12 @@
 					<a class="icon" 
 						v-b-tooltip.hover 
 						title="Compendium"  
-						v-shortkey="['r']" @shortkey="showSlide('compendium')"
-						@click="showSlide('compendium')"><i class="fas fa-book-spells"></i></a>
+						@click="setSlide({show: true, type: 'slides/Compendium'})"><i class="fas fa-book-spells"></i></a>
 					<a class="icon roll" 
 						v-b-tooltip.hover 
 						title="Dice Roller"  
-						v-shortkey="['r']" @shortkey="showSlide('roll')"
-						@click="showSlide('roll')"></a>
+						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/Roll'})"
+						@click="setSlide({show: true, type: 'slides/Roll'})"></a>
 				</div>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  

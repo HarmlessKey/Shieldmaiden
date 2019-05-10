@@ -11,8 +11,12 @@
 				</a>
 				<div class="dropdown-menu">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a class="dropdown-item" @click="slide('settings')"><i class="fas fa-cogs"></i> Settings</a>
-					<a class="dropdown-item" @click="slide('track')"><i class="far fa-desktop"></i> Track Settings</a>
+					<a class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter',})">
+						<i class="fas fa-cogs"></i> Settings
+					</a>
+					<a class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter',})">
+						<i class="far fa-desktop"></i> Track Settings
+					</a>
 					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 
@@ -97,13 +101,6 @@
 				'set_finished',
 				'set_targetReminder',
 			]),
-			slide(type) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: type,
-				})
-			},
 			start() {
 				db.ref(`encounters/${this.path}`).update({
 					round: 1

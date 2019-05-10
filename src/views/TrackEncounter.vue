@@ -31,7 +31,7 @@
 		<div class="not-started" v-else-if="encounter.round == 0">
 			<Follow />
 			<h2 class="padding">
-				<i class="fas fa-dice-d20 blue spin"></i>
+				<span class="die spin" :style="{ backgroundImage: 'url(' + require('../assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 				Roll for initiative!
 			</h2>
 			<CampaignOverview :players="campaignPlayers" />	
@@ -261,6 +261,31 @@
 				}
 				return t - hidden
 			},
+			//Random die color
+			dieColor() {
+				let number = Math.ceil(Math.random() * 6)
+
+				switch(number) {
+					case 1:
+						return 'blue';
+					break;
+					case 2:
+						return 'cyan';
+					break;
+					case 3:
+						return 'green';
+					break;
+					case 4:
+						return 'orange';
+					break;
+					case 5:
+						return 'red';
+					break;
+					case 6:
+						return 'yellow';
+					break;
+				}
+			}
 		},
 		methods: {
 			fetch_encounter() {
@@ -390,11 +415,20 @@
 		position: fixed;
 		bottom: 0;
 	}
-	.spin {
-		margin-right: 10px;
-		vertical-align: -5px;
-		font-size: 40px;
-		animation: spin 1.5s ease infinite;
+	.die {
+		display: inline-block;
+		width: 55px; 
+		height: 55px;
+		background-size: 55px 55px;
+		background-position: center;
+		background-repeat: no-repeat;
+		vertical-align: -18px;
+
+		&.spin {
+			margin-right: 10px;
+			font-size: 40px;
+			animation: spin 1.5s ease infinite;
+		}
 	}
 	@keyframes spin {
 		0%, 30% { transform: rotate(0deg); }

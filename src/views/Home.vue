@@ -4,7 +4,7 @@
 			<div id="home">
 				<section>
 					<div class="container">
-						<b-row class=my-5 id="title">
+						<b-row class=mb-5 id="title">
 							<b-col md="5">
 								<!-- <img id="logo" src="@/assets/_img/logo/logo-cyan.svg"> -->
 								<img id="logo" src="@/assets/_img/logo/logo-icon-cyan.svg">

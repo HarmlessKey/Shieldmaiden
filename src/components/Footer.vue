@@ -2,44 +2,46 @@
 	<div class="footer">
 		<div class="top container">
 			<b-row class="d-flex justify-content-between">
-				<b-col lg="3" class="d-flex justify-content-center" style="height:200px;">
+				<b-col md="3" class="logo-container">
 					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
 				</b-col>
 
-				<b-col>
-					<h2 class="gray-light">Quick Links</h2>
-					<ul>
-						<li><router-link to="/compendium">Compendium</router-link></li>
-						<li><router-link to="/feedback">Feedback</router-link></li>
-						<li><router-link to="/planned">Planned</router-link></li>
-						<li><router-link to="/updates">Updates</router-link></li>
-						<li><router-link to="/documentation">Documentation</router-link></li>
-						<li><router-link to="/about-us">About us</router-link></li>
-					</ul>
-				</b-col>
-				<b-col>
-					<h2 class="gray-light">Follow us</h2>
-					<ul>
-						<li>
-							<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
-						</li>
-						<li>
-							<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
-						</li>
-						<li>
-							<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
-						</li>
-					</ul>
-					<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
-				</b-col>
-				<b-col v-if="user">
-					<h2 class="gray-light">Your content</h2>
-					<ul>
-						<li><router-link to="/settings">Settings</router-link></li>
-						<li><router-link to="/campaigns">Campaigns</router-link></li>
-						<li><router-link to="/players">Players</router-link></li>
-						<li><router-link to="/npcs">NPC's</router-link></li>
-					</ul>
+				<b-col class="links">
+					<div>
+						<h2 class="gray-light">Quick Links</h2>
+						<ul>
+							<li><router-link to="/compendium">Compendium</router-link></li>
+							<li><router-link to="/feedback">Feedback</router-link></li>
+							<li><router-link to="/planned">Planned</router-link></li>
+							<li><router-link to="/updates">Updates</router-link></li>
+							<li><router-link to="/documentation">Documentation</router-link></li>
+							<li><router-link to="/about-us">About us</router-link></li>
+						</ul>
+					</div>
+					<div>
+						<h2 class="gray-light">Follow us</h2>
+						<ul>
+							<li>
+								<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
+							</li>
+							<li>
+								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
+							</li>
+							<li>
+								<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
+							</li>
+						</ul>
+						<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
+					</div>
+					<div v-if="user">
+						<h2 class="gray-light">Your content</h2>
+						<ul>
+							<li><router-link to="/settings">Settings</router-link></li>
+							<li><router-link to="/campaigns">Campaigns</router-link></li>
+							<li><router-link to="/players">Players</router-link></li>
+							<li><router-link to="/npcs">NPC's</router-link></li>
+						</ul>
+					</div>
 				</b-col>
 			</b-row>
 		</div>
@@ -78,35 +80,65 @@
 
 <style lang="scss" scoped>
 	.footer {
-		background-color: #494747;
+		background-color: #232323;
 
 		.top {
 			padding: 30px 20px;
 
-			.logo {
-				width: 250px;
-				margin-bottom: 30px;
-			}
-			h2 {
-				font-weight: bold !important;
-				font-size: 16px !important;
-				color: #fff !important;
-			}
+			.logo-container {
+				display: flex;
+				justify-content: flex-start;
+				height: 200px;
+				// background: #000;
 
-			ul {
-				padding: 0;
-				list-style: none;
-
-				a {
-					font-size: 12px;
-					color: #191919 !important;
-					text-transform: uppercase;
+				.logo {
+					width: 250px;
 				}
 			}
+			.links {
+				display: flex;
+				justify-content: flex-end;
+
+				div {
+					margin-left: 50px;
+
+					ul {
+						padding: 0;
+						list-style: none;
+
+						a {
+							font-size: 12px;
+							color: #b2b2b2 !important;
+							text-transform: uppercase;
+						}
+					}
+				}
+			}
+			@media (max-width: 766px) {
+				.logo-container {
+					justify-content: center;
+				}
+				.links {
+					justify-content: space-between;
+
+					div {
+						margin: 0;
+					}
+				}
+			}
+
+			h2 {
+				font-weight: bold !important;
+				font-size: 13px !important;
+				color: #494747 !important;
+				margin-bottom: 10px;
+			}
+
+			
 		}
 		.bottom {
 			padding: 20px;
-			background-color: #302f2f;
+			background-color: #191919;
 		}
 	}
 </style>

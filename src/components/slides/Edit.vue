@@ -84,14 +84,14 @@
 	export default {
 		name: 'EditNpc',
 		props: [
-		'npc',
-		'npcKey'
+		'data'
 		],
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				npc: this.data,
 			}
 		},
 		methods: {
@@ -103,7 +103,7 @@
 					if (result) {
 						this.npc.curHp = this.npc.maxHp;
 						
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.npcKey}`).set(
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.npc.key}`).set(
 							this.npc
 						);
 						this.setSlide(false);

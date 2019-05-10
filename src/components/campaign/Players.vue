@@ -67,7 +67,12 @@
 					<td>
 							<div class="d-flex justify-content-end">
 								<div class="d-flex justify-content-end actions">
-									<a class="gray-hover" v-b-tooltip.hover title="Edit player" @click="edit(key)">
+									<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
+										@click="setSlide({
+											show: true,
+											type: 'slides/EditPlayer',
+											data: { key: key, location: 'overview',}
+										})">
 										<i class="fas fa-pencil"></i>
 									</a>
 								</div>
@@ -120,14 +125,6 @@
 				'fetchCampaign',
 				'setSlide',
 			]),
-			edit(key) {
-				this.setSlide({
-					show: true,
-					type: 'editPlayer',
-					key: key,
-					location: 'overview',
-				})
-			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage

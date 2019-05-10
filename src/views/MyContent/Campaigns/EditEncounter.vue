@@ -72,7 +72,8 @@
 											</div>
 											<template v-if="encounter.entities">
 												<div class="actions">
-													<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
+													<a @click="setSlide({show: true, type: 'ViewEntity', data: players[key] })" 
+														v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
 													<a v-if="checkPlayer(key) < 0" class="gray-hover" 
@@ -91,7 +92,7 @@
 												</span>
 											</template>	
 											<div v-else class="actions">
-												<a @click="showSlide('info', players[key])" v-b-tooltip.hover title="Show Info">
+												<a @click="setSlide({show: true, type: 'ViewEntity', data: players[key] })" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
 												<a class="gray-hover" 
@@ -126,7 +127,7 @@
 												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 											</span>
 											<div class="actions justify-content-end">
-												<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
+												<a @click="setSlide({show: true, type: 'ViewEntity', data: npc })" v-b-tooltip.hover title="Show Info">
 													<i class="fas fa-info"></i>
 												</a>
 												<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
@@ -155,7 +156,7 @@
 													<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 												</span>
 												<div class="actions justify-content-end">
-													<a @click="showSlide('info', npc)" v-b-tooltip.hover title="Show Info">
+													<a @click="setSlide({show: true, type: 'ViewEntity', data: npc })" v-b-tooltip.hover title="Show Info">
 														<i class="fas fa-info"></i>
 													</a>
 													<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
@@ -221,7 +222,7 @@
 										<i v-if="entity.friendly" class="fas fa-heart green mr-2"></i> {{ entity.name }}
 									</div>
 									<div class="actions">
-										<a v-if="entity.entityType == 'npc'" @click="showSlide('edit', entity, key)" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+										<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
 											<i class="fas fa-pencil"></i>
 										</a>
 										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
@@ -418,24 +419,6 @@
 						});
 					}
 				})
-			},
-			showSlide(type, npc, key) {
-				event.stopPropagation();
-				if(type == 'info') {
-					this.setSlide({
-						show: true,
-						type: 'npc',
-						entity: npc
-					})
-				}
-				else if(type == 'edit') {
-					this.setSlide({
-						show: true,
-						type: 'edit',
-						npc: npc,
-						key: key,
-					})
-				}
 			},
 			multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {

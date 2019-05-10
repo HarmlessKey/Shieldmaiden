@@ -4,8 +4,8 @@
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
-				<a @click="addNpc()"
-					v-shortkey="['a']" @shortkey="addNpc()"
+				<a @click="setSlide({show: true, type: 'slides/AddNpc'})"
+					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/AddNpc'})"
 					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">
@@ -64,12 +64,14 @@
 											<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
 											{{ entity.entityType }}
 										</a>
-										<a class="dropdown-item" @click="reminders(entity.key)"
-											v-shortkey="['m']" @shortkey="reminders(targeted)">
+										<a class="dropdown-item" 
+											@click="setSlide({show: true, type: 'slides/TargetReminders', data: entity.key})"
+											v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/TargetReminders', data: targeted})">
 											<i class="fas fa-stopwatch"></i> <span v-if="showKeybinds.keyBinds === undefined">[m]</span> Reminders
 										</a>
-										<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
-											v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
+										<a class="dropdown-item" 
+											@click="setSlide({show: true, type: 'slides/Transform', data: entities[entity.key]})"
+											v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: entities[targeted]})">
 											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
 										</a>
 										<a class="dropdown-item" @click="setHidden(entity.key, !entity.hidden)"
@@ -80,12 +82,13 @@
 										</a>
 
 
-										<a class="dropdown-item" @click="conditions(entity)"
-											v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
+										<a class="dropdown-item" 
+											@click="setSlide({show: true, type: 'slides/Conditions', data: entity})"
+											v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/Conditions', data: entities[targeted]})">
 											<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 										</a>
-										<a class="dropdown-item" @click="damageHeal(entity)"
-											v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
+										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/DamageHealing', data: entity,})"
+											v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/DamageHealing', data: entities[targeted]})">
 											<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 										</a>
 										<div class="dropdown-divider"></div>
@@ -117,11 +120,6 @@
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
 											<div class="dropdown-header">{{ entity.name }}</div>
-											<!-- <a class="dropdown-item" 
-												@click="info(entity)"
-												v-shortkey="['i']" @shortkey="info(entities[targeted])">
-												<i class="fas fa-info"></i> <span v-if="showKeybinds.keyBinds === undefined">[i]</span> Info
-											</a> -->
 											<a v-if="entity.curHp == 0 && !entity.stable" 
 												class="dropdown-item" 
 												v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
@@ -133,8 +131,9 @@
 											@click="edit(entity.key, entities[entity.key], entity.entityType)">
 												<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
 											</a>
-											<a class="dropdown-item" @click="transform(entity.key, entities[entity.key])"
-												v-shortkey="['t']" @shortkey="transform(targeted, entities[targeted])">
+											<a class="dropdown-item" 
+												@click="setSlide({show: true, type: 'slides/Transform', data: entities[entity.key]})"
+												v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: entities[targeted]})">
 												<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
 											</a>
 											<a v-if="!entity.hidden" class="dropdown-item" @click="setHidden(entity.key, true)"
@@ -145,12 +144,12 @@
 												v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
 												<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
 											</a>
-											<a class="dropdown-item" @click="conditions(entity)"
-												v-shortkey="['c']" @shortkey="conditions(entities[targeted])">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/Conditions', data: entity})"
+												v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/Conditions', data: entities[targeted]})">
 												<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 											</a>
-											<a class="dropdown-item" @click="damageHeal(entity)"
-												v-shortkey="['d']" @shortkey="damageHeal(entities[targeted])">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/DamageHealing', data: entity})"
+												v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/DamageHealing', data: entities[targeted]})">
 												<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 											</a>
 											<div class="dropdown-divider"></div>
@@ -255,70 +254,21 @@
 				'set_stable',
 				'remove_entity',
 			]),
-			conditions(entity) {
-				event.stopPropagation();
-				if(entity) {
-					this.setSlide({
-						show: true,
-						type: 'conditions',
-						entity: entity
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Show conditions', {
-					});
-				}
-			},
-			info(entity) {
-				event.stopPropagation();
-				if(entity) {
-					this.setSlide({
-						show: true,
-						type: 'npc',
-						entity: entity
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Show info', {
-					});
-				}
-			},
-			addNpc() {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'addNpc',
-				})
-			},
 			edit(key, entity, entityType) {
-				var editType = (entityType == 'player') ? 'editPlayer' : 'editNpc';
+				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
 
-				event.stopPropagation();
 				if(key) {
 					this.setSlide({
 						show: true,
 						type: editType,
-						key: key,
-						location: 'encounter'
+						data: {
+							key: key,
+							location: 'encounter'
+						}
 					})
 				}
 				else {
 					this.$snotify.error('Select a target', 'Edit entity', {
-					});
-				}
-			},
-			transform(key, entity) {
-				event.stopPropagation();
-				if(key) {
-					this.setSlide({
-						show: true,
-						type: 'transform',
-						key: key,
-						entity: entity,
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Transform entity', {
 					});
 				}
 			},
@@ -330,34 +280,6 @@
 					})
 				} else {
 					this.$snotify.error('Select a target', 'Hide entity', {
-					});
-				}
-			},
-			reminders(key) {
-				event.stopPropagation();
-				if(key) {
-					this.setSlide({
-						show: true,
-						type: 'targetReminders',
-						key: key,
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Reminders', {
-					});
-				}
-			},
-			damageHeal(entity) {
-				event.stopPropagation();
-				if(entity) {
-					this.setSlide({
-						show: true,
-						type: 'damageHealing',
-						target: entity,
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Do damage', {
 					});
 				}
 			},

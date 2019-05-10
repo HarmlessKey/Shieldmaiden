@@ -25,7 +25,7 @@
 		<div v-if="loading" class="loader"> <span>Loading monster....</span></div>
 
 		<h1 class="d-none">{{ monster.name }}</h1>
-		<ViewEntity :entity="monster" />
+		<ViewEntity :data="monster" />
 	</div>
 </template>
 

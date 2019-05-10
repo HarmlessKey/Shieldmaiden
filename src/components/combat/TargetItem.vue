@@ -33,7 +33,7 @@
 							v-for="(condition, key) in entity.conditions" 
 							:key="key" 
 							v-b-tooltip.hover :title="key"
-							@click="showCondition(key, entity)"></div>
+							@click="showCondition(key)"></div>
 					</div>
 					<div class="progress-bar" :class="{ 
 						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
@@ -149,6 +149,18 @@
 				'setSlide',
 				'add_next_round',
 			]),
+			showCondition(key) {
+				//Stop other functions so target is not deselected
+				event.stopPropagation();
+
+				this.setSlide({
+					show: true, 
+					type: 'slides/Condition',
+					data: {
+						condition: key,
+						entity: this.entity
+				}})
+			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
@@ -173,15 +185,6 @@
 					}
 				}
 				return stats
-			},
-			showCondition(show, entity) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'condition',
-					condition: show,
-					entity: entity
-				})
 			},
 		}
 	}

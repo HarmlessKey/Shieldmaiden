@@ -44,11 +44,11 @@
 	export default {
 		name: 'Transform',
 		props: [
-			'entityKey',
-			'entity',
+			'data',
 		],
 		data() {
 			return {
+				entity: this.data,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -71,7 +71,7 @@
 						}
 
 						this.transform_entity({
-							key: this.entityKey,
+							key: this.entity.key,
 							entity: transform
 						})
 						this.setSlide(false);
@@ -83,7 +83,7 @@
 			},
 			remove() {
 				this.transform_entity({
-					key: this.entityKey,
+					key: this.entity.key,
 					remove: true
 				})
 				this.entity.transformed = false

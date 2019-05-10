@@ -21,7 +21,7 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="showSlide(npc)" class="mr-2" v-b-tooltip.hover title="Show Info">
+							<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
 								<i class="fas fa-info-circle"></i></a>
 							{{ npc.name }}
 						</div>
@@ -605,14 +605,6 @@
 				if(this.searchResults == '' && this.search != '') {
 					this.noResult = 'No results for "' + this.search + '"';
 				}
-			},
-			showSlide(npc) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'npc',
-					entity: npc
-				})
 			},
 			copy(npc) {
 				this.npc = npc;

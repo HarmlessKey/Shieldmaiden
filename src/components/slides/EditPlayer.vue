@@ -98,14 +98,15 @@
 	export default {
 		name: 'EditEntity',
 		props: [
-			'entityKey',
-			'location',
+			'data',
 		],
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				entityKey: this.data.key,
+				location: this.data.location,
 			}
 		},
 		firebase() {
@@ -140,8 +141,8 @@
 						}
 
 						//Parse to INT
-						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : false;
-						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : false;
+						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : 0;
+						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : 0;
 						this.playerBase.ac = parseInt(this.playerBase.ac)
 						this.playerBase.maxHp = parseInt(this.playerBase.maxHp)
 						this.entity.curHp = parseInt(this.entity.curHp)
@@ -159,7 +160,7 @@
 						if(this.location == 'encounter') {
 							
 							//create full object to send to store
-							this.entity.initiative = this.initiative['.value']
+							this.entity.initiative = this.initiative['.value'];
 							this.entity.ac = this.playerBase.ac;
 							this.entity.maxHp = this.playerBase.maxHp;
 

@@ -233,6 +233,11 @@ a.logout {
 		text-align: center;
 		margin-bottom: 20px;
 	}
+	img.logo {
+		width: calc(100% - 20px);
+		margin: 0 10px;
+		margin-bottom: 20px;
+	}
 	input {
 		height: 45px;
 

@@ -1,6 +1,6 @@
 <template>
 	<div id="login">
-		<h1>Harmless Key</h1>
+		<img class="logo" src="../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
 		<h2>Create an account</h2>
 		<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 		<form v-on:submit.prevent>

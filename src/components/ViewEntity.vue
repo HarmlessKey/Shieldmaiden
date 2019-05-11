@@ -1,34 +1,34 @@
 <template>
 	<div class="pb-5">
-		<h2>{{ entity.name }}</h2>
+		<h2>{{ data.name }}</h2>
 		<i>
-			<template v-if="entity.size">{{ entity.size }}</template>
-			<template v-if="entity.type"> {{ entity.type }}</template>
-			<span v-if="entity.subtype">({{ entity.subtype }})</span>
-			<template v-if="entity.alignment">, {{ entity.alignment }}</template>
+			<template v-if="data.size">{{ data.size }}</template>
+			<template v-if="data.type"> {{ data.type }}</template>
+			<span v-if="data.subtype">({{ data.subtype }})</span>
+			<template v-if="data.alignment">, {{ data.alignment }}</template>
 		</i>
 		<hr>
 		<p>
-			<template v-if="entity.armor_class">
+			<template v-if="data.armor_class">
 				<b><i class="fas fa-shield gray-hover"></i>Armor Class</b>: 
-				<span class="blue"> {{ entity.armor_class }}</span><br/>
+				<span class="blue"> {{ data.armor_class }}</span><br/>
 			</template>
 			<template v-else>
 				<b><i class="fas fa-shield gray-hover"></i> Armor Class</b>: 
-				<span class="blue"> {{ entity.ac }}</span><br/>
+				<span class="blue"> {{ data.ac }}</span><br/>
 			</template>
-			<template v-if="entity.hit_points">
+			<template v-if="data.hit_points">
 				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
-				<span class="blue"> {{ entity.hit_points }}</span>
+				<span class="blue"> {{ data.hit_points }}</span>
 			</template>
 			<template v-else>
 				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
-				<span class="blue"> {{ entity.maxHp }}</span>
+				<span class="blue"> {{ data.maxHp }}</span>
 			</template>
-			<template v-if="entity.hit_dice"> ({{ entity.hit_dice }})</template>
-			<template v-if="entity.speed">
+			<template v-if="data.hit_dice"> ({{ data.hit_dice }})</template>
+			<template v-if="data.speed">
 				<br/><b><i class="fas fa-angle-double-right gray-hover"></i> Speed</b>: 
-				<span class="blue"> {{ entity.speed }}</span>
+				<span class="blue"> {{ data.speed }}</span>
 			</template>
 		</p>
 		<hr>
@@ -38,12 +38,12 @@
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
 					class="mb-5 col-4" 
-					@click="rollAbility(ability.ability, entity[ability.ability])"
-					v-if="entity[ability.ability]">
+					@click="rollAbility(ability.ability, data[ability.ability])"
+					v-if="data[ability.ability]">
 						<div class="ability bg-gray">
 							<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
-							{{ modifier(entity[ability.ability]) }}
-							<span class="score bg-gray">{{ entity[ability.ability] }}</span>
+							{{ modifier(data[ability.ability]) }}
+							<span class="score bg-gray">{{ data[ability.ability] }}</span>
 						</div>
 				</b-col>
 			</template>
@@ -52,7 +52,7 @@
 
 		<!-- SKILLS -->
 		<p>
-			<template v-if="entity.skills">
+			<template v-if="data.skills">
 				<b>Skills</b>
 				<template v-for="(skill, index) in skills">
 					<span :key="index" v-if="npc[skill]">
@@ -61,19 +61,19 @@
 				</template>
 				<br/>
 			</template>
-			<template v-if="entity.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities }}<br/></template>
-			<template v-if="entity.damage_resistances"><b>Damage resistances</b> {{ entity.damage_resistances }}<br/></template>
-			<template v-if="entity.damage_immunities"><b>Damage immunities</b> {{ entity.damage_immunities }}<br/></template>
-			<template v-if="entity.condition_immunities"><b>Condition immunities</b> {{ entity.condition_immunities }}<br/></template>
-			<template v-if="entity.senses"><b>Senses</b> {{ entity.senses }}<br/></template>
-			<template v-if="entity.languages"><b>Languages</b> {{ entity.languages }}<br/></template>
-			<template v-if="entity.challenge_rating"><b>Challenge Rating</b> {{ entity.challenge_rating }}</template>
+			<template v-if="data.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ data.damage_vulnerabilities }}<br/></template>
+			<template v-if="data.damage_resistances"><b>Damage resistances</b> {{ data.damage_resistances }}<br/></template>
+			<template v-if="data.damage_immunities"><b>Damage immunities</b> {{ data.damage_immunities }}<br/></template>
+			<template v-if="data.condition_immunities"><b>Condition immunities</b> {{ data.condition_immunities }}<br/></template>
+			<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
+			<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
+			<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }}</template>
 		</p>
 
-		<template v-if="entity.special_abilities">
+		<template v-if="data.special_abilities">
 			<hr>
 			<!-- eslint-disable-next-line -->
-			<div v-for="(ability, index) in entity.special_abilities">
+			<div v-for="(ability, index) in data.special_abilities">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ ability.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -82,11 +82,11 @@
 			</div>
 		</template>
 
-		<template v-if="entity.actions">
+		<template v-if="data.actions">
 			<hr>
 			<h2>Actions</h2>
 			<!-- eslint-disable-next-line -->
-			<div v-for="(action, index) in entity.actions">
+			<div v-for="(action, index) in data.actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1 }}. {{ action.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -95,11 +95,11 @@
 			</div>
 		</template>
 
-		<template v-if="entity.legendary_actions">
+		<template v-if="data.legendary_actions">
 			<hr>
 			<h2>Legendary Actions</h2>
 			<!-- eslint-disable-next-line -->
-			<div v-for="(legendary_action, index) in entity.legendary_actions">
+			<div v-for="(legendary_action, index) in data.legendary_actions">
 				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">
 					<span>{{ index + 1}}. {{ legendary_action.name }}</span>
 					<i class="fas fa-caret-down"></i>
@@ -120,7 +120,6 @@
 		],
 		data() {
 			return {
-				entity: this.data,
 				skills: [
 					'acrobatics',
 					'animal Handling',

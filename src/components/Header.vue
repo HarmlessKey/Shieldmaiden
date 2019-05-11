@@ -1,8 +1,12 @@
 <template>
 	<header>
 		<div id="header" class="d-flex justify-content-between">
-			<div class="d-flex justify-content-left">
-				<router-link to="/" class="logo"></router-link>
+			<div>
+				<router-link to="/" class="logo d-flex justify-content-start">
+					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
+					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
+				</router-link>
+				
 			</div>
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">
@@ -83,10 +87,15 @@
 	position: absolute;
 	left: 5px;
 	top: 5px;
-	background-image: url('../assets/_img/logo/logo-icon-cyan.svg');
-	background-size: cover;
 	height: 40px;
-	width: 40px;
+
+	.icon {
+		height: 40px;
+	}
+	.wordmark {
+		margin: 13px 0 0 7px;
+		height: 13px;
+	}
 }
 a {
 	color: #b2b2b2 !important;

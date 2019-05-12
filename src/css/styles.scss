@@ -491,18 +491,23 @@ ul.entities {
 }
 
 .slide {
-	padding: 45px 15px 15px 15px;
 	position: fixed;
 	right: 0;
 	top: 50px;
 	height: calc(100vh - 50px);
 	width: 330px;
 	z-index: 99;
-	overflow: auto;
-	box-shadow: 0 10px 15px $gray-dark;
+	box-shadow: 0 10px 15px $black;
 	background: $gray;
+	display: grid;
+	grid-template-columns: auto;
+	grid-template-rows: 30px auto;
+	grid-template-areas: 
+	"hide"
+	"content";
 
 	a.hide {
+		grid-area: hide;
 		padding-left: 10px;
 		width: 100%;
 		font-size: 15px;
@@ -513,6 +518,11 @@ ul.entities {
 		z-index: 1000;
 		background: $gray-dark;
 		color: $white !important;
+	}
+	.content {
+		padding: 15px;
+		grid-area: content;
+		overflow: auto;
 	}
 }
 

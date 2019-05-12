@@ -155,7 +155,8 @@ export const content_module = {
 			if(state.slide.type != payload.type) {
 				state.slide = false
 				setTimeout(() => state.slide = payload, 100);
-			} else if(!isEqual(state.slide.data, payload.data)) {
+			} else if(!isEqual(state.slide.data, payload.data) && payload.data != undefined) {
+				console.log('test')
 				state.slide = false
 				setTimeout(() => state.slide = payload, 100);
 			} else {

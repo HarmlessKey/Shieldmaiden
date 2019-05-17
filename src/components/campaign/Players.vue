@@ -84,7 +84,7 @@
 		</table>
 		<div v-else class="loader"><span>Loading Players...</span></div>
 
-		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Stats</button>
+		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 	</div>
 </template>
 
@@ -131,7 +131,7 @@
 			},
 			reset() {
 				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).set({
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
 						curHp: this.players[key].maxHp
 					})
 				}

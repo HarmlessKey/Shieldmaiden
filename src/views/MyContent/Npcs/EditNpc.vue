@@ -348,7 +348,7 @@
 			<template v-if="quick == false">
 				<b-card header="Resistances & Vulnerabilities">
 					<b-row>
-						<b-col md="4"><label for="dmg_vul">Damage Vulerabilities</label></b-col>
+						<b-col md="4"><label for="dmg_vul">Damage Vulnerabilities</label></b-col>
 						<b-col>
 							<b-form-input autocomplete="off"  type="text"
 								v-b-tooltip.hover title="Damage Vulnerabilities" 

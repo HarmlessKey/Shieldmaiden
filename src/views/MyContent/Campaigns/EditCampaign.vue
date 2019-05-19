@@ -134,6 +134,7 @@
 				'campaign',
 				'players',
 				'playerInCampaign',
+				'allEncounters',
 				'overencumbered'
 			]),
 		},
@@ -164,6 +165,13 @@
 				});
 			},
 			removePlayer(id) {
+				//First remove player from all encounters
+				for(let encounterId in this.allEncounters[this.campaignId]) {
+					//Remove player from encouner
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(id).remove();
+				}
+
+				//Then remove from campaign
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
 			},
 			checkPlayer(id) {

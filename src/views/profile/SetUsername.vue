@@ -62,12 +62,13 @@ export default {
 					var user = this.usernames[i]
 					if(user.username) {
 						if (user.username.toLowerCase() == this.username.toLowerCase()) {
-							this.check = 'unavailable'
+							this.check = 'unavailable';
+							break
 						} else {
-							this.check = 'available'
+							this.check = 'available';
 						}
 					} else {
-						this.check = 'available'
+						this.check = 'available';
 					}
 				}
 			},

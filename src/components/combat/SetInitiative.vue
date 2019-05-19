@@ -52,6 +52,9 @@
 							<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
 							
 							<div class="actions">
+								<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })" v-b-tooltip.hover title="Show Info">
+									<i class="fas fa-info"></i>
+								</a>
 								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
 							</div>
 

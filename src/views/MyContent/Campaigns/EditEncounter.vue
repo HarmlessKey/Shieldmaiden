@@ -610,17 +610,6 @@ ul.nav {
 	}
 }
 
-
-// Remove arrows from number field
-input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
- 
-input[type='number'] {
-    -moz-appearance: textfield;
-}
-
 .multi_nr {
 	width: 45px;
 	height: 30px;

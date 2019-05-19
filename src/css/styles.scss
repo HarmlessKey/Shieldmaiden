@@ -12,6 +12,7 @@
 	6. Bootstrap overrides
 	7. Snotify overrides
 	8. Custom scrollbars
+	9. Number field
 */
 
 /* 1. Variables */
@@ -938,4 +939,21 @@ ul.nav {
 }
 .vb.vb-dragging-phantom > .vb-dragger > .vb-dragger-styler {
 	background-color: $gray-hover;
+}
+
+/* 9. Number field */
+/*********************************************/
+
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.form-control:disabled {
+	opacity: 0.25 !important;
 }

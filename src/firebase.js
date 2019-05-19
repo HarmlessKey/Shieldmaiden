@@ -1,7 +1,7 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-import { firebase_api_key } from '@/secret'
+import { firebase_api_key, firebase_dev_api_key } from '@/secret'
 
 
 let config = {
@@ -17,4 +17,17 @@ firebase.initializeApp(config);
 const auth = firebase.auth();
 const db = firebase.database();
 
-export { firebase, auth, db };
+let config_dev = {
+    apiKey: firebase_dev_api_key,
+    authDomain: "harmlesskey-dev.firebaseapp.com",
+    databaseURL: "https://harmlesskey-dev.firebaseio.com",
+    projectId: "harmlesskey-dev",
+    storageBucket: "harmlesskey-dev.appspot.com",
+    messagingSenderId: "941027776876",
+    appId: "1:941027776876:web:05d72b32cdec7b12"
+};
+let app_dev = firebase.initializeApp(config_dev, "dev");
+
+const db_dev = firebase.database(app_dev);
+
+export { firebase, auth, db, db_dev };

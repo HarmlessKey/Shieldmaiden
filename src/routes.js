@@ -9,6 +9,9 @@ import Spells from '@/views/Compendium/Spells.vue';
 import Conditions from '@/views/Compendium/Conditions.vue';
 import Items from '@/views/Compendium/Items.vue';
 
+import Contribute from '@/views/Contribute';
+import Spells_contrib from '@/views/Contribute/Spells.vue';
+
 import Sitemap from '@/views/Sitemap.vue';
 import Privacy from '@/views/Privacy.vue';
 import AboutUs from '@/views/AboutUs.vue';
@@ -137,6 +140,37 @@ export const routes = [{
 	meta: {
 		basePath: '/compendium',
 		baseName: 'items',
+	}
+},
+
+// CONTRUBUTE
+{
+	path: '/contribute',
+	name: 'Contribute',
+	component: Contribute
+},
+{
+	path: '/contribute/spells',
+	name: 'Contribute Spells',
+	component: Spells_contrib,
+	meta: {
+		baseName: 'Spells',
+	}
+},
+{
+	path: '/contribute/spells/:id',
+	name: 'Contribute Spell',
+	component: Spells_contrib,
+	props: (route) => ({
+		id: route.query.id,
+		test: function() {
+			console.log(route.query.id)
+			return ""
+		}
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Spells',
 	}
 },
 

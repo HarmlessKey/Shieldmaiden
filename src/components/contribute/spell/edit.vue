@@ -9,7 +9,7 @@
 					<b-card header="Old Spell Description" v-if="loading">
 						<div  class="loader"> <span>Loading old_spell....</span></div>
 					</b-card>
-					<b-card header="Old Spell Description" v-else>
+					<b-card class="old_spell" header="Old Spell Description" v-else>
 						<h1 class="spellTitle">{{ old_spell.name }}</h1>
 						<i class="mb-3 d-block" v-if="old_spell.school">
 							{{ levels[old_spell.level] }}
@@ -29,9 +29,9 @@
 								<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
 								{{ old_spell.duration }}<br/>
 							<b>Classes:</b> 
-							<!-- <template v-for="(_class, index) in old_spell.classes">
+							<template v-for="(_class, index) in old_spell.classes">
 								{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
-							</template> -->
+							</template>
 							<br/>
 						</p>
 						<p v-for="(desc, index) in old_spell.desc" :key="index">
@@ -99,7 +99,6 @@
 							</b-col>
 						</b-row>
 						<b-row>
-
 							<!-- CAST TIME -->
 							<b-col md="2">
 								<label for="cast_time_nr">Cast Time</label>
@@ -181,9 +180,8 @@
 									></b-form-input>
 							</b-col>
 						</b-row>
-
 						<b-row>
-							<!-- Range Type -->
+							<!-- RANGE TYPE -->
 							<b-col md="4">
 								<label for="range_type">Range Type</label>
 								<b-form-select v-model="spell.range_type"
@@ -198,7 +196,7 @@
 										:key="i" :value="val">{{val}}</option>
 								</b-form-select>
 							</b-col>
-							<!-- Range -->
+							<!-- RANGE -->
 							<b-col md="3">
 								<label for="range">Range ft.</label>
 								<b-form-input v-model="spell.range"
@@ -212,7 +210,7 @@
 									data-vv-as="Range"
 									></b-form-input>
 							</b-col>
-							<!-- Duration -->
+							<!-- DURATION -->
 							<b-col md="5">
 								<label for="duration_type">Duration Type</label>
 								<b-form-select v-model="spell.duration_type"
@@ -229,7 +227,7 @@
 							</b-col>
 						</b-row>
 						<b-row>
-							<!-- Duration N -->
+							<!-- DURATION N -->
 							<b-col md="6">
 								<label for="duration_n">Duration #</label>
 								<b-form-input v-model="spell.duration_n"
@@ -242,7 +240,7 @@
 									type="text"
 									></b-form-input>
 							</b-col>
-							<!-- Duration Scale -->
+							<!-- DURATION SCALE -->
 							<b-col md="6">
 								<label for="duration_scale">Time Scale</label>
 								<b-form-select v-model="spell.duration_scale"
@@ -258,6 +256,7 @@
 							</b-col>
 						</b-row>
 						<b-row>
+							<!-- DESCRIPTION -->
 							<b-col md="8">
 								<label for="description">Description</label>
 								<b-form-textarea v-model="spell.description"
@@ -269,6 +268,7 @@
 									data-vv-as="Description"
 									rows="6"></b-form-textarea>
 							</b-col>
+							<!-- CLASS SELECTOR -->
 							<b-col md="4" v-if="spell.classes">
 								<label for="classes">Classes</label>
 								<b-form-select v-model="spell.classes"
@@ -283,7 +283,7 @@
 							</b-col>
 						</b-row>
 						<b-row class="d-flex spell_row">
-							<!-- Ritual -->
+							<!-- RITUAL -->
 							<b-col md="2">
 								<label for="ritual">Ritual</label>
 								<div class="ritual d-flex justify-content-between" name="ritual">
@@ -293,8 +293,8 @@
 									</a>
 								</div>
 							</b-col>
-							<!-- Level Scaling -->
-							<b-col md="4">
+							<!-- LEVEL SCALING -->
+							<b-col md="5">
 								<label for="level_scaling">Level Scaling</label>
 								<b-form-select v-model="spell.level_scaling"
 									id="level_scaling"
@@ -306,7 +306,8 @@
 										:key="i" :value="val">{{val}}</option>
 								</b-form-select>
 							</b-col>
-							<b-col md="3">
+							<!-- SOURCE BOOK -->
+							<b-col md="5">
 								<label for="source">Source</label>
 								<b-form-input v-model="spell.page"
 									autocomplete="off"
@@ -473,5 +474,10 @@ select#classes {
 	height: 158px;
 }
 
+.old_spell {
+	position: -webkit-sticky;
+	position: sticky;
+	top: 60px;
+}
 
 </style>

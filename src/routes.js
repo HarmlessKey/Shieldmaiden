@@ -163,10 +163,6 @@ export const routes = [{
 	component: Spells_contrib,
 	props: (route) => ({
 		id: route.query.id,
-		test: function() {
-			console.log(route.query.id)
-			return ""
-		}
 	}),
 	meta: {
 		basePath: '/contribute',

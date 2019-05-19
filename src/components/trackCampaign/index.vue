@@ -1,40 +1,68 @@
 <template>
 <div>
 	<!-- NOT BROADCASTING -->
-	<div class="track" v-if="!broadcasting['.value']">
-		<div class="not-started">
-			<Follow />
-			<h2 class="padding">User is currently not broadcasting.</h2>
-			<CampaignOverview :players="campaignPlayers" />
+	<div class="track" :style="{ backgroundImage: 'url(\'' + campaignBackground + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
+		<div class="top d-flex justify-content-between">
+			<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+			{{ campaignName }}
+			<span>
+				<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+			</span>
+		</div>
+		<div class="container-fluid">
+			<div class="container entities">
+				<CampaignOverview :players="campaignPlayers" />
+			</div>
 		</div>
 	</div>
 
 	<!-- BROADCASTING -->
-	<div class="track" v-if="encounter && broadcasting['.value']" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+	<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 		
 		<!-- FINISHED -->
-		<div class="not-started container" v-if="encounter.finished == true">
-			<h2 class="padding">Encounter Finished</h2>
-			<b-row>
-				<b-col v-if="playerSettings.loot == true" md="8">
-					<Finished :encounter="encounter"/>
-				</b-col>
-				<b-col>
-					<div>
-						<Meters :entities="encounter.entities" />
-					</div>
-				</b-col>
-			</b-row>
+		<div v-if="encounter.finished == true">
+			<div class="top d-flex justify-content-between">
+				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+				{{ campaignName }}
+				<span>
+					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+				</span>
+			</div>
+			<div class="container-fluid">
+				<div class="container entities">
+					<h2 class="padding">Encounter Finished</h2>
+					<b-row>
+						<b-col v-if="playerSettings.loot == true" md="8">
+							<Finished :encounter="encounter"/>
+						</b-col>
+						<b-col>
+							<div>
+								<Meters :entities="encounter.entities" />
+							</div>
+						</b-col>
+					</b-row>
+				</div>
+			</div>
 		</div>
 
 		<!-- ROLL FOR INITIATIVE -->
-		<div class="not-started" v-else-if="encounter.round == 0">
-			<Follow />
-			<h2 class="padding">
-				<span class="die spin" :style="{ backgroundImage: 'url(' + require('../assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-				Roll for initiative!
-			</h2>
-			<CampaignOverview :players="campaignPlayers" />	
+		<div v-else-if="encounter.round == 0">
+			<div class="top d-flex justify-content-between">
+				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+				{{ campaignName }}
+				<span>
+					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+				</span>
+			</div>
+			<div class="container-fluid">
+				<div class="container entities">
+					<h2 class="padding">
+						<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+						Roll for initiative!
+					</h2>
+					<CampaignOverview :players="campaignPlayers" />	
+				</div>
+			</div>
 		</div>
 
 		<!-- ACTIVE ENCOUNTER -->
@@ -47,7 +75,6 @@
 				:campPlayers="campaignPlayers"
 			/>
 			<div class="container-fluid">
-					<Follow />
 				<div class="container entities">
 
 					<!-- LAST ROLL -->
@@ -97,16 +124,6 @@
 			</div>
 		</template>
 	</div>
-
-	<!-- ADDS -->
-	<div class="d-flex justify-content-center">
-		<ins class="adsbygoogle bg-gray-dark"
-					v-if="tier && !tier.benefits.ads"
-					style="display:inline-block;width:100%;height:100px"
-					data-ad-client="ca-pub-2711721977927243"
-					data-ad-slot="8698049578">
-		</ins>
-	</div>
 </div>
 </template>
 
@@ -115,12 +132,12 @@
 	import { db } from '@/firebase'
 	import { attributes } from '@/mixins/attributes.js'
 
-	import Follow from '@/components/track/Follow.vue'
+	import Follow from '@/components/trackCampaign/Follow.vue'
 	import Finished from '@/components/combat/Finished.vue'
-	import Turns from '@/components/track/Turns.vue'
-	import Initiative from '@/components/track/Initiative.vue'
-	import Meters from '@/components/track/Meters.vue'
-	import CampaignOverview from '@/components/track/CampaignOverview.vue'
+	import Turns from '@/components/trackCampaign/Turns.vue'
+	import Initiative from '@/components/trackCampaign/Initiative.vue'
+	import Meters from '@/components/trackCampaign/Meters.vue'
+	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue'
 
 	export default {
 		name: 'app',
@@ -141,6 +158,8 @@
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				encounter: undefined,
+				campaignName: undefined,
+				campaignBackground: undefined,
 				campaignPlayers: undefined,
 				counter: 0,
 				tier: undefined,
@@ -165,25 +184,13 @@
 					asObject: true,
 				},
 				broadcasting: {
-					source: db.ref(`track/${this.userId}/broadcast`),
+					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true
 				},
 			}
 		},
 		beforeMount() {
 			this.fetch_encounter()
-			this.fetch_tier()
-		},
-		updated() {
-			this.$nextTick(function() {
-				let ins = $('ins')
-				for (let i = 0; i < ins.length; i++) {
-					
-				}
-				if ($('ins').length > 0) {
-					(adsbygoogle = window.adsbygoogle || []).push({});
-				}
-			})
 		},
 		computed: {
 			//All entities, without hidden entities
@@ -289,68 +296,28 @@
 		},
 		methods: {
 			fetch_encounter() {
-				var track = db.ref(`track/${this.userId}`);
+				var track = db.ref(`broadcast/${this.userId}`);
 				track.on('value' , (snapshot) => {
-					let campId = snapshot.val().campaign
-					let encId = snapshot.val().encounter
+					let campId = this.$route.params.campid
 
-					let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
+					if(snapshot.val()) {
+						let encId = snapshot.val().encounter
 
-					encounter.on('value' , (snapshot) => {
-						this.encounter = snapshot.val()
-					});
+						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
+						encounter.on('value' , (snapshot) => {
+							this.encounter = snapshot.val()
+						});
+					}
 					//Get campaign for player curHP/tempHP/ACBonus
-					let campaign = db.ref(`campaigns/${this.userId}/${campId}/players`)
+					let campaign = db.ref(`campaigns/${this.userId}/${campId}`)
 
 					campaign.on('value' , (snapshot) => {
-						this.campaignPlayers = snapshot.val()
+						this.campaignPlayers = snapshot.val().players
+						this.campaignName = snapshot.val().campaign
+						this.campaignBackground = snapshot.val().background
 					});
 				});
-			},
-			fetch_tier() {
-
-				// return this.user
-				let ret = undefined
-
-				let path = 'tiers/basic'
-
-				db.ref(`users/${this.userId}`).once('value', user_snap => {
-					let user = user_snap.val()
-					if (user.voucher) {
-						if (user.voucher.date === undefined) {
-							path = `tiers/${user.voucher.id}`
-						} else {
-							let end_date = new Date(user.voucher.date)
-							let today = new Date()
-							if (user.voucher && today <= end_date) {
-								path = `tiers/${user.voucher.id}`
-							}
-						}
-					}
-					let vouch_tiers = db.ref(path)
-					vouch_tiers.once('value', voucher_snap => {
-						let voucher_order = voucher_snap.val().order
-						let patrons = db.ref('patrons').orderByChild('email').equalTo(user.email)
-						patrons.on('value', patron_snapshot => {
-
-							if (patron_snapshot.val()) {
-								let key = Object.keys(patron_snapshot.val())[0]
-								let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
-								patron_tier.once('value', tier_snapshot =>  {
-									if (tier_snapshot.val().order >= voucher_order) {
-										this.tier = tier_snapshot.val()
-									} else {
-										this.tier = voucher_snap.val()
-									}
-								})
-							}
-							else {
-								this.tier = voucher_snap.val()
-							}
-						})
-					})
-				})
 			}
 		},
 	}
@@ -364,30 +331,44 @@
 		background-color: #191919;
 		overflow-y: scroll;
 
+		.top {
+			background: rgba(38, 38, 38, .9);
+			text-transform: uppercase;
+			height: 65px;
+			padding: 10px;
+			font-size: 15px;
+			line-height: 45px;
+
+			.live {
+				margin: 10px 0;
+				height: 25px;
+				line-height: 25px;
+				padding: 0 10px;
+			}
+		}
+
 		&::-webkit-scrollbar { 
 			display: none; 
 		}
-		.not-started {
-			padding-bottom: 110px;
 
-			h2.padding {
-				font-size:25px !important;
-				line-height: 25px !important;
-				text-align: center;
-				padding-top: 50px;
-				text-shadow: 0 0 8px #000;
-				color: #fff;
-			}
-
-			.loader:before {
-				width: 80px;
-				height: 80px;
-				margin-top: -85px;
-				margin-left: -40px;
-				border-width: 5px;
-				animation-duration: 1.5s;
-			}
+		h2.padding {
+			font-size:25px !important;
+			line-height: 25px !important;
+			text-align: center;
+			padding-top: 20px;
+			text-shadow: 0 0 8px #000;
+			color: #fff;
 		}
+
+		.loader:before {
+			width: 80px;
+			height: 80px;
+			margin-top: -85px;
+			margin-left: -40px;
+			border-width: 5px;
+			animation-duration: 1.5s;
+		}
+
 		.container-fluid {
 			background-color:rgba(0, 0, 0, 0.3);
 			height: calc(100vh - 115px);
@@ -410,10 +391,6 @@
 	}
 	.no-broadcast {
 		padding-bottom: 110px !important;
-	}
-	.adsbygoogle {
-		position: fixed;
-		bottom: 0;
 	}
 	.die {
 		display: inline-block;

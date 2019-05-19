@@ -108,7 +108,7 @@
 	import { db } from '@/firebase'
 	import { attributes } from '@/mixins/attributes.js'
 
-	import Health from '@/components/track/Health.vue'
+	import Health from '@/components/trackCampaign/Health.vue'
 
 	export default {
 		name: 'app',

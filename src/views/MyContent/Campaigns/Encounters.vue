@@ -3,22 +3,12 @@
 		<div id="my-content" class="container-fluid">
 			<Crumble />
 
-			<h1 v-if="campaign" class="mb-3">{{ campaign.campaign }}</h1>
+			<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
+				{{ campaign.campaign }}
+				<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == campaignId }">live</span>
+			</h1>
 
 			<OverEncumbered v-if="overencumbered" />
-
-			<!-- BROADCAST -->
-			<div @click="broadcast(broadcasting['.value'])" class="broadcast" :class="{'bg-green': broadcasting['.value'], 'bg-gray': !broadcasting['.value'] }">
-				<template v-if="broadcasting['.value']">
-					<h3><i class="fas fa-play"></i> Broadcasting (click to stop)</h3>
-					<p class="mb-0">You are broadcasting your encounters. Anyone with the track encounter link, can follow your encounter.</p>
-					<i>Turn this off when you are not running a session and building/testing your encounters.</i>
-				</template>
-				<template v-else>
-					<h3><i class="fas fa-stop"></i> Not Broadcasting <span class="gray-hover">(click to start)</span></h3>
-					<p class="mb-0">Start broadcasting to share your encounters with your players. They can follow your encounters through your personalised link above.</p>
-				</template>
-			</div>
 
 			<template v-if="noCurHp">
 				<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
@@ -293,7 +283,7 @@
 		firebase() {
 			return {
 				broadcasting: {
-					source: db.ref(`track/${this.user.uid}/broadcast`),
+					source: db.ref(`broadcast/${this.user.uid}/live`),
 					asObject: true
 				}
 			}
@@ -462,11 +452,14 @@
 			// 	console.log(evt.draggedContext.index, '->', evt.draggedContext.futureIndex)
 			// 	console.log("MOVED")
 			// }
-			broadcast(broadcast) {
-				if(broadcast == false) { broadcast = true }
-				else { broadcast = false }
+			broadcast() {
+				//Save this is the current campaign that is being broadcasted
 
-				db.ref(`track/${this.user.uid}/broadcast`).set(broadcast)
+				if(this.broadcasting['.value'] == this.campaignId) {
+					db.ref(`broadcast/${this.user.uid}/live`).remove()
+				} else {
+					db.ref(`broadcast/${this.user.uid}/live`).set(this.campaignId)
+				}
 			},
 			setCurHp() {
 				//Stores player with curHp under campaign
@@ -488,6 +481,9 @@
 	.loader {
 		margin-top: 20px;
 	}
+	.live {
+		cursor: pointer;
+	}
 	.copy {
 		word-wrap: break-word;
 	}
@@ -503,11 +499,6 @@
 		h3 {
 			margin-bottom: 5px;
 		}
-	}
-	@keyframes blink {
-    0% { background-color: rgba(131, 181, 71, 1) }
-    50% { background-color: rgba(131, 181, 71, 0.5) }
-    100% { background-color: rgba(131, 181, 71, 1) }
 	}
 }
 </style>

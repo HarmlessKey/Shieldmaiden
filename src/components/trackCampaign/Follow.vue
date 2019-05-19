@@ -1,16 +1,16 @@
 <template>
 	<div class="follow d-flex justify-content-end">
 		<div v-if="user.uid" class="pr-2">
-			<small v-if="!following['.value']" class="bg-gray p-2">
+			<small v-if="!following['.value']">
 				<i class="fas fa-user-plus mr-1"></i> 
-				<a @click="follow(true)">Follow campaign</a>
+				<a @click="follow(true)">Follow player</a>
 			</small>
-			<small v-else class="shadow">
-				<span class="show"><i class="fas fa-user-check green"></i> Following campaign</span>
+			<small v-else>
+				<span class="show"><i class="fas fa-user-check green"></i> Following player</span>
 				<a class="hover-show" @click="follow(false)"><i class="fas fa-user-minus red"></i> Unfollow</a>
 			</small>
 		</div>
-		<small v-else class="bg-gray p-2">
+		<small v-else>
 			<router-link to="/sign-in">Sign in to follow</router-link>
 		</small>
 	</div>
@@ -54,9 +54,6 @@
 	.follow {
 		color: #fff;
 
-		.shadow {
-			text-shadow: 0 0 8px #000;
-		}
 		.hover-show {
 			display: none;
 		}

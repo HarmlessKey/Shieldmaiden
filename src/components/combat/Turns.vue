@@ -21,10 +21,7 @@
 				</div>
 
 				<!-- BROADCASTING -->
-				<a @click="broadcast(broadcasting['.value'])">
-					<i v-show="!broadcasting['.value']" v-b-tooltip.hover title="Start broadcasting" class="fas fa-play gray-light ml-2"></i>
-					<i v-show="broadcasting['.value']" v-b-tooltip.hover title="Stop broadcasting" class="fas fa-stop gray-light ml-2"></i>
-				</a>
+				<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
 			</h1>
 
 		<div class="round-info">
@@ -81,7 +78,7 @@
 		firebase() {
 			return {
 				broadcasting: {
-					source: db.ref(`track/${this.userId}/broadcast`),
+					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true
 				}
 			}
@@ -200,11 +197,14 @@
 			finish() {
 				this.set_finished();
 			},
-			broadcast(broadcast) {
-				if(broadcast == false) { broadcast = true }
-				else { broadcast = false }
+			broadcast() {
+				//Save this is the current campaign that is being broadcasted
 
-				db.ref(`track/${this.userId}/broadcast`).set(broadcast)
+				if(this.broadcasting['.value'] == this.$route.params.campid) {
+					db.ref(`broadcast/${this.userId}/live`).remove()
+				} else {
+					db.ref(`broadcast/${this.userId}/live`).set(this.$route.params.campid)
+				}
 			},
 		}
 	}
@@ -227,6 +227,13 @@
 
 		a {
 			margin-left: 5px;
+		}
+		.live {
+			cursor: pointer;
+			padding: 0 10px;
+			margin: 10px;
+			line-height: 23px;
+			height: 23px;
 		}
 	}
 }

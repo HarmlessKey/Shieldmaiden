@@ -51,7 +51,7 @@
 			</template>
 
 			<!-- WHEN A SPELL IS SELECTED -->
-			<template v-else>
+			<template v-else> 
 				<Spell :id="$route.params.id" />
 			</template>
 	</div>
@@ -64,11 +64,11 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
 	import { mapActions } from 'vuex'
-	import Spell from '@/components/contribute/spell/index.vue'
+	import Spell from '@/components/contribute/spell'
 	import axios from 'axios'
 
 	export default {
-		name: 'Spell',
+		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,

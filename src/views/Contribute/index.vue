@@ -2,11 +2,8 @@
 <div class="grid">
 	<div class="container">
 		<Crumble />
-		<h1>Compendium</h1>
-		<p>
-			All content is provided under terms of the 
-			<a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a>
-		</p>
+		<h1>Contribute</h1>
+	
 		<ul class="entities hasImg">
 			<li v-for="(item, index) in items" :key="index">
 				<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
@@ -18,7 +15,7 @@
 </template>
 
 <script>
-	// import { db_dev } from '@/firebase'
+	import { db_dev } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
 	import Crumble from '@/components/crumble/Compendium.vue'
 

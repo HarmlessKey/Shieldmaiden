@@ -67,7 +67,7 @@
 	import axios from 'axios'
 
 	export default {
-		name: 'Error',
+		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,

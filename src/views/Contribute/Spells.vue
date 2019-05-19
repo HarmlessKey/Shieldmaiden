@@ -3,7 +3,6 @@
 	<div class="container">
 
 		<!-- SPELL OVERVIEW -->
-		{{ $route.params.id }}
 		<template v-if="!$route.params.id">
 			<Crumble />
 			<h1><i class="fas fa-wand-magic"></i> Spells</h1>

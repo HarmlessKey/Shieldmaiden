@@ -8,9 +8,8 @@
 					<router-link :to="'/user/' + key" v-if="users[key]">
 						{{ users[key].username }}
 					</router-link>
-					<template v-if="track[key]">
-						<i v-show="track[key].broadcast" v-b-tooltip.hover title="Broadcasting" class="fas fa-play green"></i>
-						<i v-show="!track[key].broadcast" v-b-tooltip.hover title="Not Broadcasting" class="fas fa-stop red"></i>
+					<template v-if="broadcasting[key]">
+						<span class="live" :class="{ 'active': broadcasting[key].live }">Live</span>
 					</template>
 				</li>
 			</ul>
@@ -35,8 +34,8 @@
 					source: db.ref(`users`),
 					asObject: true
 				},
-				track: {
-					source: db.ref(`track`),
+				broadcasting: {
+					source: db.ref(`broadcast`),
 					asObject: true
 				}
 			}

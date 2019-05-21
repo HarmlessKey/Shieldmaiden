@@ -319,9 +319,11 @@
 									data-vv-as="Source"
 									></b-form-input>
 							</b-col>
-							
 						</b-row>
-
+					</b-card>
+					<b-card header="Attack Info">
+						<b-row>
+						</b-row>
 					</b-card>
 				</b-col>
 			</b-row>

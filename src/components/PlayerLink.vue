@@ -1,30 +1,28 @@
 <template>
-	<div>
-		<b-card header="Player link">
-			<div class="d-flex justify-content-start">
-				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="100" colorLight="true" :margin="5"></vue-qr>
-
-				<div class="ml-3">
-					<p class="d-flex justify-content-between">
-						<span>Let your players follow your encounters.</span>
-						<a data-toggle="collapse" :href="'#track'" 
-							role="button" aria-expanded="false">
-							<i class="fas fa-info"></i>
-						</a>
-					</p>
-					<p class="collapse mb-3" id="track">
-						With this link your active encounter can be followed on different devices. 
-						Send it to your players so they can see it on their tablets or phones, 
-						or put it up on a second screen that everyone can see. 
-						You control what is dispayed on the link through the <router-link to="/settings#track">settings</router-link>.
-					</p>
-				
-					<a class="copy" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a>
-					<input type="hidden" autocomplete="off" id="copy" :value="copy">
-				</div>
+		<div :class="{ 'd-flex justify-content-between': $route.path == '/profile' }">
+			<div class="mb-4">
+				<h2>Share your adventure</h2>
+				<p>
+					Let your players follow your encounters. 
+					<a data-toggle="collapse" :href="'#track'" 
+						role="button" aria-expanded="false">
+						<i class="fas fa-info"></i>
+					</a>
+				</p>
+				<p class="collapse mb-3" id="track">
+					With this link your active encounter can be followed on different devices. 
+					Send it to your players so they can see it on their tablets or phones, 
+					or put it up on a second screen that everyone can see. 
+					You control what is displayed on the link through the <router-link to="/settings#track">settings</router-link>.
+				</p>
+			
+				<a class="copy" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a>
+				<input type="hidden" autocomplete="off" id="copy" :value="copy">
 			</div>
-		</b-card>
-	</div>
+			<div class="">
+				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="150" colorLight="true" :margin="5"></vue-qr>
+			</div>
+		</div>
 </template>
 
 <script>

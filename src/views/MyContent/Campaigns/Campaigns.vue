@@ -7,8 +7,6 @@
 				
 				<OverEncumbered v-if="overencumbered" />
 
-				<PlayerLink />
-
 				<template v-if="players && tier">
 
 					<h2 class="mt-3 d-flex justify-content-between">

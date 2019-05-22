@@ -20,6 +20,10 @@
 						v-b-tooltip.hover 
 						title="Compendium"  
 						@click="setSlide({show: true, type: 'slides/Compendium'})"><i class="fas fa-book-spells"></i></a>
+					<a class="icon" 
+						v-b-tooltip.hover 
+						title="Player Link"  
+						@click="setSlide({show: true, type: 'PlayerLink'})"><i class="fas fa-link"></i></a>
 					<a class="icon roll" 
 						v-b-tooltip.hover 
 						title="Dice Roller"  

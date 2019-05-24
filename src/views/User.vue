@@ -10,7 +10,7 @@
 		<!-- CAMPAIGNS -->
 		<b-row v-if="campaigns" class="mt-3">
 			<b-col lg="4" md="6" v-for="campaign in campaigns" :key="campaign['.key']">
-				<router-link :to="`/user/${userId}/${campaign['.key']}`" class="card">
+				<div  class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 					<div class="card-header">
 						<span>
 							<i class="fas fa-dungeon"></i>
@@ -18,11 +18,33 @@
 						</span>
 						<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
 					</div>
-					<div class="card-body" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+					<div class="card-body">
 						
+						<!-- SHOW PLAYERS -->
+						<div v-if="campaign.players" class="players">
+							<div 
+								v-for="(player, key) in campaign.players" 
+								:key="key"
+								class="img"
+								v-b-tooltip.hover
+								:title="players[key].character_name"
+							>
+								<div v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></div>
+								<img v-else src="@/assets/_img/styles/player.svg" />
+							</div>
+						</div>
+
+						<h2 v-if="campaign.players">
+							{{ Object.keys(campaign.players).length }} players
+						</h2>
+
+						<div class="d-flex justify-content-center">
+							<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+						</div>
+
 					</div>
-						<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp) }}</small>
-				</router-link>
+						<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}</small>
+				</div>
 			</b-col>
 		</b-row>
 	</div>
@@ -74,7 +96,11 @@
 					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true,
 				},
-				campaigns: db.ref(`campaigns/${this.userId}`)
+				campaigns: db.ref(`campaigns/${this.userId}`),
+				players: {
+					source: db.ref(`players/${this.userId}`),
+					asObject: true,
+				}
 			}
 		},
 		updated() {
@@ -108,7 +134,7 @@
 				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
 				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
-				let time = hours + ":" + minutes + ":" + seconds;
+				let time = hours + ":" + minutes;
 				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
 				return date + " - " + time;
 			},
@@ -176,11 +202,14 @@
 		}
 		padding: 30px;
 
-		a.card {
+		.card {
 			color: #b2b2b2 !important;
+			background-size: cover;
+			background-position: center bottom;
 
 			.card-header {
 				position: relative;
+				background: rgba(38, 38, 38, .9);
 
 				.live {
 					position: absolute;
@@ -190,8 +219,38 @@
 			}
 			.card-body {
 				height: 200px;
-				background-size: cover;
-				background-position: center bottom;
+				background: rgba(38, 38, 38, .5);
+
+				h2 {
+					text-align: center;
+					margin-bottom: 30px;
+				}
+				.players {
+					margin-bottom: 20px;
+					display: flex;
+					justify-content: center;
+					flex-wrap: nowrap;
+
+					.img {
+						height: 35px;
+						width: 35px;
+						border: solid 1px #fff;
+						margin: 0 10px 10px 0;
+						box-sizing: border;
+
+						div {
+							width: 100%;
+							height: 100%;
+							background-size: cover;
+							background-position: center;
+							display: block;
+						}
+
+						&:last-child {
+							margin-right: 0;
+						}
+					}
+				}
 			}
 			&:hover {
 				text-decoration: none;

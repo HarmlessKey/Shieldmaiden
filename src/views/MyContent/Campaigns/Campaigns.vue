@@ -57,14 +57,26 @@
 						leave-active-class="animated bounceOutLeft">
 						<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
 							<div class="card">
-								<div class="card-header d-flex justify-content-between">
-									<span>
+								<div class="card-header">
+									<span class="title">
 										<i class="fas fa-dungeon"></i>
 										{{ campaign.campaign }}
 									</span>
 
-									<span>
-										<router-link class="mx-2 text-capitalize gray-hover" 
+									<span class="actions">
+										<i 
+											v-if="!campaign.private" 
+											class="fas fa-eye green"
+											v-b-tooltip.hover
+											title="Public campaign"
+										></i>
+										<i 
+											v-else class="fas fa-eye-slash red"
+											v-b-tooltip.hover
+											title="Private campaign"
+										></i>
+
+										<router-link class="text-capitalize gray-hover" 
 											:to="'/campaigns/' + campaign.key" 
 											v-b-tooltip.hover title="Edit">
 												<i class="fas fa-pencil"></i>
@@ -254,13 +266,27 @@
 				}
 			}
 			.card-header {
-				a:hover {
-					color: #b2b2b2 !important;
-				}
-				span {
+				position: relative;
+
+				span.title {
+					display: block;
 					white-space: nowrap;
 					overflow: hidden;
 					text-overflow: ellipsis;
+					width: calc(100% - 60px);
+				}
+				.actions {
+					position: absolute;
+					right: 12px;
+					top: 12px;
+
+					a {
+						margin-left: 10px;
+
+						&:hover {
+							color: #b2b2b2 !important;
+						}
+					}
 				}
 			}
 			.card-body {

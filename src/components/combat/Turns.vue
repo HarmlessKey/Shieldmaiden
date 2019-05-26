@@ -234,6 +234,7 @@
 			margin: 10px;
 			line-height: 23px;
 			height: 23px;
+			vertical-align: 3px;
 		}
 	}
 }

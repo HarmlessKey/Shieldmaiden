@@ -1,128 +1,145 @@
 <template>
 <div>
-	<!-- NOT BROADCASTING -->
-	<div class="track" :style="{ backgroundImage: 'url(\'' + campaignBackground + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
+	<template v-if="!campaign.private">
+		<!-- NOT BROADCASTING -->
+		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
+			<div class="top d-flex justify-content-between">
+				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+				{{ campaign.campaign }}
+				<span>
+					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+				</span>
+			</div>
+			<div class="container-fluid">
+				<div class="container entities">
+					<CampaignOverview :players="campaign.players" />
+				</div>
+			</div>
+		</div>
+
+		<!-- BROADCASTING -->
+		<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+			
+			<!-- FINISHED -->
+			<div v-if="encounter.finished == true">
+				<div class="top d-flex justify-content-between">
+					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					{{ campaignName }}
+					<span>
+						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+					</span>
+				</div>
+				<div class="container-fluid">
+					<div class="container entities">
+						<h2 class="padding">Encounter Finished</h2>
+						<b-row>
+							<b-col v-if="playerSettings.loot == true" md="8">
+								<Finished :encounter="encounter"/>
+							</b-col>
+							<b-col>
+								<div>
+									<Meters :entities="encounter.entities" />
+								</div>
+							</b-col>
+						</b-row>
+					</div>
+				</div>
+			</div>
+
+			<!-- ROLL FOR INITIATIVE -->
+			<div v-else-if="encounter.round == 0">
+				<div class="top d-flex justify-content-between">
+					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					{{ campaignName }}
+					<span>
+						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+					</span>
+				</div>
+				<div class="container-fluid">
+					<div class="container entities">
+						<h2 class="padding">
+							<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+							Roll for initiative!
+						</h2>
+						<CampaignOverview :players="campaignPlayers" />	
+					</div>
+				</div>
+			</div>
+
+			<!-- ACTIVE ENCOUNTER -->
+			<template v-else>
+				<Turns 
+					:encounter="encounter" 
+					:current="_non_hidden_targets[0]"
+					:entities_len="Object.keys(_turnCount).length"
+					:turn="turn"
+					:campPlayers="campaignPlayers"
+				/>
+				<div class="container-fluid">
+					<div class="container entities">
+
+						<!-- LAST ROLL -->
+						<div v-if="encounter.lastRoll" class="lastRoll text-center">
+							<i class="fas fa-dice-d20"></i> 
+
+							<!-- To hit -->
+							<span v-if="encounter.lastRoll.toHitTotal">
+								To hit: 
+								<span v-if="encounter.lastRoll.toHitTotal == 'Natural 1' || encounter.lastRoll.toHitTotal == 'Natural 20'"
+									:class="{ 'red': encounter.lastRoll.toHitTotal == 'Natural 1', 'green': encounter.lastRoll.toHitTotal == 'Natural 20' }">
+									{{ encounter.lastRoll.toHitTotal }}
+								</span>
+								<template v-else>
+									<span v-if="encounter.lastRoll.hitMod">
+										{{ encounter.lastRoll.toHit }} + {{ encounter.lastRoll.hitMod }} =
+									</span>
+									<span class="blue">{{ encounter.lastRoll.toHitTotal }}</span>
+								</template>.
+							</span>
+
+							<!-- Damage -->
+							<span v-if="encounter.lastRoll.damageTotal">
+								Damage: 
+								<span v-if="encounter.lastRoll.damageMod">
+									{{ encounter.lastRoll.damage }} + {{ encounter.lastRoll.damageMod }} =
+								</span>
+								<span class="red">{{ encounter.lastRoll.damageTotal }}</span>.
+							</span>
+						</div>
+
+						<b-row>
+							<b-col>
+								<Initiative 
+									:encounter="encounter" 
+									:targets="_non_hidden_targets"
+									:allEntities="_turnCount"
+									:turn="turn"
+									:campPlayers="campaignPlayers"
+								/>
+							</b-col>
+							<b-col md="3" v-if="playerSettings.meters === undefined">
+								<Meters :entities="encounter.entities" />
+							</b-col>
+						</b-row>
+					</div>
+				</div>
+			</template>
+		</div>
+	</template>
+	<div class="track" v-else>
 		<div class="top d-flex justify-content-between">
 			<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-			{{ campaignName }}
+			Not found
 			<span>
-				<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
 			</span>
 		</div>
 		<div class="container-fluid">
 			<div class="container entities">
-				<CampaignOverview :players="campaignPlayers" />
+				<h2>Perception check failed</h2>
+				<p>It seems we rolled a little low, this campaign can't be found.<br/>
+				 It is possible the campaign is set to private.</p>
 			</div>
 		</div>
-	</div>
-
-	<!-- BROADCASTING -->
-	<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
-		
-		<!-- FINISHED -->
-		<div v-if="encounter.finished == true">
-			<div class="top d-flex justify-content-between">
-				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				{{ campaignName }}
-				<span>
-					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
-				</span>
-			</div>
-			<div class="container-fluid">
-				<div class="container entities">
-					<h2 class="padding">Encounter Finished</h2>
-					<b-row>
-						<b-col v-if="playerSettings.loot == true" md="8">
-							<Finished :encounter="encounter"/>
-						</b-col>
-						<b-col>
-							<div>
-								<Meters :entities="encounter.entities" />
-							</div>
-						</b-col>
-					</b-row>
-				</div>
-			</div>
-		</div>
-
-		<!-- ROLL FOR INITIATIVE -->
-		<div v-else-if="encounter.round == 0">
-			<div class="top d-flex justify-content-between">
-				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				{{ campaignName }}
-				<span>
-					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
-				</span>
-			</div>
-			<div class="container-fluid">
-				<div class="container entities">
-					<h2 class="padding">
-						<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-						Roll for initiative!
-					</h2>
-					<CampaignOverview :players="campaignPlayers" />	
-				</div>
-			</div>
-		</div>
-
-		<!-- ACTIVE ENCOUNTER -->
-		<template v-else>
-			<Turns 
-				:encounter="encounter" 
-				:current="_non_hidden_targets[0]"
-				:entities_len="Object.keys(_turnCount).length"
-				:turn="turn"
-				:campPlayers="campaignPlayers"
-			/>
-			<div class="container-fluid">
-				<div class="container entities">
-
-					<!-- LAST ROLL -->
-					<div v-if="encounter.lastRoll" class="lastRoll text-center">
-						<i class="fas fa-dice-d20"></i> 
-
-						<!-- To hit -->
-						<span v-if="encounter.lastRoll.toHitTotal">
-							To hit: 
-							<span v-if="encounter.lastRoll.toHitTotal == 'Natural 1' || encounter.lastRoll.toHitTotal == 'Natural 20'"
-								:class="{ 'red': encounter.lastRoll.toHitTotal == 'Natural 1', 'green': encounter.lastRoll.toHitTotal == 'Natural 20' }">
-								{{ encounter.lastRoll.toHitTotal }}
-							</span>
-							<template v-else>
-								<span v-if="encounter.lastRoll.hitMod">
-									{{ encounter.lastRoll.toHit }} + {{ encounter.lastRoll.hitMod }} =
-								</span>
-								<span class="blue">{{ encounter.lastRoll.toHitTotal }}</span>
-							</template>.
-						</span>
-
-						<!-- Damage -->
-						<span v-if="encounter.lastRoll.damageTotal">
-							Damage: 
-							<span v-if="encounter.lastRoll.damageMod">
-								{{ encounter.lastRoll.damage }} + {{ encounter.lastRoll.damageMod }} =
-							</span>
-							<span class="red">{{ encounter.lastRoll.damageTotal }}</span>.
-						</span>
-					</div>
-
-					<b-row>
-						<b-col>
-							<Initiative 
-								:encounter="encounter" 
-								:targets="_non_hidden_targets"
-								:allEntities="_turnCount"
-								:turn="turn"
-								:campPlayers="campaignPlayers"
-							/>
-						</b-col>
-						<b-col md="3" v-if="playerSettings.meters === undefined">
-							<Meters :entities="encounter.entities" />
-						</b-col>
-					</b-row>
-				</div>
-			</div>
-		</template>
 	</div>
 </div>
 </template>
@@ -158,9 +175,7 @@
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				encounter: undefined,
-				campaignName: undefined,
-				campaignBackground: undefined,
-				campaignPlayers: undefined,
+				campaign: undefined,
 				counter: 0,
 				tier: undefined,
 			}
@@ -310,12 +325,10 @@
 						});
 					}
 					//Get campaign for player curHP/tempHP/ACBonus
-					let campaign = db.ref(`campaigns/${this.userId}/${campId}`)
+					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
-					campaign.on('value' , (snapshot) => {
-						this.campaignPlayers = snapshot.val().players
-						this.campaignName = snapshot.val().campaign
-						this.campaignBackground = snapshot.val().background
+					fetchCampaign.on('value' , (snapshot) => {				
+						this.campaign = snapshot.val();
 					});
 				});
 			}

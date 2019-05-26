@@ -3,10 +3,10 @@
 		<div v-if="user.uid" class="pr-2">
 			<small v-if="!following['.value']">
 				<i class="fas fa-user-plus mr-1"></i> 
-				<a @click="follow(true)">Follow player</a>
+				<a @click="follow(true)">Follow user</a>
 			</small>
 			<small v-else>
-				<span class="show"><i class="fas fa-user-check green"></i> Following player</span>
+				<span class="show"><i class="fas fa-user-check green"></i> Following user</span>
 				<a class="hover-show" @click="follow(false)"><i class="fas fa-user-minus red"></i> Unfollow</a>
 			</small>
 		</div>

@@ -8,11 +8,11 @@
 	
 		<h2>Campaigns</h2>
 		<!-- CAMPAIGNS -->
-		<b-row v-if="campaigns" class="mt-3">
+		<b-row v-if="Object.keys(campaigns).length > 0" class="mt-3">
 			<b-col lg="4" md="6" v-for="campaign in campaigns" :key="campaign['.key']">
 				<div  class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 					<div class="card-header">
-						<span>
+						<span class="title">
 							<i class="fas fa-dungeon"></i>
 							{{ campaign.campaign }}
 						</span>
@@ -47,10 +47,12 @@
 				</div>
 			</b-col>
 		</b-row>
+		<div v-else>
+			<p>This user has no public campaigns.</p>
+		</div>
 	</div>
 
 	<trackCampaign v-else />
-
 
 	<!-- ADS -->
 	<div class="d-flex justify-content-center">
@@ -96,7 +98,7 @@
 					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true,
 				},
-				campaigns: db.ref(`campaigns/${this.userId}`),
+				campaigns: db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null || false),
 				players: {
 					source: db.ref(`players/${this.userId}`),
 					asObject: true,
@@ -208,8 +210,16 @@
 			background-position: center bottom;
 
 			.card-header {
-				position: relative;
+				// position: relative;
 				background: rgba(38, 38, 38, .9);
+
+				span.title {
+					display: block;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					width: calc(100% - 55px);
+				}
 
 				.live {
 					position: absolute;

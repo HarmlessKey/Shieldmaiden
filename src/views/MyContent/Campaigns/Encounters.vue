@@ -26,7 +26,7 @@
 						<h2 class="d-flex justify-content-between">
 							<span>
 								<span>
-								Your Encounters
+								Encounters
 								<span v-if="encounters">( 
 									<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
 										{{ Object.keys(encounters).length }}

@@ -6,7 +6,7 @@
 				<OverEncumbered/>
 			</div>
 			<div id="my-content" class="container" v-else>
-				<div class="info">
+				<div class="info mb-3">
 					<Crumble />
 
 					<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
@@ -31,7 +31,19 @@
 								placeholder="Background URL"/>
 							<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
-							<button class="btn mt-2" @click="edit()">Save</button>
+							<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+								<span :class="{ 'green': !campaign.private }">
+									<i class="fas fa-eye"></i>
+									Public
+								</span>
+								/
+								<span :class="{ 'red': campaign.private }">
+									<i class="fas fa-eye-slash"></i>
+									Private
+								</span>
+							</div>
+
+							<button class="btn mt-3" @click="edit()">Save</button>
 						</b-col>
 						<b-col sm="3" v-if="campaign.background">
 							<div class="img-container"><img :src="campaign.background" /></div>
@@ -39,6 +51,7 @@
 					</b-row>
 				</div>
 				
+				<h2>Add players</h2>
 				<b-row>
 					<b-col md="6">
 						<b-card header="All Players">
@@ -188,6 +201,9 @@
 			checkPlayer(id) {
 				return (Object.keys(this.campaign.players).indexOf(id))
 			},
+			setPrivate(value) {
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value)
+			}
 		}
 	}
 </script>

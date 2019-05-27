@@ -56,7 +56,7 @@
 						enter-active-class="animated flash" 
 						leave-active-class="animated bounceOutLeft">
 						<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
-							<div class="card">
+							<div class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 								<div class="card-header">
 									<span class="title">
 										<i class="fas fa-dungeon"></i>
@@ -259,6 +259,9 @@
 			text-align: center;
 		}
 		.card {
+			background-size: cover;
+			background-position: center bottom;
+
 			&.warning {
 				.card-header {
 					background-color: #cc3e4a;
@@ -266,6 +269,7 @@
 				}
 			}
 			.card-header {
+				background: rgba(38, 38, 38, .9);
 				position: relative;
 
 				span.title {
@@ -290,6 +294,8 @@
 				}
 			}
 			.card-body {
+				background: rgba(38, 38, 38, .5);
+				
 				.col {
 					text-align: center;
 					font-size: 25px;

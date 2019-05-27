@@ -98,7 +98,7 @@
 					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true,
 				},
-				campaigns: db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null || false),
+				campaigns: db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null),
 				players: {
 					source: db.ref(`players/${this.userId}`),
 					asObject: true,

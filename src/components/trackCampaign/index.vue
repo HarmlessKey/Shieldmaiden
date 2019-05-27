@@ -24,7 +24,7 @@
 			<div v-if="encounter.finished == true">
 				<div class="top d-flex justify-content-between">
 					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-					{{ campaignName }}
+					{{ campaign.name }}
 					<span>
 						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
 					</span>
@@ -50,7 +50,7 @@
 			<div v-else-if="encounter.round == 0">
 				<div class="top d-flex justify-content-between">
 					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-					{{ campaignName }}
+					{{ campaign.name }}
 					<span>
 						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
 					</span>

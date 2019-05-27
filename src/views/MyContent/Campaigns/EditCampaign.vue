@@ -202,7 +202,12 @@
 				return (Object.keys(this.campaign.players).indexOf(id))
 			},
 			setPrivate(value) {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value)
+				//Has to be removed on false
+				if(value === false) {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).remove();
+				} else {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value);
+				}
 			}
 		}
 	}

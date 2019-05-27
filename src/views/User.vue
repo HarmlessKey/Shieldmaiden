@@ -21,7 +21,7 @@
 					<div class="card-body">
 						
 						<!-- SHOW PLAYERS -->
-						<div v-if="campaign.players" class="players">
+						<div v-if="campaign.players && !loadingPlayers" class="players">
 							<div 
 								v-for="(player, key) in campaign.players" 
 								:key="key"
@@ -86,6 +86,7 @@
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				tier: undefined,
+				loadingPlayers: true
 			}
 		},
 		firebase() {
@@ -102,6 +103,7 @@
 				players: {
 					source: db.ref(`players/${this.userId}`),
 					asObject: true,
+					readyCallback: () => this.loadingPlayers = false
 				}
 			}
 		},

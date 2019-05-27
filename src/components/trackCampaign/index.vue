@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="campaign">
 	<template v-if="!campaign.private">
 		<!-- NOT BROADCASTING -->
 		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
@@ -61,7 +61,7 @@
 							<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
 							Roll for initiative!
 						</h2>
-						<CampaignOverview :players="campaignPlayers" />	
+						<CampaignOverview :players="campaign.players" />	
 					</div>
 				</div>
 			</div>
@@ -73,7 +73,7 @@
 					:current="_non_hidden_targets[0]"
 					:entities_len="Object.keys(_turnCount).length"
 					:turn="turn"
-					:campPlayers="campaignPlayers"
+					:campPlayers="campaign.players"
 				/>
 				<div class="container-fluid">
 					<div class="container entities">
@@ -114,7 +114,7 @@
 									:targets="_non_hidden_targets"
 									:allEntities="_turnCount"
 									:turn="turn"
-									:campPlayers="campaignPlayers"
+									:campPlayers="campaign.players"
 								/>
 							</b-col>
 							<b-col md="3" v-if="playerSettings.meters === undefined">

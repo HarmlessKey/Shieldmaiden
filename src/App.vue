@@ -2,7 +2,6 @@
 	<div id="app" class="container-fluid">
 		<div>
 			<nav-main/>
-			<FreeSub />
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
@@ -66,6 +65,9 @@
 	mounted() {
 		this.checkUserStatus();
 	},
+	beforeDestroy() {
+		this.stopBroadcast();
+	},
 	methods: {
 		...mapActions([
 			'fetchCampaigns',
@@ -124,6 +126,9 @@
 							userStatusDatabaseRef.set(isOnlineForDatabase);
 					});
 			});
+		},
+		stopBroadcast() {
+			db.ref(`broadcast/${this.user.uid}/live`).remove()
 		}
 	}
 };

@@ -81,7 +81,7 @@ export default {
 						}
 						if (this.poster)
 							user.poster = true
-						db.ref(`users/${this.user.uid}`).set(user);
+						db.ref(`users/${this.user.uid}`).update(user);
 						this.$snotify.success('Username saved.', 'Critical hit!', {
 							position: "centerTop"
 						});

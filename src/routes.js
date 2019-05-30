@@ -33,6 +33,7 @@ import Patrons from '@/views/Admin/Patrons.vue';
 import Profile from '@/views/profile/Profile.vue';
 import Username from '@/views/profile/SetUsername.vue';
 import DeleteAccount from '@/views/profile/DeleteAccount.vue';
+import Followed from '@/views/Followed.vue';
 import Error404 from '@/views/Error404.vue';
 import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
 import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
@@ -43,7 +44,7 @@ import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
 import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
 import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
 import RunEncounter from '@/views/MyContent/RunEncounter.vue';
-import TrackEncounter from '@/views/TrackEncounter.vue';
+import User from '@/views/User.vue';
 
 // This is where you add all your site routes
 // Each route is set as an obect in the array
@@ -276,6 +277,14 @@ export const routes = [{
 	name: 'Username',
 	component: Username,
 },
+{
+	path: '/followed',
+	name: 'followed',
+	component: Followed,
+	meta: {
+		requiresAuth: true
+	}
+},
 
 //ADMIN
 {
@@ -466,13 +475,26 @@ export const routes = [{
 	},
 },
 {
-	path: '/track-encounter/:userid',
-	name: 'Track Encounter',
-	component: TrackEncounter,
+	path: '/user/:userid',
+	name: 'Track User',
+	component: User,
 	meta: {
-		basePath: '/track-encounter',
-		title: 'Track Encounter',
+		basePath: '/user',
+		title: 'User',
 	}
+},
+{
+	path: '/user/:userid/:campid',
+	name: 'Track Campaign',
+	component: User,
+	meta: {
+		basePath: '/user',
+		title: 'User',
+	}
+},
+{
+	path: '/track-encounter/:userid',
+	redirect: '/user/:userid',
 },
 {
 	path: '/404',

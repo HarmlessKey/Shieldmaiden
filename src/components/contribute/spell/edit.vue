@@ -323,8 +323,193 @@
 					</b-card>
 					<b-card header="Attack Info">
 						<b-row>
+							<!-- ATTACK TYPE -->
+							<b-col md="6">
+								<label for="attack_type">Attack Type</label>
+								<b-form-select v-model="spell.attack_type"
+									id="attack_type"
+									name="attack_type"
+									title="Attack Type"
+									class="form-control mb-2"
+									v-validate="'required'"
+									data-vv-as="Attack Type">
+									<option value="Undefined" disabled>- Attack Type -</option>
+									<option v-for="(val,i) in attack_type"
+										:key="i" :value="val">{{val}}</option>
+								</b-form-select>
+							</b-col>
+							<!-- SAVE -->
+							<b-col md="6">
+								<label for="save">Save</label>
+								<b-form-select v-model="spell.save"
+									id="save"
+									name="save"
+									title="Save"
+									class="form-control mb-2"
+									v-validate="'required'"
+									data-vv-as="Save">
+									<option value="Undefined" disabled>- Save -</option>
+									<option v-for="(val,i) in save"
+										:key="i" :value="val">{{val}}</option>
+								</b-form-select>
+							</b-col>
+						</b-row>
+						<b-row>
+							<b-col md="6">
+								<!-- AOE TYPE -->
+								<label for="aoe_type">AOE Type</label>
+								<b-form-select v-model="spell.aoe_type"
+									id="aoe_type"
+									name="aoe_type"
+									title="AOE Type"
+									class="form-control mb-2"
+									v-validate="'required'"
+									data-vv-as="AOE Type">
+									<option value="Undefined" disabled>- AOE Type -</option>
+									<option v-for="(val,i) in aoe_type"
+										:key="i" :value="val">{{val}}</option>
+								</b-form-select>
+							</b-col>
+							<b-col md="6">
+								<label for="aoe_size">AOE Size ft.</label>
+								<b-form-input v-model="spell.aoe_size"
+									autocomplete="off"
+									id="aoe_size"
+									name="aoe_size"
+									class="form-control mb-2"
+									title="AOE Size"
+									v-validate="'required'"
+									type="number"
+									data-vv-as="AOE Size"
+									></b-form-input>
+							</b-col>
 						</b-row>
 					</b-card>
+					<div class="card">
+						<div class="card-header d-flex justify-content-between">
+							<span>Modifiers</span>
+							<a 
+							class="gray-hover text-capitalize" 
+							v-b-tooltip.hover title="Add Modifiers" 
+							@click="add_modifier()">
+								<i class="fas fa-plus green"></i>
+								<span class="d-none d-md-inline ml-1">Add</span>
+							</a>
+						</div>
+						<div class="card-body">
+							<div v-for="(modifier, index) in spell.modifiers">
+								<b-row class="summary">
+								</b-row>
+								<b-row>
+									<b-col md="4">
+										<!-- MODIFIER TYPE -->
+										<label for="modifier_type">Modifier Type</label>
+										<b-form-select v-model="modifier.type"
+											id="modifier_type"
+											name="modifier_type"
+											title="Modifier Type"
+											class="form-control mb-2"
+											v-validate="'required'"
+											data-vv-as="Modifier Type">
+											<option value="Undefined" disabled>- Modifier Type -</option>
+											<option v-for="(val,i) in modifier_type"
+												:key="i" :value="val">{{val}}</option>
+										</b-form-select>
+									</b-col>
+									<b-col md="4">
+										<!-- MODIFIER SUBTYPE -->
+										<label for="modifier_subtype">Subtype</label>
+										<b-form-select v-model="modifier.subtype"
+											id="modifier_subtype"
+											name="modifier_subtype"
+											title="Modifier Type"
+											class="form-control mb-2"
+											v-validate="'required'"
+											data-vv-as="Modifier Type">
+											<option value="Undefined" disabled>- Subtype -</option>
+											<option v-for="(val,i) in modifier_subtype"
+												:key="i" :value="val">{{val}}</option>
+										</b-form-select>
+									</b-col>
+								</b-row>
+								<b-row>
+									<!-- DICE COUNT -->
+									<b-col md="4">
+										<label for="dice_count">Dice Count</label>
+										<b-form-input v-model="modifier.dice_count"
+											autocomplete="off"
+											id="dice_count"
+											name="dice_count"
+											class="form-control mb-2"
+											title="AOE Size"
+											v-validate="'required'"
+											type="number"
+											data-vv-as="AOE Size"
+											></b-form-input>
+									</b-col>
+									<b-col md="4">
+										<!-- MODIFIER SUBTYPE -->
+										<label for="dice_type">Dice Type</label>
+										<b-form-select v-model="modifier.dice_type"
+											id="dice_type"
+											name="dice_type"
+											title="Modifier Type"
+											class="form-control mb-2"
+											v-validate="'required'"
+											data-vv-as="Modifier Type">
+											<option value="Undefined" disabled>- Subtype -</option>
+											<option v-for="(val,i) in dice_type"
+												:key="i" :value="val">{{val}}</option>
+										</b-form-select>
+									</b-col>
+									<b-col md="4">
+										<!-- MODIFIER FIXED VALUE -->
+										<label for="fixed_val">Fixed Value</label>
+										<b-form-input v-model="modifier.fixed_val"
+											autocomplete="off"
+											id="fixed_val"
+											name="fixed_val"
+											class="form-control mb-2"
+											title="AOE Size"
+											v-validate="'required'"
+											type="number"
+											data-vv-as="AOE Size"
+											></b-form-input>
+									</b-col>
+								</b-row>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header d-flex justify-content-between">
+							<span>Conditions</span>
+							<a 
+							class="gray-hover text-capitalize" 
+							v-b-tooltip.hover title="Add Conditions" 
+							@click="add_condition()">
+								<i class="fas fa-plus green"></i>
+								<span class="d-none d-md-inline ml-1">Add</span>
+							</a>
+						</div>
+						<div class="card-body">
+							
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header d-flex justify-content-between">
+							<span>Reminders</span>
+							<a 
+							class="gray-hover text-capitalize" 
+							v-b-tooltip.hover title="Add Reminders" 
+							@click="add_reminder()">
+								<i class="fas fa-plus green"></i>
+								<span class="d-none d-md-inline ml-1">Add</span>
+							</a>
+						</div>
+						<div class="card-body">
+							
+						</div>
+					</div>
 				</b-col>
 			</b-row>
 		</template>
@@ -380,6 +565,13 @@
 				classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 
 					"Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"],
 				classes_selected: null,
+				attack_type: ["Melee Weapon", "Ranged Weapon", "Melee Spell", "Ranged Spell"],
+				save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
+				aoe_type: ["None", "Cone", "Cube", "Cylinder", "Line", "Sphere", "Square", "Square Feet"],
+				modifier_type: ["Damage", "Healing"],
+				modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
+					"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
+				dice_type: ["D4", "D6", "D8", "D10", "D12", "D20"],
 			}
 		},
 		computed: {
@@ -422,6 +614,15 @@
 				}
 				this.spell.ritual = !this.spell.ritual
 			},
+			add_modifier() {
+				if(this.spell.modifiers == undefined) {
+					this.spell.modifiers = [];
+				}
+				this.spell.modifiers.push({
+					name: 'New Modifier',
+				});
+				this.$forceUpdate(); //IMPORTANT
+			}
 		}
 	}
 </script>

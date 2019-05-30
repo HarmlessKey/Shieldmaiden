@@ -463,6 +463,10 @@ export const routes = [{
 	}
 },
 {
+	path: '/track-encounter/:userid',
+	redirect: '/user/:userid',
+},
+{
 	path: '/404',
 	name: '404',
 	component: Error404

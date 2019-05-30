@@ -399,6 +399,15 @@
 						<div class="card-body">
 							<div v-for="(modifier, index) in spell.modifiers">
 								<b-row class="summary">
+									<b-col md="4">
+										<span>{{modifier.type}}</span>
+									</b-col>
+									<b-col md="4">
+										<span>{{modifier.dice_count}}{{modifier.dice_type}}</span>
+									</b-col>
+									<b-col md="4">
+										<!-- <span>{{modifier.name}}</span> -->
+									</b-col>
 								</b-row>
 								<b-row>
 									<b-col md="4">
@@ -430,6 +439,15 @@
 											<option v-for="(val,i) in modifier_subtype"
 												:key="i" :value="val">{{val}}</option>
 										</b-form-select>
+									</b-col>
+									<b-col md="4">
+										<label for="primary">Primary Stat</label>
+										<div class="primary d-flex justify-content-between" name="primary">
+											<a class="component_box" @click="setPrimary(modifier)"
+												 :class="{'selected': modifier.primary === true}">
+												<span>P</span>
+											</a>
+										</div>
 									</b-col>
 								</b-row>
 								<b-row>
@@ -470,10 +488,10 @@
 											id="fixed_val"
 											name="fixed_val"
 											class="form-control mb-2"
-											title="AOE Size"
+											title="Fixed Value"
 											v-validate="'required'"
 											type="number"
-											data-vv-as="AOE Size"
+											data-vv-as="Fixed Value"
 											></b-form-input>
 									</b-col>
 								</b-row>
@@ -614,6 +632,13 @@
 				}
 				this.spell.ritual = !this.spell.ritual
 			},
+			setPrimary(modifier) {
+				if (modifier.primary == undefined) {
+					modifier.primary = false
+				}
+				modifier.primary = !modifier.primary
+				this.$forceUpdate(); //IMPORTANT
+			},
 			add_modifier() {
 				if(this.spell.modifiers == undefined) {
 					this.spell.modifiers = [];
@@ -622,7 +647,7 @@
 					name: 'New Modifier',
 				});
 				this.$forceUpdate(); //IMPORTANT
-			}
+			},
 		}
 	}
 </script>

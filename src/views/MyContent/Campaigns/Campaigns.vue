@@ -7,8 +7,6 @@
 				
 				<OverEncumbered v-if="overencumbered" />
 
-				<PlayerLink />
-
 				<template v-if="players && tier">
 
 					<h2 class="mt-3 d-flex justify-content-between">
@@ -58,15 +56,27 @@
 						enter-active-class="animated flash" 
 						leave-active-class="animated bounceOutLeft">
 						<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
-							<div class="card">
-								<div class="card-header d-flex justify-content-between">
-									<span>
+							<div class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+								<div class="card-header">
+									<span class="title">
 										<i class="fas fa-dungeon"></i>
 										{{ campaign.campaign }}
 									</span>
 
-									<span>
-										<router-link class="mx-2 text-capitalize gray-hover" 
+									<span class="actions">
+										<i 
+											v-if="!campaign.private" 
+											class="fas fa-eye green"
+											v-b-tooltip.hover
+											title="Public campaign"
+										></i>
+										<i 
+											v-else class="fas fa-eye-slash red"
+											v-b-tooltip.hover
+											title="Private campaign"
+										></i>
+
+										<router-link class="text-capitalize gray-hover" 
 											:to="'/campaigns/' + campaign.key" 
 											v-b-tooltip.hover title="Edit">
 												<i class="fas fa-pencil"></i>
@@ -118,21 +128,6 @@
 				</b-card>
 				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 
-				<h2>Following</h2>
-				<template v-if="userInfo && users">
-					<ul v-if="userInfo.follow" class="entities">
-						<li v-for="(following, key) in userInfo.follow" :key="key" class="d-flex justify-content-between">
-							<router-link :to="'/track-encounter/' + key" v-if="users[key]">
-								{{ users[key].username }}
-							</router-link>
-							<template v-if="track[key]">
-								<i v-show="track[key].broadcast" v-b-tooltip.hover title="Broadcasting" class="fas fa-play green"></i>
-								<i v-show="!track[key].broadcast" v-b-tooltip.hover title="Not Broadcasting" class="fas fa-stop red"></i>
-							</template>
-						</li>
-					</ul>
-					<p v-else>You are currently not following other users.</p>
-				</template>
 			</div>
 		</div>
 	</div>
@@ -164,18 +159,6 @@
 			return {
 				newCampaign: '',
 				add: false,
-			}
-		},
-		firebase() {
-			return {
-				users: {
-					source: db.ref(`users`),
-					asObject: true
-				},
-				track: {
-					source: db.ref(`track`),
-					asObject: true
-				}
 			}
 		},
 		mounted() {
@@ -276,6 +259,9 @@
 			text-align: center;
 		}
 		.card {
+			background-size: cover;
+			background-position: center bottom;
+
 			&.warning {
 				.card-header {
 					background-color: #cc3e4a;
@@ -283,16 +269,33 @@
 				}
 			}
 			.card-header {
-				a:hover {
-					color: #b2b2b2 !important;
-				}
-				span {
+				background: rgba(38, 38, 38, .9);
+				position: relative;
+
+				span.title {
+					display: block;
 					white-space: nowrap;
 					overflow: hidden;
 					text-overflow: ellipsis;
+					width: calc(100% - 60px);
+				}
+				.actions {
+					position: absolute;
+					right: 12px;
+					top: 12px;
+
+					a {
+						margin-left: 10px;
+
+						&:hover {
+							color: #b2b2b2 !important;
+						}
+					}
 				}
 			}
 			.card-body {
+				background: rgba(38, 38, 38, .5);
+				
 				.col {
 					text-align: center;
 					font-size: 25px;
@@ -310,13 +313,6 @@
 					svg {
 						font-size: 50px;
 					}
-				}
-			}
-		}
-		ul.entities {
-			li {
-				i {
-					margin-top: 5px;
 				}
 			}
 		}

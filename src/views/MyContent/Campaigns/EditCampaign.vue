@@ -6,28 +6,52 @@
 				<OverEncumbered/>
 			</div>
 			<div id="my-content" class="container" v-else>
-				<div class="info">
+				<div class="info mb-3">
 					<Crumble />
 
 					<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
 
 					<h2 class="mt-3">Edit your campaign</h2>
-					<div class="input-group mb-4" v-if="campaign">
-						<input class="form-control" 
-							v-validate="'required'" 
-							autocomplete="off"
-							type="text" 
-							name="newCampaign" 
-							v-model="campaign.campaign" 
-							data-vv-as="Campaign Name"
-							@change="changeName()"/>
-						<div class="input-group-append">
-							<button class="btn">Change Name</button>
-						</div>
-					</div>
-					<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+					<b-row class="mt-3">
+						<b-col class="mb-2">
+							<input class="form-control" 
+								autocomplete="off"
+								v-validate="'required'" 
+								data-vv-as="Encounter Name" 
+								type="text" name="name" 
+								v-model="campaign.campaign"/>
+							<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+
+							<input class="form-control mt-2"
+								autocomplete="off" 
+								v-validate="'url'" type="text" 
+								name="backbround" 
+								data-vv-as="Background"
+								v-model="campaign.background" 
+								placeholder="Background URL"/>
+							<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+
+							<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+								<span :class="{ 'green': !campaign.private }">
+									<i class="fas fa-eye"></i>
+									Public
+								</span>
+								/
+								<span :class="{ 'red': campaign.private }">
+									<i class="fas fa-eye-slash"></i>
+									Private
+								</span>
+							</div>
+
+							<button class="btn mt-3" @click="edit()">Save</button>
+						</b-col>
+						<b-col sm="3" v-if="campaign.background">
+							<div class="img-container"><img :src="campaign.background" /></div>
+						</b-col>
+					</b-row>
 				</div>
 				
+				<h2>Add players</h2>
 				<b-row>
 					<b-col md="6">
 						<b-card header="All Players">
@@ -147,11 +171,11 @@
 			...mapActions([
 				'fetchCampaign',
 			]),
-			changeName() {
+			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/campaign`).set(
-							this.campaign.campaign
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(
+							this.campaign
 						);
 						this.$snotify.success('Name changed.', 'Critical hit!', {
 							position: "rightTop"
@@ -177,15 +201,25 @@
 			checkPlayer(id) {
 				return (Object.keys(this.campaign.players).indexOf(id))
 			},
+			setPrivate(value) {
+				//Has to be removed on false
+				if(value === false) {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).remove();
+				} else {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value);
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.container {
-	
-	}
-	.info {
+	.img-container {
+		width: 100%;
+
+		img {
+			width: 100%;
+		}
 	}
 	.nav { 
 		background:#191919;

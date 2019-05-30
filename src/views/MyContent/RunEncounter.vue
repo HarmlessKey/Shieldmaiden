@@ -154,7 +154,13 @@
 		},
 		beforeRouteLeave (to, from, next) {
 			this.reset_store()
+			this.removeTrack()
 			next()
+		},
+		beforeRouteUpdate(to, from, next) {
+			this.reset_store()
+			this.removeTrack()
+			next();
 		},
 		methods: {
 			...mapActions([
@@ -164,9 +170,15 @@
 				'reset_store',
 			]),
 			track() {
-				db.ref('track/' + this.userId).update({
+				db.ref('broadcast/' + this.userId).update({
 					campaign: this.$route.params.campid,
 					encounter: this.$route.params.encid,
+				});
+			},
+			removeTrack() {
+				db.ref('broadcast/' + this.userId).update({
+					campaign: false,
+					encounter: false,
 				});
 			},
 			setAlive(n) {
@@ -188,7 +200,7 @@
 		},
 		beforeMount() {
 			this.track()
-		}
+		},
 	}
 </script>
 

@@ -81,7 +81,7 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
-	import Meters from '@/components/track/Meters.vue'
+	import Meters from '@/components/trackCampaign/Meters.vue'
 
 	export default {
 		name: 'Players',

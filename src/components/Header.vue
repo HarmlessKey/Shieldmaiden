@@ -20,6 +20,10 @@
 						v-b-tooltip.hover 
 						title="Compendium"  
 						@click="setSlide({show: true, type: 'slides/Compendium'})"><i class="fas fa-book-spells"></i></a>
+					<a class="icon" 
+						v-b-tooltip.hover 
+						title="Player Link"  
+						@click="setSlide({show: true, type: 'PlayerLink'})"><i class="fas fa-link"></i></a>
 					<a class="icon roll" 
 						v-b-tooltip.hover 
 						title="Dice Roller"  
@@ -35,6 +39,7 @@
 						<router-link v-if="userInfo && userInfo.admin" to="/admin" class="dropdown-item"><i class="fas fa-crown"></i> Admin</router-link>
 						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
 						<router-link to="/campaigns" class="dropdown-item"><i class="fas fa-treasure-chest"></i> My Content</router-link>
+						<router-link  v-if="userInfo && userInfo.follow" to="/followed" class="dropdown-item"><i class="fas fa-user-check"></i> Followed Users</router-link>
 						<router-link to="/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</router-link>
 						<div class="dropdown-divider"></div>
 						<button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>

@@ -81,7 +81,7 @@
 		data(){
 			return {
 				userId: this.$store.getters.getUser.uid,
-				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
+				copy: window.location.host + '/user/' + this.$store.getters.getUser.uid,
 				general: {
 					'meters': { 
 						entity: 'player',

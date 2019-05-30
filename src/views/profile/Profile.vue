@@ -16,6 +16,13 @@
 		</b-card>
 
 		<div class="card">
+			<div class="card-header"><i class="fas fa-link"></i> Player Link</div>
+			<div class="card-body">
+				<PlayerLink />
+			</div>
+		</div>
+
+		<div class="card">
 			<div class="card-header"><i class="fab fa-patreon patreon-red"></i> Patreon</div>
 			<div class="card-body">
 				<template v-if="tier && tier.name != 'Free'">
@@ -114,6 +121,7 @@
 
 <script>
 	import Tiers from '@/components/Tiers.vue'
+	import PlayerLink from '@/components/PlayerLink.vue'
 	import { db, auth } from '@/firebase'	
 	import { mapGetters } from 'vuex'
 
@@ -121,6 +129,7 @@ export default {
 		name: 'Profile',
 		components: {
 			Tiers,
+			PlayerLink,
 		},
 		metaInfo: {
 			title: 'Profile'

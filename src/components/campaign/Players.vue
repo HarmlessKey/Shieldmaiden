@@ -15,7 +15,7 @@
 					<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
 				</th>
 				<th class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-					<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i></i>
+					<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
 				</th>
 				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
 				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
@@ -132,7 +132,8 @@
 			reset() {
 				for(var key in this.campaign.players) {
 					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp
+						curHp: this.players[key].maxHp,
+						tempHp: 0
 					})
 				}
 			}

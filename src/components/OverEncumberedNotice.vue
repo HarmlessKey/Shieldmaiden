@@ -1,5 +1,5 @@
 <template>
-	<div class="red" v-else>
+	<div class="red">
 		It seems you don't have any slots left to add more content
 		<br>
 		<router-link to="/manage-content">Manage your content</router-link>
@@ -10,13 +10,7 @@
 
 <script>
 	export default {
-		
-		computed: {
-			
-		},
-		methods: {
-			
-		}
+
 	};
 </script>
 

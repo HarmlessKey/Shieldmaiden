@@ -1,5 +1,5 @@
 <template>
-	<div class="">
+	<div>
 		<h2 class='orange'><i class="fas fa-sad-tear"></i> It seems that you are over encumbered!</h2>
 		<p>If you want to add more content consider one of these options</p>
 		<b-card-group deck>

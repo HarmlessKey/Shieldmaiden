@@ -26,14 +26,12 @@
 	import { auth, firebase, db } from './firebase'
 	import Header from './components/Header.vue';
 	import Slide from './components/Slide.vue';
-	import FreeSub from './components/FreeSub.vue';
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 	components: {
 		navMain: Header,
-		Slide,
-		FreeSub,
+		Slide
 	},
 	metaInfo: {
 		meta: [

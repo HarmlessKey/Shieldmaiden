@@ -137,7 +137,7 @@
 			<div class="container entities">
 				<h2>Perception check failed</h2>
 				<p>It seems we rolled a little low, this campaign can't be found.<br/>
-				 It is possible the campaign is set to private.</p>
+					It is possible the campaign is set to private.</p>
 			</div>
 		</div>
 	</div>
@@ -288,24 +288,12 @@
 				let number = Math.ceil(Math.random() * 6)
 
 				switch(number) {
-					case 1:
-						return 'blue';
-					break;
-					case 2:
-						return 'cyan';
-					break;
-					case 3:
-						return 'green';
-					break;
-					case 4:
-						return 'orange';
-					break;
-					case 5:
-						return 'red';
-					break;
-					case 6:
-						return 'yellow';
-					break;
+					case 1: return 'blue';
+					case 2: return 'cyan';
+					case 3: return 'green';
+					case 4: return 'orange';
+					case 5: return 'red';
+					case 6: return 'yellow';
 				}
 			}
 		},

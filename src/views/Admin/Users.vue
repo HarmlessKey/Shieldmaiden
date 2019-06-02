@@ -38,7 +38,10 @@
 					</span>
 
 					<!-- USERNAME -->
-					<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">{{ data.value }}</router-link>
+					<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">
+						<span v-if="data.value">{{ data.value }}</span>
+						<span v-else>UNDEFINED</span>
+					</router-link>
 					
 					<!-- SUBSCRIPTION -->
 					<span slot="voucher" slot-scope="data" v-if="data.value">
@@ -51,7 +54,6 @@
 					</div>
 				</b-table>
 			</div>
-			<div v-if="isBusy" class="loader"> <span>Loading users....</span></div>
 		
 			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
 		</template>
@@ -140,11 +142,13 @@
 				this.searching = true
 				for (var i in this.users) {
 					var u = this.users[i]
-					if ((u.username.toLowerCase().includes(this.search.toLowerCase()) || 
-						u.email.toLowerCase().includes(this.search.toLowerCase())) 
-						&& this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(u)
+					if(u.username) { 
+						if ((u.username.toLowerCase().includes(this.search.toLowerCase()) || 
+							u.email.toLowerCase().includes(this.search.toLowerCase())) 
+							&& this.search != '') {
+							this.noResult = ''
+							this.searchResults.push(u)
+						}
 					}
 				}
 				if(this.searchResults == '' && this.search != '') {
@@ -155,14 +159,13 @@
 					this.searching = false
 				}
 			},
-			patreon(email) {
-				var patron = db.ref(`patrons`).orderByChild("email").equalTo(email);
-				var isPatron = patron.once('value').then(function(snapshot) {
-					// return snapshot.val()
-					console.log(snapshot.val())
-				});
-				// return patron
-			},
+			// patreon(email) {
+			// 	var patron = db.ref(`patrons`).orderByChild("email").equalTo(email);
+			// 	var isPatron = patron.once('value').then(function(snapshot) {
+			// 		// return snapshot.val()
+			// 	});
+			// 	return patron
+			// },
 		}
 	}
 </script>

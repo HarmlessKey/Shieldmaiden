@@ -116,7 +116,7 @@
 					var action = 'remove';
 				}
 				else {
-					var action = 'add';
+					action = 'add';
 				}
 				this.set_condition({
 					action: action, 

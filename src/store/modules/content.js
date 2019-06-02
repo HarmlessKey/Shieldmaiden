@@ -156,7 +156,6 @@ export const content_module = {
 				state.slide = false
 				setTimeout(() => state.slide = payload, 100);
 			} else if(!isEqual(state.slide.data, payload.data) && payload.data != undefined) {
-				console.log('test')
 				state.slide = false
 				setTimeout(() => state.slide = payload, 100);
 			} else {
@@ -188,7 +187,6 @@ export const content_module = {
 				state.allEncounters = payload
 		},
 		CHECK_ENCUMBRANCE(state) {
-			let campaign_keys = Object.keys(state.allEncounters)
 			let count = {}
 			count.campaigns = Object.keys(state.campaigns).length
 			count.players = Object.keys(state.players).length
@@ -260,10 +258,11 @@ export const content_module = {
 					patrons.on('value' , patron_snapshot => {
 						// If user patron check if patron tier is higher then voucher/basic tier
 						if(patron_snapshot.val()) {
-							let key = Object.keys(patron_snapshot.val())[0]
+							let key = Object.keys(patron_snapshot.val())[0];
+							let patron_status = patron_snapshot.val()[key].status
 							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
 							patron_tier.on('value' , tier_snapshot => {
-								if (tier_snapshot.val().order >= voucher_order) {
+								if (tier_snapshot.val().order >= voucher_order && patron_status == 'active_patron') {
 									commit('SET_TIER', tier_snapshot.val())
 								} else {
 									commit('SET_TIER', voucher_snap.val())
@@ -349,12 +348,10 @@ export const content_module = {
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
-		remove_voucher( { commit, state }) {
-			let user = users_ref.child(state.user.uid)
+		remove_voucher( { state }) {
 			db.ref(`users/${state.user.uid}/voucher`).remove()
-			console.log("Removed voucher")
 		},
-		setPoster({ commit, state }) {
+		setPoster({ state }) {
 			db.ref('posters').once('value', snapshot => {
 				let count = snapshot.val()
 				let new_count = count + 1

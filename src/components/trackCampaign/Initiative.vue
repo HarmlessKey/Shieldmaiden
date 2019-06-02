@@ -164,7 +164,7 @@
 			})
 		},
 		methods: {
-			getWindowWidth(event) {
+			getWindowWidth() {
 				//Return the window width
 				//used in the html to bind a class for small tables
         this.windowWidth = document.documentElement.clientWidth;

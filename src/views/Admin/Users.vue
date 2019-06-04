@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid">
+	<div class="container-fluid" v-if="users">
 		<template v-if="!$route.params.id">
 		<Crumble />
 		<h1 class="mb-3"><i class="fas fa-users"></i> Users ( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )</h1>
@@ -20,7 +20,6 @@
 
 			<p v-if="noResult" class="red">{{ noResult }}</p>
 			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} users found</p>
-
 			<div class="table-responsive">
 				<b-table 
 					:busy="isBusy"
@@ -30,9 +29,9 @@
 					:current-page="current"
 				>	
 					<!-- STATUS -->
-					<span slot=".key" slot-scope="data">
-						<template v-if="status[data.value]">
-							<i :class="{ 'green': status[data.value].state == 'online', 'gray-hover': status[data.value].state == 'offline' }" class="fas fa-circle"></i>
+					<span slot="status" slot-scope="data">
+						<template v-if="data.value === 'online'">
+							<i :class="{ 'green': data.value == 'online', 'gray-hover': data.value == 'offline' }" class="fas fa-circle"></i>
 						</template>
 						<span v-else><i class="fas fa-circle gray-hover"></i></span>
 					</span>
@@ -43,9 +42,27 @@
 						<span v-else>UNDEFINED</span>
 					</router-link>
 					
-					<!-- SUBSCRIPTION -->
+					<!-- VOUCHER -->
 					<span slot="voucher" slot-scope="data" v-if="data.value">
-						<template v-if="tiers[data.value.id]">{{ tiers[data.value.id].name }}</template>
+						<span 
+							v-if="tiers[data.value.id]"
+							:class="{
+								'blue': tiers[data.value.id].name == 'Folk Hero',
+								'purple': tiers[data.value.id].name == 'Noble',
+								'orange': tiers[data.value.id].name == 'Deity'
+						}">
+							{{ tiers[data.value.id].name }}</span>
+					</span>
+
+					<!-- PATREON -->
+					<span slot="patreon" slot-scope="data" v-if="data.value">
+						<span 
+							:class="{
+								'blue': data.value == 'Folk Hero',
+								'purple': data.value == 'Noble',
+								'orange': data.value == 'Deity'
+						}">
+							{{ data.value }}</span>
 					</span>
 
 					<!-- LOADER -->
@@ -83,10 +100,12 @@
 		data() {
 			return {
 				id: this.$route.params.id,
+				users: undefined,
 				current: 1,
 				fields: {
-          '.key': {
+          status: {
 						label: 'State',
+						sortable: true
 					},
           username: {
             label: 'Username',
@@ -97,7 +116,11 @@
             sortable: true
 					},
 					voucher: {
-						label: 'Subscription',
+						label: 'Voucher',
+						sortable: true
+					},
+					patreon: {
+						label: 'Patreon',
 						sortable: true
 					}
 				},
@@ -110,17 +133,8 @@
 		},
 		firebase() {
 			return {
-				users: {
-					source: db.ref('users').orderByChild('username'),
-					readyCallback: () => this.isBusy = false
-				},
-				status: {
-					source: db.ref('status'),
-					asObject: true,
-				},
 				online: {
 					source: db.ref('status').orderByChild('state').equalTo('online'),
-					readyCallback: () => this.isBusy = false
 				},
 				campaigns: db.ref('users'),
 				tiers: {
@@ -129,8 +143,37 @@
 				},
 			}
 		},
-		beforeMount() {
-			this.searchResults = this.users
+		mounted() {
+			var users = db.ref('users').orderByChild('username')
+				users.on('value', async (snapshot) => {
+					let users = snapshot.val()
+
+					for(let key in users) {
+						users[key]['.key'] = key;
+
+						//Get Patreon
+						let getPatron = db.ref(`patrons`).orderByChild("email").equalTo(users[key].email);
+						await getPatron.on('value', (snapshot) => {
+							if(snapshot.val()) {
+								for(let patreonId in snapshot.val())
+								users[key].patreon = snapshot.val()[patreonId].tier_title;
+							}
+						});
+
+						// Get Status
+						let getStatus = db.ref(`status/${key}`);
+						await getStatus.on('value', (snapshot) => {
+							if(snapshot.val()) {
+								users[key].status = snapshot.val().state;
+							}
+						});
+					}
+					this.users = users;
+					this.searchResults = Object.values(users);
+					this.isBusy = false
+				});
+
+		
 		},
 		methods: {
 			...mapActions([
@@ -155,17 +198,10 @@
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 				if(this.search == '') {
-					this.searchResults = this.users
+					this.searchResults = Object.values(this.users);
 					this.searching = false
 				}
-			},
-			// patreon(email) {
-			// 	var patron = db.ref(`patrons`).orderByChild("email").equalTo(email);
-			// 	var isPatron = patron.once('value').then(function(snapshot) {
-			// 		// return snapshot.val()
-			// 	});
-			// 	return patron
-			// },
+			}
 		}
 	}
 </script>

@@ -6,7 +6,7 @@
 			<span>
 				<i class="fab fa-patreon"></i> Patrons ( {{ Object.keys(patrons).length }} )
 			</span>
-			<router-link to="/admin/patrons/new" class="btn" ><i class="fas fa-plus"></i> New Patron</router-link>
+			<router-link to="/admin/patrons/new" class="btn" ><i class="fas fa-plus"></i> New</router-link>
 		</h1>
 
 			<b-row>
@@ -40,6 +40,16 @@
 
 					<!-- EMAIL -->
 					<router-link :to="'/admin/patrons/' + data.item['.key']" slot="email" slot-scope="data">{{ data.value }}</router-link>
+
+					<!-- STATUS -->
+					<span slot="tier_title" slot-scope="data">
+						<span 
+							:class="{
+								'blue': data.value == 'Folk Hero',
+								'purple': data.value == 'Noble',
+								'orange': data.value == 'Deity'
+							}">{{ data.value }}</span>
+					</span>
 
 					<!-- STATUS -->
 					<span slot="status" slot-scope="data">

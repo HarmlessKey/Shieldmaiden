@@ -2,7 +2,12 @@
 	<div class="container-fluid">
 		<template v-if="!$route.params.id">
 		<Crumble />
-		<h1 class="mb-3"><i class="fab fa-patreon"></i> Patrons ( {{ Object.keys(patrons).length }} )</h1>
+		<h1 class="mb-3 d-flex justify-content-between">
+			<span>
+				<i class="fab fa-patreon"></i> Patrons ( {{ Object.keys(patrons).length }} )
+			</span>
+			<router-link to="/admin/patrons/new" class="btn" ><i class="fas fa-plus"></i> New</router-link>
+		</h1>
 
 			<b-row>
 				<b-col sm="8">
@@ -36,13 +41,28 @@
 					<!-- EMAIL -->
 					<router-link :to="'/admin/patrons/' + data.item['.key']" slot="email" slot-scope="data">{{ data.value }}</router-link>
 
+					<!-- STATUS -->
+					<span slot="tier_title" slot-scope="data">
+						<span 
+							:class="{
+								'blue': data.value == 'Folk Hero',
+								'purple': data.value == 'Noble',
+								'orange': data.value == 'Deity'
+							}">{{ data.value }}</span>
+					</span>
+
+					<!-- STATUS -->
+					<span slot="status" slot-scope="data">
+						<span v-if="data.value == 'active_patron'" class="green">Active</span>
+						<span v-if="data.value == 'former_patron'" class="red">Former</span>
+					</span>
+
 					<!-- LOADER -->
 					<div slot="table-busy" class="loader">
 						<span>Loading patrons....</span>
 					</div>
 				</b-table>
 			</div>
-			<div v-if="isBusy" class="loader"> <span>Loading patrons....</span></div>
 		
 			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
 		</template>

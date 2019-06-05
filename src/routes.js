@@ -28,7 +28,8 @@ import ManageContent from '@/views/ManageContent.vue';
 
 import Admin from '@/views/Admin/Overview.vue';
 import Users from '@/views/Admin/Users.vue';
-import Patrons from '@/views/Admin/Patrons.vue';
+import Patrons from '@/views/Admin/Patrons';
+import NewPatron from '@/views/Admin/Patrons/New.vue';
 
 import Profile from '@/views/profile/Profile.vue';
 import Username from '@/views/profile/SetUsername.vue';
@@ -326,6 +327,16 @@ export const routes = [{
 	path: '/admin/patrons',
 	name: 'Patrons',
 	component: Patrons,
+	meta: {
+		baseName: 'Patrons',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/patrons/new',
+	name: 'New patron',
+	component: NewPatron,
 	meta: {
 		baseName: 'Patrons',
 		requiresAuth: true,

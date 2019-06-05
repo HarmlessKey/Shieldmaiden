@@ -76,7 +76,9 @@
 		},
 		mounted() {
 			this.$nextTick(function() {
+				// eslint-disable-next-line
 				if ($('ins').length > 0) {
+					// eslint-disable-next-line
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}
 			})

@@ -18,7 +18,7 @@
 						<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
 					</th>
 					<th class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-						<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i></i>
+						<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
 					</th>
 					<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
 				</thead>
@@ -79,7 +79,6 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 	import Meters from '@/components/trackCampaign/Meters.vue'
 

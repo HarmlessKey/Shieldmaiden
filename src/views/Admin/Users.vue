@@ -60,7 +60,8 @@
 							:class="{
 								'blue': data.value == 'Folk Hero',
 								'purple': data.value == 'Noble',
-								'orange': data.value == 'Deity'
+								'orange': data.value == 'Deity',
+								'red' : data.value == 'Former'
 						}">
 							{{ data.value }}</span>
 					</span>
@@ -155,8 +156,10 @@
 						let getPatron = db.ref(`patrons`).orderByChild("email").equalTo(users[key].email);
 						await getPatron.on('value', (snapshot) => {
 							if(snapshot.val()) {
-								for(let patreonId in snapshot.val())
-								users[key].patreon = snapshot.val()[patreonId].tier_title;
+								for(let patreonId in snapshot.val()) {
+									let patron = snapshot.val()[patreonId]
+									users[key].patreon = patron.status == "active_patron" ? patron.tier_title : "Former"
+								}
 							}
 						});
 

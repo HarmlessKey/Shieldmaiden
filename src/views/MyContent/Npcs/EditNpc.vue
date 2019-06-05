@@ -507,16 +507,6 @@
 							<hr>
 						</div>
 					</div>
-					<div v-if="npc[action.type]" class="card-header mb-3 d-flex justify-content-between">
-						{{ action.name }}
-						<a 
-						class="gray-hover text-capitalize" 
-						v-b-tooltip.hover title="Add Skill" 
-						@click="add(action.type)">
-							<i class="fas fa-plus green"></i>
-							<span class="d-none d-md-inline ml-1">Add</span>
-						</a>
-					</div>
 				</div>
 			</template>
 

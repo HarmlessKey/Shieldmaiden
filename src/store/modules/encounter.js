@@ -165,43 +165,56 @@ const mutations = {
 				}
 
 				if(!entity.avatar) {
-					entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
+					//if an entity is quicly added during an ecnounter
+					//without copying an existing
+					//it won't have data_npc
+					if(data_npc) {
+						entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
+					} else {
+						entity.img = require('@/assets/_img/styles/monster.png');
+					}
 				}
 				else {
 					entity.img = entity.avatar;
 				}
-				entity.size = data_npc.size
-				entity.type = data_npc.type
-				entity.subtype = data_npc.subtype
-				entity.alignment = data_npc.alignment
-				entity.challenge_rating = data_npc.challenge_rating
-				entity.hit_dice = data_npc.hit_dice
-				entity.speed = data_npc.speed
-				entity.senses = data_npc.senses
-				entity.languages = data_npc.languages
+				
+				//if an entity is quicly added during an ecnounter
+				//without copying an existing
+				//it won't have data_npc
+				if(data_npc) {
+					entity.size = data_npc.size
+					entity.type = data_npc.type
+					entity.subtype = data_npc.subtype
+					entity.alignment = data_npc.alignment
+					entity.challenge_rating = data_npc.challenge_rating
+					entity.hit_dice = data_npc.hit_dice
+					entity.speed = data_npc.speed
+					entity.senses = data_npc.senses
+					entity.languages = data_npc.languages
 
-				entity.strength = data_npc.strength
-				entity.dexterity = data_npc.dexterity
-				entity.constitution = data_npc.constitution
-				entity.intelligence = data_npc.intelligence
-				entity.wisdom = data_npc.wisdom
-				entity.charisma = data_npc.charisma
+					entity.strength = data_npc.strength
+					entity.dexterity = data_npc.dexterity
+					entity.constitution = data_npc.constitution
+					entity.intelligence = data_npc.intelligence
+					entity.wisdom = data_npc.wisdom
+					entity.charisma = data_npc.charisma
 
-				entity.strength_save = data_npc.strength_save
-				entity.dexterity_save = data_npc.dexterity_save
-				entity.constitution_save = data_npc.constitution_save
-				entity.intelligence_save = data_npc.intelligence_save
-				entity.wisdom_save = data_npc.wisdom_save
-				entity.charisma_save = data_npc.charisma_save
+					entity.strength_save = data_npc.strength_save
+					entity.dexterity_save = data_npc.dexterity_save
+					entity.constitution_save = data_npc.constitution_save
+					entity.intelligence_save = data_npc.intelligence_save
+					entity.wisdom_save = data_npc.wisdom_save
+					entity.charisma_save = data_npc.charisma_save
 
-				entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
-				entity.damage_resistances = data_npc.damage_resistances
-				entity.damage_immunities = data_npc.damage_immunities
-				entity.condition_immunities = data_npc.condition_immunities
+					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
+					entity.damage_resistances = data_npc.damage_resistances
+					entity.damage_immunities = data_npc.damage_immunities
+					entity.condition_immunities = data_npc.condition_immunities
 
-				entity.special_abilities = data_npc.special_abilities
-				entity.actions = data_npc.actions
-				entity.legendary_actions = data_npc.legendary_actions
+					entity.special_abilities = data_npc.special_abilities
+					entity.actions = data_npc.actions
+					entity.legendary_actions = data_npc.legendary_actions
+				}
 				break
 			}
 		}

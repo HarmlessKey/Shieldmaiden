@@ -192,13 +192,13 @@
 						this.entity.entityType = 'npc';
 						this.entity.curHp = this.entity.maxHp;
 						this.entity.active = false;
+						this.entity.npc = (this.entity.npc) ? this.entity.npc : 'custom';
 
 						db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(this.entity)
 							.then(res => {
 								//Returns the key of the added entry
 								this.add_entity(res.getKey())
-							}
-							);
+							});
 					} else {
 						//console.log('Not valid');
 					}

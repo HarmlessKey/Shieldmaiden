@@ -215,7 +215,7 @@
 										</template>
 										<template v-else-if="entity.entityType == 'npc'">
 											<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-											<span v-else-if="entity.npc == 'custom' && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
 											<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
 											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
@@ -445,7 +445,7 @@
 					let n = 0
 					for (let i in this.encounter.entities) {
 						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
-						let id = this.encounter.entities[i].id
+						// let id = this.encounter.entities[i].id
 						if (match[1].trim() == entity.name) {
 							n++
 							if (parseInt(match[3]) > last) {

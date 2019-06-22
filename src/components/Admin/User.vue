@@ -18,8 +18,8 @@
 
 		<h2>Broadcasting</h2>
 		<p> 
-			<router-link :to="'/track-encounter/' + user['.key']">
-				<i :class="{ 'fas fa-play green': track.broadcast, 'fas fa-stop red': !track.broadcast }"></i> View
+			<router-link :to="'/user/' + user['.key']">
+				<div class="live" :class="{ 'active': broadcast.live }">Live</div>
 			</router-link>
 		</p>
 
@@ -123,8 +123,8 @@
 					source: db.ref(`status/${this.id}`),
 					asObject: true,
 				},
-				track: {
-					source: db.ref(`track/${this.id}`),
+				broadcast: {
+					source: db.ref(`broadcast/${this.id}`),
 					asObject: true
 				},
 				tiers: db.ref('tiers').orderByChild('order'),

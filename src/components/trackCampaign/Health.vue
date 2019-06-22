@@ -12,7 +12,13 @@
 				}">
 					{{ animatedNumber }}
 				</span>
-				<span class="gray-hover">/</span>{{ displayHp(entity).maxHp }}
+				<span class="gray-hover">/</span>
+				<span :class="{ 
+					'green': entity.entityType == 'player' && campPlayers[entity.key].maxHpMod > 0, 
+					'red': entity.entityType == 'player' && campPlayers[entity.key].maxHpMod < 0
+				}">
+					{{ displayHp(entity).maxHp }}
+				</span>
 			<template v-if="displayHp(entity).tempHp">
 				+{{ displayHp(entity).tempHp }}
 			</template>
@@ -84,20 +90,20 @@
 						maxHp: parseInt(entity.transformed.maxHp),
 						curHp: parseInt(entity.transformed.curHp),
 					}
-					stats.tempHp = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].tempHp) : parseInt(entity.curHp);
+					stats.tempHp = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].tempHp) : parseInt(entity.tempHp);
 				} else {
 					//FOR PLAYER GET MAXHP FORM PLAYER NOT ENCOUNTER
 					if(entity.entityType == 'player') {
 						stats = {
-							maxHp: parseInt(this.players[key].maxHp),
 							curHp: parseInt(this.campPlayers[key].curHp),
 							tempHp: parseInt(this.campPlayers[key].tempHp),
 						}
+						stats.maxHp = (this.campPlayers[key].maxHpMod !== 0) ? parseInt(this.players[key].maxHp + this.campPlayers[key].maxHpMod) : parseInt(this.players[key].maxHp);
 					} else {
 						stats = {
 							maxHp: parseInt(entity.maxHp),
 							curHp: parseInt(entity.curHp),
-							tempHp: parseInt(entity.curHp),
+							tempHp: parseInt(entity.tempHp),
 						}
 					}
 				}

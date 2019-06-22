@@ -176,7 +176,7 @@
 					</b-col>
 					
 					<!-- ADDED -->
-					<b-col sm="6">
+					<b-col md="6">
 						<div id="added" class="bg-gray" v-if="encounter">
 							<template>
 								<div class="diff d-flex justify-content-between">
@@ -374,8 +374,10 @@
 				'npcs',
 				'overencumbered',
 			]),
+			// eslint-disable-next-line
 			async _excludeFriendlies() {
 				if(this.encounter) {
+					// eslint-disable-next-line
 					var entities = await _.chain(this.encounter.entities)
 									.filter(function(entity, key) {
 										entity.key = key

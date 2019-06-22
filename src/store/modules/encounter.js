@@ -130,6 +130,7 @@ const mutations = {
 				entity.curHp = rootState.content.campaigns[state.campaignId].players[key].curHp
 				entity.tempHp = rootState.content.campaigns[state.campaignId].players[key].tempHp
 				entity.ac_bonus = rootState.content.campaigns[state.campaignId].players[key].ac_bonus
+				entity.maxHpMod = rootState.content.campaigns[state.campaignId].players[key].maxHpMod
 
 				//get other values from the player
 				let db_player = rootState.content.players[key]
@@ -138,7 +139,7 @@ const mutations = {
 				
 				entity.name = db_player.character_name
 				entity.ac = parseInt(db_player.ac)
-				entity.maxHp = parseInt(db_player.maxHp)
+				entity.maxHp = (entity.maxHpMod !== 0) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
 				entity.strength = db_player.strength
 				entity.dexterity = db_player.dexterity
 				entity.constitution = db_player.constitution
@@ -372,16 +373,22 @@ const mutations = {
 		Vue.set(state.entities[key], 'curHp', entity.curHp)
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+
+		
 		
 		encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},
 	EDIT_PLAYER(state, {key, entity}) {
 		Vue.set(state.entities[key], 'initiative', entity.initiative)
 		Vue.set(state.entities[key], 'ac', entity.ac)
-		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
 		Vue.set(state.entities[key], 'curHp', entity.curHp)
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+		Vue.set(state.entities[key], 'maxHpMod', entity.maxHpMod)
+
+		entity.maxHp = entity.maxHp + entity.maxHpMod;
+
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
 
 		//INIT needs to be updated in firebase
 		encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);

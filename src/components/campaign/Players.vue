@@ -36,7 +36,7 @@
 								'red': player.ac_bonus < 0 
 							}" 
 							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
-							{{ players[key].ac + player.ac_bonus}}
+							{{ players[key].ac + player.ac_bonus }}
 						</span>
 						<span v-else class="ac">{{ players[key].ac }}</span>
 					</td>
@@ -55,11 +55,19 @@
 					</td>
 					<td>
 						<span class="current" :class="{ 
-							'red': percentage(player.curHp, players[key].maxHp) <= 33, 
-							'orange': percentage(player.curHp, players[key].maxHp) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
+							'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
+							'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
 							'green': true
 							}">{{ player.curHp }}</span>
-							<span class="gray-hover">/</span>{{ players[key].maxHp }}
+							<span class="gray-hover">/</span>
+							<span :class="{ 
+									'green': player.maxHpMod > 0, 
+									'red': player.maxHpMod < 0 
+								}" 
+								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+								{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+							</span>
+							<span v-else>{{ players[key].maxHp }}</span>
 							<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
 					</td>
 
@@ -129,11 +137,15 @@
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
 			},
+			maxHp(maxHp, maxHpMod) {
+				return maxHp + maxHpMod;
+			},
 			reset() {
 				for(var key in this.campaign.players) {
 					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
 						curHp: this.players[key].maxHp,
-						tempHp: 0
+						tempHp: 0,
+						maxHpMod: 0
 					})
 				}
 			}

@@ -164,15 +164,9 @@
 						this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
 
 						// curHp can never be larger than maxHp
-						if(this.entity.curHp > this.playerBase.maxHp) {
-							this.entity.curHp = this.playerBase.maxHp;
+						if((this.playerBase.maxHp + this.entity.maxHpMod) < this.entity.curHp) {
+							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
 						}
-
-						//If the maxHp is modified, the curHp needs to change too
-						this.entity.curHp = 
-							((this.playerBase.maxHp + this.entity.maxHpMod) < this.entity.curHp) ? 
-							parseInt(this.playerBase.maxHp + this.entity.maxHpMod) :
-							parseInt(this.entity.curHp);
 
 						//Update Firebase apart from store, cause it can be edited where there is no store.
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity)

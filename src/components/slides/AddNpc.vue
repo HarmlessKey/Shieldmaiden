@@ -54,70 +54,26 @@
 		<button class="btn btn-block mb-3" @click="add()">Add</button>
 
 		<h2>Copy an NPC from below</h2>
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" 
-					id="search-tab" 
-					data-toggle="tab" 
-					href="#search" 
-					role="tab" 
-					aria-controls="search" 
-					aria-selected="true">
-					Search
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 
-					id="custom-tab" 
-					data-toggle="tab" 
-					href="#custom" 
-					role="tab" 
-					aria-controls="custom" 
-					aria-selected="false">
-					Custom
+		
+		<p>Search all NPC's, including your custom.</p>
+		<div class="input-group mb-3">
+			<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control" />
+			<div class="input-group-append">
+				<button class="btn"><i class="fas fa-search"></i></button>
+			</div>
+		</div>
+		<ul class="entities">
+			<p v-if="noResult" class="red">{{ noResult }}</p>
+			<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
+				<span :class="{ 'blue': npc.origin == 'custom' }">
+					{{ npc.name }}
+				</span>
+				<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], npc.origin)">
+					<i class="fas fa-copy blue"></i>
+					<span class="d-none d-md-inline ml-1">Copy</span>
 				</a>
 			</li>
 		</ul>
-
-		<div class="tab-content">
-			<div class="tab-pane fade show active" id="search" role="tabpanel" aria-labelledby="search-tab">
-				<div class="input-group mb-3">
-					<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control" />
-					<div class="input-group-append">
-						<button class="btn"><i class="fas fa-search"></i></button>
-					</div>
-				</div>
-				<ul class="entities">
-					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-						{{ npc.name }}
-						<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], 'api')">
-							<i class="fas fa-copy blue"></i>
-							<span class="d-none d-md-inline ml-1">Copy</span>
-						</a>
-					</li>
-				</ul>
-			</div>
-
-			<div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">
-				<template v-if="npcs">
-					<ul class="entities">
-						<li v-for="(npc, key) in npcs" 
-							:key="key" 
-							class="d-flex justify-content-between">
-							<div class="d-flex justify-content-left">
-								<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
-								{{ npc.name }}
-							</div>
-							<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(key, 'custom')">
-								<i class="fas fa-copy blue"></i>
-								<span class="d-none d-md-inline ml-1">Copy</span>
-							</a>
-						</li>
-					</ul>
-				</template>
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -138,10 +94,28 @@
 				noResult: '',
 			}
 		},
-		firebase() {
-			return {
-				monsters: db.ref(`monsters`),
-			}
+		mounted() {
+			//GET NPCS
+			var monsters = db.ref(`monsters`);
+			monsters.on('value', async (snapshot) => {
+				let monsters = snapshot.val();
+
+				for(let key in monsters) {
+					monsters[key]['.key'] = key;
+					monsters[key].origin = 'api';
+				}
+				let custom = db.ref(`npcs/${this.userId}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						customNpcs[key].origin = 'custom';
+						customNpcs[key]['.key'] = key;
+						monsters.push(customNpcs[key]);
+					}
+				});
+				this.monsters = monsters;
+				this.loadingNpcs = false;
+			});
 		},
 		computed: {
 			...mapGetters([
@@ -171,7 +145,7 @@
 				this.entity.id = id;
 
 				if(type == 'api') {
-					var npc_data = this.monsters[id - 1]; //NO IDEA WHY I HAVE TO SUBSTRACT 1
+					var npc_data = this.monsters[id];
 					this.entity.npc = 'api'
 					this.entity.maxHp = npc_data.hit_points
 					this.entity.ac = npc_data.armor_class

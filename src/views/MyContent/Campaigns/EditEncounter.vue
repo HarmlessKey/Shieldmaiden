@@ -110,6 +110,7 @@
 									<p>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</p>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+									<p>Search all NCP's, including your custom.</p>
 									<div class="input-group mb-3">
 										<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
@@ -119,7 +120,7 @@
 									<ul class="entities">
 										<p v-if="noResult" class="red">{{ noResult }}</p>
 										<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-											<div class="d-flex justify-content-left">
+											<div :class="{'blue': npc.custom}">
 												{{ npc.name }}
 											</div>
 											<span>
@@ -131,16 +132,16 @@
 													<i class="fas fa-info"></i>
 												</a>
 												<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
-												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, false)">
+												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, npc.custom)">
 													<i class="fas fa-plus"></i>
 												</a>
-												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, false, true)">
+												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, npc.custom, true)">
 													<i class="fas fa-dice-d20"></i>
 												</a>
 											</div>
 										</li>
 									</ul>
-									<template v-if="npcs">
+									<!-- <template v-if="npcs">
 										<h2>Custom NPC's</h2>
 										<ul class="entities hasImg">
 											<li v-for="(npc, key) in npcs"
@@ -169,7 +170,7 @@
 												</div>
 											</li>
 										</ul>
-									</template>
+									</template> -->
 								</div>
 							</div>
 						</div>
@@ -363,7 +364,7 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
-				monsters: db.ref(`monsters`),
+				// monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -403,6 +404,28 @@
 			this.fetchCampaign({
 				cid: this.campaignId, 
 			})
+
+			//GET NPCS
+			var monsters = db.ref(`monsters`);
+			monsters.on('value', async (snapshot) => {
+				let monsters = snapshot.val();
+
+				for(let key in monsters) {
+					monsters[key]['.key'] = key;
+					monsters[key].custom = false;
+				}
+				let custom = db.ref(`npcs/${this.user.uid}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						customNpcs[key].custom = true;
+						customNpcs[key]['.key'] = key;
+						monsters.push(customNpcs[key]);
+					}
+				});
+				this.monsters = monsters;
+				this.loadingNpcs = false;
+			});
 		},
 		methods: {
 			...mapActions([

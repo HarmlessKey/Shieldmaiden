@@ -571,6 +571,22 @@
 				],
 			}
 		},
+		mounted() {
+			var npcs = db.ref(`monsters`);
+			npcs.on('value', async (snapshot) => {
+				let npcs = snapshot.val();
+
+				let custom = db.ref(`npcs/${this.userId}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						npcs.push(customNpcs[key]);
+					}
+				});
+				this.npcs = npcs;
+				this.loadingNpcs = false;
+			});
+		},
 		firebase() {
 			return {
 				abilities: db.ref('abilities'),
@@ -578,7 +594,7 @@
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true
 				},
-				npcs: db.ref(`monsters`),
+				// npcs: db.ref(`monsters`),
 			}
 		},
 		computed: {

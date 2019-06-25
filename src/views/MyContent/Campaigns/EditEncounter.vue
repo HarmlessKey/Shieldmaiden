@@ -141,36 +141,6 @@
 											</div>
 										</li>
 									</ul>
-									<!-- <template v-if="npcs">
-										<h2>Custom NPC's</h2>
-										<ul class="entities hasImg">
-											<li v-for="(npc, key) in npcs"
-												:key="key" 
-												class="d-flex justify-content-between">
-												<div class="d-flex justify-content-left">
-													<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
-													<img v-else src="@/assets/_img/styles/monster.png" class="img" />
-													{{ npc.name }}
-												</div>
-												<span>
-													<span class="hover-hide">CR: {{ npc.challenge_rating }}</span>
-													<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-												</span>
-												<div class="actions justify-content-end">
-													<a @click="setSlide({show: true, type: 'ViewEntity', data: npc })" v-b-tooltip.hover title="Show Info">
-														<i class="fas fa-info"></i>
-													</a>
-													<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
-													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
-														<i class="fas fa-plus"></i>
-													</a>
-													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(key, 'npc', npc.name, true, true)">
-														<i class="fas fa-dice-d20"></i>
-													</a>
-												</div>
-											</li>
-										</ul>
-									</template> -->
 								</div>
 							</div>
 						</div>
@@ -220,7 +190,9 @@
 											<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
 											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
-										<i v-if="entity.friendly" class="fas fa-heart green mr-2"></i> {{ entity.name }}
+										<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
+											{{ entity.name }}
+										</span>
 									</div>
 									<div class="actions">
 										<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">

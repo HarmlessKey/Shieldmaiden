@@ -18,7 +18,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
 	import Crumble from '@/components/crumble/Compendium.vue'
 

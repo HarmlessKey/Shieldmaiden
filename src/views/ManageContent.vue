@@ -30,7 +30,7 @@
 				<div class="card-header"><i class="fas fa-swords"></i> Encounters</div>
 
 				<template v-for="(campaign, cKey) in campaigns">
-						<div class="card-body">
+						<div class="card-body" :key="cKey">
 							<div class="p-2">
 								<span class="gray-hover">Campaign:</span> {{ campaign.campaign }}
 								( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
@@ -43,7 +43,7 @@
 								</b-list-group-item>
 							</b-list-group>
 						</div>
-					<router-link class="btn" :to="'/encounters/' + cKey">Show all</router-link>
+					<router-link class="btn" :key="cKey" :to="'/encounters/' + cKey">Show all</router-link>
 				</template>
 			</div>
 
@@ -97,7 +97,7 @@
 
 <script>
 	import { db } from '@/firebase.js'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'home',

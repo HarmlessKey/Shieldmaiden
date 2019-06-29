@@ -306,9 +306,8 @@
 				'players',
 				'playerInCampaign',
 			]),
-			_active_drag: function() {
-
-			},
+			// _active_drag: function() {
+			// },
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {

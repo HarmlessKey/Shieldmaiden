@@ -36,6 +36,7 @@ export default {
 		methods: {
 			signIn: function() {
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
+					// eslint-disable-next-line
 					(user) => {
 
 					},
@@ -46,8 +47,8 @@ export default {
 			},
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
-
-				auth.signInWithPopup(provider).then((restult) => {
+				// eslint-disable-next-line
+				auth.signInWithPopup(provider).then((result) => {
 					this.credentials = undefined;
 					this.error = undefined;
 				}).catch((err) => {
@@ -57,7 +58,6 @@ export default {
 			deleteUser() {
 				var vm = this;
 				var user = auth.currentUser;
-				var credential;
 
 				user.delete().then(function() {
 					//REMOVE ALL USER DATA
@@ -66,7 +66,7 @@ export default {
 					db.ref(`players/${user.uid}`).remove();
 					db.ref(`npcs/${user.uid}`).remove();
 					db.ref(`settings/${user.uid}`).remove();
-					db.ref(`track/${user.uid}`).remove();
+					db.ref(`broadcast/${user.uid}`).remove();
 					db.ref(`users/${user.uid}`).remove();
 
 					vm.$router.replace('/');

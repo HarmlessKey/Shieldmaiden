@@ -1,7 +1,6 @@
 <template>
 	<div class="container">	
 		<!-- <h2 class="text-center head">Encounter Finished</h2> -->
-
 		<div class="card finished">
 			<div class="card-header"><i class="fas fa-treasure-chest"></i> Loot</div>
 			<div class="card-body">
@@ -42,15 +41,34 @@
 			</div>
 			<router-link v-if="$route.name == 'RunEncounter'" class="btn btn-block" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
 		</div>
+		<b-row v-if="$route.name == 'RunEncounter'">
+			<b-col sm="8">
+				<b-card header="Damage Meters">
+					<Dmg />
+				</b-card>
+			</b-col>
+			<b-col sm="4">
+				<b-card header="Combat Log">
+					<Log />
+				</b-card>
+			</b-col>
+		</b-row>
 	</div>
 </template>
 
 <script>
+	import Dmg from '@/components/combat/side/Dmg.vue';
+	import Log from '@/components/combat/side/Log.vue';
+
 	export default {
 		name: 'app',
 		props: [
 			'encounter'
 		],
+		components: {
+			Dmg,
+			Log
+		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,

@@ -1,5 +1,5 @@
 <template>
-	<div class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab" v-if="entities">
+	<div v-if="entities">
 		<ul v-for="(type, index) in types" :key="index">
 			<h2>{{ type.name }}</h2>
 			<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
@@ -88,9 +88,9 @@
 </script>
 
 <style lang="scss" scoped>
-.tab-content {
-	padding: 0 10px 15px 10px;
-}
+// .tab-content {
+// 	padding: 0 10px 15px 10px;
+// }
 ul {
 	padding: 0;
 	list-style: none;

@@ -38,6 +38,7 @@ import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
 import Encounters from '@/views/MyContent/Campaigns/Encounters.vue';
 import EditEncounter from '@/views/MyContent/Campaigns/EditEncounter.vue';
 import Players from '@/views/MyContent/Players/Players.vue';
+import Characters from '@/views/MyContent/Characters';
 import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
 import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
 import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
@@ -386,11 +387,21 @@ export const routes = [{
 	}
 },
 {
-	path: '/character/:id',
+	path: '/characters',
+	name: 'Characters',
+	component: Characters,
+	meta: {
+		basePath: '/characters',
+		title: 'Characters',
+		requiresAuth: true
+	}
+},
+{
+	path: '/characters/:id',
 	name: 'Edit Character',
 	component: EditPlayer,
 	meta: {
-		basePath: '/players',
+		basePath: '/characters',
 		title: 'Character',
 		requiresAuth: true
 	}

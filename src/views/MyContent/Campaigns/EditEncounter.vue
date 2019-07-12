@@ -458,7 +458,7 @@
 					}
 					
 					if(custom == false) {
-						var npc_data = this.monsters[id - 1];
+						var npc_data = this.monsters[id];
 						entity.npc = 'api'
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');

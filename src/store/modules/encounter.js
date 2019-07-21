@@ -108,11 +108,19 @@ const mutations = {
 			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
 			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
 			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
+			entity.damageTaken = (db_entity.meters.damageTaken) ? db_entity.meters.damageTaken : 0;
+			entity.healingTaken = (db_entity.meters.healingTaken) ? db_entity.meters.healingTaken : 0;
+			entity.overkillTaken = (db_entity.meters.overkillTaken) ? db_entity.meters.overkillTaken : 0;
+			entity.overhealingTaken = (db_entity.meters.overhealingTaken) ? db_entity.meters.overhealingTaken : 0;
 		} else {
 			entity.damage = 0
 			entity.healing = 0
 			entity.overkill = 0
 			entity.overhealing = 0
+			entity.damageTaken = 0
+			entity.healingTaken = 0
+			entity.overkillTaken = 0
+			entity.overhealingTaken = 0
 		}
 
 		if(db_entity.transformed) {
@@ -253,24 +261,19 @@ const mutations = {
 			localStorage.setItem(state.encounterId, parsed);
 		}
 	},
-	SET_METERS(state, {key, type, amount, over}) {
+	SET_METERS(state, {key, type, amount}) {
 
 		//DON'T put environment damage in meters
 		if(key != 'environment') {
-			let newVal = state.entities[key][type] + amount; //set the new amount
-			let overType = (type == 'damage') ? 'overkill' : 'overhealing'; //set the over type overhealing
-			let newOver = state.entities[key][overType] + over; //set the new over amount
-			
-			//You can't do minus damage, so set to 0 if lower
-			//This can happen when a logged action is undone
-			if(newVal < 0) { newVal = 0 } 
-			if(newOver < 0) { newOver = 0 }
+			let currentAmount = state.entities[key][type]; //Current healing done/taken
+			if(currentAmount === undefined) { currentAmount = 0; } //if there is no healing done/taken yet
+			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
-			//Safe the new values in Firebase and the store
-			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
-			encounters_ref.child(`${state.path}/entities/${key}/meters/${overType}`).set(newOver);
-			state.entities[key][type] = newVal;
-			state.entities[key][overType] = newOver;
+			if(newAmount < 0) { newAmount = 0 } 
+
+			//Save the new values in Firebase and the store
+			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newAmount);
+			state.entities[key][type] = newAmount;
 		}
 	},
 	SET_ENCOUNTER(state, payload) {

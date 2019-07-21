@@ -211,22 +211,20 @@ export const setHP = {
 			}
 
 			//Add to damagemeters
-			//undo holds the value of ovherhealing, is there was any
+			//undo holds the value of ovherhealing, if there was any
 			if(undo) {
 				amount = -amount
 				over = (undo !== true) ? -undo : 0;
 				type = 'healing'
 			}
-			this.set_meters({
-				key: current.key,
-				type,
-				amount,
-				over,
-			})
-
-		
+			
 			//Campaign wide damage meters (no need to go through store)
 			if(!undo) {
+				this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
+				this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
+				this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
+				this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
+
 				if(current.entityType == 'player') {
 					this.damageMeters(current.key, 'damage', amount); //Damage done
 					this.damageMeters(current.key, 'overkill', over); //Over damage done
@@ -238,6 +236,11 @@ export const setHP = {
 			} 
 			//To undo, run same function with opposite types 
 			else {
+				this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
+				this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Undo Over damage done
+				this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
+				this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
+
 				if(current.entityType == 'player') {
 					this.damageMeters(current.key, 'healing', amount); //Undo Damage done
 					this.damageMeters(current.key, 'overhealing', over); //Undo Over damage done
@@ -304,21 +307,20 @@ export const setHP = {
 			}
 			
 			//Add to damagemeters
-			//undo holds the value of overdamage, is there was any
+			//undo holds the value of overdamage, if there was any
 			if(undo) {
 				amount = -amount
 				over = (undo !== true) ? -undo : 0;
 				type = 'damage'
 			}
-			this.set_meters({
-				key: current.key,
-				type,
-				amount,
-				over,
-			})
 
 			//Campaign wide healing meters (no need to go through store)
 			if(!undo) {
+				this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
+				this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
+				this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
+				this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
+
 				if(current.entityType == 'player') {
 					this.damageMeters(current.key, 'healing', amount); //Healing done
 					this.damageMeters(current.key, 'overhealing', over); //Over healing done
@@ -330,6 +332,11 @@ export const setHP = {
 			}
 			//To undo, run same function with opposite types 
 			else {
+				this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
+				this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done
+				this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
+				this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
+
 				if(current.entityType == 'player') {
 					this.damageMeters(current.key, 'damage', amount); //Undo Healing done
 					this.damageMeters(current.key, 'overkill', over); //Undo Over healing done

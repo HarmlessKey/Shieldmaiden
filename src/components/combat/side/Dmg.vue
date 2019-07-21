@@ -5,14 +5,18 @@
 			<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
 				<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
 				<div class="progress health-bar">
-					<div>
-						<span class="name">
+					<div class="info">
+						<span class="name" v-b-tooltip.hover :title="entity.name">
 							{{ entity.name }}.
 						</span>
 						<b class="numbers">
-							{{ entity[type.name] }}
-							<!-- ({{ percentage(entity[type], type) }}%) -->
-							<template v-if="entity[type.over]"> ({{ entity[type.over] }} <small>over</small>)</template>
+							<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
+							<template v-else>{{ entity[type.name] | numeral('0.0a') }}</template>
+							<template v-if="entity[type.over]">
+								(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
+								<template v-else>{{ entity[type.over] | numeral('0.0a') }} </template> 
+								<small>over</small>)
+							</template>
 						</b>
 					</div>
 					<div class="progress-bar" 
@@ -88,9 +92,6 @@
 </script>
 
 <style lang="scss" scoped>
-// .tab-content {
-// 	padding: 0 10px 15px 10px;
-// }
 ul {
 	padding: 0;
 	list-style: none;
@@ -120,21 +121,31 @@ ul {
 			background-color: #494747;
 			position: relative;
 
-			span.name, .numbers {
-				color:#191919;
+			.info {
+				width: 100%;
 				position: absolute;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
+				left: 0;
+				display: grid;
+				grid-template-columns: auto max-content;
+				grid-template-rows: auto;
+				grid-gap: 0;
+				grid-template-areas: 
+				"name numbers";
 
-			}
-			.numbers {
-				text-align: right;
-				right: 5px;
-			}
-			span.name {
-				font-weight: bold !important;
-				left: 5px;
+				span.name, .numbers {
+					color:#191919;
+				}
+				.numbers {
+					text-align: right;
+					padding: 0 5px;
+				}
+				span.name {
+					font-weight: bold !important;
+					padding-left: 5px;
+					white-space: nowrap; 
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 			}
 		}
 	}

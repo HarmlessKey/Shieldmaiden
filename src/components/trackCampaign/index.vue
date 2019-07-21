@@ -3,9 +3,9 @@
 	<template v-if="!campaign.private">
 		<!-- NOT BROADCASTING -->
 		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
-			<div class="top d-flex justify-content-between">
+			<div class="top">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				{{ campaign.campaign }}
+				<span class="title">{{ campaign.campaign }}</span>
 				<span>
 					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
 				</span>
@@ -339,7 +339,20 @@
 			padding: 10px;
 			font-size: 15px;
 			line-height: 45px;
+			display: grid;
+			grid-template-columns: max-content auto min-content;
+			grid-template-rows: auto;
+			grid-gap: 0;
+			grid-template-areas: 
+			"back title live";
 
+			.title {
+				padding-left: 20px;
+				text-align: center;
+				white-space: nowrap; 
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 			.live {
 				margin: 10px 0;
 				height: 25px;

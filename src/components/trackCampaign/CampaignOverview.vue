@@ -4,7 +4,7 @@
 		<b-col md="8">
 			<h3>Campaign Players</h3>
 			<table class="table table-hover">
-				<thead >
+				<thead>
 					<th></th>
 					<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
 					<th class="name"></th>

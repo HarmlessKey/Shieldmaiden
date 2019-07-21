@@ -38,8 +38,10 @@ import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
 import Encounters from '@/views/MyContent/Campaigns/Encounters.vue';
 import EditEncounter from '@/views/MyContent/Campaigns/EditEncounter.vue';
 import Players from '@/views/MyContent/Players/Players.vue';
-import Characters from '@/views/MyContent/Characters';
 import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
+import Reminders from '@/views/MyContent/Reminders';
+import EditReminder from '@/views/MyContent/Reminders/EditReminder.vue';
+import Characters from '@/views/MyContent/Characters';
 import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
 import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
 import RunEncounter from '@/views/MyContent/RunEncounter.vue';
@@ -383,6 +385,36 @@ export const routes = [{
 	meta: {
 		basePath: '/players',
 		title: 'Players',
+		requiresAuth: true
+	}
+},
+{
+	path: '/reminders',
+	name: 'Reminders',
+	component: Reminders,
+	meta: {
+		basePath: '/reminders',
+		title: 'Reminders',
+		requiresAuth: true
+	}
+},
+{
+	path: '/reminders/add-reminder',
+	name: 'AddReminders',
+	component: EditReminder,
+	meta: {
+		basePath: '/reminders',
+		title: 'Reminders',
+		requiresAuth: true
+	}
+},
+{
+	path: '/reminders/:id',
+	name: 'EditReminders',
+	component: EditReminder,
+	meta: {
+		basePath: '/reminders',
+		title: 'Reminders',
 		requiresAuth: true
 	}
 },

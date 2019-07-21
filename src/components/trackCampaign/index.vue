@@ -97,7 +97,7 @@
 								</template>.
 							</span>
 
-							<!-- Damage -->
+							<!-- Open Roll -->
 							<span v-if="encounter.lastRoll.damageTotal">
 								Damage: 
 								<span v-if="encounter.lastRoll.damageMod">

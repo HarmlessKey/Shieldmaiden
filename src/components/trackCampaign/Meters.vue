@@ -1,13 +1,19 @@
 <template>
 	<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length >0)" class="meters">
+		<div class="menu">
+			<ul>
+				<li @click="doneTaken = 'done'" :class="{ active: doneTaken == 'done'}">Done</li>
+				<li @click="doneTaken = 'taken'" :class="{ active: doneTaken == 'taken'}">Taken</li>
+			</ul>
+		</div>
 		<div v-for="(type, index) in types" :key="index">
-			<h3>{{ type.name }} done</h3>
+			<h3>{{ type.type }} {{ doneTaken }}</h3>
 			<transition-group tag="ul" 
 				name="entities" 
 				enter-active-class="animated fadeInUp" 
 				leave-active-class="animated fadeOutDown">
-				<template v-if="Object.keys(_meters[type.name]).length > 0">
-					<li v-for="entity in _meters[type.name]" class="health" :key="entity.key">
+				<template>
+					<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
 						<span class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></span>
 						<div class="progress health-bar">
 							<div class="info">
@@ -15,8 +21,8 @@
 								<span v-else class="name">{{ entity.name }}</span>
 								<span class="numbers">
 									<span :class="{
-										'red' : type.name == 'damage',
-										'green' : type.name == 'healing'
+										'red' : type.type == 'damage',
+										'green' : type.type == 'healing'
 									}">
 										<template v-if="entity.meters[type.name] < 10000">{{ entity.meters[type.name] }}</template>
 										<template v-else>{{ entity.meters[type.name] | numeral('0.0a') }}</template>
@@ -29,7 +35,7 @@
 							</div>
 							<div class="progress-bar bg-black" 
 								role="progressbar" 
-								:style="{width: percentageMeters(entity.meters[type.name], type.name) + '%'}" 
+								:style="{ width: percentageMeters(entity.meters[type.name], type.type) + '%' }" 
 								aria-valuemin="0" 
 								aria-valuemax="100">
 							</div>
@@ -54,10 +60,7 @@
 		data() {
 			return {
 				userId: this.$route.params.userid,
-				types: {
-					'damage': { name: 'damage', over: 'overkill' },
-					'healing': { name: 'healing', over: 'overhealing'},
-				}
+				doneTaken: 'done'
 			}
 		},
 		firebase() {
@@ -73,16 +76,42 @@
 			}
 		},
 		computed: {
+			types() {
+				let dmg = {
+					type: 'damage',
+					name: 'damage',
+					over: 'overkill'
+				}
+				let heal = {
+					type: 'healing',
+					name: 'healing',
+					over: 'overhealing'
+				}
+				if(this.doneTaken === 'taken') {
+					dmg.name = 'damageTaken';
+					dmg.over = 'overkillTaken';
+					heal.name = 'healingTaken';
+					heal.over = 'overhealingTaken';
+				}
+
+				return {
+					'damage': { type: dmg.type, name: dmg.name, over: dmg.over },
+					'healing': { type: heal.type, name: heal.name, over: heal.over },
+				}
+			},
 			_meters: function() {
+				let dmg = (this.doneTaken === 'done') ? 'damage' : 'damageTaken';
+				let heal = (this.doneTaken === 'done') ? 'healing' : 'healingTaken';
+
 				return {
 					'damage': _.chain(this.entities)
 						.filter(function(entity, key) {
 							entity.key = key
-							let damage = (entity.meters) ? entity.meters.damage : 0;
+							let damage = (entity.meters) ? entity.meters[dmg] : 0;
 							return damage > 0;
 						})
 						.orderBy(function(entity){
-							let damage = (entity.meters) ? entity.meters.damage : 0;
+							let damage = (entity.meters) ? entity.meters[dmg] : 0;
 							return parseInt(damage)
 						} , 'desc')
 						.value(),
@@ -90,11 +119,11 @@
 						.filter(function(entity, key) {
 							entity.key = key
 
-							let healing = (entity.meters) ? entity.meters.healing : 0;
+							let healing = (entity.meters) ? entity.meters[heal] : 0;
 							return healing > 0;
 						})
 						.orderBy(function(entity){
-							let healing = (entity.meters) ? entity.meters.healing : 0;
+							let healing = (entity.meters) ? entity.meters[heal] : 0;
 							return parseInt(healing)
 						} , 'desc')
 						.value()
@@ -217,6 +246,34 @@
 		}
 		.entities-move {
 			transition: transform .6s;
+		}
+		.menu {
+			height: 30px;
+			border-bottom: solid 3px #000;
+			position: relative;
+
+			ul {
+				height: 30px;
+				margin: 0;
+				display: flex;
+				justify-content: flex-start;
+
+				li {
+					cursor: pointer;
+					height: 30px;
+					padding: 0 10px;
+					display: block;
+					border-bottom: solid 3px #000;
+					font-weight: bold !important;
+
+					&.active {
+						border-color: #2c97de;
+					}
+					&:first-child {
+						padding-left: 3px;
+					}
+				}
+			}
 		}
 	}
 </style>

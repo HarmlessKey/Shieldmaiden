@@ -24,13 +24,13 @@
 				<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
 			</h1>
 
-		<div class="round-info">
+		<div class="round-info d-none d-md-inline">
 			<span v-if="encounter.round">
-				<span class="d-none d-md-inline">Round</span>
+				<span class="d-none d-lg-inline">Round</span>
 				<span class="number mx-2">{{ encounter.round }}</span>
 			</span>
 			<span v-if="encounter.round">
-				<span class="d-none d-md-inline">Turn</span>
+				<span class="d-none d-lg-inline">Turn</span>
 				<span class="number ml-2">
 					{{ encounter.turn + 1 }}
 					<span class="small gray-hover"> /{{ active_len }}</span>
@@ -44,12 +44,12 @@
 				v-b-tooltip.hover title="[shift]+[arrowleft]"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()">
 				<i class="fas fa-arrow-left"></i> 
-				<span class="ml-1 d-none d-md-inline">Prev turn</span>
+				<span class="ml-1 d-none d-lg-inline">Prev turn</span>
 			</a>
 			<template v-if="encounter.round == 0"> 
 				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
 					<i class="fas fa-arrow-left"></i> 
-					<span class="ml-1 d-none d-md-inline">Back</span>
+					<span class="ml-1 d-none d-lg-inline">Back</span>
 				</router-link>
 				<a class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>

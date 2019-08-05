@@ -38,11 +38,11 @@
 						url: 'conditions',
 						icon: 'fas fa-skull-crossbones',
 					},
-					// 'items': { 
-					// 	name: 'Items',
-					// 	url: 'items',
-					// 	icon: 'fas fa-treasure-chest',
-					// },
+					'items': { 
+						name: 'Items',
+						url: 'items',
+						icon: 'fas fa-treasure-chest',
+					},
 					'monsters': { 
 						name: 'Monsters',
 						url: 'monsters',

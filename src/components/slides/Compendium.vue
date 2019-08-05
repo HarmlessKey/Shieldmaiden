@@ -61,6 +61,7 @@
 			return {
 				types: {
 					'monsters': { icon: 'fas fa-dragon' },
+					'items': { icon: 'fas fa-treasure-chest' },
 					'spells': { icon: 'fas fa-wand-magic' },
 					'conditions': { icon: 'fas fa-skull-crossbones' },
 				},
@@ -75,6 +76,7 @@
 		firebase() {
 			return {
 				monsters: db.ref('monsters'),
+				items: db.ref('items'),
 				spells: db.ref('spells'),
 				conditions: db.ref('conditions'),
 			}

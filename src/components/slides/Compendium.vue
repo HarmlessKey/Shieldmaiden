@@ -37,6 +37,7 @@
 				<Monster v-if="current == 'monsters'" :id="show" />
 				<Spell v-if="current == 'spells'" :id="show" />
 				<Condition v-if="current == 'conditions'" :id="show" />
+				<Item v-if="current == 'items'" :id="show" />
 			</template>
 
 		</template>
@@ -48,12 +49,14 @@
 	import { db } from '@/firebase'
 
 	import Monster from '@/components/compendium/Monster.vue'
+	import Item from '@/components/compendium/Item.vue'
 	import Spell from '@/components/compendium/Spell.vue'
 	import Condition from '@/components/compendium/Condition.vue'
 
 	export default {
 		components: {
 			Monster,
+			Item,
 			Spell,
 			Condition,
 		},

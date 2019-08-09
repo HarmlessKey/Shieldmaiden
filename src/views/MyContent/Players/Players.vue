@@ -50,7 +50,8 @@
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td>
+							<!-- Actions -->
+							<td class="align-middle p-0">
 								<div class="d-flex justify-content-end">
 									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 

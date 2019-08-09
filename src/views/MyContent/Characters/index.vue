@@ -27,7 +27,8 @@
 							</router-link>
 						</td>
 						<td>{{ character.character.level }}</td>
-						<td>
+						<!-- Actions -->
+						<td class="align-middle p-0">
 							<div class="d-flex justify-content-end">
 								<div class="d-flex justify-content-end actions">
 									<router-link class="gray-hover mx-1" 

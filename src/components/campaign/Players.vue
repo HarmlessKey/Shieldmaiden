@@ -72,21 +72,21 @@
 					</td>
 
 					<!-- ACTIONS -->
-					<td>
-							<div class="d-flex justify-content-end">
-								<div class="d-flex justify-content-end actions">
-									<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
-										@click="setSlide({
-											show: true,
-											type: 'slides/EditPlayer',
-											data: { key: key, location: 'overview',}
-										})">
-										<i class="fas fa-pencil"></i>
-									</a>
-								</div>
-								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+					<td class="align-middle p-0">
+						<div class="d-flex justify-content-end">
+							<div class="d-flex justify-content-end actions">
+								<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
+									@click="setSlide({
+										show: true,
+										type: 'slides/EditPlayer',
+										data: { key: key, location: 'overview',}
+									})">
+									<i class="fas fa-pencil"></i>
+								</a>
 							</div>
-						</td>
+							<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>

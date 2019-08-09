@@ -373,12 +373,14 @@ table {
 			position: relative;
 
 			.actions {
-				display: none !important;
-				background-color: $gray-darker;
-				position: absolute;
+				// position: absolute;
 				padding: 5px 0.75rem;
 				top: 0;
 				right: 0;
+
+				// @media (max-width: 768px) {
+				
+				// }
 
 				a {
 					color: $gray-light !important;
@@ -399,7 +401,7 @@ table {
 				line-height: 22px;
 			}
 		}
-		&:hover {
+		&:focus {
 			td {
 				background-color: $gray-darker;
 			}
@@ -572,6 +574,8 @@ ul.entities {
 		}
 	}
 	table tr td .actions {
+		display: none !important;
+		background-color: $gray-darker;
 		right: 20px;
 		a {
 			background: $gray-active;

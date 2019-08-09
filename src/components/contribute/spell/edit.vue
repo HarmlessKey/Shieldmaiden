@@ -413,7 +413,7 @@
 									<b-col md="4">
 										<!-- MODIFIER TYPE -->
 										<label for="modifier_type">Modifier Type</label>
-										<b-form-select v-model="modifier.type"
+										<b-form-select v-model="type"
 											id="modifier_type"
 											name="modifier_type"
 											title="Modifier Type"
@@ -424,6 +424,7 @@
 											<option v-for="(val,i) in modifier_type"
 												:key="i" :value="val">{{val}}</option>
 										</b-form-select>
+										<span>{{type}}</span>
 									</b-col>
 									<b-col md="4">
 										<!-- MODIFIER SUBTYPE -->

@@ -3,9 +3,11 @@
 <template>
 	<div class="pb-5" v-if="entity">
 		<h2>Edit <span class="blue">{{ playerBase.character_name }}</span></h2>
-		<b-row class="mb-2">
-			<b-col v-if="location == 'encounter'" class="text-center">
-				<label>Init.</label>
+		<b-row v-if="location == 'encounter'" class="mb-3">
+			<b-col class="col-4">
+				<label>Initiative</label>
+			</b-col>
+			<b-col>
 				<b-form-input 
 					class="text-center"
 					type="number" 
@@ -17,7 +19,10 @@
 					placeholder="Initiative"></b-form-input>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
+		</b-row>
 
+		<h2>Temporary</h2>
+		<b-row class="mb-2">
 			<b-col class="text-center">
 				<label>AC Bonus</label>
 				<b-form-input 
@@ -36,6 +41,16 @@
 					name="tempHp" 
 					v-model="entity.tempHp"
 					placeholder="Temporary Hit Points"></b-form-input>
+			</b-col>
+
+			<b-col class="text-center">
+				<label>Max HP Mod</label>
+				<b-form-input 
+					class="text-center"
+					type="number" 
+					name="maxHpMod" 
+					v-model="maxHpMod"
+					placeholder="Max HP modifier"></b-form-input>
 			</b-col>
 		</b-row>
 
@@ -107,14 +122,19 @@
 				encounterId: this.$route.params.encid,
 				entityKey: this.data.key,
 				location: this.data.location,
+				entity: undefined,
+				maxHpMod: undefined
 			}
+		},
+		mounted() {
+			var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
+			entity.on('value', async (snapshot) => {
+				this.entity = snapshot.val();
+				this.maxHpMod = snapshot.val().maxHpMod;
+			});
 		},
 		firebase() {
 			return {
-				entity: {
-					source:	db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`),
-					asObject: true
-				},
 				playerBase: {
 					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
 					asObject: true
@@ -143,20 +163,55 @@
 						//Parse to INT
 						this.entity.ac_bonus = (this.entity.ac_bonus) ? parseInt(this.entity.ac_bonus) : 0;
 						this.entity.tempHp = (this.entity.tempHp) ? parseInt(this.entity.tempHp) : 0;
-						this.playerBase.ac = parseInt(this.playerBase.ac)
-						this.playerBase.maxHp = parseInt(this.playerBase.maxHp)
-						this.entity.curHp = parseInt(this.entity.curHp)
+						this.maxHpMod = (this.maxHpMod) ? parseInt(this.maxHpMod) : 0;
+						this.entity.maxHpMod = (this.entity.maxHpMod) ? parseInt(this.entity.maxHpMod) : 0;
+						this.playerBase.ac = parseInt(this.playerBase.ac);
+						this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
 
-						// curHp can never be larger than maxHp
-						if(this.entity.curHp > this.entity.maxHp) {
-							this.entity.curHp = this.entity.maxHp
+						//Modify curHP with maxHpMod
+						if(this.entity.maxHpMod === 0) {
+							//If the there was no current mod
+							//only modify curHp if maxHpMod = positive
+							if(this.maxHpMod > 0) {
+								this.entity.curHp = parseInt(parseInt(this.entity.curHp) + this.maxHpMod);
+							}
+						} else if(this.maxHpMod === 0) {
+							//if the new mod is 0, check if the old mod was positive
+							//If so, remove it from the curHp
+							if(this.entity.maxHpMod > 0) {
+								this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
+							}
+						} else {
+							//If the new mod is positive
+							if(this.maxHpMod > 0) {
+								//check if the current mod was positive to0
+								if(this.entity.maxHpMod > 0) {
+									//if so, first substract current mod, then add new
+									this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + this.maxHpMod);
+								} else {
+									//else only add the new mod
+									this.entity.curHp = parseInt(parseInt(this.entity.curHp) + this.maxHpMod);
+								}
+							} else if(this.maxHpMod < 0) {
+								//if the new mod is negative,
+								//but the current is positive, still substract current
+								if(this.entity.maxHpMod > 0) {
+									this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
+								}
+							}
 						}
-						
+						this.entity.maxHpMod = this.maxHpMod; //to store new in firebase
+
+						//CurHp can never be > maxHp
+						if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {
+							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod)
+						}
+
 						//Update Firebase apart from store, cause it can be edited where there is no store.
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity)
 						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase)
 
-						//Only update in and encounter
+						//Only update in an encounter
 						if(this.location == 'encounter') {
 							
 							//create full object to send to store
@@ -180,5 +235,7 @@
 </script>
 
 <style lang="scss" scoped>
-
+	label {
+		font-size: 12px;
+	}
 </style>

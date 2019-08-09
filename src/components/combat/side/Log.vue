@@ -1,7 +1,7 @@
 <template>
-		<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
+		<div>
 			<template v-if="log">
-				<h2>Combat log</h2>
+				<h2 v-if="!encounter.finished">Combat log</h2>
 				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
 					<li v-for="(item, key) in log" :key="key">
 						<div class="d-flex justify-content-between head">
@@ -26,7 +26,7 @@
 							<template v-if="item.type == 'damage'">overkill</template>
 							<template v-else>overhealing</template>)
 						</span>
-						<div class="undo" v-if="key == 0">
+						<div class="undo" v-if="key == 0 && !encounter.finished">
 							<a @click="undo(key, item.amount, item.over, item.target, item.by, item.type)">Undo</a>
 						</div>
 					</li>
@@ -53,6 +53,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'encounter',
 				'log',
 				'entities',
 			]),

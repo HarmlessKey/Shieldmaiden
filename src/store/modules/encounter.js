@@ -108,11 +108,19 @@ const mutations = {
 			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
 			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
 			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
+			entity.damageTaken = (db_entity.meters.damageTaken) ? db_entity.meters.damageTaken : 0;
+			entity.healingTaken = (db_entity.meters.healingTaken) ? db_entity.meters.healingTaken : 0;
+			entity.overkillTaken = (db_entity.meters.overkillTaken) ? db_entity.meters.overkillTaken : 0;
+			entity.overhealingTaken = (db_entity.meters.overhealingTaken) ? db_entity.meters.overhealingTaken : 0;
 		} else {
 			entity.damage = 0
 			entity.healing = 0
 			entity.overkill = 0
 			entity.overhealing = 0
+			entity.damageTaken = 0
+			entity.healingTaken = 0
+			entity.overkillTaken = 0
+			entity.overhealingTaken = 0
 		}
 
 		if(db_entity.transformed) {
@@ -130,6 +138,7 @@ const mutations = {
 				entity.curHp = rootState.content.campaigns[state.campaignId].players[key].curHp
 				entity.tempHp = rootState.content.campaigns[state.campaignId].players[key].tempHp
 				entity.ac_bonus = rootState.content.campaigns[state.campaignId].players[key].ac_bonus
+				entity.maxHpMod = rootState.content.campaigns[state.campaignId].players[key].maxHpMod
 
 				//get other values from the player
 				let db_player = rootState.content.players[key]
@@ -138,7 +147,7 @@ const mutations = {
 				
 				entity.name = db_player.character_name
 				entity.ac = parseInt(db_player.ac)
-				entity.maxHp = parseInt(db_player.maxHp)
+				entity.maxHp = (entity.maxHpMod !== 0) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
 				entity.strength = db_player.strength
 				entity.dexterity = db_player.dexterity
 				entity.constitution = db_player.constitution
@@ -165,43 +174,56 @@ const mutations = {
 				}
 
 				if(!entity.avatar) {
-					entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
+					//if an entity is quicly added during an ecnounter
+					//without copying an existing
+					//it won't have data_npc
+					if(data_npc) {
+						entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
+					} else {
+						entity.img = require('@/assets/_img/styles/monster.png');
+					}
 				}
 				else {
 					entity.img = entity.avatar;
 				}
-				entity.size = data_npc.size
-				entity.type = data_npc.type
-				entity.subtype = data_npc.subtype
-				entity.alignment = data_npc.alignment
-				entity.challenge_rating = data_npc.challenge_rating
-				entity.hit_dice = data_npc.hit_dice
-				entity.speed = data_npc.speed
-				entity.senses = data_npc.senses
-				entity.languages = data_npc.languages
+				
+				//if an entity is quicly added during an ecnounter
+				//without copying an existing
+				//it won't have data_npc
+				if(data_npc) {
+					entity.size = data_npc.size
+					entity.type = data_npc.type
+					entity.subtype = data_npc.subtype
+					entity.alignment = data_npc.alignment
+					entity.challenge_rating = data_npc.challenge_rating
+					entity.hit_dice = data_npc.hit_dice
+					entity.speed = data_npc.speed
+					entity.senses = data_npc.senses
+					entity.languages = data_npc.languages
 
-				entity.strength = data_npc.strength
-				entity.dexterity = data_npc.dexterity
-				entity.constitution = data_npc.constitution
-				entity.intelligence = data_npc.intelligence
-				entity.wisdom = data_npc.wisdom
-				entity.charisma = data_npc.charisma
+					entity.strength = data_npc.strength
+					entity.dexterity = data_npc.dexterity
+					entity.constitution = data_npc.constitution
+					entity.intelligence = data_npc.intelligence
+					entity.wisdom = data_npc.wisdom
+					entity.charisma = data_npc.charisma
 
-				entity.strength_save = data_npc.strength_save
-				entity.dexterity_save = data_npc.dexterity_save
-				entity.constitution_save = data_npc.constitution_save
-				entity.intelligence_save = data_npc.intelligence_save
-				entity.wisdom_save = data_npc.wisdom_save
-				entity.charisma_save = data_npc.charisma_save
+					entity.strength_save = data_npc.strength_save
+					entity.dexterity_save = data_npc.dexterity_save
+					entity.constitution_save = data_npc.constitution_save
+					entity.intelligence_save = data_npc.intelligence_save
+					entity.wisdom_save = data_npc.wisdom_save
+					entity.charisma_save = data_npc.charisma_save
 
-				entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
-				entity.damage_resistances = data_npc.damage_resistances
-				entity.damage_immunities = data_npc.damage_immunities
-				entity.condition_immunities = data_npc.condition_immunities
+					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
+					entity.damage_resistances = data_npc.damage_resistances
+					entity.damage_immunities = data_npc.damage_immunities
+					entity.condition_immunities = data_npc.condition_immunities
 
-				entity.special_abilities = data_npc.special_abilities
-				entity.actions = data_npc.actions
-				entity.legendary_actions = data_npc.legendary_actions
+					entity.special_abilities = data_npc.special_abilities
+					entity.actions = data_npc.actions
+					entity.legendary_actions = data_npc.legendary_actions
+				}
 				break
 			}
 		}
@@ -239,24 +261,19 @@ const mutations = {
 			localStorage.setItem(state.encounterId, parsed);
 		}
 	},
-	SET_METERS(state, {key, type, amount, over}) {
+	SET_METERS(state, {key, type, amount}) {
 
 		//DON'T put environment damage in meters
 		if(key != 'environment') {
-			let newVal = state.entities[key][type] + amount; //set the new amount
-			let overType = (type == 'damage') ? 'overkill' : 'overhealing'; //set the over type overhealing
-			let newOver = state.entities[key][overType] + over; //set the new over amount
-			
-			//You can't do minus damage, so set to 0 if lower
-			//This can happen when a logged action is undone
-			if(newVal < 0) { newVal = 0 } 
-			if(newOver < 0) { newOver = 0 }
+			let currentAmount = state.entities[key][type]; //Current healing done/taken
+			if(currentAmount === undefined) { currentAmount = 0; } //if there is no healing done/taken yet
+			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
-			//Safe the new values in Firebase and the store
-			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newVal);
-			encounters_ref.child(`${state.path}/entities/${key}/meters/${overType}`).set(newOver);
-			state.entities[key][type] = newVal;
-			state.entities[key][overType] = newOver;
+			if(newAmount < 0) { newAmount = 0 } 
+
+			//Save the new values in Firebase and the store
+			encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newAmount);
+			state.entities[key][type] = newAmount;
 		}
 	},
 	SET_ENCOUNTER(state, payload) {
@@ -359,16 +376,22 @@ const mutations = {
 		Vue.set(state.entities[key], 'curHp', entity.curHp)
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+
+		
 		
 		encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},
 	EDIT_PLAYER(state, {key, entity}) {
 		Vue.set(state.entities[key], 'initiative', entity.initiative)
 		Vue.set(state.entities[key], 'ac', entity.ac)
-		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
 		Vue.set(state.entities[key], 'curHp', entity.curHp)
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+		Vue.set(state.entities[key], 'maxHpMod', entity.maxHpMod)
+
+		entity.maxHp = entity.maxHp + entity.maxHpMod;
+
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
 
 		//INIT needs to be updated in firebase
 		encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);

@@ -66,6 +66,11 @@
 							{{ data.value }}</span>
 					</span>
 
+					<!-- LIVE -->
+					<span slot="live" slot-scope="data" v-if="data.value" class="red">
+						Live
+					</span>
+
 					<!-- LOADER -->
 					<div slot="table-busy" class="loader">
 						<span>Loading users....</span>
@@ -123,6 +128,10 @@
 					patreon: {
 						label: 'Patreon',
 						sortable: true
+					},
+					live: {
+						label: 'Live',
+						sortable: true
 					}
 				},
 				search: '',
@@ -168,6 +177,14 @@
 						await getStatus.on('value', (snapshot) => {
 							if(snapshot.val()) {
 								users[key].status = snapshot.val().state;
+							}
+						});
+
+						// Get Status
+						let getLive = db.ref(`broadcast/${key}/live`);
+						await getLive.on('value', (snapshot) => {
+							if(snapshot.val()) {
+								users[key].live = snapshot.val();
 							}
 						});
 					}

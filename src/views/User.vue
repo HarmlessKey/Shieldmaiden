@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="!loadingCampaigns">
 	<div class="top d-flex justify-content-between" v-if="!$route.params.campid">
 		<span><i class="fas fa-user"></i> {{ username['.value'] }}</span>
 		<Follow />
@@ -21,15 +21,15 @@
 					<div class="card-body">
 						
 						<!-- SHOW PLAYERS -->
-						<div v-if="campaign.players && !loadingPlayers" class="players">
+						<div v-if="campaign.players" class="players">
 							<div 
 								v-for="(player, key) in campaign.players" 
 								:key="key"
 								class="img"
 								v-b-tooltip.hover
-								:title="players[key].character_name"
+								:title="player.character_name"
 							>
-								<div v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></div>
+								<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
 								<img v-else src="@/assets/_img/styles/player.svg" />
 							</div>
 						</div>
@@ -85,8 +85,9 @@
 			return {
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
+				campaigns: undefined,
 				tier: undefined,
-				loadingPlayers: true
+				loadingCampaigns: true
 			}
 		},
 		firebase() {
@@ -98,22 +99,16 @@
 				live: {
 					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true,
-				},
-				campaigns: db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null),
-				players: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
-					readyCallback: () => this.loadingPlayers = false
 				}
 			}
 		},
 		updated() {
 			this.$nextTick(function() {
+				// eslint-disable-next-line
 				let ins = $('ins')
-				for (let i = 0; i < ins.length; i++) {
-					
-				}
+				// eslint-disable-next-line
 				if ($('ins').length > 0) {
+					// eslint-disable-next-line
 					(adsbygoogle = window.adsbygoogle || []).push({});
 				}
 			})
@@ -121,8 +116,25 @@
 		beforeMount() {
 			this.fetch_tier()
 		},
-		computed: {
-			
+		mounted() {
+			var campaigns = db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null);
+			campaigns.on('value', async (snapshot) => {
+				let campaigns = snapshot.val();
+				
+				//Get Players
+				for(let key in snapshot.val()) {
+					campaigns[key]['.key'] = key;
+
+					for(let playerKey in campaigns[key].players) {
+						let getPlayer = db.ref(`players/${this.userId}/${playerKey}`);
+						await getPlayer.on('value', (snapshot) => {
+							campaigns[key].players[playerKey] = snapshot.val()
+						});
+					}
+				}
+				this.campaigns = campaigns;
+				this.loadingCampaigns = false;
+			});
 		},
 		methods: {
 			makeDate(input) {
@@ -136,17 +148,12 @@
 				let d = new Date(input)
 				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
 				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
 				let time = hours + ":" + minutes;
 				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
 				return date + " - " + time;
 			},
 			fetch_tier() {
-
-				// return this.user
-				let ret = undefined
-
 				let path = 'tiers/basic'
 
 				db.ref(`users/${this.userId}`).once('value', user_snap => {

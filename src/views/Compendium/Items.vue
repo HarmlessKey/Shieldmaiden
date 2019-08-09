@@ -57,11 +57,6 @@
 						{{ data.value }}
 				</span>
 
-				<!-- CHECKED -->
-				<span :class="{ 'green': data.value }" slot="checked" slot-scope="data">
-						<i v-if="data.value" class="fas fa-check"></i>
-				</span>
-
 				<!-- LOADER -->
 				<div slot="table-busy" class="loader">
 					<span>Loading items....</span>
@@ -69,14 +64,7 @@
 			</b-table>
 		
 			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
-			
-			<!-- <a class="btn btn-block" @click="saveItems()">Copy Items from API</a>
-			<ul>
-				<li v-for="(item, index) in allItems" :key="index">
-					{{ index + 1 }}. {{ item.name }}<br/>
-					{{ item.desc }}
-				</li>
-			</ul> -->
+	
 			</template>
 
 			<!-- WHEN AN ITEM IS SELECTED -->
@@ -124,11 +112,7 @@
           rarity: {
             label: 'Rarity',
             sortable: true
-					},
-          checked: {
-            label: 'Checked',
-            sortable: true
-					},
+					}
 				},
 				search: '',
 				searching: '',
@@ -147,9 +131,6 @@
 				}
 			}
 		},
-		// mounted() {
-		// 	this.getItems()
-		// },
 		beforeMount() {
 			this.searchResults = this.items
 		},
@@ -157,35 +138,7 @@
 			...mapActions([
 				'setSlide'
 			]),
-			// saveItems() {
-
-			// 	//Save all items from the API in Firebase
-			// 	for(let key in this.allItems) {
-			// 		let item = this.allItems[key]
-			// 		// console.log(item)
-
-			// 		//REMOVE UNNEEDED SHIT
-			// 		delete item.document_slug
-			// 		item.url = item.slug
-			// 		delete item.slug
-
-			// 		console.log(item.name, ' Added')
-
-			// 		db.ref('items/').push(item);
-			// 	}
-			// },
-			// getItems() {
-			// 	var id;
-
-			// 	for(id = 1; id <= 5; id++) {
-			// 		axios.get("https://api-beta.open5e.com/magicitems/?format=json&page=" + id)
-			// 		.then(response => {
-			// 			for(let result in response.data.results) {
-			// 				this.allItems.push(response.data.results[result])
-			// 			}
-			// 		})
-			// 	}
-			// },
+		
 			searchItem() {
 				this.current = 1; //Set current page to 1
 				this.searchResults = [] //clear old search results

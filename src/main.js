@@ -11,6 +11,7 @@ import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
+import vueNumeralFilterInstaller from 'vue-numeral-filter';
 // import Element from 'element-ui';
 // import 'element-ui/lib/theme-chalk/index.css';
 
@@ -27,6 +28,7 @@ Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
+Vue.use(vueNumeralFilterInstaller);
 // Vue.use(Element);
 
 //Bootstrap

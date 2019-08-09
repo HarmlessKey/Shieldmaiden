@@ -49,15 +49,24 @@
 				<template v-if="entity.active == true">
 					<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
 						{{ setNumber(displayStats().curHp) }} 
-						<span class="hp" v-b-tooltip.hover title="Current / Max HP + Temp">
+						<span class="hp">
 							<span class="current" :class="{ 
 								'red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
 								'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) <= 76, 
 								'green': true
 								}">{{ animatedNumber }}</span>
-								<span class="gray-hover">/</span>{{ displayStats().maxHp }}
+								<span class="gray-hover" >/</span>
+								<span :class="{ 
+										'green': entity.maxHpMod > 0, 
+										'red': entity.maxHpMod < 0 
+									}" 
+									v-b-tooltip.hover :title="'Max HP + ' + entity.maxHpMod">
+									{{ displayStats().maxHp }}
+								</span>
 							<template v-if="entity.tempHp">
-								<span class="gray-hover">+{{ entity.tempHp }}</span>
+								<span class="gray-hover" v-b-tooltip.hover title="Temp HP">
+									+{{ entity.tempHp }}
+								</span>
 							</template>
 						</span>
 					</template>

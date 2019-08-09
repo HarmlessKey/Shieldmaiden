@@ -154,7 +154,15 @@ export const difficulty = {
 
 					//Custom NPC CR
 					if (entity.npc == 'custom') {
-						rating = this.npcs[entity.id].challenge_rating
+						if(!this.npcs[entity.id]) {
+							let error = {
+								0: 'error',
+								1: 'An NPC with no challenge rating is added.',
+							}
+							return error;
+						} else {
+							rating = this.npcs[entity.id].challenge_rating
+						}
 					} 
 
 					//SRD monster CR

@@ -110,6 +110,7 @@
 									<p>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</p>
 								</div>
 								<div class="tab-pane fade" id="select" role="tabpanel" aria-labelledby="select-tab">
+									<p>Search all NCP's, including your custom.</p>
 									<div class="input-group mb-3">
 										<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
 										<div class="input-group-append">
@@ -119,7 +120,7 @@
 									<ul class="entities">
 										<p v-if="noResult" class="red">{{ noResult }}</p>
 										<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-											<div class="d-flex justify-content-left">
+											<div :class="{'blue': npc.custom}">
 												{{ npc.name }}
 											</div>
 											<span>
@@ -131,52 +132,22 @@
 													<i class="fas fa-info"></i>
 												</a>
 												<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[npc['.key']]" />
-												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, false)">
+												<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(npc['.key'], 'npc', npc.name, npc.custom)">
 													<i class="fas fa-plus"></i>
 												</a>
-												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, false, true)">
+												<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(npc['.key'], 'npc', npc.name, npc.custom, true)">
 													<i class="fas fa-dice-d20"></i>
 												</a>
 											</div>
 										</li>
 									</ul>
-									<template v-if="npcs">
-										<h2>Custom NPC's</h2>
-										<ul class="entities hasImg">
-											<li v-for="(npc, key) in npcs"
-												:key="key" 
-												class="d-flex justify-content-between">
-												<div class="d-flex justify-content-left">
-													<span v-if="npc.avatar" class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></span>
-													<img v-else src="@/assets/_img/styles/monster.png" class="img" />
-													{{ npc.name }}
-												</div>
-												<span>
-													<span class="hover-hide">CR: {{ npc.challenge_rating }}</span>
-													<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-												</span>
-												<div class="actions justify-content-end">
-													<a @click="setSlide({show: true, type: 'ViewEntity', data: npc })" v-b-tooltip.hover title="Show Info">
-														<i class="fas fa-info"></i>
-													</a>
-													<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" value="1" v-model="to_add[key]" />
-													<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(key, 'npc', npc.name, true)">
-														<i class="fas fa-plus"></i>
-													</a>
-													<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(key, 'npc', npc.name, true, true)">
-														<i class="fas fa-dice-d20"></i>
-													</a>
-												</div>
-											</li>
-										</ul>
-									</template>
 								</div>
 							</div>
 						</div>
 					</b-col>
 					
 					<!-- ADDED -->
-					<b-col sm="6">
+					<b-col md="6">
 						<div id="added" class="bg-gray" v-if="encounter">
 							<template>
 								<div class="diff d-flex justify-content-between">
@@ -215,11 +186,13 @@
 										</template>
 										<template v-else-if="entity.entityType == 'npc'">
 											<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-											<span v-else-if="entity.npc == 'custom' && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
 											<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
 											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
 										</template>
-										<i v-if="entity.friendly" class="fas fa-heart green mr-2"></i> {{ entity.name }}
+										<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
+											{{ entity.name }}
+										</span>
 									</div>
 									<div class="actions">
 										<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
@@ -363,7 +336,7 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
-				monsters: db.ref(`monsters`),
+				// monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -374,8 +347,10 @@
 				'npcs',
 				'overencumbered',
 			]),
+			// eslint-disable-next-line
 			async _excludeFriendlies() {
 				if(this.encounter) {
+					// eslint-disable-next-line
 					var entities = await _.chain(this.encounter.entities)
 									.filter(function(entity, key) {
 										entity.key = key
@@ -401,6 +376,28 @@
 			this.fetchCampaign({
 				cid: this.campaignId, 
 			})
+
+			//GET NPCS
+			var monsters = db.ref(`monsters`);
+			monsters.on('value', async (snapshot) => {
+				let monsters = snapshot.val();
+
+				for(let key in monsters) {
+					monsters[key]['.key'] = key;
+					monsters[key].custom = false;
+				}
+				let custom = db.ref(`npcs/${this.user.uid}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						customNpcs[key].custom = true;
+						customNpcs[key]['.key'] = key;
+						monsters.push(customNpcs[key]);
+					}
+				});
+				this.monsters = monsters;
+				this.loadingNpcs = false;
+			});
 		},
 		methods: {
 			...mapActions([
@@ -445,7 +442,7 @@
 					let n = 0
 					for (let i in this.encounter.entities) {
 						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
-						let id = this.encounter.entities[i].id
+						// let id = this.encounter.entities[i].id
 						if (match[1].trim() == entity.name) {
 							n++
 							if (parseInt(match[3]) > last) {
@@ -461,7 +458,7 @@
 					}
 					
 					if(custom == false) {
-						var npc_data = this.monsters[id - 1];
+						var npc_data = this.monsters[id];
 						entity.npc = 'api'
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');

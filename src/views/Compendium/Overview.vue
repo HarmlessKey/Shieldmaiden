@@ -18,7 +18,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
 	import Crumble from '@/components/crumble/Compendium.vue'
 
@@ -39,11 +38,11 @@
 						url: 'conditions',
 						icon: 'fas fa-skull-crossbones',
 					},
-					// 'items': { 
-					// 	name: 'Items',
-					// 	url: 'items',
-					// 	icon: 'fas fa-treasure-chest',
-					// },
+					'items': { 
+						name: 'Items',
+						url: 'items',
+						icon: 'fas fa-treasure-chest',
+					},
 					'monsters': { 
 						name: 'Monsters',
 						url: 'monsters',

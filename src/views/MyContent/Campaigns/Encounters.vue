@@ -120,8 +120,8 @@
 												</a>
 											</div>
 
-											<span class="dropleft">
-												<a class="options d-sm-none"
+											<span class="dropleft d-sm-none actions-dropdown">
+												<a class="options"
 													id="options"
 													data-toggle="dropdown" 
 													aria-haspopup="true" 
@@ -183,7 +183,24 @@
 													<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 												</div>
 												
-												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+												<span class="dropleft d-sm-none actions-dropdown">
+													<a class="options"
+														id="options"
+														data-toggle="dropdown" 
+														aria-haspopup="true" 
+														aria-expanded="false">
+														<i class="far fa-ellipsis-v"></i>
+													</a>
+													<div class="dropdown-menu" aria-labelledby="options">	
+														<!-- <div class="dropdown-header">{{ entity.name }}</div> -->
+														<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)" class="dropdown-item">
+															<i class="fas fa-undo"></i> Reset encounter
+														</a>
+														<a v-b-tooltip.hover title="Delete" class="ml-2 dropdown-item" @click="deleteEncounter(encounter.key, encounter.encounter)">
+															<i class="fas fa-trash-alt"></i> Delete encounter
+														</a>
+													</div>
+												</span>
 												
 											</div>
 										
@@ -551,4 +568,5 @@
 		}
 	}
 }
+
 </style>

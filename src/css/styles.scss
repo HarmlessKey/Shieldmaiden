@@ -397,6 +397,14 @@ table {
 					}
 				}
 			}
+
+			.actions-dropdown {
+				width: 30px;
+				text-align: center;
+				a {
+					display: block;
+				}
+			}
 			.fa-ellipsis-v {
 				line-height: 22px;
 			}

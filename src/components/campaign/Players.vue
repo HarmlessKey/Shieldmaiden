@@ -84,7 +84,27 @@
 									<i class="fas fa-pencil"></i>
 								</a>
 							</div>
-							<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+							<span class="dropleft d-sm-none actions-dropdown">
+								<a class="options"
+									id="options"
+									data-toggle="dropdown" 
+									aria-haspopup="true" 
+									aria-expanded="false">
+									<i class="far fa-ellipsis-v"></i>
+								</a>
+								<div class="dropdown-menu" aria-labelledby="options">	
+									<!-- <div class="dropdown-header">{{ entity.name }}</div> -->
+									<a class="gray-hover dropdown-item" v-b-tooltip.hover title="Edit player" 
+										@click="setSlide({
+											show: true,
+											type: 'slides/EditPlayer',
+											data: { key: key, location: 'overview',}
+										})">
+										<i class="fas fa-pencil"></i> Edit player
+									</a>
+								</div>
+							</span>
+							<!-- <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i> -->
 						</div>
 					</td>
 				</tr>

@@ -75,7 +75,6 @@
 											<i class="far fa-ellipsis-v"></i>
 										</a>
 										<div class="dropdown-menu" aria-labelledby="options">	
-											<!-- <div class="dropdown-header">{{ entity.name }}</div> -->
 											<router-link class="gray-hover mx-1 dropdown-item" 
 												:to="'/players/' + player.key" 
 												v-b-tooltip.hover title="Edit">
@@ -89,7 +88,6 @@
 											</a>
 										</div>
 									</span>
-									<!-- <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i> -->
 								</div>
 							</td>
 						</tr>

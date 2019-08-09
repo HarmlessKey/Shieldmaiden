@@ -129,7 +129,6 @@
 													<i class="far fa-ellipsis-v"></i>
 												</a>
 												<div class="dropdown-menu" aria-labelledby="options">	
-													<!-- <div class="dropdown-header">{{ entity.name }}</div> -->
 													<router-link 
 														v-if="encounter.entities" 
 														:to="'/run-encounter/' + campaignId + '/' + encounter.key" 
@@ -192,7 +191,6 @@
 														<i class="far fa-ellipsis-v"></i>
 													</a>
 													<div class="dropdown-menu" aria-labelledby="options">	
-														<!-- <div class="dropdown-header">{{ entity.name }}</div> -->
 														<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)" class="dropdown-item">
 															<i class="fas fa-undo"></i> Reset encounter
 														</a>
@@ -553,13 +551,7 @@
 	}
 }
 
-// td:last-child {
-// 	padding: 0;
-// 	vertical-align: middle;
-// }
-
 .actions {
-	// position: relative;
 	a.disabled {
 		color: #494747 !important;
 		cursor: default !important;

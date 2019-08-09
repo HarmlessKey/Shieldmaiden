@@ -214,6 +214,7 @@ export const difficulty = {
 			//Calculate the total XP with the right multiplier
 			//This value is compared with the party tresholds, to show the difficulty
 			let compare = this.multiply(nMonsters, nPlayers, totalXp);
+			diff['totalXp'] = totalXp;
 			diff['compare'] = compare; //the XP value that you compare to the tresholds
 
 			//Return the right difficulty for the encounter

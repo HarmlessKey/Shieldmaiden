@@ -672,6 +672,26 @@ table {
 	}
 }
 
+.progress {
+	.progress-bar {
+		&.bg-secondary {
+			background-color: $gray-hover !important;
+		}
+		&.bg-success {
+			background-color: $green !important;
+		}
+		&.bg-warning {
+			background-color: $yellow !important;
+		}
+		&.bg-info {
+			background-color: $orange !important;
+		}
+		&.bg-danger {
+			background-color: $red !important;
+		}
+	}
+}
+
 ul.pagination {
 	li.page-item {
 		

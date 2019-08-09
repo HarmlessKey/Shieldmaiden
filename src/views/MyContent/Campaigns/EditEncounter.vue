@@ -5,37 +5,150 @@
 	<div id="hasSide" v-else-if="encounter">
 		<Sidebar/>
 		<div class="container-fluid">
-			<div class="info mb-4">
-				<Crumble />
+			<Crumble />
 
-				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
+			<b-row>
+				<b-col md="8">
+					<div class="info mb-4">
+						<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
 
-				<b-row class="mt-3">
-					<b-col class="mb-2">
-						<input class="form-control" 
-							autocomplete="off"
-							v-validate="'required'" 
-							data-vv-as="Encounter Name" 
-							type="text" name="name" 
-							v-model="encounter.encounter"/>
-						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+						<b-row class="mt-3">
+							<b-col class="mb-2">
+								<input class="form-control" 
+									autocomplete="off"
+									v-validate="'required'" 
+									data-vv-as="Encounter Name" 
+									type="text" name="name" 
+									v-model="encounter.encounter"/>
+								<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2"
-							autocomplete="off" 
-							v-validate="'url'" type="text" 
-							name="backbround" 
-							data-vv-as="Background"
-							v-model="encounter.background" 
-							placeholder="Background URL"/>
-						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+								<input class="form-control mt-2"
+									autocomplete="off" 
+									v-validate="'url'" type="text" 
+									name="backbround" 
+									data-vv-as="Background"
+									v-model="encounter.background" 
+									placeholder="Background URL"/>
+								<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
-						<button class="btn mt-2" @click="edit()">Save Name & Background</button>
-					</b-col>
-					<b-col sm="3" v-if="encounter.background">
-						<div class="img-container"><img :src="encounter.background" /></div>
-					</b-col>
-				</b-row>
-			</div>
+								<button class="btn mt-2" @click="edit()">Save Name & Background</button>
+							</b-col>
+							<b-col sm="3" v-if="encounter.background">
+								<div class="img-container"><img :src="encounter.background" /></div>
+							</b-col>
+						</b-row>
+					</div>
+
+					<div class="input-group mb-3">
+						<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+						<div class="input-group-append">
+							<button class="btn"><i class="fas fa-search"></i></button>
+						</div>
+					</div>
+
+					<!-- ADD MONSTERS -->
+					<b-table 
+							class="table entities"
+							:busy="loadingNpcs"
+							:items="searchResults" 
+							:fields="monsterFields"
+							:per-page="15"
+							:current-page="currentPage"
+						>
+						<template slot="index" slot-scope="data">
+							{{ data.index + 1 }}
+						</template>
+
+						<!-- ACTIONS -->
+						<div slot="actions" slot-scope="data">
+							<div class="actions justify-content-end">
+								<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" v-b-tooltip.hover title="Show Info">
+									<i class="fas fa-info"></i>
+								</a>
+								<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
+								<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
+									<i class="fas fa-plus"></i>
+								</a>
+								<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
+									<i class="fas fa-dice-d20"></i>
+								</a>
+							</div>
+						</div>
+
+						<!-- LOADER -->
+						<div slot="table-busy" class="loader">
+							<span>Loading users....</span>
+						</div>
+					</b-table>
+					<b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
+				</b-col>
+
+				<!-- ADDED ENTITIES -->
+				<b-col md="4">
+					<div v-if="encounter">
+						<h3>
+							Difficulty:
+							<span v-if="encDifficulty" class="text-capitalize" :class="{ 
+								'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
+								'orange':  encDifficulty[0] == 'hard', 
+								'yellow':  encDifficulty[0] == 'medium', 
+								'green':  encDifficulty[0] == 'easy'}">
+								{{ encDifficulty[0] }}
+							</span>
+						</h3>
+						<div class="diff-info" v-if="encDifficulty">
+							{{ encDifficulty[1] }}
+							<template v-if="encDifficulty['easy']">
+								<p>
+									<b>Party XP tresholds</b><br/>
+									<span class="left">Easy:</span> <span :class="{ 'blue': encDifficulty[0] == 'easy'}">{{ encDifficulty['easy'] }}</span><br/>
+									<span class="left">Medium:</span> <span :class="{ 'blue': encDifficulty[0] == 'medium'}">{{ encDifficulty['medium'] }}</span><br/>
+									<span class="left">Hard:</span> <span :class="{ 'blue': encDifficulty[0] == 'hard'}">{{ encDifficulty['hard'] }}</span><br/>
+									<span class="left">Deadly:</span> <span :class="{ 'blue': encDifficulty[0] == 'deadly'}">{{ encDifficulty['deadly'] }}</span>
+								</p>
+								Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
+								Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+
+								<b-progress 
+									:value="encDifficulty['compare']" 
+									:max="encDifficulty['deadly']" 
+									class="mt-3"
+									:variant="bars[encDifficulty[0]]"
+									></b-progress>
+							</template>
+						</div>
+						<ul class="entities hasImg mt-4" v-if="encounter">
+							<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
+								<div class="d-flex justify-content-left">
+									<template v-if="entity.entityType == 'player'">
+										<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+										<img v-else src="@/assets/_img/styles/player.png" class="img" />
+									</template>
+									<template v-else-if="entity.entityType == 'npc'">
+										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
+										<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+										<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
+										<img v-else src="@/assets/_img/styles/monster.png" class="img" />
+									</template>
+									<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
+										{{ entity.name }}
+									</span>
+								</div>
+								<div class="actions">
+									<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+									</a>
+									<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
+										<i class="fas fa-minus"></i>
+									</a>
+								</div>
+								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+							</li>
+						</ul>
+						<div v-else class="loader"><span>Loading entities...</span></div>
+					</div>
+				</b-col>
+			</b-row>
 
 			<!-- ADD PLAYERS AND NPC'S -->
 			<b-card header="Entities">
@@ -316,6 +429,8 @@
 		},
 		data() {
 			return {
+				currentPage: 1,
+				loadingNpcs: true,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
@@ -327,7 +442,34 @@
 				slide: this.$store.getters.getSlide,
 				searching: false,
 				encDifficulty: undefined,
-				to_add: {}
+				to_add: {},
+				monsterFields: {
+					'index': {
+						label: '#'
+					},
+					name: {
+						label: 'Name',
+						sortable: true
+					},
+					type: {
+						label: 'Type',
+						sortable: true
+					},
+					challenge_rating: {
+						label: 'CR',
+						sortable: true
+					},
+					'actions': {
+						label: ''
+					}
+				},
+				bars: {
+					trivial: 'secondary',
+					easy: 'success',
+					medium: 'warning',
+					hard: 'info',
+					deadly: 'danger',
+				}
 			} 
 		},
 		firebase() {
@@ -336,7 +478,6 @@
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
 					asObject: true
 				},
-				// monsters: db.ref(`monsters`),
 			}
 		},
 		computed: {
@@ -395,6 +536,7 @@
 						monsters.push(customNpcs[key]);
 					}
 				});
+				this.searchResults = Object.values(monsters);
 				this.monsters = monsters;
 				this.loadingNpcs = false;
 			});
@@ -534,6 +676,10 @@
 				if(this.searchResults == '' && this.search != '') {
 					this.noResult = 'No results for "' + this.search + '"';
 				}
+				if(this.search == '') {
+					this.searchResults = Object.values(this.monsters);
+					this.searching = false
+				}
 			},
 			addAllPlayers() {
 				for(let player in this.campaign.players) {
@@ -604,6 +750,10 @@ ul.nav {
 	span.left {
 		width: 80px;
 		display: inline-block;
+	}
+
+	.progress {
+		background-color: #232323 !important;
 	}
 }
 

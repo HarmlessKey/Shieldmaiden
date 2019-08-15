@@ -1,0 +1,576 @@
+<template>
+	<div v-if="overencumbered" class='container-fluid'>
+		<OverEncumbered/>
+	</div>
+	<div id="hasSide" v-else-if="encounter">
+		<Sidebar/>
+		<div class="container-fluid">
+			<Crumble />
+
+			<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
+
+			<b-row>
+				<b-col md="8">
+					<div class="my-4">
+						<ul class="nav nav-tabs" id="myTab" role="tablist">
+							<li class="nav-item">
+								<a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" id="loot-tab" data-toggle="tab" href="#loot" role="tab" aria-controls="loot" aria-selected="false">
+									<i class="fas fa-treasure-chest"></i> Loot
+								</a>
+							</li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+								<b-row class="mt-3">
+									<b-col class="mb-2">
+										<input class="form-control" 
+											autocomplete="off"
+											v-validate="'required'" 
+											data-vv-as="Encounter Name" 
+											type="text" name="name" 
+											v-model="encounter.encounter"/>
+										<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+
+										<input class="form-control mt-2"
+											autocomplete="off" 
+											v-validate="'url'" type="text" 
+											name="backbround" 
+											data-vv-as="Background"
+											v-model="encounter.background" 
+											placeholder="Background URL"/>
+										<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+
+										<button class="btn mt-2" @click="edit()">Save Name & Background</button>
+									</b-col>
+									<b-col sm="3" v-if="encounter.background">
+										<div class="img-container"><img :src="encounter.background" /></div>
+									</b-col>
+								</b-row>
+							</div>
+							<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
+								<Loot />
+							</div>
+						</div>
+					</div>
+
+					<!-- ADD ENTITIES -->
+					<h2>Add Entities</h2>
+					
+					<!-- PLAYERS -->
+					<div class="players bg-gray mb-1">
+						<div v-for="(player, key) in campaign.players" 
+							:key="key"
+							@click="add(key, 'player', players[key].character_name)" 
+							v-b-tooltip.hover 
+							:title="'Add ' + players[key].character_name">
+							<div class="d-flex justify-content-left">
+							<template v-if="checkPlayer(key) < 0">
+								<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
+								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+							</template>
+							</div>
+						</div>
+
+						<div v-if="campaign && campaign.players === undefined">
+							<h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
+							<p>Add players to your campaign first.</p>
+							<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+						</div>
+						<a v-else class="btn" @click="addAllPlayers()">Add all</a>
+					</div>
+					<p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
+
+					<!-- MONSTERS -->
+					<div class="input-group mb-3">
+						<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+						<div class="input-group-append">
+							<button class="btn"><i class="fas fa-search"></i></button>
+						</div>
+					</div>
+
+					<b-table 
+							class="table entities"
+							:busy="loadingNpcs"
+							:items="searchResults" 
+							:fields="monsterFields"
+							:per-page="15"
+							:current-page="currentPage"
+						>
+						<template slot="index" slot-scope="data">
+							{{ data.index + 1 }}
+						</template>
+
+						<!-- ACTIONS -->
+						<div slot="actions" slot-scope="data" class="p-0">
+							<div class="d-flex justify-content-end actions">
+								<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" v-b-tooltip.hover title="Show Info">
+									<i class="fas fa-info"></i>
+								</a>
+								<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
+								<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
+									<i class="fas fa-plus"></i>
+								</a>
+								<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
+									<i class="fas fa-dice-d20"></i>
+								</a>
+							</div>
+						</div>
+
+						<!-- LOADER -->
+						<div slot="table-busy" class="loader">
+							<span>Loading users....</span>
+						</div>
+					</b-table>
+					<b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
+				</b-col>
+
+				<!-- ENCOUNTER SUMMARY -->
+				<b-col md="4">
+					<div v-if="encounter">
+						<h3>
+							Difficulty:
+							<span v-if="encDifficulty" class="text-capitalize" :class="{ 
+								'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
+								'orange':  encDifficulty[0] == 'hard', 
+								'yellow':  encDifficulty[0] == 'medium', 
+								'green':  encDifficulty[0] == 'easy'}">
+								{{ encDifficulty[0] }}
+							</span>
+						</h3>
+						<div class="diff-info" v-if="encDifficulty">
+							{{ encDifficulty[1] }}
+							<template v-if="encDifficulty['easy']">
+								<p>
+									<b>Party XP tresholds</b><br/>
+									<span class="left">Easy:</span> <span :class="{ 'blue': encDifficulty[0] == 'easy'}">{{ encDifficulty['easy'] }}</span><br/>
+									<span class="left">Medium:</span> <span :class="{ 'blue': encDifficulty[0] == 'medium'}">{{ encDifficulty['medium'] }}</span><br/>
+									<span class="left">Hard:</span> <span :class="{ 'blue': encDifficulty[0] == 'hard'}">{{ encDifficulty['hard'] }}</span><br/>
+									<span class="left">Deadly:</span> <span :class="{ 'blue': encDifficulty[0] == 'deadly'}">{{ encDifficulty['deadly'] }}</span>
+								</p>
+								Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
+								Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+
+								<b-progress 
+									:value="encDifficulty['compare']" 
+									:max="encDifficulty['deadly']" 
+									class="mt-3"
+									:variant="bars[encDifficulty[0]]"
+									></b-progress>
+							</template>
+						</div>
+						<ul class="entities hasImg mt-4" v-if="encounter">
+							<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
+								<div class="d-flex justify-content-left">
+									<template v-if="entity.entityType == 'player'">
+										<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+										<img v-else src="@/assets/_img/styles/player.png" class="img" />
+									</template>
+									<template v-else-if="entity.entityType == 'npc'">
+										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
+										<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+										<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
+										<img v-else src="@/assets/_img/styles/monster.png" class="img" />
+									</template>
+									<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
+										{{ entity.name }}
+									</span>
+								</div>
+								<div class="actions">
+									<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+									</a>
+									<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
+										<i class="fas fa-minus"></i>
+									</a>
+								</div>
+								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+							</li>
+						</ul>
+						<div v-else class="loader"><span>Loading entities...</span></div>
+					</div>
+				</b-col>
+			</b-row>
+		</div>
+	</div>
+</template>
+
+<script>
+	import Sidebar from '@/components/SidebarMyContent.vue'
+	import Crumble from '@/components/crumble/MyContent.vue'
+	import Loot from './Loot.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue'
+
+	import _ from 'lodash'
+
+	import { mapGetters, mapActions } from 'vuex'
+	import { db } from '@/firebase'
+	import { difficulty } from '@/mixins/difficulty.js'
+	import { dice } from '@/mixins/dice.js'
+	import { attributes } from '@/mixins/attributes.js'
+
+	export default {
+		name: 'EditCampaign',
+		mixins: [difficulty, attributes, dice],
+		metaInfo: {
+			title: 'Encounters'
+		},
+		components: {
+			Sidebar,
+			Crumble,
+			OverEncumbered,
+			Loot
+		},
+		data() {
+			return {
+				currentPage: 1,
+				loadingNpcs: true,
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+				user: this.$store.getters.getUser,
+				search: '',
+				searchResults: [],
+				noResult: '',
+				auto_npcs: [],
+				viewNPC: [],
+				slide: this.$store.getters.getSlide,
+				searching: false,
+				encDifficulty: undefined,
+				to_add: {},
+				monsterFields: {
+					'index': {
+						label: '#'
+					},
+					name: {
+						label: 'Name',
+						sortable: true
+					},
+					type: {
+						label: 'Type',
+						sortable: true
+					},
+					challenge_rating: {
+						label: 'CR',
+						sortable: true
+					},
+					'actions': {
+						label: ''
+					}
+				},
+				bars: {
+					trivial: 'secondary',
+					easy: 'success',
+					medium: 'warning',
+					hard: 'info',
+					deadly: 'danger',
+				}
+			} 
+		},
+		computed: {
+			...mapGetters([
+				'encounter',
+				'campaign',
+				'players',
+				'npcs',
+				'overencumbered',
+			]),
+			// eslint-disable-next-line
+			async _excludeFriendlies() {
+				if(this.encounter) {
+					// eslint-disable-next-line
+					var entities = await _.chain(this.encounter.entities)
+									.filter(function(entity, key) {
+										entity.key = key
+										return !entity.friendly;
+									})
+									.sortBy('name' , 'asc')
+									.value();
+
+					return entities;
+				}
+			}
+		},
+		watch: {
+			_excludeFriendlies() {
+				this.setDifficulty()
+			}
+		},
+		mounted() {
+			this.fetchEncounter({
+				cid: this.campaignId, 
+				eid: this.encounterId, 
+			}),
+			this.fetchCampaign({
+				cid: this.campaignId, 
+			})
+
+			//GET NPCS
+			var monsters = db.ref(`monsters`);
+			monsters.on('value', async (snapshot) => {
+				let monsters = snapshot.val();
+
+				for(let key in monsters) {
+					monsters[key]['.key'] = key;
+					monsters[key].custom = false;
+				}
+				let custom = db.ref(`npcs/${this.user.uid}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						customNpcs[key].custom = true;
+						customNpcs[key]['.key'] = key;
+						monsters.push(customNpcs[key]);
+					}
+				});
+				this.searchResults = Object.values(monsters);
+				this.monsters = monsters;
+				this.loadingNpcs = false;
+			});
+		},
+		methods: {
+			...mapActions([
+				'fetchEncounter',
+				'fetchCampaign',
+				'setSlide'
+			]),
+			edit() {
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
+							this.encounter
+						);
+						this.$snotify.success('Saved.', 'Critical hit!', {
+							position: "rightTop"
+						});
+					}
+				})
+			},
+			multi_add(id,type,name,custom=false,rollHp=false) {
+				if (!this.to_add[id]) {
+					this.to_add[id] = 1
+				}
+				for (let i = 0; i < this.to_add[id]; i++ ) {
+					this.add(id,type,name,custom,rollHp)
+				}
+				this.to_add[id] = 1
+			},
+			add(id, type, name, custom = false, rollHp = false) {
+				var entity = {
+					id: id,
+					name: name,
+					entityType: type,
+					initiative: 0,
+					active: true,
+				}
+				var HP = undefined;
+
+				if(type == 'npc') {
+					entity.active = true
+					let last = -1
+					let n = 0
+					for (let i in this.encounter.entities) {
+						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
+						// let id = this.encounter.entities[i].id
+						if (match[1].trim() == entity.name) {
+							n++
+							if (parseInt(match[3]) > last) {
+								last = parseInt(match[3])
+							}
+						}
+					}
+					if (last > 0) {
+						entity.name = `${entity.name} (${++last})`
+					} else if (n > 0) {
+						entity.name = `${entity.name} (${n})`
+						
+					}
+					
+					if(custom == false) {
+						var npc_data = this.monsters[id];
+						entity.npc = 'api'
+						if(rollHp && npc_data.hit_dice) {
+							let dice = npc_data.hit_dice.split('d');
+							let mod = dice[0] * this.calcMod(npc_data.constitution)
+
+							HP = this.rollD(dice[1], dice[0], mod)
+
+							entity.curHp = HP.total
+							entity.maxHp = HP.total
+						}
+						else {
+							entity.curHp = npc_data.hit_points
+							entity.maxHp = npc_data.hit_points
+						}
+						entity.ac = npc_data.armor_class
+					}
+					else {
+						npc_data = this.npcs[id];
+						entity.npc = 'custom'
+						entity.ac = npc_data.ac
+
+						if(rollHp && npc_data.hit_dice) {
+							let dice = npc_data.hit_dice.split('d');
+							let mod = dice[0] * this.calcMod(npc_data.constitution)
+
+							HP = this.rollD(dice[1], dice[0], mod)
+							
+							entity.curHp = HP.total
+							entity.maxHp = HP.total
+						}
+						else {
+							entity.curHp = npc_data.maxHp
+							entity.maxHp = npc_data.maxHp
+						}
+					}
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
+				}
+				else if (type == 'player') {
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
+				}
+				if(type == 'npc') {
+					let notifyHP = [];
+
+					if(HP) {
+						notifyHP.total = HP.total
+						notifyHP.throws = ' [' + HP.throws + '] '
+						notifyHP.mod = HP.mod
+					}
+					else {
+						notifyHP.total = entity.maxHp;
+						notifyHP.throws = ''
+						notifyHP.mod = ''
+					}
+
+					this.$snotify.success('HP: ' + notifyHP.total + notifyHP.throws + notifyHP.mod, 'NPC added', {
+						position: "centerTop"
+					});
+				}
+			},
+			remove(id) {
+				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+			},
+			searchNPC() {
+				this.searchResults = []
+				this.searching = true
+				for (var i in this.monsters) {
+					var m = this.monsters[i]
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
+					}
+				}
+				if(this.searchResults == '' && this.search != '') {
+					this.noResult = 'No results for "' + this.search + '"';
+				}
+				if(this.search == '') {
+					this.searchResults = Object.values(this.monsters);
+					this.searching = false
+				}
+			},
+			addAllPlayers() {
+				for(let player in this.campaign.players) {
+					let name = this.players[player].character_name;
+					this.add(player, 'player', name)
+				}
+			},
+			checkPlayer(id) {
+				return (Object.keys(this.encounter.entities).indexOf(id))
+			},
+			async setDifficulty() {
+				this.encDifficulty = await this.difficulty(this.encounter.entities)
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+.container-fluid {
+	padding: 20px;
+
+}
+ul.nav {
+	a.nav-link {
+		&.active {
+			background: #302f2f !important;
+		}
+	}
+}
+.tab-content {
+	background: #302f2f !important;
+	padding: 15px;
+}
+
+.players {
+	display: flex;
+	justify-content: flex-start;
+	padding: 10px;
+
+	.img {
+		width: 38px;
+		height: 38px;
+		background-size: cover;
+		background-position: center top;
+		margin-right: 5px;
+		background-color: #302f2f;
+		cursor: pointer;
+	}
+}
+
+.diff-info {
+	background: #302f2f;
+	padding: 10px;
+	margin-top: 10px;
+
+	span.left {
+		width: 80px;
+		display: inline-block;
+	}
+
+	.progress {
+		background-color: #232323 !important;
+	}
+}
+
+
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.multi_nr {
+	width: 45px;
+	height: 30px;
+	text-align: center;
+	margin-left: 4px;
+}
+.npc {
+	padding: 15px;
+	position: fixed;
+	right: 0;
+	top: 50px;
+	height: calc(100vh - 50px);
+	width: 330px;
+	z-index: 99;
+	overflow: auto;
+	border-left: solid 1px #000;
+	box-shadow: 0 10px 8px #000;
+}
+.img-container {
+	width: 100%;
+
+	img {
+		width: 100%;
+	}
+}
+.faded {
+	opacity: .3;
+}
+
+</style>

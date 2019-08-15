@@ -48,7 +48,8 @@
 									{{ npc.name }}
 								</router-link>
 							</td>
-							<td>
+							<!-- Actions -->
+							<td class="align-middle p-0">
 								<div class="d-flex justify-content-end">
 									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 
@@ -63,7 +64,28 @@
 											<i class="fas fa-trash-alt"></i>
 										</a>
 									</div>
-									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+									<span class="dropleft d-sm-none actions-dropdown">
+										<a class="options"
+											id="options"
+											data-toggle="dropdown" 
+											aria-haspopup="true" 
+											aria-expanded="false">
+											<i class="far fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu" aria-labelledby="options">	
+											<router-link class="gray-hover mx-1 dropdown-item" 
+												:to="'/npcs/' + npc.key" 
+												v-b-tooltip.hover title="Edit">
+													<i class="fas fa-pencil"></i> Edit NPC
+											</router-link>
+											<a v-b-tooltip.hover 
+												title="Delete" 
+												class="gray-hover dropdown-item"
+												@click="confirmDelete(npc.key, npc.name)">
+												<i class="fas fa-trash-alt"></i> Delete NPC
+											</a>
+										</div>
+									</span>
 								</div>
 							</td>
 						</tr>

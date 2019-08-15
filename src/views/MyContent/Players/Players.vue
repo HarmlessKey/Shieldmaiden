@@ -50,7 +50,8 @@
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td>
+							<!-- Actions -->
+							<td class="align-middle p-0">
 								<div class="d-flex justify-content-end">
 									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 
@@ -65,7 +66,28 @@
 												<i class="fas fa-trash-alt"></i>
 										</a>
 									</div>
-									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+									<span class="dropleft d-sm-none actions-dropdown">
+										<a class="options"
+											id="options"
+											data-toggle="dropdown" 
+											aria-haspopup="true" 
+											aria-expanded="false">
+											<i class="far fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu" aria-labelledby="options">	
+											<router-link class="gray-hover mx-1 dropdown-item" 
+												:to="'/players/' + player.key" 
+												v-b-tooltip.hover title="Edit">
+													<i class="fas fa-pencil"></i> Edit player
+											</router-link>
+											<a v-b-tooltip.hover 
+												title="Delete" 
+												class="gray-hover dropdown-item"
+												@click="confirmDelete(player.key, player.player, player.control)">
+													<i class="fas fa-trash-alt"></i> Delete player
+											</a>
+										</div>
+									</span>
 								</div>
 							</td>
 						</tr>

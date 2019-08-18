@@ -1,72 +1,65 @@
 <template>
-    <div class="loot">
-        <h2>Currency</h2>
-        <b-row class="mb-5 text-center">
-            <b-col>
-                <label class="coins mr-2 white" v-b-tooltip.hover title="Platinum"><i class="fas fa-coins"></i></label>
-                <input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.pp" placeholder="Platinum"/>
+    <div>
+        <b-row class="loot">
+            <b-col sm="3">
+                <h3>Currency</h3>
+                <ul class="mb-5 currency">
+                    <li v-for="(currency, key) in currencies" :key="key">
+                        <span class="coins" :class="currency.color" v-b-tooltip.hover :title="currency.name"><i class="fas fa-coins"></i></span>
+                        <input class="form-control text-right" autocomplete="off" type="number" min="0" name="name" v-model="loot[key]" :placeholder="currency.name"/>
+                    </li>
+                </ul>
             </b-col>
-            <b-col>
-                <label class="coins mr-2 yellow" v-b-tooltip.hover title="Gold"><i class="fas fa-coins"></i></label>
-                <input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.gp" placeholder="Gold"/>
-            </b-col>
-            <b-col>
-                <label class="coins mr-2" v-b-tooltip.hover title="Silver"><i class="fas fa-coins"></i></label> 
-                <input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.sp" placeholder="Silver"/>
-            </b-col>
-            <b-col>
-                <label class="coins mr-2 orange" v-b-tooltip.hover title="Copper"><i class="fas fa-coins"></i></label>
-                <input class="form-control text-center" autocomplete="off" type="number" min="0" name="name" v-model="loot.cp" placeholder="Copper"/>
+
+            <b-col sm="9">
+                <h3 class="d-flex justify-content-between">
+                    Items
+                    <a class="gray-hover" @click="addItem()">
+                        <i class="fas fa-plus green"></i>
+                        <span class="d-none d-md-inline ml-1">Add</span>
+                    </a>
+                </h3>
+                <hr>
+                <div v-for="(item, index) in loot.items" :key="index">
+                    <h2 class="d-flex justify-content-between">
+                        {{ index + 1 }}. {{ item.name }}
+                        <a @click="removeItem(index)" 
+                            class="gray-hover"
+                            v-b-tooltip.hover title="Remove">
+                            <i class="fas fa-minus red"></i>
+                            <span class="d-none d-md-inline ml-1">Remove</span>
+                        </a>
+                    </h2>
+                    <b-row class="mb-2">
+                        <b-col sm="2">
+                            <label for="name">Name</label>
+                        </b-col>
+                        <b-col sm="10">
+                            <b-form-input
+                                id="name"
+                                type="text" 
+                                v-model="item.name" 
+                                name="name" 
+                                placeholder="Name"></b-form-input>
+                        </b-col>
+                    </b-row>
+                    <b-row class="mb-2">
+                        <b-col sm="2">
+                            <label for="desc">Description</label>
+                        </b-col>
+                        <b-col sm="10">
+                            <textarea
+                                id="desc"
+                                class="form-control" 
+                                v-model="item.desc" 
+                                rows="4"
+                                name="desc" 
+                                placeholder="Description"></textarea>
+                        </b-col>
+                    </b-row>
+                </div>
             </b-col>
         </b-row>
-
-        <h2 class="d-flex justify-content-between">
-            Items
-            <a class="gray-hover" @click="addItem()">
-                <i class="fas fa-plus green"></i>
-                <span class="d-none d-md-inline ml-1">Add</span>
-            </a>
-        </h2>
-        <hr>
-        <div v-for="(item, index) in loot.items" :key="index">
-            <h2 class="d-flex justify-content-between">
-                {{ index + 1 }}. {{ item.name }}
-                <a @click="removeItem(index)" 
-                    class="gray-hover"
-                    v-b-tooltip.hover title="Remove">
-                    <i class="fas fa-minus red"></i>
-                    <span class="d-none d-md-inline ml-1">Remove</span>
-                </a>
-            </h2>
-            <b-row class="mb-2">
-                <b-col sm="2">
-                    <label for="name">Name</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input
-                        id="name"
-                        type="text" 
-                        v-model="item.name" 
-                        name="name" 
-                        placeholder="Name"></b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="mb-2">
-                <b-col sm="2">
-                    <label for="desc">Description</label>
-                </b-col>
-                <b-col sm="10">
-                    <textarea
-                        id="desc"
-                        class="form-control" 
-                        v-model="item.desc" 
-                        rows="4"
-                        name="desc" 
-                        placeholder="Description"></textarea>
-                </b-col>
-            </b-row>
-        </div>
-
         <button class="btn mt-2" @click="setLoot()">Save loot</button>
     </div>
 </template>
@@ -83,6 +76,13 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
 				slide: this.$store.getters.getSlide,
+                currencies: {
+                    pp: { name: 'Platinum', color: 'white' },
+                    gp: { name: 'Gold', color: 'yellow' },
+                    ep: { name: 'Electrum', color: 'gray-light' },
+                    sp: { name: 'Silver', color: 'gray-hover' },
+                    cp: { name: 'Copper', color: 'orange' }
+                 }
 			} 
 		},
 		firebase() {
@@ -136,16 +136,40 @@
 </script>
 
 <style lang="scss" scoped>
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
 .loot {
 	h2 {
 		a {
 			font-size: 15px;
 		}
 	}
-}
-.coins {
-	line-height: 40px !important;
-	font-size: 20px;
+
+    .currency {
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: grid;
+            grid-template-columns: 35px auto;
+            grid-template-rows: auto;
+            margin-bottom: 5px;
+
+            .coins {
+                display: inline-block;
+                text-align: left;
+                line-height: 40px;
+            }
+        }
+    }
 }
 
 </style>

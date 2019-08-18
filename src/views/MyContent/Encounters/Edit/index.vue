@@ -24,31 +24,7 @@
 						</ul>
 						<div class="tab-content">
 							<div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-								<b-row class="mt-3">
-									<b-col class="mb-2">
-										<input class="form-control" 
-											autocomplete="off"
-											v-validate="'required'" 
-											data-vv-as="Encounter Name" 
-											type="text" name="name" 
-											v-model="encounter.encounter"/>
-										<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-
-										<input class="form-control mt-2"
-											autocomplete="off" 
-											v-validate="'url'" type="text" 
-											name="backbround" 
-											data-vv-as="Background"
-											v-model="encounter.background" 
-											placeholder="Background URL"/>
-										<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
-
-										<button class="btn mt-2" @click="edit()">Save Name & Background</button>
-									</b-col>
-									<b-col sm="3" v-if="encounter.background">
-										<div class="img-container"><img :src="encounter.background" /></div>
-									</b-col>
-								</b-row>
+								<General />
 							</div>
 							<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 								<Loot />
@@ -103,17 +79,20 @@
 							{{ data.index + 1 }}
 						</template>
 
+						<template slot="name" slot-scope="data">
+							<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })">
+								{{ data.item.name }}
+							</a>
+						</template>
+
 						<!-- ACTIONS -->
 						<div slot="actions" slot-scope="data" class="p-0">
-							<div class="d-flex justify-content-end actions">
-								<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" v-b-tooltip.hover title="Show Info">
-									<i class="fas fa-info"></i>
-								</a>
+							<div class="monster-actions">
 								<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
-								<a class="gray-hover mx-1" v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
+								<a class="gray-light" v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
 									<i class="fas fa-plus"></i>
 								</a>
-								<a class="gray-hover" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
+								<a class="gray-light" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
 									<i class="fas fa-dice-d20"></i>
 								</a>
 							</div>
@@ -201,6 +180,7 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import Loot from './Loot.vue'
+	import General from './General.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 
 	import _ from 'lodash'
@@ -221,7 +201,8 @@
 			Sidebar,
 			Crumble,
 			OverEncumbered,
-			Loot
+			Loot,
+			General
 		},
 		data() {
 			return {
@@ -335,18 +316,6 @@
 				'fetchCampaign',
 				'setSlide'
 			]),
-			edit() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).set(
-							this.encounter
-						);
-						this.$snotify.success('Saved.', 'Critical hit!', {
-							position: "rightTop"
-						});
-					}
-				})
-			},
 			multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
@@ -502,6 +471,20 @@ ul.nav {
 	padding: 15px;
 }
 
+.monster-actions {
+	display: flex;
+	justify-content: flex-end;
+	
+	a {
+		line-height: 30px;
+		height: 30px;
+		margin-left: 15px;
+	}
+	.form-control {
+		height: 30px;
+	}
+}
+
 .players {
 	display: flex;
 	justify-content: flex-start;
@@ -561,13 +544,6 @@ input[type='number'] {
 	overflow: auto;
 	border-left: solid 1px #000;
 	box-shadow: 0 10px 8px #000;
-}
-.img-container {
-	width: 100%;
-
-	img {
-		width: 100%;
-	}
 }
 .faded {
 	opacity: .3;

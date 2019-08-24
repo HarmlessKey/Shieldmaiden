@@ -28,7 +28,7 @@ Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
-Vue.use(vueNumeralFilterInstaller);
+Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 // Vue.use(Element);
 
 //Bootstrap

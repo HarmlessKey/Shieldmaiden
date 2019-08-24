@@ -10,7 +10,7 @@
 		</h1>
 
 		<b-row>
-			<b-col sm="8">
+			<b-col md="8">
 				<b-row>
 					<b-col sm="8">
 						<b-input-group class="mb-3">
@@ -44,13 +44,16 @@
 						<router-link :to="'/admin/patrons/' + data.item['.key']" slot="email" slot-scope="data">{{ data.value }}</router-link>
 
 						<!-- TIER -->
-						<span slot="tier_title" slot-scope="data">
+						<span slot="tiers" slot-scope="data">
 							<span 
+								v-for="(tier, key) in data.value"
+								:key="tier"
+								class="tiers"
 								:class="{
-									'blue': data.value == 'Folk Hero',
-									'purple': data.value == 'Noble',
-									'orange': data.value == 'Deity'
-								}">{{ data.value }}</span>
+									'blue': tiers[key].name == 'Folk Hero',
+									'purple': tiers[key].name == 'Noble',
+									'orange': tiers[key].name == 'Deity'
+								}">{{ tiers[key].name }}</span>
 						</span>
 
 						<!-- END DATE -->"
@@ -67,6 +70,11 @@
 							</span>
 						</span>
 
+						<!-- STATUS -->
+						<span slot="lifetime_support" slot-scope="data">
+								{{ data.value / 100 | numeral('$0,0') }}
+						</span>
+
 						<!-- LOADER -->
 						<div slot="table-busy" class="loader">
 							<span>Loading patrons....</span>
@@ -76,7 +84,7 @@
 			
 				<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
 			</b-col>
-			<b-col>
+			<b-col md="4">
 				<Notifications />
 			</b-col>
 		</b-row>
@@ -94,7 +102,7 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Patron from '@/components/Admin/Patrons/Patron.vue'
 	import Notifications from '@/components/Admin/Patrons/Notifications.vue'
-	import { mapActions } from 'vuex'
+	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'Patrons',
@@ -114,7 +122,7 @@
 					'index': {
 						label: '#'
 					},
-					'full_name': {
+					full_name: {
 						label: 'Name',
 						sortable: true
 					},
@@ -126,8 +134,15 @@
 						label: 'End Date',
 						sortable: true
 					},
+					tiers: {
+						label: 'Tier'
+					},
 					last_charge_status: {
 						label: 'Last Charge',
+						sortable: true
+					},
+					lifetime_support: {
+						label: 'Lifetime',
 						sortable: true
 					}
 				},
@@ -144,15 +159,16 @@
 					source: db.ref('new_patrons').orderByChild('email'),
 					readyCallback: () => this.isBusy = false
 				},
+				tiers: {
+					source: db.ref('tiers'),
+					asObject: true
+				}
 			}
 		},
 		beforeMount() {
 			this.searchResults = this.patrons
 		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
 			searchCondition() {
 				this.current = 1;
 				this.searchResults = []
@@ -193,6 +209,16 @@
 <style lang="scss" scoped>
 .container-fluid {
 	padding: 20px;
+
+	.tiers {
+		&::after {
+			content: ', ';
+			color: #b2b2b2;
+		}
+		&:last-child::after {
+			content: '';
+		}
+	}
 }
 
 </style>

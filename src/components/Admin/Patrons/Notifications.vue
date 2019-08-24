@@ -28,7 +28,7 @@
 								<span>Tier:</span> 
 								<span v-if="notification.relationships.currently_entitled_tiers">
 									<div v-for="(tier, index) in notification.relationships.currently_entitled_tiers.data" :key="index">
-										{{ tier.id }}
+										{{ tiers[tier.id].name }}
 									</div>
 								</span>
 							</li>
@@ -84,6 +84,10 @@
 					source: db.ref(`patreon_data`).orderByChild('timestamp').limitToLast(this.results),
 					readyCallback: () => this.loading = false
 				},
+				tiers: {
+					source: db.ref('tiers'),
+					asObject: true
+				}
 			}
 		},
 		computed: {

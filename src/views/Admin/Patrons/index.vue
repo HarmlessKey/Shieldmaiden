@@ -65,12 +65,11 @@
 
 						<!-- STATUS -->
 						<span slot="last_charge_status" slot-scope="data">
-							<span :class="{'green': data.value == 'Paid', 'red': data.value == 'Declined' }">
-								{{ data.value }}
-							</span>
+							<i :class="{'green fas fa-check': data.value == 'Paid', 'red fas fa-times': data.value == 'Declined' }">
+							</i>
 						</span>
 
-						<!-- STATUS -->
+						<!-- LIFETIME SUPPORT -->
 						<span slot="lifetime_support" slot-scope="data">
 								{{ data.value / 100 | numeral('$0,0') }}
 						</span>

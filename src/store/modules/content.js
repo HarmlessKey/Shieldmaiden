@@ -228,7 +228,9 @@ export const content_module = {
 				let email = user_info.email
 
 				// User always basic reward tier
-				let path = `tiers/basic`				
+				let path = `tiers/basic`
+				
+				let today = new Date()
 
 				// If user has voucher use this
 				if (user_info.voucher){
@@ -238,7 +240,7 @@ export const content_module = {
 						path = `tiers/${user_info.voucher.id}`
 					} else {
 						let end_date = new Date(user_info.voucher.date)
-						let today = new Date()
+						
 						if (today > end_date) {
 							dispatch("remove_voucher", state.user.uid)
 							voucher = undefined
@@ -254,15 +256,20 @@ export const content_module = {
 					// Get the order of voucher/basic
 					let voucher_order = voucher_snap.val().order
 					// Search email in patrons
-					let patrons = db.ref('patrons').orderByChild('email').equalTo(email)
+					let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
 					patrons.on('value' , patron_snapshot => {
-						// If user patron check if patron tier is higher then voucher/basic tier
+						// If user patron check if patron tier is higher than voucher/basic tier
 						if(patron_snapshot.val()) {
 							let key = Object.keys(patron_snapshot.val())[0];
-							let patron_status = patron_snapshot.val()[key].status
-							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
+							let pledge_end = new Date(patron_snapshot.val()[key].pledge_end);
+							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tiers[0]}`);
+
+							console.log('Today: ', today)
+							console.log('Pledge End: ', pledge_end)
+							console.log('Tiers: ', patron_snapshot.val()[key].tiers)
+
 							patron_tier.on('value' , tier_snapshot => {
-								if (tier_snapshot.val().order >= voucher_order && patron_status == 'active_patron') {
+								if (tier_snapshot.val().order >= voucher_order && pledge_end >= today) {
 									commit('SET_TIER', tier_snapshot.val())
 								} else {
 									commit('SET_TIER', voucher_snap.val())

@@ -60,11 +60,25 @@
 					<p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
 
 					<!-- MONSTERS -->
-					<div class="input-group mb-3">
-						<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-						<div class="input-group-append">
-							<button class="btn"><i class="fas fa-search"></i></button>
+					<div class="d-flex justify-content-between">
+						<div class="input-group mb-3">
+							<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+							<div class="input-group-append">
+								<button class="btn"><i class="fas fa-search"></i></button>
+							</div>
 						</div>
+						<el-select
+							v-model="typeFilter"
+							multiple
+							collapse-tags
+							placeholder="Type">
+							<el-option
+								v-for="type in monsterTypes"
+								:key="type"
+								:label="type"
+								:value="type">
+							</el-option>
+						</el-select>
 					</div>
 
 					<b-table 
@@ -89,10 +103,10 @@
 						<div slot="actions" slot-scope="data" class="p-0">
 							<div class="monster-actions">
 								<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
-								<a class="gray-light" v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
+								<a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
 									<i class="fas fa-plus"></i>
 								</a>
-								<a class="gray-light" v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
+								<a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
 									<i class="fas fa-dice-d20"></i>
 								</a>
 							</div>
@@ -220,6 +234,12 @@
 				searching: false,
 				encDifficulty: undefined,
 				to_add: {},
+				monsterTypes: [
+					"aberration",
+					"beast",
+					"undead"
+				],
+				typeFilter: [],
 				monsterFields: {
 					'index': {
 						label: '#'

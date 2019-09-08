@@ -59,7 +59,7 @@
 
 <style lang="scss" scoped>
     .declined {
-        position: absolute;
+        position: fixed;
         width: 100%;
         z-index: 9999;
         padding: 10px;

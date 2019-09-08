@@ -47,6 +47,7 @@
 						<span slot="tiers" slot-scope="data">
 							<span 
 								v-for="(tier, key) in data.value"
+								v-if="tiers[key]"
 								:key="tier"
 								class="tiers"
 								:class="{

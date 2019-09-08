@@ -5,6 +5,7 @@ const encounters_ref = db.ref('encounters')
 const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
 const users_ref = db.ref('users')
+const tiers_ref = db.ref('tiers')
 
 export const content_module = {
 	state: {
@@ -231,6 +232,7 @@ export const content_module = {
 				let path = `tiers/basic`
 				
 				let today = new Date()
+				console.log(today)
 
 				// If user has voucher use this
 				if (user_info.voucher){
@@ -240,12 +242,13 @@ export const content_module = {
 						path = `tiers/${user_info.voucher.id}`
 					} else {
 						let end_date = new Date(user_info.voucher.date)
+						console.log(end_date)
+						console.log(today > end_date)
 						
 						if (today > end_date) {
 							dispatch("remove_voucher", state.user.uid)
 							voucher = undefined
-						}
-						if (user_info.voucher && today <= end_date) {
+						} else {
 							path = `tiers/${user_info.voucher.id}`
 						}
 					}
@@ -257,16 +260,36 @@ export const content_module = {
 					let voucher_order = voucher_snap.val().order
 					// Search email in patrons
 					let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
-					patrons.on('value' , patron_snapshot => {
+					patrons.on('value' , async patron_snapshot => {
 						// If user patron check if patron tier is higher than voucher/basic tier
 						if(patron_snapshot.val()) {
 							let key = Object.keys(patron_snapshot.val())[0];
-							let pledge_end = new Date(patron_snapshot.val()[key].pledge_end);
-							let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tiers[0]}`);
+							let patron_data = patron_snapshot.val()[key];
 
-							console.log('Today: ', today)
-							console.log('Pledge End: ', pledge_end)
-							console.log('Tiers: ', patron_snapshot.val()[key].tiers)
+							let pledge_end = new Date(patron_data.pledge_end);
+
+							// Compare patron tiers to find highest tier checking order in FB
+							let patron_tierlist = Object.keys(patron_data.tiers);
+							
+							let highest_order = 0
+							let highest_tier = 'basic'
+							if (patron_tierlist.length > 1) {
+								for (let i in patron_tierlist) {
+									let tier_id = patron_tierlist[i]
+									// SMART AWAIT ASYNC CONSTRUCTION #bless Key
+									await tiers_ref.child(tier_id).once('value', tier_snapshot => {
+										let tier_order = tier_snapshot.val().order
+										if (tier_order > highest_order) {
+											highest_order = tier_order
+											highest_tier = tier_id
+										}
+									})
+								}
+							} else {
+								highest_tier = patron_tierlist[0]
+							}
+
+							let patron_tier = db.ref(`tiers/${highest_tier}`);
 
 							patron_tier.on('value' , tier_snapshot => {
 								if (tier_snapshot.val().order >= voucher_order && pledge_end >= today) {

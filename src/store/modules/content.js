@@ -221,18 +221,30 @@ export const content_module = {
 		},
 		setUserInfo({ commit, dispatch, state }) {
 			let user = users_ref.child(state.user.uid)
-			user.on('value', user_snapshot => {
+			user.on('value', async user_snapshot => {
 				let user_info = user_snapshot.val()
 				commit('SET_USERINFO', user_info)
 				
 				//Fetch patron info with email
 				let email = user_info.email
+				// console.log("LALALALALAL")
 
 				// User always basic reward tier
 				let path = `tiers/basic`
+				// console.log("FIREBASE TS", firebase.database.ServerValue.TIMESTAMP)
+				let today_ms = 0
+				await db.ref('/.info/serverTimeOffset')
+				  .once('value')
+				  .then(function stv(data) {
+				    today_ms = data.val() + Date.now();
+				  }, function (err) {
+				    return err;
+				  });
 				
-				let today = new Date()
-				console.log(today)
+				let client_today = new Date().toISOString()
+				let server_today = new Date(today_ms).toISOString()
+				console.log("Client:",client_today)
+				console.log("Server:",server_today)
 
 				// If user has voucher use this
 				if (user_info.voucher){
@@ -241,11 +253,9 @@ export const content_module = {
 					if (user_info.voucher.date === undefined){
 						path = `tiers/${user_info.voucher.id}`
 					} else {
-						let end_date = new Date(user_info.voucher.date)
-						console.log(end_date)
-						console.log(today > end_date)
+						let end_date = new Date(user_info.voucher.date).toISOString()
 						
-						if (today > end_date) {
+						if (server_today > end_date) {
 							dispatch("remove_voucher", state.user.uid)
 							voucher = undefined
 						} else {
@@ -266,7 +276,7 @@ export const content_module = {
 							let key = Object.keys(patron_snapshot.val())[0];
 							let patron_data = patron_snapshot.val()[key];
 
-							let pledge_end = new Date(patron_data.pledge_end);
+							let pledge_end = new Date(patron_data.pledge_end).toISOString()
 
 							// Compare patron tiers to find highest tier checking order in FB
 							let patron_tierlist = Object.keys(patron_data.tiers);
@@ -292,7 +302,7 @@ export const content_module = {
 							let patron_tier = db.ref(`tiers/${highest_tier}`);
 
 							patron_tier.on('value' , tier_snapshot => {
-								if (tier_snapshot.val().order >= voucher_order && pledge_end >= today) {
+								if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
 									commit('SET_TIER', tier_snapshot.val())
 								} else {
 									commit('SET_TIER', voucher_snap.val())

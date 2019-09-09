@@ -226,12 +226,11 @@ export const content_module = {
 				commit('SET_USERINFO', user_info)
 				
 				//Fetch patron info with email
-				let email = user_info.email
-				// console.log("LALALALALAL")
+				let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
 
 				// User always basic reward tier
 				let path = `tiers/basic`
-				// console.log("FIREBASE TS", firebase.database.ServerValue.TIMESTAMP)
+
 				let today_ms = 0
 				await db.ref('/.info/serverTimeOffset')
 				  .once('value')

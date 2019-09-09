@@ -57,13 +57,16 @@
 					<!-- PATREON -->
 					<span slot="patreon" slot-scope="data" v-if="data.value">
 						<span 
+							v-for="tier in data.value"
+							:key="tier"
+							class="tiers"
 							:class="{
-								'blue': data.value == 'Folk Hero',
-								'purple': data.value == 'Noble',
-								'orange': data.value == 'Deity',
-								'red' : data.value == 'Former'
+								'blue': tiers[tier].name == 'Folk Hero',
+								'purple': tiers[tier].name == 'Noble',
+								'orange': tiers[tier].name == 'Deity',
+								'red' : tiers[tier].name == 'Former'
 						}">
-							{{ data.value }}</span>
+							{{ tiers[tier].name }}</span>
 					</span>
 
 					<!-- LIVE -->
@@ -160,14 +163,15 @@
 
 					for(let key in users) {
 						users[key]['.key'] = key;
+						let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
 
 						//Get Patreon
-						let getPatron = db.ref(`patrons`).orderByChild("email").equalTo(users[key].email);
+						let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
 						await getPatron.on('value', (snapshot) => {
 							if(snapshot.val()) {
 								for(let patreonId in snapshot.val()) {
 									let patron = snapshot.val()[patreonId]
-									users[key].patreon = patron.status == "active_patron" ? patron.tier_title : "Former"
+									users[key].patreon = Object.keys(patron.tiers)
 								}
 							}
 						});
@@ -229,6 +233,16 @@
 <style lang="scss" scoped>
 .container-fluid {
 	padding: 20px;
+
+	.tiers {
+		&::after {
+			content: ', ';
+			color: #b2b2b2;
+		}
+		&:last-child::after {
+			content: '';
+		}
+	}
 }
 
 </style>

@@ -56,7 +56,9 @@
 
 					<!-- PATREON -->
 					<span slot="patreon" slot-scope="data" v-if="data.value">
+						<span v-if="data.value === 'Expired'" class="red">{{ data.value }}</span>
 						<span 
+							v-else
 							v-for="tier in data.value"
 							:key="tier"
 							class="tiers"
@@ -170,8 +172,12 @@
 						await getPatron.on('value', (snapshot) => {
 							if(snapshot.val()) {
 								for(let patreonId in snapshot.val()) {
-									let patron = snapshot.val()[patreonId]
-									users[key].patreon = Object.keys(patron.tiers)
+									let patron = snapshot.val()[patreonId];
+									if(new Date(patron.pledge_end) >= new Date()) {
+										users[key].patreon = Object.keys(patron.tiers)
+									} else {
+										users[key].patreon = 'Expired';
+									}
 								}
 							}
 						});

@@ -59,7 +59,7 @@
 
 						<!-- END DATE -->"
 						<span slot="pledge_end" slot-scope="data">
-							<span :class="{'red': data.value < new Date() }">
+							<span :class="{'red': new Date(data.value) < new Date() }">
 								{{ makeDate(data.value) }}
 							</span>
 						</span>

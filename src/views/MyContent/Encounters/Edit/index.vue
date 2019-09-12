@@ -4,13 +4,13 @@
 	</div>
 	<div id="hasSide" v-else-if="encounter">
 		<Sidebar/>
-		<div class="container-fluid">
-			<Crumble />
-
-			<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
-
-			<b-row>
-				<b-col md="8">
+		<div class="wrapper">
+			<div class="top">
+				<Crumble />
+				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
+			</div>
+			<div class="grid">
+				<div class="encounter_actions">
 					<div class="my-4">
 						<ul class="nav nav-tabs" id="myTab" role="tablist">
 							<li class="nav-item">
@@ -118,74 +118,74 @@
 						</div>
 					</b-table>
 					<b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
-				</b-col>
+				</div>
 
 				<!-- ENCOUNTER SUMMARY -->
-				<b-col md="4">
-					<div v-if="encounter">
-						<h3>
-							Difficulty:
-							<span v-if="encDifficulty" class="text-capitalize" :class="{ 
-								'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
-								'orange':  encDifficulty[0] == 'hard', 
-								'yellow':  encDifficulty[0] == 'medium', 
-								'green':  encDifficulty[0] == 'easy'}">
-								{{ encDifficulty[0] }}
-							</span>
-						</h3>
-						<div class="diff-info" v-if="encDifficulty">
-							{{ encDifficulty[1] }}
-							<template v-if="encDifficulty['easy']">
-								<p>
-									<b>Party XP tresholds</b><br/>
-									<span class="left">Easy:</span> <span :class="{ 'blue': encDifficulty[0] == 'easy'}">{{ encDifficulty['easy'] }}</span><br/>
-									<span class="left">Medium:</span> <span :class="{ 'blue': encDifficulty[0] == 'medium'}">{{ encDifficulty['medium'] }}</span><br/>
-									<span class="left">Hard:</span> <span :class="{ 'blue': encDifficulty[0] == 'hard'}">{{ encDifficulty['hard'] }}</span><br/>
-									<span class="left">Deadly:</span> <span :class="{ 'blue': encDifficulty[0] == 'deadly'}">{{ encDifficulty['deadly'] }}</span>
-								</p>
-								Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
-								Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+				<div class="encounter_overview" v-if="encounter">
+						<div>
+							<h3>
+								Difficulty:
+								<span v-if="encDifficulty" class="text-capitalize" :class="{ 
+									'red': encDifficulty[0] == 'error' || encDifficulty[0] == 'deadly', 
+									'orange':  encDifficulty[0] == 'hard', 
+									'yellow':  encDifficulty[0] == 'medium', 
+									'green':  encDifficulty[0] == 'easy'}">
+									{{ encDifficulty[0] }}
+								</span>
+							</h3>
+							<div class="diff-info" v-if="encDifficulty">
+								{{ encDifficulty[1] }}
+								<template v-if="encDifficulty['easy']">
+									<p>
+										<b>Party XP tresholds</b><br/>
+										<span class="left">Easy:</span> <span :class="{ 'blue': encDifficulty[0] == 'easy'}">{{ encDifficulty['easy'] }}</span><br/>
+										<span class="left">Medium:</span> <span :class="{ 'blue': encDifficulty[0] == 'medium'}">{{ encDifficulty['medium'] }}</span><br/>
+										<span class="left">Hard:</span> <span :class="{ 'blue': encDifficulty[0] == 'hard'}">{{ encDifficulty['hard'] }}</span><br/>
+										<span class="left">Deadly:</span> <span :class="{ 'blue': encDifficulty[0] == 'deadly'}">{{ encDifficulty['deadly'] }}</span>
+									</p>
+									Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
+									Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
 
-								<b-progress 
-									:value="encDifficulty['compare']" 
-									:max="encDifficulty['deadly']" 
-									class="mt-3"
-									:variant="bars[encDifficulty[0]]"
-									></b-progress>
-							</template>
+									<b-progress 
+										:value="encDifficulty['compare']" 
+										:max="encDifficulty['deadly']" 
+										class="mt-3"
+										:variant="bars[encDifficulty[0]]"
+										></b-progress>
+								</template>
+							</div>
+							<ul class="entities hasImg mt-4" v-if="encounter">
+								<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
+									<div class="d-flex justify-content-left">
+										<template v-if="entity.entityType == 'player'">
+											<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
+											<img v-else src="@/assets/_img/styles/player.png" class="img" />
+										</template>
+										<template v-else-if="entity.entityType == 'npc'">
+											<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
+											<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
+											<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
+											<img v-else src="@/assets/_img/styles/monster.png" class="img" />
+										</template>
+										<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
+											{{ entity.name }}
+										</span>
+									</div>
+									<div class="actions">
+										<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+											<i class="fas fa-pencil"></i>
+										</a>
+										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
+											<i class="fas fa-minus"></i>
+										</a>
+									</div>
+									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+								</li>
+							</ul>
+							<div v-else class="loader"><span>Loading entities...</span></div>
 						</div>
-						<ul class="entities hasImg mt-4" v-if="encounter">
-							<li v-for="(entity, key) in encounter.entities" :key="key" class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<template v-if="entity.entityType == 'player'">
-										<span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-										<img v-else src="@/assets/_img/styles/player.png" class="img" />
-									</template>
-									<template v-else-if="entity.entityType == 'npc'">
-										<span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-										<span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-										<img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
-										<img v-else src="@/assets/_img/styles/monster.png" class="img" />
-									</template>
-									<span class="green" :class="{ 'red': entity.entityType == 'npc' && !entity.friendly }">
-										{{ entity.name }}
-									</span>
-								</div>
-								<div class="actions">
-									<a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil"></i>
-									</a>
-									<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(key, entity.name)">
-										<i class="fas fa-minus"></i>
-									</a>
-								</div>
-								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-							</li>
-						</ul>
-						<div v-else class="loader"><span>Loading entities...</span></div>
-					</div>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -475,9 +475,36 @@
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	padding: 20px;
+.wrapper {
+	display: grid;
+	grid-template-columns: auto;
+	grid-template-rows: 100px 1fr;
+	height: calc(100vh - 50px);
 
+	.top {
+		padding: 20px;
+	}
+
+	.grid {
+		padding: 20px;
+		display: grid;
+		grid-template-columns: 1fr 400px;
+		grid-gap: 10px;
+		overflow: hidden;
+
+		
+
+		.encounter_actions, .encounter_overview {
+			padding: 10px;
+			background: rgba(38, 38, 38, .9);
+			height: calc(100vh - 190px);
+			overflow-y: scroll;
+
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		}
+	}
 }
 ul.nav {
 	a.nav-link {

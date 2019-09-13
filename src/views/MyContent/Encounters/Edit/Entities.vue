@@ -37,6 +37,8 @@
             </div>
         </div>
 
+        <span v-if="searching" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
+
         <b-table 
             class="table entities"
             :busy="loadingNpcs"
@@ -79,11 +81,14 @@
 
 <script>
     import { db } from '@/firebase';
-    import { mapActions, mapGetters } from 'vuex';
-    import _ from 'lodash'
+	import { mapActions, mapGetters } from 'vuex';
+	
+	import { dice } from '@/mixins/dice.js'
+	import { attributes } from '@/mixins/attributes.js'
 
 	export default {
-		name: 'Loot',
+		name: 'Entities',
+		mixins: [attributes, dice],
 		data() {
 			return {
                 campaignId: this.$route.params.campid,
@@ -171,7 +176,8 @@
 		methods: {
 			...mapActions([
 				'fetchEncounter',
-				'fetchCampaign'
+                'fetchCampaign',
+                'setSlide'
             ]),
             multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {

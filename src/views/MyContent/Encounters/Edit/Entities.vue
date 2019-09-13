@@ -1,10 +1,9 @@
 <template>
-    <div>
-        <!-- ADD ENTITIES -->
-        <h2>Add Entities</h2>
+    <div v-if="searchResults">
+        <h3>Players</h3>
 
         <!-- PLAYERS -->
-        <div class="players bg-gray mb-1">
+        <div class="players bg-gray mb-1" v-if="campaign.players">
             <div v-for="(player, key) in campaign.players" 
                 :key="key"
                 @click="add(key, 'player', players[key].character_name)" 
@@ -26,8 +25,11 @@
             <a v-else class="btn" @click="addAllPlayers()">Add all</a>
         </div>
         <p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
+		<hr>
 
         <!-- MONSTERS -->
+		<h3>NPC's</h3>
+
         <div class="d-flex justify-content-between">
             <div class="input-group mb-3">
                 <input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
@@ -37,7 +39,7 @@
             </div>
         </div>
 
-        <span v-if="searching" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
+        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
 
         <b-table 
             class="table entities"
@@ -133,7 +135,7 @@
 			} 
 		},
 
-		mounted() {
+		async mounted() {
 			this.fetchEncounter({
 				cid: this.campaignId, 
 				eid: this.encounterId, 
@@ -142,7 +144,7 @@
 				cid: this.campaignId, 
             })
 
-            //GET NPCS
+			//GET NPCS
 			var monsters = db.ref(`monsters`);
 			monsters.on('value', async (snapshot) => {
 				let monsters = snapshot.val();
@@ -305,7 +307,11 @@
 				}
             },
 			checkPlayer(id) {
-				return (Object.keys(this.encounter.entities).indexOf(id))
+				if(this.encounter.entities) {
+					return (Object.keys(this.encounter.entities).indexOf(id))
+				} else {
+					return -1
+				}
 			},
 		}
 	}

@@ -14,11 +14,13 @@
 					<div>
 						<ul class="nav nav-tabs" id="myTab" role="tablist">
 							<li class="nav-item">
-								<a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+								<a class="nav-link active" id="entities-tab" data-toggle="tab" href="#entities" role="tab" aria-controls="entities" aria-selected="false">
+									<i class="fas fa-helmet-battle"></i> Entities
+								</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link" id="entities-tab" data-toggle="tab" href="#entities" role="tab" aria-controls="entities" aria-selected="true">
-									<i class="fas fa-helmet-battle"></i> Entities
+								<a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">
+									General
 								</a>
 							</li>
 							<li class="nav-item">
@@ -29,11 +31,11 @@
 						</ul>
 						<div class="content">
 							<div class="tab-content">
-								<div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-									<General />
-								</div>
-								<div class="tab-pane fade" id="entities" role="tabpanel" aria-labelledby="entities-tab">
+								<div class="tab-pane fade show active" id="entities" role="tabpanel" aria-labelledby="entities-tab">
 									<Entities />
+								</div>
+								<div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="general-tab">
+									<General />
 								</div>
 								<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 									<Loot />
@@ -43,7 +45,7 @@
 					</div>	
 				</div>
 
-				<!-- ENCOUNTER SUMMARY -->
+				<!-- ENCOUNTER OVERVIEW -->
 				<div class="encounter_overview" v-if="encounter">
 					<h3>Encounter overview</h3>
 					<Overview />
@@ -62,8 +64,6 @@
 	import General from './General.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters, mapActions } from 'vuex'
-
-	
 
 	export default {
 		name: 'EditCampaign',

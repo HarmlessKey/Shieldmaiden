@@ -133,8 +133,8 @@
 				background: #302f2f !important;
 				height: calc(100% - 30px) !important;
 				
-				&::-webkit-scrollbar {
-					display: none;
+				.tab-content {
+					width: calc(100% - 5px);
 				}
 			}
 		}

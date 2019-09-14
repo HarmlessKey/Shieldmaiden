@@ -1,9 +1,9 @@
 <template>
    <div class="encounter_overview">
-       <h3>Encounter overview</h3>
-       <div class="scroll" v-bar>
-           <div class="overview bg-gray-active">
-                <div class="diff-info" v-if="encDifficulty">
+        <div>
+            <h3 class="header">Encounter overview</h3>
+            <div class="diff-info" v-if="encDifficulty">
+                <div class="advanced">
                     {{ encDifficulty[1] }}
                     <template v-if="encDifficulty['easy']">
                         <p>
@@ -15,16 +15,33 @@
                         </p>
                         Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
                         Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
-
-                        <b-progress 
-                            :value="encDifficulty['compare']" 
-                            :max="encDifficulty['deadly']" 
-                            class="mt-3"
-                            :variant="bars[encDifficulty[0]]"
-                            ></b-progress>
                     </template>
                 </div>
-                <h3 v-else class="gray-hover">Calculating difficulty...</h3>
+                <div class="progress-area">
+                    <b-progress 
+                        :value="encDifficulty['compare']" 
+                        :max="encDifficulty['deadly']" 
+                        class="mt-3"
+                        :variant="bars[encDifficulty[0]]"
+                    ></b-progress>
+                    <span 
+                        class="diff"
+                        :class="{ 
+                            'green': encDifficulty[0] == 'easy',
+                            'yellow': encDifficulty[0] == 'medium',
+                            'orange': encDifficulty[0] == 'hard',
+                            'red': encDifficulty[0] == 'deadly'
+                        }"
+                    >
+                        {{ encDifficulty[0] }}
+                    </span>
+                </div>       
+            </div>
+            <h3 v-else class="gray-hover">Calculating difficulty...</h3>
+        </div>
+       <div class="scroll bg-gray-active" v-bar>
+           <div class="overview">
+                
                 
                 <template v-if="encounter">
                     <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
@@ -200,25 +217,60 @@
     h3 {
         margin-bottom: 16px;
     }
-    .scroll {
-		height: calc(100% - 30px);
-	}
-    .overview {
-        padding: 10px;
+    .diff-info {
+        background: #302f2f;
+        margin: 10px 0 20px 0;
 
-        .diff-info {
-            background: #302f2f;
-            margin: 10px 0 20px 0;
-
-            span.left {
-                width: 80px;
-                display: inline-block;
-            }
-
+        span.left {
+            width: 80px;
+            display: inline-block;
+        }
+        
+        .progress-area {
             .progress {
                 background-color: #232323 !important;
             }
+            .diff {
+                display: none;
+            }
         }
     }
+    .scroll {
+        height: calc(100% - 250px);
+        
+        .overview {
+            padding: 10px;
+            width: calc(100% - 5px) !important;
+        }
+	}
 }
+@media only screen and (max-width: 767px) {
+		h3.header {
+            display:none;
+        }
+        .overview {
+            .diff-info {
+                .advanced {
+                    display: none;
+                }
+                .progress-area {
+                    display: flex;
+                    justify-content: space-between;
+    
+                    .progress {
+                        width: 100%;
+                        margin: 0 10px 0 0 !important;
+                        height: 30px;
+                    }
+                    .diff {
+                        text-transform: uppercase;
+                        display: block !important;
+                        width: max-content;
+                        line-height: 30px;
+                        font-size: 30px;
+                    }
+                }
+            }
+        }
+	}
 </style>

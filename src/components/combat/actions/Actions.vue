@@ -50,11 +50,7 @@
 			Roll,
 		},
 		mixins: [setHP],
-		props: ['current'],
-		computed: {
-		},
-		methods: {
-		},
+		props: ['current']
 	}
 </script>
 

@@ -134,7 +134,7 @@
 				height: calc(100% - 30px) !important;
 				
 				.tab-content {
-					width: calc(100% - 5px);
+					width: calc(100% - 15px);
 				}
 			}
 		}
@@ -152,7 +152,7 @@
 
 	@media only screen and (max-width: 850px) {
 		.wrapper {
-				grid-template-columns: 1fr 1fr;
+				grid-template-columns: 3fr 2fr;
 		}
 	}
 	@media only screen and (max-width: 767px) {

@@ -35,7 +35,8 @@
                     >
                         {{ encDifficulty[0] }}
                     </span>
-                </div>       
+                </div> 
+                <hr class="mb-0">     
             </div>
             <h3 v-else class="gray-hover">Calculating difficulty...</h3>
         </div>
@@ -219,7 +220,7 @@
     }
     .diff-info {
         background: #302f2f;
-        margin: 10px 0 20px 0;
+        padding: 10px 10px 0 10px;
 
         span.left {
             width: 80px;
@@ -239,7 +240,7 @@
         height: calc(100% - 250px);
         
         .overview {
-            padding: 10px;
+            padding: 15px 10px 30px 10px;
             width: calc(100% - 5px) !important;
         }
 	}
@@ -247,30 +248,33 @@
 @media only screen and (max-width: 767px) {
 		h3.header {
             display:none;
-        }
-        .overview {
-            .diff-info {
-                .advanced {
-                    display: none;
+        } 
+        .scroll {
+            height: calc(100% - 50px) !important;
+        } 
+        .diff-info {
+            padding-top: 15px !important;
+
+            .advanced {
+                display: none;
+            }
+            .progress-area {
+                display: flex;
+                justify-content: space-between;
+
+                .progress {
+                    width: 100%;
+                    margin: 0 10px 0 0 !important;
+                    height: 25px;
                 }
-                .progress-area {
-                    display: flex;
-                    justify-content: space-between;
-    
-                    .progress {
-                        width: 100%;
-                        margin: 0 10px 0 0 !important;
-                        height: 30px;
-                    }
-                    .diff {
-                        text-transform: uppercase;
-                        display: block !important;
-                        width: max-content;
-                        line-height: 30px;
-                        font-size: 30px;
-                    }
+                .diff {
+                    text-transform: uppercase;
+                    display: block !important;
+                    width: max-content;
+                    line-height: 25px;
+                    font-size: 25px;
                 }
             }
-        }
+        }      
 	}
 </style>

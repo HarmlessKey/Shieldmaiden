@@ -74,7 +74,7 @@
 
             <!-- LOADER -->
             <div slot="table-busy" class="loader">
-                <span>Loading users....</span>
+                <span>Loading monsters....</span>
             </div>
         </b-table>
         <b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />

@@ -41,9 +41,7 @@
             <h3 v-else class="gray-hover">Calculating difficulty...</h3>
         </div>
        <div class="scroll bg-gray-active" v-bar>
-           <div class="overview">
-                
-                
+           <div class="overview">          
                 <template v-if="encounter">
                     <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
                     <ul class="entities hasImg mt-2">

@@ -684,6 +684,26 @@ table {
 	}
 }
 
+.progress {
+	.progress-bar {
+		&.bg-secondary {
+			background-color: $gray-hover !important;
+		}
+		&.bg-success {
+			background-color: $green !important;
+		}
+		&.bg-warning {
+			background-color: $yellow !important;
+		}
+		&.bg-info {
+			background-color: $orange !important;
+		}
+		&.bg-danger {
+			background-color: $red !important;
+		}
+	}
+}
+
 ul.pagination {
 	li.page-item {
 		
@@ -946,6 +966,11 @@ ul.nav {
 	width: 5px;
 	right: 0;
 }
+.vb-content {
+	&::-webkit-scrollbar {
+		display: none !important;
+	}
+}
 .vb > .vb-dragger > .vb-dragger-styler {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
@@ -964,6 +989,7 @@ ul.nav {
 	border-radius: 0;
 	height: 100%;
 	display: block;
+	
 }
 .vb.vb-scrolling-phantom > .vb-dragger > .vb-dragger-styler {
 	background-color: $gray-hover;

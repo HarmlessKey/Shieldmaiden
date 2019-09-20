@@ -129,11 +129,11 @@
 			overflow: hidden;
 
 			.scroll {
-				padding: 15px;
 				background: #302f2f !important;
 				height: calc(100% - 30px) !important;
 				
 				.tab-content {
+					padding: 15px;
 					width: calc(100% - 15px);
 				}
 			}

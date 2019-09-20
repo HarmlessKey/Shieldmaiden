@@ -54,7 +54,7 @@
             </template>
 
             <template slot="name" slot-scope="data">
-                <a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })">
+                <a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
                     {{ data.item.name }}
                 </a>
             </template>
@@ -134,7 +134,6 @@
 				},
 			} 
 		},
-
 		async mounted() {
 			this.fetchEncounter({
 				cid: this.campaignId, 
@@ -173,14 +172,32 @@
 				'campaign',
 				'players',
 				'npcs',
-            ]),
+			]),
         },
 		methods: {
 			...mapActions([
 				'fetchEncounter',
                 'fetchCampaign',
                 'setSlide'
-            ]),
+			]),
+			searchNPC() {
+				this.searchResults = []
+				this.searching = true
+				for (var i in this.monsters) {
+					var m = this.monsters[i]
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
+					}
+				}
+				if(this.searchResults == '' && this.search != '') {
+					this.noResult = 'No results for "' + this.search + '"';
+				}
+				if(this.search == '') {
+					this.searchResults = Object.values(this.monsters);
+					this.searching = false
+				}
+			},
             multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
@@ -282,24 +299,6 @@
 					});
 				}
             },
-            searchNPC() {
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = Object.values(this.monsters);
-					this.searching = false
-				}
-			},
 			addAllPlayers() {
 				for(let player in this.campaign.players) {
 					let name = this.players[player].character_name;

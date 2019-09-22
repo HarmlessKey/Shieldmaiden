@@ -50,7 +50,7 @@
 					readyCallback: () => this.isBusy = false
 				},
 				patrons: {
-					source: db.ref('patrons'),
+					source: db.ref('new_patrons'),
 					readyCallback: () => this.isBusy = false
 				},
 			}

@@ -233,17 +233,14 @@ export const content_module = {
 
 				let today_ms = 0
 				await db.ref('/.info/serverTimeOffset')
-				  .once('value')
-				  .then(function stv(data) {
-				    today_ms = data.val() + Date.now();
-				  }, function (err) {
-				    return err;
-				  });
+					.once('value')
+					.then(function stv(data) {
+						today_ms = data.val() + Date.now();
+					}, function (err) {
+					return err;
+				});
 				
-				let client_today = new Date().toISOString()
 				let server_today = new Date(today_ms).toISOString()
-				console.log("Client:",client_today)
-				console.log("Server:",server_today)
 
 				// If user has voucher use this
 				if (user_info.voucher){

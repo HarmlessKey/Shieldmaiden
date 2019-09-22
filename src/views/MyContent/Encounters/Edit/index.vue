@@ -134,7 +134,6 @@
 				
 				.tab-content {
 					padding: 15px;
-					width: calc(100% - 15px);
 				}
 			}
 		}

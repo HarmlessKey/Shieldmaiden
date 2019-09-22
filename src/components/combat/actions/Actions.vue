@@ -50,11 +50,7 @@
 			Roll,
 		},
 		mixins: [setHP],
-		props: ['current'],
-		computed: {
-		},
-		methods: {
-		},
+		props: ['current']
 	}
 </script>
 
@@ -70,16 +66,21 @@
 	.scroll { 
 		padding: 20px 0;
 		height: calc(100% - 30px);
-		background: rgba(38, 38, 38, .9) !important;
 	}
 }
 ul.nav-tabs {
+	border-bottom: solid 3px #494747;
+	height: 37px;
+	margin: 0 10px;
 
 	.nav-link {
-		background: rgba(25, 25, 25, .9);
+		color: #b2b2b2 !important;
+		border-bottom: solid 3px #494747 !important;
 
 		&.active {
-			background: rgba(38, 38, 38, .9) !important;
+			color: #2c97de !important;
+			background: none !important;
+			border-color: #2c97de !important;
 		}
 	}
 }

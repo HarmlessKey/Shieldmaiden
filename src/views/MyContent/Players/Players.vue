@@ -50,7 +50,8 @@
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
 							<td>{{ player.level }}</td>
-							<td>
+							<!-- Actions -->
+							<td class="align-middle p-0">
 								<div class="d-flex justify-content-end">
 									<div class="d-flex justify-content-end actions">
 										<router-link class="gray-hover mx-1" 
@@ -65,7 +66,28 @@
 												<i class="fas fa-trash-alt"></i>
 										</a>
 									</div>
-									<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+									<span class="dropleft d-sm-none actions-dropdown">
+										<a class="options"
+											id="options"
+											data-toggle="dropdown" 
+											aria-haspopup="true" 
+											aria-expanded="false">
+											<i class="far fa-ellipsis-v"></i>
+										</a>
+										<div class="dropdown-menu" aria-labelledby="options">	
+											<router-link class="gray-hover mx-1 dropdown-item" 
+												:to="'/players/' + player.key" 
+												v-b-tooltip.hover title="Edit">
+													<i class="fas fa-pencil"></i> Edit player
+											</router-link>
+											<a v-b-tooltip.hover 
+												title="Delete" 
+												class="gray-hover dropdown-item"
+												@click="confirmDelete(player.key, player.player, player.control)">
+													<i class="fas fa-trash-alt"></i> Delete player
+											</a>
+										</div>
+									</span>
 								</div>
 							</td>
 						</tr>
@@ -78,49 +100,6 @@
 				<i class="fas fa-arrow-up gray-hover"></i>
 			</h2>
 			<div v-else class="loader"><span>Loading Players...</span></div>
-
-			<!-- CONTROLLED PLAYERS -->
-			<h2 class="mb-1">Your Characters</h2>
-			<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
-			
-			<table class="table" v-if="controlledCharacters">
-				<thead>
-					<th></th>
-					<th class="n">#</th>
-					<th>Character name</th>
-					<th>Level</th>
-					<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-				</thead>
-				<tbody name="table-row">
-					<tr v-for="(character, index) in controlledCharacters" :key="character.key">
-						<td class="img" v-if="character.character.avatar" :style="{ backgroundImage: 'url(\'' + character.character.avatar + '\')' }"></td>
-						<td class="img" v-else>
-							<img src="@/assets/_img/styles/player.svg" />
-						</td>
-						<td class="n">{{ index + 1 }}</td>
-						<td>
-							<router-link class="mx-2" 
-								:to="'/character/' + character.key" 
-								v-b-tooltip.hover title="Edit">{{ character.character.character_name }}
-							</router-link>
-						</td>
-						<td>{{ character.character.level }}</td>
-						<td>
-							<div class="d-flex justify-content-end">
-								<div class="d-flex justify-content-end actions">
-									<router-link class="gray-hover mx-1" 
-										:to="'/character/' + character.key" 
-										v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil"></i>
-									</router-link>
-								</div>
-								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<p v-else>You have no control over other characters.</p>
 		</div>
 	</div>
 </template>
@@ -146,7 +125,6 @@
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				controlledCharacters: undefined
 			}
 		},
 		computed: {
@@ -169,32 +147,7 @@
 				.value()
 			},
 		},
-		beforeMount() {
-			this.fetch_controlled()
-		},
 		methods: {
-			async fetch_controlled() {
-				//All controlled characters by this user
-				var controlled = await db.ref(`character_control/${this.userId}`);
-				controlled.on('value' , (snapshot) => {
-					var returnArr = [];
-
-					for(let key in snapshot.val()) {
-						let item = snapshot.val()[key];
-						item.key = key;
-
-						var character = db.ref(`players/${item.user}/${key}`)
-
-						character.on('value' , (snapshot) => {
-							item.character = snapshot.val();
-
-							returnArr.push(item); //push to array
-						});
-					}
-
-					this.controlledCharacters = returnArr;
-				});
-			},
 			confirmDelete(key, player, control) {
 				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
 					timeout: false,
@@ -259,15 +212,6 @@
 	.info h3, .info p {
 		margin-bottom:5px !important;
 	}
-	/* .img {
-		width:70px;
-		height:70px;
-		display:block;
-		background-size:cover;
-		background-position:top center;
-		grid-area: img;
-		border:solid 1px #b2b2b2;
-	} */
 	.info {
 		grid-area: info;
 	}

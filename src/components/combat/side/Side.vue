@@ -29,8 +29,12 @@
 		<div class="actions scroll" v-bar>
 			<div>
 				<div class="tab-content">
-					<Log :log="log" />	
-					<Dmg />
+					<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
+						<Log :log="log" />
+					</div>
+					<div  class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
+						<Dmg />
+					</div>
 				</div>
 			</div>
 		</div>

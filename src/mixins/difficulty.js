@@ -154,7 +154,15 @@ export const difficulty = {
 
 					//Custom NPC CR
 					if (entity.npc == 'custom') {
-						rating = this.npcs[entity.id].challenge_rating
+						if(!this.npcs[entity.id]) {
+							let error = {
+								0: 'error',
+								1: 'An NPC with no challenge rating is added.',
+							}
+							return error;
+						} else {
+							rating = this.npcs[entity.id].challenge_rating
+						}
 					} 
 
 					//SRD monster CR
@@ -206,6 +214,7 @@ export const difficulty = {
 			//Calculate the total XP with the right multiplier
 			//This value is compared with the party tresholds, to show the difficulty
 			let compare = this.multiply(nMonsters, nPlayers, totalXp);
+			diff['totalXp'] = totalXp;
 			diff['compare'] = compare; //the XP value that you compare to the tresholds
 
 			//Return the right difficulty for the encounter

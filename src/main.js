@@ -11,8 +11,9 @@ import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
-// import Element from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
+import vueNumeralFilterInstaller from 'vue-numeral-filter';
+import Element from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 
 const options = {
 	toast: {
@@ -27,7 +28,8 @@ Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
-// Vue.use(Element);
+Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
+Vue.use(Element);
 
 //Bootstrap
 global.$ = jQuery

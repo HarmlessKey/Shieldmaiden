@@ -2,6 +2,7 @@
 	<div id="app" class="container-fluid">
 		<div>
 			<nav-main/>
+			<PaymentDeclined />
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
@@ -26,12 +27,14 @@
 	import { auth, firebase, db } from './firebase'
 	import Header from './components/Header.vue';
 	import Slide from './components/Slide.vue';
+	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 	components: {
 		navMain: Header,
-		Slide
+		Slide,
+		PaymentDeclined
 	},
 	metaInfo: {
 		meta: [
@@ -86,6 +89,7 @@
 			// Create a reference to this user's specific status node.
 			// This is where we will store data about being online/offline.
 			var userStatusDatabaseRef = firebase.database().ref(`/status/${uid}`);
+			var userLiveDatabaseRef = firebase.database().ref(`/broadcast/${uid}/live`);
 
 			// We'll create two constants which we will write to
 			// the Realtime database when this device is offline
@@ -123,10 +127,11 @@
 							// server will mark us as offline once we lose connection.
 							userStatusDatabaseRef.set(isOnlineForDatabase);
 					});
+					//Remove live on lost connection
+					userLiveDatabaseRef.onDisconnect().remove().then(function() {
+						userLiveDatabaseRef.remove();
+					});
 			});
-		},
-		stopBroadcast() {
-			db.ref(`broadcast/${this.user.uid}/live`).remove()
 		}
 	}
 };

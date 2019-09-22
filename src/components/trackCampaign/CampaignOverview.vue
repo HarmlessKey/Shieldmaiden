@@ -4,7 +4,7 @@
 		<b-col md="8">
 			<h3>Campaign Players</h3>
 			<table class="table table-hover">
-				<thead >
+				<thead>
 					<th></th>
 					<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
 					<th class="name"></th>
@@ -57,7 +57,15 @@
 								'orange': percentage(player.curHp, campaignPlayers[key].maxHp) > 33 && percentage(player.curHp, campaignPlayers[key].maxHp) <= 76, 
 								'green': true
 								}">{{ player.curHp }}</span>
-								<span class="gray-hover">/</span>{{ campaignPlayers[key].maxHp }}
+								<span class="gray-hover">/</span>
+								<span :class="{ 
+									'green': player.maxHpMod > 0, 
+									'red': player.maxHpMod < 0 
+								}" 
+								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+									{{ maxHp(campaignPlayers[key].maxHp, player.maxHpMod) }}
+								</span>
+								<span v-else>{{ campaignPlayers[key].maxHp }}</span>
 								<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
 						</td>
 					</tr>
@@ -109,6 +117,9 @@
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
+			},
+			maxHp(maxHp, maxHpMod) {
+				return maxHp + maxHpMod;
 			},
 		}
 	}

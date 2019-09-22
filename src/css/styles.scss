@@ -374,12 +374,14 @@ table {
 			position: relative;
 
 			.actions {
-				display: none !important;
-				background-color: $gray-darker;
-				position: absolute;
+				// position: absolute;
 				padding: 5px 0.75rem;
 				top: 0;
 				right: 0;
+
+				// @media (max-width: 768px) {
+				
+				// }
 
 				a {
 					color: $gray-light !important;
@@ -396,11 +398,19 @@ table {
 					}
 				}
 			}
+
+			.actions-dropdown {
+				width: 30px;
+				text-align: center;
+				a {
+					display: block;
+				}
+			}
 			.fa-ellipsis-v {
 				line-height: 22px;
 			}
 		}
-		&:hover {
+		&:focus {
 			td {
 				background-color: $gray-darker;
 			}
@@ -573,6 +583,8 @@ ul.entities {
 		}
 	}
 	table tr td .actions {
+		display: none !important;
+		background-color: $gray-darker;
 		right: 20px;
 		a {
 			background: $gray-active;
@@ -670,6 +682,26 @@ table {
 	.dropdown-divider {
 		border-color: $gray-light;
 		margin: 0;
+	}
+}
+
+.progress {
+	.progress-bar {
+		&.bg-secondary {
+			background-color: $gray-hover !important;
+		}
+		&.bg-success {
+			background-color: $green !important;
+		}
+		&.bg-warning {
+			background-color: $yellow !important;
+		}
+		&.bg-info {
+			background-color: $orange !important;
+		}
+		&.bg-danger {
+			background-color: $red !important;
+		}
 	}
 }
 
@@ -935,6 +967,11 @@ ul.nav {
 	width: 5px;
 	right: 0;
 }
+.vb-content {
+	&::-webkit-scrollbar {
+		display: none !important;
+	}
+}
 .vb > .vb-dragger > .vb-dragger-styler {
 	-webkit-backface-visibility: hidden;
 	backface-visibility: hidden;
@@ -953,6 +990,7 @@ ul.nav {
 	border-radius: 0;
 	height: 100%;
 	display: block;
+	
 }
 .vb.vb-scrolling-phantom > .vb-dragger > .vb-dragger-styler {
 	background-color: $gray-hover;

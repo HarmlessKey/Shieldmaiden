@@ -76,7 +76,7 @@
 								is="transition-group" 
 								enter-active-class="animated flash" 
 								leave-active-class="animated bounceOutLeft">
-								<tr v-for="(encounter, index) in _active" :key="encounter.key">
+								<tr v-for="(encounter, index) in _active" :key="encounter.key" :ref="encounter.key">
 									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
 									<td>
 										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
@@ -103,15 +103,15 @@
 									<template v-else>
 										<td colspan="3" class="gray-hover d-none d-lg-table-cell">Not started</td>
 									</template>
-									<td>
+									<td class="align-middle p-0">
 										<div class="d-flex justify-content-end">
 											<div class="d-flex justify-content-end actions">
 												<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
 													<i class="fas fa-play"></i>
 												</router-link>
-												<span v-else class="disabled">
+												<a v-else class="disabled">
 													<i class="fas fa-play"></i>
-												</span>
+												</a>
 												<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
 													<i class="fas fa-pencil-alt"></i>
 												</router-link>
@@ -119,7 +119,39 @@
 													<i class="fas fa-trash-alt"></i>
 												</a>
 											</div>
-											<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+
+											<span class="dropleft d-sm-none actions-dropdown">
+												<a class="options"
+													id="options"
+													data-toggle="dropdown" 
+													aria-haspopup="true" 
+													aria-expanded="false">
+													<i class="far fa-ellipsis-v"></i>
+												</a>
+												<div class="dropdown-menu" aria-labelledby="options">	
+													<router-link 
+														v-if="encounter.entities" 
+														:to="'/run-encounter/' + campaignId + '/' + encounter.key" 
+														class="dropdown-item">
+															
+															<i class="fas fa-play"></i> Run encounter
+													</router-link>
+													<a v-else class="disabled dropdown-item">
+														<i class="fas fa-play"></i> Run encounter
+													</a>
+													<router-link 
+														class="mx-1 dropdown-item" 
+														:to="'/encounters/' + campaignId + '/' + encounter.key">
+
+														<i class="fas fa-pencil-alt"></i> Edit encounter
+													</router-link>
+													<a @click="deleteEncounter(encounter.key, encounter.encounter)"
+														class="dropdown-item">
+														<i class="fas fa-trash-alt"></i> Delete encounter
+													</a>
+												</div>
+											</span>
+										
 										</div>
 									</td>
 								</tr>
@@ -143,13 +175,31 @@
 												{{ encounter.encounter }}
 											</router-link>
 										</td>
-										<td>
+										<td class="align-middle p-0">
 											<div class="d-flex justify-content-end">
 												<div class="d-flex justify-content-end actions">
 													<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
 													<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 												</div>
-												<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+												
+												<span class="dropleft d-sm-none actions-dropdown">
+													<a class="options"
+														id="options"
+														data-toggle="dropdown" 
+														aria-haspopup="true" 
+														aria-expanded="false">
+														<i class="far fa-ellipsis-v"></i>
+													</a>
+													<div class="dropdown-menu" aria-labelledby="options">	
+														<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)" class="dropdown-item">
+															<i class="fas fa-undo"></i> Reset encounter
+														</a>
+														<a v-b-tooltip.hover title="Delete" class="ml-2 dropdown-item" @click="deleteEncounter(encounter.key, encounter.encounter)">
+															<i class="fas fa-trash-alt"></i> Delete encounter
+														</a>
+													</div>
+												</span>
+												
 											</div>
 										
 										</td>
@@ -306,9 +356,8 @@
 				'players',
 				'playerInCampaign',
 			]),
-			_active_drag: function() {
-
-			},
+			// _active_drag: function() {
+			// },
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -501,4 +550,15 @@
 		}
 	}
 }
+
+.actions {
+	a.disabled {
+		color: #494747 !important;
+		cursor: default !important;
+		&:hover {
+			background-color: transparent;
+		}
+	}
+}
+
 </style>

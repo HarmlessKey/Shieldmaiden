@@ -507,16 +507,6 @@
 							<hr>
 						</div>
 					</div>
-					<div v-if="npc[action.type]" class="card-header mb-3 d-flex justify-content-between">
-						{{ action.name }}
-						<a 
-						class="gray-hover text-capitalize" 
-						v-b-tooltip.hover title="Add Skill" 
-						@click="add(action.type)">
-							<i class="fas fa-plus green"></i>
-							<span class="d-none d-md-inline ml-1">Add</span>
-						</a>
-					</div>
 				</div>
 			</template>
 
@@ -581,6 +571,22 @@
 				],
 			}
 		},
+		mounted() {
+			var npcs = db.ref(`monsters`);
+			npcs.on('value', async (snapshot) => {
+				let npcs = snapshot.val();
+
+				let custom = db.ref(`npcs/${this.userId}`);
+				custom.on('value', async (snapshot) => {
+					let customNpcs = snapshot.val();
+					for(let key in customNpcs) {
+						npcs.push(customNpcs[key]);
+					}
+				});
+				this.npcs = npcs;
+				this.loadingNpcs = false;
+			});
+		},
 		firebase() {
 			return {
 				abilities: db.ref('abilities'),
@@ -588,7 +594,7 @@
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true
 				},
-				npcs: db.ref(`monsters`),
+				// npcs: db.ref(`monsters`),
 			}
 		},
 		computed: {

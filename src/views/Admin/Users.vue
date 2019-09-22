@@ -56,13 +56,24 @@
 
 					<!-- PATREON -->
 					<span slot="patreon" slot-scope="data" v-if="data.value">
+						<span v-if="data.value === 'Expired'" class="red">{{ data.value }}</span>
 						<span 
+							v-else
+							v-for="tier in data.value"
+							:key="tier"
+							class="tiers"
 							:class="{
-								'blue': data.value == 'Folk Hero',
-								'purple': data.value == 'Noble',
-								'orange': data.value == 'Deity'
+								'blue': tiers[tier].name == 'Folk Hero',
+								'purple': tiers[tier].name == 'Noble',
+								'orange': tiers[tier].name == 'Deity',
+								'red' : tiers[tier].name == 'Former'
 						}">
-							{{ data.value }}</span>
+							{{ tiers[tier].name }}</span>
+					</span>
+
+					<!-- LIVE -->
+					<span slot="live" slot-scope="data" v-if="data.value" class="red">
+						Live
 					</span>
 
 					<!-- LOADER -->
@@ -122,6 +133,10 @@
 					patreon: {
 						label: 'Patreon',
 						sortable: true
+					},
+					live: {
+						label: 'Live',
+						sortable: true
 					}
 				},
 				search: '',
@@ -150,13 +165,20 @@
 
 					for(let key in users) {
 						users[key]['.key'] = key;
+						let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
 
 						//Get Patreon
-						let getPatron = db.ref(`patrons`).orderByChild("email").equalTo(users[key].email);
+						let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
 						await getPatron.on('value', (snapshot) => {
 							if(snapshot.val()) {
-								for(let patreonId in snapshot.val())
-								users[key].patreon = snapshot.val()[patreonId].tier_title;
+								for(let patreonId in snapshot.val()) {
+									let patron = snapshot.val()[patreonId];
+									if(new Date(patron.pledge_end) >= new Date()) {
+										users[key].patreon = Object.keys(patron.tiers)
+									} else {
+										users[key].patreon = 'Expired';
+									}
+								}
 							}
 						});
 
@@ -165,6 +187,14 @@
 						await getStatus.on('value', (snapshot) => {
 							if(snapshot.val()) {
 								users[key].status = snapshot.val().state;
+							}
+						});
+
+						// Get Status
+						let getLive = db.ref(`broadcast/${key}/live`);
+						await getLive.on('value', (snapshot) => {
+							if(snapshot.val()) {
+								users[key].live = snapshot.val();
 							}
 						});
 					}
@@ -209,6 +239,16 @@
 <style lang="scss" scoped>
 .container-fluid {
 	padding: 20px;
+
+	.tiers {
+		&::after {
+			content: ', ';
+			color: #b2b2b2;
+		}
+		&:last-child::after {
+			content: '';
+		}
+	}
 }
 
 </style>

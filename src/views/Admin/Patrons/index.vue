@@ -102,7 +102,6 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Patron from '@/components/Admin/Patrons/Patron.vue'
 	import Notifications from '@/components/Admin/Patrons/Notifications.vue'
-	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'Patrons',

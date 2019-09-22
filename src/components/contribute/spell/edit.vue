@@ -572,8 +572,17 @@
 													></b-form-input>
 											</b-col>
 										</b-row>
-										<p>
-											<small>When you cast this spell using a spell slot of {{parseInt(spell.level) + 1 | ordinal}} level or higher, the damage increases by 1d6 for each slot level above 2nd.</small>
+										<p v-if="spell.level_scaling == 'Spell Scale' && modifier.level_tiers.length >= 1">
+											<small>
+												When you cast this spell using a spell slot of 
+												{{parseInt(spell.level) + 1 | ordinal}} level or higher, 
+												the damage increases by
+												{{modifier.level_tiers[0].dice_count || "..."}}
+												{{modifier.level_tiers[0].dice_type || "..."}}
+												{{modifier.level_tiers[0].fixed_val ? "+" : ""}}{{modifier.level_tiers[0].fixed_val}}
+												for {{modifier.level_tiers[0].level < 2 ? "each slot level" : "every " + modifier.level_tiers[0].level + " slot levels"}}
+												above {{parseInt(spell.level) | ordinal}}.
+											</small>
 										</p>
 									</template>
 								</div>  <!-- END MODIFIER CARD BODY -->

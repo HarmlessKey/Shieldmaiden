@@ -26,3 +26,6 @@ deploy.sh
 
 # SECRET KEYS
 secret.js
+
+scripts/data/
+.ipynb_checkpoints/

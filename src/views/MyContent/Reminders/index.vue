@@ -101,7 +101,7 @@
 		},
 		firebase() {
 			return {
-				reminders: db.ref(`reminders/${userId}`)
+				reminders: db.ref(`reminders/${this.userId}`)
 			}
 		},
 		computed: {

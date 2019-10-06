@@ -971,6 +971,7 @@ ul.nav {
 	&::-webkit-scrollbar {
 		display: none !important;
 	}
+	width: 100% !important;
 }
 .vb > .vb-dragger > .vb-dragger-styler {
 	-webkit-backface-visibility: hidden;

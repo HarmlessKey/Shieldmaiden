@@ -20,21 +20,6 @@
 		},
 		metaInfo: {
 			title: 'Planned'
-		},
-		methods: {
-			makeDate(input) {
-				var monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				var d = new Date(input*1000)
-				var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-				var date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				return date + " - " + time;
-			},
 		}
 	}
 </script>

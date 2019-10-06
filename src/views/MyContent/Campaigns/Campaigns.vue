@@ -115,7 +115,7 @@
 										</b-col>
 									</b-row>
 								</div>
-									<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp) }}</small>
+									<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
 								<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
 							</div>
 						</b-col>
@@ -142,12 +142,14 @@
 	import { mapGetters, mapActions } from 'vuex'
 	import PlayerLink from '@/components/PlayerLink.vue'
 	import { db } from '@/firebase'
+	import { general } from '@/mixins/general.js'
 
 	export default {
 		name: 'Campaigns',
 		metaInfo: {
 			title: 'Campaigns'
 		},
+		mixins: [general],
 		components: {
 			Sidebar,
 			Crumble,
@@ -225,24 +227,7 @@
 			deleteCampaign(key) {
 				db.ref('campaigns/'+ this.user.uid).child(key).remove();
 				db.ref('encounters/'+ this.user.uid).child(key).remove();
-			},
-			makeDate(input) {
-				let monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				let d = new Date(input)
-				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
-				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
-
-				let time = hours + ":" + minutes + ":" + seconds;
-				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				return date + " - " + time;
-			},
+			}
 		}
 	}
 </script>

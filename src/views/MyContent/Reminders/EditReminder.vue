@@ -11,7 +11,7 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	// import { db } from '@/firebase'
 
 	export default {
 		name: 'Players',

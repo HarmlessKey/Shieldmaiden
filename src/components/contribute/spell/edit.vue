@@ -600,29 +600,40 @@
 														></b-form-input>
 												</b-col>
 											</b-row>
+											<p v-if="spell.level_scaling == 'Character Level' && modifier.level_tiers.length >= 1">
+												<span>This spell's damage increases when your character reaches a higher level.</span><br>
+												<span v-for="(tier) in modifier.level_tiers">
+													At 
+													{{tier.level | ordinal}} level, 
+													this spell modifier does
+													{{tier.dice_count || "..."}}
+													{{tier.dice_type || "..."}}
+													{{tier.fixed_val ? "+" : ""}}{{tier.fixed_val}}
+													damage. <br>
+												</span>
+											</p>
 											<p v-if="spell.level_scaling == 'Spell Scale' && modifier.level_tiers.length >= 1">
-												<small>
+												<span>
 													When you cast this spell using a spell slot of 
 													{{parseInt(spell.level) + 1 | ordinal}} level or higher, 
-													the damage increases by
+													the damage of this modifier increases by
 													{{modifier.level_tiers[0].dice_count || "..."}}
 													{{modifier.level_tiers[0].dice_type || "..."}}
 													{{modifier.level_tiers[0].fixed_val ? "+" : ""}}{{modifier.level_tiers[0].fixed_val}}
 													for {{modifier.level_tiers[0].level < 2 ? "each slot level" : "every " + modifier.level_tiers[0].level + " slot levels"}}
 													above {{parseInt(spell.level) | ordinal}}.
-												</small>
+												</span>
 											</p>
 											<p v-if="spell.level_scaling == 'Spell Level' && modifier.level_tiers.length >= 1">
-												<small>
-													When you cast this spell using a spell slot of 
-													{{parseInt(spell.level) + 1 | ordinal}} level or higher, 
-													the damage increases by
-													{{modifier.level_tiers[0].dice_count || "..."}}
-													{{modifier.level_tiers[0].dice_type || "..."}}
-													{{modifier.level_tiers[0].fixed_val ? "+" : ""}}{{modifier.level_tiers[0].fixed_val}}
-													for {{modifier.level_tiers[0].level < 2 ? "each slot level" : "every " + modifier.level_tiers[0].level + " slot levels"}}
-													above {{parseInt(spell.level) | ordinal}}.
-												</small>
+												<span v-for="(tier) in modifier.level_tiers">
+													When you cast this spell using a 
+													{{tier.level | ordinal}}-level spell slot, 
+													this spell modifier does
+													{{tier.dice_count || "..."}}
+													{{tier.dice_type || "..."}}
+													{{tier.fixed_val ? "+" : ""}}{{tier.fixed_val}}
+													damage. <br>
+												</span>
 											</p>
 										</template>
 									</template>
@@ -715,7 +726,7 @@
 				classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 
 					"Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"],
 				classes_selected: null,
-				attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell"],
+				attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell", "Damage"],
 				save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
 				aoe_type: ["None", "Cone", "Cube", "Cylinder", "Line", "Sphere", "Square", "Square Feet"],
 				modifier_type: ["Damage", "Healing"],

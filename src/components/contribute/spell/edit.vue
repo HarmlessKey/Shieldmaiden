@@ -358,7 +358,8 @@
 										name="level_scaling"
 										title="Level Scaling"
 										v-validate="'required'"
-										class="form-control mb-2">
+										class="form-control mb-2"
+										@change="$forceUpdate()">
 										<option value="undefined">- Level Scaling -</option>
 										<option v-for="(val,i) in lvl_scaling"
 											:key="i" :value="val">{{val}}</option>

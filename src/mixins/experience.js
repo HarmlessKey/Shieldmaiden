@@ -35,6 +35,19 @@ export const experience = {
 		},
 		returnProficiency(level) {
 			return this.xpTable[level].proficiency;
+		},
+		levelAdvancement(xp) {
+			//Return full bar at lvl 20
+			if(xp >= 355000) {
+				return 100;
+			} else {
+				let level = this.calculatedLevel(xp);
+				let currentAmount = xp - this.xpTable[level].xp;
+				let neededAmount = this.xpTable[level + 1].xp - this.xpTable[level].xp;
+
+				return Math.floor(currentAmount / neededAmount * 100);
+			}
+
 		}
 	}
 }

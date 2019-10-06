@@ -90,6 +90,7 @@
 									</span>
 								</div>
 								<div class="card-body">
+									<h4 class="advancement">{{ campaign.advancement ? campaign.advancement : 'experience' }}</h4>
 									<b-row>
 										<b-col>
 											<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
@@ -280,6 +281,13 @@
 			}
 			.card-body {
 				background: rgba(38, 38, 38, .5);
+
+				.advancement {
+					text-transform: capitalize;
+					text-align: center;
+					font-size: 16px;
+					margin-bottom: 20px;
+				}
 				
 				.col {
 					text-align: center;

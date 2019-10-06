@@ -25,87 +25,102 @@
 				is="transition-group" 
 				enter-active-class="animated flash" 
 				leave-active-class="animated bounceOutLeft">
-				<tr v-for="(player, key) in campaign.players" :key="key">
-					<td class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
-					<td class="img" v-else>
-						<img src="@/assets/_img/styles/player.svg" />
-					</td>
-					<td class="ac">
-						<span :class="{ 
-								'green': player.ac_bonus > 0, 
-								'red': player.ac_bonus < 0 
-							}" 
-							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
-							{{ players[key].ac + player.ac_bonus }}
-						</span>
-						<span v-else class="ac">{{ players[key].ac }}</span>
-					</td>
-					<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
-					<td class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
-						{{ players[key].passive_perception }}
-					</td>
-					<td class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
-						{{ players[key].passive_investigation }}
-					</td>
-					<td class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
-						{{ players[key].passive_insight }}
-					</td>
-					<td class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-						{{ players[key].spell_save_dc }}
-					</td>
-					<td>
-						<span class="current" :class="{ 
-							'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
-							'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
-							'green': true
-							}">{{ player.curHp }}</span>
-							<span class="gray-hover">/</span>
+				<template v-for="(player, key) in campaign.players">
+					<tr :key="key">
+						<td class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
+						<td class="img" v-else>
+							<img src="@/assets/_img/styles/player.svg" />
+						</td>
+						<td class="ac">
 							<span :class="{ 
-									'green': player.maxHpMod > 0, 
-									'red': player.maxHpMod < 0 
+									'green': player.ac_bonus > 0, 
+									'red': player.ac_bonus < 0 
 								}" 
-								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-								{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+								v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
+								{{ players[key].ac + player.ac_bonus }}
 							</span>
-							<span v-else>{{ players[key].maxHp }}</span>
-							<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
-					</td>
+							<span v-else class="ac">{{ players[key].ac }}</span>
+						</td>
+						<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
+						<td class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
+							{{ players[key].passive_perception }}
+						</td>
+						<td class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
+							{{ players[key].passive_investigation }}
+						</td>
+						<td class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
+							{{ players[key].passive_insight }}
+						</td>
+						<td class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
+							{{ players[key].spell_save_dc }}
+						</td>
+						<td>
+							<span class="current" :class="{ 
+								'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
+								'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
+								'green': true
+								}">{{ player.curHp }}</span>
+								<span class="gray-hover">/</span>
+								<span :class="{ 
+										'green': player.maxHpMod > 0, 
+										'red': player.maxHpMod < 0 
+									}" 
+									v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+									{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+								</span>
+								<span v-else>{{ players[key].maxHp }}</span>
+								<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
+						</td>
 
-					<!-- ACTIONS -->
-					<td class="align-middle p-0">
-						<div class="d-flex justify-content-end">
-							<div class="d-flex justify-content-end actions">
-								<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
-									@click="setSlide({
-										show: true,
-										type: 'slides/EditPlayer',
-										data: { key: key, location: 'overview',}
-									})">
-									<i class="fas fa-pencil"></i>
-								</a>
-							</div>
-							<span class="dropleft d-sm-none actions-dropdown">
-								<a class="options"
-									id="options"
-									data-toggle="dropdown" 
-									aria-haspopup="true" 
-									aria-expanded="false">
-									<i class="far fa-ellipsis-v"></i>
-								</a>
-								<div class="dropdown-menu" aria-labelledby="options">	
-									<a class="gray-hover dropdown-item" v-b-tooltip.hover title="Edit player" 
+						<!-- ACTIONS -->
+						<td class="align-middle p-0">
+							<div class="d-flex justify-content-end">
+								<div class="d-flex justify-content-end actions">
+									<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
 										@click="setSlide({
 											show: true,
 											type: 'slides/EditPlayer',
 											data: { key: key, location: 'overview',}
 										})">
-										<i class="fas fa-pencil"></i> Edit player
+										<i class="fas fa-pencil"></i>
 									</a>
 								</div>
-							</span>
-						</div>
-					</td>
-				</tr>
+								<span class="dropleft d-sm-none actions-dropdown">
+									<a class="options"
+										id="options"
+										data-toggle="dropdown" 
+										aria-haspopup="true" 
+										aria-expanded="false">
+										<i class="far fa-ellipsis-v"></i>
+									</a>
+									<div class="dropdown-menu" aria-labelledby="options">	
+										<a class="gray-hover dropdown-item" v-b-tooltip.hover title="Edit player" 
+											@click="setSlide({
+												show: true,
+												type: 'slides/EditPlayer',
+												data: { key: key, location: 'overview',}
+											})">
+											<i class="fas fa-pencil"></i> Edit player
+										</a>
+									</div>
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr :key="key" v-if="campaign.advancement != 'milestone'" class="experience">
+						<td :colspan="calcColspan">
+							<div>
+								<div class="level">{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}</div>
+								<div class="progress">
+									<div class="progress-bar bg-blue"
+										role="progressbar" 
+										:style="{ width: levelAdvancement(players[key].experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+									</div>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</template>
 			</tbody>
 		</table>
 		<div v-else class="loader"><span>Loading Players...</span></div>
@@ -117,9 +132,11 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		data() {
 			return {
 				user: this.$store.getters.getUser,
@@ -140,6 +157,16 @@
 				'players',
 				'playerInCampaign',
 			]),
+			calcColspan() {
+				let colspan = 9;
+
+				if(this.settings.passive_perception == undefined) { colspan--; }
+				if(this.settings.passive_investigation == undefined) { colspan--; }
+				if(this.settings.passive_insight == undefined) { colspan--; }
+				if(this.settings.save_dc == undefined) { colspan--; }
+
+				return colspan;
+			}
 		},
 		mounted() {
 			this.fetchCampaign({
@@ -152,8 +179,8 @@
 				'setSlide',
 			]),
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				var percentage = Math.floor(current / max * 100)
+				return percentage
 			},
 			maxHp(maxHp, maxHpMod) {
 				return maxHp + maxHpMod;
@@ -191,6 +218,31 @@
 				white-space: nowrap;
 				text-overflow: ellipsis;
 				max-width:0;
+			}
+		}
+		tr.experience {
+			td {
+				background: none;
+				padding: 0 0 10px 0;
+
+				div {
+					display: flex;
+					justify-content: space-between;
+					height: 15px;
+					width: 100%;
+				
+					.level {
+						display: block;
+						width: 25px;
+						line-height: 15px;
+						text-align: center;
+					}
+					.progress {
+						width: 100%;
+						height: 15px;
+						background-color: #232323 !important;
+					}
+				}
 			}
 		}
 	}

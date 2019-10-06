@@ -2,7 +2,7 @@
 	<div>
 		<template v-if="(old_spell && spell)">
 			
-			<Crumble :name="old_spell.name"/>
+			<!-- <Crumble :name="old_spell.name"/> -->
 
 			<b-row>
 				<b-col md="4" id="old_spell">
@@ -50,13 +50,22 @@
 					<div class="card">
 						<div class="card-header d-flex justify-content-between">
 							<span>Basic Info</span>
-							<a 
-							class="gray-hover text-capitalize" 
-							v-b-tooltip.hover title="Parse Old Spell" 
-							@click="parse_old_spell()">
-								<span class="d-none d-md-inline mr-2">Parse</span>
-								<i class="fad fa-wand-magic blue"></i>
-							</a>
+							<div>
+								<a 
+								class="gray-hover text-capitalize mx-3" 
+								v-b-tooltip.hover title="Parse Old Spell" 
+								@click="parse_old_spell()">
+									<i class="fad fa-wand-magic blue"></i>
+									<span class="d-none d-md-inline ml-1 blue">Parse</span>
+								</a>
+								<a 
+								class="gray-hover text-capitalize mx-3" 
+								v-b-tooltip.hover title="Save Spell" 
+								@click="store_spell()">
+									<i class="fad fa-treasure-chest green"></i>
+									<span class="d-none d-md-inline ml-1 green">Save</span>
+								</a>
+							</div>
 						</div>
 						<div class="card-body">
 							<b-row>
@@ -92,6 +101,7 @@
 											:key="i" :value="i" 
 											:seleced="spell.level==i">{{l}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('spell_level')">{{ errors.first('pper') }}</p>
 								</b-col>
 								<!-- SCHOOL -->
 								<b-col md="3">
@@ -107,6 +117,7 @@
 										<option v-for="(s,i) in schools"
 											:key="s" :value="s">{{s}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
 								</b-col>
 							</b-row>
 							<b-row>
@@ -123,6 +134,7 @@
 										type="number"
 										data-vv-as="Cast Time"
 										></b-form-input>
+										<p class="validate red" v-if="errors.has('cast_time_nr')">{{ errors.first('cast_time_nr') }}</p>
 								</b-col>
 								<!-- CAST TIME TYPE -->
 								<b-col md="3">
@@ -138,6 +150,7 @@
 										<option v-for="(t,i) in cast_time"
 											:key="t" :value="t">{{t}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('cast_time_type')">{{ errors.first('cast_time_type') }}</p>
 									
 								</b-col>
 								<!-- REACTION TIME DESCRIPTION -->
@@ -206,6 +219,7 @@
 										<option v-for="(val,i) in range_type"
 											:key="i" :value="val">{{val}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('range_type')">{{ errors.first('range_type') }}</p>
 								</b-col>
 								<!-- RANGE -->
 								<b-col md="3">
@@ -217,7 +231,6 @@
 										name="range"
 										class="form-control mb-2"
 										title="Range"
-										v-validate="'required'"
 										type="number"
 										data-vv-as="Range"
 										></b-form-input>
@@ -236,6 +249,7 @@
 										<option v-for="(val,i) in dur_type"
 											:key="i" :value="val">{{val}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('duration_type')">{{ errors.first('duration_type') }}</p>
 								</b-col>
 							</b-row>
 							<b-row>
@@ -253,6 +267,7 @@
 										<option v-for="(val,i) in aoe_type"
 											:key="i" :value="val">{{val}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
 								</b-col>
 								<b-col md="6">
 									<label for="aoe_size">AOE Size ft.</label>
@@ -262,7 +277,6 @@
 										name="aoe_size"
 										class="form-control mb-2"
 										title="AOE Size"
-										v-validate="'required'"
 										type="number"
 										data-vv-as="AOE Size"
 										></b-form-input>
@@ -309,6 +323,7 @@
 										v-validate="'required'"
 										data-vv-as="Description"
 										rows="6"></b-form-textarea>
+										<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
 								</b-col>
 								<!-- CLASS SELECTOR -->
 								<b-col md="4" v-if="spell.classes">
@@ -342,11 +357,13 @@
 										id="level_scaling"
 										name="level_scaling"
 										title="Level Scaling"
+										v-validate="'required'"
 										class="form-control mb-2">
 										<option value="undefined">- Level Scaling -</option>
 										<option v-for="(val,i) in lvl_scaling"
 											:key="i" :value="val">{{val}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('level_scaling')">{{ errors.first('level_scaling') }}</p>
 								</b-col>
 								<!-- SOURCE BOOK -->
 								<b-col md="5">
@@ -357,7 +374,6 @@
 										name="source"
 										class="form-control mb-2"
 										title="Source"
-										v-validate="'required'"
 										data-vv-as="Source"
 										></b-form-input>
 								</b-col>
@@ -754,8 +770,8 @@
 		methods: {
 			parse_old_spell() {
 				// Parse values from old_spell object to new spell object
-				console.log(this.old_spell)
-				console.log(this.spell)
+				// console.log(this.old_spell)
+				// console.log(this.spell)
 				
 				// Parse simple values
 				this.spell.school = this.old_spell.school.name
@@ -891,6 +907,20 @@
 			},
 			update() {
 				this.$forceUpdate();
+			},
+			store_spell() {
+
+				delete this.spell['.key']
+
+				this.$validator.validateAll().then((result) => {
+					if (result) {
+						// db.ref(`new_spells/${this.id}`).set(this.spell)
+						console.log("Validated")
+						// this.$router.replace('/players')
+					} else {
+						console.log("Not validated")
+					}
+				})
 			},
 			create_spell_level_tier_description(spell, level_tiers) {
 				// Generates description for each level tier for spell level scaling

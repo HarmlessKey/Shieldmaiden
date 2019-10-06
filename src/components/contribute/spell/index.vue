@@ -106,7 +106,7 @@
 					readyCallback: () => this.loading = false
 				},
 				spell: {
-					source: db_dev.ref(`spells/${this.id}`),
+					source: db.ref(`new_spells/${this.id}`),
 					asObject: true,
 					readyCallback: () => this.loading = false
 				}
@@ -117,7 +117,7 @@
 				this.edit = value
 			},
 			checked(value) {
-				db_dev.ref(`spells/${this.id}/checked`).set(value);
+				db.ref(`new_spells/${this.id}/checked`).set(value);
 			}
 		}
 	}

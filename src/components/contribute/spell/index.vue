@@ -48,6 +48,43 @@
 					</template>
 				</p>
 			</template>
+			<template v-else-if="spell && spell.changed">
+				<!-- {{ spell }} -->
+				<i class="mb-3 d-block">
+					{{ levels[spell.level] }}
+					{{ spell.school }}
+				</i>
+
+				<p>
+					<b>Casting time:</b> {{ spell.cast_time_nr }} {{spell.cast_time_type}}<br/>
+					<b>Range:</b> {{ (spell.range_type == "Ranged") ? spell.range + " feet" : spell.range_type}}<br/>
+					<b>Components:</b> 
+					<template v-for="(val, component) in spell.components">
+						{{ val ? component.charAt(0).toUpperCase() : ""}}
+					</template>
+					<template v-if="spell.material_desciption"> ({{ spell.material_desciption }})</template>
+					<br/>
+					<b>Duration:</b> {{ spell.duration_type }}<br>
+					<b>Classes:</b> 
+					<template v-for="(_class, index) in spell.classes">
+						{{ _class }}<template v-if="Object.keys(spell.classes).length > index + 1">, </template>
+					</template>
+					<br/>
+				</p>
+				<p>
+					{{ spell.description }}
+				</p>
+				<!-- <p v-for="(desc, index) in spell.desc" :key="index">
+					{{ desc }}
+				</p> -->
+
+				<!-- <p v-if="spell.higher_level">
+					At higher levels. 
+					<template v-for="higher in spell.higher_level">
+						{{ higher }}
+					</template>
+				</p> -->
+			</template>
 		</template>
 
 		<template v-else> 
@@ -97,6 +134,13 @@
 			...mapGetters([
 				'userInfo'
 			]),
+		},
+		filters: {
+		  capitalize: function (value) {
+		    if (!value) return ''
+		    value = value.toString()
+		    return value.charAt(0).toUpperCase() + value.slice(1)
+		  }
 		},
 		firebase() {
 			return {

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<table class="table table-hover" v-if="players && campaign">
+		<table class="table table-hover" :class="{experience: campaign.advancement != 'milestone'}" v-if="players && campaign">
 			<thead>
 				<th></th>
 				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
@@ -27,8 +27,8 @@
 				leave-active-class="animated bounceOutLeft">
 				<template v-for="(player, key) in campaign.players">
 					<tr :key="key">
-						<td class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
-						<td class="img" v-else>
+						<td :rowspan="campaign.advancement != 'milestone' ? 2 : 1" class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
+						<td :rowspan="campaign.advancement != 'milestone' ? 2 : 1" class="img" v-else>
 							<img src="@/assets/_img/styles/player.svg" />
 						</td>
 						<td class="ac">
@@ -107,7 +107,7 @@
 							</div>
 						</td>
 					</tr>
-					<tr :key="key" v-if="campaign.advancement != 'milestone'" class="experience">
+					<tr :key="key" v-if="campaign.advancement != 'milestone'" class="xpbar">
 						<td :colspan="calcColspan">
 							<div>
 								<div class="level">{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}</div>
@@ -220,27 +220,37 @@
 				max-width:0;
 			}
 		}
-		tr.experience {
-			td {
-				background: none;
-				padding: 0 0 10px 0;
+		&.experience {
+			tr td.img {
+				width: 62px;
 
-				div {
-					display: flex;
-					justify-content: space-between;
-					height: 15px;
-					width: 100%;
-				
-					.level {
-						display: block;
-						width: 25px;
-						line-height: 15px;
-						text-align: center;
-					}
-					.progress {
-						width: 100%;
+				img {
+					width: 54px;
+					height: 54px;
+				}
+			}
+			tr.xpbar {
+				td {
+					background: none;
+					padding: 0;
+
+					div {
+						display: flex;
+						justify-content: space-between;
 						height: 15px;
-						background-color: #232323 !important;
+						width: 100%;
+					
+						.level {
+							display: block;
+							width: 25px;
+							line-height: 15px;
+							text-align: center;
+						}
+						.progress {
+							width: 100%;
+							height: 15px;
+							background-color: #232323 !important;
+						}
 					}
 				}
 			}

@@ -227,7 +227,7 @@
 									v-model="player.skills"
 									stacked
 								>
-									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="skill">
+									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
 										<span class="skill">
 											{{skill.skill  }}
 											<span>

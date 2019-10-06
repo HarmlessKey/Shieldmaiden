@@ -107,7 +107,7 @@
 							</div>
 						</td>
 					</tr>
-					<tr :key="key" v-if="campaign.advancement != 'milestone'" class="xpbar">
+					<tr :key="'xp-' + key" v-if="campaign.advancement != 'milestone'" class="xpbar">
 						<td :colspan="calcColspan">
 							<div>
 								<div class="level">{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}</div>

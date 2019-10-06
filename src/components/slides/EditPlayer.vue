@@ -103,15 +103,45 @@
 		</template>
 
 		<button class="btn btn-block my-3" @click="edit()">Save</button>
+
+		<div v-if="advancement['.value'] != 'milestone'" class="pt-2">
+			<hr>
+			<h2>Experience Points</h2>
+			{{ setNumber(playerBase.experience) }}
+			<h2 class="text-center xp">{{ animatedNumber }}</h2>
+
+			<div class="level">
+				<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
+				<div class="progress">
+					<div class="progress-bar bg-blue"
+						role="progressbar" 
+						:style="{ width: levelAdvancement(playerBase.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+					</div>
+				</div>
+				<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
+			</div>
+
+				<b-form-input 
+					class="text-center"
+					type="number" 
+					name="xp" 
+					v-model="xp"
+					placeholder="Award XP">
+				</b-form-input>
+
+				<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
+		</div>
 	</div>
 </template>
 
 <script>
 	import { db } from '@/firebase'
 	import { mapActions } from 'vuex'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'EditEntity',
+		mixins: [experience],
 		props: [
 			'data',
 		],
@@ -123,7 +153,10 @@
 				entityKey: this.data.key,
 				location: this.data.location,
 				entity: undefined,
-				maxHpMod: undefined
+				maxHpMod: undefined,
+				xp: undefined,
+				number: 0,
+				tweenedNumber: 0
 			}
 		},
 		mounted() {
@@ -142,7 +175,22 @@
 				initiative: {
 					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/initiative`),
 					asObject: true
-				}
+				},
+				advancement: {
+					source:	db.ref(`campaigns/${this.userId}/${this.campaignId}/advancement`),
+					asObject: true
+				},
+			}
+		},
+		computed: {
+			animatedNumber: function() {
+				return this.tweenedNumber.toFixed(0);
+			}
+		},
+		watch: {
+			number: function(newValue) {
+				// eslint-disable-next-line
+				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			}
 		},
 		methods: {
@@ -150,6 +198,22 @@
 				'setSlide',
 				'edit_player',
 			]),
+			setNumber(value) {
+				this.number = value
+			},
+			addXp() {
+				if(this.xp) {
+					let newXp = parseInt(this.playerBase.experience) + parseInt(this.xp);
+
+					if(newXp < 0) { newXp = 0; }
+					if(newXp > 355000) { newXp = 355000; }
+
+					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(
+						newXp
+					)
+					this.xp = undefined;
+				}
+			},
 			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
@@ -237,5 +301,24 @@
 <style lang="scss" scoped>
 	label {
 		font-size: 12px;
+	}
+	h2.xp {
+		font-weight: bold;
+		font-size: 28px;
+	}
+	.level {
+		display: grid;
+		grid-template-columns: 25px auto 25px;
+		height: 15px;
+		line-height: 15px;
+		margin-bottom: 20px;
+
+		.next {
+			text-align: right;
+		}
+
+		.progress {
+			height: 15px;
+		}
 	}
 </style>

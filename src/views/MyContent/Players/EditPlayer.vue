@@ -106,62 +106,93 @@
 					</b-row>
 				</b-card>
 
-				<!-- HEALTH & AC -->
-				<b-card header="Health & Armor Class">
-					<b-row>
-							<b-col class="col-sm-4 col-md-3 mb-2">
-								<label for="level">Level</label>
-								<b-form-input autocomplete="off"  id="level" 
-									type="number" 
-									min="1"
-									max="20"
-									:class="{'input': true, 'error': errors.has('level') }" 
-									v-model="player.level" 
-									v-validate="'numeric'" 
-									data-vv-as="Level"
-									name="level" 
-									placeholder="Level" />
-								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-							</b-col>
-							<b-col class="col-sm-4 col-md-3 mb-2">
-								<label for="maxHp">HP *</label>
-								<b-form-input autocomplete="off"  id="maxHp" 
-									type="number" 
-									min="1"
-									:class="{'input': true, 'error': errors.has('maxHp') }" 
-									v-model="player.maxHp" 
-									v-validate="'numeric|required'" 
-									data-vv-as="Maxium Hit Points"
-									name="maxHp" 
-									placeholder="Maximum Hit Points*" />
-								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-							</b-col>
-							<b-col class="col-sm-4 col-md-3 mb-2">
-								<label for="ac">AC *</label>
-								<b-form-input autocomplete="off"  
-									id="ac" 
-									min="1"
-									type="number" 
-									:class="{'input': true, 'error': errors.has('ac') }" 
-									v-model="player.ac" 
-									v-validate="'numeric|required'" 
-									data-vv-as="Armor Class"
-									name="ac" 
-									placeholder="Armor Class" />
-								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-							</b-col>
-							<b-col md="3">
-								<label for="save_dc">Spell Save DC</label>
-								<b-form-input autocomplete="off"  
-									id="save_dc" 
-									min="0"
-									type="number" 
-									v-model="player.spell_save_dc" 
-									name="save_dc" 
-									placeholder="Save DC" />
-							</b-col>
-					</b-row>
-				</b-card>
+				<b-row>
+					<!-- LEVEL & XP -->
+					<b-col md="6">
+						<b-card header="Level & Experience">
+							<b-row>
+								<b-col md="8" class="mb-2">
+									<label for="experience" class="experience">
+										<span>XP</span>
+										<span>
+											<span class="gray-hover">level:</span> {{ calculatedLevel(player.experience) }}
+										</span>
+									</label>
+									<b-form-input autocomplete="off"  id="experience" 
+										type="number" 
+										min="0"
+										max="355000"
+										:class="{'input': true, 'error': errors.has('experience') }" 
+										v-model="player.experience" 
+										v-validate="'numeric|min_value:0|max_value:355000'" 
+										data-vv-as="experience"
+										name="experience" 
+										placeholder="Experience" />
+									<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
+								</b-col>
+								<b-col md="4" class="mb-2">
+									<label for="level">Level Override</label>
+									<b-form-input autocomplete="off"  id="level" 
+										type="number" 
+										min="1"
+										max="20"
+										:class="{'input': true, 'error': errors.has('level') }" 
+										v-model="player.level" 
+										v-validate="'numeric|min_value:1|max_value:20'" 
+										data-vv-as="Level Override"
+										name="level" 
+										placeholder="Level Override" />
+									<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+								</b-col>
+							</b-row>
+						</b-card>
+					</b-col>
+
+					<!-- HEALTH & AC -->
+					<b-col md="6">
+						<b-card header="Health & Armor Class">
+							<b-row>
+								<b-col md="4" class="mb-2">
+									<label for="maxHp">HP *</label>
+									<b-form-input autocomplete="off"  id="maxHp" 
+										type="number" 
+										min="1"
+										:class="{'input': true, 'error': errors.has('maxHp') }" 
+										v-model="player.maxHp" 
+										v-validate="'numeric|required'" 
+										data-vv-as="Maxium Hit Points"
+										name="maxHp" 
+										placeholder="Maximum Hit Points*" />
+									<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+								</b-col>
+								<b-col md="4" class="mb-2">
+									<label for="ac">AC *</label>
+									<b-form-input autocomplete="off"  
+										id="ac" 
+										min="1"
+										type="number" 
+										:class="{'input': true, 'error': errors.has('ac') }" 
+										v-model="player.ac" 
+										v-validate="'numeric|required'" 
+										data-vv-as="Armor Class"
+										name="ac" 
+										placeholder="Armor Class" />
+									<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+								</b-col>
+								<b-col md="4">
+									<label for="save_dc">Spell Save DC</label>
+									<b-form-input autocomplete="off"  
+										id="save_dc" 
+										min="0"
+										type="number" 
+										v-model="player.spell_save_dc" 
+										name="save_dc" 
+										placeholder="Save DC" />
+								</b-col>
+							</b-row>
+						</b-card>
+					</b-col>
+				</b-row>
 
 				<!-- ABILITY SCORES -->
 				<b-card header="Ability Scores">
@@ -247,9 +278,11 @@
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},
@@ -400,6 +433,11 @@
 	label {
 		line-height: 37px;
 		margin-bottom: 0;
+
+		&.experience {
+			display: flex;
+			justify-content: space-between;
+		}
 
 		svg {
 			fill: #b2b2b2;

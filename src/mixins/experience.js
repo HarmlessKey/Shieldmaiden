@@ -1,4 +1,4 @@
-export const general = {
+export const experience = {
 	data() {
 		return {
 			xpTable: {
@@ -25,6 +25,13 @@ export const general = {
 		}
 	},
 	methods: {
-		
+		calculatedLevel(xp) {
+			for(let level in this.xpTable) {
+				if(this.xpTable[level].xp > xp) {
+					return level - 1;
+				}
+			}
+			return 20;
+		}
 	}
 }

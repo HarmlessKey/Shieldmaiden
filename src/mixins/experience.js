@@ -32,6 +32,9 @@ export const experience = {
 				}
 			}
 			return 20;
+		},
+		returnProficiency(level) {
+			return this.xpTable[level].proficiency;
 		}
 	}
 }

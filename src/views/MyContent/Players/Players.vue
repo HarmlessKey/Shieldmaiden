@@ -49,7 +49,7 @@
 								</router-link>
 							</td>
 							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
-							<td>{{ player.level }}</td>
+							<td>{{ player.level ? player.level : calculatedLevel(player.experience) }}</td>
 							<!-- Actions -->
 							<td class="align-middle p-0">
 								<div class="d-flex justify-content-end">
@@ -111,9 +111,11 @@
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},
@@ -137,7 +139,6 @@
 				'content_count',
 			]),
 			_players: function() {
-				// console.log('yo')
 				return _.chain(this.players)
 				.filter(function(player, key) {
 					player.key = key

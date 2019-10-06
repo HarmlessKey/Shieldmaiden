@@ -308,7 +308,7 @@
 					<div class="card-body">
 						<b-row>
 							<b-col md="6">
-								<b-row class="skills" v-for="(skill, index) in skills.slice(0,9)" :key="index">
+								<b-row class="skills" v-for="(skill, index) in Object.keys(skillList).slice(0,9)" :key="index">
 										<b-col class="col-5">
 											<label class="text-capitalize" :for="skill">{{ skill }}</label>
 										</b-col>
@@ -325,7 +325,7 @@
 								</b-row>
 							</b-col>
 							<b-col md="6">
-								<b-row class="skills" v-for="(skill, index) in skills.slice(9,18)" :key="index">
+								<b-row class="skills" v-for="(skill, index) in Object.keys(skillList).slice(9,18)" :key="index">
 										<b-col class="col-5">
 											<label class="text-capitalize" :for="skill">{{ skill }}</label>
 										</b-col>
@@ -522,7 +522,7 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
-
+	import { skills } from '@/mixins/skills.js'
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 
@@ -531,6 +531,7 @@
 		metaInfo: {
 			title: 'NPC\'s'
 		},
+		mixins: [skills],
 		components: {
 			Sidebar,
 			OverEncumbered,
@@ -544,26 +545,6 @@
 				searchResults: [],
 				noResult: '',
 				npcSkills: [],
-				skills: [
-					'acrobatics',
-					'animal Handling',
-					'arcana',
-					'athletics',
-					'deception',
-					'history',
-					'insight',
-					'intimidation',
-					'investigation',
-					'medicine',
-					'nature',
-					'perception',
-					'performance',
-					'persuasion',
-					'religion',
-					'sleight of Hand',
-					'stealth',
-					'survival',
-				],
 				actions: [
 					{ type: 'special_abilities', name: 'Special Abilities' },
 					{ type: 'actions', name: 'Actions' },

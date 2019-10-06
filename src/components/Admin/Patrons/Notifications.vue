@@ -4,7 +4,7 @@
 		<ul class="entities">
 			<template v-if="!loading">
 				<li v-for="(notification, key) in _notifications" :key="key">
-					<div class="mb-2 gray-hover">{{ notification.timestamp }} </div>
+					<div class="mb-2 gray-hover">{{ makeDate(notification.timestamp, true) }} </div>
 					<div class="member_info">
 						<span>{{ notification.attributes.full_name }}</span>
 						<span>{{ notification.trigger }}</span>
@@ -68,9 +68,11 @@
 <script>
 	import { db } from '@/firebase'
 	import _ from 'lodash'
+	import { general } from '@/mixins/general.js'
 
 	export default {
 		name: 'Notifications',
+		mixins: [general],
 		data() {
 			return {
 				loading: true,

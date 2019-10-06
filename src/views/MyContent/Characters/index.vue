@@ -26,7 +26,7 @@
 								v-b-tooltip.hover title="Edit">{{ character.character.character_name }}
 							</router-link>
 						</td>
-						<td>{{ character.character.level }}</td>
+						<td>{{ character.character.level ? character.character.level : calculatedLevel(character.character.experience) }}</td>
 						<!-- Actions -->
 						<td class="align-middle p-0">
 							<div class="d-flex justify-content-end">
@@ -51,9 +51,11 @@
 <script>
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import { db } from '@/firebase'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},

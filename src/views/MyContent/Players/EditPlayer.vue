@@ -298,14 +298,14 @@
 					</b-row>
 				</b-card>
 				
-				<router-link to="/players" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
+				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
 			</div>
 		</template>
 		<div class="container-fluid" v-else-if="$route.name == 'Edit Character'">
 			<p class="red">You have no conrol over this character</p>
-			<router-link to="/players" class="btn bg-gray mr-2 mt-3">Back</router-link>
+			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Back</router-link>
 		</div>
 	</div>
 </template>

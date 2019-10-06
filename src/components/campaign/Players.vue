@@ -247,8 +247,9 @@
 							text-align: center;
 						}
 						.progress {
+							margin-top: 6px;
 							width: 100%;
-							height: 15px;
+							height: 3px;
 							background-color: #232323 !important;
 						}
 					}

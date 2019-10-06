@@ -86,11 +86,11 @@
 	import { mapActions, mapGetters } from 'vuex';
 	
 	import { dice } from '@/mixins/dice.js'
-	import { attributes } from '@/mixins/attributes.js'
+	import { general } from '@/mixins/general.js'
 
 	export default {
 		name: 'Entities',
-		mixins: [attributes, dice],
+		mixins: [general, dice],
 		data() {
 			return {
                 campaignId: this.$route.params.campid,

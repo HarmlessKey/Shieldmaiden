@@ -69,6 +69,7 @@
 <script>
 	import { db } from '@/firebase'
 	import trackCampaign from '@/components/trackCampaign'
+	import { general } from '@/mixins/general.js'
 
 	import Follow from '@/components/trackCampaign/Follow.vue'
 
@@ -78,6 +79,7 @@
 			trackCampaign,
 			Follow
 		},
+		mixins: [general],
 		metaInfo: {
 			title: 'Harmless Key'
 		},
@@ -137,22 +139,6 @@
 			});
 		},
 		methods: {
-			makeDate(input) {
-				let monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				let d = new Date(input)
-				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
-				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-
-				let time = hours + ":" + minutes;
-				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				return date + " - " + time;
-			},
 			fetch_tier() {
 				let path = 'tiers/basic'
 

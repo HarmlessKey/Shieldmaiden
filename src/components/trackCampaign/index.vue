@@ -147,7 +147,7 @@
 <script>
 	import _ from 'lodash'
 	import { db } from '@/firebase'
-	import { attributes } from '@/mixins/attributes.js'
+	import { general } from '@/mixins/general.js'
 
 	import Follow from '@/components/trackCampaign/Follow.vue'
 	import Finished from '@/components/combat/Finished.vue'
@@ -158,7 +158,7 @@
 
 	export default {
 		name: 'app',
-		mixins: [attributes],
+		mixins: [general],
 		components: {
 			Follow,
 			Finished,

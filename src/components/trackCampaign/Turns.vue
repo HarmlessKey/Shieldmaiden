@@ -30,12 +30,12 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { attributes } from '@/mixins/attributes.js'
+	import { general } from '@/mixins/general.js'
 	import Health from '@/components/trackCampaign/Health.vue'
 
 	export default {
 		name: 'app',
-		mixins: [attributes],
+		mixins: [general],
 		components: {
 			Health,
 		},

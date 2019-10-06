@@ -8,8 +8,8 @@
 				<b-col>
 					<h2 v-if="userInfo">{{ userInfo.username }}</h2>
 					<p class="info">
-						<span class="gray-hover">Created:</span> {{ makeDate(user.metadata.creationTime) }}<br/>
-						<span class="gray-hover">Last login:</span> {{ makeDate(user.metadata.lastSignInTime) }}
+						<span class="gray-hover">Created:</span> {{ makeDate(user.metadata.creationTime, true) }}<br/>
+						<span class="gray-hover">Last login:</span> {{ makeDate(user.metadata.lastSignInTime, true) }}
 					</p>
 				</b-col>
 			</b-row>
@@ -122,7 +122,8 @@
 <script>
 	import Tiers from '@/components/Tiers.vue'
 	import PlayerLink from '@/components/PlayerLink.vue'
-	import { db, auth } from '@/firebase'	
+	import { db, auth } from '@/firebase'
+	import { general } from '@/mixins/general.js'
 	import { mapGetters } from 'vuex'
 
 export default {
@@ -131,6 +132,7 @@ export default {
 			Tiers,
 			PlayerLink,
 		},
+		mixins: [general],
 		metaInfo: {
 			title: 'Profile'
 		},
@@ -160,25 +162,6 @@ export default {
 			})
 		},
 		methods: {
-			makeDate(input, showTime = true) {
-				let monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				let d = new Date(input)
-				let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
-				let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-				let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
-
-				let time = hours + ":" + minutes + ":" + seconds;
-				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-				
-				if(showTime) { return date + " - " + time; }
-				return date
-			},
 			resetPassword() {
 				var vm = this;
 				var emailAddress = this.user.email;

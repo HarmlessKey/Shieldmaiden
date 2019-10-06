@@ -761,6 +761,7 @@
 				this.spell.school = this.old_spell.school.name
 				this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false
 				this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level
+				this.spell.level_scaling = (this.old_spell.higher_level) ? "undefined" : "None"
 				
 				// Parse range options
 				if (parseInt(this.old_spell.range)) {
@@ -832,6 +833,10 @@
 				}
 				this.spell.classes = classes
 
+				// Clean up spell object
+				delete this.spell.concentration
+				delete this.spell.duration
+				delete this.spell.higher_level
 				
 			},
 			setCompontent(comp) {

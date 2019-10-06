@@ -813,8 +813,12 @@
 					if (this.old_spell.components[i] == "S") {this.spell.components.somatic = true}
 					if (this.old_spell.components[i] == "M") {this.spell.components.material = true}
 				}
-				this.spell.material_description = this.old_spell.material
-				delete this.spell.material
+				if (this.old_spell.material) {
+					this.spell.material_description = this.old_spell.material
+					delete this.spell.material
+				}
+
+				
 
 				// Parse duration
 				// If a number in duration duration = concentration or time
@@ -914,7 +918,7 @@
 
 				this.$validator.validateAll().then((result) => {
 					if (result) {
-						// db.ref(`new_spells/${this.id}`).set(this.spell)
+						db.ref(`new_spells/${this.id}`).set(this.spell)
 						console.log("Validated")
 						// this.$router.replace('/players')
 					} else {

@@ -409,9 +409,10 @@
 										<option v-for="(val,i) in attack_type"
 											:key="i" :value="val" selected="selected">{{val}}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
 								</b-col>
 								<!-- SAVE -->
-								<b-col md="4">
+								<b-col md="3">
 									<label for="save">Save</label>
 									<b-form-select v-model="spell_action.save"
 										:disabled="spell_action.type != 'Spell Save'"
@@ -440,6 +441,14 @@
 										@keyup="$forceUpdate()"
 										></b-form-input>
 								</b-col>
+								<b-col md='1' class='remove-link'>
+									<!-- <button class="btn bg-red" @click="remove_action(index)"><i class="fas fa-trash-alt white"></i></button> -->
+									<a @click="remove_action(index)"
+										class="gray-hover text-capitalize align-middle"
+										v-b-tooltip.hover title="Remove">
+										<i class="fas fa-trash-alt red"></i>
+									</a>
+								</b-col>
 							</b-row>
 						</div>
 					</div>
@@ -455,188 +464,213 @@
 							</a>
 						</div>
 						<div class="card-body">
-							<div class="card" v-for="(modifier, index) in spell.modifiers">
-								<div class="card-header">
-									<!-- {{parseInt(index) + 1}}. {{modifier.dice_count}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} {{modifier.subtype}} {{modifier.type}} -->
-									<!-- THIS BREAKS WHEN DELETE SPELL ACTION -->
-									<b-form-select v-model="modifier.spell_action"
-										id="spell_action"
-										name="spell_action"
-										title="Spell Action"
-										class="form-control mb-2"
-										v-validate="'required'"
-										data-vv-as="Spell Action"
-										@change="$forceUpdate()">
-										<option value="undefined" disabled>- Spell Action -</option>
-										<option v-for="(val,i) in spell.actions"
-											:key="i" :value="i">{{val.name || val.type}}</option>
-									</b-form-select>
+							<div class="card" v-for="(modifier, mod_index) in spell.modifiers">
+								<div class="card-header collapse-header">
+									<a v-b-toggle="'accordion-'+mod_index" class="gray-light" >
+											{{parseInt(mod_index) + 1}}. 
+											{{(modifier.spell_action !== undefined) ? (spell.actions[modifier.spell_action].name || spell.actions[modifier.spell_action].type): ""}}: 
+											{{modifier.dice_count}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
+											{{modifier.subtype}} {{modifier.type}}
+										<!-- <div> -->
+											<!-- <a class="bg-gray-light" v-b-toggle="'accordion-'+mod_index" >Expand</a> -->
+											<!-- <button class="btn bg-red" @click="remove_modifier(mod_index)"><i class="fas fa-trash-alt white"></i></button> -->
+									</a>
+									<a @click="remove_modifier(mod_index)"
+										class="gray-hover text-capitalize"
+										v-b-tooltip.hover title="Remove">
+										<i class="fas fa-trash-alt red"></i>
+										<!-- <span class="d-none d-md-inline ml-1">Remove</span> -->
+									</a>
+										<!-- </div> -->
 								</div>
-								<div class="card-body">
-									<template v-if="modifier.spell_action != undefined">
-										<b-row>
-											<b-col md="4">
-												<!-- MODIFIER SUBTYPE -->
-												<label for="modifier_subtype">Subtype</label>
-												<b-form-select v-model="modifier.subtype"
-													:disabled="spell.actions[modifier.spell_action].type=='Healing Spell'"
-													id="modifier_subtype"
-													name="modifier_subtype"
-													title="Modifier Subtype"
-													class="form-control mb-2"
-													v-validate="'required'"
-													data-vv-as="Modifier Subtype"
-													@change="$forceUpdate()">
-													<option value="undefined" disabled>- Subtype -</option>
-													<option v-for="(val,i) in modifier_subtype"
-														:key="i" :value="val">{{val}}</option>
-												</b-form-select>
-											</b-col>
-											<b-col md="4">
-												<label for="primary">Primary Stat</label>
-												<div class="primary d-flex justify-content-between" name="primary">
-													<a class="component_box" @click="setPrimary(modifier)"
-														 :class="{'selected': modifier.primary === true}">
-														<span>P</span>
-													</a>
-												</div>
-											</b-col>
-										</b-row>
-										<b-row>
-											<!-- DICE COUNT -->
-											<b-col md="4">
-												<label for="dice_count">Dice Count</label>
-												<b-form-input v-model="modifier.dice_count"
-													autocomplete="off"
-													id="dice_count"
-													name="dice_count"
-													class="form-control mb-2"
-													title="AOE Size"
-													v-validate="'required'"
-													type="number"
-													data-vv-as="AOE Size"
-													@keyup="$forceUpdate()"
-													></b-form-input>
-											</b-col>
-											<b-col md="4">
-												<!-- MODIFIER SUBTYPE -->
-												<label for="dice_type">Dice Type</label>
-												<b-form-select v-model="modifier.dice_type"
-													id="dice_type"
-													name="dice_type"
-													title="Modifier Type"
-													class="form-control mb-2"
-													v-validate="'required'"
-													data-vv-as="Modifier Type"
-													@change="$forceUpdate()">
-													<!-- <option value="undefined" disabled>- Subtype -</option> -->
-													<option v-for="(val,i) in dice_type"
-														:key="i" :value="val">{{val}}</option>
-												</b-form-select>
-											</b-col>
-											<b-col md="4">
-												<!-- MODIFIER FIXED VALUE -->
-												<label for="fixed_val">Fixed Value</label>
-												<b-form-input v-model="modifier.fixed_val"
-													autocomplete="off"
-													id="fixed_val"
-													name="fixed_val"
-													class="form-control mb-2"
-													title="Fixed Value"
-													v-validate="'required'"
-													type="number"
-													data-vv-as="Fixed Value"
-													@keyup="$forceUpdate()"
-													></b-form-input>
-											</b-col>
-										</b-row>
-										<template v-if="spell.level_scaling != undefined && spell.level_scaling != 'None'">
-											<!-- HIGHER LEVEL MODIFIER -->
+									
+									<!-- THIS BREAKS WHEN DELETE SPELL ACTION -->
+
+								<b-collapse visible :id="'accordion-'+mod_index" accordion="my-accordion">
+									<div class="card-body">
+										<!-- <template v-if="modifier.spell_action != undefined"> -->
 											<b-row>
 												<b-col>
-													<hr>
+													<label for="spell_action">Spell Action</label>
+													<b-form-select v-model="modifier.spell_action"
+														id="spell_action"
+														name="spell_action"
+														title="Spell Action"
+														class="form-control mb-2 mr-5"
+														v-validate="'required'"
+														data-vv-as="Spell Action"
+														@change="$forceUpdate()">
+														<option value="undefined" disabled>- Spell Action -</option>
+														<option v-for="(val,i) in spell.actions"
+															:key="i" :value="i">{{val.name || val.type}}</option>
+													</b-form-select>
+													<p class="validate red" v-if="errors.has('spell_action')">{{ errors.first('spell_action') }}</p>
 												</b-col>
-												<b-col class="col-1" v-if="level_tier_addable(index)">
-													<a 
-													class="gray-hover text-capitalize" 
-													v-b-tooltip.hover title="Add Level Tier" 
-													@click="add_level_tier(index)">
-														<i class="fas fa-plus green"></i>
-														<!-- <span class="d-none d-md-inline ml-1">Add</span> -->
-													</a>
+												<b-col md="4" v-if="modifier.spell_action != undefined">
+													<!-- MODIFIER SUBTYPE -->
+													<label for="modifier_subtype">Subtype</label>
+													<b-form-select v-model="modifier.subtype"
+														:disabled="spell.actions[modifier.spell_action].type=='Healing Spell'"
+														id="modifier_subtype"
+														name="modifier_subtype"
+														title="Modifier Subtype"
+														class="form-control mb-2"
+														data-vv-as="Modifier Subtype"
+														@change="$forceUpdate()">
+														<option value="undefined" disabled>- Subtype -</option>
+														<option v-for="(val,i) in modifier_subtype"
+															:key="i" :value="val">{{val}}</option>
+													</b-form-select>
+												</b-col>
+												<b-col md="4" v-if="modifier.spell_action != undefined">
+													<label for="primary">Primary Stat</label>
+													<div class="primary d-flex justify-content-between" name="primary">
+														<a class="component_box" @click="setPrimary(modifier)"
+															 :class="{'selected': modifier.primary === true}">
+															<span>P</span>
+														</a>
+													</div>
 												</b-col>
 											</b-row>
-											<b-row v-for="(level_tier, index) in modifier.level_tiers" v-if="index < shown_level_tiers">
-												<!-- HL LEVEL SCALE -->
-												<b-col md="3">
-													<label for="level">{{spell.level_scaling}}</label>
-													<b-form-input v-model="level_tier.level"
-														autocomplete="off"
-														id="level"
-														name="level"
-														class="form-control mb-2"
-														:title="spell.level_scaling"
-														v-validate="'required'"
-														type="number"
-														:data-vv-as="spell.level_scaling"
-														@keyup="$forceUpdate()"
-														></b-form-input>
-												</b-col>
-												<!-- HL DICE COUNT -->
-												<b-col md="3">
+											<b-row v-if="modifier.spell_action != undefined">
+												<!-- DICE COUNT -->
+												<b-col md="4">
 													<label for="dice_count">Dice Count</label>
-													<b-form-input v-model="level_tier.dice_count"
+													<b-form-input v-model="modifier.dice_count"
 														autocomplete="off"
 														id="dice_count"
 														name="dice_count"
 														class="form-control mb-2"
 														title="Dice Count"
-														v-validate="'required'"
 														type="number"
 														data-vv-as="Dice Count"
 														@keyup="$forceUpdate()"
 														></b-form-input>
 												</b-col>
-												<b-col md="3">
-													<!-- HL MODIFIER SUBTYPE -->
+												<b-col md="4">
+													<!-- MODIFIER SUBTYPE -->
 													<label for="dice_type">Dice Type</label>
-													<b-form-select v-model="level_tier.dice_type"
+													<b-form-select v-model="modifier.dice_type"
 														id="dice_type"
 														name="dice_type"
 														title="Dice Type"
 														class="form-control mb-2"
-														v-validate="'required'"
 														data-vv-as="Dice Type"
 														@change="$forceUpdate()">
-														<option value="undefined" disabled>- Subtype -</option>
+														<!-- <option value="undefined" disabled>- Subtype -</option> -->
 														<option v-for="(val,i) in dice_type"
 															:key="i" :value="val">{{val}}</option>
 													</b-form-select>
 												</b-col>
-												<b-col md="3">
-													<!-- HL MODIFIER FIXED VALUE -->
+												<b-col md="4">
+													<!-- MODIFIER FIXED VALUE -->
 													<label for="fixed_val">Fixed Value</label>
-													<b-form-input v-model="level_tier.fixed_val"
+													<b-form-input v-model="modifier.fixed_val"
 														autocomplete="off"
 														id="fixed_val"
 														name="fixed_val"
 														class="form-control mb-2"
 														title="Fixed Value"
-														v-validate="'required'"
 														type="number"
 														data-vv-as="Fixed Value"
 														@keyup="$forceUpdate()"
 														></b-form-input>
 												</b-col>
 											</b-row>
-											<p v-if="modifier.level_tiers.length >= 1">
-												<span v-for="line in create_spell_level_tier_description(spell, modifier.level_tiers)">
-													{{line}}<br>
-												</span>
-											</p>
-										</template>
-									</template>
-								</div>  <!-- END MODIFIER CARD BODY -->
+											<template v-if="spell.level_scaling != undefined && spell.level_scaling != 'None'">
+												<!-- HIGHER LEVEL MODIFIER -->
+												<b-row>
+													<b-col>
+														<hr>
+													</b-col>
+													<b-col class="col-1" v-if="level_tier_addable(mod_index)">
+														<a 
+														class="gray-hover text-capitalize" 
+														v-b-tooltip.hover title="Add Level Tier" 
+														@click="add_level_tier(mod_index)">
+															<i class="fas fa-plus green"></i>
+															<!-- <span class="d-none d-md-inline ml-1">Add</span> -->
+														</a>
+													</b-col>
+												</b-row>
+												<b-row v-for="(level_tier, tier_index) in modifier.level_tiers" v-if="tier_index < shown_level_tiers">
+													<!-- HL LEVEL SCALE -->
+													<b-col md="3">
+														<label for="level">{{spell.level_scaling}}</label>
+														<b-form-input v-model="level_tier.level"
+															autocomplete="off"
+															id="level"
+															name="level"
+															class="form-control mb-2"
+															:title="spell.level_scaling"
+															v-validate="'required'"
+															type="number"
+															:data-vv-as="spell.level_scaling"
+															@keyup="$forceUpdate()"
+															></b-form-input>
+															<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+													</b-col>
+													<!-- HL DICE COUNT -->
+													<b-col md="3">
+														<label for="dice_count">Dice Count</label>
+														<b-form-input v-model="level_tier.dice_count"
+															autocomplete="off"
+															id="dice_count"
+															name="dice_count"
+															class="form-control mb-2"
+															title="Dice Count"
+															type="number"
+															data-vv-as="Dice Count"
+															@keyup="$forceUpdate()"
+															></b-form-input>
+													</b-col>
+													<b-col md="3">
+														<!-- HL MODIFIER SUBTYPE -->
+														<label for="dice_type">Dice Type</label>
+														<b-form-select v-model="level_tier.dice_type"
+															id="dice_type"
+															name="dice_type"
+															title="Dice Type"
+															class="form-control mb-2"
+															data-vv-as="Dice Type"
+															@change="$forceUpdate()">
+															<option value="undefined" disabled>- Subtype -</option>
+															<option v-for="(val,i) in dice_type"
+																:key="i" :value="val">{{val}}</option>
+														</b-form-select>
+													</b-col>
+													<b-col md="2">
+														<!-- HL MODIFIER FIXED VALUE -->
+														<label for="fixed_val">Fixed Value</label>
+														<b-form-input v-model="level_tier.fixed_val"
+															autocomplete="off"
+															id="fixed_val"
+															name="fixed_val"
+															class="form-control mb-2"
+															title="Fixed Value"
+															type="number"
+															data-vv-as="Fixed Value"
+															@keyup="$forceUpdate()"
+															></b-form-input>
+													</b-col>
+													<b-col md='1' class="remove-link">
+														<a @click="remove_level_tier(mod_index, tier_index)"
+															class="gray-hover text-capitalize"
+															v-b-tooltip.hover title="Remove">
+															<i class="fas fa-trash-alt red"></i>
+															<!-- <span class="d-none d-md-inline ml-1">Remove</span> -->
+														</a>
+													</b-col>
+												</b-row>
+												<p v-if="modifier.level_tiers.length >= 1">
+													<span v-for="line in create_spell_level_tier_description(spell, modifier.level_tiers)">
+														{{line}}<br>
+													</span>
+												</p>
+											</template>
+										<!-- </template> -->
+									</div>  <!-- END MODIFIER CARD BODY -->
+								</b-collapse>
 							</div>
 						</div>
 					</div>
@@ -888,6 +922,21 @@
 				});
 				this.$forceUpdate();
 			},
+			remove_action(index) {
+				this.$delete(this.spell.actions, index)
+				// Update points to actions in modifiers
+				for (let i in this.spell.modifiers) {
+					let mod = this.spell.modifiers[i]
+					if (mod.spell_action == index) {
+						mod.spell_action = undefined
+					}
+					else if (mod.spell_action > index) {
+						mod.spell_action -= 1
+					}
+				}
+
+				this.$forceUpdate()
+			},
 			add_modifier() {
 				if(this.spell.modifiers == undefined) {
 					this.spell.modifiers = [];
@@ -897,9 +946,17 @@
 				});
 				this.$forceUpdate(); //IMPORTANT
 			},
+			remove_modifier(index) {
+				this.$delete(this.spell.modifiers, index)
+				this.$forceUpdate()
+			},
 			add_level_tier(index) {
 				this.spell.modifiers[index].level_tiers.push({});
 				this.$forceUpdate();
+			},
+			remove_level_tier(mod_index, tier_index) {
+				this.$delete(this.spell.modifiers[mod_index].level_tiers, tier_index)
+				this.$forceUpdate()
 			},
 			level_tier_addable(index) {
 				if (this.spell.level_scaling == "Spell Scale" && 
@@ -915,7 +972,8 @@
 			store_spell() {
 
 				delete this.spell['.key']
-
+				this.spell.changed = true
+				this.spell.checked = false
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`new_spells/${this.id}`).set(this.spell)
@@ -1017,6 +1075,22 @@ select#classes {
 	position: -webkit-sticky;
 	position: sticky;
 	top: 60px;
+}
+
+.collapse-header {
+	display: grid;
+	grid-template-columns: auto 20px;
+}
+
+.remove-link a {
+	display: block;
+  height: 100%;
+  line-height: 60px;
+  padding-bottom: 15px;
+
+  i {
+  	vertical-align: bottom;
+  }
 }
 
 </style>

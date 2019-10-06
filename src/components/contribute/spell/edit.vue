@@ -600,39 +600,9 @@
 														></b-form-input>
 												</b-col>
 											</b-row>
-											<p v-if="spell.level_scaling == 'Character Level' && modifier.level_tiers.length >= 1">
-												<span>This spell's damage increases when your character reaches a higher level.</span><br>
-												<span v-for="(tier) in modifier.level_tiers">
-													At 
-													{{tier.level | ordinal}} level, 
-													this spell modifier does
-													{{tier.dice_count || "..."}}
-													{{tier.dice_type || "..."}}
-													{{tier.fixed_val ? "+" : ""}}{{tier.fixed_val}}
-													damage. <br>
-												</span>
-											</p>
-											<p v-if="spell.level_scaling == 'Spell Scale' && modifier.level_tiers.length >= 1">
-												<span>
-													When you cast this spell using a spell slot of 
-													{{parseInt(spell.level) + 1 | ordinal}} level or higher, 
-													the damage of this modifier increases by
-													{{modifier.level_tiers[0].dice_count || "..."}}
-													{{modifier.level_tiers[0].dice_type || "..."}}
-													{{modifier.level_tiers[0].fixed_val ? "+" : ""}}{{modifier.level_tiers[0].fixed_val}}
-													for {{modifier.level_tiers[0].level < 2 ? "each slot level" : "every " + modifier.level_tiers[0].level + " slot levels"}}
-													above {{parseInt(spell.level) | ordinal}}.
-												</span>
-											</p>
-											<p v-if="spell.level_scaling == 'Spell Level' && modifier.level_tiers.length >= 1">
-												<span v-for="(tier) in modifier.level_tiers">
-													When you cast this spell using a 
-													{{tier.level | ordinal}}-level spell slot, 
-													this spell modifier does
-													{{tier.dice_count || "..."}}
-													{{tier.dice_type || "..."}}
-													{{tier.fixed_val ? "+" : ""}}{{tier.fixed_val}}
-													damage. <br>
+											<p v-if="modifier.level_tiers.length >= 1">
+												<span v-for="line in create_spell_level_tier_description(spell, modifier.level_tiers)">
+													{{line}}<br>
 												</span>
 											</p>
 										</template>
@@ -682,6 +652,7 @@
 	import { db, db_dev } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import { mapGetters } from 'vuex'
+	import numeral from 'numeral'
 
 	export default {
 		name: 'SpellEdit',
@@ -833,6 +804,39 @@
 			},
 			update() {
 				this.$forceUpdate();
+			},
+			create_spell_level_tier_description(spell, level_tiers) {
+				// Generates description for each level tier for spell level scaling
+				let description = []
+				if (spell.level_scaling == "Character Level") {
+					description = ["This spell's damage increases when your character reaches a higher level."]
+					for (let index in level_tiers) {
+						let tier = level_tiers[index]
+						let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+						
+						description.push(new_line)
+					}
+				} 
+				else if (spell.level_scaling == "Spell Scale") {
+					let tier = level_tiers[0]
+					let new_line = "When you cast this spell using a spell slot of "
+					new_line += `${numeral(parseInt(spell.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
+					new_line += `${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
+					new_line += `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(spell.level).format('0o')}.`
+					
+					description = [new_line]
+				} 
+				else if (spell.level_scaling == "Spell Level") {
+					for (let index in level_tiers) {
+						let tier = level_tiers[index]
+						let new_line = "When you cast this spell using a "
+						new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `
+						new_line += `${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+
+						description.push(new_line)
+					}
+				}
+				return description
 			}
 		}
 	}

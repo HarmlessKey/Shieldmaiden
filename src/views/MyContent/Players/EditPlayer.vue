@@ -229,9 +229,9 @@
 								>
 									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
 										<span class="skill">
+											<span class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</span>
 											{{skill.skill  }}
 											<span>
-												<span class="gray-hover mr-3">{{ skill.ability.substring(0,3) }}</span>
 												{{ 
 													calculateSkillModifier(
 														calcMod(player[skill.ability]),
@@ -428,7 +428,7 @@
 			},
 			addPlayer() {
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
-					this.$snotify.error('You have too many player.', 'Error');
+					this.$snotify.error('You have too many players.', 'Error');
 				} else {
 					// THIS IS UGLY
 					delete this.player['.value']
@@ -449,7 +449,7 @@
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
-						this.$router.replace('/players')
+						this.$router.replace(this.$route.meta.basePath)
 					} else {
 						//console.log('Not valid');
 					}
@@ -493,8 +493,13 @@
 	}
 	.skill {
 		min-width: 250px;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 45px auto min-content;
+
+		.abillity {
+			text-transform: uppercase;
+			text-align: center;
+		}
 	}
 }
 </style>

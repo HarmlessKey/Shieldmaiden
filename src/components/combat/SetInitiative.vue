@@ -120,13 +120,13 @@
 	import { mapGetters, mapActions } from 'vuex'
 
 	import { dice } from '@/mixins/dice.js'
-	import { attributes } from '@/mixins/attributes.js'
+	import { general } from '@/mixins/general.js'
 	import Turns from '@/components/combat/Turns.vue'
 
 	export default {
 
 		name: 'SetInitiative',
-		mixins: [dice, attributes],
+		mixins: [dice, general],
 		props: ['_active', '_idle'],
 		components: {
 			Turns,

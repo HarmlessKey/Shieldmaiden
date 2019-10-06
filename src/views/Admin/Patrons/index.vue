@@ -102,6 +102,7 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Patron from '@/components/Admin/Patrons/Patron.vue'
 	import Notifications from '@/components/Admin/Patrons/Notifications.vue'
+	import { general } from '@/mixins/general.js'
 
 	export default {
 		name: 'Patrons',
@@ -110,6 +111,7 @@
 			Patron,
 			Notifications
 		},
+		mixins: [general],
 		metaInfo: {
 			title: 'Admin | Patrons'
 		},
@@ -186,20 +188,6 @@
 					this.searchResults = this.patrons
 					this.searching = false
 				}
-			},
-			makeDate(input) {
-				let monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				let d = new Date(input)
-
-				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-
-				return date
 			}
 		}
 	}

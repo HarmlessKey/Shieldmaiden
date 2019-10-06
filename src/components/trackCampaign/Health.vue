@@ -42,11 +42,11 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { attributes } from '@/mixins/attributes.js'
+	import { general } from '@/mixins/general.js'
 
 	export default {
 		name: 'Health',
-		mixins: [attributes],
+		mixins: [general],
 		props: [
 			'entity',
 			'campPlayers',

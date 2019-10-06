@@ -17,12 +17,12 @@
 							<li><span>Name:</span> <span>{{ notification.attributes.full_name }}</span></li>
 							<li><span>Email:</span> <span>{{ notification.attributes.email }}</span></li>
 							<li><span>Follower:</span> <span>{{ notification.attributes.is_follower }}</span></li>
-							<li><span>Last charge:</span> <span>{{ notification.attributes.last_charge_date }}</span></li>
+							<li><span>Last charge:</span> <span>{{ makeDate(notification.attributes.last_charge_date, true) }}</span></li>
 							<li><span>Last charge status:</span> <span>{{ notification.attributes.last_charge_status }}</span></li>
 							<li><span>Lifetime support:</span> <span>{{ notification.attributes.lifetime_support_cents  / 100 | numeral('$0,0') }}</span></li>
 							<li><span>Note:</span> <span>{{ notification.attributes.note }}</span></li>
 							<li><span>Patron status:</span> <span>{{ notification.attributes.patron_status }}</span></li>
-							<li><span>Pledge start:</span> <span>{{ notification.attributes.pledge_relationship_start }}</span></li>
+							<li><span>Pledge start:</span> <span>{{ makeDate(notification.attributes.pledge_relationship_start, true) }}</span></li>
 							<li><span>Will pay:</span> <span>{{ notification.attributes.will_pay_amount_cents  / 100 | numeral('$0,0') }}</span></li>
 							<li>
 								<span>Tier:</span> 

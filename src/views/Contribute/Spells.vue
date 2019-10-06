@@ -59,7 +59,7 @@
 </template>
 
 <script>
-	import { db_dev } from '@/firebase'
+	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
 	import { mapActions } from 'vuex'
@@ -92,6 +92,14 @@
             label: 'Level',
             sortable: true
 					},
+					changed: {
+						label: 'Changed',
+						sortable: true,
+					},
+					checked: {
+						label: 'Checked',
+						sortable: true,
+					}
 				},
 				search: '',
 				searching: '',
@@ -105,7 +113,7 @@
 		firebase() {
 			return {
 				spells: {
-					source: db_dev.ref('spells'),
+					source: db.ref('new_spells'),
 					readyCallback: () => this.isBusy = false
 				}
 			}

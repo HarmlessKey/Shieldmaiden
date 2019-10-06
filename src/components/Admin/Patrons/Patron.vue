@@ -88,6 +88,7 @@
 <script>
 	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
+	import { general } from '@/mixins/general.js'
 	import EditPatron from '@/views/Admin/Patrons/New.vue'
 
 	export default {
@@ -96,6 +97,7 @@
 			Crumble,
 			EditPatron
 		},
+		mixins: [general],
 		props: ['id'],
 		metaInfo() {
 			return {
@@ -129,20 +131,6 @@
 		methods: {
 			setEdit(value) {
 				this.edit = value
-			},
-			makeDate(input) {
-				let monthNames = [
-					"January", "February", "March",
-					"April", "May", "June", "July",
-					"August", "September", "October",
-					"November", "December"
-				];
-
-				let d = new Date(input)
-
-				let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
-
-				return date
 			}
 		}
 	}

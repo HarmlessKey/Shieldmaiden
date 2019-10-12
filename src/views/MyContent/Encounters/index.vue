@@ -178,6 +178,7 @@
 										<td class="align-middle p-0">
 											<div class="d-flex justify-content-end">
 												<div class="d-flex justify-content-end actions">
+													<a v-b-tooltip.hover title="Unfinish" @click="reset(encounter.key, hard=false)"><i class="fas fa-trash-undo"></i></a>
 													<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
 													<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
 												</div>
@@ -466,33 +467,38 @@
 					]
 				});
 			},
-			reset(id) {
-				for(let key in this.encounters[id].entities) {
-					let entity = this.encounters[id].entities[key]
+			reset(id, hard=true) {
+				if (hard){
+					console.log("Hard reset")
+					for(let key in this.encounters[id].entities) {
+						let entity = this.encounters[id].entities[key]
 
-					//Remove values
-					delete entity.tempHp
-					delete entity.transformed
-					delete entity.stabilized
-					delete entity.down
-					delete entity.ac_bonuc
-					delete entity.meters
-					delete entity.hidden
+						//Remove values
+						delete entity.tempHp
+						delete entity.transformed
+						delete entity.stabilized
+						delete entity.down
+						delete entity.ac_bonuc
+						delete entity.meters
+						delete entity.hidden
 
-					if(entity.entityType == 'npc') {
-						entity.curHp = entity.maxHp
+						if(entity.entityType == 'npc') {
+							entity.curHp = entity.maxHp
+						}
+						entity.initiative = 0
+
+
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)
+
+						//CLEAR LOG
+						localStorage.removeItem(id);
 					}
-					entity.initiative = 0
-
-
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0)
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0)
-
-					//CLEAR LOG
-					localStorage.removeItem(id);
 				}
+
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
+
 			},
 			// onMove(evt, originalEvent) {
 			// 	var index = evt.draggedContext.index

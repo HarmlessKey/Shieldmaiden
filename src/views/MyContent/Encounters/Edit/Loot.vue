@@ -1,65 +1,59 @@
 <template>
-    <div>
-        <b-row class="loot">
-            <b-col sm="3">
-                <h3>Currency</h3>
-                <ul class="mb-5 currency">
-                    <li v-for="(currency, key) in currencies" :key="key">
-                        <span class="coins" :class="currency.color" v-b-tooltip.hover :title="currency.name"><i class="fas fa-coins"></i></span>
-                        <input class="form-control text-right" autocomplete="off" type="number" min="0" name="name" v-model="loot[key]" :placeholder="currency.name"/>
-                    </li>
-                </ul>
-            </b-col>
+    <div class="loot">
+        <h3>Currency</h3>
+        <div class="currency">
+            <div v-for="(currency, key) in currencies" :key="key">
+                <span class="coins" :class="currency.color" v-b-tooltip.hover :title="currency.name"><i class="fas fa-coins"></i></span>
+                <b-form-input class="text-right" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="loot[key]" :placeholder="currency.name"/>
+            </div>
+        </div>
 
-            <b-col sm="9">
-                <h3 class="d-flex justify-content-between">
-                    Items
-                    <a class="gray-hover" @click="addItem()">
-                        <i class="fas fa-plus green"></i>
-                        <span class="d-none d-md-inline ml-1">Add</span>
-                    </a>
-                </h3>
-                <hr>
-                <div v-for="(item, index) in loot.items" :key="index">
-                    <h2 class="d-flex justify-content-between">
-                        {{ index + 1 }}. {{ item.name }}
-                        <a @click="removeItem(index)" 
-                            class="gray-hover"
-                            v-b-tooltip.hover title="Remove">
-                            <i class="fas fa-minus red"></i>
-                            <span class="d-none d-md-inline ml-1">Remove</span>
-                        </a>
-                    </h2>
-                    <b-row class="mb-2">
-                        <b-col sm="2">
-                            <label for="name">Name</label>
-                        </b-col>
-                        <b-col sm="10">
-                            <b-form-input
-                                id="name"
-                                type="text" 
-                                v-model="item.name" 
-                                name="name" 
-                                placeholder="Name"></b-form-input>
-                        </b-col>
-                    </b-row>
-                    <b-row class="mb-2">
-                        <b-col sm="2">
-                            <label for="desc">Description</label>
-                        </b-col>
-                        <b-col sm="10">
-                            <textarea
-                                id="desc"
-                                class="form-control" 
-                                v-model="item.desc" 
-                                rows="4"
-                                name="desc" 
-                                placeholder="Description"></textarea>
-                        </b-col>
-                    </b-row>
-                </div>
-            </b-col>
-        </b-row>
+        <h3 class="d-flex justify-content-between">
+            Items
+            <a class="gray-hover" @click="addItem()">
+                <i class="fas fa-plus green"></i>
+                <span class="d-none d-md-inline ml-1">Add</span>
+            </a>
+        </h3>
+        <hr>
+        <div v-for="(item, index) in loot.items" :key="index">
+            <h2 class="d-flex justify-content-between">
+                {{ index + 1 }}. {{ item.name }}
+                <a @click="removeItem(index)" 
+                    class="gray-hover"
+                    v-b-tooltip.hover title="Remove">
+                    <i class="fas fa-minus red"></i>
+                    <span class="d-none d-md-inline ml-1">Remove</span>
+                </a>
+            </h2>
+            <b-row class="mb-2">
+                <b-col sm="2">
+                    <label for="name">Name</label>
+                </b-col>
+                <b-col sm="10">
+                    <b-form-input
+                        id="name"
+                        type="text" 
+                        v-model="item.name" 
+                        name="name" 
+                        placeholder="Name"></b-form-input>
+                </b-col>
+            </b-row>
+            <b-row class="mb-2">
+                <b-col sm="2">
+                    <label for="desc">Description</label>
+                </b-col>
+                <b-col sm="10">
+                    <textarea
+                        id="desc"
+                        class="form-control" 
+                        v-model="item.desc" 
+                        rows="4"
+                        name="desc" 
+                        placeholder="Description"></textarea>
+                </b-col>
+            </b-row>
+        </div>
         <button class="btn mt-2" @click="setLoot()">Save loot</button>
     </div>
 </template>
@@ -154,20 +148,23 @@ input[type='number'] {
 	}
 
     .currency {
-        padding: 0;
-        list-style: none;
+        margin: auto;
+       display: flex;
+       justify-content: center;
+       max-width: 500px;
 
-        li {
-            display: grid;
-            grid-template-columns: 35px auto;
-            grid-template-rows: auto;
-            margin-bottom: 5px;
 
-            .coins {
-                display: inline-block;
-                text-align: left;
-                line-height: 40px;
-            }
+        div {
+            // display: grid;
+            // grid-template-columns: 35px auto;
+            // grid-template-rows: auto;
+            // margin-bottom: 5px;
+
+            // .coins {
+            //     display: inline-block;
+            //     text-align: left;
+            //     line-height: 40px;
+            // }
         }
     }
 }

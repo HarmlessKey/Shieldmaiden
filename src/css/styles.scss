@@ -41,6 +41,12 @@ $orange-light: #db815e;
 $red-light: #c45e66;
 $yellow-light: #e2da5f;
 
+$copper: #e76d3b;
+$silver: #2c97de;
+$electrum: #b2b2b2;
+$gold: #FFD700;
+$platinum: #fff;
+
 $header-hight: 50px;
 
 /* 2. Defaults */
@@ -117,6 +123,12 @@ html body {
 .orange-light { color: $orange-light !important; }
 .red-light { color: $red-light !important; }
 .yellow-light { color: $yellow-light !important; }
+
+.copper { color: $copper !important; fill: $copper !important; }
+.silver { color: $silver !important; fill: $silver !important; }
+.electrum { color: $electrum !important; fill: $electrum !important; }
+.gold { color: $gold !important; fill: $gold !important; }
+.platinum { color: $platinum !important; fill: $platinum !important; }
 
 .bg-gray { background-color: $gray !important; }
 .bg-gray-light { background-color: $gray-light !important; }

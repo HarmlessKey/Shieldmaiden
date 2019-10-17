@@ -11,9 +11,51 @@ export const currencyMixin = {
 		}
 	},
 	methods: {
-		currencyToGold(amount) {
-			let newAmount = amount;
+		currencyToCopper(amount) {
+			let cp = (amount.cp) ? parseInt(amount.cp) : 0;
+			let sp = (amount.sp) ? parseInt(amount.sp) * 10 : 0;
+			let ep = (amount.ep) ? parseInt(amount.ep) * 50 : 0;
+			let gp = (amount.gp) ? parseInt(amount.gp) * 100 : 0;
+			let pp = (amount.pp) ? parseInt(amount.pp) * 1000 : 0;
 
+			return cp + sp + ep + gp + pp;
+		},
+		copperToPretty(amount) {
+			let cp = parseInt(amount);
+			let sp = 0;
+			let ep = 0;
+			let gp = 0;
+			let pp = 0;
+			
+			//Put as much copper as possible in silver
+			if(cp) {
+				let plusSp = Math.floor(cp/10);
+				cp = (cp / 10) - plusSp;
+				cp = cp.toFixed(1) * 10;
+				sp = sp + plusSp;
+			}		
+			if(sp) {
+				let plusEp = Math.floor(sp/5);
+				sp = (sp / 5) - plusEp;
+				sp = sp.toFixed(1) * 5;
+				ep =  ep + plusEp;
+			}
+			if(ep) {
+				let plusGp = Math.floor(ep/2);
+				ep = (ep / 2) - plusGp;
+				ep = ep.toFixed(1) * 2;
+				gp =  gp + plusGp;
+			}
+			if(gp) {
+				let plusPp = Math.floor(gp/10);
+				gp = (gp / 10) - plusPp;
+				gp = gp.toFixed(1) * 10;
+				pp =  pp + plusPp;
+			}
+
+			return { cp, sp, ep, gp, pp };
+		},
+		currencyToGold(amount) {
 			let cp = parseInt(amount.cp);
 			let sp = parseInt(amount.sp);
 			let ep = (amount.ep) ? parseInt(amount.ep) : 0;

@@ -1,7 +1,7 @@
 <template>
     <div class="loot">
         <h3>Currency</h3>
-        Amount in gold {{ currencyToGold(currency) }}
+        {{ currencyToCopper(currency) }}cp = {{ copperToPretty(currencyToCopper(currency)) }}
         <div class="currency">
             <div v-for="(coin, key) in currencies" :key="key">
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">

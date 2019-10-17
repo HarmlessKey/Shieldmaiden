@@ -159,6 +159,10 @@ input[type='number'] {
         justify-content: center;
         max-width: 400px;
         text-align: center;
+
+        svg {
+            margin-bottom: 10px;
+        }
         div {
             // display: grid;
             // grid-template-columns: 35px auto;

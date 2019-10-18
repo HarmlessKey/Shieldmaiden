@@ -1,5 +1,29 @@
 <template>
 	<div>
+		<div class="group-actions">
+			<div class="money" 
+				@click="setSlide({
+					show: true,
+					type: 'slides/Currency',
+					data: { current: currency['.value'] }
+				})">
+				<template v-if="currency['.value']">
+					<template v-for="(coin, key) in money">
+						<div v-if="coin" :key="key">
+							{{ coin }}
+							<svg width="20px" height="20px" viewBox="0 0 192 192" :class="currencies[key].color">
+								<g><path :d="currencies[key].icon"/></g>
+							</svg>
+						</div>
+					</template>
+				</template>
+				<span v-else class="text-italic gray-hover">No money</span>
+			</div>
+			<div class="actions">
+				<a class="">XP</a>
+				<a class=""><i class="fad fa-treasure-chest"></i></a>
+			</div>
+		</div>
 		<table class="table table-hover" :class="{experience: campaign.advancement != 'milestone'}" v-if="players && campaign">
 			<thead>
 				<th></th>
@@ -133,10 +157,11 @@
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
 	import { experience } from '@/mixins/experience.js'
+	import { currencyMixin } from '@/mixins/currency.js'
 
 	export default {
 		name: 'Players',
-		mixins: [experience],
+		mixins: [experience, currencyMixin],
 		data() {
 			return {
 				user: this.$store.getters.getUser,
@@ -147,6 +172,10 @@
 			return {
 				settings: {
 					source: db.ref(`settings/${this.user.uid}/general`),
+					asObject: true
+				},
+				currency: {
+					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`),
 					asObject: true
 				}
 			}
@@ -166,6 +195,9 @@
 				if(this.settings.save_dc == undefined) { colspan--; }
 
 				return colspan;
+			},
+			money() {
+				return this.copperToPretty(this.currency['.value']);
 			}
 		},
 		mounted() {
@@ -199,6 +231,38 @@
 </script>
 
 <style lang="scss" scoped>
+	.group-actions {
+		border-bottom: solid 1px #b2b2b2;
+		padding-bottom: 5px;
+		display: grid;
+		grid-template-columns: auto max-content;
+		grid-template-areas: "money actions";
+
+		.money {
+			display: flex;
+			justify-content: flex-start;
+			cursor: pointer;
+			grid-area: money;
+
+			div {
+				margin-right: 10px;
+				font-weight: bold;
+
+				&:last-child {
+					margin: none;
+				}
+			}
+		}
+		.actions {
+			display: flex;
+			justify-content: flex-end;
+			grid-area: actions;
+
+			a {
+				margin-left: 10px;
+			}
+		}
+	}
 	table {
 		// font-size: 12px;
 

@@ -22,68 +22,17 @@ export const currencyMixin = {
 		},
 		copperToPretty(amount) {
 			let cp = parseInt(amount);
-			let sp = 0;
-			let ep = 0;
-			let gp = 0;
-			let pp = 0;
 			
-			//Put as much copper as possible in silver
-			if(cp) {
-				let plusSp = Math.floor(cp/10);
-				cp = (cp / 10) - plusSp;
-				cp = cp.toFixed(1) * 10;
-				sp = sp + plusSp;
-			}		
-			if(sp) {
-				let plusEp = Math.floor(sp/5);
-				sp = (sp / 5) - plusEp;
-				sp = sp.toFixed(1) * 5;
-				ep =  ep + plusEp;
-			}
-			if(ep) {
-				let plusGp = Math.floor(ep/2);
-				ep = (ep / 2) - plusGp;
-				ep = ep.toFixed(1) * 2;
-				gp =  gp + plusGp;
-			}
-			if(gp) {
-				let plusPp = Math.floor(gp/10);
-				gp = (gp / 10) - plusPp;
-				gp = gp.toFixed(1) * 10;
-				pp =  pp + plusPp;
-			}
+			let pp = Math.floor(cp / 1000);
+			cp = cp % 1000;
+			let gp = Math.floor(cp / 100);
+			cp = cp % 100;
+			let ep = Math.floor(cp / 50);
+			cp = cp % 50;
+			let sp = Math.floor(cp / 10);
+			cp = cp % 10;
 
-			return { cp, sp, ep, gp, pp };
-		},
-		currencyToGold(amount) {
-			let cp = parseInt(amount.cp);
-			let sp = parseInt(amount.sp);
-			let ep = (amount.ep) ? parseInt(amount.ep) : 0;
-			let gp = (amount.gp) ? parseInt(amount.gp) : 0;
-			let pp = parseInt(amount.pp);
-
-			if(cp) {
-				let plusSp = Math.floor(cp/10);
-				cp = (cp / 10);
-				cp = cp.toFixed(1) * 10;
-				sp = sp + plusSp;
-			}
-			if(sp) {
-				let plusEp = Math.floor(sp/5);
-				sp = (sp / 10);
-				sp = sp.toFixed(1) * 10;
-				ep =  ep + plusEp;
-			}
-			if(ep) {
-				let plusGp = Math.floor(ep/2);
-				ep = (ep / 10);
-				ep = ep.toFixed(1) * 10;
-				gp =  gp + plusGp;
-			}
-			if(pp) {
-				gp = gp + (pp*10);
-			}
-			return gp;
+			return { pp, gp, ep, sp, cp };
 		}
 	}
 }

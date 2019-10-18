@@ -1,14 +1,11 @@
 <template>
     <div class="loot">
         <h3>Currency</h3>
-        {{ currencyToCopper(currency) }}cp = {{ copperToPretty(currencyToCopper(currency)) }}
         <div class="currency">
             <div v-for="(coin, key) in currencies" :key="key">
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
                     <svg width="30px" height="30px" viewBox="0 0 192 192" :class="coin.color">
-                        <g>
-                            <path :d="coin.icon"/>
-                        </g>
+                        <g><path :d="coin.icon"/></g>
                     </svg>
                   </span>
                 <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" :placeholder="coin.name"/>

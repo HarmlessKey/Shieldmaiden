@@ -20,8 +20,9 @@
 				<span v-else class="text-italic gray-hover">No money</span>
 			</div>
 			<div class="actions">
-				<a class="">XP</a>
-				<a class=""><i class="fad fa-treasure-chest"></i></a>
+				<a class="" v-b-tooltip.hover title="Edit Group Health"><i class="fas fa-heart"></i></a>
+				<a class="" v-b-tooltip.hover title="Award Experience Points">XP</a>
+				<a class="" v-b-tooltip.hover title="Party Inventory"><i class="fad fa-treasure-chest"></i></a>
 			</div>
 		</div>
 		<table class="table table-hover" :class="{experience: campaign.advancement != 'milestone'}" v-if="players && campaign">
@@ -260,6 +261,11 @@
 
 			a {
 				margin-left: 10px;
+				color: #fff !important;
+
+				&:hover {
+					color: #2c97de !important;
+				}
 			}
 		}
 	}

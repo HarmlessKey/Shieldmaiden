@@ -11,9 +11,7 @@
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
 							{{ coin }}
-							<svg width="20px" height="20px" viewBox="0 0 192 192" :class="currencies[key].color">
-								<g><path :d="currencies[key].icon"/></g>
-							</svg>
+							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
 						</div>
 					</template>
 				</template>
@@ -244,10 +242,15 @@
 			justify-content: flex-start;
 			cursor: pointer;
 			grid-area: money;
+			line-height: 15px;
 
 			div {
 				margin-right: 10px;
 				font-weight: bold;
+
+				img {
+					height: 15px;
+				}
 
 				&:last-child {
 					margin: none;

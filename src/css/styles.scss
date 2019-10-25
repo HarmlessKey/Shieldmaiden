@@ -891,6 +891,18 @@ ul.nav {
 		text-transform: uppercase !important;
 	}
 }
+.btn-group-toggle {
+	.btn {
+		border: none;
+		background-color: $gray-active;
+		color: $gray-hover !important;
+
+		&.active {
+			background-color: $gray-light !important;
+			color: $gray-active !important;
+		}
+	}
+}
 
 /* 7. Snotify overrides */
 /*********************************************/

@@ -145,7 +145,7 @@
 	};
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	.btn-group {
 		width: 100%;
 

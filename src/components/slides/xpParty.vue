@@ -30,7 +30,7 @@
 				<b-form-checkbox :value="key" v-for="(player, key) in campaign.players" :key="key">			
 					{{ players[key].character_name  }} 
 					<span v-if="amount && awardTo.includes(key)" class="ml-2 gray-hover">
-						(+{{ awardPlayer() }})
+						({{ (awardPlayer() < 0 ? "" : "+" ) + awardPlayer() }})
 					</span>
 				</b-form-checkbox>
 			</b-form-checkbox-group>
@@ -95,8 +95,8 @@
 			}
 		},
 		watch: {
-			awardTo(newVal, oldVal) {
-				// Handle changes in individual flavour checkboxes
+			awardTo(newVal) {
+				// Handle changes in individual player checkboxes
 				if (newVal.length === 0) {
 					this.indeterminate = false
 					this.allSelected = false
@@ -134,6 +134,9 @@
 					let currentAmount = parseInt(this.players[key].experience);
 					let newAmount = currentAmount + amount;
 					
+					if(newAmount < 0) {
+						newAmount = 0;
+					}
 					if(newAmount > 355000) {
 						newAmount = 355000;
 					}

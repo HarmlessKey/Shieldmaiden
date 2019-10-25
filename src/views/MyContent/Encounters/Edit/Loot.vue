@@ -5,9 +5,6 @@
             <div v-for="(coin, key) in currencies" :key="key">
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
                     <img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-                    <!-- <svg width="30px" height="30px" viewBox="0 0 192 192" :class="coin.color">
-                        <g><path :d="coin.icon"/></g>
-                    </svg> -->
                   </span>
                 <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" :placeholder="coin.name"/>
             </div>

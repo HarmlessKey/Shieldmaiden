@@ -13,8 +13,8 @@
 		<p class="red text-center mt-2" v-if="error != ''">{{ error }}</p>
 
 		<div class="actions">
-			 <button class="btn btn-sm" @click="setCurrency('add')">Add</button>
-			 <button class="btn btn-sm bg-red" @click="setCurrency('remove')">Remove</button>
+			<button class="btn btn-sm" @click="setCurrency('add')">Add</button>
+			<button class="btn btn-sm bg-red" @click="setCurrency('remove')">Remove</button>
 		</div>
 	</div>
 </template>

@@ -121,15 +121,15 @@
 				<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
 			</div>
 
-				<b-form-input 
-					class="text-center"
-					type="number" 
-					name="xp" 
-					v-model="xp"
-					placeholder="Award XP">
-				</b-form-input>
+			<b-form-input 
+				class="text-center"
+				type="number" 
+				name="xp" 
+				v-model="xp"
+				placeholder="Award XP">
+			</b-form-input>
 
-				<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
+			<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
 		</div>
 	</div>
 </template>

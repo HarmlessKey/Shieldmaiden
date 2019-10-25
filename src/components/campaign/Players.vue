@@ -30,7 +30,7 @@
 					v-b-tooltip.hover title="Award Experience Points"
 					@click="setSlide({
 						show: true,
-						type: 'slides/InventoryParty'
+						type: 'slides/xpParty'
 					})">XP</a>
 				<a 
 					class="" 

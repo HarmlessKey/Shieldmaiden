@@ -75,7 +75,7 @@
         text-align: center;
 
         img {
-			height: 30px;
+			height: 25px;
             margin-bottom: 10px;
         }
         div {

@@ -18,9 +18,27 @@
 				<span v-else class="text-italic gray-hover">No money</span>
 			</div>
 			<div class="actions">
-				<a class="" v-b-tooltip.hover title="Edit Group Health"><i class="fas fa-heart"></i></a>
-				<a class="" v-b-tooltip.hover title="Award Experience Points">XP</a>
-				<a class="" v-b-tooltip.hover title="Party Inventory"><i class="fad fa-treasure-chest"></i></a>
+				<a 
+					class="" 
+					v-b-tooltip.hover title="Edit Group Health"
+					@click="setSlide({
+						show: true,
+						type: 'slides/InventoryParty'
+					})"><i class="fas fa-heart"></i></a>
+				<a 
+					class="" 
+					v-b-tooltip.hover title="Award Experience Points"
+					@click="setSlide({
+						show: true,
+						type: 'slides/InventoryParty'
+					})">XP</a>
+				<a 
+					class="" 
+					v-b-tooltip.hover title="Party Inventory"
+					@click="setSlide({
+						show: true,
+						type: 'slides/InventoryParty'
+					})"><i class="fas fa-treasure-chest"></i></a>
 			</div>
 		</div>
 		<table class="table table-hover" :class="{experience: campaign.advancement != 'milestone'}" v-if="players && campaign">
@@ -246,10 +264,10 @@
 
 			div {
 				margin-right: 10px;
-				font-weight: bold;
+				font-size: 16px;
 
 				img {
-					height: 15px;
+					height: 12px;
 				}
 
 				&:last-child {

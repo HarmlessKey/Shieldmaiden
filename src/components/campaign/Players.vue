@@ -25,7 +25,8 @@
 						show: true,
 						type: 'slides/InventoryParty'
 					})"><i class="fas fa-heart"></i></a>
-				<a 
+				<a
+					v-if="campaign.advancement != 'milestone'"
 					class="" 
 					v-b-tooltip.hover title="Award Experience Points"
 					@click="setSlide({

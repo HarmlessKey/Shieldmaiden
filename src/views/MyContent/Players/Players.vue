@@ -10,19 +10,21 @@
 				v-else-if="content_count.players >= tier.benefits.players"
 				type = 'players'
 			/>
-			<router-link v-else to="/players/add-player" 
-				class="btn btn-block mb-3"
-				v-b-modal.addModal>
-				<i class="fas fa-plus-square"></i> Add player
-			</router-link>
-
+			
 			<template v-if="players">
-				<h2 class="mt-3">Players ( 
-					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
-						/ 
-						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-						<template v-else>{{ tier.benefits.players }}</template>	
-						)</h2>
+				<h2 class="mt-3 d-flex justify-content-between">
+					<span>
+						Players ( 
+						<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+							/ 
+							<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
+							<template v-else>{{ tier.benefits.players }}</template>	
+							)
+					</span>
+					<router-link v-if="!overencumbered" to="/players/add-player">
+						<i class="fas fa-plus green"></i> New Player
+					</router-link>
+				</h2>
 				<table class="table mb-5">
 					<thead>
 						<th></th>
@@ -91,6 +93,34 @@
 								</div>
 							</td>
 						</tr>
+
+						<!-- OPEN SLOTS -->
+						<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
+							<tr 
+								class="openSlot"
+								v-for="index in slotsLeft"
+								:key="'open-slot-' + index"
+							>
+								<td colspan="6">
+									<div class="slot">
+										<span>Open player slot</span>
+										<router-link v-if="!overencumbered" to="/players/add-player">
+											<i class="fas fa-plus green"></i>
+										</router-link>
+									</div>
+								</td>
+							</tr>
+						</template>
+						<template v-if="slotsLeft <= 0">
+							<tr class="openSlot" key="no-slots">
+								<td colspan="6">
+									<div class="text-center">
+										<span class="red">No player slots left. </span>
+										Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
+									</div>
+								</td>
+							</tr>
+						</template>
 					</tbody>
 				</table>
 			</template>
@@ -147,6 +177,9 @@
 				.orderBy("character_name", 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.players - Object.keys(this.players).length
+			}
 		},
 		methods: {
 			confirmDelete(key, player, control) {
@@ -195,9 +228,23 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 	.container-fluid {
 		padding: 20px;
+
+		h2 {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
 	}
 	.col {
 		margin:10px;

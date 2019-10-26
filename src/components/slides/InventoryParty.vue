@@ -9,7 +9,7 @@
 				</div>
 			</template>
 		</div>
-		<span v-else class="text-italic gray-hover">No money</span>
+		<p v-else class="text-center"><a @click="addCurrency = !addCurrency">Award money</a></p>
 		<div class="addCurrency" v-if="addCurrency">
 			<div class="currency">
 				<div v-for="(coin, key) in currencies" :key="key">

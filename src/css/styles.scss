@@ -430,6 +430,17 @@ table {
 			}
 		}
 	}
+	tr.openSlot {
+		td {	
+			background: none;
+			border: dashed 1px $gray-hover !important;
+
+			.slot {	
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
 }
 
 ul.settings {

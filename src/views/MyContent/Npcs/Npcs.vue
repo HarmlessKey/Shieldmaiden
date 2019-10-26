@@ -10,19 +10,20 @@
 				v-else-if="content_count.npcs >= tier.benefits.npcs"
 				type = 'npcs'
 			/>
-			<router-link v-else to="/npcs/add-npc" 
-				class="btn btn-block mb-3"
-				v-b-modal.addModal>
-				<i class="fas fa-plus-square"></i> Add NPC
-			</router-link>
 		
 			<template v-if="npcs">
-				<h2 class="mt-3">NPC's ( 
-					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
-							/ 
-							<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
-							<template v-else>{{ tier.benefits.npcs }}</template>
-							)
+				<h2 class="mt-3 d-flex justify-content-between">
+					<span>
+						NPC's ( 
+						<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+						/ 
+						<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
+						<template v-else>{{ tier.benefits.npcs }}</template>
+						)
+					</span>
+					<router-link v-if="!overencumbered" to="/npcs/add-npc">
+						<i class="fas fa-plus green"></i> New NPC
+					</router-link>
 				</h2>
 				<table class="table">
 					<thead>
@@ -89,6 +90,34 @@
 								</div>
 							</td>
 						</tr>
+
+						<!-- OPEN SLOTS -->
+						<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
+							<tr 
+								class="openSlot"
+								v-for="index in slotsLeft"
+								:key="'open-slot-' + index"
+							>
+								<td colspan="6">
+									<div class="slot">
+										<span>Open NPC slot</span>
+										<router-link v-if="!overencumbered" to="/npcs/add-npc">
+											<i class="fas fa-plus green"></i>
+										</router-link>
+									</div>
+								</td>
+							</tr>
+						</template>
+						<template v-if="slotsLeft <= 0">
+							<tr class="openSlot" key="no-slots">
+								<td colspan="6">
+									<div class="text-center">
+										<span class="red">No NPC slots left. </span>
+										Delete NPC's to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
+									</div>
+								</td>
+							</tr>
+						</template>
 					</tbody>
 				</table>
 			</template>
@@ -140,6 +169,9 @@
 				.orderBy("name", 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.npcs - Object.keys(this.npcs).length;
+			}
 		},
 		methods: {
 			confirmDelete(key, npc) {
@@ -189,9 +221,23 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 	.container-fluid {
 		padding: 20px;
+
+		h2 {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
 	}
 	.col {
 		margin:10px;

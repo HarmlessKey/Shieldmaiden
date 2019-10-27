@@ -131,8 +131,10 @@
 				// AWARD XP
 				for(let index in this.awardTo) {
 					let key = this.awardTo[index];
-					let currentAmount = parseInt(this.players[key].experience);
+					let currentAmount = (this.players[key].experience) ? parseInt(this.players[key].experience) : 0;
 					let newAmount = currentAmount + amount;
+
+					console.log(newAmount)
 					
 					if(newAmount < 0) {
 						newAmount = 0;

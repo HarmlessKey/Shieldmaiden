@@ -37,6 +37,9 @@ export const experience = {
 			return this.xpTable[level].proficiency;
 		},
 		levelAdvancement(xp) {
+			if(!xp) {
+				xp = 0;
+			}
 			//Return full bar at lvl 20
 			if(xp >= 355000) {
 				return 100;

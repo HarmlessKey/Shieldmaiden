@@ -205,13 +205,13 @@
 				'playerInCampaign',
 			]),
 			calcColspan() {
-				let colspan = 9;
+				let colspan = 8;
 
-				if(this.settings.passive_perception == undefined) { colspan--; }
-				if(this.settings.passive_investigation == undefined) { colspan--; }
-				if(this.settings.passive_insight == undefined) { colspan--; }
-				if(this.settings.save_dc == undefined) { colspan--; }
-
+				if(this.settings.passive_perception === false) { colspan--; }
+				if(this.settings.passive_investigation === false) { colspan--; }
+				if(this.settings.passive_insight === false) { colspan--; }
+				if(this.settings.save_dc === false) { colspan--; }
+				
 				return colspan;
 			},
 			money() {

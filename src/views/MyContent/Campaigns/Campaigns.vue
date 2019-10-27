@@ -9,7 +9,7 @@
 
 				<template v-if="players && tier">
 
-					<h2 class="mt-3 d-flex justify-content-between">
+					<h2 class="mt-3 campaigns d-flex justify-content-between">
 						<span>
 							Your Campaigns 
 							<span v-if="campaigns && tier">( 
@@ -20,7 +20,10 @@
 								<template v-else>{{ tier.benefits.campaigns }}</template>
 							) </span>
 						</span>
-						<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+						<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)">
+							<i class="fas fa-plus green"></i>
+							New Campaign
+						</a>
 					</h2>
 
 					<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
@@ -120,6 +123,22 @@
 								<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
 							</div>
 						</b-col>
+
+						<!-- OPEN SLOTS -->
+						<template v-if="slotsLeft > 0 && tier.benefits.campaigns !== 'infinite'">
+							<b-col 
+								lg="4" md="6"
+								v-for="index in slotsLeft"
+								:key="'open-slot-' + index"
+							>
+								<b-card class="openSlot">
+									<b-card-body>
+										<p>Open campaign slot</p>
+										<p>Add a new campaign with {{ tier.benefits.encounters }} encounter slots</p>
+									</b-card-body>
+								</b-card>
+							</b-col>
+						</template>
 					</transition-group>
 
 				</template>
@@ -191,6 +210,9 @@
 				} , 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.campaigns - Object.keys(this.campaigns).length
+			}
 		},
 		methods: {
 			...mapActions([
@@ -239,6 +261,19 @@
 
 		a {
 			cursor: pointer;
+		}
+		h2.campaigns {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
 		}
 		h2.players {
 			margin-bottom: 5px !important;
@@ -306,6 +341,16 @@
 					svg {
 						font-size: 50px;
 					}
+				}
+			}
+			&.openSlot {
+				height: 263px;
+				border: dashed 1px #b2b2b2 !important;
+				background: none !important;
+
+				.card-body {
+					text-align: center;
+					background: none;
 				}
 			}
 		}

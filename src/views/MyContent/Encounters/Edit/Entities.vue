@@ -143,8 +143,7 @@
 				monsterFields: {
 					'index': {
 						label: '#',
-						maxContent: true,
-						noPadding: true
+						maxContent: true
 					},
 					name: {
 						label: 'Name',
@@ -161,7 +160,8 @@
 						truncate: true
 					},
 					'actions': {
-						label: ''
+						label: '',
+						noPadding: true
 					}
 				},
 			} 

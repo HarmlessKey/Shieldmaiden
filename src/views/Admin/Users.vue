@@ -114,17 +114,17 @@
 				users: undefined,
 				current: 1,
 				fields: {
-          status: {
+         			 status: {
 						label: 'State',
 						sortable: true
 					},
-          username: {
-            label: 'Username',
-            sortable: true
+					username: {
+						label: 'Username',
+						sortable: true
 					},
-          email: {
-            label: 'Email',
-            sortable: true
+					email: {
+						label: 'Email',
+						sortable: true
 					},
 					voucher: {
 						label: 'Voucher',

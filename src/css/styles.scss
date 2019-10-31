@@ -335,6 +335,15 @@ ul.crumble {
 		}
 	}
 }
+.hk-table {
+	.hk-table-column {
+		background: $gray;
+
+		&.hk-table-header {
+			background: none;
+		}
+	}
+}
 table {
 	border-collapse: separate !important; 
 	border-spacing: 0 1px;

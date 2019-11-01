@@ -44,56 +44,67 @@
            <div class="overview">          
                 <template v-if="encounter">
                     <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
-                    <ul class="entities hasImg mt-2">
-                        <li v-for="entity in _friendlies" :key="entity.key" class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-left">
-                                <template v-if="entity.entityType == 'player'">
-                                    <span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-                                    <img v-else src="@/assets/_img/styles/player.png" class="img" />
-                                </template>
-                                <template v-else-if="entity.entityType == 'npc'">
-                                    <span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-                                    <span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-                                    <img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
-                                </template>
-                                <span class="green">
-                                    {{ entity.name }}
-                                </span>
-                            </div>
-                            <div class="actions">
-                                <a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                                <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(entity.key, entity.name)">
-                                    <i class="fas fa-minus"></i>
-                                </a>
-                            </div>
-                            <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-                        </li>
-                    </ul>
+
+                    <HKtable 
+                        :items="_friendlies"
+                        :columns="entityColumns"
+                        :showHeader="false"
+                    >
+                        <template slot="image" slot-scope="data">
+                            <template v-if="data.item.entityType === 'player'">
+                                <span v-if="players[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.item.id].avatar + '\')' }"></span>
+                                <img v-else src="@/assets/_img/styles/player.png" class="image" />
+                            </template>
+                            <template v-else-if="data.item.entityType === 'npc'">
+                                <span v-if="data.item.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.item.avatar + '\')' }"></span>
+                                <span v-else-if="data.item.npc === 'custom' && npcs[data.item.id] && npcs[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.item.id].avatar + '\')' }"></span>
+                                <img v-else-if="data.item.friendly" src="@/assets/_img/styles/player.png" class="image" />
+                            </template>
+                        </template>
+
+                        <!-- NAME -->
+                        <span slot="name" slot-scope="data" class="green">
+                            {{ data.item.name }}
+                        </span>
+
+                        <!-- ACTIONS -->
+                        <div slot="actions" slot-scope="data" class="actions">
+                            <a v-if="data.item.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: data.item })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                <i class="fas fa-pencil"></i>
+                            </a>
+                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.item.key, data.item.name)">
+                                <i class="fas fa-minus"></i>
+                            </a>
+                        </div>
+                    </HKtable>
 
                     <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
-                    <ul class="entities hasImg mt-2">
-                        <li v-for="entity in _monsters" :key="entity.key" class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-left">
-                                <span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-                                <span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-                                <img v-else src="@/assets/_img/styles/monster.png" class="img" />
-                                <span class="red">
-                                    {{ entity.name }}
-                                </span>
-                            </div>
-                            <div class="actions">
-                                <a @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                                <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(entity.key, entity.name)">
-                                    <i class="fas fa-minus"></i>
-                                </a>
-                            </div>
-                            <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-                        </li>
-                    </ul>
+
+                    <HKtable 
+                        :items="_monsters"
+                        :columns="entityColumns"
+                        :showHeader="false"
+                    >
+                        <template slot="image" slot-scope="data">
+                            <span v-if="data.item.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.item.avatar + '\')' }"></span>
+                            <span v-else-if="data.item.npc == 'custom' && npcs[data.item.id] && npcs[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.item.id].avatar + '\')' }"></span>
+                            <img v-else src="@/assets/_img/styles/monster.png" class="image" />
+                        </template>
+
+                        <!-- NAME -->
+                        <span slot="name" slot-scope="data" class="red">
+                            {{ data.item.name }}
+                        </span>
+
+                        <div slot="actions" slot-scope="data" class="actions">
+                            <a @click="setSlide({show: true, type: 'slides/Edit', data: data.item })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                <i class="fas fa-pencil"></i>
+                            </a>
+                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.item.key, data.item.name)">
+                                <i class="fas fa-minus"></i>
+                            </a>
+                        </div>
+                    </HKtable>
                 </template>
                 <div v-else class="loader"><span>Loading entities...</span></div>
            </div>
@@ -104,11 +115,15 @@
 <script>
     import { db } from '@/firebase';
     import { mapActions, mapGetters } from 'vuex';
-    import { difficulty } from '@/mixins/difficulty.js'
+    import { difficulty } from '@/mixins/difficulty.js';
+    import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
         name: 'Overview',
         mixins: [difficulty],
+        components: {
+            HKtable
+        },
 		data() {
 			return {
 				campaignId: this.$route.params.campid,
@@ -122,7 +137,19 @@
 					medium: 'warning',
 					hard: 'info',
 					deadly: 'danger',
-				}
+                },
+                entityColumns: {
+                    image: {
+                        width: 46,
+                        noPadding: true
+                    },
+                    name: {
+                        truncate: true
+                    },
+                    actions: {
+                        noPadding: true
+                    }
+                }
 			} 
 		},
 		mounted() {

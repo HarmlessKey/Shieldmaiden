@@ -337,7 +337,7 @@ ul.crumble {
 }
 .hk-table {
 	margin-bottom: 20px;
-	
+
 	.hk-table-column {
 		background: $gray;
 
@@ -345,6 +345,35 @@ ul.crumble {
 			background: none;
 			padding: 5px 12px !important;
 			font-weight: bold;
+		}
+		.image {
+			width: 46px;
+			height: 46px;
+			display: block;
+			background-size: cover;
+			background-position: top center;
+			border: solid 1px $gray-light;
+			background-color: $black;
+		}
+		.actions {
+			display: flex;
+			justify-content: flex-end;
+			padding: 9px 12px;
+
+			a {
+				color: $gray-light !important;
+				width: 28px;
+				height: 28px;
+				display: block;
+				line-height: 28px;
+				text-align: center;
+				border-radius: 50%;
+
+				&:hover {
+					text-decoration: none;
+					background-color: $gray-active;
+				}
+			}
 		}
 	}
 }

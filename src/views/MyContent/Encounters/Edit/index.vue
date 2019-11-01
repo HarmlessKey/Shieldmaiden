@@ -126,7 +126,7 @@
 		}
 		.encounter_actions {
 			grid-area: actions;
-			overflow: hidden;
+			overflow-y: hidden;
 
 			.scroll {
 				background: #302f2f !important;

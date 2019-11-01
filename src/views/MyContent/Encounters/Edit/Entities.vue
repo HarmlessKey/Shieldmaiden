@@ -156,8 +156,7 @@
 					challenge_rating: {
 						label: 'CR',
 						sortable: true,
-						maxContent: true,
-						truncate: true
+						maxContent: true
 					},
 					'actions': {
 						label: '',
@@ -357,6 +356,8 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 .monster-actions {
 	display: flex;
 	justify-content: flex-end;
+	height: 46px;
+	padding: 8px 10px 8px 0;
 	
 	a {
 		line-height: 30px;

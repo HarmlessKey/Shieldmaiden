@@ -184,13 +184,15 @@
 					}, 'asc')
 					.value()
 				}
+            },
+            totalXp() {
+                return this.encDifficulty['totalXp'];
             }
-            
 		},
 		watch: {
 			_excludeFriendlies() {
 				this.setDifficulty()
-			}
+            }
 		},
 		methods: {
 			...mapActions([
@@ -202,7 +204,10 @@
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
 			},
 			async setDifficulty() {
-				this.encDifficulty = await this.difficulty(this.encounter.entities)
+                this.encDifficulty = await this.difficulty(this.encounter.entities);
+
+                //Store the new xp value for the encounter
+                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp').set(this.encDifficulty['totalXp']);
 			},
         }
 	}

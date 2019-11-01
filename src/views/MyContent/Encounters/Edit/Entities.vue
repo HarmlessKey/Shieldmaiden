@@ -39,12 +39,18 @@
             </div>
         </div>
 
-        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
+        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monsters found</span>
 
 		<HKtable 
 			:items="searchResults"
 			:columns="monsterFields"
+			:perPage="15"
+            :currentPage="currentPage"
 		>
+			<template slot="index" slot-scope="data">
+                {{ data.index }}
+            </template>
+
 			<template slot="name" slot-scope="data">
 				<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
                     {{ data.item.name }}

@@ -78,7 +78,7 @@
 
 					<!-- LOADER -->
 					<div slot="table-busy" class="loader">
-						<span>Loading users....</span>
+						<span>Loading users...</span>
 					</div>
 				</b-table>
 			</div>
@@ -114,7 +114,7 @@
 				users: undefined,
 				current: 1,
 				fields: {
-         			 status: {
+					status: {
 						label: 'State',
 						sortable: true
 					},

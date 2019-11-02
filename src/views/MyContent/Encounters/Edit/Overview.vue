@@ -234,7 +234,7 @@
                 this.encDifficulty = await this.difficulty(this.encounter.entities);
 
                 //Store the new xp value for the encounter
-                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp').set(this.encDifficulty['totalXp']);
+                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
 			},
         }
 	}

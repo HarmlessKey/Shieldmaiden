@@ -11,19 +11,9 @@
 			</div>
 				<div class="encounter_actions">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
-						<li class="nav-item">
-							<a class="nav-link active" id="entities-tab" data-toggle="tab" href="#entities" role="tab" aria-controls="entities" aria-selected="false">
-								<i class="fas fa-helmet-battle"></i> Entities
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">
-								General
-							</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="loot-tab" data-toggle="tab" href="#loot" role="tab" aria-controls="loot" aria-selected="false">
-								<i class="fas fa-treasure-chest"></i> Loot
+						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
+							<a class="nav-link" :class="{ active: tab.selected }" id="entities-tab" data-toggle="tab" :href="`#${key}`" role="tab" :aria-controls="key" :aria-selected="tab.selected">
+								<i v-if="tab.icon" :class="tab.icon"></i> {{ tab.name }}
 							</a>
 						</li>
 					</ul>
@@ -38,6 +28,9 @@
 								</div>
 								<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 									<Loot />
+								</div>
+								<div class="tab-pane fade" id="xp" role="tabpanel" aria-labelledby="xp-tab">
+									<Xp />
 								</div>
 							</div>
 						</div>
@@ -54,6 +47,7 @@
 	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import Loot from './Loot.vue'
+	import Xp from './Xp.vue'
 	import Entities from './Entities.vue'
 	import Overview from './Overview.vue'
 	import General from './General.vue'
@@ -70,6 +64,7 @@
 			Crumble,
 			OverEncumbered,
 			Loot,
+			Xp,
 			Entities,
 			Overview,
 			General
@@ -78,7 +73,13 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.getUser	
+				user: this.$store.getters.getUser,
+				tabs: {
+					entities: { name: 'Entities', selected: true, icon: 'fas fa-helmet-battle' },
+					general: { name: 'General' },
+					loot: { name: 'Loot', icon: 'fas fa-treasure-chest' },
+					xp: { name: 'XP', icon: 'fas fa-sparkles' }
+				}
 			} 
 		},
 		computed: {

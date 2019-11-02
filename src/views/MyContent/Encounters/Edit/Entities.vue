@@ -46,6 +46,7 @@
 			:columns="monsterFields"
 			:perPage="15"
             :currentPage="currentPage"
+			:loading="loadingNpcs"
 		>
 			<template slot="index" slot-scope="data">
                 {{ data.index }}
@@ -69,44 +70,12 @@
                     </a>
                 </div>
             </div>
+
+			<!-- LOADER -->
+			<div slot="table-loading" class="loader">
+				<span>Loading monsters...</span>
+			</div>
 		</HKtable>
-
-        <!-- <b-table 
-            class="table entities"
-            :busy="loadingNpcs"
-            :items="searchResults" 
-            :fields="monsterFields"
-            :per-page="15"
-            :current-page="currentPage"
-        >
-            <template slot="index" slot-scope="data">
-                {{ data.index + 1 }}
-            </template>
-
-            <template slot="name" slot-scope="data">
-                <a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
-                    {{ data.item.name }}
-                </a>
-            </template> -->
-
-            <!-- ACTIONS -->
-            <!-- <div slot="actions" slot-scope="data" class="p-0">
-                <div class="monster-actions">
-                    <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
-                    <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                    <a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
-                        <i class="fas fa-dice-d20"></i>
-                    </a>
-                </div>
-            </div> -->
-
-            <!-- LOADER -->
-            <!-- <div slot="table-busy" class="loader">
-                <span>Loading monsters....</span>
-            </div>
-        </b-table> -->
         <b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
     </div>
 </template>
@@ -147,16 +116,14 @@
 				],
 				typeFilter: [],
 				monsterFields: {
-					'index': {
-						label: '#',
-						maxContent: true
-					},
 					name: {
 						label: 'Name',
+						truncate: true,
 						sortable: true
 					},
 					type: {
 						label: 'Type',
+						truncate: true,
 						sortable: true
 					},
 					challenge_rating: {

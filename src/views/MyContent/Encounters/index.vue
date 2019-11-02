@@ -61,7 +61,20 @@
 							type = 'encounters'
 						/>
 
-						<table class="table table-hover">
+						<HKtable
+							:items="_active"
+							:columns="activeColumns"
+						>
+							<template slot="entities" slot-scope="data">
+								<i class="fas fa-users"></i>
+								<template v-if="data.item.entities">
+									{{ Object.keys(data.item.entities).length }}
+								</template>
+								<template v-else> Add</template>
+							</template>
+						</HKtable>
+
+						<!-- <table class="table table-hover">
 							<thead>
 								<th class="n d-none d-md-table-cell">#</th>
 								<th>Encounter</th>
@@ -156,7 +169,7 @@
 									</td>
 								</tr>
 							</tbody>
-						</table>
+						</table> -->
 
 						<template v-if="_finished != 0">
 							<h2>Finished Encounters</h2>
@@ -207,69 +220,7 @@
 								</tbody>
 							</table>
 						</template>
-						<!-- <ul v-sortable>
-							<li v-for="item in list">
-								{{ list.name }}
-								{{ list.order }}
-							</li>
-						</ul> -->
-						<!-- <table class="table table-hover">
-							<thead>
-								<th class="n d-none d-md-table-cell">#</th>
-								<th>Encounter</th>
-								<th>Entities</th>
-								<th class="d-none d-md-table-cell">Status</th>
-								<th class="d-none d-md-table-cell">Round</th>
-								<th class="d-none d-md-table-cell">Turn</th>
-								<th></th>
-							</thead>
-							<draggable :move="onMove" :list="_active" :element="'tbody'">
-								<tr v-for="(encounter, index) in _active">
-									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-									<td>
-										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-											{{ encounter.encounter }}
-										</router-link>
-										<template v-else>
-											{{ encounter.encounter }}
-										</template>
-									</td>
-									<td>
-										<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-users"></i>
-											<template v-if="encounter.entities">
-												{{ Object.keys(encounter.entities).length }}
-											</template>
-											<template v-else> Add</template>
-										</router-link>
-									</td>
-									<template v-if="encounter.round != 0">
-										<td class="red d-none d-md-table-cell">In progress</td>
-										<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
-										<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
-									</template>
-									<template v-else>
-										<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
-									</template>
-									<td class="actions">
-										<div class="d-flex justify-content-end">
-											<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-												<i class="fas fa-play"></i>
-											</router-link>
-											<span v-else class="disabled">
-												<i class="fas fa-play"></i>
-											</span>
-											<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-												<i class="fas fa-pencil-alt"></i>
-											</router-link>
-											<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-												<i class="fas fa-trash-alt"></i>
-											</a>
-										</div>
-									</td>
-								</tr>
-							</draggable>
-						</table> -->
+						
 						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 					</b-col>
 
@@ -286,13 +237,13 @@
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import Crumble from '@/components/crumble/MyContent.vue'
-	import PlayerLink from '@/components/PlayerLink.vue'
-	import Players from '@/components/campaign/Players.vue'
-	import draggable from 'vuedraggable'
+	import Sidebar from '@/components/SidebarMyContent.vue';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OutOfSlots from '@/components/OutOfSlots.vue';
+	import Crumble from '@/components/crumble/MyContent.vue';
+	import PlayerLink from '@/components/PlayerLink.vue';
+	import Players from '@/components/campaign/Players.vue';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
@@ -306,28 +257,45 @@
 			Sidebar,
 			Crumble,
 			PlayerLink,
-			draggable,
 			OverEncumbered,
 			OutOfSlots,
-			Players
+			Players,
+			HKtable
 		},
 		data() {
 			return {
-				list: [
-					{
-						"name": "harm",
-						"order": 0
-					},
-					{
-						"name": "key",
-						"order": 1
-					},
-				],
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 				add: false,
+				activeColumns: {
+                    index: {
+						label: '#',
+						maxContent: true
+                    },
+                    encounter: {
+						label: 'Encounter',
+                        truncate: true
+					},
+					entities: {
+						label: 'Entities',
+						truncate: true
+					},
+					status: {
+						label: 'Status'
+					},
+					round: {
+						label: 'Round'
+					},
+					turn: {
+						label: 'Turn'
+					},
+                    actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+                        noPadding: true
+                    }
+                }
 			}
 		},
 		firebase() {
@@ -356,8 +324,6 @@
 				'players',
 				'playerInCampaign',
 			]),
-			// _active_drag: function() {
-			// },
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -494,13 +460,6 @@
 					localStorage.removeItem(id);
 				}
 			},
-			// onMove(evt, originalEvent) {
-			// 	var index = evt.draggedContext.index
-			// 	var future = evt.draggedContext.futureIndex
-			// 	console.log(evt)
-			// 	console.log(evt.draggedContext.index, '->', evt.draggedContext.futureIndex)
-			// 	console.log("MOVED")
-			// }
 			broadcast() {
 				//Save this is the current campaign that is being broadcasted
 

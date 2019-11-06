@@ -65,12 +65,22 @@
 							:items="_active"
 							:columns="activeColumns"
 						>
-							<template slot="entities" slot-scope="data">
-								<i class="fas fa-users"></i>
-								<template v-if="data.item.entities">
-									{{ Object.keys(data.item.entities).length }}
+							<template slot="encounter" slot-scope="data">
+								<router-link v-if="data.item.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
+									{{ data.item.encounter }}
+								</router-link>
+								<template v-else>
+									{{ data.item.encounter }}
 								</template>
-								<template v-else> Add</template>
+							</template>
+							<template slot="entities" slot-scope="data">
+								<router-link :to="'/encounters/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Edit">
+									<i class="fas fa-users"></i>
+									<template v-if="data.item.entities">
+										{{ Object.keys(data.item.entities).length }}
+									</template>
+									<template v-else> Add</template>
+								</router-link>
 							</template>
 						</HKtable>
 

@@ -276,7 +276,8 @@
                     },
                     encounter: {
 						label: 'Encounter',
-                        truncate: true
+						truncate: true,
+						sortable: true
 					},
 					entities: {
 						label: 'Entities',

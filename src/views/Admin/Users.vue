@@ -1,22 +1,22 @@
 <template>
-	<div class="container-fluid" v-if="users">
+	<div class="container-fluid">
 		<template v-if="!$route.params.id">
 		<Crumble />
-		<h1 class="mb-3"><i class="fas fa-users"></i> Users ( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )</h1>
+		<h1 class="mb-3">
+			<i class="fas fa-users"></i> Users 
+				<span v-if="isBusy" class="loader pl-5"></span>
+			<template v-else>
+				( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )
+			</template>
+		</h1>
 
-			<b-row>
-				<b-col sm="8">
-					<b-input-group class="mb-3">
-						<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
-						<b-input-group-append>
-							<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
-						</b-input-group-append>
-					</b-input-group>
-				</b-col>
-				<b-col class="text-right">
-					<h2>{{ Object.keys(users).length }} users.</h2>
-				</b-col>
-			</b-row>
+		<b-input-group class="mb-3">
+			<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
+			<b-input-group-append>
+				<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
+			</b-input-group-append>
+		</b-input-group>
+
 
 			<p v-if="noResult" class="red">{{ noResult }}</p>
 			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} users found</p>
@@ -70,7 +70,7 @@
 					<i class="far fa-dot-circle"></i>
 				</span>
 
-				<div slot="table-busy" class="loader">
+				<div slot="table-loading" class="loader">
 					<span>Loading users...</span>
 				</div>
 			</HKtable>

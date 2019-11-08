@@ -85,7 +85,6 @@
 			},
 			awardTo: {
 				get() {
-					
 					return (this.awardXp) ? this.awardXp : this.allPlayers;
 				},
 				set(newValue) {

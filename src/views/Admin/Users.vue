@@ -1,21 +1,21 @@
 <template>
 	<div class="container-fluid">
 		<template v-if="!$route.params.id">
-		<Crumble />
-		<h1 class="mb-3">
-			<i class="fas fa-users"></i> Users 
-				<span v-if="isBusy" class="loader pl-5"></span>
-			<template v-else>
-				( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )
-			</template>
-		</h1>
+			<Crumble />
+			<h1 class="mb-3">
+				<i class="fas fa-users"></i> Users 
+					<span v-if="isBusy" class="loader pl-5"></span>
+				<template v-else>
+					( {{ Object.keys(users).length }}, {{ Object.keys(online).length }} online )
+				</template>
+			</h1>
 
-		<b-input-group class="mb-3">
-			<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
-			<b-input-group-append>
-				<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
-			</b-input-group-append>
-		</b-input-group>
+			<b-input-group class="mb-3">
+				<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
+				<b-input-group-append>
+					<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
+				</b-input-group-append>
+			</b-input-group>
 
 
 			<p v-if="noResult" class="red">{{ noResult }}</p>

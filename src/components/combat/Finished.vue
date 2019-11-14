@@ -1,45 +1,34 @@
 <template>
 	<div class="container">	
-		<!-- <h2 class="text-center head">Encounter Finished</h2> -->
+		<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Return to overview</router-link>
 		<div class="card finished">
 			<div class="card-header"><i class="fas fa-treasure-chest"></i> Loot</div>
 			<div class="card-body">
-				<template v-if="encounter.loot">
-					<template v-if="encounter.loot.gp || encounter.loot.sp || encounter.loot.cp">
-						<h3 class="text-center">Currency</h3>
-						<div class="currency d-flex justify-content-center">
-							<div v-if="encounter.loot.gp" class="mr-3">
-								<span class="coins yellow"><i class="fas fa-coins"></i></span><br/>
-								{{ encounter.loot.gp}}<span class="cur gray-hover">gp</span>
-							</div>
-							<div v-if="encounter.loot.sp" class="mr-3">
-								<span class="coins"><i class="fas fa-coins"></i></span><br/>
-								{{ encounter.loot.sp}}<span class="cur gray-hover">sp</span>
-							</div>
-							<div v-if="encounter.loot.cp" class="mr-3">
-								<span class="coins orange"><i class="fas fa-coins"></i></span><br/>
-								{{ encounter.loot.cp}}<span class="cur gray-hover">cp</span>
-							</div>
-						</div>
-					</template>
-					
-					<template v-if="encounter.loot.items">
-						<h3><i class="fas fa-wand-magic"></i> Items</h3>
-						<ul class="entities hasImg">
-							<li v-for="(item, index) in encounter.loot.items" :key="index">
-								<span class="img"><i class="fas fa-ring"></i></span>
+				<!-- XP -->
+				<div class="xp" v-if="encounter.xp">
+					<span class="green">{{ encounter.xp.overwrite || encounter.xp.calculated }}</span>XP
+					<a @click="awardXp">Award</a>
+				</div>
 
-								<span>
-									<h4>{{ item.name }}</h4>
-									{{ item.desc }}
-								</span>
-							</li>
-						</ul>
-					</template>
-				</template>
-				<h2 v-else class="red"><i class="fas fa-times"></i> No loot</h2>
+				<!-- CURRENCY -->
+				<div class="d-flex justify-content-start">
+					<div class="currency">
+						<div v-for="(coin, key) in currencies" :key="key">
+							<input 
+								autocomplete="off" 
+								type="text" 
+								min="0" 
+								name="currency" 
+								v-validate="'numeric'"
+								data-vv-as="Currency"
+								v-model="encounter.currency[key]" :placeholder="coin.name"/>
+							<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+						</div>
+					</div>
+					<a @click="awardCurrency">Award</a>
+				</div>
+				<p class="validate red mt-2" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
 			</div>
-			<router-link v-if="$route.name == 'RunEncounter'" class="btn btn-block" :to="'/encounters/' + $route.params.campid">Return to overview</router-link>
 		</div>
 		<b-row v-if="$route.name == 'RunEncounter'">
 			<b-col sm="8">
@@ -59,12 +48,14 @@
 <script>
 	import Dmg from '@/components/combat/side/Dmg.vue';
 	import Log from '@/components/combat/side/Log.vue';
+	import { currencyMixin } from '@/mixins/currency.js';
 
 	export default {
 		name: 'app',
 		props: [
 			'encounter'
 		],
+		mixins: [currencyMixin],
 		components: {
 			Dmg,
 			Log
@@ -74,6 +65,14 @@
 				userId: this.$store.getters.getUser.uid,
 			}
 		},
+		methods: {
+			awardCurrency() {
+
+			},
+			awardXp() {
+
+			}
+		}
 	}
 </script>
 
@@ -88,27 +87,50 @@
 		}
 
 		.finished {
+			margin-top: 20px;
 			background: rgba(38, 38, 38, .9) !important;
 
-			.currency {
-				text-align: center;
-				font-size: 20px;
+			.xp {
 				margin-bottom: 30px;
-
-				span.cur {
-					font-size: 15px;
-				}
+				font-size: 25px;
 			}
-			ul.entities {
-				.img {
-					background: none;
-					border: none;
-					font-size: 25px;
-					padding: 8px 15px;
-				}
-				h4 {
-					font-size: 20px;
-					margin-bottom: 5px;
+
+			.currency {
+				display: flex;
+				justify-content: flex-start;
+				margin-right: 10px;
+
+				div {
+					display: flex;
+					justify-content: flex-start;
+					font-size: 16px;
+
+					input[type='text'] {
+						text-align: right;
+						background: none;
+						border: none;
+						padding: 3px 5px 3px 0;
+						min-width: 20px;
+						max-width: 35px;
+						color: #b2b2b2;
+						height: 21px;
+						margin-right: 3px;
+
+						&:focus {
+							outline: none;
+							background:#191919;
+						}
+					}
+
+					img {
+						margin-top: 4px;
+						height: 15px;
+						margin-right: 3px;
+					}
+
+					&:last-child {
+						margin: none;
+					}
 				}
 			}
 		}

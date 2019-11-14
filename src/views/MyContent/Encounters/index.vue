@@ -187,19 +187,24 @@
 				activeColumns: {
                     encounter: {
 						label: 'Encounter',
+						truncate: true
 					},
 					entities: {
 						label: 'Entities',
-						truncate: true
+						truncate: true,
+						center: true
 					},
 					status: {
-						label: 'Status'
+						label: 'Status',
+						truncate: true
 					},
 					round: {
-						label: 'Round'
+						label: 'Round',
+						center: true
 					},
 					turn: {
-						label: 'Turn'
+						label: 'Turn',
+						center: true
 					},
                     actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',

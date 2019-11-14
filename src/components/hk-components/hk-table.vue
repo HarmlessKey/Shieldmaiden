@@ -11,11 +11,11 @@
 					v-if="!column.sortable"
 					:key="'header-'+key"
 					class="hk-table-column hk-table-header"
-					:class="{
+					:class="[{
 						truncate: column.truncate,
 						center: column.center,
 						right: column.right
-					}"
+					}, column.classes]"
 					v-html="column.label"
 				>
 				</div>
@@ -23,11 +23,11 @@
 					v-else 
 					:key="'header-'+key"
 					class="hk-table-column hk-table-header hk-table-column-sortable"
-					:class="{
+					:class="[{
 						truncate: column.truncate,
 						center: column.center,
 						right: column.right
-					}"
+					}, column.classes]"
 					@click="sort(key)"
 				>
 					<span v-html="column.label"></span>
@@ -45,12 +45,12 @@
 				class="hk-table-column"
 				v-for="(column, key) in columns"
 				:key="key+'-'+index"
-				:class="{
+				:class="[{
 					truncate: column.truncate,
 					'no-padding': column.noPadding,
 					center: column.center,
 					right: column.right
-				}"
+				}, column.classes]"
 			>
 				<slot :name="key" :item="row">
 					{{ row[key] }}

@@ -29,7 +29,7 @@
 								<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 									<Loot />
 								</div>
-								<div class="tab-pane fade" id="xp" role="tabpanel" aria-labelledby="xp-tab">
+								<div v-if="campaign.advancement === 'experience'" class="tab-pane fade" id="xp" role="tabpanel" aria-labelledby="xp-tab">
 									<Xp />
 								</div>
 							</div>
@@ -73,13 +73,7 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.getUser,
-				tabs: {
-					entities: { name: 'Entities', selected: true, icon: 'fas fa-helmet-battle' },
-					general: { name: 'General' },
-					loot: { name: 'Loot', icon: 'fas fa-treasure-chest' },
-					xp: { name: 'XP', icon: 'fas fa-sparkles' }
-				}
+				user: this.$store.getters.getUser
 			} 
 		},
 		computed: {
@@ -87,7 +81,18 @@
 				'encounter',
 				'campaign',
 				'overencumbered',
-			])
+			]),
+			tabs() {
+				let tabs = {
+					entities: { name: 'Entities', selected: true, icon: 'fas fa-helmet-battle' },
+					general: { name: 'General' },
+					loot: { name: 'Loot', icon: 'fas fa-treasure-chest' }
+				}
+				if(this.campaign.advancement === 'experience') {
+					tabs.xp = { name: 'XP', icon: 'fas fa-sparkles' };
+				}
+				return tabs;
+			}
 		},
 		mounted() {
 			this.fetchEncounter({

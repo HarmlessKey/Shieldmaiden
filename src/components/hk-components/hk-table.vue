@@ -52,7 +52,7 @@
 					right: column.right
 				}, column.classes]"
 			>
-				<slot :name="key" :item="row">
+				<slot :name="key" :item="row" :index="index">
 					{{ row[key] }}
 				</slot>
 			</div>

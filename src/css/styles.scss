@@ -805,7 +805,7 @@ hr { background: $gray-hover; }
 .form-control, .custom-select { 
 	-webkit-appearance: none;
 	border-radius: 0 !important;
-	background: $black !important;
+	background: $gray-dark !important;
 	border: solid 1px $gray !important;
 	color: $gray-light !important;
 	
@@ -813,7 +813,7 @@ hr { background: $gray-hover; }
 		box-shadow: none !important;
 	}
 	optgroup {
-		background: $black !important;
+		background: $gray-dark !important;
 	}
 }
 .custom-checkbox .custom-control-label::before {

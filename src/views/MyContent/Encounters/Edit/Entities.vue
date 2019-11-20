@@ -48,13 +48,9 @@
             :currentPage="currentPage"
 			:loading="loadingNpcs"
 		>
-			<template slot="index" slot-scope="data">
-                {{ data.index }}
-            </template>
-
 			<template slot="name" slot-scope="data">
-				<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
-                    {{ data.item.name }}
+				<a @click="setSlide({show: true, type: 'ViewEntity', data: data.row })" :class="{ 'green': data.row.custom}">
+                    {{ data.item }}
                 </a>
 			</template>
 			
@@ -62,10 +58,10 @@
 			<div slot="actions" slot-scope="data">
                 <div class="monster-actions">
                     <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
-                    <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
+                    <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
                         <i class="fas fa-plus"></i>
                     </a>
-                    <a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
+                    <a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
                         <i class="fas fa-dice-d20"></i>
                     </a>
                 </div>

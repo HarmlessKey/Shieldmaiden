@@ -29,33 +29,33 @@
 				:loading="isBusy"
 			>
 				<span slot="status" slot-scope="data">
-					<template v-if="data.item.status === 'online'">
-						<i :class="{ 'green': data.item.status === 'online', 'gray-hover': data.item.status === 'offline' }" class="fas fa-circle"></i>
+					<template v-if="data.item === 'online'">
+						<i :class="{ 'green': data.item === 'online', 'gray-hover': data.item === 'offline' }" class="fas fa-circle"></i>
 					</template>
 					<span v-else><i class="fas fa-circle gray-hover"></i></span>
 				</span>
 
-				<router-link :to="'/admin/users/' + data.item['.key']" slot="username" slot-scope="data">
-					<span v-if="data.item.username">{{ data.item.username }}</span>
+				<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
+					<span v-if="data.item">{{ data.item }}</span>
 					<span v-else>UNDEFINED</span>
 				</router-link>
 					
-				<span slot="voucher" slot-scope="data" v-if="data.item.voucher">
+				<span slot="voucher" slot-scope="data" v-if="data.item">
 					<i 
-						v-if="tiers[data.item.voucher.id]"
+						v-if="tiers[data.item.id]"
 						class="fas fa-ticket-alt"
 						:class="{
-							'blue': tiers[data.item.voucher.id].name == 'Folk Hero',
-							'purple': tiers[data.item.voucher.id].name == 'Noble',
-							'orange': tiers[data.item.voucher.id].name == 'Deity'
+							'blue': tiers[data.item.id].name == 'Folk Hero',
+							'purple': tiers[data.item.id].name == 'Noble',
+							'orange': tiers[data.item.id].name == 'Deity'
 					}"></i>
 				</span>
 
-				<span slot="patreon" slot-scope="data" v-if="data.item.patreon">
-					<span v-if="data.item.patreon === 'Expired'" class="red">{{ data.item.patreon }}</span>
+				<span slot="patreon" slot-scope="data" v-if="data.item">
+					<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
 					<i 
 						v-else
-						v-for="tier in data.item.patreon"
+						v-for="tier in data.item"
 						:key="tier"
 						class="fab fa-patreon"
 						:class="{
@@ -66,7 +66,7 @@
 					}"></i>
 				</span>
 
-				<span slot="live" slot-scope="data" v-if="data.item.live" class="red">
+				<span slot="live" slot-scope="data" v-if="data.item" class="red">
 					<i class="far fa-dot-circle"></i>
 				</span>
 

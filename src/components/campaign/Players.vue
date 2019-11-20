@@ -5,28 +5,28 @@
 			:columns="columns"
 		>	
 			<template slot="image" slot-scope="data">
-				<div class="image" v-if="players[data.item.key].avatar" :style="{ backgroundImage: 'url(\'' + players[data.item.key].avatar + '\')' }"></div>
+				<div class="image" v-if="players[data.row.key].avatar" :style="{ backgroundImage: 'url(\'' + players[data.row.key].avatar + '\')' }"></div>
 				<img v-else class="image" src="@/assets/_img/styles/player.svg" />
 			</template>
 
 			<template slot="maxHp" slot-scope="data">
 				<span class="current" :class="{ 
-					'red': percentage(data.item.curHp, maxHp(data.item.maxHp, data.item.maxHpMod)) <= 33, 
-					'orange': percentage(data.item.curHp, maxHp(data.item.maxHp, data.item.maxHpMod)) > 33 && percentage(data.item.curHp, players[data.item.key].maxHp) <= 76, 
+					'red': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) <= 33, 
+					'orange': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) > 33 && percentage(data.row.curHp, players[data.row.key].maxHp) <= 76, 
 					'green': true
 				}">
-					{{ data.item.curHp }}
+					{{ data.row.curHp }}
 				</span>
 				<span class="gray-hover">/</span>
 				<span :class="{ 
-						'green': data.item.maxHpMod > 0, 
-						'red': data.item.maxHpMod < 0 
+						'green': data.row.maxHpMod > 0, 
+						'red': data.row.maxHpMod < 0 
 					}" 
-					v-b-tooltip.hover :title="'Max HP + ' + data.item.maxHpMod" v-if="data.item.maxHpMod">
-					{{ maxHp(players[data.item.key].maxHp, data.item.maxHpMod) }}
+					v-b-tooltip.hover :title="'Max HP + ' + data.row.maxHpMod" v-if="data.row.maxHpMod">
+					{{ maxHp(players[data.row.key].maxHp, data.row.maxHpMod) }}
 				</span>
-				<span v-else>{{ players[data.item.key].maxHp }}</span>
-				<span v-if="data.item.tempHp" class="gray-hover">+{{ data.item.tempHp }}</span>
+				<span v-else>{{ players[data.row.key].maxHp }}</span>
+				<span v-if="data.row.tempHp" class="gray-hover">+{{ data.row.tempHp }}</span>
 			</template>
 
 			<div slot="actions" slot-scope="data" class="actions">
@@ -83,6 +83,7 @@
 					player.key = key;
 					player.name = this.players[key].character_name;
 					player.ac = this.players[key].ac;
+					player.maxHp = this.players[key].maxHp;
 					player.passive_perception = this.players[key].passive_perception;
 					player.passive_investigation = this.players[key].passive_investigation;
 					player.passive_insight = this.players[key].passive_insight;

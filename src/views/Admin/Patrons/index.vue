@@ -37,12 +37,12 @@
 						:loading="isBusy"
 					>
 						<!-- EMAIL -->
-						<router-link :to="'/admin/patrons/' + data.item['.key']" slot="email" slot-scope="data">{{ data.item.email }}</router-link>
+						<router-link :to="'/admin/patrons/' + data.row['.key']" slot="email" slot-scope="data">{{ data.item }}</router-link>
 
 						<!-- TIER -->
 						<span slot="tiers" slot-scope="data">
 							<i 
-								v-for="(tier, key) in data.item.tiers"
+								v-for="(tier, key) in data.item"
 								v-if="tiers[key]"
 								:key="tier"
 								class="fab fa-patreon"
@@ -55,20 +55,20 @@
 
 						<!-- END DATE -->"
 						<span slot="pledge_end" slot-scope="data">
-							<span :class="{'red': new Date(data.item.pledge_end) < new Date() }">
-								{{ makeDate(data.item.pledge_end, false, true) }}
+							<span :class="{'red': new Date(data.item) < new Date() }">
+								{{ makeDate(data.item, false, true) }}
 							</span>
 						</span>
 
 						<!-- STATUS -->
 						<span slot="last_charge_status" slot-scope="data">
-							<i :class="{'green fas fa-check': data.item.last_charge_status == 'Paid', 'red fas fa-times': data.item.last_charge_status == 'Declined' }">
+							<i :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
 							</i>
 						</span>
 
 						<!-- LIFETIME SUPPORT -->
 						<span slot="lifetime_support" slot-scope="data">
-								{{ data.item.lifetime_support / 100 | numeral('$0,0') }}
+								{{ data.item / 100 | numeral('$0,0') }}
 						</span>
 
 						<!-- LOADER -->

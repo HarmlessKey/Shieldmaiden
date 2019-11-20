@@ -67,38 +67,38 @@
 							:columns="activeColumns"
 						>
 							<template slot="encounter" slot-scope="data">
-								<router-link v-if="data.item.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
-									{{ data.item.encounter }}
+								<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+									{{ data.item }}
 								</router-link>
 								<template v-else>
-									{{ data.item.encounter }}
+									{{ data.item }}
 								</template>
 							</template>
 							<template slot="entities" slot-scope="data">
-								<router-link :to="'/encounters/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Edit">
+								<router-link :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
 									<i class="fas fa-users"></i>
-									<template v-if="data.item.entities">
-										{{ Object.keys(data.item.entities).length }}
+									<template v-if="data.row.entities">
+										{{ Object.keys(data.row.entities).length }}
 									</template>
 									<template v-else> Add</template>
 								</router-link>
 							</template>
 
-							<span slot="status" slot-scope="data" v-if="data.item.round > 0" class="red">In progress</span>
-							<template slot="turn" slot-scope="data">{{ data.item.turn + 1 }}</template>
+							<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
+							<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
 
 							<template slot="actions" slot-scope="data">
 								<div class="actions">
-									<router-link v-if="data.item.entities" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
+									<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
 										<i class="fas fa-play"></i>
 									</router-link>
 									<a v-else class="disabled">
 										<i class="fas fa-play"></i>
 									</a>
-									<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Edit">
+									<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
 										<i class="fas fa-pencil-alt"></i>
 									</router-link>
-									<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(data.item.key,data.item.encounter)">
+									<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(data.row.key,data.row.encounter)">
 										<i class="fas fa-trash-alt"></i>
 									</a>
 								</div>
@@ -116,18 +116,18 @@
 								:currentPage="currentPage"
 							>
 								<template slot="encounter" slot-scope="data">
-									<router-link v-if="data.item.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
-										{{ data.item.encounter }}
+									<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+										{{ data.item }}
 									</router-link>
 									<template v-else>
-										{{ data.item.encounter }}
+										{{ data.item }}
 									</template>
 								</template>
 
 								<template slot="actions" slot-scope="data">
 									<div class="actions">
-										<a v-b-tooltip.hover title="Reset" @click="reset(data.item.key)"><i class="fas fa-undo"></i></a>
-										<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.item.key, data.item.encounter)"><i class="fas fa-trash-alt"></i></a>
+										<a v-b-tooltip.hover title="Reset" @click="reset(data.row.key)"><i class="fas fa-undo"></i></a>
+										<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)"><i class="fas fa-trash-alt"></i></a>
 									</div>
 								</template>
 							</HKtable>

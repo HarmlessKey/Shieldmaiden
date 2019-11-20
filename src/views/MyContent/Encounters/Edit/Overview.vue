@@ -51,28 +51,28 @@
                         :showHeader="false"
                     >
                         <template slot="image" slot-scope="data">
-                            <template v-if="data.item.entityType === 'player'">
-                                <span v-if="players[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.item.id].avatar + '\')' }"></span>
+                            <template v-if="data.row.entityType === 'player'">
+                                <span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
                                 <img v-else src="@/assets/_img/styles/player.png" class="image" />
                             </template>
-                            <template v-else-if="data.item.entityType === 'npc'">
-                                <span v-if="data.item.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.item.avatar + '\')' }"></span>
-                                <span v-else-if="data.item.npc === 'custom' && npcs[data.item.id] && npcs[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.item.id].avatar + '\')' }"></span>
-                                <img v-else-if="data.item.friendly" src="@/assets/_img/styles/player.png" class="image" />
+                            <template v-else-if="data.row.entityType === 'npc'">
+                                <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                                <span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+                                <img v-else-if="data.row.friendly" src="@/assets/_img/styles/player.png" class="image" />
                             </template>
                         </template>
 
                         <!-- NAME -->
                         <span slot="name" slot-scope="data" class="green">
-                            {{ data.item.name }}
+                            {{ data.item }}
                         </span>
 
                         <!-- ACTIONS -->
                         <div slot="actions" slot-scope="data" class="actions">
-                            <a v-if="data.item.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: data.item })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                            <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
                                 <i class="fas fa-pencil"></i>
                             </a>
-                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.item.key, data.item.name)">
+                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
                                 <i class="fas fa-minus"></i>
                             </a>
                         </div>
@@ -86,21 +86,21 @@
                         :showHeader="false"
                     >
                         <template slot="image" slot-scope="data">
-                            <span v-if="data.item.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.item.avatar + '\')' }"></span>
-                            <span v-else-if="data.item.npc == 'custom' && npcs[data.item.id] && npcs[data.item.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.item.id].avatar + '\')' }"></span>
+                            <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                            <span v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
                             <img v-else src="@/assets/_img/styles/monster.png" class="image" />
                         </template>
 
                         <!-- NAME -->
                         <span slot="name" slot-scope="data" class="red">
-                            {{ data.item.name }}
+                            {{ data.item }}
                         </span>
 
                         <div slot="actions" slot-scope="data" class="actions">
-                            <a @click="setSlide({show: true, type: 'slides/Edit', data: data.item })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                            <a @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
                                 <i class="fas fa-pencil"></i>
                             </a>
-                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.item.key, data.item.name)">
+                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
                                 <i class="fas fa-minus"></i>
                             </a>
                         </div>

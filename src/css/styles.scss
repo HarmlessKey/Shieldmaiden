@@ -20,7 +20,7 @@ $gray: #262626;
 $gray-darker: #232323;
 $gray-dark: #191919;
 $gray-light: #b2b2b2;
-$gray-hover: #494747;
+$gray-hover: #5c5757;
 $gray-active: #302f2f;
 $black: #000;
 $white: #FFF;
@@ -40,6 +40,12 @@ $green-light: #9ac16a;
 $orange-light: #db815e;
 $red-light: #c45e66;
 $yellow-light: #e2da5f;
+
+$copper: #e76d3b;
+$silver: #dbdbdb;
+$electrum: #a2bade;
+$gold: #e2da5f;
+$platinum: #fff;
 
 $header-hight: 50px;
 
@@ -117,6 +123,12 @@ html body {
 .orange-light { color: $orange-light !important; }
 .red-light { color: $red-light !important; }
 .yellow-light { color: $yellow-light !important; }
+
+.copper { color: $copper !important; fill: $copper !important; }
+.silver { color: $silver !important; fill: $silver !important; }
+.electrum { color: $electrum !important; fill: $electrum !important; }
+.gold { color: $gold !important; fill: $gold !important; }
+.platinum { color: $platinum !important; fill: $platinum !important; }
 
 .bg-gray { background-color: $gray !important; }
 .bg-gray-light { background-color: $gray-light !important; }
@@ -323,6 +335,48 @@ ul.crumble {
 		}
 	}
 }
+.hk-table {
+	margin-bottom: 20px;
+
+	.hk-table-column {
+		background: $gray;
+
+		&.hk-table-header {
+			background: none;
+			padding: 5px 12px !important;
+			font-weight: bold;
+		}
+		.image {
+			width: 46px;
+			height: 46px;
+			display: block;
+			background-size: cover;
+			background-position: top center;
+			border: solid 1px $gray-light;
+			background-color: $black;
+		}
+		.actions {
+			display: flex;
+			justify-content: flex-end;
+			padding: 9px 12px;
+
+			a {
+				color: $gray-light !important;
+				width: 28px;
+				height: 28px;
+				display: block;
+				line-height: 28px;
+				text-align: center;
+				border-radius: 50%;
+
+				&:hover {
+					text-decoration: none;
+					background-color: $gray-active;
+				}
+			}
+		}
+	}
+}
 table {
 	border-collapse: separate !important; 
 	border-spacing: 0 1px;
@@ -415,6 +469,17 @@ table {
 			}
 			.actions {
 				display: flex !important;
+			}
+		}
+	}
+	tr.openSlot {
+		td {	
+			background: none;
+			border: dashed 1px $gray-hover !important;
+
+			.slot {	
+				display: flex;
+				justify-content: space-between;
 			}
 		}
 	}
@@ -740,7 +805,7 @@ hr { background: $gray-hover; }
 .form-control, .custom-select { 
 	-webkit-appearance: none;
 	border-radius: 0 !important;
-	background: $black !important;
+	background: $gray-dark !important;
 	border: solid 1px $gray !important;
 	color: $gray-light !important;
 	
@@ -748,7 +813,7 @@ hr { background: $gray-hover; }
 		box-shadow: none !important;
 	}
 	optgroup {
-		background: $black !important;
+		background: $gray-dark !important;
 	}
 }
 .custom-checkbox .custom-control-label::before {
@@ -863,10 +928,6 @@ ul.nav {
 		color: $gray-dark;
 		text-transform: capitalize;
 	}
-	// .popover-body {
-	// 	background-color: $gray-dark;
-	// 	color: $gray-light;
-	// }
 }
 .card {
 	background-color: $gray !important;
@@ -877,6 +938,18 @@ ul.nav {
 	.card-header {
 		border-radius: 0 !important;
 		text-transform: uppercase !important;
+	}
+}
+.btn-group-toggle {
+	.btn {
+		border: none;
+		background-color: $gray-active;
+		color: $gray-hover !important;
+
+		&.active {
+			background-color: $gray-light !important;
+			color: $gray-active !important;
+		}
 	}
 }
 

@@ -61,215 +61,80 @@
 							type = 'encounters'
 						/>
 
-						<table class="table table-hover">
-							<thead>
-								<th class="n d-none d-md-table-cell">#</th>
-								<th>Encounter</th>
-								<th>Entities</th>
-								<th class="d-none d-lg-table-cell">Status</th>
-								<th class="d-none d-lg-table-cell">Round</th>
-								<th class="d-none d-lg-table-cell">Turn</th>
-								<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-							</thead>
-							<tbody v-if="encounters"
-								name="table-row" 
-								is="transition-group" 
-								enter-active-class="animated flash" 
-								leave-active-class="animated bounceOutLeft">
-								<tr v-for="(encounter, index) in _active" :key="encounter.key" :ref="encounter.key">
-									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-									<td>
-										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-											{{ encounter.encounter }}
-										</router-link>
-										<template v-else>
-											{{ encounter.encounter }}
-										</template>
-									</td>
-									<td>
-										<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-users"></i>
-											<template v-if="encounter.entities">
-												{{ Object.keys(encounter.entities).length }}
-											</template>
-											<template v-else> Add</template>
-										</router-link>
-									</td>
-									<template v-if="encounter.round != 0">
-										<td class="red d-none d-lg-table-cell">In progress</td>
-										<td class="d-none d-lg-table-cell">{{ encounter.round }}</td>
-										<td class="d-none d-lg-table-cell">{{ encounter.turn + 1 }}</td>
+						<!-- ACTIVE ENCOUNTERS -->
+						<HKtable
+							:items="_active"
+							:columns="activeColumns"
+						>
+							<template slot="encounter" slot-scope="data">
+								<router-link v-if="data.item.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
+									{{ data.item.encounter }}
+								</router-link>
+								<template v-else>
+									{{ data.item.encounter }}
+								</template>
+							</template>
+							<template slot="entities" slot-scope="data">
+								<router-link :to="'/encounters/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Edit">
+									<i class="fas fa-users"></i>
+									<template v-if="data.item.entities">
+										{{ Object.keys(data.item.entities).length }}
 									</template>
-									<template v-else>
-										<td colspan="3" class="gray-hover d-none d-lg-table-cell">Not started</td>
-									</template>
-									<td class="align-middle p-0">
-										<div class="d-flex justify-content-end">
-											<div class="d-flex justify-content-end actions">
-												<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-													<i class="fas fa-play"></i>
-												</router-link>
-												<a v-else class="disabled">
-													<i class="fas fa-play"></i>
-												</a>
-												<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-													<i class="fas fa-pencil-alt"></i>
-												</router-link>
-												<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-													<i class="fas fa-trash-alt"></i>
-												</a>
-											</div>
+									<template v-else> Add</template>
+								</router-link>
+							</template>
 
-											<span class="dropleft d-sm-none actions-dropdown">
-												<a class="options"
-													id="options"
-													data-toggle="dropdown" 
-													aria-haspopup="true" 
-													aria-expanded="false">
-													<i class="far fa-ellipsis-v"></i>
-												</a>
-												<div class="dropdown-menu" aria-labelledby="options">	
-													<router-link 
-														v-if="encounter.entities" 
-														:to="'/run-encounter/' + campaignId + '/' + encounter.key" 
-														class="dropdown-item">
-															
-															<i class="fas fa-play"></i> Run encounter
-													</router-link>
-													<a v-else class="disabled dropdown-item">
-														<i class="fas fa-play"></i> Run encounter
-													</a>
-													<router-link 
-														class="mx-1 dropdown-item" 
-														:to="'/encounters/' + campaignId + '/' + encounter.key">
+							<span slot="status" slot-scope="data" v-if="data.item.round > 0" class="red">In progress</span>
+							<template slot="turn" slot-scope="data">{{ data.item.turn + 1 }}</template>
 
-														<i class="fas fa-pencil-alt"></i> Edit encounter
-													</router-link>
-													<a @click="deleteEncounter(encounter.key, encounter.encounter)"
-														class="dropdown-item">
-														<i class="fas fa-trash-alt"></i> Delete encounter
-													</a>
-												</div>
-											</span>
-										
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
+							<template slot="actions" slot-scope="data">
+								<div class="actions">
+									<router-link v-if="data.item.entities" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
+										<i class="fas fa-play"></i>
+									</router-link>
+									<a v-else class="disabled">
+										<i class="fas fa-play"></i>
+									</a>
+									<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil-alt"></i>
+									</router-link>
+									<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(data.item.key,data.item.encounter)">
+										<i class="fas fa-trash-alt"></i>
+									</a>
+								</div>
+							</template>
+						</HKtable>
 
+						<!-- FINISHED ENCOUNTERS -->
 						<template v-if="_finished != 0">
 							<h2>Finished Encounters</h2>
-							<table class="table">
-								<thead>
-									<th>#</th>
-									<th>Encounter</th>
-									<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-								</thead>
-								<tbody name="table-row" is="transition-group" enter-active-class="animated flash" leave-active-class="animated bounceOutLeft">
-									
-									<tr v-for="(encounter, index) in _finished" :key="encounter.key">
-										<td>{{ index + 1 }}</td>
-										<td>
-											<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-												{{ encounter.encounter }}
-											</router-link>
-										</td>
-										<td class="align-middle p-0">
-											<div class="d-flex justify-content-end">
-												<div class="d-flex justify-content-end actions">
-													<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)"><i class="fas fa-undo"></i></a>
-													<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(encounter.key, encounter.encounter)"><i class="fas fa-trash-alt"></i></a>
-												</div>
-												
-												<span class="dropleft d-sm-none actions-dropdown">
-													<a class="options"
-														id="options"
-														data-toggle="dropdown" 
-														aria-haspopup="true" 
-														aria-expanded="false">
-														<i class="far fa-ellipsis-v"></i>
-													</a>
-													<div class="dropdown-menu" aria-labelledby="options">	
-														<a v-b-tooltip.hover title="Reset" @click="reset(encounter.key)" class="dropdown-item">
-															<i class="fas fa-undo"></i> Reset encounter
-														</a>
-														<a v-b-tooltip.hover title="Delete" class="ml-2 dropdown-item" @click="deleteEncounter(encounter.key, encounter.encounter)">
-															<i class="fas fa-trash-alt"></i> Delete encounter
-														</a>
-													</div>
-												</span>
-												
-											</div>
-										
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</template>
-						<!-- <ul v-sortable>
-							<li v-for="item in list">
-								{{ list.name }}
-								{{ list.order }}
-							</li>
-						</ul> -->
-						<!-- <table class="table table-hover">
-							<thead>
-								<th class="n d-none d-md-table-cell">#</th>
-								<th>Encounter</th>
-								<th>Entities</th>
-								<th class="d-none d-md-table-cell">Status</th>
-								<th class="d-none d-md-table-cell">Round</th>
-								<th class="d-none d-md-table-cell">Turn</th>
-								<th></th>
-							</thead>
-							<draggable :move="onMove" :list="_active" :element="'tbody'">
-								<tr v-for="(encounter, index) in _active">
-									<td class="n d-none d-md-table-cell">{{ index + 1 }}</td>
-									<td>
-										<router-link v-if="encounter.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-											{{ encounter.encounter }}
-										</router-link>
-										<template v-else>
-											{{ encounter.encounter }}
-										</template>
-									</td>
-									<td>
-										<router-link :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-											<i class="fas fa-users"></i>
-											<template v-if="encounter.entities">
-												{{ Object.keys(encounter.entities).length }}
-											</template>
-											<template v-else> Add</template>
-										</router-link>
-									</td>
-									<template v-if="encounter.round != 0">
-										<td class="red d-none d-md-table-cell">In progress</td>
-										<td class="d-none d-md-table-cell">{{ encounter.round }}</td>
-										<td class="d-none d-md-table-cell">{{ encounter.turn + 1 }}</td>
-									</template>
+							
+							<HKtable
+								:items="_finished"
+								:columns="finishedColumns"
+								:perPage="3"
+								:currentPage="currentPage"
+							>
+								<template slot="encounter" slot-scope="data">
+									<router-link v-if="data.item.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.item.key" v-b-tooltip.hover title="Run Encounter">
+										{{ data.item.encounter }}
+									</router-link>
 									<template v-else>
-										<td colspan="3" class="gray-hover d-none d-md-table-cell">Not started</td>
+										{{ data.item.encounter }}
 									</template>
-									<td class="actions">
-										<div class="d-flex justify-content-end">
-											<router-link v-if="encounter.entities" :to="'/run-encounter/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Run Encounter">
-												<i class="fas fa-play"></i>
-											</router-link>
-											<span v-else class="disabled">
-												<i class="fas fa-play"></i>
-											</span>
-											<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + encounter.key" v-b-tooltip.hover title="Edit">
-												<i class="fas fa-pencil-alt"></i>
-											</router-link>
-											<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(encounter.key, encounter.encounter)">
-												<i class="fas fa-trash-alt"></i>
-											</a>
-										</div>
-									</td>
-								</tr>
-							</draggable>
-						</table> -->
+								</template>
+
+								<template slot="actions" slot-scope="data">
+									<div class="actions">
+										<a v-b-tooltip.hover title="Reset" @click="reset(data.item.key)"><i class="fas fa-undo"></i></a>
+										<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.item.key, data.item.encounter)"><i class="fas fa-trash-alt"></i></a>
+									</div>
+								</template>
+							</HKtable>
+
+							<b-pagination v-if="Object.keys(_finished).length > 3" align="center" :total-rows="Object.keys(_finished).length" v-model="currentPage" :per-page="3" />
+						</template>
+						
 						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 					</b-col>
 
@@ -286,13 +151,13 @@
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import Crumble from '@/components/crumble/MyContent.vue'
-	import PlayerLink from '@/components/PlayerLink.vue'
-	import Players from '@/components/campaign/Players.vue'
-	import draggable from 'vuedraggable'
+	import Sidebar from '@/components/SidebarMyContent.vue';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OutOfSlots from '@/components/OutOfSlots.vue';
+	import Crumble from '@/components/crumble/MyContent.vue';
+	import PlayerLink from '@/components/PlayerLink.vue';
+	import Players from '@/components/campaign/Players.vue';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
@@ -306,28 +171,58 @@
 			Sidebar,
 			Crumble,
 			PlayerLink,
-			draggable,
 			OverEncumbered,
 			OutOfSlots,
-			Players
+			Players,
+			HKtable
 		},
 		data() {
 			return {
-				list: [
-					{
-						"name": "harm",
-						"order": 0
-					},
-					{
-						"name": "key",
-						"order": 1
-					},
-				],
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 				add: false,
+				currentPage: 1,
+				activeColumns: {
+                    encounter: {
+						label: 'Encounter',
+						maxContent: true
+					},
+					entities: {
+						label: 'Entities',
+						center: true
+					},
+					status: {
+						label: 'Status',
+						truncate: true
+					},
+					round: {
+						label: 'Round',
+						center: true,
+						truncate: true
+					},
+					turn: {
+						label: 'Turn',
+						center: true,
+						truncate: true
+					},
+                    actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true
+                    }
+				},
+				finishedColumns: {
+					encounter: {
+						label: 'Encounter',
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true
+                    }
+				}
 			}
 		},
 		firebase() {
@@ -356,8 +251,6 @@
 				'players',
 				'playerInCampaign',
 			]),
-			// _active_drag: function() {
-			// },
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -494,13 +387,6 @@
 					localStorage.removeItem(id);
 				}
 			},
-			// onMove(evt, originalEvent) {
-			// 	var index = evt.draggedContext.index
-			// 	var future = evt.draggedContext.futureIndex
-			// 	console.log(evt)
-			// 	console.log(evt.draggedContext.index, '->', evt.draggedContext.futureIndex)
-			// 	console.log("MOVED")
-			// }
 			broadcast() {
 				//Save this is the current campaign that is being broadcasted
 

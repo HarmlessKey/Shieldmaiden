@@ -39,28 +39,27 @@
             </div>
         </div>
 
-        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
+        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monsters found</span>
 
-        <b-table 
-            class="table entities"
-            :busy="loadingNpcs"
-            :items="searchResults" 
-            :fields="monsterFields"
-            :per-page="15"
-            :current-page="currentPage"
-        >
-            <template slot="index" slot-scope="data">
-                {{ data.index + 1 }}
+		<HKtable 
+			:items="searchResults"
+			:columns="monsterFields"
+			:perPage="15"
+            :currentPage="currentPage"
+			:loading="loadingNpcs"
+		>
+			<template slot="index" slot-scope="data">
+                {{ data.index }}
             </template>
 
-            <template slot="name" slot-scope="data">
-                <a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
+			<template slot="name" slot-scope="data">
+				<a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
                     {{ data.item.name }}
                 </a>
-            </template>
-
-            <!-- ACTIONS -->
-            <div slot="actions" slot-scope="data" class="p-0">
+			</template>
+			
+			<!-- ACTIONS -->
+			<div slot="actions" slot-scope="data">
                 <div class="monster-actions">
                     <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
                     <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
@@ -72,11 +71,11 @@
                 </div>
             </div>
 
-            <!-- LOADER -->
-            <div slot="table-busy" class="loader">
-                <span>Loading monsters....</span>
-            </div>
-        </b-table>
+			<!-- LOADER -->
+			<div slot="table-loading" class="loader">
+				<span>Loading monsters...</span>
+			</div>
+		</HKtable>
         <b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
     </div>
 </template>
@@ -85,12 +84,16 @@
     import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	
-	import { dice } from '@/mixins/dice.js'
-	import { general } from '@/mixins/general.js'
+	import { dice } from '@/mixins/dice.js';
+	import { general } from '@/mixins/general.js';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Entities',
 		mixins: [general, dice],
+		components: {
+			HKtable
+		},
 		data() {
 			return {
                 campaignId: this.$route.params.campid,
@@ -113,23 +116,24 @@
 				],
 				typeFilter: [],
 				monsterFields: {
-					'index': {
-						label: '#'
-					},
 					name: {
 						label: 'Name',
+						truncate: true,
 						sortable: true
 					},
 					type: {
 						label: 'Type',
+						truncate: true,
 						sortable: true
 					},
 					challenge_rating: {
 						label: 'CR',
-						sortable: true
+						sortable: true,
+						maxContent: true
 					},
 					'actions': {
-						label: ''
+						label: '',
+						noPadding: true
 					}
 				},
 			} 
@@ -325,6 +329,8 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 .monster-actions {
 	display: flex;
 	justify-content: flex-end;
+	height: 46px;
+	padding: 8px 10px 8px 0;
 	
 	a {
 		line-height: 30px;

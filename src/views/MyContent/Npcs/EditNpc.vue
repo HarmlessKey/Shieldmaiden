@@ -241,7 +241,7 @@
 						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</b-col>
 					<b-col class="col" v-if="quick == false">
-						<label for="hitdice">Hit Dice</label>
+						<label for="hitdice">Hit Dice ({{ hitDiceStr(npc) }})</small></label>
 						<b-form-input autocomplete="off" 
 							v-b-tooltip.hover title="Hit Dice"
 							type="text" 
@@ -525,9 +525,12 @@
 
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
+	import { general } from '@/mixins/general.js'
+
 
 	export default {
 		name: 'Npcs',
+		mixins: [general],
 		metaInfo: {
 			title: 'NPC\'s'
 		},

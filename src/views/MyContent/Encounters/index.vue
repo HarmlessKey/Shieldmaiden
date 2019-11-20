@@ -478,7 +478,7 @@
 						delete entity.transformed
 						delete entity.stabilized
 						delete entity.down
-						delete entity.ac_bonuc
+						delete entity.ac_bonus
 						delete entity.meters
 						delete entity.hidden
 

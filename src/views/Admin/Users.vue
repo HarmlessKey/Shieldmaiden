@@ -54,7 +54,7 @@
 				<span slot="patreon" slot-scope="data" v-if="data.item">
 					<span v-if="data.item === 'Expired'" class="red">{{ data.item }}</span>
 					<i 
-						v-else
+						v-else-if="data.item"
 						v-for="tier in data.item"
 						:key="tier"
 						class="fab fa-patreon"

@@ -56,6 +56,7 @@
 						</a>
 					</div>
 				</HKtable>
+
 				<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
 					<div 
 						class="openSlot"
@@ -69,7 +70,7 @@
 					</div>
 				</template>
 				<template v-if="slotsLeft <= 0">
-					<div class="openSlot">
+					<div class="openSlot none">
 						<span class="red">No player slots left. </span>
 						Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
 					</div>
@@ -224,6 +225,11 @@
 			line-height: 46px;
 			border: dashed 1px #5c5757;
 			margin-top: 1px;
+
+			&.none {
+				display: block;
+				text-align: center;
+			}
 		}
 	}
 

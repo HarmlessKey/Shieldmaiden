@@ -64,7 +64,9 @@
 		}
 	},
 	mounted() {
-		this.checkUserStatus();
+		if(auth.currentUser !== null) {
+			this.checkUserStatus();
+		}
 	},
 	beforeDestroy() {
 		this.stopBroadcast();

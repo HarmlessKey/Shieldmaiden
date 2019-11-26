@@ -359,4 +359,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 	text-align: center;
 	margin-left: 4px;
 }
+.hk-table {
+	margin-bottom: 30px;
+}
 </style>

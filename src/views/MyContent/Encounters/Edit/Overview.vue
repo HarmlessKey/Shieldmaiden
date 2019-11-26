@@ -273,6 +273,9 @@
             padding: 15px 10px 30px 10px;
             width: calc(100% - 5px) !important;
         }
+    }
+    .hk-table {
+		margin-bottom: 30px;
 	}
 }
 @media only screen and (max-width: 767px) {

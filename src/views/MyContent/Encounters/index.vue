@@ -435,6 +435,9 @@
 			margin-bottom: 5px;
 		}
 	}
+	.hk-table {
+		margin-bottom: 30px;
+	}
 }
 
 .actions {

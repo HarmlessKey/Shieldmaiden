@@ -204,6 +204,9 @@
 			content: '';
 		}
 	}
+	.hk-table {
+		margin-bottom: 30px;
+	}
 }
 
 </style>

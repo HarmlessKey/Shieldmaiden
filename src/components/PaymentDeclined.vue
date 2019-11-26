@@ -29,10 +29,10 @@
             ...mapGetters([
 				'userInfo',
             ]),
-            patron() {
+            async patron() {
                 if(this.userInfo) {
                     let patron_data
-                    var patron = db.ref(`new_patrons`).orderByChild('email').equalTo(this.userInfo.email)
+                    var patron = await db.ref(`new_patrons`).orderByChild('email').equalTo(this.userInfo.email)
                     patron.on('value', (snapshot) => {
                         for(let key in snapshot.val()) {
                             patron_data = snapshot.val()[key];

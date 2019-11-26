@@ -2,7 +2,7 @@
 	<div id="app" class="container-fluid">
 		<div>
 			<nav-main/>
-			<PaymentDeclined />
+			<PaymentDeclined v-if="user !== null" />
 			<router-view/>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	

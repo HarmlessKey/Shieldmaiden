@@ -75,110 +75,11 @@
 					</div>
 				</template>
 			</template>
-			
-			<!-- 
-				<table class="table mb-5">
-					<thead>
-						<th></th>
-						<th class="n">#</th>
-						<th>Character name</th>
-						<th class="d-none d-md-table-cell">Player name</th>
-						<th>Level</th>
-						<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-					</thead>
-					<tbody name="table-row" 
-						is="transition-group"
-						enter-active-class="animated flash"
-						leave-active-class="animated bounceOutLeft">
-						<tr v-for="(player, index) in _players" :key="player.key">
-							<td class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
-							<td class="img" v-else>
-								<img src="@/assets/_img/styles/player.svg" />
-							</td>
-							<td class="n">{{ index + 1 }}</td>
-							<td>
-								<router-link class="mx-2" 
-									:to="'/players/' + player.key" 
-									v-b-tooltip.hover title="Edit">{{ player.character_name }}
-								</router-link>
-							</td>
-							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
-							<td>{{ player.level ? player.level : calculatedLevel(player.experience) }}</td>
-							<td class="align-middle p-0">
-								<div class="d-flex justify-content-end">
-									<div class="d-flex justify-content-end actions">
-										<router-link class="gray-hover mx-1" 
-											:to="'/players/' + player.key" 
-											v-b-tooltip.hover title="Edit">
-											<i class="fas fa-pencil"></i>
-										</router-link>
-										<a v-b-tooltip.hover 
-											title="Delete" 
-											class="gray-hover"
-											@click="confirmDelete(player.key, player.player, player.control)">
-												<i class="fas fa-trash-alt"></i>
-										</a>
-									</div>
-									<span class="dropleft d-sm-none actions-dropdown">
-										<a class="options"
-											id="options"
-											data-toggle="dropdown" 
-											aria-haspopup="true" 
-											aria-expanded="false">
-											<i class="far fa-ellipsis-v"></i>
-										</a>
-										<div class="dropdown-menu" aria-labelledby="options">	
-											<router-link class="gray-hover mx-1 dropdown-item" 
-												:to="'/players/' + player.key" 
-												v-b-tooltip.hover title="Edit">
-													<i class="fas fa-pencil"></i> Edit player
-											</router-link>
-											<a v-b-tooltip.hover 
-												title="Delete" 
-												class="gray-hover dropdown-item"
-												@click="confirmDelete(player.key, player.player, player.control)">
-													<i class="fas fa-trash-alt"></i> Delete player
-											</a>
-										</div>
-									</span>
-								</div>
-							</td>
-						</tr>
-
-						<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-							<tr 
-								class="openSlot"
-								v-for="index in slotsLeft"
-								:key="'open-slot-' + index"
-							>
-								<td colspan="6">
-									<div class="slot">
-										<span>Open player slot</span>
-										<router-link v-if="!overencumbered" to="/players/add-player">
-											<i class="fas fa-plus green"></i>
-										</router-link>
-									</div>
-								</td>
-							</tr>
-						</template>
-						<template v-if="slotsLeft <= 0">
-							<tr class="openSlot" key="no-slots">
-								<td colspan="6">
-									<div class="text-center">
-										<span class="red">No player slots left. </span>
-										Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
-									</div>
-								</td>
-							</tr>
-						</template>
-					</tbody>
-				</table>
-			</template> -->
-			<h2 v-else-if="players === null" class="mt-4 px-2 d-flex justify-content-between">
-				<i class="fas fa-arrow-up gray-hover"></i> 
-				Add your first player 
-				<i class="fas fa-arrow-up gray-hover"></i>
-			</h2>
+			<h3 v-else-if="players === null" class="mt-4">
+				<router-link v-if="!overencumbered" to="/players/add-player">
+					<i class="fas fa-plus green"></i> Create your first player
+				</router-link>
+			</h3>
 		</div>
 	</div>
 </template>

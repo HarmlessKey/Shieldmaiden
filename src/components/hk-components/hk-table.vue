@@ -233,12 +233,13 @@
 			&.hk-table-column-sortable {
 				cursor: pointer;
 				display: flex;
-				justify-content: space-between;
+				justify-content: flex-start;
 
 				.sort {
-					width: 15px;
+					width: 25px;
 					position: relative;
 					color: #494747;
+
 
 					.fas {
 						position: absolute;

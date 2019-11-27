@@ -121,7 +121,7 @@
 					},
 					level: {
 						label: 'Level',
-						center: true,
+						// center: true,
 						sortable: true,
 					},
 					actions: {

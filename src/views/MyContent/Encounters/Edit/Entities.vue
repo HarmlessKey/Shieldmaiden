@@ -30,23 +30,13 @@
         <!-- MONSTERS -->
 		<h3>NPC's</h3>
 
-        <div class="d-flex justify-content-between">
-            <div class="input-group mb-3">
-                <input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-                <div class="input-group-append">
-                    <button class="btn"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monsters found</span>
-
 		<HKtable 
 			:items="searchResults"
 			:columns="monsterFields"
 			:perPage="15"
             :currentPage="currentPage"
 			:loading="loadingNpcs"
+			:search="['name', 'type']"
 		>
 			<template slot="name" slot-scope="data">
 				<a @click="setSlide({show: true, type: 'ViewEntity', data: data.row })" :class="{ 'green': data.row.custom}">

@@ -29,6 +29,8 @@
 				<HKtable
 					:columns="columns"
 					:items="_npcs"
+					:perPage="20"
+					:search="['name', 'type']"
 				>
 					<template slot="avatar" slot-scope="data">
 						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>

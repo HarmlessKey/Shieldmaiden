@@ -189,6 +189,7 @@
 				}
 			},
 			searchData() {
+				this.currentPage = 1
 				const vm = this;
 				let searchTerm = this.searched.toLowerCase();
 				

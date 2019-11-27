@@ -57,7 +57,7 @@
 			<!-- ACTIONS -->
 			<div slot="actions" slot-scope="data">
                 <div class="monster-actions">
-                    <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
+                    <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.row['.key']]" />
                     <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
                         <i class="fas fa-plus"></i>
                     </a>
@@ -198,7 +198,7 @@
 					this.searching = false
 				}
 			},
-            multi_add(id,type,name,custom=false,rollHp=false) {
+			multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
 				}
@@ -207,7 +207,7 @@
 				}
 				this.to_add[id] = 1
             },
-            add(id, type, name, custom = false, rollHp = false) {
+      add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
 					id: id,
 					name: name,

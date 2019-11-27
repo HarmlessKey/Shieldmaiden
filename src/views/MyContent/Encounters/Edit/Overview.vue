@@ -45,7 +45,8 @@
                 <template v-if="encounter">
                     <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
 
-                    <HKtable 
+                    <HKtable
+                        class="mb-4" 
                         :items="_friendlies"
                         :columns="entityColumns"
                         :showHeader="false"
@@ -274,9 +275,6 @@
             width: calc(100% - 5px) !important;
         }
     }
-    .hk-table {
-		margin-bottom: 30px;
-	}
 }
 @media only screen and (max-width: 767px) {
 		h3.header {

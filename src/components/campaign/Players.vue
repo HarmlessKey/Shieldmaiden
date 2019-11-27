@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<HKtable 
+		<HKtable
+			class="mb-4"
 			:items="campaignPlayers"
 			:columns="columns"
 		>	

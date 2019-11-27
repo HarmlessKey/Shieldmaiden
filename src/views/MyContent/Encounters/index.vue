@@ -63,6 +63,7 @@
 
 						<!-- ACTIVE ENCOUNTERS -->
 						<HKtable
+							class="mb-4"
 							:items="_active"
 							:columns="activeColumns"
 						>
@@ -112,7 +113,7 @@
 							<HKtable
 								:items="_finished"
 								:columns="finishedColumns"
-								:perPage="3"
+								:perPage="6"
 								:currentPage="currentPage"
 							>
 								<template slot="encounter" slot-scope="data">
@@ -132,7 +133,6 @@
 								</template>
 							</HKtable>
 
-							<b-pagination v-if="Object.keys(_finished).length > 3" align="center" :total-rows="Object.keys(_finished).length" v-model="currentPage" :per-page="3" />
 						</template>
 						
 						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
@@ -434,9 +434,6 @@
 		h3 {
 			margin-bottom: 5px;
 		}
-	}
-	.hk-table {
-		margin-bottom: 30px;
 	}
 }
 

@@ -132,7 +132,6 @@
 				online: {
 					source: db.ref('status').orderByChild('state').equalTo('online'),
 				},
-				campaigns: db.ref('users'),
 				tiers: {
 					source: db.ref('tiers'),
 					asObject: true,

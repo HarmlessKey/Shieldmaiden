@@ -10,23 +10,12 @@
 				</template>
 			</h1>
 
-			<b-input-group class="mb-3">
-				<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search users" />
-				<b-input-group-append>
-					<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
-				</b-input-group-append>
-			</b-input-group>
-
-
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} users found</p>
-
 			<HKtable
-				:items="searchResults"
+				:items="users"
 				:columns="fields"
 				:perPage="15"
-				:currentPage="current"
 				:loading="isBusy"
+				:search="['username','email']"
 			>
 				<span slot="status" slot-scope="data">
 					<template v-if="data.item === 'online'">
@@ -75,7 +64,6 @@
 				</div>
 			</HKtable>
 		
-			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
 		</template>
 
 		<!-- SHOW USER -->
@@ -106,7 +94,6 @@
 			return {
 				id: this.$route.params.id,
 				users: undefined,
-				current: 1,
 				fields: {
 					status: {
 						maxContent: true,
@@ -137,10 +124,6 @@
 						sortable: true
 					}
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
 				isBusy: true,
 			}
 		},
@@ -197,8 +180,7 @@
 							}
 						});
 					}
-					this.users = users;
-					this.searchResults = Object.values(users);
+					this.users = Object.values(users);
 					this.isBusy = false
 				});
 
@@ -208,29 +190,6 @@
 			...mapActions([
 				'setSlide'
 			]),
-			searchCondition() {
-				this.current = 1;
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.users) {
-					var u = this.users[i]
-					if(u.username) { 
-						if ((u.username.toLowerCase().includes(this.search.toLowerCase()) || 
-							u.email.toLowerCase().includes(this.search.toLowerCase())) 
-							&& this.search != '') {
-							this.noResult = ''
-							this.searchResults.push(u)
-						}
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = Object.values(this.users);
-					this.searching = false
-				}
-			}
 		}
 	}
 </script>

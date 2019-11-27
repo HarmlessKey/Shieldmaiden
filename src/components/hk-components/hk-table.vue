@@ -8,7 +8,7 @@
                     <button class="btn"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-			<span v-if="searched !== undefined && searched !== ''" class="green" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</span>
+			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
         </div>
 
 		<!-- TABLE -->
@@ -195,6 +195,10 @@
 				let results = this.items.filter( function(row) {
 					for (let i in vm.search) {
 						let key = vm.search[i];
+						// If field is undefined don't return row
+						if (row[key] == undefined) {
+							return
+						}
 						if (row[key].toLowerCase().includes(searchTerm)){
 							return row;
 						}
@@ -255,6 +259,9 @@
 				}
 			}
 		}
+	}
+	.result-count {
+		margin-bottom: 10px;
 	}
 	.pagination {
 		margin-top: 20px;

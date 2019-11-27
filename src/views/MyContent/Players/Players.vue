@@ -29,6 +29,7 @@
 				<HKtable
 					:columns="columns"
 					:items="_players"
+					:search="['character_name']"
 				>
 					<template slot="avatar" slot-scope="data">
 						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
@@ -115,11 +116,13 @@
 					},
 					character_name: {
 						label: 'Character Name',
-						truncate: true
+						truncate: true,
+						sortable: true,
 					},
 					level: {
 						label: 'Level',
 						center: true,
+						sortable: true,
 					},
 					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',

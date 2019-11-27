@@ -1,5 +1,5 @@
 <template>
-    <div v-if="searchResults">
+    <div v-if="monsters">
         <h3>Players</h3>
 
         <!-- PLAYERS -->
@@ -31,10 +31,9 @@
 		<h3>NPC's</h3>
 
 		<HKtable 
-			:items="searchResults"
+			:items="monsters"
 			:columns="monsterFields"
 			:perPage="15"
-            :currentPage="currentPage"
 			:loading="loadingNpcs"
 			:search="['name', 'type']"
 		>
@@ -62,7 +61,6 @@
 				<span>Loading monsters...</span>
 			</div>
 		</HKtable>
-        <b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
     </div>
 </template>
 
@@ -84,22 +82,13 @@
 			return {
                 campaignId: this.$route.params.campid,
                 encounterId: this.$route.params.encid,
-                user: this.$store.getters.getUser,
-                currentPage: 1,
+				user: this.$store.getters.getUser,
+				monsters: undefined,
                 loadingNpcs: true,
-                search: '',
-				searchResults: [],
-				noResult: '',
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
-				searching: false,
                 to_add: {},
-				monsterTypes: [
-					"aberration",
-					"beast",
-					"undead"
-				],
 				typeFilter: [],
 				monsterFields: {
 					name: {
@@ -151,8 +140,7 @@
 						monsters.push(customNpcs[key]);
 					}
 				});
-				this.searchResults = Object.values(monsters);
-				this.monsters = monsters;
+				this.monsters = Object.values(monsters);
 				this.loadingNpcs = false;
 			});
         },
@@ -170,24 +158,6 @@
                 'fetchCampaign',
                 'setSlide'
 			]),
-			searchNPC() {
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = Object.values(this.monsters);
-					this.searching = false
-				}
-			},
 			multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
@@ -197,7 +167,7 @@
 				}
 				this.to_add[id] = 1
             },
-      add(id, type, name, custom = false, rollHp = false) {
+     		add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
 					id: id,
 					name: name,

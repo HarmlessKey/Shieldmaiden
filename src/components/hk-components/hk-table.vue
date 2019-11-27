@@ -76,6 +76,15 @@
 				Loading data...
 			</slot>
 		</div>
+
+		<b-pagination 
+			class="pagination"
+			v-if="!loading && Object.keys(dataItems).length > perPage" 
+			align="center" 
+			:total-rows="Object.keys(dataItems).length" 
+			v-model="currentPage" 
+			:per-page="perPage"
+		/>
 	</div>
 </template>
 
@@ -101,10 +110,6 @@
 				type: Number,
 				default: undefined
 			},
-			currentPage: {
-				type: Number,
-				default: 1
-			},
 			loading: {
 				type: Boolean,
 				default: false
@@ -119,7 +124,8 @@
 				reverse: true,
 				sortedBy: undefined,
 				data: undefined,
-				searched: undefined
+				searched: undefined,
+				currentPage: 1
 			}
 		},
 		computed: {
@@ -248,5 +254,8 @@
 				}
 			}
 		}
+	}
+	.pagination {
+		margin-top: 20px;
 	}
 </style>

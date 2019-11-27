@@ -11,78 +11,57 @@
 
 		<b-row>
 			<b-col md="8">
-				<b-row>
-					<b-col sm="8">
-						<b-input-group class="mb-3">
-							<input class="form-control" type="text" autocomplete="off" v-model="search" @keyup="searchCondition()" placeholder="Search patrons" />
-							<b-input-group-append>
-								<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
-							</b-input-group-append>
-						</b-input-group>
-					</b-col>
-					<b-col class="text-right">
-						<h2>{{ Object.keys(patrons).length }} patrons.</h2>
-					</b-col>
-				</b-row>
-
-				<p v-if="noResult" class="red">{{ noResult }}</p>
-				<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} patrons found</p>
 
 				<div class="table-responsive">
-					<b-table 
-						:busy="isBusy"
-						:items="searchResults" 
-						:fields="fields"
-						:per-page="15"
-						:current-page="current"
-					>	
-						<template slot="index" slot-scope="data">
-							{{ data.index + 1 }}
-						</template>
-
+					<HKtable
+						:items="patrons"
+						:columns="fields"
+						:perPage="15"
+						:loading="isBusy"
+						:search="['full_name', 'email']"
+					>
 						<!-- EMAIL -->
-						<router-link :to="'/admin/patrons/' + data.item['.key']" slot="email" slot-scope="data">{{ data.value }}</router-link>
+						<router-link :to="'/admin/patrons/' + data.row['.key']" slot="email" slot-scope="data">{{ data.item }}</router-link>
 
 						<!-- TIER -->
 						<span slot="tiers" slot-scope="data">
-							<span 
-								v-for="(tier, key) in data.value"
+							<i 
+								v-for="(tier, key) in data.item"
 								v-if="tiers[key]"
 								:key="tier"
-								class="tiers"
+								class="fab fa-patreon"
 								:class="{
 									'blue': tiers[key].name == 'Folk Hero',
 									'purple': tiers[key].name == 'Noble',
 									'orange': tiers[key].name == 'Deity'
-								}">{{ tiers[key].name }}</span>
+								}"></i>
 						</span>
 
 						<!-- END DATE -->"
 						<span slot="pledge_end" slot-scope="data">
-							<span :class="{'red': new Date(data.value) < new Date() }">
-								{{ makeDate(data.value) }}
+							<span :class="{'red': new Date(data.item) < new Date() }">
+								{{ makeDate(data.item, false, true) }}
 							</span>
 						</span>
 
 						<!-- STATUS -->
 						<span slot="last_charge_status" slot-scope="data">
-							<i :class="{'green fas fa-check': data.value == 'Paid', 'red fas fa-times': data.value == 'Declined' }">
+							<i :class="{'green fas fa-check': data.item == 'Paid', 'red fas fa-times': data.item == 'Declined' }">
 							</i>
 						</span>
 
 						<!-- LIFETIME SUPPORT -->
 						<span slot="lifetime_support" slot-scope="data">
-								{{ data.value / 100 | numeral('$0,0') }}
+								{{ data.item / 100 | numeral('$0,0') }}
 						</span>
 
 						<!-- LOADER -->
-						<div slot="table-busy" class="loader">
+						<div slot="table-loading" class="loader">
 							<span>Loading patrons....</span>
 						</div>
-					</b-table>
+					</HKtable>
 				</div>
-			
-				<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
+	
 			</b-col>
 			<b-col md="4">
 				<Notifications />
@@ -98,18 +77,20 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import Patron from '@/components/Admin/Patrons/Patron.vue'
-	import Notifications from '@/components/Admin/Patrons/Notifications.vue'
-	import { general } from '@/mixins/general.js'
+	import { db } from '@/firebase';
+	import Crumble from '@/components/crumble/Compendium.vue';
+	import Patron from '@/components/Admin/Patrons/Patron.vue';
+	import Notifications from '@/components/Admin/Patrons/Notifications.vue';
+	import { general } from '@/mixins/general.js';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Patrons',
 		components: {
 			Crumble,
 			Patron,
-			Notifications
+			Notifications,
+			HKtable
 		},
 		mixins: [general],
 		metaInfo: {
@@ -118,17 +99,14 @@
 		data() {
 			return {
 				id: this.$route.params.id,
-				current: 1,
 				fields: {
-					'index': {
-						label: '#'
-					},
 					full_name: {
 						label: 'Name',
 						sortable: true
 					},
 					email: {
 						label: 'Email',
+						truncate: true,
 						sortable: true
 					},
 					pledge_end: {
@@ -136,21 +114,19 @@
 						sortable: true
 					},
 					tiers: {
-						label: 'Tier'
+						label: '<i class="fab fa-patreon"></i>',
+						maxContent: true
 					},
 					last_charge_status: {
-						label: 'Last Charge',
+						label: '<i class="fas fa-file-invoice-dollar"></i>',
+						maxContent: true,
 						sortable: true
 					},
 					lifetime_support: {
-						label: 'Lifetime',
+						maxContent: true,
 						sortable: true
 					}
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
 				isBusy: true,
 			}
 		},
@@ -166,30 +142,6 @@
 				}
 			}
 		},
-		beforeMount() {
-			this.searchResults = this.patrons
-		},
-		methods: {
-			searchCondition() {
-				this.current = 1;
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.patrons) {
-					var u = this.patrons[i]
-					if (u.email.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(u)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = this.patrons
-					this.searching = false
-				}
-			}
-		}
 	}
 </script>
 
@@ -205,6 +157,9 @@
 		&:last-child::after {
 			content: '';
 		}
+	}
+	.hk-table {
+		margin-bottom: 30px;
 	}
 }
 

@@ -7,23 +7,38 @@
 				'side-collapsed': $store.getters.side_collapsed && !small_screen
 			}">
 			<div>
-				<h3>DM Content</h3>
+				<template v-if="$store.getters.getUser">
+					<h3>DM Content</h3>
+					<b-list-group>
+						<b-list-group-item>
+							<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
+						</b-list-group-item>
+						<b-list-group-item>
+							<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
+						</b-list-group-item>
+						<b-list-group-item>
+							<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
+						</b-list-group-item>
+					</b-list-group>
+					<hr>
+					<h3>Player Content</h3>
+					<b-list-group>
+						<b-list-group-item>
+							<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
+						</b-list-group-item>
+					</b-list-group>
+					<hr>
+				</template>
+				<h3>Links</h3>
 				<b-list-group>
 					<b-list-group-item>
-						<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
+						<router-link to="/compendium"><i class="fas fa-book-spells"></i><span>Compendium</span></router-link>
 					</b-list-group-item>
 					<b-list-group-item>
-						<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
+						<router-link to="/feedback"><i class="fas fa-comment-alt"></i><span>Feedback</span></router-link>
 					</b-list-group-item>
 					<b-list-group-item>
-						<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
-					</b-list-group-item>
-				</b-list-group>
-				<hr>
-				<h3>Player Content</h3>
-				<b-list-group>
-					<b-list-group-item>
-						<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
+						<router-link to="/documentation"><i class="fas fa-file"></i><span>Documentation</span></router-link>
 					</b-list-group-item>
 				</b-list-group>
 			</div>

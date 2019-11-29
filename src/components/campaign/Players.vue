@@ -1,125 +1,61 @@
 <template>
 	<div>
-		<table class="table table-hover" v-if="players && campaign">
-			<thead>
-				<th></th>
-				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
-				<th class="name"></th>
-				<th class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
-					<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
-				</th>
-				<th class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
-					<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
-				</th>
-				<th class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
-					<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
-				</th>
-				<th class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-					<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
-				</th>
-				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
-				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-			</thead>
-			<tbody
-				name="table-row" 
-				is="transition-group" 
-				enter-active-class="animated flash" 
-				leave-active-class="animated bounceOutLeft">
-				<tr v-for="(player, key) in campaign.players" :key="key">
-					<td class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
-					<td class="img" v-else>
-						<img src="@/assets/_img/styles/player.svg" />
-					</td>
-					<td class="ac">
-						<span :class="{ 
-								'green': player.ac_bonus > 0, 
-								'red': player.ac_bonus < 0 
-							}" 
-							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
-							{{ players[key].ac + player.ac_bonus }}
-						</span>
-						<span v-else class="ac">{{ players[key].ac }}</span>
-					</td>
-					<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
-					<td class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
-						{{ players[key].passive_perception }}
-					</td>
-					<td class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
-						{{ players[key].passive_investigation }}
-					</td>
-					<td class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
-						{{ players[key].passive_insight }}
-					</td>
-					<td class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-						{{ players[key].spell_save_dc }}
-					</td>
-					<td>
-						<span class="current" :class="{ 
-							'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
-							'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
-							'green': true
-							}">{{ player.curHp }}</span>
-							<span class="gray-hover">/</span>
-							<span :class="{ 
-									'green': player.maxHpMod > 0, 
-									'red': player.maxHpMod < 0 
-								}" 
-								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-								{{ maxHp(players[key].maxHp, player.maxHpMod) }}
-							</span>
-							<span v-else>{{ players[key].maxHp }}</span>
-							<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
-					</td>
+		<HKtable
+			class="mb-4"
+			:items="campaignPlayers"
+			:columns="columns"
+		>	
+			<template slot="image" slot-scope="data">
+				<div class="image" v-if="players[data.row.key].avatar" :style="{ backgroundImage: 'url(\'' + players[data.row.key].avatar + '\')' }"></div>
+				<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+			</template>
 
-					<!-- ACTIONS -->
-					<td class="align-middle p-0">
-						<div class="d-flex justify-content-end">
-							<div class="d-flex justify-content-end actions">
-								<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
-									@click="setSlide({
-										show: true,
-										type: 'slides/EditPlayer',
-										data: { key: key, location: 'overview',}
-									})">
-									<i class="fas fa-pencil"></i>
-								</a>
-							</div>
-							<span class="dropleft d-sm-none actions-dropdown">
-								<a class="options"
-									id="options"
-									data-toggle="dropdown" 
-									aria-haspopup="true" 
-									aria-expanded="false">
-									<i class="far fa-ellipsis-v"></i>
-								</a>
-								<div class="dropdown-menu" aria-labelledby="options">	
-									<a class="gray-hover dropdown-item" v-b-tooltip.hover title="Edit player" 
-										@click="setSlide({
-											show: true,
-											type: 'slides/EditPlayer',
-											data: { key: key, location: 'overview',}
-										})">
-										<i class="fas fa-pencil"></i> Edit player
-									</a>
-								</div>
-							</span>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<div v-else class="loader"><span>Loading Players...</span></div>
+			<template slot="maxHp" slot-scope="data">
+				<span class="current" :class="{ 
+					'red': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) <= 33, 
+					'orange': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) > 33 && percentage(data.row.curHp, players[data.row.key].maxHp) <= 76, 
+					'green': true
+				}">
+					{{ data.row.curHp }}
+				</span>
+				<span class="gray-hover">/</span>
+				<span :class="{ 
+						'green': data.row.maxHpMod > 0, 
+						'red': data.row.maxHpMod < 0 
+					}" 
+					v-b-tooltip.hover :title="'Max HP + ' + data.row.maxHpMod" v-if="data.row.maxHpMod">
+					{{ maxHp(players[data.row.key].maxHp, data.row.maxHpMod) }}
+				</span>
+				<span v-else>{{ players[data.row.key].maxHp }}</span>
+				<span v-if="data.row.tempHp" class="gray-hover">+{{ data.row.tempHp }}</span>
+			</template>
+
+			<div slot="actions" slot-scope="data" class="actions">
+				<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
+					@click="setSlide({
+						show: true,
+						type: 'slides/EditPlayer',
+						data: { key: data.item.key, location: 'overview'}
+					})">
+					<i class="fas fa-pencil"></i>
+				</a>
+			</div>
+		</HKtable>
 
 		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 	</div>
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Players',
+		components: {
+			HKtable
+		},
 		data() {
 			return {
 				user: this.$store.getters.getUser,
@@ -140,6 +76,80 @@
 				'players',
 				'playerInCampaign',
 			]),
+			campaignPlayers() {
+				let players = [];
+
+				for(let key in this.campaign.players) {
+					let player = this.campaign.players[key];
+					player.key = key;
+					player.name = this.players[key].character_name;
+					player.ac = this.players[key].ac;
+					player.maxHp = this.players[key].maxHp;
+					player.passive_perception = this.players[key].passive_perception;
+					player.passive_investigation = this.players[key].passive_investigation;
+					player.passive_insight = this.players[key].passive_insight;
+					player.spell_save_dc = this.players[key].spell_save_dc;
+					
+					
+					players.push(player)
+				}
+
+				return players;
+			},
+			columns() {
+				let columns = {
+					image: {
+                        width: 46,
+                        noPadding: true
+					},
+					ac: {
+						label: '<i class="fas fa-shield"></i>',
+						center: true,
+						maxContent: true
+					},
+					name: {
+						truncate: true
+                    },
+				}
+
+				if(this.settings.passive_perception === undefined) {
+					columns.passive_perception = {
+						label: '<i class="fas fa-eye"></i>',
+						maxContent: true
+					}
+				}
+				if(this.settings.passive_investigation === undefined) {
+					columns.passive_investigation = {
+						label: '<i class="fas fa-search"></i>',
+						maxContent: true
+					}
+				}
+				if(this.settings.passive_insight === undefined) {
+					columns.passive_insight = {
+						label: '<i class="fas fa-lightbulb-on"></i>',
+						maxContent: true
+					}
+				}
+				if(this.settings.save_dc === undefined) {
+					columns.spell_save_dc = {
+						label: '<i class="fas fa-hand-holding-magic"></i>',
+						maxContent: true
+					}
+				}
+
+				columns.maxHp = {
+					label: '<i class="fas fa-heart"></i>',
+					maxContent: true
+				}
+				columns.actions = {
+					label: '<i class="far fa-ellipsis-h"></i>',
+					noPadding: true,
+					right: true,
+					maxContent: true
+                };
+
+				return columns;
+			}
 		},
 		mounted() {
 			this.fetchCampaign({
@@ -172,26 +182,5 @@
 </script>
 
 <style lang="scss" scoped>
-	table {
-		// font-size: 12px;
 
-		tr {
-			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins, th.save {
-				text-align: center;
-				width: 20px;
-			}
-			th.ac, td.ac {
-				padding-right: 20px;
-			}
-			td.img {
-				background-color: #000 !important;
-			}
-			td.name {
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
-				max-width:0;
-			}
-		}
-	}
 </style>

@@ -218,7 +218,8 @@
 	position: relative;
 
 	span { 
-		color:#191919;
+		color:#e0e0e0;
+		font-weight: bold;
 		font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 		position: absolute;
 		left: 5px;

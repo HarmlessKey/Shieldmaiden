@@ -1,135 +1,114 @@
 <template>
-    <div v-if="searchResults">
-        <h3>Players</h3>
+	<div v-if="monsters">
+		<h3>Players</h3>
 
-        <!-- PLAYERS -->
-        <div class="players bg-gray mb-1" v-if="campaign.players">
-            <div v-for="(player, key) in campaign.players" 
-                :key="key"
-                @click="add(key, 'player', players[key].character_name)" 
-                v-b-tooltip.hover 
-                :title="'Add ' + players[key].character_name">
-                <div class="d-flex justify-content-left">
-                <template v-if="checkPlayer(key) < 0">
-                    <span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
-                    <span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
-                </template>
-                </div>
-            </div>
+		<!-- PLAYERS -->
+		<div class="players bg-gray mb-1" v-if="campaign.players">
+			<div v-for="(player, key) in campaign.players" 
+			:key="key"
+			@click="add(key, 'player', players[key].character_name)" 
+			v-b-tooltip.hover 
+			:title="'Add ' + players[key].character_name">
+			<div class="d-flex justify-content-left">
+				<template v-if="checkPlayer(key) < 0">
+					<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
+					<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+				</template>
+			</div>
+		</div>
 
-            <div v-if="campaign && campaign.players === undefined">
-                <h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
-                <p>Add players to your campaign first.</p>
-                <router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
-            </div>
-            <a v-else class="btn" @click="addAllPlayers()">Add all</a>
-        </div>
-        <p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
-		<hr>
+		<div v-if="campaign && campaign.players === undefined">
+			<h3 class="red"><i class="fas fa-users"></i> No Players Yet</h3>
+			<p>Add players to your campaign first.</p>
+			<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
+		</div>
+		<a v-else class="btn" @click="addAllPlayers()">Add all</a>
+	</div>
+	<p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
+	<hr>
 
-        <!-- MONSTERS -->
-		<h3>NPC's</h3>
+	<!-- MONSTERS -->
+	<h3>NPC's</h3>
 
-        <div class="d-flex justify-content-between">
-            <div class="input-group mb-3">
-                <input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-                <div class="input-group-append">
-                    <button class="btn"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-        </div>
+	<HKtable 
+	:items="monsterArray"
+	:columns="monsterFields"
+	:perPage="15"
+	:loading="loadingNpcs"
+	:search="['name', 'type']"
+	>
+	<template slot="name" slot-scope="data">
+		<a @click="setSlide({show: true, type: 'ViewEntity', data: data.row })" :class="{ 'green': data.row.custom}">
+			{{ data.item }}
+		</a>
+	</template>
 
-        <span v-if="searching && searchResults" class="green" :class="{'red': Object.keys(searchResults).length === 0}">{{ Object.keys(searchResults).length }} monstetrs found</span>
+	<!-- ACTIONS -->
+	<div slot="actions" slot-scope="data">
+		<div class="monster-actions">
+			<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.row['.key']]" />
+			<a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
+				<i class="fas fa-plus"></i>
+			</a>
+			<a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
+				<i class="fas fa-dice-d20"></i>
+			</a>
+		</div>
+	</div>
 
-        <b-table 
-            class="table entities"
-            :busy="loadingNpcs"
-            :items="searchResults" 
-            :fields="monsterFields"
-            :per-page="15"
-            :current-page="currentPage"
-        >
-            <template slot="index" slot-scope="data">
-                {{ data.index + 1 }}
-            </template>
-
-            <template slot="name" slot-scope="data">
-                <a @click="setSlide({show: true, type: 'ViewEntity', data: data.item })" :class="{ 'green': data.item.custom}">
-                    {{ data.item.name }}
-                </a>
-            </template>
-
-            <!-- ACTIONS -->
-            <div slot="actions" slot-scope="data" class="p-0">
-                <div class="monster-actions">
-                    <b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.item['.key']]" />
-                    <a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom)">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                    <a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.item['.key'], 'npc', data.item.name, data.item.custom, true)">
-                        <i class="fas fa-dice-d20"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- LOADER -->
-            <div slot="table-busy" class="loader">
-                <span>Loading monsters....</span>
-            </div>
-        </b-table>
-        <b-pagination v-if="!loadingNpcs && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="currentPage" :per-page="15" />
-    </div>
+	<!-- LOADER -->
+	<div slot="table-loading" class="loader">
+		<span>Loading monsters...</span>
+	</div>
+</HKtable>
+</div>
 </template>
 
 <script>
-    import { db } from '@/firebase';
+	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	
-	import { dice } from '@/mixins/dice.js'
-	import { general } from '@/mixins/general.js'
+	import { dice } from '@/mixins/dice.js';
+	import { general } from '@/mixins/general.js';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Entities',
 		mixins: [general, dice],
+		components: {
+			HKtable
+		},
 		data() {
 			return {
-                campaignId: this.$route.params.campid,
-                encounterId: this.$route.params.encid,
-                user: this.$store.getters.getUser,
-                currentPage: 1,
-                loadingNpcs: true,
-                search: '',
-				searchResults: [],
-				noResult: '',
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+				user: this.$store.getters.getUser,
+				monsters: undefined,
+				loadingNpcs: true,
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
-				searching: false,
-                to_add: {},
-				monsterTypes: [
-					"aberration",
-					"beast",
-					"undead"
-				],
+				to_add: {},
 				typeFilter: [],
 				monsterFields: {
-					'index': {
-						label: '#'
-					},
 					name: {
 						label: 'Name',
+						truncate: true,
 						sortable: true
 					},
 					type: {
 						label: 'Type',
+						truncate: true,
 						sortable: true
 					},
 					challenge_rating: {
 						label: 'CR',
-						sortable: true
+						sortable: true,
+						maxContent: true
 					},
 					'actions': {
-						label: ''
+						label: '',
+						noPadding: true
 					}
 				},
 			} 
@@ -141,7 +120,7 @@
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-            })
+			})
 
 			//GET NPCS
 			var monsters = db.ref(`monsters`);
@@ -161,44 +140,26 @@
 						monsters.push(customNpcs[key]);
 					}
 				});
-				this.searchResults = Object.values(monsters);
+				this.monsterArray = Object.values(monsters);
 				this.monsters = monsters;
 				this.loadingNpcs = false;
 			});
-        },
-        computed: {
+		},
+		computed: {
 			...mapGetters([
 				'encounter',
 				'campaign',
 				'players',
 				'npcs',
-			]),
-        },
+				]),
+		},
 		methods: {
 			...mapActions([
 				'fetchEncounter',
-                'fetchCampaign',
-                'setSlide'
-			]),
-			searchNPC() {
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = Object.values(this.monsters);
-					this.searching = false
-				}
-			},
-            multi_add(id,type,name,custom=false,rollHp=false) {
+				'fetchCampaign',
+				'setSlide'
+				]),
+			multi_add(id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
 				}
@@ -206,8 +167,8 @@
 					this.add(id,type,name,custom,rollHp)
 				}
 				this.to_add[id] = 1
-            },
-            add(id, type, name, custom = false, rollHp = false) {
+			},
+			add(id, type, name, custom = false, rollHp = false) {
 				var entity = {
 					id: id,
 					name: name,
@@ -239,6 +200,7 @@
 					}
 					
 					if(custom == false) {
+						// console.log(this.monsters[id-1])
 						var npc_data = this.monsters[id];
 						entity.npc = 'api'
 						if(rollHp && npc_data.hit_dice) {
@@ -298,13 +260,13 @@
 						position: "centerTop"
 					});
 				}
-            },
+			},
 			addAllPlayers() {
 				for(let player in this.campaign.players) {
 					let name = this.players[player].character_name;
 					this.add(player, 'player', name)
 				}
-            },
+			},
 			checkPlayer(id) {
 				if(this.encounter.entities) {
 					return (Object.keys(this.encounter.entities).indexOf(id))
@@ -319,12 +281,14 @@
 <style lang="scss" scoped>
 // Remove arrows from number field
 input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+	-webkit-appearance: none;
+	margin: 0;
 }
 .monster-actions {
 	display: flex;
 	justify-content: flex-end;
+	height: 46px;
+	padding: 8px 10px 8px 0;
 	
 	a {
 		line-height: 30px;
@@ -356,5 +320,8 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 	height: 30px;
 	text-align: center;
 	margin-left: 4px;
+}
+.hk-table {
+	margin-bottom: 30px;
 }
 </style>

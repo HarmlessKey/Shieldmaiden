@@ -11,6 +11,12 @@ export const general = {
 				return 0;
 			}	
 		},
+		hitDiceStr(npc) {
+			let mod = this.calcMod(npc['constitution'])
+			let sign = (mod > 0) ? '+' : '';
+			let mod_str = mod ? mod : '';
+			return "" + npc.hit_dice + sign + mod_str;
+		},
 		percentage(current, max) {
 			var percentage = Math.floor(current / max * 100)
 			return percentage

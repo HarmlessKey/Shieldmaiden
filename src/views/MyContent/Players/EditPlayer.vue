@@ -230,7 +230,7 @@
 					</b-row>
 				</b-card>
 				
-				<router-link to="/players" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
+				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
 			</div>
@@ -372,7 +372,7 @@
 					this.$validator.validateAll().then((result) => {
 						if (result) {
 							db.ref('players/' + this.userId).push(this.player);
-							this.$router.replace('/players')
+							this.$router.replace(this.$route.meta.basePath)
 						}
 					})
 				}
@@ -383,7 +383,7 @@
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
-						this.$router.replace('/players')
+						this.$router.replace(this.$route.meta.basePath)
 					} else {
 						//console.log('Not valid');
 					}

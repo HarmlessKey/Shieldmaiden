@@ -37,7 +37,7 @@
 		// },
 		data() {
 			return {
-				collapsed: false,
+				collapsed: window.innerWidth < 1200,
 				man_col: false,
 				man_col_w: 0,
 			}
@@ -52,15 +52,11 @@
 		mounted() {
 			window.onresize = () => {
 				let medium = 1200
-				if (window.innerWidth < medium) {
-					if (!this.man_col || (this.man_col && this.man_col_w > medium)) {
-						this.collapsed = true;
-					}
+				if (!this.man_col && window.innerWidth < medium) {
+					this.collapsed = true;
 				}
-				if (window.innerWidth >= medium){
-					if (!this.man_col) {
-						this.collapsed = false;
-					}
+				if (!this.man_col && window.innerWidth >= medium){
+					this.collapsed = false;
 				}
 			}
 		}

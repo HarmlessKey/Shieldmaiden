@@ -61,12 +61,18 @@
 	position: relative;
 	padding-top:10px;
 	background: #262626;
+	transition: width 0.4s linear;
 	
 	.list-group-item {
 		padding: 0 !important;
+		overflow: hidden;
 
 		span { 
 			margin-left: 10px;
+		}
+		a {
+			width: 200px;
+			transition: padding-left 0.4s linear;
 		}
 		a.active {
 			i::before {
@@ -95,6 +101,7 @@
 		.list-group-item {
 			a {
 				padding-left: 6px;
+				margin-left: 0;
 			}
 		}
 

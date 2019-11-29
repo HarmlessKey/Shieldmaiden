@@ -7,6 +7,7 @@
 				'side-collapsed': $store.getters.side_collapsed && !small_screen
 			}">
 			<div>
+				<h3>DM Content</h3>
 				<b-list-group>
 					<b-list-group-item>
 						<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
@@ -15,10 +16,14 @@
 						<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
 					</b-list-group-item>
 					<b-list-group-item>
-						<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
-					</b-list-group-item>
-					<b-list-group-item>
 						<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
+					</b-list-group-item>
+				</b-list-group>
+				<hr>
+				<h3>Player Content</h3>
+				<b-list-group>
+					<b-list-group-item>
+						<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
 					</b-list-group-item>
 				</b-list-group>
 			</div>
@@ -75,6 +80,19 @@
 	transition: width 0.4s linear;
 	z-index: 98;
 	border-right: 1px solid #302f2f;
+
+	h3 {
+		padding-left: 10px;
+		text-transform: uppercase;
+		font-size: 13px;
+		font-weight: bold;
+		margin: 10px 0;
+		width: 250px;
+		color: #5c5757;
+	}
+	hr {
+		background-color: #302f2f;
+	}
 	
 	.list-group-item {
 		padding: 0 !important;
@@ -109,6 +127,10 @@
 	}
 	&.side-collapsed {
 		width: 45px;
+
+		h3 {
+			display: none;
+		}
 
 		.list-group-item {
 			a {

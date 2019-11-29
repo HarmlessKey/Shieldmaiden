@@ -2,6 +2,9 @@
 	<header>
 		<div id="header" class="d-flex justify-content-between">
 			<div>
+				<div class="menu" @click="setSideSmallScreen()">
+					<i class="fas fa-bars"></i>
+				</div>
 				<router-link to="/" class="logo d-flex justify-content-start">
 					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
@@ -71,7 +74,8 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'setSideSmallScreen'
 			]),
 			showSlide(type) {
 				this.setSlide({
@@ -90,11 +94,15 @@
 </script>
 
 <style lang="scss" scoped>
+.menu {
+	cursor: pointer;
+}
 .logo {
 	position: absolute;
 	left: 5px;
 	top: 5px;
 	height: 40px;
+	transition: position .4s linear;
 
 	.icon {
 		height: 40px;
@@ -158,5 +166,11 @@ a.user	{
 .dropdown-menu {
 	top: -2px !important;
 	left: 10px !important;
+}
+
+@media only screen and (max-width: 600px) {
+	.logo {
+		left: 30px;
+	}
 }
 </style>

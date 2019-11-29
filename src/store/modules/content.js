@@ -1,4 +1,5 @@
 import { db, auth } from '@/firebase'
+import Vue from 'vue'
 
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
@@ -28,6 +29,7 @@ export const content_module = {
 
 		poster: undefined,
 		side_collapsed: false,
+		side_small_screen: false
 
 	},
 	getters: {
@@ -75,6 +77,9 @@ export const content_module = {
 		},
 		side_collapsed: function( state ) {
 			return state.side_collapsed;
+		},
+		side_small_screen: function( state ) {
+			return state.side_small_screen;
 		}
 	},
 	mutations: {
@@ -218,9 +223,13 @@ export const content_module = {
 		CLEAR_ENCOUNTERS(state) {
 			state.encounters = {}
 		},
-		// SET_SIDE_COLLAPSE(state, payload) {
-		// 	state.side_collapsed = payload;
-		// }
+		SET_SIDE_COLLAPSE(state) {
+			Vue.set(state, 'side_collapsed', !state.side_collapsed);
+		},
+		SET_SIDE_SMALL_SCREEN(state) {
+			console.log(state.side_small_screen)
+			Vue.set(state, 'side_small_screen', !state.side_small_screen);
+		}
 	},
 	actions: {
 		setUser({ commit }) {
@@ -405,8 +414,11 @@ export const content_module = {
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS")
 		},
-		setSideCollapsed({ state }, { collapsed }) {
-			state.side_collapsed = collapsed
+		setSideCollapsed({ commit }) {
+			commit("SET_SIDE_COLLAPSE")
+		},
+		setSideSmallScreen({ commit }) {
+			commit("SET_SIDE_SMALL_SCREEN")
 		},
 	},
 };

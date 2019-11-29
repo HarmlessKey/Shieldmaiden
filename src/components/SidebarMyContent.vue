@@ -1,29 +1,112 @@
 <template>
-	<div id="sidebar">
-		<b-list-group>
-			<b-list-group-item>
-				<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
-			</b-list-group-item>
-			<b-list-group-item>
-				<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
-			</b-list-group-item>
-			<b-list-group-item>
-				<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
-			</b-list-group-item>
-			<b-list-group-item>
-				<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
-			</b-list-group-item>
-		</b-list-group>
+	<div id="sidebar" :class="collapsed ? 'side-collapsed' : ''">
+		<div>
+			<b-list-group>
+				<b-list-group-item>
+					<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
+				</b-list-group-item>
+				<b-list-group-item>
+					<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
+				</b-list-group-item>
+				<b-list-group-item>
+					<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
+				</b-list-group-item>
+				<b-list-group-item>
+					<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
+				</b-list-group-item>
+			</b-list-group>
+		</div>
+		<div id="toggle-width" @click="toggle()">
+			<i class="far fa-angle-left"></i>
+		</div>
 	</div>
 </template>
 
 <script>
+	import { mapGetters, mapActions } from 'vuex'
+
 	export default {
-		name: 'Sidebar'
+		name: 'Sidebar',
+		// computed: {
+		// 	...mapActions([
+		// 			'setSideCollapsed'
+		// 		]),
+		// 	...mapGetters([
+		// 			'side_collapsed'
+		// 		]),
+		// },
+		data() {
+			return {
+				collapsed: false
+			}
+		},
+		methods: {
+			toggle() {
+				this.collapsed = !this.collapsed;
+			}
+		}
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss">
+
+#hasSide {
+	display: grid;
+	grid-template-columns: max-content auto;
+}
+
+#sidebar {
+	width: 200px;
+	height: calc(100vh - 50px);
+	position: relative;
+	padding-top:10px;
+	background: #262626;
+	
+	.list-group-item {
+		padding: 0 !important;
+
+		span { 
+			margin-left: 10px;
+		}
+		a.active {
+			i::before {
+				color: #2c97de !important;
+			}
+		}
+	}
+	#toggle-width {
+		height: 40px;
+		width: calc(100%);
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		padding: 0 10px;
+		// 8 digit hex code last digits are alpha
+		border-top: 1px solid #b2b2b280;
+		cursor: pointer;
+		color: #b2b2b2;
+		line-height: 40px;
+		font-size: 20px;
+		text-align: right;
+	}
+	&.side-collapsed {
+		width: 30px;
+
+		.list-group-item {
+			a {
+				padding-left: 6px;
+			}
+		}
+
+		span {
+			display: none;
+		}
+		#toggle-width i {
+			transform: rotate(180deg);
+		}
+	}
+}
+
 
 
 </style>

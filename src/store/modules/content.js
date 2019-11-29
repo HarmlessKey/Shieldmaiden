@@ -27,6 +27,7 @@ export const content_module = {
 		npcs: {},
 
 		poster: undefined,
+		side_collapsed: false,
 
 	},
 	getters: {
@@ -40,38 +41,41 @@ export const content_module = {
 			return state.slide;
 		},
 		encounters: function( state ) {
-			return state.encounters
+			return state.encounters;
 		},
 		allEncounters: function( state ) {
-			return state.allEncounters
+			return state.allEncounters;
 		},
 		players: function( state ) {
-			return state.players
+			return state.players;
 		},
 		npcs: function( state ) {
-			return state.npcs
+			return state.npcs;
 		},
 		campaign: function( state ) {
-			return state.campaign
+			return state.campaign;
 		},
 		campaigns: function( state ) {
-			return state.campaigns
+			return state.campaigns;
 		},
 		tier: function( state ) {
-			return state.tier
+			return state.tier;
 		},
 		voucher: function( state ) {
-			return state.voucher
+			return state.voucher;
 		},
 		overencumbered: function( state ) {
-			return state.overencumbered
+			return state.overencumbered;
 		},
 		content_count: function( state ) {
-			return state.content_count
+			return state.content_count;
 		},
 		poster: function( state ) {
-			return state.poster
+			return state.poster;
 		},
+		side_collapsed: function( state ) {
+			return state.side_collapsed;
+		}
 	},
 	mutations: {
 		SET_USER(state) {
@@ -213,7 +217,10 @@ export const content_module = {
 		},
 		CLEAR_ENCOUNTERS(state) {
 			state.encounters = {}
-		}
+		},
+		// SET_SIDE_COLLAPSE(state, payload) {
+		// 	state.side_collapsed = payload;
+		// }
 	},
 	actions: {
 		setUser({ commit }) {
@@ -397,6 +404,9 @@ export const content_module = {
 		},
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS")
-		}
+		},
+		setSideCollapsed({ state }, { collapsed }) {
+			state.side_collapsed = collapsed
+		},
 	},
 };

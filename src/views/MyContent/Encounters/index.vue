@@ -187,6 +187,7 @@
 				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
 				add: false,
 				currentPage: 1,
+				collapsed: false,
 				activeColumns: {
                     encounter: {
 						label: 'Encounter',
@@ -253,6 +254,7 @@
 				'campaign',
 				'players',
 				'playerInCampaign',
+				'side_collapsed',
 			]),
 			_active: function() {
 				return _.chain(this.encounters)

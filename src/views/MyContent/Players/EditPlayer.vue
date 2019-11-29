@@ -6,7 +6,7 @@
 		</div>
 		
 		<template v-else-if="player">
-			<div id="players" class="container-fluid" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
+			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
 				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">

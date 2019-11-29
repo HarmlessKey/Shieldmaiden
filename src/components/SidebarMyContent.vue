@@ -80,6 +80,9 @@
 	transition: width 0.4s linear;
 	z-index: 98;
 	border-right: 1px solid #302f2f;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-bottom: 40px;
 
 	h3 {
 		padding-left: 10px;
@@ -112,10 +115,11 @@
 		}
 	}
 	#toggle-width {
+		background: #262626;
 		height: 40px;
 		width: calc(100%);
-		position: absolute;
-		right: 0;
+		position: fixed;
+		right: left;
 		bottom: 0;
 		padding: 0 20px;
 		border-top: 1px solid #302f2f;
@@ -124,6 +128,8 @@
 		line-height: 40px;
 		font-size: 20px;
 		text-align: right;
+		width: 250px;
+		transition: width .4s linear;
 	}
 	&.side-collapsed {
 		width: 45px;
@@ -142,9 +148,16 @@
 		span {
 			display: none;
 		}
-		#toggle-width i {
-			transform: rotate(180deg);
+		#toggle-width {
+			width: 45px;
+			i {
+				transform: rotate(180deg);
+			}
 		}
+		
+	}
+	&::-webkit-scrollbar {
+	display: none;
 	}
 }
 @media only screen and (max-width: 600px) {

@@ -24,7 +24,7 @@
 				<template v-else-if="tier">
 					<b-row>
 						<!-- SHOW ENCOUNTERS -->
-						<b-col md="7">
+						<b-col lg="7">
 							<h2 class="d-flex justify-content-between">
 								<span>
 									<span>
@@ -141,7 +141,7 @@
 					</b-col>
 
 						<!-- PLAYERS -->
-						<b-col md="5">
+						<b-col lg="5">
 							<h2>Players</h2>
 							<Players />
 						</b-col>

@@ -74,6 +74,7 @@
 	background: #262626;
 	transition: width 0.4s linear;
 	z-index: 98;
+	border-right: 1px solid #302f2f;
 	
 	.list-group-item {
 		padding: 0 !important;
@@ -99,8 +100,7 @@
 		right: 0;
 		bottom: 0;
 		padding: 0 20px;
-		// 8 digit hex code last digits are alpha
-		border-top: 1px solid #b2b2b280;
+		border-top: 1px solid #302f2f;
 		cursor: pointer;
 		color: #b2b2b2;
 		line-height: 40px;

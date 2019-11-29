@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="players" class="container-fluid" v-if="tier">
+		<div id="players" class="container-fluid scrollable-content" v-if="tier">
 			<h1>Your players</h1>
 			<p>These are the players that you can use in your campaigns.</p>
 

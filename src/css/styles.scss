@@ -160,6 +160,11 @@ html body {
 	word-wrap: break-word;
 }
 
+.scrollable-content {
+	height: calc(100vh - #{$header-height});
+	overflow: auto;
+}
+
 .validate {
 	margin-top: 5px;
 	font-size: 11px;

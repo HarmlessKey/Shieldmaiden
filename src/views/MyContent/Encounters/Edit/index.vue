@@ -4,7 +4,7 @@
 	</div>
 	<div id="hasSide" class="container-fluid" v-else-if="encounter">
 		<Sidebar/>
-		<div class="wrapper">
+		<div class="wrapper scrollable-content">
 			<div class="top">
 				<Crumble />
 				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>

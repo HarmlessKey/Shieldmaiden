@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="players" class="container-fluid">
+		<div id="players" class="container-fluid scrollable-content">
 				<h2 class="mb-1">Your Characters</h2>
 			<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
 			

@@ -2,7 +2,7 @@
 	<div>
 		<div id="hasSide">
 			<Sidebar/>
-			<div id="my-content" class="container-fluid">
+			<div id="my-content" class="container-fluid scrollable-content">
 				<Crumble />
 				
 				<OverEncumbered v-if="overencumbered" />

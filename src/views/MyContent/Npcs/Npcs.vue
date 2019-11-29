@@ -1,7 +1,7 @@
 <template>
 	<div id="hasSide">
 		<Sidebar/>
-		<div id="npcs" class="container-fluid" v-if="tier">
+		<div id="npcs" class="container-fluid scrollable-content" v-if="tier">
 			<h1>Your NPC's</h1>
 			<p>These are your custom NPC's that you can use in your campaigns.</p>
 

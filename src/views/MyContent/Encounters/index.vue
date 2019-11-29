@@ -2,7 +2,7 @@
 	<div>
 		<div id="hasSide">
 			<Sidebar/>
-			<div id="my-content" class="container-fluid">
+			<div id="my-content" class="container-fluid scrollable-content">
 				<Crumble />
 
 				<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">

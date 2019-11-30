@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="content">
 		<h2 class="mb-1">Your Characters</h2>
 		<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
 		

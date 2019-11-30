@@ -161,9 +161,15 @@ html body {
 }
 
 .scrollable-content {
-	padding: 20px;
 	height: calc(100vh - #{$header-height});
 	overflow: auto;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+	.content {
+		padding: 20px;
+	}
 }
 
 .validate {

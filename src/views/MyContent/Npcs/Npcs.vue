@@ -1,5 +1,5 @@
 <template>
-	<div id="npcs" class="container-fluid" v-if="tier">
+	<div class="content" v-if="tier">
 		<h1>Your NPC's</h1>
 		<p>These are your custom NPC's that you can use in your campaigns.</p>
 

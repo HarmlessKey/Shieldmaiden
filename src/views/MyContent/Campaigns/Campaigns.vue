@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="content">
 		<Crumble />
 		
 		<OverEncumbered v-if="overencumbered" />

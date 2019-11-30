@@ -161,6 +161,7 @@ html body {
 }
 
 .scrollable-content {
+	padding: 20px;
 	height: calc(100vh - #{$header-height});
 	overflow: auto;
 }

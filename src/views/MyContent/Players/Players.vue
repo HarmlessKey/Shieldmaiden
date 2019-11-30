@@ -1,7 +1,6 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="players" class="container-fluid scrollable-content" v-if="tier">
+	<div>
+		<div id="players" class="container-fluid" v-if="tier">
 			<h1>Your players</h1>
 			<p>These are the players that you can use in your campaigns.</p>
 
@@ -88,7 +87,6 @@
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import HKtable from '@/components/hk-components/hk-table.vue'
@@ -101,7 +99,6 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 			OutOfSlots,
 			HKtable

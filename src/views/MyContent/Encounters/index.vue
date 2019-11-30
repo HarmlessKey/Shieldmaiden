@@ -1,161 +1,155 @@
 <template>
 	<div>
-		<div id="hasSide">
-			<Sidebar/>
-			<div id="my-content" class="container-fluid scrollable-content">
-				<Crumble />
+		<Crumble />
 
-				<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
-					{{ campaign.campaign }}
-					<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == campaignId }">live</span>
-				</h1>
+		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
+			{{ campaign.campaign }}
+			<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == campaignId }">live</span>
+		</h1>
 
-				<OverEncumbered v-if="overencumbered" />
+		<OverEncumbered v-if="overencumbered" />
 
-				<template v-if="noCurHp">
-					<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
+		<template v-if="noCurHp">
+			<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
 
-					<h3>Why am I seeing this?</h3>
-					<p>
-						We changed where the current HP and other stats of players are stored so players have to be readded to your campaigns, 
-						one click on the button above will do this for you.
-					</p>
-				</template>
-				<template v-else-if="tier">
-					<b-row>
-						<!-- SHOW ENCOUNTERS -->
-						<b-col lg="7">
-							<h2 class="d-flex justify-content-between">
-								<span>
-									<span>
-									Encounters
-									<span v-if="encounters">( 
-										<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
-											{{ Object.keys(encounters).length }}
-										</span> / 
-										<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
-										<template v-else>{{ tier.benefits.encounters }}</template>
-									) </span>
-								</span>
-								</span>
-								<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
-							</h2>
+			<h3>Why am I seeing this?</h3>
+			<p>
+				We changed where the current HP and other stats of players are stored so players have to be readded to your campaigns, 
+				one click on the button above will do this for you.
+			</p>
+		</template>
+		<template v-else-if="tier">
+			<b-row>
+				<!-- SHOW ENCOUNTERS -->
+				<b-col lg="7">
+					<h2 class="d-flex justify-content-between">
+						<span>
+							<span>
+							Encounters
+							<span v-if="encounters">( 
+								<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
+									{{ Object.keys(encounters).length }}
+								</span> / 
+								<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+								<template v-else>{{ tier.benefits.encounters }}</template>
+							) </span>
+						</span>
+						</span>
+						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+					</h2>
 
-							<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
-								<b-form-input
-									autocomplete="off" 
-									type="text" 
-									:class="{'input': true, 'error': errors.has('newEncounter') }"
-									v-model="newEncounter"
-									v-validate="'required'" 
-									data-vv-as="New Encounter"
-									name="newEncounter" 
-									placeholder="Encounter Title"
-									@change="addEncounter()"></b-form-input>
-								<b-input-group-append>
-									<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
-								</b-input-group-append>				
-							</b-input-group>
-							<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+					<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
+						<b-form-input
+							autocomplete="off" 
+							type="text" 
+							:class="{'input': true, 'error': errors.has('newEncounter') }"
+							v-model="newEncounter"
+							v-validate="'required'" 
+							data-vv-as="New Encounter"
+							name="newEncounter" 
+							placeholder="Encounter Title"
+							@change="addEncounter()"></b-form-input>
+						<b-input-group-append>
+							<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
+						</b-input-group-append>				
+					</b-input-group>
+					<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
-							<OutOfSlots 
-								v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
-								type = 'encounters'
-							/>
+					<OutOfSlots 
+						v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
+						type = 'encounters'
+					/>
 
-						<!-- ACTIVE ENCOUNTERS -->
-						<HKtable
-							class="mb-4"
-							:items="_active"
-							:columns="activeColumns"
-						>
-							<template slot="encounter" slot-scope="data">
-								<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
-									{{ data.item }}
-								</router-link>
-								<template v-else>
-									{{ data.item }}
-								</template>
-							</template>
-							<template slot="entities" slot-scope="data">
-								<router-link :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
-									<i class="fas fa-users"></i>
-									<template v-if="data.row.entities">
-										{{ Object.keys(data.row.entities).length }}
-									</template>
-									<template v-else> Add</template>
-								</router-link>
-							</template>
-
-							<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
-							<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
-
-							<template slot="actions" slot-scope="data">
-								<div class="actions">
-									<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
-										<i class="fas fa-play"></i>
-									</router-link>
-									<a v-else class="disabled">
-										<i class="fas fa-play"></i>
-									</a>
-									<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil-alt"></i>
-									</router-link>
-									<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(data.row.key,data.row.encounter)">
-										<i class="fas fa-trash-alt"></i>
-									</a>
-								</div>
-							</template>
-						</HKtable>
-
-						<!-- FINISHED ENCOUNTERS -->
-						<template v-if="_finished != 0">
-							<h2>Finished Encounters</h2>
-							
-							<HKtable
-								:items="_finished"
-								:columns="finishedColumns"
-								:perPage="6"
-								:currentPage="currentPage"
-							>
-								<template slot="encounter" slot-scope="data">
-									<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
-										{{ data.item }}
-									</router-link>
-									<template v-else>
-										{{ data.item }}
-									</template>
-								</template>
-
-								<template slot="actions" slot-scope="data">
-									<div class="actions">
-										<a v-b-tooltip.hover title="Unfinish" @click="reset(data.row.key, hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
-										<a v-b-tooltip.hover title="Reset" @click="reset(data.row.key)"><i class="fas fa-undo"></i></a>
-										<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)"><i class="fas fa-trash-alt"></i></a>
-									</div>
-								</template>
-							</HKtable>
-
+				<!-- ACTIVE ENCOUNTERS -->
+				<HKtable
+					class="mb-4"
+					:items="_active"
+					:columns="activeColumns"
+				>
+					<template slot="encounter" slot-scope="data">
+						<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+							{{ data.item }}
+						</router-link>
+						<template v-else>
+							{{ data.item }}
 						</template>
-						
-						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
-					</b-col>
+					</template>
+					<template slot="entities" slot-scope="data">
+						<router-link :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
+							<i class="fas fa-users"></i>
+							<template v-if="data.row.entities">
+								{{ Object.keys(data.row.entities).length }}
+							</template>
+							<template v-else> Add</template>
+						</router-link>
+					</template>
 
-						<!-- PLAYERS -->
-						<b-col lg="5">
-							<h2>Players</h2>
-							<Players />
-						</b-col>
-					</b-row>
+					<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
+					<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
+
+					<template slot="actions" slot-scope="data">
+						<div class="actions">
+							<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+								<i class="fas fa-play"></i>
+							</router-link>
+							<a v-else class="disabled">
+								<i class="fas fa-play"></i>
+							</a>
+							<router-link class="mx-1 " :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
+								<i class="fas fa-pencil-alt"></i>
+							</router-link>
+							<a v-b-tooltip.hover title="Delete" @click="deleteEncounter(data.row.key,data.row.encounter)">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+						</div>
+					</template>
+				</HKtable>
+
+				<!-- FINISHED ENCOUNTERS -->
+				<template v-if="_finished != 0">
+					<h2>Finished Encounters</h2>
+					
+					<HKtable
+						:items="_finished"
+						:columns="finishedColumns"
+						:perPage="6"
+						:currentPage="currentPage"
+					>
+						<template slot="encounter" slot-scope="data">
+							<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+								{{ data.item }}
+							</router-link>
+							<template v-else>
+								{{ data.item }}
+							</template>
+						</template>
+
+						<template slot="actions" slot-scope="data">
+							<div class="actions">
+								<a v-b-tooltip.hover title="Unfinish" @click="reset(data.row.key, hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
+								<a v-b-tooltip.hover title="Reset" @click="reset(data.row.key)"><i class="fas fa-undo"></i></a>
+								<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)"><i class="fas fa-trash-alt"></i></a>
+							</div>
+						</template>
+					</HKtable>
+
 				</template>
-			</div>
-		</div>
+				
+				<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+			</b-col>
+
+				<!-- PLAYERS -->
+				<b-col lg="5">
+					<h2>Players</h2>
+					<Players />
+				</b-col>
+			</b-row>
+		</template>
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue';
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import Crumble from '@/components/crumble/MyContent.vue';
@@ -172,7 +166,6 @@
 			title: 'Encounters'
 		},
 		components: {
-			Sidebar,
 			Crumble,
 			PlayerLink,
 			OverEncumbered,

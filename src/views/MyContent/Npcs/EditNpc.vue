@@ -1,10 +1,9 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
+	<div>
 		<div v-if="overencumbered" class='container'>
 			<OverEncumbered/>
 		</div>
-		<div id="npcs" class="container-fluid scrollable-content" v-else-if="npc || $route.name == 'AddNPC'">
+		<div id="npcs" class="container-fluid" v-else-if="npc || $route.name == 'AddNPC'">
 			
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
@@ -523,7 +522,6 @@
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 
 	import { db } from '@/firebase'
@@ -538,7 +536,6 @@
 			title: 'NPC\'s'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 		},
 		data() {

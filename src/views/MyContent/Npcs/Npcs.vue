@@ -1,96 +1,92 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="npcs" class="container-fluid scrollable-content" v-if="tier">
-			<h1>Your NPC's</h1>
-			<p>These are your custom NPC's that you can use in your campaigns.</p>
+	<div id="npcs" class="container-fluid" v-if="tier">
+		<h1>Your NPC's</h1>
+		<p>These are your custom NPC's that you can use in your campaigns.</p>
 
-			<OverEncumbered v-if="overencumbered"/>
-			<OutOfSlots 
-				v-else-if="content_count.npcs >= tier.benefits.npcs"
-				type = 'npcs'
-			/>
-		
-			<template v-if="npcs">
-				<h2 class="mt-3 d-flex justify-content-between">
-					<span>
-						NPC's ( 
-						<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
-						/ 
-						<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
-						<template v-else>{{ tier.benefits.npcs }}</template>
-						)
-					</span>
-					<router-link v-if="!overencumbered" to="/npcs/add-npc">
-						<i class="fas fa-plus green"></i> New NPC
-					</router-link>
-				</h2>
-
-				<HKtable
-					:columns="columns"
-					:items="_npcs"
-					:perPage="20"
-					:search="['name', 'type']"
-				>
-					<template slot="avatar" slot-scope="data">
-						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-						<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
-					</template>
-
-					<template slot="name" slot-scope="data">
-						<router-link class="mx-2" 
-							:to="'/npcs/' + data.row.key" 
-							v-b-tooltip.hover title="Edit">{{ data.item }}
-						</router-link>
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="gray-hover mx-1" 
-							:to="'/npcs/' + data.row.key" 
-							v-b-tooltip.hover title="Edit">
-							<i class="fas fa-pencil"></i>
-						</router-link>
-						<a v-b-tooltip.hover 
-							title="Delete" 
-							class="gray-hover"
-							@click="confirmDelete(data.row.key, data.row.name)">
-							<i class="fas fa-trash-alt"></i>
-						</a>
-					</div>
-				</HKtable>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open NPC slot</span>
-						<router-link v-if="!overencumbered" to="/npcs/add-npc">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="slotsLeft <= 0">
-					<div class="openSlot none">
-						<span class="red">No NPC slots left. </span>
-						Delete NPC's to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
-					</div>
-				</template>
-			</template>
-			<h3 v-else-if="npcs === null" class="mt-4">
+		<OverEncumbered v-if="overencumbered"/>
+		<OutOfSlots 
+			v-else-if="content_count.npcs >= tier.benefits.npcs"
+			type = 'npcs'
+		/>
+	
+		<template v-if="npcs">
+			<h2 class="mt-3 d-flex justify-content-between">
+				<span>
+					NPC's ( 
+					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					/ 
+					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
+					<template v-else>{{ tier.benefits.npcs }}</template>
+					)
+				</span>
 				<router-link v-if="!overencumbered" to="/npcs/add-npc">
-					<i class="fas fa-plus green"></i> Create your first NPC
+					<i class="fas fa-plus green"></i> New NPC
 				</router-link>
-			</h3>
-			<div v-else class="loader"><span>Loading NPC's...</span></div>
-		</div>
+			</h2>
+
+			<HKtable
+				:columns="columns"
+				:items="_npcs"
+				:perPage="20"
+				:search="['name', 'type']"
+			>
+				<template slot="avatar" slot-scope="data">
+					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+					<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+				</template>
+
+				<template slot="name" slot-scope="data">
+					<router-link class="mx-2" 
+						:to="'/npcs/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">{{ data.item }}
+					</router-link>
+				</template>
+
+				<div slot="actions" slot-scope="data" class="actions">
+					<router-link class="gray-hover mx-1" 
+						:to="'/npcs/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">
+						<i class="fas fa-pencil"></i>
+					</router-link>
+					<a v-b-tooltip.hover 
+						title="Delete" 
+						class="gray-hover"
+						@click="confirmDelete(data.row.key, data.row.name)">
+						<i class="fas fa-trash-alt"></i>
+					</a>
+				</div>
+			</HKtable>
+
+			<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
+				<div 
+					class="openSlot"
+					v-for="index in slotsLeft"
+					:key="'open-slot-' + index"
+				>
+					<span>Open NPC slot</span>
+					<router-link v-if="!overencumbered" to="/npcs/add-npc">
+						<i class="fas fa-plus green"></i>
+					</router-link>
+				</div>
+			</template>
+			<template v-if="slotsLeft <= 0">
+				<div class="openSlot none">
+					<span class="red">No NPC slots left. </span>
+					Delete NPC's to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
+				</div>
+			</template>
+		</template>
+		<h3 v-else-if="npcs === null" class="mt-4">
+			<router-link v-if="!overencumbered" to="/npcs/add-npc">
+				<i class="fas fa-plus green"></i> Create your first NPC
+			</router-link>
+		</h3>
+		<div v-else class="loader"><span>Loading NPC's...</span></div>
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import HKtable from '@/components/hk-components/hk-table.vue'
@@ -103,7 +99,6 @@
 			title: 'NPC\'s'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 			OutOfSlots,
 			HKtable

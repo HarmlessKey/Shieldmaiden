@@ -51,7 +51,6 @@
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import Loot from './Loot.vue'
 	import Entities from './Entities.vue'
@@ -66,7 +65,6 @@
 			title: 'Encounters'
 		},
 		components: {
-			Sidebar,
 			Crumble,
 			OverEncumbered,
 			Loot,

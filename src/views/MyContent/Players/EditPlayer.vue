@@ -1,7 +1,6 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div v-if="overencumbered" class='container'>
+	<div>
+		<div v-if="overencumbered">
 			<OverEncumbered/>
 		</div>
 		
@@ -243,7 +242,6 @@
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
@@ -254,7 +252,6 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 		},
 		data() {

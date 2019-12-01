@@ -438,7 +438,7 @@
 					this.$validator.validateAll().then((result) => {
 						if (result) {
 							db.ref('players/' + this.userId).push(this.player);
-							this.$router.replace('/players')
+							this.$router.replace(this.$route.meta.basePath)
 						}
 					})
 				}

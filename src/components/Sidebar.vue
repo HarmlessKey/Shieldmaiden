@@ -47,13 +47,13 @@
 				<h3>Follow us</h3>
 				<b-list-group>
 					<b-list-group-item>
+						<a href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon patreon-red"></i><span>Patreon</span></a>
+					</b-list-group-item>
+					<b-list-group-item>
 						<a href="https://www.facebook.com/harmlesskey" target="_blank"><i class="fab fa-facebook"></i><span>Facebook</span></a>
 					</b-list-group-item>
 					<b-list-group-item>
 						<a href="https://www.reddit.com/r/HarmlessKey" target="_blank"><i class="fab fa-reddit-alien"></i><span>Reddit</span></a>
-					</b-list-group-item>
-					<b-list-group-item>
-						<a href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon"></i><span>Patreon</span></a>
 					</b-list-group-item>
 					<b-list-group-item>
 						<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i><span>Trello</span></a>

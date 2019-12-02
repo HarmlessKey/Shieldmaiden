@@ -2,7 +2,7 @@
 	<div v-if="overencumbered">
 		<OverEncumbered/>
 	</div>
-	<div class="container-fluid" v-else-if="encounter && players"  
+	<div v-else-if="encounter && players"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
 		
 		<Finished v-if="encounter.finished" :encounter="encounter"/>

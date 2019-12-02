@@ -498,7 +498,8 @@ export const routes = [{
 	meta: {
 		basePath: '/campaigns',
 		title: 'Campaigns',
-		requiresAuth: true
+		requiresAuth: true,
+		sidebar: false
 	},
 },
 {

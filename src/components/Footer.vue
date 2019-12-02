@@ -1,7 +1,7 @@
 <template>
 	<div class="footer">
-		<div class="top container">
-			<b-row class="d-flex justify-content-between">
+		<div class="top">
+			<b-row class="d-flex justify-content-between content">
 				<b-col md="3" class="logo-container">
 					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
 				</b-col>
@@ -47,7 +47,7 @@
 		</div>
 
 		<div class="bottom">
-			<div class="container">
+			<div class="content">
 				<small class="d-flex justify-content-between mb-3">
 					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" href="https://game-icons.net">https://game-icons.net</a>.</span>
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
@@ -55,7 +55,8 @@
 				<small>
 					©{{ year }} Harmless Key | All Rights Reserved<br/>
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
-					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a></small>
+					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a>
+				</small>
 			</div>
 		</div>
 
@@ -83,7 +84,7 @@
 		background-color: #232323;
 
 		.top {
-			padding: 30px 20px;
+			padding: 10px 0;
 
 			.logo-container {
 				display: flex;
@@ -137,7 +138,6 @@
 			
 		}
 		.bottom {
-			padding: 20px;
 			background-color: #191919;
 		}
 	}

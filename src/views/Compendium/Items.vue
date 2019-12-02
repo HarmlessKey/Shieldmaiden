@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 
 		<!-- ITEM OVERVIEW -->
 		<template v-if="!$route.params.id">

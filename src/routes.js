@@ -55,7 +55,10 @@ import User from '@/views/User.vue';
 export const routes = [{
 	path: '',
 	name: 'home',
-	component: Home
+	component: Home,
+	meta: {
+		sidebar: false
+	}
 },
 
 //COMPENDIUM
@@ -514,6 +517,7 @@ export const routes = [{
 	meta: {
 		basePath: '/user',
 		title: 'User',
+		sidebar: false
 	}
 },
 {

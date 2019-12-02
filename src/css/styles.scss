@@ -171,6 +171,12 @@ html body {
 		padding: 20px;
 	}
 }
+#home {
+	.content {
+		max-width: 1140px;
+		margin: auto;
+	}
+}
 
 .validate {
 	margin-top: 5px;

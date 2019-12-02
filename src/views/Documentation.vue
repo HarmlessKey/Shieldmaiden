@@ -1,6 +1,6 @@
 <template>
-	<div id="hasSide" class="container">
-		<div id="sidebar">
+	<div class="content">
+		<!-- <div id="sidebar">
 			<b-navbar v-b-scrollspy>
 				<b-nav>
 					<b-nav-item href="#campaigns">Campaigns</b-nav-item>
@@ -18,8 +18,8 @@
 					</b-nav>
 				</b-nav>
 			</b-navbar>
-		</div>
-		<div class="container-fluid">
+		</div> -->
+		<div>
 			<h1>Documentation</h1>
 			<p>Here we will explain why we made certain choices and how we solved some issues we came across. If you wonder why some actions work a certain way, you will probably find answers here.
 			</p>

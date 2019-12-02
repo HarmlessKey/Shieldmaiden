@@ -12,12 +12,12 @@
 				
 			</div>
 			<div class="d-flex justify-content-end">
-				<div class="area d-flex justify-content-end">
+				<!-- <div class="area d-flex justify-content-end">
 					<a href="https://www.patreon.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Patreon" class="icon"><i class="fab fa-patreon patreon-red"></i></a>
 					<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon"><i class="fab fa-facebook-f"></i></a>
 					<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" v-b-tooltip.hover title="Reddit" class="icon"><i class="fab fa-reddit-alien"></i></a>
 					<router-link v-if="user" class="icon" to="/feedback" v-b-tooltip.hover title="Give Feedback"><i class="fas fa-comment-alt"></i></router-link>
-				</div>
+				</div> -->
 				<div class="area d-flex justify-content-end">
 					<a class="icon" 
 						v-b-tooltip.hover 
@@ -95,7 +95,10 @@
 
 <style lang="scss" scoped>
 .menu {
+	display: block;
 	cursor: pointer;
+	width: 20px;
+	text-align: center;
 }
 .logo {
 	position: absolute;
@@ -170,7 +173,7 @@ a.user	{
 
 @media only screen and (max-width: 600px) {
 	.logo {
-		left: 30px;
+		left: 40px;
 	}
 }
 </style>

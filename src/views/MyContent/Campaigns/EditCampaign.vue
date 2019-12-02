@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<div v-if="overencumbered" class='container' style="display: block;">
+		<div v-if="overencumbered" class='content' style="display: block;">
 			<OverEncumbered/>
 		</div>
-		<div id="my-content" class="container" v-else>
+		<div class="content" v-else>
 			<div class="info mb-3">
 				<Crumble />
 

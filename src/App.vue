@@ -3,8 +3,8 @@
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
-			<div id="hasSide">
-				<Sidebar v-if="$route.name != 'home'" />
+			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+				<Sidebar v-if="$route.meta.sidebar !== false" />
 				<div class="scrollable-content">
 					<router-view/>
 				</div>

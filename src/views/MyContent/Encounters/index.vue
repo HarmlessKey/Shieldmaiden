@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="content">
 		<Crumble />
 
 		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">

@@ -1,7 +1,7 @@
 <template>
 	<div class="wrapper">
-		<div class="grid">
-			<div id="home">
+		<div class="grid" id="home">
+			<div>
 				<section>
 					<div class="container">
 						<b-row class=mb-5 id="title">
@@ -134,7 +134,6 @@
 	"container"
 	"footer"
 	"empty";
-
 }
 .empty {
 	height: 55px;
@@ -203,6 +202,7 @@
 		.user-links {
 			margin-top: 5rem !important
 		}
+		
 		@media (max-width: 767.98px) {
 			#title {
 				img {
@@ -230,5 +230,4 @@ iframe, img {
 	width: 100%;
 	margin-bottom: 40px;
 }
-
 </style>

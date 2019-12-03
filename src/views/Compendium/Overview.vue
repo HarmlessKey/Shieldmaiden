@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<Crumble />
 		<h1>Compendium</h1>
 		<p>
@@ -75,7 +75,7 @@
 	"container"
 	"footer";
 
-	.container {
+	.content {
 		padding-top: 30px;
 		padding-bottom: 50px;
 		line-height: 25px;

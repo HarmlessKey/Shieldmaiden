@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<h1>Planned updates</h1>
 		<p>Follow our planned updates on Trello.</p>
 

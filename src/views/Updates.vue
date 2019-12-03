@@ -1,6 +1,6 @@
 <template>
 	<div class="grid">
-		<div class="container">
+		<div class="content">
 			<h1>Updates</h1>
 			<p>Check our latest updates on Trello.</p>
 			<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>

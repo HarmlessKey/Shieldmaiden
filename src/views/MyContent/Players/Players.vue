@@ -1,94 +1,90 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="players" class="container-fluid" v-if="tier">
-			<h1>Your players</h1>
-			<p>These are the players that you can use in your campaigns.</p>
+	<div class="content" v-if="tier">
+		<h1>Your players</h1>
+		<p>These are the players that you can use in your campaigns.</p>
 
-			<OverEncumbered v-if="overencumbered"/>
-			<OutOfSlots 
-				v-else-if="content_count.players >= tier.benefits.players"
-				type = 'players'
-			/>
-			<template v-if="players">
-				<h2 class="mt-3 d-flex justify-content-between">
-					<span>
-						Players ( 
-						<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
-							/ 
-							<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-							<template v-else>{{ tier.benefits.players }}</template>	
-							)
-					</span>
-					<router-link v-if="!overencumbered" to="/players/add-player">
-						<i class="fas fa-plus green"></i> New Player
-					</router-link>
-				</h2>
-
-
-				<HKtable
-					:columns="columns"
-					:items="_players"
-					:search="['character_name']"
-				>
-					<template slot="avatar" slot-scope="data">
-						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-						<img v-else class="image" src="@/assets/_img/styles/player.svg" />
-					</template>
-
-					<template slot="character_name" slot-scope="data">
-						<router-link class="mx-2" 
-							:to="'/players/' + data.row.key" 
-							v-b-tooltip.hover title="Edit">{{ data.item }}
-						</router-link>
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="gray-hover mx-1" 
-							:to="'/players/' + data.row.key" 
-							v-b-tooltip.hover title="Edit">
-							<i class="fas fa-pencil"></i>
-						</router-link>
-						<a v-b-tooltip.hover 
-							title="Delete" 
-							class="gray-hover"
-							@click="confirmDelete(data.row.key, data.row.player, data.row.control)">
-								<i class="fas fa-trash-alt"></i>
-						</a>
-					</div>
-				</HKtable>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open player slot</span>
-						<router-link v-if="!overencumbered" to="/players/add-player">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="slotsLeft <= 0">
-					<div class="openSlot none">
-						<span class="red">No player slots left. </span>
-						Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
-					</div>
-				</template>
-			</template>
-			<h3 v-else-if="players === null" class="mt-4">
+		<OverEncumbered v-if="overencumbered"/>
+		<OutOfSlots 
+			v-else-if="content_count.players >= tier.benefits.players"
+			type = 'players'
+		/>
+		<template v-if="players">
+			<h2 class="mt-3 d-flex justify-content-between">
+				<span>
+					Players ( 
+					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+						/ 
+						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
+						<template v-else>{{ tier.benefits.players }}</template>	
+						)
+				</span>
 				<router-link v-if="!overencumbered" to="/players/add-player">
-					<i class="fas fa-plus green"></i> Create your first player
+					<i class="fas fa-plus green"></i> New Player
 				</router-link>
-			</h3>
-		</div>
+			</h2>
+
+
+			<HKtable
+				:columns="columns"
+				:items="_players"
+				:search="['character_name']"
+			>
+				<template slot="avatar" slot-scope="data">
+					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+				</template>
+
+				<template slot="character_name" slot-scope="data">
+					<router-link class="mx-2" 
+						:to="'/players/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">{{ data.item }}
+					</router-link>
+				</template>
+
+				<div slot="actions" slot-scope="data" class="actions">
+					<router-link class="gray-hover mx-1" 
+						:to="'/players/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">
+						<i class="fas fa-pencil"></i>
+					</router-link>
+					<a v-b-tooltip.hover 
+						title="Delete" 
+						class="gray-hover"
+						@click="confirmDelete(data.row.key, data.row.player, data.row.control)">
+							<i class="fas fa-trash-alt"></i>
+					</a>
+				</div>
+			</HKtable>
+
+			<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
+				<div 
+					class="openSlot"
+					v-for="index in slotsLeft"
+					:key="'open-slot-' + index"
+				>
+					<span>Open player slot</span>
+					<router-link v-if="!overencumbered" to="/players/add-player">
+						<i class="fas fa-plus green"></i>
+					</router-link>
+				</div>
+			</template>
+			<template v-if="slotsLeft <= 0">
+				<div class="openSlot none">
+					<span class="red">No player slots left. </span>
+					Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
+				</div>
+			</template>
+		</template>
+		<h3 v-else-if="players === null" class="mt-4">
+			<router-link v-if="!overencumbered" to="/players/add-player">
+				<i class="fas fa-plus green"></i> Create your first player
+			</router-link>
+		</h3>
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import HKtable from '@/components/hk-components/hk-table.vue'
@@ -101,7 +97,6 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 			OutOfSlots,
 			HKtable
@@ -204,8 +199,6 @@
 
 <style lang="scss" scoped>
 	.container-fluid {
-		padding: 20px;
-
 		h2 {
 			border-bottom: solid 1px #b2b2b2;
 			padding-bottom: 10px;

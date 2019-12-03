@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<template v-if="!$route.params.id">
 		<Crumble />
 		<h1><i class="fas fa-skull-crossbones"></i> conditions</h1>

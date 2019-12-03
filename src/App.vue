@@ -3,7 +3,12 @@
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
-			<router-view/>
+			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+				<Sidebar v-if="$route.meta.sidebar !== false" />
+				<div class="scrollable-content">
+					<router-view/>
+				</div>
+			</div>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
 			<div v-if="slide.show == true" class="slide">
@@ -26,6 +31,7 @@
 <script>
 	import { auth, firebase, db } from './firebase'
 	import Header from './components/Header.vue';
+	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
@@ -33,6 +39,7 @@
 	export default {
 	components: {
 		navMain: Header,
+		Sidebar,
 		Slide,
 		PaymentDeclined
 	},

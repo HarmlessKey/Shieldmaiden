@@ -365,7 +365,7 @@
 
 			span.hp, span.percentage {
 				
-				color:#191919;
+				color:#fff;
 				position: absolute;
 				white-space: nowrap;
 				overflow: hidden;

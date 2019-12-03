@@ -96,9 +96,6 @@
 				this.$snotify.success(roll.roll, snotifyTitle, {
 					position: "centerTop"
 				});
-
-				item.mod = undefined
-				item.n = 1
 			}
 		}
 	};

@@ -1,12 +1,11 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div v-if="overencumbered" class='container'>
+	<div>
+		<div v-if="overencumbered">
 			<OverEncumbered/>
 		</div>
 		
 		<template v-else-if="player">
-			<div id="players" class="container-fluid" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
+			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
 				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
@@ -243,7 +242,6 @@
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
@@ -254,7 +252,6 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 		},
 		data() {

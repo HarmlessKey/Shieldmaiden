@@ -72,6 +72,9 @@
 				else {
 					die = d
 				}
+				if (item.mod == '') {
+					item.mod = undefined
+				}
 				let roll = this.rollD(die, item.n, item.mod);
 				item.result = roll.total;
 

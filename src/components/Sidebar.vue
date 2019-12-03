@@ -110,7 +110,7 @@
 	position: relative;
 	padding-top:10px;
 	background: #262626;
-	transition: width 0.4s linear;
+	transition: width 0.5s linear;
 	z-index: 98;
 	border-right: 1px solid #302f2f;
 	overflow-y: scroll;
@@ -139,7 +139,7 @@
 		}
 		a {
 			width: 250px;
-			transition: padding-left 0.4s linear;
+			transition: padding-left 0.5s linear;
 		}
 		a.active {
 			i::before {
@@ -162,10 +162,10 @@
 		font-size: 20px;
 		text-align: right;
 		width: 250px;
-		transition: width .4s linear;
+		transition: width 0.5s linear;
 
 		i {
-			transition: transform .6s linear;
+			transition: transform 0.5s linear;
 		}
 	}
 	&.side-collapsed {

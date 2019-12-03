@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="content">
 		<b-card header="Your Profile">
 			<b-row>
 				<b-col md="2" v-if="user.photoURL">

@@ -227,7 +227,6 @@ export const content_module = {
 			Vue.set(state, 'side_collapsed', !state.side_collapsed);
 		},
 		SET_SIDE_SMALL_SCREEN(state) {
-			console.log(state.side_small_screen)
 			Vue.set(state, 'side_small_screen', !state.side_small_screen);
 		}
 	},

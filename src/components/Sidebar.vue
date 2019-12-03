@@ -86,10 +86,10 @@
 		mounted() {
 			window.onresize = () => {
 				let small = 600
-				if (!this.man_col && window.innerWidth < small) {
+				if (window.innerWidth < small) {
 					this.small_screen = true;
 				}
-				if (!this.man_col && window.innerWidth >= small){
+				if (window.innerWidth >= small){
 					this.small_screen = false;
 				}
 			}

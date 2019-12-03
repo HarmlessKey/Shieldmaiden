@@ -2,10 +2,14 @@
 	<header>
 		<div id="header" class="d-flex justify-content-between">
 			<div>
-				<div class="menu" @click="setSideSmallScreen()">
+				<div 
+					v-if="$route.name !== 'home'"
+					class="menu"
+					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
+				>
 					<i class="fas fa-bars"></i>
 				</div>
-				<router-link to="/" class="logo d-flex justify-content-start">
+				<router-link to="/" class="logo d-flex justify-content-start" :class="{ home: $route.name === 'home' }">
 					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
@@ -173,6 +177,10 @@ a.user	{
 @media only screen and (max-width: 600px) {
 	.logo {
 		left: 40px;
+
+		&.home {
+			left: 5px;
+		}
 	}
 }
 </style>

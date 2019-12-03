@@ -1,5 +1,5 @@
 <template>
-	<div id="app" class="container-fluid">
+	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
@@ -87,6 +87,7 @@
 			'setUser',
 			'setUserInfo',
 			'setSlide',
+			'setSideSmallScreen'
 		]),
 		hideSlide() {
 			this.setSlide(false)

@@ -1,6 +1,10 @@
 <template>
-	<transition enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft">
+	<transition 
+		enter-active-class="animated slideInLeft" 
+		leave-active-class="animated slideOutLeft"
+	>
 		<div 
+			@click.stop=""
 			v-if="!small_screen || $store.getters.side_small_screen"
 			id="sidebar" 
 			:class="{
@@ -68,7 +72,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapActions } from 'vuex'
 
 	export default {
 		name: 'Sidebar',
@@ -196,6 +200,12 @@
 	&::-webkit-scrollbar {
 		display: none;
 	}
+}
+.slideInLeft {
+	animation-duration: 0.5s !important;
+}
+.slideOutLeft {
+	animation-duration: 0.5s !important;
 }
 @media only screen and (max-width: 600px) {
 	.hasSide {

@@ -226,8 +226,8 @@ export const content_module = {
 		SET_SIDE_COLLAPSE(state) {
 			Vue.set(state, 'side_collapsed', !state.side_collapsed);
 		},
-		SET_SIDE_SMALL_SCREEN(state) {
-			Vue.set(state, 'side_small_screen', !state.side_small_screen);
+		SET_SIDE_SMALL_SCREEN(state, payload) {
+			Vue.set(state, 'side_small_screen', payload);
 		}
 	},
 	actions: {
@@ -416,8 +416,8 @@ export const content_module = {
 		setSideCollapsed({ commit }) {
 			commit("SET_SIDE_COLLAPSE")
 		},
-		setSideSmallScreen({ commit }) {
-			commit("SET_SIDE_SMALL_SCREEN")
+		setSideSmallScreen({ commit }, payload) {
+			commit("SET_SIDE_SMALL_SCREEN", payload)
 		},
 	},
 };

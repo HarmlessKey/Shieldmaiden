@@ -4,7 +4,7 @@
 	</div>
 	<div id="hasSide" class="container-fluid" v-else-if="encounter">
 		<Sidebar/>
-		<div class="wrapper">
+		<div class="wrapper scrollable-content">
 			<div class="top">
 				<Crumble />
 				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
@@ -44,7 +44,6 @@
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
 	import Loot from './Loot.vue'
 	import Xp from './Xp.vue'
@@ -60,7 +59,6 @@
 			title: 'Encounters'
 		},
 		components: {
-			Sidebar,
 			Crumble,
 			OverEncumbered,
 			Loot,

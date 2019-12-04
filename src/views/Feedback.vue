@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<h1>Give feedback</h1>
 		<p>If you run into an issue with our app, please let us know. You can leave feedback on GitHub.</p>
 		<a href="https://github.com/HarmlessHarm/HarmlessKey/issues/new" target="_blank"><i class="fab fa-github"></i> Harmless Key GitHub.</a>
@@ -35,8 +35,7 @@
 	"container"
 	"footer";
 
-	.container {
-		padding-top: 30px;
+	.content {
 		padding-bottom: 50px;
 		line-height: 25px;
 		font-size: 15px; 

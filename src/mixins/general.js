@@ -12,9 +12,13 @@ export const general = {
 			}	
 		},
 		hitDiceStr(npc) {
-			let mod = this.calcMod(npc['constitution'])
-			let sign = (mod > 0) ? '+' : '';
-			let mod_str = mod ? mod : '';
+			let mod = this.calcMod(npc['constitution']);
+			let nHD = parseInt(npc.hit_dice.split('d')[0]);
+			let hdMod = mod * nHD;
+
+			let sign = (hdMod > 0) ? '+' : '';
+			let mod_str = hdMod ? hdMod : '';
+			
 			return "" + npc.hit_dice + sign + mod_str;
 		},
 		percentage(current, max) {

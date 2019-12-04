@@ -47,12 +47,12 @@ $electrum: #a2bade;
 $gold: #e2da5f;
 $platinum: #fff;
 
-$header-hight: 50px;
+$header-height: 50px;
 
 /* 2. Defaults */
 /*********************************************/
 html body {
-	padding-top: $header-hight;
+	padding-top: $header-height;
 	background: $gray-dark;
 	color: $gray-light;
 	font-size: 15px;
@@ -69,7 +69,7 @@ html body {
 	}
 	header {
 		display: block;
-		height: $header-hight;
+		height: $header-height;
 		line-height: 30px;
 		padding: 10px;
 		width: 100%;
@@ -160,6 +160,24 @@ html body {
 	word-wrap: break-word;
 }
 
+.scrollable-content {
+	height: calc(100vh - #{$header-height});
+	overflow: auto;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+	.content {
+		padding: 20px;
+	}
+}
+#home {
+	.content {
+		max-width: 1140px;
+		margin: auto;
+	}
+}
+
 .validate {
 	margin-top: 5px;
 	font-size: 11px;
@@ -181,15 +199,16 @@ html body {
 
 .live {
 	display: inline-block;
-	color: $gray-hover;
-	border: solid 1px $gray-light;
+	color: $white;
+	background-color: $gray-hover;
 	padding: 5px 10px;
 	font-size: 12px;
-	border-radius: 50px;
+	border-radius: 10px;
+	min-width: 65px;
 
 	&::before { 
 		content: "";
-		background-color: $gray-hover;
+		background-color: $white;
 		display: inline-block;
 		height: 10px;
 		width: 10px;
@@ -198,11 +217,11 @@ html body {
 	}
 
 	&.active {
-		border-color: $red;
-		color: $gray-light;
+		background-color: $red;
+		color: $white;
 
 		&::before {
-			background-color: $red;
+			background-color: $white;
 			animation: fadeinout 1.3s linear infinite;
 		}
 	}
@@ -297,31 +316,6 @@ a.logout {
 	}
 }
 
-#hasSide {
-	padding-left: 200px;
-}
-#sidebar {
-	width: 200px;
-	position: fixed;
-	left: 0;
-	top: $header-hight;
-	height: calc(100% - 50px);
-	padding-top:10px;
-	background:$gray;
-	
-	.list-group-item {
-		padding: 0 !important;
-
-		span { 
-			margin-left: 10px;
-		}
-		a.active {
-			i::before {
-				color: $blue !important;
-			}
-		}
-	}
-}
 ul.crumble {
 	list-style: none;
 	padding: 0 0 15px 0;
@@ -651,24 +645,6 @@ ul.entities {
 		right: 20px;
 		a {
 			background: $gray-active;
-		}
-	}
-}
-@media only screen and (max-width: 1200px) {
-	#hasSide {
-		padding-left: 30px;
-	}
-	#sidebar {
-		width: 30px;
-
-		.list-group-item {
-			a {
-				padding-left: 6px;
-			}
-		}
-
-		span {
-			display: none;
 		}
 	}
 }

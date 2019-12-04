@@ -199,15 +199,16 @@ html body {
 
 .live {
 	display: inline-block;
-	color: $gray-hover;
-	border: solid 1px $gray-light;
+	color: $white;
+	background-color: $gray-hover;
 	padding: 5px 10px;
 	font-size: 12px;
-	border-radius: 50px;
+	border-radius: 10px;
+	min-width: 65px;
 
 	&::before { 
 		content: "";
-		background-color: $gray-hover;
+		background-color: $white;
 		display: inline-block;
 		height: 10px;
 		width: 10px;
@@ -216,11 +217,11 @@ html body {
 	}
 
 	&.active {
-		border-color: $red;
-		color: $gray-light;
+		background-color: $red;
+		color: $white;
 
 		&::before {
-			background-color: $red;
+			background-color: $white;
 			animation: fadeinout 1.3s linear infinite;
 		}
 	}

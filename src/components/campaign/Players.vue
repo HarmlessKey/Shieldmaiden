@@ -35,7 +35,7 @@
 					@click="setSlide({
 						show: true,
 						type: 'slides/EditPlayer',
-						data: { key: data.item.key, location: 'overview'}
+						data: { key: data.row.key, location: 'overview'}
 					})">
 					<i class="fas fa-pencil"></i>
 				</a>

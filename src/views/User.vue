@@ -8,7 +8,7 @@
 	
 		<h2>Campaigns</h2>
 		<!-- CAMPAIGNS -->
-		<b-row v-if="Object.keys(campaigns).length > 0" class="mt-3">
+		<b-row v-if="campaigns" class="mt-3">
 			<b-col lg="4" md="6" v-for="campaign in campaigns" :key="campaign['.key']">
 				<div  class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 					<div class="card-header">
@@ -54,15 +54,6 @@
 
 	<trackCampaign v-else />
 
-	<!-- ADS -->
-	<div class="d-flex justify-content-center">
-		<ins class="adsbygoogle bg-gray-dark"
-					v-if="tier && !tier.benefits.ads"
-					style="display:inline-block;width:100%;height:100px"
-					data-ad-client="ca-pub-2711721977927243"
-					data-ad-slot="8698049578">
-		</ins>
-	</div>
 </div>
 </template>
 
@@ -88,7 +79,6 @@
 				user: this.$store.getters.getUser,
 				userId: this.$route.params.userid,
 				campaigns: undefined,
-				tier: undefined,
 				loadingCampaigns: true
 			}
 		},
@@ -103,20 +93,6 @@
 					asObject: true,
 				}
 			}
-		},
-		updated() {
-			this.$nextTick(function() {
-				// eslint-disable-next-line
-				let ins = $('ins')
-				// eslint-disable-next-line
-				if ($('ins').length > 0) {
-					// eslint-disable-next-line
-					(adsbygoogle = window.adsbygoogle || []).push({});
-				}
-			})
-		},
-		beforeMount() {
-			this.fetch_tier()
 		},
 		mounted() {
 			var campaigns = db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null);
@@ -137,49 +113,7 @@
 				this.campaigns = campaigns;
 				this.loadingCampaigns = false;
 			});
-		},
-		methods: {
-			fetch_tier() {
-				let path = 'tiers/basic'
-
-				db.ref(`users/${this.userId}`).once('value', user_snap => {
-					let user = user_snap.val()
-					if (user.voucher) {
-						if (user.voucher.date === undefined) {
-							path = `tiers/${user.voucher.id}`
-						} else {
-							let end_date = new Date(user.voucher.date)
-							let today = new Date()
-							if (user.voucher && today <= end_date) {
-								path = `tiers/${user.voucher.id}`
-							}
-						}
-					}
-					let vouch_tiers = db.ref(path)
-					vouch_tiers.once('value', voucher_snap => {
-						let voucher_order = voucher_snap.val().order
-						let patrons = db.ref('patrons').orderByChild('email').equalTo(user.email)
-						patrons.on('value', patron_snapshot => {
-
-							if (patron_snapshot.val()) {
-								let key = Object.keys(patron_snapshot.val())[0]
-								let patron_tier = db.ref(`tiers/${patron_snapshot.val()[key].tier_id}`)
-								patron_tier.once('value', tier_snapshot =>  {
-									if (tier_snapshot.val().order >= voucher_order) {
-										this.tier = tier_snapshot.val()
-									} else {
-										this.tier = voucher_snap.val()
-									}
-								})
-							}
-							else {
-								this.tier = voucher_snap.val()
-							}
-						})
-					})
-				})
-			}
-		},
+		}
 	}
 </script>
 
@@ -261,9 +195,5 @@
 				text-decoration: none;
 			}
 		}
-	}
-	.adsbygoogle {
-		position: fixed;
-		bottom: 0;
 	}
 </style>

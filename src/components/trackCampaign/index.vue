@@ -1,7 +1,7 @@
 <template>
 <div v-if="campaign">
 	<template v-if="!campaign.private">
-		<!-- NOT BROADCASTING -->
+		<!-- NOT LIVE -->
 		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
 			<div class="top">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
@@ -11,13 +11,14 @@
 				</span>
 			</div>
 			<div class="container-fluid">
+				<h2 class="not-live" v-if="broadcasting['.value'] !== $route.params.campid">Campaign is currently not live</h2>
 				<div class="container entities">
 					<CampaignOverview :players="campaign.players" />
 				</div>
 			</div>
 		</div>
 
-		<!-- BROADCASTING -->
+		<!-- LIVE -->
 		<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 			
 			<!-- FINISHED -->
@@ -359,6 +360,11 @@
 				line-height: 25px;
 				padding: 0 10px;
 			}
+		}
+
+		h2.not-live {
+			margin-top: 50px;
+			text-align: center;
 		}
 
 		&::-webkit-scrollbar { 

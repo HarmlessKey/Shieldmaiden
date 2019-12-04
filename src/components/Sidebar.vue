@@ -13,7 +13,7 @@
 			<div>
 				<template v-if="$store.getters.getUser">
 					<h3>DM Content</h3>
-					<b-list-group>
+					<b-list-group @click="setSideSmallScreen(false)">
 						<b-list-group-item>
 							<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
 						</b-list-group-item>
@@ -26,7 +26,7 @@
 					</b-list-group>
 					<hr>
 					<h3>Player Content</h3>
-					<b-list-group>
+					<b-list-group @click="setSideSmallScreen(false)">
 						<b-list-group-item>
 							<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
 						</b-list-group-item>
@@ -36,7 +36,7 @@
 					</b-list-group>
 					<hr>
 				</template>
-				<b-list-group>
+				<b-list-group @click="setSideSmallScreen(false)">
 					<b-list-group-item>
 						<router-link to="/compendium"><i class="fas fa-book-spells"></i><span>Compendium</span></router-link>
 					</b-list-group-item>
@@ -84,7 +84,8 @@
 		},
 		methods: {
 			...mapActions([
-				'setSideCollapsed'
+				'setSideCollapsed',
+				'setSideSmallScreen'
 			]),
 		},
 		mounted() {

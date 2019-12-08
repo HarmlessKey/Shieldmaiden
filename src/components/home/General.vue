@@ -8,7 +8,7 @@
 					<iframe src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 				</b-col>
 				<b-col>
-					<h3>We track everything in encounters</h3>
+					<h3>We track everything in combat</h3>
 					
 					<ul>
 						<li>Current Hit Points</li>

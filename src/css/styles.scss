@@ -173,8 +173,6 @@ html body {
 	}
 }
 .home {
-	font-size: 18px; 
-	line-height: 30px;
 	scroll-behavior: smooth;
 
 	.content {
@@ -182,6 +180,9 @@ html body {
 		margin: auto;
 	}
 	section {
+		font-size: 18px; 
+		line-height: 30px;
+		
 		.head {
 			margin: 100px 0;
 			text-align: center;

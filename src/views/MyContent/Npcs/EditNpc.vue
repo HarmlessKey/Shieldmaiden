@@ -240,7 +240,7 @@
 				</b-col>
 				<b-col class="col" v-if="quick == false">
 					<label for="hitdice">
-						Hit Dice ({{ hitDiceStr(npc) }})
+						Hit Dice {{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}
 						<a v-b-popover.hover.top="'The modifier is the NPC\'s Constitution modifier.'" title="Hit Dice + Modifier"><i class="fas fa-info-circle"></i></a>
 					</label>
 					<b-form-input autocomplete="off" 

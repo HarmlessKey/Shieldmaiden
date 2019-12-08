@@ -1,6 +1,7 @@
 @import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
+@import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 
 /*
 	Table of content
@@ -171,10 +172,29 @@ html body {
 		padding: 20px;
 	}
 }
-#home {
+.home {
+	font-size: 18px; 
+	line-height: 30px;
+	scroll-behavior: smooth;
+
 	.content {
 		max-width: 1140px;
 		margin: auto;
+	}
+	h2 {
+		font-family: 'Fredericka the Great', cursive;
+		font-size: 30px !important;
+		line-height: 50px;
+		text-align: center;
+		margin: 100px 0 !important;
+		color: #fff;
+	}
+	h3 {
+		font-size: 25px !important;
+		margin-bottom: 30px !important;
+	}
+	p {
+		margin-bottom: 50px;
 	}
 }
 

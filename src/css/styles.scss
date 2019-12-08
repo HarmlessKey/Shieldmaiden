@@ -181,37 +181,48 @@ html body {
 		max-width: 1140px;
 		margin: auto;
 	}
-	h2 {
-		font-family: 'Fredericka the Great', cursive;
-		font-size: 30px !important;
-		line-height: 50px;
-		text-align: center;
-		margin: 100px 0 !important;
-		color: #fff;
-	}
-	h3 {
-		font-size: 25px !important;
-		margin-bottom: 30px !important;
-	}
-	p {
-		margin-bottom: 50px;
-	}
-	.next {
-		display: block;
-		text-align: center;
-		margin: 0;
-		color: $white !important;
-		position: absolute;
-		bottom: 70px;
-		left: 50%;
-		margin-left: -100px;
-		width: 200px;
+	section {
+		.head {
+			margin: 100px 0;
+			text-align: center;
 
-		&:hover {
-			text-decoration: none;
+			h2 {
+				font-family: 'Fredericka the Great', cursive;
+				font-size: 30px !important;
+				line-height: 50px;
+				text-align: center;
+				color: #fff;
+			}
+		}
+		h3 {
+			font-size: 25px !important;
+			margin-bottom: 30px !important;
+		}
+		p {
+			margin-bottom: 50px;
+		}
+		.next {
+			display: block;
+			text-align: center;
+			margin: 0;
+			color: $white !important;
+			position: absolute;
+			bottom: 70px;
+			left: 50%;
+			margin-left: -125px;
+			width: 250px;
+			font-size: 25px;
 
 			i {
-				font-size: 30px;
+				font-size: 35px;
+			}
+	
+			&:hover {
+				text-decoration: none;
+	
+				i {
+					font-size: 45px;
+				}
 			}
 		}
 	}

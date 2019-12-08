@@ -10,11 +10,12 @@
 
 						<h3>We track everything, so you have the time to give your players the attention they deserve.</h3>
 
-						<p>Harmless Key is an encounter tracker for Dungeons & Dragons 5th Edition.
-						We focus on keeping the game on the table by managing everything you need to keep track of during encounters. On top of that we enhance the player experience.</p>
-
-						<a class="btn btn-lg mr-2" href="#general">Learn more</a>
 						<router-link to="sign-up" class="btn btn-lg">Create Account</router-link>
+
+						<a class="next" href="#general">
+							<div>Learn more</div>
+							<i class="fas fa-chevron-down"></i>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -32,8 +33,8 @@
 	.top {
 		color: #fff;
  		background-position: center;
-		padding: 50px 0;
-		min-height: calc(100vh - 100px - 55px);
+		padding: 50px 0 170px 0;
+		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;
 
 		.logo {
@@ -52,13 +53,13 @@
 				.content-box {
 					text-align: center;
 					margin: auto;
-					max-width: 750px;
+					max-width: 800px;
 					padding: 25px 20px 50px 20px;
 					text-shadow: 2px 2px 1px #000;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
-						font-size: 35px;
+						font-size: 40px;
 						text-transform: none;
 					}
 					h3 {
@@ -66,9 +67,7 @@
 						line-height: 35px;
 						font-style: italic;
 						text-transform: none;
-					}
-					p {
-						margin-top: 50px;
+						max-width: 700px;
 					}
 					.btn {
 						text-shadow: none;

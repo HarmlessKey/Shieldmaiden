@@ -1,7 +1,12 @@
 <template>
 	<div class="general">
 		<div class="container">
-			<h2>We keep track, you focus on the game</h2>
+			<div class="head">
+				<h2>We keep track, you focus on the game</h2>
+				<span>
+					We focus on keeping the game on the table by managing everything you need to keep track of during encounters. On top of that we enhance the player experience.
+				</span>
+			</div>
 
 			<b-row>
 				<b-col sm="6">

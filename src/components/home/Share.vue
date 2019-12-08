@@ -1,7 +1,12 @@
 <template>
 	<div class="share">
 		<div class="container">
-			<h2>Share live initiative list with your players</h2>
+			<div class="head">
+				<h2>Share live initiative list with your players</h2>
+				<span>
+					Show your players a live initiative list of the encounter, that updates as you play.
+				</span>
+			</div>
 
 			<b-row>
 				<b-col sm="6">

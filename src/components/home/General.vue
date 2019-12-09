@@ -27,8 +27,8 @@
 					<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
 				</b-col>
 			</b-row>
-			<a href="#share" class="next">
-				<div>Share initiative list</div>
+			<a href="#content" class="next">
+				<div>Build encounters</div>
 				<i class="fas fa-chevron-down"></i>
 			</a>
 		</div>

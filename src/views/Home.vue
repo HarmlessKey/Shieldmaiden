@@ -20,6 +20,16 @@
 				}">
 			</span>
 		</section>
+		<section id="content">
+			<Content />
+			<span 
+				class="die" 
+				:style="{ 
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+					transform: `rotate(${scrolled}deg)`
+				}">
+			</span>
+		</section>
 		<section id="share">
 			<Share />
 		</section>
@@ -35,6 +45,7 @@
 	import Top from '@/components/home/Top.vue'
 	import General from '@/components/home/General.vue'
 	import Share from '@/components/home/Share.vue'
+	import Content from '@/components/home/Content.vue'
 	import Footer from '@/components/Footer.vue'
 
 	export default {
@@ -43,6 +54,7 @@
 			Top,
 			General,
 			Share,
+			Content,
 			Footer,
 		},
 		data() {
@@ -75,7 +87,7 @@
 				}
 			},
 			setColors() {
-				for(let i = 0; i < 2; i++) {
+				for(let i = 0; i < 3; i++) {
 					this.returnUniqueColor();
 				}
 			},

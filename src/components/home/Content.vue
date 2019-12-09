@@ -10,7 +10,7 @@
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/follow-encounters-harmless-key.png"/>
+					<img class="image" src="@/assets/_img/encounter-builder.gif"/>
 				</b-col>
 				<b-col>
 					<h3>Encounter builder</h3>
@@ -41,7 +41,7 @@
 	.content {
 		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #232323;
+		background-color: #181818;
 
 		.image {
 			width: 100%;

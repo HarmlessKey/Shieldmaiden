@@ -10,7 +10,7 @@
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/follow-encounters-harmless-key.png"/>
+					<img class="image" src="@/assets/_img/track-encounter.gif"/>
 				</b-col>
 				<b-col>
 					<h3>Shows everything you need</h3>

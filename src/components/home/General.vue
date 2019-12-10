@@ -45,7 +45,7 @@
 	.general {
 		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #191919;
+		background-color: #232323;
 
 		ul {
 			margin-bottom: 30px;

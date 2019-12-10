@@ -1,5 +1,5 @@
 <template>
-	<div class="content">
+	<div class="builder">
 		<div class="container">
 			<div class="head">
 				<h2>Build great encounters</h2>
@@ -38,7 +38,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.content {
+	.builder {
 		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #181818;

@@ -22,6 +22,9 @@
 						<h2 class="gray-light">Follow us</h2>
 						<ul>
 							<li>
+								<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
+							</li>
+							<li>
 								<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
 							</li>
 							<li>

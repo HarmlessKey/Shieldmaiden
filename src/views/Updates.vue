@@ -2,8 +2,8 @@
 	<div class="grid">
 		<div class="content">
 			<h1>Updates</h1>
-			<p>Check our latest updates on Trello.</p>
-			<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
+			<p>Check our latest updates on our Discord.</p>
+			<a href="https://discord.gg/gCXJZCs" target="_blank" class="large-link"><i class="fab fa-discord discord-purple"></i> Harmless Key Discord</a>
 		</div>
 		<Footer />
 	</div>

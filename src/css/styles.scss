@@ -33,6 +33,7 @@ $facebook-blue: #3C5A99;
 $red: #cc3e4a;
 $red-hover: #a3303a;
 $patreon-red: #e85b46;
+$discord-purple: #7289DA;
 $orange: #e76d3b;
 $yellow: #c1b947;
 $purple: #9b7aba;
@@ -114,6 +115,7 @@ html body {
 .red { color: $red !important; }
 .black { color: $black !important; }
 .patreon-red { color: $patreon-red !important; }
+.discord-purple { color: $discord-purple !important; }
 .white { color: $white !important; }
 .orange { color: $orange !important; }
 .yellow { color: $yellow !important; }
@@ -159,6 +161,25 @@ html body {
 	overflow: auto;
 	max-height: 100%;
 	word-wrap: break-word;
+}
+
+a.large-link {
+	display: block;
+	background: $gray;
+	color: $gray-light !important;
+	padding: 20px;
+	font-size: 20px;
+	line-height: 40px;
+	width: max-content;
+
+	&:hover {
+		text-decoration: none;
+	}
+	i {
+		font-size: 40px;
+		margin-right: 10px;
+		vertical-align: -10px;
+	}
 }
 
 .scrollable-content {

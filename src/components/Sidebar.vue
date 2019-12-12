@@ -54,6 +54,9 @@
 						<a href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon patreon-red"></i><span>Patreon</span></a>
 					</b-list-group-item>
 					<b-list-group-item>
+						<a href="https://discord.gg/fhmKBM7" target="_blank"><i class="fab fa-discord"></i><span>Discord</span></a>
+					</b-list-group-item>
+					<b-list-group-item>
 						<a href="https://www.facebook.com/harmlesskey" target="_blank"><i class="fab fa-facebook"></i><span>Facebook</span></a>
 					</b-list-group-item>
 					<b-list-group-item>

@@ -118,7 +118,8 @@
 				})
 				this.set_targeted(undefined);
 
-				this.reminders(this.current, 'endTurn')
+				this.reminders(this.current, 'endTurn');
+				db.ref(`encounters/${this.path}/lastRoll`).remove();
 			},
 			reminders(target, trigger){
 				for(let key in target.reminders) {

@@ -59,8 +59,7 @@
 		},
 		data() {
 			return {
-				scrolled: 0,
-				diceColors: []
+				scrolled: 0
 			}
 		},
 		metaInfo: {
@@ -69,37 +68,30 @@
 				{ vmid: 'description', name: 'description', content: 'The initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
 			]
 		},
-		mounted() {
-			this.setColors();
+		computed: {
+			diceColors() {
+				let array = [
+					'blue',
+					'cyan',
+					'green',
+					'orange',
+					'red',
+					'yellow'
+				];
+
+				//Shuffle the array
+				for(let i = array.length - 1; i > 0; i--){
+					const j = Math.floor(Math.random() * i);
+					const temp = array[i];
+					array[i] = array[j];
+					array[j] = temp;
+				}
+				return array;
+			}
 		},
 		methods: {
 			handleScroll(e) {
 				this.scrolled = e.target.scrollTop;
-        	},
-			dieColor(number) {
-				switch(number) {
-					case 1: return 'blue';
-					case 2: return 'cyan';
-					case 3: return 'green';
-					case 4: return 'orange';
-					case 5: return 'red';
-					case 6: return 'yellow';
-				}
-			},
-			setColors() {
-				for(let i = 0; i < 3; i++) {
-					this.returnUniqueColor();
-				}
-			},
-			returnUniqueColor() {
-				let number = Math.ceil(Math.random() * 6);
-				let color = this.dieColor(number);
-				
-				if(this.diceColors.includes(color)) {
-					this.returnUniqueColor();
-				} else {
-					this.diceColors.push(color);
-				}
 			}
 		}
 	}
@@ -120,7 +112,7 @@
 	}
 	.die {
 		left: 50%;
-  		margin-left: -50px;
+		margin-left: -50px;
 		position: absolute;
 		bottom: -50px;
 		display: inline-block;

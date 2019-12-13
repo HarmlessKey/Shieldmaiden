@@ -8,25 +8,22 @@
 				</span>
 			</div>
 
-			<b-row>
-				<b-col sm="6">
-					<img class="image" src="@/assets/_img/encounter-builder.gif"/>
-				</b-col>
-				<b-col>
-					<h3>Encounter builder</h3>
-					
-					<ul>
-						<li>Calculates difficulty</li>
-						<li>Use your custom created Monsters</li>
-					</ul>
+			<img class="image" src="@/assets/_img/encounter-builder.gif"/>
+	
+			<!-- <h3>Encounter builder</h3>
+			
+			<ul>
+				<li>Calculates difficulty</li>
+				<li>Use your custom created Monsters</li>
+			</ul> -->
 
-					<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
-				</b-col>
-			</b-row>
-			<a href="#share" class="next">
-				<div>Share initiative list</div>
-				<i class="fas fa-chevron-down"></i>
-			</a>
+			<div class="text-center">
+				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
+			</div>
+				<a href="#share" class="next">
+					<div>Share initiative list</div>
+					<i class="fas fa-chevron-down"></i>
+				</a>
 		</div>
 	</div>
 </template>
@@ -43,6 +40,9 @@
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #181818;
 
+		.head {
+			margin-bottom: 30px;
+		}
 		.image {
 			width: 100%;
 			margin-bottom: 30px;

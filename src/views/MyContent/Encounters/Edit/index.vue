@@ -2,8 +2,7 @@
 	<div v-if="overencumbered" class='container-fluid'>
 		<OverEncumbered/>
 	</div>
-	<div id="hasSide" class="container-fluid" v-else-if="encounter">
-		<Sidebar/>
+	<div class="container-fluid" v-else-if="encounter">
 		<div class="wrapper scrollable-content">
 			<div class="top">
 				<Crumble />

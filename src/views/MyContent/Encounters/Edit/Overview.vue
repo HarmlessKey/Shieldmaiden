@@ -70,7 +70,7 @@
 
                         <!-- ACTIONS -->
                         <div slot="actions" slot-scope="data" class="actions">
-                            <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                            <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
                                 <i class="fas fa-pencil"></i>
                             </a>
                             <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
@@ -98,7 +98,7 @@
                         </span>
 
                         <div slot="actions" slot-scope="data" class="actions">
-                            <a @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                            <a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
                                 <i class="fas fa-pencil"></i>
                             </a>
                             <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">

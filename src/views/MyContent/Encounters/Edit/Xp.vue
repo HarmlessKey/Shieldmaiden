@@ -1,14 +1,14 @@
 <template>
     <div>
         <h2>Experience Points</h2>
-        <h3 :class="{ strikeTrough: xp.overwrite }">
-            Calucated Amount <span class="blue">{{ xp.calculated }}</span>
-            <a @click="setOverwrite = !setOverwrite" class="ml-2 red" v-if="!xp.overwrite">Overwrite</a>
-        </h3>
-        <h3 v-if="xp.overwrite">
-            Overwritten Amount <span class="blue">{{ xp.overwrite }}</span>
-            <a @click="clearOverwrite" class="ml-2 red">Use calculated</a>
-        </h3>
+        <div class="d-flex justify-content-start">
+            <span class="xp" :class="{ strikeTrough: xp.overwrite }">{{ xp.calculated }}</span>
+            <a @click="setOverwrite = !setOverwrite" class="ml-2" v-if="!xp.overwrite"><i class="fas fa-edit"></i></a>
+        </div>
+        <div class="d-flex justify-content-start" v-if="xp.overwrite">
+            <span class="xp">{{ xp.overwrite }}</span>
+            <a @click="clearOverwrite" class="ml-2 red"><i class="fas fa-times"></i></a>
+        </div>
         
         <div class="d-flex justify-content-between" v-if="setOverwrite">
             <div class="input-group mb-3">
@@ -58,7 +58,13 @@
 </script>
 
 <style lang="scss" scoped>
-    .strikeTrough {
-        text-decoration: line-through;
+    .xp {
+        font-size: 60px;
+        font-weight: bold;
+
+        &.strikeTrough {
+            text-decoration: line-through;
+            color: #5c5757;
+        }
     }
 </style>

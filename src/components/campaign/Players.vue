@@ -4,7 +4,7 @@
 			<div class="money" 
 				@click="setSlide({
 					show: true,
-					type: 'slides/Currency',
+					type: 'slides/party/Currency',
 					data: { current: currency['.value'] }
 				})">
 				<template v-if="currency['.value']">
@@ -23,7 +23,7 @@
 					v-b-tooltip.hover title="Edit Group Health"
 					@click="setSlide({
 						show: true,
-						type: 'slides/InventoryParty'
+						type: 'slides/party/health'
 					})"><i class="fas fa-heart"></i></a>
 				<a 
 					class="" 
@@ -31,14 +31,14 @@
 					v-b-tooltip.hover title="Award Experience Points"
 					@click="setSlide({
 						show: true,
-						type: 'slides/xpParty'
+						type: 'slides/party/xp'
 					})">XP</a>
 				<a 
 					class="" 
 					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
-						type: 'slides/InventoryParty'
+						type: 'slides/party/Inventory'
 					})"><i class="fas fa-treasure-chest"></i></a>
 			</div>
 		</div>

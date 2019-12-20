@@ -196,7 +196,6 @@
 						entity.name = `${entity.name} (${++last})`
 					} else if (n > 0) {
 						entity.name = `${entity.name} (${n})`
-						
 					}
 					
 					if(custom == false) {

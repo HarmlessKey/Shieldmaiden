@@ -8,7 +8,9 @@
                   </span>
                 <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" :placeholder="coin.name"/>
             </div>
-            <button class="btn mt-2" @click="setCurrency()">Save currency</button>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+            <button class="btn" @click="setCurrency()">Save currency</button>
         </div>
 
         <h3 class="d-flex justify-content-between">
@@ -19,45 +21,71 @@
             </a>
         </h3>
         <hr>
-        <div v-for="(item, index) in loot.items" :key="index">
-            <h2 class="d-flex justify-content-between">
-                {{ index + 1 }}. {{ item.name }}
-                <a @click="removeItem(index)" 
-                    class="gray-hover"
-                    v-b-tooltip.hover title="Remove">
-                    <i class="fas fa-minus red"></i>
-                    <span class="d-none d-md-inline ml-1">Remove</span>
-                </a>
-            </h2>
-            <b-row class="mb-2">
-                <b-col sm="2">
-                    <label for="name">Name</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-input
-                        id="name"
-                        type="text" 
-                        v-model="item.name" 
-                        name="name" 
-                        placeholder="Name"></b-form-input>
-                </b-col>
-            </b-row>
-            <b-row class="mb-2">
-                <b-col sm="2">
-                    <label for="desc">Description</label>
-                </b-col>
-                <b-col sm="10">
-                    <textarea
-                        id="desc"
-                        class="form-control" 
-                        v-model="item.desc" 
-                        rows="4"
-                        name="desc" 
-                        placeholder="Description"></textarea>
-                </b-col>
-            </b-row>
-        </div>
-        <button class="btn mt-2" @click="setLoot()">Save loot</button>
+        <template v-if="loot">
+            <div v-for="(item, index) in loot" :key="item['.key']">
+                <div class="b-card bg-gray mb-3">
+                    <b-card-header class="d-flex justify-content-between">
+                        {{ index + 1 }}. {{ item.public_name }}
+                        <span>
+                            <a @click="setEdit(item['.key'])" 
+                                class="mr-2 gray-light"
+                                v-b-tooltip.hover title="Edit">
+                                <i class="fas fa-pencil"></i>
+                            </a>
+                            <a @click="removeItem(item['.key'])" 
+                                class="red"
+                                v-b-tooltip.hover title="Remove">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </span>
+                    </b-card-header>
+                    <div v-if="editItem === item['.key']" class="card-body">
+                        <p>
+                            <a 
+                            v-if="!item.linked_item"
+                            @click="setSlide({
+                                show: true,
+                                type: 'slides/editEncounter/LinkItem',
+                                data: {
+                                    key: item['.key']
+                                }
+                            })"
+                            ><i class="fas fa-link"></i> Link item</a>
+                            <template v-else>
+                                <i class="fas fa-link mr-2"></i>
+                                <a >{{ items[item.linked_item.key].name }}</a>
+                                <a v-b-tooltip.hover title="Unlink"><i class="fas fa-unlink red ml-2"></i></a>
+                            </template>
+                        </p>
+
+                        <label for="name">
+                            Public Name
+                            <a v-b-popover.hover.top="'The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item.'" title="Public Name"><i class="fas fa-info-circle"></i></a>
+                        </label>
+                        <b-form-input
+                            class="mb-3"
+                            id="name"
+                            type="text" 
+                            v-model="item.public_name" 
+                            name="name" 
+                            placeholder="Name"></b-form-input>
+
+                        <label for="desc">
+                            Public Description
+                        </label>
+                        <textarea
+                            id="desc"
+                            class="form-control" 
+                            v-model="item.public_description" 
+                            rows="4"
+                            name="desc" 
+                            placeholder="Description"></textarea>
+
+                        <button class="btn mt-3" @click="saveItem(item, item['.key'])">Save</button>
+                    </div>
+                </div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -74,19 +102,21 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
-				slide: this.$store.getters.getSlide
+                slide: this.$store.getters.getSlide,
+                editItem: undefined
 			} 
 		},
 		firebase() {
 			return {
-				loot: {
-					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
-					asObject: true
-                },
+				loot: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
                 currency: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/currency`),
 					asObject: true
-				},
+                },
+                items: {
+					source: db.ref(`items`),
+					asObject: true
+                },
 			}
 		},
 		mounted() {
@@ -101,7 +131,8 @@
 		methods: {
 			...mapActions([
 				'fetchEncounter',
-				'fetchCampaign'
+                'fetchCampaign',
+                'setSlide'
             ]),
             setCurrency() {
                 delete this.currency['.key'];
@@ -114,29 +145,22 @@
 					position: "rightTop"
 				});
             },
-			setLoot() {
-				delete this.loot['.key'];
-				delete this.loot['.value'];
-
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).set(
-					this.loot
-				);
-				this.$snotify.success('Loot saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
+            setEdit(key) {
+                 this.editItem = (this.editItem === key) ? undefined : key;
+            },
+			saveItem(item, key) {
+                item = JSON.parse(JSON.stringify(item));
+                delete item['.key'];
+                db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}`).set(item);
+                this.editItem = undefined;
 			},
 			addItem() {
-				if(this.loot.items == undefined) {
-					this.loot.items = [];
-				}
-				this.loot.items.push({
-					name: 'New Item',
-				});
-				this.$forceUpdate(); //IMPORTANT
+                db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).push({
+                    public_name: 'New Item'
+                });
 			},
-			removeItem(index) {
-				this.$delete(this.loot.items, index);
-				this.$forceUpdate(); //IMPORTANT
+			removeItem(key) {
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}`).remove();
 			}
 		}
 	}

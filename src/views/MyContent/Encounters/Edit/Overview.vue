@@ -319,17 +319,21 @@
     } 
     .toggle {
         position: fixed;
-        bottom: 15px;
+        top: 65px;
         right: 0;
         height: 50px;
         width: 50px;
         z-index: 97;
         text-align: center;
-        transition: right .5s linear, transform .5s linear;
+        transition: right .5s linear;
 
         a { 
             line-height: 50px;
             color: #fff !important;
+
+            i {
+                transition: transform .5s linear;
+            }
         }
 
         &.show {

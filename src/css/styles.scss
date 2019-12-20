@@ -205,6 +205,7 @@ html body {
 	font-size: 12px;
 	border-radius: 10px;
 	min-width: 65px;
+	max-height: 25px;
 
 	&::before { 
 		content: "";

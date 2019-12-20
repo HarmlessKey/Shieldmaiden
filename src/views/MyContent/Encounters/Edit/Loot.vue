@@ -1,6 +1,6 @@
 <template>
     <div class="loot">
-        <h3>Currency</h3>
+        <h3><i class="fas fa-coins"></i> Currency</h3>
         <div class="currency">
             <div v-for="(coin, key) in currencies" :key="key">
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
@@ -13,8 +13,8 @@
             <button class="btn" @click="setCurrency()">Save currency</button>
         </div>
 
-        <h3 class="d-flex justify-content-between">
-            Items
+        <h3 class="d-flex justify-content-between mt-3">
+            <span><i class="far fa-staff"></i> Items</span>
             <a class="gray-hover" @click="addItem()">
                 <i class="fas fa-plus green"></i>
                 <span class="d-none d-md-inline ml-1">Add</span>
@@ -40,24 +40,6 @@
                         </span>
                     </b-card-header>
                     <div v-if="editItem === item['.key']" class="card-body">
-                        <p>
-                            <a 
-                            v-if="!item.linked_item"
-                            @click="setSlide({
-                                show: true,
-                                type: 'slides/editEncounter/LinkItem',
-                                data: {
-                                    key: item['.key']
-                                }
-                            })"
-                            ><i class="fas fa-link"></i> Link item</a>
-                            <template v-else>
-                                <i class="fas fa-link mr-2"></i>
-                                <a >{{ items[item.linked_item.key].name }}</a>
-                                <a v-b-tooltip.hover title="Unlink"><i class="fas fa-unlink red ml-2"></i></a>
-                            </template>
-                        </p>
-
                         <label for="name">
                             Public Name
                             <a v-b-popover.hover.top="'The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item.'" title="Public Name"><i class="fas fa-info-circle"></i></a>
@@ -75,11 +57,29 @@
                         </label>
                         <textarea
                             id="desc"
-                            class="form-control" 
+                            class="form-control mb-4" 
                             v-model="item.public_description" 
                             rows="4"
                             name="desc" 
                             placeholder="Description"></textarea>
+
+                            <p>
+                                <a 
+                                v-if="!item.linked_item"
+                                @click="setSlide({
+                                    show: true,
+                                    type: 'slides/editEncounter/LinkItem',
+                                    data: {
+                                        key: item['.key']
+                                    }
+                                })"
+                                ><i class="fas fa-link"></i> Link item</a>
+                                <template v-else>
+                                    <i class="fas fa-link mr-2"></i>
+                                    <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item.key] })">{{ items[item.linked_item.key].name }}</a>
+                                    <a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
+                                </template>
+                            </p>
 
                         <button class="btn mt-3" @click="saveItem(item, item['.key'])">Save</button>
                     </div>
@@ -161,7 +161,10 @@
 			},
 			removeItem(key) {
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}`).remove();
-			}
+            },
+            unlink(key) {
+                db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}/linked_item`).remove();
+            }
 		}
 	}
 </script>

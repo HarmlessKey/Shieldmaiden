@@ -14,7 +14,10 @@
         </div>
 
         <h3 class="d-flex justify-content-between mt-3">
-            <span><i class="far fa-staff"></i> Items</span>
+            <span>
+                <i class="far fa-staff"></i> Items
+                <span v-if="loot">( {{ Object.keys(loot).length }} )</span>
+            </span>
             <a class="gray-hover" @click="addItem()">
                 <i class="fas fa-plus green"></i>
                 <span class="d-none d-md-inline ml-1">Add</span>
@@ -28,7 +31,7 @@
                         {{ index + 1 }}. {{ item.public_name }}
                         <span>
                             <a @click="setEdit(item['.key'])" 
-                                class="mr-2 gray-light"
+                                class="mr-3 gray-light"
                                 v-b-tooltip.hover title="Edit">
                                 <i class="fas fa-pencil"></i>
                             </a>
@@ -79,6 +82,12 @@
                                     <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item.key] })">{{ items[item.linked_item.key].name }}</a>
                                     <a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
                                 </template>
+                                 <a 
+                                    class="ml-2" 
+                                    v-b-popover.hover.top="'The description of the linked item is not immideately shown when the item has been awarded. You can manualy set this to be visible for your players, once they are allowed to see it.'" 
+                                    title="Linked Item">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
                             </p>
 
                         <button class="btn mt-3" @click="saveItem(item, item['.key'])">Save</button>

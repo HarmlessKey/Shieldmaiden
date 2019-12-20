@@ -154,17 +154,12 @@
 
 	@media only screen and (max-width: 850px) {
 		.wrapper {
-				grid-template-columns: 3fr 2fr;
-		}
-	}
-	@media only screen and (max-width: 767px) {
-		.wrapper {
 			grid-template-columns: auto;
-			grid-template-rows: 30px 1fr 1fr;
+			grid-template-rows: 30px 1fr;
 			grid-template-areas: 
 			"top"
-			"actions"
-			"overview";
+			"actions";
+			overflow: visible !important;
 		}
 	}
 }

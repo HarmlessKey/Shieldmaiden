@@ -2,7 +2,7 @@
 <div>
     <div class="encounter_overview" :class="{ show: showOverview }">
         <div>
-            <h3 class="header">Encounter overview {{ showOverview }}</h3>
+            <h3 class="header">Encounter overview</h3>
             <div class="diff-info" v-if="encDifficulty">
                 <div class="advanced">
                     {{ encDifficulty[1] }}

@@ -44,8 +44,8 @@ const EditReminder = () => import('@/views/MyContent/Reminders/EditReminder.vue'
 const Characters = () => import('@/views/MyContent/Characters');
 const Npcs = () => import('@/views/MyContent/Npcs/Npcs.vue');
 const EditNpc = () => import('@/views/MyContent/Npcs/EditNpc.vue');
-const Items = () => import('@/views/MyContent/Npcs/Npcs.vue');
-const EditItem = () => import('@/views/MyContent/Npcs/EditNpc.vue');
+const Items = () => import('@/views/MyContent/Items/Items.vue');
+const EditItem = () => import('@/views/MyContent/Items/EditItem.vue');
 const RunEncounter = () => import('@/views/MyContent/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
 
@@ -484,7 +484,7 @@ export const routes = [{
 	}
 },
 {
-	path: '/items/add-npc',
+	path: '/items/add-item',
 	name: 'AddItem',
 	component: EditItem,
 	meta: {

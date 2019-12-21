@@ -41,13 +41,13 @@
 				
 				<b-card header="Basic Info">
 					<b-row>
-						<b-col sm="2">
+						<b-col md="2">
 							<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
 							<span class="img" v-else>
 								<img src="@/assets/_img/styles/player.svg" />
 							</span>
 						</b-col>
-						<b-col sm="10" class="mb-3">
+						<b-col md="10" class="mb-3">
 							<b-row class="mb-2" v-if="$route.name != 'Edit Character'">
 								<b-col sm="2">
 									<label for="player_name">Player *</label>

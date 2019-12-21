@@ -9,15 +9,6 @@
 
 		<OverEncumbered v-if="overencumbered" />
 
-		<template v-if="noCurHp">
-			<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
-
-			<h3>Why am I seeing this?</h3>
-			<p>
-				We changed where the current HP and other stats of players are stored so players have to be readded to your campaigns, 
-				one click on the button above will do this for you.
-			</p>
-		</template>
 		<template v-else-if="tier">
 			<b-row>
 				<!-- SHOW ENCOUNTERS -->
@@ -237,7 +228,8 @@
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			})
+			}),
+			this.setCurHp();
 		},
 		computed: {
 			...mapGetters([
@@ -401,13 +393,15 @@
 				}
 			},
 			setCurHp() {
-				//Stores player with curHp under campaign
-				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp
-					})
+				if(this.noCurHp) {
+					//Stores player with curHp under campaign
+					for(var key in this.campaign.players) {
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
+							curHp: this.players[key].maxHp
+						})
+					}
+					this.noCurHp = false;
 				}
-				this.noCurHp = false;
 			}
 		}
 	}

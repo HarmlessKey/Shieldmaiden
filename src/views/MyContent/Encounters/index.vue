@@ -26,7 +26,7 @@
 							) </span>
 						</span>
 						</span>
-						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="add = !add"><i class="fas fa-plus green"></i></a>
 					</h2>
 
 					<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
@@ -269,16 +269,16 @@
 			},
 			noCurHp() {
 				//Checks if all players have their curHp set
-				//If not, a button  appears that sets it
+				//If not, it is set on mounted
+				let check = false;
 				if(this.campaign) {
 					for(var key in this.campaign.players) {
 						if(this.campaign.players[key].curHp == undefined) {
-							return true;
-						} else {
-							return false;
+							check = true;
 						}
 					}
 				}
+				return check;
 			}
 		},
 		methods: {
@@ -286,30 +286,6 @@
 				'fetchEncounters',
 				'fetchCampaign',
 			]),
-			copyLink() {
-
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text') //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
-			setAdd(value) {
-				this.add = value;
-			},
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
 					if (result && (Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {

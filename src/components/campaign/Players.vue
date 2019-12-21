@@ -315,7 +315,8 @@
 			border: solid 1px #b2b2b2;
 		}
 		.col {
-			padding: 10px;
+			min-height: 35px;
+			padding: 12px 10px;
 			background-color: #262626;
 
 			&.header {
@@ -323,7 +324,6 @@
 			}
 			&.ac {
 				text-align: center;
-				line-height: 26px;
 				font-weight: bold;
 			}
 			&.name {

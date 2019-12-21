@@ -115,7 +115,7 @@
 				'setSlide',
 			]),
 			toggleAll(checked) {
-				this.awardTo = checked ? this.allPlayers : [];
+				this.setFor = checked ? this.allPlayers : [];
 			},
 			setHpModifiers() {
 				if(this.tempHp !== undefined) {

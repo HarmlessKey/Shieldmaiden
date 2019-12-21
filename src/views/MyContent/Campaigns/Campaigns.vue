@@ -87,6 +87,8 @@
 							</span>
 						</div>
 						<div class="card-body">
+							<div v-if="campaign.advancement != 'milestone'" class="advancement">Experience</div>
+							<div v-else class="advancement">Milestone</div>
 							<b-row>
 								<b-col>
 									<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
@@ -290,7 +292,6 @@
 				background: rgba(38, 38, 38, .5);
 
 				.advancement {
-					text-transform: capitalize;
 					text-align: center;
 					font-size: 16px;
 					margin-bottom: 20px;

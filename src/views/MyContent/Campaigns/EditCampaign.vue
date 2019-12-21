@@ -29,6 +29,13 @@
 							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
+						<b-form-select v-model="campaign.advancement" v-validate="'required'" name="advancement" data-vv-as="Advancement Type" class="mt-2">
+							<option :value="undefined" disabled>-- Advancement Type --</option>
+							<option value="experience">Experience</option>
+							<option value="milestone">Milestone</option>
+						</b-form-select>
+						<p class="validate red" v-if="errors.has('advancement')">{{ errors.first('advancement') }}</p>
+
 						<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
 							<span :class="{ 'green': !campaign.private }">
 								<i class="fas fa-eye"></i>
@@ -155,6 +162,7 @@
 				'allEncounters',
 				'overencumbered'
 			]),
+
 		},
 		mounted() {
 			this.fetchCampaign({

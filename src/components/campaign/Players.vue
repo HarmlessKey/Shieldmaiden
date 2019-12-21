@@ -131,7 +131,7 @@
 						{{ maxHp(players[key].maxHp, player.maxHpMod) }}
 					</span>
 					<span v-else>{{ players[key].maxHp }}</span>
-					<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
+					<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 				</div>
 				<div class="col actions" :key="'actions-'+key">
 					<a class="gray-hover" v-b-tooltip.hover title="Edit player" 

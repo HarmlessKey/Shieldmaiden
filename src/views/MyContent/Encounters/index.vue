@@ -101,6 +101,7 @@
 					<h2>Finished Encounters</h2>
 					
 					<HKtable
+						class="mb-4"
 						:items="_finished"
 						:columns="finishedColumns"
 						:perPage="6"

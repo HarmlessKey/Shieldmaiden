@@ -114,10 +114,8 @@
             </div>
         </div>
         </div>
-    <div class="toggle bg-blue" :class="{ show: showOverview }">
-        <a @click="showOverview = !showOverview">
-            <i class="fas fa-chevron-left"></i>
-        </a>
+    <div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
+        <i class="fas fa-chevron-left"></i>
     </div>
 </div>
 </template>
@@ -140,7 +138,7 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
                 slide: this.$store.getters.getSlide,
-                showOverview: true,
+                showOverview: false,
                 encDifficulty: undefined,
 				bars: {
 					trivial: 'secondary',
@@ -285,6 +283,9 @@
         }
     }
 }
+.toggle {
+    display: none
+}
 @media only screen and (max-width: 850px) {
     .encounter_overview {
         position: fixed;
@@ -326,15 +327,14 @@
         z-index: 97;
         text-align: center;
         transition: right .5s linear;
+        display: block;
+        cursor: pointer;
+        line-height: 50px;
+        color: #fff !important;
 
-        a { 
-            line-height: 50px;
-            color: #fff !important;
-
-            i {
-                transition: transform .5s linear;
-            }
-        }
+        i {
+            transition: transform .5s linear;
+        }    
 
         &.show {
             right: 300px;

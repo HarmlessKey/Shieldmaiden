@@ -155,13 +155,16 @@
 	@media only screen and (max-width: 850px) {
 		.wrapper {
 			grid-template-columns: auto;
-			grid-template-rows: 30px 1fr;
 			grid-template-areas: 
 			"top"
 			"actions";
 			overflow: visible !important;
 		}
 	}
+	@media only screen and (max-width: 768px) {
+		.wrapper {
+			grid-template-rows: 30px 1fr;
+		}
+	}
 }
-
 </style>

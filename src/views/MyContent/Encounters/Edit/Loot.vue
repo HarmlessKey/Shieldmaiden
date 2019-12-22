@@ -6,11 +6,11 @@
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
                     <img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
                   </span>
-                <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" :placeholder="coin.name"/>
+                <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" @change="setCurrency()" :placeholder="coin.name"/>
             </div>
         </div>
         <div class="d-flex justify-content-center mt-3">
-            <button class="btn" @click="setCurrency()">Save currency</button>
+            <!-- <button class="btn" @click="setCurrency()">Save currency</button> -->
         </div>
 
         <h3 class="d-flex justify-content-between mt-3">

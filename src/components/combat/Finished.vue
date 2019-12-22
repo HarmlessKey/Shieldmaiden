@@ -24,11 +24,11 @@
 									{{ encounter.xp.overwrite || encounter.xp.calculated }}
 									<span class="gray-hover">XP</span>
 								</span>
-								<a class="btn" @click="awardXp">Award</a>
+								<a class="btn" @click="awardXp">Award <i class="far fa-chevron-double-right"></i></a>
 							</div>
 
 							<!-- CURRENCY -->
-							<div class="currency bg-gray-dark" v-if="encounter.currency">
+							<div class="currency bg-gray-dark mb-3" v-if="encounter.currency">
 								<div class="currency-form">
 									<div v-for="(coin, key) in currencies" :key="key">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
@@ -44,9 +44,22 @@
 											v-model="encounter.currency[key]" :placeholder="coin.name"/>
 									</div>
 								</div>
-								<a class="btn" @click="awardCurrency">Award</a>
+								<p class="validate red mt-2" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
+								<div class="d-flex justify-content-center mt-2">
+									<a class="btn" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
+								</div>
 							</div>
-							<p class="validate red mt-2" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
+
+							<h3>Items</h3>
+							<HKtable 
+								:items="Object.values(encounter.loot)"
+								:columns="itemColumns"
+								:showHeader="false"
+							>
+								<template slot="actions" slot-scope="data">
+									<a class="btn m-1" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
+								</template>
+							</HKtable>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
 							<b-row>
@@ -75,6 +88,7 @@
 	import Log from '@/components/combat/side/Log.vue';
 	import Players from '@/components/campaign/Players.vue';
 	import { currencyMixin } from '@/mixins/currency.js';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'app',
@@ -85,12 +99,24 @@
 		components: {
 			Dmg,
 			Log,
-			Players
+			Players,
+			HKtable
 		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				campaignId: this.$route.params.campid
+				campaignId: this.$route.params.campid,
+				itemColumns: {
+					public_name: {
+						label: 'Name',
+						truncate: true,
+					},
+					'actions': {
+						label: '',
+						noPadding: true,
+						maxContent: true
+					}
+				}
 			}
 		},
 		firebase() {
@@ -175,5 +201,6 @@
 				}
 			}
 		}
+
 	}
 </style>

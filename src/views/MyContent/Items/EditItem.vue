@@ -35,52 +35,96 @@
 				<b-col sm="2">
 					<span class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></span>
 					<span class="img" v-else>
-						<img src="@/assets/_img/styles/player.svg" />
+						<img src="@/assets/_img/styles/axe.svg" />
 					</span>
 				</b-col>
 				<b-col sm="10" class="mb-3">
 			
 					<!-- NAME -->
-					<b-row>
-						<b-col sm="2"><label for="name">Name *</label></b-col>
-						<b-col sm="10">
-							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Name"
-								type="text" 
-								class="form-control mb-2" 
-								:class="{'input': true, 'error': errors.has('name') }" 
-								v-model="item.name" 
-								v-validate="'max:35|required'" 
-								maxlength="35"
-								data-vv-as="Name"
-								id="name"
-								name="name" 
-								placeholder="Name*"></b-form-input>
-							<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-						</b-col>
-					</b-row>
+					<label for="name">Name *</label>
+					<b-form-input autocomplete="off"  
+						v-b-tooltip.hover title="Name"
+						type="text" 
+						class="form-control mb-2" 
+						:class="{'input': true, 'error': errors.has('name') }" 
+						v-model="item.name" 
+						v-validate="'max:35|required'" 
+						maxlength="35"
+						data-vv-as="Name"
+						id="name"
+						name="name" 
+						placeholder="Name*"></b-form-input>
+					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 				
 
 					<!-- IMAGE -->
-					<b-row>
-						<b-col sm="2"><label for="image">Image</label></b-col>
-						<b-col sm="10">
-							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="image"
-								type="text" 
-								class="form-control" 
-								:class="{'input': true, 'error': errors.has('image') }" 
-								v-model="item.image" 
-								v-validate="'url'" 
-								data-vv-as="image"
-								name="image" 
-								id="image"
-								placeholder="Image URL"></b-form-input>
-							<p class="validate red" v-if="errors.has('image')">{{ errors.first('image') }}</p>
-						</b-col>
-					</b-row>
+					<label for="image">Image</label>
+					<b-form-input autocomplete="off"  
+						v-b-tooltip.hover title="image"
+						type="text" 
+						class="form-control" 
+						:class="{'input': true, 'error': errors.has('image') }" 
+						v-model="item.image" 
+						v-validate="'url'" 
+						data-vv-as="image"
+						name="image" 
+						id="image"
+						placeholder="Image URL"></b-form-input>
+					<p class="validate red" v-if="errors.has('image')">{{ errors.first('image') }}</p>
 				</b-col>
 			</b-row>
+
+			<label for="description">Description</label>
+			<b-textarea
+				class="mb-4"
+				autocomplete="off"  
+				type="text" 
+				rows="8"
+				v-model="item.desc" 
+				name="image" 
+				id="image"
+				placeholder="Description"
+			/>
+
+			<!-- TABLE -->
+			<label class="d-flex justify-content-between add-table">
+				<span>
+					<i class="fal fa-table"></i> Info Tables
+				</span>
+				<span class="d-flex justify-content-end">
+					<b-input 
+						type="number" 
+						v-validate="'numeric'" 
+						name="columns"
+						placeholder="columns" v-model="columns" />
+					<a @click="addTable()"><i class="fas fa-plus"></i> Add table</a>
+				</span>
+			</label>
+
+			<template v-if="item.tables">
+				<div v-for="(table, tableIndex) in item.tables" :key="tableIndex" class="mb-5">
+					<h3 class="d-flex justify-content-between">
+						<span>{{ table.name || 'Table ' + (parseInt(tableIndex)+1) }}</span>
+						<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
+					</h3>	
+
+					<b-form-input v-model="table.name" placeholder="Table name" class="mb-3"/>
+
+					<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
+						<div v-for="(col, i) in table.columns" :key="i" class="header">
+							<b-form-input v-model="table.header[i]" placeholder="Column header"/>
+						</div>
+						<div></div>
+						<template v-for="(row, rowIndex) in table.rows">
+							<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
+								<b-form-input v-model="table.rows[rowIndex].columns[colIndex]" placeholder=""/>
+							</div>
+							<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i class="fas fa-trash-alt"></i></a>
+						</template>
+					</div>
+					<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
+				</div>
+			</template>
 		</b-card>
 
 		<div class="save">
@@ -123,13 +167,15 @@
 				itemId: this.$route.params.id,
 				search: ["name"],
                 searched: undefined,
-                foundItems: []
+				foundItems: [],
+				columns: 1
 			}
 		},
 		mounted() {
 			var items = db.ref(`items`);
 			items.on('value', async (snapshot) => {
 				let items = snapshot.val();
+				items = Object.values(items);
 
 				let custom = db.ref(`custom_items/${this.userId}`);
 				custom.on('value', async (snapshot) => {
@@ -138,7 +184,7 @@
 						items.push(customItems[key]);
 					}
 				});
-				this.items = Object.values(items);
+				this.items = items;
 				this.loadingItems = false;
 			});
 		},
@@ -211,7 +257,41 @@
 						});
 					}
 				})
-			}
+			},
+			addTable() {
+				this.columns = parseInt(this.columns);
+				
+				if(this.columns !== undefined) {
+					if(this.item.tables === undefined) {
+						this.item.tables = [];
+					}
+					this.item.tables.push({
+						columns: this.columns,
+						header: [],
+						rows: [],
+					})
+				}
+				this.$forceUpdate();
+			},
+			addRow(key) {
+				var cols = []
+
+				for(let i = 1; i <= this.item.tables[key].columns; i++) {
+					cols.push('column '+ i)
+				}
+				this.item.tables[key].rows.push({
+					columns: cols
+				})
+				this.$forceUpdate();
+			},
+			removeRow(tableIndex, rowIndex) {
+				this.$delete(this.item.tables[tableIndex].rows, rowIndex);
+				this.$forceUpdate(); //IMPORTANT
+			},
+			removeTable(key) {
+				this.$delete(this.item.tables, key);
+				this.$forceUpdate(); //IMPORTANT
+			},
 		}
 	}
 </script>
@@ -248,12 +328,31 @@
 	}
 	label {
 		line-height: 37px;
-		margin-bottom: 0;
+		margin-bottom: 20px;
 
-		svg {
-			fill: #b2b2b2;
-			width: 20px;
-			height: 20px;
+		&.add-table {
+			border-bottom: solid 1px #5c5757;
+			padding-bottom: 5px;
+
+			input[type=number] {
+				max-width: 110px;
+				margin-right: 10px;
+			}
+		}
+	}
+	.item-table {
+		display: grid;
+		grid-template-rows: minmax(46px max-content);
+
+		.header {
+			font-weight: bold;
+			border-bottom: solid 1px #5c5757;
+			padding-bottom: 5px;
+			margin-bottom: 10px;
+		}
+		.remove {
+			text-align: center;
+			line-height: 38px;
 		}
 	}
 	.save {

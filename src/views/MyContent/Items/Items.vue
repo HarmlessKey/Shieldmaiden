@@ -32,7 +32,7 @@
 			>
 				<template slot="image" slot-scope="data">
 					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-					<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+					<img v-else class="image" src="@/assets/_img/styles/axe.svg" />
 				</template>
 
 				<template slot="name" slot-scope="data">

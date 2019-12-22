@@ -10,7 +10,7 @@
 		</h1>
 
 		<!-- EDIT -->
-		<template v-if="userInfo && userInfo.admin && edit">
+		<!-- <template v-if="userInfo && userInfo.admin && edit">
 			<b-row class="mb-2 mt-3">
 				<b-col sm="2"><label>Name</label></b-col>
 				<b-col>
@@ -55,7 +55,6 @@
 				</tbody>
 			</table>
 
-			<!-- TABLE -->
 			<h2>Info Table</h2>
 			<b-row class="mb-3">
 				<b-col sm="2">
@@ -96,10 +95,10 @@
 
 			<a @click="editItem()" class="btn btn-block mt-4 bg-green">Save</a>
 
-		</template>
+		</template> -->
 
 		<!-- VIEW -->
-		<template v-else>
+		<template>
 			<i class="mb-3 d-block">
 				{{ data.type }}, 
 				<span :class="{ 

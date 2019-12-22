@@ -12,11 +12,12 @@
 
 		<div v-if="foundItems" class="items">
 			<template v-for="item in foundItems">
-				<div class="name" :key="`name-${item['.key']}`">
+				<div class="name" :key="`name-${item.key}`">
 					{{ item.name }}
+					<span v-if="item.custom" class="ml-1 blue font-weight-bol"  v-b-tooltip.hover title="Custom Item">C</span>
 				</div>
-				<div class="link" :key="`link-${item['.key']}`">
-					<a @click="linkItem(item.custom, item['.key'])"><i class="fas fa-link"></i></a>
+				<div class="link" :key="`link-${item.key}`">
+					<a @click="linkItem(item.key)"><i class="fas fa-link"></i></a>
 				</div>
 			</template>
 		</div>
@@ -47,9 +48,31 @@
                 item: {
 					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}`),
 					asObject: true
-				},
-				items: db.ref(`items`)
+				}
 			}
+		},
+		mounted() {
+			var items = db.ref(`items`);
+			items.on('value', async (snapshot) => {
+				let items = snapshot.val();
+				for(let key in items) {
+					items[key].key = key;
+				}
+				items = Object.values(items);
+
+				let custom = db.ref(`custom_items/${this.userId}`);
+				custom.on('value', async (snapshot) => {
+					let customItems = snapshot.val();
+					for(let key in customItems) {
+						customItems[key].key = key;
+						customItems[key].custom = true;
+
+						items.push(customItems[key]);
+					}
+				});
+				this.items = items;
+				this.loadingItems = false;
+			});
 		},
 		methods: {
 			...mapActions([
@@ -73,13 +96,8 @@
 				});
 				this.foundItems = results;
 			},
-			linkItem(custom, key) {
-				custom = (custom === true) ? true : false;
-				
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}/linked_item`).set({
-					key,
-					custom
-				});
+			linkItem(key) {				
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}/linked_item`).set(key);
 				this.setSlide(false);
 			}
 		}

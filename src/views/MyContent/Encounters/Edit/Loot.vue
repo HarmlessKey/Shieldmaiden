@@ -79,7 +79,7 @@
                                 ><i class="fas fa-link"></i> Link item</a>
                                 <template v-else>
                                     <i class="fas fa-link mr-2"></i>
-                                    <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item.key] })">{{ items[item.linked_item.key].name }}</a>
+                                    <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item] })">{{ items[item.linked_item].name }}</a>
                                     <a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
                                 </template>
                                  <a 
@@ -121,21 +121,31 @@
                 currency: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/currency`),
 					asObject: true
-                },
-                items: {
-					source: db.ref(`items`),
-					asObject: true
-                },
+                }
 			}
 		},
 		mounted() {
+            var items = db.ref(`items`);
+			items.on('value', async (snapshot) => {
+				let items = snapshot.val();
+
+				let custom = db.ref(`custom_items/${this.user.uid}`);
+				custom.on('value', async (snapshot) => {
+					let customItems = snapshot.val();
+					for(let key in customItems) {
+						items[key] = customItems[key];
+					}
+                });
+				this.items = items;
+				this.loadingItems = false;
+			});
 			this.fetchEncounter({
 				cid: this.campaignId, 
 				eid: this.encounterId, 
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			})
+            })
 		},
 		methods: {
 			...mapActions([

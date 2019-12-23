@@ -15,25 +15,41 @@
 						</li>
 					</ul>
 
-					<div class="tab-content bg-gray px-3 py-4">
+					<div class="tab-content bg-gray-active px-3 py-4">
 						<div class="tab-pane fade show active" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 							<h3>Encounter rewards</h3>
 							<!-- XP -->
-							<div class="xp bg-gray-dark" v-if="encounter.xp">
+							<div class="xp bg-gray" v-if="encounter.xp">
 								<span>
-									{{ encounter.xp.overwrite || encounter.xp.calculated }}
+									{{ xpAmount }}
 									<span class="gray-hover">XP</span>
 								</span>
-								<a class="btn" @click="awardXp">Award <i class="far fa-chevron-double-right"></i></a>
+								<a 
+									v-if="!encounter.xp_awarded"
+									class="btn" 
+									@click="setSlide({
+										show: true,
+										type: 'slides/party/xp',
+										data: {
+											amount: xpAmount,
+											entities: players
+										}
+								})">
+									Award <i class="far fa-chevron-double-right"></i>
+								</a>
+								<div v-else class="green">
+									Awarded
+								</div>
 							</div>
 
 							<!-- CURRENCY -->
-							<div class="currency bg-gray-dark mb-3" v-if="encounter.currency">
+							<div class="currency bg-gray mb-3" v-if="encounter.currency">
 								<div class="currency-form">
 									<div v-for="(coin, key) in currencies" :key="key">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
 										<b-form-input
 											class="text-center"
+											:disabled="encounter.currency_awarded"
 											autocomplete="off" 
 											type="text" 
 											size="sm"
@@ -44,22 +60,34 @@
 											v-model="encounter.currency[key]" :placeholder="coin.name"/>
 									</div>
 								</div>
-								<p class="validate red mt-2" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
+								<p class="validate red mt-2 text-center" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
 								<div class="d-flex justify-content-center mt-2">
-									<a class="btn" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
+									<a
+										v-if="!encounter.currency_awarded"
+										class="btn" 
+										:class="{ disabled: errors.has('currency') }" 
+										@click="awardCurrency"
+									>
+										Award <i class="far fa-chevron-double-right"></i>
+									</a>
+									<div v-else class="green">
+										Awarded
+									</div>
 								</div>
 							</div>
-
-							<h3>Items</h3>
-							<HKtable 
-								:items="Object.values(encounter.loot)"
-								:columns="itemColumns"
-								:showHeader="false"
-							>
-								<template slot="actions" slot-scope="data">
-									<a class="btn m-1" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
-								</template>
-							</HKtable>
+							
+							<template v-if="encounter.loot">
+								<h3>Items</h3>
+								<HKtable 
+									:items="Object.values(encounter.loot)"
+									:columns="itemColumns"
+									:showHeader="false"
+								>
+									<template slot="actions" slot-scope="data">
+										<a class="btn m-1" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
+									</template>
+								</HKtable>
+							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
 							<b-row>
@@ -83,6 +111,7 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import Dmg from '@/components/combat/side/Dmg.vue';
 	import Log from '@/components/combat/side/Log.vue';
@@ -106,6 +135,7 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
 				itemColumns: {
 					public_name: {
 						label: 'Name',
@@ -137,13 +167,42 @@
 				
 				
 				return tabs;
+			},
+			players() {
+				// Return and array with the keys of all players in the encounter
+				let entities = Object.values(this.encounter.entities);
+				let playerKeys = [];
+				let players = entities.filter( function(entity) {
+					let entityType = entity.entityType;
+					entity = [];
+					return entityType === 'player'
+				});
+				for(let i in players) {
+					playerKeys.push(players[i].id);
+				}
+				return playerKeys;
+			},
+			xpAmount() {
+				return this.encounter.xp.overwrite || this.encounter.xp.calculated;
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide',
+			]),
 			awardCurrency() {
+				let oldValue = 0;
+				if(this.campaign.inventory && this.campaign.inventory.currency) {
+					oldValue = this.campaign.inventory.currency;
+				}
+				let newValue = parseInt(oldValue) + this.currencyToCopper(this.encounter.currency);
 
+				if(!this.errors.has('currency')) {
+					db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`).set(newValue);
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/currency_awarded`).set(true);
+				}
 			},
-			awardXp() {
+			awardItems() {
 
 			}
 		}
@@ -167,6 +226,12 @@
 			border-bottom: solid 1px #b2b2b2;
 			margin-bottom: 20px;
 			padding-bottom: 10px;
+		}
+
+		.nav {
+			.nav-link.active {
+				background-color: #302f2f !important;
+			}
 		}
 
 

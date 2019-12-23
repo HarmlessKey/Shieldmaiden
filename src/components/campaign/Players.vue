@@ -161,10 +161,10 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
-	import { experience } from '@/mixins/experience.js'
-	import { currencyMixin } from '@/mixins/currency.js'
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
+	import { currencyMixin } from '@/mixins/currency.js';
 
 	export default {
 		name: 'Players',

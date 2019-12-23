@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<h2>Award Experience</h2>
+		{{ $route.name }}
 		<b-form-input 
 			class="text-center mb-3"
 			type="number" 
@@ -52,15 +53,19 @@
 
 <script>
 	import { db } from '@/firebase';
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
+		props: [
+			'data',
+		],
 		data() {
 			return {
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
-				amount: undefined,
-				awardXp: undefined,
+				encounterId: this.$route.params.encid,
+				amount: this.data.amount,
+				awardXp: this.data.entities,
 				allSelected: true,
 				indeterminate: false,
 				options: [
@@ -109,6 +114,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide',
+			]),
 			toggleAll(checked) {
 				this.awardTo = checked ? this.allPlayers : [];
 			},
@@ -141,7 +149,15 @@
 					}
 					db.ref(`players/${this.user.uid}/${key}/experience`).set(newAmount);
 				}
-				this.amount = undefined;
+				//In the finished encounter screen, set xp_awared to true
+				//And update the amount awarded if it was changed
+				if(this.$route.name === 'RunEncounter') {
+					if(this.amount !== this.data.amount) {
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp/overwrite`).set(this.amount);
+					}
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp_awarded`).set(true);
+				}
+				this.setSlide(false);
 			}
 		}
 	};

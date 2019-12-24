@@ -6,7 +6,7 @@
 				<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Leave</router-link>
 			</div>
 			<b-row>
-				<b-col md="7">
+				<b-col md="7" class="mb-4">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
 						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
 							<a class="nav-link" :class="{ active: tab.selected }" id="entities-tab" data-toggle="tab" :href="`#${key}`" role="tab" :aria-controls="key" :aria-selected="tab.selected">
@@ -20,7 +20,7 @@
 							<h3>Encounter rewards</h3>
 							<!-- XP -->
 							<div class="xp bg-gray" v-if="encounter.xp">
-								<span>
+								<span class="amount">
 									{{ xpAmount }}
 									<span class="gray-hover">XP</span>
 								</span>
@@ -38,7 +38,7 @@
 									Award <i class="far fa-chevron-double-right"></i>
 								</a>
 								<div v-else class="green">
-									Awarded
+									<i class="fas fa-check"></i> Awarded
 								</div>
 							</div>
 
@@ -60,8 +60,8 @@
 											v-model="encounter.currency[key]" :placeholder="coin.name"/>
 									</div>
 								</div>
-								<p class="validate red mt-2 text-center" v-if="errors.has('currency')">{{ errors.first('currency') }}</p>
-								<div class="d-flex justify-content-center mt-2">
+								<div class="validate red mt-2 text-center" v-if="errors.has('currency')">{{ errors.first('currency') }}</div>
+								<div class="d-flex justify-content-center mt-3">
 									<a
 										v-if="!encounter.currency_awarded"
 										class="btn" 
@@ -71,13 +71,16 @@
 										Award <i class="far fa-chevron-double-right"></i>
 									</a>
 									<div v-else class="green">
-										Awarded
+										<i class="fas fa-check"></i> Awarded
 									</div>
 								</div>
 							</div>
 							
 							<template v-if="encounter.loot">
-								<h3>Items</h3>
+								<h3 class="d-flex justify-content-between">
+									Items
+									<a >Award all <i class="far fa-chevron-double-right"></i></a>
+								</h3>
 								<HKtable 
 									:items="Object.values(encounter.loot)"
 									:columns="itemColumns"
@@ -240,11 +243,16 @@
 			justify-content: space-between;
 			padding: 10px;
 			margin-bottom: 30px;
-			font-size: 25px;
+			line-height: 35px;
+			
+
+			.amount {
+				font-size: 25px;
+			}
 		}
 
 		.currency {
-			padding: 30px 10px 10px 10px;
+			padding: 30px 10px 20px 10px;
 
 			.currency-form {
 				margin: auto;

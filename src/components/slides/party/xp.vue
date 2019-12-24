@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<h2>Award Experience</h2>
-		{{ $route.name }}
 		<b-form-input 
 			class="text-center mb-3"
 			type="number" 
@@ -56,9 +55,17 @@
 	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
-		props: [
-			'data',
-		],
+		props: {
+			data: {
+				type: Object,
+				default: function () {
+					return {
+						amount: undefined,
+						entities: undefined
+					}
+				}
+			},
+		},
 		data() {
 			return {
 				user: this.$store.getters.getUser,

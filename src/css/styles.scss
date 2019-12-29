@@ -370,10 +370,13 @@ ul.crumble {
 			}
 		}
 	}
+	.hk-collapsed-column {
+		background: $gray;
+	}
 }
 .tab-content {
 	.hk-table {
-		.hk-table-column {
+		.hk-table-column, .hk-collapsed-column {
 			background: $gray;
 
 			&.hk-table-header {
@@ -384,7 +387,7 @@ ul.crumble {
 }
 .slide {
 	.hk-table {
-		.hk-table-column {
+		.hk-table-column, .hk-collapsed-column {
 			background: $gray-dark;
 
 			&.hk-table-header {

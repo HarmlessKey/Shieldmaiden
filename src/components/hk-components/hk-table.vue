@@ -56,6 +56,7 @@
 			<template v-for="(row, index) in paginatedData">
 				<div 
 					class="hk-table-column"
+					@click="showCollapsed = index"
 					v-for="(column, key) in columns"
 					:key="key+'-'+index"
 					:class="[{
@@ -67,6 +68,18 @@
 				>
 					<slot :name="key" :item="row[key]" :row="row" :index="index">
 						{{ row[key] }}
+					</slot>
+				</div>
+
+				<!-- Collapsed data -->
+				<div 
+					v-if="collapse && showCollapsed === index" 
+					:key="`collapse-${index}`" 
+					:style="{ 'grid-column': 'span '+Object.keys(columns).length }"
+					class="hk-collapsed-column"
+				>
+					<slot name="collapse" :row="row">
+						{{ row }}
 					</slot>
 				</div>
 			</template>
@@ -117,6 +130,10 @@
 			search: {
 				type: Array,
 				default: undefined
+			},
+			collapse: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -125,7 +142,8 @@
 				sortedBy: undefined,
 				data: undefined,
 				searched: undefined,
-				currentPage: 1
+				currentPage: 1,
+				showCollapsed: undefined
 			}
 		},
 		computed: {
@@ -259,6 +277,9 @@
 					}
 				}
 			}
+		}
+		.hk-collapsed-column {
+			padding: 10px;
 		}
 	}
 	.result-count {

@@ -30,8 +30,12 @@
 			:items="items"
 			:columns="itemColumns"
 			:showHeader="false"
+			:collapse="true"
 		>
-			
+			<div slot="collapse" slot-scope="data">
+				<h3>{{ data.row.public_name }}</h3>
+				{{ data.row.public_description }}
+			</div>
 		</HKtable>
 	</div>
 </template>

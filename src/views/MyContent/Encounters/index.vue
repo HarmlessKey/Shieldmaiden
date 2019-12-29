@@ -329,7 +329,6 @@
 			},
 			reset(id, hard=true) {
 				if (hard){
-					console.log("Hard reset")
 					for(let key in this.encounters[id].entities) {
 						let entity = this.encounters[id].entities[key]
 
@@ -345,7 +344,7 @@
 						if(entity.entityType == 'npc') {
 							entity.curHp = entity.maxHp
 						}
-						entity.initiative = 0
+						entity.initiative = 0;
 
 
 						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)

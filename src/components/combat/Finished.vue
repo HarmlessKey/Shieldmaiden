@@ -4,6 +4,11 @@
 		<div class="container">
 			<div class="actions">
 				<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Leave</router-link>
+
+				<span class="right">
+					<a v-b-tooltip.hover title="Unfinish" @click="reset(hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
+					<a v-b-tooltip.hover title="Reset" @click="reset()"><i class="fas fa-undo"></i></a>
+				</span>
 			</div>
 			<b-row>
 				<b-col md="7" class="mb-4">
@@ -202,6 +207,8 @@
 		methods: {
 			...mapActions([
 				'setSlide',
+				'init_Encounter',
+				'reset_store'
 			]),
 			awardCurrency() {
 				let oldValue = 0;
@@ -223,7 +230,43 @@
 					db.ref(`encounters/${vm.userId}/${vm.campaignId}/${vm.encounterId}/loot/${item.key}`).remove();
 				});
 				
-			}
+			},
+			reset(hard=true) {
+				const id = this.encounterId;
+				if (hard){
+					for(let key in this.encounter.entities) {
+						let entity = this.encounter.entities[key];
+
+						//Remove values
+						delete entity.tempHp;
+						delete entity.transformed;
+						delete entity.stabilized;
+						delete entity.down;
+						delete entity.ac_bonus;
+						delete entity.meters;
+						delete entity.hidden;
+
+						if(entity.entityType == 'npc') {
+							entity.curHp = entity.maxHp;
+						}
+						entity.initiative = 0;
+
+
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/entities/${key}`).set(entity);
+
+						//CLEAR LOG
+						localStorage.removeItem(id);
+					}
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/turn`).set(0);
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/round`).set(0);
+					this.reset_store();
+					this.init_Encounter({
+						cid: this.$route.params.campid, 
+						eid: this.$route.params.encid
+					})
+				}
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/finished`).set(false);
+			},
 		}
 	}
 </script>
@@ -245,6 +288,13 @@
 			border-bottom: solid 1px #b2b2b2;
 			margin-bottom: 20px;
 			padding-bottom: 10px;
+
+			.right {
+				a {
+					color: #b2b2b2 !important;
+					margin-left: 10px;
+				}
+			}
 		}
 
 		.nav {

@@ -27,22 +27,43 @@
 				<button class="btn btn-sm bg-red" @click="setCurrency('remove')">Remove</button>
 			</div>
 		</div>
+
+		<template v-if="inventory.items">
+			<h2 class="my-4">Items</h2>
+			<HKtable 
+				:items="Object.values(inventory.items)"
+				:columns="itemColumns"
+				:showHeader="false"
+			>
+
+			</HKtable>
+		</template>
 	</div>
 </template>
 
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		mixins: [currencyMixin],
+		components: {
+			HKtable
+		},
 		data() {
 			return {
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				add: {},
 				error: undefined,
-				addCurrency: false
+				addCurrency: false,
+				itemColumns: {
+					public_name: {
+						label: 'Name',
+						truncate: true,
+					}
+				}
 			}
 		},
 		firebase() {

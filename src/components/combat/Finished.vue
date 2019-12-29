@@ -79,15 +79,15 @@
 							<template v-if="encounter.loot">
 								<h3 class="d-flex justify-content-between">
 									Items
-									<a >Award all <i class="far fa-chevron-double-right"></i></a>
+									<a @click="awardItems(items)">Award all <i class="far fa-chevron-double-right"></i></a>
 								</h3>
 								<HKtable 
-									:items="Object.values(encounter.loot)"
+									:items="items"
 									:columns="itemColumns"
 									:showHeader="false"
 								>
 									<template slot="actions" slot-scope="data">
-										<a class="btn m-1" @click="awardCurrency">Award <i class="far fa-chevron-double-right"></i></a>
+										<a class="btn m-1" @click="awardItems([data.row])">Award <i class="far fa-chevron-double-right"></i></a>
 									</template>
 								</HKtable>
 							</template>
@@ -187,6 +187,16 @@
 			},
 			xpAmount() {
 				return this.encounter.xp.overwrite || this.encounter.xp.calculated;
+			},
+			items() {
+				let items = [];
+				for(let key in this.encounter.loot) {
+					let item = this.encounter.loot[key];
+					item.key = key;
+
+					items.push(item);
+				}
+				return items;
 			}
 		},
 		methods: {
@@ -205,8 +215,14 @@
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/currency_awarded`).set(true);
 				}
 			},
-			awardItems() {
-
+			awardItems(items) {
+				const vm = this;
+				items.forEach( function(item) {
+					item.encounter_id = vm.encounterId;
+					db.ref(`campaigns/${vm.userId}/${vm.campaignId}/inventory/items`).push(item);
+					db.ref(`encounters/${vm.userId}/${vm.campaignId}/${vm.encounterId}/loot/${item.key}`).remove();
+				});
+				
 			}
 		}
 	}

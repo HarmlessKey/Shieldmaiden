@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :class="classes">
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
             <div class="input-group mb-3">
@@ -19,10 +19,18 @@
 		>	
 			<!-- By default, show a header -->
 			<template v-if="showHeader">
+				<div 
+					v-if="collapse" 
+					class="hk-table-column hk-table-header"
+					@click="showCollapsed = index" 
+					:key="`collapse-header`"
+				>
+					<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
+				</div>
 				<template v-for="(column, key) in columns">
 					<div 
 						v-if="!column.sortable"
-						:key="'header-'+key"
+						:key="`header-${key}`"
 						class="hk-table-column hk-table-header"
 						:class="[{
 							truncate: column.truncate,
@@ -34,7 +42,7 @@
 					</div>
 					<div 
 						v-else 
-						:key="'header-'+key"
+						:key="`header-${key}`"
 						class="hk-table-column hk-table-header hk-table-column-sortable"
 						:class="[{
 							truncate: column.truncate,
@@ -54,11 +62,21 @@
 
 			<!-- TABLE BODY -->
 			<template v-for="(row, index) in paginatedData">
+				<!-- COLLAPSE ACTION -->
+				<div 
+					v-if="collapse" 
+					class="hk-table-column"
+					:key="`collapse-action-${index}`"
+				>
+					<a data-toggle="collapse" :href="`#collapse-${index}`">
+						<i class="fas fa-caret-right"></i>
+					</a>
+				</div>
+
 				<div 
 					class="hk-table-column"
-					@click="showCollapsed = index"
 					v-for="(column, key) in columns"
-					:key="key+'-'+index"
+					:key="`${key}-${index}`"
 					:class="[{
 						truncate: column.truncate,
 						'no-padding': column.noPadding,
@@ -73,10 +91,11 @@
 
 				<!-- Collapsed data -->
 				<div 
-					v-if="collapse && showCollapsed === index" 
-					:key="`collapse-${index}`" 
-					:style="{ 'grid-column': 'span '+Object.keys(columns).length }"
-					class="hk-collapsed-column"
+					v-if="collapse"
+					:id="`collapse-${index}`"
+					:key="`collapse-content-${index}`"
+					:style="{ 'grid-column': 'span ' + (Object.keys(columns).length + 1) }"
+					class="collapse hk-collapsed-column"
 				>
 					<slot name="collapse" :row="row">
 						{{ row }}
@@ -107,6 +126,10 @@
 	export default {
 		name: 'hk-table',
 		props: {
+			classes: {
+				type: String,
+				default: undefined
+			},
 			items: {
 				type: Array,
 				default: undefined
@@ -142,18 +165,17 @@
 				sortedBy: undefined,
 				data: undefined,
 				searched: undefined,
-				currentPage: 1,
-				showCollapsed: undefined
+				currentPage: 1
 			}
 		},
 		computed: {
 			templateColumns() {
-				let templateColumns = '';
+				let templateColumns = (this.collapse) ? '30px' : '';
 				let columns = this.columns;
 
 				for(let index in columns) {
 					let column = columns[index];
-					let width = ' auto'; // By default, columns have an auto width
+					let width = ' 1fr'; // By default, columns have an auto width
 
 					// Overwrite the width if the column is tagged with maxContent
 					if(column.maxContent) {

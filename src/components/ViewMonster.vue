@@ -1,57 +1,49 @@
 <template>
-	<div class="pb-5">
+	<div class="monster">
 		<h2>{{ data.name }}</h2>
-		<i>
+		<span class="size">
 			<template v-if="data.size">{{ data.size }}</template>
 			<template v-if="data.type"> {{ data.type }}</template>
 			<span v-if="data.subtype">({{ data.subtype }})</span>
 			<template v-if="data.alignment">, {{ data.alignment }}</template>
-		</i>
+		</span>
 		<hr>
-		<p>
+		<span class="stats">
 			<template v-if="data.armor_class">
-				<b><i class="fas fa-shield gray-hover"></i>Armor Class</b>: 
-				<span class="blue"> {{ data.armor_class }}</span><br/>
+				<b>Armor Class: </b> {{ data.armor_class }}<br/>
 			</template>
 			<template v-else>
-				<b><i class="fas fa-shield gray-hover"></i> Armor Class</b>: 
-				<span class="blue"> {{ data.ac }}</span><br/>
+				<b>Armor Class</b>: {{ data.ac }}<br/>
 			</template>
 			<template v-if="data.hit_points">
-				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
-				<span class="blue"> {{ data.hit_points }}</span>
+				<b>Hit Points</b>: {{ data.hit_points }}
 			</template>
 			<template v-else>
-				<b><i class="fas fa-heart gray-hover"></i> Hit Points</b>: 
-				<span class="blue"> {{ data.maxHp }}</span>
+				<b>Hit Points</b>: {{ data.maxHp }}
 			</template>
-			<template v-if="data.hit_dice"> ({{ data.hit_dice }})</template>
+			<template v-if="data.hit_dice"> ({{ data.hit_dice ? hitDiceStr(data) : '' }})</template>
 			<template v-if="data.speed">
-				<br/><b><i class="fas fa-angle-double-right gray-hover"></i> Speed</b>: 
-				<span class="blue"> {{ data.speed }}</span>
+				<br/><b>Speed</b>: {{ data.speed }}
 			</template>
-		</p>
+		</span>
 		<hr>
-		<b-row class="abilities">
+		<div class="abilities">
 			<template v-for="(ability, index) in abilities">
-				<b-col :sm="sm" :md="md" :lg="lg"
+				<div
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
-					class="mb-5 col-4" 
 					@click="rollAbility(ability.ability, data[ability.ability])"
 					v-if="data[ability.ability]">
-						<div class="ability bg-gray">
-							<span class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</span>
-							{{ modifier(data[ability.ability]) }}
-							<span class="score bg-gray">{{ data[ability.ability] }}</span>
-						</div>
-				</b-col>
+						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+						{{ data[ability.ability] }}
+						({{ modifier(data[ability.ability]) }})
+				</div>
 			</template>
-		</b-row>
+		</div>
 		<hr>
 
 		<!-- SKILLS -->
-		<p>
+		<span class="skills">
 			<template v-if="data.skills">
 				<b>Skills</b>
 				<template v-for="(skill, index) in skills">
@@ -68,50 +60,42 @@
 			<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
 			<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
 			<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }}</template>
-		</p>
+		</span>
+		<hr>
 
 		<template v-if="data.special_abilities">
-			<hr>
-			<div v-for="(ability, index) in data.special_abilities" :key="`ability-${index}`">
-				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#ability-'+index" role="button" aria-expanded="false">
-					<span>{{ index + 1 }}. {{ ability.name }}</span>
-					<i class="fas fa-caret-down"></i>
-				</a>
-				<p class="collapse" :id="'ability-'+index">{{ ability.desc }}</p>
-			</div>
+			<p v-for="(ability, index) in data.special_abilities" :key="`ability-${index}`">
+				<b><i>{{ ability.name }}</i></b> {{ ability.desc }}
+			</p>
 		</template>
 
 		<template v-if="data.actions">
-			<hr>
-			<h2>Actions</h2>
-			<div v-for="(action, index) in data.actions" :key="`action-${index}`">
-				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#action-'+index" role="button" aria-expanded="false">
-					<span>{{ index + 1 }}. {{ action.name }}</span>
-					<i class="fas fa-caret-down"></i>
-				</a>
-				<p class="collapse" :id="'action-'+index">{{ action.desc }}</p>
-			</div>
+			<h3>Actions</h3>
+			<p v-for="(action, index) in data.actions" :key="`action-${index}`">
+					<b><i>{{ action.name }}</i></b> {{ action.desc }}
+			</p>
 		</template>
 
 		<template v-if="data.legendary_actions">
-			<hr>
-			<h2>Legendary Actions</h2>
-			<div v-for="(legendary_action, index) in data.legendary_actions" :key="`legendary-${index}`">
-				<a class="d-flex justify-content-between" data-toggle="collapse" :href="'#legendary-action-'+index" role="button" aria-expanded="false">
-					<span>{{ index + 1}}. {{ legendary_action.name }}</span>
-					<i class="fas fa-caret-down"></i>
-				</a>
-				<p class="collapse" :id="'legendary-action-'+index">{{ legendary_action.desc }}</p>
-			</div>
+			<h3>Legendary Actions</h3>
+			<p>
+				{{ data.name }} can take 3 legendary actions, choosing from the options below. 
+				Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ data.name }} regains spent legendary actions at the start of their turn.
+			</p>
+			<p v-for="(legendary_action, index) in data.legendary_actions" :key="`legendary-${index}`">
+					<b><i>{{ legendary_action.name }}</i></b> {{ legendary_action.desc }}
+			</p>
 		</template>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
 
 	export default {
 		name: 'NPC',
+		mixins: [general],
 		props: [
 		'data'
 		],
@@ -199,52 +183,56 @@
 </script>
 
 <style lang="scss" scoped>
-h2 {
-	margin-bottom:5px !important;
-}
-a {
-	color: #b2b2b2 !important;
-}
-.abilities {
-	margin-top: 30px;
-	white-space: nowrap;
+.monster {
+	padding: 10px;
+	color: #000;
+	font-family: 'Times New Roman', Times, serif;
 
-	.ability {
-		height: 60px;
-		line-height: 45px;
-		border:solid 1px #494747;
+	h2 {
+		color: #58170D;
+		text-transform: none;
+		font-size: 32px;
+		margin-bottom: 0;
+	}
+	h3 {
+		font-family: sans-serif;
+		color: #58170D;
+		border-bottom: solid 1px rgb(165,42,42);
+		font-size: 20px;
+		padding-bottom: 2px;
+		margin-bottom: 5px;
+	}
+	p {
+		margin-bottom: 10px;
+	}
+	.size {
+		font-size: 18px;
+		font-style: italic;
+	}
+	.stats, .skills {
+		color: #58170D;
+	}
+	hr {
+		border-top: 2px solid rgb(165,42,42);
+		margin: 5px 0;
+	}
+	.abilities {
+		color: #58170D;
+		display: flex;
+		justify-content: space-between;
 		text-align: center;
 		font-size: 20px;
-		font-size: calc( 20px + (21 - 20) * ( (100vw - 360px) / ( 800 - 360) ));
-		position: relative;
-		cursor: pointer;
-		&:last-child {
-			margin: 0;
-		}
-
-		.score {
-			position: absolute;
-			bottom: -10px;
-			left: 50%;
-			transform: translateX(-50%);
-			font-size: calc( 11px + (12 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
-			border: solid 1px #494747;
-			text-align: center;
-			border-radius: 15px / 10px;
-			line-height: 25px;
-			height: 25px;
-			width: 35px;
-		}
+		padding-left: 10px;
+		max-width: 650px;
+		
 		.abilityName {
-			position: absolute;
-			top: -34px;
-			left: 50%;
-			transform: translateX(-50%);
-	
-			font-size: calc( 11px + (12 - 11) * ( (100vw - 360px) / ( 800 - 360) ));
-			text-align: center;
+			font-weight: bold;
+		}
+		div {
+			margin-right: 10px;
 		}
 	}
 }
+
 
 </style>

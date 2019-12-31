@@ -374,6 +374,14 @@ ul.crumble {
 		background: $gray;
 	}
 }
+.monster-table {
+	.hk-table {
+		.hk-collapsed-column {
+			background-color: #f7e4ba !important;
+			background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+		}
+	}
+}
 .tab-content {
 	.hk-table {
 		.hk-table-column, .hk-collapsed-column {

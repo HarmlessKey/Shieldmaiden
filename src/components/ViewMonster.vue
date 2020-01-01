@@ -73,7 +73,7 @@
 				<template v-if="data.condition_immunities"><b>Condition immunities</b> {{ data.condition_immunities }}<br/></template>
 				<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
 				<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
-				<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }}</template>
+				<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }} ({{ challengeToXp[data.challenge_rating] }}XP)</template>
 			</span>
 			<hr>
 		
@@ -138,6 +138,36 @@
 					'stealth',
 					'survival',
 				],
+				challengeToXp: {
+					0: 10,
+					'0.125': 25,
+					'0.25': 50,
+					'0.5': 100,
+					1: 200,
+					2: 450,
+					3: 700,
+					4: 1100,
+					5: 1800,
+					6: 2300,
+					7: 2900,
+					8: 3900,
+					9: 5000,
+					10: 5900,
+					11: 7200,
+					12: 8400,
+					13: 10000,
+					14: 11500,
+					15: 13000,
+					16: 15000,
+					17: 18000,
+					19: 22000,
+					20: 25000,
+					21: 33000,
+					22: 41000,
+					23: 50000,
+					24: 62000,
+					30: 155000,
+				}
 			}
 		},
 		computed: {

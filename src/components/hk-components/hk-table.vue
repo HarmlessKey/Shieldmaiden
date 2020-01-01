@@ -65,11 +65,12 @@
 				<!-- COLLAPSE ACTION -->
 				<div 
 					v-if="collapse" 
-					class="hk-table-column"
+					class="hk-table-column collapse-handler"
 					:key="`collapse-action-${index}`"
 				>
-					<a data-toggle="collapse" :href="`#collapse-${index}`">
+					<a data-toggle="collapse" class="collapsed" :href="`#collapse-${index}`">
 						<i class="fas fa-caret-right"></i>
+						<i class="fas fa-caret-down"></i>
 					</a>
 				</div>
 
@@ -261,6 +262,28 @@
 			min-height: 35px;
 			padding: 12px 10px;
 
+			&.collapse-handler {
+				a {
+					i.fa-caret-down {
+						display: inline-block;
+					}
+					i.fa-caret-right {
+						display: none;
+					}
+
+					&.collapsed {
+						i.fa-caret-down {
+							display: none;
+						}
+						i.fa-caret-right {
+							display: inline-block;
+						}
+					}
+					&:hover {
+						text-decoration: none;
+					}
+				}
+			}
 			&.no-padding {
 				padding: 0;
 			}

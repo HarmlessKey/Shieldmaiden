@@ -47,8 +47,12 @@
 			<span class="stats">
 				<template v-if="savingThrows.length > 0">
 					<b>Saving Throws </b>
-					<span class="skills">
-						<span class="skill" v-for="save in savingThrows" :key="save.save">
+					<span class="saves">
+						<span 
+							class="save" 
+							@click="rollAbility(save.save, save.score, 'save')"
+							v-for="save in savingThrows" 
+							:key="save.save">
 							{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
 						</span>
 					</span>
@@ -159,7 +163,7 @@
 					if(this.data[`${save}_save`]) {
 						saves.push({
 							save,
-							score: this.data[save]
+							score: this.data[`${save}_save`]
 						})
 					}
 				}
@@ -181,8 +185,8 @@
 					return mod
 				}
 			},
-			rollAbility(ability, score) {
-				var modifier = parseInt(Math.floor((score - 10) / 2));
+			rollAbility(ability, score, type = 'roll') {
+				var modifier = (type === 'roll') ? parseInt(Math.floor((score - 10) / 2)) : score;
 				var roll = (Math.floor(Math.random() * 20) + 1);
 				var total = roll + modifier;
 				if(modifier >= 0) {
@@ -192,7 +196,7 @@
 					mod = modifier
 				}
 				
-				this.$snotify.success(ability + ' roll.', roll + '' + mod + ' = ' + total, {
+				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
 					position: "centerTop"
 				});
 			}
@@ -234,13 +238,16 @@
 	.attributes, .stats {
 		color: #58170D;
 		
-		.skills .skill {
+		.skills .skill, .saves .save {
 			&::after {
 				content: ', ';
 			}
 			&:last-child::after {
 				content: '';
 			}
+		}
+		.saves .save {
+			cursor: pointer;
 		}
 	}
 	hr {
@@ -260,6 +267,7 @@
 			font-weight: bold;
 		}
 		div {
+			cursor: pointer;
 			margin-right: 10px;
 		}
 	}

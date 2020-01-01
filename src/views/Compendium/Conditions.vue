@@ -10,34 +10,24 @@
 				conditions from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<b-input-group class="mb-3">
-				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchCondition()" placeholder="Search conditions" />
-				<b-input-group-append>
-					<button class="btn" @click="searchCondition()"><i class="fas fa-search"></i></button>
-				</b-input-group-append>
-			</b-input-group>
-
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} conditions found</p>
-
-			<b-table 
-				:busy="isBusy"
-				:items="searchResults" 
-				:fields="fields"
-				:per-page="15"
-				:current-page="current"
+			<HKtable
+				:items="conditions"
+				:columns="fields"
+				:perPage="15"
+				:loading="isBusy"
+				:search="['name']"
 			>
-				<template slot="index" slot-scope="data">
-					{{ data.index + 1 }}
-				</template>
+				<router-link :to="'/compendium/conditions/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
 
-				<router-link :to="'/compendium/conditions/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
+				<!-- COLLAPSE -->
+				<div slot="collapse" slot-scope="data">
+					
+				</div>
+				
 				<div slot="table-busy" class="loader">
 					<span>Loading conditions....</span>
 				</div>
-			</b-table>
-		
-			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
+			</HKtable>
 		</template>
 
 		<!-- SHOW CONDITION -->
@@ -50,11 +40,12 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import Footer from '@/components/Footer.vue'
-	import Condition from '@/components/compendium/Condition.vue'
-	import { mapActions } from 'vuex'
+	import { db } from '@/firebase';
+	import Crumble from '@/components/crumble/Compendium.vue';
+	import Footer from '@/components/Footer.vue';
+	import Condition from '@/components/compendium/Condition.vue';
+	import { mapActions } from 'vuex';
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Conditions',
@@ -62,6 +53,7 @@
 			Crumble,
 			Footer,
 			Condition,
+			HKtable
 		},
 		metaInfo: {
 			title: 'Conditions'
@@ -69,21 +61,12 @@
 		data() {
 			return {
 				id: this.$route.params.id,
-				conditions: undefined,
-				current: 1,
 				fields: {
-          index: {
-            label: '#',
-					},
-          name: {
-            label: 'Name',
-            sortable: true
+					name: {
+						label: 'Name',
+						sortable: true
 					},
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
 				isBusy: true,
 			}
 		},
@@ -94,33 +77,6 @@
 					readyCallback: () => this.isBusy = false
 				}
 			}
-		},
-		beforeMount() {
-			this.searchResults = this.conditions
-		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchCondition() {
-				this.current = 1;
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.conditions) {
-					var m = this.conditions[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = this.conditions
-					this.searching = false
-				}
-			},
 		}
 	}
 </script>

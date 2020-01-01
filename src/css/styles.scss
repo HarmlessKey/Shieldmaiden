@@ -644,6 +644,11 @@ ul.entities {
 		padding: 15px;
 		grid-area: content;
 		overflow: auto;
+
+		&.monster-card {
+			background-color: #f7e4ba !important;
+			background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+		}
 	}
 }
 
@@ -722,7 +727,6 @@ ul.entities {
 	}
 	&.btn-sm {
 		font-size: 12px !important;
-		// line-height: 22px;
 	}
 }
 a {

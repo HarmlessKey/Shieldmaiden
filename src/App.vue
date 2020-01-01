@@ -18,7 +18,7 @@
 					v-b-tooltip:hover title="Hide [esc]">
 					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
 				</a>
-				<div class="content">
+				<div class="content" :class="slide.classes">
 					<Slide />
 				</div>
 			</div>

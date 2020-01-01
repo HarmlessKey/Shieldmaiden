@@ -282,23 +282,24 @@
 	}
 	hr {
 		border-top: 2px solid rgb(165,42,42);
-		margin: 5px 0;
+		margin: 10px 0;
 	}
 	.abilities {
 		color: #58170D;
 		display: flex;
 		justify-content: space-between;
 		text-align: center;
-		font-size: 20px;
-		padding-left: 10px;
+		font-size: 12px;
+		padding-left: 5px;
 		max-width: 650px;
 		
 		.abilityName {
+			font-size: 15px;
 			font-weight: bold;
 		}
 		div {
 			cursor: pointer;
-			margin-right: 10px;
+			margin-right: 5px;
 		}
 	}
 }

@@ -96,7 +96,6 @@ export const content_module = {
 			state.voucher = payload;
 		},
 		setSlide(state, payload) {
-			
 			//Function to compare 2 arrays
 			//Needed to check if the data of the slide is the same
 			var isEqual = function (value, other) {

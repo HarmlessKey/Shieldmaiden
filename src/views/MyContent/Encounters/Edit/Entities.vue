@@ -40,7 +40,7 @@
 		classes="monster-table"
 	>
 	<template slot="name" slot-scope="data">
-		<a @click="setSlide({show: true, type: 'ViewEntity', data: data.row })" :class="{ 'green': data.row.custom}">
+		<a @click="setSlide({show: true, type: 'ViewMonster', data: data.row, classes: 'monster-card' })" :class="{ 'green': data.row.custom}">
 			{{ data.item }}
 		</a>
 	</template>

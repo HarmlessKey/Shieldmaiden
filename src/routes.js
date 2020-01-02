@@ -4,6 +4,7 @@ import { store } from './store/store'
 const Home = () => import('@/views/Home.vue');
 
 const Compendium = () => import('@/views/Compendium/Overview.vue');
+const View = () => import('@/views/Compendium/View.vue');
 const Monsters = () => import('@/views/Compendium/Monsters.vue');
 const Spells = () => import('@/views/Compendium/Spells.vue');
 const Conditions = () => import('@/views/Compendium/Conditions.vue');
@@ -70,6 +71,12 @@ export const routes = [{
 	component: Compendium
 },
 {
+	path: '/compendium/:type/:id',
+	name: 'View',
+	component: View,
+
+},
+{
 	path: '/compendium/monsters',
 	name: 'Monsters',
 	component: Monsters,
@@ -77,18 +84,18 @@ export const routes = [{
 		baseName: 'Monsters',
 	}
 },
-{
-	path: '/compendium/monsters/:id',
-	name: 'Monster',
-	component: Monsters,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'Monsters',
-	}
-},
+// {
+// 	path: '/compendium/monsters/:id',
+// 	name: 'Monster',
+// 	component: Monsters,
+// 	props: (route) => ({
+// 		id: route.query.id
+// 	}),
+// 	meta: {
+// 		basePath: '/compendium',
+// 		baseName: 'Monsters',
+// 	}
+// },
 {
 	path: '/compendium/spells',
 	name: 'Spells',
@@ -97,18 +104,18 @@ export const routes = [{
 		baseName: 'Spells',
 	}
 },
-{
-	path: '/compendium/spells/:id',
-	name: 'Spell',
-	component: Spells,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'Spells',
-	}
-},
+// {
+// 	path: '/compendium/spells/:id',
+// 	name: 'Spell',
+// 	component: Spells,
+// 	props: (route) => ({
+// 		id: route.query.id
+// 	}),
+// 	meta: {
+// 		basePath: '/compendium',
+// 		baseName: 'Spells',
+// 	}
+// },
 {
 	path: '/compendium/conditions',
 	name: 'Conditions',
@@ -117,18 +124,18 @@ export const routes = [{
 		baseName: 'Conditions',
 	}
 },
-{
-	path: '/compendium/conditions/:id',
-	name: 'Condition',
-	component: Conditions,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'Conditions',
-	}
-},
+// {
+// 	path: '/compendium/conditions/:id',
+// 	name: 'Condition',
+// 	component: Conditions,
+// 	props: (route) => ({
+// 		id: route.query.id
+// 	}),
+// 	meta: {
+// 		basePath: '/compendium',
+// 		baseName: 'Conditions',
+// 	}
+// },
 {
 	path: '/compendium/items',
 	name: 'Items',
@@ -137,18 +144,18 @@ export const routes = [{
 		baseName: 'items',
 	}
 },
-{
-	path: '/compendium/items/:id',
-	name: 'Item',
-	component: CompendiumItems,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'items',
-	}
-},
+// {
+// 	path: '/compendium/items/:id',
+// 	name: 'Item',
+// 	component: CompendiumItems,
+// 	props: (route) => ({
+// 		id: route.query.id
+// 	}),
+// 	meta: {
+// 		basePath: '/compendium',
+// 		baseName: 'items',
+// 	}
+// },
 
 //STAND ALONE PAGES
 {

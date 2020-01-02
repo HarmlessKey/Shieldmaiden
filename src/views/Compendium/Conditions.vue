@@ -16,23 +16,19 @@
 				:perPage="15"
 				:loading="isBusy"
 				:search="['name']"
+				:collapse="true"
 			>
 				<router-link :to="'/compendium/conditions/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
 
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">
-					
+					<Condition :id="data.row['.key']" />
 				</div>
 				
 				<div slot="table-busy" class="loader">
 					<span>Loading conditions....</span>
 				</div>
 			</HKtable>
-		</template>
-
-		<!-- SHOW CONDITION -->
-		<template v-else>
-			<Condition :id="$route.params.id" />
 		</template>
 	</div>
 	<Footer />
@@ -60,7 +56,6 @@
 		},
 		data() {
 			return {
-				id: this.$route.params.id,
 				fields: {
 					name: {
 						label: 'Name',

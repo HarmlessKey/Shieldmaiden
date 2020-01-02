@@ -69,7 +69,6 @@
 					:key="`collapse-action-${index}`"
 				>
 					<a data-toggle="collapse" class="collapsed" :href="`#collapse-${index}`">
-						<i class="fas fa-caret-right"></i>
 						<i class="fas fa-caret-down"></i>
 					</a>
 				</div>
@@ -264,19 +263,12 @@
 
 			&.collapse-handler {
 				a {
-					i.fa-caret-down {
-						display: inline-block;
+					i {
+						transition: transform .2s linear;
 					}
-					i.fa-caret-right {
-						display: none;
-					}
-
 					&.collapsed {
 						i.fa-caret-down {
-							display: none;
-						}
-						i.fa-caret-right {
-							display: inline-block;
+							transform: rotate(-90deg);
 						}
 					}
 					&:hover {

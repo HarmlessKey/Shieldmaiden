@@ -372,6 +372,12 @@ ul.crumble {
 	}
 	.hk-collapsed-column {
 		background: $gray;
+
+		table {
+			td {
+				background-color: $gray-dark;
+			}
+		}
 	}
 }
 
@@ -423,9 +429,7 @@ table {
 		width: 30px;
 		text-align: center;
 	}
-	th:first-child, td:first-child {
-		width:10px;
-	}
+	
 	td.img {
 		padding: 3px;
 		width: 46px;
@@ -668,6 +672,10 @@ ul.entities {
 		}
 	}
 }
+.monster-card {
+	background-color: #f7e4ba !important;
+	background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
+ }
 @media only screen and (max-width: 1530px) { 
 	.monster-table {
 		.hk-table {

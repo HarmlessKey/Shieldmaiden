@@ -98,7 +98,7 @@
 					class="collapse hk-collapsed-column"
 				>
 					<slot name="collapse" :row="row">
-						{{ row }}
+						<pre>{{ row }}</pre>
 					</slot>
 				</div>
 			</template>
@@ -317,6 +317,11 @@
 		}
 		.hk-collapsed-column {
 			padding: 10px;
+
+			pre {
+				overflow: hidden;
+				color: #494747;
+			}
 		}
 	}
 	.result-count {

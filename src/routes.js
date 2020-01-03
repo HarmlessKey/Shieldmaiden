@@ -84,18 +84,6 @@ export const routes = [{
 		baseName: 'Monsters',
 	}
 },
-// {
-// 	path: '/compendium/monsters/:id',
-// 	name: 'Monster',
-// 	component: Monsters,
-// 	props: (route) => ({
-// 		id: route.query.id
-// 	}),
-// 	meta: {
-// 		basePath: '/compendium',
-// 		baseName: 'Monsters',
-// 	}
-// },
 {
 	path: '/compendium/spells',
 	name: 'Spells',
@@ -104,18 +92,6 @@ export const routes = [{
 		baseName: 'Spells',
 	}
 },
-// {
-// 	path: '/compendium/spells/:id',
-// 	name: 'Spell',
-// 	component: Spells,
-// 	props: (route) => ({
-// 		id: route.query.id
-// 	}),
-// 	meta: {
-// 		basePath: '/compendium',
-// 		baseName: 'Spells',
-// 	}
-// },
 {
 	path: '/compendium/conditions',
 	name: 'Conditions',
@@ -124,18 +100,6 @@ export const routes = [{
 		baseName: 'Conditions',
 	}
 },
-// {
-// 	path: '/compendium/conditions/:id',
-// 	name: 'Condition',
-// 	component: Conditions,
-// 	props: (route) => ({
-// 		id: route.query.id
-// 	}),
-// 	meta: {
-// 		basePath: '/compendium',
-// 		baseName: 'Conditions',
-// 	}
-// },
 {
 	path: '/compendium/items',
 	name: 'Items',
@@ -144,18 +108,6 @@ export const routes = [{
 		baseName: 'items',
 	}
 },
-// {
-// 	path: '/compendium/items/:id',
-// 	name: 'Item',
-// 	component: CompendiumItems,
-// 	props: (route) => ({
-// 		id: route.query.id
-// 	}),
-// 	meta: {
-// 		basePath: '/compendium',
-// 		baseName: 'items',
-// 	}
-// },
 
 //STAND ALONE PAGES
 {
@@ -196,17 +148,26 @@ export const routes = [{
 {
 	path: '/sign-in',
 	name: 'signIn',
-	component: SignIn
+	component: SignIn,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/sign-up',
 	name: 'signUp',
-	component: SignUp
+	component: SignUp,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/forgot-password',
 	name: 'resetPassword',
-	component: ResetPassword
+	component: ResetPassword,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/patreon',

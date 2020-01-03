@@ -76,9 +76,9 @@
                                         key: item['.key']
                                     }
                                 })"
-                                ><i class="fas fa-link"></i> Link item</a>
+                                ><i class="far fa-link"></i> Link item</a>
                                 <template v-else>
-                                    <i class="fas fa-link mr-2"></i>
+                                    <i class="far fa-link mr-2"></i>
                                     <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item] })">{{ items[item.linked_item].name }}</a>
                                     <a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
                                 </template>

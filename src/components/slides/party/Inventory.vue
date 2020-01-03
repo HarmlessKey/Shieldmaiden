@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<h2>Party Inventory</h2>
-		<div class="money" v-if="inventory.currency" @click="addCurrency = !addCurrency">
-			<template v-for="(coin, key) in copperToPretty(inventory.currency)">
+		<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
+			<template v-for="(coin, key) in copperToPretty(currency)">
 				<div v-if="coin" :key="key">
 					{{ coin }}
 					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
@@ -28,14 +28,59 @@
 			</div>
 		</div>
 
-		<template v-if="inventory.items">
+		<template v-if="items && allItems">
 			<h2 class="my-4">Items</h2>
 			<HKtable 
-				:items="Object.values(inventory.items)"
+				:items="items"
 				:columns="itemColumns"
 				:showHeader="false"
+				:collapse="true"
+				:perPage="15"
+				:search="['public_name', 'public_description']"
 			>
+				<div slot="public_name" slot-scope="data">
+					<a 
+						@click="identify(data.row['.key'], !data.row.identified)"
+						v-if="data.row.linked_item"
+						:class="{
+							green: data.row.identified,
+							red: !data.row.identified
+						}"
+						class="mr-1"
+						v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
+					>
+						<i class="far fa-link"></i>
+					</a>
+					<span v-else class="gray-hover mr-1" v-b-tooltip.hover title="No linked item">
+						<i class="far fa-unlink"></i>
+					</span>
+					{{ data.item }}
+				</div>
 
+				<!-- ACTIONS -->
+				<div slot="actions" slot-scope="data" class="actions">
+					<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteItem(data.row['.key'])"><i class="fas fa-trash-alt"></i></a>
+				</div>
+
+				<!-- COLLAPSE -->
+				<div slot="collapse" slot-scope="data">
+					<div class="mb-2">
+						<b>{{ data.row.public_name }}</b><br/>
+						{{ data.row.public_description }}
+					</div>
+					<a 
+						v-if="data.row.linked_item"
+						@click="identify(data.row['.key'], !data.row.identified)"
+						:class="{
+							green: data.row.identified,
+							red: !data.row.identified
+						}"
+						v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
+					>
+						<i class="far fa-link"></i>
+						{{ allItems[data.row.linked_item].name }}
+					</a>
+				</div>
 			</HKtable>
 		</template>
 	</div>
@@ -56,23 +101,44 @@
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				add: {},
+				allItems: undefined,
 				error: undefined,
 				addCurrency: false,
 				itemColumns: {
 					public_name: {
 						label: 'Name',
 						truncate: true,
+					},
+					'actions': {
+						label: '',
+						noPadding: true
 					}
 				}
 			}
 		},
 		firebase() {
 			return {
-				inventory: {
-					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory`),
+				currency: {
+					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`),
 					asObject: true
-				}
+				},
+				items: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items`)
 			}
+		},
+		mounted() {
+			var items = db.ref(`items`);
+			items.on('value', async (snapshot) => {
+				let items = snapshot.val();
+
+				let custom = db.ref(`custom_items/${this.user.uid}`);
+				custom.on('value', async (snapshot) => {
+					let customItems = snapshot.val();
+					for(let key in customItems) {
+						items[key] = customItems[key];
+					}
+                });
+				this.allItems = items;
+			});
 		},
 		methods: {
 			setCurrency(type) {
@@ -81,10 +147,10 @@
 				let validated = true;
 
 				if(type === 'add') {
-					newValue = this.inventory.currency + amount;
+					newValue = this.currency + amount;
 					this.error = undefined;
 				} else {
-					newValue = this.inventory.currency - amount;
+					newValue = this.currency - amount;
 					this.error = undefined;
 					if(newValue < 0) {
 						validated = false;
@@ -96,8 +162,13 @@
 					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`).set(newValue);
 					this.add = {};
 				}
+			},
+			identify(key, value) {
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items/${key}/identified`).set(value);
+			},
+			deleteItem(key) {
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items/${key}`).remove();
 			}
-
 		}
 	};
 </script>

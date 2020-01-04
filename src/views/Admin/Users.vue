@@ -140,50 +140,48 @@
 		},
 		mounted() {
 			var users = db.ref('users').orderByChild('username')
-				users.on('value', async (snapshot) => {
-					let users = snapshot.val()
+			users.on('value', async (snapshot) => {
+				let users = snapshot.val()
 
-					for(let key in users) {
-						users[key]['.key'] = key;
-						users[key].status = users[key].status ? users[key].status : 'offline';
-						let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
+				for(let key in users) {
+					users[key]['.key'] = key;
+					users[key].status = users[key].status ? users[key].status : 'offline';
+					let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
 
-						//Get Patreon
-						let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
-						await getPatron.on('value', (snapshot) => {
-							if(snapshot.val()) {
-								for(let patreonId in snapshot.val()) {
-									let patron = snapshot.val()[patreonId];
-									if(new Date(patron.pledge_end) >= new Date()) {
-										users[key].patreon = Object.keys(patron.tiers)
-									} else {
-										users[key].patreon = 'Expired';
-									}
+					//Get Patreon
+					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
+					await getPatron.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							for(let patreonId in snapshot.val()) {
+								let patron = snapshot.val()[patreonId];
+								if(new Date(patron.pledge_end) >= new Date()) {
+									users[key].patreon = Object.keys(patron.tiers)
+								} else {
+									users[key].patreon = 'Expired';
 								}
 							}
-						});
+						}
+					});
 
-						// Get Status
-						let getStatus = db.ref(`status/${key}`);
-						await getStatus.on('value', (snapshot) => {
-							if(snapshot.val()) {
-								users[key].status = snapshot.val().state;
-							}
-						});
+					// Get Status
+					let getStatus = db.ref(`status/${key}`);
+					await getStatus.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							users[key].status = snapshot.val().state;
+						}
+					});
 
-						// Get Status
-						let getLive = db.ref(`broadcast/${key}/live`);
-						await getLive.on('value', (snapshot) => {
-							if(snapshot.val()) {
-								users[key].live = snapshot.val();
-							}
-						});
-					}
-					this.users = Object.values(users);
-					this.isBusy = false
-				});
-
-		
+					// Get Status
+					let getLive = db.ref(`broadcast/${key}/live`);
+					await getLive.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							users[key].live = snapshot.val();
+						}
+					});
+				}
+				this.users = Object.values(users);
+				this.isBusy = false
+			});
 		},
 		methods: {
 			...mapActions([

@@ -1,13 +1,13 @@
 <template>
-	<div class="pb-5">
-		<h1 class="itemTitle d-flex justify-content-between">
+	<div>
+		<h3 class="itemTitle d-flex justify-content-between">
 			{{ data.name }}
 			<!-- <span v-if="userInfo && userInfo.admin ">
 				<a v-if="!edit" @click="setEdit(true)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a>
 				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a>
 				<a @click="checked(!data.checked)" :class="{'gray-hover': !data.checked, 'green': data.checked}"><i class="fas fa-check"></i> Item checked</a>
 			</span> -->
-		</h1>
+		</h3>
 
 		<!-- EDIT -->
 		<!-- <template v-if="userInfo && userInfo.admin && edit">
@@ -114,10 +114,11 @@
 				<template v-if="data.requires_attunement"> ( {{ data.requires_attunement }} )</template>
 			</i>
 
-			<p style="white-space: pre-line">{{ data.desc }}</p>
-			<div v-for="(table, index) in data.tables" :key="index">
+			<div style="white-space: pre-line">{{ data.desc }}</div>
+			
+			<div class="mt-3" v-for="(table, index) in data.tables" :key="index">
 				<h6 v-if="table.name">{{ table.name }}</h6>
-				<table class="table mb-5">
+				<table class="table">
 					<thead>
 						<th v-for="head in table.header" :key="head">{{ head }}</th>
 					</thead>

@@ -653,6 +653,9 @@ ul.entities {
 			background-color: #f7e4ba !important;
 			background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
 		}
+		&::-webkit-scrollbar {
+			display: none !important;
+		}
 	}
 }
 

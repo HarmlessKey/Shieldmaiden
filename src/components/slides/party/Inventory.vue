@@ -2,7 +2,7 @@
 	<div>
 		<h2>Party Inventory</h2>
 		<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
-			<template v-for="(coin, key) in copperToPretty(currency)">
+			<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 				<div v-if="coin" :key="key">
 					{{ coin }}
 					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
@@ -27,15 +27,16 @@
 				<button class="btn btn-sm bg-red" @click="setCurrency('remove')">Remove</button>
 			</div>
 		</div>
-
-		<template v-if="items && allItems">
+		<template>
 			<h2 class="my-4">Items</h2>
 			<HKtable 
+				v-if="items"
 				:items="items"
 				:columns="itemColumns"
 				:showHeader="false"
 				:collapse="true"
 				:perPage="15"
+				:loading="loading"
 				:search="['public_name', 'public_description']"
 			>
 				<div slot="public_name" slot-scope="data">
@@ -68,18 +69,29 @@
 						<b>{{ data.row.public_name }}</b><br/>
 						{{ data.row.public_description }}
 					</div>
-					<a 
-						v-if="data.row.linked_item"
-						@click="identify(data.row['.key'], !data.row.identified)"
-						:class="{
-							green: data.row.identified,
-							red: !data.row.identified
-						}"
-						v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
-					>
-						<i class="far fa-link"></i>
-						{{ allItems[data.row.linked_item].name }}
-					</a>
+					<template v-if="data.row.linked_item">
+						<div class="linked-item">
+							<a 
+								@click="identify(data.row['.key'], !data.row.identified)"
+								class="item-name"
+								:class="{
+									green: data.row.identified,
+									red: !data.row.identified
+								}"
+								v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
+								
+							>
+								<i class="far fa-link"></i>
+								{{ data.row.full_linked_item.name }}
+							</a>
+							<a data-toggle="collapse" class="collapsed" :href="`#full-item-${data.row.linked_item}`">
+								<i class="fas fa-caret-down"></i>
+							</a>
+						</div>
+						<div class="collapse full-item" :id="`full-item-${data.row.linked_item}`">
+							<ViewItem :data="data.row.full_linked_item"/>
+						</div>
+					</template>
 				</div>
 			</HKtable>
 		</template>
@@ -90,17 +102,21 @@
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
 	import HKtable from '@/components/hk-components/hk-table.vue';
+	import ViewItem from '@/components/ViewItem.vue';
 
 	export default {
 		mixins: [currencyMixin],
 		components: {
-			HKtable
+			HKtable,
+			ViewItem
 		},
 		data() {
 			return {
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				add: {},
+				items: undefined,
+				loading: true,
 				allItems: undefined,
 				error: undefined,
 				addCurrency: false,
@@ -121,23 +137,36 @@
 				currency: {
 					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`),
 					asObject: true
-				},
-				items: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items`)
+				}
 			}
 		},
 		mounted() {
-			var items = db.ref(`items`);
+			var items = db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items`);
 			items.on('value', async (snapshot) => {
-				let items = snapshot.val();
+				let items = snapshot.val()
 
-				let custom = db.ref(`custom_items/${this.user.uid}`);
-				custom.on('value', async (snapshot) => {
-					let customItems = snapshot.val();
-					for(let key in customItems) {
-						items[key] = customItems[key];
-					}
-                });
-				this.allItems = items;
+				for(let key in items) {
+					let item = items[key];
+					items[key].full_linked_item = {};
+					items[key]['.key'] = key;
+
+					//Get Linked item
+					let linkedItem = db.ref(`items/${item.linked_item}`)
+					await linkedItem.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							items[key].full_linked_item = snapshot.val();
+						}
+					});
+					//Get Linked item
+					let linkedCustomItem = db.ref(`custom_items/${this.user.uid}/${item.linked_item}`)
+					await linkedCustomItem.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							items[key].full_linked_item = snapshot.val();
+						}
+					});
+				}
+				this.items = Object.values(items);
+				this.loading = false;
 			});
 		},
 		methods: {
@@ -147,10 +176,10 @@
 				let validated = true;
 
 				if(type === 'add') {
-					newValue = this.currency + amount;
+					newValue = this.currency['.value'] + amount;
 					this.error = undefined;
 				} else {
-					newValue = this.currency - amount;
+					newValue = this.currency['.value'] - amount;
 					this.error = undefined;
 					if(newValue < 0) {
 						validated = false;
@@ -235,6 +264,36 @@
 				}
 			}
 			
+		}
+	}
+	.hk-table {
+		.linked-item {
+			display: grid;
+			grid-template-columns: 1fr 10px;
+
+			a.item-name {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			a {
+				i {
+					transition: transform .2s linear;
+				}
+				&.collapsed {
+					i.fa-caret-down {
+						transform: rotate(-90deg);
+					}
+				}
+			}
+		}
+		.full-item {
+			margin-top: 15px;
+			font-size: 12px;
+
+			h3 {
+				font-size: 15px;
+			}
 		}
 	}
 </style>

@@ -1,31 +1,13 @@
 <template>
 	<div>
 		<h2>Party Inventory</h2>
-		<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
+		<div class="money" v-if="currency">
 			<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 				<div v-if="coin" :key="key">
 					{{ coin }}
 					<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
 				</div>
 			</template>
-		</div>
-		<p v-else class="text-center"><a @click="addCurrency = !addCurrency">Award money</a></p>
-		<div class="addCurrency" v-if="addCurrency">
-			<div class="currency">
-				<div v-for="(coin, key) in currencies" :key="key">
-					<span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
-						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-					</span>
-					<b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="add[key]" :placeholder="coin.name"/>
-				</div>
-			</div>
-
-			<p class="red text-center mt-2" v-if="error != ''">{{ error }}</p>
-
-			<div class="actions">
-				<button class="btn btn-sm" @click="setCurrency('add')">Add</button>
-				<button class="btn btn-sm bg-red" @click="setCurrency('remove')">Remove</button>
-			</div>
 		</div>
 		<template>
 			<h2 class="my-4">Items</h2>
@@ -39,29 +21,6 @@
 				:loading="loading"
 				:search="['public_name', 'public_description']"
 			>
-				<div slot="public_name" slot-scope="data">
-					<a 
-						@click="identify(data.row['.key'], !data.row.identified)"
-						v-if="data.row.linked_item"
-						:class="{
-							green: data.row.identified,
-							red: !data.row.identified
-						}"
-						class="mr-1"
-						v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
-					>
-						<i class="far fa-link"></i>
-					</a>
-					<span v-else class="gray-hover mr-1" v-b-tooltip.hover title="No linked item">
-						<i class="far fa-unlink"></i>
-					</span>
-					{{ data.item }}
-				</div>
-
-				<!-- ACTIONS -->
-				<div slot="actions" slot-scope="data" class="actions">
-					<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteItem(data.row['.key'])"><i class="fas fa-trash-alt"></i></a>
-				</div>
 
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">
@@ -69,21 +28,9 @@
 						<b>{{ data.row.public_name }}</b><br/>
 						{{ data.row.public_description }}
 					</div>
-					<template v-if="data.row.linked_item">
+					<template v-if="data.row.linked_item && data.row.identified">
 						<div class="linked-item">
-							<a 
-								@click="identify(data.row['.key'], !data.row.identified)"
-								class="item-name"
-								:class="{
-									green: data.row.identified,
-									red: !data.row.identified
-								}"
-								v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
-								
-							>
-								<i class="far fa-link"></i>
-								{{ data.row.full_linked_item.name }}
-							</a>
+							<span>Qualities</span>
 							<a data-toggle="collapse" class="collapsed" :href="`#full-item-${data.row.linked_item}`">
 								<i class="fas fa-caret-down"></i>
 							</a>
@@ -112,9 +59,8 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				userId: this.$route.params.userid,
 				campaignId: this.$route.params.campid,
-				add: {},
 				items: undefined,
 				loading: true,
 				allItems: undefined,
@@ -124,10 +70,6 @@
 					public_name: {
 						label: 'Name',
 						truncate: true,
-					},
-					'actions': {
-						label: '',
-						noPadding: true
 					}
 				}
 			}
@@ -135,13 +77,13 @@
 		firebase() {
 			return {
 				currency: {
-					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`),
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`),
 					asObject: true
 				}
 			}
 		},
 		mounted() {
-			const items = db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items`);
+			const items = db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`);
 			items.on('value', async (snapshot) => {
 				let items = snapshot.val()
 
@@ -151,14 +93,14 @@
 					items[key]['.key'] = key;
 
 					//Get Linked item
-					const linkedItem = db.ref(`items/${item.linked_item}`)
+					let linkedItem = db.ref(`items/${item.linked_item}`)
 					await linkedItem.on('value', (snapshot) => {
 						if(snapshot.val()) {
 							items[key].full_linked_item = snapshot.val();
 						}
 					});
 					//Get Linked item
-					const linkedCustomItem = db.ref(`custom_items/${this.user.uid}/${item.linked_item}`)
+					let linkedCustomItem = db.ref(`custom_items/${this.userId}/${item.linked_item}`)
 					await linkedCustomItem.on('value', (snapshot) => {
 						if(snapshot.val()) {
 							items[key].full_linked_item = snapshot.val();
@@ -168,36 +110,6 @@
 				this.items = Object.values(items);
 				this.loading = false;
 			});
-		},
-		methods: {
-			setCurrency(type) {
-				let newValue;
-				let amount = this.currencyToCopper(this.add);
-				let validated = true;
-
-				if(type === 'add') {
-					newValue = this.currency['.value'] + amount;
-					this.error = undefined;
-				} else {
-					newValue = this.currency['.value'] - amount;
-					this.error = undefined;
-					if(newValue < 0) {
-						validated = false;
-						this.error = 'Party doesn\'t own enough';
-					}
-				}
-
-				if(validated) {	
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`).set(newValue);
-					this.add = {};
-				}
-			},
-			identify(key, value) {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items/${key}/identified`).set(value);
-			},
-			deleteItem(key) {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/items/${key}`).remove();
-			}
 		}
 	};
 </script>

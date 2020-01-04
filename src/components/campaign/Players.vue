@@ -20,28 +20,34 @@
 				</template>
 				<span v-else class="text-italic gray-hover">No money</span>
 			</div>
-			<div class="actions" v-if="viewerIsUser">
+			<div class="actions">
+				<template v-if="viewerIsUser">
+					<a 
+						v-b-tooltip.hover title="Edit Group Health"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/health'
+						})"><i class="fas fa-heart"></i></a>
+					<a 
+						v-if="campaign.advancement != 'milestone'"
+						v-b-tooltip.hover title="Award Experience Points"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/xp'
+						})">XP</a>
+					<a 
+						v-b-tooltip.hover title="Party Inventory"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/Inventory'
+						})"><i class="fas fa-treasure-chest"></i></a>
+				</template>
 				<a 
-					class="" 
-					v-b-tooltip.hover title="Edit Group Health"
-					@click="setSlide({
-						show: true,
-						type: 'slides/party/health'
-					})"><i class="fas fa-heart"></i></a>
-				<a 
-					class="" 
-					v-if="campaign.advancement != 'milestone'"
-					v-b-tooltip.hover title="Award Experience Points"
-					@click="setSlide({
-						show: true,
-						type: 'slides/party/xp'
-					})">XP</a>
-				<a 
-					class="" 
+					v-else
 					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
-						type: 'slides/party/Inventory'
+						type: 'slides/party/ViewInventory'
 					})"><i class="fas fa-treasure-chest"></i></a>
 			</div>
 		</div>
@@ -251,7 +257,7 @@
 					campaignPlayers[key]['.key'] = key;
 
 					//Get full player
-					let fullPlayer = db.ref(`players/${this.userId}/${key}`)
+					const fullPlayer = db.ref(`players/${this.userId}/${key}`)
 					await fullPlayer.on('value', (snapshot) => {
 						if(snapshot.val()) {
 							campaignPlayers[key].character_name = snapshot.val().character_name;

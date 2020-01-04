@@ -2,11 +2,14 @@
 	<div>
 		<div class="group-actions">
 			<div class="money" 
-				@click="setSlide({
-					show: true,
-					type: 'slides/party/Currency',
-					data: { current: currency['.value'] }
-				})">
+				@click="
+					viewerIsUser
+					? setSlide({
+						show: true,
+						type: 'slides/party/Currency',
+						data: { current: currency['.value'] }
+					}) : null
+				">
 				<template v-if="currency['.value']">
 					<template v-for="(coin, key) in money">
 						<div v-if="coin" :key="key">
@@ -17,7 +20,7 @@
 				</template>
 				<span v-else class="text-italic gray-hover">No money</span>
 			</div>
-			<div class="actions">
+			<div class="actions" v-if="viewerIsUser">
 				<a 
 					class="" 
 					v-b-tooltip.hover title="Edit Group Health"
@@ -42,8 +45,8 @@
 					})"><i class="fas fa-treasure-chest"></i></a>
 			</div>
 		</div>
-
 		<div 
+			v-if="players"
 			class="players" 
 			:class="{ xp: campaign.advancement != 'milestone' }"
 			:style="{ 'grid-template-columns': templateColumns }"
@@ -66,9 +69,9 @@
 			<div class="col header health"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></div>
 			<div class="col header actions"><i class="far fa-ellipsis-h"></i></div>
 
-			<template v-for="(player, key) in campaign.players">
+			<template v-for="(player, key) in players">
 				<div 
-					v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"
+					v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"
 					class="col image" 
 					:key="'image-'+key"></div>
 				<div v-else class="image" :key="'image-'+key">
@@ -81,45 +84,45 @@
 						}" 
 						v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
 						v-if="player.ac_bonus">
-						{{ players[key].ac + player.ac_bonus }}
+						{{ player.ac + player.ac_bonus }}
 					</span>
-					<span v-else>{{ players[key].ac }}</span>
+					<span v-else>{{ player.ac }}</span>
 				</div>
-				<div class="col name" :key="'name-'+key">{{ players[key].character_name }}</div>
+				<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
 
 				<div 
 					class="col pp" 
 					v-if="settings.passive_perception == undefined"
 					:key="'pp-'+key"
 				>
-					{{ players[key].passive_perception }}
+					{{ player.passive_perception }}
 				</div>
 				<div 
 					class="col pinv" 
 					v-if="settings.passive_investigation == undefined"
 					:key="'pinv-'+key"
 				>
-					{{ players[key].passive_investigation }}
+					{{ player.passive_investigation }}
 				</div>
 				<div 
 					class="col pins" 
 					v-if="settings.passive_insight == undefined"
 					:key="'pins-'+key"
 				>
-					{{ players[key].passive_insight }}
+					{{ player.passive_insight }}
 				</div>
 				<div 
 					class="col save" 
 					v-if="settings.save_dc == undefined"
 					:key="'save-'+key"
 				>
-					{{ players[key].spell_save_dc }}
+					{{ player.spell_save_dc }}
 				</div>
 
 				<div class="col health" :key="'health-'+key">
 					<span class="current" :class="{ 
-						'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
-						'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
+						'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+						'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, player.maxHp) <= 76, 
 						'green': true
 					}">{{ player.curHp }}</span>
 					<span class="gray-hover">/</span>
@@ -128,13 +131,16 @@
 							'red': player.maxHpMod < 0 
 						}" 
 						v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-						{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+						{{ maxHp(player.maxHp, player.maxHpMod) }}
 					</span>
-					<span v-else>{{ players[key].maxHp }}</span>
+					<span v-else>{{ player.maxHp }}</span>
 					<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 				</div>
 				<div class="col actions" :key="'actions-'+key">
-					<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
+					<a 	
+						v-if="viewerIsUser"
+						class="gray-hover" 
+						v-b-tooltip.hover title="Edit player" 
 						@click="setSlide({
 							show: true,
 							type: 'slides/EditPlayer',
@@ -145,18 +151,18 @@
 				</div>
 
 				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="campaign.advancement != 'milestone'">
-					<div class="level">{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}</div>
+					<div class="level">{{ player.level ? player.level : calculatedLevel(player.experience) }}</div>
 					<div class="progress">
 						<div class="progress-bar bg-blue"
 							role="progressbar" 
-							:style="{ width: levelAdvancement(players[key].experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+							:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
 						</div>
 					</div>
 				</div>
 			</template>
 		</div>
 
-		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 	</div>
 </template>
 
@@ -168,31 +174,40 @@
 
 	export default {
 		name: 'Players',
+		props: ['userId', 'campaignId'],
 		mixins: [experience, currencyMixin],
 		data() {
 			return {
-				user: this.$store.getters.getUser,
-				campaignId: this.$route.params.campid,
+				viewerId: this.$store.getters.getUser.uid,
+				players: undefined,
+				loading: true
 			}
 		},
 		firebase() {
 			return {
+				campaign:  {
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
+					asObject: true
+				},
 				settings: {
-					source: db.ref(`settings/${this.user.uid}/general`),
+					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
 				},
 				currency: {
-					source: db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`),
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`),
 					asObject: true
 				}
 			}
 		},
 		computed: {
 			...mapGetters([
-				'campaign',
-				'players',
 				'playerInCampaign',
 			]),
+			viewerIsUser() {
+				//If the viewer is the user that runs the campaing
+				//Edit functions are enables
+				return this.userId === this.viewerId;
+			},
 			templateColumns() {
 				let templateColumns = 'max-content 40px auto ';
 
@@ -228,13 +243,37 @@
 			}
 		},
 		mounted() {
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
+			const getPlayers = db.ref(`campaigns/${this.userId}/${this.campaignId}/players`);
+			getPlayers.on('value', async (snapshot) => {
+				let campaignPlayers = snapshot.val();
+
+				for(let key in campaignPlayers) {	
+					campaignPlayers[key]['.key'] = key;
+
+					//Get full player
+					let fullPlayer = db.ref(`players/${this.userId}/${key}`)
+					await fullPlayer.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							campaignPlayers[key].character_name = snapshot.val().character_name;
+							campaignPlayers[key].avatar = snapshot.val().avatar;
+							campaignPlayers[key].maxHp = snapshot.val().maxHp;
+							campaignPlayers[key].ac = snapshot.val().ac;
+							campaignPlayers[key].experience = snapshot.val().experience;
+							campaignPlayers[key].passive_perception = snapshot.val().passive_perception;
+							campaignPlayers[key].passive_investigation = snapshot.val().passive_investigation;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].save_dc = snapshot.val().save_dc;
+						}
+					});	
+				}
+				this.players = Object.values(campaignPlayers);
+				this.loading = false;
+			});
+
 		},
 		methods: {
 			...mapActions([
-				'fetchCampaign',
 				'setSlide',
 			]),
 			percentage(current, max) {
@@ -246,7 +285,7 @@
 			},
 			reset() {
 				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
+					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
 						curHp: this.players[key].maxHp,
 						tempHp: 0,
 						maxHpMod: 0
@@ -304,7 +343,7 @@
 		display: grid;
 		grid-auto-rows: max-content;
 		grid-row-gap: 1px;
-		margin: 30px 0;
+		margin: 10px 0 30px 0;
 
 		.image {
 			width: 46px;

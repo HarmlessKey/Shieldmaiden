@@ -24,7 +24,7 @@
 						<div class="tab-pane fade show active" id="loot" role="tabpanel" aria-labelledby="loot-tab">
 							<h3>Encounter rewards</h3>
 							<!-- XP -->
-							<div class="xp bg-gray" v-if="encounter.xp">
+							<div class="xp bg-gray" v-if="campaign.advancement === 'experience' && encounter.xp">
 								<span class="amount">
 									{{ xpAmount }}
 									<span class="gray-hover">XP</span>
@@ -168,11 +168,8 @@
 		computed: {
 			tabs() {
 				let tabs = {};
-				if(this.campaign.advancement === 'experience') {
-					tabs.loot = { name: 'Loot', icon: 'fas fa-treasure-chest', selected: true };
-				}
-				tabs.dmg = { name: 'Damage', icon: 'fas fa-swords' }
-				
+				tabs.loot = { name: 'Loot', icon: 'fas fa-treasure-chest', selected: true };
+				tabs.dmg = { name: 'Damage', icon: 'fas fa-swords' };
 				
 				return tabs;
 			},

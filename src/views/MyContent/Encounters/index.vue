@@ -133,7 +133,7 @@
 				<!-- PLAYERS -->
 				<b-col lg="5">
 					<h2>Players</h2>
-					<Players />
+					<Players :userId="user.uid" :campaignId="campaignId" />
 				</b-col>
 			</b-row>
 		</template>

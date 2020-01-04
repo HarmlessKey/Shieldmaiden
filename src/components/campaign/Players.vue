@@ -43,12 +43,15 @@
 						})"><i class="fas fa-treasure-chest"></i></a>
 				</template>
 				<a 
-					v-else
+					v-else-if="campaign.inventory.items"
 					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
 						type: 'slides/party/ViewInventory'
-					})"><i class="fas fa-treasure-chest"></i></a>
+					})">
+						<i class="fas fa-treasure-chest mr-1"></i>
+						{{ Object.keys(campaign.inventory.items).length }}
+					</a>
 			</div>
 		</div>
 		<div 
@@ -210,8 +213,8 @@
 				'playerInCampaign',
 			]),
 			viewerIsUser() {
-				//If the viewer is the user that runs the campaing
-				//Edit functions are enables
+				//If the viewer is the user that runs the campaign
+				//Edit functions are enabled
 				return this.userId === this.viewerId;
 			},
 			templateColumns() {

@@ -28,7 +28,10 @@
 			</div>
 		</div>
 		<template>
-			<h2 class="my-4">Items</h2>
+			<h2 class="my-4 d-flex justify-content-between">
+				<span>Items</span>
+				<a><i class="fas fa-plus green"></i></a>
+			</h2>
 			<HKtable 
 				v-if="items"
 				:items="items"

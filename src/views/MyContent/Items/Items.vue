@@ -120,7 +120,7 @@
 						noPadding: true,
 						right: true,
 						maxContent: true
-                	}
+					}
 				}
 			}
 		},
@@ -180,7 +180,6 @@
 							let linked_item = campaign.inventory.items[itemKey].linked_item;
 
 							if(linked_item === key){
-								console.log('Link removed' )
 								db.ref(`campaigns/${this.userId}/${campaignKey}/inventory/items/${itemKey}`).child('linked_item').remove();
 							}
 						}

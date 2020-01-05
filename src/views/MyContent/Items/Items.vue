@@ -132,6 +132,7 @@
 		computed: {
 			...mapGetters([
 				'tier',
+				'campaigns',
 				'overencumbered',
 				'content_count',
 			]),
@@ -150,7 +151,7 @@
 		},
 		methods: {
 			confirmDelete(key, item) {
-				this.$snotify.error('Are you sure you want to delete ' + item + '?', 'Delete item', {
+				this.$snotify.error('Are you sure you want to delete ' + item + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
 					timeout: false,
 					buttons: [
 						{
@@ -171,8 +172,19 @@
 			},
 			deleteItem(key) {
 				//Remove the item from all inventories
-				for(let campaign in this.campaigns) {
-					
+				for(let campaignKey in this.campaigns) {
+					let campaign = this.campaigns[campaignKey];
+
+					if(campaign.inventory) {
+						for(let itemKey in campaign.inventory.items) {
+							let linked_item = campaign.inventory.items[itemKey].linked_item;
+
+							if(linked_item === key){
+								console.log('Link removed' )
+								db.ref(`campaigns/${this.userId}/${campaignKey}/inventory/items/${itemKey}`).child('linked_item').remove();
+							}
+						}
+					}
 				}
 				//Remove item
 				db.ref('custom_items/' + this.userId).child(key).remove(); 

@@ -16,7 +16,7 @@
         <h3 class="d-flex justify-content-between mt-3">
             <span>
                 <i class="far fa-staff"></i> Items
-                <span v-if="loot">( {{ Object.keys(loot).length }} )</span>
+                <span v-if="items">( {{ Object.keys(items).length }} )</span>
             </span>
             <a class="gray-hover" @click="addItem()">
                 <i class="fas fa-plus green"></i>
@@ -24,8 +24,8 @@
             </a>
         </h3>
         <hr>
-        <template v-if="loot">
-            <div v-for="(item, index) in loot" :key="item['.key']">
+        <template v-if="items">
+            <div v-for="(item, index) in items" :key="item['.key']">
                 <div class="b-card bg-gray mb-3">
                     <b-card-header class="d-flex justify-content-between">
                         {{ index + 1 }}. {{ item.public_name }}
@@ -79,7 +79,7 @@
                                 ><i class="far fa-link"></i> Link item</a>
                                 <template v-else>
                                     <i class="far fa-link mr-2"></i>
-                                    <a @click="setSlide({show: true, type: 'ViewItem', data: items[item.linked_item] })">{{ items[item.linked_item].name }}</a>
+                                    <a @click="setSlide({show: true, type: 'ViewItem', data: item.full_linked_item })">{{ item.full_linked_item.name }}</a>
                                     <a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
                                 </template>
                                  <a 
@@ -112,12 +112,12 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
                 slide: this.$store.getters.getSlide,
+                items: {},
                 editItem: undefined
 			} 
 		},
 		firebase() {
 			return {
-				loot: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`),
                 currency: {
 					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/currency`),
 					asObject: true
@@ -125,19 +125,32 @@
 			}
 		},
 		mounted() {
-            var items = db.ref(`items`);
+            const items = db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`);
 			items.on('value', async (snapshot) => {
-				let items = snapshot.val();
+				let items = snapshot.val()
 
-				let custom = db.ref(`custom_items/${this.user.uid}`);
-				custom.on('value', async (snapshot) => {
-					let customItems = snapshot.val();
-					for(let key in customItems) {
-						items[key] = customItems[key];
-					}
-                });
-				this.items = items;
-				this.loadingItems = false;
+				for(let key in items) {
+					let item = items[key];
+					items[key].full_linked_item = {};
+					items[key]['.key'] = key;
+
+					//Get Linked item
+					const linkedItem = db.ref(`items/${item.linked_item}`)
+					await linkedItem.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							items[key].full_linked_item = snapshot.val();
+						}
+					});
+					//Get Linked item
+					const linkedCustomItem = db.ref(`custom_items/${this.user.uid}/${item.linked_item}`)
+					await linkedCustomItem.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							items[key].full_linked_item = snapshot.val();
+						}
+					});
+				}
+				this.items = Object.values(items);
+				this.loading = false;
 			});
 			this.fetchEncounter({
 				cid: this.campaignId, 

@@ -111,7 +111,7 @@
 					</div>
 				</b-col>
 				<b-col md="5">
-					<Players />
+					<Players :userId="userId" :campaignId="campaignId" />
 				</b-col>
 			</b-row>
 		</div>

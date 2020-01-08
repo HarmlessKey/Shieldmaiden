@@ -264,6 +264,8 @@
 						//CLEAR LOG
 						localStorage.removeItem(id);
 					}
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/xp_awarded`).remove();
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/currency_awarded`).remove();
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/turn`).set(0);
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/round`).set(0);
 					this.reset_store();

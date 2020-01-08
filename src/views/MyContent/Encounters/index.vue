@@ -347,16 +347,18 @@
 						entity.initiative = 0;
 
 
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
 
 						//CLEAR LOG
 						localStorage.removeItem(id);
 					}
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0)
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0)
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/xp_awarded`).remove();
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/currency_awarded`).remove();
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0);
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0);
 				}
 
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
 			},
 			broadcast() {

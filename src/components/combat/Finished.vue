@@ -96,6 +96,15 @@
 									</template>
 								</HKtable>
 							</template>
+							<template v-if="awardedItems">
+								<h3>Awarded Items</h3>
+								<HKtable 
+									:items="awardedItems"
+									:columns="itemColumns"
+									:showHeader="false"
+								>
+								</HKtable>
+							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
 							<b-row>
@@ -162,7 +171,8 @@
 				campaign: {
 					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
 					asObject: true
-				}
+				},
+				awardedItems: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`).orderByChild('encounter_id').equalTo(this.encounterId)
 			}
 		},
 		computed: {
@@ -214,6 +224,8 @@
 				}
 				let newValue = parseInt(oldValue) + this.currencyToCopper(this.encounter.currency);
 
+				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
+
 				if(!this.errors.has('currency')) {
 					db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`).set(newValue);
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/currency_awarded`).set(true);
@@ -254,6 +266,8 @@
 						//CLEAR LOG
 						localStorage.removeItem(id);
 					}
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/xp_awarded`).remove();
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/currency_awarded`).remove();
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/turn`).set(0);
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/round`).set(0);
 					this.reset_store();

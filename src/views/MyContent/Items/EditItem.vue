@@ -126,7 +126,8 @@
 								<b-form-input 
 									v-model="table.header[i]" 
 									:placeholder="`Column header ${i+1}`"
-									v-validate="'required'"
+									v-validate="'max;100|required'"
+									maxlength="100"
 									:data-vv-as="`column header ${i+1}`"
 									:name="`column-header-${i+1}`"
 								/>
@@ -138,7 +139,8 @@
 									<b-form-input 
 										v-model="table.rows[rowIndex].columns[colIndex]" 
 										:placeholder="`Column ${colIndex+1}`"
-										v-validate="'required'"
+										v-validate="'max:100|required'"
+										maxlength="100"
 										:data-vv-as="`column ${colIndex+1}`"
 										:name="`cell-${rowIndex+1}-${colIndex+1}`"
 									/>

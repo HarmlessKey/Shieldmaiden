@@ -149,7 +149,11 @@
 						}
 					});
 				}
-				this.items = Object.values(items);
+                if (items !== null) {
+				    this.items = Object.values(items);
+                } else {
+                    this.items = [];
+                }
 				this.loading = false;
 			});
 			this.fetchEncounter({

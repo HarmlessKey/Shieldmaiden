@@ -154,7 +154,7 @@
 						@click="setSlide({
 							show: true,
 							type: 'slides/EditPlayer',
-							data: { key: key, location: 'overview',}
+							data: { key: player['.key'], location: 'overview',}
 						})">
 						<i class="fas fa-pencil"></i>
 					</a>
@@ -294,9 +294,10 @@
 				return maxHp + maxHpMod;
 			},
 			reset() {
-				for(var key in this.campaign.players) {
+				for(var i in this.players) {
+					let key = this.players[i]['.key']
 					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp,
+						curHp: this.players[i].maxHp,
 						tempHp: 0,
 						maxHpMod: 0
 					})

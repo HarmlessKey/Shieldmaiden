@@ -8,10 +8,10 @@
 				<i class="fas fa-chevron-right mr-2"></i>
 				<router-link :to="explodePath($route.path, 1)">Compendium</router-link>
 			</li>
-			<template v-if="$route.meta.baseName">
+			<template v-if="$route.params.type || $route.meta.baseName">
 				<li>
 					<i class="fas fa-chevron-right mr-2"></i>
-					<router-link :to="explodePath($route.path, 2)">{{ $route.meta.baseName }}</router-link>
+					<router-link :to="explodePath($route.path, 2)">{{ $route.params.type || $route.meta.baseName }}</router-link>
 				</li>
 				<li v-if="name">
 					<i class="fas fa-chevron-right mr-2"></i>
@@ -25,7 +25,7 @@
 <script>
 	export default {
 		name: 'Crumble',
-		props: ['name'],
+		props: ['base', 'name'],
 		data() {
 			return {
 			}

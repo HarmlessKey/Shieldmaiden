@@ -6,7 +6,7 @@
 			v-model="doneBy" 
 			name="doneBy"
 			v-validate="'required'">
-			<option value="">Done by...</option>
+			<option value="" disabled>Done by...</option>
 			<option :value="environment">Environment</option>
 			<option v-for="(entity, index) in _active" :value="entity" :key="index">{{ entity.name }}</option>
 		</select>
@@ -26,17 +26,17 @@
 				class="form-control manual-input"
 				v-shortkey.avoid>
 			<button class="btn dmg bg-red" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'damage')">
-					Attack
-					<img src="@/assets/_img/styles/sword-break.png" />
-				</button>
-				<button class="btn heal bg-green" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'healing')">
-					Heal
-					<img src="@/assets/_img/styles/heal.png" />
-				</button>
+				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+				@click="setManual(target, 'damage')">
+				Attack
+				<img src="@/assets/_img/styles/sword-break.png" />
+			</button>
+			<button class="btn heal bg-green" 
+				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
+				@click="setManual(target, 'healing')">
+				Heal
+				<img src="@/assets/_img/styles/heal.png" />
+			</button>
 		</div>
 	</div>
 </template>

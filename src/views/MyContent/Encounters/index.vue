@@ -9,15 +9,6 @@
 
 		<OverEncumbered v-if="overencumbered" />
 
-		<template v-if="noCurHp">
-			<button class="btn btn-lg btn-block mb-4" @click="setCurHp()"><i class="fas fa-undo-alt"></i> Reset Players</button>
-
-			<h3>Why am I seeing this?</h3>
-			<p>
-				We changed where the current HP and other stats of players are stored so players have to be readded to your campaigns, 
-				one click on the button above will do this for you.
-			</p>
-		</template>
 		<template v-else-if="tier">
 			<b-row>
 				<!-- SHOW ENCOUNTERS -->
@@ -35,7 +26,7 @@
 							) </span>
 						</span>
 						</span>
-						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="add = !add"><i class="fas fa-plus green"></i></a>
 					</h2>
 
 					<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
@@ -110,6 +101,7 @@
 					<h2>Finished Encounters</h2>
 					
 					<HKtable
+						class="mb-4"
 						:items="_finished"
 						:columns="finishedColumns"
 						:perPage="6"
@@ -141,7 +133,7 @@
 				<!-- PLAYERS -->
 				<b-col lg="5">
 					<h2>Players</h2>
-					<Players />
+					<Players :userId="user.uid" :campaignId="campaignId" />
 				</b-col>
 			</b-row>
 		</template>
@@ -237,7 +229,8 @@
 			}),
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			})
+			}),
+			this.setCurHp();
 		},
 		computed: {
 			...mapGetters([
@@ -277,16 +270,16 @@
 			},
 			noCurHp() {
 				//Checks if all players have their curHp set
-				//If not, a button  appears that sets it
+				//If not, it is set on mounted
+				let check = false;
 				if(this.campaign) {
 					for(var key in this.campaign.players) {
 						if(this.campaign.players[key].curHp == undefined) {
-							return true;
-						} else {
-							return false;
+							check = true;
 						}
 					}
 				}
+				return check;
 			}
 		},
 		methods: {
@@ -294,30 +287,6 @@
 				'fetchEncounters',
 				'fetchCampaign',
 			]),
-			copyLink() {
-
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text') //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
-			setAdd(value) {
-				this.add = value;
-			},
 			addEncounter() {
 				this.$validator.validateAll().then((result) => {
 					if (result && (Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
@@ -360,7 +329,6 @@
 			},
 			reset(id, hard=true) {
 				if (hard){
-					console.log("Hard reset")
 					for(let key in this.encounters[id].entities) {
 						let entity = this.encounters[id].entities[key]
 
@@ -376,19 +344,21 @@
 						if(entity.entityType == 'npc') {
 							entity.curHp = entity.maxHp
 						}
-						entity.initiative = 0
+						entity.initiative = 0;
 
 
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity)
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
 
 						//CLEAR LOG
 						localStorage.removeItem(id);
 					}
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0)
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0)
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/xp_awarded`).remove();
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/currency_awarded`).remove();
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0);
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0);
 				}
 
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false)
+				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
 			},
 			broadcast() {
@@ -401,13 +371,15 @@
 				}
 			},
 			setCurHp() {
-				//Stores player with curHp under campaign
-				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp
-					})
+				if(this.noCurHp) {
+					//Stores player with curHp under campaign
+					for(var key in this.campaign.players) {
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
+							curHp: this.players[key].maxHp
+						})
+					}
+					this.noCurHp = false;
 				}
-				this.noCurHp = false;
 			}
 		}
 	}

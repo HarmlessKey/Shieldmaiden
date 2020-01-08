@@ -25,7 +25,7 @@ export const general = {
 			var percentage = Math.floor(current / max * 100)
 			return percentage
 		},
-		makeDate(input, showTime = false) {
+		makeDate(input, showTime = false, short = false) {
 			let monthNames = [
 				"January", "February", "March",
 				"April", "May", "June", "July",
@@ -39,7 +39,9 @@ export const general = {
 			let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
 			let time = hours + ":" + minutes + ":" + seconds;
-			let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
+			let date = (short) ?
+			d.getDate() + "-" + parseInt(d.getMonth() + 1) + "-" + d.getFullYear() :
+			d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
 			
 			if(showTime) { return date + " - " + time; }
 			return date

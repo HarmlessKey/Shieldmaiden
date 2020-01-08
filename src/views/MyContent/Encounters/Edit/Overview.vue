@@ -1,5 +1,6 @@
 <template>
-   <div class="encounter_overview">
+<div>
+    <div class="encounter_overview" :class="{ show: showOverview }">
         <div>
             <h3 class="header">Encounter overview</h3>
             <div class="diff-info" v-if="encDifficulty">
@@ -40,77 +41,83 @@
             </div>
             <h3 v-else class="gray-hover">Calculating difficulty...</h3>
         </div>
-       <div class="scroll bg-gray-active" v-bar>
-           <div class="overview">          
-                <template v-if="encounter">
-                    <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
+        <div class="scroll bg-gray-active" v-bar>
+            <div>
+                <div class="overview">          
+                        <template v-if="encounter">
+                            <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
 
-                    <HKtable
-                        class="mb-4" 
-                        :items="_friendlies"
-                        :columns="entityColumns"
-                        :showHeader="false"
-                    >
-                        <template slot="image" slot-scope="data">
-                            <template v-if="data.row.entityType === 'player'">
-                                <span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
-                                <img v-else src="@/assets/_img/styles/player.png" class="image" />
-                            </template>
-                            <template v-else-if="data.row.entityType === 'npc'">
-                                <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-                                <span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-                                <img v-else-if="data.row.friendly" src="@/assets/_img/styles/player.png" class="image" />
-                            </template>
+                            <HKtable
+                                class="mb-4" 
+                                :items="_friendlies"
+                                :columns="entityColumns"
+                                :showHeader="false"
+                            >
+                                <template slot="image" slot-scope="data">
+                                    <template v-if="data.row.entityType === 'player'">
+                                        <span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
+                                        <img v-else src="@/assets/_img/styles/player.png" class="image" />
+                                    </template>
+                                    <template v-else-if="data.row.entityType === 'npc'">
+                                        <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                                        <span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+                                        <img v-else-if="data.row.friendly" src="@/assets/_img/styles/player.png" class="image" />
+                                    </template>
+                                </template>
+
+                                <!-- NAME -->
+                                <span slot="name" slot-scope="data" class="green">
+                                    {{ data.item }}
+                                </span>
+
+                                <!-- ACTIONS -->
+                                <div slot="actions" slot-scope="data" class="actions">
+                                    <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                </div>
+                            </HKtable>
+
+                            <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
+
+                            <HKtable 
+                                :items="_monsters"
+                                :columns="entityColumns"
+                                :showHeader="false"
+                            >
+                                <template slot="image" slot-scope="data">
+                                    <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                                    <span v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+                                    <img v-else src="@/assets/_img/styles/monster.png" class="image" />
+                                </template>
+
+                                <!-- NAME -->
+                                <span slot="name" slot-scope="data" class="red">
+                                    {{ data.item }}
+                                </span>
+
+                                <div slot="actions" slot-scope="data" class="actions">
+                                    <a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                </div>
+                            </HKtable>
                         </template>
-
-                        <!-- NAME -->
-                        <span slot="name" slot-scope="data" class="green">
-                            {{ data.item }}
-                        </span>
-
-                        <!-- ACTIONS -->
-                        <div slot="actions" slot-scope="data" class="actions">
-                            <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                <i class="fas fa-pencil"></i>
-                            </a>
-                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
-                                <i class="fas fa-minus"></i>
-                            </a>
-                        </div>
-                    </HKtable>
-
-                    <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
-
-                    <HKtable 
-                        :items="_monsters"
-                        :columns="entityColumns"
-                        :showHeader="false"
-                    >
-                        <template slot="image" slot-scope="data">
-                            <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-                            <span v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-                            <img v-else src="@/assets/_img/styles/monster.png" class="image" />
-                        </template>
-
-                        <!-- NAME -->
-                        <span slot="name" slot-scope="data" class="red">
-                            {{ data.item }}
-                        </span>
-
-                        <div slot="actions" slot-scope="data" class="actions">
-                            <a @click="setSlide({show: true, type: 'slides/Edit', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                <i class="fas fa-pencil"></i>
-                            </a>
-                            <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
-                                <i class="fas fa-minus"></i>
-                            </a>
-                        </div>
-                    </HKtable>
-                </template>
-                <div v-else class="loader"><span>Loading entities...</span></div>
-           </div>
-       </div>
+                        <div v-else class="loader"><span>Loading entities...</span></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
+        <i class="fas fa-chevron-left"></i>
     </div>
+</div>
 </template>
 
 <script>
@@ -131,6 +138,7 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
                 slide: this.$store.getters.getSlide,
+                showOverview: false,
                 encDifficulty: undefined,
 				bars: {
 					trivial: 'secondary',
@@ -244,7 +252,7 @@
 <style lang="scss" scoped>
 .encounter_overview {
     grid-area: overview;
-    overflow: hidden;
+    overflow-y: hidden;
 
     h3 {
         margin-bottom: 16px;
@@ -268,44 +276,73 @@
         }
     }
     .scroll {
-        height: calc(100% - 250px);
+        height: calc(100% - 266px);
         
         .overview {
             padding: 15px 10px 30px 10px;
-            width: calc(100% - 5px) !important;
         }
     }
 }
-@media only screen and (max-width: 767px) {
-		h3.header {
-            display:none;
-        } 
+.toggle {
+    display: none
+}
+@media only screen and (max-width: 850px) {
+    .encounter_overview {
+        position: fixed;
+        top: 50px;
+        right: -300px; 
+        height: calc(100vh - 50px);
+        overflow: scroll;
+        z-index: 96;
+        background: #302f2f;
+        overflow: scroll;
+        width: 300px;
+        transition: right .5s linear,
+        box-shadow .5s linear;
+
+        &.show {
+            right: 0;
+            box-shadow: 0 10px 15px #000;
+        }
+
+        h3.header {
+            padding: 10px;
+        }
+        
         .scroll {
-            height: calc(100% - 50px) !important;
-        } 
-        .diff-info {
-            padding-top: 15px !important;
+             overflow: visible !important;
+             height: calc(100% - 286px);
+        }
 
-            .advanced {
-                display: none;
-            }
-            .progress-area {
-                display: flex;
-                justify-content: space-between;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    } 
+    .toggle {
+        position: fixed;
+        top: 65px;
+        right: 0;
+        height: 50px;
+        width: 50px;
+        z-index: 97;
+        text-align: center;
+        transition: right .5s linear;
+        display: block;
+        cursor: pointer;
+        line-height: 50px;
+        color: #fff !important;
 
-                .progress {
-                    width: 100%;
-                    margin: 0 10px 0 0 !important;
-                    height: 25px;
-                }
-                .diff {
-                    text-transform: uppercase;
-                    display: block !important;
-                    width: max-content;
-                    line-height: 25px;
-                    font-size: 25px;
-                }
+        i {
+            transition: transform .5s linear;
+        }    
+
+        &.show {
+            right: 300px;
+
+            i {
+                transform: rotate(180deg);
             }
-        }      
-	}
+        }
+    }   
+}
 </style>

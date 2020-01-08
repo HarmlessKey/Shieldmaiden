@@ -34,8 +34,8 @@
 					<div class="container entities">
 						<h2 class="padding">Encounter Finished</h2>
 						<b-row>
-							<b-col v-if="playerSettings.loot == true" md="8">
-								<Finished :encounter="encounter"/>
+							<b-col md="8">
+								<Rewards :encounter="encounter"/>
 							</b-col>
 							<b-col>
 								<div>
@@ -151,7 +151,7 @@
 	import { general } from '@/mixins/general.js'
 
 	import Follow from '@/components/trackCampaign/Follow.vue'
-	import Finished from '@/components/combat/Finished.vue'
+	import Rewards from '@/components/trackCampaign/Rewards.vue'
 	import Turns from '@/components/trackCampaign/Turns.vue'
 	import Initiative from '@/components/trackCampaign/Initiative.vue'
 	import Meters from '@/components/trackCampaign/Meters.vue'
@@ -162,7 +162,7 @@
 		mixins: [general],
 		components: {
 			Follow,
-			Finished,
+			Rewards,
 			Turns,
 			Initiative,
 			Meters,
@@ -310,7 +310,11 @@
 						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
 						encounter.on('value' , (snapshot) => {
-							this.encounter = snapshot.val()
+							let enc = snapshot.val();
+							if(enc) {
+								enc.key = encId;
+							}
+							this.encounter = enc
 						});
 					}
 					//Get campaign for player curHP/tempHP/ACBonus

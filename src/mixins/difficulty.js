@@ -1,13 +1,10 @@
 import { mapGetters } from 'vuex'
 import { db } from '@/firebase'
+import { experience } from '@/mixins/experience.js'
 
 export const difficulty = {
 
-	firebase() {
-		return {
-			
-		}
-	},
+	mixins: [experience],
 	data() {
 		return {
 			monsters_ref: db.ref(`monsters`),
@@ -185,8 +182,10 @@ export const difficulty = {
 
 				//Calculate Player tresholds
 				if(entity.entityType == 'player') {
+					let playerLevel = (!this.players[entity.id].level) ? this.calculatedLevel(this.players[entity.id].experience) : this.players[entity.id].level;
+
 					//If there is a player without a level, return an error
-					if(!this.players[entity.id].level) {
+					if(!playerLevel) {
 						let error = {
 							0: 'error',
 							1: 'A player with no level set was added.',
@@ -196,7 +195,7 @@ export const difficulty = {
 					
 					//Loop over all difficulties
 					for(let key in this.difficulties) {
-						let level = this.players[entity.id].level
+						let level = playerLevel
 						let difficulty = this.difficulties[key]
 						let treshold = this.tresholds[level][difficulty]
 						

@@ -215,6 +215,25 @@ const mutations = {
 					entity.wisdom_save = data_npc.wisdom_save
 					entity.charisma_save = data_npc.charisma_save
 
+					entity.acrobatics = data_npc.acrobatics
+					entity['animal Handling'] = data_npc['animal Handling']
+					entity.arcana = data_npc.arcana
+					entity.athletics = data_npc.athletics
+					entity.deception = data_npc.deception
+					entity.history = data_npc.history
+					entity.insight = data_npc.insight
+					entity.intimidation = data_npc.intimidation
+					entity.investigation = data_npc.investigation
+					entity.medicine = data_npc.medicine
+					entity.nature = data_npc.nature
+					entity.perception = data_npc.perception
+					entity.performance = data_npc.performance
+					entity.persuasion = data_npc.persuasion
+					entity.religion = data_npc.religion
+					entity['sleight of Hand'] = data_npc['sleight of Hand']
+					entity.stealth = data_npc.stealth
+					entity.survival = data_npc.survival
+
 					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
 					entity.damage_resistances = data_npc.damage_resistances
 					entity.damage_immunities = data_npc.damage_immunities

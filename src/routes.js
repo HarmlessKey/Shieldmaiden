@@ -1,51 +1,54 @@
 
 import { store } from './store/store'
 
-import Home from '@/views/Home.vue';
+const Home = () => import('@/views/Home.vue');
 
-import Compendium from '@/views/Compendium/Overview.vue';
-import Monsters from '@/views/Compendium/Monsters.vue';
-import Spells from '@/views/Compendium/Spells.vue';
-import Conditions from '@/views/Compendium/Conditions.vue';
-import Items from '@/views/Compendium/Items.vue';
+const Compendium = () => import('@/views/Compendium/Overview.vue');
+const View = () => import('@/views/Compendium/View.vue');
+const Monsters = () => import('@/views/Compendium/Monsters.vue');
+const Spells = () => import('@/views/Compendium/Spells.vue');
+const Conditions = () => import('@/views/Compendium/Conditions.vue');
+const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
-import Sitemap from '@/views/Sitemap.vue';
-import Privacy from '@/views/Privacy.vue';
-import AboutUs from '@/views/AboutUs.vue';
-import Documentation from '@/views/Documentation.vue';
-import Planned from '@/views/Planned.vue';
-import Feedback from '@/views/Feedback.vue';
-import Updates from '@/views/Updates.vue';
-import SignIn from '@/views/SignIn.vue';
-import SignUp from '@/views/SignUp.vue';
-import Settings from '@/views/Settings.vue';
-import ResetPassword from '@/views/ResetPassword.vue';
-import Patreon from '@/views/Patreon.vue';
-import ManageContent from '@/views/ManageContent.vue';
+const Sitemap = () => import('@/views/Sitemap.vue');
+const Privacy = () => import('@/views/Privacy.vue');
+const AboutUs = () => import('@/views/AboutUs.vue');
+const Documentation = () => import('@/views/Documentation.vue');
+const Planned = () => import('@/views/Planned.vue');
+const Feedback = () => import('@/views/Feedback.vue');
+const Updates = () => import('@/views/Updates.vue');
+const SignIn = () => import('@/views/SignIn.vue');
+const SignUp = () => import('@/views/SignUp.vue');
+const Settings = () => import('@/views/Settings.vue');
+const ResetPassword = () => import('@/views/ResetPassword.vue');
+const Patreon = () => import('@/views/Patreon.vue');
+const ManageContent = () => import('@/views/ManageContent.vue');
 
-import Admin from '@/views/Admin/Overview.vue';
-import Users from '@/views/Admin/Users.vue';
-import Patrons from '@/views/Admin/Patrons';
-import NewPatron from '@/views/Admin/Patrons/New.vue';
+const Admin = () => import('@/views/Admin/Overview.vue');
+const Users = () => import('@/views/Admin/Users.vue');
+const Patrons = () => import('@/views/Admin/Patrons');
+const NewPatron = () => import('@/views/Admin/Patrons/New.vue');
 
-import Profile from '@/views/profile/Profile.vue';
-import Username from '@/views/profile/SetUsername.vue';
-import DeleteAccount from '@/views/profile/DeleteAccount.vue';
-import Followed from '@/views/Followed.vue';
-import Error404 from '@/views/Error404.vue';
-import MyContent from '@/views/MyContent/Campaigns/Campaigns.vue';
-import EditCampaign from '@/views/MyContent/Campaigns/EditCampaign.vue';
-import Encounters from '@/views/MyContent/Encounters';
-import EditEncounter from '@/views/MyContent/Encounters/Edit';
-import Players from '@/views/MyContent/Players/Players.vue';
-import EditPlayer from '@/views/MyContent/Players/EditPlayer.vue';
-import Reminders from '@/views/MyContent/Reminders';
-import EditReminder from '@/views/MyContent/Reminders/EditReminder.vue';
-import Characters from '@/views/MyContent/Characters';
-import Npcs from '@/views/MyContent/Npcs/Npcs.vue';
-import EditNpc from '@/views/MyContent/Npcs/EditNpc.vue';
-import RunEncounter from '@/views/MyContent/RunEncounter.vue';
-import User from '@/views/User.vue';
+const Profile = () => import('@/views/profile/Profile.vue');
+const Username = () => import('@/views/profile/SetUsername.vue');
+const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
+const Followed = () => import('@/views/Followed.vue');
+const Error404 = () => import('@/views/Error404.vue');
+const MyContent = () => import('@/views/MyContent/Campaigns/Campaigns.vue');
+const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue');
+const Encounters = () => import('@/views/MyContent/Encounters');
+const EditEncounter = () => import('@/views/MyContent/Encounters/Edit');
+const Players = () => import('@/views/MyContent/Players/Players.vue');
+const EditPlayer = () => import('@/views/MyContent/Players/EditPlayer.vue');
+const Reminders = () => import('@/views/MyContent/Reminders');
+const EditReminder = () => import('@/views/MyContent/Reminders/EditReminder.vue');
+const Characters = () => import('@/views/MyContent/Characters');
+const Npcs = () => import('@/views/MyContent/Npcs/Npcs.vue');
+const EditNpc = () => import('@/views/MyContent/Npcs/EditNpc.vue');
+const Items = () => import('@/views/MyContent/Items/Items.vue');
+const EditItem = () => import('@/views/MyContent/Items/EditItem.vue');
+const RunEncounter = () => import('@/views/MyContent/RunEncounter.vue');
+const User = () => import('@/views/User.vue');
 
 // This is where you add all your site routes
 // Each route is set as an obect in the array
@@ -68,22 +71,16 @@ export const routes = [{
 	component: Compendium
 },
 {
+	path: '/compendium/:type/:id',
+	name: 'View',
+	component: View,
+
+},
+{
 	path: '/compendium/monsters',
 	name: 'Monsters',
 	component: Monsters,
 	meta: {
-		baseName: 'Monsters',
-	}
-},
-{
-	path: '/compendium/monsters/:id',
-	name: 'Monster',
-	component: Monsters,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
 		baseName: 'Monsters',
 	}
 },
@@ -96,18 +93,6 @@ export const routes = [{
 	}
 },
 {
-	path: '/compendium/spells/:id',
-	name: 'Spell',
-	component: Spells,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'Spells',
-	}
-},
-{
 	path: '/compendium/conditions',
 	name: 'Conditions',
 	component: Conditions,
@@ -116,34 +101,10 @@ export const routes = [{
 	}
 },
 {
-	path: '/compendium/conditions/:id',
-	name: 'Condition',
-	component: Conditions,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
-		baseName: 'Conditions',
-	}
-},
-{
 	path: '/compendium/items',
 	name: 'Items',
-	component: Items,
+	component: CompendiumItems,
 	meta: {
-		baseName: 'items',
-	}
-},
-{
-	path: '/compendium/items/:id',
-	name: 'Item',
-	component: Items,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/compendium',
 		baseName: 'items',
 	}
 },
@@ -187,17 +148,26 @@ export const routes = [{
 {
 	path: '/sign-in',
 	name: 'signIn',
-	component: SignIn
+	component: SignIn,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/sign-up',
 	name: 'signUp',
-	component: SignUp
+	component: SignUp,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/forgot-password',
 	name: 'resetPassword',
-	component: ResetPassword
+	component: ResetPassword,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/patreon',
@@ -468,6 +438,36 @@ export const routes = [{
 	meta: {
 		basePath: '/npcs',
 		title: 'NPCs',
+		requiresAuth: true
+	}
+},
+{
+	path: '/items',
+	name: 'Items',
+	component: Items,
+	meta: {
+		basePath: '/items',
+		title: 'items',
+		requiresAuth: true
+	}
+},
+{
+	path: '/items/add-item',
+	name: 'AddItem',
+	component: EditItem,
+	meta: {
+		basePath: '/items',
+		title: 'items',
+		requiresAuth: true
+	}
+},
+{
+	path: '/items/:id',
+	name: 'EditItem',
+	component: EditItem,
+	meta: {
+		basePath: '/items',
+		title: 'items',
 		requiresAuth: true
 	}
 },

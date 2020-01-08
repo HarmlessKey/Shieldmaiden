@@ -1,33 +1,14 @@
 <template>
 	<div>
-		<template v-if="$route.meta.basePath != '/compendium'">
-			<small class="url">url: <a :href="'https://harmlesskey.com/compendium/conditions/'+id" target="_blank">https://harmlesskey.com/compendium/conditions/{{ id }}</a></small>
-			<ins class="adsbygoogle"
-				v-if="(tier && !tier.benefits.ads) || tier == undefined"
-				style="display:inline-block;width:285px;height:100px"
-				data-ad-client="ca-pub-2711721977927243"
-				data-ad-slot="5263800080">
-			</ins>
-		</template>
-		<template v-else>
-			<Crumble :name="condition.name" />
-			<div v-if="(tier && !tier.benefits.ads) || tier == undefined" align="center">
-				<ins class="adsbygoogle"
-						style="display:block; margin-bottom:20px;"
-						data-ad-client="ca-pub-2711721977927243"
-						data-ad-slot="4341848074"
-						data-ad-format="auto"
-						data-full-width-responsive="true">
-				</ins>
-			</div>
-		</template>
-
-		<div v-if="loading" class="loader"> <span>Loading condition....</span></div>
-
-		<h1>{{ condition.name }}</h1>
+		<h3>
+			<svg class="icon" viewBox="0 0 512 512">
+				<path :d="condition.icon" fill-opacity="1"></path>
+			</svg>
+			{{ condition.name }}
+		</h3>
 		<i>{{ condition.condition }}</i>
 
-		<ul :class="condition['.key']">
+		<ul v-if="condition.effects">
 			<li v-for="(effect, index) in condition.effects" :key="index">
 				{{ effect }}
 			</li>
@@ -46,48 +27,15 @@
 				</tr>
 			</tbody>
 		</table>
-		
 	</div>
 </template>
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'Condition',
-		components: {
-			Crumble
-		},
 		props: ['id'],
-		metaInfo() {
-			return {
-				title: this.condition.name + ' | D&D 5th Edition',
-				meta: [
-          { vmid: 'description', name: 'description', content: 'D&D 5th Edition Condition: ' + this.condition.name }
-        ],
-			}
-		},
-		computed: {
-			...mapGetters([
-				'tier',
-			]),
-		},
-		mounted() {
-			this.$nextTick(function() {
-				// eslint-disable-next-line
-				if ($('ins').length > 0) {
-					// eslint-disable-next-line
-					(adsbygoogle = window.adsbygoogle || []).push({});
-				}
-			})
-		},
-		beforeMount() {
-			//Because the component is loaded in another view, 
-			//the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
 		data() {
 			return {
 				loading: true,
@@ -106,27 +54,23 @@
 				condition: {
 					source: db.ref(`conditions/${this.id}`),
 					asObject: true,
-					readyCallback: () => this.loading = false
+					readyCallback: () => this.$emit('name', this.condition.name),
 				}
 			}
-		},
-		methods: {
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	h1 {
-		margin-bottom: 5px !important;
-	}
-	.url {
-		display: block;
-		margin-bottom: 15px;
-		word-break: break-all;
+	svg.icon {
+		width: 20px;
+		height: 20px;
+		margin-right: 5px;
+		fill: #b2b2b2;
 	}
 	ul {
 		margin-top: 20px;
-		padding: 20px;
+		padding-left: 20px;
 
 		li {
 			margin-bottom: 20px;

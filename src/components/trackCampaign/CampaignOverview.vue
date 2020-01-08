@@ -1,9 +1,11 @@
 <template>
-<div class="container">
+<div class="container pt-4">
 	<b-row>
 		<b-col md="8">
 			<h3>Campaign Players</h3>
-			<table class="table table-hover">
+			<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
+
+			<!-- <table class="table table-hover">
 				<thead>
 					<th></th>
 					<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
@@ -70,15 +72,11 @@
 						</td>
 					</tr>
 				</tbody>
-			</table>
+			</table> -->
 		</b-col>
 		<b-col md="4">
 			<h3 class="d-flex justify-content-between">
 				Campaign wide meters
-				<!-- <span>
-					<a>+</a>
-					<a>-</a>
-				</span> -->
 			</h3>
 			<Meters :entities="players" :campaign="true" />
 		</b-col>
@@ -87,30 +85,20 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Meters from '@/components/trackCampaign/Meters.vue'
+	import { db } from '@/firebase';
+	import Meters from '@/components/trackCampaign/Meters.vue';
+	import ViewPlayers from '@/components/campaign/Players.vue';
 
 	export default {
 		name: 'Players',
 		props: ['players'],
 		components: {
 			Meters,
+			ViewPlayers
 		},
 		data() {
 			return {
-				userId: this.$route.params.userid,
-			}
-		},
-		firebase() {
-			return {
-				campaignPlayers: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
-				},
-				settings: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				}
+				userId: this.$route.params.userid
 			}
 		},
 		methods: {

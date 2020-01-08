@@ -94,7 +94,7 @@
 					<span class="d-flex justify-content-end">
 						<b-input 
 							type="number" 
-							v-validate="'numeric|max_value:10|min_value:0'" 
+							v-validate="'numeric|max_value:10|min_value:1'" 
 							max="10"
 							min="0"
 							name="columns"

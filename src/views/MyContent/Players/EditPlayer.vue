@@ -310,12 +310,12 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
-	import { experience } from '@/mixins/experience.js'
-	import { skills } from '@/mixins/skills.js'
-	import { general } from '@/mixins/general.js'
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
+	import { skills } from '@/mixins/skills.js';
+	import { general } from '@/mixins/general.js';
 
 	export default {
 		name: 'Players',

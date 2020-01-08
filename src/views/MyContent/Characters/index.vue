@@ -21,7 +21,7 @@
 			</template>
 
 			<template slot="level" slot-scope="data">
-				{{ data.row.character.level }}
+				{{ data.row.character.level ? data.row.character.level : calculatedLevel(data.row.character.experience) }}
 			</template>
 
 			<div slot="actions" slot-scope="data" class="actions">
@@ -37,11 +37,13 @@
 </template>
 
 <script>
-	import HKtable from '@/components/hk-components/hk-table.vue'
-	import { db } from '@/firebase'
+	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},

@@ -94,7 +94,11 @@
 						}
 					}
 				});
-				this.foundItems = results;
+				if(searchTerm === '') {
+					this.foundItems = [];
+				} else {
+					this.foundItems = results;
+				}
 			},
 			linkItem(key) {				
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}/linked_item`).set(key);

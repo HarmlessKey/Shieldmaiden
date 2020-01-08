@@ -221,7 +221,11 @@
 						}
 					}
 				});
-				this.foundItems = results;
+				if(searchTerm === '') {
+					this.foundItems = [];
+				} else {
+					this.foundItems = results;
+				}
 			},
 			copy(item) {
 				this.item = item;

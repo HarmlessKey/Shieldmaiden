@@ -356,34 +356,50 @@ a.logout {
 
 /* 5. Components*/
 /*********************************************/
-#login {
-	padding-top: 50px;
-	max-width: 300px;
-	margin: auto;
+.login-container {
+	color: #fff;
+	background-position: center;
+	height: calc(100vh - 50px);
+	background-color: #000;
+	background-image: url('../assets/_img/styles/paper-bg.png');
+	padding-top: 100px;
 
-	h1, h2 {
-		text-transform: none !important;
-		text-align: center;
-		margin-bottom: 20px;
-	}
-	img.logo {
-		width: calc(100% - 20px);
-		margin: 0 10px;
-		margin-bottom: 20px;
-	}
-	input {
-		height: 45px;
+	#login {
+		background-color: $gray;
+		max-width: 360px;
+		margin: auto;
+		padding: 120px 30px 30px;
+		position: relative;
+		box-shadow: 5px 5px 10px #000;
+		border-radius: 5px;
 
-		&.email {
-			margin-bottom: 0;
-			border-bottom: none !important;
+	
+		h1, h2 {
+			text-transform: none !important;
+			text-align: center;
+			margin-bottom: 20px;
 		}
-	}
-	.google {
-		background-color: $gray-light !important;
-		color: #262626 !important;
-		img {
-			height: 23px;
+		img.logo {
+			width: calc(100% - 50px);
+			margin: 0 25px;
+			position: absolute;
+			top: -35px;
+			left: 0;
+		}
+		input {
+			height: 45px;
+	
+			&.email {
+				margin-bottom: 0;
+				border-bottom: none !important;
+			}
+		}
+		.google {
+			background-color: $gray-light !important;
+			color: #262626 !important;
+			img {
+				height: 23px;
+			}
 		}
 	}
 }

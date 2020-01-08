@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>{{ item.public_name }}</h2>
+		<h2>{{ data.item.public_name }}</h2>
 		<h3>Link item</h3>
 		<div class="input-group mb-3">
             <input type="text" autocomplete="off" v-model="searched" @keyup="searchItems()" placeholder="Search" class="form-control"/>
@@ -43,14 +43,14 @@
                 foundItems: []
 			}
 		},
-		firebase() {
-			return {
-                item: {
-					source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}`),
-					asObject: true
-				}
-			}
-		},
+		// firebase() {
+		// 	return {
+		// 		item: {
+		// 			source: db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.item['.key']}`),
+		// 			asObject: true
+		// 		}
+		// 	}
+		// },
 		mounted() {
 			var items = db.ref(`items`);
 			items.on('value', async (snapshot) => {
@@ -100,8 +100,11 @@
 					this.foundItems = results;
 				}
 			},
-			linkItem(key) {				
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${this.data.key}/linked_item`).set(key);
+			linkItem(key) {
+				this.data.item.linked_item = key;
+				let ref_key = this.data.item['.key'];
+				delete this.data.item['.key'];
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/loot/${ref_key}`).set(this.data.item);
 				this.setSlide(false);
 			}
 		}

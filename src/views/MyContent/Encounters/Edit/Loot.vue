@@ -73,7 +73,7 @@
                                     show: true,
                                     type: 'slides/editEncounter/LinkItem',
                                     data: {
-                                        key: item['.key']
+                                        item: item
                                     }
                                 })"
                                 ><i class="far fa-link"></i> Link item</a>

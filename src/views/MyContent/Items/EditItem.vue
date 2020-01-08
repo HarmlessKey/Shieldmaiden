@@ -48,8 +48,8 @@
 							class="form-control mb-2" 
 							:class="{'input': true, 'error': errors.has('name') }" 
 							v-model="item.name" 
-							v-validate="'max:35|required'" 
-							maxlength="35"
+							v-validate="'max:100|required'" 
+							maxlength="100"
 							data-vv-as="Name"
 							id="name"
 							name="name" 
@@ -96,9 +96,10 @@
 							type="number" 
 							v-validate="'numeric|max_value:10|min_value:1'" 
 							max="10"
-							min="0"
+							min="1"
 							name="columns"
 							placeholder="columns" v-model="columns" />
+						
 						<a @click="!errors.has('columns') ? addTable() : null" :class="{ disabled: errors.has('columns')}"><i class="fas fa-plus"></i> Add table</a>
 					</span>
 				</label>
@@ -108,18 +109,40 @@
 						<h3 class="d-flex justify-content-between">
 							<span>{{ table.name || 'Table ' + (parseInt(tableIndex)+1) }}</span>
 							<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
-						</h3>	
+						</h3>
 
-						<b-form-input v-model="table.name" placeholder="Table name" class="mb-3"/>
+						<b-form-input 
+							v-model="table.name" 
+							placeholder="Table name" 
+							class="mb-3"
+							name="table name"
+							v-validate="'required'" 
+						/>
+						<p class="validate red" v-if="errors.has('table name')">{{ errors.first('table name') }}</p>
+
 
 						<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
 							<div v-for="(col, i) in table.columns" :key="i" class="header">
-								<b-form-input v-model="table.header[i]" placeholder="Column header"/>
+								<b-form-input 
+									v-model="table.header[i]" 
+									:placeholder="`Column header ${i+1}`"
+									v-validate="'required'"
+									:data-vv-as="`column header ${i+1}`"
+									:name="`column-header-${i+1}`"
+								/>
+								<p class="validate red" v-if="errors.has(`column-header-${i+1}`)">{{ errors.first(`column-header-${i+1}`) }}</p>
 							</div>
 							<div></div>
 							<template v-for="(row, rowIndex) in table.rows">
 								<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
-									<b-form-input v-model="table.rows[rowIndex].columns[colIndex]" placeholder=""/>
+									<b-form-input 
+										v-model="table.rows[rowIndex].columns[colIndex]" 
+										:placeholder="`Column ${colIndex+1}`"
+										v-validate="'required'"
+										:data-vv-as="`column ${colIndex+1}`"
+										:name="`cell-${rowIndex+1}-${colIndex+1}`"
+									/>
+									<p class="validate red" v-if="errors.has(`cell-${rowIndex+1}-${colIndex+1}`)">{{ errors.first(`cell-${rowIndex+1}-${colIndex+1}`) }}</p>
 								</div>
 								<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i class="fas fa-trash-alt"></i></a>
 							</template>
@@ -283,7 +306,7 @@
 				var cols = []
 
 				for(let i = 1; i <= this.item.tables[key].columns; i++) {
-					cols.push('column '+ i)
+					cols.push(undefined)
 				}
 				this.item.tables[key].rows.push({
 					columns: cols

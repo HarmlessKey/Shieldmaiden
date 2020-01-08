@@ -46,7 +46,7 @@
 						})"><i class="fas fa-treasure-chest"></i></a>
 				</template>
 				<a 
-					v-else-if="campaign.inventory.items"
+					v-else-if="campaign.inventory && campaign.inventory.items"
 					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
@@ -54,7 +54,7 @@
 					})">
 						<i class="fas fa-treasure-chest mr-1"></i>
 						{{ Object.keys(campaign.inventory.items).length }}
-					</a>
+				</a>
 			</div>
 		</div>
 		<div 

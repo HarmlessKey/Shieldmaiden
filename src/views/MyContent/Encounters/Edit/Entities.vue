@@ -31,14 +31,16 @@
 	<h3>NPC's</h3>
 
 	<HKtable 
-	:items="monsterArray"
-	:columns="monsterFields"
-	:perPage="15"
-	:loading="loadingNpcs"
-	:search="['name', 'type']"
+		:items="monsterArray"
+		:columns="monsterFields"
+		:perPage="15"
+		:loading="loadingNpcs"
+		:search="['name', 'type']"
+		:collapse="true"
+		classes="monster-table"
 	>
 	<template slot="name" slot-scope="data">
-		<a @click="setSlide({show: true, type: 'ViewEntity', data: data.row })" :class="{ 'green': data.row.custom}">
+		<a @click="setSlide({show: true, type: 'ViewMonster', data: data.row, classes: 'monster-card' })" :class="{ 'green': data.row.custom}">
 			{{ data.item }}
 		</a>
 	</template>
@@ -56,6 +58,11 @@
 		</div>
 	</div>
 
+	<!-- COLLAPSE -->
+	<div slot="collapse" slot-scope="data">
+		<ViewMonster :data="data.row" />
+	</div>
+
 	<!-- LOADER -->
 	<div slot="table-loading" class="loader">
 		<span>Loading monsters...</span>
@@ -71,12 +78,14 @@
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 	import HKtable from '@/components/hk-components/hk-table.vue';
+	import ViewMonster from '@/components/ViewMonster.vue';
 
 	export default {
 		name: 'Entities',
 		mixins: [general, dice],
 		components: {
-			HKtable
+			HKtable,
+			ViewMonster
 		},
 		data() {
 			return {
@@ -196,7 +205,6 @@
 						entity.name = `${entity.name} (${++last})`
 					} else if (n > 0) {
 						entity.name = `${entity.name} (${n})`
-						
 					}
 					
 					if(custom == false) {

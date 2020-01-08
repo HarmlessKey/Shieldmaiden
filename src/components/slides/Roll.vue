@@ -52,14 +52,14 @@
 				result: '',
 				log: [],
 				dice: {
-					4:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d4' },
-					6:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d6' },
-					8: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d8' },
-					10: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
-					12: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d12' },
-					20: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d20' },
-					100: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
-					X: { n: 1, mod: undefined, result: undefined, x: undefined, icon: 'fas fa-dice-d20' }
+					4:{ n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d4' },
+					6:{ n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d6' },
+					8: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d8' },
+					10: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d10' },
+					12: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d12' },
+					20: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d20' },
+					100: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d10' },
+					X: { n: 1, mod: undefined, result: undefined, x: undefined, icon: 'fad fa-dice-d20' }
 				},
 			}
 		},

@@ -96,6 +96,15 @@
 									</template>
 								</HKtable>
 							</template>
+							<template v-if="awardedItems">
+								<h3>Awarded Items</h3>
+								<HKtable 
+									:items="awardedItems"
+									:columns="itemColumns"
+									:showHeader="false"
+								>
+								</HKtable>
+							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
 							<b-row>
@@ -162,7 +171,8 @@
 				campaign: {
 					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
 					asObject: true
-				}
+				},
+				awardedItems: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/items`).orderByChild('encounter_id').equalTo(this.encounterId)
 			}
 		},
 		computed: {

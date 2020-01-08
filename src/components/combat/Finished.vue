@@ -224,6 +224,8 @@
 				}
 				let newValue = parseInt(oldValue) + this.currencyToCopper(this.encounter.currency);
 
+				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
+
 				if(!this.errors.has('currency')) {
 					db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`).set(newValue);
 					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/currency_awarded`).set(true);

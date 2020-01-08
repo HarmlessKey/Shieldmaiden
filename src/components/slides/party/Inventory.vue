@@ -2,6 +2,7 @@
 	<div>
 		<template v-if="!addNew">
 			<h2>Party Inventory</h2>
+			<div v-if="currency['.value'] >= maxCurrencyAmount" class="red text-center">Max amount reached</div>
 			<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
 				<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 					<div v-if="coin" :key="key">
@@ -198,6 +199,7 @@
 						this.error = 'Party doesn\'t own enough';
 					}
 				}
+				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
 
 				if(validated) {	
 					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`).set(newValue);

@@ -54,6 +54,7 @@
 						this.error = 'Party doesn\'t own enough';
 					}
 				}
+				newValue = (newValue > this.maxCurrencyAmount) ? this.maxCurrencyAmount : newValue;
 
 				if(validated) {	
 					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/inventory/currency`).set(newValue);

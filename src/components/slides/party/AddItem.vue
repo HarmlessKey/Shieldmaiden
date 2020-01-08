@@ -116,7 +116,11 @@
 						}
 					}
 				});
-				this.foundItems = results;
+				if(searchTerm === '') {
+					this.foundItems = [];
+				} else {
+					this.foundItems = results;
+				}
 			},
 			linkItem(key) {
 				this.$set(this.item, 'linked_item', key);

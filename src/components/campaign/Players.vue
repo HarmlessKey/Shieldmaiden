@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<div class="group-actions">
-			<div class="money" 
+			<div 
+				class="money" 
+				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
 				@click="
 					viewerIsUser
 					? setSlide({

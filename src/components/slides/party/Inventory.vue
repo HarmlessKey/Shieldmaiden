@@ -2,7 +2,7 @@
 	<div>
 		<template v-if="!addNew">
 			<h2>Party Inventory</h2>
-			<div v-if="currency['.value'] >= maxCurrencyAmount" class="red text-center">Max amount reached</div>
+			<div v-if="currency['.value'] >= maxCurrencyAmount" class="red text-center mb-2">Max amount reached</div>
 			<div class="money" v-if="currency" @click="addCurrency = !addCurrency">
 				<template v-for="(coin, key) in copperToPretty(currency['.value'])">
 					<div v-if="coin" :key="key">

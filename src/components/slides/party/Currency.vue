@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<h2>Update currency</h2>
+		<div v-if="currentValue >= maxCurrencyAmount" class="red text-center mb-2">Max amount reached</div>
 		<div class="currency">
             <div v-for="(coin, key) in currencies" :key="key">
                 <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">

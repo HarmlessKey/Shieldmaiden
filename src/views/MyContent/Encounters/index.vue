@@ -231,6 +231,7 @@
 				cid: this.campaignId, 
 			}),
 			this.setCurHp();
+			this.checkAdvancement();
 		},
 		computed: {
 			...mapGetters([
@@ -379,6 +380,27 @@
 						})
 					}
 					this.noCurHp = false;
+				}
+			},
+			checkAdvancement() {
+				if(!this.campaign.advancement) {
+					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?', 'Set advancement', {
+						timeout: 0,
+						buttons: [
+						{
+							text: 'Experience', action: (toast) => { 
+								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('experience'); 
+								this.$snotify.remove(toast.id); 
+							}, bold: false 
+						},
+						{
+							text: 'Milestone', action: (toast) => { 
+								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('milestone');
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false },
+						]
+					});
 				}
 			}
 		}

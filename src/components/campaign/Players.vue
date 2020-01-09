@@ -268,6 +268,7 @@
 						if(snapshot.val()) {
 							campaignPlayers[key].character_name = snapshot.val().character_name;
 							campaignPlayers[key].avatar = snapshot.val().avatar;
+							campaignPlayers[key].level = snapshot.val().level;
 							campaignPlayers[key].maxHp = snapshot.val().maxHp;
 							campaignPlayers[key].ac = snapshot.val().ac;
 							campaignPlayers[key].experience = snapshot.val().experience;

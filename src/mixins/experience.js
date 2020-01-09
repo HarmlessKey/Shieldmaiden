@@ -27,6 +27,9 @@ export const experience = {
 	},
 	methods: {
 		calculatedLevel(xp) {
+			if(!xp) {
+				xp = 0;
+			}
 			for(let level in this.xpTable) {
 				if(this.xpTable[level].xp > xp) {
 					return level - 1;

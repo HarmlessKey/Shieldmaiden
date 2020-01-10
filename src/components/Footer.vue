@@ -22,13 +22,16 @@
 						<h2 class="gray-light">Follow us</h2>
 						<ul>
 							<li>
+								<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
+							</li>
+							<li>
+								<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
+							</li>
+							<li>
 								<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
 							</li>
 							<li>
 								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
-							</li>
-							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
 							</li>
 						</ul>
 						<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->

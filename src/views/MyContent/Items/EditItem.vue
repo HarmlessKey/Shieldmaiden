@@ -126,7 +126,7 @@
 								<b-form-input 
 									v-model="table.header[i]" 
 									:placeholder="`Column header ${i+1}`"
-									v-validate="'max;100|required'"
+									v-validate="'max:100|required'"
 									maxlength="100"
 									:data-vv-as="`column header ${i+1}`"
 									:name="`column-header-${i+1}`"

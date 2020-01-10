@@ -231,7 +231,6 @@
 				cid: this.campaignId, 
 			}),
 			this.setCurHp();
-			this.checkAdvancement();
 		},
 		computed: {
 			...mapGetters([
@@ -281,6 +280,11 @@
 					}
 				}
 				return check;
+			}
+		},
+		watch: {
+			campaign: function(newVal, oldVal) {
+				this.checkAdvancement();
 			}
 		},
 		methods: {
@@ -384,7 +388,7 @@
 			},
 			checkAdvancement() {
 				if(!this.campaign.advancement) {
-					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?', 'Set advancement', {
+					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?' ,'Set advancement', {
 						timeout: 0,
 						buttons: [
 						{

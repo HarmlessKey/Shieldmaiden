@@ -116,8 +116,8 @@
 					turn: turn,
 					round: round,
 				})
+				db.ref(`encounters/${this.path}/lastRoll`).set(false)
 				this.set_targeted(undefined);
-
 				this.reminders(this.current, 'endTurn')
 			},
 			reminders(target, trigger){

@@ -2,7 +2,7 @@
 
 <template>
 	<div class="pb-5" v-if="entity">
-		<h2>Edit <span class="blue">{{ playerBase.character_name }}</span></h2>
+		<h2>Edit <router-link :to="`/players/${entityKey}`" ><span class="blue">{{ playerBase.character_name }}</span></router-link></h2>
 		<b-row v-if="location == 'encounter'" class="mb-3">
 			<b-col class="col-4">
 				<label>Initiative</label>
@@ -80,19 +80,6 @@
 			<hr>
 			<h2 class="mb-0">Override</h2>
 			<b-row class="my-2">
-				<b-col class="text-center">
-					<label>AC</label>
-					<b-form-input 
-						class="text-center"
-						type="number" 
-						name="ac" 
-						min="1"
-						v-model="playerBase.ac"
-						v-validate="'required|numeric'"
-						data-vv-as="Amor Class"
-						placeholder="Armor Class"></b-form-input>
-						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-				</b-col>
 
 				<b-col class="text-center">
 					<label>Cur HP</label>
@@ -122,11 +109,40 @@
 						<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 				</b-col>
 			</b-row>
+			<b-row>
+				<b-col class="text-center">
+					<label>AC</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="ac" 
+						min="1"
+						v-model="playerBase.ac"
+						v-validate="'required|numeric'"
+						data-vv-as="Amor Class"
+						placeholder="Armor Class"></b-form-input>
+						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+				</b-col>
+				<b-col class="text-center">
+					<label>Level</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="level" 
+						min="1"
+						max="20"
+						v-model="playerBase.level"
+						v-validate="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'"
+						data-vv-as="Level"
+						placeholder="Level"></b-form-input>
+						<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+				</b-col>
+			</b-row>
 		</template>
 
 		<button class="btn btn-block my-3" @click="edit()">Save</button>
 
-		<div v-if="advancement['.value'] != 'milestone'" class="pt-2">
+		<div v-if="isXpAdvancement()" class="pt-2">
 			<hr>
 			<h2>Experience Points</h2>
 			{{ setNumber(playerBase.experience) }}
@@ -217,7 +233,7 @@
 					}
 				}
 				return fails;
-			}
+			},
 		},
 		watch: {
 			number: function(newValue) {
@@ -245,6 +261,11 @@
 					)
 					this.xp = undefined;
 				}
+			},
+			isXpAdvancement() {
+				let adv =  this.advancement['.value'] != 'milestone';
+				console.log(adv)
+				return adv
 			},
 			set_save(check, index) {
 				if(check === 'unset') {

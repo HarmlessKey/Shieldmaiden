@@ -2,7 +2,7 @@
 
 <template>
 	<div class="pb-5" v-if="entity">
-		<h2>Edit <span class="blue">{{ playerBase.character_name }}</span></h2>
+		<h2>Edit <router-link :to="`/players/${entityKey}`" ><span class="blue">{{ playerBase.character_name }}</span></router-link></h2>
 		<b-row v-if="location == 'encounter'" class="mb-3">
 			<b-col class="col-4">
 				<label>Initiative</label>

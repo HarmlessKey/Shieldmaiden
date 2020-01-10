@@ -11,7 +11,7 @@
 		<p>
 			<b>Roll a d20:</b> If the roll is 10 or higher, they succeed. Otherwise, they fail. 
 			A success or failure has no effect by itself. On their third success, they become stable (see below). 
-			On their third failure, thei die. The successes and failures don’t need to be consecutive; keep track of both until they collect three of a kind. 
+			On their third failure, they die. The successes and failures don’t need to be consecutive; keep track of both until they collect three of a kind. 
 			The number of both is reset to zero when they regain any Hit Points or become stable.
 		</p>
 

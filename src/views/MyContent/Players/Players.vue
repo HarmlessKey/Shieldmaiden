@@ -41,6 +41,10 @@
 					</router-link>
 				</template>
 
+				<template slot="level" slot-scope="data">
+					{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
+				</template>
+
 				<div slot="actions" slot-scope="data" class="actions">
 					<router-link class="gray-hover mx-1" 
 						:to="'/players/' + data.row.key" 
@@ -84,15 +88,17 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import HKtable from '@/components/hk-components/hk-table.vue'
-	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	import _ from 'lodash';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OutOfSlots from '@/components/OutOfSlots.vue';
+	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { mapGetters } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},

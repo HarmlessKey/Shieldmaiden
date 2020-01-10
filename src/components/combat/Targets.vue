@@ -56,7 +56,7 @@
 											class="dropdown-item" 
 											v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
 											@click="set_stable({key: entity.key, action: 'set'})">
-											<i class="fas fa-hand-holding-magic"></i> [s] Stabilize
+											<i class="fas fa-heartbeat"></i> [s] Stabilize
 										</a>
 										<a class="dropdown-item" 
 										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"

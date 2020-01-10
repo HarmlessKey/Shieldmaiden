@@ -20,6 +20,28 @@
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
 		</b-row>
+		<template v-else-if="entity.curHp === 0 && !entity.stable && !entity.dead">
+			<div class="px-1 my-3 d-flex justify-content-between">
+				<div v-for="(n, index) in 5" :key="index">
+					<template v-if="Object.keys(entity.saves).length === n">
+						<a v-show="entity.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="set_save('unset', n)"><i class="fas fa-check"></i></a>
+						<a v-show="entity.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="set_save('unset', n)"><i class="fas fa-times"></i></a>
+					</template>
+					<template v-else>
+						<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
+						<span v-show="entity.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
+					</template>
+					<span v-show="!entity.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+				</div>
+			</div>
+			<div v-if="Object.keys(entity.saves).length < 5" class="d-flex justify-content-between">
+				<button class="btn save bg-green" @click="set_save('succes', Object.keys(entity.saves).length)"><i class="fas fa-check"></i></button>
+				<button class="btn save bg-red" @click="set_save('fail', Object.keys(entity.saves).length)"><i class="fas fa-times"></i></button>
+			</div>
+			<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill()"><i class="fas fa-skull"></i> Player died</a>
+			<a class="btn btn-block my-3" @click="stabilize()"><i class="fas fa-heartbeat"></i> Stabilize</a>
+		</template>
+		<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 
 		<h2>Temporary</h2>
 		<b-row class="mb-2">
@@ -78,7 +100,7 @@
 						class="text-center"
 						type="number" 
 						name="maxHp" 
-						min="1"
+						min="0"
 						v-model="entity.curHp"
 						v-validate="'required|numeric'"
 						data-vv-as="Current HP"
@@ -103,15 +125,45 @@
 		</template>
 
 		<button class="btn btn-block my-3" @click="edit()">Save</button>
+
+		<div v-if="advancement['.value'] != 'milestone'" class="pt-2">
+			<hr>
+			<h2>Experience Points</h2>
+			{{ setNumber(playerBase.experience) }}
+			<h2 class="text-center xp">{{ animatedNumber }}</h2>
+
+			<div class="level">
+				<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
+				<div class="progress">
+					<div class="progress-bar bg-blue"
+						role="progressbar" 
+						:style="{ width: levelAdvancement(playerBase.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+					</div>
+				</div>
+				<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
+			</div>
+
+			<b-form-input 
+				class="text-center"
+				type="number" 
+				name="xp" 
+				v-model="xp"
+				placeholder="Award XP">
+			</b-form-input>
+
+			<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
+		</div>
 	</div>
 </template>
 
 <script>
 	import { db } from '@/firebase'
 	import { mapActions } from 'vuex'
+	import { experience } from '@/mixins/experience.js'
 
 	export default {
 		name: 'EditEntity',
+		mixins: [experience],
 		props: [
 			'data',
 		],
@@ -123,13 +175,17 @@
 				entityKey: this.data.key,
 				location: this.data.location,
 				entity: undefined,
-				maxHpMod: undefined
+				maxHpMod: undefined,
+				xp: undefined,
+				number: 0,
+				tweenedNumber: 0,
 			}
 		},
 		mounted() {
 			var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
 			entity.on('value', async (snapshot) => {
 				this.entity = snapshot.val();
+				this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
 				this.maxHpMod = snapshot.val().maxHpMod;
 			});
 		},
@@ -142,7 +198,31 @@
 				initiative: {
 					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/initiative`),
 					asObject: true
+				},
+				advancement: {
+					source:	db.ref(`campaigns/${this.userId}/${this.campaignId}/advancement`),
+					asObject: true
+				},
+			}
+		},
+		computed: {
+			animatedNumber: function() {
+				return this.tweenedNumber.toFixed(0);
+			},
+			death_fails() {
+				let fails = 0;
+				for(let key in this.entity.saves) {
+					if(this.entity.saves[key] === 'fail') {
+						fails++
+					}
 				}
+				return fails;
+			}
+		},
+		watch: {
+			number: function(newValue) {
+				// eslint-disable-next-line
+				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			}
 		},
 		methods: {
@@ -150,6 +230,47 @@
 				'setSlide',
 				'edit_player',
 			]),
+			setNumber(value) {
+				this.number = value
+			},
+			addXp() {
+				if(this.xp) {
+					let newXp = parseInt(this.playerBase.experience) + parseInt(this.xp);
+
+					if(newXp < 0) { newXp = 0; }
+					if(newXp > 355000) { newXp = 355000; }
+
+					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(
+						newXp
+					)
+					this.xp = undefined;
+				}
+			},
+			set_save(check, index) {
+				if(check === 'unset') {
+					// delete this.entity.saves[index];
+					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves/${index}`).remove();
+				}
+				else {
+					var i = parseInt(index + 1);
+					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves/${i}`).set(check);
+				}
+			},
+			stabilize() {
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).set(true);
+			},
+			kill() {
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).set(true);
+			},
+			revive() {
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/curHp`).set(1);
+			},
 			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
@@ -167,24 +288,26 @@
 						this.entity.maxHpMod = (this.entity.maxHpMod) ? parseInt(this.entity.maxHpMod) : 0;
 						this.playerBase.ac = parseInt(this.playerBase.ac);
 						this.playerBase.maxHp = parseInt(this.playerBase.maxHp);
+						this.entity.curHp = parseInt(this.entity.curHp);
+
 
 						//Modify curHP with maxHpMod
 						if(this.entity.maxHpMod === 0) {
 							//If the there was no current mod
 							//only modify curHp if maxHpMod = positive
 							if(this.maxHpMod > 0) {
-								this.entity.curHp = parseInt(parseInt(this.entity.curHp) + this.maxHpMod);
+								this.entity.curHp = parseInt(this.entity.curHp + this.maxHpMod);
 							}
 						} else if(this.maxHpMod === 0) {
 							//if the new mod is 0, check if the old mod was positive
 							//If so, remove it from the curHp
 							if(this.entity.maxHpMod > 0) {
-								this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod);
+								this.entity.curHp = parseInt(this.entity.curHp - this.entity.maxHpMod);
 							}
 						} else {
 							//If the new mod is positive
 							if(this.maxHpMod > 0) {
-								//check if the current mod was positive to0
+								//check if the current mod was positive too
 								if(this.entity.maxHpMod > 0) {
 									//if so, first substract current mod, then add new
 									this.entity.curHp = parseInt(parseInt(this.entity.curHp) - this.entity.maxHpMod + this.maxHpMod);
@@ -204,16 +327,23 @@
 
 						//CurHp can never be > maxHp
 						if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {
-							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod)
+							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
 						}
 
 						//Update Firebase apart from store, cause it can be edited where there is no store.
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity)
-						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase)
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity);
+						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase);
+
+						//If the new curHp > 0, remove stable and dead conditions
+						if(this.entity.curHp > 0) {
+							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
+							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
+							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
+						}
+
 
 						//Only update in an encounter
 						if(this.location == 'encounter') {
-							
 							//create full object to send to store
 							this.entity.initiative = this.initiative['.value'];
 							this.entity.ac = this.playerBase.ac;
@@ -237,5 +367,27 @@
 <style lang="scss" scoped>
 	label {
 		font-size: 12px;
+	}
+	h2.xp {
+		font-weight: bold;
+		font-size: 28px;
+	}
+	.level {
+		display: grid;
+		grid-template-columns: 25px auto 25px;
+		height: 15px;
+		line-height: 15px;
+		margin-bottom: 20px;
+
+		.next {
+			text-align: right;
+		}
+
+		.progress {
+			height: 15px;
+		}
+	}
+	.btn.save {
+		width: 49.5%;
 	}
 </style>

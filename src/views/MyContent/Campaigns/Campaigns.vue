@@ -87,6 +87,8 @@
 							</span>
 						</div>
 						<div class="card-body">
+							<div v-if="campaign.advancement != 'milestone'" class="advancement">Experience</div>
+							<div v-else class="advancement">Milestone</div>
 							<b-row>
 								<b-col>
 									<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
@@ -182,6 +184,9 @@
 				} , 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.campaigns - Object.keys(this.campaigns).length
+			}
 		},
 		methods: {
 			...mapActions([
@@ -231,6 +236,19 @@
 		a {
 			cursor: pointer;
 		}
+		h2.campaigns {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
 		h2.players {
 			margin-bottom: 5px !important;
 			text-align: center;
@@ -272,6 +290,12 @@
 			}
 			.card-body {
 				background: rgba(38, 38, 38, .5);
+
+				.advancement {
+					text-align: center;
+					font-size: 16px;
+					margin-bottom: 20px;
+				}
 				
 				.col {
 					text-align: center;
@@ -290,6 +314,16 @@
 					svg {
 						font-size: 50px;
 					}
+				}
+			}
+			&.openSlot {
+				height: 263px;
+				border: dashed 1px #b2b2b2 !important;
+				background: none !important;
+
+				.card-body {
+					text-align: center;
+					background: none;
 				}
 			}
 		}

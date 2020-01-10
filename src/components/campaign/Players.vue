@@ -1,186 +1,469 @@
 <template>
 	<div>
-		<HKtable
-			class="mb-4"
-			:items="campaignPlayers"
-			:columns="columns"
-		>	
-			<template slot="image" slot-scope="data">
-				<div class="image" v-if="players[data.row.key].avatar" :style="{ backgroundImage: 'url(\'' + players[data.row.key].avatar + '\')' }"></div>
-				<img v-else class="image" src="@/assets/_img/styles/player.svg" />
-			</template>
-
-			<template slot="maxHp" slot-scope="data">
-				<span class="current" :class="{ 
-					'red': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) <= 33, 
-					'orange': percentage(data.row.curHp, maxHp(data.item, data.row.maxHpMod)) > 33 && percentage(data.row.curHp, players[data.row.key].maxHp) <= 76, 
-					'green': true
-				}">
-					{{ data.row.curHp }}
-				</span>
-				<span class="gray-hover">/</span>
-				<span :class="{ 
-						'green': data.row.maxHpMod > 0, 
-						'red': data.row.maxHpMod < 0 
-					}" 
-					v-b-tooltip.hover :title="'Max HP + ' + data.row.maxHpMod" v-if="data.row.maxHpMod">
-					{{ maxHp(players[data.row.key].maxHp, data.row.maxHpMod) }}
-				</span>
-				<span v-else>{{ players[data.row.key].maxHp }}</span>
-				<span v-if="data.row.tempHp" class="gray-hover">+{{ data.row.tempHp }}</span>
-			</template>
-
-			<div slot="actions" slot-scope="data" class="actions">
-				<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
+		<div class="group-actions">
+			<div 
+				class="money" 
+				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
+				@click="
+					viewerIsUser
+					? setSlide({
+						show: true,
+						type: 'slides/party/Currency',
+						data: { current: currency['.value'] }
+					}) : null
+				">
+				<template v-if="currency['.value']">
+					<template v-for="(coin, key) in money">
+						<div v-if="coin" :key="key">
+							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
+							<template v-else>{{ coin }} </template>
+							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
+						</div>
+					</template>
+				</template>
+				<span v-else class="text-italic gray-hover">No money</span>
+			</div>
+			<div class="actions">
+				<template v-if="viewerIsUser">
+					<a 
+						v-b-tooltip.hover title="Edit Group Health"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/health'
+						})"><i class="fas fa-heart"></i></a>
+					<a 
+						v-if="isXpAdvancement()"
+						v-b-tooltip.hover title="Award Experience Points"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/xp'
+						})">XP</a>
+					<a 
+						v-b-tooltip.hover title="Party Inventory"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/Inventory'
+						})"><i class="fas fa-treasure-chest"></i></a>
+				</template>
+				<a 
+					v-else-if="campaign.inventory && campaign.inventory.items"
+					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
-						type: 'slides/EditPlayer',
-						data: { key: data.row.key, location: 'overview'}
+						type: 'slides/party/ViewInventory'
 					})">
-					<i class="fas fa-pencil"></i>
+						<i class="fas fa-treasure-chest mr-1"></i>
+						{{ Object.keys(campaign.inventory.items).length }}
 				</a>
 			</div>
-		</HKtable>
+		</div>
+		<div 
+			v-if="players"
+			class="players" 
+			:class="{ xp: isXpAdvancement() }"
+			:style="{ 'grid-template-columns': templateColumns }"
+		>
+			<div class="header"></div>
+			<div class="col header ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></div>
+			<div class="col header name"></div>
+			<div class="col header pp" v-if="settings.passive_perception == undefined">
+				<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
+			</div>
+			<div class="col header pinv" v-if="settings.passive_investigation == undefined">
+				<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
+			</div>
+			<div class="col header pins" v-if="settings.passive_insight == undefined">
+				<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
+			</div>
+			<div class="col header save" v-if="settings.save_dc == undefined">
+				<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
+			</div>
+			<div class="col header health"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></div>
+			<div class="col header actions"><i class="far fa-ellipsis-h"></i></div>
 
-		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+			<template v-for="(player, key) in players">
+				<div 
+					v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"
+					class="col image" 
+					:key="'image-'+key"></div>
+				<div v-else class="image" :key="'image-'+key">
+					<img src="@/assets/_img/styles/player.svg" />
+				</div>
+				<div class="col ac" :key="'ac-'+key">
+					<span :class="{ 
+							'green': player.ac_bonus > 0, 
+							'red': player.ac_bonus < 0 
+						}" 
+						v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
+						v-if="player.ac_bonus">
+						{{ player.ac + player.ac_bonus }}
+					</span>
+					<span v-else>{{ player.ac }}</span>
+				</div>
+				<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
+
+				<div 
+					class="col pp" 
+					v-if="settings.passive_perception == undefined"
+					:key="'pp-'+key"
+				>
+					{{ player.passive_perception }}
+				</div>
+				<div 
+					class="col pinv" 
+					v-if="settings.passive_investigation == undefined"
+					:key="'pinv-'+key"
+				>
+					{{ player.passive_investigation }}
+				</div>
+				<div 
+					class="col pins" 
+					v-if="settings.passive_insight == undefined"
+					:key="'pins-'+key"
+				>
+					{{ player.passive_insight }}
+				</div>
+				<div 
+					class="col save" 
+					v-if="settings.save_dc == undefined"
+					:key="'save-'+key"
+				>
+					{{ player.spell_save_dc }}
+				</div>
+
+				<div class="col health" :key="'health-'+key">
+					<template v-if="player.curHp <= 0">
+						<div v-if="player.stable" class="green">
+							<span><i class="fas fa-fist-raised"></i> Stable</span>
+						</div>
+						<div v-else-if="player.dead" class="red">
+							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+						</div>
+						<div v-else class="saves d-flex justify-content-end">
+							<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
+								<span v-show="check == 'succes'" class="green"><i class="fas fa-check"></i></span> 
+								<span v-show="check == 'fail'" class="red"><i class="fas fa-times"></i></span>
+							</div>
+						</div>
+					</template>
+					<template v-else>
+						<span class="current" :class="{ 
+							'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+							'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, player.maxHp) <= 76, 
+							'green': true
+						}">{{ player.curHp }}</span>
+						<span class="gray-hover">/</span>
+						<span :class="{ 
+								'green': player.maxHpMod > 0, 
+								'red': player.maxHpMod < 0 
+							}" 
+							v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+							{{ maxHp(player.maxHp, player.maxHpMod) }}
+						</span>
+						<span v-else>{{ player.maxHp }}</span>
+						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
+					</template>
+				</div>
+				<div class="col actions" :key="'actions-'+key">
+					<a 	
+						v-if="viewerIsUser"
+						class="gray-hover" 
+						v-b-tooltip.hover title="Edit player" 
+						@click="setSlide({
+							show: true,
+							type: 'slides/EditPlayer',
+							data: { key: player['.key'], location: 'overview',}
+						})">
+						<i class="fas fa-pencil"></i>
+					</a>
+				</div>
+				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
+					<div class="level" 
+							 :class="{red: isXpAdvancement() && player.level}"
+							 v-b-tooltip.hover
+							 :title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+						{{ player.level ? player.level : calculatedLevel(player.experience) }}
+					</div>
+					<div class="progress">
+						<div class="progress-bar bg-blue"
+							role="progressbar" 
+							:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+						</div>
+					</div>
+				</div>
+			</template>
+		</div>
+
+		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 	</div>
 </template>
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
-	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { experience } from '@/mixins/experience.js';
+	import { currencyMixin } from '@/mixins/currency.js';
 
 	export default {
 		name: 'Players',
-		components: {
-			HKtable
-		},
+		props: ['userId', 'campaignId'],
+		mixins: [experience, currencyMixin],
 		data() {
 			return {
-				user: this.$store.getters.getUser,
-				campaignId: this.$route.params.campid,
+				viewerId: this.$store.getters.getUser.uid,
+				players: undefined,
+				loading: true
 			}
 		},
 		firebase() {
 			return {
+				campaign:  {
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
+					asObject: true
+				},
 				settings: {
-					source: db.ref(`settings/${this.user.uid}/general`),
+					source: db.ref(`settings/${this.userId}/general`),
+					asObject: true
+				},
+				currency: {
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`),
 					asObject: true
 				}
 			}
 		},
 		computed: {
 			...mapGetters([
-				'campaign',
-				'players',
 				'playerInCampaign',
 			]),
-			campaignPlayers() {
-				let players = [];
-
-				for(let key in this.campaign.players) {
-					let player = this.campaign.players[key];
-					player.key = key;
-					player.name = this.players[key].character_name;
-					player.ac = this.players[key].ac;
-					player.maxHp = this.players[key].maxHp;
-					player.passive_perception = this.players[key].passive_perception;
-					player.passive_investigation = this.players[key].passive_investigation;
-					player.passive_insight = this.players[key].passive_insight;
-					player.spell_save_dc = this.players[key].spell_save_dc;
-					
-					
-					players.push(player)
-				}
-
-				return players;
+			viewerIsUser() {
+				//If the viewer is the user that runs the campaign
+				//Edit functions are enabled
+				return this.userId === this.viewerId;
 			},
-			columns() {
-				let columns = {
-					image: {
-                        width: 46,
-                        noPadding: true
-					},
-					ac: {
-						label: '<i class="fas fa-shield"></i>',
-						center: true,
-						maxContent: true
-					},
-					name: {
-						truncate: true
-                    },
-				}
+			templateColumns() {
+				let templateColumns = 'max-content 40px auto ';
 
-				if(this.settings.passive_perception === undefined) {
-					columns.passive_perception = {
-						label: '<i class="fas fa-eye"></i>',
-						maxContent: true
-					}
+				if(this.settings.passive_perception === undefined) { 
+					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_investigation === undefined) {
-					columns.passive_investigation = {
-						label: '<i class="fas fa-search"></i>',
-						maxContent: true
-					}
+				if(this.settings.passive_investigation === undefined) { 
+					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_insight === undefined) {
-					columns.passive_insight = {
-						label: '<i class="fas fa-lightbulb-on"></i>',
-						maxContent: true
-					}
+				if(this.settings.passive_insight === undefined) { 
+					templateColumns = templateColumns.concat(' max-content');
 				}
 				if(this.settings.save_dc === undefined) {
-					columns.spell_save_dc = {
-						label: '<i class="fas fa-hand-holding-magic"></i>',
-						maxContent: true
-					}
+					templateColumns = templateColumns.concat(' max-content');
 				}
 
-				columns.maxHp = {
-					label: '<i class="fas fa-heart"></i>',
-					maxContent: true
-				}
-				columns.actions = {
-					label: '<i class="far fa-ellipsis-h"></i>',
-					noPadding: true,
-					right: true,
-					maxContent: true
-                };
+				templateColumns = templateColumns.concat(' max-content max-content');
 
-				return columns;
+				return templateColumns;
+			},
+			calcColspan() {
+				let colspan = 8;
+
+				if(this.settings.passive_perception !== undefined) { colspan--; }
+				if(this.settings.passive_investigation !== undefined) { colspan--; }
+				if(this.settings.passive_insight !== undefined) { colspan--; }
+				if(this.settings.save_dc !== undefined) { colspan--; }
+
+				return colspan;
+			},
+			money() {
+				return this.copperToPretty(this.currency['.value']);
 			}
 		},
 		mounted() {
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
+			const getPlayers = db.ref(`campaigns/${this.userId}/${this.campaignId}/players`);
+			getPlayers.on('value', async (snapshot) => {
+				let campaignPlayers = snapshot.val();
+
+				for(let key in campaignPlayers) {	
+					campaignPlayers[key]['.key'] = key;
+
+					//Get full player
+					const fullPlayer = db.ref(`players/${this.userId}/${key}`)
+					await fullPlayer.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							campaignPlayers[key].character_name = snapshot.val().character_name;
+							campaignPlayers[key].avatar = snapshot.val().avatar;
+							campaignPlayers[key].level = snapshot.val().level;
+							campaignPlayers[key].maxHp = snapshot.val().maxHp;
+							campaignPlayers[key].ac = snapshot.val().ac;
+							campaignPlayers[key].experience = snapshot.val().experience;
+							campaignPlayers[key].passive_perception = snapshot.val().passive_perception;
+							campaignPlayers[key].passive_investigation = snapshot.val().passive_investigation;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
+						}
+					});	
+				}
+				this.players = Object.values(campaignPlayers);
+				this.loading = false;
+			});
+
 		},
 		methods: {
 			...mapActions([
-				'fetchCampaign',
 				'setSlide',
 			]),
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				var percentage = Math.floor(current / max * 100)
+				return percentage
 			},
 			maxHp(maxHp, maxHpMod) {
 				return maxHp + maxHpMod;
 			},
 			reset() {
-				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp,
-						tempHp: 0,
-						maxHpMod: 0
-					})
+				for(var i in this.players) {
+					let player = this.players[i];
+					let key = this.players[i]['.key'];
+
+					if(!player.dead) {
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
+							curHp: this.players[i].maxHp,
+							tempHp: 0,
+							maxHpMod: 0
+						});
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/stable`).remove();
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
+					}
 				}
+			},
+			isXpAdvancement(){
+				return this.campaign.advancement != 'milestone'
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.group-actions {
+		border-bottom: solid 1px #b2b2b2;
+		padding-bottom: 5px;
+		display: grid;
+		grid-template-columns: auto max-content;
+		grid-template-areas: "money actions";
 
+		.money {
+			display: flex;
+			justify-content: flex-start;
+			cursor: pointer;
+			grid-area: money;
+			line-height: 15px;
+
+			div {
+				margin-right: 10px;
+				font-size: 16px;
+
+				img {
+					height: 12px;
+				}
+
+				&:last-child {
+					margin: none;
+				}
+			}
+		}
+		.actions {
+			display: flex;
+			justify-content: flex-end;
+			grid-area: actions;
+
+			a {
+				margin-left: 10px;
+				color: #fff !important;
+
+				&:hover {
+					color: #2c97de !important;
+				}
+			}
+		}
+	}
+	.players {
+		display: grid;
+		grid-auto-rows: max-content;
+		grid-row-gap: 1px;
+		margin: 10px 0 30px 0;
+
+		.image {
+			width: 46px;
+			height: 46px;
+			background-size: cover;
+			background-position: top center;
+			background-color: black;
+			border: solid 1px #b2b2b2;
+		}
+		.col {
+			min-height: 35px;
+			padding: 12px 10px;
+			background-color: #262626;
+
+			&.header {
+				background: none;
+			}
+			&.ac {
+				text-align: center;
+				font-weight: bold;
+			}
+			&.name {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.saves {
+				.save {
+					margin-left: 4px;
+				}
+			}
+			&.actions {
+				display: flex;
+				justify-content: flex-end;
+				padding: 9px 12px;
+
+				a {
+					color: #b2b2b2 !important;
+					width: 28px;
+					height: 28px;
+					display: block;
+					line-height: 28px;
+					text-align: center;
+					border-radius: 50%;
+
+					&:hover {
+						text-decoration: none;
+						background-color: #302f2f;
+					}
+				}
+			}
+		}
+		&.xp {
+			.image {
+				width: 62px;
+				height: 62px;
+				grid-row: span 2;
+			}
+			.xp-bar {
+				display: flex;
+				justify-content: space-between;
+				height: 15px;
+				width: 100%;
+			
+				.level {
+					display: block;
+					width: 25px;
+					line-height: 15px;
+					text-align: center;
+				}
+				.progress {
+					margin-top: 6px;
+					width: 100%;
+					height: 3px;
+					background-color: #232323 !important;
+				}
+			}
+		}
+	}
 </style>

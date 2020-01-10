@@ -28,8 +28,10 @@
 									<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
 									<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
 								</div>
+								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> Player died</a>
 								<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 						</template>
+						<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 						
 						<template v-else>
 							<div class="health">
@@ -158,12 +160,22 @@
 			]),
 			target: function() {
 				return this.entities[this.targeted]
+			},
+			death_fails() {
+				let fails = 0;
+				for(let key in this.current.saves) {
+					if(this.current.saves[key] === 'fail') {
+						fails++
+					}
+				}
+				return fails;
 			}
 		},
 		methods: {
 			...mapActions([
 				'setSlide',
 				'set_save',
+				'set_dead',
 				'set_stable',
 				'set_targetReminder',
 			]),
@@ -177,23 +189,30 @@
 				})
 			},
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				var hp_percentage = Math.floor(current / max * 100);
+				return hp_percentage;
 			},
 			shadow() {
-				this.setShadow = this.$refs.scroll.scrollTop
+				this.setShadow = this.$refs.scroll.scrollTop;
 			},
-			save(check, number) {
+			save(check, index) {
 				this.set_save({
 					key: this.current.key,
 					check: check,
-					number: number
+					index
 				})
 			},
 			stabilize() {
 				this.set_stable({
 					key: this.current.key,
 					action: 'set',
+				})
+			},
+			kill_revive(action) {
+				this.set_dead({
+					key: this.current.key,
+					action: action,
+					revive: true
 				})
 			},
 			removeReminder(key) {

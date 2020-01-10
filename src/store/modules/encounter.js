@@ -134,26 +134,31 @@ const mutations = {
 		
 		switch(entity.entityType) {
 			case 'player': {
-				//get the curHp & tempHP & AC Bonus from the campaign
-				entity.curHp = rootState.content.campaigns[state.campaignId].players[key].curHp
-				entity.tempHp = rootState.content.campaigns[state.campaignId].players[key].tempHp
-				entity.ac_bonus = rootState.content.campaigns[state.campaignId].players[key].ac_bonus
-				entity.maxHpMod = rootState.content.campaigns[state.campaignId].players[key].maxHpMod
+				let campaignPlayer = rootState.content.campaigns[state.campaignId].players[key];
+
+				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
+				entity.curHp = campaignPlayer.curHp;
+				entity.tempHp = campaignPlayer.tempHp;
+				entity.ac_bonus = campaignPlayer.ac_bonus;
+				entity.maxHpMod = campaignPlayer.maxHpMod;
+				entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
+				entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
+				entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
 
 				//get other values from the player
-				let db_player = rootState.content.players[key]
+				let db_player = rootState.content.players[key];
 
 				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
 				
-				entity.name = db_player.character_name
-				entity.ac = parseInt(db_player.ac)
+				entity.name = db_player.character_name;
+				entity.ac = parseInt(db_player.ac);
 				entity.maxHp = (entity.maxHpMod !== 0) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
-				entity.strength = db_player.strength
-				entity.dexterity = db_player.dexterity
-				entity.constitution = db_player.constitution
-				entity.intelligence = db_player.intelligence
-				entity.wisdom = db_player.wisdom
-				entity.charisma = db_player.charisma
+				entity.strength = db_player.strength;
+				entity.dexterity = db_player.dexterity;
+				entity.constitution = db_player.constitution;
+				entity.intelligence = db_player.intelligence;
+				entity.wisdom = db_player.wisdom;
+				entity.charisma = db_player.charisma;
 				break
 			}
 			case 'npc': {
@@ -191,57 +196,57 @@ const mutations = {
 				//without copying an existing
 				//it won't have data_npc
 				if(data_npc) {
-					entity.size = data_npc.size
-					entity.type = data_npc.type
-					entity.subtype = data_npc.subtype
-					entity.alignment = data_npc.alignment
-					entity.challenge_rating = data_npc.challenge_rating
-					entity.hit_dice = data_npc.hit_dice
-					entity.speed = data_npc.speed
-					entity.senses = data_npc.senses
-					entity.languages = data_npc.languages
+					entity.size = data_npc.size;
+					entity.type = data_npc.type;
+					entity.subtype = data_npc.subtype;
+					entity.alignment = data_npc.alignment;
+					entity.challenge_rating = data_npc.challenge_rating;
+					entity.hit_dice = data_npc.hit_dice;
+					entity.speed = data_npc.speed;
+					entity.senses = data_npc.senses;
+					entity.languages = data_npc.languages;
 
-					entity.strength = data_npc.strength
-					entity.dexterity = data_npc.dexterity
-					entity.constitution = data_npc.constitution
-					entity.intelligence = data_npc.intelligence
-					entity.wisdom = data_npc.wisdom
-					entity.charisma = data_npc.charisma
+					entity.strength = data_npc.strength;
+					entity.dexterity = data_npc.dexterity;
+					entity.constitution = data_npc.constitution;
+					entity.intelligence = data_npc.intelligence;
+					entity.wisdom = data_npc.wisdom;
+					entity.charisma = data_npc.charisma;
 
-					entity.strength_save = data_npc.strength_save
-					entity.dexterity_save = data_npc.dexterity_save
-					entity.constitution_save = data_npc.constitution_save
-					entity.intelligence_save = data_npc.intelligence_save
-					entity.wisdom_save = data_npc.wisdom_save
-					entity.charisma_save = data_npc.charisma_save
+					entity.strength_save = data_npc.strength_save;
+					entity.dexterity_save = data_npc.dexterity_save;
+					entity.constitution_save = data_npc.constitution_save;
+					entity.intelligence_save = data_npc.intelligence_save;
+					entity.wisdom_save = data_npc.wisdom_save;
+					entity.charisma_save = data_npc.charisma_save;
 
-					entity.acrobatics = data_npc.acrobatics
-					entity['animal Handling'] = data_npc['animal Handling']
-					entity.arcana = data_npc.arcana
-					entity.athletics = data_npc.athletics
-					entity.deception = data_npc.deception
-					entity.history = data_npc.history
-					entity.insight = data_npc.insight
-					entity.intimidation = data_npc.intimidation
-					entity.investigation = data_npc.investigation
-					entity.medicine = data_npc.medicine
-					entity.nature = data_npc.nature
-					entity.perception = data_npc.perception
-					entity.performance = data_npc.performance
-					entity.persuasion = data_npc.persuasion
-					entity.religion = data_npc.religion
-					entity['sleight of Hand'] = data_npc['sleight of Hand']
-					entity.stealth = data_npc.stealth
-					entity.survival = data_npc.survival
+					entity.acrobatics = data_npc.acrobatics;
+					entity['animal Handling'] = data_npc['animal Handling'];
+					entity.arcana = data_npc.arcana;
+					entity.athletics = data_npc.athletics;
+					entity.deception = data_npc.deception;
+					entity.history = data_npc.history;
+					entity.insight = data_npc.insight;
+					entity.intimidation = data_npc.intimidation;
+					entity.investigation = data_npc.investigation;
+					entity.medicine = data_npc.medicine;
+					entity.nature = data_npc.nature;
+					entity.perception = data_npc.perception;
+					entity.performance = data_npc.performance;
+					entity.persuasion = data_npc.persuasion;
+					entity.religion = data_npc.religion;
+					entity['sleight of Hand'] = data_npc['sleight of Hand'];
+					entity.stealth = data_npc.stealth;
+					entity.survival = data_npc.survival;
 
-					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities
-					entity.damage_resistances = data_npc.damage_resistances
-					entity.damage_immunities = data_npc.damage_immunities
-					entity.condition_immunities = data_npc.condition_immunities
+					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities;
+					entity.damage_resistances = data_npc.damage_resistances;
+					entity.damage_immunities = data_npc.damage_immunities;
+					entity.condition_immunities = data_npc.condition_immunities;
 
-					entity.special_abilities = data_npc.special_abilities
-					entity.actions = data_npc.actions
-					entity.legendary_actions = data_npc.legendary_actions
+					entity.special_abilities = data_npc.special_abilities;
+					entity.actions = data_npc.actions;
+					entity.legendary_actions = data_npc.legendary_actions;
 				}
 				break
 			}
@@ -348,53 +353,53 @@ const mutations = {
 			encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).remove();
 		}
 	},
-	SET_SAVE(state, {key, check, number}) {
+	SET_SAVE(state, {key, check, index}) {
 		if(check == 'reset') {
 			//RESET SAVES
-			Vue.set(state.entities[key], 'saves', {})
-			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
+			Vue.set(state.entities[key], 'saves', {});
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
 
 			//REMOVE STABLE
 			Vue.set(state.entities[key], 'stable', false)
-			encounters_ref.child(`${state.path}/entities/${key}/stable`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
 		}
 		else if(check == 'unset') {
-			Vue.delete(state.entities[key].saves, number)
-			encounters_ref.child(`${state.path}/entities/${key}/saves/${number}`).remove();
+			Vue.delete(state.entities[key].saves, index)
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${index}`).remove();
 		}
 		else {
-			var n = parseInt(number + 1);
-			Vue.set(state.entities[key].saves, n, check)
-			encounters_ref.child(`${state.path}/entities/${key}/saves/${n}`).set(check);
+			var i = parseInt(index + 1);
+			Vue.set(state.entities[key].saves, i, check);
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${i}`).set(check);
 		}
 	},
 	SET_STABLE(state, {key, action}) {
 		if(action == 'set') {
 			//RESET SAVES
 			Vue.set(state.entities[key], 'saves', {})
-			encounters_ref.child(`${state.path}/entities/${key}/saves`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
 
 			//REMOVE DEAD
 			Vue.delete(state.entities[key], 'dead')
-			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
 
 			//SET STABLE
 			Vue.set(state.entities[key], 'stable', 'true')
-			encounters_ref.child(`${state.path}/entities/${key}/stable`).set('true');
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).set(true);
 		}
 		else if(action == 'unset') {
 			Vue.delete(state.entities[key], 'stable')
-			encounters_ref.child(`${state.path}/entities/${key}/stable`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
 		}
 	},
 	EDIT_ENTITY(state, {key, entity}) {
-		Vue.set(state.entities[key], 'name', entity.name)
-		Vue.set(state.entities[key], 'initiative', entity.initiative)
-		Vue.set(state.entities[key], 'ac', entity.ac)
-		Vue.set(state.entities[key], 'maxHp', entity.maxHp)
-		Vue.set(state.entities[key], 'curHp', entity.curHp)
-		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus)
-		Vue.set(state.entities[key], 'tempHp', entity.tempHp)
+		Vue.set(state.entities[key], 'name', entity.name);
+		Vue.set(state.entities[key], 'initiative', entity.initiative);
+		Vue.set(state.entities[key], 'ac', entity.ac);
+		Vue.set(state.entities[key], 'maxHp', entity.maxHp);
+		Vue.set(state.entities[key], 'curHp', entity.curHp);
+		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus);
+		Vue.set(state.entities[key], 'tempHp', entity.tempHp);
 
 		
 		
@@ -514,15 +519,21 @@ const mutations = {
 			}
 		}
 	},
-	SET_DEAD(state, {key, action}) {
-		if(action == 'set') {
+	SET_DEAD(state, {key, action, revive=false}) {
+		if(action === 'set') {
 			//SET DEAD
-			state.entities[key].dead = true
-			encounters_ref.child(`${state.path}/entities/${key}/dead`).set(true);
+			state.entities[key].dead = true;
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
 		}
-		else if(action == 'unset') {
-			Vue.delete(state.entities[key], 'dead')
-			encounters_ref.child(`${state.path}/entities/${key}/dead`).remove();
+		else if(action === 'unset') {
+			Vue.delete(state.entities[key], 'dead');
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+			if(revive) {
+				state.entities[key].curHp = 1;
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(1);
+			}
 		}
 	},
 	FINISH(state) {

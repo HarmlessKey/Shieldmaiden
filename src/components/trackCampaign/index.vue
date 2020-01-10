@@ -317,7 +317,7 @@
 							this.encounter = enc
 						});
 					}
-					//Get campaign for player curHP/tempHP/ACBonus
+					//Get campaign for player curHP/tempHP/ACBonus/Dead/Stable/DeathSaves
 					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
 					fetchCampaign.on('value' , (snapshot) => {				

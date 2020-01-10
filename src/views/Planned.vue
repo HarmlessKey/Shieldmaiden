@@ -4,7 +4,10 @@
 		<h1>Planned updates</h1>
 		<p>Follow our planned updates on Trello.</p>
 
-		<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank" class="large-link"><i class="fab fa-trello"></i> Harmless Key Trello.</a>
+		<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank" class="large-link">
+			<div class="icon"><i class="fab fa-trello"></i></div>
+			<div class="text">Harmless Key Trello.</div>
+		</a>
 	</div>
 	<Footer />
 </div>

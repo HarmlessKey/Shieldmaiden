@@ -3,7 +3,10 @@
 	<div class="content">
 		<h1>Give feedback</h1>
 		<p>If you run into an issue with our app, please let us know, whether it's a bug report or a feature request. Our discord is the best place to leave feedback, follow the link below.</p>
-		<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link"><i class="fab fa-discord discord-purple"></i> Harmless Key Discord</a>
+		<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link">
+			<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
+			<div class="text">Harmless Key Discord</div>
+		</a>
 	</div>
 	<Footer />
 </div>

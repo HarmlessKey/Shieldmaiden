@@ -37,6 +37,7 @@ $discord-purple: #7289DA;
 $orange: #e76d3b;
 $yellow: #c1b947;
 $purple: #9b7aba;
+$discord-purple: #7289DA;
 $blue-light: #88b3ce;
 $green-light: #9ac16a;
 $orange-light: #db815e;
@@ -120,6 +121,7 @@ html body {
 .orange { color: $orange !important; }
 .yellow { color: $yellow !important; }
 .purple { color: $purple !important; }
+.discord-purple { color: $discord-purple !important; }
 .blue-light { color: $blue-light !important; }
 .facebook-blue { color: $facebook-blue !important; }
 .green-light { color: $green-light !important; }
@@ -147,6 +149,7 @@ html body {
 .bg-orange { background-color: $orange !important; }
 .bg-yellow { background-color: $yellow !important; }
 .bg-purple { background-color: $purple !important; }
+.bg-discord-purple { background-color: $discord-purple !important; }
 .bg-blue-light { background-color: $blue-light !important; }
 .bg-green-light { background-color: $green-light !important; }
 .bg-orange-light { background-color: $orange-light !important; }
@@ -167,18 +170,31 @@ a.large-link {
 	display: block;
 	background: $gray;
 	color: $gray-light !important;
-	padding: 20px;
 	font-size: 20px;
 	line-height: 40px;
 	width: max-content;
+	border-radius: 5px;
+	display: flex;
+	justify-content: flex-start;
+	box-shadow: 3px 3px 10px $black;
 
+	.icon {
+		border-top-left-radius: 5px;
+		border-bottom-left-radius: 5px;
+		background-color: $gray-hover;
+		padding: 20px 20px 15px 20px;
+		font-size: 40px;
+		color: $white;
+
+		i {
+			vertical-align: -5px;
+		}
+	}
+	.text {
+		padding: 20px;
+	}
 	&:hover {
 		text-decoration: none;
-	}
-	i {
-		font-size: 40px;
-		margin-right: 10px;
-		vertical-align: -10px;
 	}
 }
 

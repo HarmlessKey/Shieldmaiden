@@ -32,7 +32,7 @@
 							type: 'slides/party/health'
 						})"><i class="fas fa-heart"></i></a>
 					<a 
-						v-if="campaign.advancement != 'milestone'"
+						v-if="isXpAdvancement()"
 						v-b-tooltip.hover title="Award Experience Points"
 						@click="setSlide({
 							show: true,
@@ -60,7 +60,7 @@
 		<div 
 			v-if="players"
 			class="players" 
-			:class="{ xp: campaign.advancement != 'milestone' }"
+			:class="{ xp: isXpAdvancement() }"
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
 			<div class="header"></div>
@@ -177,9 +177,13 @@
 						<i class="fas fa-pencil"></i>
 					</a>
 				</div>
-
-				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="campaign.advancement != 'milestone'">
-					<div class="level">{{ player.level ? player.level : calculatedLevel(player.experience) }}</div>
+				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
+					<div class="level" 
+							 :class="{red: isXpAdvancement() && player.level}"
+							 v-b-tooltip.hover
+							 :title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+						{{ player.level ? player.level : calculatedLevel(player.experience) }}
+					</div>
 					<div class="progress">
 						<div class="progress-bar bg-blue"
 							role="progressbar" 
@@ -327,6 +331,9 @@
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
 					}
 				}
+			},
+			isXpAdvancement(){
+				return this.campaign.advancement != 'milestone'
 			}
 		}
 	}

@@ -27,7 +27,7 @@
 								v-for="(entity, i) in _targets"
 								class="d-flex justify-content-between" 
 								:key="entity.key" 
-								:class="{ 'targeted' : targeted == entity.key, 'top': _active[0].key == entity.key && encounter.turn != 0}">
+								:class="{ 'targeted': targeted.includes(entity.key), 'top': _active[0].key == entity.key && encounter.turn != 0}">
 
 								<span class="topinfo d-flex justify-content-between" v-if="_active[0].key == entity.key && encounter.turn != 0">
 									Top of the round
@@ -38,8 +38,8 @@
 								</span>
 
 								<div class="target" 
-									@click="set_targeted(entity.key)"
-									v-shortkey="[i]" @shortkey="set_targeted(entity.key)">
+									@click="set_targeted({e: $event, key: entity.key})"
+									v-shortkey="[i]" @shortkey="set_targeted({e: $event, key: entity.key})">
 									<TargetItem :item="entity.key" :i="i" />
 								</div>
 								<span>
@@ -106,8 +106,8 @@
 								<template v-for="entity in _idle">
 									<li class="d-flex justify-content-between" 
 										v-bind:key="entity.key" 
-										:class="{ targeted : targeted == entity.key }">
-										<div class="target" @click="set_targeted(entity.key)">
+										:class="{ targeted : targeted.includes(entity.key) }">
+										<div class="target" @click="set_targeted({e: $event, key: entity.key})">
 											<TargetItem :item="entity.key" />
 										</div>
 										<span>
@@ -166,7 +166,7 @@
 							<hr>
 							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ _down.length }})</h2>
 							<ul class="targets down_targets">
-								<li v-for="(entity, index) in _down" :key="index" @click="set_targeted(entity.key)" :class="{ targeted : targeted == entity.key }">
+								<li v-for="(entity, index) in _down" :key="index" @click="set_targeted({e: $event, key: entity.key})" :class="{ targeted : targeted.includes(entity.key) }">
 									<TargetItem :item="entity.key" />
 								</li>
 							</ul>
@@ -201,7 +201,6 @@
 				'encounter',
 				'entities',
 				'targeted',
-				// 'down',
 			]),
 			_targets: function() {
 				let t = this.encounter.turn

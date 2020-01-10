@@ -2,7 +2,7 @@
 	<div>
 		<div class="target">
 			<span class="initiative" v-b-tooltip.hover title="Initiative">
-				<i v-if="targeted == entity.key" class="fas fa-crosshairs blue"></i>
+				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
 				<template v-else>{{ entity.initiative }}</template>
 			</span>
 			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
@@ -210,6 +210,7 @@
 	"initiative img ac hp-bar hp-bar hp-bar hp hp";
 	
 	line-height: 30px;
+	user-select: none;
 }
 .progress { 
 	height: 30px;

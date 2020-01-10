@@ -1,17 +1,17 @@
 <template>
 	<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-		<p v-if="!target">No target selected</p>
+		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else>
-			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entity[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
 					<span :class="{ 
-							'green': target.ac_bonus > 0, 
-							'red': target.ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
-						{{ displayStats(target).ac + target.ac_bonus}}
+							'green': entity[targeted[0]].ac_bonus > 0, 
+							'red': entity[targeted[0]].ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + entity[targeted[0]].ac_bonus" v-if="entity[targeted[0]].ac_bonus">
+						{{ displayStats(entity[targeted[0]]).ac + entity[targeted[0]].ac_bonus}}
 					</span>
-					<span v-else>{{ displayStats(target).ac }}</span>
+					<span v-else>{{ displayStats(entity[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
@@ -43,19 +43,25 @@
 					v-shortkey.avoid>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'damage')">
+					@click="setManual('damage')">
 					Attack
 					<img src="@/assets/_img/styles/sword-break.png" />
 				</button>
 				<button class="btn heal bg-green" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'healing')">
+					@click="setManual('healing')">
 					Heal
 					<img src="@/assets/_img/styles/heal.png" />
 				</button>
 			</div>
 			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 			<h2 class="mt-2 text-center">{{ manualAmount }}</h2>
+
+			<ul>
+				<li v-for="key in targeted" :key="`target-${key}`">
+					{{ entities[key].name }}
+				</li>
+			</ul>
 		</template>
 	</div>
 </template>
@@ -85,10 +91,7 @@
 			...mapGetters([
 				'entities',
 				'targeted',
-			]),
-			target: function() {
-				return this.entities[this.targeted]
-			}
+			])
 		},
 		methods: {
 			displayStats(entity) {
@@ -109,12 +112,14 @@
 				}
 				return stats
 			},
-			setManual(target, type) {
+			setManual(type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, this.crit, target, this.current, type)
+						for(let i in this.targeted) {
+							this.setHP(this.manualAmount, this.crit, this.entities[this.targeted[i]], this.current, type)
+						}
 
 						//Reset input fields
 						this.manualAmount = '';

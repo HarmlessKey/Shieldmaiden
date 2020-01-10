@@ -55,62 +55,39 @@
 								</div>
 							</div>
 
-							<div class="health target px-2" v-if="targeted">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + target.img + '\')' }"></span>
-								<span class="ac"
-									:class="{ 
-										'green': target.ac_bonus > 0, 
-										'red': target.ac_bonus < 0 
-									}" 
-									v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
-									{{ displayStats(target).ac + target.ac_bonus}}
-								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(target).ac }}</span>
-								<div class="progress health-bar">
-									<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-									<div v-show="!target.stable && !target.dead">
-										<span class="percentage">{{ target.name }}</span>
-										<span class="hp">{{ displayStats(target).curHp }} / {{ displayStats(target).maxHp }}</span>
-									</div>
-									<div class="progress-bar" :class="{ 
-										'bg-red': percentage(displayStats(target).curHp, displayStats(target).maxHp) <= 33, 
-										'bg-orange': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 33 && percentage(displayStats(target).curHp, displayStats(target).maxHp) < 76, 
-										'bg-green': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 7
+							<template v-if="targeted.length > 0">
+								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
+									<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
+									<span class="ac"
+										:class="{ 
+											'green': entities[key].ac_bonus > 0, 
+											'red': entities[key].ac_bonus < 0 
 										}" 
-										role="progressbar" 
-										:style="{width: percentage(displayStats(target).curHp, displayStats(target).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+										v-b-tooltip.hover :title="'Armor Class + ' + entities[key].ac_bonus" v-if="entities[key].ac_bonus">
+										{{ displayStats(entities[key]).ac + entities[key].ac_bonus}}
+									</span>
+									<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(entities[key]).ac }}</span>
+									<div class="progress health-bar">
+										<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+										<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+										<div v-show="!entities[key].stable && !entities[key].dead">
+											<span class="percentage">{{ entities[key].name }}</span>
+											<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
+										</div>
+										<div class="progress-bar" :class="{ 
+											'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
+											'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
+											'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
+											}" 
+											role="progressbar" 
+											:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+										</div>
 									</div>
 								</div>
-							</div>
+							</template>
+
 							<h2 v-else class="red">No Target</h2>
 						</template>
-
-						<!-- <b-row class="conditions" v-if="Object.keys(current.conditions).length > 0">
-							<b-col sm="1" v-for="condition, key in current.conditions" :key="key" @click="showCondition(key)" v-if="conditions[key]">
-								<span class="n" v-if="key == 'exhaustion'">
-									{{ current.conditions[key] }}
-								</span>
-								<template v-else>
-									<svg v-b-popover.hover="conditions[key].condition" 
-										:title="key" 
-										class="icon text" 
-										xmlns="https://www.w3.org/2000/svg"
-										viewBox="0 0 512 512">
-										<path :d="conditions[key].icon" fill-opacity="1"></path>
-									</svg>
-								</template>
-							</b-col>
-						</b-row> -->
-
-						<!-- <b-row v-if="current.reminders" class="reminders justify-content-start px-2">
-							<b-col class="col-3 p-1" v-for="reminder, key in current.reminders" :key="key">
-								<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
-									{{ reminder.title }}
-									<span class="delete"><i class="fas fa-times"></i></span>
-								</a>
-							</b-col>
-						</b-row> -->
 					</template>
 					<div v-else class="loader"><span>Loading current...</span></div>
 				</div>
@@ -158,9 +135,6 @@
 				'turn',
 				'targeted',
 			]),
-			target: function() {
-				return this.entities[this.targeted]
-			},
 			death_fails() {
 				let fails = 0;
 				for(let key in this.current.saves) {

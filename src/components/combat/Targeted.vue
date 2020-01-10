@@ -4,7 +4,7 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted" @click="set_targeted(target.key)"
+				<a v-if="targeted.length > 0" @click="set_targeted(target.key)"
 					v-b-tooltip.hover title="Untarget">
 					<i class="fas fa-times red"></i>
 				</a>
@@ -170,7 +170,9 @@
 				'targeted',
 			]),
 			target: function() {
-				return this.entities[this.targeted]
+				if(this.targeted.length === 1) {
+					return this.entities[this.targeted[0]];
+				}
 			},
 			death_fails() {
 				let fails = 0;

@@ -57,11 +57,10 @@ export const setHP = {
 			//Death saves at 0 hp, if automate is on
 			if(curHp == 0 && this.settings.automate !== false) {
 				var n = parseInt(Object.keys(target.saves).length)
-				
 				this.set_save({
 					key: target.key,
 					check: 'fail',
-					number: n
+					index: n
 				})
 				if(crit) {
 					n = parseInt(Object.keys(target.saves).length)
@@ -69,7 +68,7 @@ export const setHP = {
 					this.set_save({
 						key: target.key,
 						check: 'fail',
-						number: n
+						index: n
 					})
 				}
 			}

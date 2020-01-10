@@ -132,21 +132,37 @@
 				</div>
 
 				<div class="col health" :key="'health-'+key">
-					<span class="current" :class="{ 
-						'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
-						'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, player.maxHp) <= 76, 
-						'green': true
-					}">{{ player.curHp }}</span>
-					<span class="gray-hover">/</span>
-					<span :class="{ 
-							'green': player.maxHpMod > 0, 
-							'red': player.maxHpMod < 0 
-						}" 
-						v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-						{{ maxHp(player.maxHp, player.maxHpMod) }}
-					</span>
-					<span v-else>{{ player.maxHp }}</span>
-					<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
+					<template v-if="player.curHp <= 0">
+						<div v-if="player.stable" class="green">
+							<span><i class="fas fa-fist-raised"></i> Stable</span>
+						</div>
+						<div v-else-if="player.dead" class="red">
+							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+						</div>
+						<div v-else class="saves d-flex justify-content-end">
+							<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
+								<span v-show="check == 'succes'" class="green"><i class="fas fa-check"></i></span> 
+								<span v-show="check == 'fail'" class="red"><i class="fas fa-times"></i></span>
+							</div>
+						</div>
+					</template>
+					<template v-else>
+						<span class="current" :class="{ 
+							'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+							'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, player.maxHp) <= 76, 
+							'green': true
+						}">{{ player.curHp }}</span>
+						<span class="gray-hover">/</span>
+						<span :class="{ 
+								'green': player.maxHpMod > 0, 
+								'red': player.maxHpMod < 0 
+							}" 
+							v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+							{{ maxHp(player.maxHp, player.maxHpMod) }}
+						</span>
+						<span v-else>{{ player.maxHp }}</span>
+						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
+					</template>
 				</div>
 				<div class="col actions" :key="'actions-'+key">
 					<a 	
@@ -276,7 +292,7 @@
 							campaignPlayers[key].passive_investigation = snapshot.val().passive_investigation;
 							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
 							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
-							campaignPlayers[key].save_dc = snapshot.val().save_dc;
+							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
 						}
 					});	
 				}
@@ -298,12 +314,18 @@
 			},
 			reset() {
 				for(var i in this.players) {
-					let key = this.players[i]['.key']
-					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[i].maxHp,
-						tempHp: 0,
-						maxHpMod: 0
-					})
+					let player = this.players[i];
+					let key = this.players[i]['.key'];
+
+					if(!player.dead) {
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
+							curHp: this.players[i].maxHp,
+							tempHp: 0,
+							maxHpMod: 0
+						});
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/stable`).remove();
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
+					}
 				}
 			}
 		}
@@ -383,6 +405,11 @@
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+			}
+			.saves {
+				.save {
+					margin-left: 4px;
+				}
 			}
 			&.actions {
 				display: flex;

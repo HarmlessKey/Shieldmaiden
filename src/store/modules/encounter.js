@@ -305,9 +305,14 @@ const mutations = {
 	},
 	SET_TARGETED(state, {e, key}) {
 		if(e === 'untarget') {
-			state.targeted = state.targeted.filter(function(value){
-				return value != key;
-			});
+			if(key === 'all') {
+				state.targeted = [];
+			}
+			else {
+				state.targeted = state.targeted.filter(function(value){
+					return value != key;
+				});
+			}
 		} else {
 			if(e.shiftKey) {
 				if(!state.targeted.includes(key)) {

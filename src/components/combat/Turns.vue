@@ -117,7 +117,7 @@
 					round: round,
 				})
 				db.ref(`encounters/${this.path}/lastRoll`).set(false)
-				this.set_targeted(undefined);
+				this.set_targeted({ e: 'untarget', key: 'all' });
 				this.reminders(this.current, 'endTurn')
 			},
 			reminders(target, trigger){
@@ -182,7 +182,7 @@
 					turn: turn,
 					round: round,
 				})
-				this.set_targeted(undefined);
+				this.set_targeted({ e: 'untarget', key: 'all' });
 			},
 			confirmFinish() {
 				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {

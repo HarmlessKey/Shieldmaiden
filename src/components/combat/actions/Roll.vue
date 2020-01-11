@@ -324,10 +324,14 @@
 				//BUILD SNOTIFY POPUP
 				this.$snotify.html(
 					`<div class="snotifyToast__title">
-						<b>${action.name}</b>
+						<div class="target">
+							<div class="image" style="background-image: url(${target.img});"></div>
+							<div class="ac">${target.ac}</div>
+							<div class="name truncate">${target.name}</div>
+						</div>
 					</div>
 					<div class="snotifyToast__body">
-						<h3>${target.name}</h3>
+						<h2><b>${action.name}</b></h2>
 						${adv}
 						${hits}
 						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>

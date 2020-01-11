@@ -1,5 +1,5 @@
 <template>
-	<div v-if="current" class="tab-pane roll fade" id="roll" role="tabpanel" aria-labelledby="roll-tab">
+	<div v-if="current">
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else-if="current.entityType === 'npc'">
 			<p v-if="targeted.length === 1">

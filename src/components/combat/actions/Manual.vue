@@ -1,5 +1,5 @@
 <template>
-	<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+	<div>
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else>
 			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>

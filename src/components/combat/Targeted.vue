@@ -4,7 +4,7 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length > 0" @click="set_targeted(set_targeted({e: 'untarget', key: 'all'}))"
+				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})"
 					v-b-tooltip.hover title="Untarget all">
 					<i class="fas fa-times red"></i>
 				</a>
@@ -124,6 +124,11 @@
 
 					<!-- MULTIPLE TARGETS -->
 					<template v-else-if="targeted.length > 1">
+						<div class="mb-2">
+							<a @click="setSlide({show: true, type: 'slides/DamageHealing', data: targeted})">
+								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
+							</a>
+						</div>
 						<div class="health untarget" v-for="key in targeted" :key="`target-${key}`">
 							<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
 							<div class="progress health-bar">

@@ -13,8 +13,8 @@
 			</span>
 			<span class="ac" 
 				:class="{ 
-						'green': entity.ac_bonus > 0, 
-						'red': entity.ac_bonus < 0 
+					'green': entity.ac_bonus > 0, 
+					'red': entity.ac_bonus < 0 
 				}" 
 				v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
 				v-if="entity.ac_bonus">

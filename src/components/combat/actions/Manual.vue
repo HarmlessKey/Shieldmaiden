@@ -2,16 +2,16 @@
 	<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else>
-			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entity[targeted[0]].name }}</b><br/>
+			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
 					<span :class="{ 
-							'green': entity[targeted[0]].ac_bonus > 0, 
-							'red': entity[targeted[0]].ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + entity[targeted[0]].ac_bonus" v-if="entity[targeted[0]].ac_bonus">
-						{{ displayStats(entity[targeted[0]]).ac + entity[targeted[0]].ac_bonus}}
+							'green': entities[targeted[0]].ac_bonus > 0, 
+							'red': entities[targeted[0]].ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
 					</span>
-					<span v-else>{{ displayStats(entity[targeted[0]]).ac }}</span>
+					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
@@ -56,10 +56,33 @@
 			</div>
 			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 			<h2 class="mt-2 text-center">{{ manualAmount }}</h2>
-
-			<ul>
+			
+			<ul class="select-amount">
 				<li v-for="key in targeted" :key="`target-${key}`">
-					{{ entities[key].name }}
+					<div class="name truncate">{{ entities[key].name }}</div>
+					<div class="selections">
+						<div 
+							class="select bg-gray-hover" 
+							:class="{'bg-blue': intensity[key] === 'half'}"
+							@click="setIntensity(key, 'half')"
+						>
+							Half
+						</div>
+						<div 
+							class="select bg-gray-hover" 
+							:class="{'bg-blue': intensity[key] === 'full'}"
+							@click="setIntensity(key, 'full')"
+						>
+							Full
+						</div>
+						<div 
+							class="select bg-gray-hover"
+							:class="{'bg-blue': intensity[key] === 'double'}"
+							@click="setIntensity(key, 'double')"
+						>
+							Double
+						</div>
+					</div>
 				</li>
 			</ul>
 		</template>
@@ -67,9 +90,8 @@
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-
-	import { setHP } from '@/mixins/HpManipulations.js'
+	import { mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
 
 	export default {
 
@@ -84,14 +106,51 @@
 				manualAmount: '',
 				damageType: '',
 				crit: false,
-				log: undefined
+				log: undefined,
+				intensitySetter: undefined
 			}
 		},
 		computed: {
 			...mapGetters([
 				'entities',
 				'targeted',
-			])
+			]),
+			intensity: {
+				get() {		
+					let returnValue = {}
+					for(let i in this.targeted) {
+						returnValue[this.targeted[i]] = 'full';
+					}
+					return (this.intensitySetter) ? this.intensitySetter : returnValue;
+				},
+				set(newValue) {
+					this.intensitySetter = newValue;
+					return newValue;
+				}	
+			}
+		},
+		watch: {
+			targeted(newTargets) {
+				let newIntensity = this.intensity;
+
+				//Add new targets to intensity list
+				for(let i in newTargets) {
+					let key = newTargets[i];
+
+					if(!Object.keys(this.intensity).includes(key)) {
+						this.$set(newIntensity, key, 'full')
+					}
+					this.intensity = newIntensity;
+				}
+				//Remove untargeted from intensity list
+				for(let key in newIntensity) {
+
+					if(!newTargets.includes(key)) {
+						delete newIntensity[key];
+					}
+					this.intensity = newIntensity;
+				}
+			}
 		},
 		methods: {
 			displayStats(entity) {
@@ -112,13 +171,30 @@
 				}
 				return stats
 			},
+			setIntensity(key, intensity) {
+				let newIntensity = this.intensity;
+				newIntensity[key] = intensity;
+
+				this.intensity = newIntensity;
+			},
 			setManual(type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 
 						//Update HP
 						for(let i in this.targeted) {
-							this.setHP(this.manualAmount, this.crit, this.entities[this.targeted[i]], this.current, type)
+							let key = this.targeted[i];
+							let amount = parseInt(this.manualAmount);
+
+							//Half or doulbe amount
+							if(this.intensity[key] === 'half') {
+								amount = Math.floor(amount / 2);
+							}
+							if(this.intensity[key] === 'double') {
+								amount = amount * 2;
+							}
+
+							this.setHP(amount, this.crit, this.entities[key], this.current, type)
 						}
 
 						//Reset input fields
@@ -165,6 +241,38 @@
 			position: absolute;
 			height: 25px;
 			right: 5px;
+		}
+	}
+}
+ul.select-amount {
+	list-style: none;
+	padding: 0;
+
+	li {
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		background-color: #191919;
+		margin-bottom: 1px;
+
+		.name {
+			padding: 5px;
+		}
+		.selections {
+			display: flex;
+			justify-content: flex-end;
+
+			.select {
+				padding: 0 5px;
+				margin-right: 1px;
+				line-height: 28px;
+				color: #fff;
+				user-select: none;
+				cursor: pointer;
+
+				&:last-child {
+					margin: 0;
+				}
+			}
 		}
 	}
 }

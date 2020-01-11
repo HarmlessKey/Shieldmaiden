@@ -1,17 +1,17 @@
 <template>
 	<div v-if="current" class="tab-pane roll fade" id="roll" role="tabpanel" aria-labelledby="roll-tab">
-		<p v-if="!target">No target selected</p>
-		<template v-else-if="current.entityType == 'npc'">
-			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+		<p v-if="targeted.length === 0">No target selected</p>
+		<template v-else-if="current.entityType === 'npc' && targeted.length === 1">
+			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
 					<span :class="{ 
-							'green': target.ac_bonus > 0, 
-							'red': target.ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
-						{{ displayStats(target).ac + target.ac_bonus}}
+							'green': entities[targeted[0]].ac_bonus > 0, 
+							'red': entities[targeted[0]].ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
 					</span>
-					<span v-else>{{ displayStats(target).ac }}</span>
+					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			
@@ -87,7 +87,7 @@
 
 			</template>
 		</template>
-		<p v-else>Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
+		<p v-else-if="current.entityType === 'player'">Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
 	</div>
 </template>
 
@@ -123,10 +123,7 @@
 				'entities',
 				'turn',
 				'targeted',
-			]),
-			target: function() {
-				return this.entities[this.targeted]
-			}
+			])
 		},
 		methods: {
 			displayStats(entity) {
@@ -165,11 +162,11 @@
 				var critInfo = '';
 				var highest = 0;
 
-				var ac = parseInt(this.displayStats(this.target).ac);
+				var ac = parseInt(this.displayStats(this.entities[this.targeted[0]]).ac);
 
 				//Add bonus AC if there is any
-				if(this.target.ac_bonus) {
-					ac = parseInt(this.target.ac_bonus) + ac;
+				if(this.entities[this.targeted[0]].ac_bonus) {
+					ac = parseInt(this.entities[this.targeted[0]].ac_bonus) + ac;
 				}
 
 				let toHit = [];

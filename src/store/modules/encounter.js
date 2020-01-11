@@ -304,23 +304,28 @@ const mutations = {
 		state.encounter = payload
 	},
 	SET_TARGETED(state, {e, key}) {
-		if(e.shiftKey) {
-			if(!state.targeted.includes(key)) {
-				state.targeted.push(key);
-			} else {
-				state.targeted = state.targeted.filter(function(value){
-					return value != key;
-				});
-			}
+		if(e === 'untarget') {
+			state.targeted = state.targeted.filter(function(value){
+				return value != key;
+			});
 		} else {
-			if(state.targeted.length === 0 || state.targeted != key) {
-				state.targeted = [key]
-			}
-			else {
-				state.targeted = [];
+			if(e.shiftKey) {
+				if(!state.targeted.includes(key)) {
+					state.targeted.push(key);
+				} else {
+					state.targeted = state.targeted.filter(function(value){
+						return value != key;
+					});
+				}
+			} else {
+				if(state.targeted.length === 0 || state.targeted != key) {
+					state.targeted = [key]
+				}
+				else {
+					state.targeted = [];
+				}
 			}
 		}
-		
 	},
 	START_ENCOUNTER(state) {
 		encounters_ref.child(state.path).update({

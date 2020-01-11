@@ -3,7 +3,10 @@
 			<h2 
 				class="componentHeader d-flex justify-content-between" 
 				:class="{ shadow : setShadow > 0 }">
-				<span><i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})</span>
+				<span>
+					<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+					<a v-b-popover.hover.top="'Click a target to select it. Click it again to deselect. You select every target you click.'" title="Multitargeting"><i class="fas fa-info-circle"></i></a>
+				</span>
 				<a @click="setSlide({show: true, type: 'slides/AddNpc'})"
 					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/AddNpc'})"
 					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">

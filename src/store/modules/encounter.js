@@ -314,22 +314,13 @@ const mutations = {
 				});
 			}
 		} else {
-			if(e.shiftKey) {
-				if(!state.targeted.includes(key)) {
-					state.targeted.push(key);
-				} else {
-					state.targeted = state.targeted.filter(function(value){
-						return value != key;
-					});
-				}
+			if(!state.targeted.includes(key)) {
+				state.targeted.push(key);
 			} else {
-				if(state.targeted.length === 0 || state.targeted != key) {
-					state.targeted = [key]
-				}
-				else {
-					state.targeted = [];
-				}
-			}
+				state.targeted = state.targeted.filter(function(value){
+					return value != key;
+				});
+			}	
 		}
 	},
 	START_ENCOUNTER(state) {

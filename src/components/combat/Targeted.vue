@@ -4,8 +4,8 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length === 1" @click="set_targeted(set_targeted({e: 'untarget', key: target.key}))"
-					v-b-tooltip.hover title="Untarget">
+				<a v-if="targeted.length > 0" @click="set_targeted(set_targeted({e: 'untarget', key: 'all'}))"
+					v-b-tooltip.hover title="Untarget all">
 					<i class="fas fa-times red"></i>
 				</a>
 			</div>

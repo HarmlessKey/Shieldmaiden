@@ -40,16 +40,19 @@
 					name="Manual Input" 
 					min="0"
 					class="form-control manual-input"
-					v-shortkey.avoid>
+					@keypress="submitManual($event)"
+				>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('damage')">
+					@click="setManual('damage')"
+				>
 					Attack
 					<img src="@/assets/_img/styles/sword-break.png" />
 				</button>
 				<button class="btn heal bg-green" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('healing')">
+					@click="setManual('healing')"
+				>
 					Heal
 					<img src="@/assets/_img/styles/heal.png" />
 				</button>
@@ -176,6 +179,13 @@
 				newIntensity[key] = intensity;
 
 				this.intensity = newIntensity;
+			},
+			submitManual(e) {
+				if(e.key === 'Enter' && e.shiftKey) {
+					this.setManual('healing');
+				} else if(e.key === 'Enter') {
+					this.setManual('damage');
+				}
 			},
 			setManual(type) {
 				this.$validator.validateAll().then((result) => {

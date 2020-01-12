@@ -129,29 +129,57 @@
 								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
 							</a>
 						</div>
-						<div class="health untarget" v-for="key in targeted" :key="`target-${key}`">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
-							<div class="progress health-bar">
-								<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-								<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-								<div v-show="!entities[key].stable && !entities[key].dead">
-									<span class="percentage">{{ entities[key].name }}</span>
-									<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
+						<div v-for="key in targeted" :key="`target-${key}`" class="target bg-gray-dark">
+							<div class="health untarget">
+								<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
+								<div class="progress health-bar">
+									<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+									<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+									<div v-show="!entities[key].stable && !entities[key].dead">
+										<span class="percentage">{{ entities[key].name }}</span>
+										<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
+									</div>
+									<div class="progress-bar" 
+										:class="{ 
+											'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
+											'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
+											'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
+										}" 
+										role="progressbar" 
+										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+									</div>
 								</div>
-								<div class="progress-bar" 
-									:class="{ 
-										'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
-										'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
-										'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
-									}" 
-									role="progressbar" 
-									:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-								</div>
+								<a class="clear" @click="set_targeted({e: 'untarget', key})"
+									v-b-tooltip.hover title="Untarget">
+									<i class="fas fa-times red"></i>
+								</a>
 							</div>
-							<a class="clear" @click="set_targeted({e: 'untarget', key})"
-								v-b-tooltip.hover title="Untarget">
-								<i class="fas fa-times red"></i>
-							</a>
+							<div class="scores">
+								<template v-for="(ability, index) in abilities">
+									<div
+										:key="`score-${index}`" 
+										v-if="entities[key][ability.ability]"
+										class="ability"
+									>
+										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+										<div 
+											class="mod"
+											v-b-tooltip.hover title="Roll Check"
+											@click="rollAbility(ability.ability, entities[key][ability.ability])"
+										>
+											{{ modifier(entities[key][ability.ability]) }}
+										</div>
+										<div 
+											class="mod"
+											v-b-tooltip.hover title="Roll Save"
+											v-if="entities[key].entityType === 'npc'"
+											@click="rollAbility(ability.ability, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 'save')"
+										>
+											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+										</div>
+									</div>
+								</template>
+							</div>
 						</div>
 					</template>
 					<h2 v-else class="red">No target</h2>
@@ -186,7 +214,8 @@
 				showKeybinds: {
 					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
-				}
+				},
+				abilities: db.ref('abilities')
 			}
 		},
 		watch: {
@@ -301,6 +330,33 @@
 				}
 				return stats
 			},
+			modifier(score) {
+				var mod = Math.floor((score - 10) / 2)
+				if(mod >= 0) {
+					return '+' + mod
+				}
+				else {
+					return mod
+				}
+			},
+			rollAbility(ability, score, type = 'check') {
+				if(typeof score === 'string') {
+					score = parseInt(score.substr(1));
+				}
+				var modifier = (type === 'check') ? parseInt(Math.floor((score - 10) / 2)) : score;
+				var roll = (Math.floor(Math.random() * 20) + 1);
+				var total = roll + modifier;
+				if(modifier >= 0) {
+					var mod = '+' + modifier
+				}
+				else {
+					mod = modifier
+				}
+				
+				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
+					position: "centerTop"
+				});
+			}
 		}
 	}
 </script>
@@ -334,8 +390,7 @@
 		grid-template-columns: 30px 1fr;
 		grid-template-rows: auto;
 		grid-gap: 0;
-
-		margin-bottom: 10px;
+		user-select: none;
 
 		&.untarget {
 			grid-template-columns: 30px 1fr 30px;
@@ -375,6 +430,25 @@
 			}
 			span.percentage {
 				left: 5px;
+			}
+		}
+	}
+	.target {
+		margin-bottom: 10px;
+		
+		.scores {
+			display: flex;
+			justify-content: space-between;
+			user-select: none;
+			padding: 5px;
+	
+			.ability {
+				text-align: center;
+				cursor: pointer;
+
+				.mod {
+					line-height: 25px;
+				}
 			}
 		}
 	}

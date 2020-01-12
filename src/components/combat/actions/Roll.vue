@@ -81,7 +81,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action, advantage)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>

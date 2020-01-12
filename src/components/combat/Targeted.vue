@@ -341,7 +341,7 @@
 			},
 			rollAbility(ability, score, type = 'check') {
 				if(typeof score === 'string') {
-					score = parseInt(score.substr(1));
+					score = parseInt(score);
 				}
 				var modifier = (type === 'check') ? parseInt(Math.floor((score - 10) / 2)) : score;
 				var roll = (Math.floor(Math.random() * 20) + 1);
@@ -439,13 +439,13 @@
 		
 		.scores {
 			width: 100%;
-			margin-top: 5px;
 			display: grid;
 			grid-template-columns: repeat(6, 1fr);
 			user-select: none;
 			grid-column-gap: 1px;
 	
 			.ability {
+				margin-top: 5px;
 				text-align: center;
 
 				.abilityName {

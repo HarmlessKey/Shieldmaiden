@@ -346,6 +346,7 @@
 		display: grid;
 		grid-template-columns: auto max-content;
 		grid-template-areas: "money actions";
+		user-select: none;
 
 		.money {
 			display: flex;

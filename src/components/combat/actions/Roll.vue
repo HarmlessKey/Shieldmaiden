@@ -117,7 +117,7 @@
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
-       			options: [
+				options: [
 					{ text: 'To hit', value: 'toHit' },
 					{ text: 'Damage', value: 'damage' },
 					{ text: 'Modifiers', value: 'modifiers' },

@@ -5,7 +5,7 @@
 				:class="{ shadow : setShadow > 0 }">
 				<span>
 					<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
-					<a v-b-popover.hover.top="'Click a target to select it. Click it again to deselect. You select every target you click.'" title="Multitargeting"><i class="fas fa-info-circle"></i></a>
+					<a v-b-popover.hover.top="'Use shift+click to select multiple targets, or hold down on a tablet or phone.'" title="Multitargeting"><i class="fas fa-info-circle"></i></a>
 				</span>
 				<a @click="setSlide({show: true, type: 'slides/AddNpc'})"
 					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/AddNpc'})"
@@ -20,6 +20,7 @@
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 					<div>
+						<!-- ACTIVE TARGETS -->
 						<transition-group 
 							tag="ul" 
 							class="targets active_targets pt-3" 
@@ -41,8 +42,13 @@
 								</span>
 
 								<div class="target" 
-									@click="set_targeted({e: $event, key: entity.key})"
-									v-shortkey="[i]" @shortkey="set_targeted({e: $event, key: entity.key})">
+									@mousedown="start($event, entity.key)" 
+									@mouseleave="stop" 
+									@mouseup="stop" 
+									@touchstart="start($event, entity.key)" 
+									@touchend="stop" 
+									@touchcancel="stop"
+									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
 									<TargetItem :item="entity.key" :i="i" />
 								</div>
 								<span>
@@ -102,6 +108,8 @@
 								</span>
 							</li>
 						</transition-group>
+
+						<!-- IDLE TARGETS -->
 						<template v-if="_idle.length">
 							<hr>
 							<h2>IDLE ({{ _idle.length }})</h2>
@@ -110,7 +118,15 @@
 									<li class="d-flex justify-content-between" 
 										v-bind:key="entity.key" 
 										:class="{ targeted : targeted.includes(entity.key) }">
-										<div class="target" @click="set_targeted({e: $event, key: entity.key})">
+										<div 
+											class="target" 
+											@mousedown="start($event, entity.key)" 
+											@mouseleave="stop" 
+											@mouseup="stop" 
+											@touchstart="start($event, entity.key)" 
+											@touchend="stop" 
+											@touchcancel="stop"
+										>
 											<TargetItem :item="entity.key" />
 										</div>
 										<span>
@@ -169,7 +185,16 @@
 							<hr>
 							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ _down.length }})</h2>
 							<ul class="targets down_targets">
-								<li v-for="(entity, index) in _down" :key="index" @click="set_targeted({e: $event, key: entity.key})" :class="{ targeted : targeted.includes(entity.key) }">
+								<li 
+									v-for="(entity, index) in _down" 
+									:key="index" 
+									@mousedown="start($event, entity.key)" 
+									@mouseleave="stop" 
+									@mouseup="stop" 
+									@touchstart="start($event, entity.key)" 
+									@touchend="stop" 
+									@touchcancel="stop" 
+									:class="{ targeted : targeted.includes(entity.key) }">
 									<TargetItem :item="entity.key" />
 								</li>
 							</ul>
@@ -195,6 +220,10 @@
 				userId: auth.currentUser.uid,
 				currentTarget: {},
 				setShadow: 0,
+				interval:false,
+				counter: 0,
+				event: undefined,
+				key: undefined
 			}
 		},
 		computed: {
@@ -248,6 +277,13 @@
 				}
 			}
 		},
+		watch: {
+			counter(newValue) {
+				if(newValue > 8) {
+					this.stop()
+				}
+			}
+		},
 		methods: {
 			...mapActions([
 				'setSlide',
@@ -256,6 +292,31 @@
 				'set_stable',
 				'remove_entity',
 			]),
+			start(e, key) {
+				//Check how long the item is being pressed
+				if(!this.interval){
+					this.interval = setInterval(() => this.counter++, 30);
+					this.event = e;
+					this.key = key;
+				}
+			},
+			stop(){
+				//If and item was pressed, see if it was long or short
+				if(this.interval) {
+					let longPress = (this.counter >= 8) ? true : false;
+	
+					this.set_targeted({
+						longPress,
+						e: this.event,
+						key: this.key
+					})
+				}
+				//Reset all values
+				clearInterval(this.interval)
+				this.interval = false;
+				this.counter = 0;
+				this.key = undefined;
+			},
 			edit(key, entity, entityType) {
 				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
 

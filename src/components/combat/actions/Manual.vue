@@ -41,6 +41,8 @@
 					min="0"
 					class="form-control manual-input"
 					@keypress="submitManual($event)"
+					v-b-tooltip.hover
+					title="Enter=Damge, Shift+Enter=Healing"
 				>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 

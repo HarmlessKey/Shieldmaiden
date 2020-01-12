@@ -303,7 +303,7 @@ const mutations = {
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
 	},
-	SET_TARGETED(state, {e, key}) {
+	SET_TARGETED(state, {longPress, e, key}) {
 		if(e === 'untarget') {
 			if(key === 'all') {
 				state.targeted = [];
@@ -314,13 +314,22 @@ const mutations = {
 				});
 			}
 		} else {
-			if(!state.targeted.includes(key)) {
-				state.targeted.push(key);
+			if(longPress || e.shiftKey) {
+				if(!state.targeted.includes(key)) {
+					state.targeted.push(key);
+				} else {
+					state.targeted = state.targeted.filter(function(value){
+						return value != key;
+					});
+				}
 			} else {
-				state.targeted = state.targeted.filter(function(value){
-					return value != key;
-				});
-			}	
+				if(state.targeted.length === 0 || state.targeted != key) {
+					state.targeted = [key]
+				}
+				else {
+					state.targeted = [];
+				}
+			}
 		}
 	},
 	START_ENCOUNTER(state) {

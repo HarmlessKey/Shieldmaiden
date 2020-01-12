@@ -113,8 +113,8 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
 
 	export default {
 		name: 'TargetItem',

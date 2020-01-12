@@ -27,7 +27,14 @@
 							<template v-else>overhealing</template>)
 						</span>
 						<div class="undo" v-if="key == 0 && !encounter.finished">
-							<a @click="undo(key, item.amount, item.over, item.target, item.by, item.type)">Undo</a>
+							<a 
+								@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
+								v-shortkey="['ctrl', 'z']" 
+								@shortkey="undo(key, item.amount, item.over, item.target, item.by, item.type)"
+							>
+								Undo
+								<template v-if="showKeybinds.keyBinds === undefined"> [ctrl] + [z]</template>
+							</a>
 						</div>
 					</li>
 				</transition-group>
@@ -37,18 +44,28 @@
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-	import { setHP } from '@/mixins/HpManipulations.js'
+	import { mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
+	import { db } from '@/firebase';
 
 	export default {
 		name: 'Log',
 		mixins: [setHP],
 		data() {
 			return {
+				user: this.$store.getters.getUser,
 				storageLog: JSON.parse(localStorage.getItem(this.$route.params.encid)),
 				environment: {
 					key: 'environment',
 				},
+			}
+		},
+		firebase() {
+			return {
+				showKeybinds: {
+					source: db.ref(`settings/${this.user.uid}/general`),
+					asObject: true
+				}
 			}
 		},
 		computed: {
@@ -115,11 +132,12 @@ ul {
 				position: absolute;
 				line-height: 28px;
 				height: 28px;
-				width: 60px;
+				width: max-content;
+				padding: 0 5px;
 				top: 50%;
 				left: 50%;
 				margin-top: -14px;
-				margin-left: -30px;
+				transform: translateX(-50%);
 			}
 		}
 		&:hover {

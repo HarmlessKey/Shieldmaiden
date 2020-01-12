@@ -129,7 +129,7 @@
 								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
 							</a>
 						</div>
-						<div v-for="key in targeted" :key="`target-${key}`" class="target bg-gray-dark">
+						<div v-for="key in targeted" :key="`target-${key}`" class="target">
 							<div class="health untarget">
 								<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
 								<div class="progress health-bar">
@@ -149,7 +149,7 @@
 										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 									</div>
 								</div>
-								<a class="clear" @click="set_targeted({e: 'untarget', key})"
+								<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})"
 									v-b-tooltip.hover title="Untarget">
 									<i class="fas fa-times red"></i>
 								</a>
@@ -163,14 +163,14 @@
 									>
 										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 										<div 
-											class="mod"
+											class="mod bg-gray-dark"
 											v-b-tooltip.hover title="Roll Check"
 											@click="rollAbility(ability.ability, entities[key][ability.ability])"
 										>
 											{{ modifier(entities[key][ability.ability]) }}
 										</div>
 										<div 
-											class="mod"
+											class="mod bg-gray-dark"
 											v-b-tooltip.hover title="Roll Save"
 											v-if="entities[key].entityType === 'npc'"
 											@click="rollAbility(ability.ability, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 'save')"
@@ -399,7 +399,7 @@
 				display: block;
 				width: 30px;
 				height: 30px;
-				padding: 6px 10px 14px 10px;
+				padding: 5px 10px 15px 10px;
 				font-size: 15px;
 			}
 		}
@@ -435,19 +435,26 @@
 	}
 	.target {
 		margin-bottom: 10px;
+		border: solid 1px #191919;
 		
 		.scores {
-			display: flex;
-			justify-content: space-between;
+			width: 100%;
+			margin-top: 5px;
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
 			user-select: none;
-			padding: 5px;
+			grid-column-gap: 1px;
 	
 			.ability {
 				text-align: center;
-				cursor: pointer;
 
+				.abilityName {
+					margin-bottom: 3px;
+				}
 				.mod {
+					cursor: pointer;
 					line-height: 25px;
+					margin-top: 1px;
 				}
 			}
 		}

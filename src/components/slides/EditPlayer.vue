@@ -264,7 +264,6 @@
 			},
 			isXpAdvancement() {
 				let adv =  this.advancement['.value'] != 'milestone';
-				console.log(adv)
 				return adv
 			},
 			set_save(check, index) {

@@ -80,6 +80,9 @@ html body {
 		top: 0;
 		z-index: 999;
 	}
+	pre {
+		color: $gray-light;
+	}
 
 /* 3. Heading */
 /*********************************************/
@@ -155,6 +158,11 @@ html body {
 
 .pointer {
 	cursor: pointer !important;
+}
+.truncate {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .scroll {
@@ -1053,14 +1061,50 @@ ul.nav {
 	}
 }
 .snotify-simple {
+	border: solid 1px $gray-hover;
+
 	.snotifyToast__inner {
-		padding-top: 13px !important;
+		padding: 13px 15px 15px 15px !important;
 		background-color: $gray-dark !important;
 
-		.snotifyToast__title, .snotifyToast__body {
+		.snotifyToast__title {
 			color: $gray-light !important;
+			width: 100%;
+			
+			
+			.target {
+				display: grid;
+				grid-template-columns: 30px 30px 1fr;
+				font-size: 15px;
+				line-height: 30px;
+				margin-bottom: 10px;
+				text-transform: none !important;
+				background-color: $gray-darker;
+				position: relative;
+				
+				.ac {
+					text-align: center;
+					background-color: $black;
+				}
+				.image {
+					width: 30px;
+					height: 30px;
+					background-size: cover;
+					background-position: center top;
+					background-color: $black;
+				}
+				.name {
+					padding: 0 10px;
+				}
+				&:hover {
+					.name {
+						direction: rtl;
+					}
+				}
+			}
 		}
 		.snotifyToast__body {
+			color: $gray-light !important;
 			h2 {
 				text-transform: none !important;
 				margin-bottom: 5px !important;

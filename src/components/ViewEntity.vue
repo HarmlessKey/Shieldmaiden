@@ -279,6 +279,7 @@ a {
 .abilities {
 	margin-top: 30px;
 	white-space: nowrap;
+	user-select: none;
 
 	.ability {
 		height: 60px;

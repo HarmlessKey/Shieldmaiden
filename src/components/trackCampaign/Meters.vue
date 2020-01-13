@@ -251,6 +251,7 @@
 			height: 30px;
 			border-bottom: solid 3px #000;
 			position: relative;
+			user-select: none;
 
 			ul {
 				height: 30px;

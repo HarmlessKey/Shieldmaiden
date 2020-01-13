@@ -1,29 +1,31 @@
 <template>
-	<div v-if="current" class="tab-pane roll fade" id="roll" role="tabpanel" aria-labelledby="roll-tab">
-		<p v-if="!target">No target selected</p>
-		<template v-else-if="current.entityType == 'npc'">
-			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+	<div v-if="current">
+		<p v-if="targeted.length === 0">No target selected</p>
+		<template v-else-if="current.entityType === 'npc'">
+			<p v-if="targeted.length === 1">
+				<i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
 					<span :class="{ 
-							'green': target.ac_bonus > 0, 
-							'red': target.ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
-						{{ displayStats(target).ac + target.ac_bonus}}
+							'green': entities[targeted[0]].ac_bonus > 0, 
+							'red': entities[targeted[0]].ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
 					</span>
-					<span v-else>{{ displayStats(target).ac }}</span>
+					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			
 			<template v-if="current.actions">
 				<h2>Actions</h2>
 
+				<!-- ROLL OPTIONS -->
 				<div class="d-flex justify-content-between">
 					<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
 					<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
 				</div>
 				<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
-					<b-form-group label="Options open roll">
+					<b-form-group label="Display options open roll">
 						<b-form-checkbox-group
 							v-model="rollOptions"
 							:options="options"
@@ -33,8 +35,11 @@
 					</b-form-group>
 					<small>Open rolls are shown on the player screen.</small>
 				</div>
+				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
+				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damge once</b-form-checkbox>
 
-				<div class="advantage d-flex justify-content-between">
+
+				<div v-if="toHit" class="advantage d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
 						Advantage
@@ -54,7 +59,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action, advantage)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
@@ -76,7 +81,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="roll(action, advantage)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 							</button>
@@ -87,7 +92,7 @@
 
 			</template>
 		</template>
-		<p v-else>Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
+		<p v-else-if="current.entityType === 'player'">Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
 	</div>
 </template>
 
@@ -110,11 +115,14 @@
 				advantage: false,
 				openRoll: false,
 				rollOptions: ['toHit', 'damage'],
-        options: [
-          { text: 'To hit', value: 'toHit' },
-          { text: 'Damage', value: 'damage' },
-          { text: 'Modifiers', value: 'modifiers' },
-        ]
+				setToHit: undefined,
+				rollOnce: true,
+				options: [
+					{ text: 'To hit', value: 'toHit' },
+					{ text: 'Damage', value: 'damage' },
+					{ text: 'Modifiers', value: 'modifiers' },
+				],
+				aoeRoll: undefined
 			}
 		},
 		computed: {
@@ -122,10 +130,27 @@
 				'encounter',
 				'entities',
 				'turn',
-				'targeted',
+				'targeted'
 			]),
-			target: function() {
-				return this.entities[this.targeted]
+			toHit: {
+				get() {
+					let hit = true
+					if(this.targeted.length > 1) {
+						hit = false;
+					}
+					return (this.setToHit) ? this.setToHit : hit;
+				},
+				set(newValue) {
+					this.setToHit = newValue;
+					return newValue;
+				}
+			}
+		},
+		watch: {
+			targeted(newValue) {
+				if(newValue.length > 1) {
+					this.toHit = false;
+				}
 			}
 		},
 		methods: {
@@ -154,7 +179,16 @@
 					this.advantage = value;
 				}
 			},
-			roll(action, advantage) {
+			groupRoll(action) {
+				for(let i in this.targeted) {
+					let key = this.targeted[i];
+					let target = this.entities[key];
+
+					this.roll(action, target, i);
+				}
+				this.aoeRoll = undefined;
+			},
+			roll(action, target, rollCounter) {
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
@@ -165,17 +199,17 @@
 				var critInfo = '';
 				var highest = 0;
 
-				var ac = parseInt(this.displayStats(this.target).ac);
+				var ac = parseInt(this.displayStats(target).ac);
 
 				//Add bonus AC if there is any
-				if(this.target.ac_bonus) {
-					ac = parseInt(this.target.ac_bonus) + ac;
+				if(target.ac_bonus) {
+					ac = parseInt(target.ac_bonus) + ac;
 				}
 
 				let toHit = [];
 				let adv = ""
 				//If there is advantage roll twice
-				if(advantage) {
+				if(this.advantage) {
 					for(let i = 0; i <= 1; i++) {
 						toHit[i] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
 					}
@@ -184,9 +218,8 @@
 					highest = (toHit[0].total >= toHit[1].total) ? 0 : 1;
 					
 					//Set advantage message for snotify
-					let color = (advantage == 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color}">${advantage}</small>`;
-					
+					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
+					adv = `<small class="${color}">${this.advantage}</small>`;	
 				} 
 				//Roll once where there is no advantage/disadvantage
 				else {
@@ -195,17 +228,40 @@
 				}
 
 				//Roll the damage for all seperated rolls
-				for(let roll in rolls) {
-					let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[5]
-					let rolled = this.rollD(dice[1], dice[0]) //roll the dice
-					let damage = rolled.total; //roll the dice
+				//Roll if it's the first roll and rollOnce = true
+				//Roll if rollOnce is false
+				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
+					//Check if it was a crit
+					if(this.toHit) {
+						if(toHit[highest].throws[0] == '20') {
+							crit = true;
+						}
+					}	
 
-					allDamageRolls.push(rolled.throws);
-					total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+					//Roll the damage
+					for(let roll in rolls) {
+						let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[5]
+						let rolled = this.rollD(dice[1], dice[0]) //roll the dice
+						let damage = rolled.total; //roll the dice
+
+						allDamageRolls.push(rolled.throws);
+						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+
+					}
+					if(this.rollOnce) {
+						this.aoeRoll = { 
+							allDamageRolls,
+							total
+						}
+					}
+				} else {
+					//Use the first roll if rollOnce = true
+					allDamageRolls = this.aoeRoll.allDamageRolls;
+					total = this.aoeRoll.total;
 				}
 
 				//If there was disadvantage, it cannot crit
-				if(advantage == 'disadvantage') {
+				if(this.advantage == 'disadvantage') {
 					highest = (highest == 0) ? 1 : 0;
 				}
 				//Check if it was a critical hit
@@ -231,29 +287,30 @@
 					total = '<span class="red">' + total + '</span>';
 				}
 
-				//If the to hit roll is a 20, it is a critical hit
-				if(toHit[highest].throws[0] == '20') {
-					hits = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
-					crit = true;
-				}
-				//If the to hit roll is a 1, it is a critical fail
-				else if(toHit[highest].throws[0] == '1') {
-					hits = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
-				}
-				else {
-					//If the to hit is higher than or equal to target's AC, it hits
-					if(toHit[highest].total >= ac) {
-						//Form HTML for snotify
-						hits = `<span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
-										<span class="green">HIT!</span> 
-										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
+				if(this.toHit) {
+					//If the to hit roll is a 20, it is a critical hit
+					if(crit) {
+						hits = '<h2 class="green">NATURAL 20</h2>'; //form HTML for snotify
 					}
-					//If the to hit is lower than the target's ac, it misses
+					//If the to hit roll is a 1, it is a critical fail
+					else if(toHit[highest].throws[0] == '1') {
+						hits = '<h2 class="red">NATURAL 1</h2>'; //form HTML fo snotify
+					}
 					else {
-						//Form HTML for snotify
-						hits = `<span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
-										<span class="red">MISS!</span> 
-										<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span>`;
+						//If the to hit is higher than or equal to target's AC, it hits
+						if(toHit[highest].total >= ac) {
+							//Form HTML for snotify
+							hits = `<h2><span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
+											<span class="green">HIT!</span> 
+											<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
+						}
+						//If the to hit is lower than the target's ac, it misses
+						else {
+							//Form HTML for snotify
+							hits = `<h2><span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
+											<span class="red">MISS!</span> 
+											<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
+						}
 					}
 				}
 
@@ -267,18 +324,23 @@
 				//BUILD SNOTIFY POPUP
 				this.$snotify.html(
 					`<div class="snotifyToast__title">
-						<b>${action.name}</b>
+						<div class="target">
+							<div class="image" style="background-image: url(${target.img});"></div>
+							<div class="ac">${target.ac}</div>
+							<div class="name truncate">${target.name}</div>
+						</div>
 					</div>
 					<div class="snotifyToast__body">
+						<h2><b>${action.name}</b></h2>
 						${adv}
-						<h2>${hits}</h2>
+						${hits}
 						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
 						${critInfo}
 
-						<a data-toggle="collapse" href="#rolls" role="button" >
+						<a data-toggle="collapse" href="#rolls-${rollCounter}" role="button" >
 							<small>Show Rolls <i class="fal fa-chevron-down"></i></small>
 						</a>
-						<p id="rolls" class="collapse">
+						<p id="rolls-${rollCounter}" class="collapse">
 							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
 							Your rolls: ${allDamageRolls}
 						</p>
@@ -289,7 +351,7 @@
 						{ 
 							text: 'Hit', 
 							action: (toast) => { 
-								this.setHP(totalDamage, crit, this.target, this.current, 'damage')
+								this.setHP(totalDamage, crit, target, this.current, 'damage')
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -298,7 +360,7 @@
 							//Does half of the damage rounded down
 							text: 'Half', 
 							action: (toast) => { 
-								this.setHP(Math.floor(totalDamage/2), crit, this.target, this.current, 'damage')
+								this.setHP(Math.floor(totalDamage/2), crit, target, this.current, 'damage')
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -307,7 +369,7 @@
 							//Does double of the damage
 							text: 'Double', 
 							action: (toast) => { 
-								this.setHP(parseInt(totalDamage*2), crit, this.target, this.current, 'damage')
+								this.setHP(parseInt(totalDamage*2), crit, target, this.current, 'damage')
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false

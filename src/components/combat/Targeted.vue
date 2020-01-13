@@ -4,8 +4,8 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted" @click="set_targeted(target.key)"
-					v-b-tooltip.hover title="Untarget">
+				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})"
+					v-b-tooltip.hover title="Untarget all">
 					<i class="fas fa-times red"></i>
 				</a>
 			</div>
@@ -36,6 +36,7 @@
 		<div class="scroll" v-bar>
 			<div v-on:scroll="shadow()" ref="scroll">
 				<div class="current">
+					<!-- SINGLE TARGET -->
 					<template v-if="target">
 						<template v-if="target.entityType == 'player' && target.curHp == 0 && !target.stable && !target.dead">
 								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
@@ -68,17 +69,17 @@
 									<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
 									<div v-show="!target.stable && !target.dead">
-										<span class="percentage">{{ percentage(displayStats().curHp, displayStats().maxHp) }}%</span>
-										<span class="hp">{{ displayStats().curHp }} / {{ displayStats().maxHp }}</span>
+										<span class="percentage">{{ percentage(displayStats(target).curHp, displayStats(target).maxHp) }}%</span>
+										<span class="hp">{{ displayStats(target).curHp }} / {{ displayStats(target).maxHp }}</span>
 									</div>
 									<div class="progress-bar" 
 										:class="{ 
-											'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
-											'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) < 76, 
-											'bg-green': percentage(displayStats().curHp, displayStats().maxHp) > 7
+											'bg-red': percentage(displayStats(target).curHp, displayStats(target).maxHp) <= 33, 
+											'bg-orange': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 33 && percentage(displayStats(target).curHp, displayStats(target).maxHp) < 76, 
+											'bg-green': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 7
 										}" 
 										role="progressbar" 
-										:style="{width: percentage(displayStats().curHp, displayStats().maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+										:style="{width: percentage(displayStats(target).curHp, displayStats(target).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 									</div>
 								</div>
 							</div>
@@ -120,6 +121,67 @@
 						</b-row>
 						<ViewEntity class="mt-3 hide" :data="target" />
 					</template>
+
+					<!-- MULTIPLE TARGETS -->
+					<template v-else-if="targeted.length > 1">
+						<div class="mb-2">
+							<a @click="setSlide({show: true, type: 'slides/DamageHealing', data: targeted})">
+								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
+							</a>
+						</div>
+						<div v-for="key in targeted" :key="`target-${key}`" class="target">
+							<div class="health untarget">
+								<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
+								<div class="progress health-bar">
+									<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+									<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+									<div v-show="!entities[key].stable && !entities[key].dead">
+										<span class="percentage">{{ entities[key].name }}</span>
+										<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
+									</div>
+									<div class="progress-bar" 
+										:class="{ 
+											'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
+											'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
+											'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
+										}" 
+										role="progressbar" 
+										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+									</div>
+								</div>
+								<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})"
+									v-b-tooltip.hover title="Untarget">
+									<i class="fas fa-times red"></i>
+								</a>
+							</div>
+							<div class="scores">
+								<template v-for="(ability, index) in abilities">
+									<div
+										:key="`score-${index}`" 
+										v-if="entities[key][ability.ability]"
+										class="ability"
+									>
+										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+										<div 
+											class="mod bg-gray-dark"
+											v-b-tooltip.hover title="Roll Check"
+											@click="rollAbility(ability.ability, entities[key][ability.ability])"
+										>
+											{{ modifier(entities[key][ability.ability]) }}
+										</div>
+										<div 
+											class="mod bg-gray-dark"
+											v-b-tooltip.hover title="Roll Save"
+											v-if="entities[key].entityType === 'npc'"
+											@click="rollAbility(ability.ability, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 'save')"
+										>
+											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+										</div>
+									</div>
+								</template>
+							</div>
+						</div>
+					</template>
 					<h2 v-else class="red">No target</h2>
 				</div>
 			</div>
@@ -152,7 +214,8 @@
 				showKeybinds: {
 					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
-				}
+				},
+				abilities: db.ref('abilities')
 			}
 		},
 		watch: {
@@ -170,7 +233,9 @@
 				'targeted',
 			]),
 			target: function() {
-				return this.entities[this.targeted]
+				if(this.targeted.length === 1) {
+					return this.entities[this.targeted[0]];
+				}
 			},
 			death_fails() {
 				let fails = 0;
@@ -247,24 +312,51 @@
 					key: key,
 				})
 			},
-			displayStats() {
+			displayStats(target) {
 				var stats = '';
-				if(this.target.transformed == true) {
+				if(target.transformed == true) {
 					stats = {
-						ac: this.target.transformedAc,
-						maxHp: this.target.transformedMaxHp,
-						curHp: this.target.transformedCurHp,
+						ac: target.transformedAc,
+						maxHp: target.transformedMaxHp,
+						curHp: target.transformedCurHp,
 					}
 				}
 				else {
 					stats = {
-						ac: this.target.ac,
-						maxHp: this.target.maxHp,
-						curHp: this.target.curHp,
+						ac: target.ac,
+						maxHp: target.maxHp,
+						curHp: target.curHp,
 					}
 				}
 				return stats
 			},
+			modifier(score) {
+				var mod = Math.floor((score - 10) / 2)
+				if(mod >= 0) {
+					return '+' + mod
+				}
+				else {
+					return mod
+				}
+			},
+			rollAbility(ability, score, type = 'check') {
+				if(typeof score === 'string') {
+					score = parseInt(score);
+				}
+				var modifier = (type === 'check') ? parseInt(Math.floor((score - 10) / 2)) : score;
+				var roll = (Math.floor(Math.random() * 20) + 1);
+				var total = roll + modifier;
+				if(modifier >= 0) {
+					var mod = '+' + modifier
+				}
+				else {
+					mod = modifier
+				}
+				
+				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
+					position: "centerTop"
+				});
+			}
 		}
 	}
 </script>
@@ -298,17 +390,25 @@
 		grid-template-columns: 30px 1fr;
 		grid-template-rows: auto;
 		grid-gap: 0;
-		grid-template-areas: 
-		"img hp-bar";
+		user-select: none;
 
-		margin-bottom: 10px;
+		&.untarget {
+			grid-template-columns: 30px 1fr 30px;
+
+			.clear {
+				display: block;
+				width: 30px;
+				height: 30px;
+				padding: 5px 10px 15px 10px;
+				font-size: 15px;
+			}
+		}
 
 		.img {
 			background-color: #191919;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
-			grid-area: img;
 		}
 		.progress { 
 			height: 30px;
@@ -330,6 +430,32 @@
 			}
 			span.percentage {
 				left: 5px;
+			}
+		}
+	}
+	.target {
+		margin-bottom: 10px;
+		border: solid 1px #191919;
+		
+		.scores {
+			width: 100%;
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
+			user-select: none;
+			grid-column-gap: 1px;
+	
+			.ability {
+				margin-top: 5px;
+				text-align: center;
+
+				.abilityName {
+					margin-bottom: 3px;
+				}
+				.mod {
+					cursor: pointer;
+					line-height: 25px;
+					margin-top: 1px;
+				}
 			}
 		}
 	}

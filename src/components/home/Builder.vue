@@ -9,13 +9,6 @@
 			</div>
 
 			<img class="image" src="@/assets/_img/encounter-builder.gif"/>
-	
-			<!-- <h3>Encounter builder</h3>
-			
-			<ul>
-				<li>Calculates difficulty</li>
-				<li>Use your custom created Monsters</li>
-			</ul> -->
 
 			<div class="text-center">
 				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
@@ -41,7 +34,7 @@
 		background-color: #181818;
 
 		.head {
-			margin-bottom: 30px;
+			padding-bottom: 30px;
 		}
 		.image {
 			width: 100%;

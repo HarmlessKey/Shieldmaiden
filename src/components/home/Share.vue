@@ -41,6 +41,7 @@
 
 <style lang="scss" scoped>
 	.share {
+		padding-bottom: 50px;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #111111;
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="home" v-if="diceColors.length > 0" v-on:scroll.passive="handleScroll">
+	<div class="home" v-if="diceColors.length > 0" v-on:scroll="handleScroll">
 		<section id="top">
 			<Top />
 			<span 
@@ -20,8 +20,8 @@
 				}">
 			</span>
 		</section>
-		<section id="content">
-			<Content />
+		<section id="builder">
+			<Builder />
 			<span 
 				class="die" 
 				:style="{ 
@@ -32,6 +32,16 @@
 		</section>
 		<section id="share">
 			<Share />
+			<span 
+				class="die" 
+				:style="{ 
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+					transform: `rotate(${scrolled}deg)`
+				}">
+			</span>
+		</section>
+		<section id="share">
+			<Campaign />
 		</section>
 		<Footer />
 		<div class="patreon bg-black d-flex justify-content-end">
@@ -45,7 +55,8 @@
 	import Top from '@/components/home/Top.vue'
 	import General from '@/components/home/General.vue'
 	import Share from '@/components/home/Share.vue'
-	import Content from '@/components/home/Content.vue'
+	import Builder from '@/components/home/Builder.vue'
+	import Campaign from '@/components/home/Campaign.vue'
 	import Footer from '@/components/Footer.vue'
 
 	export default {
@@ -54,8 +65,9 @@
 			Top,
 			General,
 			Share,
-			Content,
-			Footer,
+			Builder,
+			Campaign,
+			Footer
 		},
 		data() {
 			return {
@@ -63,9 +75,9 @@
 			}
 		},
 		metaInfo: {
-			title: 'Harmless Key | D&D Encounter Tracker',
+			title: 'Encounter Tracker D&D | Harmless Key',
 			meta: [
-				{ vmid: 'description', name: 'description', content: 'The initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
+				{ vmid: 'description', name: 'description', content: 'Initiative tracker for D&D 5e. Our tool keeps track of everything in encounters so even during combat you can give your players the attention they deserve.' }
 			]
 		},
 		computed: {
@@ -101,8 +113,8 @@
 
 .home {
 	padding-bottom: 55px;
-	height: 100vh;
 	overflow-y: scroll;
+	height: 100vh;
 
 	&::-webkit-scrollbar {
 		display: none;

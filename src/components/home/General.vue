@@ -21,13 +21,14 @@
 						<li>Concentration</li>
 						<li>Reactions used</li>
 						<li>Custom reminders for other effects</li>
+						<li>Multi-targeting (perfect for AOE damage)</li>
 						<li>Roll monster abilities and apply damage instantly</li>
 					</ul>
 
 					<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
 				</b-col>
 			</b-row>
-			<a href="#content" class="next">
+			<a href="#builder" class="next">
 				<div>Build encounters</div>
 				<i class="fas fa-chevron-down"></i>
 			</a>

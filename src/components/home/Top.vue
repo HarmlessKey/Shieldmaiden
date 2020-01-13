@@ -8,7 +8,7 @@
 						<div class="text-center gray-hover mb-4">Build by 2 guys with a passion for the game.</div>
 						<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
 
-						<h3>We track everything, so you have the time to give your players the attention they deserve.</h3>
+						<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
 
 						<router-link to="sign-up" class="btn btn-lg">Create Account</router-link>
 
@@ -54,7 +54,7 @@
 					text-align: center;
 					margin: auto;
 					max-width: 800px;
-					padding: 25px 20px 50px 20px;
+					padding: 25px 20px 20px 20px;
 					text-shadow: 2px 2px 1px #000;
 
 					h1 {

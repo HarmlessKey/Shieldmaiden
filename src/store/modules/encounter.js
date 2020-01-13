@@ -9,7 +9,7 @@ const getDefaultState = () => {
 	return {
 		uid: undefined,
 		entities: {},
-		targeted: undefined,
+		targeted: [],
 		encounter: undefined,
 		campaignId: undefined,
 		encounterId: undefined,
@@ -303,12 +303,33 @@ const mutations = {
 	SET_ENCOUNTER(state, payload) {
 		state.encounter = payload
 	},
-	SET_TARGETED(state, payload) {
-		if(state.targeted == undefined || state.targeted != payload) {
-			state.targeted = payload
-		}
-		else {
-			state.targeted = undefined
+	SET_TARGETED(state, {longPress, e, key}) {
+		if(e === 'untarget') {
+			if(key === 'all') {
+				state.targeted = [];
+			}
+			else {
+				state.targeted = state.targeted.filter(function(value){
+					return value != key;
+				});
+			}
+		} else {
+			if(longPress || e.shiftKey) {
+				if(!state.targeted.includes(key)) {
+					state.targeted.push(key);
+				} else {
+					state.targeted = state.targeted.filter(function(value){
+						return value != key;
+					});
+				}
+			} else {
+				if(state.targeted.length === 0 || state.targeted != key) {
+					state.targeted = [key]
+				}
+				else {
+					state.targeted = [];
+				}
+			}
 		}
 	},
 	START_ENCOUNTER(state) {

@@ -1,17 +1,17 @@
 <template>
-	<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-		<p v-if="!target">No target selected</p>
+	<div>
+		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else>
-			<p><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ target.name }}</b><br/>
+			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 
 				<b class="blue">
 					<span :class="{ 
-							'green': target.ac_bonus > 0, 
-							'red': target.ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + target.ac_bonus" v-if="target.ac_bonus">
-						{{ displayStats(target).ac + target.ac_bonus}}
+							'green': entities[targeted[0]].ac_bonus > 0, 
+							'red': entities[targeted[0]].ac_bonus < 0 
+						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
 					</span>
-					<span v-else>{{ displayStats(target).ac }}</span>
+					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
@@ -40,30 +40,63 @@
 					name="Manual Input" 
 					min="0"
 					class="form-control manual-input"
-					v-shortkey.avoid>
+					@keypress="submitManual($event)"
+					v-b-tooltip.hover
+					title="Enter=Damge, Shift+Enter=Healing"
+				>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'damage')">
+					@click="setManual('damage')"
+				>
 					Attack
 					<img src="@/assets/_img/styles/sword-break.png" />
 				</button>
 				<button class="btn heal bg-green" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'healing')">
+					@click="setManual('healing')"
+				>
 					Heal
 					<img src="@/assets/_img/styles/heal.png" />
 				</button>
 			</div>
 			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
 			<h2 class="mt-2 text-center">{{ manualAmount }}</h2>
+			
+			<ul class="select-amount">
+				<li v-for="key in targeted" :key="`target-${key}`">
+					<div class="name truncate">{{ entities[key].name }}</div>
+					<div class="selections">
+						<div 
+							class="select bg-gray-hover" 
+							:class="{'bg-blue': intensity[key] === 'half'}"
+							@click="setIntensity(key, 'half')"
+						>
+							Half
+						</div>
+						<div 
+							class="select bg-gray-hover" 
+							:class="{'bg-blue': intensity[key] === 'full'}"
+							@click="setIntensity(key, 'full')"
+						>
+							Full
+						</div>
+						<div 
+							class="select bg-gray-hover"
+							:class="{'bg-blue': intensity[key] === 'double'}"
+							@click="setIntensity(key, 'double')"
+						>
+							Double
+						</div>
+					</div>
+				</li>
+			</ul>
 		</template>
 	</div>
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-
-	import { setHP } from '@/mixins/HpManipulations.js'
+	import { mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
 
 	export default {
 
@@ -78,7 +111,8 @@
 				manualAmount: '',
 				damageType: '',
 				crit: false,
-				log: undefined
+				log: undefined,
+				intensitySetter: undefined
 			}
 		},
 		computed: {
@@ -86,8 +120,41 @@
 				'entities',
 				'targeted',
 			]),
-			target: function() {
-				return this.entities[this.targeted]
+			intensity: {
+				get() {		
+					let returnValue = {}
+					for(let i in this.targeted) {
+						returnValue[this.targeted[i]] = 'full';
+					}
+					return (this.intensitySetter) ? this.intensitySetter : returnValue;
+				},
+				set(newValue) {
+					this.intensitySetter = newValue;
+					return newValue;
+				}	
+			}
+		},
+		watch: {
+			targeted(newTargets) {
+				let newIntensity = this.intensity;
+
+				//Add new targets to intensity list
+				for(let i in newTargets) {
+					let key = newTargets[i];
+
+					if(!Object.keys(this.intensity).includes(key)) {
+						this.$set(newIntensity, key, 'full')
+					}
+					this.intensity = newIntensity;
+				}
+				//Remove untargeted from intensity list
+				for(let key in newIntensity) {
+
+					if(!newTargets.includes(key)) {
+						delete newIntensity[key];
+					}
+					this.intensity = newIntensity;
+				}
 			}
 		},
 		methods: {
@@ -109,12 +176,38 @@
 				}
 				return stats
 			},
-			setManual(target, type) {
+			setIntensity(key, intensity) {
+				let newIntensity = this.intensity;
+				newIntensity[key] = intensity;
+
+				this.intensity = newIntensity;
+			},
+			submitManual(e) {
+				if(e.key === 'Enter' && e.shiftKey) {
+					this.setManual('healing');
+				} else if(e.key === 'Enter') {
+					this.setManual('damage');
+				}
+			},
+			setManual(type) {
 				this.$validator.validateAll().then((result) => {
 					if(result && this.manualAmount != '') {
 
 						//Update HP
-						this.setHP(this.manualAmount, this.crit, target, this.current, type)
+						for(let i in this.targeted) {
+							let key = this.targeted[i];
+							let amount = parseInt(this.manualAmount);
+
+							//Half or doulbe amount
+							if(this.intensity[key] === 'half') {
+								amount = Math.floor(amount / 2);
+							}
+							if(this.intensity[key] === 'double') {
+								amount = amount * 2;
+							}
+
+							this.setHP(amount, this.crit, this.entities[key], this.current, type)
+						}
 
 						//Reset input fields
 						this.manualAmount = '';
@@ -160,6 +253,38 @@
 			position: absolute;
 			height: 25px;
 			right: 5px;
+		}
+	}
+}
+ul.select-amount {
+	list-style: none;
+	padding: 0;
+
+	li {
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		background-color: #191919;
+		margin-bottom: 1px;
+
+		.name {
+			padding: 5px;
+		}
+		.selections {
+			display: flex;
+			justify-content: flex-end;
+
+			.select {
+				padding: 0 5px;
+				margin-right: 1px;
+				line-height: 28px;
+				color: #fff;
+				user-select: none;
+				cursor: pointer;
+
+				&:last-child {
+					margin: 0;
+				}
+			}
 		}
 	}
 }

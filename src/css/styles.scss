@@ -185,6 +185,7 @@ a.large-link {
 	display: flex;
 	justify-content: flex-start;
 	box-shadow: 3px 3px 10px $black;
+	user-select: none;
 
 	.icon {
 		border-top-left-radius: 5px;

@@ -831,6 +831,14 @@ ul.entities {
 
 /* 6. Bootstrap overrides*/
 /*********************************************/
+.navbar {
+	width: 100%;
+	border-bottom: solid 1px $gray-light;
+
+	.navbar-brand, a.nav-link {
+		color: $white !important;
+	}
+}
 .btn {
 	border-radius: 0 !important;
 	background: $blue;

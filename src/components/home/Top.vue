@@ -1,20 +1,20 @@
 <template>
-	<div class="top" :style="{'background-image': 'url(' + require('@/assets/_img/styles/paper-bg.png') + ')'}" v-if="userInfo">
+	<div class="top" :style="{'background-image': 'url(' + require('@/assets/_img/styles/paper-bg.png') + ')'}">
 		<div class="container-fluid">
 			<div class="container">
 				<img  v-if="!user" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
-				<div v-else class="welcome" :class="{logged: user}">
+				<div v-else class="welcome">
 					<b-navbar toggleable="lg" type="dark">
 						<b-navbar-brand>
-							Welcome {{ userInfo.username }}
+							Welcome
 						</b-navbar-brand>
 						<b-collapse id="nav-collapse" is-nav>
 							<b-navbar-nav class="ml-auto">
 								<b-navbar-nav>
-									<b-nav-item to="campaigns"><i class="fas fa-dungeon"></i></b-nav-item>
-									<b-nav-item to="players"><i class="fas fa-users"></i></b-nav-item>
-									<b-nav-item to="npcs"><i class="fas fa-dragon"></i></b-nav-item>
-									<b-nav-item to="items"><i class="far fa-staff"></i></b-nav-item>
+									<b-nav-item v-b-tooltip.hover.bottom="'Campaigns'"  to="campaigns"><i class="fas fa-dungeon"></i></b-nav-item>
+									<b-nav-item v-b-tooltip.hover.bottom="'Players'" to="players"><i class="fas fa-users"></i></b-nav-item>
+									<b-nav-item v-b-tooltip.hover.bottom="'NPC\'s'" to="npcs"><i class="fas fa-dragon"></i></b-nav-item>
+									<b-nav-item v-b-tooltip.hover.bottom="'Items'" to="items"><i class="far fa-staff"></i></b-nav-item>
 								</b-navbar-nav>	
 							</b-navbar-nav>
 						</b-collapse>

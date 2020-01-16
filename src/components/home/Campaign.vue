@@ -2,15 +2,15 @@
 	<div class="campaign">
 		<div class="container">
 			<div class="head">
-				<h2>Dungeons & Dragons Campaign Manager</h2>
+				<h2>Campaign Manager</h2>
 				<span>
-					Our tool started out as a combat tracker, but it has been and still is growing. Over time we became more, but if you just want to run your encounters, we are still perfect for that.
+					Our tool started out as a combat tracker for Dungeons & Dragons, but it has been growing a lot. Over time we became more, but if you just want to run your encounters, we are still perfect for that.
 				</span>
 			</div>
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/campaign-manager-harmless-key.png"/>
+					<img class="image" src="@/assets/_img/player-overview.gif"/>
 				</b-col>
 				<b-col>
 					<h3>More than an encounter tool,<br/> if you want it to be.</h3>
@@ -39,7 +39,7 @@
 	.campaign {
 		padding-bottom: 50px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #191919;
+		background-color: #181818;
 
 		ul {
 			margin-bottom: 30px;

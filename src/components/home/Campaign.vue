@@ -10,7 +10,7 @@
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/player-overview.gif"/>
+					<img class="image" src="@/assets/_img/home/player-overview.gif"/>
 				</b-col>
 				<b-col>
 					<h3>More than an encounter tool,<br/> if you want it to be.</h3>

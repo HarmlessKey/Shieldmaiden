@@ -10,7 +10,7 @@
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/multitargeting.gif"/>
+					<img class="image" src="@/assets/_img/home/multitargeting.gif"/>
 					<!-- <iframe src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 				</b-col>
 				<b-col>

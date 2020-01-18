@@ -10,7 +10,7 @@
 
 			<b-row>
 				<b-col sm="6">
-					<img class="image" src="@/assets/_img/track-encounter.gif"/>
+					<img class="image" src="@/assets/_img/home/track-encounter.gif"/>
 				</b-col>
 				<b-col>
 					<h3>Shows everything you need</h3>
@@ -29,6 +29,11 @@
 					<router-link to="sign-up" class="btn btn-lg">Try it now!</router-link>
 				</b-col>
 			</b-row>
+
+			<a class="next" href="#campaign">
+				<div>Campaign Manager</div>
+				<i class="fas fa-chevron-down"></i>
+			</a>
 		</div>
 	</div>
 </template>

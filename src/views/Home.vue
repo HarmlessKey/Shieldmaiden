@@ -10,12 +10,22 @@
 				}">
 			</span>
 		</section>
+		<section id="overview">
+			<Overview />
+			<span 
+				class="die" 
+				:style="{ 
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+					transform: `rotate(${scrolled}deg)`
+				}">
+			</span>
+		</section>
 		<section id="general">
 			<General />
 			<span 
 				class="die" 
 				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
 					transform: `rotate(${scrolled}deg)`
 				}">
 			</span>
@@ -25,7 +35,7 @@
 			<span 
 				class="die" 
 				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
 					transform: `rotate(${scrolled}deg)`
 				}">
 			</span>
@@ -35,12 +45,12 @@
 			<span 
 				class="die" 
 				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
 					transform: `rotate(${scrolled}deg)`
 				}">
 			</span>
 		</section>
-		<section id="share">
+		<section id="campaign">
 			<Campaign />
 		</section>
 		<Footer />
@@ -53,6 +63,7 @@
 
 <script>
 	import Top from '@/components/home/Top.vue'
+	import Overview from '@/components/home/Overview.vue'
 	import General from '@/components/home/General.vue'
 	import Share from '@/components/home/Share.vue'
 	import Builder from '@/components/home/Builder.vue'
@@ -63,6 +74,7 @@
 		name: 'home',
 		components: {
 			Top,
+			Overview,
 			General,
 			Share,
 			Builder,

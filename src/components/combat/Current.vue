@@ -55,6 +55,32 @@
 								</div>
 							</div>
 
+							<div class="conditions" v-if="Object.keys(current.conditions).length > 0">
+								<template v-for="(condition, key) in current.conditions">
+									<div :key="key" 
+										@click="setSlide({
+											show: true, 
+											type: 'slides/Condition',
+											data: {
+												condition: key,
+												entity: current
+											}})" 
+											v-if="conditions[key]">
+										<span class="n" v-if="key == 'exhaustion'">
+											{{ current.conditions[key] }}
+										</span>
+										<template v-else>
+											<svg v-b-popover.hover="conditions[key].condition" 
+												:title="key" 
+												class="icon text" 
+												viewBox="0 0 512 512">
+												<path :d="conditions[key].icon" fill-opacity="1"></path>
+											</svg>
+										</template>
+									</div>
+								</template>
+							</div>
+
 							<template v-if="targeted.length > 0">
 								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
 									<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
@@ -375,6 +401,10 @@
 	}
 	.conditions {
 		margin-bottom: 10px;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, 30px);
+		grid-auto-rows: 30px;
+		grid-gap: 1px;
 
 		svg, .n {
 			display: block;

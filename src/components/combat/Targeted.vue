@@ -85,9 +85,9 @@
 							</div>
 						</template>
 
-						<b-row class="conditions" v-if="Object.keys(target.conditions).length > 0">
+						<div class="conditions" v-if="Object.keys(target.conditions).length > 0">
 							<template v-for="(condition, key) in target.conditions">
-								<b-col sm="1" :key="key" 
+								<div :key="key" 
 									@click="setSlide({
 										show: true, 
 										type: 'slides/Condition',
@@ -107,9 +107,9 @@
 											<path :d="conditions[key].icon" fill-opacity="1"></path>
 										</svg>
 									</template>
-								</b-col>
+								</div>
 							</template>
-						</b-row>
+						</div>
 
 						<b-row v-if="target.reminders" class="reminders justify-content-start px-2">
 							<b-col class="col-3 p-1" v-for="(reminder, key) in target.reminders" :key="key">
@@ -482,7 +482,11 @@
 		}
 	}
 	.conditions {
-		margin-bottom: 10px;
+		margin: 10px 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, 30px);
+		grid-auto-rows: 30px;
+		grid-gap: 1px;
 
 		svg, .n {
 			display: block;

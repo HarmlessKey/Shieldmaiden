@@ -185,17 +185,20 @@
 					},
 					status: {
 						label: 'Status',
-						truncate: true
+						truncate: true,
+						hide: 'sm'
 					},
 					round: {
 						label: 'Round',
 						center: true,
-						truncate: true
+						truncate: true,
+						hide: 'md'
 					},
 					turn: {
 						label: 'Turn',
 						center: true,
-						truncate: true
+						truncate: true,
+						hide: 'md'
 					},
                     actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',

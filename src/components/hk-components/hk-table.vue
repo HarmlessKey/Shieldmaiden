@@ -30,35 +30,41 @@
 					<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
 				</div>
 				<template v-for="(column, key) in columns">
-					<div 
-						v-if="!column.sortable"
-						:key="`header-${key}`"
-						class="hk-table-column hk-table-header"
-						:class="[{
-							truncate: column.truncate,
-							center: column.center,
-							right: column.right
-						}, column.classes]"
-						v-html="column.label"
-					>
-					</div>
-					<div 
-						v-else 
-						:key="`header-${key}`"
-						class="hk-table-column hk-table-header hk-table-column-sortable"
-						:class="[{
-							truncate: column.truncate,
-							center: column.center,
-							right: column.right
-						}, column.classes]"
-						@click="sort(key)"
-					>
-						<span v-html="column.label"></span>
-						<span class="sort">
-							<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
-							<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
-						</span>
-					</div>
+					<template v-if="
+						!column.hide 
+						|| column.hide === 'sm' && !is_small
+						|| column.hide === 'md' && (!is_medium && !is_small)
+					">
+						<div 
+							v-if="!column.sortable"
+							:key="`header-${key}`"
+							class="hk-table-column hk-table-header"
+							:class="[{
+								truncate: column.truncate,
+								center: column.center,
+								right: column.right
+							}, column.classes]"
+							v-html="column.label"
+						>
+						</div>
+						<div 
+							v-else 
+							:key="`header-${key}`"
+							class="hk-table-column hk-table-header hk-table-column-sortable"
+							:class="[{
+								truncate: column.truncate,
+								center: column.center,
+								right: column.right
+							}, column.classes]"
+							@click="sort(key)"
+						>
+							<span v-html="column.label"></span>
+							<span class="sort">
+								<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
+								<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
+							</span>
+						</div>
+					</template>
 				</template>
 			</template>
 
@@ -74,22 +80,27 @@
 						<i class="fas fa-caret-down"></i>
 					</a>
 				</div>
-
-				<div 
-					class="hk-table-column"
-					v-for="(column, key) in columns"
-					:key="`${key}-${index}`"
-					:class="[{
-						truncate: column.truncate,
-						'no-padding': column.noPadding,
-						center: column.center,
-						right: column.right
-					}, column.classes]"
-				>
-					<slot :name="key" :item="row[key]" :row="row" :index="index">
-						{{ row[key] }}
-					</slot>
-				</div>
+				
+				<template v-for="(column, key) in columns">
+					<div 
+						v-if="!column.hide 
+							|| column.hide === 'sm' && !is_small
+							|| column.hide === 'md' && (!is_medium && !is_small)
+						"
+						class="hk-table-column"
+						:key="`${key}-${index}`"
+						:class="[{
+							truncate: column.truncate,
+							'no-padding': column.noPadding,
+							center: column.center,
+							right: column.right
+						}, column.classes]"
+					>
+						<slot :name="key" :item="row[key]" :row="row" :index="index">
+							{{ row[key] }}
+						</slot>
+					</div>
+				</template>
 
 				<!-- Collapsed data -->
 				<div 
@@ -182,20 +193,27 @@
 					let column = columns[index];
 					let width = ' 1fr'; // By default, columns have an auto width
 
-					// Overwrite the width if the column is tagged with maxContent
-					if(column.maxContent) {
-						width = ' max-content';
+					//Check if the column should be hidden a certain width
+					if(
+						!column.hide 
+						|| column.hide === 'sm' && !this.is_small
+						|| column.hide === 'md' && (!this.is_medium && !this.is_small)
+					) {
+						// Overwrite the width if the column is tagged with maxContent
+						if(column.maxContent) {
+							width = ' max-content';
+						}
+						// Overwrite the width if the column has a width specified
+						if(column.width) {
+							width = ' ' + column.width + 'px'
+						}
+						// Overwrite if there is a min and max width
+						// Ignored if only min or only max is provided
+						if(column.min && column.max) {
+							width = ' minmax(' + column.min + ' ' + column.max + ')';
+						}
+						templateColumns = templateColumns.concat(width);
 					}
-					// Overwrite the width if the column has a width specified
-					if(column.width) {
-						width = ' ' + column.width + 'px'
-					}
-					// Overwrite if there is a min and max width
-					// Ignored if only min or only max is provided
-					if(column.min && column.max) {
-						width = ' minmax(' + column.min + ' ' + column.max + ')';
-					}
-					templateColumns = templateColumns.concat(width);
 				}
 				return templateColumns;
 			},

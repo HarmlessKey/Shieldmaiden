@@ -49,7 +49,6 @@
 					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 			</b-col>
 		</b-row>
-		<!-- <b-form-checkbox name="nextRound" checked="checked" v-model="entity.addNextRound">Add next round</b-form-checkbox> -->
 		<label >When to add</label>
 		<b-form-group>
 			<b-form-radio-group

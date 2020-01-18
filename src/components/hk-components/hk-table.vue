@@ -1,5 +1,7 @@
 <template>
-	<div :class="classes">
+	<div :class="classes" ref="table">
+		small {{ is_small }}<br/>
+		medium {{ is_medium }}
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
             <div class="input-group mb-3">
@@ -161,6 +163,9 @@
 		},
 		data() {
 			return {
+				width: 0,
+				is_small: false,
+				is_medium: false,
 				reverse: true,
 				sortedBy: undefined,
 				data: undefined,
@@ -246,6 +251,20 @@
 					}
 				});
 				this.dataItems = results;
+			}
+		},
+		mounted() {
+			this.width = this.$refs.table.clientWidth; //set width of table
+			window.onresize = () => {
+				let width = this.$refs.table.clientWidth
+				let small = 400;
+				let medium = 600;
+
+				this.is_medium = (width <= medium) ? true : false;
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.table.clientWidth;
 			}
 		}
 	}

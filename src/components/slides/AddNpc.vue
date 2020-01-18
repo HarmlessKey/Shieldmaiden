@@ -49,7 +49,16 @@
 					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 			</b-col>
 		</b-row>
-		<b-form-checkbox name="nextRound" checked="checked" v-model="entity.addNextRound">Add next round</b-form-checkbox>
+		<label >When to add</label>
+		<b-form-group>
+			<b-form-radio-group
+				id="btn-radios-1"
+				v-model="addMoment"
+				:options="options"
+				buttons
+				name="radios-btn-default"
+			></b-form-radio-group>
+		</b-form-group>
 		<hr>
 		<button class="btn btn-block mb-3" @click="add()">Add</button>
 
@@ -78,8 +87,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'AddEntity',
@@ -92,6 +101,11 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
+				options: [
+					{ text: 'Add next round', value: 'next' },
+					{ text: 'Add directly', value: 'directly' },
+				],
+				addMoment: 'next'
 			}
 		},
 		mounted() {
@@ -158,14 +172,22 @@
 					this.entity.ac = npc_data[id].ac
 					this.entity.name = npc_data[id].name
 				}
-				this.$forceUpdate()
+				this.searchResults = [];
+				this.searching = false;
+				this.$forceUpdate();
 			},
 			add() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						this.entity.entityType = 'npc';
 						this.entity.curHp = this.entity.maxHp;
-						this.entity.active = false;
+
+						if(this.addMoment === 'next') {
+							this.entity.addNextRound = true;
+							this.entity.active = false;
+						} else {
+							this.entity.active = true;
+						}
 						this.entity.npc = (this.entity.npc) ? this.entity.npc : 'custom';
 
 						db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(this.entity)
@@ -184,9 +206,9 @@
 
 <style lang="scss" scoped>
 	ul.entities {
-		list-style:none;
-		padding:0;
-		line-height:30px;
+		list-style: none;
+		padding: 0;
+		line-height: 25px;
 
 		li {
 			margin-bottom:5px;
@@ -194,16 +216,6 @@
 			a {
 				font-size:14px;
 			}
-		}
-		.img {
-			width: 30px;
-			height: 30px;
-			display: block;
-			background-size: cover;
-			background-position: top center;
-			border: solid 1px #b2b2b2;
-			background-color: #000;
-			margin-right: 10px;
 		}
 	}
 	ul.nav {

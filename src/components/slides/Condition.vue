@@ -14,7 +14,7 @@
 			@click="remove(cond['.key'])">
 			Remove condition</a>
 
-		<table v-if="cond['.key'] == 'exhaustion'" class="table">
+		<table v-if="cond['.key'] === 'exhaustion'" class="table">
 			<thead>
 				<th>Current</th>
 				<th>Effect</th>
@@ -30,8 +30,7 @@
 				</tr>
 			</tbody>
 		</table>
-
-		<ul :class="cond['.key']">
+		<ul>
 			<li v-for="(effect, index) in cond.effects" :key="index">
 				{{ effect }}
 			</li>

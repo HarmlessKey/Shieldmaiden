@@ -91,14 +91,19 @@
 					<span class="green" 
 						v-if="entity.addNextRound == true"
 						v-b-tooltip.hover title="Will be added next round"
-						@click="add_next_round({key: entity.key, action: 'tag', value: false})">
+						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 						<i class="fas fa-check"></i>
 					</span>
 					<span class="gray-hover" 
 						v-if="entity.addNextRound == false"
 						v-b-tooltip.hover title="Click to add next round"
-						@click="add_next_round({key: entity.key, action: 'tag', value: true})">
+						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 						<i class="fas fa-check"></i>
+					</span>
+					<span class="ml-2 gray-hover" 
+						v-b-tooltip.hover title="Add now"
+						@click="add_next_round({key: entity.key, action: 'set'})">
+						<i class="fas fa-plus"></i>
 					</span>
 				</div>
 			</template>

@@ -1114,6 +1114,15 @@ ul.nav {
 		}
 	}
 }
+.slide {
+	.btn-group {
+		width: 100%;
+
+		label.btn {
+			width: 50% !important;
+		}
+	}
+}
 
 /* 7. Snotify overrides */
 /*********************************************/

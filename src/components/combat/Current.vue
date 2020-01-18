@@ -55,31 +55,7 @@
 								</div>
 							</div>
 
-							<div class="conditions" v-if="Object.keys(current.conditions).length > 0">
-								<template v-for="(condition, key) in current.conditions">
-									<div :key="key" 
-										@click="setSlide({
-											show: true, 
-											type: 'slides/Condition',
-											data: {
-												condition: key,
-												entity: current
-											}})" 
-											v-if="conditions[key]">
-										<span class="n" v-if="key == 'exhaustion'">
-											{{ current.conditions[key] }}
-										</span>
-										<template v-else>
-											<svg v-b-popover.hover="conditions[key].condition" 
-												:title="key" 
-												class="icon text" 
-												viewBox="0 0 512 512">
-												<path :d="conditions[key].icon" fill-opacity="1"></path>
-											</svg>
-										</template>
-									</div>
-								</template>
-							</div>
+							<Conditions :entity="current" />
 
 							<template v-if="targeted.length > 0">
 								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
@@ -126,12 +102,14 @@
 <script>
 	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
+	import Conditions from '@/components/combat/Conditions.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 
 	export default {
 		name: 'Current',
 		components: {
-			Actions: Actions,
+			Actions,
+			Conditions
 		},
 		props: ['current'],
 		data() {

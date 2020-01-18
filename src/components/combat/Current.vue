@@ -350,7 +350,7 @@
 		grid-template-areas: 
 		"img hp-bar";
 
-		margin-bottom: 10px;
+		margin-bottom: 5px;
 
 		&.target {
 			grid-template-columns: 30px 30px 1fr;

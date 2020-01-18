@@ -55,7 +55,7 @@ export const setHP = {
 			var rest_amount = amount;
 
 			//Death saves at 0 hp, if automate is on
-			if(curHp == 0 && this.settings.automate !== false) {
+			if(curHp == 0 && this.settings.automate !== false && target.entityType === 'player') {
 				var n = parseInt(Object.keys(target.saves).length)
 				this.set_save({
 					key: target.key,
@@ -266,7 +266,7 @@ export const setHP = {
 			var over = 0
 
 			//If the target is a player and the curHp was 0, saves need to be reset
-			if(target.entityType == 'player' && curHp == 0) {
+			if(target.entityType === 'player' && curHp === 0) {
 				this.set_save({
 					key: target.key,
 					check: 'reset'

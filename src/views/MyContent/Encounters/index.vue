@@ -285,6 +285,7 @@
 		watch: {
 			campaign: function(newVal, oldVal) {
 				this.checkAdvancement();
+				this.removeGhostPlayers();
 			}
 		},
 		methods: {
@@ -379,9 +380,11 @@
 				if(this.noCurHp) {
 					//Stores player with curHp under campaign
 					for(var key in this.campaign.players) {
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-							curHp: this.players[key].maxHp
-						})
+						if(this.campaign.players[key].curHp === undefined) {
+							db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
+								curHp: this.players[key].maxHp
+							});
+						}
 					}
 					this.noCurHp = false;
 				}
@@ -405,6 +408,15 @@
 							bold: false },
 						]
 					});
+				}
+			},
+			removeGhostPlayers() {
+				const players = Object.keys(this.players);
+				for(let key in this.campaign.players) {
+					if(!players.includes(key)) {
+						console.error('Ghost Player Removed: ', key);
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).remove();
+					}
 				}
 			}
 		}

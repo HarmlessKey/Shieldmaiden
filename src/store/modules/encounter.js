@@ -389,6 +389,7 @@ const mutations = {
 			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${index}`).remove();
 		}
 		else {
+			console.log(key)
 			var i = parseInt(index + 1);
 			Vue.set(state.entities[key].saves, i, check);
 			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${i}`).set(check);
@@ -543,7 +544,7 @@ const mutations = {
 	SET_DEAD(state, {key, action, revive=false}) {
 		if(action === 'set') {
 			//SET DEAD
-			state.entities[key].dead = true;
+			Vue.set(state.entities[key], 'dead', true);
 			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
 			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
 		}

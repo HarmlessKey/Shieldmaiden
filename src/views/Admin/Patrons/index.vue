@@ -102,7 +102,8 @@
 				fields: {
 					full_name: {
 						label: 'Name',
-						sortable: true
+						sortable: true,
+						hide: 'md'
 					},
 					email: {
 						label: 'Email',

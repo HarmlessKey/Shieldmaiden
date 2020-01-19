@@ -1,5 +1,5 @@
 <template>
-	<div :class="classes">
+	<div :class="classes" ref="table">
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
             <div class="input-group mb-3">
@@ -10,7 +10,6 @@
             </div>
 			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
         </div>
-
 		<!-- TABLE -->
 		<div 
 			v-if="!loading"
@@ -28,35 +27,37 @@
 					<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
 				</div>
 				<template v-for="(column, key) in columns">
-					<div 
-						v-if="!column.sortable"
-						:key="`header-${key}`"
-						class="hk-table-column hk-table-header"
-						:class="[{
-							truncate: column.truncate,
-							center: column.center,
-							right: column.right
-						}, column.classes]"
-						v-html="column.label"
-					>
-					</div>
-					<div 
-						v-else 
-						:key="`header-${key}`"
-						class="hk-table-column hk-table-header hk-table-column-sortable"
-						:class="[{
-							truncate: column.truncate,
-							center: column.center,
-							right: column.right
-						}, column.classes]"
-						@click="sort(key)"
-					>
-						<span v-html="column.label"></span>
-						<span class="sort">
-							<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
-							<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
-						</span>
-					</div>
+					<template v-if="showColumn(column.hide)">
+						<div 
+							v-if="!column.sortable"
+							:key="`header-${key}`"
+							class="hk-table-column hk-table-header"
+							:class="[{
+								truncate: column.truncate,
+								center: column.center,
+								right: column.right
+							}, column.classes]"
+							v-html="column.label"
+						>
+						</div>
+						<div 
+							v-else 
+							:key="`header-${key}`"
+							class="hk-table-column hk-table-header hk-table-column-sortable"
+							:class="[{
+								truncate: column.truncate,
+								center: column.center,
+								right: column.right
+							}, column.classes]"
+							@click="sort(key)"
+						>
+							<span v-html="column.label"></span>
+							<span class="sort">
+								<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
+								<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
+							</span>
+						</div>
+					</template>
 				</template>
 			</template>
 
@@ -72,29 +73,31 @@
 						<i class="fas fa-caret-down"></i>
 					</a>
 				</div>
-
-				<div 
-					class="hk-table-column"
-					v-for="(column, key) in columns"
-					:key="`${key}-${index}`"
-					:class="[{
-						truncate: column.truncate,
-						'no-padding': column.noPadding,
-						center: column.center,
-						right: column.right
-					}, column.classes]"
-				>
-					<slot :name="key" :item="row[key]" :row="row" :index="index">
-						{{ row[key] }}
-					</slot>
-				</div>
+				
+				<template v-for="(column, key) in columns">
+					<div 
+						v-if="showColumn(column.hide)"
+						class="hk-table-column"
+						:key="`${key}-${index}`"
+						:class="[{
+							truncate: column.truncate,
+							'no-padding': column.noPadding,
+							center: column.center,
+							right: column.right
+						}, column.classes]"
+					>
+						<slot :name="key" :item="row[key]" :row="row" :index="index">
+							{{ row[key] }}
+						</slot>
+					</div>
+				</template>
 
 				<!-- Collapsed data -->
 				<div 
 					v-if="collapse"
 					:id="`collapse-${index}`"
 					:key="`collapse-content-${index}`"
-					:style="{ 'grid-column': 'span ' + (Object.keys(columns).length + 1) }"
+					:style="{ 'grid-column': 'span ' + (columnCount + 1) }"
 					class="collapse hk-collapsed-column"
 				>
 					<slot name="collapse" :row="row">
@@ -161,6 +164,10 @@
 		},
 		data() {
 			return {
+				columnCount: 0,
+				width: 0,
+				is_small: false,
+				is_medium: false,
 				reverse: true,
 				sortedBy: undefined,
 				data: undefined,
@@ -170,6 +177,7 @@
 		},
 		computed: {
 			templateColumns() {
+				let columnCount = 0;
 				let templateColumns = (this.collapse) ? '30px' : '';
 				let columns = this.columns;
 
@@ -177,21 +185,30 @@
 					let column = columns[index];
 					let width = ' 1fr'; // By default, columns have an auto width
 
-					// Overwrite the width if the column is tagged with maxContent
-					if(column.maxContent) {
-						width = ' max-content';
+					//Check if the column should be hidden a certain width
+					if(
+						!column.hide 
+						|| column.hide === 'sm' && !this.is_small
+						|| column.hide === 'md' && (!this.is_medium && !this.is_small)
+					) {
+						// Overwrite the width if the column is tagged with maxContent
+						if(column.maxContent) {
+							width = ' max-content';
+						}
+						// Overwrite the width if the column has a width specified
+						if(column.width) {
+							width = ' ' + column.width + 'px'
+						}
+						// Overwrite if there is a min and max width
+						// Ignored if only min or only max is provided
+						if(column.min && column.max) {
+							width = ' minmax(' + column.min + ' ' + column.max + ')';
+						}
+						templateColumns = templateColumns.concat(width);
+						columnCount++;
 					}
-					// Overwrite the width if the column has a width specified
-					if(column.width) {
-						width = ' ' + column.width + 'px'
-					}
-					// Overwrite if there is a min and max width
-					// Ignored if only min or only max is provided
-					if(column.min && column.max) {
-						width = ' minmax(' + column.min + ' ' + column.max + ')';
-					}
-					templateColumns = templateColumns.concat(width);
 				}
+				this.columnCount = columnCount;
 				return templateColumns;
 			},
 			dataItems: {
@@ -218,6 +235,22 @@
 			}
 		},
 		methods: {
+			setSize() {
+				let width = this.$refs.table.clientWidth
+				let small = 400;
+				let medium = 500;
+
+				this.is_medium = (width <= medium) ? true : false;
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.table.clientWidth;
+			},
+			showColumn(hide) {
+				if(hide === 'sm' && this.is_small || hide === 'md' && this.is_medium) {
+					return false;
+				} return true;
+			},
 			sort(column) {
 				this.reverse = !this.reverse;
 				this.sortedBy = column;
@@ -247,6 +280,16 @@
 				});
 				this.dataItems = results;
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>

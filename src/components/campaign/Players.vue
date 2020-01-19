@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="group-actions">
+		<div class="group-actions" ref="players">
 			<div 
 				class="money" 
 				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
@@ -66,20 +66,20 @@
 			<div class="header"></div>
 			<div class="col header ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></div>
 			<div class="col header name"></div>
-			<div class="col header pp" v-if="settings.passive_perception == undefined">
+			<div class="col header pp" v-if="settings.passive_perception === undefined && !is_small">
 				<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
 			</div>
-			<div class="col header pinv" v-if="settings.passive_investigation == undefined">
+			<div class="col header pinv" v-if="settings.passive_investigation === undefined && !is_small">
 				<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
 			</div>
-			<div class="col header pins" v-if="settings.passive_insight == undefined">
+			<div class="col header pins" v-if="settings.passive_insight === undefined && !is_medium">
 				<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
 			</div>
-			<div class="col header save" v-if="settings.save_dc == undefined">
+			<div class="col header save" v-if="settings.save_dc === undefined && !is_medium">
 				<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
 			</div>
 			<div class="col header health"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></div>
-			<div class="col header actions"><i class="far fa-ellipsis-h"></i></div>
+			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
 				<div 
@@ -104,28 +104,28 @@
 
 				<div 
 					class="col pp" 
-					v-if="settings.passive_perception == undefined"
+					v-if="settings.passive_perception === undefined && !is_small"
 					:key="'pp-'+key"
 				>
 					{{ player.passive_perception }}
 				</div>
 				<div 
 					class="col pinv" 
-					v-if="settings.passive_investigation == undefined"
+					v-if="settings.passive_investigation === undefined && !is_small"
 					:key="'pinv-'+key"
 				>
 					{{ player.passive_investigation }}
 				</div>
 				<div 
 					class="col pins" 
-					v-if="settings.passive_insight == undefined"
+					v-if="settings.passive_insight === undefined && !is_medium"
 					:key="'pins-'+key"
 				>
 					{{ player.passive_insight }}
 				</div>
 				<div 
 					class="col save" 
-					v-if="settings.save_dc == undefined"
+					v-if="settings.save_dc === undefined && !is_medium"
 					:key="'save-'+key"
 				>
 					{{ player.spell_save_dc }}
@@ -164,9 +164,8 @@
 						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 					</template>
 				</div>
-				<div class="col actions" :key="'actions-'+key">
+				<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
 					<a 	
-						v-if="viewerIsUser"
 						class="gray-hover" 
 						v-b-tooltip.hover title="Edit player" 
 						@click="setSlide({
@@ -210,6 +209,9 @@
 		mixins: [experience, currencyMixin],
 		data() {
 			return {
+				width: 0,
+				is_small: false,
+				is_medium: false,
 				viewerId: this.$store.getters.getUser.uid,
 				players: undefined,
 				loading: true
@@ -243,30 +245,32 @@
 			templateColumns() {
 				let templateColumns = 'max-content 40px auto ';
 
-				if(this.settings.passive_perception === undefined) { 
+				if(this.settings.passive_perception === undefined && !this.is_small) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_investigation === undefined) { 
+				if(this.settings.passive_investigation === undefined && !this.is_small) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.passive_insight === undefined) { 
+				if(this.settings.passive_insight === undefined && !this.is_medium) { 
 					templateColumns = templateColumns.concat(' max-content');
 				}
-				if(this.settings.save_dc === undefined) {
+				if(this.settings.save_dc === undefined && !this.is_medium) {
 					templateColumns = templateColumns.concat(' max-content');
 				}
-
-				templateColumns = templateColumns.concat(' max-content max-content');
+				if(this.viewerIsUser) {
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				templateColumns = templateColumns.concat(' max-content');
 
 				return templateColumns;
 			},
 			calcColspan() {
-				let colspan = 8;
+				let colspan = (this.viewerIsUser) ? 4 : 3;
 
-				if(this.settings.passive_perception !== undefined) { colspan--; }
-				if(this.settings.passive_investigation !== undefined) { colspan--; }
-				if(this.settings.passive_insight !== undefined) { colspan--; }
-				if(this.settings.save_dc !== undefined) { colspan--; }
+				if(this.settings.passive_perception === undefined && !this.is_small) { colspan++; }
+				if(this.settings.passive_investigation === undefined && !this.is_small) { colspan++; }
+				if(this.settings.passive_insight === undefined && !this.is_medium) { colspan++; }
+				if(this.settings.save_dc === undefined && !this.is_medium) { colspan++; }
 
 				return colspan;
 			},
@@ -303,12 +307,30 @@
 				this.players = Object.values(campaignPlayers);
 				this.loading = false;
 			});
-
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
 		},
 		methods: {
 			...mapActions([
 				'setSlide',
 			]),
+			getWindowWidth(event) {
+				this.width = this.$refs.players.clientWidth;
+			},
+			setSize() {
+				let width = this.$refs.players.clientWidth
+				let small = 400;
+				let medium = 500;
+
+				this.is_medium = (width <= medium) ? true : false;
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.players.clientWidth;
+			},
 			percentage(current, max) {
 				var percentage = Math.floor(current / max * 100)
 				return percentage
@@ -335,6 +357,9 @@
 			isXpAdvancement(){
 				return this.campaign.advancement != 'milestone'
 			}
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>

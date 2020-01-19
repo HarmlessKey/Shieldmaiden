@@ -1,7 +1,5 @@
 <template>
 	<div :class="classes" ref="table">
-		small {{ is_small }}<br/>
-		medium {{ is_medium }}
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
             <div class="input-group mb-3">
@@ -12,7 +10,6 @@
             </div>
 			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
         </div>
-
 		<!-- TABLE -->
 		<div 
 			v-if="!loading"
@@ -30,11 +27,7 @@
 					<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
 				</div>
 				<template v-for="(column, key) in columns">
-					<template v-if="
-						!column.hide 
-						|| column.hide === 'sm' && !is_small
-						|| column.hide === 'md' && (!is_medium && !is_small)
-					">
+					<template v-if="showColumn(column.hide)">
 						<div 
 							v-if="!column.sortable"
 							:key="`header-${key}`"
@@ -83,10 +76,7 @@
 				
 				<template v-for="(column, key) in columns">
 					<div 
-						v-if="!column.hide 
-							|| column.hide === 'sm' && !is_small
-							|| column.hide === 'md' && (!is_medium && !is_small)
-						"
+						v-if="showColumn(column.hide)"
 						class="hk-table-column"
 						:key="`${key}-${index}`"
 						:class="[{
@@ -107,7 +97,7 @@
 					v-if="collapse"
 					:id="`collapse-${index}`"
 					:key="`collapse-content-${index}`"
-					:style="{ 'grid-column': 'span ' + (Object.keys(columns).length + 1) }"
+					:style="{ 'grid-column': 'span ' + (columnCount + 1) }"
 					class="collapse hk-collapsed-column"
 				>
 					<slot name="collapse" :row="row">
@@ -174,6 +164,7 @@
 		},
 		data() {
 			return {
+				columnCount: 0,
 				width: 0,
 				is_small: false,
 				is_medium: false,
@@ -186,6 +177,7 @@
 		},
 		computed: {
 			templateColumns() {
+				let columnCount = 0;
 				let templateColumns = (this.collapse) ? '30px' : '';
 				let columns = this.columns;
 
@@ -213,8 +205,10 @@
 							width = ' minmax(' + column.min + ' ' + column.max + ')';
 						}
 						templateColumns = templateColumns.concat(width);
+						columnCount++;
 					}
 				}
+				this.columnCount = columnCount;
 				return templateColumns;
 			},
 			dataItems: {
@@ -241,6 +235,22 @@
 			}
 		},
 		methods: {
+			setSize() {
+				let width = this.$refs.table.clientWidth
+				let small = 400;
+				let medium = 500;
+
+				this.is_medium = (width <= medium) ? true : false;
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.table.clientWidth;
+			},
+			showColumn(hide) {
+				if(hide === 'sm' && this.is_small || hide === 'md' && this.is_medium) {
+					return false;
+				} return true;
+			},
 			sort(column) {
 				this.reverse = !this.reverse;
 				this.sortedBy = column;
@@ -272,18 +282,14 @@
 			}
 		},
 		mounted() {
-			this.width = this.$refs.table.clientWidth; //set width of table
-			window.onresize = () => {
-				let width = this.$refs.table.clientWidth
-				let small = 400;
-				let medium = 600;
-
-				this.is_medium = (width <= medium) ? true : false;
-				this.is_small = (width <= small) ? true : false;
-
-				//sets new width on resize
-				this.width = this.$refs.table.clientWidth;
-			}
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>

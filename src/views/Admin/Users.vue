@@ -107,7 +107,8 @@
 					email: {
 						label: 'Email',
 						truncate: true,
-						sortable: true
+						sortable: true,
+						hide: 'md'
 					},
 					voucher: {
 						label: '<i class="fas fa-ticket-alt"></i>',

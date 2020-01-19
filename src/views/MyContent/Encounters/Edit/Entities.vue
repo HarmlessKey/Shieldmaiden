@@ -108,7 +108,8 @@
 					type: {
 						label: 'Type',
 						truncate: true,
-						sortable: true
+						sortable: true,
+						hide: 'sm'
 					},
 					challenge_rating: {
 						label: 'CR',

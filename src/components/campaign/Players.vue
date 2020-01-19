@@ -82,12 +82,12 @@
 			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
-				<div 
-					v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"
-					class="col image" 
-					:key="'image-'+key"></div>
-				<div v-else class="image" :key="'image-'+key">
-					<img src="@/assets/_img/styles/player.svg" />
+				<div class="image" :key="'image-'+key">
+					<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
+						<i class="fas fa-paw-claws green"></i>
+					</div>
+					<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+					<img v-else src="@/assets/_img/styles/player.svg" />	
 				</div>
 				<div class="col ac" :key="'ac-'+key">
 					<span :class="{ 
@@ -96,9 +96,9 @@
 						}" 
 						v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
 						v-if="player.ac_bonus">
-						{{ player.ac + player.ac_bonus }}
+						{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
 					</span>
-					<span v-else>{{ player.ac }}</span>
+					<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
 				</div>
 				<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
 
@@ -141,26 +141,39 @@
 						</div>
 						<div v-else class="saves d-flex justify-content-end">
 							<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
-								<span v-show="check == 'succes'" class="green"><i class="fas fa-check"></i></span> 
-								<span v-show="check == 'fail'" class="red"><i class="fas fa-times"></i></span>
+								<span v-show="check === 'succes'" class="green"><i class="fas fa-check"></i></span> 
+								<span v-show="check === 'fail'" class="red"><i class="fas fa-times"></i></span>
 							</div>
 						</div>
 					</template>
 					<template v-else>
-						<span class="current" :class="{ 
-							'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
-							'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, player.maxHp) <= 76, 
-							'green': true
-						}">{{ player.curHp }}</span>
-						<span class="gray-hover">/</span>
-						<span :class="{ 
-								'green': player.maxHpMod > 0, 
-								'red': player.maxHpMod < 0 
-							}" 
-							v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-							{{ maxHp(player.maxHp, player.maxHpMod) }}
-						</span>
-						<span v-else>{{ player.maxHp }}</span>
+						<template v-if="player.transformed">
+							<span class="current" :class="{ 
+								'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
+								'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
+								'green': true
+							}">{{ player.transformed.curHp }}</span>
+							<span class="gray-hover">/</span>
+							<span>
+								{{ player.transformed.maxHp }}
+							</span>
+						</template>
+						<template v-else>
+							<span class="current" :class="{ 
+								'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+								'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
+								'green': true
+							}">{{ player.curHp }}</span>
+							<span class="gray-hover">/</span>
+							<span :class="{ 
+									'green': player.maxHpMod > 0, 
+									'red': player.maxHpMod < 0 
+								}" 
+								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+								{{ maxHp(player.maxHp, player.maxHpMod) }}
+							</span>
+							<span v-else>{{ player.maxHp }}</span>
+						</template>
 						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 					</template>
 				</div>
@@ -470,6 +483,17 @@
 				width: 62px;
 				height: 62px;
 				grid-row: span 2;
+				position: relative;
+
+				.transformed {
+					right: 0;
+					bottom: 0;
+					position: absolute;
+					background: #000;
+					padding: 0 2px;
+					border-left: solid 1px #b2b2b2;
+					border-top: solid 1px #b2b2b2;
+				}
 			}
 			.xp-bar {
 				display: flex;

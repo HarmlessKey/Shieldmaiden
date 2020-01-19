@@ -123,15 +123,6 @@ const mutations = {
 			entity.overhealingTaken = 0
 		}
 
-		if(db_entity.transformed) {
-			entity.transformed = true
-			entity.transformedMaxHp = db_entity.transformed.maxHp
-			entity.transformedCurHp = db_entity.transformed.curHp
-			entity.transformedAc = db_entity.transformed.ac
-		} else {
-			entity.transformed = false
-		}
-		
 		switch(entity.entityType) {
 			case 'player': {
 				let campaignPlayer = rootState.content.campaigns[state.campaignId].players[key];
@@ -144,6 +135,16 @@ const mutations = {
 				entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
 				entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
 				entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
+				
+				//Get player transformed from campaign
+				if(campaignPlayer.transformed) {
+					entity.transformed = true;
+					entity.transformedMaxHp = campaignPlayer.transformed.maxHp;
+					entity.transformedCurHp = campaignPlayer.transformed.curHp;
+					entity.transformedAc = campaignPlayer.transformed.ac;
+				} else {
+					entity.transformed = false;
+				}
 
 				//get other values from the player
 				let db_player = rootState.content.players[key];
@@ -162,9 +163,18 @@ const mutations = {
 				break
 			}
 			case 'npc': {
-				entity.curHp = db_entity.curHp
-				entity.tempHp = db_entity.tempHp
-				entity.ac_bonus = db_entity.ac_bonus
+				entity.curHp = db_entity.curHp;
+				entity.tempHp = db_entity.tempHp;
+				entity.ac_bonus = db_entity.ac_bonus;
+
+				if(db_entity.transformed) {
+					entity.transformed = true;
+					entity.transformedMaxHp = db_entity.transformed.maxHp;
+					entity.transformedCurHp = db_entity.transformed.curHp;
+					entity.transformedAc = db_entity.transformed.ac;
+				} else {
+					entity.transformed = false;
+				}
 
 				//Fetch data from API
 				if(entity.npc == 'api') {
@@ -444,20 +454,28 @@ const mutations = {
 	},
 	TRANSFORM_ENTITY(state, {key, entity, remove}) {
 		if(remove) {
-			state.entities[key].transformed = false
-			Vue.delete(state.entities[key], 'transformedMaxHp')
-			Vue.delete(state.entities[key], 'transformedCurHp')
-			Vue.delete(state.entities[key], 'transformedAc')
+			state.entities[key].transformed = false;
+			Vue.delete(state.entities[key], 'transformedMaxHp');
+			Vue.delete(state.entities[key], 'transformedCurHp');
+			Vue.delete(state.entities[key], 'transformedAc');
 
-			encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+			if(state.entities[key].entityType === 'npc') {
+				encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+			} else {
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+			}
 		}
 		else {
 			state.entities[key].transformed = true
 			Vue.set(state.entities[key], 'transformedMaxHp', entity.maxHp)
 			Vue.set(state.entities[key], 'transformedCurHp', entity.maxHp)
 			Vue.set(state.entities[key], 'transformedAc', entity.ac)
-
-			encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+			
+			if(state.entities[key].entityType === 'npc') {
+				encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+			} else {
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(entity);
+			}
 		}
 	},
 	REMOVE_ENTITY(state, {key}) {

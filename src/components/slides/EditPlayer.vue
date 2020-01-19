@@ -3,6 +3,9 @@
 <template>
 	<div class="pb-5" v-if="entity">
 		<h2>Edit <router-link :to="`/players/${entityKey}`" ><span class="blue">{{ playerBase.character_name }}</span></router-link></h2>
+		
+		<a v-if="entity.transformed" @click="removeTransform()" class="btn btn-block bg-red mb-3">Remove transformation</a>
+		
 		<b-row v-if="location == 'encounter'" class="mb-3">
 			<b-col class="col-4">
 				<label>Initiative</label>
@@ -65,7 +68,7 @@
 					placeholder="Temporary Hit Points"></b-form-input>
 			</b-col>
 
-			<b-col class="text-center">
+			<b-col class="text-center" v-if="!entity.transformed">
 				<label>Max HP Mod</label>
 				<b-form-input 
 					class="text-center"
@@ -80,48 +83,90 @@
 			<hr>
 			<h2 class="mb-0">Override</h2>
 			<b-row class="my-2">
-
 				<b-col class="text-center">
-					<label>Cur HP</label>
-					<b-form-input 
-						class="text-center"
-						type="number" 
-						name="maxHp" 
-						min="0"
-						v-model="entity.curHp"
-						v-validate="'required|numeric'"
-						data-vv-as="Current HP"
-						placeholder="Current Hit Points"></b-form-input>
+					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Cur HP</label>
+					<template v-if="entity.transformed">
+						<b-form-input 
+							class="text-center"
+							type="number" 
+							name="t-curHp" 
+							min="1"
+							v-model="entity.transformed.curHp"
+							v-validate="'required|numeric|min:1'"
+							data-vv-as="Current HP"
+							placeholder="Current Hit Points"/>
+						<p class="validate red" v-if="errors.has('t-curHp')">{{ errors.first('t-curHp') }}</p>
+					</template>
+					<template v-else>
+						<b-form-input 
+							class="text-center"
+							type="number" 
+							name="curHp" 
+							min="0"
+							v-model="entity.curHp"
+							v-validate="'required|numeric'"
+							data-vv-as="Current HP"
+							placeholder="Current Hit Points">
+						</b-form-input>
 						<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
+					</template>
 				</b-col>
 
 				<b-col class="text-center">
-					<label>Max HP</label>
-					<b-form-input 
-						class="text-center"
-						type="number" 
-						name="maxHp" 
-						min="1"
-						v-model="playerBase.maxHp"
-						v-validate="'required|numeric'"
-						data-vv-as="Maximum HP"
-						placeholder="Maximum Hit Points"></b-form-input>
+					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Max HP</label>
+					<template v-if="entity.transformed">
+						<b-form-input 		
+							class="text-center"
+							type="number" 
+							name="t-maxHp" 
+							min="1"
+							v-model="entity.transformed.maxHp"
+							v-validate="'required|numeric'"
+							data-vv-as="Maximum HP"
+							placeholder="Maximum Hit Points"/>
+						<p class="validate red" v-if="errors.has('t-maxHp')">{{ errors.first('t-maxHp') }}</p>
+					</template>
+					<template v-else>
+						<b-form-input 
+							class="text-center"
+							type="number" 
+							name="maxHp" 
+							min="1"
+							v-model="playerBase.maxHp"
+							v-validate="'required|numeric'"
+							data-vv-as="Maximum HP"
+							placeholder="Maximum Hit Points"/>
 						<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+					</template>
 				</b-col>
 			</b-row>
 			<b-row>
 				<b-col class="text-center">
-					<label>AC</label>
-					<b-form-input 
-						class="text-center"
-						type="number" 
-						name="ac" 
-						min="1"
-						v-model="playerBase.ac"
-						v-validate="'required|numeric'"
-						data-vv-as="Amor Class"
-						placeholder="Armor Class"></b-form-input>
+					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> AC</label>
+					<template v-if="entity.transformed">
+						<b-form-input 
+							class="text-center"
+							type="number" 
+							name="t-ac" 
+							min="1"
+							v-model="entity.transformed.ac"
+							v-validate="'required|numeric'"
+							data-vv-as="Amor Class"
+							placeholder="Armor Class"/>
+						<p class="validate red" v-if="errors.has('t-ac')">{{ errors.first('t-ac') }}</p>
+					</template>
+					<template v-else>
+						<b-form-input 
+							class="text-center"
+							type="number" 
+							name="ac" 
+							min="1"
+							v-model="playerBase.ac"
+							v-validate="'required|numeric'"
+							data-vv-as="Amor Class"
+							placeholder="Armor Class"/>
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+					</template>
 				</b-col>
 				<b-col class="text-center">
 					<label>Level</label>
@@ -276,6 +321,17 @@
 					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves/${i}`).set(check);
 				}
 			},
+			removeTransform() {
+				if(this.location === 'encounter') {
+					this.transform_entity({
+						key: this.entity.key,
+						remove: true
+					})
+					this.entity.transformed = false;
+				} else {
+					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/transformed`).remove();
+				}
+			},
 			stabilize() {
 				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
 				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
@@ -363,7 +419,7 @@
 
 
 						//Only update in an encounter
-						if(this.location == 'encounter') {
+						if(this.location === 'encounter') {
 							//create full object to send to store
 							this.entity.initiative = this.initiative['.value'];
 							this.entity.ac = this.playerBase.ac;

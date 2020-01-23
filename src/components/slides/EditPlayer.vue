@@ -405,9 +405,18 @@
 						if(this.entity.curHp > (this.playerBase.maxHp + this.entity.maxHpMod)) {
 							this.entity.curHp = parseInt(this.playerBase.maxHp + this.entity.maxHpMod);
 						}
+						if(this.entity.transformed) {
+							if(this.entity.transformed.curHp > this.entity.transformed.maxHp) {
+								this.entity.transformed.curHp = this.entity.transformed.maxHp;
+							}
+							if(this.entity.transformed.curHp <= 0) {
+								this.$delete(this.entity, 'transformed');
+							}
+						}
+								
 
 						//Update Firebase apart from store, cause it can be edited where there is no store.
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).update(this.entity);
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).set(this.entity);
 						db.ref(`players/${this.userId}/${this.entityKey}`).update(this.playerBase);
 
 						//If the new curHp > 0, remove stable and dead conditions

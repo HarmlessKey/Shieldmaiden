@@ -362,6 +362,7 @@
 							tempHp: 0,
 							maxHpMod: 0
 						});
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/transformed`).remove();
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/stable`).remove();
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
 					}
@@ -426,6 +427,7 @@
 		grid-auto-rows: max-content;
 		grid-row-gap: 1px;
 		margin: 10px 0 30px 0;
+		user-select: none;
 
 		.image {
 			width: 46px;

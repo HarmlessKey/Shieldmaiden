@@ -4,7 +4,7 @@
 			<div class="head">
 				<h2>Share live initiative list with your players</h2>
 				<span>
-					Show your players a live initiative list of the encounter, that updates as you play.
+					Show your players a live initiative list of the encounter, that updates as you play. Perfect for at the table and if you host a podcast or stream.
 				</span>
 			</div>
 
@@ -46,7 +46,7 @@
 
 <style lang="scss" scoped>
 	.share {
-		padding-bottom: 50px;
+		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #111111;
 

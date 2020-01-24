@@ -116,7 +116,6 @@
 						line-height: 35px;
 						font-style: italic;
 						text-transform: none;
-						max-width: 700px;
 					}
 					.button-container {
 						display: flex;

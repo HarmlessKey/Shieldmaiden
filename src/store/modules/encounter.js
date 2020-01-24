@@ -537,12 +537,11 @@ const mutations = {
 		else if(pool == 'transformed') {
 			if(newHp <= 0) {
 				state.entities[key].transformed = false; //Update store
-				encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove()
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
 			}
 			else {
 				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
-
-				encounters_ref.child(`${state.path}/entities/${key}/transformed/curHp`).set(newHp);
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed/curHp`).set(newHp);
 			}
 		}
 		//when target has no tempHp or is not transformed, set curHP

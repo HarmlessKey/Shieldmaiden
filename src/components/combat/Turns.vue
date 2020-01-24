@@ -1,6 +1,7 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 			<h1>
+				<router-link :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
 				<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
 				<a class="edit"
 					id="edit"

@@ -1,5 +1,5 @@
 <template>
-	<div class="top" :style="{'background-image': 'url(' + require('@/assets/_img/styles/paper-bg.png') + ')'}">
+	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
 				<img  v-if="!user" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
@@ -28,7 +28,7 @@
 						<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
 						
 						<div class="button-container">
-							<router-link v-if="!user" to="sign-up" class="btn btn-lg">Create Account</router-link>
+							<router-link v-if="!user" to="sign-up" class="btn btn-lg">Demo Encounter</router-link>
 							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !user}">
 								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 								<div class="text">Join our Discord</div>
@@ -75,8 +75,9 @@
 
 <style lang="scss" scoped>
 	.top {
+		background-image: url('../../assets/_img/styles/paper-bg.png');
 		color: #fff;
- 		background-position: center;
+		background-position: center;
 		padding: 50px 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;

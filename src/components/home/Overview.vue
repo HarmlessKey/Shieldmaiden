@@ -72,6 +72,10 @@
 				display: flex;
 				flex: 1 1 25%;
 				
+				.card-header {
+					font-family: 'Fredericka the Great', cursive;
+					color: #fff;
+				}
 				.card-img {
 					box-shadow: inset 0 0 10px #000000;
 					border-radius: 0;

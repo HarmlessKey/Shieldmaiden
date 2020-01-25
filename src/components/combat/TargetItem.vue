@@ -184,7 +184,7 @@
 			},
 			displayStats() {
 				var stats = '';
-				if(this.entity.transformed == true) {
+				if(this.entity.transformed) {
 					stats = {
 						ac: this.entity.transformedAc,
 						maxHp: this.entity.transformedMaxHp,

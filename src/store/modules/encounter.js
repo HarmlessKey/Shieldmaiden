@@ -43,7 +43,7 @@ const demoEncounter = {
 	},
 	"finished" : false,
 	"round" : 0,
-	"turn" : 1
+	"turn" : 0
 }
 
 const encounters_ref = db.ref('encounters')
@@ -53,6 +53,7 @@ const monsters_ref = db.ref('monsters')
 const getDefaultState = () => {
 	return {
 		demo: false,
+		demoEntities: demoEncounter.entities,
 		uid: undefined,
 		entities: {},
 		targeted: [],
@@ -70,6 +71,7 @@ const state = getDefaultState()
 
 const getters = {
 	entities: function( state ) { return state.entities },
+	demoEntities: function( state ) { return state.demoEntities },
 	track: function( state ) { return state.track },
 	active: function( state ) { return state.active },
 	idle: function( state ) { return state.idle },
@@ -379,7 +381,8 @@ const mutations = {
 		});
 	},
 	SET_INITIATIVE(sate, {key, initiative}) {
-		state.entities[key].initiative = initiative;
+		Vue.set(state.entities[key], 'initiative', initiative);
+		if(state.demo) Vue.set(state.demoEntities[key], 'initiative', initiative);
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update({
 			initiative: parseInt(initiative),
 		});
@@ -658,7 +661,7 @@ const actions = {
 		commit("CLEAR_ENTITIES");
 		const uid = rootState.content.user.uid;
 		const path = `${uid}/${cid}/${eid}`;
-		commit("SET_PATH", path)
+		commit("SET_PATH", path);
 
 		//Set the entities when it's not a demo encounter
 		if(!demo) {
@@ -666,13 +669,13 @@ const actions = {
 			await encounter.once('value', snapshot => {
 				commit('SET_ENCOUNTER', snapshot.val());
 				for (let key in snapshot.val().entities) {
-					commit('ADD_ENTITY', {rootState, key})
+					commit('ADD_ENTITY', {rootState, key});
 				}
 			})
 		} else {
 			commit('SET_ENCOUNTER', demoEncounter);
 			for (let key in demoEncounter.entities) {
-				commit('ADD_ENTITY', {rootState, key})
+				commit('ADD_ENTITY', {rootState, key});
 			}
 		}
 		commit('INITIALIZED');
@@ -682,10 +685,10 @@ const actions = {
 			const path = state.path
 			const encounter = encounters_ref.child(path);
 			encounter.on('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val())
-			})
+				commit('SET_ENCOUNTER', snapshot.val());
+			});
 		} else {
-			commit('SET_ENCOUNTER', demoEncounter)
+			commit('SET_ENCOUNTER', demoEncounter);
 		}
 	},
 	set_turn({ commit }, payload) { commit("SET_TURN", payload) },
@@ -723,6 +726,13 @@ const actions = {
 	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
 	transform_entity({ commit }, payload) { commit('TRANSFORM_ENTITY', payload); },
 	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
+	add_entity_demo({ commit, rootState }, entity) { 
+		//generate semi random id
+		let key = Date.now() + Math.random().toString(36).substring(4);
+		Vue.set(demoEncounter.entities, key, entity);
+
+		commit('ADD_ENTITY', {rootState, key});
+	},
 	remove_entity({ commit }, payload) { commit('REMOVE_ENTITY', payload); },
 	set_dead({ commit }, payload) { commit('SET_DEAD', payload); },
 	set_finished({ commit }) { commit('FINISH'); },

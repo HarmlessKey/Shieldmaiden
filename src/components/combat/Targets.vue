@@ -318,7 +318,7 @@
 				this.key = undefined;
 			},
 			edit(key, entity, entityType) {
-				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
+				var editType = (entityType === 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
 
 				if(key) {
 					this.setSlide({

@@ -52,7 +52,7 @@
 					<i class="fas fa-arrow-left"></i> 
 					<span class="ml-1 d-none d-lg-inline">Back</span>
 				</router-link>
-				<a class="btn" @click="set_turn({turn: 1, round: 1})">Start encounter <i class="fas fa-arrow-right"></i></a>
+				<a class="btn" @click="set_turn({turn: 0, round: 1})">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>
 			<a v-else class="btn" 
 				@click="nextTurn()" 

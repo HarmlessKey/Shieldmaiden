@@ -1,15 +1,16 @@
 <template>
-	<div v-if="overencumbered">
+	<div v-if="overencumbered && demo">
 		<OverEncumbered/>
 	</div>
-	<div v-else-if="encounter && players"  
-		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
-		
+	<div 
+		v-else-if="encounter && (players || demo)"  
+		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
+	>	
 		<Finished v-if="encounter.finished" :encounter="encounter"/>
 
 		<template v-else>
 			<SetInitiative 
-				v-if="encounter.round == 0"
+				v-if="encounter.round === 0"
 				:_active = "_active"
 				:_idle = "_idle"
 			/>
@@ -28,9 +29,6 @@
 					:_idle = "_idle"
 				/>
 				<Targeted />
-				<!-- <Actions 
-					:current="_active[encounter.turn]"
-				/> -->
 				<Side />
 			</div>
 		</template>
@@ -74,6 +72,7 @@
 
 			return {
 				userId: this.$store.getters.getUser.uid,
+				demo: this.$route.name === "Demo",
 				target: undefined,
 				alive: undefined,
 			}
@@ -86,12 +85,18 @@
 				},
 			}
 		},
+		beforeMount() {
+			if(this.$route.name !== "Demo") {
+				this.track()
+			}
+		},
 		mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid
-			})
-			this.track_Encounter()
+				eid: this.$route.params.encid,
+				demo: this.demo
+			});
+			this.track_Encounter(this.demo);
 		},
 		computed: {
 			...mapGetters([
@@ -197,10 +202,7 @@
 			finish() {
 				this.set_finished();
 			},
-		},
-		beforeMount() {
-			this.track()
-		},
+		}
 	}
 </script>
 

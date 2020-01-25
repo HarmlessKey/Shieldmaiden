@@ -110,7 +110,7 @@
 					round++
 					this.update_round()
 				}
-				if(!state.demo) {
+				if(!this.demo) {
 					db.ref(`encounters/${this.path}`).update({
 						turn: turn,
 						round: round,
@@ -178,7 +178,8 @@
 				if (round == 0) {
 					turn = 0
 				}
-				db.ref(`encounters/${this.path}`).update({
+				
+				if(!this.demo) db.ref(`encounters/${this.path}`).update({
 					turn: turn,
 					round: round,
 				})

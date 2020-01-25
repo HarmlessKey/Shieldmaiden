@@ -217,7 +217,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: auth.currentUser.uid,
+				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
 				currentTarget: {},
 				setShadow: 0,
 				interval:false,

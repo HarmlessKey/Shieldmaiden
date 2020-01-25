@@ -355,7 +355,7 @@ const mutations = {
 	},
 	START_ENCOUNTER(state) {
 		Vue.set(state.encounter, 'round', 1);
-		if(!state.demo) encounters_ref.child(state.path).update({round: 1});
+		if(!state.demo) encounters_ref.child(state.path).child('round').update(1);
 	},
 	SET_PATH(state, path) {
 		state.path = path

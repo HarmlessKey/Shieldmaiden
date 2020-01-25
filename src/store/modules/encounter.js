@@ -295,17 +295,17 @@ const mutations = {
 		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId))
 		}
-		if(action == 'set') {
+		if(action === 'set') {
 			state.log.unshift(value)
 			
 			const parsed = JSON.stringify(state.log);
-			localStorage.setItem(state.encounterId, parsed);
+			if(!state.demo) localStorage.setItem(state.encounterId, parsed);
 		}
 		if(action == 'unset') {
 			Vue.delete(state.log, value)
 			
 			const parsed = JSON.stringify(state.log);
-			localStorage.setItem(state.encounterId, parsed);
+			if(!state.demo) localStorage.setItem(state.encounterId, parsed);
 		}
 	},
 	SET_METERS(state, {key, type, amount}) {
@@ -490,14 +490,16 @@ const mutations = {
 	},
 	REMOVE_ENTITY(state, {key}) {
 		Vue.delete(state.entities, key)
-		encounters_ref.child(`${state.path}/entities/${key}`).remove();
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
 	},
 	SET_DOWN(state, {key, value}) {
 		state.entities[key].down = value
-		if (value) {
-			encounters_ref.child(`${state.path}/entities/${key}/down`).set(true)
-		} else {
-			encounters_ref.child(`${state.path}/entities/${key}/down`).remove()
+		if(!state.demo) {
+			if (value) {
+				encounters_ref.child(`${state.path}/entities/${key}/down`).set(true)
+			} else {
+				encounters_ref.child(`${state.path}/entities/${key}/down`).remove()
+			}
 		}
 	},
 	ADD_NEXT_ROUND(state, {key, action, value}) {
@@ -505,9 +507,11 @@ const mutations = {
 			state.entities[key].addNextRound = value
 		}
 		else if(action == 'set') {
-			Vue.set(state.entities[key], 'active', true)
-			encounters_ref.child(`${state.path}/entities/${key}/active`).set(true)
-			encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove()
+			Vue.set(state.entities[key], 'active', true);
+			if(!state.demo) {
+				encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
+				encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove();
+			}
 		}
 	},
 	SET_HP(state, {key, pool, newHp}) {
@@ -524,10 +528,12 @@ const mutations = {
 
 				//Player tempHp is stored under campaign
 				//NPC tempHp is stored under encounter
-				if(state.entities[key].entityType == 'player') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
-				} else {
-					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
+					} else {
+						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
+					}
 				}
 			}
 			//if the damage was lower than the amount of tempHp, set a new tempHp
@@ -536,10 +542,12 @@ const mutations = {
 
 				//Player tempHp is stored under campaign
 				//NPC tempHp is stored under encounter
-				if(state.entities[key].entityType == 'player') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
-				} else {
-					encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
+					} else {
+						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
+					}
 				}
 			}
 		}
@@ -547,11 +555,11 @@ const mutations = {
 		else if(pool == 'transformed') {
 			if(newHp <= 0) {
 				state.entities[key].transformed = false; //Update store
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
 			}
 			else {
 				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed/curHp`).set(newHp);
+				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed/curHp`).set(newHp);
 			}
 		}
 		//when target has no tempHp or is not transformed, set curHP
@@ -560,11 +568,13 @@ const mutations = {
 			state.entities[key].curHp = newHp //Update store
 
 			//Players curHp is stored under the campaign
-			if(state.entities[key].entityType == 'player') {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
-			} else {
-				//NPC curHp is stored under the encounter
-				encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+			if(!state.demo) {
+				if(state.entities[key].entityType == 'player') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
+				} else {
+					//NPC curHp is stored under the encounter
+					encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+				}
 			}
 		}
 	},
@@ -572,22 +582,26 @@ const mutations = {
 		if(action === 'set') {
 			//SET DEAD
 			Vue.set(state.entities[key], 'dead', true);
-			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
+			if(!state.demo) {
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
+			}
 		}
 		else if(action === 'unset') {
 			Vue.delete(state.entities[key], 'dead');
-			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-			campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+			if(!state.demo) {
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+			}
 			if(revive) {
 				state.entities[key].curHp = 1;
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(1);
+				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(1);
 			}
 		}
 	},
 	FINISH(state) {
 		state.encounter.finished = true
-		encounters_ref.child(`${state.path}/finished`).set(true);
+		if(!state.demo) encounters_ref.child(`${state.path}/finished`).set(true);
 	},
 	INITIALIZED(state) {
 		state.initialized = true
@@ -599,26 +613,32 @@ const mutations = {
 		Object.assign(state, getDefaultState())
 	},
 	SET_TARGETREMINDER(state, {action, entity, key, reminder, type}) {
-		if(action == 'add') {
-			if(type == 'premade') {
-				encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder)
-				Vue.set(state.entities[entity].reminders, key, reminder)
+		if(action === 'add') {
+			if(type === 'premade') {
+				Vue.set(state.entities[entity].reminders, key, reminder);
+				if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder);
 			}
-			if(type == 'custom') {
-				encounters_ref.child(`${state.path}/entities/${entity}/reminders`).push(reminder)
-				.then(res => {
-					//Returns the key of the added entry
-					Vue.set(state.entities[entity].reminders, res.getKey(), reminder)
-				});
+			if(type === 'custom') {
+				if(!state.demo) {
+					encounters_ref.child(`${state.path}/entities/${entity}/reminders`).push(reminder)
+					.then(res => {
+						//Returns the key of the added entry
+						Vue.set(state.entities[entity].reminders, res.getKey(), reminder);
+					});
+					/* 
+						TODO:
+						Add reminder when in demo 
+					*/
+				}
 			}
 		}
-		else if(action == 'remove') {
-			Vue.delete(state.entities[entity].reminders, key)
-			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove()
+		else if(action === 'remove') {
+			Vue.delete(state.entities[entity].reminders, key);
+			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove();
 		}
-		else if(action == 'update') {
-			Vue.set(state.entities[entity].reminders[key], 'rounds', reminder)
-			encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder)
+		else if(action === 'update') {
+			Vue.set(state.entities[entity].reminders[key], 'rounds', reminder);
+			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder);
 		}
 	},
 }

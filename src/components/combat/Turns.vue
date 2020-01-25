@@ -12,10 +12,10 @@
 				</a>
 				<div class="dropdown-menu">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter',})">
+					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
 						<i class="fas fa-cogs"></i> Settings
 					</a>
-					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter',})">
+					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 						<i class="far fa-desktop"></i> Track Settings
 					</a>
 					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
@@ -52,7 +52,7 @@
 					<i class="fas fa-arrow-left"></i> 
 					<span class="ml-1 d-none d-lg-inline">Back</span>
 				</router-link>
-				<a class="btn" @click="start_encounter()">Start encounter <i class="fas fa-arrow-right"></i></a>
+				<a class="btn" @click="set_turn({turn: 1, round: 1})">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>
 			<a v-else class="btn" 
 				@click="nextTurn()" 
@@ -65,8 +65,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'Turns',
@@ -74,7 +74,7 @@
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.getUser.uid
 			}
 		},
 		firebase() {
@@ -94,7 +94,7 @@
 		},
 		methods: {
 			...mapActions([
-				'start_encounter',
+				'set_turn',
 				'update_round',
 				'set_targeted',
 				'setSlide',
@@ -110,19 +110,14 @@
 					round++
 					this.update_round()
 				}
-				if(!this.demo) {
-					db.ref(`encounters/${this.path}`).update({
-						turn: turn,
-						round: round,
-					})
-					db.ref(`encounters/${this.path}/lastRoll`).set(false);
-				}
+				this.set_turn({turn, round})
+				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
 				this.set_targeted({ e: 'untarget', key: 'all' });
 				this.reminders(this.current, 'endTurn')
 			},
 			reminders(target, trigger){
 				for(let key in target.reminders) {
-					if(target.reminders[key].trigger == trigger) {
+					if(target.reminders[key].trigger === trigger) {
 
 						//Buttons to remove or keep reminder
 						if(target.reminders[key].action != 'remove') {
@@ -175,14 +170,10 @@
 					turn = this.active_len - 1
 					round--
 				}
-				if (round == 0) {
+				if (round === 0) {
 					turn = 0
 				}
-				
-				if(!this.demo) db.ref(`encounters/${this.path}`).update({
-					turn: turn,
-					round: round,
-				})
+				this.set_turn({turn, round});
 				this.set_targeted({ e: 'untarget', key: 'all' });
 			},
 			confirmFinish() {
@@ -190,8 +181,8 @@
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},

@@ -84,21 +84,21 @@ const getters = {
 	log: function( state ) {
 		//If there is a storage log, set it in the store
 		if(localStorage.getItem(state.encounterId)) {
-			state.log = JSON.parse(localStorage.getItem(state.encounterId))
+			state.log = JSON.parse(localStorage.getItem(state.encounterId));
 		}
-		return state.log
+		return state.log;
 	},
 	turn: function( state ) {
 		if (state.encounter) {
-			return state.encounter.turn
+			return state.encounter.turn;
 		}
-		return undefined
+		return undefined;
 	},
 	round: function( state ) {
 		if (state.encounter) {
-			return state.encounter.round
+			return state.encounter.round;
 		}
-		return undefined
+		return undefined;
 	}
 }
 
@@ -112,7 +112,7 @@ const mutations = {
 			entityType: db_entity.entityType,
 			maxHp: db_entity.maxHp,
 			ac: parseInt(db_entity.ac),
-			active: db_entity.active,
+			active: db_entity.active
 		}
 		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
 		entity.npc = (db_entity.npc) ? db_entity.npc : false;
@@ -135,14 +135,14 @@ const mutations = {
 			entity.overkillTaken = (db_entity.meters.overkillTaken) ? db_entity.meters.overkillTaken : 0;
 			entity.overhealingTaken = (db_entity.meters.overhealingTaken) ? db_entity.meters.overhealingTaken : 0;
 		} else {
-			entity.damage = 0
-			entity.healing = 0
-			entity.overkill = 0
-			entity.overhealing = 0
-			entity.damageTaken = 0
-			entity.healingTaken = 0
-			entity.overkillTaken = 0
-			entity.overhealingTaken = 0
+			entity.damage = 0;
+			entity.healing = 0;
+			entity.overkill = 0;
+			entity.overhealing = 0;
+			entity.damageTaken = 0;
+			entity.healingTaken = 0;
+			entity.overkillTaken = 0;
+			entity.overhealingTaken = 0;
 		}
 
 		switch(entity.entityType) {
@@ -283,7 +283,7 @@ const mutations = {
 				break
 			}
 		}
-		Vue.set(state.entities, key, entity)
+		Vue.set(state.entities, key, entity);
 	},
 	CLEAR_ENTITIES(state) { state.entities = {}; },	
 	TRACK(state, value) { state.track = value; },
@@ -345,52 +345,58 @@ const mutations = {
 				}
 			} else {
 				if(state.targeted.length === 0 || state.targeted != key) {
-					state.targeted = [key]
-				}
-				else {
+					state.targeted = [key];
+				} else {
 					state.targeted = [];
 				}
 			}
 		}
 	},
-	START_ENCOUNTER(state) {
-		Vue.set(state.encounter, 'round', 1);
-		if(!state.demo) encounters_ref.child(state.path).child('round').update(1);
+	SET_TURN(state, {turn, round}) {
+		Vue.set(state.encounter, 'round', round);
+		Vue.set(state.encounter, 'turn', turn);
+
+		if(!state.demo) {
+			db.ref(state.path).update({
+				turn: turn,
+				round: round,
+			});
+		}
 	},
 	SET_PATH(state, path) {
-		state.path = path
+		state.path = path;
 	},
 	SET_ACTIVE(state, {key, active}) {
-		state.entities[key].active = active
+		state.entities[key].active = active;
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update({
 			active: active
-		})
+		});
 	},
 	SET_HIDDEN(state, {key, hidden}) {
-		state.entities[key].hidden = hidden
+		state.entities[key].hidden = hidden;
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update({
 			hidden: hidden
-		})
+		});
 	},
 	SET_INITIATIVE(sate, {key, initiative}) {
-		state.entities[key].initiative = initiative
+		state.entities[key].initiative = initiative;
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update({
 			initiative: parseInt(initiative),
-		})
+		});
 	},
 	SET_CONDITION(state, {action, key, condition, level}) {
 		if(action == 'add') {
 			if(condition == 'exhaustion') {
-				Vue.set(state.entities[key].conditions, condition, level)
+				Vue.set(state.entities[key].conditions, condition, level);
 				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set(level);
 			}
 			else {
-				Vue.set(state.entities[key].conditions, condition, true)
+				Vue.set(state.entities[key].conditions, condition, true);
 				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set('true');
 			}
 		}
 		else if(action == 'remove') {
-			Vue.delete(state.entities[key].conditions, condition)
+			Vue.delete(state.entities[key].conditions, condition);
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).remove();
 		}
 	},
@@ -401,11 +407,11 @@ const mutations = {
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
 
 			//REMOVE STABLE
-			Vue.set(state.entities[key], 'stable', false)
+			Vue.set(state.entities[key], 'stable', false);
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
 		}
 		else if(check == 'unset') {
-			Vue.delete(state.entities[key].saves, index)
+			Vue.delete(state.entities[key].saves, index);
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${index}`).remove();
 		}
 		else {
@@ -417,19 +423,19 @@ const mutations = {
 	SET_STABLE(state, {key, action}) {
 		if(action == 'set') {
 			//RESET SAVES
-			Vue.set(state.entities[key], 'saves', {})
+			Vue.set(state.entities[key], 'saves', {});
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
 
 			//REMOVE DEAD
-			Vue.delete(state.entities[key], 'dead')
+			Vue.delete(state.entities[key], 'dead');
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
 
 			//SET STABLE
-			Vue.set(state.entities[key], 'stable', 'true')
+			Vue.set(state.entities[key], 'stable', 'true');
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).set(true);
 		}
 		else if(action == 'unset') {
-			Vue.delete(state.entities[key], 'stable')
+			Vue.delete(state.entities[key], 'stable');
 			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
 		}
 	},
@@ -474,10 +480,10 @@ const mutations = {
 			}
 		}
 		else {
-			state.entities[key].transformed = true
-			Vue.set(state.entities[key], 'transformedMaxHp', entity.maxHp)
-			Vue.set(state.entities[key], 'transformedCurHp', entity.maxHp)
-			Vue.set(state.entities[key], 'transformedAc', entity.ac)
+			state.entities[key].transformed = true;
+			Vue.set(state.entities[key], 'transformedMaxHp', entity.maxHp);
+			Vue.set(state.entities[key], 'transformedCurHp', entity.maxHp);
+			Vue.set(state.entities[key], 'transformedAc', entity.ac);
 			
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
@@ -496,15 +502,15 @@ const mutations = {
 		state.entities[key].down = value
 		if(!state.demo) {
 			if (value) {
-				encounters_ref.child(`${state.path}/entities/${key}/down`).set(true)
+				encounters_ref.child(`${state.path}/entities/${key}/down`).set(true);
 			} else {
-				encounters_ref.child(`${state.path}/entities/${key}/down`).remove()
+				encounters_ref.child(`${state.path}/entities/${key}/down`).remove();
 			}
 		}
 	},
 	ADD_NEXT_ROUND(state, {key, action, value}) {
 		if(action == 'tag') {
-			state.entities[key].addNextRound = value
+			state.entities[key].addNextRound = value;
 		}
 		else if(action == 'set') {
 			Vue.set(state.entities[key], 'active', true);
@@ -524,7 +530,7 @@ const mutations = {
 			//if the damage was higher than the amount of tempHp, remove the tempHp
 			//Save the rest amount to put into transformed or curHp later
 			if(newHp <= 0) {
-				state.entities[key].tempHp = undefined //update store
+				state.entities[key].tempHp = undefined; //update store
 
 				//Player tempHp is stored under campaign
 				//NPC tempHp is stored under encounter
@@ -600,17 +606,17 @@ const mutations = {
 		}
 	},
 	FINISH(state) {
-		state.encounter.finished = true
+		state.encounter.finished = true;
 		if(!state.demo) encounters_ref.child(`${state.path}/finished`).set(true);
 	},
 	INITIALIZED(state) {
-		state.initialized = true
+		state.initialized = true;
 	},
 	UNINITIALIZED(state) {
-		state.initialized = false
+		state.initialized = false;
 	},
 	RESET_STORE(state) {
-		Object.assign(state, getDefaultState())
+		Object.assign(state, getDefaultState());
 	},
 	SET_TARGETREMINDER(state, {action, entity, key, reminder, type}) {
 		if(action === 'add') {
@@ -654,7 +660,7 @@ const actions = {
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path)
 
-		//Get the entities when it's not a demo encounter
+		//Set the entities when it's not a demo encounter
 		if(!demo) {
 			const encounter = await encounters_ref.child(path);
 			await encounter.once('value', snapshot => {
@@ -682,7 +688,7 @@ const actions = {
 			commit('SET_ENCOUNTER', demoEncounter)
 		}
 	},
-	start_encounter({ commit }) { commit("START_ENCOUNTER") },
+	set_turn({ commit }, payload) { commit("SET_TURN", payload) },
 	set_log({ commit }, payload) { commit("SET_LOG", payload) },
 	set_meters({ commit }, payload) { commit("SET_METERS", payload) },
 	set_active({ commit }, payload) { commit("SET_ACTIVE", payload) },
@@ -703,6 +709,13 @@ const actions = {
 			}
 		}
 	},
+	add_next_round({ commit }, payload) {
+		event.stopPropagation(); //So target is not unselected when clicked
+		commit('ADD_NEXT_ROUND', payload);
+	},
+	set_hp({ commit }, payload) {
+		commit('SET_HP', payload);
+	},
 	set_condition({ commit }, payload) { commit('SET_CONDITION', payload); },
 	set_save({ commit }, payload) { commit('SET_SAVE', payload); },
 	set_stable({ commit }, payload) { commit('SET_STABLE', payload); },
@@ -711,13 +724,6 @@ const actions = {
 	transform_entity({ commit }, payload) { commit('TRANSFORM_ENTITY', payload); },
 	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
 	remove_entity({ commit }, payload) { commit('REMOVE_ENTITY', payload); },
-	add_next_round({ commit }, payload) {
-		event.stopPropagation(); //So target is not unselected when clicked
-		commit('ADD_NEXT_ROUND', payload);
-	},
-	set_hp({ commit }, payload) {
-		commit('SET_HP', payload);
-	},
 	set_dead({ commit }, payload) { commit('SET_DEAD', payload); },
 	set_finished({ commit }) { commit('FINISH'); },
 	reset_store({ commit }) { commit("RESET_STORE"); },

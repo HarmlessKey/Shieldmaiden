@@ -672,10 +672,9 @@ const mutations = {
 						//Returns the key of the added entry
 						Vue.set(state.entities[entity].reminders, res.getKey(), reminder);
 					});
-					/* 
-						TODO:
-						Add reminder when in demo 
-					*/
+				} else {
+					let reminderKey = Date.now() + Math.random().toString(36).substring(4);
+					Vue.set(state.entities[entity].reminders, reminderKey, reminder);
 				}
 			}
 		}

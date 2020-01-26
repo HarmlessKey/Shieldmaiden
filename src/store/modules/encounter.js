@@ -1,9 +1,47 @@
-import { db } from '@/firebase'
-import Vue from 'vue'
+import { db } from '@/firebase';
+import Vue from 'vue';
 
+const demoPlayers = {
+	'playerone': {
+		character_name: 'Player One',
+		maxHp: 10,
+		maxHpMod: 0,
+		curHp: 10,
+		ac: 12,
+		strength: 10,
+		dexterity: 12,
+		constitution: 10,
+		intelligence: 14,
+		wisdom: 12,
+		charisma:15
+	},
+	'playertwo': {
+		character_name: 'Player Two',
+		maxHp: 14,
+		maxHpMod: 0,
+		curHp: 14,
+		ac: 16,
+		strength: 15,
+		dexterity: 12,
+		constitution: 15,
+		intelligence: 10,
+		wisdom: 10,
+		charisma:11
+	}
+}
 const demoEncounter = {
 	"encounter" : "Demo Encounter",
 	"entities" : {
+		"playerone" : {
+			"active" : true,		
+			"entityType" : "player",
+			"initiative" : 0,
+		},
+		"playertwo" : {
+			"active" : true,		
+			"entityType" : "player",
+			"initiative" : 0,
+		},
 		"-LyLsDRVSegNw2P9kVox" : {
 			"ac" : 18,
 			"active" : true,		
@@ -149,7 +187,7 @@ const mutations = {
 
 		switch(entity.entityType) {
 			case 'player': {
-				let campaignPlayer = rootState.content.campaigns[state.campaignId].players[key];
+				let campaignPlayer = (!state.demo) ? rootState.content.campaigns[state.campaignId].players[key] : demoPlayers[key];
 
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
 				entity.curHp = campaignPlayer.curHp;
@@ -171,7 +209,7 @@ const mutations = {
 				}
 
 				//get other values from the player
-				let db_player = rootState.content.players[key];
+				let db_player = (!state.demo) ? rootState.content.players[key] : demoPlayers[key];
 
 				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
 				

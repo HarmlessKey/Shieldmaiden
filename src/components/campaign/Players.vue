@@ -82,12 +82,19 @@
 			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
-				<div class="image" :key="'image-'+key">
+				<div 
+					class="image" 
+					:key="'image-'+key" 
+					:style="[
+						player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
+						{ backgroundImage: 'url(/img/player.03a988f6.svg)'}
+					]
+				">
 					<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
 						<i class="fas fa-paw-claws green"></i>
 					</div>
-					<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-					<img v-else src="@/assets/_img/styles/player.svg" />	
+					<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
+					<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
 				</div>
 				<div class="col ac" :key="'ac-'+key">
 					<span :class="{ 
@@ -436,6 +443,17 @@
 			background-position: top center;
 			background-color: black;
 			border: solid 1px #b2b2b2;
+			position: relative;
+
+			.transformed {
+				right: 0;
+				bottom: 0;
+				position: absolute;
+				background: #000;
+				padding: 0 2px;
+				border-left: solid 1px #b2b2b2;
+				border-top: solid 1px #b2b2b2;
+			}
 		}
 		.col {
 			min-height: 35px;
@@ -485,17 +503,6 @@
 				width: 62px;
 				height: 62px;
 				grid-row: span 2;
-				position: relative;
-
-				.transformed {
-					right: 0;
-					bottom: 0;
-					position: absolute;
-					background: #000;
-					padding: 0 2px;
-					border-left: solid 1px #b2b2b2;
-					border-top: solid 1px #b2b2b2;
-				}
 			}
 			.xp-bar {
 				display: flex;

@@ -32,6 +32,8 @@
 				<Side />
 			</div>
 		</template>
+
+		<DemoOverlay v-if="demo" />
 	</div>
 
 </template>
@@ -41,15 +43,16 @@
 	import { mapActions, mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
-	import Finished from '@/components/combat/Finished.vue'
-	import Actions from '@/components/combat/actions/Actions.vue'
-	import Turns from '@/components/combat/Turns.vue'
-	import Current from '@/components/combat/Current.vue'
-	import Targets from '@/components/combat/Targets.vue'
-	import Targeted from '@/components/combat/Targeted.vue'
-	import Side from '@/components/combat/side/Side.vue'
-	import SetInitiative from '@/components/combat/SetInitiative.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import Finished from '@/components/combat/Finished.vue';
+	import Actions from '@/components/combat/actions/Actions.vue';
+	import Turns from '@/components/combat/Turns.vue';
+	import Current from '@/components/combat/Current.vue';
+	import Targets from '@/components/combat/Targets.vue';
+	import Targeted from '@/components/combat/Targeted.vue';
+	import Side from '@/components/combat/side/Side.vue';
+	import SetInitiative from '@/components/combat/SetInitiative.vue';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
 
 	export default {
 		name: 'app',
@@ -66,6 +69,7 @@
 			Side,
 			SetInitiative,
 			OverEncumbered,
+			DemoOverlay
 		},
 		data() {
 			// Dispatch route parameters to store

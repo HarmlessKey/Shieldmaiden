@@ -1,0 +1,91 @@
+<template>
+	<div class="demo">
+		<transition 
+			enter-active-class="animated slideInBottom" 
+			leave-active-class="animated slideOutBottom"
+		>
+			<div class="grid bg-gray-dark" :class="{ hide: !showInfo }">
+				<div class="">
+					<h3>
+						Demo Encounter 
+						<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i></a>
+					</h3>
+					This demo encounter has all the functionality our encounter tracker has. If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
+					Create your personal account now and make your D&D encounters smoother than ever.
+				</div>
+				<div>
+					<router-link to="/sign-up" class="btn btn-lg bg-green">Create Account</router-link>
+				</div>
+			</div>
+		</transition>
+		<div class="toggle bg-blue" @click="showInfo = !showInfo">
+			<i class="fas fa-times" v-if="showInfo"></i>
+			<i class="fas fa-chevron-up" v-else></i>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default {
+		name: 'DemoOverlay',
+		data () {
+			return {
+				showInfo: true
+			}
+		},
+		methods: {
+			reload() {
+				this.$router.go();
+			}
+		}		
+	}
+</script>
+
+<style lang="scss" scoped>
+.demo {
+	position: fixed;
+	margin: 0 15px;
+	bottom: 0;
+	width: calc(100% - 30px);
+	z-index: 999;
+	
+
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr max-content;
+		grid-template-rows: max-content;
+		padding: 20px;
+		box-shadow: 0px 0px 15px #000;
+		transition: bottom .5s linear;
+
+		&.hide {
+			display:none;
+		}
+	}
+	.toggle {
+        position: absolute;
+		top: -50px;
+        right: 5px;
+        height: 50px;
+        width: 50px;
+        z-index: 97;
+        text-align: center;
+        transition: right .5s linear;
+        display: block;
+        cursor: pointer;
+        line-height: 50px;
+        color: #fff !important;
+
+        i {
+            transition: transform .5s linear;
+        }    
+
+        &.show {
+
+            i {
+                transform: rotate(180deg);
+            }
+        }
+    }
+}
+</style>

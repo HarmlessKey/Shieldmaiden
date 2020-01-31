@@ -3,32 +3,28 @@
 		<div class="container-fluid">
 			<div class="container">
 				<img  v-if="!user" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
-				<div v-else class="welcome">
-					<b-navbar toggleable="lg" type="dark">
-						<b-navbar-brand>
-							Welcome
-						</b-navbar-brand>
-						<b-collapse id="nav-collapse" is-nav>
-							<b-navbar-nav class="ml-auto">
-								<b-navbar-nav>
-									<b-nav-item v-b-tooltip.hover.bottom="'Campaigns'"  to="campaigns"><i class="fas fa-dungeon"></i></b-nav-item>
-									<b-nav-item v-b-tooltip.hover.bottom="'Players'" to="players"><i class="fas fa-users"></i></b-nav-item>
-									<b-nav-item v-b-tooltip.hover.bottom="'NPC\'s'" to="npcs"><i class="fas fa-dragon"></i></b-nav-item>
-									<b-nav-item v-b-tooltip.hover.bottom="'Items'" to="items"><i class="far fa-staff"></i></b-nav-item>
-								</b-navbar-nav>	
-							</b-navbar-nav>
-						</b-collapse>
-					</b-navbar>
-					<img class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
-				</div>
+				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
 				<div class="content-box">
 					<div class="text">
-						<div class="text-center gray-hover mb-4">Build by 2 guys with a passion for the game.</div>
-						<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
-						<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
-						
+						<template v-if="!user">
+							<div class="text-center gray-hover mb-4">Build by 2 guys with a passion for the game.</div>
+							<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
+							<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
+						</template>
+						<div v-else>
+							<div class="menu">
+								<router-link v-b-tooltip.hover.bottom="'Campaigns'"  to="campaigns"><i class="fas fa-dungeon"></i></router-link>
+								<router-link v-b-tooltip.hover.bottom="'Players'" to="players"><i class="fas fa-users"></i></router-link>
+								<router-link v-b-tooltip.hover.bottom="'NPC\'s'" to="npcs"><i class="fas fa-dragon"></i></router-link>
+								<router-link v-b-tooltip.hover.bottom="'Items'" to="items"><i class="far fa-staff"></i></router-link>
+							</div>
+							<div class="share">
+								<PlayerLink />
+							</div>
+						</div>
+
 						<div class="button-container">
-							<router-link v-if="!user" to="sign-up" class="btn btn-lg">Demo Encounter</router-link>
+							<router-link v-if="!user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
 							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !user}">
 								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 								<div class="text">Join our Discord</div>
@@ -55,11 +51,15 @@
 </template>
 
 <script>
+	import PlayerLink from '../PlayerLink';
 	import { auth } from '@/firebase.js';
 	import { mapGetters } from 'vuex';
 
 	export default {
 		name: 'Top',
+		components: {
+			PlayerLink
+		},
 		computed: {
 			...mapGetters([
 				'userInfo',
@@ -90,11 +90,6 @@
 			max-width: 400px;
 			filter: drop-shadow(2px 2px 1px  #000);
 		}
-		.welcome {
-			.navbar {
-				margin-bottom: 30px;
-			}
-		}
 		.container-fluid {
 
 			.container {
@@ -117,6 +112,26 @@
 						line-height: 35px;
 						font-style: italic;
 						text-transform: none;
+					}
+					.menu {
+						display: grid;
+						justify-content: center;
+						grid-template-columns: repeat(4, max-content);
+						grid-gap: 20px;
+						font-size: 25px;
+						margin-top: 20px;
+
+						a {
+							color: #fff !important;
+						}
+					}
+					.share {
+						text-align: left;
+						font-size: 15px;
+						margin: 40px 0;
+						padding: 20px 0;
+						border-top: solid 1px #5c5757;
+						border-bottom: solid 1px #5c5757;
 					}
 					.button-container {
 						display: flex;

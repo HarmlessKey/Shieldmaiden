@@ -2,10 +2,9 @@
 	<div class="overview">
 		<div class="container">
 			<div class="deck">
-					<b-card 
-						header="Combat Tracker"
-						img-src="/img/general.d70ae7d9.png"
-					>
+					<b-card>
+						<img class="card-img" src="@/assets/_img/home/general.png"/>
+						<div class="card-header">Combat Tracker</div>
 						<b-card-text>
 							We track everything in combat you can think of.
 						</b-card-text>
@@ -13,10 +12,9 @@
 							<a href="#general" class="btn btn-block">Learn More</a>
 						</template>
 					</b-card>
-					<b-card 
-						header="Encounter Builder"
-						img-src="/img/builder.24879c88.png"
-					>
+					<b-card>
+						<img class="card-img" src="@/assets/_img/home/builder.png"/>
+						<div class="card-header">Encounter Builder</div>
 						<b-card-text>
 							Quickly create your encounters with ease.
 						</b-card-text>
@@ -24,10 +22,9 @@
 							<a href="#builder" class="btn btn-block">Learn More</a>
 						</template>
 					</b-card>
-					<b-card 
-						header="Share Initiative"
-						img-src="/img/share.e1965dc6.png"
-					>
+					<b-card>	
+						<img class="card-img" src="@/assets/_img/home/share.png"/>
+						<div class="card-header">Share Initiative</div>
 						<b-card-text>
 							Live. On a second screen, or with anyone in the world.
 						</b-card-text>
@@ -35,10 +32,9 @@
 							<a href="#share" class="btn btn-block">Learn More</a>
 						</template>
 					</b-card>
-					<b-card 
-						header="Campaign Manager"
-						img-src="/img/campaign.ab183c6b.png"
-					>
+					<b-card>
+						<img class="card-img" src="@/assets/_img/home/campaign.png"/>
+						<div class="card-header">Campaign Manager</div>
 						<b-card-text>
 							Manage more than just your encounters.
 						</b-card-text>
@@ -72,6 +68,12 @@
 				display: flex;
 				flex: 1 1 25%;
 				
+				.card-body {
+					padding: 0;
+				}
+				.card-text {
+					padding: 20px;
+				}
 				.card-header {
 					font-family: 'Fredericka the Great', cursive;
 					color: #fff;

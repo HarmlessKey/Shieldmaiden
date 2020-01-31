@@ -26,7 +26,7 @@
 						<li>Roll monster abilities and apply damage instantly</li>
 					</ul>
 
-					<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
+					<router-link to="sign-up" class="btn btn-lg">Try it in our demo</router-link>
 				</b-col>
 			</b-row>
 			<a href="#builder" class="next">

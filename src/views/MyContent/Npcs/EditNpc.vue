@@ -529,11 +529,10 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
-	import { general } from '@/mixins/general.js'
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
+	import { general } from '@/mixins/general.js';
 
 
 	export default {

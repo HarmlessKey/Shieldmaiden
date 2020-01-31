@@ -1,7 +1,7 @@
 <!-- EDIT PLAYER -->
 
 <template>
-	<div class="pb-5" v-if="entity">
+	<div class="pb-5" v-if="entity && !demo">
 		<h2 class="d-flex justify-content-between">
 			<span>Edit {{ playerBase.character_name }}</span>
 			<a v-b-tooltip.hover title="Transform" @click="setTransform = !setTransform">
@@ -224,6 +224,12 @@
 			</div>
 		</template>
 	</div>
+	<div v-else-if="demo">
+		<h2>Edit Player</h2>
+		<p>In the demo you can't edit players. Sign up to get access to all the features our app has to offer, like creating players and monsters and of course your own encounters.</p>
+
+		<router-link to="/sign-up" class="btn btn-block btn-lg bg-green">Create Account</router-link>
+	</div>
 </template>
 
 <script>
@@ -243,6 +249,7 @@
 		],
 		data() {
 			return {
+				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -257,12 +264,14 @@
 			}
 		},
 		mounted() {
-			var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
-			entity.on('value', async (snapshot) => {
-				this.entity = snapshot.val();
-				this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
-				this.maxHpMod = snapshot.val().maxHpMod;
-			});
+			if(!this.demo) {
+				var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
+				entity.on('value', async (snapshot) => {
+					this.entity = snapshot.val();
+					this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
+					this.maxHpMod = snapshot.val().maxHpMod;
+				});
+			}
 		},
 		firebase() {
 			return {

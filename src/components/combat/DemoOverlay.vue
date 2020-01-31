@@ -11,9 +11,9 @@
 						<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i></a>
 					</h3>
 					This demo encounter has all the functionality our encounter tracker has. If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
-					Create your personal account now and make your D&D encounters smoother than ever.
+					Create your personal account now and run your D&D encounters smoother than ever.
 				</div>
-				<div>
+				<div class="create">
 					<router-link to="/sign-up" class="btn btn-lg bg-green">Create Account</router-link>
 				</div>
 			</div>
@@ -57,9 +57,13 @@
 		padding: 20px;
 		box-shadow: 0px 0px 15px #000;
 		transition: bottom .5s linear;
+		grid-gap: 20px;
 
 		&.hide {
 			display:none;
+		}
+		.create {
+			align-self: center;
 		}
 	}
 	.toggle {

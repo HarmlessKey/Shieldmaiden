@@ -6,7 +6,10 @@
 		v-else-if="encounter && (players || demo)"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
 	>	
-		<Finished v-if="encounter.finished" :encounter="encounter"/>
+		<template v-if="encounter.finished">
+			<Finished v-if="!demo" :encounter="encounter"/>
+			<DemoFinished v-else />
+		</template>
 
 		<template v-else>
 			<SetInitiative 
@@ -44,6 +47,7 @@
 	import { db } from '@/firebase'
 
 	import Finished from '@/components/combat/Finished.vue';
+	import DemoFinished from '@/components/combat/DemoFinished.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import Turns from '@/components/combat/Turns.vue';
 	import Current from '@/components/combat/Current.vue';
@@ -61,6 +65,7 @@
 		},
 		components: {
 			Finished,
+			DemoFinished,
 			Actions,
 			Turns,
 			Current,
@@ -112,7 +117,7 @@
 				'overencumbered',
 			]),
 			_active: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc'; 
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -128,7 +133,7 @@
 					.value()
 			},
 			_idle: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -141,7 +146,7 @@
 					.value()
 			},
 			_alive: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -156,7 +161,7 @@
 		},
 		watch: {
 			alive(newVal) {
-				if(newVal == 0 && this.initialized) {
+				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}
 			}

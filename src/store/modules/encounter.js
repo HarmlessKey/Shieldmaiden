@@ -3,30 +3,49 @@ import Vue from 'vue';
 
 const demoPlayers = {
 	'playerone': {
-		character_name: 'Player One',
-		maxHp: 10,
+		character_name: 'Barbarian',
+		maxHp: 41,
 		maxHpMod: 0,
-		curHp: 10,
+		curHp: 41,
 		ac: 12,
-		strength: 10,
-		dexterity: 12,
-		constitution: 10,
-		intelligence: 14,
-		wisdom: 12,
-		charisma:15
+		strength: 20,
+		dexterity: 14,
+		constitution: 16,
+		intelligence: 6,
+		wisdom: 8,
+		charisma:10
 	},
 	'playertwo': {
-		character_name: 'Player Two',
+		character_name: 'Warlock',
 		maxHp: 14,
 		maxHpMod: 0,
 		curHp: 14,
 		ac: 16,
-		strength: 15,
-		dexterity: 12,
-		constitution: 15,
-		intelligence: 10,
-		wisdom: 10,
-		charisma:11
+		strength: 8,
+		dexterity: 14,
+		constitution: 14,
+		intelligence: 11,
+		wisdom: 14,
+		charisma:18,
+		tempHp: 6
+	},
+	'playerthree': {
+		character_name: 'Druid',
+		maxHp: 14,
+		maxHpMod: 0,
+		curHp: 14,
+		ac: 16,
+		strength: 8,
+		dexterity: 14,
+		constitution: 14,
+		intelligence: 11,
+		wisdom: 18,
+		charisma:11,
+		transformed: {
+			ac: 14,
+			maxHp: 37,
+			curHp: 37
+		}
 	}
 }
 const demoEncounter = {
@@ -36,48 +55,56 @@ const demoEncounter = {
 			"active" : true,		
 			"entityType" : "player",
 			"initiative" : 0,
+			"conditions": {
+				exhaustion: 1
+			}
 		},
 		"playertwo" : {
 			"active" : true,		
 			"entityType" : "player",
 			"initiative" : 0,
 		},
-		"-LyLsDRVSegNw2P9kVox" : {
-			"ac" : 18,
+		"playerthree" : {
 			"active" : true,		
-			"curHp" : 7,
-			"entityType" : "npc",
-			"id" : "169",
+			"entityType" : "player",
 			"initiative" : 0,
-			"key" : "-LyLsDRVSegNw2P9kVox",
-			"maxHp" : 7,
-			"name" : "Hobgoblin",
+		},
+		"monsterone" : {
+			"ac" : 13,
+			"active" : true,		
+			"curHp" : 21,
+			"entityType" : "npc",
+			"id" : "216",
+			"initiative" : 0,
+			"key" : "monsterone",
+			"maxHp" : 21,
+			"name" : "Orc (1)",
 			"npc" : "api"
 		},
-			"-LyLsG7UKs6HBXY2KelL" : {
-			"ac" : 15,
-			"active" : true,
-			"curHp" : 11,
+		"monstertwo" : {
+			"ac" : 13,
+			"active" : true,		
+			"curHp" : 12,
 			"entityType" : "npc",
-			"id" : "150",
+			"id" : "216",
 			"initiative" : 0,
-			"key" : "-LyLsG7UKs6HBXY2KelL",
-			"maxHp" : 11,
-			"name" : "Goblin",
+			"key" : "monstertwo",
+			"maxHp" : 12,
+			"name" : "Orc (2)",
 			"npc" : "api"
 		},
-		"-LyLsGO8dzJocx0wJecf" : {
-			"ac" : 15,
-			"active" : true,
-			"curHp" : 4,
+		"monsterthree" : {
+			"ac" : 11,
+			"active" : true,		
+			"curHp" : 72,
 			"entityType" : "npc",
-			"id" : "150",
+			"id" : "213",
 			"initiative" : 0,
-			"key" : "-LyLsGO8dzJocx0wJecf",
-			"maxHp" : 4,
-			"name" : "Goblin (1)",
+			"key" : "monstertwo",
+			"maxHp" : 72,
+			"name" : "Ogre",
 			"npc" : "api"
-		}
+		},
 	},
 	"finished" : false,
 	"round" : 0,

@@ -5,7 +5,7 @@
 			<b-card header="Thanks for trying our demo">
 				<b-card-text>
 					<h3>We hope you were impressed by the possibilities</h3>
-					<p>This is exactly how you can run your custom created encounters in our app. With your own players and monsters that you created yourself.</p>
+					<p>This is exactly how you can run your custom created encounters in our app. With your own players, and monsters from the SRD or created by you.</p>
 
 					<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
 				</b-card-text>

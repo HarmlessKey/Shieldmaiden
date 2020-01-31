@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-5">
+	<div class="pb-5" ref="entity" :class="{ small: is_small }">
 		<h2>{{ data.name }}</h2>
 		<i>
 			<template v-if="data.size">{{ data.size }}</template>
@@ -35,6 +35,7 @@
 		<div class="abilities">
 			<template v-for="(ability, index) in abilities">
 				<div
+					class="ability"
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
 					@click="rollAbility(ability.ability, data[ability.ability])"
@@ -77,7 +78,7 @@
 			<template v-if="data.condition_immunities"><b>Condition immunities</b> {{ data.condition_immunities }}<br/></template>
 			<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
 			<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
-			<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }}</template>
+			<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }} ({{ challengeToXp[data.challenge_rating] }}XP)</template>
 		</p>
 
 		<template v-if="data.special_abilities">
@@ -115,6 +116,7 @@
 		],
 		data() {
 			return {
+				is_small: false,
 				skills: [
 					'acrobatics',
 					'animal Handling',
@@ -168,29 +170,6 @@
 			}
 		},
 		computed: {
-			//Depending on where this is shown
-			//they layout needs be adjusted slightly
-			sm: function() {
-				if(this.$route.meta.basePath == '/compendium') {
-					return 4
-				} else {
-					return 6
-				}
-			},
-			md: function() {
-				if(this.$route.meta.basePath == '/compendium') {
-					return 4
-				} else {
-					return 6
-				}
-			},
-			lg: function() {
-				if(this.$route.meta.basePath == '/compendium') {
-					return 2
-				} else {
-					return 4
-				}
-			},
 			monsterSkills() {
 				let skills = [];
 				for(let i in this.skills) {
@@ -226,6 +205,15 @@
 			}
 		},
 		methods: {
+			setSize() {
+				let width = this.$refs.entity.clientWidth
+				let small = 300;
+
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.entity.clientWidth;
+			},
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)
 				if(mod > 0) {
@@ -250,6 +238,16 @@
 					position: "centerTop"
 				});
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	};
 </script>
@@ -268,20 +266,19 @@ a {
 	color: #b2b2b2 !important;
 }
 .abilities {
-	display: flex;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: 	repeat(6, 40px);
+	grid-column-gap: 15px;
 	text-align: center;
 	font-size: 12px;
-	padding-left: 5px;
 	max-width: 650px;
 	
 	.abilityName {
 		font-size: 15px;
 		font-weight: bold;
 	}
-	div {
+	.ability {
 		cursor: pointer;
-		margin-right: 5px;
 	}
 }
 .skills .skill, .saves .save {
@@ -294,6 +291,13 @@ a {
 }
 .saves .save {
 	cursor: pointer;
+}
+.small {
+	.abilities {
+		grid-template-columns: 	repeat(3, auto);
+		grid-template-rows: auto auto;
+		grid-row-gap: 15px;
+	}
 }
 
 </style>

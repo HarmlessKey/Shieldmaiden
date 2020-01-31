@@ -94,6 +94,7 @@
 		name: 'AddEntity',
 		data() {
 			return {
+				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -139,6 +140,7 @@
 		methods: {
 			...mapActions([
 				'setSlide',
+				'add_entity_demo',
 				'add_entity',
 			]),
 			searchNPC() {
@@ -189,12 +191,16 @@
 							this.entity.active = true;
 						}
 						this.entity.npc = (this.entity.npc) ? this.entity.npc : 'custom';
-
-						db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(this.entity)
-							.then(res => {
-								//Returns the key of the added entry
-								this.add_entity(res.getKey())
-							});
+						
+						if(!this.demo) {
+							db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(this.entity)
+								.then(res => {
+									//Returns the key of the added entry
+									this.add_entity(res.getKey())
+								});
+						} else {
+							this.add_entity_demo(this.entity);
+						}
 					} else {
 						//console.log('Not valid');
 					}

@@ -1,6 +1,7 @@
 @import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
+@import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 
 /*
 	Table of content
@@ -32,6 +33,7 @@ $facebook-blue: #3C5A99;
 $red: #cc3e4a;
 $red-hover: #a3303a;
 $patreon-red: #e85b46;
+$discord-purple: #7289DA;
 $orange: #e76d3b;
 $yellow: #c1b947;
 $purple: #9b7aba;
@@ -117,6 +119,7 @@ html body {
 .red { color: $red !important; }
 .black { color: $black !important; }
 .patreon-red { color: $patreon-red !important; }
+.discord-purple { color: $discord-purple !important; }
 .white { color: $white !important; }
 .orange { color: $orange !important; }
 .yellow { color: $yellow !important; }
@@ -182,6 +185,7 @@ a.large-link {
 	display: flex;
 	justify-content: flex-start;
 	box-shadow: 3px 3px 10px $black;
+	user-select: none;
 
 	.icon {
 		border-top-left-radius: 5px;
@@ -214,10 +218,60 @@ a.large-link {
 		padding: 20px;
 	}
 }
-#home {
+.home {
+	scroll-behavior: smooth;
+
 	.content {
 		max-width: 1140px;
 		margin: auto;
+	}
+	section {
+		font-size: 18px; 
+		line-height: 30px;
+		
+		.head {
+			padding: 100px 0 75px 0;
+			text-align: center;
+
+			h2 {
+				font-family: 'Fredericka the Great', cursive;
+				font-size: 30px !important;
+				line-height: 50px;
+				text-align: center;
+				color: #fff;
+			}
+		}
+		h3 {
+			font-size: 25px !important;
+			margin-bottom: 30px !important;
+		}
+		p {
+			margin-bottom: 50px;
+		}
+		.next {
+			display: block;
+			text-align: center;
+			margin: 0;
+			color: $white !important;
+			position: absolute;
+			bottom: 70px;
+			left: 50%;
+			margin-left: -125px;
+			width: 250px;
+			font-size: 25px;
+
+			i {
+				font-size: 35px;
+			}
+	
+			&:hover {
+				text-decoration: none;
+	
+				i {
+					font-size: 45px;
+				}
+			}
+		}
 	}
 }
 
@@ -328,34 +382,50 @@ a.logout {
 
 /* 5. Components*/
 /*********************************************/
-#login {
-	padding-top: 50px;
-	max-width: 300px;
-	margin: auto;
+.login-container {
+	color: #fff;
+	background-position: center;
+	height: calc(100vh - 50px);
+	background-color: #000;
+	background-image: url('../assets/_img/styles/paper-bg.png');
+	padding-top: 100px;
 
-	h1, h2 {
-		text-transform: none !important;
-		text-align: center;
-		margin-bottom: 20px;
-	}
-	img.logo {
-		width: calc(100% - 20px);
-		margin: 0 10px;
-		margin-bottom: 20px;
-	}
-	input {
-		height: 45px;
+	#login {
+		background-color: $gray;
+		max-width: 360px;
+		margin: auto;
+		padding: 120px 30px 30px;
+		position: relative;
+		box-shadow: 5px 5px 10px #000;
+		border-radius: 5px;
 
-		&.email {
-			margin-bottom: 0;
-			border-bottom: none !important;
+	
+		h1, h2 {
+			text-transform: none !important;
+			text-align: center;
+			margin-bottom: 20px;
 		}
-	}
-	.google {
-		background-color: $gray-light !important;
-		color: #262626 !important;
-		img {
-			height: 23px;
+		img.logo {
+			width: calc(100% - 50px);
+			margin: 0 25px;
+			position: absolute;
+			top: -35px;
+			left: 0;
+		}
+		input {
+			height: 45px;
+	
+			&.email {
+				margin-bottom: 0;
+				border-bottom: none !important;
+			}
+		}
+		.google {
+			background-color: $gray-light !important;
+			color: #262626 !important;
+			img {
+				height: 23px;
+			}
 		}
 	}
 }
@@ -761,6 +831,14 @@ ul.entities {
 
 /* 6. Bootstrap overrides*/
 /*********************************************/
+.navbar {
+	width: 100%;
+	border-bottom: solid 1px $gray-light;
+
+	.navbar-brand, a.nav-link {
+		color: $white !important;
+	}
+}
 .btn {
 	border-radius: 0 !important;
 	background: $blue;

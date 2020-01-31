@@ -1,5 +1,5 @@
 <template>
-	<div class="monster">
+	<div class="monster" ref="entity" :class="{ small: is_small }">
 		<div class="monster-stats">
 			<h2>{{ data.name }}</h2>
 			<span class="size">
@@ -31,6 +31,7 @@
 			<div class="abilities">
 				<template v-for="(ability, index) in abilities">
 					<div
+						class="ability"
 						v-b-tooltip.hover title="Roll"
 						:key="index" 
 						@click="rollAbility(ability.ability, data[ability.ability])"
@@ -118,6 +119,7 @@
 		],
 		data() {
 			return {
+				is_small: false,
 				skills: [
 					'acrobatics',
 					'animal Handling',
@@ -206,6 +208,15 @@
 			}
 		},
 		methods: {
+			setSize() {
+				let width = this.$refs.entity.clientWidth
+				let small = 300;
+
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.entity.clientWidth;
+			},
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)
 				if(mod > 0) {
@@ -230,6 +241,16 @@
 					position: "centerTop"
 				});
 			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	};
 </script>
@@ -286,21 +307,27 @@
 	}
 	.abilities {
 		color: #58170D;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 	repeat(6, 40px);
+		grid-column-gap: 15px;
 		text-align: center;
 		font-size: 12px;
-		padding-left: 5px;
 		max-width: 650px;
 		
 		.abilityName {
 			font-size: 15px;
 			font-weight: bold;
 		}
-		div {
+		.ability {
 			cursor: pointer;
-			margin-right: 5px;
 		}
+	}
+}
+.small {
+	.abilities {
+		grid-template-columns: 	repeat(3, auto);
+		grid-template-rows: auto auto;
+		grid-row-gap: 15px;
 	}
 }
 

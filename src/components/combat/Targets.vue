@@ -217,7 +217,7 @@
 		props: ['_active','_idle'],
 		data() {
 			return {
-				userId: auth.currentUser.uid,
+				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
 				currentTarget: {},
 				setShadow: 0,
 				interval:false,
@@ -318,7 +318,7 @@
 				this.key = undefined;
 			},
 			edit(key, entity, entityType) {
-				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
+				var editType = (entityType === 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
 
 				if(key) {
 					this.setSlide({

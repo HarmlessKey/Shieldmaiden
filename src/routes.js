@@ -63,7 +63,14 @@ export const routes = [{
 		sidebar: false
 	}
 },
-
+{
+	path: '/demo',
+	name: 'Demo',
+	component: RunEncounter,
+	meta: {
+		sidebar: false
+	},
+},
 //COMPENDIUM
 {
 	path: '/compendium',

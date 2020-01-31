@@ -116,11 +116,17 @@
 	}
 	.home {
 		.share {
+			grid-template-columns: auto 110px;
+			grid-template-areas: "text qr";
 
+			.qr {
+				grid-area: qr;
+			}
 			p {
 				margin-bottom: 10px;
 			}
 			h2 {
+				font-size: 25px;
 				font-family: 'Fredericka the Great', cursive;
 			}
 			small {

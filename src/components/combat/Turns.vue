@@ -18,6 +18,7 @@
 					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 						<i class="far fa-desktop"></i> Track Settings
 					</a>
+					<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
 					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 
@@ -101,6 +102,9 @@
 				'set_finished',
 				'set_targetReminder',
 			]),
+			reload() {
+				this.$router.go();
+			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1
 				let round = this.encounter.round

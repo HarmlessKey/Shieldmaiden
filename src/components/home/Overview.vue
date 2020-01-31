@@ -26,7 +26,7 @@
 						<img class="card-img" src="@/assets/_img/home/share.png"/>
 						<div class="card-header">Share Initiative</div>
 						<b-card-text>
-							Live. On a second screen, or with anyone in the world.
+							On a second screen, or with anyone in the world.
 						</b-card-text>
 						<template slot="footer">
 							<a href="#share" class="btn btn-block">Learn More</a>

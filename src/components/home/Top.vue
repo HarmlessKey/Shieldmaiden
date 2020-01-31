@@ -77,7 +77,7 @@
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
 		color: #fff;
-		background-position: center;
+		background-position: top center;
 		padding: 50px 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;
@@ -112,6 +112,7 @@
 						line-height: 35px;
 						font-style: italic;
 						text-transform: none;
+						margin-bottom: 50px !important;
 					}
 					.menu {
 						display: grid;

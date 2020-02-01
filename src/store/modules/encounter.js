@@ -424,7 +424,7 @@ const mutations = {
 		Vue.set(state.encounter, 'turn', turn);
 
 		if(!state.demo) {
-			db.ref(state.path).update({
+			encounters_ref.child(state.path).update({
 				turn: turn,
 				round: round,
 			});

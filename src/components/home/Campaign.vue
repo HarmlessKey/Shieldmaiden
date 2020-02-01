@@ -4,7 +4,7 @@
 			<div class="head">
 				<h2>Campaign Manager</h2>
 				<span>
-					Our tool started out as a combat tracker for Dungeons & Dragons, but it has been growing a lot. Over time we became more, but if you just want to run your encounters, we are still perfect for that.
+					Our tool started out as a combat tracker for Dungeons & Dragons, but it has grown a lot. Over time it has become so much more than that, but if you simply want to run your encounters it is still perfect for just that.
 				</span>
 			</div>
 

@@ -4,7 +4,7 @@
 			<div class="head">
 				<h2>Build great encounters</h2>
 				<span>
-					Our encounter builder is easy to use and let's you use your own custom monsters.
+					Our encounter builder is easy to use and lets you use your own custom monsters.
 				</span>
 			</div>
 

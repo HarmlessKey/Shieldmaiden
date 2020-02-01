@@ -23,7 +23,7 @@
 						<li>Reactions used</li>
 						<li>Custom reminders for other effects</li>
 						<li>Multi-targeting (perfect for AOE damage)</li>
-						<li>Roll monster abilities and apply damage instantly</li>
+						<li>Roll monster abilities and instantly apply damage</li>
 					</ul>
 
 					<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>

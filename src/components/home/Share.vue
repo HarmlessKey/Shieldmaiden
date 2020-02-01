@@ -4,7 +4,7 @@
 			<div class="head">
 				<h2>Share live initiative list with your players</h2>
 				<span>
-					Show your players a live initiative list of the encounter, that updates as you play. Perfect for at the table and if you host a podcast or stream.
+					Show your players a live initiative list of the encounter that updates as you play. Perfect for at the table or if you are hosting a podcast or stream.
 				</span>
 			</div>
 
@@ -16,16 +16,16 @@
 					<h3>Shows everything you need</h3>
 					
 					<ul>
-						<li>Shows initiative with current on top</li>
-						<li>Live updated while you play</li>
-						<li>Players current health</li>
+						<li>Initiative with current on top</li>
+						<li>Live updates while playing</li>
+						<li>Players' current health</li>
 						<li>Conditions</li>
 						<li>Rolls (if you want)</li>
 						<li>Damage/healing meters</li>
-						<li>Give atmosphere with personal background images</li>
+						<li>Atmosphere created by added personal background images</li>
 					</ul>
 
-					<p>Through settings you decide what is and isn’t shown to your players.</p>
+					<p>Through different settings you decide what is and isn't visible for your players.</p>
 					<router-link to="sign-up" class="btn btn-lg">Try it now!</router-link>
 				</b-col>
 			</b-row>

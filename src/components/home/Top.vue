@@ -7,7 +7,7 @@
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!user">
-							<div class="text-center gray-hover mb-4">Build by 2 guys with a passion for the game.</div>
+							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
 						</template>

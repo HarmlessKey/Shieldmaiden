@@ -20,21 +20,23 @@
 				<h2>Actions</h2>
 
 				<!-- ROLL OPTIONS -->
-				<div class="d-flex justify-content-between">
-					<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
-					<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
-				</div>
-				<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
-					<b-form-group label="Display options open roll">
-						<b-form-checkbox-group
-							v-model="rollOptions"
-							:options="options"
-							name="flavour-2a"
-							stacked
-						></b-form-checkbox-group>
-					</b-form-group>
-					<small>Open rolls are shown on the player screen.</small>
-				</div>
+				<template v-if="!demo">
+					<div class="d-flex justify-content-between">
+						<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
+						<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
+					</div>
+					<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
+						<b-form-group label="Display options open roll">
+							<b-form-checkbox-group
+								v-model="rollOptions"
+								:options="options"
+								name="flavour-2a"
+								stacked
+							></b-form-checkbox-group>
+						</b-form-group>
+						<small>Open rolls are shown on the player screen.</small>
+					</div>
+				</template>
 				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
 				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damge once</b-form-checkbox>
 
@@ -109,6 +111,7 @@
 		props: ['current'],
 		data: function() {
 			return {
+				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -315,10 +318,12 @@
 				}
 
 				//If it was an open roll
-				if(this.openRoll) {
-					this.rollOpenly(toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus'])
-				} else {
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false)
+				if(!this.demo) {
+					if(this.openRoll) {
+						this.rollOpenly(toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+					} else {
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
+					}
 				}
 
 				//BUILD SNOTIFY POPUP

@@ -4,6 +4,7 @@ import { mapActions, mapGetters } from 'vuex'
 export const setHP = {
 	data() {
 		return {
+			demo: this.$route.name === "Demo",
 			userId: this.$store.getters.getUser.uid,
 			campaignId: this.$route.params.campid,
 		}
@@ -218,35 +219,37 @@ export const setHP = {
 			}
 			
 			//Campaign wide damage meters (no need to go through store)
-			if(!undo) {
-				this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
-				this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
-				this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
-				this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
-
-				if(current.entityType == 'player') {
-					this.damageMeters(current.key, 'damage', amount); //Damage done
-					this.damageMeters(current.key, 'overkill', over); //Over damage done
-				}
-				if(target.entityType == 'player') {
-					this.damageMeters(target.key, 'damageTaken', amount); //damage taken
-					this.damageMeters(target.key, 'overkillTaken', over); //Over damage taken
-				}
-			} 
-			//To undo, run same function with opposite types 
-			else {
-				this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
-				this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Undo Over damage done
-				this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
-				this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
-
-				if(current.entityType == 'player') {
-					this.damageMeters(current.key, 'healing', amount); //Undo Damage done
-					this.damageMeters(current.key, 'overhealing', over); //Undo Over damage done
-				}
-				if(target.entityType == 'player') {
-					this.damageMeters(target.key, 'healingTaken', amount); //Undo damage taken
-					this.damageMeters(target.key, 'overhealingTaken', over); //Undo Over damage taken
+			if(!this.demo) {
+				if(!undo) {
+					this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
+					this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
+					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
+					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
+	
+					if(current.entityType == 'player') {
+						this.damageMeters(current.key, 'damage', amount); //Damage done
+						this.damageMeters(current.key, 'overkill', over); //Over damage done
+					}
+					if(target.entityType == 'player') {
+						this.damageMeters(target.key, 'damageTaken', amount); //damage taken
+						this.damageMeters(target.key, 'overkillTaken', over); //Over damage taken
+					}
+				} 
+				//To undo, run same function with opposite types 
+				else {
+					this.set_meters({key: current.key, type: 'healing', amount}) //Undo damage done
+					this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Undo Over damage done
+					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
+					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
+	
+					if(current.entityType == 'player') {
+						this.damageMeters(current.key, 'healing', amount); //Undo Damage done
+						this.damageMeters(current.key, 'overhealing', over); //Undo Over damage done
+					}
+					if(target.entityType == 'player') {
+						this.damageMeters(target.key, 'healingTaken', amount); //Undo damage taken
+						this.damageMeters(target.key, 'overhealingTaken', over); //Undo Over damage taken
+					}
 				}
 			}
 		},
@@ -314,35 +317,37 @@ export const setHP = {
 			}
 
 			//Campaign wide healing meters (no need to go through store)
-			if(!undo) {
-				this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
-				this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
-				this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
-				this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
+			if(!this.demo) {
+				if(!undo) {
+					this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
+					this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
+					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
+					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
 
-				if(current.entityType == 'player') {
-					this.damageMeters(current.key, 'healing', amount); //Healing done
-					this.damageMeters(current.key, 'overhealing', over); //Over healing done
+					if(current.entityType == 'player') {
+						this.damageMeters(current.key, 'healing', amount); //Healing done
+						this.damageMeters(current.key, 'overhealing', over); //Over healing done
+					}
+					if(target.entityType == 'player') {
+						this.damageMeters(target.key, 'healingTaken', amount); //Healing taken
+						this.damageMeters(target.key, 'overhealingTaken', over); //Over healing taken
+					}
 				}
-				if(target.entityType == 'player') {
-					this.damageMeters(target.key, 'healingTaken', amount); //Healing taken
-					this.damageMeters(target.key, 'overhealingTaken', over); //Over healing taken
-				}
-			}
-			//To undo, run same function with opposite types 
-			else {
-				this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
-				this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done
-				this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
-				this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
+				//To undo, run same function with opposite types 
+				else {
+					this.set_meters({key: current.key, type: 'damage', amount}) //Undo Healing done
+					this.set_meters({key: current.key, type: 'overkill', amount: over}) //Undo Over Healing done
+					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
+					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
 
-				if(current.entityType == 'player') {
-					this.damageMeters(current.key, 'damage', amount); //Undo Healing done
-					this.damageMeters(current.key, 'overkill', over); //Undo Over healing done
-				}
-				if(target.entityType == 'player') {
-					this.damageMeters(target.key, 'damageTaken', amount); //Undo Healing taken
-					this.damageMeters(target.key, 'overkillTaken', over); //Undo overhealing taken
+					if(current.entityType == 'player') {
+						this.damageMeters(current.key, 'damage', amount); //Undo Healing done
+						this.damageMeters(current.key, 'overkill', over); //Undo Over healing done
+					}
+					if(target.entityType == 'player') {
+						this.damageMeters(target.key, 'damageTaken', amount); //Undo Healing taken
+						this.damageMeters(target.key, 'overkillTaken', over); //Undo overhealing taken
+					}
 				}
 			}
 		},

@@ -106,7 +106,7 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { mapActions } from 'vuex'
+	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
 		name: 'EditEntity',
@@ -115,19 +115,37 @@
 		],
 		data() {
 			return {
+				demo: this.$route.name === "Demo",
 				entityKey: this.data.key,
+				entity: undefined,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
+				encounterId: this.$route.params.encid
 			}
 		},
 		firebase() {
 			return {
-				entity: {
-					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
-					asObject: true
-				}
+				// entity: {
+				// 	source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
+				// 	asObject: true
+				// }
 			}
+		},
+		computed: {
+			...mapGetters([
+				'demoEntities'
+			])	
+		},
+		mounted() {
+			if(!this.demo) {
+				var entity = db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`);
+				entity.on('value', async (snapshot) => {
+					this.entity = snapshot.val();
+				});
+			} else {
+				this.entity = this.demoEntities[this.entityKey];
+			}
+			
 		},
 		methods: {
 			...mapActions([
@@ -156,8 +174,7 @@
 						if(this.entity.curHp > this.entity.maxHp) {
 							this.entity.curHp = this.entity.maxHp
 						}
-						
-						this.edit_entity({key: this.entityKey, entity: this.entity})
+						this.edit_entity({key: this.entityKey, entity: this.entity});
 						this.setSlide(false);
 					}
 					else {

@@ -38,6 +38,11 @@
 						url: 'patrons',
 						icon: 'fab fa-patreon',
 					},
+					'xml': { 
+						name: 'Generate XML sitemap',
+						url: 'xml',
+						icon: 'fas fa-file-code',
+					},
 				},
 			}
 		}

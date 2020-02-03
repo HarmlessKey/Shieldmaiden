@@ -28,6 +28,7 @@ const Admin = () => import('@/views/Admin/Overview.vue');
 const Users = () => import('@/views/Admin/Users.vue');
 const Patrons = () => import('@/views/Admin/Patrons');
 const NewPatron = () => import('@/views/Admin/Patrons/New.vue');
+const GenerateXML = () => import('@/views/Admin/GenerateXML.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
@@ -306,6 +307,17 @@ export const routes = [{
 	meta: {
 		basePath: '/admin',
 		baseName: 'Patrons',
+		requiresAuth: true,
+		requiresAdmin: true
+	}
+},
+{
+	path: '/admin/xml',
+	name: 'GenerateXML',
+	component: GenerateXML,
+	meta: {
+		basePath: '/admin',
+		baseName: 'Generate XML',
 		requiresAuth: true,
 		requiresAdmin: true
 	}

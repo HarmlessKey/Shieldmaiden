@@ -45,7 +45,10 @@
 			}
 		},
 		methods: {
-			downloadXml() {
+			async downloadXml() {
+				const d = new Date();
+				const lastmodDate = `${d.getFullYear()}-${d.getMonth() < 10 ? '0'+d.getMonth() : d.getMonth() }-${d.getDate() < 10 ? '0'+d.getDate() : d.getDate() }`;
+
 				let xmlDoc = document.implementation.createDocument ("", "", null);
 
 				//Create element that holds all URLs
@@ -65,7 +68,7 @@
 
 					//Add lastmod element
 					let lastmod = xmlDoc.createElement("lastmod");
-					let date = xmlDoc.createTextNode("2019-01-29");
+					let date = xmlDoc.createTextNode(lastmodDate);
 					lastmod.appendChild(date);
 					urlElement.appendChild(lastmod);
 
@@ -74,10 +77,104 @@
 				}
 
 				//CONDTIONS
-				//ITEMS
-				//MONSTERS
-				//SPELLS
+				const conditions_ref = db.ref('conditions');
+				await conditions_ref.on('value', (snapshot) => {
+					let conditions = snapshot.val()
 
+					for(let key in conditions) {
+						let urlElement = xmlDoc.createElement("url");
+
+						//Add loc element
+						let loc = xmlDoc.createElement("loc");
+						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/conditions/${key}`);
+						loc.appendChild(url);
+						urlElement.appendChild(loc);
+
+						//Add lastmod element
+						let lastmod = xmlDoc.createElement("lastmod");
+						let date = xmlDoc.createTextNode(lastmodDate);
+						lastmod.appendChild(date);
+						urlElement.appendChild(lastmod);
+
+						//Add to urlset
+						urlset.appendChild(urlElement);
+					}
+				});
+
+				//ITEMS
+				const items_ref = db.ref('items');
+				await items_ref.on('value', (snapshot) => {
+					let items = snapshot.val()
+
+					for(let key in items) {
+						let urlElement = xmlDoc.createElement("url");
+
+						//Add loc element
+						let loc = xmlDoc.createElement("loc");
+						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/items/${key}`);
+						loc.appendChild(url);
+						urlElement.appendChild(loc);
+
+						//Add lastmod element
+						let lastmod = xmlDoc.createElement("lastmod");
+						let date = xmlDoc.createTextNode(lastmodDate);
+						lastmod.appendChild(date);
+						urlElement.appendChild(lastmod);
+
+						//Add to urlset
+						urlset.appendChild(urlElement);
+					}
+				});
+
+				//MONSTERS
+				const monsters_ref = db.ref('monsters');
+				await monsters_ref.on('value', (snapshot) => {
+					let monsters = snapshot.val()
+
+					for(let key in monsters) {
+						let urlElement = xmlDoc.createElement("url");
+
+						//Add loc element
+						let loc = xmlDoc.createElement("loc");
+						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/monsters/${key}`);
+						loc.appendChild(url);
+						urlElement.appendChild(loc);
+
+						//Add lastmod element
+						let lastmod = xmlDoc.createElement("lastmod");
+						let date = xmlDoc.createTextNode(lastmodDate);
+						lastmod.appendChild(date);
+						urlElement.appendChild(lastmod);
+
+						//Add to urlset
+						urlset.appendChild(urlElement);
+					}
+				});
+
+				//SPELLS
+				const spells_ref = db.ref('spells');
+				await spells_ref.on('value', (snapshot) => {
+					let spells = snapshot.val()
+
+					for(let key in spells) {
+						let urlElement = xmlDoc.createElement("url");
+
+						//Add loc element
+						let loc = xmlDoc.createElement("loc");
+						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/spells/${key}`);
+						loc.appendChild(url);
+						urlElement.appendChild(loc);
+
+						//Add lastmod element
+						let lastmod = xmlDoc.createElement("lastmod");
+						let date = xmlDoc.createTextNode(lastmodDate);
+						lastmod.appendChild(date);
+						urlElement.appendChild(lastmod);
+
+						//Add to urlset
+						urlset.appendChild(urlElement);
+					}
+				});
 
 				//TO DOWNLOAD THE FILE
 				var serializer = new XMLSerializer();

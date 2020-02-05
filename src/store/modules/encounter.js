@@ -13,7 +13,9 @@ const demoPlayers = {
 		constitution: 16,
 		intelligence: 6,
 		wisdom: 8,
-		charisma:10
+		charisma:10,
+		experience: 2700,
+		skills: ['athletics', 'intimidation']
 	},
 	'playertwo': {
 		character_name: 'Warlock',
@@ -27,7 +29,9 @@ const demoPlayers = {
 		intelligence: 11,
 		wisdom: 14,
 		charisma:18,
-		tempHp: 6
+		tempHp: 6,
+		experience: 2700,
+		skills: ['persuasion', 'stealth']
 	},
 	'playerthree': {
 		character_name: 'Druid',
@@ -45,7 +49,9 @@ const demoPlayers = {
 			ac: 14,
 			maxHp: 37,
 			curHp: 37
-		}
+		},
+		experience: 2700,
+		skills: ['animal Handling', 'medicine']
 	}
 }
 const demoEncounter = {
@@ -249,6 +255,9 @@ const mutations = {
 				entity.intelligence = db_player.intelligence;
 				entity.wisdom = db_player.wisdom;
 				entity.charisma = db_player.charisma;
+				entity.skills = db_player.skills;
+				entity.experience = db_player.experience;
+				entity.level = db_player.level;
 				break
 			}
 			case 'npc': {

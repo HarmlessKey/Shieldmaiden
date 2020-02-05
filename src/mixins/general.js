@@ -1,7 +1,4 @@
 export const general = {
-	created() {
-		// console.log("CREATED MIXIN")
-	},
 	methods: {
 		calcMod(val) {
 			if(val) {

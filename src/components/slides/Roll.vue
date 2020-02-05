@@ -65,17 +65,15 @@
 		},
 		methods: {
 			roll(d, item) {
+				if(item.x === undefined) {
+					item.x = 20;
+				}
 
-				if(d == 'X') {
-					var die = item.x
-				}
-				else {
-					die = d
-				}
-				if (item.mod == '') {
+				let die = (d === 'X') ? item.x : d;
+				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(die, item.n, item.mod);
+				let roll = this.rollD(die, item.n, item.mod, `${item.n}d${die} roll`);
 				item.result = roll.total;
 
 				let snotifyTitle = 'You rolled: ' + roll.total;
@@ -93,12 +91,7 @@
 					}
 					
 				}
-
 				this.log.unshift(roll);
-
-				this.$snotify.success(roll.roll, snotifyTitle, {
-					position: "centerTop"
-				});
 			}
 		}
 	};

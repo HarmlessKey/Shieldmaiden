@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-5" ref="entity" :class="{ small: is_small }">
+	<div class="pb-5" ref="entity" :class="{ smallWidth: is_small }">
 		<h2>{{ data.name }}</h2>
 		<i>
 			<template v-if="data.size">{{ data.size }}</template>
@@ -38,7 +38,7 @@
 					class="ability"
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
-					@click="rollAbility(ability.ability, data[ability.ability])"
+					@click="rollD(20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
 					v-if="data[ability.ability]">
 						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability.ability] }}
@@ -55,7 +55,7 @@
 				<span class="saves">
 					<span 
 						class="save" 
-						@click="rollAbility(save.save, save.score, 'save')"
+						@click="rollD(20, 1, save.score, `${save.save} save`)"
 						v-for="save in savingThrows" 
 						:key="save.save">
 						{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
@@ -107,10 +107,11 @@
 <script>
 	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
+	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'NPC',
-		mixins: [general],
+		mixins: [general, dice],
 		props: [
 		'data'
 		],
@@ -217,26 +218,11 @@
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)
 				if(mod > 0) {
-					return '+' + mod
+					return '+' + mod;
 				}
 				else {
-					return mod
+					return mod;
 				}
-			},
-			rollAbility(ability, score, type = 'roll') {
-				var modifier = (type === 'roll') ? parseInt(Math.floor((score - 10) / 2)) : score;
-				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + modifier;
-				if(modifier >= 0) {
-					var mod = '+' + modifier
-				}
-				else {
-					mod = modifier
-				}
-				
-				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
-					position: "centerTop"
-				});
 			}
 		},
 		mounted() {
@@ -292,7 +278,7 @@ a {
 .saves .save {
 	cursor: pointer;
 }
-.small {
+.smallWidth {
 	.abilities {
 		grid-template-columns: 	repeat(3, auto);
 		grid-template-rows: auto auto;

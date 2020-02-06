@@ -7,7 +7,7 @@ const demoPlayers = {
 		maxHp: 41,
 		maxHpMod: 0,
 		curHp: 41,
-		ac: 12,
+		ac: 15,
 		strength: 20,
 		dexterity: 14,
 		constitution: 16,
@@ -19,9 +19,9 @@ const demoPlayers = {
 	},
 	'playertwo': {
 		character_name: 'Warlock',
-		maxHp: 14,
+		maxHp: 31,
 		maxHpMod: 0,
-		curHp: 14,
+		curHp: 31,
 		ac: 16,
 		strength: 8,
 		dexterity: 14,
@@ -35,9 +35,9 @@ const demoPlayers = {
 	},
 	'playerthree': {
 		character_name: 'Druid',
-		maxHp: 14,
+		maxHp: 34,
 		maxHpMod: 0,
-		curHp: 14,
+		curHp: 34,
 		ac: 16,
 		strength: 8,
 		dexterity: 14,
@@ -256,6 +256,7 @@ const mutations = {
 				entity.wisdom = db_player.wisdom;
 				entity.charisma = db_player.charisma;
 				entity.skills = db_player.skills;
+				entity.skills_expertise = db_player.skills_expertise;
 				entity.experience = db_player.experience;
 				entity.level = db_player.level;
 				break

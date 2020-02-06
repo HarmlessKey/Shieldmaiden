@@ -232,7 +232,8 @@
 					this.data.skills ? (
 					this.data.skills.includes(key) ? 
 					this.returnProficiency(this.data.level ? this.data.level : this.calculatedLevel(this.data.experience)): 0) 
-					: 0
+					: 0,
+					this.data.skills_expertise ? this.data.skills_expertise.includes(key) : false
 				) 
 			}
 		},
@@ -282,6 +283,8 @@ a {
 .playerSkills {
 	user-select: none;
 	column-count: 3;
+	column-gap: 20px;
+	column-rule: 1px solid #5c5757;
 
 	.playerSkill {
 		display: flex;

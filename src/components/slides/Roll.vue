@@ -77,18 +77,14 @@
 				let roll = this.rollD(die, item.n, item.mod, `${item.n}d${die} roll`);
 				item.result = roll.total;
 
-				let snotifyTitle = 'You rolled: ' + roll.total;
-
 				//Show Natural 1 or Natural 20
 				if(item.n == 1 && die == 20) {
 					let throws = '"'+roll.throws+'"'
 					if(throws.substring(5, 0) == '"1"') {
 						roll.total = 'Natural 1';
-						snotifyTitle = roll.total;
 					}
 					else if(throws.substring(5, 0) == '"20"') {
 						roll.total = 'Natural 20';
-						snotifyTitle = roll.total;
 					}
 					
 				}

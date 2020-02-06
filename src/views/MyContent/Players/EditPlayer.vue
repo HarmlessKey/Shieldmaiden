@@ -219,32 +219,47 @@
 						<b-card header="Skills">
 							<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
 
-							<b-form-group label="Select skill proficiencies">
-								<b-form-checkbox-group
-									id="skills"
-									name="skills"
-									v-model="player.skills"
-									stacked
-								>
-									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
-										<span class="skill">
-											<span class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</span>
-											{{skill.skill  }}
-											<span>
-												{{ 
-													calculateSkillModifier(
-														calcMod(player[skill.ability]),
-														player.skills ? (
-														player.skills.includes(key) ? 
-														returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-														: 0) : 0
-													) 
-												}}
-											</span>
-										</span>
-									</b-form-checkbox>
-								</b-form-checkbox-group>
-							</b-form-group>
+							<div class="d-flex justify-content-start">
+								<b-form-group label="Expertise" class="mr-2">
+									<b-form-checkbox-group
+										id="expertise"
+										name="expertise"
+										v-model="player.skills_expertise"
+										stacked
+									>
+										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key" :disabled="player.skills ? !player.skills.includes(key) : true">
+											+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+										</b-form-checkbox>
+									</b-form-checkbox-group>
+								</b-form-group>
+								<b-form-group label="Proficiency" class="skills">
+									<b-form-checkbox-group
+										id="skills"
+										name="skills"
+										v-model="player.skills"
+										stacked
+									>
+										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
+											<div class="skill">
+												<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+												<div>{{skill.skill  }}</div>
+												<div class="mod">
+													{{ 
+														calculateSkillModifier(
+															calcMod(player[skill.ability]),
+															player.skills ? (
+															player.skills.includes(key) ? 
+															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
+															: 0) : 0,
+															player.skills_expertise ? player.skills_expertise.includes(key) : false
+														) 
+													}}
+												</div>
+											</div>
+										</b-form-checkbox>
+									</b-form-checkbox-group>
+								</b-form-group>
+							</div>
 						</b-card>
 					</b-col>
 				</b-row>
@@ -487,16 +502,6 @@
 		height: 100px;
 		background-size: cover;
 		background-position: center top;
-	}
-	.skill {
-		min-width: 250px;
-		display: grid;
-		grid-template-columns: 45px auto min-content;
-
-		.abillity {
-			text-transform: uppercase;
-			text-align: center;
-		}
 	}
 }
 </style>

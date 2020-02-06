@@ -300,9 +300,9 @@ a {
 		i {
 
 			&.fa-circle {
-				margin-left: 2px;
-				font-size: 8px;
-				vertical-align: 1px;
+				margin: 0 3px;
+				font-size: 6px;
+				vertical-align: 2px;
 			}
 		}
 	}

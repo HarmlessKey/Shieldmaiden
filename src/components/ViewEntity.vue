@@ -59,7 +59,10 @@
 				<div :value="key" v-for="(skill, key) in skillList" :key="key">
 					<span class="playerSkill" @click="rollD(20, 1, skillModifier(skill, key), `${skill.skill} check`)">
 						<span class="truncate">
-							<i v-if="data.skills && data.skills.includes(key)" class="far fa-dot-circle"></i>
+							<template v-if="data.skills && data.skills.includes(key)">
+								<i v-if="data.skills_expertise && data.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+								<i v-else class="fas fa-circle"></i>
+							</template>
 							<i v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
@@ -295,7 +298,12 @@ a {
 			color: #fff;
 		}
 		i {
-			font-size: 10px;
+
+			&.fa-circle {
+				margin-left: 2px;
+				font-size: 8px;
+				vertical-align: 1px;
+			}
 		}
 	}
 }

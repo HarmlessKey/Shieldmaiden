@@ -24,11 +24,13 @@ export const skills = {
 		}
 	},
 	methods: {
-		calculateSkillModifier(abilityScore, proficiency) {
-			if((abilityScore + proficiency) >= 0) {
-				return '+' + parseInt(abilityScore + proficiency);
+		calculateSkillModifier(abilityScore, proficiency, expertise) {
+			let mod = (expertise) ? (abilityScore + proficiency + proficiency) : abilityScore + proficiency;
+
+			if((mod) >= 0) {
+				return '+' + parseInt(mod);
 			} else {
-				return parseInt(abilityScore + proficiency);
+				return parseInt(mod);
 			}
 		}
 	}

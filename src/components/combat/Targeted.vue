@@ -141,7 +141,7 @@
 										<div 
 											class="mod bg-gray-dark"
 											v-b-tooltip.hover title="Roll Check"
-											@click="rollAbility(ability.ability, entities[key][ability.ability])"
+											@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
 										>
 											{{ modifier(entities[key][ability.ability]) }}
 										</div>
@@ -149,7 +149,7 @@
 											class="mod bg-gray-dark"
 											v-b-tooltip.hover title="Roll Save"
 											v-if="entities[key].entityType === 'npc'"
-											@click="rollAbility(ability.ability, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 'save')"
+											@click="rollD(20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${ability.ability} save`)"
 										>
 											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
 										</div>
@@ -170,9 +170,11 @@
 	import { mapActions, mapGetters } from 'vuex'
 	import ViewEntity from '@/components/ViewEntity.vue';
 	import Conditions from '@/components/combat/Conditions.vue';
+	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'Targeted',
+		mixins: [dice],
 		components: {
 			ViewEntity,
 			Conditions
@@ -316,24 +318,6 @@
 				else {
 					return mod
 				}
-			},
-			rollAbility(ability, score, type = 'check') {
-				if(typeof score === 'string') {
-					score = parseInt(score);
-				}
-				var modifier = (type === 'check') ? parseInt(Math.floor((score - 10) / 2)) : score;
-				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + modifier;
-				if(modifier >= 0) {
-					var mod = '+' + modifier
-				}
-				else {
-					mod = modifier
-				}
-				
-				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
-					position: "centerTop"
-				});
 			}
 		}
 	}

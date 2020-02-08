@@ -325,10 +325,6 @@ a.large-link {
 	}
 }
 
-@keyframes fadeinout {
-	0%,100% { opacity: 0; }
-	50% { opacity: 1; }
-}
 .loader:before {
 	content: '';
 	box-sizing: border-box;
@@ -346,11 +342,6 @@ a.large-link {
 	animation: spinner .8s ease infinite;
 }
 
-@keyframes spinner {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
-}
-
 .grow {
 	&:hover {
 		animation-name: grow;
@@ -358,10 +349,31 @@ a.large-link {
 	}
 }
 
+
+
+
+
+/* 4. Animations */
+/*********************************************/
+@keyframes spinit {
+	0% { top: 0em; }
+	50% { top: -5em; }
+	100% { top: -9em; }
+}
+
 @keyframes grow {
 	0% { width: 0; }
 	100% { width: 100%; }
 }
+@keyframes spinner {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+@keyframes fadeinout {
+	0%,100% { opacity: 0; }
+	50% { opacity: 1; }
+}
+
 
 /* 4. Buttons and Links */
 /*********************************************/
@@ -964,6 +976,28 @@ ul.pagination {
 
 hr { background: $gray-hover; }
 
+.form-group.skills {
+	.custom-control {
+
+		.custom-control-label {
+			width: 100%;
+
+			.skill {
+				width: 100%;
+				display: grid;
+				grid-template-columns: 45px 1fr min-content;
+		
+				.abillity {
+					text-transform: uppercase;
+					text-align: center;
+				}
+				.mod {
+					margin-left: 8px;
+				}
+			}
+		}
+	}
+}
 .form-control, .custom-select { 
 	-webkit-appearance: none;
 	border-radius: 0 !important;
@@ -1158,7 +1192,6 @@ ul.nav {
 			color: $gray-light !important;
 			width: 100%;
 			
-			
 			.target {
 				display: grid;
 				grid-template-columns: 30px 30px 1fr;
@@ -1199,6 +1232,20 @@ ul.nav {
 			small {
 				display: inline-block;
 				line-height: 12px !important;
+			}
+			&.roll {
+				width: 100%;
+
+				.roll_title {
+					text-align: center;
+					font-size: 15px;
+				}
+				.rolled {
+					line-height: 90px;
+					width: 100%;
+					text-align: center;
+					font-size: 80px;
+				}
 			}
 		}
 	}

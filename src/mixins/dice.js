@@ -1,9 +1,27 @@
 export const dice = {
-	created() {
-		// console.log("CREATED MIXIN")
+	data() {
+		return {
+			animateTrigger: false,
+		}
+	},
+	watch: {
+		animateTrigger(newValue) {
+			$('#roll').each(function () {
+				$(this).prop('Counter',0).animate({
+					Counter: $(this).text()
+				}, {
+					duration: 500,
+					easing: 'linear',
+					step: function (now) {
+						$(this).text(Math.ceil(now));
+					}
+				});
+			});
+		}
 	},
 	methods: {
-		rollD(d=20,n=1,m=0) {
+		rollD(d=20, n=1, m=0, notify=false) {
+			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b
 			let throws = []
 			for (var i=0; i < n; i++) {
@@ -14,16 +32,29 @@ export const dice = {
 			if (Math.sign(m) >= 0) {
 				s = '+'
 			}
-			let sum = throws.reduce(add) + parseInt(m)
-			// console.log(`Rolled ${n}d${d}${s}${m}: [${throws}] ${s}${m} -> ${sum}`)
+			let sumThrows = throws.reduce(add);
+			let sumTotal = sumThrows + parseInt(m);
 
 			let roll = {
 				roll: n + 'd' + d + s + m,
-				mod: s + ' ' + m,
+				mod: s + m,
 				throws: throws,
-				total: sum,
+				total: sumTotal,
 			}
-			return roll
+			
+			if(notify) {
+				this.animateTrigger = !this.animateTrigger;
+				this.$snotify.html(
+					`<div class="snotifyToast__body roll">
+						<div class="roll_title">${notify}</div>
+						<div class="rolled" id="roll">${roll.total}</div>
+						<div class="roll_title">${sumThrows}${roll.mod}</div>
+					</div> `, {
+					timeout: 3000,
+					closeOnClick: true
+				});
+			}
+			return roll;
 		},
 		rollD6(n=1,m=0) {
 			return this.rollD(6,n,m)

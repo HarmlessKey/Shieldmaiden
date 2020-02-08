@@ -141,7 +141,7 @@
 										<div 
 											class="mod bg-gray-dark"
 											v-b-tooltip.hover title="Roll Check"
-											@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} save`)"
+											@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
 										>
 											{{ modifier(entities[key][ability.ability]) }}
 										</div>

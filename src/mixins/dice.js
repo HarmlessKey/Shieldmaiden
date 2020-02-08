@@ -1,9 +1,7 @@
-import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from "constants";
-
 export const dice = {
 	data() {
 		return {
-			animateTrigger: undefined
+			animateTrigger: false,
 		}
 	},
 	watch: {
@@ -45,7 +43,7 @@ export const dice = {
 			}
 			
 			if(notify) {
-				this.animateTrigger = roll.total;
+				this.animateTrigger = !this.animateTrigger;
 				this.$snotify.html(
 					`<div class="snotifyToast__body roll">
 						<div class="roll_title">${notify}</div>

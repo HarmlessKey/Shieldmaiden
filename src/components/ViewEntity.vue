@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-5" ref="entity" :class="{ small: is_small }">
+	<div class="pb-5" ref="entity" :class="{ smallWidth: is_small }">
 		<h2>{{ data.name }}</h2>
 		<i>
 			<template v-if="data.size">{{ data.size }}</template>
@@ -9,6 +9,10 @@
 		</i>
 		<hr>
 		<p>
+			<template v-if="data.entityType === 'player'">
+				<b>Level</b>: 
+				<span> {{ data.level || calculatedLevel(data.experience) }}</span><br/>
+			</template>
 			<template v-if="data.armor_class">
 				<b>Armor Class</b>: 
 				<span> {{ data.armor_class }}</span><br/>
@@ -38,7 +42,7 @@
 					class="ability"
 					v-b-tooltip.hover title="Roll"
 					:key="index" 
-					@click="rollAbility(ability.ability, data[ability.ability])"
+					@click="rollD(20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
 					v-if="data[ability.ability]">
 						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability.ability] }}
@@ -49,13 +53,32 @@
 		<hr>
 
 		<!-- SKILLS -->
+		<template v-if="data.entityType === 'player'">
+			<h3>Skills</h3>
+			<div class="playerSkills">
+				<div :value="key" v-for="(skill, key) in skillList" :key="key">
+					<span class="playerSkill" @click="rollD(20, 1, skillModifier(skill, key), `${skill.skill} check`)">
+						<span class="truncate">
+							<template v-if="data.skills && data.skills.includes(key)">
+								<i v-if="data.skills_expertise && data.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+								<i v-else class="fas fa-circle"></i>
+							</template>
+							<i v-else class="far fa-circle"></i>
+							{{ skill.skill }}
+						</span>
+						<span>{{ skillModifier(skill, key) }}</span>
+					</span>
+				</div>
+			</div>
+			<hr>
+		</template>
 		<p>
 			<template v-if="savingThrows.length > 0">
 				<b>Saving Throws </b>
 				<span class="saves">
 					<span 
 						class="save" 
-						@click="rollAbility(save.save, save.score, 'save')"
+						@click="rollD(20, 1, save.score, `${save.save} save`)"
 						v-for="save in savingThrows" 
 						:key="save.save">
 						{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
@@ -107,36 +130,19 @@
 <script>
 	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
+	import { dice } from '@/mixins/dice.js';
+	import { skills } from '@/mixins/skills.js';
+	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'NPC',
-		mixins: [general],
+		mixins: [general, dice, experience, skills],
 		props: [
 		'data'
 		],
 		data() {
 			return {
 				is_small: false,
-				skills: [
-					'acrobatics',
-					'animal Handling',
-					'arcana',
-					'athletics',
-					'deception',
-					'history',
-					'insight',
-					'intimidation',
-					'investigation',
-					'medicine',
-					'nature',
-					'perception',
-					'performance',
-					'persuasion',
-					'religion',
-					'sleight of Hand',
-					'stealth',
-					'survival',
-				],
 				challengeToXp: {
 					0: 10,
 					'0.125': 25,
@@ -172,13 +178,13 @@
 		computed: {
 			monsterSkills() {
 				let skills = [];
-				for(let i in this.skills) {
-					let skill = this.skills[i];
+				for(let key in this.skillList) {
+					let skill = this.skillList[key].skill;
 
-					if(this.data[skill]) {
+					if(this.data[key]) {
 						skills.push({
 							skill,
-							score: this.data[skill]
+							score: this.data[key]
 						})
 					}
 				}
@@ -217,26 +223,21 @@
 			modifier(score) {
 				var mod = Math.floor((score - 10) / 2)
 				if(mod > 0) {
-					return '+' + mod
+					return '+' + mod;
 				}
 				else {
-					return mod
+					return mod;
 				}
 			},
-			rollAbility(ability, score, type = 'roll') {
-				var modifier = (type === 'roll') ? parseInt(Math.floor((score - 10) / 2)) : score;
-				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + modifier;
-				if(modifier >= 0) {
-					var mod = '+' + modifier
-				}
-				else {
-					mod = modifier
-				}
-				
-				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
-					position: "centerTop"
-				});
+			skillModifier(skill, key) {
+				return this.calculateSkillModifier(
+					this.calcMod(this.data[skill.ability]),
+					this.data.skills ? (
+					this.data.skills.includes(key) ? 
+					this.returnProficiency(this.data.level ? this.data.level : this.calculatedLevel(this.data.experience)): 0) 
+					: 0,
+					this.data.skills_expertise ? this.data.skills_expertise.includes(key) : false
+				) 
 			}
 		},
 		mounted() {
@@ -266,6 +267,7 @@ a {
 	color: #b2b2b2 !important;
 }
 .abilities {
+	user-select: none;
 	display: grid;
 	grid-template-columns: 	repeat(6, 40px);
 	grid-column-gap: 15px;
@@ -281,6 +283,30 @@ a {
 		cursor: pointer;
 	}
 }
+.playerSkills {
+	user-select: none;
+	column-count: 3;
+	column-gap: 20px;
+	column-rule: 1px solid #5c5757;
+
+	.playerSkill {
+		display: flex;
+		justify-content: space-between;
+		cursor: pointer;
+
+		&:hover {
+			color: #fff;
+		}
+		i {
+
+			&.fa-circle {
+				margin: 0 3px;
+				font-size: 6px;
+				vertical-align: 2px;
+			}
+		}
+	}
+}
 .skills .skill, .saves .save {
 	&::after {
 		content: ', ';
@@ -292,11 +318,14 @@ a {
 .saves .save {
 	cursor: pointer;
 }
-.small {
+.smallWidth {
 	.abilities {
 		grid-template-columns: 	repeat(3, auto);
 		grid-template-rows: auto auto;
 		grid-row-gap: 15px;
+	}
+	.playerSkills {
+		column-count: 2;
 	}
 }
 

@@ -67,37 +67,6 @@
 					<basic-info v-model='spell' :levels='levels'/>
 					<!-- SPELL ACTIONS -->
 					<spell-actions v-model='spell' />
-
-					<div class="card">
-						<div class="card-header d-flex justify-content-between">
-							<span>Conditions</span>
-							<a 
-							class="gray-hover text-capitalize" 
-							v-b-tooltip.hover title="Add Conditions" 
-							@click="add_condition()">
-								<i class="fas fa-plus green"></i>
-								<span class="d-none d-md-inline ml-1">Add</span>
-							</a>
-						</div>
-						<div class="card-body">
-							
-						</div>
-					</div>
-					<div class="card">
-						<div class="card-header d-flex justify-content-between">
-							<span>Reminders</span>
-							<a 
-							class="gray-hover text-capitalize" 
-							v-b-tooltip.hover title="Add Reminders" 
-							@click="add_reminder()">
-								<i class="fas fa-plus green"></i>
-								<span class="d-none d-md-inline ml-1">Add</span>
-							</a>
-						</div>
-						<div class="card-body">
-							
-						</div>
-					</div>
 				</b-col>
 			</b-row>
 		</template>

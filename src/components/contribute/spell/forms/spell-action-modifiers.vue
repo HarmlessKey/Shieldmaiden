@@ -272,6 +272,13 @@ export default {
 			this.$delete(this.modifiers, index)
 			this.$forceUpdate()
 		},
+		setPrimary(modifier) {
+			if (modifier.primary == undefined) {
+				modifier.primary = false
+			}
+			modifier.primary = !modifier.primary
+			this.$forceUpdate(); //IMPORTANT
+		},
 		add_level_tier(index) {
 			this.modifiers[index].level_tiers.push({});
 			this.$forceUpdate();

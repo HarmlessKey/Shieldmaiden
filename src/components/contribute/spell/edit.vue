@@ -261,15 +261,6 @@
 				
 			},
 			
-			setPrimary(modifier) {
-				if (modifier.primary == undefined) {
-					modifier.primary = false
-				}
-				modifier.primary = !modifier.primary
-				this.$forceUpdate(); //IMPORTANT
-			},
-			
-			
 			update() {
 				this.$forceUpdate();
 			},

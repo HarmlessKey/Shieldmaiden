@@ -100,13 +100,15 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
+	import { remindersMixin } from '@/mixins/reminders';
 
 	export default {
 		name: 'Current',
+		mixins: [remindersMixin],
 		components: {
 			Actions,
 			Conditions
@@ -129,7 +131,8 @@
 			//Watch current to trigger reminders when an entity starts their turn
 			current(newVal, oldVal) {
 				if(newVal != oldVal) {
-					this.reminders()
+					this.checkReminders(this.current, 'startTurn');
+					this.timedReminders(this.current); //Handle timed reminders
 				}
 			}
 		},
@@ -154,8 +157,7 @@
 				'setSlide',
 				'set_save',
 				'set_dead',
-				'set_stable',
-				'set_targetReminder',
+				'set_stable'
 			]),
 			showCondition(show) {
 				event.stopPropagation();
@@ -193,13 +195,6 @@
 					revive: true
 				})
 			},
-			removeReminder(key) {
-				this.set_targetReminder({
-					action: 'remove',
-					entity: this.current.key,
-					key: key,
-				})
-			},
 			displayStats(entity) {
 				var stats;
 				if(entity.transformed == true) {
@@ -217,80 +212,6 @@
 					}
 				}
 				return stats
-			},
-			reminders(){
-				for(let key in this.current.reminders) {
-					var notify = false
-
-					//TIMED REMINDERS
-					if(this.current.reminders[key].trigger == 'timed') {
-						if(this.current.reminders[key].rounds > 1) {
-							let rounds = parseInt(this.current.reminders[key].rounds) - 1
-
-							this.set_targetReminder({
-								action: 'update',
-								entity: this.current.key,
-								key: key,
-								reminder: rounds
-							}); 
-						}
-						else {
-							notify = true;
-						}
-					}
-
-					//START OF TURN REMINDERS
-					if(this.current.reminders[key].trigger == 'startTurn') {
-						notify = true;
-					}
-					
-					// NOTIFY
-					if(notify) {
-						//Buttons to remove or keep reminder
-						if(this.current.reminders[key].action != 'remove') {
-							var buttons = [
-								{ 
-									text: 'Keep Reminder', 
-									action: (toast) => { 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-								{ 
-									text: 'Remove', 
-									action: (toast) => { 
-										this.set_targetReminder({
-											action: 'remove',
-											entity: this.current.key,
-											key: key,
-										}); 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-							]
-						}
-						else {
-							buttons = ''
-						}
-
-						// NOTIFICATION
-						this.$snotify.warning(
-							this.current.name + ': ' + this.current.reminders[key].notify,
-							this.current.reminders[key].title, 
-							{
-								position: "centerCenter",
-								timeout: 0,
-								buttons
-							}
-						);
-						if(this.current.reminders[key].action == 'remove') {
-							this.set_targetReminder({
-								action: 'remove',
-								entity: this.current.key,
-								key: key,
-							});
-						}
-					}
-				}
 			},
 		}
 	}

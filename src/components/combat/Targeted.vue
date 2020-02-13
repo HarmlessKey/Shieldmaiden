@@ -179,7 +179,6 @@
 			ViewEntity,
 			Conditions
 		},
-		props: ['current'],
 		data() {
 			return {
 				setShadow: 0,
@@ -196,14 +195,6 @@
 					asObject: true
 				},
 				abilities: db.ref('abilities')
-			}
-		},
-		watch: {
-			//Watch current to trigger reminders when an entity starts their turn
-			current(newVal, oldVal) {
-				if(newVal != oldVal) {
-					this.reminders()
-				}
 			}
 		},
 		computed: {
@@ -283,13 +274,6 @@
 				this.set_stable({
 					key: this.target.key,
 					action: 'set',
-				})
-			},
-			removeReminder(key) {
-				this.set_targetReminder({
-					action: 'remove',
-					entity: this.target.key,
-					key: key,
 				})
 			},
 			displayStats(target) {

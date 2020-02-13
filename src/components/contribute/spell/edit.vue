@@ -67,7 +67,7 @@
 					<basic-info v-model='spell' :levels='levels'/>
 					<!-- SPELL ACTIONS -->
 					<spell-actions v-model='spell' />
-					
+
 					<div class="card">
 						<div class="card-header d-flex justify-content-between">
 							<span>Conditions</span>
@@ -274,6 +274,7 @@
 				this.$forceUpdate();
 			},
 			store_spell() {
+				console.log(this.spell)
 
 				delete this.spell['.key']
 				this.spell.changed = true

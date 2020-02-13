@@ -13,7 +13,7 @@
 		</div>
 		<div class="card-body">
 			<!-- <span v-for="mod in modifiers">test<br></span> -->
-			<div class="card" v-if="modifiers.length > 0" v-for="(modifier, mod_index) in modifiers">
+			<div class="card" v-if="modifiers && modifiers.length > 0" v-for="(modifier, mod_index) in modifiers">
 				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header mod_header d-flex justify-content-between">
 					<div class="gray-light" >
 						{{parseInt(mod_index) + 1}}.
@@ -204,7 +204,7 @@
 										</a>
 									</b-col>
 								</b-row>
-								<p v-if="modifier.level_tiers.length >= 1">
+								<p v-if="modifier.level_tiers && modifier.level_tiers.length > 0">
 									<span v-for="line in create_spell_level_tier_description(modifier.level_tiers)">
 										{{line}}<br>
 									</span>

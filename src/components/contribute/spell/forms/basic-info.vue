@@ -1,0 +1,415 @@
+<template>
+	<div class="card">
+		<div class="card-header d-flex justify-content-between">
+			<span>Basic Info</span>
+			<!-- <div>
+				<a 
+				class="gray-hover text-capitalize mx-3" 
+				v-b-tooltip.hover title="Parse Old Spell" 
+				@click="parse_old_spell()">
+					<i class="fad fa-wand-magic blue"></i>
+					<span class="d-none d-md-inline ml-1 blue">Parse</span>
+				</a>
+				<a 
+				class="gray-hover text-capitalize mx-3" 
+				v-b-tooltip.hover title="Save Spell" 
+				@click="store_spell()">
+					<i class="fad fa-treasure-chest green"></i>
+					<span class="d-none d-md-inline ml-1 green">Save</span>
+				</a>
+			</div> -->
+		</div>
+		<div class="card-body">
+			<b-row>
+				<!-- NAME -->
+				<b-col md="6">
+					<label for="name">Name</label>
+					<b-form-input v-model="spell.name"
+						id="name"
+						name="name"
+						title="Name"
+						type="text"
+						class="form-control mb-2"
+						:class="{'input': true, 'error': errors.has('name') }"
+						v-validate="'required'"
+						autocomplete="off"
+						data-vv-as="Name"
+						placeholde="Name">
+					</b-form-input>
+					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+				</b-col>
+				<!-- LEVEL -->
+				<b-col md="3">
+					<label for="spell_level">Level</label>
+					<b-form-select v-model="spell.level"
+						id="spell_level"
+						name="spell_level"
+						title="Spell Level"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Spell Level">
+						<option value="undefined" disabled>- Spell Level -</option>
+						<option v-for="(l,i) in levels" 
+							:key="i" :value="i" 
+							:seleced="spell.level==i">{{l}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('spell_level')">{{ errors.first('pper') }}</p>
+				</b-col>
+				<!-- SCHOOL -->
+				<b-col md="3">
+					<label for="spell_school">School</label>
+					<b-form-select v-model="spell.school"
+						id="spell_school"
+						name="spell_school"
+						title="Spell School"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Spell School">
+						<option value="undefined" disabled>- Select School -</option>
+						<option v-for="(s,i) in schools"
+							:key="s" :value="s">{{s}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- CAST TIME -->
+				<b-col md="2">
+					<label for="cast_time_nr">Cast Time</label>
+					<b-form-input v-model="spell.cast_time_nr"
+						autocomplete="off"
+						id="cast_time_nr"
+						name="cast_time_nr"
+						class="form-control mb-2"
+						title="Casting Time"
+						v-validate="'required'"
+						type="number"
+						data-vv-as="Cast Time"
+						></b-form-input>
+						<p class="validate red" v-if="errors.has('cast_time_nr')">{{ errors.first('cast_time_nr') }}</p>
+				</b-col>
+				<!-- CAST TIME TYPE -->
+				<b-col md="3">
+					<label for="cast_time_nr">Cast Type</label>
+					<b-form-select v-model="spell.cast_time_type"
+						id="cast_time_type"
+						name="cast_time_type"
+						title="Casting Type"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Casting Type">
+						<option value="undefined" disabled>- Casting Type -</option>
+						<option v-for="(t,i) in cast_time"
+							:key="t" :value="t">{{t}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('cast_time_type')">{{ errors.first('cast_time_type') }}</p>
+					
+				</b-col>
+				<!-- REACTION TIME DESCRIPTION -->
+				<b-col>
+					<label for="cast_time_nr">Reaction Time Description</label>
+					<b-form-input v-model="spell.cast_time_react_desc"
+						:disabled="spell.cast_time_type!='Reaction'"
+						autocomplete="off"
+						id="cast_time_react_desc"
+						name="cast_time_react_desc"
+						class="form-control mb-2"
+						title="Reaction Time Description"
+						type="text"
+						data-vv-as="Reaction Time Description"
+						placeholder="Enter the reaction time description"
+						></b-form-input>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- COMPONENTS -->
+				<b-col md="3" v-if="spell.components">
+					<label for="components">Componens</label>
+					<div class="components d-flex justify-content-between" name="components">
+						<a class="component_box" @click="setComponent('verbal')"
+							 :class="{'selected': spell.components['verbal']}">
+							<span>V</span>
+						</a>
+						<a class="component_box" @click="setComponent('somatic')"
+							 :class="{'selected': spell.components['somatic']}">
+							<span>S</span>
+						</a>
+						<a class="component_box" @click="setComponent('material')"
+							 :class="{'selected': spell.components['material']}">
+							<span>M</span>
+						</a>
+					</div>
+				</b-col>
+				<!-- MATERIAL COMPONENT DESCRIPTION -->
+				<b-col md='9' v-if="spell.components">
+					<label>Material components description</label>
+					<b-form-input v-model="spell.material_description"
+						:disabled="!spell.components['material']"
+						autocomplete="off"
+						id="material_description"
+						name="material_description"
+						class="form-control mb-2"
+						title="Material Component Description"
+						type="text"
+						data-vv-as="Material Component Description"
+						placeholder="Enter the material component description"
+						></b-form-input>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- RANGE TYPE -->
+				<b-col md="4">
+					<label for="range_type">Range Type</label>
+					<b-form-select v-model="spell.range_type"
+						id="range_type"
+						name="range_type"
+						title="Range Type"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Range Type">
+						<option value="undefined" disabled>- Range Type -</option>
+						<option v-for="(val,i) in range_type"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('range_type')">{{ errors.first('range_type') }}</p>
+				</b-col>
+				<!-- RANGE -->
+				<b-col md="3">
+					<label for="range">Range ft.</label>
+					<b-form-input v-model="spell.range"
+						:disabled="spell.range_type!='Ranged'"
+						autocomplete="off"
+						id="range"
+						name="range"
+						class="form-control mb-2"
+						title="Range"
+						type="number"
+						data-vv-as="Range"
+						></b-form-input>
+				</b-col>
+				<!-- DURATION -->
+				<b-col md="5">
+					<label for="duration_type">Duration Type</label>
+					<b-form-select v-model="spell.duration_type"
+						id="duration_type"
+						name="duration_type"
+						title="Duration Type"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Duration Type">
+						<option value="undefined" disabled>- Duration Type -</option>
+						<option v-for="(val,i) in dur_type"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('duration_type')">{{ errors.first('duration_type') }}</p>
+				</b-col>
+			</b-row>
+			<b-row>
+				<b-col md="6">
+					<!-- AOE TYPE -->
+					<label for="aoe_type">AOE Type</label>
+					<b-form-select v-model="spell.aoe_type"
+						id="aoe_type"
+						name="aoe_type"
+						title="AOE Type"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="AOE Type">
+						<option value="undefined" disabled>- AOE Type -</option>
+						<option v-for="(val,i) in aoe_type"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
+				</b-col>
+				<b-col md="6">
+					<label for="aoe_size">AOE Size ft.</label>
+					<b-form-input v-model="spell.aoe_size"
+						autocomplete="off"
+						id="aoe_size"
+						name="aoe_size"
+						class="form-control mb-2"
+						title="AOE Size"
+						type="number"
+						data-vv-as="AOE Size"
+						></b-form-input>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- DURATION N -->
+				<b-col md="6">
+					<label for="duration_n">Duration #</label>
+					<b-form-input v-model="spell.duration_n"
+						:disabled="!dur_type_time.includes(spell.duration_type)"
+						autocomplete="off"
+						id="duration_n"
+						name="duration_n"
+						class="form-control mb-2"
+						title="Duration #"
+						type="text"
+						></b-form-input>
+				</b-col>
+				<!-- DURATION SCALE -->
+				<b-col md="6">
+					<label for="duration_scale">Time Scale</label>
+					<b-form-select v-model="spell.duration_scale"
+						:disabled="!dur_type_time.includes(spell.duration_type)"
+						id="duration_scale"
+						name="duration_scale"
+						title="Time Scale"
+						class="form-control mb-2">
+						<option value="undefined">- Time Scale -</option>
+						<option v-for="(val,i) in dur_time"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- DESCRIPTION -->
+				<b-col md="8">
+					<label for="description">Description</label>
+					<b-form-textarea v-model="spell.description"
+						id="description"
+						name="description"
+						title="Description"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Description"
+						rows="6"></b-form-textarea>
+						<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+				</b-col>
+				<!-- CLASS SELECTOR -->
+				<b-col md="4" v-if="spell.classes">
+					<label for="classes">Classes</label>
+					<b-form-select v-model="spell.classes"
+						id="classes"
+						name="classes"
+						title="Classes" 
+						multiple size="6"
+						class="form-control mb-2">
+						<option v-for="(val,i) in classes"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+				</b-col>
+			</b-row>
+			<b-row class="d-flex spell_row">
+				<!-- RITUAL -->
+				<b-col md="2">
+					<label for="ritual">Ritual</label>
+					<div class="ritual d-flex justify-content-between" name="ritual">
+						<a class="component_box" @click="setRitual()"
+							 :class="{'selected': spell.ritual === true}">
+							<span>R</span>
+						</a>
+					</div>
+				</b-col>
+				<!-- LEVEL SCALING -->
+				<b-col md="5">
+					<label for="level_scaling">Level Scaling</label>
+					<b-form-select v-model="spell.level_scaling"
+						id="level_scaling"
+						name="level_scaling"
+						title="Level Scaling"
+						v-validate="'required'"
+						class="form-control mb-2"
+						@change="$forceUpdate()">
+						<option value="undefined">- Level Scaling -</option>
+						<option v-for="(val,i) in lvl_scaling"
+							:key="i" :value="val">{{val}}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has('level_scaling')">{{ errors.first('level_scaling') }}</p>
+				</b-col>
+				<!-- SOURCE BOOK -->
+				<b-col md="5">
+					<label for="source">Source</label>
+					<b-form-input v-model="spell.page"
+						autocomplete="off"
+						id="source"
+						name="source"
+						class="form-control mb-2"
+						title="Source"
+						data-vv-as="Source"
+						></b-form-input>
+				</b-col>
+			</b-row>
+		</div>
+	</div>
+</template>
+
+<script>
+export default {
+
+  name: 'basic-info',
+  props: {
+  	value: Object,
+  	levels: Array,
+  },
+
+  data() {
+    return {
+			schools: [
+				"Abjuration","Conjuration",
+				"Divination","Enchantment",
+				"Evocation","Illusion",
+				"Necromancy","Transmutation"],
+			cast_time: [
+				"Action", "Bonus Action", "Reaction", 
+				"Minute", "Hour", "No Action", "Special"],
+			range_type: ["Self", "Touch", "Ranged", "Sight", "Unlimited"],
+			dur_type: ["Concentration", "Instantaneous", "Special",
+			 "Time", "Until Dispelled", "Until Dispelled or Triggered"],
+			dur_type_time: ["Concentration", "Time"],
+			dur_time: ["Round", "Minute", "Hour", "Day"],
+			aoe_type: ["None", "Cone", "Cube", "Cylinder", "Line", "Sphere", "Square", "Square Feet"],
+			lvl_scaling: ["None", "Character Level", "Spell Scale", "Spell Level"],
+			classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 
+				"Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"],
+			classes_selected: null,
+    };
+  },
+  methods: {
+  	setComponent(comp) {
+			if (Object.keys(this.spell.components)[0]=="0") {
+				this.spell.components = {'verbal':0,'somatic':0,'material':0}
+			}
+			this.spell.components[comp] = !this.spell.components[comp]
+		},
+		setRitual() {
+			let yn = ["yes", "no"]
+			if (yn.includes(this.spell.ritual)) {
+				this.spell.ritual = false
+			}
+			this.spell.ritual = !this.spell.ritual
+		},
+  },
+  computed: {
+  	spell: {
+  		get(){
+  			return this.value;
+  		},
+  		set(newValue) {
+  			this.$emit("input", newValue);
+  			return newValue;
+  		}
+  	}
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+
+.component_box {
+	background: #000;
+	width: 40px;
+	text-align: center;
+	line-height: 36px;
+	height: 36px;
+	font-size: 18px;
+	span {
+		color: white;
+	}
+}
+.component_box.selected {
+	background: #2c97de;
+}
+
+</style>

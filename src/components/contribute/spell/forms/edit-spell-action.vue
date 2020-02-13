@@ -52,6 +52,7 @@
 						id="modifiers-tab" 
 						data-toggle="tab" 
 						role="tab" 
+						href="#modifiers"
 						aria-controls="modifiers" 
 						aria-selected="true">
 						<i class="fad fa-flame orange"></i>
@@ -63,6 +64,7 @@
 						id="Conditions-tab" 
 						data-toggle="tab" 
 						role="tab" 
+						href="#conditions"
 						aria-controls="Conditions" 
 						aria-selected="false">
 						<i class="fad fa-skull-crossbones yellow"></i>
@@ -74,6 +76,7 @@
 						id="Notifications-tab" 
 						data-toggle="tab" 
 						role="tab" 
+						href="#notifications"
 						aria-controls="Notifications" 
 						aria-selected="false">
 						<i class="fad fa-bell green"></i>
@@ -81,13 +84,38 @@
 					</a>
 				</li>
 			</ul>
-				<div class="tab-body">
+			<div class="tab-content">
+				<div class="tab-pane fade show active" 
+					id="modifiers" 
+					role="tabpanel" 
+					aria-labelledby="Modifiers-tab"
+				>
 					<spell-action-modifiers 
 						v-model="spell_action.modifiers" 
 						:level_scaling="level_scaling"
 						:level="level"
 					/>
+					
 				</div>
+				<div class="tab-pane fade show" 
+					id="conditions" 
+					role="tabpanel" 
+					aria-labelledby="Conditions-tab"
+				>
+					<spell-action-conditions
+					/>
+					
+				</div>
+				<div class="tab-pane fade show" 
+					id="notifications" 
+					role="tabpanel" 
+					aria-labelledby="Notifications-tab"
+				>
+					<spell-action-notifications
+					/>
+					
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -156,5 +184,8 @@ ul.nav-tabs {
 			border-color: #2c97de !important;
 		}
 	}
+}
+.tab-content {
+	position: relative;
 }
 </style>

@@ -1,17 +1,18 @@
 <template>
 	<!-- MODIFIERS -->
-	<div class="card">
-		<div class="card-header d-flex justify-content-between">
-			<span>Modifiers</span>
+	<div>
+	<!-- <div class="card"> -->
+		<div class="d-flex justify-content-between">
+			<!-- <span>Modifiers</span> -->
 			<a 
-			class="gray-hover text-capitalize" 
+			class="gray-hover text-capitalize add-mod" 
 			v-b-tooltip.hover title="Add Modifiers" 
 			@click="add_modifier()">
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 			</a>
 		</div>
-		<div class="card-body">
+		<!-- <div class="card-body"> -->
 			<!-- <span v-for="mod in modifiers">test<br></span> -->
 			<div class="card" v-if="modifiers && modifiers.length > 0" v-for="(modifier, mod_index) in modifiers">
 				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header mod_header d-flex justify-content-between">
@@ -213,7 +214,7 @@
 					</div>  <!-- END MODIFIER CARD BODY -->
 				</b-collapse>
 			</div>
-		</div>
+		<!-- </div> -->
 	</div>
 </template>
 
@@ -335,6 +336,12 @@ export default {
 
 .mod_header {
 	cursor: pointer;
+}
+.add-mod {
+	position: absolute;
+	top: -25px;
+	right: 20px;
+	z-index: 1;
 }
 
 .component_box {

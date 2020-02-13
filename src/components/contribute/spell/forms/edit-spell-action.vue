@@ -94,6 +94,7 @@
 						v-model="spell_action.modifiers" 
 						:level_scaling="level_scaling"
 						:level="level"
+						:action_type="spell_action.type"
 					/>
 					
 				</div>

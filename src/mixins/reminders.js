@@ -1,6 +1,28 @@
 import { mapActions } from 'vuex';
 
 export const remindersMixin = {
+	data() {
+		return {
+			premade: {
+				"concentration": {
+					".key": "concentratrion",
+					"action": "notify",
+					"color": "blue-light",
+					"notify": "Target was concentrating. Roll to see if it keeps their concentration.",
+					"title": "Concentrating",
+					"trigger": "damage"
+				},
+				"reaction": {
+					".key": "reaction",
+					"action": "remove",
+					"color": "red-light",
+					"notify": "Reaction regained",
+					"title": "Reaction Used",
+					"trigger": "startTurn"
+				}
+			}
+		}
+	},
 	methods: {
 		...mapActions([ 'set_targetReminder' ]),
 		checkReminders(target, trigger){

@@ -58,9 +58,11 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import ReminderForm from '@/components/ReminderForm';
+	import { remindersMixin } from '@/mixins/reminders'
 
 	export default {
 		name: 'TargetReminders',
+		mixins: [remindersMixin],
 		components: {
 			ReminderForm
 		},
@@ -76,11 +78,6 @@
 				customReminder: {}
 			}
 		},
-		firebase() {
-			return {
-				premade: db.ref(`reminders`),
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',
@@ -92,26 +89,13 @@
 			]),
 			addReminder(type, reminder = false) {	
 				if(type == 'premade') {
-					
-					//Recreating the reminder without ['.key']
-					//If ['.key'] is deleted if won't be there if you want to add it again...
-					let premadeReminder = {
-						title: reminder.title,
-						trigger: reminder.trigger,
-						notify: reminder.notify,
-						color: reminder.color,
-					}
-					if(reminder.action) {
-						premadeReminder.action = reminder.action
-					}
-
 					this.set_targetReminder({
 						action: 'add',
 						entity: this.entityKey,
 						key: reminder['.key'],
 						type: 'premade',
-						reminder: premadeReminder
-					})
+						reminder: reminder
+					});
 				}
 				else if(type == 'custom') {
 					this.validation.validateAll().then((result) => {

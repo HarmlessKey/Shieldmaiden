@@ -10,8 +10,8 @@ const Spells = () => import('@/views/Compendium/Spells.vue');
 const Conditions = () => import('@/views/Compendium/Conditions.vue');
 const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
-const Spells_contrib = () => import '@/views/Contribute/Spells.vue';
-const Contribute = () => import '@/views/Contribute';
+const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
+const Contribute = () => import('@/views/Contribute');
 
 const Sitemap = () => import('@/views/Sitemap.vue');
 const Privacy = () => import('@/views/Privacy.vue');
@@ -122,12 +122,12 @@ export const routes = [{
 
 // CONTRUBUTE
 {
-	path: '/contribute',
+	path: '/admin/contribute',
 	name: 'Contribute',
 	component: Contribute
 },
 {
-	path: '/contribute/spells',
+	path: '/admin/contribute/spells',
 	name: 'Contribute Spells',
 	component: Spells_contrib,
 	meta: {
@@ -135,7 +135,7 @@ export const routes = [{
 	}
 },
 {
-	path: '/contribute/spells/:id',
+	path: '/admin/contribute/spells/:id',
 	name: 'Contribute Spell',
 	component: Spells_contrib,
 	props: (route) => ({

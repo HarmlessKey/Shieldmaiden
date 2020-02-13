@@ -33,7 +33,7 @@
 					{{ data.index + 1 }}
 				</template>
 
-				<router-link :to="'/contribute/spells/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
+				<router-link :to="'spells/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
 				<div slot="table-busy" class="loader">
 					<span>Loading spells....</span>
 				</div>
@@ -119,7 +119,7 @@
 			}
 		},
 		mounted() {
-			this.getSpell()
+			// this.getSpell()
 		},
 		beforeMount() {
 			this.searchResults = this.spells

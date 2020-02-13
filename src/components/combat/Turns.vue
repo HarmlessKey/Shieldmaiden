@@ -1,6 +1,7 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 			<h1>
+				<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
 				<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
 				<a class="edit"
 					id="edit"
@@ -11,17 +12,18 @@
 				</a>
 				<div class="dropdown-menu">	
 					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter',})">
+					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
 						<i class="fas fa-cogs"></i> Settings
 					</a>
-					<a class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter',})">
+					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 						<i class="far fa-desktop"></i> Track Settings
 					</a>
+					<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
 					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 				</div>
 
 				<!-- BROADCASTING -->
-				<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
+				<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
 			</h1>
 
 		<div class="round-info d-none d-md-inline">
@@ -46,12 +48,12 @@
 				<i class="fas fa-arrow-left"></i> 
 				<span class="ml-1 d-none d-lg-inline">Prev turn</span>
 			</a>
-			<template v-if="encounter.round == 0"> 
-				<router-link :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
+			<template v-if="encounter.round === 0"> 
+				<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
 					<i class="fas fa-arrow-left"></i> 
 					<span class="ml-1 d-none d-lg-inline">Back</span>
 				</router-link>
-				<a class="btn" @click="start()">Start encounter <i class="fas fa-arrow-right"></i></a>
+				<a class="btn" @click="set_turn({turn: 0, round: 1})">Start encounter <i class="fas fa-arrow-right"></i></a>
 			</template>
 			<a v-else class="btn" 
 				@click="nextTurn()" 
@@ -64,15 +66,16 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'Turns',
 		props: ['active_len', 'current'],
 		data () {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				demo: this.$route.name === "Demo",
+				userId: this.$store.getters.getUser.uid
 			}
 		},
 		firebase() {
@@ -92,16 +95,15 @@
 		},
 		methods: {
 			...mapActions([
+				'set_turn',
 				'update_round',
 				'set_targeted',
 				'setSlide',
 				'set_finished',
 				'set_targetReminder',
 			]),
-			start() {
-				db.ref(`encounters/${this.path}`).update({
-					round: 1
-				})
+			reload() {
+				this.$router.go();
 			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1
@@ -112,17 +114,14 @@
 					round++
 					this.update_round()
 				}
-				db.ref(`encounters/${this.path}`).update({
-					turn: turn,
-					round: round,
-				})
-				this.set_targeted(undefined);
-
+				this.set_turn({turn, round})
+				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
+				this.set_targeted({ e: 'untarget', key: 'all' });
 				this.reminders(this.current, 'endTurn')
 			},
 			reminders(target, trigger){
 				for(let key in target.reminders) {
-					if(target.reminders[key].trigger == trigger) {
+					if(target.reminders[key].trigger === trigger) {
 
 						//Buttons to remove or keep reminder
 						if(target.reminders[key].action != 'remove') {
@@ -175,22 +174,19 @@
 					turn = this.active_len - 1
 					round--
 				}
-				if (round == 0) {
+				if (round === 0) {
 					turn = 0
 				}
-				db.ref(`encounters/${this.path}`).update({
-					turn: turn,
-					round: round,
-				})
-				this.set_targeted(undefined);
+				this.set_turn({turn, round});
+				this.set_targeted({ e: 'untarget', key: 'all' });
 			},
 			confirmFinish() {
 				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
@@ -199,7 +195,6 @@
 			},
 			broadcast() {
 				//Save this is the current campaign that is being broadcasted
-
 				if(this.broadcasting['.value'] == this.$route.params.campid) {
 					db.ref(`broadcast/${this.userId}/live`).remove()
 				} else {

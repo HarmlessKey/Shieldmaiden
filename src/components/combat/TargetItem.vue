@@ -2,7 +2,7 @@
 	<div>
 		<div class="target">
 			<span class="initiative" v-b-tooltip.hover title="Initiative">
-				<i v-if="targeted == entity.key" class="fas fa-crosshairs blue"></i>
+				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
 				<template v-else>{{ entity.initiative }}</template>
 			</span>
 			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
@@ -13,8 +13,8 @@
 			</span>
 			<span class="ac" 
 				:class="{ 
-						'green': entity.ac_bonus > 0, 
-						'red': entity.ac_bonus < 0 
+					'green': entity.ac_bonus > 0, 
+					'red': entity.ac_bonus < 0 
 				}" 
 				v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
 				v-if="entity.ac_bonus">
@@ -91,14 +91,19 @@
 					<span class="green" 
 						v-if="entity.addNextRound == true"
 						v-b-tooltip.hover title="Will be added next round"
-						@click="add_next_round({key: entity.key, action: 'tag', value: false})">
+						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 						<i class="fas fa-check"></i>
 					</span>
 					<span class="gray-hover" 
 						v-if="entity.addNextRound == false"
 						v-b-tooltip.hover title="Click to add next round"
-						@click="add_next_round({key: entity.key, action: 'tag', value: true})">
+						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 						<i class="fas fa-check"></i>
+					</span>
+					<span class="ml-2 gray-hover" 
+						v-b-tooltip.hover title="Add now"
+						@click="add_next_round({key: entity.key, action: 'set'})">
+						<i class="fas fa-plus"></i>
 					</span>
 				</div>
 			</template>
@@ -113,8 +118,8 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
 
 	export default {
 		name: 'TargetItem',
@@ -179,7 +184,7 @@
 			},
 			displayStats() {
 				var stats = '';
-				if(this.entity.transformed == true) {
+				if(this.entity.transformed) {
 					stats = {
 						ac: this.entity.transformedAc,
 						maxHp: this.entity.transformedMaxHp,
@@ -210,6 +215,7 @@
 	"initiative img ac hp-bar hp-bar hp-bar hp hp";
 	
 	line-height: 30px;
+	user-select: none;
 }
 .progress { 
 	height: 30px;
@@ -218,7 +224,7 @@
 	position: relative;
 
 	span { 
-		color:#191919;
+		color:#fff;
 		font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 		position: absolute;
 		left: 5px;

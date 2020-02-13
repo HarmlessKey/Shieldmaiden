@@ -9,13 +9,13 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<input v-if="die == 'X'" class="form-control" min="0" type="number" v-model="item.x" name="x" />
+			<input v-if="die == 'X'" class="form-control" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
 				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
-			<input class="form-control" min="0" type="number" v-model="item.n" name="N" />
-			<input class="form-control" type="number" v-model="item.mod" name="mod" />
+			<input class="form-control" min="0" max="999" type="number" v-model="item.n" name="N" />
+			<input class="form-control" type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
 			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
@@ -52,53 +52,43 @@
 				result: '',
 				log: [],
 				dice: {
-					4:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d4' },
-					6:{ n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d6' },
-					8: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d8' },
-					10: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
-					12: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d12' },
-					20: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d20' },
-					100: { n: 1, mod: undefined, result: undefined, icon: 'fas fa-dice-d10' },
-					X: { n: 1, mod: undefined, result: undefined, x: undefined, icon: 'fas fa-dice-d20' }
+					4:{ n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d4' },
+					6:{ n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d6' },
+					8: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d8' },
+					10: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d10' },
+					12: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d12' },
+					20: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d20' },
+					100: { n: 1, mod: undefined, result: undefined, icon: 'fad fa-dice-d10' },
+					X: { n: 1, mod: undefined, result: undefined, x: undefined, icon: 'fad fa-dice-d20' }
 				},
 			}
 		},
 		methods: {
 			roll(d, item) {
+				item.n = (item.n > 999) ? 999 : item.n;
+				item.mod = (item.mod > 999) ? 999 : item.mod;
+				item.mod = (item.mod < -999) ? -999 : item.mod;
+				item.x = (item.x === undefined) ? 20 : item.x;
 
-				if(d == 'X') {
-					var die = item.x
+				let die = (d === 'X') ? item.x : d;
+				if (item.mod === '') {
+					item.mod = undefined
 				}
-				else {
-					die = d
-				}
-				let roll = this.rollD(die, item.n, item.mod);
+				let roll = this.rollD(die, item.n, item.mod, `${item.n}d${die} roll`);
 				item.result = roll.total;
-
-				let snotifyTitle = 'You rolled: ' + roll.total;
 
 				//Show Natural 1 or Natural 20
 				if(item.n == 1 && die == 20) {
 					let throws = '"'+roll.throws+'"'
 					if(throws.substring(5, 0) == '"1"') {
 						roll.total = 'Natural 1';
-						snotifyTitle = roll.total;
 					}
 					else if(throws.substring(5, 0) == '"20"') {
 						roll.total = 'Natural 20';
-						snotifyTitle = roll.total;
 					}
 					
 				}
-
 				this.log.unshift(roll);
-
-				this.$snotify.success(roll.roll, snotifyTitle, {
-					position: "centerTop"
-				});
-
-				item.mod = undefined
-				item.n = 1
 			}
 		}
 	};

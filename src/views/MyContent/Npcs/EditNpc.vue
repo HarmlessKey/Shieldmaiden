@@ -1,11 +1,9 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div v-if="overencumbered" class='container'>
-			<OverEncumbered/>
-		</div>
-		<div id="npcs" class="container-fluid" v-else-if="npc || $route.name == 'AddNPC'">
-			
+	<div v-if="overencumbered" class='container'>
+		<OverEncumbered/>
+	</div>
+	<div class="content" v-else-if="npc || $route.name == 'AddNPC'">
+		<div class="form">
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
 
@@ -241,7 +239,10 @@
 						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</b-col>
 					<b-col class="col" v-if="quick == false">
-						<label for="hitdice">Hit Dice</label>
+						<label for="hitdice">
+							Hit Dice {{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}
+							<a v-b-popover.hover.top="'The modifier is the NPC\'s Constitution modifier.'" title="Hit Dice + Modifier"><i class="fas fa-info-circle"></i></a>
+						</label>
 						<b-form-input autocomplete="off" 
 							v-b-tooltip.hover title="Hit Dice"
 							type="text" 
@@ -509,30 +510,38 @@
 					</div>
 				</div>
 			</template>
+		</div>
 
-			<div class="mt-2">
-				<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
-				<button v-if="$route.name == 'AddNPC'" class="btn" @click="addNpc()"><i class="fas fa-plus"></i> Add NPC</button>
-				<button v-else class="btn" @click="editNpc()"><i class="fas fa-check"></i> Save</button>
-			</div>
+		<div class="save">
+			<p class="error red" v-if="errors.items && errors.items.length > 0">There is an error in your form.</p>
+			<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
+			<button v-if="$route.name == 'AddNPC'" class="btn" @click="addNpc()"><i class="fas fa-plus"></i> Add NPC</button>
+			<button 
+				v-else 
+				:disabled="errors.items && errors.items.length > 0"
+				class="btn" 
+				@click="editNpc()"
+			>
+				<i class="fas fa-check"></i> Save
+			</button>
 		</div>
 	</div>
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
+	import { general } from '@/mixins/general.js';
 
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
 
 	export default {
 		name: 'Npcs',
+		mixins: [general],
 		metaInfo: {
 			title: 'NPC\'s'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 		},
 		data() {
@@ -647,7 +656,8 @@
 						db.ref('npcs/' + this.userId).push(this.npc);
 						this.$router.replace('/npcs')
 					} else {
-						//console.log('Not valid');
+						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
+						});
 					}
 				})
 			},
@@ -721,43 +731,64 @@
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	padding: 20px;
+.content {
+	display: grid;
+	height: calc(100vh - 50px) !important;
+	grid-template-rows: auto 60px;
 
-	ul{
-		padding: 0;
+	.form {
+		overflow-y: scroll;
 
-		&.entities {
-			li {
-				margin-bottom: 3px;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		ul {
+			padding: 0;
+
+			&.entities {
+				li {
+					margin-bottom: 3px;
+				}
 			}
 		}
-	}
-	a.tab {
-		display: inline-block;
-		padding: 10px;
-		margin-bottom: 1px;
+		a.tab {
+			display: inline-block;
+			padding: 10px;
+			margin-bottom: 1px;
 
-		&.active {
-			background-color: #262626;
-			color: #b2b2b2 !important;
+			&.active {
+				background-color: #262626;
+				color: #b2b2b2 !important;
+			}
+		}
+		.img-container, img {
+			width: 100%;
+		}
+		label {
+			line-height: 37px;
+			margin-bottom: 0;
+
+			svg {
+				fill: #b2b2b2;
+				width: 20px;
+				height: 20px;
+			}
+		}
+		.skills {
+			line-height: 40px;
 		}
 	}
-	.img-container, img {
-		width: 100%;
-	}
-	label {
-		line-height: 37px;
-		margin-bottom: 0;
+	.save {
+		display: flex;
+		justify-content: flex-end;
+		padding: 10px 0;
+		border-top: solid 1px #5c5757;
 
-		svg {
-			fill: #b2b2b2;
-			width: 20px;
-			height: 20px;
+		.error {
+			margin: 0 10px 0 0;
+			line-height: 40px;
 		}
-	}
-	.skills {
-		line-height: 40px;
 	}
 }
 

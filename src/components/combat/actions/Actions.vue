@@ -5,7 +5,7 @@
 				<a class="nav-link active" 
 					id="manual-tab" 
 					data-toggle="tab" 
-					href="#manual" 
+					:href="`#manual-${location}`" 
 					role="tab" 
 					aria-controls="manual" 
 					aria-selected="true">
@@ -17,7 +17,7 @@
 				<a class="nav-link" 
 					id="roll-tab" 
 					data-toggle="tab" 
-					href="#roll" 
+					:href="`#roll-${location}`" 
 					role="tab" 
 					aria-controls="roll" 
 					aria-selected="false">
@@ -29,8 +29,12 @@
 		<div class="scroll" v-bar>
 			<div>
 				<div class="tab-content">
-					<Manual :current="current" />
-					<Roll :current="current" />	
+					<div class="tab-pane fade show active" :id="`manual-${location}`" role="tabpanel" aria-labelledby="manual-tab">
+						<Manual :current="current" />
+					</div>
+					<div v-if="current" class="tab-pane roll fade" :id="`roll-${location}`" role="tabpanel" aria-labelledby="roll-tab">
+						<Roll :current="current" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -50,12 +54,13 @@
 			Roll,
 		},
 		mixins: [setHP],
-		props: ['current']
+		props: ['current', 'location']
 	}
 </script>
 
 <style lang="scss" scoped>
 #actions {
+	font-size: 12px;
 	// grid-area: actions;
 	// overflow: hidden;
 

@@ -1,4 +1,5 @@
 import { db, auth } from '@/firebase'
+import Vue from 'vue'
 
 const campaigns_ref = db.ref('campaigns/')
 const encounters_ref = db.ref('encounters')
@@ -27,6 +28,8 @@ export const content_module = {
 		npcs: {},
 
 		poster: undefined,
+		side_collapsed: false,
+		side_small_screen: false
 
 	},
 	getters: {
@@ -40,38 +43,44 @@ export const content_module = {
 			return state.slide;
 		},
 		encounters: function( state ) {
-			return state.encounters
+			return state.encounters;
 		},
 		allEncounters: function( state ) {
-			return state.allEncounters
+			return state.allEncounters;
 		},
 		players: function( state ) {
-			return state.players
+			return state.players;
 		},
 		npcs: function( state ) {
-			return state.npcs
+			return state.npcs;
 		},
 		campaign: function( state ) {
-			return state.campaign
+			return state.campaign;
 		},
 		campaigns: function( state ) {
-			return state.campaigns
+			return state.campaigns;
 		},
 		tier: function( state ) {
-			return state.tier
+			return state.tier;
 		},
 		voucher: function( state ) {
-			return state.voucher
+			return state.voucher;
 		},
 		overencumbered: function( state ) {
-			return state.overencumbered
+			return state.overencumbered;
 		},
 		content_count: function( state ) {
-			return state.content_count
+			return state.content_count;
 		},
 		poster: function( state ) {
-			return state.poster
+			return state.poster;
 		},
+		side_collapsed: function( state ) {
+			return state.side_collapsed;
+		},
+		side_small_screen: function( state ) {
+			return state.side_small_screen;
+		}
 	},
 	mutations: {
 		SET_USER(state) {
@@ -87,7 +96,6 @@ export const content_module = {
 			state.voucher = payload;
 		},
 		setSlide(state, payload) {
-			
 			//Function to compare 2 arrays
 			//Needed to check if the data of the slide is the same
 			var isEqual = function (value, other) {
@@ -213,6 +221,12 @@ export const content_module = {
 		},
 		CLEAR_ENCOUNTERS(state) {
 			state.encounters = {}
+		},
+		SET_SIDE_COLLAPSE(state) {
+			Vue.set(state, 'side_collapsed', !state.side_collapsed);
+		},
+		SET_SIDE_SMALL_SCREEN(state, payload) {
+			Vue.set(state, 'side_small_screen', payload);
 		}
 	},
 	actions: {
@@ -397,6 +411,12 @@ export const content_module = {
 		},
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS")
-		}
+		},
+		setSideCollapsed({ commit }) {
+			commit("SET_SIDE_COLLAPSE")
+		},
+		setSideSmallScreen({ commit }, payload) {
+			commit("SET_SIDE_SMALL_SCREEN", payload)
+		},
 	},
 };

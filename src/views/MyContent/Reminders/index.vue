@@ -1,6 +1,5 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
+	<div>
 		<div id="reminders" class="container-fluid" v-if="tier">
 			<h1>Your custom reminders</h1>
 			<p>These reminders can quicly be used during an encounter.</p>
@@ -78,7 +77,6 @@
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import { mapGetters } from 'vuex'
@@ -90,7 +88,6 @@
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 			OutOfSlots,
 		},

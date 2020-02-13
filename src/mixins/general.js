@@ -1,7 +1,4 @@
 export const general = {
-	created() {
-		// console.log("CREATED MIXIN")
-	},
 	methods: {
 		calcMod(val) {
 			if(val) {
@@ -11,11 +8,21 @@ export const general = {
 				return 0;
 			}	
 		},
+		hitDiceStr(npc) {
+			let mod = this.calcMod(npc['constitution']);
+			let nHD = parseInt(npc.hit_dice.split('d')[0]);
+			let hdMod = mod * nHD;
+
+			let sign = (hdMod > 0) ? '+' : '';
+			let mod_str = hdMod ? hdMod : '';
+			
+			return "" + npc.hit_dice + sign + mod_str;
+		},
 		percentage(current, max) {
 			var percentage = Math.floor(current / max * 100)
 			return percentage
 		},
-		makeDate(input, showTime = false) {
+		makeDate(input, showTime = false, short = false) {
 			let monthNames = [
 				"January", "February", "March",
 				"April", "May", "June", "July",
@@ -29,7 +36,9 @@ export const general = {
 			let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
 			let time = hours + ":" + minutes + ":" + seconds;
-			let date = d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
+			let date = (short) ?
+			d.getDate() + "-" + parseInt(d.getMonth() + 1) + "-" + d.getFullYear() :
+			d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
 			
 			if(showTime) { return date + " - " + time; }
 			return date

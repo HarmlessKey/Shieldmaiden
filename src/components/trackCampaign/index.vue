@@ -1,7 +1,7 @@
 <template>
 <div v-if="campaign">
 	<template v-if="!campaign.private">
-		<!-- NOT BROADCASTING -->
+		<!-- NOT LIVE -->
 		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
 			<div class="top">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
@@ -11,13 +11,14 @@
 				</span>
 			</div>
 			<div class="container-fluid">
+				<h2 class="not-live" v-if="broadcasting['.value'] !== $route.params.campid">Campaign is currently not live</h2>
 				<div class="container entities">
 					<CampaignOverview :players="campaign.players" />
 				</div>
 			</div>
 		</div>
 
-		<!-- BROADCASTING -->
+		<!-- LIVE -->
 		<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 			
 			<!-- FINISHED -->
@@ -33,8 +34,8 @@
 					<div class="container entities">
 						<h2 class="padding">Encounter Finished</h2>
 						<b-row>
-							<b-col v-if="playerSettings.loot == true" md="8">
-								<Finished :encounter="encounter"/>
+							<b-col md="8">
+								<Rewards :encounter="encounter"/>
 							</b-col>
 							<b-col>
 								<div>
@@ -150,7 +151,7 @@
 	import { general } from '@/mixins/general.js'
 
 	import Follow from '@/components/trackCampaign/Follow.vue'
-	import Finished from '@/components/combat/Finished.vue'
+	import Rewards from '@/components/trackCampaign/Rewards.vue'
 	import Turns from '@/components/trackCampaign/Turns.vue'
 	import Initiative from '@/components/trackCampaign/Initiative.vue'
 	import Meters from '@/components/trackCampaign/Meters.vue'
@@ -161,7 +162,7 @@
 		mixins: [general],
 		components: {
 			Follow,
-			Finished,
+			Rewards,
 			Turns,
 			Initiative,
 			Meters,
@@ -309,10 +310,14 @@
 						let encounter = db.ref(`encounters/${this.userId}/${campId}/${encId}`)
 
 						encounter.on('value' , (snapshot) => {
-							this.encounter = snapshot.val()
+							let enc = snapshot.val();
+							if(enc) {
+								enc.key = encId;
+							}
+							this.encounter = enc
 						});
 					}
-					//Get campaign for player curHP/tempHP/ACBonus
+					//Get campaign for player curHP/tempHP/ACBonus/Dead/Stable/DeathSaves
 					let fetchCampaign = db.ref(`campaigns/${this.userId}/${campId}`);
 
 					fetchCampaign.on('value' , (snapshot) => {				
@@ -359,6 +364,11 @@
 				line-height: 25px;
 				padding: 0 10px;
 			}
+		}
+
+		h2.not-live {
+			margin-top: 50px;
+			text-align: center;
 		}
 
 		&::-webkit-scrollbar { 

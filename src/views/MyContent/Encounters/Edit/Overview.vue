@@ -1,5 +1,6 @@
 <template>
-   <div class="encounter_overview">
+<div>
+    <div class="encounter_overview" :class="{ show: showOverview }">
         <div>
             <h3 class="header">Encounter overview</h3>
             <div class="diff-info" v-if="encDifficulty">
@@ -40,81 +41,104 @@
             </div>
             <h3 v-else class="gray-hover">Calculating difficulty...</h3>
         </div>
-       <div class="scroll bg-gray-active" v-bar>
-           <div class="overview">          
-                <template v-if="encounter">
-                    <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
-                    <ul class="entities hasImg mt-2">
-                        <li v-for="entity in _friendlies" :key="entity.key" class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-left">
-                                <template v-if="entity.entityType == 'player'">
-                                    <span v-if="players[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[entity.id].avatar + '\')' }"></span>
-                                    <img v-else src="@/assets/_img/styles/player.png" class="img" />
-                                </template>
-                                <template v-else-if="entity.entityType == 'npc'">
-                                    <span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-                                    <span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-                                    <img v-else-if="entity.friendly" src="@/assets/_img/styles/player.png" class="img" />
-                                </template>
-                                <span class="green">
-                                    {{ entity.name }}
-                                </span>
-                            </div>
-                            <div class="actions">
-                                <a v-if="entity.entityType == 'npc'" @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                                <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(entity.key, entity.name)">
-                                    <i class="fas fa-minus"></i>
-                                </a>
-                            </div>
-                            <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-                        </li>
-                    </ul>
+        <div class="scroll bg-gray-active" v-bar>
+            <div>
+                <div class="overview">          
+                        <template v-if="encounter">
+                            <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
 
-                    <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
-                    <ul class="entities hasImg mt-2">
-                        <li v-for="entity in _monsters" :key="entity.key" class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-left">
-                                <span v-if="entity.avatar" class="img" :style="{ backgroundImage: 'url(\'' + entity.avatar + '\')' }"></span>
-                                <span v-else-if="entity.npc == 'custom' && npcs[entity.id] && npcs[entity.id].avatar" class="img" :style="{ backgroundImage: 'url(\'' + npcs[entity.id].avatar + '\')' }"></span>
-                                <img v-else src="@/assets/_img/styles/monster.png" class="img" />
-                                <span class="red">
-                                    {{ entity.name }}
+                            <HKtable
+                                class="mb-4" 
+                                :items="_friendlies"
+                                :columns="entityColumns"
+                                :showHeader="false"
+                            >
+                                <template slot="image" slot-scope="data">
+                                    <template v-if="data.row.entityType === 'player'">
+                                        <span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
+                                        <img v-else src="@/assets/_img/styles/player.png" class="image" />
+                                    </template>
+                                    <template v-else-if="data.row.entityType === 'npc'">
+                                        <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                                        <span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+                                        <img v-else-if="data.row.friendly" src="@/assets/_img/styles/player.png" class="image" />
+                                    </template>
+                                </template>
+
+                                <!-- NAME -->
+                                <span slot="name" slot-scope="data" class="green">
+                                    {{ data.item }}
                                 </span>
-                            </div>
-                            <div class="actions">
-                                <a @click="setSlide({show: true, type: 'slides/Edit', data: entity })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
-                                    <i class="fas fa-pencil"></i>
-                                </a>
-                                <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(entity.key, entity.name)">
-                                    <i class="fas fa-minus"></i>
-                                </a>
-                            </div>
-                            <i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-                        </li>
-                    </ul>
-                </template>
-                <div v-else class="loader"><span>Loading entities...</span></div>
-           </div>
-       </div>
+
+                                <!-- ACTIONS -->
+                                <div slot="actions" slot-scope="data" class="actions">
+                                    <a v-if="data.row.entityType === 'npc'" @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                </div>
+                            </HKtable>
+
+                            <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
+
+                            <HKtable 
+                                :items="_monsters"
+                                :columns="entityColumns"
+                                :showHeader="false"
+                            >
+                                <template slot="image" slot-scope="data">
+                                    <span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+                                    <span v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+                                    <img v-else src="@/assets/_img/styles/monster.png" class="image" />
+                                </template>
+
+                                <!-- NAME -->
+                                <span slot="name" slot-scope="data" class="red">
+                                    {{ data.item }}
+                                </span>
+
+                                <div slot="actions" slot-scope="data" class="actions">
+                                    <a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+                                        <i class="fas fa-pencil"></i>
+                                    </a>
+                                    <a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+                                        <i class="fas fa-minus"></i>
+                                    </a>
+                                </div>
+                            </HKtable>
+                        </template>
+                        <div v-else class="loader"><span>Loading entities...</span></div>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
+        <i class="fas fa-chevron-left"></i>
     </div>
+</div>
 </template>
 
 <script>
     import { db } from '@/firebase';
     import { mapActions, mapGetters } from 'vuex';
-    import { difficulty } from '@/mixins/difficulty.js'
+    import { difficulty } from '@/mixins/difficulty.js';
+    import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
         name: 'Overview',
         mixins: [difficulty],
+        components: {
+            HKtable
+        },
 		data() {
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.getUser,
                 slide: this.$store.getters.getSlide,
+                showOverview: false,
                 encDifficulty: undefined,
 				bars: {
 					trivial: 'secondary',
@@ -122,7 +146,19 @@
 					medium: 'warning',
 					hard: 'info',
 					deadly: 'danger',
-				}
+                },
+                entityColumns: {
+                    image: {
+                        width: 46,
+                        noPadding: true
+                    },
+                    name: {
+                        truncate: true
+                    },
+                    actions: {
+                        noPadding: true
+                    }
+                }
 			} 
 		},
 		mounted() {
@@ -184,13 +220,15 @@
 					}, 'asc')
 					.value()
 				}
+            },
+            totalXp() {
+                return this.encDifficulty['totalXp'];
             }
-            
 		},
 		watch: {
 			_excludeFriendlies() {
 				this.setDifficulty()
-			}
+            }
 		},
 		methods: {
 			...mapActions([
@@ -202,7 +240,10 @@
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
 			},
 			async setDifficulty() {
-				this.encDifficulty = await this.difficulty(this.encounter.entities)
+                this.encDifficulty = await this.difficulty(this.encounter.entities);
+
+                //Store the new xp value for the encounter
+                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
 			},
         }
 	}
@@ -211,7 +252,7 @@
 <style lang="scss" scoped>
 .encounter_overview {
     grid-area: overview;
-    overflow: hidden;
+    overflow-y: hidden;
 
     h3 {
         margin-bottom: 16px;
@@ -235,44 +276,73 @@
         }
     }
     .scroll {
-        height: calc(100% - 250px);
+        height: calc(100% - 266px);
         
         .overview {
             padding: 15px 10px 30px 10px;
-            width: calc(100% - 5px) !important;
         }
-	}
+    }
 }
-@media only screen and (max-width: 767px) {
-		h3.header {
-            display:none;
-        } 
+.toggle {
+    display: none
+}
+@media only screen and (max-width: 850px) {
+    .encounter_overview {
+        position: fixed;
+        top: 50px;
+        right: -300px; 
+        height: calc(100vh - 50px);
+        overflow: scroll;
+        z-index: 96;
+        background: #302f2f;
+        overflow: scroll;
+        width: 300px;
+        transition: right .5s linear,
+        box-shadow .5s linear;
+
+        &.show {
+            right: 0;
+            box-shadow: 0 10px 15px #000;
+        }
+
+        h3.header {
+            padding: 10px;
+        }
+        
         .scroll {
-            height: calc(100% - 50px) !important;
-        } 
-        .diff-info {
-            padding-top: 15px !important;
+             overflow: visible !important;
+             height: calc(100% - 286px);
+        }
 
-            .advanced {
-                display: none;
-            }
-            .progress-area {
-                display: flex;
-                justify-content: space-between;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    } 
+    .toggle {
+        position: fixed;
+        top: 65px;
+        right: 0;
+        height: 50px;
+        width: 50px;
+        z-index: 97;
+        text-align: center;
+        transition: right .5s linear;
+        display: block;
+        cursor: pointer;
+        line-height: 50px;
+        color: #fff !important;
 
-                .progress {
-                    width: 100%;
-                    margin: 0 10px 0 0 !important;
-                    height: 25px;
-                }
-                .diff {
-                    text-transform: uppercase;
-                    display: block !important;
-                    width: max-content;
-                    line-height: 25px;
-                    font-size: 25px;
-                }
+        i {
+            transition: transform .5s linear;
+        }    
+
+        &.show {
+            right: 300px;
+
+            i {
+                transform: rotate(180deg);
             }
-        }      
-	}
+        }
+    }   
+}
 </style>

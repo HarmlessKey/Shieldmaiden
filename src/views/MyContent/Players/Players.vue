@@ -1,130 +1,137 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="players" class="container-fluid" v-if="tier">
-			<h1>Your players</h1>
-			<p>These are the players that you can use in your campaigns.</p>
+	<div class="content" v-if="tier">
+		<h1>Your players</h1>
+		<p>These are the players that you can use in your campaigns.</p>
 
-			<OverEncumbered v-if="overencumbered"/>
-			<OutOfSlots 
-				v-else-if="content_count.players >= tier.benefits.players"
-				type = 'players'
-			/>
-			<router-link v-else to="/players/add-player" 
-				class="btn btn-block mb-3"
-				v-b-modal.addModal>
-				<i class="fas fa-plus-square"></i> Add player
-			</router-link>
-
-			<template v-if="players">
-				<h2 class="mt-3">Players ( 
+		<OverEncumbered v-if="overencumbered"/>
+		<OutOfSlots 
+			v-else-if="content_count.players >= tier.benefits.players"
+			type = 'players'
+		/>
+		<template v-if="players">
+			<h2 class="mt-3 d-flex justify-content-between">
+				<span>
+					Players ( 
 					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
 						/ 
 						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
 						<template v-else>{{ tier.benefits.players }}</template>	
-						)</h2>
-				<table class="table mb-5">
-					<thead>
-						<th></th>
-						<th class="n">#</th>
-						<th>Character name</th>
-						<th class="d-none d-md-table-cell">Player name</th>
-						<th>Level</th>
-						<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-					</thead>
-					<tbody name="table-row" 
-						is="transition-group"
-						enter-active-class="animated flash"
-						leave-active-class="animated bounceOutLeft">
-						<tr v-for="(player, index) in _players" :key="player.key">
-							<td class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></td>
-							<td class="img" v-else>
-								<img src="@/assets/_img/styles/player.svg" />
-							</td>
-							<td class="n">{{ index + 1 }}</td>
-							<td>
-								<router-link class="mx-2" 
-									:to="'/players/' + player.key" 
-									v-b-tooltip.hover title="Edit">{{ player.character_name }}
-								</router-link>
-							</td>
-							<td class="d-none d-md-table-cell">{{ player.player_name }}</td>
-							<td>{{ player.level }}</td>
-							<!-- Actions -->
-							<td class="align-middle p-0">
-								<div class="d-flex justify-content-end">
-									<div class="d-flex justify-content-end actions">
-										<router-link class="gray-hover mx-1" 
-											:to="'/players/' + player.key" 
-											v-b-tooltip.hover title="Edit">
-											<i class="fas fa-pencil"></i>
-										</router-link>
-										<a v-b-tooltip.hover 
-											title="Delete" 
-											class="gray-hover"
-											@click="confirmDelete(player.key, player.player, player.control)">
-												<i class="fas fa-trash-alt"></i>
-										</a>
-									</div>
-									<span class="dropleft d-sm-none actions-dropdown">
-										<a class="options"
-											id="options"
-											data-toggle="dropdown" 
-											aria-haspopup="true" 
-											aria-expanded="false">
-											<i class="far fa-ellipsis-v"></i>
-										</a>
-										<div class="dropdown-menu" aria-labelledby="options">	
-											<router-link class="gray-hover mx-1 dropdown-item" 
-												:to="'/players/' + player.key" 
-												v-b-tooltip.hover title="Edit">
-													<i class="fas fa-pencil"></i> Edit player
-											</router-link>
-											<a v-b-tooltip.hover 
-												title="Delete" 
-												class="gray-hover dropdown-item"
-												@click="confirmDelete(player.key, player.player, player.control)">
-													<i class="fas fa-trash-alt"></i> Delete player
-											</a>
-										</div>
-									</span>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</template>
-			<h2 v-else-if="players === null" class="mt-4 px-2 d-flex justify-content-between">
-				<i class="fas fa-arrow-up gray-hover"></i> 
-				Add your first player 
-				<i class="fas fa-arrow-up gray-hover"></i>
+						)
+				</span>
+				<router-link v-if="!overencumbered" to="/players/add-player">
+					<i class="fas fa-plus green"></i> New Player
+				</router-link>
 			</h2>
-			<div v-else class="loader"><span>Loading Players...</span></div>
-		</div>
+
+
+			<HKtable
+				:columns="columns"
+				:items="_players"
+				:search="['character_name']"
+			>
+				<template slot="avatar" slot-scope="data">
+					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+				</template>
+
+				<template slot="character_name" slot-scope="data">
+					<router-link class="mx-2" 
+						:to="'/players/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">{{ data.item }}
+					</router-link>
+				</template>
+
+				<template slot="level" slot-scope="data">
+					{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
+				</template>
+
+				<div slot="actions" slot-scope="data" class="actions">
+					<router-link class="gray-hover mx-1" 
+						:to="'/players/' + data.row.key" 
+						v-b-tooltip.hover title="Edit">
+						<i class="fas fa-pencil"></i>
+					</router-link>
+					<a v-b-tooltip.hover 
+						title="Delete" 
+						class="gray-hover"
+						@click="confirmDelete(data.row.key, data.row.player, data.row.control)">
+							<i class="fas fa-trash-alt"></i>
+					</a>
+				</div>
+			</HKtable>
+
+			<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
+				<div 
+					class="openSlot"
+					v-for="index in slotsLeft"
+					:key="'open-slot-' + index"
+				>
+					<span>Open player slot</span>
+					<router-link v-if="!overencumbered" to="/players/add-player">
+						<i class="fas fa-plus green"></i>
+					</router-link>
+				</div>
+			</template>
+			<template v-if="slotsLeft <= 0">
+				<div class="openSlot none">
+					<span class="red">No player slots left. </span>
+					Delete players to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
+				</div>
+			</template>
+		</template>
+		<h3 v-else-if="players === null" class="mt-4">
+			<router-link v-if="!overencumbered" to="/players/add-player">
+				<i class="fas fa-plus green"></i> Create your first player
+			</router-link>
+		</h3>
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	import _ from 'lodash';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OutOfSlots from '@/components/OutOfSlots.vue';
+	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { mapGetters } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 			OutOfSlots,
+			HKtable
 		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
+				columns: {
+					avatar: {
+						width: 46,
+						noPadding: true
+					},
+					character_name: {
+						label: 'Character Name',
+						truncate: true,
+						sortable: true,
+					},
+					level: {
+						label: 'Level',
+						// center: true,
+						sortable: true,
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
+                	}
+				}
 			}
 		},
 		computed: {
@@ -137,7 +144,6 @@
 				'content_count',
 			]),
 			_players: function() {
-				// console.log('yo')
 				return _.chain(this.players)
 				.filter(function(player, key) {
 					player.key = key
@@ -146,6 +152,9 @@
 				.orderBy("character_name", 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.players - Object.keys(this.players).length
+			}
 		},
 		methods: {
 			confirmDelete(key, player, control) {
@@ -194,25 +203,36 @@
 	}
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 	.container-fluid {
-		padding: 20px;
+		h2 {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
+		.openSlot {
+			display: flex;
+			justify-content: space-between;
+			padding: 0 10px;
+			width: 100%;
+			height: 46px;
+			line-height: 46px;
+			border: dashed 1px #5c5757;
+			margin-top: 1px;
+
+			&.none {
+				display: block;
+				text-align: center;
+			}
+		}
 	}
-	.col {
-		margin:10px;
-		padding:10px;
-		margin-bottom:10px;
-		display: grid;
-		grid-template-rows: auto;
-		grid-template-columns:70px 1fr 10px;
-		grid-gap: 10px;
-		grid-template-areas: 
-		"img info delete";
-	}
-	.info h3, .info p {
-		margin-bottom:5px !important;
-	}
-	.info {
-		grid-area: info;
-	}
+
 </style>

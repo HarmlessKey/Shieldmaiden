@@ -1,141 +1,136 @@
 <template>
-	<div>
-		<div id="hasSide">
-			<Sidebar/>
-			<div id="my-content" class="container-fluid">
-				<Crumble />
-				
-				<OverEncumbered v-if="overencumbered" />
+	<div class="content">
+		<Crumble />
+		
+		<OverEncumbered v-if="overencumbered" />
 
-				<template v-if="players && tier">
+		<template v-if="players && tier">
 
-					<h2 class="mt-3 d-flex justify-content-between">
-						<span>
-							Your Campaigns 
-							<span v-if="campaigns && tier">( 
-								<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
-									{{ Object.keys(campaigns).length }}
-								</span> / 
-								<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
-								<template v-else>{{ tier.benefits.campaigns }}</template>
-							) </span>
-						</span>
-						<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
-					</h2>
+			<h2 class="mt-3 d-flex justify-content-between">
+				<span>
+					Your Campaigns 
+					<span v-if="campaigns && tier">( 
+						<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
+							{{ Object.keys(campaigns).length }}
+						</span> / 
+						<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
+						<template v-else>{{ tier.benefits.campaigns }}</template>
+					) </span>
+				</span>
+				<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+			</h2>
 
-					<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
-						<div class="input-group" >
-							<input type="text" 
-								class="form-control" 
-								autocomplete="off"
-								:class="{'input': true, 'error': errors.has('newCampaign') }" 
-								v-model="newCampaign" 
-								v-validate="'required'"
-								data-vv-as="New Campaign" 
-								name="newCampaign"
-								@change="addCampaign()"
-								placeholder="Add new campaign"
-							/>
-							<div class="input-group-append">
-								<button class="btn"><i class="fas fa-plus"></i> Add</button>
-							</div>
-						</div>
-						<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-					</div>
-
-					<OutOfSlots 
-						v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
-						type = 'campaigns'
+			<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
+				<div class="input-group" >
+					<input type="text" 
+						class="form-control" 
+						autocomplete="off"
+						:class="{'input': true, 'error': errors.has('newCampaign') }" 
+						v-model="newCampaign" 
+						v-validate="'required'"
+						data-vv-as="New Campaign" 
+						name="newCampaign"
+						@change="addCampaign()"
+						placeholder="Add new campaign"
 					/>
-
-					<transition-group 
-						v-if="campaigns"
-						tag="div" 
-						class="row mt-3" 
-						name="campaigns" 
-						enter-active-class="animated flash" 
-						leave-active-class="animated bounceOutLeft">
-						<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
-							<div class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-								<div class="card-header">
-									<span class="title">
-										<i class="fas fa-dungeon"></i>
-										{{ campaign.campaign }}
-									</span>
-
-									<span class="actions">
-										<i 
-											v-if="!campaign.private" 
-											class="fas fa-eye green"
-											v-b-tooltip.hover
-											title="Public campaign"
-										></i>
-										<i 
-											v-else class="fas fa-eye-slash red"
-											v-b-tooltip.hover
-											title="Private campaign"
-										></i>
-
-										<router-link class="text-capitalize gray-hover" 
-											:to="'/campaigns/' + campaign.key" 
-											v-b-tooltip.hover title="Edit">
-												<i class="fas fa-pencil"></i>
-										</router-link>
-										<a v-b-tooltip.hover 
-											title="Delete" 
-											class="gray-hover text-capitalize"
-											@click="confirmDelete(campaign.key, campaign.campaign)">
-												<i class="fas fa-trash-alt"></i>
-										</a>
-									</span>
-								</div>
-								<div class="card-body">
-									<b-row>
-										<b-col>
-											<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
-												<i class="fas fa-users"></i><br/>
-												<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
-												<template v-else> Add</template>
-											</router-link>
-										</b-col>
-
-										<b-col>
-												<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
-												<i class="fas fa-swords"></i><br/>
-												<template v-if="allEncounters && allEncounters[campaign.key]">
-													<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
-														{{ Object.keys(allEncounters[campaign.key]).length }}
-													</span> 
-													/
-													<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
-													<template v-else>{{ tier.benefits.encounters }}</template>
-												</template>
-												<template v-else> Create</template>
-											</router-link>
-										</b-col>
-									</b-row>
-								</div>
-									<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
-								<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
-							</div>
-						</b-col>
-					</transition-group>
-
-				</template>
-				<b-card header="No players" class="warning" v-else-if="players === null">
-					<p>There are no players to join in your campaigns yet, let's create some first.</p>
-					<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
-				</b-card>
-				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
-
+					<div class="input-group-append">
+						<button class="btn"><i class="fas fa-plus"></i> Add</button>
+					</div>
+				</div>
+				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 			</div>
-		</div>
+
+			<OutOfSlots 
+				v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
+				type = 'campaigns'
+			/>
+
+			<transition-group 
+				v-if="campaigns"
+				tag="div" 
+				class="row mt-3" 
+				name="campaigns" 
+				enter-active-class="animated flash" 
+				leave-active-class="animated bounceOutLeft">
+				<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
+					<div class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+						<div class="card-header">
+							<span class="title">
+								<i class="fas fa-dungeon"></i>
+								{{ campaign.campaign }}
+							</span>
+
+							<span class="actions">
+								<i 
+									v-if="!campaign.private" 
+									class="fas fa-eye green"
+									v-b-tooltip.hover
+									title="Public campaign"
+								></i>
+								<i 
+									v-else class="fas fa-eye-slash red"
+									v-b-tooltip.hover
+									title="Private campaign"
+								></i>
+
+								<router-link class="text-capitalize gray-hover" 
+									:to="'/campaigns/' + campaign.key" 
+									v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+								</router-link>
+								<a v-b-tooltip.hover 
+									title="Delete" 
+									class="gray-hover text-capitalize"
+									@click="confirmDelete(campaign.key, campaign.campaign)">
+										<i class="fas fa-trash-alt"></i>
+								</a>
+							</span>
+						</div>
+						<div class="card-body">
+							<div v-if="campaign.advancement != 'milestone'" class="advancement">Experience</div>
+							<div v-else class="advancement">Milestone</div>
+							<b-row>
+								<b-col>
+									<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
+										<i class="fas fa-users"></i><br/>
+										<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
+										<template v-else> Add</template>
+									</router-link>
+								</b-col>
+
+								<b-col>
+										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
+										<i class="fas fa-swords"></i><br/>
+										<template v-if="allEncounters && allEncounters[campaign.key]">
+											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
+												{{ Object.keys(allEncounters[campaign.key]).length }}
+											</span> 
+											/
+											<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+											<template v-else>{{ tier.benefits.encounters }}</template>
+										</template>
+										<template v-else> Create</template>
+									</router-link>
+								</b-col>
+							</b-row>
+						</div>
+							<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+						<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
+					</div>
+				</b-col>
+			</transition-group>
+
+		</template>
+		<b-card header="No players" class="warning" v-else-if="players === null">
+			<p>There are no players to join in your campaigns yet, let's create some first.</p>
+			<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
+		</b-card>
+		<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 	</div>
 </template>
 
 <script>
 	import _ from 'lodash'
-	import Sidebar from '@/components/SidebarMyContent.vue'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
 	import Crumble from '@/components/crumble/MyContent.vue'
@@ -151,7 +146,6 @@
 		},
 		mixins: [general],
 		components: {
-			Sidebar,
 			Crumble,
 			PlayerLink,
 			OverEncumbered,
@@ -190,6 +184,9 @@
 				} , 'asc')
 				.value()
 			},
+			slotsLeft() {
+				return this.tier.benefits.campaigns - Object.keys(this.campaigns).length
+			}
 		},
 		methods: {
 			...mapActions([
@@ -239,6 +236,19 @@
 		a {
 			cursor: pointer;
 		}
+		h2.campaigns {
+			border-bottom: solid 1px #b2b2b2;
+			padding-bottom: 10px;
+
+			a {
+				text-transform: none;
+				color: #b2b2b2 !important;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
 		h2.players {
 			margin-bottom: 5px !important;
 			text-align: center;
@@ -280,6 +290,12 @@
 			}
 			.card-body {
 				background: rgba(38, 38, 38, .5);
+
+				.advancement {
+					text-align: center;
+					font-size: 16px;
+					margin-bottom: 20px;
+				}
 				
 				.col {
 					text-align: center;
@@ -298,6 +314,16 @@
 					svg {
 						font-size: 50px;
 					}
+				}
+			}
+			&.openSlot {
+				height: 263px;
+				border: dashed 1px #b2b2b2 !important;
+				background: none !important;
+
+				.card-body {
+					text-align: center;
+					background: none;
 				}
 			}
 		}

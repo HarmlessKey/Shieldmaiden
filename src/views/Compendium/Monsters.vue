@@ -1,6 +1,6 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<template v-if="!$route.params.id">
 		<Crumble />
 		<h1><i class="fas fa-dragon"></i> Monsters</h1>
@@ -10,35 +10,26 @@
 				monsters from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<b-input-group class="mb-3">
-				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchMonster()" placeholder="Search monsters" />
-				<b-input-group-append>
-					<button class="btn" @click="searchMonster()"><i class="fas fa-search"></i></button>
-				</b-input-group-append>
-			</b-input-group>
-
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} monsters found</p>
-
-			<b-table 
-				:busy="isBusy"
-				:items="searchResults" 
-				:fields="fields"
-				:per-page="15"
-				:current-page="current"
+			<HKtable
+				:items="monsters"
+				:columns="fields"
+				:perPage="15"
+				:loading="isBusy"
+				:search="['name']"
+				:collapse="true"
+				classes="monster-table"
 			>
-				<router-link :to="'/compendium/monsters/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
+				<router-link :to="'/compendium/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+
+				<!-- COLLAPSE -->
+				<div slot="collapse" slot-scope="data">
+					<ViewMonster :data="data.row" />
+				</div>
+				
 				<div slot="table-busy" class="loader">
 					<span>Loading monsters....</span>
 				</div>
-			</b-table>
-		
-			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
-		</template>
-
-		<!-- SHOW MONSTER -->
-		<template v-else>
-			<Monster :id="$route.params.id" />
+			</HKtable>
 		</template>
 	</div>
 	<Footer />
@@ -49,31 +40,28 @@
 	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import Footer from '@/components/Footer.vue'
-	import Monster from '@/components/compendium/Monster.vue'
+	import ViewMonster from '@/components/ViewMonster.vue'
 	import { mapActions } from 'vuex'
+	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Error',
 		components: {
 			Crumble,
 			Footer,
-			Monster,
+			ViewMonster,
+			HKtable
 		},
 		metaInfo: {
 			title: 'Monsters'
 		},
 		data() {
 			return {
-				id: this.$route.params.id,
 				monsters: undefined,
-				current: 1,
 				fields: {
-          index: {
-            label: '#',
-					},
-          name: {
-            label: 'Name',
-            sortable: true
+					name: {
+						label: 'Name',
+						sortable: true
 					},
 					type: {
 						label: 'Type',
@@ -84,10 +72,6 @@
 						sortable: true
 					},
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
 				isBusy: true,
 			}
 		},
@@ -98,33 +82,6 @@
 					readyCallback: () => this.isBusy = false
 				}
 			}
-		},
-		beforeMount() {
-			this.searchResults = this.monsters
-		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchMonster() {
-				this.current = 1;
-				this.searchResults = []
-				this.searching = true
-				for (var i in this.monsters) {
-					var m = this.monsters[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				if(this.search == '') {
-					this.searchResults = this.monsters
-					this.searching = false
-				}
-			},
 		}
 	}
 </script>

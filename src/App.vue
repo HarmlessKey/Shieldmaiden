@@ -1,9 +1,14 @@
 <template>
-	<div id="app" class="container-fluid">
+	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main/>
-			<PaymentDeclined />
-			<router-view/>
+			<PaymentDeclined v-if="user !== null" />
+			<div :class="{ hasSide: $route.meta.sidebar !== false }">
+				<Sidebar v-if="$route.meta.sidebar !== false" />
+				<div class="scrollable-content">
+					<router-view/>
+				</div>
+			</div>
 		</div>
 		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
 			<div v-if="slide.show == true" class="slide">
@@ -13,7 +18,7 @@
 					v-b-tooltip:hover title="Hide [esc]">
 					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
 				</a>
-				<div class="content">
+				<div class="content" :class="slide.classes">
 					<Slide />
 				</div>
 			</div>
@@ -26,6 +31,7 @@
 <script>
 	import { auth, firebase, db } from './firebase'
 	import Header from './components/Header.vue';
+	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
@@ -33,6 +39,7 @@
 	export default {
 	components: {
 		navMain: Header,
+		Sidebar,
 		Slide,
 		PaymentDeclined
 	},
@@ -64,7 +71,9 @@
 		}
 	},
 	mounted() {
-		this.checkUserStatus();
+		if(auth.currentUser !== null) {
+			this.checkUserStatus();
+		}
 	},
 	beforeDestroy() {
 		this.stopBroadcast();
@@ -78,6 +87,7 @@
 			'setUser',
 			'setUserInfo',
 			'setSlide',
+			'setSideSmallScreen'
 		]),
 		hideSlide() {
 			this.setSlide(false)

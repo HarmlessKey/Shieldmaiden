@@ -1,5 +1,5 @@
 # Harmless Key Encounter Tracker
-
+More readme is needed
 ## Project setup
 ```
 npm install
@@ -24,3 +24,6 @@ npm run test
 ```
 npm run lint
 ```
+
+
+add more stuff here

@@ -1,6 +1,6 @@
 <template>
 <div>
-	<div class="container">
+	<div class="content">
 		<h2>Followed Users</h2>
 		<template v-if="userInfo">
 			<ul v-if="following" class="entities">

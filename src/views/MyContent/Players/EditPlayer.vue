@@ -1,12 +1,11 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div v-if="overencumbered" class='container'>
+	<div>
+		<div v-if="overencumbered">
 			<OverEncumbered/>
 		</div>
 		
 		<template v-else-if="player">
-			<div id="players" class="container-fluid" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
+			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
 				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
@@ -42,7 +41,13 @@
 				
 				<b-card header="Basic Info">
 					<b-row>
-						<b-col sm="9" class="mb-3">
+						<b-col md="2">
+							<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+							<span class="img" v-else>
+								<img src="@/assets/_img/styles/player.svg" />
+							</span>
+						</b-col>
+						<b-col md="10" class="mb-3">
 							<b-row class="mb-2" v-if="$route.name != 'Edit Character'">
 								<b-col sm="2">
 									<label for="player_name">Player *</label>
@@ -99,31 +104,54 @@
 								</b-col>
 							</b-row>
 						</b-col>
-
-						<b-col sm="3" v-if="player.avatar">
-							<div class="img-container"><img :src="player.avatar" /></div>
-						</b-col>
 					</b-row>
 				</b-card>
 
-				<!-- HEALTH & AC -->
-				<b-card header="Health & Armor Class">
-					<b-row>
-							<b-col class="col-sm-4 col-md-3 mb-2">
-								<label for="level">Level</label>
+				<b-card-group deck>
+					<!-- LEVEL & XP -->
+					<b-card header="Level & Experience">
+						<b-row>
+							<b-col md="8" class="mb-2">
+								<label for="experience" class="experience">
+									<span>XP</span>
+									<span>
+										<span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}
+										<a class="ml-2" @click="setSlide({show: true, type: 'slides/xpTable'})"><i class="fas fa-info-circle"></i></a>
+									</span>
+								</label>
+								<b-form-input autocomplete="off"  id="experience" 
+									type="number" 
+									min="0"
+									max="355000"
+									:class="{'input': true, 'error': errors.has('experience') }" 
+									v-model="player.experience" 
+									v-validate="'numeric|min_value:0|max_value:355000'" 
+									data-vv-as="experience"
+									name="experience" 
+									placeholder="Experience" />
+								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
+							</b-col>
+							<b-col md="4" class="mb-2">
+								<label for="level">Level Override</label>
 								<b-form-input autocomplete="off"  id="level" 
 									type="number" 
 									min="1"
 									max="20"
 									:class="{'input': true, 'error': errors.has('level') }" 
 									v-model="player.level" 
-									v-validate="'numeric'" 
-									data-vv-as="Level"
+									v-validate="'numeric|min_value:1|max_value:20'" 
+									data-vv-as="Level Override"
 									name="level" 
-									placeholder="Level" />
+									placeholder="Level Override" />
 								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
 							</b-col>
-							<b-col class="col-sm-4 col-md-3 mb-2">
+						</b-row>
+					</b-card>
+
+					<!-- HEALTH & AC -->
+					<b-card header="Health & Armor Class">
+						<b-row>
+							<b-col md="4" class="mb-2">
 								<label for="maxHp">HP *</label>
 								<b-form-input autocomplete="off"  id="maxHp" 
 									type="number" 
@@ -136,7 +164,7 @@
 									placeholder="Maximum Hit Points*" />
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 							</b-col>
-							<b-col class="col-sm-4 col-md-3 mb-2">
+							<b-col md="4" class="mb-2">
 								<label for="ac">AC *</label>
 								<b-form-input autocomplete="off"  
 									id="ac" 
@@ -150,7 +178,7 @@
 									placeholder="Armor Class" />
 								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 							</b-col>
-							<b-col md="3">
+							<b-col md="4">
 								<label for="save_dc">Spell Save DC</label>
 								<b-form-input autocomplete="off"  
 									id="save_dc" 
@@ -160,27 +188,81 @@
 									name="save_dc" 
 									placeholder="Save DC" />
 							</b-col>
-					</b-row>
-				</b-card>
+						</b-row>
+					</b-card>
+				</b-card-group>
 
-				<!-- ABILITY SCORES -->
-				<b-card header="Ability Scores">
-					<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
-						<b-col class="col-3">
-							<label :for="ability.ability">
-								{{ ability.ability.substring(0,3).toUpperCase() }}
-							</label>
-						</b-col>
-						<b-col class="col-9">
-							<b-form-input autocomplete="off"  
-								:id="ability.ability" 
-								type="number" 
-								v-model="player[ability.ability]" 
-								:name="ability.ability" 
-								:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-						</b-col>
-					</b-row>
-				</b-card>
+				<b-row>
+					<!-- ABILITY SCORES -->
+					<b-col sm="6">
+						<b-card header="Ability Scores">
+							<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
+								<b-col class="col-3">
+									<label :for="ability.ability">
+										{{ ability.ability.substring(0,3).toUpperCase() }}
+									</label>
+								</b-col>
+								<b-col class="col-9">
+									<b-form-input autocomplete="off"  
+										:id="ability.ability" 
+										type="number" 
+										v-model="player[ability.ability]" 
+										:name="ability.ability" 
+										:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
+								</b-col>
+							</b-row>
+						</b-card>
+					</b-col>
+
+					<!-- SKILLS -->
+					<b-col sm="6">
+						<b-card header="Skills">
+							<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
+
+							<div class="d-flex justify-content-start">
+								<b-form-group label="Expertise" class="mr-2">
+									<b-form-checkbox-group
+										id="expertise"
+										name="expertise"
+										v-model="player.skills_expertise"
+										stacked
+									>
+										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key" :disabled="player.skills ? !player.skills.includes(key) : true">
+											+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+										</b-form-checkbox>
+									</b-form-checkbox-group>
+								</b-form-group>
+								<b-form-group label="Proficiency" class="skills">
+									<b-form-checkbox-group
+										id="skills"
+										name="skills"
+										v-model="player.skills"
+										stacked
+									>
+										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
+											<div class="skill">
+												<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+												<div>{{skill.skill  }}</div>
+												<div class="mod">
+													{{ 
+														calculateSkillModifier(
+															calcMod(player[skill.ability]),
+															player.skills ? (
+															player.skills.includes(key) ? 
+															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
+															: 0) : 0,
+															player.skills_expertise ? player.skills_expertise.includes(key) : false
+														) 
+													}}
+												</div>
+											</div>
+										</b-form-checkbox>
+									</b-form-checkbox-group>
+								</b-form-group>
+							</div>
+						</b-card>
+					</b-col>
+				</b-row>
 
 				<!-- SENSES -->
 				<b-card header="Senses">
@@ -230,31 +312,33 @@
 					</b-row>
 				</b-card>
 				
-				<router-link to="/players" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
+				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
 			</div>
 		</template>
 		<div class="container-fluid" v-else-if="$route.name == 'Edit Character'">
 			<p class="red">You have no conrol over this character</p>
-			<router-link to="/players" class="btn bg-gray mr-2 mt-3">Back</router-link>
+			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Back</router-link>
 		</div>
 	</div>
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
+	import { skills } from '@/mixins/skills.js';
+	import { general } from '@/mixins/general.js';
 
 	export default {
 		name: 'Players',
+		mixins: [experience, skills, general],
 		metaInfo: {
 			title: 'Players'
 		},
 		components: {
-			Sidebar,
 			OverEncumbered,
 		},
 		data() {
@@ -295,20 +379,14 @@
 					return this.$store.getters.getUser.uid;
 				}
 			},
-			// player() {
-			// 	let playr = undefined;
-
-			// 	let playerRef = db.ref(`players/${this.userId}/${this.playerId}`)
-			// 	playerRef.on('value' , (snapshot) => {
-			// 		playr = snapshot.val()
-			// 	});
-			// 	return playr;
-			// },
 		},
 		beforeMount() {
 			this.fetch_control()
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			fetch_control() {
 				let playr = db.ref(`players/${this.userId}/${this.playerId}/control`);
 				playr.on('value' , (snapshot) => {
@@ -362,7 +440,7 @@
 			},
 			addPlayer() {
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
-					this.$snotify.error('You have too many player.', 'Error');
+					this.$snotify.error('You have too many players.', 'Error');
 				} else {
 					// THIS IS UGLY
 					delete this.player['.value']
@@ -372,7 +450,7 @@
 					this.$validator.validateAll().then((result) => {
 						if (result) {
 							db.ref('players/' + this.userId).push(this.player);
-							this.$router.replace('/players')
+							this.$router.replace(this.$route.meta.basePath)
 						}
 					})
 				}
@@ -383,12 +461,18 @@
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
-						this.$router.replace('/players')
+						this.$router.replace(this.$route.meta.basePath)
 					} else {
 						//console.log('Not valid');
 					}
 				});
-			}
+			},
+			showSlide(type) {
+				this.setSlide({
+					show: true,
+					type,
+				})
+			},
 		}
 	}
 </script>
@@ -401,21 +485,23 @@
 		line-height: 37px;
 		margin-bottom: 0;
 
+		&.experience {
+			display: flex;
+			justify-content: space-between;
+		}
+
 		svg {
 			fill: #b2b2b2;
 			width: 20px;
 			height: 20px;
 		}
 	}
-	.img-container {
-		width: 100%;
-
-		img {
-			width: 100%;
-		}
+	.img {
+		display: block;
+		width: 100px;
+		height: 100px;
+		background-size: cover;
+		background-position: center top;
 	}
 }
-
-
-
 </style>

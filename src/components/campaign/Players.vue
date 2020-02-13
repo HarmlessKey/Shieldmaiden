@@ -1,63 +1,175 @@
 <template>
 	<div>
-		<table class="table table-hover" v-if="players && campaign">
-			<thead>
-				<th></th>
-				<th class="ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></th>
-				<th class="name"></th>
-				<th class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
-					<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
-				</th>
-				<th class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
-					<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
-				</th>
-				<th class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
-					<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
-				</th>
-				<th class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-					<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
-				</th>
-				<th class="hp"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></th>
-				<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-			</thead>
-			<tbody
-				name="table-row" 
-				is="transition-group" 
-				enter-active-class="animated flash" 
-				leave-active-class="animated bounceOutLeft">
-				<tr v-for="(player, key) in campaign.players" :key="key">
-					<td class="img" v-if="players[key].avatar" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></td>
-					<td class="img" v-else>
-						<img src="@/assets/_img/styles/player.svg" />
-					</td>
-					<td class="ac">
-						<span :class="{ 
-								'green': player.ac_bonus > 0, 
-								'red': player.ac_bonus < 0 
-							}" 
-							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" v-if="player.ac_bonus">
-							{{ players[key].ac + player.ac_bonus }}
-						</span>
-						<span v-else class="ac">{{ players[key].ac }}</span>
-					</td>
-					<td class="name"  v-b-tooltip.hover :title="players[key].character_name"><span>{{ players[key].character_name }}</span></td>
-					<td class="pp d-none d-md-table-cell" v-if="settings.passive_perception == undefined">
-						{{ players[key].passive_perception }}
-					</td>
-					<td class="pinv d-none d-md-table-cell" v-if="settings.passive_investigation == undefined">
-						{{ players[key].passive_investigation }}
-					</td>
-					<td class="pins d-none d-md-table-cell" v-if="settings.passive_insight == undefined">
-						{{ players[key].passive_insight }}
-					</td>
-					<td class="save d-none d-md-table-cell" v-if="settings.save_dc == undefined">
-						{{ players[key].spell_save_dc }}
-					</td>
-					<td>
-						<span class="current" :class="{ 
-							'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
-							'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, players[key].maxHp) <= 76, 
-							'green': true
+		<div class="group-actions" ref="players">
+			<div 
+				class="money" 
+				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
+				@click="
+					viewerIsUser
+					? setSlide({
+						show: true,
+						type: 'slides/party/Currency',
+						data: { current: currency['.value'] }
+					}) : null
+				">
+				<template v-if="currency['.value']">
+					<template v-for="(coin, key) in money">
+						<div v-if="coin" :key="key">
+							<template v-if="key === 'pp' && coin >= 1000">{{ coin | numeral('0.0a') }} </template>
+							<template v-else>{{ coin }} </template>
+							<img :src="require(`@/assets/_img/currency/${currencies[key].color}.svg`)" />
+						</div>
+					</template>
+				</template>
+				<span v-else class="text-italic gray-hover">No money</span>
+			</div>
+			<div class="actions">
+				<template v-if="viewerIsUser">
+					<a 
+						v-b-tooltip.hover title="Edit Group Health"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/health'
+						})"><i class="fas fa-heart"></i></a>
+					<a 
+						v-if="isXpAdvancement()"
+						v-b-tooltip.hover title="Award Experience Points"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/xp'
+						})">XP</a>
+					<a 
+						v-b-tooltip.hover title="Party Inventory"
+						@click="setSlide({
+							show: true,
+							type: 'slides/party/Inventory'
+						})"><i class="fas fa-treasure-chest"></i></a>
+				</template>
+				<a 
+					v-else-if="campaign.inventory && campaign.inventory.items"
+					v-b-tooltip.hover title="Party Inventory"
+					@click="setSlide({
+						show: true,
+						type: 'slides/party/ViewInventory'
+					})">
+						<i class="fas fa-treasure-chest mr-1"></i>
+						{{ Object.keys(campaign.inventory.items).length }}
+				</a>
+			</div>
+		</div>
+		<div 
+			v-if="players"
+			class="players" 
+			:class="{ xp: isXpAdvancement() }"
+			:style="{ 'grid-template-columns': templateColumns }"
+		>
+			<div class="header"></div>
+			<div class="col header ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></div>
+			<div class="col header name"></div>
+			<div class="col header pp" v-if="settings.passive_perception === undefined && !is_small">
+				<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
+			</div>
+			<div class="col header pinv" v-if="settings.passive_investigation === undefined && !is_small">
+				<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
+			</div>
+			<div class="col header pins" v-if="settings.passive_insight === undefined && !is_medium">
+				<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
+			</div>
+			<div class="col header save" v-if="settings.save_dc === undefined && !is_medium">
+				<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
+			</div>
+			<div class="col header health"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></div>
+			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
+
+			<template v-for="(player, key) in players">
+				<div 
+					class="image" 
+					:key="'image-'+key" 
+					:style="[
+						player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
+						{ backgroundImage: 'url(/img/player.03a988f6.svg)'}
+					]
+				">
+					<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
+						<i class="fas fa-paw-claws green"></i>
+					</div>
+					<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
+					<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
+				</div>
+				<div class="col ac" :key="'ac-'+key">
+					<span :class="{ 
+							'green': player.ac_bonus > 0, 
+							'red': player.ac_bonus < 0 
+						}" 
+						v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
+						v-if="player.ac_bonus">
+						{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
+					</span>
+					<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
+				</div>
+				<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
+
+				<div 
+					class="col pp" 
+					v-if="settings.passive_perception === undefined && !is_small"
+					:key="'pp-'+key"
+				>
+					{{ player.passive_perception }}
+				</div>
+				<div 
+					class="col pinv" 
+					v-if="settings.passive_investigation === undefined && !is_small"
+					:key="'pinv-'+key"
+				>
+					{{ player.passive_investigation }}
+				</div>
+				<div 
+					class="col pins" 
+					v-if="settings.passive_insight === undefined && !is_medium"
+					:key="'pins-'+key"
+				>
+					{{ player.passive_insight }}
+				</div>
+				<div 
+					class="col save" 
+					v-if="settings.save_dc === undefined && !is_medium"
+					:key="'save-'+key"
+				>
+					{{ player.spell_save_dc }}
+				</div>
+
+				<div class="col health" :key="'health-'+key">
+					<template v-if="player.curHp <= 0">
+						<div v-if="player.stable" class="green">
+							<span><i class="fas fa-fist-raised"></i> Stable</span>
+						</div>
+						<div v-else-if="player.dead" class="red">
+							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+						</div>
+						<div v-else class="saves d-flex justify-content-end">
+							<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
+								<span v-show="check === 'succes'" class="green"><i class="fas fa-check"></i></span> 
+								<span v-show="check === 'fail'" class="red"><i class="fas fa-times"></i></span>
+							</div>
+						</div>
+					</template>
+					<template v-else>
+						<template v-if="player.transformed">
+							<span class="current" :class="{ 
+								'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
+								'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
+								'green': true
+							}">{{ player.transformed.curHp }}</span>
+							<span class="gray-hover">/</span>
+							<span>
+								{{ player.transformed.maxHp }}
+							</span>
+						</template>
+						<template v-else>
+							<span class="current" :class="{ 
+								'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+								'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
+								'green': true
 							}">{{ player.curHp }}</span>
 							<span class="gray-hover">/</span>
 							<span :class="{ 
@@ -65,132 +177,351 @@
 									'red': player.maxHpMod < 0 
 								}" 
 								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-								{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+								{{ maxHp(player.maxHp, player.maxHpMod) }}
 							</span>
-							<span v-else>{{ players[key].maxHp }}</span>
-							<span v-if="player.tempHp" class="gray-hover">+{{ player.tempHp }}</span>
-					</td>
-
-					<!-- ACTIONS -->
-					<td class="align-middle p-0">
-						<div class="d-flex justify-content-end">
-							<div class="d-flex justify-content-end actions">
-								<a class="gray-hover" v-b-tooltip.hover title="Edit player" 
-									@click="setSlide({
-										show: true,
-										type: 'slides/EditPlayer',
-										data: { key: key, location: 'overview',}
-									})">
-									<i class="fas fa-pencil"></i>
-								</a>
-							</div>
-							<span class="dropleft d-sm-none actions-dropdown">
-								<a class="options"
-									id="options"
-									data-toggle="dropdown" 
-									aria-haspopup="true" 
-									aria-expanded="false">
-									<i class="far fa-ellipsis-v"></i>
-								</a>
-								<div class="dropdown-menu" aria-labelledby="options">	
-									<a class="gray-hover dropdown-item" v-b-tooltip.hover title="Edit player" 
-										@click="setSlide({
-											show: true,
-											type: 'slides/EditPlayer',
-											data: { key: key, location: 'overview',}
-										})">
-										<i class="fas fa-pencil"></i> Edit player
-									</a>
-								</div>
-							</span>
+							<span v-else>{{ player.maxHp }}</span>
+						</template>
+						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
+					</template>
+				</div>
+				<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
+					<a 	
+						class="gray-hover" 
+						v-b-tooltip.hover title="Edit player" 
+						@click="setSlide({
+							show: true,
+							type: 'slides/EditPlayer',
+							data: { key: player['.key'], location: 'overview',}
+						})">
+						<i class="fas fa-pencil"></i>
+					</a>
+				</div>
+				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
+					<div class="level" 
+							 :class="{red: isXpAdvancement() && player.level}"
+							 v-b-tooltip.hover
+							 :title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+						{{ player.level ? player.level : calculatedLevel(player.experience) }}
+					</div>
+					<div class="progress">
+						<div class="progress-bar bg-blue"
+							role="progressbar" 
+							:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
 						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<div v-else class="loader"><span>Loading Players...</span></div>
+					</div>
+				</div>
+			</template>
+		</div>
 
-		<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 	</div>
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from 'vuex';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
+	import { currencyMixin } from '@/mixins/currency.js';
 
 	export default {
 		name: 'Players',
+		props: ['userId', 'campaignId'],
+		mixins: [experience, currencyMixin],
 		data() {
 			return {
-				user: this.$store.getters.getUser,
-				campaignId: this.$route.params.campid,
+				width: 0,
+				is_small: false,
+				is_medium: false,
+				viewerId: this.$store.getters.getUser.uid,
+				players: undefined,
+				loading: true
 			}
 		},
 		firebase() {
 			return {
+				campaign:  {
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
+					asObject: true
+				},
 				settings: {
-					source: db.ref(`settings/${this.user.uid}/general`),
+					source: db.ref(`settings/${this.userId}/general`),
+					asObject: true
+				},
+				currency: {
+					source: db.ref(`campaigns/${this.userId}/${this.campaignId}/inventory/currency`),
 					asObject: true
 				}
 			}
 		},
 		computed: {
 			...mapGetters([
-				'campaign',
-				'players',
 				'playerInCampaign',
 			]),
+			viewerIsUser() {
+				//If the viewer is the user that runs the campaign
+				//Edit functions are enabled
+				return this.userId === this.viewerId;
+			},
+			templateColumns() {
+				let templateColumns = 'max-content 40px auto ';
+
+				if(this.settings.passive_perception === undefined && !this.is_small) { 
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				if(this.settings.passive_investigation === undefined && !this.is_small) { 
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				if(this.settings.passive_insight === undefined && !this.is_medium) { 
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				if(this.settings.save_dc === undefined && !this.is_medium) {
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				if(this.viewerIsUser) {
+					templateColumns = templateColumns.concat(' max-content');
+				}
+				templateColumns = templateColumns.concat(' max-content');
+
+				return templateColumns;
+			},
+			calcColspan() {
+				let colspan = (this.viewerIsUser) ? 4 : 3;
+
+				if(this.settings.passive_perception === undefined && !this.is_small) { colspan++; }
+				if(this.settings.passive_investigation === undefined && !this.is_small) { colspan++; }
+				if(this.settings.passive_insight === undefined && !this.is_medium) { colspan++; }
+				if(this.settings.save_dc === undefined && !this.is_medium) { colspan++; }
+
+				return colspan;
+			},
+			money() {
+				return this.copperToPretty(this.currency['.value']);
+			}
 		},
 		mounted() {
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
+			const getPlayers = db.ref(`campaigns/${this.userId}/${this.campaignId}/players`);
+			getPlayers.on('value', async (snapshot) => {
+				let campaignPlayers = snapshot.val();
+
+				for(let key in campaignPlayers) {	
+					campaignPlayers[key]['.key'] = key;
+
+					//Get full player
+					const fullPlayer = db.ref(`players/${this.userId}/${key}`)
+					await fullPlayer.on('value', (snapshot) => {
+						if(snapshot.val()) {
+							campaignPlayers[key].character_name = snapshot.val().character_name;
+							campaignPlayers[key].avatar = snapshot.val().avatar;
+							campaignPlayers[key].level = snapshot.val().level;
+							campaignPlayers[key].maxHp = snapshot.val().maxHp;
+							campaignPlayers[key].ac = snapshot.val().ac;
+							campaignPlayers[key].experience = snapshot.val().experience;
+							campaignPlayers[key].passive_perception = snapshot.val().passive_perception;
+							campaignPlayers[key].passive_investigation = snapshot.val().passive_investigation;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
+							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
+						}
+					});	
+				}
+				this.players = Object.values(campaignPlayers);
+				this.loading = false;
+			});
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
 		},
 		methods: {
 			...mapActions([
-				'fetchCampaign',
 				'setSlide',
 			]),
+			getWindowWidth(event) {
+				this.width = this.$refs.players.clientWidth;
+			},
+			setSize() {
+				let width = this.$refs.players.clientWidth
+				let small = 400;
+				let medium = 500;
+
+				this.is_medium = (width <= medium) ? true : false;
+				this.is_small = (width <= small) ? true : false;
+
+				//sets new width on resize
+				this.width = this.$refs.players.clientWidth;
+			},
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				var percentage = Math.floor(current / max * 100)
+				return percentage
 			},
 			maxHp(maxHp, maxHpMod) {
 				return maxHp + maxHpMod;
 			},
 			reset() {
-				for(var key in this.campaign.players) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-						curHp: this.players[key].maxHp,
-						tempHp: 0,
-						maxHpMod: 0
-					})
+				for(var i in this.players) {
+					let player = this.players[i];
+					let key = this.players[i]['.key'];
+
+					if(!player.dead) {
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
+							curHp: this.players[i].maxHp,
+							tempHp: 0,
+							maxHpMod: 0
+						});
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/transformed`).remove();
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/stable`).remove();
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}/saves`).remove();
+					}
 				}
+			},
+			isXpAdvancement(){
+				return this.campaign.advancement != 'milestone'
 			}
+		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	table {
-		// font-size: 12px;
+	.group-actions {
+		border-bottom: solid 1px #b2b2b2;
+		padding-bottom: 5px;
+		display: grid;
+		grid-template-columns: auto max-content;
+		grid-template-areas: "money actions";
+		user-select: none;
 
-		tr {
-			th.ac, th.pp, th.pinv, th.pins, td.ac, td.pp, td.pinv, td.pins, th.save {
+		.money {
+			display: flex;
+			justify-content: flex-start;
+			cursor: pointer;
+			grid-area: money;
+			line-height: 15px;
+
+			div {
+				margin-right: 10px;
+				font-size: 16px;
+
+				img {
+					height: 12px;
+				}
+
+				&:last-child {
+					margin: none;
+				}
+			}
+		}
+		.actions {
+			display: flex;
+			justify-content: flex-end;
+			grid-area: actions;
+
+			a {
+				margin-left: 10px;
+				color: #fff !important;
+
+				&:hover {
+					color: #2c97de !important;
+				}
+			}
+		}
+	}
+	.players {
+		display: grid;
+		grid-auto-rows: max-content;
+		grid-row-gap: 1px;
+		margin: 10px 0 30px 0;
+		user-select: none;
+
+		.image {
+			width: 46px;
+			height: 46px;
+			background-size: cover;
+			background-position: top center;
+			background-color: black;
+			border: solid 1px #b2b2b2;
+			position: relative;
+
+			.transformed {
+				right: 0;
+				bottom: 0;
+				position: absolute;
+				background: #000;
+				padding: 0 2px;
+				border-left: solid 1px #b2b2b2;
+				border-top: solid 1px #b2b2b2;
+			}
+		}
+		.col {
+			min-height: 35px;
+			padding: 12px 10px;
+			background-color: #262626;
+
+			&.header {
+				background: none;
+			}
+			&.ac {
 				text-align: center;
-				width: 20px;
+				font-weight: bold;
 			}
-			th.ac, td.ac {
-				padding-right: 20px;
-			}
-			td.img {
-				background-color: #000 !important;
-			}
-			td.name {
-				overflow: hidden;
+			&.name {
 				white-space: nowrap;
+				overflow: hidden;
 				text-overflow: ellipsis;
-				max-width:0;
+			}
+			.saves {
+				.save {
+					margin-left: 4px;
+				}
+			}
+			&.actions {
+				display: flex;
+				justify-content: flex-end;
+				padding: 9px 12px;
+
+				a {
+					color: #b2b2b2 !important;
+					width: 28px;
+					height: 28px;
+					display: block;
+					line-height: 28px;
+					text-align: center;
+					border-radius: 50%;
+
+					&:hover {
+						text-decoration: none;
+						background-color: #302f2f;
+					}
+				}
+			}
+		}
+		&.xp {
+			.image {
+				width: 62px;
+				height: 62px;
+				grid-row: span 2;
+			}
+			.xp-bar {
+				display: flex;
+				justify-content: space-between;
+				height: 15px;
+				width: 100%;
+			
+				.level {
+					display: block;
+					width: 25px;
+					line-height: 15px;
+					text-align: center;
+				}
+				.progress {
+					margin-top: 6px;
+					width: 100%;
+					height: 3px;
+					background-color: #232323 !important;
+				}
 			}
 		}
 	}

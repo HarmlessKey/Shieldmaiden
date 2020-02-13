@@ -1,69 +1,79 @@
 <template>
-	<div id="hasSide">
-		<Sidebar/>
-		<div id="players" class="container-fluid">
-				<h2 class="mb-1">Your Characters</h2>
-			<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
-			
-			<table class="table" v-if="controlledCharacters">
-				<thead>
-					<th></th>
-					<th class="n">#</th>
-					<th>Character name</th>
-					<th>Level</th>
-					<th class="text-right"><i class="far fa-ellipsis-h"></i></th>
-				</thead>
-				<tbody name="table-row">
-					<tr v-for="(character, index) in controlledCharacters" :key="character.key">
-						<td class="img" v-if="character.character.avatar" :style="{ backgroundImage: 'url(\'' + character.character.avatar + '\')' }"></td>
-						<td class="img" v-else>
-							<img src="@/assets/_img/styles/player.svg" />
-						</td>
-						<td class="n">{{ index + 1 }}</td>
-						<td>
-							<router-link class="mx-2" 
-								:to="'/characters/' + character.key" 
-								v-b-tooltip.hover title="Edit">{{ character.character.character_name }}
-							</router-link>
-						</td>
-						<td>{{ character.character.level }}</td>
-						<!-- Actions -->
-						<td class="align-middle p-0">
-							<div class="d-flex justify-content-end">
-								<div class="d-flex justify-content-end actions">
-									<router-link class="gray-hover mx-1" 
-										:to="'/characters/' + character.key" 
-										v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil"></i>
-									</router-link>
-								</div>
-								<i class="far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<p v-else>You have no control over other characters.</p>
-		</div>
+	<div class="content">
+		<h2 class="mb-1">Your Characters</h2>
+		<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
+		
+		<HKtable
+			v-if="controlledCharacters"
+			:columns="columns"
+			:items="controlledCharacters"
+		>
+			<template slot="avatar" slot-scope="data">
+				<div class="image" v-if="data.row.character.avatar" :style="{ backgroundImage: 'url(\'' + data.row.character.avatar + '\')' }"></div>
+				<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+			</template>
+
+			<template slot="character_name" slot-scope="data">
+				<router-link
+					:to="'/characters/' + data.row.key" 
+					v-b-tooltip.hover title="Edit">{{ data.row.character.character_name }}
+				</router-link>
+			</template>
+
+			<template slot="level" slot-scope="data">
+				{{ data.row.character.level ? data.row.character.level : calculatedLevel(data.row.character.experience) }}
+			</template>
+
+			<div slot="actions" slot-scope="data" class="actions">
+				<router-link class="gray-hover mx-1" 
+					:to="'/characters/' + data.row.key" 
+					v-b-tooltip.hover title="Edit">
+					<i class="fas fa-pencil"></i>
+				</router-link>
+			</div>
+		</HKtable>
+		<p v-else>You have no control over other characters.</p>
 	</div>
 </template>
 
 <script>
-	import Sidebar from '@/components/SidebarMyContent.vue'
-	import { db } from '@/firebase'
+	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { db } from '@/firebase';
+	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'Players',
+		mixins: [experience],
 		metaInfo: {
 			title: 'Players'
 		},
 		components: {
-			Sidebar
+			HKtable
 		},
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
-				controlledCharacters: undefined
+				controlledCharacters: undefined,
+				columns: {
+					avatar: {
+						width: 46,
+						noPadding: true
+					},
+					character_name: {
+						label: 'Character Name',
+						truncate: true
+					},
+					level: {
+						label: 'Level',
+						center: true,
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
+                	}
+				}
 			}
 		},
 		async mounted() {

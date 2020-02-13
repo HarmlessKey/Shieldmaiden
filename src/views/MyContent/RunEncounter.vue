@@ -1,15 +1,19 @@
 <template>
-	<div v-if="overencumbered">
+	<div v-if="overencumbered && demo">
 		<OverEncumbered/>
 	</div>
-	<div class="container-fluid" v-else-if="encounter && players"  
-		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]">	
-		
-		<Finished v-if="encounter.finished" :encounter="encounter"/>
+	<div 
+		v-else-if="encounter && (players || demo)"  
+		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
+	>	
+		<template v-if="encounter.finished">
+			<Finished v-if="!demo" :encounter="encounter"/>
+			<DemoFinished v-else />
+		</template>
 
 		<template v-else>
 			<SetInitiative 
-				v-if="encounter.round == 0"
+				v-if="encounter.round === 0"
 				:_active = "_active"
 				:_idle = "_idle"
 			/>
@@ -28,12 +32,11 @@
 					:_idle = "_idle"
 				/>
 				<Targeted />
-				<!-- <Actions 
-					:current="_active[encounter.turn]"
-				/> -->
 				<Side />
 			</div>
 		</template>
+
+		<DemoOverlay v-if="demo" />
 	</div>
 
 </template>
@@ -43,15 +46,17 @@
 	import { mapActions, mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
-	import Finished from '@/components/combat/Finished.vue'
-	import Actions from '@/components/combat/actions/Actions.vue'
-	import Turns from '@/components/combat/Turns.vue'
-	import Current from '@/components/combat/Current.vue'
-	import Targets from '@/components/combat/Targets.vue'
-	import Targeted from '@/components/combat/Targeted.vue'
-	import Side from '@/components/combat/side/Side.vue'
-	import SetInitiative from '@/components/combat/SetInitiative.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
+	import Finished from '@/components/combat/Finished.vue';
+	import DemoFinished from '@/components/combat/DemoFinished.vue';
+	import Actions from '@/components/combat/actions/Actions.vue';
+	import Turns from '@/components/combat/Turns.vue';
+	import Current from '@/components/combat/Current.vue';
+	import Targets from '@/components/combat/Targets.vue';
+	import Targeted from '@/components/combat/Targeted.vue';
+	import Side from '@/components/combat/side/Side.vue';
+	import SetInitiative from '@/components/combat/SetInitiative.vue';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
 
 	export default {
 		name: 'app',
@@ -60,6 +65,7 @@
 		},
 		components: {
 			Finished,
+			DemoFinished,
 			Actions,
 			Turns,
 			Current,
@@ -68,12 +74,14 @@
 			Side,
 			SetInitiative,
 			OverEncumbered,
+			DemoOverlay
 		},
 		data() {
 			// Dispatch route parameters to store
 
 			return {
 				userId: this.$store.getters.getUser.uid,
+				demo: this.$route.name === "Demo",
 				target: undefined,
 				alive: undefined,
 			}
@@ -86,12 +94,18 @@
 				},
 			}
 		},
+		beforeMount() {
+			if(this.$route.name !== "Demo") {
+				this.track()
+			}
+		},
 		mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid
-			})
-			this.track_Encounter()
+				eid: this.$route.params.encid,
+				demo: this.demo
+			});
+			this.track_Encounter(this.demo);
 		},
 		computed: {
 			...mapGetters([
@@ -103,7 +117,7 @@
 				'overencumbered',
 			]),
 			_active: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc'; 
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -119,7 +133,7 @@
 					.value()
 			},
 			_idle: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -132,7 +146,7 @@
 					.value()
 			},
 			_alive: function() {
-				let order = (this.settings.initOrder) ? 'asc' : 'desc';
+				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
 				return _.chain(this.entities)
 					.filter(function(entity, key) {
@@ -147,7 +161,7 @@
 		},
 		watch: {
 			alive(newVal) {
-				if(newVal == 0 && this.initialized) {
+				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}
 			}
@@ -197,10 +211,7 @@
 			finish() {
 				this.set_finished();
 			},
-		},
-		beforeMount() {
-			this.track()
-		},
+		}
 	}
 </script>
 

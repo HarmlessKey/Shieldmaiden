@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="content">
 		<b-card header="Your Profile">
 			<b-row>
 				<b-col md="2" v-if="user.photoURL">
@@ -120,11 +120,11 @@
 </template>
 
 <script>
-	import Tiers from '@/components/Tiers.vue'
-	import PlayerLink from '@/components/PlayerLink.vue'
-	import { db, auth } from '@/firebase'
-	import { general } from '@/mixins/general.js'
-	import { mapGetters } from 'vuex'
+	import Tiers from '@/components/Tiers.vue';
+	import PlayerLink from '@/components/PlayerLink.vue';
+	import { db, auth } from '@/firebase';
+	import { general } from '@/mixins/general.js';
+	import { mapGetters } from 'vuex';
 
 export default {
 		name: 'Profile',

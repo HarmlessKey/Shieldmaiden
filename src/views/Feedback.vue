@@ -1,9 +1,12 @@
 <template>
 <div class="grid">
-	<div class="container">
+	<div class="content">
 		<h1>Give feedback</h1>
-		<p>If you run into an issue with our app, please let us know. You can leave feedback on GitHub.</p>
-		<a href="https://github.com/HarmlessHarm/HarmlessKey/issues/new" target="_blank"><i class="fab fa-github"></i> Harmless Key GitHub.</a>
+		<p>If you run into an issue with our app, please let us know, whether it's a bug report or a feature request. Our discord is the best place to leave feedback, follow the link below.</p>
+		<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link">
+			<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
+			<div class="text">Harmless Key Discord</div>
+		</a>
 	</div>
 	<Footer />
 </div>
@@ -35,8 +38,7 @@
 	"container"
 	"footer";
 
-	.container {
-		padding-top: 30px;
+	.content {
 		padding-bottom: 50px;
 		line-height: 25px;
 		font-size: 15px; 

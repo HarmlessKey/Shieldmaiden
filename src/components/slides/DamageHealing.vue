@@ -1,54 +1,33 @@
 <template>
-	<div class="pb-5">
+	<div>
 		<h2>Damage / heal <span class="blue">{{ target.name }}</span></h2>
 
 		<select class="form-control" 
 			v-model="doneBy" 
 			name="doneBy"
 			v-validate="'required'">
-			<option value="">Done by...</option>
+			<option value="" disabled>Done by...</option>
 			<option :value="environment">Environment</option>
 			<option v-for="(entity, index) in _active" :value="entity" :key="index">{{ entity.name }}</option>
 		</select>
 		<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
-
-		<p class="mt-3">Target: <b class="blue">{{ target.name }}</b><br/>
-		Target AC: <b class="blue">{{ target.ac }}</b></p>
-		<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
-		<b-form-checkbox class="mb-2" name="log" v-model="log">Log</b-form-checkbox>
-
-		<div class="manual">
-			<input type="number" 
-				v-model="manualAmount" 
-				v-validate="'numeric'" 
-				name="Manual Input" 
-				min="0"
-				class="form-control manual-input"
-				v-shortkey.avoid>
-			<button class="btn dmg bg-red" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'damage')">
-					Attack
-					<img src="@/assets/_img/styles/sword-break.png" />
-				</button>
-				<button class="btn heal bg-green" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual(target, 'healing')">
-					Heal
-					<img src="@/assets/_img/styles/heal.png" />
-				</button>
-		</div>
+		
+		<Actions class="mt-3" v-if="doneBy" :current="doneBy" location="side"/>
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { mapActions, mapGetters } from 'vuex'
-	import { setHP } from '@/mixins/HpManipulations.js'
+	import _ from 'lodash';
+	import { mapActions, mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
+	import Actions from '@/components/combat/actions/Actions.vue';
 
 	export default {
 		name: 'damageHealing',
 		mixins: [setHP],
+		components: {
+			Actions: Actions,
+		},
 		props: [
 		'data',
 		],

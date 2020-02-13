@@ -55,6 +55,7 @@
 								</div>
 							</div>
 
+							<Reminders :entity="current" />
 							<Conditions :entity="current" />
 
 							<template v-if="targeted.length > 0">
@@ -103,6 +104,7 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import Conditions from '@/components/combat/Conditions.vue';
+	import Reminders from '@/components/combat/Reminders.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import { remindersMixin } from '@/mixins/reminders';
 
@@ -111,7 +113,8 @@
 		mixins: [remindersMixin],
 		components: {
 			Actions,
-			Conditions
+			Conditions,
+			Reminders
 		},
 		props: ['current'],
 		data() {
@@ -317,34 +320,6 @@
 			background-color: #302f2f;
 			padding: 2px;
 			cursor: pointer;
-		}
-	}
-	.reminders {
-		margin-bottom: 20px;
-		font-size: 11px;
-
-		.col {
-			a {
-				color: #fff !important;
-				position: relative;
-				padding: 3px;
-
-				.delete {
-					display: none;
-				}
-
-				&:hover {
-					.delete {
-						position: absolute;
-						right: 5px;
-						color: #fff !important;
-						font-size: 12px;
-						display: inline-block;
-						
-					}
-					padding-right: 15px;
-				}
-			}
 		}
 	}
 }

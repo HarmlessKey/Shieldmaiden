@@ -31,7 +31,7 @@ export const remindersMixin = {
 						let rounds = parseInt(target.reminders[key].rounds) - 1
 
 						this.set_targetReminder({
-							action: 'update',
+							action: 'update-timer',
 							entity: target.key,
 							key: key,
 							reminder: rounds

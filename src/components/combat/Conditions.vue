@@ -4,7 +4,7 @@
 			<div :key="key" 
 				@click="setSlide({
 					show: true, 
-					type: 'slides/Condition',
+					type: 'slides/encounter/Condition',
 					data: {
 						condition: key,
 						entity: entity
@@ -42,16 +42,7 @@
 		methods: {
 			...mapActions([
 				'setSlide'
-			]),
-			showCondition(show) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'condition',
-					condition: show,
-					entity: this.target
-				})
-			}
+			])
 		}
 	}
 </script>

@@ -15,7 +15,7 @@
 					v-b-tooltip.hover title="[e] Edit">
 					<span class="icon"><i class="fas fa-pencil"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/TargetReminders', data: target.key})"
+				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: target.key})"
 					v-b-tooltip.hover title="[m] Reminders">
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
 				</a>
@@ -23,11 +23,11 @@
 					v-b-tooltip.hover title="[t] Transform">
 					<span class="icon"><i class="fas fa-paw-claws"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/Conditions', data: target})"
+				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: target})"
 					v-b-tooltip.hover title="[c] Conditions">
 					<span class="icon"><i class="fas fa-flame"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/DamageHealing', data: target})"
+				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target})"
 					v-b-tooltip.hover title="[d] Do Damage / Healing">
 					<span class="icon"><i class="fas fa-swords"></i></span>
 				</a>
@@ -85,23 +85,15 @@
 							</div>
 						</template>
 
+						<Reminders :entity="target" />
 						<Conditions :entity="target" />
-
-						<b-row v-if="target.reminders" class="reminders justify-content-start px-2">
-							<b-col class="col-3 p-1" v-for="(reminder, key) in target.reminders" :key="key">
-								<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
-									{{ reminder.title }}
-									<span class="delete"><i class="fas fa-times"></i></span>
-								</a>
-							</b-col>
-						</b-row>
 						<ViewEntity class="mt-3 hide" :data="target" />
 					</template>
 
 					<!-- MULTIPLE TARGETS -->
 					<template v-else-if="targeted.length > 1">
 						<div class="mb-2">
-							<a @click="setSlide({show: true, type: 'slides/DamageHealing', data: targeted})">
+							<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})">
 								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
 							</a>
 						</div>
@@ -170,6 +162,7 @@
 	import { mapActions, mapGetters } from 'vuex'
 	import ViewEntity from '@/components/ViewEntity.vue';
 	import Conditions from '@/components/combat/Conditions.vue';
+	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
 
 	export default {
@@ -177,7 +170,8 @@
 		mixins: [dice],
 		components: {
 			ViewEntity,
-			Conditions
+			Conditions,
+			Reminders
 		},
 		data() {
 			return {
@@ -225,7 +219,7 @@
 				'set_save',
 				'set_dead',
 				'set_stable',
-				'set_targetReminder',
+				'set_targetReminder'
 			]),
 			showCondition(show) {
 				event.stopPropagation();
@@ -237,7 +231,7 @@
 				})
 			},
 			edit(key, entityType) {
-				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
+				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/encounter/EditNpc';
 
 				event.stopPropagation();
 				this.setSlide({
@@ -428,7 +422,7 @@
 		}
 	}
 	.conditions {
-		margin: 5px 0 10px 0;
+		margin: 2px 0 10px 0;
 		display: grid;
 		grid-template-columns: repeat(auto-fill, 30px);
 		grid-auto-rows: 30px;
@@ -446,34 +440,6 @@
 			background-color: #302f2f;
 			padding: 2px;
 			cursor: pointer;
-		}
-	}
-	.reminders {
-		margin-bottom: 20px;
-		font-size: 11px;
-
-		.col {
-			a {
-				color: #fff !important;
-				position: relative;
-				padding: 3px;
-
-				.delete {
-					display: none;
-				}
-
-				&:hover {
-					.delete {
-						position: absolute;
-						right: 5px;
-						color: #fff !important;
-						font-size: 12px;
-						display: inline-block;
-						
-					}
-					padding-right: 15px;
-				}
-			}
 		}
 	}
 }

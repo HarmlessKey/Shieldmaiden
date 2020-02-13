@@ -7,8 +7,8 @@
 					<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
 					<a v-b-popover.hover.top="'Use shift+click to select multiple targets, or hold down on a tablet or phone.'" title="Multitargeting"><i class="fas fa-info-circle"></i></a>
 				</span>
-				<a @click="setSlide({show: true, type: 'slides/AddNpc'})"
-					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/AddNpc'})"
+				<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
+					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">
@@ -74,8 +74,8 @@
 											{{ entity.entityType }}
 										</a>
 										<a class="dropdown-item" 
-											@click="setSlide({show: true, type: 'slides/TargetReminders', data: entity.key})"
-											v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/TargetReminders', data: targeted})">
+											@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entity.key})"
+											v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})">
 											<i class="fas fa-stopwatch"></i> <span v-if="showKeybinds.keyBinds === undefined">[m]</span> Reminders
 										</a>
 										<a class="dropdown-item" 
@@ -92,12 +92,12 @@
 
 
 										<a class="dropdown-item" 
-											@click="setSlide({show: true, type: 'slides/Conditions', data: entity})"
-											v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/Conditions', data: entities[targeted]})">
+											@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+											v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted]})">
 											<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 										</a>
-										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/DamageHealing', data: entity,})"
-											v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/DamageHealing', data: entities[targeted]})">
+										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
+											v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entities[targeted]})">
 											<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 										</a>
 										<div class="dropdown-divider"></div>
@@ -163,12 +163,12 @@
 												v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
 												<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
 											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/Conditions', data: entity})"
-												v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/Conditions', data: entities[targeted]})">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+												v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted]})">
 												<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/DamageHealing', data: entity})"
-												v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/DamageHealing', data: entities[targeted]})">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity})"
+												v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entities[targeted]})">
 												<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 											</a>
 											<div class="dropdown-divider"></div>
@@ -318,7 +318,7 @@
 				this.key = undefined;
 			},
 			edit(key, entity, entityType) {
-				var editType = (entityType === 'player') ? 'slides/EditPlayer' : 'slides/EditNpc';
+				var editType = (entityType === 'player') ? 'slides/EditPlayer' : 'slides/encounter/EditNpc';
 
 				if(key) {
 					this.setSlide({

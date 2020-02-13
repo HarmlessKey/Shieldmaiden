@@ -719,7 +719,11 @@ const mutations = {
 			Vue.delete(state.entities[entity].reminders, key);
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove();
 		}
-		else if(action === 'update') {
+		else if(action === 'update-timer') {
+			Vue.set(state.entities[entity].reminders, key, reminder);
+			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder);
+		}
+		else if(action === 'update-timer') {
 			Vue.set(state.entities[entity].reminders[key], 'rounds', reminder);
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder);
 		}

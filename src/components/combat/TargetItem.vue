@@ -169,7 +169,7 @@
 
 				this.setSlide({
 					show: true, 
-					type: 'slides/Condition',
+					type: 'slides/encounter/Condition',
 					data: {
 						condition: key,
 						entity: this.entity

@@ -41,7 +41,6 @@
 										name="mod_name"
 										title="Modifier Name"
 										class="form-control mb-2 mr-5"
-										v-validate="'required'"
 										data-vv-as="Modifier Name"
 										@keyup="$forceUpdate()">
 										
@@ -333,7 +332,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .mod_header {
 	cursor: pointer;
+}
+
+.component_box {
+	background: #000;
+	width: 40px;
+	text-align: center;
+	line-height: 36px;
+	height: 36px;
+	font-size: 18px;
+	span {
+		color: white;
+	}
+}
+.component_box.selected {
+	background: #2c97de;
 }
 </style>

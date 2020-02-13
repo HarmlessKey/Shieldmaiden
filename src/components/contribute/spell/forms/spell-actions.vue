@@ -1,31 +1,32 @@
 <template>
-	<div class="card">
-		<div class="card-header d-flex justify-content-between">
-			<span>Spell Actions</span>
-			<a 
-			class="gray-hover text-capitalize" 
-			v-b-tooltip.hover title="Add Action" 
-			@click="add_action()">
-				<i class="fas fa-plus green"></i>
-				<span class="d-none d-md-inline ml-1">Add</span>
-			</a>
-		</div>
-		<div class="card-body">
-			<edit-spell-action 
-				v-if="edit_index !== undefined" 
-				v-model="spell.actions[edit_index]" 
-				:level_scaling="spell.level_scaling"
-				:level="spell.level"
-				@saved="saved_action()"
-			/>
-			<template v-else>
+	<div>
+		<edit-spell-action 
+			v-if="edit_index !== undefined" 
+			v-model="spell.actions[edit_index]" 
+			:level_scaling="spell.level_scaling"
+			:level="spell.level"
+			@saved="saved_action()"
+		/>
+		<div v-else class="card">
+			<div class="card-header d-flex justify-content-between">
+				<span>Spell Actions</span>
+				<a 
+				class="gray-hover text-capitalize" 
+				v-b-tooltip.hover title="Add Action" 
+				@click="add_action()">
+					<i class="fas fa-plus green"></i>
+					<span class="d-none d-md-inline ml-1">Add</span>
+				</a>
+			</div>
+			<div class="card-body">
 				<div v-for="(spell_action, index) in spell.actions" class="d-flex justify-content-between">
 					<span>{{spell_action.type}}</span>
 					<span @click="edit_action(index)">edit</span>
 					<span @click="remove_action(index)">delete</span>
 				</div>
-			</template>
+			</div>
 		</div>
+		
 	</div>
 </template>
 

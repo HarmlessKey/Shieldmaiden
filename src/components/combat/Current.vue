@@ -116,7 +116,7 @@
 			Conditions,
 			Reminders
 		},
-		props: ['current'],
+		props: ['current', 'next'],
 		data() {
 			return {
 				setShadow: 0,
@@ -131,17 +131,29 @@
 			}
 		},
 		watch: {
-			//Watch current to trigger reminders when an entity starts their turn
-			current(newVal, oldVal) {
-				if(newVal != oldVal) {
-					this.checkReminders(this.current, 'startTurn');
-					this.timedReminders(this.current); //Handle timed reminders
+			//Watch turn to trigger reminders when an entity starts their turn
+			turn(newVal, oldVal) {
+				this.checkReminders(this.current, 'startTurn');
+
+				//Check if the turn went up or down	concidering round changes
+				//Fails with only 2 entities
+				if((newVal > oldVal && oldVal != 0) || 
+					(newVal > oldVal && oldVal === 0 && newVal === 1) || 
+					(newVal === 0 && oldVal > newVal && oldVal !== 1)
+				) {
+					console.log('Turn went up');
+					this.timedReminders(this.current, 'up');
+				} else {
+					console.log('Turn went back');
+					//Update next in initiative order
+					this.timedReminders(this.next, 'down');
 				}
 			}
 		},
 		computed: {
 			...mapGetters([
 				'entities',
+				'round',
 				'turn',
 				'targeted',
 			]),

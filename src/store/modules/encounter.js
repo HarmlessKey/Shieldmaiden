@@ -719,7 +719,7 @@ const mutations = {
 			Vue.delete(state.entities[entity].reminders, key);
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove();
 		}
-		else if(action === 'update-timer') {
+		else if(action === 'update') {
 			Vue.set(state.entities[entity].reminders, key, reminder);
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder);
 		}

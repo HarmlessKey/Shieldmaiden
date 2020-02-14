@@ -43,27 +43,35 @@ export const remindersMixin = {
 				}
 			}
 		},
-		timedReminders(target){
+		timedReminders(target, direction){
 			for(let key in target.reminders) {
-				var notify = false;
+				let notify = false;
+				let update = false;
 
 				//TIMED REMINDERS
 				if(target.reminders[key].trigger === 'timed') {
-					if(target.reminders[key].rounds > 1) {
-						let rounds = parseInt(target.reminders[key].rounds) - 1
-
-						this.set_targetReminder({
-							action: 'update-timer',
-							entity: target.key,
-							key: key,
-							reminder: rounds
-						}); 
-					}
-					else {
-						notify = true;
+					//Round went up
+					if(direction === 'up') {
+						if(target.reminders[key].rounds > 1) {
+							update = parseInt(target.reminders[key].rounds) - 1;
+						} else { 
+							notify = true; 
+						}
+					} else {
+						update = parseInt(target.reminders[key].rounds) + 1;
 					}
 				}
-				
+				//UPDATE
+				if(update) {
+					console.log('update timer')
+					this.set_targetReminder({
+						action: 'update-timer',
+						entity: target.key,
+						key: key,
+						reminder: update
+					}); 
+				}
+
 				// NOTIFY
 				if(notify) {
 					this.notify(target, key);
@@ -79,9 +87,11 @@ export const remindersMixin = {
 			}
 		},
 		notify(target, key) {
+			let notify = target.reminders[key].notify;
 
 			//Create buttons for notification
 			if(target.reminders[key].action !== 'remove') {
+				notify = 'removed';
 				var buttons = [
 					{ 
 						text: 'Keep Reminder', 
@@ -107,7 +117,7 @@ export const remindersMixin = {
 
 			// NOTIFICATION
 			this.$snotify.warning(
-				target.name + ': ' + target.reminders[key].notify,
+				target.name + ': ' + notify,
 				target.reminders[key].title, 
 				{
 					timeout: 0,

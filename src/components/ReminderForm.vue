@@ -116,6 +116,7 @@ export default {
     watch: {
         reminder: {
             handler() {
+                //Emits validation on every change
                 this.$emit('validation', this.$validator);
             },
             deep: true
@@ -123,6 +124,7 @@ export default {
     },
     mounted() {
         if(Object.keys(this.value).length === 0) {
+            //Set default values
             this.$set(this.reminder, 'color', 'green-light');
             this.$set(this.reminder, 'action', 'remove');
         }

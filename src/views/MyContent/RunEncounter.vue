@@ -26,6 +26,7 @@
 				{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
 				<Current 
 					:current="_active[encounter.turn]"
+					:next="next"
 				/>
 				<Targets 
 					:_active = "_active"
@@ -158,6 +159,11 @@
 					} , order)
 					.value()
 			},
+			next() {
+				//returns next in initiative order
+				//returns first if there is no next
+				return this._active[this.encounter.turn + 1] || this._active[0];
+			}
 		},
 		watch: {
 			alive(newVal) {

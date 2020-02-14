@@ -6,6 +6,7 @@
             </b-col>
             <b-col>
                 <b-form-input type="text" 
+                autocomplete="off"
                 v-model="reminder.title"
                 v-validate="'required'"
                 name="title"
@@ -34,7 +35,7 @@
                 v-validate="'required'"
                 id="trigger"
                 name="trigger">
-                    <option selected="selected" value="">Select the trigger</option>
+                    <option selected="selected" value="">- Select the trigger -</option>
                     <option v-for="(trigger, key) in triggers" :value="key" :key="key">{{ trigger }}</option>
                 </b-form-select>
                 <p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>
@@ -61,8 +62,10 @@
             </b-col>
             <b-col>
                 <b-form-radio-group v-model="reminder.action" name="action">
-                    <b-form-radio value="remove">Remove on trigger</b-form-radio><br/>
-                    <small v-if="reminder.action == 'remove'">(You will still be notified)</small>
+                    <div>
+                        <b-form-radio value="remove">Remove on trigger</b-form-radio><br/>
+                        <small v-if="reminder.action == 'remove'">(You will still be notified)</small>
+                    </div>
                     <b-form-radio value="notify" class="mt-2">Notify on trigger</b-form-radio><br/>
                     <template v-if="reminder.action == 'notify'">
                         <b-form-textarea class="mt-2" rows="3" name="notification" v-validate="'required'" v-model="reminder.notify" placeholder="Notification"></b-form-textarea>
@@ -140,6 +143,7 @@ export default {
 
 <style scoped lang="scss">
     .colors {
+        max-width: 300px;
 		padding: 5px;
 
 		a {

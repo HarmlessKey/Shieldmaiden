@@ -141,10 +141,8 @@
 					(newVal > oldVal && oldVal === 0 && newVal === 1) || 
 					(newVal === 0 && oldVal > newVal && oldVal !== 1)
 				) {
-					console.log('Turn went up');
 					this.timedReminders(this.current, 'up');
 				} else {
-					console.log('Turn went back');
 					//Update next in initiative order
 					this.timedReminders(this.next, 'down');
 				}

@@ -23,29 +23,28 @@
 				</router-link>
 			</h2>
 
-
 			<HKtable
 				:columns="columns"
-				:items="_reminders"
+				:items="reminders"
 				:search="['title']"
 			>
 				<template slot="title" slot-scope="data">
 					<router-link class="mx-2" 
-						:to="'/reminders/' + data.row.key" 
+						:to="'/reminders/' + data.row['.key']" 
 						v-b-tooltip.hover title="Edit">{{ data.item }}
 					</router-link>
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
 					<router-link class="gray-hover mx-1" 
-						:to="'/reminders/' + data.row.key" 
+						:to="'/reminders/' + data.row['.key']" 
 						v-b-tooltip.hover title="Edit">
 						<i class="fas fa-pencil"></i>
 					</router-link>
 					<a v-b-tooltip.hover 
 						title="Delete" 
 						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row.reminder, data.row.control)">
+						@click="confirmDelete(data.row['.key'], data.row.title)">
 							<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
@@ -87,9 +86,9 @@
 	import { db } from '@/firebase';
 
 	export default {
-		name: 'Players',
+		name: 'Reminders',
 		metaInfo: {
-			title: 'Players'
+			title: 'Reminders'
 		},
 		components: {
 			OverEncumbered,
@@ -122,9 +121,6 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'players',
-				'campaigns',
-				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
@@ -142,13 +138,13 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, reminder, control) {
+			confirmDelete(key, reminder) {
 				this.$snotify.error('Are you sure you want to delete ' + reminder + '?', 'Delete reminder', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deleteReminder(key, control)
+							this.deleteReminder(key)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -162,9 +158,9 @@
 					]
 				});
 			},
-			deletePlayer(key, control) {
+			deleteReminder(key) {
 				//Remove player
-				db.ref('reminders/' + this.userId).child(key).remove(); 
+				db.ref(`reminders/${this.userId}`).child(key).remove(); 
 			}
 		}
 	}

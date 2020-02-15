@@ -1,7 +1,7 @@
 <template>
 	<div class="content" v-if="tier">
 		<h1>Your reminders</h1>
-		<p>These are the reminders that you can use in your encounters.</p>
+		<p>Reminders create useful notifications during encounters, so you don't forget someone was concentrating for instance.</p>
 
 		<OverEncumbered v-if="overencumbered"/>
 		<OutOfSlots 

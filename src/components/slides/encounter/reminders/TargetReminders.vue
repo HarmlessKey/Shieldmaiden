@@ -44,6 +44,18 @@
 						<a class="green" v-b-tooltip.hover title="Set" @click="addReminder('premade', reminder)"><i class="fas fa-plus"></i></a>
 					</li>
 				</ul>
+
+				<template v-if="personalReminders">
+					<h3>Personal</h3>
+					<ul class="premade">
+						<li v-for="(reminder, key) in personalReminders" :key="key"
+							class="d-flex justify-content-between"
+							:class="'bg-'+reminder.color">
+							<div>{{ reminder.title }}</div>
+							<a class="green" v-b-tooltip.hover title="Set" @click="addReminder('premade', reminder)"><i class="fas fa-plus"></i></a>
+						</li>
+					</ul>
+				</template>
 			</div>
 
 			<div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">	
@@ -71,11 +83,17 @@
 		],
 		data() {
 			return {
+				userId: this.$store.getters.getUser.uid,
 				entityKey: this.data,
 				action: 'remove',
 				selectedColor: 'green-light',
 				premadeReminder: undefined,
 				customReminder: {}
+			}
+		},
+		firebase() {
+			return {
+				personalReminders: db.ref(`reminders/${this.userId}`)
 			}
 		},
 		computed: {
@@ -89,6 +107,7 @@
 			]),
 			addReminder(type, reminder = false) {	
 				if(type == 'premade') {
+					delete reminder['.key'];
 					this.set_targetReminder({
 						action: 'add',
 						entity: this.entityKey,

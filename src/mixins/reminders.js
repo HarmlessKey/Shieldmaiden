@@ -91,7 +91,6 @@ export const remindersMixin = {
 
 			//Create buttons for notification
 			if(target.reminders[key].action !== 'remove') {
-				notify = 'removed';
 				var buttons = [
 					{ 
 						text: 'Keep Reminder', 
@@ -112,7 +111,8 @@ export const remindersMixin = {
 					},
 				]
 			} else {
-				buttons = ''
+				notify = 'removed';
+				buttons = '';
 			}
 
 			// NOTIFICATION

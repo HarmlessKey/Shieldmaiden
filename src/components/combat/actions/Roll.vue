@@ -201,6 +201,7 @@
 				var allDamageRolls = [];
 				var critInfo = '';
 				var highest = 0;
+				var lowest = undefined;
 
 				var ac = parseInt(this.displayStats(target).ac);
 
@@ -216,10 +217,11 @@
 					for(let i = 0; i <= 1; i++) {
 						toHit[i] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
 					}
-					
-					//Check which roll was highest
-					highest = (toHit[0].total >= toHit[1].total) ? 0 : 1;
-					
+
+					//Define the position of the highest and lowest rolls in the array
+					highest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 0 : 1;
+					lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 1 : 0;
+
 					//Set advantage message for snotify
 					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
 					adv = `<small class="${color}">${this.advantage}</small>`;	
@@ -263,14 +265,15 @@
 					total = this.aoeRoll.total;
 				}
 
-				//If there was disadvantage, it cannot crit
+				//Flip the positions of highest and lowest if there was disadvantage
 				if(this.advantage == 'disadvantage') {
-					highest = (highest == 0) ? 1 : 0;
+					highest = (highest === 0) ? 1 : 0;
+					lowest = (lowest === 0) ? 1 : 0;
 				}
 				//Check if it was a critical hit
-				if(toHit[highest].throws[0] == '20') {
+				if(toHit[highest].throws[0] === 20) {
 					//Form HTML for snotify
-					critInfo = `<small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small>`;
+					critInfo = `<div><small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
 					
 					//Double the rolled damage
 					total = parseInt(total*2);
@@ -291,30 +294,28 @@
 				}
 
 				if(this.toHit) {
+					let toHitRoll = toHit[highest].throws[0];
+
 					//If the to hit roll is a 20, it is a critical hit
-					if(crit) {
-						hits = '<h2 class="green">NATURAL 20</h2>'; //form HTML for snotify
+					if(toHitRoll === 20) {
+						toHitRoll = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
 					}
 					//If the to hit roll is a 1, it is a critical fail
-					else if(toHit[highest].throws[0] == '1') {
-						hits = '<h2 class="red">NATURAL 1</h2>'; //form HTML fo snotify
+					else if(toHitRoll === 1) {
+						toHitRoll = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
 					}
-					else {
-						//If the to hit is higher than or equal to target's AC, it hits
-						if(toHit[highest].total >= ac) {
-							//Form HTML for snotify
-							hits = `<h2><span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
-											<span class="green">HIT!</span> 
-											<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
-						}
-						//If the to hit is lower than the target's ac, it misses
-						else {
-							//Form HTML for snotify
-							hits = `<h2><span class="gray-hover">${toHit[highest].throws[0]} ${toHit[highest].mod} = </span>${toHit[highest].total}
-											<span class="red">MISS!</span> 
-											<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
-						}
-					}
+					//If the to hit is higher than or equal to target's AC, it hits
+					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
+					let ignoredRoll = (this.advantage) ? `<del>${toHit[lowest].throws[0]}</del>` : ``;
+
+					//Form HTML for snotify
+					hits = `<h2><span class="gray-hover">
+							${ignoredRoll}
+							${toHitRoll} ${toHit[highest].mod} = </span>${toHit[highest].total}
+							${hitOrMiss}
+							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
+						
+					
 				}
 
 				//If it was an open roll

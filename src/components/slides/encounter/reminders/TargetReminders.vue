@@ -45,7 +45,7 @@
 					</li>
 				</ul>
 
-				<template v-if="personalReminders">
+				<template v-if="personalReminders.length > 0">
 					<h3>Personal</h3>
 					<ul class="premade">
 						<li v-for="(reminder, key) in personalReminders" :key="key"

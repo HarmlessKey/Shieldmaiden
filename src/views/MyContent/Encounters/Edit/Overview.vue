@@ -47,7 +47,7 @@
                         <template v-if="encounter">
                             <h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
 
-                            <HKtable
+                            <hk-table
                                 class="mb-4" 
                                 :items="_friendlies"
                                 :columns="entityColumns"
@@ -79,11 +79,11 @@
                                         <i class="fas fa-minus"></i>
                                     </a>
                                 </div>
-                            </HKtable>
+                            </hk-table>
 
                             <h3>{{ Object.keys(_monsters).length }} Monsters</h3>
 
-                            <HKtable 
+                            <hk-table 
                                 :items="_monsters"
                                 :columns="entityColumns"
                                 :showHeader="false"
@@ -107,7 +107,7 @@
                                         <i class="fas fa-minus"></i>
                                     </a>
                                 </div>
-                            </HKtable>
+                            </hk-table>
                         </template>
                         <div v-else class="loader"><span>Loading entities...</span></div>
                 </div>
@@ -124,14 +124,10 @@
     import { db } from '@/firebase';
     import { mapActions, mapGetters } from 'vuex';
     import { difficulty } from '@/mixins/difficulty.js';
-    import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
         name: 'Overview',
         mixins: [difficulty],
-        components: {
-            HKtable
-        },
 		data() {
 			return {
 				campaignId: this.$route.params.campid,

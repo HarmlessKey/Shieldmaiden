@@ -26,7 +26,7 @@
 			<hr>
 		</template>
 		
-		<HKtable 
+		<hk-table 
 			:items="items"
 			:columns="itemColumns"
 			:showHeader="false"
@@ -36,21 +36,17 @@
 				<h3>{{ data.row.public_name }}</h3>
 				{{ data.row.public_description }}
 			</div>
-		</HKtable>
+		</hk-table>
 	</div>
 </template>
 
 <script>
 	import { db } from '@/firebase';
 	import { currencyMixin } from '@/mixins/currency.js';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'app',
 		mixins: [currencyMixin],
-		components: {
-			HKtable
-		},
 		props: [
 			'encounter'
 		],

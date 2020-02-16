@@ -13,7 +13,7 @@
 				items from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<HKtable
+			<hk-table
 				:items="items"
 				:columns="fields"
 				:perPage="15"
@@ -50,7 +50,7 @@
 				<div slot="table-busy" class="loader">
 					<span>Loading items....</span>
 				</div>
-			</HKtable>
+			</hk-table>
 		</template>
 	</div>
 	<Footer />
@@ -58,19 +58,17 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import Footer from '@/components/Footer.vue'
-	import ViewItem from '@/components/ViewItem.vue'
-	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { db } from '@/firebase';
+	import Crumble from '@/components/crumble/Compendium.vue';
+	import Footer from '@/components/Footer.vue';
+	import ViewItem from '@/components/ViewItem.vue';
 
 	export default {
 		name: 'Error',
 		components: {
 			Crumble,
 			Footer,
-			ViewItem,
-			HKtable
+			ViewItem
 		},
 		metaInfo: {
 			title: 'Items'

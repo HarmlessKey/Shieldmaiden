@@ -86,7 +86,7 @@
 									Items
 									<a @click="awardItems(items)">Award all <i class="far fa-chevron-double-right"></i></a>
 								</h3>
-								<HKtable 
+								<hk-table 
 									:items="items"
 									:columns="itemColumns"
 									:showHeader="false"
@@ -94,16 +94,16 @@
 									<template slot="actions" slot-scope="data">
 										<a class="btn m-1" @click="awardItems([data.row])">Award <i class="far fa-chevron-double-right"></i></a>
 									</template>
-								</HKtable>
+								</hk-table>
 							</template>
 							<template v-if="awardedItems">
 								<h3>Awarded Items</h3>
-								<HKtable 
+								<hk-table 
 									:items="awardedItems"
 									:columns="itemColumns"
 									:showHeader="false"
 								>
-								</HKtable>
+								</hk-table>
 							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
@@ -134,7 +134,6 @@
 	import Log from '@/components/combat/side/Log.vue';
 	import Players from '@/components/campaign/Players.vue';
 	import { currencyMixin } from '@/mixins/currency.js';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'app',
@@ -145,8 +144,7 @@
 		components: {
 			Dmg,
 			Log,
-			Players,
-			HKtable
+			Players
 		},
 		data() {
 			return {

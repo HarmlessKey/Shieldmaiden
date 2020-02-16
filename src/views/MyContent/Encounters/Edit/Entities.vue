@@ -30,7 +30,7 @@
 	<!-- MONSTERS -->
 	<h3>NPC's</h3>
 
-	<HKtable 
+	<hk-table 
 		:items="monsterArray"
 		:columns="monsterFields"
 		:perPage="15"
@@ -67,7 +67,7 @@
 	<div slot="table-loading" class="loader">
 		<span>Loading monsters...</span>
 	</div>
-</HKtable>
+</hk-table>
 </div>
 </template>
 
@@ -77,14 +77,12 @@
 	
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 	import ViewMonster from '@/components/ViewMonster.vue';
 
 	export default {
 		name: 'Entities',
 		mixins: [general, dice],
 		components: {
-			HKtable,
 			ViewMonster
 		},
 		data() {

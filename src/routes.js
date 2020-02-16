@@ -110,7 +110,7 @@ export const routes = [{
 },
 {
 	path: '/compendium/items',
-	name: 'Items',
+	name: 'CompendiumItems',
 	component: CompendiumItems,
 	meta: {
 		baseName: 'items',
@@ -462,7 +462,7 @@ export const routes = [{
 },
 {
 	path: '/items',
-	name: 'Items',
+	name: 'CustomItems',
 	component: Items,
 	meta: {
 		basePath: '/items',

@@ -63,7 +63,6 @@ export const remindersMixin = {
 				}
 				//UPDATE
 				if(update) {
-					console.log('update timer')
 					this.set_targetReminder({
 						action: 'update-timer',
 						entity: target.key,

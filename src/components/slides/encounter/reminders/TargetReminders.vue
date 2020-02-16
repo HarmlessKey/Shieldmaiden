@@ -107,14 +107,17 @@
 			]),
 			addReminder(type, reminder = false) {	
 				if(type == 'premade') {
+					let key = reminder['.key'] || reminder.key;
 					delete reminder['.key'];
+
 					this.set_targetReminder({
 						action: 'add',
 						entity: this.entityKey,
-						key: reminder['.key'],
+						key,
 						type: 'premade',
 						reminder: reminder
 					});
+					reminder['.key'] = key;
 				}
 				else if(type == 'custom') {
 					this.validation.validateAll().then((result) => {

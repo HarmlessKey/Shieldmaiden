@@ -8,7 +8,8 @@
                 <b-form-input type="text" 
                 autocomplete="off"
                 v-model="reminder.title"
-                v-validate="'required'"
+                v-validate="'required|max:30'"
+                maxLength="30"
                 name="title"
                 id="title"
                 placeholder="Title"></b-form-input>
@@ -50,8 +51,9 @@
                     name="rounds"
                     type="number" 
                     v-model="reminder.rounds"
-                    v-validate="'required'"
-                    min="1"></b-form-input>
+                    v-validate="'required|max_value:99'"
+                    min="1"
+                    max="99"></b-form-input>
                     <p class="validate red" v-if="errors.has('rounds')">{{ errors.first('rounds') }}</p>
                     <small>(One minute is 10 rounds)</small>
             </b-col>
@@ -63,10 +65,10 @@
             <b-col>
                 <b-form-radio-group v-model="reminder.action" name="action">
                     <div>
-                        <b-form-radio value="remove">Remove on trigger</b-form-radio><br/>
+                        <b-form-radio value="remove"><i class="fas fa-trash-alt"></i> Remove on trigger</b-form-radio><br/>
                         <small v-if="reminder.action == 'remove'">(You will still be notified)</small>
                     </div>
-                    <b-form-radio value="notify" class="mt-2">Notify on trigger</b-form-radio><br/>
+                    <b-form-radio value="notify" class="mt-2"><i class="fas fa-bell"></i> Notify on trigger</b-form-radio><br/>
                     <template v-if="reminder.action == 'notify'">
                         <b-form-textarea class="mt-2" rows="3" name="notification" v-validate="'required'" v-model="reminder.notify" placeholder="Notification"></b-form-textarea>
                         <p class="validate red" v-if="errors.has('notification')">{{ errors.first('notification') }}</p>
@@ -143,7 +145,7 @@ export default {
 
 <style scoped lang="scss">
     .colors {
-        max-width: 300px;
+        max-width: 250px;
 		padding: 5px;
 
 		a {

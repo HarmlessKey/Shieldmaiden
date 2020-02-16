@@ -1,7 +1,9 @@
-import { db } from '@/firebase'
-import { mapActions, mapGetters } from 'vuex'
+import { db } from '@/firebase';
+import { mapActions, mapGetters } from 'vuex';
+import { remindersMixin } from '@/mixins/reminders';
 
 export const setHP = {
+	mixins: [remindersMixin],
 	data() {
 		return {
 			demo: this.$route.name === "Demo",
@@ -33,8 +35,7 @@ export const setHP = {
 			'set_hp',
 			'set_dead',
 			'set_log',
-			'set_meters',
-			'set_targetReminder',
+			'set_meters'
 		]),
 		setHP(amount, crit, target, current, type, log = true, notify = true, undo = false) {
 			amount = parseInt(amount);
@@ -145,53 +146,8 @@ export const setHP = {
 				})
 
 				//Check if a reminder is triggered on damage taken
-				for(let key in target.reminders) {
-					if(target.reminders[key].trigger == 'damage') {
-						//Buttons to remove or keep reminder
-						if(target.reminders[key].action != 'remove') {
-							var buttons = [
-								{ 
-									text: 'Keep Reminder', 
-									action: (toast) => { 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-								{ 
-									text: 'Remove', 
-									action: (toast) => { 
-										this.set_targetReminder({
-											action: 'remove',
-											entity: target.key,
-											key: key,
-										}); 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-							]
-						}
-						else {
-							buttons = ''
-						}
-
-						// NOTIFICATION
-						this.$snotify.warning(
-							target.name + ': ' + target.reminders[key].notify,
-							target.reminders[key].title, 
-							{
-								position: "centerCenter",
-								timeout: 0,
-								buttons
-							}
-						);
-						if(target.reminders[key].action == 'remove') {
-							this.set_targetReminder({
-								action: 'remove',
-								entity: target.key,
-								key: key,
-							}); 
-						}
-					}
-				}
+				this.checkReminders(target, 'damage');
+				
 			}
 
 			//Notification

@@ -10,19 +10,27 @@
 						<template v-if="key == 'ads'">Ads are removed</template>
 						<template v-if="key == 'campaigns'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-							<span v-else class="green">{{ benefit }}</span> campaign slots
+							<span v-else class="green">{{ benefit }}</span> Campaign slots
 						</template>
 						<template v-if="key == 'encounters'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-							<span v-else class="green">{{ benefit }}</span> encounter slots
+							<span v-else class="green">{{ benefit }}</span> Encounter slots
 						</template>
 						<template v-if="key == 'players'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-							<span v-else class="green">{{ benefit }}</span> player slots
+							<span v-else class="green">{{ benefit }}</span> Player slots
 						</template>
 						<template v-if="key == 'npcs'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
 							<span v-else class="green">{{ benefit }}</span> NPC slots
+						</template>
+						<template v-if="key == 'items'">
+							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+							<span v-else class="green">{{ benefit }}</span> Item slots
+						</template>
+						<template v-if="key == 'reminders'">
+							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+							<span v-else class="green">{{ benefit }}</span> Reminder slots
 						</template>
 					</li>
 				</ul>

@@ -51,7 +51,7 @@
 	},
 	data() {
 		return {
-			user: auth.currentUser,
+			user: auth.currentUser
 		}
 	},
 	computed: {

@@ -159,6 +159,8 @@ html body {
 .bg-red-light { background-color: $red-light !important; }
 .bg-yellow-light { background-color: $yellow-light !important; }
 
+.invert { filter: invert(1); }
+
 .pointer {
 	cursor: pointer !important;
 }

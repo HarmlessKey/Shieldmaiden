@@ -1,5 +1,5 @@
 <template>
-	<header :class="{ 'bg-blue': enviroment === 'development' }">
+	<header :class="{ invert: enviroment === 'development' }">
 		<div id="header" class="d-flex justify-content-between">
 			<div>
 				<div 

@@ -1,5 +1,5 @@
 <template>
-	<header>
+	<header :class="{ 'bg-blue': enviroment === 'development' }">
 		<div id="header" class="d-flex justify-content-between">
 			<div>
 				<div 
@@ -68,7 +68,7 @@
 		data() {
 			return {
 				user: auth.currentUser,
-				// admin: this.$store.getters.userInfo.admin
+				enviroment: process.env.NODE_ENV
 			}
 		},
 		computed: {

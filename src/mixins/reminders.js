@@ -110,7 +110,7 @@ export const remindersMixin = {
 					},
 				]
 			} else {
-				notify = 'removed';
+				notify = 'reminder removed';
 				buttons = '';
 			}
 

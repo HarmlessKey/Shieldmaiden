@@ -24,7 +24,7 @@
 				</router-link>
 			</h2>
 
-			<HKtable
+			<hk-table
 				:columns="columns"
 				:items="_items"
 				:perPage="20"
@@ -55,7 +55,7 @@
 						<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
-			</HKtable>
+			</hk-table>
 
 			<template v-if="slotsLeft > 0 && tier.benefits.items !== 'infinite'">
 				<div 
@@ -89,7 +89,6 @@
 	import _ from 'lodash'
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import HKtable from '@/components/hk-components/hk-table.vue'
 	import { mapGetters } from 'vuex'
 	import { db } from '@/firebase'
 
@@ -100,8 +99,7 @@
 		},
 		components: {
 			OverEncumbered,
-			OutOfSlots,
-			HKtable
+			OutOfSlots
 		},
 		data() {
 			return {

@@ -1,16 +1,14 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
-import { firebase_api_key, firebase_dev_api_key } from '@/secret'
-
 
 let config = {
-    apiKey: firebase_api_key,
-    authDomain: "harmlesskey.firebaseapp.com",
-    databaseURL: "https://dndcombat-71e41.firebaseio.com",
-    projectId: "dndcombat-71e41",
-    storageBucket: "dndcombat-71e41.appspot.com",
-    messagingSenderId: "440135570024"
+    apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+    authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
+    projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID
 };
 firebase.initializeApp(config);
 

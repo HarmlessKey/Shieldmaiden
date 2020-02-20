@@ -3,7 +3,7 @@
 		<h2 class="mb-1">Your Characters</h2>
 		<p>The characters you play in other campaigns. Ask your DM to give you control over a character.</p>
 		
-		<HKtable
+		<hk-table
 			v-if="controlledCharacters"
 			:columns="columns"
 			:items="controlledCharacters"
@@ -31,24 +31,20 @@
 					<i class="fas fa-pencil"></i>
 				</router-link>
 			</div>
-		</HKtable>
+		</hk-table>
 		<p v-else>You have no control over other characters.</p>
 	</div>
 </template>
 
 <script>
-	import HKtable from '@/components/hk-components/hk-table.vue';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 
 	export default {
-		name: 'Players',
+		name: 'Characters',
 		mixins: [experience],
 		metaInfo: {
-			title: 'Players'
-		},
-		components: {
-			HKtable
+			title: 'Characters'
 		},
 		data() {
 			return {

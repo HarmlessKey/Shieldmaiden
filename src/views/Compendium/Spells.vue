@@ -12,7 +12,7 @@
 				spells from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<HKtable
+			<hk-table
 				:items="spells"
 				:columns="fields"
 				:perPage="15"
@@ -30,7 +30,7 @@
 				<div slot="table-busy" class="loader">
 					<span>Loading conditions....</span>
 				</div>
-			</HKtable>
+			</hk-table>
 		</template>
 	</div>
 	<Footer />
@@ -42,15 +42,13 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,
-			Spell,
-			HKtable
+			Spell
 		},
 		metaInfo: {
 			title: 'Spells'

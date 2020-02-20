@@ -10,7 +10,7 @@
 				monsters from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<HKtable
+			<hk-table
 				:items="monsters"
 				:columns="fields"
 				:perPage="15"
@@ -29,7 +29,7 @@
 				<div slot="table-busy" class="loader">
 					<span>Loading monsters....</span>
 				</div>
-			</HKtable>
+			</hk-table>
 		</template>
 	</div>
 	<Footer />
@@ -37,20 +37,18 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import Footer from '@/components/Footer.vue'
-	import ViewMonster from '@/components/ViewMonster.vue'
-	import { mapActions } from 'vuex'
-	import HKtable from '@/components/hk-components/hk-table.vue';
+	import { db } from '@/firebase';
+	import Crumble from '@/components/crumble/Compendium.vue';
+	import Footer from '@/components/Footer.vue';
+	import ViewMonster from '@/components/ViewMonster.vue';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Error',
 		components: {
 			Crumble,
 			Footer,
-			ViewMonster,
-			HKtable
+			ViewMonster
 		},
 		metaInfo: {
 			title: 'Monsters'

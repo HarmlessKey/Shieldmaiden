@@ -24,6 +24,9 @@
 							<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
 						</b-list-group-item>
 						<b-list-group-item>
+							<router-link to="/reminders"><i class="fas fa-stopwatch"></i><span>Reminders</span></router-link>
+						</b-list-group-item>
+						<b-list-group-item>
 							<router-link to="/items"><i class="far fa-staff"></i><span>Items</span></router-link>
 						</b-list-group-item>
 					</b-list-group>

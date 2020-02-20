@@ -16,6 +16,7 @@
 								<router-link v-b-tooltip.hover.bottom="'Campaigns'"  to="campaigns"><i class="fas fa-dungeon"></i></router-link>
 								<router-link v-b-tooltip.hover.bottom="'Players'" to="players"><i class="fas fa-users"></i></router-link>
 								<router-link v-b-tooltip.hover.bottom="'NPC\'s'" to="npcs"><i class="fas fa-dragon"></i></router-link>
+								<router-link v-b-tooltip.hover.bottom="'Reminders'" to="reminders"><i class="fas fa-stopwatch"></i></router-link>
 								<router-link v-b-tooltip.hover.bottom="'Items'" to="items"><i class="far fa-staff"></i></router-link>
 							</div>
 							<div class="share">
@@ -117,7 +118,7 @@
 					.menu {
 						display: grid;
 						justify-content: center;
-						grid-template-columns: repeat(4, max-content);
+						grid-template-columns: repeat(5, max-content);
 						grid-gap: 20px;
 						font-size: 25px;
 						margin-top: 20px;

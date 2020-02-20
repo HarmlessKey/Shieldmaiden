@@ -10,7 +10,7 @@
 				</template>
 			</h1>
 
-			<HKtable
+			<hk-table
 				:items="users"
 				:columns="fields"
 				:perPage="15"
@@ -62,7 +62,7 @@
 				<div slot="table-loading" class="loader">
 					<span>Loading users...</span>
 				</div>
-			</HKtable>
+			</hk-table>
 		
 		</template>
 
@@ -78,14 +78,12 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import User from '@/components/Admin/User.vue';
 	import { mapActions } from 'vuex';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Users',
 		components: {
 			Crumble,
-			User,
-			HKtable
+			User
 		},
 		metaInfo: {
 			title: 'Admin | Users'

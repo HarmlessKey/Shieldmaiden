@@ -52,7 +52,7 @@
 					/>
 
 				<!-- ACTIVE ENCOUNTERS -->
-				<HKtable
+				<hk-table
 					class="mb-4"
 					:items="_active"
 					:columns="activeColumns"
@@ -94,13 +94,13 @@
 							</a>
 						</div>
 					</template>
-				</HKtable>
+				</hk-table>
 
 				<!-- FINISHED ENCOUNTERS -->
 				<template v-if="_finished != 0">
 					<h2>Finished Encounters</h2>
 					
-					<HKtable
+					<hk-table
 						class="mb-4"
 						:items="_finished"
 						:columns="finishedColumns"
@@ -123,7 +123,7 @@
 								<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)"><i class="fas fa-trash-alt"></i></a>
 							</div>
 						</template>
-					</HKtable>
+					</hk-table>
 
 				</template>
 				
@@ -147,7 +147,6 @@
 	import Crumble from '@/components/crumble/MyContent.vue';
 	import PlayerLink from '@/components/PlayerLink.vue';
 	import Players from '@/components/campaign/Players.vue';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	import { mapGetters, mapActions } from 'vuex'
 	import { db } from '@/firebase'
@@ -162,8 +161,7 @@
 			PlayerLink,
 			OverEncumbered,
 			OutOfSlots,
-			Players,
-			HKtable
+			Players
 		},
 		data() {
 			return {

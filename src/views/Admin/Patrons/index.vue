@@ -13,7 +13,7 @@
 			<b-col md="8">
 
 				<div class="table-responsive">
-					<HKtable
+					<hk-table
 						:items="patrons"
 						:columns="fields"
 						:perPage="15"
@@ -59,7 +59,7 @@
 						<div slot="table-loading" class="loader">
 							<span>Loading patrons....</span>
 						</div>
-					</HKtable>
+					</hk-table>
 				</div>
 	
 			</b-col>
@@ -82,15 +82,13 @@
 	import Patron from '@/components/Admin/Patrons/Patron.vue';
 	import Notifications from '@/components/Admin/Patrons/Notifications.vue';
 	import { general } from '@/mixins/general.js';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Patrons',
 		components: {
 			Crumble,
 			Patron,
-			Notifications,
-			HKtable
+			Notifications
 		},
 		mixins: [general],
 		metaInfo: {

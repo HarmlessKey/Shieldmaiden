@@ -113,7 +113,7 @@ export const routes = [{
 },
 {
 	path: '/compendium/items',
-	name: 'Items',
+	name: 'CompendiumItems',
 	component: CompendiumItems,
 	meta: {
 		baseName: 'items',
@@ -422,7 +422,7 @@ export const routes = [{
 },
 {
 	path: '/reminders/add-reminder',
-	name: 'AddReminders',
+	name: 'AddReminder',
 	component: EditReminder,
 	meta: {
 		basePath: '/reminders',
@@ -432,7 +432,7 @@ export const routes = [{
 },
 {
 	path: '/reminders/:id',
-	name: 'EditReminders',
+	name: 'EditReminder',
 	component: EditReminder,
 	meta: {
 		basePath: '/reminders',
@@ -492,7 +492,7 @@ export const routes = [{
 },
 {
 	path: '/items',
-	name: 'Items',
+	name: 'CustomItems',
 	component: Items,
 	meta: {
 		basePath: '/items',

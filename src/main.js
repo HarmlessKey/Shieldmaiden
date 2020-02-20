@@ -13,6 +13,7 @@ import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import Element from 'element-ui';
+import HkTable from './components/hk-components/hk-table'
 import 'element-ui/lib/theme-chalk/index.css';
 
 const options = {
@@ -22,6 +23,7 @@ const options = {
 	}
 }
 
+Vue.component('hk-table', HkTable);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);

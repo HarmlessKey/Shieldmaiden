@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<Crumble :name="spell.name"/>
+		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
 	
 		<h1 class="spellTitle d-flex justify-content-between">
-			{{ spell.name }}
+			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="userInfo && userInfo.admin ">
 				<a v-if="!edit" @click="setEdit(!edit)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a>
 				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a>
@@ -94,7 +94,7 @@
 </template>
 
 <script>
-	import { db_dev, db } from '@/firebase'
+	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import SpellEdit from '@/components/contribute/spell/edit.vue'
 	import { mapGetters } from 'vuex'

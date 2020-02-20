@@ -15,7 +15,6 @@
 </template>
 
 <script>
-	import { db_dev } from '@/firebase'
 	import Footer from '@/components/Footer.vue'
 	import Crumble from '@/components/crumble/Compendium.vue'
 

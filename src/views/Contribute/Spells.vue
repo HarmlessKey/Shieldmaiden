@@ -113,7 +113,7 @@
 		firebase() {
 			return {
 				spells: {
-					source: db.ref('new_spells'),
+					source: db.ref('spells'),
 					readyCallback: () => this.isBusy = false
 				}
 			}
@@ -128,42 +128,6 @@
 			...mapActions([
 				'setSlide'
 			]),
-			saveSpells() {
-				this.adding = true
-
-				//Save all spells from the API in Firebase
-				for(let key in this.allSpells) {
-					let spell = this.allSpells[key]
-					// console.log(spell)
-
-					let id = spell._id
-
-					//REMOVE UNNEEDED SHIT
-					delete spell._id
-					delete spell.school.url
-					for(let key in spell.subclasses) {
-						delete spell.subclasses[key].url
-					}
-
-					for(let key in spell.classes) {
-						delete spell.classes[key].url
-					}
-
-					spell.url = encodeURI(spell.name)
-
-					//console.log(key, spell.name, 'Added')
-
-					db_dev.ref('spells/' + id).set(spell);
-				}
-				this.adding = false
-			},
-			getSpell() {
-				var id;
-				for(id = 1; id <= 319; id++) {
-					axios.get("http://www.dnd5eapi.co/api/spells/" + id)
-					.then(response => {this.allSpells.push(response.data)})
-				}
-			},
 			searchSpell() {
 				this.current = 1; //Set current page to 1
 				this.searchResults = [] //clear old search results

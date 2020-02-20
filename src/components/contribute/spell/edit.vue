@@ -75,7 +75,7 @@
 </template>
 
 <script>
-	import { db, db_dev } from '@/firebase'
+	import { db } from '@/firebase'
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import basicInfo from '@/components/contribute/spell/forms/basic-info.vue'
 	import spellActions from '@/components/contribute/spell/forms/spell-actions.vue'
@@ -144,7 +144,9 @@
 				// console.log(this.spell)
 				
 				// Parse simple values
-				this.spell.school = this.old_spell.school.name
+				this.$set(this.spell, 'name', this.old_spell.name);
+				// this.spell.name = this.old_spell.name;
+				this.spell.school = this.old_spell.school.name;
 				this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false
 				this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level
 				this.spell.level_scaling = (this.old_spell.higher_level) ? "undefined" : "None"
@@ -234,8 +236,7 @@
 				this.$forceUpdate();
 			},
 			store_spell() {
-				console.log(this.spell)
-
+				delete this.spell['.value']
 				delete this.spell['.key']
 				this.spell.changed = true
 				this.spell.checked = false

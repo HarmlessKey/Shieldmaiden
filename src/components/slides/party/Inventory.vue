@@ -36,7 +36,7 @@
 					<a @click="addNew = true"><i class="fas fa-plus green"></i></a>
 				</h2>
 				<div class="green mb-2" v-if="notify">{{ notify }}</div>
-				<HKtable 
+				<hk-table 
 					v-if="items"
 					:items="items"
 					:columns="itemColumns"
@@ -100,7 +100,7 @@
 							</div>
 						</template>
 					</div>
-				</HKtable>
+				</hk-table>
 			</template>
 		</template>
 		<AddItem v-else @close="closeAdd" />
@@ -110,14 +110,12 @@
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 	import ViewItem from '@/components/ViewItem.vue';
 	import AddItem from '@/components/slides/party/AddItem.vue';
 
 	export default {
 		mixins: [currencyMixin],
 		components: {
-			HKtable,
 			ViewItem,
 			AddItem
 		},

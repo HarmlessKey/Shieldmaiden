@@ -10,7 +10,7 @@
 				conditions from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
 			</p>
 
-			<HKtable
+			<hk-table
 				:items="conditions"
 				:columns="fields"
 				:perPage="15"
@@ -28,7 +28,7 @@
 				<div slot="table-busy" class="loader">
 					<span>Loading conditions....</span>
 				</div>
-			</HKtable>
+			</hk-table>
 		</template>
 	</div>
 	<Footer />
@@ -41,15 +41,13 @@
 	import Footer from '@/components/Footer.vue';
 	import Condition from '@/components/compendium/Condition.vue';
 	import { mapActions } from 'vuex';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 
 	export default {
 		name: 'Conditions',
 		components: {
 			Crumble,
 			Footer,
-			Condition,
-			HKtable
+			Condition
 		},
 		metaInfo: {
 			title: 'Conditions'

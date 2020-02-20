@@ -11,7 +11,7 @@
 		</div>
 		<template>
 			<h2 class="my-4">Items</h2>
-			<HKtable 
+			<hk-table 
 				v-if="items"
 				:items="items"
 				:columns="itemColumns"
@@ -40,7 +40,7 @@
 						</div>
 					</template>
 				</div>
-			</HKtable>
+			</hk-table>
 		</template>
 	</div>
 </template>
@@ -48,13 +48,11 @@
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
-	import HKtable from '@/components/hk-components/hk-table.vue';
 	import ViewItem from '@/components/ViewItem.vue';
 
 	export default {
 		mixins: [currencyMixin],
 		components: {
-			HKtable,
 			ViewItem
 		},
 		data() {

@@ -68,9 +68,11 @@
 <script>
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
+	import { remindersMixin } from '@/mixins/reminders';
 
 	export default {
 		name: 'Turns',
+		mixins: [remindersMixin],
 		props: ['active_len', 'current'],
 		data () {
 			return {
@@ -99,8 +101,7 @@
 				'update_round',
 				'set_targeted',
 				'setSlide',
-				'set_finished',
-				'set_targetReminder',
+				'set_finished'
 			]),
 			reload() {
 				this.$router.go();
@@ -117,55 +118,7 @@
 				this.set_turn({turn, round})
 				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
 				this.set_targeted({ e: 'untarget', key: 'all' });
-				this.reminders(this.current, 'endTurn')
-			},
-			reminders(target, trigger){
-				for(let key in target.reminders) {
-					if(target.reminders[key].trigger === trigger) {
-
-						//Buttons to remove or keep reminder
-						if(target.reminders[key].action != 'remove') {
-							var buttons = [
-								{ 
-									text: 'Keep Reminder', 
-									action: (toast) => { 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-								{ 
-									text: 'Remove', 
-									action: (toast) => { 
-										this.set_targetReminder({
-											action: 'remove',
-											entity: target.key,
-											key: key,
-										}); 
-										this.$snotify.remove(toast.id); 
-									}, bold: false
-								},
-							]
-						}
-						else {
-							buttons = ''
-						}
-
-						this.$snotify.warning(
-							target.name + ': ' + target.reminders[key].notify,
-							target.reminders[key].title, 
-							{
-								position: "centerCenter",
-								timeout: 0,
-								buttons
-							}
-						);
-						if(target.reminders[key].action == 'remove')
-						this.set_targetReminder({
-							action: 'remove',
-							entity: target.key,
-							key: key,
-						}); 
-					}
-				}
+				this.checkReminders(this.current, 'endTurn');
 			},
 			prevTurn() {
 				let turn = this.encounter.turn - 1

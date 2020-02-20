@@ -392,7 +392,7 @@ export const routes = [{
 },
 {
 	path: '/reminders/add-reminder',
-	name: 'AddReminders',
+	name: 'AddReminder',
 	component: EditReminder,
 	meta: {
 		basePath: '/reminders',
@@ -402,7 +402,7 @@ export const routes = [{
 },
 {
 	path: '/reminders/:id',
-	name: 'EditReminders',
+	name: 'EditReminder',
 	component: EditReminder,
 	meta: {
 		basePath: '/reminders',

@@ -42,7 +42,7 @@
 				</div>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
-						<span class="img" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 						<i v-else class="fas fa-user"></i>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right">

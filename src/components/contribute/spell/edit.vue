@@ -50,11 +50,11 @@
 				<b-col md="8" id="new_spell">
 					<div>
 						<a 
-						class="gray-hover text-capitalize mx-3" 
+						class="gray-hover text-capitalize mx-3" :class="spell.changed ? 'red': 'blue' " 
 						v-b-tooltip.hover title="Parse Old Spell" 
 						@click="parse_old_spell()">
-							<i class="fad fa-wand-magic blue"></i>
-							<span class="d-none d-md-inline ml-1 blue">Parse</span>
+							<i class="fad fa-wand-magic"></i>
+							<span class="d-none d-md-inline ml-1">{{ spell.changed ? 'Reset' : 'Parse' }}</span>
 						</a>
 						<a 
 						class="gray-hover text-capitalize mx-3" 
@@ -186,11 +186,9 @@
 					if (this.old_spell.components[i] == "M") {this.spell.components.material = true}
 				}
 				if (this.old_spell.material) {
-					this.spell.material_description = this.old_spell.material
+					this.spell.material_description = this.parse_spell_str(this.old_spell.material)
 					delete this.spell.material
 				}
-
-				
 
 				// Parse duration
 				// If a number in duration duration = concentration or time
@@ -218,6 +216,15 @@
 					this.spell.duration_type = duration_list.map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')
 				}
 
+				// Parse Description
+				let temp_desc = [...this.old_spell.desc]
+				this.spell.description = ""
+				for (let i in temp_desc) {
+					this.spell.description += this.parse_spell_str(temp_desc[i]);
+					if (i < temp_desc.length -1)
+						this.spell.description += "\n\n" // Add white line after each paragraph
+				}
+
 				// Parse classes
 				let classes = []
 				for (let index in this.old_spell.classes) {
@@ -229,9 +236,10 @@
 				delete this.spell.concentration
 				delete this.spell.duration
 				delete this.spell.higher_level
-				
 			},
-			
+			parse_spell_str(old_string) {
+				return old_string.replace('â€™', '\'');
+			},
 			update() {
 				this.$forceUpdate();
 			},

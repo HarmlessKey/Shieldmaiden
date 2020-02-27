@@ -1,187 +1,199 @@
 <template>
-<div class="grid">
-	<div class="container">
-
-		<!-- SPELL OVERVIEW -->
+	<div class="content">
 		<template v-if="!$route.params.id">
 			<Crumble />
-			<h1><i class="fas fa-wand-magic"></i> Spells</h1>
-			<p>
-				If you can't find a spell, 
-				it is because we are only allowed to store 
-				spells from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
-			</p>
+			<h2><i class="fas fa-wand-magic"></i> Contribute to Spells</h2>
 
-			<b-input-group class="mb-3">
-				<input class="form-control" autocomplete="off" type="text" v-model="search" @keyup="searchSpell()" placeholder="Search spells" />
-				<b-input-group-append>
-					<button class="btn" @click="searchSpell()"><i class="fas fa-search"></i></button>
-				</b-input-group-append>
-			</b-input-group>
+			<el-steps align-center>
+				<el-step title="Tag" description="Tag the spell you want to edit"></el-step>
+				<el-step title="Edit" description="Edit the spell"></el-step>
+				<el-step title="Finish" description="Set it to finished when done"></el-step>
+				<el-step title="Tag new" description="Tag the next spell"></el-step>
+			</el-steps>
 
-			<p v-if="noResult" class="red">{{ noResult }}</p>
-			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} spells found</p>
-
-			<b-table 
-				:busy="isBusy"
-				:items="searchResults" 
-				:fields="fields"
-				:per-page="15"
-				:current-page="current"
-			>
-				<template slot="index" slot-scope="data">
-					{{ data.index + 1 }}
-				</template>
-
-				<router-link :to="'spells/' + data.item['.key']" slot="name" slot-scope="data">{{ data.value }}</router-link>
-				<div slot="table-busy" class="loader">
-					<span>Loading spells....</span>
+			<div class="grid">
+				<div>
+					<div class="card">
+						<div class="card-header">
+							Untagged Spells
+							<span v-if="untaggedSpells">{{ Object.keys(untaggedSpells).length }}</span>
+						</div>
+						<div class="card-body">
+							<hk-table
+								:items="untaggedSpells"
+								:columns=untaggedColumns
+								:perPage="15"
+								:search="['name']"
+							>
+								<div slot="actions" slot-scope="data" class="actions">
+									<a 
+										v-if="Object.keys(taggedSpells).length === 0"
+										@click="tag(data.row['.key'], data.row.name)"
+										v-b-tooltip.hover title="Tag"
+									>
+										<i class="fas fa-plus"></i>
+									</a>
+								</div>
+							</hk-table>
+						</div>
+					</div>
 				</div>
-			</b-table>
-		
-			<b-pagination v-if="!isBusy && Object.keys(searchResults).length > 15" align="center" :total-rows="Object.keys(searchResults).length" v-model="current" :per-page="15" />
-			
-			<!-- <a class="btn btn-block" @click="saveSpells()">Copy Spells from API</a>
-			<ul>
-				<li v-for="(spell, index) in allSpells" :key="index">
-					{{ index + 1 }}. {{ spell.name }}
-				</li>
-			</ul> -->
-			</template>
 
-			<!-- WHEN A SPELL IS SELECTED -->
-			<template v-else> 
-				<Spell :id="$route.params.id" />
-			</template>
+				<div>
+					<div class="card">
+						<div class="card-header">
+							Your Tagged Spells
+							<span v-if="taggedSpells">{{ Object.keys(taggedSpells).length }}</span>
+						</div>
+						<div class="card-body">
+							<hk-table
+								:items="taggedSpells"
+								:columns="taggedColumns"
+							>
+								<router-link :to="'/contribute/spells/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+
+								<div slot="actions" slot-scope="data" class="actions">
+									<router-link 
+										:to="'/contribute/spells/' + data.row['.key']"
+										v-b-tooltip.hover title="Edit"
+									>
+										<i class="fas fa-pencil"></i>
+									</router-link>
+									<a 
+										@click="finish(data.row['.key'])"
+										v-b-tooltip.hover title="Finish"
+									>
+										<i class="fas fa-check"></i>
+									</a>
+									<a 
+										@click="unTag(data.row['.key'])"
+										v-b-tooltip.hover title="Untag"
+									>
+										<i class="fas fa-times"></i>
+									</a>
+								</div>
+							</hk-table>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="card">
+						<div class="card-header">
+							Finished Spells
+							<span v-if="finishedSpells">{{ Object.keys(finishedSpells).length }}</span>
+						</div>
+						<div class="card-body">
+							<hk-table
+								:items="finishedSpells"
+								:columns="untaggedColumns"
+								:perPage="15"
+								:search="['name']"
+							>
+							</hk-table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
 	</div>
-	<Footer />
-</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
-	import Footer from '@/components/Footer.vue'
-	import { mapActions } from 'vuex'
-	import Spell from '@/components/contribute/spell'
-	import axios from 'axios'
+	import { db } from '@/firebase';
+	import Crumble from '@/components/crumble/Compendium.vue';
+	import Footer from '@/components/Footer.vue';
+	import Spell from '@/components/compendium/Spell.vue';
 
 	export default {
 		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,
-			Spell,
+			Spell
 		},
 		metaInfo: {
 			title: 'Spells'
 		},
 		data() {
 			return {
-				id: this.$route.params.id,
-				current: 1,
-				fields: {
-          index: {
-            label: '#',
-					},
-          name: {
-            label: 'Name',
-            sortable: true
-					},
-          level: {
-            label: 'Level',
-            sortable: true
-					},
-					changed: {
-						label: 'Changed',
+				userId: this.$store.getters.getUser.uid,
+				untaggedColumns: {
+					name: {
+						label: 'Name',
 						sortable: true,
+						truncate: true
 					},
-					checked: {
-						label: 'Checked',
-						sortable: true,
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
 					}
 				},
-				search: '',
-				searching: '',
-				searchResults: [],
-				noResult: '',
-				isBusy: true,
-				spells: [],
-				allSpells: [],
+				taggedColumns: {
+					name: {
+						label: 'Name',
+						truncate: true
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
+					}
+				},
+				isBusy: true
 			}
 		},
 		firebase() {
 			return {
-				spells: {
-					source: db.ref('spells'),
-					readyCallback: () => this.isBusy = false
-				}
+				untaggedSpells: db.ref('spells').orderByChild('metadata/tagged').equalTo(null),
+				taggedSpells: db.ref('new_spells').orderByChild('metadata/tagged').equalTo(this.userId),
+				finishedSpells: db.ref('new_spells').orderByChild('metadata/finished').equalTo(true)
 			}
 		},
-		mounted() {
-			// this.getSpell()
-		},
-		beforeMount() {
-			this.searchResults = this.spells
-		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchSpell() {
-				this.current = 1; //Set current page to 1
-				this.searchResults = [] //clear old search results
-				this.searching = true // shows someone is searching
-
-				//loop over all spells
-				for (var i in this.spells) {
-					var m = this.spells[i]
-
-					//if the name of a spell contains the search words, add it to search results
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
+			tag(key, name) {
+				db.ref(`spells/${key}`).update({
+					metadata: {
+						tagged: this.userId
 					}
-				}
-				// If there are no results, show this
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-				// if someons is not searching anymore, all spells need to be shown
-				if(this.search == '') {
-					this.searchResults = this.spells
-					this.searching = false
-				}
+				});
+				db.ref(`new_spells/${key}`).update({
+					name,
+					metadata: {
+						tagged: this.userId
+					}
+				});
 			},
-			// showSlide(monster) {
-			// 	this.setSlide({
-			// 		show: true,
-			// 		type: 'npc',
-			// 		entity: monster
-			// 	})
-			// },
+			unTag(key) {
+				db.ref(`new_spells/${key}/metadata/tagged`).remove();
+				db.ref(`spells/${key}/metadata/tagged`).remove();
+			},
+			finish(key) {
+				db.ref(`new_spells/${key}/metadata/finished`).set(true);
+				db.ref(`new_spells/${key}/metadata/tagged`).remove();
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.grid {
-	height: calc(100vh - 50px) !important;
-	display: grid;
-	grid-template-columns: auto;
-	grid-template-rows: 3fr 1fr;
-	grid-gap: 0;
-	grid-template-areas: 
-	"container"
-	"footer";
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-template-rows: auto;
+		grid-gap: 20px;
 
-	.container {
-		padding-top: 30px;
-		padding-bottom: 50px;
-		line-height: 25px;
-		font-size: 15px; 
-		font-weight: lighter;
+		.card {
+			.card-header {
+				display: flex;
+				justify-content: space-between
+			}
+			.card-body {
+				padding: 10px;
+			}
+		}
 	}
-}
-
 </style>

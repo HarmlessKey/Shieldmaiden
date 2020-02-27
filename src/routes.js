@@ -11,6 +11,7 @@ const Conditions = () => import('@/views/Compendium/Conditions.vue');
 const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
+const Spell_contrib = () => import('@/components/contribute/spell');
 const Contribute = () => import('@/views/Contribute');
 
 const Sitemap = () => import('@/views/Sitemap.vue');
@@ -122,28 +123,36 @@ export const routes = [{
 
 // CONTRUBUTE
 {
-	path: '/admin/contribute',
+	path: '/contribute',
 	name: 'Contribute',
-	component: Contribute
+	component: Contribute,
+	meta: {
+		requiresContribute: true,
+		requiresAuth: true
+	}
 },
 {
-	path: '/admin/contribute/spells',
+	path: '/contribute/spells',
 	name: 'Contribute Spells',
 	component: Spells_contrib,
 	meta: {
 		baseName: 'Spells',
+		requiresContribute: true,
+		requiresAuth: true
 	}
 },
 {
-	path: '/admin/contribute/spells/:id',
+	path: '/contribute/spells/:id',
 	name: 'Contribute Spell',
-	component: Spells_contrib,
+	component: Spell_contrib,
 	props: (route) => ({
 		id: route.query.id,
 	}),
 	meta: {
 		basePath: '/contribute',
 		baseName: 'Spells',
+		requiresContribute: true,
+		requiresAuth: true
 	}
 },
 

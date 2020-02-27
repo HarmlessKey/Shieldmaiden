@@ -1355,3 +1355,19 @@ input[type='number'] {
 .form-control:disabled {
 	opacity: 0.25 !important;
 }
+
+/* 10. Elements overrides */
+/*********************************************/
+.el-steps {
+	margin-bottom: 30px;
+
+	.el-step {
+		.el-step__line {
+			background-color: $gray-light;
+		}
+		.el-step__icon {
+			background-color: $gray-dark;
+			color: $gray-light;
+		}
+	}
+}

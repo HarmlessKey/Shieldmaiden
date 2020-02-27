@@ -65,6 +65,7 @@ router.beforeEach((to, from, next) => {
 	const currentUser = auth.currentUser; //Check if there is a user
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
 	const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
+	const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
 
 	//Check if someone is logged in and if Auth is needed
 	if (requiresAuth && !currentUser) {
@@ -73,13 +74,14 @@ router.beforeEach((to, from, next) => {
 		//Auth is needed and there is a user
 
 		//GET USER
-		//DOESN'T SEEM TO WORK TROUGHT STORE, SO DIRECTLY FROM FIREBASE
+		//DOESN'T SEEM TO WORK TROUGH STORE, SO DIRECTLY FROM FIREBASE
 		var user = db.ref(`users/${currentUser.uid}`);
 		user.on('value' , (snapshot) => {
 
 			//Check if user data exists
 			if(snapshot.val()) {
 				let admin = snapshot.val().admin
+				let contribute = snapshot.val().contribute
 				let username = snapshot.val().username
 
 				//Force to input a username
@@ -87,12 +89,12 @@ router.beforeEach((to, from, next) => {
 					next('/set-username');
 				} else {
 					//CHECK FOR ADMIN
-					if(requiresAdmin && !admin) {
+					if(requiresAdmin && !admin || requiresContribute && !contribute) {
 						next('/404');
-					} else if(requiresAdmin && admin) {
+					} else if((requiresAdmin && admin || requiresContribute && admin) || requiresContribute && contribute) {
 						next();
 					} else {
-						next(); //No admin pages can be visited
+						next(); //No admin/contribute pages can be visited
 					}
 				}
 			} else {

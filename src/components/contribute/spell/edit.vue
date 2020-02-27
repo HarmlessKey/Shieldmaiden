@@ -144,7 +144,7 @@
 				// console.log(this.spell)
 				
 				// Parse simple values
-				this.$set(this.spell, 'name', this.old_spell.name);
+				// this.$set(this.spell, 'name', this.old_spell.name);
 				// this.spell.name = this.old_spell.name;
 				this.spell.school = this.old_spell.school.name;
 				this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false
@@ -239,13 +239,15 @@
 				}
 				this.spell.classes = classes
 
+				this.store_spell();
+
 				// Clean up spell object
 				// delete this.spell.concentration
 				// delete this.spell.duration
 				// delete this.spell.higher_level
 			},
 			parse_spell_str(old_string) {
-				return old_string.replace(/â€™/g, '\'');
+				return old_string.replace(/â€™/g, '\'').replace(/â€�/g, '\"').replace(/â€œ/g, '\"');
 			},
 			update() {
 				this.$forceUpdate();

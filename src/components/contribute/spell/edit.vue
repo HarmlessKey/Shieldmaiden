@@ -218,19 +218,19 @@
 
 				// Parse Description
 				this.spell.description = ""
-				// console.log(this.old_spell)
-				// for (let i in this.old_spell.desc) {
-				// 	// console.log((i))
-				// 	// console.log((i !== '0'))
-				// 	if (i != 0)
-				// 		this.spell.description += "\n\n" // Add white line before each paragraph after first
-				// 	this.spell.description += this.parse_spell_str(this.old_spell.desc[i]);
-				// }
+				console.log(this.old_spell)
+				for (let i in this.old_spell.desc) {
+					// console.log((i))
+					// console.log((i !== '0'))
+					if (i != 0)
+						this.spell.description += "\n\n" // Add white line before each paragraph after first
+					this.spell.description += this.parse_spell_str(this.old_spell.desc[i]);
+				}
 
-				// for (let i in this.old_spell.higher_level) {
-				// 	this.spell.description += "\n\n" // Add white line after each paragraph
-				// 	this.spell.description += this.parse_spell_str(this.old_spell.higher_level[i]);
-				// }
+				for (let i in this.old_spell.higher_level) {
+					this.spell.description += "\n\n" // Add white line after each paragraph
+					this.spell.description += this.parse_spell_str(this.old_spell.higher_level[i]);
+				}
 
 				// Parse classes
 				let classes = []

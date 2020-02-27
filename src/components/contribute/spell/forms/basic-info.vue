@@ -265,7 +265,7 @@
 			</b-row>
 			<b-row>
 				<!-- DESCRIPTION -->
-				<b-col md="8">
+				<b-col md="6">
 					<label for="description">Description</label>
 					<b-form-textarea v-model="spell.description"
 						id="description"
@@ -276,9 +276,16 @@
 						data-vv-as="Description"
 						rows="6"></b-form-textarea>
 						<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+					
 				</b-col>
+				<b-col md="6">
+					<label for="description_preview">Preview</label>
+					<pre name="description_preview">{{ spell.description }}</pre>
+				</b-col>
+			</b-row>
+			<b-row>
 				<!-- CLASS SELECTOR -->
-				<b-col md="4" v-if="spell.classes">
+				<b-col md="12" v-if="spell.classes">
 					<label for="classes">Classes</label>
 					<b-form-select v-model="spell.classes"
 						id="classes"
@@ -336,16 +343,16 @@
 </template>
 
 <script>
+
 export default {
 
-  name: 'basic-info',
-  props: {
-  	value: Object,
-  	levels: Array,
-  },
-
-  data() {
-    return {
+	name: 'basic-info',
+	props: {
+		value: Object,
+		levels: Array,
+	},
+	data() {
+		return {
 			schools: [
 				"Abjuration","Conjuration",
 				"Divination","Enchantment",
@@ -364,10 +371,11 @@ export default {
 			classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 
 				"Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"],
 			classes_selected: null,
-    };
-  },
-  methods: {
-  	setComponent(comp) {
+
+		};
+	},
+	methods: {
+		setComponent(comp) {
 			if (Object.keys(this.spell.components)[0]=="0") {
 				this.spell.components = {'verbal':0,'somatic':0,'material':0}
 			}
@@ -380,18 +388,18 @@ export default {
 			}
 			this.spell.ritual = !this.spell.ritual
 		},
-  },
-  computed: {
-  	spell: {
-  		get(){
-  			return this.value;
-  		},
-  		set(newValue) {
-  			this.$emit("input", newValue);
-  			return newValue;
-  		}
-  	}
-  },
+	},
+	computed: {
+		spell: {
+			get(){
+				return this.value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+				return newValue;
+			}
+		}
+	},
 };
 </script>
 
@@ -410,6 +418,16 @@ export default {
 }
 .component_box.selected {
 	background: #2c97de;
+}
+
+pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    font-family: inherit;
+    text-align: justify;
 }
 
 </style>

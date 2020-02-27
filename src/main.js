@@ -89,10 +89,14 @@ router.beforeEach((to, from, next) => {
 					next('/set-username');
 				} else {
 					//CHECK FOR ADMIN
-					if(requiresAdmin && !admin || requiresContribute && !contribute) {
+					if(requiresAdmin && !admin) {
 						next('/404');
-					} else if((requiresAdmin && admin || requiresContribute && admin) || requiresContribute && contribute) {
-						next();
+					} else if(requiresContribute) {
+						if(!contribute && !admin) {			
+							next('/404');
+						} else {
+							next();
+						}
 					} else {
 						next(); //No admin/contribute pages can be visited
 					}

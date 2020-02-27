@@ -60,7 +60,7 @@
 										<i class="fas fa-pencil"></i>
 									</router-link>
 									<a 
-										@click="finish(data.row['.key'])"
+										@click="confirmFinish(data.row['.key'], data.row.name)"
 										v-b-tooltip.hover title="Finish"
 									>
 										<i class="fas fa-check"></i>
@@ -170,6 +170,14 @@
 			unTag(key) {
 				db.ref(`new_spells/${key}/metadata/tagged`).remove();
 				db.ref(`spells/${key}/metadata/tagged`).remove();
+			},
+			confirmFinish(key, name) {
+				this.$snotify.error('Are you sure you\'ve finished the item "' + name + '"? Make sure not to set incomplete items to finised.', 'Finish Item', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { this.finish(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
 			},
 			finish(key) {
 				db.ref(`new_spells/${key}/metadata/finished`).set(true);

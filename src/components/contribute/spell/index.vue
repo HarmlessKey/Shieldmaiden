@@ -1,15 +1,15 @@
 <template>
-	<div>
+	<div class="content">
 		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
 	
-		<h1 class="spellTitle d-flex justify-content-between">
+		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
-			<span v-if="userInfo && userInfo.admin ">
+			<span v-if="userInfo && (userInfo.admin || userInfo.contribute)">
 				<a v-if="!edit" @click="setEdit(!edit)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a>
 				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a>
-				<a @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a>
+				<a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a>
 			</span>
-		</h1>
+		</h2>
 
 		<template v-if="!edit">
 			<!-- SHOW THE OLD SPELL IF SPELL IS NOT CHANGED YET -->
@@ -106,13 +106,9 @@
 			SpellEdit,
 		},
 		props: ['id'],
-		beforeMount() {
-			//Because the component is loaded
-			//in another view, the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
 		data() {
 			return {
+				spellId: this.$route.params.id,
 				edit: false,
 				loading: true,
 				levels: {
@@ -145,12 +141,12 @@
 		firebase() {
 			return {
 				oldSpell: {
-					source: db.ref(`spells/${this.id}`),
+					source: db.ref(`spells/${this.spellId}`),
 					asObject: true,
 					readyCallback: () => this.loading = false
 				},
 				spell: {
-					source: db.ref(`new_spells/${this.id}`),
+					source: db.ref(`new_spells/${this.spellId}`),
 					asObject: true,
 					readyCallback: () => this.loading = false
 				}

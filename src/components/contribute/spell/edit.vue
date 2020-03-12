@@ -250,17 +250,29 @@
 				// delete this.spell.duration
 				// delete this.spell.higher_level
 			},
-			parse_spell_str(old_string) {
+			parse_spell_str(text) {
+				// console.log(text);
 				// map to replace weird character with real character 
-				let replace_map = [
-					[/â€™/g, '\''],
-					[/â€�/g, '\"'],
-					[/â€œ/g, '\"'],
+				let rules = [
+					{
+						regex: /â€™/g,
+						replacement: '\'',
+					},
+					{
+						regex: /â€�/g,
+						replacement: '\"'
+					},
+					{
+						regex: /â€œ/g,
+						replacement: '\"'
+					},
 				];
-				for (let i in replace_map){
-					old_string = old_string.replace(...replace_map[i]);
-				}
-				return old_string;
+
+				rules.forEach(function(rule) {
+					text = text.replace(rule.regex, rule.replacement);
+				});
+
+				return text.trim();
 			},
 			update() {
 				this.$forceUpdate();

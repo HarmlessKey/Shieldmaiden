@@ -69,7 +69,7 @@
 						data-vv-as="Spell School">
 						<option value="undefined" disabled>- Select School -</option>
 						<option v-for="(s) in schools"
-							:key="s" :value="s.value">{{ s.label }}</option>
+							:key="s.value" :value="s.value">{{ s.label }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
 				</b-col>
@@ -85,7 +85,7 @@
 						name="cast_time_nr"
 						class="form-control mb-2"
 						title="Casting Time"
-						v-validate="'required'"
+						v-validate="'required|numeric'"
 						type="number"
 						data-vv-as="Cast Time"
 						></b-form-input>
@@ -247,10 +247,13 @@
 						autocomplete="off"
 						id="duration_n"
 						name="duration_n"
+						v-validate="'numeric'"
 						class="form-control mb-2"
 						title="Duration #"
 						type="text"
+						data-vv-as="Duriation #"
 						></b-form-input>
+						<p class="validate red" v-if="errors.has('duration_n')">{{ errors.first('duration_n') }}</p>
 				</b-col>
 				<!-- DURATION SCALE -->
 				<b-col md="6">

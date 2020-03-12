@@ -270,6 +270,14 @@
 				delete this.spell['.key'];
 				this.spell.changed = true;
 				this.spell.checked = false;
+
+				if(this.spell.cast_time_nr) {
+					parseInt(this.spell.cast_time_nr);
+				}
+				if(this.spell.duration_n) {
+					parseInt(this.spell.duration_n);
+				}
+
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`new_spells/${this.id}`).set(this.spell);

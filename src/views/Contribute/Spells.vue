@@ -59,6 +59,9 @@
 									>
 										<i class="fas fa-pencil"></i>
 									</router-link>
+									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
+										<i class="fas fa-eye"></i>
+									</a>
 									<a 
 										@click="confirmFinish(data.row['.key'], data.row.name)"
 										v-b-tooltip.hover title="Finish"
@@ -90,6 +93,11 @@
 								:perPage="15"
 								:search="['name']"
 							>
+								<div slot="actions" slot-scope="data" class="actions">		
+									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
+										<i class="fas fa-eye"></i>
+									</a>
+								</div>
 							</hk-table>
 						</div>
 					</div>
@@ -104,13 +112,16 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
+	import ViewSpell from '@/components/ViewMonster.vue';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,
-			Spell
+			Spell,
+			ViewSpell
 		},
 		metaInfo: {
 			title: 'Spells'
@@ -154,6 +165,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			tag(key, name) {
 				db.ref(`spells/${key}`).update({
 					metadata: {

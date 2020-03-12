@@ -139,7 +139,6 @@
 		},
 		methods: {
 			parse_old_spell() {
-				console.log(old_spell);
 				// Parse values from old_spell object to new spell object
 				// console.log(this.old_spell)
 				// console.log(this.spell)
@@ -147,7 +146,7 @@
 				// Parse simple values
 				// this.$set(this.spell, 'name', this.old_spell.name);
 				// this.spell.name = this.old_spell.name;
-				this.spell.school = this.old_spell.school.name;
+				this.spell.school = this.old_spell.school.name.toLowerCase();
 				this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false;
 				this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level;
 				this.spell.level_scaling = (this.old_spell.higher_level) ? "undefined" : "None";
@@ -170,9 +169,8 @@
 				// Parse casting time
 				let cast_time = this.old_spell.casting_time.split(' ');
 				this.spell.cast_time_nr = parseInt(cast_time[0]);
-				let cast_type =  cast_time.slice(1)
-							 									  .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-							 									  .join(' ');
+				let cast_type =  cast_time[1];
+																	 
 				if (cast_type[cast_type.length -1] == 's') {
 					cast_type = cast_type.substring(0, cast_type.length - 1);
 				}

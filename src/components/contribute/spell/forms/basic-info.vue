@@ -328,7 +328,7 @@
 				<!-- SOURCE BOOK -->
 				<b-col md="5">
 					<label for="source">Source</label>
-					<b-form-input v-model="spell.page"
+					<b-form-input v-model="spell.source"
 						autocomplete="off"
 						id="source"
 						name="source"

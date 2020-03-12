@@ -1,7 +1,7 @@
 <template>
 	<div class="spell">
 		<div class="spell__title">
-			<h3>{{ spell.name }}</h3>
+			<h3>{{ spell.name }} <span class="source gray-hover">{{ spell.source }}</span></h3>
 			<i>{{ spell.level | numeral('0o') }}-level {{ spell.school }}</i>
 		</div>
 
@@ -112,6 +112,10 @@
 
 		h3 {
 			margin-bottom: 5px;
+
+			.source {
+				font-size: 12px;
+			}
 		}
 	}
 	&__info {

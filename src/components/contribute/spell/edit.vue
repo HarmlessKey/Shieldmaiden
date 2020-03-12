@@ -247,7 +247,16 @@
 				// delete this.spell.higher_level
 			},
 			parse_spell_str(old_string) {
-				return old_string.replace(/â€™/g, '\'').replace(/â€�/g, '\"').replace(/â€œ/g, '\"');
+				// map to replace weird character with real character 
+				let replace_map = [
+					[/â€™/g, '\''],
+					[/â€�/g, '\"'],
+					[/â€œ/g, '\"'],
+				];
+				for (let i in replace_map){
+					old_string = old_string.replace(...replace_map[i]);
+				}
+				return old_string;
 			},
 			update() {
 				this.$forceUpdate();

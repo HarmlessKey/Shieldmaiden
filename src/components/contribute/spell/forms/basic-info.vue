@@ -38,6 +38,7 @@
 					</b-form-input>
 					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 				</b-col>
+
 				<!-- LEVEL -->
 				<b-col md="3">
 					<label for="spell_level">Level</label>
@@ -55,6 +56,7 @@
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('spell_level')">{{ errors.first('pper') }}</p>
 				</b-col>
+
 				<!-- SCHOOL -->
 				<b-col md="3">
 					<label for="spell_school">School</label>
@@ -66,12 +68,13 @@
 						v-validate="'required'"
 						data-vv-as="Spell School">
 						<option value="undefined" disabled>- Select School -</option>
-						<option v-for="(s,i) in schools"
-							:key="s" :value="s">{{s}}</option>
+						<option v-for="(s) in schools"
+							:key="s" :value="s.value">{{ s.label }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
 				</b-col>
 			</b-row>
+
 			<b-row>
 				<!-- CAST TIME -->
 				<b-col md="2">
@@ -88,6 +91,7 @@
 						></b-form-input>
 						<p class="validate red" v-if="errors.has('cast_time_nr')">{{ errors.first('cast_time_nr') }}</p>
 				</b-col>
+
 				<!-- CAST TIME TYPE -->
 				<b-col md="3">
 					<label for="cast_time_nr">Cast Type</label>
@@ -99,8 +103,8 @@
 						v-validate="'required'"
 						data-vv-as="Casting Type">
 						<option value="undefined" disabled>- Casting Type -</option>
-						<option v-for="(t,i) in cast_time"
-							:key="t" :value="t">{{t}}</option>
+						<option v-for="(t) in cast_time"
+							:key="t.value" :value="t.value">{{t.label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('cast_time_type')">{{ errors.first('cast_time_type') }}</p>
 					
@@ -259,7 +263,7 @@
 						class="form-control mb-2">
 						<option value="undefined">- Time Scale -</option>
 						<option v-for="(val,i) in dur_time"
-							:key="i" :value="val">{{val}}</option>
+							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
 					</b-form-select>
 				</b-col>
 			</b-row>
@@ -354,18 +358,40 @@ export default {
 	data() {
 		return {
 			schools: [
-				"Abjuration","Conjuration",
-				"Divination","Enchantment",
-				"Evocation","Illusion",
-				"Necromancy","Transmutation"],
+				{ label: "Abjuration", value: "abjurdation" },
+				{ label: "Conjuration", value: "conjuration" },
+				{ label: "Divination", value: "divination" },
+				{ label: "Enchantment", value: "enchantment" },
+				{ label: "Evocation", value: "evocation" },
+				{ label: "Illusion", value: "illusion" },
+				{ label: "Necromancy", value: "necromancy" },
+				{ label: "Transmutation", value: "transmutation" }
+			],
 			cast_time: [
-				"Action", "Bonus Action", "Reaction", 
-				"Minute", "Hour", "No Action", "Special"],
+				{ label: "Action", value: "action" },
+				{ label: "Bonus Action", value: "bonus action" }, 
+				{ label: "Reaction", value: "reaction" }, 
+				{ label: "Minute", value: "minute" }, 
+				{ label: "Hour", value: "hour" }, 
+				{ label: "No Action", value: "no action" }, 
+				{ label: "Special", value: "special" }
+			],
 			range_type: ["Self", "Touch", "Ranged", "Sight", "Unlimited"],
-			dur_type: ["Concentration", "Instantaneous", "Special",
-			 "Time", "Until Dispelled", "Until Dispelled or Triggered"],
+			dur_type: [
+				"Concentration", 
+				"Instantaneous", 
+				"Special",
+				"Time", 
+				"Until Dispelled", 
+				"Until Dispelled or Triggered"
+			],
 			dur_type_time: ["Concentration", "Time"],
-			dur_time: ["Round", "Minute", "Hour", "Day"],
+			dur_time: [
+				{ label: "Round", value: "round" },
+				{ label: "Minute", value: "minute" },
+				{ label: "Hour", value: "hour" },
+				{ label: "Day", value: "day" }
+			],
 			aoe_type: ["None", "Cone", "Cube", "Cylinder", "Line", "Sphere", "Square", "Square Feet"],
 			lvl_scaling: ["None", "Character Level", "Spell Scale", "Spell Level"],
 			classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 

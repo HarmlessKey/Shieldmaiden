@@ -294,7 +294,7 @@
 				</b-col>
 				<b-col md="6">
 					<label for="description_preview">Preview</label>
-					<pre name="description_preview">{{ spell.description }}</pre>
+					<div name="description_preview" v-html="parseMarkdown(spell.description)"></div>
 				</b-col>
 			</b-row>
 			<b-row>
@@ -358,6 +358,8 @@
 
 <script>
 
+import { hkMarkdown } from "@/mixins/hk-markdown.js"
+
 export default {
 
 	name: 'basic-info',
@@ -365,6 +367,7 @@ export default {
 		value: Object,
 		levels: Array,
 	},
+	mixins: [hkMarkdown],
 	data() {
 		return {
 			schools: [

@@ -282,8 +282,15 @@
 						v-validate="'required'"
 						data-vv-as="Description"
 						rows="6"></b-form-textarea>
-						<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
-					
+					<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+
+					<label for="higher_level">At higher levels</label>
+					<b-form-textarea v-model="spell.higher_level"
+						id="higher_level"
+						name="higher_level"
+						title="higher_level"
+						class="form-control mb-2"
+						rows="3"></b-form-textarea>
 				</b-col>
 				<b-col md="6">
 					<label for="description_preview">Preview</label>

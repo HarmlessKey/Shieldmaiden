@@ -228,9 +228,9 @@
 					this.spell.description += this.parse_spell_str(this.old_spell.desc[i]);
 				}
 
+				this.spell.higher_level = "";
 				for (let i in this.old_spell.higher_level) {
-					this.spell.description += "\n\n"; // Add white line after each paragraph
-					this.spell.description += this.parse_spell_str(this.old_spell.higher_level[i]);
+					this.spell.higher_level += this.parse_spell_str(this.old_spell.higher_level[i]);
 				}
 
 				// Parse classes

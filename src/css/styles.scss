@@ -1371,3 +1371,32 @@ input[type='number'] {
 		}
 	}
 }
+
+.el-input {
+	.el-input__inner {
+			background-color: $gray-dark;
+			border-radius: 0;
+			border: none;
+	}
+}
+
+.el-select {
+	.el-select__tags {
+		.el-tag {
+			background-color: $gray-light;
+			color: $gray-dark;
+
+			.el-tag__close {
+				background-color: $gray;
+
+				&:hover {
+					background-color: $gray-dark;
+				}
+			}
+		}
+	}
+}
+
+.el-select-dropdown {
+
+}

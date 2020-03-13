@@ -140,8 +140,7 @@
 		methods: {
 			parse_old_spell() {
 				// Parse values from old_spell object to new spell object
-				// console.log(this.old_spell)
-				// console.log(this.spell)
+
 				
 				// Parse simple values
 				// this.$set(this.spell, 'name', this.old_spell.name);

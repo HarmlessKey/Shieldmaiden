@@ -177,8 +177,9 @@
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('range_type')">{{ errors.first('range_type') }}</p>
 				</b-col>
+
 				<!-- RANGE -->
-				<b-col md="3">
+				<b-col md="4">
 					<label for="range">Range ft.</label>
 					<b-form-input v-model="spell.range"
 						:disabled="spell.range_type!='Ranged'"
@@ -191,8 +192,31 @@
 						data-vv-as="Range"
 						></b-form-input>
 				</b-col>
+
+				<!-- CLASSES -->
+				<b-col md="4" v-if="spell.classes">
+					<label for="classes">Classes</label>
+					<div>
+						<el-select
+							v-model="spell.classes"
+							multiple
+							collapse-tags
+							filterable
+    					allow-create
+							placeholder="Classes">
+							<el-option
+								v-for="item in classes"
+								:key="item"
+								:label="item"
+								:value="item">
+							</el-option>
+						</el-select>
+					</div>
+				</b-col>
+			</b-row>		
+			<b-row>
 				<!-- DURATION -->
-				<b-col md="5">
+				<b-col md="4">
 					<label for="duration_type">Duration Type</label>
 					<b-form-select v-model="spell.duration_type"
 						id="duration_type"
@@ -206,6 +230,38 @@
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('duration_type')">{{ errors.first('duration_type') }}</p>
+				</b-col>
+
+				<!-- DURATION N -->
+				<b-col md="4">
+					<label for="duration_n">Duration #</label>
+					<b-form-input v-model="spell.duration_n"
+						:disabled="!dur_type_time.includes(spell.duration_type)"
+						autocomplete="off"
+						id="duration_n"
+						name="duration_n"
+						v-validate="'numeric'"
+						class="form-control mb-2"
+						title="Duration #"
+						type="text"
+						data-vv-as="Duriation #"
+						></b-form-input>
+						<p class="validate red" v-if="errors.has('duration_n')">{{ errors.first('duration_n') }}</p>
+				</b-col>
+
+				<!-- DURATION SCALE -->
+				<b-col md="4">
+					<label for="duration_scale">Time Scale</label>
+					<b-form-select v-model="spell.duration_scale"
+						:disabled="!dur_type_time.includes(spell.duration_type)"
+						id="duration_scale"
+						name="duration_scale"
+						title="Time Scale"
+						class="form-control mb-2">
+						<option value="undefined">- Time Scale -</option>
+						<option v-for="(val,i) in dur_time"
+							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
+					</b-form-select>
 				</b-col>
 			</b-row>
 			<b-row>
@@ -239,38 +295,6 @@
 				</b-col>
 			</b-row>
 			<b-row>
-				<!-- DURATION N -->
-				<b-col md="6">
-					<label for="duration_n">Duration #</label>
-					<b-form-input v-model="spell.duration_n"
-						:disabled="!dur_type_time.includes(spell.duration_type)"
-						autocomplete="off"
-						id="duration_n"
-						name="duration_n"
-						v-validate="'numeric'"
-						class="form-control mb-2"
-						title="Duration #"
-						type="text"
-						data-vv-as="Duriation #"
-						></b-form-input>
-						<p class="validate red" v-if="errors.has('duration_n')">{{ errors.first('duration_n') }}</p>
-				</b-col>
-				<!-- DURATION SCALE -->
-				<b-col md="6">
-					<label for="duration_scale">Time Scale</label>
-					<b-form-select v-model="spell.duration_scale"
-						:disabled="!dur_type_time.includes(spell.duration_type)"
-						id="duration_scale"
-						name="duration_scale"
-						title="Time Scale"
-						class="form-control mb-2">
-						<option value="undefined">- Time Scale -</option>
-						<option v-for="(val,i) in dur_time"
-							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
-					</b-form-select>
-				</b-col>
-			</b-row>
-			<b-row>
 				<!-- DESCRIPTION -->
 				<b-col md="6">
 					<label for="description">Description</label>
@@ -295,21 +319,6 @@
 				<b-col md="6">
 					<label for="description_preview">Preview</label>
 					<div name="description_preview" v-html="parseMarkdown(spell.description)"></div>
-				</b-col>
-			</b-row>
-			<b-row>
-				<!-- CLASS SELECTOR -->
-				<b-col md="12" v-if="spell.classes">
-					<label for="classes">Classes</label>
-					<b-form-select v-model="spell.classes"
-						id="classes"
-						name="classes"
-						title="Classes" 
-						multiple size="6"
-						class="form-control mb-2">
-						<option v-for="(val,i) in classes"
-							:key="i" :value="val">{{val}}</option>
-					</b-form-select>
 				</b-col>
 			</b-row>
 			<b-row class="d-flex spell_row">
@@ -457,6 +466,9 @@ export default {
 }
 .component_box.selected {
 	background: #2c97de;
+}
+.row {
+	margin-bottom: 20px;
 }
 
 pre {

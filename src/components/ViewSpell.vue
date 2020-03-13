@@ -2,19 +2,23 @@
 	<div class="spell">
 		<div class="spell__title">
 			<h3>{{ spell.name }} <span class="source gray-hover">{{ spell.source }}</span></h3>
-			<i>{{ spell.level | numeral('0o') }}-level {{ spell.school }}</i>
+			<i>
+				<template v-if="spell.level === 0">Cantrip </template>
+				<template v-else>{{ spell.level | numeral('0o') }} </template>
+				{{ spell.school }}
+			</i>
 		</div>
 
 		<div class="spell__info">
 			<b>Casting time:</b> {{ spell.cast_time_nr }} {{spell.cast_time_type }}<br/>
 			<b>Range:</b> {{ range }}<br/>
-			<b>Components:</b>
-			<template v-for="(component, index) in spell.components">
-					{{ component }}<template v-if="Object.keys(spell.components).length > index + 1">, </template>
-				</template>
-				<template v-if="spell.material"> ({{ spell.material }})</template>
-				<br/>
-				<b>Duration:</b> {{ duration }}<br/>
+			<b>Components: </b>
+			<template v-if="spell.components.verbal">V </template>
+			<template v-if="spell.components.somatic">S </template>
+			<template v-if="spell.components.material">M </template>
+			{{ spell.material_description ? `(${spell.material_description})` : "" }}
+			<br/>
+			<b>Duration:</b> {{ duration }}<br/>
 				<template v-if="spell.classes">
 					<b>Classes:</b> 
 					<template v-for="(_class, index) in spell.classes">
@@ -30,24 +34,26 @@
 			</div>
 		</div>
 
-		<div class="actions">
+		<div class="actions" v-if="spell.actions">
 			<h4>Roll spell</h4>
 
-			<p>Select level</p>
-			<div class="actions__levels">
-				<div 
-					class="level"
-					:class="{ 
-						selected: selectedLevel === i,
-						disabled: i < spell.level
-					}"
-					v-for="i in 9"
-					:key="i"
-					@click="(spell.level <= i) ? selectLevel(i) : null"
-				>
-					{{ i }}
+			<template v-if="spell.level > 0">
+				<p>Select level</p>
+				<div class="actions__levels">
+					<div 
+						class="level"
+						:class="{ 
+							selected: selectedLevel === i,
+							disabled: i < spell.level
+						}"
+						v-for="i in 9"
+						:key="i"
+						@click="(spell.level <= i) ? selectLevel(i) : null"
+					>
+						{{ i }}
+					</div>
 				</div>
-			</div>
+			</template>
 		</div>
 
 		<pre>

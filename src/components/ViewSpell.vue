@@ -38,7 +38,7 @@
 			<h4>Roll spell</h4>
 
 			<template v-if="spell.level > 0">
-				<p>Select level</p>
+				<p>Select cast level</p>
 				<div class="actions__levels">
 					<div 
 						class="level"
@@ -54,6 +54,8 @@
 					</div>
 				</div>
 			</template>
+
+			<a class="btn btn-block mt-3" @click="rollSpell(spell, selectedLevel)">Roll</a>
 		</div>
 
 		<pre>
@@ -63,10 +65,12 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { db } from '@/firebase';
+	import { spells } from '@/mixins/spells.js';
 
 	export default {
 		name: 'Spell',
+		mixins: [spells],
 		props: [
 		'data'
 		],

@@ -91,7 +91,7 @@
 								@change="$forceUpdate()">
 								<!-- <option value="undefined" disabled>- Subtype -</option> -->
 								<option v-for="(val,i) in dice_type"
-									:key="i" :value="val">{{val}}</option>
+									:key="i" :value="val.value">{{ val.label }}</option>
 							</b-form-select>
 						</b-col>
 						<b-col md="4">
@@ -125,76 +125,78 @@
 								</a>
 							</b-col>
 						</b-row>
-						<b-row v-for="(level_tier, tier_index) in modifier.level_tiers" v-if="tier_index < shown_level_tiers">
-							<!-- HL LEVEL SCALE -->
-							<b-col md="3">
-								<label for="level">{{level_scaling}}</label>
-								<b-form-input v-model="level_tier.level"
-									autocomplete="off"
-									id="level"
-									name="level"
-									class="form-control mb-2"
-									:title="level_scaling"
-									v-validate="'required'"
-									type="number"
-									:data-vv-as="level_scaling"
-									@keyup="$forceUpdate()"
-									></b-form-input>
-									<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-							</b-col>
-							<!-- HL DICE COUNT -->
-							<b-col md="3">
-								<label for="dice_count">Dice Count</label>
-								<b-form-input v-model="level_tier.dice_count"
-									autocomplete="off"
-									id="dice_count"
-									name="dice_count"
-									class="form-control mb-2"
-									title="Dice Count"
-									type="number"
-									data-vv-as="Dice Count"
-									@keyup="$forceUpdate()"
-									></b-form-input>
-							</b-col>
-							<b-col md="3">
-								<!-- HL MODIFIER SUBTYPE -->
-								<label for="dice_type">Dice Type</label>
-								<b-form-select v-model="level_tier.dice_type"
-									id="dice_type"
-									name="dice_type"
-									title="Dice Type"
-									class="form-control mb-2"
-									data-vv-as="Dice Type"
-									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Subtype -</option>
-									<option v-for="(val,i) in dice_type"
-										:key="i" :value="val">{{val}}</option>
-								</b-form-select>
-							</b-col>
-							<b-col md="2">
-								<!-- HL MODIFIER FIXED VALUE -->
-								<label for="fixed_val">Fixed Value</label>
-								<b-form-input v-model="level_tier.fixed_val"
-									autocomplete="off"
-									id="fixed_val"
-									name="fixed_val"
-									class="form-control mb-2"
-									title="Fixed Value"
-									type="number"
-									data-vv-as="Fixed Value"
-									@keyup="$forceUpdate()"
-									></b-form-input>
-							</b-col>
-							<b-col md='1' class="remove-link">
-								<a @click="remove_level_tier(mod_index, tier_index)"
-									class="gray-hover text-capitalize"
-									v-b-tooltip.hover title="Remove">
-									<i class="fas fa-trash-alt red"></i>
-								</a>
-							</b-col>
-						</b-row>
+						<template v-for="(level_tier, tier_index) in modifier.level_tiers">
+							<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+								<!-- HL LEVEL SCALE -->
+								<b-col md="3">
+									<label for="level">{{level_scaling}}</label>
+									<b-form-input v-model="level_tier.level"
+										autocomplete="off"
+										id="level"
+										name="level"
+										class="form-control mb-2"
+										:title="level_scaling"
+										v-validate="'required'"
+										type="number"
+										:data-vv-as="level_scaling"
+										@keyup="$forceUpdate()"
+										></b-form-input>
+										<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+								</b-col>
+								<!-- HL DICE COUNT -->
+								<b-col md="3">
+									<label for="dice_count">Dice Count</label>
+									<b-form-input v-model="level_tier.dice_count"
+										autocomplete="off"
+										id="dice_count"
+										name="dice_count"
+										class="form-control mb-2"
+										title="Dice Count"
+										type="number"
+										data-vv-as="Dice Count"
+										@keyup="$forceUpdate()"
+										></b-form-input>
+								</b-col>
+								<b-col md="3">
+									<!-- HL MODIFIER DICETYPE -->
+									<label for="dice_type">Dice Type</label>
+									<b-form-select v-model="level_tier.dice_type"
+										id="dice_type"
+										name="dice_type"
+										title="Dice Type"
+										class="form-control mb-2"
+										data-vv-as="Dice Type"
+										@change="$forceUpdate()">
+										<option value="undefined" disabled>- Dice type -</option>
+										<option v-for="(val,i) in dice_type"
+											:key="i" :value="val.value">{{ val.label }}</option>
+									</b-form-select>
+								</b-col>
+								<b-col md="2">
+									<!-- HL MODIFIER FIXED VALUE -->
+									<label for="fixed_val">Fixed Value</label>
+									<b-form-input v-model="level_tier.fixed_val"
+										autocomplete="off"
+										id="fixed_val"
+										name="fixed_val"
+										class="form-control mb-2"
+										title="Fixed Value"
+										type="number"
+										data-vv-as="Fixed Value"
+										@keyup="$forceUpdate()"
+										></b-form-input>
+								</b-col>
+								<b-col md='1' class="remove-link">
+									<a @click="remove_level_tier(mod_index, tier_index)"
+										class="gray-hover text-capitalize"
+										v-b-tooltip.hover title="Remove">
+										<i class="fas fa-trash-alt red"></i>
+									</a>
+								</b-col>
+							</b-row>
+						</template>
 						<p v-if="modifier.level_tiers && modifier.level_tiers.length > 0">
-							<span v-for="line in create_spell_level_tier_description(modifier.level_tiers)">
+							<span v-for="(line, i) in create_spell_level_tier_description(modifier.level_tiers)" :key="`tier-${i}`">
 								{{line}}<br>
 							</span>
 						</p>
@@ -240,7 +242,14 @@ export default {
     	modifier_type: ["Damage", "Healing"],
 			modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
 				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
-			dice_type: ["D4", "D6", "D8", "D10", "D12", "D20"],
+			dice_type: [
+				{ label: "D4", value: 4 }, 
+				{ label: "D6", value: 6 },
+				{ label: "D8", value: 8 }, 
+				{ label: "D10", value: 10 },
+				{ label: "D12", value: 12 },
+				{ label: "D20", value: 20 }
+			],
     };
   },
   methods: {

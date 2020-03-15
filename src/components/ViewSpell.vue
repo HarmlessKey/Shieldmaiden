@@ -35,7 +35,33 @@
 		</div>
 
 		<div class="actions" v-if="spell.actions">
-			<h4>Roll spell</h4>
+			<h4 class="mb-3">Roll spell</h4>
+
+			<div class="input" v-if="spell.level_scaling === 'Character Level'">
+				<label for="casterLevel">Character level</label>
+				<b-form-input
+					id="casterLevel" 
+					type="text"
+					v-validate="'required|numeric'"
+					name="casterLevel"
+					data-vv-as="caster level"
+					v-model="casterLevel"
+				/>
+				<div class="validate red" v-if="errors.has('casterLevel')">{{ errors.first('casterLevel') }}</div>
+			</div>
+
+			<div class="input" v-if="isToHit">
+				<label for="toHit">To hit modifier</label>
+				<b-form-input
+					id="toHit" 
+					type="text"
+					v-validate="'required|numeric'"
+					name="toHit"
+					data-vv-as="To hit modifier"
+					v-model="toHitModifier"
+				/>
+				<div class="validate red" v-if="errors.has('toHit')">{{ errors.first('toHit') }}</div>
+			</div>
 
 			<template v-if="spell.level > 0">
 				<p>Select cast level</p>
@@ -55,8 +81,36 @@
 				</div>
 			</template>
 
-			<a class="btn btn-block mt-3" @click="rollSpell(spell, selectedLevel)">Roll</a>
+			<button 
+				:disabled="errors.items && errors.items.length > 0 || missingRequired"
+				class="btn btn-block mt-3" 
+				@click="roll(spell, selectedLevel, casterLevel, toHitModifier)"
+			>
+				Roll
+			</button>
 		</div>
+
+		<template v-if="rolled">
+				<h3><b>{{ spell.name }} ({{ selectedLevel }})</b></h3>
+			<div class="" v-for="(action, i) in rolled.actions" :key="`action-${i}`">
+				<h3 v-if="action.type === 'Spell Save'">
+					{{ action.save }} saving throw
+				</h3>
+				<h3 v-else-if="action.toHit">
+					<span class="gray-hover">To hit:</span>
+					{{ action.toHit.total }}
+				</h3>
+				<h3 class="result" v-for="(roll, i) in action.rolls" :key="`roll-${i}`">
+					<span class="gray-hover">Damage:</span>
+					<b class="red"> {{ totalDamage(roll) }}</b> <i>{{ roll.subtype }}</i>
+				</h3>
+			</div>
+			<pre>
+				{{ rolled }}
+			</pre>
+		</template>
+
+		<hr>
 
 		<pre>
 			{{ spell }}
@@ -77,7 +131,10 @@
 		data() {
 			return {
 				spell: this.data,
-				selectedLevel: this.data.level
+				selectedLevel: this.data.level,
+				casterLevel: undefined,
+				toHitModifier: undefined,
+				rolled: undefined
 			}
 		},
 		computed: {
@@ -105,11 +162,45 @@
 				}
 
 				return type;
+			},
+			isToHit() {
+				//Checks if there is an action with to hit.
+				let toHit = false;
+
+				for(let action of this.spell.actions) {
+					if(action.type === 'Melee Weapon' || action.type === 'Ranged Weapon' || action.type === 'Spell Attack') {
+						toHit = true;
+					}
+				}
+				return toHit;
+			},
+			missingRequired() {
+				let missing = false;
+
+				if(this.isToHit && this.toHitModifier === undefined) {
+					missing = true;
+				}
+				if(this.spell.level_scaling === 'Character Level' && this.casterLevel === undefined) {
+					missing = true;
+				}
+				return missing;
 			}
 		},
 		methods: {
 			selectLevel(i) {
 				this.selectedLevel = i;
+			},
+			roll(spell, selectedLevel, casterLevel, toHitModifier) {
+				this.rolled = this.rollSpell(spell, selectedLevel, casterLevel, toHitModifier);
+			},
+			totalDamage(rolls) {
+				let total = rolls.modifierRoll.total;
+
+				if(rolls.scaledRoll) {
+					total = total + rolls.scaledRoll.total;
+				}
+
+				return total;
 			}
 		}
 	};
@@ -137,6 +228,16 @@
 
 	.actions {
 		margin-bottom: 15px;
+
+		.input {
+			display: grid;
+			grid-template-columns: 1fr 50px;
+			margin-bottom: 10px;
+
+			.validate {
+				grid-column: span 2;
+			}
+		}
 
 		&__levels {
 			display: flex;

@@ -96,7 +96,7 @@
 			</b-row>
 		</template>
 
-		<template>
+		<template v-if="!demo">
 			<hr>
 			<span class="justify-content-between d-flex">
 				<h2 class="mb-0">Display Override</h2>

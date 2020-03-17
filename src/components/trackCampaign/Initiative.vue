@@ -25,7 +25,9 @@
 						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
 
 						<td class="ac">
-							<template v-if="(entity.entityType == 'player' && playerSettings.ac === undefined) || (entity.entityType == 'npc' && npcSettings.ac == true)">
+							<template v-if="
+								(entity.entityType == 'player' && playerSettings.ac === undefined) 
+								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
 								<span class="ac" :class="{ 
 										'green': displayAc(entity).bonus > 0, 
 										'red': displayAc(entity).bonus < 0 
@@ -40,20 +42,27 @@
 						</td>
 
 						<td class="name">
-							<template v-if="entity.entityType == 'npc'">{{ entity.name }}</template>
+							<template v-if="entity.entityType == 'npc'">
+								<template v-if="displayNPCField('name', entity)">
+									{{ entity.name }}
+								</template>
+								<template v-else>
+									? ? ?
+								</template>
+							</template>
 							<template v-else>{{ players[entity.key].character_name }}</template>
 						</td>
 
 						<td class="hp">
 							<template v-if="
 								(entity.entityType == 'player' && playerSettings.health === undefined)
-								|| (entity.entityType == 'npc' && npcSettings.health == true)
+								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === true)
 							">
 								<Health	:entity="entity" :campPlayers="campPlayers" />
 							</template>
 							<template v-else-if="
 								(entity.entityType == 'player' && playerSettings.health === 'obscured')
-								|| (entity.entityType == 'npc' && npcSettings.health === 'obscured')
+								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 							">
 								<template v-if="entity.curHp == 0">
 									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
@@ -224,6 +233,17 @@
 				}
 				return img
 			},
+			displayNPCField(field, entity) {
+				const defaults = {name: true, health: false, ac: false};
+				if (entity.settings && entity.settings[field] !== undefined) 
+					return entity.settings[field];
+
+				else if (this.npcSettings[field] == undefined)
+					return defaults[field]; // Default value
+
+				else 
+					return this.npcSettings[field];
+			}
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);

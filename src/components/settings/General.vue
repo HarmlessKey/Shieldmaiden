@@ -131,6 +131,35 @@
 				</div>
 			</li>
 		</ul>
+		<h3>User interface</h3>
+		<ul class="settings">
+			<li v-for="(setting, key) in ui" :key="key">
+				<div class="d-flex justify-content-between">
+					<span>
+						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+						<a v-if="key == 'keyBinds'" data-toggle="collapse" class="ml-1" :href="'#'+key" 
+							role="button" aria-expanded="false">
+							<i class="fas fa-info"></i>
+						</a>
+					</span>
+					<div>
+						<a v-for="option in setting.options" 
+							v-b-tooltip.hover 
+							:title="[ option.value == settings[key] ? option.name : option.action ]" 
+							:key="option.name" 
+							@click="setSetting(key, option.value)" class="ml-2"
+							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]">
+								<span class="d-none d-md-inline mr-1">
+									<template v-if="option.value == settings[key]">{{ option.name }}</template>
+									<template v-if="option.value != settings[key]">{{ option.action }}</template>
+								</span>
+								<i :class="option.icon"></i>
+						</a>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<pre>{{ settings }}</pre>
 		<a class="btn" @click="setDefault()">Set default</a>
 	</div>
 </template>
@@ -187,6 +216,16 @@
 						}
 					},
 				},
+				ui: {
+					'side_collapsed': {
+						name: 'Side Menu Collapsed',
+						icon: 'fas fa-bars',
+						options: {
+							0: { value: true, name: 'Collapsed', action: 'Collapse', icon: 'fas fa-arrow-alt-to-left', color: 'red'},
+							1: { value: undefined, name: 'Visible', action: 'Show', icon: 'fas fa-arrow-alt-to-right', color: 'green'},
+						}
+					},
+				}
 			}
 		},
 		firebase() {

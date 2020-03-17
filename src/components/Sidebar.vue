@@ -73,7 +73,7 @@
 					</b-list-group-item>
 				</b-list-group>
 			</div>
-			<div id="toggle-width" @click="setSideCollapsed()">
+			<div id="toggle-width" @click="toggleSideCollapsed()">
 				<i class="far fa-angle-left"></i>
 			</div>
 		</div>
@@ -93,6 +93,7 @@
 		},
 		methods: {
 			...mapActions([
+				'toggleSideCollapsed',
 				'setSideCollapsed',
 				'setSideSmallScreen'
 			]),
@@ -107,7 +108,8 @@
 					this.small_screen = false;
 				}
 			}
-		}
+			this.setSideCollapsed();
+		}, 
 	}
 </script>
 

@@ -98,7 +98,13 @@
 
 		<template>
 			<hr>
-			<h2 class="mb-0">Display Override</h2>
+			<span class="justify-content-between">
+				<h2 class="mb-0">Display Override</h2>
+				<a v-b-tooltip.hover title="clear display overrides" @click="clearOverrides()" class="red">
+					<span class="mr-1 small">clear</span>
+					<i class="fas fa-broom small"></i>
+				</a>
+			</span>
 
 			<ul class="settings">
 				<li v-for="(setting, key) in npcsOptions" class="d-flex justify-content-between" :key="key">
@@ -272,6 +278,9 @@
 				}
 				else
 					return false;
+			},
+			clearOverrides() {
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings`).remove();
 			}
 		}
 	};

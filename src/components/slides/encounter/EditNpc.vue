@@ -96,6 +96,38 @@
 			</b-row>
 		</template>
 
+		<template v-if="!demo">
+			<hr>
+			<span class="justify-content-between d-flex">
+				<h2 class="mb-0">Display Override</h2>
+				<a v-b-tooltip.hover title="clear display overrides" @click="clearOverrides()" class="red">
+					<span class="mr-1 small">clear</span>
+					<i class="fas fa-broom small"></i>
+				</a>
+			</span>
+
+			<ul class="settings">
+				<li v-for="(setting, key) in npcsOptions" class="d-flex justify-content-between" :key="key">
+					<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
+					<div>
+
+						<a v-for="option in setting.options"
+							v-b-tooltip.hover 
+							:title="[ isActive(key, option) ? option.name : option.action ]" 
+							:key="option.name" 
+							@click="setSetting(key, option.value)" class="ml-2"
+							:class="[ isActive(key, option) ? option.color : 'gray-light' ]">
+								<span class="d-none d-md-inline mr-1">
+									<template v-if="isActive(key, option)">{{ option.name }}</template>
+									<template v-else>{{ option.action }}</template>
+								</span>
+								<i :class="option.icon"></i>
+						</a>
+					</div>
+				</li>
+			</ul>
+		</template>
+
 		<button class="btn btn-block my-3" @click="edit()">Save</button>
 		<small>
 			Edit this entity only for the current encounter.<br/>
@@ -120,15 +152,50 @@
 				entity: undefined,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid
-			}
-		},
-		firebase() {
-			return {
-				// entity: {
-				// 	source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`),
-				// 	asObject: true
-				// }
+				encounterId: this.$route.params.encid,
+				npcSettings: undefined,
+				npcsOptions: {
+					'name': { 
+						entity: 'npc',
+						name: 'Name', 
+						icon: 'fas fa-helmet-battle',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							// 1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
+							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green', settings_default: true },
+							// 2: { value: undefined, name: 'Default', action: 'Default', icon: 'fas fa-sparkles', color: 'blue'}
+						}
+					},
+					'health': { 
+						entity: 'npc',
+						name: 'Health', 
+						icon: 'fas fa-heart',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red', settings_default: true },
+							1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
+							2: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+							// 3: { value: undefined, name: 'Default', action: 'Default', icon: 'fas fa-sparkles', color: 'blue'}
+						}
+					},
+					'ac': { 
+						entity: 'npc',
+						name: 'Armor Class', 
+						icon: 'fas fa-shield',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red', settings_default: true },
+							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
+					// 'conditions': { 
+					// 	entity: 'npc',
+					// 	name: 'Conditions', 
+					// 	icon: 'fas fa-skull-crossbones',
+					// 	options: {
+					// 		0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+					// 		1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+					// 	}
+					// },
+				},
 			}
 		},
 		computed: {
@@ -136,12 +203,19 @@
 				'demoEntities'
 			])	
 		},
+
 		mounted() {
 			if(!this.demo) {
-				var entity = db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`);
-				entity.on('value', async (snapshot) => {
+				var entity_ref = db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}`);
+				entity_ref.on('value', async (snapshot) => {
 					this.entity = snapshot.val();
 				});
+
+				var npcSettings_ref = db.ref(`settings/${this.userId}/track/npc`);
+				npcSettings_ref.on('value', async (snapshot) => {
+					this.npcSettings = snapshot.val();
+				});
+
 			} else {
 				this.entity = this.demoEntities[this.entityKey];
 			}
@@ -181,11 +255,40 @@
 						//console.log('Not valid');
 					}
 				})
+			},
+			setSetting(key, value) {
+				if(value === undefined) {
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings/${key}`).remove();
+				} else {
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings/${key}`).set(value)
+				}
+			},
+			isActive(key, option) {
+				if (this.entity.settings && this.entity.settings[key] !== undefined) {
+					if (this.entity.settings[key] == option.value)
+						return true
+					else
+						return false
+				}
+				else if (this.npcSettings && this.npcSettings[key] === undefined && option.settings_default) {
+					return true;
+				}
+				else if (this.npcSettings &&  this.npcSettings[key] == option.value) {
+					return true;
+				}
+				else if (this.npcSettings == undefined && option.settings_default)
+					return true;
+				else
+					return false;
+			},
+			clearOverrides() {
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings`).remove();
 			}
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
+
 
 </style>

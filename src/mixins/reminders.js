@@ -31,7 +31,7 @@ export const remindersMixin = {
 				//Check if the reminders trigger matches the current trigger
 				if(target.reminders[key].trigger === trigger) {
 					//NOTIFY
-					this.notify(target, key);
+					this.__notify__(target, key);
 
 					if(target.reminders[key].action === 'remove') {
 						this.set_targetReminder({
@@ -73,7 +73,7 @@ export const remindersMixin = {
 
 				// NOTIFY
 				if(notify) {
-					this.notify(target, key);
+					this.__notify__(target, key);
 					
 					if(target.reminders[key].action === 'remove') {
 						this.set_targetReminder({
@@ -85,7 +85,7 @@ export const remindersMixin = {
 				}
 			}
 		},
-		notify(target, key) {
+		__notify__(target, key) {
 			let notify = target.reminders[key].notify;
 
 			//Create buttons for notification

@@ -37,7 +37,7 @@
 							<template v-if="tier && tier.name !== 'Free' && !voucher">
 									<h2 class="text-center"><i class="patreon-red fas fa-heart"></i> Thanks for your support.</h2>
 							</template>
-							<a v-else href="https://www.patreon.com/join/harmlesskey" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
 
 						<a class="next" href="#general">

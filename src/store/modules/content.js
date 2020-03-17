@@ -7,6 +7,7 @@ const players_ref = db.ref('players')
 const npcs_ref = db.ref('npcs')
 const users_ref = db.ref('users')
 const tiers_ref = db.ref('tiers')
+const settings_ref = db.ref('settings')
 
 export const content_module = {
 	state: {
@@ -28,7 +29,7 @@ export const content_module = {
 		npcs: {},
 
 		poster: undefined,
-		side_collapsed: false,
+		side_collapsed: true,
 		side_small_screen: false
 
 	},
@@ -222,8 +223,11 @@ export const content_module = {
 		CLEAR_ENCOUNTERS(state) {
 			state.encounters = {}
 		},
-		SET_SIDE_COLLAPSE(state) {
+		TOGGLE_SIDE_COLLAPSE(state) {
 			Vue.set(state, 'side_collapsed', !state.side_collapsed);
+		},
+		SET_SIDE_COLLAPSE(state, payload) {
+			Vue.set(state, 'side_collapsed', payload)
 		},
 		SET_SIDE_SMALL_SCREEN(state, payload) {
 			Vue.set(state, 'side_small_screen', payload);
@@ -412,8 +416,32 @@ export const content_module = {
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS")
 		},
-		setSideCollapsed({ commit }) {
-			commit("SET_SIDE_COLLAPSE")
+		toggleSideCollapsed({ commit, state }) {
+			const uid = state.user.uid;
+			let collapsed_ref = settings_ref.child(uid).child('general/side_collapsed');
+			
+			commit("TOGGLE_SIDE_COLLAPSE");
+			
+			let collapsed = state.side_collapsed;
+			console.log(collapsed);
+			if (collapsed === false){
+				collapsed_ref.remove();
+			}
+			else
+				collapsed_ref.set(true)
+
+		},
+		setSideCollapsed({ commit, state }) {
+			const uid = state.user.uid;
+			const screen_small = state.side_small_screen;
+			let general = settings_ref.child(uid).child('general');
+			general.on('value', snapshot => {
+				let collapse = false;
+				if (snapshot.val())
+					collapse = snapshot.val().side_collapsed;
+
+				commit("SET_SIDE_COLLAPSE", collapse);
+			})
 		},
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload)

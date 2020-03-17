@@ -525,7 +525,6 @@ const mutations = {
 		Vue.set(state.entities[key], 'curHp', entity.curHp);
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus);
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp);
-		// Vue.set(state.entities[key], 'nameHidden', entity.nameHidden);
 
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},

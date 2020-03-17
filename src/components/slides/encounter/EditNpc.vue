@@ -250,11 +250,38 @@
 						//console.log('Not valid');
 					}
 				})
+			},
+			setSetting(key, value) {
+				if(value === undefined) {
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings/${key}`).remove();
+				} else {
+					db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/settings/${key}`).set(value)
+				}
+			},
+			isActive(key, option) {
+				console.log(key)
+				console.log(this.npcSettings)
+				console.log(option.settings_default)
+				if (this.entity.settings && this.entity.settings[key] !== undefined) {
+					if (this.entity.settings[key] == option.value)
+						return true
+					else
+						return false
+				}
+				else if (this.npcSettings[key] === undefined && option.settings_default) {
+					return true;
+				}
+				else if (this.npcSettings[key] == option.value) {
+					return true;
+				}
+				else
+					return false;
 			}
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
+
 
 </style>

@@ -41,10 +41,7 @@
 
 						<td class="name">
 							<template v-if="entity.entityType == 'npc'">
-								<template v-if="
-									(entity.nameHidden === undefined && npcSettings.name === undefined)
-									|| (entity.nameHidden === false && npcSettings.name === true)
-								">
+								<template v-if="displayNPCName(entity)">
 									{{ entity.name }}
 								</template>
 								<template v-else>
@@ -53,7 +50,6 @@
 							</template>
 							<template v-else>{{ players[entity.key].character_name }}</template>
 						</td>
-						<pre>{{entity}}</pre>
 
 						<td class="hp">
 							<template v-if="
@@ -235,6 +231,16 @@
 				}
 				return img
 			},
+			displayNPCName(entity) {
+				if (entity.settings && entity.settings.name !== undefined) 
+					return entity.settings.name;
+
+				else if (this.npcSettings.name == undefined)
+					return true;
+
+				else 
+					return false;
+			}
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);

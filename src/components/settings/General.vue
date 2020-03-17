@@ -159,7 +159,6 @@
 				</div>
 			</li>
 		</ul>
-		<pre>{{ settings }}</pre>
 		<a class="btn" @click="setDefault()">Set default</a>
 	</div>
 </template>

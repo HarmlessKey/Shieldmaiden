@@ -98,7 +98,7 @@
 
 		<template>
 			<hr>
-			<span class="justify-content-between">
+			<span class="justify-content-between d-flex">
 				<h2 class="mb-0">Display Override</h2>
 				<a v-b-tooltip.hover title="clear display overrides" @click="clearOverrides()" class="red">
 					<span class="mr-1 small">clear</span>

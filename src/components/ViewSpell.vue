@@ -42,7 +42,7 @@
 				<b-form-input
 					id="casterLevel" 
 					type="text"
-					v-validate="'required|numeric'"
+					v-validate="'required|numeric|max_value:20'"
 					name="casterLevel"
 					data-vv-as="caster level"
 					v-model="casterLevel"

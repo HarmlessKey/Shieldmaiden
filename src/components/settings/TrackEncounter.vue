@@ -103,6 +103,16 @@
 					},
 				},
 				npcs: {
+					'name': { 
+						entity: 'npc',
+						name: 'Name', 
+						icon: 'fas fa-helmet-battle',
+						options: {
+							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+							// 1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
+							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+						}
+					},
 					'health': { 
 						entity: 'npc',
 						name: 'Health', 

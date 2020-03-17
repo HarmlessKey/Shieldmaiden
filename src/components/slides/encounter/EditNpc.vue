@@ -276,6 +276,8 @@
 				else if (this.npcSettings &&  this.npcSettings[key] == option.value) {
 					return true;
 				}
+				else if (this.npcSettings == undefined && option.settings_default)
+					return true;
 				else
 					return false;
 			},

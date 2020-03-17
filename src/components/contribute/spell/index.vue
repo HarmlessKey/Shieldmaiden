@@ -72,7 +72,7 @@
 					<br/>
 				</p>
 				<p>
-					{{ spell.description }}
+					<vue-markdown name="description" :source="spell.description"></vue-markdown>
 				</p>
 				<!-- <p v-for="(desc, index) in spell.desc" :key="index">
 					{{ desc }}
@@ -98,12 +98,14 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import SpellEdit from '@/components/contribute/spell/edit.vue'
 	import { mapGetters } from 'vuex'
+	import VueMarkdown from 'vue-markdown'
 
 	export default {
 		name: 'Spell',
 		components: {
 			Crumble,
 			SpellEdit,
+			VueMarkdown,
 		},
 		props: ['id'],
 		data() {

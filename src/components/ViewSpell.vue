@@ -91,7 +91,7 @@
 		</div>
 
 		<template v-if="rolled">
-				<h3><b>{{ spell.name }} ({{ selectedLevel }})</b></h3>
+				<h3><b>{{ spell.name }} <template v-if="selectedLevel > 0">({{ selectedLevel }})</template></b></h3>
 			<div class="" v-for="(action, i) in rolled.actions" :key="`action-${i}`">
 				<h3 v-if="action.type === 'Spell Save'">
 					{{ action.save }} saving throw
@@ -111,9 +111,12 @@
 					<div slot="total" slot-scope="data" class="red">
 						<b>{{ totalDamage(data.row) }}</b>
 					</div>
-					<div slot="type" slot-scope="data">
-						{{ data.row.subtype }}
-					</div>
+					<template slot="type" slot-scope="data">
+						<span :class="data.row.subtype">
+							<i :class="returnDamageTypeIcon(data.row.subtype)"/>
+							{{ data.row.subtype }}
+						</span>
+					</template>
 					<div slot="collapse" slot-scope="data">
 						<div>
 							Rolls: {{ data.row.modifierRoll.roll }} = {{ data.row.modifierRoll.total }}<br/>

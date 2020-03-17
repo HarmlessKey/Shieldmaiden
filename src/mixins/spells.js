@@ -63,6 +63,21 @@ export const spells = {
 			}
 			return returnRoll;
 		},
+		returnDamageTypeIcon(type) {
+				if(type === 'Acid') { return 'fas fa-tint'; }
+				if(type === 'Bludgening') { 	return 'fas fa-hammer-war';  }
+				if(type === 'Cold') { return 'far fa-snowflake'; }
+				if(type === 'Fire') { return 'fas fa-flame'; }
+				if(type === 'Force') { return 'fas fa-sparkles'; }
+				if(type === 'Lightning') { return 'fas fa-bolt'; }
+				if(type === 'Necrotic') { return 'fas fa-skull'; }
+				if(type === 'Piercing') { return 'far fa-bow-arrow'; }
+				if(type === 'Poison') { return 'fas fa-flask-poison'; }
+				if(type === 'Psychic') { return 'fas fa-brain'; }
+				if(type === 'Radiant') { return 'fas fa-sun'; }
+				if(type === 'Slashing') { return 'fas fa-sword'; }
+				if(type === 'Thunder') { return 'far fa-waveform-path'; }
+		},
 		__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType) {
 			let scaledModifier = undefined;
 

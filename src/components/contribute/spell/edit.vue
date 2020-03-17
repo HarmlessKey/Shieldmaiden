@@ -10,7 +10,7 @@
 						<div  class="loader"> <span>Loading old_spell....</span></div>
 					</b-card>
 					<b-card class="old_spell" header="Old Spell Description" v-else>
-						<h1 class="spellTitle">{{ old_spell.name }}</h1>
+						<h1 class="spellTitle"><a :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
 						<i class="mb-3 d-block" v-if="old_spell.school">
 							{{ levels[old_spell.level] }}
 							{{ old_spell.school.name }}
@@ -44,6 +44,8 @@
 								{{ higher }}
 							</template>
 						</p>
+					</b-card>
+					<b-card>
 					</b-card>
 				</b-col> <!-- Old spell -->
 
@@ -79,6 +81,7 @@
 	import Crumble from '@/components/crumble/Compendium.vue'
 	import basicInfo from '@/components/contribute/spell/forms/basic-info.vue'
 	import spellActions from '@/components/contribute/spell/forms/spell-actions.vue'
+	import { general } from '@/mixins/general.js'
 	import { mapGetters } from 'vuex'
 
 	export default {
@@ -88,6 +91,7 @@
 			basicInfo,
 			spellActions,
 		},
+		mixins: [general],
 		props: ['id'],
 		metaInfo() {
 			return {

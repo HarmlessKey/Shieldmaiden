@@ -1,7 +1,7 @@
 <template>
 	<div class="footer">
 		<div class="top">
-			<b-row class="d-flex justify-content-between content">
+			<div class="d-flex justify-content-between content">
 				<b-col md="3" class="logo-container">
 					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
 				</b-col>
@@ -46,7 +46,7 @@
 						</ul>
 					</div>
 				</b-col>
-			</b-row>
+			</div>
 		</div>
 
 		<div class="bottom">

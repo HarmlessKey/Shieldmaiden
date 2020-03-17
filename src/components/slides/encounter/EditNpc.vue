@@ -178,7 +178,6 @@
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red', settings_default: true },
 							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-							// 2: { value: undefined, name: 'Default', action: 'Default', icon: 'fas fa-sparkles', color: 'blue'}
 						}
 					},
 					// 'conditions': { 
@@ -265,10 +264,10 @@
 					else
 						return false
 				}
-				else if (this.npcSettings[key] === undefined && option.settings_default) {
+				else if (this.npcSettings && this.npcSettings[key] === undefined && option.settings_default) {
 					return true;
 				}
-				else if (this.npcSettings[key] == option.value) {
+				else if (this.npcSettings &&  this.npcSettings[key] == option.value) {
 					return true;
 				}
 				else

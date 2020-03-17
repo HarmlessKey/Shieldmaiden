@@ -318,7 +318,7 @@
 				</b-col>
 				<b-col md="6">
 					<label for="description_preview">Preview</label>
-					<div name="description_preview" v-html="parseMarkdown(spell.description)"></div>
+					<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
 				</b-col>
 			</b-row>
 			<b-row class="d-flex spell_row">
@@ -367,7 +367,7 @@
 
 <script>
 
-import { hkMarkdown } from "@/mixins/hk-markdown.js"
+import VueMarkdown from 'vue-markdown'
 
 export default {
 
@@ -376,7 +376,9 @@ export default {
 		value: Object,
 		levels: Array,
 	},
-	mixins: [hkMarkdown],
+	components: {
+		VueMarkdown
+	},
 	data() {
 		return {
 			schools: [

@@ -28,7 +28,7 @@
 		</div>
 
 		<div class="spell__description">
-			<div>{{ spell.description }}</div>
+			<vue-markdown name="description" :source="spell.description"/>
 			<div v-if="spell.higher_level">
 				<b class="pl-2"><i>At Higher Levels.</i></b> {{ spell.higher_level }}
 			</div>
@@ -100,10 +100,31 @@
 					<span class="gray-hover">To hit:</span>
 					{{ action.toHit.total }}
 				</h3>
-				<h3 class="result" v-for="(roll, i) in action.rolls" :key="`roll-${i}`">
-					<span class="gray-hover">Damage:</span>
-					<b class="red"> {{ totalDamage(roll) }}</b> <i>{{ roll.subtype }}</i>
-				</h3>
+
+				<h3 class="gray-hover">Damage</h3>
+				<hk-table 
+					:items="action.rolls"
+					:columns="resultColumns"
+					:showHeader="false"
+					:collapse="true"
+				>
+					<div slot="total" slot-scope="data" class="red">
+						<b>{{ totalDamage(data.row) }}</b>
+					</div>
+					<div slot="type" slot-scope="data">
+						{{ data.row.subtype }}
+					</div>
+					<div slot="collapse" slot-scope="data">
+						<div>
+							Rolls: {{ data.row.modifierRoll.roll }} = {{ data.row.modifierRoll.total }}<br/>
+							{{ data.row.modifierRoll.throws }}
+						</div>
+						<div v-if="data.row.scaledRoll" class="mt-3">
+							Scale ({{ selectedLevel }}): {{ data.row.scaledRoll.roll }} = {{ data.row.scaledRoll.total }}<br/>
+							{{ data.row.scaledRoll.throws }}
+						</div>
+					</div>
+				</hk-table>
 			</div>
 			<pre>
 				{{ rolled }}
@@ -121,10 +142,14 @@
 <script>
 	import { db } from '@/firebase';
 	import { spells } from '@/mixins/spells.js';
+	import VueMarkdown from 'vue-markdown';
 
 	export default {
 		name: 'Spell',
 		mixins: [spells],
+		components: {
+			VueMarkdown
+		},
 		props: [
 		'data'
 		],
@@ -134,7 +159,15 @@
 				selectedLevel: this.data.level,
 				casterLevel: undefined,
 				toHitModifier: undefined,
-				rolled: undefined
+				rolled: undefined,
+				resultColumns: {
+					total: {
+						maxContent: true
+					},
+					type: {
+						truncate: true
+					}
+				}
 			}
 		},
 		computed: {

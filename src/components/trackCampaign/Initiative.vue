@@ -40,7 +40,14 @@
 						</td>
 
 						<td class="name">
-							<template v-if="entity.entityType == 'npc'">{{ entity.name }}</template>
+							<template v-if="entity.entityType == 'npc'">
+								<template v-if="npcSettings.name === undefined">
+									{{ entity.name }}
+								</template>
+								<template v-else>
+									? ? ?
+								</template>
+							</template>
 							<template v-else>{{ players[entity.key].character_name }}</template>
 						</td>
 

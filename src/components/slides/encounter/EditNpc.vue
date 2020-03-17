@@ -259,9 +259,6 @@
 				}
 			},
 			isActive(key, option) {
-				console.log(key)
-				console.log(this.npcSettings)
-				console.log(option.settings_default)
 				if (this.entity.settings && this.entity.settings[key] !== undefined) {
 					if (this.entity.settings[key] == option.value)
 						return true

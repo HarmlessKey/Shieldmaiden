@@ -45,8 +45,6 @@
 							</template>
 						</p>
 					</b-card>
-					<b-card>
-					</b-card>
 				</b-col> <!-- Old spell -->
 
 				<b-col md="8" id="new_spell">

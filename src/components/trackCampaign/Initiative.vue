@@ -41,7 +41,10 @@
 
 						<td class="name">
 							<template v-if="entity.entityType == 'npc'">
-								<template v-if="npcSettings.name === undefined">
+								<template v-if="
+									(entity.nameHidden === undefined && npcSettings.name === undefined)
+									|| (entity.nameHidden === false && npcSettings.name === true)
+								">
 									{{ entity.name }}
 								</template>
 								<template v-else>
@@ -50,6 +53,7 @@
 							</template>
 							<template v-else>{{ players[entity.key].character_name }}</template>
 						</td>
+						<pre>{{entity}}</pre>
 
 						<td class="hp">
 							<template v-if="

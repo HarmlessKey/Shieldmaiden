@@ -96,6 +96,45 @@
 			</b-row>
 		</template>
 
+		<template>
+			<hr>
+			<h2 class="mb-0">Display</h2>
+			<b-row class="my-2">
+				<b-col class="text-center" v-if="entity.npc">
+					<label>Name</label>
+					<b-form-checkbox
+						class="text-center"
+						name="nameHidden" 
+						v-model="entity.nameHidden"></b-form-input>
+				</b-col>
+
+				<!-- <b-col class="text-center" v-if="entity.npc">
+					<label>AC</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="maxHp" 
+						min="1"
+						v-model="entity.maxHp"
+						placeholder="Maximum Hit Points"></b-form-input>
+				</b-col> -->
+
+				<!-- <b-col class="text-center">
+					<label>Cur HP</label>
+					<b-form-input 
+						class="text-center"
+						type="number" 
+						name="maxHp" 
+						min="1"
+						v-model="entity.curHp"
+						v-validate="'required|numeric'"
+						data-vv-as="Current HP"
+						placeholder="Current Hit Points"></b-form-input>
+						<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
+				</b-col> -->
+			</b-row>
+		</template>
+
 		<button class="btn btn-block my-3" @click="edit()">Save</button>
 		<small>
 			Edit this entity only for the current encounter.<br/>

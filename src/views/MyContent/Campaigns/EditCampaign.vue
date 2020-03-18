@@ -69,35 +69,26 @@
 									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 									{{ player.character_name }}
 								</div>
-								<template v-if="campaign.players">
-										<div class="actions bg-gray">
-											<a v-if="checkPlayer(key) < 0" 
-											class="gray-hover"
-											v-b-tooltip.hover 
-											title="Add Character" 
-											@click="addPlayer(key, player.character_name)">
-												<i class="fas fa-plus"></i>
-											</a>
-										</div>
-									<span>
-										<span v-if="checkPlayer(key) >= 0">
-											<i class="fas fa-check"></i>
-											<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
-										</span>
-										<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-									</span>
-								</template>	
-								<div v-else class="d-flex justify-content-end">
-									<div class="actions">
-										<a class="gray-hover" 
-											v-b-tooltip.hover 
-											title="Add Character" 
-											@click="addPlayer(key, player.character_name)">
-												<i class="fas fa-plus"></i>
-										</a>
-									</div>
-									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+								<div class="actions bg-gray">
+									<a v-if="checkPlayer(key) == -1" 
+									class="gray-hover"
+									v-b-tooltip.hover 
+									title="Add Character" 
+									@click="addPlayer(key, player.character_name)">
+										<i class="fas fa-plus"></i>
+									</a>
 								</div>
+								<span>
+									<span v-if="checkPlayer(key) >= 0">
+										<i class="fas fa-check"></i>
+										<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
+									</span>
+									<span v-if="checkPlayer(key) == -2">
+										<i class="fas fa-check"></i>
+										<small><span class="d-none d-md-inline ml-1 gray-hover">Different Campaign</span></small>
+									</span>
+									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+								</span>
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading Players...</span></div>
@@ -189,6 +180,7 @@
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
 					curHp: this.players[id].maxHp
 				});
+				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
 			},
 			removePlayer(id) {
 				//First remove player from all encounters
@@ -199,9 +191,18 @@
 
 				//Then remove from campaign
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
+				db.ref(`players/${this.user.uid}/${id}/campaign_id`).remove();
 			},
 			checkPlayer(id) {
-				return (Object.keys(this.campaign.players).indexOf(id))
+				if (this.campaign.players !== undefined) {
+					let ret = (Object.keys(this.campaign.players).indexOf(id));
+					if (ret >= 0)
+						return ret;
+				}
+				
+				if (this.players[id].campaign_id !== undefined && this.players[id].campaign_id !== this.campaignId)
+					return -2;
+				return -1;
 			},
 			setPrivate(value) {
 				//Has to be removed on false

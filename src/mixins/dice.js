@@ -35,8 +35,10 @@ export const dice = {
 			let sumThrows = throws.reduce(add);
 			let sumTotal = sumThrows + parseInt(m);
 
+			let showRoll = (m !== 0) ? n + 'd' + d + s + m : n + 'd' + d;
+
 			let roll = {
-				roll: n + 'd' + d + s + m,
+				roll: showRoll,
 				mod: s + m,
 				throws: throws,
 				total: sumTotal,

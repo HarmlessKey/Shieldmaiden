@@ -9,7 +9,8 @@ export const spells = {
 	methods: {
 		rollSpell(spell, castLevel, casterLevel, toHitModifier) {
 			let returnRoll = {
-				actions: []
+				actions: [],
+				damageTypes: []
 			};
 			const actions = spell.actions;
 			const scaleType = spell.level_scaling;
@@ -19,7 +20,7 @@ export const spells = {
 			// LOOP OVER ALL ACTIONS
 			for(let action of actions) {
 				let type = action.type;
-				returnRoll.actions[i] = { type, rolls: [] }
+				returnRoll.actions[i] = { type, rolls: [] };
 
 				//If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'Melee Weapon' || type === 'Ranged Weapon' || type === 'Spell Attack') {
@@ -30,12 +31,22 @@ export const spells = {
 				}
 
 				for(let modifier of action.modifiers) {
+					let subtype = modifier.subtype;
 					let dice_type = modifier.dice_type;
 					let dice_count = modifier.dice_count;
 					let fixed_val = (modifier.fixed_val) ? modifier.fixed_val : 0;
 					let modifierRoll = undefined;
 					let scaledRoll = undefined;
 
+					//Create a list with al damage types for this action
+					//Only if it is not a healing spell
+					if(type !== 'Healing Spell' && subtype) {
+						if(!returnRoll.damageTypes.includes(subtype)) {
+							returnRoll.damageTypes.push(subtype);
+						}
+					}
+
+					//Check if the spell scales with the current roll
 					let tiers = modifier.level_tiers;
 					let scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
 					
@@ -53,30 +64,31 @@ export const spells = {
 						modifierRoll = this.rollD(dice_type, dice_count, fixed_val);
 					}
 
+					//Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({
 						modifierRoll,
 						subtype: modifier.subtype,
 						scaledRoll
-					})
+					});
 				}
 				i++;
 			}
 			return returnRoll;
 		},
 		returnDamageTypeIcon(type) {
-				if(type === 'Acid') { return 'fas fa-tint'; }
-				if(type === 'Bludgening') { 	return 'fas fa-hammer-war';  }
-				if(type === 'Cold') { return 'far fa-snowflake'; }
-				if(type === 'Fire') { return 'fas fa-flame'; }
-				if(type === 'Force') { return 'fas fa-sparkles'; }
-				if(type === 'Lightning') { return 'fas fa-bolt'; }
-				if(type === 'Necrotic') { return 'fas fa-skull'; }
-				if(type === 'Piercing') { return 'far fa-bow-arrow'; }
-				if(type === 'Poison') { return 'fas fa-flask-poison'; }
-				if(type === 'Psychic') { return 'fas fa-brain'; }
-				if(type === 'Radiant') { return 'fas fa-sun'; }
-				if(type === 'Slashing') { return 'fas fa-sword'; }
-				if(type === 'Thunder') { return 'far fa-waveform-path'; }
+			if(type === 'Acid') { return 'fas fa-tint'; }
+			if(type === 'Bludgening') { return 'fas fa-hammer-war';  }
+			if(type === 'Cold') { return 'far fa-snowflake'; }
+			if(type === 'Fire') { return 'fas fa-flame'; }
+			if(type === 'Force') { return 'fas fa-sparkles'; }
+			if(type === 'Lightning') { return 'fas fa-bolt'; }
+			if(type === 'Necrotic') { return 'fas fa-skull'; }
+			if(type === 'Piercing') { return 'far fa-bow-arrow'; }
+			if(type === 'Poison') { return 'fas fa-flask-poison'; }
+			if(type === 'Psychic') { return 'fas fa-brain'; }
+			if(type === 'Radiant') { return 'fas fa-sun'; }
+			if(type === 'Slashing') { return 'fas fa-sword'; }
+			if(type === 'Thunder') { return 'far fa-waveform-path'; }
 		},
 		__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType) {
 			let scaledModifier = undefined;

@@ -90,55 +90,119 @@
 			</button>
 		</div>
 
-		<template v-if="rolled">
-				<h3><b>{{ spell.name }} <template v-if="selectedLevel > 0">({{ selectedLevel }})</template></b></h3>
-			<div class="" v-for="(action, i) in rolled.actions" :key="`action-${i}`">
-				<h3 v-if="action.type === 'Spell Save'">
-					{{ action.save }} saving throw
+		<div class="rolled" v-if="rolled">
+			<h3><b>{{ spell.name }} <template v-if="selectedLevel > 0">({{ selectedLevel }})</template></b></h3>
+			<div v-for="(action, i) in rolled.actions" :key="`action-${i}`">
+				<h3 v-if="action.type === 'Spell Save'" class="d-flex justify-content-between">
+					<span>{{ action.save }} saving throw</span>
+					<div class="save">
+						<a @click="setSave('save')" :class="savingThrow === 'save' ? 'green' : 'gray-light'">
+							<i class="fas fa-check"/>
+						</a>
+						<a @click="setSave('fail')" :class="savingThrow === 'fail' ? 'red' : 'gray-light'">
+							<i class="fas fa-times"/>
+						</a>
+					</div>
 				</h3>
-				<h3 v-else-if="action.toHit">
+				<h2 v-else-if="action.toHit">
 					<span class="gray-hover">To hit:</span>
-					{{ action.toHit.total }}
-				</h3>
+					{{ action.toHit.throws[0] + action.toHit.mod }} = <b>{{ action.toHit.total }}</b>
+				</h2>
 
-				<h3 class="gray-hover">Damage</h3>
 				<hk-table 
 					:items="action.rolls"
 					:columns="resultColumns"
 					:showHeader="false"
 					:collapse="true"
 				>
-					<div slot="total" slot-scope="data" class="red">
-						<b>{{ totalDamage(data.row) }}</b>
+					<div slot="total" slot-scope="data" :class="action.type === 'Healing Spell' ? 'green' : 'red'">
+						<b>{{ totalDamage(action, data.row) }}</b>
 					</div>
 					<template slot="type" slot-scope="data">
-						<span :class="data.row.subtype">
+						<span class="green" v-if="action.type === 'Healing Spell'">
+							<i class="fas fa-heart"/> Healing
+						</span>
+						<span v-else :class="data.row.subtype">
 							<i :class="returnDamageTypeIcon(data.row.subtype)"/>
 							{{ data.row.subtype }}
 						</span>
 					</template>
 					<div slot="collapse" slot-scope="data">
 						<div>
-							Rolls: {{ data.row.modifierRoll.roll }} = {{ data.row.modifierRoll.total }}<br/>
+							Rolls: {{ data.row.modifierRoll.roll }} = <b>{{ data.row.modifierRoll.total }}</b><br/>
 							{{ data.row.modifierRoll.throws }}
 						</div>
 						<div v-if="data.row.scaledRoll" class="mt-3">
-							Scale ({{ selectedLevel }}): {{ data.row.scaledRoll.roll }} = {{ data.row.scaledRoll.total }}<br/>
+							Scale ({{ selectedLevel }}): {{ data.row.scaledRoll.roll }} = <b>{{ data.row.scaledRoll.total }}</b><br/>
 							{{ data.row.scaledRoll.throws }}
+						</div>
+						<div v-if="savingThrow === 'save'" class="mt-3">
+							Successful saving throw: <b>half damage</b>
+						</div>
+						<div v-if="resistances[data.row.subtype] === 'vulnerable'" class="mt-3">
+							Vulnerable to {{ data.row.subtype }}: <b>double damage</b>
+						</div>
+						<div v-if="resistances[data.row.subtype] === 'resistant'" class="mt-3">
+							Resistant to {{ data.row.subtype }}: <b>half damage</b>
+						</div>
+						<div v-if="resistances[data.row.subtype] === 'immune'" class="mt-3">
+							Immune to {{ data.row.subtype }}: <b>no damage</b>
+						</div>
+						<hr>
+						<div>
+						<b>Final result:</b> <br/>	
+						({{ data.row.modifierRoll.total }}
+						<span v-if="data.row.scaledRoll"> + {{ data.row.scaledRoll.total }}</span>)
+						<span v-if="savingThrow === 'save'"> / 2</span>
+						<span v-if="resistances[data.row.subtype] === 'vulnerable'"> * 2</span>
+						<span v-if="resistances[data.row.subtype] === 'resistant'"> / 2</span>
+						<span v-if="resistances[data.row.subtype] === 'immune'"> no effect</span>
+						<span> = <b :class="data.row.subtype">{{ totalDamage(action, data.row) }}</b></span>
 						</div>
 					</div>
 				</hk-table>
+
+				<div v-if="rolled.damageTypes" class="mt-3">
+					<h3>Resistances</h3>
+					<div v-for="(type, i) in rolled.damageTypes" :key="`type-${i}`" class="resistances">
+						<div v-b-tooltip:hover :title="type" class="icon" :class="type">
+							<i :class="returnDamageTypeIcon(type)"/>
+						</div>
+						<div 
+							class="option"
+							:class="resistances[type] === 'vulnerable' ? 'bg-blue' : 'bg-gray-dark'"
+							@click="setResistances(type, 'vulnerable')"
+						>
+							Vulnerable
+						</div>
+						<div 
+							class="option" 
+							:class="resistances[type] === 'resistant' ? 'bg-blue' : 'bg-gray-dark'"
+							@click="setResistances(type, 'resistant')"
+						>
+							Resistant
+						</div>
+						<div 
+							class="option"
+							:class="resistances[type] === 'immune' ? 'bg-blue' : 'bg-gray-dark'"
+							@click="setResistances(type, 'immune')"
+						>
+							Immune
+						</div>
+					</div>
+				</div>
+
+				<h3 class="mt-3">Final result: </h3>
 			</div>
-			<pre>
+			<!-- <pre>
 				{{ rolled }}
-			</pre>
-		</template>
+			</pre> -->
+		</div>
 
-		<hr>
-
+		<!-- <hr>
 		<pre>
 			{{ spell }}
-		</pre>
+		</pre> -->
 	</div>
 </template>
 
@@ -163,6 +227,8 @@
 				casterLevel: undefined,
 				toHitModifier: undefined,
 				rolled: undefined,
+				savingThrow: undefined,
+				resistances: {},
 				resultColumns: {
 					total: {
 						maxContent: true
@@ -229,14 +295,35 @@
 			roll(spell, selectedLevel, casterLevel, toHitModifier) {
 				this.rolled = this.rollSpell(spell, selectedLevel, casterLevel, toHitModifier);
 			},
-			totalDamage(rolls) {
-				let total = rolls.modifierRoll.total;
+			totalDamage(action, rolls) {
+				let total = parseInt(rolls.modifierRoll.total);
 
 				if(rolls.scaledRoll) {
 					total = total + rolls.scaledRoll.total;
 				}
-
+				if(action.type === 'Spell Save' && this.savingThrow === 'save') {
+					total = Math.floor(total / 2);
+				}
+				if(this.resistances[rolls.subtype] === 'vulnerable') {
+					total = total * 2;
+				}
+				if(this.resistances[rolls.subtype] === 'resistant') {
+					total = Math.floor(total / 2);
+				}
+				if(this.resistances[rolls.subtype] === 'immune') {
+					total = 0;
+				}
 				return total;
+			},
+			setSave(save) {
+				this.savingThrow = (save !== this.savingThrow) ? save : undefined;
+			},
+			setResistances(type, resistance) {
+				if(this.resistances[type] === resistance) {
+					this.$delete(this.resistances, type);
+				} else {
+					this.$set(this.resistances, type, resistance);
+				}
 			}
 		}
 	};
@@ -298,6 +385,36 @@
 					opacity: .4;
 					cursor: not-allowed;
 				}
+			}
+		}
+	}
+
+	.rolled {
+		h2 {
+			text-transform: none !important;
+			font-size: 25px;
+		}
+
+		.save {
+			a {
+				margin-left: 10px;
+			}
+		}
+		.resistances {
+			display: grid;
+			grid-template-columns: 30px 1fr 1fr 1fr;
+			grid-column-gap: 1px;
+			user-select: none;
+
+			.icon {
+				padding: 3px 0;
+				text-align: center;
+			}
+			.option {
+				cursor: pointer;
+				padding: 3px 0;
+				text-align: center;
+				color: #fff;
 			}
 		}
 	}

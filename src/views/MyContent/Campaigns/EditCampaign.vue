@@ -100,10 +100,11 @@
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
 								<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
-									<div class="d-flex justify-content-left">
+									<div class="d-flex justify-content-left" :class="{ 'red': inOtherCampaign(key) }">
 										<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
 										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 										{{ players[key].character_name }}
+										<span v-if="inOtherCampaign(key)"><small class="d-none d-md-inline ml-1 gray-hover">Different Campaign</small></span>
 									</div>
 									
 									<div class="actions bg-gray">
@@ -182,27 +183,31 @@
 				});
 				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
 			},
-			removePlayer(id) {
+			removePlayer(playerId) {
 				//First remove player from all encounters
 				for(let encounterId in this.allEncounters[this.campaignId]) {
 					//Remove player from encouner
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(id).remove();
+					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(playerId).remove();
 				}
 
 				//Then remove from campaign
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).remove();
-				db.ref(`players/${this.user.uid}/${id}/campaign_id`).remove();
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(playerId).remove();
+				if (this.players[playerId].campaign_id == this.campaignId)
+					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
 			},
-			checkPlayer(id) {
+			checkPlayer(playerId) {
 				if (this.campaign.players !== undefined) {
-					let ret = (Object.keys(this.campaign.players).indexOf(id));
+					let ret = (Object.keys(this.campaign.players).indexOf(playerId));
 					if (ret >= 0)
 						return ret;
 				}
 				
-				if (this.players[id].campaign_id !== undefined && this.players[id].campaign_id !== this.campaignId)
+				if (this.inOtherCampaign(playerId))
 					return -2;
 				return -1;
+			},
+			inOtherCampaign(playerId) {
+				return (this.players[playerId].campaign_id !== undefined && this.players[playerId].campaign_id !== this.campaignId)
 			},
 			setPrivate(value) {
 				//Has to be removed on false

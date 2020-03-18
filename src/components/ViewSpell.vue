@@ -4,7 +4,7 @@
 			<h3>{{ spell.name }} <span class="source gray-hover">{{ spell.source }}</span></h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
-				<template v-else>{{ spell.level | numeral('0o') }} </template>
+				<template v-else>{{ spell.level | numeral('0o') }}-level </template>
 				{{ spell.school }}
 			</i>
 		</div>
@@ -50,6 +50,7 @@
 				<div class="validate red" v-if="errors.has('casterLevel')">{{ errors.first('casterLevel') }}</div>
 			</div>
 
+			<!-- TO HIT MODIFIER INPUT -->
 			<div class="input" v-if="isToHit">
 				<label for="toHit">To hit modifier</label>
 				<b-form-input
@@ -63,6 +64,19 @@
 				<div class="validate red" v-if="errors.has('toHit')">{{ errors.first('toHit') }}</div>
 			</div>
 
+			<!-- ADVANTAGE INPUT -->
+			<div v-if="isToHit" class="advantage d-flex justify-content-between">
+				<button class="btn btn-sm bg-gray-hover" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
+					<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
+					Advantage
+				</button>
+				<button class="btn btn-sm bg-gray-hover" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
+					<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
+					Disadvantage
+				</button>
+			</div>
+
+			<!-- SPELL LEVEL INPUT -->
 			<template v-if="spell.level > 0">
 				<p>Select cast level</p>
 				<div class="actions__levels">
@@ -81,6 +95,7 @@
 				</div>
 			</template>
 
+			<!-- ROLL SPELL -->
 			<button 
 				:disabled="errors.items && errors.items.length > 0 || missingRequired"
 				class="btn btn-block mt-3" 
@@ -90,8 +105,11 @@
 			</button>
 		</div>
 
+		<!-- ROLL DISPLAY -->
 		<div class="rolled" v-if="rolled">
 			<h3><b>{{ spell.name }} <template v-if="selectedLevel > 0">({{ selectedLevel }})</template></b></h3>
+
+			<!-- ALL ACTIONS -->
 			<div v-for="(action, i) in rolled.actions" :key="`action-${i}`">
 				<h3 v-if="action.type === 'Spell Save'" class="d-flex justify-content-between">
 					<span>{{ action.save }} saving throw</span>
@@ -104,11 +122,24 @@
 						</a>
 					</div>
 				</h3>
+
+				<!-- TO HIT RESULTS -->
 				<h2 v-else-if="action.toHit">
-					<span class="gray-hover">To hit:</span>
-					{{ action.toHit.throws[0] + action.toHit.mod }} = <b>{{ action.toHit.total }}</b>
+					<span class="gray-hover">To hit: </span>
+					<template v-if="action.toHit.singleRoll">
+						{{ action.toHit.singleRoll.throws[0] + action.toHit.singleRoll.mod }} = <b>{{ action.toHit.singleRoll.total }}</b>
+					</template>
+					<template v-else>
+						<template v-if="advantage === 'advantage'">
+							<del class="gray-hover">{{ action.toHit.lowest.throws[0] }}</del> {{ action.toHit.highest.throws[0] + action.toHit.highest.mod }} = <b>{{ action.toHit.highest.total }}</b>
+						</template>
+						<template v-else>
+							<del class="gray-hover">{{ action.toHit.highest.throws[0] }}</del> {{ action.toHit.lowest.throws[0] + action.toHit.lowest.mod }} = <b>{{ action.toHit.lowest.total }}</b>
+						</template>
+					</template>
 				</h2>
 
+				<!-- MODIFIER RESULTS -->
 				<hk-table 
 					:items="action.rolls"
 					:columns="resultColumns"
@@ -162,7 +193,7 @@
 					</div>
 				</hk-table>
 
-				<div v-if="rolled.damageTypes" class="mt-3">
+				<div v-if="rolled.damageTypes.length > 0" class="mt-3">
 					<h3>Resistances</h3>
 					<div v-for="(type, i) in rolled.damageTypes" :key="`type-${i}`" class="resistances">
 						<div v-b-tooltip:hover :title="type" class="icon" :class="type">
@@ -226,6 +257,7 @@
 				selectedLevel: this.data.level,
 				casterLevel: undefined,
 				toHitModifier: undefined,
+				advantage: false,
 				rolled: undefined,
 				savingThrow: undefined,
 				resistances: {},
@@ -318,6 +350,9 @@
 			setSave(save) {
 				this.savingThrow = (save !== this.savingThrow) ? save : undefined;
 			},
+			setAdvantage(value) {
+				this.advantage = (value !== this.advantage) ? value : false;
+			},
 			setResistances(type, resistance) {
 				if(this.resistances[type] === resistance) {
 					this.$delete(this.resistances, type);
@@ -349,6 +384,11 @@
 		 margin-bottom: 15px;
 	}
 
+	.advantage {
+		.btn {
+			width: 48%;
+		}
+	}
 	.actions {
 		margin-bottom: 15px;
 

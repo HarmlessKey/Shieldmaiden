@@ -313,9 +313,7 @@
 							${ignoredRoll}
 							${toHitRoll} ${toHit[highest].mod} = </span>${toHit[highest].total}
 							${hitOrMiss}
-							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;
-						
-					
+							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;		
 				}
 
 				//If it was an open roll

@@ -7,7 +7,7 @@ export const spells = {
 		}
 	},
 	methods: {
-		rollSpell(spell, castLevel, casterLevel, toHitModifier) {
+		rollSpell(spell, castLevel, casterLevel, toHitModifier, advantage) {
 			let returnRoll = {
 				actions: [],
 				damageTypes: []
@@ -24,7 +24,7 @@ export const spells = {
 
 				//If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'Melee Weapon' || type === 'Ranged Weapon' || type === 'Spell Attack') {
-					returnRoll.actions[i].toHit = this.rollD(20, 1, toHitModifier);
+					returnRoll.actions[i].toHit = this.__rollToHit__(toHitModifier, advantage);
 				}
 				if(type === 'Spell Save') {
 					returnRoll.actions[i].save = action.save;
@@ -132,6 +132,24 @@ export const spells = {
 				}
 			}
 			return scaledModifier;
+		},
+		__rollToHit__(modifier, advantage) {
+			let rolls = {};
+
+			if(this.advantage) {
+				for(let i = 0; i <= 1; i++) {
+					toHit[i] =  this.rollD(20, 1, modifier); //Roll the to hit, d20 + attack bonus
+				}
+
+				//Define the position of the highest and lowest rolls in the array
+				rolls.highest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? toHit[0] : toHit[1];
+				rolls.lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? toHit[1]: toHit[0];
+			} 
+			//Roll once where there is no advantage/disadvantage
+			else {
+				rolls.singleRoll = this.rollD(20, 1, modifier); //Roll the to hit, d20 + attack bonus
+			}
+			return rolls;
 		}
 	}
 }

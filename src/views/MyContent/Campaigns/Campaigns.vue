@@ -159,6 +159,7 @@
 		},
 		mounted() {
 			this.clearEncounters()
+			this.assignPlayers()
 		},
 		computed: {
 			...mapGetters([
@@ -224,7 +225,26 @@
 			deleteCampaign(key) {
 				db.ref('campaigns/'+ this.user.uid).child(key).remove();
 				db.ref('encounters/'+ this.user.uid).child(key).remove();
-			}
+			},
+			assignPlayers() {
+				for (let campaignId in this.campaigns) {
+					for (let playerId in this.campaigns[campaignId].players) {
+						if (Object.keys(this.players[playerId]).indexOf('campaign_id') < 0) {
+							// Player not yet assigned to campaign
+							console.log("player in no campaign")
+							db.ref(`players/${this.user.uid}/${playerId}`).update({campaign_id: campaignId});
+						} else if (this.players[playerId].campaign_id !== campaignId) {
+							// Player in both this campaign as other campaign
+							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
+								buttons: [
+									// { text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
+									{ text: 'Ok', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+								]
+							});
+						}
+					}
+				}
+			},
 		}
 	}
 </script>

@@ -108,16 +108,14 @@
 						:currentPage="currentPage"
 					>
 						<template slot="encounter" slot-scope="data">
-							<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+							<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
 								{{ data.item }}
 							</router-link>
-							<template v-else>
-								{{ data.item }}
-							</template>
 						</template>
 
 						<template slot="actions" slot-scope="data">
 							<div class="actions">
+								<router-link v-b-tooltip.hover title="View" :to="'/run-encounter/' + campaignId + '/' + data.row.key"><i class="fas fa-eye"></i></router-link>
 								<a v-b-tooltip.hover title="Unfinish" @click="reset(data.row.key, hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
 								<a v-b-tooltip.hover title="Reset" @click="reset(data.row.key)"><i class="fas fa-undo"></i></a>
 								<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)"><i class="fas fa-trash-alt"></i></a>

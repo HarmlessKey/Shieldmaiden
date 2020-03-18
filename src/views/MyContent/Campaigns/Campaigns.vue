@@ -231,7 +231,6 @@
 					for (let playerId in this.campaigns[campaignId].players) {
 						if (Object.keys(this.players[playerId]).indexOf('campaign_id') < 0) {
 							// Player not yet assigned to campaign
-							console.log("player in no campaign")
 							db.ref(`players/${this.user.uid}/${playerId}`).update({campaign_id: campaignId});
 						} else if (this.players[playerId].campaign_id !== campaignId) {
 							// Player in both this campaign as other campaign

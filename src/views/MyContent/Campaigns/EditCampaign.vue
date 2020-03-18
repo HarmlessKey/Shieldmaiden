@@ -69,26 +69,26 @@
 									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 									{{ player.character_name }}
 								</div>
-								<div class="actions bg-gray">
-									<a v-if="checkPlayer(key) == -1" 
-									class="gray-hover"
+								
+								<span v-if="inOtherCampaign(key)">
+									<span class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
+									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
+								</span>
+
+								<span v-else-if="checkPlayer(key) >= 0">
+									<i class="fas fa-check"></i>
+									<span class="d-none d-md-inline ml-1 gray-hover"><small>Added</small></span>
+								</span>
+
+								<div v-else class="actions bg-gray">
+									<a class="gray-hover"
 									v-b-tooltip.hover 
 									title="Add Character" 
 									@click="addPlayer(key, player.character_name)">
 										<i class="fas fa-plus"></i>
 									</a>
 								</div>
-								<span>
-									<span v-if="checkPlayer(key) >= 0">
-										<i class="fas fa-check"></i>
-										<small><span class="d-none d-md-inline ml-1 gray-hover">Added</span></small>
-									</span>
-									<span v-if="checkPlayer(key) == -2">
-										<i class="fas fa-check"></i>
-										<small><span class="d-none d-md-inline ml-1 gray-hover">Different Campaign</span></small>
-									</span>
-									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-								</span>
+								
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading Players...</span></div>
@@ -104,7 +104,7 @@
 										<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
 										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 										{{ players[key].character_name }}
-										<span v-if="inOtherCampaign(key)"><small class="d-none d-md-inline ml-1 gray-hover">Different Campaign</small></span>
+										<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
 									</div>
 									
 									<div class="actions bg-gray">
@@ -196,15 +196,10 @@
 					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
 			},
 			checkPlayer(playerId) {
-				if (this.campaign.players !== undefined) {
-					let ret = (Object.keys(this.campaign.players).indexOf(playerId));
-					if (ret >= 0)
-						return ret;
-				}
-				
-				if (this.inOtherCampaign(playerId))
-					return -2;
-				return -1;
+				if (this.campaign.players === undefined)
+					return -1
+
+				return (Object.keys(this.campaign.players).indexOf(playerId));
 			},
 			inOtherCampaign(playerId) {
 				return (this.players[playerId].campaign_id !== undefined && this.players[playerId].campaign_id !== this.campaignId)

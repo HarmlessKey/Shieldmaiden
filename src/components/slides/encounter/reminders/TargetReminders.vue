@@ -4,7 +4,7 @@
 		<b-row v-if="entities[entityKey].reminders" class="current justify-content-start px-3">
 			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[entityKey].reminders" :key="key">
 				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
-					{{ reminder.title }}
+					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
 				</a>
 			</b-col>
@@ -174,6 +174,14 @@
 			},
 			showVariableOptions(key) {
 				this.varOptions = (this.varOptions !== key) ? key : undefined;
+			},
+			title(reminder) {
+				let title = reminder.title;
+
+				if(reminder.selectedVars) {
+					 title = this.replaceReminderVariables(title, reminder.selectedVars);
+				}
+				return title;
 			}
 		}
 	};

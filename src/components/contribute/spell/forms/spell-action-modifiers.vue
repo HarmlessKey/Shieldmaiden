@@ -329,7 +329,7 @@ export default {
 				description = ["This spell's damage increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
-					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 					
 					description.push(new_line)
 				}
@@ -338,7 +338,7 @@ export default {
 				let tier = level_tiers[0]
 				let new_line = "When you cast this spell using a spell slot of "
 				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
-				new_line += `${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
+				new_line += `${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
 				new_line += `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
 				
 				description = [new_line]
@@ -348,7 +348,7 @@ export default {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "
 					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `
-					new_line += `${tier.dice_count || "..."}${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					new_line += `${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 
 					description.push(new_line)
 				}

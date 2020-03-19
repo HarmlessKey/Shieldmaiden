@@ -23,7 +23,7 @@
 			<b-row>
 				<!-- NAME -->
 				<b-col md="6">
-					<label for="name">Name</label>
+					<label class="required" for="name">Name</label>
 					<b-form-input v-model="spell.name"
 						id="name"
 						name="name"
@@ -41,7 +41,7 @@
 
 				<!-- LEVEL -->
 				<b-col md="3">
-					<label for="spell_level">Level</label>
+					<label class="required" for="spell_level">Level</label>
 					<b-form-select v-model="spell.level"
 						id="spell_level"
 						name="spell_level"
@@ -49,7 +49,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="Spell Level">
-						<option value="undefined" disabled>- Spell Level -</option>
+						<option :value="undefined" disabled>- Spell Level -</option>
 						<option v-for="(l,i) in levels" 
 							:key="i" :value="i" 
 							:seleced="spell.level==i">{{l}}</option>
@@ -59,7 +59,7 @@
 
 				<!-- SCHOOL -->
 				<b-col md="3">
-					<label for="spell_school">School</label>
+					<label class="required" for="spell_school">School</label>
 					<b-form-select v-model="spell.school"
 						id="spell_school"
 						name="spell_school"
@@ -67,7 +67,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="Spell School">
-						<option value="undefined" disabled>- Select School -</option>
+						<option :value="undefined" disabled>- Select School -</option>
 						<option v-for="(s) in schools"
 							:key="s.value" :value="s.value">{{ s.label }}</option>
 					</b-form-select>
@@ -78,7 +78,7 @@
 			<b-row>
 				<!-- CAST TIME -->
 				<b-col md="2">
-					<label for="cast_time_nr">Cast Time</label>
+					<label class="required" for="cast_time_nr">Cast Time</label>
 					<b-form-input v-model="spell.cast_time_nr"
 						autocomplete="off"
 						id="cast_time_nr"
@@ -94,7 +94,7 @@
 
 				<!-- CAST TIME TYPE -->
 				<b-col md="3">
-					<label for="cast_time_nr">Cast Type</label>
+					<label class="required" for="cast_time_nr">Cast Type</label>
 					<b-form-select v-model="spell.cast_time_type"
 						id="cast_time_type"
 						name="cast_time_type"
@@ -102,7 +102,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="Casting Type">
-						<option value="undefined" disabled>- Casting Type -</option>
+						<option :value="undefined" disabled>- Casting Type -</option>
 						<option v-for="(t) in cast_time"
 							:key="t.value" :value="t.value">{{t.label}}</option>
 					</b-form-select>
@@ -163,7 +163,7 @@
 			<b-row>
 				<!-- RANGE TYPE -->
 				<b-col md="4">
-					<label for="range_type">Range Type</label>
+					<label class="required" for="range_type">Range Type</label>
 					<b-form-select v-model="spell.range_type"
 						id="range_type"
 						name="range_type"
@@ -171,7 +171,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="Range Type">
-						<option value="undefined" disabled>- Range Type -</option>
+						<option :value="undefined" disabled>- Range Type -</option>
 						<option v-for="(val,i) in range_type"
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>
@@ -217,7 +217,7 @@
 			<b-row>
 				<!-- DURATION -->
 				<b-col md="4">
-					<label for="duration_type">Duration Type</label>
+					<label class="required" for="duration_type">Duration Type</label>
 					<b-form-select v-model="spell.duration_type"
 						id="duration_type"
 						name="duration_type"
@@ -225,7 +225,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="Duration Type">
-						<option value="undefined" disabled>- Duration Type -</option>
+						<option :value="undefined" disabled>- Duration Type -</option>
 						<option v-for="(val,i) in dur_type"
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>
@@ -258,7 +258,7 @@
 						name="duration_scale"
 						title="Time Scale"
 						class="form-control mb-2">
-						<option value="undefined">- Time Scale -</option>
+						<option :value="undefined" disabled>- Time Scale -</option>
 						<option v-for="(val,i) in dur_time"
 							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
 					</b-form-select>
@@ -267,7 +267,7 @@
 			<b-row>
 				<b-col md="6">
 					<!-- AOE TYPE -->
-					<label for="aoe_type">AOE Type</label>
+					<label class="required" for="aoe_type">AOE Type</label>
 					<b-form-select v-model="spell.aoe_type"
 						id="aoe_type"
 						name="aoe_type"
@@ -275,7 +275,7 @@
 						class="form-control mb-2"
 						v-validate="'required'"
 						data-vv-as="AOE Type">
-						<option value="undefined" disabled>- AOE Type -</option>
+						<option :value="undefined" disabled>- AOE Type -</option>
 						<option v-for="(val,i) in aoe_type"
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>
@@ -297,7 +297,7 @@
 			<b-row>
 				<!-- DESCRIPTION -->
 				<b-col md="6">
-					<label for="description">Description</label>
+					<label class="required" for="description">Description</label>
 					<b-form-textarea v-model="spell.description"
 						id="description"
 						name="description"
@@ -334,7 +334,7 @@
 				</b-col>
 				<!-- LEVEL SCALING -->
 				<b-col md="5">
-					<label for="level_scaling">Level Scaling</label>
+					<label class="required" for="level_scaling">Level Scaling</label>
 					<b-form-select v-model="spell.level_scaling"
 						id="level_scaling"
 						name="level_scaling"
@@ -342,7 +342,7 @@
 						v-validate="'required'"
 						class="form-control mb-2"
 						@change="$forceUpdate()">
-						<option value="undefined">- Level Scaling -</option>
+						<option :value="undefined" disabled>- Level Scaling -</option>
 						<option v-for="(val,i) in lvl_scaling"
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>

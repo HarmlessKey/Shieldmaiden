@@ -382,7 +382,17 @@ a.large-link {
 	}
 }
 
-
+label.required:after {
+	// content: '\f069';
+	// font-family: FontAwesome;
+	// // font-
+	content: '*';
+	color: $red;
+	font-size: 25px;
+	line-height: 15px;
+	vertical-align: middle;
+	margin-left: 5px;
+}
 
 
 

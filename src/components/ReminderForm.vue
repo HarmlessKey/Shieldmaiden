@@ -8,7 +8,7 @@
 				<b-form-input type="text" 
 				autocomplete="off"
 				v-model="reminder.title"
-				v-validate="'required|max:30'"
+				v-validate="'required|max:30|variable_check'"
 				maxLength="30"
 				name="title"
 				id="title"
@@ -73,7 +73,7 @@
 						<b-form-textarea 
 							class="mt-2" rows="3" 
 							name="notification" 
-							v-validate="'required|max:999'" 
+							v-validate="'required|max:999|variable_check'" 
 							maxLength="999"
 							v-model="reminder.notify" 
 							placeholder="Notification"/>
@@ -224,6 +224,22 @@ export default {
 			this.$set(this.reminder, 'color', 'green-light');
 			this.$set(this.reminder, 'action', 'remove');
 		}
+		this.$validator.extend('variable_check', {
+			getMessage: field => `The ${field} contains undefined variables.`,
+			validate: value => {
+				let regexpr = /\[(\w+)\]/g;
+				let text_vars = value.match(regexpr, "$1");
+				if (!text_vars)
+					return true;
+				for (let v of text_vars) {
+					let stripped = v.slice(1,-1);
+					if (!this.reminder.variables || !Object.keys(this.reminder.variables).includes(stripped))
+						return false
+				}
+				return true;
+			}
+		})
+		// this.$validator.extend('falsy', (value) => ! value);
 		this.$emit('validation', this.$validator);
 	},
 	methods: {
@@ -259,6 +275,7 @@ export default {
 		},
 		setOption(key, i) {
 			this.reminder.selectedVars[key] = i;
+			this.$forceUpdate();
 		}
 	}
 }

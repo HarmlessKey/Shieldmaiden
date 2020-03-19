@@ -62,6 +62,9 @@
 			},
 			editReminder() {
 				this.validation.validateAll().then((result) => {
+					// console.log(this.reminder)
+					delete this.reminder['.key'];
+
 					if (result) {
 						this.set_targetReminder({
 							action: 'update',

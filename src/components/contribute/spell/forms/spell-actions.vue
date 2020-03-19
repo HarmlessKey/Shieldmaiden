@@ -19,11 +19,39 @@
 				</a>
 			</div>
 			<div class="card-body">
-				<div v-for="(spell_action, index) in spell.actions" class="d-flex justify-content-between">
-					<span>{{spell_action.type}}</span>
-					<span @click="edit_action(index)">edit</span>
-					<span @click="remove_action(index)">delete</span>
-				</div>
+				<!-- <div 
+					v-for="(spell_action, index) in spell.actions" 
+					class="hk-table" 
+					:key="`action-${index}`"
+				>
+					<div class="hk-column">{{spell_action.type}}</div>
+					<div class="hk-column actions">
+						<div @click="edit_action(index)">edit</div>
+						<div @click="remove_action(index)">delete</div>
+					</div>
+				</div> -->
+				<hk-table 
+					:columns="columns"
+					:items="spell.actions"
+				>
+					<template slot="modifiers" slot-scope="data">
+						{{ data.item ? data.item.length : "" }}
+					</template>
+					<template slot="conditions" slot-scope="data">
+						{{ data.item ? data.item.length : "" }}
+					</template>
+					<template slot="notifications" slot-scope="data">
+						{{ data.item ? data.item.length : "" }}
+					</template>
+					<div slot="actions" class="actions" slot-scope="data">
+						<a @click="edit_action(data.index)">
+							<i class="fas fa-pencil"></i>
+						</a>
+						<a @click="remove_action(data.index)">
+							<i class="fas fa-trash-alt"></i>
+						</a>
+					</div>
+				</hk-table>
 			</div>
 		</div>
 		
@@ -46,7 +74,30 @@ export default {
   data() {
     return {
     	editing: false,
-    	edit_index: undefined,
+			edit_index: undefined,
+			columns: {
+				type: {
+					label: "Type"
+				},
+				modifiers: {
+					label: '<i class="fas fa-dice-d20"></i>',
+					center: true
+				},
+				conditions: {
+					label: '<i class="fas fa-flame"></i>',
+					center: true
+				},
+				notifications: {
+					label: '<i class="fas fa-bell"></i>',
+					center: true
+				},
+				actions: {
+					label: '<i class="far fa-ellipsis-h"></i>',
+					noPadding: true,
+					right: true,
+					maxContent: true
+				}
+			}
     };
   },
   computed: {

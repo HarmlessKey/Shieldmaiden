@@ -18,7 +18,7 @@
 					<div class="gray-light" >
 						{{parseInt(mod_index) + 1}}.
 						{{modifier.name}}
-						{{modifier.dice_count}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
+						{{modifier.dice_count}}{{modifier.dice_type ? "D" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
 						{{modifier.subtype}} {{modifier.type}}
 					</div>
 					<a @click="remove_modifier(mod_index)"
@@ -31,17 +31,6 @@
 				<b-collapse visible :id="'accordion-'+mod_index" accordion="my-accordion">
 					<div class="card-body">
 						<b-row>
-							<b-col>
-								<label for="mod_name">Modifier Name</label>
-								<b-form-input v-model="modifier.name"
-									id="mod_name"
-									name="mod_name"
-									title="Modifier Name"
-									class="form-control mb-2 mr-5"
-									data-vv-as="Modifier Name"
-									@keyup="$forceUpdate()">
-								</b-form-input>
-							</b-col>
 							<b-col md="4">
 								<label for="modifier_subtype">
 									Subtype
@@ -81,6 +70,22 @@
 										<span>P</span>
 									</a>
 								</div>
+							</b-col>
+							<b-col md="4">
+								<!-- SPELL FAIL MODIFIER -->
+								<label for="dice_type">Save Fail Modifier</label>
+								<b-form-select v-model="modifier.save_fail_mod"
+									:disabled="action_type !== 'Spell Save'"
+									id="save_fail_mod"
+									name="save_fail_mod"
+									title="Save Fail Modifier"
+									class="form-control mb-2"
+									data-vv-as="Save Fail Modifier"
+									@change="$forceUpdate()">
+									<!-- <option value="undefined" disabled>- Subtype -</option> -->
+									<option v-for="(val,i) in save_fail_mod"
+										:key="i" :value="val.value">{{ val.label }}</option>
+								</b-form-select>
 							</b-col>
 						</b-row>
 						<b-row>
@@ -270,10 +275,16 @@ export default {
 				{ label: "D12", value: 12 },
 				{ label: "D20", value: 20 }
 			],
-		};
-	},
-	methods: {
-		add_modifier() {
+			save_fail_mod: [
+				{ label: "0", value: 0},
+				// { label: "¼", value: 0.25},
+				{ label: "½", value: 0.5},
+				{ label: "1", value: 1},
+			]
+    };
+  },
+  methods: {
+  	add_modifier() {
 			let modifiers = this.modifiers;
 			if(modifiers === undefined) {
 				modifiers = []

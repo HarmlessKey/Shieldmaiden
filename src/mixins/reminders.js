@@ -87,6 +87,21 @@ export const remindersMixin = {
 		},
 		__notify__(target, key) {
 			let notify = target.reminders[key].notify;
+			let title = target.reminders[key].title;
+			
+			//Replace variables in title and message
+			if(target.reminders[key].selectedVars) {
+				let regexpr = /\[(\w+)\]/g;
+				notify = notify.replace(regexpr, function(result) {
+					let var_name = result.slice(1,-1);
+					return target.reminders[key].selectedVars[var_name]
+				});
+
+				title = title.replace(regexpr, function(result) {
+					let var_name = result.slice(1,-1);
+					return target.reminders[key].selectedVars[var_name]
+				});
+			}
 
 			//Create buttons for notification
 			if(target.reminders[key].action !== 'remove') {
@@ -117,7 +132,7 @@ export const remindersMixin = {
 			// NOTIFICATION
 			this.$snotify.warning(
 				target.name + ': ' + notify,
-				target.reminders[key].title, 
+				title, 
 				{
 					timeout: 0,
 					buttons

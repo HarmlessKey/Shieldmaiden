@@ -70,7 +70,13 @@
 					</div>
 					<b-form-radio value="notify" class="mt-2"><i class="fas fa-bell"></i> Notify on trigger</b-form-radio><br/>
 					<template v-if="reminder.action == 'notify'">
-						<b-form-textarea class="mt-2" rows="3" name="notification" v-validate="'required'" v-model="reminder.notify" placeholder="Notification"></b-form-textarea>
+						<b-form-textarea 
+							class="mt-2" rows="3" 
+							name="notification" 
+							v-validate="'required|max:999'" 
+							maxLength="999"
+							v-model="reminder.notify" 
+							placeholder="Notification"/>
 						<p class="validate red" v-if="errors.has('notification')">{{ errors.first('notification') }}</p>
 						<small>(You'll get the option to keep or remove the reminder)</small>
 					</template>
@@ -79,7 +85,7 @@
 		</b-row>
 
 		<!-- VARIABLES -->
-		<b-row class="mb-3">
+		<b-row class="mb-3" v-if="variables">
 			<b-col class="col-3">
 				Variables 
 				<a 
@@ -145,7 +151,11 @@
 export default {
 	name: "ReminderForm",
 	props: {
-		value: Object
+		value: Object,
+		variables: {
+			type: Boolean,
+			default: true
+		}
 	},
 	data() {
 		return {

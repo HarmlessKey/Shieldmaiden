@@ -128,7 +128,7 @@
 			<b-row>
 				<!-- COMPONENTS -->
 				<b-col md="3" v-if="spell.components">
-					<label for="components">Componens</label>
+					<label for="components">Components</label>
 					<div class="components d-flex justify-content-between" name="components">
 						<a class="component_box" @click="setComponent('verbal')"
 							 :class="{'selected': spell.components['verbal']}">
@@ -180,17 +180,19 @@
 
 				<!-- RANGE -->
 				<b-col md="4">
-					<label for="range">Range ft.</label>
+					<label class="required" for="range">Range ft.</label>
 					<b-form-input v-model="spell.range"
 						:disabled="spell.range_type!='Ranged'"
 						autocomplete="off"
 						id="range"
 						name="range"
+						v-validate="'required'"
 						class="form-control mb-2"
 						title="Range"
 						type="number"
 						data-vv-as="Range"
-						></b-form-input>
+						/>
+						<p class="validate red" v-if="errors.has('range')">{{ errors.first('range') }}</p>
 				</b-col>
 
 				<!-- CLASSES -->

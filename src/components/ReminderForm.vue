@@ -124,7 +124,13 @@
 					<!-- Options -->
 					<div v-for="(option, i) in variable" :key="`${key}-option-${i}`" class="option">
 						<div class="input-group">
+							<div class="input-group-prepend" v-if="selectOptions">
+								<button class="btn btn-sm bg-gray" @click="setOption(key, reminder.variables[key][i])">
+									<i class="fas fa-check" :class="{ green: reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
+								</button>
+							</div>
 							<b-form-input 
+								:disabled="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
 								:name="'option'+key"
 								size="sm"
 								type="text" 
@@ -136,7 +142,13 @@
 								placeholder="Option" 
 							/>
 							<div class="input-group-append">
-								<button class="btn btn-sm bg-gray-hover" @click="removeOption(key, i)"><i class="fas fa-trash-alt"></i></button>
+								<button 
+									class="btn btn-sm bg-gray-hover" 
+									@click="removeOption(key, i)"
+									:disabled="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
+								>
+									<i class="fas fa-trash-alt"></i>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -155,6 +167,10 @@ export default {
 		variables: {
 			type: Boolean,
 			default: true
+		},
+		selectOptions: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -233,7 +249,16 @@ export default {
 		},
 		removeVar(key) {
 			this.$delete(this.reminder.variables, key);
+
+			// if the reminder is in use, the selection must be deleted too
+			if(this.reminder.selectedVars) {
+				this.$delete(this.reminder.selectedVars, key);
+			}
+
 			this.$forceUpdate();
+		},
+		setOption(key, i) {
+			this.reminder.selectedVars[key] = i;
 		}
 	}
 }

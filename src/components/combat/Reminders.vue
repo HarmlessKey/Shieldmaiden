@@ -9,10 +9,10 @@
 						key,
 						entity
 				}})" 
-				v-b-tooltip.hover :title="'Show '+reminder.title" 
+				v-b-tooltip.hover :title="'Show '+title(reminder)" 
 				class="text-truncate d-block" :class="'bg-'+reminder.color"
 			>
-				{{ reminder.title }}
+				{{ title(reminder) }}
 				<span class="counter" v-if="reminder.rounds">{{ reminder.rounds }}</span>
 			</a>
 		</b-col>
@@ -20,15 +20,25 @@
 </template>
 
 <script>
+	import { remindersMixin } from '@/mixins/reminders';
 	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Reminders',
 		props: ['entity'],
+		mixins: [remindersMixin],
 		methods: {
 			...mapActions([
 				'setSlide'
-			])
+			]),
+			title(reminder) {
+				let title = reminder.title;
+
+				if(reminder.selectedVars) {
+					 title = this.replaceReminderVariables(title, reminder.selectedVars);
+				}
+				return title;
+			}
 		}
 	}
 </script>

@@ -32,7 +32,7 @@
 					<div class="card-body">
 						<b-row>
 							<b-col md="4">
-								<label for="modifier_subtype">
+								<label class="required" :for="`modifier_subtype-${mod_index}`">
 									Subtype
 									<a 
 										v-b-popover.hover.top="'Select the damage type for this modifier.'" 
@@ -43,16 +43,18 @@
 								</label>
 								<b-form-select v-model="modifier.subtype"
 									:disabled="action_type == 'Healing Spell'"
-									id="modifier_subtype"
-									name="modifier_subtype"
+									:id="`modifier_subtype-${mod_index}`"
+									:name="`modifier_subtype-${mod_index}`"
 									title="Modifier Subtype"
 									class="form-control mb-2"
+									v-validate="'required'"
 									data-vv-as="Modifier Subtype"
 									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Subtype -</option>
+									<option :value="undefined" disabled>- Subtype -</option>
 									<option v-for="(val,i) in modifier_subtype"
 										:key="i" :value="val">{{val}}</option>
 								</b-form-select>
+								<p class="validate red" v-if="errors.has(`modifier_subtype-${mod_index}`)">{{ errors.first(`modifier_subtype-${mod_index}`) }}</p>
 							</b-col>
 							<b-col md="4">
 								<label for="primary">
@@ -153,11 +155,11 @@
 								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
 									<b-col md="3">
-										<label for="level">{{level_scaling}}</label>
+										<label class="required" :for="`level-${mod_index}`">{{level_scaling}}</label>
 										<b-form-input v-model="level_tier.level"
 											autocomplete="off"
-											id="level"
-											name="level"
+											:id="`level-${mod_index}`"
+											:name="`level-${mod_index}`"
 											class="form-control mb-2"
 											:title="level_scaling"
 											v-validate="'required'"
@@ -165,7 +167,7 @@
 											:data-vv-as="level_scaling"
 											@keyup="$forceUpdate()"
 											></b-form-input>
-											<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+											<p class="validate red" v-if="errors.has(`level-${mod_index}`)">{{ errors.first(`level-${mod_index}`) }}</p>
 									</b-col>
 									<!-- HL DICE COUNT -->
 									<b-col md="3">
@@ -191,7 +193,7 @@
 											class="form-control mb-2"
 											data-vv-as="Dice Type"
 											@change="$forceUpdate()">
-											<option value="undefined" disabled>- Dice type -</option>
+											<option :value="undefined" disabled>- Dice type -</option>
 											<option v-for="(val,i) in dice_type"
 												:key="i" :value="val.value">{{ val.label }}</option>
 										</b-form-select>
@@ -247,6 +249,7 @@ export default {
 	computed: {
 		modifiers: {
 			get() {
+				this.$emit("input", this.value);
 				return this.value;
 			},
 			set(newValue) {
@@ -260,6 +263,10 @@ export default {
 			}
 			return 100;
 		},
+		validator() {
+			// let mod_key = `test ${}`
+			return {"modifiers": this.$validator};
+		}
 	},
 
 	data() {
@@ -307,6 +314,7 @@ export default {
 			this.$forceUpdate(); //IMPORTANT
 		},
 		add_level_tier(index) {
+			console.log(this.modifiers[index])
 			this.modifiers[index].level_tiers.push({});
 			this.$forceUpdate();
 		},
@@ -355,7 +363,26 @@ export default {
 			}
 			return description
 		},
-	}
+	},
+	watch: {
+		modifiers: {
+			handler() {
+				console.log('watch modifiers')
+				console.log(this.validator)
+				let vm = this;
+				// this.validator['modifiers'].validateAll().then(function() {
+					// Emits validation on every change
+				// });
+				this.$nextTick(() => {
+					this.$emit('validation', this.validator);
+				})
+			},
+			deep: true,
+		}
+	},
+	mounted() {
+		this.$emit('validation', this.validator);
+	},
 };
 </script>
 

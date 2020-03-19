@@ -448,8 +448,25 @@ export default {
 				this.$emit("input", newValue);
 				return newValue;
 			}
+		},
+		validator() {
+			// Validator object to propagate to parent
+			return {'basic-info': this.$validator};
 		}
 	},
+	watch: {
+		spell: {
+			handler() {
+				// Emits validation on every change
+				this.$emit('validation', this.validator);
+			},
+			deep: true,
+		}
+	},
+	mounted() {
+		// Emit validator list
+		this.$emit('validation', this.validator);
+	}
 };
 </script>
 

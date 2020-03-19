@@ -64,9 +64,9 @@
 							<span class="d-none d-md-inline ml-1 green">Save</span>
 						</a>
 					</div>
-					<basic-info v-model='spell' :levels='levels'/>
+					<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
 					<!-- SPELL ACTIONS -->
-					<spell-actions v-model='spell' />
+					<spell-actions v-model='spell' @validation="setValidators" />
 				</b-col>
 			</b-row>
 		</template>
@@ -111,6 +111,7 @@
 					"1st","2nd","3rd",
 					"4th","5th","6th",
 					"7th","8th","9th"],
+				validators: {},
 			}
 		},
 		computed: {
@@ -200,8 +201,8 @@
 					} else {
 						this.spell.duration_type = "Time";
 					}
-					// Find duration time number and scale
 					
+					// Find duration time number and scale
 					this.spell.duration_n = parseInt(duration_list[0]);
 					// Calculate time scale
 					let scale = duration_list[1];
@@ -276,7 +277,34 @@
 			update() {
 				this.$forceUpdate();
 			},
-			store_spell() {
+			setValidators(validators) {
+				// Receives validator lists from basic info and spell actions
+				// console.log("set validate called root")
+				// console.log(validators)
+				// validators.forEach( validator => {
+
+				// })
+				for (let v in validators) {
+					this.validators[v] = validators[v];
+					// this.validators.push(validator)
+
+				}
+				console.log(this.validators);
+
+				// this.validation = validate;
+			},
+			async validate_validators() {
+				// loops through all available validators to check if the forms
+				// are all valid. This happens async.
+				for (let v in this.validators) {
+					let validator = this.validators[v];
+					 let temp = await validator.validateAll()
+					 if (temp == false)
+					 	return false;
+				}
+				return true;
+			},
+			async store_spell() {
 				delete this.spell['.value'];
 				delete this.spell['.key'];
 				this.spell.changed = true;
@@ -289,15 +317,23 @@
 					parseInt(this.spell.duration_n);
 				}
 
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`new_spells/${this.id}`).set(this.spell);
-						console.log("Validated");
-						// this.$router.replace('/players')
-					} else {
-						console.log("Not validated");
-					}
-				})
+				
+				if (await this.validate_validators() === true) {
+				// this.validation.validateAll().then((result) => {
+					// if (result) {
+					console.log("Validated");
+					db.ref(`new_spells/${this.id}`).set(this.spell);
+					this.$snotify.success('Spell Saved.', 'Critical hit!', {
+						position: "rightTop"
+					});
+					// this.$router.replace('/players')
+				} else {
+					console.log("Not validated");
+					this.$snotify.error('Form Not Valid', 'Critical miss!', {
+						position: "rightTop"
+					});
+				}
+				// })
 			},
 			
 		}

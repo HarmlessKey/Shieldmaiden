@@ -2,10 +2,12 @@
 	<div>
 		<edit-spell-action 
 			v-if="edit_index !== undefined" 
-			v-model="spell.actions[edit_index]" 
+			v-model="spell.actions[edit_index]"
+			:action_index="edit_index"
 			:level_scaling="spell.level_scaling"
 			:level="spell.level"
 			@saved="saved_action()"
+			@validation="setValidation"
 		/>
 		<div v-else class="card">
 			<div class="card-header d-flex justify-content-between">
@@ -133,7 +135,29 @@ export default {
 
 			this.$forceUpdate()
 		},
-	}
+		setValidation(validators) {
+			// This component just passes through all validators
+			// No form fields that need validation
+			console.log("set validate called action")
+			console.log(validators)
+			// this.validators = validators;
+			this.$emit('validation', validators)
+
+		}
+	},
+	// watch: {
+	// 	spell: {
+	// 		handler() {
+	// 			// Emits validation on every change
+	// 			this.$emit('validation', this.validation);
+	// 		},
+	// 		deep: true,
+	// 	}
+	// },
+	// mounted() {
+	// 	console.log("Emit validation basic info")
+	// 	this.$emit('validation', this.$validator);
+	// },
 };
 </script>
 

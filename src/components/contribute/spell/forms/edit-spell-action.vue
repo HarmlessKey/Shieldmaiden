@@ -14,7 +14,7 @@
 			<b-row>
 				<!-- ATTACK TYPE -->
 				<b-col>
-					<label for="attack_type">Action Type</label>
+					<label class="required" for="attack_type">Action Type</label>
 					<b-form-select v-model="spell_action.type"
 						id="action_type"
 						name="action_type"
@@ -23,7 +23,7 @@
 						v-validate="'required'"
 						data-vv-as="Action Type"
 						@change="$forceUpdate()">
-						<option value="undefined" disabled>- Action Type -</option>
+						<option :value="undefined" disabled>- Action Type -</option>
 						<option v-for="(val,i) in attack_type"
 							:key="i" :value="val" selected="selected">{{val}}</option>
 					</b-form-select>
@@ -40,7 +40,7 @@
 						class="form-control mb-2"
 						data-vv-as="Save"
 						@change="$forceUpdate()">
-						<option value="undefined" disabled>- Save -</option>
+						<option :value="undefined" disabled>- Save -</option>
 						<option v-for="(val,i) in save"
 							:key="i" :value="val">{{val}}</option>
 					</b-form-select>
@@ -97,6 +97,7 @@
 						:level_scaling="level_scaling"
 						:level="level"
 						:action_type="spell_action.type"
+						@validation="setValidation"
 					/>
 					
 				</div>
@@ -136,6 +137,7 @@ export default {
 		value: Object,
 		level_scaling: String,
 		level: Number,
+		action_index: Number,
 	},
 	components: {
 		spellActionModifiers,
@@ -151,6 +153,13 @@ export default {
 				this.$emit("input", newValue);
 				return newValue;
 			}
+		},
+		validator() {
+			let val_key = `spell-action-${this.action_index}`;
+			let ret = {}
+			ret[val_key] = this.$validator;
+			// let val_key = `spell-action-`;
+			return ret;
 		}
 	},
 
@@ -158,13 +167,65 @@ export default {
 		return {
 			attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell", "Damage", "Other"],
 			save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
+			validators: {},
 		};
 	},
 	methods: {
-		save_action() {
-			this.$emit("saved")
+		async save_action() {
+			if (await this.validate_validators() === true) {
+				// this.validation.validateAll().then((result) => {
+				// if (result) {
+				console.log("Validated");
+				// this.$snotify.success('Spell Action OK.', 'Critical hit!', {
+				// 	position: "rightTop"
+				// });
+				this.$emit("saved")
+				// this.$router.replace('/players')
+			} else {
+				console.log("Not validated");
+				this.$snotify.error('Form Not Valid', 'Critical miss!', {
+					position: "rightTop"
+				});
+			}
+		},
+		async validate_validators() {
+			// loops through all available validators to check if the forms
+			// are all valid. This happens async.
+			for (let v in this.validators) {
+				let validator = this.validators[v];
+				 let temp = await validator.validateAll()
+				 if (temp == false)
+				 	return false;
+			}
+			return true;
+		},
+		setValidation(validators) {
+			// receives validators from either modifiers, conditions, reminders
+			console.log("set validate called edit action")
+			console.log(validators)
+			for (let v in validators) {
+				console.log(v)
+				let new_key = Object.keys(this.validator)[0] + '-' + v;
+				this.validators[new_key] = validators[v]
+			}
+			console.log(this.validators)
+			this.$emit('validation', this.validators)
+			// this.validation = validate;
 		}
-	}
+	},
+	watch: {
+		spell_action: {
+			handler() {
+				console.log("watch spell edit triggered")
+				// Emits validators on every change
+				this.$emit('validation', this.validators);
+			},
+			deep: true,
+		}
+	},
+	mounted() {
+		this.$emit('validation', this.validators);
+	},
 };
 </script>
 

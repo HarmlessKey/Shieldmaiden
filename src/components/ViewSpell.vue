@@ -238,7 +238,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { spells } from '@/mixins/spells.js';
 	import VueMarkdown from 'vue-markdown';
 
@@ -381,7 +380,7 @@
 		margin-bottom: 15px;
 	}
 	&__description {
-		 margin-bottom: 15px;
+		margin-bottom: 15px;
 	}
 
 	.advantage {

@@ -135,8 +135,9 @@ export const spells = {
 		},
 		__rollToHit__(modifier, advantage) {
 			let rolls = {};
+			let toHit = [];
 
-			if(this.advantage) {
+			if(advantage) {
 				for(let i = 0; i <= 1; i++) {
 					toHit[i] =  this.rollD(20, 1, modifier); //Roll the to hit, d20 + attack bonus
 				}

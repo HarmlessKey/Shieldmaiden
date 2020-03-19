@@ -1,18 +1,20 @@
 <template>
 	<!-- MODIFIERS -->
 	<div>
-		<div class="d-flex justify-content-between">
+		<h2 class="d-flex justify-content-between">
+			<span><i class="fas fa-dice-d20"/> Modifiers <template v-if="modifiers">( {{ modifiers.length }} )</template></span>
 			<a 
-			class="gray-hover text-capitalize add-mod" 
-			v-b-tooltip.hover title="Add Modifier" 
-			@click="add_modifier()">
+				class="gray-light text-capitalize" 
+				v-b-tooltip.hover title="Add Modifier" 
+				@click="add_modifier()"
+			>
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 			</a>
-		</div>
+		</h2>
 		<template v-for="(modifier, mod_index) in modifiers">
 			<div class="card" v-if="modifiers && modifiers.length > 0" :key="`modifier-${mod_index}`">
-				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header mod_header d-flex justify-content-between">
+				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
 						{{parseInt(mod_index) + 1}}.
 						{{modifier.name}}
@@ -41,7 +43,15 @@
 								</b-form-input>
 							</b-col>
 							<b-col md="4">
-								<label for="modifier_subtype">Subtype</label>
+								<label for="modifier_subtype">
+									Subtype
+									<a 
+										v-b-popover.hover.top="'Select the damage type for this modifier.'" 
+										title="Damage type"
+									>
+										<i class="fas fa-info-circle"></i>
+									</a>
+								</label>
 								<b-form-select v-model="modifier.subtype"
 									:disabled="action_type == 'Healing Spell'"
 									id="modifier_subtype"
@@ -56,7 +66,15 @@
 								</b-form-select>
 							</b-col>
 							<b-col md="4">
-								<label for="primary">Primary Stat</label>
+								<label for="primary">
+									<span>Primary Stat</span>
+									<a 
+										v-b-popover.hover.top="'Select this if the primary ability modifier is added as a fixed value to the damage/healing of the modifier.'" 
+										title="Primary Stat"
+									>
+										<i class="fas fa-info-circle"></i>
+									</a>
+								</label>
 								<div class="primary d-flex justify-content-between" name="primary">
 									<a class="component_box" @click="setPrimary(modifier)"
 										:class="{'selected': modifier.primary === true}">
@@ -210,38 +228,38 @@
 </template>
 
 <script>
-	import numeral from 'numeral'
+import numeral from 'numeral';
 
 export default {
 
-  name: 'spell-action-modifiers',
-  props: {
-  	value: Array,
-  	level_scaling: String,
-  	level: Number,
-  	action_type: String,
-  },
-  computed: {
-  	modifiers: {
-  		get() {
-  			return this.value;
-  		},
-  		set(newValue) {
-  			this.$emit("input", newValue);
-  			return newValue;
-  		}
-  	},
-  	shown_level_tiers() {
+	name: 'spell-action-modifiers',
+	props: {
+		value: Array,
+		level_scaling: String,
+		level: Number,
+		action_type: String,
+	},
+	computed: {
+		modifiers: {
+			get() {
+				return this.value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+				return newValue;
+			}
+		},
+		shown_level_tiers() {
 			if (this.level_scaling == "Spell Scale") {
 				return 1;
 			}
 			return 100;
 		},
-  },
+	},
 
-  data() {
-    return {
-    	modifier_type: ["Damage", "Healing"],
+	data() {
+		return {
+			modifier_type: ["Damage", "Healing"],
 			modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
 				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
 			dice_type: [
@@ -252,11 +270,10 @@ export default {
 				{ label: "D12", value: 12 },
 				{ label: "D20", value: 20 }
 			],
-    };
-  },
-  methods: {
-  	add_modifier() {
-  		console.log(this.modifiers)
+		};
+	},
+	methods: {
+		add_modifier() {
 			let modifiers = this.modifiers;
 			if(modifiers === undefined) {
 				modifiers = []
@@ -327,13 +344,18 @@ export default {
 			}
 			return description
 		},
-  }
+	}
 };
 </script>
 
 <style lang="scss" scoped>
-
-.mod_header {
+h2 {
+	font-size: 18px !important;
+	text-transform: none !important;
+	border-bottom: solid 1px #5c5757;
+	padding-bottom: 5px;
+}
+.card-header {
 	cursor: pointer;
 }
 .add-mod {
@@ -356,5 +378,9 @@ export default {
 }
 .component_box.selected {
 	background: #2c97de;
+}
+label {
+	display: flex;
+	justify-content: space-between;
 }
 </style>

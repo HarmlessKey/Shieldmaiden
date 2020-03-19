@@ -46,6 +46,8 @@
 					</b-form-select>
 				</b-col>
 			</b-row>
+
+			<!-- MODIFIERS, CONDITIONS & REMINDERS -->
 			<ul class="nav nav-tabs" id="myTab" role="tablist">
 				<li class="nav-item">
 					<a class="nav-link active" 
@@ -55,7 +57,7 @@
 						href="#modifiers"
 						aria-controls="modifiers" 
 						aria-selected="true">
-						<i class="fad fa-flame orange"></i>
+						<i class="fas fa-dice-d20"></i>
 						<span class="d-none d-md-inline ml-1">Modifiers</span>
 					</a>
 				</li>
@@ -67,7 +69,7 @@
 						href="#conditions"
 						aria-controls="Conditions" 
 						aria-selected="false">
-						<i class="fad fa-skull-crossbones yellow"></i>
+						<i class="fas fa-flame"></i>
 						<span class="d-none d-md-inline ml-1">Conditions</span>
 					</a>
 				</li>
@@ -79,7 +81,7 @@
 						href="#notifications"
 						aria-controls="Notifications" 
 						aria-selected="false">
-						<i class="fad fa-bell green"></i>
+						<i class="fas fa-bell"></i>
 						<span class="d-none d-md-inline ml-1">Notifications</span>
 					</a>
 				</li>
@@ -104,6 +106,8 @@
 					aria-labelledby="Conditions-tab"
 				>
 					<spell-action-conditions
+						v-model="spell_action.conditions"
+						:action_type="spell_action.type"
 					/>
 					
 				</div>
@@ -122,45 +126,45 @@
 </template>
 
 <script>
-	import spellActionModifiers from '@/components/contribute/spell/forms/spell-action-modifiers.vue';
-	import spellActionConditions from '@/components/contribute/spell/forms/spell-action-conditions.vue';
-	import spellActionNotifications from '@/components/contribute/spell/forms/spell-action-notifications.vue';
+import spellActionModifiers from '@/components/contribute/spell/forms/spell-action-modifiers.vue';
+import spellActionConditions from '@/components/contribute/spell/forms/spell-action-conditions.vue';
+import spellActionNotifications from '@/components/contribute/spell/forms/spell-action-notifications.vue';
 
 export default {
-  name: 'edit-spell-action',
-  props: {
-  	value: Object,
-  	level_scaling: String,
-  	level: Number,
-  },
-  components: {
-  	spellActionModifiers,
-  	spellActionConditions,
-  	spellActionNotifications,
-  },
-  computed: {
-  	spell_action: {
-  		get() {
-  			return this.value;
-  		},
-  		set(newValue) {
-  			this.$emit("input", newValue);
-  			return newValue;
-  		}
-  	}
-  },
+	name: 'edit-spell-action',
+	props: {
+		value: Object,
+		level_scaling: String,
+		level: Number,
+	},
+	components: {
+		spellActionModifiers,
+		spellActionConditions,
+		spellActionNotifications,
+	},
+	computed: {
+		spell_action: {
+			get() {
+				return this.value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+				return newValue;
+			}
+		}
+	},
 
-  data() {
-    return {
-    	attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell", "Damage"],
-    	save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
-    };
-  },
-  methods: {
-  	save_action() {
-  		this.$emit("saved")
-  	}
-  }
+	data() {
+		return {
+			attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell", "Damage", "Other"],
+			save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
+		};
+	},
+	methods: {
+		save_action() {
+			this.$emit("saved")
+		}
+	}
 };
 </script>
 
@@ -172,7 +176,7 @@ export default {
 ul.nav-tabs {
 	border-bottom: solid 3px #494747;
 	height: 37px;
-	margin: 0 10px;
+	margin: 20px 0;
 
 	.nav-link {
 		color: #b2b2b2 !important;
@@ -187,6 +191,7 @@ ul.nav-tabs {
 	}
 }
 .tab-content {
+	padding: 20px;
 	position: relative;
 }
 </style>

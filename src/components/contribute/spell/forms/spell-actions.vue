@@ -19,17 +19,6 @@
 				</a>
 			</div>
 			<div class="card-body">
-				<!-- <div 
-					v-for="(spell_action, index) in spell.actions" 
-					class="hk-table" 
-					:key="`action-${index}`"
-				>
-					<div class="hk-column">{{spell_action.type}}</div>
-					<div class="hk-column actions">
-						<div @click="edit_action(index)">edit</div>
-						<div @click="remove_action(index)">delete</div>
-					</div>
-				</div> -->
 				<hk-table 
 					:columns="columns"
 					:items="spell.actions"
@@ -59,21 +48,21 @@
 </template>
 
 <script>
-	import HKtable from '@/components/hk-components/hk-table.vue';
-	import editSpellAction from '@/components/contribute/spell/forms/edit-spell-action.vue';
+import editSpellAction from '@/components/contribute/spell/forms/edit-spell-action.vue';
+
 export default {
 
-  name: 'spell-actions',
-  props: {
-  	value: Object,
-  },
-  components: {
-  	editSpellAction,
-  },
+	name: 'spell-actions',
+	props: {
+		value: Object,
+	},
+	components: {
+		editSpellAction,
+	},
 
-  data() {
-    return {
-    	editing: false,
+	data() {
+		return {
+			editing: false,
 			edit_index: undefined,
 			columns: {
 				type: {
@@ -98,22 +87,22 @@ export default {
 					maxContent: true
 				}
 			}
-    };
-  },
-  computed: {
-  	spell: {
-  		get() {
-  			return this.value;
-  		},
-  		set(newValue) {
-  			this.$emit("input", newValue);
-  			return newValue;
-  		}
-  	}
-  },
-  
-  methods: {
-  	add_action() {
+		};
+	},
+	computed: {
+		spell: {
+			get() {
+				return this.value;
+			},
+			set(newValue) {
+				this.$emit("input", newValue);
+				return newValue;
+			}
+		}
+	},
+	
+	methods: {
+		add_action() {
 			if (this.spell.actions == undefined) {
 				this.spell.actions = [];
 			}
@@ -144,7 +133,7 @@ export default {
 
 			this.$forceUpdate()
 		},
-  }
+	}
 };
 </script>
 

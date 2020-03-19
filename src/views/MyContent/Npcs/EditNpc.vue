@@ -737,6 +737,7 @@
 	grid-template-rows: auto 60px;
 
 	.form {
+		overflow-x: hidden;
 		overflow-y: scroll;
 
 		&::-webkit-scrollbar {

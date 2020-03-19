@@ -2,7 +2,8 @@
 	<div id="actions">
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
-				<a class="nav-link active" 
+				<a class="nav-link"
+					:class="{'active': current.entityType === 'player'}"
 					id="manual-tab" 
 					data-toggle="tab" 
 					:href="`#manual-${location}`" 
@@ -15,6 +16,7 @@
 			</li>
 			<li class="nav-item">
 				<a class="nav-link" 
+					:class="{'active': current.entityType !== 'player'}"
 					id="roll-tab" 
 					data-toggle="tab" 
 					:href="`#roll-${location}`" 
@@ -29,10 +31,20 @@
 		<div class="scroll" v-bar>
 			<div>
 				<div class="tab-content">
-					<div class="tab-pane fade show active" :id="`manual-${location}`" role="tabpanel" aria-labelledby="manual-tab">
+					<div class="tab-pane fade show active" 
+						:class="{'active': current.entityType === 'player'}" 
+						:id="`manual-${location}`" 
+						role="tabpanel" 
+						aria-labelledby="manual-tab">
+
 						<Manual :current="current" />
 					</div>
-					<div v-if="current" class="tab-pane roll fade" :id="`roll-${location}`" role="tabpanel" aria-labelledby="roll-tab">
+					<div v-if="current" class="tab-pane roll fade"
+						:class="{'active': current.entityType !== 'player'}"
+						:id="`roll-${location}`" 
+						role="tabpanel" 
+						aria-labelledby="roll-tab">
+
 						<Roll :current="current" />
 					</div>
 				</div>

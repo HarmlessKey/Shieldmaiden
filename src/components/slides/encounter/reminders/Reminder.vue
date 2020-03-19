@@ -1,6 +1,6 @@
 <template>
 	<div class="pb-5">
-		<h2>{{ reminder.title }}</h2>
+		<h2>{{ title }}</h2>
 		<a 
 			class="btn btn-block bg-red mb-3"
 			@click="remove()"
@@ -8,18 +8,20 @@
 			Remove reminder
 		</a>
 
-		<reminder-form v-model="reminder" @validation="setValidation" />
+		<reminder-form v-model="reminder" @validation="setValidation" :select-options="true" />
 		<button class="btn btn-block" @click="editReminder()">Save</button>
 	</div>
 </template>
 
 <script>
+	import { remindersMixin } from '@/mixins/reminders';
 	import { mapActions } from 'vuex';
 	import ReminderForm from '@/components/ReminderForm';
 
 	export default {
 		name: 'Reminder',
 		props: ['data'],
+		mixins: [remindersMixin],
 		components: {
 			ReminderForm
 		},
@@ -32,6 +34,14 @@
 		computed: {
 			reminder() {
 				return this.entity.reminders[this.key];
+			},
+			title() {
+				let title = this.reminder.title;
+
+				if(this.reminder.selectedVars) {
+					 title = this.replaceReminderVariables(title, this.reminder.selectedVars);
+				}
+				return title;
 			}
 		},
 		methods: {
@@ -52,6 +62,9 @@
 			},
 			editReminder() {
 				this.validation.validateAll().then((result) => {
+					// console.log(this.reminder)
+					delete this.reminder['.key'];
+
 					if (result) {
 						this.set_targetReminder({
 							action: 'update',

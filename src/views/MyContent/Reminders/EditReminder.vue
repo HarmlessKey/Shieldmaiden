@@ -105,7 +105,7 @@
 	.reminder {
 		display: grid;
 		grid-column-gap: 20px;
-		grid-template-columns: 400px 1fr;
+		grid-template-columns: 450px 1fr;
 
 	}
 }

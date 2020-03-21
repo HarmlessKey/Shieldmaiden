@@ -52,6 +52,9 @@
 					<b-list-group-item>
 						<router-link to="/documentation"><i class="fas fa-file"></i><span>Documentation</span></router-link>
 					</b-list-group-item>
+					<b-list-group-item>
+						<router-link to="/about-us"><i class="fas fa-user-friends"></i><span>About Us</span></router-link>
+					</b-list-group-item>
 				</b-list-group>
 				<hr>
 				<h3>Follow us</h3>

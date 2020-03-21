@@ -27,7 +27,7 @@
 			<hk-table
 				:columns="columns"
 				:items="_players"
-				:search="['character_name']"
+				:search="['character_name', 'campaign_name']"
 			>
 				<template slot="avatar" slot-scope="data">
 					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
@@ -39,6 +39,10 @@
 						:to="'/players/' + data.row.key" 
 						v-b-tooltip.hover title="Edit">{{ data.item }}
 					</router-link>
+				</template>
+
+				<template slot="campaign_name" slot-scope="data">
+					{{ data.item }}
 				</template>
 
 				<template slot="level" slot-scope="data">
@@ -118,10 +122,14 @@
 						truncate: true,
 						sortable: true,
 					},
+					campaign_name: {
+						label: 'Campaign',
+						sortable: true,
+					},
 					level: {
 						label: 'Level',
 						// center: true,
-						sortable: true,
+						// sortable: true,
 					},
 					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',
@@ -142,9 +150,13 @@
 				'content_count',
 			]),
 			_players: function() {
+				let vm = this;
 				return _.chain(this.players)
 				.filter(function(player, key) {
 					player.key = key
+					if (player.campaign_id)
+						player.campaign_name = vm.campaigns[player.campaign_id].campaign
+
 					return player
 				})
 				.orderBy("character_name", 'asc')

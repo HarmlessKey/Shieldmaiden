@@ -10,7 +10,10 @@
 				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
 				<h1 class="d-none d-md-flex justify-content-start">
 					<span class="mr-3">
-						<template v-if="current.entityType == 'npc'">{{ current.name }}</template>
+						<template v-if="current.entityType == 'npc'">
+							<template v-if="displayNPCField('name', current)">{{ current.name }}</template>
+							<template v-else>? ? ?</template>
+						</template>
 						<template v-else>{{ players[current.key].character_name }}</template>
 					</span>
 
@@ -103,6 +106,17 @@
 					}
 				}
 				return img
+			},
+			displayNPCField(field, entity) {
+				const defaults = {name: true, health: false, ac: false};
+				if (entity.settings && entity.settings[field] !== undefined) 
+					return entity.settings[field];
+
+				else if (this.npcSettings[field] == undefined)
+					return defaults[field]; // Default value
+
+				else 
+					return this.npcSettings[field];
 			},
 		},
 	}

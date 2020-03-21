@@ -17,12 +17,28 @@
 						<template v-else>{{ players[current.key].character_name }}</template>
 					</span>
 
-						<Health 
-							v-if="(current.entityType == 'player' && playerSettings.health === undefined)
-							|| (current.entityType == 'npc' && npcSettings.health == true)"
-							:entity="current"
-							:campPlayers="campPlayers"
-						/>
+					<Health 
+						v-if="(current.entityType == 'player' && playerSettings.health === undefined)
+						|| displayNPCField('health', current) === true"
+						:entity="current"
+						:campPlayers="campPlayers"
+					/>
+					<template v-else-if="
+						(current.entityType == 'player' && playerSettings.health === 'obscured')
+						|| (current.entityType == 'npc' && displayNPCField('health', current) === 'obscured')
+					">
+						<template v-if="current.curHp == 0">
+							<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+						</template>
+						<span v-else>
+							
+						<i  class="fas" :class="{
+								'green fa-heart': percentage(current.curHp, current.maxHp) == 100,
+								'orange fa-heart-broken': percentage(current.curHp, current.maxHp) < 100 && percentage(current.curHp, current.maxHp) > 33,
+								'red fa-heartbeat': percentage(current.curHp, current.maxHp) <= 33,
+							}"></i>
+						</span>
+					</template>
 					<span v-else class="gray-hover">
 						? ? ?
 					</span>

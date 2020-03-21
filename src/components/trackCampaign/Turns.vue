@@ -10,16 +10,35 @@
 				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
 				<h1 class="d-none d-md-flex justify-content-start">
 					<span class="mr-3">
-						<template v-if="current.entityType == 'npc'">{{ current.name }}</template>
+						<template v-if="current.entityType == 'npc'">
+							<template v-if="displayNPCField('name', current)">{{ current.name }}</template>
+							<template v-else>? ? ?</template>
+						</template>
 						<template v-else>{{ players[current.key].character_name }}</template>
 					</span>
 
-						<Health 
-							v-if="(current.entityType == 'player' && playerSettings.health === undefined)
-							|| (current.entityType == 'npc' && npcSettings.health == true)"
-							:entity="current"
-							:campPlayers="campPlayers"
-						/>
+					<Health 
+						v-if="(current.entityType == 'player' && playerSettings.health === undefined)
+						|| displayNPCField('health', current) === true"
+						:entity="current"
+						:campPlayers="campPlayers"
+					/>
+					<template v-else-if="
+						(current.entityType == 'player' && playerSettings.health === 'obscured')
+						|| (current.entityType == 'npc' && displayNPCField('health', current) === 'obscured')
+					">
+						<template v-if="current.curHp == 0">
+							<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+						</template>
+						<span v-else>
+							
+						<i  class="fas" :class="{
+								'green fa-heart': percentage(current.curHp, current.maxHp) == 100,
+								'orange fa-heart-broken': percentage(current.curHp, current.maxHp) < 100 && percentage(current.curHp, current.maxHp) > 33,
+								'red fa-heartbeat': percentage(current.curHp, current.maxHp) <= 33,
+							}"></i>
+						</span>
+					</template>
 					<span v-else class="gray-hover">
 						? ? ?
 					</span>
@@ -103,6 +122,17 @@
 					}
 				}
 				return img
+			},
+			displayNPCField(field, entity) {
+				const defaults = {name: true, health: false, ac: false};
+				if (entity.settings && entity.settings[field] !== undefined) 
+					return entity.settings[field];
+
+				else if (this.npcSettings[field] == undefined)
+					return defaults[field]; // Default value
+
+				else 
+					return this.npcSettings[field];
 			},
 		},
 	}

@@ -118,6 +118,8 @@
 					aria-labelledby="Notifications-tab"
 				>
 					<spell-action-notifications
+						v-model="spell_action.notifications"
+						:action_type="spell_action.type"
 					/>
 					
 				</div>
@@ -173,14 +175,7 @@ export default {
 	methods: {
 		async save_action() {
 			if (await this.validate_validators() === true) {
-				// this.validation.validateAll().then((result) => {
-				// if (result) {
-				console.log("Validated");
-				// this.$snotify.success('Spell Action OK.', 'Critical hit!', {
-				// 	position: "rightTop"
-				// });
-				this.$emit("saved")
-				// this.$router.replace('/players')
+				this.$emit("saved");
 			} else {
 				console.log("Not validated");
 				this.$snotify.error('Form Not Valid', 'Critical miss!', {
@@ -201,14 +196,10 @@ export default {
 		},
 		setValidation(validators) {
 			// receives validators from either modifiers, conditions, reminders
-			console.log("set validate called edit action")
-			console.log(validators)
 			for (let v in validators) {
-				console.log(v)
 				let new_key = Object.keys(this.validator)[0] + '-' + v;
 				this.validators[new_key] = validators[v]
 			}
-			console.log(this.validators)
 			this.$emit('validation', this.validators)
 			// this.validation = validate;
 		}
@@ -216,7 +207,6 @@ export default {
 	watch: {
 		spell_action: {
 			handler() {
-				console.log("watch spell edit triggered")
 				// Emits validators on every change
 				this.$emit('validation', this.validators);
 			},

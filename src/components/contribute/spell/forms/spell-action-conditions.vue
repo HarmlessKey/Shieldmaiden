@@ -58,11 +58,11 @@
 									</a>
 								</label>
 								<b-form-select v-model="condition.application"
-									id="condition"
-									name="condition"
-									title="Condition"
+									id="application"
+									name="Application"
+									title="application"
 									class="form-control mb-2"
-									data-vv-as="condition Subtype"
+									data-vv-as="application Subtype"
 									@change="$forceUpdate()">
 									<option value="undefined" disabled>- Application -</option>
 									<option 
@@ -89,7 +89,7 @@ export default {
 	mixins: [conditions],
 	props: {
 		value: Array,
-		action_type: String,
+		action_type: String
 	},
 	data() {
 		return {
@@ -116,9 +116,7 @@ export default {
 			if(conditions === undefined) {
 				conditions = []
 			}
-			conditions.push({
-				level_tiers: [],
-			});
+			conditions.push({});
 			this.$emit("input", conditions)
 			this.$forceUpdate(); //IMPORTANT
 		},

@@ -205,13 +205,14 @@ export default {
 				return this.value;
 			},
 			set(newValue) {
+				console.log('emitted')
 				this.$emit('input', newValue);
 			}
 		}
 	},
 	watch: {
 		reminder: {
-			handler() {
+			handler(newValue) {
 				//Emits validation on every change
 				this.$emit('validation', this.$validator);
 			},
@@ -248,13 +249,13 @@ export default {
 		},
 		addVariable() {
 			if(!this.reminder.variables) {
-				this.reminder.variables = {};
+				this.$set(this.reminder, 'variables', {});
 			}
-			this.reminder.variables[this.newVar] = [ "option 1" ];
+			this.$set(this.reminder.variables, this.newVar, [""]);
 			this.newVar = undefined;
 		},
 		addOption(key) {
-			this.reminder.variables[key].push("new option");
+			this.reminder.variables[key].push("");
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {

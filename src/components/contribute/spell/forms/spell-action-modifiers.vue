@@ -75,19 +75,50 @@
 							</b-col>
 							<b-col md="4">
 								<!-- SPELL FAIL MODIFIER -->
-								<label for="dice_type">Save Fail Modifier</label>
-								<b-form-select v-model="modifier.save_fail_mod"
-									:disabled="action_type !== 'Spell Save'"
-									id="save_fail_mod"
-									name="save_fail_mod"
-									title="Save Fail Modifier"
-									class="form-control mb-2"
-									data-vv-as="Save Fail Modifier"
-									@change="$forceUpdate()">
-									<!-- <option value="undefined" disabled>- Subtype -</option> -->
-									<option v-for="(val,i) in save_fail_mod"
-										:key="i" :value="val.value">{{ val.label }}</option>
-								</b-form-select>
+								<template v-if="action_type === 'Spell Save'">
+									<label for="dice_type">
+										<span>Save Fail Modifier</span>
+										<a 
+											v-b-popover.hover.top="'Select the effect of this modifier if the target makes a succesful saving throw.'" 
+											title="Succesful Save"
+										>
+											<i class="fas fa-info-circle"></i>
+										</a>
+									</label>
+									<b-form-select v-model="modifier.save_fail_mod"
+										:disabled="action_type !== 'Spell Save'"
+										id="save_fail_mod"
+										name="save_fail_mod"
+										title="Save Fail Modifier"
+										class="form-control mb-2"
+										data-vv-as="Save Fail Modifier"
+										@change="$forceUpdate()">
+										<!-- <option value="undefined" disabled>- Subtype -</option> -->
+										<option v-for="(val,i) in save_fail_mod"
+											:key="i" :value="val.value">{{ val.label }}</option>
+									</b-form-select>
+								</template>
+								<template v-if="action_type === 'Spell Attack' || action_type === 'Melee Weapon' || action_type === 'Ranged Weapon'">
+									<label for="dice_type">
+										<span>Miss Modifier</span>
+										<a 
+											v-b-popover.hover.top="'Select the effect of this modifier if the attack was a miss.'" 
+											title="Missed attack"
+										>
+											<i class="fas fa-info-circle"></i>
+										</a>
+									</label>
+									<b-form-select v-model="modifier.save_fail_mod"
+										id="save_fail_mod"
+										name="save_fail_mod"
+										title="Save Fail Modifier"
+										class="form-control mb-2"
+										data-vv-as="Save Fail Modifier"
+										@change="$forceUpdate()">
+										<option v-for="(val,i) in save_fail_mod"
+											:key="i" :value="val.value">{{ val.label }}</option>
+									</b-form-select>
+								</template>
 							</b-col>
 						</b-row>
 						<b-row>
@@ -275,18 +306,18 @@ export default {
 			modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
 				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
 			dice_type: [
-				{ label: "D4", value: 4 }, 
-				{ label: "D6", value: 6 },
-				{ label: "D8", value: 8 }, 
-				{ label: "D10", value: 10 },
-				{ label: "D12", value: 12 },
-				{ label: "D20", value: 20 }
+				{ label: "d4", value: 4 }, 
+				{ label: "d6", value: 6 },
+				{ label: "d8", value: 8 }, 
+				{ label: "d10", value: 10 },
+				{ label: "d12", value: 12 },
+				{ label: "d20", value: 20 }
 			],
 			save_fail_mod: [
-				{ label: "0", value: 0},
+				{ label: "No effect", value: 0},
 				// { label: "¼", value: 0.25},
-				{ label: "½", value: 0.5},
-				{ label: "1", value: 1},
+				{ label: "Half damage", value: 0.5},
+				{ label: "Full damage", value: 1},
 			]
     };
   },
@@ -367,12 +398,7 @@ export default {
 	watch: {
 		modifiers: {
 			handler() {
-				console.log('watch modifiers')
-				console.log(this.validator)
 				let vm = this;
-				// this.validator['modifiers'].validateAll().then(function() {
-					// Emits validation on every change
-				// });
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

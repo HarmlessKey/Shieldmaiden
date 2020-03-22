@@ -138,11 +138,8 @@ export default {
 		setValidation(validators) {
 			// This component just passes through all validators
 			// No form fields that need validation
-			console.log("set validate called action")
-			console.log(validators)
 			// this.validators = validators;
 			this.$emit('validation', validators)
-
 		}
 	},
 	// watch: {

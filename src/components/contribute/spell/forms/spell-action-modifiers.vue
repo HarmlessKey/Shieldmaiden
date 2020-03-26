@@ -121,7 +121,7 @@
 										v-validate="'required'"
 										data-vv-as="Miss Modifier"
 										@change="$forceUpdate()">
-										<option v-for="(val,i) in miss_mod"
+										<option v-for="(val,i) in save_fail_mod"
 											:key="i" :value="val.value">{{ val.label }}</option>
 									</b-form-select>
 									<p class="validate red" v-if="errors.has(`miss_mod-${mod_index}`)">{{ errors.first(`miss_mod-${mod_index}`) }}</p>

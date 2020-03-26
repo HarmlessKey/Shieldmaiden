@@ -165,7 +165,6 @@ export default {
 	computed: {
 		notifications: {
 			get() {
-				this.$emit("input", this.value);
 				return this.value;
 			},
 			set(newValue) {

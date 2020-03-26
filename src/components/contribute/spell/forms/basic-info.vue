@@ -113,12 +113,12 @@
 				<!-- COMPONENTS -->
 				<b-col md="3" v-if="spell.components">
 					<label for="components">Components</label>
-					<div class="components d-flex justify-content-between" name="components">
-						<a class="component_box" @click="setComponent('verbal')"
+					<div class="components d-flex justify-content-start" name="components">
+						<a class="component_box mr-2" @click="setComponent('verbal')"
 							 :class="{'selected': spell.components['verbal']}">
 							<span>V</span>
 						</a>
-						<a class="component_box" @click="setComponent('somatic')"
+						<a class="component_box mr-2" @click="setComponent('somatic')"
 							 :class="{'selected': spell.components['somatic']}">
 							<span>S</span>
 						</a>
@@ -130,7 +130,9 @@
 				</b-col>
 				<!-- MATERIAL COMPONENT DESCRIPTION -->
 				<b-col md='9' v-if="spell.components">
-					<label>Material components description</label>
+					<label for="material_description" :class="{ required: spell.components['material'] }">
+						Material components description
+					</label>
 					<b-form-input v-model="spell.material_description"
 						:disabled="!spell.components['material']"
 						autocomplete="off"
@@ -139,9 +141,11 @@
 						class="form-control mb-2"
 						title="Material Component Description"
 						type="text"
+						v-validate="'required'"
 						data-vv-as="Material Component Description"
 						placeholder="Enter the material component description"
 						></b-form-input>
+						<p class="validate red" v-if="errors.has('material_description')">{{ errors.first('material_description') }}</p>
 				</b-col>
 			</b-row>
 			<b-row>
@@ -220,13 +224,13 @@
 
 				<!-- DURATION N -->
 				<b-col md="4">
-					<label for="duration_n">Duration #</label>
+					<label for="duration_n" :class="{ required: dur_type_time.includes(spell.duration_type) }">Duration #</label>
 					<b-form-input v-model="spell.duration_n"
 						:disabled="!dur_type_time.includes(spell.duration_type)"
 						autocomplete="off"
 						id="duration_n"
 						name="duration_n"
-						v-validate="'numeric'"
+						v-validate="'numeric|required'"
 						class="form-control mb-2"
 						title="Duration #"
 						type="text"
@@ -237,17 +241,20 @@
 
 				<!-- DURATION SCALE -->
 				<b-col md="4">
-					<label for="duration_scale">Time Scale</label>
+					<label for="duration_scale" :class="{ required: dur_type_time.includes(spell.duration_type) }">Time Scale</label>
 					<b-form-select v-model="spell.duration_scale"
 						:disabled="!dur_type_time.includes(spell.duration_type)"
 						id="duration_scale"
 						name="duration_scale"
 						title="Time Scale"
-						class="form-control mb-2">
+						v-validate="'required'"
+						class="form-control mb-2"
+						data-vv-as="Duriation scale">
 						<option :value="undefined" disabled>- Time Scale -</option>
 						<option v-for="(val,i) in dur_time"
 							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
 					</b-form-select>
+					<p class="validate red" v-if="errors.has('duration_scale')">{{ errors.first('duration_scale') }}</p>
 				</b-col>
 			</b-row>
 			<b-row>
@@ -268,43 +275,19 @@
 					<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
 				</b-col>
 				<b-col md="6">
-					<label for="aoe_size">AOE Size ft.</label>
+					<label for="aoe_size" :class="{ required: spell.aoe_type !== 'None' }">AOE Size ft.</label>
 					<b-form-input v-model="spell.aoe_size"
+						:disabled="spell.aoe_type === 'None'"
 						autocomplete="off"
 						id="aoe_size"
 						name="aoe_size"
 						class="form-control mb-2"
 						title="AOE Size"
 						type="number"
+						v-validate="'required'"
 						data-vv-as="AOE Size"
 						></b-form-input>
-				</b-col>
-			</b-row>
-			<b-row>
-				<!-- DESCRIPTION -->
-				<b-col md="6">
-					<label class="required" for="description">Description</label>
-					<b-form-textarea v-model="spell.description"
-						id="description"
-						name="description"
-						title="Description"
-						class="form-control mb-2"
-						v-validate="'required'"
-						data-vv-as="Description"
-						rows="6"></b-form-textarea>
-					<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
-
-					<label for="higher_level">At higher levels</label>
-					<b-form-textarea v-model="spell.higher_level"
-						id="higher_level"
-						name="higher_level"
-						title="higher_level"
-						class="form-control mb-2"
-						rows="3"></b-form-textarea>
-				</b-col>
-				<b-col md="6">
-					<label for="description_preview">Preview</label>
-					<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
+						<p class="validate red" v-if="errors.has('aoe_size')">{{ errors.first('aoe_size') }}</p>
 				</b-col>
 			</b-row>
 			<b-row class="d-flex spell_row">
@@ -320,7 +303,16 @@
 				</b-col>
 				<!-- LEVEL SCALING -->
 				<b-col md="5">
-					<label class="required" for="level_scaling">Level Scaling</label>
+					<label class="required" for="level_scaling">
+						Level Scaling
+						<a 
+							class="ml-2"
+							v-b-popover.hover.top="'Set in what way the spell changes at higher levels.'" 
+							title="At higer levels"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
 					<b-form-select v-model="spell.level_scaling"
 						id="level_scaling"
 						name="level_scaling"
@@ -345,6 +337,42 @@
 						title="Source"
 						data-vv-as="Source"
 						></b-form-input>
+				</b-col>
+			</b-row>
+			<b-row>
+				<!-- DESCRIPTION -->
+				<b-col md="6">
+					<label class="required" for="description">
+						Description
+						<a 
+							class="ml-2"
+							v-b-popover.hover.top="'*Italic*, **Bold**, - list and tables'" 
+							title="Accepts markdown"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
+					<b-form-textarea v-model="spell.description"
+						id="description"
+						name="description"
+						title="Description"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="Description"
+						rows="6"></b-form-textarea>
+					<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+
+					<label for="higher_level">At higher levels</label>
+					<b-form-textarea v-model="spell.higher_level"
+						id="higher_level"
+						name="higher_level"
+						title="higher_level"
+						class="form-control mb-2"
+						rows="3"></b-form-textarea>
+				</b-col>
+				<b-col md="6">
+					<label for="description_preview">Preview</label>
+					<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
 				</b-col>
 			</b-row>
 		</div>
@@ -481,6 +509,11 @@ pre {
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
     font-family: inherit;
     text-align: justify;
+}
+
+label {
+	display: flex;
+	justify-content: flex-start;
 }
 
 </style>

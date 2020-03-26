@@ -21,6 +21,7 @@
 				</a>
 			</div>
 			<div class="card-body">
+					<p>Spell actions are the parts of a spell that can be rolled. By adding spell actions to your spell, it can be used during encounters to quickly apply damage or healing and to set conditions and reminders.</p>
 				<hk-table 
 					v-if="spell.actions"
 					:columns="columns"

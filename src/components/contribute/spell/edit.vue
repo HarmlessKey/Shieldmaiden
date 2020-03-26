@@ -64,29 +64,28 @@
 							</b-card>
 						</b-col>
 
-						<b-col md="8">
-							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-							<!-- SPELL ACTIONS -->
-							<spell-actions v-model='spell' @validation="setValidators" />
-						</b-col>
-					</b-row>
+					<b-col md="8">
+						<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
+						<!-- SPELL ACTIONS -->
+						<spell-actions v-model='spell' @validation="setValidators" />
+					</b-col>
+				</b-row>
+			</div>
+			<div class="save">
+				<div class="d-flex justify-content-start">
+					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+					 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+					</div>	
+					<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>		
 				</div>
-				<div class="save">
-					<div>
-						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-						 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
-						</div>			
-					</div>
-					<div>
-						<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>
-						<button 
-							:disabled="errors.items && errors.items.length > 0"
-							class="btn" 
-							@click="store_spell()"
-						>
-							<i class="fas fa-check"></i> Save
-						</button>
-					</div>
+				<div>
+					<button 
+						:disabled="errors.items && errors.items.length > 0"
+						class="btn" 
+						@click="store_spell()"
+					>
+						<i class="fas fa-check"></i> Save
+					</button>
 				</div>
 			</template>
 		</div>
@@ -462,7 +461,8 @@ export default {
 
 		.unsaved_changes {
 			padding: 10px;
-			height: 40px;
+			height: 38px;
+			margin-right: 10px;
 		}
 	}
 }

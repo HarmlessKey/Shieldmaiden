@@ -54,7 +54,7 @@
 
 								<div slot="actions" slot-scope="data" class="actions">
 									<router-link 
-										:to="'/contribute/spells/' + data.row['.key']"
+										:to="'/contribute/spells/' + data.row['.key']+'/edit'"
 										v-b-tooltip.hover title="Edit"
 									>
 										<i class="fas fa-pencil"></i>
@@ -93,7 +93,14 @@
 								:perPage="15"
 								:search="['name']"
 							>
-								<div slot="actions" slot-scope="data" class="actions">		
+								<div slot="actions" slot-scope="data" class="actions">
+									<router-link 
+										v-if="userInfo.admin"
+										:to="'/contribute/spells/' + data.row['.key']"
+										v-b-tooltip.hover title="Edit"
+									>
+										<i class="fas fa-pencil"></i>
+									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
 									</a>
@@ -113,7 +120,7 @@
 	import Footer from '@/components/Footer.vue';
 	import Spell from '@/components/compendium/Spell.vue';
 	import ViewSpell from '@/components/ViewMonster.vue';
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Spells',
@@ -163,6 +170,11 @@
 				taggedSpells: db.ref('new_spells').orderByChild('metadata/tagged').equalTo(this.userId),
 				finishedSpells: db.ref('new_spells').orderByChild('metadata/finished').equalTo(true)
 			}
+		},
+		computed: {
+			...mapGetters([
+				"userInfo"
+			])
 		},
 		methods: {
 			...mapActions([

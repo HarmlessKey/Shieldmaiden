@@ -5,7 +5,7 @@
 			{{ (spell.changed) ? spell.name : old_spell.name }}
 		</h2>
 		
-		<div class="spell-wrapper">
+		<div class="spell-wrapper" v-if="canEdit()">
 			<template v-if="(old_spell && spell)">
 				
 				<div class="form">
@@ -115,6 +115,8 @@ export default {
 	},
 	data() {
 		return {
+			userId: this.$store.getters.getUser.uid,
+			id: this.$route.params.id,
 			loading: true,
 			levels: ["Cantrip",
 				"1st","2nd","3rd",
@@ -123,13 +125,13 @@ export default {
 			validators: {},
 			spell: {},
 			unsaved_changes: false,
-			fb_spell_json: {},
-			id: this.$route.params.id,
+			fb_spell_json: {}
 		}
 	},
 	computed: {
 		...mapGetters([
 			'tier',
+			"userInfo"
 		]),
 	},
 	firebase() {
@@ -151,6 +153,10 @@ export default {
 		}
 	},
 	methods: {
+		canEdit() {
+			return (this.old_spell.metadta && this.old_spell.metadata.tagged === this.userId) ||
+				this.userInfo.admin;
+		},
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
 			

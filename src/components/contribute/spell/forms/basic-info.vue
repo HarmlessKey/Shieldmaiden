@@ -2,22 +2,6 @@
 	<div class="card">
 		<div class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
-			<!-- <div>
-				<a 
-				class="gray-hover text-capitalize mx-3" 
-				v-b-tooltip.hover title="Parse Old Spell" 
-				@click="parse_old_spell()">
-					<i class="fad fa-wand-magic blue"></i>
-					<span class="d-none d-md-inline ml-1 blue">Parse</span>
-				</a>
-				<a 
-				class="gray-hover text-capitalize mx-3" 
-				v-b-tooltip.hover title="Save Spell" 
-				@click="store_spell()">
-					<i class="fad fa-treasure-chest green"></i>
-					<span class="d-none d-md-inline ml-1 green">Save</span>
-				</a>
-			</div> -->
 		</div>
 		<div class="card-body">
 			<b-row>
@@ -462,13 +446,10 @@ export default {
 				// Emits validation on every change
 				this.$emit('validation', this.validator);
 			},
+			immediate: true,
 			deep: true,
 		}
 	},
-	mounted() {
-		// Emit validator list
-		this.$emit('validation', this.validator);
-	}
 };
 </script>
 

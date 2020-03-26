@@ -1,87 +1,83 @@
 <template>
-	<div>
+	<div class="spell-wrapper">
 		<template v-if="(old_spell && spell)">
 			
-			<!-- <Crumble :name="old_spell.name"/> -->
-
-			<b-row>
-				<b-col md="4" id="old_spell">
-					<b-card header="Old Spell Description" v-if="loading">
-						<div  class="loader"> <span>Loading old_spell....</span></div>
-					</b-card>
-					<b-card class="old_spell" header="Old Spell Description" v-else>
-						<h1 class="spellTitle"><a :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
-						<i class="mb-3 d-block" v-if="old_spell.school">
-							{{ levels[old_spell.level] }}
-							{{ old_spell.school.name }}
-						</i>
-
-						<p>
-							<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
-							<b>Range:</b> {{ old_spell.range }}<br/>
-							<b>Components:</b> 
-							<template v-for="(component, index) in old_spell.components">
-								{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
-							</template>
-							<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
-							<br/>
-							<b>Duration:</b>
-								<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
-								{{ old_spell.duration }}<br/>
-							<b>Classes:</b> 
-							<template v-for="(_class, index) in old_spell.classes">
-								{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
-							</template>
-							<br/>
-						</p>
-						<p v-for="(desc, index) in old_spell.desc" :key="index">
-							{{ desc }}
-						</p>
-
-						<p v-if="old_spell.higher_level">
-							At higher levels. 
-							<template v-for="higher in old_spell.higher_level">
-								{{ higher }}
-							</template>
-						</p>
-					</b-card>
-				</b-col> <!-- Old spell -->
-
-				<b-col md="8" id="new_spell">
-					<div>
-						<a 
-						class="gray-hover text-capitalize mx-3 blue" 
-						v-b-tooltip.hover title="Parse Old Spell" 
-						@click="parse_old_spell()">
-							<i class="fad fa-wand-magic"></i>
-							<span class="d-none d-md-inline ml-1">Parse</span>
-						</a>
-						<a 
-						class="gray-hover text-capitalize mx-3" 
-						v-b-tooltip.hover title="Save Spell" 
-						@click="store_spell()">
-							<i class="fad fa-treasure-chest green"></i>
-							<span class="d-none d-md-inline ml-1 green">Save</span>
-						</a>
-						<template v-if="unsaved_changes">
+			<div class="form">
+				<b-row>
+					<b-col md="4" id="old_spell">
+						<b-card header="Old Spell Description" v-if="loading">
+							<div  class="loader"> <span>Loading old_spell...</span></div>
+						</b-card>
+						<b-card class="old_spell" header="Old Spell Description" v-else>
 							<a 
-							class="gray-hover text-capitalize mx-3" 
-							v-b-tooltip.hover title="Cancel Changes" 
-							@click="cancel_changes()">
-								<i class="fad fa-skull-crossbones red"></i>
-								<span class="d-none d-md-inline ml-1 red">Cancel</span>
+								class="btn btn-block mb-3" 
+								@click="parse_old_spell()">
+									<i class="fas fa-wand-magic"></i>
+									<span class="d-none d-md-inline ml-1">Parse to new spell</span>
 							</a>
-							<span class="red unsaved_changes">There are unsaved changes in the spell</span>
-							
-						</template>
-					</div>
-					<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-					<!-- SPELL ACTIONS -->
-					<spell-actions v-model='spell' @validation="setValidators" />
-				</b-col>
-			</b-row>
+
+							<h1 class="spellTitle"><a :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
+							<i class="mb-3 d-block" v-if="old_spell.school">
+								{{ levels[old_spell.level] }}
+								{{ old_spell.school.name }}
+							</i>
+
+							<p>
+								<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
+								<b>Range:</b> {{ old_spell.range }}<br/>
+								<b>Components:</b> 
+								<template v-for="(component, index) in old_spell.components">
+									{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
+								</template>
+								<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
+								<br/>
+								<b>Duration:</b>
+									<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
+									{{ old_spell.duration }}<br/>
+								<b>Classes:</b> 
+								<template v-for="(_class, index) in old_spell.classes">
+									{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
+								</template>
+								<br/>
+							</p>
+							<p v-for="(desc, index) in old_spell.desc" :key="index">
+								{{ desc }}
+							</p>
+
+							<p v-if="old_spell.higher_level">
+								At higher levels. 
+								<template v-for="higher in old_spell.higher_level">
+									{{ higher }}
+								</template>
+							</p>
+						</b-card>
+					</b-col>
+
+					<b-col md="8">
+						<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
+						<!-- SPELL ACTIONS -->
+						<spell-actions v-model='spell' @validation="setValidators" />
+					</b-col>
+				</b-row>
+			</div>
+			<div class="save">
+				<div>
+					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+					 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+					</div>			
+				</div>
+				<div>
+					<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>
+					<button 
+						:disabled="errors.items && errors.items.length > 0"
+						class="btn" 
+						@click="store_spell()"
+					>
+						<i class="fas fa-check"></i> Save
+					</button>
+				</div>
+			</div>
 		</template>
-	<!-- <style src="vue-multiselect/dist/vue-multiselect.min.css"></style> -->
 	</div>
 </template>
 
@@ -110,11 +106,6 @@ export default {
       ]
 		}
 	},
-	beforeMount() {
-		//Because the component is loaded
-		//in another view, the scroll needs to be reset to 0
-		window.scrollTo(0,0);
-	},
 	data() {
 		return {
 			loading: true,
@@ -132,13 +123,6 @@ export default {
 		...mapGetters([
 			'tier',
 		]),
-	},
-	mounted() {
-		this.$nextTick(function() {
-			if ($('ins').length > 0) {
-				(adsbygoogle = window.adsbygoogle || []).push({});
-			}
-		})
 	},
 	firebase() {
 		return {
@@ -364,76 +348,99 @@ export default {
 }
 </script>
 
-<!-- <style src="vue-multiselect/dist/vue-multiselect.min.css"></style> -->
 
 <style lang="scss" scoped>
-	// @import "vue-multiselect/dist/vue-multiselect.min.css";
-
- .spellTitle {
-		margin-bottom: 5px;
- }
- .url {
-	display: block;
-	margin-bottom: 15px;
-	word-break: break-all;
-}
-label {
-	margin-top: 0.5rem;
-	margin-bottom: 0;
-}
-
-.class_box {
-	padding: 0 6px;
-	background: #000;
-	width: 40px;
-	text-align: center;
-	line-height: 36px;
-	height: 36px;
-	font-size: 18px;
-	span {
-		color: white;
-	}
-}
-
-select#classes {
-	height: 158px;
-}
-
-.component_box {
-	background: #000;
-	width: 40px;
-	text-align: center;
-	line-height: 36px;
-	height: 36px;
-	font-size: 18px;
-	span {
-		color: white;
-	}
-}
-.component_box.selected {
-	background: #2c97de;
-}
-
-.old_spell {
-	position: -webkit-sticky;
-	position: sticky;
-	top: 60px;
-}
-
-.collapse-header {
+.spell-wrapper {
 	display: grid;
-	grid-template-columns: auto 20px;
-}
+	height: calc(100vh - 175px) !important;
+	grid-template-rows: auto 60px;
 
-.remove-link a {
-	display: block;
-  height: 100%;
-  line-height: 60px;
-  padding-bottom: 15px;
+	.form {
+		overflow-x: hidden;
+		overflow-y: scroll;
 
-  i {
-  	vertical-align: bottom;
-  }
+		&::-webkit-scrollbar {
+			display: none;
+		}
+		.spellTitle {
+				margin-bottom: 5px;
+		}
+		.url {
+			display: block;
+			margin-bottom: 15px;
+			word-break: break-all;
+		}
+		label {
+			margin-top: 0.5rem;
+			margin-bottom: 0;
+		}
+
+		.class_box {
+			padding: 0 6px;
+			background: #000;
+			width: 40px;
+			text-align: center;
+			line-height: 36px;
+			height: 36px;
+			font-size: 18px;
+			span {
+				color: white;
+			}
+		}
+
+		select#classes {
+			height: 158px;
+		}
+
+		.component_box {
+			background: #000;
+			width: 40px;
+			text-align: center;
+			line-height: 36px;
+			height: 36px;
+			font-size: 18px;
+			span {
+				color: white;
+			}
+		}
+		.component_box.selected {
+			background: #2c97de;
+		}
+
+		.old_spell {
+			position: -webkit-sticky;
+			position: sticky;
+			top: 0;
+		}
+
+		.collapse-header {
+			display: grid;
+			grid-template-columns: auto 20px;
+		}
+
+		.remove-link a {
+			display: block;
+			height: 100%;
+			line-height: 60px;
+			padding-bottom: 15px;
+
+			i {
+				vertical-align: bottom;
+			}
+		}
+	}
+
+	.save {
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+		border-top: solid 1px #5c5757;
+
+		.unsaved_changes {
+			padding: 10px;
+			height: 40px;
+		}
+	}
 }
 
 </style>

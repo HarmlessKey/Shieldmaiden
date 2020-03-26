@@ -35,6 +35,7 @@
 								<label class="required" :for="`modifier_subtype-${mod_index}`">
 									Subtype
 									<a 
+										class="ml-1"
 										v-b-popover.hover.top="'Select the damage type for this modifier.'" 
 										title="Damage type"
 									>
@@ -60,6 +61,7 @@
 								<label for="primary">
 									<span>Primary Stat</span>
 									<a 
+										class="ml-1"
 										v-b-popover.hover.top="'Select this if the primary ability modifier is added as a fixed value to the damage/healing of the modifier.'" 
 										title="Primary Stat"
 									>
@@ -76,9 +78,10 @@
 							<b-col md="4">
 								<!-- SPELL FAIL MODIFIER -->
 								<template v-if="action_type === 'Spell Save'">
-									<label for="dice_type">
+									<label for="dice_type" class="required">
 										<span>Save Fail Modifier</span>
 										<a 
+											class="ml-1"
 											v-b-popover.hover.top="'Select the effect of this modifier if the target makes a succesful saving throw.'" 
 											title="Succesful Save"
 										>
@@ -97,27 +100,31 @@
 										<option v-for="(val,i) in save_fail_mod"
 											:key="i" :value="val.value">{{ val.label }}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has(`save_fail_mod-${mod_index}`)">{{ errors.first(`save_fail_mod-${mod_index}`) }}</p>
 								</template>
 								<template v-if="action_type === 'Spell Attack' || action_type === 'Melee Weapon' || action_type === 'Ranged Weapon'">
-									<label for="dice_type">
+									<label for="dice_type" class="required">
 										<span>Miss Modifier</span>
 										<a 
+											class="ml-1"
 											v-b-popover.hover.top="'Select the effect of this modifier if the attack was a miss.'" 
 											title="Missed attack"
 										>
 											<i class="fas fa-info-circle"></i>
 										</a>
 									</label>
-									<b-form-select v-model="modifier.save_fail_mod"
-										id="save_fail_mod"
-										name="save_fail_mod"
-										title="Save Fail Modifier"
+									<b-form-select v-model="modifier.miss_mod"
+										id="miss_mod"
+										:name="`miss_mod-${mod_index}`"
+										title="Miss Modifier"
 										class="form-control mb-2"
-										data-vv-as="Save Fail Modifier"
+										v-validate="'required'"
+										data-vv-as="Miss Modifier"
 										@change="$forceUpdate()">
-										<option v-for="(val,i) in save_fail_mod"
+										<option v-for="(val,i) in miss_mod"
 											:key="i" :value="val.value">{{ val.label }}</option>
 									</b-form-select>
+									<p class="validate red" v-if="errors.has(`miss_mod-${mod_index}`)">{{ errors.first(`miss_mod-${mod_index}`) }}</p>
 								</template>
 							</b-col>
 						</b-row>
@@ -153,7 +160,16 @@
 							</b-col>
 							<b-col md="4">
 								<!-- MODIFIER FIXED VALUE -->
-								<label for="fixed_val">Fixed Value</label>
+								<label for="fixed_val">
+									Fixed Value
+									<a 
+											class="ml-1"
+											v-b-popover.hover.top="'Set the fixed value that is added on top of the rolled value.'" 
+											title="Fixed"
+										>
+											<i class="fas fa-info-circle"></i>
+										</a>
+								</label>
 								<b-form-input v-model="modifier.fixed_val"
 									autocomplete="off"
 									id="fixed_val"
@@ -441,7 +457,7 @@ h2 {
 }
 label {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 .remove {
 	padding-top: 7px;

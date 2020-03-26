@@ -3,11 +3,6 @@
 		<Crumble :name="(spell.changed) ? spell.name : old_spell.name"/>
 		<h2 class="spellTitle d-flex justify-content-between" v-if="old_spell">
 			{{ (spell.changed) ? spell.name : old_spell.name }}
-			<!-- <span v-if="userInfo && (userInfo.admin || userInfo.contribute)"> -->
-				<!-- <a v-if="!edit" @click="setEdit(!edit)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a> -->
-				<!-- <a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a> -->
-				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
-			<!-- </span> -->
 		</h2>
 		
 		<div class="spell-wrapper">
@@ -377,35 +372,39 @@ export default {
 
 
 <style lang="scss" scoped>
-.spell-wrapper {
-	display: grid;
-	height: calc(100vh - 188px) !important;
-	grid-template-rows: auto 60px;
+.content {
+	padding-bottom: 0;
 
-	.form {
-		overflow-x: hidden;
-		overflow-y: scroll;
-
-		&::-webkit-scrollbar {
-			display: none;
+	.spell-wrapper {
+		display: grid;
+		height: calc(100vh - 168px) !important;
+		grid-template-rows: auto 60px;
+	
+		.form {
+			overflow-x: hidden;
+			overflow-y: scroll;
+	
+			&::-webkit-scrollbar {
+				display: none;
+			}
+			.old_spell {
+				position: -webkit-sticky;
+				position: sticky;
+				top: 0;
+			}
 		}
-		.old_spell {
-			position: -webkit-sticky;
-			position: sticky;
-			top: 0;
-		}
-	}
-
-	.save {
-		display: flex;
-		justify-content: space-between;
-		padding: 10px 0;
-		border-top: solid 1px #5c5757;
-
-		.unsaved_changes {
-			padding: 10px;
-			height: 38px;
-			margin-right: 10px;
+	
+		.save {
+			display: flex;
+			justify-content: space-between;
+			padding: 10px 0;
+			border-top: solid 1px #5c5757;
+	
+			.unsaved_changes {
+				padding: 10px;
+				height: 38px;
+				margin-right: 10px;
+			}
 		}
 	}
 }

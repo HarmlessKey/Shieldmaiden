@@ -76,9 +76,10 @@
 					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
 					 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
 					</div>	
-					<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>		
+					<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
 				</div>
 				<div>
+					<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
 					<button 
 						:disabled="errors.items && errors.items.length > 0"
 						class="btn" 

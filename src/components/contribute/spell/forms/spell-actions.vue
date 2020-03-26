@@ -22,6 +22,7 @@
 			</div>
 			<div class="card-body">
 				<hk-table 
+					v-if="spell.actions"
 					:columns="columns"
 					:items="spell.actions"
 				>

@@ -87,6 +87,7 @@
 						<i class="fas fa-check"></i> Save
 					</button>
 				</div>
+			</div>
 			</template>
 		</div>
 	</div>

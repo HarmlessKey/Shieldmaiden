@@ -50,11 +50,11 @@
 				<b-col md="8" id="new_spell">
 					<div>
 						<a 
-						class="gray-hover text-capitalize mx-3" :class="spell.changed ? 'red': 'blue' " 
+						class="gray-hover text-capitalize mx-3 blue" 
 						v-b-tooltip.hover title="Parse Old Spell" 
 						@click="parse_old_spell()">
 							<i class="fad fa-wand-magic"></i>
-							<span class="d-none d-md-inline ml-1">{{ spell.changed ? 'Reset' : 'Parse' }}</span>
+							<span class="d-none d-md-inline ml-1">Parse</span>
 						</a>
 						<a 
 						class="gray-hover text-capitalize mx-3" 
@@ -115,6 +115,7 @@ export default {
 			validators: {},
 			spell: {},
 			unsaved_changes: false,
+			fb_spell_json: {},
 		}
 	},
 	computed: {
@@ -134,7 +135,11 @@ export default {
 			spell: {
 				source: db.ref(`new_spells/${this.id}`),
 				asObject: true,
-				readyCallback: () => this.loading = false
+				readyCallback: () => {
+					this.loading = false
+					this.fb_spell_json = JSON.stringify(this.spell);
+					this.unsaved_changes = false
+				}
 			},
 			old_spell: {
 				source: db.ref(`spells/${this.id}`),
@@ -343,7 +348,10 @@ export default {
 			handler() {
 				// Emits validation on every change
 				console.log("Change in object");
-				this.unsaved_changes = true;
+				if (JSON.stringify(this.spell) !== this.fb_spell_json)
+					this.unsaved_changes = true;
+				else
+					this.unsaved_changes = false;
 			},
 		}
 	},

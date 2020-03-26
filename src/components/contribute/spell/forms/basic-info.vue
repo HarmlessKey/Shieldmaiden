@@ -396,7 +396,7 @@ export default {
 	data() {
 		return {
 			schools: [
-				{ label: "Abjuration", value: "abjurdation" },
+				{ label: "Abjuration", value: "abjuration" },
 				{ label: "Conjuration", value: "conjuration" },
 				{ label: "Divination", value: "divination" },
 				{ label: "Enchantment", value: "enchantment" },

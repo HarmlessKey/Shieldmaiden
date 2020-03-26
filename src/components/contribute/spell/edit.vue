@@ -257,12 +257,9 @@ export default {
 			// Source book
 			this.spell.source = this.old_spell.page;
 
-			this.store_spell();
+			// Make spell responsive
+			this.spell = Object.assign({}, this.spell);
 
-			// Clean up spell object
-			// delete this.spell.concentration
-			// delete this.spell.duration
-			// delete this.spell.higher_level
 		},
 		parse_spell_str(text) {
 			// map to replace weird character with real character 
@@ -314,6 +311,7 @@ export default {
 		async store_spell() {
 			delete this.spell['.value'];
 			delete this.spell['.key'];
+
 			this.spell.changed = true;
 			this.spell.checked = false;
 

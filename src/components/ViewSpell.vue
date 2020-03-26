@@ -238,9 +238,9 @@
 
 				<h3 class="mt-3">Final result: </h3>
 			</div>
-			<pre>
+			<!-- <pre>
 				{{ rolled }}
-			</pre>
+			</pre> -->
 		</div>
 
 		<hr>

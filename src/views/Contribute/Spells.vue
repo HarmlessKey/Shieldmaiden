@@ -101,7 +101,7 @@
 									>
 										<i class="fas fa-pencil"></i>
 									</router-link>
-									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
+									<a @click="setSlide({ show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
 									</a>
 								</div>

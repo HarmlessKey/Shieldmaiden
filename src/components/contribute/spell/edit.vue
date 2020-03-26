@@ -149,7 +149,6 @@ export default {
 					this.loading = false
 					this.fb_spell_json = JSON.stringify(this.spell);
 					this.unsaved_changes = false
-					console.log("received new fb data")
 				}
 			},
 			old_spell: {
@@ -162,7 +161,6 @@ export default {
 	methods: {
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
-			console.log("In parse old spell")
 			
 			// Parse simple values
 			// this.$set(this.spell, 'name', this.old_spell.name);
@@ -238,10 +236,7 @@ export default {
 
 			// Parse Description
 			this.spell.description = "";
-			// console.log(this.old_spell)
 			for (let i in this.old_spell.desc) {
-				// console.log((i))
-				// console.log((i !== '0'))
 				if (i != 0)
 					this.spell.description += "\n\n"; // Add white line before each paragraph after first
 				this.spell.description += this.parse_spell_str(this.old_spell.desc[i]);
@@ -270,7 +265,6 @@ export default {
 			// delete this.spell.higher_level
 		},
 		parse_spell_str(text) {
-			// console.log(text);
 			// map to replace weird character with real character 
 			let rules = [
 				{
@@ -298,7 +292,6 @@ export default {
 		},
 		setValidators(validators) {
 			// Receives validator lists from basic info and spell actions
-			// console.log(validators);
 			for (let v in validators) {
 				this.validators[v] = validators[v];
 				// this.validators.push(validator)
@@ -363,7 +356,6 @@ export default {
 			deep: true,
 			handler() {
 				// Emits validation on every change
-				console.log("Change in object");
 				if (JSON.stringify(this.spell) !== this.fb_spell_json)
 					this.unsaved_changes = true;
 				else

@@ -379,7 +379,7 @@ export default {
 <style lang="scss" scoped>
 .spell-wrapper {
 	display: grid;
-	height: calc(100vh - 175px) !important;
+	height: calc(100vh - 188px) !important;
 	grid-template-rows: auto 60px;
 
 	.form {
@@ -389,71 +389,10 @@ export default {
 		&::-webkit-scrollbar {
 			display: none;
 		}
-		.spellTitle {
-				margin-bottom: 5px;
-		}
-		.url {
-			display: block;
-			margin-bottom: 15px;
-			word-break: break-all;
-		}
-		label {
-			margin-top: 0.5rem;
-			margin-bottom: 0;
-		}
-
-		.class_box {
-			padding: 0 6px;
-			background: #000;
-			width: 40px;
-			text-align: center;
-			line-height: 36px;
-			height: 36px;
-			font-size: 18px;
-			span {
-				color: white;
-			}
-		}
-
-		select#classes {
-			height: 158px;
-		}
-
-		.component_box {
-			background: #000;
-			width: 40px;
-			text-align: center;
-			line-height: 36px;
-			height: 36px;
-			font-size: 18px;
-			span {
-				color: white;
-			}
-		}
-		.component_box.selected {
-			background: #2c97de;
-		}
-
 		.old_spell {
 			position: -webkit-sticky;
 			position: sticky;
 			top: 0;
-		}
-
-		.collapse-header {
-			display: grid;
-			grid-template-columns: auto 20px;
-		}
-
-		.remove-link a {
-			display: block;
-			height: 100%;
-			line-height: 60px;
-			padding-bottom: 15px;
-
-			i {
-				vertical-align: bottom;
-			}
 		}
 	}
 

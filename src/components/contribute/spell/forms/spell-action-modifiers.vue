@@ -168,20 +168,17 @@
 						</b-row>
 						<template v-if="level_scaling != undefined && level_scaling != 'None'">
 							<!-- HIGHER LEVEL MODIFIER -->
-							<b-row>
-								<b-col>
-									<hr>
-								</b-col>
-								<b-col class="col-1" v-if="level_tier_addable(mod_index)">
+							<h2 class="d-flex justify-content-between mt-3">
+									Scaling
 									<a 
+									v-if="level_tier_addable(mod_index)"
 									class="gray-hover text-capitalize" 
 									v-b-tooltip.hover title="Add Level Tier" 
 									@click="add_level_tier(mod_index)">
 										<i class="fas fa-plus green"></i>
 										<!-- <span class="d-none d-md-inline ml-1">Add</span> -->
 									</a>
-								</b-col>
-							</b-row>
+							</h2>
 							<template v-for="(level_tier, tier_index) in modifier.level_tiers">
 								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
@@ -229,26 +226,27 @@
 												:key="i" :value="val.value">{{ val.label }}</option>
 										</b-form-select>
 									</b-col>
-									<b-col md="2">
+									<b-col md="3">
 										<!-- HL MODIFIER FIXED VALUE -->
 										<label for="fixed_val">Fixed Value</label>
-										<b-form-input v-model="level_tier.fixed_val"
-											autocomplete="off"
-											id="fixed_val"
-											name="fixed_val"
-											class="form-control mb-2"
-											title="Fixed Value"
-											type="number"
-											data-vv-as="Fixed Value"
-											@keyup="$forceUpdate()"
-											></b-form-input>
-									</b-col>
-									<b-col md='1' class="remove-link">
-										<a @click="remove_level_tier(mod_index, tier_index)"
-											class="gray-hover text-capitalize"
-											v-b-tooltip.hover title="Remove">
-											<i class="fas fa-trash-alt red"></i>
-										</a>
+										<div class="d-flex justify-content-between">
+											<b-form-input v-model="level_tier.fixed_val"
+												autocomplete="off"
+												id="fixed_val"
+												name="fixed_val"
+												class="form-control mb-2"
+												title="Fixed Value"
+												type="number"
+												data-vv-as="Fixed Value"
+												@keyup="$forceUpdate()"
+												></b-form-input>
+
+												<a @click="remove_level_tier(mod_index, tier_index)"
+													class="remove"
+													v-b-tooltip.hover title="Remove">
+													<i class="fas fa-trash-alt red"></i>
+												</a>
+										</div>
 									</b-col>
 								</b-row>
 							</template>
@@ -269,7 +267,6 @@
 import numeral from 'numeral';
 
 export default {
-
 	name: 'spell-action-modifiers',
 	props: {
 		value: Array,
@@ -345,7 +342,6 @@ export default {
 			this.$forceUpdate(); //IMPORTANT
 		},
 		add_level_tier(index) {
-			console.log(this.modifiers[index])
 			this.modifiers[index].level_tiers.push({});
 			this.$forceUpdate();
 		},
@@ -446,5 +442,9 @@ h2 {
 label {
 	display: flex;
 	justify-content: space-between;
+}
+.remove {
+	padding-top: 7px;
+	margin-left: 10px;
 }
 </style>

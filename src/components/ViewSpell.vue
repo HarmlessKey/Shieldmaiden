@@ -124,19 +124,29 @@
 				</h3>
 
 				<!-- TO HIT RESULTS -->
-				<h2 v-else-if="action.toHit">
-					<span class="gray-hover">To hit: </span>
-					<template v-if="action.toHit.singleRoll">
-						{{ action.toHit.singleRoll.throws[0] + action.toHit.singleRoll.mod }} = <b>{{ action.toHit.singleRoll.total }}</b>
-					</template>
-					<template v-else>
-						<template v-if="advantage === 'advantage'">
-							<del class="gray-hover">{{ action.toHit.lowest.throws[0] }}</del> {{ action.toHit.highest.throws[0] + action.toHit.highest.mod }} = <b>{{ action.toHit.highest.total }}</b>
+				<h2 v-else-if="action.toHit" class="d-flex justify-content-between">
+					<div>
+						<template v-if="action.toHit.singleRoll">
+							{{ action.toHit.singleRoll.throws[0] + action.toHit.singleRoll.mod }} = <b>{{ action.toHit.singleRoll.total }}</b>
 						</template>
 						<template v-else>
-							<del class="gray-hover">{{ action.toHit.highest.throws[0] }}</del> {{ action.toHit.lowest.throws[0] + action.toHit.lowest.mod }} = <b>{{ action.toHit.lowest.total }}</b>
+							<template v-if="advantage === 'advantage'">
+								<del class="gray-hover">{{ action.toHit.lowest.throws[0] }}</del> {{ action.toHit.highest.throws[0] + action.toHit.highest.mod }} = <b>{{ action.toHit.highest.total }}</b>
+							</template>
+							<template v-else>
+								<del class="gray-hover">{{ action.toHit.highest.throws[0] }}</del> {{ action.toHit.lowest.throws[0] + action.toHit.lowest.mod }} = <b>{{ action.toHit.lowest.total }}</b>
+							</template>
 						</template>
-					</template>
+					</div>
+
+					<div class="save">
+						<a @click="setHitOrMiss('hit')" :class="hitOrMiss === 'hit' ? 'green' : 'gray-light'">
+							HIT
+						</a>
+						<a @click="setHitOrMiss('miss')" :class="hitOrMiss === 'miss' ? 'red' : 'gray-light'">
+							MISS
+						</a>
+					</div>
 				</h2>
 
 				<!-- MODIFIER RESULTS -->
@@ -168,7 +178,10 @@
 							{{ data.row.scaledRoll.throws }}
 						</div>
 						<div v-if="savingThrow === 'save'" class="mt-3">
-							Successful saving throw: <b>half damage</b>
+							Successful saving throw: <b>{{ missSaveEffect(data.row.missSave, 'text') }}</b>
+						</div>
+						<div v-if="hitOrMiss === 'miss'" class="mt-3">
+							Missed attack: <b>{{ missSaveEffect(data.row.missSave, 'text') }}</b>
 						</div>
 						<div v-if="resistances[data.row.subtype] === 'vulnerable'" class="mt-3">
 							Vulnerable to {{ data.row.subtype }}: <b>double damage</b>
@@ -184,7 +197,7 @@
 						<b>Final result:</b> <br/>	
 						({{ data.row.modifierRoll.total }}
 						<span v-if="data.row.scaledRoll"> + {{ data.row.scaledRoll.total }}</span>)
-						<span v-if="savingThrow === 'save'"> / 2</span>
+						<span v-if="savingThrow === 'save' || hitOrMiss === 'miss'"> {{ missSaveEffect(data.row.missSave, 'calc') }}</span>
 						<span v-if="resistances[data.row.subtype] === 'vulnerable'"> * 2</span>
 						<span v-if="resistances[data.row.subtype] === 'resistant'"> / 2</span>
 						<span v-if="resistances[data.row.subtype] === 'immune'"> no effect</span>
@@ -225,13 +238,13 @@
 
 				<h3 class="mt-3">Final result: </h3>
 			</div>
-			<!-- <pre>
+			<pre>
 				{{ rolled }}
-			</pre> -->
+			</pre>
 		</div>
 
-		<!-- <hr>
-		<pre>
+		<hr>
+		<!-- <pre>
 			{{ spell }}
 		</pre> -->
 	</div>
@@ -259,6 +272,7 @@
 				advantage: false,
 				rolled: undefined,
 				savingThrow: undefined,
+				hitOrMiss: undefined,
 				resistances: {},
 				resultColumns: {
 					total: {
@@ -324,7 +338,7 @@
 				this.selectedLevel = i;
 			},
 			roll(spell, selectedLevel, casterLevel, toHitModifier) {
-				this.rolled = this.rollSpell(spell, selectedLevel, casterLevel, toHitModifier);
+				this.rolled = this.rollSpell(spell, selectedLevel, casterLevel, toHitModifier, this.advantage);
 			},
 			totalDamage(action, rolls) {
 				let total = parseInt(rolls.modifierRoll.total);
@@ -333,7 +347,10 @@
 					total = total + rolls.scaledRoll.total;
 				}
 				if(action.type === 'Spell Save' && this.savingThrow === 'save') {
-					total = Math.floor(total / 2);
+					total = Math.floor(total * rolls.missSave);
+				}
+				if(action.toHit && this.hitOrMiss === 'miss') {
+					total = Math.floor(total * rolls.missSave);
 				}
 				if(this.resistances[rolls.subtype] === 'vulnerable') {
 					total = total * 2;
@@ -349,6 +366,9 @@
 			setSave(save) {
 				this.savingThrow = (save !== this.savingThrow) ? save : undefined;
 			},
+			setHitOrMiss(result) {
+				this.hitOrMiss = (result !== this.hitOrMiss) ? result : undefined;
+			},
 			setAdvantage(value) {
 				this.advantage = (value !== this.advantage) ? value : false;
 			},
@@ -357,6 +377,29 @@
 					this.$delete(this.resistances, type);
 				} else {
 					this.$set(this.resistances, type, resistance);
+				}
+			},
+			missSaveEffect(effect, type) {
+				if(type === 'text') {
+					if(effect === 1) {
+						return 'full damage';
+					}
+					if(effect === .5) {
+						return 'half damage';
+					}
+					if(effect === 0) {
+						return 'no damage';
+					}
+				} else {
+					if(effect === 1) {
+						return '';
+					}
+					if(effect === .5) {
+						return '/ 2';
+					}
+					if(effect === 0) {
+						return 'no effect';
+					}
 				}
 			}
 		}
@@ -436,7 +479,7 @@
 
 		.save {
 			a {
-				margin-left: 10px;
+				margin-left: 5px;
 			}
 		}
 		.resistances {

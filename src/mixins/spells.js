@@ -20,11 +20,13 @@ export const spells = {
 			// LOOP OVER ALL ACTIONS
 			for(let action of actions) {
 				let type = action.type;
+				let toHit = false;
 				returnRoll.actions[i] = { type, rolls: [] };
 
 				//If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'Melee Weapon' || type === 'Ranged Weapon' || type === 'Spell Attack') {
 					returnRoll.actions[i].toHit = this.__rollToHit__(toHitModifier, advantage);
+					toHit = true;
 				}
 				if(type === 'Spell Save') {
 					returnRoll.actions[i].save = action.save;
@@ -37,6 +39,7 @@ export const spells = {
 					let fixed_val = (modifier.fixed_val) ? modifier.fixed_val : 0;
 					let modifierRoll = undefined;
 					let scaledRoll = undefined;
+					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
 
 					//Create a list with al damage types for this action
 					//Only if it is not a healing spell
@@ -68,7 +71,8 @@ export const spells = {
 					returnRoll.actions[i].rolls.push({
 						modifierRoll,
 						subtype: modifier.subtype,
-						scaledRoll
+						scaledRoll,
+						missSave
 					});
 				}
 				i++;
@@ -136,6 +140,8 @@ export const spells = {
 		__rollToHit__(modifier, advantage) {
 			let rolls = {};
 			let toHit = [];
+
+			console.log('advantage', advantage)
 
 			if(advantage) {
 				for(let i = 0; i <= 1; i++) {

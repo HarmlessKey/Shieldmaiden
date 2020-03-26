@@ -1,17 +1,14 @@
 <template>
 	<div class="content">
 		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
-	
 		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="userInfo && (userInfo.admin || userInfo.contribute)">
-				<a v-if="!edit" @click="setEdit(!edit)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a>
-				<a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a>
+				<router-link :to="'/contribute/spells/' + spellId + '/edit'" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></router-link>
 				<a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a>
 			</span>
 		</h2>
 
-		<template v-if="!edit">
 			<!-- SHOW THE OLD SPELL IF SPELL IS NOT CHANGED YET -->
 			<template v-if="oldSpell.school && !spell.changed">
 				<i class="mb-3 d-block">
@@ -74,22 +71,7 @@
 				<p>
 					<vue-markdown name="description" :source="spell.description"></vue-markdown>
 				</p>
-				<!-- <p v-for="(desc, index) in spell.desc" :key="index">
-					{{ desc }}
-				</p> -->
-
-				<!-- <p v-if="spell.higher_level">
-					At higher levels. 
-					<template v-for="higher in spell.higher_level">
-						{{ higher }}
-					</template>
-				</p> -->
 			</template>
-		</template>
-
-		<template v-else> 
-			<SpellEdit :id="$route.params.id" />
-		</template>
 	</div>
 </template>
 
@@ -161,7 +143,7 @@
 			checked(value) {
 				db.ref(`new_spells/${this.id}/checked`).set(value);
 			}
-		}
+		},
 	}
 </script>
 

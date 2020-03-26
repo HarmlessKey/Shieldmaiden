@@ -12,6 +12,7 @@ const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
+const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
 const Contribute = () => import('@/views/Contribute');
 
 const Sitemap = () => import('@/views/Sitemap.vue');
@@ -145,6 +146,20 @@ export const routes = [{
 	path: '/contribute/spells/:id',
 	name: 'Contribute Spell',
 	component: Spell_contrib,
+	props: (route) => ({
+		id: route.query.id,
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Spells',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/spells/:id/edit',
+	name: 'Edit Spell',
+	component: SpellEdit,
 	props: (route) => ({
 		id: route.query.id,
 	}),

@@ -1,83 +1,95 @@
 <template>
-	<div class="spell-wrapper">
-		<template v-if="(old_spell && spell)">
-			
-			<div class="form">
-				<b-row>
-					<b-col md="4" id="old_spell">
-						<b-card header="Old Spell Description" v-if="loading">
-							<div  class="loader"> <span>Loading old_spell...</span></div>
-						</b-card>
-						<b-card class="old_spell" header="Old Spell Description" v-else>
-							<a 
-								class="btn btn-block mb-3" 
-								@click="parse_old_spell()">
-									<i class="fas fa-wand-magic"></i>
-									<span class="d-none d-md-inline ml-1">Parse to new spell</span>
-							</a>
+	<div class="content">
+		<Crumble :name="(spell.changed) ? spell.name : old_spell.name"/>
+		<h2 class="spellTitle d-flex justify-content-between" v-if="old_spell">
+			{{ (spell.changed) ? spell.name : old_spell.name }}
+			<!-- <span v-if="userInfo && (userInfo.admin || userInfo.contribute)"> -->
+				<!-- <a v-if="!edit" @click="setEdit(!edit)" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></a> -->
+				<!-- <a v-else @click="setEdit(false)" v-b-tooltip.hover title="Cancel" class="mx-2"><i class="fas fa-times"></i></a> -->
+				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
+			<!-- </span> -->
+		</h2>
+		
+		<div class="spell-wrapper">
+			<template v-if="(old_spell && spell)">
+				
+				<div class="form">
+					<b-row>
+						<b-col md="4" id="old_spell">
+							<b-card header="Old Spell Description" v-if="loading">
+								<div  class="loader"> <span>Loading old_spell...</span></div>
+							</b-card>
+							<b-card class="old_spell" header="Old Spell Description" v-else>
+								<a 
+									class="btn btn-block mb-3" 
+									@click="parse_old_spell()">
+										<i class="fas fa-wand-magic"></i>
+										<span class="d-none d-md-inline ml-1">Parse to new spell</span>
+								</a>
 
-							<h1 class="spellTitle"><a :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
-							<i class="mb-3 d-block" v-if="old_spell.school">
-								{{ levels[old_spell.level] }}
-								{{ old_spell.school.name }}
-							</i>
+								<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
+								<i class="mb-3 d-block" v-if="old_spell.school">
+									{{ levels[old_spell.level] }}
+									{{ old_spell.school.name }}
+								</i>
 
-							<p>
-								<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
-								<b>Range:</b> {{ old_spell.range }}<br/>
-								<b>Components:</b> 
-								<template v-for="(component, index) in old_spell.components">
-									{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
-								</template>
-								<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
-								<br/>
-								<b>Duration:</b>
-									<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
-									{{ old_spell.duration }}<br/>
-								<b>Classes:</b> 
-								<template v-for="(_class, index) in old_spell.classes">
-									{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
-								</template>
-								<br/>
-							</p>
-							<p v-for="(desc, index) in old_spell.desc" :key="index">
-								{{ desc }}
-							</p>
+								<p>
+									<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
+									<b>Range:</b> {{ old_spell.range }}<br/>
+									<b>Components:</b> 
+									<template v-for="(component, index) in old_spell.components">
+										{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
+									</template>
+									<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
+									<br/>
+									<b>Duration:</b>
+										<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
+										{{ old_spell.duration }}<br/>
+									<b>Classes:</b> 
+									<template v-for="(_class, index) in old_spell.classes">
+										{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
+									</template>
+									<br/>
+								</p>
+								<p v-for="(desc, index) in old_spell.desc" :key="index">
+									{{ desc }}
+								</p>
 
-							<p v-if="old_spell.higher_level">
-								At higher levels. 
-								<template v-for="higher in old_spell.higher_level">
-									{{ higher }}
-								</template>
-							</p>
-						</b-card>
-					</b-col>
+								<p v-if="old_spell.higher_level">
+									At higher levels. 
+									<template v-for="higher in old_spell.higher_level">
+										{{ higher }}
+									</template>
+								</p>
+							</b-card>
+						</b-col>
 
-					<b-col md="8">
-						<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-						<!-- SPELL ACTIONS -->
-						<spell-actions v-model='spell' @validation="setValidators" />
-					</b-col>
-				</b-row>
-			</div>
-			<div class="save">
-				<div>
-					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-					 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
-					</div>			
+						<b-col md="8">
+							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
+							<!-- SPELL ACTIONS -->
+							<spell-actions v-model='spell' @validation="setValidators" />
+						</b-col>
+					</b-row>
 				</div>
-				<div>
-					<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>
-					<button 
-						:disabled="errors.items && errors.items.length > 0"
-						class="btn" 
-						@click="store_spell()"
-					>
-						<i class="fas fa-check"></i> Save
-					</button>
+				<div class="save">
+					<div>
+						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+						 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+						</div>			
+					</div>
+					<div>
+						<a v-if="unsaved_changes" to="/npcs" class="btn bg-gray mr-2" @click="cancel_changes()">Revert</a>
+						<button 
+							:disabled="errors.items && errors.items.length > 0"
+							class="btn" 
+							@click="store_spell()"
+						>
+							<i class="fas fa-check"></i> Save
+						</button>
+					</div>
 				</div>
-			</div>
-		</template>
+			</template>
+		</div>
 	</div>
 </template>
 
@@ -97,7 +109,6 @@ export default {
 		spellActions,
 	},
 	mixins: [general],
-	props: ['id'],
 	metaInfo() {
 		return {
 			title: this.old_spell.name + ' | D&D 5th Edition',
@@ -117,6 +128,7 @@ export default {
 			spell: {},
 			unsaved_changes: false,
 			fb_spell_json: {},
+			id: this.$route.params.id,
 		}
 	},
 	computed: {
@@ -261,7 +273,7 @@ export default {
 					replacement: '\"'
 				},
 			];
-
+			console.log("REPLACE ")
 			rules.forEach(function(rule) {
 				text = text.replace(rule.regex, rule.replacement);
 			});
@@ -272,6 +284,7 @@ export default {
 			this.$forceUpdate();
 		},
 		setValidators(validators) {
+			console.log("set validators")
 			// Receives validator lists from basic info and spell actions
 			for (let v in validators) {
 				this.validators[v] = validators[v];
@@ -345,6 +358,17 @@ export default {
 			},
 		}
 	},
+	beforeRouteLeave (to, from, next) {
+		if (unsaved_changes) {
+			this.$snotify.error('There are unsaved changes in the form.\n Would you like to continue?', 'Unsaved Changes', {
+				buttons: [
+				{ text: 'Leave', action: (toast) => { next(); this.$snotify.remove(toast.id); }, bold: false},
+				{ text: 'Stay', action: (toast) => { next(false); this.$snotify.remove(toast.id); }, bold: true},
+				]
+			});
+		}
+  }
+
 }
 </script>
 

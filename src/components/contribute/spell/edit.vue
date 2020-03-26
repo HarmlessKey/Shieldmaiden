@@ -257,7 +257,7 @@ export default {
 			// Source book
 			this.spell.source = this.old_spell.page;
 
-			// this.store_spell();
+			this.store_spell();
 
 			// Clean up spell object
 			// delete this.spell.concentration

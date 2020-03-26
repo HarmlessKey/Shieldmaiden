@@ -63,7 +63,17 @@
 							<i class="fad fa-treasure-chest green"></i>
 							<span class="d-none d-md-inline ml-1 green">Save</span>
 						</a>
-						<span v-if="unsaved_changes" class="red unsaved_changes">There are unsaved changes in the spell</span>
+						<template v-if="unsaved_changes">
+							<a 
+							class="gray-hover text-capitalize mx-3" 
+							v-b-tooltip.hover title="Cancel Changes" 
+							@click="cancel_changes()">
+								<i class="fad fa-skull-crossbones red"></i>
+								<span class="d-none d-md-inline ml-1 red">Cancel</span>
+							</a>
+							<span class="red unsaved_changes">There are unsaved changes in the spell</span>
+							
+						</template>
 					</div>
 					<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
 					<!-- SPELL ACTIONS -->
@@ -139,6 +149,7 @@ export default {
 					this.loading = false
 					this.fb_spell_json = JSON.stringify(this.spell);
 					this.unsaved_changes = false
+					console.log("received new fb data")
 				}
 			},
 			old_spell: {
@@ -331,6 +342,7 @@ export default {
 				});
 				this.validators = {};
 				this.unsaved_changes = false;
+				this.fb_spell_json = JSON.stringify(this.spell);
 				// this.$router.replace('/players')
 			} else {
 				console.log("Not validated");
@@ -340,6 +352,10 @@ export default {
 			}
 			// })
 		},
+		cancel_changes() {
+			this.spell = JSON.parse(this.fb_spell_json);
+			this.unsaved_changes = false;
+		}
 	},
 	watch: {
 		spell: {

@@ -57,24 +57,7 @@
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`modifier_subtype-${mod_index}`)">{{ errors.first(`modifier_subtype-${mod_index}`) }}</p>
 							</b-col>
-							<b-col md="4">
-								<label for="primary">
-									<span>Primary Stat</span>
-									<a 
-										class="ml-1"
-										v-b-popover.hover.top="'Select this if the primary ability modifier is added as a fixed value to the damage/healing of the modifier.'" 
-										title="Primary Stat"
-									>
-										<i class="fas fa-info-circle"></i>
-									</a>
-								</label>
-								<div class="primary d-flex justify-content-between" name="primary">
-									<a class="component_box" @click="setPrimary(modifier)"
-										:class="{'selected': modifier.primary === true}">
-										<span>P</span>
-									</a>
-								</div>
-							</b-col>
+					
 							<b-col md="4">
 								<!-- SPELL FAIL MODIFIER -->
 								<template v-if="action_type === 'Spell Save'">
@@ -127,10 +110,35 @@
 									<p class="validate red" v-if="errors.has(`miss_mod-${mod_index}`)">{{ errors.first(`miss_mod-${mod_index}`) }}</p>
 								</template>
 							</b-col>
+
+							<!-- SPECIAL ACTIONS -->
+							<b-col md="4">
+								<label :for="`modifier_subtype-${mod_index}`">
+									Special
+									<a 
+										v-if="modifier.special"
+										class="ml-1"
+										v-b-popover.hover.top="specials[modifier.special].info" 
+										:title="specials[modifier.special].label"
+									>
+										<i class="fas fa-info-circle"></i>
+									</a>
+								</label>
+								<b-form-select v-model="modifier.special"
+									:id="`modifier_special-${mod_index}`"
+									:name="`modifier_special-${mod_index}`"
+									title="Modifier special"
+									class="form-control mb-2"
+									@change="$forceUpdate()">
+									<option :value="undefined">No special action</option>
+									<option v-for="(special, key) in specials"
+										:key="key" :value="key">{{ special.label }}</option>
+								</b-form-select>
+							</b-col>
 						</b-row>
 						<b-row>
 							<!-- DICE COUNT -->
-							<b-col md="4">
+							<b-col md="3">
 								<label for="dice_count">Dice Count</label>
 								<b-form-input v-model="modifier.dice_count"
 									autocomplete="off"
@@ -143,7 +151,7 @@
 									@keyup="$forceUpdate()"
 									></b-form-input>
 							</b-col>
-							<b-col md="4">
+							<b-col md="3">
 								<!-- MODIFIER SUBTYPE -->
 								<label for="dice_type">Dice Type</label>
 								<b-form-select v-model="modifier.dice_type"
@@ -158,7 +166,7 @@
 										:key="i" :value="val.value">{{ val.label }}</option>
 								</b-form-select>
 							</b-col>
-							<b-col md="4">
+							<b-col md="3">
 								<!-- MODIFIER FIXED VALUE -->
 								<label for="fixed_val">
 									Fixed Value
@@ -181,6 +189,24 @@
 									@keyup="$forceUpdate()"
 									></b-form-input>
 							</b-col>
+							<b-col md="3">
+							<label for="primary">
+								<span>Primary Stat</span>
+								<a 
+									class="ml-1"
+									v-b-popover.hover.top="'Select this if the primary ability modifier is added as a fixed value to the damage/healing of the modifier.'" 
+									title="Primary Stat"
+								>
+									<i class="fas fa-info-circle"></i>
+								</a>
+							</label>
+							<div class="primary d-flex justify-content-between" name="primary">
+								<a class="component_box" @click="setPrimary(modifier)"
+									:class="{'selected': modifier.primary === true}">
+									<span>P</span>
+								</a>
+							</div>
+						</b-col>
 						</b-row>
 						<template v-if="level_scaling != undefined && level_scaling != 'None'">
 							<!-- HIGHER LEVEL MODIFIER -->
@@ -331,7 +357,11 @@ export default {
 				// { label: "¼", value: 0.25},
 				{ label: "Half damage", value: 0.5},
 				{ label: "Full damage", value: 1},
-			]
+			],
+			specials: {
+				siphon: { label: "Heal caster", info: "On a hit, the caster is healed for half of the damage done." },
+				drain: { label: "Reduce max HP", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
+			}
     };
   },
   methods: {
@@ -358,6 +388,9 @@ export default {
 			this.$forceUpdate(); //IMPORTANT
 		},
 		add_level_tier(index) {
+			if(!this.modifiers[index].level_tiers) {
+				this.modifiers[index].level_tiers = [];
+			}
 			this.modifiers[index].level_tiers.push({});
 			this.$forceUpdate();
 		},
@@ -380,7 +413,7 @@ export default {
 				description = ["This spell's damage increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
-					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 					
 					description.push(new_line)
 				}
@@ -389,7 +422,7 @@ export default {
 				let tier = level_tiers[0]
 				let new_line = "When you cast this spell using a spell slot of "
 				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
-				new_line += `${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
+				new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
 				new_line += `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
 				
 				description = [new_line]
@@ -399,7 +432,7 @@ export default {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "
 					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `
-					new_line += `${tier.dice_count || "..."}D${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 
 					description.push(new_line)
 				}

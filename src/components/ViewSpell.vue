@@ -487,6 +487,7 @@
 			grid-template-columns: 30px 1fr 1fr 1fr;
 			grid-column-gap: 1px;
 			user-select: none;
+			margin-bottom: 1px;
 
 			.icon {
 				padding: 3px 0;

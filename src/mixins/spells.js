@@ -51,11 +51,14 @@ export const spells = {
 
 					//Check if the spell scales with the current roll
 					let tiers = modifier.level_tiers;
-					let scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
+					if(tiers) {
+						let scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
 					
-					//Roll the scaledModifier
-					if(scaledModifier) {
-						scaledRoll = this.rollD(scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
+					
+						//Roll the scaledModifier
+						if(scaledModifier) {
+							scaledRoll = this.rollD(scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
+						}
 					}
 					
 					//Roll the modifier
@@ -81,7 +84,7 @@ export const spells = {
 		},
 		returnDamageTypeIcon(type) {
 			if(type === 'Acid') { return 'fas fa-tint'; }
-			if(type === 'Bludgening') { return 'fas fa-hammer-war';  }
+			if(type === 'Bludgeoning') { return 'fas fa-hammer-war';  }
 			if(type === 'Cold') { return 'far fa-snowflake'; }
 			if(type === 'Fire') { return 'fas fa-flame'; }
 			if(type === 'Force') { return 'fas fa-sparkles'; }

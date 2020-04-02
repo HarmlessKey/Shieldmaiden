@@ -31,7 +31,7 @@
 								<reminder-form v-model="notification.reminder" @validation="setValidation"/>
 							</b-col>
 							<b-col sm="6">
-								<label for="condition">
+								<label for="application">
 									<span>Application</span>
 									<a 
 										v-b-popover.hover.top="'When should this reminder be applied?'" 
@@ -44,15 +44,40 @@
 									id="application"
 									name="application"
 									title="application"
-									class="form-control mb-4"
+									class="form-control mb-2"
 									data-vv-as="application"
 									@change="$forceUpdate()">
 									<option value="undefined" disabled>- Application -</option>
 									<option 
 										v-for="(appl, i) in application"
-										:key="`con-${i}`" :value="appl"
+										:key="`appl-${i}`" :value="appl"
 									>
 										{{ appl }}
+									</option>
+								</b-form-select>
+
+								<label for="target">
+									<span>Target</span>
+									<a 
+										v-b-popover.hover.top="'To whom should the reminder be applied?'" 
+										title="Target"
+									>
+										<i class="fas fa-info-circle"></i>
+									</a>
+								</label>
+								<b-form-select v-model="notification.target"
+									id="target"
+									name="target"
+									title="target"
+									class="form-control mb-4"
+									data-vv-as="target"
+									@change="$forceUpdate()">
+									<option value="undefined" disabled>- Apply to -</option>
+									<option 
+										v-for="(target, i) in targets"
+										:key="`target-${i}`" :value="target"
+									>
+										{{ target }}
 									</option>
 								</b-form-select>
 								<template v-if="notification.reminder && notification.reminder.variables && Object.keys(notification.reminder.variables).length > 0">
@@ -159,6 +184,10 @@ export default {
 			application: [
 				"Always",
 				"Failed save"
+			],
+			targets: [
+				"Target",
+				"Caster"
 			]
     };
 	},

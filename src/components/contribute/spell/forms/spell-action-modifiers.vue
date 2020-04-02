@@ -464,6 +464,9 @@ h2 {
 	border-bottom: solid 1px #5c5757;
 	padding-bottom: 5px;
 }
+.row {
+	margin-bottom: 20px;
+}
 .card-header {
 	cursor: pointer;
 }

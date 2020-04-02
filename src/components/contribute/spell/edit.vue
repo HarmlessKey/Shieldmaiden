@@ -154,7 +154,7 @@ export default {
 	},
 	methods: {
 		canEdit() {
-			return (this.old_spell.metadta && this.old_spell.metadata.tagged === this.userId) ||
+			return (this.old_spell.metadata && this.old_spell.metadata.tagged === this.userId) ||
 				this.userInfo.admin;
 		},
 		parse_old_spell() {

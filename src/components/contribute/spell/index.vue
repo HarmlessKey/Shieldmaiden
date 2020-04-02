@@ -3,7 +3,7 @@
 		<Crumble :name="(spell.changed) ? spell.name : oldSpell.name"/>
 		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
-			<span v-if="userInfo && (userInfo.admin || userInfo.contribute)">
+			<span v-if="canEdit()">
 				<router-link :to="'/contribute/spells/' + spellId + '/edit'" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></router-link>
 				<a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a>
 			</span>
@@ -92,6 +92,7 @@
 		props: ['id'],
 		data() {
 			return {
+				userId: this.$store.getters.getUser.uid,
 				spellId: this.$route.params.id,
 				edit: false,
 				loading: true,
@@ -113,7 +114,7 @@
 		computed: {
 			...mapGetters([
 				'userInfo'
-			]),
+			])
 		},
 		filters: {
 		  capitalize: function (value) {
@@ -137,6 +138,10 @@
 			}
 		},
 		methods: {
+			canEdit() {
+				return (this.spell.metadata && this.spell.metadata.tagged === this.userId) ||
+					this.userInfo.admin;
+			},
 			setEdit(value) {
 				this.edit = value
 			},

@@ -207,6 +207,7 @@
 			},
 			finish(key) {
 				db.ref(`new_spells/${key}/metadata/finished`).set(true);
+				db.ref(`new_spells/${key}/metadata/finished_by`).set(this.userId);
 				db.ref(`new_spells/${key}/metadata/tagged`).remove();
 			}
 		}

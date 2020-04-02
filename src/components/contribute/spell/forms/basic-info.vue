@@ -2,6 +2,9 @@
 	<div class="card">
 		<div class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
+			<a @click="setSlide({ show: true, type: 'ViewSpell', data: spell })">
+				<i class="fas fa-eye"></i>
+			</a>
 		</div>
 		<div class="card-body">
 			<b-row>
@@ -382,6 +385,7 @@
 <script>
 
 import VueMarkdown from 'vue-markdown';
+import { mapActions } from 'vuex';
 
 export default {
 
@@ -439,6 +443,9 @@ export default {
 		};
 	},
 	methods: {
+		...mapActions([
+			'setSlide'
+		]),
 		setComponent(comp) {
 			if (Object.keys(this.spell.components)[0]=="0") {
 				this.spell.components = {'verbal':0,'somatic':0,'material':0}

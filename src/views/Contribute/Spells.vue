@@ -42,7 +42,7 @@
 				<div>
 					<div class="card">
 						<div class="card-header">
-							Your Tagged Spells
+							Your Tagged Spell
 							<span v-if="taggedSpells">{{ Object.keys(taggedSpells).length }}</span>
 						</div>
 						<div class="card-body">
@@ -79,7 +79,6 @@
 						</div>
 					</div>
 				</div>
-
 				<div>
 					<div class="card">
 						<div class="card-header">

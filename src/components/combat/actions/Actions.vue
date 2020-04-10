@@ -37,7 +37,7 @@
 						role="tabpanel" 
 						aria-labelledby="manual-tab">
 
-						<Manual :current="current" />
+						<Manual :current="current" :targeted="targeted" />
 					</div>
 					<div v-if="current" class="tab-pane roll fade"
 						:class="{'active': current.entityType !== 'player'}"
@@ -54,10 +54,11 @@
 </template>
 
 <script>
-	import { setHP } from '@/mixins/HpManipulations.js'
+	import { mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
 
-	import Manual from '@/components/combat/actions/Manual.vue'
-	import Roll from '@/components/combat/actions/Roll.vue'
+	import Manual from '@/components/combat/actions/Manual.vue';
+	import Roll from '@/components/combat/actions/Roll.vue';
 
 	export default {
 		name: 'Actions',
@@ -66,7 +67,12 @@
 			Roll,
 		},
 		mixins: [setHP],
-		props: ['current', 'location']
+		props: ['current', 'location'],
+		computed: {
+			...mapGetters([
+				'targeted',
+			])
+		}
 	}
 </script>
 

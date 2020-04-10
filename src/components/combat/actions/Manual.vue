@@ -102,7 +102,7 @@
 
 		name: 'Actions',
 		mixins: [setHP],
-		props: ['current'],
+		props: ['current', 'targeted'],
 		data: function() {
 			return {
 				userId: this.$store.getters.getUser.uid,
@@ -117,8 +117,7 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'targeted',
+				'entities'
 			]),
 			intensity: {
 				get() {		

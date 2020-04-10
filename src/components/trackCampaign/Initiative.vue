@@ -1,5 +1,30 @@
 <template>
 	<div v-if="targets && allEntities && players && campPlayers">
+
+		<!-- ACTIONS -->
+		<div class="actions" v-if="characters.length !== 0">
+			<span v-if="targeted.length === 0">Select a target to perform actions</span>
+			<div v-else>
+				<a 
+					v-b-tooltip.hover
+					title="Damage or Healing"
+					@click="setSlide({
+						show: true,
+						type: 'slides/trackCampaign/playerRequests/index',
+						data: {
+							characters,
+							targeted: targeted,
+							targets,
+							players,
+							campPlayers,
+							npcs,
+							type: 'manual'
+						}
+					})"><i class="fas fa-swords"></i></a>
+			</div>
+		</div>
+
+		<!-- INITIATIVE LIST -->
 		<table class="table targets" :class="{'table-sm': windowWidth <= 360}">
 			<thead>
 				<th>In.</th>
@@ -31,21 +56,21 @@
 					>
 						<td class="initiative">{{ entity.initiative }}</td>
 					
-						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
+						<td class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"></td>
 
 						<td class="ac">
 							<template v-if="
 								(entity.entityType == 'player' && playerSettings.ac === undefined) 
 								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
 								<span class="ac" :class="{ 
-										'green': displayAc(entity).bonus > 0, 
-										'red': displayAc(entity).bonus < 0 
+										'green': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus > 0, 
+										'red': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus < 0 
 									}"  
-									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity).bonus" 
-									v-if="displayAc(entity).bonus">
-									{{ displayAc(entity).ac + displayAc(entity).bonus }}
+									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus" 
+									v-if="displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus">
+									{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus }}
 								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity).ac }}</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac }}</span>
 							</template>
 							<span v-else class="gray-hover">?</span>
 						</td>
@@ -119,19 +144,21 @@
 				</template>
 			</tbody>
 		</table>
-		{{ targeted }}
+		{{ characters }}
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
+	import { mapActions } from 'vuex';
+	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
-	import Health from '@/components/trackCampaign/Health.vue'
+	import Health from '@/components/trackCampaign/Health.vue';
 
 	export default {
 		name: 'app',
-		mixins: [general],
+		mixins: [general, trackEncounter],
 		components: {
 			Health,
 		},
@@ -165,10 +192,6 @@
 				},
 				npcs: {
 					source: db.ref(`npcs/${this.dmId}`),
-					asObject: true,
-				},
-				npcSettings: {
-					source: db.ref(`settings/${this.dmId}/track/npc`),
 					asObject: true,
 				},
 				playerSettings: {
@@ -215,6 +238,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			start(e, key) {
 				//Check how long the item is being pressed
 				if(!this.interval){
@@ -241,93 +267,30 @@
 				this.key = undefined;
 			},
 			target({longPress, e, key}) {
+				let targeted = this.targeted;
+
 				if(longPress || e.shiftKey) {
-					if(!this.targeted.includes(key)) {
-						this.targeted.push(key);
+					if(!targeted.includes(key)) {
+						targeted.push(key);
 					} else {
-						this.targeted = this.targeted.filter(function(value){
+						targeted = targeted.filter(function(value){
 							return value != key;
 						});
 					}
 				} else {
-					if(this.targeted.length === 0 || this.targeted != key) {
-						this.targeted = [key];
+					if(targeted.length === 0 || targeted != key) {
+						targeted = [key];
 					} else {
-						this.targeted = [];
+						targeted = [];
 					}
 				}
+				this.targeted = targeted;
 			},
 			getWindowWidth() {
 				//Return the window width
 				//used in the html to bind a class for small tables
         this.windowWidth = document.documentElement.clientWidth;
-      },
-			displayAc(entity) {
-				var stats = {}
-				var key = entity.key
-
-				if(entity.transformed) {
-						stats.ac = parseInt(entity.transformed.ac);
-						stats.bonus = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].ac_bonus) : parseInt(entity.ac_bonus);
-				}
-				else {
-						if(entity.entityType == 'player') {
-							stats = {
-								ac: parseInt(this.players[key].ac),
-								bonus: parseInt(this.campPlayers[key].ac_bonus),
-							}
-						} else {
-							stats = {
-								ac: parseInt(entity.ac),
-								bonus: parseInt(entity.ac_bonus),
-							}
-						}
-				}
-				return stats
-			},
-			img(entity) {
-				//Check what image should be displayed
-				let encounterImg = entity.avatar; //img linked within the encounter
-
-				if(encounterImg) {
-					var img = encounterImg;
-				} else {
-					if(entity.id) {
-						if(entity.entityType == 'player') {
-							let playerImg = this.players[entity.id].avatar;
-
-							if(playerImg) {
-								img = playerImg
-							} else {
-								img = require('@/assets/_img/styles/player.svg');
-							}
-						}
-						if(entity.entityType == 'npc') {						
-							if(entity.npc == 'custom') {
-								let npcImg = this.npcs[entity.id].avatar;
-
-								img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-							} else {
-								img = require('@/assets/_img/styles/monster.svg');
-							}
-						}
-					} else {
-						img = require('@/assets/_img/styles/monster.svg');
-					}
-				}
-				return img
-			},
-			displayNPCField(field, entity) {
-				const defaults = {name: true, health: false, ac: false};
-				if (entity.settings && entity.settings[field] !== undefined) 
-					return entity.settings[field];
-
-				else if (this.npcSettings[field] == undefined)
-					return defaults[field]; // Default value
-
-				else 
-					return this.npcSettings[field];
-			}
+      }
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);
@@ -336,6 +299,12 @@
 </script>
 
 <style lang="scss" scoped>
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	padding: 20px 0 5px 0;
+	border-bottom: solid 1px #fff;
+}
 	.table {
 		border-collapse: separate; 
 		border-spacing: 0 5px;

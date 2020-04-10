@@ -19,8 +19,17 @@
 					<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
 						<td colspan="6">Top of the round</td>
 					</tr>
-					<tr :key="entity.key">
-						<td>{{ entity.initiative }}</td>
+					<tr 
+						:key="entity.key" 
+						:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
+						@mousedown="characters.length !== 0 ? start($event, entity.key) : null" 
+						@mouseleave="characters.length !== 0 ? stop() : null" 
+						@mouseup="characters.length !== 0 ? stop() : null" 
+						@touchstart="characters.length !== 0 ? start($event, entity.key) : null" 
+						@touchend="characters.length !== 0 ? stop() : null" 
+						@touchcancel="characters.length !== 0 ? stop() : null"
+					>
+						<td class="initiative">{{ entity.initiative }}</td>
 					
 						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
 
@@ -110,6 +119,7 @@
 				</template>
 			</tbody>
 		</table>
+		{{ targeted }}
 	</div>
 </template>
 
@@ -134,26 +144,35 @@
 		],
 		data() {
 			return {
-				userId: this.$route.params.userid,
+				dmId: this.$route.params.userid,
+				userId: this.$store.getters.getUser.uid,
+				characters: [],
 				windowWidth: 0,
+
+				//Multitargeting needs variables
+				targeted: [],
+				interval:false,
+				counter: 0,
+				event: undefined,
+				key: undefined
 			}
 		},
 		firebase() {
 			return {
 				players: {
-					source: db.ref(`players/${this.userId}`),
+					source: db.ref(`players/${this.dmId}`),
 					asObject: true,
 				},
 				npcs: {
-					source: db.ref(`npcs/${this.userId}`),
+					source: db.ref(`npcs/${this.dmId}`),
 					asObject: true,
 				},
 				npcSettings: {
-					source: db.ref(`settings/${this.userId}/track/npc`),
+					source: db.ref(`settings/${this.dmId}/track/npc`),
 					asObject: true,
 				},
 				playerSettings: {
-					source: db.ref(`settings/${this.userId}/track/player`),
+					source: db.ref(`settings/${this.dmId}/track/player`),
 					asObject: true,
 				},
 				conditions: {
@@ -163,6 +182,22 @@
 			}
 		},
 		mounted() {
+			//Check if user has control over a character in the campaign
+			if(this.userId) {
+				const allCampaignPlayers = Object.keys(this.campPlayers);
+				const getCharacters = db.ref(`character_control/${this.userId}`);
+				getCharacters.on('value', async (snapshot) => {
+					let controlledCharacters = snapshot.val();
+
+					for(let key in controlledCharacters) {
+						if(allCampaignPlayers.includes(key)) {
+							this.characters.push(key);
+						}
+					}
+
+				});
+			}
+
 			//For a responsive window size
 			//in the html we bind a class based on that
 			this.$nextTick(function() {
@@ -172,7 +207,56 @@
 				this.getWindowWidth()
 			})
 		},
+		watch: {
+			counter(newValue) {
+				if(newValue > 8) {
+					this.stop()
+				}
+			}
+		},
 		methods: {
+			start(e, key) {
+				//Check how long the item is being pressed
+				if(!this.interval){
+					this.interval = setInterval(() => this.counter++, 30);
+					this.event = e;
+					this.key = key;
+				}
+			},
+			stop(){
+				//If and item was pressed, see if it was long or short
+				if(this.interval) {
+					let longPress = this.counter >= 8;
+	
+					this.target({
+						longPress,
+						e: this.event,
+						key: this.key
+					})
+				}
+				//Reset all values
+				clearInterval(this.interval)
+				this.interval = false;
+				this.counter = 0;
+				this.key = undefined;
+			},
+			target({longPress, e, key}) {
+				if(longPress || e.shiftKey) {
+					if(!this.targeted.includes(key)) {
+						this.targeted.push(key);
+					} else {
+						this.targeted = this.targeted.filter(function(value){
+							return value != key;
+						});
+					}
+				} else {
+					if(this.targeted.length === 0 || this.targeted != key) {
+						this.targeted = [key];
+					} else {
+						this.targeted = [];
+					}
+				}
+			},
 			getWindowWidth() {
 				//Return the window width
 				//used in the html to bind a class for small tables
@@ -255,17 +339,17 @@
 	.table {
 		border-collapse: separate; 
 		border-spacing: 0 5px;
+		user-select: none;
 
 		tr:first-child {
 			td {
-				border-top: solid 1px #2c97de !important;
-				border-bottom: solid 1px #2c97de !important;
+				border-color: #2c97de !important;
 			}
 			td:first-child {
-				border-left: solid 1px #2c97de !important;
+				border-color: #2c97de !important;
 			}
 			td:last-child {
-				border-right: solid 1px #2c97de !important;
+				border-color: #2c97de !important;
 			}
 		}
 		tr.top {
@@ -277,10 +361,20 @@
 			}
 		}
 		tr {
+			cursor: pointer;
+
 			td {
 				background: rgba(38, 38, 38, .9);
+				border-top: solid 1px transparent !important;
+				border-bottom: solid 1px transparent !important;
 			}
-			td.ac, th.ac {
+			td:first-child {
+				border-left: solid 1px transparent !important;
+			}
+			td:last-child {
+				border-right: solid 1px transparent !important;
+			}
+			td.initiative, td.ac, th.ac {
 				width: 30px;
 				text-align: center;
 			}
@@ -301,6 +395,16 @@
 				@media only screen and (max-width: 575px) {
 					height: 32px;
 					width: 32px;
+				}
+			}
+			&.targeted {
+				td {
+					border-color: #83b547 !important;
+				}
+			}
+			&:hover {
+				td {
+					border-color: #fff !important;
 				}
 			}
 		}

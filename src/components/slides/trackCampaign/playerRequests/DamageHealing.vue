@@ -140,10 +140,10 @@
 						let results = {};
 
 						if(this.type === 'healing') {
-							results = {
+							results = [{
 								amount: this.healingAmount,
 								damage_type: 'healing'
-							}
+							}]
 						}
 						if(this.type === 'damage') {
 							results = this.damage;

@@ -10,7 +10,7 @@
 					aria-controls="log" 
 					aria-selected="true">
 					<i class="fas fa-scroll-old"></i>
-					<span class="d-none d-md-inline ml-1">Log</span>
+					<span class="d-none d-xxl-inline ml-1 truncate">Log</span>
 				</a>
 			</li>
 			<li class="nav-item">
@@ -22,7 +22,19 @@
 					aria-controls="damage" 
 					aria-selected="false">
 					<i class="fas fa-swords"></i>
-					<span class="d-none d-md-inline ml-1">Meters</span>
+					<span class="d-none d-xxl-inline ml-1 truncate">Meters</span>
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" 	
+					id="requests-tab" 
+					data-toggle="tab" 
+					href="#requests" 
+					role="tab" 
+					aria-controls="requests" 
+					aria-selected="false">
+					<i class="fas fa-bell"></i>
+					<span class="d-none d-xxl-inline ml-1 truncate">Requests</span>
 				</a>
 			</li>
 		</ul>
@@ -35,6 +47,9 @@
 					<div  class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
 						<Dmg />
 					</div>
+					<div  class="tab-pane fade" id="requests" role="tabpanel" aria-labelledby="requests-tab">
+						<Requests />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -44,14 +59,16 @@
 <script>
 	import Dmg from '@/components/combat/side/Dmg.vue'
 	import Log from '@/components/combat/side/Log.vue'
+	import Requests from '@/components/combat/side/Requests.vue'
 
 	export default {
 		name: 'Side',
 		components: {
 			Dmg,
-			Log
+			Log,
+			Requests
 		},
-		props: ['log', 'dmg'],
+		props:['log'],
 		data () {
 			return {
 

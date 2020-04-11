@@ -365,12 +365,13 @@
 					background: rgba(38, 38, 38, .9);
 					border-top: solid 1px transparent;
 					border-bottom: solid 1px transparent;
-				}
-				td:first-child {
-					border-left: solid 1px transparent;
-				}
-				td:last-child {
-					border-right: solid 1px transparent;
+
+					&:first-child {
+						border-left: solid 1px transparent;
+					}
+					&:last-child {
+						border-right: solid 1px transparent;
+					}
 				}
 				td.initiative, td.ac, th.ac {
 					width: 38px;

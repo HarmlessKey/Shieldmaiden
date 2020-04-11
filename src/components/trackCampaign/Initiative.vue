@@ -3,9 +3,15 @@
 
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
-			<span v-if="targeted.length === 0">Select a target to perform actions</span>
-			<div v-else>
+			<div>
+				<span v-if="targeted.length === 0">Select a target to perform actions</span>
+				<span v-else>
+					{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
+				</span>
+			</div>
+			<div class="right">
 				<a 
+					v-if="targeted.length > 0"
 					v-b-tooltip.hover
 					title="Damage or Healing"
 					@click="setSlide({
@@ -21,11 +27,23 @@
 							type: 'manual'
 						}
 					})"><i class="fas fa-swords"></i></a>
+				<a
+					v-b-tooltip.hover
+					title="Pending requests"
+					@click="setSlide({
+						show: true,
+						type: 'slides/trackCampaign/playerRequests/pendingRequests',
+						data: {
+							campPlayers
+						}
+					})">
+					<i class="far fa-hourglass-half"></i>
+				</a>
 			</div>
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<table class="table targets" :class="{'table-sm': windowWidth <= 360}">
+		<table class="initiative targets">
 			<thead>
 				<th>In.</th>
 				<th></th>
@@ -144,7 +162,6 @@
 				</template>
 			</tbody>
 		</table>
-		{{ characters }}
 	</div>
 </template>
 
@@ -285,6 +302,7 @@
 					}
 				}
 				this.targeted = targeted;
+				this.setSlide({ show: false });
 			},
 			getWindowWidth() {
 				//Return the window width
@@ -301,89 +319,101 @@
 <style lang="scss" scoped>
 .actions {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	padding: 20px 0 5px 0;
 	border-bottom: solid 1px #fff;
+
+	.right {
+		a {
+			color: #fff !important;
+			margin-left: 10px;
+		}
+	}
 }
-	.table {
+	.initiative {
+		margin-top: 20px;
 		border-collapse: separate; 
+		width: 100%;
 		border-spacing: 0 5px;
 		user-select: none;
 
-		tr:first-child {
-			td {
-				border-color: #2c97de !important;
+		tbody {
+			tr:first-child {
+				td {
+					border-color: #83b547;
+				}
 			}
-			td:first-child {
-				border-color: #2c97de !important;
-			}
-			td:last-child {
-				border-color: #2c97de !important;
-			}
-		}
-		tr.top {
-			td {
-				font-size: 12px;
-				padding: 10px 0 5px 0;
-				border: none !important;
-				border-bottom: solid 1px #fff !important;
-			}
-		}
-		tr {
-			cursor: pointer;
+			tr.top {
+				td {
+					font-size: 12px;
+					padding: 10px 0 5px 0;
+					border: none;
+					border-bottom: solid 1px #fff;
+					cursor: default;
 
-			td {
-				background: rgba(38, 38, 38, .9);
-				border-top: solid 1px transparent !important;
-				border-bottom: solid 1px transparent !important;
+					&:hover {
+						border-left: none;
+						border-right: none;
+						border-top: none;
+					}
+				}
 			}
-			td:first-child {
-				border-left: solid 1px transparent !important;
+			tr {
+				cursor: pointer;
+
+				td {
+					background: rgba(38, 38, 38, .9);
+					border-top: solid 1px transparent;
+					border-bottom: solid 1px transparent;
+				}
+				td:first-child {
+					border-left: solid 1px transparent;
+				}
+				td:last-child {
+					border-right: solid 1px transparent;
+				}
+				td.initiative, td.ac, th.ac {
+					width: 38px;
+					text-align: center;
+				}
+				td.ac {
+					font-weight: bold;
+				}
+				td.name {
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					max-width:0;
+				}
+				td.img {
+					width: 45px;
+					background-size: cover;
+					background-position: center top;
+
+					// @media only screen and (max-width: 575px) {
+					// 	height: 32px;
+					// 	width: 32px;
+					// }
+				}
+				&.targeted {
+					td {
+						border-color: #2c97de;
+					}
+				}
+				&:hover {
+					td {
+						border-color: #fff;
+					}
+				}
 			}
-			td:last-child {
-				border-right: solid 1px transparent !important;
+			tr td:first-child, thead th {
+				color: #fff;
+				background: none;
+				text-shadow: 0 0 3px  #000;
 			}
-			td.initiative, td.ac, th.ac {
-				width: 30px;
+			tr td:first-child, thead th:first-child {
 				text-align: center;
 			}
-			td.ac {
-				font-weight: bold;
-			}
-			td.name {
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
-				max-width:0;
-			}
-			td.img {
-				width: 45px;
-				background-size: cover;
-				background-position: center top;
-
-				@media only screen and (max-width: 575px) {
-					height: 32px;
-					width: 32px;
-				}
-			}
-			&.targeted {
-				td {
-					border-color: #83b547 !important;
-				}
-			}
-			&:hover {
-				td {
-					border-color: #fff !important;
-				}
-			}
-		}
-		tr td:first-child, thead th {
-			color: #fff;
-			background: none;
-			text-shadow: 0 0 3px  #000;
-		}
-		tr td:first-child, thead th:first-child {
-			text-align: center;
 		}
 	}
 	.conditions {

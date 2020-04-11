@@ -1,33 +1,5 @@
 <template>
 	<div>
-		<!-- <div class="manual">
-			<input type="text" 
-				v-model="manualAmount" 
-				v-validate="'numeric'" 
-				name="Manual Input" 
-				min="0"
-				class="form-control manual-input"
-				@keypress="submitManual($event)"
-				v-b-tooltip.hover
-				title="Enter=Damge, Shift+Enter=Healing"
-			>
-			<button class="btn dmg bg-red" 
-				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="sendRequest('damage')"
-			>
-				Attack
-				<img src="@/assets/_img/styles/sword-break.png" />
-			</button>
-			<button class="btn heal bg-green" 
-				:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-				@click="sendRequest('healing')"
-			>
-				Heal
-				<img src="@/assets/_img/styles/heal.png" />
-			</button>
-		</div>
-		<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p> -->
-
 		<div class="type d-flex justify-content-between">
 			<button class="btn bg-gray-hover mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
 				Damage <img src="@/assets/_img/styles/sword-break.png" />
@@ -99,7 +71,7 @@
 </template>
 
 <script>
-	import _ from 'lodash';
+	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import Manual from '@/components/combat/actions/Manual.vue';
 	
@@ -110,25 +82,28 @@
 		},
 		props: [
 		'targeted',
-		'player'
+		'player',
+		'encounter'
 		],
 		data() {
 			return {
 				userId: this.$store.getters.getUser.uid,
+				dmId: this.$route.params.userid,
+				campaignId: this.$route.params.campid,
 				damage_types: [
-				"Acid",
-				"Bludgeoning",
-				"Cold",
-				"Fire",
-				"Force",
-				"Lightning",
-				"Necrotic",
-				"Piercing",
-				"Poison",
-				"Psychic",
-				"Radiant",
-				"Slashing",
-				"Thunder"
+					"Acid",
+					"Bludgeoning",
+					"Cold",
+					"Fire",
+					"Force",
+					"Lightning",
+					"Necrotic",
+					"Piercing",
+					"Poison",
+					"Psychic",
+					"Radiant",
+					"Slashing",
+					"Thunder"
 				],
 				type: 'damage',
 				damage: [
@@ -149,6 +124,9 @@
 			]),
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			addInput() {
 				this.damage.push({ amount: '', damage_type: 'Acid' });
 			},
@@ -175,21 +153,22 @@
 						const request = {
 							timestamp: Date.now(),
 							username: this.userInfo.username,
-							round: this.round,
-							turn: this.turn,
+							round: this.encounter.round,
+							turn: this.encounter.turn,
 							player: this.player,
 							targets: this.targeted,
 							results,
 							type: this.type
 						};
 
-						console.log(request);
+						db.ref(`encounters/${this.dmId}/${this.campaignId}/${this.encounter.key}/requests`).push(request);
 
 						this.$snotify.success(
 							`Your ${this.type} request was successfuly sent.`, 
 							`${this.type.charAt(0).toUpperCase() + this.type.slice(1)} request`, 
 							{ position: "centerTop" }
 						);
+						this.setSlide({show: false});
 					}
 				});
 			},
@@ -248,38 +227,6 @@
 		margin-bottom: 15px;
 		font-size:50px;
 		text-align: center;
-	}
-	.manual {
-		display:grid;
-		grid-template-columns: 2fr 1fr;
-		grid-template-rows: 40px 40px;
-		grid-gap: 10px;
-		grid-template-areas: 
-		"input btn-dmg"
-		"input btn-heal";
-
-		.manual-input {
-			height:90px;
-			font-size:50px;
-			text-align: center;
-			grid-area: input;
-		}
-		.heal {
-			grid-area: btn-heal;
-		}
-		.dmg {
-			grid-area: btn-dmg;
-		}
-		.dmg, .heal {
-			position: relative;
-			padding: 5px 35px 5px 5px;
-
-			img {
-				position: absolute;
-				height: 25px;
-				right: 5px;
-			}
-		}
 	}
 	
 </style>

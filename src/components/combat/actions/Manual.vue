@@ -237,6 +237,7 @@
 		font-size:50px;
 		text-align: center;
 		grid-area: input;
+		border: none !important;
 	}
 	.heal {
 		grid-area: btn-heal;

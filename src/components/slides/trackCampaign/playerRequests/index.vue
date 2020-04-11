@@ -24,7 +24,7 @@
 				</div>
 			</li>
 		</ul>
-		<DamageHealing :targeted="targeted" :player="player" />
+		<DamageHealing :targeted="targeted" :player="player" :encounter="encounter" />
 	</div>
 </template>
 
@@ -43,6 +43,7 @@
 		],
 		data() {
 			return {
+				encounter: this.data.encounter,
 				characters: this.data.characters,
 				targets: this.data.targets,
 				targeted: this.data.targeted,
@@ -77,18 +78,18 @@
 			margin-bottom: 2px;
 			display: flex;
 			justify-content: flex-start;
-			height: 27px;
+			height: 30px;
 
 			.img {
-				width: 25px;
-				height: 25px;
+				width: 30px;
+				height: 30px;
 				background-size: cover;
 				background-position: center top;
 				border: solid 1px #fff;
 			}
 			.name {
-				padding: 4px 10px;
-				line-height: 19px;
+				padding: 6px 10px;
+				line-height: 18px;
 			}
 		}
 	}

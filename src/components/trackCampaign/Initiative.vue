@@ -1,6 +1,5 @@
 <template>
 	<div v-if="targets && allEntities && players && campPlayers">
-
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
 			<div>
@@ -24,6 +23,7 @@
 							players,
 							campPlayers,
 							npcs,
+							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
 							type: 'manual'
 						}
 					})"><i class="fas fa-swords"></i></a>

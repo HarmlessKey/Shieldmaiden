@@ -36,6 +36,9 @@
 					<i class="fas fa-bell"></i>
 					<span class="d-none d-xxl-inline ml-1 truncate">Requests</span>
 				</a>
+				<span class="notifications bg-red white" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
+					{{ Object.keys(encounter.requests).length }}
+				</span>
 			</li>
 		</ul>
 		<div class="actions scroll" v-bar>
@@ -57,9 +60,10 @@
 </template>
 
 <script>
-	import Dmg from '@/components/combat/side/Dmg.vue'
-	import Log from '@/components/combat/side/Log.vue'
-	import Requests from '@/components/combat/side/Requests.vue'
+	import Dmg from '@/components/combat/side/Dmg.vue';
+	import Log from '@/components/combat/side/Log.vue';
+	import Requests from '@/components/combat/side/Requests.vue';
+	import { mapGetters } from 'vuex';
 
 	export default {
 		name: 'Side',
@@ -69,24 +73,44 @@
 			Requests
 		},
 		props:['log'],
-		data () {
-			return {
-
-			}
+		computed: {
+			...mapGetters([
+				'encounter'
+			])
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 #side_container {
+	padding-top: 5px;
+	margin-top: -5px;
 	grid-area: side;
 	overflow: hidden;
 }
-.nav-link {
-	background: rgba(25, 25, 25, .9);
-
-	&.active {
-		background: rgba(38, 38, 38, .9) !important;
+.nav {
+	.nav-item {
+		position: relative;
+	
+		.nav-link {
+			background: rgba(25, 25, 25, .9);
+		
+			&.active {
+				background: rgba(38, 38, 38, .9) !important;
+			}
+		}
+	
+		.notifications {
+			position: absolute;
+			top: -5px;
+			right: -7px;
+			display: block;
+			height: 20px;
+			line-height: 20px;
+			padding: 0 7px;
+			text-align: center;
+			border-radius: 50%;
+		}
 	}
 }
 .scroll { 

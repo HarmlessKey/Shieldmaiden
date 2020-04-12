@@ -297,6 +297,7 @@ a.large-link {
 }
 
 .live {
+	user-select: none;
 	display: inline-block;
 	color: $white;
 	background-color: $gray-hover;

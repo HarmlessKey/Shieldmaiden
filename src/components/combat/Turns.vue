@@ -1,30 +1,30 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
-			<h1>
-				<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
-				<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
-				<a class="edit"
-					id="edit"
-					data-toggle="dropdown" 
-					aria-haspopup="true" 
-					aria-expanded="false">
-					<i class="fas fa-cog"></i>
+		<h1>
+			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
+			<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
+			<a class="edit"
+				id="edit"
+				data-toggle="dropdown" 
+				aria-haspopup="true" 
+				aria-expanded="false">
+				<i class="fas fa-cog"></i>
+			</a>
+			<div class="dropdown-menu">	
+				<div class="dropdown-header">{{ encounter.encounter }}</div>
+				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
+					<i class="fas fa-cogs"></i> Settings
 				</a>
-				<div class="dropdown-menu">	
-					<div class="dropdown-header">{{ encounter.encounter }}</div>
-					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
-						<i class="fas fa-cogs"></i> Settings
-					</a>
-					<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-						<i class="far fa-desktop"></i> Track Settings
-					</a>
-					<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
-					<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
-				</div>
+				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+					<i class="far fa-desktop"></i> Track Settings
+				</a>
+				<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
+				<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
+			</div>
 
-				<!-- BROADCASTING -->
-				<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
-			</h1>
+			<!-- BROADCASTING -->
+			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
+		</h1>
 
 		<div class="round-info d-none d-md-inline">
 			<span v-if="encounter.round">
@@ -40,7 +40,15 @@
 			</span>
 			<span class="current-name"></span>
 		</div>
-		<div>
+		<div class="d-flex justify-content-end">
+			<div 
+				class="requests" 
+				v-if="encounter.requests && Object.keys(encounter.requests).length > 0"
+				@click="setSlide({show: true, type: 'combat/side/Requests'})"
+			>
+				<i class="fas fa-bell"></i>
+				<span class="notifications bg-red white">{{ Object.keys(encounter.requests).length }}</span>
+			</div>
 			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
 				@click="prevTurn()"
 				v-b-tooltip.hover title="[shift]+[arrowleft]"
@@ -147,7 +155,7 @@
 				this.set_finished();
 			},
 			broadcast() {
-				//Save this is the current campaign that is being broadcasted
+				//Save the current campaign that is being broadcasted
 				if(this.broadcasting['.value'] == this.$route.params.campid) {
 					db.ref(`broadcast/${this.userId}/live`).remove()
 				} else {
@@ -160,10 +168,10 @@
 
 <style lang="scss" scoped>
 #turns {
-	height: 65px;
+	height: 60px;
 	padding: 10px;
 	font-size: 15px;
-	line-height: 45px;
+	line-height: 36px;
 	background: rgba(38, 38, 38, .9);
 	font-size: 20px;
 	text-transform: uppercase;
@@ -171,7 +179,7 @@
 
 
 	h1 {
-		line-height:45px;
+		line-height: 36px;
 
 		a {
 			margin-left: 5px;
@@ -185,14 +193,35 @@
 			vertical-align: 3px;
 		}
 	}
+	.number { 
+		display: inline-block; 
+		border: solid 1px #2c97de;
+		height: 40px;
+		padding: 2px 15px;
+		font-weight: bold;
+		font-size: 30px;
+		line-height: 30px;
+	}
+	.requests {
+		padding-top: 3px;
+		width: 26px;
+		margin-right: 15px;
+		position: relative;
+		cursor: pointer;
+
+		.notifications {
+			font-size: 13px;
+			position: absolute;
+			top: -1px;
+			right: -3px;
+			display: block;
+			height: 18px;
+			line-height: 18px;
+			padding: 0 6px;
+			text-align: center;
+			border-radius: 50%;
+		}
+	}
 }
 
-.number { 
-	display: inline-block; 
-	border: solid 1px #2c97de;
-	height: 45px;
-	padding: 0 15px;
-	font-weight: bold;
-	font-size: 30px;
-}
 </style>

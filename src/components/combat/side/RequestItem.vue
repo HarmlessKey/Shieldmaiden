@@ -56,6 +56,10 @@
 					</template>
 				</div>
 			</div>
+			<div class="actions">
+				<button class="btn btn-sm bg-green">Apply</button>
+				<button class="btn btn-sm bg-red">Decline</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -186,6 +190,15 @@
 				padding-left: 10px;
 				line-height: 28px;
 				text-align: right;
+			}
+		}
+		.actions {
+			margin-top: 20px;
+			display: flex;
+			justify-content: space-between;
+			
+			button {
+				width: 48%;
 			}
 		}
 	}

@@ -18,7 +18,8 @@
 						type="text"
 						class="form-control mb-2"
 						:class="{'input': true, 'error': errors.has('name') }"
-						v-validate="'required'"
+						v-validate="'required|max:100'"
+						maxlength="101"
 						autocomplete="off"
 						data-vv-as="Name"
 						placeholde="Name">
@@ -72,7 +73,7 @@
 						name="cast_time_nr"
 						class="form-control mb-2"
 						title="Casting Time"
-						v-validate="'required|numeric'"
+						v-validate="'required|numeric|max:999'"
 						type="number"
 						data-vv-as="Cast Time"
 						></b-form-input>
@@ -177,7 +178,7 @@
 						autocomplete="off"
 						id="range"
 						name="range"
-						v-validate="'required'"
+						v-validate="'required|numeric|max:999'"
 						class="form-control mb-2"
 						title="Range"
 						type="number"
@@ -233,7 +234,7 @@
 						autocomplete="off"
 						id="duration_n"
 						name="duration_n"
-						v-validate="'numeric|required'"
+						v-validate="'required|numeric|max:999'"
 						class="form-control mb-2"
 						title="Duration #"
 						type="text"
@@ -338,8 +339,11 @@
 						name="source"
 						class="form-control mb-2"
 						title="Source"
+						v-validate="'max:100'"
+						maxlength="101"
 						data-vv-as="Source"
 						></b-form-input>
+					<p class="validate red" v-if="errors.has('source')">{{ errors.first('source') }}</p>
 				</b-col>
 			</b-row>
 			<b-row>
@@ -360,7 +364,8 @@
 						name="description"
 						title="Description"
 						class="form-control mb-2"
-						v-validate="'required'"
+						v-validate="'required|max:5000'"
+						maxlength="5001"
 						data-vv-as="Description"
 						rows="6"></b-form-textarea>
 					<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
@@ -371,7 +376,11 @@
 						name="higher_level"
 						title="higher_level"
 						class="form-control mb-2"
+						v-validate="'max:1000'"
+						maxlength="1001"
+						data-vv-as="At Higher Levels"
 						rows="3"></b-form-textarea>
+					<p class="validate red" v-if="errors.has('higher_level')">{{ errors.first('higher_level') }}</p>
 				</b-col>
 				<b-col md="6">
 					<label for="description_preview">Preview</label>

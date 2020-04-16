@@ -60,7 +60,42 @@
 								</div>
 							</div>
 						</template>
-						{{ final_results }}
+					</div>
+
+					<!-- FINAL RESULTS -->
+					<div class="damage">Final</div>
+					<div class="targets">
+						<template v-for="(final, key) in final_results">
+							<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
+								{{ entities[key].name }}
+							</div>
+							<div class="amount bg-gray-dark" :key="`final-amount-${key}`">
+								{{ final }}
+							</div>
+							<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+								<div
+									v-b-tooltip.hover title="No damage" 
+									@click="setIntensity('i', index, key)"
+									:class="{blue: final.defense === '0'}"
+								>
+									0
+								</div>
+								<div
+									v-b-tooltip.hover title="Half damage" 
+									@click="setIntensity('i', index, key)"
+									:class="{blue: final.defense === '.5'}"
+								>
+									5
+								</div>
+								<div
+									v-b-tooltip.hover title="Full damage" 
+									@click="setIntensity('i', index, key)"
+									:class="{blue: final.defense === '1'}"
+								>
+									1
+								</div>
+							</div>
+						</template>
 					</div>
 				</div>
 				<div class="actions">
@@ -95,6 +130,11 @@
 	export default {
 		name: 'Requests',
 		props: ['request', 'i'],
+		data() {
+			return {
+				final_results: undefined
+			}
+		},
 		computed: {
 			...mapGetters([
 				'players',
@@ -123,27 +163,38 @@
 					}
 				}
 				return results;
-			},
-			final_results() {
-				let results = {};
+			}
+		},
+		mounted() {
+			this.final_results = this.setFinal(this.results);
+		},
+		watch: {
+			results: {
+				deep: true,
+				handler(newVal) {
+					console.log(newVal)
+					this.final_results = this.setFinal(newVal);
+				}
+			}
+		},
+		methods: {
+			setFinal(results) {
+				let final = {};
 
-				for(let result of this.results) {
+				for(let result of results) {
 
 					for(let key in result.targets) {
 						let amount = result.targets[key].amount;
 
 						if(!Object.keys(results).includes(key)) {
-							results[key] = amount;
+							final[key] = amount;
 						} else {
-							results[key] = result.targets[key] + amount;
+							final[key] = result.targets[key] + amount;
 						}
 					}
 				}
-				console.log(results)
-				return results;
-			}
-		},
-		methods: {
+				return final;
+			},
 			setDefense(defense, index, target) {
 				let amount = this.results[index].amount;
 
@@ -158,10 +209,11 @@
 						amount = 0;
 					}
 				}
-
 				this.$set(this.results[index].targets[target], 'defense', defense);
 				this.$set(this.results[index].targets[target], 'amount', amount);
 				this.$forceUpdate();
+
+				this.final_results = this.setFinal(this.results);
 			}
 		},
 	}

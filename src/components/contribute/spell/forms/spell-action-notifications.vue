@@ -15,7 +15,7 @@
 			<div class="card" v-if="notifications && notifications.length > 0" :key="`notification-${not_index}`">
 				<div v-b-toggle="'accordion-'+not_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
-						{{parseInt(not_index) + 1}}. {{ notification.notification }}
+						{{parseInt(not_index) + 1}}. {{ notification.reminder.title }}
 					</div>
 					<a @click="remove_notification(not_index)"
 						class="gray-hover text-capitalize"
@@ -31,9 +31,10 @@
 								<reminder-form v-model="notification.reminder" @validation="setValidation"/>
 							</b-col>
 							<b-col sm="6">
-								<label for="application">
+								<label class="required" for="application">
 									<span>Application</span>
 									<a 
+										class="ml-1"
 										v-b-popover.hover.top="'When should this reminder be applied?'" 
 										title="Apply reminder"
 									>
@@ -41,13 +42,14 @@
 									</a>
 								</label>
 								<b-form-select v-model="notification.application"
-									id="application"
-									name="application"
+									:id="`application-${not_index}`"
+									:name="`application-${not_index}`"
 									title="application"
 									class="form-control mb-2"
+									v-validate="'required'"
 									data-vv-as="application"
 									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Application -</option>
+									<option :value="undefined" disabled>- Application -</option>
 									<option 
 										v-for="(appl, i) in application"
 										:key="`appl-${i}`" :value="appl"
@@ -55,10 +57,12 @@
 										{{ appl }}
 									</option>
 								</b-form-select>
+								<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
 
-								<label for="target">
+								<label class="required" for="target">
 									<span>Target</span>
 									<a 
+										class="ml-1"
 										v-b-popover.hover.top="'To whom should the reminder be applied?'" 
 										title="Target"
 									>
@@ -66,13 +70,14 @@
 									</a>
 								</label>
 								<b-form-select v-model="notification.target"
-									id="target"
-									name="target"
+									:id="`target-${not_index}`"
+									:name="`target-${not_index}`"
 									title="target"
 									class="form-control mb-4"
+									v-validate="'required'"
 									data-vv-as="target"
 									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Apply to -</option>
+									<option :value="undefined" disabled>- Apply to -</option>
 									<option 
 										v-for="(target, i) in targets"
 										:key="`target-${i}`" :value="target"
@@ -80,6 +85,8 @@
 										{{ target }}
 									</option>
 								</b-form-select>
+								<p class="validate red" v-if="errors.has(`target-${not_index}`)">{{ errors.first(`target-${not_index}`) }}</p>
+
 								<template v-if="notification.reminder && notification.reminder.variables && Object.keys(notification.reminder.variables).length > 0">
 									<label>
 										Variable scaling
@@ -201,6 +208,10 @@ export default {
 				return newValue;
 			}
 		},
+		validator() {
+			// let mod_key = `test ${}`
+			return {"notifications": this.$validator};
+		}
 	},
   methods: {
   	add_notification() {
@@ -296,7 +307,7 @@ export default {
 				})
 			},
 			deep: true,
-			immidiate: true,
+			immediate: true,
 		}
 	},
 };

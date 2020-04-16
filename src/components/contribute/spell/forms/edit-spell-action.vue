@@ -164,7 +164,6 @@ export default {
 			let val_key = `spell-action-${this.action_index}`;
 			let ret = {}
 			ret[val_key] = this.$validator;
-			// let val_key = `spell-action-`;
 			return ret;
 		}
 	},

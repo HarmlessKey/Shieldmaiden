@@ -311,8 +311,7 @@ h2 {
 }
 label {
 	display: flex;
-	justify-content: space-between;
-
+	justify-content: flex-start;
 	&.var {
 		border-bottom: solid 1px #5c5757;
 		padding-bottom: 5px;

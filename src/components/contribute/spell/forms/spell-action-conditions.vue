@@ -160,6 +160,6 @@ h2 {
 }
 label {
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 </style>

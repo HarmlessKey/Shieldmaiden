@@ -28,15 +28,16 @@
 						<b-row>
 							<!-- CONDITION -->
 							<b-col md="6">
-								<label for="condition">Condition</label>
+								<label class="required" for="condition">Condition</label>
 								<b-form-select v-model="condition.condition"
-									id="condition"
-									name="condition"
+									:id="`condition-${con_index}`"
+									:name="`condition-${con_index}`"
 									title="Condition"
 									class="form-control mb-2"
-									data-vv-as="condition Subtype"
+									v-validate="'required'"
+									data-vv-as="Condition Subtype"
 									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Condition -</option>
+									<option :value="undefined" disabled>- Condition -</option>
 									<option 
 										v-for="(con, i) in conditionList"
 										:key="`con-${i}`" :value="con.value"
@@ -44,11 +45,12 @@
 										{{ con.name }}
 									</option>
 								</b-form-select>
+								<p class="validate red" v-if="errors.has(`condition-${con_index}`)">{{ errors.first(`condition-${con_index}`) }}</p>
 							</b-col>
 
 							<!-- APPLIED WHEN -->
 							<b-col md="6">
-								<label for="condition">
+								<label class="required" for="condition">
 									<span>Application</span>
 									<a 
 										v-b-popover.hover.top="'When should this condition be applied?'" 
@@ -58,13 +60,14 @@
 									</a>
 								</label>
 								<b-form-select v-model="condition.application"
-									id="application"
-									name="Application"
+									:id="`application-${con_index}`"
+									:name="`application-${con_index}`"
 									title="application"
 									class="form-control mb-2"
-									data-vv-as="application Subtype"
+									v-validate="'required'"
+									data-vv-as="Application Subtype"
 									@change="$forceUpdate()">
-									<option value="undefined" disabled>- Application -</option>
+									<option :value="undefined" disabled>- Application -</option>
 									<option 
 										v-for="(appl, i) in application"
 										:key="`con-${i}`" :value="appl"
@@ -72,6 +75,7 @@
 										{{ appl }}
 									</option>
 								</b-form-select>
+								<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
 							</b-col>
 						</b-row>
 					</div>
@@ -108,6 +112,10 @@ export default {
 				this.$emit("input", newValue);
 				return newValue;
 			}
+		},
+		validator() {
+			// let mod_key = `test ${}`
+			return {"conditions": this.$validator};
 		}
 	},
 	methods: {
@@ -134,7 +142,7 @@ export default {
 				})
 			},
 			deep: true,
-			immidiate: true,
+			immediate: true,
 		}
 	},
 };

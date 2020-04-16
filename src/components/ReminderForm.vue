@@ -2,7 +2,7 @@
 	<div>
 		<b-row class="mb-2">
 			<b-col class="col-3">
-				<label for="title">Title</label>
+				<label class="required	" for="title">Title</label>
 			</b-col>
 			<b-col>
 				<b-form-input type="text" 
@@ -28,7 +28,7 @@
 		</b-row>
 		<b-row class="mb-2">
 			<b-col class="col-3">
-				<label for="trigger">Trigger</label>
+				<label class="required" for="trigger">Trigger</label>
 			</b-col>
 			<b-col>
 				<b-form-select type="text" 
@@ -36,7 +36,7 @@
 				v-validate="'required'"
 				id="trigger"
 				name="trigger">
-					<option selected="selected" value="">- Select the trigger -</option>
+					<option :value="undefined" disabled>- Select the trigger -</option>
 					<option v-for="(trigger, key) in triggers" :value="key" :key="key">{{ trigger }}</option>
 				</b-form-select>
 				<p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>

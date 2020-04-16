@@ -159,6 +159,9 @@ export default {
 		},
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
+
+			// TODO:
+			// Check if the parsed value is actually a valid value (e.g. available in dropdown)
 			
 			// Parse simple values
 			// this.$set(this.spell, 'name', this.old_spell.name);
@@ -291,8 +294,8 @@ export default {
 			for (let v in validators) {
 				this.validators[v] = validators[v];
 				// this.validators.push(validator)
-
 			}
+			// this.spell = Object.assign({}, this.spell);
 			// this.validation = validate;
 		},
 		async validate_validators() {

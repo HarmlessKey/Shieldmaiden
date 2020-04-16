@@ -449,11 +449,12 @@ export default {
 				})
 			},
 			deep: true,
+			immediate: true,
 		}
 	},
-	mounted() {
-		this.$emit('validation', this.validator);
-	},
+	// mounted() {
+	// 	this.$emit('validation', this.validator);
+	// },
 };
 </script>
 

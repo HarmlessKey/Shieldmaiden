@@ -109,6 +109,7 @@
 					<spell-action-conditions
 						v-model="spell_action.conditions"
 						:action_type="spell_action.type"
+						@validation="setValidation"
 					/>
 					
 				</div>
@@ -122,6 +123,7 @@
 						:level_scaling="level_scaling"
 						:level="level"
 						:action_type="spell_action.type"
+						@validation="setValidation"
 					/>
 					
 				</div>
@@ -213,11 +215,12 @@ export default {
 				this.$emit('validation', this.validators);
 			},
 			deep: true,
+			immidiate: true,
 		}
 	},
-	mounted() {
-		this.$emit('validation', this.validators);
-	},
+	// mounted() {
+	// 	this.$emit('validation', this.validators);
+	// },
 };
 </script>
 

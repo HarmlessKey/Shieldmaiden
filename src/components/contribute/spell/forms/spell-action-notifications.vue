@@ -286,7 +286,19 @@ export default {
 			}
 			return description
 		},
-  }
+  },
+  watch: {
+		notifications: {
+			handler() {
+				let vm = this;
+				this.$nextTick(() => {
+					this.$emit('validation', this.validator);
+				})
+			},
+			deep: true,
+			immidiate: true,
+		}
+	},
 };
 </script>
 

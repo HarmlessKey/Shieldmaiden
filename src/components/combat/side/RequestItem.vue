@@ -185,7 +185,7 @@
 				return targets;
 			}
 		},
-		mounted() {
+		beforeMount() {
 			this.final_results = this.setFinal(this.results);
 		},
 		methods: {

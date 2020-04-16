@@ -216,17 +216,17 @@
 			position: absolute;
 			top: -1px;
 			right: -3px;
-			height: 18px;
-			width: 18px;
+			height: 20px;
+			width: 20px;
 			border-radius: 50%;
 			
 			div {
 				position: absolute;
-				width: 18px;
-				height: 18px;
-				line-height: 18px;
+				width: inherit;
+				height: inherit;
+				line-height: 20px;
 				text-align: center;
-				font-size: 12px;
+				font-size: 13px;
 			}
 		}
 	}

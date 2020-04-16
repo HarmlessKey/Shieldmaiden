@@ -113,6 +113,8 @@ export default {
 			this.spell.actions.push({
 				type: "Spell Attack",
 				modifiers: [],
+				conditions: [],
+				notifications: [],
 			});
 			this.$forceUpdate();
 		},

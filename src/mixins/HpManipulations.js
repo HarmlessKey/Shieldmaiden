@@ -16,10 +16,6 @@ export const setHP = {
 			settings: {
 				source: db.ref(`settings/${this.userId}/encounter`),
 				asObject: true,
-			},
-			players: {
-				source: db.ref(`campaigns/${this.userId}/${this.campaignId}/players`),
-				asObject: true,
 			}
 		}
 	},

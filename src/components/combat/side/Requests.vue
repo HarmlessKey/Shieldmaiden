@@ -2,7 +2,7 @@
 	<div>
 		<h2>Player requests</h2>
 		<ul class="requests">
-			<li v-for="(request, i) in _requests" class="request" :key="`request-${i}`">
+			<li v-for="(request, i) in _requests" class="request" :key="`request-${request.key}`">
 				<Request :request="request" :i="i" />
 			</li>
 		</ul>
@@ -29,12 +29,17 @@
 				'encounter'
 			]),
 			_requests() {
-				return _.sortBy(this.encounter.requests, 'timestamp').reverse();
-			}
-		},
-		methods: {
-			
-		},
+				return _.chain(this.encounter.requests)
+					.filter(function(request, key) {
+						request.key = key
+						return request;
+					})
+					.orderBy(function(request) {
+						return parseInt(request.timestamp)
+					} , 'desc')
+					.value()
+			},
+		}
 	}
 </script>
 

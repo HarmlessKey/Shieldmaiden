@@ -196,7 +196,7 @@
 		}
 	}
 	.number { 
-		display: inline-block; 
+		display: inline-block;
 		border: solid 1px #2c97de;
 		height: 40px;
 		padding: 2px 15px;

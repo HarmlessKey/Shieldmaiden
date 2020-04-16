@@ -62,45 +62,51 @@
 						</template>
 					</div>
 
-					<!-- FINAL RESULTS -->
-					<div class="damage">Final</div>
-					<div class="targets">
-						<template v-for="(final, key) in final_results">
-							<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
-								{{ entities[key].name }}
-							</div>
-							<div class="amount bg-gray-dark" :key="`final-amount-${key}`">
-								{{ final }}
-							</div>
-							<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
-								<div
-									v-b-tooltip.hover title="No damage" 
-									@click="setIntensity('i', index, key)"
-									:class="{blue: final.defense === '0'}"
-								>
-									0
-								</div>
-								<div
-									v-b-tooltip.hover title="Half damage" 
-									@click="setIntensity('i', index, key)"
-									:class="{blue: final.defense === '.5'}"
-								>
-									5
-								</div>
-								<div
-									v-b-tooltip.hover title="Full damage" 
-									@click="setIntensity('i', index, key)"
-									:class="{blue: final.defense === '1'}"
-								>
-									1
-								</div>
-							</div>
-						</template>
-					</div>
 				</div>
+
+				<!-- FINAL RESULTS -->
+				<div class="damage">Final values</div>
+				<div class="targets">
+					<template v-for="(final, key) in final_results">
+						<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
+							{{ entities[key].name }}
+						</div>
+						<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
+							{{ Math.floor(final * intensity[key]) }}
+						</div>
+						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+							<div
+								v-b-tooltip.hover title="No damage" 
+									@click="setIntensity(key, 0)"
+								:class="{blue: intensity[key] === 0}"
+							>
+								<i class="fas fa-circle"></i>
+								<span>0</span>
+							</div>
+							<div
+								v-b-tooltip.hover title="Half damage" 
+									@click="setIntensity(key, .5)"
+								:class="{blue: intensity[key] === .5}"
+							>
+								<i class="fas fa-circle"></i>
+								<span>½</span>
+							</div>
+							<div
+								v-b-tooltip.hover title="Full damage" 
+								@click="setIntensity(key, 1)"
+								:class="{blue: intensity[key] === 1}"
+							>
+								<i class="fas fa-circle"></i>
+								<span>1</span>
+							</div>
+						</div>
+					</template>
+				</div>
+
+				<!-- ACTIONS -->
 				<div class="actions">
-					<button class="btn btn-sm bg-green">Apply</button>
-					<button class="btn btn-sm bg-red">Decline</button>
+					<button class="btn btn-sm bg-green" @click="apply('damage')">Apply</button>
+					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
 				</div>
 			</template>
 
@@ -115,8 +121,8 @@
 					</div>
 				</div>
 				<div class="actions">
-					<button class="btn btn-sm bg-green">Apply</button>
-					<button class="btn btn-sm bg-red">Decline</button>
+					<button class="btn btn-sm bg-green" @click="apply('healing')">Apply</button>
+					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
 				</div>
 			</template>
 		</div>
@@ -124,15 +130,20 @@
 </template>
 
 <script>
-	import _ from 'lodash';
+	import { db } from '@/firebase';
 	import { mapGetters } from 'vuex';
+	import { setHP } from '@/mixins/HpManipulations.js';
 
 	export default {
-		name: 'Requests',
+		name: 'RequestItem',
+		mixins: [setHP],
 		props: ['request', 'i'],
 		data() {
 			return {
-				final_results: undefined
+				userId: this.$store.getters.getUser.uid,
+				campaignId: this.$route.params.campid,
+				encounterId: this.$route.params.encid,
+				final_results: {}
 			}
 		},
 		computed: {
@@ -163,34 +174,33 @@
 					}
 				}
 				return results;
+			},
+			intensity() {
+				//Set no/half/full damage for targets
+				let targets = {};
+
+				for(let target of this.request.targets) {
+					targets[target] = 1;
+				}
+				return targets;
 			}
 		},
 		mounted() {
 			this.final_results = this.setFinal(this.results);
 		},
-		watch: {
-			results: {
-				deep: true,
-				handler(newVal) {
-					console.log(newVal)
-					this.final_results = this.setFinal(newVal);
-				}
-			}
-		},
 		methods: {
 			setFinal(results) {
-				let final = {};
+				let final = this.final_results;
 
-				for(let result of results) {
-
+				let amount = {};
+				for(let result of results) {					
 					for(let key in result.targets) {
-						let amount = result.targets[key].amount;
-
-						if(!Object.keys(results).includes(key)) {
-							final[key] = amount;
+						if(amount[key]) {
+							amount[key] = amount[key] + parseInt(result.targets[key].amount);
 						} else {
-							final[key] = result.targets[key] + amount;
+							amount[key] = parseInt(result.targets[key].amount);
 						}
+						final[key] = amount[key];
 					}
 				}
 				return final;
@@ -214,6 +224,20 @@
 				this.$forceUpdate();
 
 				this.final_results = this.setFinal(this.results);
+			},
+			setIntensity(target, value) {
+				this.$set(this.intensity, target, value);
+				this.$forceUpdate();
+			},
+			apply(type) {
+				for(let key in this.final_results) {
+					let amount = Math.floor(this.final_results[key] * this.intensity[key]);
+					this.setHP(amount, false, this.entities[key], this.entities[this.request.player], type);
+				}
+				this.remove();
+			},
+			remove() {
+				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/requests/${this.request.key}`).remove();
 			}
 		},
 	}
@@ -265,7 +289,12 @@
 				padding-left: 5px;
 				line-height: 28px;
 			}
-
+			.amount {
+				font-size: 15px;
+				padding-right: 10px;
+				line-height: 28px;
+				text-align: right;
+			}
 			.defenses {
 				user-select: none;
 				display: flex;
@@ -293,13 +322,13 @@
 						color: #191919;
 					}
 
+					&.green, &.red, &.blue {
+						span {
+							color: #fff;
+						}
+					}
+
 				}
-			}
-			.amount {
-				font-size: 15px;
-				padding-left: 10px;
-				line-height: 28px;
-				text-align: right;
 			}
 		}
 		.actions {

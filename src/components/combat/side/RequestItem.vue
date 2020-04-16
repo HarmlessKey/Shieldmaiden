@@ -10,7 +10,7 @@
 		<div class="title">
 			<a data-toggle="collapse" class="collapsed" :href="`#request-${i}`">
 				<span>
-					<span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span> request
+					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span> request
 				</span> 
 				<i class="fas fa-caret-down"></i>
 			</a>
@@ -19,47 +19,71 @@
 			:id="`request-${i}`"
 			class="collapse results"
 		>
-			<div v-for="(result, index) in results" :key="`result-${index}`">
-				<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
-				<div class="targets">
-					<template v-for="(target, key) in result.targets">
-						<div class="name truncate" :key="`name-${key}-${i}`">
-							{{ entities[key].name }}
-						</div>
-						<div class="defenses" :key="`defenses-${key}-${i}`">
-							<div 
-								v-b-tooltip.hover title="Vulnerable" 
-								@click="setDefense('v', index, key)"
-								:class="{red: target.defense === 'v'}"
-							>
-								<i class="fas fa-shield"></i>
-								<span>V</span>
+			<!-- DAMAGE -->
+			<template v-if="request.type === 'damage'">
+				<div v-for="(result, index) in results" :key="`result-${index}`">
+					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
+					<div class="targets">
+						<template v-for="(target, key) in result.targets">
+							<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+								{{ entities[key].name }}
 							</div>
-							<div 
-								v-b-tooltip.hover title="Resistant" 
-								@click="setDefense('r', index, key)"
-								:class="{green: target.defense === 'r'}"
-							>
-								<i class="fas fa-shield"></i>
-								<span>R</span>
+
+							<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
+								{{ target.amount }}
 							</div>
-							<div 
-								v-b-tooltip.hover title="Immune" 
-								@click="setDefense('i', index, key)"
-								:class="{green: target.defense === 'i'}"
-							>
-								<i class="fas fa-shield"></i>
-								<span>I</span>
+
+							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
+								<div 
+									v-b-tooltip.hover title="Vulnerable" 
+									@click="setDefense('v', index, key)"
+									:class="{red: target.defense === 'v'}"
+								>
+									<i class="fas fa-shield"></i>
+									<span>V</span>
+								</div>
+								<div 
+									v-b-tooltip.hover title="Resistant" 
+									@click="setDefense('r', index, key)"
+									:class="{green: target.defense === 'r'}"
+								>
+									<i class="fas fa-shield"></i>
+									<span>R</span>
+								</div>
+								<div 
+									v-b-tooltip.hover title="Immune" 
+									@click="setDefense('i', index, key)"
+									:class="{green: target.defense === 'i'}"
+								>
+									<i class="fas fa-shield"></i>
+									<span>I</span>
+								</div>
 							</div>
-						</div>
-						<div class="amount" :key="`amount-${key}-${i}`">{{ target.amount }}</div>
-					</template>
+						</template>
+						{{ final_results }}
+					</div>
 				</div>
-			</div>
-			<div class="actions">
-				<button class="btn btn-sm bg-green">Apply</button>
-				<button class="btn btn-sm bg-red">Decline</button>
-			</div>
+				<div class="actions">
+					<button class="btn btn-sm bg-green">Apply</button>
+					<button class="btn btn-sm bg-red">Decline</button>
+				</div>
+			</template>
+
+			<!-- HEALING -->
+			<template v-else>
+				<div class="damage">Targets</div>
+				<div class="targets">
+					<div v-for="target in request.targets" :key="target">
+						<div class="name truncate bg-gray-dark" v-if="entities[target]">
+							{{ entities[target].name }}
+						</div>
+					</div>
+				</div>
+				<div class="actions">
+					<button class="btn btn-sm bg-green">Apply</button>
+					<button class="btn btn-sm bg-red">Decline</button>
+				</div>
+			</template>
 		</div>
 	</div>
 </template>
@@ -76,6 +100,15 @@
 				'players',
 				'entities'
 			]),
+			totalAmount() {
+				let amount = 0;
+
+				for(let result of this.request.results) {
+					amount = amount + parseInt(result.amount);
+				}
+
+				return amount;
+			},
 			results() {
 				let results = this.request.results;
 				let targets = this.request.targets;
@@ -89,6 +122,24 @@
 						result.targets[target].defense = '';
 					}
 				}
+				return results;
+			},
+			final_results() {
+				let results = {};
+
+				for(let result of this.results) {
+
+					for(let key in result.targets) {
+						let amount = result.targets[key].amount;
+
+						if(!Object.keys(results).includes(key)) {
+							results[key] = amount;
+						} else {
+							results[key] = result.targets[key] + amount;
+						}
+					}
+				}
+				console.log(results)
 				return results;
 			}
 		},
@@ -147,16 +198,19 @@
 		padding-top: 15px;
 
 		.damage {
-			font-size: 18px;
+			font-size: 15px;
 			border-bottom: solid 1px #494747;
-			padding-bottom: 5px;
+			padding-bottom: 2px;
 		}
 		.targets {
 			display: grid;
-			grid-template-columns: 1fr max-content minmax(30px, max-content);
+			grid-template-columns: 1fr max-content max-content;
 			grid-auto-rows: 28px;
+			grid-row-gap: 2px;
+			margin-bottom: 15px;
 
 			.name {
+				padding-left: 5px;
 				line-height: 28px;
 			}
 
@@ -164,22 +218,26 @@
 				user-select: none;
 				display: flex;
 				justify-content: flex-end;
+				padding-right: 5px;
 
 				div {
 					cursor: pointer;
 					position: relative;
 					width: 15px;
-					font-size: 19px;
-					margin-left: 8px;
+					font-size: 15px;
+					margin-left: 4px;
+					text-align: center;
+					line-height: 28px;
 
 					span {
-						font-size: 13px;
+						font-size: 11px;
 						text-align: center;
 						font-weight: bold;
 						position: absolute;
 						width: 15px;
-						top: 4px;
-						left: 2px;
+						line-height: 28px;
+						top: 0;
+						left: 0;
 						color: #191919;
 					}
 

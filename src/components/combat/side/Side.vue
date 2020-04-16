@@ -36,9 +36,9 @@
 					<i class="fas fa-bell"></i>
 					<span class="d-none d-xxl-inline ml-1 truncate">Requests</span>
 				</a>
-				<span class="notifications bg-red white" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
-					{{ Object.keys(encounter.requests).length }}
-				</span>
+				<div class="notifications bg-red white" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
+					<div>{{ Object.keys(encounter.requests).length }}</div>
+				</div>
 			</li>
 		</ul>
 		<div class="actions scroll" v-bar>
@@ -100,16 +100,23 @@
 			}
 		}
 	
-		.notifications {
+		.notifications {		
+			user-select: none;
 			position: absolute;
 			top: -5px;
-			right: -7px;
-			display: block;
+			right: -8px;
 			height: 20px;
-			line-height: 20px;
-			padding: 0 7px;
-			text-align: center;
+			width: 20px;
 			border-radius: 50%;
+			
+			div {
+				position: absolute;
+				width: inherit;
+				height: inherit;
+				line-height: 20px;
+				text-align: center;
+				font-size: 13px;
+			}
 		}
 	}
 }

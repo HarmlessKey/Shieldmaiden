@@ -2,7 +2,7 @@
 	<div>
 		<h2>Player requests</h2>
 		<ul class="requests">
-			<li v-for="(request, i) in encounter.requests" class="request" :key="`request-${i}`">
+			<li v-for="(request, i) in _requests" class="request" :key="`request-${i}`">
 				<Request :request="request" :i="i" />
 			</li>
 		</ul>
@@ -27,7 +27,10 @@
 		computed: {
 			...mapGetters([
 				'encounter'
-			])
+			]),
+			_requests() {
+				return _.sortBy(this.encounter.requests, 'timestamp').reverse();
+			}
 		},
 		methods: {
 			

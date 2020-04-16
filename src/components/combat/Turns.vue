@@ -47,7 +47,9 @@
 				@click="setSlide({show: true, type: 'combat/side/Requests'})"
 			>
 				<i class="fas fa-bell"></i>
-				<span class="notifications bg-red white">{{ Object.keys(encounter.requests).length }}</span>
+				<div class="notifications bg-red white">
+					<div>{{ Object.keys(encounter.requests).length }}</div>
+				</div>
 			</div>
 			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
 				@click="prevTurn()"
@@ -210,16 +212,22 @@
 		cursor: pointer;
 
 		.notifications {
-			font-size: 13px;
+			user-select: none;
 			position: absolute;
 			top: -1px;
 			right: -3px;
-			display: block;
 			height: 18px;
-			line-height: 18px;
-			padding: 0 6px;
-			text-align: center;
+			width: 18px;
 			border-radius: 50%;
+			
+			div {
+				position: absolute;
+				width: 18px;
+				height: 18px;
+				line-height: 18px;
+				text-align: center;
+				font-size: 12px;
+			}
 		}
 	}
 }

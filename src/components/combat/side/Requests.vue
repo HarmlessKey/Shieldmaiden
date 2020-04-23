@@ -60,6 +60,7 @@
 		}
 	}
 	.fadeInDown, .fadeOutRight {
+		animation-duration: 0.5s !important;
 		animation-delay: .2s;
 	}
 </style>

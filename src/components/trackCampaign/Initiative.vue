@@ -331,18 +331,14 @@
 	}
 }
 	.initiative {
-		margin-top: 20px;
+		margin: 20px 0;
 		border-collapse: separate; 
 		width: 100%;
 		border-spacing: 0 5px;
 		user-select: none;
 
 		tbody {
-			tr:first-child {
-				td {
-					border-color: #83b547;
-				}
-			}
+			
 			tr.top {
 				td {
 					font-size: 12px;

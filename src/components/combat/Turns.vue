@@ -47,7 +47,7 @@
 				@click="setSlide({show: true, type: 'combat/side/Requests'})"
 			>
 				<i class="fas fa-bell"></i>
-				<div class="notifications bg-red white">
+				<div class="notifications bg-red white animated zoomIn">
 					<div>{{ Object.keys(encounter.requests).length }}</div>
 				</div>
 			</div>

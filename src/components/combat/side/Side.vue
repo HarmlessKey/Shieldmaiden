@@ -36,7 +36,7 @@
 					<i class="fas fa-bell"></i>
 					<span class="d-none d-xxl-inline ml-1 truncate">Requests</span>
 				</a>
-				<div class="notifications bg-red white" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
+				<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
 					<div>{{ Object.keys(encounter.requests).length }}</div>
 				</div>
 			</li>

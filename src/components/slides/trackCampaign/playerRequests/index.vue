@@ -63,8 +63,6 @@
 				}
 				return targeted;
 			}
-		},
-		methods: {
 		}
 	};
 </script>

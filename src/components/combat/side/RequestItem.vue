@@ -113,7 +113,7 @@
 			<!-- HEALING -->
 			<template v-else>
 				<div class="damage">Targets</div>
-				<div class="targets">
+				<div class="targets healing">
 					<div v-for="target in request.targets" :key="target">
 						<div class="name truncate bg-gray-dark" v-if="entities[target]">
 							{{ entities[target].name }}
@@ -329,6 +329,9 @@
 					}
 
 				}
+			}
+			&.healing {
+				grid-template-columns: 1fr;
 			}
 		}
 		.actions {

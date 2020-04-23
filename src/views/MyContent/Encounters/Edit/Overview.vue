@@ -89,8 +89,18 @@
 																:showHeader="false"
 														>
 																<template slot="image" slot-scope="data">
-																		<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-																		<span v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+																		<span v-if="data.row.avatar" class="image" 
+																		:style="{
+																			backgroundImage: 'url(\'' + data.row.avatar + '\')',
+																			'border-color': data.row.color_label ? data.row.color_label : ``
+																		}" />
+																		<span 
+																			v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" 
+																			class="image" 
+																			:style="{ 
+																				backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')', 
+																				'border-color': data.row.color_label ? data.row.color_label : ``
+																			}" />
 																		<icon v-else icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
 																</template>
 

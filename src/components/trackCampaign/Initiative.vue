@@ -72,7 +72,10 @@
 						@touchend="characters.length !== 0 ? stop() : null" 
 						@touchcancel="characters.length !== 0 ? stop() : null"
 					>
-						<td class="initiative">{{ entity.initiative }}</td>
+						<td class="initiative">
+							<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
+							<template v-else>{{ entity.initiative }}</template>
+						</td>
 					
 						<td class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"></td>
 
@@ -386,11 +389,6 @@
 					width: 45px;
 					background-size: cover;
 					background-position: center top;
-
-					// @media only screen and (max-width: 575px) {
-					// 	height: 32px;
-					// 	width: 32px;
-					// }
 				}
 				&.targeted {
 					td {
@@ -398,8 +396,10 @@
 					}
 				}
 				&:hover {
-					td {
-						border-color: #fff;
+					@media only screen and (min-width: 576px) {
+						td {
+							border-color: #fff;
+						}
 					}
 				}
 			}

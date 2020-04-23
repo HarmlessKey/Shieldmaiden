@@ -220,6 +220,8 @@
 				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
 				currentTarget: {},
 				setShadow: 0,
+
+				//Multitargeting needs variables
 				interval:false,
 				counter: 0,
 				event: undefined,

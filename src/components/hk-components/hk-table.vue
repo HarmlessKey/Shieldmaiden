@@ -2,14 +2,14 @@
 	<div :class="classes" ref="table">
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
-            <div class="input-group mb-3">
-                <input type="text" autocomplete="off" v-model="searched" @keyup="searchData()" placeholder="Search" class="form-control"/>
-                <div class="input-group-append">
-                    <button class="btn" @click="searchData()"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
+						<div class="input-group mb-3">
+								<input type="text" autocomplete="off" v-model="searched" @keyup="searchData()" placeholder="Search" class="form-control"/>
+								<div class="input-group-append">
+										<button class="btn" @click="searchData()"><i class="fas fa-search"></i></button>
+								</div>
+						</div>
 			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
-        </div>
+				</div>
 		<!-- TABLE -->
 		<div 
 			v-if="!loading"

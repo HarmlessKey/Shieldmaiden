@@ -1,6 +1,49 @@
 <template>
 	<div v-if="targets && allEntities && players && campPlayers">
-		<table class="table targets" :class="{'table-sm': windowWidth <= 360}">
+		<!-- ACTIONS -->
+		<div class="actions" v-if="characters.length !== 0">
+			<div>
+				<span v-if="targeted.length === 0">Select a target to perform actions</span>
+				<span v-else>
+					{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
+				</span>
+			</div>
+			<div class="right">
+				<a 
+					v-if="targeted.length > 0"
+					v-b-tooltip.hover
+					title="Damage or Healing"
+					@click="setSlide({
+						show: true,
+						type: 'slides/trackCampaign/playerRequests/index',
+						data: {
+							characters,
+							targeted: targeted,
+							targets,
+							players,
+							campPlayers,
+							npcs,
+							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
+							type: 'manual'
+						}
+					})"><i class="fas fa-swords"></i></a>
+				<a
+					v-b-tooltip.hover
+					title="Pending requests"
+					@click="setSlide({
+						show: true,
+						type: 'slides/trackCampaign/playerRequests/pendingRequests',
+						data: {
+							campPlayers
+						}
+					})">
+					<i class="far fa-hourglass-half"></i>
+				</a>
+			</div>
+		</div>
+
+		<!-- INITIATIVE LIST -->
+		<table class="initiative targets">
 			<thead>
 				<th>In.</th>
 				<th></th>
@@ -19,24 +62,33 @@
 					<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
 						<td colspan="6">Top of the round</td>
 					</tr>
-					<tr :key="entity.key">
-						<td>{{ entity.initiative }}</td>
+					<tr 
+						:key="entity.key" 
+						:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
+						@mousedown="characters.length !== 0 ? start($event, entity.key) : null" 
+						@mouseleave="characters.length !== 0 ? stop() : null" 
+						@mouseup="characters.length !== 0 ? stop() : null" 
+						@touchstart="characters.length !== 0 ? start($event, entity.key) : null" 
+						@touchend="characters.length !== 0 ? stop() : null" 
+						@touchcancel="characters.length !== 0 ? stop() : null"
+					>
+						<td class="initiative">{{ entity.initiative }}</td>
 					
-						<td class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></td>
+						<td class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"></td>
 
 						<td class="ac">
 							<template v-if="
 								(entity.entityType == 'player' && playerSettings.ac === undefined) 
 								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
 								<span class="ac" :class="{ 
-										'green': displayAc(entity).bonus > 0, 
-										'red': displayAc(entity).bonus < 0 
+										'green': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus > 0, 
+										'red': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus < 0 
 									}"  
-									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity).bonus" 
-									v-if="displayAc(entity).bonus">
-									{{ displayAc(entity).ac + displayAc(entity).bonus }}
+									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus" 
+									v-if="displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus">
+									{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus }}
 								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity).ac }}</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac }}</span>
 							</template>
 							<span v-else class="gray-hover">?</span>
 						</td>
@@ -114,14 +166,16 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
+	import { mapActions } from 'vuex';
+	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
-	import Health from '@/components/trackCampaign/Health.vue'
+	import Health from '@/components/trackCampaign/Health.vue';
 
 	export default {
 		name: 'app',
-		mixins: [general],
+		mixins: [general, trackEncounter],
 		components: {
 			Health,
 		},
@@ -134,26 +188,31 @@
 		],
 		data() {
 			return {
-				userId: this.$route.params.userid,
+				dmId: this.$route.params.userid,
+				userId: this.$store.getters.getUser.uid,
+				characters: [],
 				windowWidth: 0,
+
+				//Multitargeting needs variables
+				targeted: [],
+				interval:false,
+				counter: 0,
+				event: undefined,
+				key: undefined
 			}
 		},
 		firebase() {
 			return {
 				players: {
-					source: db.ref(`players/${this.userId}`),
+					source: db.ref(`players/${this.dmId}`),
 					asObject: true,
 				},
 				npcs: {
-					source: db.ref(`npcs/${this.userId}`),
-					asObject: true,
-				},
-				npcSettings: {
-					source: db.ref(`settings/${this.userId}/track/npc`),
+					source: db.ref(`npcs/${this.dmId}`),
 					asObject: true,
 				},
 				playerSettings: {
-					source: db.ref(`settings/${this.userId}/track/player`),
+					source: db.ref(`settings/${this.dmId}/track/player`),
 					asObject: true,
 				},
 				conditions: {
@@ -163,6 +222,22 @@
 			}
 		},
 		mounted() {
+			//Check if user has control over a character in the campaign
+			if(this.userId) {
+				const allCampaignPlayers = Object.keys(this.campPlayers);
+				const getCharacters = db.ref(`character_control/${this.userId}`);
+				getCharacters.on('value', async (snapshot) => {
+					let controlledCharacters = snapshot.val();
+
+					for(let key in controlledCharacters) {
+						if(allCampaignPlayers.includes(key)) {
+							this.characters.push(key);
+						}
+					}
+
+				});
+			}
+
 			//For a responsive window size
 			//in the html we bind a class based on that
 			this.$nextTick(function() {
@@ -172,78 +247,68 @@
 				this.getWindowWidth()
 			})
 		},
+		watch: {
+			counter(newValue) {
+				if(newValue > 8) {
+					this.stop()
+				}
+			}
+		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
+			start(e, key) {
+				//Check how long the item is being pressed
+				if(!this.interval){
+					this.interval = setInterval(() => this.counter++, 30);
+					this.event = e;
+					this.key = key;
+				}
+			},
+			stop(){
+				//If and item was pressed, see if it was long or short
+				if(this.interval) {
+					let longPress = this.counter >= 8;
+	
+					this.target({
+						longPress,
+						e: this.event,
+						key: this.key
+					})
+				}
+				//Reset all values
+				clearInterval(this.interval)
+				this.interval = false;
+				this.counter = 0;
+				this.key = undefined;
+			},
+			target({longPress, e, key}) {
+				let targeted = this.targeted;
+
+				if(longPress || e.shiftKey) {
+					if(!targeted.includes(key)) {
+						targeted.push(key);
+					} else {
+						targeted = targeted.filter(function(value){
+							return value != key;
+						});
+					}
+				} else {
+					if(targeted.length === 0 || targeted != key) {
+						targeted = [key];
+					} else {
+						targeted = [];
+					}
+				}
+				this.targeted = targeted;
+				this.setSlide({ show: false });
+			},
 			getWindowWidth() {
 				//Return the window width
 				//used in the html to bind a class for small tables
         this.windowWidth = document.documentElement.clientWidth;
-      },
-			displayAc(entity) {
-				var stats = {}
-				var key = entity.key
-
-				if(entity.transformed) {
-						stats.ac = parseInt(entity.transformed.ac);
-						stats.bonus = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].ac_bonus) : parseInt(entity.ac_bonus);
-				}
-				else {
-						if(entity.entityType == 'player') {
-							stats = {
-								ac: parseInt(this.players[key].ac),
-								bonus: parseInt(this.campPlayers[key].ac_bonus),
-							}
-						} else {
-							stats = {
-								ac: parseInt(entity.ac),
-								bonus: parseInt(entity.ac_bonus),
-							}
-						}
-				}
-				return stats
-			},
-			img(entity) {
-				//Check what image should be displayed
-				let encounterImg = entity.avatar; //img linked within the encounter
-
-				if(encounterImg) {
-					var img = encounterImg;
-				} else {
-					if(entity.id) {
-						if(entity.entityType == 'player') {
-							let playerImg = this.players[entity.id].avatar;
-
-							if(playerImg) {
-								img = playerImg
-							} else {
-								img = require('@/assets/_img/styles/player.svg');
-							}
-						}
-						if(entity.entityType == 'npc') {						
-							if(entity.npc == 'custom') {
-								let npcImg = this.npcs[entity.id].avatar;
-
-								img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-							} else {
-								img = require('@/assets/_img/styles/monster.svg');
-							}
-						}
-					} else {
-						img = require('@/assets/_img/styles/monster.svg');
-					}
-				}
-				return img
-			},
-			displayNPCField(field, entity) {
-				const defaults = {name: true, health: false, ac: false};
-				if (entity.settings && entity.settings[field] !== undefined) 
-					return entity.settings[field];
-
-				else if (this.npcSettings[field] == undefined)
-					return defaults[field]; // Default value
-
-				else 
-					return this.npcSettings[field];
-			}
+      }
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);
@@ -252,65 +317,104 @@
 </script>
 
 <style lang="scss" scoped>
-	.table {
+.actions {
+	display: flex;
+	justify-content: space-between;
+	padding: 20px 0 5px 0;
+	border-bottom: solid 1px #fff;
+
+	.right {
+		a {
+			color: #fff !important;
+			margin-left: 10px;
+		}
+	}
+}
+	.initiative {
+		margin-top: 20px;
 		border-collapse: separate; 
+		width: 100%;
 		border-spacing: 0 5px;
+		user-select: none;
 
-		tr:first-child {
-			td {
-				border-top: solid 1px #2c97de !important;
-				border-bottom: solid 1px #2c97de !important;
-			}
-			td:first-child {
-				border-left: solid 1px #2c97de !important;
-			}
-			td:last-child {
-				border-right: solid 1px #2c97de !important;
-			}
-		}
-		tr.top {
-			td {
-				font-size: 12px;
-				padding: 10px 0 5px 0;
-				border: none !important;
-				border-bottom: solid 1px #fff !important;
-			}
-		}
-		tr {
-			td {
-				background: rgba(38, 38, 38, .9);
-			}
-			td.ac, th.ac {
-				width: 30px;
-				text-align: center;
-			}
-			td.ac {
-				font-weight: bold;
-			}
-			td.name {
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
-				max-width:0;
-			}
-			td.img {
-				width: 45px;
-				background-size: cover;
-				background-position: center top;
-
-				@media only screen and (max-width: 575px) {
-					height: 32px;
-					width: 32px;
+		tbody {
+			tr:first-child {
+				td {
+					border-color: #83b547;
 				}
 			}
-		}
-		tr td:first-child, thead th {
-			color: #fff;
-			background: none;
-			text-shadow: 0 0 3px  #000;
-		}
-		tr td:first-child, thead th:first-child {
-			text-align: center;
+			tr.top {
+				td {
+					font-size: 12px;
+					padding: 10px 0 5px 0;
+					border: none;
+					border-bottom: solid 1px #fff;
+					cursor: default;
+
+					&:hover {
+						border-left: none;
+						border-right: none;
+						border-top: none;
+					}
+				}
+			}
+			tr {
+				cursor: pointer;
+
+				td {
+					background: rgba(38, 38, 38, .9);
+					border-top: solid 1px transparent;
+					border-bottom: solid 1px transparent;
+
+					&:first-child {
+						border-left: solid 1px transparent;
+					}
+					&:last-child {
+						border-right: solid 1px transparent;
+					}
+				}
+				td.initiative, td.ac, th.ac {
+					width: 38px;
+					text-align: center;
+				}
+				td.ac {
+					font-weight: bold;
+				}
+				td.name {
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					max-width:0;
+				}
+				td.img {
+					width: 45px;
+					background-size: cover;
+					background-position: center top;
+
+					// @media only screen and (max-width: 575px) {
+					// 	height: 32px;
+					// 	width: 32px;
+					// }
+				}
+				&.targeted {
+					td {
+						border-color: #2c97de;
+					}
+				}
+				&:hover {
+					td {
+						border-color: #fff;
+					}
+				}
+			}
+			tr td:first-child, thead th {
+				color: #fff;
+				background: none;
+				text-shadow: 0 0 3px  #000;
+			}
+			tr td:first-child, thead th:first-child {
+				text-align: center;
+			}
 		}
 	}
 	.conditions {

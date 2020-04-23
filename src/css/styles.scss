@@ -1403,9 +1403,59 @@ input[type='number'] {
 }
 
 .el-color-picker {
-
+	
 	&__trigger {
+		height: 38px !important;
+		width: 38px !important;
 		border-radius: 0 !important;
-		border-color: $gray-light !important;
+		border-color: $gray-hover !important;
+		padding: 3px !important;
+	}
+	&__color {
+		border: none !important;
+	}
+}
+
+.el-color-dropdown {
+	&.el-color-picker {
+		&__panel {
+			border-color: $gray-hover;
+			border-radius: 0;
+			background-color: $gray-dark;
+
+			.el-color-predefine {
+				&__color-selector {
+					> div {
+						border-radius: 0;
+					}
+					&.selected {
+						border-radius: 0;
+						box-shadow: none;
+						border: solid 1px $white;
+					}
+				}
+			}
+		}
+	}
+	&__btns {
+		.el-color-dropdown__value {
+			.el-input__inner {
+				color: $gray-light;
+				background-color: $gray-darker;
+			}
+		}
+		.el-button {
+			&.el-color-dropdown__btn {
+				border: none;
+				border-radius: 0;
+				background-color: $blue;
+				color: $white;
+
+				&:hover {
+					background-color: $blue-hover;
+					color: $white;
+				}
+			}
+		}
 	}
 }

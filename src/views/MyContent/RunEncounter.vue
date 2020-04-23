@@ -163,12 +163,46 @@
 				//returns next in initiative order
 				//returns first if there is no next
 				return this._active[this.encounter.turn + 1] || this._active[0];
+			},
+			requests() {
+				if(this.encounter) {
+					return this.encounter.requests;
+				}
 			}
 		},
 		watch: {
 			alive(newVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
+				}
+			},
+			requests: {
+				deep: true,
+				handler(newValue, oldValue) {
+					if((newValue && oldValue) && (Object.keys(newValue).length > Object.keys(oldValue).length)) {
+							this.$snotify.warning(
+							'A new player request was made.',
+							'New request', 
+							{
+								timeout: 5000,
+								buttons: [
+									{ 
+										text: 'Show requests', 
+										action: (toast) => { 
+											this.setSlide({show: true, type: 'combat/side/Requests'});
+											this.$snotify.remove(toast.id); 
+										}, bold: false
+									},
+									{ 
+										text: 'Close', 
+										action: (toast) => { 
+											this.$snotify.remove(toast.id); 
+										}, bold: false
+									}
+								]
+							}
+						);
+					}
 				}
 			}
 		},
@@ -188,6 +222,7 @@
 				'track_Encounter',
 				'set_finished',
 				'reset_store',
+				'setSlide'
 			]),
 			track() {
 				db.ref('broadcast/' + this.userId).update({

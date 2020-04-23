@@ -7,7 +7,7 @@
 				<span class="small gray-hover"> /{{ entities_len }}</span>
 			</span>
 
-				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + img(current) + '\')' }"></div>
+				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.key], npcs[current.key]) + '\')' }"></div>
 				<h1 class="d-none d-md-flex justify-content-start">
 					<span class="mr-3">
 						<template v-if="current.entityType == 'npc'">
@@ -48,13 +48,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
-	import Health from '@/components/trackCampaign/Health.vue'
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
+	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import Health from '@/components/trackCampaign/Health.vue';
 
 	export default {
 		name: 'app',
-		mixins: [general],
+		mixins: [general, trackEncounter],
 		components: {
 			Health,
 		},
@@ -80,60 +81,11 @@
 					source: db.ref(`npcs/${this.userId}`),
 					asObject: true,
 				},
-				npcSettings: {
-					source: db.ref(`settings/${this.userId}/track/npc`),
-					asObject: true,
-				},
 				playerSettings: {
 					source: db.ref(`settings/${this.userId}/track/player`),
 					asObject: true,
 				},
 			}
-		},
-		methods: {
-			img(entity) {
-				//Check what image should be displayed
-				let encounterImg = entity.avatar; //img linked within the encounter
-
-				if(encounterImg) {
-					var img = encounterImg;
-				} else {
-					if(entity.id) {
-						if(entity.entityType == 'player') {
-							let playerImg = this.players[entity.id].avatar;
-
-							if(playerImg) {
-								img = playerImg
-							} else {
-								img = require('@/assets/_img/styles/player.svg');
-							}
-						}
-						if(entity.entityType == 'npc') {						
-							if(entity.npc == 'custom') {
-								let npcImg = this.npcs[entity.id].avatar;
-
-								img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-							} else {
-								img = require('@/assets/_img/styles/monster.svg');
-							}
-						}
-					} else {
-						img = require('@/assets/_img/styles/monster.svg');
-					}
-				}
-				return img
-			},
-			displayNPCField(field, entity) {
-				const defaults = {name: true, health: false, ac: false};
-				if (entity.settings && entity.settings[field] !== undefined) 
-					return entity.settings[field];
-
-				else if (this.npcSettings[field] == undefined)
-					return defaults[field]; // Default value
-
-				else 
-					return this.npcSettings[field];
-			},
 		},
 	}
 </script>

@@ -10,7 +10,7 @@
 		<h5>Targets</h5>
 		<ul class="targeted">
 			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-gray-dark">
-				<div class="img" :style="{ backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[key]) + '\')' }" />
+				<div class="img" :style="{ backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) + '\')' }" />
 				<div class="name truncate">
 					<template v-if="displayTargeted[key].entityType === 'npc'">
 						<template v-if="displayNPCField('name', displayTargeted[key])">

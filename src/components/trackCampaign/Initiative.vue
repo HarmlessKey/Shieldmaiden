@@ -27,7 +27,7 @@
 							type: 'manual'
 						}
 					})"><i class="fas fa-swords"></i></a>
-				<a
+				<!-- <a
 					v-b-tooltip.hover
 					title="Pending requests"
 					@click="setSlide({
@@ -38,7 +38,7 @@
 						}
 					})">
 					<i class="far fa-hourglass-half"></i>
-				</a>
+				</a> -->
 			</div>
 		</div>
 

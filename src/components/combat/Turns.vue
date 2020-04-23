@@ -34,8 +34,7 @@
 			<span v-if="encounter.round">
 				<span class="d-none d-lg-inline">Turn</span>
 				<span class="number ml-2">
-					{{ encounter.turn + 1 }}
-					<span class="small gray-hover"> /{{ active_len }}</span>
+					{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
 				</span>
 			</span>
 			<span class="current-name"></span>

@@ -31,8 +31,8 @@
 		<div class="scroll" v-bar>
 			<div>
 				<div class="tab-content">
-					<div class="tab-pane fade show active" 
-						:class="{'active': current.entityType === 'player'}" 
+					<div class="tab-pane fade" 
+						:class="{'show active': current.entityType === 'player'}" 
 						:id="`manual-${location}`" 
 						role="tabpanel" 
 						aria-labelledby="manual-tab">
@@ -40,7 +40,7 @@
 						<Manual :current="current" :targeted="targeted" />
 					</div>
 					<div v-if="current" class="tab-pane roll fade"
-						:class="{'active': current.entityType !== 'player'}"
+						:class="{'show active': current.entityType !== 'player'}"
 						:id="`roll-${location}`" 
 						role="tabpanel" 
 						aria-labelledby="roll-tab">

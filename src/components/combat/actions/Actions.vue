@@ -9,7 +9,7 @@
 					:href="`#manual-${location}`" 
 					role="tab" 
 					aria-controls="manual" 
-					aria-selected="true">
+					:aria-selected="current.entityType === 'player'">
 					<i class="fas fa-keyboard"></i> 
 					<span class="d-none d-md-inline ml-1">Manual</span>
 				</a>
@@ -22,7 +22,7 @@
 					:href="`#roll-${location}`" 
 					role="tab" 
 					aria-controls="roll" 
-					aria-selected="false">
+					:aria-selected="current.entityType !== 'player'">
 					<i class="fas fa-dice-d20"></i> 
 					<span class="d-none d-md-inline ml-1">Roll</span>
 				</a>

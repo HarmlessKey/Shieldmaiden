@@ -64,7 +64,13 @@
 						
 						<template v-else>
 							<div class="health">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + target.img + '\')' }"></span>
+								<icon v-if="target.img === 'monster' || target.img === 'player'" class="img" :icon="target.img" :fill="target.color_label" :style="target.color_label ? `border-color: ${target.color_label}` : ``" />
+								<span 
+									v-else class="img" 
+									:style="{
+										'background-image': 'url(' + target.img + ')',
+										'border-color': target.color_label ? target.color_label : ``
+									}"/>
 								<div class="progress health-bar">
 									<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
@@ -99,7 +105,13 @@
 						</div>
 						<div v-for="key in targeted" :key="`target-${key}`" class="target">
 							<div class="health untarget">
-								<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
+								<icon v-if="entities[key].img === 'monster' || entities[key].img === 'player'" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
+								<span 
+									v-else class="img" 
+									:style="{
+										'background-image': 'url(' + entities[key].img + ')',
+										'border-color': entities[key].color_label ? entities[key].color_label : ``
+									}"/>
 								<div class="progress health-bar">
 									<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
@@ -315,7 +327,7 @@
 		height: calc(100% - 30px);
 	}
 	h2.componentHeader {
-		padding: 10px 15px !important;
+		padding: 10px 15px 10px 10px !important;
 		margin-bottom: 0 !important;
 
 		&.shadow {
@@ -349,6 +361,7 @@
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
+			border: solid 1px transparent;
 		}
 		.progress { 
 			height: 30px;
@@ -400,24 +413,21 @@
 		}
 	}
 	.options {
-		margin-top: 10px;
+		margin: 20px -3px 0 -3px;
 
 		a {
+			background-color: #b2b2b2;
+			margin: 0 3px;
+			display: block;
+			width: 100%;
 			text-align: center;
-			color: #b2b2b2 !important;
+			color: #191919 !important;
+			line-height: 30px;
+			font-size: 15px;
 
-			.icon {
-				border-radius: 50%;
-				background: #302f2f;
-				width: 30px;
-				height: 30px;
-				display: block;
-				font-size: 15px; 
-				line-height: 30px;
-
-				&:hover {
-					background: #494747;
-				}
+			&:hover {
+				background: #5c5757;
+				color: #fff !important;
 			}
 		}
 	}

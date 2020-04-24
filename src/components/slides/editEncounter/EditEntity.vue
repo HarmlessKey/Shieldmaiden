@@ -107,12 +107,12 @@
 				encounterId: this.$route.params.encid,
 				npc: this.data,
 				hkColors: [
-					"#2c97de",
-					"#83b547",
-					"#cc3e4a",
-					"#e76d3b",
-					"#c1b947",
-					"#9b7aba"
+					"#23618B",
+					"#506D2E",
+					"#7A252C",
+					"#A64E2B",
+					"#807A2E",
+					"#59476A"
 				]
 			}
 		},

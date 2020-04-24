@@ -1,7 +1,7 @@
 <template>
   <svg viewBox="0 0 512 512">
     <g class="" style="touch-action: none;" transform="translate(0,0)">
-      <path :d="icons[icon]" :fill="fill" fill-opacity="1"></path>
+      <path :d="icons[icon]" :fill="fillColor" fill-opacity="1"></path>
       </g>
   </svg>
 
@@ -18,6 +18,11 @@
       fill: {
         type: String,
         default: "#b2b2b2"
+      }
+    },
+    computed: {
+      fillColor() {
+        return (this.fill === null) ? "#b2b2b2" : this.fill;
       }
     },
 		data() {

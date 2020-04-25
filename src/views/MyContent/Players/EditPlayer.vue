@@ -5,38 +5,11 @@
 		</div>
 		
 		<template v-else-if="player">
-			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control == $store.getters.getUser.uid) || $route.name != 'Edit Character'">
+			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control === $store.getters.getUser.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
 				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
-					<p>Give control over this character to another user. Let your players change their base stats themselves, so it is less work for you.<br/> You can always revert this and you also keep control yourself.</p>
-					
-					<div v-if="controlUser">
-						<a @click="removeControl()" v-b-tooltip.hover title="Remove Control">
-							<i class="fas fa-times red"></i>
-						</a> 
-						Control given to <span class="green">{{ controlUser.username }}</span> ({{ controlUser.email }}).
-					</div>
-					<div v-else>
-						<label>Enter the full username or email.</label>
-						<b-form inline>
-							<b-form-input type="text" autocomplete="off"  class="mr-2 mt-2" v-model="findUser" placeholder="username or email" />
-
-							<a class="btn mt-2" variant="primary" @click="find_user()">Find user</a>
-						</b-form>
-						
-						<p v-if="foundUser === false && findUser != ''" class="red">User {{ findUser }} not found</p>
-						<div v-else-if="foundUser && findUser != ''">
-							<hr>
-							<p> 
-								Username: {{ foundUser.username }}<br/>
-								Email: {{ foundUser.email }}
-							</p>
-							<button class="btn btn-block mt-4 bg-green" @click="confirmGiveControl()">
-								Give control to {{ foundUser.username }}
-							</button>
-						</div>
-					</div>
+					<GiveCharacterControl :playerId="playerId" :control="player.control" />
 				</b-card>
 				
 				<b-card header="Basic Info">
@@ -326,6 +299,7 @@
 
 <script>
 	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
@@ -340,19 +314,16 @@
 		},
 		components: {
 			OverEncumbered,
+			GiveCharacterControl
 		},
 		data() {
 			return {
-				playerId: this.$route.params.id,
-				controlUser: undefined,
-				findUser: undefined,
-				foundUser: undefined,
+				playerId: this.$route.params.id
 			}
 		},
 		firebase() {
 			return {
 				abilities: db.ref('abilities'),
-				users: db.ref(`users`),
 				player: {
 					source: db.ref(`players/${this.userId}/${this.playerId}`),
 					asObject: true
@@ -380,64 +351,10 @@
 				}
 			},
 		},
-		beforeMount() {
-			this.fetch_control()
-		},
 		methods: {
 			...mapActions([
 				'setSlide'
 			]),
-			fetch_control() {
-				let playr = db.ref(`players/${this.userId}/${this.playerId}/control`);
-				playr.on('value' , (snapshot) => {
-					let key = snapshot.val()
-
-					if(key) {
-						let user = db.ref(`users/${key}`)
-
-						user.on('value' , (snapshot) => {
-							this.controlUser = {
-								email : snapshot.val().email,
-								username: snapshot.val().username,
-							}
-						});
-					}
-				});
-			},
-			find_user() {
-				for (var i in this.users) {
-					var user = this.users[i]
-					if(user.username) {
-						if (user.username.toLowerCase() == this.findUser.toLowerCase() || user.email.toLowerCase() == this.findUser.toLowerCase()) {
-							this.foundUser = user
-							return
-						} else {
-							this.foundUser = false;
-						}
-					} else {
-						this.foundUser = false;
-					}
-				}
-			},
-			confirmGiveControl() {
-				this.$snotify.success('Are you sure you want to give "' + this.foundUser.username + '" control over this character?', 'Give out control', {
-					buttons: [
-						{ text: 'Yes', action: (toast) => { this.giveControl(); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-					]
-				});
-			},
-			giveControl() {
-				db.ref(`players/${this.userId}/${this.playerId}/control`).set(this.foundUser['.key']);
-				db.ref(`character_control/${this.foundUser['.key']}/${this.playerId}`).set({
-					user: this.userId,
-				});
-			},
-			removeControl() {
-				db.ref(`character_control/${this.player.control}/${this.playerId}`).remove();
-				db.ref(`players/${this.userId}/${this.playerId}/control`).remove();
-				this.controlUser = undefined
-			},
 			addPlayer() {
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
 					this.$snotify.error('You have too many players.', 'Error');

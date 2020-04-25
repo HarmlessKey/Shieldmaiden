@@ -99,8 +99,4 @@
 		padding: 20px 10px 15px 10px;
 	}
 }
-@media only screen and (max-width: 600px) {
-
-}
-
 </style>

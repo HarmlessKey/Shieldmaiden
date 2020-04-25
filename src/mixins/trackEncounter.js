@@ -52,20 +52,20 @@ export const trackEncounter = {
 						if(playerImg) {
 							img = playerImg
 						} else {
-							img = require('@/assets/_img/styles/player.svg');
+							img = 'player';
 						}
 					}
 					if(entity.entityType == 'npc') {						
 						if(entity.npc == 'custom') {
 							let npcImg = npc.avatar;
 
-							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
+							img = (npcImg) ? npcImg : 'monster';
 						} else {
-							img = require('@/assets/_img/styles/monster.svg');
+							img = 'monster';
 						}
 					}
 				} else {
-					img = require('@/assets/_img/styles/monster.svg');
+					img = 'monster';
 				}
 			}
 			return img

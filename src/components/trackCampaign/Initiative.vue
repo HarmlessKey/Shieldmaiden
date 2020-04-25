@@ -73,8 +73,15 @@
 						@touchcancel="characters.length !== 0 ? stop() : null"
 					>
 						<td class="initiative">{{ entity.initiative }}</td>
-					
-						<td class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"></td>
+						
+						<td class="image">
+							<icon 
+								v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+							/>
+							<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
+						</td>
 
 						<td class="ac">
 							<template v-if="
@@ -94,14 +101,14 @@
 						</td>
 
 						<td class="name">
-							<template v-if="entity.entityType == 'npc'">
+							<span v-if="entity.entityType == 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
 								<template v-if="displayNPCField('name', entity)">
 									{{ entity.name }}
 								</template>
 								<template v-else>
 									? ? ?
 								</template>
-							</template>
+							</span>
 							<template v-else>{{ players[entity.key].character_name }}</template>
 						</td>
 
@@ -382,15 +389,18 @@
 					text-overflow: ellipsis;
 					max-width:0;
 				}
-				td.img {
+				td.image {
+					padding: 0;
 					width: 45px;
 					background-size: cover;
 					background-position: center top;
 
-					// @media only screen and (max-width: 575px) {
-					// 	height: 32px;
-					// 	width: 32px;
-					// }
+					.img {
+						width: 43px;
+						height: 43px;
+						border: solid 1px #b2b2b2;
+					}
+
 				}
 				&.targeted {
 					td {

@@ -14,7 +14,12 @@
 				leave-active-class="animated fadeOutDown">
 				<template>
 					<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
-						<span class="img" :style="{ backgroundImage: 'url(\'' + img(entity) + '\')' }"></span>
+						<icon 
+							v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+							:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+							:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+						/>
+						<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
 						<div class="progress health-bar">
 							<div class="info">
 								<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
@@ -48,11 +53,13 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { db } from '@/firebase'
+	import _ from 'lodash';
+	import { db } from '@/firebase';
+	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
 	export default {
 		name: 'app',
+		mixins: [trackEncounter],
 		props: [
 			'entities',
 			'campaign'
@@ -179,6 +186,9 @@
 
 <style lang="scss" scoped>
 	.meters {
+		padding-top: 28px;
+		user-select: none;
+
 		h3 {
 			text-transform: capitalize;
 			color: #fff;
@@ -210,6 +220,7 @@
 					grid-area: img;
 					width: 30px; 
 					height: 30px;
+					border: solid 1px transparent;
 				}
 				.progress { 
 					width: 100% !important;

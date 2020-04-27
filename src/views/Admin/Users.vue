@@ -147,20 +147,6 @@
 					users[key].status = users[key].status ? users[key].status : 'offline';
 					let email = (users[key].patreon_email) ? users[key].patreon_email : users[key].email;
 
-					/*
-						TEMPORARY FUNCTION TO SAVE ALL USERS IN SEARCH_USERS
-						
-						REMOVE ONCE DONE
-						
-						Save all users under searchUsers with lower case values
-					*/
-					if(users[key].username){
-						db.ref(`search_users`).child(key).set({
-							username: users[key].username.toLowerCase(),
-							email: users[key].email.toLowerCase()
-						});
-					}
-
 					//Get Patreon
 					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);
 					await getPatron.on('value', (snapshot) => {

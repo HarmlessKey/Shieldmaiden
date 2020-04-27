@@ -44,7 +44,7 @@
 	import Spell from '@/components/compendium/Spell.vue';
 
 	export default {
-		name: 'Error',
+		name: 'Spells',
 		components: {
 			Crumble,
 			Footer,

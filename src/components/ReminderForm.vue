@@ -2,7 +2,7 @@
 	<div>
 		<b-row class="mb-2">
 			<b-col class="col-3">
-				<label for="title">Title</label>
+				<label class="required	" for="title">Title</label>
 			</b-col>
 			<b-col>
 				<b-form-input type="text" 
@@ -28,7 +28,7 @@
 		</b-row>
 		<b-row class="mb-2">
 			<b-col class="col-3">
-				<label for="trigger">Trigger</label>
+				<label class="required" for="trigger">Trigger</label>
 			</b-col>
 			<b-col>
 				<b-form-select type="text" 
@@ -36,7 +36,7 @@
 				v-validate="'required'"
 				id="trigger"
 				name="trigger">
-					<option selected="selected" value="">- Select the trigger -</option>
+					<option :value="undefined" disabled>- Select the trigger -</option>
 					<option v-for="(trigger, key) in triggers" :value="key" :key="key">{{ trigger }}</option>
 				</b-form-select>
 				<p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>
@@ -205,13 +205,14 @@ export default {
 				return this.value;
 			},
 			set(newValue) {
+				console.log('emitted')
 				this.$emit('input', newValue);
 			}
 		}
 	},
 	watch: {
 		reminder: {
-			handler() {
+			handler(newValue) {
 				//Emits validation on every change
 				this.$emit('validation', this.$validator);
 			},
@@ -248,13 +249,13 @@ export default {
 		},
 		addVariable() {
 			if(!this.reminder.variables) {
-				this.reminder.variables = {};
+				this.$set(this.reminder, 'variables', {});
 			}
-			this.reminder.variables[this.newVar] = [ "option 1" ];
+			this.$set(this.reminder.variables, this.newVar, [""]);
 			this.newVar = undefined;
 		},
 		addOption(key) {
-			this.reminder.variables[key].push("new option");
+			this.reminder.variables[key].push("");
 			this.$forceUpdate();
 		},
 		removeOption(key, i) {

@@ -39,6 +39,7 @@ export const spells = {
 					let fixed_val = (modifier.fixed_val) ? modifier.fixed_val : 0;
 					let modifierRoll = undefined;
 					let scaledRoll = undefined;
+					let scaledModifier = undefined;
 					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
 
 					//Create a list with al damage types for this action
@@ -52,8 +53,7 @@ export const spells = {
 					//Check if the spell scales with the current roll
 					let tiers = modifier.level_tiers;
 					if(tiers) {
-						let scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
-					
+						scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
 					
 						//Roll the scaledModifier
 						if(scaledModifier) {

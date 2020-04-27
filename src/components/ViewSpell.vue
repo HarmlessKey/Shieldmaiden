@@ -183,13 +183,13 @@
 						<div v-if="hitOrMiss === 'miss'" class="mt-3">
 							Missed attack: <b>{{ missSaveEffect(data.row.missSave, 'text') }}</b>
 						</div>
-						<div v-if="resistances[data.row.subtype] === 'vulnerable'" class="mt-3">
+						<div v-if="resistances[data.row.subtype] === 'v'" class="mt-3">
 							Vulnerable to {{ data.row.subtype }}: <b>double damage</b>
 						</div>
-						<div v-if="resistances[data.row.subtype] === 'resistant'" class="mt-3">
+						<div v-if="resistances[data.row.subtype] === 'r'" class="mt-3">
 							Resistant to {{ data.row.subtype }}: <b>half damage</b>
 						</div>
-						<div v-if="resistances[data.row.subtype] === 'immune'" class="mt-3">
+						<div v-if="resistances[data.row.subtype] === 'i'" class="mt-3">
 							Immune to {{ data.row.subtype }}: <b>no damage</b>
 						</div>
 						<hr>
@@ -198,9 +198,9 @@
 						({{ data.row.modifierRoll.total }}
 						<span v-if="data.row.scaledRoll"> + {{ data.row.scaledRoll.total }}</span>)
 						<span v-if="savingThrow === 'save' || hitOrMiss === 'miss'"> {{ missSaveEffect(data.row.missSave, 'calc') }}</span>
-						<span v-if="resistances[data.row.subtype] === 'vulnerable'"> * 2</span>
-						<span v-if="resistances[data.row.subtype] === 'resistant'"> / 2</span>
-						<span v-if="resistances[data.row.subtype] === 'immune'"> no effect</span>
+						<span v-if="resistances[data.row.subtype] === 'v'"> * 2</span>
+						<span v-if="resistances[data.row.subtype] === 'r'"> / 2</span>
+						<span v-if="resistances[data.row.subtype] === 'i'"> no effect</span>
 						<span> = <b :class="data.row.subtype">{{ totalDamage(action, data.row) }}</b></span>
 						</div>
 					</div>
@@ -208,31 +208,38 @@
 
 				<div v-if="rolled.damageTypes.length > 0" class="mt-3">
 					<h3>Resistances</h3>
-					<div v-for="(type, i) in rolled.damageTypes" :key="`type-${i}`" class="resistances">
-						<div v-b-tooltip:hover :title="type" class="icon" :class="type">
-							<i :class="returnDamageTypeIcon(type)"/>
+					<div v-for="(type, i) in rolled.damageTypes" :key="`type-${i}`" class="defenses">
+						<div class="icon">
+							<i :class="[returnDamageTypeIcon(type), type]"/> {{ type }}
 						</div>
 						<div 
 							class="option"
-							:class="resistances[type] === 'vulnerable' ? 'bg-blue' : 'bg-gray-dark'"
-							@click="setResistances(type, 'vulnerable')"
+							v-b-tooltip.hover title="Vulnerable" 
+							@click="setDefense(type, 'v')"
+							:class="{red: resistances[type] === 'v'}"
 						>
-							Vulnerable
-						</div>
-						<div 
-							class="option" 
-							:class="resistances[type] === 'resistant' ? 'bg-blue' : 'bg-gray-dark'"
-							@click="setResistances(type, 'resistant')"
-						>
-							Resistant
+							<i class="fas fa-shield"></i>
+							<span>V</span>
 						</div>
 						<div 
 							class="option"
-							:class="resistances[type] === 'immune' ? 'bg-blue' : 'bg-gray-dark'"
-							@click="setResistances(type, 'immune')"
+							v-b-tooltip.hover title="Resistant" 
+							@click="setDefense(type, 'r')"
+							:class="{green: resistances[type] === 'r'}"
 						>
-							Immune
+							<i class="fas fa-shield"></i>
+							<span>R</span>
 						</div>
+						<div 
+							class="option"
+							v-b-tooltip.hover title="Immune" 
+							@click="setDefense(type, 'i')"
+							:class="{green: resistances[type] === 'i'}"
+						>
+							<i class="fas fa-shield"></i>
+							<span>I</span>
+						</div>
+
 					</div>
 				</div>
 
@@ -352,13 +359,13 @@
 				if(action.toHit && this.hitOrMiss === 'miss') {
 					total = Math.floor(total * rolls.missSave);
 				}
-				if(this.resistances[rolls.subtype] === 'vulnerable') {
+				if(this.resistances[rolls.subtype] === 'v') {
 					total = total * 2;
 				}
-				if(this.resistances[rolls.subtype] === 'resistant') {
+				if(this.resistances[rolls.subtype] === 'r') {
 					total = Math.floor(total / 2);
 				}
-				if(this.resistances[rolls.subtype] === 'immune') {
+				if(this.resistances[rolls.subtype] === 'i') {
 					total = 0;
 				}
 				return total;
@@ -372,7 +379,7 @@
 			setAdvantage(value) {
 				this.advantage = (value !== this.advantage) ? value : false;
 			},
-			setResistances(type, resistance) {
+			setDefense(type, resistance) {
 				if(this.resistances[type] === resistance) {
 					this.$delete(this.resistances, type);
 				} else {
@@ -482,22 +489,45 @@
 				margin-left: 5px;
 			}
 		}
-		.resistances {
+		.defenses {
 			display: grid;
-			grid-template-columns: 30px 1fr 1fr 1fr;
-			grid-column-gap: 1px;
+			grid-template-columns: 1fr 18px 18px 18px;
+			grid-column-gap: 5px;
 			user-select: none;
 			margin-bottom: 1px;
+			padding: 2px 5px;
 
+			&:hover {
+				background-color: #191919;
+			}
 			.icon {
 				padding: 3px 0;
-				text-align: center;
 			}
 			.option {
 				cursor: pointer;
-				padding: 3px 0;
+				position: relative;
+				width: 18px;
+				font-size: 18px;
 				text-align: center;
-				color: #fff;
+				line-height: 28px;
+
+				span {
+					font-size: 12px;
+					text-align: center;
+					font-weight: bold;
+					position: absolute;
+					width: 18px;
+					line-height: 28px;
+					top: 0;
+					left: 0;
+					color: #191919;
+				}
+
+				&.green, &.red, &.blue {
+					span {
+						color: #fff;
+					}
+				}
 			}
 		}
 	}

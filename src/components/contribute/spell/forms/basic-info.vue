@@ -89,7 +89,8 @@
 						title="Casting Type"
 						class="form-control mb-2"
 						v-validate="'required'"
-						data-vv-as="Casting Type">
+						data-vv-as="Casting Type"
+						@change="clearErrors()">
 						<option :value="undefined" disabled>- Casting Type -</option>
 						<option v-for="(t) in cast_time"
 							:key="t.value" :value="t.value">{{t.label}}</option>
@@ -101,7 +102,7 @@
 				<b-col>
 					<label for="cast_time_nr">Reaction Time Description</label>
 					<b-form-input v-model="spell.cast_time_react_desc"
-						:disabled="spell.cast_time_type!='Reaction'"
+						:disabled="spell.cast_time_type !== 'reaction'"
 						autocomplete="off"
 						id="cast_time_react_desc"
 						name="cast_time_react_desc"
@@ -162,7 +163,8 @@
 						title="Range Type"
 						class="form-control mb-2"
 						v-validate="'required'"
-						data-vv-as="Range Type">
+						data-vv-as="Range Type"
+						@change="clearErrors()">
 						<option :value="undefined" disabled>- Range Type -</option>
 						<option v-for="(val,i) in range_type"
 							:key="i" :value="val">{{val}}</option>
@@ -218,7 +220,8 @@
 						title="Duration Type"
 						class="form-control mb-2"
 						v-validate="'required'"
-						data-vv-as="Duration Type">
+						data-vv-as="Duration Type"
+						@change="clearErrors()">
 						<option :value="undefined" disabled>- Duration Type -</option>
 						<option v-for="(val,i) in dur_type"
 							:key="i" :value="val">{{val}}</option>
@@ -271,7 +274,8 @@
 						title="AOE Type"
 						class="form-control mb-2"
 						v-validate="'required'"
-						data-vv-as="AOE Type">
+						data-vv-as="AOE Type"
+						@change="clearErrors()">
 						<option :value="undefined" disabled>- AOE Type -</option>
 						<option v-for="(val,i) in aoe_type"
 							:key="i" :value="val">{{val}}</option>

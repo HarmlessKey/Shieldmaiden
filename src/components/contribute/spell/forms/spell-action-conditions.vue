@@ -114,8 +114,7 @@ export default {
 			}
 		},
 		validator() {
-			// let mod_key = `test ${}`
-			return {"conditions": this.$validator};
+			return { "conditions": this.$validator };
 		}
 	},
 	methods: {

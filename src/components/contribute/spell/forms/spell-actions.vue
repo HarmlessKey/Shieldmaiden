@@ -146,23 +146,9 @@ export default {
 		setValidation(validators) {
 			// This component just passes through all validators
 			// No form fields that need validation
-			// this.validators = validators;
 			this.$emit('validation', validators)
 		}
 	},
-	// watch: {
-	// 	spell: {
-	// 		handler() {
-	// 			// Emits validation on every change
-	// 			this.$emit('validation', this.validation);
-	// 		},
-	// 		deep: true,
-	// 	}
-	// },
-	// mounted() {
-	// 	console.log("Emit validation basic info")
-	// 	this.$emit('validation', this.$validator);
-	// },
 };
 </script>
 

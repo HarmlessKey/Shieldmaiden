@@ -334,8 +334,7 @@ export default {
 			return 100;
 		},
 		validator() {
-			// let mod_key = `test ${}`
-			return {"modifiers": this.$validator};
+			return { "modifiers": this.$validator };
 		}
 	},
 
@@ -452,9 +451,6 @@ export default {
 			immediate: true,
 		}
 	},
-	// mounted() {
-	// 	this.$emit('validation', this.validator);
-	// },
 };
 </script>
 

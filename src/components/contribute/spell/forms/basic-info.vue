@@ -499,8 +499,10 @@ export default {
 				this.spell.components = {'verbal':0,'somatic':0,'material':0};
 			}
 			this.spell.components[comp] = !this.spell.components[comp];
-			console.log("set Comp")
-			this.clearErrors();
+
+			this.$nextTick(() => {
+				this.clearErrors();
+			});
 		},
 		setRitual() {
 			let yn = ["yes", "no"]

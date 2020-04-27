@@ -210,8 +210,7 @@ export default {
 			}
 		},
 		validator() {
-			// let mod_key = `test ${}`
-			return {"notifications": this.$validator};
+			return { "notifications": this.$validator };
 		}
 	},
   methods: {

@@ -182,7 +182,6 @@ export default {
 			if (await this.validate_validators() === true) {
 				this.$emit("saved");
 			} else {
-				console.log("Not validated");
 				this.$snotify.error('Form Not Valid', 'Critical miss!', {
 					position: "rightTop"
 				});
@@ -209,7 +208,6 @@ export default {
 				this.validators[new_key] = validators[v]
 			}
 			this.$emit('validation', this.validators)
-			// this.validation = validate;
 		}
 	},
 	watch: {
@@ -222,9 +220,6 @@ export default {
 			immidiate: true,
 		}
 	},
-	// mounted() {
-	// 	this.$emit('validation', this.validators);
-	// },
 };
 </script>
 

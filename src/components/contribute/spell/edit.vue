@@ -252,7 +252,6 @@ export default {
 			for (let index in this.old_spell.classes) {
 				classes.push(this.old_spell.classes[index].name.toLowerCase());
 			}
-			console.log(classes)
 			this.spell.classes = classes;
 
 			// Source book
@@ -288,14 +287,10 @@ export default {
 			this.$forceUpdate();
 		},
 		setValidators(validators) {
-			console.log("set validators")
 			// Receives validator lists from basic info and spell actions
 			for (let v in validators) {
 				this.validators[v] = validators[v];
-				// this.validators.push(validator)
 			}
-			// this.spell = Object.assign({}, this.spell);
-			// this.validation = validate;
 		},
 		async validate_validators() {
 			// loops through all available validators to check if the forms
@@ -325,9 +320,6 @@ export default {
 
 			
 			if (await this.validate_validators() === true) {
-			// this.validation.validateAll().then((result) => {
-				// if (result) {
-				console.log("Validated");
 				db.ref(`new_spells/${this.id}`).set(this.spell);
 				this.$snotify.success('Spell Saved.', 'Critical hit!', {
 					position: "rightTop"
@@ -335,14 +327,11 @@ export default {
 				this.validators = {};
 				this.unsaved_changes = false;
 				this.fb_spell_json = JSON.stringify(this.spell);
-				// this.$router.replace('/players')
 			} else {
-				console.log("Not validated");
 				this.$snotify.error('Form Not Valid', 'Critical miss!', {
 					position: "rightTop"
 				});
 			}
-			// })
 		},
 		cancel_changes() {
 			this.spell = JSON.parse(this.fb_spell_json);
@@ -351,7 +340,6 @@ export default {
 	},
 	watch: {
 		spell: {
-			// immediate: true,
 			deep: true,
 			handler() {
 				// Emits validation on every change

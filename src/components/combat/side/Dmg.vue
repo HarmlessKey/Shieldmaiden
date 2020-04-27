@@ -99,6 +99,7 @@
 
 <style lang="scss" scoped>
 ul {
+	user-select: none;
 	padding: 0;
 	list-style: none;
 

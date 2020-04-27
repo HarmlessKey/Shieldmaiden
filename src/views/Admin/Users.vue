@@ -154,10 +154,12 @@
 						
 						Save all users under searchUsers with lower case values
 					*/
-					db.ref(`search_users`).child(key).set({
-						username: users[key].username.toLowerCase(),
-						email: users[key].email.toLowerCase()
-					});
+					if(users[key].username){
+						db.ref(`search_users`).child(key).set({
+							username: users[key].username.toLowerCase(),
+							email: users[key].email.toLowerCase()
+						});
+					}
 
 					//Get Patreon
 					let getPatron = db.ref(`new_patrons`).orderByChild("email").equalTo(email);

@@ -183,7 +183,8 @@ export default {
 		value: Array,
 		action_type: String,
 		level: Number,
-		level_scaling: String
+		level_scaling: String,
+		spell:Object,
 	},
   data() {
     return {
@@ -222,8 +223,11 @@ export default {
 			notifications.push({
 				reminder: {}
 			});
-			this.$emit("input", notifications)
+			this.$emit("input", notifications);
 			this.$forceUpdate(); //IMPORTANT
+
+			this.$emit("spellUpdate");
+
 		},
 		remove_notification(index) {
 			this.$delete(this.notifications, index)

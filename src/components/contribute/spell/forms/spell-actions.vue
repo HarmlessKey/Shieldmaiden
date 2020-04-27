@@ -6,6 +6,7 @@
 			:action_index="edit_index"
 			:level_scaling="spell.level_scaling"
 			:level="spell.level"
+			@spellUpdate="spellUpdate()"
 			@saved="saved_action()"
 			@validation="setValidation"
 		/>
@@ -138,6 +139,9 @@ export default {
 			}
 
 			this.$forceUpdate()
+		},
+		spellUpdate() {
+			this.spell = Object.assign({}, this.spell);
 		},
 		setValidation(validators) {
 			// This component just passes through all validators

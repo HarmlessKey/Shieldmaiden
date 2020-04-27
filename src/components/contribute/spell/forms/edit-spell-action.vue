@@ -123,6 +123,7 @@
 						:level_scaling="level_scaling"
 						:level="level"
 						:action_type="spell_action.type"
+						@spellUpdate="spellUpdate()"
 						@validation="setValidation"
 					/>
 					
@@ -144,6 +145,7 @@ export default {
 		level_scaling: String,
 		level: Number,
 		action_index: Number,
+		spell: Object,
 	},
 	components: {
 		spellActionModifiers,
@@ -196,6 +198,9 @@ export default {
 				 	return false;
 			}
 			return true;
+		},
+		spellUpdate() {
+			this.$emit('spellUpdate')
 		},
 		setValidation(validators) {
 			// receives validators from either modifiers, conditions, reminders

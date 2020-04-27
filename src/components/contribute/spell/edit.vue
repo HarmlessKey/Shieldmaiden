@@ -278,7 +278,6 @@ export default {
 					replacement: '\"'
 				},
 			];
-			console.log("REPLACE ")
 			rules.forEach(function(rule) {
 				text = text.replace(rule.regex, rule.replacement);
 			});

@@ -1,6 +1,6 @@
-import { mapGetters } from 'vuex'
-import { db } from '@/firebase'
-import { experience } from '@/mixins/experience.js'
+import { mapGetters } from 'vuex';
+import { db } from '@/firebase';
+import { experience } from '@/mixins/experience.js';
 
 export const difficulty = {
 

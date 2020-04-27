@@ -43,5 +43,10 @@ export const general = {
 			if(showTime) { return date + " - " + time; }
 			return date
 		},
+		toKebabCase(input) {
+			return input.replace(/(a-z)(A-Z)/g, "$1-$2")
+									.replace(/\s+/g, '-')
+									.toLowerCase();
+		}
 	}
 }

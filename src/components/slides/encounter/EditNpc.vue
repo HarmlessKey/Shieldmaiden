@@ -3,14 +3,21 @@
 <template>
 	<div class="pb-5" v-if="entity">
 		<h2>Edit <span class="blue">{{ entity.name }}</span></h2>
-		<b-form-input 
-			type="text" 
-			name="name" 
-			v-model="entity.name"
-			:class="{'input': true, 'error': errors.has('name') }"
-			v-validate="'required'"
-			placeholder="Name"></b-form-input>
-			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+		<div class="d-flex justify-content-start">
+			<el-color-picker
+				class="mr-2"
+				v-model="entity.color_label"
+				:predefine="hkColors">
+			</el-color-picker>
+			<b-form-input 
+				type="text" 
+				name="name" 
+				v-model="entity.name"
+				:class="{'input': true, 'error': errors.has('name') }"
+				v-validate="'required'"
+				placeholder="Name"></b-form-input>
+		</div>
+		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
 		<b-row class="mb-2">
 			<b-col>
@@ -154,6 +161,14 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				npcSettings: undefined,
+				hkColors: [
+					"#88b3ce",
+					"#9ac16a",
+					"#c45e66",
+					"#db815e",
+					"#e2da5f",
+					"#9b7aba"
+				],
 				npcsOptions: {
 					'name': { 
 						entity: 'npc',
@@ -248,6 +263,7 @@
 						if(this.entity.curHp > this.entity.maxHp) {
 							this.entity.curHp = this.entity.maxHp
 						}
+						
 						this.edit_entity({key: this.entityKey, entity: this.entity});
 						this.setSlide(false);
 					}

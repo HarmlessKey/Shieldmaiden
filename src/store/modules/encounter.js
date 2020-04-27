@@ -197,6 +197,7 @@ const mutations = {
 		entity.dead = (db_entity.dead) ? db_entity.dead : false;
 		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
 		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
+		entity.color_label = (db_entity.color_label) ? db_entity.color_label : null;
 
 		if (db_entity.meters) {
 			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
@@ -244,7 +245,7 @@ const mutations = {
 				//get other values from the player
 				let db_player = (!state.demo) ? rootState.content.players[key] : demoPlayers[key];
 
-				entity.img = (db_player.avatar) ? db_player.avatar : require('@/assets/_img/styles/player.png');
+				entity.img = (db_player.avatar) ? db_player.avatar : 'player';
 				
 				entity.name = db_player.character_name;
 				entity.ac = parseInt(db_player.ac);
@@ -292,9 +293,9 @@ const mutations = {
 					//without copying an existing
 					//it won't have data_npc
 					if(data_npc) {
-						entity.img = (data_npc.avatar) ? data_npc.avatar : require('@/assets/_img/styles/monster.png');
+						entity.img = (data_npc.avatar) ? data_npc.avatar : 'monster';
 					} else {
-						entity.img = require('@/assets/_img/styles/monster.png');
+						entity.img = 'monster';
 					}
 				}
 				else {
@@ -525,6 +526,7 @@ const mutations = {
 		Vue.set(state.entities[key], 'curHp', entity.curHp);
 		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus);
 		Vue.set(state.entities[key], 'tempHp', entity.tempHp);
+		Vue.set(state.entities[key], 'color_label', entity.color_label);
 
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
 	},

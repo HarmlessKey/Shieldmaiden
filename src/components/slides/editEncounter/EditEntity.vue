@@ -40,6 +40,18 @@
 			</b-col>
 		</b-row>
 		<hr>
+		<b-row>
+			<b-col class="col-2">
+				<label for="avatar">Color</label>
+			</b-col>
+			<b-col>
+				<el-color-picker
+					v-model="npc.color_label"
+					:predefine="hkColors">
+				</el-color-picker>
+			</b-col>
+		</b-row>
+		<hr>
 
 		<b-form-checkbox name="friendly" v-model="npc.friendly">Friendly NPC</b-form-checkbox>
 
@@ -48,6 +60,7 @@
 			<b-col class="text-center">
 				<label for="ac">Armor Class</label>
 				<b-form-input 
+					class="text-center"
 					type="text" 
 					name="ac" 
 					data-vv-as="Armor Class"
@@ -60,6 +73,7 @@
 			<b-col class="text-center">
 				<label for="maxHp">Hit Points</label>
 				<b-form-input 
+					class="text-center"
 					type="text" 
 					name="maxHp" 
 					id="maxHp" 
@@ -92,6 +106,14 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				npc: this.data,
+				hkColors: [
+					"#88b3ce",
+					"#9ac16a",
+					"#c45e66",
+					"#db815e",
+					"#e2da5f",
+					"#9b7aba"
+				]
 			}
 		},
 		methods: {

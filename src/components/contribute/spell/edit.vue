@@ -259,6 +259,7 @@ export default {
 
 			// Make spell responsive
 			this.spell = Object.assign({}, this.spell);
+			this.validate_validators();
 
 		},
 		parse_spell_str(text) {

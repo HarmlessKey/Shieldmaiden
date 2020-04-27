@@ -286,9 +286,9 @@
 					<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
 				</b-col>
 				<b-col md="6">
-					<label for="aoe_size" :class="{ required: spell.aoe_type !== 'None' }">AOE Size ft.</label>
+					<label for="aoe_size" :class="{ required: spell.aoe_type !== 'none' }">AOE Size ft.</label>
 					<b-form-input v-model="spell.aoe_size"
-						:disabled="spell.aoe_type === 'None'"
+						:disabled="spell.aoe_type === 'none'"
 						autocomplete="off"
 						id="aoe_size"
 						name="aoe_size"

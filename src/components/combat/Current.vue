@@ -36,7 +36,15 @@
 						<template v-else>
 							<div class="health">
 								<span v-if="current.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
-								<span v-else class="img" :style="{ backgroundImage: 'url(\'' + current.img + '\')' }"></span>
+								<template v-else>
+									<icon v-if="current.img === 'monster' || current.img === 'player'" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
+									<span 
+										v-else class="img" 
+										:style="{
+											'background-image': 'url(' + current.img + ')',
+											'border-color': current.color_label ? current.color_label : ``
+										}"/>
+								</template>
 								<div class="progress health-bar">
 									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
@@ -60,7 +68,13 @@
 
 							<template v-if="targeted.length > 0">
 								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
-									<span class="img" :style="{ backgroundImage: 'url(\'' + entities[key].img + '\')' }"></span>
+									<icon v-if="entities[key].img === 'monster' || entities[key].img === 'player'" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
+									<span 
+										v-else class="img" 
+										:style="{
+											'background-image': 'url(' + entities[key].img + ')',
+											'border-color': entities[key].color_label ? entities[key].color_label : ``
+										}"/>
 									<span class="ac"
 										:class="{ 
 											'green': entities[key].ac_bonus > 0, 
@@ -279,6 +293,7 @@
 			line-height: 30px;
 			text-align: center;
 			grid-area: img;
+			border: solid 1px transparent;
 		}
 		.ac {
 			text-align:center;

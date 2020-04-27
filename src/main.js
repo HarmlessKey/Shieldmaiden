@@ -13,7 +13,9 @@ import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import Element from 'element-ui';
+import locale from 'element-ui/lib/locale/lang/en'
 import HkTable from './components/hk-components/hk-table'
+import Icon from './components/Icon'
 import 'element-ui/lib/theme-chalk/index.css';
 
 const options = {
@@ -24,6 +26,7 @@ const options = {
 }
 
 Vue.component('hk-table', HkTable);
+Vue.component('icon', Icon);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);
@@ -31,7 +34,7 @@ Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-Vue.use(Element);
+Vue.use(Element, { locale });
 
 //Bootstrap
 global.$ = jQuery

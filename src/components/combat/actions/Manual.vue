@@ -102,7 +102,7 @@
 
 		name: 'Actions',
 		mixins: [setHP],
-		props: ['current'],
+		props: ['current', 'targeted'],
 		data: function() {
 			return {
 				userId: this.$store.getters.getUser.uid,
@@ -117,8 +117,7 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities',
-				'targeted',
+				'entities'
 			]),
 			intensity: {
 				get() {		
@@ -238,6 +237,7 @@
 		font-size:50px;
 		text-align: center;
 		grid-area: input;
+		border: none !important;
 	}
 	.heal {
 		grid-area: btn-heal;

@@ -163,12 +163,46 @@
 				//returns next in initiative order
 				//returns first if there is no next
 				return this._active[this.encounter.turn + 1] || this._active[0];
+			},
+			requests() {
+				if(this.encounter) {
+					return this.encounter.requests;
+				}
 			}
 		},
 		watch: {
 			alive(newVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
+				}
+			},
+			requests: {
+				deep: true,
+				handler(newValue, oldValue) {
+					if((newValue && oldValue) && (Object.keys(newValue).length > Object.keys(oldValue).length)) {
+							this.$snotify.warning(
+							'A new player request was made.',
+							'New request', 
+							{
+								timeout: 5000,
+								buttons: [
+									{ 
+										text: 'Show requests', 
+										action: (toast) => { 
+											this.setSlide({show: true, type: 'combat/side/Requests'});
+											this.$snotify.remove(toast.id); 
+										}, bold: false
+									},
+									{ 
+										text: 'Close', 
+										action: (toast) => { 
+											this.$snotify.remove(toast.id); 
+										}, bold: false
+									}
+								]
+							}
+						);
+					}
 				}
 			}
 		},
@@ -188,6 +222,7 @@
 				'track_Encounter',
 				'set_finished',
 				'reset_store',
+				'setSlide'
 			]),
 			track() {
 				db.ref('broadcast/' + this.userId).update({
@@ -233,13 +268,13 @@
 		background: rgba(38, 38, 38, .9) !important;
 	}
 	.combat {
-		padding:10px;
-		width: 100vw;
+		padding: 5px;
+		width: 100%;
 		height: calc(100% - 50px);
 		display: grid;
 		grid-template-columns: 3fr 4fr 3fr 2fr;
 		grid-template-rows: 60px auto;
-		grid-gap: 10px;
+		grid-gap: 5px;
 		grid-template-areas:
 		"turns turns turns turns"
 		"current targets targeted side";
@@ -261,19 +296,16 @@
 	}
 	@media only screen and (max-width: 1000px) {
 		.combat {
-			grid-template-columns: 3fr 3fr 2fr;
-			grid-template-rows: 60px auto;
-			grid-gap: 10px;
+			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 			"turns turns turns"
-			"current targeted";
+			"current targets targeted";
 		}
 	}
 	@media only screen and (max-width: 600px) {
 		.combat {
-			grid-template-columns: auto;
-			grid-template-rows: 60px 1fr 2fr;
-			grid-gap: 10px;
+			grid-template-columns: 1fr;
+			grid-template-rows: 60px auto;
 			grid-template-areas:
 			"turns"
 			"current"

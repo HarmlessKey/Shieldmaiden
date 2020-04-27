@@ -3,7 +3,13 @@
 		<ul v-for="(type, index) in types" :key="index">
 			<h2>{{ type.name }}</h2>
 			<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-				<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+				<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+				<span 
+					v-else class="img" 
+					:style="{
+						'background-image': 'url(' + entity.img + ')',
+						'border-color': entity.color_label ? entity.color_label : ``
+					}"/>
 				<div class="progress health-bar">
 					<div class="info">
 						<span class="name" v-b-tooltip.hover :title="entity.name">
@@ -93,6 +99,7 @@
 
 <style lang="scss" scoped>
 ul {
+	user-select: none;
 	padding: 0;
 	list-style: none;
 
@@ -114,6 +121,7 @@ ul {
 			grid-area: img;
 			width: 30px; 
 			height: 30px;
+			border: solid 1px transparent;
 		}
 		.progress { 
 			height: 30px;

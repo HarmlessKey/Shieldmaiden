@@ -56,8 +56,8 @@
 						v-validate="'required'"
 						data-vv-as="Spell School">
 						<option :value="undefined" disabled>- Select School -</option>
-						<option v-for="(s) in schools"
-							:key="s.value" :value="s.value">{{ s.label }}</option>
+						<option v-for="({ label, value }) in schools"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
 				</b-col>
@@ -92,8 +92,8 @@
 						data-vv-as="Casting Type"
 						@change="clearErrors()">
 						<option :value="undefined" disabled>- Casting Type -</option>
-						<option v-for="(t) in cast_time"
-							:key="t.value" :value="t.value">{{t.label}}</option>
+						<option v-for="({ label, value }) in cast_time_type"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('cast_time_type')">{{ errors.first('cast_time_type') }}</p>
 					
@@ -166,17 +166,17 @@
 						data-vv-as="Range Type"
 						@change="clearErrors()">
 						<option :value="undefined" disabled>- Range Type -</option>
-						<option v-for="(val,i) in range_type"
-							:key="i" :value="val">{{val}}</option>
+						<option v-for="({ label, value }) in range_type"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('range_type')">{{ errors.first('range_type') }}</p>
 				</b-col>
 
 				<!-- RANGE -->
 				<b-col md="4">
-					<label class="required" for="range">Range ft.</label>
+					<label for="range" :class="{ required: spell.range_type === 'ranged' }">Range ft.</label>
 					<b-form-input v-model="spell.range"
-						:disabled="spell.range_type!='Ranged'"
+						:disabled="spell.range_type !== 'ranged'"
 						autocomplete="off"
 						id="range"
 						name="range"
@@ -202,10 +202,11 @@
 							placeholder="Classes">
 							<el-option
 								v-for="item in classes"
-								:key="item"
-								:label="item"
-								:value="item">
+								:key="item.value"
+								:label="item.label"
+								:value="item.value">
 							</el-option>
+
 						</el-select>
 					</div>
 				</b-col>
@@ -223,8 +224,9 @@
 						data-vv-as="Duration Type"
 						@change="clearErrors()">
 						<option :value="undefined" disabled>- Duration Type -</option>
-						<option v-for="(val,i) in dur_type"
-							:key="i" :value="val">{{val}}</option>
+
+						<option v-for="({ label, value }) in dur_type"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('duration_type')">{{ errors.first('duration_type') }}</p>
 				</b-col>
@@ -258,8 +260,8 @@
 						class="form-control mb-2"
 						data-vv-as="Duriation scale">
 						<option :value="undefined" disabled>- Time Scale -</option>
-						<option v-for="(val,i) in dur_time"
-							:key="`dur_time-${i}`" :value="val.value">{{ val.label }}</option>
+						<option v-for="({ label, value}, i) in dur_time"
+							:key="value" :value="value">{{ label }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('duration_scale')">{{ errors.first('duration_scale') }}</p>
 				</b-col>
@@ -277,8 +279,9 @@
 						data-vv-as="AOE Type"
 						@change="clearErrors()">
 						<option :value="undefined" disabled>- AOE Type -</option>
-						<option v-for="(val,i) in aoe_type"
-							:key="i" :value="val">{{val}}</option>
+						<option v-for="({ label, value }) in aoe_type"
+							:key="value" :value="value">{{label}}</option>
+
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
 				</b-col>
@@ -329,8 +332,8 @@
 						class="form-control mb-2"
 						@change="$forceUpdate()">
 						<option :value="undefined" disabled>- Level Scaling -</option>
-						<option v-for="(val,i) in lvl_scaling"
-							:key="i" :value="val">{{val}}</option>
+						<option v-for="({ label, value }) in lvl_scaling"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('level_scaling')">{{ errors.first('level_scaling') }}</p>
 				</b-col>
@@ -420,37 +423,69 @@ export default {
 				{ label: "Evocation", value: "evocation" },
 				{ label: "Illusion", value: "illusion" },
 				{ label: "Necromancy", value: "necromancy" },
-				{ label: "Transmutation", value: "transmutation" }
+				{ label: "Transmutation", value: "transmutation" },
 			],
-			cast_time: [
+			cast_time_type: [
 				{ label: "Action", value: "action" },
 				{ label: "Bonus Action", value: "bonus action" }, 
 				{ label: "Reaction", value: "reaction" }, 
 				{ label: "Minute", value: "minute" }, 
 				{ label: "Hour", value: "hour" }, 
 				{ label: "No Action", value: "no action" }, 
-				{ label: "Special", value: "special" }
+				{ label: "Special", value: "special" },
 			],
-			range_type: ["Self", "Touch", "Ranged", "Sight", "Unlimited"],
+			range_type: [
+				{ label: "Self", value: "self" },
+				{ label: "Touch", value: "touch" },
+				{ label: "Ranged", value: "ranged" },
+				{ label: "Sight", value: "sight" },
+				{ label: "Unlimited", value: "unlimited" },
+			],
 			dur_type: [
-				"Concentration", 
-				"Instantaneous", 
-				"Special",
-				"Time", 
-				"Until Dispelled", 
-				"Until Dispelled or Triggered"
+				{ label: "Concentration", value: "concentration" },
+				{ label: "Instantaneous", value: "instantaneous" },
+				{ label: "Special", value: "special" },
+				{ label: "Time", value: "time" },
+				{ label: "Until Dispelled", value: "until dispelled" },
+				{ label: "Until Dispelled or Triggered", value: "until dispelled or triggered" },
 			],
-			dur_type_time: ["Concentration", "Time"],
+			dur_type_time: [ "concentration", "time" ],
 			dur_time: [
 				{ label: "Round", value: "round" },
 				{ label: "Minute", value: "minute" },
 				{ label: "Hour", value: "hour" },
-				{ label: "Day", value: "day" }
+				{ label: "Day", value: "day" },
 			],
-			aoe_type: ["None", "Cone", "Cube", "Cylinder", "Line", "Sphere", "Square", "Square Feet"],
-			lvl_scaling: ["None", "Character Level", "Spell Scale", "Spell Level"],
-			classes: ["Bard", "Barbarian", "Cleric", "Druid", "Fighter", "Monk", 
-				"Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"],
+			aoe_type: [
+				{ label: "None", value: "none" },
+				{ label: "Cone", value: "cone" },
+				{ label: "Cube", value: "cube" },
+				{ label: "Cylinder", value: "cylinder" },
+				{ label: "Line", value: "line" },
+				{ label: "Sphere", value: "sphere" },
+				{ label: "Square", value: "square" },
+				{ label: "Square Feet", value: "square feet" },
+			],
+			lvl_scaling: [
+				{ label: "None", value: "none" },
+				{ label: "Character Level", value: "character level" },
+				{ label: "Spell Scale", value: "spell scale" },
+				{ label: "Spell Level", value: "spell level" },
+			],
+			classes: [
+				{ label: "Bard", value: "bard" },
+				{ label: "Barbarian", value: "barbarian" },
+				{ label: "Cleric", value: "cleric" },
+				{ label: "Druid", value: "druid" },
+				{ label: "Fighter", value: "fighter" },
+				{ label: "Monk", value: "monk" },
+				{ label: "Paladin", value: "paladin" },
+				{ label: "Ranger", value: "ranger" },
+				{ label: "Rogue", value: "rogue" },
+				{ label: "Sorcerer", value: "sorcerer" },
+				{ label: "Warlock", value: "warlock" },
+				{ label: "Wizard", value: "wizard" },
+			],
 			classes_selected: null,
 
 		};
@@ -461,9 +496,11 @@ export default {
 		]),
 		setComponent(comp) {
 			if (Object.keys(this.spell.components)[0]=="0") {
-				this.spell.components = {'verbal':0,'somatic':0,'material':0}
+				this.spell.components = {'verbal':0,'somatic':0,'material':0};
 			}
-			this.spell.components[comp] = !this.spell.components[comp]
+			this.spell.components[comp] = !this.spell.components[comp];
+			console.log("set Comp")
+			this.clearErrors();
 		},
 		setRitual() {
 			let yn = ["yes", "no"]
@@ -472,6 +509,10 @@ export default {
 			}
 			this.spell.ritual = !this.spell.ritual
 		},
+		clearErrors() {
+			this.$validator.errors.clear();
+			this.$validator.validateAll();
+		}
 	},
 	computed: {
 		spell: {

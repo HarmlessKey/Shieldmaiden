@@ -2,15 +2,22 @@
 	<div>
 		<div class="target">
 			<span class="initiative" v-b-tooltip.hover title="Initiative">
-				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
+				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
 				<template v-else>{{ entity.initiative }}</template>
 			</span>
-			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
+			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red" /></span>
 			<span v-else-if="entity.transformed == true" class="img" v-b-tooltip.hover title="Transformed">
 				<i class="fas fa-paw-claws green"></i>
 			</span>
-			<span v-else class="img" :style="{'background-image': 'url(' + entity.img + ')'}">
-			</span>
+			<template v-else>
+				<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+				<span 
+					v-else class="img" 
+					:style="{
+						'background-image': 'url(' + entity.img + ')',
+						'border-color': entity.color_label ? entity.color_label : ``
+					}"/>
+			</template>
 			<span class="ac" 
 				:class="{ 
 					'green': entity.ac_bonus > 0, 
@@ -266,6 +273,7 @@
 	line-height: 30px;
 	grid-area: img;
 	overflow: hidden;
+	border: solid 1px transparent;
 
 	span {
 		position: relative;

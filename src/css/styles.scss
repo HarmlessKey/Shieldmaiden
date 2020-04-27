@@ -37,7 +37,6 @@ $discord-purple: #7289DA;
 $orange: #e76d3b;
 $yellow: #c1b947;
 $purple: #9b7aba;
-$discord-purple: #7289DA;
 $blue-light: #88b3ce;
 $green-light: #9ac16a;
 $orange-light: #db815e;
@@ -1339,4 +1338,124 @@ ul.nav {
 }
 .vb.vb-dragging-phantom > .vb-dragger > .vb-dragger-styler {
 	background-color: $gray-hover;
+}
+
+/* 9. Number field */
+/*********************************************/
+
+// Remove arrows from number field
+input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield;
+}
+
+.form-control:disabled {
+	opacity: 0.25 !important;
+}
+
+/* 10. Elements overrides */
+/*********************************************/
+.el-steps {
+	margin-bottom: 30px;
+
+	.el-step {
+		.el-step__line {
+			background-color: $gray-light;
+		}
+		.el-step__icon {
+			background-color: $gray-dark;
+			color: $gray-light;
+		}
+	}
+}
+
+.el-input {
+	.el-input__inner {
+			background-color: $gray-dark;
+			border-radius: 0;
+			border: none;
+	}
+}
+
+.el-select {
+	.el-select__tags {
+		.el-tag {
+			background-color: $gray-light;
+			color: $gray-dark;
+
+			.el-tag__close {
+				background-color: $gray;
+
+				&:hover {
+					background-color: $gray-dark;
+				}
+			}
+		}
+	}
+}
+
+.el-select-dropdown {
+
+}
+
+.el-color-picker {
+	
+	&__trigger {
+		height: 38px !important;
+		width: 38px !important;
+		border-radius: 0 !important;
+		border-color: $gray-hover !important;
+		padding: 3px !important;
+	}
+	&__color {
+		border: none !important;
+	}
+}
+
+.el-color-dropdown {
+	&.el-color-picker {
+		&__panel {
+			border-color: $gray-hover;
+			border-radius: 0;
+			background-color: $gray-dark;
+
+			.el-color-predefine {
+				&__color-selector {
+					> div {
+						border-radius: 0;
+					}
+					&.selected {
+						border-radius: 0;
+						box-shadow: none;
+						border: solid 1px $white;
+					}
+				}
+			}
+		}
+	}
+	&__btns {
+		.el-color-dropdown__value {
+			.el-input__inner {
+				color: $gray-light;
+				background-color: $gray-darker;
+			}
+		}
+		.el-button {
+			&.el-color-dropdown__btn {
+				border: none;
+				border-radius: 0;
+				background-color: $blue;
+				color: $white;
+
+				&:hover {
+					background-color: $blue-hover;
+					color: $white;
+				}
+			}
+		}
+	}
 }

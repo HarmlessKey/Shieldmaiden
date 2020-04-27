@@ -7,7 +7,12 @@
 				<span class="small gray-hover"> /{{ entities_len }}</span>
 			</span>
 
-				<div class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.key], npcs[current.key]) + '\')' }"></div>
+				<icon 
+					v-if="displayImg(current, players[current.id], npcs[current.id]) === 'monster' || displayImg(current, players[current.id], npcs[current.id]) === 'player'" class="img d-none d-md-block" 
+					:icon="displayImg(current, players[current.id], npcs[current.id])" 
+					:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
+				/>
+				<div v-else class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
 				<h1 class="d-none d-md-flex justify-content-start">
 					<span class="mr-3">
 						<template v-if="current.entityType == 'npc'">
@@ -113,6 +118,7 @@
 			background-size: cover;
 			background-position: center top;
 			margin-left: 15px;
+			border: solid 1px #b2b2b2;
 		}
 		h1 {
 			line-height: 45px;

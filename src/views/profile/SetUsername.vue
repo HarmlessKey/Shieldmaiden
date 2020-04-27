@@ -1,5 +1,5 @@
 <template>
-	<div class="container" v-if="user">
+	<div class="content container" v-if="user">
 		<template v-if="!userInfo || !userInfo.username">
 			<b-card header="Username">
 				<p>To continue, please first enter a username.</p>
@@ -42,11 +42,6 @@ export default {
 				check: 'available',
 			}
 		},
-		firebase() {
-			return {
-				usernames: db.ref('users')
-			}
-		},
 		computed: {
 			...mapGetters([
 				'userInfo',
@@ -58,30 +53,37 @@ export default {
 		},
 		methods: {
 			checkUsername() {
-				for (var i in this.usernames) {
-					var user = this.usernames[i]
-					if(user.username) {
-						if (user.username.toLowerCase() == this.username.toLowerCase()) {
-							this.check = 'unavailable';
-							break
-						} else {
-							this.check = 'available';
-						}
+				
+				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.username.toLowerCase());
+
+				// Check username
+				username.on('value' , (snapshot) => {
+					if(snapshot.exists()) {
+						this.check = 'unavailable';
+						return
 					} else {
 						this.check = 'available';
 					}
-				}
+				});
+
 			},
 			setUsername() {
 				this.$validator.validateAll().then((result) => {
-					if (result && this.check == 'available') {
+					if (result && this.check === 'available') {
 						let user = {
 							username: this.username,
 							email: this.user.email
 						}
-						if (this.poster)
-							user.poster = true
+						if (this.poster) user.poster = true;
+
 						db.ref(`users/${this.user.uid}`).update(user);
+
+						//Save searchable results in search_user
+						db.ref(`search_users`).child(this.user.uid).set({
+							username: this.username.toLowerCase(),
+							email: this.user.email.toLowerCase()
+						});
+
 						this.$snotify.success('Username saved.', 'Critical hit!', {
 							position: "centerTop"
 						});

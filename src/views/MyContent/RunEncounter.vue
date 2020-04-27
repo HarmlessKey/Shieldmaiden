@@ -268,13 +268,13 @@
 		background: rgba(38, 38, 38, .9) !important;
 	}
 	.combat {
-		padding:10px;
-		width: 100vw;
+		padding: 5px;
+		width: 100%;
 		height: calc(100% - 50px);
 		display: grid;
 		grid-template-columns: 3fr 4fr 3fr 2fr;
 		grid-template-rows: 60px auto;
-		grid-gap: 10px;
+		grid-gap: 5px;
 		grid-template-areas:
 		"turns turns turns turns"
 		"current targets targeted side";
@@ -296,19 +296,16 @@
 	}
 	@media only screen and (max-width: 1000px) {
 		.combat {
-			grid-template-columns: 3fr 3fr 2fr;
-			grid-template-rows: 60px auto;
-			grid-gap: 10px;
+			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 			"turns turns turns"
-			"current targeted";
+			"current targets targeted";
 		}
 	}
 	@media only screen and (max-width: 600px) {
 		.combat {
-			grid-template-columns: auto;
-			grid-template-rows: 60px 1fr 2fr;
-			grid-gap: 10px;
+			grid-template-columns: 1fr;
+			grid-template-rows: 60px auto;
 			grid-template-areas:
 			"turns"
 			"current"

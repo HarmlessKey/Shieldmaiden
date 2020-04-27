@@ -442,6 +442,7 @@ ul.targets {
 		margin-top: 30px;
 
 		.topinfo {
+			cursor: default;
 			text-transform: uppercase;
 			font-size: 11px;
 			width: 100%;

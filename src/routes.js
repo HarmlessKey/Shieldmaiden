@@ -231,6 +231,9 @@ export const routes = [{
 	path: '/set-username',
 	name: 'Username',
 	component: Username,
+	meta: {
+		sidebar: false
+	}
 },
 {
 	path: '/followed',

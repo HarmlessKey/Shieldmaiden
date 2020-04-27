@@ -169,11 +169,11 @@ export default {
 			this.spell.school = this.old_spell.school.name.toLowerCase();
 			this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false;
 			this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level;
-			this.spell.level_scaling = (this.old_spell.higher_level) ? undefined : "None";
+			this.spell.level_scaling = (this.old_spell.higher_level) ? undefined : "none";
 			
 			// Parse range options
 			if (parseInt(this.old_spell.range)) {
-				this.spell.range_type = "Ranged";
+				this.spell.range_type = "ranged";
 				let range_list = this.old_spell.range.split(' ');
 				let rangeN = parseInt(range_list[0]);
 				// Parse miles to feet
@@ -182,7 +182,7 @@ export default {
 				}
 				this.spell.range = rangeN;
 			} else {
-				this.spell.range_type = this.old_spell.range;
+				this.spell.range_type = this.old_spell.range.toLowerCase();
 				delete this.spell.range;
 			}
 
@@ -214,10 +214,10 @@ export default {
 			if (/\d/.test(this.old_spell.duration)) {
 				let duration_list = this.old_spell.duration.split(' ');
 				if (this.old_spell.concentration == 'yes') {
-					this.spell.duration_type = "Concentration";
+					this.spell.duration_type = "concentration";
 					duration_list = duration_list.slice(2);
 				} else {
-					this.spell.duration_type = "Time";
+					this.spell.duration_type = "time";
 				}
 				
 				// Find duration time number and scale
@@ -228,11 +228,10 @@ export default {
 				if (scale[scale.length -1] == 's') {
 					scale = scale.substring(0, scale.length -1);
 				}
-				this.spell.duration_scale = scale;
+				this.spell.duration_scale = scale.toLowerCase();
 
 			} else {
-				let duration_list = this.old_spell.duration.split(' ');
-				this.spell.duration_type = duration_list.map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ');
+				this.spell.duration_type = this.old_spell.duration.toLowerCase();
 			}
 
 			// Parse Description
@@ -251,8 +250,9 @@ export default {
 			// Parse classes
 			let classes = [];
 			for (let index in this.old_spell.classes) {
-				classes.push(this.old_spell.classes[index].name);
+				classes.push(this.old_spell.classes[index].name.toLowerCase());
 			}
+			console.log(classes)
 			this.spell.classes = classes;
 
 			// Source book

@@ -21,7 +21,7 @@
 		"element-ui": "^2.7.2",
 		"firebase": "^5.8.6",
 		"firebaseui": "^3.4.1",
-		"jquery": "^3.3.1",
+		"jquery": "^3.5.0",
 		"lodash": "^4.17.11",
 		"node": "^11.0.0",
 		"popper": "^1.0.1",

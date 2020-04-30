@@ -25,13 +25,17 @@
 								:perPage="15"
 								:search="['name']"
 							>
-								<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
-									<span>{{data.item}}</span>
+								<router-link 
+									:to="'/contribute/spells/' + data.row['.key']" 
+									slot="name" slot-scope="data"
+									:class="isDifficult(data.row) ? 'red' : ''"
+								>
+									<span>{{ data.item }}</span>
 									<a v-if="isDifficult(data.row)"
 										class="ml-2"
 										v-b-popover.hover.top="'This spell is tagged as difficult'" 
 									><i class="fas fa-exclamation-triangle"></i></a>
-								</div>
+								</router-link>
 								<div slot="actions" slot-scope="data" class="actions">
 									<a 
 										v-if="Object.keys(taggedSpells).length === 0"

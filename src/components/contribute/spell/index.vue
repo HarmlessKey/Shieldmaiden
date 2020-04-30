@@ -5,7 +5,7 @@
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="canEdit()">
 				<router-link :to="'/contribute/spells/' + spellId + '/edit'" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></router-link>
-				<a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a>
+				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
 

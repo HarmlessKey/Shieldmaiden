@@ -58,7 +58,7 @@
 								<p class="validate red" v-if="errors.has(`modifier_subtype-${mod_index}`)">{{ errors.first(`modifier_subtype-${mod_index}`) }}</p>
 							</b-col>
 					
-							<b-col md="4">
+							<b-col md="3">
 								<!-- SPELL FAIL MODIFIER -->
 								<template v-if="action_type === 'spell save'">
 									<label for="dice_type" class="required">
@@ -112,7 +112,7 @@
 							</b-col>
 
 							<!-- SPECIAL ACTIONS -->
-							<b-col md="4">
+							<b-col md="3">
 								<label :for="`modifier_subtype-${mod_index}`">
 									Special
 									<a 
@@ -134,6 +134,27 @@
 									<option v-for="(special, key) in specials"
 										:key="key" :value="key">{{ special.label }}</option>
 								</b-form-select>
+							</b-col>
+							<!-- PROJECTILE COUNT -->
+							<b-col md="2">
+								<label for="projectile_count">
+									<span>Count</span>
+									<a 
+										class="ml-1"
+										v-b-popover.hover.top="'Number of projectiles that are cast'" 
+										title="Number of Projectiles"
+									><i class="fas fa-info-circle"></i></a>
+								</label>
+								<b-form-input v-model="modifier.projectile_count"
+									autocomplete="off"
+									id="projectile_count"
+									name="projectile_count"
+									class="form-control mb-2"
+									title="Count"
+									type="number"
+									data-vv-as="Count"
+									@keyup="$forceUpdate()"
+									></b-form-input>
 							</b-col>
 						</b-row>
 						<b-row>
@@ -224,7 +245,7 @@
 							<template v-for="(level_tier, tier_index) in modifier.level_tiers">
 								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
-									<b-col md="3">
+									<b-col md="2">
 										<label class="required" :for="`level-${mod_index}`">{{level_scaling.capitalizeEach()}}</label>
 										<b-form-input v-model="level_tier.level"
 											autocomplete="off"
@@ -239,8 +260,22 @@
 											></b-form-input>
 											<p class="validate red" v-if="errors.has(`level-${mod_index}`)">{{ errors.first(`level-${mod_index}`) }}</p>
 									</b-col>
+									<!-- HL PROJECTILE COUNT -->
+									<b-col md="2">
+										<label for="projectile_count">Count</label>
+										<b-form-input v-model="level_tier.projectile_count"
+											autocomplete="off"
+											id="projectile_count"
+											name="projectile_count"
+											class="form-control mb-2"
+											title="Count"
+											type="number"
+											data-vv-as="Count"
+											@keyup="$forceUpdate()"
+											></b-form-input>
+									</b-col>
 									<!-- HL DICE COUNT -->
-									<b-col md="3">
+									<b-col md="2">
 										<label for="dice_count">Dice Count</label>
 										<b-form-input v-model="level_tier.dice_count"
 											autocomplete="off"

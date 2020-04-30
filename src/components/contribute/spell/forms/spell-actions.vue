@@ -112,7 +112,7 @@ export default {
 				this.spell.actions = [];
 			}
 			this.spell.actions.push({
-				type: "Spell Attack",
+				type: "spell attack",
 				modifiers: [],
 				conditions: [],
 				notifications: [],

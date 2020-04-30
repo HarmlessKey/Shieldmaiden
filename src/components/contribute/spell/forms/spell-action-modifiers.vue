@@ -43,7 +43,7 @@
 									</a>
 								</label>
 								<b-form-select v-model="modifier.subtype"
-									:disabled="action_type == 'Healing Spell'"
+									:disabled="action_type == 'healing spell'"
 									:id="`modifier_subtype-${mod_index}`"
 									:name="`modifier_subtype-${mod_index}`"
 									title="Modifier Subtype"
@@ -52,15 +52,15 @@
 									data-vv-as="Modifier Subtype"
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Subtype -</option>
-									<option v-for="(val,i) in modifier_subtype"
-										:key="i" :value="val">{{val}}</option>
+									<option v-for="({ label, value }) in modifier_subtype"
+										:key="value" :value="value">{{label}}</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`modifier_subtype-${mod_index}`)">{{ errors.first(`modifier_subtype-${mod_index}`) }}</p>
 							</b-col>
 					
 							<b-col md="4">
 								<!-- SPELL FAIL MODIFIER -->
-								<template v-if="action_type === 'Spell Save'">
+								<template v-if="action_type === 'spell save'">
 									<label for="dice_type" class="required">
 										<span>Save Fail Modifier</span>
 										<a 
@@ -72,7 +72,7 @@
 										</a>
 									</label>
 									<b-form-select v-model="modifier.save_fail_mod"
-										:disabled="action_type !== 'Spell Save'"
+										:disabled="action_type !== 'spell save'"
 										id="save_fail_mod"
 										name="save_fail_mod"
 										title="Save Fail Modifier"
@@ -80,8 +80,8 @@
 										data-vv-as="Save Fail Modifier"
 										@change="$forceUpdate()">
 										<!-- <option value="undefined" disabled>- Subtype -</option> -->
-										<option v-for="(val,i) in save_fail_mod"
-											:key="i" :value="val.value">{{ val.label }}</option>
+										<option v-for="({ label, value }) in save_fail_mod"
+											:key="value" :value="value">{{ label }}</option>
 									</b-form-select>
 									<p class="validate red" v-if="errors.has(`save_fail_mod-${mod_index}`)">{{ errors.first(`save_fail_mod-${mod_index}`) }}</p>
 								</template>
@@ -208,7 +208,7 @@
 							</div>
 						</b-col>
 						</b-row>
-						<template v-if="level_scaling != undefined && level_scaling != 'None'">
+						<template v-if="level_scaling != undefined && level_scaling != 'none'">
 							<!-- HIGHER LEVEL MODIFIER -->
 							<h2 class="d-flex justify-content-between mt-3">
 									Scaling
@@ -225,7 +225,7 @@
 								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
 									<b-col md="3">
-										<label class="required" :for="`level-${mod_index}`">{{level_scaling}}</label>
+										<label class="required" :for="`level-${mod_index}`">{{level_scaling.capitalizeEach()}}</label>
 										<b-form-input v-model="level_tier.level"
 											autocomplete="off"
 											:id="`level-${mod_index}`"
@@ -328,7 +328,7 @@ export default {
 			}
 		},
 		shown_level_tiers() {
-			if (this.level_scaling == "Spell Scale") {
+			if (this.level_scaling == "spell scale") {
 				return 1;
 			}
 			return 100;
@@ -340,9 +340,25 @@ export default {
 
 	data() {
 		return {
-			modifier_type: ["Damage", "Healing"],
-			modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
-				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
+			modifier_type: [
+				{label: "Damage", value: "damage"},
+				{label: "Healing", value: "healing"}
+			],
+			modifier_subtype: [
+				{ label: "Acid", value: "acid" },
+				{ label: "Bludgeoning", value: "bludgeoning" },
+				{ label: "Cold", value: "cold" },
+				{ label: "Fire", value: "fire" },
+				{ label: "Force", value: "force" },
+				{ label: "Lightning", value: "lightning" },
+				{ label: "Necrotic", value: "necrotic" },
+				{ label: "Piercing", value: "piercing" },
+				{ label: "Poison", value: "poison" },
+				{ label: "Psychic", value: "psychic" },
+				{ label: "Radiant", value: "radiant" },
+				{ label: "Slashing", value: "slashing" },
+				{ label: "Thunder", value: "thunder" },
+			],
 			dice_type: [
 				{ label: "d4", value: 4 }, 
 				{ label: "d6", value: 6 },
@@ -398,7 +414,7 @@ export default {
 			this.$forceUpdate()
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "Spell Scale" && 
+			if (this.level_scaling == "spell scale" && 
 					this.modifiers[index].level_tiers &&
 					this.modifiers[index].level_tiers.length >= 1) {
 				return false
@@ -408,7 +424,7 @@ export default {
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
 			let description = []
-			if (this.level_scaling == "Character Level") {
+			if (this.level_scaling == "character level") {
 				description = ["This spell's damage increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
@@ -417,7 +433,7 @@ export default {
 					description.push(new_line)
 				}
 			} 
-			else if (this.level_scaling == "Spell Scale") {
+			else if (this.level_scaling == "spell scale") {
 				let tier = level_tiers[0]
 				let new_line = "When you cast this spell using a spell slot of "
 				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
@@ -426,7 +442,7 @@ export default {
 				
 				description = [new_line]
 			} 
-			else if (this.level_scaling == "Spell Level") {
+			else if (this.level_scaling == "spell level") {
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "
@@ -451,6 +467,9 @@ export default {
 			immediate: true,
 		}
 	},
+	// mounted() {
+		
+	// },
 };
 </script>
 

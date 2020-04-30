@@ -51,11 +51,8 @@
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Application -</option>
 									<option 
-										v-for="(appl, i) in application"
-										:key="`appl-${i}`" :value="appl"
-									>
-										{{ appl }}
-									</option>
+										v-for="({ label, value }, i) in application"
+										:key="value" :value="value">{{ label }}</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
 
@@ -79,11 +76,8 @@
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Apply to -</option>
 									<option 
-										v-for="(target, i) in targets"
-										:key="`target-${i}`" :value="target"
-									>
-										{{ target }}
-									</option>
+										v-for="({ label, value}) in targets"
+										:key="value" :value="value">{{ label }}</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`target-${not_index}`)">{{ errors.first(`target-${not_index}`) }}</p>
 
@@ -190,12 +184,12 @@ export default {
     return {
 			scaleVariable: undefined,
 			application: [
-				"Always",
-				"Failed save"
+				{ label: "Always", value: "always" },
+				{ label: "Failed save", value: "Failed Save" },
 			],
 			targets: [
-				"Target",
-				"Caster"
+				{label: "Target", value: "target" },
+				{label: "Caster", value: "caster" }
 			]
     };
 	},
@@ -236,14 +230,14 @@ export default {
 			this.validation = validate;
 		},
 		scalableVariable(variable) {
-			if(this.level_scaling === "Spell Scale") {
+			if(this.level_scaling === "spell scale") {
 				return variable.length === 1 && !isNaN(variable[0]);
 			} else {
 				return variable.length === 1;
 			}
 		},
 		level_tier_addable(index, key) {
-			if (this.level_scaling === "Spell Scale" && 
+			if (this.level_scaling === "spell scale" && 
 					this.notifications[index].scaling &&
 					this.notifications[index].scaling[key] &&
 					this.notifications[index].scaling[key].level_tiers &&
@@ -270,7 +264,7 @@ export default {
 		create_spell_level_tier_description(level_tiers, variable) {
 			// Generates description for each level tier for spell level scaling
 			let description = []
-			if (this.level_scaling == "Character Level") {
+			if (this.level_scaling == "character level") {
 				description = [`'${variable}' changes when your character reaches a higher level.`]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
@@ -279,7 +273,7 @@ export default {
 					description.push(new_line)
 				}
 			} 
-			else if (this.level_scaling == "Spell Scale") {
+			else if (this.level_scaling == "spell scale") {
 				let tier = level_tiers[0]
 				let new_line = "When you cast this spell using a spell slot of "
 				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the value of '${variable}' increases by `
@@ -288,7 +282,7 @@ export default {
 				
 				description = [new_line]
 			} 
-			else if (this.level_scaling == "Spell Level") {
+			else if (this.level_scaling == "spell level") {
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "

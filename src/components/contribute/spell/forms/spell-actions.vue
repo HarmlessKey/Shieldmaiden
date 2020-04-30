@@ -15,7 +15,6 @@
 				<span>Spell Actions</span>
 				<a 
 				class="gray-hover text-capitalize" 
-				v-b-tooltip.hover title="Add Action" 
 				@click="add_action()">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
@@ -35,6 +34,9 @@
 						{{ data.item ? data.item.length : "" }}
 					</template>
 					<template slot="notifications" slot-scope="data">
+						{{ data.item ? data.item.length : "" }}
+					</template>
+					<template slot="effects" slot-scope="data">
 						{{ data.item ? data.item.length : "" }}
 					</template>
 					<div slot="actions" class="actions" slot-scope="data">
@@ -85,6 +87,10 @@ export default {
 					label: '<i class="fas fa-bell"></i>',
 					center: true
 				},
+				effects: {
+					label: '<i class="fas fa-hand-holding-magic"></i>',
+					center: true
+				},	
 				actions: {
 					label: '<i class="far fa-ellipsis-h"></i>',
 					noPadding: true,
@@ -116,6 +122,7 @@ export default {
 				modifiers: [],
 				conditions: [],
 				notifications: [],
+				effects: []
 			});
 			this.$forceUpdate();
 		},

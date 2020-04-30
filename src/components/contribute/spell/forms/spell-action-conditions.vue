@@ -15,6 +15,7 @@
 			<div class="card" v-if="conditions && conditions.length > 0" :key="`condition-${con_index}`">
 				<div v-b-toggle="'accordion-'+con_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
+						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(con_index) + 1}}. {{ condition.condition }}
 					</div>
 					<a @click="remove_condition(con_index)"
@@ -160,5 +161,26 @@ h2 {
 label {
 	display: flex;
 	justify-content: flex-start;
+}
+.card {
+	.card-header {
+		cursor: pointer;
+		background-color: #191919;
+
+		.caret {
+			display: inline-block;
+			padding-right: 5px;
+		}
+		&.collapsed {
+			.caret {
+				i.fa-caret-down {
+					transform: rotate(-90deg);
+				}
+			}
+		}
+	}
+	.card-body {
+		background-color: #232323;
+	}
 }
 </style>

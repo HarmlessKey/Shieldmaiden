@@ -16,9 +16,10 @@
 			<div class="card" v-if="modifiers && modifiers.length > 0" :key="`modifier-${mod_index}`">
 				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
+						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(mod_index) + 1}}.
 						{{modifier.name}}
-						{{modifier.dice_count}}{{modifier.dice_type ? "D" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
+						{{modifier.dice_count}}{{modifier.dice_type ? "d" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
 						{{modifier.subtype}} {{modifier.type}}
 					</div>
 					<a @click="remove_modifier(mod_index)"
@@ -495,5 +496,26 @@ label {
 .remove {
 	padding-top: 7px;
 	margin-left: 10px;
+}
+.card {
+	.card-header {
+		cursor: pointer;
+		background-color: #191919;
+
+		.caret {
+			display: inline-block;
+			padding-right: 5px;
+		}
+		&.collapsed {
+			.caret {
+				i.fa-caret-down {
+					transform: rotate(-90deg);
+				}
+			}
+		}
+	}
+	.card-body {
+		background-color: #232323;
+	}
 }
 </style>

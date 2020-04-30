@@ -470,12 +470,19 @@ export default {
 			} 
 			else if (this.level_scaling == "spell scale") {
 				let tier = level_tiers[0]
-				let new_line = "When you cast this spell using a spell slot of "
-				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
-				new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
-				new_line += `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
+				// Opening line
+				let level_txt = "When you cast this spell using a spell slot of "
+				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
+				// Damage modifier text
+				let damage_txt = 'the damage of this modifier increases by '
+				damage_txt += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""}`
+				// Projectile count text
+				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
+				// Spell slot text
+				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
 				
-				description = [new_line]
+				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${tier.dice_count ? damage_txt : ''} ${slot_txt}`
+				description = [text]
 			} 
 			else if (this.level_scaling == "spell level") {
 				for (let index in level_tiers) {

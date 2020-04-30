@@ -25,6 +25,13 @@
 								:perPage="15"
 								:search="['name']"
 							>
+								<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
+									<span>{{data.item}}</span>
+									<a v-if="isDifficult(data.row)"
+										class="ml-2"
+										v-b-popover.hover.top="'This spell is tagged as difficult'" 
+									><i class="fas fa-exclamation-triangle"></i></a>
+								</div>
 								<div slot="actions" slot-scope="data" class="actions">
 									<a 
 										v-if="Object.keys(taggedSpells).length === 0"
@@ -61,6 +68,12 @@
 									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
+									</a>
+									<a 
+										@click="markDifficult(data.row['.key'], data.row['metadata'].difficult)"
+										v-b-tooltip.hover title="Mark Difficult"
+									>
+										<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
 									</a>
 									<a 
 										@click="confirmFinish(data.row['.key'], data.row.name)"
@@ -179,22 +192,31 @@
 			...mapActions([
 				'setSlide'
 			]),
+			isDifficult(row) {
+				return (row.metadata && row.metadata.difficult)
+			},
 			tag(key, name) {
-				db.ref(`spells/${key}`).update({
-					metadata: {
+				db.ref(`spells/${key}/metadata`).update({
 						tagged: this.userId
-					}
 				});
 				db.ref(`new_spells/${key}`).update({
 					name,
-					metadata: {
-						tagged: this.userId
-					}
+				});
+				db.ref(`new_spells/${key}/metadata`).update({
+					tagged: this.userId
 				});
 			},
 			unTag(key) {
 				db.ref(`new_spells/${key}/metadata/tagged`).remove();
 				db.ref(`spells/${key}/metadata/tagged`).remove();
+			},
+			markDifficult(key, current) {
+				db.ref(`new_spells/${key}/metadata`).update({
+					difficult: !current
+				});
+				db.ref(`spells/${key}/metadata`).update({
+					difficult: !current
+				});
 			},
 			confirmFinish(key, name) {
 				this.$snotify.error('Are you sure you\'ve finished the item "' + name + '"? Make sure not to set incomplete items to finised.', 'Finish Item', {

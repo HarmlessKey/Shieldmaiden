@@ -17,12 +17,19 @@ export const effects = {
 				defenses: {
 					label: "Defenses",
 					info: "Set Vulnerability, Resistance or Immunity."
+				},
+				advantage: {
+					label: "Advantage"
+				},
+				disadvantage: {
+					label: "Advantage"
 				}
 			},
 			effect_subtypes: {
 				bonus: [
 					{ value: "AC", label: "Armor Class" },
 					{ value: "maxHp", label: "Maximum Hit Points" },
+					{ value: "attack", label: "Attack Rolls" },
 				],
 				set: [
 					{ value: "AC", label: "Armor Class" },
@@ -37,6 +44,16 @@ export const effects = {
 					{ value: "v", label: "Vulnerable" },
 					{ value: "r", label: "Resistant" },
 					{ value: "i", label: "Immune" }
+				],
+				advantage: [
+					{ value: "attack", label: "Attack Rolls" },
+					{ value: "ability", label: "Ability Checks" },
+					{ value: "save", label: "Saving Throws" },
+				],
+				disadvantage: [
+					{ value: "attack", label: "Attack Rolls" },
+					{ value: "ability", label: "Ability Checks" },
+					{ value: "save", label: "Saving Throws" },
 				]
 			}
 		}

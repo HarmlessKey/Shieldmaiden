@@ -103,6 +103,27 @@
 				</b-col>
 			</template>
 
+			<!-- DEFENSES -->
+			<template v-else-if="effect.type === 'advantage' || effect.type === 'disadvantage'">
+				<b-col md="6" v-if="effect.subtype !== 'attack'">
+					<label for="ability">
+						Ability
+					</label>
+					<b-form-select v-model="effect.ability"
+						id="ability"
+						name="ability"
+						title="effect Subtype"
+						class="form-control mb-2"
+						data-vv-as="effect Subtype"
+						@change="$forceUpdate()">
+						<option :value="undefined" disabled>- Ability -</option>
+						<option v-for="ability in abilities"
+							:key="ability" :value="ability">{{ ability }}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+				</b-col>
+			</template>
+
 			<!-- ALL OTHER -->
 			<template v-else>
 				<!-- DICE COUNT -->
@@ -183,10 +204,11 @@
 
 <script>
 import { effects } from '../mixins/effects';
+import { abilities } from '../mixins/abilities';
 
 export default {
 	name: "EffectsForm",
-	mixins: [effects],
+	mixins: [effects, abilities],
 	props: {
 		value: Object,
 		variables: {

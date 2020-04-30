@@ -46,6 +46,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 Vue.use(BootstrapVue);
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
+
+require('./functions.js')
+
 // Set-up and use the Vue Router
 // Pass in your routes and then
 // Set the mode to use history

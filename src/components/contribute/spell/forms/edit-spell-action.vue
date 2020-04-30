@@ -23,8 +23,8 @@
 						data-vv-as="Action Type"
 						@change="$forceUpdate()">
 						<option :value="undefined" disabled>- Action Type -</option>
-						<option v-for="(val,i) in attack_type"
-							:key="i" :value="val" selected="selected">{{val}}</option>
+						<option v-for="({ label, value}) in attack_type"
+							:key="value" :value="value" selected="selected">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
 				</b-col>
@@ -32,7 +32,7 @@
 				<b-col md="3">
 					<label for="save">Save</label>
 					<b-form-select v-model="spell_action.save"
-						:disabled="spell_action.type != 'Spell Save'"
+						:disabled="spell_action.type != 'spell save'"
 						id="save"
 						name="save"
 						title="Save"
@@ -40,8 +40,8 @@
 						data-vv-as="Save"
 						@change="$forceUpdate()">
 						<option :value="undefined" disabled>- Save -</option>
-						<option v-for="(val,i) in save"
-							:key="i" :value="val">{{val}}</option>
+						<option v-for="({ label, value}) in save"
+							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 				</b-col>
 			</b-row>
@@ -196,8 +196,24 @@ export default {
 
 	data() {
 		return {
-			attack_type: ["Melee Weapon", "Ranged Weapon", "Spell Attack", "Spell Save", "Healing Spell", "Damage", "Other"],
-			save: ["None", "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"],
+			attack_type: [
+				{ label: "Melee Weapon", value: "melee weapon" },
+				{ label: "Ranged Weapon", value: "ranged weapon" },
+				{ label: "Spell Attack", value: "spell attack" },
+				{ label: "Spell Save", value: "spell save" },
+				{ label: "Healing Spell", value: "healing spell" },
+				{ label: "Damage", value: "damage" },
+				{ label: "Other", value: "other" },
+			],
+			save: [
+				{ label: "None", value: "none" },
+				{ label: "Strength", value: "strength" },
+				{ label: "Dexterity", value: "dexterity" },
+				{ label: "Constitution", value: "constitution" },
+				{ label: "Intelligence", value: "intelligence" },
+				{ label: "Wisdom", value: "wisdom" },
+				{ label: "Charisma", value: "charisma" },
+			],
 			validators: {},
 		};
 	},

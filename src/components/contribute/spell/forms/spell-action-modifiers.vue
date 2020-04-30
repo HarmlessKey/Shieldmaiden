@@ -18,8 +18,8 @@
 					<div class="gray-light" >
 						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(mod_index) + 1}}.
-						{{modifier.name}}
-						{{modifier.dice_count}}{{modifier.dice_type ? "d" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
+						{{modifier.projectile_count ? `${modifier.projectile_count}x`: ""}}
+						{{modifier.dice_count}}{{modifier.dice_type ? "D" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
 						{{modifier.subtype}} {{modifier.type}}
 					</div>
 					<a @click="remove_modifier(mod_index)"
@@ -44,7 +44,7 @@
 									</a>
 								</label>
 								<b-form-select v-model="modifier.subtype"
-									:disabled="action_type == 'Healing Spell'"
+									:disabled="action_type == 'healing spell'"
 									:id="`modifier_subtype-${mod_index}`"
 									:name="`modifier_subtype-${mod_index}`"
 									title="Modifier Subtype"
@@ -53,15 +53,15 @@
 									data-vv-as="Modifier Subtype"
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Subtype -</option>
-									<option v-for="(val,i) in modifier_subtype"
-										:key="i" :value="val">{{val}}</option>
+									<option v-for="({ label, value }) in modifier_subtype"
+										:key="value" :value="value">{{label}}</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`modifier_subtype-${mod_index}`)">{{ errors.first(`modifier_subtype-${mod_index}`) }}</p>
 							</b-col>
 					
-							<b-col md="4">
+							<b-col md="3">
 								<!-- SPELL FAIL MODIFIER -->
-								<template v-if="action_type === 'Spell Save'">
+								<template v-if="action_type === 'spell save'">
 									<label for="dice_type" class="required">
 										<span>Save Fail Modifier</span>
 										<a 
@@ -73,7 +73,7 @@
 										</a>
 									</label>
 									<b-form-select v-model="modifier.save_fail_mod"
-										:disabled="action_type !== 'Spell Save'"
+										:disabled="action_type !== 'spell save'"
 										id="save_fail_mod"
 										name="save_fail_mod"
 										title="Save Fail Modifier"
@@ -81,8 +81,8 @@
 										data-vv-as="Save Fail Modifier"
 										@change="$forceUpdate()">
 										<!-- <option value="undefined" disabled>- Subtype -</option> -->
-										<option v-for="(val,i) in save_fail_mod"
-											:key="i" :value="val.value">{{ val.label }}</option>
+										<option v-for="({ label, value }) in save_fail_mod"
+											:key="value" :value="value">{{ label }}</option>
 									</b-form-select>
 									<p class="validate red" v-if="errors.has(`save_fail_mod-${mod_index}`)">{{ errors.first(`save_fail_mod-${mod_index}`) }}</p>
 								</template>
@@ -113,7 +113,7 @@
 							</b-col>
 
 							<!-- SPECIAL ACTIONS -->
-							<b-col md="4">
+							<b-col md="3">
 								<label :for="`modifier_subtype-${mod_index}`">
 									Special
 									<a 
@@ -135,6 +135,27 @@
 									<option v-for="(special, key) in specials"
 										:key="key" :value="key">{{ special.label }}</option>
 								</b-form-select>
+							</b-col>
+							<!-- PROJECTILE COUNT -->
+							<b-col md="2">
+								<label for="projectile_count">
+									<span>Count</span>
+									<a 
+										class="ml-1"
+										v-b-popover.hover.top="'Number of projectiles that are cast'" 
+										title="Number of Projectiles"
+									><i class="fas fa-info-circle"></i></a>
+								</label>
+								<b-form-input v-model="modifier.projectile_count"
+									autocomplete="off"
+									id="projectile_count"
+									name="projectile_count"
+									class="form-control mb-2"
+									title="Count"
+									type="number"
+									data-vv-as="Count"
+									@keyup="$forceUpdate()"
+									></b-form-input>
 							</b-col>
 						</b-row>
 						<b-row>
@@ -209,7 +230,7 @@
 							</div>
 						</b-col>
 						</b-row>
-						<template v-if="level_scaling != undefined && level_scaling != 'None'">
+						<template v-if="level_scaling != undefined && level_scaling != 'none'">
 							<!-- HIGHER LEVEL MODIFIER -->
 							<h2 class="d-flex justify-content-between mt-3">
 									Scaling
@@ -225,8 +246,8 @@
 							<template v-for="(level_tier, tier_index) in modifier.level_tiers">
 								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
-									<b-col md="3">
-										<label class="required" :for="`level-${mod_index}`">{{level_scaling}}</label>
+									<b-col md="2">
+										<label class="required" :for="`level-${mod_index}`">{{level_scaling.capitalizeEach()}}</label>
 										<b-form-input v-model="level_tier.level"
 											autocomplete="off"
 											:id="`level-${mod_index}`"
@@ -240,8 +261,22 @@
 											></b-form-input>
 											<p class="validate red" v-if="errors.has(`level-${mod_index}`)">{{ errors.first(`level-${mod_index}`) }}</p>
 									</b-col>
+									<!-- HL PROJECTILE COUNT -->
+									<b-col md="2">
+										<label for="projectile_count">Count</label>
+										<b-form-input v-model="level_tier.projectile_count"
+											autocomplete="off"
+											id="projectile_count"
+											name="projectile_count"
+											class="form-control mb-2"
+											title="Count"
+											type="number"
+											data-vv-as="Count"
+											@keyup="$forceUpdate()"
+											></b-form-input>
+									</b-col>
 									<!-- HL DICE COUNT -->
-									<b-col md="3">
+									<b-col md="2">
 										<label for="dice_count">Dice Count</label>
 										<b-form-input v-model="level_tier.dice_count"
 											autocomplete="off"
@@ -264,7 +299,7 @@
 											class="form-control mb-2"
 											data-vv-as="Dice Type"
 											@change="$forceUpdate()">
-											<option :value="undefined" disabled>- Dice type -</option>
+											<option :value="undefined">- Dice type -</option>
 											<option v-for="(val,i) in dice_type"
 												:key="i" :value="val.value">{{ val.label }}</option>
 										</b-form-select>
@@ -329,7 +364,7 @@ export default {
 			}
 		},
 		shown_level_tiers() {
-			if (this.level_scaling == "Spell Scale") {
+			if (this.level_scaling == "spell scale") {
 				return 1;
 			}
 			return 100;
@@ -341,9 +376,25 @@ export default {
 
 	data() {
 		return {
-			modifier_type: ["Damage", "Healing"],
-			modifier_subtype: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning",
-				"Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"],
+			modifier_type: [
+				{label: "Damage", value: "damage"},
+				{label: "Healing", value: "healing"}
+			],
+			modifier_subtype: [
+				{ label: "Acid", value: "acid" },
+				{ label: "Bludgeoning", value: "bludgeoning" },
+				{ label: "Cold", value: "cold" },
+				{ label: "Fire", value: "fire" },
+				{ label: "Force", value: "force" },
+				{ label: "Lightning", value: "lightning" },
+				{ label: "Necrotic", value: "necrotic" },
+				{ label: "Piercing", value: "piercing" },
+				{ label: "Poison", value: "poison" },
+				{ label: "Psychic", value: "psychic" },
+				{ label: "Radiant", value: "radiant" },
+				{ label: "Slashing", value: "slashing" },
+				{ label: "Thunder", value: "thunder" },
+			],
 			dice_type: [
 				{ label: "d4", value: 4 }, 
 				{ label: "d6", value: 6 },
@@ -399,7 +450,7 @@ export default {
 			this.$forceUpdate()
 		},
 		level_tier_addable(index) {
-			if (this.level_scaling == "Spell Scale" && 
+			if (this.level_scaling == "spell scale" && 
 					this.modifiers[index].level_tiers &&
 					this.modifiers[index].level_tiers.length >= 1) {
 				return false
@@ -409,25 +460,38 @@ export default {
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
 			let description = []
-			if (this.level_scaling == "Character Level") {
-				description = ["This spell's damage increases when your character reaches a higher level."]
+			if (this.level_scaling == "character level") {
+				description = ["This spell's damage/projectiles increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
-					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
+					let level_txt = `at ${numeral(tier.level).format('0o')} level`
+					let damage_txt = `this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 					
+					let new_line = `${tier.projectile_count ? count_txt : ''} `
+					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
+					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`
+					new_line += `${tier.dice_count ? damage_txt : ''}`
 					description.push(new_line)
 				}
 			} 
-			else if (this.level_scaling == "Spell Scale") {
+			else if (this.level_scaling == "spell scale") {
 				let tier = level_tiers[0]
-				let new_line = "When you cast this spell using a spell slot of "
-				new_line += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher, the damage of this modifier increases by `
-				new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} `
-				new_line += `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
+				// Opening line
+				let level_txt = "When you cast this spell using a spell slot of "
+				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
+				// Damage modifier text
+				let damage_txt = 'the damage of this modifier increases by '
+				damage_txt += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""}`
+				// Projectile count text
+				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
+				// Spell slot text
+				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`
 				
-				description = [new_line]
+				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${tier.dice_count ? damage_txt : ''} ${slot_txt}`
+				description = [text]
 			} 
-			else if (this.level_scaling == "Spell Level") {
+			else if (this.level_scaling == "spell level") {
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "
@@ -452,6 +516,9 @@ export default {
 			immediate: true,
 		}
 	},
+	// mounted() {
+		
+	// },
 };
 </script>
 

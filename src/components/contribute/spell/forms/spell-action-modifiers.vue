@@ -17,7 +17,7 @@
 				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
 						{{parseInt(mod_index) + 1}}.
-						{{modifier.name}}
+						{{modifier.projectile_count ? `${modifier.projectile_count}x`: ""}}
 						{{modifier.dice_count}}{{modifier.dice_type ? "D" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
 						{{modifier.subtype}} {{modifier.type}}
 					</div>
@@ -298,7 +298,7 @@
 											class="form-control mb-2"
 											data-vv-as="Dice Type"
 											@change="$forceUpdate()">
-											<option :value="undefined" disabled>- Dice type -</option>
+											<option :value="undefined">- Dice type -</option>
 											<option v-for="(val,i) in dice_type"
 												:key="i" :value="val.value">{{ val.label }}</option>
 										</b-form-select>
@@ -460,11 +460,17 @@ export default {
 			// Generates description for each level tier for spell level scaling
 			let description = []
 			if (this.level_scaling == "character level") {
-				description = ["This spell's damage increases when your character reaches a higher level."]
+				description = ["This spell's damage/projectiles increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
-					let new_line = `At ${numeral(tier.level).format('0o')} level, this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
+					let level_txt = `at ${numeral(tier.level).format('0o')} level`
+					let damage_txt = `this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 					
+					let new_line = `${tier.projectile_count ? count_txt : ''} `
+					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
+					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`
+					new_line += `${tier.dice_count ? damage_txt : ''}`
 					description.push(new_line)
 				}
 			} 

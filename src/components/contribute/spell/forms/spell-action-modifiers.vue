@@ -482,7 +482,8 @@ export default {
 				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
 				// Damage modifier text
 				let damage_txt = 'the damage of this modifier increases by '
-				damage_txt += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""}`
+				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+				damage_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 				// Projectile count text
 				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
 				// Spell slot text

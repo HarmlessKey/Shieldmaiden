@@ -103,7 +103,7 @@
 				</b-col>
 			</template>
 
-			<!-- DEFENSES -->
+			<!-- ADVANTAGE / DISADVANTAGE -->
 			<template v-else-if="effect.type === 'advantage' || effect.type === 'disadvantage'">
 				<b-col md="6" v-if="effect.subtype !== 'attack'">
 					<label for="ability">
@@ -118,7 +118,7 @@
 						@change="$forceUpdate()">
 						<option :value="undefined" disabled>- Ability -</option>
 						<option v-for="ability in abilities"
-							:key="ability" :value="ability">{{ ability }}</option>
+							:key="ability" :value="ability">{{ ability.capitalize() }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 				</b-col>
@@ -150,7 +150,7 @@
 						class="form-control mb-2"
 						data-vv-as="Dice Type"
 						@change="$forceUpdate()">
-						<option :value="undefined">-</option>
+						<option value="">-</option>
 						<option v-for="(val,i) in dice_type"
 							:key="i" :value="val.value">{{ val.label }}</option>
 					</b-form-select>

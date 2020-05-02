@@ -284,17 +284,18 @@ export default {
 			// Generates description for each level tier for spell level scaling
 			let description = []
 			if (this.level_scaling == "character level") {
-				description = ["This spell's damage/projectiles increases when your character reaches a higher level."]
+				description = ["This spell's effect increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
-					let tier = level_tiers[index]
-					let level_txt = `at ${numeral(tier.level).format('0o')} level`
-					let damage_txt = `this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
-					
-					let new_line = `${tier.projectile_count ? count_txt : ''} `
-					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
-					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`
-					new_line += `${tier.dice_count ? damage_txt : ''}`
-					description.push(new_line)
+					let tier = level_tiers[index];
+					let level_txt = `At ${numeral(tier.level).format('0o')} level`;
+					let effect_txt = 'the value of this effect is ';
+					effect_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+					effect_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+	
+					let new_line = `${tier.dice_count ? level_txt.capitalize()+',' : level_txt}`;
+					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`;
+					new_line += `${(tier.dice_count || tier.fixed_val) ? effect_txt : ''}`;
+					description.push(new_line);
 				}
 			} 
 			else if (this.level_scaling === "spell scale") {
@@ -302,25 +303,26 @@ export default {
 				// Opening line
 				let level_txt = "When you cast this spell using a spell slot of ";
 				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`;
-				// Damage modifier text
-				let damage_txt = 'the value of this effect increases by ';
-				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
-				damage_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
+				// Effect text
+				let effect_txt = 'the value of this effect increases by ';
+				effect_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+				effect_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;
 				
-				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? damage_txt : ''} ${slot_txt}`;
+				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? effect_txt : ''} ${slot_txt}`;
 				description = [text];
 			} 
 			else if (this.level_scaling == "spell level") {
 				for (let index in level_tiers) {
-					let tier = level_tiers[index]
-					let new_line = "When you cast this spell using a "
-					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `
-					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
+					let tier = level_tiers[index];
+					let new_line = "When you cast this spell using a ";
+					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `;
+					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`;
 
-					description.push(new_line)
+					description.push(new_line);
 				}
 			}
 			return description

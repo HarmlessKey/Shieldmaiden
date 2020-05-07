@@ -38,7 +38,7 @@
 								</router-link>
 								<div slot="actions" slot-scope="data" class="actions">
 									<a 
-										v-if="Object.keys(taggedSpells).length === 0"
+										v-if="Object.keys(taggedSpell).length === 0"
 										@click="tag(data.row['.key'], data.row.name)"
 										v-b-tooltip.hover title="Tag"
 									>

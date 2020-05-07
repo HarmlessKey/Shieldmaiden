@@ -466,7 +466,7 @@ export default {
 					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
 					let level_txt = `at ${numeral(tier.level).format('0o')} level`
 					let damage_txt = 'this spell modifier does ';
-					damge_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+					damage_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
 					damage_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 
 					let new_line = `${tier.projectile_count ? count_txt : ''} `

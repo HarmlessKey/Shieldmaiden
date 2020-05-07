@@ -197,6 +197,8 @@
 				</b-form-select>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 			</b-col>
+
+			<!-- ATTACK -->
 			<b-col md="4" v-if="hasField('attack')">
 				<label for="ability">
 					Made by/against
@@ -213,6 +215,27 @@
 						:key="value" :value="value">{{ label }}</option>
 				</b-form-select>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+			</b-col>
+
+			<!-- MINIMUM -->
+			<b-col md="3" v-if="hasField('minimum')">
+				<label for="primary">
+					<span>Minimum Value</span>
+					<a 
+						class="ml-1"
+						v-b-popover.hover.top="'Select this if fixed value is a minimum score.'" 
+						title="Minimum Value"
+					>
+						<i class="fas fa-info-circle"></i>
+					</a>
+				</label>
+				<div class="primary d-flex justify-content-between" name="primary">
+					<a class="component_box" @click="setMinimum(effect)"
+						:class="{'selected': effect.minimum === true}"
+					>
+						<span>M</span>
+					</a>
+				</div>
 			</b-col>
 		</b-row>
 	</div>
@@ -297,6 +320,13 @@ export default {
 				effect.primary = false
 			}
 			effect.primary = !effect.primary
+			this.$forceUpdate(); //IMPORTANT
+		},
+		setMinimum(effect) {
+			if (effect.minimum == undefined) {
+				effect.minimum = false
+			}
+			effect.minimum = !effect.minimum
 			this.$forceUpdate(); //IMPORTANT
 		},
 		hasField(field_name) {

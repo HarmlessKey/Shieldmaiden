@@ -4,7 +4,6 @@
 			<span>Edit Spell Action</span>
 			<a 
 			class="gray-hover text-capitalize" 
-			v-b-tooltip.hover title="Add Action" 
 			@click="save_action()">
 				<i class="fas fa-edit green"></i>
 				<span class="d-none d-md-inline ml-1">Save</span>
@@ -75,14 +74,26 @@
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" 
-						id="Notifications-tab" 
+						id="notifications-tab" 
 						data-toggle="tab" 
 						role="tab" 
 						href="#notifications"
-						aria-controls="Notifications" 
+						aria-controls="notifications" 
 						aria-selected="false">
 						<i class="fas fa-bell"></i>
 						<span class="d-none d-md-inline ml-1">Notifications</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" 
+						id="effects-tab" 
+						data-toggle="tab" 
+						role="tab" 
+						href="#effects"
+						aria-controls="effects" 
+						aria-selected="false">
+						<i class="fas fa-hand-holding-magic"></i>
+						<span class="d-none d-md-inline ml-1">Effects</span>
 					</a>
 				</li>
 			</ul>
@@ -99,9 +110,8 @@
 						:action_type="spell_action.type"
 						@validation="setValidation"
 					/>
-					
 				</div>
-				<div class="tab-pane fade show" 
+				<div class="tab-pane fade" 
 					id="conditions" 
 					role="tabpanel" 
 					aria-labelledby="Conditions-tab"
@@ -111,9 +121,8 @@
 						:action_type="spell_action.type"
 						@validation="setValidation"
 					/>
-					
 				</div>
-				<div class="tab-pane fade show" 
+				<div class="tab-pane fade" 
 					id="notifications" 
 					role="tabpanel" 
 					aria-labelledby="Notifications-tab"
@@ -126,7 +135,20 @@
 						@spellUpdate="spellUpdate()"
 						@validation="setValidation"
 					/>
-					
+				</div>
+				<div class="tab-pane fade" 
+					id="effects" 
+					role="tabpanel" 
+					aria-labelledby="effects-tab"
+				>
+					<spell-action-effects
+						v-model="spell_action.effects"
+						:level_scaling="level_scaling"
+						:level="level"
+						:action_type="spell_action.type"
+						@spellUpdate="spellUpdate()"
+						@validation="setValidation"
+					/>
 				</div>
 			</div>
 		</div>
@@ -137,6 +159,7 @@
 import spellActionModifiers from '@/components/contribute/spell/forms/spell-action-modifiers.vue';
 import spellActionConditions from '@/components/contribute/spell/forms/spell-action-conditions.vue';
 import spellActionNotifications from '@/components/contribute/spell/forms/spell-action-notifications.vue';
+import spellActionEffects from '@/components/contribute/spell/forms/spell-action-effects.vue';
 
 export default {
 	name: 'edit-spell-action',
@@ -151,6 +174,7 @@ export default {
 		spellActionModifiers,
 		spellActionConditions,
 		spellActionNotifications,
+		spellActionEffects
 	},
 	computed: {
 		spell_action: {

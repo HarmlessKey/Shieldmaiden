@@ -15,6 +15,7 @@
 			<div class="card" v-if="notifications && notifications.length > 0" :key="`notification-${not_index}`">
 				<div v-b-toggle="'accordion-'+not_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
+						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(not_index) + 1}}. {{ notification.reminder.title }}
 					</div>
 					<a @click="remove_notification(not_index)"
@@ -328,5 +329,26 @@ label {
 .remove {
 	padding-top: 7px;
 	margin-left: 10px;
+}
+.card {
+	.card-header {
+		cursor: pointer;
+		background-color: #191919;
+
+		.caret {
+			display: inline-block;
+			padding-right: 5px;
+		}
+		&.collapsed {
+			.caret {
+				i.fa-caret-down {
+					transform: rotate(-90deg);
+				}
+			}
+		}
+	}
+	.card-body {
+		background-color: #232323;
+	}
 }
 </style>

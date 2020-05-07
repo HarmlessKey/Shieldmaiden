@@ -269,22 +269,23 @@ export default {
 			this.$forceUpdate();
 		},
 		remove_level_tier(mod_index, tier_index) {
-			this.$delete(this.effects[mod_index].level_tiers, tier_index)
-			this.$forceUpdate()
+			this.$delete(this.effects[mod_index].level_tiers, tier_index);
+			this.$forceUpdate();
 		},
 		level_tier_addable(index) {
 			if (this.level_scaling == "spell scale" && 
 					this.effects[index].level_tiers &&
 					this.effects[index].level_tiers.length >= 1) {
-				return false
+				return false;
 			}
-			return true
+			return true;
 		},
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
 			let description = []
 			if (this.level_scaling == "character level") {
-				description = ["This spell's effect increases when your character reaches a higher level."]
+				description = ["This spell's effect increases when your character reaches a higher level."];
+
 				for (let index in level_tiers) {
 					let tier = level_tiers[index];
 					let level_txt = `At ${numeral(tier.level).format('0o')} level`;
@@ -297,7 +298,7 @@ export default {
 					new_line += `${(tier.dice_count || tier.fixed_val) ? effect_txt : ''}`;
 					description.push(new_line);
 				}
-			} 
+			}
 			else if (this.level_scaling === "spell scale") {
 				let tier = level_tiers[0];
 				// Opening line
@@ -325,7 +326,7 @@ export default {
 					description.push(new_line);
 				}
 			}
-			return description
+			return description;
 		},
   },
   watch: {

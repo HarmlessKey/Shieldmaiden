@@ -105,7 +105,7 @@
 
 			<!-- ADVANTAGE / DISADVANTAGE -->
 			<template v-else-if="effect.type === 'advantage' || effect.type === 'disadvantage'">
-				<b-col md="6" v-if="effect.subtype !== 'attack'">
+				<b-col md="6" v-if="effect.subtype && effect.subtype !== 'attack'">
 					<label for="ability">
 						Ability
 					</label>
@@ -117,8 +117,26 @@
 						data-vv-as="effect Subtype"
 						@change="$forceUpdate()">
 						<option :value="undefined" disabled>- Ability -</option>
+						<option value="all">All</option>
 						<option v-for="ability in abilities"
 							:key="ability" :value="ability">{{ ability.capitalize() }}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+				</b-col>
+				<b-col md="6" v-else-if="effect.subtype === 'attack'">
+					<label for="ability">
+						Made by/against
+					</label>
+					<b-form-select v-model="effect.ability"
+						id="ability"
+						name="ability"
+						title="effect Subtype"
+						class="form-control mb-2"
+						data-vv-as="effect Subtype"
+						@change="$forceUpdate()">
+						<option :value="undefined" disabled>- Choose -</option>
+						<option v-for="{label, value} in byAgainst"
+							:key="value" :value="value">{{ label }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 				</b-col>
@@ -238,6 +256,10 @@ export default {
 				{ label: "Hour", value: "hour" },
 				{ label: "Day", value: "day" },
 			],
+			byAgainst: [
+				{ value: "by", label: "Attacks made by" },
+				{ value: "against", label: "Attacks made against" }
+			]
 		}
 	},
 	computed: {

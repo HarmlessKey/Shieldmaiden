@@ -22,7 +22,7 @@ export const effects = {
 					label: "Advantage"
 				},
 				disadvantage: {
-					label: "Advantage"
+					label: "Disadvantage"
 				}
 			},
 			effect_subtypes: {

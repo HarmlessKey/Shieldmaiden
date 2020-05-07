@@ -16,6 +16,7 @@
 			<div class="card" v-if="modifiers && modifiers.length > 0" :key="`modifier-${mod_index}`">
 				<div v-b-toggle="'accordion-'+mod_index" class="card-header collapse-header d-flex justify-content-between">
 					<div class="gray-light" >
+						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(mod_index) + 1}}.
 						{{modifier.projectile_count ? `${modifier.projectile_count}x`: ""}}
 						{{modifier.dice_count}}{{modifier.dice_type ? "D" : ""}}{{modifier.dice_type}}{{modifier.fixed_val ? "+" : ""}}{{modifier.fixed_val}} 
@@ -465,8 +466,10 @@ export default {
 					let tier = level_tiers[index]
 					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
 					let level_txt = `at ${numeral(tier.level).format('0o')} level`
-					let damage_txt = `this spell modifier does ${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
-					
+					let damage_txt = 'this spell modifier does ';
+					damge_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+					damage_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
+
 					let new_line = `${tier.projectile_count ? count_txt : ''} `
 					new_line += `${!tier.projectile_count && tier.dice_count ? level_txt.capitalize()+'s,' : level_txt}`
 					new_line += `${tier.projectile_count && tier.dice_count ? ', and ' : '.'}`
@@ -481,7 +484,8 @@ export default {
 				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
 				// Damage modifier text
 				let damage_txt = 'the damage of this modifier increases by '
-				damage_txt += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""}`
+				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
+				damage_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 				// Projectile count text
 				let count_txt = `the spell creates ${tier.projectile_count} more projectile${tier.projectile_count > 1 ? "s" : ""}`
 				// Spell slot text
@@ -562,5 +566,26 @@ label {
 .remove {
 	padding-top: 7px;
 	margin-left: 10px;
+}
+.card {
+	.card-header {
+		cursor: pointer;
+		background-color: #191919;
+
+		.caret {
+			display: inline-block;
+			padding-right: 5px;
+		}
+		&.collapsed {
+			.caret {
+				i.fa-caret-down {
+					transform: rotate(-90deg);
+				}
+			}
+		}
+	}
+	.card-body {
+		background-color: #232323;
+	}
 }
 </style>

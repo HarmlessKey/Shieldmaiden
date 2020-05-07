@@ -205,7 +205,6 @@ export default {
 				return this.value;
 			},
 			set(newValue) {
-				console.log('emitted')
 				this.$emit('input', newValue);
 			}
 		}

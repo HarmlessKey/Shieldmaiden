@@ -270,6 +270,10 @@ export default {
 					replacement: '\'',
 				},
 				{
+					regex: /â€”/g,
+					replacement: '\-\-',
+				},
+				{
 					regex: /â€�/g,
 					replacement: '\"'
 				},

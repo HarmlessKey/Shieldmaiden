@@ -355,7 +355,6 @@ export default {
 	computed: {
 		modifiers: {
 			get() {
-				this.$emit("input", this.value);
 				return this.value;
 			},
 			set(newValue) {

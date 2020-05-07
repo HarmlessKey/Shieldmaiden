@@ -70,10 +70,10 @@
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Application -</option>
 									<option 
-										v-for="(appl, i) in application"
-										:key="`con-${i}`" :value="appl"
+										v-for="{label, value} in application"
+										:key="value" :value="value"
 									>
-										{{ appl }}
+										{{ label }}
 									</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
@@ -96,15 +96,17 @@ export default {
 		value: Array,
 		action_type: String
 	},
-	data() {
-		return {
-			application: [
-				"Always",
-				"Failed save"
-			]
-		};
-	},
 	computed: {
+		application() {
+			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
+
+			let application = [
+				{ label: "Always", value: "always" },
+				hitFail
+			];
+
+			return application;
+		},
 		conditions: {
 			get() {
 				return this.value;

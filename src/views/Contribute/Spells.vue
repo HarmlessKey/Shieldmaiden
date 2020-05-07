@@ -38,7 +38,7 @@
 								</router-link>
 								<div slot="actions" slot-scope="data" class="actions">
 									<a 
-										v-if="Object.keys(taggedSpells).length === 0"
+										v-if="Object.keys(taggedSpell).length === 0"
 										@click="tag(data.row['.key'], data.row.name)"
 										v-b-tooltip.hover title="Tag"
 									>
@@ -106,7 +106,9 @@
 								:items="taggedSpells"
 								:columns="taggedColumns"
 							>
-								<router-link :to="'/contribute/spells/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+								<router-link :to="'/contribute/spells/' + data.row['.key']" slot="name" slot-scope="data">
+									<span v-b-popover.hover.top="`This spell is tagged by: ${getPlayerName(data.row.metadata.tagged)}`">{{ data.item }}</span>
+								</router-link>
 
 								<div slot="actions" slot-scope="data" class="actions">
 									<router-link 
@@ -245,7 +247,9 @@
 				allSpells: db.ref('spells'),
 				// untaggedSpells: db.ref('spells').orderByChild('metadata/tagged').equalTo(null),
 				taggedSpell: db.ref('new_spells').orderByChild('metadata/tagged').equalTo(this.userId),
-				finishedSpells: db.ref('new_spells').orderByChild('metadata/finished').equalTo(true)
+				finishedSpells: db.ref('new_spells').orderByChild('metadata/finished').equalTo(true),
+				admins: db.ref('users').orderByChild('admin').equalTo(true),
+				contributors: db.ref('users').orderByChild('contribute').equalTo(true),
 			}
 		},
 		computed: {
@@ -265,6 +269,9 @@
 						return (('metadata' in spell) && ('tagged' in spell.metadata) && !('finished' in spell.metadata))
 					}).value();
 			},
+			users: function() {
+				return _.union(this.admins, this.contributors);
+			}
 		},
 		methods: {
 			...mapActions([
@@ -302,6 +309,12 @@
 					db.ref(`spells/${key}/metadata`).update({
 						difficult: !current
 					});
+				}
+			},
+			getPlayerName(uid) {
+				for (let user of this.users) {
+					if (user['.key'] === uid)
+						return user.username;
 				}
 			},
 			confirmFinish(key, name) {

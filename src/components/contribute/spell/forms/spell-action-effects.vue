@@ -49,10 +49,10 @@
 									@change="$forceUpdate()">
 									<option :value="undefined" disabled>- Application -</option>
 									<option 
-										v-for="(appl, i) in application"
-										:key="`appl-${i}`" :value="appl"
+										v-for="{label, value} in application"
+										:key="value" :value="value"
 									>
-										{{ appl }}
+										{{ label }}
 									</option>
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`application-${eff_index}`)">{{ errors.first(`application-${eff_index}`) }}</p>
@@ -210,10 +210,6 @@ export default {
 				{ label: "d12", value: 12 },
 				{ label: "d20", value: 20 }
 			],
-			application: [
-				"Always",
-				"Failed save"
-			],
 			targets: [
 				"Target",
 				"Caster"
@@ -221,6 +217,16 @@ export default {
     };
 	},
 	computed: {
+		application() {
+			let hitFail = (this.action_type === 'spell save') ? { label: "Failed save", value: "fail" } : { label: "On a hit", value: "hit" };
+
+			let application = [
+				{ label: "Always", value: "always" },
+				hitFail
+			];
+
+			return application;
+		},
 		effects: {
 			get() {
 				return this.value;

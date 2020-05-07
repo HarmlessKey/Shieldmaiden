@@ -86,7 +86,7 @@
 									</b-form-select>
 									<p class="validate red" v-if="errors.has(`save_fail_mod-${mod_index}`)">{{ errors.first(`save_fail_mod-${mod_index}`) }}</p>
 								</template>
-								<template v-if="action_type === 'Spell Attack' || action_type === 'Melee Weapon' || action_type === 'Ranged Weapon'">
+								<template v-if="action_type === 'spell attack' || action_type === 'melee weapon' || action_type === 'ranged weapon'">
 									<label for="dice_type" class="required">
 										<span>Miss Modifier</span>
 										<a 

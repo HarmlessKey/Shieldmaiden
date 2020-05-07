@@ -40,7 +40,7 @@
 						name="subtype"
 					>
 						<option :value="undefined" disabled>- Effect subtype -</option>
-						<option v-for="({label, value}, i) in effect_subtypes[effect.type]" :value="value" :key="`type-${i}`">
+						<option v-for="({label}, value) in effect_subtypes[effect.type]" :value="value" :key="`type-${value}`">
 							{{ label }}
 						</option>
 					</b-form-select>
@@ -73,7 +73,7 @@
 						title="Time Scale"
 						class="form-control mb-2"
 						data-vv-as="Duriation scale">
-						<option :value="undefined" disabled>- Time Scale -</option>
+						<option :value="undefined">- Time Scale -</option>
 						<option v-for="{ label, value } in dur_time"
 							:key="value" :value="value">{{ label }}</option>
 					</b-form-select>
@@ -81,69 +81,8 @@
 			</template>
 		</b-row>
 		<b-row>
-			<!-- DEFENSES -->
-			<template v-if="effect.type === 'defenses'">
-				<b-col md="4">
-					<label class="required" for="damage_type">
-						Damage Type
-					</label>
-					<b-form-select v-model="effect.damage_type"
-						id="damage_type"
-						name="damage_type"
-						title="effect Subtype"
-						class="form-control mb-2"
-						v-validate="'required'"
-						data-vv-as="effect Subtype"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Damage type -</option>
-						<option v-for="(type ,i) in damage_types"
-							:key="i" :value="type">{{ type }}</option>
-					</b-form-select>
-					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
-				</b-col>
-			</template>
-
-			<!-- ADVANTAGE / DISADVANTAGE -->
-			<template v-else-if="effect.type === 'advantage' || effect.type === 'disadvantage'">
-				<b-col md="6" v-if="effect.subtype && effect.subtype !== 'attack'">
-					<label for="ability">
-						Ability
-					</label>
-					<b-form-select v-model="effect.ability"
-						id="ability"
-						name="ability"
-						title="effect Subtype"
-						class="form-control mb-2"
-						data-vv-as="effect Subtype"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Ability -</option>
-						<option value="all">All</option>
-						<option v-for="ability in abilities"
-							:key="ability" :value="ability">{{ ability.capitalize() }}</option>
-					</b-form-select>
-					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
-				</b-col>
-				<b-col md="6" v-else-if="effect.subtype === 'attack'">
-					<label for="ability">
-						Made by/against
-					</label>
-					<b-form-select v-model="effect.ability"
-						id="ability"
-						name="ability"
-						title="effect Subtype"
-						class="form-control mb-2"
-						data-vv-as="effect Subtype"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Choose -</option>
-						<option v-for="{label, value} in byAgainst"
-							:key="value" :value="value">{{ label }}</option>
-					</b-form-select>
-					<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
-				</b-col>
-			</template>
-
-			<!-- ALL OTHER -->
-			<template v-else>
+			<!-- FORM WITH VALUES -->
+			<template v-if="hasField('values')">
 				<!-- DICE COUNT -->
 				<b-col md="3">
 					<label for="dice_count">Dice Count</label>
@@ -216,6 +155,65 @@
 					</div>
 				</b-col>
 			</template>
+			<!-- DAMAGE TYPES -->
+			<template v-if="hasField('damage_types')">
+				<b-col md="4">
+					<label class="required" for="damage_type">
+						Damage Type
+					</label>
+					<b-form-select v-model="effect.damage_type"
+						id="damage_type"
+						name="damage_type"
+						title="effect Subtype"
+						class="form-control mb-2"
+						v-validate="'required'"
+						data-vv-as="effect Subtype"
+						@change="$forceUpdate()">
+						<option :value="undefined" disabled>- Damage type -</option>
+						<option v-for="(type ,i) in damage_types"
+							:key="i" :value="type">{{ type }}</option>
+					</b-form-select>
+					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
+				</b-col>
+			</template>
+
+			<!-- ABILITIES -->
+			<b-col md="4" v-if="hasField('abilities')">
+				<label for="ability">
+					Ability
+				</label>
+				<b-form-select v-model="effect.ability"
+					id="ability"
+					name="ability"
+					title="effect Subtype"
+					class="form-control mb-2"
+					data-vv-as="effect Subtype"
+					@change="$forceUpdate()">
+					<option :value="undefined" disabled>- Ability -</option>
+					<option value="all">All</option>
+					<option value="choose">Choose</option>
+					<option v-for="ability in abilities"
+						:key="ability" :value="ability">{{ ability.capitalize() }}</option>
+				</b-form-select>
+				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+			</b-col>
+			<b-col md="4" v-if="hasField('attack')">
+				<label for="ability">
+					Made by/against
+				</label>
+				<b-form-select v-model="effect.ability"
+					id="ability"
+					name="ability"
+					title="effect Subtype"
+					class="form-control mb-2"
+					data-vv-as="effect Subtype"
+					@change="$forceUpdate()">
+					<option :value="undefined" disabled>- Choose -</option>
+					<option v-for="{label, value} in byAgainst"
+						:key="value" :value="value">{{ label }}</option>
+				</b-form-select>
+				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+			</b-col>
 		</b-row>
 	</div>
 </template>
@@ -273,7 +271,7 @@ export default {
 		},
 		type() {
 			return this.effect.type;
-		}
+		},
 	},
 	watch: {
 		effect: {
@@ -301,6 +299,23 @@ export default {
 			effect.primary = !effect.primary
 			this.$forceUpdate(); //IMPORTANT
 		},
+		hasField(field_name) {
+			let type = this.effect.type;
+			let subtype = this.effect.subtype;
+			let ret = false;
+			if (type) {
+				if (this.effect_types[type].form_fields && this.effect_types[type].form_fields[field_name]) {
+					ret = this.effect_types[type].form_fields[field_name];
+				}
+				if (subtype) {
+					if (this.effect_subtypes[type][subtype].form_fields && this.effect_subtypes[type][subtype].form_fields[field_name]) {
+						ret = this.effect_subtypes[type][subtype].form_fields[field_name];
+					}
+				}
+			}
+			return ret;
+		}
+
 	}
 }
 </script>

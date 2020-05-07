@@ -135,16 +135,6 @@ export default {
 		remove_action(index) {
 			this.$delete(this.spell.actions, index)
 			// Update points to actions in modifiers
-			for (let i in this.spell.modifiers) {
-				let mod = this.spell.modifiers[i]
-				if (mod.spell_action == index) {
-					mod.spell_action = undefined
-				}
-				else if (mod.spell_action > index) {
-					mod.spell_action -= 1
-				}
-			}
-
 			this.$forceUpdate()
 		},
 		spellUpdate() {

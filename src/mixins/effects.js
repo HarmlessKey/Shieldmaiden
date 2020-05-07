@@ -59,11 +59,13 @@ export const effects = {
 					attack: { label: "Attack Rolls", form_fields: { attack: true }  },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
+					death_save: { label: "Death Saving Throws" },
 				},
 				disadvantage: {
 					attack: { label: "Attack Rolls", form_fields: { attack: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
+					death_save: { label: "Death Saving Throws" },
 				},
 				special: {
 					max_healing: { label: "Maximum Healing"},

@@ -11,45 +11,61 @@
 
 		<template v-else-if="tier">
 			<b-row>
-				<!-- SHOW ENCOUNTERS -->
-				<b-col lg="7">
-					<h2 class="d-flex justify-content-between">
+			<!-- SHOW ENCOUNTERS -->
+			<b-col lg="7">
+				<h2 class="d-flex justify-content-between">
+					<span>
 						<span>
-							<span>
-							Encounters
-							<span v-if="encounters">( 
-								<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
-									{{ Object.keys(encounters).length }}
-								</span> / 
-								<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
-								<template v-else>{{ tier.benefits.encounters }}</template>
-							) </span>
-						</span>
-						</span>
-						<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="add = !add"><i class="fas fa-plus green"></i></a>
-					</h2>
+						Encounters
+						<span v-if="encounters">( 
+							<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
+								{{ Object.keys(encounters).length }}
+							</span> / 
+							<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+							<template v-else>{{ tier.benefits.encounters }}</template>
+						) </span>
+					</span>
+					</span>
+					<a v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" v-b-tooltip.hover title="Add Encounter" @click="add = !add"><i class="fas fa-plus green"></i></a>
+				</h2>
 
-					<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
-						<b-form-input
-							autocomplete="off" 
-							type="text" 
-							:class="{'input': true, 'error': errors.has('newEncounter') }"
-							v-model="newEncounter"
-							v-validate="'required'" 
-							data-vv-as="New Encounter"
-							name="newEncounter" 
-							placeholder="Encounter Title"
-							@change="addEncounter()"></b-form-input>
-						<b-input-group-append>
-							<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
-						</b-input-group-append>				
-					</b-input-group>
-					<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+				<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
+					<b-form-input
+						autocomplete="off" 
+						type="text" 
+						:class="{'input': true, 'error': errors.has('newEncounter') }"
+						v-model="newEncounter"
+						v-validate="'required'" 
+						data-vv-as="New Encounter"
+						name="newEncounter" 
+						placeholder="Encounter Title"
+						@change="addEncounter()"></b-form-input>
+					<b-input-group-append>
+						<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
+					</b-input-group-append>				
+				</b-input-group>
+				<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
-					<OutOfSlots 
-						v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
-						type = 'encounters'
+				<OutOfSlots 
+					v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
+					type = 'encounters'
+				/>
+
+				<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
+					<h2>Create encounter</h2>
+					<input type="text" 
+						class="form-control" 
+						autocomplete="off"
+						v-model="newEncounter" 
+						v-validate="'required'"
+						data-vv-as="Encounter Title" 
+						name="firstEncounter"
+						placeholder="Encounter title"
 					/>
+					<p class="validate red" v-if="errors.has('firstEncounter')">{{ errors.first('firstEncounter') }}</p>
+					
+					<button class="btn btn-lg bg-green btn-block my-4" @click="addEncounter()">Create encounter</button>
+				</div>
 
 				<!-- ACTIVE ENCOUNTERS -->
 				<hk-table
@@ -425,7 +441,20 @@
 <style lang="scss" scoped>
 .container-fluid {
 	padding: 20px;
-
+	
+	.first-encounter {
+		h2 {
+			margin-top: 50px;
+			text-transform: none;
+			text-align: center;
+			font-size: 30px;
+		}
+		.form-control {
+			text-align: center;
+			height: 50px;
+			font-size: 20px;
+		}
+	}
 	.loader {
 		margin-top: 20px;
 	}

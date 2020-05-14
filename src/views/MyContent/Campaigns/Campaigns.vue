@@ -45,8 +45,14 @@
 				type = 'campaigns'
 			/>
 
+			<!-- NO PLAYERS YET -->
+			<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
+				<h2>Create players for your campaign</h2>
+				<router-link to="/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
+			</div>
+
 			<transition-group 
-				v-if="campaigns"
+				v-if="campaigns && Object.keys(campaigns).length > 0"
 				tag="div" 
 				class="row mt-3" 
 				name="campaigns" 
@@ -114,17 +120,34 @@
 								</b-col>
 							</b-row>
 						</div>
-							<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
-						<router-link :to="'/encounters/' + campaign.key" class="btn">Play <i class="fas fa-play"></i></router-link>
+						<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+						<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn bg-green">Create players</router-link>
+						<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green"><i class="fas fa-plus"></i> Add players</router-link>
+						<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green"><i class="fas fa-plus"></i> Create encounters</router-link>
+						<router-link :to="'/encounters/' + campaign.key" v-else class="btn">Play <i class="fas fa-play"></i></router-link>
 					</div>
 				</b-col>
 			</transition-group>
 
+			<!-- CREATE FIRST CAMPAIGN -->
+			<div class="first-campaign" v-else>
+				<h2>Create your first campaign</h2>
+				<input type="text" 
+					class="form-control" 
+					autocomplete="off"
+					v-model="newCampaign" 
+					v-validate="'required'"
+					data-vv-as="Campaign Title" 
+					name="firstCampaign"
+					@change="addCampaign()"
+					placeholder="Title of your first campaign"
+				/>
+				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
+				
+				<button class="btn btn-lg bg-green btn-block mt-4">Create campaign</button>
+			</div>
+
 		</template>
-		<b-card header="No players" class="warning" v-else-if="players === null">
-			<p>There are no players to join in your campaigns yet, let's create some first.</p>
-			<router-link class="btn btn-block" to="/players/add-player">Create players</router-link>
-		</b-card>
 		<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 	</div>
 </template>
@@ -272,6 +295,19 @@
 			margin-bottom: 5px !important;
 			text-align: center;
 		}
+		.first-campaign {
+			h2 {
+				margin-top: 50px;
+				text-transform: none;
+				text-align: center;
+				font-size: 30px;
+			}
+			.form-control {
+				text-align: center;
+				height: 50px;
+				font-size: 20px;
+			}
+		} 
 		.card {
 			background-size: cover;
 			background-position: center bottom;

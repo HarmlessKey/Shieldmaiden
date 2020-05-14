@@ -1456,6 +1456,12 @@ input[type='number'] {
 
 }
 
+.el-switch {
+	.el-switch__label {
+		color: #b2b2b2;
+	}
+}
+
 .el-color-picker {
 	
 	&__trigger {

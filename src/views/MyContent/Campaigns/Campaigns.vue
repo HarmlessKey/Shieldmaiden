@@ -37,6 +37,16 @@
 						<button class="btn"><i class="fas fa-plus"></i> Add</button>
 					</div>
 				</div>
+				<el-switch
+					class="mt-2"
+					v-model="advancement"
+					active-color="#2c97de"
+					inactive-color="#2c97de"
+					active-value="milestone"
+					inactive-value="experience"
+					active-text="Milestone"
+					inactive-text="Experience">
+				</el-switch>
 				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 			</div>
 
@@ -142,6 +152,17 @@
 					@change="addCampaign()"
 					placeholder="Title of your first campaign"
 				/>
+				<div class="switch">
+					<el-switch
+						v-model="advancement"
+						active-color="#2c97de"
+						inactive-color="#2c97de"
+						active-value="milestone"
+						inactive-value="experience"
+						active-text="Milestone"
+						inactive-text="Experience">
+					</el-switch>
+				</div>
 				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
 				
 				<button class="btn btn-lg bg-green btn-block mt-4">Create campaign</button>
@@ -178,6 +199,7 @@
 			return {
 				newCampaign: '',
 				add: false,
+				advancement: "experience"
 			}
 		},
 		mounted() {
@@ -224,6 +246,7 @@
 					if (result && (this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
 						db.ref('campaigns/' + this.user.uid).push({
 							campaign: this.newCampaign,
+							advancement: this.advancement,
 							timestamp: Date.now(),
 						});
 						this.newCampaign = '';
@@ -306,6 +329,11 @@
 				text-align: center;
 				height: 50px;
 				font-size: 20px;
+			}
+			.switch {
+				display: flex;
+				justify-content: center;
+				margin-top: 30px;
 			}
 		} 
 		.card {

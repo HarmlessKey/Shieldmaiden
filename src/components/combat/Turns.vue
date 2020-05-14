@@ -26,18 +26,20 @@
 			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
 		</h1>
 
-		<div class="round-info d-none d-md-inline">
-			<span v-if="encounter.round">
+		<div class="round-info d-none d-md-inline" v-if="encounter.round">
+			<span>
 				<span class="d-none d-lg-inline">Round</span>
 				<span class="number mx-2">{{ encounter.round }}</span>
 			</span>
-			<span v-if="encounter.round">
+			<span>
 				<span class="d-none d-lg-inline">Turn</span>
 				<span class="number ml-2">
 					{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
 				</span>
 			</span>
-			<span class="current-name"></span>
+		</div>
+		<div class="blue" v-else>
+			Set Intitative
 		</div>
 		<div class="d-flex justify-content-end">
 			<div 

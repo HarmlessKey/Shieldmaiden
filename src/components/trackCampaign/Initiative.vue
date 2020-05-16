@@ -395,13 +395,13 @@
 				td.image {
 					padding: 0;
 					width: 45px;
-					background-size: cover;
-					background-position: center top;
 
 					.img {
 						width: 43px;
 						height: 43px;
 						border: solid 1px #b2b2b2;
+						background-size: cover;
+						background-position: center top;
 					}
 
 				}

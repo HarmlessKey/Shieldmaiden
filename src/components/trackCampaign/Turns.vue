@@ -1,6 +1,6 @@
 <template>
 	<div class="turns d-flex justify-content-center">
-			<div class="round-info d-none d-md-flex justify-content-center" v-if="encounter.round">
+			<div class="round-info d-flex justify-content-center" v-if="encounter.round">
 				<div class="mr-3">
 					<div class="mb-1">Round</div>
 					<div class="number">{{ encounter.round }}</div>

@@ -45,7 +45,7 @@
 		<!-- INITIATIVE LIST -->
 		<table class="initiative targets">
 			<thead>
-				<th>In.</th>
+				<th class="init">In.</th>
 				<th></th>
 				<th class="ac"><i class="fas fa-shield"></i></th>
 				<th>Name</th>
@@ -72,7 +72,7 @@
 						@touchend="characters.length !== 0 ? stop() : null" 
 						@touchcancel="characters.length !== 0 ? stop() : null"
 					>
-						<td class="initiative">
+						<td class="init">
 							<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
 							<template v-else>{{ entity.initiative }}</template>
 						</td>
@@ -354,6 +354,11 @@
 		border-spacing: 0 5px;
 		user-select: none;
 
+		th.ac, th.init {
+			text-align: center;
+			width: 38px;
+		}
+
 		tbody {
 			
 			tr.top {
@@ -386,7 +391,7 @@
 						border-right: solid 1px transparent;
 					}
 				}
-				td.initiative, td.ac, th.ac {
+				td.init, td.ac, th.ac {
 					width: 38px;
 					text-align: center;
 				}

@@ -10,7 +10,19 @@
 		<h5>Targets</h5>
 		<ul class="targeted">
 			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-gray-dark">
-				<div class="img" :style="{ backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) + '\')' }" />
+				<icon 
+					v-if="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'monster' || displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'player'" class="img" 
+					:icon="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id])" 
+					:fill="displayTargeted[key].color_label" :style="displayTargeted[key].color_label ? `border-color: ${displayTargeted[key].color_label}` : ``"
+				/>
+				<div 
+					v-else
+					class="img" 
+					:style="{ 
+						backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) + '\')',
+						'border-color': displayTargeted[key].color_label ? displayTargeted[key].color_label : ''
+					}"
+				/>
 				<div class="name truncate">
 					<template v-if="displayTargeted[key].entityType === 'npc'">
 						<template v-if="displayNPCField('name', displayTargeted[key])">

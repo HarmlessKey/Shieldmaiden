@@ -83,7 +83,14 @@
 								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
 								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 							/>
-							<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
+							<div 
+								v-else 
+								class="img" 
+								:style="{ 
+									backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')',
+									'border-color': entity.color_label ? entity.color_label : ''
+								}"
+							/>
 						</td>
 
 						<td class="ac">

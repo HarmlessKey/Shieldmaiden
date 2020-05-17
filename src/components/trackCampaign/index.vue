@@ -78,36 +78,6 @@
 				/>
 				<div class="container-fluid">
 					<div class="container entities">
-
-						<!-- LAST ROLL -->
-						<div v-if="encounter.lastRoll" class="lastRoll text-center">
-							<i class="fas fa-dice-d20"></i> 
-
-							<!-- To hit -->
-							<span v-if="encounter.lastRoll.toHitTotal">
-								To hit: 
-								<span v-if="encounter.lastRoll.toHitTotal == 'Natural 1' || encounter.lastRoll.toHitTotal == 'Natural 20'"
-									:class="{ 'red': encounter.lastRoll.toHitTotal == 'Natural 1', 'green': encounter.lastRoll.toHitTotal == 'Natural 20' }">
-									{{ encounter.lastRoll.toHitTotal }}
-								</span>
-								<template v-else>
-									<span v-if="encounter.lastRoll.hitMod">
-										{{ encounter.lastRoll.toHit }} + {{ encounter.lastRoll.hitMod }} =
-									</span>
-									<span class="blue">{{ encounter.lastRoll.toHitTotal }}</span>
-								</template>.
-							</span>
-
-							<!-- Open Roll -->
-							<span v-if="encounter.lastRoll.damageTotal">
-								Damage: 
-								<span v-if="encounter.lastRoll.damageMod">
-									{{ encounter.lastRoll.damage }} + {{ encounter.lastRoll.damageMod }} =
-								</span>
-								<span class="red">{{ encounter.lastRoll.damageTotal }}</span>.
-							</span>
-						</div>
-
 						<b-row>
 							<b-col>
 								<Initiative 
@@ -179,6 +149,7 @@
 				campaign: undefined,
 				counter: 0,
 				tier: undefined,
+				rolls: []
 			}
 		},
 		firebase() {
@@ -296,6 +267,31 @@
 					case 5: return 'red';
 					case 6: return 'yellow';
 				}
+			},
+			lastRoll() {
+				if(this.encounter) {
+					return this.encounter.lastRoll;
+				}
+			}
+		},
+		watch: {
+			lastRoll(newValue, oldValue) {
+				this.rolls.push(newValue);
+				this.$snotify.html(
+					`<div class="snotifyToast__body roll">
+						<div class="roll_title">To hit roll 1d20 ${newValue.hitMod ? ` + ${newValue.hitMod}` : ''}</div>
+						<div class="rolled" id="roll">
+							${newValue.toHitTotal}
+						</div>
+						<div class="roll_title">
+							${newValue.damageMod ? `${newValue.damage} + ${newValue.damageMod} = ` : ''}
+							<span class="red">${newValue.damageTotal}</span> 
+							damage
+						</div>
+					</div> `, {
+					timeout: 5000,
+					closeOnClick: true
+				});
 			}
 		},
 		methods: {

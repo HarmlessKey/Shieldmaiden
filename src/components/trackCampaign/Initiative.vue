@@ -45,7 +45,7 @@
 		<!-- INITIATIVE LIST -->
 		<table class="initiative targets">
 			<thead>
-				<th>In.</th>
+				<th class="init">In.</th>
 				<th></th>
 				<th class="ac"><i class="fas fa-shield"></i></th>
 				<th>Name</th>
@@ -72,7 +72,7 @@
 						@touchend="characters.length !== 0 ? stop() : null" 
 						@touchcancel="characters.length !== 0 ? stop() : null"
 					>
-						<td class="initiative">
+						<td class="init">
 							<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
 							<template v-else>{{ entity.initiative }}</template>
 						</td>
@@ -83,7 +83,14 @@
 								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
 								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 							/>
-							<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
+							<div 
+								v-else 
+								class="img" 
+								:style="{ 
+									backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')',
+									'border-color': entity.color_label ? entity.color_label : ''
+								}"
+							/>
 						</td>
 
 						<td class="ac">
@@ -347,6 +354,11 @@
 		border-spacing: 0 5px;
 		user-select: none;
 
+		th.ac, th.init {
+			text-align: center;
+			width: 38px;
+		}
+
 		tbody {
 			
 			tr.top {
@@ -379,7 +391,7 @@
 						border-right: solid 1px transparent;
 					}
 				}
-				td.initiative, td.ac, th.ac {
+				td.init, td.ac, th.ac {
 					width: 38px;
 					text-align: center;
 				}
@@ -395,13 +407,13 @@
 				td.image {
 					padding: 0;
 					width: 45px;
-					background-size: cover;
-					background-position: center top;
 
 					.img {
 						width: 43px;
 						height: 43px;
 						border: solid 1px #b2b2b2;
+						background-size: cover;
+						background-position: center top;
 					}
 
 				}

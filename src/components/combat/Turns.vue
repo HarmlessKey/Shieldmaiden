@@ -26,18 +26,20 @@
 			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
 		</h1>
 
-		<div class="round-info d-none d-md-inline">
-			<span v-if="encounter.round">
-				<span class="d-none d-lg-inline">Round</span>
-				<span class="number mx-2">{{ encounter.round }}</span>
-			</span>
-			<span v-if="encounter.round">
-				<span class="d-none d-lg-inline">Turn</span>
-				<span class="number ml-2">
+		<div class="round-info d-none d-md-flex justify-content-center" v-if="encounter.round">
+			<div class="mr-3">
+				<div>Round</div>
+				<div class="number">{{ encounter.round }}</div>
+			</div>
+			<div>
+				<div>Turn</div>
+				<div class="number">
 					{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
-				</span>
-			</span>
-			<span class="current-name"></span>
+				</div>
+			</div>
+		</div>
+		<div class="blue" v-else>
+			Set Intitative
 		</div>
 		<div class="d-flex justify-content-end">
 			<div 
@@ -195,14 +197,17 @@
 			vertical-align: 3px;
 		}
 	}
-	.number { 
-		display: inline-block;
-		border: solid 1px #2c97de;
-		height: 40px;
-		padding: 2px 15px;
-		font-weight: bold;
-		font-size: 30px;
-		line-height: 30px;
+	.round-info {
+		line-height: 12px;
+		font-size: 11px;
+		text-align: center;
+
+		.number { 
+			height: 40px;
+			font-weight: bold;
+			font-size: 30px;
+			line-height: 30px;
+		}
 	}
 	.requests {
 		padding-top: 3px;

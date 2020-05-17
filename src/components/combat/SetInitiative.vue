@@ -10,7 +10,13 @@
 				<div v-on:scroll="shadow()" ref="scroll">
 					<ul v-if="entities" class="entities hasImg">
 						<li v-for="entity in _players" :key="entity.key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+							<span 
+								v-else class="img" 
+								:style="{
+									'background-image': 'url(' + entity.img + ')',
+									'border-color': entity.color_label ? entity.color_label : ``
+								}"/>
 							<div class="d-flex justify-content-between">
 								<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-hover' ]"><i class="fas fa-check"></i></span> -->
 								{{ entity.name }}
@@ -47,8 +53,21 @@
 				<div v-on:scroll="shadow()" ref="scroll">
 					<ul class="entities hasImg">
 						<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="	{selected:selected.includes(i)}">
-							<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-dark' ]"><i class="fas fa-check"></i></span> -->
-							<span class="img pointer" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"  @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"></span>
+							<icon 
+								v-if="entity.img === 'monster' || entity.img === 'player'" 
+								class="img pointer" 
+								:icon="entity.img" 
+								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+								@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
+							/>
+							<span 
+								v-else class="img pointer" 
+								:style="{
+									'background-image': 'url(' + entity.img + ')',
+									'border-color': entity.color_label ? entity.color_label : ``
+								}"
+								@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
+							/>
 							<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
 							
 							<div class="actions">
@@ -79,7 +98,23 @@
 					<ul class="entities hasImg">
 						<li v-for="(entity) in _active" v-bind:key="entity.key">
 							<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
-							<span v-else class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<template v-else>
+								<icon 
+									v-if="entity.img === 'monster' || entity.img === 'player'" 
+									class="img pointer" 
+									:icon="entity.img" 
+									:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+									@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
+								/>
+								<span 
+									v-else class="img pointer" 
+									:style="{
+										'background-image': 'url(' + entity.img + ')',
+										'border-color': entity.color_label ? entity.color_label : ``
+									}"
+									@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
+								/>
+							</template>
 							<div class="d-flex justify-content-between">
 								{{ entity.name }}
 								<span>{{ entity.initiative }}</span>

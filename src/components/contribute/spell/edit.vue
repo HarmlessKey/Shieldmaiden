@@ -281,6 +281,10 @@ export default {
 					regex: /â€œ/g,
 					replacement: '\"'
 				},
+				{
+					regex: /â€“/g,
+					replacement: '\-\-'
+				},
 			];
 			rules.forEach(function(rule) {
 				text = text.replace(rule.regex, rule.replacement);

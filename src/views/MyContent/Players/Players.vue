@@ -154,8 +154,12 @@
 				return _.chain(this.players)
 				.filter(function(player, key) {
 					player.key = key
-					if (player.campaign_id)
-						player.campaign_name = vm.campaigns[player.campaign_id].campaign
+					if (player.campaign_id) {
+						if (vm.campaigns[player.campaign_id] !== undefined)
+							player.campaign_name = vm.campaigns[player.campaign_id].campaign
+						else
+							player.campaign_id = undefined;
+					}
 
 					return player
 				})

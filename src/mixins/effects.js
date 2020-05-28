@@ -38,6 +38,7 @@ export const effects = {
 					AC: { label: "Armor Class" },
 					maxHp: { label: "Maximum Hit Points" },
 					attack: { label: "Attack Rolls" },
+					damage: { label: "Damage Rolls", form_fields: { damage_types: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 				},
@@ -70,6 +71,7 @@ export const effects = {
 				special: {
 					max_healing: { label: "Maximum Healing"},
 					max_damage: { label: "Maximum Damage", form_fields: { damage_types: true } },
+					death_ward: { label: "Death Ward" },
 				},
 			}
 		}

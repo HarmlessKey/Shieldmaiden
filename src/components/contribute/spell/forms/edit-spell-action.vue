@@ -11,8 +11,22 @@
 		</div>
 		<div class="card-body">
 			<b-row>
-				<!-- ATTACK TYPE -->
-				<b-col>
+				<!-- ACTION NAME -->
+				<b-col md="3">
+					<label for="name">Action Name</label>
+					<b-form-input v-model="spell_action.name"
+						autocomplete="off"
+						id="name"
+						name="name"
+						class="form-control mb-2"
+						title="Action Name"
+						v-validate="'max:100'"
+						data-vv-as="Action Name"
+						@keyup="$forceUpdate()"
+						></b-form-input>
+				</b-col>
+				<!-- ACTION TYPE -->
+				<b-col md="3">
 					<label class="required" for="attack_type">Action Type</label>
 					<b-form-select v-model="spell_action.type"
 						id="action_type"
@@ -29,7 +43,7 @@
 					<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
 				</b-col>
 				<!-- SAVE -->
-				<b-col md="3">
+				<b-col md="2">
 					<label for="save">Save</label>
 					<b-form-select v-model="spell_action.save"
 						:disabled="spell_action.type != 'spell save'"
@@ -66,7 +80,7 @@
 				<!-- Seperate cast -->
 				<b-col md="2">
 					<label for="seperate">
-						<span>Seperate</span>
+						<span>Sep.</span>
 						<a 
 							class="ml-1"
 							v-b-popover.hover.top="'Select this, if the spell action can be rolled seperately from the rest of the actions.'" 

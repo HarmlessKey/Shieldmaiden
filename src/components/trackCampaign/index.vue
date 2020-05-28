@@ -275,17 +275,16 @@
 			}
 		},
 		watch: {
-			lastRoll(newValue, oldValue) {
-				this.rolls.push(newValue);
+			lastRoll(roll, oldRoll) {
+				this.rolls.push(roll);
 				this.$snotify.html(
-					`<div class="snotifyToast__body roll">
-						<div class="roll_title">To hit roll 1d20 ${newValue.hitMod ? ` + ${newValue.hitMod}` : ''}</div>
-						<div class="rolled" id="roll">
-							${newValue.toHitTotal}
-						</div>
-						<div class="roll_title">
-							${newValue.damageMod ? `${newValue.damage} + ${newValue.damageMod} = ` : ''}
-							<span class="red">${newValue.damageTotal}</span> 
+					`<div class="snotifyToast__body">
+					${this.notificationTargets(roll.targets)	}
+						<div class="snotifyToast__body">
+							${roll.toHitTotal}
+						
+							${roll.damageMod ? `${roll.damage} + ${roll.damageMod} = ` : ''}
+							<span class="red">${roll.damageTotal}</span> 
 							damage
 						</div>
 					</div> `, {
@@ -295,6 +294,20 @@
 			}
 		},
 		methods: {
+			notificationTargets(targets) {
+				let returnTargets = [];
+				for(const key of targets) {
+
+					let html = '<div class="target">';
+					html += `<div class="image" style="background-image: url(${this.encounter.entities[key].img});"></div>`;
+					html += `<div class="name truncate">${this.encounter.entities[key].name}</div>`;
+					html += `</div>`;
+
+					returnTargets.push(html);
+				}
+
+				return returnTargets.join();
+			},
 			fetch_encounter() {
 				var track = db.ref(`broadcast/${this.userId}`);
 				track.on('value' , (snapshot) => {

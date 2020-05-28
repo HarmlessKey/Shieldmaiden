@@ -38,7 +38,7 @@
 					</div>
 				</template>
 				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
-				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damge once</b-form-checkbox>
+				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damage once</b-form-checkbox>
 
 
 				<div v-if="toHit" class="advantage d-flex justify-content-between">
@@ -245,7 +245,7 @@
 
 					//Roll the damage
 					for(let roll in rolls) {
-						let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[5]
+						let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
 						let rolled = this.rollD(dice[1], dice[0]) //roll the dice
 						let damage = rolled.total; //roll the dice
 
@@ -253,10 +253,23 @@
 						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
 
 					}
+					//Set the roll that needs to be used when rolling damage only once
 					if(this.rollOnce) {
 						this.aoeRoll = { 
 							allDamageRolls,
 							total
+						}
+					}
+					//If it was an open roll, save it, so it will be shared on the track encounter screen.
+					if(!this.demo) {
+						//If the damage is rolled once, show all targets with that roll
+						//Otherwise show 1 target per roll
+						let targets = (this.rollOnce) ? this.targeted : [target.key];
+
+						if(this.openRoll) {
+							this.rollOpenly(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+						} else {
+							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 						}
 					}
 				} else {
@@ -314,15 +327,6 @@
 							${toHitRoll} ${toHit[highest].mod} = </span>${toHit[highest].total}
 							${hitOrMiss}
 							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;		
-				}
-
-				//If it was an open roll
-				if(!this.demo) {
-					if(this.openRoll) {
-						this.rollOpenly(toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
-					} else {
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
-					}
 				}
 
 				//BUILD SNOTIFY POPUP
@@ -389,11 +393,11 @@
 				});
 				this.advantage = false; //turn advantage off
 			},
-			rollOpenly(toHit, damage, hitMod, damageMod) {
-				var showRoll = [];
+			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
+				var showRoll = {targets};
 
 				//Show to hit roll
-				if (Object.values(this.rollOptions).indexOf('toHit') > -1) {
+				if (Object.values(this.rollOptions).includes('toHit')) {
 					if(toHit == '20') {
 						showRoll.toHitTotal = 'Natural 20'
 					} else if(toHit == '1') {
@@ -403,18 +407,18 @@
 					}
 
 					//Show Modifier
-					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
+					if(Object.values(this.rollOptions).includes('modifiers')) {
 						showRoll.toHit = toHit;
 						showRoll.hitMod = hitMod;
 					}
 				}
 
 				//Show damage roll
-				if (Object.values(this.rollOptions).indexOf('damage') > -1) {
+				if (Object.values(this.rollOptions).includes('damage')) {
 					showRoll.damageTotal = parseInt(damage) + parseInt(damageMod);
 
 					//Show Modifier
-					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
+					if(Object.values(this.rollOptions).includes('modifiers')) {
 						showRoll.damage = damage;
 						showRoll.damageMod = damageMod;
 					}

@@ -44,6 +44,44 @@
 							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
 				</b-col>
+				<!-- Free cast -->
+				<b-col md="2">
+					<label for="free">
+						<span>Free</span>
+						<a 
+							class="ml-1"
+							v-b-popover.hover.top="'Select this, if the spell action can be used without expending a spell slot.'" 
+							title="Free"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
+					<div class="free d-flex justify-content-between" name="free">
+						<a class="component_box" @click="setFree(spell_action)"
+							:class="{'selected': spell_action.free === true}">
+							<span>F</span>
+						</a>
+					</div>
+				</b-col>
+				<!-- Seperate cast -->
+				<b-col md="2">
+					<label for="seperate">
+						<span>Seperate</span>
+						<a 
+							class="ml-1"
+							v-b-popover.hover.top="'Select this, if the spell action can be rolled seperately from the rest of the actions.'" 
+							title="Seperate"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
+					<div class="seperate d-flex justify-content-between" name="seperate">
+						<a class="component_box" @click="setSeperate(spell_action)"
+							:class="{'selected': spell_action.seperate === true}">
+							<span>S</span>
+						</a>
+					</div>
+				</b-col>
 			</b-row>
 
 			<!-- MODIFIERS, CONDITIONS & REMINDERS -->
@@ -248,7 +286,21 @@ export default {
 				this.validators[new_key] = validators[v]
 			}
 			this.$emit('validation', this.validators)
-		}
+		},
+		setSeperate(spell_action) {
+			if (spell_action.seperate == undefined) {
+				spell_action.seperate = false
+			}
+			spell_action.seperate = !spell_action.seperate
+			this.$forceUpdate(); //IMPORTANT
+		},
+		setFree(spell_action) {
+			if (spell_action.free == undefined) {
+				spell_action.free = false
+			}
+			spell_action.free = !spell_action.free
+			this.$forceUpdate(); //IMPORTANT
+		},
 	},
 	watch: {
 		spell_action: {
@@ -288,5 +340,20 @@ ul.nav-tabs {
 .tab-content {
 	padding: 20px;
 	position: relative;
+}
+
+.component_box {
+	background: #000;
+	width: 40px;
+	text-align: center;
+	line-height: 36px;
+	height: 36px;
+	font-size: 18px;
+	span {
+		color: white;
+	}
+}
+.component_box.selected {
+	background: #2c97de;
 }
 </style>

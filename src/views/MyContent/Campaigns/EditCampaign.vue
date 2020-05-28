@@ -152,6 +152,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'campaigns',
 				'campaign',
 				'players',
 				'playerInCampaign',
@@ -206,6 +207,9 @@
 				return (Object.keys(this.campaign.players).indexOf(playerId));
 			},
 			inOtherCampaign(playerId) {
+				if (this.campaigns[this.players[playerId].campaign_id] === undefined) {
+					this.players[playerId].campaign_id = undefined;
+				}
 				return (this.players[playerId].campaign_id !== undefined && this.players[playerId].campaign_id !== this.campaignId)
 			},
 			setPrivate(value) {

@@ -78,6 +78,81 @@
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`application-${con_index}`)">{{ errors.first(`application-${con_index}`) }}</p>
 							</b-col>
+							<!-- <span>{{ condition.application }}</span> -->
+						</b-row>
+						<b-row v-if="condition.application == 'hitpoint_based'">
+							<b-col md="3">
+								<label :for="`dice_count-${con_index}`" class="required">Dice Count</label>
+								<b-form-input v-model="condition.dice_count"
+									autocomplete="off"
+									:id="`dice_count-${con_index}`"
+									:name="`dice_count-${con_index}`"
+									class="form-control mb-2"
+									title="Dice Count"
+									type="number"
+									v-validate="'required'"
+									data-vv-as="Dice Count"
+									@keyup="$forceUpdate()"
+									></b-form-input>
+									<p class="validate red" v-if="errors.has(`dice_count-${con_index}`)">{{ errors.first(`dice_count-${con_index}`) }}</p>
+							</b-col>
+							<b-col md="3">
+								<!-- HITPOINTS DICE TYPE -->
+								<label for="dice_type" class="required">Dice Type</label>
+								<b-form-select v-model="condition.dice_type"
+									:id="`dice_type-${con_index}`"
+									:name="`dice_type-${con_index}`"
+									title="Dice Type"
+									class="form-control mb-2"
+									v-validate="'required'"
+									data-vv-as="Dice Type"
+									@change="$forceUpdate()">
+									<!-- <option value="undefined" disabled>- Subtype -</option> -->
+									<option v-for="(val,i) in dice_type"
+										:key="i" :value="val.value">{{ val.label }}</option>
+								</b-form-select>
+								<p class="validate red" v-if="errors.has(`dice_type-${con_index}`)">{{ errors.first(`dice_type-${con_index}`) }}</p>
+							</b-col>
+							<b-col md="3">
+								<!-- HITPOINTS FIXED VALUE -->
+								<label for="fixed_val">
+									Fixed Value
+									<a 
+											class="ml-1"
+											v-b-popover.hover.top="'Set the fixed value that is added on top of the rolled value.'" 
+											title="Fixed"
+										>
+											<i class="fas fa-info-circle"></i>
+										</a>
+								</label>
+								<b-form-input v-model="condition.fixed_val"
+									autocomplete="off"
+									id="fixed_val"
+									name="fixed_val"
+									class="form-control mb-2"
+									title="Fixed Value"
+									type="number"
+									data-vv-as="Fixed Value"
+									@keyup="$forceUpdate()"
+									></b-form-input>
+							</b-col>
+							<b-col md="3">
+								<!-- HITPOINTS ORDER VALUE -->
+								<label for="order" class="required">Order</label>
+								<b-form-select v-model="condition.order"
+									:id="`order-${con_index}`"
+									:name="`order-${con_index}`"
+									title="Order"
+									class="form-control mb-2"
+									v-validate="'required'"
+									data-vv-as="Order"
+									@change="$forceUpdate()">
+									<option :value="undefined" disabled>- Order -</option>
+									<option v-for="(val,i) in order"
+										:key="i" :value="val.value">{{ val.label }}</option>
+								</b-form-select>
+								<p class="validate red" v-if="errors.has(`order-${con_index}`)">{{ errors.first(`order-${con_index}`) }}</p>
+							</b-col>
 						</b-row>
 					</div>
 				</b-collapse>
@@ -102,7 +177,8 @@ export default {
 
 			let application = [
 				{ label: "Always", value: "always" },
-				hitFail
+				{ label: "Hitpoint based", value: "hitpoint_based" },
+				hitFail,
 			];
 
 			return application;
@@ -118,6 +194,22 @@ export default {
 		},
 		validator() {
 			return { "conditions": this.$validator };
+		}
+	},
+	data() {
+		return {
+			dice_type: [
+				{ label: "d4", value: 4 }, 
+				{ label: "d6", value: 6 },
+				{ label: "d8", value: 8 }, 
+				{ label: "d10", value: 10 },
+				{ label: "d12", value: 12 },
+				{ label: "d20", value: 20 }
+			],
+			order: [
+				{ label: "Asc", value: "asc" },
+				{ label: "Desc", value: "desc" }
+			],
 		}
 	},
 	methods: {

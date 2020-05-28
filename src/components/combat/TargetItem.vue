@@ -18,16 +18,19 @@
 						'border-color': entity.color_label ? entity.color_label : ``
 					}"/>
 			</template>
-			<span class="ac" 
-				:class="{ 
-					'green': entity.ac_bonus > 0, 
-					'red': entity.ac_bonus < 0 
-				}" 
-				v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
-				v-if="entity.ac_bonus">
-				{{ displayStats().ac + entity.ac_bonus}}
-			</span>
-			<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
+			<div class="ac_wrapper">
+				<i class="fas fa-shield" ></i>
+				<span class="ac" 
+					:class="{ 
+						'green': entity.ac_bonus > 0,
+						'red': entity.ac_bonus < 0 
+					}" 
+					v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
+					v-if="entity.ac_bonus">
+					{{ displayStats().ac + entity.ac_bonus}}
+				</span>
+				<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
+			</div>
 
 			<template>
 				<div class="progress health-bar">
@@ -257,6 +260,27 @@
 	text-align: center;
 	height: 30px;
 }
+.ac_wrapper {
+
+	grid-area: ac;
+	position: relative;
+	i, .ac {
+		position: absolute;
+		line-height: 30px;
+		width: 100%;
+		text-align: center;
+	}
+	i {
+		font-size: 25px;
+		color: #5c5757;
+	}
+	.ac {
+		font-weight: bold;
+		color: #fff;
+		margin-top: -1px;
+	}
+}
+
 .initiative {
 	grid-area: initiative;
 }
@@ -279,11 +303,7 @@
 		position: relative;
 	}
 }
-.ac {
-	font-weight: bold;
-	color: #b2b2b2;
-	grid-area: ac;
-}
+
 .hp {
 	font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 	text-align: right;

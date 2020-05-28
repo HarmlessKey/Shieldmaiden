@@ -70,6 +70,7 @@ export const effects = {
 				special: {
 					max_healing: { label: "Maximum Healing"},
 					max_damage: { label: "Maximum Damage", form_fields: { damage_types: true } },
+					death_ward: { label: "Death Ward" },
 				},
 			}
 		}

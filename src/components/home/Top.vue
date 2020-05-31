@@ -33,9 +33,9 @@
 
 						</div>
 						<!-- PATREON -->
-						<div v-if="user">
-							<template v-if="tier && tier.name !== 'Free' && !voucher">
-									<h2 class="text-center"><i class="patreon-red fas fa-heart"></i> Thanks for your support.</h2>
+						<div>
+							<template v-if="userInfo && userInfo.patron">
+									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
 							</template>
 							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
@@ -67,9 +67,9 @@
 				'tier',
 				'voucher'
 			]),
-			user() {
-				return auth.currentUser
-			}
+			...mapGetters({
+				user: 'getUser'
+			})
 		},
 	}
 </script>

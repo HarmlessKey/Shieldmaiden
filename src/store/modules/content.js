@@ -240,8 +240,7 @@ export const content_module = {
 		setUserInfo({ commit, dispatch, state }) {
 			let user = users_ref.child(state.user.uid)
 			user.on('value', async user_snapshot => {
-				let user_info = user_snapshot.val()
-				commit('SET_USERINFO', user_info)
+				let user_info = user_snapshot.val();
 				
 				//Fetch patron info with email
 				let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
@@ -281,7 +280,7 @@ export const content_module = {
 				let vouch_tiers = db.ref(path)
 				vouch_tiers.on('value', voucher_snap => {
 					// Get the order of voucher/basic
-					let voucher_order = voucher_snap.val().order
+					let voucher_order = voucher_snap.val().order;
 					// Search email in patrons
 					let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
 					patrons.on('value' , async patron_snapshot => {
@@ -289,8 +288,7 @@ export const content_module = {
 						if(patron_snapshot.val()) {
 							let key = Object.keys(patron_snapshot.val())[0];
 							let patron_data = patron_snapshot.val()[key];
-
-							let pledge_end = new Date(patron_data.pledge_end).toISOString()
+							let pledge_end = new Date(patron_data.pledge_end).toISOString();
 
 							// Compare patron tiers to find highest tier checking order in FB
 							let patron_tierlist = Object.keys(patron_data.tiers);
@@ -313,9 +311,16 @@ export const content_module = {
 								highest_tier = patron_tierlist[0]
 							}
 
+							//Get tier info
 							let patron_tier = db.ref(`tiers/${highest_tier}`);
-
 							patron_tier.on('value' , tier_snapshot => {
+								//Save Patron info under UserInfo
+								user_info.patron = {
+									last_charge_status: patron_data.last_charge_status,
+									pledge_end,
+									tier: tier_snapshot.val().name
+								};
+
 								if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
 									commit('SET_TIER', tier_snapshot.val())
 								} else {
@@ -330,7 +335,8 @@ export const content_module = {
 							commit('CHECK_ENCUMBRANCE');
 						}
 					})
-				})
+				});
+				commit('SET_USERINFO', user_info);
 			});
 		},
 		setSlide({ commit }, payload) {

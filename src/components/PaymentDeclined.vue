@@ -1,12 +1,12 @@
 <template>
 	<div 
-        v-if="patron && patron.last_charge_status === 'Declined' && new Date(patron.pledge_end) > new Date()" 
+        v-if="tier && userInfo && userInfo.patron && userInfo.patron.last_charge_status === 'Declined' && new Date(userInfo.patron.pledge_end) > new Date()" 
         class="bg-red declined white"
         :class="{'hide_declined': hide}"
     >
         <div>
             <b>Payment declined!</b><br/>
-            Your last payment on Patreon was declined, your subscription will automatically be cancelled on {{ makeDate(patron.pledge_end) }}.<br/>
+            Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
             Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
         </div>
         <a @click="hide = true"><i class="fas fa-times"></i></a>
@@ -14,9 +14,9 @@
 </template>
 
 <script>
-    import { db } from '@/firebase'
-    import { mapGetters } from 'vuex'
-    import { general } from '@/mixins/general.js'
+    import { db } from '@/firebase';
+    import { mapGetters } from 'vuex';
+    import { general } from '@/mixins/general.js';
 
 	export default {
         data() {
@@ -27,20 +27,9 @@
         mixins: [general],
         computed: {
             ...mapGetters([
+                'tier',
 				'userInfo',
-            ]),
-            async patron() {
-                if(this.userInfo) {
-                    let patron_data
-                    var patron = await db.ref(`new_patrons`).orderByChild('email').equalTo(this.userInfo.email)
-                    patron.on('value', (snapshot) => {
-                        for(let key in snapshot.val()) {
-                            patron_data = snapshot.val()[key];
-                        }
-                    });
-                    return patron_data
-                }
-            }
+            ])
         }
 	};
 </script>

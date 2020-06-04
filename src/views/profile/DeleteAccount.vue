@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="content">
 		<h2>Are you sure you want to delete your account?</h2>
 		<p>All your data will permanently be deleted.</p>
 		<p v-if="error" class="red">{{ error }}</p>
@@ -65,9 +65,12 @@ export default {
 					db.ref(`encounters/${user.uid}`).remove();
 					db.ref(`players/${user.uid}`).remove();
 					db.ref(`npcs/${user.uid}`).remove();
+					db.ref(`reminders/${user.uid}`).remove();
+					db.ref(`custom_items/${user.uid}`).remove();
 					db.ref(`settings/${user.uid}`).remove();
 					db.ref(`broadcast/${user.uid}`).remove();
 					db.ref(`users/${user.uid}`).remove();
+					db.ref(`search_users/${user.uid}`).remove();
 
 					vm.$router.replace('/');
 				}).catch(function(error) {
@@ -80,7 +83,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.container {
+	.content {
 		text-align: center;
 
 		.warning {

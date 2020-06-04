@@ -1,6 +1,6 @@
 <template>
 	<div 
-        v-if="userInfo && userInfo.patron && userInfo.patron.last_charge_status === 'Declined' && new Date(userInfo.patron.pledge_end) > new Date()" 
+        v-if="tier && userInfo && userInfo.patron && userInfo.patron.last_charge_status === 'Declined' && new Date(userInfo.patron.pledge_end) > new Date()" 
         class="bg-red declined white"
         :class="{'hide_declined': hide}"
     >
@@ -27,6 +27,7 @@
         mixins: [general],
         computed: {
             ...mapGetters([
+                'tier',
 				'userInfo',
             ])
         }

@@ -40,6 +40,7 @@ export const effects = {
 					attack: { label: "Attack Rolls" },
 					damage: { label: "Damage Rolls", form_fields: { damage_types: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 				},
 				set: {
@@ -59,12 +60,14 @@ export const effects = {
 				advantage: {
 					attack: { label: "Attack Rolls", form_fields: { attack: true }  },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 					death_save: { label: "Death Saving Throws" },
 				},
 				disadvantage: {
 					attack: { label: "Attack Rolls", form_fields: { attack: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 					death_save: { label: "Death Saving Throws" },
 				},

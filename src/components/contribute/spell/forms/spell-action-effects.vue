@@ -57,6 +57,7 @@
 								</b-form-select>
 								<p class="validate red" v-if="errors.has(`application-${eff_index}`)">{{ errors.first(`application-${eff_index}`) }}</p>
 							</b-col>
+							<!-- TARGETS -->
 							<b-col sm="6">
 								<label class="required" for="target">
 									<span>Target</span>

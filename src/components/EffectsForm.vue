@@ -197,24 +197,45 @@
 				</b-form-select>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 			</b-col>
+			<!-- SKILLS -->
+			<b-col md="4" v-if="hasField('skills')">
+				<label for="skill">
+					Skill
+				</label>
+				<!-- <pre>{{skillList}}</pre> -->
+				<b-form-select v-model="effect.skill"
+					id="skill"
+					name="skill"
+					title="Skill"
+					class="form-control mb-2"
+					data-vv-as="Skill"
+					@change="$forceUpdate()">
+					<option :value="undefined" disabled>- Skill -</option>
+					<option value="all">All</option>
+					<option value="choose">Choose</option>
+					<option v-for="(obj, skill) in skillList"
+						:key="skill" :value="skill">{{ skill.capitalize() }}</option>
+				</b-form-select>
+				<p class="validate red" v-if="errors.has(`skills`)">{{ errors.first(`skills`) }}</p>
+			</b-col>
 
 			<!-- ATTACK -->
 			<b-col md="4" v-if="hasField('attack')">
-				<label for="ability">
+				<label for="attack">
 					Made by/against
 				</label>
-				<b-form-select v-model="effect.ability"
-					id="ability"
-					name="ability"
-					title="effect Subtype"
+				<b-form-select v-model="effect.attack"
+					id="attack"
+					name="attack"
+					title="Made by/against"
 					class="form-control mb-2"
-					data-vv-as="effect Subtype"
+					data-vv-as="Made by/against"
 					@change="$forceUpdate()">
 					<option :value="undefined" disabled>- Choose -</option>
 					<option v-for="{label, value} in byAgainst"
 						:key="value" :value="value">{{ label }}</option>
 				</b-form-select>
-				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+				<p class="validate red" v-if="errors.has(`attack`)">{{ errors.first(`attack`) }}</p>
 			</b-col>
 
 			<!-- MINIMUM -->
@@ -244,10 +265,11 @@
 <script>
 import { effects } from '../mixins/effects';
 import { abilities } from '../mixins/abilities';
+import { skills } from '../mixins/skills';
 
 export default {
 	name: "EffectsForm",
-	mixins: [effects, abilities],
+	mixins: [effects, abilities, skills],
 	props: {
 		value: Object,
 		variables: {

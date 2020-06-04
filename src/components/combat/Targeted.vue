@@ -40,7 +40,7 @@
 			</div>
 
 			<!-- MULTITARGET OPTIONS -->
-			<div class="options d-flex justify-content-between" v-else>
+			<div class="options d-flex justify-content-between" v-else-if="targeted.length > 0">
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
 					v-b-tooltip.hover title="[d] Do Damage / Healing">
@@ -185,7 +185,13 @@
 							</div>
 						</div>
 					</template>
-					<h2 v-else class="red">No target</h2>
+					<template v-else>
+						<h2 class="red">No target</h2>
+						<p class="noTargetInfo">
+							Select at least 1 target from the target list to perform targeted actions.<br/>
+							To select <b>multiple targets</b>, hold [shift] and click on the desired targets. On a touchscreen hold down to select multiple targets.
+						</p>
+					</template>
 				</div>
 			</div>
 		</div>
@@ -342,6 +348,10 @@
 	grid-area: targeted;
 	overflow: hidden;
 	
+	.noTargetInfo {
+		font-size: 15px;
+		line-height: 25px;
+	}
 	.current {
 		padding: 15px 10px;
 		width: calc(100% - 5px);

@@ -75,7 +75,7 @@
             			Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
 								</p>
 							</div>
-							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1">Cancel subscription</a></small>
+							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank">Cancel subscription</a></small>
 							<hr>
 						</div>
 

@@ -392,6 +392,9 @@
 				<b-col md="6">
 					<label for="description_preview">Preview</label>
 					<vue-markdown name="description_preview" :source="spell.description"></vue-markdown>
+					<div v-if="spell.higher_level">
+						<b class="pl-2"><i>At Higher Levels.</i></b> {{ spell.higher_level }}
+					</div>
 				</b-col>
 			</b-row>
 		</div>
@@ -487,7 +490,6 @@ export default {
 				{ label: "Wizard", value: "wizard" },
 			],
 			classes_selected: null,
-
 		};
 	},
 	methods: {

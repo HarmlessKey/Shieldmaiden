@@ -199,10 +199,10 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { db, auth } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
-	import TargetItem from '@/components/combat/TargetItem.vue'
+	import _ from 'lodash';
+	import { db, auth } from '@/firebase';
+	import { mapGetters, mapActions } from 'vuex';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Targets',

@@ -1,19 +1,20 @@
 <template>
 	<div class="pb-5" v-if="entities">
-		<h2>Reminders <span class="blue">{{ targets.length }} targets</span></h2>
-		<b-row v-if="targets.length === 1 && entities[targets[0]].reminders" class="current justify-content-start px-3">
-			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targets[0]].reminders" :key="key">
+		<h2>Set Reminders</h2>
+		<ul class="targets">
+			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+				<TargetItem  :item="target" :i="i" />
+			</li>
+		</ul>
+		<hr>
+		<b-row v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="current justify-content-start px-3">
+			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
 				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
 				</a>
 			</b-col>
 		</b-row>
-		<div v-else>
-			<p v-for="(reminder, i) in addedReminders" :key="`added-${i}`">
-				<i class="fas fa-check green"></i> {{ reminder.title }}
-			</p>
-		</div>
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
 				<a class="nav-link active" 
@@ -98,13 +99,15 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import ReminderForm from '@/components/ReminderForm';
-	import { remindersMixin } from '@/mixins/reminders'
+	import { remindersMixin } from '@/mixins/reminders';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'TargetReminders',
 		mixins: [remindersMixin],
 		components: {
-			ReminderForm
+			ReminderForm,
+			TargetItem
 		},
 		props: [
 			'data',
@@ -113,14 +116,12 @@
 			return {
 				userId: this.$store.getters.getUser.uid,
 				entityKey: this.data,
-				targets: this.data,
 				action: 'remove',
 				selectedColor: 'green-light',
 				premadeReminder: undefined,
 				customReminder: {},
 				varOptions: undefined,
-				selectedVars: {},
-				addedReminders: []
+				selectedVars: {}
 			}
 		},
 		firebase() {
@@ -131,6 +132,7 @@
 		computed: {
 			...mapGetters([
 				'entities',
+				'targeted'
 			]),
 		},
 		methods: {
@@ -139,7 +141,7 @@
 			]),
 			addReminder(type, reminder = false, selectedVars=undefined) {
 					if(type === 'premade') {
-						for(const target of this.targets) {
+						for(const target of this.targeted) {
 							let key = reminder['.key'] || reminder.key;
 							delete reminder['.key'];
 
@@ -156,12 +158,11 @@
 							});
 							reminder['.key'] = key;
 						}
-						this.addedReminders.push(reminder);
 					}
 					else if(type === 'custom') {
 						this.validation.validateAll().then((result) => {	
 							if (result) {
-								for(const target of this.targets) {
+								for(const target of this.targeted) {
 									this.set_targetReminder({
 										action: 'add',
 										entity: target,
@@ -169,7 +170,6 @@
 										reminder: this.customReminder
 									});
 								}
-								this.addedReminders.push(this.customReminder);
 								this.customReminder = {};
 							}
 						});
@@ -181,7 +181,7 @@
 			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
-					entity: this.targets[0],
+					entity: this.targeted[0],
 					key: key,
 				})
 			},
@@ -201,7 +201,17 @@
 </script>
 
 <style lang="scss" scoped>
+	ul.targets {
+		list-style: none;
+		padding: 0;
 
+		li {
+			margin-bottom: 2px !important;
+			border: solid 1px transparent;
+			background: #191919;
+			padding-right: 10px;
+		}
+	}
 	ul.nav-tabs {
 		border-bottom: solid 3px #494747;
 		height: 41px;

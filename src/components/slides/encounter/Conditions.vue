@@ -1,6 +1,12 @@
 <template>
 	<div class="pb-5">
-		<h2>Conditions <span class="blue">{{ targets.length }} targets</span></h2>
+		<h2>Set Conditions</h2>
+		<ul class="targets">
+			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+				<TargetItem  :item="target" :i="i" />
+			</li>
+		</ul>
+		<hr>
 		<ul class="conditions">
 			<template v-for="({value, name, condition, effects }, index) in conditionList">
 				<li :key="index" v-if="value != 'exhaustion'">
@@ -73,16 +79,19 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { conditions } from '@/mixins/conditions.js';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Conditions',
 		mixins: [conditions],
+		components: {
+			TargetItem
+		},
 		props: [
 		'data',
 		],
 		data() {
 			return {
-				targets: this.data,
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
@@ -90,7 +99,8 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities'
+				'entities',
+				'targeted'
 			]),
 		},
 		methods: {
@@ -101,7 +111,7 @@
 			set(condition) {
 				const action = (this.checkAll(condition)) ? 'remove' : 'add';
 
-				for(const key of this.targets) {
+				for(const key of this.targeted) {
 					this.set_condition({
 						action, 
 						key, 
@@ -112,7 +122,7 @@
 			setExhausted(level) {
 				var action = (level === 0) ? 'remove' : 'add';
 
-				for(const key of this.targets) {
+				for(const key of this.targeted) {
 					this.set_condition({
 						action, 
 						key, 
@@ -126,7 +136,7 @@
 			},
 			//Checks if all targets have a certain condition
 			checkAll(condition) {
-				for(const key of this.targets) {
+				for(const key of this.targeted) {
 					if(!this.check(condition, key)) {
 						return false;
 					}
@@ -136,7 +146,7 @@
 			checkExhaustion() {
 				let exhaustion = undefined;
 
-				for(const key of this.targets) {
+				for(const key of this.targeted) {
 					const targetsExhaustion = this.entities[key].conditions.exhaustion;
 
 					if(targetsExhaustion && !exhaustion) {
@@ -152,6 +162,17 @@
 </script>
 
 <style lang="scss" scoped>
+	ul.targets {
+		list-style: none;
+		padding: 0;
+
+		li {
+			margin-bottom: 2px !important;
+			border: solid 1px transparent;
+			background: #191919;
+			padding-right: 10px;
+		}
+	}
 	ul.conditions {
 		list-style: none;
 		padding: 0;

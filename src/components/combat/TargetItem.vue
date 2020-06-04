@@ -253,6 +253,7 @@
 			height: 12px;
 			border: solid 1px #fff;
 			margin-left: 1px;
+			cursor: pointer;
 		}
 	}
 }

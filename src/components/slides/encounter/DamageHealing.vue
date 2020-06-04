@@ -1,7 +1,14 @@
 <template>
 	<div>
-		<h2>Damage / heal <span class="blue">{{ target.name }}</span></h2>
+		<h2>Damage / heal</h2>
 
+		<ul class="targets">
+			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+				<TargetItem  :item="target" :i="i" />
+			</li>
+		</ul>
+
+		<label>Damage done by</label>
 		<select class="form-control" 
 			v-model="doneBy" 
 			name="doneBy"
@@ -21,12 +28,14 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 	import Actions from '@/components/combat/actions/Actions.vue';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'damageHealing',
 		mixins: [setHP],
 		components: {
 			Actions: Actions,
+			TargetItem
 		},
 		props: [
 		'data',
@@ -50,6 +59,7 @@
 		computed: {
 			...mapGetters([
 				'entities',
+				'targeted'
 			]),
 			_active: function() {
 				return _.chain(this.entities)
@@ -89,6 +99,17 @@
 </script>
 
 <style lang="scss" scoped>
+	ul.targets {
+		list-style: none;
+		padding: 0;
+
+		li {
+			margin-bottom: 2px !important;
+			border: solid 1px transparent;
+			background: #191919;
+			padding-right: 10px;
+		}
+	}
 	.manual {
 		display:grid;
 		grid-template-columns: 2fr 1fr;

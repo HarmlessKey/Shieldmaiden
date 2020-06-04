@@ -176,7 +176,22 @@
 					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
 				</b-col>
 			</template>
-
+			<!-- DESCRIPTION -->
+			<b-col md="12" v-if="hasField('description')">
+				<label for="description">
+					Description
+				</label>
+				<b-form-textarea v-model="effect.description"
+					id="description"
+					name="description"
+					title="Desciption"
+					class="form-control mb-2"
+					data-vv-as="Desciption"
+					v-validate="'required|max:100'"
+					maxlength="101"
+					@change="$forceUpdate()"></b-form-textarea>
+				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+			</b-col>
 			<!-- ABILITIES -->
 			<b-col md="4" v-if="hasField('abilities')">
 				<label for="ability">
@@ -185,9 +200,9 @@
 				<b-form-select v-model="effect.ability"
 					id="ability"
 					name="ability"
-					title="effect Subtype"
+					title="Ability"
 					class="form-control mb-2"
-					data-vv-as="effect Subtype"
+					data-vv-as="Ability"
 					@change="$forceUpdate()">
 					<option :value="undefined" disabled>- Ability -</option>
 					<option value="all">All</option>

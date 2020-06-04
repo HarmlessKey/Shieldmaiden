@@ -70,12 +70,12 @@
 										<a class="dropdown-item" 
 										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"
 										@click="edit(entity.key, entities[entity.key], entity.entityType)">
-											<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
+											<i class="fas fa-pencil"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
 											{{ entity.entityType }}
 										</a>
 										<a class="dropdown-item" 
 											@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entity.key})"
-											v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})">
+										>
 											<i class="fas fa-stopwatch"></i> <span v-if="showKeybinds.keyBinds === undefined">[m]</span> Reminders
 										</a>
 										<a class="dropdown-item" 
@@ -89,15 +89,10 @@
 											<template v-if="!entity.hidden"> Hide</template>
 											<template v-else> Show</template>
 										</a>
-
-
-										<a class="dropdown-item" 
-											@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
-											v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted]})">
+										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})">
 											<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 										</a>
-										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
-											v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entities[targeted]})">
+										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})">
 											<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 										</a>
 										<div class="dropdown-divider"></div>
@@ -163,12 +158,10 @@
 												v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
 												<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
 											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
-												v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted]})">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})">
 												<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
 											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity})"
-												v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entities[targeted]})">
+											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity})">
 												<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
 											</a>
 											<div class="dropdown-divider"></div>
@@ -206,10 +199,10 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { db, auth } from '@/firebase'
-	import { mapGetters, mapActions } from 'vuex'
-	import TargetItem from '@/components/combat/TargetItem.vue'
+	import _ from 'lodash';
+	import { db, auth } from '@/firebase';
+	import { mapGetters, mapActions } from 'vuex';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Targets',

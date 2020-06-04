@@ -1,20 +1,22 @@
 <template>
 	<div class="pb-5">
 		<h2>
-			<svg :title="cond['.key']" 
-				class="icon text" 
-				viewBox="0 0 512 512">
-					<path :d="cond.icon" fill-opacity="1"></path>
-			</svg>
-			{{ cond['.key'] }}
+			<icon :icon="cond.value" class="icon" />
+			{{ cond.name }}
 		</h2>
 
-		<a v-if="entity.conditions[cond['.key']]" 
+		<div class="bg-gray-dark pr-2">
+				<TargetItem  :item="entity.key" />
+		</div>
+
+		<hr>
+
+		<a v-if="entity.conditions[cond.value]" 
 			class="btn btn-block bg-red mb-3"
-			@click="remove(cond['.key'])">
+			@click="remove(cond.value)">
 			Remove condition</a>
 
-		<table v-if="cond['.key'] === 'exhaustion'" class="table">
+		<table v-if="cond.value === 'exhaustion'" class="table">
 			<thead>
 				<th>Current</th>
 				<th>Effect</th>
@@ -39,11 +41,17 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions } from 'vuex';
+	import { conditions } from '@/mixins/conditions.js';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Condition',
+		mixins: [conditions],
+		components: {
+			TargetItem
+		},
 		props: [
 		'data',
 		],
@@ -63,10 +71,15 @@
 		},
 		firebase() {
 			return {
-				cond: {
-					source: db.ref(`conditions/${this.condition}`),
-					asObject: true
-				}
+				// cond: {
+				// 	source: db.ref(`conditions/${this.condition}`),
+				// 	asObject: true
+				// }
+			}
+		},
+		computed: {
+			cond() {
+				return this.conditionList.filter(item => item.value === this.condition)[0];
 			}
 		},
 		methods: {

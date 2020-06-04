@@ -34,7 +34,7 @@
 			</div>
 		</div>
 
-		<div class="actions" v-if="spell.actions">
+		<div class="actions" v-if="spell.actions && !no_roll">
 			<h4 class="mb-3">Roll spell</h4>
 
 			<div class="input" v-if="spell.level_scaling === 'Character Level'">
@@ -268,7 +268,8 @@
 			VueMarkdown
 		},
 		props: [
-		'data'
+			'data',
+			'no_roll',
 		],
 		data() {
 			return {

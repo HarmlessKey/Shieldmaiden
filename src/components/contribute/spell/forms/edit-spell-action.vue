@@ -11,20 +11,6 @@
 		</div>
 		<div class="card-body">
 			<b-row>
-				<!-- ACTION NAME -->
-				<b-col md="3">
-					<label for="name">Action Name</label>
-					<b-form-input v-model="spell_action.name"
-						autocomplete="off"
-						id="name"
-						name="name"
-						class="form-control mb-2"
-						title="Action Name"
-						v-validate="'max:100'"
-						data-vv-as="Action Name"
-						@keyup="$forceUpdate()"
-						></b-form-input>
-				</b-col>
 				<!-- ACTION TYPE -->
 				<b-col md="3">
 					<label class="required" for="attack_type">Action Type</label>
@@ -41,6 +27,20 @@
 							:key="value" :value="value" selected="selected">{{label}}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
+				</b-col>
+				<!-- ACTION NAME -->
+				<b-col md="3">
+					<label for="name">Action Name</label>
+					<b-form-input v-model="spell_action.name"
+						autocomplete="off"
+						id="name"
+						name="name"
+						class="form-control mb-2"
+						title="Action Name"
+						v-validate="'max:100'"
+						data-vv-as="Action Name"
+						@keyup="$forceUpdate()"
+						></b-form-input>
 				</b-col>
 				<!-- SAVE -->
 				<b-col md="2">

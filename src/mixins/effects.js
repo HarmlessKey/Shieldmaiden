@@ -31,7 +31,12 @@ export const effects = {
 				special: {
 					label: "Special",
 					info: "Special effects that don't fall into the other categories."
-				}
+				},
+				// description: {
+				// 	label: "Description",
+				// 	info: "An effect that has a descriptive component.",
+				// 	form_fields: { description: true },
+				// },
 			},
 			effect_subtypes: {
 				bonus: {
@@ -40,6 +45,7 @@ export const effects = {
 					attack: { label: "Attack Rolls" },
 					damage: { label: "Damage Rolls", form_fields: { damage_types: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 				},
 				set: {
@@ -59,12 +65,14 @@ export const effects = {
 				advantage: {
 					attack: { label: "Attack Rolls", form_fields: { attack: true }  },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 					death_save: { label: "Death Saving Throws" },
 				},
 				disadvantage: {
 					attack: { label: "Attack Rolls", form_fields: { attack: true } },
 					ability: { label: "Ability Checks", form_fields: { abilities: true } },
+					skill: {label: "Skill Checks", form_fields: {skills: true } },
 					save: { label: "Saving Throws", form_fields: { abilities: true } },
 					death_save: { label: "Death Saving Throws" },
 				},
@@ -72,7 +80,9 @@ export const effects = {
 					max_healing: { label: "Maximum Healing"},
 					max_damage: { label: "Maximum Damage", form_fields: { damage_types: true } },
 					death_ward: { label: "Death Ward" },
+					description: { label: "Description", form_fields: { description: true } },
 				},
+				// description: {}
 			}
 		}
 	},

@@ -38,6 +38,8 @@
 								right: column.right
 							}, column.classes]"
 							v-html="column.label"
+							v-b-tooltip.hover="column.tooltip"
+							:title="column.title"
 						>
 						</div>
 						<div 
@@ -49,6 +51,8 @@
 								center: column.center,
 								right: column.right
 							}, column.classes]"
+							v-b-tooltip.hover="column.tooltip"
+							:title="column.title"
 							@click="sort(key)"
 						>
 							<span v-html="column.label"></span>

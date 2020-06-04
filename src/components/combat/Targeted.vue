@@ -10,26 +10,54 @@
 				</a>
 			</div>
 
+			<!-- SINGLE TARGET OPTIONS -->
 			<div class="options d-flex justify-content-between" v-if="target">
+				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })"
+					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })"
+					v-b-tooltip.hover title="[d] Do Damage / Healing">
+					<span class="icon"><i class="fas fa-swords"></i></span>
+				</a>
+				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
+					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
+					v-b-tooltip.hover title="[c] Conditions">
+					<span class="icon"><i class="fas fa-flame"></i></span>
+				</a>
+				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
+					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
+					v-b-tooltip.hover title="[m] Reminders">
+					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+				</a>
+				<a @click="setSlide({show: true, type: 'slides/Transform', data: target })"
+					v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: target })"
+					v-b-tooltip.hover title="[t] Transform">
+					<span class="icon"><i class="fas fa-paw-claws"></i></span>
+				</a>
+				
 				<a @click="edit(target.key, target.entityType)"
 					v-b-tooltip.hover title="[e] Edit">
 					<span class="icon"><i class="fas fa-pencil"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: target.key})"
-					v-b-tooltip.hover title="[m] Reminders">
-					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+			</div>
+
+			<!-- MULTITARGET OPTIONS -->
+			<div class="options d-flex justify-content-between" v-else>
+				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
+					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
+					v-b-tooltip.hover title="[d] Do Damage / Healing">
+					<span class="icon"><i class="fas fa-swords"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/Transform', data: target})"
-					v-b-tooltip.hover title="[t] Transform">
-					<span class="icon"><i class="fas fa-paw-claws"></i></span>
-				</a>
-				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: target})"
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
+					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
 					v-b-tooltip.hover title="[c] Conditions">
 					<span class="icon"><i class="fas fa-flame"></i></span>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target})"
-					v-b-tooltip.hover title="[d] Do Damage / Healing">
-					<span class="icon"><i class="fas fa-swords"></i></span>
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
+					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
+					v-b-tooltip.hover title="[m] Reminders"
+				>
+					<span class="icon"><i class="fas fa-stopwatch"></i></span>
 				</a>
 			</div>
 		</h2>
@@ -98,11 +126,6 @@
 
 					<!-- MULTIPLE TARGETS -->
 					<template v-else-if="targeted.length > 1">
-						<div class="mb-2">
-							<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})">
-								<i class="fas fa-swords"></i> Attack of Opportunity / Reaction
-							</a>
-						</div>
 						<div v-for="key in targeted" :key="`target-${key}`" class="target">
 							<div class="health untarget">
 								<icon v-if="entities[key].img === 'monster' || entities[key].img === 'player'" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />

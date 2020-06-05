@@ -176,7 +176,22 @@
 					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
 				</b-col>
 			</template>
-
+			<!-- DESCRIPTION -->
+			<b-col md="12" v-if="hasField('description')">
+				<label for="description">
+					Description
+				</label>
+				<b-form-textarea v-model="effect.description"
+					id="description"
+					name="description"
+					title="Desciption"
+					class="form-control mb-2"
+					data-vv-as="Desciption"
+					v-validate="'required|max:100'"
+					maxlength="101"
+					@change="$forceUpdate()"></b-form-textarea>
+				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
+			</b-col>
 			<!-- ABILITIES -->
 			<b-col md="4" v-if="hasField('abilities')">
 				<label for="ability">
@@ -185,9 +200,9 @@
 				<b-form-select v-model="effect.ability"
 					id="ability"
 					name="ability"
-					title="effect Subtype"
+					title="Ability"
 					class="form-control mb-2"
-					data-vv-as="effect Subtype"
+					data-vv-as="Ability"
 					@change="$forceUpdate()">
 					<option :value="undefined" disabled>- Ability -</option>
 					<option value="all">All</option>
@@ -197,24 +212,45 @@
 				</b-form-select>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 			</b-col>
+			<!-- SKILLS -->
+			<b-col md="4" v-if="hasField('skills')">
+				<label for="skill">
+					Skill
+				</label>
+				<!-- <pre>{{skillList}}</pre> -->
+				<b-form-select v-model="effect.skill"
+					id="skill"
+					name="skill"
+					title="Skill"
+					class="form-control mb-2"
+					data-vv-as="Skill"
+					@change="$forceUpdate()">
+					<option :value="undefined" disabled>- Skill -</option>
+					<option value="all">All</option>
+					<option value="choose">Choose</option>
+					<option v-for="(obj, skill) in skillList"
+						:key="skill" :value="skill">{{ skill.capitalize() }}</option>
+				</b-form-select>
+				<p class="validate red" v-if="errors.has(`skills`)">{{ errors.first(`skills`) }}</p>
+			</b-col>
 
 			<!-- ATTACK -->
 			<b-col md="4" v-if="hasField('attack')">
-				<label for="ability">
+				<label for="attack">
 					Made by/against
 				</label>
-				<b-form-select v-model="effect.ability"
-					id="ability"
-					name="ability"
-					title="effect Subtype"
+				<b-form-select v-model="effect.attack"
+					id="attack"
+					name="attack"
+					title="Made by/against"
 					class="form-control mb-2"
-					data-vv-as="effect Subtype"
+					data-vv-as="Made by/against"
 					@change="$forceUpdate()">
 					<option :value="undefined" disabled>- Choose -</option>
 					<option v-for="{label, value} in byAgainst"
 						:key="value" :value="value">{{ label }}</option>
 				</b-form-select>
-				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
+				<p class="validate red" v-if="errors.has(`attack`)">{{ errors.first(`attack`) }}</p>
 			</b-col>
 
 			<!-- MINIMUM -->
@@ -244,10 +280,11 @@
 <script>
 import { effects } from '../mixins/effects';
 import { abilities } from '../mixins/abilities';
+import { skills } from '../mixins/skills';
 
 export default {
 	name: "EffectsForm",
-	mixins: [effects, abilities],
+	mixins: [effects, abilities, skills],
 	props: {
 		value: Object,
 		variables: {

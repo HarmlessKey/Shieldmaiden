@@ -18,7 +18,7 @@
 				:icon="displayImg(current, players[current.id], npcs[current.id])" 
 				:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
 			/>
-			<div v-else class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
+			<div v-else class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.id], npcs[current.id]) + '\')' }"/>
 			<h1 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
 					<template v-if="current.entityType == 'npc'">

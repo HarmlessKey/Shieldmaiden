@@ -5,7 +5,6 @@
 				:class="{ shadow : setShadow > 0 }">
 				<span>
 					<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
-					<a v-b-popover.hover.top="'Use shift+click to select multiple targets, or hold down on a tablet or phone.'" title="Multitargeting"><i class="fas fa-info-circle"></i></a>
 				</span>
 				<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
@@ -19,14 +18,22 @@
 			</h2>
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
-					<div>
+					<div v-shortkey="{
+						downSingle: ['arrowdown'], 
+						downMultiple: ['shift', 'arrowdown'],
+						upSingle: ['arrowup'], 
+						upMultiple: ['shift', 'arrowup']
+					}" 
+					@shortkey="cycle_target"
+				>
 						<!-- ACTIVE TARGETS -->
 						<transition-group 
 							tag="ul" 
 							class="targets active_targets pt-3" 
 							name="targets" 
 							enter-active-class="animated fadeInUp" 
-							leave-active-class="animated fadeOutDown">
+							leave-active-class="animated fadeOutDown"
+						>
 							<li 
 								v-for="(entity, i) in _targets"
 								class="d-flex justify-content-between" 
@@ -304,7 +311,7 @@
 						longPress,
 						e: this.event,
 						key: this.key
-					})
+					});
 				}
 				//Reset all values
 				clearInterval(this.interval)
@@ -352,6 +359,32 @@
 					]
 				});
 			},
+			cycle_target(event) {
+				const lastSelected = this.targeted[this.targeted.length - 1];
+				const longPress = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? false : true; //Multitarget or not
+				//Create array with keys of all targets
+				const targetsArray = this._targets.map(function (target) {
+					return target.key;
+				});
+				const current = targetsArray.indexOf(lastSelected); //Set the target from where we're gonna select the next
+
+				let index;
+				//Select the next target, either up or down based on the key that's pressed
+				if((event.srcKey === 'downSingle' || event.srcKey === 'downMultiple')) {
+					index = ((current + 1) < this._targets.length) ? current + 1 : 0;
+				} else {
+					index = ((current - 1) < 0) ? targetsArray.length - 1 : current - 1;
+				}
+				const target = targetsArray[index];
+
+				//Select the target
+				this.set_targeted({
+					longPress,
+					e: event,
+					key: target
+				});
+				
+			}
 		},
 	}
 </script>

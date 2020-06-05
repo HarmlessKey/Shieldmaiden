@@ -185,13 +185,14 @@
 							</div>
 						</div>
 					</template>
-					<template v-else>
-						<h2 class="red">No target</h2>
-						<p class="noTargetInfo">
-							Select at least 1 target from the target list to perform targeted actions.<br/>
-							To select <b>multiple targets</b>, hold [shift] and click on the desired targets. On a touchscreen hold down to select multiple targets.
-						</p>
-					</template>
+					<div v-else class="noTargetInfo">
+						<h3 class="red">No target selected</h3>
+						<p> Select at least 1 target from the target list to perform targeted actions.</p>
+
+						<p><b>Selecing a target</b><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
+						<p><b>Multi-targeting</b><br/>Hold down shift and click on multiple entities to target them all at once.</p>
+						<p><b>Cycle through targets</b><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
+					</div>
 				</div>
 			</div>
 		</div>

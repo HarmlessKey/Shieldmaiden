@@ -2,11 +2,11 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<img  v-if="!user" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
 				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
 				<div class="content-box">
 					<div class="text">
-						<template v-if="!user">
+						<template v-if="!userInfo">
 							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
@@ -25,8 +25,8 @@
 						</div>
 
 						<div class="button-container">
-							<router-link v-if="!user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
-							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !user}">
+							<router-link v-if="!userInfo" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !userInfo}">
 								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 								<div class="text">Join our Discord</div>
 							</a>

@@ -5,7 +5,7 @@
 				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
 			</div>
 			<div>
-				<h2>Share your adventure</h2>
+				<h2>Share live initiative list</h2>
 				<p>
 					Let your players follow your encounters. 
 					<a data-toggle="collapse" :href="'#track'" 
@@ -19,9 +19,12 @@
 					or put it up on a second screen that everyone can see. 
 					You control what is displayed on the link through the <router-link to="/settings#track">settings</router-link>.
 				</p>
-			
-				<a class="copy" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i> - {{ copy }}</a>
-				<input type="hidden" autocomplete="off" id="copy" :value="copy">
+				<b-input-group class="mt-3">
+					<b-form-input :value="copy" id="copy" autocomplete="off" />
+					<b-input-group-append>
+						<a class="btn" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i></a>
+					</b-input-group-append>
+				</b-input-group>
 			</div>
 		</div>
 		<small>
@@ -73,7 +76,7 @@
 				}
 
 				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
+				// toCopy.setAttribute('type', 'hidden')
 				window.getSelection().removeAllRanges()
 			},
 		},

@@ -8,6 +8,25 @@
 					</b-col>
 
 					<b-col md="9" class="links">
+						<div v-if="user">
+							<h2 class="gray-light">Your content</h2>
+							<ul>
+								<li><router-link to="/settings">Settings</router-link></li>
+							</ul>
+							<h2 class="gray-light">DM</h2>
+							<ul>
+								<li><router-link to="/campaigns">Campaigns</router-link></li>
+								<li><router-link to="/players">Players</router-link></li>
+								<li><router-link to="/npcs">NPC's</router-link></li>
+								<li><router-link to="/reminders">Reminders</router-link></li>
+								<li><router-link to="/items">Items</router-link></li>
+							</ul>
+							<h2 class="gray-light">Player</h2>
+							<ul>
+								<li><router-link to="/characters">Characters</router-link></li>
+								<li><router-link to="/followed">Following</router-link></li>
+							</ul>
+						</div>
 						<div>
 							<h2 class="gray-light">Quick Links</h2>
 							<ul>
@@ -36,15 +55,6 @@
 								</li>
 							</ul>
 							<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
-						</div>
-						<div v-if="user">
-							<h2 class="gray-light">Your content</h2>
-							<ul>
-								<li><router-link to="/settings">Settings</router-link></li>
-								<li><router-link to="/campaigns">Campaigns</router-link></li>
-								<li><router-link to="/players">Players</router-link></li>
-								<li><router-link to="/npcs">NPC's</router-link></li>
-							</ul>
 						</div>
 					</b-col>
 				</b-row>

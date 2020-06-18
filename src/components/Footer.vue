@@ -1,51 +1,53 @@
 <template>
 	<div class="footer">
 		<div class="top">
-			<div class="d-flex justify-content-between content">
-				<b-col md="3" class="logo-container">
-					<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
-				</b-col>
+			<div class="content">
+				<b-row>
+					<b-col md="3" class="logo-container">
+						<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
+					</b-col>
 
-				<b-col class="links">
-					<div>
-						<h2 class="gray-light">Quick Links</h2>
-						<ul>
-							<li><router-link to="/compendium">Compendium</router-link></li>
-							<li><router-link to="/feedback">Feedback</router-link></li>
-							<li><router-link to="/planned">Planned</router-link></li>
-							<li><router-link to="/updates">Updates</router-link></li>
-							<li><router-link to="/documentation">Documentation</router-link></li>
-							<li><router-link to="/about-us">About us</router-link></li>
-						</ul>
-					</div>
-					<div>
-						<h2 class="gray-light">Follow us</h2>
-						<ul>
-							<li>
-								<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
-							</li>
-							<li>
-								<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
-							</li>
-							<li>
-								<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
-							</li>
-							<li>
-								<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
-							</li>
-						</ul>
-						<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
-					</div>
-					<div v-if="user">
-						<h2 class="gray-light">Your content</h2>
-						<ul>
-							<li><router-link to="/settings">Settings</router-link></li>
-							<li><router-link to="/campaigns">Campaigns</router-link></li>
-							<li><router-link to="/players">Players</router-link></li>
-							<li><router-link to="/npcs">NPC's</router-link></li>
-						</ul>
-					</div>
-				</b-col>
+					<b-col md="9" class="links">
+						<div>
+							<h2 class="gray-light">Quick Links</h2>
+							<ul>
+								<li><router-link to="/compendium">Compendium</router-link></li>
+								<li><router-link to="/feedback">Feedback</router-link></li>
+								<li><router-link to="/planned">Planned</router-link></li>
+								<li><router-link to="/updates">Updates</router-link></li>
+								<li><router-link to="/documentation">Documentation</router-link></li>
+								<li><router-link to="/about-us">About us</router-link></li>
+							</ul>
+						</div>
+						<div>
+							<h2 class="gray-light">Follow us</h2>
+							<ul>
+								<li>
+									<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
+								</li>
+								<li>
+									<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
+								</li>
+								<li>
+									<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
+								</li>
+								<li>
+									<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
+								</li>
+							</ul>
+							<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
+						</div>
+						<div v-if="user">
+							<h2 class="gray-light">Your content</h2>
+							<ul>
+								<li><router-link to="/settings">Settings</router-link></li>
+								<li><router-link to="/campaigns">Campaigns</router-link></li>
+								<li><router-link to="/players">Players</router-link></li>
+								<li><router-link to="/npcs">NPC's</router-link></li>
+							</ul>
+						</div>
+					</b-col>
+				</b-row>
 			</div>
 		</div>
 
@@ -123,13 +125,14 @@
 					justify-content: center;
 				}
 				.links {
-					justify-content: space-between;
+					justify-content: center;
 
 					div {
-						margin: 0;
+						margin: 15px;
 					}
 				}
 			}
+			
 
 			h2 {
 				font-weight: bold !important;

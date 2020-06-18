@@ -15,26 +15,29 @@ export const trackEncounter = {
 		}
 	},
 	methods: {
+		isTransformed(entity, campPlayer) {
+			return (entity.entityType === 'player') ? campPlayer.transformed : entity.transformed;
+		},
 		displayAc(entity, player, campPlayer) {
 			var stats = {}
 			var key = entity.key
 
-			if(entity.transformed) {
-					stats.ac = parseInt(entity.transformed.ac);
-					stats.bonus = (entity.entityType == 'player') ? parseInt(campPlayer.ac_bonus) : parseInt(entity.ac_bonus);
+			if(this.isTransformed(entity, campPlayer)) {
+				stats.ac = (entity.entityType === 'player') ? campPlayer.transformed.ac : entity.transformed.ac;
+				stats.bonus = (entity.entityType === 'player') ? parseInt(campPlayer.ac_bonus) : parseInt(entity.ac_bonus);
 			}
 			else {
-					if(entity.entityType == 'player') {
-						stats = {
-							ac: parseInt(player.ac),
-							bonus: parseInt(campPlayer.ac_bonus),
-						}
-					} else {
-						stats = {
-							ac: parseInt(entity.ac),
-							bonus: parseInt(entity.ac_bonus),
-						}
+				if(entity.entityType === 'player') {
+					stats = {
+						ac: parseInt(player.ac),
+						bonus: parseInt(campPlayer.ac_bonus),
 					}
+				} else {
+					stats = {
+						ac: parseInt(entity.ac),
+						bonus: parseInt(entity.ac_bonus),
+					}
+				}
 			}
 			return stats
 		},

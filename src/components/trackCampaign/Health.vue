@@ -2,20 +2,20 @@
 	<div v-if="campPlayers && players && (displayHp(entity).curHp > 0 || entity.entityType == 'npc')">
 		{{ setNumber(displayHp(entity).curHp) }}
 		<span class="hp">
-			<span v-if="entity.transformed" v-b-tooltip.hover title="Transformed" class="mr-1">
+			<span v-if="isTransformed(entity, campPlayers[entity.key])" v-b-tooltip.hover title="Transformed" class="mr-1">
 				<i class="fas fa-paw-claws"></i>
 			</span>
 			<span class="current" :class="{ 
 				'red': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) <= 33, 
-				'orange': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 33 && percentage(displayHp(entity).curHp, displayHp(entity).maxHp) < 76, 
-				'green': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 7
+				'orange': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 33 && percentage(displayHp(entity).curHp, displayHp(entity).maxHp) <= 76, 
+				'green': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 76
 				}">
 					{{ animatedNumber }}
 				</span>
 				<span class="gray-hover">/</span>
 				<span :class="{ 
-					'green': entity.entityType == 'player' && campPlayers[entity.key].maxHpMod > 0, 
-					'red': entity.entityType == 'player' && campPlayers[entity.key].maxHpMod < 0
+					'green': entity.entityType === 'player' && campPlayers[entity.key].maxHpMod > 0, 
+					'red': entity.entityType === 'player' && campPlayers[entity.key].maxHpMod < 0
 				}">
 					{{ displayHp(entity).maxHp }}
 				</span>
@@ -41,12 +41,13 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
+	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
 	export default {
 		name: 'Health',
-		mixins: [general],
+		mixins: [general, trackEncounter],
 		props: [
 			'entity',
 			'campPlayers',
@@ -82,13 +83,16 @@
 				this.number = value
 			},
 			displayHp(entity) {
-				var stats = {};
-				var key = entity.key;
+				let stats = {};
+				const key = entity.key;
 
-				if(entity.transformed) {
+				if(this.isTransformed(entity, this.campPlayers[key])) {
+					let maxHp = (entity.entityType === 'player') ? this.campPlayers[key].transformed.maxHp : entity.transformed.maxHp;
+					let curHp = (entity.entityType === 'player') ? this.campPlayers[key].transformed.curHp : entity.transformed.curHp;
+
 					stats = {
-						maxHp: parseInt(entity.transformed.maxHp),
-						curHp: parseInt(entity.transformed.curHp),
+						maxHp: parseInt(maxHp),
+						curHp: parseInt(curHp),
 					}
 					stats.tempHp = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].tempHp) : parseInt(entity.tempHp);
 				} else {

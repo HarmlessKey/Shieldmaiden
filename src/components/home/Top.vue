@@ -8,8 +8,8 @@
 					<div class="text">
 						<template v-if="!userInfo">
 							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
-							<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
-							<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
+							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
+							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
 						<div v-else>
 							<div class="menu">
@@ -30,7 +30,6 @@
 								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 								<div class="text">Join our Discord</div>
 							</a>
-
 						</div>
 						
 						<!-- PATREON -->

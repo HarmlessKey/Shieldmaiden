@@ -87,7 +87,7 @@
 			}
 		},
 		metaInfo: {
-			title: 'Encounter Tracker D&D | Harmless Key',
+			title: 'Combat Tracker D&D | Harmless Key',
 			meta: [
 				{ vmid: 'description', name: 'description', content: 'Initiative tracker for D&D 5e. Our tool keeps track of everything in encounters so even during combat you can give your players the attention they deserve.' }
 			]

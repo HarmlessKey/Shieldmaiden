@@ -124,8 +124,8 @@
 
 						<td class="hp">
 							<template v-if="
-								(entity.entityType == 'player' && playerSettings.health === undefined)
-								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === true)
+								(entity.entityType === 'player' && playerSettings.health === undefined)
+								|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
 							">
 								<Health	:entity="entity" :campPlayers="campPlayers" />
 							</template>

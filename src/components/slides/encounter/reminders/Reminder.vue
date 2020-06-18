@@ -1,6 +1,11 @@
 <template>
 	<div class="pb-5">
 		<h2>{{ title }}</h2>
+
+		<div class="bg-gray-dark pr-2">
+				<TargetItem  :item="entity.key" />
+		</div>
+
 		<a 
 			class="btn btn-block bg-red mb-3"
 			@click="remove()"
@@ -17,13 +22,15 @@
 	import { remindersMixin } from '@/mixins/reminders';
 	import { mapActions } from 'vuex';
 	import ReminderForm from '@/components/ReminderForm';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Reminder',
 		props: ['data'],
 		mixins: [remindersMixin],
 		components: {
-			ReminderForm
+			ReminderForm,
+			TargetItem
 		},
 		data() {
 			return {

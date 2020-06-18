@@ -29,7 +29,7 @@
 					min="0"
 					v-model="entity.initiative"
 					:class="{'input': true, 'error': errors.has('initiative') }"
-					v-validate="'numeric|required'"
+					v-validate="'required'"
 					placeholder="Initiative"></b-form-input>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</b-col>
@@ -246,7 +246,7 @@
 					if (result) {
 						delete this.entity['.key']
 
-						this.entity.initiative = parseInt(this.entity.initiative)
+						this.entity.initiative = Number(this.entity.initiative)
 						if(this.entity.ac_bonus) {
 							this.entity.ac_bonus = parseInt(this.entity.ac_bonus)
 						}

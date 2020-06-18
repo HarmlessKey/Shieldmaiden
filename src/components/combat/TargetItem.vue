@@ -1,14 +1,33 @@
 <template>
 	<div>
 		<div class="target">
+			<!-- INITIATIVE -->
 			<span class="initiative" v-b-tooltip.hover title="Initiative">
 				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
 				<template v-else>{{ entity.initiative }}</template>
 			</span>
-			<span v-if="entity.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red" /></span>
-			<span v-else-if="entity.transformed == true" class="img" v-b-tooltip.hover title="Transformed">
-				<i class="fas fa-paw-claws green"></i>
+
+			<!-- HIDDEN -->
+			<span 
+				v-if="entity.hidden" 
+				class="img" 
+				v-b-tooltip.hover title="Hidden"
+				:style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+			>
+				<i class="fas fa-eye-slash red" />
 			</span>
+
+			<!-- TRANSFORMED -->
+			<span 
+				v-else-if="entity.transformed == true" 
+				class="img" 
+				v-b-tooltip.hover title="Transformed"
+				:style="entity.color_label ? `border-color: ${entity.color_label}; color: ${entity.color_label}` : ``"
+			>
+				<i class="fas fa-paw-claws" />
+			</span>
+
+			<!-- AVATAR -->
 			<template v-else>
 				<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 				<span 
@@ -18,17 +37,23 @@
 						'border-color': entity.color_label ? entity.color_label : ``
 					}"/>
 			</template>
-			<span class="ac" 
-				:class="{ 
-					'green': entity.ac_bonus > 0, 
-					'red': entity.ac_bonus < 0 
-				}" 
-				v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
-				v-if="entity.ac_bonus">
-				{{ displayStats().ac + entity.ac_bonus}}
-			</span>
-			<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
 
+			<!-- ARMOR CLASS -->
+			<div class="ac_wrapper">
+				<i class="fas fa-shield" ></i>
+				<span class="ac" 
+					:class="{ 
+						'green': entity.ac_bonus > 0,
+						'red': entity.ac_bonus < 0 
+					}" 
+					v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
+					v-if="entity.ac_bonus">
+					{{ displayStats().ac + entity.ac_bonus}}
+				</span>
+				<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
+			</div>
+
+			<!-- HEALT BAR -->
 			<template>
 				<div class="progress health-bar">
 					<span>
@@ -250,6 +275,7 @@
 			height: 12px;
 			border: solid 1px #fff;
 			margin-left: 1px;
+			cursor: pointer;
 		}
 	}
 }
@@ -257,6 +283,27 @@
 	text-align: center;
 	height: 30px;
 }
+.ac_wrapper {
+
+	grid-area: ac;
+	position: relative;
+	i, .ac {
+		position: absolute;
+		line-height: 30px;
+		width: 100%;
+		text-align: center;
+	}
+	i {
+		font-size: 25px;
+		color: #5c5757;
+	}
+	.ac {
+		font-weight: bold;
+		color: #fff;
+		margin-top: -1px;
+	}
+}
+
 .initiative {
 	grid-area: initiative;
 }
@@ -268,7 +315,6 @@
 	background-position: center top;
 	background-repeat: no-repeat;
 	background-size: cover;
-	color: #cc3e4a;
 	font-size: 20px;
 	line-height: 30px;
 	grid-area: img;
@@ -279,11 +325,7 @@
 		position: relative;
 	}
 }
-.ac {
-	font-weight: bold;
-	color: #b2b2b2;
-	grid-area: ac;
-}
+
 .hp {
 	font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
 	text-align: right;

@@ -38,11 +38,6 @@
 						url: 'patrons',
 						icon: 'fab fa-patreon',
 					},
-					'contribute': {
-						name: 'Contribute',
-						url: 'contribute',
-						icon: 'fas fa-edit',
-					},
 					'xml': { 
 						name: 'Generate XML sitemap',
 						url: 'xml',

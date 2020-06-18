@@ -37,8 +37,7 @@
 									}
 								})"><i class="fas fa-pencil"></i></a>
 							</div>
-								<!-- <input type="number" class="form-control mr-2" v-model="entity.curHp" v-validate="'numeric'" name="playerCurHp" @change="setCurHp(entity.key, entity)" /> -->
-								<input type="number" class="form-control init" v-model="entity.initiative" v-validate="'numeric'" min="0" max="99" name="playerInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
+								<input type="number" class="form-control init" v-model="entity.initiative" min="0" max="99" name="playerInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -77,11 +76,10 @@
 								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
 							</div>
 
-							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" v-validate="'numeric'" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
+							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
-						<p class="validate red" v-if="errors.has('playerInit')">{{ errors.first('npcInit') }}</p>
 						<a class="btn btn-block mb-4" :class="{'disabled' : selected.length <= 1 }" @click="rollGroup()"><i class="fas fa-dice-d20"></i> Roll as group</a>
 						<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
 					</div>

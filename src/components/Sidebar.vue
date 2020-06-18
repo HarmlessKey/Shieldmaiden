@@ -14,64 +14,98 @@
 				<template v-if="$store.getters.getUser">
 					<h3>DM Content</h3>
 					<b-list-group @click="setSideSmallScreen(false)">
-						<b-list-group-item>
-							<router-link to="/campaigns"><i class="fas fa-dungeon"></i><span>Campaigns</span></router-link>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Campaigns' : ''"
+						>
+							<router-link to="/campaigns">
+								<i class="fas fa-dungeon"></i><span>Campaigns</span>
+							</router-link>
 						</b-list-group-item>
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Players' : ''"
+						>
 							<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
 						</b-list-group-item>
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'NPC\'s' : ''"
+						>
 							<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
 						</b-list-group-item>
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Reminders' : ''"
+						>
 							<router-link to="/reminders"><i class="fas fa-stopwatch"></i><span>Reminders</span></router-link>
 						</b-list-group-item>
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Items' : ''"
+						>
 							<router-link to="/items"><i class="far fa-staff"></i><span>Items</span></router-link>
 						</b-list-group-item>
 					</b-list-group>
 					<hr>
 					<h3>Player Content</h3>
 					<b-list-group @click="setSideSmallScreen(false)">
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Characters' : ''"
+						>
 							<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
 						</b-list-group-item>
-						<b-list-group-item>
+						<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Following' : ''"
+						>
 							<router-link to="/followed"><i class="fas fa-user-check"></i><span>Followed Users</span></router-link>
 						</b-list-group-item>
 					</b-list-group>
 					<hr>
 				</template>
 				<b-list-group @click="setSideSmallScreen(false)">
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Compendium' : ''"
+						>
 						<router-link to="/compendium"><i class="fas fa-book-spells"></i><span>Compendium</span></router-link>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Feedback' : ''"
+						>
 						<router-link to="/feedback"><i class="fas fa-comment-alt"></i><span>Feedback</span></router-link>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Documentation' : ''"
+						>
 						<router-link to="/documentation"><i class="fas fa-file"></i><span>Documentation</span></router-link>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'About Us' : ''"
+						>
 						<router-link to="/about-us"><i class="fas fa-user-friends"></i><span>About Us</span></router-link>
 					</b-list-group-item>
 				</b-list-group>
 				<hr>
 				<h3>Follow us</h3>
 				<b-list-group>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Patreon' : ''"
+						>
 						<a href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon patreon-red"></i><span>Patreon</span></a>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Discord' : ''"
+						>
 						<a href="https://discord.gg/fhmKBM7" target="_blank"><i class="fab fa-discord"></i><span>Discord</span></a>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Facebook' : ''"
+						>
 						<a href="https://www.facebook.com/harmlesskey" target="_blank"><i class="fab fa-facebook"></i><span>Facebook</span></a>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Reddit' : ''"
+						>
 						<a href="https://www.reddit.com/r/HarmlessKey" target="_blank"><i class="fab fa-reddit-alien"></i><span>Reddit</span></a>
 					</b-list-group-item>
-					<b-list-group-item>
+					<b-list-group-item 
+							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Trello' : ''"
+						>
 						<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i><span>Trello</span></a>
 					</b-list-group-item>
 				</b-list-group>
@@ -196,8 +230,10 @@
 
 		.list-group-item {
 			a {
+				width: 44px;
 				padding-left: 12px;
-				margin-left: 0;
+				margin: 0;
+				transition: width 0.5s linear;
 			}
 		}
 

@@ -2,14 +2,14 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<img  v-if="!user" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
 				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
 				<div class="content-box">
 					<div class="text">
-						<template v-if="!user">
+						<template v-if="!userInfo">
 							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
-							<h1>ENCOUNTER TRACKER FOR D&D 5e.</h1>
-							<h3>We track everything in combat, so you have the time to give your players the attention they deserve.</h3>
+							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
+							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
 						<div v-else>
 							<div class="menu">
@@ -25,17 +25,18 @@
 						</div>
 
 						<div class="button-container">
-							<router-link v-if="!user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
-							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !user}">
+							<router-link v-if="!userInfo" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !userInfo}">
 								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 								<div class="text">Join our Discord</div>
 							</a>
-
 						</div>
+						
 						<!-- PATREON -->
-						<div v-if="user">
-							<template v-if="tier && tier.name !== 'Free' && !voucher">
-									<h2 class="text-center"><i class="patreon-red fas fa-heart"></i> Thanks for your support.</h2>
+						<div>
+							<!-- <pre>{{ tier }}</pre> -->
+							<template v-if="tier && userInfo && userInfo.patron">
+									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
 							</template>
 							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
@@ -63,14 +64,14 @@
 		},
 		computed: {
 			...mapGetters([
-				'userInfo',
 				'tier',
-				'voucher'
+				'voucher',
+				'userInfo',
 			]),
-			user() {
-				return auth.currentUser
-			}
-		},
+			...mapGetters({
+				user: 'getUser'
+			})
+		}
 	}
 </script>
 

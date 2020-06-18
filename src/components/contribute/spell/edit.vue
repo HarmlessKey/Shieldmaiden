@@ -14,76 +14,88 @@
 							<b-card header="Old Spell Description" v-if="loading">
 								<div  class="loader"> <span>Loading old_spell...</span></div>
 							</b-card>
-							<b-card class="old_spell" header="Old Spell Description" v-else>
-								<a 
-									class="btn btn-block mb-3" 
-									@click="parse_old_spell()">
-										<i class="fas fa-wand-magic"></i>
-										<span class="d-none d-md-inline ml-1">Parse to new spell</span>
-								</a>
+							<div class="card old_spell" v-else>
+								
+								<div class="card-header d-flex justify-content-between">
+									<a @click="preview('old')" :class="preview_spell=='old' ? 'selected' : ''">Old Spell Description</a>
+									<a @click="preview('new')" :class="preview_spell=='new' ? 'selected' : ''">New Spell Description</a>
+								</div>
+								<div class="card-body" v-if="preview_spell == 'old'">
+								<!-- <b-card class="old_spell" header="Old Spell Description" v-else> -->
+									<a 
+										class="btn btn-block mb-3" 
+										@click="parse_old_spell()">
+											<i class="fas fa-wand-magic"></i>
+											<span class="d-none d-md-inline ml-1">Parse to new spell</span>
+									</a>
 
-								<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
-								<i class="mb-3 d-block" v-if="old_spell.school">
-									{{ levels[old_spell.level] }}
-									{{ old_spell.school.name }}
-								</i>
+									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
+									<i class="mb-3 d-block" v-if="old_spell.school">
+										{{ levels[old_spell.level] }}
+										{{ old_spell.school.name }}
+									</i>
 
-								<p>
-									<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
-									<b>Range:</b> {{ old_spell.range }}<br/>
-									<b>Components:</b> 
-									<template v-for="(component, index) in old_spell.components">
-										{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
-									</template>
-									<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
-									<br/>
-									<b>Duration:</b>
-										<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
-										{{ old_spell.duration }}<br/>
-									<b>Classes:</b> 
-									<template v-for="(_class, index) in old_spell.classes">
-										{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
-									</template>
-									<br/>
-								</p>
-								<p v-for="(desc, index) in old_spell.desc" :key="index">
-									{{ desc }}
-								</p>
+									<p>
+										<b>Casting time:</b> {{ old_spell.casting_time }}<br/>
+										<b>Range:</b> {{ old_spell.range }}<br/>
+										<b>Components:</b> 
+										<template v-for="(component, index) in old_spell.components">
+											{{ component }}<template v-if="Object.keys(old_spell.components).length > index + 1">, </template>
+										</template>
+										<template v-if="old_spell.material"> ({{ old_spell.material }})</template>
+										<br/>
+										<b>Duration:</b>
+											<template v-if="old_spell.concentration == 'yes'"> Concentration, </template>
+											{{ old_spell.duration }}<br/>
+										<b>Classes:</b> 
+										<template v-for="(_class, index) in old_spell.classes">
+											{{ _class.name }}<template v-if="Object.keys(old_spell.classes).length > index + 1">, </template>
+										</template>
+										<br/>
+									</p>
+									<p v-for="(desc, index) in old_spell.desc" :key="index">
+										{{ desc }}
+									</p>
 
-								<p v-if="old_spell.higher_level">
-									At higher levels. 
-									<template v-for="higher in old_spell.higher_level">
-										{{ higher }}
-									</template>
-								</p>
-							</b-card>
+									<p v-if="old_spell.higher_level">
+										At higher levels. 
+										<template v-for="higher in old_spell.higher_level">
+											{{ higher }}
+										</template>
+									</p>
+								</div> <!-- card-body -->
+								<!-- New spell preview active -->
+								<div class="card-body" v-else>
+									<ViewSpell :data="spell" :no_roll="true" />
+								</div>
+							</div> <!-- card -->
 						</b-col>
 
-					<b-col md="8">
-						<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-						<!-- SPELL ACTIONS -->
-						<spell-actions v-model='spell' @validation="setValidators" />
-					</b-col>
-				</b-row>
-			</div>
-			<div class="save">
-				<div class="d-flex justify-content-start">
-					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-					 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
-					</div>	
-					<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+						<b-col md="8">
+							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
+							<!-- SPELL ACTIONS -->
+							<spell-actions v-model='spell' @validation="setValidators" />
+						</b-col>
+					</b-row>
 				</div>
-				<div>
-					<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-					<button 
-						:disabled="errors.items && errors.items.length > 0"
-						class="btn" 
-						@click="store_spell()"
-					>
-						<i class="fas fa-check"></i> Save
-					</button>
+				<div class="save">
+					<div class="d-flex justify-content-start">
+						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+						 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+						</div>	
+						<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+					</div>
+					<div>
+						<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+						<button 
+							:disabled="errors.items && errors.items.length > 0"
+							class="btn" 
+							@click="store_spell()"
+						>
+							<i class="fas fa-check"></i> Save
+						</button>
+					</div>
 				</div>
-			</div>
 			</template>
 		</div>
 	</div>
@@ -94,6 +106,7 @@ import { db } from '@/firebase'
 import Crumble from '@/components/crumble/Compendium.vue'
 import basicInfo from '@/components/contribute/spell/forms/basic-info.vue'
 import spellActions from '@/components/contribute/spell/forms/spell-actions.vue'
+import ViewSpell from '@/components/ViewSpell.vue'
 import { general } from '@/mixins/general.js'
 import { mapGetters } from 'vuex'
 
@@ -103,6 +116,7 @@ export default {
 		Crumble,
 		basicInfo,
 		spellActions,
+		ViewSpell,
 	},
 	mixins: [general],
 	metaInfo() {
@@ -125,7 +139,8 @@ export default {
 			validators: {},
 			spell: {},
 			unsaved_changes: false,
-			fb_spell_json: {}
+			fb_spell_json: {},
+			preview_spell: 'old',
 		}
 	},
 	computed: {
@@ -156,6 +171,14 @@ export default {
 		canEdit() {
 			return (this.old_spell.metadata && this.old_spell.metadata.tagged === this.userId) ||
 				this.userInfo.admin;
+		},
+		preview(type) {
+			this.preview_spell = type;
+			// if (type === 'old') {
+			// 	this.preview = 'old';
+			// } else {
+			// 	this.preview = 'new';
+			// }
 		},
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
@@ -281,6 +304,10 @@ export default {
 					regex: /â€œ/g,
 					replacement: '\"'
 				},
+				{
+					regex: /â€“/g,
+					replacement: '\-\-'
+				},
 			];
 			rules.forEach(function(rule) {
 				text = text.replace(rule.regex, rule.replacement);
@@ -392,6 +419,11 @@ export default {
 				position: -webkit-sticky;
 				position: sticky;
 				top: 0;
+				.card-header a.selected {
+					// font-weight: bold;
+					color: white !important;
+					cursor: default !important;
+				}
 			}
 		}
 	

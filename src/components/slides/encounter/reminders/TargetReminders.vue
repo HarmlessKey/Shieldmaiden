@@ -1,8 +1,14 @@
 <template>
 	<div class="pb-5" v-if="entities">
-		<h2>Reminders <span class="blue">{{ entities[entityKey].name }}</span></h2>
-		<b-row v-if="entities[entityKey].reminders" class="current justify-content-start px-3">
-			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[entityKey].reminders" :key="key">
+		<h2>Set Reminders</h2>
+		<ul class="targets">
+			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+				<TargetItem  :item="target" :i="i" />
+			</li>
+		</ul>
+		<hr>
+		<b-row v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="current justify-content-start px-3">
+			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
 				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
@@ -93,13 +99,15 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import ReminderForm from '@/components/ReminderForm';
-	import { remindersMixin } from '@/mixins/reminders'
+	import { remindersMixin } from '@/mixins/reminders';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'TargetReminders',
 		mixins: [remindersMixin],
 		components: {
-			ReminderForm
+			ReminderForm,
+			TargetItem
 		},
 		props: [
 			'data',
@@ -124,43 +132,48 @@
 		computed: {
 			...mapGetters([
 				'entities',
+				'targeted'
 			]),
 		},
 		methods: {
 			...mapActions([
 				'set_targetReminder',
 			]),
-			addReminder(type, reminder = false, selectedVars=undefined) {	
-				if(type == 'premade') {
-					let key = reminder['.key'] || reminder.key;
-					delete reminder['.key'];
+			addReminder(type, reminder = false, selectedVars=undefined) {
+					if(type === 'premade') {
+						for(const target of this.targeted) {
+							let key = reminder['.key'] || reminder.key;
+							delete reminder['.key'];
 
-					if(selectedVars) {
-						reminder.selectedVars = selectedVars;
-					}
+							if(selectedVars) {
+								reminder.selectedVars = selectedVars;
+							}
 
-					this.set_targetReminder({
-						action: 'add',
-						entity: this.entityKey,
-						key,
-						type: 'premade',
-						reminder: reminder
-					});
-					reminder['.key'] = key;
-				}
-				else if(type == 'custom') {
-					this.validation.validateAll().then((result) => {
-						if (result) {
 							this.set_targetReminder({
 								action: 'add',
-								entity: this.entityKey,
-								type: 'custom',
-								reminder: this.customReminder
-							})
-							this.customReminder = {};
+								entity: target,
+								key,
+								type: 'premade',
+								reminder: reminder
+							});
+							reminder['.key'] = key;
 						}
-					})
-				}
+					}
+					else if(type === 'custom') {
+						this.validation.validateAll().then((result) => {	
+							if (result) {
+								for(const target of this.targeted) {
+									this.set_targetReminder({
+										action: 'add',
+										entity: target,
+										type: 'custom',
+										reminder: this.customReminder
+									});
+								}
+								this.customReminder = {};
+							}
+						});
+					}
 			},
 			setValidation(validate) {
 				this.validation = validate;
@@ -168,7 +181,7 @@
 			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
-					entity: this.entityKey,
+					entity: this.targeted[0],
 					key: key,
 				})
 			},
@@ -188,7 +201,17 @@
 </script>
 
 <style lang="scss" scoped>
+	ul.targets {
+		list-style: none;
+		padding: 0;
 
+		li {
+			margin-bottom: 2px !important;
+			border: solid 1px transparent;
+			background: #191919;
+			padding-right: 10px;
+		}
+	}
 	ul.nav-tabs {
 		border-bottom: solid 3px #494747;
 		height: 41px;

@@ -1,13 +1,13 @@
 import { db, auth } from '@/firebase'
 import Vue from 'vue'
 
-const campaigns_ref = db.ref('campaigns/')
-const encounters_ref = db.ref('encounters')
-const players_ref = db.ref('players')
-const npcs_ref = db.ref('npcs')
-const users_ref = db.ref('users')
-const tiers_ref = db.ref('tiers')
-const settings_ref = db.ref('settings')
+const campaigns_ref = db.ref('campaigns/');
+const encounters_ref = db.ref('encounters');
+const players_ref = db.ref('players');
+const npcs_ref = db.ref('npcs');
+const users_ref = db.ref('users');
+const tiers_ref = db.ref('tiers');
+const settings_ref = db.ref('settings');
 
 export const content_module = {
 	state: {
@@ -34,68 +34,28 @@ export const content_module = {
 
 	},
 	getters: {
-		getUser: function( state ) {
-			return state.user;
-		},
-		userInfo: function( state ) {
-			return state.userInfo;
-		},
-		getSlide: function( state ) {
-			return state.slide;
-		},
-		encounters: function( state ) {
-			return state.encounters;
-		},
-		allEncounters: function( state ) {
-			return state.allEncounters;
-		},
-		players: function( state ) {
-			return state.players;
-		},
-		npcs: function( state ) {
-			return state.npcs;
-		},
-		campaign: function( state ) {
-			return state.campaign;
-		},
-		campaigns: function( state ) {
-			return state.campaigns;
-		},
-		tier: function( state ) {
-			return state.tier;
-		},
-		voucher: function( state ) {
-			return state.voucher;
-		},
-		overencumbered: function( state ) {
-			return state.overencumbered;
-		},
-		content_count: function( state ) {
-			return state.content_count;
-		},
-		poster: function( state ) {
-			return state.poster;
-		},
-		side_collapsed: function( state ) {
-			return state.side_collapsed;
-		},
-		side_small_screen: function( state ) {
-			return state.side_small_screen;
-		}
+		getUser: function( state ) { return state.user; },
+		userInfo: function( state ) { return state.userInfo; },
+		getSlide: function( state ) { return state.slide; },
+		encounters: function( state ) { return state.encounters; },
+		allEncounters: function( state ) { return state.allEncounters; },
+		players: function( state ) { return state.players; },
+		npcs: function( state ) { return state.npcs; },
+		campaign: function( state ) { return state.campaign; },
+		campaigns: function( state ) { return state.campaigns; },
+		tier: function( state ) { return state.tier; },
+		voucher: function( state ) { return state.voucher;},
+		overencumbered: function( state ) { return state.overencumbered; },
+		content_count: function( state ) { return state.content_count; },
+		poster: function( state ) { return state.poster; },
+		side_collapsed: function( state ) { return state.side_collapsed; },
+		side_small_screen: function( state ) { return state.side_small_screen; }
 	},
 	mutations: {
-		SET_USER(state) {
-			state.user = auth.currentUser;
-		},
-		SET_USERINFO(state, payload) {
-			state.userInfo = payload;
-		},
-		SET_TIER(state, payload) {
-			state.tier = payload;
-		},
-		SET_VOUCHER(state, payload) {
-			state.voucher = payload;
-		},
+		SET_USER(state) { state.user = auth.currentUser; },
+		SET_USERINFO(state, payload) { state.userInfo = payload; },
+		SET_TIER(state, payload) { state.tier = payload; },
+		SET_VOUCHER(state, payload) { state.voucher = payload; },
 		setSlide(state, payload) {
 			//Function to compare 2 arrays
 			//Needed to check if the data of the slide is the same
@@ -142,7 +102,6 @@ export const content_module = {
 			
 					}
 				};
-
 			
 				// Compare properties
 				if (type === '[object Array]') {
@@ -156,7 +115,6 @@ export const content_module = {
 						}
 					}
 				}
-			
 				// If nothing failed, return true
 				return true;
 			
@@ -173,28 +131,22 @@ export const content_module = {
 			}
 		},
 		SET_PLAYERS(state, payload) {
-			if (payload)
-				state.players = payload
+			if (payload) state.players = payload
 		},
 		SET_NPCS(state, payload) {
-			if (payload)
-				state.npcs = payload
+			if (payload) state.npcs = payload
 		},
 		SET_CAMPAIGN(state, payload) {
-			if (payload)
-				state.campaign = payload
+			if (payload) state.campaign = payload
 		},
 		SET_CAMPAIGNS(state, payload) {
-			if (payload)
-				state.campaigns = payload
+			if (payload) state.campaigns = payload
 		},
 		SET_ENCOUNTERS(state, payload) {
-			if (payload)
-				state.encounters = payload
+			if (payload) state.encounters = payload
 		},
 		SET_ALLENCOUNTERS(state, payload) {
-			if (payload)
-				state.allEncounters = payload
+			if (payload) state.allEncounters = payload
 		},
 		CHECK_ENCUMBRANCE(state) {
 			let count = {}
@@ -220,28 +172,19 @@ export const content_module = {
 					state.overencumbered = false
 			}
 		},
-		CLEAR_ENCOUNTERS(state) {
-			state.encounters = {}
-		},
-		TOGGLE_SIDE_COLLAPSE(state) {
-			Vue.set(state, 'side_collapsed', !state.side_collapsed);
-		},
-		SET_SIDE_COLLAPSE(state, payload) {
-			Vue.set(state, 'side_collapsed', payload)
-		},
-		SET_SIDE_SMALL_SCREEN(state, payload) {
-			Vue.set(state, 'side_small_screen', payload);
-		}
+		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
+		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
+		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
+		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); }
 	},
 	actions: {
 		setUser({ commit }) {
 			commit('SET_USER');
 		},
-		setUserInfo({ commit, dispatch, state }) {
-			let user = users_ref.child(state.user.uid)
+		async setUserInfo({ commit, dispatch, state }) {
+			let user = await users_ref.child(state.user.uid)
 			user.on('value', async user_snapshot => {
-				let user_info = user_snapshot.val()
-				commit('SET_USERINFO', user_info)
+				let user_info = user_snapshot.val();
 				
 				//Fetch patron info with email
 				let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
@@ -258,22 +201,22 @@ export const content_module = {
 					return err;
 				});
 				
-				let server_today = new Date(today_ms).toISOString()
+				let server_today = new Date(today_ms).toISOString();
 
 				// If user has voucher use this
 				if (user_info.voucher){
 					let voucher = user_info.voucher
 
 					if (user_info.voucher.date === undefined){
-						path = `tiers/${user_info.voucher.id}`
+						path = `tiers/${user_info.voucher.id}`;
 					} else {
-						let end_date = new Date(user_info.voucher.date).toISOString()
+						let end_date = new Date(user_info.voucher.date).toISOString();
 						
 						if (server_today > end_date) {
-							dispatch("remove_voucher", state.user.uid)
-							voucher = undefined
+							dispatch("remove_voucher", state.user.uid);
+							voucher = undefined;
 						} else {
-							path = `tiers/${user_info.voucher.id}`
+							path = `tiers/${user_info.voucher.id}`;
 						}
 					}
 					commit('SET_VOUCHER', voucher);
@@ -281,7 +224,7 @@ export const content_module = {
 				let vouch_tiers = db.ref(path)
 				vouch_tiers.on('value', voucher_snap => {
 					// Get the order of voucher/basic
-					let voucher_order = voucher_snap.val().order
+					let voucher_order = voucher_snap.val().order;
 					// Search email in patrons
 					let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
 					patrons.on('value' , async patron_snapshot => {
@@ -289,8 +232,7 @@ export const content_module = {
 						if(patron_snapshot.val()) {
 							let key = Object.keys(patron_snapshot.val())[0];
 							let patron_data = patron_snapshot.val()[key];
-
-							let pledge_end = new Date(patron_data.pledge_end).toISOString()
+							let pledge_end = new Date(patron_data.pledge_end).toISOString();
 
 							// Compare patron tiers to find highest tier checking order in FB
 							let patron_tierlist = Object.keys(patron_data.tiers);
@@ -313,9 +255,16 @@ export const content_module = {
 								highest_tier = patron_tierlist[0]
 							}
 
+							//Get tier info
 							let patron_tier = db.ref(`tiers/${highest_tier}`);
-
 							patron_tier.on('value' , tier_snapshot => {
+								//Save Patron info under UserInfo
+								user_info.patron = {
+									last_charge_status: patron_data.last_charge_status,
+									pledge_end,
+									tier: tier_snapshot.val().name
+								};
+
 								if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
 									commit('SET_TIER', tier_snapshot.val())
 								} else {
@@ -330,18 +279,13 @@ export const content_module = {
 							commit('CHECK_ENCUMBRANCE');
 						}
 					})
-				})
+				});
+				commit('SET_USERINFO', user_info);
 			});
 		},
-		setSlide({ commit }, payload) {
-			commit('setSlide', payload);
-		},
-		setCampaignId({ commit }, value) {
-			commit('SET_CAMPAIGN_ID', value)
-		},
-		setEncounterId({ commit }, value) {
-			commit('SET_ENCOUNTER_ID', value)
-		},
+		setSlide({ commit }, payload) { commit('setSlide', payload); },
+		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },
+		setEncounterId({ commit }, value) { commit('SET_ENCOUNTER_ID', value); },
 		fetchEncounter({ commit, state}, { cid, eid }) {
 			commit("SET_CAMPAIGN_ID", cid)
 			commit("SET_ENCOUNTER_ID", eid)
@@ -414,7 +358,7 @@ export const content_module = {
 			})
 		},
 		clearEncounters({ commit }) {
-			commit("CLEAR_ENCOUNTERS")
+			commit("CLEAR_ENCOUNTERS");
 		},
 		toggleSideCollapsed({ commit, state }) {
 			const uid = state.user.uid;

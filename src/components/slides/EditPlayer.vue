@@ -26,7 +26,7 @@
 						min="0"
 						v-model="initiative['.value']"
 						:class="{'input': true, 'error': errors.has('initiative') }"
-						v-validate="'numeric|required'"
+						v-validate="'required'"
 						placeholder="Initiative"></b-form-input>
 						<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 				</b-col>
@@ -380,7 +380,7 @@
 						delete this.playerBase['.key'] // can't be entered in Firebase
 
 						if(this.location == 'encounter') {
-							this.initiative['.value'] = parseInt(this.initiative['.value']);
+							this.initiative['.value'] = Number(this.initiative['.value']);
 						}
 
 						//Parse to INT

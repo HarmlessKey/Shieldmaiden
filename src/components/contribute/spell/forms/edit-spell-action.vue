@@ -11,8 +11,8 @@
 		</div>
 		<div class="card-body">
 			<b-row>
-				<!-- ATTACK TYPE -->
-				<b-col>
+				<!-- ACTION TYPE -->
+				<b-col md="3">
 					<label class="required" for="attack_type">Action Type</label>
 					<b-form-select v-model="spell_action.type"
 						id="action_type"
@@ -28,8 +28,22 @@
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
 				</b-col>
-				<!-- SAVE -->
+				<!-- ACTION NAME -->
 				<b-col md="3">
+					<label for="name">Action Name</label>
+					<b-form-input v-model="spell_action.name"
+						autocomplete="off"
+						id="name"
+						name="name"
+						class="form-control mb-2"
+						title="Action Name"
+						v-validate="'max:100'"
+						data-vv-as="Action Name"
+						@keyup="$forceUpdate()"
+						></b-form-input>
+				</b-col>
+				<!-- SAVE -->
+				<b-col md="2">
 					<label for="save">Save</label>
 					<b-form-select v-model="spell_action.save"
 						:disabled="spell_action.type != 'spell save'"
@@ -43,6 +57,44 @@
 						<option v-for="({ label, value}) in save"
 							:key="value" :value="value">{{label}}</option>
 					</b-form-select>
+				</b-col>
+				<!-- Free cast -->
+				<b-col md="2">
+					<label for="free">
+						<span>Free</span>
+						<a 
+							class="ml-1"
+							v-b-popover.hover.top="'Select this, if the spell action can be used without expending a spell slot.'" 
+							title="Free"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
+					<div class="free d-flex justify-content-between" name="free">
+						<a class="component_box" @click="setFree(spell_action)"
+							:class="{'selected': spell_action.free === true}">
+							<span>F</span>
+						</a>
+					</div>
+				</b-col>
+				<!-- Seperate cast -->
+				<b-col md="2">
+					<label for="seperate">
+						<span>Sep.</span>
+						<a 
+							class="ml-1"
+							v-b-popover.hover.top="'Select this, if the spell action can be rolled seperately from the rest of the actions.'" 
+							title="Seperate"
+						>
+							<i class="fas fa-info-circle"></i>
+						</a>
+					</label>
+					<div class="seperate d-flex justify-content-between" name="seperate">
+						<a class="component_box" @click="setSeperate(spell_action)"
+							:class="{'selected': spell_action.seperate === true}">
+							<span>S</span>
+						</a>
+					</div>
 				</b-col>
 			</b-row>
 
@@ -118,6 +170,8 @@
 				>
 					<spell-action-conditions
 						v-model="spell_action.conditions"
+						:level_scaling="level_scaling"
+						:level="level"
 						:action_type="spell_action.type"
 						@validation="setValidation"
 					/>
@@ -248,7 +302,21 @@ export default {
 				this.validators[new_key] = validators[v]
 			}
 			this.$emit('validation', this.validators)
-		}
+		},
+		setSeperate(spell_action) {
+			if (spell_action.seperate == undefined) {
+				spell_action.seperate = false
+			}
+			spell_action.seperate = !spell_action.seperate
+			this.$forceUpdate(); //IMPORTANT
+		},
+		setFree(spell_action) {
+			if (spell_action.free == undefined) {
+				spell_action.free = false
+			}
+			spell_action.free = !spell_action.free
+			this.$forceUpdate(); //IMPORTANT
+		},
 	},
 	watch: {
 		spell_action: {
@@ -288,5 +356,20 @@ ul.nav-tabs {
 .tab-content {
 	padding: 20px;
 	position: relative;
+}
+
+.component_box {
+	background: #000;
+	width: 40px;
+	text-align: center;
+	line-height: 36px;
+	height: 36px;
+	font-size: 18px;
+	span {
+		color: white;
+	}
+}
+.component_box.selected {
+	background: #2c97de;
 }
 </style>

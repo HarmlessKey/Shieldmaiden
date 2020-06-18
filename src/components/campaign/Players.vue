@@ -158,7 +158,7 @@
 							<span class="current" :class="{ 
 								'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
 								'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
-								'green': true
+								'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
 							}">{{ player.transformed.curHp }}</span>
 							<span class="gray-hover">/</span>
 							<span>
@@ -169,7 +169,7 @@
 							<span class="current" :class="{ 
 								'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
 								'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
-								'green': true
+								'green': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 76
 							}">{{ player.curHp }}</span>
 							<span class="gray-hover">/</span>
 							<span :class="{ 
@@ -356,7 +356,7 @@
 				return percentage
 			},
 			maxHp(maxHp, maxHpMod) {
-				return maxHp + maxHpMod;
+				return parseInt((maxHpMod) ? maxHp + maxHpMod : maxHp);
 			},
 			reset() {
 				for(var i in this.players) {

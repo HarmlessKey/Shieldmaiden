@@ -407,7 +407,10 @@
 				this.advantage = false; //turn advantage off
 			},
 			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
-				var showRoll = {targets};
+				var showRoll = {
+					targets,
+					timestamp: Date.now()
+				};
 
 				//Show to hit roll
 				if(this.toHit) {
@@ -426,7 +429,6 @@
 						}
 					}
 				}
-				console.log(showRoll)
 
 				//Show damage roll
 				if (Object.values(this.rollOptions).includes('damage')) {

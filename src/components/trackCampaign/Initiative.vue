@@ -277,9 +277,11 @@
 				}
 			},
 			lastRoll(roll, oldRoll) {
-				this.$emit('newRoll', roll);
+				//Check if the roll has not been shown before
+				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
+				if(roll && roll.timestamp !== oldRoll.timestamp) {
+					this.$emit('newRoll', roll);
 
-				if(roll) {
 					let crit;
 					if(roll.crit) {
 						crit = (roll.crit === 20) ? `<div class="advantage green">critical</div>` : `<div class="advantage red">critical</div>`;
@@ -312,7 +314,7 @@
 								</div>
 							</div>
 						</div> `, {
-						timeout: 0,
+						timeout: 8000,
 						closeOnClick: true
 					});
 				}

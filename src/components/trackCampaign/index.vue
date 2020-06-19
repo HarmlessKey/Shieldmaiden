@@ -89,14 +89,14 @@
 									@newRoll="pushRoll"
 								/>
 							</b-col>
-							<b-col md="3" v-if="playerSettings.meters === undefined">
+							<b-col md="3">
 								<div class="menu">
 									<ul>
-										<li @click="sideDisplay = 'damage'" :class="{ active: sideDisplay == 'damage'}"><i class="fas fa-swords"></i></li>
+										<li @click="sideDisplay = 'damage'" :class="{ active: sideDisplay == 'damage'}" v-if="playerSettings.meters === undefined"><i class="fas fa-swords"></i></li>
 										<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
 									</ul>
 								</div>
-								<Meters :entities="encounter.entities" v-if="sideDisplay === 'damage'" />
+								<Meters :entities="encounter.entities" v-if="sideDisplay === 'damage' && playerSettings.meters === undefined" />
 								<Rolls :entities="encounter.entities" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
 							</b-col>
 						</b-row>
@@ -160,7 +160,7 @@
 				counter: 0,
 				tier: undefined,
 				rolls: [],
-				sideDisplay: 'damage'
+				setSideDisplay: undefined
 			}
 		},
 		firebase() {
@@ -191,6 +191,17 @@
 			this.fetch_encounter()
 		},
 		computed: {
+			sideDisplay: {
+				get() {
+					if(this.setSideDisplay) {
+						return this.setSideDisplay;
+					}
+					return (this.playerSettings.meters === undefined) ? 'damage' : 'rolls';
+				},
+				set(newValue) {
+					this.setSideDisplay = newValue;
+				}
+			},
 			//All entities, without hidden entities
 			_turnCount() {
 				return _.chain(this.encounter.entities)

@@ -238,6 +238,13 @@
 				},
 			}
 		},
+		computed: {
+			lastRoll() {
+				if(this.encounter) {
+					return this.encounter.lastRoll;
+				}
+			}
+		},
 		mounted() {
 			//Check if user has control over a character in the campaign
 			if(this.userId) {
@@ -251,7 +258,6 @@
 							this.characters.push(key);
 						}
 					}
-
 				});
 			}
 
@@ -269,12 +275,64 @@
 				if(newValue > 8) {
 					this.stop()
 				}
+			},
+			lastRoll(roll, oldRoll) {
+				this.$emit('newRoll', roll);
+
+				const toHitDisplay = (roll.toHitTotal) ? `<h2><b>${roll.toHitTotal}</b> <span class="gray-hover">to hit</span></h2>` : ``;
+
+				this.$snotify.html(
+					`<div class="snotifyToast__title">
+							${this.notificationTargets(roll.targets)}
+						</div>
+						<div class="snotifyToast__body">
+							${toHitDisplay}
+						
+							<h2>
+								${roll.damageMod ? `${roll.damage} + ${roll.damageMod} = ` : ''}
+								<b class="red">${roll.damageTotal}</b> <span class="gray-hover">damage</span>
+							</h2>
+						</div>
+					</div> `, {
+					timeout: 5000,
+					closeOnClick: true
+				});
 			}
 		},
 		methods: {
 			...mapActions([
 				'setSlide'
 			]),
+			notificationTargets(targets) {
+				let returnTargets = [];
+				for(const key of targets) {
+					const entity = this.encounter.entities[key];
+
+					let html = '<div class="target">';
+					html += `<div class="image" style="background-image: url(${entity.img});"></div>`;
+
+					//AC
+					if((entity.entityType == 'player' && this.playerSettings.ac === undefined) 
+						|| (entity.entityType == 'npc' && this.displayNPCField('ac', entity) == true)) {
+						const ac = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).ac
+						const bonus = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).bonus;
+
+						html += `<div class="ac">`;
+						html += (bonus) ? ac + bonus : ac;
+						html += `</div>`;
+					} else {
+						html += `<div class="ac">?</div>`;
+					}
+
+
+					html += `<div class="name truncate">${this.encounter.entities[key].name}</div>`;
+					html += `</div>`;
+
+					returnTargets.push(html);
+				}
+
+				return returnTargets.join("");
+			},
 			start(e, key) {
 				//Check how long the item is being pressed
 				if(!this.interval){

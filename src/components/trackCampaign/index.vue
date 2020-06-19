@@ -86,9 +86,11 @@
 									:allEntities="_turnCount"
 									:turn="turn"
 									:campPlayers="campaign.players"
+									@newRoll="pushRoll"
 								/>
 							</b-col>
 							<b-col md="3" v-if="playerSettings.meters === undefined">
+								{{ rolls }}
 								<Meters :entities="encounter.entities" />
 							</b-col>
 						</b-row>
@@ -267,47 +269,9 @@
 					case 5: return 'red';
 					case 6: return 'yellow';
 				}
-			},
-			lastRoll() {
-				if(this.encounter) {
-					return this.encounter.lastRoll;
-				}
-			}
-		},
-		watch: {
-			lastRoll(roll, oldRoll) {
-				this.rolls.push(roll);
-				this.$snotify.html(
-					`<div class="snotifyToast__body">
-					${this.notificationTargets(roll.targets)	}
-						<div class="snotifyToast__body">
-							${roll.toHitTotal}
-						
-							${roll.damageMod ? `${roll.damage} + ${roll.damageMod} = ` : ''}
-							<span class="red">${roll.damageTotal}</span> 
-							damage
-						</div>
-					</div> `, {
-					timeout: 5000,
-					closeOnClick: true
-				});
 			}
 		},
 		methods: {
-			notificationTargets(targets) {
-				let returnTargets = [];
-				for(const key of targets) {
-
-					let html = '<div class="target">';
-					html += `<div class="image" style="background-image: url(${this.encounter.entities[key].img});"></div>`;
-					html += `<div class="name truncate">${this.encounter.entities[key].name}</div>`;
-					html += `</div>`;
-
-					returnTargets.push(html);
-				}
-
-				return returnTargets.join();
-			},
 			fetch_encounter() {
 				var track = db.ref(`broadcast/${this.userId}`);
 				track.on('value' , (snapshot) => {
@@ -333,6 +297,9 @@
 						this.campaign = snapshot.val();
 					});
 				});
+			},
+			pushRoll(roll) {
+				this.rolls.push(roll);
 			}
 		},
 	}

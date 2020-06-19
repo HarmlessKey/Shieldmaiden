@@ -260,22 +260,26 @@
 							total
 						}
 					}
-					//If it was an open roll, save it, so it will be shared on the track encounter screen.
-					if(!this.demo) {
-						//If the damage is rolled once, show all targets with that roll
-						//Otherwise show 1 target per roll
-						let targets = (this.rollOnce) ? this.targeted : [target.key];
-
-						if(this.openRoll) {
-							this.rollOpenly(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
-						} else {
-							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
-						}
-					}
 				} else {
 					//Use the first roll if rollOnce = true
 					allDamageRolls = this.aoeRoll.allDamageRolls;
 					total = this.aoeRoll.total;
+				}
+
+				//If it was an open roll, save it, so it will be shared on the track encounter screen.
+				if(!this.demo) {
+					//If the damage is rolled once, show all targets with that roll
+					//Otherwise show 1 target per roll
+					let targets = (this.rollOnce) ? this.targeted : [target.key];
+
+					//Only roll if 
+					//All rolls should be seperate (different damage or same damage and to hit)
+					//All rolls are together (same damge, no to hit) and there was no roll before
+					if(this.openRoll && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
+						this.rollOpenly(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+					} else {
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
+					}
 				}
 
 				//Flip the positions of highest and lowest if there was disadvantage
@@ -397,19 +401,21 @@
 				var showRoll = {targets};
 
 				//Show to hit roll
-				if (Object.values(this.rollOptions).includes('toHit')) {
-					if(toHit == '20') {
-						showRoll.toHitTotal = 'Natural 20'
-					} else if(toHit == '1') {
-						showRoll.toHitTotal = 'Natural 1'
-					} else {
-						showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
-					}
+				if(this.toHit) {
+					if (Object.values(this.rollOptions).includes('toHit')) {
+						if(toHit == '20') {
+							showRoll.toHitTotal = 'Natural 20'
+						} else if(toHit == '1') {
+							showRoll.toHitTotal = 'Natural 1'
+						} else {
+							showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
+						}
 
-					//Show Modifier
-					if(Object.values(this.rollOptions).includes('modifiers')) {
-						showRoll.toHit = toHit;
-						showRoll.hitMod = hitMod;
+						//Show Modifier
+						if(Object.values(this.rollOptions).includes('modifiers')) {
+							showRoll.toHit = toHit;
+							showRoll.hitMod = hitMod;
+						}
 					}
 				}
 

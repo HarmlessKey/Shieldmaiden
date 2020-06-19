@@ -26,7 +26,7 @@
 							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
 							type: 'manual'
 						}
-					})"><i class="fas fa-swords"></i></a>
+					})"><i class="fas fa-sword"></i></a>
 				<!-- <a
 					v-b-tooltip.hover
 					title="Pending requests"
@@ -279,24 +279,43 @@
 			lastRoll(roll, oldRoll) {
 				this.$emit('newRoll', roll);
 
-				const toHitDisplay = (roll.toHitTotal) ? `<h2><b>${roll.toHitTotal}</b> <span class="gray-hover">to hit</span></h2>` : ``;
+				if(roll) {
+					let crit;
+					if(roll.crit) {
+						crit = (roll.crit === 20) ? `<div class="advantage green">critical</div>` : `<div class="advantage red">critical</div>`;
+					}
 
-				this.$snotify.html(
-					`<div class="snotifyToast__title">
-							${this.notificationTargets(roll.targets)}
-						</div>
-						<div class="snotifyToast__body">
-							${toHitDisplay}
-						
-							<h2>
-								${roll.damageMod ? `${roll.damage} + ${roll.damageMod} = ` : ''}
-								<b class="red">${roll.damageTotal}</b> <span class="gray-hover">damage</span>
-							</h2>
-						</div>
-					</div> `, {
-					timeout: 5000,
-					closeOnClick: true
-				});
+					let toHitDisplay;
+					if(roll.toHitTotal) {
+						toHitDisplay = `<div class="roll">`;
+						toHitDisplay += (crit) ? crit : ``;
+						toHitDisplay += (roll.toHit) ? `<div class="top">${roll.toHit} + ${roll.hitMod}</div>` : ``;
+						toHitDisplay += `<h2><b>${roll.toHitTotal}</b></h2><div class="bottom">to hit</div>`;
+						toHitDisplay += `</div>`;
+					}
+
+					this.$snotify.html(
+						`<div class="snotifyToast__title">
+								${this.notificationTargets(roll.targets)}
+							</div>
+							<div class="snotifyToast__body">
+								<div class="display-rolls">
+									${(toHitDisplay) ? toHitDisplay : ``}
+
+									<div class="roll">
+										${roll.damageMod ? `<div class="top">${roll.damage} + ${roll.damageMod}</div>` : ''}
+										<h2>
+											<b class="red">${roll.damageTotal}</b>
+										</h2>
+										<div class="bottom">damage</div>
+									</div>
+								</div>
+							</div>
+						</div> `, {
+						timeout: 0,
+						closeOnClick: true
+					});
+				}
 			}
 		},
 		methods: {
@@ -396,7 +415,7 @@
 	display: flex;
 	justify-content: space-between;
 	padding: 20px 0 5px 0;
-	border-bottom: solid 1px #fff;
+	border-bottom: solid 2px #fff;
 
 	.right {
 		a {

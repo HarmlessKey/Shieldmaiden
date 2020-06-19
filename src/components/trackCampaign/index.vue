@@ -90,8 +90,14 @@
 								/>
 							</b-col>
 							<b-col md="3" v-if="playerSettings.meters === undefined">
-								{{ rolls }}
-								<Meters :entities="encounter.entities" />
+								<div class="menu">
+									<ul>
+										<li @click="sideDisplay = 'damage'" :class="{ active: sideDisplay == 'damage'}"><i class="fas fa-swords"></i></li>
+										<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
+									</ul>
+								</div>
+								<Meters :entities="encounter.entities" v-if="sideDisplay === 'damage'" />
+								<Rolls :entities="encounter.entities" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
 							</b-col>
 						</b-row>
 					</div>
@@ -118,16 +124,17 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
+	import _ from 'lodash';
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
 
-	import Follow from '@/components/trackCampaign/Follow.vue'
-	import Rewards from '@/components/trackCampaign/Rewards.vue'
-	import Turns from '@/components/trackCampaign/Turns.vue'
-	import Initiative from '@/components/trackCampaign/Initiative.vue'
-	import Meters from '@/components/trackCampaign/Meters.vue'
-	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue'
+	import Follow from '@/components/trackCampaign/Follow.vue';
+	import Rewards from '@/components/trackCampaign/Rewards.vue';
+	import Turns from '@/components/trackCampaign/Turns.vue';
+	import Initiative from '@/components/trackCampaign/Initiative.vue';
+	import Meters from '@/components/trackCampaign/Meters.vue';
+	import Rolls from '@/components/trackCampaign/Rolls.vue';
+	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue';
 
 	export default {
 		name: 'app',
@@ -138,6 +145,7 @@
 			Turns,
 			Initiative,
 			Meters,
+			Rolls,
 			CampaignOverview,
 		},
 		metaInfo: {
@@ -151,7 +159,8 @@
 				campaign: undefined,
 				counter: 0,
 				tier: undefined,
-				rolls: []
+				rolls: [],
+				sideDisplay: 'damage'
 			}
 		},
 		firebase() {
@@ -299,7 +308,9 @@
 				});
 			},
 			pushRoll(roll) {
-				this.rolls.push(roll);
+				if(roll) {
+					this.rolls.unshift(roll);
+				}
 			}
 		},
 	}
@@ -383,10 +394,37 @@
 				padding: 5px;
 			}
 		}
-		.damage {
-			max-width: 370px;
-			padding: 20px;
-			background: rgba(80, 80, 80, .5) !important;
+		.menu {
+			height: 48px;
+			padding-top: 20px;
+			border-bottom: solid 2px #000;
+			position: relative;
+			user-select: none;
+
+			ul {
+				height: 48px;
+				margin: 0;
+				display: flex;
+				justify-content: flex-start;
+				padding: 0;
+
+				li {
+					cursor: pointer;
+					height: 28px;
+					padding: 0 10px;
+					display: block;
+					border-bottom: solid 2px #000;
+					color: #fff;
+
+					&.active {
+						color: #2c97de;
+						border-color: #2c97de;
+					}
+					&:first-child {
+						padding-left: 3px;
+					}
+				}
+			}
 		}
 	}
 	.no-broadcast {

@@ -224,7 +224,7 @@
 
 					//Set advantage message for snotify
 					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color}">${this.advantage}</small>`;	
+					adv = `<small class="${color} advantage">${this.advantage}</small>`;	
 				} 
 				//Roll once where there is no advantage/disadvantage
 				else {
@@ -270,7 +270,7 @@
 				if(!this.demo) {
 					//If the damage is rolled once, show all targets with that roll
 					//Otherwise show 1 target per roll
-					let targets = (this.rollOnce) ? this.targeted : [target.key];
+					let targets = (this.rollOnce && !this.toHit) ? this.targeted : [target.key];
 
 					//Only roll if 
 					//All rolls should be seperate (different damage or same damage and to hit)
@@ -298,9 +298,9 @@
 				
 				//Add the damage modifier
 				if(action['damage_bonus']) {
-					var bonus = ' + '+action['damage_bonus']; //form HTML for snotify
+					var bonus = '+'+action['damage_bonus']; //form HTML for snotify
 					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']); //Add it to the total damage
-					var showTotal = ' = <span class="red">' + totalDamage + '</span>'; //form HTML for snotify
+					var showTotal = '<span class="red">' + totalDamage + '</span>'; //form HTML for snotify
 				}
 				else {
 					//If there was no modifier
@@ -315,22 +315,26 @@
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
-						toHitRoll = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
+						toHitRoll = '<span class="green">20</span>'; //form HTML for snotify
 					}
 					//If the to hit roll is a 1, it is a critical fail
 					else if(toHitRoll === 1) {
-						toHitRoll = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
+						toHitRoll = '<span class="red">1</span>'; //form HTML fo snotify
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (this.advantage) ? `<del>${toHit[lowest].throws[0]}</del>` : ``;
+					let ignoredRoll = (this.advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
 
 					//Form HTML for snotify
-					hits = `<h2><span class="gray-hover">
-							${ignoredRoll}
-							${toHitRoll} ${toHit[highest].mod} = </span>${toHit[highest].total}
-							${hitOrMiss}
-							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;		
+					hits = `<div class="roll">
+							${(adv) ? adv : ``}
+							<div class="top">
+								${ignoredRoll}
+								${toHitRoll}${toHit[highest].mod}
+							</div>
+							<h2>${toHit[highest].total}</h2>
+							<div class="bottom">to hit</div>
+						</div>`;		
 				}
 
 				//BUILD SNOTIFY POPUP
@@ -343,18 +347,23 @@
 						</div>
 					</div>
 					<div class="snotifyToast__body">
-						<h2><b>${action.name}</b></h2>
-						${adv}
-						${hits}
-						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
+						<h2 class="title"><b>${action.name}</b></h2>
+						<div class="display-rolls">
+							${hits}
+							<div class="roll">
+								<div class="top">${total}${bonus}</div>
+								<h2>${showTotal}</h2>
+								<div class="bottom">damage</div>
+							</div>
+						</div>
 						${critInfo}
 
 						<a data-toggle="collapse" href="#rolls-${rollCounter}" role="button" >
-							<small>Show Rolls <i class="fal fa-chevron-down"></i></small>
+							Damage Rolls <i class="fal fa-chevron-down"></i>
 						</a>
 						<p id="rolls-${rollCounter}" class="collapse">
 							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
-							Your rolls: ${allDamageRolls}
+							Rolls: ${allDamageRolls}
 						</p>
 					</div> `, {
 					timeout: 0,
@@ -403,13 +412,12 @@
 				//Show to hit roll
 				if(this.toHit) {
 					if (Object.values(this.rollOptions).includes('toHit')) {
-						if(toHit == '20') {
-							showRoll.toHitTotal = 'Natural 20'
-						} else if(toHit == '1') {
-							showRoll.toHitTotal = 'Natural 1'
-						} else {
-							showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
+						if(toHit === 20) {
+							showRoll.crit = 20;
+						} else if(toHit === 1) {
+							showRoll.crit = 1;
 						}
+						showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
 
 						//Show Modifier
 						if(Object.values(this.rollOptions).includes('modifiers')) {
@@ -418,6 +426,7 @@
 						}
 					}
 				}
+				console.log(showRoll)
 
 				//Show damage roll
 				if (Object.values(this.rollOptions).includes('damage')) {

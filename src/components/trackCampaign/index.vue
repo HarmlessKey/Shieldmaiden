@@ -213,7 +213,7 @@
 					return entity.name
 				}, 'asc')
 				.orderBy(function(entity){
-					return parseInt(entity.initiative)
+					return Number(entity.initiative)
 				} , 'desc')
 				.value()
 			},
@@ -227,7 +227,7 @@
 					return entity.name
 				}, 'asc')
 				.orderBy(function(entity){
-					return parseInt(entity.initiative)
+					return Number(entity.initiative)
 				} , 'desc')
 				.value()
 			},
@@ -247,7 +247,7 @@
 					return entity.name
 				}, 'asc')
 				.orderBy(function(entity){
-					return parseInt(entity.initiative)
+					return Number(entity.initiative)
 				} , 'desc')
 				.value()
 			},

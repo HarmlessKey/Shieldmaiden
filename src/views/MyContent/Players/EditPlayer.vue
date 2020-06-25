@@ -289,6 +289,43 @@
 					</b-card>
 				</b-card-group>
 
+				<b-card header="Companion">
+					<div v-if="!npcs">
+						<p>You currently have no custom npcs created</p>
+						<p>First create a custom NPC to use as a companion</p>
+						<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
+					</div>
+					<div v-else>
+						<div class="input-group mb-3">
+							<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+							<div class="input-group-append">
+								<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
+							</div>
+						</div>
+						<ul class="entities">
+							<p v-if="noResult" class="red">{{ noResult }}</p>
+							<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
+								<div class="d-flex justify-content-left">
+									<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
+										<i class="fas fa-info-circle"></i></a>
+									{{ npc.name }}
+								</div>
+								<a class="gray-hover" 
+									v-b-tooltip.hover title="Add Companion" 
+									@click="add(npc)">
+									<i class="fas fa-plus green"></i>
+									<span class="d-none d-md-inline ml-1">Add</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<template v-if="player.companions !== undefined">
+						<div v-for="companion in player.companions">
+							{{ companion }}
+						</div>
+					</template>
+				</b-card>
+
 	
 				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
@@ -323,7 +360,11 @@
 		},
 		data() {
 			return {
-				playerId: this.$route.params.id
+				playerId: this.$route.params.id,
+				search: '',
+				searchResults: [],
+				noResult: '',
+				npcs: [],
 			}
 		},
 		firebase() {
@@ -355,6 +396,13 @@
 					return this.$store.getters.getUser.uid;
 				}
 			},
+		},
+		mounted() {
+			let custom = db.ref(`npcs/${this.userId}`);
+			custom.on('value', async (snapshot) => {
+				this.npcs = snapshot.val();
+			});
+			this.loadingNpcs = false;
 		},
 		methods: {
 			...mapActions([
@@ -394,6 +442,36 @@
 					show: true,
 					type,
 				})
+			},
+			searchNPC() {
+				this.searchResults = []
+				this.searching = true
+				for (var i in this.npcs) {
+					var m = this.npcs[i];
+					m.key = i;
+					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
+						this.noResult = ''
+						this.searchResults.push(m)
+					}
+				}
+				if(this.searchResults == '' && this.search != '') {
+					this.noResult = 'No results for "' + this.search + '"';
+				}
+			},
+			add(npc) {
+				if (this.player.companions === undefined) {
+					this.player.companions = [];
+				}
+				console.log(npc);
+				let new_companion = {};
+
+				new_companion.curHp = npc.maxHp || npc.hit_points;
+				new_companion.key = npc.key;
+				// new_companion.key = npc
+				this.player.companions.push(new_companion);	
+
+				this.searchResults = [];
+				this.search = '';
 			},
 		}
 	}

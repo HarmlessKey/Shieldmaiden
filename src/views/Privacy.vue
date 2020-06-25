@@ -1,46 +1,93 @@
 <template>
 	<div class="container">
-		<h1>Privacy Policy</h1>
-		<h3>First, thank you for using the Harmless Key Encounter Tracker!</h3>
-		<p>This policy is to help you understand what information we collect, how we use it, and what choices you have.</p>
+		<h1>Privacy Policy for Harmless Key</h1>
 
-		<h3>How We Collect Your Information</h3>
-		<p>When you give it to us or give us permission to obtain it.</p>
-		<p>When you sign up for or use our products, you voluntarily give us certain information. This can include your name, the email address or phone number you used to sign up, details about your campaigns and any other information you provide us.</p>
+		<p>At Harmless Key, accessible from harmlesskey.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Harmless Key and how we use it.</p>
 
-		<p>You also may give us permission to access your information in other services. For example, you may link your Google account to Harmless Key, which allows us to obtain information from those accounts. The information we get from those services often depends on your settings or their privacy policies, so be sure to check what those are.</p>
+		<p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.</p>
 
-		<p>We also get technical information when you use our products</p>
+		<p>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in Harmless Key. This policy is not applicable to any information collected offline or via channels other than this website.</p>
 
-		<p>These days, whenever you use a website, mobile application, or other internet service, there's certain information that almost always gets created and recorded automatically. The same is true when you use our products. Here are some of the types of information we collect:</p>
+		<h2>Consent</h2>
 
-		<p>Log data. When you use Harmless Key, our servers may automatically record information ("log data"), including information that your browser sends whenever you visit a website or your mobile app sends when you're using it. This log data may include your Internet Protocol address, the address of the web pages you visited that had Harmless Key features, browser type and settings, the date and time of your request, how you used Harmless Key, and cookie data.</p>
+		<p>By using our website, you hereby consent to our Privacy Policy and agree to its terms.</p>
+
+		<h2>Information we collect</h2>
+
+		<p>The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information.</p>
+		<p>If you contact us directly, we may receive additional information about you such as your name, email address, phone number, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.</p>
+		<p>When you register for an Account, we may ask for your contact information, including items such as name, company name, address, email address, and telephone number.</p>
+
+		<h2>How we use your information</h2>
+
+		<p>We use the information we collect in various ways, including to:</p>
+
+		<ul>
+		<li>Provide, operate, and maintain our webste</li>
+		<li>Improve, personalize, and expand our webste</li>
+		<li>Understand and analyze how you use our webste</li>
+		<li>Develop new products, services, features, and functionality</li>
+		<li>Communicate with you, either directly or through one of our partners, including for customer service, to provide you with updates and other information relating to the webste, and for marketing and promotional purposes</li>
+		<li>Send you emails</li>
+		<li>Find and prevent fraud</li>
+		</ul>
+
+		<h2>Log Files</h2>
+
+		<p>Harmless Key follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information. Our Privacy Policy was created with the help of the <a target="_blank" href="https://www.privacypolicygenerator.info">Privacy Policy Generator</a> and the <a target="_blank" href="https://www.privacypolicyonline.com/privacy-policy-generator/">Online Privacy Policy Generator</a>.</p>
+
+		<h2>Cookies and Web Beacons</h2>
+
+		<p>Like any other website, Harmless Key uses 'cookies'. These cookies are used to store information including visitors' preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users' experience by customizing our web page content based on visitors' browser type and/or other information.</p>
+
+		<p>For more general information on cookies, please read <a target="_blank" href="https://www.cookieconsent.com/what-are-cookies/">"What Are Cookies"</a>.</p>
+
+		<h2>Google DoubleClick DART Cookie</h2>
+
+		<p>Google is one of a third-party vendor on our site. It also uses cookies, known as DART cookies, to serve ads to our site visitors based upon their visit to www.website.com and other sites on the internet. However, visitors may choose to decline the use of DART cookies by visiting the Google ad and content network Privacy Policy at the following URL – <a target="_blank" href="https://policies.google.com/technologies/ads">https://policies.google.com/technologies/ads</a></p>
+
+
+		<h2>Advertising Partners Privacy Policies</h2>
+
+		<P>You may consult this list to find the Privacy Policy for each of the advertising partners of Harmless Key.</p>
+
+		<p>Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on Harmless Key, which are sent directly to users' browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.</p>
+
+		<p>Note that Harmless Key has no access to or control over these cookies that are used by third-party advertisers.</p>
+
+		<h2>Third Party Privacy Policies</h2>
+
+		<p>Harmless Key's Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options. </p>
+
+		<p>You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsers' respective websites.</p>
+
+		<h2>CCPA Privacy Rights (Do Not Sell My Personal Information)</h2>
+
+		<p>Under the CCPA, among other rights, California consumers have the right to:</p>
+		<p>Request that a business that collects a consumer's personal data disclose the categories and specific pieces of personal data that a business has collected about consumers.</p>
+		<p>Request that a business delete any personal data about the consumer that a business has collected.</p>
+		<p>Request that a business that sells a consumer's personal data, not sell the consumer's personal data.</p>
+		<p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us.</p>
+
+		<h2>GDPR Data Protection Rights</h2>
+
+		<p>We would like to make sure you are fully aware of all of your data protection rights. Every user is entitled to the following:</p>
+		<p>The right to access – You have the right to request copies of your personal data. We may charge you a small fee for this service.</p>
+		<p>The right to rectification – You have the right to request that we correct any information you believe is inaccurate. You also have the right to request that we complete the information you believe is incomplete.</p>
+		<p>The right to erasure – You have the right to request that we erase your personal data, under certain conditions.</p>
+		<p>The right to restrict processing – You have the right to request that we restrict the processing of your personal data, under certain conditions.</p>
+		<p>The right to object to processing – You have the right to object to our processing of your personal data, under certain conditions.</p>
+		<p>The right to data portability – You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions.</p>
+		<p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us.</p>
+
+		<h2>Children's Information</h2>
+
+		<p>Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.</p>
+
+		<p>Harmless Key does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.</p>
 		
-		<p>Cookie data. Depending on how you're accessing our products, we may use "cookies" (small text files sent by your computer each time you visit our website, unique to your Harmless Key account or your browser) or similar technologies to record log data. When we use cookies, we may use "session" cookies (that last until you close your browser) or "persistent" cookies (that last until you or your browser delete them). For example, we may use cookies to store your language preferences or other Harmless Key settings so you don't have to set them up every time you visit Harmless Key. Some of the cookies we use are associated with your Harmless Key account (including personal information about you, such as the email address you gave us), and other cookies are not.</p>
-		
-		<p>Device information. In addition to log data, we may also collect information about the device you're using Harmless Key on, including what type of device it is, what operating system you're using, device settings, unique device identifiers, and crash data. Whether we collect some or all of this information often depends on what type of device you're using and its settings. For example, different types of information are available depending on whether you're using a Mac or a PC, or an iPhone or an Android phone. To learn more about what information your device makes available to us, please also check the policies of your device manufacturer or software provider.</p>
-		
-		<h3>Transferring your Information</h3>
-		
-		<p>Harmless Key is headquartered in the Netherlands. By using our products or services, you authorize us to transfer and store your information inside the Netherlands, for the purposes described in this policy. The privacy protections and the rights of authorities to access your personal information in such countries may not be equivalent to those in your home country.</p>
-		
-		<h3>How and when do we share information</h3>
-		
-		<p>Anyone that has the link, can follow your encounters. Other than that none of your information is shared with anyone.</p>
-		
-		<h3>What choices do you have about your information?</h3>
-		<p>You may close your account at any time, you can delete it under "your profile". All your data will be removed from our database.</p>
-				
-		<p>Our policy on children's information</p>
-		
-		<p>Harmless Key is not directed to children under 13. If you learn that your minor child has provided us with personal information without your consent, please contact us.</p>
-		
-		<p>How do we make changes to this policy?</p>
-		
-		<p>We may change this policy from time to time, and if we do we'll post any changes on this page. If you continue to use Harmless Key after those changes are in effect, you agree to the revised policy. If the changes are significant, we may provide more prominent notice or get your consent as required by law.</p>
-		
-		<p>How can you contact us?<br/>
-		You can contact us by emailing <a href="mailto:harmlesskey@gmail.com">harmlesskey@gmail.com</a></p>
+		<h2>How can you contact us?</h2>
+		<p>You can contact us by emailing <a target="_blank" href="mailto:harmlesskey@gmail.com">harmlesskey@gmail.com</a></p>
 	</div>
 </template>
 

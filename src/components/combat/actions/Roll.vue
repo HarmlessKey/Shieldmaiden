@@ -128,6 +128,14 @@
 				aoeRoll: undefined
 			}
 		},
+		firebase() {
+			return {
+				criticalSettings: {
+					source: db.ref(`settings/${this.userId}/encounter/critical`),
+					asObject: true
+				},
+			}
+		},
 		computed: {
 			...mapGetters([
 				'encounter',
@@ -195,7 +203,8 @@
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
-				let crit = false;
+				let critDouble = false;
+				let critRoll = 1; //set to 2 on a crit
 				let hits = '';
 				var total = 0;
 				var allDamageRolls = [];
@@ -215,7 +224,8 @@
 				//If there is advantage roll twice
 				if(this.advantage) {
 					for(let i = 0; i <= 1; i++) {
-						toHit[i] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+						let attack_bonus = action.attack_bonus || 0;
+						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
 					}
 
 					//Define the position of the highest and lowest rolls in the array
@@ -229,7 +239,13 @@
 				//Roll once where there is no advantage/disadvantage
 				else {
 					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
-					toHit[highest] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+					toHit[highest] = this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+				}
+
+				//Flip the positions of highest and lowest if there was disadvantage
+				if(this.advantage == 'disadvantage') {
+					highest = (highest === 0) ? 1 : 0;
+					lowest = (lowest === 0) ? 1 : 0;
 				}
 
 				//Roll the damage for all seperated rolls
@@ -237,21 +253,26 @@
 				//Roll if rollOnce is false
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
-					if(this.toHit) {
-						if(toHit[highest].throws[0] == '20') {
-							crit = true;
+					if(this.toHit && toHit[highest].throws[0] === 20) {
+						if(this.criticalSettings['.value']) {
+							critDouble = true;
+						} else {
+							critInfo = `<div><small>The damage dice were rolled twice.</small></div>`;
+							critRoll = 2;
 						}
-					}	
+					}
 
-					//Roll the damage
-					for(let roll in rolls) {
-						let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
-						let rolled = this.rollD(dice[1], dice[0]) //roll the dice
-						let damage = rolled.total; //roll the dice
-
-						allDamageRolls.push(rolled.throws);
-						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
-
+					//Roll the damage. Twice if it was a crit and critsettings are set to roll twice
+					for(let c = 0; c < critRoll; c++) {
+						for(let roll in rolls) {
+							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
+							let rolled = this.rollD(dice[1], dice[0]) //roll the dice
+							let damage = rolled.total; //roll the dice
+	
+							allDamageRolls.push(rolled.throws);
+							total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+	
+						}
 					}
 					//Set the roll that needs to be used when rolling damage only once
 					if(this.rollOnce) {
@@ -281,21 +302,12 @@
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
 				}
-
-				//Flip the positions of highest and lowest if there was disadvantage
-				if(this.advantage == 'disadvantage') {
-					highest = (highest === 0) ? 1 : 0;
-					lowest = (lowest === 0) ? 1 : 0;
-				}
-				//Check if it was a critical hit
-				if(toHit[highest].throws[0] === 20) {
+				//Check if it was a critical hit and rolled damage should be doubled, not be rolled twice
+				if(critDouble) {
 					//Form HTML for snotify
-					critInfo = `<div><small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
-					
-					//Double the rolled damage
+					critInfo = `<div><small>The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
 					total = parseInt(total*2);
 				}
-				
 				//Add the damage modifier
 				if(action['damage_bonus']) {
 					var bonus = '+'+action['damage_bonus']; //form HTML for snotify
@@ -305,9 +317,7 @@
 				else {
 					//If there was no modifier
 					bonus = '';
-					showTotal = ''
-					totalDamage = total;
-					total = '<span class="red">' + total + '</span>';
+					showTotal = '<span class="red">' + total + '</span>';
 				}
 
 				if(this.toHit) {
@@ -315,11 +325,11 @@
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
-						toHitRoll = '<span class="green">20</span>'; //form HTML for snotify
+						toHitRoll = '<span class="green">natural 20</span>'; //form HTML for snotify
 					}
 					//If the to hit roll is a 1, it is a critical fail
 					else if(toHitRoll === 1) {
-						toHitRoll = '<span class="red">1</span>'; //form HTML fo snotify
+						toHitRoll = '<span class="red">natural 1</span>'; //form HTML fo snotify
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
@@ -333,7 +343,9 @@
 								${toHitRoll}${toHit[highest].mod}
 							</div>
 							<h2>${toHit[highest].total}</h2>
-							<div class="bottom">to hit</div>
+							<div class="bottom">
+								${hitOrMiss}
+							</div>
 						</div>`;		
 				}
 

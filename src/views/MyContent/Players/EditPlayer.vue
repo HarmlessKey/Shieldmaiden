@@ -12,79 +12,77 @@
 					<GiveCharacterControl :playerId="playerId" :control="player.control" />
 				</b-card>
 				
-				<b-card header="Basic Info">
-					<b-row>
-						<b-col md="2">
-							<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-							<span class="img" v-else>
-								<img src="@/assets/_img/styles/player.svg" />
-							</span>
-						</b-col>
-						<b-col md="10" class="mb-3">
-							<b-row class="mb-2" v-if="$route.name != 'Edit Character'">
-								<b-col sm="2">
-									<label for="player_name">Player *</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off"  
-										id="player_name" 
-										type="text" 
-										:class="{'input': true, 'error': errors.has('player_name') }" 
-										v-model="player.player_name" 
-										v-validate="'max:15|required'" 
-										maxlength="15"
-										data-vv-as="Name"
-										name="player_name" 
-										placeholder="Player Name"></b-form-input>
-									<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
-								</b-col>
-							</b-row>
-
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="character_name">Character *</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off"  
-										id="character_name" 
-										type="text" 
-										:class="{'input': true, 'error': errors.has('character_name') }" 
-										v-model="player.character_name" 
-										v-validate="'max:35|required'" 
-										maxlength="35"
-										data-vv-as="Character Name"
-										name="character_name" 
-										placeholder="Character Name"></b-form-input>
-									<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
-								</b-col>
-							</b-row>
-
-							<b-row>
-								<b-col sm="2">
-									<label for="avatar">Avatar</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off"  
-										id="avatar" 
-										type="text" 
-										:class="{'input': true, 'error': errors.has('avatar') }"
-										v-model="player.avatar"
-										v-validate="'url'"
-										data-vv-as="Avatar"
-										name="avatar"
-										placeholder="Image URL"></b-form-input>
-									<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-								</b-col>
-							</b-row>
-						</b-col>
-					</b-row>
-				</b-card>
-
 				<b-card-group deck>
-					<!-- LEVEL & XP -->
-					<b-card header="Level & Experience">
+					<b-card header="Basic Info">
 						<b-row>
-							<b-col md="8" class="mb-2">
+							<b-col md="2">
+								<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+								<span class="img" v-else>
+									<img src="@/assets/_img/styles/player.svg" />
+								</span>
+							</b-col>
+							<b-col md="10" class="mb-3">
+								<b-row class="mb-2" v-if="$route.name != 'Edit Character'">
+									<b-col sm="2">
+										<label for="player_name" class="required">Player</label>
+									</b-col>
+									<b-col sm="10">
+										<b-form-input autocomplete="off"  
+											id="player_name" 
+											type="text" 
+											:class="{'input': true, 'error': errors.has('player_name') }" 
+											v-model="player.player_name" 
+											v-validate="'max:15|required'" 
+											maxlength="15"
+											data-vv-as="Name"
+											name="player_name" 
+											placeholder="Player Name"></b-form-input>
+										<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
+									</b-col>
+								</b-row>
+
+								<b-row class="mb-2">
+									<b-col sm="2">
+										<label for="character_name" class="required">Character</label>
+									</b-col>
+									<b-col sm="10">
+										<b-form-input autocomplete="off"  
+											id="character_name" 
+											type="text" 
+											:class="{'input': true, 'error': errors.has('character_name') }" 
+											v-model="player.character_name" 
+											v-validate="'max:35|required'" 
+											maxlength="35"
+											data-vv-as="Character Name"
+											name="character_name" 
+											placeholder="Character Name"></b-form-input>
+										<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
+									</b-col>
+								</b-row>
+
+								<b-row>
+									<b-col sm="2">
+										<label for="avatar">Avatar</label>
+									</b-col>
+									<b-col sm="10">
+										<b-form-input autocomplete="off"  
+											id="avatar" 
+											type="text" 
+											:class="{'input': true, 'error': errors.has('avatar') }"
+											v-model="player.avatar"
+											v-validate="'url'"
+											data-vv-as="Avatar"
+											name="avatar"
+											placeholder="Image URL"></b-form-input>
+										<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+									</b-col>
+								</b-row>
+							</b-col>
+						</b-row>
+					</b-card>
+					<b-card header="Level & Base Stats">
+						<b-row>
+							<b-col md="6" class="mb-2">
 								<label for="experience" class="experience">
 									<span>XP</span>
 									<span>
@@ -104,7 +102,7 @@
 									placeholder="Experience" />
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
 							</b-col>
-							<b-col md="4" class="mb-2">
+							<b-col md="6" class="mb-2">
 								<label for="level">Level Override</label>
 								<b-form-input autocomplete="off"  id="level" 
 									type="number" 
@@ -118,14 +116,8 @@
 									placeholder="Level Override" />
 								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
 							</b-col>
-						</b-row>
-					</b-card>
-
-					<!-- HEALTH & AC -->
-					<b-card header="Health & Armor Class">
-						<b-row>
 							<b-col md="4" class="mb-2">
-								<label for="maxHp">HP *</label>
+								<label for="maxHp" class="required">HP</label>
 								<b-form-input autocomplete="off"  id="maxHp" 
 									type="number" 
 									min="1"
@@ -138,7 +130,7 @@
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 							</b-col>
 							<b-col md="4" class="mb-2">
-								<label for="ac">AC *</label>
+								<label for="ac" class="required">AC</label>
 								<b-form-input autocomplete="off"  
 									id="ac" 
 									min="1"
@@ -165,126 +157,139 @@
 					</b-card>
 				</b-card-group>
 
-				<b-row>
+				<b-card-group deck>
 					<!-- ABILITY SCORES -->
-					<b-col sm="6">
-						<b-card header="Ability Scores">
-							<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
-								<b-col class="col-3">
-									<label :for="ability.ability">
-										{{ ability.ability.substring(0,3).toUpperCase() }}
-									</label>
-								</b-col>
-								<b-col class="col-9">
-									<b-form-input autocomplete="off"  
-										:id="ability.ability" 
-										type="number" 
-										v-model="player[ability.ability]" 
-										:name="ability.ability" 
-										:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-								</b-col>
-							</b-row>
-						</b-card>
-					</b-col>
+					<b-card header="Ability Scores & Senses" class="ability-card">
+						<div class="mb-2 d-flex justify-content-start">
+								<div class="name">
+									<label>Ability</label>
+								</div>
+								<div class="value">
+									<label>Value</label>
+								</div>
+								<div class="save">
+									<label class="ml-2">Save</label>
+								</div>
+						</div>
+						<div class="mb-2 d-flex justify-content-start" v-for="(ability, index) in abilities" :key="index">
+							<div class="name">
+								<label :for="ability.ability">
+									{{ ability.ability.substring(0,3).toUpperCase() }}
+								</label>
+							</div>
+							<div class="value">
+								<b-form-input autocomplete="off"  
+									:id="ability.ability" 
+									type="number" 
+									v-model="player[ability.ability]" 
+									:name="ability.ability" 
+									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
+							</div>
+							<div class="save">
+								<b-form-checkbox
+									class="ml-3 mt-2"
+									v-model="player[`${ability.ability}-save-profficient`]">
+										+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+									</b-form-checkbox>
+							</div>
+						</div>
+						<!-- SENSES -->
+						<h5 class="mt-5">Senses</h5>
+						<b-row>
+							<b-col md="4" class="mb-2">
+								<label for="pper">Passive Perception</label>
+								<b-form-input autocomplete="off"  id="pper" 
+									type="number" 
+									min="1"
+									max="20"
+									:class="{'input': true, 'error': errors.has('pper') }" 
+									v-model="player.passive_perception" 
+									v-validate="'numeric'" 
+									data-vv-as="Passive Perception"
+									name="pper" 
+									placeholder="Perception" />
+								<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
+							</b-col>
+							<b-col md="4" class="mb-2">
+								<label for="pinv">Passive Investigation</label>
+								<b-form-input autocomplete="off"  id="pinv" 
+									type="number" 
+									min="1"
+									max="20"
+									:class="{'input': true, 'error': errors.has('pinv') }" 
+									v-model="player.passive_investigation" 
+									v-validate="'numeric'" 
+									data-vv-as="Passive Investigation"
+									name="pinv" 
+									placeholder="Investigation" />
+								<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
+							</b-col>
+							<b-col md="4" class="mb-2">
+								<label for="pins">Passive Insight</label>
+								<b-form-input autocomplete="off"  id="pins" 
+									type="number" 
+									min="1"
+									max="20"
+									:class="{'input': true, 'error': errors.has('pins') }" 
+									v-model="player.passive_insight" 
+									v-validate="'numeric'" 
+									data-vv-as="pins"
+									name="pins" 
+									placeholder="Insight" />
+								<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
+							</b-col>
+						</b-row>
+					</b-card>
 
 					<!-- SKILLS -->
-					<b-col sm="6">
-						<b-card header="Skills">
-							<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
+					<b-card header="Skills">
+						<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
 
-							<div class="d-flex justify-content-start">
-								<b-form-group label="Expertise" class="mr-2">
-									<b-form-checkbox-group
-										id="expertise"
-										name="expertise"
-										v-model="player.skills_expertise"
-										stacked
-									>
-										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key" :disabled="player.skills ? !player.skills.includes(key) : true">
-											+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
-										</b-form-checkbox>
-									</b-form-checkbox-group>
-								</b-form-group>
-								<b-form-group label="Proficiency" class="skills">
-									<b-form-checkbox-group
-										id="skills"
-										name="skills"
-										v-model="player.skills"
-										stacked
-									>
-										<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
-											<div class="skill">
-												<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
-												<div>{{skill.skill  }}</div>
-												<div class="mod">
-													{{ 
-														calculateSkillModifier(
-															calcMod(player[skill.ability]),
-															player.skills ? (
-															player.skills.includes(key) ? 
-															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-															: 0) : 0,
-															player.skills_expertise ? player.skills_expertise.includes(key) : false
-														) 
-													}}
-												</div>
+						<div class="d-flex justify-content-start">
+							<b-form-group label="Expertise" class="mr-2">
+								<b-form-checkbox-group
+									id="expertise"
+									name="expertise"
+									v-model="player.skills_expertise"
+									stacked
+								>
+									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key" :disabled="player.skills ? !player.skills.includes(key) : true">
+										+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+									</b-form-checkbox>
+								</b-form-checkbox-group>
+							</b-form-group>
+							<b-form-group label="Proficiency" class="skills">
+								<b-form-checkbox-group
+									id="skills"
+									name="skills"
+									v-model="player.skills"
+									stacked
+								>
+									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
+										<div class="skill">
+											<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+											<div>{{skill.skill  }}</div>
+											<div class="mod">
+												{{ 
+													calculateSkillModifier(
+														calcMod(player[skill.ability]),
+														player.skills ? (
+														player.skills.includes(key) ? 
+														returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
+														: 0) : 0,
+														player.skills_expertise ? player.skills_expertise.includes(key) : false
+													) 
+												}}
 											</div>
-										</b-form-checkbox>
-									</b-form-checkbox-group>
-								</b-form-group>
-							</div>
-						</b-card>
-					</b-col>
-				</b-row>
+										</div>
+									</b-form-checkbox>
+								</b-form-checkbox-group>
+							</b-form-group>
+						</div>
+					</b-card>
+				</b-card-group>
 
-				<!-- SENSES -->
-				<b-card header="Senses">
-					<b-row>
-						<b-col md="4" class="mb-2">
-							<label for="pper">Passive Perception</label>
-							<b-form-input autocomplete="off"  id="pper" 
-								type="number" 
-								min="1"
-								max="20"
-								:class="{'input': true, 'error': errors.has('pper') }" 
-								v-model="player.passive_perception" 
-								v-validate="'numeric'" 
-								data-vv-as="Passive Perception"
-								name="pper" 
-								placeholder="Perception" />
-							<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
-						</b-col>
-						<b-col md="4" class="mb-2">
-							<label for="pinv">Passive Investigation</label>
-							<b-form-input autocomplete="off"  id="pinv" 
-								type="number" 
-								min="1"
-								max="20"
-								:class="{'input': true, 'error': errors.has('pinv') }" 
-								v-model="player.passive_investigation" 
-								v-validate="'numeric'" 
-								data-vv-as="Passive Investigation"
-								name="pinv" 
-								placeholder="Investigation" />
-							<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
-						</b-col>
-						<b-col md="4" class="mb-2">
-							<label for="pins">Passive Insight</label>
-							<b-form-input autocomplete="off"  id="pins" 
-								type="number" 
-								min="1"
-								max="20"
-								:class="{'input': true, 'error': errors.has('pins') }" 
-								v-model="player.passive_insight" 
-								v-validate="'numeric'" 
-								data-vv-as="pins"
-								name="pins" 
-								placeholder="Insight" />
-							<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
-						</b-col>
-					</b-row>
-				</b-card>
-				
+	
 				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
@@ -419,6 +424,21 @@
 		height: 100px;
 		background-size: cover;
 		background-position: center top;
+	}
+
+	.ability-card {
+		.card-body {
+			// column-count: 2;
+		}
+		.name {
+			width: 100px;
+		}
+		.value {
+			width: 100px;
+		}
+		.checkbox {
+
+		}
 	}
 }
 </style>

@@ -62,24 +62,14 @@
 		mixins: [trackEncounter],
 		props: [
 			'entities',
-			'campaign'
+			'campaign',
+			'players',
+			'npcs'
 		],
 		data() {
 			return {
 				userId: this.$route.params.userid,
 				doneTaken: 'done'
-			}
-		},
-		firebase() {
-			return {
-				players: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
-				},
-				npcs: {
-					source: db.ref(`npcs/${this.userId}`),
-					asObject: true,
-				},
 			}
 		},
 		computed: {

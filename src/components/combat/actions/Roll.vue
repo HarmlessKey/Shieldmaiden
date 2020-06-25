@@ -437,19 +437,23 @@
 						//Show Modifier
 						if(Object.values(this.rollOptions).includes('modifiers')) {
 							showRoll.toHit = toHit;
-							showRoll.hitMod = hitMod;
+							if(hitMod) {
+								showRoll.hitMod = hitMod;
+							}
 						}
 					}
 				}
 
 				//Show damage roll
 				if (Object.values(this.rollOptions).includes('damage')) {
-					showRoll.damageTotal = parseInt(damage) + parseInt(damageMod);
+					showRoll.damageTotal = (damageMod) ? parseInt(damage) + parseInt(damageMod) : parseInt(damage);
 
 					//Show Modifier
 					if(Object.values(this.rollOptions).includes('modifiers')) {
 						showRoll.damage = damage;
-						showRoll.damageMod = damageMod;
+						if(damageMod) {
+							showRoll.damageMod = damageMod;
+						}
 					}
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)

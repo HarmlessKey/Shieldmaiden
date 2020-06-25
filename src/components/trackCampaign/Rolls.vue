@@ -2,8 +2,48 @@
 	<div>
 		<h3 class="mt-3">DM Rolls</h3>
 		<ul class="rolls">
-			<li v-for="(roll, index) in rolls" :key="`roll-${index}`">
-				{{ roll }}
+			<li v-for="(roll, index) in rolls" :key="`roll-${index}`" class="bg-gray-dark">
+				<div class="targets">
+					<div class="target" v-for="(key, index) in roll.targets" :key="`target-${index}`">
+						<icon 
+							v-if="displayImg(entities[key], players[entities[key].id], npcs[entities[key].id]) === 'monster' || displayImg(entities[key], players[entities[key].id], npcs[entities[key].id]) === 'player'"
+							class="img" 
+							:icon="displayImg(entities[key], players[entities[key].id], npcs[entities[key].id])" 
+							:fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``"
+						/>
+						<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entities[key], players[entities[key].id], npcs[entities[key].id]) + '\')' }"/>
+
+						<div class="name">
+							{{ entities[key].name }}
+						</div>
+					</div>
+				</div>
+
+				<!-- FIRST -->
+				<div class="rolls" v-if="index === 0">
+					<div v-if="roll.toHitTotal" class="roll">
+						<div class="top">{{ roll.hitMod ? `${roll.toHit} + ${roll.hitMod}` : '' }}</div>
+						<h2>{{ roll.toHitTotal }}</h2>
+						<div class="bottom">to hit</div>
+					</div>
+					<div class="roll">
+						<div class="top">{{ roll.damageMod ? `${roll.damage} + ${roll.damageMod}` : '' }}</div>
+						<h2 class="red">{{ roll.damageTotal }}</h2>
+						<div class="bottom">damage</div>
+					</div>
+				</div>
+				
+				<!-- NOT FIRST -->
+				<div class="small-roll" v-else>
+					<div v-if="roll.toHitTotal" class="roll">
+						<b>{{ roll.toHitTotal }}</b> to hit
+						<span v-if="roll.hitMod"> ({{ roll.toHit }} + {{ roll.hitMod }})</span>
+					</div>
+					<div class="roll">
+						<b class="red">{{ roll.damageTotal }}</b> damage
+						<span v-if="roll.damageMod"> ({{ roll.damageMod ? roll.damage + roll.damageMod : '' }})</span>
+					</div>
+				</div>
 			</li>
 		</ul>
 	</div>
@@ -17,21 +57,91 @@
 		mixins: [trackEncounter],
 		props: [
 			'rolls',
-			'entities'
-		],
-		data() {
-			return {
-				userId: this.$route.params.userid
-			}
-		},
-		computed: {
-			
-		}
+			'entities',
+			'players',
+			'npcs'
+		]
 	}
 </script>
 
 <style lang="scss" scoped>
-	.rolls {
+	ul.rolls {
+		list-style: none;
+		padding: 0;
 
+		li {
+			padding: 15px 10px;
+			border: solid 1px #5c5757;
+			margin-bottom: 10px;
+			
+			.targets {
+				margin-bottom: 10px;
+
+				.target {
+					background: #232323;
+					display: grid;
+					grid-template-columns: 30px 1fr;
+					font-size: 15px;
+					line-height: 30px;
+					margin-bottom: 5px;
+
+					.img {
+						height: 30px;
+						border: solid 1px transparent;
+						background-position: center top;
+						background-size: cover;
+					}
+					.name {
+						padding: 0 10px;
+					}
+					&:hover {
+						.name {
+							direction: rtl;
+						}
+					}
+				}
+			}
+			&:first-child {
+				.rolls {
+					display: flex;
+					justify-content: center;
+					width: 100%;
+
+					div.roll {
+						border: solid 1px #5c5757;
+						text-align: center;
+						padding: 5px 0;
+						flex-direction: column;
+						flex: 1 1 50%;
+						margin: 5px;
+						position: relative;
+
+						h2 {
+							font-size: 40px;
+							margin-bottom: 0 !important;
+							height: 50px;
+							line-height: 50px;
+							font-weight: bold;
+						}
+						.top, .bottom {
+							font-size: 15px;
+							height: 20px;
+							line-height: 20px;;
+						}
+						.advantage {
+							position: absolute;
+							background: #191919;
+							padding: 0 10px;
+							top: -5px;
+							left: 50%;
+						transform: translate(-50%, -50%);
+						}
+					}
+				}
+			}
+			.small-roll {
+				font-size: 20px;
+			}
+		}
 	}
 </style>

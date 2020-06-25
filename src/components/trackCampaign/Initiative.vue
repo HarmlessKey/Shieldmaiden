@@ -202,6 +202,7 @@
 			'allEntities',
 			'turn',
 			'campPlayers',
+			"players"
 		],
 		data() {
 			return {
@@ -220,10 +221,6 @@
 		},
 		firebase() {
 			return {
-				players: {
-					source: db.ref(`players/${this.dmId}`),
-					asObject: true,
-				},
 				npcs: {
 					source: db.ref(`npcs/${this.dmId}`),
 					asObject: true,
@@ -291,7 +288,7 @@
 					if(roll.toHitTotal) {
 						toHitDisplay = `<div class="roll">`;
 						toHitDisplay += (crit) ? crit : ``;
-						toHitDisplay += (roll.toHit) ? `<div class="top">${roll.toHit} + ${roll.hitMod}</div>` : ``;
+						toHitDisplay += (roll.toHit) ? `<div class="top">${roll.toHit} + ${roll.hitMod}</div>` : `<div class="top"></div>`;
 						toHitDisplay += `<h2><b>${roll.toHitTotal}</b></h2><div class="bottom">to hit</div>`;
 						toHitDisplay += `</div>`;
 					}
@@ -305,7 +302,7 @@
 									${(toHitDisplay) ? toHitDisplay : ``}
 
 									<div class="roll">
-										${roll.damageMod ? `<div class="top">${roll.damage} + ${roll.damageMod}</div>` : ''}
+										${roll.damageMod ? `<div class="top">${roll.damage} + ${roll.damageMod}</div>` : '<div class="top"></div>'}
 										<h2>
 											<b class="red">${roll.damageTotal}</b>
 										</h2>

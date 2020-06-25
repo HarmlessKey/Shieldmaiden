@@ -39,7 +39,7 @@
 							</b-col>
 							<b-col>
 								<div>
-									<Meters :entities="encounter.entities" />
+									<Meters :entities="encounter.entities" :players="players" :npcs="npcs" />
 								</div>
 							</b-col>
 						</b-row>
@@ -85,6 +85,7 @@
 									:targets="_non_hidden_targets"
 									:allEntities="_turnCount"
 									:turn="turn"
+									:players="players"
 									:campPlayers="campaign.players"
 									@newRoll="pushRoll"
 								/>
@@ -96,8 +97,8 @@
 										<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
 									</ul>
 								</div>
-								<Meters :entities="encounter.entities" v-if="sideDisplay === 'damage' && playerSettings.meters === undefined" />
-								<Rolls :entities="encounter.entities" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
+								<Meters :entities="encounter.entities" :npcs="npcs" :players="players" v-if="sideDisplay === 'damage' && playerSettings.meters === undefined" />
+								<Rolls :entities="encounter.entities" :npcs="npcs" :players="players" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
 							</b-col>
 						</b-row>
 					</div>

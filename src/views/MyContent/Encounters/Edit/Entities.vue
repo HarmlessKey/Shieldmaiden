@@ -177,77 +177,78 @@
 				this.to_add[id] = 1
 			},
 			add(id, type, name, custom = false, rollHp = false) {
-				var entity = {
+				let entity = {
 					id: id,
 					name: name,
 					entityType: type,
 					initiative: 0,
 					active: true,
 				}
-				var HP = undefined;
+				let HP = undefined;
 
 				if(type == 'npc') {
-					entity.active = true
-					let last = -1
-					let n = 0
+					entity.active = true;
+					let last = -1;
+					let n = 0;
 					for (let i in this.encounter.entities) {
-						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/)
+						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/);
 						// let id = this.encounter.entities[i].id
 						if (match[1].trim() == entity.name) {
-							n++
+							n++;
 							if (parseInt(match[3]) > last) {
-								last = parseInt(match[3])
+								last = parseInt(match[3]);
 							}
 						}
 					}
 					if (last > 0) {
-						entity.name = `${entity.name} (${++last})`
+						entity.name = `${entity.name} (${++last})`;
 					} else if (n > 0) {
-						entity.name = `${entity.name} (${n})`
+						entity.name = `${entity.name} (${n})`;
 					}
 					
 					if(custom == false) {
-						// console.log(this.monsters[id-1])
-						var npc_data = this.monsters[id];
-						entity.npc = 'api'
+						let npc_data = this.monsters[id];;
+						entity.npc = 'api';
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution)
+							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(dice[1], dice[0], mod)
+							HP = this.rollD(dice[1], dice[0], mod);
 
-							entity.curHp = HP.total
-							entity.maxHp = HP.total
+							entity.curHp = HP.total;
+							entity.maxHp = HP.total;
 						}
 						else {
-							entity.curHp = npc_data.hit_points
-							entity.maxHp = npc_data.hit_points
+							entity.curHp = npc_data.hit_points;
+							entity.maxHp = npc_data.hit_points;
 						}
-						entity.ac = npc_data.armor_class
+						entity.ac = npc_data.armor_class;
 					}
 					else {
-						npc_data = this.npcs[id];
-						entity.npc = 'custom'
-						entity.ac = npc_data.ac
+						let npc_data = this.npcs[id];
+						entity.npc = 'custom';
+						entity.ac = npc_data.ac;
+
 
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
-							let mod = dice[0] * this.calcMod(npc_data.constitution)
+							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(dice[1], dice[0], mod)
+							HP = this.rollD(dice[1], dice[0], mod);
 							
-							entity.curHp = HP.total
-							entity.maxHp = HP.total
+							entity.curHp = HP.total;
+							entity.maxHp = HP.total;
 						}
 						else {
-							entity.curHp = npc_data.maxHp
-							entity.maxHp = npc_data.maxHp
+							entity.curHp = npc_data.maxHp;
+							entity.maxHp = npc_data.maxHp;
 						}
 					}
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
 				else if (type == 'player') {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
+					console.log(this.players[id].companions)
 				}
 				if(type == 'npc') {
 					let notifyHP = [];

@@ -11,9 +11,12 @@
 							:icon="displayImg(entities[key], players[entities[key].id], npcs[entities[key].id])" 
 							:fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``"
 						/>
-						<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entities[key], players[entities[key].id], npcs[entities[key].id]) + '\')' }"/>
+						<div v-else class="img" :style="{ 
+							backgroundImage: 'url(\'' + displayImg(entities[key], players[entities[key].id], npcs[entities[key].id]) + '\')',
+							borderColor: entities[key].color_label ? entities[key].color_label : ``
+						}"/>
 
-						<div class="name">
+						<div class="name truncate">
 							{{ entities[key].name }}
 						</div>
 					</div>

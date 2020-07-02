@@ -203,6 +203,7 @@
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
+				let crit = false;
 				let critDouble = false;
 				let critRoll = 1; //set to 2 on a crit
 				let hits = '';
@@ -254,6 +255,7 @@
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
 					if(this.toHit && toHit[highest].throws[0] === 20) {
+						crit = true;
 						if(this.criticalSettings['.value']) {
 							critDouble = true;
 						} else {
@@ -317,6 +319,7 @@
 				else {
 					//If there was no modifier
 					bonus = '';
+					totalDamage = total;
 					showTotal = '<span class="red">' + total + '</span>';
 				}
 

@@ -15,11 +15,14 @@
 				<template>
 					<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
 						<icon 
-							v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+							v-if="displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'player'" class="img" 
 							:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
-							:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+							:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
 						/>
-						<div v-else class="img" :style="{ backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')' }"/>
+						<div v-else class="img" :style="{ 
+							backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
+							borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
+						}"/>
 						<div class="progress health-bar">
 							<div class="info">
 								<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>

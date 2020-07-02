@@ -461,4 +461,14 @@
 		0%, 30% { transform: rotate(0deg); }
 		70%, 100% { transform: rotate(360deg); }
 	}
+
+	@media only screen and (max-width: 1000px) { 
+		.container {
+			&.entities {
+				padding: 0 20px;
+				width: 100%;
+				max-width: unset;
+			}
+		}
+	}
 </style>

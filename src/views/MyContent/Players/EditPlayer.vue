@@ -524,6 +524,7 @@
 
 				new_companion.curHp = npc.maxHp || npc.hit_points;
 				new_companion.key = npc.key;
+				new_companion.name = npc.name;
 				// new_companion.key = npc
 				this.player.companions.push(new_companion);	
 

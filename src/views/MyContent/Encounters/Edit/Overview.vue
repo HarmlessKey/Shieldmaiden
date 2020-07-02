@@ -58,6 +58,10 @@
 								<span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
 								<icon v-else icon="player" class="image" />
 							</template>
+							<template v-if="data.row.entityType === 'companion'">
+								<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+								<icon v-else icon="player" class="image" />
+							</template>
 							<template v-else-if="data.row.entityType === 'npc'">
 								<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
 								<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
@@ -208,7 +212,7 @@
 					return _.chain(this.encounter.entities)
 					.filter(function(entity, key) {
 						entity.key = key
-						return entity.friendly || entity.entityType === 'player';
+						return entity.friendly || entity.entityType === 'player' || entity.entityType === 'companion';
 					})
 					.orderBy(function(entity) {
 						return entity.name

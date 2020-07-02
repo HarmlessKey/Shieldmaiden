@@ -176,7 +176,7 @@
 				}
 				this.to_add[id] = 1
 			},
-			add(id, type, name, custom = false, rollHp = false) {
+			add( id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
 				let entity = {
 					id: id,
 					name: name,
@@ -207,7 +207,7 @@
 					}
 					
 					if(custom == false) {
-						let npc_data = this.monsters[id];;
+						let npc_data = this.monsters[id];
 						entity.npc = 'api';
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
@@ -251,7 +251,15 @@
 				}
 				else if (type == 'player') {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
-					console.log(this.players[id].companions)
+					const companions = this.players[id].companions;
+					for (let i in companions) {
+						console.log(companions[i])
+						this.add( companions[i].key, 'companion', companions[i].name , true, false, id )
+					}
+				}
+				else if (type == 'companion') {
+					entity.npc = 'custom';
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {
 					let notifyHP = [];

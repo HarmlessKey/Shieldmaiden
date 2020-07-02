@@ -2,7 +2,7 @@
 	<div>
 		<h3 class="mt-3">DM Rolls</h3>
 		<ul class="rolls">
-			<li v-for="(roll, index) in rolls" :key="`roll-${index}`" class="bg-gray-dark">
+			<li v-for="(roll, index) in rolls" :key="`roll-${index}`">
 				<div class="targets">
 					<div class="target" v-for="(key, index) in roll.targets" :key="`target-${index}`">
 						<icon 
@@ -24,12 +24,12 @@
 
 				<!-- FIRST -->
 				<div class="rolls" v-if="index === 0">
-					<div v-if="roll.toHitTotal" class="roll">
+					<div v-if="roll.toHitTotal" class="roll bg-gray-dark">
 						<div class="top">{{ roll.hitMod ? `${roll.toHit} + ${roll.hitMod}` : '' }}</div>
 						<h2>{{ roll.toHitTotal }}</h2>
 						<div class="bottom">to hit</div>
 					</div>
-					<div class="roll">
+					<div class="roll bg-gray-dark">
 						<div class="top">{{ roll.damageMod ? `${roll.damage} + ${roll.damageMod}` : '' }}</div>
 						<h2 class="red">{{ roll.damageTotal }}</h2>
 						<div class="bottom">damage</div>
@@ -68,20 +68,24 @@
 </script>
 
 <style lang="scss" scoped>
+	h3 {
+		text-shadow: 0 0 8px #000;
+		color: #fff;
+	}
 	ul.rolls {
 		list-style: none;
 		padding: 0;
 
 		li {
 			padding: 15px 10px;
-			border: solid 1px #5c5757;
 			margin-bottom: 10px;
+			background: rgba(38, 38, 38, .9);
 			
 			.targets {
 				margin-bottom: 10px;
 
 				.target {
-					background: #232323;
+					background: #191919;
 					display: grid;
 					grid-template-columns: 30px 1fr;
 					font-size: 15px;

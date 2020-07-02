@@ -1,57 +1,59 @@
 <template>
-	<div v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length >0)" class="meters">
+	<div class="meters">
 		<div class="menu">
 			<ul>
 				<li @click="doneTaken = 'done'" :class="{ active: doneTaken == 'done'}">Done</li>
 				<li @click="doneTaken = 'taken'" :class="{ active: doneTaken == 'taken'}">Taken</li>
 			</ul>
 		</div>
-		<div v-for="(type, index) in types" :key="index">
-			<h3>{{ type.type }} {{ doneTaken }}</h3>
-			<transition-group tag="ul" 
-				name="entities" 
-				enter-active-class="animated fadeInUp" 
-				leave-active-class="animated fadeOutDown">
-				<template>
-					<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
-						<icon 
-							v-if="displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'player'" class="img" 
-							:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
-							:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
-						/>
-						<div v-else class="img" :style="{ 
-							backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
-							borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
-						}"/>
-						<div class="progress health-bar">
-							<div class="info">
-								<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
-								<span v-else class="name">{{ entity.name }}</span>
-								<span class="numbers">
-									<span :class="{
-										'red' : type.type == 'damage',
-										'green' : type.type == 'healing'
-									}">
-										<template v-if="entity.meters[type.name] < 10000">{{ entity.meters[type.name] }}</template>
-										<template v-else>{{ entity.meters[type.name] | numeral('0.0a') }}</template>
+		<template v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length > 0)">
+			<div v-for="(type, index) in types" :key="index">
+				<h3>{{ type.type }} {{ doneTaken }}</h3>
+				<transition-group tag="ul" 
+					name="entities" 
+					enter-active-class="animated fadeInUp" 
+					leave-active-class="animated fadeOutDown">
+					<template>
+						<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
+							<icon 
+								v-if="displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+								:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
+							/>
+							<div v-else class="img" :style="{ 
+								backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
+								borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
+							}"/>
+							<div class="progress health-bar">
+								<div class="info">
+									<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
+									<span v-else class="name">{{ entity.name }}</span>
+									<span class="numbers">
+										<span :class="{
+											'red' : type.type == 'damage',
+											'green' : type.type == 'healing'
+										}">
+											<template v-if="entity.meters[type.name] < 10000">{{ entity.meters[type.name] }}</template>
+											<template v-else>{{ entity.meters[type.name] | numeral('0.0a') }}</template>
+										</span>
+										<template v-if="entity.meters[type.over]"> 
+											(<template v-if="entity.meters[type.over] < 10000">{{ entity.meters[type.over] }} </template>
+											<template v-else>{{ entity.meters[type.over] | numeral('0.0a') }} </template> 
+											<small>over</small>)</template>
 									</span>
-									<template v-if="entity.meters[type.over]"> 
-										(<template v-if="entity.meters[type.over] < 10000">{{ entity.meters[type.over] }} </template>
-										<template v-else>{{ entity.meters[type.over] | numeral('0.0a') }} </template> 
-										<small>over</small>)</template>
-								</span>
+								</div>
+								<div class="progress-bar bg-black" 
+									role="progressbar" 
+									:style="{ width: percentageMeters(entity.meters[type.name], type.type) + '%' }" 
+									aria-valuemin="0" 
+									aria-valuemax="100">
+								</div>
 							</div>
-							<div class="progress-bar bg-black" 
-								role="progressbar" 
-								:style="{ width: percentageMeters(entity.meters[type.name], type.type) + '%' }" 
-								aria-valuemin="0" 
-								aria-valuemax="100">
-							</div>
-						</div>
-					</li>
-				</template>
-			</transition-group>
-		</div>
+						</li>
+					</template>
+				</transition-group>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -102,7 +104,6 @@
 			_meters: function() {
 				let dmg = (this.doneTaken === 'done') ? 'damage' : 'damageTaken';
 				let heal = (this.doneTaken === 'done') ? 'healing' : 'healingTaken';
-
 				return {
 					'damage': _.chain(this.entities)
 						.filter(function(entity, key) {
@@ -135,7 +136,7 @@
 				var img = '';
 
 				//In campaign overview image is obtained different
-				if(this.campaign == true) {
+				if(this.campaign) {
 					let playerImg = this.players[entity.key].avatar;
 					img = (playerImg) ? playerImg : require('@/assets/_img/styles/player.svg');
 				}
@@ -179,7 +180,6 @@
 
 <style lang="scss" scoped>
 	.meters {
-		padding-top: 28px;
 		user-select: none;
 
 		h3 {
@@ -270,6 +270,8 @@
 					display: block;
 					border-bottom: solid 3px #000;
 					font-weight: bold !important;
+					text-shadow: 0 0 8px #000;
+					color: #fff;
 
 					&.active {
 						border-color: #2c97de;

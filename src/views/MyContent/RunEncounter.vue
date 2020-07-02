@@ -3,6 +3,7 @@
 		<OverEncumbered/>
 	</div>
 	<div 
+		class="combat-wrapper"
 		v-else-if="encounter && (players || demo)"  
 		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
 	>	
@@ -257,7 +258,7 @@
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
+.combat-wrapper {
 	background-size: cover !important;
 	background-position: center bottom !important;
 	background-color: #191919;

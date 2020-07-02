@@ -106,12 +106,7 @@
 
 <style lang="scss" scoped>
 	.turns {
-		background: rgba(38, 38, 38, .9);
-		text-transform: uppercase;
-		height: 65px;
-		padding: 10px;
-		font-size: 15px;
-		line-height: 45px;
+		padding: 10px 0 !important;
 
 		.round-info {
 			line-height: 12px;

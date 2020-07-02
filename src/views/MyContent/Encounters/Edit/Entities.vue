@@ -229,6 +229,9 @@
 						entity.npc = 'custom';
 						entity.ac = npc_data.ac;
 
+						if (npc_data.friendly) {
+							entity.friendly = true;
+						}
 
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');

@@ -310,20 +310,48 @@
 										<i class="fas fa-info-circle"></i></a>
 									{{ npc.name }}
 								</div>
-								<a class="gray-hover" 
+								<a class="gray-hover" v-if="notAdded(npc)"
 									v-b-tooltip.hover title="Add Companion" 
 									@click="add(npc)">
 									<i class="fas fa-plus green"></i>
 									<span class="d-none d-md-inline ml-1">Add</span>
 								</a>
+								<span v-else><small>Already added.</small></span>
 							</li>
 						</ul>
 					</div>
-					<template v-if="player.companions !== undefined">
-						<div v-for="companion in player.companions">
-							{{ companion }}
+
+					<!--  Companions table -->
+					<hk-table v-if="player.companions !== undefined"
+						:columns="columns"
+						:items="_companions"
+					>
+						<template slot="avatar" slot-scope="data">
+							<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+							<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+						</template>
+
+						<template slot="name" slot-scope="data">
+							<router-link class="mx-2" 
+								:to="'/npcs/' + data.row.key" 
+								v-b-tooltip.hover title="Edit">{{ data.item }}
+							</router-link>
+						</template>
+
+						<div slot="actions" slot-scope="data" class="actions">
+							<router-link class="gray-hover mx-1" 
+								:to="'/npcs/' + data.row.key" 
+								v-b-tooltip.hover title="Edit">
+								<i class="fas fa-pencil"></i>
+							</router-link>
+							<a v-b-tooltip.hover 
+								title="Delete" 
+								class="gray-hover"
+								@click="confirmDelete(data.index)">
+								<i class="fas fa-trash-alt"></i>
+							</a>
 						</div>
-					</template>
+					</hk-table>
 				</b-card>
 
 	
@@ -364,7 +392,23 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				npcs: [],
+				npcs: {},
+				columns: {
+					avatar: {
+						width: 46,
+						noPadding: true
+					},
+					name: {
+						label: 'Name',
+						truncate: true
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
+        	}
+				}
 			}
 		},
 		firebase() {
@@ -381,7 +425,20 @@
 				'tier',
 				'players',
 				'overencumbered',
+				// 'npcs',
 			]),
+			_companions: function() {
+				let comps = [];
+				if (Object.keys(this.npcs).length > 0) {
+					for (let i in this.player.companions) {
+						let key = this.player.companions[i].key;
+						let npc = this.npcs[key];
+						npc.key = key;
+						comps.push(npc);
+					}
+				}
+				return comps;
+			},
 			//User ID needs te be different if it is
 			//an external controlled character
 			userId() {
@@ -472,6 +529,17 @@
 
 				this.searchResults = [];
 				this.search = '';
+			},
+			notAdded(npc) {
+				let key = npc.key;
+				for (let i in this.player.companions) {
+					if (this.player.companions[i].key == key)
+						return false;
+				}
+				return true;
+			},
+			confirmDelete(index) {
+				this.player.companions.splice(index, 1);
 			},
 		}
 	}

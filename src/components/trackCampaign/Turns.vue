@@ -18,7 +18,10 @@
 				:icon="displayImg(current, players[current.id], npcs[current.id])" 
 				:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
 			/>
-			<div v-else class="img d-none d-md-block" :style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.id], npcs[current.id]) + '\')' }"/>
+			<div v-else class="img d-none d-md-block" 
+				:style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.id], npcs[current.id]) + '\')',
+				borderColor: current.color_label ? current.color_label : ``
+			}"/>
 			<h1 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
 					<template v-if="current.entityType == 'npc'">
@@ -103,12 +106,7 @@
 
 <style lang="scss" scoped>
 	.turns {
-		background: rgba(38, 38, 38, .9);
-		text-transform: uppercase;
-		height: 65px;
-		padding: 10px;
-		font-size: 15px;
-		line-height: 45px;
+		padding: 10px 0 !important;
 
 		.round-info {
 			line-height: 12px;

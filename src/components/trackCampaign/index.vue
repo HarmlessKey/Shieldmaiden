@@ -2,67 +2,65 @@
 <div v-if="campaign">
 	<template v-if="!campaign.private">
 		<!-- NOT LIVE -->
-		<div class="track" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" v-if="!encounter || broadcasting['.value'] != $route.params.campid">
-			<div class="top">
+		<div class="track-wrapper" 
+			:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" 
+			v-if="!encounter || broadcasting['.value'] != $route.params.campid
+		">
+			<div class="turns">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				<span class="title">{{ campaign.campaign }}</span>
+				<span class="title truncate">{{ campaign.campaign }}</span>
 				<span>
-					<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+					<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
 				</span>
 			</div>
-			<div class="container-fluid">
-				<h2 class="not-live" v-if="broadcasting['.value'] !== $route.params.campid">Campaign is currently not live</h2>
-				<div class="container entities">
-					<CampaignOverview :players="campaign.players" />
+			<div class="track">
+				<div class="initiative">
+					<h3>Campaign Players</h3>
+					<div class="scroll" v-bar>
+						<div>
+							<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
+						</div>
+					</div>
+				</div>
+				<div class="side">
+					<h3>Campaign wide meters</h3>
+					<div class="scroll" v-bar>
+						<div>
+							<Meters :entities="campaign.players" :players="players" :campaign="true" :npcs="{}" />
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- LIVE -->
-		<div class="track" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+		<div class="track-wrapper" v-else-if="encounter && broadcasting['.value'] == $route.params.campid" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 			
 			<!-- FINISHED -->
-			<div v-if="encounter.finished == true">
-				<div class="top d-flex justify-content-between">
+			<template  v-if="encounter.finished">
+				<div class="turns">
 					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-					{{ campaign.name }}
+					<span class="title truncate">Encounter Finished</span>
 					<span>
-						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
+						<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
 					</span>
 				</div>
-				<div class="container-fluid">
-					<div class="container entities">
-						<h2 class="padding">Encounter Finished</h2>
-						<b-row>
-							<b-col md="8">
-								<Rewards :encounter="encounter"/>
-							</b-col>
-							<b-col>
-								<div>
-									<Meters :entities="encounter.entities" />
-								</div>
-							</b-col>
-						</b-row>
+				<div class="track">
+					<div class="initiative">
+						<Rewards :encounter="encounter"/>
+					</div>
+					<div class="side">
+						<Meters :entities="encounter.entities" :players="players" :npcs="npcs" />
 					</div>
 				</div>
-			</div>
+			</template>
 
 			<!-- ROLL FOR INITIATIVE -->
-			<div v-else-if="encounter.round == 0">
-				<div class="top d-flex justify-content-between">
-					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-					{{ campaign.name }}
-					<span>
-						<span class="live active" v-if="broadcasting['.value'] == $route.params.campid">live</span>
-					</span>
-				</div>
-				<div class="container-fluid">
-					<div class="container entities">
-						<h2 class="padding">
-							<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-							Roll for initiative!
-						</h2>
-						<CampaignOverview :players="campaign.players" />	
+			<div class="track" v-else-if="encounter.round === 0">
+				<div class="roll-for-initiative">
+					<div>
+						<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
+						<h2>Roll for initiative!</h2>
 					</div>
 				</div>
 			</div>
@@ -76,58 +74,37 @@
 					:turn="turn"
 					:campPlayers="campaign.players"
 				/>
-				<div class="container-fluid">
-					<div class="container entities">
-
-						<!-- LAST ROLL -->
-						<div v-if="encounter.lastRoll" class="lastRoll text-center">
-							<i class="fas fa-dice-d20"></i> 
-
-							<!-- To hit -->
-							<span v-if="encounter.lastRoll.toHitTotal">
-								To hit: 
-								<span v-if="encounter.lastRoll.toHitTotal == 'Natural 1' || encounter.lastRoll.toHitTotal == 'Natural 20'"
-									:class="{ 'red': encounter.lastRoll.toHitTotal == 'Natural 1', 'green': encounter.lastRoll.toHitTotal == 'Natural 20' }">
-									{{ encounter.lastRoll.toHitTotal }}
-								</span>
-								<template v-else>
-									<span v-if="encounter.lastRoll.hitMod">
-										{{ encounter.lastRoll.toHit }} + {{ encounter.lastRoll.hitMod }} =
-									</span>
-									<span class="blue">{{ encounter.lastRoll.toHitTotal }}</span>
-								</template>.
-							</span>
-
-							<!-- Open Roll -->
-							<span v-if="encounter.lastRoll.damageTotal">
-								Damage: 
-								<span v-if="encounter.lastRoll.damageMod">
-									{{ encounter.lastRoll.damage }} + {{ encounter.lastRoll.damageMod }} =
-								</span>
-								<span class="red">{{ encounter.lastRoll.damageTotal }}</span>.
-							</span>
+				<div class="track">
+					<div class="initiative">
+						<Initiative 
+							:encounter="encounter" 
+							:targets="_non_hidden_targets"
+							:allEntities="_turnCount"
+							:turn="turn"
+							:players="players"
+							:campPlayers="campaign.players"
+							@newRoll="pushRoll"
+						/>
+					</div>
+					<div class="side">
+						<div class="menu">
+							<ul>
+								<li @click="sideDisplay = 'damage'" :class="{ active: sideDisplay == 'damage'}" v-if="playerSettings.meters === undefined"><i class="fas fa-swords"></i></li>
+								<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
+							</ul>
 						</div>
-
-						<b-row>
-							<b-col>
-								<Initiative 
-									:encounter="encounter" 
-									:targets="_non_hidden_targets"
-									:allEntities="_turnCount"
-									:turn="turn"
-									:campPlayers="campaign.players"
-								/>
-							</b-col>
-							<b-col md="3" v-if="playerSettings.meters === undefined">
-								<Meters :entities="encounter.entities" />
-							</b-col>
-						</b-row>
+						<div class="scroll during-encounter" v-bar>
+							<div>
+								<Meters :entities="encounter.entities" :npcs="npcs" :players="players" v-if="sideDisplay === 'damage' && playerSettings.meters === undefined" />
+								<Rolls :entities="encounter.entities" :npcs="npcs" :players="players" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
+							</div>
+						</div>
 					</div>
 				</div>
 			</template>
 		</div>
 	</template>
-	<div class="track" v-else>
+	<div class="track-wrapper" v-else>
 		<div class="top d-flex justify-content-between">
 			<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
 			Not found
@@ -146,16 +123,18 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { db } from '@/firebase'
-	import { general } from '@/mixins/general.js'
+	import _ from 'lodash';
+	import { db } from '@/firebase';
+	import { general } from '@/mixins/general.js';
 
-	import Follow from '@/components/trackCampaign/Follow.vue'
-	import Rewards from '@/components/trackCampaign/Rewards.vue'
-	import Turns from '@/components/trackCampaign/Turns.vue'
-	import Initiative from '@/components/trackCampaign/Initiative.vue'
-	import Meters from '@/components/trackCampaign/Meters.vue'
-	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue'
+	import Follow from '@/components/trackCampaign/Follow.vue';
+	import Rewards from '@/components/trackCampaign/Rewards.vue';
+	import Turns from '@/components/trackCampaign/Turns.vue';
+	import Initiative from '@/components/trackCampaign/Initiative.vue';
+	import Meters from '@/components/trackCampaign/Meters.vue';
+	import Rolls from '@/components/trackCampaign/Rolls.vue';
+	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue';
+	import ViewPlayers from '@/components/campaign/Players.vue';
 
 	export default {
 		name: 'app',
@@ -166,7 +145,9 @@
 			Turns,
 			Initiative,
 			Meters,
+			Rolls,
 			CampaignOverview,
+			ViewPlayers
 		},
 		metaInfo: {
 			title: 'Harmless Key'
@@ -179,6 +160,8 @@
 				campaign: undefined,
 				counter: 0,
 				tier: undefined,
+				rolls: [],
+				setSideDisplay: undefined
 			}
 		},
 		firebase() {
@@ -209,6 +192,17 @@
 			this.fetch_encounter()
 		},
 		computed: {
+			sideDisplay: {
+				get() {
+					if(this.setSideDisplay) {
+						return this.setSideDisplay;
+					}
+					return (this.playerSettings.meters === undefined) ? 'damage' : 'rolls';
+				},
+				set(newValue) {
+					this.setSideDisplay = newValue;
+				}
+			},
 			//All entities, without hidden entities
 			_turnCount() {
 				return _.chain(this.encounter.entities)
@@ -324,115 +318,241 @@
 						this.campaign = snapshot.val();
 					});
 				});
+			},
+			pushRoll(roll) {
+				if(roll) {
+					this.rolls.unshift(roll);
+				}
 			}
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
-	.track {
+	.track-wrapper {
 		height: calc(100vh - 50px);
 		background-size: cover;
 		background-position: center bottom;
 		background-color: #191919;
-		overflow-y: scroll;
+		width: 100vw;
+		position: relative;
 
-		.top {
+		.turns {
+			grid-area: top;
 			background: rgba(38, 38, 38, .9);
 			text-transform: uppercase;
 			height: 65px;
-			padding: 10px;
-			font-size: 15px;
-			line-height: 45px;
+			padding: 20px 10px;
 			display: grid;
-			grid-template-columns: max-content auto min-content;
-			grid-template-rows: auto;
-			grid-gap: 0;
-			grid-template-areas: 
-			"back title live";
+			grid-template-columns: max-content auto max-content;
 
 			.title {
-				padding-left: 20px;
 				text-align: center;
-				white-space: nowrap; 
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-			.live {
-				margin: 10px 0;
-				height: 25px;
-				line-height: 25px;
 				padding: 0 10px;
 			}
 		}
 
-		h2.not-live {
-			margin-top: 50px;
-			text-align: center;
-		}
+		.track {
+			max-width: 1250px;
+			margin: auto;
+			padding-top: 30px;
+			width: 100%;
+			height: calc(100% - 65px);
+			display: grid;
+			grid-template-columns: 3fr 1fr;
+			grid-template-rows: 1fr;
+			grid-gap: 15px;
+			grid-template-areas:
+			"initiative side";
 
-		&::-webkit-scrollbar { 
-			display: none; 
-		}
+			.initiative {
+				grid-area: initiative;
+				padding-left: 15px;
+				overflow: hidden;
 
-		h2.padding {
-			font-size:25px !important;
-			line-height: 25px !important;
-			text-align: center;
-			padding-top: 20px;
-			text-shadow: 0 0 8px #000;
-			color: #fff;
-		}
+				.scroll {
+					height: calc(100% - 56px);
 
-		.loader:before {
-			width: 80px;
-			height: 80px;
-			margin-top: -85px;
-			margin-left: -40px;
-			border-width: 5px;
-			animation-duration: 1.5s;
-		}
+					> div {
+						padding-right: 6px;
+					}
+				}
+			}
+			.side {
+				grid-area: side;
+				padding-right: 15px;
+				overflow: hidden;
 
-		.container-fluid {
-			background-color:rgba(0, 0, 0, 0.3);
-			height: calc(100vh - 115px);
-			overflow-y: scroll;
-			padding-bottom: 110px;
+				.menu {
+					height: 29px;
+					border-bottom: solid 2px #000;
+					position: relative;
+					user-select: none;
+					margin-bottom: 10px;
+
+					ul {
+						height: 29px;
+						margin: 0;
+						display: flex;
+						justify-content: flex-start;
+						padding: 0;
+
+						li {
+							cursor: pointer;
+							height: 29px;
+							padding: 0 10px;
+							display: block;
+							border-bottom: solid 2px #000;
+							color: #fff;
+
+							&.active {
+								color: #2c97de;
+								border-color: #2c97de;
+							}
+							&:first-child {
+								padding-left: 3px;
+							}
+						}
+					}
+				}
+				.scroll {
+					height: calc(100% - 56px);
+
+					> div {
+						padding-right: 6px;
+					}
+					&.during-encounter {
+						height: calc(100% - 50px);
+					}
+				}
+			}
+			.roll-for-initiative {
+				height: calc(100vh - 50px);
+				z-index: 99;
+				width: 100%;
+				left: 0;
+				position: fixed;
+				top: 50px;
+				background: rgba(38, 38, 38, .5);
+				text-align: center;
+
+				> div {
+					position: absolute;
+					top: 40%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+				}
+				.die {
+					display: inline-block;
+					width: 155px; 
+					height: 155px;
+					background-size: 155px 155px;
+					background-position: center;
+					background-repeat: no-repeat;
+					margin-bottom: 30px;
+
+					&.spin {
+						margin-right: 10px;
+						font-size: 40px;
+						animation: spin 1.5s ease infinite;
+					}
+				}
+				h2 {
+					font-weight: bold;
+					font-size: 50px;
+					text-transform: none;
+					color: #fff;
+					text-shadow: 0 0 8px #000;
+				}
+			}
+			h3 {
+				margin-bottom: 30px !important;
+				color: #fff;
+				text-shadow: 0 0 8px #000;
+			}
+			h2.not-live {
+				margin-top: 50px;
+				text-align: center;
+			}
 
 			&::-webkit-scrollbar { 
 				display: none; 
 			}
-			.lastRoll {
-				background: rgba(0, 0, 0, .6);
-				padding: 5px;
+
+			h2.padding {
+				font-size:25px !important;
+				line-height: 25px !important;
+				text-align: center;
+				padding-top: 20px;
+				text-shadow: 0 0 8px #000;
+				color: #fff;
 			}
-		}
-		.damage {
-			max-width: 370px;
-			padding: 20px;
-			background: rgba(80, 80, 80, .5) !important;
+			.loader:before {
+				width: 80px;
+				height: 80px;
+				margin-top: -85px;
+				margin-left: -40px;
+				border-width: 5px;
+				animation-duration: 1.5s;
+			}
+			.container-fluid {
+				background-color:rgba(0, 0, 0, 0.3);
+				height: calc(100vh - 115px);
+				overflow-y: scroll;
+				padding-bottom: 110px;
+
+				&::-webkit-scrollbar { 
+					display: none; 
+				}
+				.lastRoll {
+					background: rgba(0, 0, 0, .6);
+					padding: 5px;
+				}
+			}
+			
 		}
 	}
 	.no-broadcast {
 		padding-bottom: 110px !important;
 	}
-	.die {
-		display: inline-block;
-		width: 55px; 
-		height: 55px;
-		background-size: 55px 55px;
-		background-position: center;
-		background-repeat: no-repeat;
-		vertical-align: -18px;
-
-		&.spin {
-			margin-right: 10px;
-			font-size: 40px;
-			animation: spin 1.5s ease infinite;
-		}
-	}
 	@keyframes spin {
 		0%, 30% { transform: rotate(0deg); }
 		70%, 100% { transform: rotate(360deg); }
+	}
+	@media only screen and (max-width: 1000px) {
+		.track-wrapper {
+			.track {
+				grid-template-columns: 2fr 1fr;
+			}
+		}
+	}
+	@media only screen and (max-width: 720px) { 
+		.track-wrapper {
+			.track {
+				overflow: scroll;
+				grid-template-columns: 1fr;
+				grid-template-rows: auto;
+				grid-template-areas:
+				"initiative"
+				"side";
+
+				.initiative {
+					padding: 0 15px;
+					overflow: visible !important;
+
+					.scroll {
+						overflow: visible !important;
+					}
+				}
+				.side {
+					padding: 0 15px;
+					overflow: visible !important;
+
+					.scroll {
+						overflow: visible !important;
+					}
+				}
+			}
+		}
 	}
 </style>

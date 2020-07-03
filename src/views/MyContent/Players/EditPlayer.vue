@@ -517,16 +517,15 @@
 			},
 			add(npc) {
 				if (this.player.companions === undefined) {
-					this.player.companions = [];
+					this.player.companions = {};
 				}
-				console.log(npc);
 				let new_companion = {};
 
 				new_companion.curHp = npc.maxHp || npc.hit_points;
 				new_companion.key = npc.key;
 				new_companion.name = npc.name;
 				// new_companion.key = npc
-				this.player.companions.push(new_companion);	
+				this.player.companions[npc.key] = new_companion;	
 
 				this.searchResults = [];
 				this.search = '';

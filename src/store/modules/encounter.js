@@ -187,6 +187,7 @@ const mutations = {
 			ac: parseInt(db_entity.ac),
 			active: db_entity.active
 		}
+
 		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
 		entity.npc = (db_entity.npc) ? db_entity.npc : false;
 		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
@@ -265,12 +266,72 @@ const mutations = {
 			case 'companion': {
 				let player_data = (!state.demo) ? rootState.content.players[db_entity.player] : demoPlayers[db_entity.player];
 				let npc_data = rootState.content.npcs[key];
+				let companion_data = player_data.companions[key]
 				
-				console.log("entity", db_entity)
-				console.log("player", player_data)
-				console.log("npc", npc_data)
+				entity.curHp = 5;
+				entity.tempHp = companion_data.tempHp;
+				entity.ac_bonus = companion_data.ac_bonus;
+				entity.maxHpMod = companion_data.maxHpMod;
 
-				// entity.curHp = player_data.companions[key]
+				entity.img = (npc_data.avatar) ? npc_data.avatar : 'player';
+
+				// entity.name = npc_data.name;
+				entity.ac = npc_data.ac;
+				entity.maxHp = npc_data.maxHp;
+
+				entity.size = npc_data.size;
+				entity.type = npc_data.type;
+				entity.subtype = npc_data.subtype;
+				entity.alignment = npc_data.alignment;
+				entity.challenge_rating = npc_data.challenge_rating;
+				entity.hit_dice = npc_data.hit_dice;
+				entity.speed = npc_data.speed;
+				entity.senses = npc_data.senses;
+				entity.languages = npc_data.languages;
+
+				entity.strength = npc_data.strength;
+				entity.dexterity = npc_data.dexterity;
+				entity.constitution = npc_data.constitution;
+				entity.intelligence = npc_data.intelligence;
+				entity.wisdom = npc_data.wisdom;
+				entity.charisma = npc_data.charisma;
+
+				entity.strength_save = npc_data.strength_save;
+				entity.dexterity_save = npc_data.dexterity_save;
+				entity.constitution_save = npc_data.constitution_save;
+				entity.intelligence_save = npc_data.intelligence_save;
+				entity.wisdom_save = npc_data.wisdom_save;
+				entity.charisma_save = npc_data.charisma_save;
+
+				entity.acrobatics = npc_data.acrobatics;
+				entity['animal Handling'] = npc_data['animal Handling'];
+				entity.arcana = npc_data.arcana;
+				entity.athletics = npc_data.athletics;
+				entity.deception = npc_data.deception;
+				entity.history = npc_data.history;
+				entity.insight = npc_data.insight;
+				entity.intimidation = npc_data.intimidation;
+				entity.investigation = npc_data.investigation;
+				entity.medicine = npc_data.medicine;
+				entity.nature = npc_data.nature;
+				entity.perception = npc_data.perception;
+				entity.performance = npc_data.performance;
+				entity.persuasion = npc_data.persuasion;
+				entity.religion = npc_data.religion;
+				entity['sleight of Hand'] = npc_data['sleight of Hand'];
+				entity.stealth = npc_data.stealth;
+				entity.survival = npc_data.survival;
+
+				entity.damage_vulnerabilities = npc_data.damage_vulnerabilities;
+				entity.damage_resistances = npc_data.damage_resistances;
+				entity.damage_immunities = npc_data.damage_immunities;
+				entity.condition_immunities = npc_data.condition_immunities;
+
+				entity.special_abilities = npc_data.special_abilities;
+				entity.actions = npc_data.actions;
+				entity.legendary_actions = npc_data.legendary_actions;
+
+				break;
 			}
 			case 'npc': {
 				entity.curHp = db_entity.curHp;
@@ -302,11 +363,7 @@ const mutations = {
 					//if an entity is quicly added during an ecnounter
 					//without copying an existing
 					//it won't have data_npc
-					if(data_npc) {
-						entity.img = (data_npc.avatar) ? data_npc.avatar : 'monster';
-					} else {
-						entity.img = 'monster';
-					}
+					entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
 				}
 				else {
 					entity.img = entity.avatar;
@@ -371,6 +428,7 @@ const mutations = {
 				break
 			}
 		}
+		console.log("BEFORE SET", entity.curHp)
 		Vue.set(state.entities, key, entity);
 	},
 	CLEAR_ENTITIES(state) { state.entities = {}; },	

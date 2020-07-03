@@ -262,6 +262,16 @@ const mutations = {
 				entity.level = db_player.level;
 				break
 			}
+			case 'companion': {
+				let player_data = (!state.demo) ? rootState.content.players[db_entity.player] : demoPlayers[db_entity.player];
+				let npc_data = rootState.content.npcs[key];
+				
+				console.log("entity", db_entity)
+				console.log("player", player_data)
+				console.log("npc", npc_data)
+
+				// entity.curHp = player_data.companions[key]
+			}
 			case 'npc': {
 				entity.curHp = db_entity.curHp;
 				entity.tempHp = db_entity.tempHp;

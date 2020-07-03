@@ -259,6 +259,7 @@
 				}
 				else if (type == 'companion') {
 					entity.npc = 'custom';
+					entity.player = companion_of;
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 				if(type == 'npc') {

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="targets && allEntities && players && campPlayers">
+	<div v-if="targets && allEntities && players && campPlayers" class="initiative-wrapper">
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
 			<div>
@@ -26,159 +26,151 @@
 							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
 							type: 'manual'
 						}
-					})"><i class="fas fa-swords"></i></a>
-				<!-- <a
-					v-b-tooltip.hover
-					title="Pending requests"
-					@click="setSlide({
-						show: true,
-						type: 'slides/trackCampaign/playerRequests/pendingRequests',
-						data: {
-							campPlayers
-						}
-					})">
-					<i class="far fa-hourglass-half"></i>
-				</a> -->
+					})"><i class="fas fa-sword"></i></a>
 			</div>
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<table class="initiative targets">
-			<thead>
-				<th class="init">In.</th>
-				<th></th>
-				<th class="ac"><i class="fas fa-shield"></i></th>
-				<th>Name</th>
-				<th class="hp"><i class="fas fa-heart"></i></th>
-				<th class="d-none d-md-table-cell">Conditions</th>
-			</thead>
-			<tbody 
-				class="entities"
-				name="entities"
-				is="transition-group"
-				enter-active-class="animated fadeIn"
-				leave-active-class="animated fadeOut">
-				<template v-for="(entity, index) in targets">
-					<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
-						<td colspan="6">Top of the round</td>
-					</tr>
-					<tr 
-						:key="entity.key" 
-						:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
-						@mousedown="characters.length !== 0 ? start($event, entity.key) : null" 
-						@mouseleave="characters.length !== 0 ? stop() : null" 
-						@mouseup="characters.length !== 0 ? stop() : null" 
-						@touchstart="characters.length !== 0 ? start($event, entity.key) : null" 
-						@touchend="characters.length !== 0 ? stop() : null" 
-						@touchcancel="characters.length !== 0 ? stop() : null"
-					>
-						<td class="init">
-							<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
-							<template v-else>{{ entity.initiative }}</template>
-						</td>
-					
-						<td class="image">
-							<icon 
-								v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
-								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
-								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-							/>
-							<div 
-								v-else 
-								class="img" 
-								:style="{ 
-									backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')',
-									'border-color': entity.color_label ? entity.color_label : ''
-								}"
-							/>
-						</td>
+		<div class="scroll" v-bar>
+			<div>
+				<table class="initiative-list targets">
+					<thead>
+						<th class="init">In.</th>
+						<th></th>
+						<th class="ac"><i class="fas fa-shield"></i></th>
+						<th>Name</th>
+						<th class="hp"><i class="fas fa-heart"></i></th>
+						<th class="d-none d-md-table-cell">Conditions</th>
+					</thead>
+					<tbody 
+						class="entities"
+						name="entities"
+						is="transition-group"
+						enter-active-class="animated fadeIn"
+						leave-active-class="animated fadeOut">
+						<template v-for="(entity, index) in targets">
+							<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
+								<td colspan="6">Top of the round</td>
+							</tr>
+							<tr 
+								:key="entity.key" 
+								:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
+								@mousedown="characters.length !== 0 ? start($event, entity.key) : null" 
+								@mouseleave="characters.length !== 0 ? stop() : null" 
+								@mouseup="characters.length !== 0 ? stop() : null" 
+								@touchstart="characters.length !== 0 ? start($event, entity.key) : null" 
+								@touchend="characters.length !== 0 ? stop() : null" 
+								@touchcancel="characters.length !== 0 ? stop() : null"
+							>
+								<td class="init">
+									<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
+									<template v-else>{{ entity.initiative }}</template>
+								</td>
+							
+								<td class="image">
+									<icon 
+										v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+										:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+										:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+									/>
+									<div 
+										v-else 
+										class="img" 
+										:style="{ 
+											backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')',
+											'border-color': entity.color_label ? entity.color_label : ''
+										}"
+									/>
+								</td>
 
-						<td class="ac">
-							<template v-if="
-								(entity.entityType == 'player' && playerSettings.ac === undefined) 
-								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
-								<span class="ac" :class="{ 
-										'green': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus > 0, 
-										'red': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus < 0 
-									}"  
-									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus" 
-									v-if="displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus">
-									{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus }}
-								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac }}</span>
-							</template>
-							<span v-else class="gray-hover">?</span>
-						</td>
-
-						<td class="name">
-							<span v-if="entity.entityType == 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
-								<template v-if="displayNPCField('name', entity)">
-									{{ entity.name }}
-								</template>
-								<template v-else>
-									? ? ?
-								</template>
-							</span>
-							<template v-else>{{ players[entity.key].character_name }}</template>
-						</td>
-
-						<td class="hp">
-							<template v-if="
-								(entity.entityType === 'player' && playerSettings.health === undefined)
-								|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
-							">
-								<Health	:entity="entity" :campPlayers="campPlayers" />
-							</template>
-							<template v-else-if="
-								(entity.entityType == 'player' && playerSettings.health === 'obscured')
-								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
-							">
-								<template v-if="entity.curHp == 0">
-									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
-								</template>
-								<i v-else class="fas" :class="{
-										'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
-										'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
-										'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
-									}"></i>
-							</template>
-							<template v-else>
-								<span class="gray-hover">
-									<template v-if="entity.curHp == 0">
-										<i class="fas fa-skull-crossbones red"></i>
+								<td class="ac">
+									<template v-if="
+										(entity.entityType == 'player' && playerSettings.ac === undefined) 
+										|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
+										<span class="ac" :class="{ 
+												'green': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus > 0, 
+												'red': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus < 0 
+											}"  
+											v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus" 
+											v-if="displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus">
+											{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus }}
+										</span>
+										<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac }}</span>
 									</template>
-									<template v-else>? ? ?</template>
-								</span>
-							</template>
-						</td>
+									<span v-else class="gray-hover">?</span>
+								</td>
 
-						<td class="conditions d-none d-md-table-cell">
-							<div class="d-flex justify-content-right" v-if="
-							entity.conditions &&
-							((entity.entityType == 'player' && playerSettings.conditions === undefined) 
-								|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
-							">
-								<template v-for="(condition, key) in entity.conditions">
-									<div :key="key" v-if="conditions[key]">
-											<span class="n" v-if="key == 'exhaustion'">
-												{{ entity.conditions[key] }}
-											</span>
-											<svg
-												v-else
-												v-b-popover.hover="conditions[key].condition" 
-												:title="key" 
-												class="icon text" 
-												viewBox="0 0 512 512">
-												<path :d="conditions[key].icon" fill-opacity="1"></path>
-											</svg>
+								<td class="name">
+									<span v-if="entity.entityType == 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
+										<template v-if="displayNPCField('name', entity)">
+											{{ entity.name }}
+										</template>
+										<template v-else>
+											? ? ?
+										</template>
+									</span>
+									<template v-else>{{ players[entity.key].character_name }}</template>
+								</td>
+
+								<td class="hp">
+									<template v-if="
+										(entity.entityType === 'player' && playerSettings.health === undefined)
+										|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
+									">
+										<Health	:entity="entity" :campPlayers="campPlayers" />
+									</template>
+									<template v-else-if="
+										(entity.entityType == 'player' && playerSettings.health === 'obscured')
+										|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
+									">
+										<template v-if="entity.curHp == 0">
+											<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+										</template>
+										<i v-else class="fas" :class="{
+												'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+												'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
+												'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+											}"></i>
+									</template>
+									<template v-else>
+										<span class="gray-hover">
+											<template v-if="entity.curHp == 0">
+												<i class="fas fa-skull-crossbones red"></i>
+											</template>
+											<template v-else>? ? ?</template>
+										</span>
+									</template>
+								</td>
+
+								<td class="conditions d-none d-md-table-cell">
+									<div class="d-flex justify-content-right" v-if="
+									entity.conditions &&
+									((entity.entityType == 'player' && playerSettings.conditions === undefined) 
+										|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
+									">
+										<template v-for="(condition, key) in entity.conditions">
+											<div :key="key" v-if="conditions[key]">
+													<span class="n" v-if="key == 'exhaustion'">
+														{{ entity.conditions[key] }}
+													</span>
+													<svg
+														v-else
+														v-b-popover.hover="conditions[key].condition" 
+														:title="key" 
+														class="icon text" 
+														viewBox="0 0 512 512">
+														<path :d="conditions[key].icon" fill-opacity="1"></path>
+													</svg>
+											</div>
+										</template>
 									</div>
-								</template>
-							</div>
-						</td>
-					</tr>
-				</template>
-			</tbody>
-		</table>
+								</td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -202,6 +194,7 @@
 			'allEntities',
 			'turn',
 			'campPlayers',
+			"players"
 		],
 		data() {
 			return {
@@ -220,10 +213,6 @@
 		},
 		firebase() {
 			return {
-				players: {
-					source: db.ref(`players/${this.dmId}`),
-					asObject: true,
-				},
 				npcs: {
 					source: db.ref(`npcs/${this.dmId}`),
 					asObject: true,
@@ -236,6 +225,13 @@
 					source: db.ref('conditions'),
 					asObject: true,
 				},
+			}
+		},
+		computed: {
+			lastRoll() {
+				if(this.encounter) {
+					return this.encounter.lastRoll;
+				}
 			}
 		},
 		mounted() {
@@ -251,7 +247,6 @@
 							this.characters.push(key);
 						}
 					}
-
 				});
 			}
 
@@ -269,12 +264,85 @@
 				if(newValue > 8) {
 					this.stop()
 				}
+			},
+			lastRoll(roll, oldRoll) {
+				//Check if the roll has not been shown before
+				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
+				if(roll && roll.timestamp !== oldRoll.timestamp) {
+					this.$emit('newRoll', roll);
+
+					let crit;
+					if(roll.crit) {
+						crit = (roll.crit === 20) ? `<div class="advantage green">critical</div>` : `<div class="advantage red">critical</div>`;
+					}
+
+					let toHitDisplay;
+					if(roll.toHitTotal) {
+						toHitDisplay = `<div class="roll">`;
+						toHitDisplay += (crit) ? crit : ``;
+						toHitDisplay += (roll.toHit) ? `<div class="top">${roll.toHit} + ${roll.hitMod}</div>` : `<div class="top"></div>`;
+						toHitDisplay += `<h2><b>${roll.toHitTotal}</b></h2><div class="bottom">to hit</div>`;
+						toHitDisplay += `</div>`;
+					}
+
+					this.$snotify.html(
+						`<div class="snotifyToast__title">
+								${this.notificationTargets(roll.targets)}
+							</div>
+							<div class="snotifyToast__body">
+								<div class="display-rolls">
+									${(toHitDisplay) ? toHitDisplay : ``}
+
+									<div class="roll">
+										${roll.damageMod ? `<div class="top">${roll.damage} + ${roll.damageMod}</div>` : '<div class="top"></div>'}
+										<h2>
+											<b class="red">${roll.damageTotal}</b>
+										</h2>
+										<div class="bottom">damage</div>
+									</div>
+								</div>
+							</div>
+						</div> `, {
+						timeout: 8000,
+						closeOnClick: true
+					});
+				}
 			}
 		},
 		methods: {
 			...mapActions([
 				'setSlide'
 			]),
+			notificationTargets(targets) {
+				let returnTargets = [];
+				for(const key of targets) {
+					const entity = this.encounter.entities[key];
+
+					let html = '<div class="target">';
+					html += `<div class="image" style="background-image: url(${entity.img});"></div>`;
+
+					//AC
+					if((entity.entityType == 'player' && this.playerSettings.ac === undefined) 
+						|| (entity.entityType == 'npc' && this.displayNPCField('ac', entity) == true)) {
+						const ac = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).ac
+						const bonus = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).bonus;
+
+						html += `<div class="ac">`;
+						html += (bonus) ? ac + bonus : ac;
+						html += `</div>`;
+					} else {
+						html += `<div class="ac">?</div>`;
+					}
+
+
+					html += `<div class="name truncate">${this.encounter.entities[key].name}</div>`;
+					html += `</div>`;
+
+					returnTargets.push(html);
+				}
+
+				return returnTargets.join("");
+			},
 			start(e, key) {
 				//Check how long the item is being pressed
 				if(!this.interval){
@@ -334,129 +402,142 @@
 </script>
 
 <style lang="scss" scoped>
-.actions {
-	display: flex;
-	justify-content: space-between;
-	padding: 20px 0 5px 0;
-	border-bottom: solid 1px #fff;
+.initiative-wrapper {
+	overflow: hidden;
+	height: 100%;
 
-	.right {
-		a {
-			color: #fff !important;
-			margin-left: 10px;
+	.actions {
+		display: flex;
+		justify-content: space-between;
+		padding-bottom: 5px;
+		border-bottom: solid 2px #fff;
+
+		.right {
+			a {
+				color: #fff !important;
+				margin-left: 10px;
+			}
+		}
+	}
+	.scroll {
+		height: calc(100% - 49px);
+
+		> div {
+			padding-right: 6px;
+
+			.initiative-list {
+				margin: 20px 0;
+				border-collapse: separate; 
+				width: 100%;
+				border-spacing: 0 5px;
+				user-select: none;
+
+				th.ac, th.init {
+					text-align: center;
+					width: 38px;
+				}
+
+				tbody {
+					
+					tr.top {
+						td {
+							font-size: 12px;
+							padding: 10px 0 5px 0;
+							border: none;
+							border-bottom: solid 1px #fff;
+							cursor: default;
+
+							&:hover {
+								border-left: none;
+								border-right: none;
+								border-top: none;
+							}
+						}
+					}
+					tr {
+						cursor: pointer;
+
+						td {
+							background: rgba(38, 38, 38, .9);
+							border-top: solid 1px transparent;
+							border-bottom: solid 1px transparent;
+
+							&:first-child {
+								border-left: solid 1px transparent;
+							}
+							&:last-child {
+								border-right: solid 1px transparent;
+							}
+						}
+						td.init, td.ac, th.ac {
+							width: 38px;
+							text-align: center;
+						}
+						td.ac {
+							font-weight: bold;
+						}
+						td.name {
+							overflow: hidden;
+							white-space: nowrap;
+							text-overflow: ellipsis;
+							max-width:0;
+						}
+						td.image {
+							padding: 0;
+							width: 45px;
+
+							.img {
+								width: 43px;
+								height: 43px;
+								border: solid 1px #b2b2b2;
+								background-size: cover;
+								background-position: center top;
+							}
+
+						}
+						&.targeted {
+							td {
+								border-color: #2c97de;
+							}
+						}
+						&:hover {
+							@media only screen and (min-width: 576px) {
+								td {
+									border-color: #fff;
+								}
+							}
+						}
+					}
+					tr td:first-child, thead th {
+						color: #fff;
+						background: none;
+						text-shadow: 0 0 3px  #000;
+					}
+					tr td:first-child, thead th:first-child {
+						text-align: center;
+					}
+				}
+			}
+			.conditions {
+				padding: 9px 10px;
+
+				svg, .n {
+					width: 24px;
+					height: 24px;
+					line-height: 20px;
+					fill: #cc3e4a;
+					padding: 2px;
+					margin: 0;
+					display: block;
+					font-size: 16px;
+					text-align: center;
+					color: #cc3e4a;
+				}
+			}
+			.entities-move {
+				transition: transform .6s;
+			}
 		}
 	}
 }
-	.initiative {
-		margin: 20px 0;
-		border-collapse: separate; 
-		width: 100%;
-		border-spacing: 0 5px;
-		user-select: none;
-
-		th.ac, th.init {
-			text-align: center;
-			width: 38px;
-		}
-
-		tbody {
-			
-			tr.top {
-				td {
-					font-size: 12px;
-					padding: 10px 0 5px 0;
-					border: none;
-					border-bottom: solid 1px #fff;
-					cursor: default;
-
-					&:hover {
-						border-left: none;
-						border-right: none;
-						border-top: none;
-					}
-				}
-			}
-			tr {
-				cursor: pointer;
-
-				td {
-					background: rgba(38, 38, 38, .9);
-					border-top: solid 1px transparent;
-					border-bottom: solid 1px transparent;
-
-					&:first-child {
-						border-left: solid 1px transparent;
-					}
-					&:last-child {
-						border-right: solid 1px transparent;
-					}
-				}
-				td.init, td.ac, th.ac {
-					width: 38px;
-					text-align: center;
-				}
-				td.ac {
-					font-weight: bold;
-				}
-				td.name {
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					max-width:0;
-				}
-				td.image {
-					padding: 0;
-					width: 45px;
-
-					.img {
-						width: 43px;
-						height: 43px;
-						border: solid 1px #b2b2b2;
-						background-size: cover;
-						background-position: center top;
-					}
-
-				}
-				&.targeted {
-					td {
-						border-color: #2c97de;
-					}
-				}
-				&:hover {
-					@media only screen and (min-width: 576px) {
-						td {
-							border-color: #fff;
-						}
-					}
-				}
-			}
-			tr td:first-child, thead th {
-				color: #fff;
-				background: none;
-				text-shadow: 0 0 3px  #000;
-			}
-			tr td:first-child, thead th:first-child {
-				text-align: center;
-			}
-		}
-	}
-	.conditions {
-		padding: 9px 10px;
-
-		svg, .n {
-			width: 24px;
-			height: 24px;
-			line-height: 20px;
-			fill: #cc3e4a;
-			padding: 2px;
-			margin: 0;
-			display: block;
-			font-size: 16px;
-			text-align: center;
-			color: #cc3e4a;
-		}
-	}
-	.entities-move {
-		transition: transform .6s;
-	}
 </style>

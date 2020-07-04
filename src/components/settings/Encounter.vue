@@ -60,7 +60,7 @@
 						}
 					},
 					'background': { 
-						name: 'Bakcground Image', 
+						name: 'Background Image', 
 						icon: 'fas fa-image',
 						options: {
 							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
@@ -73,6 +73,14 @@
 						options: {
 							0: { value: undefined, name: 'Descend', action: 'Descend', icon: 'fas fa-long-arrow-alt-down', color: 'green' },
 							1: { value: true, name: 'Ascend', action: 'Ascend', icon: 'fas fa-long-arrow-alt-up', color: 'green' },
+						}
+					},
+					'critical': { 
+						name: 'Critical Hits', 
+						icon: 'far fa-crosshairs',
+						options: {
+							0: { value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'green' },
+							1: { value: true, name: 'Double', action: 'Double', icon: 'fas fa-chevron-double-up', color: 'green' },
 						}
 					},
 				},

@@ -1254,6 +1254,7 @@ ul.nav {
 }
 .snotify-simple {
 	border: solid 1px $gray-hover;
+	user-select: none;
 
 	.snotifyToast__inner {
 		padding: 13px 15px 15px 15px !important;
@@ -1296,6 +1297,8 @@ ul.nav {
 		}
 		.snotifyToast__body {
 			color: $gray-light !important;
+			width: 100%; 
+			
 			h2 {
 				text-transform: none !important;
 				margin-bottom: 5px !important;
@@ -1303,6 +1306,46 @@ ul.nav {
 			small {
 				display: inline-block;
 				line-height: 12px !important;
+			}
+			.title {
+				margin-bottom: 15px !important;
+			}
+			.display-rolls {
+				display: flex;
+				justify-content: center;
+				width: 100%;
+				margin-bottom: 10px;
+				
+				div.roll {
+					border: solid 1px $gray-hover;
+					text-align: center;
+					padding: 5px 0;
+					flex-direction: column;
+					flex: 1 1 50%;
+					margin: 5px;
+					position: relative;
+
+					h2 {
+						font-size: 40px;
+						margin-bottom: 0 !important;
+						height: 50px;
+						line-height: 50px;
+						font-weight: bold;
+					}
+					.top, .bottom {
+						font-size: 15px;
+						height: 20px;
+						line-height: 20px;;
+					}
+					.advantage {
+						position: absolute;
+						background: $gray-dark;
+						padding: 0 10px;
+						top: -5px;
+						left: 50%;
+  					transform: translate(-50%, -50%);
+					}
+				}
 			}
 			&.roll {
 				width: 100%;

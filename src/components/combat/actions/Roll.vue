@@ -38,7 +38,7 @@
 					</div>
 				</template>
 				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
-				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damge once</b-form-checkbox>
+				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damage once</b-form-checkbox>
 
 
 				<div v-if="toHit" class="advantage d-flex justify-content-between">
@@ -128,6 +128,14 @@
 				aoeRoll: undefined
 			}
 		},
+		firebase() {
+			return {
+				criticalSettings: {
+					source: db.ref(`settings/${this.userId}/encounter/critical`),
+					asObject: true
+				},
+			}
+		},
 		computed: {
 			...mapGetters([
 				'encounter',
@@ -196,6 +204,8 @@
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
 				let crit = false;
+				let critDouble = false;
+				let critRoll = 1; //set to 2 on a crit
 				let hits = '';
 				var total = 0;
 				var allDamageRolls = [];
@@ -215,7 +225,8 @@
 				//If there is advantage roll twice
 				if(this.advantage) {
 					for(let i = 0; i <= 1; i++) {
-						toHit[i] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+						let attack_bonus = action.attack_bonus || 0;
+						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
 					}
 
 					//Define the position of the highest and lowest rolls in the array
@@ -224,12 +235,18 @@
 
 					//Set advantage message for snotify
 					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color}">${this.advantage}</small>`;	
+					adv = `<small class="${color} advantage">${this.advantage}</small>`;	
 				} 
 				//Roll once where there is no advantage/disadvantage
 				else {
 					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
-					toHit[highest] =  this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+					toHit[highest] = this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+				}
+
+				//Flip the positions of highest and lowest if there was disadvantage
+				if(this.advantage == 'disadvantage') {
+					highest = (highest === 0) ? 1 : 0;
+					lowest = (lowest === 0) ? 1 : 0;
 				}
 
 				//Roll the damage for all seperated rolls
@@ -237,22 +254,29 @@
 				//Roll if rollOnce is false
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
-					if(this.toHit) {
-						if(toHit[highest].throws[0] == '20') {
-							crit = true;
+					if(this.toHit && toHit[highest].throws[0] === 20) {
+						crit = true;
+						if(this.criticalSettings['.value']) {
+							critDouble = true;
+						} else {
+							critInfo = `<div><small>The damage dice were rolled twice.</small></div>`;
+							critRoll = 2;
 						}
-					}	
-
-					//Roll the damage
-					for(let roll in rolls) {
-						let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[5]
-						let rolled = this.rollD(dice[1], dice[0]) //roll the dice
-						let damage = rolled.total; //roll the dice
-
-						allDamageRolls.push(rolled.throws);
-						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
-
 					}
+
+					//Roll the damage. Twice if it was a crit and critsettings are set to roll twice
+					for(let c = 0; c < critRoll; c++) {
+						for(let roll in rolls) {
+							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
+							let rolled = this.rollD(dice[1], dice[0]) //roll the dice
+							let damage = rolled.total; //roll the dice
+	
+							allDamageRolls.push(rolled.throws);
+							total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+	
+						}
+					}
+					//Set the roll that needs to be used when rolling damage only once
 					if(this.rollOnce) {
 						this.aoeRoll = { 
 							allDamageRolls,
@@ -265,32 +289,38 @@
 					total = this.aoeRoll.total;
 				}
 
-				//Flip the positions of highest and lowest if there was disadvantage
-				if(this.advantage == 'disadvantage') {
-					highest = (highest === 0) ? 1 : 0;
-					lowest = (lowest === 0) ? 1 : 0;
+				//If it was an open roll, save it, so it will be shared on the track encounter screen.
+				if(!this.demo) {
+					//If the damage is rolled once, show all targets with that roll
+					//Otherwise show 1 target per roll
+					let targets = (this.rollOnce && !this.toHit) ? this.targeted : [target.key];
+
+					//Only roll if 
+					//All rolls should be seperate (different damage or same damage and to hit)
+					//All rolls are together (same damge, no to hit) and there was no roll before
+					if(this.openRoll && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
+						this.rollOpenly(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+					} else {
+						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
+					}
 				}
-				//Check if it was a critical hit
-				if(toHit[highest].throws[0] === 20) {
+				//Check if it was a critical hit and rolled damage should be doubled, not be rolled twice
+				if(critDouble) {
 					//Form HTML for snotify
-					critInfo = `<div><small>The rolled damage is doubled on a crit.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
-					
-					//Double the rolled damage
+					critInfo = `<div><small>The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
 					total = parseInt(total*2);
 				}
-				
 				//Add the damage modifier
 				if(action['damage_bonus']) {
-					var bonus = ' + '+action['damage_bonus']; //form HTML for snotify
+					var bonus = '+'+action['damage_bonus']; //form HTML for snotify
 					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']); //Add it to the total damage
-					var showTotal = ' = <span class="red">' + totalDamage + '</span>'; //form HTML for snotify
+					var showTotal = '<span class="red">' + totalDamage + '</span>'; //form HTML for snotify
 				}
 				else {
 					//If there was no modifier
 					bonus = '';
-					showTotal = ''
 					totalDamage = total;
-					total = '<span class="red">' + total + '</span>';
+					showTotal = '<span class="red">' + total + '</span>';
 				}
 
 				if(this.toHit) {
@@ -298,31 +328,28 @@
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
-						toHitRoll = '<span class="green">NATURAL 20</span>'; //form HTML for snotify
+						toHitRoll = '<span class="green">natural 20</span>'; //form HTML for snotify
 					}
 					//If the to hit roll is a 1, it is a critical fail
 					else if(toHitRoll === 1) {
-						toHitRoll = '<span class="red">NATURAL 1</span>'; //form HTML fo snotify
+						toHitRoll = '<span class="red">natural 1</span>'; //form HTML fo snotify
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (this.advantage) ? `<del>${toHit[lowest].throws[0]}</del>` : ``;
+					let ignoredRoll = (this.advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
 
 					//Form HTML for snotify
-					hits = `<h2><span class="gray-hover">
-							${ignoredRoll}
-							${toHitRoll} ${toHit[highest].mod} = </span>${toHit[highest].total}
-							${hitOrMiss}
-							<span class="gray-hover">(<i class="fas fa-shield"></i> ${ac})</span></h2>`;		
-				}
-
-				//If it was an open roll
-				if(!this.demo) {
-					if(this.openRoll) {
-						this.rollOpenly(toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
-					} else {
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
-					}
+					hits = `<div class="roll">
+							${(adv) ? adv : ``}
+							<div class="top">
+								${ignoredRoll}
+								${toHitRoll}${toHit[highest].mod}
+							</div>
+							<h2>${toHit[highest].total}</h2>
+							<div class="bottom">
+								${hitOrMiss}
+							</div>
+						</div>`;		
 				}
 
 				//BUILD SNOTIFY POPUP
@@ -335,18 +362,23 @@
 						</div>
 					</div>
 					<div class="snotifyToast__body">
-						<h2><b>${action.name}</b></h2>
-						${adv}
-						${hits}
-						<h2 class="gray-hover">${total} ${bonus} ${showTotal} <span class="gray-hover">damage</span></h2>
+						<h2 class="title"><b>${action.name}</b></h2>
+						<div class="display-rolls">
+							${hits}
+							<div class="roll">
+								<div class="top">${total}${bonus}</div>
+								<h2>${showTotal}</h2>
+								<div class="bottom">damage</div>
+							</div>
+						</div>
 						${critInfo}
 
 						<a data-toggle="collapse" href="#rolls-${rollCounter}" role="button" >
-							<small>Show Rolls <i class="fal fa-chevron-down"></i></small>
+							Damage Rolls <i class="fal fa-chevron-down"></i>
 						</a>
 						<p id="rolls-${rollCounter}" class="collapse">
 							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
-							Your rolls: ${allDamageRolls}
+							Rolls: ${allDamageRolls}
 						</p>
 					</div> `, {
 					timeout: 0,
@@ -389,34 +421,42 @@
 				});
 				this.advantage = false; //turn advantage off
 			},
-			rollOpenly(toHit, damage, hitMod, damageMod) {
-				var showRoll = [];
+			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
+				var showRoll = {
+					targets,
+					timestamp: Date.now()
+				};
 
 				//Show to hit roll
-				if (Object.values(this.rollOptions).indexOf('toHit') > -1) {
-					if(toHit == '20') {
-						showRoll.toHitTotal = 'Natural 20'
-					} else if(toHit == '1') {
-						showRoll.toHitTotal = 'Natural 1'
-					} else {
+				if(this.toHit) {
+					if (Object.values(this.rollOptions).includes('toHit')) {
+						if(toHit === 20) {
+							showRoll.crit = 20;
+						} else if(toHit === 1) {
+							showRoll.crit = 1;
+						}
 						showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
-					}
 
-					//Show Modifier
-					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
-						showRoll.toHit = toHit;
-						showRoll.hitMod = hitMod;
+						//Show Modifier
+						if(Object.values(this.rollOptions).includes('modifiers')) {
+							showRoll.toHit = toHit;
+							if(hitMod) {
+								showRoll.hitMod = hitMod;
+							}
+						}
 					}
 				}
 
 				//Show damage roll
-				if (Object.values(this.rollOptions).indexOf('damage') > -1) {
-					showRoll.damageTotal = parseInt(damage) + parseInt(damageMod);
+				if (Object.values(this.rollOptions).includes('damage')) {
+					showRoll.damageTotal = (damageMod) ? parseInt(damage) + parseInt(damageMod) : parseInt(damage);
 
 					//Show Modifier
-					if(Object.values(this.rollOptions).indexOf('modifiers') > -1) {
+					if(Object.values(this.rollOptions).includes('modifiers')) {
 						showRoll.damage = damage;
-						showRoll.damageMod = damageMod;
+						if(damageMod) {
+							showRoll.damageMod = damageMod;
+						}
 					}
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)

@@ -1,42 +1,49 @@
 <template>
 	<div class="rewards">
-		<h2>Rewards</h2>
-		<template v-if="encounter.xp_awarded">
-			<div class="xp animated bounceIn" >
-				<span class="green">{{ xpAmount }} </span> <span class="gray-hover">XP</span>
-			</div>
-			<hr>
-		</template>
+		<div class="scroll" v-bar>
+			<div>
+				<h2>Rewards</h2>
+				<template v-if="encounter.xp_awarded">
+					<h2>Experience Points</h2>
+					<div class="xp animated bounceIn" >
+						<span class="green">{{ xpAmount }} </span> <span class="gray-hover">XP</span>
+					</div>
+				</template>
 
-		<template v-if="encounter.currency_awarded">
-			<div class="currency animated bounceIn">
-				<div v-for="(coin, key) in currencies" :key="key">
-					<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-					<b-form-input
-						class="text-center"
-						:disabled="true"
-						autocomplete="off" 
-						type="text" 
-						size="sm"
-						min="0"
-						v-model="encounter.currency[key]"
-					/>
-				</div>
+				<template v-if="encounter.currency_awarded">
+					<h2>Currency</h2>
+					<div class="currency-wrapper">
+						<div class="currency animated bounceIn">
+							<div v-for="(coin, key) in currencies" :key="key">
+								<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+								<b-form-input
+									class="text-center"
+									:disabled="true"
+									autocomplete="off" 
+									type="text" 
+									size="sm"
+									min="0"
+									v-model="encounter.currency[key]"
+								/>
+							</div>
+						</div>
+					</div>
+				</template>
+				
+				<h2>Items</h2>
+				<hk-table 
+					:items="items"
+					:columns="itemColumns"
+					:showHeader="false"
+					:collapse="true"
+				>
+					<div slot="collapse" slot-scope="data">
+						<h3>{{ data.row.public_name }}</h3>
+						{{ data.row.public_description }}
+					</div>
+				</hk-table>
 			</div>
-			<hr>
-		</template>
-		
-		<hk-table 
-			:items="items"
-			:columns="itemColumns"
-			:showHeader="false"
-			:collapse="true"
-		>
-			<div slot="collapse" slot-scope="data">
-				<h3>{{ data.row.public_name }}</h3>
-				{{ data.row.public_description }}
-			</div>
-		</hk-table>
+		</div>
 	</div>
 </template>
 
@@ -84,35 +91,74 @@
 </script>
 
 <style lang="scss" scoped>
-	.xp {
-		margin-bottom: 20px;
-		font-size: 35px;
-		text-align: center;
-	}
+.rewards {
+	height: 100%;
+	overflow: hidden;
+	
+	.scroll{ 
+		height: calc(100% - 30px);
 
-	.currency {
-		padding-top: 10px;
-		margin: auto;
-		display: flex;
-		justify-content: center;
-		max-width: 400px;
-		text-align: center;
+		> div {
+			padding-right: 6px;
+		}
 
-		img {
-			height: 25px;
+		h2 {
+			color: #fff;
+			text-shadow: 0 0 3px  #000;
+			text-transform: none !important;
 			margin-bottom: 10px;
 		}
-		input {
-			background: none !important;
-			border: none !important;
-			font-weight: bold;
-			font-size: 18px;
+		.xp {
+			padding: 30px 0;
+			margin-bottom: 20px;
+			font-size: 35px;
+			text-align: center;
+			background: rgba(38, 38, 38, .8);
+			color: #fff;
 		}
-		div {
-			margin-right: 5px;
 
-			&:last-child {
-				margin-right: 0;
+		.currency-wrapper {
+			background: rgba(38, 38, 38, .8);
+			margin-bottom: 20px;
+			padding: 30px 0;
+
+			.currency {
+				padding-top: 10px;
+				margin: auto;
+				display: flex;
+				justify-content: center;
+				max-width: 400px;
+				text-align: center;
+
+				img {
+					height: 25px;
+					margin-bottom: 10px;
+				}
+				input {
+					background: none !important;
+					border: none !important;
+					font-weight: bold;
+					font-size: 18px;
+					color: #fff !important;
+					opacity: 1 !important;
+				}
+				div {
+					margin-right: 5px;
+
+					&:last-child {
+						margin-right: 0;
+					}
+				}
+			}
+		}
+	}
+}
+@media only screen and (max-width: 720px) { 
+		.rewards {
+			overflow: visible !important;
+
+			.scroll {
+				overflow: visible !important;
 			}
 		}
 	}

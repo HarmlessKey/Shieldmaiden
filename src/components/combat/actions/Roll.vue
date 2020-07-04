@@ -40,7 +40,7 @@
 				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
 				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damage once</b-form-checkbox>
 
-
+				<!-- ADVANTAGE / DISADVANTAGE -->
 				<div v-if="toHit" class="advantage d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
@@ -51,6 +51,65 @@
 						Disadvantage
 					</button>
 				</div>
+				
+				<!-- CUSTOM ROLL -->
+				<h3>Custom Roll</h3>
+				<div class="custom-roll">
+					<div v-if="toHit">
+						<label><small>Hit mod</small></label>
+						<b-form-input 
+							autocomplete="off" 
+							size="sm"
+							type="number" 
+							v-model="custom_roll.attack_bonus" 
+							name="custom_hit"
+							data-vv-as="To Hit Modifier"
+							placeholder="Hit"
+						/>
+					</div>
+					<div :class="{ span: !toHit }">
+						<label><small>Damage Dice</small></label>
+						<b-form-input 
+							autocomplete="off" 
+							size="sm"
+							type="text" 
+							v-model="custom_roll.damage_dice" 
+							name="custom_roll"
+							data-vv-as="Custom Roll"
+							placeholder="Dice"
+							v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
+						/>
+					</div>
+					<div>
+						<label><small>Modifier</small></label>
+						<b-form-input 
+							autocomplete="off" 
+							size="sm"
+							type="number" 
+							v-model="custom_roll.damage_bonus" 
+							name="custom_mod"
+							data-vv-as="Custom Modifier"
+							placeholder="Mod"
+						/>
+					</div>
+					<div>
+						<button 
+							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
+							@click="groupRoll(custom_roll)" 
+							class="btn btn-sm"
+						>
+							<i class="fas fa-dice-d20"></i>
+							<span class="d-none d-md-inline ml-1">Roll</span>
+						</button>
+					</div>
+				</div>
+				<p class="validate red" v-if="errors.has('custom_roll')">
+					{{ errors.first('custom_roll') }}
+					Allowed format: "2d6" or "2d6+1d8".
+				</p>
+
+				<!-- ACTIONS -->
+				<h3 class="mt-3">Actions</h3>
 				<ul class="roll">
 					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
@@ -70,9 +129,10 @@
 					</li>
 				</ul>
 			</template>
-			<template v-if="current.legendary_actions">
-				<h2>Legendary Actions</h2>
 
+			<!-- LEGENDARY ACTIONS -->
+			<template v-if="current.legendary_actions">
+				<h3>Legendary Actions</h3>
 				<ul class="roll">
 					<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
@@ -120,6 +180,12 @@
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
+				custom_roll: {
+					name: 'Custom Roll',
+					attack_bonus: undefined,
+					damage_dice: undefined,
+					damage_bonus: undefined
+				},
 				options: [
 					{ text: 'To hit', value: 'toHit' },
 					{ text: 'Damage', value: 'damage' },
@@ -145,11 +211,8 @@
 			]),
 			toHit: {
 				get() {
-					let hit = true
-					if(this.targeted.length > 1) {
-						hit = false;
-					}
-					return (this.setToHit) ? this.setToHit : hit;
+					let hit = (this.targeted.length > 1) ? false : true;
+					return (this.setToHit !== undefined) ? this.setToHit : hit;
 				},
 				set(newValue) {
 					this.setToHit = newValue;
@@ -198,6 +261,11 @@
 					this.roll(action, target, i);
 				}
 				this.aoeRoll = undefined;
+				this.custom_roll = { 
+					name: 'Custom Roll',
+					damage_dice: undefined, 
+					damamge_bonus: undefined
+				};
 			},
 			roll(action, target, rollCounter) {
 				event.stopPropagation();
@@ -340,16 +408,16 @@
 
 					//Form HTML for snotify
 					hits = `<div class="roll">
-							${(adv) ? adv : ``}
-							<div class="top">
-								${ignoredRoll}
-								${toHitRoll}${toHit[highest].mod}
-							</div>
-							<h2>${toHit[highest].total}</h2>
-							<div class="bottom">
-								${hitOrMiss}
-							</div>
-						</div>`;		
+						${(adv) ? adv : ``}
+						<div class="top">
+							${ignoredRoll}
+							${toHitRoll}${toHit[highest].mod}
+						</div>
+						<h2>${toHit[highest].total}</h2>
+						<div class="bottom">
+							${hitOrMiss}
+						</div>
+					</div>`;		
 				}
 
 				//BUILD SNOTIFY POPUP
@@ -364,7 +432,7 @@
 					<div class="snotifyToast__body">
 						<h2 class="title"><b>${action.name}</b></h2>
 						<div class="display-rolls">
-							${hits}
+							${this.toHit ? hits : ''}
 							<div class="roll">
 								<div class="top">${total}${bonus}</div>
 								<h2>${showTotal}</h2>
@@ -469,6 +537,26 @@
 	.select {
 		h2 {
 			margin-bottom: 5px !important;
+		}
+	}
+	.custom-roll {
+		display: grid;
+		grid-template-columns: 50px 1fr 50px max-content;
+		grid-gap: 3px;
+
+		input {
+			border: none !important;
+		}
+		label {
+			margin-bottom: 5px;
+			height: 15px;
+		}
+		.btn {
+			height: 31px !important;
+			margin-top: 20px !important;
+		}
+		.span {
+			grid-column: span 2;
 		}
 	}
 	ul.roll {

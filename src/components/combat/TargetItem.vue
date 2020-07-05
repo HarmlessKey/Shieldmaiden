@@ -29,7 +29,7 @@
 
 			<!-- AVATAR -->
 			<template v-else>
-				<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+				<icon v-if="entity.img === 'monster' || entity.img === 'player' || entity.img === 'companion'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 				<span 
 					v-else class="img" 
 					:style="{
@@ -79,7 +79,7 @@
 
 				<!-- HEALTH -->
 				<template v-if="entity.active == true">
-					<template v-if="(entity.curHp > 0 && entity.entityType == 'player') || entity.entityType == 'npc'">
+					<template v-if="(entity.curHp > 0 && entity.entityType == 'player'  || entity.entityType === 'companion') || entity.entityType == 'npc'">
 						{{ setNumber(displayStats().curHp) }} 
 						<span class="hp">
 							<span class="current" :class="{ 

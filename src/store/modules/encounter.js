@@ -268,12 +268,12 @@ const mutations = {
 				let npc_data = rootState.content.npcs[key];
 				let companion_data = player_data.companions[key]
 				
-				entity.curHp = 5;
+				entity.curHp = companion_data.curHp;
 				entity.tempHp = companion_data.tempHp;
 				entity.ac_bonus = companion_data.ac_bonus;
 				entity.maxHpMod = companion_data.maxHpMod;
 
-				entity.img = (npc_data.avatar) ? npc_data.avatar : 'player';
+				entity.img = (npc_data.avatar) ? npc_data.avatar : 'companion';
 
 				// entity.name = npc_data.name;
 				entity.ac = npc_data.ac;

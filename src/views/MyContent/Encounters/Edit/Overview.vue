@@ -60,12 +60,12 @@
 							</template>
 							<template v-if="data.row.entityType === 'companion'">
 								<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-								<icon v-else icon="player" class="image" />
+								<icon v-else icon="companion" class="image" />
 							</template>
 							<template v-else-if="data.row.entityType === 'npc'">
 								<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
 								<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-								<icon v-else-if="data.row.friendly" icon="player" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
+								<icon v-else-if="data.row.friendly" icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
 							</template>
 						</template>
 

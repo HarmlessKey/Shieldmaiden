@@ -76,10 +76,7 @@ export const setHP = {
 				var newtemp = parseInt(tempHp - amount);
 
 				//Adjust the rest amount
-				rest_amount = 0;
-				if(newtemp <= 0) {
-					rest_amount = parseInt(amount - tempHp);
-				}
+				rest_amount = (newTemp < 0) ? -newTemp : 0;
 
 				//Set the new HP
 				this.set_hp({
@@ -90,19 +87,16 @@ export const setHP = {
 			}
 			//Then check if the target is transformed and put rest damage in the transformation
 			if(target.transformed == true) {
-				var newtrans = parseInt(transCurHp - rest_amount);
+				var newTrans = parseInt(transCurHp - rest_amount);
 
 				//Adjust the rest amount
-				rest_amount = 0;
-				if(newtrans <= 0) {
-					rest_amount = parseInt(amount - transCurHp);
-				}
+				rest_amount = (newTrans < 0) ? -newTrans : 0
 
 				//Set the new HP
 				this.set_hp({
 					key: target.key,
 					pool: 'transformed',
-					newHp: newtrans,
+					newHp: newTrans,
 				});
 			}
 			//If there is damage left after taking it from the tempHp and/or the transformation

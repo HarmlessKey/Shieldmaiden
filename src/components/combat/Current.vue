@@ -9,7 +9,7 @@
 				<div class="current">
 
 					<template v-if="current">
-						<template v-if="current.entityType == 'player' && current.curHp == 0 && !current.stable && !current.dead">
+						<template v-if="(current.entityType === 'player' || current.entityType === 'companion') && current.curHp == 0 && !current.stable && !current.dead">
 								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
@@ -37,7 +37,7 @@
 							<div class="health">
 								<span v-if="current.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
 								<template v-else>
-									<icon v-if="current.img === 'monster' || current.img === 'player'" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
+									<icon v-if="['monster', 'player', 'companion'].includes(current.img)" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
 									<span 
 										v-else class="img" 
 										:style="{
@@ -68,7 +68,7 @@
 
 							<template v-if="targeted.length > 0">
 								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
-									<icon v-if="entities[key].img === 'monster' || entities[key].img === 'player'" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
+									<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
 									<span 
 										v-else class="img" 
 										:style="{

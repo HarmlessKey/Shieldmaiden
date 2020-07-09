@@ -430,8 +430,7 @@
 			_companions: function() {
 				let comps = [];
 				if (Object.keys(this.npcs).length > 0) {
-					for (let i in this.player.companions) {
-						let key = this.player.companions[i].key;
+					for (let key in this.player.companions) {
 						let npc = this.npcs[key];
 						npc.key = key;
 						comps.push(npc);
@@ -503,6 +502,7 @@
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
+				console.log(this.npcs)
 				for (var i in this.npcs) {
 					var m = this.npcs[i];
 					m.key = i;
@@ -521,11 +521,7 @@
 				}
 				let new_companion = {};
 
-				new_companion.curHp = npc.maxHp || npc.hit_points;
-				new_companion.key = npc.key;
-				new_companion.name = npc.name;
-				// new_companion.key = npc
-				this.player.companions[npc.key] = new_companion;	
+				this.player.companions[npc.key] = true;
 
 				this.searchResults = [];
 				this.search = '';
@@ -533,7 +529,7 @@
 			notAdded(npc) {
 				let key = npc.key;
 				for (let i in this.player.companions) {
-					if (this.player.companions[i].key == key)
+					if (i == key)
 						return false;
 				}
 				return true;

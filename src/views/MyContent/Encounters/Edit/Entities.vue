@@ -252,9 +252,8 @@
 				else if (type == 'player') {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 					const companions = this.players[id].companions;
-					for (let i in companions) {
-						console.log(companions[i])
-						this.add( companions[i].key, 'companion', companions[i].name , true, false, id )
+					for (let key in companions) {
+						this.add( key, 'companion', this.npcs[key].name , true, false, id )
 					}
 				}
 				else if (type == 'companion') {

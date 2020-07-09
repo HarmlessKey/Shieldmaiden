@@ -1,0 +1,96 @@
+{
+    "computed_values": {
+
+        "display": {
+            "name": "String",
+            "avatar": "String",
+            "hit_points": "Integer",
+            "armor_class": "Integer",
+            "level": "Integer",
+            "proficiency": "Integer",
+            "initiative": "Integer",
+            "speed": {
+                "walking": "Integer"
+            }
+        },
+        "sheet": {
+            "abilities": {
+                "strength": "Integer",
+                "dexterity": "Integer",
+                "constitution": "Integer",
+                "intelligence": "Integer",
+                "wisdom": "Integer",
+                "charisma": "Integer"
+            },
+            "saving_throws": {
+                "strength": "Integer"
+            },
+            "skills": {
+                "history": "Integer"
+            },
+            "senses": {
+                "perception": "Integer",
+                "investigation": "Integer",
+                "insight": "Integer"
+            },
+            "defenses": {
+                "resistant": "Boolean"
+            }
+        }
+    },
+    "base_values": {
+        "name": "String",
+        "player_name": "String",
+        "avatar": "String",
+        "advancement": "Milestone/Experience",
+        "hit_point_type": "fixed/rolled",
+        "experience": "Integer",
+        "hit_dice": "Integer",
+        "classes": [
+            {
+                "name": "Barbarian",
+                "level": "Integer",
+                "hit_dice": "Integer",
+                "rolled_hit_points": {
+                    "2": "Integer"
+                },
+                "spell_casting_ability": "String"
+            }
+        ],
+        "skill_proficiencies": ["String"],
+        "skill_expertises": ["String"],
+        "saving_throw_proficiencies": ["String"],
+        "abilities": {
+            "strength": "Integer",
+            "dexterity": "Integer",
+            "constitution": "Integer",
+            "intelligence": "Integer",
+            "wisdom": "Integer",
+            "charisma": "Integer"
+        }
+    },
+    "modifiers": [
+        {
+            "type": "Bonus/Set Score",
+            "name": "String",
+            "value": "Integer",
+            "ref": "abilities.max.strength"
+        },
+        {
+            "type": "Bonus/Set Score",
+            "name": "String",
+            "value": "Integer",
+            "ref": "abilities.strength"
+        },
+        {
+            "name": "Ability Score Improvement 4",
+            "value": "2",
+            "ref": "abilities.constitution"
+        },
+        {
+            "name" : "Ring",
+            "value": "1",
+            "ref": "saving_throws.charisma"
+        }
+    ]
+}

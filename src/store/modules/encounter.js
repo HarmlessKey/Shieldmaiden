@@ -263,111 +263,69 @@ const mutations = {
 				entity.level = db_player.level;
 				break
 			}
-			case 'companion': {
-				let player_data = (!state.demo) ? rootState.content.players[db_entity.player] : demoPlayers[db_entity.player];
-				let npc_data = rootState.content.npcs[key];
-				let companion_data = player_data.companions[key]
+			case 'npc':
+			case 'companion': 
+			{
+
+				let data_npc = {};
 				
-				entity.curHp = companion_data.curHp;
-				entity.tempHp = companion_data.tempHp;
-				entity.ac_bonus = companion_data.ac_bonus;
-				entity.maxHpMod = companion_data.maxHpMod;
+				if (entity.entityType === 'companion') {
 
-				entity.img = (npc_data.avatar) ? npc_data.avatar : 'companion';
+					data_npc = rootState.content.npcs[key];
 
-				// entity.name = npc_data.name;
-				entity.ac = npc_data.ac;
-				entity.maxHp = npc_data.maxHp;
+					let campaingCompanion = rootState.content.campaigns[state.campaignId].companions[key];
 
-				entity.size = npc_data.size;
-				entity.type = npc_data.type;
-				entity.subtype = npc_data.subtype;
-				entity.alignment = npc_data.alignment;
-				entity.challenge_rating = npc_data.challenge_rating;
-				entity.hit_dice = npc_data.hit_dice;
-				entity.speed = npc_data.speed;
-				entity.senses = npc_data.senses;
-				entity.languages = npc_data.languages;
+					entity.curHp = campaingCompanion.curHp;
+					entity.tempHp = campaingCompanion.tempHp;
+					entity.ac_bonus = campaingCompanion.ac_bonus;
+					entity.maxHpMod = campaingCompanion.maxHpMod;
 
-				entity.strength = npc_data.strength;
-				entity.dexterity = npc_data.dexterity;
-				entity.constitution = npc_data.constitution;
-				entity.intelligence = npc_data.intelligence;
-				entity.wisdom = npc_data.wisdom;
-				entity.charisma = npc_data.charisma;
+					entity.saves = (campaingCompanion.saves) ? campaingCompanion.saves : {};
+					entity.stable = (campaingCompanion.stable) ? campaingCompanion.stable : false;
+					entity.dead = (campaingCompanion.dead) ? campaingCompanion.dead : false;
 
-				entity.strength_save = npc_data.strength_save;
-				entity.dexterity_save = npc_data.dexterity_save;
-				entity.constitution_save = npc_data.constitution_save;
-				entity.intelligence_save = npc_data.intelligence_save;
-				entity.wisdom_save = npc_data.wisdom_save;
-				entity.charisma_save = npc_data.charisma_save;
+					entity.ac = data_npc.ac;
+					entity.maxHp = data_npc.maxHp;
 
-				entity.acrobatics = npc_data.acrobatics;
-				entity['animal Handling'] = npc_data['animal Handling'];
-				entity.arcana = npc_data.arcana;
-				entity.athletics = npc_data.athletics;
-				entity.deception = npc_data.deception;
-				entity.history = npc_data.history;
-				entity.insight = npc_data.insight;
-				entity.intimidation = npc_data.intimidation;
-				entity.investigation = npc_data.investigation;
-				entity.medicine = npc_data.medicine;
-				entity.nature = npc_data.nature;
-				entity.perception = npc_data.perception;
-				entity.performance = npc_data.performance;
-				entity.persuasion = npc_data.persuasion;
-				entity.religion = npc_data.religion;
-				entity['sleight of Hand'] = npc_data['sleight of Hand'];
-				entity.stealth = npc_data.stealth;
-				entity.survival = npc_data.survival;
-
-				entity.damage_vulnerabilities = npc_data.damage_vulnerabilities;
-				entity.damage_resistances = npc_data.damage_resistances;
-				entity.damage_immunities = npc_data.damage_immunities;
-				entity.condition_immunities = npc_data.condition_immunities;
-
-				entity.special_abilities = npc_data.special_abilities;
-				entity.actions = npc_data.actions;
-				entity.legendary_actions = npc_data.legendary_actions;
-
-				break;
-			}
-			case 'npc': {
-				entity.curHp = db_entity.curHp;
-				entity.tempHp = db_entity.tempHp;
-				entity.ac_bonus = db_entity.ac_bonus;
-
-				if(db_entity.transformed) {
-					entity.transformed = true;
-					entity.transformedMaxHp = db_entity.transformed.maxHp;
-					entity.transformedCurHp = db_entity.transformed.curHp;
-					entity.transformedAc = db_entity.transformed.ac;
-				} else {
-					entity.transformed = false;
-				}
-
-				//Fetch data from API
-				if(entity.npc == 'api') {
-					let monsters = monsters_ref.child(entity.id);
-
-					var data_npc = await monsters.once('value').then(function(snapshot) {
-						return snapshot.val()
-					})
+					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 				}
 				else {
-					data_npc = rootState.content.npcs[entity.id]
+
+					//Fetch data from API
+					if(entity.npc == 'api') {
+						let monsters = monsters_ref.child(entity.id);
+
+						data_npc = await monsters.once('value').then(function(snapshot) {
+							return snapshot.val()
+						})
+					}
+					else {
+						data_npc = rootState.content.npcs[entity.id]
+					}
+
+					entity.curHp = db_entity.curHp;
+					entity.tempHp = db_entity.tempHp;
+					entity.ac_bonus = db_entity.ac_bonus;
+
+					if(db_entity.transformed) {
+						entity.transformed = true;
+						entity.transformedMaxHp = db_entity.transformed.maxHp;
+						entity.transformedCurHp = db_entity.transformed.curHp;
+						entity.transformedAc = db_entity.transformed.ac;
+					} else {
+						entity.transformed = false;
+					}
+					if(!entity.avatar) {
+						//if an entity is quicly added during an ecnounter
+						//without copying an existing
+						//it won't have data_npc
+						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
+					}
+					else {
+						entity.img = entity.avatar;
+					}
 				}
 
-				if(!entity.avatar) {
-					//if an entity is quicly added during an ecnounter
-					//without copying an existing
-					//it won't have data_npc
-					entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
-				}
-				else {
-					entity.img = entity.avatar;
-				}
 				
 				//if an entity is quicly added during an ecnounter
 				//without copying an existing
@@ -428,7 +386,6 @@ const mutations = {
 				break
 			}
 		}
-		console.log("BEFORE SET", entity.curHp)
 		Vue.set(state.entities, key, entity);
 	},
 	CLEAR_ENTITIES(state) { state.entities = {}; },	
@@ -548,42 +505,45 @@ const mutations = {
 		}
 	},
 	SET_SAVE(state, {key, check, index}) {
+		console.log(check)
+		let db_name = state.entities[key].entityType + 's';
 		if(check == 'reset') {
 			//RESET SAVES
 			Vue.set(state.entities[key], 'saves', {});
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
 
 			//REMOVE STABLE
 			Vue.set(state.entities[key], 'stable', false);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
 		}
 		else if(check == 'unset') {
 			Vue.delete(state.entities[key].saves, index);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${index}`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${index}`).remove();
 		}
 		else {
 			var i = parseInt(index + 1);
 			Vue.set(state.entities[key].saves, i, check);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${i}`).set(check);
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${i}`).set(check);
 		}
 	},
 	SET_STABLE(state, {key, action}) {
+		let db_name = state.entities[key].entityType + 's';
 		if(action == 'set') {
 			//RESET SAVES
 			Vue.set(state.entities[key], 'saves', {});
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
 
 			//REMOVE DEAD
 			Vue.delete(state.entities[key], 'dead');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
 
 			//SET STABLE
 			Vue.set(state.entities[key], 'stable', 'true');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).set(true);
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).set(true);
 		}
 		else if(action == 'unset') {
 			Vue.delete(state.entities[key], 'stable');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
 		}
 	},
 	EDIT_ENTITY(state, {key, entity}) {
@@ -685,7 +645,11 @@ const mutations = {
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
 						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
-					} else {
+					}
+					if(state.entities[key].entityType == 'companion') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).remove();
+					}
+					 else {
 						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
 					}
 				}
@@ -699,7 +663,11 @@ const mutations = {
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
 						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
-					} else {
+					}
+					if(state.entities[key].entityType == 'companions') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).set(newHp);
+					}
+					else {
 						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
 					}
 				}
@@ -709,11 +677,31 @@ const mutations = {
 		else if(pool == 'transformed') {
 			if(newHp <= 0) {
 				state.entities[key].transformed = false; //Update store
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+					}
+					if(state.entities[key].entityType == 'companion') {
+				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+					}
+					else {
+						encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+					}
+				}
 			}
 			else {
 				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed/curHp`).set(newHp);
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(newHp);
+					}
+					if(state.entities[key].entityType == 'companion') {
+				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(newHp);
+					}
+					else {
+						encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(newHp);
+					}
+				}
 			}
 		}
 		//when target has no tempHp or is not transformed, set curHP
@@ -725,7 +713,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType == 'player') {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
-				} else {
+				}
+				if(state.entities[key].entityType == 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/curHp`).set(newHp);
+				}
+				else {
 					//NPC curHp is stored under the encounter
 					encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
 				}
@@ -733,23 +725,24 @@ const mutations = {
 		}
 	},
 	SET_DEAD(state, {key, action, revive=false}) {
+		let db_name = state.entities[key].entityType + 's';
 		if(action === 'set') {
 			//SET DEAD
 			Vue.set(state.entities[key], 'dead', true);
 			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).set(true);
 			}
 		}
 		else if(action === 'unset') {
 			Vue.delete(state.entities[key], 'dead');
 			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
 			}
 			if(revive) {
 				state.entities[key].curHp = 1;
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(1);
+				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/curHp`).set(1);
 			}
 		}
 	},

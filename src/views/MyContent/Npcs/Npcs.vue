@@ -132,7 +132,6 @@
 				'content_count',
 			]),
 			_npcs: function() {
-				// console.log('yo')
 				return _.chain(this.npcs)
 				.filter(function(npc, key) {
 					npc.key = key

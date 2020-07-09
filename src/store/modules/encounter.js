@@ -505,7 +505,6 @@ const mutations = {
 		}
 	},
 	SET_SAVE(state, {key, check, index}) {
-		console.log(check)
 		let db_name = state.entities[key].entityType + 's';
 		if(check == 'reset') {
 			//RESET SAVES

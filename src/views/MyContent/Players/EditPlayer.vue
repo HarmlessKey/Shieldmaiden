@@ -502,7 +502,6 @@
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
-				console.log(this.npcs)
 				for (var i in this.npcs) {
 					var m = this.npcs[i];
 					m.key = i;

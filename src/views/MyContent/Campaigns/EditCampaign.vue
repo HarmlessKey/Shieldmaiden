@@ -186,7 +186,6 @@
 				})
 			},
 			addPlayer(id) {
-				console.log(this.players[id])
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
 					curHp: this.players[id].maxHp
 				});
@@ -203,7 +202,6 @@
 			removePlayer(playerId) {
 				// Get companions of player
 				let companions = Object.keys(this.players[playerId].companions);
-				console.log(companions);
 
 				//First remove player from all encounters
 				for(let encounterId in this.allEncounters[this.campaignId]) {

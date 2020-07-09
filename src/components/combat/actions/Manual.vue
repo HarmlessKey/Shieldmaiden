@@ -16,23 +16,6 @@
 			</p>
 			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
 
-			<!-- <select class="form-control mb-2" v-model="damageType" name="damageType">
-				<option value="">Type of damage...</option>
-				<option value="acid">Acid</option>
-				<option value="bludgeoning">Bludgeoning</option>
-				<option value="cold">Cold</option>
-				<option value="fire">Fire</option>
-				<option value="force">Force</option>
-				<option value="lightning">Lightning</option>
-				<option value="necrotic">Necrotic</option>
-				<option value="piercing">Piercing</option>
-				<option value="poison">Poison</option>
-				<option value="psychic">Psychic</option>
-				<option value="radiant">Radiant</option>
-				<option value="slashing">Slashing</option>
-				<option value="thunder">Thunder</option>
-			</select> -->
-
 			<div class="manual">
 				<input type="text" 
 					v-model="manualAmount" 
@@ -42,6 +25,7 @@
 					class="form-control manual-input"
 					@keypress="submitManual($event)"
 					v-b-tooltip.hover
+					autocomplete="off" 
 					title="Enter=Damge, Shift+Enter=Healing"
 				>
 				<button class="btn dmg bg-red" 

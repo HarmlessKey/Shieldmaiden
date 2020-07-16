@@ -18,9 +18,9 @@
 						<template v-else>{{ tier.benefits.players }}</template>	
 						)
 				</span>
-				<router-link v-if="!overencumbered" to="/players/add-player">
+				<a v-if="!overencumbered" to="/players/add-player" @click="addPlayer()">
 					<i class="fas fa-plus green"></i> New Player
-				</router-link>
+				</a>
 			</h2>
 
 
@@ -46,7 +46,7 @@
 				</template>
 
 				<template slot="level" slot-scope="data">
-					{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
+					{{ data.item }}
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
@@ -171,6 +171,32 @@
 			}
 		},
 		methods: {
+			addPlayer() {
+				const character_base = {
+					general: {
+						character_name: "Unnamed Character",
+						advancement: "milestone",
+						hit_point_type: "fixed"
+					}
+				}
+				const character_computed = {
+					display: {
+						character_name: "Unnamed Character",
+						level: 1
+					}
+				}
+
+				//Add if not overencumbered
+				if(!this.overencumbered) {
+					db.ref(`characters_base/${this.userId}`).push(character_base).then(res => {
+						//Returns the key of the added entry
+						const key = res.getKey();
+
+						db.ref(`characters_computed/${this.userId}/${key}`).set(character_computed);
+						this.$router.replace(`/players/${key}`)
+					});
+				}
+			},
 			confirmDelete(key, player, control) {
 				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
 					timeout: false,
@@ -211,7 +237,8 @@
 					}
 				}
 				//Remove player
-				db.ref('players/' + this.userId).child(key).remove(); 
+				db.ref('character_computed/' + this.userId).child(key).remove(); 
+				db.ref('character_base/' + this.userId).child(key).remove(); 
 			}
 		}
 	}

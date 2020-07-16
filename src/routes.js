@@ -45,7 +45,7 @@ const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue'
 const Encounters = () => import('@/views/MyContent/Encounters');
 const EditEncounter = () => import('@/views/MyContent/Encounters/Edit');
 const Players = () => import('@/views/MyContent/Players/Players.vue');
-const EditPlayer = () => import('@/views/MyContent/Players/EditPlayer.vue');
+const EditPlayer = () => import('@/views/MyContent/Players/EditPlayer');
 const Reminders = () => import('@/views/MyContent/Reminders');
 const EditReminder = () => import('@/views/MyContent/Reminders/EditReminder.vue');
 const Characters = () => import('@/views/MyContent/Characters');

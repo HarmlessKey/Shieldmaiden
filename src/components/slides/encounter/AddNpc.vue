@@ -201,8 +201,6 @@
 						} else {
 							this.add_entity_demo(this.entity);
 						}
-					} else {
-						//console.log('Not valid');
 					}
 				})
 			},

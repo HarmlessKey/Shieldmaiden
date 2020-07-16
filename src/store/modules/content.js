@@ -3,7 +3,7 @@ import Vue from 'vue'
 
 const campaigns_ref = db.ref('campaigns/');
 const encounters_ref = db.ref('encounters');
-const players_ref = db.ref('players');
+const players_ref = db.ref('characters_computed');
 const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
 const tiers_ref = db.ref('tiers');

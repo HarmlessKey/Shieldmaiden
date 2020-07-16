@@ -6,14 +6,6 @@ export const trackEncounter = {
 			dmId: this.$route.params.userid
 		}
 	},
-	// firebase() {
-	// 	return {
-	// 		npcSettings: {
-	// 			source: db.ref(`settings/${this.dmId}/track/npc`),
-	// 			asObject: true,
-	// 		},
-	// 	}
-	// },
 	methods: {
 		isTransformed(entity, campData) {
 			return (entity.entityType === 'player' || entity.entityType === 'companion') ? campData.transformed : entity.transformed;

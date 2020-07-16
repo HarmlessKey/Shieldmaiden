@@ -25,14 +25,14 @@
 		</span>
 	</div>
 	<div v-else>
-		<div v-if="campPlayers[entity.key].stable" class="green">
+		<div v-if="camp_data.stable" class="green">
 			<span><i class="fas fa-fist-raised"></i> Stable</span>
 		</div>
-		<div v-else-if="campPlayers[entity.key].dead" class="red">
+		<div v-else-if="camp_data.dead" class="red">
 			<span><i class="fas fa-skull-crossbones"></i> Dead</span>
 		</div>
 		<div v-else class="hp d-flex justify-content-start">
-			<div v-for="(check, key) in campPlayers[entity.key].saves" v-bind:key="key" class="mr-1">
+			<div v-for="(check, key) in camp_data.saves" v-bind:key="key" class="mr-1">
 				<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 				<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
 			</div>

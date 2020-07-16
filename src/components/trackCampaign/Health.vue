@@ -1,26 +1,26 @@
 <template>
-	<div v-if="campPlayers && players && (displayHp(entity).curHp > 0 || entity.entityType == 'npc')">
-		{{ setNumber(displayHp(entity).curHp) }}
+	<div v-if="campPlayers && campPlayers && players && npcs && (health.curHp > 0 || entity.entityType == 'npc')">
+		{{ setNumber(health.curHp) }}
 		<span class="hp">
-			<span v-if="isTransformed(entity, campPlayers[entity.key])" v-b-tooltip.hover title="Transformed" class="mr-1">
+			<span v-if="isTransformed(entity, camp_data)" v-b-tooltip.hover title="Transformed" class="mr-1">
 				<i class="fas fa-paw-claws"></i>
 			</span>
 			<span class="current" :class="{ 
-				'red': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) <= 33, 
-				'orange': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 33 && percentage(displayHp(entity).curHp, displayHp(entity).maxHp) <= 76, 
-				'green': percentage(displayHp(entity).curHp, displayHp(entity).maxHp) > 76
+				'red': percentage(health.curHp, health.maxHp) <= 33, 
+				'orange': percentage(health.curHp, health.maxHp) > 33 && percentage(health.curHp, health.maxHp) <= 76, 
+				'green': percentage(health.curHp, health.maxHp) > 76
 				}">
 					{{ animatedNumber }}
 				</span>
 				<span class="gray-hover">/</span>
 				<span :class="{ 
-					'green': entity.entityType === 'player' && campPlayers[entity.key].maxHpMod > 0, 
-					'red': entity.entityType === 'player' && campPlayers[entity.key].maxHpMod < 0
+					'green': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod > 0, 
+					'red': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod < 0
 				}">
-					{{ displayHp(entity).maxHp }}
+					{{ health.maxHp }}
 				</span>
-			<template v-if="displayHp(entity).tempHp">
-				+{{ displayHp(entity).tempHp }}
+			<template v-if="health.tempHp">
+				+{{ health.tempHp }}
 			</template>
 		</span>
 	</div>
@@ -51,6 +51,9 @@
 		props: [
 			'entity',
 			'campPlayers',
+			'campCompanions',
+			'npcs',
+			'players',
 		],
 		data() {
 			return {
@@ -59,18 +62,70 @@
 				tweenedNumber: 0,
 			}
 		},
-		firebase() {
-			return {
-				players: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
-				},
-			}
-		},
+		// firebase() {
+		// 	return {
+		// 		players: {
+		// 			source: db.ref(`players/${this.userId}`),
+		// 			asObject: true,
+		// 		},
+		// 		npcs: {
+		// 			source: db.ref(`npcs/${this.userId}`),
+		// 			asObject: true,
+		// 		}
+		// 	}
+		// },
 		computed: {
 			animatedNumber: function() {
 				return this.tweenedNumber.toFixed(0);
 			},
+			camp_data: function() {
+				const key = this.entity.key;
+				
+				if (this.entity.entityType === 'player')
+					return this.campPlayers[key];
+
+				if (this.entity.entityType === 'companion')
+					return this.campCompanions[key];
+
+				return undefined;
+			},
+			health: function() {
+				let ret = {};
+				const key = this.entity.key;
+
+				let maxHp, curHp, tempHp;
+
+				if (this.isTransformed(this.entity, this.camp_data)) {
+					maxHp = (this.camp_data !== undefined) ? this.camp_data.transformed.maxHp : this.entity.transformed.maxHp;
+					curHp = (this.camp_data !== undefined) ? this.camp_data.transformed.curHp : this.entity.transformed.curHp;
+					tempHp = (this.camp_data !== undefined) ? this.camp_data.tempHp : this.entity.tempHp;
+				}
+
+				// Not transformed
+				else {
+					// Fill cur and temp first from campaign or entity data
+					curHp = (this.camp_data !== undefined) ? this.camp_data.curHp : this.entity.curHp;
+					tempHp = (this.camp_data !== undefined) ? this.camp_data.tempHp : this.entity.tempHp;
+
+					// Npc max hp in entity
+					if (this.entity.entityType === 'npc')
+						maxHp = this.entity.maxHp;
+
+					else if (this.entity.entityType === 'player')
+						maxHp = (this.camp_data.maxHpMod) ? this.players[key].maxHp + this.camp_data.maxHpMod : this.players[key].maxHp;
+
+					else if (this.entity.entityType === 'companion')
+						maxHp = (this.camp_data.maxHpMod) ? this.npcs[key].maxHp + this.camp_data.maxHpMod : this.npcs[key].maxHp;
+				}
+
+				ret = {
+					maxHp: parseInt(maxHp),
+					curHp: parseInt(curHp),
+					tempHp: parseInt(tempHp),
+				};
+
+				return ret;
+			}
 		},
 		watch: {
 			number: function(newValue) {
@@ -82,37 +137,52 @@
 			setNumber(value) {
 				this.number = value
 			},
-			displayHp(entity) {
-				let stats = {};
-				const key = entity.key;
+			// displayHp(entity) {
+			// 	let stats = {};
+			// 	const key = entity.key;
 
-				if(this.isTransformed(entity, this.campPlayers[key])) {
-					let maxHp = (entity.entityType === 'player') ? this.campPlayers[key].transformed.maxHp : entity.transformed.maxHp;
-					let curHp = (entity.entityType === 'player') ? this.campPlayers[key].transformed.curHp : entity.transformed.curHp;
+			// 	let camp_data = undefined;
+			// 	if (entity.entityType === 'player') {
+			// 		camp_data = this.campPlayers[key];
+			// 	}
+			// 	else if (entity.entityType === 'companion') {
+			// 		camp_data = this.campCompanions[key];
+			// 	}
+			// 	if(this.isTransformed(entity, camp_data)) {
+			// 		let maxHp = (camp_data !== undefined) ? camp_data.transformed.maxHp : entity.transformed.maxHp;
+			// 		let curHp = (camp_data !== undefined) ? camp_data.transformed.curHp : entity.transformed.curHp;
+			// 		let tempHp = (camp_data !== undefined) ? camp_data.tempHp : entity.tempHp;
 
-					stats = {
-						maxHp: parseInt(maxHp),
-						curHp: parseInt(curHp),
-					}
-					stats.tempHp = (entity.entityType == 'player') ? parseInt(this.campPlayers[key].tempHp) : parseInt(entity.tempHp);
-				} else {
-					//FOR PLAYER GET MAXHP FORM PLAYER NOT ENCOUNTER
-					if(entity.entityType == 'player') {
-						stats = {
-							curHp: parseInt(this.campPlayers[key].curHp),
-							tempHp: parseInt(this.campPlayers[key].tempHp),
-						}
-						stats.maxHp = (this.campPlayers[key].maxHpMod !== 0) ? parseInt(this.players[key].maxHp + this.campPlayers[key].maxHpMod) : parseInt(this.players[key].maxHp);
-					} else {
-						stats = {
-							maxHp: parseInt(entity.maxHp),
-							curHp: parseInt(entity.curHp),
-							tempHp: parseInt(entity.tempHp),
-						}
-					}
-				}
-				return stats
-			},
+			// 		stats = {
+			// 			maxHp: parseInt(maxHp),
+			// 			curHp: parseInt(curHp),
+			// 			tempHp: parseInt(tempHp),
+			// 		}
+			// 	} else {
+			// 		//FOR PLAYER GET MAXHP FORM PLAYER NOT ENCOUNTER
+			// 		if(entity.entityType === 'player') {
+			// 			stats = {
+			// 				curHp: parseInt(camp_data.curHp),
+			// 				tempHp: parseInt(camp_data.tempHp),
+			// 			}
+			// 			stats.maxHp = (camp_data.maxHpMod !== 0) ? parseInt(this.players[key].maxHp + this.campPlayers[key].maxHpMod) : parseInt(this.players[key].maxHp);
+			// 		}
+			// 		else if (entity.entityType === 'companion') {
+			// 			stats = {
+			// 				curHp: parseInt(camp_data.curHp),
+			// 				tempHp: parseInt(camp_data.tempHp),
+			// 			}
+			// 			stats.maxHp = parseInt(entity.maxHp + camp_data.maxHpMod);
+			// 		} else {
+			// 			stats = {
+			// 				maxHp: parseInt(entity.maxHp),
+			// 				curHp: parseInt(entity.curHp),
+			// 				tempHp: parseInt(entity.tempHp),
+			// 			}
+			// 		}
+			// 	}
+			// 	return stats
+			// },
 		},
 	}
 </script>

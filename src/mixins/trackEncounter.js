@@ -6,31 +6,36 @@ export const trackEncounter = {
 			dmId: this.$route.params.userid
 		}
 	},
-	firebase() {
-		return {
-			npcSettings: {
-				source: db.ref(`settings/${this.dmId}/track/npc`),
-				asObject: true,
-			},
-		}
-	},
+	// firebase() {
+	// 	return {
+	// 		npcSettings: {
+	// 			source: db.ref(`settings/${this.dmId}/track/npc`),
+	// 			asObject: true,
+	// 		},
+	// 	}
+	// },
 	methods: {
-		isTransformed(entity, campPlayer) {
-			return (entity.entityType === 'player') ? campPlayer.transformed : entity.transformed;
+		isTransformed(entity, campData) {
+			return (entity.entityType === 'player' || entity.entityType === 'companion') ? campData.transformed : entity.transformed;
 		},
-		displayAc(entity, player, campPlayer) {
+		displayAc(entity, player, npc, camp_data) {
 			var stats = {}
 			var key = entity.key
 
-			if(this.isTransformed(entity, campPlayer)) {
-				stats.ac = (entity.entityType === 'player') ? campPlayer.transformed.ac : entity.transformed.ac;
-				stats.bonus = (entity.entityType === 'player') ? parseInt(campPlayer.ac_bonus) : parseInt(entity.ac_bonus);
+			if(this.isTransformed(entity, camp_data)) {
+				stats.ac = (entity.entityType === 'player') ? camp_data.transformed.ac : entity.transformed.ac;
+				stats.bonus = (entity.entityType === 'player') ? parseInt(camp_data.ac_bonus) : parseInt(entity.ac_bonus);
 			}
 			else {
 				if(entity.entityType === 'player') {
 					stats = {
 						ac: parseInt(player.ac),
-						bonus: parseInt(campPlayer.ac_bonus),
+						bonus: parseInt(camp_data.ac_bonus),
+					}
+				} else if (entity.entityType === 'companion') {
+					stats = {
+						ac: parseInt(npc.ac),
+						bonus: parseInt(camp_data.ac_bonus),
 					}
 				} else {
 					stats = {
@@ -51,18 +56,18 @@ export const trackEncounter = {
 				if(entity.id) {
 					if(entity.entityType == 'player') {
 						let playerImg = player.avatar;
-
-						if(playerImg) {
-							img = playerImg
-						} else {
-							img = 'player';
-						}
+						img = playerImg || 'player';
+					}
+					if(entity.entityType == 'companion') {
+						let companionImg = npc.avatar;
+						img = companionImg || 'companion';
+						
 					}
 					if(entity.entityType == 'npc') {						
 						if(entity.npc == 'custom') {
 							let npcImg = npc.avatar;
+							img = npcImg || 'monster';
 
-							img = (npcImg) ? npcImg : 'monster';
 						} else {
 							img = 'monster';
 						}

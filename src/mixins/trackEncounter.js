@@ -23,8 +23,8 @@ export const trackEncounter = {
 			var key = entity.key
 
 			if(this.isTransformed(entity, camp_data)) {
-				stats.ac = (entity.entityType === 'player') ? camp_data.transformed.ac : entity.transformed.ac;
-				stats.bonus = (entity.entityType === 'player') ? parseInt(camp_data.ac_bonus) : parseInt(entity.ac_bonus);
+				stats.ac = (camp_data) ? parseInt(camp_data.transformed.ac) : parseInt(entity.transformed.ac);
+				stats.bonus = (camp_data) ? parseInt(camp_data.ac_bonus) : parseInt(entity.ac_bonus);
 			}
 			else {
 				if(entity.entityType === 'player') {

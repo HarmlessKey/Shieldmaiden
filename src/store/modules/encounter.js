@@ -581,7 +581,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
 					encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
-				} else {
+				} 
+				else if (state.entities[key].entityType === 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+				} 
+				else {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
 				}
 			}
@@ -595,7 +599,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
 					encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
-				} else {
+				} 
+				else if (state.entities[key].entityType === 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(entity);
+				} 
+				else {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(entity);
 				}
 			}

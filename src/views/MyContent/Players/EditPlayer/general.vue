@@ -17,7 +17,7 @@
 			<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
 		</div>
 		<div class="form-item mb-3">
-			<label for="player_name" class="required">Character name</label>
+			<label for="character_name" class="required">Character name</label>
 			<b-form-input 
 				@change="saveCharacterName()"
 				autocomplete="off"  
@@ -96,11 +96,6 @@
 		components: {
 			GiveCharacterControl
 		},
-		data() {
-			return {
-				
-			}
-		},
 		computed: {
 			character() {
 				return (this.general) ? this.general : {};
@@ -112,7 +107,6 @@
 		},
 		methods: {
 			savePlayerName() {
-				console.log('changed')
 				this.$validator.validate('player_name', this.character.player_name).then((result) => {
 					if (result) {
 						db.ref(`characters_base/${this.userId}/${this.playerId}/general/player_name`).set(this.character.player_name);

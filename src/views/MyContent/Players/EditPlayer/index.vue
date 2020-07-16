@@ -6,18 +6,26 @@
 	<div v-else class="content">
 		<ul class="tabs">
 			<li 
-				@click="tab === 'general'"
-				:class="{ active: tab === 'general' }"
+				v-for="({value, label}, i) in tabs"
+				@click="current_tab = value"
+				:class="{ active: current_tab === value }"
+				:key="`tab-${i}`"
 			>
-				General
+				{{ label }}
 			</li>
 		</ul>
 		<div class="tab-content">
 			<General 
-				v-if="tab === 'general'"
+				v-if="current_tab === 'general'"
 				:general="base_values.general" 
 				:playerId="playerId" 
 				:userId="userId" 
+			/>
+			<Race
+				v-if="current_tab === 'race'"
+				:character_race="base_values.race" 
+				:playerId="playerId" 
+				:userId="userId"
 			/>
 		</div>
 	</div>
@@ -29,6 +37,7 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import General from './general';
+	import Race from './race';
 
 	export default {
 		name: 'Players',
@@ -37,12 +46,18 @@
 		},
 		components: {
 			OverEncumbered,
-			General
+			General,
+			Race
 		},
 		data() {
 			return {
 				playerId: this.$route.params.id,
-				tab: 'general'
+				tabs: [
+					{ value: 'general', label: "General" },
+					{ value: 'race', label: "Race" },
+					{ value: 'class', label: "Class" }
+				],
+				current_tab: 'general'
 			}
 		},
 		firebase() {
@@ -105,9 +120,11 @@
 			padding: 0;
 			display: flex;
 			justify-content: flex-start;
+			user-select: none;
 
 			li {
 				cursor: pointer;
+				padding: 0 10px;
 
 				&.active {
 					color: #2c97de;

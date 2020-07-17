@@ -26,12 +26,14 @@
 				:character_race="base_values.race" 
 				:playerId="playerId" 
 				:userId="userId"
+				:modifiers="race_modifiers"
 			/>
 			<Class
 				v-if="current_tab === 'class'"
 				:base_classes="base_values.class" 
 				:playerId="playerId"
 				:userId="userId"
+				:modifiers="class_modifiers"
 			/>
 		</div>
 	</div>
@@ -100,6 +102,30 @@
 					return this.$store.getters.getUser.uid;
 				}
 			},
+			//Turn modifiers into an array, but save the keys
+			modifiers() {
+				if(this.base_values.modifiers) {
+					let returnArray = [];
+					for(const [key, value] of Object.entries(this.base_values.modifiers)) {
+						let mod = value;
+						mod['.key'] = key;
+						returnArray.push(mod);
+					}
+					return returnArray;
+				} return [];
+			},
+			race_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.origin === 'race';
+				});
+				return modifiers;
+			},
+			class_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.origin === 'class';
+				});
+				return modifiers;
+			}
 		},
 		methods: {
 			...mapActions([
@@ -110,7 +136,7 @@
 					show: true,
 					type,
 				})
-			},
+			}
 		}
 	}
 </script>
@@ -118,17 +144,18 @@
 <style lang="scss" scoped>
 	.content {
 		display: grid;
-		grid-template-rows: 40px 1fr;
+		grid-template-rows: 30px 1fr;
 		overflow: hidden;
 		height: calc(100vh - 60px);
 
 		.tabs {
-			height: 40px;
+			height: 30px;
 			list-style: none;
 			padding: 0;
 			display: flex;
 			justify-content: flex-start;
 			user-select: none;
+			border-bottom: solid 1px #5c5757;
 
 			li {
 				cursor: pointer;
@@ -137,9 +164,13 @@
 				&.active {
 					color: #2c97de;
 				}
+				&:first-child {
+					padding-left: 0;
+				}
 			}
 		}
 		.tab-content {
+			padding-top: 20px;
 			overflow: scroll;
 
 			&::-webkit-scrollbar {

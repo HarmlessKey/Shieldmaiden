@@ -21,6 +21,7 @@
 $gray: #262626;
 $gray-darker: #232323;
 $gray-dark: #191919;
+$gray-darkest: #141414;
 $gray-light: #b2b2b2;
 $gray-hover: #5c5757;
 $gray-active: #302f2f;
@@ -1167,25 +1168,47 @@ ul.nav {
 		margin-bottom: 1px;
 	}
 }
-.modal-content {
-	border-radius: 0 !important;
-	border: none;
-	background: $gray-dark !important;
-	color: $gray-light !important; 
-}
-.modal-content .btn {
-	color: $white !important;
-}
-.modal-header, .modal-footer {
-	border-color: $black !important;
-}
-.modal .close {
-	color: $red;
-	text-shadow: none;
-	opacity: 1;
-}
-.modal .close:hover {
-	color: $red;
+.modal-dialog {	
+	margin-top: calc(1.75rem + 60px) !important;
+
+	.modal-content {
+		border-radius: 0 !important;
+		border: none;
+		background: $gray-dark !important;
+		color: $gray-light !important;
+
+		.modal-header {
+			border-color: $black !important;
+			border-radius: 0;
+			height: 50px;
+
+			.modal-title {
+				line-height: 20px;
+				margin-bottom: 0;
+			}
+			.close {
+				color: $red;
+				text-shadow: none;
+				opacity: 1;
+				height: 50px;
+				line-height: 20px;
+		
+				&:hover {
+					color: $red !important;
+				}
+			}
+		}
+		.modal-body {
+			padding-top: calc(1rem + 50px);
+
+			.form-control, .custom-select {
+				border-color: $gray-hover !important;
+			}
+		}
+		.modal-footer {
+			border-color: $gray-hover;
+		}
+	}
 }
 .popover {
 	border-radius: 0 !important;

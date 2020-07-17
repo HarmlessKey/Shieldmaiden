@@ -3,7 +3,7 @@ export const skills = {
 		return {
 			skillList: {
 				'acrobatics': { skill: 'Acrobatics', ability: 'dexterity' },
-				'animal Handling': { skill: 'Animal Handling', ability: 'wisdom' },
+				'animalHandling': { skill: 'Animal Handling', ability: 'wisdom' },
 				'arcana': { skill: 'Arcana', ability: 'intelligence' },
 				'athletics': { skill: 'Athletics', ability: 'strength' },
 				'deception': { skill: 'Deception', ability: 'charisma' },
@@ -17,7 +17,7 @@ export const skills = {
 				'performance': { skill: 'Performance', ability: 'charisma' },
 				'persuasion': { skill: 'Persuasion', ability: 'charisma' },
 				'religion': { skill: 'Religion', ability: 'intelligence' },
-				'sleight of Hand': { skill: 'Sleight Of Hand', ability: 'dexterity' },
+				'sleightOfHand': { skill: 'Sleight Of Hand', ability: 'dexterity' },
 				'stealth': { skill: 'Stealth', ability: 'dexterity' },
 				'survival': { skill: 'Survival', ability: 'wisdom' },
 			}

@@ -20,7 +20,27 @@
 			<b-form-select v-model="modifier.type" :options="modifier_types" />
 		</div>
 
-		<!-- REF -->
+		<!-- TARGET -->
+		<div class="form-item mb-3">
+			<label for="type">Modifier target</label>
+			<b-form-select v-model="modifier.target" :options="modifier_targets" />
+		</div>
+
+		<!-- ABILITES -->
+		<div class="form-item mb-3" v-if="modifier.target === 'ability'">
+			<label for="type">Ability</label>
+			<b-form-select v-model="modifier.subtarget" :options="abilities" />
+		</div>
+
+		<!-- SKILLS -->
+		<div class="form-item mb-3" v-if="modifier.target === 'skill'">
+			<label for="type">Skill</label>
+			<select class="form-control" v-model="modifier.subtarget" name="skills">
+				<option v-for="({skill}, key) in skillList" :key="`${key}`" :value="key">
+					{{ skill }}
+				</option>
+			</select>
+		</div>
 
 		<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
 			<label for="value" class="required">Value</label>
@@ -38,10 +58,12 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { skills } from '@/mixins/skills.js';
+	import { abilities } from '@/mixins/abilities.js';
 
 	export default {
 		name: 'CharacterRace',
+		mixins: [skills, abilities],
 		props: {
 			value: {
 				type: Object,
@@ -51,13 +73,15 @@
 				type: Boolean,
 				default: false
 			},
-			ref: {
+			reference: {
 				type: Boolean,
 				default: true
 			}
 		},
 		data() {
 			return {
+				setTarget: undefined,
+				setSubtarget: undefined,
 				modifier_types: [
 					{
 						value: "bonus",
@@ -75,6 +99,24 @@
 						value: "expertise",
 						text: "Expertise"
 					}
+				],
+				modifier_targets: [
+					{
+						value: "ability",
+						text: "Abillity Score"
+					},
+					{
+						value: "skill",
+						text: "Skill"
+					},
+					{
+						value: "ac",
+						text: "Armor Class"
+					},
+					{
+						value: "speed",
+						text: "Speed"
+					}
 				]
 			}
 		},
@@ -87,9 +129,6 @@
 					this.$emit('input', newvalue);
 				}
 			}
-		},
-		methods: {
-			
 		}
 	}
 </script>

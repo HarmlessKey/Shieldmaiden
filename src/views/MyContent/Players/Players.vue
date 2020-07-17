@@ -177,6 +177,12 @@
 						character_name: "Unnamed Character",
 						advancement: "milestone",
 						hit_point_type: "fixed"
+					},
+					class: {
+						classes: {
+							main: true,
+							level: 1
+						}
 					}
 				}
 				const character_computed = {
@@ -237,8 +243,8 @@
 					}
 				}
 				//Remove player
-				db.ref('character_computed/' + this.userId).child(key).remove(); 
-				db.ref('character_base/' + this.userId).child(key).remove(); 
+				db.ref('characters_computed/' + this.userId).child(key).remove(); 
+				db.ref('characters_base/' + this.userId).child(key).remove(); 
 			}
 		}
 	}

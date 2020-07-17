@@ -1,6 +1,5 @@
 {
     "character_computed": {
-
         "display": {
             "name": "String",
             "avatar": "String",
@@ -64,7 +63,13 @@
                     },
                     "spell_casting_ability": "String",
                     "speed": {
-                        "base": "Integer"
+                        "walking": {
+                            "base": "Integer"
+                        }
+                    },
+                    "armor_class": {
+                        "base": "Integer",
+                        "dexterity": "Boolean"
                     }
                 }
             ]
@@ -84,23 +89,7 @@
                 "value": "Integer",
                 "ref": "ability.strength",
                 "origin": "race"
-            },
-            {
-                "type": "Bonus/Set Score",
-                "name": "String",
-                "value": "Integer",
-                "ref": "class"
-            },
-            {
-                "name": "Ability Score Improvement 4",
-                "value": "2",
-                "ref": "abilities.constitution"
-            },
-            {
-                "name" : "Ring",
-                "value": "1",
-                "ref": "saving_throws.charisma"
             }
         ]
-    },
+    }
 }

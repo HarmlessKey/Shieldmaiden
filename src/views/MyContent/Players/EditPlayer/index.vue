@@ -27,6 +27,12 @@
 				:playerId="playerId" 
 				:userId="userId"
 			/>
+			<Class
+				v-if="current_tab === 'class'"
+				:base_classes="base_values.class" 
+				:playerId="playerId"
+				:userId="userId"
+			/>
 		</div>
 	</div>
 </template>
@@ -38,6 +44,7 @@
 	import { db } from '@/firebase';
 	import General from './general';
 	import Race from './race';
+	import Class from './class';
 
 	export default {
 		name: 'Players',
@@ -47,7 +54,8 @@
 		components: {
 			OverEncumbered,
 			General,
-			Race
+			Race,
+			Class
 		},
 		data() {
 			return {

@@ -9,9 +9,16 @@
 				id="race" 
 				type="text" 
 				v-model="race.race_name" 
-				name="race" 
 				placeholder="Race"/>
-			<p class="validate red" v-if="errors.has('race')">{{ errors.first('race') }}</p>
+		</div>
+		<div class="form-item mb-3">
+			<label for="race_description" class="required">Description</label>
+			<b-form-textarea
+				autocomplete="off"
+				id="race_description"
+				v-model="race.race_description"
+				placeholder="Race description"
+			/>
 		</div>
 	</div>
 </template>

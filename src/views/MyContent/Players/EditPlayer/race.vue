@@ -24,6 +24,7 @@
 		<div class="form-item mb-3">
 			<label for="race_description">Description</label>
 			<b-form-textarea
+				@change="saveRaceDescription()"
 				autocomplete="off"
 				id="race_description"
 				v-model="race.race_description"
@@ -120,6 +121,9 @@
 			},
 			saveRaceSpeed() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/walking_speed`).set(this.race.walking_speed);
+			},
+			saveRaceDescription() {
+				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_description`).set(this.race.race_description);
 			},
 			newModifier() {
 				this.modifier = {

@@ -2,7 +2,7 @@
 	<div>
 		<h3>Race</h3>
 		<div class="form-item mb-3">
-			<label for="race" class="required">Race</label>
+			<label for="race">Race</label>
 			<b-form-input 
 				@change="saveRaceName()"
 				autocomplete="off"  
@@ -12,7 +12,17 @@
 				placeholder="Race"/>
 		</div>
 		<div class="form-item mb-3">
-			<label for="race_description" class="required">Description</label>
+			<label for="speed">Base walking speed</label>
+			<b-form-input 
+				@change="saveRaceSpeed()"
+				autocomplete="off"  
+				id="speed" 
+				type="number" 
+				v-model="race.walking_speed" 
+				placeholder="Speed"/>
+		</div>
+		<div class="form-item mb-3">
+			<label for="race_description">Description</label>
 			<b-form-textarea
 				autocomplete="off"
 				id="race_description"
@@ -107,6 +117,9 @@
 		methods: {
 			saveRaceName() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_name`).set(this.race.race_name);
+			},
+			saveRaceSpeed() {
+				db.ref(`characters_base/${this.userId}/${this.playerId}/race/walking_speed`).set(this.race.walking_speed);
 			},
 			newModifier() {
 				this.modifier = {

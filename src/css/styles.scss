@@ -1104,7 +1104,7 @@ hr { background: $gray-hover; }
 	-webkit-appearance: none;
 	border-radius: 0 !important;
 	background: $gray-dark !important;
-	border: solid 1px $gray !important;
+	border: solid 1px $gray-hover !important;
 	color: $gray-light !important;
 	
 	&:focus {
@@ -1200,10 +1200,6 @@ ul.nav {
 		}
 		.modal-body {
 			padding-top: calc(1rem + 50px);
-
-			.form-control, .custom-select {
-				border-color: $gray-hover !important;
-			}
 		}
 		.modal-footer {
 			border-color: $gray-hover;
@@ -1228,6 +1224,9 @@ ul.nav {
 	.card-header {
 		border-radius: 0 !important;
 		text-transform: uppercase !important;
+	}
+	.form-control {
+		border: none !important;
 	}
 }
 .btn-group-toggle {

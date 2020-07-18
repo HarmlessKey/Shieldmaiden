@@ -37,7 +37,7 @@
 				<template slot="character_name" slot-scope="data">
 					<router-link class="mx-2" 
 						:to="'/players/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">{{ data.item }}
+						v-b-tooltip.hover title="Edit">{{ data.row.display.character_name }}
 					</router-link>
 				</template>
 
@@ -46,7 +46,7 @@
 				</template>
 
 				<template slot="level" slot-scope="data">
-					{{ data.item }}
+					{{ data.row.display.level }}
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">

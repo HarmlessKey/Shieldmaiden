@@ -30,7 +30,8 @@
 			/>
 			<Class
 				v-if="current_tab === 'class'"
-				:base_classes="base_values.class" 
+				:base_class="base_values.class" 
+				:hit_point_type="base_values.general.hit_point_type"
 				:playerId="playerId"
 				:userId="userId"
 				:modifiers="class_modifiers"

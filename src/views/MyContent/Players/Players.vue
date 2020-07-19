@@ -180,8 +180,10 @@
 					},
 					class: {
 						classes: {
-							main: true,
-							level: 1
+							main: {
+								level: 1,
+								base_armor_class: 10
+							}
 						}
 					}
 				}

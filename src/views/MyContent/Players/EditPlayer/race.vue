@@ -42,6 +42,11 @@
 			<template slot="target" slot-scope="data">
 				{{ data.row.subtarget || data.item }}
 			</template>
+			<template slot="value" slot-scope="data">
+				<template v-if="data.item">{{ data.item }}</template>
+				<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
+				<template v-else-if="data.row.type === 'expertise'">Expertise</template>
+			</template>
 			<div slot="actions" slot-scope="data" class="actions">
 					<a class="gray-hover mx-1" 
 						@click="editModifier(data.row)" 

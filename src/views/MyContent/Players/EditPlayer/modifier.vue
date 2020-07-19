@@ -117,6 +117,16 @@
 						value: "speed",
 						text: "Speed"
 					}
+				],
+				modifier_restriction: [
+					{
+						value: "armor",
+						text: "Must wear armor"
+					},
+					{
+						value: "no_armor",
+						text: "Can't wear armor"
+					}
 				]
 			}
 		},

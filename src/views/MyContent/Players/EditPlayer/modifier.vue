@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="form-item mb-3">
-			<div>Origin: {{ modifier.origin }}</div>
+			<div class="gray-hover mb-3">Mod Origin: {{ modifier.origin }}</div>
 			<label for="name" class="required">Name</label>
 			<b-form-input 
 				autocomplete="off"  

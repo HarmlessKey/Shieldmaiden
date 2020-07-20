@@ -88,6 +88,25 @@
 												placeholder="Feature name"/>
 										</div>
 
+										<label for="description">Description</label>
+										<div class="d-flex justify-content-between mb-3">
+											<b-form-textarea 
+												@change="editFeature(classKey, level, key, 'description')"
+												v-model="subclass.features[`level_${level}`][key].description"
+												id="description"
+												name="description"
+												title="Description"
+												class="form-control"
+												v-validate="'max:5000'"
+												maxlength="5001"
+												data-vv-as="Description"
+												rows="6" 
+											/>
+											<div class="ml-3">
+												<vue-markdown name="description_preview" :source="feature.description"></vue-markdown>
+											</div>
+										</div>
+
 										<!-- FEATURE MODIFIER -->
 										<h3>Modifiers</h3>
 										<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
@@ -100,7 +119,7 @@
 												{{ data.row.subtarget || data.item.capitalize() }}
 											</template>
 											<template slot="value" slot-scope="data">
-												<template v-if="data.item">{{ data.item }}</template>
+												<template v-if="data.item">{{ data.item.capitalize() }}</template>
 												<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
 												<template v-else-if="data.row.type === 'expertise'">Expertise</template>
 												<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
@@ -132,7 +151,7 @@
       <Modifier v-model="modifier" />
 			<template slot="modal-footer">
 				<a class="btn bg-gray" @click="hideModal">Cancel</a>
-				<a v-if="modifier['.key']" class="btn" @click="saveModifier()">Save</a>
+				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
 				<a v-else class="btn" @click="addModifier">Add</a>
 			</template>
     </b-modal>
@@ -140,6 +159,7 @@
 </template>
 
 <script>
+	import VueMarkdown from 'vue-markdown';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { modifierMixin } from '@/mixins/modifiers.js';
 	import Modifier from './modifier.vue';
@@ -157,6 +177,7 @@
 			"modifiers"
 		],
 		components: {
+			VueMarkdown,
 			GiveCharacterControl,
 			Modifier
 		},
@@ -178,6 +199,9 @@
 					},
 					target: {
 						label: 'Target',
+					},
+					type: {
+						label: 'Type',
 					},
 					value: {
 						label: 'Value',

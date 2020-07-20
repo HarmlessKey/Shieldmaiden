@@ -117,13 +117,15 @@
 			},
 			race_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
-					return mod.origin === 'race';
+					const origin = mod.origin.split(".");
+					return origin[0] === 'race';
 				});
 				return modifiers;
 			},
 			class_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
-					return mod.origin === 'class';
+					const origin = mod.origin.split(".");
+					return origin[0] === 'class';
 				});
 				return modifiers;
 			}

@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<div class="form-item mb-3">
+			<div>Origin: {{ modifier.origin }}</div>
 			<label for="name" class="required">Name</label>
 			<b-form-input 
 				autocomplete="off"  
@@ -15,13 +16,14 @@
 		</div>
 
 		<!-- TYPE -->
-		<div class="form-item mb-3">
+		<div class="form-item">
 			<label for="type">Type</label>
 			<b-form-select v-model="modifier.type" :options="modifier_types" />
 		</div>
+		<small class="d-block mt-1" v-if="modifier.type"><b>{{ modifier.type.capitalize() }}</b>: {{ type_info[modifier.type] }}</small>
 
 		<!-- TARGET -->
-		<div class="form-item mb-3">
+		<div class="form-item my-3">
 			<label for="type">Modifier target</label>
 			<b-form-select v-model="modifier.target" :options="modifier_targets" />
 		</div>
@@ -41,7 +43,7 @@
 				</option>
 			</select>
 		</div>
-
+		
 		<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
 			<label for="value" class="required">Value</label>
 			<b-form-input 
@@ -53,6 +55,12 @@
 				name="value" 
 			/>
 			<p class="validate red" v-if="errors.has('value')">{{ errors.first('value') }}</p>
+		</div>
+
+		<!-- ABILITES -->
+		<div class="form-item mb-3" v-if="modifier.type === 'ability'">
+			<label for="type">Ability modifier</label>
+			<b-form-select v-model="modifier.ability_modifier" :options="abilities" />
 		</div>
 	</div>
 </template>
@@ -96,10 +104,21 @@
 						text: "Proficiency"
 					},
 					{
+						value: "ability",
+						text: "Ability modifier"
+					},
+					{
 						value: "expertise",
 						text: "Expertise"
 					}
 				],
+				type_info: {
+					bonus: "Input a number value to add as a bonus.",
+					set: "Input a number that target will be set to, it is not added like a bonus.",
+					proficiency: "Add the your proficiency as bonus.",
+					ability: "Add an ability modifier as a bonus",
+					expertise: "Add the proficiency bonus once more, only works on proficient skills."
+				},
 				modifier_targets: [
 					{
 						value: "ability",

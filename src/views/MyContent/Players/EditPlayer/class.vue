@@ -70,7 +70,10 @@
 							<b-card no-body v-for="(feature, key, index) in subclass.features[`level_${level}`]" :key="`feature-${index}`">
 								<b-card-header role="tab">
 									{{ feature.name }}
-									<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"></i></a>
+									<div class="actions">
+										<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
+										<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
+									</div>
 								</b-card-header>
 								<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
 									<b-card-body>
@@ -84,6 +87,38 @@
 												v-model="subclass.features[`level_${level}`][key].name" 
 												placeholder="Feature name"/>
 										</div>
+
+										<!-- FEATURE MODIFIER -->
+										<h3>Modifiers</h3>
+										<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
+
+										<hk-table
+											:columns="columns"
+											:items="feature_modifiers(classKey, level, key)"
+										>
+											<template slot="target" slot-scope="data">
+												{{ data.row.subtarget || data.item.capitalize() }}
+											</template>
+											<template slot="value" slot-scope="data">
+												<template v-if="data.item">{{ data.item }}</template>
+												<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
+												<template v-else-if="data.row.type === 'expertise'">Expertise</template>
+												<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
+											</template>
+											<div slot="actions" slot-scope="data" class="actions">
+													<a class="gray-hover mx-1" 
+														@click="editModifier(data.row)" 
+														v-b-tooltip.hover title="Edit">
+														<i class="fas fa-pencil"></i>
+													</a>
+													<a v-b-tooltip.hover 
+														title="Delete" 
+														class="gray-hover"
+														@click="deleteModifier(data.row['.key'])">
+															<i class="fas fa-trash-alt"></i>
+													</a>
+												</div>
+										</hk-table>
 									</b-card-body>
 								</b-collapse>
 							</b-card>
@@ -92,24 +127,38 @@
 				</template>
 			</div>
 		</div>
+
+		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
+      <Modifier v-model="modifier" />
+			<template slot="modal-footer">
+				<a class="btn bg-gray" @click="hideModal">Cancel</a>
+				<a v-if="modifier['.key']" class="btn" @click="saveModifier()">Save</a>
+				<a v-else class="btn" @click="addModifier">Add</a>
+			</template>
+    </b-modal>
 	</div>
 </template>
 
 <script>
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
+	import { modifierMixin } from '@/mixins/modifiers.js';
+	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 
 	export default {
 		name: 'CharacterRace',
+		mixins: [modifierMixin],
 		props: [
 			"base_class",
 			"hit_point_type",
 			"computed",
 			"playerId", 
-			"userId"
+			"userId",
+			"modifiers"
 		],
 		components: {
-			GiveCharacterControl
+			GiveCharacterControl,
+			Modifier
 		},
 		data() {
 			return {
@@ -119,7 +168,27 @@
 					{ value: "8", text: "d8" },
 					{ value: "10", text: "d10" },
 					{ value: "12", text: "d12" },
-				]
+				],
+				modifier: {},
+				columns: {
+					name: {
+						label: 'Name',
+						truncate: true,
+						sortable: true,
+					},
+					target: {
+						label: 'Target',
+					},
+					value: {
+						label: 'Value',
+					},
+					actions: {
+						label: '<i class="far fa-ellipsis-h"></i>',
+						noPadding: true,
+						right: true,
+						maxContent: true
+          }
+				}
 			}
 		},
 		computed: {
@@ -131,25 +200,46 @@
 			}
 		},
 		methods: {
+			feature_modifiers(classKey, level, key) {
+				const modifiers = this.modifiers.filter(mod => {
+					const origin = mod.origin.split(".");
+					return origin[1] === classKey && origin[2] == level && origin[3] === key;
+				});
+				return modifiers;
+			},
 			saveClassName(key) {
-				const value = (key === 'main') ? this.main.name : this.subclasses[key].name;
+				const value = this.classes[key].name;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/name`).set(value);
 			},
 			saveClassLevel(key) {
-				const value = (key === 'main') ? this.main.level : this.subclasses[key].level;
+				const value = this.classes[key].level;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
 			},
 			saveBaseHiPoints(key) {
-				const value = (key === 'main') ? this.main.base_hit_points : this.subclasses[key].base_hit_points;
+				const value = this.classes[key].base_hit_points;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_hit_points`).set(value);
 			},
 			saveHitDice(key) {
-				const value = (key === 'main') ? this.main.hit_dice : this.subclasses[key].hit_dice;
+				const value = this.classes[key].hit_dice;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/hit_dice`).set(value);
 			},
 			addFeature(key, level) {
 				const feature = { name: `Level ${level} feature` }
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}`).push(feature);
+			},
+			deleteFeature(classKey, level, key) {
+				//Delete all modifiers linked to this feature
+
+				//Delete feature
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${key}`).remove();
+			},
+			confirmDelete(classKey, level, key, name) {
+				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { this.deleteFeature(classKey, level, key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
 			},
 			editFeature(classKey, level, featureKey, prop) {
 				const value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
@@ -184,6 +274,17 @@
 	.card {
 		.card-header {
 			text-transform: none !important;
+			display: flex;
+			justify-content: space-between;
+
+			.actions {
+				display: flex;
+				justify-content: flex-end;
+				
+				a {
+					margin-left: 10px;
+				}
+			}
 		}
 		margin-bottom: 1px !important;
 	}

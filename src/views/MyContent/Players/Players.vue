@@ -177,7 +177,7 @@
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key, control)
+							this.deletePlayer(key, player, control)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -191,7 +191,7 @@
 					]
 				});
 			},
-			deletePlayer(key, control) {
+			deletePlayer(key, player, control) {
 				//Remove from character control
 				if(control) {
 					db.ref(`character_control/${control}`).child(key).remove(); 
@@ -207,6 +207,11 @@
 
 							//Go over all entities in the encounter
 							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
+
+							// Remove companions from each encounter
+							for (let comp_key in player.companions) {
+								db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(comp_key).remove();
+							}
 						}
 					}
 				}

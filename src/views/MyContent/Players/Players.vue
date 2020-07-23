@@ -58,7 +58,7 @@
 					<a v-b-tooltip.hover 
 						title="Delete" 
 						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row.player, data.row.control)">
+						@click="confirmDelete(data.row.key, data.row)">
 							<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
@@ -171,13 +171,13 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, player, control) {
-				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
+			confirmDelete(key, player) {
+				this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key, player, control)
+							this.deletePlayer(key, player)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -191,10 +191,11 @@
 					]
 				});
 			},
-			deletePlayer(key, player, control) {
+			deletePlayer(key, player) {
+				console.log(player);
 				//Remove from character control
-				if(control) {
-					db.ref(`character_control/${control}`).child(key).remove(); 
+				if(player.control) {
+					db.ref(`character_control/${player.control}`).child(key).remove(); 
 				}
 
 				for(let campaign in this.campaigns) {

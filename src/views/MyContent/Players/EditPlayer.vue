@@ -347,7 +347,7 @@
 							<a v-b-tooltip.hover 
 								title="Delete" 
 								class="gray-hover"
-								@click="confirmDelete(data.index)">
+								@click="confirmDelete(data.row.key)">
 								<i class="fas fa-trash-alt"></i>
 							</a>
 						</div>
@@ -527,6 +527,12 @@
 			},
 			notAdded(npc) {
 				let key = npc.key;
+				for (let pI in this.players) {
+					for (let i in this.players[pI].companions) {
+						if (i == key)
+							return false;
+					}
+				}
 				for (let i in this.player.companions) {
 					if (i == key)
 						return false;
@@ -534,7 +540,8 @@
 				return true;
 			},
 			confirmDelete(index) {
-				this.player.companions.splice(index, 1);
+
+				this.$delete(this.player.companions, index)
 			},
 		}
 	}

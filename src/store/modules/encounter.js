@@ -273,21 +273,31 @@ const mutations = {
 
 					data_npc = rootState.content.npcs[key];
 
-					let campaingCompanion = rootState.content.campaigns[state.campaignId].companions[key];
+					let campaignCompanion = rootState.content.campaigns[state.campaignId].companions[key];
 
-					entity.curHp = campaingCompanion.curHp;
-					entity.tempHp = campaingCompanion.tempHp;
-					entity.ac_bonus = campaingCompanion.ac_bonus;
-					entity.maxHpMod = campaingCompanion.maxHpMod;
+					entity.curHp = campaignCompanion.curHp;
+					entity.tempHp = campaignCompanion.tempHp;
+					entity.ac_bonus = campaignCompanion.ac_bonus;
+					entity.maxHpMod = campaignCompanion.maxHpMod;
 
-					entity.saves = (campaingCompanion.saves) ? campaingCompanion.saves : {};
-					entity.stable = (campaingCompanion.stable) ? campaingCompanion.stable : false;
-					entity.dead = (campaingCompanion.dead) ? campaingCompanion.dead : false;
+					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
+					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
+					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
 					entity.ac = data_npc.ac;
 					entity.maxHp = data_npc.maxHp;
 
 					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
+
+					//Get player transformed from campaign
+					if(campaignCompanion.transformed) {
+						entity.transformed = true;
+						entity.transformedMaxHp = campaignCompanion.transformed.maxHp;
+						entity.transformedCurHp = campaignCompanion.transformed.curHp;
+						entity.transformedAc = campaignCompanion.transformed.ac;
+					} else {
+						entity.transformed = false;
+					}
 				}
 				else {
 

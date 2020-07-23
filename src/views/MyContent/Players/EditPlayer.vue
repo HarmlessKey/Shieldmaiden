@@ -516,14 +516,15 @@
 			},
 			add(npc) {
 				if (this.player.companions === undefined) {
-					this.player.companions = {};
+					this.$set(this.player, 'companions', {});
 				}
-				let new_companion = {};
 
-				this.player.companions[npc.key] = true;
+				this.$set(this.player.companions, npc.key, true);
 
 				this.searchResults = [];
 				this.search = '';
+
+				this.$forceUpdate();
 			},
 			notAdded(npc) {
 				let key = npc.key;

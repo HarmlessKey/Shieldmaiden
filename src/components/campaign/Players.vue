@@ -87,7 +87,7 @@
 					:key="'image-'+key" 
 					:style="[
 						player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
-						{ backgroundImage: 'url(/img/player.03a988f6.svg)'}
+						{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
 					]
 				">
 					<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">

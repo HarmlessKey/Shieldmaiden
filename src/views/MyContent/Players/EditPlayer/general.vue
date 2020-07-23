@@ -69,10 +69,10 @@
 					v-model="character.hit_point_type"
 					active-color="#2c97de"
 					inactive-color="#2c97de"
-					inactive-value="rolled"
-					inactive-text="Rolled"
-					active-value="fixed"
-					active-text="Fixed">
+					active-value="rolled"
+					active-text="Rolled"
+					inactive-value="fixed"
+					inactive-text="Fixed">
 				</el-switch>
 			</div>
 		</div>
@@ -90,6 +90,7 @@
 		name: 'CharacterGeneral',
 		props: [
 			"general", 
+			"classes",
 			"playerId", 
 			"userId"
 		],
@@ -129,6 +130,14 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/advancement`).set(this.character.advancement);
 			},
 			saveHpType() {
+				if(this.character.hit_point_type === "rolled") {
+					for(const classKey in this.classes) {
+						const Class = this.classes[classKey];
+						if(!Class.rolled_hit_points && Class.level > 1) {
+							db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/2`).set(0);
+						}
+					}
+				}
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/hit_point_type`).set(this.character.hit_point_type);
 			}
 		}

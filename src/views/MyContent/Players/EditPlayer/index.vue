@@ -14,10 +14,11 @@
 				{{ label }}
 			</li>
 		</ul>
-		<div class="tab-content">
+		<div class="tab-content" v-if="base_values.class">
 			<General 
 				v-if="current_tab === 'general'"
 				:general="base_values.general" 
+				:classes="base_values.class.classes"
 				:playerId="playerId" 
 				:userId="userId" 
 			/>

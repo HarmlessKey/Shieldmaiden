@@ -41,8 +41,18 @@
 						<label for="hit_dice">Hit dice</label>
 						<b-form-select v-model="subclass.hit_dice" :options="dice" @change="saveHitDice('main')" />
 					</div>
-					<div class="rolled" v-if="hit_point_type === 'rolled' && subclass.level > 1">
+					<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
 						<label>Rolled HP</label>
+						<div class="rolled">
+							<span class="val">
+								{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
+							</span>
+							<a class="mx-1" 
+								@click="rollHitPoints(classKey)" 
+								v-b-tooltip.hover title="Roll Hit Points">
+								<i class="fas fa-pencil"></i>
+							</a>
+						</div>
 					</div>
 				</div>
 
@@ -235,6 +245,7 @@
 			</div>
 		</div>
 
+		<!-- MODIFIER MODAL -->
 		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
       <Modifier v-model="modifier" />
 			<template slot="modal-footer">
@@ -242,6 +253,31 @@
 				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
 				<a v-else class="btn" @click="addModifier">Add</a>
 			</template>
+    </b-modal>
+
+		<!-- ROLLED HP MODAL -->
+		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[rollHP].name}`">
+      <div>
+				<template v-for="level in classes[rollHP].level">
+					<div v-if="level > 1" :key="`roll-${level}`" class="roll_hp">
+					<label :for="`level-${level}`">Level {{ level }}</label>
+					<b-form-input 
+						@change="setRolledHP(rollHP, level)"
+						autocomplete="off" 
+						:id="`level-${level}`" 
+						type="text"
+						v-model="classes[rollHP].rolled_hit_points[level]" 
+					/>
+					<a 
+						v-if="!classes[rollHP].rolled_hit_points[level]"
+						class="btn"
+						@click="rollHitDice(rollHP, level)"
+					>
+						Roll
+					</a>
+					</div>
+				</template>
+      </div>
     </b-modal>
 	</div>
 </template>
@@ -255,10 +291,11 @@
 	import { skills } from '@/mixins/skills.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
+	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'CharacterRace',
-		mixins: [modifierMixin, abilities, weapons, skills],
+		mixins: [modifierMixin, abilities, weapons, skills, dice],
 		props: [
 			"base_class",
 			"hit_point_type",
@@ -288,6 +325,7 @@
 					{ value: "shield", label: "Shield" }
 				],
 				modifier: {},
+				rollHP: 'main',
 				columns: {
 					name: {
 						label: 'Name',
@@ -346,6 +384,15 @@
 				});
 				return modifiers;
 			},
+			totalRolled(classKey) {
+				let totalRolled = 0;
+				for(const [key, value] of Object.entries(this.classes[classKey].rolled_hit_points)) {
+					if(this.classes[classKey].level >= key) {
+						totalRolled = totalRolled + parseInt(value);
+					}
+				}
+				return totalRolled;
+			},
 			setProficiencies(newVal, classKey, type) {
 				const current = this.proficiencies[classKey][type];
 
@@ -375,12 +422,30 @@
 					}
 				}
 			},
+			rollHitPoints(classKey) {
+				this.rollHP = classKey;
+				this.$refs['roll-hp-modal'].show();
+			},
+			setRolledHP(classKey, level) {
+				const value = this.classes[classKey].rolled_hit_points[level];
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+			},
+			rollHitDice(classKey, level) {
+				const hit_dice = this.classes[classKey].hit_dice;
+				const value = this.rollD(hit_dice, 1, 0).total;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+			},
 			saveClassName(key) {
 				const value = this.classes[key].name;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/name`).set(value);
 			},
 			saveClassLevel(key) {
 				const value = this.classes[key].level;
+
+				//Check if rolled_hit_points exists and create it if not
+				if(this.hit_point_type === "rolled" && !this.classes[key].rolled_hit_points && value > 1) {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/rolled_hit_points/2`).set(0);
+				}
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
 			},
 			saveBaseHiPoints(key) {
@@ -430,6 +495,26 @@
 		display: grid;
 		grid-template-columns: 100px 100px 1fr;
 		grid-gap: 15px;
+	}	
+	.rolled {
+		line-height: 38px;
+		.val {
+			font-size: 25px;
+		}
+	}
+	.roll_hp {
+		display: grid;
+		grid-template-columns: 60px 60px max-content;
+		margin-bottom: 5px;
+		grid-column-gap: 10px;
+
+		label {
+			line-height: 38px;
+			margin: 0;
+		}
+		.form-control {
+			text-align: center;
+		}
 	}
 	h4.feature-title {
 		display: flex;

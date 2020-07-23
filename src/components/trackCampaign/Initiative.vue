@@ -69,7 +69,7 @@
 							
 								<td class="image">
 									<icon 
-										v-if="displayImg(entity, players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entity, players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+										v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img"
 										:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
 										:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 									/>
@@ -82,85 +82,92 @@
 										}"
 									/>
 								</td>
+						<td class="ac">
+							<template v-if="
+								(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
+								<span class="ac" :class="{ 
+										'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
+										'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
+									}"  
+									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus" 
+									v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus">
+									{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+								</span>
+								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}</span>
+							</template>
+							<span v-else class="gray-hover">?</span>
+						</td>
 
-								<td class="ac">
-									<template v-if="
-										(entity.entityType == 'player' && playerSettings.ac === undefined) 
-										|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
-										<span class="ac" :class="{ 
-												'green': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus > 0, 
-												'red': displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus < 0 
-											}"  
-											v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus" 
-											v-if="displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus">
-											{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac + displayAc(entity, players[entity.key], campPlayers[entity.key]).bonus }}
-										</span>
-										<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], campPlayers[entity.key]).ac }}</span>
-									</template>
-									<span v-else class="gray-hover">?</span>
-								</td>
+						<td class="name">
+							<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
+								<template v-if="displayNPCField('name', entity)">
+									{{ entity.name }}
+								</template>
+								<template v-else>
+									? ? ?
+								</template>
+							</span>
+							<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
+							<template v-else>{{ players[entity.key].character_name }}</template>
+						</td>
 
-								<td class="name">
-									<span v-if="entity.entityType == 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
-										<template v-if="displayNPCField('name', entity)">
-											{{ entity.name }}
-										</template>
-										<template v-else>
-											? ? ?
-										</template>
-									</span>
-									<template v-else>{{ players[entity.key].character_name }}</template>
-								</td>
+						<td class="hp">
+							<template v-if="
+								(playerSettings.health === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+								|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
+							">
+								<Health	
+									:entity="entity" 
+									:campPlayers="campPlayers" 
+									:campCompanions="campCompanions"
+									:players="players"
+									:npcs="npcs" 
+								/>
+							</template>
+							<template v-else-if="
+								(playerSettings.health === 'obscured' && (entity.entityType === 'player' || entity.entityType === 'companion'))
+								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
+							">
+								<template v-if="entity.curHp == 0">
+									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+								</template>
+								<i v-else class="fas" :class="{
+										'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+										'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
+										'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+									}"></i>
+							</template>
+							<template v-else>
+								<span class="gray-hover">
+									<template v-if="entity.curHp == 0">
+										<i class="fas fa-skull-crossbones red"></i>
+									
+                                  </template>
+                                <template v-else>? ? ?</template>
+                                </span>
+                            </template>
+                        </td>
 
-								<td class="hp">
-									<template v-if="
-										(entity.entityType === 'player' && playerSettings.health === undefined)
-										|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
-									">
-										<Health	:entity="entity" :campPlayers="campPlayers" />
-									</template>
-									<template v-else-if="
-										(entity.entityType == 'player' && playerSettings.health === 'obscured')
-										|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
-									">
-										<template v-if="entity.curHp == 0">
-											<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
-										</template>
-										<i v-else class="fas" :class="{
-												'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
-												'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
-												'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
-											}"></i>
-									</template>
-									<template v-else>
-										<span class="gray-hover">
-											<template v-if="entity.curHp == 0">
-												<i class="fas fa-skull-crossbones red"></i>
-											</template>
-											<template v-else>? ? ?</template>
-										</span>
-									</template>
-								</td>
-
-								<td class="conditions d-none d-md-table-cell">
-									<div class="d-flex justify-content-right" v-if="
-									entity.conditions &&
-									((entity.entityType == 'player' && playerSettings.conditions === undefined) 
-										|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
-									">
-										<template v-for="(condition, key) in entity.conditions">
-											<div :key="key" v-if="conditions[key]">
-													<span class="n" v-if="key == 'exhaustion'">
-														{{ entity.conditions[key] }}
-													</span>
-													<svg
-														v-else
-														v-b-popover.hover="conditions[key].condition" 
-														:title="key" 
-														class="icon text" 
-														viewBox="0 0 512 512">
-														<path :d="conditions[key].icon" fill-opacity="1"></path>
-													</svg>
+						<td class="conditions d-none d-md-table-cell">
+							<div class="d-flex justify-content-right" v-if="
+							entity.conditions &&
+							((playerSettings.conditions === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+								|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
+							">
+								<template v-for="(condition, key) in entity.conditions">
+									<div :key="key" v-if="conditions[key]">
+											<span class="n" v-if="key == 'exhaustion'">
+												{{ entity.conditions[key] }}
+											</span>
+											<svg
+												v-else
+												v-b-popover.hover="conditions[key].condition" 
+												:title="key" 
+												class="icon text" 
+												viewBox="0 0 512 512">
+												<path :d="conditions[key].icon" fill-opacity="1"></path>
+											</svg>
 											</div>
 										</template>
 									</div>
@@ -194,7 +201,11 @@
 			'allEntities',
 			'turn',
 			'campPlayers',
-			"players"
+			'campCompanions',
+			'players',
+			'playerSettings',
+			'npcs',
+			'npcSettings',
 		],
 		data() {
 			return {
@@ -213,14 +224,6 @@
 		},
 		firebase() {
 			return {
-				npcs: {
-					source: db.ref(`npcs/${this.dmId}`),
-					asObject: true,
-				},
-				playerSettings: {
-					source: db.ref(`settings/${this.dmId}/track/player`),
-					asObject: true,
-				},
 				conditions: {
 					source: db.ref('conditions'),
 					asObject: true,
@@ -322,10 +325,12 @@
 					html += `<div class="image" style="background-image: url(${entity.img});"></div>`;
 
 					//AC
-					if((entity.entityType == 'player' && this.playerSettings.ac === undefined) 
+					if(this.playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion') 
 						|| (entity.entityType == 'npc' && this.displayNPCField('ac', entity) == true)) {
-						const ac = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).ac
-						const bonus = this.displayAc(entity, this.players[entity.key], this.campPlayers[entity.key]).bonus;
+						
+						const dispAC = this.displayAc(entity, this.players[entity.key], this.npcs[entity.key], this.camp_data(entity))
+						const ac = dispAC.ac
+						const bonus = dispAC.bonus;
 
 						html += `<div class="ac">`;
 						html += (bonus) ? ac + bonus : ac;
@@ -392,8 +397,18 @@
 			getWindowWidth() {
 				//Return the window width
 				//used in the html to bind a class for small tables
-        this.windowWidth = document.documentElement.clientWidth;
-      }
+				this.windowWidth = document.documentElement.clientWidth;
+			},
+			camp_data(entity) {
+				let key = entity.key
+				if (entity.entityType === 'player')
+					return this.campPlayers[key];
+
+				if (entity.entityType === 'companion')
+					return this.campCompanions[key];
+
+				return undefined;
+			},
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);

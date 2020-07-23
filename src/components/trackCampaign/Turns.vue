@@ -14,7 +14,7 @@
 			</div>
 
 			<icon 
-				v-if="displayImg(current, players[current.id], npcs[current.id]) === 'monster' || displayImg(current, players[current.id], npcs[current.id]) === 'player'" class="img d-none d-md-block" 
+				v-if="['monster', 'player', 'companions'].includes(displayImg(current, players[current.id], npcs[current.id]))" class="img d-none d-md-block"
 				:icon="displayImg(current, players[current.id], npcs[current.id])" 
 				:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
 			/>
@@ -24,18 +24,23 @@
 			}"/>
 			<h1 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
-					<template v-if="current.entityType == 'npc'">
+					<!-- Companion name is stored in NPC data -->
+					<template v-if="current.entityType === 'npc' || current.entityType === 'companion'">
 						<template v-if="displayNPCField('name', current)">{{ current.name }}</template>
 						<template v-else>? ? ?</template>
 					</template>
 					<template v-else>{{ players[current.key].character_name }}</template>
 				</span>
 
+				<!-- Companion health is stored in campaign.companions -->
 				<Health 
-					v-if="(current.entityType == 'player' && playerSettings.health === undefined)
+					v-if="(playerSettings.health === undefined && (current.entityType === 'player' || current.entityType === 'companion'))
 					|| displayNPCField('health', current) === true"
 					:entity="current"
 					:campPlayers="campPlayers"
+					:campCompanions="campCompanions"
+					:players="players"
+					:npcs="npcs"
 				/>
 				<template v-else-if="
 					(current.entityType == 'player' && playerSettings.health === 'obscured')
@@ -79,26 +84,15 @@
 			'entities_len',
 			'turn',
 			'campPlayers',
+			'campCompanions',
+			'players',
+			'playerSettings',
+			'npcs',
+			'npcSettings',
 		],
 		data() {
 			return {
 				userId: this.$route.params.userid,
-			}
-		},
-		firebase() {
-			return {
-				players: {
-					source: db.ref(`players/${this.userId}`),
-					asObject: true,
-				},
-				npcs: {
-					source: db.ref(`npcs/${this.userId}`),
-					asObject: true,
-				},
-				playerSettings: {
-					source: db.ref(`settings/${this.userId}/track/player`),
-					asObject: true,
-				},
 			}
 		},
 	}

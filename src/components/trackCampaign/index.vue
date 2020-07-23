@@ -73,6 +73,11 @@
 					:entities_len="Object.keys(_turnCount).length"
 					:turn="turn"
 					:campPlayers="campaign.players"
+					:campCompanions="campaign.companions"
+					:players="players"
+					:npcs="npcs"
+					:playerSettings="playerSettings"
+					:npcSettings="npcSettings"
 				/>
 				<div class="track">
 					<div class="initiative">
@@ -81,10 +86,14 @@
 							:targets="_non_hidden_targets"
 							:allEntities="_turnCount"
 							:turn="turn"
-							:players="players"
 							:campPlayers="campaign.players"
+							:campCompanions="campaign.companions"
+							:players="players"
+							:npcs="npcs"
+							:playerSettings="playerSettings"
+							:npcSettings="npcSettings"
 							@newRoll="pushRoll"
-						/>
+                    />
 					</div>
 					<div class="side">
 						<div class="menu">
@@ -95,8 +104,15 @@
 						</div>
 						<div class="scroll during-encounter" v-bar>
 							<div>
-								<Meters :entities="encounter.entities" :npcs="npcs" :players="players" v-if="sideDisplay === 'damage' && playerSettings.meters === undefined" />
-								<Rolls :entities="encounter.entities" :npcs="npcs" :players="players" :rolls="rolls" v-if="sideDisplay === 'rolls'" />
+								<Meters v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+                                    :entities="encounter.entities" 
+                                    :npcs="npcs" 
+                                    :players="players"  />
+								<Rolls v-if="sideDisplay === 'rolls'"
+                                    :entities="encounter.entities" 
+                                    :npcs="npcs" 
+                                    :players="players" 
+                                    :rolls="rolls"  />
 							</div>
 						</div>
 					</div>

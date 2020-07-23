@@ -168,7 +168,7 @@
 						<b-row>
 							<b-col sm="2"><label for="cr">Challenge rating</label></b-col>
 							<b-col>
-									<b-form-select v-model="npc.challenge_rating">
+									<b-form-select v-model="npc.challenge_rating" class="mb-2" id="cr">
 										<option value="undefined" disabled selected>- Select CR -</option>
 										<option value="0">0</option>
 										<option value="0.125">1/8</option>
@@ -187,7 +187,7 @@
 								<b-form-input autocomplete="off"  
 									v-b-tooltip.hover title="Avatar"
 									type="text" 
-									class="form-control" 
+									class="form-control mb-2" 
 									:class="{'input': true, 'error': errors.has('avatar') }" 
 									v-model="npc.avatar" 
 									v-validate="'url'" 
@@ -196,6 +196,14 @@
 									id="avatar"
 									placeholder="Image URL"></b-form-input>
 								<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+							</b-col>
+						</b-row>
+
+						<!-- FRIENDLY NPC -->
+						<b-row>
+							<b-col sm="2"><label for >Friendly NPC</label></b-col>
+							<b-col>
+								<b-form-checkbox v-model="npc.friendly" class="mt-1 mb-2" id="friendly"><em>Add as friendly</em></b-form-checkbox>
 							</b-col>
 						</b-row>
 					</b-col>
@@ -581,8 +589,8 @@
 			}
 		},
 		mounted() {
-			var npcs = db.ref(`monsters`);
-			npcs.on('value', async (snapshot) => {
+			var npcs_ref = db.ref(`monsters`);
+			npcs_ref.on('value', async (snapshot) => {
 				let npcs = snapshot.val();
 
 				let custom = db.ref(`npcs/${this.userId}`);

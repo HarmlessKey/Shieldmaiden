@@ -16,7 +16,7 @@
 					<template>
 						<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
 							<icon 
-								v-if="displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'monster' || displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) === 'player'" class="img" 
+								v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img" 
 								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
 								:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
 							/>
@@ -59,7 +59,6 @@
 
 <script>
 	import _ from 'lodash';
-	import { db } from '@/firebase';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
 	export default {

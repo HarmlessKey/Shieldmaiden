@@ -367,7 +367,6 @@ export const content_module = {
 			commit("TOGGLE_SIDE_COLLAPSE");
 			
 			let collapsed = state.side_collapsed;
-			console.log(collapsed);
 			if (collapsed === false){
 				collapsed_ref.remove();
 			}

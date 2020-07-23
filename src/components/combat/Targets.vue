@@ -320,7 +320,20 @@
 				this.key = undefined;
 			},
 			edit(key, entity, entityType) {
-				var editType = (entityType === 'player') ? 'slides/EditPlayer' : 'slides/encounter/EditNpc';
+				let editType = undefined;
+				switch(entityType) {
+					case 'player':
+						editType = 'slides/EditPlayer';
+						break;
+					case 'companion':
+						editType = 'slides/encounter/EditCompanion';
+						break;
+					case 'npc':
+						editType = 'slides/encounter/EditNpc';
+						break;
+				}
+
+				console.log(editType);
 
 				if(key) {
 					this.setSlide({

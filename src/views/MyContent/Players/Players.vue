@@ -192,7 +192,6 @@
 				});
 			},
 			deletePlayer(key, player) {
-				console.log(player);
 				//Remove from character control
 				if(player.control) {
 					db.ref(`character_control/${player.control}`).child(key).remove(); 

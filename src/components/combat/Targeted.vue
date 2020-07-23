@@ -285,9 +285,6 @@
 						editType = 'slides/encounter/EditNpc';
 						break;
 				}
-				// var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/encounter/EditNpc';
-
-				console.log(editType);
 
 				event.stopPropagation();
 				this.setSlide({

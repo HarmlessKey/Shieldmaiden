@@ -187,7 +187,6 @@
 					}
 				}
 				// Remove NPC as companion from players
-				console.log(this.players)
 				for (let playerKey in this.players) {
 					for (let companionKey in this.players[playerKey].companions) {
 						if (companionKey === key) {

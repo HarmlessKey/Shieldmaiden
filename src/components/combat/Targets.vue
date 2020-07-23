@@ -333,8 +333,6 @@
 						break;
 				}
 
-				console.log(editType);
-
 				if(key) {
 					this.setSlide({
 						show: true,

@@ -666,7 +666,7 @@ const mutations = {
 					if(state.entities[key].entityType == 'companion') {
 						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).remove();
 					}
-					 else {
+					else {
 						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
 					}
 				}
@@ -696,10 +696,10 @@ const mutations = {
 				state.entities[key].transformed = false; //Update store
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
-				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
 					}
 					if(state.entities[key].entityType == 'companion') {
-				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
 					}
 					else {
 						encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
@@ -710,10 +710,10 @@ const mutations = {
 				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
-				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(newHp);
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(newHp);
 					}
 					if(state.entities[key].entityType == 'companion') {
-				 		campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(newHp);
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(newHp);
 					}
 					else {
 						encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(newHp);

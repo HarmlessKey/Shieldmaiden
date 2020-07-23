@@ -407,7 +407,7 @@
 						noPadding: true,
 						right: true,
 						maxContent: true
-        	}
+					}
 				}
 			}
 		},

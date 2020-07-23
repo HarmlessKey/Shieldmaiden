@@ -73,7 +73,7 @@ export const setHP = {
 
 			//First check if there is tempHp and put damage in there first.
 			if(tempHp) {
-				var newtemp = parseInt(tempHp - amount);
+				let newTemp = parseInt(tempHp - amount);
 
 				//Adjust the rest amount
 				rest_amount = (newTemp < 0) ? -newTemp : 0;
@@ -82,7 +82,7 @@ export const setHP = {
 				this.set_hp({
 					key: target.key,
 					pool: 'temp',
-					newHp: newtemp,
+					newHp: newTemp,
 				});
 			}
 			//Then check if the target is transformed and put rest damage in the transformation

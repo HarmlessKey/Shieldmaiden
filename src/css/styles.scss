@@ -1509,7 +1509,7 @@ input[type='number'] {
 	.el-input__inner {
 			background-color: $gray-dark;
 			border-radius: 0;
-			border: none;
+			border-color: $gray-hover;
 	}
 }
 
@@ -1529,9 +1529,42 @@ input[type='number'] {
 		}
 	}
 }
-
 .el-select-dropdown {
+	border-radius: 0 !important;
+	background-color: $gray  !important;
+	border-color: $gray !important;
 
+	&__item {
+		color: $gray-light !important;
+
+		&.hover, &:hover, &.selected {
+			background-color: $gray-hover !important;
+		}
+		&.selected {
+			background-color: $gray-active !important;
+			
+			&:hover, &.hover {
+				background-color: $gray-hover !important;
+			}
+			&::after {
+				color: $blue !important;
+			}
+		}
+	}
+}
+.el-popper[x-placement^=top] .popper__arrow {
+	border-top-color: $gray !important;
+
+	&::after {
+		border-top-color: $gray !important;
+	}
+}
+.el-popper[x-placement^=bottom] .popper__arrow {
+	border-bottom-color: $gray !important;
+
+	&::after {
+		border-bottom-color: $gray !important;
+	}
 }
 
 .el-switch {

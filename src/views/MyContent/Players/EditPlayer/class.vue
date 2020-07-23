@@ -1,6 +1,5 @@
 <template>
 	<div>
-		
 		<!-- MAIN CLASS -->
 		<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
 			<div>
@@ -56,6 +55,95 @@
 						type="number" 
 						v-model="subclass.base_armor_class" 
 						placeholder="Base Armor Class"/>
+				</div>
+
+				<div v-if="classKey === 'main'" class="proficiencies">
+					<h3>Proficiencies</h3>
+					<div class="form-item mb-3">
+						<label for="armor">Armor</label>
+						<div>
+							<el-select
+								id="armor"
+								:value="proficiencies[classKey].armor"
+								@change="setProficiencies($event, classKey, 'armor')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Armor">
+								<el-option
+									v-for="item in armor_types"
+									:key="item.value"
+									:label="item.label"
+									:value="item.value">
+								</el-option>
+							</el-select>
+						</div>
+					</div>
+					<div class="form-item mb-3">
+						<label for="weapon">Weapons</label>
+						<div>
+							<el-select 
+								id="weapon"
+								:value="proficiencies[classKey].weapon"
+								@change="setProficiencies($event, classKey, 'weapon')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Weapons">
+								<el-option-group
+									v-for="group in weaponList"
+									:key="group.category"
+									:label="group.category">
+									<el-option
+										v-for="item in group.weapons"
+										:key="item.value"
+										:label="item.label"
+										:value="item.value">
+									</el-option>
+								</el-option-group>
+							</el-select>
+						</div>
+					</div>
+					<div class="form-item mb-3">
+						<label for="skill">Skills</label>
+						<div>
+							<el-select
+								id="skill"
+								:value="proficiencies[classKey].skill"
+								@change="setProficiencies($event, classKey, 'skill')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Skills">
+								<el-option
+									v-for="(item, key) in skillList"
+									:key="key"
+									:label="item.skill"
+									:value="key">
+								</el-option>
+							</el-select>
+						</div>
+					</div>
+					<div class="form-item mb-3" v-if="classKey === 'main'">
+						<label for="saving">Saving throws</label>
+						<div>
+							<el-select
+								id="saving"
+								:value="proficiencies[classKey].saving_throw"
+								@change="setProficiencies($event, classKey, 'saving_throw')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Saving throws">
+								<el-option
+									v-for="{value, label} in abilities"
+									:key="value"
+									:label="label"
+									:value="value">
+								</el-option>
+							</el-select>
+						</div>
+					</div>
 				</div>
 				
 				<!-- CLASS FEATURES -->
@@ -162,12 +250,15 @@
 	import VueMarkdown from 'vue-markdown';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { modifierMixin } from '@/mixins/modifiers.js';
+	import { abilities } from '@/mixins/abilities.js';
+	import { weapons } from '@/mixins/weapons.js';
+	import { skills } from '@/mixins/skills.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 
 	export default {
 		name: 'CharacterRace',
-		mixins: [modifierMixin],
+		mixins: [modifierMixin, abilities, weapons, skills],
 		props: [
 			"base_class",
 			"hit_point_type",
@@ -189,6 +280,12 @@
 					{ value: "8", text: "d8" },
 					{ value: "10", text: "d10" },
 					{ value: "12", text: "d12" },
+				],
+				armor_types: [
+					{ value: "light", label: "Light armor" },
+					{ value: "medium", label: "Medium armor" },
+					{ value: "heavy", label: "Heavy armor" },
+					{ value: "shield", label: "Shield" }
 				],
 				modifier: {},
 				columns: {
@@ -221,6 +318,24 @@
 			},
 			classes() {
 				return (this.base_class) ? this.base_class.classes : {};
+			},
+			proficiencies() {
+				let returnModifiers = {};
+				const types = ["armor", "weapon", "skill", "saving_throw"];
+		
+				for(const classKey in this.classes) {
+					returnModifiers[classKey] = {};
+
+					for(const type of types) {
+						returnModifiers[classKey][type] = this.modifiers.filter(mod => {
+							const origin = mod.origin.split(".");
+							return origin[1] === classKey && origin[2] === "proficiencies" && origin[3] === type;
+						}).map(obj => {
+							return obj.subtarget;
+						});
+					}
+				}
+				return returnModifiers;
 			}
 		},
 		methods: {
@@ -230,6 +345,35 @@
 					return origin[1] === classKey && origin[2] == level && origin[3] === key;
 				});
 				return modifiers;
+			},
+			setProficiencies(newVal, classKey, type) {
+				const current = this.proficiencies[classKey][type];
+
+				//Remove
+				for(const prof of current) {
+					if(!newVal.includes(prof)) {
+						//Get the key of the proficiency that needs to be removed
+						const key = this.modifiers.filter(mod => {
+							const origin = mod.origin.split(".");
+							return origin[1] === classKey && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
+						}).map(obj => {
+							return obj['.key'];
+						});
+						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
+					}
+				}
+				//Add
+				for(const prof of newVal) {
+					if(!current.includes(prof)) {
+						const newModifier = {
+							origin: `class.${classKey}.proficiencies.${type}`,
+							type: "proficiency",
+							target: type,
+							subtarget: prof
+						}
+						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
+					}
+				}
 			},
 			saveClassName(key) {
 				const value = this.classes[key].name;

@@ -30,8 +30,12 @@
 
 		<!-- ABILITES -->
 		<div class="form-item mb-3" v-if="modifier.target === 'ability'">
-			<label for="type">Ability</label>
-			<b-form-select v-model="modifier.subtarget" :options="abilities" />
+			<label for="ability">Ability</label>
+			<select class="form-control" v-model="modifier.subtarget" name="ability">
+				<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
+					{{ label }}
+				</option>
+			</select>
 		</div>
 
 		<!-- SKILLS -->
@@ -59,8 +63,12 @@
 
 		<!-- ABILITES -->
 		<div class="form-item mb-3" v-if="modifier.type === 'ability'">
-			<label for="type">Ability modifier</label>
-			<b-form-select v-model="modifier.ability_modifier" :options="abilities" />
+			<label for="ability_modifier">Ability modifier</label>
+			<select class="form-control" v-model="modifier.ability_modifier" name="ability_modifier">
+				<option v-for="{value, label} in abilities" :key="`modifier-${value}`" :value="value">
+					{{ label }}
+				</option>
+			</select>
 		</div>
 	</div>
 </template>

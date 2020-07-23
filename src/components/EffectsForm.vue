@@ -207,8 +207,8 @@
 					<option :value="undefined" disabled>- Ability -</option>
 					<option value="all">All</option>
 					<option value="choose">Choose</option>
-					<option v-for="ability in abilities"
-						:key="ability" :value="ability">{{ ability.capitalize() }}</option>
+					<option v-for="{value, label} in abilities"
+						:key="value" :value="value">{{ label }}</option>
 				</b-form-select>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
 			</b-col>

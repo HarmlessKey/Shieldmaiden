@@ -37,6 +37,13 @@
 				:userId="userId"
 				:modifiers="class_modifiers"
 			/>
+			<Abilities
+				v-if="current_tab === 'abilities'"
+				:base_abilities="base_values.abilities"
+				:playerId="playerId"
+				:userId="userId"
+				:modifiers="ability_modifiers"
+			/>
 		</div>
 	</div>
 </template>
@@ -49,6 +56,7 @@
 	import General from './general';
 	import Race from './race';
 	import Class from './class';
+	import Abilities from './abilities';
 
 	export default {
 		name: 'Players',
@@ -59,7 +67,8 @@
 			OverEncumbered,
 			General,
 			Race,
-			Class
+			Class,
+			Abilities
 		},
 		data() {
 			return {
@@ -67,7 +76,8 @@
 				tabs: [
 					{ value: 'general', label: "General" },
 					{ value: 'race', label: "Race" },
-					{ value: 'class', label: "Class" }
+					{ value: 'class', label: "Class" },
+					{ value: 'abilities', label: "Abilities" }
 				],
 				current_tab: 'general'
 			}
@@ -129,7 +139,13 @@
 					return origin[0] === 'class';
 				});
 				return modifiers;
-			}
+			},
+			ability_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'ability';
+				});
+				return modifiers;
+			},
 		},
 		methods: {
 			...mapActions([

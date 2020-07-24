@@ -47,9 +47,7 @@
 							<span class="val">
 								{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
 							</span>
-							<a class="mx-1" 
-								@click="rollHitPoints(classKey)" 
-								v-b-tooltip.hover title="Roll Hit Points">
+							<a class="mx-1" @click="rollHitPoints(classKey)">
 								<i class="fas fa-pencil"></i>
 							</a>
 						</div>
@@ -257,9 +255,7 @@
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[rollHP].name}`">
-      <div>
-				<template v-for="level in classes[rollHP].level">
-					<div v-if="level > 1" :key="`roll-${level}`" class="roll_hp">
+					<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp">
 					<label :for="`level-${level}`">Level {{ level }}</label>
 					<b-form-input 
 						@change="setRolledHP(rollHP, level)"
@@ -269,15 +265,13 @@
 						v-model="classes[rollHP].rolled_hit_points[level]" 
 					/>
 					<a 
-						v-if="!classes[rollHP].rolled_hit_points[level]"
+						:class="{ hidden: classes[rollHP].rolled_hit_points[level] }"
 						class="btn"
 						@click="rollHitDice(rollHP, level)"
 					>
 						Roll
 					</a>
-					</div>
-				</template>
-      </div>
+					</div>      
     </b-modal>
 	</div>
 </template>
@@ -294,7 +288,7 @@
 	import { dice } from '@/mixins/dice.js';
 
 	export default {
-		name: 'CharacterRace',
+		name: 'CharacterClass',
 		mixins: [modifierMixin, abilities, weapons, skills, dice],
 		props: [
 			"base_class",
@@ -374,6 +368,14 @@
 					}
 				}
 				return returnModifiers;
+			},
+			reversedLevels() {
+				let levelArray = [];
+
+				for(let i = 2; i <= this.classes[this.rollHP].level; i++) {
+					levelArray.push(i);
+				}
+				return levelArray.reverse();
 			}
 		},
 		methods: {
@@ -387,7 +389,7 @@
 			totalRolled(classKey) {
 				let totalRolled = 0;
 				for(const [key, value] of Object.entries(this.classes[classKey].rolled_hit_points)) {
-					if(this.classes[classKey].level >= key) {
+					if(this.classes[classKey].level >= key && value) {
 						totalRolled = totalRolled + parseInt(value);
 					}
 				}
@@ -503,10 +505,15 @@
 		}
 	}
 	.roll_hp {
+		width: 100%;
 		display: grid;
 		grid-template-columns: 60px 60px max-content;
 		margin-bottom: 5px;
 		grid-column-gap: 10px;
+		grid-template-areas: 
+		"label input button";
+		justify-content: center;
+		align-content: center;
 
 		label {
 			line-height: 38px;
@@ -515,6 +522,9 @@
 		.form-control {
 			text-align: center;
 		}
+	}
+	.hidden {
+		visibility: hidden;
 	}
 	h4.feature-title {
 		display: flex;

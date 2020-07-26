@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="pb-5">
 		<!-- MAIN CLASS -->
 		<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
 			<div>
@@ -157,7 +157,26 @@
 				<!-- CLASS FEATURES -->
 				<h3>{{ subclass.name || "Class" }} features</h3>
 				<template v-for="level in 20" >
-					<div :key="`features-${level}`" v-if="subclass.level >= level">
+					<div :key="`features-${level}`" v-if="[4, 8, 12, 16, 19].includes(level) && subclass.level >= level">
+						<h4 class="feature-title">Level {{ level }}</h4>
+						<div role="tablist" class="mb-3">
+							<b-card no-body>
+								<b-card-header role="tab">
+									Ability Score Improvement / Feat
+									<div class="actions">
+										<a v-b-toggle="`accordion-${level}`"><i class="fas fa-pencil-alt"/></a>
+									</div>
+								</b-card-header>
+								<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
+									<b-card-body>
+										<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can’t increase an ability score above 20 using this feature.</p>
+										<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead.</p>
+									</b-card-body>
+								</b-collapse>
+							</b-card>
+						</div>
+					</div>
+					<div :key="`features-${level}`" v-else-if="subclass.level >= level">
 						<h4 class="feature-title">
 							Level {{ level }}
 							<a @click="addFeature(classKey, level)">Add feature</a>
@@ -555,6 +574,7 @@
 				
 				a {
 					margin-left: 10px;
+					color: #b2b2b2;
 				}
 			}
 		}

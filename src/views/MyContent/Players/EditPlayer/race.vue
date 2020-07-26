@@ -32,8 +32,10 @@
 			/>
 		</div>
 
-		<h3>Race Modifiers</h3>
-		<a @click="newModifier('race')">New Modifier</a>
+		<h3 class="title">
+			Race Modifiers
+			<a @click="newModifier('race')">Add Modifier</a>
+		</h3>
 
 		<hk-table
 			:columns="columns"
@@ -62,6 +64,68 @@
 				</div>
 		</hk-table>
 
+		<!-- FEATS -->
+		<h3 class="title mt-4">
+			Feats
+			<a @click="addFeat()">Add feat</a>
+		</h3>
+		<div role="tablist" class="mb-3">
+			<b-card no-body v-for="(feat, index) in feats" :key="`feat-${feat['.key']}`">
+				<b-card-header role="tab">
+					{{ feat.name }}
+					<div class="actions">
+						<a v-b-toggle="`accordion-${index}`"><i class="fas fa-pencil-alt"/></a>
+					</div>
+				</b-card-header>
+				<b-collapse :id="`accordion-${index}`" accordion="my-accordion" role="tabpanel">
+					<b-card-body>
+						<div class="form-item mb-3">
+							<label :for="`name-${index}`">Name</label>
+							<b-form-input 
+								@change="editFeat(feat['.key'], index, 'name')"
+								autocomplete="off"
+								:id="`name-${index}`"
+								type="text"
+								v-model="feats[index].name"
+								placeholder="Feat"/>
+						</div>
+
+						<!-- Modifiers -->
+						<h3 class="title">
+							Modifiers
+							<a @click="newModifier(`feat.${feat['.key']}`)">Add Modifier</a>
+						</h3>
+						<hk-table
+							:columns="columns"
+							:items="modifiers_feat(feat['.key'])"
+						>
+							<template slot="target" slot-scope="data">
+								{{ data.row.subtarget || data.item.capitalize() }}
+							</template>
+							<template slot="value" slot-scope="data">
+								<template v-if="data.item">{{ data.item }}</template>
+								<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
+								<template v-else-if="data.row.type === 'expertise'">Expertise</template>
+							</template>
+							<div slot="actions" slot-scope="data" class="actions">
+									<a class="gray-hover mx-1" 
+										@click="editModifier(data.row)" 
+										v-b-tooltip.hover title="Edit">
+										<i class="fas fa-pencil"></i>
+									</a>
+									<a v-b-tooltip.hover 
+										title="Delete" 
+										class="gray-hover"
+										@click="deleteModifier(data.row['.key'])">
+											<i class="fas fa-trash-alt"></i>
+									</a>
+								</div>
+						</hk-table>
+					</b-card-body>
+				</b-collapse>
+			</b-card>
+		</div>
+
 		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
       <Modifier v-model="modifier" />
 			<template slot="modal-footer">
@@ -85,6 +149,8 @@
 		props: [
 			"character_race",
 			"modifiers",
+			"feat_modifiers",
+			"feats",
 			"playerId", 
 			"userId"
 		],
@@ -122,6 +188,14 @@
 			}
 		},
 		methods: {
+			modifiers_feat(key) {
+				const modifiers = this.feat_modifiers.filter(mod => {
+					const origin = mod.origin.split(".");
+					console.log(origin[1])
+					return origin[1] === key;
+				});
+				return modifiers;
+			},
 			saveRaceName() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_name`).set(this.race.race_name);
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/race`).set(this.race.race_name);
@@ -133,11 +207,46 @@
 			saveRaceDescription() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_description`).set(this.race.race_description);
 				this.$emit("change", "race.description");
+			},
+			addFeat() {
+				const feat = { name: "New Feat", origin: "race" }
+				db.ref(`characters_base/${this.userId}/${this.playerId}/feats`).push(feat);
+			},
+			editFeat(key, index, property) {
+				const value = this.feats[index][property];
+				db.ref(`characters_base/${this.userId}/${this.playerId}/feats/${key}/${property}`).set(value);
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.hk-table {
+		margin-bottom: 30px;
+	}
+	h3.title {
+		display: flex;
+		justify-content: space-between;
+		padding-bottom: 5px;
+		margin-bottom: 1px;
+		border-bottom: solid 1px #5c5757;
+	}
+	.card {
+		.card-header {
+			text-transform: none !important;
+			display: flex;
+			justify-content: space-between;
 
+			.actions {
+				display: flex;
+				justify-content: flex-end;
+				
+				a {
+					margin-left: 10px;
+					color: #b2b2b2;
+				}
+			}
+		}
+		margin-bottom: 1px !important;
+	}
 </style>

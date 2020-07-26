@@ -53,7 +53,7 @@ export const setHP = {
 			var rest_amount = amount;
 
 			//Death saves at 0 hp, if automate is on
-			if(curHp == 0 && this.settings.automate !== false && target.entityType === 'player') {
+			if(curHp == 0 && this.settings.automate !== false && (target.entityType === 'player' || target.entityType === 'companion')) {
 				var n = parseInt(Object.keys(target.saves).length)
 				this.set_save({
 					key: target.key,
@@ -73,36 +73,30 @@ export const setHP = {
 
 			//First check if there is tempHp and put damage in there first.
 			if(tempHp) {
-				var newtemp = parseInt(tempHp - amount);
+				let newTemp = parseInt(tempHp - amount);
 
 				//Adjust the rest amount
-				rest_amount = 0;
-				if(newtemp <= 0) {
-					rest_amount = parseInt(amount - tempHp);
-				}
+				rest_amount = (newTemp < 0) ? -newTemp : 0;
 
 				//Set the new HP
 				this.set_hp({
 					key: target.key,
 					pool: 'temp',
-					newHp: newtemp,
+					newHp: newTemp,
 				});
 			}
 			//Then check if the target is transformed and put rest damage in the transformation
 			if(target.transformed == true) {
-				var newtrans = parseInt(transCurHp - rest_amount);
+				var newTrans = parseInt(transCurHp - rest_amount);
 
 				//Adjust the rest amount
-				rest_amount = 0;
-				if(newtrans <= 0) {
-					rest_amount = parseInt(amount - transCurHp);
-				}
+				rest_amount = (newTrans < 0) ? -newTrans : 0
 
 				//Set the new HP
 				this.set_hp({
 					key: target.key,
 					pool: 'transformed',
-					newHp: newtrans,
+					newHp: newTrans,
 				});
 			}
 			//If there is damage left after taking it from the tempHp and/or the transformation
@@ -129,7 +123,7 @@ export const setHP = {
 						amount = curHp;
 					}
 					//Character dies if the overkill is >= maxHp
-					if(over >= maxHp && target.entityType == 'player') {
+					if(over >= maxHp && (target.entityType === 'player' || target.entityType === 'companion')) {
 						this.set_dead({
 							key: target.key,
 							action: 'set',
@@ -178,13 +172,11 @@ export const setHP = {
 					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
 					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Over damage taken
 	
-					if(current.entityType == 'player') {
-						this.damageMeters(current.key, 'damage', amount); //Damage done
-						this.damageMeters(current.key, 'overkill', over); //Over damage done
-					}
-					if(target.entityType == 'player') {
-						this.damageMeters(target.key, 'damageTaken', amount); //damage taken
-						this.damageMeters(target.key, 'overkillTaken', over); //Over damage taken
+					if(current.entityType === 'player' || current.entityType === 'companion') {
+						this.damageMeters(current.key, 'damage', amount, current.entityType); //Damage done
+						this.damageMeters(current.key, 'overkill', over, current.entityType); //Over damage done
+						this.damageMeters(target.key, 'damageTaken', amount, current.entityType); //damage taken
+						this.damageMeters(target.key, 'overkillTaken', over, current.entityType); //Over damage taken
 					}
 				} 
 				//To undo, run same function with opposite types 
@@ -194,13 +186,11 @@ export const setHP = {
 					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Undo damage taken
 					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Undo Over damage taken
 	
-					if(current.entityType == 'player') {
-						this.damageMeters(current.key, 'healing', amount); //Undo Damage done
-						this.damageMeters(current.key, 'overhealing', over); //Undo Over damage done
-					}
-					if(target.entityType == 'player') {
-						this.damageMeters(target.key, 'healingTaken', amount); //Undo damage taken
-						this.damageMeters(target.key, 'overhealingTaken', over); //Undo Over damage taken
+					if(current.entityType === 'player' || current.entityType === 'companion') {
+						this.damageMeters(current.key, 'healing', amount, current.entityType); //Undo Damage done
+						this.damageMeters(current.key, 'overhealing', over, current.entityType); //Undo Over damage done
+						this.damageMeters(target.key, 'healingTaken', amount, current.entityType); //Undo damage taken
+						this.damageMeters(target.key, 'overhealingTaken', over, current.entityType); //Undo Over damage taken
 					}
 				}
 			}
@@ -221,7 +211,7 @@ export const setHP = {
 			var over = 0
 
 			//If the target is a player and the curHp was 0, saves need to be reset
-			if(target.entityType === 'player' && curHp === 0) {
+			if((target.entityType === 'player' || target.entityType === 'companion') && curHp === 0) {
 				this.set_save({
 					key: target.key,
 					check: 'reset'
@@ -276,13 +266,11 @@ export const setHP = {
 					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
 					this.set_meters({key: target.key, type: 'overhealingTaken', amount: over}) //Over healing taken
 
-					if(current.entityType == 'player') {
-						this.damageMeters(current.key, 'healing', amount); //Healing done
-						this.damageMeters(current.key, 'overhealing', over); //Over healing done
-					}
-					if(target.entityType == 'player') {
-						this.damageMeters(target.key, 'healingTaken', amount); //Healing taken
-						this.damageMeters(target.key, 'overhealingTaken', over); //Over healing taken
+					if((current.entityType === 'player' || current.entityType === 'companion')) {
+						this.damageMeters(current.key, 'healing', amount, current.entityType); //Healing done
+						this.damageMeters(current.key, 'overhealing', over, current.entityType); //Over healing done
+						this.damageMeters(target.key, 'healingTaken', amount, current.entityType); //Healing taken
+						this.damageMeters(target.key, 'overhealingTaken', over, current.entityType); //Over healing taken
 					}
 				}
 				//To undo, run same function with opposite types 
@@ -292,13 +280,11 @@ export const setHP = {
 					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Undo Healing taken
 					this.set_meters({key: target.key, type: 'overkillTaken', amount: over}) //Undo Over Healing taken
 
-					if(current.entityType == 'player') {
-						this.damageMeters(current.key, 'damage', amount); //Undo Healing done
-						this.damageMeters(current.key, 'overkill', over); //Undo Over healing done
-					}
-					if(target.entityType == 'player') {
-						this.damageMeters(target.key, 'damageTaken', amount); //Undo Healing taken
-						this.damageMeters(target.key, 'overkillTaken', over); //Undo overhealing taken
+					if((current.entityType === 'player' || current.entityType === 'companion')) {
+						this.damageMeters(current.key, 'damage', amount, current.entityType); //Undo Healing done
+						this.damageMeters(current.key, 'overkill', over, current.entityType); //Undo Over healing done
+						this.damageMeters(target.key, 'damageTaken', amount, current.entityType); //Undo Healing taken
+						this.damageMeters(target.key, 'overkillTaken', over, current.entityType); //Undo overhealing taken
 					}
 				}
 			}
@@ -332,9 +318,10 @@ export const setHP = {
 				value: newLog
 			})
 		},
-		async damageMeters(playerKey, type, amount) {
+		async damageMeters(key, type, amount, entityType) {
+			let db_name = entityType + 's';
 			//Get the current healing done/taken
-			let targetMeters = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/meters/${type}`);
+			let targetMeters = db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`);
 			let currentAmount = await targetMeters.once('value').then(function(snapshot) {
 				return snapshot.val()
 			})
@@ -342,7 +329,7 @@ export const setHP = {
 			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
 			//Set the new amount
-			db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${playerKey}/meters/${type}`).set(newAmount);
+			db.ref(`campaigns/${this.userId}/${this.campaignId}/${db_name}/${key}/meters/${type}`).set(newAmount);
 		}
 	}
 }

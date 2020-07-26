@@ -1,7 +1,7 @@
 <template>
 	<div v-if="current">
 		<p v-if="targeted.length === 0">No target selected</p>
-		<template v-else-if="current.entityType === 'npc'">
+		<template v-else-if="current.entityType === 'npc' || 'companion'">
 			<p v-if="targeted.length === 1">
 				<i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
 				<i class="fas fa-shield gray-hover"></i> Armor Class: 

@@ -54,7 +54,7 @@
 			...mapActions([
 				'fetchEncounter'
 			]),
-            edit() {
+      edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).update(

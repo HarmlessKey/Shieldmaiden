@@ -61,19 +61,24 @@
 				</el-switch>
 			</div>
 		</div>
-		<div class="form-item mb-3">
-			<label for="avatar" class="required">Hit point type</label>
+		<div class="form-item mb-3 avatar">
 			<div>
-				<el-switch
-					@change="saveHpType()"
-					v-model="character.hit_point_type"
-					active-color="#2c97de"
-					inactive-color="#2c97de"
-					active-value="rolled"
-					active-text="Rolled"
-					inactive-value="fixed"
-					inactive-text="Fixed">
-				</el-switch>
+
+			</div>
+			<div>
+				<label for="avatar" class="required">Hit point type</label>
+				<div>
+					<el-switch
+						@change="saveHpType()"
+						v-model="character.hit_point_type"
+						active-color="#2c97de"
+						inactive-color="#2c97de"
+						active-value="rolled"
+						active-text="Rolled"
+						inactive-value="fixed"
+						inactive-text="Fixed">
+					</el-switch>
+				</div>
 			</div>
 		</div>
 		<b-card header="Give out control">
@@ -128,8 +133,10 @@
 			},
 			saveAdvancement() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/advancement`).set(this.character.advancement);
+				this.$emit("change", "general.advancement");
 			},
 			saveHpType() {
+				//Make sure the rolled HP object exists when type is rolled
 				if(this.character.hit_point_type === "rolled") {
 					for(const classKey in this.classes) {
 						const Class = this.classes[classKey];
@@ -139,11 +146,16 @@
 					}
 				}
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/hit_point_type`).set(this.character.hit_point_type);
+				this.$emit("change", "general.advancementhit_point_type");
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-
+	.avatar {
+		display: grid;
+		grid-template-rows: 80px 1fr;
+		grid-column-gap: 20px;
+	}
 </style>

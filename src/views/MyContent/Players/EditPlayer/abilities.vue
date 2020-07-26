@@ -8,7 +8,7 @@
 					:id="value" 
 					@change="saveAbility(value)"
 					autocomplete="off"  
-					type="text"
+					type="number"
 					v-model="ability_scores[value]"
 				/>
 			</div>
@@ -48,7 +48,9 @@
 		},
 		methods: {
 			saveAbility(ability) {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/abilities/${ability}`).set(this.ability_scores[ability]);
+				const score = (this.ability_scores[ability]) ? parseInt(this.ability_scores[ability]) : 0;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/abilities/${ability}`).set(score);
+				this.$emit("change", `abilities.${ability}`);
 			}
 		}
 	}

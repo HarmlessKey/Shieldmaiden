@@ -19,6 +19,17 @@ export const dice = {
 			});
 		}
 	},
+	computed: {
+		dice_types() {		
+			return [
+				{ value: 4, text: "d4", average: this.calcAverage(4) },
+				{ value: 6, text: "d6", average: this.calcAverage(6) },
+				{ value: 8, text: "d8", average: this.calcAverage(8) },
+				{ value: 10, text: "d10", average: this.calcAverage(10) },
+				{ value: 12, text: "d12", average: this.calcAverage(12) },
+			];
+		} 
+	},
 	methods: {
 		rollD(d=20, n=1, m=0, notify=false) {
 			m = parseInt(m); //Removes + from modifier
@@ -73,5 +84,8 @@ export const dice = {
 		rollD100(n=1,m=0) {
 			return this.rollD(100,n,m)
 		},
+		calcAverage(value, amount = 1) {
+			return Math.ceil(((value + 1)/2)*amount);
+		}
 	}
 }

@@ -124,6 +124,7 @@
 		methods: {
 			saveRaceName() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_name`).set(this.race.race_name);
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/race`).set(this.race.race_name);
 			},
 			saveRaceSpeed() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/walking_speed`).set(this.race.walking_speed);

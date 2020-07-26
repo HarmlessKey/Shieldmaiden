@@ -15,12 +15,14 @@
 			</li>
 		</ul>
 		<div class="tab-content" v-if="base_values.class">
+			<pre>{{ computed_values }}</pre>
 			<General 
 				v-if="current_tab === 'general'"
 				:general="base_values.general" 
 				:classes="base_values.class.classes"
 				:playerId="playerId" 
-				:userId="userId" 
+				:userId="userId"
+				@change="compute"
 			/>
 			<Race
 				v-if="current_tab === 'race'"
@@ -28,6 +30,7 @@
 				:playerId="playerId" 
 				:userId="userId"
 				:modifiers="race_modifiers"
+				@change="compute"
 			/>
 			<Class
 				v-if="current_tab === 'class'"
@@ -36,6 +39,7 @@
 				:playerId="playerId"
 				:userId="userId"
 				:modifiers="class_modifiers"
+				@change="compute"
 			/>
 			<Abilities
 				v-if="current_tab === 'abilities'"
@@ -43,6 +47,7 @@
 				:playerId="playerId"
 				:userId="userId"
 				:modifiers="ability_modifiers"
+				@change="compute"
 			/>
 		</div>
 	</div>
@@ -51,6 +56,9 @@
 <script>
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
+	import { experience } from '@/mixins/experience.js';
+	import { general } from '@/mixins/general.js';
+	import { dice } from '@/mixins/dice.js';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import General from './general';
@@ -63,6 +71,7 @@
 		metaInfo: {
 			title: 'Character'
 		},
+		mixins: [experience, general, dice],
 		components: {
 			OverEncumbered,
 			General,
@@ -146,6 +155,26 @@
 				});
 				return modifiers;
 			},
+			ac_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'ac';
+				});
+				return modifiers;
+			},
+			speed_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'speed';
+				});
+				return modifiers;
+			},
+		},
+		watch: {
+			base_values: {
+				handler(newValue, oldValue) {
+					console.log('Base values changed')
+				},
+				deep: true,
+			}
 		},
 		methods: {
 			...mapActions([
@@ -156,6 +185,103 @@
 					show: true,
 					type,
 				})
+			},
+			compute(origin) {
+				console.log("change made, compute charachter", origin);
+				origin = origin.split(".");
+
+				const hit_point_type = this.base_values.general.hit_point_type;
+
+				//Ability Scores
+				let ability_scores = { ...this.base_values.abilities };
+
+				//Add Ability Score Modifiers
+				for(const [key, value] of Object.entries(ability_scores)) {
+					for(const modifier of this.ability_modifiers) {
+						if(modifier.subtarget === key && modifier.type === 'bonus') {
+							ability_scores[key] = value + parseInt(modifier.value);
+						}
+					}
+				}
+				//Save Ability Scores
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/abilities`).update(ability_scores);
+
+				/**
+				 * 
+				 * TODO!
+				 * Set Ability Set Score Modifiers
+				 * 
+				 **/
+
+				//Level and HP
+				let computed_level = 0;
+				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
+
+				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
+					const level = value.level;
+					computed_level = computed_level + level;
+					//Save class with level for display
+					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}`).update({ class: value.name, level });
+
+					//Set HP					
+					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
+						let totalRolled = 0;
+						for(const [key, rolled] of Object.entries(value.rolled_hit_points)) {
+							if(value.level >= key && rolled) {
+								totalRolled = totalRolled + parseInt(rolled);
+							}
+						}
+						computed_hp = computed_hp + parseInt(totalRolled);
+					} else if(hit_point_type === 'fixed' && value.hit_dice) {
+						const hit_dice = this.dice_types.filter(die => {
+							return die.value === value.hit_dice;
+						});
+						computed_hp = computed_hp + ((level - 1) * hit_dice[0].average);
+					}
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
+
+				//Add CON modifier * level to computed HP
+				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/hit_points`).set(computed_hp);
+
+				//Set proficiency bonus
+				const proficiency = this.xpTable[computed_level].proficiency;
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
+
+				//Armor Class
+				let armor_class = (this.base_values.class.classes.main.base_armor_class) ? this.base_values.class.classes.main.base_armor_class : 10;
+				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
+
+				//Add AC Modifiers	
+				for(const modifier of this.ac_modifiers) {
+					armor_class = this.addModifier(armor_class, modifier, proficiency, ability_scores);
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/armor_class`).set(armor_class);
+
+				//Speed
+				let speed = (this.base_values.race.walking_speed) ? parseInt(this.base_values.race.walking_speed) : 0;
+
+				//Add Speed Modifiers	
+				for(const modifier of this.speed_modifiers) {
+					speed = this.addModifier(speed, modifier, proficiency, ability_scores);
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
+			},
+			addModifier(value, modifier, proficiency, ability_scores) {
+				let newValue = parseInt(value);
+				
+				if(modifier.type === 'bonus') {
+					newValue = newValue + parseInt(modifier.value);
+				}
+				if(modifier.type === 'proficiency') {
+					newValue = newValue + proficiency;
+				}
+				if(modifier.type === 'ability') {
+					newValue = newValue + this.calcMod(ability_scores[modifier.ability_modifier]);
+				}
+
+				return newValue;
 			}
 		}
 	}

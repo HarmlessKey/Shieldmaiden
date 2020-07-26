@@ -39,7 +39,7 @@
 					</div>
 					<div class="form-item mb-3">
 						<label for="hit_dice">Hit dice</label>
-						<b-form-select v-model="subclass.hit_dice" :options="dice" @change="saveHitDice('main')" />
+						<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice('main')" />
 					</div>
 					<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
 						<label>Rolled HP</label>
@@ -305,13 +305,6 @@
 		},
 		data() {
 			return {
-				dice: [
-					{ value: "4", text: "d4" },
-					{ value: "6", text: "d6" },
-					{ value: "8", text: "d8" },
-					{ value: "10", text: "d10" },
-					{ value: "12", text: "d12" },
-				],
 				armor_types: [
 					{ value: "light", label: "Light armor" },
 					{ value: "medium", label: "Medium armor" },
@@ -451,7 +444,7 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
 			},
 			saveBaseHiPoints(key) {
-				const value = this.classes[key].base_hit_points;
+				const value = (this.classes[key].base_hit_points) ? parseInt(this.classes[key].base_hit_points) : 0;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_hit_points`).set(value);
 			},
 			saveHitDice(key) {

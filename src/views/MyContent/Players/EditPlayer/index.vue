@@ -15,7 +15,9 @@
 			</li>
 		</ul>
 		<div class="tab-content" v-if="base_values.class">
-			<pre>{{ computed_values }}</pre>
+			<Computed 
+				:computed="computed_values.display" 
+			/>
 			<General 
 				v-if="current_tab === 'general'"
 				:general="base_values.general" 
@@ -61,6 +63,7 @@
 	import { dice } from '@/mixins/dice.js';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
+	import Computed from './computed';
 	import General from './general';
 	import Race from './race';
 	import Class from './class';
@@ -74,6 +77,7 @@
 		mixins: [experience, general, dice],
 		components: {
 			OverEncumbered,
+			Computed,
 			General,
 			Race,
 			Class,
@@ -167,6 +171,12 @@
 				});
 				return modifiers;
 			},
+			initiative_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'initiative';
+				});
+				return modifiers;
+			}
 		},
 		watch: {
 			base_values: {
@@ -248,6 +258,15 @@
 				//Set proficiency bonus
 				const proficiency = this.xpTable[computed_level].proficiency;
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
+
+				//Initiative
+				let initiative = this.calcMod(ability_scores.dexterity);
+
+				//Add Initiative Modifiers	
+				for(const modifier of this.initiative_modifiers) {
+					initiative = this.addModifier(initiative, modifier, proficiency, ability_scores);
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
 
 				//Armor Class
 				let armor_class = (this.base_values.class.classes.main.base_armor_class) ? this.base_values.class.classes.main.base_armor_class : 10;

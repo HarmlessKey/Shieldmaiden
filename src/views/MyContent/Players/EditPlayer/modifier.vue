@@ -143,6 +143,10 @@
 					{
 						value: "speed",
 						text: "Speed"
+					},
+					{
+						value: "initiative",
+						text: "Initiative"
 					}
 				],
 				modifier_restriction: [

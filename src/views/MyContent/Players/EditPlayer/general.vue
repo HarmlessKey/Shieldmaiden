@@ -31,23 +31,32 @@
 				placeholder="Character name"/>
 			<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
 		</div>
-		<div class="form-item mb-3">
-			<label for="avatar" class="required">Avatar</label>
-			<b-form-input
-				@change="saveAvatar()"
-				autocomplete="off"  
-				id="avatar" 
-				type="text" 
-				:class="{'input': true, 'error': errors.has('avatar') }"
-				v-model="character.avatar"
-				v-validate="'url'"
-				data-vv-as="Avatar"
-				name="avatar"
-				placeholder="Image URL"/>
-			<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+		<div class="form-item mb-3 avatar">
+			<div 
+					class="image"
+					:style="[
+						character.avatar ? { backgroundImage: 'url(\'' + character.avatar + '\')' } : 
+						{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
+					]"
+			/>
+			<div>
+				<label for="avatar" class="required">Avatar</label>
+				<b-form-input
+					@change="saveAvatar()"
+					autocomplete="off"  
+					id="avatar" 
+					type="text" 
+					:class="{'input': true, 'error': errors.has('avatar') }"
+					v-model="character.avatar"
+					v-validate="'url'"
+					data-vv-as="Avatar"
+					name="avatar"
+					placeholder="Image URL"/>
+				<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+			</div>
 		</div>
 		<div class="form-item mb-3">
-			<label for="avatar" class="required">Advancement</label>
+			<label for="advancement" class="required">Advancement</label>
 			<div>
 				<el-switch
 					@change="saveAdvancement()"
@@ -61,24 +70,19 @@
 				</el-switch>
 			</div>
 		</div>
-		<div class="form-item mb-3 avatar">
+		<div class="form-item mb-3">
+			<label for="hit_point_type" class="required">Hit point type</label>
 			<div>
-
-			</div>
-			<div>
-				<label for="avatar" class="required">Hit point type</label>
-				<div>
-					<el-switch
-						@change="saveHpType()"
-						v-model="character.hit_point_type"
-						active-color="#2c97de"
-						inactive-color="#2c97de"
-						active-value="rolled"
-						active-text="Rolled"
-						inactive-value="fixed"
-						inactive-text="Fixed">
-					</el-switch>
-				</div>
+				<el-switch
+					@change="saveHpType()"
+					v-model="character.hit_point_type"
+					active-color="#2c97de"
+					inactive-color="#2c97de"
+					active-value="rolled"
+					active-text="Rolled"
+					inactive-value="fixed"
+					inactive-text="Fixed">
+				</el-switch>
 			</div>
 		</div>
 		<b-card header="Give out control">
@@ -108,8 +112,9 @@
 			}
 		},
 		created() {
-			this.$validator.attach('player_name', 'required|max:30');
-			this.$validator.attach('character_name', 'required|max:35');
+			this.$validator.attach({ name:'player_name', rules: 'required|max:30' });
+			this.$validator.attach({ name:'character_name', rules: 'required|max:35' });
+			this.$validator.attach({ name:'avatar', rules: 'url' });
 		},
 		methods: {
 			savePlayerName() {
@@ -128,8 +133,12 @@
 				});
 			},
 			saveAvatar() {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/general/avatar`).set(this.character.avatar);
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/avatar`).set(this.character.avatar);
+				this.$validator.validate('avatar', this.character.avatar).then((result) => {
+					if(result) {
+						db.ref(`characters_base/${this.userId}/${this.playerId}/general/avatar`).set(this.character.avatar);
+						db.ref(`characters_computed/${this.userId}/${this.playerId}/display/avatar`).set(this.character.avatar);
+					}
+				});
 			},
 			saveAdvancement() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/advancement`).set(this.character.advancement);
@@ -155,7 +164,16 @@
 <style lang="scss" scoped>
 	.avatar {
 		display: grid;
-		grid-template-rows: 80px 1fr;
-		grid-column-gap: 20px;
+		grid-template-columns: 68px 1fr;
+		grid-column-gap: 15px;
+
+		.image {
+			width: 68px;
+			height: 68px;
+			border: solid 1px #5c5757;
+			background-position: center top;
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
 	}
 </style>

@@ -255,23 +255,23 @@
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[rollHP].name}`">
-					<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp">
-					<label :for="`level-${level}`">Level {{ level }}</label>
-					<b-form-input 
-						@change="setRolledHP(rollHP, level)"
-						autocomplete="off" 
-						:id="`level-${level}`" 
-						type="text"
-						v-model="classes[rollHP].rolled_hit_points[level]" 
-					/>
-					<a 
-						:class="{ hidden: classes[rollHP].rolled_hit_points[level] }"
-						class="btn"
-						@click="rollHitDice(rollHP, level)"
-					>
-						Roll
-					</a>
-					</div>      
+			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp">
+			<label :for="`level-${level}`">Level {{ level }}</label>
+			<b-form-input 
+				@change="setRolledHP(rollHP, level)"
+				autocomplete="off" 
+				:id="`level-${level}`" 
+				type="text"
+				v-model="classes[rollHP].rolled_hit_points[level]" 
+			/>
+			<a 
+				:class="{ hidden: classes[rollHP].rolled_hit_points[level] }"
+				class="btn"
+				@click="rollHitDice(rollHP, level)"
+			>
+				Roll
+			</a>
+			</div>      
     </b-modal>
 	</div>
 </template>
@@ -422,17 +422,22 @@
 				this.$refs['roll-hp-modal'].show();
 			},
 			setRolledHP(classKey, level) {
+				//Set rolled HP manually
 				const value = this.classes[classKey].rolled_hit_points[level];
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+				this.$emit("change", "class.rolled_hit_points");
 			},
 			rollHitDice(classKey, level) {
+				//Roll HP digitally
 				const hit_dice = this.classes[classKey].hit_dice;
 				const value = this.rollD(hit_dice, 1, 0).total;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+				this.$emit("change", "class.rolled_hit_points");
 			},
 			saveClassName(key) {
 				const value = this.classes[key].name;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/name`).set(value);
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}/class`).set(value);
 			},
 			saveClassLevel(key) {
 				const value = this.classes[key].level;
@@ -442,24 +447,34 @@
 					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/rolled_hit_points/2`).set(0);
 				}
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
+				this.$emit("change", "class.level");
 			},
 			saveBaseHiPoints(key) {
 				const value = (this.classes[key].base_hit_points) ? parseInt(this.classes[key].base_hit_points) : 0;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_hit_points`).set(value);
+				this.$emit("change", "class.base_hit_points");
 			},
 			saveHitDice(key) {
-				const value = this.classes[key].hit_dice;
+				const value = parseInt(this.classes[key].hit_dice);
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/hit_dice`).set(value);
+				this.$emit("change", "class.hit_dice");
+			},
+			saveBaseArmorClass(key) {
+				const value = (this.classes[key].base_armor_class) ? parseInt(this.classes[key].base_armor_class) : 0;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_armor_class`).set(value);
+				this.$emit("change", "class.armor_class");
 			},
 			addFeature(key, level) {
 				const feature = { name: `Level ${level} feature` }
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}`).push(feature);
+				this.$emit("change", "class.add_feature");
 			},
 			deleteFeature(classKey, level, key) {
 				//Delete all modifiers linked to this feature
 
 				//Delete feature
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${key}`).remove();
+				this.$emit("change", "class.delete_feature");
 			},
 			confirmDelete(classKey, level, key, name) {
 				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
@@ -472,6 +487,7 @@
 			editFeature(classKey, level, featureKey, prop) {
 				const value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${featureKey}/${prop}`).set(value);
+				this.$emit("change", "class.edit_feature");
 			}
 		}
 	}

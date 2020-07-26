@@ -128,9 +128,11 @@
 			},
 			saveRaceSpeed() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/walking_speed`).set(this.race.walking_speed);
+				this.$emit("change", "race.speed");
 			},
 			saveRaceDescription() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_description`).set(this.race.race_description);
+				this.$emit("change", "race.description");
 			}
 		}
 	}

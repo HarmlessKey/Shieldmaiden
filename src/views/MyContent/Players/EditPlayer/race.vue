@@ -191,7 +191,6 @@
 			modifiers_feat(key) {
 				const modifiers = this.feat_modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
-					console.log(origin[1])
 					return origin[1] === key;
 				});
 				return modifiers;

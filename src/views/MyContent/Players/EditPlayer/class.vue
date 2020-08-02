@@ -65,92 +65,85 @@
 						placeholder="Base Armor Class"/>
 				</div>
 
-				<div v-if="classKey === 'main'" class="proficiencies">
-					<h3>Proficiencies</h3>
+				<!-- PROFICIENCIES -->
+				<h3>Proficiencies</h3>
+				<div class="proficiencies">
 					<div class="form-item mb-3">
 						<label for="armor">Armor</label>
-						<div>
-							<el-select
-								id="armor"
-								:value="proficiencies[classKey].armor"
-								@change="setProficiencies($event, classKey, 'armor')"
-								multiple
-								collapse-tags
-								filterable
-								placeholder="Armor">
+						<el-select
+							id="armor"
+							:value="proficiencies[classKey].armor"
+							@change="setProficiencies($event, classKey, 'armor')"
+							multiple
+							collapse-tags
+							filterable
+							placeholder="Armor">
+							<el-option
+								v-for="item in armor_types"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value">
+							</el-option>
+						</el-select>
+					</div>
+					<div class="form-item mb-3">
+						<label for="weapon">Weapons</label>
+						<el-select 
+							id="weapon"
+							:value="proficiencies[classKey].weapon"
+							@change="setProficiencies($event, classKey, 'weapon')"
+							multiple
+							collapse-tags
+							filterable
+							placeholder="Weapons">
+							<el-option-group
+								v-for="group in weaponList"
+								:key="group.category"
+								:label="group.category">
 								<el-option
-									v-for="item in armor_types"
+									v-for="item in group.weapons"
 									:key="item.value"
 									:label="item.label"
 									:value="item.value">
 								</el-option>
-							</el-select>
-						</div>
-					</div>
-					<div class="form-item mb-3">
-						<label for="weapon">Weapons</label>
-						<div>
-							<el-select 
-								id="weapon"
-								:value="proficiencies[classKey].weapon"
-								@change="setProficiencies($event, classKey, 'weapon')"
-								multiple
-								collapse-tags
-								filterable
-								placeholder="Weapons">
-								<el-option-group
-									v-for="group in weaponList"
-									:key="group.category"
-									:label="group.category">
-									<el-option
-										v-for="item in group.weapons"
-										:key="item.value"
-										:label="item.label"
-										:value="item.value">
-									</el-option>
-								</el-option-group>
-							</el-select>
-						</div>
+							</el-option-group>
+						</el-select>
 					</div>
 					<div class="form-item mb-3">
 						<label for="skill">Skills</label>
-						<div>
-							<el-select
-								id="skill"
-								:value="proficiencies[classKey].skill"
-								@change="setProficiencies($event, classKey, 'skill')"
-								multiple
-								collapse-tags
-								filterable
-								placeholder="Skills">
-								<el-option
-									v-for="(item, key) in skillList"
-									:key="key"
-									:label="item.skill"
-									:value="key">
-								</el-option>
-							</el-select>
-						</div>
+						<el-select
+							id="skill"
+							:value="proficiencies[classKey].skill"
+							@change="setProficiencies($event, classKey, 'skill')"
+							multiple
+							collapse-tags
+							filterable
+							placeholder="Skills">
+							<el-option
+								v-for="(item, key) in skillList"
+								:key="key"
+								:label="item.skill"
+								:value="key">
+							</el-option>
+						</el-select>
 					</div>
 					<div class="form-item mb-3" v-if="classKey === 'main'">
 						<label for="saving">Saving throws</label>
-						<div>
-							<el-select
-								id="saving"
-								:value="proficiencies[classKey].saving_throw"
-								@change="setProficiencies($event, classKey, 'saving_throw')"
-								multiple
-								collapse-tags
-								filterable
-								placeholder="Saving throws">
-								<el-option
-									v-for="{value, label} in abilities"
-									:key="value"
-									:label="label"
-									:value="value">
-								</el-option>
-							</el-select>
-						</div>
+						<el-select
+							id="saving"
+							:value="proficiencies[classKey].saving_throw"
+							@change="setProficiencies($event, classKey, 'saving_throw')"
+							multiple
+							collapse-tags
+							filterable
+							placeholder="Saving throws">
+							<el-option
+								v-for="{value, label} in abilities"
+								:key="value"
+								:label="label"
+								:value="value">
+							</el-option>
+						</el-select>
 					</div>
 				</div>
 				
@@ -192,6 +185,15 @@
 								</b-card-header>
 								<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
 									<b-card-body>
+										<div class="form-item mb-3">
+											<b-form-checkbox 
+												v-model="subclass.features[`level_${level}`][key].display" 
+												@change="editFeature(classKey, level, key, 'display')" 
+												id="display"
+											>
+												Display on character sheet {{ level }}
+											</b-form-checkbox>
+										</div>
 										<div class="form-item mb-3">
 											<label for="class">Feature name</label>
 											<b-form-input 
@@ -240,18 +242,18 @@
 												<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
 											</template>
 											<div slot="actions" slot-scope="data" class="actions">
-													<a class="gray-hover mx-1" 
-														@click="editModifier(data.row)" 
-														v-b-tooltip.hover title="Edit">
-														<i class="fas fa-pencil"></i>
-													</a>
-													<a v-b-tooltip.hover 
-														title="Delete" 
-														class="gray-hover"
-														@click="deleteModifier(data.row['.key'])">
-															<i class="fas fa-trash-alt"></i>
-													</a>
-												</div>
+												<a class="gray-hover mx-1" 
+													@click="editModifier(data.row)" 
+													v-b-tooltip.hover title="Edit">
+													<i class="fas fa-pencil"></i>
+												</a>
+												<a v-b-tooltip.hover
+													title="Delete"
+													class="gray-hover"
+													@click="deleteModifier(data.row['.key'])">
+														<i class="fas fa-trash-alt"></i>
+												</a>
+											</div>
 										</hk-table>
 									</b-card-body>
 								</b-collapse>
@@ -525,7 +527,20 @@
 		display: grid;
 		grid-template-columns: 100px 100px 1fr;
 		grid-gap: 15px;
-	}	
+	}
+	.proficiencies {
+		display: flex;
+		justify-content: space-between;
+		margin: 0 -10px 20px -10px;
+
+		.form-item {
+			margin: 0 10px;
+
+			.el-select {
+				width: 100%;
+			}
+		}
+	}
 	.rolled {
 		line-height: 38px;
 		.val {
@@ -574,7 +589,7 @@
 				
 				a {
 					margin-left: 10px;
-					color: #b2b2b2;
+					color: #b2b2b2 !important;
 				}
 			}
 		}

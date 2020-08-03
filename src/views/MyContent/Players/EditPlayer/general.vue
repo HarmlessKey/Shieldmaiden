@@ -85,9 +85,9 @@
 				</el-switch>
 			</div>
 		</div>
-		<b-card header="Give out control">
+		<!-- <b-card header="Give out control">
 			<GiveCharacterControl :playerId="playerId" :control="character.control" />
-		</b-card>
+		</b-card> -->
 	</div>
 </template>
 

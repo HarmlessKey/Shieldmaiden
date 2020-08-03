@@ -1,9 +1,29 @@
 <template>
-	<div v-if="overencumbered">
-		<OverEncumbered />
+	<div v-if="!base_values.general.build" class="build-type">
+		<h3>How do you want to build your character?</h3>
+		<div class="types">
+			<b-card header="Advanced">
+				<p>Create a complete character sheet that you can use as player in your games.</p>
+				<template slot="footer">
+					<a class="btn btn-block" @click="setBuildType('advanced')">Create</a>
+				</template>
+			</b-card>
+			<b-card header="Simple">
+				<p>Create a character with only basic stats needed for use in Harmless Key. This can't be used as a full character reference in your games, but just works for the our combat tracker.</p>
+				<template slot="footer">
+					<a class="btn btn-block" @click="setBuildType('simple')">Create</a>
+				</template>
+			</b-card>
+			<b-card header="Import">
+				<p>Import a character from DnDBeyond. Copy your character sheet over, so it can be used in our combat tracker.</p>
+				<template slot="footer">
+					<a class="btn btn-block" @click="setBuildType('advanced')">Create</a>
+				</template>
+			</b-card>
+		</div>
 	</div>
-	
-	<div v-else class="content">
+
+	<div v-else-if="base_values.general.build === 'advanced'" class="content">
 		<ul class="tabs">
 			<li 
 				v-for="({value, label}, i) in tabs"
@@ -224,6 +244,9 @@
 					type,
 				})
 			},
+			setBuildType(type) {
+				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(type);
+			},
 			compute(origin) {
 				console.log("change made, compute charachter", origin);
 				origin = origin.split(".");
@@ -335,6 +358,30 @@
 </script>
 
 <style lang="scss" scoped>
+	.build-type {
+		padding: 20px;
+		
+		> h3 {
+			text-align: center;
+			margin-bottom: 30px;
+		}
+
+		.types {
+			display: flex;
+			justify-content: center;
+			margin: -10px;
+
+			.card {
+				max-width: 200px;
+				margin: 10px;
+				
+				.card-footer {
+					padding: 0;
+					border: none;
+				}
+			}
+		}
+	}
 	.content {
 		display: grid;
 		grid-template-rows: 30px 1fr;

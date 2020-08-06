@@ -66,7 +66,7 @@
 				<div class="current">
 					<!-- SINGLE TARGET -->
 					<template v-if="target">
-						<template v-if="target.entityType == 'player' && target.curHp == 0 && !target.stable && !target.dead">
+						<template v-if="(target.entityType === 'player' || target.entityType === 'companion') && target.curHp == 0 && !target.stable && !target.dead">
 								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
@@ -85,14 +85,14 @@
 									<button class="btn save bg-green" @click="save('succes', Object.keys(target.saves).length)"><i class="fas fa-check"></i></button>
 									<button class="btn save bg-red" @click="save('fail', Object.keys(target.saves).length)"><i class="fas fa-times"></i></button>
 								</div>
-								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> Player died</a>
+								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
 								<a class="btn btn-block mt-3" @click="set_stable({key: target.key, action: 'set'})"><i class="fas fa-heartbeat"></i> Stabilize</a>
 						</template>
 						<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 						
 						<template v-else>
 							<div class="health">
-								<icon v-if="target.img === 'monster' || target.img === 'player'" class="img" :icon="target.img" :fill="target.color_label" :style="target.color_label ? `border-color: ${target.color_label}` : ``" />
+								<icon v-if="['monster', 'player', 'companion'].includes(target.img)" class="img" :icon="target.img" :fill="target.color_label" :style="target.color_label ? `border-color: ${target.color_label}` : ``" />
 								<span 
 									v-else class="img" 
 									:style="{
@@ -128,7 +128,7 @@
 					<template v-else-if="targeted.length > 1">
 						<div v-for="key in targeted" :key="`target-${key}`" class="target">
 							<div class="health untarget">
-								<icon v-if="entities[key].img === 'monster' || entities[key].img === 'player'" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
+								<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
 								<span 
 									v-else class="img" 
 									:style="{
@@ -273,7 +273,18 @@
 				})
 			},
 			edit(key, entityType) {
-				var editType = (entityType == 'player') ? 'slides/EditPlayer' : 'slides/encounter/EditNpc';
+				let editType = undefined;
+				switch(entityType) {
+					case 'player':
+						editType = 'slides/EditPlayer';
+						break;
+					case 'companion':
+						editType = 'slides/encounter/EditCompanion';
+						break;
+					case 'npc':
+						editType = 'slides/encounter/EditNpc';
+						break;
+				}
 
 				event.stopPropagation();
 				this.setSlide({

@@ -51,7 +51,7 @@
 					<a v-b-tooltip.hover 
 						title="Delete" 
 						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row.name)">
+						@click="confirmDelete(data.row.key, data.row)">
 						<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
@@ -118,7 +118,7 @@
 						noPadding: true,
 						right: true,
 						maxContent: true
-                	}
+					}
 				}
 			}
 		},
@@ -127,12 +127,12 @@
 				'tier',
 				'npcs',
 				'campaigns',
+				'players',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
 			_npcs: function() {
-				// console.log('yo')
 				return _.chain(this.npcs)
 				.filter(function(npc, key) {
 					npc.key = key
@@ -147,7 +147,7 @@
 		},
 		methods: {
 			confirmDelete(key, npc) {
-				this.$snotify.error('Are you sure you want to delete ' + npc + '?', 'Delete NPC', {
+				this.$snotify.error('Are you sure you want to delete ' + npc.name + '?', 'Delete NPC', {
 					timeout: false,
 					buttons: [
 						{
@@ -183,6 +183,14 @@
 									db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities/${entityKey}`).remove();
 								}
 							}
+						}
+					}
+				}
+				// Remove NPC as companion from players
+				for (let playerKey in this.players) {
+					for (let companionKey in this.players[playerKey].companions) {
+						if (companionKey === key) {
+							db.ref(`players/${this.userId}/${playerKey}/companions/`).child(key).remove();
 						}
 					}
 				}

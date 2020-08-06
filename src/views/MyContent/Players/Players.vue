@@ -58,7 +58,7 @@
 					<a v-b-tooltip.hover 
 						title="Delete" 
 						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row.player, data.row.control)">
+						@click="confirmDelete(data.row.key, data.row)">
 							<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
@@ -136,7 +136,7 @@
 						noPadding: true,
 						right: true,
 						maxContent: true
-                	}
+					}
 				}
 			}
 		},
@@ -171,13 +171,13 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, player, control) {
-				this.$snotify.error('Are you sure you want to delete ' + player + '?', 'Delete player', {
+			confirmDelete(key, player) {
+				this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key, control)
+							this.deletePlayer(key, player)
 							this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -191,10 +191,10 @@
 					]
 				});
 			},
-			deletePlayer(key, control) {
+			deletePlayer(key, player) {
 				//Remove from character control
-				if(control) {
-					db.ref(`character_control/${control}`).child(key).remove(); 
+				if(player.control) {
+					db.ref(`character_control/${player.control}`).child(key).remove(); 
 				}
 
 				for(let campaign in this.campaigns) {
@@ -207,6 +207,11 @@
 
 							//Go over all entities in the encounter
 							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
+
+							// Remove companions from each encounter
+							for (let comp_key in player.companions) {
+								db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(comp_key).remove();
+							}
 						}
 					}
 				}

@@ -10,7 +10,7 @@
 				<div v-on:scroll="shadow()" ref="scroll">
 					<ul v-if="entities" class="entities hasImg">
 						<li v-for="entity in _players" :key="entity.key">
-							<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+							<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 							<span 
 								v-else class="img" 
 								:style="{
@@ -53,7 +53,7 @@
 					<ul class="entities hasImg">
 						<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="	{selected:selected.includes(i)}">
 							<icon 
-								v-if="entity.img === 'monster' || entity.img === 'player'" 
+								v-if="['monster', 'player', 'companion'].includes(entity.img)" 
 								class="img pointer" 
 								:icon="entity.img" 
 								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
@@ -98,7 +98,7 @@
 							<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
 							<template v-else>
 								<icon 
-									v-if="entity.img === 'monster' || entity.img === 'player'" 
+									v-if="['monster', 'player', 'companion'].includes(entity.img)" 
 									class="img pointer" 
 									:icon="entity.img" 
 									:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
@@ -184,7 +184,7 @@
 				return _.chain(this.entities)
 								.filter(function(entity, key) {
 									entity.key = key
-									return entity.entityType == 'player';
+									return entity.entityType == 'player' || entity.entityType == 'companion';
 								})
 								.sortBy('name' , 'desc')
 								.value()

@@ -88,7 +88,7 @@
 									<a class="gray-hover"
 									v-b-tooltip.hover 
 									title="Add Character" 
-									@click="addPlayer(key, player.character_name)">
+									@click="addPlayer(key)">
 										<i class="fas fa-plus"></i>
 									</a>
 								</div>
@@ -112,7 +112,7 @@
 									</div>
 									
 									<div class="actions bg-gray">
-										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key, players[key].character_name)">
+										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key)">
 											<i class="fas fa-minus"></i>
 										</a>
 									</div>
@@ -155,6 +155,7 @@
 				'campaigns',
 				'campaign',
 				'players',
+				'npcs',
 				'playerInCampaign',
 				'allEncounters',
 				'overencumbered'
@@ -164,11 +165,13 @@
 		mounted() {
 			this.fetchCampaign({
 				cid: this.campaignId, 
-			})
+			});
+			this.fetchNpcs();
 		},
 		methods: {
 			...mapActions([
 				'fetchCampaign',
+				'fetchNpcs',
 			]),
 			edit() {
 				this.$validator.validateAll().then((result) => {
@@ -187,18 +190,36 @@
 					curHp: this.players[id].maxHp
 				});
 				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
+				if (this.players[id].companions !== undefined) {
+					for (let key in this.players[id].companions) {
+						
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(key).set({
+							curHp: this.npcs[key].maxHp,
+						})
+					}
+				}
 			},
 			removePlayer(playerId) {
+				// Get companions of player
+				let companions = Object.keys(this.players[playerId].companions);
+
 				//First remove player from all encounters
 				for(let encounterId in this.allEncounters[this.campaignId]) {
 					//Remove player from encouner
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(playerId).remove();
+					for (let companionId of companions) {
+						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(companionId).remove();
+					}
 				}
 
 				//Then remove from campaign
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(playerId).remove();
-				if (this.players[playerId].campaign_id == this.campaignId)
+				for (let companionId of companions) {
+					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(companionId).remove();
+				}
+				if (this.players[playerId].campaign_id == this.campaignId) {
 					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
+				}
 			},
 			checkPlayer(playerId) {
 				if (this.campaign.players === undefined)

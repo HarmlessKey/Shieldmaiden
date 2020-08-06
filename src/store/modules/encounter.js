@@ -187,6 +187,7 @@ const mutations = {
 			ac: parseInt(db_entity.ac),
 			active: db_entity.active
 		}
+
 		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
 		entity.npc = (db_entity.npc) ? db_entity.npc : false;
 		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
@@ -262,45 +263,79 @@ const mutations = {
 				entity.level = db_player.level;
 				break
 			}
-			case 'npc': {
-				entity.curHp = db_entity.curHp;
-				entity.tempHp = db_entity.tempHp;
-				entity.ac_bonus = db_entity.ac_bonus;
+			case 'npc':
+			case 'companion': 
+			{
 
-				if(db_entity.transformed) {
-					entity.transformed = true;
-					entity.transformedMaxHp = db_entity.transformed.maxHp;
-					entity.transformedCurHp = db_entity.transformed.curHp;
-					entity.transformedAc = db_entity.transformed.ac;
-				} else {
-					entity.transformed = false;
-				}
+				let data_npc = {};
+				
+				if (entity.entityType === 'companion') {
 
-				//Fetch data from API
-				if(entity.npc == 'api') {
-					let monsters = monsters_ref.child(entity.id);
+					data_npc = rootState.content.npcs[key];
 
-					var data_npc = await monsters.once('value').then(function(snapshot) {
-						return snapshot.val()
-					})
-				}
-				else {
-					data_npc = rootState.content.npcs[entity.id]
-				}
+					let campaignCompanion = rootState.content.campaigns[state.campaignId].companions[key];
 
-				if(!entity.avatar) {
-					//if an entity is quicly added during an ecnounter
-					//without copying an existing
-					//it won't have data_npc
-					if(data_npc) {
-						entity.img = (data_npc.avatar) ? data_npc.avatar : 'monster';
+					entity.curHp = campaignCompanion.curHp;
+					entity.tempHp = campaignCompanion.tempHp;
+					entity.ac_bonus = campaignCompanion.ac_bonus;
+					entity.maxHpMod = campaignCompanion.maxHpMod;
+
+					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
+					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
+					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
+
+					entity.ac = data_npc.ac;
+					entity.maxHp = data_npc.maxHp;
+
+					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
+
+					//Get player transformed from campaign
+					if(campaignCompanion.transformed) {
+						entity.transformed = true;
+						entity.transformedMaxHp = campaignCompanion.transformed.maxHp;
+						entity.transformedCurHp = campaignCompanion.transformed.curHp;
+						entity.transformedAc = campaignCompanion.transformed.ac;
 					} else {
-						entity.img = 'monster';
+						entity.transformed = false;
 					}
 				}
 				else {
-					entity.img = entity.avatar;
+
+					//Fetch data from API
+					if(entity.npc == 'api') {
+						let monsters = monsters_ref.child(entity.id);
+
+						data_npc = await monsters.once('value').then(function(snapshot) {
+							return snapshot.val()
+						})
+					}
+					else {
+						data_npc = rootState.content.npcs[entity.id]
+					}
+
+					entity.curHp = db_entity.curHp;
+					entity.tempHp = db_entity.tempHp;
+					entity.ac_bonus = db_entity.ac_bonus;
+
+					if(db_entity.transformed) {
+						entity.transformed = true;
+						entity.transformedMaxHp = db_entity.transformed.maxHp;
+						entity.transformedCurHp = db_entity.transformed.curHp;
+						entity.transformedAc = db_entity.transformed.ac;
+					} else {
+						entity.transformed = false;
+					}
+					if(!entity.avatar) {
+						//if an entity is quicly added during an ecnounter
+						//without copying an existing
+						//it won't have data_npc
+						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
+					}
+					else {
+						entity.img = entity.avatar;
+					}
 				}
+
 				
 				//if an entity is quicly added during an ecnounter
 				//without copying an existing
@@ -480,42 +515,44 @@ const mutations = {
 		}
 	},
 	SET_SAVE(state, {key, check, index}) {
+		let db_name = state.entities[key].entityType + 's';
 		if(check == 'reset') {
 			//RESET SAVES
 			Vue.set(state.entities[key], 'saves', {});
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
 
 			//REMOVE STABLE
 			Vue.set(state.entities[key], 'stable', false);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
 		}
 		else if(check == 'unset') {
 			Vue.delete(state.entities[key].saves, index);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${index}`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${index}`).remove();
 		}
 		else {
 			var i = parseInt(index + 1);
 			Vue.set(state.entities[key].saves, i, check);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves/${i}`).set(check);
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${i}`).set(check);
 		}
 	},
 	SET_STABLE(state, {key, action}) {
+		let db_name = state.entities[key].entityType + 's';
 		if(action == 'set') {
 			//RESET SAVES
 			Vue.set(state.entities[key], 'saves', {});
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
 
 			//REMOVE DEAD
 			Vue.delete(state.entities[key], 'dead');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
 
 			//SET STABLE
 			Vue.set(state.entities[key], 'stable', 'true');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).set(true);
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).set(true);
 		}
 		else if(action == 'unset') {
 			Vue.delete(state.entities[key], 'stable');
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/stable`).remove();
+			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
 		}
 	},
 	EDIT_ENTITY(state, {key, entity}) {
@@ -554,7 +591,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
 					encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
-				} else {
+				} 
+				else if (state.entities[key].entityType === 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+				} 
+				else {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
 				}
 			}
@@ -568,7 +609,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
 					encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
-				} else {
+				} 
+				else if (state.entities[key].entityType === 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(entity);
+				} 
+				else {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(entity);
 				}
 			}
@@ -617,7 +662,11 @@ const mutations = {
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
 						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
-					} else {
+					}
+					if(state.entities[key].entityType == 'companion') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).remove();
+					}
+					else {
 						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
 					}
 				}
@@ -631,7 +680,11 @@ const mutations = {
 				if(!state.demo) {
 					if(state.entities[key].entityType == 'player') {
 						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
-					} else {
+					}
+					if(state.entities[key].entityType == 'companions') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).set(newHp);
+					}
+					else {
 						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
 					}
 				}
@@ -641,11 +694,31 @@ const mutations = {
 		else if(pool == 'transformed') {
 			if(newHp <= 0) {
 				state.entities[key].transformed = false; //Update store
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+					}
+					if(state.entities[key].entityType == 'companion') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+					}
+					else {
+						encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+					}
+				}
 			}
 			else {
 				Vue.set(state.entities[key], 'transformedCurHp', newHp) //Update store
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed/curHp`).set(newHp);
+				if(!state.demo) {
+					if(state.entities[key].entityType == 'player') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(newHp);
+					}
+					if(state.entities[key].entityType == 'companion') {
+						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(newHp);
+					}
+					else {
+						encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(newHp);
+					}
+				}
 			}
 		}
 		//when target has no tempHp or is not transformed, set curHP
@@ -657,7 +730,11 @@ const mutations = {
 			if(!state.demo) {
 				if(state.entities[key].entityType == 'player') {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
-				} else {
+				}
+				if(state.entities[key].entityType == 'companion') {
+					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/curHp`).set(newHp);
+				}
+				else {
 					//NPC curHp is stored under the encounter
 					encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
 				}
@@ -665,23 +742,24 @@ const mutations = {
 		}
 	},
 	SET_DEAD(state, {key, action, revive=false}) {
+		let db_name = state.entities[key].entityType + 's';
 		if(action === 'set') {
 			//SET DEAD
 			Vue.set(state.entities[key], 'dead', true);
 			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).set(true);
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).set(true);
 			}
 		}
 		else if(action === 'unset') {
 			Vue.delete(state.entities[key], 'dead');
 			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/dead`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
 			}
 			if(revive) {
 				state.entities[key].curHp = 1;
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(1);
+				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/curHp`).set(1);
 			}
 		}
 	},

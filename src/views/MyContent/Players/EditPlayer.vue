@@ -511,6 +511,8 @@
 							camp_ref.once('value').then(function(snapshot) {
 								let campaign = snapshot.val();
 								for (let comp_key in player_data.companions) {
+									// Add player id to npc data
+									db.ref(`npcs/${vm.userId}/${comp_key}`).update({'player_id': vm.playerId});
 									// If companion not yet in campaign, add it with npc data curHP
 									if (campaign.companions === undefined) {
 										camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
@@ -527,6 +529,8 @@
 									if (campaign.companions !== undefined && Object.keys(campaign.companions).includes(comp_del_key)) {
 										camp_ref.child('companions').child(comp_del_key).remove();
 									}
+									// console.log(vm.userId);
+									db.ref(`npcs/${vm.userId}/${comp_del_key}`).child('player_id').remove();
 									const enc_ref = db.ref(`encounters/${vm.userId}/${player_data.campaign_id}`)
 									enc_ref.once('value').then(function(snapshot) {
 										const encounters = snapshot.val()

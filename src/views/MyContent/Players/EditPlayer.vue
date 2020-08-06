@@ -572,15 +572,19 @@
 			},
 			notAdded(npc) {
 				let key = npc.key;
-				for (let pI in this.players) {
-					for (let i in this.players[pI].companions) {
-						if (i == key)
-							return false;
-					}
-				}
+				// Check for companion in player
 				for (let i in this.player.companions) {
 					if (i == key)
 						return false;
+				}
+				// Check for companion in all other players (no own)
+				for (let pI in this.players) {
+					if (this.player['.key'] !== pI) {
+						for (let i in this.players[pI].companions) {
+							if (i == key)
+								return false;
+						}
+					}
 				}
 				return true;
 			},

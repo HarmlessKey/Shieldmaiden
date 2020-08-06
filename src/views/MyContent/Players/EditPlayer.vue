@@ -393,6 +393,7 @@
 				searchResults: [],
 				noResult: '',
 				npcs: {},
+				companions_to_delete: [],
 				columns: {
 					avatar: {
 						width: 46,
@@ -487,6 +488,44 @@
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
+
+						// If player already in campaign, add companions to campaign
+						// IN FUTURE migrate this to add / remove companion functions
+						if (this.player.campaign_id !== undefined) {
+							let vm = this;
+							const player_data = this.player
+							const camp_ref = db.ref(`campaigns/${this.userId}/${this.player.campaign_id}`);
+							camp_ref.once('value').then(function(snapshot) {
+								let campaign = snapshot.val();
+								for (let comp_key in player_data.companions) {
+									// If companion not yet in campaign, add it with npc data curHP
+									if (campaign.companions === undefined) {
+										camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
+									}
+									else if (!Object.keys(campaign.companions).includes(comp_key)) {
+										camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
+									}
+									else {
+										// console.log('companion already added')
+									}
+								}
+								// Remove companion from campaign object and remove entity from all encounters in campaign
+								for (let comp_del_key of vm.companions_to_delete) {
+									if (campaign.companions !== undefined && Object.keys(campaign.companions).includes(comp_del_key)) {
+										camp_ref.child('companions').child(comp_del_key).remove();
+									}
+									const enc_ref = db.ref(`encounters/${vm.userId}/${player_data.campaign_id}`)
+									enc_ref.once('value').then(function(snapshot) {
+										const encounters = snapshot.val()
+										for (let encounter_key in encounters) {
+											if (Object.keys(encounters[encounter_key].entities).includes(comp_del_key)) {
+												enc_ref.child(`${encounter_key}/entities/${comp_del_key}`).remove();
+											}
+										}
+									})
+								}
+							})
+						}
 						this.$router.replace(this.$route.meta.basePath)
 					} else {
 						//console.log('Not valid');
@@ -524,6 +563,11 @@
 				this.searchResults = [];
 				this.search = '';
 
+				// If companion was deleted before saving, undelete it
+				if (this.companions_to_delete.indexOf(npc.key) > -1) {
+					this.companions_to_delete.splice(this.companions_to_delete.indexOf(npc.key), 1);
+				}
+
 				this.$forceUpdate();
 			},
 			notAdded(npc) {
@@ -543,6 +587,7 @@
 			confirmDelete(index) {
 
 				this.$delete(this.player.companions, index)
+				this.companions_to_delete.push(index);
 			},
 		}
 	}

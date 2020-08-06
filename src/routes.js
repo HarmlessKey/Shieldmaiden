@@ -518,7 +518,7 @@ export const routes = [{
 	}
 },
 {
-	path: '/companions/:id/:userid',
+	path: '/companions/:userid/:id',
 	name: 'EditCompanion',
 	component: EditNpc,
 	meta: {

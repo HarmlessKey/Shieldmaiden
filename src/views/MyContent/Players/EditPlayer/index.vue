@@ -329,7 +329,7 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
 
 				//Armor Class
-				let armor_class = (this.base_values.class.classes.main.base_armor_class) ? this.base_values.class.classes.main.base_armor_class : 10;
+				let armor_class = 10;
 				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
 
 				//Add AC Modifiers	
@@ -396,11 +396,14 @@
 		}
 	}
 	.content {
+		background-image: url('../../../../assets/_img/styles/paper-bg.png');
+		background-position: top left;
 		display: grid;
 		grid-template-rows: 30px 1fr;
 		overflow: hidden;
 		height: calc(100vh - 60px);
-
+		background-color: #000;
+		
 		.tabs {
 			height: 30px;
 			list-style: none;

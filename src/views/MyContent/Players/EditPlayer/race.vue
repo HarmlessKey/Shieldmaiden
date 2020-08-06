@@ -220,6 +220,11 @@
 </script>
 
 <style lang="scss" scoped>
+	h3 {
+		font-family: 'Fredericka the Great', cursive !important;
+		font-size: 25px !important;
+		margin: 40px 0 20px 0 !important;
+	}
 	.hk-table {
 		margin-bottom: 30px;
 	}

@@ -32,294 +32,292 @@
 						Level up <i class="fas fa-arrow-circle-up"/>
 					</a>
 				</h3>
-				<div class="level">
-					<div class="form-item mb-3">
-						<label for="class">Class</label>
-						<b-form-input 
-							@change="saveClassName(classKey)"
-							autocomplete="off"  
-							id="class" 
-							type="text" 
-							v-model="subclass.name" 
-							placeholder="Main Class"/>
-					</div>
-					<div class="form-item mb-3">
-						<label for="level">Level</label>
-						<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel('main')">
-						<option 
-							v-for="level in 20" 
-							:key="`${level}`"
-							:value="level"
-							:disabled="level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level))"
-						>
-							{{ level }}
-						</option>
-					</select>
-					</div>
-				</div>
 
-				<!-- HIT POINTS -->
-				<h3><i class="fas fa-heart"></i> Hit Points</h3>
-				<div class="hit_points">
-					<div class="form-item mb-3" v-if="classKey === 'main'">
-						<label for="class">Starting HP</label>
-						<b-form-input 
-							@change="saveBaseHiPoints(classKey)"
-							autocomplete="off"  
-							id="class" 
-							type="number" 
-							v-model="subclass.base_hit_points" 
-							placeholder="Starting hit points"/>
-					</div>
-					<div class="form-item mb-3">
-						<label for="hit_dice">Hit dice</label>
-						<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice('main')" />
-					</div>
-					<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
-						<label>Rolled HP</label>
-						<div class="rolled">
-							<span class="val">
-								{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
-							</span>
-							<a class="mx-1" @click="rollHitPoints(classKey)">
-								<i class="fas fa-pencil"></i>
-							</a>
+				<div class="p-3">
+					<div class="level">
+						<div class="form-item mb-3">
+							<label for="class">Class</label>
+							<b-form-input 
+								@change="saveClassName(classKey)"
+								autocomplete="off"  
+								id="class" 
+								type="text" 
+								v-model="subclass.name" 
+								placeholder="Main Class"/>
 						</div>
-					</div>
-				</div>
-
-				<!-- BASE AC -->
-				<div class="form-item mb-3" v-if="classKey === 'main'">
-					<label for="class">Base armor class</label>
-					<b-form-input 
-						@change="saveBaseArmorClass(classKey)"
-						autocomplete="off"  
-						id="class" 
-						type="number" 
-						v-model="subclass.base_armor_class" 
-						placeholder="Base Armor Class"/>
-				</div>
-
-				<!-- CASTER -->
-				<h3>Spell casting</h3>
-				<div class="casting">
-					<div class="form-item mb-3">
-						<label for="class">Caster type</label>
-						<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
-					</div>
-					<div class="form-item mb-3">
-						<label for="class">Spell casting ability</label>
-						<select class="form-control" v-model="subclass.casting_ability" name="ability" @change="saveCastingAbility(classKey)">
-							<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
-								{{ label }}
+						<div class="form-item mb-3">
+							<label for="level">Level</label>
+							<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel('main')">
+							<option 
+								v-for="level in 20" 
+								:key="`${level}`"
+								:value="level"
+								:disabled="level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level))"
+							>
+								{{ level }}
 							</option>
 						</select>
+						</div>
 					</div>
-					<div class="form-item mb-3">
-						<label for="class">Spell knowledge</label>
-						<b-form-select v-model="subclass.spell_knowledge" :options="spell_knowledge_types" @change="saveSpellKnowledge(classKey)" />
-					</div>
-				</div>
 
-				<!-- PROFICIENCIES -->
-				<h3>Proficiencies</h3>
-				<div class="proficiencies">
-					<div class="form-item mb-3">
-						<label for="armor">Armor</label>
-						<el-select
-							id="armor"
-							:value="proficiencies[classKey].armor"
-							@change="setProficiencies($event, classKey, 'armor')"
-							multiple
-							collapse-tags
-							filterable
-							placeholder="Armor">
-							<el-option
-								v-for="item in armor_types"
-								:key="item.value"
-								:label="item.label"
-								:value="item.value">
-							</el-option>
-						</el-select>
-					</div>
-					<div class="form-item mb-3">
-						<label for="weapon">Weapons</label>
-						<el-select 
-							id="weapon"
-							:value="proficiencies[classKey].weapon"
-							@change="setProficiencies($event, classKey, 'weapon')"
-							multiple
-							collapse-tags
-							filterable
-							placeholder="Weapons">
-							<el-option-group
-								v-for="group in weaponList"
-								:key="group.category"
-								:label="group.category">
+					<!-- HIT POINTS -->
+					<h3 v-b-toggle="`hp-${classKey}`" class="collapse">
+						<span><i class="fas fa-heart"></i> Hit Points</span>
+						{{ computed.display.hit_points }}
+					</h3>
+					<b-collapse :id="`hp-${classKey}`" class="hit_points">
+						<div class="form-item mb-3" v-if="classKey === 'main'">
+							<label for="class">Starting HP</label>
+							<b-form-input 
+								@change="saveBaseHitPoints(classKey)"
+								autocomplete="off"  
+								id="class" 
+								type="number" 
+								v-model="subclass.base_hit_points" 
+								placeholder="Starting hit points"/>
+						</div>
+						<div class="form-item mb-3">
+							<label for="hit_dice">Hit dice</label>
+							<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice('main')" />
+						</div>
+						<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
+							<label>Rolled HP</label>
+							<div class="rolled">
+								<span class="val">
+									{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
+								</span>
+								<a class="mx-1" @click="rollHitPoints(classKey)">
+									<i class="fas fa-pencil"></i>
+								</a>
+							</div>
+						</div>
+					</b-collapse>
+	
+					<!-- CASTER -->
+					<h3 v-b-toggle="`casting-${classKey}`" class="collapse">
+						<span><i class="fas fa-hand-holding-magic"/> Spell casting</span>
+					</h3>
+					<b-collapse :id="`casting-${classKey}`" class="casting">
+						<div class="form-item mb-3">
+							<label for="class">Caster type</label>
+							<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
+						</div>
+						<div class="form-item mb-3">
+							<label for="class">Spell casting ability</label>
+							<select class="form-control" v-model="subclass.casting_ability" name="ability" @change="saveCastingAbility(classKey)">
+								<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
+									{{ label }}
+								</option>
+							</select>
+						</div>
+						<div class="form-item mb-3">
+							<label for="class">Spell knowledge</label>
+							<b-form-select v-model="subclass.spell_knowledge" :options="spell_knowledge_types" @change="saveSpellKnowledge(classKey)" />
+						</div>
+					</b-collapse>
+
+					<!-- PROFICIENCIES -->
+					<h3 v-b-toggle="`prof-${classKey}`" class="collapse">
+						<span><i class="fas fa-sparkles"/> Proficiencies</span>
+					</h3>
+					<b-collapse :id="`prof-${classKey}`" class="proficiencies" >
+						<div class="form-item mb-3">
+							<label for="armor">Armor</label>
+							<el-select
+								id="armor"
+								:value="proficiencies[classKey].armor"
+								@change="setProficiencies($event, classKey, 'armor')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Armor">
 								<el-option
-									v-for="item in group.weapons"
+									v-for="item in armor_types"
 									:key="item.value"
 									:label="item.label"
 									:value="item.value">
 								</el-option>
-							</el-option-group>
-						</el-select>
-					</div>
-					<div class="form-item mb-3">
-						<label for="skill">Skills</label>
-						<el-select
-							id="skill"
-							:value="proficiencies[classKey].skill"
-							@change="setProficiencies($event, classKey, 'skill')"
-							multiple
-							collapse-tags
-							filterable
-							placeholder="Skills">
-							<el-option
-								v-for="(item, key) in skillList"
-								:key="key"
-								:label="item.skill"
-								:value="key">
-							</el-option>
-						</el-select>
-					</div>
-					<div class="form-item mb-3" v-if="classKey === 'main'">
-						<label for="saving">Saving throws</label>
-						<el-select
-							id="saving"
-							:value="proficiencies[classKey].saving_throw"
-							@change="setProficiencies($event, classKey, 'saving_throw')"
-							multiple
-							collapse-tags
-							filterable
-							placeholder="Saving throws">
-							<el-option
-								v-for="{value, label} in abilities"
-								:key="value"
-								:label="label"
-								:value="value">
-							</el-option>
-						</el-select>
-					</div>
-				</div>
-				
-				<!-- CLASS FEATURES -->
-				<h3>{{ subclass.name || "Class" }} features</h3>
-				<template v-for="level in 20">
-					<template v-if="subclass.level >= level">
-						<div :key="`features-${level}`" v-if="[4, 8, 12, 16, 19].includes(level)">
-							<h4 class="feature-title">Level {{ level }}</h4>
-							<div role="tablist" class="mb-3">
-								<b-card no-body>
-									<b-card-header role="tab">
-										Ability Score Improvement / Feat
-										<div class="actions">
-											<a v-b-toggle="`accordion-${level}`"><i class="fas fa-pencil-alt"/></a>
-										</div>
-									</b-card-header>
-									<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
-										<b-card-body>
-											<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-												As usual, you can’t increase an ability score above 20 using this feature.</p>
-											<p>Instead of increasing ability scores you can also choose to take 1 feat.</p>
-										</b-card-body>
-									</b-collapse>
-								</b-card>
-							</div>
+							</el-select>
 						</div>
-						<div :key="`features-${level}`" v-else>
-							<h4 class="feature-title">
-								Level {{ level }}
-								<a @click="addFeature(classKey, level)">Add feature</a>
-							</h4>
-							<div role="tablist" v-if="subclass.features" class="mb-3">
-								<b-card no-body v-for="(feature, key, index) in subclass.features[`level_${level}`]" :key="`feature-${index}`">
-									<b-card-header role="tab">
-										{{ feature.name }}
-										<div class="actions">
-											<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
-											<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
-										</div>
-									</b-card-header>
-									<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
-										<b-card-body>
-											<div class="form-item mb-3">
-												<b-form-checkbox 
-													v-model="subclass.features[`level_${level}`][key].display" 
-													@change="editFeature(classKey, level, key, 'display')" 
-													id="display"
+						<div class="form-item mb-3">
+							<label for="weapon">Weapons</label>
+							<el-select 
+								id="weapon"
+								:value="proficiencies[classKey].weapon"
+								@change="setProficiencies($event, classKey, 'weapon')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Weapons">
+								<el-option-group
+									v-for="group in weaponList"
+									:key="group.category"
+									:label="group.category">
+									<el-option
+										v-for="item in group.weapons"
+										:key="item.value"
+										:label="item.label"
+										:value="item.value">
+									</el-option>
+								</el-option-group>
+							</el-select>
+						</div>
+						<div class="form-item mb-3">
+							<label for="skill">Skills</label>
+							<el-select
+								id="skill"
+								:value="proficiencies[classKey].skill"
+								@change="setProficiencies($event, classKey, 'skill')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Skills">
+								<el-option
+									v-for="(item, key) in skillList"
+									:key="key"
+									:label="item.skill"
+									:value="key">
+								</el-option>
+							</el-select>
+						</div>
+						<div class="form-item mb-3" v-if="classKey === 'main'">
+							<label for="saving">Saving throws</label>
+							<el-select
+								id="saving"
+								:value="proficiencies[classKey].saving_throw"
+								@change="setProficiencies($event, classKey, 'saving_throw')"
+								multiple
+								collapse-tags
+								filterable
+								placeholder="Saving throws">
+								<el-option
+									v-for="{value, label} in abilities"
+									:key="value"
+									:label="label"
+									:value="value">
+								</el-option>
+							</el-select>
+						</div>
+					</b-collapse>
+					
+					<!-- CLASS FEATURES -->
+					<h3>{{ subclass.name || "Class" }} features</h3>
+					<template v-for="level in 20">
+						<template v-if="subclass.level >= level">
+							<div :key="`features-${level}`" v-if="[4, 8, 12, 16, 19].includes(level)">
+								<h4 class="feature-title">Level {{ level }}</h4>
+								<div role="tablist" class="mb-3">
+									<b-card no-body>
+										<b-card-header role="tab">
+											Ability Score Improvement / Feat
+											<div class="actions">
+												<a v-b-toggle="`accordion-${level}`"><i class="fas fa-pencil-alt"/></a>
+											</div>
+										</b-card-header>
+										<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
+											<b-card-body>
+												<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
+													As usual, you can’t increase an ability score above 20 using this feature.</p>
+												<p>Instead of increasing ability scores you can also choose to take 1 feat.</p>
+											</b-card-body>
+										</b-collapse>
+									</b-card>
+								</div>
+							</div>
+							<div :key="`features-${level}`" v-else>
+								<h4 class="feature-title">
+									Level {{ level }}
+									<a @click="addFeature(classKey, level)">Add feature</a>
+								</h4>
+								<div role="tablist" v-if="subclass.features" class="mb-3">
+									<b-card no-body v-for="(feature, key, index) in subclass.features[`level_${level}`]" :key="`feature-${index}`">
+										<b-card-header role="tab">
+											{{ feature.name }}
+											<div class="actions">
+												<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
+												<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
+											</div>
+										</b-card-header>
+										<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
+											<b-card-body>
+												<div class="form-item mb-3">
+													<b-form-checkbox 
+														v-model="subclass.features[`level_${level}`][key].display" 
+														@change="editFeature(classKey, level, key, 'display')" 
+														id="display"
+													>
+														Display on character sheet {{ level }}
+													</b-form-checkbox>
+												</div>
+												<div class="form-item mb-3">
+													<label for="class">Feature name</label>
+													<b-form-input 
+														@change="editFeature(classKey, level, key, 'name')"
+														autocomplete="off"  
+														:id="`name-${level}-${index}`" 
+														type="text" 
+														v-model="subclass.features[`level_${level}`][key].name" 
+														placeholder="Feature name"/>
+												</div>
+
+												<label for="description">Description</label>
+												<div class="d-flex justify-content-between mb-3">
+													<b-form-textarea 
+														@change="editFeature(classKey, level, key, 'description')"
+														v-model="subclass.features[`level_${level}`][key].description"
+														id="description"
+														name="description"
+														title="Description"
+														class="form-control"
+														v-validate="'max:5000'"
+														maxlength="5001"
+														data-vv-as="Description"
+														rows="6" 
+													/>
+													<div class="ml-3">
+														<vue-markdown name="description_preview" :source="feature.description"></vue-markdown>
+													</div>
+												</div>
+
+												<!-- FEATURE MODIFIER -->
+												<h3>Modifiers</h3>
+												<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
+
+												<hk-table
+													:columns="columns"
+													:items="feature_modifiers(classKey, level, key)"
 												>
-													Display on character sheet {{ level }}
-												</b-form-checkbox>
-											</div>
-											<div class="form-item mb-3">
-												<label for="class">Feature name</label>
-												<b-form-input 
-													@change="editFeature(classKey, level, key, 'name')"
-													autocomplete="off"  
-													:id="`name-${level}-${index}`" 
-													type="text" 
-													v-model="subclass.features[`level_${level}`][key].name" 
-													placeholder="Feature name"/>
-											</div>
-
-											<label for="description">Description</label>
-											<div class="d-flex justify-content-between mb-3">
-												<b-form-textarea 
-													@change="editFeature(classKey, level, key, 'description')"
-													v-model="subclass.features[`level_${level}`][key].description"
-													id="description"
-													name="description"
-													title="Description"
-													class="form-control"
-													v-validate="'max:5000'"
-													maxlength="5001"
-													data-vv-as="Description"
-													rows="6" 
-												/>
-												<div class="ml-3">
-													<vue-markdown name="description_preview" :source="feature.description"></vue-markdown>
-												</div>
-											</div>
-
-											<!-- FEATURE MODIFIER -->
-											<h3>Modifiers</h3>
-											<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
-
-											<hk-table
-												:columns="columns"
-												:items="feature_modifiers(classKey, level, key)"
-											>
-												<template slot="target" slot-scope="data">
-													{{ data.row.subtarget || data.item.capitalize() }}
-												</template>
-												<template slot="value" slot-scope="data">
-													<template v-if="data.item">{{ data.item.capitalize() }}</template>
-													<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
-													<template v-else-if="data.row.type === 'expertise'">Expertise</template>
-													<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
-												</template>
-												<div slot="actions" slot-scope="data" class="actions">
-													<a class="gray-hover mx-1" 
-														@click="editModifier(data.row)" 
-														v-b-tooltip.hover title="Edit">
-														<i class="fas fa-pencil"></i>
-													</a>
-													<a v-b-tooltip.hover
-														title="Delete"
-														class="gray-hover"
-														@click="deleteModifier(data.row['.key'])">
-															<i class="fas fa-trash-alt"></i>
-													</a>
-												</div>
-											</hk-table>
-										</b-card-body>
-									</b-collapse>
-								</b-card>
+													<template slot="target" slot-scope="data">
+														{{ data.row.subtarget || data.item.capitalize() }}
+													</template>
+													<template slot="value" slot-scope="data">
+														<template v-if="data.item">{{ data.item.capitalize() }}</template>
+														<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
+														<template v-else-if="data.row.type === 'expertise'">Expertise</template>
+														<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
+													</template>
+													<div slot="actions" slot-scope="data" class="actions">
+														<a class="gray-hover mx-1" 
+															@click="editModifier(data.row)" 
+															v-b-tooltip.hover title="Edit">
+															<i class="fas fa-pencil"></i>
+														</a>
+														<a v-b-tooltip.hover
+															title="Delete"
+															class="gray-hover"
+															@click="deleteModifier(data.row['.key'])">
+																<i class="fas fa-trash-alt"></i>
+														</a>
+													</div>
+												</hk-table>
+											</b-card-body>
+										</b-collapse>
+									</b-card>
+								</div>
 							</div>
-						</div>
+						</template>
 					</template>
-				</template>
+				</div>
 			</div>
 		</div>
 
@@ -592,7 +590,7 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
 				this.$emit("change", "class.level");
 			},
-			saveBaseHiPoints(key) {
+			saveBaseHitPoints(key) {
 				const value = (this.classes[key].base_hit_points) ? parseInt(this.classes[key].base_hit_points) : 0;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_hit_points`).set(value);
 				this.$emit("change", "class.base_hit_points");
@@ -637,6 +635,23 @@
 </script>
 
 <style lang="scss" scoped>
+	h3 {
+		font-family: 'Fredericka the Great', cursive !important;
+		font-size: 25px !important;
+		margin: 40px 0 20px 0 !important;
+
+		&.collapse {
+			border-bottom: solid 1px #fff;
+			cursor: pointer;
+			display: flex;
+			justify-content: space-between;
+			padding-bottom: 5px;
+		
+			&:hover {
+				color: #fff !important;
+			}
+		}
+	}
 	.handle-xp {
 		display: flex;
 		justify-content: flex-start;
@@ -653,11 +668,8 @@
 		}
 	}
 	.level-up {
-		background-color: #83b547;
+		color: #83b547 !important;
 		font-size: 15px;
-		color: #fff !important;
-		padding: 5px;
-		border-radius: 3px;
 	}
 	.form-control {
 		width: 100%;

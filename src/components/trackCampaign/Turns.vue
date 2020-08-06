@@ -14,7 +14,7 @@
 			</div>
 
 			<icon 
-				v-if="['monster', 'player', 'companions'].includes(displayImg(current, players[current.id], npcs[current.id]))" class="img d-none d-md-block"
+				v-if="['monster', 'player', 'companion'].includes(displayImg(current, players[current.id], npcs[current.id]))" class="img d-none d-md-block"
 				:icon="displayImg(current, players[current.id], npcs[current.id])" 
 				:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
 			/>

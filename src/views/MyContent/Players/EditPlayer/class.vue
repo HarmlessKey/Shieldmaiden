@@ -1,9 +1,37 @@
 <template>
 	<div class="pb-5">
+		<!-- EXPERIENCE -->
+		<div class="form-item mb-3" v-if="advancement === 'experience'">
+			<h3>Experience points: <b>{{ Class.experience_points }}</b></h3>
+
+			<div class="handle-xp">
+				<b-form-input 
+					autocomplete="off"
+					id="xp" 
+					type="number"
+					v-model="xp" 
+					placeholder="Amount"/>
+					<div>
+						<a @click="handleXP('add')" class="btn btn-sm bg-green">Add</a>
+						<a @click="handleXP('remove')" class="btn btn-sm bg-red">Remove</a>
+					</div>
+			</div>
+			<hr>
+		</div>
+
 		<!-- MAIN CLASS -->
 		<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
 			<div>
-				<h3>Level {{ subclass.level }} {{ subclass.name }}</h3>
+				<h3>
+					Level {{ subclass.level }} {{ subclass.name }}
+					<a 
+						v-if="advancement === 'experience' && calculatedLevel(Class.experience_points) > computed.display.level" 
+						class="level-up"
+						@click="levelUp(classKey)"
+					>
+						Level up <i class="fas fa-arrow-circle-up"/>
+					</a>
+				</h3>
 				<div class="level">
 					<div class="form-item mb-3">
 						<label for="class">Class</label>
@@ -18,7 +46,12 @@
 					<div class="form-item mb-3">
 						<label for="level">Level</label>
 						<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel('main')">
-						<option v-for="level in 20" :key="`${level}`" :value="level">
+						<option 
+							v-for="level in 20" 
+							:key="`${level}`"
+							:value="level"
+							:disabled="level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level))"
+						>
 							{{ level }}
 						</option>
 					</select>
@@ -81,6 +114,10 @@
 								{{ label }}
 							</option>
 						</select>
+					</div>
+					<div class="form-item mb-3">
+						<label for="class">Spell knowledge</label>
+						<b-form-select v-model="subclass.spell_knowledge" :options="spell_knowledge_types" @change="saveSpellKnowledge(classKey)" />
 					</div>
 				</div>
 
@@ -332,20 +369,22 @@
 	import { weapons } from '@/mixins/weapons.js';
 	import { skills } from '@/mixins/skills.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
+	import { experience } from '@/mixins/experience.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'CharacterClass',
-		mixins: [modifierMixin, abilities, weapons, skills, dice, spellSlots],
+		mixins: [modifierMixin, abilities, weapons, skills, dice, spellSlots, experience],
 		props: [
 			"base_class",
 			"hit_point_type",
-			"computed",
+			"advancement",
 			"playerId",
 			"userId",
-			"modifiers"
+			"modifiers",
+			"computed"
 		],
 		components: {
 			VueMarkdown,
@@ -367,8 +406,14 @@
 					{ value: "third", text: "Third caster" },
 					{ value: "other", text: "Other" }
 				],
+				spell_knowledge_types: [
+					{ value: "know_prepare", text: "Knows all spells & prepares" },
+					{ value: "learn_prepare", text: "Learns spells & prepares" },
+					{ value: "learn", text: "Learns spells" }
+				],
 				modifier: {},
 				rollHP: 'main',
+				xp: undefined,
 				columns: {
 					name: {
 						label: 'Name',
@@ -428,6 +473,33 @@
 			}
 		},
 		methods: {
+			handleXP(type) {
+				if(this.xp) {
+					let newValue;
+					const currentVal = parseInt(this.Class.experience_points);
+					const change = parseInt(this.xp);
+
+					if(type === "add") {
+						newValue = currentVal + change;
+						newValue = (newValue > 355000) ? 355000 : newValue;
+					} else {
+						newValue = currentVal - change;
+						newValue = (newValue < 0) ? 0 : newValue;
+					}
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/experience_points`).set(newValue);
+					this.xp = undefined;
+				}
+			},
+			levelUp(classKey) {
+				const level = parseInt(this.classes[classKey].level) + 1; 
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/level`).set(level);
+
+				//Open modal to roll HP
+				if(this.hit_point_type === "rolled") {
+					this.$refs['roll-hp-modal'].show();
+				}
+				this.$emit("change", "class.level_up");
+			},
 			feature_modifiers(classKey, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
@@ -452,7 +524,12 @@
 			saveCastingAbility(classKey) {
 				const value = this.classes[classKey].casting_ability;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/casting_ability`).set(value);
-				this.$emit("change", "class.caster_type");
+				this.$emit("change", "class.casting_ability");
+			},
+			saveSpellKnowledge(classKey) {
+				const value = this.classes[classKey].casting_ability;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spell_knowledge`).set(value);
+				this.$emit("change", "class.spell_knowledge");
 			},
 			setProficiencies(newVal, classKey, type) {
 				const current = this.proficiencies[classKey][type];
@@ -560,6 +637,28 @@
 </script>
 
 <style lang="scss" scoped>
+	.handle-xp {
+		display: flex;
+		justify-content: flex-start;
+
+		.form-control {
+			height: 57px;
+			max-width: 150px;
+			margin-right: 1px;
+			font-size: 25px;
+		}
+		a {
+			display: block;
+			margin-bottom: 1px;
+		}
+	}
+	.level-up {
+		background-color: #83b547;
+		font-size: 15px;
+		color: #fff !important;
+		padding: 5px;
+		border-radius: 3px;
+	}
 	.form-control {
 		width: 100%;
 	}

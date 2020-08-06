@@ -44,7 +44,7 @@
 			<General 
 				v-if="current_tab === 'general'"
 				:general="base_values.general" 
-				:classes="base_values.class.classes"
+				:character_class="base_values.class"
 				:playerId="playerId" 
 				:userId="userId"
 				@change="compute"
@@ -63,10 +63,12 @@
 				v-if="current_tab === 'class'"
 				:base_class="base_values.class" 
 				:hit_point_type="base_values.general.hit_point_type"
+				:advancement="base_values.general.advancement"
 				:playerId="playerId"
 				:userId="userId"
 				:modifiers="class_modifiers"
 				:feat_modifiers="feat_modifiers"
+				:computed="computed_values"
 				@change="compute"
 			/>
 			<Abilities
@@ -94,6 +96,7 @@
 	import Race from './race';
 	import Class from './class';
 	import Abilities from './abilities';
+	
 
 	export default {
 		name: 'Players',

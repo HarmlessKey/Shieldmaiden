@@ -99,7 +99,7 @@
 		name: 'CharacterGeneral',
 		props: [
 			"general", 
-			"classes",
+			"character_class",
 			"playerId", 
 			"userId"
 		],
@@ -141,14 +141,18 @@
 				});
 			},
 			saveAdvancement() {
+				if(this.character.advancement === 'experience' && !this.character_class.experience) {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/experience_points`).set(0);
+				}
+
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/advancement`).set(this.character.advancement);
 				this.$emit("change", "general.advancement");
 			},
 			saveHpType() {
 				//Make sure the rolled HP object exists when type is rolled
 				if(this.character.hit_point_type === "rolled") {
-					for(const classKey in this.classes) {
-						const Class = this.classes[classKey];
+					for(const classKey in this.character_class.classes) {
+						const Class = this.character_class.classes[classKey];
 						if(!Class.rolled_hit_points && Class.level > 1) {
 							db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/2`).set(0);
 						}

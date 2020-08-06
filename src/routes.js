@@ -518,6 +518,16 @@ export const routes = [{
 	}
 },
 {
+	path: '/companions/:userid/:id',
+	name: 'EditCompanion',
+	component: EditNpc,
+	meta: {
+		basePath: '/companions',
+		title: 'Companion',
+		requiresAuth: true
+	}
+},
+{
 	path: '/items',
 	name: 'CustomItems',
 	component: Items,

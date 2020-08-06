@@ -554,7 +554,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$route.params.userid || this.$store.getters.getUser.uid,
 				npcId: this.$route.params.id,
 				quick: false,
 				search: '',
@@ -589,6 +589,7 @@
 			}
 		},
 		mounted() {
+			console.log(this.userId);
 			var npcs_ref = db.ref(`monsters`);
 			npcs_ref.on('value', async (snapshot) => {
 				let npcs = snapshot.val();

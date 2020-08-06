@@ -28,7 +28,7 @@
 									<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
 									<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
 								</div>
-								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> Player died</a>
+								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{current.entityType.capitalize()}} died</a>
 								<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 						</template>
 						<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>

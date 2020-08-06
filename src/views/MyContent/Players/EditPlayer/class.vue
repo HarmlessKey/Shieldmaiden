@@ -69,17 +69,19 @@
 
 				<!-- CASTER -->
 				<h3>Spell casting</h3>
-				<div class="form-item mb-3">
-					<label for="class">Caster type</label>
-					<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
-				</div>
-				<div class="form-item mb-3">
-					<label for="class">Spell casting ability</label>
-					<select class="form-control" v-model="subclass.casting_ability" name="ability" @change="saveCastingAbility(classKey)">
-						<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
-							{{ label }}
-						</option>
-					</select>
+				<div class="casting">
+					<div class="form-item mb-3">
+						<label for="class">Caster type</label>
+						<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
+					</div>
+					<div class="form-item mb-3">
+						<label for="class">Spell casting ability</label>
+						<select class="form-control" v-model="subclass.casting_ability" name="ability" @change="saveCastingAbility(classKey)">
+							<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
+								{{ label }}
+							</option>
+						</select>
+					</div>
 				</div>
 
 				<!-- PROFICIENCIES -->
@@ -180,8 +182,9 @@
 									</b-card-header>
 									<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
 										<b-card-body>
-											<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can’t increase an ability score above 20 using this feature.</p>
-											<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead.</p>
+											<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
+												As usual, you can’t increase an ability score above 20 using this feature.</p>
+											<p>Instead of increasing ability scores you can also choose to take 1 feat.</p>
 										</b-card-body>
 									</b-collapse>
 								</b-card>
@@ -278,11 +281,6 @@
 								</b-card>
 							</div>
 						</div>
-
-						<!-- SPELLS -->
-						<div :key="`casting-${level}`" v-if="subclass.caster_type">
-							Spell slots
-						</div>
 					</template>
 				</template>
 			</div>
@@ -317,6 +315,11 @@
 				Roll
 			</a>
 			</div>      
+    </b-modal>
+
+		<!-- SPELLS KNOWN MODAL -->
+		<b-modal ref="spells-known-modal" hide-footer title="Spells known">
+			     
     </b-modal>
 	</div>
 </template>

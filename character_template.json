@@ -10,6 +10,24 @@
             "initiative": "Integer",
             "speed": {
                 "walking": "Integer"
+            },
+            "classes": {
+                "main": {
+                    "class": "String",
+                    "subclass": "String",
+                    "level": "Integer",
+                    "spells_known": "Integer",
+                    "cantrips_known": "Integer",
+                    "spell_save_dc": "Integer",
+                    "spell_attack_modifier": "Integer"
+                },
+                "subclass_id": {
+                    
+                }
+            },
+            "spell_slots": {
+                "1": "Integer",
+                "2": "Integer"
             }
         },
         "sheet": {

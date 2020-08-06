@@ -285,6 +285,7 @@
 				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
 					const level = value.level;
 					computed_level = computed_level + level;
+					
 					//Save class with level for display
 					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}`).update({ class: value.name, level });
 
@@ -313,6 +314,7 @@
 				//Set proficiency bonus
 				const proficiency = this.xpTable[computed_level].proficiency;
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
+				
 
 				//Initiative
 				let initiative = this.calcMod(ability_scores.dexterity);

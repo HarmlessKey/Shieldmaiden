@@ -289,37 +289,39 @@
 					</b-card>
 				</b-card-group>
 
-				<b-card header="Companion">
-					<div v-if="!npcs">
-						<p>You currently have no custom npcs created</p>
-						<p>First create a custom NPC to use as a companion</p>
-						<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
-					</div>
-					<div v-else>
-						<div class="input-group mb-3">
-							<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-							<div class="input-group-append">
-								<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
-							</div>
+				<b-card header="Companions">
+					<template v-if="isOwner()">
+						<div v-if="!npcs">
+							<p>You currently have no custom npcs created</p>
+							<p>First create a custom NPC to use as a companion</p>
+							<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
 						</div>
-						<ul class="entities">
-							<p v-if="noResult" class="red">{{ noResult }}</p>
-							<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
-										<i class="fas fa-info-circle"></i></a>
-									{{ npc.name }}
+						<div v-else>
+							<div class="input-group mb-3">
+								<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
+								<div class="input-group-append">
+									<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
 								</div>
-								<a class="gray-hover" v-if="notAdded(npc)"
-									v-b-tooltip.hover title="Add Companion" 
-									@click="add(npc)">
-									<i class="fas fa-plus green"></i>
-									<span class="d-none d-md-inline ml-1">Add</span>
-								</a>
-								<span v-else><small>Already added.</small></span>
-							</li>
-						</ul>
-					</div>
+							</div>
+							<ul class="entities">
+								<p v-if="noResult" class="red">{{ noResult }}</p>
+								<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
+									<div class="d-flex justify-content-left">
+										<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
+											<i class="fas fa-info-circle"></i></a>
+										{{ npc.name }}
+									</div>
+									<a class="gray-hover" v-if="notAdded(npc)"
+										v-b-tooltip.hover title="Add Companion" 
+										@click="add(npc)">
+										<i class="fas fa-plus green"></i>
+										<span class="d-none d-md-inline ml-1">Add</span>
+									</a>
+									<span v-else><small>Already added.</small></span>
+								</li>
+							</ul>
+						</div>
+					</template>
 
 					<!--  Companions table -->
 					<hk-table v-if="player.companions !== undefined"
@@ -344,7 +346,8 @@
 								v-b-tooltip.hover title="Edit">
 								<i class="fas fa-pencil"></i>
 							</router-link>
-							<a v-b-tooltip.hover 
+							<a v-if="isOwner()"
+								v-b-tooltip.hover
 								title="Delete" 
 								class="gray-hover"
 								@click="confirmDelete(data.row.key)">
@@ -352,6 +355,11 @@
 							</a>
 						</div>
 					</hk-table>
+					<div v-else-if="!isOwner()">
+						<p>You currently have no companions linked to your player character</p>
+						<p>Ask your DM to link an NPC to you character</p>
+						<!-- <router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link> -->
+					</div>
 				</b-card>
 
 	
@@ -442,7 +450,7 @@
 			//User ID needs te be different if it is
 			//an external controlled character
 			userId() {
-				if(this.$route.name == 'Edit Character') {
+				if(!this.isOwner()) {
 					let id = undefined
 					let user = db.ref(`character_control/${this.$store.getters.getUser.uid}/${this.$route.params.id}`);
 					user.on('value' , (snapshot) => {
@@ -465,6 +473,11 @@
 			...mapActions([
 				'setSlide'
 			]),
+			isOwner() {
+				if (this.$route.name == 'Edit Character')
+					return false
+				return true
+			},
 			addPlayer() {
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
 					this.$snotify.error('You have too many players.', 'Error');

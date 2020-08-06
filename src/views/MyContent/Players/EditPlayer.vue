@@ -333,14 +333,14 @@
 
 						<template slot="name" slot-scope="data">
 							<router-link class="mx-2" 
-								:to="'/npcs/' + data.row.key" 
+								:to="`/companions/${data.row.key}/${userId}`"
 								v-b-tooltip.hover title="Edit">{{ data.item }}
 							</router-link>
 						</template>
 
 						<div slot="actions" slot-scope="data" class="actions">
 							<router-link class="gray-hover mx-1" 
-								:to="'/npcs/' + data.row.key" 
+								:to="`/companions/${data.row.key}/${userId}`"
 								v-b-tooltip.hover title="Edit">
 								<i class="fas fa-pencil"></i>
 							</router-link>

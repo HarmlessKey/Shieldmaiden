@@ -626,6 +626,11 @@
 				'fetchCampaign',
 				'setSlide'
 			]),
+			isOwner() {
+				if (this.$route.name == 'Edit Companion')
+					return false
+				return true
+			},
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
@@ -677,7 +682,12 @@
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
-						this.$router.replace('/npcs')
+						if (this.isOwner()){
+							this.$router.replace('/npcs')
+						}
+						else {
+							this.$router.replace(`/characters/${this.npc.player_id}`)
+						}
 					} else {
 						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
 						});

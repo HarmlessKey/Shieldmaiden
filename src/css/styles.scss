@@ -1113,6 +1113,9 @@ hr { background: $gray-hover; }
 	optgroup {
 		background: $gray-dark !important;
 	}
+	&:hover {
+		border-color: $gray-light !important;
+	}
 }
 .custom-checkbox .custom-control-label::before {
 	border-radius: 0 !important;

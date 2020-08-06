@@ -1,29 +1,32 @@
 <template>
-	<div v-if="!base_values.general.build" class="build-type">
+	<div v-if="base_values.general && !base_values.general.build" class="build-type">
 		<h3>How do you want to build your character?</h3>
 		<div class="types">
-			<b-card header="Advanced">
+			<b-card header="Advanced" @click="build = 'advanced'" :class="{ active: build === 'advanced' }">
 				<p>Create a complete character sheet that you can use as player in your games.</p>
 				<template slot="footer">
-					<a class="btn btn-block" @click="setBuildType('advanced')">Create</a>
+					<a class="btn btn-block">Choose</a>
 				</template>
 			</b-card>
-			<b-card header="Simple">
+			<b-card header="Simple" @click="build = 'simple'" :class="{ active: build === 'simple' }">
 				<p>Create a character with only basic stats needed for use in Harmless Key. This can't be used as a full character reference in your games, but just works for the our combat tracker.</p>
 				<template slot="footer">
-					<a class="btn btn-block" @click="setBuildType('simple')">Create</a>
+					<a class="btn btn-block">Choose</a>
 				</template>
 			</b-card>
-			<b-card header="Import">
+			<b-card header="Import" @click="build = 'import'" :class="{ active: build === 'import' }">
 				<p>Import a character from DnDBeyond. Copy your character sheet over, so it can be used in our combat tracker.</p>
 				<template slot="footer">
-					<a class="btn btn-block" @click="setBuildType('advanced')">Create</a>
+					<a class="btn btn-block">Choose</a>
 				</template>
 			</b-card>
 		</div>
+		<div class="d-flex justify-content-center mt-5">
+			<a class="btn btn-lg" @click="setBuildType('advanced')">Create character</a>
+		</div>
 	</div>
 
-	<div v-else-if="base_values.general.build === 'advanced'" class="content">
+	<div v-else-if="base_values.general && base_values.general.build === 'advanced'" class="content">
 		<ul class="tabs">
 			<li 
 				v-for="({value, label}, i) in tabs"
@@ -109,6 +112,7 @@
 		data() {
 			return {
 				playerId: this.$route.params.id,
+				build: 'advanced',
 				tabs: [
 					{ value: 'general', label: "General" },
 					{ value: 'race', label: "Race" },
@@ -244,8 +248,8 @@
 					type,
 				})
 			},
-			setBuildType(type) {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(type);
+			setBuildType() {
+				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(this.build);
 			},
 			compute(origin) {
 				console.log("change made, compute charachter", origin);
@@ -372,12 +376,16 @@
 			margin: -10px;
 
 			.card {
+				border: solid 1px transparent !important;
 				max-width: 200px;
 				margin: 10px;
 				
 				.card-footer {
 					padding: 0;
 					border: none;
+				}
+				&.active {
+					border-color: #2c97de !important;
 				}
 			}
 		}

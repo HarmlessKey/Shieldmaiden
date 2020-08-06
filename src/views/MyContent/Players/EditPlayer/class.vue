@@ -25,6 +25,7 @@
 					</div>
 				</div>
 
+				<!-- HIT POINTS -->
 				<h3><i class="fas fa-heart"></i> Hit Points</h3>
 				<div class="hit_points">
 					<div class="form-item mb-3" v-if="classKey === 'main'">
@@ -54,6 +55,7 @@
 					</div>
 				</div>
 
+				<!-- BASE AC -->
 				<div class="form-item mb-3" v-if="classKey === 'main'">
 					<label for="class">Base armor class</label>
 					<b-form-input 
@@ -63,6 +65,21 @@
 						type="number" 
 						v-model="subclass.base_armor_class" 
 						placeholder="Base Armor Class"/>
+				</div>
+
+				<!-- CASTER -->
+				<h3>Spell casting</h3>
+				<div class="form-item mb-3">
+					<label for="class">Caster type</label>
+					<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
+				</div>
+				<div class="form-item mb-3">
+					<label for="class">Spell casting ability</label>
+					<select class="form-control" v-model="subclass.casting_ability" name="ability" @change="saveCastingAbility(classKey)">
+						<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
+							{{ label }}
+						</option>
+					</select>
 				</div>
 
 				<!-- PROFICIENCIES -->
@@ -149,117 +166,124 @@
 				
 				<!-- CLASS FEATURES -->
 				<h3>{{ subclass.name || "Class" }} features</h3>
-				<template v-for="level in 20" >
-					<div :key="`features-${level}`" v-if="[4, 8, 12, 16, 19].includes(level) && subclass.level >= level">
-						<h4 class="feature-title">Level {{ level }}</h4>
-						<div role="tablist" class="mb-3">
-							<b-card no-body>
-								<b-card-header role="tab">
-									Ability Score Improvement / Feat
-									<div class="actions">
-										<a v-b-toggle="`accordion-${level}`"><i class="fas fa-pencil-alt"/></a>
-									</div>
-								</b-card-header>
-								<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
-									<b-card-body>
-										<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can’t increase an ability score above 20 using this feature.</p>
-										<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead.</p>
-									</b-card-body>
-								</b-collapse>
-							</b-card>
+				<template v-for="level in 20">
+					<template v-if="subclass.level >= level">
+						<div :key="`features-${level}`" v-if="[4, 8, 12, 16, 19].includes(level)">
+							<h4 class="feature-title">Level {{ level }}</h4>
+							<div role="tablist" class="mb-3">
+								<b-card no-body>
+									<b-card-header role="tab">
+										Ability Score Improvement / Feat
+										<div class="actions">
+											<a v-b-toggle="`accordion-${level}`"><i class="fas fa-pencil-alt"/></a>
+										</div>
+									</b-card-header>
+									<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
+										<b-card-body>
+											<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1. As normal, you can’t increase an ability score above 20 using this feature.</p>
+											<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead.</p>
+										</b-card-body>
+									</b-collapse>
+								</b-card>
+							</div>
 						</div>
-					</div>
-					<div :key="`features-${level}`" v-else-if="subclass.level >= level">
-						<h4 class="feature-title">
-							Level {{ level }}
-							<a @click="addFeature(classKey, level)">Add feature</a>
-						</h4>
-						<div role="tablist" v-if="subclass.features" class="mb-3">
-							<b-card no-body v-for="(feature, key, index) in subclass.features[`level_${level}`]" :key="`feature-${index}`">
-								<b-card-header role="tab">
-									{{ feature.name }}
-									<div class="actions">
-										<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
-										<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
-									</div>
-								</b-card-header>
-								<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
-									<b-card-body>
-										<div class="form-item mb-3">
-											<b-form-checkbox 
-												v-model="subclass.features[`level_${level}`][key].display" 
-												@change="editFeature(classKey, level, key, 'display')" 
-												id="display"
+						<div :key="`features-${level}`" v-else>
+							<h4 class="feature-title">
+								Level {{ level }}
+								<a @click="addFeature(classKey, level)">Add feature</a>
+							</h4>
+							<div role="tablist" v-if="subclass.features" class="mb-3">
+								<b-card no-body v-for="(feature, key, index) in subclass.features[`level_${level}`]" :key="`feature-${index}`">
+									<b-card-header role="tab">
+										{{ feature.name }}
+										<div class="actions">
+											<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
+											<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
+										</div>
+									</b-card-header>
+									<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
+										<b-card-body>
+											<div class="form-item mb-3">
+												<b-form-checkbox 
+													v-model="subclass.features[`level_${level}`][key].display" 
+													@change="editFeature(classKey, level, key, 'display')" 
+													id="display"
+												>
+													Display on character sheet {{ level }}
+												</b-form-checkbox>
+											</div>
+											<div class="form-item mb-3">
+												<label for="class">Feature name</label>
+												<b-form-input 
+													@change="editFeature(classKey, level, key, 'name')"
+													autocomplete="off"  
+													:id="`name-${level}-${index}`" 
+													type="text" 
+													v-model="subclass.features[`level_${level}`][key].name" 
+													placeholder="Feature name"/>
+											</div>
+
+											<label for="description">Description</label>
+											<div class="d-flex justify-content-between mb-3">
+												<b-form-textarea 
+													@change="editFeature(classKey, level, key, 'description')"
+													v-model="subclass.features[`level_${level}`][key].description"
+													id="description"
+													name="description"
+													title="Description"
+													class="form-control"
+													v-validate="'max:5000'"
+													maxlength="5001"
+													data-vv-as="Description"
+													rows="6" 
+												/>
+												<div class="ml-3">
+													<vue-markdown name="description_preview" :source="feature.description"></vue-markdown>
+												</div>
+											</div>
+
+											<!-- FEATURE MODIFIER -->
+											<h3>Modifiers</h3>
+											<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
+
+											<hk-table
+												:columns="columns"
+												:items="feature_modifiers(classKey, level, key)"
 											>
-												Display on character sheet {{ level }}
-											</b-form-checkbox>
-										</div>
-										<div class="form-item mb-3">
-											<label for="class">Feature name</label>
-											<b-form-input 
-												@change="editFeature(classKey, level, key, 'name')"
-												autocomplete="off"  
-												:id="`name-${level}-${index}`" 
-												type="text" 
-												v-model="subclass.features[`level_${level}`][key].name" 
-												placeholder="Feature name"/>
-										</div>
-
-										<label for="description">Description</label>
-										<div class="d-flex justify-content-between mb-3">
-											<b-form-textarea 
-												@change="editFeature(classKey, level, key, 'description')"
-												v-model="subclass.features[`level_${level}`][key].description"
-												id="description"
-												name="description"
-												title="Description"
-												class="form-control"
-												v-validate="'max:5000'"
-												maxlength="5001"
-												data-vv-as="Description"
-												rows="6" 
-											/>
-											<div class="ml-3">
-												<vue-markdown name="description_preview" :source="feature.description"></vue-markdown>
-											</div>
-										</div>
-
-										<!-- FEATURE MODIFIER -->
-										<h3>Modifiers</h3>
-										<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
-
-										<hk-table
-											:columns="columns"
-											:items="feature_modifiers(classKey, level, key)"
-										>
-											<template slot="target" slot-scope="data">
-												{{ data.row.subtarget || data.item.capitalize() }}
-											</template>
-											<template slot="value" slot-scope="data">
-												<template v-if="data.item">{{ data.item.capitalize() }}</template>
-												<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
-												<template v-else-if="data.row.type === 'expertise'">Expertise</template>
-												<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
-											</template>
-											<div slot="actions" slot-scope="data" class="actions">
-												<a class="gray-hover mx-1" 
-													@click="editModifier(data.row)" 
-													v-b-tooltip.hover title="Edit">
-													<i class="fas fa-pencil"></i>
-												</a>
-												<a v-b-tooltip.hover
-													title="Delete"
-													class="gray-hover"
-													@click="deleteModifier(data.row['.key'])">
-														<i class="fas fa-trash-alt"></i>
-												</a>
-											</div>
-										</hk-table>
-									</b-card-body>
-								</b-collapse>
-							</b-card>
+												<template slot="target" slot-scope="data">
+													{{ data.row.subtarget || data.item.capitalize() }}
+												</template>
+												<template slot="value" slot-scope="data">
+													<template v-if="data.item">{{ data.item.capitalize() }}</template>
+													<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
+													<template v-else-if="data.row.type === 'expertise'">Expertise</template>
+													<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
+												</template>
+												<div slot="actions" slot-scope="data" class="actions">
+													<a class="gray-hover mx-1" 
+														@click="editModifier(data.row)" 
+														v-b-tooltip.hover title="Edit">
+														<i class="fas fa-pencil"></i>
+													</a>
+													<a v-b-tooltip.hover
+														title="Delete"
+														class="gray-hover"
+														@click="deleteModifier(data.row['.key'])">
+															<i class="fas fa-trash-alt"></i>
+													</a>
+												</div>
+											</hk-table>
+										</b-card-body>
+									</b-collapse>
+								</b-card>
+							</div>
 						</div>
-					</div>
+
+						<!-- SPELLS -->
+						<div :key="`casting-${level}`" v-if="subclass.caster_type">
+							Spell slots
+						</div>
+					</template>
 				</template>
 			</div>
 		</div>
@@ -304,18 +328,19 @@
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/weapons.js';
 	import { skills } from '@/mixins/skills.js';
+	import { spellSlots } from '@/mixins/spellSlots.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'CharacterClass',
-		mixins: [modifierMixin, abilities, weapons, skills, dice],
+		mixins: [modifierMixin, abilities, weapons, skills, dice, spellSlots],
 		props: [
 			"base_class",
 			"hit_point_type",
 			"computed",
-			"playerId", 
+			"playerId",
 			"userId",
 			"modifiers"
 		],
@@ -331,6 +356,13 @@
 					{ value: "medium", label: "Medium armor" },
 					{ value: "heavy", label: "Heavy armor" },
 					{ value: "shield", label: "Shield" }
+				],
+				caster_types: [
+					{ value: null, text: "Not a caster" },
+					{ value: "full", text: "Full caster" },
+					{ value: "half", text: "Half caster" },
+					{ value: "third", text: "Third caster" },
+					{ value: "other", text: "Other" }
 				],
 				modifier: {},
 				rollHP: 'main',
@@ -408,6 +440,16 @@
 					}
 				}
 				return totalRolled;
+			},
+			saveCasterType(classKey) {
+				const value = this.classes[classKey].caster_type;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/caster_type`).set(value);
+				this.$emit("change", "class.caster_type");
+			},
+			saveCastingAbility(classKey) {
+				const value = this.classes[classKey].casting_ability;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/casting_ability`).set(value);
+				this.$emit("change", "class.caster_type");
 			},
 			setProficiencies(newVal, classKey, type) {
 				const current = this.proficiencies[classKey][type];
@@ -535,6 +577,7 @@
 
 		.form-item {
 			margin: 0 10px;
+			flex: 1 1;
 
 			.el-select {
 				width: 100%;

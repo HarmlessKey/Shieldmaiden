@@ -15,6 +15,7 @@ export const modifierMixin = {
 		addModifier() {
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(this.modifier);
 			this.$refs['modifier-modal'].hide();
+			this.$emit("change", "modifier.added");
 		},
 		editModifier(modifier) {
 			this.modifier = { ...modifier};
@@ -26,9 +27,11 @@ export const modifierMixin = {
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
 			this.modifier = {}
 			this.$refs['modifier-modal'].hide();
+			this.$emit("change", "modifier.saved");
 		},
 		deleteModifier(key) {
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
+			this.$emit("change", "modifier.deleted");
 		}
 	}
 }

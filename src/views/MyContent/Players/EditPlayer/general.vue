@@ -141,7 +141,7 @@
 				});
 			},
 			saveAdvancement() {
-				if(this.character.advancement === 'experience' && !this.character_class.experience) {
+				if(this.character.advancement === 'experience' && !this.character_class.experience_points) {
 					db.ref(`characters_base/${this.userId}/${this.playerId}/class/experience_points`).set(0);
 				}
 

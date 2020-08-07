@@ -2,27 +2,17 @@
 	<div class="pb-5">
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
-			<h3>Experience points: <b>{{ Class.experience_points }}</b></h3>
-
-			<div class="handle-xp">
-				<b-form-input 
-					autocomplete="off"
-					id="xp" 
-					type="number"
-					v-model="xp" 
-					placeholder="Amount"/>
-					<div>
-						<a @click="handleXP('add')" class="btn btn-sm bg-green">Add</a>
-						<a @click="handleXP('remove')" class="btn btn-sm bg-red">Remove</a>
-					</div>
-			</div>
+			<h3 v-b-modal.experience-modal class="pointer">
+				Experience points: <b>{{ Class.experience_points }}</b> 
+				<small class="ml-2"><i class="fas fa-pencil-alt"></i></small>
+			</h3>
 			<hr>
 		</div>
 
 		<!-- MAIN CLASS -->
 		<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
 			<div>
-				<h3 @click="showClass = classKey">
+				<h3 @click="setShowClass(classKey)" class="pointer" :class="{ 'hidden-class': classKey !== showClass}">
 					Level {{ subclass.level }} {{ subclass.name }}
 					<i class="fas fa-chevron-down"/>
 					<a 
@@ -65,8 +55,16 @@
 
 						<!-- HIT POINTS -->
 						<h3 v-b-toggle="`hp-${classKey}`" class="collapse">
-							<span><i class="fas fa-heart"></i> Hit Points</span>
-							{{ computed.display.hit_points }}
+							<span><i class="fas fa-heart"></i> Hit points</span>
+							<span>
+								<span v-b-tooltip:hover title="Hit dice" v-if="subclass.hit_dice">{{ subclass.level }}d{{ subclass.hit_dice }}</span> |
+								<span v-b-tooltip:hover title="CON modifier" v-if="computed.sheet.abilities && computed.sheet.abilities.constitution">
+								 {{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
+								</span> |
+								<span v-b-tooltip:hover title="Hit points">
+									{{ computed.display.hit_points }}
+								</span>
+							</span>
 						</h3>
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
 							<div class="form-item mb-3" v-if="classKey === 'main'">
@@ -85,13 +83,11 @@
 							</div>
 							<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
 								<label>Rolled HP</label>
-								<div class="rolled">
+								<div class="rolled" @click="rollHitPoints(classKey)">
 									<span class="val">
 										{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
 									</span>
-									<a class="mx-1" @click="rollHitPoints(classKey)">
-										<i class="fas fa-pencil"></i>
-									</a>
+									<i class="fas fa-pencil"></i>
 								</div>
 							</div>
 						</b-collapse>
@@ -357,8 +353,25 @@
 			</div>      
     </b-modal>
 
+		<!-- EXPERIENCE MODAL -->
+		<b-modal ref="experience-modal" id="experience-modal" hide-footer title="Experience">
+			<h3 class="xp">{{ Class.experience_points }}<small>xp</small></h3>
+			<div class="handle-xp">
+				<b-form-input 
+					autocomplete="off"
+					id="xp" 
+					type="number"
+					v-model="xp" 
+					placeholder="Amount"/>
+					<div>
+						<a @click="handleXP('add')" class="btn bg-green">Add</a>
+						<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
+					</div>
+			</div>
+    </b-modal>
+
 		<!-- SPELLS KNOWN MODAL -->
-		<b-modal ref="spells-known-modal" hide-footer title="Spells known">
+		<b-modal ref="spells-known-modal" id="spells-known-modal" hide-footer title="Spells known">
 			     
     </b-modal>
 	</div>
@@ -373,13 +386,23 @@
 	import { skills } from '@/mixins/skills.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { experience } from '@/mixins/experience.js';
+	import { general } from '@/mixins/general.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'CharacterClass',
-		mixins: [modifierMixin, abilities, weapons, skills, dice, spellSlots, experience],
+		mixins: [
+			general,
+			modifierMixin, 
+			abilities, 
+			weapons, 
+			skills, 
+			dice, 
+			spellSlots, 
+			experience
+		],
 		props: [
 			"base_class",
 			"hit_point_type",
@@ -477,6 +500,9 @@
 			}
 		},
 		methods: {
+			setShowClass(classKey){
+				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
+			},
 			handleXP(type) {
 				if(this.xp) {
 					let newValue;
@@ -626,7 +652,7 @@
 				}
 
 				//Delete feature
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${key}`).remove();
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/c1lasses/${classKey}/features/level_${level}/${key}`).remove();
 				this.$emit("change", "class.delete_feature");
 			},
 			confirmDelete(classKey, level, key, name) {
@@ -663,16 +689,36 @@
 				color: #fff !important;
 			}
 		}
+		.fa-chevron-down {
+			transition: .3s linear;
+		}
+		&.hidden-class {
+			.fa-chevron-down {
+				transform: rotate(-90deg);
+			}
+		}
+	}
+	.modal {
+		h3.xp {
+			margin-top: 0px !important;
+			font-size: 40px !important;
+			text-align: center;
+
+			small {
+				color: #5c5757;
+				margin-left: 3px;
+			}
+		}
 	}
 	.handle-xp {
 		display: flex;
-		justify-content: flex-start;
+		justify-content: center;
 
 		.form-control {
-			height: 57px;
-			max-width: 150px;
+			height: 77px;
 			margin-right: 1px;
 			font-size: 25px;
+			max-width: 150px;
 		}
 		a {
 			display: block;
@@ -711,9 +757,12 @@
 		}
 	}
 	.rolled {
+		cursor: pointer;
 		line-height: 38px;
+		font-family: 'Fredericka the Great', cursive !important;
+
 		.val {
-			font-size: 25px;
+			font-size: 30px;
 		}
 	}
 	.roll_hp {

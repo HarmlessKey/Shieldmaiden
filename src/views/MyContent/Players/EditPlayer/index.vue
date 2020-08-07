@@ -89,6 +89,7 @@
 	import { experience } from '@/mixins/experience.js';
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
+	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import Computed from './computed';
@@ -103,7 +104,7 @@
 		metaInfo: {
 			title: 'Character'
 		},
-		mixins: [experience, general, dice],
+		mixins: [experience, general, dice, spellSlots],
 		components: {
 			OverEncumbered,
 			Computed,
@@ -260,6 +261,16 @@
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
+				//Ability score maximums
+				let ability_max = {
+					strength: 20,
+					dexteriy: 20,
+					constitution: 20,
+					intelligence: 20,
+					wisdom: 20,
+					charisma: 20
+				}
+
 				//Ability Scores
 				let ability_scores = { ...this.base_values.abilities };
 
@@ -269,6 +280,11 @@
 						if(modifier.subtarget === key && modifier.type === 'bonus') {
 							ability_scores[key] = value + parseInt(modifier.value);
 						}
+					}
+
+					//Set score to maximum if it is higher than it's maximum
+					if(ability_scores[key] > ability_max[key]) {
+						ability_scores[key] = ability_max[key];
 					}
 				}
 				//Save Ability Scores
@@ -281,10 +297,13 @@
 				 * 
 				 **/
 
-				//Level and HP
+				//Level HP and Spells
 				let computed_level = 0;
 				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
+				let caster_multilevel = 0; //For multiclassing in multiple casters you need a caster level (phb 164)
+				let spell_slots;
 
+				//Set level specific stats HP/Spells
 				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
 					const level = value.level;
 					computed_level = computed_level + level;
@@ -292,7 +311,7 @@
 					//Save class with level for display
 					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}`).update({ class: value.name, level });
 
-					//Set HP					
+					//Check if the HP is rolled
 					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
 						let totalRolled = 0;
 						for(const [key, rolled] of Object.entries(value.rolled_hit_points)) {
@@ -307,8 +326,29 @@
 						});
 						computed_hp = computed_hp + ((level - 1) * hit_dice[0].average);
 					}
+
+					//Spell slots
+					if(value.caster_type) {
+						let multiplier = 1;
+
+						if(value.caster_type === 'half') {
+							multiplier = 2;
+						} else if(value.caster_type === 'third') {
+							multiplier = 3;
+						}
+
+						caster_multilevel = caster_multilevel + Math.floor(level/multiplier);
+						spell_slots = this.caster[value.caster_type].slots[level];
+					}
 				}
+				//Save total level
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
+
+				//Save spell slots
+				if(caster_multilevel > 1) {
+					spell_slots = this.caster.full.slots[caster_multilevel];
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
 
 				//Add CON modifier * level to computed HP
 				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));
@@ -318,7 +358,6 @@
 				const proficiency = this.xpTable[computed_level].proficiency;
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
 				
-
 				//Initiative
 				let initiative = this.calcMod(ability_scores.dexterity);
 

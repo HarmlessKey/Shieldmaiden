@@ -75,6 +75,9 @@
 					{{ feat.name }}
 					<div class="actions">
 						<a v-b-toggle="`accordion-${index}`"><i class="fas fa-pencil-alt"/></a>
+						<a class="gray-hover"	@click="confirmDelete(feat['.key'])">
+								<i class="fas fa-trash-alt"></i>
+						</a>
 					</div>
 				</b-card-header>
 				<b-collapse :id="`accordion-${index}`" accordion="my-accordion" role="tabpanel">
@@ -91,10 +94,10 @@
 						</div>
 
 						<!-- Modifiers -->
-						<h3 class="title">
+						<h4 class="title">
 							Modifiers
 							<a @click="newModifier(`feat.${feat['.key']}`)">Add Modifier</a>
-						</h3>
+						</h4>
 						<hk-table
 							:columns="columns"
 							:items="modifiers_feat(feat['.key'])"
@@ -214,7 +217,27 @@
 			editFeat(key, index, property) {
 				const value = this.feats[index][property];
 				db.ref(`characters_base/${this.userId}/${this.playerId}/feats/${key}/${property}`).set(value);
-			}
+			},
+			deleteFeat(key) {
+				//Delete all modifiers linked to this feat
+				const linked_modifiers = this.modifiers_feat(key);
+
+				for(const modifier of linked_modifiers) {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
+				}
+
+				//Delete feat
+				db.ref(`characters_base/${this.userId}/${this.playerId}/feats/${key}`).remove();
+				this.$emit("change", "race.feat_removed");
+			},
+			confirmDelete(key, name) {
+				this.$snotify.error('Are you sure you want to delete the the feat "' + name + '"?', 'Delete feat', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { this.deleteFeat(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
 		}
 	}
 </script>
@@ -228,7 +251,11 @@
 	.hk-table {
 		margin-bottom: 30px;
 	}
-	h3.title {
+	h4 {
+		font-size: 16px;
+		margin: 15px 0 !important;
+	}
+	.title {
 		display: flex;
 		justify-content: space-between;
 		padding-bottom: 5px;
@@ -247,7 +274,7 @@
 				
 				a {
 					margin-left: 10px;
-					color: #b2b2b2;
+					color: #b2b2b2 !important;
 				}
 			}
 		}

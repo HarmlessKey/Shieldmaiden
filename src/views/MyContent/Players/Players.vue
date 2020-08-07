@@ -30,7 +30,7 @@
 				:search="['character_name', 'campaign_name']"
 			>
 				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+					<div class="image" v-if="data.row.display.avatar" :style="{ backgroundImage: 'url(\'' + data.row.display.avatar + '\')' }"></div>
 					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
 				</template>
 

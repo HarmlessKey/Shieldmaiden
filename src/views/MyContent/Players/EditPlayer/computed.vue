@@ -1,5 +1,5 @@
 <template>
-	<div class="computed bg-gray">
+	<div class="computed">
 		<div 
 				class="image"
 				:style="[
@@ -61,11 +61,13 @@
 <style lang="scss" scoped>
 	.computed {
 		width: 100%;
-		padding: 10px;
+		padding: 15px;
 		display: grid;
 		grid-template-columns: 68px max-content 1fr;
 		grid-column-gap: 15px;
 		margin-bottom: 15px;
+		background-color: rgba(0, 0, 0, .5);
+		border: solid 1px #5c5757;
 
 		.image {
 			width: 68px;
@@ -101,6 +103,7 @@
 					line-height: 56px;
 					font-size: 45px;
 					font-weight: bold;
+					font-family: 'Fredericka the Great', cursive !important;
 				}
 				.ft {
 					font-size: 15px;

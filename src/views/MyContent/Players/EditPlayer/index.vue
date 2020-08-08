@@ -432,7 +432,6 @@
 					bonuses: {}
 				};
 				for(const ability in ability_scores) {
-					console.log(ability)
 					for(const modifier of this.saving_throw_modifiers) {
 						//Save saving throw proficiencies as a boolean, don't save the bonus
 						//This get's calculated front end
@@ -449,7 +448,26 @@
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/saving_throws`).set(saving_throws);
 
-				//Senses
+				//Senses, passive checks phb (175)
+				let senses = {
+					perception: 10,
+					investigation: 10,
+					insight: 10
+				}
+				for(const [skill, value] of Object.entries(senses)) {
+					//Ad ability modifier
+					if(skill === 'investigation') {
+						this.$set(senses, skill, (value + this.calcMod(ability_scores['intelligence'])));
+					} else {
+						this.$set(senses, skill, (value + this.calcMod(ability_scores['wisdom'])));
+					}
+
+					//Add proficiency
+					if(skills.proficiencies[skill]) {
+						this.$set(senses, skill, (senses[skill] + proficiency))
+					}
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/senses`).set(senses);
 
 				//Clear the proficiency tracker
 				this.proficiency_tracker = [];

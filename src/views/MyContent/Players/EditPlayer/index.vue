@@ -311,6 +311,7 @@
 				 **/
 
 				//Level HP and Spells
+				let classes = {};
 				let computed_level = 0;
 				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
 				let caster_multilevel = 0; //For multiclassing in multiple casters you need a caster level (phb 164)
@@ -321,9 +322,7 @@
 					const level = value.level;
 					computed_level = computed_level + level;
 					
-					//Save class with level for display
-					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}`).update({ class: value.name, level });
-
+					
 					//Check if the HP is rolled
 					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
 						let totalRolled = 0;
@@ -353,7 +352,16 @@
 						caster_multilevel = caster_multilevel + Math.floor(level/multiplier);
 						spell_slots = this.caster[value.caster_type].slots[level];
 					}
+
+					//Create class object for sheet
+					classes[key] = {
+						class: value.name,
+						level
+					}
 				}
+				//save classes
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).set(classes);
+
 				//Save total level
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
 
@@ -371,6 +379,17 @@
 				//Set proficiency bonus
 				const proficiency = this.xpTable[computed_level].proficiency;
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/proficiency`).set(proficiency);
+
+				//Set spellcasting variables Spell Attack / Spell Save DC
+				//Proficiency bonus is needed for this
+				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
+					if(value.casting_ability) {
+						classes[key].spell_attack = proficiency + this.calcMod(ability_scores[value.casting_ability]);
+						classes[key].spell_save_dc = 8 + proficiency + this.calcMod(ability_scores[value.casting_ability]);
+					}
+				}
+				//Update classes
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).update(classes);
 				
 				//Initiative
 				let initiative = this.calcMod(ability_scores.dexterity);
@@ -467,7 +486,7 @@
 						this.$set(senses, skill, (senses[skill] + proficiency))
 					}
 				}
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/senses`).set(senses);
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/senses`).set(senses); 
 
 				//Clear the proficiency tracker
 				this.proficiency_tracker = [];

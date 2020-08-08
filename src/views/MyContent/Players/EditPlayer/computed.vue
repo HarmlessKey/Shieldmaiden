@@ -3,16 +3,16 @@
 		<div 
 				class="image"
 				:style="[
-					character.avatar ? { backgroundImage: 'url(\'' + character.avatar + '\')' } : 
+					character.display.avatar ? { backgroundImage: 'url(\'' + character.display.avatar + '\')' } : 
 					{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
 				]"
 		/>
 		<div class="general">
-			<h4>{{ character.character_name || "Unnamed Character" }}</h4>
-			<div v-if="character.classes">
-				{{ character.race }} {{ character.classes.main.class }}
+			<h4>{{ character.display.character_name || "Unnamed Character" }}</h4>
+			<div v-if="character.sheet.classes">
+				{{ character.display.race }} {{ character.sheet.classes.main.class }}
 			</div>
-			Level {{ character.level }} 
+			Level {{ character.display.level }} 
 		</div>
 		
 		<div class="abilities" v-if="abilities">
@@ -27,29 +27,29 @@
 		</div>
 
 		<div class="stats">
-			<div class="armor_class" v-if="character.armor_class">
+			<div class="armor_class" v-if="character.display.armor_class">
 				<h6>Armor Class</h6>
 				<div class="value">
-					{{ character.armor_class }}
+					{{ character.display.armor_class }}
 				</div>
 			</div>
-			<div class="hit_points" v-if="character.hit_points">
+			<div class="hit_points" v-if="character.display.hit_points">
 				<h6>Hit Points</h6>
 				<div class="value">
-					{{ character.hit_points }}
+					{{ character.display.hit_points }}
 				</div>
 			</div>
-			<div class="speed" v-if="character.speed">
+			<div class="speed" v-if="character.display.speed">
 				<h6>Speed</h6>
 				<div class="value">
-					{{ character.speed }}<span class="ft gray-hover">ft.</span>
+					{{ character.display.speed }}<span class="ft gray-hover">ft.</span>
 				</div>
 			</div>
-			<div class="initiative" v-if="character.initiative">
+			<div class="initiative" v-if="character.display.initiative">
 				<h6>Initiative</h6>
 				<div class="value">
 					<span class="gray-hover">
-						{{ character.initiative >= 0 ? "+" : "-" }}</span>{{ Math.abs(character.initiative) }}
+						{{ character.display.initiative >= 0 ? "+" : "-" }}</span>{{ Math.abs(character.display.initiative) }}
 				</div>
 			</div>
 		</div>
@@ -67,7 +67,7 @@
 		],
 		computed: {
 			character() {
-				return (this.computed) ? this.computed.display : {};
+				return (this.computed) ? this.computed : {};
 			},
 			abilities() {
 				return (this.computed.sheet) ? this.computed.sheet.abilities : undefined;

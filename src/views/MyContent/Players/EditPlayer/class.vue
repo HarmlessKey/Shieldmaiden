@@ -95,6 +95,12 @@
 						<!-- CASTER -->
 						<h3 v-b-toggle="`casting-${classKey}`" class="collapse">
 							<span><i class="fas fa-hand-holding-magic"/> Spell casting</span>
+							<span>
+								<span v-b-tooltip:hover title="Spell attack" v-if="subclass.casting_ability">
+									{{ computed.sheet.classes[classKey].spell_attack > 0 ? "+" : "" }}{{ computed.sheet.classes[classKey].spell_attack }}
+								</span> |
+								<span v-b-tooltip:hover title="Spell save DC" v-if="subclass.casting_ability">{{ computed.sheet.classes[classKey].spell_save_dc }}</span>
+							</span>
 						</h3>
 						<b-collapse :id="`casting-${classKey}`" class="casting">
 							<div class="form-item mb-3">

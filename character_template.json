@@ -10,6 +10,16 @@
             "initiative": "Integer",
             "speed": {
                 "walking": "Integer"
+            }
+        },
+        "sheet": {
+            "abilities": {
+                "strength": "Integer",
+                "dexterity": "Integer",
+                "constitution": "Integer",
+                "intelligence": "Integer",
+                "wisdom": "Integer",
+                "charisma": "Integer"
             },
             "classes": {
                 "main": {
@@ -28,16 +38,6 @@
             "spell_slots": {
                 "1": "Integer",
                 "2": "Integer"
-            }
-        },
-        "sheet": {
-            "abilities": {
-                "strength": "Integer",
-                "dexterity": "Integer",
-                "constitution": "Integer",
-                "intelligence": "Integer",
-                "wisdom": "Integer",
-                "charisma": "Integer"
             },
             "saving_throws": {
                 "strength": "Integer"

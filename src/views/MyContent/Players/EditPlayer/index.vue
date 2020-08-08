@@ -39,7 +39,7 @@
 		</ul>
 		<div class="tab-content" v-if="base_values.class">
 			<Computed 
-				:computed="computed_values.display" 
+				:computed="computed_values" 
 			/>
 			<General 
 				v-if="current_tab === 'general'"
@@ -90,6 +90,7 @@
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
+	import { skills } from '@/mixins/skills.js';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import Computed from './computed';
@@ -104,7 +105,7 @@
 		metaInfo: {
 			title: 'Character'
 		},
-		mixins: [experience, general, dice, spellSlots],
+		mixins: [experience, general, dice, spellSlots, skills],
 		components: {
 			OverEncumbered,
 			Computed,
@@ -197,9 +198,21 @@
 				});
 				return modifiers;
 			},
+			saving_throw_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'saving_throw';
+				});
+				return modifiers;
+			},
 			ac_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
 					return mod.target === 'ac';
+				});
+				return modifiers;
+			},
+			skill_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'skill';
 				});
 				return modifiers;
 			},
@@ -264,7 +277,7 @@
 				//Ability score maximums
 				let ability_max = {
 					strength: 20,
-					dexteriy: 20,
+					dexterity: 20,
 					constitution: 20,
 					intelligence: 20,
 					wisdom: 20,
@@ -293,7 +306,7 @@
 				/**
 				 * 
 				 * TODO!
-				 * Set Ability Set Score Modifiers
+				 * Ability Set Score Modifiers
 				 * 
 				 **/
 
@@ -329,8 +342,8 @@
 
 					//Spell slots
 					if(value.caster_type) {
+						//For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
 						let multiplier = 1;
-
 						if(value.caster_type === 'half') {
 							multiplier = 2;
 						} else if(value.caster_type === 'third') {
@@ -344,10 +357,11 @@
 				//Save total level
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
 
-				//Save spell slots
+				//Check if multiclassed in multiple casters, then use the caster_multilevel and full caster spell slot table (phb 164)
 				if(caster_multilevel > 1) {
 					spell_slots = this.caster.full.slots[caster_multilevel];
 				}
+				//Save spell slots
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
 
 				//Add CON modifier * level to computed HP
@@ -368,7 +382,7 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
 
 				//Armor Class
-				let armor_class = 10;
+				let armor_class = 10; //Base is always 10 (phb 14)
 				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
 
 				//Add AC Modifiers	
@@ -385,20 +399,85 @@
 					speed = this.addModifier(speed, modifier, proficiency, ability_scores);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
+
+				//Skills
+				let skills = {
+					proficiencies: {},
+					expertise: {},
+					bonuses: {}
+				};
+				for(const skill in this.skillList) {
+					for(const modifier of this.skill_modifiers) {
+						//Save skill proficiencies as a boolean, don't save the bonus
+						//This get's calculated front end, same goes for expertise
+						//This way expertise can easily only be added if the proficiency is also true
+						//It's also easier to show front-end what skills have proficiency and expertise
+						if(skill === modifier.subtarget) {
+							if(modifier.type === "proficiency") {
+								skills.proficiencies[skill] = true;
+							} else if(modifier.type === "expertise") {
+								skills.expertise[skill] = true;
+							} else {
+								let value = (skills.bonuses[skill]) ? skills.bonuses[skill] : 0;
+								skills.bonuses[skill] = this.addModifier(value, modifier, proficiency, ability_scores);
+							}
+						}
+					}
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/skills`).set(skills);
+
+				//Saving throws
+				let saving_throws = {
+					proficiencies: {},
+					bonuses: {}
+				};
+				for(const ability in ability_scores) {
+					console.log(ability)
+					for(const modifier of this.saving_throw_modifiers) {
+						//Save saving throw proficiencies as a boolean, don't save the bonus
+						//This get's calculated front end
+						//This way it's easy tho show what saving throws have proficiency
+						if(ability === modifier.subtarget) {
+							if(modifier.type === "proficiency") {
+								saving_throws.proficiencies[ability] = true;
+							} else {
+								let value = (saving_throws.bonuses[ability]) ? saving_throws.bonuses[ability] : 0;
+								saving_throws.bonuses[ability] = this.addModifier(value, modifier, proficiency, ability_scores);
+							}
+						}
+					}
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/saving_throws`).set(saving_throws);
+
+				//Senses
+
+				//Clear the proficiency tracker
+				this.proficiency_tracker = [];
 			},
 			addModifier(value, modifier, proficiency, ability_scores) {
 				let newValue = parseInt(value);
-				
+ 
 				if(modifier.type === 'bonus') {
 					newValue = newValue + parseInt(modifier.value);
 				}
 				if(modifier.type === 'proficiency') {
-					newValue = newValue + proficiency;
+					//Keep track of what subtargets have had proficiency added
+					//proficiency can only be added once
+					let added_before = false;
+					for(const prof of this.proficiency_tracker) {
+						if(prof === `${modifier.target}.${modifier.subtarget}`) {
+							added_before = true;
+						}
+					}
+					//If proficiency wasn't added before, add it and track that it was added
+					if(!added_before) {
+						newValue = newValue + parseInt(proficiency);
+						this.proficiency_tracker.push(`${modifier.target}.${modifier.subtarget}`);
+					}
 				}
 				if(modifier.type === 'ability') {
 					newValue = newValue + this.calcMod(ability_scores[modifier.ability_modifier]);
 				}
-
 				return newValue;
 			}
 		}

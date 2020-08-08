@@ -42,7 +42,7 @@
 			:items="modifiers"
 		>
 			<template slot="target" slot-scope="data">
-				{{ data.row.subtarget.capitalize() || data.item.capitalize() }}
+				{{ data.row.subtarget || data.item.capitalize() }}
 			</template>
 			<template slot="value" slot-scope="data">
 				<template v-if="data.item">{{ data.item }}</template>
@@ -76,7 +76,7 @@
 					<div class="actions">
 						<a v-b-toggle="`accordion-${index}`"><i class="fas fa-pencil-alt"/></a>
 						<a class="gray-hover"	@click="confirmDelete(feat['.key'])">
-								<i class="fas fa-trash-alt"></i>
+							<i class="fas fa-trash-alt"></i>
 						</a>
 					</div>
 				</b-card-header>

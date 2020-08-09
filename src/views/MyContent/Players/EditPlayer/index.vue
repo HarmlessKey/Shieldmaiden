@@ -85,7 +85,6 @@
 
 <script>
 	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { experience } from '@/mixins/experience.js';
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
@@ -122,7 +121,10 @@
 					{ value: 'general', label: "General" },
 					{ value: 'race', label: "Race" },
 					{ value: 'class', label: "Class" },
-					{ value: 'abilities', label: "Abilities" }
+					{ value: 'abilities', label: "Abilities" },
+					{ value: 'equipment', label: "Equipment" },
+					{ value: 'actions', label: "Actions" },
+					{ value: 'background', label: "Background" },
 				],
 				current_tab: 'general'
 			}
@@ -247,14 +249,6 @@
 				return feats;
 			},
 		},
-		watch: {
-			base_values: {
-				handler(newValue, oldValue) {
-					console.log('Base values changed')
-				},
-				deep: true,
-			}
-		},
 		methods: {
 			...mapActions([
 				'setSlide'
@@ -269,6 +263,7 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(this.build);
 			},
 			compute(origin) {
+				// eslint-disable-next-line
 				console.log("change made, compute charachter", origin);
 				origin = origin.split(".");
 
@@ -370,7 +365,9 @@
 					spell_slots = this.caster.full.slots[caster_multilevel];
 				}
 				//Save spell slots
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
+				if(spell_slots) {
+					db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
+				}
 
 				//Add CON modifier * level to computed HP
 				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));

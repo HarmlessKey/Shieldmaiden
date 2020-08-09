@@ -1553,6 +1553,9 @@ input[type='number'] {
 				color: $blue !important;
 			}
 		}
+		&.is-disabled {
+			opacity: .5;
+		}
 	}
 }
 .el-popper[x-placement^=top] .popper__arrow {

@@ -129,7 +129,7 @@
 			</b-card>
 		</div>
 
-		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
+		<b-modal ref="modifier-modal" scrollable :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
       <Modifier v-model="modifier" />
 			<template slot="modal-footer">
 				<a class="btn bg-gray" @click="hideModal">Cancel</a>

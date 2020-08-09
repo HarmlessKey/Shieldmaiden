@@ -4,11 +4,16 @@ export const modifierMixin = {
 	methods: {
 		newModifier(origin) {
 			this.modifier = {
-				origin: origin
+				origin: origin,
+				type: null,
+				target: null,
+				subtarget: null,
+				ability_modifier: null,
+				restrictions: []
 			}
 			this.$refs['modifier-modal'].show();
 		},
-		hideModal(origin) {
+		hideModal() {
 			this.modifier = {}
 			this.$refs['modifier-modal'].hide();
 		},
@@ -24,6 +29,13 @@ export const modifierMixin = {
 		saveModifier(modifier) {
 			const key = modifier['.key'];
 			delete modifier['.key'];
+
+			//Clear modifier of unneeded properties
+			if(!["ability", "ability_maximum", "skill"].includes(modifier.target)) {
+				delete modifier.subtarget;
+			}
+
+
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
 			this.modifier = {}
 			this.$refs['modifier-modal'].hide();

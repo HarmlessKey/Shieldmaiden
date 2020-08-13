@@ -1195,9 +1195,13 @@ ul.nav {
 				opacity: 1;
 				height: 50px;
 				line-height: 20px;
+				
 		
 				&:hover {
 					color: $red !important;
+				}
+				&:focus {
+					outline: none;
 				}
 			}
 		}

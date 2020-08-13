@@ -119,6 +119,9 @@
 								<label for="class">Spell knowledge</label>
 								<b-form-select v-model="subclass.spell_knowledge" :options="spell_knowledge_types" @change="saveSpellKnowledge(classKey)" />
 							</div>
+							<div class="form-item mb-3" v-if="subclass.caster_type">
+								<a @click="spellsKnown(classKey)">Spells known</a>
+							</div>
 						</b-collapse>
 
 						<!-- PROFICIENCIES -->
@@ -339,20 +342,20 @@
     </b-modal>
 
 		<!-- ROLLED HP MODAL -->
-		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[rollHP].name}`">
+		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`">
 			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp">
 			<label :for="`level-${level}`">Level {{ level }}</label>
 			<b-form-input 
-				@change="setRolledHP(rollHP, level)"
+				@change="setRolledHP(editClass, level)"
 				autocomplete="off" 
 				:id="`level-${level}`" 
 				type="text"
-				v-model="classes[rollHP].rolled_hit_points[level]" 
+				v-model="classes[editClass].rolled_hit_points[level]" 
 			/>
 			<a 
-				:class="{ hidden: classes[rollHP].rolled_hit_points[level] }"
+				:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
 				class="btn"
-				@click="rollHitDice(rollHP, level)"
+				@click="rollHitDice(editClass, level)"
 			>
 				Roll
 			</a>
@@ -378,7 +381,19 @@
 
 		<!-- SPELLS KNOWN MODAL -->
 		<b-modal ref="spells-known-modal" id="spells-known-modal" hide-footer title="Spells known">
-			     
+			<div class="spells-known" v-if="classes[editClass].spells_known">
+				<h3>Cantrips & Spells known</h3>
+					<div class="columns">
+						<div>Level</div><div>Cantrips</div><div>Spells</div>
+						<template v-for="i in 20">
+							<div :key="`level-${i}`">
+								{{ i }}
+							</div>
+							<b-form-input v-model="classes[editClass].spells_known.cantrips[i]" :key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" :tabindex="`1${i < 10 ? `0${i}` : i}`" />
+							<b-form-input v-model="classes[editClass].spells_known.spells[i]" :key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" :tabindex="`2${i < 10 ? `0${i}` : i}`" />
+						</template>
+					</div>
+			</div> 
     </b-modal>
 	</div>
 </template>
@@ -388,7 +403,7 @@
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { modifierMixin } from '@/mixins/modifiers.js';
 	import { abilities } from '@/mixins/abilities.js';
-	import { weapons } from '@/mixins/weapons.js';
+	import { weapons } from '@/mixins/armorAndWeapons.js';
 	import { skills } from '@/mixins/skills.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { experience } from '@/mixins/experience.js';
@@ -444,7 +459,7 @@
 					{ value: "learn", text: "Learns spells" }
 				],
 				modifier: {},
-				rollHP: 'main',
+				editClass: 'main',
 				showClass: 'main',
 				xp: undefined,
 				columns: {
@@ -499,7 +514,7 @@
 			reversedLevels() {
 				let levelArray = [];
 
-				for(let i = 2; i <= this.classes[this.rollHP].level; i++) {
+				for(let i = 2; i <= this.classes[this.editClass].level; i++) {
 					levelArray.push(i);
 				}
 				return levelArray.reverse();
@@ -532,7 +547,7 @@
 
 				//Open modal to roll HP
 				if(this.hit_point_type === "rolled") {
-					this.rollHP = classKey;
+					this.editClass = classKey;
 					this.$refs['roll-hp-modal'].show();
 				}
 				this.$emit("change", "class.level_up");
@@ -555,6 +570,15 @@
 			},
 			saveCasterType(classKey) {
 				const value = this.classes[classKey].caster_type;
+				if(value) {
+					let spells_known = {
+						cantrips: { 1: 0 },
+						spells: { 1: 0 }
+					}
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known`).set(spells_known);
+				} else {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known`).remove();
+				}
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/caster_type`).set(value);
 				this.$emit("change", "class.caster_type");
 			},
@@ -564,7 +588,7 @@
 				this.$emit("change", "class.casting_ability");
 			},
 			saveSpellKnowledge(classKey) {
-				const value = this.classes[classKey].casting_ability;
+				const value = this.classes[classKey].spell_knowledge;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spell_knowledge`).set(value);
 				this.$emit("change", "class.spell_knowledge");
 			},
@@ -598,14 +622,25 @@
 				}
 			},
 			rollHitPoints(classKey) {
-				this.rollHP = classKey;
+				this.editClass = classKey;
 				this.$refs['roll-hp-modal'].show();
+			},
+			spellsKnown(classKey) {
+				this.editClass = classKey;
+				this.$refs['spells-known-modal'].show();
 			},
 			setRolledHP(classKey, level) {
 				//Set rolled HP manually
-				const value = this.classes[classKey].rolled_hit_points[level];
+				const value = parseInt(this.classes[classKey].rolled_hit_points[level]) || 0;
+
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
 				this.$emit("change", "class.rolled_hit_points");
+			},
+			setSpellsKnown(classKey, type, level) {
+				//Set spells known
+				const value = parseInt(this.classes[classKey].spells_known[type][level]) || 0;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known/${type}/${level}`).set(value);
+				this.$emit("change", "class.spells_known");
 			},
 			rollHitDice(classKey, level) {
 				//Roll HP digitally
@@ -818,5 +853,24 @@
 			}
 		}
 		margin-bottom: 1px !important;
+	}
+	.spells-known {
+		h3 {
+			margin-top: 10px !important;
+		}
+		.columns {
+			display: grid;
+			grid-auto-columns: 30px;
+			grid-template-columns: max-content max-content max-content;
+			grid-column-gap: 15px;
+			grid-row-gap: 10px;
+			line-height: 30px;
+
+			input {
+				height: 30px;
+				max-width: 50px;
+				text-align: center;
+			}
+		}
 	}
 </style>

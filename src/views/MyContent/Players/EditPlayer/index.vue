@@ -305,6 +305,7 @@
 				 * 
 				 **/
 
+
 				//Level HP and Spells
 				let classes = {};
 				let computed_level = 0;
@@ -317,6 +318,11 @@
 					const level = value.level;
 					computed_level = computed_level + level;
 					
+					//Create class object for sheet
+					classes[key] = {
+						class: value.name,
+						level
+					}
 					
 					//Check if the HP is rolled
 					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
@@ -345,13 +351,9 @@
 						}
 
 						caster_multilevel = caster_multilevel + Math.floor(level/multiplier);
-						spell_slots = this.caster[value.caster_type].slots[level];
-					}
-
-					//Create class object for sheet
-					classes[key] = {
-						class: value.name,
-						level
+						spell_slots = this.spell_slot_tables[value.caster_type][level];
+						classes[key].spells_known = this.base_values.class.classes[key].spells_known.spells[level] || 0;
+						classes[key].cantrips_known = this.base_values.class.classes[key].spells_known.cantrips[level] || 0;
 					}
 				}
 				//save classes
@@ -362,7 +364,7 @@
 
 				//Check if multiclassed in multiple casters, then use the caster_multilevel and full caster spell slot table (phb 164)
 				if(caster_multilevel > 1) {
-					spell_slots = this.caster.full.slots[caster_multilevel];
+					spell_slots = this.spell_slot_tables.full[caster_multilevel];
 				}
 				//Save spell slots
 				if(spell_slots) {
@@ -399,6 +401,9 @@
 
 				//Armor Class
 				let armor_class = 10; //Base is always 10 (phb 14)
+
+				//Check if armor is equiped
+
 				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
 
 				//Add AC Modifiers	

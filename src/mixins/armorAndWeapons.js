@@ -320,6 +320,158 @@ export const weapons = {
 					}
 				]
 			}],
+			armor_types: [
+				{ 
+					value: "light", 
+					label: "Light armor",
+					armor: [
+						{
+							type: "light",
+							value: "padded",
+							label: "Padded",
+							cost: 500,
+							armor_class: 11,
+							dex_mod: true,
+							stealth_disadvantage: true,
+							weight: 8
+						},
+						{
+							type: "light",
+							value: "leather",
+							label: "Leather",
+							cost: 1000,
+							armor_class: 11,
+							dex_mod: true,
+							weight: 10
+						},
+						{
+							type: "light",
+							value: "studded_leather",
+							label: "Studded leather",
+							cost: 4500,
+							armor_class: 12,
+							dex_mod: true,
+							weight: 13
+						}
+					]
+				},
+				{ 
+					value: "medium", 
+					label: "Medium armor",
+					armor: [
+						{
+							type: "medium",
+							value: "hide",
+							label: "Hide",
+							cost: 1000,
+							armor_class: 12,
+							dex_mod: true,
+							dex_max: 2,
+							weigth: 12
+						},
+						{
+							type: "medium",
+							value: "chain_shirt",
+							label: "Chain shirt",
+							cost: 5000,
+							armor_class: 13,
+							dex_mod: true,
+							dex_max: 2,
+							weigth: 20
+						},
+						{
+							type: "medium",
+							value: "scale_mail",
+							label: "Scale mail",
+							cost: 5000,
+							armor_class: 14,
+							dex_mod: true,
+							dex_max: 2,
+							stealth_disadvantage: true,
+							weigth: 45
+						},
+						{
+							type: "medium",
+							value: "breastplate",
+							label: "Breastplate",
+							cost: 40000,
+							armor_class: 14,
+							dex_mod: true,
+							dex_max: 2,
+							weigth: 20
+						},
+						{
+							type: "medium",
+							value: "half_plate",
+							label: "Half plate",
+							cost: 75000,
+							armor_class: 15,
+							dex_mod: true,
+							dex_max: 2,
+							stealth_disadvantage: true,
+							weigth: 40
+						},
+					]
+				},
+				{ 
+					value: "heavy", 
+					label: "Heavy armor",
+					armr: [
+						{
+							type: "heavy",
+							value: "ring_mail",
+							label: "Ring mail",
+							cost: 3000,
+							armor_class: 14,
+							stealth_disadvantage: true,
+							weigth: 40
+						},
+						{
+							type: "heavy",
+							value: "chain_mail",
+							label: "Chain mail",
+							cost: 7500,
+							armor_class: 16,
+							strength_required: 13,
+							stealth_disadvantage: true,
+							weigth: 55
+						},
+						{
+							type: "heavy",
+							value: "splint",
+							label: "Splint",
+							cost: 20000,
+							armor_class: 17,
+							strenth_required: 15,
+							stealth_disadvantage: true,
+							weigth: 60
+						},
+						{
+							type: "heavy",
+							value: "plate",
+							label: "Plate",
+							cost: 150000,
+							armor_class: 15,
+							strength_required: 15,
+							stealth_disadvantage: true,
+							weigth: 40
+						},
+					]
+				},
+				{ 
+					value: "shield", 
+					label: "Shield",
+					armor: [
+						{
+							value: "shield",
+							label: "Shield",
+							cost: 1000,
+							armor_class_mod: 2,
+							weight: 2
+						}
+					]
+				}
+			]
 		}
 	}
 }

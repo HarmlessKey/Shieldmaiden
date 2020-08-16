@@ -99,7 +99,7 @@
 				});
 			},
 			confirmGiveControl() {
-				this.$snotify.success('Are you sure you want to give "' + this.foundUser.username + '" control over this character?', 'Give out control', {
+				this.$snotify.success('Are you sure you want to give "' + Object.values(this.foundUser)[0].username + '" control over this character?', 'Give out control', {
 					buttons: [
 						{ text: 'Yes', action: (toast) => { this.giveControl(); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},

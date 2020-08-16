@@ -253,9 +253,8 @@
 														<b-form-checkbox 
 															v-model="subclass.features[`level_${level}`][key].display" 
 															@change="editFeature(classKey, level, key, 'display')" 
-															id="display"
 														>
-															Display on character sheet {{ level }}
+															Display on character sheet
 														</b-form-checkbox>
 													</div>
 													<div class="form-item mb-3">
@@ -705,7 +704,17 @@
 				});
 			},
 			editFeature(classKey, level, featureKey, prop) {
-				const value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
+				let value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
+
+				if(prop === 'display') {
+					//when the value doesn't exist, it's false, and needs to be set to true
+					//So check if undefined and set to true if it was
+					value = (value === undefined) ? true : !value;
+
+					//Delete the prop if it was needs to be false
+					value = (!value) ? null : value;
+				}
+
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${featureKey}/${prop}`).set(value);
 				this.$emit("change", "class.edit_feature");
 			}

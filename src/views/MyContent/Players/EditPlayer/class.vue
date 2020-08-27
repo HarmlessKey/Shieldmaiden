@@ -35,7 +35,17 @@
 									id="class" 
 									type="text" 
 									v-model="subclass.name" 
-									placeholder="Main Class"/>
+									placeholder="Class"/>
+							</div>
+							<div class="form-item mb-3">
+								<label for="subclass">Subclass</label>
+								<b-form-input 
+									@change="saveClassSubclass(classKey)"
+									autocomplete="off"  
+									id="subclass" 
+									type="text" 
+									v-model="subclass.subclass" 
+									placeholder="Subclass"/>
 							</div>
 							<div class="form-item mb-3">
 								<label for="level">Level</label>
@@ -226,8 +236,21 @@
 											<b-collapse :id="`accordion-${level}`" accordion="my-accordion" role="tabpanel">
 												<b-card-body>
 													<p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-														As usual, you can’t increase an ability score above 20 using this feature.</p>
-													<p>Instead of increasing ability scores you can also choose to take 1 feat.</p>
+														You can’t increase an ability score above 20. (phb 15)</p>
+													<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
+
+													<el-switch
+														@change="saveFeatureType(classKey, level, $event)"
+														:value="subclass.features[`level_${level}`] ? subclass.features[`level_${level}`].type : 'asi'"
+														active-color="#2c97de"
+														inactive-color="#2c97de"
+														active-value="feat"
+														active-text="Feat"
+														inactive-value="asi"
+														inactive-text="Ability Score Improvement"/>
+
+													<div v-if="subclass.features[`level_${level}`] && subclass.features[`level_${level}`].type">
+													</div>
 												</b-card-body>
 											</b-collapse>
 										</b-card>
@@ -653,6 +676,11 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/name`).set(value);
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}/class`).set(value);
 			},
+			saveClassSubclass(key) {
+				const value = this.classes[key].subclass;
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/subclass`).set(value);
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}/subclass`).set(value);
+			},
 			saveClassLevel(key) {
 				const value = this.classes[key].level;
 
@@ -701,6 +729,18 @@
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
+			},
+			/**
+			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19
+			 * Eiter Ability Score Improvement or Feat 
+			 **/
+			saveFeatureType(classKey, level, value) {
+				//Delete the ASI's when chaning to feat
+
+				//Delete the Feat when changing to ASI
+
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/type`).set(value);
+				this.$emit("change", `class.edit_feature_level_${level}`);
 			},
 			editFeature(classKey, level, featureKey, prop) {
 				let value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
@@ -783,7 +823,7 @@
 	}
 	.level {
 		display: grid;
-		grid-template-columns: 1fr 100px;
+		grid-template-columns: 1fr 1fr 100px;
 		grid-gap: 15px;
 	}
 	.hit_points {

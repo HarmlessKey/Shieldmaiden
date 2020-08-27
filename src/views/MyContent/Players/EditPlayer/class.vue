@@ -332,13 +332,13 @@
 
 		<!-- MODIFIER MODAL -->
 		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
-      <Modifier v-model="modifier" />
+			<Modifier v-model="modifier" />
 			<template slot="modal-footer">
 				<a class="btn bg-gray" @click="hideModal">Cancel</a>
 				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
 				<a v-else class="btn" @click="addModifier">Add</a>
 			</template>
-    </b-modal>
+		</b-modal>
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`">
@@ -359,7 +359,7 @@
 				Roll
 			</a>
 			</div>      
-    </b-modal>
+		</b-modal>
 
 		<!-- EXPERIENCE MODAL -->
 		<b-modal ref="experience-modal" id="experience-modal" hide-footer title="Experience">
@@ -376,7 +376,7 @@
 						<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
 					</div>
 			</div>
-    </b-modal>
+		</b-modal>
 
 		<!-- SPELLS KNOWN MODAL -->
 		<b-modal ref="spells-known-modal" id="spells-known-modal" hide-footer title="Spells known">
@@ -393,7 +393,7 @@
 						</template>
 					</div>
 			</div> 
-    </b-modal>
+		</b-modal>
 	</div>
 </template>
 
@@ -481,7 +481,7 @@
 						noPadding: true,
 						right: true,
 						maxContent: true
-          }
+					}
 				}
 			}
 		},
@@ -681,7 +681,6 @@
 			addFeature(key, level) {
 				const feature = { name: `Level ${level} feature` }
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}`).push(feature);
-				this.$emit("change", "class.add_feature");
 			},
 			deleteFeature(classKey, level, key) {
 				//Delete all modifiers linked to this feature

@@ -52,11 +52,9 @@
 			<Race
 				v-if="current_tab === 'race'"
 				:character_race="base_values.race" 
-				:playerId="playerId" 
+				:playerId="playerId"
 				:userId="userId"
 				:modifiers="race_modifiers"
-				:feat_modifiers="feat_modifiers"
-				:feats="race_feats"
 				@change="compute"
 			/>
 			<Class
@@ -67,7 +65,6 @@
 				:playerId="playerId"
 				:userId="userId"
 				:modifiers="class_modifiers"
-				:feat_modifiers="feat_modifiers"
 				:computed="computed_values"
 				@change="compute"
 			/>
@@ -229,25 +226,7 @@
 					return mod.target === 'initiative';
 				});
 				return modifiers;
-			},
-			feats() {
-				if(this.base_values.feats) {
-					let returnArray = [];
-					for(const [key, value] of Object.entries(this.base_values.feats)) {
-						let mod = value;
-						mod['.key'] = key;
-						returnArray.push(mod);
-					}
-					return returnArray;
-				} return [];
-			},
-			race_feats() {
-				const feats = this.feats.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[0] === 'race';
-				});
-				return feats;
-			},
+			}
 		},
 		methods: {
 			...mapActions([

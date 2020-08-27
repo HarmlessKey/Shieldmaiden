@@ -32,7 +32,7 @@
 			/>
 		</div>
 
-		<h3 class="title">
+		<!-- <h3 class="title">
 			Race Modifiers
 			<a @click="newModifier('race')">Add Modifier</a>
 		</h3>
@@ -62,20 +62,20 @@
 							<i class="fas fa-trash-alt"></i>
 					</a>
 				</div>
-		</hk-table>
+		</hk-table> -->
 
-		<!-- FEATS -->
+		<!-- Traits -->
 		<h3 class="title mt-4">
-			Feats
-			<a @click="addFeat()">Add feat</a>
+			Traits
+			<a @click="addTrait()">Add trait</a>
 		</h3>
 		<div role="tablist" class="mb-3">
-			<b-card no-body v-for="(feat, index) in feats" :key="`feat-${feat['.key']}`">
+			<b-card no-body v-for="(trait, key, index) in race.traits" :key="`trait-${key}`">
 				<b-card-header role="tab">
-					{{ feat.name }}
+					{{ trait.name }}
 					<div class="actions">
 						<a v-b-toggle="`accordion-${index}`"><i class="fas fa-pencil-alt"/></a>
-						<a class="gray-hover"	@click="confirmDelete(feat['.key'])">
+						<a class="gray-hover" @click="confirmDelete(key)">
 							<i class="fas fa-trash-alt"></i>
 						</a>
 					</div>
@@ -85,22 +85,22 @@
 						<div class="form-item mb-3">
 							<label :for="`name-${index}`">Name</label>
 							<b-form-input 
-								@change="editFeat(feat['.key'], index, 'name')"
+								@change="editTrait(key, 'name')"
 								autocomplete="off"
 								:id="`name-${index}`"
 								type="text"
-								v-model="feats[index].name"
-								placeholder="Feat"/>
+								v-model="race.traits[key].name"
+								placeholder="Trait"/>
 						</div>
 
 						<!-- Modifiers -->
 						<h4 class="title">
 							Modifiers
-							<a @click="newModifier(`feat.${feat['.key']}`)">Add Modifier</a>
+							<a @click="newModifier(`race.trait.${key}`)">Add Modifier</a>
 						</h4>
 						<hk-table
 							:columns="columns"
-							:items="modifiers_feat(feat['.key'])"
+							:items="trait_modifiers(key)"
 						>
 							<template slot="target" slot-scope="data">
 								{{ data.row.subtarget || data.item.capitalize() }}
@@ -191,10 +191,10 @@
 			}
 		},
 		methods: {
-			modifiers_feat(key) {
-				const modifiers = this.feat_modifiers.filter(mod => {
+			trait_modifiers(key) {
+				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
-					return origin[1] === key;
+					return origin[1] === "trait" && origin[2] === key;
 				});
 				return modifiers;
 			},
@@ -210,30 +210,30 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_description`).set(this.race.race_description);
 				this.$emit("change", "race.description");
 			},
-			addFeat() {
-				const feat = { name: "New Feat", origin: "race" }
-				db.ref(`characters_base/${this.userId}/${this.playerId}/feats`).push(feat);
+			addTrait() {
+				const trait = { name: "New Trait" }
+				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits`).push(trait);
 			},
-			editFeat(key, index, property) {
-				const value = this.feats[index][property];
-				db.ref(`characters_base/${this.userId}/${this.playerId}/feats/${key}/${property}`).set(value);
+			editTrait(key, property) {
+				const value = this.race.traits[key][property];
+				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits/${key}/${property}`).set(value);
 			},
-			deleteFeat(key) {
+			deleteTrait(key) {
 				//Delete all modifiers linked to this feat
-				const linked_modifiers = this.modifiers_feat(key);
+				const linked_modifiers = this.trait_modifiers(key);
 
 				for(const modifier of linked_modifiers) {
 					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
 				}
 
-				//Delete feat
-				db.ref(`characters_base/${this.userId}/${this.playerId}/feats/${key}`).remove();
-				this.$emit("change", "race.feat_removed");
+				//Delete trait
+				db.ref(`characters_base/${this.userId}/${this.playerId}/trait/${key}`).remove();
+				this.$emit("change", "race.trait_removed");
 			},
 			confirmDelete(key, name) {
-				this.$snotify.error('Are you sure you want to delete the the feat "' + name + '"?', 'Delete feat', {
+				this.$snotify.error('Are you sure you want to delete the the trait "' + name + '"?', 'Delete trait', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeat(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteTrait(key); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});

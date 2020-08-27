@@ -153,7 +153,7 @@
 				if(this.character.hit_point_type === "rolled") {
 					for(const classKey in this.character_class.classes) {
 						const Class = this.character_class.classes[classKey];
-						if(!Class.rolled_hit_points && Class.level > 1) {
+						if(!Class.rolled_hit_points) {
 							db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/2`).set(0);
 						}
 					}

@@ -58,7 +58,7 @@
 							<span><i class="fas fa-heart"></i> Hit points</span>
 							<span>
 								<span v-b-tooltip:hover title="Hit dice" v-if="subclass.hit_dice">{{ subclass.level }}d{{ subclass.hit_dice }}</span> |
-								<span v-b-tooltip:hover title="CON modifier" v-if="computed.sheet.abilities && computed.sheet.abilities.constitution">
+								<span v-b-tooltip:hover title="CON modifier" v-if="computed.sheet && computed.sheet.abilities && computed.sheet.abilities.constitution">
 								 {{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
 								</span> |
 								<span v-b-tooltip:hover title="Hit points">

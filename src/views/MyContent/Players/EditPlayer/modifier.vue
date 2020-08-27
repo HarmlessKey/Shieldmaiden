@@ -51,6 +51,47 @@
 					</option>
 				</select>
 			</div>
+
+			<!-- WEAPONS -->
+			<div class="form-item mb-3" v-if="modifier.target === 'weapon'">
+				<label for="type">Weapon</label>
+				<el-select 
+					id="weapon"
+					v-model="modifier.subtarget"
+					collapse-tags
+					filterable
+					placeholder="Select the weapon">
+					<el-option-group
+						v-for="group in weaponList"
+						:key="group.category"
+						:label="group.category">
+						<el-option
+							v-for="item in group.weapons"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value">
+						</el-option>
+					</el-option-group>
+				</el-select>
+			</div>
+
+			<!-- ARMOR -->
+			<div class="form-item mb-3" v-if="modifier.target === 'armor'">
+				<label for="type">Armor</label>
+				<el-select
+					id="armor"
+					v-model="modifier.subtarget"
+					collapse-tags
+					filterable
+					placeholder="Armor">
+					<el-option
+						v-for="item in armor_types"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value">
+					</el-option>
+				</el-select>
+			</div>
 			
 			<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
 				<label for="value" class="required">Value</label>
@@ -104,10 +145,11 @@
 <script>
 	import { skills } from '@/mixins/skills.js';
 	import { abilities } from '@/mixins/abilities.js';
+	import { weapons } from '@/mixins/armorAndWeapons.js';
 
 	export default {
 		name: 'CharacterClass',
-		mixins: [skills, abilities],
+		mixins: [skills, abilities, weapons],
 		props: {
 			value: {
 				type: Object,
@@ -175,6 +217,14 @@
 					{
 						value: "ac",
 						text: "Armor Class"
+					},
+					{
+						value: "armor",
+						text: "Armor"
+					},
+					{
+						value: "weapon",
+						text: "Weapon"
 					},
 					{
 						value: "speed",

@@ -48,14 +48,16 @@
 									placeholder="Subclass"/>
 							</div>
 							<div class="form-item mb-3">
-								<label for="level">Level</label>
+								<label for="level">Level 	{{ subclass.level + (20 - computed.display.level) }}</label>
 								<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel('main')">
 								<option 
 									v-for="level in 20" 
 									:key="`${level}`"
 									:value="level"
-									:disabled="advancement === 'experience' && level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level))"
-								>
+									:disabled="
+										(advancement === 'experience' && level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level)))
+										|| (advancement === 'milestone' && level > (subclass.level + (20 - computed.display.level)) ) 
+									">
 									{{ level }}
 								</option>
 							</select>

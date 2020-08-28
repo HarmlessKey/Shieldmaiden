@@ -9,7 +9,7 @@
 			<hr>
 		</div>
 
-		<!-- MAIN CLASS -->
+		<!-- CLASSES -->
 		<div v-for="(subclass, classKey) in classes" :key="`class-${classKey}`">
 			<div>
 				<h3 @click="setShowClass(classKey)" class="pointer" :class="{ 'hidden-class': classKey !== showClass}">
@@ -85,14 +85,14 @@
 									autocomplete="off"  
 									:id="`${classKey}-class`" 
 									type="number" 
-									v-model="subclass.base_hit_points" 
+									v-model="subclass.base_hit_points"
 									placeholder="Starting hit points"/>
 							</div>
 							<div class="form-item mb-3">
 								<label for="hit_dice">Hit dice</label>
 								<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice(classKey)" />
 							</div>
-							<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
+							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 'main')">
 								<label>Rolled HP</label>
 								<div class="rolled" @click="rollHitPoints(classKey)">
 									<span class="val">
@@ -353,6 +353,7 @@
 				</el-collapse-transition>
 			</div>
 		</div>
+		<a @click="addClass()"><i class="fas fa-plus"/> Add a class</a>
 
 		<!-- MODIFIER MODAL -->
 		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
@@ -754,9 +755,20 @@
 					//Delete the prop if it was needs to be false
 					value = (!value) ? null : value;
 				}
-
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${featureKey}/${prop}`).set(value);
 				this.$emit("change", "class.edit_feature");
+			},
+			addClass() {
+				
+				let newClass = {
+					level: 1
+				};
+				newClass.rolled_hit_points = (this.hit_point_type === "rolled") ? { 1: 0 } : null;
+
+				console.log(newClass);
+
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes`).push(newClass);
+				this.$emit("change", "class.added_class");
 			}
 		}
 	}

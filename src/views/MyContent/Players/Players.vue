@@ -181,8 +181,7 @@
 					class: {
 						classes: {
 							main: {
-								level: 1,
-								base_armor_class: 10
+								level: 1
 							}
 						}
 					}

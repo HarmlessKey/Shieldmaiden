@@ -262,7 +262,7 @@
 					
 					//Create class object for sheet
 					classes[key] = {
-						class: value.name,
+						class: value.name || null,
 						level
 					}
 					

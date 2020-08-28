@@ -245,9 +245,100 @@
 				// eslint-disable-next-line
 				console.log("change made, compute charachter", origin);
 				origin = origin.split(".");
+				let modifiers = this.modifiers;
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
+				//Level HP and Spells
+				let classes = {};
+				let computed_level = 0;
+				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
+				let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
+
+				//Set level specific stats HP/Spells
+				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
+					const level = value.level;
+					computed_level = computed_level + level;
+					
+					//Create class object for sheet
+					classes[key] = {
+						class: value.name,
+						level
+					}
+					
+					//Check if the HP is rolled
+					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
+						let totalRolled = 0;
+						for(const [key, rolled] of Object.entries(value.rolled_hit_points)) {
+							if(value.level >= key && rolled) {
+								totalRolled = totalRolled + parseInt(rolled);
+							}
+						}
+						computed_hp = computed_hp + parseInt(totalRolled);
+					} else if(hit_point_type === 'fixed' && value.hit_dice) {
+						const hit_dice = this.dice_types.filter(die => {
+							return die.value === value.hit_dice;
+						});
+						//For the main class only set fixed HP for the levels after first
+						computed_hp = (key === 'main') ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
+					}
+
+					//Spell slots
+					if(value.caster_type) {
+						//For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
+						let multiplier = 1;
+						if(value.caster_type === 'half') {
+							multiplier = 2;
+						} else if(value.caster_type === 'third') {
+							multiplier = 3;
+						}
+
+						caster_levels.push((level/multiplier));
+						classes[key].spells_known = this.base_values.class.classes[key].spells_known.spells[level] || 0;
+						classes[key].cantrips_known = this.base_values.class.classes[key].spells_known.cantrips[level] || 0;
+					}
+				}
+				//save classes
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).set(classes);
+
+				//Save total level
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
+
+				//Check if there is a caster level and determine the spell slots based on caster spell slot table (phb 164)
+				if(caster_levels.length >= 1) {
+					let caster_level;
+
+					//For a multiclasser, round down the third and half caster levels
+					if(caster_levels.length > 1) {
+						caster_level = caster_levels.reduce((a, b) => {
+							return Math.floor(a) + Math.floor(b);
+						}, 0);
+					}
+					//For a single caster round up the third or half caster level
+					else {
+						caster_level = Math.ceil(caster_levels[0]);
+					}
+
+					const spell_slots = this.spell_slot_table[caster_level];
+					db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
+				}
+
+				//REMOVE MODIFIERS
+				//If modifiers are linked to a class feature and the class is not the required level for that feature,
+				//the modifier must not be added, so remove these modifiers from the modifier list.
+				for(const [classKey, value] of Object.entries(classes)) {
+					for(const index in modifiers) {
+						const modifier = modifiers[index];
+						const origin = modifier.origin.split(".");
+
+						//Remove the modifier if the class level is not high enough
+						if(origin[0] === "class" && origin[1] === classKey && origin[2] > value.level) {
+							console.log('remove', modifier);
+							modifiers.splice(index, 1);
+						}
+					}
+				}
+				
 				//Ability score maximums
 				let ability_max = {
 					strength: 20,
@@ -284,72 +375,6 @@
 				 * 
 				 **/
 
-
-				//Level HP and Spells
-				let classes = {};
-				let computed_level = 0;
-				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
-				let caster_multilevel = 0; //For multiclassing in multiple casters you need a caster level (phb 164)
-				let spell_slots;
-
-				//Set level specific stats HP/Spells
-				for(const [key, value] of Object.entries(this.base_values.class.classes)) {
-					const level = value.level;
-					computed_level = computed_level + level;
-					
-					//Create class object for sheet
-					classes[key] = {
-						class: value.name,
-						level
-					}
-					
-					//Check if the HP is rolled
-					if(hit_point_type === 'rolled' && value.rolled_hit_points) {
-						let totalRolled = 0;
-						for(const [key, rolled] of Object.entries(value.rolled_hit_points)) {
-							if(value.level >= key && rolled) {
-								totalRolled = totalRolled + parseInt(rolled);
-							}
-						}
-						computed_hp = computed_hp + parseInt(totalRolled);
-					} else if(hit_point_type === 'fixed' && value.hit_dice) {
-						const hit_dice = this.dice_types.filter(die => {
-							return die.value === value.hit_dice;
-						});
-						computed_hp = computed_hp + ((level - 1) * hit_dice[0].average);
-					}
-
-					//Spell slots
-					if(value.caster_type) {
-						//For multiclassing in multiple casters the total caster level changes depening on the caster type (pbp 164)
-						let multiplier = 1;
-						if(value.caster_type === 'half') {
-							multiplier = 2;
-						} else if(value.caster_type === 'third') {
-							multiplier = 3;
-						}
-
-						caster_multilevel = caster_multilevel + Math.floor(level/multiplier);
-						spell_slots = this.spell_slot_tables[value.caster_type][level];
-						classes[key].spells_known = this.base_values.class.classes[key].spells_known.spells[level] || 0;
-						classes[key].cantrips_known = this.base_values.class.classes[key].spells_known.cantrips[level] || 0;
-					}
-				}
-				//save classes
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/classes`).set(classes);
-
-				//Save total level
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/level`).set(computed_level);
-
-				//Check if multiclassed in multiple casters, then use the caster_multilevel and full caster spell slot table (phb 164)
-				if(caster_multilevel > 1) {
-					spell_slots = this.spell_slot_tables.full[caster_multilevel];
-				}
-				//Save spell slots
-				if(spell_slots) {
-					db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/spell_slots`).set(spell_slots);
-				}
-
 				//Add CON modifier * level to computed HP
 				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/hit_points`).set(computed_hp);
@@ -382,7 +407,6 @@
 				let armor_class = 10; //Base is always 10 (phb 14)
 
 				//Check if armor is equiped
-
 				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
 
 				//Add AC Modifiers	

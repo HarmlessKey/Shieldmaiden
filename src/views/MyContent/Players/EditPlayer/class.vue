@@ -28,11 +28,11 @@
 					<div class="p-3" v-show="showClass === classKey">
 						<div class="level">
 							<div class="form-item mb-3">
-								<label for="class">Class</label>
+								<label :for="`${classKey}-class`">Class</label>
 								<b-form-input 
 									@change="saveClassName(classKey)"
 									autocomplete="off"  
-									id="class" 
+									:id="`${classKey}-class`" 
 									type="text" 
 									v-model="subclass.name" 
 									placeholder="Class"/>
@@ -42,7 +42,7 @@
 								<b-form-input 
 									@change="saveClassSubclass(classKey)"
 									autocomplete="off"  
-									id="subclass" 
+									:id="`${classKey}-subclass`" 
 									type="text" 
 									v-model="subclass.subclass" 
 									placeholder="Subclass"/>
@@ -54,7 +54,6 @@
 									v-for="level in 20" 
 									:key="`${level}`"
 									:value="level"
-
 									:disabled="advancement === 'experience' && level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level))"
 								>
 									{{ level }}
@@ -78,18 +77,18 @@
 						</h3>
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
 							<div class="form-item mb-3" v-if="classKey === 'main'">
-								<label for="class">Starting HP</label>
+								<label :for="`${classKey}-class`">Starting HP</label>
 								<b-form-input 
 									@change="saveBaseHitPoints(classKey)"
 									autocomplete="off"  
-									id="class" 
+									:id="`${classKey}-class`" 
 									type="number" 
 									v-model="subclass.base_hit_points" 
 									placeholder="Starting hit points"/>
 							</div>
 							<div class="form-item mb-3">
 								<label for="hit_dice">Hit dice</label>
-								<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice('main')" />
+								<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice(classKey)" />
 							</div>
 							<div v-if="hit_point_type === 'rolled' && subclass.level > 1">
 								<label>Rolled HP</label>
@@ -141,9 +140,9 @@
 						</h3>
 						<b-collapse :id="`prof-${classKey}`" class="proficiencies" >
 							<div class="form-item mb-3">
-								<label for="armor">Armor</label>
+								<label :for="`${classKey}-armor`">Armor</label>
 								<el-select
-									id="armor"
+									:id="`${classKey}-armor`"
 									:value="proficiencies[classKey].armor"
 									@change="setProficiencies($event, classKey, 'armor')"
 									multiple
@@ -159,9 +158,9 @@
 								</el-select>
 							</div>
 							<div class="form-item mb-3">
-								<label for="weapon">Weapons</label>
+								<label :for="`${classKey}-weapon`">Weapons</label>
 								<el-select 
-									id="weapon"
+									:id="`${classKey}-weapon`"
 									:value="proficiencies[classKey].weapon"
 									@change="setProficiencies($event, classKey, 'weapon')"
 									multiple
@@ -182,9 +181,9 @@
 								</el-select>
 							</div>
 							<div class="form-item mb-3">
-								<label for="skill">Skills</label>
+								<label :for="`${classKey}-skill`">Skills</label>
 								<el-select
-									id="skill"
+									:id="`${classKey}-skill`"
 									:value="proficiencies[classKey].skill"
 									@change="setProficiencies($event, classKey, 'skill')"
 									multiple
@@ -200,9 +199,9 @@
 								</el-select>
 							</div>
 							<div class="form-item mb-3" v-if="classKey === 'main'">
-								<label for="saving">Saving throws</label>
+								<label :for="`${classKey}-saving`">Saving throws</label>
 								<el-select
-									id="saving"
+									:id="`${classKey}-saving`"
 									:value="proficiencies[classKey].saving_throw"
 									@change="setProficiencies($event, classKey, 'saving_throw')"
 									multiple
@@ -291,12 +290,12 @@
 															placeholder="Feature name"/>
 													</div>
 
-													<label for="description">Description</label>
+													<label :for="`${classKey}-${level}-description`">Description</label>
 													<div class="d-flex justify-content-between mb-3">
 														<b-form-textarea 
 															@change="editFeature(classKey, level, key, 'description')"
 															v-model="subclass.features[`level_${level}`][key].description"
-															id="description"
+															:id="`${classKey}-${level}-description`"
 															name="description"
 															title="Description"
 															class="form-control"
@@ -365,7 +364,7 @@
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`">
-			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp">
+			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 'main' && level === 1 }">
 			<label :for="`level-${level}`">Level {{ level }}</label>
 			<b-form-input 
 				@change="setRolledHP(editClass, level)"
@@ -536,7 +535,7 @@
 			reversedLevels() {
 				let levelArray = [];
 
-				for(let i = 2; i <= this.classes[this.editClass].level; i++) {
+				for(let i = 1; i <= this.classes[this.editClass].level; i++) {
 					levelArray.push(i);
 				}
 				return levelArray.reverse();

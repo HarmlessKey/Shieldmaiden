@@ -243,7 +243,7 @@
 			},
 			compute(origin) {
 				// eslint-disable-next-line
-				console.log("change made, compute charachter", origin);
+				console.log("change made. Origin: ", origin);
 				origin = origin.split(".");
 				let modifiers = this.modifiers;
 
@@ -252,7 +252,7 @@
 				//Level HP and Spells
 				let classes = {};
 				let computed_level = 0;
-				let computed_hp = (this.base_values.class.classes.main.base_hit_points) ? this.base_values.class.classes.main.base_hit_points : 0;
+				let computed_hp = (this.base_values.class.classes[0].base_hit_points) ? this.base_values.class.classes[0].base_hit_points : 0;
 				let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
 				//Set level specific stats HP/Spells
@@ -280,7 +280,7 @@
 							return die.value === value.hit_dice;
 						});
 						//For the main class only set fixed HP for the levels after first
-						computed_hp = (key === 'main') ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
+						computed_hp = (key === 0) ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
 					}
 
 					//Spell slots
@@ -416,13 +416,15 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/armor_class`).set(armor_class);
 
 				//Speed
-				let speed = (this.base_values.race.walking_speed) ? parseInt(this.base_values.race.walking_speed) : 0;
+				if(this.base_values.race) {
+					let speed = (this.base_values.race.walking_speed) ? parseInt(this.base_values.race.walking_speed) : 0;
 
-				//Add Speed Modifiers	
-				for(const modifier of this.speed_modifiers) {
-					speed = this.addModifier(speed, modifier, proficiency, ability_scores);
+					//Add Speed Modifiers	
+					for(const modifier of this.speed_modifiers) {
+						speed = this.addModifier(speed, modifier, proficiency, ability_scores);
+					}
+					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
 				}
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
 
 				//Skills
 				let skills = {

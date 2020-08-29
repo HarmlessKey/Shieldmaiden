@@ -180,7 +180,7 @@
 					},
 					class: {
 						classes: {
-							main: {
+							0: {
 								level: 1
 							}
 						}

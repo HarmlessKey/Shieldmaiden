@@ -10,7 +10,7 @@
 		<div class="general">
 			<h4>{{ character.display.character_name || "Unnamed Character" }}</h4>
 			<div v-if="character.sheet && character.sheet.classes">
-				{{ character.display.race }} {{ character.sheet.classes.main.class }}
+				{{ character.display.race }} {{ character.sheet.classes[0].class }}
 			</div>
 			Level {{ character.display.level }} 
 		</div>

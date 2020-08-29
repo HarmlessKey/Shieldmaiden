@@ -26,6 +26,7 @@
 
 				<el-collapse-transition>
 					<div class="p-3" v-show="showClass === classKey">
+						<a @click="confirmDeleteClass(classKey, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
 						<div class="level">
 							<div class="form-item mb-3">
 								<label :for="`${classKey}-class`">Class</label>
@@ -49,7 +50,7 @@
 							</div>
 							<div class="form-item mb-3">
 								<label for="level">Level 	{{ subclass.level + (20 - computed.display.level) }}</label>
-								<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel('main')">
+								<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel(0)">
 								<option 
 									v-for="level in 20" 
 									:key="`${level}`"
@@ -78,7 +79,7 @@
 							</span>
 						</h3>
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
-							<div class="form-item mb-3" v-if="classKey === 'main'">
+							<div class="form-item mb-3" v-if="classKey === 0">
 								<label :for="`${classKey}-class`">Starting HP</label>
 								<b-form-input 
 									@change="saveBaseHitPoints(classKey)"
@@ -92,7 +93,7 @@
 								<label for="hit_dice">Hit dice</label>
 								<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice(classKey)" />
 							</div>
-							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 'main')">
+							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)">
 								<label>Rolled HP</label>
 								<div class="rolled" @click="rollHitPoints(classKey)">
 									<span class="val">
@@ -200,7 +201,7 @@
 									</el-option>
 								</el-select>
 							</div>
-							<div class="form-item mb-3" v-if="classKey === 'main'">
+							<div class="form-item mb-3" v-if="classKey === 0">
 								<label :for="`${classKey}-saving`">Saving throws</label>
 								<el-select
 									:id="`${classKey}-saving`"
@@ -268,7 +269,7 @@
 												{{ feature.name }}
 												<div class="actions">
 													<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
-													<a @click="confirmDelete(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
+													<a @click="confirmDeleteFeature(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
 												</div>
 											</b-card-header>
 											<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
@@ -367,7 +368,7 @@
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`">
-			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 'main' && level === 1 }">
+			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
 			<label :for="`level-${level}`">Level {{ level }}</label>
 			<b-form-input 
 				@change="setRolledHP(editClass, level)"
@@ -394,7 +395,7 @@
 					autocomplete="off"
 					id="xp" 
 					type="number"
-					v-model="xp" 
+					v-model="xp"
 					placeholder="Amount"/>
 					<div>
 						<a @click="handleXP('add')" class="btn bg-green">Add</a>
@@ -417,7 +418,7 @@
 							<b-form-input v-model="classes[editClass].spells_known.spells[i]" :key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" :tabindex="`2${i < 10 ? `0${i}` : i}`" />
 						</template>
 					</div>
-			</div> 
+			</div>
 		</b-modal>
 	</div>
 </template>
@@ -483,8 +484,8 @@
 					{ value: "learn", text: "Learns spells" }
 				],
 				modifier: {},
-				editClass: 'main',
-				showClass: 'main',
+				editClass: 0,
+				showClass: 0,
 				xp: undefined,
 				columns: {
 					name: {
@@ -579,7 +580,7 @@
 			feature_modifiers(classKey, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
-					return origin[1] === classKey && origin[2] == level && origin[3] === key;
+					return origin[1] == classKey && origin[2] == level && origin[3] === key;
 				});
 				return modifiers;
 			},
@@ -712,6 +713,14 @@
 				const feature = { name: `Level ${level} feature` }
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}`).push(feature);
 			},
+			confirmDeleteFeature(classKey, level, key, name) {
+				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { this.deleteFeature(classKey, level, key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			},
 			deleteFeature(classKey, level, key) {
 				//Delete all modifiers linked to this feature
 				const linked_modifiers = this.feature_modifiers(classKey, level, key);
@@ -721,16 +730,32 @@
 				}
 
 				//Delete feature
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/c1lasses/${classKey}/features/level_${level}/${key}`).remove();
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${key}`).remove();
 				this.$emit("change", "class.delete_feature");
 			},
-			confirmDelete(classKey, level, key, name) {
-				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
-					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeature(classKey, level, key); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-					]
-				});
+			confirmDeleteClass(classKey, name) {
+				this.$snotify.error(
+					`Are you sure you want to delete ${name ? `the class "${name}"` : `this class`}? All linked features and modifiers will be removed.`, `Delete class`, 
+					{
+						buttons: [
+							{ text: 'Yes', action: (toast) => { this.deleteClass(classKey); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						]
+					});
+			},
+			deleteClass(classKey) {
+				//Delete all linked modifiers
+				for(const modifier of this.modifiers) {
+					const origin = modifier.origin.split(".");
+
+					if(origin[1] === classKey) {
+						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
+					}
+				}
+
+				//Delete class
+				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}`).remove();
+				this.$emit("change", "class.delete_class");
 			},
 			/**
 			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19

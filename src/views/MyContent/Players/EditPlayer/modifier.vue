@@ -257,9 +257,7 @@
 				type: Boolean,
 				default: true
 			},
-			classes: {
-				type: Object
-			}
+			classes: undefined
 		},
 		data() {
 			return {
@@ -366,6 +364,11 @@
 						{
 							value: "ac",
 							text: "Armor Class"
+						},
+						{
+							value: "hp",
+							text: "Hit Points",
+							disabled: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
 						},
 						{
 							value: "armor",

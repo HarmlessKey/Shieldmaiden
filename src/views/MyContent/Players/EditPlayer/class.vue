@@ -367,7 +367,7 @@
 		</b-modal>
 
 		<!-- ROLLED HP MODAL -->
-		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`">
+		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`" v-if="hit_point_type === 'rolled'">
 			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
 			<label :for="`level-${level}`">Level {{ level }}</label>
 			<b-form-input 

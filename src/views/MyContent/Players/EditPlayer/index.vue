@@ -203,6 +203,12 @@
 				});
 				return modifiers;
 			},
+			hp_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'hp';
+				});
+				return modifiers;
+			},
 			ac_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
 					return mod.target === 'ac';
@@ -333,7 +339,6 @@
 
 						//Remove the modifier if the class level is not high enough
 						if(origin[0] === "class" && origin[1] === classKey && origin[2] > value.level) {
-							console.log('remove', modifier);
 							modifiers.splice(index, 1);
 						}
 					}
@@ -377,6 +382,11 @@
 
 				//Add CON modifier * level to computed HP
 				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));
+
+				//Add HP modifiers
+				for(const modifier of this.hp_modifiers) {
+					computed_hp = this.addModifier(computed_hp, modifier, proficiency, ability_scores, computed_level, classes);
+				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/hit_points`).set(computed_hp);
 
 				//Set proficiency bonus

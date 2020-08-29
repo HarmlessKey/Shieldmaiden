@@ -200,41 +200,6 @@
 					ability: "Add an ability modifier as a bonus",
 					expertise: "Double the proficiency bonus. Only works on proficient skills."
 				},
-				modifier_targets: [
-					{
-						value: null,
-						text: "Select the target",
-						disabled: true
-					},
-					{
-						value: "ability",
-						text: "Abillity Score"
-					},
-					{
-						value: "skill",
-						text: "Skill"
-					},
-					{
-						value: "ac",
-						text: "Armor Class"
-					},
-					{
-						value: "armor",
-						text: "Armor"
-					},
-					{
-						value: "weapon",
-						text: "Weapon"
-					},
-					{
-						value: "speed",
-						text: "Speed"
-					},
-					{
-						value: "initiative",
-						text: "Initiative"
-					}
-				],
 				modifier_restrictions: [
 					{
 						value: "armor",
@@ -272,6 +237,46 @@
 					this.$emit('input', newValue);
 					this.$forceUpdate();
 				}
+			},
+			modifier_targets() {
+				return [
+						{
+							value: null,
+							text: "Select the target",
+							disabled: true
+						},
+						{
+							value: "ability",
+							text: "Abillity Score",
+							disabled: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
+						},
+						{
+							value: "skill",
+							text: "Skill"
+						},
+						{
+							value: "ac",
+							text: "Armor Class"
+						},
+						{
+							value: "armor",
+							text: "Armor",
+							disabled: ["bonus", "set", "ability", "expertise"].includes(this.modifier.type)
+						},
+						{
+							value: "weapon",
+							text: "Weapon",
+							disabled: ["bonus", "set", "ability", "expertise"].includes(this.modifier.type)
+						},
+						{
+							value: "speed",
+							text: "Speed"
+						},
+						{
+							value: "initiative",
+							text: "Initiative"
+						}
+					]
 			},
 			modifier_origin() {
 				if(this.modifier.origin) {

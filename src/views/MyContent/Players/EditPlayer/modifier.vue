@@ -1,5 +1,6 @@
 <template>
-	<div>
+	<!-- MODIFIER -->
+	<div v-if="!scaling">
 		<div class="form-item mb-3">
 			<div class="gray-hover mb-3">Origin: {{ modifier_origin }}</div>
 			<label for="name" class="required">Name</label>
@@ -93,17 +94,25 @@
 				</el-select>
 			</div>
 			
+			<!-- VALUE -->
 			<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
 				<label for="value" class="required">Value</label>
-				<b-form-input 
-					autocomplete="off"  
-					id="value" 
-					type="number" 
-					v-model="modifier.value" 
-					v-validate="'required'"
-					name="value" 
-				/>
+				<div class="d-flex justify-content-between">
+					<b-form-input 
+						autocomplete="off"  
+						id="value" 
+						type="number" 
+						v-model="modifier.value" 
+						v-validate="'required'"
+						name="value" 
+					/>
+					<a @click="scaling = true" class="ml-1 btn" v-b-tooltip.hover="`Level scaling`"><i class="far fa-chart-line"/></a>
+				</div>
 				<p class="validate red" v-if="errors.has('value')">{{ errors.first('value') }}</p>
+				<p class="mt-1" v-if="modifier.scale_size && modifier.scale_value">
+					<span v-html="scalingText()"/>
+					<a @click="deleteScaling" class="red ml-1" v-b-tooltip.hover="'Delete scaling'"><i class="fas fa-times"/></a>
+				</p>
 			</div>
 
 			<!-- ABILITES -->
@@ -140,12 +149,97 @@
 			</div>
 		</template>
 	</div>
+
+	<!-- SCALING -->
+	<div v-else>
+		<a @click="scaling = false"><i class="fas fa-chevron-left"></i> Edit modifier</a>
+		<p class="mt-3">
+			<b>{{ modifier.name }} level scaling</b><br/>
+			Set how the value of this modifier changes as your character levels.
+		</p>
+
+		<!-- VALUE -->
+		<div class="form-item mb-3">
+			<label for="value" class="required">Initial value</label>
+			<b-form-input 
+				autocomplete="off"  
+				id="value" 
+				type="number" 
+				v-model="modifier.value" 
+				v-validate="'required'"
+				name="value" 
+			/>
+			<p class="validate red" v-if="errors.has('value')">{{ errors.first('value') }}</p>
+		</div>
+		
+		<!-- STARTING LEVELS -->
+		<div class="form-item mb-3" v-if="modifier.origin.split('.')[0] !== 'class'">
+			<label for="start" class="required">Starting level</label>
+			<b-form-input 
+				autocomplete="off"  
+				id="start"
+				type="number"
+				v-model="modifier.scaling_start"
+				v-validate="'required'"
+				name="start"
+			/>
+			<p class="validate red" v-if="errors.has('start')">{{ errors.first('start') }}</p>
+		</div>
+
+		<!-- SCALING TYPE -->
+		<div class="form-item mb-3">
+			<label for="scaling_type">Scaling type</label>
+			<b-form-select class="form-control" v-model="modifier.scaling_type" name="scaling_type">
+				<option :value="null" disabled>Select the scaling type</option>
+				<option v-for="{value, text} in scaling_types" :key="`ability-${value}`" :value="value">
+					{{ text }}
+				</option>
+			</b-form-select>
+		</div>
+		
+		<!-- LEVEL SCALING -->
+		<div v-if="modifier.scaling_type === 'scale'" class="form-item mb-3">
+			<div class="d-flex justify-content-between mb-2">
+				<div>
+					<label for="size" class="required">Scale size</label>
+					<b-form-input 
+						autocomplete="off"  
+						id="size" 
+						type="number" 
+						v-model="modifier.scale_size" 
+						v-validate="'required'"
+						name="size" 
+					/>
+				</div>
+				<div>
+					<label for="scale_value" class="required">Scale value</label>
+					<b-form-input 
+						autocomplete="off"  
+						id="scale_value" 
+						type="number" 
+						v-model="modifier.scale_value" 
+						v-validate="'required'"
+						name="scale_value" 
+					/>
+				</div>
+			</div>
+			<p class="validate red" v-if="errors.has('size')">{{ errors.first('size') }}</p>
+			<p class="validate red" v-if="errors.has('scale_value')">{{ errors.first('scale_value') }}</p>
+			
+			<p v-if="modifier.scale_size && modifier.scale_value" v-html="scalingText()"/>
+		</div>
+
+		<!-- STEPS -->
+		<div v-if="modifier.scaling_type === 'steps'">
+		</div>
+	</div>
 </template>
 
 <script>
 	import { skills } from '@/mixins/skills.js';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
+	import numeral from 'numeral';
 
 	export default {
 		name: 'CharacterClass',
@@ -162,10 +256,14 @@
 			reference: {
 				type: Boolean,
 				default: true
+			},
+			classes: {
+				type: Object
 			}
 		},
 		data() {
 			return {
+				scaling: false,
 				modifier_types: [
 					{
 						value: null,
@@ -217,6 +315,16 @@
 						value: "no_shield",
 						text: "Can't wear a shield"
 					}
+				],
+				scaling_types: [
+					{
+						value: "scale",
+						text: "Level scaling"
+					},
+					{
+						value: "steps",
+						text: "Step changes"
+					},
 				]
 			}
 		},
@@ -252,7 +360,8 @@
 						},
 						{
 							value: "skill",
-							text: "Skill"
+							text: "Skill",
+							disabled: ["set"].includes(this.modifier.type)
 						},
 						{
 							value: "ac",
@@ -270,7 +379,8 @@
 						},
 						{
 							value: "speed",
-							text: "Speed"
+							text: "Speed",
+							disabled: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
 						},
 						{
 							value: "initiative",
@@ -312,13 +422,37 @@
 					}
 				}
 				return false;
+			},
+			scalingText() {
+				if(this.modifier.scaling_type === 'scale') {
+					let text = `This modifier increases with <b>${this.modifier.scale_value}</b> for every `;
+					
+					if(this.modifier.origin.split('.')[0] === 'class') {
+						const class_name = this.classes[this.modifier.origin.split('.')[1]].name;
+						text += `${this.modifier.scale_size > 1 ? `${this.modifier.scale_size} ${class_name} levels` : `${class_name} level`} above `;
+					}
+
+					if(this.modifier.origin.split('.')[0] === 'class') text += numeral(this.modifier.origin.split('.')[2]).format('0o');
+					else text += this.modifier.start;
+					text += ".";
+					return text;
+				}
+			},
+			deleteScaling() {
+				delete this.modifier.scaling_type;
+				delete this.modifier.scaling_start;
+				delete this.modifier.scale_size;
+				delete this.modifier.scale_value;
+
+				this.$emit('input', this.modifier);
+				this.$forceUpdate();
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.el-select {
-		width: 100%;
+	.el-select, .form-control {
+		width: 100% !important;
 	}
 </style>

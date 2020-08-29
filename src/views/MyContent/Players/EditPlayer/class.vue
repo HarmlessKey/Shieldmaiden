@@ -26,7 +26,7 @@
 
 				<el-collapse-transition>
 					<div class="p-3" v-show="showClass === classKey">
-						<a v-if="classKey !== 0" @click="confirmDeleteClass(classKey, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
+						<a v-if="classKey != 0" @click="confirmDeleteClass(classKey, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
 						<div class="level">
 							<div class="form-item mb-3">
 								<label :for="`${classKey}-class`">Class</label>
@@ -358,7 +358,7 @@
 
 		<!-- MODIFIER MODAL -->
 		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
-			<Modifier v-model="modifier" />
+			<Modifier v-model="modifier" :classes="classes"/>
 			<template slot="modal-footer">
 				<a class="btn bg-gray" @click="hideModal">Cancel</a>
 				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>

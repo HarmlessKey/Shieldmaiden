@@ -34,7 +34,14 @@ export const modifierMixin = {
 			if(!["ability", "ability_maximum", "skill"].includes(modifier.target)) {
 				delete modifier.subtarget;
 			}
-
+			//Delete scaling if the type is not a bonus or set
+			if(!["bonus", "set"].includes(modifier.type)) {
+				console.log('delete scaling')
+				delete modifier.scaling_type;
+				delete modifier.scaling_start;
+				delete modifier.scale_size;
+				delete modifier.scale_value;
+			}
 
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
 			this.modifier = {}

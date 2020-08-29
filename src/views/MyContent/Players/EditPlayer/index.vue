@@ -399,7 +399,7 @@
 
 				//Add Initiative Modifiers	
 				for(const modifier of this.initiative_modifiers) {
-					initiative = this.addModifier(initiative, modifier, proficiency, ability_scores);
+					initiative = this.addModifier(initiative, modifier, proficiency, ability_scores, computed_level, classes);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
 
@@ -411,7 +411,7 @@
 
 				//Add AC Modifiers	
 				for(const modifier of this.ac_modifiers) {
-					armor_class = this.addModifier(armor_class, modifier, proficiency, ability_scores);
+					armor_class = this.addModifier(armor_class, modifier, proficiency, ability_scores, computed_level, classes);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/armor_class`).set(armor_class);
 
@@ -421,7 +421,7 @@
 
 					//Add Speed Modifiers	
 					for(const modifier of this.speed_modifiers) {
-						speed = this.addModifier(speed, modifier, proficiency, ability_scores);
+						speed = this.addModifier(speed, modifier, proficiency, ability_scores, computed_level, classes);
 					}
 					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
 				}
@@ -445,7 +445,7 @@
 								skills.expertise[skill] = true;
 							} else {
 								let value = (skills.bonuses[skill]) ? skills.bonuses[skill] : 0;
-								skills.bonuses[skill] = this.addModifier(value, modifier, proficiency, ability_scores);
+								skills.bonuses[skill] = this.addModifier(value, modifier, proficiency, ability_scores, computed_level, classes);
 							}
 						}
 					}
@@ -467,7 +467,7 @@
 								saving_throws.proficiencies[ability] = true;
 							} else {
 								let value = (saving_throws.bonuses[ability]) ? saving_throws.bonuses[ability] : 0;
-								saving_throws.bonuses[ability] = this.addModifier(value, modifier, proficiency, ability_scores);
+								saving_throws.bonuses[ability] = this.addModifier(value, modifier, proficiency, ability_scores, computed_level, classes);
 							}
 						}
 					}
@@ -498,11 +498,29 @@
 				//Clear the proficiency tracker
 				this.proficiency_tracker = [];
 			},
-			addModifier(value, modifier, proficiency, ability_scores) {
+			addModifier(value, modifier, proficiency, ability_scores, character_level, classes) {
 				let newValue = parseInt(value);
- 
+				let modifier_value = parseInt(modifier.value);
+
+				//Check for scaling
+				if(modifier.scaling_type) {
+					if(modifier.scaling_type === 'scale') {
+						const classKey = modifier.origin.split(".")[1];
+						const starting_level = (modifier.origin.split(".")[0] === 'class') ? modifier.origin.split(".")[2] : modifier.scaling_start;
+						const current_level = (modifier.origin.split(".")[0] === 'class') ? classes[classKey].level : character_level;
+
+						//Calculate the increase based on starting level, character-/class-level and the scale
+						const increase = parseInt(Math.floor((current_level - starting_level) / modifier.scale_size));
+
+						//Add the increase to the starting value
+						modifier_value = modifier_value + increase * parseInt(modifier.scale_value);
+					} else if(modifier.scaling_type === 'steps') {
+
+					}
+				}
+
 				if(modifier.type === 'bonus') {
-					newValue = newValue + parseInt(modifier.value);
+					newValue = newValue + parseInt(modifier_value);
 				}
 				if(modifier.type === 'proficiency') {
 					//Keep track of what subtargets have had proficiency added

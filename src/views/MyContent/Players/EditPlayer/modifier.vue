@@ -393,15 +393,11 @@
 			},
 			modifier_origin() {
 				if(this.modifier.origin) {
-					const originArray = this.modifier.origin.split(".");
+					const originArray = (this.modifier) ? this.modifier.origin.split(".") : [];
 					let returnString = "";
 
 					for(const index in originArray) {
 						const origin = originArray[index];
-
-						if(index === 1 && origin === "feat") {
-
-						}
 						returnString += (index > 0) ? ` > ${origin.capitalize()}` : origin.capitalize();
 					}
 					return returnString;

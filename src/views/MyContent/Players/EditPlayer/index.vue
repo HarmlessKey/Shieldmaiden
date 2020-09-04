@@ -14,10 +14,11 @@
 					<a class="btn btn-block">Choose</a>
 				</template>
 			</b-card>
-			<b-card header="Import" @click="build = 'import'" :class="{ active: build === 'import' }">
+			<b-card header="Import">
+				<p>(Coming soon)</p>
 				<p>Import a character from DnDBeyond. Copy your character sheet over, so it can be used in our combat tracker.</p>
 				<template slot="footer">
-					<a class="btn btn-block">Choose</a>
+					<a class="btn btn-block disabled">Choose</a>
 				</template>
 			</b-card>
 		</div>
@@ -561,8 +562,10 @@
 		padding: 20px;
 		
 		> h3 {
+			font-family: 'Fredericka the Great', cursive !important;
 			text-align: center;
-			margin-bottom: 30px;
+			font-size: 25px !important;
+			margin: 40px 0 30px 0 !important;
 		}
 
 		.types {

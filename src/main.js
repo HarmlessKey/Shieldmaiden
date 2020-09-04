@@ -17,6 +17,7 @@ import locale from 'element-ui/lib/locale/lang/en'
 import HkTable from './components/hk-components/hk-table'
 import Icon from './components/Icon'
 import 'element-ui/lib/theme-chalk/index.css';
+import TextareaAutosize from 'vue-textarea-autosize'
 
 const options = {
 	toast: {
@@ -35,6 +36,7 @@ Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 Vue.use(Element, { locale });
+Vue.use(TextareaAutosize);
 
 //Bootstrap
 global.$ = jQuery

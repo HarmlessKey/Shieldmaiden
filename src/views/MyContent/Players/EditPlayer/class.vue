@@ -482,6 +482,11 @@
 			GiveCharacterControl,
 			Modifier
 		},
+		mounted() {
+			$(document).ready(function(){
+				$('[data-toggle="tooltip"]').tooltip();
+			});
+		},
 		data() {
 			return {
 				armor_types: [

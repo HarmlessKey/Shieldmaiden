@@ -259,7 +259,7 @@
 				//Level HP and Spells
 				let classes = {};
 				let computed_level = 0;
-				let computed_hp = (this.base_values.class.classes[0].base_hit_points) ? this.base_values.class.classes[0].base_hit_points : 0;
+				let computed_hp = (this.base_values.class.classes[0].hit_dice) ? this.base_values.class.classes[0].hit_dice : 0;
 				let caster_levels = []; //A caster level is needed to determine spell slots with the caster table (phb 165)
 
 				//Set level specific stats HP/Spells
@@ -287,7 +287,7 @@
 							return die.value === value.hit_dice;
 						});
 						//For the main class only set fixed HP for the levels after first
-						computed_hp = (key === 0) ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
+						computed_hp = (key == 0) ? computed_hp + ((level - 1) * hit_dice[0].average) : computed_hp + (level * hit_dice[0].average);
 					}
 
 					//Spell slots
@@ -333,14 +333,15 @@
 				//REMOVE MODIFIERS
 				//If modifiers are linked to a class feature and the class is not the required level for that feature,
 				//the modifier must not be added, so remove these modifiers from the modifier list.
+				let remove_array = [];
 				for(const [classKey, value] of Object.entries(classes)) {
 					for(const index in modifiers) {
 						const modifier = modifiers[index];
 						const origin = modifier.origin.split(".");
 
 						//Remove the modifier if the class level is not high enough
-						if(origin[0] === "class" && origin[1] === classKey && origin[2] > value.level) {
-							modifiers.splice(index, 1);
+						if(origin[0] === "class" && origin[1] == classKey && parseInt(origin[2]) > parseInt(value.level)) {
+							delete modifiers[index];
 						}
 					}
 				}
@@ -362,9 +363,10 @@
 				for(const [key, value] of Object.entries(ability_scores)) {
 					for(const modifier of this.ability_modifiers) {
 						if(modifier.subtarget === key && modifier.type === 'bonus') {
-							ability_scores[key] = value + parseInt(modifier.value);
+							value = value + parseInt(modifier.value);
 						}
 					}
+					ability_scores[key] = value;
 
 					//Set score to maximum if it is higher than it's maximum
 					if(ability_scores[key] > ability_max[key]) {

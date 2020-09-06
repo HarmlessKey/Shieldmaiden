@@ -224,7 +224,14 @@
 										<template v-for="(feature, key, index) in subclass.features[`level_${level}`]">
 											<b-card no-body :key="`feature-${index}`">
 												<b-card-header role="tab">
-													{{ key === "--asi" ? "Ability Score Improvement / Feat" : feature.name }}
+													<span>
+														<i 
+															class="mr-1" 
+															v-b-tooltip.hover="subclass.features[`level_${level}`][key].display ? 'Displayed on Sheet' : 'Hidden on Sheet'" 
+															:class="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'"
+														/>
+														{{ key === "--asi" ? "Ability Score Improvement / Feat" : feature.name }}
+													</span>
 													<div class="actions">
 														<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
 														<a v-if="key !== '--asi'" @click="confirmDeleteFeature(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
@@ -296,6 +303,9 @@
 															</div>
 
 															<label :for="`${classKey}-${level}-description`">
+																<a @click="setSlide({show: true, type: 'slides/characterBuilder/Descriptions'})">
+																	<i class="fas fa-info-circle"/>
+																</a>
 																Description
 																<a v-if="edit_feature_description === key" @click="editFeature(classKey, level, key, 'description'), edit_feature_description = undefined"><i class="fas fa-check green"/></a>
 																<a v-else @click="edit_feature_description = key"><i class="fas fa-pencil-alt"/></a>
@@ -312,7 +322,7 @@
 																data-vv-as="Description"
 																:min-height="30"
 															/>
-															<vue-markdown v-else name="description_preview" :source="feature.description"></vue-markdown>
+															<vue-markdown v-else name="description_preview" :source="replaceDescriptionStats(feature.description, computed.sheet ? computed.sheet.classes[classKey] : undefined)"></vue-markdown>
 																	
 															<!-- FEATURE MODIFIER -->
 															<h3 class="title">
@@ -430,6 +440,7 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex';
 	import VueMarkdown from 'vue-markdown';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { modifierMixin } from '@/mixins/modifiers.js';
@@ -442,6 +453,7 @@
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
+	import { characterDescriptions } from '@/mixins/characterDescriptions.js';
 
 	export default {
 		name: 'CharacterClass',
@@ -453,7 +465,8 @@
 			skills, 
 			dice, 
 			spellSlots, 
-			experience
+			experience,
+			characterDescriptions
 		],
 		props: [
 			"base_class",
@@ -553,6 +566,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			feature_modifiers(classKey, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");

@@ -627,6 +627,11 @@ ul.crumble {
 			}
 		}
 	}
+	table.table, table {
+		td {
+			background-color: $gray-dark;
+		}
+	}
 }
 table.table, table {
 	border-collapse: separate !important; 

@@ -45,7 +45,7 @@
 		data() {
 			return {
 				is_small: false,
-				copy: window.location.host + '/user/' + this.$store.getters.getUser.uid,
+				copy: window.location.href + 'user/' + this.$store.getters.getUser.uid,
 			}
 		},
 		methods: {

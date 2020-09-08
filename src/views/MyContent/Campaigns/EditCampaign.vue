@@ -201,21 +201,25 @@
 			},
 			removePlayer(playerId) {
 				// Get companions of player
-				let companions = Object.keys(this.players[playerId].companions);
+				let companions = this.players[playerId].companions;
 
 				//First remove player from all encounters
 				for(let encounterId in this.allEncounters[this.campaignId]) {
 					//Remove player from encouner
 					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(playerId).remove();
-					for (let companionId of companions) {
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(companionId).remove();
+					if (companions !== undefined) {					
+						for (let companionId of Object.keys(companions)) {
+							db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(companionId).remove();
+						}
 					}
 				}
 
 				//Then remove from campaign
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(playerId).remove();
-				for (let companionId of companions) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(companionId).remove();
+				if (companions !== undefined) {
+					for (let companionId of Object.keys(companions)) {
+						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(companionId).remove();
+					}
 				}
 				if (this.players[playerId].campaign_id == this.campaignId) {
 					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();

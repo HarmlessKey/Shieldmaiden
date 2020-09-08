@@ -81,23 +81,24 @@ export const characterDescriptions = {
 				for(const replace of this.replaceStats) {
 					const regex = new RegExp(replace.ref, "g");
 					const replace_value = replace.value || replace.description;
-					description = description.replace(regex, `**<span data-toggle="tooltip" title="${replace.description}">${replace_value}</span>**`);
+					description = description.replace(regex, `<b data-toggle="tooltip" title="${replace.description}">${replace_value}</b>`);
 				}
-				//Class level
+				
 				if(Class) {
+					//Class level
 					const level_regex = /\[class_level\]/g;
 					const level_replace_value = Class.level || Class.class + " level";
-					description = description.replace(level_regex, `**<span data-toggle="tooltip" title="${Class.class} level">${level_replace_value}**`);
+					description = description.replace(level_regex, `<b data-toggle="tooltip" title="${Class.class} level">${level_replace_value}</b>`);
 
 					//Spell attack
 					const attack_regex = /\[spell_attack\]/g;
 					const attack_replace_value = Class.spell_attack || "spell attack modifier";
-					description = description.replace(attack_regex, `**<span data-toggle="tooltip" title="Spell attack modifier">${attack_replace_value}</span>**`);
+					description = description.replace(attack_regex, `<b data-toggle="tooltip" title="Spell attack modifier">${attack_replace_value}</b>`);
 
 					//Spell save DC
 					const save_regex = /\[spell_save_dc\]/g;
 					const save_replace_value = Class.spell_save_dc || "spell save DC";
-					description = description.replace(save_regex, `**<span data-toggle="tooltip" title="Spell save DC">${save_replace_value}</span>**`);
+					description = description.replace(save_regex, `<b data-toggle="tooltip" title="Spell save DC">${save_replace_value}</b>`);
 				}
 			}
 

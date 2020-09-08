@@ -79,10 +79,16 @@
 							</span>
 						</h3>
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
-							<div class="form-item mb-3">
-								<label for="hit_dice">Hit dice</label>
-								<b-form-select v-model="subclass.hit_dice" :options="dice_types" @change="saveHitDice(classKey)" />
+							<label>Hit dice</label>
+							<div class="hit-dice">
+								<template v-for="{value, text} in dice_types">
+									<a @click="saveHitDice(classKey, value)" :key="`d${value}-${classKey}`" :class="{ active: subclass.hit_dice === value }">
+										<i :class="`fas fa-dice-d${value}`"></i>
+										{{ text }}
+									</a>
+								</template>
 							</div>
+							
 							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)">
 								<label>Rolled HP</label>
 								<div class="rolled" @click="rollHitPoints(classKey)">
@@ -757,8 +763,7 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
 				this.$emit("change", "class.level");
 			},
-			saveHitDice(key) {
-				const value = parseInt(this.classes[key].hit_dice);
+			saveHitDice(key, value) {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/hit_dice`).set(value);
 				this.$emit("change", "class.hit_dice");
 			},
@@ -942,9 +947,24 @@
 		grid-gap: 15px;
 	}
 	.hit_points {
-		display: grid;
-		grid-template-columns: 100px 100px 1fr;
-		grid-gap: 15px;
+		
+
+		.hit-dice {
+			display: flex;
+			justify-content: flex-start;
+			width: 30px;
+			text-align: center;
+			margin: -10px;
+
+			a {
+				color: #b2b2b2 !important;
+				padding: 10px;
+
+				i {
+					font-size: 25px;
+				}
+			}
+		}
 	}
 	.proficiencies {
 		display: flex;

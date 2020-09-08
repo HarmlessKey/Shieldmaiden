@@ -19,7 +19,11 @@
 		</table>
 
 		<h3>Character stats</h3>
-		<p>You can add stats of your character into the description. Simply enter the reference of desired stat as shown in the tables below. The actual value will be shown when the description is displayed.</p>
+		<p>
+			You can add stats of your character into the description. 
+			Simply enter the reference of the desired stat, as shown in the tables below, into the description field. 
+			The actual value will be shown when the description is displayed. The brackets are required.
+		</p>
 		
 		<table class="table">
 			<thead>
@@ -58,14 +62,31 @@
 		<table class="table">
 			<thead>
 				<th>
-					Stat
+					Character
 				</th>
 				<th>
 					Reference
 				</th>
 			</thead>
 			<tbody>
-				<tr v-for="({stat, ref}, index) in stats" :key="`stats-${index}`">
+				<tr v-for="({stat, ref}, index) in character" :key="`character-${index}`">
+					<td>{{ stat }}</td>
+					<td>{{ ref }}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table class="table">
+			<thead>
+				<th>
+					Class
+				</th>
+				<th>
+					Reference
+				</th>
+			</thead>
+			<tbody>
+				<tr v-for="({stat, ref}, index) in Class" :key="`class-${index}`">
 					<td>{{ stat }}</td>
 					<td>{{ ref }}</td>
 				</tr>
@@ -84,7 +105,8 @@
 						"**Bold**",
 						"__Underline__",
 						"- Unordered list item",
-						"1. Ordered list item"
+						"1. Ordered list item",
+						"| table | columns |"
 				],
 				ability_scores: [
 					{
@@ -138,7 +160,7 @@
 						ref: "[cha_mod]"
 					},
 				],
-				stats: [
+				character: [
 					{
 						stat: "Proficiency bonus",
 						ref: "[proficiency]"
@@ -146,7 +168,9 @@
 					{
 						stat: "Character level",
 						ref: "[character_level]"
-					},
+					}
+				],
+				Class: [
 					{
 						stat: "Class level",
 						ref: "[class_level]"
@@ -159,7 +183,7 @@
 						stat: "Spell save DC",
 						ref: "[spell_save_dc]"
 					}
-				]
+				],
 			}
 		}
 	};

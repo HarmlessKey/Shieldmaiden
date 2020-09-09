@@ -19,7 +19,7 @@
 		</select>
 		<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
 		
-		<Actions class="mt-3" v-if="doneBy" :current="doneBy" location="side"/>
+		<Actions class="mt-3" v-if="doneBy" :settings="settings" :current="doneBy" location="side"/>
 	</div>
 </template>
 
@@ -53,6 +53,14 @@
 				log: true,
 				environment: {
 					key: 'environment'
+				},
+			}
+		},
+		firebase() {
+			return {
+				settings: {
+					source: db.ref(`settings/${this.userId}/encounter`),
+					asObject: true,
 				},
 			}
 		},

@@ -3,26 +3,26 @@
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
 				<a class="nav-link"
-					:class="{'active': current.entityType === 'player' || current.entityType === 'companion'}"
+					:class="{'active': current.entityType === 'player' || current.entityType === 'companion' || settings.npcDamageTab}"
 					id="manual-tab" 
 					data-toggle="tab" 
 					:href="`#manual-${location}`" 
 					role="tab" 
 					aria-controls="manual" 
-					:aria-selected="current.entityType === 'player'  || current.entityType === 'companion'">
+					:aria-selected="current.entityType === 'player'  || current.entityType === 'companion' || settings.npcDamageTab">
 					<i class="fas fa-keyboard"></i> 
 					<span class="d-none d-md-inline ml-1">Manual</span>
 				</a>
 			</li>
 			<li class="nav-item">
 				<a class="nav-link" 
-					:class="{'active': current.entityType === 'npc'}"
+					:class="{'active': current.entityType === 'npc' && !settings.npcDamageTab}"
 					id="roll-tab" 
 					data-toggle="tab" 
 					:href="`#roll-${location}`" 
 					role="tab" 
 					aria-controls="roll" 
-					:aria-selected="current.entityType === 'npc'">
+					:aria-selected="current.entityType === 'npc' && !settings.npcDamageTab">
 					<i class="fas fa-dice-d20"></i> 
 					<span class="d-none d-md-inline ml-1">Roll</span>
 				</a>
@@ -30,7 +30,7 @@
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane fade" 
-				:class="{'show active': current.entityType === 'player'  || current.entityType === 'companion'}" 
+				:class="{'show active': current.entityType === 'player'  || current.entityType === 'companion' || settings.npcDamageTab}" 
 				:id="`manual-${location}`" 
 				role="tabpanel" 
 				aria-labelledby="manual-tab">
@@ -38,7 +38,7 @@
 				<Manual :current="current" :targeted="targeted" />
 			</div>
 			<div v-if="current" class="tab-pane roll fade"
-				:class="{'show active': current.entityType === 'npc'}"
+				:class="{'show active': current.entityType === 'npc' && !settings.npcDamageTab }"
 				:id="`roll-${location}`" 
 				role="tabpanel" 
 				aria-labelledby="roll-tab">

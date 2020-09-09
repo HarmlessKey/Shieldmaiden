@@ -108,7 +108,7 @@
 					</template>
 					<div v-else class="loader"><span>Loading current...</span></div>
 				</div>
-				<Actions :current="current" location="current"/>
+				<Actions :current="current" :settings="settings" location="current"/>
 			</div>
 		</div>
 	</div>
@@ -130,7 +130,7 @@
 			Conditions,
 			Reminders
 		},
-		props: ['current', 'next'],
+		props: ['current', 'next', 'settings'],
 		data() {
 			return {
 				setShadow: 0,

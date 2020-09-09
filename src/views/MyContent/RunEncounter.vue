@@ -28,6 +28,7 @@
 				<Current 
 					:current="_active[encounter.turn]"
 					:next="next"
+					:settings="settings"
 				/>
 				<Targets 
 					:_active = "_active"

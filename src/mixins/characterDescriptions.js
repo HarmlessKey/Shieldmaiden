@@ -4,62 +4,62 @@ export const characterDescriptions = {
 			replaceStats: [
 				{
 					ref: "\\[str\\]",
-					value: this.calcMod(this.computed.sheet.abilities.strength),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.strength) : undefined,
 					description: "strength score"
 				},
 				{
 					ref: "\\[dex\\]",
-					value: this.calcMod(this.computed.sheet.abilities.dexterity),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.dexterity) : undefined,
 					description: "dexterity score"
 				},
 				{
 					ref: "\\[con\\]",
-					value: this.calcMod(this.computed.sheet.abilities.constitution),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.constitution) : undefined,
 					description: "constitution score"
 				},
 				{
 					ref: "\\[int\\]",
-					value: this.calcMod(this.computed.sheet.abilities.intelligence),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.intelligence) : undefined,
 					description: "intelligence score"
 				},
 				{
 					ref: "\\[wis\\]",
-					value: this.calcMod(this.computed.sheet.abilities.wisdom),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.wisdom) : undefined,
 					description: "wisdom score"
 				},
 				{
 					ref: "\\[cha\\]",
-					value: this.calcMod(this.computed.sheet.abilities.charisma),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.calcMod(this.computed.sheet.abilities.charisma) : undefined,
 					description: "charisma score"
 				},
 				{
 					ref: "\\[str_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.strength),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.strength : undefined,
 					description: "strength modifier"
 				},
 				{
 					ref: "\\[dex_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.dexterity),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.dexterity : undefined,
 					description: "dexterity modifier"
 				},
 				{
 					ref: "\\[con_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.constitution),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.constitution : undefined,
 					description: "constitution modifier"
 				},
 				{
 					ref: "\\[int_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.intelligence),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.intelligence : undefined,
 					description: "intelligence modifier"
 				},
 				{
 					ref: "\\[wis_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.wisdom),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.wisdom : undefined,
 					description: "wisdom modifier"
 				},
 				{
 					ref: "\\[cha_mod\\]",
-					value: this.calcMod(this.computed.sheet.abilities.charisma),
+					value: (this.computed.sheet && this.computed.sheet.abilities) ? this.computed.sheet.abilities.charisma : undefined,
 					description: "charisma modifier"
 				},
 				{

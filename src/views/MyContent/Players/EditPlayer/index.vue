@@ -1,6 +1,6 @@
 <template>
 	<div v-if="base_values.general && !base_values.general.build" class="build-type">
-		<h3>How do you want to build your character?</h3>
+		<h3>How do you want to do this?</h3>
 		<div class="types">
 			<b-card header="Advanced" @click="build = 'advanced'" :class="{ active: build === 'advanced' }">
 				<p>Create a complete character sheet that you can use as player in your games.</p>

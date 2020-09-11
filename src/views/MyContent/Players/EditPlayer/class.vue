@@ -81,12 +81,10 @@
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
 							<label>Hit dice</label>
 							<div class="hit-dice">
-								<template v-for="{value, text} in dice_types">
-									<a @click="saveHitDice(classKey, value)" :key="`d${value}-${classKey}`" :class="{ active: subclass.hit_dice === value }">
-										<i :class="`fas fa-dice-d${value}`"></i>
-										{{ text }}
-									</a>
-								</template>
+								<a v-for="{value, text} in dice_types" @click="saveHitDice(classKey, value)" :key="`d${value}-${classKey}`" :class="{ active: subclass.hit_dice === value }">
+									<i :class="`fas fa-dice-d${value}`"></i>
+									{{ text }}
+								</a>
 							</div>
 							
 							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)">
@@ -337,6 +335,7 @@
 															</h3>
 
 															<hk-table
+																v-if="feature_modifiers(classKey, level, key).length > 0"
 																:columns="columns"
 																:items="feature_modifiers(classKey, level, key)"
 															>
@@ -681,7 +680,7 @@
 						//Get the key of the proficiency that needs to be removed
 						const key = this.modifiers.filter(mod => {
 							const origin = mod.origin.split(".");
-							return origin[1] === classKey && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
+							return origin[1] == classKey && origin[2] === "proficiencies" && origin[3] === type && mod.subtarget === prof;
 						}).map(obj => {
 							return obj['.key'];
 						});
@@ -947,8 +946,6 @@
 		grid-gap: 15px;
 	}
 	.hit_points {
-		
-
 		.hit-dice {
 			display: flex;
 			justify-content: flex-start;
@@ -957,9 +954,12 @@
 			margin: -10px;
 
 			a {
-				color: #b2b2b2 !important;
+				color: #5c5757 !important;
 				padding: 10px;
 
+				&.active {
+					color: #fff !important;
+				}
 				i {
 					font-size: 25px;
 				}

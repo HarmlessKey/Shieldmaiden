@@ -429,10 +429,11 @@
 					if(this.modifier.origin.split('.')[0] === 'class') {
 						const class_name = this.classes[this.modifier.origin.split('.')[1]].name;
 						text += `${this.modifier.scale_size > 1 ? `${this.modifier.scale_size} ${class_name} levels` : `${class_name} level`} above `;
+						text += numeral(this.modifier.origin.split('.')[2]).format('0o');
+					}	else {
+						text += `${this.modifier.scale_size > 1 ? `${this.modifier.scale_size} character levels` : `character level`} above `;
+						text += numeral(this.modifier.scaling_start).format('0o');
 					}
-
-					if(this.modifier.origin.split('.')[0] === 'class') text += numeral(this.modifier.origin.split('.')[2]).format('0o');
-					else text += this.modifier.start;
 					text += ".";
 					return text;
 				}

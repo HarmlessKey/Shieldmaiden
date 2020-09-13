@@ -74,7 +74,7 @@
 					:columns="activeColumns"
 				>
 					<template slot="encounter" slot-scope="data">
-						<router-link v-if="data.row.entities" class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
+						<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Run Encounter">
 							{{ data.item }}
 						</router-link>
 						<template v-else>
@@ -83,11 +83,10 @@
 					</template>
 					<template slot="entities" slot-scope="data">
 						<router-link :to="'/encounters/' + campaignId + '/' + data.row.key" v-b-tooltip.hover title="Edit">
-							<i class="fas fa-users"></i>
-							<template v-if="data.row.entities">
+							<span class="gray-light" v-if="data.row.entities">
 								{{ Object.keys(data.row.entities).length }}
-							</template>
-							<template v-else> Add</template>
+							</span>
+							<template v-else><i class="fas fa-plus"></i> Add</template>
 						</router-link>
 					</template>
 
@@ -187,9 +186,10 @@
 				currentPage: 1,
 				collapsed: false,
 				activeColumns: {
-                    encounter: {
+					encounter: {
 						label: 'Encounter',
-						maxContent: true
+						maxContent: true,
+						sortable: true
 					},
 					entities: {
 						label: 'Entities',

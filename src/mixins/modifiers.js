@@ -36,7 +36,6 @@ export const modifierMixin = {
 			}
 			//Delete scaling if the type is not a bonus or set
 			if(!["bonus", "set"].includes(modifier.type)) {
-				console.log('delete scaling')
 				delete modifier.scaling_type;
 				delete modifier.scaling_start;
 				delete modifier.scale_size;

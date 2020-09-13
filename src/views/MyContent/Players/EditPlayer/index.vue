@@ -40,6 +40,10 @@
 		</ul>
 		<div class="tab-content" v-if="base_values.class">
 			<Computed 
+				:hit_point_type="base_values.general.hit_point_type"
+				:modifiers="modifiers"
+				:classes="base_values.class.classes"
+				:race="base_values.race"
 				:computed="computed_values" 
 			/>
 			<General 
@@ -333,7 +337,6 @@
 				//REMOVE MODIFIERS
 				//If modifiers are linked to a class feature and the class is not the required level for that feature,
 				//the modifier must not be added, so remove these modifiers from the modifier list.
-				let remove_array = [];
 				for(const [classKey, value] of Object.entries(classes)) {
 					for(const index in modifiers) {
 						const modifier = modifiers[index];
@@ -360,7 +363,7 @@
 				let ability_scores = { ...this.base_values.abilities };
 
 				//Add Ability Score Modifiers
-				for(const [key, value] of Object.entries(ability_scores)) {
+				for(let [key, value] of Object.entries(ability_scores)) {
 					for(const modifier of this.ability_modifiers) {
 						if(modifier.subtarget === key && modifier.type === 'bonus') {
 							value = value + parseInt(modifier.value);
@@ -528,7 +531,7 @@
 						//Add the increase to the starting value
 						modifier_value = modifier_value + increase * parseInt(modifier.scale_value);
 					} else if(modifier.scaling_type === 'steps') {
-
+						//define how step scaling is handled
 					}
 				}
 

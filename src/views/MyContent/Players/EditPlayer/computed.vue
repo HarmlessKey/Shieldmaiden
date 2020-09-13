@@ -33,7 +33,22 @@
 					{{ character.display.armor_class }}
 				</div>
 			</div>
-			<div class="hit_points" v-if="character.display.hit_points">
+			<div 
+				class="hit_points" 
+				v-if="character.display.hit_points" 
+				@click="setSlide({
+					show: true, 
+					type: 'slides/characterBuilder/HitPoints',
+					data: {
+						total: character.display.hit_points,
+						hit_point_type,
+						level: character.display.level,
+						con_mod: character.sheet ? calcMod(character.sheet.abilities.constitution) : 0,
+						modifiers: hp_modifiers,
+						classes,
+					}
+				})
+			">
 				<h6>Hit Points</h6>
 				<div class="value">
 					{{ character.display.hit_points }}
@@ -57,12 +72,17 @@
 </template>
 
 <script>
+	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
 
 	export default {
 		name: 'CharacterComputed',
 		mixins: [general],
 		props: [
+			"hit_point_type",
+			"modifiers",
+			"classes",
+			"race",
 			"computed"
 		],
 		computed: {
@@ -71,7 +91,18 @@
 			},
 			abilities() {
 				return (this.computed.sheet) ? this.computed.sheet.abilities : undefined;
-			}
+			},
+			hp_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					return mod.target === 'hp';
+				});
+				return modifiers;
+			},
+		},
+		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 		}
 	}
 </script>
@@ -134,6 +165,7 @@
 			.armor_class, .hit_points, .speed, .initiative  {
 				margin-left: 15px;
 				text-align: center;
+				cursor: pointer;
 
 				h6 {
 					font-size: 12px;

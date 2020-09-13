@@ -45,7 +45,7 @@
 		<table class="table">
 			<thead>
 				<th>
-				 Ability modifiers
+					Ability modifiers
 				</th>
 				<th>
 					Reference

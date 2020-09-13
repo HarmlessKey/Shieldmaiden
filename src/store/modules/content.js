@@ -376,7 +376,6 @@ export const content_module = {
 		},
 		setSideCollapsed({ commit, state }) {
 			const uid = state.user.uid;
-			const screen_small = state.side_small_screen;
 			let general = settings_ref.child(uid).child('general');
 			general.on('value', snapshot => {
 				let collapse = false;

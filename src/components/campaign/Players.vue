@@ -198,9 +198,10 @@
 				</div>
 				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
 					<div class="level" 
-							 :class="{red: isXpAdvancement() && player.level}"
-							 v-b-tooltip.hover
-							 :title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+						:class="{red: isXpAdvancement() && player.level}"
+						v-b-tooltip.hover
+						:title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''
+					">
 						{{ player.level ? player.level : calculatedLevel(player.experience) }}
 					</div>
 					<div class="progress">
@@ -337,7 +338,7 @@
 			...mapActions([
 				'setSlide',
 			]),
-			getWindowWidth(event) {
+			getWindowWidth() {
 				this.width = this.$refs.players.clientWidth;
 			},
 			setSize() {

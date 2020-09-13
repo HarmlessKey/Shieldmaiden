@@ -30,34 +30,34 @@
 						<div class="level">
 							<div class="form-item mb-3">
 								<label :for="`${classKey}-class`">Class</label>
-								<b-form-input 
+								<b-form-input
 									@change="saveClassName(classKey)"
-									autocomplete="off"  
-									:id="`${classKey}-class`" 
-									type="text" 
-									v-model="subclass.name" 
+									autocomplete="off"
+									:id="`${classKey}-class`"
+									type="text"
+									v-model="subclass.name"
 									placeholder="Class"/>
 							</div>
 							<div class="form-item mb-3">
 								<label for="subclass">Subclass</label>
-								<b-form-input 
+								<b-form-input
 									@change="saveClassSubclass(classKey)"
-									autocomplete="off"  
-									:id="`${classKey}-subclass`" 
-									type="text" 
-									v-model="subclass.subclass" 
+									autocomplete="off"
+									:id="`${classKey}-subclass`"
+									type="text"
+									v-model="subclass.subclass"
 									placeholder="Subclass"/>
 							</div>
 							<div class="form-item mb-3">
-								<label for="level">Level 	{{ subclass.level + (20 - computed.display.level) }}</label>
+								<label for="level">Level</label>
 								<select class="form-control" v-model="subclass.level" name="skills" @change="saveClassLevel(classKey)">
 								<option 
-									v-for="level in 20" 
+									v-for="level in 20"
 									:key="`${level}`"
 									:value="level"
 									:disabled="
 										(advancement === 'experience' && level > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level)))
-										|| (advancement === 'milestone' && level > (subclass.level + (20 - computed.display.level)) ) 
+										|| (advancement === 'milestone' && level > (subclass.level + (20 - computed.display.level)) )
 									">
 									{{ level }}
 								</option>
@@ -71,13 +71,16 @@
 							<span>
 								<span v-b-tooltip:hover title="Hit dice" v-if="subclass.hit_dice">{{ subclass.level }}d{{ subclass.hit_dice }}</span> |
 								<span v-b-tooltip:hover title="CON modifier" v-if="computed.sheet && computed.sheet.abilities && computed.sheet.abilities.constitution">
-								 {{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
+									{{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
 								</span> |
-								<span v-b-tooltip:hover title="Hit points">
-									{{ computed.display.hit_points }}
+								<span :id="`hp-info-popover-${classKey}`">
+									{{ classTotalHP(classKey, 'total') }}
 								</span>
 							</span>
 						</h3>
+						<b-popover :target="`hp-info-popover-${classKey}`" triggers="hover" :title="`${subclass.name} Hit Points: ${classTotalHP(classKey, 'total')}`" placement="top">
+							<span v-html="classTotalHP(classKey, 'info')" />
+						</b-popover>
 						<b-collapse :id="`hp-${classKey}`" class="hit_points">
 							<label>Hit dice</label>
 							<div class="hit-dice">
@@ -88,7 +91,7 @@
 							</div>
 							
 							<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)">
-								<label>Rolled HP</label>
+								<label>Rolled hit points</label>
 								<div class="rolled" @click="rollHitPoints(classKey)">
 									<span class="val">
 										{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
@@ -102,10 +105,19 @@
 						<h3 v-b-toggle="`casting-${classKey}`" class="collapse">
 							<span><i class="fas fa-hand-holding-magic"/> Spell casting</span>
 							<span v-if="subclass.casting_ability">
-								<span v-b-tooltip:hover title="Spell attack">
+								<span :id="`spell-attack-popover-${classKey}`">
 									{{ computed.sheet.classes[classKey].spell_attack > 0 ? "+" : "" }}{{ computed.sheet.classes[classKey].spell_attack }}
 								</span> |
-								<span v-b-tooltip:hover title="Spell save DC">{{ computed.sheet.classes[classKey].spell_save_dc }}</span>
+								<span :id="`spell-save-popover-${classKey}`">{{ computed.sheet.classes[classKey].spell_save_dc }}</span>
+								<b-popover :target="`spell-attack-popover-${classKey}`" triggers="hover" :title="`${subclass.name} spell attack`" placement="top">
+									{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
+									Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+								</b-popover>
+								<b-popover :target="`spell-save-popover-${classKey}`" triggers="hover" :title="`${subclass.name} spell save DC: ${computed.sheet.classes[classKey].spell_save_dc}`" placement="top">
+									Base: <b>8</b><br/>
+									{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
+									Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+								</b-popover>
 							</span>
 						</h3>
 						<b-collapse :id="`casting-${classKey}`" class="casting">
@@ -234,7 +246,13 @@
 															v-b-tooltip.hover="subclass.features[`level_${level}`][key].display ? 'Displayed on Sheet' : 'Hidden on Sheet'" 
 															:class="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'"
 														/>
-														{{ key === "--asi" ? "Ability Score Improvement / Feat" : feature.name }}
+														{{ 
+															key === "--asi" 
+																? `${subclass.features[`level_${level}`][key].type === 'asi' 
+																	? `Ability Score Increase` 
+																	: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
+																: feature.name 
+														}}
 													</span>
 													<div class="actions">
 														<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
@@ -261,7 +279,7 @@
 																active-value="feat"
 																active-text="Feat"
 																inactive-value="asi"
-																inactive-text="Ability Score Improvement"/>
+																inactive-text="Ability Score Increase"/>
 														</template>
 
 														<!-- ASI -->	
@@ -287,7 +305,7 @@
 														<template v-else>
 															<div class="form-item mb-3">
 																<b-form-checkbox 
-																	v-model="subclass.features[`level_${level}`][key].display" 
+																	:value="subclass.features[`level_${level}`][key].display" 
 																	@change="editFeature(classKey, level, key, 'display')" 
 																>
 																	Display on character sheet
@@ -302,8 +320,8 @@
 																	autocomplete="off"  
 																	:id="`name-${level}-${index}`" 
 																	type="text" 
-																	v-model="subclass.features[`level_${level}`][key].name" 
-																	placeholder="Feature name"/>
+																	:value="subclass.features[`level_${level}`][key].name" 
+																	:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"/>
 															</div>
 
 															<label :for="`${classKey}-${level}-description`">
@@ -315,8 +333,8 @@
 																<a v-else @click="edit_feature_description = key"><i class="fas fa-pencil-alt"/></a>
 															</label>
 															<textarea-autosize
-															v-if="edit_feature_description === key"
-																v-model="subclass.features[`level_${level}`][key].description"
+																v-if="edit_feature_description === key"
+																:value="subclass.features[`level_${level}`][key].description"
 																:id="`${classKey}-${level}-description`"
 																name="description"
 																title="Description"
@@ -488,7 +506,9 @@
 			Modifier
 		},
 		mounted() {
+			// eslint-disable-next-line
 			$(document).ready(function(){
+				// eslint-disable-next-line
 				$('[data-toggle="tooltip"]').tooltip();
 			});
 		},
@@ -637,6 +657,33 @@
 					this.$refs['roll-hp-modal'].show();
 				}
 				this.$emit("change", "class.level_up");
+			},
+			classTotalHP(classKey, type) {
+				const hit_dice = this.dice_types.filter(dice => {
+					return dice.value === this.classes[classKey].hit_dice;
+				});
+				const average = (hit_dice[0]) ? hit_dice[0].average : 0;
+				const level = this.classes[classKey].level;
+				const total_rolled = (classKey == 0) ? level - 1 : level;
+
+				//Return the total HP of class
+				if(type === 'total') {
+					let total = (classKey == 0) ? this.classes[classKey].hit_dice : 0;
+					if(this.hit_point_type === 'rolled') {
+						total = total + this.totalRolled(classKey);
+					} else {
+						total = total + total_rolled * average;
+					}
+					return total;
+				} 
+				// Return info about the total HP
+				else if(type === 'info') {
+					let info = (classKey == 0) ? "<p>Your main class starts with 1 full hit die and no average or rolled hit die for the first level.</p>" : "";
+					if(classKey == 0) info += `Starting: <b>${this.classes[classKey].hit_dice}</b><br/>`;
+					if(this.hit_point_type === 'rolled') info += `Rolled ${total_rolled}d${this.classes[classKey].hit_dice}: <b>${this.totalRolled(classKey)}</b>`;
+					else info += `${total_rolled} average hit dice: <b>${total_rolled * average}</b>`;
+					return info;
+				}
 			},
 			totalRolled(classKey) {
 				let totalRolled = 0;
@@ -861,9 +908,13 @@
 					//So check if undefined and set to true if it was
 					value = (value === undefined) ? true : !value;
 
-					//Delete the prop if it was needs to be false
+					//Delete the prop if it was false
 					value = (!value) ? null : value;
 				}
+
+				//Remove value if undefined
+				if(value === undefined) value = null;
+
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${featureKey}/${prop}`).set(value);
 				this.$emit("change", "class.edit_feature");
 			},
@@ -951,11 +1002,11 @@
 			justify-content: flex-start;
 			width: 30px;
 			text-align: center;
-			margin: -10px;
+			margin: 0 -10px 20px -10px;
 
 			a {
 				color: #5c5757 !important;
-				padding: 10px;
+				padding: 0 10px;
 
 				&.active {
 					color: #fff !important;

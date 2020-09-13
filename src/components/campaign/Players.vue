@@ -326,7 +326,7 @@
 							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
 						}
 						//The player doesn't exist so remove it from the campaign
-						else {
+						else if(this.viewerIsUser) {
 							// eslint-disable-next-line
 							console.error('Ghost Player Removed: ', key);
 							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).remove();

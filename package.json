@@ -23,7 +23,7 @@
 		"firebaseui": "^3.4.1",
 		"jqeury": "0.0.1-security",
 		"jquery": "^3.5.1",
-		"lodash": "^4.17.11",
+		"lodash": "^4.17.19",
 		"node": "^11.0.0",
 		"popper": "^1.0.1",
 		"popper.js": "^1.14.4",

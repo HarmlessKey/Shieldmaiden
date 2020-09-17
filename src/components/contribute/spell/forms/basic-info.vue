@@ -193,21 +193,13 @@
 				<b-col md="4" v-if="spell.classes">
 					<label for="classes">Classes</label>
 					<div>
-						<el-select
+						<q-select
+							filled
 							v-model="spell.classes"
 							multiple
-							collapse-tags
-							filterable
-							allow-create
-							placeholder="Classes">
-							<el-option
-								v-for="item in classes"
-								:key="item.value"
-								:label="item.label"
-								:value="item.value">
-							</el-option>
-
-						</el-select>
+							:options="classes"
+							label="Classes"
+						/>
 					</div>
 				</b-col>
 			</b-row>		

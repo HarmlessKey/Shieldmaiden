@@ -1576,3 +1576,15 @@ html body {
 		}
 	}
 }
+
+/* QUALSAR */
+.q-field, .q-color-picker {
+	.row {
+		margin-left: 0;
+		margin-right: 0;
+	}
+}
+.q-checkbox.row {
+	margin-left: 0;
+	margin-right: 0;
+}

@@ -12,11 +12,8 @@ import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
-import Element from 'element-ui';
-import locale from 'element-ui/lib/locale/lang/en'
 import HkTable from './components/hk-components/hk-table'
 import Icon from './components/Icon'
-import 'element-ui/lib/theme-chalk/index.css';
 import './quasar';
 
 const options = {
@@ -35,7 +32,6 @@ Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-Vue.use(Element, { locale });
 
 //Bootstrap
 global.$ = jQuery

@@ -3,89 +3,85 @@
 <template>
 	<div class="pb-5">
 		<h2>Edit <span class="blue">{{ npc.name }}</span></h2>
-		<b-row>
-			<b-col class="col-2">
-				<label for="name">Name</label>
-			</b-col>
-			<b-col>
-				<b-form-input 
-					type="text" 
-					name="name" 
-					id="name" 
-					v-model="npc.name"
-					:class="{'input': true, 'error': errors.has('name') }"
-					v-validate="'required'"
-					placeholder="Name"></b-form-input>
-				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-			</b-col>
-		</b-row>
+			<q-input 
+				dark filled square
+				label="Name"
+				type="text" 
+				name="name" 
+				id="name" 
+				v-model="npc.name"
+				:class="{'input': true, 'error': errors.has('name') }"
+				v-validate="'required'"
+				placeholder="Name"/>
+			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
-		<b-row>
-			<b-col class="col-2">
-				<label for="avatar">Avatar</label>
-			</b-col>
-			<b-col>
-				<b-form-input 
-					v-b-tooltip.hover title="Avatar"
-					type="text" 
-					class="form-control" 
-					:class="{'input': true, 'error': errors.has('avatar') }" 
-					v-model="npc.avatar" 
-					v-validate="'url'" 
-					data-vv-as="Avatar"
-					name="avatar" 
-					id="avatar" 
-					placeholder="Image URL"></b-form-input>
-				<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-			</b-col>
-		</b-row>
+			<q-input
+				dark filled square
+				label="Avatar"
+				type="text" 
+				:class="{'input': true, 'error': errors.has('avatar') }" 
+				v-model="npc.avatar" 
+				v-validate="'url'" 
+				data-vv-as="Avatar"
+				name="avatar" 
+				id="avatar" 
+				placeholder="Input URL"
+			/>
+			<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 		<hr>
-		<b-row>
-			<b-col class="col-2">
-				<label for="avatar">Color</label>
-			</b-col>
-			<b-col>
-				<el-color-picker
-					v-model="npc.color_label"
-					:predefine="hkColors">
-				</el-color-picker>
-			</b-col>
-		</b-row>
+			<q-input
+				dark filled square
+				v-model="npc.color_label"
+				label="Color label"
+				readonly
+			>
+				<template v-slot:append>
+					<q-icon name="colorize" class="cursor-pointer">
+						<q-popup-proxy transition-show="scale" transition-hide="scale">
+							<q-color v-model="npc.color_label" :palette="hkColors" default-view="palette" />
+						</q-popup-proxy>
+					</q-icon>
+				</template>
+			</q-input>
 		<hr>
 
-		<b-form-checkbox name="friendly" v-model="npc.friendly">Friendly NPC</b-form-checkbox>
+		<q-checkbox dark v-model="npc.friendly" label="Friendly NPC" color="positive" />
 
 		<hr>
-		<b-row class="mb-2">
-			<b-col class="text-center">
-				<label for="ac">Armor Class</label>
-				<b-form-input 
-					class="text-center"
-					type="text" 
+			<div class="d-flex justify-content-between">
+				<q-input 
+					dark filled square
+					label="Armor class"
+					class="mr-2"
+					type="number" 
 					name="ac" 
 					data-vv-as="Armor Class"
 					v-model="npc.ac"
-					:class="{'input': true, 'error': errors.has('ac') }"
 					v-validate="'required'"
-					placeholder="Armor Class"></b-form-input>
-				<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-			</b-col>
-			<b-col class="text-center">
-				<label for="maxHp">Hit Points</label>
-				<b-form-input 
-					class="text-center"
+				>
+					<template v-slot:append>
+						<i class="fas fa-shield"/>
+					</template>
+				</q-input>
+
+				<q-input 
+					dark filled square
+					label="Hit points"
+
 					type="text" 
 					name="maxHp" 
-					id="maxHp" 
 					data-vv-as="Hit Points"
 					v-model="npc.maxHp"
-					:class="{'input': true, 'error': errors.has('maxHp') }"
 					v-validate="'required'"
-					placeholder="Hit Points"></b-form-input>
-					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-			</b-col>
-		</b-row>
-		<button class="btn btn-block mb-2" @click="edit()">Save</button>
+					placeholder="Hit Points">
+					<template v-slot:append>
+						<q-icon name="favorite"/>
+					</template>
+				</q-input>
+			</div>
+			<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+			<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+		<button class="btn btn-block my-2" @click="edit()">Save</button>
 		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
 		<div class="img-container"><img :src="npc.avatar" /></div>
 	</div>

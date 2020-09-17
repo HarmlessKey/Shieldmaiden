@@ -4,13 +4,6 @@
 			<Crumble />
 			<h2><i class="fas fa-wand-magic"></i> Contribute to Spells</h2>
 
-			<el-steps align-center>
-				<el-step title="Tag" description="Tag the spell you want to edit"></el-step>
-				<el-step title="Edit" description="Edit the spell"></el-step>
-				<el-step title="Finish" description="Set it to finished when done"></el-step>
-				<el-step title="Tag new" description="Tag the next spell"></el-step>
-			</el-steps>
-
 			<div class="grid">
 				<div>
 					<div class="card">

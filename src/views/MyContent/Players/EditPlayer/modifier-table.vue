@@ -19,15 +19,17 @@
 			</template>
 			<div slot="actions" slot-scope="data" class="actions">
 					<a class="gray-hover mx-1" 
-						@click="editModifier(data.row)" 
-						v-b-tooltip.hover title="Edit">
+						@click="editModifier(data.row)">
 						<i class="fas fa-pencil"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit modifier
+						</q-tooltip>
 					</a>
-					<a v-b-tooltip.hover 
-						title="Delete" 
-						class="gray-hover"
-						@click="deleteModifier(data.row['.key'])">
+					<a class="gray-hover" @click="deleteModifier(data.row['.key'])">
 							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete modifier
+							</q-tooltip>
 					</a>
 				</div>
 		</hk-table>
@@ -35,7 +37,7 @@
 </template>
 
 <script>
-
+	import { db } from '@/firebase';
 
 	export default {
 		name: 'ModifierTable',
@@ -77,7 +79,7 @@
 		},
 		methods: {
 			newModifier(origin) {
-				this.modifier = {
+				const modifier = {
 					origin: origin,
 					type: null,
 					target: null,
@@ -85,8 +87,16 @@
 					ability_modifier: null,
 					restrictions: []
 				}
-				this.modal = true;
+				this.$emit('edit', { modifier, origin: this.origin });
 			},
+			deleteModifier(key) {
+				db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
+				this.$emit("change", "modifier.deleted");
+			},
+			editModifier(modifier) {
+				modifier = { ...modifier};
+				this.$emit('edit', { modifier, origin: this.origin });
+			}
 		}
 	}
 </script>

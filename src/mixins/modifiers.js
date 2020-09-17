@@ -2,17 +2,6 @@ import { db } from '@/firebase';
 
 export const modifierMixin = {
 	methods: {
-		newModifier(origin) {
-			this.modifier = {
-				origin: origin,
-				type: null,
-				target: null,
-				subtarget: null,
-				ability_modifier: null,
-				restrictions: []
-			}
-			this.modal = true;
-		},
 		hideModal() {
 			this.modifier = {}
 			this.modal = false;
@@ -21,10 +10,6 @@ export const modifierMixin = {
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(this.modifier);
 			this.modal = false;
 			this.$emit("change", "modifier.added");
-		},
-		editModifier(modifier) {
-			this.modifier = { ...modifier};
-			this.modal = true;
 		},
 		saveModifier(modifier) {
 			const key = modifier['.key'];
@@ -46,10 +31,6 @@ export const modifierMixin = {
 			this.modifier = {}
 			this.modal = false;
 			this.$emit("change", "modifier.saved");
-		},
-		deleteModifier(key) {
-			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
-			this.$emit("change", "modifier.deleted");
 		}
 	}
 }

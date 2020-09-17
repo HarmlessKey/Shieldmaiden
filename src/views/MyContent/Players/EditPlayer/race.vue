@@ -3,7 +3,7 @@
 		<h3>Race</h3>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square
+				dark filled square dense
 				label="Race" 
 				@change="saveRaceName()"
 				autocomplete="off"  
@@ -14,7 +14,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square
+				dark filled square dense
 				label="Base walking speed" 
 				@change="saveRaceSpeed()"
 				autocomplete="off"  
@@ -25,7 +25,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square
+				dark filled square dense
 				type="textarea"
 				label="Race description"
 				@change="saveRaceDescription()"
@@ -65,7 +65,11 @@
 						</div>
 
 						<!-- Modifiers -->
-						<Modifier-table :modifiers="trait_modifiers(key)" :origin="`race.trait.${key}`" />
+						<Modifier-table 
+							:modifiers="trait_modifiers(key)" 
+							:origin="`race.trait.${key}`"
+							@edit="editModifier"
+						/>
 					
 						
 					</b-card-body>
@@ -74,13 +78,7 @@
 		</div>
 
 		<q-dialog v-model="modal">
-			{{ modifier['.key'] ? 'Edit' : 'New' }}
       <Modifier v-model="modifier" />
-			<template slot="modal-footer">
-				<a class="btn bg-gray" @click="hideModal">Cancel</a>
-				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
-				<a v-else class="btn" @click="addModifier">Add</a>
-			</template>
 		</q-dialog>
 	</div>
 </template>
@@ -126,6 +124,10 @@
 					return origin[1] === "trait" && origin[2] === key;
 				});
 				return modifiers;
+			},
+			editModifier(e) {
+				this.modal = true;
+				this.modifier = e.modifier;
 			},
 			saveRaceName() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_name`).set(this.race.race_name);
@@ -180,10 +182,7 @@
 	.hk-table {
 		margin-bottom: 30px;
 	}
-	h4 {
-		font-size: 16px;
-		margin: 15px 0 !important;
-	}
+	
 	.title {
 		display: flex;
 		justify-content: space-between;

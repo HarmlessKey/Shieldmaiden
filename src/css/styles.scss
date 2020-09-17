@@ -977,6 +977,10 @@ html body {
 	a {
 		color: $blue !important;
 		cursor: pointer !important;
+
+		&:hover {
+			text-decoration: none;
+		}
 	}
 	table {
 		tr {
@@ -1578,7 +1582,7 @@ html body {
 }
 
 /* QUALSAR */
-.q-field, .q-color-picker {
+.q-field, .q-color-picker, .q-list {
 	.row {
 		margin-left: 0;
 		margin-right: 0;

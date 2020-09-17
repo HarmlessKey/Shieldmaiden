@@ -335,7 +335,7 @@ export default {
 	},
 	watch: {
 		effect: {
-			handler(newValue) {
+			handler() {
 				//Emits validation on every change
 				this.$emit('validation', this.$validator);
 			},

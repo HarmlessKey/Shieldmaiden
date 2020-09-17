@@ -136,8 +136,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-
 	export default {
 		name: 'NPC',
 		props: [

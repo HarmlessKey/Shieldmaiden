@@ -246,6 +246,7 @@
 				cid: this.campaignId, 
 			}),
 			this.setCurHp();
+			this.removeGhostPlayers();
 		},
 		computed: {
 			...mapGetters([
@@ -298,9 +299,8 @@
 			}
 		},
 		watch: {
-			campaign: function() {
+			campaign() {
 				this.checkAdvancement();
-				this.removeGhostPlayers();
 			}
 		},
 		methods: {

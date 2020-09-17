@@ -211,7 +211,7 @@ export default {
 	},
 	watch: {
 		reminder: {
-			handler(newValue) {
+			handler() {
 				//Emits validation on every change
 				this.$emit('validation', this.$validator);
 			},

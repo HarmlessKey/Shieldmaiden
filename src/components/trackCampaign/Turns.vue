@@ -67,7 +67,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 	import Health from '@/components/trackCampaign/Health.vue';

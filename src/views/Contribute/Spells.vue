@@ -4,13 +4,6 @@
 			<Crumble />
 			<h2><i class="fas fa-wand-magic"></i> Contribute to Spells</h2>
 
-			<el-steps align-center>
-				<el-step title="Tag" description="Tag the spell you want to edit"></el-step>
-				<el-step title="Edit" description="Edit the spell"></el-step>
-				<el-step title="Finish" description="Set it to finished when done"></el-step>
-				<el-step title="Tag new" description="Tag the next spell"></el-step>
-			</el-steps>
-
 			<div class="grid">
 				<div>
 					<div class="card">
@@ -71,7 +64,7 @@
 										<i class="fas fa-pencil"></i>
 									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										 v-b-tooltip.hover title="Preview">
+										v-b-tooltip.hover title="Preview">
 										<i class="fas fa-eye"></i>
 									</a>
 									<a 
@@ -118,7 +111,7 @@
 										<i class="fas fa-pencil"></i>
 									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										 v-b-tooltip.hover title="Preview">
+										v-b-tooltip.hover title="Preview">
 										<i class="fas fa-eye"></i>
 									</a>
 									<a 
@@ -193,6 +186,7 @@
 </template>
 
 <script>
+	import _ from 'lodash';
 	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';

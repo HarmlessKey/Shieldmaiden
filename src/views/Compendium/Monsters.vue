@@ -41,7 +41,6 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import ViewMonster from '@/components/ViewMonster.vue';
-	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Error',

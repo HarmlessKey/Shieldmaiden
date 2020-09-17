@@ -54,7 +54,6 @@
 
 <script>
 	import PlayerLink from '../PlayerLink';
-	import { auth } from '@/firebase.js';
 	import { mapGetters } from 'vuex';
 
 	export default {

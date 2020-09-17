@@ -82,104 +82,107 @@
 			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
-				<div 
-					class="image" 
-					:key="'image-'+key" 
-					:style="[
-						player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
-						{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
-					]
-				">
-					<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
-						<i class="fas fa-paw-claws green"></i>
+				<template v-if="player.curHp"><!-- make sure incomplete players aren't displayed -->
+					<div 
+						class="image" 
+						:key="'image-'+key" 
+						:style="[
+							player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
+							{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
+						]
+					">
+						<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
+							<i class="fas fa-paw-claws green"></i>
+						</div>
+						<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
+						<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
 					</div>
-					<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
-					<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
-				</div>
-				<div class="col ac" :key="'ac-'+key">
-					<span :class="{ 
-							'green': player.ac_bonus > 0, 
-							'red': player.ac_bonus < 0 
-						}" 
-						v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
-						v-if="player.ac_bonus">
-						{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
-					</span>
-					<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
-				</div>
-				<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
+					<div class="col ac" :key="'ac-'+key">
+						<span :class="{ 
+								'green': player.ac_bonus > 0, 
+								'red': player.ac_bonus < 0 
+							}" 
+							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
+							v-if="player.ac_bonus">
+							{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
+						</span>
+						<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
+					</div>
+					<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
 
-				<div 
-					class="col pp" 
-					v-if="settings.passive_perception === undefined && !is_small"
-					:key="'pp-'+key"
-				>
-					{{ player.passive_perception }}
-				</div>
-				<div 
-					class="col pinv" 
-					v-if="settings.passive_investigation === undefined && !is_small"
-					:key="'pinv-'+key"
-				>
-					{{ player.passive_investigation }}
-				</div>
-				<div 
-					class="col pins" 
-					v-if="settings.passive_insight === undefined && !is_medium"
-					:key="'pins-'+key"
-				>
-					{{ player.passive_insight }}
-				</div>
-				<div 
-					class="col save" 
-					v-if="settings.save_dc === undefined && !is_medium"
-					:key="'save-'+key"
-				>
-					{{ player.spell_save_dc }}
-				</div>
+					<div 
+						class="col pp" 
+						v-if="settings.passive_perception === undefined && !is_small"
+						:key="'pp-'+key"
+					>
+						{{ player.passive_perception }}
+					</div>
+					<div 
+						class="col pinv" 
+						v-if="settings.passive_investigation === undefined && !is_small"
+						:key="'pinv-'+key"
+					>
+						{{ player.passive_investigation }}
+					</div>
+					<div 
+						class="col pins" 
+						v-if="settings.passive_insight === undefined && !is_medium"
+						:key="'pins-'+key"
+					>
+						{{ player.passive_insight }}
+					</div>
+					<div 
+						class="col save" 
+						v-if="settings.save_dc === undefined && !is_medium"
+						:key="'save-'+key"
+					>
+						{{ player.spell_save_dc }}
+					</div>
 
-				<div class="col health" :key="'health-'+key">
-					<template v-if="player.curHp <= 0">
-						<div v-if="player.stable" class="green">
-							<span><i class="fas fa-fist-raised"></i> Stable</span>
-						</div>
-						<div v-else-if="player.dead" class="red">
-							<span><i class="fas fa-skull-crossbones"></i> Dead</span>
-						</div>
-						<div v-else class="saves d-flex justify-content-end">
-							<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
-								<span v-show="check === 'succes'" class="green"><i class="fas fa-check"></i></span> 
-								<span v-show="check === 'fail'" class="red"><i class="fas fa-times"></i></span>
+					<div class="col health" :key="'health-'+key">
+						<template v-if="player.curHp <= 0">
+							<div v-if="player.stable" class="green">
+								<span><i class="fas fa-fist-raised"></i> Stable</span>
 							</div>
-						</div>
-					</template>
-					<template v-else>
-						<template v-if="player.transformed">
-							<span class="current" :class="{ 
-								'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
-								'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
-								'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
-							}">{{ player.transformed.curHp }}</span>
-							<span class="gray-hover">/</span>
-							<span>
-								{{ player.transformed.maxHp }}
-							</span>
+							<div v-else-if="player.dead" class="red">
+								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
+							</div>
+							<div v-else class="saves d-flex justify-content-end">
+								<div v-for="(check, index) in player.saves" :key="`save-${index}`" class="save">
+									<span v-show="check === 'succes'" class="green"><i class="fas fa-check"></i></span> 
+									<span v-show="check === 'fail'" class="red"><i class="fas fa-times"></i></span>
+								</div>
+							</div>
 						</template>
 						<template v-else>
-							<span class="current" :class="{ 
-								'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
-								'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
-								'green': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 76
-							}">{{ player.curHp }}</span>
-							<span class="gray-hover">/</span>
-							<span :class="{ 
-									'green': player.maxHpMod > 0, 
-									'red': player.maxHpMod < 0 
-								}" 
-								v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
-								{{ maxHp(player.maxHp, player.maxHpMod) }}
-							</span>
-							<span v-else>{{ player.maxHp }}</span>
+							<template v-if="player.transformed">
+								<span class="current" :class="{ 
+									'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
+									'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
+									'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
+								}">{{ player.transformed.curHp }}</span>
+								<span class="gray-hover">/</span>
+								<span>
+									{{ player.transformed.maxHp }}
+								</span>
+							</template>
+							<template v-else>
+								<span class="current" :class="{ 
+									'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
+									'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
+									'green': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 76
+								}">{{ player.curHp }}</span>
+								<span class="gray-hover">/</span>
+								<span :class="{ 
+										'green': player.maxHpMod > 0, 
+										'red': player.maxHpMod < 0 
+									}" 
+									v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+									{{ maxHp(player.maxHp, player.maxHpMod) }}
+								</span>
+								<span v-else>{{ player.maxHp }}</span>
+							</template>
+							<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 						</template>
 						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 					</template>
@@ -204,13 +207,33 @@
 					">
 						{{ player.level ? player.level : calculatedLevel(player.experience) }}
 					</div>
-					<div class="progress">
-						<div class="progress-bar bg-blue"
-							role="progressbar" 
-							:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
+						<a 	
+							class="gray-hover" 
+							v-b-tooltip.hover title="Edit player" 
+							@click="setSlide({
+								show: true,
+								type: 'slides/EditPlayer',
+								data: { key: player['.key'], location: 'overview',}
+							})">
+							<i class="fas fa-pencil"></i>
+						</a>
+					</div>
+					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
+						<div class="level" 
+								:class="{red: isXpAdvancement() && player.level}"
+								v-b-tooltip.hover
+								:title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+							{{ player.level ? player.level : calculatedLevel(player.experience) }}
+						</div>
+						<div class="progress">
+							<div class="progress-bar bg-blue"
+								role="progressbar" 
+								:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+							</div>
 						</div>
 					</div>
-				</div>
+				</template>
 			</template>
 		</div>
 
@@ -310,6 +333,7 @@
 					//Get full player
 					const fullPlayer = db.ref(`players/${this.userId}/${key}`)
 					await fullPlayer.on('value', (snapshot) => {
+						//Create the player Object
 						if(snapshot.val()) {
 							campaignPlayers[key].character_name = snapshot.val().character_name;
 							campaignPlayers[key].avatar = snapshot.val().avatar;
@@ -322,6 +346,12 @@
 							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
 							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
 							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
+						}
+						//The player doesn't exist so remove it from the campaign
+						else if(this.viewerIsUser) {
+							// eslint-disable-next-line
+							console.error('Ghost Player Removed: ', key);
+							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).remove();
 						}
 					});	
 				}

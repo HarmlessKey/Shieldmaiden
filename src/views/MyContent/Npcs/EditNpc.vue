@@ -589,7 +589,6 @@
 			}
 		},
 		mounted() {
-			console.log(this.userId);
 			var npcs_ref = db.ref(`monsters`);
 			npcs_ref.on('value', async (snapshot) => {
 				let npcs = snapshot.val();

@@ -37,16 +37,8 @@
 						<button class="btn"><i class="fas fa-plus"></i> Add</button>
 					</div>
 				</div>
-				<el-switch
-					class="mt-2"
-					v-model="advancement"
-					active-color="#2c97de"
-					inactive-color="#2c97de"
-					active-value="milestone"
-					inactive-value="experience"
-					active-text="Milestone"
-					inactive-text="Experience">
-				</el-switch>
+				<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
+
 				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
 			</div>
 
@@ -153,15 +145,7 @@
 					placeholder="Title of your first campaign"
 				/>
 				<div class="switch">
-					<el-switch
-						v-model="advancement"
-						active-color="#2c97de"
-						inactive-color="#2c97de"
-						active-value="milestone"
-						inactive-value="experience"
-						active-text="Milestone"
-						inactive-text="Experience">
-					</el-switch>
+					<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
 				</div>
 				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
 				
@@ -199,7 +183,17 @@
 			return {
 				newCampaign: '',
 				add: false,
-				advancement: "experience"
+				advancement: "experience",
+				advancement_options: [
+					{
+						value: "experience",
+						label: "Experience"
+					},
+					{
+						value: "milestone",
+						label: "Milestone"
+					}
+				]
 			}
 		},
 		mounted() {

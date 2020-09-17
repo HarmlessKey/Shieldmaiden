@@ -56,14 +56,6 @@
 				},
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/encounter`),
-					asObject: true,
-				},
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',

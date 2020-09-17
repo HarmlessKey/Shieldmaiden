@@ -263,6 +263,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis !important;
+		line-height: 30px;
 	}
 	.conditions {
 		position: absolute;

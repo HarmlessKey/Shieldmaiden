@@ -346,7 +346,7 @@
 			...mapActions([
 				'setSlide',
 			]),
-			getWindowWidth(event) {
+			getWindowWidth() {
 				this.width = this.$refs.players.clientWidth;
 			},
 			setSize() {

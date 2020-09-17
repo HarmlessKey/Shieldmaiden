@@ -184,28 +184,6 @@
 							</template>
 							<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
 						</template>
-						<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
-					</template>
-				</div>
-				<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
-					<a 	
-						class="gray-hover" 
-						v-b-tooltip.hover title="Edit player" 
-						@click="setSlide({
-							show: true,
-							type: 'slides/EditPlayer',
-							data: { key: player['.key'], location: 'overview',}
-						})">
-						<i class="fas fa-pencil"></i>
-					</a>
-				</div>
-				<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
-					<div class="level" 
-						:class="{red: isXpAdvancement() && player.level}"
-						v-b-tooltip.hover
-						:title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''
-					">
-						{{ player.level ? player.level : calculatedLevel(player.experience) }}
 					</div>
 					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
 						<a 	

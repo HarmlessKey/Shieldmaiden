@@ -102,8 +102,8 @@ html body {
 		color: $gray-light;
 	}
 
-/* 3. Heading */
-/*********************************************/
+	/* 3. Heading */
+	/*********************************************/
 	.container, .container-fluid {
 		h1, h2, h3, h4, h5, h6 { font-weight:normal;  }
 		h1 {
@@ -645,7 +645,7 @@ html body {
 			background-color: $gray-dark;
 		}
 	}
-}
+
 table.table, table {
 	border-collapse: separate !important; 
 	border-spacing: 0 1px;
@@ -1281,7 +1281,7 @@ ul.nav {
 	.form-control {
 		border: none !important;
 	}
-}
+
 .btn-group-toggle {
 	.btn {
 		border: none;
@@ -1688,7 +1688,7 @@ ul.nav {
 }
 
 /* QUALSAR */
-.q-field, .q-color-picker, .q-list {
+.q-field, .q-color-picker, .q-list, .q-menu {
 	.row {
 		margin-left: 0;
 		margin-right: 0;
@@ -1697,4 +1697,5 @@ ul.nav {
 .q-checkbox.row {
 	margin-left: 0;
 	margin-right: 0;
+}
 }

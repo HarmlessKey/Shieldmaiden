@@ -2,8 +2,9 @@
 	<div>
 		<h3>Race</h3>
 		<div class="form-item mb-3">
-			<label for="race">Race</label>
-			<b-form-input 
+			<q-input
+				dark filled square
+				label="Race" 
 				@change="saveRaceName()"
 				autocomplete="off"  
 				id="race" 
@@ -12,8 +13,9 @@
 				placeholder="Race"/>
 		</div>
 		<div class="form-item mb-3">
-			<label for="speed">Base walking speed</label>
-			<b-form-input 
+			<q-input
+				dark filled square
+				label="Base walking speed" 
 				@change="saveRaceSpeed()"
 				autocomplete="off"  
 				id="speed" 
@@ -22,47 +24,16 @@
 				placeholder="Speed"/>
 		</div>
 		<div class="form-item mb-3">
-			<label for="race_description">Description</label>
-			<b-form-textarea
+			<q-input
+				dark filled square
+				type="textarea"
+				label="Race description"
 				@change="saveRaceDescription()"
-				autocomplete="off"
-				id="race_description"
 				v-model="race.race_description"
-				placeholder="Race description"
+				placeholder="This field accepts markdown"
+				autogrow
 			/>
 		</div>
-
-		<!-- <h3 class="title">
-			Race Modifiers
-			<a @click="newModifier('race')">Add Modifier</a>
-		</h3>
-
-		<hk-table
-			:columns="columns"
-			:items="modifiers"
-		>
-			<template slot="target" slot-scope="data">
-				{{ data.row.subtarget || data.item.capitalize() }}
-			</template>
-			<template slot="value" slot-scope="data">
-				<template v-if="data.item">{{ data.item }}</template>
-				<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
-				<template v-else-if="data.row.type === 'expertise'">Expertise</template>
-			</template>
-			<div slot="actions" slot-scope="data" class="actions">
-					<a class="gray-hover mx-1" 
-						@click="editModifier(data.row)" 
-						v-b-tooltip.hover title="Edit">
-						<i class="fas fa-pencil"></i>
-					</a>
-					<a v-b-tooltip.hover 
-						title="Delete" 
-						class="gray-hover"
-						@click="deleteModifier(data.row['.key'])">
-							<i class="fas fa-trash-alt"></i>
-					</a>
-				</div>
-		</hk-table> -->
 
 		<!-- Traits -->
 		<h3 class="title mt-4">
@@ -94,54 +65,29 @@
 						</div>
 
 						<!-- Modifiers -->
-						<h4 class="title">
-							Modifiers
-							<a @click="newModifier(`race.trait.${key}`)">Add Modifier</a>
-						</h4>
-						<hk-table
-							:columns="columns"
-							:items="trait_modifiers(key)"
-						>
-							<template slot="target" slot-scope="data">
-								{{ data.row.subtarget || data.item.capitalize() }}
-							</template>
-							<template slot="value" slot-scope="data">
-								<template v-if="data.item">{{ data.item }}</template>
-								<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
-								<template v-else-if="data.row.type === 'expertise'">Expertise</template>
-							</template>
-							<div slot="actions" slot-scope="data" class="actions">
-									<a class="gray-hover mx-1" 
-										@click="editModifier(data.row)" 
-										v-b-tooltip.hover title="Edit">
-										<i class="fas fa-pencil"></i>
-									</a>
-									<a v-b-tooltip.hover 
-										title="Delete" 
-										class="gray-hover"
-										@click="deleteModifier(data.row['.key'])">
-											<i class="fas fa-trash-alt"></i>
-									</a>
-								</div>
-						</hk-table>
+						<Modifier-table :modifiers="trait_modifiers(key)" :origin="`race.trait.${key}`" />
+					
+						
 					</b-card-body>
 				</b-collapse>
 			</b-card>
 		</div>
 
-		<b-modal ref="modifier-modal" scrollable :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
+		<q-dialog v-model="modal">
+			{{ modifier['.key'] ? 'Edit' : 'New' }}
       <Modifier v-model="modifier" />
 			<template slot="modal-footer">
 				<a class="btn bg-gray" @click="hideModal">Cancel</a>
 				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
 				<a v-else class="btn" @click="addModifier">Add</a>
 			</template>
-    </b-modal>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
+	import ModifierTable from './modifier-table.vue';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { modifierMixin } from '@/mixins/modifiers.js';
@@ -159,30 +105,13 @@
 		],
 		components: {
 			GiveCharacterControl,
-			Modifier
+			Modifier,
+			ModifierTable
 		},
 		data() {
 			return {
 				modifier: {},
-				columns: {
-					name: {
-						label: 'Name',
-						truncate: true,
-						sortable: true,
-					},
-					target: {
-						label: 'Target',
-					},
-					value: {
-						label: 'Value',
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
-          }
-				}
+				modal: false
 			}
 		},
 		computed: {

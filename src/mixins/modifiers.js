@@ -11,20 +11,20 @@ export const modifierMixin = {
 				ability_modifier: null,
 				restrictions: []
 			}
-			this.$refs['modifier-modal'].show();
+			this.modal = true;
 		},
 		hideModal() {
 			this.modifier = {}
-			this.$refs['modifier-modal'].hide();
+			this.modal = false;
 		},
 		addModifier() {
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(this.modifier);
-			this.$refs['modifier-modal'].hide();
+			this.modal = false;
 			this.$emit("change", "modifier.added");
 		},
 		editModifier(modifier) {
 			this.modifier = { ...modifier};
-			this.$refs['modifier-modal'].show();
+			this.modal = true;
 		},
 		saveModifier(modifier) {
 			const key = modifier['.key'];
@@ -44,7 +44,7 @@ export const modifierMixin = {
 
 			db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
 			this.modifier = {}
-			this.$refs['modifier-modal'].hide();
+			this.modal = false;
 			this.$emit("change", "modifier.saved");
 		},
 		deleteModifier(key) {

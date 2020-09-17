@@ -2,33 +2,31 @@
 	<div>
 		<h3>General Character Info</h3>
 		<div class="form-item mb-3">
-			<label for="player_name" class="required">Player name</label>
-			<b-form-input 
+			<q-input 
+				dark filled square
+				label="Player name"
 				@change="savePlayerName()"
 				autocomplete="off"  
-				id="player_name" 
 				type="text" 
 				v-model="character.player_name" 
 				v-validate="'max:30|required'" 
 				maxlength="30"
 				data-vv-as="Player name"
-				name="player_name" 
-				placeholder="Player name"/>
+				name="player_name"/>
 			<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
 		</div>
 		<div class="form-item mb-3">
-			<label for="character_name" class="required">Character name</label>
-			<b-form-input 
+			<q-input 
+				dark filled square
+				label="Character name"
 				@change="saveCharacterName()"
 				autocomplete="off"  
-				id="character_name" 
 				type="text" 
 				v-model="character.character_name" 
 				v-validate="'max:35|required'" 
 				maxlength="35"
 				data-vv-as="Character name"
-				name="character_name" 
-				placeholder="Character name"/>
+				name="character_name"/>
 			<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
 		</div>
 		<div class="form-item mb-3 avatar">
@@ -40,54 +38,39 @@
 					]"
 			/>
 			<div>
-				<label for="avatar" class="required">Avatar</label>
-				<b-form-input
+				<q-input
+					dark filled square
+					label="Avatar"
 					@change="saveAvatar()"
 					autocomplete="off"  
 					id="avatar" 
 					type="text" 
-					:class="{'input': true, 'error': errors.has('avatar') }"
 					v-model="character.avatar"
 					v-validate="'url'"
 					data-vv-as="Avatar"
 					name="avatar"
-					placeholder="Image URL"/>
+					placeholder="Input URL"/>
 				<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 			</div>
 		</div>
 		<div class="form-item mb-3">
-			<label for="advancement" class="required">Advancement</label>
-			<div>
-				<el-switch
-					@change="saveAdvancement()"
-					v-model="character.advancement"
-					active-color="#2c97de"
-					inactive-color="#2c97de"
-					inactive-value="milestone"
-					inactive-text="Milestone"
-					active-value="experience"
-					active-text="Experience">
-				</el-switch>
-			</div>
+			<q-select 
+				dark filled square
+				@change="saveAdvancement()"
+				v-model="character.advancement" 
+				:options="advancement_options" 
+				label="Advancement" 
+			/>
 		</div>
 		<div class="form-item mb-3">
-			<label for="hit_point_type" class="required">Hit point type</label>
-			<div>
-				<el-switch
-					@change="saveHpType()"
-					v-model="character.hit_point_type"
-					active-color="#2c97de"
-					inactive-color="#2c97de"
-					active-value="rolled"
-					active-text="Rolled"
-					inactive-value="fixed"
-					inactive-text="Fixed">
-				</el-switch>
-			</div>
+			<q-select 
+				dark filled square
+				@change="saveHpType()"
+				v-model="character.hit_point_type" 
+				:options="hit_point_options" 
+				label="Advancement" 
+			/>
 		</div>
-		<!-- <b-card header="Give out control">
-			<GiveCharacterControl :playerId="playerId" :control="character.control" />
-		</b-card> -->
 	</div>
 </template>
 
@@ -105,6 +88,30 @@
 		],
 		components: {
 			GiveCharacterControl
+		},
+		data() {
+			return {
+				advancement_options: [
+					{
+						value: "experience",
+						label: "Experience"
+					},
+					{
+						value: "milestone",
+						label: "Milestone"
+					}
+				],
+				hit_point_options: [
+					{
+						value: "fixed",
+						label: "Fixed"
+					},
+					{
+						value: "rolled",
+						label: "Rolled"
+					}
+				]
+			}
 		},
 		computed: {
 			character() {

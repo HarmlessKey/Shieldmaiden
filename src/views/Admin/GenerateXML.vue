@@ -184,7 +184,6 @@
 				var file = document.createElement('a');
 
 				var filename = "sitemap.xml";
-				var file = document.createElement('a');
 				var bb = new Blob([xmltext], {type: 'text/plain'});
 
 				file.setAttribute('href', window.URL.createObjectURL(bb));

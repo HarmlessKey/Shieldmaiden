@@ -412,10 +412,10 @@ export default {
 				siphon: { label: "Heal caster", info: "On a hit, the caster is healed for half of the damage done." },
 				drain: { label: "Reduce max HP", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
 			}
-    };
-  },
-  methods: {
-  	add_modifier() {
+		};
+	},
+	methods: {
+		add_modifier() {
 			let modifiers = this.modifiers;
 			if(modifiers === undefined) {
 				modifiers = []
@@ -509,7 +509,6 @@ export default {
 	watch: {
 		modifiers: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

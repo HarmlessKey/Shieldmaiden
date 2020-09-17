@@ -71,7 +71,7 @@
 										<i class="fas fa-pencil"></i>
 									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										 v-b-tooltip.hover title="Preview">
+										v-b-tooltip.hover title="Preview">
 										<i class="fas fa-eye"></i>
 									</a>
 									<a 
@@ -118,7 +118,7 @@
 										<i class="fas fa-pencil"></i>
 									</router-link>
 									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										 v-b-tooltip.hover title="Preview">
+										v-b-tooltip.hover title="Preview">
 										<i class="fas fa-eye"></i>
 									</a>
 									<a 
@@ -193,6 +193,7 @@
 </template>
 
 <script>
+	import _ from 'lodash';
 	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';

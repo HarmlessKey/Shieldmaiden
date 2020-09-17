@@ -286,9 +286,8 @@ export default {
 			// are all valid. This happens async.
 			for (let v in this.validators) {
 				let validator = this.validators[v];
-				 let temp = await validator.validateAll()
-				 if (temp == false)
-				 	return false;
+				let temp = await validator.validateAll()
+				if (temp == false) return false;
 			}
 			return true;
 		},

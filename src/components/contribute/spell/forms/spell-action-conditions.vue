@@ -351,7 +351,6 @@ export default {
 	watch: {
 		conditions: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

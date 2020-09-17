@@ -12,7 +12,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Meters from '@/components/trackCampaign/Meters.vue';
 	import ViewPlayers from '@/components/campaign/Players.vue';
 

@@ -35,7 +35,7 @@
 				let title = reminder.title;
 
 				if(reminder.selectedVars) {
-					 title = this.replaceReminderVariables(title, reminder.selectedVars);
+					title = this.replaceReminderVariables(title, reminder.selectedVars);
 				}
 				return title;
 			}

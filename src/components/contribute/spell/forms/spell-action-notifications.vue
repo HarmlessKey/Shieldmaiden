@@ -181,14 +181,14 @@ export default {
 		level_scaling: String,
 		spell:Object,
 	},
-  data() {
-    return {
+	data() {
+		return {
 			scaleVariable: undefined,
 			targets: [
 				{label: "Target", value: "target" },
 				{label: "Caster", value: "caster" }
 			]
-    };
+		};
 	},
 	computed: {
 		application() {
@@ -214,9 +214,9 @@ export default {
 			return { "notifications": this.$validator };
 		}
 	},
-  methods: {
-  	add_notification() {
-  		let notifications = this.notifications;
+	methods: {
+		add_notification() {
+			let notifications = this.notifications;
 			if(notifications === undefined) {
 				notifications = []
 			}
@@ -301,11 +301,10 @@ export default {
 			}
 			return description
 		},
-  },
-  watch: {
+	},
+	watch: {
 		notifications: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

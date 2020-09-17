@@ -30,7 +30,7 @@
 				<b-form-checkbox :value="key" v-for="(player, key) in campaign.players" :key="key">			
 					{{ players[key].character_name  }} 
 					<span v-if="amount && awardTo.includes(key)" class="ml-2 gray-hover">
-						({{ ((awardPlayer() < 0) ? "" : "+") + awardPlayer() }})
+						({{ ((awardPlayer() &lt; 0) ? "" : "+") + awardPlayer() }})
 					</span>
 				</b-form-checkbox>
 			</b-form-checkbox-group>

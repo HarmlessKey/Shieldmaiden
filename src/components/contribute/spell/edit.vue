@@ -81,7 +81,7 @@
 				<div class="save">
 					<div class="d-flex justify-content-start">
 						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-						 <i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+							<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
 						</div>	
 						<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
 					</div>
@@ -123,8 +123,8 @@ export default {
 		return {
 			title: this.old_spell.name + ' | D&D 5th Edition',
 			meta: [
-        { vmid: 'description', name: 'description', content: 'D&D 5th Edition Spell: ' + this.old_spell.name }
-      ]
+				{ vmid: 'description', name: 'description', content: 'D&D 5th Edition Spell: ' + this.old_spell.name }
+			]
 		}
 	},
 	data() {
@@ -213,7 +213,7 @@ export default {
 			let cast_time = this.old_spell.casting_time.split(' ');
 			this.spell.cast_time_nr = parseInt(cast_time[0]);
 			let cast_type =  cast_time[1];
-																 
+
 			if (cast_type[cast_type.length -1] == 's') {
 				cast_type = cast_type.substring(0, cast_type.length - 1);
 			}
@@ -290,22 +290,27 @@ export default {
 			let rules = [
 				{
 					regex: /â€™/g,
+					// eslint-disable-next-line
 					replacement: '\'',
 				},
 				{
 					regex: /â€”/g,
+					// eslint-disable-next-line
 					replacement: '\-\-',
 				},
 				{
 					regex: /â€�/g,
+					// eslint-disable-next-line
 					replacement: '\"'
 				},
 				{
 					regex: /â€œ/g,
+					// eslint-disable-next-line
 					replacement: '\"'
 				},
 				{
 					regex: /â€“/g,
+					// eslint-disable-next-line
 					replacement: '\-\-'
 				},
 			];
@@ -329,9 +334,8 @@ export default {
 			// are all valid. This happens async.
 			for (let v in this.validators) {
 				let validator = this.validators[v];
-				 let temp = await validator.validateAll()
-				 if (temp == false)
-				 	return false;
+				let temp = await validator.validateAll()
+				if (temp == false) return false;
 			}
 			return true;
 		},
@@ -393,7 +397,7 @@ export default {
 		} else {
 			next()
 		}
-  }
+	}
 
 }
 </script>

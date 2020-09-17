@@ -201,8 +201,8 @@ export default {
 		level_scaling: String,
 		spell: Object,
 	},
-  data() {
-    return {
+	data() {
+		return {
 			dice_type: [
 				{ label: "d4", value: 4 }, 
 				{ label: "d6", value: 6 },
@@ -215,7 +215,7 @@ export default {
 				"Target",
 				"Caster"
 			]
-    };
+		};
 	},
 	computed: {
 		application() {
@@ -247,9 +247,9 @@ export default {
 			return { "effects": this.$validator };
 		}
 	},
-  methods: {
-  	add_effect() {
-  		let effects = this.effects;
+	methods: {
+		add_effect() {
+			let effects = this.effects;
 			if(effects === undefined) {
 				effects = []
 			}
@@ -320,7 +320,7 @@ export default {
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;
 				
-				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? effect_txt : ''} ${slot_txt}`;
+				let text = `${level_txt} ${tier.projectile_count ? tier.projectile_count : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? effect_txt : ''} ${slot_txt}`;
 				description = [text];
 			} 
 			else if (this.level_scaling == "spell level") {
@@ -335,11 +335,10 @@ export default {
 			}
 			return description;
 		},
-  },
-  watch: {
+	},
+	watch: {
 		effects: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

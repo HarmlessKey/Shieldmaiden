@@ -120,15 +120,15 @@
 					<label for="components">Components</label>
 					<div class="components d-flex justify-content-start" name="components">
 						<a class="component_box mr-2" @click="setComponent('verbal')"
-							 :class="{'selected': spell.components['verbal']}">
+							:class="{'selected': spell.components['verbal']}">
 							<span>V</span>
 						</a>
 						<a class="component_box mr-2" @click="setComponent('somatic')"
-							 :class="{'selected': spell.components['somatic']}">
+							:class="{'selected': spell.components['somatic']}">
 							<span>S</span>
 						</a>
 						<a class="component_box" @click="setComponent('material')"
-							 :class="{'selected': spell.components['material']}">
+							:class="{'selected': spell.components['material']}">
 							<span>M</span>
 						</a>
 					</div>
@@ -198,7 +198,7 @@
 							multiple
 							collapse-tags
 							filterable
-    					allow-create
+							allow-create
 							placeholder="Classes">
 							<el-option
 								v-for="item in classes"
@@ -260,7 +260,7 @@
 						class="form-control mb-2"
 						data-vv-as="Duriation scale">
 						<option :value="undefined" disabled>- Time Scale -</option>
-						<option v-for="({ label, value}, i) in dur_time"
+						<option v-for="{ label, value} in dur_time"
 							:key="value" :value="value">{{ label }}</option>
 					</b-form-select>
 					<p class="validate red" v-if="errors.has('duration_scale')">{{ errors.first('duration_scale') }}</p>
@@ -307,7 +307,7 @@
 					<label for="ritual">Ritual</label>
 					<div class="ritual d-flex justify-content-between" name="ritual">
 						<a class="component_box" @click="setRitual()"
-							 :class="{'selected': spell.ritual === true}">
+							:class="{'selected': spell.ritual === true}">
 							<span>R</span>
 						</a>
 					</div>
@@ -567,13 +567,13 @@ export default {
 }
 
 pre {
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    font-family: inherit;
-    text-align: justify;
+		white-space: pre-wrap;       /* Since CSS 2.1 */
+		white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+		white-space: -pre-wrap;      /* Opera 4-6 */
+		white-space: -o-pre-wrap;    /* Opera 7 */
+		word-wrap: break-word;       /* Internet Explorer 5.5+ */
+		font-family: inherit;
+		text-align: justify;
 }
 
 label {

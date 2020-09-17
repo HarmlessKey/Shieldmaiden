@@ -6,9 +6,7 @@
 	</div>
 </template>
 
-<script>
-	import _ from 'lodash';
-	
+<script>	
 	export default {
 		name: 'pendingRequests',
 		props: [

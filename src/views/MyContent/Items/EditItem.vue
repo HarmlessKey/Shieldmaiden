@@ -181,11 +181,10 @@
 
 	export default {
 		name: 'Items',
-		mixins: [general],
+		mixins: [general, skills],
 		metaInfo: {
 			title: 'Items'
 		},
-		mixins: [skills],
 		components: {
 			OverEncumbered,
 		},

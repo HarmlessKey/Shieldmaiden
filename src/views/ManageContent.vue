@@ -2,7 +2,7 @@
 	<div class="container">
 		<h1>Manage your content</h1>
 
-		<b-card-group deck v-if="tier">
+		<hk-card-deck v-if="tier">
 			<!-- CAMPAIGNS -->
 			<div class="card" v-if="campaigns">
 				<div class="card-header">
@@ -90,7 +90,7 @@
 				</div>
 				<router-link class="btn" to="/npcs">Show all</router-link>
 			</div>
-		</b-card-group>
+		</hk-card-deck>
 
 	</div>
 </template>

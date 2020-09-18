@@ -2,7 +2,7 @@
 	<div class="content" v-if="tier && userInfo">
 		<b-row>
 			<b-col md="6">
-				<b-card header="Your Profile">
+				<hk-card header="Your Profile">
 					<div>
 						<h4>{{ userInfo.username }}</h4>
 						<p class="info">
@@ -137,7 +137,7 @@
 							<router-link to="/profile/delete-account" class="gray-light"><i class="fas fa-trash-alt red"></i> Delete account</router-link>
 						</div>
 					</div>
-				</b-card>
+				</hk-card>
 			</b-col>
 
 			<!-- PLAYER LINK -->

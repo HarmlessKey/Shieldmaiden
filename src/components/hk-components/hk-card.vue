@@ -1,21 +1,23 @@
 <template>
 	<div class="hk-card">
-		<slot name="image"/>
-		<slot name="header">
-			<div v-if="header" class="card-header">
-				{{ header }}
-			</div>
-		</slot>
+		<div>
+			<slot name="image"/>
+			<slot name="header" class="card-header">
+				<div v-if="header" class="card-header">
+					{{ header }}
+				</div>
+			</slot>
 
-		<div class="card-body">
-			<slot/>
+			<div class="card-body">
+				<slot/>
+			</div>
+
+			<slot name="footer">
+				<div v-if="footer" class="card-footer">
+					{{ footer }}
+				</div>
+			</slot>
 		</div>
-
-		<slot name="footer">
-			<div v-if="footer" class="card-footer">
-				{{ footer }}
-			</div>
-		</slot>
 	</div>
 </template>
 
@@ -31,17 +33,6 @@
 				type: String,
 				deafault: undefined
 			}
-		},
-		data() {
-			return {
-	
-			}
-		},
-		computed: {
-			
-		},
-		methods: {
-			
 		}
 	}
 </script>
@@ -59,12 +50,19 @@
 		}
 		.card-body {
 			min-height: 1px;
-    	padding: 1.25rem;
+			padding: 1.25rem;
+			
+			&:empty {
+				display: none;
+			}
 		}
 		.card-footer {
 			padding: 0.75rem 1.25rem;
 			background-color: rgba(0, 0, 0, 0.03);
 			border-top: 1px solid rgba(0, 0, 0, 0.125);
+		}
+		.card-image {
+			width: 100%;
 		}
 	}
 </style>

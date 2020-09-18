@@ -8,9 +8,9 @@
 			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control === $store.getters.getUser.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
-				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
+				<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
 					<GiveCharacterControl :playerId="playerId" :control="player.control" />
-				</b-card>
+				</hk-card>
 
 				<hk-card-deck>
 					<hk-card header="Basic Info" >
@@ -157,9 +157,9 @@
 					</hk-card>
 				</hk-card-deck>
 
-				<b-card-group deck>
+				<hk-card-group deck>
 					<!-- ABILITY SCORES -->
-					<b-card header="Ability Scores & Senses" class="ability-card">
+					<hk-card header="Ability Scores & Senses" class="ability-card">
 						<div class="mb-2 d-flex justify-content-start">
 								<div class="name">
 									<label>Ability</label>
@@ -239,10 +239,10 @@
 								<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
 							</b-col>
 						</b-row>
-					</b-card>
+					</hk-card>
 
 					<!-- SKILLS -->
-					<b-card header="Skills">
+					<hk-card header="Skills">
 						<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
 
 						<div class="d-flex justify-content-start">
@@ -286,10 +286,10 @@
 								</b-form-checkbox-group>
 							</b-form-group>
 						</div>
-					</b-card>
-				</b-card-group>
+					</hk-card>
+				</hk-card-group>
 
-				<b-card header="Companions">
+				<hk-card header="Companions">
 					<template v-if="isOwner()">
 						<div v-if="!npcs">
 							<p>You currently have no custom npcs created</p>
@@ -360,7 +360,7 @@
 						<p>Ask your DM to link an NPC to you character</p>
 						<!-- <router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link> -->
 					</div>
-				</b-card>
+				</hk-card>
 
 	
 				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>

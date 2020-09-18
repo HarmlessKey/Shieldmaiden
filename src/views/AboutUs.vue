@@ -10,8 +10,8 @@
 			</p>
 
 			<h2>The Harmless Key Team</h2>
-			<b-card-group deck>
-				<b-card header="The Harmless">
+			<hk-card-deck deck>
+				<hk-card header="The Harmless">
 					<div class="d-flex justify-content-start">
 						<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
 						<div>
@@ -41,8 +41,8 @@
 							</ul>
 						</b-col>
 					</b-row>
-				</b-card>
-				<b-card header="The Key">
+				</hk-card>
+				<hk-card header="The Key">
 					<div class="d-flex justify-content-start">
 						<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/key.jpg') + ')'}"></div>
 						<div>
@@ -75,10 +75,10 @@
 							</ul>
 						</b-col>
 					</b-row>
-				</b-card>
-			</b-card-group>
+				</hk-card>
+			</hk-card-deck>
 
-			<b-card header="Special thanks">
+			<hk-card header="Special thanks">
 				<h2>Patrick Teunissen</h2>
 				<h3>For designing our logo!</h3>
 				<p class="mb-5">This guy was nice enough to lend us his time and design the awesome logo for us. We couldn't be happier!</p>
@@ -102,7 +102,7 @@
 						<img class="icon" src="../assets/_img/logo/logo-icon-yellow.svg"/>
 					</b-col>
 				</b-row>
-			</b-card>
+			</hk-card>
 
 		</div>
 		<Footer />

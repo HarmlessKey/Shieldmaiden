@@ -54,7 +54,7 @@
 			<h2>Add players</h2>
 			<b-row>
 				<b-col md="6">
-					<b-card header="All Players">
+					<hk-card header="All Players">
 						<ul class="entities hasImg" v-if="players && campaign">
 							<li v-for="(player, key) in players" 
 							:key="key" 
@@ -87,11 +87,11 @@
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading Players...</span></div>
-					</b-card>
+					</hk-card>
 				</b-col>
 
 				<b-col md="6">
-					<b-card header="Players in Campaign">
+					<hk-card header="Players in Campaign">
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
 								<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
@@ -112,7 +112,7 @@
 							</ul>
 						</template>
 						<div v-else class="loader"><span>Loading Players...</span></div>
-					</b-card>
+					</hk-card>
 				</b-col>
 			</b-row>
 		</div>

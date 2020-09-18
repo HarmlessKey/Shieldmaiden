@@ -7,7 +7,7 @@
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
 
-			<b-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
+			<hk-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
 				
 				<div class="input-group mb-3">
 					<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
@@ -31,9 +31,9 @@
 						</a>
 					</li>
 				</ul>
-			</b-card>
+			</hk-card>
 			
-			<b-card header="Basic Info">
+			<hk-card header="Basic Info">
 				<b-row>
 					<b-col md="9" class="mb-3">
 						<!-- NAME -->
@@ -212,9 +212,9 @@
 						<div class="img-container"><img :src="npc.avatar" /></div>
 					</b-col>
 				</b-row>
-			</b-card>
+			</hk-card>
 
-			<b-card header="Health & Armor Class">
+			<hk-card header="Health & Armor Class">
 				<b-row>
 					<b-col class="col">
 						<label for="ac">Armor Class *</label>
@@ -268,11 +268,11 @@
 							</p>
 					</b-col>
 				</b-row>
-			</b-card>
+			</hk-card>
 
 			<b-row>
 				<b-col sm="6">
-					<b-card header="Ability Scores">
+					<hk-card header="Ability Scores">
 						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
 							<b-col class="col-3">
 								<label :for="ability.ability">
@@ -291,10 +291,10 @@
 									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
-					</b-card>
+					</hk-card>
 				</b-col>
 				<b-col sm="6">
-					<b-card header="Saving Throws" v-if="quick == false">
+					<hk-card header="Saving Throws" v-if="quick == false">
 						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
 							<b-col class="col-3">
 								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
@@ -308,7 +308,7 @@
 									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
 							</b-col>
 						</b-row>
-					</b-card>
+					</hk-card>
 				</b-col>
 			</b-row>
 
@@ -355,7 +355,7 @@
 			</div>
 			
 			<template v-if="quick == false">
-				<b-card header="Resistances & Vulnerabilities">
+				<hk-card header="Resistances & Vulnerabilities">
 					<b-row>
 						<b-col md="4"><label for="dmg_vul">Damage Vulnerabilities</label></b-col>
 						<b-col>
@@ -410,7 +410,7 @@
 								placeholder="Condition Immunities"></b-form-input>
 						</b-col>
 					</b-row>
-				</b-card>
+				</hk-card>
 			</template>
 
 			<!-- ACTIONS / ABILITIES -->

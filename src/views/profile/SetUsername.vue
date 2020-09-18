@@ -1,7 +1,7 @@
 <template>
 	<div class="content container" v-if="user">
 		<template v-if="!userInfo || !userInfo.username">
-			<b-card header="Username">
+			<hk-card header="Username">
 				<p>To continue, please first enter a username.</p>
 				<b-input-group class="mb-2">
 					<b-form-input type="text" 
@@ -22,7 +22,7 @@
 				<p v-if="username" class="pl-1">
 					<span :class="{'green': check == 'available', 'red': check == 'unavailable'}">{{ username }}</span> is {{ check }}
 				</p>
-			</b-card>
+			</hk-card>
 		</template>
 	</div>
 </template>

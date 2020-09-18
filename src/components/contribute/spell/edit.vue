@@ -11,9 +11,9 @@
 				<div class="form">
 					<b-row>
 						<b-col md="4" id="old_spell">
-							<b-card header="Old Spell Description" v-if="loading">
+							<hk-card header="Old Spell Description" v-if="loading">
 								<div  class="loader"> <span>Loading old_spell...</span></div>
-							</b-card>
+							</hk-card>
 							<div class="card old_spell" v-else>
 								
 								<div class="card-header d-flex justify-content-between">
@@ -21,7 +21,7 @@
 									<a @click="preview('new')" :class="preview_spell=='new' ? 'selected' : ''">New Spell Description</a>
 								</div>
 								<div class="card-body" v-if="preview_spell == 'old'">
-								<!-- <b-card class="old_spell" header="Old Spell Description" v-else> -->
+								<!-- <hk-card class="old_spell" header="Old Spell Description" v-else> -->
 									<a 
 										class="btn btn-block mb-3" 
 										@click="parse_old_spell()">

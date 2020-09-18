@@ -4,7 +4,7 @@
 	</div>
 	<div class="content" v-else-if="item || $route.name == 'AddItem'">
 		<div class="form">
-			<b-card header="Copy Existing Item" v-if="$route.name == 'AddItem'">
+			<hk-card header="Copy Existing Item" v-if="$route.name == 'AddItem'">
 				
 				<div class="input-group mb-3">
 					<input type="text" autocomplete="off" v-model="searched" @keyup="searchItems()" placeholder="Search items" class="form-control"/>
@@ -28,9 +28,9 @@
 						</a>
 					</li>
 				</ul>
-			</b-card>
+			</hk-card>
 		
-			<b-card header="Your Item">
+			<hk-card header="Your Item">
 				<b-row>
 					<b-col sm="2">
 						<span class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></span>
@@ -152,7 +152,7 @@
 						<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
 					</div>
 				</template>
-			</b-card>
+			</hk-card>
 		</div>
 
 		<div class="save">

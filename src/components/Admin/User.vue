@@ -29,8 +29,8 @@
 
 			<hr>
 
-			<b-card-group deck>
-				<b-card header="DM Data">
+			<hk-card-deck>
+				<hk-card header="DM Data">
 					<p class="data">
 						<span class="type">Campaigns: </span> 
 						<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
@@ -48,25 +48,25 @@
 						<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
 						<template v-else>0</template><br/>
 					</p>
-				</b-card>
-				<b-card header="Following">
+				</hk-card>
+				<hk-card header="Following">
 					<ul class="entities">
 						<li v-for="(followed, key) in user.followed" :key="key">
 							{{ followed }}
 						</li>
 					</ul>
-				</b-card>
-				<b-card header="Player Characters">
+				</hk-card>
+				<hk-card header="Player Characters">
 					<ul class="entities" v-if="!loading_characters">
 						<li v-for="(character, key) in characters" :key="key">
 							{{ character.character_name }}
 						</li>
 					</ul>
 					<div v-else class="loader"> <span>Loading characters....</span></div>
-				</b-card>
-			</b-card-group>
+				</hk-card>
+			</hk-card-deck>
 
-			<b-card header="Voucher">
+			<hk-card header="Voucher">
 				<h3>Gift user a subscription</h3>
 			
 				<b-row class="mb-3">
@@ -105,7 +105,7 @@
 					</b-col>
 				</b-row>
 				<a class="btn" @click="setVoucher()">Save</a>
-			</b-card>
+			</hk-card>
 		</div>
 	</div>
 </template>

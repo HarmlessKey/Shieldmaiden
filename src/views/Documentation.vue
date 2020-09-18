@@ -26,7 +26,7 @@
 			
 			<div>
 				<section id="campaigns">
-					<b-card header="Campaigns">
+					<hk-card header="Campaigns">
 						<p><b>Why do I have to make a campaign?</b><br/> 
 						Since it's very possible someone is running multiple campaigns, we decided creating one is mandatory. This way your encounters are grouped under a campaign, so when running multiple campaigns there is some structure to it.</p>
 
@@ -44,28 +44,28 @@
 
 						<p>We store Hit point information under the campaign and not under an encounter, so it is not reset between encounters.</p>
 
-					</b-card>
+					</hk-card>
 				</section>
 
 				<section id="players">
-					<b-card header="Players">
+					<hk-card header="Players">
 						<p>Our app is not aimed at character sheets, this is why the options for players are limited. For players you only have to add the information essential for running an encounter in our app, a name, maximum hit points and armor class. We do give you the option to add ability scores, but that is optional.</p>
-					</b-card>
+					</hk-card>
 
 				</section>
 
 				<section id="npcs">
-					<b-card header="NPC's">
+					<hk-card header="NPC's">
 						<p><b>Why call them NPC's?</b><br/>
 						We decided to name it NPC's and not monsters, because friendlies can be added as well. Say your group has recruited a mighty hero to fight with them in an upcoming battle, you can add this hero as an NPC that you can control and keep track of during encounters.</p>
 
 						<p><b>Why can't I find the monster I'm looking for?</b><br/>
 						We're not allowed to use anything outside of the SRD, so if you can't find your monster, it's probably because of that. We only stored the monsters from the SRD in our database, but we do give you the opportunity to create your own.</p>
-					</b-card>
+					</hk-card>
 				</section>
 
 				<section id="encounters">
-					<b-card header="Encounters">
+					<hk-card header="Encounters">
 						<p>
 							Encounters is what our app is all about. Here we'll talk about creating one, if you want to know what happens when running an encounter check the section <a href="#run-encounter">Run Encounter</a>.
 						</p>
@@ -94,11 +94,11 @@
 							Adding an NPC copies some of the values to the encounter. Name, maximum hit points and armor class are tracked under the encounter, not under the NPC. This is done so manipulations can be made without changing the original values. You can choose how the Hit Points of an NPC are set. We can either set the average of their hit dice, or we can roll the hit dice for you.
 							When we roll the hit points, we add the amount of dice times the constitution modifier. So for a monster with 2d8 hit dice and a constitution modifier of 2 we roll 2 d8 and add 4.
 						</p>
-					</b-card>
+					</hk-card>
 				</section>
 
 				<section id="run-encounter">
-					<b-card header="Running an encounter">
+					<hk-card header="Running an encounter">
 					<h2 id="run-encounter-set-in" class="pt-5">Setting initiatve</h2>
 						<p>Nothing special going on here. We decided that initiative for players cannot be rolled. Players usually like to roll themselves and you as a DM will have to enter their rolls manually.</p>
 
@@ -167,7 +167,7 @@
 						<p>
 							The damage meters are stored as a total number for each entity. If the damage done was higher than the targets current hit points, we store the rest damage as an overkill. Healing for more than a target's maximum hit points results is stored as overhealing.
 						</p>
-					</b-card>
+					</hk-card>
 				</section>
 			</div>
 		</div>

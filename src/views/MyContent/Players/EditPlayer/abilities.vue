@@ -18,14 +18,13 @@
 
 <script>
 	import VueMarkdown from 'vue-markdown';
-	import { modifierMixin } from '@/mixins/modifiers.js';
 	import { abilities } from '@/mixins/abilities.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 
 	export default {
 		name: 'CharacterAbilities',
-		mixins: [modifierMixin, abilities],
+		mixins: [abilities],
 		props: [
 			"base_abilities",
 			"computed",

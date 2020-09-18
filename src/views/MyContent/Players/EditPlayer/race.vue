@@ -78,7 +78,7 @@
 		</div>
 
 		<q-dialog v-model="modal">
-      <Modifier v-model="modifier" />
+      <Modifier :value="modifier" :userId="userId" :playerId="playerId" @save="modifierSaved" />
 		</q-dialog>
 	</div>
 </template>
@@ -88,11 +88,9 @@
 	import ModifierTable from './modifier-table.vue';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
-	import { modifierMixin } from '@/mixins/modifiers.js';
 
 	export default {
 		name: 'CharacterRace',
-		mixins: [modifierMixin],
 		props: [
 			"character_race",
 			"modifiers",
@@ -169,6 +167,10 @@
 					]
 				});
 			},
+			modifierSaved() {
+				this.modal = false;
+				this.$emit("change", "modifier.saved");
+			}
 		}
 	}
 </script>

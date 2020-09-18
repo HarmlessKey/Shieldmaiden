@@ -56,8 +56,7 @@
 				columns: {
 					name: {
 						label: 'Name',
-						truncate: true,
-						sortable: true,
+						truncate: true
 					},
 					target: {
 						label: 'Target',
@@ -105,5 +104,9 @@
 	h4 {
 		font-size: 16px;
 		margin: 15px 0 !important;
+		border-bottom: solid 1px #5c5757;
+		display: flex;
+		justify-content: space-between;
+		padding-bottom: 5px;
 	}
 </style>

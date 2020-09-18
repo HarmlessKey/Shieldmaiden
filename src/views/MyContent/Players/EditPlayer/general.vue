@@ -55,7 +55,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-select 
-				dark filled square dense
+				dark filled square dense map-options emit-value
 				@change="saveAdvancement()"
 				v-model="character.advancement" 
 				:options="advancement_options" 
@@ -64,7 +64,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-select 
-				dark filled square dense
+				dark filled square dense map-options emit-value
 				@change="saveHpType()"
 				v-model="character.hit_point_type" 
 				:options="hit_point_options" 

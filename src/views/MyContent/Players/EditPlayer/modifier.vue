@@ -30,84 +30,68 @@
 
 				<!-- TYPE -->
 				<div class="form-item">
-					<q-select dark filled square dense v-model="modifier.type" :options="modifier_types" label="Type" />
+					<q-select dark filled square dense map-options emit-value v-model="modifier.type" :options="modifier_types" label="Type" />
 				</div>
 				<small class="d-block mt-1" v-if="modifier.type"><b>{{ modifier.type.capitalize() }}</b>: {{ type_info[modifier.type] }}</small>
 
 				<template v-if="modifier.type">
 					<!-- TARGET -->
 					<div class="form-item my-3">
-						<q-select dark filled square dense v-model="modifier.target" :options="modifier_targets" label="Modifier target" />
+						<q-select dark filled square dense map-options emit-value v-model="modifier.target" :options="modifier_targets" label="Modifier target" />
 					</div>
 
 					<!-- ABILITES -->
 					<div class="form-item mb-3" v-if="modifier.target === 'ability'">
-						<label for="ability">Ability</label>
-						<b-form-select class="form-control" v-model="modifier.subtarget" name="ability">
-							<option :value="null" disabled>Select the ability</option>
-							<option v-for="{value, label} in abilities" :key="`ability-${value}`" :value="value">
-								{{ label }}
-							</option>
-						</b-form-select>
+						<q-select dark filled square dense map-options emit-value v-model="modifier.subtarget" :options="abilities" label="Ability" />
 					</div>
 
 					<!-- SKILLS -->
 					<div class="form-item mb-3" v-if="modifier.target === 'skill'">
 						<label for="type">Skill</label>
-						<select class="form-control" v-model="modifier.subtarget" name="skills">
-							<option :value="null" disabled>Select the skill</option>
-							<option v-for="({skill}, key) in skillList" :key="`${key}`" :value="key">
-								{{ skill }}
-							</option>
-						</select>
+						<q-select dark filled square dense map-options emit-value option-value="value
+						" option-label="skill" v-model="modifier.subtarget" :options="Object.values(skillList)" label="Skill" />
 					</div>
 
 					<!-- WEAPONS -->
 					<div class="form-item mb-3" v-if="modifier.target === 'weapon'">
-						<label for="type">Weapon</label>
-						<el-select 
-							id="weapon"
-							v-model="modifier.subtarget"
-							collapse-tags
-							filterable
-							placeholder="Select the weapon">
-							<el-option-group
-								v-for="group in weaponList"
-								:key="group.category"
-								:label="group.category">
-								<el-option
-									v-for="item in group.weapons"
-									:key="item.value"
-									:label="item.label"
-									:value="item.value">
-								</el-option>
-							</el-option-group>
-						</el-select>
+						<q-select dark filled square dense v-model="modifier.subtarget" :options="weaponList" label="Weapon">
+							<template v-slot:option="scope">
+								<q-item :key="`weapon-category-${scope.index}`">
+									<q-item-section>
+										<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+									</q-item-section>
+								</q-item>
+
+								<template v-for="weapon in scope.opt.weapons">
+									<q-item
+										:key="weapon.value"
+										clickable
+										v-ripple
+										v-close-popup
+										@click="modifier.subtarget = weapon.value"
+										:active="modifier.subtarget === weapon.value"
+									>
+										<q-item-section>
+											<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+										</q-item-section>
+									</q-item>
+								</template>
+								<q-separator />
+							</template>
+						</q-select>
 					</div>
 
 					<!-- ARMOR -->
 					<div class="form-item mb-3" v-if="modifier.target === 'armor'">
-						<label for="type">Armor</label>
-						<el-select
-							id="armor"
-							v-model="modifier.subtarget"
-							collapse-tags
-							filterable
-							placeholder="Armor">
-							<el-option
-								v-for="item in armor_types"
-								:key="item.value"
-								:label="item.label"
-								:value="item.value">
-							</el-option>
-						</el-select>
+						<q-select dark filled square dense map-options emit-value v-model="modifier.subtarget" :options="armor_types" label="Armor" />
 					</div>
 					
 					<!-- VALUE -->
 					<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
-						<label for="value" class="required">Value</label>
 						<div class="d-flex justify-content-between">
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Value"
 								autocomplete="off"  
 								id="value" 
 								type="number" 
@@ -126,35 +110,14 @@
 
 					<!-- ABILITES -->
 					<div class="form-item mb-3" v-if="modifier.type === 'ability'">
-						<label for="ability_modifier">Ability modifier</label>
-						<select class="form-control" v-model="modifier.ability_modifier" name="ability_modifier">
-							<option :value="null" disabled>Select the ability</option>
-							<option v-for="{value, label} in abilities" :key="`modifier-${value}`" :value="value">
-								{{ label }}
-							</option>
-						</select>
+						<q-select dark filled square dense map-options emit-value v-model="modifier.ability_modifier" :options="abilities" label="Ability modifier" />
 					</div>
 
 					<hr>
 
 					<!-- RESTRICTIONS -->
 					<div class="form-item my-3">
-						<label for="restrictions">Restrictions</label>
-						<el-select
-							id="restrictions"
-							v-model="modifier.restrictions"
-							multiple
-							collapse-tags
-							placeholder="Select restrictions">
-							<el-option
-								v-for="item in modifier_restrictions"
-								:key="item.value"
-								:label="item.text"
-								:value="item.value"
-								:disabled="disabledRestriction(item.value)"
-							>
-							</el-option>
-						</el-select>
+						<q-select dark filled square dense multiple clearable v-model="modifier.restrictions" :options="modifier_restrictions" label="Restrictions" />
 					</div>
 				</template>
 			</div>
@@ -184,8 +147,9 @@
 				
 				<!-- STARTING LEVELS -->
 				<div class="form-item mb-3" v-if="modifier.origin.split('.')[0] !== 'class'">
-					<label for="start" class="required">Starting level</label>
-					<b-form-input 
+					<q-input 
+						dark filled square dense
+						label="Starting level"
 						autocomplete="off"  
 						id="start"
 						type="number"
@@ -198,21 +162,16 @@
 
 				<!-- SCALING TYPE -->
 				<div class="form-item mb-3">
-					<label for="scaling_type">Scaling type</label>
-					<b-form-select class="form-control" v-model="modifier.scaling_type" name="scaling_type">
-						<option :value="null" disabled>Select the scaling type</option>
-						<option v-for="{value, text} in scaling_types" :key="`ability-${value}`" :value="value">
-							{{ text }}
-						</option>
-					</b-form-select>
+					<q-select dark filled square dense map-options emit-value v-model="modifier.scaling_type" :options="scaling_types" label="Scaling type" />
 				</div>
 				
 				<!-- LEVEL SCALING -->
 				<div v-if="modifier.scaling_type === 'scale'" class="form-item mb-3">
 					<div class="d-flex justify-content-between mb-2">
 						<div>
-							<label for="size" class="required">Scale size</label>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Scale size"
 								autocomplete="off"  
 								id="size" 
 								type="number" 
@@ -222,8 +181,9 @@
 							/>
 						</div>
 						<div>
-							<label for="scale_value" class="required">Scale value</label>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Scale value"
 								autocomplete="off"  
 								id="scale_value" 
 								type="number" 
@@ -246,15 +206,15 @@
 			</q-page>
 		</q-page-container>
 
-		<q-footer class="bg-black gray-light">
-			<q-toolbar inset>
-				Footer
-			</q-toolbar>
+		<q-footer class="bg-black gray-light p-3 d-flex justify-content-end">
+				<button class="btn bg-gray mr-2" v-close-popup>Cancel</button>
+				<button class="btn" @click="saveModifier()">Save</button>
 		</q-footer>
 	</q-layout>
 </template>
 
 <script>
+	import { db } from '@/firebase';
 	import { skills } from '@/mixins/skills.js';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
@@ -276,11 +236,20 @@
 				type: Boolean,
 				default: true
 			},
-			classes: undefined
+			classes: undefined,
+			userId: {
+				type: String,
+				required: true
+			},
+			playerId: {
+				type: String,
+				required: true
+			}
 		},
 		data() {
 			return {
 				scaling: false,
+				modifier_setter: undefined,
 				modifier_types: [
 					{
 						value: "bonus",
@@ -343,27 +312,14 @@
 		computed: {
 			modifier: {
 				get() {
-					let value = this.value;
-
-					//Set undefined variables to null
-					value.type = (value.type) ? value.type : null;
-					value.target = (value.target) ? value.target : null;
-					value.subtarget = (value.subtarget) ? value.subtarget : null;
-					value.ability_modifier = (value.ability_modifier) ? value.ability_modifier : null;
-
-					return value;
+					return (this.modifier_setter) ? this.modifier_setter : this.value;
 				},
 				set(newValue) {
-					
+					this.modifier_setter = newValue;
 				}
 			},
 			modifier_targets() {
 				return [
-						{
-							value: null,
-							label: "Select the target",
-							disable: true
-						},
 						{
 							value: "ability",
 							label: "Abillity Score",
@@ -418,22 +374,20 @@
 			}
 		},
 		methods: {
-			disabledRestriction(value) {
-				if(this.modifier.restrictions) {
-					if(value === "armor" && this.modifier.restrictions.includes("no_armor")) {
-						return true;
-					}
-					if(value === "no_armor" && this.modifier.restrictions.includes("armor")) {
-						return true;
-					}
-					if(value === "shield" && this.modifier.restrictions.includes("no_shield")) {
-						return true;
-					}
-					if(value === "no_shield" && this.modifier.restrictions.includes("shield")) {
-						return true;
-					}
+			saveModifier() {
+				let modifier = this.modifier;
+
+				//Edit
+				if(modifier['.key']) {
+					const key = modifier['.key'];
+					delete modifier['.key'];
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
 				}
-				return false;
+				//New
+				else {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(this.modifier);
+				}
+				this.$emit("save", "modifier.saved");
 			},
 			scalingText() {
 				if(this.modifier.scaling_type === 'scale') {
@@ -450,22 +404,11 @@
 					text += ".";
 					return text;
 				}
-			},
-			deleteScaling() {
-				delete this.modifier.scaling_type;
-				delete this.modifier.scaling_start;
-				delete this.modifier.scale_size;
-				delete this.modifier.scale_value;
-
-				this.$emit('input', this.modifier);
-				this.$forceUpdate();
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.el-select, .form-control {
-		width: 100% !important;
-	}
+	
 </style>

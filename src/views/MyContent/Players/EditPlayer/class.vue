@@ -24,7 +24,7 @@
 					</a>
 				</h3>
 
-				<el-collapse-transition>
+				<q-slide-transition>
 					<div class="p-3" v-show="showClass === classKey">
 						<a v-if="classKey != 0" @click="confirmDeleteClass(classKey, subclass.class)" class="red mb-4 d-block"><i class="fas fa-trash-alt"/> Delete class</a>
 						<div class="level">
@@ -149,81 +149,64 @@
 						</h3>
 						<b-collapse :id="`prof-${classKey}`" class="proficiencies" >
 							<div class="form-item mb-3">
-								<label :for="`${classKey}-armor`">Armor</label>
-								<el-select
-									:id="`${classKey}-armor`"
-									:value="proficiencies[classKey].armor"
-									@change="setProficiencies($event, classKey, 'armor')"
+								<q-select 
+									dark filled square dense
+									emit-value map-options 
+									label="Armor"
 									multiple
-									collapse-tags
-									filterable
-									placeholder="Armor">
-									<el-option
-										v-for="item in armor_types"
-										:key="item.value"
-										:label="item.label"
-										:value="item.value">
-									</el-option>
-								</el-select>
+									:options="armor_types" 
+									:value="proficiencies[classKey].armor" 
+									@input="setProficiencies($event, classKey, 'armor')"
+								/>
 							</div>
 							<div class="form-item mb-3">
-								<label :for="`${classKey}-weapon`">Weapons</label>
-								<el-select 
-									:id="`${classKey}-weapon`"
-									:value="proficiencies[classKey].weapon"
-									@change="setProficiencies($event, classKey, 'weapon')"
-									multiple
-									collapse-tags
-									filterable
-									placeholder="Weapons">
-									<el-option-group
-										v-for="group in weaponList"
-										:key="group.category"
-										:label="group.category">
-										<el-option
-											v-for="item in group.weapons"
-											:key="item.value"
-											:label="item.label"
-											:value="item.value">
-										</el-option>
-									</el-option-group>
-								</el-select>
+								<q-select dark filled square dense multiple :value="proficiencies[classKey].weapon" :options="weaponList" @input="setProficiencies($event, classKey, 'weapon')" label="Weapon">
+									<template v-slot:option="scope">
+										<q-item :key="`weapon-category-${scope.index}`">
+											<q-item-section>
+												<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+											</q-item-section>
+										</q-item>
+
+										<template v-for="weapon in scope.opt.weapons">
+											<q-item
+												:key="weapon.value"
+												clickable
+												v-ripple
+												:active="proficiencies[classKey].weapon.includes(weapon.value)"
+											>
+												<q-item-section>
+													<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+												</q-item-section>
+											</q-item>
+										</template>
+										<q-separator />
+									</template>
+								</q-select>
 							</div>
 							<div class="form-item mb-3">
-								<label :for="`${classKey}-skill`">Skills</label>
-								<el-select
-									:id="`${classKey}-skill`"
-									:value="proficiencies[classKey].skill"
-									@change="setProficiencies($event, classKey, 'skill')"
+								<q-select 
+									dark filled square dense
+									emit-value map-options 
+									label="Skills"
 									multiple
-									collapse-tags
-									filterable
-									placeholder="Skills">
-									<el-option
-										v-for="(item, key) in skillList"
-										:key="key"
-										:label="item.skill"
-										:value="key">
-									</el-option>
-								</el-select>
+									option-value="value"
+									option-label="skill"
+									:options="Object.values(skillList)" 
+									:value="proficiencies[classKey].skill" 
+									@input="setProficiencies($event, classKey, 'skill')"
+								/>
 							</div>
-							<div class="form-item mb-3" v-if="classKey === 0">
-								<label :for="`${classKey}-saving`">Saving throws</label>
-								<el-select
-									:id="`${classKey}-saving`"
-									:value="proficiencies[classKey].saving_throw"
-									@change="setProficiencies($event, classKey, 'saving_throw')"
+							<div class="form-item mb-3" v-if="classKey == 0">
+								<q-select 
+									dark filled square dense
+									emit-value map-options 
+									label="Saving throws"
 									multiple
-									collapse-tags
-									filterable
-									placeholder="Saving throws">
-									<el-option
-										v-for="{value, label} in abilities"
-										:key="value"
-										:label="label"
-										:value="value">
-									</el-option>
-								</el-select>
+									:options="abilities" 
+									:value="proficiencies[classKey].saving_throw" 
+									@input="setProficiencies($event, classKey, 'saving_throw')"
+								/>
 							</div>
 						</b-collapse>
 						
@@ -351,35 +334,13 @@
 																Modifiers
 																<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
 															</h3>
-
-															<hk-table
-																v-if="feature_modifiers(classKey, level, key).length > 0"
-																:columns="columns"
-																:items="feature_modifiers(classKey, level, key)"
-															>
-																<template slot="target" slot-scope="data">
-																	{{ data.row.subtarget || data.item.capitalize() }}
-																</template>
-																<template slot="value" slot-scope="data">
-																	<template v-if="data.item">{{ data.item.capitalize() }}</template>
-																	<template v-else-if="data.row.type === 'proficiency'">Proficiency</template>
-																	<template v-else-if="data.row.type === 'expertise'">Expertise</template>
-																	<template v-else-if="data.row.type === 'ability'">{{ data.row.ability_modifier.capitalize() }}</template>
-																</template>
-																<div slot="actions" slot-scope="data" class="actions">
-																	<a class="gray-hover mx-1" 
-																		@click="editModifier(data.row)" 
-																		v-b-tooltip.hover title="Edit">
-																		<i class="fas fa-pencil"></i>
-																	</a>
-																	<a v-b-tooltip.hover
-																		title="Delete"
-																		class="gray-hover"
-																		@click="deleteModifier(data.row['.key'])">
-																			<i class="fas fa-trash-alt"></i>
-																	</a>
-																</div>
-															</hk-table>
+															
+															<!-- Modifiers -->
+															<Modifier-table 
+																:modifiers="feature_modifiers(classKey, level, key)" 
+																:origin="`race.trait.${key}`"
+																@edit="editModifier"
+															/>
 														</template>
 													</b-card-body>
 												</b-collapse>
@@ -390,20 +351,15 @@
 							</template>
 						</template>
 					</div>
-				</el-collapse-transition>
+				</q-slide-transition>
 			</div>
 		</div>
 		<a @click="addClass()" class="d-block mt-4"><i class="fas fa-plus"/> Add a class</a>
 
 		<!-- MODIFIER MODAL -->
-		<b-modal ref="modifier-modal" :title="`${modifier['.key'] ? 'Edit' : 'New' } Modifier`">
-			<Modifier v-model="modifier" :classes="classes"/>
-			<template slot="modal-footer">
-				<a class="btn bg-gray" @click="hideModal">Cancel</a>
-				<a v-if="modifier['.key']" class="btn" @click="saveModifier(modifier)">Save</a>
-				<a v-else class="btn" @click="addModifier">Add</a>
-			</template>
-		</b-modal>
+		<q-dialog v-model="modifier_modal">
+      <Modifier :value="modifier" :userId="userId" :playerId="playerId" @save="modifierSaved" />
+		</q-dialog>
 
 		<!-- ROLLED HP MODAL -->
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`" v-if="hit_point_type === 'rolled'">
@@ -466,13 +422,13 @@
 	import { mapActions } from 'vuex';
 	import VueMarkdown from 'vue-markdown';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
-	import { modifierMixin } from '@/mixins/modifiers.js';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
 	import { skills } from '@/mixins/skills.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { experience } from '@/mixins/experience.js';
 	import { general } from '@/mixins/general.js';
+	import ModifierTable from './modifier-table.vue';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
@@ -482,7 +438,6 @@
 		name: 'CharacterClass',
 		mixins: [
 			general,
-			modifierMixin, 
 			abilities, 
 			weapons, 
 			skills, 
@@ -503,6 +458,7 @@
 		components: {
 			VueMarkdown,
 			GiveCharacterControl,
+			ModifierTable,
 			Modifier
 		},
 		mounted() {
@@ -514,6 +470,7 @@
 		},
 		data() {
 			return {
+				modifier_modal: false,
 				armor_types: [
 					{ value: "light", label: "Light armor" },
 					{ value: "medium", label: "Medium armor" },
@@ -615,6 +572,14 @@
 			},
 			setShowClass(classKey){
 				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
+			},
+			editModifier(e) {
+				this.modifier_modal = true;
+				this.modifier = e.modifier;
+			},
+			modifierSaved() {
+				this.modifier_modal = false;
+				this.$emit("change", "modifier.saved");
 			},
 			handleXP(type) {
 				if(this.xp) {

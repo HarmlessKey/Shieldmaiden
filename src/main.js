@@ -13,6 +13,7 @@ import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import HkTable from './components/hk-components/hk-table'
+import HkCard from './components/hk-components/hk-card'
 import Icon from './components/Icon'
 import './quasar';
 
@@ -24,6 +25,7 @@ const options = {
 }
 
 Vue.component('hk-table', HkTable);
+Vue.component('hk-card', HkCard);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})

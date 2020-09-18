@@ -11,9 +11,9 @@
 				<b-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
 					<GiveCharacterControl :playerId="playerId" :control="player.control" />
 				</b-card>
-				
-				<b-card-group deck>
-					<b-card header="Basic Info">
+
+				<hk-card-deck>
+					<hk-card header="Basic Info" >
 						<b-row>
 							<b-col md="2">
 								<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
@@ -79,10 +79,10 @@
 								</b-row>
 							</b-col>
 						</b-row>
-					</b-card>
-					<b-card header="Level & Base Stats">
-						<b-row>
-							<b-col md="6" class="mb-2">
+					</hk-card>
+					<hk-card header="Level & Base Stats">
+						<div class="row">
+							<div class="col-6 mb-2">
 								<label for="experience" class="experience">
 									<span>XP</span>
 									<span>
@@ -101,7 +101,7 @@
 									name="experience" 
 									placeholder="Experience" />
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
-							</b-col>
+							</div>
 							<b-col md="6" class="mb-2">
 								<label for="level">Level Override</label>
 								<b-form-input autocomplete="off"  id="level" 
@@ -153,9 +153,9 @@
 									name="save_dc" 
 									placeholder="Save DC" />
 							</b-col>
-						</b-row>
-					</b-card>
-				</b-card-group>
+						</div>
+					</hk-card>
+				</hk-card-deck>
 
 				<b-card-group deck>
 					<!-- ABILITY SCORES -->

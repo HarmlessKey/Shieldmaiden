@@ -19,15 +19,20 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
-								<i class="fas fa-info-circle"></i></a>
+							<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
+								<i class="fas fa-info-circle"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Show info
+								</q-tooltip>
+							</a>
 							{{ npc.name }}
 						</div>
-						<a class="gray-hover" 
-							v-b-tooltip.hover title="Copy NPC" 
-							@click="copy(npc)">
+						<a class="gray-hover" @click="copy(npc)">
 							<i class="fas fa-copy blue"></i>
 							<span class="d-none d-md-inline ml-1">Copy</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Copy NPC
+							</q-tooltip>
 						</a>
 					</li>
 				</ul>
@@ -41,7 +46,6 @@
 							<b-col sm="2"><label for="name">Name *</label></b-col>
 							<b-col>
 								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Name"
 									type="text" 
 									class="form-control mb-2" 
 									:class="{'input': true, 'error': errors.has('name') }" 
@@ -61,7 +65,6 @@
 							<b-col sm="2"><label for="size">Size</label></b-col>
 								<b-col>
 									<b-form-input autocomplete="off" 
-										v-b-tooltip.hover title="Size"
 										type="text" 
 										class="form-control mb-2" 
 										v-model="npc.size"
@@ -79,7 +82,6 @@
 									<b-col sm="4"><label for="type">Type</label></b-col>
 									<b-col sm="8">
 										<b-form-input autocomplete="off" 
-											v-b-tooltip.hover title="Type"
 											type="text" 
 											class="form-control mb-2" 
 											v-model="npc.type" 
@@ -95,7 +97,6 @@
 									<b-col sm="4"><label for="subtype">Subtype</label></b-col>
 									<b-col sm="8">
 										<b-form-input autocomplete="off" 
-											v-b-tooltip.hover title="Subtype"
 											type="text"
 											class="form-control mb-2"
 											v-model="npc.subtype" 
@@ -111,7 +112,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="alignment">Alignment</label></b-col>
 							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Alignment"
+								<b-form-input autocomplete="off" 
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.alignment" 
@@ -126,7 +127,6 @@
 							<b-col sm="2"><label for="speed">Speed</label></b-col>
 							<b-col>
 								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Speed"
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.speed" 
@@ -140,7 +140,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="senses">Senses</label></b-col>
 							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Senses" 
+								<b-form-input autocomplete="off"
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.senses" 
@@ -154,7 +154,7 @@
 						<b-row v-if="quick == false">
 							<b-col sm="2"><label for="languages">Languages</label></b-col>
 							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Languages" 
+								<b-form-input autocomplete="off" 
 									type="text" 
 									class="form-control mb-2" 
 									v-model="npc.languages" 
@@ -185,7 +185,6 @@
 							<b-col sm="2"><label for="avatar">Avatar</label></b-col>
 							<b-col>
 								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Avatar"
 									type="text" 
 									class="form-control mb-2" 
 									:class="{'input': true, 'error': errors.has('avatar') }" 
@@ -219,7 +218,6 @@
 					<b-col class="col">
 						<label for="ac">Armor Class *</label>
 						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Armor Class"
 							type="number" 
 							class="form-control" 
 							:class="{'input': true, 'error': errors.has('ac') }" 
@@ -234,7 +232,6 @@
 					<b-col class="col">
 						<label for="hp">Hit Points *</label>
 						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Hit Points"
 							type="number" 
 							class="form-control" 
 							:class="{'input': true, 'error': errors.has('Hit Points') }" 
@@ -252,7 +249,6 @@
 							<a v-b-popover.hover.top="'The modifier is the NPC\'s Constitution modifier.'" title="Hit Dice + Modifier"><i class="fas fa-info-circle"></i></a>
 						</label>
 						<b-form-input autocomplete="off" 
-							v-b-tooltip.hover title="Hit Dice"
 							type="text" 
 							class="form-control" 
 							v-model="npc.hit_dice"  
@@ -360,7 +356,6 @@
 						<b-col md="4"><label for="dmg_vul">Damage Vulnerabilities</label></b-col>
 						<b-col>
 							<b-form-input autocomplete="off"  type="text"
-								v-b-tooltip.hover title="Damage Vulnerabilities" 
 								class="form-control mb-2" 
 								v-model="npc.damage_vulnerabilities" 
 								name="damage_vulnerabilities" 
@@ -373,7 +368,6 @@
 						<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
 						<b-col>
 							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Damage Resistances" 
 								type="text" 
 								class="form-control mb-2" 
 								v-model="npc.damage_resistances" 
@@ -387,7 +381,6 @@
 						<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
 						<b-col>
 							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Damage Immunities" 
 								type="text" 
 								class="form-control mb-2" 
 								v-model="npc.damage_immunities" 
@@ -401,7 +394,6 @@
 						<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
 						<b-col>	
 							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Condition Immnunities" 
 								type="text" 
 								class="form-control mb-2" 
 								v-model="npc.condition_immunities" 
@@ -418,23 +410,24 @@
 				<div class="card" v-for="(action, index) in actions" :key="index">
 					<div class="card-header d-flex justify-content-between">
 						{{ action.name }}
-						<a 
-						class="gray-hover text-capitalize" 
-						v-b-tooltip.hover title="Add Skill" 
-						@click="add(action.type)">
+						<a class="gray-hover text-capitalize" @click="add(action.type)">
 							<i class="fas fa-plus green"></i>
 							<span class="d-none d-md-inline ml-1">Add</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Add skill
+							</q-tooltip>
 						</a>
 					</div>
 					<div class="card-body">
 						<div v-for="(ability, index) in npc[action.type]" :key="index">
 							<h2 class="d-flex justify-content-between">
 								{{ index + 1 }}. {{ ability.name }}
-								<a @click="remove(index, action.type)" 
-									class="gray-hover text-capitalize"
-									v-b-tooltip.hover title="Remove">
+								<a @click="remove(index, action.type)" class="gray-hover text-capitalize">
 									<i class="fas fa-minus red"></i>
 									<span class="d-none d-md-inline ml-1">Remove</span>
+									<q-tooltip anchor="top middle" self="center middle">
+										Remove
+									</q-tooltip>
 								</a>
 							</h2>
 							<b-row class="mb-2">

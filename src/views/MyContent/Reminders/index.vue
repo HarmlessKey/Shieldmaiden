@@ -29,23 +29,26 @@
 				:search="['title']"
 			>
 				<template slot="title" slot-scope="data">
-					<router-link class="mx-2" 
-						:to="'/reminders/' + data.row['.key']" 
-						v-b-tooltip.hover title="Edit">{{ data.item }}
+					<router-link class="mx-2" :to="'/reminders/' + data.row['.key']">
+						{{ data.item }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" 
-						:to="'/reminders/' + data.row['.key']" 
-						v-b-tooltip.hover title="Edit">
+					<router-link class="gray-hover mx-1" :to="'/reminders/' + data.row['.key']">
 						<i class="fas fa-pencil"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
-					<a v-b-tooltip.hover 
-						title="Delete" 
-						class="gray-hover"
-						@click="confirmDelete(data.row['.key'], data.row.title)">
+					<a class="gray-hover" @click="confirmDelete(data.row['.key'], data.row.title)">
 							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
 					</a>
 				</div>
 			</hk-table>

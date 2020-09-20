@@ -35,9 +35,11 @@
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" 
-						:to="'/players/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">{{ data.item }}
+					<router-link class="mx-2"  :to="'/players/' + data.row.key">
+						{{ data.item }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
 				</template>
 
@@ -50,16 +52,17 @@
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" 
-						:to="'/players/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">
+					<router-link class="gray-hover mx-1" :to="'/players/' + data.row.key">
 						<i class="fas fa-pencil"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
-					<a v-b-tooltip.hover 
-						title="Delete" 
-						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row)">
+					<a class="gray-hover" @click="confirmDelete(data.row.key, data.row)">
 							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
 					</a>
 				</div>
 			</hk-table>

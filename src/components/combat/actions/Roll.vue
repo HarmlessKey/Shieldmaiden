@@ -9,8 +9,11 @@
 					<span :class="{ 
 							'green': entities[targeted[0]].ac_bonus > 0, 
 							'red': entities[targeted[0]].ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						}" v-if="entities[targeted[0]].ac_bonus">
 						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
+						<q-tooltip anchor="center right" self="center left">
+							Armor class + {{ entities[targeted[0]].ac_bonus }}
+						</q-tooltip>
 					</span>
 					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
@@ -120,9 +123,12 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" @click="groupRoll(action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
+								<q-tooltip anchor="center right" self="center left">
+									Roll {{ action.name }}
+								</q-tooltip>
 							</button>
 						</span>
 						<p class="collapse py-2 pr-1" :id="'act-'+index">{{ action.desc }}</p>
@@ -143,9 +149,12 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" @click="groupRoll(action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
+								<q-tooltip anchor="center right" self="center left">
+									Roll {{ action.name }}
+								</q-tooltip>
 							</button>
 						</span>
 						<p class="collapse py-2 pr-1" :id="'leg-'+index">{{ action.desc }}</p>

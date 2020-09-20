@@ -3,8 +3,11 @@
 				<h3><i class="fas fa-coins"></i> Currency</h3>
 				<div class="currency">
 						<div v-for="(coin, key) in currencies" :key="key">
-								<span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
+								<span class="coins" :class="coin.color">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+										<q-tooltip anchor="top middle" self="center middle">
+											{{ coin.name }}
+										</q-tooltip>
 									</span>
 								<b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" @change="setCurrency()" :placeholder="coin.name"/>
 						</div>
@@ -30,15 +33,17 @@
 									<div slot="header" class="card-header d-flex justify-content-between">
 											{{ index + 1 }}. {{ item.public_name }}
 											<span>
-													<a @click="setEdit(item['.key'])" 
-														class="mr-3 gray-light"
-														v-b-tooltip.hover title="Edit">
+													<a @click="setEdit(item['.key'])" class="mr-3 gray-light">
 														<i class="fas fa-pencil"></i>
+														<q-tooltip anchor="top middle" self="center middle">
+															Edit
+														</q-tooltip>
 													</a>
-													<a @click="removeItem(item['.key'])" 
-														class="red"
-														v-b-tooltip.hover title="Remove">
+													<a @click="removeItem(item['.key'])" class="red">
 														<i class="fas fa-trash-alt"></i>
+														<q-tooltip anchor="top middle" self="center middle">
+															Remove
+														</q-tooltip>
 													</a>
 											</span>
 									</div>
@@ -68,19 +73,26 @@
 
 											<p>
 												<a 
-												v-if="!item.linked_item"
-												@click="setSlide({
-													show: true,
-													type: 'slides/editEncounter/LinkItem',
-													data: {
+													v-if="!item.linked_item"
+													@click="setSlide({
+														show: true,
+														type: 'slides/editEncounter/LinkItem',
+														data: {
 															item: item
-													}
-												})"
-												><i class="far fa-link"></i> Link item</a>
+														}
+													})"
+												>
+													<i class="far fa-link"></i> Link item
+												</a>
 												<template v-else>
 													<i class="far fa-link mr-2"></i>
 													<a @click="setSlide({show: true, type: 'ViewItem', data: item.full_linked_item })">{{ item.full_linked_item.name }}</a>
-													<a v-b-tooltip.hover title="Unlink" @click="unlink(item['.key'])"><i class="fas fa-unlink red ml-2"></i></a>
+													<a @click="unlink(item['.key'])">
+														<i class="fas fa-unlink red ml-2"></i>
+														<q-tooltip anchor="top middle" self="center middle">
+															Unlink
+														</q-tooltip>
+													</a>
 												</template>
 												<a
 													class="ml-2" 

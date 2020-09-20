@@ -9,11 +9,13 @@
 						key,
 						entity
 				}})" 
-				v-b-tooltip.hover :title="'Show '+title(reminder)" 
 				class="text-truncate d-block" :class="'bg-'+reminder.color"
 			>
 				{{ title(reminder) }}
 				<span class="counter" v-if="reminder.rounds">{{ reminder.rounds }}</span>
+				<q-tooltip anchor="top middle" self="center middle">
+					Show {{ title(reminder) }}
+				</q-tooltip>
 			</a>
 		</b-col>
 	</b-row>

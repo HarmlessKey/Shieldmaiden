@@ -77,9 +77,12 @@
 				<span :class="{ 'blue': npc.origin == 'custom' }">
 					{{ npc.name }}
 				</span>
-				<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], npc.origin)">
+				<a class="gray-hover" @click="set(npc['.key'], npc.origin)">
 					<i class="fas fa-copy blue"></i>
 					<span class="d-none d-md-inline ml-1">Copy</span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Copy NPC
+					</q-tooltip>
 				</a>
 			</li>
 		</ul>

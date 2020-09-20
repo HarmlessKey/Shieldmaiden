@@ -79,11 +79,17 @@
 							<a v-if="data.row.entityType === 'npc'" 
 								@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
 								class="mr-2 gray-hover" 
-								v-b-tooltip.hover title="Edit">
+							>
 								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
 							</a>
-							<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+							<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
 								<i class="fas fa-minus"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Remove character
+								</q-tooltip>
 							</a>
 						</div>
 					</hk-table>
@@ -117,11 +123,17 @@
 					</span>
 
 					<div slot="actions" slot-scope="data" class="actions">
-						<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover" v-b-tooltip.hover title="Edit">
+						<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover">
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 							<i class="fas fa-pencil"></i>
 						</a>
-						<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="remove(data.row.key, data.row.name)">
+						<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
 							<i class="fas fa-minus"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Remove character
+							</q-tooltip>
 						</a>
 					</div>
 				</hk-table>

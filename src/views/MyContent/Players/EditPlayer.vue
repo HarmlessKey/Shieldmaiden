@@ -307,15 +307,20 @@
 								<p v-if="noResult" class="red">{{ noResult }}</p>
 								<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 									<div class="d-flex justify-content-left">
-										<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
-											<i class="fas fa-info-circle"></i></a>
+										<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
+											<i class="fas fa-info-circle"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Show info
+											</q-tooltip>
+										</a>
 										{{ npc.name }}
 									</div>
-									<a class="gray-hover" v-if="notAdded(npc)"
-										v-b-tooltip.hover title="Add Companion" 
-										@click="add(npc)">
+									<a class="gray-hover" v-if="notAdded(npc)" @click="add(npc)">
 										<i class="fas fa-plus green"></i>
 										<span class="d-none d-md-inline ml-1">Add</span>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add companion
+										</q-tooltip>
 									</a>
 									<span v-else><small>Already added.</small></span>
 								</li>
@@ -334,24 +339,28 @@
 						</template>
 
 						<template slot="name" slot-scope="data">
-							<router-link class="mx-2" 
-								:to="`/companions/${userId}/${data.row.key}`"
-								v-b-tooltip.hover title="Edit">{{ data.item }}
+							<router-link class="mx-2" :to="`/companions/${userId}/${data.row.key}`">
+									{{ data.item }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
 							</router-link>
 						</template>
 
 						<div slot="actions" slot-scope="data" class="actions">
-							<router-link class="gray-hover mx-1" 
-								:to="`/companions/${userId}/${data.row.key}`"
-								v-b-tooltip.hover title="Edit">
+							<router-link class="gray-hover mx-1" :to="`/companions/${userId}/${data.row.key}`" >
 								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
 							</router-link>
 							<a v-if="isOwner()"
-								v-b-tooltip.hover
-								title="Delete" 
 								class="gray-hover"
 								@click="confirmDelete(data.row.key)">
 								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
 							</a>
 						</div>
 					</hk-table>

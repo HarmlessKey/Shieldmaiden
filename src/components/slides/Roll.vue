@@ -1,6 +1,11 @@
 <template>
 	<div>
-		<h2 v-b-tooltip.hover title="press [r] to show/hide">Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span></h2>
+		<h2>
+			Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span>
+			<q-tooltip anchor="bottom middle" self="center middle">
+				Press [r] to show/hide
+			</q-tooltip>
+		</h2>
 		<div class="roller">
 			<span>Die</span>
 			<span>#</span>

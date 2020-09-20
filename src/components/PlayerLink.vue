@@ -22,7 +22,12 @@
 				<b-input-group class="mt-3">
 					<b-form-input :value="copy" id="copy" autocomplete="off" />
 					<b-input-group-append>
-						<a class="btn" @click="copyLink()" v-b-tooltip.hover title="Click to copy"><i class="fas fa-copy"></i></a>
+						<a class="btn" @click="copyLink()">
+							<i class="fas fa-copy"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Click to copy
+							</q-tooltip>
+						</a>
 					</b-input-group-append>
 				</b-input-group>
 			</div>

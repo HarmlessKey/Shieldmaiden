@@ -8,8 +8,13 @@
 					<span :class="{ 
 							'green': entities[targeted[0]].ac_bonus > 0, 
 							'red': entities[targeted[0]].ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						}"
+						v-if="entities[targeted[0]].ac_bonus"
+					>
 						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
+						<q-tooltip anchor="top middle" self="center middle">
+							Armor Class + {{ entities[targeted[0]].ac_bonus }}
+						</q-tooltip>
 					</span>
 					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
@@ -24,16 +29,17 @@
 					min="0"
 					class="form-control manual-input"
 					@keypress="submitManual($event)"
-					v-b-tooltip.hover
 					autocomplete="off" 
-					title="Enter=Damge, Shift+Enter=Healing"
-				>
+				/>
 				<button class="btn dmg bg-red" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual('damage')"
 				>
 					Attack
 					<img src="@/assets/_img/styles/sword-break.png" />
+					<q-tooltip anchor="center right" self="center left">
+						Enter
+					</q-tooltip>
 				</button>
 				<button class="btn heal bg-green" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
@@ -41,6 +47,9 @@
 				>
 					Heal
 					<img src="@/assets/_img/styles/heal.png" />
+					<q-tooltip anchor="center right" self="center left">
+						Shift + Enter
+					</q-tooltip>
 				</button>
 			</div>
 			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>

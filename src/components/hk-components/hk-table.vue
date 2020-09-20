@@ -38,9 +38,11 @@
 								right: column.right
 							}, column.classes]"
 							v-html="column.label"
-							v-b-tooltip.hover="column.tooltip"
 							:title="column.title"
 						>
+							<q-tooltip v-if="column.tooltip" anchor="center right" self="center left">
+								{{ column.tooltip }}
+							</q-tooltip>
 						</div>
 						<div 
 							v-else 
@@ -51,7 +53,6 @@
 								center: column.center,
 								right: column.right
 							}, column.classes]"
-							v-b-tooltip.hover="column.tooltip"
 							:title="column.title"
 							@click="sort(key)"
 						>
@@ -60,6 +61,9 @@
 								<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
 								<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
 							</span>
+							<q-tooltip v-if="column.tooltip" anchor="center right" self="center left">
+								{{ column.tooltip }}
+							</q-tooltip>
 						</div>
 					</template>
 				</template>

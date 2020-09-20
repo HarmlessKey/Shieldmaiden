@@ -70,10 +70,18 @@
 							<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
 							
 							<div class="actions">
-								<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })" v-b-tooltip.hover title="Show Info">
+								<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })">
 									<i class="fas fa-info"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										SHow info
+									</q-tooltip>
 								</a>
-								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
+								<a @click="rollMonster(entity.key, entity)">
+									<i class="fas fa-dice-d20"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										1d20 + {{ calcMod(entity.dexterity) }}
+									</q-tooltip>
+								</a>
 							</div>
 
 							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
@@ -118,9 +126,24 @@
 								<span>{{ entity.initiative }}</span>
 							</div>
 							<div class="actions">
-								<a v-if="!entity.hidden" v-b-tooltip.hover title="Set Hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})"><i class="fas fa-eye-slash"></i></a>
-								<a v-else v-b-tooltip.hover title="Unhide" class="pointer" @click="set_hidden({key: entity.key, hidden: false})"><i class="fas fa-eye"></i></a>
-								<a v-b-tooltip.hover title="Set Inactive" class="pointer" @click="set_active({key: entity.key, active: false})"><i class="fas fa-minus"></i></a>
+								<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
+									<i class="fas fa-eye-slash"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set hidden
+									</q-tooltip>
+								</a>
+								<a v-else class="pointer" @click="set_hidden({key: entity.key, hidden: false})">
+									<i class="fas fa-eye"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Unhide
+									</q-tooltip>
+								</a>
+								<a class="pointer" @click="set_active({key: entity.key, active: false})">
+									<i class="fas fa-minus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set inactive
+									</q-tooltip>
+								</a>
 							</div>
 						</li>
 					</ul>
@@ -138,7 +161,12 @@
 								<span>{{ entity.initiative }}</span>
 							</span>
 							<div class="actions">
-								<a v-b-tooltip.hover title="Set Active" @click="set_active({key: entity.key, active: true})"><i class="fas fa-plus"></i></a>
+								<a @click="set_active({key: entity.key, active: true})">
+									<i class="fas fa-plus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set active
+									</q-tooltip>
+								</a>
 							</div>
 						</li>
 					</ul>

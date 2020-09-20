@@ -8,12 +8,15 @@
 				</span>
 				<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
-					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
+					class="gray-hover text-capitalize">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">
 						Add
 						<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
 					</span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Add NPC
+					</q-tooltip>
 				</a>
 			</h2>
 			<div class="scroll" v-bar>
@@ -43,8 +46,18 @@
 								<span class="topinfo d-flex justify-content-between" v-if="_active[0].key == entity.key && encounter.turn != 0">
 									Top of the round
 									<div>
-										<span class="green" v-if="Object.keys(_addedNextRound).length > 0" v-b-tooltip.hover title="Added next round">+ {{ Object.keys(_addedNextRound).length }}</span>
-										<span class="red" v-if="Object.keys(_activeDown).length > 0" v-b-tooltip.hover title="Removed next round"><span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}</span>
+										<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
+											+ {{ Object.keys(_addedNextRound).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Added next round
+											</q-tooltip>
+										</span>
+										<span class="red" v-if="Object.keys(_activeDown).length > 0">
+											<span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Removed next round
+											</q-tooltip>
+										</span>
 									</div>
 								</span>
 

@@ -16,15 +16,20 @@
 				<ul class="entities mt-3" v-if="foundItems">
 					<li  v-for="(item, index) in foundItems" :key="'item-'+index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="setSlide({show: true, type: 'ViewItem', data: item})" class="mr-2" v-b-tooltip.hover title="Show Info">
-								<i class="fas fa-info-circle"></i></a>
+							<a @click="setSlide({show: true, type: 'ViewItem', data: item})" class="mr-2">
+								<i class="fas fa-info-circle"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Show info
+								</q-tooltip>
+							</a>
 							{{ item.name }}
 						</div>
-						<a class="gray-hover" 
-							v-b-tooltip.hover title="Copy Item" 
-							@click="copy(item)">
+						<a class="gray-hover" @click="copy(item)">
 							<i class="fas fa-copy blue"></i>
 							<span class="d-none d-md-inline ml-1">Copy</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Copy item
+							</q-tooltip>
 						</a>
 					</li>
 				</ul>
@@ -43,7 +48,6 @@
 						<!-- NAME -->
 						<label for="name">Name *</label>
 						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Name"
 							type="text" 
 							class="form-control mb-2" 
 							:class="{'input': true, 'error': errors.has('name') }" 
@@ -60,7 +64,6 @@
 						<!-- IMAGE -->
 						<label for="image">Image</label>
 						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="image"
 							type="text" 
 							class="form-control" 
 							:class="{'input': true, 'error': errors.has('image') }" 

@@ -35,28 +35,34 @@
 
 							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
 								<div 
-									v-b-tooltip.hover title="Vulnerable" 
 									@click="setDefense('v', index, key)"
 									:class="{red: target.defense === 'v'}"
 								>
 									<i class="fas fa-shield"></i>
 									<span>V</span>
+									<q-tooltip anchor="center right" self="center left">
+										Vulnerable
+									</q-tooltip>
 								</div>
 								<div 
-									v-b-tooltip.hover title="Resistant" 
 									@click="setDefense('r', index, key)"
 									:class="{green: target.defense === 'r'}"
 								>
 									<i class="fas fa-shield"></i>
 									<span>R</span>
+									<q-tooltip anchor="center right" self="center left">
+										Resistant
+									</q-tooltip>
 								</div>
 								<div 
-									v-b-tooltip.hover title="Immune" 
 									@click="setDefense('i', index, key)"
 									:class="{green: target.defense === 'i'}"
 								>
 									<i class="fas fa-shield"></i>
 									<span>I</span>
+									<q-tooltip anchor="center right" self="center left">
+										Immune
+									</q-tooltip>
 								</div>
 							</div>
 						</template>
@@ -76,28 +82,34 @@
 						</div>
 						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
 							<div
-								v-b-tooltip.hover title="No damage" 
-									@click="setIntensity(key, 0)"
+								@click="setIntensity(key, 0)"
 								:class="{blue: intensity[key] === 0}"
 							>
 								<i class="fas fa-circle"></i>
 								<span>0</span>
+								<q-tooltip anchor="center right" self="center left">
+									No damage
+								</q-tooltip>
 							</div>
 							<div
-								v-b-tooltip.hover title="Half damage" 
-									@click="setIntensity(key, .5)"
+								@click="setIntensity(key, .5)"
 								:class="{blue: intensity[key] === .5}"
 							>
 								<i class="fas fa-circle"></i>
 								<span>½</span>
+								<q-tooltip anchor="center right" self="center left">
+									Half damage
+								</q-tooltip>
 							</div>
 							<div
-								v-b-tooltip.hover title="Full damage" 
 								@click="setIntensity(key, 1)"
 								:class="{blue: intensity[key] === 1}"
 							>
 								<i class="fas fa-circle"></i>
 								<span>1</span>
+								<q-tooltip anchor="center right" self="center left">
+									Full damage
+								</q-tooltip>
 							</div>
 						</div>
 					</template>

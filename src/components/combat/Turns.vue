@@ -18,7 +18,12 @@
 				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 					<i class="far fa-desktop"></i> Track Settings
 				</a>
-				<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
+				<a v-if="demo" @click="reload">
+					<i class="far fa-sync-alt"></i> Reset encounter
+					<q-tooltip anchor="top middle" self="center middle">
+						Reset
+					</q-tooltip>
+				</a>
 				<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
 			</div>
 
@@ -54,10 +59,12 @@
 			</div>
 			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
 				@click="prevTurn()"
-				v-b-tooltip.hover title="[shift]+[arrowleft]"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()">
 				<i class="fas fa-arrow-left"></i> 
 				<span class="ml-1 d-none d-lg-inline">Prev turn</span>
+				<q-tooltip anchor="top middle" self="center middle">
+					[shift]+[arrow left]
+				</q-tooltip>
 			</a>
 			<template v-if="encounter.round === 0"> 
 				<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
@@ -68,9 +75,11 @@
 			</template>
 			<a v-else class="btn" 
 				@click="nextTurn()" 
-				v-b-tooltip.hover title="[shift]+[arrowright]"
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
 				<span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					[shift]+[arrow right]
+				</q-tooltip>
 			</a>
 		</div>
 	</div>

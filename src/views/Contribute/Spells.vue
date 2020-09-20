@@ -33,9 +33,11 @@
 									<a 
 										v-if="Object.keys(taggedSpell).length === 0"
 										@click="tag(data.row['.key'], data.row.name)"
-										v-b-tooltip.hover title="Tag"
 									>
 										<i class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Tag
+										</q-tooltip>
 									</a>
 								</div>
 							</hk-table>
@@ -59,31 +61,37 @@
 								<div slot="actions" slot-scope="data" class="actions">
 									<router-link 
 										:to="'/contribute/spells/' + data.row['.key']+'/edit'"
-										v-b-tooltip.hover title="Edit"
 									>
 										<i class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
 									</router-link>
-									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										v-b-tooltip.hover title="Preview">
+									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Preview
+										</q-tooltip>
 									</a>
-									<a 
-										@click="markDifficult(data.row)"
-										v-b-tooltip.hover title="Mark Difficult"
-									>
+									<a @click="markDifficult(data.row)">
 										<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Mark difficult
+										</q-tooltip>
 									</a>
 									<a 
 										@click="confirmFinish(data.row['.key'], data.row.name)"
-										v-b-tooltip.hover title="Finish"
 									>
 										<i class="fas fa-check"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Finish
+										</q-tooltip>
 									</a>
-									<a 
-										@click="unTag(data.row['.key'])"
-										v-b-tooltip.hover title="Untag"
-									>
+									<a @click="unTag(data.row['.key'])">
 										<i class="fas fa-times"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Untag
+										</q-tooltip>
 									</a>
 								</div>
 							</hk-table>
@@ -106,31 +114,35 @@
 								<div slot="actions" slot-scope="data" class="actions">
 									<router-link 
 										:to="'/contribute/spells/' + data.row['.key']+'/edit'"
-										v-b-tooltip.hover title="Edit"
 									>
 										<i class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
 									</router-link>
-									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })"
-										v-b-tooltip.hover title="Preview">
+									<a @click="setSlide({show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Preview
+										</q-tooltip>
 									</a>
-									<a 
-										@click="markDifficult(data.row)"
-										v-b-tooltip.hover title="Mark Difficult"
-									>
+									<a @click="markDifficult(data.row)">
 										<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Mark difficult
+										</q-tooltip>
 									</a>
-									<a 
-										@click="confirmFinish(data.row['.key'], data.row.name)"
-										v-b-tooltip.hover title="Finish"
-									>
+									<a @click="confirmFinish(data.row['.key'], data.row.name)">
 										<i class="fas fa-check"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Finish
+										</q-tooltip>
 									</a>
-									<a 
-										@click="unTag(data.row['.key'])"
-										v-b-tooltip.hover title="Untag"
-									>
+									<a @click="unTag(data.row['.key'])">
 										<i class="fas fa-times"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Mark difficult
+										</q-tooltip>
 									</a>
 								</div>
 							</hk-table>
@@ -158,22 +170,26 @@
 									><i class="fas fa-exclamation-triangle"></i></a>
 								</div>
 								<div slot="actions" slot-scope="data" class="actions">
-									<a v-if="isDifficult(data.row)"
-										@click="markDifficult(data.row)"
-										v-b-tooltip.hover title="Unmark Difficult"
-									>
+									<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">
 										<i class="fas fa-exclamation" :class="isDifficult(data.row) ? 'red' : ''"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Unmark difficult
+										</q-tooltip>
 									</a>
 									<router-link 
 										v-if="userInfo.admin"
 										:to="'/contribute/spells/' + data.row['.key']"
-										v-b-tooltip.hover title="Edit"
 									>
 										<i class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
 									</router-link>
-									<a @click="setSlide({ show: true, type: 'ViewSpell', data: data.row })"
-											v-b-tooltip.hover title="Preview">
+									<a @click="setSlide({ show: true, type: 'ViewSpell', data: data.row })">
 										<i class="fas fa-eye"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Preview
+										</q-tooltip>
 									</a>
 								</div>
 							</hk-table>

@@ -6,8 +6,18 @@
 				<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Leave</router-link>
 
 				<span class="right">
-					<a v-b-tooltip.hover title="Unfinish" @click="reset(hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
-					<a v-b-tooltip.hover title="Reset" @click="reset()"><i class="fas fa-undo"></i></a>
+					<a @click="reset(hard=false)">
+						<i class="fas fa-trash-restore-alt"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Unfinish
+						</q-tooltip>
+					</a>
+					<a @click="reset()">
+						<i class="fas fa-undo"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Reset
+						</q-tooltip>
+					</a>
 				</span>
 			</div>
 			<b-row>

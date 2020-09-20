@@ -6,7 +6,12 @@
 				
 				<h3>We hope you were impressed by the possibilities</h3>
 				<p>This is exactly how you can run your custom created encounters in our app. With your own players, and monsters from the SRD or created by you.</p>
-				<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
+				<a @click="reload">
+					<i class="far fa-sync-alt"></i> Reset encounter
+					<q-tooltip anchor="top middle" self="center middle">
+						Reset
+					</q-tooltip>
+				</a>
 		
 				<template slot="footer">
 					<router-link class="btn btn-block btn-lg bg-green" to="/sign-up">Create Account Now</router-link>

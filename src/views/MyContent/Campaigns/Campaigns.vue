@@ -72,25 +72,31 @@
 								<i 
 									v-if="!campaign.private" 
 									class="fas fa-eye green"
-									v-b-tooltip.hover
-									title="Public campaign"
-								></i>
-								<i 
-									v-else class="fas fa-eye-slash red"
-									v-b-tooltip.hover
-									title="Private campaign"
-								></i>
+								>
+									<q-tooltip anchor="top middle" self="center middle">
+											Public campaign
+										</q-tooltip>
+								</i>
+								<i v-else class="fas fa-eye-slash red">
+									<q-tooltip anchor="top middle" self="center middle">
+											Private campaign
+										</q-tooltip>
+								</i>
 
-								<router-link class="text-capitalize gray-hover" 
-									:to="'/campaigns/' + campaign.key" 
-									v-b-tooltip.hover title="Edit">
+								<router-link class="text-capitalize gray-hover" :to="'/campaigns/' + campaign.key">
 										<i class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
 								</router-link>
-								<a v-b-tooltip.hover 
-									title="Delete" 
+								<a
 									class="gray-hover text-capitalize"
-									@click="confirmDelete(campaign.key, campaign.campaign)">
+									@click="confirmDelete(campaign.key, campaign.campaign)"
+								>
 										<i class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
 								</a>
 							</span>
 						</div>
@@ -99,15 +105,18 @@
 							<div v-else class="advancement">Milestone</div>
 							<b-row>
 								<b-col>
-									<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
+									<router-link :to="'/campaigns/' + campaign.key">
 										<i class="fas fa-users"></i><br/>
 										<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
 										<template v-else> Add</template>
+										<q-tooltip anchor="top middle" self="center middle">
+											Players
+										</q-tooltip>
 									</router-link>
 								</b-col>
 
 								<b-col>
-										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
+										<router-link :to="'/encounters/' + campaign.key">
 										<i class="fas fa-swords"></i><br/>
 										<template v-if="allEncounters && allEncounters[campaign.key]">
 											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
@@ -118,6 +127,9 @@
 											<template v-else>{{ tier.benefits.encounters }}</template>
 										</template>
 										<template v-else> Create</template>
+										<q-tooltip anchor="top middle" self="center middle">
+											Encounters
+										</q-tooltip>
 									</router-link>
 								</b-col>
 							</b-row>

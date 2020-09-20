@@ -14,7 +14,12 @@
 			<template v-for="item in foundItems">
 				<div class="name" :key="`name-${item.key}`">
 					{{ item.name }}
-					<span v-if="item.custom" class="ml-1 blue font-weight-bol"  v-b-tooltip.hover title="Custom Item">C</span>
+					<span v-if="item.custom" class="ml-1 blue font-weight-bol">
+						C
+						<q-tooltip anchor="top middle" self="center middle">
+							Custom item
+						</q-tooltip>
+					</span>
 				</div>
 				<div class="link" :key="`link-${item.key}`">
 					<a @click="linkItem(item.key)"><i class="fas fa-link"></i></a>

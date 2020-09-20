@@ -7,8 +7,11 @@
 		</p>
 		
 		<div v-if="controlUser">
-			<a @click="removeControl()" v-b-tooltip.hover title="Remove Control">
+			<a @click="removeControl()">
 				<i class="fas fa-times red"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Remove control
+				</q-tooltip>
 			</a> 
 			Control given to <span class="green">{{ controlUser.username }}</span> ({{ controlUser.email }}).
 		</div>

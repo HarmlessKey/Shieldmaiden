@@ -4,8 +4,11 @@
 		<div v-if="currentValue >= maxCurrencyAmount" class="red text-center mb-2">Max amount reached</div>
 		<div class="currency">
             <div v-for="(coin, key) in currencies" :key="key">
-                <span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
+                <span class="coins" :class="coin.color">
                     <img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+										<q-tooltip anchor="top middle" self="center middle">
+											{{ coin.name }}
+										</q-tooltip>
                   </span>
                 <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="add[key]" :placeholder="coin.name"/>
             </div>

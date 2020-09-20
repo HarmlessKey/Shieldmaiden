@@ -7,14 +7,16 @@
 			<div v-for="(player, key) in campaign.players" 
 			:key="key"
 			@click="add(key, 'player', players[key].character_name)" 
-			v-b-tooltip.hover 
-			:title="'Add ' + players[key].character_name">
+		>
 			<div class="d-flex justify-content-left">
 				<template v-if="checkPlayer(key) < 0">
 					<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
 					<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 				</template>
 			</div>
+			<q-tooltip anchor="top middle" self="center middle">
+				Add {{ players[key].character_name }}
+			</q-tooltip>
 		</div>
 
 		<div v-if="campaign && campaign.players === undefined">
@@ -48,12 +50,18 @@
 	<!-- ACTIONS -->
 	<div slot="actions" slot-scope="data">
 		<div class="monster-actions">
-			<b-form-input class="multi_nr" autocomplete="off" v-b-tooltip.hover title="Add multiple npc's at once" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.row['.key']]" />
-			<a v-b-tooltip.hover title="Add with average HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
+			<b-form-input class="multi_nr" autocomplete="off" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.row['.key']]" />
+			<a @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Add with average HP
+				</q-tooltip>
 			</a>
-			<a v-b-tooltip.hover title="Add and roll HP" @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
+			<a @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
 				<i class="fas fa-dice-d20"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Add with rolled HP
+				</q-tooltip>
 			</a>
 		</div>
 	</div>

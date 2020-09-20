@@ -77,10 +77,11 @@
 
 								<div v-else class="actions bg-gray">
 									<a class="gray-hover"
-									v-b-tooltip.hover 
-									title="Add Character" 
 									@click="addPlayer(key)">
 										<i class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add character
+										</q-tooltip>
 									</a>
 								</div>
 								
@@ -103,8 +104,11 @@
 									</div>
 									
 									<div class="actions bg-gray">
-										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key)">
+										<a class="gray-hover" @click="removePlayer(key)">
 											<i class="fas fa-minus"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Remove character
+											</q-tooltip>
 										</a>
 									</div>
 									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>

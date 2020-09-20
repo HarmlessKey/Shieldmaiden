@@ -26,11 +26,12 @@
 								v-for="(player, key) in campaign.players" 
 								:key="key"
 								class="img"
-								v-b-tooltip.hover
-								:title="player.character_name"
 							>
 								<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
 								<img v-else src="@/assets/_img/styles/player.svg" />
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ player.character_name }}
+								</q-tooltip>
 							</div>
 						</div>
 

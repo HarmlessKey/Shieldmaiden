@@ -10,9 +10,7 @@
 			<li v-for="(setting, key) in general" class="d-flex justify-content-between" :key="key">
 				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
-					<a v-for="option in setting.options" 
-						v-b-tooltip.hover 
-						:title="[ option.value == player[key] ? option.name : option.action ]" 
+					<a v-for="option in setting.options"
 						:key="option.name" 
 						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
 						:class="[ option.value == player[key] ? option.color : 'gray-light' ]">
@@ -21,6 +19,9 @@
 								<template v-if="option.value != player[key]">{{ option.action }}</template>
 							</span>
 							<i :class="option.icon"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ option.value == settings[key] ? option.name : option.action }}
+							</q-tooltip>
 					</a>
 				</div>
 			</li>
@@ -32,16 +33,18 @@
 				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
 					<a v-for="option in setting.options" 
-						v-b-tooltip.hover 
-						:title="[ option.value == npc[key] ? option.name : option.action ]" 
 						:key="option.name" 
 						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
-						:class="[ option.value == npc[key] ? option.color : 'gray-light' ]">
+						:class="[ option.value == npc[key] ? option.color : 'gray-light' ]"
+					>
 							<span class="d-none d-md-inline mr-1">
 								<template v-if="option.value == npc[key]">{{ option.name }}</template>
 								<template v-if="option.value != npc[key]">{{ option.action }}</template>
 							</span>
 							<i :class="option.icon"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ option.value == settings[key] ? option.name : option.action }}
+							</q-tooltip>
 					</a>
 				</div>
 			</li>
@@ -53,16 +56,18 @@
 				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
 				<div>
 					<a v-for="option in setting.options" 
-						v-b-tooltip.hover 
-						:title="[ option.value == player[key] ? option.name : option.action ]" 
 						:key="option.name" 
 						@click="setSetting(setting.entity, key, option.value)" class="ml-2"
-						:class="[ option.value == player[key] ? option.color : 'gray-light' ]">
+						:class="[ option.value == player[key] ? option.color : 'gray-light' ]"
+					>
 							<span class="d-none d-md-inline mr-1">
 								<template v-if="option.value == player[key]">{{ option.name }}</template>
 								<template v-if="option.value != player[key]">{{ option.action }}</template>
 							</span>
 							<i :class="option.icon"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ option.value == settings[key] ? option.name : option.action }}
+							</q-tooltip>
 					</a>
 				</div>
 			</li>

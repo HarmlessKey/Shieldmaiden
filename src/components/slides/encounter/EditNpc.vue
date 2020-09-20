@@ -109,9 +109,12 @@
 			<hr>
 			<span class="justify-content-between d-flex">
 				<h2 class="mb-0">Display Override</h2>
-				<a v-b-tooltip.hover title="clear display overrides" @click="clearOverrides()" class="red">
+				<a @click="clearOverrides()" class="red">
 					<span class="mr-1 small">clear</span>
 					<i class="fas fa-broom small"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Clear display overrides
+					</q-tooltip>
 				</a>
 			</span>
 
@@ -121,8 +124,6 @@
 					<div>
 
 						<a v-for="option in setting.options"
-							v-b-tooltip.hover 
-							:title="[ isActive(key, option) ? option.name : option.action ]" 
 							:key="option.name" 
 							@click="setSetting(key, option.value)" class="ml-2"
 							:class="[ isActive(key, option) ? option.color : 'gray-light' ]">
@@ -131,6 +132,9 @@
 									<template v-else>{{ option.action }}</template>
 								</span>
 								<i :class="option.icon"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ isActive(key, option) ? option.name : option.action }}
+								</q-tooltip>
 						</a>
 					</div>
 				</li>

@@ -14,8 +14,18 @@
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
 										<template v-if="Object.keys(current.saves).length == n">
-											<a v-show="current.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
-											<a v-show="current.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-times"></i></a>
+											<a v-show="current.saves[n] === 'succes'" class="green" @click="save('unset', n)">
+												<i class="fas fa-check"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Change
+												</q-tooltip>
+											</a>
+											<a v-show="current.saves[n] === 'fail'" class="red" @click="save('unset', n)">
+												<i class="fas fa-times"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Change
+												</q-tooltip>
+											</a>
 										</template>
 										<template v-else>
 											<span v-show="current.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
@@ -35,7 +45,12 @@
 						
 						<template v-else>
 							<div class="health">
-								<span v-if="current.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
+								<span v-if="current.hidden" class="img">
+									<i class="fas fa-eye-slash red"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Hidden
+									</q-tooltip>
+								</span>
 								<template v-else>
 									<icon v-if="['monster', 'player', 'companion'].includes(current.img)" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
 									<span 
@@ -80,10 +95,18 @@
 											'green': entities[key].ac_bonus > 0, 
 											'red': entities[key].ac_bonus < 0 
 										}" 
-										v-b-tooltip.hover :title="'Armor Class + ' + entities[key].ac_bonus" v-if="entities[key].ac_bonus">
+										v-if="entities[key].ac_bonus">
 										{{ displayStats(entities[key]).ac + entities[key].ac_bonus}}
+										<q-tooltip anchor="top middle" self="center middle">
+											Armor class + {{ entities[key].ac_bonus }}
+										</q-tooltip>
 									</span>
-									<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(entities[key]).ac }}</span>
+									<span class="ac" v-else>
+										{{ displayStats(entities[key]).ac }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Armor class
+										</q-tooltip>
+									</span>
 									<div class="progress health-bar">
 										<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
 										<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>

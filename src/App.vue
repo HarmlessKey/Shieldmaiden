@@ -15,8 +15,11 @@
 				<a @click="hideSlide()" 
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
-					v-b-tooltip:hover title="Hide [esc]">
+				>
 					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
+					<q-tooltip anchor="bottom middle" self="center middle">
+						Hide [esc]
+					</q-tooltip>
 				</a>
 				<div class="content" :class="slide.classes">
 					<Slide />

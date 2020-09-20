@@ -8,7 +8,12 @@
 				<div class="">
 					<h3>
 						Demo Encounter 
-						<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i></a>
+						<a @click="reload">
+							<i class="far fa-sync-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Reset
+							</q-tooltip>
+						</a>
 					</h3>
 					This demo encounter has all the functionality our encounter tracker has. If you create an account you can make your own encounters and run them just like this, but with your custom content.<br/>
 					Create your personal account now and run your D&D encounters smoother than ever.

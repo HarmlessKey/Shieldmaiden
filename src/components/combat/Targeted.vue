@@ -4,38 +4,52 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})"
-					v-b-tooltip.hover title="Untarget all">
+				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})">
 					<i class="fas fa-times red"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Untarget all
+					</q-tooltip>
 				</a>
 			</div>
 
 			<!-- SINGLE TARGET OPTIONS -->
 			<div class="options d-flex justify-content-between" v-if="target">
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })"
-					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })"
-					v-b-tooltip.hover title="[d] Do Damage / Healing">
+					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })">
 					<span class="icon"><i class="fas fa-swords"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[d] Do damage / healing
+					</q-tooltip>
 				</a>
 				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
-					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
-					v-b-tooltip.hover title="[c] Conditions">
+					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})">
 					<span class="icon"><i class="fas fa-flame"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[c] Conditions
+					</q-tooltip>
 				</a>
 				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
-					v-b-tooltip.hover title="[m] Reminders">
+				>
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[m] Reminders
+					</q-tooltip>
 				</a>
 				<a @click="setSlide({show: true, type: 'slides/Transform', data: target })"
 					v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: target })"
-					v-b-tooltip.hover title="[t] Transform">
+				>
 					<span class="icon"><i class="fas fa-paw-claws"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[t] transform
+					</q-tooltip>
 				</a>
 				
-				<a @click="edit(target.key, target.entityType)"
-					v-b-tooltip.hover title="[e] Edit">
+				<a @click="edit(target.key, target.entityType)">
 					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[e] Edit
+					</q-tooltip>
 				</a>
 			</div>
 
@@ -43,21 +57,29 @@
 			<div class="options d-flex justify-content-between" v-else-if="targeted.length > 0">
 				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
 					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
-					v-b-tooltip.hover title="[d] Do Damage / Healing">
+				>
 					<span class="icon"><i class="fas fa-swords"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[d] Do damage / healing
+					</q-tooltip>
 				</a>
 				<a 
 					@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
 					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
-					v-b-tooltip.hover title="[c] Conditions">
+				>
 					<span class="icon"><i class="fas fa-flame"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[c] Conditions
+					</q-tooltip>
 				</a>
 				<a 
 					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
 					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
-					v-b-tooltip.hover title="[m] Reminders"
 				>
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[m] Reminders
+					</q-tooltip>
 				</a>
 			</div>
 		</h2>
@@ -71,8 +93,18 @@
 								<div class="px-1 my-3 d-flex justify-content-between">
 									<div v-for="(n, index) in 5" :key="index">
 										<template v-if="Object.keys(target.saves).length == n">
-											<a v-show="target.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
-											<a v-show="target.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-times"></i></a>
+											<a v-show="target.saves[n] === 'succes'" class="green" @click="save('unset', n)">
+												<i class="fas fa-check"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Undo
+												</q-tooltip>
+											</a>
+											<a v-show="target.saves[n] === 'fail'" class="red" @click="save('unset', n)">
+												<i class="fas fa-times"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Undo
+												</q-tooltip>
+											</a>
 										</template>
 										<template v-else>
 											<span v-show="target.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
@@ -152,9 +184,11 @@
 										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
 									</div>
 								</div>
-								<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})"
-									v-b-tooltip.hover title="Untarget">
+								<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})">
 									<i class="fas fa-times red"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Untarget
+									</q-tooltip>
 								</a>
 							</div>
 							<div class="scores">
@@ -167,18 +201,22 @@
 										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 										<div 
 											class="mod bg-gray-dark"
-											v-b-tooltip.hover title="Roll Check"
 											@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
 										>
 											{{ modifier(entities[key][ability.ability]) }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Roll check
+											</q-tooltip>
 										</div>
 										<div 
 											class="mod bg-gray-dark"
-											v-b-tooltip.hover title="Roll Save"
 											v-if="entities[key].entityType === 'npc'"
 											@click="rollD(20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${ability.ability} save`)"
 										>
 											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Roll save
+											</q-tooltip>
 										</div>
 									</div>
 								</template>

@@ -4,11 +4,13 @@
 			<span><i class="fas fa-bell"/> Notifications <template v-if="notifications">( {{ notifications.length }} )</template></span>
 			<a 
 				class="gray-light text-capitalize" 
-				v-b-tooltip.hover title="Add Notification" 
 				@click="add_notification()"
 			>
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
+				<q-tooltip anchor="center right" self="center left">
+					Add notification
+				</q-tooltip>
 			</a>
 		</h2>
 		<template v-for="(notification, not_index) in notifications">
@@ -18,10 +20,11 @@
 						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(not_index) + 1}}. {{ notification.reminder.title }}
 					</div>
-					<a @click="remove_notification(not_index)"
-						class="gray-hover text-capitalize"
-						v-b-tooltip.hover title="Remove">
+					<a @click="remove_notification(not_index)" class="gray-hover text-capitalize">
 						<i class="fas fa-trash-alt red"></i>
+						<q-tooltip anchor="center right" self="center left">
+							Remove
+						</q-tooltip>
 					</a>
 				</div>
 				<b-collapse visible :id="'accordion-'+not_index" accordion="my-accordion">
@@ -100,9 +103,11 @@
 												<a 
 													v-if="level_tier_addable(not_index, key)"
 													class="gray-hover text-capitalize" 
-													v-b-tooltip.hover title="Add Level Tier" 
 													@click="add_level_tier(not_index, key)">
 														<i class="fas fa-plus green"></i>
+														<q-tooltip anchor="center right" self="center left">
+															Add level tier
+														</q-tooltip>
 												</a>
 											</label>
 											<template v-if="notification.scaling && notification.scaling[key]">
@@ -139,10 +144,11 @@
 																@keyup="$forceUpdate()"
 																></b-form-input>
 
-																<a @click="remove_level_tier(not_index, tier_index, key)"
-																	class="remove"
-																	v-b-tooltip.hover title="Remove">
+																<a @click="remove_level_tier(not_index, tier_index, key)" class="remove">
 																	<i class="fas fa-trash-alt red"></i>
+																	<q-tooltip anchor="center right" self="center left">
+																		Remove
+																	</q-tooltip>
 																</a>
 														</div>
 													</b-col>

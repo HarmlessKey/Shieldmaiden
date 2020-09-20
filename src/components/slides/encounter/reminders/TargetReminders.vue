@@ -9,9 +9,12 @@
 		<hr>
 		<b-row v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="current justify-content-start px-3">
 			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
-				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
+				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Remove {{ reminder.title }}
+					</q-tooltip>
 				</a>
 			</b-col>
 		</b-row>
@@ -47,7 +50,12 @@
 						class="d-flex justify-content-between"
 						:class="'bg-'+reminder.color">
 						<div class="title">{{ reminder.title }}</div>
-						<a class="green add" v-b-tooltip.hover title="Set" @click="addReminder('premade', reminder)"><i class="fas fa-plus"></i></a>
+						<a class="green add" @click="addReminder('premade', reminder)">
+							<i class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Set
+							</q-tooltip>
+						</a>
 					</li>
 				</ul>
 
@@ -57,12 +65,11 @@
 						<li v-for="(reminder, key) in personalReminders" :key="key">
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
-								<a 
-									class="add"
-									v-b-tooltip.hover title="Set" 
-									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
-								>
+								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
 									<i :class="reminder.variables ? 'fas fa-caret-right gray-light' : 'fas fa-plus green'"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set
+									</q-tooltip>
 								</a>
 							</div>
 							<div v-if="varOptions === key" class="variables">

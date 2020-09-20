@@ -12,16 +12,18 @@
 					</span>
 					<div>
 						<a v-for="option in setting.options" 
-							v-b-tooltip.hover 
-							:title="[ option.value == settings[key] ? option.name : option.action ]" 
 							:key="option.name" 
 							@click="setSetting(key, option.value)" class="ml-2"
-							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]">
+							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]"
+						>
 								<span class="d-none d-md-inline mr-1">
 									<template v-if="option.value == settings[key]">{{ option.name }}</template>
 									<template v-if="option.value != settings[key]">{{ option.action }}</template>
 								</span>
 								<i :class="option.icon"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ option.value == settings[key] ? option.name : option.action }}
+								</q-tooltip>
 						</a>
 					</div>
 				</div>

@@ -4,9 +4,12 @@
 	<div class="pb-5" v-if="entity && !demo">
 		<h2 class="d-flex justify-content-between">
 			<span>Edit {{ playerBase.character_name }}</span>
-			<a v-b-tooltip.hover title="Transform" @click="setTransform = !setTransform">
+			<a @click="setTransform = !setTransform">
 				<i v-if="setTransform" class="fas fa-times red"></i>
 				<i v-else class="fas fa-paw-claws green"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Transform
+				</q-tooltip>
 			</a>
 		</h2>
 		
@@ -35,8 +38,18 @@
 				<div class="px-1 my-3 d-flex justify-content-between">
 					<div v-for="(n, index) in 5" :key="index">
 						<template v-if="Object.keys(entity.saves).length === n">
-							<a v-show="entity.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="set_save('unset', n)"><i class="fas fa-check"></i></a>
-							<a v-show="entity.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="set_save('unset', n)"><i class="fas fa-times"></i></a>
+							<a v-show="entity.saves[n] === 'succes'" class="green" @click="set_save('unset', n)">
+								<i class="fas fa-check"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Change
+								</q-tooltip>
+							</a>
+							<a v-show="entity.saves[n] === 'fail'" class="red" @click="set_save('unset', n)">
+								<i class="fas fa-times"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Change
+								</q-tooltip>
+							</a>
 						</template>
 						<template v-else>
 							<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>

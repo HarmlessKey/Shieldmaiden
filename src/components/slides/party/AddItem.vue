@@ -33,7 +33,12 @@
 				<i class="far fa-link mr-2"></i>
 				<span>{{ items[item.linked_item].name }}</span>
 			</div>
-			<a v-b-tooltip.hover title="Unlink" @click="item.linked_item = null"><i class="fas fa-unlink red ml-2"></i></a>
+			<a @click="item.linked_item = null">
+				<i class="fas fa-unlink red ml-2"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Unlink
+				</q-tooltip>
+			</a>
 		</div>
 
 		<a class="btn mb-3" @click="addItem" :disabled="errors.items && errors.items.length > 0">Add</a>
@@ -51,7 +56,12 @@
 			<template v-for="item in foundItems">
 				<div class="name" :key="`name-${item.key}`">
 					{{ item.name }}
-					<span v-if="item.custom" class="ml-1 blue font-weight-bol"  v-b-tooltip.hover title="Custom Item">C</span>
+					<span v-if="item.custom" class="ml-1 blue font-weight-bol">
+						C
+						<q-tooltip anchor="top middle" self="center middle">
+							Custom item
+						</q-tooltip>
+					</span>
 				</div>
 				<div class="link" :key="`link-${item.key}`">
 					<a @click="linkItem(item.key)"><i class="fas fa-link"></i></a>

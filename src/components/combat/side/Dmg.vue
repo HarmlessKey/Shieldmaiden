@@ -12,8 +12,11 @@
 					}"/>
 				<div class="progress health-bar">
 					<div class="info">
-						<span class="name" v-b-tooltip.hover :title="entity.name">
+						<span class="name">
 							{{ entity.name }}.
+							<q-tooltip anchor="center right" self="center left">
+								{{ entity.name }}
+							</q-tooltip>
 						</span>
 						<b class="numbers">
 							<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>

@@ -214,30 +214,36 @@
 						</div>
 						<div 
 							class="option"
-							v-b-tooltip.hover title="Vulnerable" 
 							@click="setDefense(type, 'v')"
 							:class="{red: resistances[type] === 'v'}"
 						>
 							<i class="fas fa-shield"></i>
 							<span>V</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Vulnerable
+							</q-tooltip>
 						</div>
 						<div 
 							class="option"
-							v-b-tooltip.hover title="Resistant" 
 							@click="setDefense(type, 'r')"
 							:class="{green: resistances[type] === 'r'}"
 						>
 							<i class="fas fa-shield"></i>
 							<span>R</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Resistant
+							</q-tooltip>
 						</div>
 						<div 
 							class="option"
-							v-b-tooltip.hover title="Immune" 
 							@click="setDefense(type, 'i')"
 							:class="{green: resistances[type] === 'i'}"
 						>
 							<i class="fas fa-shield"></i>
 							<span>I</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Immune
+							</q-tooltip>
 						</div>
 
 					</div>

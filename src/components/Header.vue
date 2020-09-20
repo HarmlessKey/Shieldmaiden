@@ -17,28 +17,37 @@
 			</div>
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">
-					<a href="https://discord.gg/fhmKBM7" target="_blank" v-b-tooltip.hover title="Discord" class="icon"><i class="fab fa-discord"></i></a>
-					<!-- <a href="https://www.patreon.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Patreon" class="icon"><i class="fab fa-patreon patreon-red"></i></a>
-					<a href="https://www.facebook.com/harmlesskey" target="_blank" v-b-tooltip.hover title="Facebook" class="icon"><i class="fab fa-facebook-f"></i></a>
-					<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" v-b-tooltip.hover title="Reddit" class="icon"><i class="fab fa-reddit-alien"></i></a>
-					<router-link v-if="user" class="icon" to="/feedback" v-b-tooltip.hover title="Give Feedback"><i class="fas fa-comment-alt"></i></router-link> -->
+					<a href="https://discord.gg/fhmKBM7" target="_blank" class="icon">
+					<i class="fab fa-discord"></i>
+					<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+						Discord
+					</q-tooltip>
+				</a>
 				</div>
 				<div class="area d-flex justify-content-end">
-					<a class="icon" 
-						v-b-tooltip.hover 
-						title="Compendium"  
-						@click="setSlide({show: true, type: 'slides/Compendium'})"><i class="fas fa-book-spells"></i></a>
+					<a class="icon"
+						@click="setSlide({show: true, type: 'slides/Compendium'})">
+						<i class="fas fa-book-spells"></i>
+						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+							Compendium
+						</q-tooltip>
+					</a>
 					<a 
 						v-if="user"
 						class="icon" 
-						v-b-tooltip.hover 
-						title="Player Link"  
-						@click="setSlide({show: true, type: 'PlayerLink'})"><i class="fas fa-link"></i></a>
-					<a class="icon roll" 
-						v-b-tooltip.hover 
-						title="Dice Roller"  
+						@click="setSlide({show: true, type: 'PlayerLink'})">
+						<i class="fas fa-link"></i>
+						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+							Player link
+						</q-tooltip>
+					</a>
+					<a class="icon roll"
 						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/Roll'})"
-						@click="setSlide({show: true, type: 'slides/Roll'})"></a>
+						@click="setSlide({show: true, type: 'slides/Roll'})">
+						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+							Dice roller
+						</q-tooltip>
+						</a>
 				</div>
 				<div v-if="user">
 					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  

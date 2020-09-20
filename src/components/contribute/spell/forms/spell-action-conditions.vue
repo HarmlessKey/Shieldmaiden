@@ -4,11 +4,13 @@
 			<span><i class="fas fa-flame"/> Conditions <template v-if="conditions">( {{conditions.length }} )</template></span>
 			<a 
 				class="gray-light text-capitalize" 
-				v-b-tooltip.hover title="Add Condition" 
 				@click="add_condition()"
 			>
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
+				<q-tooltip anchor="center right" self="center left">
+					Add condition
+				</q-tooltip>
 			</a>
 		</h2>
 		<template v-for="(condition, con_index) in conditions">
@@ -18,10 +20,11 @@
 						<div class="caret blue"><i class="fas fa-caret-down" /></div>
 						{{parseInt(con_index) + 1}}. {{ condition.condition }}
 					</div>
-					<a @click="remove_condition(con_index)"
-						class="gray-hover text-capitalize"
-						v-b-tooltip.hover title="Remove">
+					<a @click="remove_condition(con_index)" class="gray-hover text-capitalize">
 						<i class="fas fa-trash-alt red"></i>
+						<q-tooltip anchor="center right" self="center left">
+							Remove
+						</q-tooltip>
 					</a>
 				</div>
 				<b-collapse visible :id="'accordion-'+con_index" accordion="my-accordion">
@@ -164,10 +167,11 @@
 										<a 
 										v-if="level_tier_addable(con_index)"
 										class="gray-hover text-capitalize" 
-										v-b-tooltip.hover title="Add Level Tier" 
 										@click="add_level_tier(con_index)">
 											<i class="fas fa-plus green"></i>
-											<!-- <span class="d-none d-md-inline ml-1">Add</span> -->
+											<q-tooltip anchor="center right" self="center left">
+												Add level tier
+											</q-tooltip>
 										</a>
 								</h2>
 								<template v-for="(level_tier, tier_index) in condition.level_tiers">
@@ -232,10 +236,11 @@
 													@keyup="$forceUpdate()"
 													></b-form-input>
 
-													<a @click="remove_level_tier(con_index, tier_index)"
-														class="remove"
-														v-b-tooltip.hover title="Remove">
+													<a @click="remove_level_tier(con_index, tier_index)" class="remove">
 														<i class="fas fa-trash-alt red"></i>
+														<q-tooltip anchor="center right" self="center left">
+															Remove
+														</q-tooltip>
 													</a>
 											</div>
 										</b-col>

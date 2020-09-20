@@ -2,29 +2,36 @@
 	<div>
 		<div class="target">
 			<!-- INITIATIVE -->
-			<span class="initiative" v-b-tooltip.hover title="Initiative">
+			<span class="initiative">
 				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
 				<template v-else>{{ entity.initiative }}</template>
+				<q-tooltip anchor="top middle" self="center middle">
+					Initiative
+				</q-tooltip>
 			</span>
 
 			<!-- HIDDEN -->
 			<span 
 				v-if="entity.hidden" 
 				class="img" 
-				v-b-tooltip.hover title="Hidden"
 				:style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 			>
 				<i class="fas fa-eye-slash red" />
+				<q-tooltip anchor="top middle" self="center middle">
+					Hidden
+				</q-tooltip>
 			</span>
 
 			<!-- TRANSFORMED -->
 			<span 
 				v-else-if="entity.transformed == true" 
 				class="img" 
-				v-b-tooltip.hover title="Transformed"
 				:style="entity.color_label ? `border-color: ${entity.color_label}; color: ${entity.color_label}` : ``"
 			>
 				<i class="fas fa-paw-claws" />
+				<q-tooltip anchor="top middle" self="center middle">
+					Transformed
+				</q-tooltip>
 			</span>
 
 			<!-- AVATAR -->
@@ -46,11 +53,18 @@
 						'green': entity.ac_bonus > 0,
 						'red': entity.ac_bonus < 0 
 					}" 
-					v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
 					v-if="entity.ac_bonus">
 					{{ displayStats().ac + entity.ac_bonus}}
+					<q-tooltip anchor="top middle" self="center middle">
+						Armor class + {{ entity.ac_bonus }}
+					</q-tooltip>
 				</span>
-				<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
+				<span class="ac" v-else>
+					{{ displayStats().ac }}
+					<q-tooltip anchor="top middle" self="center middle">
+						Armor class
+					</q-tooltip>
+				</span>
 			</div>
 
 			<!-- HEALT BAR -->
@@ -64,8 +78,11 @@
 						<div class="condition bg-red" 
 							v-for="(condition, key) in entity.conditions" 
 							:key="key" 
-							v-b-tooltip.hover :title="key"
-							@click="showCondition(key)"></div>
+							@click="showCondition(key)">
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ key }}
+							</q-tooltip>
+							</div>
 					</div>
 					<div class="progress-bar" :class="{ 
 						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
@@ -92,12 +109,18 @@
 										'green': entity.maxHpMod > 0, 
 										'red': entity.maxHpMod < 0 
 									}" 
-									v-b-tooltip.hover :title="'Max HP + ' + entity.maxHpMod">
+								>
 									{{ displayStats().maxHp }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Max HP + {{ entity.maxHpMod }}
+									</q-tooltip>
 								</span>
 							<template v-if="entity.tempHp">
-								<span class="gray-hover" v-b-tooltip.hover title="Temp HP">
+								<span class="gray-hover">
 									+{{ entity.tempHp }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Temp HP
+									</q-tooltip>
 								</span>
 							</template>
 						</span>
@@ -122,20 +145,26 @@
 				<div v-else class="text-right">
 					<span class="green" 
 						v-if="entity.addNextRound == true"
-						v-b-tooltip.hover title="Will be added next round"
 						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 						<i class="fas fa-check"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Will be added next round
+						</q-tooltip>
 					</span>
 					<span class="gray-hover" 
 						v-if="entity.addNextRound == false"
-						v-b-tooltip.hover title="Click to add next round"
 						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 						<i class="fas fa-check"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Click to add next round
+						</q-tooltip>
 					</span>
 					<span class="ml-2 gray-hover" 
-						v-b-tooltip.hover title="Add now"
 						@click="add_next_round({key: entity.key, action: 'set'})">
 						<i class="fas fa-plus"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Add now
+						</q-tooltip>
 					</span>
 				</div>
 			</template>
@@ -143,7 +172,10 @@
 
 		<!-- REMINDERS -->
 		<ul v-if="entity.reminders" class="reminders d-flex justify-content-start">
-			<li v-for="(reminder, index) in entity.reminders" :key="index" v-b-tooltip.hover :title="reminder.title" :class="'bg-'+reminder.color">
+			<li v-for="(reminder, index) in entity.reminders" :key="index" :class="'bg-'+reminder.color">
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ reminder.title }}
+				</q-tooltip>
 			</li>
 		</ul>
 	</div>

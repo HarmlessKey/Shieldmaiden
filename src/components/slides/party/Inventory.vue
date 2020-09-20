@@ -16,8 +16,11 @@
 			<div class="addCurrency" v-if="addCurrency">
 				<div class="currency">
 					<div v-for="(coin, key) in currencies" :key="key">
-						<span class="coins" :class="coin.color" v-b-tooltip.hover :title="coin.name">
+						<span class="coins" :class="coin.color">
 							<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ coin.name }}
+							</q-tooltip>
 						</span>
 						<b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="add[key]" :placeholder="coin.name"/>
 					</div>
@@ -55,19 +58,29 @@
 								red: !data.row.identified
 							}"
 							class="mr-1"
-							v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
 						>
 							<i class="far fa-link"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ data.row.identified ? 'Identified' : 'Not Identified' }}
+							</q-tooltip>
 						</a>
-						<span v-else class="gray-hover mr-1" v-b-tooltip.hover title="No linked item">
+						<span v-else class="gray-hover mr-1">
 							<i class="far fa-unlink"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								No linked item
+							</q-tooltip>
 						</span>
 						{{ data.item }}
 					</div>
 
 					<!-- ACTIONS -->
 					<div slot="actions" slot-scope="data" class="actions">
-						<a v-b-tooltip.hover title="Delete" class="ml-2" @click="deleteItem(data.row['.key'])"><i class="fas fa-trash-alt"></i></a>
+						<a class="ml-2" @click="deleteItem(data.row['.key'])">
+							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
+						</a>
 					</div>
 
 					<!-- COLLAPSE -->
@@ -85,11 +98,13 @@
 										green: data.row.identified,
 										red: !data.row.identified
 									}"
-									v-b-tooltip.hover :title="data.row.identified ? 'Identified' : 'Not Identified'"
 									
 								>
 									<i class="far fa-link"></i>
 									{{ data.row.full_linked_item.name }}
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ data.row.identified ? 'Identified' : 'Not Identified' }}
+									</q-tooltip>
 								</a>
 								<a data-toggle="collapse" class="collapsed" :href="`#full-item-${data.row.linked_item}`">
 									<i class="fas fa-caret-down"></i>

@@ -67,6 +67,7 @@
 				margin: 10px;
 				display: flex;
 				flex: 1 1 25%;
+				margin-bottom: 20px;
 				
 				.card-header {
 					font-family: 'Fredericka the Great', cursive;
@@ -81,7 +82,7 @@
 			.deck {
 				flex-wrap: wrap;
 
-				.card {
+				.hk-card {
 					flex-direction: column;
 					flex: 1 1 calc(50% - 20px);
 				}
@@ -91,7 +92,7 @@
 			.deck {
 				margin: 0;
 
-				.card {
+				.hk-card {
 					margin: 0;
 					flex: 1 1 100%;
 				}

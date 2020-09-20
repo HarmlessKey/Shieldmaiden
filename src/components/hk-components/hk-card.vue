@@ -1,23 +1,21 @@
 <template>
 	<div class="hk-card">
-		<div>
-			<slot name="image"/>
-			<slot name="header" class="card-header">
-				<div v-if="header" class="card-header">
-					{{ header }}
-				</div>
-			</slot>
-
-			<div class="card-body">
-				<slot/>
+		<slot name="image"/>
+		<slot name="header" class="card-header">
+			<div v-if="header" class="card-header">
+				{{ header }}
 			</div>
+		</slot>
 
-			<slot name="footer">
-				<div v-if="footer" class="card-footer">
-					{{ footer }}
-				</div>
-			</slot>
+		<div class="card-body">
+			<slot/>
 		</div>
+
+		<slot name="footer">
+			<div v-if="footer" class="card-footer">
+				{{ footer }}
+			</div>
+		</slot>
 	</div>
 </template>
 
@@ -39,6 +37,12 @@
 
 <style lang="scss" scoped>
 	.hk-card {
+		position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
 		background-color: #262626;
 		margin-bottom: 20px;
 		

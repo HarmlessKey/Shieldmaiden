@@ -638,6 +638,10 @@ html body {
 			line-height: 1.5;
 			border-radius: 0.3rem;
 		}
+		&.btn-block {
+			display: block;
+    	width: 100%;
+		}
 		&.bg-green:hover { background-color:$green-hover !important; }
 		&.bg-red:hover { background-color:$red-hover !important; }
 	}

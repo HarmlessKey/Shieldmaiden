@@ -50,7 +50,7 @@
 		data() {
 			return {
 				is_small: false,
-				copy: window.location.href + 'user/' + this.$store.getters.getUser.uid,
+				copy: window.origin + '/user/' + this.$store.getters.getUser.uid,
 			}
 		},
 		methods: {

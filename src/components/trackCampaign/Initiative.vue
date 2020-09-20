@@ -20,6 +20,7 @@
 							targets,
 							players,
 							campPlayers,
+							npcSettings,
 							npcs,
 							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
 							type: 'manual'

@@ -61,6 +61,7 @@
 				targeted: this.data.targeted,
 				players: this.data.players,
 				campPlayers: this.data.campPlayers,
+				npcSettings: this.data.npcSettings,
 				npcs: this.data.npcs,
 				player: this.data.characters[0]
 			}

@@ -580,6 +580,9 @@
 					margin-top: 3px;
 				}
 			}
+			.btn {
+				min-width: 55px;
+			}
 		}
 	}
 	.advantage {

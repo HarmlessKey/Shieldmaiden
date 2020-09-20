@@ -429,6 +429,7 @@
 				const players = Object.keys(this.players);
 				for(let key in this.campaign.players) {
 					if(!players.includes(key)) {
+						// eslint-disable-next-line
 						console.error('Ghost Player Removed: ', key);
 						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).remove();
 					}

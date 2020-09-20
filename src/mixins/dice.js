@@ -5,14 +5,18 @@ export const dice = {
 		}
 	},
 	watch: {
-		animateTrigger(newValue) {
+		animateTrigger() {
+			// eslint-disable-next-line
 			$('#roll').each(function () {
+				// eslint-disable-next-line
 				$(this).prop('Counter',0).animate({
+					// eslint-disable-next-line
 					Counter: $(this).text()
 				}, {
 					duration: 500,
 					easing: 'linear',
 					step: function (now) {
+						// eslint-disable-next-line
 						$(this).text(Math.ceil(now));
 					}
 				});

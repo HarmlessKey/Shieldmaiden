@@ -1671,124 +1671,34 @@ html body {
 		opacity: 0.25 !important;
 	}
 
-	/* 10. Elements overrides */
+	/* QUALSAR */
 	/*********************************************/
-	.el-steps {
-		margin-bottom: 30px;
-
-		.el-step {
-			.el-step__line {
-				background-color: $gray-light;
-			}
-			.el-step__icon {
-				background-color: $gray-dark;
-				color: $gray-light;
-			}
+	.q-field, .q-color-picker, .q-list {
+		.row {
+			margin-left: 0;
+			margin-right: 0;
 		}
 	}
-
-	.el-input {
-		.el-input__inner {
-				background-color: $gray-dark;
-				border-radius: 0;
-				border: none;
-		}
-	}
-
-	.el-select {
-		.el-select__tags {
-			.el-tag {
-				background-color: $gray-light;
-				color: $gray-dark;
-
-				.el-tag__close {
-					background-color: $gray;
-
-					&:hover {
-						background-color: $gray-dark;
-					}
-				}
-			}
-		}
-	}
-
-	.el-select-dropdown {
-
-	}
-
-	.el-switch {
-		.el-switch__label {
-			color: #b2b2b2;
-		}
-	}
-
-	.el-color-picker {
-		
-		&__trigger {
-			height: 38px !important;
-			width: 38px !important;
-			border-radius: 0 !important;
-			border-color: $gray-hover !important;
-			padding: 3px !important;
-		}
-		&__color {
-			border: none !important;
-		}
-	}
-
-	.el-color-dropdown {
-		&.el-color-picker {
-			&__panel {
-				border-color: $gray-hover;
-				border-radius: 0;
-				background-color: $gray-dark;
-
-				.el-color-predefine {
-					&__color-selector {
-						> div {
-							border-radius: 0;
-						}
-						&.selected {
-							border-radius: 0;
-							box-shadow: none;
-							border: solid 1px $white;
-						}
-					}
-				}
-			}
-		}
-		&__btns {
-			.el-color-dropdown__value {
-				.el-input__inner {
-					color: $gray-light;
-					background-color: $gray-darker;
-				}
-			}
-			.el-button {
-				&.el-color-dropdown__btn {
-					border: none;
-					border-radius: 0;
-					background-color: $blue;
-					color: $white;
-
-					&:hover {
-						background-color: $blue-hover;
-						color: $white;
-					}
-				}
-			}
-		}
-	}
-}
-
-/* QUALSAR */
-.q-field, .q-color-picker, .q-list {
-	.row {
+	.q-checkbox.row {
 		margin-left: 0;
 		margin-right: 0;
 	}
-}
-.q-checkbox.row {
-	margin-left: 0;
-	margin-right: 0;
+	.q-menu {
+		color: $gray-dark;
+		
+		.q-list {
+			.q-item {
+				&__section--avatar {
+					min-width: 35px;
+				}
+			}
+			a.q-item {
+				color:$gray-dark !important;
+		
+				&:hover {
+					color: $blue !important;
+				}
+			}
+		}
+	}		
 }

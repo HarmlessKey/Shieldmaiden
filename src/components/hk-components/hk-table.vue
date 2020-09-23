@@ -2,14 +2,14 @@
 	<div :class="classes" ref="table">
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
-						<div class="input-group mb-3">
-								<input type="text" autocomplete="off" v-model="searched" @keyup="searchData()" placeholder="Search" class="form-control"/>
-								<div class="input-group-append">
-										<button class="btn" @click="searchData()"><i class="fas fa-search"></i></button>
-								</div>
-						</div>
-			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
+			<div class="input-group mb-3">
+				<input type="text" autocomplete="off" v-model="searched" @keyup="searchData()" placeholder="Search" class="form-control"/>
+				<div class="input-group-append">
+						<button class="btn" @click="searchData()"><i class="fas fa-search"></i></button>
 				</div>
+			</div>
+			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
+		</div>
 		<!-- TABLE -->
 		<div 
 			v-if="!loading"
@@ -37,10 +37,9 @@
 								center: column.center,
 								right: column.right
 							}, column.classes]"
-							v-html="column.label"
-							:title="column.title"
 						>
-							<q-tooltip v-if="column.tooltip" anchor="center right" self="center left">
+							<span v-html="column.label"/>
+							<q-tooltip v-if="column.tooltip" anchor="top middle" self="center middle">
 								{{ column.tooltip }}
 							</q-tooltip>
 						</div>
@@ -53,7 +52,6 @@
 								center: column.center,
 								right: column.right
 							}, column.classes]"
-							:title="column.title"
 							@click="sort(key)"
 						>
 							<span v-html="column.label"></span>
@@ -61,7 +59,7 @@
 								<i class="fas fa-sort-up" :class="{ blue: !reverse && sortedBy === key }"></i>
 								<i class="fas fa-sort-down" :class="{ blue: reverse && sortedBy === key }"></i>
 							</span>
-							<q-tooltip v-if="column.tooltip" anchor="center right" self="center left">
+							<q-tooltip v-if="column.tooltip" anchor="top middle" self="center middle">
 								{{ column.tooltip }}
 							</q-tooltip>
 						</div>

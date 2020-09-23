@@ -1,279 +1,230 @@
 <template>
 	<div>
-		<b-row class="mb-3">
-			<b-col sm="3">
-				<label class="required" for="type">
-					Effect Type
-					<a 
-						v-if="effect.type"
-						class="ml-1"
-						v-b-popover.hover.top="effect_types[effect.type].info" 
-						:title="effect.type"
-					>
-						<i class="fas fa-info-circle"></i>
-					</a>
-				</label>
-				<b-form-select 
+		<div class="row mb-3">
+			<div class="col-12 col-md-3">
+				<q-select
+					dark filled square dense
+					emit-value
+       	 	map-options
+					label="Effect type"
 					v-model="effect.type"
 					v-validate="'required'"
-					id="type"
-					name="type"
+					:options="Object.values(effect_types)"
 				>
-					<option :value="undefined" disabled>- Effect type -</option>
-					<option v-for="({label}, key) in effect_types" :value="key" :key="`type-${key}`">
-						{{ label }}
-					</option>
-				</b-form-select>
+					<template v-slot:append>
+						<q-icon name="info" v-if="effect.type" @click.stop>
+							<q-menu square anchor="top middle" self="bottom middle" max-width="250px" v-if="effect.type">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>{{ effect.type.capitalize() }}</b>
+									</q-card-section>
+
+									<q-card-section>
+										{{ effect_types[effect.type].info }}
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</template>
+				</q-select>
 				<p class="validate red" v-if="errors.has('type')">{{ errors.first('type') }}</p>
 				<p v-if="effect.type" class="mt-2 px-2 d-block">
 				</p>
-			</b-col>
+			</div>
 			<template v-if="effect.type">
-				<b-col sm="3">
-					<label class="required" for="subtype">
-						Effect Subtype
-					</label>
-					<b-form-select 
+				<div class="col-12 col-md-3">
+					<q-select
+						dark filled square dense
+						emit-value
+						map-options
+						label="Effect subtype"
 						v-model="effect.subtype"
 						v-validate="'required'"
-						id="subtype"
-						name="subtype"
-					>
-						<option :value="undefined" disabled>- Effect subtype -</option>
-						<option v-for="({label}, value) in effect_subtypes[effect.type]" :value="value" :key="`type-${value}`">
-							{{ label }}
-						</option>
-					</b-form-select>
-				</b-col>
+						:options="Object.values(effect_subtypes[effect.type])"
+					/>
+				</div>
 
 				<!-- DURATION -->
-				<b-col sm="3">
-					<label for="duration_n">Duration</label>
-					<b-form-input 
+				<div class="col-12 col-md-3">
+					<q-input 
+						dark filled square dense
 						v-model="effect.duration"
+						label="Duration"
+						type="number"
 						autocomplete="off"
-						id="duration"
 						name="duration"
 						v-validate="'max:999'"
-						class="form-control mb-2"
+						class="mb-2"
 						title="Duration"
-						type="text"
 						data-vv-as="Duriation"
 					/>
-						<p class="validate red" v-if="errors.has('duration')">{{ errors.first('duration') }}</p>
-				</b-col>
+					<p class="validate red" v-if="errors.has('duration')">{{ errors.first('duration') }}</p>
+				</div>
 
 				<!-- DURATION SCALE -->
-				<b-col md="3">
-					<label for="duration_scale">Time Scale</label>
-					<b-form-select 
+				<div class="col-12 col-md-3">
+					<q-select
+						dark filled square dense
+						emit-value
+						map-options
+						label="Time scale"
 						v-model="effect.duration_scale"
-						id="duration_scale"
-						name="duration_scale"
-						title="Time Scale"
-						class="form-control mb-2"
-						data-vv-as="Duriation scale">
-						<option :value="undefined">- Time Scale -</option>
-						<option v-for="{ label, value } in dur_time"
-							:key="value" :value="value">{{ label }}</option>
-					</b-form-select>
-				</b-col>
+						:options="dur_time"
+					/>
+				</div>
 			</template>
-		</b-row>
-		<b-row>
+		</div>
+		<div class="row">
 			<!-- FORM WITH VALUES -->
 			<template v-if="hasField('values')">
 				<!-- DICE COUNT -->
-				<b-col md="3">
-					<label for="dice_count">Dice Count</label>
-					<b-form-input v-model="effect.dice_count"
+				<div class="col-12 col-md-3">
+					<q-input 
+						dark filled square dense
+						v-model="effect.dice_count"
+						label="Dice count"
 						autocomplete="off"
-						id="dice_count"
 						name="dice_count"
-						class="form-control mb-2"
+						class="mb-2"
 						title="Dice Count"
 						type="number"
 						data-vv-as="Dice Count"
 						@keyup="$forceUpdate()"
-						></b-form-input>
-				</b-col>
-				<b-col md="3">
-					<!-- EFFECT SUBTYPE -->
-					<label for="dice_type">Dice Type</label>
-					<b-form-select v-model="effect.dice_type"
-						id="dice_type"
-						name="dice_type"
-						title="Dice Type"
-						class="form-control mb-2"
-						data-vv-as="Dice Type"
-						@change="$forceUpdate()">
-						<option value="">-</option>
-						<option v-for="(val,i) in dice_type"
-							:key="i" :value="val.value">{{ val.label }}</option>
-					</b-form-select>
-				</b-col>
-				<b-col md="3">
+					/>
+				</div>
+				<div class="col-12 col-md-3">
+					<!-- EFFECT DICE TYPE -->
+					<q-select
+						dark filled square dense
+						emit-value
+						map-options
+						label="Dice type"
+						v-model="effect.dice_type"
+						:options="dice_type"
+						@change="$forceUpdate()"
+					/>
+				</div>
+				<div class="col-12 col-md-3">
 					<!-- EFFECT FIXED VALUE -->
-					<label for="fixed_val">
-						Fixed Value
-						<a 
-							class="ml-1"
-							v-b-popover.hover.top="'If the effect has a fixed number, set it here.'" 
-							title="Fixed value"
-						>
-							<i class="fas fa-info-circle"></i>
-						</a>
-					</label>
-					<b-form-input v-model="effect.fixed_val"
+					<q-input 
+						dark filled square dense
+						label="Fixed value"
+						v-model="effect.fixed_val"
 						autocomplete="off"
 						id="fixed_val"
 						name="fixed_val"
-						class="form-control mb-2"
-						title="Fixed Value"
+						class="mb-2"
 						type="number"
 						data-vv-as="Fixed Value"
 						@keyup="$forceUpdate()"
-					/>
-				</b-col>
-				<b-col md="3">
-					<label for="primary">
-						<span>Primary Stat</span>
-						<a 
-							class="ml-1"
-							v-b-popover.hover.top="'Select this if the primary ability modifier is added as a fixed for the effect.'" 
-							title="Primary Stat"
-						>
-							<i class="fas fa-info-circle"></i>
-						</a>
-					</label>
-					<div class="primary d-flex justify-content-between" name="primary">
-						<a class="component_box" @click="setPrimary(effect)"
-							:class="{'selected': effect.primary === true}"
-						>
-							<span>P</span>
-						</a>
-					</div>
-				</b-col>
+					>
+						<template v-slot:append>
+							<q-icon name="info" @click.stop>
+								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+									<q-card dark square>
+										<q-card-section class="bg-gray-active">
+											<b>Fixed value</b>
+										</q-card-section>
+										<q-card-section>
+											If the effect has a fixed number, set it here.
+										</q-card-section>
+									</q-card>
+								</q-menu>
+							</q-icon>
+						</template>
+					</q-input>
+				</div>
+				<div class="col-12 col-md-3">
+					<q-checkbox size="lg" dark v-model="effect.primary" val="lg" label="Add primary stat" :toggle-indeterminate="false" />
+				</div>
 			</template>
 			<!-- DAMAGE TYPES -->
 			<template v-if="hasField('damage_types')">
-				<b-col md="4">
-					<label class="required" for="damage_type">
-						Damage Type
-					</label>
-					<b-form-select v-model="effect.damage_type"
-						id="damage_type"
+				<div class="col-12 col-md-4">
+					<q-select
+						dark filled square dense
+						label="Damage type"
 						name="damage_type"
-						title="effect Subtype"
-						class="form-control mb-2"
+						v-model="effect.damage_type"
+						:options="damage_types"
 						v-validate="'required'"
 						data-vv-as="effect Subtype"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Damage type -</option>
-						<option v-for="(type ,i) in damage_types"
-							:key="i" :value="type">{{ type }}</option>
-					</b-form-select>
+					/>
 					<p class="validate red" v-if="errors.has(`damage_type`)">{{ errors.first(`damage_type`) }}</p>
-				</b-col>
+				</div>
 			</template>
 			<!-- DESCRIPTION -->
-			<b-col md="12" v-if="hasField('description')">
-				<label for="description">
-					Description
-				</label>
-				<b-form-textarea v-model="effect.description"
-					id="description"
+			<div class="col-12" v-if="hasField('description')">
+				<q-input
+					dark filled square dense
+					v-model="effect.description"
+					label="Description"
 					name="description"
-					title="Desciption"
-					class="form-control mb-2"
+					autogrow
 					data-vv-as="Desciption"
 					v-validate="'required|max:100'"
 					maxlength="101"
-					@change="$forceUpdate()"></b-form-textarea>
+					@change="$forceUpdate()"
+				/>
 				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
-			</b-col>
+			</div>
 			<!-- ABILITIES -->
-			<b-col md="4" v-if="hasField('abilities')">
-				<label for="ability">
-					Ability
-				</label>
-				<b-form-select v-model="effect.ability"
-					id="ability"
+			<div class="col-12 col-md-4" v-if="hasField('abilities')">
+				<q-select
+					dark filled square dense
+					label="Ability"
 					name="ability"
-					title="Ability"
-					class="form-control mb-2"
+					v-model="effect.ability"
+					:options="abilities"
+					v-validate="'required'"
 					data-vv-as="Ability"
-					@change="$forceUpdate()">
-					<option :value="undefined" disabled>- Ability -</option>
-					<option value="all">All</option>
-					<option value="choose">Choose</option>
-					<option v-for="ability in abilities"
-						:key="ability" :value="ability">{{ ability.capitalize() }}</option>
-				</b-form-select>
+					class="mb-2"
+					@change="$forceUpdate()"
+				/>
 				<p class="validate red" v-if="errors.has(`ability`)">{{ errors.first(`ability`) }}</p>
-			</b-col>
+			</div>
 			<!-- SKILLS -->
-			<b-col md="4" v-if="hasField('skills')">
-				<label for="skill">
-					Skill
-				</label>
-				<!-- <pre>{{skillList}}</pre> -->
-				<b-form-select v-model="effect.skill"
-					id="skill"
+			<div class="col-12 col-md-4" v-if="hasField('skills')">
+				<q-select
+					dark filled square dense
+					map-options
+					emit-value
+					option-label="skill"
+					label="Skill"
 					name="skill"
-					title="Skill"
-					class="form-control mb-2"
+					v-model="effect.skill"
+					:options="Object.values(skillList)"
+					v-validate="'required'"
 					data-vv-as="Skill"
-					@change="$forceUpdate()">
-					<option :value="undefined" disabled>- Skill -</option>
-					<option value="all">All</option>
-					<option value="choose">Choose</option>
-					<option v-for="(obj, skill) in skillList"
-						:key="skill" :value="skill">{{ skill.capitalize() }}</option>
-				</b-form-select>
+					class="mb-2"
+					@change="$forceUpdate()"
+				/>
 				<p class="validate red" v-if="errors.has(`skills`)">{{ errors.first(`skills`) }}</p>
-			</b-col>
+			</div>
 
 			<!-- ATTACK -->
-			<b-col md="4" v-if="hasField('attack')">
-				<label for="attack">
-					Made by/against
-				</label>
-				<b-form-select v-model="effect.attack"
-					id="attack"
+			<div class="col-12 col-md-4" v-if="hasField('attack')">
+				<q-select
+					dark filled square dense
+					map-options
+					emit-value
+					label="Made by/against"
 					name="attack"
-					title="Made by/against"
-					class="form-control mb-2"
+					v-model="effect.attack"
+					:options="byAgainst"
+					v-validate="'required'"
 					data-vv-as="Made by/against"
-					@change="$forceUpdate()">
-					<option :value="undefined" disabled>- Choose -</option>
-					<option v-for="{label, value} in byAgainst"
-						:key="value" :value="value">{{ label }}</option>
-				</b-form-select>
+					class="mb-2"
+					@change="$forceUpdate()"
+				/>
 				<p class="validate red" v-if="errors.has(`attack`)">{{ errors.first(`attack`) }}</p>
-			</b-col>
+			</div>
 
 			<!-- MINIMUM -->
-			<b-col md="3" v-if="hasField('minimum')">
-				<label for="primary">
-					<span>Minimum Value</span>
-					<a 
-						class="ml-1"
-						v-b-popover.hover.top="'Select this if fixed value is a minimum score.'" 
-						title="Minimum Value"
-					>
-						<i class="fas fa-info-circle"></i>
-					</a>
-				</label>
-				<div class="primary d-flex justify-content-between" name="primary">
-					<a class="component_box" @click="setMinimum(effect)"
-						:class="{'selected': effect.minimum === true}"
-					>
-						<span>M</span>
-					</a>
-				</div>
-			</b-col>
-		</b-row>
+			<div class="col-12 col-md-3" v-if="hasField('minimum')">
+				<q-checkbox size="lg" dark v-model="effect.minimum" val="lg" label="Fixed value is minimum" />
+			</div>
+		</div>
 	</div>
 </template>
 

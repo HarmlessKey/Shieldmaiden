@@ -18,51 +18,65 @@
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">
 					<a href="https://discord.gg/fhmKBM7" target="_blank" class="icon">
-					<i class="fab fa-discord"></i>
-					<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
-						Discord
-					</q-tooltip>
-				</a>
+						<i class="fab fa-discord"></i>
+						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
+							Discord
+						</q-tooltip>
+					</a>
 				</div>
 				<div class="area d-flex justify-content-end">
 					<a class="icon"
 						@click="setSlide({show: true, type: 'slides/Compendium'})">
 						<i class="fas fa-book-spells"></i>
-						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Compendium
 						</q-tooltip>
 					</a>
 					<a 
 						v-if="user"
-						class="icon" 
+						class="icon"
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i class="fas fa-link"></i>
-						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Player link
 						</q-tooltip>
 					</a>
-					<a class="icon roll"
+					<a class="icon roll" 
 						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/Roll'})"
 						@click="setSlide({show: true, type: 'slides/Roll'})">
-						<q-tooltip anchor="bottom middle" self="center middle" :offset="[30, 30]">
+						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Dice roller
 						</q-tooltip>
-						</a>
-				</div>
-				<div v-if="user">
-					<a class="user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                                  
-						<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
-						<i v-else class="fas fa-user"></i>
 					</a>
-					<div class="dropdown-menu dropdown-menu-right">
-						<router-link v-if="userInfo && userInfo.admin" to="/admin" class="dropdown-item"><i class="fas fa-crown"></i> Admin</router-link>
-						<router-link v-if="userInfo && (userInfo.admin || userInfo.contribute)" to="/contribute" class="dropdown-item"><i class="fas fa-file-edit"></i> Contribute</router-link>
-						<router-link to="/profile" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</router-link>
-						<router-link to="/campaigns" class="dropdown-item"><i class="fas fa-treasure-chest"></i> My Content</router-link>
-						<router-link to="/settings" class="dropdown-item"><i class="fas fa-cogs"></i> Settings</router-link>
-						<div class="dropdown-divider"></div>
-						<button class="dropdown-item" v-on:click="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-					</div>
+				</div>
+				<div v-if="user" class="user">
+					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
+					<i v-else class="fas fa-user"></i>
+					<q-menu square :offset="[9, 0]">
+          	<q-list>
+							<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
+								<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
+								<q-item-section>Admin</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
+								<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
+								<q-item-section>Contribute</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup to="/campaigns">
+								<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
+								<q-item-section>My content</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup to="/settings">
+								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+								<q-item-section>Settings</q-item-section>
+							</q-item>
+							<q-separator />
+							<q-item clickable v-close-popup @click="signOut()">
+								<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
+								<q-item-section>Sign out</q-item-section>
+							</q-item>
+          	</q-list>
+					</q-menu>
 				</div>
 				<router-link v-else to="/sign-in" class="ml-2">Sign in</router-link>
 			</div>
@@ -130,11 +144,10 @@
 	}
 }
 a {
-	color: #b2b2b2 !important;
+	color:#b2b2b2 !important;
 
 	&:hover {
 		color: #2c97de !important;
-		text-decoration: none;
 	}
 }
 a.icon {
@@ -156,7 +169,7 @@ a.icon {
 		background-repeat: no-repeat;
 	}
 }
-a.user	{
+.user	{
 	cursor: pointer;
 	font-size: 15px;
 	padding: 0 5px 5px 10px;
@@ -177,10 +190,6 @@ a.user	{
 	padding: 3px 10px;
 	border-right: solid 1px #494747;
 	height: 30px;
-}
-.dropdown-menu {
-	top: -2px !important;
-	left: 10px !important;
 }
 
 @media only screen and (max-width: 600px) {

@@ -67,7 +67,6 @@
 								label="Application"
 								:options="application"
 								v-model="condition.application"
-								:id="`application-${con_index}`"
 								:name="`application-${con_index}`"
 								class="mb-2"
 								v-validate="'required'"

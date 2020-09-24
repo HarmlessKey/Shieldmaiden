@@ -5,15 +5,15 @@
 				<q-select
 					dark filled square dense
 					emit-value
-       	 	map-options
+					map-options
 					label="Effect type"
 					v-model="effect.type"
 					v-validate="'required'"
 					:options="Object.values(effect_types)"
 				>
-					<template v-slot:append>
-						<q-icon name="info" v-if="effect.type" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px" v-if="effect.type">
+					<template v-slot:append v-if="effect.type">
+						<q-icon name="info" @click.stop>
+							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 								<q-card dark square>
 									<q-card-section class="bg-gray-active">
 										<b>{{ effect.type.capitalize() }}</b>
@@ -135,7 +135,7 @@
 					</q-input>
 				</div>
 				<div class="col-12 col-md-3">
-					<q-checkbox size="lg" dark v-model="effect.primary" val="lg" label="Add primary stat" :toggle-indeterminate="false" />
+					<q-checkbox size="lg" dark v-model="effect.primary" label="Add primary stat" :false-value="null" indeterminate-value="something-else" />
 				</div>
 			</template>
 			<!-- DAMAGE TYPES -->
@@ -222,7 +222,7 @@
 
 			<!-- MINIMUM -->
 			<div class="col-12 col-md-3" v-if="hasField('minimum')">
-				<q-checkbox size="lg" dark v-model="effect.minimum" val="lg" label="Fixed value is minimum" />
+				<q-checkbox size="lg" dark v-model="effect.minimum" label="Fixed value is minimum" :false-value="null" indeterminate-value="something-else" />
 			</div>
 		</div>
 	</div>

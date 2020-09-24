@@ -302,7 +302,7 @@
 					emit-value
 					map-options
 					:options="lvl_scaling"
-					label="Duration type"
+					label="Spell scaling"
 					v-model="spell.level_scaling"
 					name="level_scaling"
 					v-validate="'required'"

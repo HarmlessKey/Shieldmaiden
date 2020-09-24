@@ -749,6 +749,22 @@ html body {
 		}
 	}
 
+	/* ACCORDION */
+	.accordion {
+		.q-item {
+			background-color: $gray-dark;
+			margin-bottom: 1px;
+
+			&__section--avatar {
+				min-width: max-content;
+			}
+		}
+		.accordion-body {
+			background-color: $gray-darker;
+			padding: 20px 0;
+		}
+	}
+	
 	ul.crumble {
 		list-style: none;
 		padding: 0 0 15px 0;
@@ -762,6 +778,58 @@ html body {
 			}
 		}
 	}
+
+	/* HK CARD */
+	.hk-card {
+		position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+		background-color: #262626;
+		margin-bottom: 20px;
+		
+		.card-header {
+			padding: 0.75rem 1.25rem;
+			margin-bottom: 0;
+			background-color: rgba(0, 0, 0, 0.1);
+			border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+		}
+		.card-body {
+			min-height: 1px;
+			padding: 1.25rem;
+			
+			&:empty {
+				display: none;
+			}
+		}
+		.card-footer {
+			padding: 0.75rem 1.25rem;
+			background-color: rgba(0, 0, 0, 0.03);
+			border-top: 1px solid rgba(0, 0, 0, 0.125);
+		}
+		.card-image {
+			width: 100%;
+		}
+	}
+
+	/* HK CARD DECK */
+	.hk-card-deck {
+		display: flex;
+		flex-flow: row wrap;
+		margin-right: -15px;
+		margin-left: -15px;
+
+		.hk-card {
+			flex: 1 0 0%;
+			margin-right: 15px;
+			margin-bottom: 0;
+			margin-left: 15px;
+		}
+	}
+
+	/* HK TABLE */
 	.hk-table {
 
 		.hk-table-column {
@@ -824,7 +892,7 @@ html body {
 			}
 		}
 	}
-	.card {
+	.hk-card {
 		.card-body {
 			.hk-table {
 				.hk-table-column, .hk-collapsed-column {
@@ -1037,7 +1105,7 @@ html body {
 			}
 		}
 	}
-	.card, .slide {
+	.hk-card, .slide {
 		ul.entities {
 			li {
 				background-color: $gray-darker;

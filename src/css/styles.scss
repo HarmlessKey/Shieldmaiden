@@ -1352,28 +1352,6 @@ html body {
 
 	hr { background: $gray-hover; }
 
-	.form-group.skills {
-		.custom-control {
-
-			.custom-control-label {
-				width: 100%;
-
-				.skill {
-					width: 100%;
-					display: grid;
-					grid-template-columns: 45px 1fr min-content;
-			
-					.abillity {
-						text-transform: uppercase;
-						text-align: center;
-					}
-					.mod {
-						margin-left: 8px;
-					}
-				}
-			}
-		}
-	}
 	.form-control, .custom-select { 
 		-webkit-appearance: none;
 		border-radius: 0 !important;

@@ -12,282 +12,277 @@
 					<GiveCharacterControl :playerId="playerId" :control="player.control" />
 				</hk-card>
 
-				<hk-card-deck>
+				<hk-card-deck class="mb-4">
 					<hk-card header="Basic Info" >
-						<b-row>
-							<b-col md="2">
-								<span class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-								<span class="img" v-else>
-									<img src="@/assets/_img/styles/player.svg" />
-								</span>
-							</b-col>
-							<b-col md="10" class="mb-3">
-								<b-row class="mb-2" v-if="$route.name != 'Edit Character'">
-									<b-col sm="2">
-										<label for="player_name" class="required">Player</label>
-									</b-col>
-									<b-col sm="10">
-										<b-form-input autocomplete="off"  
-											id="player_name" 
-											type="text" 
-											:class="{'input': true, 'error': errors.has('player_name') }" 
-											v-model="player.player_name" 
-											v-validate="'max:15|required'" 
-											maxlength="15"
-											data-vv-as="Name"
-											name="player_name" 
-											placeholder="Player Name"></b-form-input>
-										<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
-									</b-col>
-								</b-row>
+						<q-input 
+							v-if="$route.name != 'Edit Character'"
+							dark filled square dense
+							label="Player name"
+							autocomplete="off"  
+							type="text" 
+							class="mb-2" 
+							v-model="player.player_name" 
+							v-validate="'max:15|required'" 
+							maxlength="15"
+							data-vv-as="Name"
+							name="player_name" 
+						/>
+						<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
+						
+						<q-input 
+							dark filled square dense
+							label="Character name"
+							autocomplete="off"  
+							type="text" 
+							class="mb-2" 
+							v-model="player.character_name" 
+							v-validate="'max:35|required'" 
+							maxlength="35"
+							data-vv-as="Character Name"
+							name="character_name" 
+						/>
+						<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
+	
+						<div class="avatar">
+							<div class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+							<div class="img" v-else>
+								<img src="@/assets/_img/styles/player.svg" />
+							</div>
+							<div>
+								<q-input 
+									dark filled square
+									label="Avatar"
+									autocomplete="off"  
+									type="text" 
+									v-model="player.avatar"
+									v-validate="'url'"
+									data-vv-as="Avatar"
+									name="avatar"
+									placeholder="Image URL"/>
+								<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+							</div>
+						</div>
 
-								<b-row class="mb-2">
-									<b-col sm="2">
-										<label for="character_name" class="required">Character</label>
-									</b-col>
-									<b-col sm="10">
-										<b-form-input autocomplete="off"  
-											id="character_name" 
-											type="text" 
-											:class="{'input': true, 'error': errors.has('character_name') }" 
-											v-model="player.character_name" 
-											v-validate="'max:35|required'" 
-											maxlength="35"
-											data-vv-as="Character Name"
-											name="character_name" 
-											placeholder="Character Name"></b-form-input>
-										<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
-									</b-col>
-								</b-row>
-
-								<b-row>
-									<b-col sm="2">
-										<label for="avatar">Avatar</label>
-									</b-col>
-									<b-col sm="10">
-										<b-form-input autocomplete="off"  
-											id="avatar" 
-											type="text" 
-											:class="{'input': true, 'error': errors.has('avatar') }"
-											v-model="player.avatar"
-											v-validate="'url'"
-											data-vv-as="Avatar"
-											name="avatar"
-											placeholder="Image URL"></b-form-input>
-										<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-									</b-col>
-								</b-row>
-							</b-col>
-						</b-row>
 					</hk-card>
 					<hk-card header="Level & Base Stats">
 						<div class="row">
-							<div class="col-6 mb-2">
-								<label for="experience" class="experience">
-									<span>XP</span>
-									<span>
-										<span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}
-										<a class="ml-2" @click="setSlide({show: true, type: 'slides/xpTable'})"><i class="fas fa-info-circle"></i></a>
-									</span>
-								</label>
-								<b-form-input autocomplete="off"  id="experience" 
+							<div class="col-12 col-md-6 mb-2">
+								<q-input 
+									dark filled square dense
+									label="Experience points"
+									autocomplete="off" 
 									type="number" 
 									min="0"
 									max="355000"
-									:class="{'input': true, 'error': errors.has('experience') }" 
 									v-model="player.experience" 
 									v-validate="'numeric|min_value:0|max_value:355000'" 
 									data-vv-as="experience"
 									name="experience" 
-									placeholder="Experience" />
+									:disable="player.level > 0"
+								>
+									<template v-slot:append>
+										<small><span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
+										<q-icon name="info" class="ml-1 pointer" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
+									</template>
+								</q-input>				
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
 							</div>
-							<b-col md="6" class="mb-2">
-								<label for="level">Level Override</label>
-								<b-form-input autocomplete="off"  id="level" 
+							<div class="col-12 col-md-6 mb-2">
+								<q-input 
+									dark filled square dense
+									clearable
+									label="Level override"
+									autocomplete="off"
 									type="number" 
 									min="1"
 									max="20"
-									:class="{'input': true, 'error': errors.has('level') }" 
 									v-model="player.level" 
 									v-validate="'numeric|min_value:1|max_value:20'" 
 									data-vv-as="Level Override"
-									name="level" 
-									placeholder="Level Override" />
+									name="level"
+								/>
 								<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-							</b-col>
-							<b-col md="4" class="mb-2">
-								<label for="maxHp" class="required">HP</label>
-								<b-form-input autocomplete="off"  id="maxHp" 
+							</div>
+							<div class="col-12 col-md-4">
+								<q-input 
+									dark filled square dense
+									label="Hit points"
+									autocomplete="off"  id="maxHp" 
 									type="number" 
 									min="1"
-									:class="{'input': true, 'error': errors.has('maxHp') }" 
 									v-model="player.maxHp" 
 									v-validate="'numeric|required'" 
 									data-vv-as="Maxium Hit Points"
 									name="maxHp" 
-									placeholder="Maximum Hit Points*" />
+									placeholder="Maximum Hit Points*"
+								>
+									<q-icon slot="append" name="fas fa-heart" />
+								</q-input>
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-							</b-col>
-							<b-col md="4" class="mb-2">
-								<label for="ac" class="required">AC</label>
-								<b-form-input autocomplete="off"  
+							</div>
+							<div class="col-12 col-md-4">
+								<q-input 
+									dark filled square dense
+									label="Armor class"
+									autocomplete="off"  
 									id="ac" 
 									min="1"
 									type="number" 
-									:class="{'input': true, 'error': errors.has('ac') }" 
 									v-model="player.ac" 
 									v-validate="'numeric|required'" 
 									data-vv-as="Armor Class"
 									name="ac" 
-									placeholder="Armor Class" />
+								>
+									<q-icon slot="append" name="fas fa-shield" />
+								</q-input>
 								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-							</b-col>
-							<b-col md="4">
-								<label for="save_dc">Spell Save DC</label>
-								<b-form-input autocomplete="off"  
+							</div>
+							<div class="col-12 col-md-4">
+								<q-input 
+									dark filled square dense
+									label="Spell save DC"
+									autocomplete="off"  
 									id="save_dc" 
 									min="0"
 									type="number" 
 									v-model="player.spell_save_dc" 
 									name="save_dc" 
-									placeholder="Save DC" />
-							</b-col>
+								/>
+							</div>
 						</div>
 					</hk-card>
 				</hk-card-deck>
 
-				<hk-card-group deck>
-					<!-- ABILITY SCORES -->
-					<hk-card header="Ability Scores & Senses" class="ability-card">
-						<div class="mb-2 d-flex justify-content-start">
-								<div class="name">
-									<label>Ability</label>
-								</div>
-								<div class="value">
-									<label>Value</label>
-								</div>
-								<div class="save">
-									<label class="ml-2">Save</label>
-								</div>
-						</div>
-						<div class="mb-2 d-flex justify-content-start" v-for="(ability, index) in abilities" :key="index">
-							<div class="name">
-								<label :for="ability.ability">
-									{{ ability.ability.substring(0,3).toUpperCase() }}
-								</label>
-							</div>
-							<div class="value">
-								<b-form-input autocomplete="off"  
-									:id="ability.ability" 
-									type="number" 
-									v-model="player[ability.ability]" 
-									:name="ability.ability" 
-									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-							</div>
-							<div class="save">
-								<b-form-checkbox
-									class="ml-3 mt-2"
-									v-model="player[`${ability.ability}-save-profficient`]">
-										+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
-									</b-form-checkbox>
-							</div>
-						</div>
-						<!-- SENSES -->
-						<h5 class="mt-5">Senses</h5>
-						<b-row>
-							<b-col md="4" class="mb-2">
-								<label for="pper">Passive Perception</label>
-								<b-form-input autocomplete="off"  id="pper" 
-									type="number" 
-									min="1"
-									max="20"
-									:class="{'input': true, 'error': errors.has('pper') }" 
-									v-model="player.passive_perception" 
-									v-validate="'numeric'" 
-									data-vv-as="Passive Perception"
-									name="pper" 
-									placeholder="Perception" />
-								<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
-							</b-col>
-							<b-col md="4" class="mb-2">
-								<label for="pinv">Passive Investigation</label>
-								<b-form-input autocomplete="off"  id="pinv" 
-									type="number" 
-									min="1"
-									max="20"
-									:class="{'input': true, 'error': errors.has('pinv') }" 
-									v-model="player.passive_investigation" 
-									v-validate="'numeric'" 
-									data-vv-as="Passive Investigation"
-									name="pinv" 
-									placeholder="Investigation" />
-								<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
-							</b-col>
-							<b-col md="4" class="mb-2">
-								<label for="pins">Passive Insight</label>
-								<b-form-input autocomplete="off"  id="pins" 
-									type="number" 
-									min="1"
-									max="20"
-									:class="{'input': true, 'error': errors.has('pins') }" 
-									v-model="player.passive_insight" 
-									v-validate="'numeric'" 
-									data-vv-as="pins"
-									name="pins" 
-									placeholder="Insight" />
-								<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
-							</b-col>
-						</b-row>
-					</hk-card>
-
-					<!-- SKILLS -->
-					<hk-card header="Skills">
-						<p>Proficiency Bonus: +{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</p>
-
-						<div class="d-flex justify-content-start">
-							<b-form-group label="Expertise" class="mr-2">
-								<b-form-checkbox-group
-									id="expertise"
-									name="expertise"
-									v-model="player.skills_expertise"
-									stacked
+				<!-- ABILITY SCORES -->
+				<hk-card header="Ability Scores & Senses" class="ability-card">
+					<div class="row">
+						<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
+							<q-input 
+								dark filled square dense
+								:label="ability.ability.capitalize()"
+								autocomplete="off"  
+								type="number" 
+								v-model="player[ability.ability]" 
+								:name="ability.ability"
+							>
+								<q-checkbox 
+									slot="append"
+									size="xs" 
+									dark 
+									v-model="player[`${ability.ability}-save-profficient`]" 
+									:false-value="null" 
+									indeterminate-value="something-else" 
 								>
-									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key" :disabled="player.skills ? !player.skills.includes(key) : true">
-										+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
-									</b-form-checkbox>
-								</b-form-checkbox-group>
-							</b-form-group>
-							<b-form-group label="Proficiency" class="skills">
-								<b-form-checkbox-group
-									id="skills"
-									name="skills"
-									v-model="player.skills"
-									stacked
-								>
-									<b-form-checkbox :value="key" v-for="(skill, key) in skillList" :key="key">
-										<div class="skill">
-											<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
-											<div>{{skill.skill  }}</div>
-											<div class="mod">
-												{{ 
-													calculateSkillModifier(
-														calcMod(player[skill.ability]),
-														player.skills ? (
-														player.skills.includes(key) ? 
-														returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-														: 0) : 0,
-														player.skills_expertise ? player.skills_expertise.includes(key) : false
-													) 
-												}}
-											</div>
+									<q-tooltip anchor="top middle" self="center middle">
+										Saving throw proficiency
+									</q-tooltip>
+								</q-checkbox>
+							</q-input>
+						</div>
+					</div>
+
+					<!-- SENSES -->
+					<h5 class="mt-3">Senses</h5>
+					<div class="row">
+						<div  class="col-12 col-md-4 mb-2">
+							<q-input 
+								dark filled square dense
+								label="Passive perception"
+								autocomplete="off" 
+								type="number" 
+								min="1"
+								max="20"
+								v-model="player.passive_perception" 
+								v-validate="'numeric'" 
+								data-vv-as="Passive Perception"
+								name="pper" 
+								placeholder="Perception" />
+							<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
+						</div>
+						<div  class="col-12 col-md-4 mb-2">
+							<q-input 
+								dark filled square dense
+								label="Passive investigation"
+								autocomplete="off"
+								type="number" 
+								min="1"
+								max="20"
+								v-model="player.passive_investigation" 
+								v-validate="'numeric'" 
+								data-vv-as="Passive Investigation"
+								name="pinv" 
+								placeholder="Investigation" />
+							<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
+						</div>
+						<div  class="col-12 col-md-4 mb-2">
+							<q-input 
+								dark filled square dense
+								label="Passive insight"
+								autocomplete="off"
+								type="number" 
+								min="1"
+								max="20"
+								v-model="player.passive_insight" 
+								v-validate="'numeric'" 
+								data-vv-as="pins"
+								name="pins" 
+								placeholder="Insight" />
+							<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
+						</div>
+					</div>
+				</hk-card>
+
+				<!-- SKILLS -->
+				<hk-card header="Skills">
+					<h5>
+						Proficiency Bonus: 
+						+<b class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</b>
+					</h5>
+
+					<div class="skills">
+						<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
+							<q-checkbox 
+								size="xs" 
+								dark
+								:val="key" 
+								v-model="skills_expertise" 
+								:false-value="null" indeterminate-value="something-else"
+								:disable="player.skills ? !player.skills.includes(key) : true"
+							>
+								<template slot:label>
+									+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+								</template>
+							</q-checkbox>
+
+							<q-checkbox 
+								size="xs" 
+								dark
+								:val="key" 
+								v-model="skills" 
+								:false-value="null" indeterminate-value="something-else"
+							>
+								<template slot:label>
+									<div class="skill">
+										<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+										{{ skill.skill  }}
+										<div class="mod">
+											{{ 
+												calculateSkillModifier(
+													calcMod(player[skill.ability]),
+													player.skills ? (
+													player.skills.includes(key) ? 
+													returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
+													: 0) : 0,
+													player.skills_expertise ? player.skills_expertise.includes(key) : false
+												) 
+											}}
 										</div>
-									</b-form-checkbox>
-								</b-form-checkbox-group>
-							</b-form-group>
+									</div>
+								</template>
+							</q-checkbox>
 						</div>
-					</hk-card>
-				</hk-card-group>
+					</div>
+				</hk-card>
 
 				<hk-card header="Companions">
 					<template v-if="isOwner()">
@@ -297,12 +292,16 @@
 							<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
 						</div>
 						<div v-else>
-							<div class="input-group mb-3">
-								<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-								<div class="input-group-append">
-									<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
-								</div>
-							</div>
+							<q-input 
+								dark filled square dense
+								label="Search NPC"
+								type="text" 
+								autocomplete="off" 
+								v-model="search" @keyup="searchNPC()"
+							>
+								<q-icon slot="append" size="xs" name="fas fa-search" @click="searchNPC()"/>
+							</q-input>
+
 							<ul class="entities">
 								<p v-if="noResult" class="red">{{ noResult }}</p>
 								<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
@@ -468,6 +467,22 @@
 					return id;
 				} else {
 					return this.$store.getters.getUser.uid;
+				}
+			},
+			skills: {
+				get() {
+					return this.player.skills ? this.player.skills : ["arcana"];
+				},
+				set(newValue) {
+					this.$set(this.player, 'skills', newValue);
+				}
+			},
+			skills_expertise: {
+				get() {
+					return this.player.skills_expertise ? this.player.skills_expertise : ["arcana"];
+				},
+				set(newValue) {
+					this.$set(this.player, 'skills_expertise', newValue);
 				}
 			},
 		},
@@ -642,26 +657,45 @@
 			height: 20px;
 		}
 	}
-	.img {
-		display: block;
-		width: 100px;
-		height: 100px;
-		background-size: cover;
-		background-position: center top;
+	.avatar {
+		display: grid;
+		grid-template-columns: 56px 1fr;
+		grid-column-gap: 10px;
+
+		.img {
+			border: solid 1px #b2b2b2;
+			display: block;
+			width: 56px;
+			height: 56px;
+			background-size: cover;
+			background-position: center top;
+		}
 	}
+	.skills {
+		columns: 3;
 
-	.ability-card {
-		.card-body {
-			// column-count: 2;
-		}
-		.name {
-			width: 100px;
-		}
-		.value {
-			width: 100px;
-		}
-		.checkbox {
+		.skill {
+			width: 100%;
+			display: grid;
+			grid-template-columns: 45px 1fr min-content;
 
+			.abillity {
+				text-transform: uppercase;
+				text-align: center;
+			}
+			.mod {
+				margin-left: 8px;
+			}
+		}
+	}
+	@media only screen and (max-width: 1250px) { 
+		.skills {
+			columns: 2;
+		}
+	}
+	@media only screen and (max-width: 890px) { 
+		.skills {
+			columns: 1;
 		}
 	}
 }

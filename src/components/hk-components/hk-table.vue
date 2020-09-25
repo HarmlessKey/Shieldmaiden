@@ -127,7 +127,7 @@
 			v-if="!loading && Object.keys(dataItems).length > perPage" 
       v-model="currentPage"
       :max="maxPage"
-			max-pages="5"
+			:max-pages="5"
 			color="dark"
 			:direction-links="true"
       :boundary-links="true"

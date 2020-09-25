@@ -1744,11 +1744,25 @@ html body {
 
 	/* QUALSAR */
 	/*********************************************/
-	.q-field, .q-color-picker, .q-list {
+	.q-field, .q-color-picker, .q-list, .q-pagination {
 		.row {
 			margin-left: 0;
 			margin-right: 0;
 		}
+	}
+	.q-pagination {
+		.q-btn {
+			background-color: $gray;
+			margin-left: 1px;
+			color: $gray-light !important;
+
+			.col {
+				padding: 0;
+			}
+		}
+	}
+	.q-btn {
+		border-radius: 0;
 	}
 	.q-checkbox.row {
 		margin-left: 0;

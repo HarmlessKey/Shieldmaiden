@@ -2,12 +2,16 @@
 	<div :class="classes" ref="table">
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
-			<div class="input-group mb-3">
-				<input type="text" autocomplete="off" v-model="searched" @keyup="searchData()" placeholder="Search" class="form-control"/>
-				<div class="input-group-append">
-						<button class="btn" @click="searchData()"><i class="fas fa-search"></i></button>
-				</div>
-			</div>
+			<q-input 
+				dark filled square dense
+				label="Search"
+				type="text" 
+				autocomplete="off" 
+				v-model="searched"
+				@keyup="searchData()" 
+			>
+				<q-icon slot="append" name="fas fa-search" size="xs" @click="searchData()" />
+			</q-input>
 			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
 		</div>
 		<!-- TABLE -->
@@ -21,10 +25,9 @@
 				<div 
 					v-if="collapse" 
 					class="hk-table-column hk-table-header"
-					@click="showCollapsed = index" 
 					:key="`collapse-header`"
 				>
-					<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
+				<!-- EMPTY HEADER COLUMN FOR COLLAPSE COLUMNS -->
 				</div>
 				<template v-for="(column, key) in columns">
 					<template v-if="showColumn(column.hide)">
@@ -72,12 +75,12 @@
 				<!-- COLLAPSE ACTION -->
 				<div 
 					v-if="collapse" 
-					class="hk-table-column collapse-handler"
+					class="hk-table-column collapse-handler pointer"
+					@click="setCollapsed(index)"
 					:key="`collapse-action-${index}`"
+					:class="{ shown: showCollapsed === index }"
 				>
-					<a data-toggle="collapse" class="collapsed" :href="`#collapse-${index}`">
-						<i class="fas fa-caret-down"></i>
-					</a>
+					<i class="fas fa-chevron-down" />
 				</div>
 				
 				<template v-for="(column, key) in columns">
@@ -99,17 +102,18 @@
 				</template>
 
 				<!-- Collapsed data -->
-				<div 
-					v-if="collapse"
-					:id="`collapse-${index}`"
-					:key="`collapse-content-${index}`"
-					:style="{ 'grid-column': 'span ' + (columnCount + 1) }"
-					class="collapse hk-collapsed-column"
-				>
-					<slot name="collapse" :row="row">
-						<pre>{{ row }}</pre>
-					</slot>
-				</div>
+				<q-slide-transition v-if="collapse" :key="`collapse-content-${index}`">
+					<div 
+						v-show="showCollapsed === index"
+						:id="`collapse-${index}`"
+						:style="{ 'grid-column': 'span ' + (columnCount + 1) }"
+						class="hk-collapsed-column"
+					>
+						<slot name="collapse" :row="row">
+							<pre>{{ row }}</pre>
+						</slot>
+					</div>
+				</q-slide-transition>
 			</template>
 		</div>
 		<div v-else class="loader">
@@ -118,14 +122,16 @@
 			</slot>
 		</div>
 
-		<b-pagination 
+		<q-pagination
 			class="pagination"
 			v-if="!loading && Object.keys(dataItems).length > perPage" 
-			align="center" 
-			:total-rows="Object.keys(dataItems).length" 
-			v-model="currentPage" 
-			:per-page="perPage"
-		/>
+      v-model="currentPage"
+      :max="maxPage"
+			max-pages="5"
+			color="dark"
+			:direction-links="true"
+      :boundary-links="true"
+    />
 	</div>
 </template>
 
@@ -178,7 +184,8 @@
 				sortedBy: undefined,
 				data: undefined,
 				searched: undefined,
-				currentPage: 1
+				currentPage: 1,
+				showCollapsed: undefined
 			}
 		},
 		computed: {
@@ -238,6 +245,9 @@
 
 					return this.dataItems.slice(start, end);
 				}
+			},
+			maxPage() {
+				return Math.ceil(Object.keys(this.dataItems).length / this.perPage);
 			}
 		},
 		methods: {
@@ -285,6 +295,9 @@
 					}
 				});
 				this.dataItems = results;
+			},
+			setCollapsed(index) {
+				this.showCollapsed = (this.showCollapsed !== index) ? index : undefined;
 			}
 		},
 		mounted() {
@@ -311,17 +324,12 @@
 			padding: 12px 10px;
 
 			&.collapse-handler {
-				a {
-					i {
-						transition: transform .2s linear;
-					}
-					&.collapsed {
-						i.fa-caret-down {
-							transform: rotate(-90deg);
-						}
-					}
-					&:hover {
-						text-decoration: none;
+				i {
+					transition: transform .2s linear;
+				}
+				&.shown {
+					i.fa-chevron-down {
+						transform: rotate(180deg);
 					}
 				}
 			}

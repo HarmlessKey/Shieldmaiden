@@ -38,10 +38,11 @@
 			<h4 class="mb-3">Roll spell</h4>
 
 			<div class="input" v-if="spell.level_scaling === 'Character Level'">
-				<label for="casterLevel">Character level</label>
-				<b-form-input
+				<q-input
+					dark filled square dense
+					label="Character level"
 					id="casterLevel" 
-					type="text"
+					type="number"
 					v-validate="'required|numeric|max_value:20'"
 					name="casterLevel"
 					data-vv-as="caster level"
@@ -52,8 +53,9 @@
 
 			<!-- TO HIT MODIFIER INPUT -->
 			<div class="input" v-if="isToHit">
-				<label for="toHit">To hit modifier</label>
-				<b-form-input
+				<q-input
+					dark filled square dense
+					label="To hit modifier"
 					id="toHit" 
 					type="text"
 					v-validate="'required|numeric'"

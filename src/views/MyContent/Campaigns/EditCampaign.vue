@@ -10,17 +10,34 @@
 				<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
 
 				<h2 class="mt-3">Edit your campaign</h2>
-				<b-row class="mt-3">
-					<b-col class="mb-2">
-						<input class="form-control" 
-							autocomplete="off"
-							v-validate="'required'" 
-							data-vv-as="Encounter Name" 
-							type="text" name="name" 
-							v-model="campaign.campaign"/>
-						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2"
+				<q-input 
+					dark filled square dense
+					autocomplete="off"
+					v-validate="'required'" 
+					data-vv-as="Encounter Name" 
+					type="text" 
+					name="name" 
+					v-model="campaign.campaign"/>
+				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+
+				<q-select 
+					dark filled square dense
+					emit-value
+					map-options
+					class="mt-2" 
+					v-model="campaign.advancement" 
+					:options="advancement_options" 
+				/>
+
+				<div class="background">
+					<div class="img" v-if="campaign.background" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"></div>
+					<div class="img" v-else>
+						<q-icon name="fas fa-image"/>
+					</div>
+					<div>
+						<q-input 
+							dark filled square
 							autocomplete="off" 
 							v-validate="'url'" type="text" 
 							name="backbround" 
@@ -28,32 +45,27 @@
 							v-model="campaign.background" 
 							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+					</div>
+				</div>
 
-						<b-form-select class="mt-2" v-model="campaign.advancement" :options="advancement_options" text-field="label"/>
+				<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+					<span :class="{ 'green': !campaign.private }">
+						<i class="fas fa-eye"></i>
+						Public
+					</span>
+					/
+					<span :class="{ 'red': campaign.private }">
+						<i class="fas fa-eye-slash"></i>
+						Private
+					</span>
+				</div>
 
-						<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
-							<span :class="{ 'green': !campaign.private }">
-								<i class="fas fa-eye"></i>
-								Public
-							</span>
-							/
-							<span :class="{ 'red': campaign.private }">
-								<i class="fas fa-eye-slash"></i>
-								Private
-							</span>
-						</div>
-
-						<button class="btn mt-3" @click="edit()">Save</button>
-					</b-col>
-					<b-col sm="3" v-if="campaign.background">
-						<div class="img-container"><img :src="campaign.background" /></div>
-					</b-col>
-				</b-row>
+				<button class="btn mt-3" @click="edit()">Save</button>
 			</div>
 			
 			<h2>Add players</h2>
-			<b-row>
-				<b-col md="6">
+			<div class="row">
+				<div class="col-12 col-md-6">
 					<hk-card header="All Players">
 						<ul class="entities hasImg" v-if="players && campaign">
 							<li v-for="(player, key) in players" 
@@ -89,9 +101,9 @@
 						</ul>
 						<div v-else class="loader"><span>Loading Players...</span></div>
 					</hk-card>
-				</b-col>
+				</div>
 
-				<b-col md="6">
+				<div class="col-12 col-md-6">
 					<hk-card header="Players in Campaign">
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
@@ -117,8 +129,8 @@
 						</template>
 						<div v-else class="loader"><span>Loading Players...</span></div>
 					</hk-card>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -255,11 +267,20 @@
 </script>
 
 <style lang="scss" scoped>
-	.img-container {
-		width: 100%;
+	.background {
+		display: grid;
+		grid-template-columns: 56px 1fr;
+		grid-column-gap: 10px;
+		font-size: 35px;
+		text-align: center;
 
-		img {
-			width: 100%;
+		.img {
+			border: solid 1px #b2b2b2;
+			display: block;
+			width: 56px;
+			height: 56px;
+			background-size: cover;
+			background-position: center top;
 		}
 	}
 	.nav { 

@@ -471,7 +471,7 @@
 			},
 			skills: {
 				get() {
-					return this.player.skills ? this.player.skills : ["arcana"];
+					return this.player.skills ? this.player.skills : [];
 				},
 				set(newValue) {
 					this.$set(this.player, 'skills', newValue);
@@ -479,7 +479,7 @@
 			},
 			skills_expertise: {
 				get() {
-					return this.player.skills_expertise ? this.player.skills_expertise : ["arcana"];
+					return this.player.skills_expertise ? this.player.skills_expertise : [];
 				},
 				set(newValue) {
 					this.$set(this.player, 'skills_expertise', newValue);

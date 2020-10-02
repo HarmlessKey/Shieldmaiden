@@ -20,8 +20,8 @@
 					</a>
 				</span>
 			</div>
-			<b-row>
-				<b-col md="7" class="mb-4">
+			<div class="row">
+				<div class="col-12 col-md-7 mb-4">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
 						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
 							<a class="nav-link" :class="{ active: tab.selected }" id="entities-tab" data-toggle="tab" :href="`#${key}`" role="tab" :aria-controls="key" :aria-selected="tab.selected">
@@ -62,11 +62,12 @@
 								<div class="currency-form">
 									<div v-for="(coin, key) in currencies" :key="key">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-										<b-form-input
+										<q-input
+											dark filled square dense
 											class="text-center"
-											:disabled="encounter.currency_awarded"
+											:disable="encounter.currency_awarded"
 											autocomplete="off" 
-											type="text" 
+											type="number" 
 											size="sm"
 											min="0" 
 											name="currency" 
@@ -117,22 +118,22 @@
 							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
-							<b-row>
-								<b-col sm="6">
+							<div class="row">
+								<div class="col-12 col-md-6">
 									<Dmg />
-								</b-col>
-								<b-col sm="6">
+								</div>
+								<div class="col-12 col-md-6">
 									<h2>Log</h2>
 									<Log />
-								</b-col>
-							</b-row>
+								</div>
+							</div>
 						</div>
 					</div>
-				</b-col>
-				<b-col md="5">
+				</div>
+				<div class="col-12 col-md-5">
 					<Players :userId="userId" :campaignId="campaignId" />
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>

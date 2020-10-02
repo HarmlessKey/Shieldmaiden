@@ -248,7 +248,7 @@
 						</q-input>
 						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</div>
-					<div class="col-12 col-md-4" v-if="quick == false">
+					<div class="col-12 col-md-4" v-if="!quick">
 						<q-input 
 							dark filled square dense
 							label="Hit dice"
@@ -262,7 +262,7 @@
 							data-vv-as="Hit Dice"
 						>
 							<template v-slot:append>
-								{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}
+								<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
 								<q-icon name="info" size="xs">
 									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 										<q-card dark square>

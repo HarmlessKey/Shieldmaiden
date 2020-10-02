@@ -2,34 +2,37 @@
 	<div>
 		<div class="share" :class="{ small: is_small }" ref="share">
 			<div class="qr">
-				<vue-qr class="bg-gray" :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
+				<vue-qr :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
 			</div>
 			<div>
 				<h2>Share live initiative list</h2>
-				<p>
+				<p @click="showInfo = !showInfo">
 					Let your players follow your encounters. 
-					<a data-toggle="collapse" :href="'#track'" 
-						role="button" aria-expanded="false">
-						<i class="fas fa-info"></i>
+					<a>
+						<i class="fas fa-info-circle"></i>
 					</a>
 				</p>
-				<p class="collapse mb-3" id="track">
-					With this link your active encounter can be followed on different devices. 
-					Send it to your players so they can see it on their tablets or phones, 
-					or put it up on a second screen that everyone can see. 
-					You control what is displayed on the link through the <router-link to="/settings#track">settings</router-link>.
-				</p>
-				<b-input-group class="mt-3">
-					<b-form-input :value="copy" id="copy" autocomplete="off" />
-					<b-input-group-append>
-						<a class="btn" @click="copyLink()">
-							<i class="fas fa-copy"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Click to copy
-							</q-tooltip>
-						</a>
-					</b-input-group-append>
-				</b-input-group>
+				<q-slide-transition>
+					<p v-show="showInfo">
+						With this link your active encounter can be followed on different devices. 
+						Send it to your players so they can see it on their tablets or phones, 
+						or put it up on a second screen that everyone can see. 
+						You control what is displayed on the link through the <router-link to="/settings#track">settings</router-link>.
+					</p>
+				</q-slide-transition>
+				<q-input
+					dark filled square dense
+					:value="copy"
+					autocomplete="off"
+					type="text"
+				>
+					<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
+						<q-tooltip anchor="top middle" self="center middle">
+							Click to copy
+						</q-tooltip>
+					</q-icon>
+				</q-input>
+				<input :value="copy" id="copy" type="hidden" />
 			</div>
 		</div>
 		<small>
@@ -50,6 +53,7 @@
 		data() {
 			return {
 				is_small: false,
+				showInfo: false,
 				copy: window.origin + '/user/' + this.$store.getters.getUser.uid,
 			}
 		},
@@ -81,7 +85,7 @@
 				}
 
 				/* unselect the range */
-				// toCopy.setAttribute('type', 'hidden')
+				toCopy.setAttribute('type', 'hidden')
 				window.getSelection().removeAllRanges()
 			},
 		},
@@ -129,6 +133,7 @@
 
 			.qr {
 				grid-area: qr;
+				border: none;
 			}
 			p {
 				margin-bottom: 10px;

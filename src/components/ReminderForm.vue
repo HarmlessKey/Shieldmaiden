@@ -100,9 +100,9 @@
 					data-vv-as="variable name"
 					placeholder="New Variable name" 
 				>
-					<div slot="append" :disable="!newVar || errors.has('var_name')">
-						<q-icon name="fas fa-plus-circle" class="blue pointer" @click="addVariable()"/>
-					</div>
+					<a slot="append">
+						<q-icon name="fas fa-plus-circle" class="blue" @click="addVariable()" :class="{ disabled: !newVar || errors.has('var_name') }"/>
+					</a>
 				</q-input>
 			</div>
 			<p class="validate red" v-if="errors.has('var_name')">{{ errors.first('var_name') }}</p>

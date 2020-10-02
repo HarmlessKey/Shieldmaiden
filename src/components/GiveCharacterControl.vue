@@ -1,7 +1,8 @@
 <template>
-	<div class="">
+	<div>
 		<p>
-			Give control over this character to another user. Let your players change their base stats themselves, so it is less work for you.<br/> 
+			Give control over this character to another user. Let your players change their base stats themselves, 
+			so it is less work for you.<br/> 
 			You can always revert this and you also keep control yourself.<br/>
 			Players need control over character to be able to send in damage or healing request during an encounter.
 		</p>
@@ -17,11 +18,18 @@
 		</div>
 		<div v-else>
 			<label>Enter the full username or email.</label>
-			<b-form inline>
-				<b-form-input type="text" autocomplete="off"  class="mr-2 mt-2" v-model="findUser" placeholder="username or email" />
-
-				<a class="btn mt-2" variant="primary" @click="find_user()">Find user</a>
-			</b-form>
+			<q-input
+				dark filled square dense
+				label="Username or email"
+				v-model="findUser"
+				autocomplete="off"
+			>
+				<q-icon slot="append" size="xs" class="blue pointer" @click="find_user()" name="fas fa-search">
+					<q-tooltip anchor="top middle" self="center middle">
+						Search
+					</q-tooltip>
+				</q-icon>
+			</q-input>
 			
 			<p v-if="foundUser === false && findUser != ''" class="red">User {{ findUser }} not found</p>
 			<div v-else-if="foundUser && findUser !== ''">

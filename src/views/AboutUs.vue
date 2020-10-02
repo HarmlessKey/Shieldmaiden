@@ -10,7 +10,7 @@
 			</p>
 
 			<h2>The Harmless Key Team</h2>
-			<hk-card-deck deck>
+			<hk-card-deck class="mb-3">
 				<hk-card header="The Harmless">
 					<div class="d-flex justify-content-start">
 						<div class="img" :style="{'background-image': 'url(' + require('@/assets/_img/harm.jpg') + ')'}"></div>
@@ -21,8 +21,8 @@
 						</div>
 					</div>
 					<hr>
-					<b-row>
-						<b-col>
+					<div class="row">
+						<div class="col">
 							<h3>Abillity Scores</h3>
 							<ul class="abillities">
 								<li class="d-flex justify-content-between">Assembly <span class="score">10</span></li>
@@ -32,15 +32,15 @@
 								<li class="d-flex justify-content-between">Python <span class="score">19</span></li>
 								<li class="d-flex justify-content-between">R <span class="score">11</span></li>
 							</ul>
-						</b-col>
-						<b-col>
+						</div>
+						<div class="col">
 							<h3>Skills</h3>
 							<ul class="skills">
 								<li class="d-flex justify-content-between"><span class="skill"><i class="fas fa-circle"></i> Bug Creation</span> <span>+5</span></li>
 								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Bug Fixing</span> <span>+2</span></li>
 							</ul>
-						</b-col>
-					</b-row>
+						</div>
+					</div>
 				</hk-card>
 				<hk-card header="The Key">
 					<div class="d-flex justify-content-start">
@@ -52,8 +52,8 @@
 						</div>
 					</div>
 					<hr>
-					<b-row>
-						<b-col>
+					<div class="row">
+						<div class="col">
 							<h3>Abillity Scores</h3>
 							<ul class="abillities">
 								<li class="d-flex justify-content-between">Assembly <span class="score">9</span></li>
@@ -63,8 +63,8 @@
 								<li class="d-flex justify-content-between">Python <span class="score">10</span></li>
 								<li class="d-flex justify-content-between">R <span class="score">11</span></li>
 							</ul>
-						</b-col>
-						<b-col>
+						</div>
+						<div class="col">
 							<h3>Skills</h3>
 							<ul class="skills">
 								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Concentrating</span> <span>+2</span></li>
@@ -73,8 +73,8 @@
 								<li class="d-flex justify-content-between"><span class="skill"><i class="fas fa-circle"></i> Drinking</span> <span>+9</span></li>
 								<li class="d-flex justify-content-between"><span class="skill"><i class="far fa-circle"></i> Sleeping</span> <span>-2</span></li>
 							</ul>
-						</b-col>
-					</b-row>
+						</div>
+					</div>
 				</hk-card>
 			</hk-card-deck>
 
@@ -82,26 +82,26 @@
 				<h2>Patrick Teunissen</h2>
 				<h3>For designing our logo!</h3>
 				<p class="mb-5">This guy was nice enough to lend us his time and design the awesome logo for us. We couldn't be happier!</p>
-				<b-row>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+				<div class="row">
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-green.svg"/>
-					</b-col>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+					</div>
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-blue.svg"/>
-					</b-col>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+					</div>
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-red.svg"/>
-					</b-col>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+					</div>
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-orange.svg"/>
-					</b-col>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+					</div>
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg"/>
-					</b-col>
-					<b-col class="d-flex justify-content-center" style="height:120px;">
+					</div>
+					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-yellow.svg"/>
-					</b-col>
-				</b-row>
+					</div>
+				</div>
 			</hk-card>
 
 		</div>
@@ -174,7 +174,7 @@
 				width: 100px;
 			}
 
-			.card {
+			.hk-card {
 				.img {
 					border: solid 1px #b2b2b2;
 					width: 80px;

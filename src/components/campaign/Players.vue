@@ -82,7 +82,7 @@
 			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
-				<template v-if="player.curHp"><!-- make sure incomplete players aren't displayed -->
+				<template v-if="player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
 					<div 
 						class="image" 
 						:key="'image-'+key" 

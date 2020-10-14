@@ -17,23 +17,18 @@
 		
 		<Transform :data="entityKey" @close="closeTransform" v-if="setTransform" />
 		<template v-else>
-			<b-row v-if="location == 'encounter'" class="mb-3">
-				<b-col class="col-4">
-					<label>Initiative</label>
-				</b-col>
-				<b-col>
-					<b-form-input 
-						class="text-center"
-						type="number" 
-						name="initiative"
-						min="0"
-						v-model="initiative['.value']"
-						:class="{'input': true, 'error': errors.has('initiative') }"
-						v-validate="'required'"
-						placeholder="Initiative"></b-form-input>
-						<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
-				</b-col>
-			</b-row>
+			<div v-if="location == 'encounter'" class="mb-3">
+				<q-input 
+					dark filled square dense
+					label="initiative"
+					type="number" 
+					name="initiative"
+					min="0"
+					v-model="initiative['.value']"
+					v-validate="'required'"
+				/>
+				<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
+			</div>
 			<template v-else-if="entity.curHp === 0 && !entity.stable && !entity.dead">
 				<div class="px-1 my-3 d-flex justify-content-between">
 					<div v-for="(n, index) in 5" :key="index">
@@ -68,58 +63,70 @@
 			<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 
 			<h2>Temporary</h2>
-			<b-row class="mb-2">
-				<b-col class="text-center">
-					<label>AC Bonus</label>
-					<b-form-input 
-						class="text-center"
+			<div class="row mb-2">
+				<div class="col">
+					<q-input 
+						dark filled square dense
+						label="AC bonus"
 						type="number" 
 						name="ac_bonus" 
 						v-model="entity.ac_bonus"
-						placeholder="AC Bonus"></b-form-input>
-				</b-col>
+						clearable
+					/>
+				</div>
 
-				<b-col class="text-center">
-					<label>Temp HP</label>
-					<b-form-input 
-						class="text-center"
+				<div class="col mx-1">
+					<q-input 
+						dark filled square dense
+						label="Temp HP"
 						type="number" 
 						name="tempHp" 
 						v-model="entity.tempHp"
-						placeholder="Temporary Hit Points"></b-form-input>
-				</b-col>
+						clearable
+					/>
+				</div>
 
-				<b-col class="text-center" v-if="!entity.transformed">
-					<label>Max HP Mod</label>
-					<b-form-input 
-						class="text-center"
+				<div class="col" v-if="!entity.transformed">
+					<q-input 
+						dark filled square dense
+						label="Max HP Mod"
 						type="number" 
 						name="maxHpMod" 
 						v-model="maxHpMod"
-						placeholder="Max HP modifier"></b-form-input>
-				</b-col>
-			</b-row>
+						clearable
+					/>
+				</div>
+			</div>
 
 			<template>
 				<hr>
 				<h2 class="mb-0">Override</h2>
-				<b-row class="my-2">
-					<b-col class="text-center">
-						<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Cur HP</label>
+				<div class="row my-2">
+					<div class="col mr-1">
 						<template v-if="entity.transformed">
-							<b-form-input 
-								class="text-center"
+							<q-input 
+								dark filled square dense
+								label="Cur HP"
 								type="number" 
 								name="t-curHp" 
 								min="1"
 								v-model="entity.transformed.curHp"
 								v-validate="'required|numeric|min:1'"
 								data-vv-as="Current HP"
-								placeholder="Current Hit Points"/>
+								placeholder="Current Hit Points"
+							>
+								<q-icon slot="prepend" name="fas fa-paw-claws green">
+									<q-tooltip anchor="top middle" self="center middle">
+										Transformed
+									</q-tooltip>
+								</q-icon>
+							</q-input>
 							<p class="validate red" v-if="errors.has('t-curHp')">{{ errors.first('t-curHp') }}</p>
 						</template>
 						<template v-else>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Cur HP"
 								class="text-center"
 								type="number" 
 								name="curHp" 
@@ -127,16 +134,16 @@
 								v-model="entity.curHp"
 								v-validate="'required|numeric'"
 								data-vv-as="Current HP"
-								placeholder="Current Hit Points">
-							</b-form-input>
+							/>
 							<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
 						</template>
-					</b-col>
+					</div>
 
-					<b-col class="text-center">
-						<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Max HP</label>
+					<div class="col">
 						<template v-if="entity.transformed">
-							<b-form-input 		
+							<q-input 	
+								dark filled square dense
+								label="Max HP"	
 								class="text-center"
 								type="number" 
 								name="t-maxHp" 
@@ -144,11 +151,19 @@
 								v-model="entity.transformed.maxHp"
 								v-validate="'required|numeric'"
 								data-vv-as="Maximum HP"
-								placeholder="Maximum Hit Points"/>
+							>
+								<q-icon slot="prepend" name="fas fa-paw-claws green">
+									<q-tooltip anchor="top middle" self="center middle">
+										Transformed
+									</q-tooltip>
+								</q-icon>
+							</q-input>
 							<p class="validate red" v-if="errors.has('t-maxHp')">{{ errors.first('t-maxHp') }}</p>
 						</template>
 						<template v-else>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Max HP"
 								class="text-center"
 								type="number" 
 								name="maxHp" 
@@ -156,16 +171,17 @@
 								v-model="playerBase.maxHp"
 								v-validate="'required|numeric'"
 								data-vv-as="Maximum HP"
-								placeholder="Maximum Hit Points"/>
+							/>
 							<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 						</template>
-					</b-col>
-				</b-row>
-				<b-row>
-					<b-col class="text-center">
-						<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> AC</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col mr-1">
 						<template v-if="entity.transformed">
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Armor class"
 								class="text-center"
 								type="number" 
 								name="t-ac" 
@@ -173,11 +189,19 @@
 								v-model="entity.transformed.ac"
 								v-validate="'required|numeric'"
 								data-vv-as="Amor Class"
-								placeholder="Armor Class"/>
+							>
+								<q-icon slot="prepend" name="fas fa-paw-claws green">
+									<q-tooltip anchor="top middle" self="center middle">
+										Transformed
+									</q-tooltip>
+								</q-icon>
+							</q-input>
 							<p class="validate red" v-if="errors.has('t-ac')">{{ errors.first('t-ac') }}</p>
 						</template>
 						<template v-else>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
+								label="Armor class"
 								class="text-center"
 								type="number" 
 								name="ac" 
@@ -188,10 +212,11 @@
 								placeholder="Armor Class"/>
 							<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 						</template>
-					</b-col>
-					<b-col class="text-center">
-						<label>Level</label>
-						<b-form-input 
+					</div>
+					<div class="col">
+						<q-input 
+							dark filled square dense
+							label="Level"
 							class="text-center"
 							type="number" 
 							name="level" 
@@ -200,10 +225,18 @@
 							v-model="playerBase.level"
 							v-validate="isXpAdvancement() ? 'numeric|between:1,20' : 'required|numeric|between:1,20'"
 							data-vv-as="Level"
-							placeholder="Level"></b-form-input>
-							<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-					</b-col>
-				</b-row>
+							:clearable="isXpAdvancement()"
+						>
+							<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
+								{{ calculatedLevel(playerBase.experience) }}
+								<q-tooltip anchor="top left" self="center left">
+									Level based on XP
+								</q-tooltip>
+							</span>
+						</q-input>
+						<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
+					</div>
+				</div>
 			</template>
 
 			<button class="btn btn-block my-3" @click="edit()">Save</button>
@@ -225,13 +258,14 @@
 					<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
 				</div>
 
-				<b-form-input 
+				<q-input 
+					dark square filled dense
 					class="text-center"
 					type="number" 
 					name="xp" 
 					v-model="xp"
-					placeholder="Award XP">
-				</b-form-input>
+					label="Award XP"
+				/>
 
 				<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
 			</div>

@@ -103,10 +103,6 @@
 	h2 {
 		margin-bottom: 5px !important;
 	}
-	.q-field--filled .q-field__control {
-		text-align: center;
-		padding: 0 !important;
-	}
 	.roller {
 		display: grid;
 		grid-template-columns: 50px 50px 50px 40px auto;

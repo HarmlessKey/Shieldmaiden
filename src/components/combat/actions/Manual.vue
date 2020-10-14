@@ -19,7 +19,7 @@
 					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
-			<b-form-checkbox class="mb-2" name="crit" v-model="crit">Critical hit</b-form-checkbox>
+			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 
 			<div class="manual">
 				<input type="text" 

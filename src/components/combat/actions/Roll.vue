@@ -25,23 +25,24 @@
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
 					<div class="d-flex justify-content-between">
-						<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
-						<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
+						<q-checkbox dark v-model="openRoll" label="Roll openly" indeterminate-value="something-else" />
+						<a class="ml-1" @click="rollInfo = !rollInfo"><i class="fas fa-cog"></i></a>
 					</div>
-					<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
-						<b-form-group label="Display options open roll">
-							<b-form-checkbox-group
-								v-model="rollOptions"
+					<q-slide-transition>
+						<div v-show="rollInfo" class="bg-gray-hover p-2 mb-2" id="rollOptions">
+							<q-option-group
+								dark
 								:options="options"
-								name="flavour-2a"
-								stacked
-							></b-form-checkbox-group>
-						</b-form-group>
-						<small>Open rolls are shown on the player screen.</small>
-					</div>
+								label="Display options open roll"
+								type="checkbox"
+								v-model="rollOptions"
+							/>
+							<small>Open rolls are shown on the player screen.</small>
+						</div>
+					</q-slide-transition>
 				</template>
-				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
-				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damage once</b-form-checkbox>
+				<div><q-checkbox dark v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
+				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
 				<div v-if="toHit" class="advantage d-flex justify-content-between">
@@ -59,40 +60,37 @@
 				<h3>Custom Roll</h3>
 				<div class="custom-roll">
 					<div v-if="toHit">
-						<label><small>Hit mod</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Hit mod"
 							autocomplete="off" 
-							size="sm"
 							type="number" 
 							v-model="custom_roll.attack_bonus" 
 							name="custom_hit"
 							data-vv-as="To Hit Modifier"
-							placeholder="Hit"
 						/>
 					</div>
 					<div :class="{ span: !toHit }">
-						<label><small>Damage Dice</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Damage dice"
 							autocomplete="off" 
-							size="sm"
 							type="text" 
 							v-model="custom_roll.damage_dice" 
 							name="custom_roll"
 							data-vv-as="Custom Roll"
-							placeholder="Dice"
 							v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
 						/>
 					</div>
 					<div>
-						<label><small>Modifier</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Modifier"
 							autocomplete="off" 
-							size="sm"
 							type="number" 
 							v-model="custom_roll.damage_bonus" 
 							name="custom_mod"
 							data-vv-as="Custom Modifier"
-							placeholder="Mod"
 						/>
 					</div>
 					<div>
@@ -180,6 +178,7 @@
 		props: ['current'],
 		data: function() {
 			return {
+				rollInfo: false,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
@@ -196,9 +195,9 @@
 					damage_bonus: undefined
 				},
 				options: [
-					{ text: 'To hit', value: 'toHit' },
-					{ text: 'Damage', value: 'damage' },
-					{ text: 'Modifiers', value: 'modifiers' },
+					{ label: 'To hit', value: 'toHit' },
+					{ label: 'Damage', value: 'damage' },
+					{ label: 'Modifiers', value: 'modifiers' },
 				],
 				aoeRoll: undefined
 			}
@@ -553,16 +552,8 @@
 		grid-template-columns: 50px 1fr 50px max-content;
 		grid-gap: 3px;
 
-		input {
-			border: none !important;
-		}
-		label {
-			margin-bottom: 5px;
-			height: 15px;
-		}
 		.btn {
-			height: 31px !important;
-			margin-top: 20px !important;
+			height: 40px !important;
 		}
 		.span {
 			grid-column: span 2;

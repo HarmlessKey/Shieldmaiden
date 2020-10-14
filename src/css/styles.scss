@@ -924,6 +924,11 @@ html body {
 				}
 			}
 		}
+		.roller {
+			.q-field--filled .q-field__control {
+				padding: 0;
+			}
+		}
 	}
 	table.table, table {
 		border-collapse: separate !important; 

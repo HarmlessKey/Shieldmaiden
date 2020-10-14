@@ -14,13 +14,13 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<input v-if="die == 'X'" class="form-control" min="0" max="999" type="number" v-model="item.x" name="x" />
+			<q-input dark filled square dense v-if="die == 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
 				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
-			<input class="form-control" min="0" max="999" type="number" v-model="item.n" name="N" />
-			<input class="form-control" type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
+			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
+			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
 			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
@@ -103,6 +103,10 @@
 	h2 {
 		margin-bottom: 5px !important;
 	}
+	.q-field--filled .q-field__control {
+		text-align: center;
+		padding: 0 !important;
+	}
 	.roller {
 		display: grid;
 		grid-template-columns: 50px 50px 50px 40px auto;
@@ -117,11 +121,6 @@
 
 		.btn {
 			height: 36px;
-		}
-		input {
-			width: 50px;
-			text-align: center;
-			padding: 0 0 0 5px;
 		}
 		.icon {
 			height: 100%;

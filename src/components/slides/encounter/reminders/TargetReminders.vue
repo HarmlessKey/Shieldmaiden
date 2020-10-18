@@ -75,14 +75,15 @@
 							<div v-if="varOptions === key" class="variables">
 								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
 									<label>{{ var_key }}</label>
-									<b-form-select 
+									<q-select 
+										dark filled square dense
+										:label="var_key"
+										:options="variable"
 										type="text" 
 										v-validate="'required'"
 										v-model="selectedVars[var_key]"
-										:name="var_key">
-											<option selected="selected" value="">- Select -</option>
-											<option v-for="(option, i) in variable" :value="option" :key="var_key+i">{{ option }}</option>
-									</b-form-select>
+										:name="var_key"
+									/>
 									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
 								</div>
 								<a @click="addReminder('premade', reminder, selectedVars)" class="gray-light d-block mt-3">

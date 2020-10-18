@@ -1,61 +1,33 @@
 <template>
 	<div id="side_container">
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" 
-					id="log-tab" 
-					data-toggle="tab" 
-					href="#log" 
-					role="tab" 
-					aria-controls="log" 
-					aria-selected="true">
-					<i class="fas fa-scroll-old"></i>
-					<span class="d-none d-xxl-inline ml-1 truncate">Log</span>
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 	
-					id="damage-tab" 
-					data-toggle="tab" 
-					href="#damage" 
-					role="tab" 
-					aria-controls="damage" 
-					aria-selected="false">
-					<i class="fas fa-swords"></i>
-					<span class="d-none d-xxl-inline ml-1 truncate">Meters</span>
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 	
-					id="requests-tab" 
-					data-toggle="tab" 
-					href="#requests" 
-					role="tab" 
-					aria-controls="requests" 
-					aria-selected="false">
-					<i class="fas fa-bell"></i>
-					<span class="d-none d-xxl-inline ml-1 truncate">Requests</span>
-				</a>
-				<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
-					<div>{{ Object.keys(encounter.requests).length }}</div>
-				</div>
-			</li>
-		</ul>
-		<div class="actions scroll" v-bar>
-			<div>
-				<div class="tab-content">
-					<div class="tab-pane fade show active" id="log" role="tabpanel" aria-labelledby="log-tab">
-						<Log :log="log" />
+		 <q-tabs
+        v-model="tab"
+				dark
+				indicator-color="transparent"
+				dense
+				align="left"
+      >
+        <q-tab name="log" icon="fas fa fa-scroll-old" />
+        <q-tab name="damage" icon="fas fa-swords" />
+        <q-tab name="requests" icon="fas fa-bell">
+					<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
+						<div>{{ Object.keys(encounter.requests).length }}</div>
 					</div>
-					<div  class="tab-pane fade" id="damage" role="tabpanel" aria-labelledby="damage-tab">
-						<Dmg />
-					</div>
-					<div  class="tab-pane fade" id="requests" role="tabpanel" aria-labelledby="requests-tab">
-						<Requests />
-					</div>
-				</div>
-			</div>
-		</div>
+        </q-tab>
+		</q-tabs>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+			<q-tab-panels v-model="tab" class="bg-transparent">
+				<q-tab-panel name="log">
+					<Log :log="log" />
+				</q-tab-panel>
+				<q-tab-panel name="damage">
+					<Dmg />
+				</q-tab-panel>
+				<q-tab-panel name="requests">
+					<Requests />
+				</q-tab-panel>
+			</q-tab-panels>
+		</q-scroll-area>
 	</div>
 </template>
 
@@ -73,6 +45,11 @@
 			Requests
 		},
 		props:['log'],
+		data() {
+			return {
+				tab: "log"
+			}
+		},
 		computed: {
 			...mapGetters([
 				'encounter'
@@ -87,6 +64,37 @@
 	margin-top: -5px;
 	grid-area: side;
 	overflow: hidden;
+}
+.q-tabs {
+	.q-tab {
+		padding-top: 5px;
+		padding-bottom: 5px;
+		background: rgba(25, 25, 25, .9);
+		position: relative;
+
+		&.q-tab--active {
+			background: rgba(38, 38, 38, .9) !important;
+			color: #2c97de;
+		}
+		.notifications {		
+			user-select: none;
+			position: absolute;
+			top: -5px;
+			right: -25px;
+			height: 20px;
+			width: 20px;
+			border-radius: 50%;
+			
+			div {
+				position: absolute;
+				width: inherit;
+				height: inherit;
+				line-height: 20px;
+				text-align: center;
+				font-size: 13px;
+			}
+		}
+	}
 }
 .nav {
 	.nav-item {
@@ -120,7 +128,7 @@
 		}
 	}
 }
-.scroll { 
+.q-scrollarea { 
 	height: calc(100% - 30px);
 	background: rgba(38, 38, 38, .9);
 	padding-top: 20px;

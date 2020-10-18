@@ -22,7 +22,15 @@
 								{{ coin.name }}
 							</q-tooltip>
 						</span>
-						<b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="add[key]" :placeholder="coin.name"/>
+						<q-input 
+							dark filled square dense
+							:label="coin.name"
+							class="text-center"
+							autocomplete="off" 
+							type="number" min="0" 
+							name="name" 
+							v-model="add[key]" 
+						/>
 					</div>
 				</div>
 
@@ -261,28 +269,7 @@
 		margin-top: 20px; 
 		padding-top: 20px;
 			
-		.currency {
-			margin: auto;
-			display: flex;
-			justify-content: center;
-			max-width: 400px;
-			text-align: center;
-
-			img {
-				height: 25px;
-				margin-bottom: 10px;
-			}
-			div {
-				margin-right: 5px;
-
-				&:last-child {
-					margin-right: 0;
-				}
-			}
-			input[type='number'] {
-				-moz-appearance: textfield;
-			}
-		}
+	
 		.actions {
 			margin-top: 20px;
 			display: flex;

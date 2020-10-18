@@ -34,21 +34,19 @@
 					</a>
 				</h2>
 
-				<b-input-group v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')" class="mb-2">
-					<b-form-input
-						autocomplete="off" 
-						type="text" 
-						:class="{'input': true, 'error': errors.has('newEncounter') }"
-						v-model="newEncounter"
-						v-validate="'required'" 
-						data-vv-as="New Encounter"
-						name="newEncounter" 
-						placeholder="Encounter Title"
-						@change="addEncounter()"></b-form-input>
-					<b-input-group-append>
-						<button class="btn" @click="addEncounter()"><i class="fas fa-plus"></i> Add</button>
-					</b-input-group-append>				
-				</b-input-group>
+				<q-input 
+					v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')"
+					dark filled square dense
+					label="Encounter title"
+					type="text" 
+					autocomplete="off" 
+					v-model="newEncounter"
+					v-validate="'required'" 
+					data-vv-as="New Encounter"
+					name="newEncounter" 
+				>
+					<q-icon slot="append" class="pointer green" name="fas fa-plus" size="xs" @click="addEncounter()" />
+				</q-input>
 				<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
 
 				<OutOfSlots 
@@ -58,14 +56,16 @@
 
 				<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
 					<h2>Create encounter</h2>
-					<input type="text" 
+					<q-input
+						dark filled square dense
+						label="Encounter title" 
+						type="text" 
 						class="form-control" 
 						autocomplete="off"
 						v-model="newEncounter" 
 						v-validate="'required'"
 						data-vv-as="Encounter Title" 
 						name="firstEncounter"
-						placeholder="Encounter title"
 					/>
 					<p class="validate red" v-if="errors.has('firstEncounter')">{{ errors.first('firstEncounter') }}</p>
 					

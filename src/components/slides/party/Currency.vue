@@ -3,16 +3,24 @@
 		<h2>Update currency</h2>
 		<div v-if="currentValue >= maxCurrencyAmount" class="red text-center mb-2">Max amount reached</div>
 		<div class="currency">
-            <div v-for="(coin, key) in currencies" :key="key">
-                <span class="coins" :class="coin.color">
-                    <img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ coin.name }}
-										</q-tooltip>
-                  </span>
-                <b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="add[key]" :placeholder="coin.name"/>
-            </div>
-        </div>
+			<div v-for="(coin, key) in currencies" :key="key">
+					<span class="coins" :class="coin.color">
+						<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+						<q-tooltip anchor="top middle" self="center middle">
+							{{ coin.name }}
+						</q-tooltip>
+					</span>
+					<q-input 
+						dark filled square dense
+						:label="coin.name"
+						class="text-center"
+						autocomplete="off" 
+						type="number" min="0" 
+						name="name" 
+						v-model="add[key]" 
+					/>
+			</div>
+		</div>
 
 		<p class="red text-center mt-2" v-if="error != ''">{{ error }}</p>
 
@@ -72,28 +80,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.currency {
-        margin: auto;
-        display: flex;
-        justify-content: center;
-        max-width: 400px;
-        text-align: center;
-
-        img {
-			height: 25px;
-            margin-bottom: 10px;
-        }
-        div {
-            margin-right: 5px;
-
-            &:last-child {
-                margin-right: 0;
-            }
-		}
-		input[type='number'] {
-			-moz-appearance: textfield;
-		}
-	}
+	
 	.actions {
 		margin-top: 20px;
 		display: flex;

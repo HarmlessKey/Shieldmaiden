@@ -336,19 +336,19 @@ html body {
 	//DISPLAYS
 	.d {
 		&-flex {
-			display: flex !important;
+			display: flex;
 		}
 		&-none {
-			display: none !important;
+			display: none;
 		}
 		&-block {
-			display: block !important;
+			display: block;
 		}
 		&-inline {
-			display: inline !important;
+			display: inline;
 
 			&-block {
-				display: inline-block !important;
+				display: inline-block;
 			}
 		}
 	}
@@ -878,6 +878,22 @@ html body {
 					}
 				}
 			}
+			.q-field {
+				width: 60px;
+
+				.row {
+					padding: 0;
+				}
+				&__control {
+					height: 26px;
+				}
+				input {
+					text-align: center;
+					height: 26px;
+					line-height: 26px;
+					padding: 0 5px;
+				}
+			}
 		}
 		.hk-collapsed-column {
 			background: $gray;
@@ -1031,6 +1047,38 @@ html body {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	.currency {
+		margin: auto;
+		display: flex;
+		justify-content: center;
+		max-width: 400px;
+		text-align: center;
+
+		img {
+			height: 25px;
+			margin-bottom: 10px;
+		}
+		div {
+			margin-right: 5px;
+
+			&:last-child {
+					margin-right: 0;
+			}
+		}
+		.q-field {
+			.row {
+				text-align: center;
+				padding: 0 5px;
+			}
+			input {
+				text-align: center;
+			}
+			&__label {
+				font-size: 10px;
 			}
 		}
 	}
@@ -1787,12 +1835,47 @@ html body {
 	/*-----------------------------------*/
 
 	//XS
-	@media only screen and (max-width: 768px) {
-		
+	@media only screen and (max-width: 576px) {
+		.d-xs {
+			&-flex {
+				display: flex !important;
+			}
+			&-none {
+				display: none !important;
+			}
+			&-block {
+				display: block !important;
+			}
+			&-inline {
+				display: inline !important;
+	
+				&-block {
+					display: inline-block !important;
+				}
+			}
+		}
 	}
 
 	//SM
-	@media only screen and (max-width: 992px) {
+	@media only screen and (min-width: 576px) {
+		.d-sm {
+			&-flex {
+				display: flex !important;
+			}
+			&-none {
+				display: none !important;
+			}
+			&-block {
+				display: block !important;
+			}
+			&-inline {
+				display: inline !important;
+	
+				&-block {
+					display: inline-block !important;
+				}
+			}
+		}
 		.hk-card-deck {
 			.hk-card {
 				flex: 1 1 100%;
@@ -1802,7 +1885,68 @@ html body {
 	}
 
 	//MD
+	@media only screen and (min-width: 768px) {
+		.d-md {
+			&-flex {
+				display: flex !important;
+			}
+			&-none {
+				display: none !important;
+			}
+			&-block {
+				display: block !important;
+			}
+			&-inline {
+				display: inline !important;
+	
+				&-block {
+					display: inline-block !important;
+				}
+			}
+		}
+	}
+
+	//LG
+	@media only screen and (max-width: 992px) {
+		.d-lg {
+			&-flex {
+				display: flex !important;
+			}
+			&-none {
+				display: none !important;
+			}
+			&-block {
+				display: block !important;
+			}
+			&-inline {
+				display: inline !important;
+	
+				&-block {
+					display: inline-block !important;
+				}
+			}
+		}
+	}
+
+	//XL
 	@media only screen and (max-width: 1200px) {
-		
+		.d-xl {
+			&-flex {
+				display: flex !important;
+			}
+			&-none {
+				display: none !important;
+			}
+			&-block {
+				display: block !important;
+			}
+			&-inline {
+				display: inline !important;
+	
+				&-block {
+					display: inline-block !important;
+				}
+			}
+		}
 	}
 }

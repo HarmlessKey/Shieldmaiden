@@ -2,31 +2,43 @@
 	<div>
 		<div class="mb-2"><a @click="cancel">Cancel</a></div>
 		<h2>New Item</h2>
-		<label for="name">
-			Public Name
-			<a v-b-popover.hover.top="'The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item.'" title="Public Name"><i class="fas fa-info-circle"></i></a>
-		</label>
-		<b-form-input
+		<q-input
+			dark filled square dense
+			label="Public name"
 			class="mb-3"
-			id="name"
 			type="text" 
 			v-model="item.public_name" 
 			v-validate="'required'"
 			name="name" 
 			data-vv-as="Public Name"
-			placeholder="Name"></b-form-input>
+		>
+			<template v-slot:append>
+				<q-icon name="info" @click.stop>
+					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+						<q-card dark square>
+							<q-card-section class="bg-gray-active">
+								<b>Public name</b>
+							</q-card-section>
+							<q-card-section>
+								The public name is visible for players after you have awarded the item. 
+								You decide when you also want to share the information of the linked item.
+							</q-card-section>
+						</q-card>
+					</q-menu>
+				</q-icon>
+			</template>
+		</q-input>
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-		<label for="desc">
-			Public Description
-		</label>
-		<textarea
-			id="desc"
-			class="form-control mb-3" 
+		<q-input
+			dark filled square dense
+			autogrow
+			label="Public description"
+			class="mb-3" 
 			v-model="item.public_description" 
 			rows="4"
 			name="desc" 
-			placeholder="Description"></textarea>
+		/>
 
 		<div v-if="item.linked_item" class="linked mb-3">
 			<div class="item-name">
@@ -44,13 +56,17 @@
 		<a class="btn mb-3" @click="addItem" :disabled="errors.items && errors.items.length > 0">Add</a>
 
 		<h3>Link item</h3>
-		<div class="input-group mb-3">
-            <input type="text" autocomplete="off" v-model="searched" @keyup="searchItems()" placeholder="Search" class="form-control"/>
-            <div class="input-group-append">
-                <button class="btn" @click="searchItems()"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-        <div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
+		<q-input 
+			dark filled square dense
+			label="Search items"
+			type="text" 
+			autocomplete="off" 
+			v-model="searched"
+			@keyup="searchItems()" 
+		>
+			<q-icon slot="append" name="fas fa-search" size="xs" @click="searchItems()" />
+		</q-input>
+		<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
 
 		<div v-if="foundItems" class="items">
 			<template v-for="item in foundItems">

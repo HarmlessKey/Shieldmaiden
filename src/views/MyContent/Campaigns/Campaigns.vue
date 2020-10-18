@@ -20,26 +20,30 @@
 				<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 			</h2>
 
-			<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
-				<div class="input-group" >
-					<input type="text" 
-						class="form-control" 
-						autocomplete="off"
-						:class="{'input': true, 'error': errors.has('newCampaign') }" 
-						v-model="newCampaign" 
-						v-validate="'required'"
-						data-vv-as="New Campaign" 
-						name="newCampaign"
-						@change="addCampaign()"
-						placeholder="Add new campaign"
-					/>
-					<div class="input-group-append">
-						<button class="btn"><i class="fas fa-plus"></i> Add</button>
-					</div>
-				</div>
-				<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
+			<div v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
+				<q-input 
+					dark filled square dense
+					type="text" 
+					autocomplete="off"
+					:class="{'input': true, 'error': errors.has('newCampaign') }" 
+					v-model="newCampaign" 
+					v-validate="'required'"
+					data-vv-as="New Campaign" 
+					name="newCampaign"
+					@change="addCampaign()"
+					label="New campaign name"
+				/>
+				<q-select
+					dark filled square dense
+					label="Advancement"
+					class="mt-2" 
+					v-model="advancement" 
+					:options="advancement_options"
+				/>
 
 				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+
+				<button class="btn"><i class="fas fa-plus"></i> Add</button>
 			</div>
 
 			<OutOfSlots 
@@ -146,7 +150,9 @@
 			<!-- CREATE FIRST CAMPAIGN -->
 			<div class="first-campaign" v-else>
 				<h2>Create your first campaign</h2>
-				<input type="text" 
+				<q-input 
+					dark filled square dense
+					type="text" 
 					class="form-control" 
 					autocomplete="off"
 					v-model="newCampaign" 
@@ -154,11 +160,15 @@
 					data-vv-as="Campaign Title" 
 					name="firstCampaign"
 					@change="addCampaign()"
-					placeholder="Title of your first campaign"
+					label="Title of your first campaign"
 				/>
-				<div class="switch">
-					<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
-				</div>
+				<q-select 
+					dark filled square dense
+					label="Advancement"
+					class="mt-2" 
+					v-model="advancement" 
+					:options="advancement_options"
+				/>
 				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
 				
 				<button class="btn btn-lg bg-green btn-block mt-4">Create campaign</button>

@@ -10,7 +10,7 @@
 				v-model="searched"
 				@keyup="searchData()" 
 			>
-				<q-icon slot="append" name="fas fa-search" size="xs" @click="searchData()" />
+				<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchData()" />
 			</q-input>
 			<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(dataItems).length === 0}">{{ Object.keys(dataItems).length }} results for {{ searched }}</div>
 		</div>

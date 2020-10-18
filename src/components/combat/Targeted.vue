@@ -1,5 +1,5 @@
 <template>
-	<div id="current">
+	<div id="targeted">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 
 			<div class="d-flex justify-content-between">
@@ -83,157 +83,155 @@
 				</a>
 			</div>
 		</h2>
-		<div class="scroll" v-bar>
-			<div v-on:scroll="shadow()" ref="scroll">
-				<div class="current">
-					<!-- SINGLE TARGET -->
-					<template v-if="target">
-						<template v-if="(target.entityType === 'player' || target.entityType === 'companion') && target.curHp == 0 && !target.stable && !target.dead">
-								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
-								<div class="px-1 my-3 d-flex justify-content-between">
-									<div v-for="(n, index) in 5" :key="index">
-										<template v-if="Object.keys(target.saves).length == n">
-											<a v-show="target.saves[n] === 'succes'" class="green" @click="save('unset', n)">
-												<i class="fas fa-check"></i>
-												<q-tooltip anchor="top middle" self="center middle">
-													Undo
-												</q-tooltip>
-											</a>
-											<a v-show="target.saves[n] === 'fail'" class="red" @click="save('unset', n)">
-												<i class="fas fa-times"></i>
-												<q-tooltip anchor="top middle" self="center middle">
-													Undo
-												</q-tooltip>
-											</a>
-										</template>
-										<template v-else>
-											<span v-show="target.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
-											<span v-show="target.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
-										</template>
-										<span v-show="!target.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
-									</div>
-								</div>
-								<div v-if="Object.keys(target.saves).length < 5" class="d-flex justify-content-between">
-									<button class="btn save bg-green" @click="save('succes', Object.keys(target.saves).length)"><i class="fas fa-check"></i></button>
-									<button class="btn save bg-red" @click="save('fail', Object.keys(target.saves).length)"><i class="fas fa-times"></i></button>
-								</div>
-								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
-								<a class="btn btn-block mt-3" @click="set_stable({key: target.key, action: 'set'})"><i class="fas fa-heartbeat"></i> Stabilize</a>
-						</template>
-						<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
-						
-						<template v-else>
-							<div class="health">
-								<icon v-if="['monster', 'player', 'companion'].includes(target.img)" class="img" :icon="target.img" :fill="target.color_label" :style="target.color_label ? `border-color: ${target.color_label}` : ``" />
-								<span 
-									v-else class="img" 
-									:style="{
-										'background-image': 'url(' + target.img + ')',
-										'border-color': target.color_label ? target.color_label : ``
-									}"/>
-								<div class="progress health-bar">
-									<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-									<div v-show="!target.stable && !target.dead">
-										<span class="percentage">{{ percentage(displayStats(target).curHp, displayStats(target).maxHp) }}%</span>
-										<span class="hp">{{ displayStats(target).curHp }} / {{ displayStats(target).maxHp }}</span>
-									</div>
-									<div class="progress-bar" 
-										:class="{ 
-											'bg-red': percentage(displayStats(target).curHp, displayStats(target).maxHp) <= 33, 
-											'bg-orange': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 33 && percentage(displayStats(target).curHp, displayStats(target).maxHp) < 76, 
-											'bg-green': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 7
-										}" 
-										role="progressbar" 
-										:style="{width: percentage(displayStats(target).curHp, displayStats(target).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-									</div>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+			<div class="current">
+				<!-- SINGLE TARGET -->
+				<template v-if="target">
+					<template v-if="(target.entityType === 'player' || target.entityType === 'companion') && target.curHp == 0 && !target.stable && !target.dead">
+							<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
+							<div class="px-1 my-3 d-flex justify-content-between">
+								<div v-for="(n, index) in 5" :key="index">
+									<template v-if="Object.keys(target.saves).length == n">
+										<a v-show="target.saves[n] === 'succes'" class="green" @click="save('unset', n)">
+											<i class="fas fa-check"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Undo
+											</q-tooltip>
+										</a>
+										<a v-show="target.saves[n] === 'fail'" class="red" @click="save('unset', n)">
+											<i class="fas fa-times"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Undo
+											</q-tooltip>
+										</a>
+									</template>
+									<template v-else>
+										<span v-show="target.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
+										<span v-show="target.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
+									</template>
+									<span v-show="!target.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
 								</div>
 							</div>
-						</template>
-
-						<Reminders :entity="target" />
-						<Conditions :entity="target" />
-						<ViewEntity class="mt-3 hide" :data="target" />
+							<div v-if="Object.keys(target.saves).length < 5" class="d-flex justify-content-between">
+								<button class="btn save bg-green" @click="save('succes', Object.keys(target.saves).length)"><i class="fas fa-check"></i></button>
+								<button class="btn save bg-red" @click="save('fail', Object.keys(target.saves).length)"><i class="fas fa-times"></i></button>
+							</div>
+							<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
+							<a class="btn btn-block mt-3" @click="set_stable({key: target.key, action: 'set'})"><i class="fas fa-heartbeat"></i> Stabilize</a>
 					</template>
-
-					<!-- MULTIPLE TARGETS -->
-					<template v-else-if="targeted.length > 1">
-						<div v-for="key in targeted" :key="`target-${key}`" class="target">
-							<div class="health untarget">
-								<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
-								<span 
-									v-else class="img" 
-									:style="{
-										'background-image': 'url(' + entities[key].img + ')',
-										'border-color': entities[key].color_label ? entities[key].color_label : ``
-									}"/>
-								<div class="progress health-bar">
-									<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-									<div v-show="!entities[key].stable && !entities[key].dead">
-										<span class="percentage">{{ entities[key].name }}</span>
-										<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
-									</div>
-									<div class="progress-bar" 
-										:class="{ 
-											'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
-											'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
-											'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
-										}" 
-										role="progressbar" 
-										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-									</div>
+					<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
+					
+					<template v-else>
+						<div class="health">
+							<icon v-if="['monster', 'player', 'companion'].includes(target.img)" class="img" :icon="target.img" :fill="target.color_label" :style="target.color_label ? `border-color: ${target.color_label}` : ``" />
+							<span 
+								v-else class="img" 
+								:style="{
+									'background-image': 'url(' + target.img + ')',
+									'border-color': target.color_label ? target.color_label : ``
+								}"/>
+							<div class="progress health-bar">
+								<span v-show="target.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+								<span v-show="target.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+								<div v-show="!target.stable && !target.dead">
+									<span class="percentage">{{ percentage(displayStats(target).curHp, displayStats(target).maxHp) }}%</span>
+									<span class="hp">{{ displayStats(target).curHp }} / {{ displayStats(target).maxHp }}</span>
 								</div>
-								<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})">
-									<i class="fas fa-times red"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Untarget
-									</q-tooltip>
-								</a>
-							</div>
-							<div class="scores">
-								<template v-for="(ability, index) in abilities">
-									<div
-										:key="`score-${index}`" 
-										v-if="entities[key][ability.ability]"
-										class="ability"
-									>
-										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
-										<div 
-											class="mod bg-gray-dark"
-											@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
-										>
-											{{ modifier(entities[key][ability.ability]) }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Roll check
-											</q-tooltip>
-										</div>
-										<div 
-											class="mod bg-gray-dark"
-											v-if="entities[key].entityType === 'npc'"
-											@click="rollD(20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${ability.ability} save`)"
-										>
-											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Roll save
-											</q-tooltip>
-										</div>
-									</div>
-								</template>
+								<div class="progress-bar" 
+									:class="{ 
+										'bg-red': percentage(displayStats(target).curHp, displayStats(target).maxHp) <= 33, 
+										'bg-orange': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 33 && percentage(displayStats(target).curHp, displayStats(target).maxHp) < 76, 
+										'bg-green': percentage(displayStats(target).curHp, displayStats(target).maxHp) > 7
+									}" 
+									role="progressbar" 
+									:style="{width: percentage(displayStats(target).curHp, displayStats(target).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+								</div>
 							</div>
 						</div>
 					</template>
-					<div v-else class="noTargetInfo">
-						<h3 class="red">No target selected</h3>
-						<p> Select at least 1 target from the target list to perform targeted actions.</p>
 
-						<p><b>Selecing a target</b><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
-						<p><b>Multi-targeting</b><br/>Hold down shift and click on multiple entities to target them all at once.</p>
-						<p><b>Cycle through targets</b><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
+					<Reminders :entity="target" />
+					<Conditions :entity="target" />
+					<ViewEntity class="mt-3 hide" :data="target" />
+				</template>
+
+				<!-- MULTIPLE TARGETS -->
+				<template v-else-if="targeted.length > 1">
+					<div v-for="key in targeted" :key="`target-${key}`" class="target">
+						<div class="health untarget">
+							<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
+							<span 
+								v-else class="img" 
+								:style="{
+									'background-image': 'url(' + entities[key].img + ')',
+									'border-color': entities[key].color_label ? entities[key].color_label : ``
+								}"/>
+							<div class="progress health-bar">
+								<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
+								<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
+								<div v-show="!entities[key].stable && !entities[key].dead">
+									<span class="percentage">{{ entities[key].name }}</span>
+									<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
+								</div>
+								<div class="progress-bar" 
+									:class="{ 
+										'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
+										'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
+										'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
+									}" 
+									role="progressbar" 
+									:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
+								</div>
+							</div>
+							<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})">
+								<i class="fas fa-times red"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Untarget
+								</q-tooltip>
+							</a>
+						</div>
+						<div class="scores">
+							<template v-for="(ability, index) in abilities">
+								<div
+									:key="`score-${index}`" 
+									v-if="entities[key][ability.ability]"
+									class="ability"
+								>
+									<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+									<div 
+										class="mod bg-gray-dark"
+										@click="rollD(20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
+									>
+										{{ modifier(entities[key][ability.ability]) }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Roll check
+										</q-tooltip>
+									</div>
+									<div 
+										class="mod bg-gray-dark"
+										v-if="entities[key].entityType === 'npc'"
+										@click="rollD(20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${ability.ability} save`)"
+									>
+										{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Roll save
+										</q-tooltip>
+									</div>
+								</div>
+							</template>
+						</div>
 					</div>
+				</template>
+				<div v-else class="noTargetInfo">
+					<h3 class="red">No target selected</h3>
+					<p> Select at least 1 target from the target list to perform targeted actions.</p>
+
+					<p><b>Selecing a target</b><br/>Click on an entity in the target list, or use [0-9] on your keyboard to target it.</p>
+					<p><b>Multi-targeting</b><br/>Hold down shift and click on multiple entities to target them all at once.</p>
+					<p><b>Cycle through targets</b><br/>Use the up and down arrow keys on your keyboard to cycle through the targets. Hold shift to select multiple targets in a row.</p>
 				</div>
 			</div>
-		</div>
+		</q-scroll-area>
 	</div>
 </template>
 
@@ -339,7 +337,7 @@
 				return hp_percentage
 			},
 			shadow() {
-				this.setShadow = this.$refs.scroll.scrollTop
+				this.setShadow = this.$refs.scroll.scrollPosition;
 			},
 			save(check, index) {
 				this.set_save({
@@ -393,7 +391,7 @@
 </script>
 
 <style lang="scss" scoped>
-#current {
+#targeted {
 	background: rgba(38, 38, 38, .9);
 	grid-area: targeted;
 	overflow: hidden;
@@ -406,7 +404,7 @@
 		padding: 15px 10px;
 		width: calc(100% - 5px);
 	}
-	.scroll {
+	.q-scrollarea {
 		height: calc(100% - 30px);
 	}
 	h2.componentHeader {
@@ -414,7 +412,7 @@
 		margin-bottom: 0 !important;
 
 		&.shadow {
-			box-shadow: 0 0 10px rgba(0,0,0,0.8); 
+			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
 		}
 	}
 	.btn.save {
@@ -537,7 +535,7 @@
 	}
 }
 @media only screen and (max-width: 600px) {
-	#current, .scroll, .current {
+	#targeted, .scroll, .current {
 		overflow: visible !important;
 	}
 	.hide {

@@ -50,7 +50,17 @@
 	<!-- ACTIONS -->
 	<div slot="actions" slot-scope="data">
 		<div class="monster-actions">
-			<b-form-input class="multi_nr" autocomplete="off" type="number" min="1" name="name" placeholder="1" v-model="to_add[data.row['.key']]" />
+			<q-input 
+				dark filled square dense
+				class="multi_nr" 
+				autocomplete="off" 
+				type="number" 
+				min="1"
+				max="99"
+				name="name" 
+				placeholder="1" 
+				v-model="to_add[data.row['.key']]"
+			/>
 			<a @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
 				<q-tooltip anchor="top middle" self="center middle">

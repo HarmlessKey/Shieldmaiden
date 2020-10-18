@@ -1,112 +1,141 @@
 <template>
-		<div class="loot">
-				<h3><i class="fas fa-coins"></i> Currency</h3>
-				<div class="currency">
-						<div v-for="(coin, key) in currencies" :key="key">
-								<span class="coins" :class="coin.color">
-										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-										<q-tooltip anchor="top middle" self="center middle">
-											{{ coin.name }}
-										</q-tooltip>
-									</span>
-								<b-form-input class="text-center" autocomplete="off" type="number" size="sm" min="0" name="name" v-model="currency[key]" @change="setCurrency()" :placeholder="coin.name"/>
-						</div>
-				</div>
-				<div class="d-flex justify-content-center mt-3">
-						<!-- <button class="btn" @click="setCurrency()">Save currency</button> -->
-				</div>
-
-				<h3 class="d-flex justify-content-between mt-3">
-						<span>
-								<i class="far fa-staff"></i> Items
-								<span v-if="items">( {{ Object.keys(items).length }} )</span>
-						</span>
-						<a class="gray-hover" @click="addItem()">
-								<i class="fas fa-plus green"></i>
-								<span class="d-none d-md-inline ml-1">Add</span>
-						</a>
-				</h3>
-				<hr>
-				<template v-if="items">
-						<div v-for="(item, index) in items" :key="item['.key']">
-								<hk-card class="bg-gray mb-3">
-									<div slot="header" class="card-header d-flex justify-content-between">
-											{{ index + 1 }}. {{ item.public_name }}
-											<span>
-													<a @click="setEdit(item['.key'])" class="mr-3 gray-light">
-														<i class="fas fa-pencil"></i>
-														<q-tooltip anchor="top middle" self="center middle">
-															Edit
-														</q-tooltip>
-													</a>
-													<a @click="removeItem(item['.key'])" class="red">
-														<i class="fas fa-trash-alt"></i>
-														<q-tooltip anchor="top middle" self="center middle">
-															Remove
-														</q-tooltip>
-													</a>
-											</span>
-									</div>
-									<div v-if="editItem === item['.key']">
-											<label for="name">
-													Public Name
-													<a v-b-popover.hover.top="'The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item.'" title="Public Name"><i class="fas fa-info-circle"></i></a>
-											</label>
-											<b-form-input
-												class="mb-3"
-												id="name"
-												type="text" 
-												v-model="item.public_name" 
-												name="name" 
-												placeholder="Name"></b-form-input>
-
-											<label for="desc">
-													Public Description
-											</label>
-											<textarea
-												id="desc"
-												class="form-control mb-4" 
-												v-model="item.public_description" 
-												rows="4"
-												name="desc" 
-												placeholder="Description"></textarea>
-
-											<p>
-												<a 
-													v-if="!item.linked_item"
-													@click="setSlide({
-														show: true,
-														type: 'slides/editEncounter/LinkItem',
-														data: {
-															item: item
-														}
-													})"
-												>
-													<i class="far fa-link"></i> Link item
-												</a>
-												<template v-else>
-													<i class="far fa-link mr-2"></i>
-													<a @click="setSlide({show: true, type: 'ViewItem', data: item.full_linked_item })">{{ item.full_linked_item.name }}</a>
-													<a @click="unlink(item['.key'])">
-														<i class="fas fa-unlink red ml-2"></i>
-														<q-tooltip anchor="top middle" self="center middle">
-															Unlink
-														</q-tooltip>
-													</a>
-												</template>
-												<a
-													class="ml-2" 
-													v-b-popover.hover.top="'The description of the linked item is not immideately shown when the item has been awarded. You can manualy set this to be visible for your players, once they are allowed to see it.'" 
-													title="Linked Item">
-													<i class="fas fa-info-circle"></i>
-												</a>
-											</p>
-											<button class="btn mt-3" @click="saveItem(item, item['.key'])">Save</button>
-										</div>
-								</hk-card>
-						</div>
-				</template>
+	<div class="loot">
+		<h3><i class="fas fa-coins"></i> Currency</h3>
+		<div class="currency">
+			<div v-for="(coin, key) in currencies" :key="key">
+				<span class="coins" :class="coin.color">
+					<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+					<q-tooltip anchor="top middle" self="center middle">
+						{{ coin.name }}
+					</q-tooltip>
+				</span>
+				<q-input 
+					dark filled square dense
+					:label="coin.name"
+					class="text-center"
+					autocomplete="off" 
+					type="number" min="0" 
+					name="name" 
+					v-model="currency[key]"
+					@change="setCurrency()"
+				/>
+			</div>
 		</div>
+		<div class="d-flex justify-content-center mt-3">
+				<!-- <button class="btn" @click="setCurrency()">Save currency</button> -->
+		</div>
+
+		<h3 class="d-flex justify-content-between mt-3">
+			<span>
+				<i class="far fa-staff"></i> Items
+				<span v-if="items">( {{ Object.keys(items).length }} )</span>
+			</span>
+			<a class="gray-hover" @click="addItem()">
+				<i class="fas fa-plus green"></i>
+				<span class="d-none d-md-inline ml-1">Add</span>
+			</a>
+		</h3>
+		<hr>
+		<template v-if="items">
+			<div v-for="(item, index) in items" :key="item['.key']">
+				<hk-card class="bg-gray mb-3">
+					<div slot="header" class="card-header d-flex justify-content-between">
+						{{ index + 1 }}. {{ item.public_name }}
+						<span>
+							<a @click="setEdit(item['.key'])" class="mr-3 gray-light">
+								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</a>
+							<a @click="removeItem(item['.key'])" class="red">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Remove
+								</q-tooltip>
+							</a>
+						</span>
+					</div>
+					<div v-if="editItem === item['.key']">
+						<q-input
+							dark filled square dense
+							label="Public name"
+							class="mb-3"
+							id="name"
+							type="text" 
+							v-model="item.public_name" 
+							name="name" 
+						>
+							<template v-slot:append>
+								<q-icon name="info" @click.stop class="pointer">
+									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+										<q-card dark square>
+											<q-card-section class="bg-gray-active">
+												<b>Public name</b>
+											</q-card-section>
+											<q-card-section>
+												The public name is visible for players after you have awarded the item. 
+												You decide when you also want to share the information of the linked item.
+											</q-card-section>
+										</q-card>
+									</q-menu>
+								</q-icon>
+							</template>
+						</q-input>
+
+						<q-input
+							dark filled square dense
+							autogrow
+							label="Public description"
+							id="desc"
+							class="mb-4" 
+							v-model="item.public_description" 
+							rows="4"
+							name="desc"
+						/>
+						<p>
+							<a 
+								v-if="!item.linked_item"
+								@click="setSlide({
+									show: true,
+									type: 'slides/editEncounter/LinkItem',
+									data: {
+										item: item
+									}
+								})"
+							>
+								<i class="far fa-link"></i> Link item
+							</a>
+							<template v-else>
+								<i class="far fa-link mr-2"></i>
+								<a @click="setSlide({show: true, type: 'ViewItem', data: item.full_linked_item })">{{ item.full_linked_item.name }}</a>
+								<a @click="unlink(item['.key'])">
+									<i class="fas fa-unlink red ml-2"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Unlink
+									</q-tooltip>
+								</a>
+							</template>
+							<q-icon name="info" class="blue pointer">
+								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+									<q-card dark square>
+										<q-card-section class="bg-gray-active">
+											<b>Linked item</b>
+										</q-card-section>
+										<q-card-section>
+											The description of the linked item is not immideately shown when the item has been awarded. 
+											You can manualy set this to be visible for your players, once they are allowed to see it.
+										</q-card-section>
+									</q-card>
+								</q-menu>
+							</q-icon>
+						</p>
+						<button class="btn mt-3" @click="saveItem(item, item['.key'])">Save</button>
+					</div>
+				</hk-card>
+			</div>
+		</template>
+	</div>
 </template>
 
 <script>

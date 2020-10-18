@@ -116,7 +116,7 @@
 		text-align:center;
 
 		.btn {
-			height: 36px;
+			height: 40px;
 		}
 		.icon {
 			height: 100%;

@@ -6,11 +6,12 @@
 			<h1>New Patron</h1>
 		</template>
 
-		<b-row class="mb-4">
-			<b-col md="4">
+		<div class="row mb-4">
+			<div class="col-12 col-md-4">
 				<template v-if="$route.path === '/admin/patrons/new'">
-					<label for="patron_id">Patron ID</label>
-					<b-form-input 
+					<q-input 
+						dark filled square dense
+						label="Patron ID"
 						autocomplete="off" 
 						id="patron_id"
 						type="number"
@@ -19,12 +20,14 @@
 						v-validate="'required|numeric'" 
 						data-vv-as="Patron ID"
 						name="patron_id" 
-						placeholder="Patron ID" />
+					/>
 					<p class="validate red" v-if="errors.has('patron_id')">{{ errors.first('patron_id') }}</p>
 				</template>
 
 				<label for="email" class="mt-4">Email</label>
-				<b-form-input 
+				<q-input 
+					dark filled square dense
+					label="Patron ID"
 					autocomplete="off" 
 					type="text"
 					id="email"
@@ -37,7 +40,7 @@
 				<p class="validate red" v-if="errors.has('email')">{{ errors.first('email') }}</p>
 
 				<label for="tier" class="mt-4">Tier</label>
-				<b-select 
+				<q-select 
 					id="tier"
 					v-model="patron.tier_id"
 					v-validate="'required'" 
@@ -45,11 +48,11 @@
 					name="tier" 
 					placeholder="Tier">
 					<option v-for="(tier, key) in tiers" :key="key" :value="key">{{ tier.name }}</option>
-				</b-select>
+				</q-select>
 				<p class="validate red" v-if="errors.has('tier')">{{ errors.first('tier') }}</p>
 
 				<label for="status" class="mt-4">Status</label>
-				<b-select 
+				<q-select 
 					id="status"
 					v-model="patron.status"
 					v-validate="'required'" 
@@ -57,10 +60,10 @@
 					name="status">
 					<option value="active_patron" selected="selected">Active</option>
 					<option value="former_patron">Former</option>
-				</b-select>
+				</q-select>
 					<p class="validate red" v-if="errors.has('status')">{{ errors.first('status') }}</p>
-			</b-col>
-		</b-row>
+			</div>
+		</div>
 		<button class="btn" @click="addPatron">
 			<span v-if="$route.path === '/admin/patrons/new'">Add</span>
 			<span v-else>Save</span>

@@ -6,7 +6,7 @@
 			<h1>New Patron</h1>
 		</template>
 
-		<div class="row mb-4">
+		<div class="row q-col-gutter-md mb-4">
 			<div class="col-12 col-md-4">
 				<template v-if="$route.path === '/admin/patrons/new'">
 					<q-input 

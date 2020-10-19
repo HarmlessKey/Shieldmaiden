@@ -9,8 +9,8 @@
 			<template v-if="(old_spell && spell)">
 				
 				<div class="form">
-					<b-row>
-						<b-col md="4" id="old_spell">
+					<div class="row q-col-gutter-md">
+						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
 								<div  class="loader"> <span>Loading old_spell...</span></div>
 							</hk-card>
@@ -69,14 +69,14 @@
 									<ViewSpell :data="spell" :no_roll="true" />
 								</div>
 							</div> <!-- card -->
-						</b-col>
+						</div>
 
-						<b-col md="8">
+						<div class="col-12 col-md-8">
 							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
 							<!-- SPELL ACTIONS -->
 							<spell-actions v-model='spell' @validation="setValidators" />
-						</b-col>
-					</b-row>
+						</div>
+					</div>
 				</div>
 				<div class="save">
 					<div class="d-flex justify-content-start">

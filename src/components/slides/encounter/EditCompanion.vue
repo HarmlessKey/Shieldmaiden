@@ -19,7 +19,7 @@
 		<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 
 		<h2 class="mt-2">Temporary</h2>
-		<div class="row mb-2">
+		<div class="row q-col-gutter-md mb-2">
 			<div class="col">
 				<q-input 
 					dark filled square dense
@@ -54,7 +54,7 @@
 		<template>
 			<hr>
 			<h2 class="mb-0">Override</h2>
-			<div class="row my-2">
+			<div class="row q-col-gutter-md my-2">
 				<div class="col">
 					<template v-if="entity.transformed">
 						<q-input 

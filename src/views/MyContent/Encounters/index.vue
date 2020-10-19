@@ -10,9 +10,9 @@
 		<OverEncumbered v-if="overencumbered" />
 
 		<template v-else-if="tier">
-			<b-row>
+			<div class="row q-col-gutter-md">
 			<!-- SHOW ENCOUNTERS -->
-			<b-col lg="7">
+			<div class="col-12 col-md-7">
 				<h2 class="d-flex justify-content-between">
 					<span>
 						<span>
@@ -184,14 +184,14 @@
 				</template>
 				
 				<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
-			</b-col>
+			</div>
 
 				<!-- PLAYERS -->
-				<b-col lg="5">
+				<div class="col-12 col-md-5">
 					<h2>Players</h2>
 					<Players :userId="user.uid" :campaignId="campaignId" />
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</template>
 	</div>
 </template>

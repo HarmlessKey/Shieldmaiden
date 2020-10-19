@@ -64,7 +64,7 @@
 			</div>
 			
 			<h2>Add players</h2>
-			<div class="row">
+			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-6">
 					<hk-card header="All Players">
 						<ul class="entities hasImg" v-if="players && campaign">

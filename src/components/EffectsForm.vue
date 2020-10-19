@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="row mb-3">
+		<div class="row q-col-gutter-md mb-3">
 			<div class="col-12 col-md-3">
 				<q-select
 					dark filled square dense
@@ -74,7 +74,7 @@
 				</div>
 			</template>
 		</div>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- FORM WITH VALUES -->
 			<template v-if="hasField('values')">
 				<!-- DICE COUNT -->

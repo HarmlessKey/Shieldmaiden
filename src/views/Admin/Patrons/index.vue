@@ -9,8 +9,8 @@
 			<router-link to="/admin/patrons/new" class="btn" ><i class="fas fa-plus"></i> New</router-link>
 		</h1>
 
-		<b-row>
-			<b-col md="8">
+		<div class="row q-col-gutter-md">
+			<div class="col-12 col-md-8">
 
 				<div class="table-responsive">
 					<hk-table
@@ -62,11 +62,11 @@
 					</hk-table>
 				</div>
 	
-			</b-col>
-			<b-col md="4">
+			</div>
+			<div class="col-12 col-md-4">
 				<Notifications />
-			</b-col>
-		</b-row>
+			</div>
+		</div>
 		</template>
 
 		<!-- SHOW Patron -->

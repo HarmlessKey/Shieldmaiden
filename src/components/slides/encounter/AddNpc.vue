@@ -13,7 +13,7 @@
 		/>
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
-		<div class="row mb-2">
+		<div class="row q-col-gutter-md mb-2">
 			<div class="col">
 				<q-input 
 					dark filled square dense

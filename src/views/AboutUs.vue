@@ -21,7 +21,7 @@
 						</div>
 					</div>
 					<hr>
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div class="col">
 							<h3>Abillity Scores</h3>
 							<ul class="abillities">
@@ -52,7 +52,7 @@
 						</div>
 					</div>
 					<hr>
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div class="col">
 							<h3>Abillity Scores</h3>
 							<ul class="abillities">
@@ -82,7 +82,7 @@
 				<h2>Patrick Teunissen</h2>
 				<h3>For designing our logo!</h3>
 				<p class="mb-5">This guy was nice enough to lend us his time and design the awesome logo for us. We couldn't be happier!</p>
-				<div class="row">
+				<div class="row q-col-gutter-md">
 					<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
 						<img class="icon" src="../assets/_img/logo/logo-icon-green.svg"/>
 					</div>

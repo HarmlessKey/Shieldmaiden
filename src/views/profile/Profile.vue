@@ -1,7 +1,7 @@
 <template>
 	<div class="content" v-if="tier && userInfo">
-		<b-row>
-			<b-col md="6">
+		<div class="row q-col-gutter-md">
+			<div class="col-12 col-md-6">
 				<hk-card header="Your Profile">
 					<div>
 						<h4>{{ userInfo.username }}</h4>
@@ -138,18 +138,18 @@
 						</div>
 					</div>
 				</hk-card>
-			</b-col>
+			</div>
 
 			<!-- PLAYER LINK -->
-			<b-col>
+			<div class="col">
 				<div class="card">
 					<div class="card-header"><i class="fas fa-link"></i> Player Link</div>
 					<div class="card-body">
 						<PlayerLink />
 					</div>
 				</div>
-			</b-col>
-		</b-row>
+			</div>
+		</div>
 
 		<div class="card" v-if="!tier || (tier && tier.name === 'Free')">
 			<div class="card-header">Support us on Patreon</div>

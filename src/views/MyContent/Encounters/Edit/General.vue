@@ -1,29 +1,35 @@
 <template>
-   <b-row class="mt-3">
-        <b-col class="mb-2">
-            <input class="form-control" 
-                autocomplete="off"
-                v-validate="'required'" 
-                data-vv-as="Encounter Name" 
-                type="text" name="name" 
-                v-model="encounter.encounter"/>
-            <p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+   <div class="row q-col-gutter-md mt-3">
+		<div class="col mb-2">
+			<q-input
+				dark filled square dense
+				label="Name"
+				autocomplete="off"
+				v-validate="'required'" 
+				data-vv-as="Encounter Name" 
+				type="text" 
+				name="name" 
+				v-model="encounter.encounter"/>
+			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-            <input class="form-control mt-2"
-                autocomplete="off" 
-                v-validate="'url'" type="text" 
-                name="backbround" 
-                data-vv-as="Background"
-                v-model="encounter.background" 
-                placeholder="Background URL"/>
-            <p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+			<q-input 
+				dark filled square dense
+				label="Background"
+				class="form-control mt-2"
+				autocomplete="off" 
+				v-validate="'url'" type="text" 
+				name="backbround" 
+				data-vv-as="Background"
+				v-model="encounter.background" 
+			/>
+			<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 
-            <button class="btn mt-2" @click="edit()">Save Name & Background</button>
-        </b-col>
-        <b-col sm="3" v-if="encounter.background">
-            <div class="img-container"><img :src="encounter.background" /></div>
-        </b-col>
-    </b-row>
+			<button class="btn mt-2" @click="edit()">Save Name & Background</button>
+		</div>
+		<div class="col-12 col-sm-3" v-if="encounter.background">
+			<div class="img-container"><img :src="encounter.background" /></div>
+		</div>
+    </div>
 </template>
 
 <script>

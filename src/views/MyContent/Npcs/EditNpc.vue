@@ -74,7 +74,7 @@
 				/>
 				
 				<!-- TYPE -->
-				<div class="row" v-if="!quick">
+				<div class="row q-col-gutter-md" v-if="!quick">
 					<div class="col-12 col-md-6">
 						<q-input 
 							dark filled square dense
@@ -210,7 +210,7 @@
 			</hk-card>
 
 			<hk-card header="Health & Armor Class">
-				<div class="row">
+				<div class="row q-col-gutter-md">
 					<div class="col-12 col-md-4">
 						<q-input 
 							dark filled square dense
@@ -288,7 +288,7 @@
 
 			<!-- ABILITY SCORES -->
 			<hk-card header="Ability Scores">
-				<div class="row">
+				<div class="row q-col-gutter-md">
 					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
 						<q-input 
 							dark filled square dense
@@ -304,7 +304,7 @@
 
 			<!-- SAVING THROWS -->
 			<hk-card header="Saving Throws" v-if="!quick">
-				<div class="row">
+				<div class="row q-col-gutter-md">
 					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
 						<q-input 
 							dark filled square dense

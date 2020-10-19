@@ -63,7 +63,7 @@
 			<a v-else-if="entity.dead" class="btn bg-green btn-block my-3" @click="revive()"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 
 			<h2>Temporary</h2>
-			<div class="row mb-2">
+			<div class="row q-col-gutter-md mb-2">
 				<div class="col">
 					<q-input 
 						dark filled square dense
@@ -75,7 +75,7 @@
 					/>
 				</div>
 
-				<div class="col mx-1">
+				<div class="col">
 					<q-input 
 						dark filled square dense
 						label="Temp HP"
@@ -101,8 +101,8 @@
 			<template>
 				<hr>
 				<h2 class="mb-0">Override</h2>
-				<div class="row my-2">
-					<div class="col mr-1">
+				<div class="row q-col-gutter-md my-2">
+					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
 								dark filled square dense
@@ -176,8 +176,8 @@
 						</template>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col mr-1">
+				<div class="row q-col-gutter-md">
+					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
 								dark filled square dense

@@ -39,7 +39,7 @@
 
 				<div class="accordion-body">
 					<EffectsForm v-model="effect.effect" />
-					<div class="row mt-3">
+					<div class="row q-col-gutter-md mt-3">
 						<div class="col-12 col-md-6">
 							<q-select 
 								dark filled square dense
@@ -120,7 +120,7 @@
 								</a>
 						</h2>
 						<template v-for="(level_tier, tier_index) in effect.level_tiers">
-							<div class="row" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+							<div class="row q-col-gutter-md" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 								<!-- HL LEVEL SCALE -->
 								<div class="col-12 col-md-2">
 									<q-input 

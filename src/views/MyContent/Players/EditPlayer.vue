@@ -65,7 +65,7 @@
 
 					</hk-card>
 					<hk-card header="Level & Base Stats">
-						<div class="row">
+						<div class="row q-col-gutter-md">
 							<div class="col-12 col-md-6 mb-2">
 								<q-input 
 									dark filled square dense
@@ -155,7 +155,7 @@
 
 				<!-- ABILITY SCORES -->
 				<hk-card header="Ability Scores & Senses" class="ability-card">
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
 							<q-input 
 								dark filled square dense
@@ -183,7 +183,7 @@
 
 					<!-- SENSES -->
 					<h5 class="mt-3">Senses</h5>
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div  class="col-12 col-md-4 mb-2">
 							<q-input 
 								dark filled square dense
@@ -252,6 +252,9 @@
 								<template slot:label>
 									+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
 								</template>
+								<q-tooltip anchor="top middle" self="center middle">
+									Expertise
+								</q-tooltip>
 							</q-checkbox>
 
 							<q-checkbox 
@@ -279,6 +282,9 @@
 										</div>
 									</div>
 								</template>
+								<q-tooltip anchor="top middle" self="center middle">
+									Proficiency
+								</q-tooltip>
 							</q-checkbox>
 						</div>
 					</div>

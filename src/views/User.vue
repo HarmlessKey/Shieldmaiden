@@ -8,46 +8,44 @@
 	
 		<h2>Campaigns</h2>
 		<!-- CAMPAIGNS -->
-		<b-row v-if="campaigns" class="mt-3">
-			<b-col lg="4" md="6" v-for="campaign in campaigns" :key="campaign['.key']">
-				<div  class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-					<div class="card-header">
+		<div v-if="campaigns" class="row q-col-gutter-md mt-3">
+			<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
+				<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+					<div slot="header" class="card-header">
 						<span class="title">
 							<i class="fas fa-dungeon"></i>
 							{{ campaign.campaign }}
 						</span>
 						<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
 					</div>
-					<div class="card-body">
 						
-						<!-- SHOW PLAYERS -->
-						<div v-if="campaign.players" class="players">
-							<div 
-								v-for="(player, key) in campaign.players" 
-								:key="key"
-								class="img"
-							>
-								<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-								<img v-else src="@/assets/_img/styles/player.svg" />
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ player.character_name }}
-								</q-tooltip>
-							</div>
+					<!-- SHOW PLAYERS -->
+					<div v-if="campaign.players" class="players">
+						<div 
+							v-for="(player, key) in campaign.players" 
+							:key="key"
+							class="img"
+						>
+							<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+							<img v-else src="@/assets/_img/styles/player.svg" />
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ player.character_name }}
+							</q-tooltip>
 						</div>
-
-						<h2 v-if="campaign.players">
-							{{ Object.keys(campaign.players).length }} players
-						</h2>
-
-						<div class="d-flex justify-content-center">
-							<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
-						</div>
-
 					</div>
-						<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}</small>
-				</div>
-			</b-col>
-		</b-row>
+
+					<h2 v-if="campaign.players">
+						{{ Object.keys(campaign.players).length }} players
+					</h2>
+
+					<div class="d-flex justify-content-center">
+						<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+					</div>
+
+					<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}</small>
+				</hk-card>
+			</div>
+		</div>
 		<div v-else>
 			<p>This user has no public campaigns.</p>
 		</div>

@@ -7,8 +7,8 @@
 			</li>
 		</ul>
 		<hr>
-		<b-row v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="current justify-content-start px-3">
-			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
+		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-md current justify-content-start px-3">
+			<div class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
 				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
@@ -16,8 +16,8 @@
 						Remove {{ reminder.title }}
 					</q-tooltip>
 				</a>
-			</b-col>
-		</b-row>
+			</div>
+		</div>
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 			<li class="nav-item">
 				<a class="nav-link active" 

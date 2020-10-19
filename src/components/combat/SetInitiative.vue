@@ -17,17 +17,14 @@
 									'background-image': 'url(' + entity.img + ')',
 									'border-color': entity.color_label ? entity.color_label : ``
 								}"/>
-							<div class="d-flex justify-content-between">
-								<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-hover' ]"><i class="fas fa-check"></i></span> -->
+							<div class="truncate">
 								{{ entity.name }}
-								<span class="pr-5 hover-hide">
-									{{ entity.curHp}}
-									<span class="gray-hover">/{{entity.maxHp}}
-									<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
-									</span>
-									</span>
 							</div>
 							<div class="actions">
+								<div>
+									{{ entity.curHp}} / {{entity.maxHp}}
+									<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
+								</div>
 								<a @click="setSlide({
 									show: true,
 									type: 'slides/EditPlayer',
@@ -35,9 +32,22 @@
 										key: entity.key,
 										location: 'encounter'
 									}
-								})"><i class="fas fa-pencil"></i></a>
+								})">
+									<i class="fas fa-pencil"></i>
+								</a>
+								<q-input 
+									dark filled square dense
+									type="number" 
+									class="ml-2"
+									v-model="entity.initiative" 
+									min="0" 
+									max="99" 
+									name="playerInit" 
+									placeholder="0"
+									@focus="$event.target.select()"
+									@input="set_initiative({key: entity.key, initiative: entity.initiative})" 
+								/>
 							</div>
-								<input type="number" class="form-control init" v-model="entity.initiative" min="0" max="99" name="playerInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -76,15 +86,28 @@
 										SHow info
 									</q-tooltip>
 								</a>
-								<a @click="rollMonster(entity.key, entity)">
-									<i class="fas fa-dice-d20"></i>
+							</div>
+
+							<q-input 
+								dark filled square dense
+								type="number" 
+								class="init" 
+								min="0" 
+								max="99" 
+								v-model="entity.initiative" 
+								name="npcInit" 
+								@input="set_initiative({key: entity.key, initiative: entity.initiative})"
+								placeholder="0"
+							>
+								<template v-slot:append>
+									<a @click="rollMonster(entity.key, entity)">
+									<q-icon size="small" name="fas fa-dice-d20"/>
 									<q-tooltip anchor="top middle" self="center middle">
 										1d20 + {{ calcMod(entity.dexterity) }}
 									</q-tooltip>
 								</a>
-							</div>
-
-							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
+								</template>
+							</q-input>
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
@@ -210,21 +233,21 @@
 			}),
 			_players: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.entityType == 'player' || entity.entityType == 'companion';
-								})
-								.sortBy('name' , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.entityType == 'player' || entity.entityType == 'companion';
+					})
+					.sortBy('name' , 'desc')
+					.value()
 			},
 			_npcs: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.entityType == 'npc';
-								})
-								.sortBy('name' , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.entityType == 'npc';
+					})
+					.sortBy('name' , 'desc')
+					.value()
 			},
 		},
 		methods: {
@@ -346,23 +369,8 @@
 				line-height: 44px;
 				text-align: center;
 			}
-			.form-control {
-				position: absolute;
-				right: 4px;
-				top: 4px;
-				border: none !important;
-				text-align: center;
-				width: 50px;
-				padding: 0;
-				margin: 0;
-				
-				&.init {
-					width: 40px;
-				}
-			}
 			.actions {
-				background: #141414 !important;
-				right: 50px;
+				right: 80px;
 			}
 			.roll {
 				font-size: 17px;

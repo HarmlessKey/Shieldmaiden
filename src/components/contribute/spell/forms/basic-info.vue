@@ -7,7 +7,7 @@
 			</a>
 		</div>
 		
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- NAME -->
 			<div class="col-12 col-md-6">
 				<q-input
@@ -64,7 +64,7 @@
 			</div>
 		</div>
 
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- CAST TIME -->
 			<div class="col-12 col-md-2">
 				<q-input 
@@ -113,7 +113,7 @@
 				/>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- COMPONENTS -->
 			<div class="col-12 col-md-3" v-if="spell.components">
 				<label for="components">Components</label>
@@ -151,7 +151,7 @@
 				<p class="validate red" v-if="errors.has('material_description')">{{ errors.first('material_description') }}</p>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- RANGE TYPE -->
 			<div class="col-12 col-md-4">
 				<q-select 
@@ -202,7 +202,7 @@
 				</div>
 			</div>
 		</div>		
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- DURATION -->
 			<div class="col-12 col-md-4">
 				<q-select 
@@ -256,7 +256,7 @@
 				<p class="validate red" v-if="errors.has('duration_scale')">{{ errors.first('duration_scale') }}</p>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<div class="col-12 col-md-6">
 				<!-- AOE TYPE -->
 				<q-select 
@@ -290,7 +290,7 @@
 				<p class="validate red" v-if="errors.has('aoe_size')">{{ errors.first('aoe_size') }}</p>
 			</div>
 		</div>
-		<div class="row spell_row">
+		<div class="row q-col-gutter-md spell_row">
 			<!-- RITUAL -->
 			<div class="col-12 col-md-2">
 				<q-checkbox size="lg" dark v-model="spell.ritual" val="lg" label="Ritual" />
@@ -342,7 +342,7 @@
 				<p class="validate red" v-if="errors.has('source')">{{ errors.first('source') }}</p>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<!-- DESCRIPTION -->
 			<div class="col-12 col-md-6">
 				<q-input 

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-		<div class="row">
+		<div class="row q-col-gutter-md">
 			<div class="col">
 				<q-input 
 					dark filled square dense

@@ -40,7 +40,7 @@
 				</template>
 
 				<div class="accordion-body">
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4">
 							<q-select 
 								dark filled square dense
@@ -198,7 +198,7 @@
 							</q-input>
 						</div>
 					</div>
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<!-- DICE COUNT -->
 						<div class="col-12 col-md-3">
 							<q-input 
@@ -276,7 +276,7 @@
 							</a>
 						</h2>
 						<template v-for="(level_tier, tier_index) in modifier.level_tiers">
-							<div class="row" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+							<div class="row q-col-gutter-md" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 								<!-- HL LEVEL SCALE -->
 								<div class="col-12 col-md-2">
 									<q-input 

@@ -3,7 +3,7 @@
 		<Crumble :name="user.username" />
 
 		<div class="container">
-			<div class="row">
+			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
 					<h1>{{ user.username }}</h1>
 					<p><i class="gray-hover">{{ id }}</i></p>

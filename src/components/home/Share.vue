@@ -8,11 +8,11 @@
 				</span>
 			</div>
 
-			<b-row>
-				<b-col sm="6">
+			<div class="row q-col-gutter-md">
+				<div class="col-12 col-md-6">
 					<img class="image" src="@/assets/_img/home/track-encounter.gif"/>
-				</b-col>
-				<b-col>
+				</div>
+				<div class="col-12 col-md-6">
 					<h3>Shows everything you need</h3>
 					
 					<ul>
@@ -27,8 +27,8 @@
 
 					<p>Through different settings you decide what is and isn't visible for your players.</p>
 					<router-link to="sign-up" class="btn btn-lg">Try it now!</router-link>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 
 			<a class="next" href="#campaign">
 				<div>Campaign Manager</div>

@@ -40,11 +40,11 @@ Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 //Bootstrap
 global.$ = jQuery
 global.jQuery = jQuery
-Vue.use(require('bootstrap'))
-import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
+// Vue.use(require('bootstrap'))
+// import BootstrapVue from 'bootstrap-vue'
+// import 'bootstrap/dist/css/bootstrap.css'
 
-Vue.use(BootstrapVue);
+// Vue.use(BootstrapVue);
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 

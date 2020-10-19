@@ -36,7 +36,7 @@
 				</template>
 
 				<div class="accordion-body">
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-6">
 							<label>Reminder</label>
 							<reminder-form v-model="notification.reminder" @validation="setValidation"/>
@@ -141,7 +141,7 @@
 										</label>
 										<template v-if="notification.scaling && notification.scaling[key]">
 											<div 
-												class="row"
+												class="row q-col-gutter-md"
 												v-for="(level_tier, tier_index) in notification.scaling[key].level_tiers" 
 												:key="`tier-${key}-${tier_index}`"
 											>

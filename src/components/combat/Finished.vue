@@ -20,7 +20,7 @@
 					</a>
 				</span>
 			</div>
-			<div class="row">
+			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-7 mb-4">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
 						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
@@ -118,7 +118,7 @@
 							</template>
 						</div>
 						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
-							<div class="row">
+							<div class="row q-col-gutter-md">
 								<div class="col-12 col-md-6">
 									<Dmg />
 								</div>

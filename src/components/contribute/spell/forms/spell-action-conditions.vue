@@ -38,7 +38,7 @@
 				</template>
 
 				<div class="accordion-body">
-					<div class="row">
+					<div class="row q-col-gutter-md">
 						<!-- CONDITION -->
 						<div class="col-12 col-md-6">
 							<q-select 
@@ -94,7 +94,7 @@
 						<!-- <span>{{ condition.application }}</span> -->
 					</div>
 					<template v-if="condition.application == 'hitpoint_based'">
-						<div class="row">
+						<div class="row q-col-gutter-md">
 							<div class="col-12 col-md-3">
 								<q-input 
 									dark filled square dense
@@ -193,7 +193,7 @@
 									</a>
 							</h2>
 							<template v-for="(level_tier, tier_index) in condition.level_tiers">
-								<div class="row" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+								<div class="row q-col-gutter-md" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 									<!-- HL LEVEL SCALE -->
 									<div class="col-12 col-md-3">
 										<q-input 

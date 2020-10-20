@@ -64,7 +64,7 @@
 				name="campaigns" 
 				enter-active-class="animated flash" 
 				leave-active-class="animated bounceOutLeft">
-				<div class="col-12 col-md-6" v-for="campaign in _campaigns" :key="campaign.key">
+				<div class="col-12 col-md-6 col-lg-4" v-for="campaign in _campaigns" :key="campaign.key">
 					<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<div slot="header" class="card-header">
 							<span class="title">

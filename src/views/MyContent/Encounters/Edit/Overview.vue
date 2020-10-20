@@ -4,27 +4,40 @@
 			<div>
 				<h3 class="header">Encounter overview</h3>
 				<div class="diff-info" v-if="encDifficulty">
-					<div class="advanced">
-						{{ encDifficulty[1] }}
-						<template v-if="encDifficulty['easy']">
-							<p>
-								<b>Party XP tresholds</b><br/>
-								<span :class="{ 'green': encDifficulty[0] == 'easy'}"><span class="left">Easy:</span> <span>{{ encDifficulty['easy'] }}</span></span><br/>
-								<span :class="{ 'yellow': encDifficulty[0] == 'medium'}"><span class="left">Medium:</span> <span>{{ encDifficulty['medium'] }}</span></span><br/>
-								<span :class="{ 'orange': encDifficulty[0] == 'hard'}"><span class="left">Hard:</span> <span>{{ encDifficulty['hard'] }}</span></span><br/>
-								<span :class="{ 'red': encDifficulty[0] == 'deadly'}"><span class="left">Deadly:</span> <span>{{ encDifficulty['deadly'] }}</span></span>
-							</p>
-							Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
-							Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
-						</template>
+					<div class="d-flex justify-content-between">
+						<div class="advanced">
+							{{ encDifficulty[1] }}
+							<template v-if="encDifficulty['easy']">
+								<p>
+									<b>Party XP tresholds</b><br/>
+									<span :class="{ 'green': encDifficulty[0] === 'easy'}"><span class="left">Easy:</span> <span>{{ encDifficulty['easy'] }}</span></span><br/>
+									<span :class="{ 'yellow': encDifficulty[0] === 'medium'}"><span class="left">Medium:</span> <span>{{ encDifficulty['medium'] }}</span></span><br/>
+									<span :class="{ 'orange': encDifficulty[0] === 'hard'}"><span class="left">Hard:</span> <span>{{ encDifficulty['hard'] }}</span></span><br/>
+									<span :class="{ 'red': encDifficulty[0] === 'deadly'}"><span class="left">Deadly:</span> <span>{{ encDifficulty['deadly'] }}</span></span>
+								</p>
+								Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
+								Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+							</template>
+						</div>
+						<q-circular-progress
+							class="d-none d-xl-block"
+							show-value
+							font-size="16px"
+							:value="encDifficulty['compare']/encDifficulty['deadly']*100"
+							size="200px"
+							:color="bars[encDifficulty[0]]"
+							track-color="dark"
+						>
+							{{ encDifficulty[0].capitalize() }}
+						</q-circular-progress>
 					</div>
-					<div class="progress-area">
-						<b-progress 
-							:value="encDifficulty['compare']" 
-							:max="encDifficulty['deadly']" 
-							class="mt-3"
-							:variant="bars[encDifficulty[0]]"
-						></b-progress>
+					<div class="progress-area d-block d-xl-none">
+						<q-linear-progress 
+							size="20px" 
+							:value="encDifficulty['compare']/encDifficulty['deadly']" 
+							:color="bars[encDifficulty[0]]" 
+							class="q-mt-sm" 
+						/>
 						<span 
 							class="diff"
 							:class="{ 
@@ -166,11 +179,11 @@
 				showOverview: false,
 				encDifficulty: undefined,
 				bars: {
-					trivial: 'secondary',
-					easy: 'success',
-					medium: 'warning',
-					hard: 'info',
-					deadly: 'danger',
+					trivial: 'grey',
+					easy: 'positive',
+					medium: 'info',
+					hard: 'warning',
+					deadly: 'negative',
 				},
 				entityColumns: {
 					image: {

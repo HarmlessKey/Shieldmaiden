@@ -9,23 +9,34 @@
 				aria-haspopup="true" 
 				aria-expanded="false">
 				<i class="fas fa-cog"></i>
+				<q-menu square>
+					<q-list>
+						<q-item>
+							<q-item-section>
+								<b>{{ encounter.encounter }}</b>
+							</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
+							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+							<q-item-section>Settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
+							<q-item-section>Track settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup v-if="demo" @click="reload">
+							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
+							<q-item-section>Reset encounter</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup @click="confirmFinish()">
+							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+							<q-item-section>End encounter</q-item-section>
+						</q-item>
+					</q-list>
+				</q-menu>
 			</a>
-			<div class="dropdown-menu">	
-				<div class="dropdown-header">{{ encounter.encounter }}</div>
-				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
-					<i class="fas fa-cogs"></i> Settings
-				</a>
-				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-					<i class="far fa-desktop"></i> Track Settings
-				</a>
-				<a v-if="demo" @click="reload">
-					<i class="far fa-sync-alt"></i> Reset encounter
-					<q-tooltip anchor="top middle" self="center middle">
-						Reset
-					</q-tooltip>
-				</a>
-				<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
-			</div>
 
 			<!-- BROADCASTING -->
 			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>

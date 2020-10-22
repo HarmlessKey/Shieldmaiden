@@ -42,89 +42,10 @@
 					<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 					
 					<template v-else>
-						<div class="health">
-							<span v-if="current.hidden" class="img">
-								<i class="fas fa-eye-slash red"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Hidden
-								</q-tooltip>
-							</span>
-							<template v-else>
-								<icon v-if="['monster', 'player', 'companion'].includes(current.img)" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
-								<span 
-									v-else class="img" 
-									:style="{
-										'background-image': 'url(' + current.img + ')',
-										'border-color': current.color_label ? current.color_label : ``
-									}"/>
-							</template>
-							<div class="progress health-bar">
-								<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-								<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-								<div v-show="!current.stable && !current.dead">
-									<span class="percentage">{{ current.name }}</span>
-									<span class="hp">{{ displayStats(current).curHp }} / {{ displayStats(current).maxHp }}</span>
-								</div>
-								<div class="progress-bar" :class="{ 
-									'bg-red': percentage(displayStats(current).curHp, displayStats(current).maxHp) <= 33, 
-									'bg-orange': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 33 && percentage(displayStats(current).curHp, displayStats(current).maxHp) < 76, 
-									'bg-green': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 7
-									}" 
-									role="progressbar" 
-									:style="{width: percentage(displayStats(current).curHp, displayStats(current).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-								</div>
-							</div>
-						</div>
+						<TargetItem :item="current.key" />
 
 						<Reminders :entity="current" />
 						<Conditions :entity="current" />
-
-						<template v-if="targeted.length > 0">
-							<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
-								<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
-								<span 
-									v-else class="img" 
-									:style="{
-										'background-image': 'url(' + entities[key].img + ')',
-										'border-color': entities[key].color_label ? entities[key].color_label : ``
-									}"/>
-								<span class="ac"
-									:class="{ 
-										'green': entities[key].ac_bonus > 0, 
-										'red': entities[key].ac_bonus < 0 
-									}" 
-									v-if="entities[key].ac_bonus">
-									{{ displayStats(entities[key]).ac + entities[key].ac_bonus}}
-									<q-tooltip anchor="top middle" self="center middle">
-										Armor class + {{ entities[key].ac_bonus }}
-									</q-tooltip>
-								</span>
-								<span class="ac" v-else>
-									{{ displayStats(entities[key]).ac }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Armor class
-									</q-tooltip>
-								</span>
-								<div class="progress health-bar">
-									<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-									<div v-show="!entities[key].stable && !entities[key].dead">
-										<span class="percentage">{{ entities[key].name }}</span>
-										<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
-									</div>
-									<div class="progress-bar" :class="{ 
-										'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
-										'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
-										'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
-										}" 
-										role="progressbar" 
-										:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-									</div>
-								</div>
-							</div>
-						</template>
-
-						<h2 v-else class="red">No Target</h2>
 					</template>
 				</template>
 				<div v-else class="loader"><span>Loading current...</span></div>
@@ -141,6 +62,7 @@
 	import Reminders from '@/components/combat/Reminders.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import { remindersMixin } from '@/mixins/reminders';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Current',
@@ -148,7 +70,8 @@
 		components: {
 			Actions,
 			Conditions,
-			Reminders
+			Reminders,
+			TargetItem
 		},
 		props: ['current', 'next', 'settings'],
 		data() {
@@ -271,7 +194,7 @@
 	overflow: hidden;
 	
 	.current {
-		padding: 15px 10px;
+		padding: 10px;
 	}
 	.q-scrollarea {
 		height: calc(100% - 30px);

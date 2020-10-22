@@ -1,51 +1,31 @@
 <template>
 	<div id="actions">
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link"
-					:class="{'active': current.entityType === 'player' || current.entityType === 'companion' || settings.npcDamageTab}"
-					id="manual-tab" 
-					data-toggle="tab" 
-					:href="`#manual-${location}`" 
-					role="tab" 
-					aria-controls="manual" 
-					:aria-selected="current.entityType === 'player'  || current.entityType === 'companion' || settings.npcDamageTab">
-					<i class="fas fa-keyboard"></i> 
-					<span class="d-none d-md-inline ml-1">Manual</span>
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 
-					:class="{'active': current.entityType === 'npc' && !settings.npcDamageTab}"
-					id="roll-tab" 
-					data-toggle="tab" 
-					:href="`#roll-${location}`" 
-					role="tab" 
-					aria-controls="roll" 
-					:aria-selected="current.entityType === 'npc' && !settings.npcDamageTab">
-					<i class="fas fa-dice-d20"></i> 
-					<span class="d-none d-md-inline ml-1">Roll</span>
-				</a>
-			</li>
-		</ul>
-		<div class="tab-content">
-			<div class="tab-pane fade" 
-				:class="{'show active': current.entityType === 'player'  || current.entityType === 'companion' || settings.npcDamageTab}" 
-				:id="`manual-${location}`" 
-				role="tabpanel" 
-				aria-labelledby="manual-tab">
+		<q-tabs
+        v-model="tab"
+				dark
+				inline-label
+				dense
+				align="left"
+				:breakpoint="0"
+				no-caps
+      >
+        <q-tab 
+					v-for="({name, icon, label}, index) in tabs"
+					:key="`tab-${index}`" 
+					:name="name" 
+					:icon="icon"
+					:label="label"
+				/>
+		</q-tabs>
 
-				<Manual :current="current" :targeted="targeted" />
-			</div>
-			<div v-if="current" class="tab-pane roll fade"
-				:class="{'show active': current.entityType === 'npc' && !settings.npcDamageTab }"
-				:id="`roll-${location}`" 
-				role="tabpanel" 
-				aria-labelledby="roll-tab">
-
-				<Roll :current="current" />
-			</div>
-		</div>
+		<q-tab-panels v-model="tab" class="bg-transparent">
+				<q-tab-panel name="manual">
+					<Manual :current="current" :targeted="targeted" />
+				</q-tab-panel>
+				<q-tab-panel name="roll">
+					<Roll :current="current" />
+				</q-tab-panel>
+		</q-tab-panels>
 	</div>
 </template>
 
@@ -64,10 +44,33 @@
 		},
 		mixins: [setHP],
 		props: ['current', 'location'],
+		data() {
+			return {
+				tabSetter: undefined,
+				tabs: [
+					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
+					{ name: "roll", label: "Roll", icon: "fas fa-dice-d20" }
+				]
+			}
+		},
 		computed: {
 			...mapGetters([
 				'targeted',
-			])
+			]),
+			tab: {
+				get() {
+					const tab = (
+						this.current.entityType === 'player' || 
+						this.current.entityType === 'companion' || 
+						this.settings.npcDamageTab
+					) ? "manual" : "roll";
+
+					return (this.tabSetter) ? this.tabSetter : tab;
+				},
+				set(newValue) {
+					this.tabSetter = newValue;
+				}
+ 			}
 		}
 	}
 </script>

@@ -22,12 +22,14 @@
 			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 
 			<div class="manual">
-				<input type="text" 
+				<q-input 
+					dark filled square
+					type="text" 
 					v-model="manualAmount" 
 					v-validate="'numeric'" 
 					name="Manual Input" 
 					min="0"
-					class="form-control manual-input"
+					class="manual-input"
 					@keypress="submitManual($event)"
 					autocomplete="off" 
 				/>
@@ -225,13 +227,6 @@
 	"input btn-dmg"
 	"input btn-heal";
 
-	.manual-input {
-		height:90px;
-		font-size:50px;
-		text-align: center;
-		grid-area: input;
-		border: none !important;
-	}
 	.heal {
 		grid-area: btn-heal;
 	}

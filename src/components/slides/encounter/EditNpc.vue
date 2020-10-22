@@ -6,11 +6,12 @@
 		<q-input 
 			dark filled square
 			label="Name"
+			autocomplete="off"
 			type="text" 
 			name="name" 
 			v-model="entity.name"
-			:class="{'input': true, 'error': errors.has('name') }"
 			v-validate="'required'"
+			class="mb-2"
 			placeholder="Name"
 		/>
 
@@ -21,7 +22,7 @@
 			readonly
 		>
 			<template v-slot:append>
-				<q-icon name="colorize" class="cursor-pointer">
+				<q-icon name="colorize" class="cursor-pointer" :style="`color: ${entity.color_label};`">
 					<q-popup-proxy transition-show="scale" transition-hide="scale">
 						<q-color v-model="entity.color_label" :palette="hkColors" default-view="palette" />
 					</q-popup-proxy>
@@ -34,6 +35,7 @@
 			<q-input 
 				dark filled square
 				label="Initiative"
+				autocomplete="off"
 				type="number" 
 				name="initiative"
 				min="0"
@@ -46,6 +48,7 @@
 			<q-input 
 				dark filled square
 				label="AC Bonus"
+				autocomplete="off"
 				class="mr-1"
 				type="number" 
 				name="ac_bonus" 
@@ -55,6 +58,7 @@
 			<q-input 
 				dark filled square
 				label="Temp HP"
+				autocomplete="off"
 				type="number" 
 				name="tempHp" 
 				v-model="entity.tempHp"
@@ -68,6 +72,7 @@
 					<q-input 
 						dark filled square
 						label="Armor class"
+						autocomplete="off"
 						class="mr-1"
 						type="number" 
 						name="ac" 
@@ -81,6 +86,7 @@
 					<q-input 
 						dark filled square
 						label="Armor class"
+						autocomplete="off"
 						class="mr-1"
 						type="number" 
 						name="maxHp" 
@@ -94,6 +100,7 @@
 					<q-input 
 						dark filled square
 						label="Armor class"
+						autocomplete="off"
 						type="number" 
 						name="maxHp" 
 						min="1"

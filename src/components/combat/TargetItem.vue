@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<div class="target">
+		<div class="target bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
-			<span class="initiative">
+			<span class="initiative" v-if="initiative">
 				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
 				<template v-else>{{ entity.initiative }}</template>
 				<q-tooltip anchor="top middle" self="center middle">
@@ -69,7 +69,7 @@
 
 			<!-- HEALT BAR -->
 			<q-linear-progress 
-				size="30px" 
+				size="35px" 
 				:value="displayStats().curHp/displayStats().maxHp"
 				:color="hpBarColor(percentage(displayStats().curHp, displayStats().maxHp))" 
 			>
@@ -175,7 +175,19 @@
 
 	export default {
 		name: 'TargetItem',
-		props: ['item', 'i'],
+		props: {
+			item : {
+				type: String,
+				required: true
+			}, 
+			i: {
+				type: Number
+			},
+			initiative: {
+				type: Boolean,
+				default: false
+			}
+		},
 		data () {
 			return {
 				user: this.$store.getters.getUser,
@@ -268,23 +280,26 @@
 .target {
 	width: 100%;
 	display: grid;
-	grid-template-columns: 30px 30px 30px 1fr;
+	grid-template-columns: 35px 35px 1fr;
 	grid-template-rows: auto;
 	grid-gap: 0;
 	
-	line-height: 30px;
+	line-height: 35px;
 	user-select: none;
 
+	&.hasInitiative {
+		grid-template-columns: 35px 35px 35px 1fr;
+	}
 	.initiative, .ac, .img {
 		text-align: center;
-		height: 30px;
+		height: 35px;
 	}
 	.ac_wrapper {
 		position: relative;
 
 		i, .ac {
 			position: absolute;
-			line-height: 30px;
+			line-height: 35px;
 			width: 100%;
 			text-align: center;
 		}
@@ -300,14 +315,14 @@
 	}
 	.img {
 		display: block;
-		width: 30px;
-		height: 30px;
+		width: 35px;
+		height: 35px;
 		background-color: #191919;
 		background-position: center top;
 		background-repeat: no-repeat;
 		background-size: cover;
 		font-size: 20px;
-		line-height: 30px;
+		line-height: 35px;
 		overflow: hidden;
 		border: solid 1px transparent;
 
@@ -322,7 +337,7 @@
 		display: grid;
 		grid-template-columns: auto max-content;
 		grid-column-gap: 5px;
-		line-height: 30px;
+		line-height: 35px;
 		margin-right: 5px;
 		color: #fff;
 		// text-shadow:

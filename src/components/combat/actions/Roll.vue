@@ -20,8 +20,6 @@
 			</p>
 			
 			<template v-if="current.actions">
-				<h2>Actions</h2>
-
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
 					<div class="d-flex justify-content-between">
@@ -114,10 +112,7 @@
 				<ul class="roll">
 					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light"
-								data-toggle="collapse" :href="'#act-'+index" 
-								role="button" 
-								aria-expanded="false">
+							<a class="d-flex justify-content-between gray-light" @click="setShow('action', index)">
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
@@ -129,7 +124,9 @@
 								</q-tooltip>
 							</button>
 						</span>
-						<p class="collapse py-2 pr-1" :id="'act-'+index">{{ action.desc }}</p>
+						<q-slide-transition>
+							<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
+						</q-slide-transition>
 					</li>
 				</ul>
 			</template>
@@ -140,10 +137,7 @@
 				<ul class="roll">
 					<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light"
-								data-toggle="collapse" 
-								:href="'#leg-'+index" role="button" 
-								aria-expanded="false">
+							<a class="d-flex justify-content-between gray-light" @click="setShow('legendary', index)">
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
@@ -155,13 +149,17 @@
 								</q-tooltip>
 							</button>
 						</span>
-						<p class="collapse py-2 pr-1" :id="'leg-'+index">{{ action.desc }}</p>
+						<q-slide-transition>
+							<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
+						</q-slide-transition>
 					</li>
 				</ul>
 
 			</template>
 		</template>
-		<p v-else-if="current.entityType === 'player'">Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
+		<p v-else-if="current.entityType === 'player'">
+			Most players want to roll their own attacks, you probably shouldn't take that away from them. ;)
+		</p>
 	</div>
 </template>
 
@@ -183,6 +181,8 @@
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				showAction: undefined,
+				showLegendary: undefined,
 				advantage: false,
 				openRoll: false,
 				rollOptions: ['toHit', 'damage'],
@@ -253,6 +253,13 @@
 					}
 				}
 				return stats
+			},
+			setShow(type, index) {
+				if(type === 'action') {
+					this.showAction = (this.showAction === index) ? undefined : index;
+				} else if(type === 'legendary') {
+					this.showLegendary = (this.showLegendary === index) ? undefined : index;
+				}
 			},
 			setAdvantage(value) {
 				if(this.advantage == value) {
@@ -581,7 +588,7 @@
 				}
 			}
 			.btn {
-				min-width: 55px;
+				min-width: 60px;
 			}
 		}
 	}

@@ -79,10 +79,10 @@
 									@touchend="stop" 
 									@touchcancel="stop"
 									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
-									<TargetItem :item="entity.key" :i="i" />
+									<TargetItem :item="entity.key" :i="i" :initiative="true" />
 								</div>
 								<a class="options">
-									<i class="far fa-ellipsis-v"></i>
+									<i class="fal fa-ellipsis-v"></i>
 									<q-menu square anchor="bottom right" self="top right">
 										<q-item>
 											<q-item-section>
@@ -397,9 +397,11 @@
 	}
 	a.options {
 		display: inline-block;
-		height: 30px;
-		line-height: 30px;
-		padding: 0 5px 0 15px;
+		height: 35px;
+		line-height: 35px;
+		text-align: center;
+		width: 25px;
+		font-size: 18px;
 		color: #b2b2b2 !important;
 
 		&:hover {
@@ -422,9 +424,9 @@
 	height: calc(100% - 20px);
 }
 ul.targets {
-	margin: 0 0 20px 0;
+	margin: 0;
 	list-style: none;
-	padding:0 15px 0 10px !important;
+	padding: 10px 15px 10px 10px !important;
 
 	li {
 		// height: 32px;

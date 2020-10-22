@@ -31,6 +31,7 @@
 			flat
 			dark
 			:options="options"
+			toggle-color="primary"
 		/>
 
 		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>

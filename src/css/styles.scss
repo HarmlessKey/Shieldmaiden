@@ -614,6 +614,12 @@ html body {
 	/*********************************************/
 	a {
 		text-decoration: none;
+		color: $blue;
+		cursor: pointer;
+
+		&:hover {
+			text-decoration: none;
+		}
 	}
 
 	.btn {
@@ -934,17 +940,6 @@ html body {
 		}
 	}
 
-	.tab-content {
-		.hk-table {
-			.hk-table-column, .hk-collapsed-column {
-				background: $gray;
-
-				&.hk-table-header {
-					background: none;
-				}
-			}
-		}
-	}
 	.hk-card {
 		.card-body {
 			.hk-table {
@@ -1171,6 +1166,7 @@ html body {
 		}
 		&.hasImg {
 			li {
+				padding-left: 0;
 				grid-template-columns: 55px auto max-content;
 			}
 		}
@@ -1195,6 +1191,23 @@ html body {
 				}
 				&:hover td {
 					background-color: $gray-dark;
+				}
+			}
+		}
+	}
+
+	.manual-input {
+		height: 90px;
+		font-size:50px;
+		
+		.q-field {
+			height: 90px;
+
+			&__control {
+				height: 90px;
+
+				input {
+					text-align: center;
 				}
 			}
 		}
@@ -1303,252 +1316,6 @@ html body {
 			right: 20px;
 			a {
 				background: $gray-active;
-			}
-		}
-	}
-
-	/* 6. Bootstrap overrides*/
-	/*********************************************/
-	.navbar {
-		width: 100%;
-		border-bottom: solid 1px $gray-light;
-
-		.navbar-brand, a.nav-link {
-			color: $white !important;
-		}
-	}
-	
-	a {
-		color: $blue !important;
-		cursor: pointer !important;
-
-		&:hover {
-			text-decoration: none;
-		}
-	}
-	table {
-		tr {
-			th {
-				&:focus, &.active {
-					outline: none !important;
-					box-shadow: none !important;
-				}
-			}
-		}
-	}
-	.progress {
-		border-radius: 0 !important;
-	}
-	.dropdown-menu {
-		padding: 0 !important;
-		border-radius: 0 !important;
-		border: none !important;
-		color: $gray-dark !important;
-		font-size: 12px !important;
-		
-		button, a { 
-			margin: 0 !important;
-			color: $gray-dark !important;
-			cursor: pointer;
-			font-size: 15px;
-			padding: 5px 15px;
-			line-height: 30px;
-
-			&:hover, &.active { 
-				color: $blue !important;
-				background: none;
-			}
-		}
-		.dropdown-header {
-			padding: 10px 15px !important;
-			line-height: 20px;
-			margin: 0 !important;
-			color: $gray-light;
-			font-size: 13px;
-		}
-		.dropdown-divider {
-			border-color: $gray-light;
-			margin: 0;
-		}
-	}
-
-	.progress {
-		.progress-bar {
-			&.bg-secondary {
-				background-color: $gray-hover !important;
-			}
-			&.bg-success {
-				background-color: $green !important;
-			}
-			&.bg-warning {
-				background-color: $yellow !important;
-			}
-			&.bg-info {
-				background-color: $orange !important;
-			}
-			&.bg-danger {
-				background-color: $red !important;
-			}
-		}
-	}
-
-	ul.pagination {
-		li.page-item {
-			
-
-			.page-link {
-				border-color: $gray-dark !important;
-				background-color: $gray !important;
-				color: $gray-light !important;
-
-				.bnt-primary {
-					color: $blue;
-				}
-
-				&:focus {
-					box-shadow: none;
-				}
-			}
-			&.active {
-				.page-link {
-					color: $blue !important;
-				}
-			}
-			&.disabled {
-				.page-link {
-					color: $gray-hover !important;
-				}
-			}
-		}
-
-	}
-
-	.form-control, .custom-select { 
-		-webkit-appearance: none;
-		border-radius: 0 !important;
-		background: $gray-dark !important;
-		border: solid 1px $gray !important;
-		color: $gray-light !important;
-		
-		&:focus {
-			box-shadow: none !important;
-		}
-		optgroup {
-			background: $gray-dark !important;
-		}
-	}
-	.custom-checkbox .custom-control-label::before {
-		border-radius: 0 !important;
-	}
-	ul.nav {
-		border: none;
-	}
-	.nav-tabs { 
-		.nav-link {
-			border: none !important;
-			border-radius: 0 !important;
-
-			&.active {
-				color: $gray-light !important;
-				background-color: $gray !important;
-			}
-		}
-	}
-	.navbar {
-		padding: 0 !important;
-
-		.nav {
-			.nav-item {
-				width: 100%; 
-				display: block;
-				
-				.nav-link {
-					color: $gray-light !important;
-				}
-			}
-			.nav {
-				
-				.nav-link {
-					padding-left: 20px !important;
-					font-size: 13px !important;
-					line-height: 15px !important;
-				}
-			}
-		}
-	}
-	.list-group {
-
-		.list-group-item {
-			border-radius: 0 !important;
-			background: none !important;
-			border: none !important;
-			color: $gray-light !important;
-		}
-	}
-	.card {
-		.list-group-item {
-			background-color: $gray-dark !important;
-			margin-bottom: 1px;
-		}
-	}
-	.modal-content {
-		border-radius: 0 !important;
-		border: none;
-		background: $gray-dark !important;
-		color: $gray-light !important; 
-	}
-	.modal-content .btn {
-		color: $white !important;
-	}
-	.modal-header, .modal-footer {
-		border-color: $black !important;
-	}
-	.modal .close {
-		color: $red;
-		text-shadow: none;
-		opacity: 1;
-	}
-	.modal .close:hover {
-		color: $red;
-	}
-	.popover {
-		border-radius: 0 !important;
-
-		.popover-header {
-			margin-bottom: 0 !important;
-			color: $gray-dark;
-			text-transform: capitalize;
-		}
-	}
-	.card {
-		background-color: $gray !important;
-		border-radius: 0 !important;
-		border: none !important;
-		margin-bottom: 20px !important;
-
-		.card-header {
-			border-radius: 0 !important;
-			text-transform: uppercase !important;
-		}
-	}
-	.btn-group-toggle {
-		.btn {
-			border: none;
-			background-color: $gray-active;
-			color: $gray-hover !important;
-
-			&.active {
-				background-color: $gray-light !important;
-				color: $gray-active !important;
-			}
-		}
-	}
-	.slide {
-		.btn-group {
-			width: 100%;
-
-			label.btn {
-				width: 50% !important;
 			}
 		}
 	}
@@ -1798,10 +1565,6 @@ html body {
 			background-color: $gray;
 			margin-left: 1px;
 			color: $gray-light !important;
-
-			.col {
-				padding: 0;
-			}
 		}
 	}
 	.q-btn {
@@ -1822,6 +1585,17 @@ html body {
 				&:hover {
 					color: $blue !important;
 				}
+			}
+		}
+	}
+
+	.q-tabs--dense {
+		.q-tab {
+			min-height: 30px;
+
+			&__icon {
+				height: 20px;
+				font-size: 15px;
 			}
 		}
 	}

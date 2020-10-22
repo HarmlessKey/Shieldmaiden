@@ -3,6 +3,7 @@
 		<h2>Add <span class="blue">{{ entity.name }}</span></h2>
 		<q-input 
 			dark filled square dense
+			autocomplete="off"
 			label="Name"
 			type="text" 
 			name="name" 
@@ -17,6 +18,7 @@
 			<div class="col">
 				<q-input 
 					dark filled square dense
+					autocomplete="off"
 					label="Initiative"
 					type="number" 
 					name="initiative"
@@ -30,6 +32,7 @@
 			<div class="col">
 				<q-input 
 					dark filled square dense
+					autocomplete="off"
 					label="Armor class"
 					type="number" 
 					name="ac"
@@ -43,6 +46,7 @@
 			<div class="col">
 				<q-input 
 					dark filled square dense
+					autocomplete="off"
 					label="Hit points"
 					type="number" 
 					name="maxHp"
@@ -54,14 +58,16 @@
 				<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 			</div>
 		</div>
-		<label >When to add</label>
+		<label class="my-2">When to add</label>
 		<q-btn-toggle
+			class="mt-2"
 			v-model="addMoment"
 			spread
 			no-caps
 			flat
 			dark
 			:options="options"
+			toggle-color="primary"
 		/>
 		<hr>
 		<button class="btn btn-block mb-3" @click="add()">Add</button>

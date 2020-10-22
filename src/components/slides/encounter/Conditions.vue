@@ -7,71 +7,52 @@
 			</li>
 		</ul>
 		<hr>
-		<ul class="conditions">
-			<template v-for="({value, name, condition, effects }, index) in conditionList">
-				<li :key="index" v-if="value != 'exhaustion'">
-					<div class="d-flex justify-content-between" :class="{ 'green': checkAll(value) }">
-						<span class="d-flex justify-content-left">	
-							<icon :icon="value" class="icon"/> {{ name }}
-						</span>
-						<span>
-							<a class="mr-3" @click="set(value)" :key="value">
-								<span v-if="!checkAll(value)"><i class="fas fa-plus-circle green" key="true"></i></span>
-								<span v-if="checkAll(value)"><i class="fas fa-minus-circle red" key="true"></i></span>
-							</a>
-							<a 
-								data-toggle="collapse"
-								v-bind:href="'#cond_'+index"
-								role="button"
-								aria-expanded="false">
-									<i class="fas fa-caret-down"></i>
-							</a>
-						</span>
-					</div>
-					<p class="collapse shown" v-bind:id="'cond_'+index">
-						<b>{{ condition }}</b>
-						<ul>
-							<li v-for="(effect, index) in effects" :key="index">
-								{{ effect }}
-							</li>
-						</ul>
-					</p>
-				</li>
-			</template>
-			<hr>
-			<!-- EXHAUSTION -->
-			<li>
-				<div class="d-flex justify-content-between">
-					<span class="d-flex justify-content-left">	
-						<icon :icon="conditionList[3].value" class="icon" /> {{ conditionList[3].name }}
-					</span>
-					<span>
-						<a 
-							data-toggle="collapse"
-							v-bind:href="'#cond_'+conditionList[3].value"
-							role="button"
-							aria-expanded="false">
-								<i class="fas fa-caret-down"></i>
-						</a>
-					</span>
-				</div>
-				<div class="exhaustion d-flex justify-content-center">
-					<a @click="setExhausted(0)"><i class="fas fa-times"></i></a>
-					<a v-for="index in 6" :key="index" @click="setExhausted(index)"
-					:class="{ 'active': checkExhaustion() === index }"
-					>{{ index }}</a>
-				</div>
 
-				<p class="collapse shown" v-bind:id="'cond_'+conditionList[3].value">
-					<b>{{ conditionList[3].condition }}</b>
-					<ul class="exhausted">
-						<li v-for="(effect, index) in conditionList[3].effects" :key="index">
+		<q-list dark square :class="`accordion`" v-if="value != 'exhaustion'">
+			<q-expansion-item
+				v-for="({value, name, condition, effects }, index) in conditionList"
+				:key="index"
+				dark switch-toggle-side
+				:group="name"
+			>
+				<template v-if="value !== 'exhaustion'" v-slot:header>
+					<q-item-section>
+						<div class="d-flex justify-content-start">
+							<icon :icon="value" class="icon"/>
+							{{ name }}
+						</div>
+					</q-item-section>
+					<q-item-section avatar>
+						<a @click.stop="set(value)" :key="value">
+							<span v-if="!checkAll(value)"><i class="fas fa-plus-circle green" key="true"></i></span>
+							<span v-if="checkAll(value)"><i class="fas fa-minus-circle red" key="true"></i></span>
+						</a>
+					</q-item-section>
+				</template>
+				<template v-else v-slot:header>
+					<q-item-section>
+						{{ name }}
+					</q-item-section>
+					<q-item-sections>
+						<div class="exhaustion d-flex justify-content-center">
+							<a @click.stop="setExhausted(0)"><i class="fas fa-times"></i></a>
+							<a v-for="index in 6" :key="index" @click.stop="setExhausted(index)"
+							:class="{ 'active': checkExhaustion() === index }"
+							>{{ index }}</a>
+						</div>
+					</q-item-sections>
+				</template>
+
+				<div class="accordion-body">
+					<b>{{ condition }}</b>
+					<ul>
+						<li v-for="(effect, index) in effects" :key="index">
 							{{ effect }}
 						</li>
 					</ul>
-				</p>
-			</li>
-		</ul>
+				</div>
+			</q-expansion-item>
+		</q-list>
 	</div>
 </template>
 
@@ -161,6 +142,32 @@
 </script>
 
 <style lang="scss" scoped>
+	.icon {
+		width: 25px;
+		height: 25px;
+		margin-right: 10px;
+	}
+	.exhaustion {
+		margin-top: 5px;
+		user-select: none;
+
+		a {
+			background: #302f2f;
+			color: #fff;
+			width: 20px;
+			height: 20px;
+			line-height: 20px;
+			border-radius: 50%;
+			text-align: center;
+			margin-left: 1px;
+			font-size: 12px;
+
+			&.active {
+				background: #83b547;
+				color: #fff !important;
+			}
+		}
+	}
 	ul.targets {
 		list-style: none;
 		padding: 0;

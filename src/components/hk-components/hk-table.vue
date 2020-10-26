@@ -6,6 +6,7 @@
 				dark filled square dense
 				label="Search"
 				type="text" 
+				class="mb-2"
 				autocomplete="off" 
 				v-model="searched"
 				@keyup="searchData()"

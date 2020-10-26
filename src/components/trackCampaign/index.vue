@@ -104,15 +104,19 @@
 						</div>
 						<div class="scroll during-encounter" v-bar>
 							<div>
-								<Meters v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
-                                    :entities="encounter.entities" 
-                                    :npcs="npcs" 
-                                    :players="players"  />
-								<Rolls v-if="sideDisplay === 'rolls'"
-                                    :entities="encounter.entities" 
-                                    :npcs="npcs" 
-                                    :players="players" 
-                                    :rolls="rolls"  />
+								<Meters 
+									v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+									:entities="encounter.entities" 
+									:npcs="npcs" 
+									:players="players"
+								/>
+								<Rolls 
+									v-if="sideDisplay === 'rolls'"
+									:entities="encounter.entities" 
+									:npcs="npcs" 
+									:players="players" 
+									:rolls="rolls"
+								/>
 							</div>
 						</div>
 					</div>

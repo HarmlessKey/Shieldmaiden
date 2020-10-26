@@ -42,7 +42,11 @@
 						<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
 					</div>
 
-					<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}</small>
+					<template slot="footer">
+						<small class="text-center d-block py-1 bg-gray-active">
+							<span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}
+						</small>
+					</template>
 				</hk-card>
 			</div>
 		</div>
@@ -132,7 +136,7 @@
 		}
 		padding: 30px;
 
-		.card {
+		.hk-card {
 			color: #b2b2b2 !important;
 			background-size: cover;
 			background-position: center bottom;
@@ -170,6 +174,7 @@
 					flex-wrap: nowrap;
 
 					.img {
+						background: #000;
 						height: 35px;
 						width: 35px;
 						border: solid 1px #fff;

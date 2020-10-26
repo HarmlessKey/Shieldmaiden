@@ -114,13 +114,15 @@
 										{{ data.row.identified ? 'Identified' : 'Not Identified' }}
 									</q-tooltip>
 								</a>
-								<a data-toggle="collapse" class="collapsed" :href="`#full-item-${data.row.linked_item}`">
-									<i class="fas fa-caret-down"></i>
+								<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
+									<i class="fas fa-chevron-down"></i>
 								</a>
 							</div>
-							<div class="collapse full-item" :id="`full-item-${data.row.linked_item}`">
+							<q-slide-transition>
+							<div v-show="showItem" class="full-item">
 								<ViewItem :data="data.row.full_linked_item"/>
 							</div>
+							</q-slide-transition>
 						</template>
 					</div>
 				</hk-table>
@@ -154,6 +156,7 @@
 				allItems: undefined,
 				error: undefined,
 				addCurrency: false,
+				showItem: false,
 				itemColumns: {
 					public_name: {
 						label: 'Name',
@@ -301,8 +304,8 @@
 					transition: transform .2s linear;
 				}
 				&.collapsed {
-					i.fa-caret-down {
-						transform: rotate(-90deg);
+					i.fa-chevron-down {
+						transform: rotate(-180deg);
 					}
 				}
 			}

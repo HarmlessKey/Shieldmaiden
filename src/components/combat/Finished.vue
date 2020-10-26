@@ -345,13 +345,14 @@
 		.actions {
 			display: flex;
 			justify-content: space-between;
-			border-bottom: solid 1px #b2b2b2;
+			border-bottom: solid 1px #fff;
 			margin-bottom: 20px;
-			padding-bottom: 10px;
+			padding-bottom: 5px;
+			color: #fff;
 
 			.right {
 				a {
-					color: #b2b2b2 !important;
+					color: #fff !important;
 					margin-left: 10px;
 				}
 			}

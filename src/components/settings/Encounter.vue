@@ -3,11 +3,22 @@
 		<ul class="settings">
 			<li v-for="(setting, key) in general" :key="key">
 				<div class="d-flex justify-content-between">
-					<span v-b-popover.hover.top="setting.info" :title="setting.name">
+					<span>
 						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
-						<a v-if="key == 'automate'" data-toggle="collapse" class="ml-1" :href="'#'+key" 
-							role="button" aria-expanded="false">
-							<i class="fas fa-info"></i>
+						<a v-if="setting.info">
+							<q-icon name="info" v-if="setting.info">
+								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+									<q-card dark square>
+										<q-card-section class="bg-gray-active">
+											<b>{{ setting.name }}</b>
+										</q-card-section>
+
+										<q-card-section>
+											<div v-html="setting.info" />
+										</q-card-section>
+									</q-card>
+								</q-menu>
+							</q-icon>
 						</a>
 					</span>
 					<div>
@@ -26,17 +37,6 @@
 								</q-tooltip>
 						</a>
 					</div>
-				</div>
-				<div v-if="key == 'automate'" class="collapse px-4 bg-gray-darker" id="automate">
-					<p><b>Automate.</b> When you check the automate setting, some actions in an encounter will be done automatically.</p>
-
-					<p>At the moment only one action is dependent on the automate function.</p>
-
-					<p><b>Death Saving Throws</b><br/>
-						When a down player receives damage, it will automatically get a failed death saving throw. 
-						If the "critical hit" checkbox is checked, two death saves will be failed.<br/>
-						Even a character that is stable at 0 hit points will automatically fail saves when taking damage.
-					</p>
 				</div>
 			</li>
 		</ul>
@@ -57,12 +57,12 @@
 						name: 'Automate', 
 						icon: 'fas fa-calculator',
 						info: 
-							'When you check the automate setting, some actions in an encounter will be done automatically.\n'+
-							'At the moment only one action is dependent on the automate function.\n\n'+
-							'Death Saving Throws\n'+
-							'When a down player receives damage, it will automatically get a failed death saving throw.'+ 
-							'If the "critical hit" checkbox is checked, two death saves will be failed.\n'+
-							'Even a character that is stable at 0 hit points will automatically fail saves when taking damage.',
+							'<p>When you check the automate setting, some actions in an encounter will be done automatically.<br/>'+
+							'At the moment only one action is dependent on the automate function.</p>'+
+							'<b>Death Saving Throws</b>'+
+							'<p>When a down player receives damage, it will automatically get a failed death saving throw.'+ 
+							'If the "critical hit" checkbox is checked, two death saves will be failed.<br/>'+
+							'Even a character that is stable at 0 hit points will automatically fail saves when taking damage.</p>',
 						options: {
 							0: { value: false, name: 'Not Automated', action: 'Don\'t', icon: 'fas fa-times', color: 'red' },
 							1: { value: undefined, name: 'Automate', action: 'Automate', icon: 'fas fa-check', color: 'green' },
@@ -89,7 +89,7 @@
 					'critical': { 
 						name: 'Critical Hits', 
 						icon: 'far fa-crosshairs',
-						info: 'How do you want critical hits to be handled?\n Roll: all the damage dice are rolled twice.\n Double: the rolled damage is doubled.',
+						info: 'How do you want critical hits to be handled?<br/> <b>Roll</b>: all the damage dice are rolled twice.<br/> <b>Double</b>: the rolled damage is doubled.',
 						options: {
 							0: { value: undefined, name: 'Roll', action: 'Roll', icon: 'fas fa-dice-d20', color: 'green' },
 							1: { value: true, name: 'Double', action: 'Double', icon: 'fas fa-chevron-double-up', color: 'green' },

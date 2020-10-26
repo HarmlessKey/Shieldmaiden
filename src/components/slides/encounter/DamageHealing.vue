@@ -107,7 +107,6 @@
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
 			background: #191919;
-			padding-right: 10px;
 		}
 	}
 	.manual {

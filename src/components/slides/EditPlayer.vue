@@ -249,12 +249,13 @@
 
 				<div class="level">
 					<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
-					<div class="progress">
-						<div class="progress-bar bg-blue"
-							role="progressbar" 
-							:style="{ width: levelAdvancement(playerBase.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
+					<q-linear-progress size="25px" :value="levelAdvancement(playerBase.experience)" color="primary">
+						<div class="absolute-full flex flex-center">
+							<div class="white">
+								{{ Math.floor(levelAdvancement(playerBase.experience) * 100) }}%
+							</div>
 						</div>
-					</div>
+					</q-linear-progress>
 					<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
 				</div>
 
@@ -533,16 +534,16 @@
 	.level {
 		display: grid;
 		grid-template-columns: 25px auto 25px;
-		height: 15px;
-		line-height: 15px;
+		height: 25px;
+		line-height: 25px;
 		margin-bottom: 20px;
 
 		.next {
 			text-align: right;
 		}
-
-		.progress {
-			height: 15px;
+		.q-linear-progress {
+			font-size: 15px !important;
+			height: 25px;
 		}
 	}
 	.btn.save {

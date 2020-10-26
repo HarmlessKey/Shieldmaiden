@@ -14,13 +14,13 @@
 							<hk-card header="Old Spell Description" v-if="loading">
 								<div  class="loader"> <span>Loading old_spell...</span></div>
 							</hk-card>
-							<div class="card old_spell" v-else>
+							<hk-card class="old_spell" v-else>
 								
-								<div class="card-header d-flex justify-content-between">
+								<div class="card-header d-flex justify-content-between" slot="header">
 									<a @click="preview('old')" :class="preview_spell=='old' ? 'selected' : ''">Old Spell Description</a>
 									<a @click="preview('new')" :class="preview_spell=='new' ? 'selected' : ''">New Spell Description</a>
 								</div>
-								<div class="card-body" v-if="preview_spell == 'old'">
+								<div v-if="preview_spell == 'old'">
 								<!-- <hk-card class="old_spell" header="Old Spell Description" v-else> -->
 									<a 
 										class="btn btn-block mb-3" 
@@ -65,10 +65,10 @@
 									</p>
 								</div> <!-- card-body -->
 								<!-- New spell preview active -->
-								<div class="card-body" v-else>
+								<div v-else>
 									<ViewSpell :data="spell" :no_roll="true" />
 								</div>
-							</div> <!-- card -->
+							</hk-card>
 						</div>
 
 						<div class="col-12 col-md-8">

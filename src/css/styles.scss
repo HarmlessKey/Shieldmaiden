@@ -196,6 +196,9 @@ html body {
 	//MARGINGS
 	.m {
 		&b, &y {
+			&-0 {
+				margin-bottom: 0 !important;
+			}
 			&-1 {
 				margin-bottom: 0.25rem !important;
 			}
@@ -213,6 +216,9 @@ html body {
 			}
 		}
 		&t, &y {
+			&-0 {
+				margin-top: 0 !important;
+			}
 			&-1 {
 				margin-top: 0.25rem !important;
 			}
@@ -230,6 +236,9 @@ html body {
 			}
 		}
 		&l, &x {
+			&-0 {
+				margin-left: 0 !important;
+			}
 			&-1 {
 				margin-left: 0.25rem !important;
 			}
@@ -247,6 +256,9 @@ html body {
 			}
 		}
 		&r, &x {
+			&-0 {
+				margin-right: 0 !important;
+			}
 			&-1 {
 				margin-right: 0.25rem !important;
 			}
@@ -268,6 +280,9 @@ html body {
 	//PADDINGS
 	.p {
 		&b, &y {
+			&-0 {
+				padding-bottom: 0 !important;
+			}
 			&-1 {
 				padding-bottom: 0.25rem !important;
 			}
@@ -285,6 +300,9 @@ html body {
 			}
 		}
 		&t, &y {
+			&-0 {
+				padding-top: 0 !important;
+			}
 			&-1 {
 				padding-top: 0.25rem !important;
 			}
@@ -302,6 +320,9 @@ html body {
 			}
 		}
 		&l, &x {
+			&-0 {
+				padding-left: 0 !important;
+			}
 			&-1 {
 				padding-left: 0.25rem !important;
 			}
@@ -319,6 +340,9 @@ html body {
 			}
 		}
 		&r, &x {
+			&-0 {
+				padding-right: 0 !important;
+			}
 			&-1 {
 				padding-right: 0.25rem !important;
 			}
@@ -865,7 +889,7 @@ html body {
 		margin-left: -15px;
 
 		.hk-card {
-			flex: 1 0 0%;
+			flex: 1 1 100%;
 			margin-right: 15px;
 			margin-bottom: 0;
 			margin-left: 15px;
@@ -967,11 +991,14 @@ html body {
 	table.table, table {
 		border-collapse: separate !important; 
 		border-spacing: 0 1px;
+		width: 100%;
 		
 		thead {
 			margin-bottom: 1px !important;
 
 			th {
+				text-align: left;
+				padding: 10px;
 				border: none;
 			}
 		}
@@ -980,6 +1007,8 @@ html body {
 				margin-bottom: 1px !important;
 
 				td {
+					width: max-content !important;
+					padding: 10px;
 					color: $gray-light;
 					border-top: none;
 					background-color: $gray;
@@ -1017,35 +1046,43 @@ html body {
 					.fa-ellipsis-v {
 						line-height: 22px;
 					}
-				}
-				td.actions {
-					router-link, a, .disabled {
-						font-size: 15px;
-						line-height: 0px;
+					span.bind {
+						border: solid 1px #2c97de;
+						display: inline-block;
+						min-width: 20px;
+						padding: 0 5px;
+						text-align: center;
 					}
-					.disabled {
-						opacity: .3;
+					&.actions {
+						router-link, a, .disabled {
+							font-size: 15px;
+							line-height: 0px;
+						}
+						.disabled {
+							opacity: .3;
+						}
 					}
-				}
-				td.n, th.n {
-					width: 30px;
-					text-align: center;
+
+					&.index {
+						width: 1% !important;
+						white-space: nowrap;
+					}
+					&.img {
+						padding: 3px;
+						width: 46px;
+						height: 46px;
+						background-size:cover;
+						background-position:top center;
+						background-color: $black;
+						border: solid 1px $gray-light !important;
+				
+						img {
+							width: 40px;
+							height: 40px;
+						}
+					}
 				}
 				
-				td.img {
-					padding: 3px;
-					width: 46px;
-					height: 46px;
-					background-size:cover;
-					background-position:top center;
-					background-color: $black;
-					border: solid 1px $gray-light !important;
-			
-					img {
-						width: 40px;
-						height: 40px;
-					}
-				}
 				&:focus {
 					td {
 						background-color: $gray-darker;
@@ -1065,6 +1102,12 @@ html body {
 						}
 					}
 				}
+			}
+		}
+		&.table-sm {
+			font-size: 13px; 
+			td, th {
+				padding: 5px;
 			}
 		}
 	}
@@ -1134,6 +1177,8 @@ html body {
 			.actions {
 				display: flex;
 				justify-content: flex-end;
+				background: none !important;
+				padding-right: 10px;
 
 				a {
 					color: $gray-light !important;
@@ -1176,9 +1221,6 @@ html body {
 			li {
 				background-color: $gray-darker;
 
-				.actions {
-					background-color: $gray-dark !important;
-				}
 				&:hover {
 					background-color: $gray-dark;
 				}
@@ -1587,14 +1629,19 @@ html body {
 				}
 			}
 		}
+
+		table {
+			td {
+				background-color: $gray-dark !important;
+			}
+		}
 	}
 
 	.q-tabs--dense {
 		.q-tab {
-			min-height: 30px;
+			min-height: 35px;
 
 			&__icon {
-				height: 20px;
 				font-size: 15px;
 			}
 		}
@@ -1648,12 +1695,6 @@ html body {
 				}
 			}
 		}
-		.hk-card-deck {
-			.hk-card {
-				flex: 1 1 100%;
-				margin-bottom: 1rem;
-			}
-		}
 	}
 
 	//MD
@@ -1702,6 +1743,12 @@ html body {
 				&-block {
 					display: inline-block !important;
 				}
+			}
+		}
+		.hk-card-deck {
+			.hk-card {
+				flex: 1 0 0%;
+				margin-bottom: 1rem;
 			}
 		}
 	}

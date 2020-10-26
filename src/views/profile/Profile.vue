@@ -142,24 +142,22 @@
 
 			<!-- PLAYER LINK -->
 			<div class="col">
-				<div class="card">
-					<div class="card-header"><i class="fas fa-link"></i> Player Link</div>
-					<div class="card-body">
-						<PlayerLink />
+				<hk-card>
+					<div class="card-header" slot="header">
+						<i class="fas fa-link"></i> Player Link
 					</div>
-				</div>
+					<PlayerLink />
+				</hk-card>
 			</div>
 		</div>
 
-		<div class="card" v-if="!tier || (tier && tier.name === 'Free')">
-			<div class="card-header">Support us on Patreon</div>
-			<div class="card-body">
-				<template>
-					<p>Get instant access to more storage.</p>
-					<Tiers />
-				</template>
+		<hk-card v-if="!tier || (tier && tier.name === 'Free')">
+			<div class="card-header" slot="header">
+				Support us on Patreon
 			</div>
-		</div>
+			<p>Get instant access to more storage.</p>
+			<Tiers />
+		</hk-card>
 	</div>
 </template>
 

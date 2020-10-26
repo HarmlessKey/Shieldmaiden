@@ -246,16 +246,11 @@
 					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
 						<div class="level" :class="{red: isXpAdvancement() && player.level}">
 							{{ player.level ? player.level : calculatedLevel(player.experience) }}
-							<q-tooltip anchor="top middle" self="center middle">
-								{{ isXpAdvancement() && player.level ? 'Level is overwritten' : '' }}
+							<q-tooltip anchor="top middle" self="center middle" v-if="player.level">
+								Level is overwritten
 							</q-tooltip>
 						</div>
-						<div class="progress">
-							<div class="progress-bar bg-blue"
-								role="progressbar" 
-								:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
-							</div>
-						</div>
+						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-gray-active" />
 					</div>
 				</template>
 			</template>
@@ -571,11 +566,9 @@
 					line-height: 15px;
 					text-align: center;
 				}
-				.progress {
+				.q-linear-progress {
 					margin-top: 6px;
-					width: 100%;
 					height: 3px;
-					background-color: #232323 !important;
 				}
 			}
 		}

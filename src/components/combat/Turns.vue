@@ -3,11 +3,7 @@
 		<h1>
 			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
 			<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
-			<a class="edit"
-				id="edit"
-				data-toggle="dropdown" 
-				aria-haspopup="true" 
-				aria-expanded="false">
+			<a class="edit">
 				<i class="fas fa-cog"></i>
 				<q-menu square>
 					<q-list>

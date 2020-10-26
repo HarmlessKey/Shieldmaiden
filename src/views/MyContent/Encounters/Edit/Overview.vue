@@ -4,6 +4,7 @@
 			<div>
 				<h3 class="header">Encounter overview</h3>
 				<div class="diff-info" v-if="encDifficulty">
+					<h5 class="mb-3">Difficulty</h5>
 					<div class="d-flex justify-content-between">
 						<div class="advanced">
 							{{ encDifficulty[1] }}
@@ -20,18 +21,18 @@
 							</template>
 						</div>
 						<q-circular-progress
-							class="d-none d-xl-block"
+							class="d-none d-lg-block"
 							show-value
-							font-size="16px"
+							font-size="18px"
 							:value="encDifficulty['compare']/encDifficulty['deadly']*100"
-							size="200px"
+							size="165px"
 							:color="bars[encDifficulty[0]]"
 							track-color="dark"
 						>
 							{{ encDifficulty[0].capitalize() }}
 						</q-circular-progress>
 					</div>
-					<div class="progress-area d-block d-xl-none">
+					<div class="progress-area d-block d-lg-none">
 						<q-linear-progress 
 							size="20px" 
 							:value="encDifficulty['compare']/encDifficulty['deadly']" 
@@ -47,15 +48,14 @@
 								'red': encDifficulty[0] == 'deadly'
 							}"
 						>
-						{{ encDifficulty[0] }}
-					</span>
-				</div> 
-				<hr class="mb-0">     
+							{{ encDifficulty[0] }}
+						</span>
+					</div> 
+					<hr class="mb-0">
+				</div>
+				<h3 v-else class="gray-hover">Calculating difficulty...</h3>
 			</div>
-			<h3 v-else class="gray-hover">Calculating difficulty...</h3>
-		</div>
-		<div class="scroll bg-gray-active" v-bar>
-			<div>
+			<q-scroll-area dark class="bg-gray-active" :thumb-style="{ width: '5px'}">
 				<div class="overview">          
 					<template v-if="encounter">
 						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
@@ -66,100 +66,99 @@
 							:columns="entityColumns"
 							:showHeader="false"
 						>
-						<template slot="image" slot-scope="data">
-							<template v-if="data.row.entityType === 'player'">
-								<span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
-								<icon v-else icon="player" class="image" />
+							<template slot="image" slot-scope="data">
+								<template v-if="data.row.entityType === 'player'">
+									<span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
+									<icon v-else icon="player" class="image" />
+								</template>
+								<template v-if="data.row.entityType === 'companion'">
+									<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+									<icon v-else icon="companion" class="image" />
+								</template>
+								<template v-else-if="data.row.entityType === 'npc'">
+									<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
+									<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
+									<icon v-else-if="data.row.friendly" icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
+								</template>
 							</template>
-							<template v-if="data.row.entityType === 'companion'">
-								<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-								<icon v-else icon="companion" class="image" />
-							</template>
-							<template v-else-if="data.row.entityType === 'npc'">
-								<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-								<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-								<icon v-else-if="data.row.friendly" icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
-							</template>
-						</template>
 
-						<!-- NAME -->
-						<span slot="name" slot-scope="data" class="green">
-							{{ data.item }}
-						</span>
+							<!-- NAME -->
+							<span slot="name" slot-scope="data" class="green">
+								{{ data.item }}
+							</span>
 
-						<!-- ACTIONS -->
-						<div slot="actions" slot-scope="data" class="actions">
-							<a v-if="data.row.entityType === 'npc'" 
-								@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
-								class="mr-2 gray-hover" 
-							>
-								<i class="fas fa-pencil"></i>
+							<!-- ACTIONS -->
+							<div slot="actions" slot-scope="data" class="actions">
+								<a v-if="data.row.entityType === 'npc'" 
+									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
+									class="mr-2 gray-hover" 
+								>
+									<i class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</a>
+								<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
+									<i class="fas fa-minus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Remove character
+									</q-tooltip>
+								</a>
+							</div>
+						</hk-table>
+
+						<h3>{{ Object.keys(_monsters).length }} Monsters</h3>
+
+						<hk-table 
+							:items="_monsters"
+							:columns="entityColumns"
+							:showHeader="false"
+						>
+							<template slot="image" slot-scope="data">
+								<span v-if="data.row.avatar" class="image" 
+									:style="{
+										backgroundImage: 'url(\'' + data.row.avatar + '\')',
+										'border-color': data.row.color_label ? data.row.color_label : ``
+									}" />
+								<span 
+									v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" 
+									class="image" 
+									:style="{ 
+										backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')', 
+										'border-color': data.row.color_label ? data.row.color_label : ``
+									}" />
+								<icon v-else icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
+							</template>
+
+							<!-- NAME -->
+							<span slot="name" slot-scope="data" class="red">
+								{{ data.item }}
+							</span>
+
+							<div slot="actions" slot-scope="data" class="actions">
+								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover">
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
-							</a>
-							<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
-								<i class="fas fa-minus"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Remove character
-								</q-tooltip>
-							</a>
-						</div>
-					</hk-table>
-
-					<h3>{{ Object.keys(_monsters).length }} Monsters</h3>
-
-					<hk-table 
-						:items="_monsters"
-						:columns="entityColumns"
-						:showHeader="false"
-					>
-					<template slot="image" slot-scope="data">
-						<span v-if="data.row.avatar" class="image" 
-							:style="{
-								backgroundImage: 'url(\'' + data.row.avatar + '\')',
-								'border-color': data.row.color_label ? data.row.color_label : ``
-							}" />
-						<span 
-							v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" 
-							class="image" 
-							:style="{ 
-								backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')', 
-								'border-color': data.row.color_label ? data.row.color_label : ``
-							}" />
-						<icon v-else icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
+									<i class="fas fa-pencil"></i>
+								</a>
+								<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
+									<i class="fas fa-minus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Remove character
+									</q-tooltip>
+								</a>
+							</div>
+						</hk-table>
 					</template>
-
-					<!-- NAME -->
-					<span slot="name" slot-scope="data" class="red">
-						{{ data.item }}
-					</span>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover">
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-							<i class="fas fa-pencil"></i>
-						</a>
-						<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
-							<i class="fas fa-minus"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Remove character
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table>
-			</template>
-			<div v-else class="loader"><span>Loading entities...</span></div>
+					<div v-else class="loader"><span>Loading entities...</span></div>
+				</div>
+			</q-scroll-area>
+		</div>
+		<div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
+			<i class="fas fa-chevron-left"></i>
 		</div>
 	</div>
-</div>
-</div>
-<div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
-	<i class="fas fa-chevron-left"></i>
-</div>
-</div>
 </template>
 
 <script>
@@ -280,107 +279,108 @@
 			async setDifficulty() {
 				this.encDifficulty = await this.difficulty(this.encounter.entities);
 
-								//Store the new xp value for the encounter
-								db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
-							},
-						}
-					}
-				</script>
+				//Store the new xp value for the encounter
+				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
+			},
+		}
+	}
+</script>
 
-				<style lang="scss" scoped>
-				.encounter_overview {
-					grid-area: overview;
-					overflow-y: hidden;
+<style lang="scss" scoped>
+	.encounter_overview {
+		height: 100%;
+		grid-area: overview;
+		overflow-y: hidden;
 
-					h3 {
-						margin-bottom: 16px;
-					}
-					.diff-info {
-						background: #302f2f;
-						padding: 10px 10px 0 10px;
+		h3 {
+			margin-bottom: 8px;
+		}
+		.diff-info {
+			background: #302f2f;
+			padding: 10px 10px 0 10px;
 
-						span.left {
-							width: 80px;
-							display: inline-block;
-						}
+			span.left {
+				width: 80px;
+				display: inline-block;
+			}
 
-						.progress-area {
-							.progress {
-								background-color: #232323 !important;
-							}
-							.diff {
-								display: none;
-							}
-						}
-					}
-					.scroll {
-						height: calc(100% - 266px);
-
-						.overview {
-							padding: 15px 10px 30px 10px;
-						}
-					}
+			.progress-area {
+				.progress {
+					background-color: #232323 !important;
 				}
-				.toggle {
-					display: none
+				.diff {
+					display: none;
 				}
-				@media only screen and (max-width: 850px) {
-					.encounter_overview {
-						position: fixed;
-						top: 50px;
-						right: -300px; 
-						height: calc(100vh - 50px);
-						overflow: scroll;
-						z-index: 96;
-						background: #302f2f;
-						overflow: scroll;
-						width: 300px;
-						transition: right .5s linear,
-						box-shadow .5s linear;
+			}
+		}
+		.q-scrollarea {
+			height: calc(100% - 290px) !important;
 
-						&.show {
-							right: 0;
-							box-shadow: 0 10px 15px #000;
-						}
+			.overview {
+				padding: 15px 10px 30px 10px;
+			}
+		}
+	}
+	.toggle {
+		display: none
+	}
+	@media only screen and (max-width: 850px) {
+		.encounter_overview {
+			position: fixed;
+			top: 50px;
+			right: -300px; 
+			height: calc(100vh - 50px);
+			overflow: scroll;
+			z-index: 96;
+			background: #302f2f;
+			overflow: scroll;
+			width: 300px;
+			transition: right .5s linear,
+			box-shadow .5s linear;
 
-						h3.header {
-							padding: 10px;
-						}
+			&.show {
+				right: 0;
+				box-shadow: 0 10px 15px #000;
+			}
 
-						.scroll {
-							overflow: visible !important;
-							height: calc(100% - 286px);
-						}
+			h3.header {
+				padding: 10px;
+			}
 
-						&::-webkit-scrollbar {
-							display: none;
-						}
-					} 
-					.toggle {
-						position: fixed;
-						top: 65px;
-						right: 0;
-						height: 50px;
-						width: 50px;
-						z-index: 97;
-						text-align: center;
-						transition: right .5s linear;
-						display: block;
-						cursor: pointer;
-						line-height: 50px;
-						color: #fff !important;
+			.q-scrollarea {
+				overflow: visible !important;
+				height: calc(100% - 286px);
+			}
 
-						i {
-							transition: transform .5s linear;
-						}    
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		} 
+		.toggle {
+			position: fixed;
+			top: 65px;
+			right: 0;
+			height: 50px;
+			width: 50px;
+			z-index: 97;
+			text-align: center;
+			transition: right .5s linear;
+			display: block;
+			cursor: pointer;
+			line-height: 50px;
+			color: #fff !important;
 
-						&.show {
-							right: 300px;
+			i {
+				transition: transform .5s linear;
+			}    
 
-							i {
-								transform: rotate(180deg);
-							}
-						}
-					}   
+			&.show {
+				right: 300px;
+
+				i {
+					transform: rotate(180deg);
 				}
-			</style>
+			}
+		}   
+	}
+</style>

@@ -7,7 +7,8 @@
 				dark square filled dense
 				label="Armor class"
 				type="number" 
-				name="ac" 
+				name="ac"
+				class="mb-2"
 				v-model="transAc"
 				v-validate="'required'"
 			/>

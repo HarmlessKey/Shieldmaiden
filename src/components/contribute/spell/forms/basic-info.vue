@@ -1,5 +1,5 @@
 <template>
-	<hk-card class="card">
+	<hk-card>
 		<div slot="header" class="card-header d-flex justify-content-between">
 			<span>Basic Info</span>
 			<a @click="setSlide({ show: true, type: 'ViewSpell', data: spell })">

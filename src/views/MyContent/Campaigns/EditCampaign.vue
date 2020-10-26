@@ -13,25 +13,34 @@
 
 				<q-input 
 					dark filled square dense
+					label="name"
 					autocomplete="off"
 					v-validate="'required'" 
 					data-vv-as="Encounter Name" 
 					type="text" 
 					name="name" 
-					v-model="campaign.campaign"/>
+					v-model="campaign.campaign"
+				/>
 				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
 				<q-select 
 					dark filled square dense
+					label="Advancement"
 					emit-value
 					map-options
-					class="mt-2" 
+					class="my-2" 
 					v-model="campaign.advancement" 
 					:options="advancement_options" 
 				/>
 
 				<div class="background">
-					<div class="img" v-if="campaign.background" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"></div>
+					<div 
+						class="img pointer" 
+						v-if="campaign.background" 
+						:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+						@click="image = true"
+					>
+					</div>
 					<div class="img" v-else>
 						<q-icon name="fas fa-image"/>
 					</div>
@@ -68,15 +77,12 @@
 				<div class="col-12 col-md-6">
 					<hk-card header="All Players">
 						<ul class="entities hasImg" v-if="players && campaign">
-							<li v-for="(player, key) in players" 
-							:key="key" 
-							class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
-									{{ player.character_name }}
-								</div>
-								
+							<li v-for="(player, key) in players" :key="key">
+								<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+								{{ player.character_name }}
+							
 								<span v-if="inOtherCampaign(key)">
 									<span class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
 									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
@@ -107,15 +113,18 @@
 					<hk-card header="Players in Campaign">
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
-								<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
-									<div class="d-flex justify-content-left" :class="{ 'red': inOtherCampaign(key) }">
-										<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
-										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+								<li v-for="(player, key) in campaign.players" :key="key">		
+									<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
+									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+									<div :class="{ 'red': inOtherCampaign(key) }">
 										{{ players[key].character_name }}
-										<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
+										<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover">
+											<small>Different Campaign</small>
+										</span>
 									</div>
 									
-									<div class="actions bg-gray">
+									<div class="actions">
 										<a class="gray-hover" @click="removePlayer(key)">
 											<i class="fas fa-minus"></i>
 											<q-tooltip anchor="top middle" self="center middle">
@@ -132,6 +141,10 @@
 				</div>
 			</div>
 		</div>
+
+		<q-dialog v-model="image">
+			<img :src="campaign.background" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -155,6 +168,7 @@
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
 				newCampaign: '',
+				image: false,
 				advancement_options: [
 					{
 						value: "experience",
@@ -282,42 +296,5 @@
 			background-size: cover;
 			background-position: center top;
 		}
-	}
-	.nav { 
-		background:#191919;
-	}
-	#add {
-		padding: 15px 10px;
-		grid-area: add;
-	}
-	.tab-content {
-		padding:15px 10px;
-	}
-	#added {
-		padding: 15px 10px;
-		grid-area:added;
-	}
-	.monster {
-		padding:15px;
-		position:fixed;
-		right:0;
-		top:80px;
-		height: calc(100vh - 80px);
-		width:330px;
-		z-index:99;
-		overflow: scroll;
-		border-left:solid 1px #000;
-		box-shadow: 0 10px 8px #000;
-	}
-
-	.slideInRight {
-		transition-duration: 0.1s;
-	}
-
-	.slideOutRight {
-		transition-duration: 0.1s;
-	}
-	.faded {
-		opacity: .3;
 	}
 </style>

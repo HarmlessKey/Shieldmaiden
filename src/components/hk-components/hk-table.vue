@@ -8,7 +8,7 @@
 				type="text" 
 				autocomplete="off" 
 				v-model="searched"
-				@keyup="searchData()" 
+				@keyup="searchData()"
 			>
 				<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchData()" />
 			</q-input>

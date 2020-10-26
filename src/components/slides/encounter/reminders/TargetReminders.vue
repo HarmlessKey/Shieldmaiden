@@ -7,8 +7,8 @@
 			</li>
 		</ul>
 		<hr>
-		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-md current justify-content-start px-3">
-			<div class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
+		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
+			<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
 				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
@@ -18,34 +18,26 @@
 				</a>
 			</div>
 		</div>
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" 
-					id="premade-tab" 
-					data-toggle="tab" 
-					href="#premade" 
-					role="tab" 
-					aria-controls="premade" 
-					aria-selected="true">
-					Premade
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 
-					id="custom-tab" 
-					data-toggle="tab" 
-					href="#custom" 
-					role="tab" 
-					aria-controls="custom" 
-					aria-selected="false">
-					Custom
-				</a>
-			</li>
-		</ul>
 
-		<div class="tab-content">
-			<div class="tab-pane fade show active" id="premade" role="tabpanel" aria-labelledby="premade-tab">
-				<ul class="premade">
+		<q-tabs
+			v-model="tab"
+			dark
+			inline-label
+			dense
+			no-caps
+		>
+			<q-tab 
+				v-for="({name, icon, label}, index) in tabs"
+				:key="`tab-${index}`" 
+				:name="name" 
+				:icon="icon"
+				:label="label"
+			/>
+		</q-tabs>
+
+		<q-tab-panels v-model="tab" class="bg-transparent">
+				<q-tab-panel name="premade">
+					<ul class="premade">
 					<li v-for="(reminder, key) in premade" :key="key"
 						class="d-flex justify-content-between"
 						:class="'bg-'+reminder.color">
@@ -93,13 +85,12 @@
 						</li>
 					</ul>
 				</template>
-			</div>
-
-			<div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">	
-				<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
-				<button class="btn btn-block" @click="addReminder('custom')">Set</button>
-			</div>
-		</div>
+				</q-tab-panel>
+				<q-tab-panel name="custom">
+					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
+					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
+				</q-tab-panel>
+		</q-tab-panels>
 	</div>
 </template>
 
@@ -125,6 +116,11 @@
 				userId: this.$store.getters.getUser.uid,
 				entityKey: this.data,
 				action: 'remove',
+				tab: "premade",
+				tabs: [
+					{ name: "premade", label: "Premade" },
+					{ name: "custom", label: "Custom" }
+				],
 				selectedColor: 'green-light',
 				premadeReminder: undefined,
 				customReminder: {},
@@ -236,32 +232,29 @@
 			}
 		}
 	}
-	.tab-content {
-		padding-top: 20px;
-				
-		ul.premade {
-			color: #fff;
-			list-style: none;
-			padding: 0;
 
-			li {
-				margin-bottom: 3px;
-				background-color: #191919;
+	ul.premade {
+		color: #fff;
+		list-style: none;
+		padding: 0;
 
-				.title {
-					padding: 5px;
-				}
-				a.add {
-					display: block;
-					background: #191919;
-					padding: 5px 0;
-					width: 30px;
-					text-align: center;
-				}
-				.variables {
-					border-top: solid 3px #262626;
-					padding: 10px;
-				}
+		li {
+			margin-bottom: 3px;
+			background-color: #191919;
+
+			.title {
+				padding: 5px;
+			}
+			a.add {
+				display: block;
+				background: #191919;
+				padding: 5px 0;
+				width: 30px;
+				text-align: center;
+			}
+			.variables {
+				border-top: solid 3px #262626;
+				padding: 10px;
 			}
 		}
 	}
@@ -269,27 +262,25 @@
 		margin-bottom: 20px;
 		font-size: 11px;
 
-		.col {
-			a {
-				color: #fff !important;
-				position: relative;
-				padding: 3px;
+		a {
+			color: #fff !important;
+			position: relative;
+			padding: 3px;
 
+			.delete {
+				display: none;
+			}
+
+			&:hover {
 				.delete {
-					display: none;
+					position: absolute;
+					right: 5px;
+					color: #fff !important;
+					font-size: 12px;
+					display: inline-block;
+					
 				}
-
-				&:hover {
-					.delete {
-						position: absolute;
-						right: 5px;
-						color: #fff !important;
-						font-size: 12px;
-						display: inline-block;
-						
-					}
-					padding-right: 15px;
-				}
+				padding-right: 15px;
 			}
 		}
 	}

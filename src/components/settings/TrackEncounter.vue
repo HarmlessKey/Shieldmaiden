@@ -4,11 +4,28 @@
 		<a @click="copyLink()" class="copy">{{ copy }}</a>
 		<input type="hidden" id="copy" :value="copy">
 		
-
 		<h3>General</h3>
 		<ul class="settings">
 			<li v-for="(setting, key) in general" class="d-flex justify-content-between" :key="key">
-				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
+				<span>
+					<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+					<a v-if="setting.info">
+						<q-icon name="info" v-if="setting.info">
+							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>{{ setting.name }}</b>
+									</q-card-section>
+
+									<q-card-section>
+										<div v-html="setting.info" />
+										<Keybindings v-if="key === 'keyBinds'" :data="{ sm: true }" />
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</a>
+				</span>
 				<div>
 					<a v-for="option in setting.options"
 						:key="option.name" 
@@ -20,7 +37,7 @@
 							</span>
 							<i :class="option.icon"></i>
 							<q-tooltip anchor="top middle" self="center middle">
-								{{ option.value == settings[key] ? option.name : option.action }}
+								{{ option.value == general[key] ? option.name : option.action }}
 							</q-tooltip>
 					</a>
 				</div>
@@ -30,7 +47,25 @@
 		<h3>NPC settings</h3>
 		<ul class="settings">
 			<li v-for="(setting, key) in npcs" class="d-flex justify-content-between" :key="key">
-				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
+				<span>
+					<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+					<a v-if="setting.info">
+						<q-icon name="info" v-if="setting.info">
+							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>{{ setting.name }}</b>
+									</q-card-section>
+
+									<q-card-section>
+										<div v-html="setting.info" />
+										<Keybindings v-if="key === 'keyBinds'" :data="{ sm: true }" />
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</a>
+				</span>
 				<div>
 					<a v-for="option in setting.options" 
 						:key="option.name" 
@@ -43,7 +78,7 @@
 							</span>
 							<i :class="option.icon"></i>
 							<q-tooltip anchor="top middle" self="center middle">
-								{{ option.value == settings[key] ? option.name : option.action }}
+								{{ option.value == npc[key] ? option.name : option.action }}
 							</q-tooltip>
 					</a>
 				</div>
@@ -53,7 +88,25 @@
 		<h3>Player settings</h3>
 		<ul class="settings">
 			<li v-for="(setting, key) in players" class="d-flex justify-content-between" :key="key">
-				<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
+				<span>
+					<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
+					<a v-if="setting.info">
+						<q-icon name="info" v-if="setting.info">
+							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>{{ setting.name }}</b>
+									</q-card-section>
+
+									<q-card-section>
+										<div v-html="setting.info" />
+										<Keybindings v-if="key === 'keyBinds'" :data="{ sm: true }" />
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</a>
+				</span>
 				<div>
 					<a v-for="option in setting.options" 
 						:key="option.name" 
@@ -66,7 +119,7 @@
 							</span>
 							<i :class="option.icon"></i>
 							<q-tooltip anchor="top middle" self="center middle">
-								{{ option.value == settings[key] ? option.name : option.action }}
+								{{ option.value == player[key] ? option.name : option.action }}
 							</q-tooltip>
 					</a>
 				</div>
@@ -92,29 +145,21 @@
 						entity: 'player',
 						name: 'Damage Meters', 
 						icon: 'fas fa-swords',
+						info: 'Players can see the damage meters.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
 						}
-					},
-					'loot': { 
-						entity: 'player',
-						name: 'Loot', 
-						icon: 'fas fa-treasure-chest',
-						options: {
-							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
-					},
+					}
 				},
 				npcs: {
 					'name': { 
 						entity: 'npc',
 						name: 'Name', 
 						icon: 'fas fa-helmet-battle',
+						info: 'Players can see the names of NPC\'s.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							// 1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
 						}
 					},
@@ -122,6 +167,7 @@
 						entity: 'npc',
 						name: 'Health', 
 						icon: 'fas fa-heart',
+						info: 'Players can see the health of NPC\'s.',
 						options: {
 							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
@@ -132,6 +178,7 @@
 						entity: 'npc',
 						name: 'Armor Class', 
 						icon: 'fas fa-shield',
+						info: 'Players can see the armor class of NPC\'s.',
 						options: {
 							0: { value: undefined, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: true, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
@@ -141,6 +188,7 @@
 						entity: 'npc',
 						name: 'Conditions', 
 						icon: 'fas fa-skull-crossbones',
+						info: 'Players can see the conditions on NPC\'s.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
@@ -152,6 +200,7 @@
 						entity: 'player',
 						name: 'Health', 
 						icon: 'fas fa-heart',
+						info: 'Players can see the health of players.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: 'obscured', name: 'Obsc', action: 'Obsc', icon: 'fas fa-question-circle', color: 'orange' },
@@ -162,6 +211,7 @@
 						entity: 'player',
 						name: 'Armor Class', 
 						icon: 'fas fa-shield',
+						info: 'Players can see the armor class of players.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
@@ -171,6 +221,7 @@
 						entity: 'player',
 						name: 'Conditions', 
 						icon: 'fas fa-skull-crossbones',
+						info: 'Players can see the conditions of players.',
 						options: {
 							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
 							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },

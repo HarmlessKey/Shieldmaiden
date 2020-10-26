@@ -26,6 +26,13 @@
 				</div>
 				<div class="area d-flex justify-content-end">
 					<a class="icon"
+						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
+						<i class="fas fa-keyboard"/>
+						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
+							Keybindings
+						</q-tooltip>
+					</a>
+					<a class="icon"
 						@click="setSlide({show: true, type: 'slides/Compendium'})">
 						<i class="fas fa-book-spells"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -61,6 +68,10 @@
 							<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
 								<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
 								<q-item-section>Contribute</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup to="/profile">
+								<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
+								<q-item-section>Profile</q-item-section>
 							</q-item>
 							<q-item clickable v-close-popup to="/campaigns">
 								<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>

@@ -21,6 +21,7 @@
 			name="maxHp" 
 			v-model="transHp"
 			v-validate="'required'"
+			class="my-2"
 		/>
 		<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 		<button class="btn btn-block mb-3" @click="edit()">Transform</button>

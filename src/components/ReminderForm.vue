@@ -12,7 +12,7 @@
 		/>
 		<p class="validate red" v-if="errors.has('title')">{{ errors.first('title') }}</p>
 
-		<div class="colors d-flex justify-content-between mb-2">
+		<div class="colors d-flex justify-content-between my-2">
 			<a v-for="(color, index) in colors" :key="index" class="color" :class="'bg-'+color" @click="setColor(color)">
 				<span v-show="color == reminder.color"><i class="fas fa-check"></i></span>
 			</a>

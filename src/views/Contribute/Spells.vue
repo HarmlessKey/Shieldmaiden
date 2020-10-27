@@ -23,10 +23,12 @@
 								:class="isDifficult(data.row) ? 'red' : ''"
 							>
 								<span>{{ data.item }}</span>
-								<a v-if="isDifficult(data.row)"
-									class="ml-2"
-									v-b-popover.hover.top="'This spell is tagged as difficult'" 
-								><i class="fas fa-exclamation-triangle"></i></a>
+								<a v-if="isDifficult(data.row)" class="ml-2">
+									<i class="fas fa-exclamation-triangle"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Dificult
+									</q-tooltip>
+								</a>
 							</router-link>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a 
@@ -105,7 +107,12 @@
 							:columns="taggedColumns"
 						>
 							<router-link :to="'/contribute/spells/' + data.row['.key']" slot="name" slot-scope="data">
-								<span v-b-popover.hover.top="`This spell is tagged by: ${getPlayerName(data.row.metadata.tagged)}`">{{ data.item }}</span>
+								<span>
+									{{ data.item }}
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ getPlayerName(data.row.metadata.tagged) }}
+									</q-tooltip>
+								</span>
 							</router-link>
 
 							<div slot="actions" slot-scope="data" class="actions">
@@ -159,10 +166,12 @@
 						>
 							<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
 								<span>{{data.item}}</span>
-								<a v-if="isDifficult(data.row)"
-									class="ml-2"
-									v-b-popover.hover.top="'This spell is tagged as difficult'"
-								><i class="fas fa-exclamation-triangle"></i></a>
+								<a v-if="isDifficult(data.row)" class="ml-2">
+									<i class="fas fa-exclamation-triangle"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Difficult
+									</q-tooltip>
+								</a>
 							</div>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a v-if="isDifficult(data.row)" @click="markDifficult(data.row)">

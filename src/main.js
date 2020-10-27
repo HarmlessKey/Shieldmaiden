@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import App from './App.vue';
-import jQuery from 'jquery'
 import VueFire from 'vuefire'
 import VeeValidate from 'vee-validate';
 import { auth, db } from './firebase';
@@ -36,15 +35,6 @@ Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-
-//Bootstrap
-global.$ = jQuery
-global.jQuery = jQuery
-// Vue.use(require('bootstrap'))
-// import BootstrapVue from 'bootstrap-vue'
-// import 'bootstrap/dist/css/bootstrap.css'
-
-// Vue.use(BootstrapVue);
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 

@@ -420,6 +420,26 @@ html body {
 		word-wrap: break-word;
 	}
 
+	.openSlot {
+		display: flex;
+		justify-content: space-between;
+		padding: 0 10px;
+		width: 100%;
+		height: 46px;
+		line-height: 46px;
+		margin-top: 1px;
+		color: #fff;
+		border: dashed 1px #5c5757;
+
+		&.none {
+			font-size: 20px;
+			display: block;
+			text-align: center;
+			border-color: transparent;
+			background-color: $patreon-red;
+		}
+	}
+
 	a.large-link {
 		display: block;
 		background: $gray;

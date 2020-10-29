@@ -1,6 +1,7 @@
 <template>
 	<div id="actions">
 		<q-tabs
+			class="px-3"
 			v-model="tab"
 			dark
 			inline-label

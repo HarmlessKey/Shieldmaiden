@@ -16,13 +16,14 @@
 						<div class="currency animated bounceIn">
 							<div v-for="(coin, key) in currencies" :key="key">
 								<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-								<b-form-input
+								<q-input 
+									dark filled square dense
+									disable
+									:label="coin.name"
 									class="text-center"
-									:disabled="true"
 									autocomplete="off" 
-									type="text" 
-									size="sm"
-									min="0"
+									type="number" min="0" 
+									name="name" 
 									v-model="encounter.currency[key]"
 								/>
 							</div>

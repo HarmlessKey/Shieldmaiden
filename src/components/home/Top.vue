@@ -13,11 +13,36 @@
 						</template>
 						<div v-else>
 							<div class="menu">
-								<router-link v-b-tooltip.hover.bottom="'Campaigns'"  to="campaigns"><i class="fas fa-dungeon"></i></router-link>
-								<router-link v-b-tooltip.hover.bottom="'Players'" to="players"><i class="fas fa-users"></i></router-link>
-								<router-link v-b-tooltip.hover.bottom="'NPC\'s'" to="npcs"><i class="fas fa-dragon"></i></router-link>
-								<router-link v-b-tooltip.hover.bottom="'Reminders'" to="reminders"><i class="fas fa-stopwatch"></i></router-link>
-								<router-link v-b-tooltip.hover.bottom="'Items'" to="items"><i class="far fa-staff"></i></router-link>
+								<router-link to="campaigns">
+									<i class="fas fa-dungeon"></i>
+									<q-tooltip anchor="bottom middle" self="center middle">
+										Campaigns
+									</q-tooltip>
+								</router-link>
+								<router-link to="players">
+									<i class="fas fa-users"></i>
+									<q-tooltip anchor="bottom middle" self="center middle">
+										Players
+									</q-tooltip>
+								</router-link>
+								<router-link to="npcs">
+									<i class="fas fa-dragon"></i>
+									<q-tooltip anchor="bottom middle" self="center middle">
+										NPC's
+									</q-tooltip>
+								</router-link>
+								<router-link to="reminders">
+									<i class="fas fa-stopwatch"></i>
+									<q-tooltip anchor="bottom middle" self="center middle">
+										Reminders
+									</q-tooltip>
+								</router-link>
+								<router-link to="items">
+									<i class="far fa-staff"></i>
+									<q-tooltip anchor="bottom middle" self="center middle">
+										Items
+									</q-tooltip>
+								</router-link>
 							</div>
 							<div class="share">
 								<PlayerLink />
@@ -54,7 +79,6 @@
 
 <script>
 	import PlayerLink from '../PlayerLink';
-	import { auth } from '@/firebase.js';
 	import { mapGetters } from 'vuex';
 
 	export default {

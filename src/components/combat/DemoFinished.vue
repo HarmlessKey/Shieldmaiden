@@ -2,17 +2,21 @@
 	<div class="container-fluid">
 		<div class="container">
 			<img src="@/assets/_img/logo/logo-main-icon-left.svg"/>
-			<b-card header="Thanks for trying our demo">
-				<b-card-text>
-					<h3>We hope you were impressed by the possibilities</h3>
-					<p>This is exactly how you can run your custom created encounters in our app. With your own players, and monsters from the SRD or created by you.</p>
-
-					<a @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
-				</b-card-text>
+			<hk-card header="Thanks for trying our demo">
+				
+				<h3>We hope you were impressed by the possibilities</h3>
+				<p>This is exactly how you can run your custom created encounters in our app. With your own players, and monsters from the SRD or created by you.</p>
+				<a @click="reload">
+					<i class="far fa-sync-alt"></i> Reset encounter
+					<q-tooltip anchor="top middle" self="center middle">
+						Reset
+					</q-tooltip>
+				</a>
+		
 				<template slot="footer">
 					<router-link class="btn btn-block btn-lg bg-green" to="/sign-up">Create Account Now</router-link>
 				</template>
-			</b-card>
+			</hk-card>
 		</div>
 	</div>
 </template>

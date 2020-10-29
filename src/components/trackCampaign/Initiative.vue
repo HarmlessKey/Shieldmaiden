@@ -11,8 +11,6 @@
 			<div class="right">
 				<a 
 					v-if="targeted.length > 0"
-					v-b-tooltip.hover
-					title="Damage or Healing"
 					@click="setSlide({
 						show: true,
 						type: 'slides/trackCampaign/playerRequests/index',
@@ -27,7 +25,12 @@
 							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
 							type: 'manual'
 						}
-					})"><i class="fas fa-sword"></i></a>
+					})">
+					<i class="fas fa-sword"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Do damage or healing
+					</q-tooltip>
+				</a>
 			</div>
 		</div>
 
@@ -91,11 +94,19 @@
 										'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
 										'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
 									}"  
-									v-b-tooltip.hover :title="'Armor Class + ' + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus" 
-									v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus">
+									v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
+								>
 									{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+									</q-tooltip>
 								</span>
-								<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}</span>
+								<span class="ac" v-else>
+									{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Armor class
+									</q-tooltip>
+								</span>
 							</template>
 							<span v-else class="gray-hover">?</span>
 						</td>
@@ -163,11 +174,12 @@
 											</span>
 											<svg
 												v-else
-												v-b-popover.hover="conditions[key].condition" 
-												:title="key" 
 												class="icon text" 
 												viewBox="0 0 512 512">
 												<path :d="conditions[key].icon" fill-opacity="1"></path>
+												<q-tooltip anchor="top middle" self="center middle">
+													{{ key.capitalize() }}
+												</q-tooltip>
 											</svg>
 											</div>
 										</template>

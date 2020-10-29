@@ -40,13 +40,15 @@
 			<template v-for="(ability, index) in abilities">
 				<div
 					class="ability"
-					v-b-tooltip.hover title="Roll"
 					:key="index" 
 					@click="rollD(20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
 					v-if="data[ability.ability]">
 						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability.ability] }}
 						({{ modifier(data[ability.ability]) }})
+						<q-tooltip anchor="top middle" self="center middle">
+							Roll
+						</q-tooltip>
 				</div>
 			</template>
 		</div>

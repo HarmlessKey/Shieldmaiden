@@ -2,12 +2,12 @@
 	<div class="footer">
 		<div class="top">
 			<div class="content">
-				<b-row>
-					<b-col md="3" class="logo-container">
+				<div class="row q-col-gutter-md">
+					<div class="col-12 col-md-3 logo-container">
 						<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
-					</b-col>
+					</div>
 
-					<b-col md="9" class="links">
+					<div class="col-12 col-md-9 links">
 						<div v-if="user">
 							<h2 class="gray-light">Your content</h2>
 							<ul>
@@ -56,8 +56,8 @@
 							</ul>
 							<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
 						</div>
-					</b-col>
-				</b-row>
+					</div>
+				</div>
 			</div>
 		</div>
 

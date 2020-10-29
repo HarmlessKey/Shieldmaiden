@@ -3,7 +3,7 @@
 			<template v-if="log">
 				<h2 v-if="!encounter.finished">Combat log</h2>
 				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
-					<li v-for="(item, key) in log" :key="key">
+					<li v-for="(item, key) in log" :key="`item-${key}`">
 						<div class="d-flex justify-content-between head">
 							<span>
 								Round: {{ item.round }}

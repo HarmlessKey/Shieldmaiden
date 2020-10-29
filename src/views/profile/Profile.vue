@@ -1,8 +1,8 @@
 <template>
 	<div class="content" v-if="tier && userInfo">
-		<b-row>
-			<b-col md="6">
-				<b-card header="Your Profile">
+		<div class="row q-col-gutter-md">
+			<div class="col-12 col-md-6">
+				<hk-card header="Your Profile">
 					<div>
 						<h4>{{ userInfo.username }}</h4>
 						<p class="info">
@@ -72,7 +72,7 @@
 								<h3>Payment Declined</h3>
 								<p>
 									Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
-            			Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
+									Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
 								</p>
 							</div>
 							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank">Cancel subscription</a></small>
@@ -137,29 +137,27 @@
 							<router-link to="/profile/delete-account" class="gray-light"><i class="fas fa-trash-alt red"></i> Delete account</router-link>
 						</div>
 					</div>
-				</b-card>
-			</b-col>
+				</hk-card>
+			</div>
 
 			<!-- PLAYER LINK -->
-			<b-col>
-				<div class="card">
-					<div class="card-header"><i class="fas fa-link"></i> Player Link</div>
-					<div class="card-body">
-						<PlayerLink />
+			<div class="col">
+				<hk-card>
+					<div class="card-header" slot="header">
+						<i class="fas fa-link"></i> Player Link
 					</div>
-				</div>
-			</b-col>
-		</b-row>
-
-		<div class="card" v-if="!tier || (tier && tier.name === 'Free')">
-			<div class="card-header">Support us on Patreon</div>
-			<div class="card-body">
-				<template>
-					<p>Get instant access to more storage.</p>
-					<Tiers />
-				</template>
+					<PlayerLink />
+				</hk-card>
 			</div>
 		</div>
+
+		<hk-card v-if="!tier || (tier && tier.name === 'Free')">
+			<div class="card-header" slot="header">
+				Support us on Patreon
+			</div>
+			<p>Get instant access to more storage.</p>
+			<Tiers />
+		</hk-card>
 	</div>
 </template>
 

@@ -4,184 +4,200 @@
 			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
 				class="gray-light text-capitalize" 
-				v-b-tooltip.hover title="Add Effect" 
 				@click="add_effect()"
 			>
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
+				<q-tooltip anchor="center right" self="center left">
+					Add effect
+				</q-tooltip>
 			</a>
 		</h2>
-		<template v-for="(effect, eff_index) in effects">
-			<div class="card" v-if="effects && effects.length > 0" :key="`effect-${eff_index}`">
-				<div v-b-toggle="'accordion-'+eff_index" class="card-header collapse-header d-flex justify-content-between">
-					<div class="gray-light" >
-						<div class="caret blue"><i class="fas fa-caret-down" /></div>
+
+		<q-list dark square :class="`accordion`">
+			<q-expansion-item
+				v-for="(effect, eff_index) in effects"
+				:key="`effect-${eff_index}`"
+				dark switch-toggle-side
+				group="effects"
+			>
+				<template v-slot:header>
+					<q-item-section>
 						{{parseInt(eff_index) + 1}}. 
 						{{ effect.effect.type }} 
 						{{ effect.effect.subtype }}
-					</div>
-					<a @click="remove_effect(eff_index)" class="gray-hover text-capitalize">
-						<i class="fas fa-trash-alt red"></i>
-					</a>
-				</div>
-				<b-collapse visible :id="'accordion-'+eff_index" accordion="my-accordion">
-					<div class="card-body">
-						<EffectsForm v-model="effect.effect" />
-						<b-row class="mt-3">
-							<b-col sm="6">
-								<label class="required" for="application">
-									<span>Application</span>
-									<a 
-										class="ml-1"
-										v-b-popover.hover.top="'When should this effect be applied?'" 
-										title="Apply effect"
-									>
-										<i class="fas fa-info-circle"></i>
-									</a>
-								</label>
-								<b-form-select v-model="effect.application"
-									:id="`application-${eff_index}`"
-									:name="`application-${eff_index}`"
-									title="application"
-									class="form-control mb-2"
-									v-validate="'required'"
-									data-vv-as="application"
-									@change="$forceUpdate()">
-									<option :value="undefined" disabled>- Application -</option>
-									<option 
-										v-for="{label, value} in application"
-										:key="value" :value="value"
-									>
-										{{ label }}
-									</option>
-								</b-form-select>
-								<p class="validate red" v-if="errors.has(`application-${eff_index}`)">{{ errors.first(`application-${eff_index}`) }}</p>
-							</b-col>
-							<!-- TARGETS -->
-							<b-col sm="6">
-								<label class="required" for="target">
-									<span>Target</span>
-									<a 
-										class="ml-1"
-										v-b-popover.hover.top="'To whom should the effect be applied?'" 
-										title="Target"
-									>
-										<i class="fas fa-info-circle"></i>
-									</a>
-								</label>
-								<b-form-select v-model="effect.target"
-									:id="`target-${eff_index}`"
-									:name="`target-${eff_index}`"
-									title="target"
-									class="form-control mb-4"
-									v-validate="'required'"
-									data-vv-as="target"
-									@change="$forceUpdate()">
-									<option :value="undefined" disabled>- Apply to -</option>
-									<option 
-										v-for="(target, i) in targets"
-										:key="`target-${i}`" :value="target"
-									>
-										{{ target }}
-									</option>
-								</b-form-select>
-								<p class="validate red" v-if="errors.has(`target-${eff_index}`)">{{ errors.first(`target-${eff_index}`) }}</p>
-							</b-col>
-						</b-row>
+					</q-item-section>
+					<q-item-section avatar>
+						<a @click="remove_effect(eff_index)" class="gray-hover text-capitalize">
+							<i class="fas fa-trash-alt red"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Remove effect
+							</q-tooltip>
+						</a>
+					</q-item-section>
+				</template>
 
-						<!-- SCALING -->
-						<template v-if="level_scaling != undefined && level_scaling != 'none'">
-							<h2 class="d-flex justify-content-between mt-3">
-									Scaling
-									<a 
+				<div class="accordion-body">
+					<EffectsForm v-model="effect.effect" />
+					<div class="row q-col-gutter-md mt-3">
+						<div class="col-12 col-md-6">
+							<q-select 
+								dark filled square dense
+								emit-value
+								map-options
+								label="Application"
+								v-model="effect.application"
+								:options="application"
+								:name="`application-${eff_index}`"
+								class="mb-2"
+								v-validate="'required'"
+								data-vv-as="application"
+								@change="$forceUpdate()"
+							>
+								<template v-slot:append>
+									<q-icon name="info" @click.stop>
+										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card dark square>
+												<q-card-section class="bg-gray-active">
+													<b>Apply effect</b>
+												</q-card-section>
+
+												<q-card-section>
+													Select when this effect should be applied.
+												</q-card-section>
+											</q-card>
+										</q-menu>
+									</q-icon>
+								</template>
+							</q-select>
+							<p class="validate red" v-if="errors.has(`application-${eff_index}`)">{{ errors.first(`application-${eff_index}`) }}</p>
+						</div>
+						<!-- TARGETS -->
+						<div class="col-12 col-md-6">
+							<q-select
+								dark filled square dense
+								label="Target"
+								v-model="effect.target"
+								:options="targets"
+								:name="`target-${eff_index}`"
+								class="mb-4"
+								v-validate="'required'"
+								data-vv-as="target"
+								@change="$forceUpdate()"
+							>							
+								<template v-slot:append>
+									<q-icon name="info" @click.stop>
+										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card dark square>
+												<q-card-section class="bg-gray-active">
+													<b>Target</b>
+												</q-card-section>
+												<q-card-section>
+													Select to whom the effect should be applied.
+												</q-card-section>
+											</q-card>
+										</q-menu>
+									</q-icon>
+								</template>
+							</q-select>
+							<p class="validate red" v-if="errors.has(`target-${eff_index}`)">{{ errors.first(`target-${eff_index}`) }}</p>
+						</div>
+					</div>
+
+					<!-- SCALING -->
+					<template v-if="level_scaling != undefined && level_scaling != 'none'">
+						<h2 class="d-flex justify-content-between mt-3">
+								Scaling
+								<a 
 									v-if="level_tier_addable(eff_index)"
 									class="gray-hover text-capitalize" 
-									v-b-tooltip.hover title="Add Level Tier" 
-									@click="add_level_tier(eff_index)">
-										<i class="fas fa-plus green"></i>
-									</a>
-							</h2>
-							<template v-for="(level_tier, tier_index) in effect.level_tiers">
-								<b-row v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
-									<!-- HL LEVEL SCALE -->
-									<b-col md="2">
-										<label class="required" :for="`level-${eff_index}`">{{level_scaling.capitalizeEach()}}</label>
-										<b-form-input v-model="level_tier.level"
+									@click="add_level_tier(eff_index)"
+								>
+									<i class="fas fa-plus green"></i>
+									<q-tooltip anchor="center right" self="center left">
+										Add level tier
+									</q-tooltip>
+								</a>
+						</h2>
+						<template v-for="(level_tier, tier_index) in effect.level_tiers">
+							<div class="row q-col-gutter-md" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+								<!-- HL LEVEL SCALE -->
+								<div class="col-12 col-md-2">
+									<q-input 
+										dark filled square dense
+										:label="level_scaling.capitalizeEach()"
+										v-model="level_tier.level"
+										autocomplete="off"
+										:name="`level-${eff_index}`"
+										class="mb-2"
+										v-validate="'required'"
+										type="number"
+										:data-vv-as="level_scaling"
+										@keyup="$forceUpdate()"
+									/>
+									<p class="validate red" v-if="errors.has(`level-${eff_index}`)">{{ errors.first(`level-${eff_index}`) }}</p>
+								</div>
+								<!-- HL DICE COUNT -->
+								<div class="col-12 col-md-2">
+									<q-input 
+										dark filled square dense
+										label="Dice count"
+										v-model="level_tier.dice_count"
+										autocomplete="off"
+										class="mb-2"
+										type="number"
+										@keyup="$forceUpdate()"
+									/>								
+								</div>
+								<!-- HL MODIFIER DICETYPE -->
+								<div class="col-12 col-md-3">
+									<label for="dice_type">Dice Type</label>
+									<q-select 
+										dark filled square dense
+										emit-value
+										map-options
+										label="Dice type"
+										:options="dice_type"
+										v-model="level_tier.dice_type"
+										class="mb-2"
+										data-vv-as="Dice Type"
+										@change="$forceUpdate()"
+									/>
+								</div>
+								<!-- HL MODIFIER FIXED VALUE -->
+								<div class="col-12 col-md-3">
+									<div class="d-flex justify-content-between">
+										<q-input 
+											dark filled square dense
+											emit-value
+											map-options
+											label="Fixed value"
+											v-model="level_tier.fixed_val"
 											autocomplete="off"
-											:id="`level-${eff_index}`"
-											:name="`level-${eff_index}`"
-											class="form-control mb-2"
-											:title="level_scaling"
-											v-validate="'required'"
+											class="mb-2"
 											type="number"
-											:data-vv-as="level_scaling"
 											@keyup="$forceUpdate()"
-											></b-form-input>
-											<p class="validate red" v-if="errors.has(`level-${eff_index}`)">{{ errors.first(`level-${eff_index}`) }}</p>
-									</b-col>
-									<!-- HL DICE COUNT -->
-									<b-col md="2">
-										<label for="dice_count">Dice Count</label>
-										<b-form-input v-model="level_tier.dice_count"
-											autocomplete="off"
-											id="dice_count"
-											name="dice_count"
-											class="form-control mb-2"
-											title="Dice Count"
-											type="number"
-											data-vv-as="Dice Count"
-											@keyup="$forceUpdate()"
-											></b-form-input>
-									</b-col>
-									<!-- HL MODIFIER DICETYPE -->
-									<b-col md="3">
-										<label for="dice_type">Dice Type</label>
-										<b-form-select v-model="level_tier.dice_type"
-											id="dice_type"
-											name="dice_type"
-											title="Dice Type"
-											class="form-control mb-2"
-											data-vv-as="Dice Type"
-											@change="$forceUpdate()">
-											<option value="">- Dice type -</option>
-											<option v-for="(val,i) in dice_type"
-												:key="i" :value="val.value">{{ val.label }}</option>
-										</b-form-select>
-									</b-col>
-									<!-- HL MODIFIER FIXED VALUE -->
-									<b-col md="3">
-										<label for="fixed_val">Fixed Value</label>
-										<div class="d-flex justify-content-between">
-											<b-form-input v-model="level_tier.fixed_val"
-												autocomplete="off"
-												id="fixed_val"
-												name="fixed_val"
-												class="form-control mb-2"
-												title="Fixed Value"
-												type="number"
-												data-vv-as="Fixed Value"
-												@keyup="$forceUpdate()"
-												></b-form-input>
+										/>
 
-												<a @click="remove_level_tier(eff_index, tier_index)"
-													class="remove"
-													v-b-tooltip.hover title="Remove">
-													<i class="fas fa-trash-alt red"></i>
-												</a>
-										</div>
-									</b-col>
-								</b-row>
-							</template>
-							<p v-if="effect.level_tiers && effect.level_tiers.length > 0">
-								<span v-for="(line, i) in create_spell_level_tier_description(effect.level_tiers)" :key="`tier-${i}`">
-									{{line}}<br>
-								</span>
-							</p>
+										<a @click="remove_level_tier(eff_index, tier_index)" class="remove">
+											<i class="fas fa-trash-alt red"></i>
+											<q-tooltip anchor="center right" self="center left">
+												Remove
+											</q-tooltip>
+										</a>
+									</div>
+								</div>
+							</div>
 						</template>
-					</div>
-				</b-collapse>
-			</div>
-		</template>
+						<p v-if="effect.level_tiers && effect.level_tiers.length > 0">
+							<span v-for="(line, i) in create_spell_level_tier_description(effect.level_tiers)" :key="`tier-${i}`">
+								{{line}}<br>
+							</span>
+						</p>
+					</template>
+				</div>
+			</q-expansion-item>
+		</q-list>
 	</div>
 </template>
 
@@ -201,8 +217,8 @@ export default {
 		level_scaling: String,
 		spell: Object,
 	},
-  data() {
-    return {
+	data() {
+		return {
 			dice_type: [
 				{ label: "d4", value: 4 }, 
 				{ label: "d6", value: 6 },
@@ -215,7 +231,7 @@ export default {
 				"Target",
 				"Caster"
 			]
-    };
+		};
 	},
 	computed: {
 		application() {
@@ -247,9 +263,9 @@ export default {
 			return { "effects": this.$validator };
 		}
 	},
-  methods: {
-  	add_effect() {
-  		let effects = this.effects;
+	methods: {
+		add_effect() {
+			let effects = this.effects;
 			if(effects === undefined) {
 				effects = []
 			}
@@ -320,7 +336,7 @@ export default {
 				// Spell slot text
 				let slot_txt = `for ${tier.level < 2 ? "each slot level" : "every " + tier.level + " slot levels"} above ${numeral(this.level).format('0o')}.`;
 				
-				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? effect_txt : ''} ${slot_txt}`;
+				let text = `${level_txt} ${tier.projectile_count ? tier.projectile_count : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${(tier.dice_count || tier.fixed_val) ? effect_txt : ''} ${slot_txt}`;
 				description = [text];
 			} 
 			else if (this.level_scaling == "spell level") {
@@ -335,11 +351,10 @@ export default {
 			}
 			return description;
 		},
-  },
-  watch: {
+	},
+	watch: {
 		effects: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

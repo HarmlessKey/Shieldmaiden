@@ -2,25 +2,13 @@ export const dice = {
 	data() {
 		return {
 			animateTrigger: false,
+			rolled: 0
 		}
 	},
 	watch: {
 		animateTrigger() {
-			// eslint-disable-next-line
-			$('#roll').each(function () {
-				// eslint-disable-next-line
-				$(this).prop('Counter',0).animate({
-					// eslint-disable-next-line
-					Counter: $(this).text()
-				}, {
-					duration: 500,
-					easing: 'linear',
-					step: function (now) {
-						// eslint-disable-next-line
-						$(this).text(Math.ceil(now));
-					}
-				});
-			});
+			this.animateValue("roll", 0, this.rolled, 500);
+			this.rolled = 0;
 		}
 	},
 	methods: {
@@ -59,6 +47,7 @@ export const dice = {
 					timeout: 3000,
 					closeOnClick: true
 				});
+				this.rolled = roll.total;
 			}
 			return roll;
 		},
@@ -77,5 +66,20 @@ export const dice = {
 		rollD100(n=1,m=0) {
 			return this.rollD(100,n,m)
 		},
+		animateValue(id, start, end, duration) {
+			if (start === end) return;
+			const range = end - start;
+			let current = start;
+			const increment = end > start? 1 : -1;
+			const stepTime = Math.abs(Math.floor(duration / range));
+			const obj = document.getElementById(id);
+			const timer = setInterval(function() {
+					current += increment;
+					obj.innerHTML = current;
+					if (current == end) {
+							clearInterval(timer);
+					}
+			}, stepTime);
+		}
 	}
 }

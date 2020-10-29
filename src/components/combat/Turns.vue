@@ -3,24 +3,36 @@
 		<h1>
 			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
 			<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
-			<a class="edit"
-				id="edit"
-				data-toggle="dropdown" 
-				aria-haspopup="true" 
-				aria-expanded="false">
+			<a class="edit">
 				<i class="fas fa-cog"></i>
+				<q-menu square>
+					<q-list>
+						<q-item>
+							<q-item-section>
+								<b>{{ encounter.encounter }}</b>
+							</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
+							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+							<q-item-section>Settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
+							<q-item-section>Track settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup v-if="demo" @click="reload">
+							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
+							<q-item-section>Reset encounter</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup @click="confirmFinish()">
+							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+							<q-item-section>End encounter</q-item-section>
+						</q-item>
+					</q-list>
+				</q-menu>
 			</a>
-			<div class="dropdown-menu">	
-				<div class="dropdown-header">{{ encounter.encounter }}</div>
-				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/Encounter'})">
-					<i class="fas fa-cogs"></i> Settings
-				</a>
-				<a v-if="!demo" class="dropdown-item" @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-					<i class="far fa-desktop"></i> Track Settings
-				</a>
-				<a v-if="demo" @click="reload" v-b-tooltip.hover title="Reset"><i class="far fa-sync-alt"></i> Reset encounter</a>
-				<a class="dropdown-item" @click="confirmFinish()"><i class="fas fa-times"></i> End Encounter</a>
-			</div>
 
 			<!-- BROADCASTING -->
 			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
@@ -54,10 +66,12 @@
 			</div>
 			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
 				@click="prevTurn()"
-				v-b-tooltip.hover title="[shift]+[arrowleft]"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()">
 				<i class="fas fa-arrow-left"></i> 
 				<span class="ml-1 d-none d-lg-inline">Prev turn</span>
+				<q-tooltip anchor="top middle" self="center middle">
+					[shift]+[arrow left]
+				</q-tooltip>
 			</a>
 			<template v-if="encounter.round === 0"> 
 				<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
@@ -68,9 +82,11 @@
 			</template>
 			<a v-else class="btn" 
 				@click="nextTurn()" 
-				v-b-tooltip.hover title="[shift]+[arrowright]"
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
 				<span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					[shift]+[arrow right]
+				</q-tooltip>
 			</a>
 		</div>
 	</div>

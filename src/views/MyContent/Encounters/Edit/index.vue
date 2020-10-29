@@ -6,34 +6,44 @@
 		<div class="wrapper scrollable-content">
 			<div class="top">
 				<Crumble />
-				<router-link :to="'/encounters/' + $route.params.campid"><i class="fas fa-arrow-left"></i> Back</router-link>
+				<router-link :to="'/encounters/' + $route.params.campid">
+					<i class="fas fa-arrow-left"></i> Back
+				</router-link>
 			</div>
-				<div class="encounter_actions">
-					<ul class="nav nav-tabs" id="myTab" role="tablist">
-						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
-							<a class="nav-link" :class="{ active: tab.selected }" id="entities-tab" data-toggle="tab" :href="`#${key}`" role="tab" :aria-controls="key" :aria-selected="tab.selected">
-								<i v-if="tab.icon" :class="tab.icon"></i> {{ tab.name }}
-							</a>
-						</li>
-					</ul>
-					<div class="scroll" v-bar>
-						<div>
-							<div class="tab-content">
-								<div class="tab-pane fade show active" id="entities" role="tabpanel" aria-labelledby="entities-tab">
+				<div class="mt-2 encounter_actions">
+					<q-tabs
+						v-model="tab"
+						dark
+						inline-label
+						dense
+						align="left"
+						:breakpoint="0"
+						no-caps
+					>
+						<q-tab 
+							v-for="({name, icon, label}, index) in tabs"
+							:key="`tab-${index}`" 
+							:name="name" 
+							:icon="icon"
+							:label="label"
+						/>
+					</q-tabs>
+					<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
+						<q-tab-panels v-model="tab" class="bg-transparent">
+							<q-tab-panel name="entities">
 									<Entities />
-								</div>
-								<div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="general-tab">
+							</q-tab-panel>
+							<q-tab-panel name="general">
 									<General />
-								</div>
-								<div class="tab-pane fade" id="loot" role="tabpanel" aria-labelledby="loot-tab">
+							</q-tab-panel>
+							<q-tab-panel name="loot">
 									<Loot />
-								</div>
-								<div v-if="campaign.advancement === 'experience'" class="tab-pane fade" id="xp" role="tabpanel" aria-labelledby="xp-tab">
+							</q-tab-panel>
+							<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
 									<Xp />
-								</div>
-							</div>
-						</div>
-					</div>
+							</q-tab-panel>
+						</q-tab-panels>
+					</q-scroll-area>
 				</div>
 
 				<!-- ENCOUNTER OVERVIEW -->
@@ -70,7 +80,8 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.getUser
+				user: this.$store.getters.getUser,
+				tab: 'entities'
 			} 
 		},
 		computed: {
@@ -81,12 +92,12 @@
 			]),
 			tabs() {
 				let tabs = {
-					entities: { name: 'Entities', selected: true, icon: 'fas fa-helmet-battle' },
-					general: { name: 'General' },
-					loot: { name: 'Loot', icon: 'fas fa-treasure-chest' }
+					entities: { name: 'entities', label: 'Entities', icon: 'fas fa-helmet-battle' },
+					general: { name: 'general', label: 'General' },
+					loot: { name: 'loot', label: 'Loot', icon: 'fas fa-treasure-chest' }
 				}
 				if(this.campaign.advancement === 'experience') {
-					tabs.xp = { name: 'XP', icon: 'fas fa-sparkles' };
+					tabs.xp = { name: 'xp', label: 'XP', icon: 'fas fa-sparkles' };
 				}
 				return tabs;
 			}
@@ -131,13 +142,9 @@
 			grid-area: actions;
 			overflow-y: hidden;
 
-			.scroll {
+			.q-scrollarea {
 				background: #302f2f !important;
 				height: calc(100% - 30px) !important;
-				
-				.tab-content {
-					padding: 15px;
-				}
 			}
 		}
 	}

@@ -2,96 +2,98 @@
 	<div class="container">
 		<h1>Manage your content</h1>
 
-		<b-card-group deck v-if="tier">
+		<hk-card-deck v-if="tier">
 			<!-- CAMPAIGNS -->
-			<div class="card" v-if="campaigns">
-				<div class="card-header">
+			<hk-card v-if="campaigns">
+				<div class="card-header" slot="header">
 					<i class="fas fa-dungeon"></i> Campaigns
 				</div>
 
-				<div class="card-body">
-					<div class="p-2">
-						( <span :class="{ 'green': true, 'red': Object.keys(campaigns).length > tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
-						/ {{ tier.benefits.campaigns }} )
-					</div>
-
-					<b-list-group>
-						<b-list-group-item v-for="(campaign, key) in campaigns" :key="key" class="d-flex justify-content-between">
-							{{ campaign.campaign }}
-							<span @click="confirmDelete(key, 'campaign', campaign.campaign)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-						</b-list-group-item>
-					</b-list-group>
+				<div class="p-2">
+					( <span :class="{ 'green': true, 'red': Object.keys(campaigns).length > tier.benefits.campaigns }">{{ Object.keys(campaigns).length }}</span> 
+					/ {{ tier.benefits.campaigns }} )
 				</div>
-				<router-link class="btn" to="/campaigns">Show all</router-link>
-			</div>
+
+				<b-list-group>
+					<b-list-group-item v-for="(campaign, key) in campaigns" :key="key" class="d-flex justify-content-between">
+						{{ campaign.campaign }}
+						<span @click="confirmDelete(key, 'campaign', campaign.campaign)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+					</b-list-group-item>
+				</b-list-group>
+				
+				<div slot="footer">
+					<router-link class="btn" to="/campaigns">Show all</router-link>
+				</div>
+			</hk-card>
 
 			<!-- ENCOUNTERS -->
-			<div class="card encounters" v-if="allEncounters">
-				<div class="card-header"><i class="fas fa-swords"></i> Encounters</div>
+			<hk-card class="encounters" v-if="allEncounters">
+				<div class="card-header" slot="header"><i class="fas fa-swords"></i> Encounters</div>
 
 				<template v-for="(campaign, cKey) in campaigns">
-						<div class="card-body" :key="cKey">
-							<div class="p-2">
-								<span class="gray-hover">Campaign:</span> {{ campaign.campaign }}
-								( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
-								/ {{ tier.benefits.encounters }} )
-							</div>
-							<b-list-group :key="cKey">
-								<b-list-group-item v-for="(encounter, key) in allEncounters[cKey]" :key="key" class="d-flex justify-content-between">
-									{{ encounter.encounter }}
-									<span @click="confirmDelete({ campKey: cKey, encKey: key }, 'encounter', encounter.encounter)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-								</b-list-group-item>
-							</b-list-group>
+					<div :key="cKey">
+						<div class="p-2">
+							<span class="gray-hover">Campaign:</span> {{ campaign.campaign }}
+							( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
+							/ {{ tier.benefits.encounters }} )
 						</div>
-					<router-link class="btn" :key="cKey" :to="'/encounters/' + cKey">Show all</router-link>
+						<b-list-group :key="cKey">
+							<b-list-group-item v-for="(encounter, key) in allEncounters[cKey]" :key="key" class="d-flex justify-content-between">
+								{{ encounter.encounter }}
+								<span @click="confirmDelete({ campKey: cKey, encKey: key }, 'encounter', encounter.encounter)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+							</b-list-group-item>
+						</b-list-group>
+					</div>
 				</template>
-			</div>
+				<div slot="footer">
+					<router-link class="btn" :key="cKey" :to="'/encounters/' + cKey">Show all</router-link>
+				</div>
+			</hk-card>
 
 			<!-- PLAYERS -->
-			<div class="card" v-if="players">
-				<div class="card-header">
+			<hk-card v-if="players">
+				<div class="card-header" slot="header">
 					<i class="fas fa-users"></i> Players
 				</div>
 
-				<div class="card-body">
-					<div class="p-2">
-						( <span :class="{ 'green': true, 'red': Object.keys(players).length > tier.benefits.players }">{{ Object.keys(players).length }}</span> 
-						/ {{ tier.benefits.players }} )
-					</div>
-
-					<b-list-group>
-						<b-list-group-item v-for="(player, key) in players" :key="key" class="d-flex justify-content-between">
-							{{ player.character_name }}
-							<span @click="confirmDelete(key, 'player', player.character_name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-						</b-list-group-item>
-					</b-list-group>
+				<div class="p-2">
+					( <span :class="{ 'green': true, 'red': Object.keys(players).length > tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+					/ {{ tier.benefits.players }} )
 				</div>
-				<router-link class="btn" to="/players">Show all</router-link>
-			</div>
+
+				<b-list-group>
+					<b-list-group-item v-for="(player, key) in players" :key="key" class="d-flex justify-content-between">
+						{{ player.character_name }}
+						<span @click="confirmDelete(key, 'player', player.character_name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+					</b-list-group-item>
+				</b-list-group>
+				<div slot="footer">
+					<router-link class="btn" to="/players">Show all</router-link>
+				</div>
+			</hk-card>
 
 			<!-- NPCS -->
-			<div class="card" v-if="npcs">
-				<div class="card-header">
+			<hk-card v-if="npcs">
+				<div class="card-header" slot="header">
 					<i class="fas fa-dragon"></i> NPC's
 				</div>
 
-				<div class="card-body">
-					<div class="p-2">
-						( <span :class="{ 'green': true, 'red': Object.keys(npcs).length > tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
-						/ {{ tier.benefits.npcs }} )
-					</div>
-
-					<b-list-group>
-						<b-list-group-item v-for="(npc, key) in npcs" :key="key" class="d-flex justify-content-between">
-							{{ npc.name }}
-							<span @click="confirmDelete(key, 'NPC', npc.name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-						</b-list-group-item>
-					</b-list-group>
+				<div class="p-2">
+					( <span :class="{ 'green': true, 'red': Object.keys(npcs).length > tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					/ {{ tier.benefits.npcs }} )
 				</div>
-				<router-link class="btn" to="/npcs">Show all</router-link>
-			</div>
-		</b-card-group>
 
+				<b-list-group>
+					<b-list-group-item v-for="(npc, key) in npcs" :key="key" class="d-flex justify-content-between">
+						{{ npc.name }}
+						<span @click="confirmDelete(key, 'NPC', npc.name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
+					</b-list-group-item>
+				</b-list-group>
+				<div slot="footer">
+					<router-link class="btn" to="/npcs">Show all</router-link>
+				</div>
+			</hk-card>
+		</hk-card-deck>
 	</div>
 </template>
 

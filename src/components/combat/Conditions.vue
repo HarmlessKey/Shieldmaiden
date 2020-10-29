@@ -13,11 +13,11 @@
 					<span class="n" v-if="key == 'exhaustion'">
 						{{ entity.conditions[key] }}
 					</span>
-					<svg v-b-popover.hover="conditions[key].condition" 
-						:title="key" 
-						class="icon text" 
-						viewBox="0 0 512 512">
+					<svg class="icon text" viewBox="0 0 512 512">
 						<path :d="conditions[key].icon" fill-opacity="1"></path>
+						<q-tooltip anchor="top middle" self="center middle">
+							{{ key.capitalize() }}
+						</q-tooltip>
 					</svg>
 			</div>
 		</template>

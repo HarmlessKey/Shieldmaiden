@@ -26,34 +26,48 @@
 			<div class="actions">
 				<template v-if="viewerIsUser">
 					<a 
-						v-b-tooltip.hover title="Edit Group Health"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/health'
-						})"><i class="fas fa-heart"></i></a>
+						})">
+						<i class="fas fa-heart"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit Group Health
+						</q-tooltip>
+					</a>
 					<a 
 						v-if="isXpAdvancement()"
-						v-b-tooltip.hover title="Award Experience Points"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/xp'
-						})">XP</a>
+						})">
+							XP
+							<q-tooltip anchor="top middle" self="center middle">
+								Award Experience Points
+							</q-tooltip>
+						</a>
 					<a 
-						v-b-tooltip.hover title="Party Inventory"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/Inventory'
-						})"><i class="fas fa-treasure-chest"></i></a>
+						})">
+						<i class="fas fa-treasure-chest"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Party Inventory
+						</q-tooltip>
+					</a>
 				</template>
 				<a 
 					v-else-if="campaign.inventory && campaign.inventory.items"
-					v-b-tooltip.hover title="Party Inventory"
 					@click="setSlide({
 						show: true,
 						type: 'slides/party/ViewInventory'
 					})">
 						<i class="fas fa-treasure-chest mr-1"></i>
 						{{ Object.keys(campaign.inventory.items).length }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Party Inventory
+						</q-tooltip>
 				</a>
 			</div>
 		</div>
@@ -64,21 +78,43 @@
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
 			<div class="header"></div>
-			<div class="col header ac"><i class="fas fa-shield" v-b-tooltip.hover title="Armor Class"></i></div>
+			<div class="col header ac">
+				<i class="fas fa-shield"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Armor class
+				</q-tooltip>
+			</div>
 			<div class="col header name"></div>
 			<div class="col header pp" v-if="settings.passive_perception === undefined && !is_small">
-				<i class="fas fa-eye" v-b-tooltip.hover title="Passive Perception"></i>
+				<i class="fas fa-eye"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Passive perception
+				</q-tooltip>
 			</div>
 			<div class="col header pinv" v-if="settings.passive_investigation === undefined && !is_small">
-				<i class="fas fa-search" v-b-tooltip.hover title="Passive Investigation"></i>
+				<i class="fas fa-search"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Passive investigation
+				</q-tooltip>
 			</div>
 			<div class="col header pins" v-if="settings.passive_insight === undefined && !is_medium">
-				<i class="fas fa-lightbulb-on" v-b-tooltip.hover title="Passive Insight"></i>
+				<i class="fas fa-lightbulb-on"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Passive insight
+				</q-tooltip>
 			</div>
 			<div class="col header save" v-if="settings.save_dc === undefined && !is_medium">
-				<i class="fas fa-hand-holding-magic" v-b-tooltip.hover title="Save DC"></i>
+				<i class="fas fa-hand-holding-magic"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Save DC
+				</q-tooltip>
 			</div>
-			<div class="col header health"><i class="fas fa-heart" v-b-tooltip.hover title="Health"></i></div>
+			<div class="col header health">
+				<i class="fas fa-heart"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Health
+				</q-tooltip>
+			</div>
 			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
@@ -91,8 +127,11 @@
 							{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
 						]
 					">
-						<div class="transformed" v-if="player.transformed" v-b-tooltip.hover title="Transformed">
+						<div class="transformed" v-if="player.transformed">
 							<i class="fas fa-paw-claws green"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Transformed
+							</q-tooltip>
 						</div>
 						<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
 						<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
@@ -102,9 +141,11 @@
 								'green': player.ac_bonus > 0, 
 								'red': player.ac_bonus < 0 
 							}" 
-							v-b-tooltip.hover :title="'Armor Class + ' + player.ac_bonus" 
 							v-if="player.ac_bonus">
 							{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
+							<q-tooltip anchor="top middle" self="center middle">
+								Armor Class {{ player.ac_bonus }}
+							</q-tooltip>
 						</span>
 						<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
 					</div>
@@ -177,8 +218,11 @@
 										'green': player.maxHpMod > 0, 
 										'red': player.maxHpMod < 0 
 									}" 
-									v-b-tooltip.hover :title="'Max HP + ' + player.maxHpMod" v-if="player.maxHpMod">
+									v-if="player.maxHpMod">
 									{{ maxHp(player.maxHp, player.maxHpMod) }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Max HP + {{ player.maxHpMod }}
+									</q-tooltip>
 								</span>
 								<span v-else>{{ player.maxHp }}</span>
 							</template>
@@ -188,28 +232,25 @@
 					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
 						<a 	
 							class="gray-hover" 
-							v-b-tooltip.hover title="Edit player" 
 							@click="setSlide({
 								show: true,
 								type: 'slides/EditPlayer',
 								data: { key: player['.key'], location: 'overview',}
 							})">
 							<i class="fas fa-pencil"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Edit player
+							</q-tooltip>
 						</a>
 					</div>
 					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
-						<div class="level" 
-								:class="{red: isXpAdvancement() && player.level}"
-								v-b-tooltip.hover
-								:title="isXpAdvancement() && player.level ? 'Level is overwritten' : ''">
+						<div class="level" :class="{red: isXpAdvancement() && player.level}">
 							{{ player.level ? player.level : calculatedLevel(player.experience) }}
+							<q-tooltip anchor="top middle" self="center middle" v-if="player.level">
+								Level is overwritten
+							</q-tooltip>
 						</div>
-						<div class="progress">
-							<div class="progress-bar bg-blue"
-								role="progressbar" 
-								:style="{ width: levelAdvancement(player.experience) + '%' }" aria-valuemin="0" aria-valuemax="100">
-							</div>
-						</div>
+						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-gray-active" />
 					</div>
 				</template>
 			</template>
@@ -525,11 +566,9 @@
 					line-height: 15px;
 					text-align: center;
 				}
-				.progress {
+				.q-linear-progress {
 					margin-top: 6px;
-					width: 100%;
 					height: 3px;
-					background-color: #232323 !important;
 				}
 			}
 		}

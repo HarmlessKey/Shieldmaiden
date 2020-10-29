@@ -1,10 +1,11 @@
 <template>
 	<div class="content container" v-if="user">
 		<template v-if="!userInfo || !userInfo.username">
-			<b-card header="Username">
+			<hk-card header="Username">
 				<p>To continue, please first enter a username.</p>
-				<b-input-group class="mb-2">
-					<b-form-input type="text" 
+					<q-input 
+						dark filled square dense
+						type="text" 
 						autocomplete="off"
 						placeholder="Username" 
 						max-length="1" 
@@ -12,17 +13,14 @@
 						data-vv-as="Username" 
 						name="username"
 						v-model="username" @keyup.native="checkUsername()" />
-					<b-input-group-append>
-						<button class="btn" :class="{
-							'disabled': check == 'unavailable' || errors.has('username'), 
-							}" @click="setUsername()"><i class="fas fa-check"></i> Save</button>
-					</b-input-group-append>
-				</b-input-group>
+					<button class="btn" :class="{
+						'disabled': check == 'unavailable' || errors.has('username'), 
+						}" @click="setUsername()"><i class="fas fa-check"></i> Save</button>
 				<p class="validate red pl-1" v-if="errors.has('username')">{{ errors.first('username') }}</p>
 				<p v-if="username" class="pl-1">
 					<span :class="{'green': check == 'available', 'red': check == 'unavailable'}">{{ username }}</span> is {{ check }}
 				</p>
-			</b-card>
+			</hk-card>
 		</template>
 	</div>
 </template>

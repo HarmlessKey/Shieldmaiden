@@ -1,30 +1,29 @@
 <template>
 	<div class="pb-5">
 		<h2>Transform</h2>
-		<b-row class="mb-2">
-			<b-col sm="2"><label>AC</label></b-col>
-			<b-col>
-				<b-form-input 
-					type="number" 
-					name="ac" 
-					v-model="transAc"
-					v-validate="'required'"
-					placeholder="Armor Class"></b-form-input>
-					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-			</b-col>
-		</b-row>
-		<b-row class="mb-2">
-			<b-col sm="2"><label>Hit Points</label></b-col>
-			<b-col>
-				<b-form-input 
-					type="number" 
-					name="maxHp" 
-					v-model="transHp"
-					v-validate="'required'"
-					placeholder="maxHp"></b-form-input>
-					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-			</b-col>
-		</b-row>
+
+		<q-input 
+			dark filled square dense
+			label="Armor class"
+			autocomplete="off"
+			type="number" 
+			name="ac" 
+			v-model="transAc"
+			v-validate="'required'"
+		/>
+		<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+
+		<q-input 
+			dark filled square dense
+			label="Hit points"
+			autocomplete="off"
+			type="number" 
+			name="maxHp" 
+			v-model="transHp"
+			v-validate="'required'"
+			class="my-2"
+		/>
+		<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 		<button class="btn btn-block mb-3" @click="edit()">Transform</button>
 		<small>
 			Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 

@@ -2,8 +2,11 @@
 	<div v-if="campPlayers && campPlayers && players && npcs && (health.curHp > 0 || entity.entityType == 'npc')">
 		{{ setNumber(health.curHp) }}
 		<span class="hp">
-			<span v-if="isTransformed(entity, camp_data)" v-b-tooltip.hover title="Transformed" class="mr-1">
+			<span v-if="isTransformed(entity, camp_data)" class="mr-1">
 				<i class="fas fa-paw-claws"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Transformed
+				</q-tooltip>
 			</span>
 			<span class="current" :class="{ 
 				'red': percentage(health.curHp, health.maxHp) <= 33, 
@@ -41,7 +44,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 

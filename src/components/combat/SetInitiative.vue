@@ -17,17 +17,14 @@
 									'background-image': 'url(' + entity.img + ')',
 									'border-color': entity.color_label ? entity.color_label : ``
 								}"/>
-							<div class="d-flex justify-content-between">
-								<!-- <span :class="[entity.initiative > 0 ? 'green' : 'gray-hover' ]"><i class="fas fa-check"></i></span> -->
+							<div class="truncate">
 								{{ entity.name }}
-								<span class="pr-5 hover-hide">
-									{{ entity.curHp}}
-									<span class="gray-hover">/{{entity.maxHp}}
-									<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
-									</span>
-									</span>
 							</div>
 							<div class="actions">
+								<div>
+									{{ entity.curHp}} / {{entity.maxHp}}
+									<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
+								</div>
 								<a @click="setSlide({
 									show: true,
 									type: 'slides/EditPlayer',
@@ -35,9 +32,22 @@
 										key: entity.key,
 										location: 'encounter'
 									}
-								})"><i class="fas fa-pencil"></i></a>
+								})">
+									<i class="fas fa-pencil"></i>
+								</a>
+								<q-input 
+									dark filled square dense
+									type="number" 
+									class="ml-2"
+									v-model="entity.initiative" 
+									min="0" 
+									max="99" 
+									name="playerInit" 
+									placeholder="0"
+									@focus="$event.target.select()"
+									@input="set_initiative({key: entity.key, initiative: entity.initiative})" 
+								/>
 							</div>
-								<input type="number" class="form-control init" v-model="entity.initiative" min="0" max="99" name="playerInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>
@@ -48,16 +58,16 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 				<span><i class="fas fa-dragon"></i> NPC's</span>
 			</h2>
+			<!-- <q-checkbox dark v-model="selected" :true-value="Object.keys(_npcs).map(Number)" :false-value="[]" label="Select all" /> -->
 			<div class="scroll" v-bar>
 				<div v-on:scroll="shadow()" ref="scroll">
 					<ul class="entities hasImg">
-						<li class="d-flex justify-content-between" v-for="(entity, i) in _npcs" :key="entity.key" :class="	{selected:selected.includes(i)}">
+						<li v-for="(entity, i) in _npcs" :key="entity.key">
 							<icon 
 								v-if="['monster', 'player', 'companion'].includes(entity.img)" 
 								class="img pointer" 
 								:icon="entity.img" 
 								:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-								@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
 							/>
 							<span 
 								v-else class="img pointer" 
@@ -65,23 +75,46 @@
 									'background-image': 'url(' + entity.img + ')',
 									'border-color': entity.color_label ? entity.color_label : ``
 								}"
-								@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
 							/>
-							<span class="ml-1 pointer" @click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)">{{ entity.name }}</span>
+							<div class="truncate">
+								<q-checkbox dark v-model="selected" :val="i" :label="entity.name" />
+							</div>
 							
 							<div class="actions">
-								<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })" v-b-tooltip.hover title="Show Info">
+								<a @click="setSlide({show: true, type: 'ViewEntity', data: entity })">
 									<i class="fas fa-info"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										SHow info
+									</q-tooltip>
 								</a>
-								<a @click="rollMonster(entity.key, entity)" v-b-tooltip.hover :title="'1d20 + ' + calcMod(entity.dexterity)"><i class="fas fa-dice-d20"></i></a>
+								<q-input 
+									dark filled square dense
+									type="number" 
+									class="ml-3" 
+									min="0" 
+									max="99" 
+									v-model="entity.initiative" 
+									name="npcInit" 
+									@input="set_initiative({key: entity.key, initiative: entity.initiative})"
+									placeholder="0"
+								>
+									<template v-slot:append>
+										<a @click="rollMonster(entity.key, entity)">
+										<q-icon size="small" name="fas fa-dice-d20"/>
+										<q-tooltip anchor="top middle" self="center middle">
+											1d20 + {{ calcMod(entity.dexterity) }}
+										</q-tooltip>
+									</a>
+									</template>
+								</q-input>
 							</div>
 
-							<input type="number" class="form-control init" min="0" max="99" v-model="entity.initiative" name="npcInit" @input="set_initiative({key: entity.key, initiative: entity.initiative})" />
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
-						<a class="btn btn-block mb-4" :class="{'disabled' : selected.length <= 1 }" @click="rollGroup()"><i class="fas fa-dice-d20"></i> Roll as group</a>
-						<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
+						<a class="btn btn-block" @click="(selected.length === 0) ? rollAll() : rollGroup()">
+							<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+						</a>
 					</div>
 				</div>
 			</div>
@@ -102,7 +135,6 @@
 									class="img pointer" 
 									:icon="entity.img" 
 									:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-									@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
 								/>
 								<span 
 									v-else class="img pointer" 
@@ -110,35 +142,65 @@
 										'background-image': 'url(' + entity.img + ')',
 										'border-color': entity.color_label ? entity.color_label : ``
 									}"
-									@click="selected.includes(i) ? selected.splice(selected.indexOf(i), 1) : selected.push(i)"
 								/>
 							</template>
 							<div class="d-flex justify-content-between">
 								{{ entity.name }}
-								<span>{{ entity.initiative }}</span>
+								<b class="blue">{{ entity.initiative }}</b>
 							</div>
 							<div class="actions">
-								<a v-if="!entity.hidden" v-b-tooltip.hover title="Set Hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})"><i class="fas fa-eye-slash"></i></a>
-								<a v-else v-b-tooltip.hover title="Unhide" class="pointer" @click="set_hidden({key: entity.key, hidden: false})"><i class="fas fa-eye"></i></a>
-								<a v-b-tooltip.hover title="Set Inactive" class="pointer" @click="set_active({key: entity.key, active: false})"><i class="fas fa-minus"></i></a>
+								<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
+									<i class="fas fa-eye-slash"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set hidden
+									</q-tooltip>
+								</a>
+								<a v-else class="pointer mr-1" @click="set_hidden({key: entity.key, hidden: false})">
+									<i class="fas fa-eye"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Unhide
+									</q-tooltip>
+								</a>
+								<a class="pointer mr-2" @click="set_active({key: entity.key, active: false})">
+									<i class="fas fa-minus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set inactive
+									</q-tooltip>
+								</a>
 							</div>
 						</li>
 					</ul>
 				
 					<span class="d-flex justify-content-between pr-3">
 						<h2>Inactive</h2>
-						<a v-b-popover.hover="'These can have their initiative allready set, but will not join combat until you set them active.'" title="Inactive entities"><i class="fas fa-info-circle"></i></a>
 					</span>
 
 					<ul class="entities hasImg">
 						<li v-for="(entity) in _idle" v-bind:key="entity.key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + entity.img + '\')' }"></span>
+							<icon 
+									v-if="['monster', 'player', 'companion'].includes(entity.img)" 
+									class="img pointer" 
+									:icon="entity.img" 
+									:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+								/>
+								<span 
+									v-else class="img pointer" 
+									:style="{
+										'background-image': 'url(' + entity.img + ')',
+										'border-color': entity.color_label ? entity.color_label : ``
+									}"
+								/>
 							<span class="d-flex justify-content-between">
 								{{ entity.name }}
 								<span>{{ entity.initiative }}</span>
 							</span>
 							<div class="actions">
-								<a v-b-tooltip.hover title="Set Active" @click="set_active({key: entity.key, active: true})"><i class="fas fa-plus"></i></a>
+								<a @click="set_active({key: entity.key, active: true})">
+									<i class="fas fa-plus"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set active
+									</q-tooltip>
+								</a>
 							</div>
 						</li>
 					</ul>
@@ -167,6 +229,7 @@
 		data () {
 			return {
 				selected: [],
+				selectAll: [],
 				setShadow: 0,
 			}
 		},
@@ -182,21 +245,21 @@
 			}),
 			_players: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.entityType == 'player' || entity.entityType == 'companion';
-								})
-								.sortBy('name' , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.entityType == 'player' || entity.entityType == 'companion';
+					})
+					.sortBy('name' , 'desc')
+					.value()
 			},
 			_npcs: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.entityType == 'npc';
-								})
-								.sortBy('name' , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.entityType == 'npc';
+					})
+					.sortBy('name' , 'desc')
+					.value()
 			},
 		},
 		methods: {
@@ -317,28 +380,6 @@
 				font-size: 20px;
 				line-height: 44px;
 				text-align: center;
-			}
-			.form-control {
-				position: absolute;
-				right: 4px;
-				top: 4px;
-				border: none !important;
-				text-align: center;
-				width: 50px;
-				padding: 0;
-				margin: 0;
-				
-				&.init {
-					width: 40px;
-				}
-			}
-			.actions {
-				background: #141414 !important;
-				right: 50px;
-			}
-			.roll {
-				font-size: 17px;
-				margin-left: 10px;
 			}
 		}
 	}

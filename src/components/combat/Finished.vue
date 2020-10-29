@@ -6,22 +6,46 @@
 				<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Leave</router-link>
 
 				<span class="right">
-					<a v-b-tooltip.hover title="Unfinish" @click="reset(hard=false)"><i class="fas fa-trash-restore-alt"></i></a>
-					<a v-b-tooltip.hover title="Reset" @click="reset()"><i class="fas fa-undo"></i></a>
+					<a @click="reset(hard=false)">
+						<i class="fas fa-trash-restore-alt"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Unfinish
+						</q-tooltip>
+					</a>
+					<a @click="reset()">
+						<i class="fas fa-undo"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Reset
+						</q-tooltip>
+					</a>
 				</span>
 			</div>
-			<b-row>
-				<b-col md="7" class="mb-4">
-					<ul class="nav nav-tabs" id="myTab" role="tablist">
-						<li class="nav-item" v-for="(tab, key) in tabs" :key="key">
-							<a class="nav-link" :class="{ active: tab.selected }" id="entities-tab" data-toggle="tab" :href="`#${key}`" role="tab" :aria-controls="key" :aria-selected="tab.selected">
-								<i v-if="tab.icon" :class="tab.icon"></i> {{ tab.name }}
-							</a>
-						</li>
-					</ul>
 
-					<div class="tab-content bg-gray-active px-3 py-4">
-						<div class="tab-pane fade show active" id="loot" role="tabpanel" aria-labelledby="loot-tab">
+			<q-slide-transition v-if="!tier || tier.name === 'Free'">
+				<a href="https://www.patreon.com/join/harmlesskey" target="_blank"  class="patreon bg-patreon-red" v-show="patreon">
+					Enjoying Harmless Key? <b>Please support us on <q-icon name="fab fa-patreon black" /> Patreon.</b>
+					<a class="close red" @click.prevent="patreon = false">
+						<q-icon name="fas fa-times" size="small" />
+					</a>
+				</a>
+			</q-slide-transition>
+			
+			<div class="row q-col-gutter-md">
+				<div class="col-12 col-md-7 mb-4">
+					 <q-tabs
+							v-model="tab"
+							dark
+							indicator-color="transparent"
+							no-caps
+							dense
+							align="left"
+							inline-label
+						>
+							<q-tab :name="key" :icon="tab.icon" :label="tab.name" v-for="(tab, key) in tabs" :key="key" />
+					</q-tabs>
+
+					<q-tab-panels v-model="tab" class="bg-gray-active">
+						<q-tab-panel name="loot">
 							<h3>Encounter rewards</h3>
 							<!-- XP -->
 							<div class="xp bg-gray" v-if="campaign.advancement === 'experience' && encounter.xp">
@@ -52,11 +76,12 @@
 								<div class="currency-form">
 									<div v-for="(coin, key) in currencies" :key="key">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-										<b-form-input
+										<q-input
+											dark filled square dense
 											class="text-center"
-											:disabled="encounter.currency_awarded"
+											:disable="encounter.currency_awarded"
 											autocomplete="off" 
-											type="text" 
+											type="number" 
 											size="sm"
 											min="0" 
 											name="currency" 
@@ -105,24 +130,25 @@
 								>
 								</hk-table>
 							</template>
-						</div>
-						<div class="tab-pane fade" id="dmg" role="tabpanel" aria-labelledby="dmg-tab">
-							<b-row>
-								<b-col sm="6">
+						</q-tab-panel>
+
+						<q-tab-panel name="dmg">
+							<div class="row q-col-gutter-md">
+								<div class="col-12 col-md-6">
 									<Dmg />
-								</b-col>
-								<b-col sm="6">
+								</div>
+								<div class="col-12 col-md-6">
 									<h2>Log</h2>
 									<Log />
-								</b-col>
-							</b-row>
-						</div>
-					</div>
-				</b-col>
-				<b-col md="5">
+								</div>
+							</div>
+						</q-tab-panel>
+					</q-tab-panels>
+				</div>
+				<div class="col-12 col-md-5">
 					<Players :userId="userId" :campaignId="campaignId" />
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -134,6 +160,7 @@
 	import Log from '@/components/combat/side/Log.vue';
 	import Players from '@/components/campaign/Players.vue';
 	import { currencyMixin } from '@/mixins/currency.js';
+	import { mapGetters } from 'vuex';
 
 	export default {
 		name: 'app',
@@ -151,6 +178,8 @@
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				patreon: true,
+				tab: "loot",
 				itemColumns: {
 					public_name: {
 						label: 'Name',
@@ -174,6 +203,9 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+				'tier'
+			]),
 			tabs() {
 				let tabs = {};
 				tabs.loot = { name: 'Loot', icon: 'fas fa-treasure-chest', selected: true };
@@ -291,17 +323,46 @@
 			font-size: 25px !important;
 			text-align: center;
 		}
+		.patreon {
+			display: block;
+			padding: 10px;
+			text-align: center;
+			font-size: 30px;
+			margin-bottom: 25px;
+			position: relative;
+			color: #fff;
+
+			.close {
+				background: #000;
+				position: absolute;
+				top: 0;
+				right: 0;
+				padding: 5px;
+				height: 25px;
+				line-height: 10px;
+			}
+		}
 		.actions {
 			display: flex;
 			justify-content: space-between;
-			border-bottom: solid 1px #b2b2b2;
+			border-bottom: solid 1px #fff;
 			margin-bottom: 20px;
-			padding-bottom: 10px;
+			padding-bottom: 5px;
+			color: #fff;
 
 			.right {
 				a {
-					color: #b2b2b2 !important;
+					color: #fff !important;
 					margin-left: 10px;
+				}
+			}
+		}
+
+		.q-tabs {
+			.q-tab {
+				&.q-tab--active {
+					background: #302f2f !important;
+					color: #2c97de;
 				}
 			}
 		}

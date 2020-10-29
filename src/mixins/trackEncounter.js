@@ -1,5 +1,3 @@
-import { db } from '@/firebase';
-
 export const trackEncounter = {
 	data() {
 		return {
@@ -11,8 +9,7 @@ export const trackEncounter = {
 			return (entity.entityType === 'player' || entity.entityType === 'companion') ? campData.transformed : entity.transformed;
 		},
 		displayAc(entity, player, npc, camp_data) {
-			var stats = {}
-			var key = entity.key
+			let stats = {}
 
 			if(this.isTransformed(entity, camp_data)) {
 				stats.ac = (camp_data) ? parseInt(camp_data.transformed.ac) : parseInt(entity.transformed.ac);

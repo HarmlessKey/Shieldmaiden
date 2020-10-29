@@ -1,6 +1,11 @@
 <template>
 	<div>
-		<h2 v-b-tooltip.hover title="press [r] to show/hide">Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span></h2>
+		<h2>
+			Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span>
+			<q-tooltip anchor="bottom middle" self="center middle">
+				Press [r] to show/hide
+			</q-tooltip>
+		</h2>
 		<div class="roller">
 			<span>Die</span>
 			<span>#</span>
@@ -9,13 +14,13 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<input v-if="die == 'X'" class="form-control" min="0" max="999" type="number" v-model="item.x" name="x" />
+			<q-input dark filled square dense v-if="die == 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
 				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
-			<input class="form-control" min="0" max="999" type="number" v-model="item.n" name="N" />
-			<input class="form-control" type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
+			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
+			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
 			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
@@ -111,12 +116,7 @@
 		text-align:center;
 
 		.btn {
-			height: 36px;
-		}
-		input {
-			width: 50px;
-			text-align: center;
-			padding: 0 0 0 5px;
+			height: 40px;
 		}
 		.icon {
 			height: 100%;

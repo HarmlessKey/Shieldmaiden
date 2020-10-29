@@ -1,30 +1,37 @@
 <template>
 	<div>
-		<div class="target">
+		<div class="target bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
-			<span class="initiative" v-b-tooltip.hover title="Initiative">
+			<span class="initiative" v-if="initiative">
 				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
 				<template v-else>{{ entity.initiative }}</template>
+				<q-tooltip anchor="top middle" self="center middle">
+					Initiative
+				</q-tooltip>
 			</span>
 
 			<!-- HIDDEN -->
 			<span 
 				v-if="entity.hidden" 
 				class="img" 
-				v-b-tooltip.hover title="Hidden"
 				:style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 			>
 				<i class="fas fa-eye-slash red" />
+				<q-tooltip anchor="top middle" self="center middle">
+					Hidden
+				</q-tooltip>
 			</span>
 
 			<!-- TRANSFORMED -->
 			<span 
 				v-else-if="entity.transformed == true" 
 				class="img" 
-				v-b-tooltip.hover title="Transformed"
 				:style="entity.color_label ? `border-color: ${entity.color_label}; color: ${entity.color_label}` : ``"
 			>
 				<i class="fas fa-paw-claws" />
+				<q-tooltip anchor="top middle" self="center middle">
+					Transformed
+				</q-tooltip>
 			</span>
 
 			<!-- AVATAR -->
@@ -46,104 +53,117 @@
 						'green': entity.ac_bonus > 0,
 						'red': entity.ac_bonus < 0 
 					}" 
-					v-b-tooltip.hover :title="'Armor Class + ' + entity.ac_bonus" 
 					v-if="entity.ac_bonus">
 					{{ displayStats().ac + entity.ac_bonus}}
+					<q-tooltip anchor="top middle" self="center middle">
+						Armor class + {{ entity.ac_bonus }}
+					</q-tooltip>
 				</span>
-				<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats().ac }}</span>
+				<span class="ac" v-else>
+					{{ displayStats().ac }}
+					<q-tooltip anchor="top middle" self="center middle">
+						Armor class
+					</q-tooltip>
+				</span>
 			</div>
 
 			<!-- HEALT BAR -->
-			<template>
-				<div class="progress health-bar">
-					<span>
-						<template v-if="entity.active && showKeybinds.keyBinds === undefined">[{{ i }}]</template>
+			<q-linear-progress 
+				size="35px" 
+				:value="displayStats().curHp/displayStats().maxHp"
+				:color="hpBarColor(percentage(displayStats().curHp, displayStats().maxHp))" 
+			>
+				<div class="absolute-full health-bar">
+					<div class="truncate">
 						{{ entity.name }}
-					</span>
+					</div>
+
+					<!-- HEALTH -->
+					<template v-if="entity.active">
+						<template v-if="(entity.curHp > 0 && (entity.entityType == 'player'  || entity.entityType === 'companion')) || entity.entityType == 'npc'">
+							<span class="hp">
+								<span class="current">{{ animatedNumber }}</span>
+									<span class="max">
+										{{ displayStats().maxHp }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Max HP {{ entity.maxHpMod > 0 ? `+ ${entity.maxHpMod}` : `` }}
+										</q-tooltip>
+									</span>
+									<span v-if="entity.tempHp" class="temp">
+										+{{ entity.tempHp }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Temp HP
+										</q-tooltip>
+									</span>
+							</span>
+						</template>
+						<template v-else>
+							<div class="hp">
+								<div v-if="entity.stable">
+									<i class="fas fa-fist-raised green"></i> Stable
+								</div>
+								<div v-if="entity.dead && !entity.stable">
+									<i class="fas fa-skull-crossbones red"></i> Dead
+								</div>
+								<div v-else class="hp d-flex justify-content-end">
+									<div v-for="(check, index) in entity.saves" :key="index">
+										<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
+										<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+									</div>
+								</div>
+							</div>
+						</template>
+					</template>
+
+					<!-- IDLE ACTIONS -->
+					<div v-else class="text-right">
+						<span class="green" 
+							v-if="entity.addNextRound == true"
+							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
+							<i class="fas fa-check"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Will be added next round
+							</q-tooltip>
+						</span>
+						<span class="gray-hover" 
+							v-if="entity.addNextRound == false"
+							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
+							<i class="fas fa-check"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Click to add next round
+							</q-tooltip>
+						</span>
+						<span class="ml-2 gray-hover" 
+							@click="add_next_round({key: entity.key, action: 'set'})">
+							<i class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Add now
+							</q-tooltip>
+						</span>
+					</div>
+
+					<!-- CONDITIONS -->
 					<div class="conditions d-flex justify-content-right" v-if="entity.conditions">
 						<div class="condition bg-red" 
 							v-for="(condition, key) in entity.conditions" 
 							:key="key" 
-							v-b-tooltip.hover :title="key"
-							@click="showCondition(key)"></div>
-					</div>
-					<div class="progress-bar" :class="{ 
-						'bg-red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
-						'bg-orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) <= 76, 
-						'bg-green': true
-						}" 
-						role="progressbar" 
-						:style="{ width: percentage(displayStats().curHp, displayStats().maxHp) + '%' }" aria-valuemin="0" aria-valuemax="100">
-					</div>
-				</div>
-
-				<!-- HEALTH -->
-				<template v-if="entity.active == true">
-					<template v-if="(entity.curHp > 0 && (entity.entityType == 'player'  || entity.entityType === 'companion')) || entity.entityType == 'npc'">
-						{{ setNumber(displayStats().curHp) }} 
-						<span class="hp">
-							<span class="current" :class="{ 
-								'red': percentage(displayStats().curHp, displayStats().maxHp) <= 33, 
-								'orange': percentage(displayStats().curHp, displayStats().maxHp) > 33 && percentage(displayStats().curHp, displayStats().maxHp) <= 76, 
-								'green': true
-								}">{{ animatedNumber }}</span>
-								<span class="gray-hover" >/</span>
-								<span :class="{ 
-										'green': entity.maxHpMod > 0, 
-										'red': entity.maxHpMod < 0 
-									}" 
-									v-b-tooltip.hover :title="'Max HP + ' + entity.maxHpMod">
-									{{ displayStats().maxHp }}
-								</span>
-							<template v-if="entity.tempHp">
-								<span class="gray-hover" v-b-tooltip.hover title="Temp HP">
-									+{{ entity.tempHp }}
-								</span>
-							</template>
-						</span>
-					</template>
-					<template v-else>
-						<div class="hp">
-							<div v-if="entity.stable" class="green">
-								<span><i class="fas fa-fist-raised"></i> Stable</span>
-							</div>
-							<div v-if="entity.dead && !entity.stable" class="red">
-								<span><i class="fas fa-skull-crossbones"></i> Dead</span>
-							</div>
-							<div v-else class="hp d-flex justify-content-end">
-								<div v-for="(check, index) in entity.saves" :key="index">
-									<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
-									<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
-								</div>
-							</div>
+							@click="showCondition(key)">
+							<q-tooltip anchor="top middle" self="center middle">
+								{{ key }}
+							</q-tooltip>
 						</div>
-					</template>
-				</template>
-				<div v-else class="text-right">
-					<span class="green" 
-						v-if="entity.addNextRound == true"
-						v-b-tooltip.hover title="Will be added next round"
-						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
-						<i class="fas fa-check"></i>
-					</span>
-					<span class="gray-hover" 
-						v-if="entity.addNextRound == false"
-						v-b-tooltip.hover title="Click to add next round"
-						v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
-						<i class="fas fa-check"></i>
-					</span>
-					<span class="ml-2 gray-hover" 
-						v-b-tooltip.hover title="Add now"
-						@click="add_next_round({key: entity.key, action: 'set'})">
-						<i class="fas fa-plus"></i>
-					</span>
+					</div>
 				</div>
-			</template>
+			</q-linear-progress>
+
 		</div>
 
 		<!-- REMINDERS -->
 		<ul v-if="entity.reminders" class="reminders d-flex justify-content-start">
-			<li v-for="(reminder, index) in entity.reminders" :key="index" v-b-tooltip.hover :title="reminder.title" :class="'bg-'+reminder.color">
+			<li v-for="(reminder, index) in entity.reminders" :key="index" :class="'bg-'+reminder.color">
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ reminder.title }}
+				</q-tooltip>
 			</li>
 		</ul>
 	</div>
@@ -155,12 +175,23 @@
 
 	export default {
 		name: 'TargetItem',
-		props: ['item', 'i'],
+		props: {
+			item : {
+				type: String,
+				required: true
+			}, 
+			i: {
+				type: Number
+			},
+			initiative: {
+				type: Boolean,
+				default: false
+			}
+		},
 		data () {
 			return {
 				user: this.$store.getters.getUser,
 				target: '',
-				number: 0,
 				tweenedNumber: 0
 			}
 		},
@@ -177,15 +208,19 @@
 				'entities',
 				'targeted',
 			]),
-			animatedNumber: function() {
+			animatedNumber() {
 				return this.tweenedNumber.toFixed(0);
 			},
-			entity: function() {
+			entity() {
 				return this.entities[this.item]
+			},
+			number() {
+				TweenLite.to(this.$data, 1, { tweenedNumber: this.displayStats().curHp });
+				return this.displayStats().curHp;
 			}
 		},
 		watch: {
-			number: function(newValue) {
+			number(newValue) {
 				// eslint-disable-next-line
 				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			}
@@ -211,8 +246,13 @@
 				var hp_percentage = Math.floor(current / max * 100)
 				return hp_percentage
 			},
-			setNumber(value) {
-				this.number = value
+			hpBarColor(percentage) {
+				if(percentage < 33) {
+					return 'negative';
+				} else if(percentage < 76) {
+					return 'warning';
+				} 
+				return 'positive';
 			},
 			displayStats() {
 				var stats = '';
@@ -240,116 +280,111 @@
 .target {
 	width: 100%;
 	display: grid;
-	grid-template-columns: 30px 30px 30px 2fr 2fr;
-	grid-template-rows: 1fr;
+	grid-template-columns: 35px 35px 1fr;
+	grid-template-rows: auto;
 	grid-gap: 0;
-	grid-template-areas: 
-	"initiative img ac hp-bar hp-bar hp-bar hp hp";
 	
-	line-height: 30px;
+	line-height: 35px;
 	user-select: none;
-}
-.progress { 
-	height: 30px;
-	background-color: #232323;
-	margin-right: 5px;
-	position: relative;
 
-	span { 
-		color:#fff;
-		font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
-		position: absolute;
-		left: 5px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis !important;
-		line-height: 30px;
+	&.hasInitiative {
+		grid-template-columns: 35px 35px 35px 1fr;
 	}
-	.conditions {
-		position: absolute;
-		right: 0;
-		top: 0;
+	.initiative, .ac, .img {
+		text-align: center;
+		height: 35px;
+	}
+	.ac_wrapper {
+		position: relative;
 
-		.condition {
-			display: block;
-			width: 12px;
-			height: 12px;
-			border: solid 1px #fff;
-			margin-left: 1px;
-			cursor: pointer;
+		i, .ac {
+			position: absolute;
+			line-height: 35px;
+			width: 100%;
+			text-align: center;
+		}
+		i {
+			font-size: 25px;
+			color: #5c5757;
+		}
+		.ac {
+			font-weight: bold;
+			color: #fff;
+			margin-top: -1px;
 		}
 	}
-}
-.initiative, .ac, .img {
-	text-align: center;
-	height: 30px;
-}
-.ac_wrapper {
+	.img {
+		display: block;
+		width: 35px;
+		height: 35px;
+		background-color: #191919;
+		background-position: center top;
+		background-repeat: no-repeat;
+		background-size: cover;
+		font-size: 20px;
+		line-height: 35px;
+		overflow: hidden;
+		border: solid 1px transparent;
 
-	grid-area: ac;
-	position: relative;
-	i, .ac {
-		position: absolute;
-		line-height: 30px;
-		width: 100%;
-		text-align: center;
+		span {
+			position: relative;
+		}
 	}
-	i {
-		font-size: 25px;
-		color: #5c5757;
-	}
-	.ac {
-		font-weight: bold;
+
+	.health-bar { 
+		padding-left: 5px;
+		font-size: 13px;
+		display: grid;
+		grid-template-columns: auto max-content;
+		grid-column-gap: 5px;
+		line-height: 35px;
+		margin-right: 5px;
 		color: #fff;
-		margin-top: -1px;
+		// text-shadow:
+		// 	-1px -1px 2px rgba(0, 0, 0, .5),  
+		// 	1px -1px 2px rgba(0, 0, 0, .5),
+		// 	-1px 1px 2px rgba(0, 0, 0, .5),
+		// 	1px 1px 2px rgba(0, 0, 0, .5);
+
+		.conditions {
+			position: absolute;
+			right: 0;
+			top: 0;
+
+			.condition {
+				display: block;
+				width: 12px;
+				height: 12px;
+				border: solid 1px #fff;
+				margin-left: 1px;
+				cursor: pointer;
+			}
+		}
+
+		.hp {
+			text-align: right;
+			
+			.current {
+				font-size: 18px;
+				font-weight: bold;
+			}
+			.max, .temp {
+				opacity: .5;
+			}
+			.save {
+				margin-right: 4px;
+			}
+		}
 	}
-}
+	ul.reminders {
+		padding-left: 30px;
+		list-style: none;
 
-.initiative {
-	grid-area: initiative;
-}
-.img {
-	display: block;
-	width: 30px;
-	height: 30px;
-	background-color: #191919;
-	background-position: center top;
-	background-repeat: no-repeat;
-	background-size: cover;
-	font-size: 20px;
-	line-height: 30px;
-	grid-area: img;
-	overflow: hidden;
-	border: solid 1px transparent;
-
-	span {
-		position: relative;
-	}
-}
-
-.hp {
-	font-size: calc( 8px + (10 - 8) * ( (100vw - 360px) / ( 800 - 360) ));
-	text-align: right;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis !important;
-	
-	.save {
-		margin-right: 4px;
-	}
-}
-.temp {
-	color: #494747;
-}
-ul.reminders {
-	padding-left: 30px;
-	list-style: none;
-
-	li {
-		width: 20px;
-		height: 7px;
-		// border: solid 1px #fff;
-		margin: 1px 1px 1px 0;
+		li {
+			width: 20px;
+			height: 7px;
+			margin: 1px 1px 1px 0;
+		}
 	}
 }
 </style>

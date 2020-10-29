@@ -112,8 +112,9 @@
 						</li>
 					</ul>
 					<div class="pl-2 pr-3">
-						<a class="btn btn-block mb-4" :class="{'disabled' : selected.length <= 1 }" @click="rollGroup()"><i class="fas fa-dice-d20"></i> Roll as group</a>
-						<a class="btn btn-block" @click="rollAll()"><i class="fas fa-dice-d20"></i> Roll all</a>
+						<a class="btn btn-block" @click="(selected.length === 0) ? rollAll() : rollGroup()">
+							<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+						</a>
 					</div>
 				</div>
 			</div>

@@ -43,7 +43,7 @@
 				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
-				<div v-if="toHit" class="advantage d-flex justify-content-between">
+				<!-- <div v-if="toHit" class="advantage d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
 						Advantage
@@ -52,7 +52,10 @@
 						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
 						Disadvantage
 					</button>
-				</div>
+				</div> -->
+				<p class="mt-3">
+					<q-icon name="info" size="sm"/> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+				</p>
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
@@ -94,8 +97,14 @@
 					<div>
 						<button 
 							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
-							@click="groupRoll(custom_roll)" 
+							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
+							:class="{ 
+								'bg-red': actionHover === `custom-disadvantage`,
+								'bg-green': actionHover === `custom-advantage`
+							}"
+							@mousemove="checkAdvantage($event, 'action', 'custom')"
+							@mouseout="clearAdvantage()"
 						>
 							<i class="fas fa-dice-d20"></i>
 							<span class="d-none d-md-inline ml-1">Roll</span>
@@ -116,7 +125,17 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" @click="groupRoll(action)" class="btn btn-sm">
+							<button 
+								v-if="action['damage_dice']" 
+								@click="groupRoll($event, action)" 
+								class="btn btn-sm"
+								:class="{ 
+									'bg-red': actionHover === `${index}-disadvantage`,
+									'bg-green': actionHover === `${index}-advantage`
+								}"
+								@mousemove="checkAdvantage($event, 'action', index)"
+								@mouseout="clearAdvantage()"
+							>
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 								<q-tooltip anchor="center right" self="center left">
@@ -141,7 +160,7 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" @click="groupRoll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
 								<q-tooltip anchor="center right" self="center left">
@@ -188,6 +207,11 @@
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
+				animateTrigger: false,
+				rolledDamage: 0,
+				rolledToHit: 0,
+				actionHover: undefined,
+				legendaryHover: undefined,
 				custom_roll: {
 					name: 'Custom Roll',
 					attack_bonus: undefined,
@@ -233,9 +257,57 @@
 				if(newValue.length > 1) {
 					this.toHit = false;
 				}
+			},
+			animateTrigger() {
+				this.animateValue("toHitRoll", 0, this.rolledToHit, 500);
+				this.animateValue("damageRoll", 0, this.rolledDamage, 500);
+				this.rolledDamage = 0;
+				this.rolledToHit = 0;
 			}
 		},
+		created() {
+			this.$nextTick(function() {
+				window.addEventListener('keyup', this.checkKeyPress);
+				window.addEventListener('keydown', this.checkKeyPress);
+			});
+		},
+		destroyed() {
+			window.removeEventListener('keyup', this.checkKeypress);
+			window.removeEventListener('keydown', this.checkKeypress);
+		},
 		methods: {
+			checkKeyPress(e) {
+				if(e.type === "keydown") {
+					if(this.actionHover) {
+						let hover = this.actionHover.split("-");
+						if(e.key === "Shift") {
+							this.actionHover = `${hover[0]}-advantage`;
+						} else if(e.key === "Control") {
+							this.actionHover = `${hover[0]}-disadvantage`;
+						}
+					} else if(this.legendaryHover) {
+						let hover = this.legendaryHover.split("-");
+						if(e.key === "Shift") {
+							this.legendaryHover = `${hover[0]}-advantage`;
+						} else if(e.key === "Control") {
+							this.legendaryHover = `${hover[0]}-disadvantage`;
+						} 
+					}
+				}
+				if(e.type === "keyup") {
+					if(this.actionHover) {
+						let hover = this.actionHover.split("-");
+						if(e.key === "Shift" || e.key === "Control") {
+							this.actionHover = `${hover[0]}-undefined`;
+						}
+					} else if(this.legendaryHover) {
+						let hover = this.legendaryHover.split("-");
+						if(e.key === "Shift" || e.key === "Control") {
+							this.legendaryHover = `${hover[0]}-undefined`;
+						}
+					}
+				}
+			},
 			displayStats(entity) {
 				var stats;
 				if(entity.transformed == true) {
@@ -268,12 +340,12 @@
 					this.advantage = value;
 				}
 			},
-			groupRoll(action) {
+			groupRoll(e, action) {
 				for(let i in this.targeted) {
 					let key = this.targeted[i];
 					let target = this.entities[key];
 
-					this.roll(action, target, i);
+					this.roll(e, action, target, i);
 				}
 				this.aoeRoll = undefined;
 				this.custom_roll = { 
@@ -282,7 +354,7 @@
 					damamge_bonus: undefined
 				};
 			},
-			roll(action, target, rollCounter) {
+			roll(e, action, target, rollCounter) {
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
@@ -295,6 +367,13 @@
 				var critInfo = '';
 				var highest = 0;
 				var lowest = undefined;
+				let advantage = undefined;
+
+				if(e.shiftKey) {
+					advantage = "advantage";
+				} else if(e.ctrlKey) {
+					advantage = "disadvantage";
+				}
 
 				var ac = parseInt(this.displayStats(target).ac);
 
@@ -306,7 +385,7 @@
 				let toHit = [];
 				let adv = ""
 				//If there is advantage roll twice
-				if(this.advantage) {
+				if(advantage) {
 					for(let i = 0; i <= 1; i++) {
 						let attack_bonus = action.attack_bonus || 0;
 						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
@@ -317,8 +396,8 @@
 					lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 1 : 0;
 
 					//Set advantage message for snotify
-					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color} advantage">${this.advantage}</small>`;	
+					let color = (advantage === 'advantage') ? 'green' : 'red'; 
+					adv = `<small class="${color} advantage">${advantage}</small>`;	
 				} 
 				//Roll once where there is no advantage/disadvantage
 				else {
@@ -327,7 +406,7 @@
 				}
 
 				//Flip the positions of highest and lowest if there was disadvantage
-				if(this.advantage == 'disadvantage') {
+				if(advantage === 'disadvantage') {
 					highest = (highest === 0) ? 1 : 0;
 					lowest = (lowest === 0) ? 1 : 0;
 				}
@@ -397,14 +476,15 @@
 				if(action['damage_bonus']) {
 					var bonus = '+'+action['damage_bonus']; //form HTML for snotify
 					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']); //Add it to the total damage
-					var showTotal = '<span class="red">' + totalDamage + '</span>'; //form HTML for snotify
+					var showTotal = '<span class="red" id="damageRoll">' + totalDamage + '</span>'; //form HTML for snotify
 				}
 				else {
 					//If there was no modifier
 					bonus = '';
 					totalDamage = total;
-					showTotal = '<span class="red">' + total + '</span>';
+					showTotal = '<span class="red" id="damageRoll">' + total + '</span>';
 				}
+				this.rolledDamage = totalDamage; //For animation
 
 				if(this.toHit) {
 					let toHitRoll = toHit[highest].throws[0];
@@ -419,7 +499,9 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (this.advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+
+					this.rolledToHit = toHit[highest].total; //For animation
 
 					//Form HTML for snotify
 					hits = `<div class="roll">
@@ -428,7 +510,7 @@
 							${ignoredRoll}
 							${toHitRoll}${toHit[highest].mod}
 						</div>
-						<h2>${toHit[highest].total}</h2>
+						<h2 id="toHitRoll">${toHit[highest].total}</h2>
 						<div class="bottom">
 							${hitOrMiss}
 						</div>
@@ -502,6 +584,7 @@
 						},
 					]
 				});
+				this.animateTrigger = !this.animateTrigger;
 				this.advantage = false; //turn advantage off
 			},
 			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
@@ -543,6 +626,42 @@
 					}
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
+			},
+			checkAdvantage(e, type, index) {
+				let advantage;
+
+				if(e.shiftKey) {
+					advantage = "advantage"
+				} else if(e.ctrlKey) {
+					advantage = "disadvantage"
+				}
+
+				if(type === 'action') {
+					this.actionHover = `${index}-${advantage}`;
+				} 
+				if(type === 'legendary') {
+					this.legendaryHover = `${index}-${advantage}`;
+				} 
+				
+			},
+			clearAdvantage() {
+				this.actionHover = undefined;
+				this.legendaryHover = undefined;
+			},
+			animateValue(id, start, end, duration) {
+				if (start === end) return;
+				const range = end - start;
+				let current = start;
+				const increment = end > start? 1 : -1;
+				const stepTime = Math.abs(Math.floor(duration / range));
+				const obj = document.getElementById(id);
+				const timer = setInterval(function() {
+						current += increment;
+						obj.innerHTML = current;
+						if (current == end) {
+								clearInterval(timer);
+						}
+				}, stepTime);
 			}
 		},
 	}

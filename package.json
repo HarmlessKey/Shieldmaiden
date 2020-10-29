@@ -14,8 +14,6 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.0",
     "firebase": "^5.8.6",
-    "jqeury": "0.0.1-security",
-    "jquery": "^3.5.1",
     "lodash": "^4.17.11",
     "node": "^11.0.0",
     "quasar": "^1.0.0",
@@ -30,7 +28,6 @@
     "vue-shortkey": "^3.1.6",
     "vue-snotify": "^3.2.1",
     "vuebar": "0.0.20",
-    "vuedraggable": "^2.17.0",
     "vuefire": "^1.4.5",
     "vuex": "^3.0.1"
   },

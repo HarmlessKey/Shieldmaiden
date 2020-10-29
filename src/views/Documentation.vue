@@ -1,24 +1,5 @@
 <template>
 	<div class="content">
-		<!-- <div id="sidebar">
-			<b-navbar v-b-scrollspy>
-				<b-nav>
-					<b-nav-item href="#campaigns">Campaigns</b-nav-item>
-					<b-nav-item href="#players">Players</b-nav-item>
-					<b-nav-item href="#npcs">NPC's</b-nav-item>
-					<b-nav-item href="#encounters">Encounters</b-nav-item>
-					<b-nav-item href="#run-encounter">Run Encounter</b-nav-item>
-					<b-nav>
-						<b-nav-item href="#run-encounter-set-in">Setting Initiative</b-nav-item>
-						<b-nav-item href="#run-encounter-track-in">Track Initiative</b-nav-item>
-						<b-nav-item href="#run-encounter-manual">Manual Damage</b-nav-item>
-						<b-nav-item href="#run-encounter-select">Roll Damage</b-nav-item>
-						<b-nav-item href="#run-encounter-log">Combat Log</b-nav-item>
-						<b-nav-item href="#run-encounter-meters">Damage Meters</b-nav-item>
-					</b-nav>
-				</b-nav>
-			</b-navbar>
-		</div> -->
 		<div>
 			<h1>Documentation</h1>
 			<p>Here we will explain why we made certain choices and how we solved some issues we came across. If you wonder why some actions work a certain way, you will probably find answers here.

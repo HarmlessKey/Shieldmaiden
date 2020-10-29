@@ -4,7 +4,7 @@
 		<div class="filters" v-if="search !== undefined">
 			<q-input 
 				dark filled square dense
-				label="Search"
+				placeholder="Search"
 				type="text" 
 				class="mb-2"
 				autocomplete="off" 

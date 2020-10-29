@@ -2,13 +2,18 @@
 	<div>
 		<h2>{{ data.item.public_name }}</h2>
 		<h3>Link item</h3>
-		<div class="input-group mb-3">
-            <input type="text" autocomplete="off" v-model="searched" @keyup="searchItems()" placeholder="Search" class="form-control"/>
-            <div class="input-group-append">
-                <button class="btn" @click="searchItems()"><i class="fas fa-search"></i></button>
-            </div>
-        </div>
-        <div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
+		<q-input 
+			dark filled square dense
+			placeholder="Search"
+			type="text" 
+			class="mb-2"
+			autocomplete="off" 
+			v-model="searched"
+			@keyup="searchItems()"
+		>
+			<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchItems()" />
+		</q-input>
+		<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
 
 		<div v-if="foundItems" class="items">
 			<template v-for="item in foundItems">

@@ -17,20 +17,26 @@
 		</div>
 
 		<template v-if="current">
-			<b-input-group class="mb-3">
-				<input class="form-control" type="text" v-model="search" @keyup="searchType()" :placeholder="'Search ' + current" />
-				<b-input-group-append>
-					<button class="btn" @click="searchType()"><i class="fas fa-search"></i></button>
-				</b-input-group-append>
-			</b-input-group>
+			<q-input 
+				dark filled square dense
+				placeholder="Search"
+				type="text" 
+				class="mb-2"
+				autocomplete="off" 
+				v-model="search"
+				@keyup="searchType()"
+			>
+				<q-icon slot="append" name="fas fa-search" size="xs" class="pointer" @click="searchType()" />
+			</q-input>
+
 
 			<p v-if="noResult" class="red">{{ noResult }}</p>
 			<p v-if="searching && !noResult" class="green">{{ Object.keys(searchResults).length }} {{ current }} found</p>
 
 			<!-- SHOW SEARCH RESULTS -->
-			<ul class="entities">
+			<ul class="results">
 				<li v-for="(result, index) in searchResults" :key="index">
-						<span class="gray-hover">{{ index + 1 }}. </span>
+						<div class="index">{{ index + 1 }}. </div>
 						<a @click="showInfo(result['.key'])">
 							{{ result.name }}
 							<q-tooltip anchor="top middle" self="center middle">
@@ -160,6 +166,24 @@
 			}
 			&.active {
 				color: #2c97de !important;
+			}
+		}
+	}
+	ul.results {
+		list-style: none;
+		padding: 0;
+		
+		li {
+			display: grid;
+			background-color: #191919;
+			grid-template-columns: max-content auto;
+			margin-bottom: 1px;
+			vertical-align: center;
+			line-height: 46px;
+			padding: 0 5px;
+
+			.index {
+				padding-right: 10px;
 			}
 		}
 	}

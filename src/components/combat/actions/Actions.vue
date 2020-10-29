@@ -68,7 +68,7 @@
 				set(newValue) {
 					this.tabSetter = newValue;
 				}
- 			}
+			}
 		}
 	}
 </script>

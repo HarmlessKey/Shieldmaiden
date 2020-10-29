@@ -222,6 +222,7 @@
 						columnCount++;
 					}
 				}
+				// eslint-disable-next-line
 				this.columnCount = columnCount;
 				return templateColumns;
 			},

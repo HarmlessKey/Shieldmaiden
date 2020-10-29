@@ -215,6 +215,7 @@
 				return this.entities[this.item]
 			},
 			number() {
+				// eslint-disable-next-line
 				TweenLite.to(this.$data, 1, { tweenedNumber: this.displayStats().curHp });
 				return this.displayStats().curHp;
 			}

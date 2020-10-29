@@ -60,7 +60,7 @@
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
 					<q-menu square :offset="[9, 0]">
-          	<q-list>
+						<q-list>
 							<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
 								<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
 								<q-item-section>Admin</q-item-section>
@@ -86,7 +86,7 @@
 								<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
 								<q-item-section>Sign out</q-item-section>
 							</q-item>
-          	</q-list>
+						</q-list>
 					</q-menu>
 				</div>
 				<router-link v-else to="/sign-in" class="ml-2">Sign in</router-link>

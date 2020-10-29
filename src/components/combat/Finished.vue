@@ -32,7 +32,7 @@
 			
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-7 mb-4">
-					 <q-tabs
+						<q-tabs
 							v-model="tab"
 							dark
 							indicator-color="transparent"

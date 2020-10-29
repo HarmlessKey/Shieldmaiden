@@ -1,6 +1,6 @@
 <template>
 	<div id="side_container">
-		 <q-tabs
+			<q-tabs
         v-model="tab"
 				dark
 				indicator-color="transparent"

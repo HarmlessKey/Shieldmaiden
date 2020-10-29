@@ -28,7 +28,7 @@
 				}" 
 				@shortkey="cycle_target"
 			>
-					<template v-for="({group, targets}, index) in groups">
+					<template v-for="{group, targets} in groups">
 						<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
 							<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
 						</h2>
@@ -136,7 +136,7 @@
 											</q-item>
 											<q-item 
 												clickable v-close-popup 
-											 @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
+												@click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
 											>
 												<q-item-section avatar><i class="fas fa-swords"></i></q-item-section>
 												<q-item-section>Do damage/healing</q-item-section>

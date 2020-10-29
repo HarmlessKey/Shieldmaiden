@@ -52,7 +52,7 @@
 					dark filled square dense
 					emit-value map-options
 					label="School"
-				 	v-model="spell.school"
+					v-model="spell.school"
 					id="spell_school"
 					name="spell_school"
 					title="Spell School"

@@ -35,7 +35,7 @@
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<div class="scroll" v-bar>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<div>
 				<table class="initiative-list targets">
 					<thead>
@@ -190,7 +190,7 @@
 					</tbody>
 				</table>
 			</div>
-		</div>
+		</q-scroll-area>
 	</div>
 </template>
 
@@ -447,7 +447,7 @@
 			}
 		}
 	}
-	.scroll {
+	.q-scrollarea {
 		height: calc(100% - 49px);
 
 		> div {

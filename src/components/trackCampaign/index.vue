@@ -16,19 +16,19 @@
 			<div class="track">
 				<div class="initiative">
 					<h3>Campaign Players</h3>
-					<div class="scroll" v-bar>
+					<q-scroll-area dark :thumb-style="{ width: '5px'}">
 						<div>
 							<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
 						</div>
-					</div>
+					</q-scroll-area>
 				</div>
 				<div class="side">
 					<h3>Campaign wide meters</h3>
-					<div class="scroll" v-bar>
+					<q-scroll-area dark :thumb-style="{ width: '5px'}">
 						<div>
 							<Meters :entities="campaign.players" :players="players" :campaign="true" :npcs="{}" />
 						</div>
-					</div>
+					</q-scroll-area>
 				</div>
 			</div>
 		</div>
@@ -102,7 +102,7 @@
 								<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
 							</ul>
 						</div>
-						<div class="scroll during-encounter" v-bar>
+						<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
 							<div>
 								<Meters 
 									v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
@@ -118,7 +118,7 @@
 									:rolls="rolls"
 								/>
 							</div>
-						</div>
+						</q-scroll-area>
 					</div>
 				</div>
 			</template>
@@ -390,8 +390,8 @@
 				padding-left: 15px;
 				overflow: hidden;
 
-				.scroll {
-					height: calc(100% - 56px);
+				.q-scrollarea {
+					height: calc(100% - 86px);
 
 					> div {
 						padding-right: 6px;
@@ -435,7 +435,7 @@
 						}
 					}
 				}
-				.scroll {
+				.q-scrollarea {
 					height: calc(100% - 56px);
 
 					> div {
@@ -560,7 +560,7 @@
 					padding: 0 15px;
 					overflow: visible !important;
 
-					.scroll {
+					.q-scrollarea {
 						overflow: visible !important;
 					}
 				}
@@ -568,7 +568,7 @@
 					padding: 0 15px;
 					overflow: visible !important;
 
-					.scroll {
+					.q-scrollarea {
 						overflow: visible !important;
 					}
 				}

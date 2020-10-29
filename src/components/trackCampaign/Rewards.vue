@@ -1,6 +1,6 @@
 <template>
 	<div class="rewards">
-		<div class="scroll" v-bar>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<div>
 				<h2>Rewards</h2>
 				<template v-if="encounter.xp_awarded">
@@ -44,7 +44,7 @@
 					</div>
 				</hk-table>
 			</div>
-		</div>
+		</q-scroll-area>
 	</div>
 </template>
 
@@ -96,7 +96,7 @@
 	height: 100%;
 	overflow: hidden;
 	
-	.scroll{ 
+	.q-scrollarea { 
 		height: calc(100% - 30px);
 
 		> div {
@@ -158,7 +158,7 @@
 		.rewards {
 			overflow: visible !important;
 
-			.scroll {
+			.q-scrollarea {
 				overflow: visible !important;
 			}
 		}

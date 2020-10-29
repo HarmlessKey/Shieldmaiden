@@ -1,13 +1,13 @@
 <template>
 	<div class="container">
 		<h1><i class="fas fa-cogs"></i> Settings</h1>
-		<b-card header="General Settings" id="general">
+		<hk-card header="General Settings" id="general">
 			<General />
-		</b-card>
-		<b-card header="Run Encounter Settings" id="run">
+		</hk-card>
+		<hk-card header="Run Encounter Settings" id="run">
 			<Encounter />
-		</b-card>
-		<b-card header="Track Encounter Settings" id="track">
+		</hk-card>
+		<hk-card header="Track Encounter Settings" id="track">
 			<p class="mb-5">Track encounter is what we call the link you can share with your party, 
 				or put up on a second screen for your party to see. 
 				In here players can follow the encounter, 
@@ -15,7 +15,7 @@
 				Below you can determine what should be visible on the track encounter screen.
 			</p>
 			<Track />
-		</b-card>
+		</hk-card>
 	</div>
 </template>
 

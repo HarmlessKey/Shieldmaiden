@@ -14,7 +14,6 @@
 </template>
 
 <script>
-    import { db } from '@/firebase';
     import { mapGetters } from 'vuex';
     import { general } from '@/mixins/general.js';
 

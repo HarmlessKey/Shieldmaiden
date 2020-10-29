@@ -8,8 +8,11 @@
 				@click="setType(name)"
 				class="mr-2"
 				:class="{ 'active': current == name}"
-				v-b-tooltip.hover :title="name">
+			>
 				<span class="icon"><i :class="type.icon"></i></span>
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ name }}
+				</q-tooltip>
 			</a>
 		</div>
 
@@ -28,7 +31,12 @@
 			<ul class="entities">
 				<li v-for="(result, index) in searchResults" :key="index">
 						<span class="gray-hover">{{ index + 1 }}. </span>
-						<a v-b-tooltip.hover title="Show Info" @click="showInfo(result['.key'])">{{ result.name }}</a>
+						<a @click="showInfo(result['.key'])">
+							{{ result.name }}
+							<q-tooltip anchor="top middle" self="center middle">
+								Show info
+							</q-tooltip>
+						</a>
 				</li>
 			</ul>
 

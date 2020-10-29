@@ -16,7 +16,9 @@
 				<a @click="addInput()" class="handle"><i class="fas fa-plus green"></i></a>
 
 				<template v-for="(input, i) in damage">
-					<b-form-input
+					<q-input
+						dark filled square dense
+						label="Amount"
 						:key="`damage-${i}`"
 						class="amount"
 						autocomplete="off"
@@ -27,11 +29,17 @@
 						data-vv-as="amount"
 						min="0"
 					/>
-					<select class="form-control" :class="{'no-delete': i === 0}" v-model="damage[i].damage_type" name="damage_type" :key="`type-${i}`">
-						<option v-for="damage_type in damage_types" :key="`${damage_type}-${i}`" :value="damage_type">
-							{{ damage_type }}
-						</option>
-					</select>
+					<q-select
+						:key="`type-${i}`"
+						dark filled square dense
+						emit-value
+						map-options
+						label="Damage type"
+						v-model="damage[i].damage_type"
+						:options="damage_types"
+						@change="$forceUpdate()"
+						:class="{'no-delete': i === 0}"
+					/>
 					<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i class="fas fa-trash-alt red"></i></a>
 
 					<p class="validate red" v-if="errors.has(`amount-${i}`)" :key="`validate-${i}`">{{ errors.first(`amount-${i}`) }}</p>
@@ -48,7 +56,8 @@
 		</template>
 
 		<template v-if="type === 'healing'">
-			<b-form-input 
+			<q-input 
+				dark filled square
 				autocomplete="off"
 				type="text" 
 				v-model="healingAmount" 
@@ -225,8 +234,7 @@
 	.healing-input {
 		height: 90px;
 		margin-bottom: 15px;
-		font-size:50px;
-		text-align: center;
+		font-size:25px;
 	}
 	
 </style>

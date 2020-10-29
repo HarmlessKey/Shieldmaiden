@@ -9,39 +9,41 @@
 					<span :class="{ 
 							'green': entities[targeted[0]].ac_bonus > 0, 
 							'red': entities[targeted[0]].ac_bonus < 0 
-						}" v-b-tooltip.hover :title="'Armor Class + ' + entities[targeted[0]].ac_bonus" v-if="entities[targeted[0]].ac_bonus">
+						}" v-if="entities[targeted[0]].ac_bonus">
 						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
+						<q-tooltip anchor="center right" self="center left">
+							Armor class + {{ entities[targeted[0]].ac_bonus }}
+						</q-tooltip>
 					</span>
 					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
 			
 			<template v-if="current.actions">
-				<h2>Actions</h2>
-
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
 					<div class="d-flex justify-content-between">
-						<b-form-checkbox class="mb-2" name="openRoll" v-model="openRoll">Roll openly</b-form-checkbox>
-						<a data-toggle="collapse" class="ml-1" href="#rollOptions" role="button" aria-expanded="false"><i class="fas fa-cog"></i></a>
+						<q-checkbox dark v-model="openRoll" label="Roll openly" indeterminate-value="something-else" />
+						<a class="ml-1" @click="rollInfo = !rollInfo"><i class="fas fa-cog"></i></a>
 					</div>
-					<div class="collapse bg-gray-hover p-2 mb-2" id="rollOptions">
-						<b-form-group label="Display options open roll">
-							<b-form-checkbox-group
-								v-model="rollOptions"
+					<q-slide-transition>
+						<div v-show="rollInfo" class="bg-gray-hover p-2 mb-2" id="rollOptions">
+							<q-option-group
+								dark
 								:options="options"
-								name="flavour-2a"
-								stacked
-							></b-form-checkbox-group>
-						</b-form-group>
-						<small>Open rolls are shown on the player screen.</small>
-					</div>
+								label="Display options open roll"
+								type="checkbox"
+								v-model="rollOptions"
+							/>
+							<small>Open rolls are shown on the player screen.</small>
+						</div>
+					</q-slide-transition>
 				</template>
-				<b-form-checkbox class="mb-2" name="toHit" v-model="toHit">Roll to hit</b-form-checkbox>
-				<b-form-checkbox v-if="targeted.length > 1" class="mb-2" name="rollOnce" v-model="rollOnce">Roll damage once</b-form-checkbox>
+				<div><q-checkbox dark v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
+				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
-				<div v-if="toHit" class="advantage d-flex justify-content-between">
+				<!-- <div v-if="toHit" class="advantage d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
 						Advantage
@@ -50,53 +52,59 @@
 						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
 						Disadvantage
 					</button>
-				</div>
+				</div> -->
+				<p class="mt-3">
+					<q-icon name="info" size="sm"/> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+				</p>
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
 				<div class="custom-roll">
 					<div v-if="toHit">
-						<label><small>Hit mod</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Hit mod"
 							autocomplete="off" 
-							size="sm"
 							type="number" 
 							v-model="custom_roll.attack_bonus" 
 							name="custom_hit"
 							data-vv-as="To Hit Modifier"
-							placeholder="Hit"
 						/>
 					</div>
 					<div :class="{ span: !toHit }">
-						<label><small>Damage Dice</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Damage dice"
 							autocomplete="off" 
-							size="sm"
 							type="text" 
 							v-model="custom_roll.damage_dice" 
 							name="custom_roll"
 							data-vv-as="Custom Roll"
-							placeholder="Dice"
 							v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
 						/>
 					</div>
 					<div>
-						<label><small>Modifier</small></label>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Modifier"
 							autocomplete="off" 
-							size="sm"
 							type="number" 
 							v-model="custom_roll.damage_bonus" 
 							name="custom_mod"
 							data-vv-as="Custom Modifier"
-							placeholder="Mod"
 						/>
 					</div>
 					<div>
 						<button 
 							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
-							@click="groupRoll(custom_roll)" 
+							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
+							:class="{ 
+								'bg-red': actionHover === `custom-disadvantage`,
+								'bg-green': actionHover === `custom-advantage`
+							}"
+							@mousemove="checkAdvantage($event, 'action', 'custom')"
+							@mouseout="clearAdvantage()"
 						>
 							<i class="fas fa-dice-d20"></i>
 							<span class="d-none d-md-inline ml-1">Roll</span>
@@ -113,19 +121,31 @@
 				<ul class="roll">
 					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light"
-								data-toggle="collapse" :href="'#act-'+index" 
-								role="button" 
-								aria-expanded="false">
+							<a class="d-flex justify-content-between gray-light" @click="setShow('action', index)">
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
+							<button 
+								v-if="action['damage_dice']" 
+								@click="groupRoll($event, action)" 
+								class="btn btn-sm"
+								:class="{ 
+									'bg-red': actionHover === `${index}-disadvantage`,
+									'bg-green': actionHover === `${index}-advantage`
+								}"
+								@mousemove="checkAdvantage($event, 'action', index)"
+								@mouseout="clearAdvantage()"
+							>
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
+								<q-tooltip anchor="center right" self="center left">
+									Roll {{ action.name }}
+								</q-tooltip>
 							</button>
 						</span>
-						<p class="collapse py-2 pr-1" :id="'act-'+index">{{ action.desc }}</p>
+						<q-slide-transition>
+							<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
+						</q-slide-transition>
 					</li>
 				</ul>
 			</template>
@@ -136,25 +156,29 @@
 				<ul class="roll">
 					<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
 						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light"
-								data-toggle="collapse" 
-								:href="'#leg-'+index" role="button" 
-								aria-expanded="false">
+							<a class="d-flex justify-content-between gray-light" @click="setShow('legendary', index)">
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" v-b-tooltip.hover :title="'Roll '+action.name" @click="groupRoll(action)" class="btn btn-sm">
+							<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
 								<i class="fas fa-dice-d20"></i>
 								<span class="d-none d-md-inline ml-1">Roll</span>
+								<q-tooltip anchor="center right" self="center left">
+									Roll {{ action.name }}
+								</q-tooltip>
 							</button>
 						</span>
-						<p class="collapse py-2 pr-1" :id="'leg-'+index">{{ action.desc }}</p>
+						<q-slide-transition>
+							<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
+						</q-slide-transition>
 					</li>
 				</ul>
 
 			</template>
 		</template>
-		<p v-else-if="current.entityType === 'player'">Most players want to roll their own attacks, you probably shouldn't take that away from them.</p>
+		<p v-else-if="current.entityType === 'player'">
+			Most players want to roll their own attacks, you probably shouldn't take that away from them. ;)
+		</p>
 	</div>
 </template>
 
@@ -171,15 +195,23 @@
 		props: ['current'],
 		data: function() {
 			return {
+				rollInfo: false,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				showAction: undefined,
+				showLegendary: undefined,
 				advantage: false,
 				openRoll: false,
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
+				animateTrigger: false,
+				rolledDamage: 0,
+				rolledToHit: 0,
+				actionHover: undefined,
+				legendaryHover: undefined,
 				custom_roll: {
 					name: 'Custom Roll',
 					attack_bonus: undefined,
@@ -187,9 +219,9 @@
 					damage_bonus: undefined
 				},
 				options: [
-					{ text: 'To hit', value: 'toHit' },
-					{ text: 'Damage', value: 'damage' },
-					{ text: 'Modifiers', value: 'modifiers' },
+					{ label: 'To hit', value: 'toHit' },
+					{ label: 'Damage', value: 'damage' },
+					{ label: 'Modifiers', value: 'modifiers' },
 				],
 				aoeRoll: undefined
 			}
@@ -225,9 +257,57 @@
 				if(newValue.length > 1) {
 					this.toHit = false;
 				}
+			},
+			animateTrigger() {
+				this.animateValue("toHitRoll", 0, this.rolledToHit, 500);
+				this.animateValue("damageRoll", 0, this.rolledDamage, 500);
+				this.rolledDamage = 0;
+				this.rolledToHit = 0;
 			}
 		},
+		created() {
+			this.$nextTick(function() {
+				window.addEventListener('keyup', this.checkKeyPress);
+				window.addEventListener('keydown', this.checkKeyPress);
+			});
+		},
+		destroyed() {
+			window.removeEventListener('keyup', this.checkKeypress);
+			window.removeEventListener('keydown', this.checkKeypress);
+		},
 		methods: {
+			checkKeyPress(e) {
+				if(e.type === "keydown") {
+					if(this.actionHover) {
+						let hover = this.actionHover.split("-");
+						if(e.key === "Shift") {
+							this.actionHover = `${hover[0]}-advantage`;
+						} else if(e.key === "Control") {
+							this.actionHover = `${hover[0]}-disadvantage`;
+						}
+					} else if(this.legendaryHover) {
+						let hover = this.legendaryHover.split("-");
+						if(e.key === "Shift") {
+							this.legendaryHover = `${hover[0]}-advantage`;
+						} else if(e.key === "Control") {
+							this.legendaryHover = `${hover[0]}-disadvantage`;
+						} 
+					}
+				}
+				if(e.type === "keyup") {
+					if(this.actionHover) {
+						let hover = this.actionHover.split("-");
+						if(e.key === "Shift" || e.key === "Control") {
+							this.actionHover = `${hover[0]}-undefined`;
+						}
+					} else if(this.legendaryHover) {
+						let hover = this.legendaryHover.split("-");
+						if(e.key === "Shift" || e.key === "Control") {
+							this.legendaryHover = `${hover[0]}-undefined`;
+						}
+					}
+				}
+			},
 			displayStats(entity) {
 				var stats;
 				if(entity.transformed == true) {
@@ -246,6 +326,13 @@
 				}
 				return stats
 			},
+			setShow(type, index) {
+				if(type === 'action') {
+					this.showAction = (this.showAction === index) ? undefined : index;
+				} else if(type === 'legendary') {
+					this.showLegendary = (this.showLegendary === index) ? undefined : index;
+				}
+			},
 			setAdvantage(value) {
 				if(this.advantage == value) {
 					this.advantage = false;
@@ -253,12 +340,12 @@
 					this.advantage = value;
 				}
 			},
-			groupRoll(action) {
+			groupRoll(e, action) {
 				for(let i in this.targeted) {
 					let key = this.targeted[i];
 					let target = this.entities[key];
 
-					this.roll(action, target, i);
+					this.roll(e, action, target, i);
 				}
 				this.aoeRoll = undefined;
 				this.custom_roll = { 
@@ -267,7 +354,7 @@
 					damamge_bonus: undefined
 				};
 			},
-			roll(action, target, rollCounter) {
+			roll(e, action, target, rollCounter) {
 				event.stopPropagation();
 				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
@@ -280,6 +367,13 @@
 				var critInfo = '';
 				var highest = 0;
 				var lowest = undefined;
+				let advantage = undefined;
+
+				if(e.shiftKey) {
+					advantage = "advantage";
+				} else if(e.ctrlKey) {
+					advantage = "disadvantage";
+				}
 
 				var ac = parseInt(this.displayStats(target).ac);
 
@@ -291,7 +385,7 @@
 				let toHit = [];
 				let adv = ""
 				//If there is advantage roll twice
-				if(this.advantage) {
+				if(advantage) {
 					for(let i = 0; i <= 1; i++) {
 						let attack_bonus = action.attack_bonus || 0;
 						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
@@ -302,8 +396,8 @@
 					lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 1 : 0;
 
 					//Set advantage message for snotify
-					let color = (this.advantage == 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color} advantage">${this.advantage}</small>`;	
+					let color = (advantage === 'advantage') ? 'green' : 'red'; 
+					adv = `<small class="${color} advantage">${advantage}</small>`;	
 				} 
 				//Roll once where there is no advantage/disadvantage
 				else {
@@ -312,7 +406,7 @@
 				}
 
 				//Flip the positions of highest and lowest if there was disadvantage
-				if(this.advantage == 'disadvantage') {
+				if(advantage === 'disadvantage') {
 					highest = (highest === 0) ? 1 : 0;
 					lowest = (lowest === 0) ? 1 : 0;
 				}
@@ -382,14 +476,15 @@
 				if(action['damage_bonus']) {
 					var bonus = '+'+action['damage_bonus']; //form HTML for snotify
 					var totalDamage = parseInt(total) + parseInt(action['damage_bonus']); //Add it to the total damage
-					var showTotal = '<span class="red">' + totalDamage + '</span>'; //form HTML for snotify
+					var showTotal = '<span class="red" id="damageRoll">' + totalDamage + '</span>'; //form HTML for snotify
 				}
 				else {
 					//If there was no modifier
 					bonus = '';
 					totalDamage = total;
-					showTotal = '<span class="red">' + total + '</span>';
+					showTotal = '<span class="red" id="damageRoll">' + total + '</span>';
 				}
+				this.rolledDamage = totalDamage; //For animation
 
 				if(this.toHit) {
 					let toHitRoll = toHit[highest].throws[0];
@@ -404,7 +499,9 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (this.advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+
+					this.rolledToHit = toHit[highest].total; //For animation
 
 					//Form HTML for snotify
 					hits = `<div class="roll">
@@ -413,7 +510,7 @@
 							${ignoredRoll}
 							${toHitRoll}${toHit[highest].mod}
 						</div>
-						<h2>${toHit[highest].total}</h2>
+						<h2 id="toHitRoll">${toHit[highest].total}</h2>
 						<div class="bottom">
 							${hitOrMiss}
 						</div>
@@ -487,6 +584,7 @@
 						},
 					]
 				});
+				this.animateTrigger = !this.animateTrigger;
 				this.advantage = false; //turn advantage off
 			},
 			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
@@ -528,6 +626,42 @@
 					}
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
+			},
+			checkAdvantage(e, type, index) {
+				let advantage;
+
+				if(e.shiftKey) {
+					advantage = "advantage"
+				} else if(e.ctrlKey) {
+					advantage = "disadvantage"
+				}
+
+				if(type === 'action') {
+					this.actionHover = `${index}-${advantage}`;
+				} 
+				if(type === 'legendary') {
+					this.legendaryHover = `${index}-${advantage}`;
+				} 
+				
+			},
+			clearAdvantage() {
+				this.actionHover = undefined;
+				this.legendaryHover = undefined;
+			},
+			animateValue(id, start, end, duration) {
+				if (start === end) return;
+				const range = end - start;
+				let current = start;
+				const increment = end > start? 1 : -1;
+				const stepTime = Math.abs(Math.floor(duration / range));
+				const obj = document.getElementById(id);
+				const timer = setInterval(function() {
+						current += increment;
+						obj.innerHTML = current;
+						if (current == end) {
+								clearInterval(timer);
+						}
+				}, stepTime);
 			}
 		},
 	}
@@ -544,16 +678,8 @@
 		grid-template-columns: 50px 1fr 50px max-content;
 		grid-gap: 3px;
 
-		input {
-			border: none !important;
-		}
-		label {
-			margin-bottom: 5px;
-			height: 15px;
-		}
 		.btn {
-			height: 31px !important;
-			margin-top: 20px !important;
+			height: 40px !important;
 		}
 		.span {
 			grid-column: span 2;
@@ -581,7 +707,7 @@
 				}
 			}
 			.btn {
-				min-width: 55px;
+				min-width: 60px;
 			}
 		}
 	}

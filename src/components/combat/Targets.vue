@@ -8,43 +8,66 @@
 				</span>
 				<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
 					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
-					class="gray-hover text-capitalize" v-b-tooltip.hover title="Add NPC">
+					class="gray-hover text-capitalize">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">
 						Add
 						<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
 					</span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Add NPC
+					</q-tooltip>
 				</a>
 			</h2>
-			<div class="scroll" v-bar>
-				<div v-on:scroll="shadow()" ref="scroll">
-					<div v-shortkey="{
-						downSingle: ['arrowdown'], 
-						downMultiple: ['shift', 'arrowdown'],
-						upSingle: ['arrowup'], 
-						upMultiple: ['shift', 'arrowup']
-					}" 
-					@shortkey="cycle_target"
-				>
-						<!-- ACTIVE TARGETS -->
-						<transition-group 
+			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+				<div v-shortkey="{
+					downSingle: ['arrowdown'], 
+					downMultiple: ['shift', 'arrowdown'],
+					upSingle: ['arrowup'], 
+					upMultiple: ['shift', 'arrowup']
+				}" 
+				@shortkey="cycle_target"
+			>
+					<template v-for="{group, targets} in groups">
+						<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+							<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
+						</h2>
+						<transition-group
+							:key="group"
 							tag="ul" 
-							class="targets active_targets pt-3" 
-							name="targets" 
+							class="targets"
+							:class="`${group}_targets`"
+							name="group" 
 							enter-active-class="animated fadeInUp" 
 							leave-active-class="animated fadeOutDown"
 						>
 							<li 
-								v-for="(entity, i) in _targets"
+								v-for="(entity, i) in targets"
 								class="d-flex justify-content-between" 
 								:key="entity.key" 
-								:class="{ 'targeted': targeted.includes(entity.key), 'top': _active[0].key == entity.key && encounter.turn != 0}">
-
-								<span class="topinfo d-flex justify-content-between" v-if="_active[0].key == entity.key && encounter.turn != 0">
+								:class="{ 
+									'targeted': targeted.includes(entity.key), 
+									'top': _active[0].key === entity.key && encounter.turn !== 0
+								}"
+							>
+								<span 
+									class="topinfo d-flex justify-content-between" 
+									v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
+								>
 									Top of the round
 									<div>
-										<span class="green" v-if="Object.keys(_addedNextRound).length > 0" v-b-tooltip.hover title="Added next round">+ {{ Object.keys(_addedNextRound).length }}</span>
-										<span class="red" v-if="Object.keys(_activeDown).length > 0" v-b-tooltip.hover title="Removed next round"><span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}</span>
+										<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
+											+ {{ Object.keys(_addedNextRound).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Added next round
+											</q-tooltip>
+										</span>
+										<span class="red" v-if="Object.keys(_activeDown).length > 0">
+											<span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Removed next round
+											</q-tooltip>
+										</span>
 									</div>
 								</span>
 
@@ -56,152 +79,84 @@
 									@touchend="stop" 
 									@touchcancel="stop"
 									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
-									<TargetItem :item="entity.key" :i="i" />
+									<TargetItem :item="entity.key" :i="i" :initiative="true" />
 								</div>
-								<span>
-									<a class="options"
-										id="options"
-										data-toggle="dropdown" 
-										aria-haspopup="true" 
-										aria-expanded="false">
-										<i class="far fa-ellipsis-v"></i>
-									</a>
-									<div class="dropdown-menu" aria-labelledby="options">	
-										<div class="dropdown-header">{{ entity.name }}</div>
-										<a v-if="entity.curHp == 0 && !entity.stable" 
-											class="dropdown-item" 
-											v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
-											@click="set_stable({key: entity.key, action: 'set'})">
-											<i class="fas fa-heartbeat"></i> [s] Stabilize
-										</a>
-										<a class="dropdown-item" 
-										v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"
-										@click="edit(entity.key, entities[entity.key], entity.entityType)">
-											<i class="fas fa-pencil"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
-											{{ entity.entityType }}
-										</a>
-										<a class="dropdown-item" 
-											@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entity.key})"
-										>
-											<i class="fas fa-stopwatch"></i> <span v-if="showKeybinds.keyBinds === undefined">[m]</span> Reminders
-										</a>
-										<a class="dropdown-item" 
-											@click="setSlide({show: true, type: 'slides/Transform', data: entities[entity.key]})"
-											v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: entities[targeted]})">
-											<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
-										</a>
-										<a class="dropdown-item" @click="setHidden(entity.key, !entity.hidden)"
-											v-shortkey="['h']" @shortkey="setHidden(targeted, !entities[targeted].hidden)">
-											<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> 
-											<template v-if="!entity.hidden"> Hide</template>
-											<template v-else> Show</template>
-										</a>
-										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})">
-											<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
-										</a>
-										<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})">
-											<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
-										</a>
-										<div class="dropdown-divider"></div>
-										<a class="dropdown-item" @click="remove(entity.key, entity.name)">
-											<i class="fas fa-times"></i> Remove
-										</a>
-									</div>
-								</span>
+								<a class="options">
+									<i class="fal fa-ellipsis-v"></i>
+									<q-menu square anchor="bottom right" self="top right">
+										<q-item>
+											<q-item-section>
+												<b>{{ entity.name }}</b>
+											</q-item-section>
+										</q-item>
+										<q-separator />
+										<q-list>
+											<q-item 
+												clickable v-close-popup 
+												v-if="entity.curHp == 0 && !entity.stable && entity.entityType === 'player'"
+												@click="set_stable({key: entity.key, action: 'set'})"
+											>
+												<q-item-section avatar><i class="fas fa-heartbeat"></i></q-item-section>
+												<q-item-section>Stabilize</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="edit(entity.key, entities[entity.key], entity.entityType)"
+											>
+												<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
+												<q-item-section>Edit</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entity.key})"
+											>
+												<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
+												<q-item-section>Reminders</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="setSlide({show: true, type: 'slides/Transform', data: entities[entity.key]})"
+											>
+												<q-item-section avatar><i class="fas fa-paw-claws"></i></q-item-section>
+												<q-item-section>Transform</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="setHidden(entity.key, !entity.hidden)"
+											>
+												<q-item-section avatar><i :class="entity.hidden ? 'fas fa-eye' : 'fas fa-eye-slash'"></i></q-item-section>
+												<q-item-section>{{ entity.hidden ? "Show" : "Hide" }}</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+											>
+												<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
+												<q-item-section>Conditions</q-item-section>
+											</q-item>
+											<q-item 
+												clickable v-close-popup 
+												@click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
+											>
+												<q-item-section avatar><i class="fas fa-swords"></i></q-item-section>
+												<q-item-section>Do damage/healing</q-item-section>
+											</q-item>
+											<q-separator />
+											<q-item 
+												clickable v-close-popup 
+												@click="remove(entity.key, entity.name)"
+											>
+												<q-item-section avatar><i class="fas fa-trash-alt red"></i></q-item-section>
+												<q-item-section>Remove</q-item-section>
+											</q-item>
+										</q-list>
+									</q-menu>
+								</a>
 							</li>
 						</transition-group>
-
-						<!-- IDLE TARGETS -->
-						<template v-if="_idle.length">
-							<hr>
-							<h2>IDLE ({{ _idle.length }})</h2>
-							<ul class="targets idle_targets">
-								<template v-for="entity in _idle">
-									<li class="d-flex justify-content-between" 
-										v-bind:key="entity.key" 
-										:class="{ targeted : targeted.includes(entity.key) }">
-										<div 
-											class="target" 
-											@mousedown="start($event, entity.key)" 
-											@mouseleave="stop" 
-											@mouseup="stop" 
-											@touchstart="start($event, entity.key)" 
-											@touchend="stop" 
-											@touchcancel="stop"
-										>
-											<TargetItem :item="entity.key" />
-										</div>
-										<span>
-										<a class="options"
-											id="options"
-											data-toggle="dropdown" 
-											aria-haspopup="true" 
-											aria-expanded="false">
-											<i class="far fa-ellipsis-v"></i>
-										</a>
-										<div class="dropdown-menu" aria-labelledby="options">	
-											<div class="dropdown-header">{{ entity.name }}</div>
-											<a v-if="entity.curHp == 0 && !entity.stable" 
-												class="dropdown-item" 
-												v-shortkey="['s']" @shortkey="set_stable({key: targeted, action: 'set'})"
-												@click="set_stable({key: entity.key, action: 'set'})">
-												<i class="fas fa-hand-holding-magic"></i> <span v-if="showKeybinds.keyBinds === undefined">[s]</span> Stabilize
-											</a>
-											<a class="dropdown-item" 
-											v-shortkey="['e']" @shortkey="edit(targeted, entities[targeted], entities[targeted].entityType)"
-											@click="edit(entity.key, entities[entity.key], entity.entityType)">
-												<i class="fas fa-hammer-war"></i> <span v-if="showKeybinds.keyBinds === undefined">[e]</span> Edit
-											</a>
-											<a class="dropdown-item" 
-												@click="setSlide({show: true, type: 'slides/Transform', data: entities[entity.key]})"
-												v-shortkey="['t']" @shortkey="setSlide({show: true, type: 'slides/Transform', data: entities[targeted]})">
-												<i class="fas fa-paw-claws"></i> <span v-if="showKeybinds.keyBinds === undefined">[t]</span> Transform
-											</a>
-											<a v-if="!entity.hidden" class="dropdown-item" @click="setHidden(entity.key, true)"
-												v-shortkey="['h']" @shortkey="setHidden(targeted, true)">
-												<i class="fas fa-eye-slash"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Hide
-											</a>
-											<a v-else class="dropdown-item" @click="setHidden(entity.key, false)"
-												v-shortkey="['h']" @shortkey="setHidden(targeted, false)">
-												<i class="fas fa-eye"></i> <span v-if="showKeybinds.keyBinds === undefined">[h]</span> Show
-											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})">
-												<i class="fas fa-flame"></i> <span v-if="showKeybinds.keyBinds === undefined">[c]</span> Conditions
-											</a>
-											<a class="dropdown-item" @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity})">
-												<i class="fas fa-swords"></i> <span v-if="showKeybinds.keyBinds === undefined">[d]</span> Do damage/healing
-											</a>
-											<div class="dropdown-divider"></div>
-											<a class="dropdown-item" @click="remove(entity.key, entity.name)">
-												<i class="fas fa-times"></i> Remove
-											</a>
-										</div>
-									</span>
-									</li>
-								</template>
-							</ul>
-						</template>
-						<template v-if="_down.length">
-							<hr>
-							<h2><i class="fas fa-skull-crossbones"></i> Down ({{ _down.length }})</h2>
-							<ul class="targets down_targets">
-								<li 
-									v-for="(entity, index) in _down" 
-									:key="index" 
-									@mousedown="start($event, entity.key)" 
-									@mouseleave="stop" 
-									@mouseup="stop" 
-									@touchstart="start($event, entity.key)" 
-									@touchend="stop" 
-									@touchcancel="stop" 
-									:class="{ targeted : targeted.includes(entity.key) }">
-									<TargetItem :item="entity.key" />
-								</li>
-							</ul>
-						</template>
-					</div>
+					</template>
 				</div>
-			</div>
+			</q-scroll-area>
 	</div>
 </template>
 
@@ -236,6 +191,22 @@
 				'entities',
 				'targeted',
 			]),
+			groups() {
+				return [
+					{ 
+						group: "active",
+						targets: this._targets
+					},
+					{
+						group: "idle",
+						targets: this._idle
+					},
+					{
+						group: "down",
+						targets: this._down
+					}
+				]
+			},
 			_targets: function() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._active)
@@ -244,14 +215,14 @@
 			},
 			_down: function() {
 				return _.chain(this.entities)
-								.filter(function(entity, key) {
-									entity.key = key
-									return entity.down == true;
-								})
-								.orderBy(function(entity){
-									return parseInt(entity.initiative)
-								} , 'desc')
-								.value()
+					.filter(function(entity, key) {
+						entity.key = key
+						return entity.down == true;
+					})
+					.orderBy(function(entity){
+						return parseInt(entity.initiative)
+					} , 'desc')
+					.value()
 			},
 			//Count NPC's that are down but still in active list
 			_activeDown: function() {
@@ -360,7 +331,7 @@
 				}
 			},
 			shadow() {
-				this.setShadow = this.$refs.scroll.scrollTop
+				this.setShadow = this.$refs.scroll.scrollPosition;
 			},
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
@@ -413,21 +384,24 @@
 
 	h2 {
 		padding-left: 10px;
+		margin-bottom: 5px;
 
 		&.componentHeader {
 			padding: 10px 15px !important;
 			margin-bottom: 0 !important;
 
 			&.shadow {
-				box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
 			}
 		}
 	}
 	a.options {
 		display: inline-block;
-		height: 30px;
-		line-height: 30px;
-		padding: 0 5px 0 15px;
+		height: 35px;
+		line-height: 35px;
+		text-align: center;
+		width: 25px;
+		font-size: 18px;
 		color: #b2b2b2 !important;
 
 		&:hover {
@@ -445,13 +419,14 @@
 		}
 	}
 }
-.scroll {
+.q-scrollarea {
 	padding:0 0 30px 0;
 	height: calc(100% - 20px);
 }
 ul.targets {
-	list-style:none;
-	padding:0 15px 0 10px;
+	margin: 0;
+	list-style: none;
+	padding: 10px 15px 10px 10px !important;
 
 	li {
 		// height: 32px;
@@ -476,7 +451,7 @@ ul.targets {
 	}
 	li.top {
 		position: relative;
-		margin-top: 30px;
+		margin-top: 35px;
 
 		.topinfo {
 			cursor: default;
@@ -496,7 +471,7 @@ ul.targets {
 	animation-delay: .6s;
 }
 @media only screen and (max-width: 600px) {
-	#targets, .scroll {
+	#targets, .q-scrollarea {
 		overflow: visible !important;
 		padding-bottom: 0;
 	}

@@ -10,8 +10,8 @@
 			@saved="saved_action()"
 			@validation="setValidation"
 		/>
-		<div v-else class="card">
-			<div class="card-header d-flex justify-content-between">
+		<hk-card v-else >
+			<div slot="header" class="card-header d-flex justify-content-between">
 				<span>Spell Actions</span>
 				<a 
 				class="gray-hover text-capitalize" 
@@ -20,52 +20,50 @@
 					<span class="d-none d-md-inline ml-1">Add</span>
 				</a>
 			</div>
-			<div class="card-body">
-					<p>Spell actions are the parts of a spell that can be rolled. By adding spell actions to your spell, it can be used during encounters to quickly apply damage or healing and to set conditions and reminders.</p>
-				<hk-table 
-					v-if="spell.actions"
-					:columns="columns"
-					:items="spell.actions"
-				>
-					<template slot="type" slot-scope="data">
-						{{ data.item.capitalizeEach() }}						
-					</template>
-					<template slot="free" slot-scope="data">
-						<!-- {{ data.item }} -->
+			<p>Spell actions are the parts of a spell that can be rolled. By adding spell actions to your spell, it can be used during encounters to quickly apply damage or healing and to set conditions and reminders.</p>
+			
+			<hk-table 
+				v-if="spell.actions"
+				:columns="columns"
+				:items="spell.actions"
+			>
+				<template slot="type" slot-scope="data">
+					{{ data.item.capitalizeEach() }}						
+				</template>
+				<template slot="free" slot-scope="data">
+					<!-- {{ data.item }} -->
 
-						<!-- {{ data.item }} -->
-						<i v-if="!data.item" class="far fa-check green"></i>
-						<i v-else class="far fa-times red"></i>
-						<!-- {{ data.item ? '<i class="far fa-code-check"></i>' : '<i class="far fa-code-times"></i>' }} -->
-					</template>
-					<template slot="seperate" slot-scope="data">
-						<i v-if="data.item" class="far fa-check green"></i>
-						<i v-else class="far fa-times red"></i>
-					</template>
-					<template slot="modifiers" slot-scope="data">
-						{{ data.item ? data.item.length : "0" }}
-					</template>
-					<template slot="conditions" slot-scope="data">
-						{{ data.item ? data.item.length : "0" }}
-					</template>
-					<template slot="notifications" slot-scope="data">
-						{{ data.item ? data.item.length : "0" }}
-					</template>
-					<template slot="effects" slot-scope="data">
-						{{ data.item ? data.item.length : "0" }}
-					</template>
-					<div slot="actions" class="actions" slot-scope="data">
-						<a @click="edit_action(data.index)">
-							<i class="fas fa-pencil"></i>
-						</a>
-						<a @click="remove_action(data.index)">
-							<i class="fas fa-trash-alt"></i>
-						</a>
-					</div>
-				</hk-table>
-			</div>
-		</div>
-		
+					<!-- {{ data.item }} -->
+					<i v-if="!data.item" class="far fa-check green"></i>
+					<i v-else class="far fa-times red"></i>
+					<!-- {{ data.item ? '<i class="far fa-code-check"></i>' : '<i class="far fa-code-times"></i>' }} -->
+				</template>
+				<template slot="seperate" slot-scope="data">
+					<i v-if="data.item" class="far fa-check green"></i>
+					<i v-else class="far fa-times red"></i>
+				</template>
+				<template slot="modifiers" slot-scope="data">
+					{{ data.item ? data.item.length : "0" }}
+				</template>
+				<template slot="conditions" slot-scope="data">
+					{{ data.item ? data.item.length : "0" }}
+				</template>
+				<template slot="notifications" slot-scope="data">
+					{{ data.item ? data.item.length : "0" }}
+				</template>
+				<template slot="effects" slot-scope="data">
+					{{ data.item ? data.item.length : "0" }}
+				</template>
+				<div slot="actions" class="actions" slot-scope="data">
+					<a @click="edit_action(data.index)">
+						<i class="fas fa-pencil"></i>
+					</a>
+					<a @click="remove_action(data.index)">
+						<i class="fas fa-trash-alt"></i>
+					</a>
+				</div>
+			</hk-table>
+		</hk-card>
 	</div>
 </template>
 

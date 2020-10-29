@@ -10,17 +10,43 @@
 				<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
 
 				<h2 class="mt-3">Edit your campaign</h2>
-				<b-row class="mt-3">
-					<b-col class="mb-2">
-						<input class="form-control" 
-							autocomplete="off"
-							v-validate="'required'" 
-							data-vv-as="Encounter Name" 
-							type="text" name="name" 
-							v-model="campaign.campaign"/>
-						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<input class="form-control mt-2"
+				<q-input 
+					dark filled square dense
+					label="name"
+					autocomplete="off"
+					v-validate="'required'" 
+					data-vv-as="Encounter Name" 
+					type="text" 
+					name="name" 
+					v-model="campaign.campaign"
+				/>
+				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+
+				<q-select 
+					dark filled square dense
+					label="Advancement"
+					emit-value
+					map-options
+					class="my-2" 
+					v-model="campaign.advancement" 
+					:options="advancement_options" 
+				/>
+
+				<div class="background">
+					<div 
+						class="img pointer" 
+						v-if="campaign.background" 
+						:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+						@click="image = true"
+					>
+					</div>
+					<div class="img" v-else>
+						<q-icon name="fas fa-image"/>
+					</div>
+					<div>
+						<q-input 
+							dark filled square
 							autocomplete="off" 
 							v-validate="'url'" type="text" 
 							name="backbround" 
@@ -28,52 +54,35 @@
 							v-model="campaign.background" 
 							placeholder="Background URL"/>
 						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+					</div>
+				</div>
 
-						<el-switch
-							class="mt-2"
-							v-model="campaign.advancement"
-							active-color="#2c97de"
-							inactive-color="#2c97de"
-							active-value="milestone"
-							inactive-value="experience"
-							active-text="Milestone"
-							inactive-text="Experience">
-						</el-switch>
+				<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+					<span :class="{ 'green': !campaign.private }">
+						<i class="fas fa-eye"></i>
+						Public
+					</span>
+					/
+					<span :class="{ 'red': campaign.private }">
+						<i class="fas fa-eye-slash"></i>
+						Private
+					</span>
+				</div>
 
-						<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
-							<span :class="{ 'green': !campaign.private }">
-								<i class="fas fa-eye"></i>
-								Public
-							</span>
-							/
-							<span :class="{ 'red': campaign.private }">
-								<i class="fas fa-eye-slash"></i>
-								Private
-							</span>
-						</div>
-
-						<button class="btn mt-3" @click="edit()">Save</button>
-					</b-col>
-					<b-col sm="3" v-if="campaign.background">
-						<div class="img-container"><img :src="campaign.background" /></div>
-					</b-col>
-				</b-row>
+				<button class="btn mt-3" @click="edit()">Save</button>
 			</div>
 			
 			<h2>Add players</h2>
-			<b-row>
-				<b-col md="6">
-					<b-card header="All Players">
+			<div class="row q-col-gutter-md">
+				<div class="col-12 col-md-6">
+					<hk-card header="All Players">
 						<ul class="entities hasImg" v-if="players && campaign">
-							<li v-for="(player, key) in players" 
-							:key="key" 
-							class="d-flex justify-content-between">
-								<div class="d-flex justify-content-left">
-									<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
-									{{ player.character_name }}
-								</div>
-								
+							<li v-for="(player, key) in players" :key="key">
+								<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+								{{ player.character_name }}
+							
 								<span v-if="inOtherCampaign(key)">
 									<span class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
 									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
@@ -86,34 +95,41 @@
 
 								<div v-else class="actions bg-gray">
 									<a class="gray-hover"
-									v-b-tooltip.hover 
-									title="Add Character" 
 									@click="addPlayer(key)">
 										<i class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add character
+										</q-tooltip>
 									</a>
 								</div>
 								
 							</li>
 						</ul>
 						<div v-else class="loader"><span>Loading Players...</span></div>
-					</b-card>
-				</b-col>
+					</hk-card>
+				</div>
 
-				<b-col md="6">
-					<b-card header="Players in Campaign">
+				<div class="col-12 col-md-6">
+					<hk-card header="Players in Campaign">
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
-								<li v-for="(player, key) in campaign.players" :key="key" class="d-flex justify-content-between">
-									<div class="d-flex justify-content-left" :class="{ 'red': inOtherCampaign(key) }">
-										<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
-										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+								<li v-for="(player, key) in campaign.players" :key="key">		
+									<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
+									<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+									<div :class="{ 'red': inOtherCampaign(key) }">
 										{{ players[key].character_name }}
-										<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
+										<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover">
+											<small>Different Campaign</small>
+										</span>
 									</div>
 									
-									<div class="actions bg-gray">
-										<a class="gray-hover" v-b-tooltip.hover title="Remove Character" @click="removePlayer(key)">
+									<div class="actions">
+										<a class="gray-hover" @click="removePlayer(key)">
 											<i class="fas fa-minus"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Remove character
+											</q-tooltip>
 										</a>
 									</div>
 									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
@@ -121,10 +137,14 @@
 							</ul>
 						</template>
 						<div v-else class="loader"><span>Loading Players...</span></div>
-					</b-card>
-				</b-col>
-			</b-row>
+					</hk-card>
+				</div>
+			</div>
 		</div>
+
+		<q-dialog v-model="image">
+			<img :src="campaign.background" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -147,7 +167,18 @@
 			return {
 				user: this.$store.getters.getUser,
 				campaignId: this.$route.params.campid,
-				newCampaign: ''
+				newCampaign: '',
+				image: false,
+				advancement_options: [
+					{
+						value: "experience",
+						label: "Experience"
+					},
+					{
+						value: "milestone",
+						label: "Milestone"
+					}
+				]
 			}
 		},
 		computed: {
@@ -250,48 +281,20 @@
 </script>
 
 <style lang="scss" scoped>
-	.img-container {
-		width: 100%;
+	.background {
+		display: grid;
+		grid-template-columns: 56px 1fr;
+		grid-column-gap: 10px;
+		font-size: 35px;
+		text-align: center;
 
-		img {
-			width: 100%;
+		.img {
+			border: solid 1px #b2b2b2;
+			display: block;
+			width: 56px;
+			height: 56px;
+			background-size: cover;
+			background-position: center top;
 		}
-	}
-	.nav { 
-		background:#191919;
-	}
-	#add {
-		padding: 15px 10px;
-		grid-area: add;
-	}
-	.tab-content {
-		padding:15px 10px;
-	}
-	#added {
-		padding: 15px 10px;
-		grid-area:added;
-	}
-	.monster {
-		padding:15px;
-		position:fixed;
-		right:0;
-		top:80px;
-		height: calc(100vh - 80px);
-		width:330px;
-		z-index:99;
-		overflow: scroll;
-		border-left:solid 1px #000;
-		box-shadow: 0 10px 8px #000;
-	}
-
-	.slideInRight {
-		transition-duration: 0.1s;
-	}
-
-	.slideOutRight {
-		transition-duration: 0.1s;
-	}
-	.faded {
-		opacity: .3;
 	}
 </style>

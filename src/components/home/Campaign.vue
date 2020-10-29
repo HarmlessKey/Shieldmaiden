@@ -8,11 +8,11 @@
 				</span>
 			</div>
 
-			<b-row>
-				<b-col sm="6">
+			<div class="row q-col-gutter-md">
+				<div class="col-12 col-md-6">
 					<img class="image" src="@/assets/_img/home/player-overview.gif"/>
-				</b-col>
-				<b-col>
+				</div>
+				<div class="col-12 col-md-6">
 					<h3>More than an encounter tool,<br/> if you want it to be.</h3>
 					
 					<ul>
@@ -23,8 +23,8 @@
 					</ul>
 
 					<router-link to="sign-up" class="btn btn-lg">Start a campaign</router-link>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>

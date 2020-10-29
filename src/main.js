@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import App from './App.vue';
-import jQuery from 'jquery'
 import VueFire from 'vuefire'
 import VeeValidate from 'vee-validate';
 import { auth, db } from './firebase';
@@ -12,11 +11,11 @@ import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
-import Element from 'element-ui';
-import locale from 'element-ui/lib/locale/lang/en'
 import HkTable from './components/hk-components/hk-table'
+import HkCard from './components/hk-components/hk-card'
+import HkCardDeck from './components/hk-components/hk-card-deck'
 import Icon from './components/Icon'
-import 'element-ui/lib/theme-chalk/index.css';
+import './quasar';
 
 const options = {
 	toast: {
@@ -26,6 +25,8 @@ const options = {
 }
 
 Vue.component('hk-table', HkTable);
+Vue.component('hk-card', HkCard);
+Vue.component('hk-card-deck', HkCardDeck);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
@@ -34,16 +35,6 @@ Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-Vue.use(Element, { locale });
-
-//Bootstrap
-global.$ = jQuery
-global.jQuery = jQuery
-Vue.use(require('bootstrap'))
-import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-
-Vue.use(BootstrapVue);
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 

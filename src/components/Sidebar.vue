@@ -13,102 +13,156 @@
 			<div>
 				<template v-if="$store.getters.getUser">
 					<h3>DM Content</h3>
-					<b-list-group @click="setSideSmallScreen(false)">
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Campaigns' : ''"
-						>
-							<router-link to="/campaigns">
-								<i class="fas fa-dungeon"></i><span>Campaigns</span>
-							</router-link>
-						</b-list-group-item>
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Players' : ''"
-						>
-							<router-link to="/players"><i class="fas fa-users"></i><span>Players</span></router-link>
-						</b-list-group-item>
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'NPC\'s' : ''"
-						>
-							<router-link to="/npcs"><i class="fas fa-dragon"></i><span>NPC's</span></router-link>
-						</b-list-group-item>
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Reminders' : ''"
-						>
-							<router-link to="/reminders"><i class="fas fa-stopwatch"></i><span>Reminders</span></router-link>
-						</b-list-group-item>
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Items' : ''"
-						>
-							<router-link to="/items"><i class="far fa-staff"></i><span>Items</span></router-link>
-						</b-list-group-item>
-					</b-list-group>
+					<q-list @click="setSideSmallScreen(false)">
+						<q-item clickable v-ripple to="/campaigns">
+							<q-item-section avatar>
+								<i class="fas fa-dungeon"></i>
+							</q-item-section>
+							<q-item-section class="title">Campaigns</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Campaigns
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/players">
+							<q-item-section avatar>
+								<i class="fas fa-users"></i>
+							</q-item-section>
+							<q-item-section class="title">Players</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Players
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/npcs">
+							<q-item-section avatar>
+								<i class="fas fa-dragon"></i>
+							</q-item-section>
+							<q-item-section class="title">NPC's</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								NPC's
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/reminders">
+							<q-item-section avatar>
+								<i class="fas fa-stopwatch"></i>
+							</q-item-section>
+							<q-item-section class="title">Reminders</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Reminders
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/items">
+							<q-item-section avatar>
+								<i class="fas fa-staff"></i>
+							</q-item-section>
+							<q-item-section class="title">Items</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Items
+							</q-tooltip>
+						</q-item>
+					</q-list>
 					<hr>
 					<h3>Player Content</h3>
-					<b-list-group @click="setSideSmallScreen(false)">
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Characters' : ''"
-						>
-							<router-link to="/characters"><i class="fas fa-helmet-battle"></i><span>Characters</span></router-link>
-						</b-list-group-item>
-						<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Following' : ''"
-						>
-							<router-link to="/followed"><i class="fas fa-user-check"></i><span>Followed Users</span></router-link>
-						</b-list-group-item>
-					</b-list-group>
+					<q-list @click="setSideSmallScreen(false)">
+						<q-item clickable v-ripple to="/characters">
+							<q-item-section avatar>
+								<i class="fas fa-helmet-battle"></i>
+							</q-item-section>
+							<q-item-section class="title">Characters</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Characters
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/followed">
+							<q-item-section avatar>
+								<i class="fas fa-user-check"></i>
+							</q-item-section>
+							<q-item-section class="title">Following</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Following
+							</q-tooltip>
+						</q-item>
+					</q-list>
 					<hr>
 				</template>
-				<b-list-group @click="setSideSmallScreen(false)">
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Compendium' : ''"
-						>
-						<router-link to="/compendium"><i class="fas fa-book-spells"></i><span>Compendium</span></router-link>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Feedback' : ''"
-						>
-						<router-link to="/feedback"><i class="fas fa-comment-alt"></i><span>Feedback</span></router-link>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Documentation' : ''"
-						>
-						<router-link to="/documentation"><i class="fas fa-file"></i><span>Documentation</span></router-link>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'About Us' : ''"
-						>
-						<router-link to="/about-us"><i class="fas fa-user-friends"></i><span>About Us</span></router-link>
-					</b-list-group-item>
-				</b-list-group>
+
+				<q-list @click="setSideSmallScreen(false)">
+					<q-item clickable v-ripple to="/compendium">
+						<q-item-section avatar>
+							<i class="fas fa-book-spells"></i>
+						</q-item-section>
+						<q-item-section class="title">Compendium</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Compendium
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple to="/feedback">
+						<q-item-section avatar>
+							<i class="fas fa-comment-alt"></i>
+						</q-item-section>
+						<q-item-section class="title">Feedback</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Feedback
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple to="/documentation">
+						<q-item-section avatar>
+							<i class="fas fa-file"></i>
+						</q-item-section>
+						<q-item-section class="title">Documentation</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Documentation
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple to="/about-us">
+						<q-item-section avatar>
+							<i class="fas fa-user-friends"></i>
+						</q-item-section>
+						<q-item-section class="title">About us</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							About us
+						</q-tooltip>
+					</q-item>
+				</q-list>
 				<hr>
 				<h3>Follow us</h3>
-				<b-list-group>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Patreon' : ''"
-						>
-						<a href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon patreon-red"></i><span>Patreon</span></a>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Discord' : ''"
-						>
-						<a href="https://discord.gg/fhmKBM7" target="_blank"><i class="fab fa-discord"></i><span>Discord</span></a>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Facebook' : ''"
-						>
-						<a href="https://www.facebook.com/harmlesskey" target="_blank"><i class="fab fa-facebook"></i><span>Facebook</span></a>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Reddit' : ''"
-						>
-						<a href="https://www.reddit.com/r/HarmlessKey" target="_blank"><i class="fab fa-reddit-alien"></i><span>Reddit</span></a>
-					</b-list-group-item>
-					<b-list-group-item 
-							v-b-tooltip.hover.left.nofade.viewport="$store.getters.side_collapsed ? 'Trello' : ''"
-						>
-						<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank"><i class="fab fa-trello"></i><span>Trello</span></a>
-					</b-list-group-item>
-				</b-list-group>
+				<q-list @click="setSideSmallScreen(false)">
+					<q-item clickable v-ripple link tag="a" href="https://www.patreon.com/harmlesskey" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-patreon patreon-red"></i>
+						</q-item-section>
+						<q-item-section class="title">Patreon</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Patreon
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple link tag="a" href="https://discord.gg/fhmKBM7" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-discord"></i>
+						</q-item-section>
+						<q-item-section class="title">Discord</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Discord
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple link tag="a" href="https://www.facebook.com/harmlesskey" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-facebook"></i>
+						</q-item-section>
+						<q-item-section class="title">Facebook</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Facebook
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple link tag="a" href="https://www.reddit.com/r/HarmlessKey" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-reddit-alien"></i>
+						</q-item-section>
+						<q-item-section class="title">Reddit</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Reddit
+						</q-tooltip>
+					</q-item>
+				</q-list>
 			</div>
 			<div id="toggle-width" @click="toggleSideCollapsed()">
 				<i class="far fa-angle-left"></i>
@@ -183,20 +237,22 @@
 		background-color: #302f2f;
 	}
 	
-	.list-group-item {
-		padding: 0 !important;
-		overflow: hidden;
-
-		span { 
-			margin-left: 10px;
-		}
-		a {
+	.q-list {
+		.q-item {
+			color: #b2b2b2 !important;
+			overflow: hidden;
 			width: 250px;
 			transition: padding-left 0.5s linear;
-		}
-		a.active {
-			i::before {
-				color: #2c97de !important;
+			min-height: 40px;
+
+			.q-item__section--avatar {
+				min-width: 35px;
+			}
+
+			&.q-router-link--active {
+				i::before {	
+					color: #2c97de !important;
+				}
 			}
 		}
 	}
@@ -228,12 +284,14 @@
 			display: none;
 		}
 
-		.list-group-item {
-			a {
-				width: 44px;
-				padding-left: 12px;
-				margin: 0;
-				transition: width 0.5s linear;
+		.q-item {
+			width: 44px;
+			padding-left: 12px;
+			margin: 0;
+			transition: width 0.5s linear;
+
+			.title {
+				display:none;
 			}
 		}
 

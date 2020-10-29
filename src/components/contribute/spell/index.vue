@@ -4,7 +4,12 @@
 		<h2 class="spellTitle d-flex justify-content-between" v-if="oldSpell">
 			{{ (spell.changed) ? spell.name : oldSpell.name }}
 			<span v-if="canEdit()">
-				<router-link :to="'/contribute/spells/' + spellId + '/edit'" v-b-tooltip.hover title="Edit" class="mx-2"><i class="fas fa-pencil-alt"></i></router-link>
+				<router-link :to="'/contribute/spells/' + spellId + '/edit'" class="mx-2">
+					<i class="fas fa-pencil-alt"></i>
+					<q-tooltip anchor="center right" self="center left">
+						Edit
+					</q-tooltip>
+				</router-link>
 				<!-- <a v-if="userInfo.admin" @click="checked(!spell.checked)" :class="{'gray-hover': !spell.checked, 'green': spell.checked}"><i class="fas fa-check"></i> Item checked</a> -->
 			</span>
 		</h2>
@@ -117,11 +122,11 @@
 			])
 		},
 		filters: {
-		  capitalize: function (value) {
-		    if (!value) return ''
-		    value = value.toString()
-		    return value.charAt(0).toUpperCase() + value.slice(1)
-		  }
+			capitalize: function (value) {
+				if (!value) return ''
+				value = value.toString()
+				return value.charAt(0).toUpperCase() + value.slice(1)
+			}
 		},
 		firebase() {
 			return {

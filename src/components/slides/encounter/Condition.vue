@@ -41,7 +41,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions } from 'vuex';
 	import { conditions } from '@/mixins/conditions.js';
 	import TargetItem from '@/components/combat/TargetItem.vue';

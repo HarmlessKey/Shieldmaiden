@@ -4,164 +4,196 @@
 			<span><i class="fas fa-bell"/> Notifications <template v-if="notifications">( {{ notifications.length }} )</template></span>
 			<a 
 				class="gray-light text-capitalize" 
-				v-b-tooltip.hover title="Add Notification" 
 				@click="add_notification()"
 			>
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
+				<q-tooltip anchor="center right" self="center left">
+					Add notification
+				</q-tooltip>
 			</a>
 		</h2>
-		<template v-for="(notification, not_index) in notifications">
-			<div class="card" v-if="notifications && notifications.length > 0" :key="`notification-${not_index}`">
-				<div v-b-toggle="'accordion-'+not_index" class="card-header collapse-header d-flex justify-content-between">
-					<div class="gray-light" >
-						<div class="caret blue"><i class="fas fa-caret-down" /></div>
+
+		<q-list dark square :class="`accordion`">
+			<q-expansion-item
+				v-for="(notification, not_index) in notifications"
+				:key="`notification-${not_index}`"
+				dark switch-toggle-side
+				group="conditions"
+			>
+				<template v-slot:header>
+					<q-item-section>
 						{{parseInt(not_index) + 1}}. {{ notification.reminder.title }}
-					</div>
-					<a @click="remove_notification(not_index)"
-						class="gray-hover text-capitalize"
-						v-b-tooltip.hover title="Remove">
-						<i class="fas fa-trash-alt red"></i>
-					</a>
-				</div>
-				<b-collapse visible :id="'accordion-'+not_index" accordion="my-accordion">
-					<div class="card-body">
-						<b-row>
-							<b-col sm="6">
-								<label>Reminder</label>
-								<reminder-form v-model="notification.reminder" @validation="setValidation"/>
-							</b-col>
-							<b-col sm="6">
-								<label class="required" for="application">
-									<span>Application</span>
-									<a 
-										class="ml-1"
-										v-b-popover.hover.top="'When should this reminder be applied?'" 
-										title="Apply reminder"
-									>
-										<i class="fas fa-info-circle"></i>
-									</a>
-								</label>
-								<b-form-select v-model="notification.application"
-									:id="`application-${not_index}`"
-									:name="`application-${not_index}`"
-									title="application"
-									class="form-control mb-2"
-									v-validate="'required'"
-									data-vv-as="application"
-									@change="$forceUpdate()">
-									<option :value="undefined" disabled>- Application -</option>
-									<option 
-										v-for="{ label, value } in application"
-										:key="value" :value="value">{{ label }}</option>
-								</b-form-select>
-								<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
+					</q-item-section>
+					<q-item-section avatar>
+						<a @click="remove_notification(not_index)" class="remove">
+							<i class="fas fa-trash-alt red" />
+							<q-tooltip anchor="top middle" self="center middle">
+								Remove notification
+							</q-tooltip>
+						</a>
+					</q-item-section>
+				</template>
 
-								<label class="required" for="target">
-									<span>Target</span>
-									<a 
-										class="ml-1"
-										v-b-popover.hover.top="'To whom should the reminder be applied?'" 
-										title="Target"
-									>
-										<i class="fas fa-info-circle"></i>
-									</a>
-								</label>
-								<b-form-select v-model="notification.target"
-									:id="`target-${not_index}`"
-									:name="`target-${not_index}`"
-									title="target"
-									class="form-control mb-4"
-									v-validate="'required'"
-									data-vv-as="target"
-									@change="$forceUpdate()">
-									<option :value="undefined" disabled>- Apply to -</option>
-									<option 
-										v-for="({ label, value}) in targets"
-										:key="value" :value="value">{{ label }}</option>
-								</b-form-select>
-								<p class="validate red" v-if="errors.has(`target-${not_index}`)">{{ errors.first(`target-${not_index}`) }}</p>
+				<div class="accordion-body">
+					<div class="row q-col-gutter-md">
+						<div class="col-12 col-md-6">
+							<label>Reminder</label>
+							<reminder-form v-model="notification.reminder" @validation="setValidation"/>
+						</div>
+						<div class="col-12 col-md-6">
+							<q-select 
+								dark filled square dense
+								map-options
+								emit-value
+								label="Application"
+								:options="application"
+								v-model="notification.application"
+								:name="`application-${not_index}`"
+								class="mb-2"
+								v-validate="'required'"
+								data-vv-as="application"
+								@change="$forceUpdate()"
+							>
+								<template v-slot:append>
+									<q-icon name="info" @click.stop>
+										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card dark square>
+												<q-card-section class="bg-gray-active">
+													<b>Apply reminder</b>
+												</q-card-section>
 
-								<template v-if="notification.reminder && notification.reminder.variables && Object.keys(notification.reminder.variables).length > 0">
-									<label>
-										Variable scaling
-										<a 
-											v-b-popover.hover.top="'Set how reminder variables should scale. Scalable variables can have only 1 option, if the scale type is set to Spell Scale, this option must have a number value.'" 
-											title="Variable scaling"
-										>
-											<i class="fas fa-info-circle"></i>
-										</a>
-									</label>
-									<hr>
-									<div v-for="(variable, key) in notification.reminder.variables" :key="`var-${key}`">
-										<div v-if="scalableVariable(variable)" class="mb-3">
-											<label class="var d-flex justify-content-between">
-												{{ key }}
-												<a 
-													v-if="level_tier_addable(not_index, key)"
-													class="gray-hover text-capitalize" 
-													v-b-tooltip.hover title="Add Level Tier" 
-													@click="add_level_tier(not_index, key)">
-														<i class="fas fa-plus green"></i>
-												</a>
-											</label>
-											<template v-if="notification.scaling && notification.scaling[key]">
-												<b-row 
-													v-for="(level_tier, tier_index) in notification.scaling[key].level_tiers" 
-													:key="`tier-${key}-${tier_index}`"
-												>
-													<b-col md="6">
-														<label class="required" :for="`level-${key}-${tier_index}`">{{level_scaling}}</label>
-														<b-form-input v-model="level_tier.level"
-															autocomplete="off"
-															:id="`level-${key}-${tier_index}`"
-															:name="`level-${key}-${tier_index}`"
-															class="form-control mb-2"
-															:title="level_scaling"
-															v-validate="'required'"
-															type="number"
-															:data-vv-as="level_scaling"
-															@keyup="$forceUpdate()"
-															></b-form-input>
-															<p class="validate red" v-if="errors.has(`level-${key}-${tier_index}`)">{{ errors.first(`level-${not_index}`) }}</p>
-													</b-col>
-													<b-col md="6">
-														<label for="change">Change</label>
-														<div class="d-flex justify-content-between">
-															<b-form-input v-model="level_tier.change"
-																autocomplete="off"
-																id="change"
-																name="change"
-																class="form-control mb-2"
-																title="change"
-																type="number"
-																data-vv-as="change"
-																@keyup="$forceUpdate()"
-																></b-form-input>
-
-																<a @click="remove_level_tier(not_index, tier_index, key)"
-																	class="remove"
-																	v-b-tooltip.hover title="Remove">
-																	<i class="fas fa-trash-alt red"></i>
-																</a>
-														</div>
-													</b-col>
-												</b-row>
-												<small v-if="notification.scaling[key].level_tiers && notification.scaling[key].level_tiers.length > 0">
-													<span v-for="(line, i) in create_spell_level_tier_description(notification.scaling[key].level_tiers, key)" :key="`tier-${i}`">
-														{{ line }}<br>
-													</span>
-												</small>
-											</template>
-										</div>
-									</div>
+												<q-card-section>
+													Select when this reminder should be applied.
+												</q-card-section>
+											</q-card>
+										</q-menu>
+									</q-icon>
 								</template>
-							</b-col>
-						</b-row>
+							</q-select>
+							<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
+
+							<q-select 
+								dark filled square dense
+								map-options
+								emit-value
+								label="Target"
+								:options="targets"
+								v-model="notification.target"
+								:name="`target-${not_index}`"
+								class="mb-4"
+								v-validate="'required'"
+								data-vv-as="target"
+								@change="$forceUpdate()"
+							>
+								<template v-slot:append>
+									<q-icon name="info" @click.stop>
+										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card dark square>
+												<q-card-section class="bg-gray-active">
+													<b>Target</b>
+												</q-card-section>
+
+												<q-card-section>
+													Select to whom the reminder should be applied.
+												</q-card-section>
+											</q-card>
+										</q-menu>
+									</q-icon>
+								</template>
+							</q-select>
+							<p class="validate red" v-if="errors.has(`target-${not_index}`)">{{ errors.first(`target-${not_index}`) }}</p>
+
+							<template v-if="notification.reminder && notification.reminder.variables && Object.keys(notification.reminder.variables).length > 0">
+								<label>
+									Variable scaling
+									<a class="ml-1">
+										<q-icon name="info" @click.stop>
+											<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+												<q-card dark square>
+													<q-card-section class="bg-gray-active">
+														<b>Variable scaling</b>
+													</q-card-section>
+
+													<q-card-section>
+														Set how reminder variables should scale. Scalable variables can have only 1 option, 
+														if the scale type is set to Spell Scale, this option must have a number value.
+													</q-card-section>
+												</q-card>
+											</q-menu>
+										</q-icon>
+									</a>
+								</label>
+								<hr>
+								<div v-for="(variable, key) in notification.reminder.variables" :key="`var-${key}`">
+									<div v-if="scalableVariable(variable)" class="mb-3">
+										<label class="var d-flex justify-content-between">
+											{{ key }}
+											<a 
+												v-if="level_tier_addable(not_index, key)"
+												class="gray-hover text-capitalize" 
+												@click="add_level_tier(not_index, key)">
+													<i class="fas fa-plus green"></i>
+													<q-tooltip anchor="center right" self="center left">
+														Add level tier
+													</q-tooltip>
+											</a>
+										</label>
+										<template v-if="notification.scaling && notification.scaling[key]">
+											<div 
+												class="row q-col-gutter-md"
+												v-for="(level_tier, tier_index) in notification.scaling[key].level_tiers" 
+												:key="`tier-${key}-${tier_index}`"
+											>
+												<div class="col-12 col-md-6">
+													<q-input 
+														dark filled square dense
+														:label="level_scaling"
+														v-model="level_tier.level"
+														autocomplete="off"
+														:name="`level-${key}-${tier_index}`"
+														class="mb-2"
+														v-validate="'required'"
+														type="number"
+														:data-vv-as="level_scaling"
+														@keyup="$forceUpdate()"
+													/>
+													<p class="validate red" v-if="errors.has(`level-${key}-${tier_index}`)">{{ errors.first(`level-${not_index}`) }}</p>
+												</div>
+												<div class="col-12 col-md-6">
+													<div class="d-flex justify-content-between">
+														<q-input 
+															dark filled square dense
+															label="Change"
+															v-model="level_tier.change"
+															autocomplete="off"
+															class="mb-2"
+															type="number"
+															@keyup="$forceUpdate()"
+														/>
+														<a @click="remove_level_tier(not_index, tier_index, key)" class="remove">
+															<i class="fas fa-trash-alt red"></i>
+															<q-tooltip anchor="center right" self="center left">
+																Remove
+															</q-tooltip>
+														</a>
+													</div>
+												</div>
+											</div>
+											<small v-if="notification.scaling[key].level_tiers && notification.scaling[key].level_tiers.length > 0">
+												<span v-for="(line, i) in create_spell_level_tier_description(notification.scaling[key].level_tiers, key)" :key="`tier-${i}`">
+													{{ line }}<br>
+												</span>
+											</small>
+										</template>
+									</div>
+								</div>
+							</template>
+						</div>
 					</div>
-				</b-collapse>
-			</div>
-		</template>
+				</div>
+			</q-expansion-item>
+		</q-list>
 	</div>
 </template>
 
@@ -181,14 +213,14 @@ export default {
 		level_scaling: String,
 		spell:Object,
 	},
-  data() {
-    return {
+	data() {
+		return {
 			scaleVariable: undefined,
 			targets: [
 				{label: "Target", value: "target" },
 				{label: "Caster", value: "caster" }
 			]
-    };
+		};
 	},
 	computed: {
 		application() {
@@ -214,9 +246,9 @@ export default {
 			return { "notifications": this.$validator };
 		}
 	},
-  methods: {
-  	add_notification() {
-  		let notifications = this.notifications;
+	methods: {
+		add_notification() {
+			let notifications = this.notifications;
 			if(notifications === undefined) {
 				notifications = []
 			}
@@ -301,11 +333,10 @@ export default {
 			}
 			return description
 		},
-  },
-  watch: {
+	},
+	watch: {
 		notifications: {
 			handler() {
-				let vm = this;
 				this.$nextTick(() => {
 					this.$emit('validation', this.validator);
 				})

@@ -1,51 +1,36 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-		<b-row>
-			<b-col class="text-center">
-				<label>Temp HP</label>
-				<b-form-input 
-					class="text-center"
+		<div class="row q-col-gutter-md">
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="Temporary HP"
 					type="number" 
 					name="tempHp" 
 					v-model="tempHp"
-					placeholder="Temporary Hit Points"></b-form-input>
-			</b-col>
-
-			<b-col class="text-center">
-				<label>Max HP Mod</label>
-				<b-form-input 
-					class="text-center"
+				/>
+			</div>
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="Maximum HP modifier" 
 					type="number" 
 					name="maxHpMod" 
 					v-model="maxHpMod"
-					placeholder="Max HP modifier"></b-form-input>
-			</b-col>
-		</b-row>
+				/>
+			</div>
+		</div>
 		
-		<b-form-group label="Change for:">
-				<b-form-checkbox
-				v-model="allSelected"
-				:indeterminate="indeterminate"
-				aria-describedby="flavours"
-				aria-controls="flavours"
-				@change="toggleAll"
-				>
-					{{ allSelected ? "Un-select All" : "Select All" }}
-				</b-form-checkbox>
-
-			<b-form-checkbox-group
-				class="ml-4"
-				id="players"
-				name="players"
-				v-model="setFor"
-				stacked
-			>
-				<b-form-checkbox :value="key" v-for="(player, key) in campaign.players" :key="key">			
-					{{ players[key].character_name  }} 
-				</b-form-checkbox>
-			</b-form-checkbox-group>
-		</b-form-group>
+		<h3 class="mt-3">Set HP changes for:</h3>
+		<div v-for="(player, key) in campaign.players" :key="key">
+			<q-checkbox 
+				dark
+				v-model="setFor" 
+				:val="key" 
+				:label="players[key].character_name"
+			/>
+		</div>
 
 		<button class="btn btn-block my-3" @click="setHpModifiers()">Update health</button>
 	</div>
@@ -62,14 +47,7 @@
 				campaignId: this.$route.params.campid,
 				tempHp: undefined,
 				maxHpMod: undefined,
-				awardHp: undefined,
-				allSelected: true,
-				indeterminate: false,
-				options: [
-					{ text: 'Divide over', value: 'divide' },
-					{ text: 'Award to all', value: 'toAll' },
-				],
-				awardType: 'divide'
+				awardHp: undefined
 			}
 		},
 		computed: {

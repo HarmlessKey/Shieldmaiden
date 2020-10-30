@@ -1,5 +1,5 @@
 <template>
-	<div class="menu bg-gray">
+	<div class="menu bg-gray-dark">
 		<div v-if="targeted.length === 0" class="no-target">
 			Select a target
 		</div>

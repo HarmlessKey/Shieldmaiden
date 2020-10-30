@@ -436,10 +436,6 @@ ul.targets {
 		cursor: pointer;
 		background: #191919;
 
-		&:hover {
-			background: #000;
-			border-color: #b2b2b2;
-		}
 		&.targeted {
 			border-color: #2c97de !important;
 			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);

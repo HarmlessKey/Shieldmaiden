@@ -30,21 +30,23 @@
 							</span>
 							<i v-else class="fas fa-plus-circle green" />
 
-							<q-menu square>
-								<q-list>
-									<q-item>
-										<q-item-section>Exhaustion</q-item-section>
-									</q-item>
-									<q-separator />
-									<q-item clickable v-close-popup v-for="index in 6" :key="index" @click="setExhausted(index)">
-										<q-item-section>Level {{ index }}</q-item-section>
-									</q-item>
-									<q-separator />
-									<q-item clickable v-close-popup @click="setExhausted(0)">
-										<q-item-section>Remove</q-item-section>
-									</q-item>
-								</q-list>
-							</q-menu>
+							<q-popup-proxy square :breakpoint="576">
+								<div class="bg-gray gray-light">
+									<q-list>
+										<q-item>
+											<q-item-section>Exhaustion</q-item-section>
+										</q-item>
+										<q-separator />
+										<q-item clickable v-close-popup v-for="index in 6" :key="index" @click="setExhausted(index)">
+											<q-item-section>Level {{ index }}</q-item-section>
+										</q-item>
+										<q-separator />
+										<q-item clickable v-close-popup @click="setExhausted(0)">
+											<q-item-section>Remove</q-item-section>
+										</q-item>
+									</q-list>
+								</div>
+							</q-popup-proxy>
 						</a>
 					</q-item-section>
 

@@ -291,7 +291,7 @@
 	}
 }
 @media only screen and (max-width: 600px) {
-	#current, .q-scrollarea, .current {
+	#current {
 		overflow: visible !important;
 	}
 	.hide {

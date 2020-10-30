@@ -453,6 +453,11 @@
 		}
 	}
 }
+@media only screen and (max-width: 900px) {
+	#targeted {
+		display: none;
+	}
+}
 @media only screen and (max-width: 600px) {
 	#targeted, .scroll, .current {
 		overflow: visible !important;

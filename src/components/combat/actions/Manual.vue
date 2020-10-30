@@ -220,7 +220,7 @@
 <style lang="scss" scoped>
 .manual {
 	display:grid;
-	grid-template-columns: 2fr 1fr;
+	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 40px 40px;
 	grid-gap: 10px;
 	grid-template-areas: 

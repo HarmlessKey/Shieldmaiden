@@ -281,8 +281,8 @@
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		height: 48px;
-		line-height: 48px;
+		height: 60px;
+		line-height: 60px;
 		display: flex;
 		justify-content: space-between;
 		

@@ -195,7 +195,7 @@
 
 <style lang="scss" scoped>
 	.menu {
-		position: absolute;
+		position: fixed;
 		width: 100%;
 		bottom: 0;
 		height: 48px;

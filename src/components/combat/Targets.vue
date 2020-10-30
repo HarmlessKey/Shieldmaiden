@@ -72,10 +72,11 @@
 								</span>
 
 								<div class="target" 
-									@mousedown="start($event, entity.key)" 
+									@mousedown="start($event, entity.key)"
+									@touchstart="start($event, entity.key)" 
 									@mouseleave="stop" 
 									@mouseup="stop" 
-									@touchend="stop" 
+									@touchcancel="stop" 
 									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
 									<TargetItem :item="entity.key" :i="i" :initiative="true" />
 								</div>

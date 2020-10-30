@@ -43,7 +43,7 @@
 				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
-				<!-- <div v-if="toHit" class="advantage d-flex justify-content-between">
+				<div v-if="toHit" class="advantage d-sm-none d-flex justify-content-between">
 					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
 						Advantage
@@ -52,8 +52,8 @@
 						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
 						Disadvantage
 					</button>
-				</div> -->
-				<p class="mt-3">
+				</div>
+				<p class="mt-3 d-none d-sm-block">
 					<q-icon name="info" size="sm"/> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
 				</p>
 				
@@ -367,7 +367,7 @@
 				var critInfo = '';
 				var highest = 0;
 				var lowest = undefined;
-				let advantage = undefined;
+				let advantage = this.advantage;
 
 				if(e.shiftKey) {
 					advantage = "advantage";
@@ -712,6 +712,8 @@
 		}
 	}
 	.advantage {
+		margin-top: 20px;
+
 		.btn {
 			width: 48%;
 		}

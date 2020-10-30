@@ -415,9 +415,9 @@ html body {
 	}
 
 	.scroll {
-		overflow: auto;
-		max-height: 100%;
-		word-wrap: break-word;
+		&::-webkit-scrollbar {
+			display: none !important;
+		}
 	}
 
 	.openSlot {
@@ -1365,13 +1365,7 @@ html body {
 	}
 
 	@media only screen and (max-width: 575px) {
-		ul.entities li .actions {
-			margin-right: 20px;
 
-			a {
-				background: $gray-active;
-			}
-		}
 		table tr td .actions {
 			display: none !important;
 			background-color: $gray-darker;

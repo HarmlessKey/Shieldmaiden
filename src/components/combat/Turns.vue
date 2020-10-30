@@ -1,37 +1,39 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 		<h1>
-			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-chevron-left"></i></router-link>
+			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-angle-left"></i></router-link>
 			<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
 			<a class="edit">
 				<i class="fas fa-cog"></i>
-				<q-menu square>
-					<q-list>
-						<q-item>
-							<q-item-section>
-								<b>{{ encounter.encounter }}</b>
-							</q-item-section>
-						</q-item>
-						<q-separator />
-						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
-							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-							<q-item-section>Settings</q-item-section>
-						</q-item>
-						<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
-							<q-item-section>Track settings</q-item-section>
-						</q-item>
-						<q-item clickable v-close-popup v-if="demo" @click="reload">
-							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
-							<q-item-section>Reset encounter</q-item-section>
-						</q-item>
-						<q-separator />
-						<q-item clickable v-close-popup @click="confirmFinish()">
-							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
-							<q-item-section>End encounter</q-item-section>
-						</q-item>
-					</q-list>
-				</q-menu>
+				<q-popup-proxy square :breakpoint="576">
+					<div class="bg-gray gray-light">
+						<q-list>
+							<q-item>
+								<q-item-section>
+									<b>{{ encounter.encounter }}</b>
+								</q-item-section>
+							</q-item>
+							<q-separator />
+							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
+								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+								<q-item-section>Settings</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+								<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
+								<q-item-section>Track settings</q-item-section>
+							</q-item>
+							<q-item clickable v-close-popup v-if="demo" @click="reload">
+								<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
+								<q-item-section>Reset encounter</q-item-section>
+							</q-item>
+							<q-separator />
+							<q-item clickable v-close-popup @click="confirmFinish()">
+								<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+								<q-item-section>End encounter</q-item-section>
+							</q-item>
+						</q-list>
+					</div>
+				</q-popup-proxy>
 			</a>
 
 			<!-- BROADCASTING -->

@@ -91,7 +91,7 @@ export const dice = {
 							clearInterval(timer);
 					}
 			}, stepTime);
-		}
+		},
 		calcAverage(value, amount = 1) {
 			return Math.ceil(((value + 1)/2)*amount);
 		}

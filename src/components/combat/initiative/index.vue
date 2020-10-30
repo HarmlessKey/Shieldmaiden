@@ -49,7 +49,7 @@
 			Initiative
 
 			<a @click="set_turn({turn: 0, round: 1})">
-				Start
+				Start <i class="far fa-angle-right"></i>
 			</a>
 		</div>
 		<q-tab-panels
@@ -60,12 +60,17 @@
       class="transparent-bg"
     >
       <q-tab-panel name="players">
+				<h2>Players</h2>
         <Players :players="_players" />
       </q-tab-panel>
       <q-tab-panel name="npcs">
+				<h2>NPC's</h2>
         <NPCs :npcs="_npcs" />
       </q-tab-panel>
       <q-tab-panel name="overview">
+				<a class="btn btn-block" @click="set_turn({turn: 0, round: 1})">
+					Start encounter
+				</a>
         <Overview :active="_active" :idle="_idle" />
       </q-tab-panel>
 		</q-tab-panels>
@@ -184,7 +189,7 @@
 
 <style lang="scss" scoped>
 #container {
-	padding:10px;
+	padding: 10px;
 	width: 100vw;
 	height: calc(100% - 50px);
 	display: grid;
@@ -226,9 +231,6 @@
 	.set {
 		grid-area: set;
 	}
-	ul.entities {
-		padding:0 15px 0 10px;
-	}
 }
 .initiative-move {
   transition: transform .5s;
@@ -243,9 +245,6 @@
 		"players"
 		"npcs"
 		"set";
-	}
-	.players, .npcs, .set, .q-scrollarea {
-		overflow: visible !important;
 	}
 }
 

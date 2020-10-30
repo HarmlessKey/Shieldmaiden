@@ -85,7 +85,7 @@
 
 					<q-input 
 						dark filled square
-						label="Armor class"
+						label="Max HP"
 						autocomplete="off"
 						class="mr-1"
 						type="number" 
@@ -99,7 +99,7 @@
 
 					<q-input 
 						dark filled square
-						label="Armor class"
+						label="Current HP"
 						autocomplete="off"
 						type="number" 
 						name="maxHp" 

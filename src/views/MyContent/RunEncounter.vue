@@ -257,6 +257,9 @@
 			this.removeTrack()
 			next();
 		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
+		},
 		methods: {
 			...mapActions([
 				'init_Encounter',

@@ -59,8 +59,7 @@
 </template>
 
 <script>
-	import _ from 'lodash';
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapActions } from 'vuex';
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 

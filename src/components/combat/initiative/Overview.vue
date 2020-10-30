@@ -82,7 +82,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
 
 	export default {

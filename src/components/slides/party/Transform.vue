@@ -1,29 +1,34 @@
 <template>
 	<div class="pb-5">
 		<h2>Transform</h2>
-
-		<q-input 
-			dark filled square dense
-			label="Armor class"
-			autocomplete="off"
-			type="number" 
-			name="ac" 
-			v-model="transAc"
-			v-validate="'required'"
-		/>
-		<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-
-		<q-input 
-			dark filled square dense
-			label="Hit points"
-			autocomplete="off"
-			type="number" 
-			name="maxHp" 
-			v-model="transHp"
-			v-validate="'required'"
-			class="my-2"
-		/>
+		
+		<div class="row q-col-gutter-md mb-2">
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="Armor class"
+					autocomplete="off"
+					type="number" 
+					name="ac" 
+					v-model="transAc"
+					v-validate="'required'"
+				/>
+			</div>
+			
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="Hit points"
+					autocomplete="off"
+					type="number" 
+					name="maxHp" 
+					v-model="transHp"
+					v-validate="'required'"
+				/>
+			</div>
+		</div>
 		<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+		<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 		<button class="btn btn-block mb-3" @click="edit()">Transform</button>
 		<small>
 			Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 

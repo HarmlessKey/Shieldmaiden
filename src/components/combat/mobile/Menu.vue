@@ -4,6 +4,7 @@
 			Select a target
 		</div>
 		<q-tabs
+			v-else
 			dark
 			inline-label
 			no-caps

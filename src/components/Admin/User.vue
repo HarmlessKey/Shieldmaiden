@@ -3,12 +3,12 @@
 		<Crumble :name="user.username" />
 
 		<div class="container">
-			<b-row>
-				<b-col md="4">
+			<div class="row q-col-gutter-md">
+				<div class="col-12 col-md-4">
 					<h1>{{ user.username }}</h1>
 					<p><i class="gray-hover">{{ id }}</i></p>
-				</b-col>
-				<b-col md="4">
+				</div>
+				<div class="col-12 col-md-4">
 					<h2>Status</h2>
 					<p v-if="status.state">
 						<i :class="{ 'green': status.state == 'online', 'gray-hover': status.state == 'offline' }" class="fas fa-circle"></i>
@@ -16,21 +16,21 @@
 						<span v-if="status.state == 'offline'">Last online: {{ makeDate(status.last_changed) }}</span>
 					</p>
 					<p v-else>Unknown</p>
-				</b-col>
-				<b-col md="4">
+				</div>
+				<div class="col-12 col-md-4">
 					<h2>Broadcasting</h2>
 					<p> 
 						<router-link :to="'/user/' + id">
 							<div class="live" :class="{ 'active': broadcast.live }">Live</div>
 						</router-link>
 					</p>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 
 			<hr>
 
-			<b-card-group deck>
-				<b-card header="DM Data">
+			<hk-card-deck class="mb-3">
+				<hk-card header="DM Data">
 					<p class="data">
 						<span class="type">Campaigns: </span> 
 						<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
@@ -48,64 +48,65 @@
 						<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
 						<template v-else>0</template><br/>
 					</p>
-				</b-card>
-				<b-card header="Following">
+				</hk-card>
+				<hk-card header="Following">
 					<ul class="entities">
 						<li v-for="(followed, key) in user.followed" :key="key">
 							{{ followed }}
 						</li>
 					</ul>
-				</b-card>
-				<b-card header="Player Characters">
+				</hk-card>
+				<hk-card header="Player Characters">
 					<ul class="entities" v-if="!loading_characters">
 						<li v-for="(character, key) in characters" :key="key">
 							{{ character.character_name }}
 						</li>
 					</ul>
 					<div v-else class="loader"> <span>Loading characters....</span></div>
-				</b-card>
-			</b-card-group>
+				</hk-card>
+			</hk-card-deck>
 
-			<b-card header="Voucher">
+			<hk-card header="Voucher">
 				<h3>Gift user a subscription</h3>
-			
-				<b-row class="mb-3">
-					<label class="col-md-2">Tier</label>
-					<b-col md="3">
-						<b-select v-model="voucher.id">
-							<option v-for="(tier, key) in tiers" :key="key" :value="tier['.key']">{{ tier.name }}</option>
-						</b-select>
-					</b-col>
-				</b-row>
-				<b-row class="mb-3">
-					<label class="col-md-2">Duration</label>
-					<b-col md="3">
-						<b-radio-group name="duration" v-model="duration">
-							<b-form-radio value="date">Till date</b-form-radio><br/>
-							<b-form-radio value="infinite">Till cancelled</b-form-radio>
-						</b-radio-group>
-					</b-col>
-				</b-row>
-				<b-row class="mb-3">
-					<label class="col-md-2">Date</label>
-					<b-col md="3" v-if="duration == 'date'">
-						<b-form-input type="text"
-						v-validate="'required'"
-						data-vv-as="Date" 
-						name="date" 
-						placeholder="mm/dd/yyyy"
-						v-model="voucher.date"/>
-						<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
-					</b-col>
-				</b-row>
-				<b-row class="mb-3">
-					<label class="col-md-2">Message</label>
-					<b-col>
-						<b-form-textarea rows="3" v-model="voucher.message" name="message" placeholder="message" />
-					</b-col>
-				</b-row>
+
+				<q-select 
+					dark filled square dense
+					emit-value
+					map-options
+					label="Tier"
+					v-model="voucher.id"
+					:options="Object.values(tiers)"
+					option-label="name"
+					option-value=".key"
+				>
+				</q-select>
+				
+				<q-option-group
+					v-model="duration"
+					:options="duration_options"
+				/>
+
+				<q-input 
+					v-if="duration === 'date'"
+					dark filled square dense
+					label="Date"
+					type="text"
+					v-validate="'required'"
+					data-vv-as="Date" 
+					name="date" 
+					placeholder="mm/dd/yyyy"
+					v-model="voucher.date"/>
+				<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
+
+				<q-input 
+					dark filled square dense
+					label="Message"
+					v-model="voucher.message" 
+					name="message" 
+					autogrow
+				/>
 				<a class="btn" @click="setVoucher()">Save</a>
-			</b-card>
+			</hk-card>
 		</div>
 	</div>
 </template>
@@ -136,7 +137,17 @@
 				loading_characters: true,
 				duration: 'date',
 				characters: {},
-				user: undefined
+				user: undefined,
+				duration_options: [
+					{
+						value: 'date',
+						label: 'Till date'
+					},
+					{
+						value: 'infinite',
+						label: 'Till cancelled'
+					}
+				]
 			}
 		},
 		firebase() {
@@ -193,6 +204,16 @@
 			});
 		},
 		computed: {
+			tiersArray() {
+				let array = [];
+				for(const value of Object.values(this.tiers)) {
+					array.push({
+						value: value['.key'],
+						label: value.name
+					});
+				}
+				return array;
+			},
 			encounter_count() {
 				var count = 0;
 				

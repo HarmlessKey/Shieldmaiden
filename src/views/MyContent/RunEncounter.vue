@@ -1,63 +1,95 @@
 <template>
-	<div v-if="overencumbered && demo">
-		<OverEncumbered/>
+	<div ref="encounter">
+		<div v-if="overencumbered && demo">
+			<OverEncumbered/>
+		</div>
+		<div 
+			class="combat-wrapper"
+			v-else-if="encounter && (players || demo)"  
+			:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
+		>	
+			<!-- DESKTOP -->
+			<template v-if="width > 576">
+				<template v-if="encounter.finished">
+					<Finished v-if="!demo" :encounter="encounter"/>
+					<DemoFinished v-else />
+				</template>
+
+				<template v-else>
+					<SetInitiative 
+						v-if="encounter.round === 0"
+						:_active="_active"
+						:_idle="_idle"
+						:width="width"
+					/>
+					<div v-else class="desktop">
+						<Turns 
+							:active_len="Object.keys(_active).length"
+							:current="_active[encounter.turn]"
+							:next="_active[encounter.turn + 1]"
+						/>
+						{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
+						<Current 
+							:current="_active[encounter.turn]"
+							:next="next"
+							:settings="settings"
+						/>
+						<Targets 
+							:_active = "_active"
+							:_idle = "_idle"
+						/>
+						<Targeted />
+						<Side />
+					</div>
+				</template>
+
+				<DemoOverlay v-if="demo" />
+			</template>
+
+			<!-- MOBILE -->
+			<template v-else>
+				<SetInitiative 
+					v-if="encounter.round === 0"
+					:_active="_active"
+					:_idle="_idle"
+					:width="width"
+				/>
+				<div v-else class="mobile">
+					<Turns 
+						:active_len="Object.keys(_active).length"
+						:current="_active[encounter.turn]"
+						:next="_active[encounter.turn + 1]"
+					/>
+					
+					<Targets
+						:_active = "_active"
+						:_idle = "_idle"
+					/>
+
+					<div>
+						<Menu :entities="entities" :settings="settings" :current="_active[encounter.turn]" />
+					</div>
+				</div>
+			</template>
+		</div>
 	</div>
-	<div 
-		class="combat-wrapper"
-		v-else-if="encounter && (players || demo)"  
-		:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
-	>	
-		<template v-if="encounter.finished">
-			<Finished v-if="!demo" :encounter="encounter"/>
-			<DemoFinished v-else />
-		</template>
-
-		<template v-else>
-			<SetInitiative 
-				v-if="encounter.round === 0"
-				:_active = "_active"
-				:_idle = "_idle"
-			/>
-			<div v-else class="combat">
-				<Turns 
-					:active_len="Object.keys(_active).length"
-					:current="_active[encounter.turn]"
-					:next="_active[encounter.turn + 1]"
-				/>
-				{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
-				<Current 
-					:current="_active[encounter.turn]"
-					:next="next"
-					:settings="settings"
-				/>
-				<Targets 
-					:_active = "_active"
-					:_idle = "_idle"
-				/>
-				<Targeted />
-				<Side />
-			</div>
-		</template>
-
-		<DemoOverlay v-if="demo" />
-	</div>
-
 </template>
 
 <script>
-	import _ from 'lodash'
-	import { mapActions, mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	import _ from 'lodash';
+	import { mapActions, mapGetters } from 'vuex';
+	import { db } from '@/firebase';
 
 	import Finished from '@/components/combat/Finished.vue';
 	import DemoFinished from '@/components/combat/DemoFinished.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import Turns from '@/components/combat/Turns.vue';
+	import Menu from '@/components/combat/mobile/Menu.vue';
 	import Current from '@/components/combat/Current.vue';
 	import Targets from '@/components/combat/Targets.vue';
 	import Targeted from '@/components/combat/Targeted.vue';
 	import Side from '@/components/combat/side/Side.vue';
-	import SetInitiative from '@/components/combat/SetInitiative.vue';
+	import SetInitiative from '@/components/combat/initiative';
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
 
@@ -71,6 +103,7 @@
 			DemoFinished,
 			Actions,
 			Turns,
+			Menu,
 			Current,
 			Targets,
 			Targeted,
@@ -87,6 +120,7 @@
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				alive: undefined,
+				width: 0
 			}
 		},
 		firebase() {
@@ -103,6 +137,11 @@
 			}
 		},
 		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid,
@@ -226,6 +265,9 @@
 				'reset_store',
 				'setSlide'
 			]),
+			setSize() {
+				this.width = this.$refs.encounter.clientWidth;
+			},
 			track() {
 				db.ref('broadcast/' + this.userId).update({
 					campaign: this.$route.params.campid,
@@ -269,13 +311,13 @@
 		margin-top: 30px;
 		background: rgba(38, 38, 38, .9) !important;
 	}
-	.combat {
+	.desktop {
 		padding: 5px;
 		width: 100%;
 		height: calc(100% - 50px);
 		display: grid;
 		grid-template-columns: 3fr 4fr 3fr 2fr;
-		grid-template-rows: 60px auto;
+		grid-template-rows: 60px 1fr;
 		grid-gap: 5px;
 		grid-template-areas:
 		"turns turns turns turns"
@@ -296,23 +338,37 @@
 			margin-bottom: 15px !important;
 		}
 	}
+
+	.mobile {
+		height: 100%;
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: 60px 1fr 48px;
+		grid-template-areas:
+		"turns"
+		"targets"
+		"menu";
+
+		#turns {
+			z-index: 99;
+			border-bottom: solid 1px#191919;
+		}
+	}
+
 	@media only screen and (max-width: 1000px) {
-		.combat {
+		.desktop {
 			grid-template-columns: 2fr 3fr 2fr;
 			grid-template-areas:
 			"turns turns turns"
 			"current targets targeted";
 		}
 	}
-	@media only screen and (max-width: 600px) {
-		.combat {
-			grid-template-columns: 1fr;
-			grid-template-rows: 60px auto;
+	@media only screen and (max-width: 900px) {
+		.desktop {
+			grid-template-columns: 1fr 1fr;
 			grid-template-areas:
-			"turns"
-			"current"
-			"targets"
-			"targeted";
+			"turns turns turns"
+			"current targets";
 		}
 	}
 }

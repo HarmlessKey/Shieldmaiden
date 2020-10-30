@@ -1,70 +1,65 @@
-<!-- EDIT PLAYER -->
+<!-- EDIT COMPANION -->
 
 <template>
 	<div class="pb-5" v-if="entity && !demo">
 		<h2 class="d-flex justify-content-between">
 			<span>Edit {{ npcBase.name }}</span>
-		</h2>
-				
-		<b-row class="mb-3">
-			<b-col class="col-4">
-				<label>Initiative</label>
-			</b-col>
-			<b-col>
-				<b-form-input 
-					class="text-center"
-					type="number" 
-					name="initiative"
-					min="0"
-					v-model="initiative['.value']"
-					:class="{'input': true, 'error': errors.has('initiative') }"
-					v-validate="'required'"
-					placeholder="Initiative"></b-form-input>
-					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
-			</b-col>
-		</b-row>
-		
-		<h2>Temporary</h2>
-		<b-row class="mb-2">
-			<b-col class="text-center">
-				<label>AC Bonus</label>
-				<b-form-input 
-					class="text-center"
+		</h2>	
+
+		<q-input 
+			dark filled square dense
+			label="initiative"
+			type="number" 
+			name="initiative"
+			min="0"
+			v-model="initiative['.value']"
+			:class="{'input': true, 'error': errors.has('initiative') }"
+			v-validate="'required'"
+		/>
+		<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
+
+		<h2 class="mt-2">Temporary</h2>
+		<div class="row q-col-gutter-md mb-2">
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="AC Bonus"
 					type="number" 
 					name="ac_bonus" 
 					v-model="entity.ac_bonus"
-					placeholder="AC Bonus"></b-form-input>
-			</b-col>
+				/>
+			</div>
 
-			<b-col class="text-center">
-				<label>Temp HP</label>
-				<b-form-input 
-					class="text-center"
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					label="Temp HP"
 					type="number" 
 					name="tempHp" 
 					v-model="entity.tempHp"
-					placeholder="Temporary Hit Points"></b-form-input>
-			</b-col>
+				/>
+			</div>
 
-			<b-col class="text-center" v-if="!entity.transformed">
-				<label>Max HP Mod</label>
-				<b-form-input 
-					class="text-center"
+			<div class="col" v-if="!entity.transformed">
+				<q-input 
+					dark filled square dense
+					label="Max HP mod"
 					type="number" 
 					name="maxHpMod" 
 					v-model="maxHpMod"
-					placeholder="Max HP modifier"></b-form-input>
-			</b-col>
-		</b-row>
+				/>
+			</div>
+		</div>
 
 		<template>
 			<hr>
 			<h2 class="mb-0">Override</h2>
-			<b-row class="my-2">
-				<b-col class="text-center">
-					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Cur HP</label>
+			<div class="row q-col-gutter-md my-2">
+				<div class="col">
 					<template v-if="entity.transformed">
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Current HP"
 							class="text-center"
 							type="number" 
 							name="t-curHp" 
@@ -72,11 +67,19 @@
 							v-model="entity.transformed.curHp"
 							v-validate="'required|numeric|min:1'"
 							data-vv-as="Current HP"
-							placeholder="Current Hit Points"/>
+						>
+							<q-icon slot="prepend" name="fas fa-paw-claws green">
+								<q-tooltip anchor="top middle" self="center middle">
+									Transformed
+								</q-tooltip>
+							</q-icon>
+						</q-input>
 						<p class="validate red" v-if="errors.has('t-curHp')">{{ errors.first('t-curHp') }}</p>
 					</template>
 					<template v-else>
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Current HP"
 							class="text-center"
 							type="number" 
 							name="curHp" 
@@ -84,16 +87,16 @@
 							v-model="entity.curHp"
 							v-validate="'required|numeric'"
 							data-vv-as="Current HP"
-							placeholder="Current Hit Points">
-						</b-form-input>
+						/>
 						<p class="validate red" v-if="errors.has('curHp')">{{ errors.first('curHp') }}</p>
 					</template>
-				</b-col>
+				</div>
 
-				<b-col class="text-center">
-					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> Max HP</label>
+				<div class="col">
 					<template v-if="entity.transformed">
-						<b-form-input 		
+						<q-input
+							dark filled square dense
+							label="Max HP"
 							class="text-center"
 							type="number" 
 							name="t-maxHp" 
@@ -101,52 +104,64 @@
 							v-model="entity.transformed.maxHp"
 							v-validate="'required|numeric'"
 							data-vv-as="Maximum HP"
-							placeholder="Maximum Hit Points"/>
+						>
+							<q-icon slot="prepend" name="fas fa-paw-claws green">
+								<q-tooltip anchor="top middle" self="center middle">
+									Transformed
+								</q-tooltip>
+							</q-icon>
+						</q-input>
 						<p class="validate red" v-if="errors.has('t-maxHp')">{{ errors.first('t-maxHp') }}</p>
 					</template>
 					<template v-else>
-						<b-form-input 
-							class="text-center"
+						<q-input 
+							dark filled square dense
+							label="Max HP"
 							type="number" 
 							name="maxHp" 
 							min="1"
 							v-model="npcBase.maxHp"
 							v-validate="'required|numeric'"
 							data-vv-as="Maximum HP"
-							placeholder="Maximum Hit Points"/>
+						/>
 						<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 					</template>
-				</b-col>
-			</b-row>
-			<b-row>
-				<b-col class="text-center">
-					<label><i class="fas fa-paw-claws green" v-if="entity.transformed"></i> AC</label>
+				</div>
+				<div class="col">
 					<template v-if="entity.transformed">
-						<b-form-input 
-							class="text-center"
+						<q-input 
+							dark filled square dense
+							label="Armor class"
 							type="number" 
 							name="t-ac" 
 							min="1"
 							v-model="entity.transformed.ac"
 							v-validate="'required|numeric'"
 							data-vv-as="Amor Class"
-							placeholder="Armor Class"/>
+						>
+							<q-icon slot="prepend" name="fas fa-paw-claws green">
+								<q-tooltip anchor="top middle" self="center middle">
+									Transformed
+								</q-tooltip>
+							</q-icon>
+						</q-input>
 						<p class="validate red" v-if="errors.has('t-ac')">{{ errors.first('t-ac') }}</p>
 					</template>
 					<template v-else>
-						<b-form-input 
-							class="text-center"
+						<q-input 
+							dark filled square dense
+							label="Armor class"
 							type="number" 
 							name="ac" 
 							min="1"
 							v-model="npcBase.ac"
 							v-validate="'required|numeric'"
 							data-vv-as="Amor Class"
-							placeholder="Armor Class"/>
+						/>
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 					</template>
-				</b-col>
-			</b-row>
+				</div>
+			</div>
 		</template>
 
 		<button class="btn btn-block my-3" @click="edit()">Save</button>

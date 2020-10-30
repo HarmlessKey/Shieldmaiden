@@ -52,7 +52,7 @@ export const experience = {
 				let currentAmount = xp - this.xpTable[level].xp;
 				let neededAmount = this.xpTable[level + 1].xp - this.xpTable[level].xp;
 
-				return Math.floor(currentAmount / neededAmount * 100);
+				return currentAmount / neededAmount;
 			}
 
 		}

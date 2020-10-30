@@ -1,6 +1,6 @@
 <template>
-	<div class="card">
-		<div class="card-header d-flex justify-content-between">
+	<hk-card>
+		<div slot="header" class="card-header d-flex justify-content-between">
 			<span>Edit Spell Action</span>
 			<a 
 			class="gray-hover text-capitalize" 
@@ -9,204 +9,126 @@
 				<span class="d-none d-md-inline ml-1">Save</span>
 			</a>
 		</div>
-		<div class="card-body">
-			<b-row>
-				<!-- ACTION TYPE -->
-				<b-col md="3">
-					<label class="required" for="attack_type">Action Type</label>
-					<b-form-select v-model="spell_action.type"
-						id="action_type"
-						name="action_type"
-						title="Action Type"
-						class="form-control mb-2"
-						v-validate="'required'"
-						data-vv-as="Action Type"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Action Type -</option>
-						<option v-for="({ label, value}) in attack_type"
-							:key="value" :value="value" selected="selected">{{label}}</option>
-					</b-form-select>
-					<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
-				</b-col>
-				<!-- ACTION NAME -->
-				<b-col md="3">
-					<label for="name">Action Name</label>
-					<b-form-input v-model="spell_action.name"
-						autocomplete="off"
-						id="name"
-						name="name"
-						class="form-control mb-2"
-						title="Action Name"
-						v-validate="'max:100'"
-						data-vv-as="Action Name"
-						@keyup="$forceUpdate()"
-						></b-form-input>
-				</b-col>
-				<!-- SAVE -->
-				<b-col md="2">
-					<label for="save">Save</label>
-					<b-form-select v-model="spell_action.save"
-						:disabled="spell_action.type != 'spell save'"
-						id="save"
-						name="save"
-						title="Save"
-						class="form-control mb-2"
-						data-vv-as="Save"
-						@change="$forceUpdate()">
-						<option :value="undefined" disabled>- Save -</option>
-						<option v-for="({ label, value}) in save"
-							:key="value" :value="value">{{label}}</option>
-					</b-form-select>
-				</b-col>
-				<!-- Free cast -->
-				<b-col md="2">
-					<label for="free">
-						<span>Free</span>
-						<a 
-							class="ml-1"
-							v-b-popover.hover.top="'Select this, if the spell action can be used without expending a spell slot.'" 
-							title="Free"
-						>
-							<i class="fas fa-info-circle"></i>
-						</a>
-					</label>
-					<div class="free d-flex justify-content-between" name="free">
-						<a class="component_box" @click="setFree(spell_action)"
-							:class="{'selected': spell_action.free === true}">
-							<span>F</span>
-						</a>
-					</div>
-				</b-col>
-				<!-- Seperate cast -->
-				<b-col md="2">
-					<label for="seperate">
-						<span>Sep.</span>
-						<a 
-							class="ml-1"
-							v-b-popover.hover.top="'Select this, if the spell action can be rolled seperately from the rest of the actions.'" 
-							title="Seperate"
-						>
-							<i class="fas fa-info-circle"></i>
-						</a>
-					</label>
-					<div class="seperate d-flex justify-content-between" name="seperate">
-						<a class="component_box" @click="setSeperate(spell_action)"
-							:class="{'selected': spell_action.seperate === true}">
-							<span>S</span>
-						</a>
-					</div>
-				</b-col>
-			</b-row>
-
-			<!-- MODIFIERS, CONDITIONS & REMINDERS -->
-			<ul class="nav nav-tabs" id="myTab" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" 
-						id="modifiers-tab" 
-						data-toggle="tab" 
-						role="tab" 
-						href="#modifiers"
-						aria-controls="modifiers" 
-						aria-selected="true">
-						<i class="fas fa-dice-d20"></i>
-						<span class="d-none d-md-inline ml-1">Modifiers</span>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" 
-						id="Conditions-tab" 
-						data-toggle="tab" 
-						role="tab" 
-						href="#conditions"
-						aria-controls="Conditions" 
-						aria-selected="false">
-						<i class="fas fa-flame"></i>
-						<span class="d-none d-md-inline ml-1">Conditions</span>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" 
-						id="notifications-tab" 
-						data-toggle="tab" 
-						role="tab" 
-						href="#notifications"
-						aria-controls="notifications" 
-						aria-selected="false">
-						<i class="fas fa-bell"></i>
-						<span class="d-none d-md-inline ml-1">Notifications</span>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" 
-						id="effects-tab" 
-						data-toggle="tab" 
-						role="tab" 
-						href="#effects"
-						aria-controls="effects" 
-						aria-selected="false">
-						<i class="fas fa-hand-holding-magic"></i>
-						<span class="d-none d-md-inline ml-1">Effects</span>
-					</a>
-				</li>
-			</ul>
-			<div class="tab-content">
-				<div class="tab-pane fade show active" 
-					id="modifiers" 
-					role="tabpanel" 
-					aria-labelledby="Modifiers-tab"
-				>
-					<spell-action-modifiers 
-						v-model="spell_action.modifiers" 
-						:level_scaling="level_scaling"
-						:level="level"
-						:action_type="spell_action.type"
-						@validation="setValidation"
-					/>
-				</div>
-				<div class="tab-pane fade" 
-					id="conditions" 
-					role="tabpanel" 
-					aria-labelledby="Conditions-tab"
-				>
-					<spell-action-conditions
-						v-model="spell_action.conditions"
-						:level_scaling="level_scaling"
-						:level="level"
-						:action_type="spell_action.type"
-						@validation="setValidation"
-					/>
-				</div>
-				<div class="tab-pane fade" 
-					id="notifications" 
-					role="tabpanel" 
-					aria-labelledby="Notifications-tab"
-				>
-					<spell-action-notifications
-						v-model="spell_action.notifications"
-						:level_scaling="level_scaling"
-						:level="level"
-						:action_type="spell_action.type"
-						@spellUpdate="spellUpdate()"
-						@validation="setValidation"
-					/>
-				</div>
-				<div class="tab-pane fade" 
-					id="effects" 
-					role="tabpanel" 
-					aria-labelledby="effects-tab"
-				>
-					<spell-action-effects
-						v-model="spell_action.effects"
-						:level_scaling="level_scaling"
-						:level="level"
-						:action_type="spell_action.type"
-						@spellUpdate="spellUpdate()"
-						@validation="setValidation"
-					/>
-				</div>
+		<div class="row q-col-gutter-md">
+			<!-- ACTION TYPE -->
+			<div class="col-12 col-md-3">
+				<q-select 
+					dark filled square dense
+					map-options
+					emit-value
+					label="Attack type"
+					:options="attack_type"
+					v-model="spell_action.type"
+					name="action_type"
+					class="mb-2"
+					v-validate="'required'"
+					data-vv-as="Action Type"
+					@change="$forceUpdate()"
+				/>
+				<p class="validate red" v-if="errors.has('action_type')">{{ errors.first('action_type') }}</p>
+			</div>
+			<!-- ACTION NAME -->
+			<div class="col-12 col-md-3">
+				<q-input 
+					dark filled square dense
+					label="Action name"
+					v-model="spell_action.name"
+					autocomplete="off"
+					name="name"
+					class="mb-2"
+					title="Action Name"
+					v-validate="'max:100'"
+					data-vv-as="Action Name"
+					@keyup="$forceUpdate()"
+				/>
+			</div>
+			<!-- SAVE -->
+			<div class="col-12 col-md-2">
+				<q-select 
+					dark filled square dense
+					map-options
+					emit-value
+					label="Save"
+					:options="save"
+					v-model="spell_action.save"
+					:disable="spell_action.type != 'spell save'"
+					name="save"
+					class="mb-2"
+					data-vv-as="Save"
+					@change="$forceUpdate()"
+				/>
+			</div>
+			<!-- Free cast -->
+			<div class="col-12 col-md-2">
+				<q-checkbox size="lg" dark v-model="spell_action.free" label="Free" :false-value="null" indeterminate-value="something-else">
+					<q-tooltip anchor="top middle" self="center middle">
+						Doesn't cost a spell slot
+					</q-tooltip>
+				</q-checkbox>
+			</div>
+			<!-- Seperate cast -->
+			<div class="col-12 col-md-2">
+				<q-checkbox size="lg" dark v-model="spell_action.seperate" label="Seperate" :false-value="null" indeterminate-value="something-else">
+					<q-tooltip anchor="top middle" self="center middle">
+						Can be cast seperately
+					</q-tooltip>
+				</q-checkbox>
 			</div>
 		</div>
-	</div>
+
+		<!-- MODIFIERS, CONDITIONS & REMINDERS -->
+		<q-tabs
+			v-model="tab"
+			dense dark
+			class="text-grey"
+			align="left"
+		>
+			<q-tab name="modifiers" icon="fas fa-dice-d20" />
+			<q-tab name="conditions" icon="fas fa-flame" />
+			<q-tab name="notifications" icon="fas fa-bell" />
+			<q-tab name="effects" icon="fas fa-hand-holding-magic" />
+		</q-tabs>
+		<q-tab-panels v-model="tab" dark>
+			<q-tab-panel name="modifiers">
+				<spell-action-modifiers 
+					v-model="spell_action.modifiers" 
+					:level_scaling="level_scaling"
+					:level="level"
+					:action_type="spell_action.type"
+					@validation="setValidation"
+				/>
+			</q-tab-panel>
+			<q-tab-panel name="conditions">
+				<spell-action-conditions
+					v-model="spell_action.conditions"
+					:level_scaling="level_scaling"
+					:level="level"
+					:action_type="spell_action.type"
+					@validation="setValidation"
+				/>
+			</q-tab-panel>
+			<q-tab-panel name="notifications">
+				<spell-action-notifications
+					v-model="spell_action.notifications"
+					:level_scaling="level_scaling"
+					:level="level"
+					:action_type="spell_action.type"
+					@spellUpdate="spellUpdate()"
+					@validation="setValidation"
+				/>
+			</q-tab-panel>
+			<q-tab-panel name="effects">
+				<spell-action-effects
+					v-model="spell_action.effects"
+					:level_scaling="level_scaling"
+					:level="level"
+					:action_type="spell_action.type"
+					@spellUpdate="spellUpdate()"
+					@validation="setValidation"
+				/>
+			</q-tab-panel>
+		</q-tab-panels>
+	</hk-card>
 </template>
 
 <script>
@@ -250,6 +172,7 @@ export default {
 
 	data() {
 		return {
+			tab: "modifiers",
 			attack_type: [
 				{ label: "Melee Weapon", value: "melee weapon" },
 				{ label: "Ranged Weapon", value: "ranged weapon" },

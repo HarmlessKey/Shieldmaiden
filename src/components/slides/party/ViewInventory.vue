@@ -31,13 +31,15 @@
 					<template v-if="data.row.linked_item && data.row.identified">
 						<div class="linked-item">
 							<span>Qualities</span>
-							<a data-toggle="collapse" class="collapsed" :href="`#full-item-${data.row.linked_item}`">
-								<i class="fas fa-caret-down"></i>
+							<a @click="showItem = !showItem" :class="{ collapsed: showItem }">
+								<i class="fas fa-chevron-down"></i>
 							</a>
 						</div>
-						<div class="collapse full-item" :id="`full-item-${data.row.linked_item}`">
-							<ViewItem :data="data.row.full_linked_item"/>
-						</div>
+						<q-slide-transition>
+							<div v-show="showItem" class="full-item">
+								<ViewItem :data="data.row.full_linked_item"/>
+							</div>
+						</q-slide-transition>
 					</template>
 				</div>
 			</hk-table>
@@ -63,6 +65,7 @@
 				loading: true,
 				allItems: undefined,
 				error: undefined,
+				showItem: false,
 				addCurrency: false,
 				itemColumns: {
 					public_name: {
@@ -190,9 +193,9 @@
 				i {
 					transition: transform .2s linear;
 				}
-				&.collapsed {
-					i.fa-caret-down {
-						transform: rotate(-90deg);
+				i.fa-chevron-down {
+					&.collapsed {
+					transform: rotate(-180deg);
 					}
 				}
 			}

@@ -1,85 +1,102 @@
 <template>
 	<div class="pb-5">
 		<h2>Add <span class="blue">{{ entity.name }}</span></h2>
-		<b-form-input 
+		<q-input 
+			dark filled square dense
+			autocomplete="off"
+			label="Name"
 			type="text" 
 			name="name" 
 			v-model="entity.name"
 			:class="{'input': true, 'error': errors.has('name') }"
 			v-validate="'required'"
-			placeholder="Name"></b-form-input>
-			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+			placeholder="Name"
+		/>
+		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
-		<b-row class="mb-2">
-			<b-col class="text-center">
-				<label>Init.</label>
-				<b-form-input 
+		<div class="row q-col-gutter-md mb-2">
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					autocomplete="off"
+					label="Initiative"
 					type="number" 
 					name="initiative"
 					min="0"
 					v-model="entity.initiative"
 					:class="{'input': true, 'error': errors.has('initiative') }"
 					v-validate="'required'"
-					placeholder="Initiative"
-					></b-form-input>
+				/>
 					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
-			</b-col>
-			<b-col class="text-center">
-				<label>AC</label>
-				<b-form-input 
+			</div>
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					autocomplete="off"
+					label="Armor class"
 					type="number" 
 					name="ac"
 					min="1"
 					v-model="entity.ac"
 					:class="{'input': true, 'error': errors.has('ac') }"
 					v-validate="'required'"
-					placeholder="Armor Class"></b-form-input>
-					<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-			</b-col>
-			<b-col class="text-center">
-				<label >Hit Points</label>
-				<b-form-input 
+				/>
+				<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+			</div>
+			<div class="col">
+				<q-input 
+					dark filled square dense
+					autocomplete="off"
+					label="Hit points"
 					type="number" 
 					name="maxHp"
 					min="1"
 					:class="{'input': true, 'error': errors.has('maxHp') }"
 					v-validate="'required'"
 					v-model="entity.maxHp"
-					placeholder="Hit Points"></b-form-input>
-					<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-			</b-col>
-		</b-row>
-		<label >When to add</label>
-		<b-form-group>
-			<b-form-radio-group
-				id="btn-radios-1"
-				v-model="addMoment"
-				:options="options"
-				buttons
-				name="radios-btn-default"
-			></b-form-radio-group>
-		</b-form-group>
+				/>
+				<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+			</div>
+		</div>
+		<label class="my-2">When to add</label>
+		<q-btn-toggle
+			class="mt-2"
+			v-model="addMoment"
+			spread
+			no-caps
+			flat
+			dark
+			:options="options"
+			toggle-color="primary"
+		/>
 		<hr>
 		<button class="btn btn-block mb-3" @click="add()">Add</button>
 
 		<h2>Copy an NPC from below</h2>
 		
 		<p>Search all NPC's, including your custom.</p>
-		<div class="input-group mb-3">
-			<input type="text" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control" />
-			<div class="input-group-append">
-				<button class="btn"><i class="fas fa-search"></i></button>
-			</div>
-		</div>
+		<q-input 
+			dark filled square dense
+			label="Search NPC"
+			type="text" 
+			autocomplete="off" 
+			v-model="search"
+			@keyup="searchNPC()" 
+		>
+			<q-icon slot="append" name="fas fa-search" size="xs" @click="searchNPC()" />
+		</q-input>
 		<ul class="entities">
 			<p v-if="noResult" class="red">{{ noResult }}</p>
 			<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 				<span :class="{ 'blue': npc.origin == 'custom' }">
 					{{ npc.name }}
 				</span>
-				<a class="gray-hover" v-b-tooltip.hover title="Copy NPC" @click="set(npc['.key'], npc.origin)">
+				<a class="gray-hover" @click="set(npc['.key'], npc.origin)">
 					<i class="fas fa-copy blue"></i>
 					<span class="d-none d-md-inline ml-1">Copy</span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Copy NPC
+					</q-tooltip>
 				</a>
 			</li>
 		</ul>
@@ -103,8 +120,8 @@
 				searchResults: [],
 				noResult: '',
 				options: [
-					{ text: 'Add next round', value: 'next' },
-					{ text: 'Add directly', value: 'directly' },
+					{ label: 'Add next round', value: 'next' },
+					{ label: 'Add directly', value: 'directly' },
 				],
 				addMoment: 'next'
 			}

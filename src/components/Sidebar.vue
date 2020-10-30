@@ -250,7 +250,8 @@
 			}
 
 			&.q-router-link--active {
-				i::before {					color: #2c97de !important;
+				i::before {	
+					color: #2c97de !important;
 				}
 			}
 		}

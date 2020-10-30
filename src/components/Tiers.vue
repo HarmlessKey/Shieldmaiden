@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<b-card-group deck v-if="tier">
-			<b-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
+		<hk-card-deck v-if="tier">
+			<hk-card :header="t.name" v-for="(t, key) in tiers" :key="key" :class="{ 'current': t.name == tier.name }">
 				<h2>{{ t.price }}</h2>
 				<i v-if="t.price == 'Free'" class="gray-hover sub">forever</i>
 				<i v-else class="gray-hover sub">per month</i>
@@ -37,8 +37,8 @@
 				<div slot="footer" v-if="t.price != 'Free'">
 					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" class="btn btn-block bg-patreon-red">Join {{ t.price }} tier</a>
 				</div>
-			</b-card>
-		</b-card-group>
+			</hk-card>
+		</hk-card-deck>
 		<div v-else class="loader"><span>Loading Tiers...</span></div>
 	</div>
 </template>

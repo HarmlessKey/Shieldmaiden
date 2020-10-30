@@ -1,50 +1,38 @@
 <template>
 	<div>
 		<h2>Award Experience</h2>
-		<b-form-input 
+		<q-input 
+			dark filled square dense
+			label="Amount"
 			class="text-center mb-3"
 			type="number" 
 			name="amount" 
 			v-model="amount"
-			placeholder="Amount">
-		</b-form-input>
-		
-		<b-form-group label="Award experience to:">
-				<b-form-checkbox
-				v-model="allSelected"
-				:indeterminate="indeterminate"
-				aria-describedby="flavours"
-				aria-controls="flavours"
-				@change="toggleAll"
-				>
-					{{ allSelected ? "Un-select All" : "Select All" }}
-				</b-form-checkbox>
+		/>
 
-			<b-form-checkbox-group
-				class="ml-4"
-				id="players"
-				name="players"
-				v-model="awardTo"
-				stacked
+		<h3 class="mt-3">Award experience to:</h3>
+		<div v-for="(player, key) in campaign.players" :key="key">
+			<q-checkbox 
+				dark
+				v-model="awardTo" 
+				:val="key" 
 			>
-				<b-form-checkbox :value="key" v-for="(player, key) in campaign.players" :key="key">			
-					{{ players[key].character_name  }} 
-					<span v-if="amount && awardTo.includes(key)" class="ml-2 gray-hover">
-						({{ ((awardPlayer() &lt; 0) ? "" : "+") + awardPlayer() }})
-					</span>
-				</b-form-checkbox>
-			</b-form-checkbox-group>
-		</b-form-group>
+				{{ players[key].character_name }}
+				<span v-if="amount && awardTo.includes(key)" class="ml-2 blue">
+					({{ ((awardPlayer() &lt; 0) ? "" : "+") + awardPlayer() }})
+				</span>
+			</q-checkbox>
+		</div>
 
-		<b-form-group>
-			<b-form-radio-group
-				id="btn-radios-1"
-				v-model="awardType"
-				:options="options"
-				buttons
-				name="radios-btn-default"
-			></b-form-radio-group>
-		</b-form-group>
+		<q-btn-toggle
+			v-model="awardType"
+			spread
+			no-caps
+			flat
+			dark
+			:options="options"
+			toggle-color="primary"
+		/>
 
 		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>
 	</div>
@@ -76,8 +64,8 @@
 				allSelected: true,
 				indeterminate: false,
 				options: [
-					{ text: 'Divide over', value: 'divide' },
-					{ text: 'Award to all', value: 'toAll' },
+					{ label: 'Divide over', value: 'divide' },
+					{ label: 'Award to all', value: 'toAll' },
 				],
 				awardType: 'divide'
 			}

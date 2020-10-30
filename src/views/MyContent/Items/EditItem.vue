@@ -4,86 +4,90 @@
 	</div>
 	<div class="content" v-else-if="item || $route.name == 'AddItem'">
 		<div class="form">
-			<b-card header="Copy Existing Item" v-if="$route.name == 'AddItem'">
-				
-				<div class="input-group mb-3">
-					<input type="text" autocomplete="off" v-model="searched" @keyup="searchItems()" placeholder="Search items" class="form-control"/>
-					<div class="input-group-append">
-						<button class="btn" @click="searchItems()"><i class="fas fa-search"></i></button>
-					</div>
-				</div>
+			<hk-card header="Copy Existing Item" v-if="$route.name == 'AddItem'">
+				<q-input 
+					dark filled square dense
+					label="Search items"
+					type="text" 
+					autocomplete="off" 
+					v-model="searched"
+					@keyup="searchItems()" 
+				>
+					<q-icon slot="append" name="fas fa-search" class="pointer" size="xs" @click="searchItems()" />
+				</q-input>
 				<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
 				<ul class="entities mt-3" v-if="foundItems">
 					<li  v-for="(item, index) in foundItems" :key="'item-'+index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="setSlide({show: true, type: 'ViewItem', data: item})" class="mr-2" v-b-tooltip.hover title="Show Info">
-								<i class="fas fa-info-circle"></i></a>
+							<a @click="setSlide({show: true, type: 'ViewItem', data: item})" class="mr-2">
+								<i class="fas fa-info-circle"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Show info
+								</q-tooltip>
+							</a>
 							{{ item.name }}
 						</div>
-						<a class="gray-hover" 
-							v-b-tooltip.hover title="Copy Item" 
-							@click="copy(item)">
+						<a class="gray-hover" @click="copy(item)">
 							<i class="fas fa-copy blue"></i>
 							<span class="d-none d-md-inline ml-1">Copy</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Copy item
+							</q-tooltip>
 						</a>
 					</li>
 				</ul>
-			</b-card>
+			</hk-card>
 		
-			<b-card header="Your Item">
-				<b-row>
-					<b-col sm="2">
-						<span class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></span>
-						<span class="img" v-else>
-							<img src="@/assets/_img/styles/axe.svg" />
-						</span>
-					</b-col>
-					<b-col sm="10" class="mb-3">
-				
-						<!-- NAME -->
-						<label for="name">Name *</label>
-						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Name"
+			<hk-card header="Your Item">
+				<!-- NAME -->
+				<q-input 
+					dark filled square dense
+					label="Name"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="item.name" 
+					v-validate="'max:100|required'" 
+					maxlength="100"
+					data-vv-as="Name"
+					id="name"
+					name="name" 
+				/>
+				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+			
+				<!-- IMAGE -->
+				<div class="avatar">
+					<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
+					<div class="img" v-else>
+						<img src="@/assets/_img/styles/axe.svg" />
+					</div>
+					<div>
+						<q-input 
+							dark filled square
+							label="image"
+							autocomplete="off"  
 							type="text" 
-							class="form-control mb-2" 
-							:class="{'input': true, 'error': errors.has('name') }" 
-							v-model="item.name" 
-							v-validate="'max:100|required'" 
-							maxlength="100"
-							data-vv-as="Name"
-							id="name"
-							name="name" 
-							placeholder="Name*"></b-form-input>
-						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-					
-
-						<!-- IMAGE -->
-						<label for="image">Image</label>
-						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="image"
-							type="text" 
-							class="form-control" 
-							:class="{'input': true, 'error': errors.has('image') }" 
 							v-model="item.image" 
 							v-validate="'url'" 
 							data-vv-as="image"
 							name="image" 
 							id="image"
-							placeholder="Image URL"></b-form-input>
+							placeholder="Image URL"
+						/>
 						<p class="validate red" v-if="errors.has('image')">{{ errors.first('image') }}</p>
-					</b-col>
-				</b-row>
+					</div>
+				</div>
 
-				<label for="description">Description</label>
-				<b-textarea
+				<q-input
+					dark filled square dense
+					label="Description"
+					autogrow
 					class="mb-4"
 					autocomplete="off"  
 					type="text" 
-					rows="8"
 					v-model="item.desc" 
 					name="image" 
 					id="image"
-					placeholder="Description"
 				/>
 
 				<!-- TABLE -->
@@ -92,13 +96,17 @@
 						<i class="fal fa-table"></i> Info Tables
 					</span>
 					<span class="d-flex justify-content-end">
-						<b-input 
+						<q-input 
+							dark filled square dense
+							label="Columns"
 							type="number" 
 							v-validate="'numeric|max_value:10|min_value:1'" 
 							max="10"
 							min="1"
 							name="columns"
-							placeholder="columns" v-model="columns" />
+							v-model="columns"
+							class="mr-2"
+						/>
 						
 						<a @click="!errors.has('columns') ? addTable() : null" :class="{ disabled: errors.has('columns')}"><i class="fas fa-plus"></i> Add table</a>
 					</span>
@@ -111,19 +119,20 @@
 							<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
 						</h3>
 
-						<b-form-input 
+						<q-input 
+							dark filled square dense
+							label="Table name"
 							v-model="table.name" 
-							placeholder="Table name" 
 							class="mb-3"
 							name="table name"
 							v-validate="'required'" 
 						/>
 						<p class="validate red" v-if="errors.has('table name')">{{ errors.first('table name') }}</p>
 
-
 						<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
 							<div v-for="(col, i) in table.columns" :key="i" class="header">
-								<b-form-input 
+								<q-input 
+									dark filled square dense
 									v-model="table.header[i]" 
 									:placeholder="`Column header ${i+1}`"
 									v-validate="'max:100|required'"
@@ -136,7 +145,8 @@
 							<div></div>
 							<template v-for="(row, rowIndex) in table.rows">
 								<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
-									<b-form-input 
+									<q-input 
+										dark filled square dense
 										v-model="table.rows[rowIndex].columns[colIndex]" 
 										:placeholder="`Column ${colIndex+1}`"
 										v-validate="'max:100|required'"
@@ -152,7 +162,7 @@
 						<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
 					</div>
 				</template>
-			</b-card>
+			</hk-card>
 		</div>
 
 		<div class="save">
@@ -339,12 +349,19 @@
 			display: none;
 		}
 		
-		.img {
-			display: block;
-			width: 100px;
-			height: 100px;
-			background-size: cover;
-			background-position: center top;
+		.avatar {
+			display: grid;
+			grid-template-columns: 56px 1fr;
+			grid-column-gap: 10px;
+
+			.img {
+				border: solid 1px #b2b2b2;
+				display: block;
+				width: 56px;
+				height: 56px;
+				background-size: cover;
+				background-position: center top;
+			}
 		}
 		label {
 			line-height: 37px;

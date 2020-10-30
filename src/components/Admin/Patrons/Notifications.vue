@@ -10,9 +10,9 @@
 						<span>{{ notification.trigger }}</span>
 					</div>
 
-					<a v-b-toggle="'details' + key" class="mt-2">Details</a>
-					<b-collapse :id="'details' + key" class="mt-1">
-						<ul>
+					<a @click="setShow(key)" class="mt-2">Details</a>
+					<q-slide-transition>
+						<ul v-show="show === key">
 							<li><span>Entitled Amount:</span> <span>{{ notification.attributes.currently_entitled_amount_cents  / 100 | numeral('$0,0') }}</span></li>
 							<li><span>Name:</span> <span>{{ notification.attributes.full_name }}</span></li>
 							<li><span>Email:</span> <span>{{ notification.attributes.email }}</span></li>
@@ -33,7 +33,7 @@
 								</span>
 							</li>
 						</ul>
-					</b-collapse>
+					</q-slide-transition>
 
 					<div v-if="notification.trigger === 'members:pledge:delete'" class="trigger bg-red white">
 						Pledge deleted
@@ -77,7 +77,8 @@
 			return {
 				loading: true,
 				edit: false,
-				results: 20
+				results: 20,
+				show: undefined
 			}
 		},
 		firebase() {
@@ -107,7 +108,9 @@
 			},
 		},
 		methods: {
-		
+			setSHow(key) {
+				this.show = (this.show === key) ? undefined : key;
+			}
 		}
 	}
 </script>

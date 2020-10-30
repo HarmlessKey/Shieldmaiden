@@ -7,47 +7,47 @@
 			</li>
 		</ul>
 		<hr>
-		<b-row v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="current justify-content-start px-3">
-			<b-col class="col-3 p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
-				<a @click="removeReminder(key)" v-b-tooltip.hover :title="'Remove '+reminder.title" class="text-truncate d-block" :class="'bg-'+reminder.color">
+		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
+			<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
+				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
 					{{ title(reminder) }}
 					<span class="delete"><i class="fas fa-times"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						Remove {{ reminder.title }}
+					</q-tooltip>
 				</a>
-			</b-col>
-		</b-row>
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<li class="nav-item">
-				<a class="nav-link active" 
-					id="premade-tab" 
-					data-toggle="tab" 
-					href="#premade" 
-					role="tab" 
-					aria-controls="premade" 
-					aria-selected="true">
-					Premade
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" 
-					id="custom-tab" 
-					data-toggle="tab" 
-					href="#custom" 
-					role="tab" 
-					aria-controls="custom" 
-					aria-selected="false">
-					Custom
-				</a>
-			</li>
-		</ul>
+			</div>
+		</div>
 
-		<div class="tab-content">
-			<div class="tab-pane fade show active" id="premade" role="tabpanel" aria-labelledby="premade-tab">
-				<ul class="premade">
+		<q-tabs
+			v-model="tab"
+			dark
+			inline-label
+			dense
+			no-caps
+		>
+			<q-tab 
+				v-for="({name, icon, label}, index) in tabs"
+				:key="`tab-${index}`" 
+				:name="name" 
+				:icon="icon"
+				:label="label"
+			/>
+		</q-tabs>
+
+		<q-tab-panels v-model="tab" class="bg-transparent">
+				<q-tab-panel name="premade">
+					<ul class="premade">
 					<li v-for="(reminder, key) in premade" :key="key"
 						class="d-flex justify-content-between"
 						:class="'bg-'+reminder.color">
 						<div class="title">{{ reminder.title }}</div>
-						<a class="green add" v-b-tooltip.hover title="Set" @click="addReminder('premade', reminder)"><i class="fas fa-plus"></i></a>
+						<a class="green add" @click="addReminder('premade', reminder)">
+							<i class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Set
+							</q-tooltip>
+						</a>
 					</li>
 				</ul>
 
@@ -57,25 +57,25 @@
 						<li v-for="(reminder, key) in personalReminders" :key="key">
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
-								<a 
-									class="add"
-									v-b-tooltip.hover title="Set" 
-									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
-								>
+								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
 									<i :class="reminder.variables ? 'fas fa-caret-right gray-light' : 'fas fa-plus green'"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Set
+									</q-tooltip>
 								</a>
 							</div>
 							<div v-if="varOptions === key" class="variables">
 								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
 									<label>{{ var_key }}</label>
-									<b-form-select 
+									<q-select 
+										dark filled square dense
+										:label="var_key"
+										:options="variable"
 										type="text" 
 										v-validate="'required'"
 										v-model="selectedVars[var_key]"
-										:name="var_key">
-											<option selected="selected" value="">- Select -</option>
-											<option v-for="(option, i) in variable" :value="option" :key="var_key+i">{{ option }}</option>
-									</b-form-select>
+										:name="var_key"
+									/>
 									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
 								</div>
 								<a @click="addReminder('premade', reminder, selectedVars)" class="gray-light d-block mt-3">
@@ -85,13 +85,12 @@
 						</li>
 					</ul>
 				</template>
-			</div>
-
-			<div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">	
-				<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
-				<button class="btn btn-block" @click="addReminder('custom')">Set</button>
-			</div>
-		</div>
+				</q-tab-panel>
+				<q-tab-panel name="custom">
+					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
+					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
+				</q-tab-panel>
+		</q-tab-panels>
 	</div>
 </template>
 
@@ -117,6 +116,11 @@
 				userId: this.$store.getters.getUser.uid,
 				entityKey: this.data,
 				action: 'remove',
+				tab: "premade",
+				tabs: [
+					{ name: "premade", label: "Premade" },
+					{ name: "custom", label: "Custom" }
+				],
 				selectedColor: 'green-light',
 				premadeReminder: undefined,
 				customReminder: {},
@@ -228,32 +232,29 @@
 			}
 		}
 	}
-	.tab-content {
-		padding-top: 20px;
-				
-		ul.premade {
-			color: #fff;
-			list-style: none;
-			padding: 0;
 
-			li {
-				margin-bottom: 3px;
-				background-color: #191919;
+	ul.premade {
+		color: #fff;
+		list-style: none;
+		padding: 0;
 
-				.title {
-					padding: 5px;
-				}
-				a.add {
-					display: block;
-					background: #191919;
-					padding: 5px 0;
-					width: 30px;
-					text-align: center;
-				}
-				.variables {
-					border-top: solid 3px #262626;
-					padding: 10px;
-				}
+		li {
+			margin-bottom: 3px;
+			background-color: #191919;
+
+			.title {
+				padding: 5px;
+			}
+			a.add {
+				display: block;
+				background: #191919;
+				padding: 5px 0;
+				width: 30px;
+				text-align: center;
+			}
+			.variables {
+				border-top: solid 3px #262626;
+				padding: 10px;
 			}
 		}
 	}
@@ -261,27 +262,25 @@
 		margin-bottom: 20px;
 		font-size: 11px;
 
-		.col {
-			a {
-				color: #fff !important;
-				position: relative;
-				padding: 3px;
+		a {
+			color: #fff !important;
+			position: relative;
+			padding: 3px;
 
+			.delete {
+				display: none;
+			}
+
+			&:hover {
 				.delete {
-					display: none;
+					position: absolute;
+					right: 5px;
+					color: #fff !important;
+					font-size: 12px;
+					display: inline-block;
+					
 				}
-
-				&:hover {
-					.delete {
-						position: absolute;
-						right: 5px;
-						color: #fff !important;
-						font-size: 12px;
-						display: inline-block;
-						
-					}
-					padding-right: 15px;
-				}
+				padding-right: 15px;
 			}
 		}
 	}

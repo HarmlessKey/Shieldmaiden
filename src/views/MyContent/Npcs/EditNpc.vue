@@ -7,517 +7,477 @@
 			<a class="tab" :class="{ active: !quick }" @click="setQuick(0)">Complete Build</a>
 			<a class="tab" :class="{ active: quick }" @click="setQuick(1)">Quick Build</a>
 
-			<b-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
-				
-				<div class="input-group mb-3">
-					<input type="text" autocomplete="off" v-model="search" @keyup="searchNPC()" placeholder="Search NPC" class="form-control"/>
-					<div class="input-group-append">
-						<button class="btn" @click="searchNPC()"><i class="fas fa-search"></i></button>
-					</div>
-				</div>
+			<hk-card header="Copy Existing NPC" v-if="$route.name == 'AddNPC'">
+				<q-input 
+					dark filled square dense
+					label="Search NPC"
+					type="text" 
+					autocomplete="off" 
+					v-model="search" 
+					@keyup="searchNPC()"
+					class="mb-3"
+				>
+					<template v-slot:append>
+						<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
+					</template>
+				</q-input>
 				<ul class="entities">
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						<div class="d-flex justify-content-left">
-							<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2" v-b-tooltip.hover title="Show Info">
-								<i class="fas fa-info-circle"></i></a>
+							<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
+								<i class="fas fa-info-circle"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Show info
+								</q-tooltip>
+							</a>
 							{{ npc.name }}
 						</div>
-						<a class="gray-hover" 
-							v-b-tooltip.hover title="Copy NPC" 
-							@click="copy(npc)">
+						<a class="gray-hover" @click="copy(npc)">
 							<i class="fas fa-copy blue"></i>
 							<span class="d-none d-md-inline ml-1">Copy</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Copy NPC
+							</q-tooltip>
 						</a>
 					</li>
 				</ul>
-			</b-card>
+			</hk-card>
 			
-			<b-card header="Basic Info">
-				<b-row>
-					<b-col md="9" class="mb-3">
-						<!-- NAME -->
-						<b-row>
-							<b-col sm="2"><label for="name">Name *</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Name"
-									type="text" 
-									class="form-control mb-2" 
-									:class="{'input': true, 'error': errors.has('name') }" 
-									v-model="npc.name" 
-									v-validate="'max:35|required'" 
-									maxlength="35"
-									data-vv-as="Name"
-									id="name"
-									name="name" 
-									placeholder="Name*"></b-form-input>
-								<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-							</b-col>
-						</b-row>
+			<hk-card header="Basic Info">
+				<!-- NAME -->
+				<q-input 
+					dark filled square dense
+					label="Name"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="npc.name" 
+					v-validate="'max:35|required'" 
+					maxlength="35"
+					data-vv-as="Name"
+					name="name" 
+				/>
+				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-						<!-- SIZE -->
-						<b-row v-if="quick == false">
-							<b-col sm="2"><label for="size">Size</label></b-col>
-								<b-col>
-									<b-form-input autocomplete="off" 
-										v-b-tooltip.hover title="Size"
-										type="text" 
-										class="form-control mb-2" 
-										v-model="npc.size"
-										maxlenght="30"
-										id="size"
-										name="size" 
-										placeholder="Size"></b-form-input>
-								</b-col>
-						</b-row>
-						
-						<!-- TYPE -->
-						<b-row v-if="quick == false">
-							<b-col sm="6">
-								<b-row>
-									<b-col sm="4"><label for="type">Type</label></b-col>
-									<b-col sm="8">
-										<b-form-input autocomplete="off" 
-											v-b-tooltip.hover title="Type"
-											type="text" 
-											class="form-control mb-2" 
-											v-model="npc.type" 
-											name="type" 
-											id="type"
-											placeholder="Type"></b-form-input>
-									</b-col>
-								</b-row>
-							</b-col>
+				<!-- SIZE -->
+				<q-input 
+					v-if="!quick"
+					dark filled square dense
+					label="Size"
+					autocomplete="off" 
+					type="text" 
+					class="mb-2" 
+					v-model="npc.size"
+					maxlenght="30"
+					name="size" 
+				/>
+				
+				<!-- TYPE -->
+				<div class="row q-col-gutter-md" v-if="!quick">
+					<div class="col-12 col-md-6">
+						<q-input 
+							dark filled square dense
+							label="Type"
+							autocomplete="off" 
+							type="text" 
+							class="mb-2" 
+							v-model="npc.type" 
+							name="type" 
+							id="type"
+						/>
+					</div>
+					<div class="col-12 col-md-6">
+						<q-input 
+							dark filled square dense
+							label="Subtype"
+							autocomplete="off" 
+							type="text"
+							class="mb-2"
+							v-model="npc.subtype" 
+							name="subtype" 
+							id="subtype"
+							placeholder="Subtype"
+						/>
+					</div>
+				</div>
 
-							<b-col sm="6">
-								<b-row>
-									<b-col sm="4"><label for="subtype">Subtype</label></b-col>
-									<b-col sm="8">
-										<b-form-input autocomplete="off" 
-											v-b-tooltip.hover title="Subtype"
-											type="text"
-											class="form-control mb-2"
-											v-model="npc.subtype" 
-											name="subtype" 
-											id="subtype"
-											placeholder="Subtype"></b-form-input>
-									</b-col>
-								</b-row>
-							</b-col>
-						</b-row>
+				<!-- ALIGNMENT -->
+				<q-input 
+					v-if="!quick"
+					dark filled square dense
+					label="Alignment"
+					autocomplete="off" 
+					type="text" 
+					class="mb-2" 
+					v-model="npc.alignment" 
+					name="alignment" 
+					placeholder="Alignment"
+				/>
 
-						<!-- ALIGNMENT -->
-						<b-row v-if="quick == false">
-							<b-col sm="2"><label for="alignment">Alignment</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Alignment"
-									type="text" 
-									class="form-control mb-2" 
-									v-model="npc.alignment" 
-									name="alignment" 
-									id="alignment"
-									placeholder="Alignment"></b-form-input>
-							</b-col>
-						</b-row>
+				<!-- SPEED -->
+				<q-input 
+					dark filled square dense
+					label="Speed"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="npc.speed" 
+					name="speed" 
+					placeholder="Speed"
+				/>
 
-						<!-- SPEED -->
-						<b-row>
-							<b-col sm="2"><label for="speed">Speed</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Speed"
-									type="text" 
-									class="form-control mb-2" 
-									v-model="npc.speed" 
-									name="speed" 
-									id="speed"
-									placeholder="Speed"></b-form-input>
-							</b-col>
-						</b-row>
+				<!-- SENSES -->
+				<q-input 
+					dark filled square dense
+					label="Senses"
+					v-if="!quick"
+					autocomplete="off"
+					type="text" 
+					class="mb-2" 
+					v-model="npc.senses" 
+					name="senses" 
+					placeholder="Senses"
+				/>
 
-						<!-- SENSES -->
-						<b-row v-if="quick == false">
-							<b-col sm="2"><label for="senses">Senses</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Senses" 
-									type="text" 
-									class="form-control mb-2" 
-									v-model="npc.senses" 
-									name="senses" 
-									id="senses"
-									placeholder="Senses"></b-form-input>
-							</b-col>
-						</b-row>
+				<!-- LANGUAGES -->
+				<q-input 
+					dark filled square dense
+					label="Languages"
+					v-if="!quick"
+					autocomplete="off" 
+					type="text" 
+					class="mb-2" 
+					v-model="npc.languages" 
+					name="Languages" 
+					id="languages"
+					placeholder="Languages"
+				/>
 
-						<!-- LANGUAGES -->
-						<b-row v-if="quick == false">
-							<b-col sm="2"><label for="languages">Languages</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  v-b-tooltip.hover title="Languages" 
-									type="text" 
-									class="form-control mb-2" 
-									v-model="npc.languages" 
-									name="Languages" 
-									id="languages"
-									placeholder="Languages"></b-form-input>
-							</b-col>
-						</b-row>
+				<!-- CR -->
+				<q-select 
+					dark filled square dense
+					label="Challenge rating"
+					v-model="npc.challenge_rating" 
+					class="mb-2"
+					:options="[0]"
+				>
+					<template v-slot:option>
+						<q-list dark>
+							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0, $forceUpdate()">0</q-item>
+							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.125, $forceUpdate()">1/8</q-item>
+							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.25, $forceUpdate()">1/4</q-item>
+							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.5, $forceUpdate()">1/2</q-item>
+							<q-item 
+								v-for="index in 24"
+								:key="`cr-${index}`"
+								clickable v-ripple v-close-popup 
+								@click="npc.challenge_rating = index, $forceUpdate()"
+							>
+								{{ index }}
+							</q-item>
+							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 30, $forceUpdate()">30</q-item>
+						</q-list>
+					</template>
+				</q-select>
 
-						<!-- CR -->
-						<b-row>
-							<b-col sm="2"><label for="cr">Challenge rating</label></b-col>
-							<b-col>
-									<b-form-select v-model="npc.challenge_rating" class="mb-2" id="cr">
-										<option value="undefined" disabled selected>- Select CR -</option>
-										<option value="0">0</option>
-										<option value="0.125">1/8</option>
-										<option value="0.25">1/4</option>
-										<option value="0.5">1/2</option>
-										<option v-for="index in 24" :value="index" :key="index">{{ index }}</option>
-										<option value="30">30</option>
-									</b-form-select>
-							</b-col>
-						</b-row>
+				<!-- AVATAR -->
+				<div class="avatar">
+					<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
+					<div class="img" v-else>
+						<img src="@/assets/_img/styles/monster.svg" />
+					</div>
+					<div>
+						<q-input 
+							dark filled square
+							label="Avatar"
+							autocomplete="off"  
+							type="text" 
+							class="mb-2" 
+							:class="{'input': true, 'error': errors.has('avatar') }" 
+							v-model="npc.avatar" 
+							v-validate="'url'" 
+							data-vv-as="Avatar"
+							name="avatar" 
+							placeholder="Image URL"
+						/>
+						<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
+					</div>
+				</div>
 
-						<!-- AVATAR -->
-						<b-row>
-							<b-col sm="2"><label for="avatar">Avatar</label></b-col>
-							<b-col>
-								<b-form-input autocomplete="off"  
-									v-b-tooltip.hover title="Avatar"
-									type="text" 
-									class="form-control mb-2" 
-									:class="{'input': true, 'error': errors.has('avatar') }" 
-									v-model="npc.avatar" 
-									v-validate="'url'" 
-									data-vv-as="Avatar"
-									name="avatar" 
-									id="avatar"
-									placeholder="Image URL"></b-form-input>
-								<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-							</b-col>
-						</b-row>
+				<!-- FRIENDLY NPC -->
+				<q-checkbox size="lg" dark v-model="npc.friendly" label="Add as friendly" :false-value="null" indeterminate-value="something-else" />
+			</hk-card>
 
-						<!-- FRIENDLY NPC -->
-						<b-row>
-							<b-col sm="2"><label for >Friendly NPC</label></b-col>
-							<b-col>
-								<b-form-checkbox v-model="npc.friendly" class="mt-1 mb-2" id="friendly"><em>Add as friendly</em></b-form-checkbox>
-							</b-col>
-						</b-row>
-					</b-col>
-
-					<b-col md="3" v-if="npc.avatar">
-						<div class="img-container"><img :src="npc.avatar" /></div>
-					</b-col>
-				</b-row>
-			</b-card>
-
-			<b-card header="Health & Armor Class">
-				<b-row>
-					<b-col class="col">
-						<label for="ac">Armor Class *</label>
-						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Armor Class"
+			<hk-card header="Health & Armor Class">
+				<div class="row q-col-gutter-md">
+					<div class="col-12 col-md-4">
+						<q-input 
+							dark filled square dense
+							label="Armor class"
+							autocomplete="off"  
 							type="number" 
-							class="form-control" 
-							:class="{'input': true, 'error': errors.has('ac') }" 
+							class="mb-2" 
 							v-model="npc.ac" 
 							v-validate="'required'" 
 							name="ac" 
-							id="ac"
-							data-vv-as="Armor Class"
-							placeholder="Armor Class"></b-form-input>
+							data-vv-as="Armor class"
+						>
+							<template v-slot:append>
+								<q-icon name="fas fa-shield" size="xs" />
+							</template>
+						</q-input>
 						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-					</b-col>
-					<b-col class="col">
-						<label for="hp">Hit Points *</label>
-						<b-form-input autocomplete="off"  
-							v-b-tooltip.hover title="Hit Points"
+					</div>
+					<div class="col-12 col-md-4">
+						<q-input 
+							dark filled square dense
+							label="Hit points"
+							autocomplete="off"  
 							type="number" 
-							class="form-control" 
+							class="mb-2" 
 							:class="{'input': true, 'error': errors.has('Hit Points') }" 
 							v-model="npc.maxHp" 
 							v-validate="'required'" 
 							name="hp" 
-							id="hp"
 							data-vv-as="Hit Points"
-							placeholder="Hit Points"></b-form-input>
+						>
+							<template v-slot:append>
+								<q-icon name="fas fa-heart" size="xs" />
+							</template>
+						</q-input>
 						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
-					</b-col>
-					<b-col class="col" v-if="quick == false">
-						<label for="hitdice">
-							Hit Dice {{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}
-							<a v-b-popover.hover.top="'The modifier is the NPC\'s Constitution modifier.'" title="Hit Dice + Modifier"><i class="fas fa-info-circle"></i></a>
-						</label>
-						<b-form-input autocomplete="off" 
-							v-b-tooltip.hover title="Hit Dice"
+					</div>
+					<div class="col-12 col-md-4" v-if="!quick">
+						<q-input 
+							dark filled square dense
+							label="Hit dice"
+							autocomplete="off" 
 							type="text" 
-							class="form-control" 
+							class="mb-2" 
 							v-model="npc.hit_dice"  
 							v-validate="{ regex:/^[0-9]+d[0-9]+$/ }"
 							name="hit_dice" 
 							id="hitdice"
 							data-vv-as="Hit Dice"
-							placeholder="Hit Dice"></b-form-input>
-							<p class="validate red" 
-								v-if="errors.has('hit_dice')">
-								{{ errors.first('hit_dice') }}
-								Allowed format: "2d6".
-							</p>
-					</b-col>
-				</b-row>
-			</b-card>
-
-			<b-row>
-				<b-col sm="6">
-					<b-card header="Ability Scores">
-						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
-							<b-col class="col-3">
-								<label :for="ability.ability">
-									<!-- <svg class="icon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512">
-										<path :d="ability.icon"></path>
-									</svg> -->
-									{{ ability.ability.substring(0,3).toUpperCase() }}
-								</label>
-							</b-col>
-							<b-col class="col-9">
-								<b-form-input autocomplete="off"  
-									:id="ability.ability" 
-									type="number" 
-									v-model="npc[ability.ability]" 
-									:name="ability.ability" 
-									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-							</b-col>
-						</b-row>
-					</b-card>
-				</b-col>
-				<b-col sm="6">
-					<b-card header="Saving Throws" v-if="quick == false">
-						<b-row class="mb-2" v-for="(ability, index) in abilities" :key="index">
-							<b-col class="col-3">
-								<label :for="ability.ability+'_save'">{{ ability.ability.substring(0,3).toUpperCase() }}</label>
-							</b-col>
-							<b-col class="col-9">
-								<b-form-input autocomplete="off"  
-									:id="ability.ability+'_save'" 
-									type="number" 
-									v-model="npc[ability.ability+'_save']" 
-									:name="ability.ability" 
-									:placeholder="ability.ability.substring(0,3).toUpperCase()"></b-form-input>
-							</b-col>
-						</b-row>
-					</b-card>
-				</b-col>
-			</b-row>
-
-			<div class="card" v-if="quick == false">
-				<div class="card-header">Skills</div>
-					<div class="card-body">
-						<b-row>
-							<b-col md="6">
-								<b-row class="skills" v-for="(skill, index) in skills.slice(0,9)" :key="index">
-										<b-col class="col-5">
-											<label class="text-capitalize" :for="skill">{{ skill }}</label>
-										</b-col>
-										<b-col class="col-7">
-											<input 
-												autocomplete="off"
-												type="number" 
-												class="form-control mr-2 text-capitalize" 
-												v-model="npc[skill]" 
-												name="skill" 
-												:id="skill"
-												:placeholder="skill" />
-										</b-col>
-								</b-row>
-							</b-col>
-							<b-col md="6">
-								<b-row class="skills" v-for="(skill, index) in skills.slice(9,18)" :key="index">
-										<b-col class="col-5">
-											<label class="text-capitalize" :for="skill">{{ skill }}</label>
-										</b-col>
-										<b-col class="col-7">
-											<input 
-												autocomplete="off"
-												type="number" 
-												class="form-control mr-2 text-capitalize" 
-												v-model="npc[skill]" 
-												name="skill" 
-												:id="skill"
-												:placeholder="skill" />
-										</b-col>
-								</b-row>
-							</b-col>
-						</b-row>
-					</div>
-			</div>
-			
-			<template v-if="quick == false">
-				<b-card header="Resistances & Vulnerabilities">
-					<b-row>
-						<b-col md="4"><label for="dmg_vul">Damage Vulnerabilities</label></b-col>
-						<b-col>
-							<b-form-input autocomplete="off"  type="text"
-								v-b-tooltip.hover title="Damage Vulnerabilities" 
-								class="form-control mb-2" 
-								v-model="npc.damage_vulnerabilities" 
-								name="damage_vulnerabilities" 
-								id="dmg_vul"
-								placeholder="Damage Vulnerabilities"></b-form-input>
-						</b-col>
-					</b-row>
-					
-					<b-row>
-						<b-col md="4"><label for="dmg_res">Damage Resistances</label></b-col>
-						<b-col>
-							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Damage Resistances" 
-								type="text" 
-								class="form-control mb-2" 
-								v-model="npc.damage_resistances" 
-								name="damage_resistances" 
-								id="dmg_res"
-								placeholder="Damage Resistances"></b-form-input>
-						</b-col>
-					</b-row>
-
-					<b-row>
-						<b-col md="4"><label for="dmg_im">Damage Immunities</label></b-col>
-						<b-col>
-							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Damage Immunities" 
-								type="text" 
-								class="form-control mb-2" 
-								v-model="npc.damage_immunities" 
-								name="damage_immunities"
-								id="dmg_im" 
-								placeholder="Damage Immunities"></b-form-input>
-						</b-col>
-					</b-row>
-
-					<b-row>
-						<b-col md="4"><label for="con_im">Condition Immunities</label></b-col>
-						<b-col>	
-							<b-form-input autocomplete="off"  
-								v-b-tooltip.hover title="Condition Immnunities" 
-								type="text" 
-								class="form-control mb-2" 
-								v-model="npc.condition_immunities" 
-								name="condition_immunities" 
-								id="con_im"
-								placeholder="Condition Immunities"></b-form-input>
-						</b-col>
-					</b-row>
-				</b-card>
-			</template>
-
-			<!-- ACTIONS / ABILITIES -->
-			<template v-if="quick == false">
-				<div class="card" v-for="(action, index) in actions" :key="index">
-					<div class="card-header d-flex justify-content-between">
-						{{ action.name }}
-						<a 
-						class="gray-hover text-capitalize" 
-						v-b-tooltip.hover title="Add Skill" 
-						@click="add(action.type)">
-							<i class="fas fa-plus green"></i>
-							<span class="d-none d-md-inline ml-1">Add</span>
-						</a>
-					</div>
-					<div class="card-body">
-						<div v-for="(ability, index) in npc[action.type]" :key="index">
-							<h2 class="d-flex justify-content-between">
-								{{ index + 1 }}. {{ ability.name }}
-								<a @click="remove(index, action.type)" 
-									class="gray-hover text-capitalize"
-									v-b-tooltip.hover title="Remove">
-									<i class="fas fa-minus red"></i>
-									<span class="d-none d-md-inline ml-1">Remove</span>
-								</a>
-							</h2>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="name">Name</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off" 
-										id="name"
-										type="text" 
-										class="form-control" 
-										maxlength="30"
-										v-model="ability.name" 
-										name="name" 
-										placeholder="Name"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row>
-								<b-col sm="2" class="mb-2">
-									<label for="damage_dice">Damage Dice</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off" 
-										id="damage_dice"
-										type="text" 
-										class="form-control" 
-										v-model="ability.damage_dice" 
-										:name="'damage_dice_'+action.type+index"
-										data-vv-as="Damage Dice"
-										placeholder="Damage Dice"
-										v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"></b-form-input>
-										<p class="validate red" 
-											v-if="errors.has('damage_dice_'+action.type+index.toString())">
-											{{ errors.first('damage_dice_'+action.type+index.toString()) }}
-											Allowed format: "2d6" or "2d6+1d8".
-										</p>
-								</b-col>
-								<b-col sm="2" class="mb-2">
-									<label for="damage_bonus">Damage Bonus</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off" 
-										id="damage_bonus"
-										type="number" 
-										class="form-control" 
-										v-model="ability.damage_bonus" 
-										name="damage_bonus" 
-										placeholder="Damage Bonus"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="attack_bonus">Attack Bonus</label>
-								</b-col>
-								<b-col sm="10">
-									<b-form-input autocomplete="off" 
-										id="attack_bonus"
-										type="number" 
-										class="form-control" 
-										v-model="ability.attack_bonus" 
-										name="attack_bonus" 
-										placeholder="Attack Bonus"></b-form-input>
-								</b-col>
-							</b-row>
-							<b-row class="mb-2">
-								<b-col sm="2">
-									<label for="desc">Description</label>
-								</b-col>
-								<b-col sm="10">
-									<textarea
-										id="desc"
-										class="form-control" 
-										v-model="ability.desc" 
-										rows="4"
-										name="desc" 
-										placeholder="Description"></textarea>
-								</b-col>
-							</b-row>
-							<hr>
-						</div>
+						>
+							<template v-slot:append>
+								<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
+								<q-icon name="info" size="xs">
+									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+										<q-card dark square>
+											<q-card-section class="bg-gray-active">
+												<b>Hit Dice + Modifier</b>
+											</q-card-section>
+											<q-card-section>
+												The modifier is the NPC's Constitution modifier multiplied by the number of hit dice.
+											</q-card-section>
+										</q-card>
+									</q-menu>
+								</q-icon>
+							</template>				
+						</q-input>
+						<p class="validate red" 
+							v-if="errors.has('hit_dice')">
+							{{ errors.first('hit_dice') }}
+							Allowed format: "2d6".
+						</p>
 					</div>
 				</div>
-			</template>
+			</hk-card>
+
+			<!-- ABILITY SCORES -->
+			<hk-card header="Ability Scores">
+				<div class="row q-col-gutter-md">
+					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
+						<q-input 
+							dark filled square dense
+							:label="ability.ability.capitalize()"
+							autocomplete="off"  
+							type="number" 
+							v-model="npc[ability.ability]" 
+							:name="ability.ability"
+						/>
+					</div>
+				</div>
+			</hk-card>
+
+			<!-- SAVING THROWS -->
+			<hk-card header="Saving Throws" v-if="!quick">
+				<div class="row q-col-gutter-md">
+					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
+						<q-input 
+							dark filled square dense
+							:label="ability.ability.capitalize()"
+							autocomplete="off"  
+							type="number" 
+							v-model="npc[ability.ability+'_save']" 
+							:name="ability.ability"
+						/>
+					</div>
+				</div>
+			</hk-card>
+
+			<!-- SKILLS -->
+			<hk-card v-if="!quick" header="Skills">
+				<div class="skills">
+					<q-input
+						dark filled square dense
+						:label="skill.capitalize()"
+						v-for="(skill, index) in skills" 
+						:key="index"
+						autocomplete="off"
+						type="number" 
+						class="mb-2" 
+						v-model="npc[skill]" 
+					/>
+				</div>
+			</hk-card>
+			
+			<!-- DEFENSES -->
+			<hk-card header="Resistances & Vulnerabilities" v-if="!quick">
+				<q-input 
+					dark filled square dense
+					label="Damage vulnerabilities"
+					autocomplete="off"  
+					type="text"
+					class="mb-2" 
+					v-model="npc.damage_vulnerabilities" 
+					name="damage_vulnerabilities" 
+				/>
+
+				<q-input 
+					dark filled square dense
+					label="Damage resistances"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="npc.damage_resistances" 
+					name="damage_resistances" 
+				/>
+
+				<q-input 
+					dark filled square dense
+					label="Damage immunities"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="npc.damage_immunities" 
+					name="damage_immunities"
+				/>
+
+				<q-input 
+					dark filled square dense
+					label="Condition immunities"
+					autocomplete="off"  
+					type="text" 
+					class="mb-2" 
+					v-model="npc.condition_immunities" 
+					name="condition_immunities" 
+				/>
+			</hk-card>
+
+			<!-- ACTIONS / ABILITIES -->
+			<hk-card v-for="(action, index) in actions" :key="index">
+				<div slot="header" class="card-header d-flex justify-content-between">
+					{{ action.name }}
+					<a class="gray-hover text-capitalize" @click="add(action.type)">
+						<i class="fas fa-plus green"></i>
+						<span class="d-none d-md-inline ml-1">Add</span>
+						<q-tooltip anchor="top middle" self="center middle">
+							Add {{ action.name }}
+						</q-tooltip>
+					</a>
+				</div>
+
+				<q-list dark square :class="`accordion`">
+					<q-expansion-item
+						v-for="(ability, index) in npc[action.type]" 
+						:key="index"
+						dark switch-toggle-side
+						:group="action.name"
+					>
+						<template v-slot:header>
+							<q-item-section>
+								{{ index + 1 }}. {{ ability.name }}
+							</q-item-section>
+							<q-item-section avatar>
+								<a @click="remove(index, action.type)" class="remove">
+									<i class="fas fa-trash-alt red" />
+									<q-tooltip anchor="top middle" self="center middle">
+										Remove
+									</q-tooltip>
+								</a>
+							</q-item-section>
+						</template>
+
+						<div class="accordion-body">
+							<div>
+								<q-input 
+									dark filled square dense
+									label="Name"
+									autocomplete="off" 
+									id="name"
+									type="text" 
+									class="mb-2" 
+									maxlength="30"
+									v-model="ability.name" 
+									name="name" 
+									placeholder="Name"
+								/>
+								<q-input 
+									dark filled square dense
+									label="Damage dice"
+									autocomplete="off" 
+									type="text" 
+									class="mb-2" 
+									v-model="ability.damage_dice" 
+									:name="'damage_dice_'+action.type+index"
+									data-vv-as="Damage Dice"
+									placeholder="Damage Dice"
+									v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
+								/>
+								<p class="validate red" 
+									v-if="errors.has('damage_dice_'+action.type+index.toString())">
+									{{ errors.first('damage_dice_'+action.type+index.toString()) }}
+									Allowed format: "2d6" or "2d6+1d8".
+								</p>
+
+								<q-input 
+									dark filled square dense
+									label="Damage bonus"
+									autocomplete="off" 
+									id="damage_bonus"
+									type="number" 
+									class="mb-2" 
+									v-model="ability.damage_bonus" 
+									name="damage_bonus" 
+									placeholder="Damage Bonus"
+								/>
+
+								<q-input 
+									dark filled square dense
+									label="Attack/to hit bonus"
+									autocomplete="off" 
+									id="attack_bonus"
+									type="number" 
+									class="mb-2" 
+									v-model="ability.attack_bonus" 
+									name="attack_bonus" 
+									placeholder="Attack Bonus"
+								/>
+								<q-input
+									dark filled square dense
+									label="Description"
+									v-model="ability.desc" 
+									name="desc" 
+									autogrow
+								/>
+							</div>
+						</div>
+					</q-expansion-item>
+				</q-list>
+			</hk-card>
 		</div>
 
 		<div class="save">
@@ -781,21 +741,21 @@
 				color: #b2b2b2 !important;
 			}
 		}
-		.img-container, img {
-			width: 100%;
-		}
-		label {
-			line-height: 37px;
-			margin-bottom: 0;
+		.avatar {
+			display: grid;
+			grid-template-columns: 56px 1fr;
+			grid-column-gap: 10px;
 
-			svg {
-				fill: #b2b2b2;
-				width: 20px;
-				height: 20px;
+			.img {
+				border: solid 1px #b2b2b2;
+				width: 56px;
+				height: 56px;
+				background-size: cover;
+				background-position: center top;
 			}
 		}
 		.skills {
-			line-height: 40px;
+			columns: 2;
 		}
 	}
 	.save {

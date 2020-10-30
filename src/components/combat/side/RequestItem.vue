@@ -8,124 +8,135 @@
 			</span>
 		</div>
 		<div class="title">
-			<a data-toggle="collapse" class="collapsed" :href="`#request-${i}`">
+			<a @click="showRequest = !showRequest">
 				<span>
 					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span> request
 				</span> 
 				<i class="fas fa-caret-down"></i>
 			</a>
 		</div>
-		<div 
-			:id="`request-${i}`"
-			class="collapse results"
-		>
-			<!-- DAMAGE -->
-			<template v-if="request.type === 'damage'">
-				<div v-for="(result, index) in results" :key="`result-${index}`">
-					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
+		<q-slide-transition>
+			<div v-show="showRequest" class="results">
+				<!-- DAMAGE -->
+				<template v-if="request.type === 'damage'">
+					<div v-for="(result, index) in results" :key="`result-${index}`">
+						<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
+						<div class="targets">
+							<template v-for="(target, key) in result.targets">
+								<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+									{{ entities[key].name }}
+								</div>
+
+								<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
+									{{ target.amount }}
+								</div>
+
+								<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
+									<div 
+										@click="setDefense('v', index, key)"
+										:class="{red: target.defense === 'v'}"
+									>
+										<i class="fas fa-shield"></i>
+										<span>V</span>
+										<q-tooltip anchor="center right" self="center left">
+											Vulnerable
+										</q-tooltip>
+									</div>
+									<div 
+										@click="setDefense('r', index, key)"
+										:class="{green: target.defense === 'r'}"
+									>
+										<i class="fas fa-shield"></i>
+										<span>R</span>
+										<q-tooltip anchor="center right" self="center left">
+											Resistant
+										</q-tooltip>
+									</div>
+									<div 
+										@click="setDefense('i', index, key)"
+										:class="{green: target.defense === 'i'}"
+									>
+										<i class="fas fa-shield"></i>
+										<span>I</span>
+										<q-tooltip anchor="center right" self="center left">
+											Immune
+										</q-tooltip>
+									</div>
+								</div>
+							</template>
+						</div>
+
+					</div>
+
+					<!-- FINAL RESULTS -->
+					<div class="damage">Final values</div>
 					<div class="targets">
-						<template v-for="(target, key) in result.targets">
-							<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+						<template v-for="(final, key) in final_results">
+							<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
 								{{ entities[key].name }}
 							</div>
-
-							<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
-								{{ target.amount }}
+							<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
+								{{ Math.floor(final * intensity[key]) }}
 							</div>
-
-							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
-								<div 
-									v-b-tooltip.hover title="Vulnerable" 
-									@click="setDefense('v', index, key)"
-									:class="{red: target.defense === 'v'}"
+							<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+								<div
+									@click="setIntensity(key, 0)"
+									:class="{blue: intensity[key] === 0}"
 								>
-									<i class="fas fa-shield"></i>
-									<span>V</span>
+									<i class="fas fa-circle"></i>
+									<span>0</span>
+									<q-tooltip anchor="center right" self="center left">
+										No damage
+									</q-tooltip>
 								</div>
-								<div 
-									v-b-tooltip.hover title="Resistant" 
-									@click="setDefense('r', index, key)"
-									:class="{green: target.defense === 'r'}"
+								<div
+									@click="setIntensity(key, .5)"
+									:class="{blue: intensity[key] === .5}"
 								>
-									<i class="fas fa-shield"></i>
-									<span>R</span>
+									<i class="fas fa-circle"></i>
+									<span>½</span>
+									<q-tooltip anchor="center right" self="center left">
+										Half damage
+									</q-tooltip>
 								</div>
-								<div 
-									v-b-tooltip.hover title="Immune" 
-									@click="setDefense('i', index, key)"
-									:class="{green: target.defense === 'i'}"
+								<div
+									@click="setIntensity(key, 1)"
+									:class="{blue: intensity[key] === 1}"
 								>
-									<i class="fas fa-shield"></i>
-									<span>I</span>
+									<i class="fas fa-circle"></i>
+									<span>1</span>
+									<q-tooltip anchor="center right" self="center left">
+										Full damage
+									</q-tooltip>
 								</div>
 							</div>
 						</template>
 					</div>
 
-				</div>
+					<!-- ACTIONS -->
+					<div class="actions">
+						<button class="btn btn-sm bg-green" @click="apply('damage')">Apply</button>
+						<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
+					</div>
+				</template>
 
-				<!-- FINAL RESULTS -->
-				<div class="damage">Final values</div>
-				<div class="targets">
-					<template v-for="(final, key) in final_results">
-						<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
-							{{ entities[key].name }}
-						</div>
-						<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
-							{{ Math.floor(final * intensity[key]) }}
-						</div>
-						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
-							<div
-								v-b-tooltip.hover title="No damage" 
-									@click="setIntensity(key, 0)"
-								:class="{blue: intensity[key] === 0}"
-							>
-								<i class="fas fa-circle"></i>
-								<span>0</span>
+				<!-- HEALING -->
+				<template v-else>
+					<div class="damage">Targets</div>
+					<div class="targets healing">
+						<div v-for="target in request.targets" :key="target">
+							<div class="name truncate bg-gray-dark" v-if="entities[target]">
+								{{ entities[target].name }}
 							</div>
-							<div
-								v-b-tooltip.hover title="Half damage" 
-									@click="setIntensity(key, .5)"
-								:class="{blue: intensity[key] === .5}"
-							>
-								<i class="fas fa-circle"></i>
-								<span>½</span>
-							</div>
-							<div
-								v-b-tooltip.hover title="Full damage" 
-								@click="setIntensity(key, 1)"
-								:class="{blue: intensity[key] === 1}"
-							>
-								<i class="fas fa-circle"></i>
-								<span>1</span>
-							</div>
-						</div>
-					</template>
-				</div>
-
-				<!-- ACTIONS -->
-				<div class="actions">
-					<button class="btn btn-sm bg-green" @click="apply('damage')">Apply</button>
-					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
-				</div>
-			</template>
-
-			<!-- HEALING -->
-			<template v-else>
-				<div class="damage">Targets</div>
-				<div class="targets healing">
-					<div v-for="target in request.targets" :key="target">
-						<div class="name truncate bg-gray-dark" v-if="entities[target]">
-							{{ entities[target].name }}
 						</div>
 					</div>
-				</div>
-				<div class="actions">
-					<button class="btn btn-sm bg-green" @click="apply('healing')">Apply</button>
-					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
-				</div>
-			</template>
-		</div>
+					<div class="actions">
+						<button class="btn btn-sm bg-green" @click="apply('healing')">Apply</button>
+						<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
+					</div>
+				</template>
+			</div>
+		</q-slide-transition>
 	</div>
 </template>
 
@@ -143,7 +154,8 @@
 				userId: this.$store.getters.getUser.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				final_results: {}
+				final_results: {},
+				showRequest: false
 			}
 		},
 		computed: {

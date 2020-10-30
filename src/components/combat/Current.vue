@@ -4,113 +4,54 @@
 			<i v-if="current.hidden" class="fas fa-eye-slash red"></i> 
 			{{ current.name }}
 		</h2>
-		<div class="scroll" v-bar>
-			<div v-on:scroll="shadow()" ref="scroll">
-				<div class="current">
-
-					<template v-if="current">
-						<template v-if="(current.entityType === 'player' || current.entityType === 'companion') && current.curHp == 0 && !current.stable && !current.dead">
-								<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
-								<div class="px-1 my-3 d-flex justify-content-between">
-									<div v-for="(n, index) in 5" :key="index">
-										<template v-if="Object.keys(current.saves).length == n">
-											<a v-show="current.saves[n] === 'succes'" class="green" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-check"></i></a>
-											<a v-show="current.saves[n] === 'fail'" class="red" v-b-tooltip.hover title="Change" @click="save('unset', n)"><i class="fas fa-times"></i></a>
-										</template>
-										<template v-else>
-											<span v-show="current.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
-											<span v-show="current.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
-										</template>
-										<span v-show="!current.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
-									</div>
-								</div>
-								<div v-if="Object.keys(current.saves).length < 5" class="d-flex justify-content-between">
-									<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
-									<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
-								</div>
-								<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{current.entityType.capitalize()}} died</a>
-								<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
-						</template>
-						<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
-						
-						<template v-else>
-							<div class="health">
-								<span v-if="current.hidden" class="img" v-b-tooltip.hover title="Hidden"><i class="fas fa-eye-slash red"></i></span>
-								<template v-else>
-									<icon v-if="['monster', 'player', 'companion'].includes(current.img)" class="img" :icon="current.img" :fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``" />
-									<span 
-										v-else class="img" 
-										:style="{
-											'background-image': 'url(' + current.img + ')',
-											'border-color': current.color_label ? current.color_label : ``
-										}"/>
-								</template>
-								<div class="progress health-bar">
-									<span v-show="current.stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-									<span v-show="current.dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-									<div v-show="!current.stable && !current.dead">
-										<span class="percentage">{{ current.name }}</span>
-										<span class="hp">{{ displayStats(current).curHp }} / {{ displayStats(current).maxHp }}</span>
-									</div>
-									<div class="progress-bar" :class="{ 
-										'bg-red': percentage(displayStats(current).curHp, displayStats(current).maxHp) <= 33, 
-										'bg-orange': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 33 && percentage(displayStats(current).curHp, displayStats(current).maxHp) < 76, 
-										'bg-green': percentage(displayStats(current).curHp, displayStats(current).maxHp) > 7
-										}" 
-										role="progressbar" 
-										:style="{width: percentage(displayStats(current).curHp, displayStats(current).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-									</div>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
+			<div class="current">
+				<template v-if="current">
+					<template v-if="(current.entityType === 'player' || current.entityType === 'companion') && current.curHp == 0 && !current.stable && !current.dead">
+							<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
+							<div class="px-1 my-3 d-flex justify-content-between">
+								<div v-for="(n, index) in 5" :key="index">
+									<template v-if="Object.keys(current.saves).length == n">
+										<a v-show="current.saves[n] === 'succes'" class="green" @click="save('unset', n)">
+											<i class="fas fa-check"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Change
+											</q-tooltip>
+										</a>
+										<a v-show="current.saves[n] === 'fail'" class="red" @click="save('unset', n)">
+											<i class="fas fa-times"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Change
+											</q-tooltip>
+										</a>
+									</template>
+									<template v-else>
+										<span v-show="current.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
+										<span v-show="current.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
+									</template>
+									<span v-show="!current.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
 								</div>
 							</div>
-
-							<Reminders :entity="current" />
-							<Conditions :entity="current" />
-
-							<template v-if="targeted.length > 0">
-								<div class="health target px-2"  v-for="key in targeted" :key="`target-${key}`">
-									<icon v-if="['monster', 'player', 'companion'].includes(entities[key].img)" class="img" :icon="entities[key].img" :fill="entities[key].color_label" :style="entities[key].color_label ? `border-color: ${entities[key].color_label}` : ``" />
-									<span 
-										v-else class="img" 
-										:style="{
-											'background-image': 'url(' + entities[key].img + ')',
-											'border-color': entities[key].color_label ? entities[key].color_label : ``
-										}"/>
-									<span class="ac"
-										:class="{ 
-											'green': entities[key].ac_bonus > 0, 
-											'red': entities[key].ac_bonus < 0 
-										}" 
-										v-b-tooltip.hover :title="'Armor Class + ' + entities[key].ac_bonus" v-if="entities[key].ac_bonus">
-										{{ displayStats(entities[key]).ac + entities[key].ac_bonus}}
-									</span>
-									<span class="ac" v-b-tooltip.hover title="Armor Class" v-else>{{ displayStats(entities[key]).ac }}</span>
-									<div class="progress health-bar">
-										<span v-show="entities[key].stable" class="green percentage"><i class="fas fa-fist-raised"></i> Stable</span>
-										<span v-show="entities[key].dead" class="red percentage"><i class="fas fa-skull-crossbones"></i> Dead</span>
-										<div v-show="!entities[key].stable && !entities[key].dead">
-											<span class="percentage">{{ entities[key].name }}</span>
-											<span class="hp">{{ displayStats(entities[key]).curHp }} / {{ displayStats(entities[key]).maxHp }}</span>
-										</div>
-										<div class="progress-bar" :class="{ 
-											'bg-red': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) <= 33, 
-											'bg-orange': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 33 && percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) < 76, 
-											'bg-green': percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) > 7
-											}" 
-											role="progressbar" 
-											:style="{width: percentage(displayStats(entities[key]).curHp, displayStats(entities[key]).maxHp) + '%'}" aria-valuemin="0" aria-valuemax="100">
-										</div>
-									</div>
-								</div>
-							</template>
-
-							<h2 v-else class="red">No Target</h2>
-						</template>
+							<div v-if="Object.keys(current.saves).length < 5" class="d-flex justify-content-between">
+								<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
+								<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
+							</div>
+							<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{current.entityType.capitalize()}} died</a>
+							<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
 					</template>
-					<div v-else class="loader"><span>Loading current...</span></div>
-				</div>
-				<Actions :current="current" :settings="settings" location="current"/>
+					<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
+					
+					<template v-else>
+						<TargetItem :item="current.key" />
+
+						<Reminders :entity="current" />
+						<Conditions :entity="current" />
+					</template>
+				</template>
+				<div v-else class="loader"><span>Loading current...</span></div>
 			</div>
-		</div>
+			<Actions :current="current" :settings="settings" location="current"/>
+		</q-scroll-area>
 	</div>
 </template>
 
@@ -121,6 +62,7 @@
 	import Reminders from '@/components/combat/Reminders.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import { remindersMixin } from '@/mixins/reminders';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
 		name: 'Current',
@@ -128,7 +70,8 @@
 		components: {
 			Actions,
 			Conditions,
-			Reminders
+			Reminders,
+			TargetItem
 		},
 		props: ['current', 'next', 'settings'],
 		data() {
@@ -200,7 +143,7 @@
 				return hp_percentage;
 			},
 			shadow() {
-				this.setShadow = this.$refs.scroll.scrollTop;
+				this.setShadow = this.$refs.scroll.scrollPosition;
 			},
 			save(check, index) {
 				this.set_save({
@@ -251,10 +194,9 @@
 	overflow: hidden;
 	
 	.current {
-		padding: 15px 10px;
-		width: calc(100% - 5px);
+		padding: 10px;
 	}
-	.scroll {
+	.q-scrollarea {
 		height: calc(100% - 30px);
 	}
 	h2.componentHeader {
@@ -262,7 +204,7 @@
 		margin-bottom: 0 !important;
 
 		&.shadow {
-			box-shadow: 0 0 10px rgba(0,0,0,0.8); 
+			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
 		}
 	}
 	.btn.save {
@@ -349,7 +291,7 @@
 	}
 }
 @media only screen and (max-width: 600px) {
-	#current, .scroll, .current {
+	#current {
 		overflow: visible !important;
 	}
 	.hide {

@@ -36,23 +36,26 @@
 				</template>
 
 				<template slot="name" slot-scope="data">
-					<router-link class="mx-2" 
-						:to="'/items/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">{{ data.item }}
+					<router-link class="mx-2" :to="'/items/' + data.row.key">
+						{{ data.item }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" 
-						:to="'/items/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">
+					<router-link class="gray-hover mx-1" :to="'/items/' + data.row.key">
 						<i class="fas fa-pencil"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
-					<a v-b-tooltip.hover 
-						title="Delete" 
-						class="gray-hover"
-						@click="confirmDelete(data.row.key, data.row.name)">
+					<a class="gray-hover" @click="confirmDelete(data.row.key, data.row.name)">
 						<i class="fas fa-trash-alt"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Delete
+						</q-tooltip>
 					</a>
 				</div>
 			</hk-table>
@@ -69,11 +72,10 @@
 					</router-link>
 				</div>
 			</template>
-			<template v-if="slotsLeft <= 0">
-				<div class="openSlot none">
-					<span class="red">No item slots left. </span>
-					Delete items to create new space, <router-link to="/patreon">or support us for more slots</router-link>.
-				</div>
+			<template v-if="!tier || tier.name === 'Free'">
+				<router-link class="openSlot none" to="/patreon">
+					Support us on Patreon for more slots.
+				</router-link>
 			</template>
 		</template>
 		<h3 v-else-if="items === null" class="mt-4">
@@ -205,21 +207,6 @@
 				&:hover {
 					text-decoration: none;
 				}
-			}
-		}
-		.openSlot {
-			display: flex;
-			justify-content: space-between;
-			padding: 0 10px;
-			width: 100%;
-			height: 46px;
-			line-height: 46px;
-			border: dashed 1px #5c5757;
-			margin-top: 1px;
-
-			&.none {
-				display: block;
-				text-align: center;
 			}
 		}
 	}

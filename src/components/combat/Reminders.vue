@@ -1,6 +1,6 @@
 <template>
-	<b-row v-if="entity.reminders" class="reminders justify-content-start px-2">
-		<b-col class="col-3 p-1" v-for="(reminder, key) in entity.reminders" :key="key">
+	<div v-if="entity.reminders" class="row q-col-gutter-md reminders justify-content-start px-2">
+		<div class="col-3 p-1" v-for="(reminder, key) in entity.reminders" :key="key">
 			<a 
 				@click="setSlide({
 					show: true, 
@@ -9,14 +9,16 @@
 						key,
 						entity
 				}})" 
-				v-b-tooltip.hover :title="'Show '+title(reminder)" 
 				class="text-truncate d-block" :class="'bg-'+reminder.color"
 			>
 				{{ title(reminder) }}
 				<span class="counter" v-if="reminder.rounds">{{ reminder.rounds }}</span>
+				<q-tooltip anchor="top middle" self="center middle">
+					Show {{ title(reminder) }}
+				</q-tooltip>
 			</a>
-		</b-col>
-	</b-row>
+		</div>
+	</div>
 </template>
 
 <script>

@@ -20,26 +20,30 @@
 				<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
 			</h2>
 
-			<div class="input-group" v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
-				<div class="input-group" >
-					<input type="text" 
-						class="form-control" 
-						autocomplete="off"
-						:class="{'input': true, 'error': errors.has('newCampaign') }" 
-						v-model="newCampaign" 
-						v-validate="'required'"
-						data-vv-as="New Campaign" 
-						name="newCampaign"
-						@change="addCampaign()"
-						placeholder="Add new campaign"
-					/>
-					<div class="input-group-append">
-						<button class="btn"><i class="fas fa-plus"></i> Add</button>
-					</div>
-				</div>
-				<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
+			<div v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
+				<q-input 
+					dark filled square dense
+					type="text" 
+					autocomplete="off"
+					:class="{'input': true, 'error': errors.has('newCampaign') }" 
+					v-model="newCampaign" 
+					v-validate="'required'"
+					data-vv-as="New Campaign" 
+					name="newCampaign"
+					@change="addCampaign()"
+					label="New campaign name"
+				/>
+				<q-select
+					dark filled square dense
+					label="Advancement"
+					class="mt-2" 
+					v-model="advancement" 
+					:options="advancement_options"
+				/>
 
 				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
+
+				<button class="btn"><i class="fas fa-plus"></i> Add</button>
 			</div>
 
 			<OutOfSlots 
@@ -56,13 +60,13 @@
 			<transition-group 
 				v-if="campaigns && Object.keys(campaigns).length > 0"
 				tag="div" 
-				class="row mt-3" 
+				class="row q-col-gutter-md mt-3" 
 				name="campaigns" 
 				enter-active-class="animated flash" 
 				leave-active-class="animated bounceOutLeft">
-				<b-col lg="4" md="6" v-for="campaign in _campaigns" :key="campaign.key">
-					<div class="card" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-						<div class="card-header">
+				<div class="col-12 col-md-6 col-lg-4" v-for="campaign in _campaigns" :key="campaign.key">
+					<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+						<div slot="header" class="card-header">
 							<span class="title">
 								<i class="fas fa-dungeon"></i>
 								{{ campaign.campaign }}
@@ -72,42 +76,50 @@
 								<i 
 									v-if="!campaign.private" 
 									class="fas fa-eye green"
-									v-b-tooltip.hover
-									title="Public campaign"
-								></i>
-								<i 
-									v-else class="fas fa-eye-slash red"
-									v-b-tooltip.hover
-									title="Private campaign"
-								></i>
+								>
+									<q-tooltip anchor="top middle" self="center middle">
+											Public campaign
+										</q-tooltip>
+								</i>
+								<i v-else class="fas fa-eye-slash red">
+									<q-tooltip anchor="top middle" self="center middle">
+											Private campaign
+										</q-tooltip>
+								</i>
 
-								<router-link class="text-capitalize gray-hover" 
-									:to="'/campaigns/' + campaign.key" 
-									v-b-tooltip.hover title="Edit">
+								<router-link class="text-capitalize gray-hover" :to="'/campaigns/' + campaign.key">
 										<i class="fas fa-pencil"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Edit
+										</q-tooltip>
 								</router-link>
-								<a v-b-tooltip.hover 
-									title="Delete" 
+								<a
 									class="gray-hover text-capitalize"
-									@click="confirmDelete(campaign.key, campaign.campaign)">
+									@click="confirmDelete(campaign.key, campaign.campaign)"
+								>
 										<i class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
 								</a>
 							</span>
 						</div>
-						<div class="card-body">
 							<div v-if="campaign.advancement != 'milestone'" class="advancement">Experience</div>
 							<div v-else class="advancement">Milestone</div>
-							<b-row>
-								<b-col>
-									<router-link :to="'/campaigns/' + campaign.key" v-b-tooltip.hover title="Players">
+							<div class="row q-col-gutter-md">
+								<div class="col">
+									<router-link :to="'/campaigns/' + campaign.key">
 										<i class="fas fa-users"></i><br/>
 										<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
 										<template v-else> Add</template>
+										<q-tooltip anchor="top middle" self="center middle">
+											Players
+										</q-tooltip>
 									</router-link>
-								</b-col>
+								</div>
 
-								<b-col>
-										<router-link :to="'/encounters/' + campaign.key" v-b-tooltip.hover title="Encounters">
+								<div class="col">
+										<router-link :to="'/encounters/' + campaign.key">
 										<i class="fas fa-swords"></i><br/>
 										<template v-if="allEncounters && allEncounters[campaign.key]">
 											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
@@ -118,23 +130,29 @@
 											<template v-else>{{ tier.benefits.encounters }}</template>
 										</template>
 										<template v-else> Create</template>
+										<q-tooltip anchor="top middle" self="center middle">
+											Encounters
+										</q-tooltip>
 									</router-link>
-								</b-col>
-							</b-row>
+								</div>
+							</div>
+						<div slot="footer" class="card-footer">
+							<small class="date py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+							<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn btn-block bg-green">Create players</router-link>
+							<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn btn-block bg-green"><i class="fas fa-plus"></i> Add players</router-link>
+							<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn btn-block bg-green"><i class="fas fa-plus"></i> Create encounters</router-link>
+							<router-link :to="'/encounters/' + campaign.key" v-else class="btn btn-block">Play <i class="fas fa-play"></i></router-link>
 						</div>
-						<small class="text-center py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
-						<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn bg-green">Create players</router-link>
-						<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green"><i class="fas fa-plus"></i> Add players</router-link>
-						<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green"><i class="fas fa-plus"></i> Create encounters</router-link>
-						<router-link :to="'/encounters/' + campaign.key" v-else class="btn">Play <i class="fas fa-play"></i></router-link>
-					</div>
-				</b-col>
+					</hk-card>
+				</div>
 			</transition-group>
 
 			<!-- CREATE FIRST CAMPAIGN -->
 			<div class="first-campaign" v-else>
 				<h2>Create your first campaign</h2>
-				<input type="text" 
+				<q-input 
+					dark filled square dense
+					type="text" 
 					class="form-control" 
 					autocomplete="off"
 					v-model="newCampaign" 
@@ -142,11 +160,15 @@
 					data-vv-as="Campaign Title" 
 					name="firstCampaign"
 					@change="addCampaign()"
-					placeholder="Title of your first campaign"
+					label="Title of your first campaign"
 				/>
-				<div class="switch">
-					<b-form-select class="mt-2" v-model="advancement" :options="advancement_options" text-field="label"/>
-				</div>
+				<q-select 
+					dark filled square dense
+					label="Advancement"
+					class="mt-2" 
+					v-model="advancement" 
+					:options="advancement_options"
+				/>
 				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
 				
 				<button class="btn btn-lg bg-green btn-block mt-4">Create campaign</button>
@@ -330,7 +352,7 @@
 				margin-top: 30px;
 			}
 		} 
-		.card {
+		.hk-card {
 			background-size: cover;
 			background-position: center bottom;
 
@@ -381,7 +403,8 @@
 					a {
 						width: 100%;
 						display: block;
-						color: #b2b2b2 !important;
+						color: #fff !important;
+						text-shadow: 5px 5px 5pxrgba(0, 0, 0, .5);
 
 						&:hover {
 							text-decoration: none;
@@ -391,6 +414,15 @@
 					svg {
 						font-size: 50px;
 					}
+				}
+			}
+			.card-footer {
+				padding: 0;
+				
+				.date {
+					width: 100%;
+					text-align: center;
+					display: block;
 				}
 			}
 			&.openSlot {

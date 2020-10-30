@@ -422,9 +422,15 @@
 									class="mb-2" 
 									maxlength="30"
 									v-model="ability.name" 
-									name="name" 
+									:name="`name_${action.type}${index}`" 
 									placeholder="Name"
+									v-validate="'required'"
 								/>
+								<p class="validate red" 
+									v-if="errors.has('name_'+action.type+index.toString())">
+									{{ errors.first('name_'+action.type+index.toString()) }}
+									Allowed format: "2d6" or "2d6+1d8".
+								</p>
 								<q-input 
 									dark filled square dense
 									label="Damage dice"
@@ -451,7 +457,8 @@
 									type="number" 
 									class="mb-2" 
 									v-model="ability.damage_bonus" 
-									name="damage_bonus" 
+									:name="`damage_bonus_${action.type}${index}`"
+									v-validate="'numeric'"
 									placeholder="Damage Bonus"
 								/>
 
@@ -463,14 +470,16 @@
 									type="number" 
 									class="mb-2" 
 									v-model="ability.attack_bonus" 
-									name="attack_bonus" 
+									:name="`attack_bonus_${action.type}${index}`"
+									v-validate="'numeric'"
 									placeholder="Attack Bonus"
 								/>
 								<q-input
 									dark filled square dense
 									label="Description"
 									v-model="ability.desc" 
-									name="desc" 
+									name="desc"
+									v-validate=""
 									autogrow
 								/>
 							</div>
@@ -620,10 +629,9 @@
 				this.search = '';
 			},
 			addNpc() {
-				// THIS IS UGLY
 				delete this.npc['.value']
 				delete this.npc['.key']
-				// UGLY ENDS HERE
+
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref('npcs/' + this.userId).push(this.npc);
@@ -635,9 +643,8 @@
 				})
 			},
 			editNpc() {
-				// THIS IS UGLY
 				delete this.npc['.key']
-				// UGLY ENDS HERE
+
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
@@ -663,7 +670,7 @@
 					});
 				}
 				else if(type == 'legendary_actions') {
-					if(this.npc.legendary_actions == undefined) {
+					if(this.npc.legendary_actions === undefined) {
 						this.npc.legendary_actions = [];
 					}
 					this.npc.legendary_actions.push({
@@ -671,7 +678,7 @@
 					});
 				}
 				else if(type == 'special_abilities') {
-					if(this.npc.special_abilities == undefined) {
+					if(this.npc.special_abilities === undefined) {
 						this.npc.special_abilities = [];
 					}
 					this.npc.special_abilities.push({

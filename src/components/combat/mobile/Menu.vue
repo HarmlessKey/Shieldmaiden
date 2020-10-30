@@ -1,10 +1,6 @@
 <template>
 	<div class="menu bg-gray-dark">
-		<div v-if="targeted.length === 0" class="no-target">
-			Select a target
-		</div>
 		<q-tabs
-			v-else
 			dark
 			inline-label
 			no-caps
@@ -15,19 +11,24 @@
 				:key="`tab-${index}`" 
 				:name="name" 
 				:icon="icon"
-				@click="dialog[name] = !dialog[name]"
+				@click="
+					(name === 'info') ? 
+					setSlide({
+						show: true,
+						type: 'combat/side/Side'
+					}) : dialog[name] = !dialog[name]"
 			/>
 		</q-tabs>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog v-model="dialog.damage">
+		<q-dialog square v-model="dialog.damage">
 			<div class="bg-gray pt-2">
 				<Actions :current="current" :settings="settings" location="current" />
 			</div>
 		</q-dialog>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog v-model="dialog.options">
+		<q-dialog square v-model="dialog.options">
 			<div class="bg-gray">
 				<q-list>
 					<q-item>
@@ -114,16 +115,6 @@
 		props: ["entities", "settings", "current"],
 		data () {
 			return {
-				tabs: [
-					{
-						name: "damage",
-						icon: "fas fa-swords"
-					},
-					{
-						name: "options",
-						icon: "fas fa-ellipsis-h"
-					}
-				],
 				dialog: {
 					damage: false,
 					options: false
@@ -134,6 +125,26 @@
 			...mapGetters([
 				'targeted',
 			]),
+			tabs() { 
+				let tabs = [];
+
+				if(this.targeted.length) {
+
+					tabs.push({
+						name: "damage",
+						icon: "fas fa-swords"
+					},
+					{
+						name: "options",
+						icon: "fas fa-ellipsis-h"
+					})
+				}
+				tabs.push(	{
+						name: "info",
+						icon: "info"
+					});
+					return tabs;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -198,12 +209,15 @@
 		position: fixed;
 		width: 100%;
 		bottom: 0;
-		height: 48px;
+		height: 60px;
 
 		.no-target {
-			line-height: 48px;
+			line-height: 60px;
 			text-align: center;
 			user-select: none;
+		}
+		.q-tabs {
+			height: 100%;
 		}
 	}
 </style>

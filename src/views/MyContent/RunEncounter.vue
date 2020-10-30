@@ -8,8 +8,12 @@
 			v-else-if="encounter && (players || demo)"  
 			:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
 		>	
+			<template v-if="encounter.finished">
+				<Finished v-if="!demo" :encounter="encounter"/>
+				<DemoFinished v-else />
+			</template>
 			<!-- DESKTOP -->
-			<template v-if="width > 576">
+			<template v-else-if="width > 576">
 				<template v-if="encounter.finished">
 					<Finished v-if="!demo" :encounter="encounter"/>
 					<DemoFinished v-else />
@@ -39,7 +43,9 @@
 							:_idle = "_idle"
 						/>
 						<Targeted />
-						<Side />
+						<div id="side_container"> 
+							<Side />
+						</div>
 					</div>
 				</template>
 
@@ -340,13 +346,20 @@
 			font-size: 15px !important;
 			margin-bottom: 15px !important;
 		}
+
+		#side_container {
+			padding-top: 5px;
+			margin-top: -5px;
+			grid-area: side;
+			overflow: hidden;
+		}
 	}
 
 	.mobile {
 		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr;
-		grid-template-rows: 60px 1fr 48px;
+		grid-template-rows: 60px 1fr 60px;
 		grid-template-areas:
 		"turns"
 		"targets"
@@ -364,6 +377,9 @@
 			grid-template-areas:
 			"turns turns turns"
 			"current targets targeted";
+		}
+		#side_container {
+			display: none;
 		}
 	}
 	@media only screen and (max-width: 900px) {

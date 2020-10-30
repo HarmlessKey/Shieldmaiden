@@ -24,7 +24,7 @@
 			<div class="manual">
 				<q-input 
 					dark filled square
-					type="text" 
+					type="number" 
 					v-model="manualAmount" 
 					v-validate="'numeric'" 
 					name="Manual Input" 

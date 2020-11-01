@@ -4,7 +4,7 @@
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
 			<div :class="{ hasSide: $route.meta.sidebar !== false }">
-				<Sidebar v-if="$route.meta.sidebar !== false" />
+				<Sidebar />
 				<div class="scrollable-content">
 					<router-view/>
 				</div>

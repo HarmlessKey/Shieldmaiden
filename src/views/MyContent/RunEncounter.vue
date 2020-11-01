@@ -376,7 +376,7 @@
 			border-bottom: solid 1px#191919;
 		}
 		#current {
-			z-index: 99;
+			z-index: 90;
 		}
 	}
 

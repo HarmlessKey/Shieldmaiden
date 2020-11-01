@@ -5,10 +5,11 @@
 	>
 		<div 
 			@click.stop=""
-			v-if="!small_screen || $store.getters.side_small_screen"
+			v-if="(!small_screen && $route.meta.sidebar !== false) || $store.getters.side_small_screen"
 			id="sidebar" 
 			:class="{
-				'side-collapsed': $store.getters.side_collapsed && !small_screen
+				'side-collapsed': $store.getters.side_collapsed && !small_screen && $route.meta.sidebar !== false,
+				'slideIn': $route.meta.sidebar === false
 			}">
 			<div>
 				<template v-if="$store.getters.getUser">
@@ -308,6 +309,14 @@
 	}
 	&::-webkit-scrollbar {
 		display: none;
+	}
+
+	&.slideIn {
+		position: absolute;
+
+		#toggle-width {
+			display: none;
+		}
 	}
 }
 .slideInLeft {

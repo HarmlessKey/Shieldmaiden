@@ -78,7 +78,7 @@
 									@mouseup="stop" 
 									@touchcancel="stop" 
 									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
-									<TargetItem :item="entity.key" :i="i" :initiative="true" />
+									<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 								</div>
 								<a class="options">
 									<i class="fal fa-ellipsis-v"></i>
@@ -388,7 +388,7 @@
 		margin-bottom: 5px;
 
 		&.componentHeader {
-			padding: 10px 15px !important;
+			padding: 10px 15px;
 			margin-bottom: 0 !important;
 
 			&.shadow {
@@ -467,10 +467,16 @@ ul.targets {
 .fadeInUp, .fadeInDown {
 	animation-delay: .6s;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 576px) {
 	#targets, .q-scrollarea {
 		overflow: visible !important;
 		padding-bottom: 0;
+
+		.componentHeader {
+			font-size: 15px;
+			padding: 5px 10px;
+			line-height: normal;
+		}
 	}
 }
 </style>

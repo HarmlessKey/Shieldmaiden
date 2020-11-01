@@ -1,6 +1,10 @@
 <template>
 	<div class="menu bg-gray-dark">
+		<div v-if="targeted.length === 0" class="no-target red">
+			Select a target.
+		</div>
 		<q-tabs
+			v-else
 			dark
 			inline-label
 			no-caps
@@ -15,7 +19,8 @@
 					(name === 'info') ? 
 					setSlide({
 						show: true,
-						type: 'combat/side/Side'
+						type: 'combat/TargetInfo',
+						data: { key: targeted[0] }
 					}) : dialog[name] = !dialog[name]"
 			/>
 		</q-tabs>
@@ -132,17 +137,20 @@
 
 					tabs.push({
 						name: "damage",
-						icon: "fas fa-swords"
+						icon: "fas fa-swords",
 					},
 					{
 						name: "options",
 						icon: "fas fa-ellipsis-h"
 					})
 				}
-				tabs.push(	{
+				if(this.targeted.length === 1) {
+					tabs.push(	{
 						name: "info",
 						icon: "info"
 					});
+				}
+				if(this.targeted.length)
 					return tabs;
 			},
 		},

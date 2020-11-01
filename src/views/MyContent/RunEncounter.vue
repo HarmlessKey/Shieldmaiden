@@ -32,7 +32,6 @@
 							:current="_active[encounter.turn]"
 							:next="_active[encounter.turn + 1]"
 						/>
-						{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
 						<Current 
 							:current="_active[encounter.turn]"
 							:next="next"
@@ -66,6 +65,12 @@
 						:current="_active[encounter.turn]"
 						:next="_active[encounter.turn + 1]"
 					/>
+
+					<CurrentMobile 
+						:current="_active[encounter.turn]"
+						:next="next"
+						:settings="settings"
+					/>
 					
 					<Targets
 						:_active = "_active"
@@ -92,6 +97,7 @@
 	import Turns from '@/components/combat/Turns.vue';
 	import Menu from '@/components/combat/mobile/Menu.vue';
 	import Current from '@/components/combat/Current.vue';
+	import CurrentMobile from '@/components/combat/mobile/Current.vue';
 	import Targets from '@/components/combat/Targets.vue';
 	import Targeted from '@/components/combat/Targeted.vue';
 	import Side from '@/components/combat/side/Side.vue';
@@ -111,6 +117,7 @@
 			Turns,
 			Menu,
 			Current,
+			CurrentMobile,
 			Targets,
 			Targeted,
 			Side,
@@ -125,7 +132,6 @@
 				userId: this.$store.getters.getUser.uid,
 				demo: this.$route.name === "Demo",
 				target: undefined,
-				alive: undefined,
 				width: 0
 			}
 		},
@@ -193,6 +199,9 @@
 					} , order)
 					.value()
 			},
+			alive() {
+				return Object.keys(this._alive).length;
+			},
 			_alive: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
@@ -218,7 +227,7 @@
 			}
 		},
 		watch: {
-			alive(newVal) {
+			alive(newVal, oldVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}
@@ -289,9 +298,6 @@
 					encounter: false,
 				});
 			},
-			setAlive(n) {
-				this.alive = n;
-			},
 			confirmFinish() {
 				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
 					position: "centerCenter",
@@ -359,15 +365,18 @@
 		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr;
-		grid-template-rows: 60px 1fr 60px;
+		grid-template-rows: 60px max-content 1fr 60px;
 		grid-template-areas:
 		"turns"
+		"current"
 		"targets"
 		"menu";
 
 		#turns {
-			z-index: 99;
 			border-bottom: solid 1px#191919;
+		}
+		#current {
+			z-index: 99;
 		}
 	}
 

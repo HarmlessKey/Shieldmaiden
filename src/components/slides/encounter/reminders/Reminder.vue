@@ -2,12 +2,12 @@
 	<div class="pb-5">
 		<h2>{{ title }}</h2>
 
-		<div class="bg-gray-dark pr-2">
+		<div class="bg-gray-dark">
 				<TargetItem  :item="entity.key" />
 		</div>
 
 		<a 
-			class="btn btn-block bg-red mb-3"
+			class="btn btn-block bg-red my-3"
 			@click="remove()"
 		>
 			Remove reminder

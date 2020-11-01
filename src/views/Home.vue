@@ -145,7 +145,7 @@
 		background-size: 100px;
 		background-position: center;
 		background-repeat: no-repeat;
-		z-index: 99;
+		z-index: 97;
 	}
 	.patreon {
 		position: fixed;
@@ -154,7 +154,7 @@
 		padding: 10px;
 		height: 55px;
 		line-height: 33px;
-		z-index: 100;
+		z-index: 97;
 	}
 }
 

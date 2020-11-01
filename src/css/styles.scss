@@ -745,49 +745,6 @@ html body {
     margin-left: auto;
 	}
 
-	#sidebar {
-		.list-group-item {
-			a {
-				padding: 10px 15px;
-				display: block;
-				font-size: 15px;
-				line-height: 20px;
-				color: $gray-light !important;
-				
-				&:hover, &.active:hover {
-					background-color: $gray-hover;
-					text-decoration: none;
-				}
-				&.active {
-					background-color: $gray-active;
-
-					svg {
-						color: $blue !important;
-					}
-				}
-				span {
-					color: $gray-light !important;
-				}
-				svg {
-					margin-right:15px;
-					color: $gray-light !important;
-					font-size:20px;
-					line-height:20px;
-				}
-			}
-			
-			&:hover, &.active:hover {
-				background-color:$gray-hover !important;
-				text-decoration: none;
-			}
-			&.active {
-				background-color: $gray-active !important;
-			}
-		}
-		.list-group-item:first-child, .list-group-item:last-child {
-			border-radius: 0 !important;
-		}
-	}
 	.login-container {
 		color: #fff;
 		background-position: center;

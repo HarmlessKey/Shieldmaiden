@@ -1,9 +1,8 @@
 <template>
 	<header :class="{ invert: enviroment === 'development' }">
-		<div id="header" class="d-flex justify-content-between">
+		<div id="header" class="d-flex justify-content-between" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
-					v-if="$route.meta.sidebar !== false"
 					class="menu"
 					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
 				>
@@ -205,13 +204,15 @@ a.icon {
 	height: 30px;
 }
 
+#header.hidden-sidebar {
+	.logo {
+		left: 45px;
+	}
+}
+
 @media only screen and (max-width: 600px) {
 	.logo {
 		left: 40px;
-
-		&.home {
-			left: 5px;
-		}
 	}
 }
 </style>

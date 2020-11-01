@@ -24,7 +24,7 @@
 					</a>
 				</div>
 				<div class="area d-flex justify-content-end">
-					<a class="icon"
+					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i class="fas fa-keyboard"/>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">

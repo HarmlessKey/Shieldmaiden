@@ -1,6 +1,12 @@
 <template>
 	<div class="menu bg-gray-dark">
-		<div v-if="targeted.length === 0" class="no-target red">
+		<div v-if="targeted.length === 0" class="no-target red" 
+			@click="setSlide({
+				show: true,
+				type: 'slides/encounter/TargetingInfo',
+				data: { key: targeted[0] }
+			})"
+		>
 			Select a target.
 		</div>
 		<q-tabs

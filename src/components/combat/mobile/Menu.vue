@@ -33,8 +33,8 @@
 
 		<!-- DAMAGE / HEALING -->
 		<q-dialog square v-model="dialog.damage">
-			<div class="bg-gray pt-2">
-				<Actions :current="current" :settings="settings" location="current" />
+			<div class="bg-gray px-3 py-3">
+				<Actions :current="current" :settings="settings" :select-entity="true" />
 			</div>
 		</q-dialog>
 

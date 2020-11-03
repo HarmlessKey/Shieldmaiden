@@ -200,10 +200,10 @@
 	import { mapActions } from 'vuex';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
-	import Health from '@/components/trackCampaign/Health.vue';
+	import Health from './Health.vue';
 
 	export default {
-		name: 'app',
+		name: 'Initiative',
 		mixins: [general, trackEncounter],
 		components: {
 			Health,

@@ -117,7 +117,7 @@
 					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
 					{ name: "roll", label: "Roll", icon: "fas fa-dice-d20" }
 				],
-				doneBy: this.current ? this.current.key : undefined
+				doneBySetter: undefined 
 			}
 		},
 		computed: {
@@ -133,6 +133,15 @@
 				})
 				.sortBy('name' , 'asc')
 				.value()
+			},
+			doneBy: {
+				get() {
+					const key = (this.current) ? this.current.key : undefined;
+					return (this.doneBySetter) ? this.doneBySetter : key;
+				},
+				set(newValue) {
+					this.doneBySetter = newValue;
+				}
 			},
 			tab: {
 				get() {

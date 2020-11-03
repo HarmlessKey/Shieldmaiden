@@ -153,7 +153,6 @@
 				<q-input 
 					dark filled square dense
 					type="text" 
-					class="form-control" 
 					autocomplete="off"
 					v-model="newCampaign" 
 					v-validate="'required'"
@@ -340,16 +339,6 @@
 				text-transform: none;
 				text-align: center;
 				font-size: 30px;
-			}
-			.form-control {
-				text-align: center;
-				height: 50px;
-				font-size: 20px;
-			}
-			.switch {
-				display: flex;
-				justify-content: center;
-				margin-top: 30px;
 			}
 		} 
 		.hk-card {

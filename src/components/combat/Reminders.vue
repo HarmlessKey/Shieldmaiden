@@ -1,5 +1,5 @@
 <template>
-	<div v-if="entity.reminders" class="row q-col-gutter-md reminders">
+	<div v-if="entity.reminders.length > 0" class="row q-col-gutter-md reminders">
 		<div class="col-3" v-for="(reminder, key) in entity.reminders" :key="key">
 			<a 
 				@click="setSlide({

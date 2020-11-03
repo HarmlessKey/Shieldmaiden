@@ -19,7 +19,9 @@
 				</template>
 				<div v-else class="loader"><span>Loading current...</span></div>
 			</div>
-			<Actions :current="current" :settings="settings" location="current"/>
+			<div class="px-3 py-3">
+				<Actions :current="current" :settings="settings" />
+			</div>
 		</q-scroll-area>
 	</div>
 </template>

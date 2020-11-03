@@ -93,23 +93,34 @@
 							:playerSettings="playerSettings"
 							:npcSettings="npcSettings"
 							@newRoll="pushRoll"
-                    />
+            />
 					</div>
 					<div class="side">
-						<div class="menu">
-							<ul>
-								<li @click="sideDisplay = 'damage'" :class="{ active: sideDisplay == 'damage'}" v-if="playerSettings.meters === undefined"><i class="fas fa-swords"></i></li>
-								<li @click="sideDisplay = 'rolls'" :class="{ active: sideDisplay == 'rolls'}"><i class="fas fa-dice-d20"></i></li>
-							</ul>
-						</div>
+						<q-tabs
+							v-model="sideDisplay"
+							dark
+							inline-label
+							dense
+							no-caps
+						>
+							<q-tab 
+								v-for="({name, icon, label}, index) in tabs"
+								:key="`tab-${index}`" 
+								:name="name" 
+								:icon="icon"
+								:label="label"
+							/>
+						</q-tabs>
 						<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
 							<div>
-								<Meters 
-									v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
-									:entities="encounter.entities" 
-									:npcs="npcs" 
-									:players="players"
-								/>
+								<div class="meters-wrapper">
+									<Meters 
+										v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+										:entities="encounter.entities" 
+										:npcs="npcs" 
+										:players="players"
+									/>
+								</div>
 								<Rolls 
 									v-if="sideDisplay === 'rolls'"
 									:entities="encounter.entities" 
@@ -212,6 +223,22 @@
 			this.fetch_encounter()
 		},
 		computed: {
+			tabs() {
+				let tabs = [];
+				if(this.playerSettings.meters === undefined) {
+					tabs.push({
+						name: "damage",
+						label: "Damage meters",
+						icon: "fas fa-swords",
+					});
+				}
+				tabs.push({
+					name: "rolls",
+					label: "Rolls",
+					icon: "fas fa-dice-d20",
+				});
+				return tabs;
+			},
 			sideDisplay: {
 				get() {
 					if(this.setSideDisplay) {
@@ -403,38 +430,6 @@
 				padding-right: 15px;
 				overflow: hidden;
 
-				.menu {
-					height: 29px;
-					border-bottom: solid 2px #000;
-					position: relative;
-					user-select: none;
-					margin-bottom: 10px;
-
-					ul {
-						height: 29px;
-						margin: 0;
-						display: flex;
-						justify-content: flex-start;
-						padding: 0;
-
-						li {
-							cursor: pointer;
-							height: 29px;
-							padding: 0 10px;
-							display: block;
-							border-bottom: solid 2px #000;
-							color: #fff;
-
-							&.active {
-								color: #2c97de;
-								border-color: #2c97de;
-							}
-							&:first-child {
-								padding-left: 3px;
-							}
-						}
-					}
-				}
 				.q-scrollarea {
 					height: calc(100% - 56px);
 
@@ -443,6 +438,9 @@
 					}
 					&.during-encounter {
 						height: calc(100% - 50px);
+					}
+					.meters-wrapper {
+						padding-top: 15px;
 					}
 				}
 			}

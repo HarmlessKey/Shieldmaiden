@@ -315,7 +315,7 @@
 		line-height: 25px;
 	}
 	.current {
-		padding: 15px 10px;
+		padding: 12px 10px 15px 10px;
 		width: calc(100% - 5px);
 	}
 	.q-scrollarea {

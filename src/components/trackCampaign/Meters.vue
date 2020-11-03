@@ -1,11 +1,19 @@
 <template>
 	<div class="meters">
-		<div class="menu">
-			<ul>
-				<li @click="doneTaken = 'done'" :class="{ active: doneTaken == 'done'}">Done</li>
-				<li @click="doneTaken = 'taken'" :class="{ active: doneTaken == 'taken'}">Taken</li>
-			</ul>
-		</div>
+		<q-tabs
+			v-model="doneTaken"
+			dark
+			inline-label
+			dense
+			no-caps
+		>
+			<q-tab 
+				v-for="({name, label}, index) in tabs"
+				:key="`tab-${index}`" 
+				:name="name" 
+				:label="label"
+			/>
+		</q-tabs>
 		<template v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length > 0)">
 			<div v-for="(type, index) in types" :key="index">
 				<h3>{{ type.type }} {{ doneTaken }}</h3>
@@ -73,7 +81,17 @@
 		data() {
 			return {
 				userId: this.$route.params.userid,
-				doneTaken: 'done'
+				doneTaken: 'done',
+				tabs: [
+					{
+						name: 'done',
+						label: 'Done'
+					},
+					{
+						name: 'taken',
+						label: 'Taken'
+					}
+				]
 			}
 		},
 		computed: {
@@ -249,37 +267,6 @@
 		}
 		.entities-move {
 			transition: transform .6s;
-		}
-		.menu {
-			height: 30px;
-			border-bottom: solid 3px #000;
-			position: relative;
-			user-select: none;
-
-			ul {
-				height: 30px;
-				margin: 0;
-				display: flex;
-				justify-content: flex-start;
-
-				li {
-					cursor: pointer;
-					height: 30px;
-					padding: 0 10px;
-					display: block;
-					border-bottom: solid 3px #000;
-					font-weight: bold !important;
-					text-shadow: 0 0 8px #000;
-					color: #fff;
-
-					&.active {
-						border-color: #2c97de;
-					}
-					&:first-child {
-						padding-left: 3px;
-					}
-				}
-			}
 		}
 	}
 </style>

@@ -437,7 +437,8 @@
 	.actions {
 		display: flex;
 		justify-content: space-between;
-		padding-bottom: 5px;
+		height: 35px;
+		line-height: 35px;
 		border-bottom: solid 2px #fff;
 
 		.right {
@@ -512,7 +513,7 @@
 						}
 						td.image {
 							padding: 0;
-							width: 45px;
+							width: 45px !important;
 
 							.img {
 								width: 43px;

@@ -437,8 +437,9 @@
 
 <style lang="scss" scoped>
 	.group-actions {
-		border-bottom: solid 1px #b2b2b2;
-		padding-bottom: 5px;
+		border-bottom: solid 2px #b2b2b2;
+		height: 35px;
+		line-height: 35px;
 		display: grid;
 		grid-template-columns: auto max-content;
 		grid-template-areas: "money actions";

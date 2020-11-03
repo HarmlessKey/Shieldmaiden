@@ -332,9 +332,6 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		height: 30px;
 		margin-left: 15px;
 	}
-	.form-control {
-		height: 30px;
-	}
 }
 
 .players {

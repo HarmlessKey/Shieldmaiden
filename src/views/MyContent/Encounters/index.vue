@@ -60,7 +60,6 @@
 						dark filled square dense
 						label="Encounter title" 
 						type="text" 
-						class="form-control" 
 						autocomplete="off"
 						v-model="newEncounter" 
 						v-validate="'required'"
@@ -492,11 +491,6 @@
 			text-transform: none;
 			text-align: center;
 			font-size: 30px;
-		}
-		.form-control {
-			text-align: center;
-			height: 50px;
-			font-size: 20px;
 		}
 	}
 	.loader {

@@ -1,44 +1,45 @@
 <template>
-<div v-if="campaign">
-	<template v-if="!campaign.private">
-		<!-- NOT LIVE -->
-		<div class="track-wrapper" 
-			:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }" 
-			v-if="!encounter || broadcasting['.value'] != $route.params.campid
-		">
-			<div class="turns">
+<div class="track-wrapper" ref="track">
+	<template v-if="campaign">
+			<template v-if="!campaign.private">
+			<!-- NOT LIVE -->
+			<template v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
+				<div class="top">
+					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					<span class="title truncate">{{ campaign.campaign }}</span>
+					<span>
+						<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
+					</span>
+				</div>
+				<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+					<CampaignOverview :players="players" :campaign-players="campaign.players" :width="width" />
+				</div>
+			</template>
+
+			<!-- LIVE -->
+			<div 
+				v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
+				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
+			>
+				<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" />
+			</div>
+		</template>
+		<div v-else>
+			<div class="top d-flex justify-content-between">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				<span class="title truncate">{{ campaign.campaign }}</span>
+				Not found
 				<span>
-					<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
 				</span>
 			</div>
-			<CampaignOverview :players="players" :campaign-players="campaign.players" />
-		</div>
-
-		<!-- LIVE -->
-		<div 
-			v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
-			:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
-		>
-			<Live :encounter="encounter" :campaign="campaign" :players="players" />
-		</div>
-	</template>
-	<div class="track-wrapper" v-else>
-		<div class="top d-flex justify-content-between">
-			<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-			Not found
-			<span>
-			</span>
-		</div>
-		<div class="container-fluid">
-			<div class="container entities">
-				<h2>Perception check failed</h2>
-				<p>It seems we rolled a little low, this campaign can't be found.<br/>
-					It is possible the campaign is set to private.</p>
+			<div class="container-fluid">
+				<div class="container entities">
+					<h2>Perception check failed</h2>
+					<p>It seems we rolled a little low, this campaign can't be found.<br/>
+						It is possible the campaign is set to private.</p>
+				</div>
 			</div>
 		</div>
-	</div>
+	</template>
 </div>
 </template>
 
@@ -46,7 +47,6 @@
 	import { db } from '@/firebase';
 
 	import Follow from '@/components/trackCampaign/Follow.vue';
-	import Rewards from '@/components/trackCampaign/live/Rewards.vue';
 	import CampaignOverview from '@/components/trackCampaign/CampaignOverview.vue';
 	import ViewPlayers from '@/components/campaign/Players.vue';
 	import Live from './live';
@@ -68,7 +68,8 @@
 				userId: this.$route.params.userid,
 				encounter: undefined,
 				campaign: undefined,
-				tier: undefined
+				tier: undefined,
+				width: 0
 			}
 		},
 		firebase() {
@@ -86,7 +87,17 @@
 		beforeMount() {
 			this.fetch_encounter()
 		},
+		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
 		methods: {
+			setSize() {
+				this.width = this.$refs.track.clientWidth;
+			},
 			fetch_encounter() {
 				var track = db.ref(`broadcast/${this.userId}`);
 				track.on('value' , (snapshot) => {
@@ -114,6 +125,9 @@
 				});
 			}
 		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
+		},
 	}
 </script>
 
@@ -125,5 +139,26 @@
 		background-color: #191919;
 		width: 100vw;
 		position: relative;
+
+		.top {
+			grid-area: top;
+			background: rgba(38, 38, 38, .9);
+			text-transform: uppercase;
+			height: 60px;
+			line-height: 40px;
+			padding: 10px;
+			display: grid;
+			grid-template-columns: max-content auto max-content;
+
+			.title {
+				text-align: center;
+				padding: 0 10px;
+			}
+		}
+		.campaign {
+			height: calc(100% - 60px);
+			background-size: cover;
+			background-position: top center;
+		}
 	}
 </style>

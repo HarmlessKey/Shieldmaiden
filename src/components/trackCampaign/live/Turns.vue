@@ -2,11 +2,11 @@
 	<div class="turns d-flex justify-content-center">
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round">
 			<div class="mr-3">
-				<div class="mb-1">Round</div>
+				<div>Round</div>
 				<div class="number">{{ encounter.round }}</div>
 			</div>
 			<div>
-				<div class="mb-1">Turn</div>
+				<div>Turn</div>
 				<div class="number">
 					{{ turn + 1 }}<span class="small gray-hover">/{{ entities_len }}</span>
 				</div>
@@ -98,7 +98,11 @@
 
 <style lang="scss" scoped>
 	.turns {
-		padding: 10px 0 !important;
+		grid-area: top;
+		background: rgba(38, 38, 38, .9);
+		text-transform: uppercase;
+		height: 60px;
+		padding: 10px;
 
 		.round-info {
 			line-height: 12px;
@@ -106,22 +110,21 @@
 			text-align: center;
 
 			.number { 
-				height: 40px;
 				font-weight: bold;
 				font-size: 30px;
 				line-height: 30px;
 			}
 		}
 		.img {
-			width: 45px;
-			height: 45px;
+			width: 40px;
+			height: 40px;
 			background-size: cover;
 			background-position: center top;
 			margin-left: 15px;
 			border: solid 1px #b2b2b2;
 		}
 		h1 {
-			line-height: 45px;
+			line-height: 40px;
 			margin-left: 20px;
 		}
 	}

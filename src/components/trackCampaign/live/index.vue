@@ -1,5 +1,5 @@
 <template>
-	<div class="track-wrapper">
+	<div class="track-wrapper" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
 		<!-- ROLL FOR INITIATIVE -->
 		<RollForInitiative v-if="encounter.round === 0" />
 
@@ -17,7 +17,9 @@
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
 			/>
-			<div class="track">
+
+			<!-- DESKTOP -->
+			<div class="track desktop" v-if="width > 576">
 				<div class="initiative">
 					<Initiative 
 						:encounter="encounter" 
@@ -70,6 +72,83 @@
 					</q-scroll-area>
 				</div>
 			</div>
+
+			<!-- MOBILE -->
+			<div v-else class="track mobile">
+				<div class="bg-gray-dark">
+					<q-select
+						dark filled square
+						v-model="panel"
+						:options="panels"
+					>
+						<template v-slot:selected>
+							<q-item>
+								<q-item-section avatar>
+									<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
+								</q-item-section>
+								<q-item-section>
+									<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+								</q-item-section>
+							</q-item>
+						</template>
+						<template v-slot:option="scope">
+							<q-item
+								clickable
+								v-ripple
+								v-close-popup
+								:active="panel === scope.opt.value"
+								@click="panel = scope.opt.value"
+							>
+								<q-item-section avatar>
+									<q-icon :name="scope.opt.icon"/>
+								</q-item-section>
+								<q-item-section>
+									<q-item-label v-html="scope.opt.label"/>
+								</q-item-section>
+							</q-item>
+						</template>
+					</q-select>
+				</div>
+				<q-tab-panels 
+					v-model="panel"
+					animated
+					swipeable
+					infinite
+					class="transparent-bg"
+				>
+					<q-tab-panel name="initiative">
+						<Initiative 
+							:encounter="encounter" 
+							:targets="_non_hidden_targets"
+							:allEntities="_turnCount"
+							:turn="turn"
+							:campPlayers="campaign.players"
+							:campCompanions="campaign.companions"
+							:players="players"
+							:npcs="npcs"
+							:playerSettings="playerSettings"
+							:npcSettings="npcSettings"
+							:width="width"
+							@newRoll="pushRoll"
+						/>
+					</q-tab-panel>
+					<q-tab-panel name="meters" v-if="playerSettings.meters === undefined">
+						<Meters 
+							:entities="encounter.entities" 
+							:npcs="npcs" 
+							:players="players"
+						/>
+					</q-tab-panel>
+					<q-tab-panel name="rolls">
+						<Rolls 
+							:entities="encounter.entities" 
+							:npcs="npcs" 
+							:players="players" 
+							:rolls="rolls"
+						/>
+					</q-tab-panel>
+				</q-tab-panels>
+			</div>
 		</template>
 
 		<!-- FINISHED -->
@@ -81,7 +160,7 @@
 					<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
 				</span>
 			</div>
-			<div class="track">
+			<div class="track desktop">
 				<div class="initiative">
 					<Rewards :encounter="encounter"/>
 				</div>
@@ -112,12 +191,36 @@
 			Rolls,
 			RollForInitiative
 		},
-		props: ["encounter", "campaign", "players"],
+		props: [
+			"encounter", 
+			"campaign", 
+			"players", 
+			"width"
+		],
 		data() {
 			return {
+				userId: this.$route.params.userid,
+				panel: "initiative",
 				setSideDisplay: undefined,
 				counter: 0,
-				rolls: []
+				rolls: [],
+				panels: [
+					{
+						label: "Initiative list",
+						value: "initiative",
+						icon: "fas fa-list-ul"
+					},
+					{
+						label: "Damage meters",
+						value: "meters",
+						icon: "fas fa-swords"
+					},
+					{
+						label: "Shared rolls",
+						value: "rolls",
+						icon: "fas fa-dice-d20"
+					}
+				]
 			}
 		},
 		firebase() {
@@ -238,7 +341,7 @@
 				set(newValue) {
 					this.setSideDisplay = newValue;
 				}
-			},
+			}
 		},
 		methods: {
 			pushRoll(roll) {
@@ -251,135 +354,68 @@
 </script>
 
 <style lang="scss" scoped>
-.turns {
-	grid-area: top;
-	background: rgba(38, 38, 38, .9);
-	text-transform: uppercase;
-	height: 65px;
-	padding: 20px 10px;
-	display: grid;
-	grid-template-columns: max-content auto max-content;
-
-	.title {
-		text-align: center;
-		padding: 0 10px;
-	}
-}
-
 .track {
 	max-width: 1250px;
 	margin: auto;
-	padding-top: 30px;
 	width: 100%;
-	height: calc(100% - 65px);
+	height: calc(100% - 60px);
 	display: grid;
-	grid-template-columns: 3fr 1fr;
-	grid-template-rows: 1fr;
-	grid-gap: 15px;
-	grid-template-areas:
-	"initiative side";
+	
 
-	.initiative {
-		grid-area: initiative;
-		padding-left: 15px;
-		overflow: hidden;
+	&.desktop {
+		grid-template-columns: 3fr 1fr;
+		grid-template-rows: 1fr;
+		grid-gap: 15px;
+		padding-top: 30px;
 
-		.q-scrollarea {
-			height: calc(100% - 86px);
+		.initiative {
+			padding-left: 15px;
+			overflow: hidden;
 
-			> div {
-				padding-right: 6px;
+			.q-scrollarea {
+				height: calc(100% - 86px);
+
+				> div {
+					padding-right: 6px;
+				}
+			}
+		}
+		.side {
+			padding-right: 15px;
+			overflow: hidden;
+
+			.q-scrollarea {
+				height: calc(100% - 56px);
+
+				&.during-encounter {
+					height: calc(100% - 50px);
+				}
+				.meters-wrapper {
+					padding-top: 15px;
+				}
 			}
 		}
 	}
-	.side {
-		grid-area: side;
-		padding-right: 15px;
-		overflow: hidden;
+	&.mobile {
+		grid-template-rows: 60px 1fr;
+		grid-template-columns: 1fr;
 
-		.q-scrollarea {
-			height: calc(100% - 56px);
-
-			&.during-encounter {
-				height: calc(100% - 50px);
-			}
-			.meters-wrapper {
-				padding-top: 15px;
-			}
+		.transparent-bg {
+			background: rgba(38, 38, 38, .5);
 		}
-	}
-	h3 {
-		margin-bottom: 30px !important;
-		color: #fff;
-		text-shadow: 0 0 8px #000;
-	}
-	h2.not-live {
-		margin-top: 50px;
-		text-align: center;
+		.q-tab-panel {
+			padding: 0 15px;
+		}
 	}
 
 	&::-webkit-scrollbar { 
 		display: none; 
 	}
-
-	h2.padding {
-		font-size:25px !important;
-		line-height: 25px !important;
-		text-align: center;
-		padding-top: 20px;
-		text-shadow: 0 0 8px #000;
-		color: #fff;
-	}
-	.loader:before {
-		width: 80px;
-		height: 80px;
-		margin-top: -85px;
-		margin-left: -40px;
-		border-width: 5px;
-		animation-duration: 1.5s;
-	}
-	.container-fluid {
-		background-color:rgba(0, 0, 0, 0.3);
-		height: calc(100vh - 115px);
-		overflow-y: scroll;
-		padding-bottom: 110px;
-
-		&::-webkit-scrollbar { 
-			display: none; 
-		}
-		.lastRoll {
-			background: rgba(0, 0, 0, .6);
-			padding: 5px;
-		}
-	}
 }
-
-
 
 @media only screen and (max-width: 1000px) {
-	.track {
-		grid-template-columns: 2fr 1fr;
-	}
-}
-
-
-@media only screen and (max-width: 720px) {
-	.track {
-		overflow: scroll;
-		grid-template-columns: 1fr;
-		grid-template-rows: auto;
-		grid-template-areas:
-		"initiative"
-		"side";
-
-		.initiative {
-			padding: 0 15px;
-			overflow: visible !important;
-		}
-		.side {
-			padding: 0 15px;
-			overflow: visible !important;
-		}
+	.track.desktop {
+		grid-template-columns: 3fr 2fr;
 	}
 }
 </style>

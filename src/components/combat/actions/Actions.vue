@@ -12,7 +12,13 @@
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
 						<q-item-section avatar>
-							<icon v-if="['monster', 'player', 'companion'].includes(entities[doneBy].img)" class="img" :icon="entities[doneBy].img" :fill="entities[doneBy].color_label" :style="entities[doneBy].color_label ? `border-color: ${entities[doneBy].color_label}` : ``" />
+							<icon 
+								class="img" 
+								v-if="['monster', 'player', 'companion'].includes(entities[doneBy].img)" 
+								:icon="entities[doneBy].img" 
+								:fill="entities[doneBy].color_label" 
+								:style="entities[doneBy].color_label ? `border-color: ${entities[doneBy].color_label}` : ``" 
+							/>
 							<span 
 								v-else 
 								class="img" 
@@ -88,6 +94,7 @@
 </template>
 
 <script>
+	import _ from 'lodash';
 	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 

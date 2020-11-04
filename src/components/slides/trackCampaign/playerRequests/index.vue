@@ -1,10 +1,54 @@
 <template>
 	<div>
 		<div class="mb-3" v-if="characters.length > 1">
-			<h5>Who performs the action?</h5>
-			<select class="form-control" v-model="player" name="player">
-				<option v-for="key in characters" :key="key" :value="key">{{ players[key].character_name }}</option>
-			</select>
+			<h5 class="mb-2">Who performs the action?</h5>
+			<q-select 
+				dark filled square dense
+				name="doneBy"
+				:value="player" 
+				:options="characters"
+				v-validate="'required'"
+			>
+				<template v-slot:selected>
+					<q-item v-if="player" class="selected">
+						<q-item-section avatar>
+							<icon v-if="!players[player].avatar" class="img" icon="player" />
+							<span 
+								v-else 
+								class="img" 
+								:style="{'background-image': 'url(' + players[player].avatar + ')'}
+							"/>
+						</q-item-section>
+						<q-item-section>
+							<q-item-label v-html="players[player].character_name"/>
+						</q-item-section>
+					</q-item>
+					<span v-else>
+						Who performs the action?
+					</span>
+				</template>
+				<template v-slot:option="scope">
+					<q-item
+						clickable
+						v-ripple
+						v-close-popup
+						:active="player === scope.opt"
+						@click="player = scope.opt"
+					>
+						<q-item-section avatar>
+							<icon v-if="!players[scope.opt].avatar" class="img" icon="player" />
+							<span 
+								v-else 
+								class="img" 
+								:style="{'background-image': 'url(' + players[scope.opt].avatar + ')'}
+							"/>
+						</q-item-section>
+						<q-item-section>
+							<q-item-label v-html="players[scope.opt].character_name"/>
+						</q-item-section>
+					</q-item>
+				</template>
+			</q-select>
 		</div>
 		
 		<h5>Targets</h5>
@@ -103,6 +147,25 @@
 				line-height: 18px;
 			}
 		}
+	}
+	.q-field {
+		margin-bottom: 15px;
+
+		.q-item {
+			&.selected {
+				padding: 0;
+				min-height: 35px !important;
+				line-height: 35px !important
+			}
+		}
+	}
+	.img {
+		display: block;
+		width: 35px;
+		height: 35px;
+		background-size: cover;
+		background-position: top center;
+		border: solid 1px #b2b2b2;
 	}
 	
 </style>

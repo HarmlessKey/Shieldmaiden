@@ -15,51 +15,54 @@
 			/>
 		</q-tabs>
 		<template v-if="(Object.keys(_meters['damage']).length > 0 || Object.keys(_meters['healing']).length > 0)">
-			<div v-for="(type, index) in types" :key="index">
-				<h3>{{ type.type }} {{ doneTaken }}</h3>
-				<transition-group tag="ul" 
-					name="entities" 
-					enter-active-class="animated fadeInUp" 
-					leave-active-class="animated fadeOutDown">
-					<template>
-						<li v-for="entity in _meters[type.type]" class="health" :key="entity.key">
-							<icon 
-								v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img" 
-								:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
-								:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
-							/>
-							<div v-else class="img" :style="{ 
-								backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
-								borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
-							}"/>
-							<div class="progress health-bar">
-								<div class="info">
-									<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
-									<span v-else class="name">{{ entity.name }}</span>
-									<span class="numbers">
-										<span :class="{
-											'red' : type.type == 'damage',
-											'green' : type.type == 'healing'
-										}">
-											<template v-if="entity.meters[type.name] < 10000">{{ entity.meters[type.name] }}</template>
-											<template v-else>{{ entity.meters[type.name] | numeral('0.0a') }}</template>
+			<div v-for="({type, subtype, over}, index) in types" :key="index">
+				<template v-if="Object.keys(_meters[type]).length > 0">
+					<h3>{{ type }} {{ doneTaken }}</h3>
+					<transition-group tag="ul" 
+						name="entities" 
+						enter-active-class="animated fadeInUp" 
+						leave-active-class="animated fadeOutDown">
+						<template>
+							<li v-for="entity in _meters[type]" class="health" :key="entity.key">
+								<icon 
+									v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img" 
+									:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+									:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
+								/>
+								<div v-else class="img" :style="{ 
+									backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
+									borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
+								}"/>
+								<q-linear-progress 
+									size="30px" 
+									:value="percentageMeters(entity.meters[subtype], type, subtype)" 
+									color="black" 
+									class="bg-gray-active"
+								>
+									<div class="info">
+										<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
+										<span v-else class="name">
+											{{ entity.name }}
 										</span>
-										<template v-if="entity.meters[type.over]"> 
-											(<template v-if="entity.meters[type.over] < 10000">{{ entity.meters[type.over] }} </template>
-											<template v-else>{{ entity.meters[type.over] | numeral('0.0a') }} </template> 
-											<small>over</small>)</template>
-									</span>
-								</div>
-								<div class="progress-bar bg-black" 
-									role="progressbar" 
-									:style="{ width: percentageMeters(entity.meters[type.name], type.type) + '%' }" 
-									aria-valuemin="0" 
-									aria-valuemax="100">
-								</div>
-							</div>
-						</li>
-					</template>
-				</transition-group>
+										<span class="numbers">
+											<span :class="{
+												'red' : type == 'damage',
+												'green' : type == 'healing'
+											}">
+												<template v-if="entity.meters[subtype] < 10000">{{ entity.meters[subtype] }}</template>
+												<template v-else>{{ entity.meters[subtype] | numeral('0.0a') }}</template>
+											</span>
+											<template v-if="entity.meters[over]"> 
+												(<template v-if="entity.meters[over] < 10000">{{ entity.meters[over] }} </template>
+												<template v-else>{{ entity.meters[over] | numeral('0.0a') }} </template> 
+												<small>over</small>)</template>
+										</span>
+									</div>
+								</q-linear-progress>
+							</li>
+						</template>
+					</transition-group>
+				</template>
 			</div>
 		</template>
 	</div>
@@ -98,24 +101,32 @@
 			types() {
 				let dmg = {
 					type: 'damage',
-					name: 'damage',
+					subtype: 'damage',
 					over: 'overkill'
 				}
 				let heal = {
 					type: 'healing',
-					name: 'healing',
+					subtype: 'healing',
 					over: 'overhealing'
 				}
 				if(this.doneTaken === 'taken') {
-					dmg.name = 'damageTaken';
+					dmg.subtype = 'damageTaken';
 					dmg.over = 'overkillTaken';
-					heal.name = 'healingTaken';
+					heal.subtype = 'healingTaken';
 					heal.over = 'overhealingTaken';
 				}
 
 				return {
-					'damage': { type: dmg.type, name: dmg.name, over: dmg.over },
-					'healing': { type: heal.type, name: heal.name, over: heal.over },
+					'damage': { 
+						type: dmg.type, 
+						subtype: dmg.subtype, 
+						over: dmg.over
+					},
+					'healing': { 
+						type: heal.type, 
+						subtype: heal.subtype, 
+						over: heal.over
+					},
 				}
 			},
 			_meters: function() {
@@ -131,8 +142,7 @@
 						.orderBy(function(entity){
 							let damage = (entity.meters) ? entity.meters[dmg] : 0;
 							return parseInt(damage)
-						} , 'desc')
-						.value(),
+						} , 'desc').value(),
 					'healing': _.chain(this.entities)
 						.filter(function(entity, key) {
 							entity.key = key
@@ -143,8 +153,7 @@
 						.orderBy(function(entity){
 							let healing = (entity.meters) ? entity.meters[heal] : 0;
 							return parseInt(healing)
-						} , 'desc')
-						.value()
+						} , 'desc').value()
 				}
 			},
 		},
@@ -181,15 +190,10 @@
 				}
 				return img
 			},
-			percentageMeters(input, type) {
-				var total = 0;
-
-				for(var key in this._meters[type]) {
-					var amount = this._meters[type][key].meters[type]
-					total = total + amount;
-				}
-				var percentage = Math.floor(input / total * 100)
-				return percentage;
+			percentageMeters(input, type, subtype) {
+				//Highest = 100%
+				//lower is percentage of highest
+				return input / this._meters[type][0].meters[subtype];
 			},
 		},
 	}
@@ -205,12 +209,12 @@
 			text-shadow: 0 0 3px  #000;
 			font-size: 12px !important;
 			font-weight: bold !important;
-			line-height: 52px;
-			margin: 0 !important;
+			margin: 20px 0 0 0 !important;
 		}
 		ul {
 			padding: 0;
 			list-style: none;
+			margin: 0;
 
 			li {
 				display: grid;
@@ -232,14 +236,14 @@
 					height: 30px;
 					border: solid 1px transparent;
 				}
-				.progress { 
-					width: 100% !important;
-					height: 30px;
+				.q-linear-progress { 
+					font-size: 15px !important;
 					line-height: 30px;
-					background-color: rgba(38, 38, 38, .8);
+					height: 30px;
 					position: relative;
 
 					.info {
+						color: #b2b2b2;
 						width: 100%;
 						position: absolute;
 						left: 0;

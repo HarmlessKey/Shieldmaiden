@@ -745,49 +745,6 @@ html body {
     margin-left: auto;
 	}
 
-	#sidebar {
-		.list-group-item {
-			a {
-				padding: 10px 15px;
-				display: block;
-				font-size: 15px;
-				line-height: 20px;
-				color: $gray-light !important;
-				
-				&:hover, &.active:hover {
-					background-color: $gray-hover;
-					text-decoration: none;
-				}
-				&.active {
-					background-color: $gray-active;
-
-					svg {
-						color: $blue !important;
-					}
-				}
-				span {
-					color: $gray-light !important;
-				}
-				svg {
-					margin-right:15px;
-					color: $gray-light !important;
-					font-size:20px;
-					line-height:20px;
-				}
-			}
-			
-			&:hover, &.active:hover {
-				background-color:$gray-hover !important;
-				text-decoration: none;
-			}
-			&.active {
-				background-color: $gray-active !important;
-			}
-		}
-		.list-group-item:first-child, .list-group-item:last-child {
-			border-radius: 0 !important;
-		}
-	}
 	.login-container {
 		color: #fff;
 		background-position: center;
@@ -1027,7 +984,7 @@ html body {
 				margin-bottom: 1px !important;
 
 				td {
-					width: max-content !important;
+					width: max-content;
 					padding: 10px;
 					color: $gray-light;
 					border-top: none;
@@ -1128,6 +1085,107 @@ html body {
 			font-size: 13px; 
 			td, th {
 				padding: 5px;
+			}
+		}
+	}
+
+	.target-item {
+		width: 100%;
+		display: grid;
+		grid-template-columns: 35px 35px 1fr;
+		grid-template-rows: auto;
+		grid-gap: 0;
+		
+		line-height: 35px;
+		user-select: none;
+	
+		&.hasInitiative {
+			grid-template-columns: 35px 35px 35px 1fr;
+		}
+		.initiative, .ac, .img {
+			text-align: center;
+			height: 35px;
+		}
+		.ac_wrapper {
+			position: relative;
+	
+			i, .ac {
+				position: absolute;
+				line-height: 35px;
+				width: 100%;
+				text-align: center;
+			}
+			i {
+				font-size: 25px;
+				color: #5c5757;
+			}
+			.ac {
+				font-weight: bold;
+				color: #fff;
+				margin-top: -1px;
+			}
+		}
+		.img {
+			display: block;
+			width: 35px;
+			height: 35px;
+			background-color: #191919;
+			background-position: center top;
+			background-repeat: no-repeat;
+			background-size: cover;
+			font-size: 20px;
+			line-height: 35px;
+			overflow: hidden;
+			border: solid 1px transparent;
+	
+			span {
+				position: relative;
+			}
+		}
+	
+		.health-bar { 
+			padding-left: 5px;
+			font-size: 13px;
+			display: grid;
+			grid-template-columns: auto max-content;
+			grid-column-gap: 5px;
+			line-height: 35px;
+			margin-right: 5px;
+			color: #fff;
+			// text-shadow:
+			// 	-1px -1px 2px rgba(0, 0, 0, .5),  
+			// 	1px -1px 2px rgba(0, 0, 0, .5),
+			// 	-1px 1px 2px rgba(0, 0, 0, .5),
+			// 	1px 1px 2px rgba(0, 0, 0, .5);
+	
+			.conditions {
+				position: absolute;
+				right: 0;
+				top: 0;
+	
+				.condition {
+					display: block;
+					width: 12px;
+					height: 12px;
+					border: solid 1px #fff;
+					margin-left: 1px;
+					cursor: pointer;
+				}
+			}
+	
+			.hp {
+				text-align: right;
+				
+				.current {
+					font-size: 18px;
+					font-weight: bold;
+				}
+				.max, .temp {
+					opacity: .5;
+				}
+				.save {
+					margin-right: 4px;
+				}
 			}
 		}
 	}
@@ -1563,9 +1621,6 @@ html body {
 		-moz-appearance: textfield;
 	}
 
-	.form-control:disabled {
-		opacity: 0.25 !important;
-	}
 
 	/* QUALSAR */
 	/*********************************************/
@@ -1581,7 +1636,7 @@ html body {
 		border-radius: 0;
 	}
 	.q-menu {
-		color: $gray-dark;
+		color: $gray-light;
 		
 		.q-list {
 			.q-item {
@@ -1590,7 +1645,7 @@ html body {
 				}
 			}
 			a.q-item {
-				color:$gray-dark !important;
+				color:$gray-light !important;
 		
 				&:hover {
 					color: $blue !important;
@@ -1612,6 +1667,12 @@ html body {
 			&__icon {
 				font-size: 15px;
 			}
+		}
+		.q-tabs__arrow {
+			line-height: 35px;
+			font-size: 30px;
+			text-shadow: 0px 0px 3px #000;
+			color: #fff;
 		}
 	}
 

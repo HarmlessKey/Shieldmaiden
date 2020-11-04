@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="target bg-gray-dark" :class="{ hasInitiative: initiative }">
+		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative">
 				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
@@ -159,7 +159,7 @@
 		</div>
 
 		<!-- REMINDERS -->
-		<ul v-if="entity.reminders" class="reminders d-flex justify-content-start">
+		<ul v-if="entity.reminders && showReminders" class="target-reminders d-flex justify-content-start">
 			<li v-for="(reminder, index) in entity.reminders" :key="index" :class="'bg-'+reminder.color">
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ reminder.title }}
@@ -184,6 +184,10 @@
 				type: Number
 			},
 			initiative: {
+				type: Boolean,
+				default: false
+			},
+			showReminders: {
 				type: Boolean,
 				default: false
 			}
@@ -278,114 +282,15 @@
 </script>
 
 <style lang="scss" scoped>
-.target {
-	width: 100%;
-	display: grid;
-	grid-template-columns: 35px 35px 1fr;
-	grid-template-rows: auto;
-	grid-gap: 0;
-	
-	line-height: 35px;
-	user-select: none;
+ul.target-reminders {
+	padding-left: 30px;
+	list-style: none;
+	margin: 0;
 
-	&.hasInitiative {
-		grid-template-columns: 35px 35px 35px 1fr;
-	}
-	.initiative, .ac, .img {
-		text-align: center;
-		height: 35px;
-	}
-	.ac_wrapper {
-		position: relative;
-
-		i, .ac {
-			position: absolute;
-			line-height: 35px;
-			width: 100%;
-			text-align: center;
-		}
-		i {
-			font-size: 25px;
-			color: #5c5757;
-		}
-		.ac {
-			font-weight: bold;
-			color: #fff;
-			margin-top: -1px;
-		}
-	}
-	.img {
-		display: block;
-		width: 35px;
-		height: 35px;
-		background-color: #191919;
-		background-position: center top;
-		background-repeat: no-repeat;
-		background-size: cover;
-		font-size: 20px;
-		line-height: 35px;
-		overflow: hidden;
-		border: solid 1px transparent;
-
-		span {
-			position: relative;
-		}
-	}
-
-	.health-bar { 
-		padding-left: 5px;
-		font-size: 13px;
-		display: grid;
-		grid-template-columns: auto max-content;
-		grid-column-gap: 5px;
-		line-height: 35px;
-		margin-right: 5px;
-		color: #fff;
-		// text-shadow:
-		// 	-1px -1px 2px rgba(0, 0, 0, .5),  
-		// 	1px -1px 2px rgba(0, 0, 0, .5),
-		// 	-1px 1px 2px rgba(0, 0, 0, .5),
-		// 	1px 1px 2px rgba(0, 0, 0, .5);
-
-		.conditions {
-			position: absolute;
-			right: 0;
-			top: 0;
-
-			.condition {
-				display: block;
-				width: 12px;
-				height: 12px;
-				border: solid 1px #fff;
-				margin-left: 1px;
-				cursor: pointer;
-			}
-		}
-
-		.hp {
-			text-align: right;
-			
-			.current {
-				font-size: 18px;
-				font-weight: bold;
-			}
-			.max, .temp {
-				opacity: .5;
-			}
-			.save {
-				margin-right: 4px;
-			}
-		}
-	}
-	ul.reminders {
-		padding-left: 30px;
-		list-style: none;
-
-		li {
-			width: 20px;
-			height: 7px;
-			margin: 1px 1px 1px 0;
-		}
+	li {
+		width: 20px;
+		height: 7px;
+		margin: 1px 1px 1px 0;
 	}
 }
 </style>

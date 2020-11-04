@@ -1,7 +1,13 @@
 <template>
 	<div class="menu bg-gray-dark">
-		<div v-if="targeted.length === 0" class="no-target">
-			Select a target
+		<div v-if="targeted.length === 0" class="no-target red" 
+			@click="setSlide({
+				show: true,
+				type: 'slides/encounter/TargetingInfo',
+				data: { key: targeted[0] }
+			})"
+		>
+			Select a target.
 		</div>
 		<q-tabs
 			v-else
@@ -15,19 +21,25 @@
 				:key="`tab-${index}`" 
 				:name="name" 
 				:icon="icon"
-				@click="dialog[name] = !dialog[name]"
+				@click="
+					(name === 'info') ? 
+					setSlide({
+						show: true,
+						type: 'combat/TargetInfo',
+						data: { key: targeted[0] }
+					}) : dialog[name] = !dialog[name]"
 			/>
 		</q-tabs>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog v-model="dialog.damage">
-			<div class="bg-gray pt-2">
-				<Actions :current="current" :settings="settings" location="current" />
+		<q-dialog square v-model="dialog.damage">
+			<div class="bg-gray px-3 py-3">
+				<Actions :current="current" :settings="settings" :select-entity="true" />
 			</div>
 		</q-dialog>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog v-model="dialog.options">
+		<q-dialog square v-model="dialog.options">
 			<div class="bg-gray">
 				<q-list>
 					<q-item>
@@ -114,16 +126,6 @@
 		props: ["entities", "settings", "current"],
 		data () {
 			return {
-				tabs: [
-					{
-						name: "damage",
-						icon: "fas fa-swords"
-					},
-					{
-						name: "options",
-						icon: "fas fa-ellipsis-h"
-					}
-				],
 				dialog: {
 					damage: false,
 					options: false
@@ -134,6 +136,29 @@
 			...mapGetters([
 				'targeted',
 			]),
+			tabs() { 
+				let tabs = [];
+
+				if(this.targeted.length) {
+
+					tabs.push({
+						name: "damage",
+						icon: "fas fa-swords",
+					},
+					{
+						name: "options",
+						icon: "fas fa-ellipsis-h"
+					})
+				}
+				if(this.targeted.length === 1) {
+					tabs.push(	{
+						name: "info",
+						icon: "info"
+					});
+				}
+				if(this.targeted.length)
+					return tabs;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -198,12 +223,15 @@
 		position: fixed;
 		width: 100%;
 		bottom: 0;
-		height: 48px;
+		height: 60px;
 
 		.no-target {
-			line-height: 48px;
+			line-height: 60px;
 			text-align: center;
 			user-select: none;
+		}
+		.q-tabs {
+			height: 100%;
 		}
 	}
 </style>

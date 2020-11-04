@@ -8,8 +8,12 @@
 			v-else-if="encounter && (players || demo)"  
 			:style="[settings.background ?  {'background': 'url(\'' + encounter.background + '\')'} : {'background': ''}]"
 		>	
+			<template v-if="encounter.finished">
+				<Finished v-if="!demo" :encounter="encounter"/>
+				<DemoFinished v-else />
+			</template>
 			<!-- DESKTOP -->
-			<template v-if="width > 576">
+			<template v-else-if="width > 576">
 				<template v-if="encounter.finished">
 					<Finished v-if="!demo" :encounter="encounter"/>
 					<DemoFinished v-else />
@@ -28,7 +32,6 @@
 							:current="_active[encounter.turn]"
 							:next="_active[encounter.turn + 1]"
 						/>
-						{{ setAlive(Object.keys(_alive).length) }} <!-- Check if there are alive NPC's -->
 						<Current 
 							:current="_active[encounter.turn]"
 							:next="next"
@@ -39,7 +42,9 @@
 							:_idle = "_idle"
 						/>
 						<Targeted />
-						<Side />
+						<div id="side_container"> 
+							<Side />
+						</div>
 					</div>
 				</template>
 
@@ -59,6 +64,12 @@
 						:active_len="Object.keys(_active).length"
 						:current="_active[encounter.turn]"
 						:next="_active[encounter.turn + 1]"
+					/>
+
+					<CurrentMobile 
+						:current="_active[encounter.turn]"
+						:next="next"
+						:settings="settings"
 					/>
 					
 					<Targets
@@ -86,6 +97,7 @@
 	import Turns from '@/components/combat/Turns.vue';
 	import Menu from '@/components/combat/mobile/Menu.vue';
 	import Current from '@/components/combat/Current.vue';
+	import CurrentMobile from '@/components/combat/mobile/Current.vue';
 	import Targets from '@/components/combat/Targets.vue';
 	import Targeted from '@/components/combat/Targeted.vue';
 	import Side from '@/components/combat/side/Side.vue';
@@ -105,6 +117,7 @@
 			Turns,
 			Menu,
 			Current,
+			CurrentMobile,
 			Targets,
 			Targeted,
 			Side,
@@ -119,7 +132,6 @@
 				userId: this.$store.getters.getUser.uid,
 				demo: this.$route.name === "Demo",
 				target: undefined,
-				alive: undefined,
 				width: 0
 			}
 		},
@@ -187,6 +199,9 @@
 					} , order)
 					.value()
 			},
+			alive() {
+				return Object.keys(this._alive).length;
+			},
 			_alive: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc';
 
@@ -212,7 +227,7 @@
 			}
 		},
 		watch: {
-			alive(newVal) {
+			alive(newVal, oldVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}
@@ -257,6 +272,9 @@
 			this.removeTrack()
 			next();
 		},
+		beforeDestroy() {
+			window.removeEventListener('resize', this.setSize);
+		},
 		methods: {
 			...mapActions([
 				'init_Encounter',
@@ -279,9 +297,6 @@
 					campaign: false,
 					encounter: false,
 				});
-			},
-			setAlive(n) {
-				this.alive = n;
 			},
 			confirmFinish() {
 				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
@@ -337,21 +352,31 @@
 			font-size: 15px !important;
 			margin-bottom: 15px !important;
 		}
+
+		#side_container {
+			padding-top: 5px;
+			margin-top: -5px;
+			grid-area: side;
+			overflow: hidden;
+		}
 	}
 
 	.mobile {
 		height: 100%;
 		display: grid;
 		grid-template-columns: 1fr;
-		grid-template-rows: 60px 1fr 48px;
+		grid-template-rows: 60px max-content 1fr 60px;
 		grid-template-areas:
 		"turns"
+		"current"
 		"targets"
 		"menu";
 
 		#turns {
-			z-index: 99;
 			border-bottom: solid 1px#191919;
+		}
+		#current {
+			z-index: 90;
 		}
 	}
 
@@ -361,6 +386,9 @@
 			grid-template-areas:
 			"turns turns turns"
 			"current targets targeted";
+		}
+		#side_container {
+			display: none;
 		}
 	}
 	@media only screen and (max-width: 900px) {

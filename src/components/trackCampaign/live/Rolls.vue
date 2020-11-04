@@ -71,10 +71,12 @@
 	h3 {
 		text-shadow: 0 0 8px #000;
 		color: #fff;
+		margin-bottom: 6px !important;
 	}
 	ul.rolls {
 		list-style: none;
 		padding: 0;
+		margin: 0;
 
 		li {
 			padding: 15px 10px;

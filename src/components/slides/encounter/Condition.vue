@@ -5,9 +5,9 @@
 			{{ cond.name }}
 		</h2>
 
-		<div class="bg-gray-dark pr-2">
-				<TargetItem  :item="entity.key" />
-		</div>
+		<span class="bg-gray-dark">
+			<TargetItem  :item="entity.key" />
+		</span>
 
 		<hr>
 

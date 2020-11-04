@@ -2,36 +2,41 @@
 	<div v-if="targets && allEntities && players && campPlayers" class="initiative-wrapper">
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
-			<div>
-				<span v-if="targeted.length === 0">Select a target to perform actions</span>
-				<span v-else>
-					{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
-				</span>
+			<!-- MOBILE -->
+			<div v-if="width <= 576">
+				<q-tabs
+					dark
+					inline-label
+					no-caps
+					indicator-color="transparent"
+				>
+					<q-tab 
+						name="Damage" 
+						icon="fas fa-swords"
+						@click="damageRequest"
+					/>
+				</q-tabs>
 			</div>
-			<div class="right">
-				<a 
-					v-if="targeted.length > 0"
-					@click="setSlide({
-						show: true,
-						type: 'slides/trackCampaign/playerRequests/index',
-						data: {
-							characters,
-							targeted: targeted,
-							targets,
-							players,
-							campPlayers,
-							npcSettings,
-							npcs,
-							encounter: { key: encounter.key, turn: encounter.turn, round: encounter.round },
-							type: 'manual'
-						}
-					})">
-					<i class="fas fa-sword"></i>
-					<q-tooltip anchor="top middle" self="center middle">
-						Do damage or healing
-					</q-tooltip>
-				</a>
-			</div>
+
+			<!-- DESKTOP -->
+			<template v-else>
+				<div>
+					<span v-if="targeted.length === 0">Select a target to perform actions</span>
+					<span v-else>
+						{{ targeted.length }} {{ targeted.length > 1 ? 'targets' : 'target' }}
+					</span>
+				</div>
+				<div class="right">
+					<a 
+						v-if="targeted.length > 0"
+						@click="damageRequest()">
+						<i class="fas fa-sword"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Do damage or healing
+						</q-tooltip>
+					</a>
+				</div>
+			</template>
 		</div>
 
 		<!-- INITIATIVE LIST -->
@@ -141,25 +146,25 @@
 								(playerSettings.health === 'obscured' && (entity.entityType === 'player' || entity.entityType === 'companion'))
 								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
 							">
-								<template v-if="entity.curHp == 0">
-									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+							<template v-if="entity.curHp == 0">
+								<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
 								</template>
 								<i v-else class="fas" :class="{
 										'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
 										'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
 										'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
-									}"></i>
+									}"
+								/>
 							</template>
 							<template v-else>
 								<span class="gray-hover">
 									<template v-if="entity.curHp == 0">
 										<i class="fas fa-skull-crossbones red"></i>
-									
-                                  </template>
-                                <template v-else>? ? ?</template>
-                                </span>
-                            </template>
-                        </td>
+									</template>
+									<template v-else>? ? ?</template>
+								</span>
+							</template>
+						</td>
 
 						<td class="conditions d-none d-md-table-cell">
 							<div class="d-flex justify-content-right" v-if="
@@ -200,10 +205,10 @@
 	import { mapActions } from 'vuex';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 
-	import Health from '@/components/trackCampaign/Health.vue';
+	import Health from './Health.vue';
 
 	export default {
-		name: 'app',
+		name: 'Initiative',
 		mixins: [general, trackEncounter],
 		components: {
 			Health,
@@ -219,13 +224,13 @@
 			'playerSettings',
 			'npcs',
 			'npcSettings',
+			'width'
 		],
 		data() {
 			return {
 				dmId: this.$route.params.userid,
 				userId: this.$store.getters.getUser.uid,
 				characters: [],
-				windowWidth: 0,
 
 				//Multitargeting needs variables
 				targeted: [],
@@ -265,15 +270,6 @@
 					}
 				});
 			}
-
-			//For a responsive window size
-			//in the html we bind a class based on that
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.getWindowWidth);
-
-				//Init
-				this.getWindowWidth()
-			})
 		},
 		watch: {
 			counter(newValue) {
@@ -407,11 +403,6 @@
 				this.targeted = targeted;
 				this.setSlide({ show: false });
 			},
-			getWindowWidth() {
-				//Return the window width
-				//used in the html to bind a class for small tables
-				this.windowWidth = document.documentElement.clientWidth;
-			},
 			camp_data(entity) {
 				let key = entity.key
 				if (entity.entityType === 'player')
@@ -422,6 +413,27 @@
 
 				return undefined;
 			},
+			damageRequest() {
+				this.setSlide({
+					show: true,
+					type: 'slides/trackCampaign/playerRequests/index',
+					data: {
+						characters: this.characters,
+						targeted: this.targeted,
+						targets: this.targets,
+						players: this.players,
+						campPlayers: this.campPlayers,
+						npcSettings: this.npcSettings,
+						npcs: this.npcs,
+						encounter: { 
+							key: this.encounter.key, 
+							turn: this.encounter.turn, 
+							round: this.encounter.round
+						},
+						type: 'manual'
+					}
+				})
+			}
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.getWindowWidth);
@@ -437,7 +449,8 @@
 	.actions {
 		display: flex;
 		justify-content: space-between;
-		padding-bottom: 5px;
+		height: 35px;
+		line-height: 35px;
 		border-bottom: solid 2px #fff;
 
 		.right {
@@ -566,6 +579,59 @@
 				transition: transform .6s;
 			}
 		}
+	}
+}
+@media only screen and (max-width: 576px) {
+	.initiative-wrapper {
+		padding-bottom: 60px;
+
+		.actions {
+			position: fixed;
+			bottom: 0;
+			z-index: 90;
+			background: #191919;
+			left: 0;
+			width: 100%;
+			border: none;
+			height: 60px;
+			line-height: 60px;
+			display: block;
+		}
+		.q-scrollarea {
+			height: 100%;
+		}
+		.initiative-list {
+			margin: 0 !important;
+
+			th {
+				padding: 5px 0;
+
+				&.init {
+					text-align: left !important;
+				}
+			}
+			td {
+				padding: 5px 0;
+
+				&.image {
+					width: 35px !important;
+
+					.img {
+						width: 33px !important;
+						height: 33px !important;
+					}
+				}
+				&.init, &.ac {
+					width: 35px;
+				}
+				&.init {
+					text-align: left !important;
+				}
+			}			
+		}
+	}
+	.q-tabs {
+		height: 60px;
 	}
 }
 </style>

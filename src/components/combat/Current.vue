@@ -7,50 +7,21 @@
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">
 				<template v-if="current">
-					<template v-if="(current.entityType === 'player' || current.entityType === 'companion') && current.curHp == 0 && !current.stable && !current.dead">
-							<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
-							<div class="px-1 my-3 d-flex justify-content-between">
-								<div v-for="(n, index) in 5" :key="index">
-									<template v-if="Object.keys(current.saves).length == n">
-										<a v-show="current.saves[n] === 'succes'" class="green" @click="save('unset', n)">
-											<i class="fas fa-check"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Change
-											</q-tooltip>
-										</a>
-										<a v-show="current.saves[n] === 'fail'" class="red" @click="save('unset', n)">
-											<i class="fas fa-times"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Change
-											</q-tooltip>
-										</a>
-									</template>
-									<template v-else>
-										<span v-show="current.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
-										<span v-show="current.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
-									</template>
-									<span v-show="!current.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
-								</div>
-							</div>
-							<div v-if="Object.keys(current.saves).length < 5" class="d-flex justify-content-between">
-								<button class="btn save bg-green" @click="save('succes', Object.keys(current.saves).length)"><i class="fas fa-check"></i></button>
-								<button class="btn save bg-red" @click="save('fail', Object.keys(current.saves).length)"><i class="fas fa-times"></i></button>
-							</div>
-							<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{current.entityType.capitalize()}} died</a>
-							<a class="btn btn-block mt-3" @click="set_stable({key: current.key, action: 'set'})"><i class="fas fa-hand-holding-magic"></i> Stabilize</a>
-					</template>
-					<a v-else-if="current.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
-					
-					<template v-else>
-						<TargetItem :item="current.key" />
+					<DeathSaves 
+						v-if="(current.entityType === 'player' || current.entityType === 'companion')" 
+						:target="current"
+					/>
 
-						<Reminders :entity="current" />
-						<Conditions :entity="current" />
-					</template>
+					<TargetItem :item="current.key" class="mb-2" />
+
+					<Reminders :entity="current" />
+					<Conditions :entity="current" />
 				</template>
 				<div v-else class="loader"><span>Loading current...</span></div>
 			</div>
-			<Actions :current="current" :settings="settings" location="current"/>
+			<div class="px-3 py-3">
+				<Actions :current="current" :settings="settings" />
+			</div>
 		</q-scroll-area>
 	</div>
 </template>
@@ -63,6 +34,7 @@
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import { remindersMixin } from '@/mixins/reminders';
 	import TargetItem from '@/components/combat/TargetItem.vue';
+	import DeathSaves from '@/components/combat/DeathSaves.vue';
 
 	export default {
 		name: 'Current',
@@ -71,7 +43,8 @@
 			Actions,
 			Conditions,
 			Reminders,
-			TargetItem
+			TargetItem,
+			DeathSaves
 		},
 		props: ['current', 'next', 'settings'],
 		data() {
@@ -111,78 +84,19 @@
 				'round',
 				'turn',
 				'targeted',
-			]),
-			death_fails() {
-				let fails = 0;
-				for(let key in this.current.saves) {
-					if(this.current.saves[key] === 'fail') {
-						fails++
-					}
-				}
-				return fails;
-			}
+			])
 		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'set_save',
-				'set_dead',
-				'set_stable'
+				'setSlide'
 			]),
-			showCondition(show) {
-				event.stopPropagation();
-				this.setSlide({
-					show: true,
-					type: 'condition',
-					condition: show,
-					entity: this.current
-				})
-			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100);
 				return hp_percentage;
 			},
 			shadow() {
 				this.setShadow = this.$refs.scroll.scrollPosition;
-			},
-			save(check, index) {
-				this.set_save({
-					key: this.current.key,
-					check: check,
-					index
-				})
-			},
-			stabilize() {
-				this.set_stable({
-					key: this.current.key,
-					action: 'set',
-				})
-			},
-			kill_revive(action) {
-				this.set_dead({
-					key: this.current.key,
-					action: action,
-					revive: true
-				})
-			},
-			displayStats(entity) {
-				var stats;
-				if(entity.transformed == true) {
-					stats = {
-						ac: entity.transformedAc,
-						maxHp: entity.transformedMaxHp,
-						curHp: entity.transformedCurHp,
-					}
-				}
-				else {
-					stats = {
-						ac: entity.ac,
-						maxHp: entity.maxHp,
-						curHp: entity.curHp,
-					}
-				}
-				return stats
-			},
+			}
 		}
 	}
 </script>

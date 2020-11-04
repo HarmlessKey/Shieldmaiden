@@ -86,46 +86,8 @@
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div class="current">
 				<!-- SINGLE TARGET -->
-				<template v-if="target">
-					<template v-if="(target.entityType === 'player' || target.entityType === 'companion') && target.curHp == 0 && !target.stable && !target.dead">
-							<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
-							<div class="px-1 my-3 d-flex justify-content-between">
-								<div v-for="(n, index) in 5" :key="index">
-									<template v-if="Object.keys(target.saves).length == n">
-										<a v-show="target.saves[n] === 'succes'" class="green" @click="save('unset', n)">
-											<i class="fas fa-check"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Undo
-											</q-tooltip>
-										</a>
-										<a v-show="target.saves[n] === 'fail'" class="red" @click="save('unset', n)">
-											<i class="fas fa-times"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Undo
-											</q-tooltip>
-										</a>
-									</template>
-									<template v-else>
-										<span v-show="target.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
-										<span v-show="target.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
-									</template>
-									<span v-show="!target.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
-								</div>
-							</div>
-							<div v-if="Object.keys(target.saves).length < 5" class="d-flex justify-content-between">
-								<button class="btn save bg-green" @click="save('succes', Object.keys(target.saves).length)"><i class="fas fa-check"></i></button>
-								<button class="btn save bg-red" @click="save('fail', Object.keys(target.saves).length)"><i class="fas fa-times"></i></button>
-							</div>
-							<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
-							<a class="btn btn-block mt-3" @click="set_stable({key: target.key, action: 'set'})"><i class="fas fa-heartbeat"></i> Stabilize</a>
-					</template>
-					<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
-					
-					<TargetItem v-else :item="target.key" />
-
-					<Reminders :entity="target" />
-					<Conditions :entity="target" />
-					<ViewEntity class="mt-3 hide" :data="target" />
+				<template v-if="targeted.length === 1">
+					<TargetInfo :data="{ key: targeted[0] }" />
 				</template>
 
 				<!-- MULTIPLE TARGETS -->
@@ -192,7 +154,7 @@
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
-	import TargetItem from '@/components/combat/TargetItem.vue';
+	import TargetInfo from '@/components/combat/TargetInfo.vue';
 
 	export default {
 		name: 'Targeted',
@@ -201,7 +163,7 @@
 			ViewEntity,
 			Conditions,
 			Reminders,
-			TargetItem
+			TargetInfo
 		},
 		data() {
 			return {
@@ -353,11 +315,11 @@
 		line-height: 25px;
 	}
 	.current {
-		padding: 15px 10px;
+		padding: 12px 10px 15px 10px;
 		width: calc(100% - 5px);
 	}
 	.q-scrollarea {
-		height: calc(100% - 30px);
+		height: calc(100% - 110px);
 	}
 	h2.componentHeader {
 		padding: 10px 15px 10px 10px !important;

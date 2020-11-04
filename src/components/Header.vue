@@ -1,9 +1,8 @@
 <template>
 	<header :class="{ invert: enviroment === 'development' }">
-		<div id="header" class="d-flex justify-content-between">
+		<div id="header" class="d-flex justify-content-between" :class="{ 'hidden-sidebar': $route.meta.sidebar === false }">
 			<div>
 				<div 
-					v-if="$route.meta.sidebar !== false"
 					class="menu"
 					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
 				>
@@ -25,7 +24,7 @@
 					</a>
 				</div>
 				<div class="area d-flex justify-content-end">
-					<a class="icon"
+					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i class="fas fa-keyboard"/>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
@@ -59,35 +58,37 @@
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
-					<q-menu square :offset="[9, 0]">
-						<q-list>
-							<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
-								<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
-								<q-item-section>Admin</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
-								<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
-								<q-item-section>Contribute</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup to="/profile">
-								<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
-								<q-item-section>Profile</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup to="/campaigns">
-								<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
-								<q-item-section>My content</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup to="/settings">
-								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-								<q-item-section>Settings</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item clickable v-close-popup @click="signOut()">
-								<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
-								<q-item-section>Sign out</q-item-section>
-							</q-item>
-						</q-list>
-					</q-menu>
+					<q-popup-proxy square :offset="[9, 0]">
+						<div class="bg-gray gray-light">
+							<q-list>
+								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
+									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
+									<q-item-section>Admin</q-item-section>
+								</q-item>
+								<q-item clickable v-close-popup to="/contribute" v-if="userInfo && (userInfo.admin || userInfo.contribute)">
+									<q-item-section avatar><i class="fas fa-file-edit"></i></q-item-section>
+									<q-item-section>Contribute</q-item-section>
+								</q-item>
+								<q-item clickable v-close-popup to="/profile">
+									<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
+									<q-item-section>Profile</q-item-section>
+								</q-item>
+								<q-item clickable v-close-popup to="/campaigns">
+									<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
+									<q-item-section>My content</q-item-section>
+								</q-item>
+								<q-item clickable v-close-popup to="/settings">
+									<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+									<q-item-section>Settings</q-item-section>
+								</q-item>
+								<q-separator />
+								<q-item clickable v-close-popup @click="signOut()">
+									<q-item-section avatar><i class="fas fa-sign-out-alt"></i></q-item-section>
+									<q-item-section>Sign out</q-item-section>
+								</q-item>
+							</q-list>
+						</div>
+					</q-popup-proxy>
 				</div>
 				<router-link v-else to="/sign-in" class="ml-2">Sign in</router-link>
 			</div>
@@ -203,13 +204,15 @@ a.icon {
 	height: 30px;
 }
 
+#header.hidden-sidebar {
+	.logo {
+		left: 45px;
+	}
+}
+
 @media only screen and (max-width: 600px) {
 	.logo {
 		left: 40px;
-
-		&.home {
-			left: 5px;
-		}
 	}
 }
 </style>

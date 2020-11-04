@@ -1,5 +1,5 @@
 <template>
-	<div id="side_container">
+	<div class="side">
 			<q-tabs
         v-model="tab"
 				dark
@@ -18,7 +18,7 @@
 		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel name="log">
-					<Log :log="log" />
+					<Log />
 				</q-tab-panel>
 				<q-tab-panel name="damage">
 					<Dmg />
@@ -44,7 +44,6 @@
 			Log,
 			Requests
 		},
-		props:['log'],
 		data() {
 			return {
 				tab: "log"
@@ -59,11 +58,8 @@
 </script>
 
 <style lang="scss" scoped>
-#side_container {
-	padding-top: 5px;
-	margin-top: -5px;
-	grid-area: side;
-	overflow: hidden;
+.side {
+	height: 100%;
 }
 .q-tabs {
 	.q-tab {
@@ -136,10 +132,5 @@
 
 .tab-content {
 	padding: 0 10px 15px 10px;
-}
-@media only screen and (max-width: 1000px) {
-	#side_container {
-		display: none;
-	}
 }
 </style>

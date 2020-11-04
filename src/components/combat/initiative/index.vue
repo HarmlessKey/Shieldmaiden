@@ -30,28 +30,9 @@
 	</div>
 
 	<!-- MOBILE -->
-	<div v-else class="mobile">
-		<div class="top bg-gray">
-			<div class="left">
-				<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-3">
-					<i class="far fa-angle-left"></i>
-				</router-link>
-				<span 
-					v-if="!demo" 
-					@click="broadcast()" 
-					class="live" 
-					:class="{'active': broadcasting['.value'] == $route.params.campid }"
-				>
-					live
-				</span>
-			</div>
+	<div v-else class="mobile-init">
+		<Turns />
 
-			Initiative
-
-			<a @click="set_turn({turn: 0, round: 1})">
-				Start <i class="far fa-angle-right"></i>
-			</a>
-		</div>
 		<q-tab-panels
       v-model="panel"
       animated
@@ -248,10 +229,15 @@
 	}
 }
 
-.mobile {
+.mobile-init {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 60px 1fr 48px;
+	grid-template-rows: 60px 1fr 60px;
+	height: 100vh;
+	grid-template-areas:
+		"turns"
+		"overview"
+		"menu";
 
 	.top {
 		display: flex;
@@ -281,10 +267,11 @@
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		height: 48px;
-		line-height: 48px;
+		height: 60px;
+		line-height: 60px;
 		display: flex;
 		justify-content: space-between;
+		grid-area: menu;
 		
 		a {
 			font-size: 25px;

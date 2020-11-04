@@ -18,7 +18,7 @@
 					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
 				</b>
 			</p>
-			
+
 			<template v-if="current.actions">
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">

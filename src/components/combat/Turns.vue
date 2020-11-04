@@ -1,8 +1,6 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
-		<h1>
-			<router-link v-if="!demo" :to="`/encounters/${$route.params.campid}`" class="mr-2"><i class="far fa-angle-left"></i></router-link>
-			<span class="d-none d-md-inline">{{ encounter.encounter }}</span>
+		<div>
 			<a class="edit">
 				<i class="fas fa-cog"></i>
 				<q-popup-proxy square :breakpoint="576">
@@ -14,6 +12,14 @@
 								</q-item-section>
 							</q-item>
 							<q-separator />
+							<q-item v-if="!demo" clickable v-close-popup @click="broadcast()">
+								<q-item-section avatar>
+									<i class="far fa-dot-circle" :class="{ red: broadcasting['.value'] === $route.params.campid }"></i>
+								</q-item-section>
+								<q-item-section>
+									{{ broadcasting['.value'] !== $route.params.campid ? "Go live" : "Cancel broadcast" }}
+								</q-item-section>
+							</q-item>
 							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
 								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
 								<q-item-section>Settings</q-item-section>
@@ -27,6 +33,11 @@
 								<q-item-section>Reset encounter</q-item-section>
 							</q-item>
 							<q-separator />
+							<q-item clickable v-close-popup :to="`/encounters/${$route.params.campid}`">
+								<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
+								<q-item-section>Leave encounter</q-item-section>
+							</q-item>
+							<q-separator />
 							<q-item clickable v-close-popup @click="confirmFinish()">
 								<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
 								<q-item-section>End encounter</q-item-section>
@@ -36,60 +47,92 @@
 				</q-popup-proxy>
 			</a>
 
-			<!-- BROADCASTING -->
-			<span v-if="!demo" @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == $route.params.campid }">live</span>
-		</h1>
+			<span class="ml-2 d-none d-md-inline truncate">{{ encounter.encounter }}</span>
+		</div>
 
-		<div class="round-info d-none d-md-flex justify-content-center" v-if="encounter.round">
-			<div class="mr-3">
-				<div>Round</div>
-				<div class="number">{{ encounter.round }}</div>
-			</div>
-			<div>
-				<div>Turn</div>
-				<div class="number">
-					{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
+		<!-- TURNS & ROUNDS -->
+		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">	
+			<a  
+				class="handler gray-light" 
+				@click="prevTurn()"
+				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
+			>
+				<i class="fas fa-step-backward"></i> 
+				<q-tooltip anchor="top middle" self="center middle">
+					Previous turn
+				</q-tooltip>
+			</a>
+
+			<template v-if="encounter.round">
+				<div class="mr-3">
+					<div class="header">Round</div>
+					<div class="number">{{ encounter.round }}</div>
 				</div>
-			</div>
+				<div>
+					<div class="header">Turn</div>
+					<div class="number">
+						{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
+					</div>
+				</div>
+			</template>
+
+			<a class="handler gray-light" 
+				@click="nextTurn()" 
+				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
+				<i class="fas fa-step-forward"></i>
+				<q-tooltip anchor="top middle" self="center middle">
+					Next turn
+				</q-tooltip>
+			</a>
 		</div>
 		<div class="blue" v-else>
 			Set Intitative
 		</div>
-		<div class="d-flex justify-content-end">
-			<div 
-				class="requests" 
-				v-if="encounter.requests && Object.keys(encounter.requests).length > 0"
-				@click="setSlide({show: true, type: 'combat/side/Requests'})"
-			>
-				<i class="fas fa-bell"></i>
-				<div class="notifications bg-red white animated zoomIn">
-					<div>{{ Object.keys(encounter.requests).length }}</div>
+
+		
+		<div class="d-flex justify-content-end center">
+			<!-- BROADCASTING -->
+			<span v-if="!demo" @click="broadcast()" class="live mx-2" :class="{'active': broadcasting['.value'] === $route.params.campid }">
+				{{ broadcasting['.value'] !== $route.params.campid ? "Go " : "" }}
+				live
+			</span>
+
+			<template v-if="encounter.round > 0">
+				<div 
+					class="requests d-none d-md-block" 
+					v-if="encounter.requests && Object.keys(encounter.requests).length > 0"
+					@click="setSlide({show: true, type: 'combat/side/Requests'})"
+				>
+					<i class="fas fa-bell"></i>
+					<div class="notifications bg-red white animated zoomIn">
+						<div>{{ Object.keys(encounter.requests).length }}</div>
+					</div>
 				</div>
-			</div>
-			<a v-if="encounter.round > 0" class="btn bg-gray-dark mr-2" 
-				@click="prevTurn()"
-				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()">
-				<i class="fas fa-arrow-left"></i> 
-				<span class="ml-1 d-none d-lg-inline">Prev turn</span>
-				<q-tooltip anchor="top middle" self="center middle">
-					[shift]+[arrow left]
-				</q-tooltip>
-			</a>
-			<template v-if="encounter.round === 0"> 
-				<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
-					<i class="fas fa-arrow-left"></i> 
-					<span class="ml-1 d-none d-lg-inline">Back</span>
-				</router-link>
-				<a class="btn" @click="set_turn({turn: 0, round: 1})">Start encounter <i class="fas fa-arrow-right"></i></a>
+
+				<div 
+					class="info" @click="setSlide({
+						show: true,
+						type: 'combat/side/Side'
+					})"
+				>
+					<q-icon name="info" />
+				</div>
 			</template>
-			<a v-else class="btn" 
-				@click="nextTurn()" 
-				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
-				<span class="mr-2 d-none d-md-inline">Next turn</span> <i class="fas fa-arrow-right"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					[shift]+[arrow right]
-				</q-tooltip>
-			</a>
+
+			<template v-else>
+				<span class="d-none d-md-block">
+					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
+						<i class="fas fa-arrow-left"></i> 
+						Leave
+					</router-link>
+				</span>
+				<a class="btn" @click="set_turn({turn: 0, round: 1})">
+					Start 
+					<span class="ml-1 d-none d-md-inline"> 
+						encounter <i class="fas fa-arrow-right"></i>
+					</span>
+				</a>
+			</template>
 		</div>
 	</div>
 </template>
@@ -193,26 +236,34 @@
 	height: 60px;
 	padding: 10px;
 	font-size: 15px;
-	line-height: 36px;
+	line-height: 40px;
 	background: rgba(38, 38, 38, .9);
 	font-size: 20px;
-	text-transform: uppercase;
 	grid-area: turns;
+	align-items: center;
 
+	.center {
+		align-items: center;
+	}
+	.live {
+		cursor: pointer;
+	}
+	.edit {
+		font-size: 28px;
 
-	h1 {
-		line-height: 36px;
-
-		a {
-			margin-left: 5px;
+		i {
+			vertical-align: -2px;
 		}
-		.live {
-			cursor: pointer;
-			padding: 0 10px;
-			margin: 10px;
-			line-height: 23px;
-			height: 23px;
-			vertical-align: 3px;
+	}
+
+	.handler {
+		font-size: 25px;
+		padding: 0 20px;
+		line-height: 40px;
+
+
+		&:hover {
+			color: #2c97de !important;
 		}
 	}
 	.round-info {
@@ -221,16 +272,15 @@
 		text-align: center;
 
 		.number { 
-			height: 40px;
 			font-weight: bold;
 			font-size: 30px;
 			line-height: 30px;
 		}
 	}
-	.requests {
+	.requests, .info {
 		padding-top: 3px;
 		width: 26px;
-		margin-right: 15px;
+		margin: 0 15px;
 		position: relative;
 		cursor: pointer;
 
@@ -251,6 +301,39 @@
 				text-align: center;
 				font-size: 13px;
 			}
+		}
+	}
+	.info {
+		margin: 0;
+		padding: 0;
+		display: none;
+		font-size: 28px;
+
+		.q-icon {
+			vertical-align: -4px;
+		}
+	}
+}
+
+@media only screen and (max-width: 576px) {
+	.live {
+		display: none;
+	}
+	.info {
+		display: block !important;
+	}
+	.edit {
+		color: #b2b2b2;
+	}
+	.round-info {
+		.header {
+			margin-top: 5px;
+		}
+
+		.number { 
+			font-weight: bold;
+			font-size: 18px !important;
+			line-height: 18px !important;
 		}
 	}
 }

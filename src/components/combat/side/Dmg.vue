@@ -9,8 +9,9 @@
 					:style="{
 						'background-image': 'url(' + entity.img + ')',
 						'border-color': entity.color_label ? entity.color_label : ``
-					}"/>
-				<div class="progress health-bar">
+					}"
+				/>
+				<q-linear-progress size="30px" color="negative" :value="percentage(entity[type.name], type.name)/100" >
 					<div class="info">
 						<span class="name">
 							{{ entity.name }}.
@@ -28,15 +29,7 @@
 							</template>
 						</b>
 					</div>
-					<div class="progress-bar" 
-						:class="{ 
-							'bg-red': type.name == 'damage', 
-							'bg-green': type.name == 'healing'
-						}" 
-						role="progressbar" 
-						:style="{width: percentage(entity[type.name], type.name) + '%'}" aria-valuemin="0" aria-valuemax="100">
-					</div>
-				</div>
+				</q-linear-progress>
 			</li>
 		</ul>
 	</div>
@@ -126,13 +119,14 @@ ul {
 			height: 30px;
 			border: solid 1px transparent;
 		}
-		.progress { 
+		.q-linear-progress { 
 			height: 30px;
 			line-height: 30px;
 			background-color: #494747;
 			position: relative;
 
 			.info {
+				font-size: 13px;
 				width: 100%;
 				position: absolute;
 				left: 0;

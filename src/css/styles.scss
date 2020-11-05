@@ -751,7 +751,7 @@ html body {
 		height: calc(100vh - 50px);
 		background-color: #000;
 		background-image: url('../assets/_img/styles/paper-bg.png');
-		padding-top: 100px;
+		padding: 100px 30px 0 30px;
 
 		#login {
 			background-color: $gray;
@@ -775,19 +775,21 @@ html body {
 				top: -35px;
 				left: 0;
 			}
-			input {
-				height: 45px;
-		
-				&.email {
-					margin-bottom: 0;
-					border-bottom: none !important;
-				}
+			.q-field {
+				margin-bottom: 1px;
 			}
 			.google {
 				background-color: $gray-light !important;
 				color: #262626 !important;
+				height: 38px;
+				padding: 0 !important;
+				line-height: 38px;
+				
 				img {
-					height: 23px;
+					vertical-align: -6px;
+					margin-right: 5px;
+					display: inline;
+					height: 26px;
 				}
 			}
 		}

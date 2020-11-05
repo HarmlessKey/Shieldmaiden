@@ -32,6 +32,41 @@
 	<!-- MOBILE -->
 	<div v-else class="mobile-init">
 		<Turns />
+		
+		<div class="bg-gray-dark">
+			<q-select
+				dark filled square
+				v-model="panel"
+				:options="panels"
+			>
+				<template v-slot:selected>
+					<q-item>
+						<q-item-section avatar>
+							<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
+						</q-item-section>
+						<q-item-section>
+							<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+						</q-item-section>
+					</q-item>
+				</template>
+				<template v-slot:option="scope">
+					<q-item
+						clickable
+						v-ripple
+						v-close-popup
+						:active="panel === scope.opt.value"
+						@click="panel = scope.opt.value"
+					>
+						<q-item-section avatar>
+							<q-icon :name="scope.opt.icon"/>
+						</q-item-section>
+						<q-item-section>
+							<q-item-label v-html="scope.opt.label"/>
+						</q-item-section>
+					</q-item>
+				</template>
+			</q-select>
+		</div>
 
 		<q-tab-panels
       v-model="panel"
@@ -101,7 +136,24 @@
 				setShadowPlayer: 0,
 				setShadowNPC: 0,
 				setShadowOverview: 0,
-				panel: "players"
+				panel: "players",
+				panels: [
+					{
+						label: "Players initiative",
+						value: "players",
+						icon: "fas fa-helmet-battle"
+					},
+					{
+						label: "NPC's initiative",
+						value: "npcs",
+						icon: "fas fa-dragon"
+					},
+					{
+						label: "Overview",
+						value: "overview",
+						icon: "fas fa-list-ul"
+					}
+				]
 			}
 		},
 		firebase() {
@@ -232,12 +284,12 @@
 .mobile-init {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 60px 1fr 60px;
+	grid-template-rows: 60px 60px 1fr;
 	height: 100vh;
 	grid-template-areas:
 		"turns"
-		"overview"
-		"menu";
+		"menu"
+		"overview";
 
 	.top {
 		display: flex;
@@ -261,26 +313,6 @@
 	ul.entities {
 		li {
 			background-color: #191919 !important;
-		}
-	}
-	.menu {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		height: 60px;
-		line-height: 60px;
-		display: flex;
-		justify-content: space-between;
-		grid-area: menu;
-		
-		a {
-			font-size: 25px;
-			padding: 0 15px;
-
-			&.disabled {
-				opacity: .1;
-				cursor: forbidden;
-			}
 		}
 	}
 }

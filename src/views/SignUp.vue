@@ -23,7 +23,10 @@
 				/>
 
 				<button type="submit" class="btn btn-block mt-3" v-on:click="signUp">Create account</button>
-				<a class="btn btn-block google mt-4" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign up with Google</a>
+				<a class="btn btn-block google mt-2" @click="googleSignIn()">
+					<img src="@/assets/_img/styles/google.png" alt="Google logo"/> 
+					Sign up with Google
+				</a>
 			</form>
 		</div>
 	</div>

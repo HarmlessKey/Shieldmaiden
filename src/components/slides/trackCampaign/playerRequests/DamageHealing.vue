@@ -22,7 +22,7 @@
 						:key="`damage-${i}`"
 						class="amount"
 						autocomplete="off"
-						type="text" 
+						type="number" 
 						v-model="damage[i].amount" 
 						v-validate="'required|numeric'" 
 						:name="`amount-${i}`" 
@@ -59,7 +59,7 @@
 			<q-input 
 				dark filled square
 				autocomplete="off"
-				type="text" 
+				type="number" 
 				v-model="healingAmount" 
 				v-validate="'numeric'" 
 				name="Manual Input" 

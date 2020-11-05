@@ -40,28 +40,38 @@
 			Traits
 			<a @click="addTrait()">Add trait</a>
 		</h3>
-		<div role="tablist" class="mb-3">
-			<b-card no-body v-for="(trait, key, index) in race.traits" :key="`trait-${key}`">
-				<b-card-header role="tab">
-					{{ trait.name }}
-					<div class="actions">
-						<a v-b-toggle="`accordion-${index}`"><i class="fas fa-pencil-alt"/></a>
-						<a class="gray-hover" @click="confirmDelete(key)">
-							<i class="fas fa-trash-alt"></i>
-						</a>
-					</div>
-				</b-card-header>
-				<b-collapse :id="`accordion-${index}`" accordion="my-accordion" role="tabpanel">
-					<b-card-body>
+		<div class="mb-3">
+			<q-list dark square class="accordion">
+				<q-expansion-item
+					v-for="(trait, key, index) in race.traits" 
+					:key="`trait-${key}`" 
+					dark switch-toggle-side
+					group="traits"
+				>
+					<template v-slot:header>
+						<q-item-section>
+							{{ trait.name }}
+						</q-item-section>
+						<q-item-section avatar>
+							<div class="actions">
+								<a class="gray-light mr-3"><i class="fas fa-pencil-alt"/></a>
+								<a class="gray-light" @click.stop="confirmDelete(key)">
+									<i class="fas fa-trash-alt"></i>
+								</a>
+							</div>
+						</q-item-section>
+					</template>
+
+					<div class="accordion-body">
 						<div class="form-item mb-3">
-							<label :for="`name-${index}`">Name</label>
-							<b-form-input 
+							<q-input 
+								dark filled square dense
 								@change="editTrait(key, 'name')"
 								autocomplete="off"
 								:id="`name-${index}`"
 								type="text"
 								v-model="race.traits[key].name"
-								placeholder="Trait"/>
+								label="Trait name"/>
 						</div>
 
 						<!-- Modifiers -->
@@ -70,11 +80,9 @@
 							:origin="`race.trait.${key}`"
 							@edit="editModifier"
 						/>
-					
-						
-					</b-card-body>
-				</b-collapse>
-			</b-card>
+					</div>
+				</q-expansion-item>
+			</q-list>
 		</div>
 
 		<q-dialog v-model="modal">

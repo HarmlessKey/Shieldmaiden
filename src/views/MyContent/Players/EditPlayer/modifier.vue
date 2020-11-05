@@ -1,15 +1,13 @@
 <template>
-	<q-layout view="Lhh lpR fff" container class="bg-gray">
-		<q-header class="bg-black">
-			<q-toolbar>
-				<q-toolbar-title>{{ modifier['.key'] ? 'Edit' : 'New' }} modifier</q-toolbar-title>
-				<q-btn flat v-close-popup round dense icon="close" />
-			</q-toolbar>
-		</q-header>
+	<hk-card>
+		<div slot="header" class="card-header d-flex justify-content-between">
+			<span>
+				{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
+			</span>
+			<q-btn flat v-close-popup round dense icon="close" />
+		</div>
 
-		<q-page-container>
-			<q-page padding>
-			<!-- MODIFIER -->
+		<!-- MODIFIER -->
 			<div v-if="!scaling">
 				<div class="form-item mb-3">
 					<div class="mb-3">Origin: {{ modifier_origin }}</div>
@@ -203,14 +201,12 @@
 				<div v-if="modifier.scaling_type === 'steps'">
 				</div>
 			</div>
-			</q-page>
-		</q-page-container>
 
-		<q-footer class="bg-black gray-light p-3 d-flex justify-content-end">
+			<div slot="footer" class="card-footer">
 				<button class="btn bg-gray mr-2" v-close-popup>Cancel</button>
 				<button class="btn" @click="saveModifier()">Save</button>
-		</q-footer>
-	</q-layout>
+			</div>
+	</hk-card>
 </template>
 
 <script>

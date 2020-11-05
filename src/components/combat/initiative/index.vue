@@ -33,7 +33,7 @@
 	<div v-else class="mobile-init">
 		<Turns />
 		
-		<div class="bg-gray-dark">
+		<div class="menu bg-gray-dark">
 			<q-select
 				dark filled square
 				v-model="panel"
@@ -90,22 +90,6 @@
         <Overview :active="_active" :idle="_idle" />
       </q-tab-panel>
 		</q-tab-panels>
-
-		<div class="menu bg-gray-dark">
-			<a 
-				@click="switchTab('previous')"
-				:class="{ disabled: panel === 'players' }"
-			>
-				<i class="fas fa-angle-left"></i>
-			</a>
-			{{ panel.capitalize() }}
-			<a 
-				@click="switchTab('next')"
-				:class="{ disabled: panel === 'overview' }"
-			>
-				<i class="fas fa-angle-right"></i>
-			</a>
-		</div>
 	</div>
 </template>
 
@@ -285,7 +269,7 @@
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 60px 60px 1fr;
-	height: 100vh;
+	height: calc(100vh - 50px);
 	grid-template-areas:
 		"turns"
 		"menu"
@@ -305,6 +289,9 @@
 
 		a {
 			font-size: 25px;
+		}
+		.menu {
+			grid-area: menu;
 		}
 	}
 	.transparent-bg {

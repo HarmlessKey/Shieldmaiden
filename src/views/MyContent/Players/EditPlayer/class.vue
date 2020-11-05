@@ -305,143 +305,155 @@
 
 						<!-- CLASS FEATURES -->
 						<h3>{{ subclass.name || "Class" }} features</h3>
-						<template v-for="level in 20">
-							<template v-if="subclass.level >= level">
-								<div :key="`features-${level}`">
+
+						<template >
+							<q-list dark square class="accordion hit_points" v-for="level in levels" :key="`features-${classKey}-${level}`">
+								<template v-if="subclass.level >= level">
 									<h4 class="feature-title">
 										Level {{ level }}
 										<a @click="addFeature(classKey, level)">Add feature</a>
 									</h4>
-									<div role="tablist" v-if="subclass.features" class="mb-3">
-										<template v-for="(feature, key, index) in subclass.features[`level_${level}`]">
-											<b-card no-body :key="`feature-${index}`">
-												<b-card-header role="tab">
-													<span>
-														<i 
-															class="mr-1" 
-															v-b-tooltip.hover="subclass.features[`level_${level}`][key].display ? 'Displayed on Sheet' : 'Hidden on Sheet'" 
-															:class="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'"
-														/>
-														{{ 
-															key === "--asi" 
-																? `${subclass.features[`level_${level}`][key].type === 'asi' 
-																	? `Ability Score Increase` 
-																	: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
-																: feature.name 
-														}}
-													</span>
-													<div class="actions">
-														<a v-b-toggle="`accordion-${level}-${index}`"><i class="fas fa-pencil-alt"/></a>
-														<a v-if="key !== '--asi'" @click="confirmDeleteFeature(classKey, level, key, feature.name)"><i class="fas fa-trash-alt"/></a>
-													</div>
-												</b-card-header>
-												<b-collapse :id="`accordion-${level}-${index}`" accordion="my-accordion" role="tabpanel">
-													<b-card-body>
-
-														<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
-														<template  v-if="key === '--asi'">
-															<p>
-																When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-																You can’t increase an ability score above 20. (phb 15)
-															</p>
-															<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
-
-															<el-switch
-																class="mb-4"
-																@change="saveFeatureType(classKey, level, $event)"
-																:value="subclass.features[`level_${level}`][key].type"
-																active-color="#2c97de"
-																inactive-color="#2c97de"
-																active-value="feat"
-																active-text="Feat"
-																inactive-value="asi"
-																inactive-text="Ability Score Increase"/>
-														</template>
-
-														<!-- ASI -->	
-														<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
-															<p>Choose 2 abilities to increase with 1 point</p>
-															<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi">
-																<label>
-																	Ability {{ i }}
-																</label>
-																<select
-																	class="form-control"
-																	:value="asi_modifier(classKey, level, key, i).subtarget"
-																	name="asi"
-																	@change="saveASI($event, classKey, level, key, i)"
-																>
-																	<option v-for="{value, label} in abilities" :key="`asi-${i}-${level}-${value}`" :value="value">
-																		{{ label }}
-																	</option>
-																</select>
-															</div>
-														</div>
-													
-														<template v-else>
-															<div class="form-item mb-3">
-																<b-form-checkbox 
-																	:value="subclass.features[`level_${level}`][key].display" 
-																	@change="editFeature(classKey, level, key, 'display')" 
-																>
-																	Display on character sheet
-																</b-form-checkbox>
-															</div>
-															<div class="form-item mb-3">
-																<label for="class">
-																	{{ key === "--asi" ? "Feat name" : "Feature name" }}
-																</label>
-																<b-form-input 
-																	@change="editFeature(classKey, level, key, 'name')"
-																	autocomplete="off"  
-																	:id="`name-${level}-${index}`" 
-																	type="text" 
-																	:value="subclass.features[`level_${level}`][key].name" 
-																	:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"/>
-															</div>
-
-															<label :for="`${classKey}-${level}-description`">
-																<a @click="setSlide({show: true, type: 'slides/characterBuilder/Descriptions'})">
-																	<i class="fas fa-info-circle"/>
-																</a>
-																Description
-																<a v-if="edit_feature_description === key" @click="editFeature(classKey, level, key, 'description'), edit_feature_description = undefined"><i class="fas fa-check green"/></a>
-																<a v-else @click="edit_feature_description = key"><i class="fas fa-pencil-alt"/></a>
-															</label>
-															<textarea-autosize
-																v-if="edit_feature_description === key"
-																:value="subclass.features[`level_${level}`][key].description"
-																:id="`${classKey}-${level}-description`"
-																name="description"
-																title="Description"
-																class="form-control"
-																v-validate="'max:5000'"
-																maxlength="5001"
-																data-vv-as="Description"
-																:min-height="30"
-															/>
-															<vue-markdown v-else name="description_preview" :source="replaceDescriptionStats(feature.description, computed.sheet ? computed.sheet.classes[classKey] : undefined)"></vue-markdown>
-																	
-															<!-- FEATURE MODIFIER -->
-															<h3 class="title">
-																Modifiers
-																<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
-															</h3>
-															
-															<!-- Modifiers -->
-															<Modifier-table 
-																:modifiers="feature_modifiers(classKey, level, key)" 
-																:origin="`race.trait.${key}`"
-																@edit="editModifier"
-															/>
-														</template>
-													</b-card-body>
-												</b-collapse>
-											</b-card>
+									<q-expansion-item
+										v-for="(feature, key, index) in subclass.features[`level_${level}`]"
+										:key="`feature-${key}`"
+										dark switch-toggle-side
+										:group="`features-${classKey}-${level}`"
+									>
+										<template v-slot:header>
+											<q-item-section avatar>
+												<q-icon size="xs" :name="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'">
+													<q-tooltip anchor="top middle" self="center middle">
+														{{ subclass.features[`level_${level}`][key].display ? "Displayed on Sheet" : "Hidden on Sheet" }}
+													</q-tooltip>
+												</q-icon>
+											</q-item-section>
+											<q-item-section>
+												{{ 
+													key === "--asi" 
+														? `${subclass.features[`level_${level}`][key].type === 'asi' 
+															? `Ability Score Increase` 
+															: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
+														: feature.name 
+												}}
+											</q-item-section>
+											<q-item-section avatar>
+												<div class="actions">
+													<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
+													<a 
+														class="gray-light" 
+														v-if="key !== '--asi'" 
+														@click="confirmDeleteFeature(classKey, level, key, feature.name)"
+													>
+														<i class="fas fa-trash-alt"/>
+													</a>
+												</div>
+											</q-item-section>
 										</template>
-									</div>
-								</div>
-							</template>
+
+										<div class="accordion-body">
+											<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
+											<template  v-if="key === '--asi'">
+												<p>
+													When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
+													You can’t increase an ability score above 20. (phb 15)
+												</p>
+												<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
+
+												<el-switch
+													class="mb-4"
+													@change="saveFeatureType(classKey, level, $event)"
+													:value="subclass.features[`level_${level}`][key].type"
+													active-color="#2c97de"
+													inactive-color="#2c97de"
+													active-value="feat"
+													active-text="Feat"
+													inactive-value="asi"
+													inactive-text="Ability Score Increase"/>
+											</template>
+
+											<!-- ASI -->	
+											<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
+												<p>Choose 2 abilities to increase with 1 point</p>
+												<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi">
+													<label>
+														Ability {{ i }}
+													</label>
+													<select
+														class="form-control"
+														:value="asi_modifier(classKey, level, key, i).subtarget"
+														name="asi"
+														@change="saveASI($event, classKey, level, key, i)"
+													>
+														<option v-for="{value, label} in abilities" :key="`asi-${i}-${level}-${value}`" :value="value">
+															{{ label }}
+														</option>
+													</select>
+												</div>
+											</div>
+
+											<!-- CUSTOM FEATURE -->
+											<template v-else>
+												<div class="form-item mb-3">
+													<q-checkbox 
+														dark 
+														:value="subclass.features[`level_${level}`][key].display"
+														label="Display on character sheet" 
+														:false-value="null" 
+														indeterminate-value="something-else" 
+														@input="editFeature(classKey, level, key, 'display')"
+													/>
+												</div>
+												<div class="form-item mb-3">
+													<q-input 
+														dark filled square dense
+														@change="editFeature(classKey, level, key, 'name')"
+														autocomplete="off"  
+														:id="`name-${level}-${index}`" 
+														type="text" 
+														:value="subclass.features[`level_${level}`][key].name" 
+														:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"
+													/>
+												</div>
+
+												<label :for="`${classKey}-${level}-description`">
+													<a @click="setSlide({show: true, type: 'slides/characterBuilder/Descriptions'})">
+														<i class="fas fa-info-circle"/>
+													</a>
+													Description
+													<a v-if="edit_feature_description === key" @click="editFeature(classKey, level, key, 'description'), edit_feature_description = undefined"><i class="fas fa-check green"/></a>
+													<a v-else @click="edit_feature_description = key"><i class="fas fa-pencil-alt"/></a>
+												</label>
+												<q-input
+													dark filled square
+													v-if="edit_feature_description === key"
+													:value="subclass.features[`level_${level}`][key].description"
+													:id="`${classKey}-${level}-description`"
+													name="description"
+													label="Description"
+													v-validate="'max:5000'"
+													maxlength="5001"
+													data-vv-as="Description"
+													autogrow
+												/>
+												<vue-markdown v-else name="description_preview" :source="replaceDescriptionStats(feature.description, computed.sheet ? computed.sheet.classes[classKey] : undefined)"></vue-markdown>
+														
+												<!-- FEATURE MODIFIER -->
+												<h3 class="title">
+													Modifiers
+													<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
+												</h3>
+												
+												<!-- Modifiers -->
+												<Modifier-table 
+													:modifiers="feature_modifiers(classKey, level, key)" 
+													:origin="`race.trait.${key}`"
+													@edit="editModifier"
+												/>
+											</template>
+										</div>
+									</q-expansion-item>
+								</template>
+							</q-list>
 						</template>
 					</div>
 				</q-slide-transition>

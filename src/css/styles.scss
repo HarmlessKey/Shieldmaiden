@@ -1445,6 +1445,7 @@ html body {
 	.snotify-leftTop, .snotify-centerTop, .snotify-rightTop {
 		top: 60px !important;
 	}
+
 	.snotifyToast__title {
 		font-weight: normal;
 		text-transform: uppercase;
@@ -1674,6 +1675,13 @@ html body {
 			text-shadow: 0px 0px 3px #000;
 			color: #fff;
 		}
+	}
+
+	.q-notification {
+		border-radius: 0;
+	}
+	.q-notifications__list--top {
+		top: 120px;
 	}
 
 	//RESPONSIVENESS

@@ -142,13 +142,14 @@ export const setHP = {
 
 			//Notification
 			if(notify) {
-				this.$snotify.error(
-					current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
-					'Damage done!', 
-					{
-						position: "centerTop"
-					}
-				);
+				this.$q.notify({
+					message: 'Damage done',
+					caption: current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
+					icon: 'fas fa-swords',
+					type: 'negative',
+					position: 'top',
+					timeout: 1000
+				});
 			}
 
 			//Add to log
@@ -237,13 +238,15 @@ export const setHP = {
 
 			//Notification
 			if(notify) {
-				this.$snotify.success(
-					current.name + ' did ' + amount + ' ' + type + ' to ' + target.name, 
-					'Healing done!', 
-					{
-						position: "centerTop",
-					}
-				);
+				this.$q.notify({
+					message: 'Healing done!',
+					caption: current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
+					icon: 'fas fa-heart',
+					type: 'positive',
+					position: 'top',
+					timeout: 1000,
+					classes: 'inEncounter'
+				});
 			}
 			//Add to log
 			if(log == true) {

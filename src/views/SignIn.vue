@@ -24,7 +24,7 @@
 				/>
 				<button class="btn btn-block mt-3" @click="signIn()">Sign In <i class="fas fa-sign-in-alt"></i></button>
 			</form>
-			<a class="btn btn-block google my-3" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
+			<a class="btn btn-block google my-2" @click="googleSignIn()"><img src="@/assets/_img/styles/google.png" alt="Google logo"/> Sign in with Google</a>
 
 			<p class="text-center mb-1"><small><router-link to="/forgot-password">Forgot password?</router-link></small></p>
 			<div class="text-center"><small>No account yet? <router-link to="/sign-up">Create one here.</router-link></small></div>

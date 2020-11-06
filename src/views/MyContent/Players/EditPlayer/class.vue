@@ -238,6 +238,7 @@
 								</template>
 
 								<div class="accordion-body">
+									<!-- ARMOR -->
 									<div class="form-item mb-3">
 										<q-select 
 											dark filled square
@@ -249,8 +250,23 @@
 											@input="setProficiencies($event, classKey, 'armor')"
 										/>
 									</div>
+
+									<!-- WEAPONS -->
 									<div class="form-item mb-3">
-										<q-select dark filled square multiple :value="proficiencies[classKey].weapon" :options="weaponList" @input="setProficiencies($event, classKey, 'weapon')" label="Weapon">
+										<q-select 
+											dark 
+											filled 
+											square 
+											multiple 
+											:value="proficiencies[classKey].weapon" 
+											:options="weaponList" 
+											label="Weapon"
+										>
+											<template v-slot:selected v-if="proficiencies[classKey].weapon.length !== 0">
+												<span v-for="(key, index) in proficiencies[classKey].weapon" :key="key" class="mr-1">
+													{{ displayWeapon(key).label }}{{ index &lt; (proficiencies[classKey].weapon.length - 1) ? "," : ""  }}
+												</span>
+											</template>
 											<template v-slot:option="scope">
 												<q-item :key="`weapon-category-${scope.index}`">
 													<q-item-section>
@@ -263,6 +279,7 @@
 														:key="weapon.value"
 														clickable
 														v-ripple
+														@click="setWeaponProficiencies(weapon.value, classKey)" 
 														:active="proficiencies[classKey].weapon.includes(weapon.value)"
 													>
 														<q-item-section>
@@ -470,7 +487,8 @@
 		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`" v-if="hit_point_type === 'rolled'">
 			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
 			<label :for="`level-${level}`">Level {{ level }}</label>
-			<b-form-input 
+			<q-input 
+				dark filled square dense
 				@change="setRolledHP(editClass, level)"
 				autocomplete="off" 
 				:id="`level-${level}`" 
@@ -491,7 +509,8 @@
 		<b-modal ref="experience-modal" id="experience-modal" hide-footer title="Experience">
 			<h3 class="xp">{{ Class.experience_points }}<small>xp</small></h3>
 			<div class="handle-xp">
-				<b-form-input 
+				<q-input 
+					dark filled square dense
 					autocomplete="off"
 					id="xp" 
 					type="number"
@@ -514,8 +533,18 @@
 							<div :key="`level-${i}`">
 								{{ i }}
 							</div>
-							<b-form-input v-model="classes[editClass].spells_known.cantrips[i]" :key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" :tabindex="`1${i < 10 ? `0${i}` : i}`" />
-							<b-form-input v-model="classes[editClass].spells_known.spells[i]" :key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" :tabindex="`2${i < 10 ? `0${i}` : i}`" />
+							<q-input 
+								dark filled square dense
+								v-model="classes[editClass].spells_known.cantrips[i]" 
+								:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
+								:tabindex="`1${i < 10 ? `0${i}` : i}`"
+							/>
+							<q-input 
+								dark filled square dense
+								v-model="classes[editClass].spells_known.spells[i]"
+								:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
+								:tabindex="`2${i < 10 ? `0${i}` : i}`"
+							/>
 						</template>
 					</div>
 			</div>
@@ -815,6 +844,32 @@
 						}
 						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
 					}
+				}
+			},
+			setWeaponProficiencies(weapon, classKey) {
+				const current = this.proficiencies[classKey]['weapon'];
+				
+				//Remove
+				if(current.includes(weapon)) {
+					//Get the key of the proficiency that needs to be removed
+					const key = this.modifiers.filter(mod => {
+						const origin = mod.origin.split(".");
+						return origin[1] == classKey && origin[2] === "proficiencies" && origin[3] === 'weapon' && mod.subtarget === weapon;
+					}).map(obj => {
+						return obj['.key'];
+					});
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
+				}
+				
+				//Add
+				if(!current.includes(weapon)) {
+					const newModifier = {
+						origin: `class.${classKey}.proficiencies.weapon`,
+						type: "proficiency",
+						target: 'weapon',
+						subtarget: weapon
+					}
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
 				}
 			},
 			rollHitPoints(classKey) {

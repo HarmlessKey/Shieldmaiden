@@ -473,5 +473,18 @@ export const weapons = {
 				}
 			]
 		}
+	},
+	methods: {
+		displayWeapon(key) {
+			//Returns 1 single weapon, based on the key
+			let weaponList = JSON.parse(JSON.stringify(this.weaponList));
+			for(const category of weaponList) {
+				for(const weapon of category.weapons) {
+					if(weapon.value === key) {
+						return weapon;
+					}
+				}
+			}
+		}
 	}
 }

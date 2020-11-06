@@ -86,36 +86,64 @@
 					
 					<!-- VALUE -->
 					<div class="form-item mb-3" v-if="modifier.type === 'bonus' || modifier.type === 'set'">
-						<div class="d-flex justify-content-between">
-							<q-input 
-								dark filled square dense
-								label="Value"
-								autocomplete="off"  
-								id="value" 
-								type="number" 
-								v-model="modifier.value" 
-								v-validate="'required'"
-								name="value" 
-							/>
-							<a @click="scaling = true" class="ml-1 btn" v-b-tooltip.hover="`Level scaling`"><i class="far fa-chart-line"/></a>
+						<div class="row q-col-gutter-md">
+							<div class="col-9">
+								<q-input 
+									dark filled square dense
+									label="Value"
+									autocomplete="off"  
+									id="value" 
+									type="number" 
+									v-model="modifier.value" 
+									v-validate="'required'"
+									name="value" 
+								/>
+							</div>
+							<div class="col-3">
+								<a @click="scaling = true" class="btn btn-block">
+									<i class="far fa-chart-line"/>
+									<q-tooltip anchor="top middle" self="center middle">
+										Level scaling
+									</q-tooltip>
+								</a>
+							</div>
 						</div>
 						<p class="validate red" v-if="errors.has('value')">{{ errors.first('value') }}</p>
 						<p class="mt-1" v-if="modifier.scale_size && modifier.scale_value">
 							<span v-html="scalingText()"/>
-							<a @click="deleteScaling" class="red ml-1" v-b-tooltip.hover="'Delete scaling'"><i class="fas fa-times"/></a>
+							<a @click="deleteScaling" class="red ml-1">
+								<i class="fas fa-times"/>
+								<q-tooltip anchor="top middle" self="center middle">
+									Remove scaling
+								</q-tooltip>
+							</a>
 						</p>
 					</div>
 
 					<!-- ABILITES -->
 					<div class="form-item mb-3" v-if="modifier.type === 'ability'">
-						<q-select dark filled square dense map-options emit-value v-model="modifier.ability_modifier" :options="abilities" label="Ability modifier" />
+						<q-select 
+							dark filled square dense 
+							map-options 
+							emit-value 
+							v-model="modifier.ability_modifier" 
+							:options="abilities" 
+							label="Ability modifier"
+						/>
 					</div>
 
 					<hr>
 
 					<!-- RESTRICTIONS -->
 					<div class="form-item my-3">
-						<q-select dark filled square dense multiple clearable v-model="modifier.restrictions" :options="modifier_restrictions" label="Restrictions" />
+						<q-select 
+							dark filled square dense 
+							multiple 
+							clearable 
+							v-model="modifier.restrictions" 
+							options="modifier_restrictions" 
+							label="Restrictions"
+						/>
 					</div>
 				</template>
 			</div>
@@ -165,8 +193,8 @@
 				
 				<!-- LEVEL SCALING -->
 				<div v-if="modifier.scaling_type === 'scale'" class="form-item mb-3">
-					<div class="d-flex justify-content-between mb-2">
-						<div>
+					<div class="row q-col-gutter-md mb-2">
+						<div class="col-6">
 							<q-input 
 								dark filled square dense
 								label="Scale size"
@@ -178,7 +206,7 @@
 								name="size" 
 							/>
 						</div>
-						<div>
+						<div class="col-6">
 							<q-input 
 								dark filled square dense
 								label="Scale value"
@@ -202,7 +230,7 @@
 				</div>
 			</div>
 
-			<div slot="footer" class="card-footer">
+			<div slot="footer" class="card-footer d-flex justify-content-end">
 				<button class="btn bg-gray mr-2" v-close-popup>Cancel</button>
 				<button class="btn" @click="saveModifier()">Save</button>
 			</div>

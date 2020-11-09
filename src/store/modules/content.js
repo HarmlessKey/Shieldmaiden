@@ -30,7 +30,8 @@ export const content_module = {
 
 		poster: undefined,
 		side_collapsed: true,
-		side_small_screen: false
+		side_small_screen: false,
+		share_rolls: false,
 
 	},
 	getters: {
@@ -49,7 +50,8 @@ export const content_module = {
 		content_count: function( state ) { return state.content_count; },
 		poster: function( state ) { return state.poster; },
 		side_collapsed: function( state ) { return state.side_collapsed; },
-		side_small_screen: function( state ) { return state.side_small_screen; }
+		side_small_screen: function( state ) { return state.side_small_screen; },
+		share_rolls: function( state ) { return state.share_rolls; }
 	},
 	mutations: {
 		SET_USER(state) { state.user = auth.currentUser; },
@@ -175,7 +177,8 @@ export const content_module = {
 		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
 		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
 		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
-		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); }
+		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
+		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); }
 	},
 	actions: {
 		setUser({ commit }) {
@@ -387,6 +390,9 @@ export const content_module = {
 		},
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload)
+		},
+		setShareRolls({ commit }, payload) {
+			commit("SET_SHARE_ROLLS", payload)
 		},
 	},
 };

@@ -23,7 +23,29 @@
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
 					<div class="d-flex justify-content-between">
-						<q-checkbox dark v-model="openRoll" label="Roll openly" indeterminate-value="something-else" />
+						<q-checkbox 
+							dark :value="share_rolls" 
+							@input="setShareRolls($event)" 
+							indeterminate-value="something-else">
+								Share Rolls
+								<q-icon name="info" class="blue">
+									<q-menu square anchor="top middle" self="bottom middle" max-width="250px" prevent>
+										<q-card dark square>
+											<q-card-section class="bg-gray-active">
+												<b>Share rolls</b>
+											</q-card-section>
+
+											<q-card-section>
+												<p>
+													Check this box to share rolls with your players, 
+													they will be shown on the player screen when you are live.
+												</p>
+												<a @click="setSlide({show: true, type: 'PlayerLink'})">Link to your player screen</a>
+											</q-card-section>
+										</q-card>
+									</q-menu>
+								</q-icon>
+						</q-checkbox>
 						<a class="ml-1" @click="rollInfo = !rollInfo"><i class="fas fa-cog"></i></a>
 					</div>
 					<q-slide-transition>
@@ -54,7 +76,7 @@
 					</button>
 				</div>
 				<p class="mt-3 d-none d-sm-block">
-					<q-icon name="info" size="sm"/> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+					<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
 				</p>
 				
 				<!-- CUSTOM ROLL -->
@@ -184,7 +206,7 @@
 
 <script>
 	import { db } from '@/firebase'
-	import { mapGetters } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 	import { dice } from '@/mixins/dice.js'
 	import { setHP } from '@/mixins/HpManipulations.js'
 
@@ -203,7 +225,6 @@
 				showAction: undefined,
 				showLegendary: undefined,
 				advantage: false,
-				openRoll: false,
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
@@ -239,7 +260,8 @@
 				'encounter',
 				'entities',
 				'turn',
-				'targeted'
+				'targeted',
+				'share_rolls'
 			]),
 			toHit: {
 				get() {
@@ -276,6 +298,10 @@
 			window.removeEventListener('keydown', this.checkKeypress);
 		},
 		methods: {
+			...mapActions([
+				'setSlide',
+				'setShareRolls',
+			]),
 			checkKeyPress(e) {
 				if(e.type === "keydown") {
 					if(this.actionHover) {
@@ -460,8 +486,8 @@
 					//Only roll if 
 					//All rolls should be seperate (different damage or same damage and to hit)
 					//All rolls are together (same damge, no to hit) and there was no roll before
-					if(this.openRoll && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
-						this.rollOpenly(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+					if(this.share_rolls && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
+						this.shareRoll(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
 					} else {
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
@@ -587,7 +613,7 @@
 				this.animateTrigger = !this.animateTrigger;
 				this.advantage = false; //turn advantage off
 			},
-			rollOpenly(targets, toHit, damage, hitMod, damageMod) {
+			shareRoll(targets, toHit, damage, hitMod, damageMod) {
 				var showRoll = {
 					targets,
 					timestamp: Date.now()
@@ -672,6 +698,9 @@
 		h2 {
 			margin-bottom: 5px !important;
 		}
+	}
+	.info {
+		vertical-align: -7px;
 	}
 	.custom-roll {
 		display: grid;

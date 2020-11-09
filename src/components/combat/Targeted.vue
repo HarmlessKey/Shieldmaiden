@@ -154,6 +154,7 @@
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
+	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetInfo from '@/components/combat/TargetInfo.vue';
 
 	export default {
@@ -163,6 +164,7 @@
 			ViewEntity,
 			Conditions,
 			Reminders,
+			TargetItem,
 			TargetInfo
 		},
 		data() {

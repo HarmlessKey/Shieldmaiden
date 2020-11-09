@@ -26,8 +26,17 @@
 					v-model="entity.initiative"
 					:class="{'input': true, 'error': errors.has('initiative') }"
 					v-validate="'required'"
-				/>
-					<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
+				>
+					<template v-slot:append>
+						<a @click="rollInitiative">
+						<q-icon size="small" name="fas fa-dice-d20"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							1d20 {{ dexterity ? `+ ${calcMod(dexterity)}` : `` }}
+						</q-tooltip>
+					</a>
+					</template>
+				</q-input>
+				<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
 			</div>
 			<div class="col">
 				<q-input 
@@ -106,9 +115,12 @@
 <script>
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
+	import { general } from '@/mixins/general.js';
+	import { dice } from '@/mixins/dice.js';
 
 	export default {
 		name: 'AddEntity',
+		mixins: [general, dice],
 		data() {
 			return {
 				demo: this.$route.name === "Demo",
@@ -116,6 +128,7 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				entity: {},
+				dexterity: undefined,
 				search: '',
 				searchResults: [],
 				noResult: '',
@@ -174,23 +187,31 @@
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},
+			rollInitiative() {
+				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
+				const roll = this.rollD(20, 1, mod);
+				this.$set(this.entity, "initiative", roll.total);
+			},
 			set(id, type) {
 				this.entity.id = id;
 
-				if(type == 'api') {
-					var npc_data = this.monsters[id];
+				let npc_data;
+				if(type === 'api') {
+					npc_data = this.monsters[id];
 					this.entity.npc = 'api'
 					this.entity.maxHp = npc_data.hit_points
 					this.entity.ac = npc_data.armor_class
 					this.entity.name = npc_data.name
 				}
-				else if(type == 'custom') {
+				else if(type === 'custom') {
 					npc_data = this.npcs;
 					this.entity.npc = 'custom'
 					this.entity.maxHp = npc_data[id].maxHp
 					this.entity.ac = npc_data[id].ac
 					this.entity.name = npc_data[id].name
 				}
+				this.dexterity = npc_data.dexterity;
+
 				this.searchResults = [];
 				this.searching = false;
 				this.$forceUpdate();

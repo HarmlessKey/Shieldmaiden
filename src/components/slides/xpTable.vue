@@ -1,15 +1,15 @@
 <template>
 	<div class="pb-5">
 		<h2>Experience</h2>
-		<b-table 
+		<hk-table 
 			:items="table" 
-			:fields="fields"
+			:columns="fields"
 			class="xpTable"
 		>
 			<span slot="proficiency" slot-scope="data">
-				+{{ data.value }}
+				+{{ data.item }}
 			</span>
-		</b-table>
+		</hk-table>
 	</div>
 </template>
 
@@ -46,7 +46,7 @@
 </script>
 
 <style>
-	.xpTable thead th {
+	.xpTable .hk-table-header {
 		font-size: 12px !important;
 	}
 </style>

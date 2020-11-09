@@ -3,8 +3,9 @@
 		<h3 class="text-center">Base ability scores</h3>
 		<div class="base_abilities">
 			<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-				<label :for="value">{{ label.toUpperCase()  }}</label>
-				<b-form-input
+				<q-input
+					dark filled square
+					:label="label"
 					:id="value" 
 					@change="saveAbility(value)"
 					autocomplete="off"  
@@ -77,10 +78,9 @@
 				font-weight: bold;
 				font-size: 12px;
 			}
-			.form-control {
-				text-align: center;
+			.q-field {
+				text-align: center !important;
 				font-size: 25px;
-				height: 50px;
 				font-weight: bold;
 			}
 		}

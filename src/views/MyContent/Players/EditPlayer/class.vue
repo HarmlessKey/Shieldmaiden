@@ -2,7 +2,7 @@
 	<div class="pb-5">
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
-			<h3 v-b-modal.experience-modal class="pointer">
+			<h3 class="pointer" @click="experience_modal = !experience_modal">
 				Experience points: <b>{{ Class.experience_points }}</b> 
 				<small class="ml-2"><i class="fas fa-pencil-alt"></i></small>
 			</h3>
@@ -56,7 +56,7 @@
 									label="Level"
 									v-model="subclass.level"
 									:options="levels"
-									@change="saveClassLevel(classKey)">
+								>
 									<template v-slot:option="scope">
 										<q-item 
 											clickable 
@@ -121,6 +121,7 @@
 								</template>
 
 								<div class="accordion-body">
+									<p>Hit dice</p>
 									<div class="hit-dice">
 										<a v-for="{value, text} in dice_types" @click="saveHitDice(classKey, value)" :key="`d${value}-${classKey}`" :class="{ active: subclass.hit_dice === value }">
 											<i :class="`fas fa-dice-d${value}`"></i>
@@ -128,8 +129,8 @@
 										</a>
 									</div>
 									
-									<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)">
-										<label>Rolled hit points</label>
+									<div v-if="hit_point_type === 'rolled' && (subclass.level > 1 || classKey !== 0)" class="mt-3">
+										<p>Rolled hit points</p>
 										<div class="rolled" @click="rollHitPoints(classKey)">
 											<span class="val">
 												{{ subclass.rolled_hit_points ? totalRolled(classKey) : 0 }}
@@ -189,8 +190,15 @@
 
 								<div class="accordion-body">
 									<div class="form-item mb-3">
-										<label for="class">Caster type</label>
-										<b-form-select v-model="subclass.caster_type" :options="caster_types" @change="saveCasterType(classKey)" />
+										<q-select 
+											dark filled square dense
+											label="Caster type"
+											v-model="subclass.caster_type" 
+											:options="caster_types" 
+											emit-value
+											map-options
+											@input="saveCasterType(classKey)"
+										/>
 									</div>
 									<div class="form-item mb-3">
 										<q-select 
@@ -200,7 +208,7 @@
 											emit-value
 											map-options
 											:options="abilities" 
-											@change="saveCastingAbility(classKey)"
+											@input="saveCastingAbility(classKey)"
 										/>
 									</div>
 									<div class="form-item mb-3">
@@ -211,7 +219,7 @@
 											emit-value
 											map-options
 											:options="spell_knowledge_types" 
-											@change="saveSpellKnowledge(classKey)"
+											@input="saveSpellKnowledge(classKey)"
 										/>
 									</div>
 									<div class="form-item mb-3" v-if="subclass.caster_type">
@@ -376,35 +384,35 @@
 												</p>
 												<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
 
-												<el-switch
-													class="mb-4"
-													@change="saveFeatureType(classKey, level, $event)"
+												<q-select
+													dark filled square dense
+													class="mb-3"
+													placeholder="ASI or Feat"
+													emit-value
+													map-options
+													:options="[
+														{ value: 'asi', label: 'Abilitiy Score Increase' }, 
+														{ value: 'feat', label: 'Feat' }
+													]"
+													@input="saveFeatureType(classKey, level, $event)"
 													:value="subclass.features[`level_${level}`][key].type"
-													active-color="#2c97de"
-													inactive-color="#2c97de"
-													active-value="feat"
-													active-text="Feat"
-													inactive-value="asi"
-													inactive-text="Ability Score Increase"/>
+												/>
 											</template>
 
 											<!-- ASI -->	
 											<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
 												<p>Choose 2 abilities to increase with 1 point</p>
-												<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi">
-													<label>
-														Ability {{ i }}
-													</label>
-													<select
-														class="form-control"
-														:value="asi_modifier(classKey, level, key, i).subtarget"
+												<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
+													<q-select
+														dark filled square
+														:label="`Ability ${i}`"
+														:options="abilities"
+														emit-value
+														map-options
+														v-model="asi_modifier(classKey, level, key, i).subtarget"
 														name="asi"
-														@change="saveASI($event, classKey, level, key, i)"
-													>
-														<option v-for="{value, label} in abilities" :key="`asi-${i}-${level}-${value}`" :value="value">
-															{{ label }}
-														</option>
-													</select>
+														@input="saveASI($event, classKey, level, key, i)"
+													/>
 												</div>
 											</div>
 
@@ -453,13 +461,7 @@
 													autogrow
 												/>
 												<vue-markdown v-else name="description_preview" :source="replaceDescriptionStats(feature.description, computed.sheet ? computed.sheet.classes[classKey] : undefined)"></vue-markdown>
-														
-												<!-- FEATURE MODIFIER -->
-												<h3 class="title">
-													Modifiers
-													<a @click="newModifier(`class.${classKey}.${level}.${key}`)">New Modifier</a>
-												</h3>
-												
+																
 												<!-- Modifiers -->
 												<Modifier-table 
 													:modifiers="feature_modifiers(classKey, level, key)" 
@@ -484,71 +486,96 @@
 		</q-dialog>
 
 		<!-- ROLLED HP MODAL -->
-		<b-modal ref="roll-hp-modal" hide-footer :title="`Rolled HP ${classes[editClass].name}`" v-if="hit_point_type === 'rolled'">
-			<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-			<label :for="`level-${level}`">Level {{ level }}</label>
-			<q-input 
-				dark filled square dense
-				@change="setRolledHP(editClass, level)"
-				autocomplete="off" 
-				:id="`level-${level}`" 
-				type="text"
-				v-model="classes[editClass].rolled_hit_points[level]" 
-			/>
-			<a 
-				:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
-				class="btn"
-				@click="rollHitDice(editClass, level)"
-			>
-				Roll
-			</a>
-			</div>      
-		</b-modal>
+		<q-dialog v-model="roll_hp_modal" v-if="hit_point_type === 'rolled'">
+			<hk-card>
+				<div slot="header" class="card-header d-flex justify-content-between">
+					<span>
+						Rolled HP {{ classes[editClass].name }}
+					</span>
+					<q-btn flat v-close-popup round dense icon="close" />
+				</div>
+			
+				<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
+					<label :for="`level-${level}`">Level {{ level }}</label>
+					<q-input 
+						dark filled square dense
+						@change="setRolledHP(editClass, level)"
+						autocomplete="off" 
+						:id="`level-${level}`" 
+						type="text"
+						v-model="classes[editClass].rolled_hit_points[level]" 
+					/>
+					<a 
+						:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
+						class="btn"
+						@click="rollHitDice(editClass, level)"
+					>
+						Roll
+					</a>
+				</div>
+			</hk-card>  
+		</q-dialog>
 
 		<!-- EXPERIENCE MODAL -->
-		<b-modal ref="experience-modal" id="experience-modal" hide-footer title="Experience">
-			<h3 class="xp">{{ Class.experience_points }}<small>xp</small></h3>
-			<div class="handle-xp">
-				<q-input 
-					dark filled square dense
-					autocomplete="off"
-					id="xp" 
-					type="number"
-					v-model="xp"
-					placeholder="Amount"/>
-					<div>
-						<a @click="handleXP('add')" class="btn bg-green">Add</a>
-						<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
-					</div>
-			</div>
-		</b-modal>
+		<q-dialog v-model="experience_modal">
+			<hk-card>
+				<div slot="header" class="card-header d-flex justify-content-between">
+					<span>
+						Experience points
+					</span>
+					<q-btn flat v-close-popup round dense icon="close" />
+				</div>
+				<h3 class="xp">{{ Class.experience_points }}<small>xp</small></h3>
+				<div class="handle-xp">
+					<q-input 
+						dark filled square dense
+						autocomplete="off"
+						id="xp" 
+						type="number"
+						v-model="xp"
+						placeholder="Amount"/>
+						<div>
+							<a @click="handleXP('add')" class="btn bg-green">Add</a>
+							<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
+						</div>
+				</div>
+			</hk-card>
+		</q-dialog>
 
 		<!-- SPELLS KNOWN MODAL -->
-		<b-modal ref="spells-known-modal" id="spells-known-modal" hide-footer title="Spells known">
-			<div class="spells-known" v-if="classes[editClass].spells_known">
-				<h3>Cantrips & Spells known</h3>
-					<div class="columns">
-						<div>Level</div><div>Cantrips</div><div>Spells</div>
-						<template v-for="i in 20">
-							<div :key="`level-${i}`">
-								{{ i }}
-							</div>
-							<q-input 
-								dark filled square dense
-								v-model="classes[editClass].spells_known.cantrips[i]" 
-								:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
-								:tabindex="`1${i < 10 ? `0${i}` : i}`"
-							/>
-							<q-input 
-								dark filled square dense
-								v-model="classes[editClass].spells_known.spells[i]"
-								:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
-								:tabindex="`2${i < 10 ? `0${i}` : i}`"
-							/>
-						</template>
-					</div>
-			</div>
-		</b-modal>
+		<q-dialog v-model="spells_known_modal">
+			<hk-card>
+				<div slot="header" class="card-header d-flex justify-content-between">
+					<span>
+						Spells known 
+					</span>
+					<q-btn flat v-close-popup round dense icon="close" />
+				</div>
+				<div class="spells-known" v-if="classes[editClass].spells_known">
+					<h3>Cantrips & Spells known</h3>
+						<div class="columns">
+							<div>Level</div><div>Cantrips</div><div>Spells</div>
+							<template v-for="i in 20">
+								<div :key="`level-${i}`">
+									{{ i }}
+								</div>
+								<q-input 
+									dark filled square dense
+									v-model="classes[editClass].spells_known.cantrips[i]" 
+									:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
+									:tabindex="`1${i < 10 ? `0${i}` : i}`"
+								/>
+								<q-input 
+									dark filled square dense
+									v-model="classes[editClass].spells_known.spells[i]"
+									:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
+									:tabindex="`2${i < 10 ? `0${i}` : i}`"
+								/>
+							</template>
+						</div>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -598,6 +625,9 @@
 		data() {
 			return {
 				modifier_modal: false,
+				roll_hp_modal: false,
+				experience_modal: false,
+				spells_known_modal: false,
 				armor_types: [
 					{ value: "light", label: "Light armor" },
 					{ value: "medium", label: "Medium armor" },
@@ -753,7 +783,7 @@
 				//Open modal to roll HP
 				if(this.hit_point_type === "rolled") {
 					this.editClass = classKey;
-					this.$refs['roll-hp-modal'].show();
+					this.rolled_hp_modal = true;
 				}
 				this.$emit("change", "class.level_up");
 			},
@@ -874,11 +904,11 @@
 			},
 			rollHitPoints(classKey) {
 				this.editClass = classKey;
-				this.$refs['roll-hp-modal'].show();
+				this.roll_hp_modal = true;
 			},
 			spellsKnown(classKey) {
 				this.editClass = classKey;
-				this.$refs['spells-known-modal'].show();
+				this.spells_known_modal = true;
 			},
 			setRolledHP(classKey, level) {
 				//Set rolled HP manually
@@ -897,6 +927,7 @@
 				//Roll HP digitally
 				const hit_dice = this.classes[classKey].hit_dice;
 				const value = this.rollD(hit_dice, 1, 0).total;
+
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
 				this.$emit("change", "class.rolled_hit_points");
 			},
@@ -1006,8 +1037,8 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/--asi`).set({ type: value });
 				this.$emit("change", `class.edit_feature_level_${level}`);
 			},
-			saveASI(event, classKey, level, featureKey, index) {
-				const ability = (event.target.value) ? event.target.value : null;
+			saveASI(value, classKey, level, featureKey, index) {
+				const ability = (value) ? value : null;
 				const newModifier = {
 					origin: `class.${classKey}.${level}.${featureKey}.${index}`,
 					type: "bonus",
@@ -1045,6 +1076,7 @@
 				let newClass = {
 					level: 1
 				};
+				//Set rolled HP for the first level to make sure the object exists
 				newClass.rolled_hit_points = (this.hit_point_type === "rolled") ? { 1: 0 } : null;
 
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes`).push(newClass);
@@ -1101,11 +1133,18 @@
 		display: flex;
 		justify-content: center;
 
-		.form-control {
+		.q-field {
 			height: 77px;
 			margin-right: 1px;
-			font-size: 25px;
 			max-width: 150px;
+
+			&__control {
+				height: 90px;
+
+				input {
+					text-align: center;
+				}
+			}
 		}
 		a {
 			display: block;
@@ -1115,9 +1154,6 @@
 	.level-up {
 		color: #83b547 !important;
 		font-size: 15px;
-	}
-	.form-control {
-		width: 100%;
 	}
 	.level {
 		display: grid;
@@ -1198,7 +1234,7 @@
 		margin-bottom: 1px;
 		border-bottom: solid 1px #5c5757;
 	}
-	.card {
+	.hk-card {
 		margin-bottom: 1px !important;
 
 		h3.title {

@@ -1,11 +1,16 @@
 <template>
 	<div>
 		<h4 class="title">
-			Modifiers
-			<a @click="newModifier(origin), modal = true">Add Modifier</a>
+			Modifiers 
+			{{ modifiers.length > 0 ? `( ${modifiers.length} )` : `` }}
+			<a @click="newModifier(origin), modal = true">
+				<i class="fas fa-plus green" />
+				Add Modifier
+			</a>
 		</h4>
 
 		<hk-table
+			v-if="modifiers.length > 0"
 			:columns="columns"
 			:items="modifiers"
 		>
@@ -107,6 +112,6 @@
 		border-bottom: solid 1px #5c5757;
 		display: flex;
 		justify-content: space-between;
-		padding-bottom: 5px;
+		line-height: 30px;
 	}
 </style>

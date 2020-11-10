@@ -38,7 +38,7 @@
 						placeholder="0"
 					>
 						<template v-slot:append>
-							<a @click="rollMonster(entity.key, entity)">
+							<a @click="rollMonster($event, entity.key, entity)">
 							<q-icon size="small" name="fas fa-dice-d20"/>
 							<q-tooltip anchor="top middle" self="center middle">
 								1d20 + {{ calcMod(entity.dexterity) }}
@@ -51,7 +51,7 @@
 			</li>
 		</ul>
 		<div class="pl-2 pr-3">
-			<a class="btn btn-block" @click="(selected.length === 0) ? rollAll() : rollGroup()">
+			<a class="btn btn-block" @click="(selected.length === 0) ? rollAll($event) : rollGroup($event)">
 				<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
 			</a>
 		</div>
@@ -78,21 +78,21 @@
 				'setSlide',
 				'set_initiative'
 			]),
-			rollMonster(key, entity) {
-				let roll = this.rollD(20, 1, this.calcMod(entity.dexterity));
+			rollMonster(e, key, entity) {
+				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity));
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
 					initiative: entity.initiative
 				})
 			},
-			rollAll() {
+			rollAll(e) {
 				for (let i in this.npcs) {
 					let key = this.npcs[i].key
-					this.rollMonster(key, this.npcs[i])
+					this.rollMonster(e, key, this.npcs[i])
 				}
 			},
-			rollGroup() {
+			rollGroup(e) {
 				let dex = Infinity
 				let i
 				let key
@@ -106,7 +106,7 @@
 						dex = entity.dexterity;
 					}
 				}
-				let roll = this.rollD(20,1,this.calcMod(dex)).total;
+				let roll = this.rollD(e, 20, 1, this.calcMod(dex)).total;
 
 				for(let i in this.selected) {
 					key = this.selected[i]

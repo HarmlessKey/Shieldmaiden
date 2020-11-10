@@ -21,7 +21,7 @@
 			</div>
 			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
-			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
+			<button class="btn" @click="roll($event, die, item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
 		<template v-if="log">
@@ -69,7 +69,7 @@
 			}
 		},
 		methods: {
-			roll(d, item) {
+			roll(e, d, item) {
 				item.n = (item.n > 999) ? 999 : item.n;
 				item.mod = (item.mod > 999) ? 999 : item.mod;
 				item.mod = (item.mod < -999) ? -999 : item.mod;
@@ -79,7 +79,7 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(die, item.n, item.mod, `${item.n}d${die} roll`);
+				let roll = this.rollD(e, die, item.n, item.mod, `${item.n}d${die} roll`);
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20

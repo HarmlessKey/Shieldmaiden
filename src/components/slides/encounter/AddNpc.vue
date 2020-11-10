@@ -187,9 +187,9 @@
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},
-			rollInitiative() {
+			rollInitiative(e) {
 				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
-				const roll = this.rollD(20, 1, mod);
+				const roll = this.rollD(e, 20, 1, mod);
 				this.$set(this.entity, "initiative", roll.total);
 			},
 			set(id, type) {

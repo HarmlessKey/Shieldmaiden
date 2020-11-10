@@ -65,19 +65,21 @@
 				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
-				<div v-if="toHit" class="advantage d-sm-none d-flex justify-content-between">
-					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
-						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
-						Advantage
-					</button>
-					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
-						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
-						Disadvantage
-					</button>
-				</div>
-				<p class="mt-3 d-none d-sm-block">
-					<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
-				</p>
+				<template v-if="toHit">
+					<div class="advantage d-sm-none d-flex justify-content-between">
+						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
+							<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
+							Advantage
+						</button>
+						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
+							<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
+							Disadvantage
+						</button>
+					</div>
+					<p class="mt-3 d-none d-sm-block">
+						<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+					</p>
+				</template>
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
@@ -122,8 +124,8 @@
 							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
 							:class="{ 
-								'bg-red': actionHover === `custom-disadvantage`,
-								'bg-green': actionHover === `custom-advantage`
+								'bg-red': actionHover === `custom-disadvantage` && toHit,
+								'bg-green': actionHover === `custom-advantage` && toHit
 							}"
 							@mousemove="checkAdvantage($event, 'action', 'custom')"
 							@mouseout="clearAdvantage()"
@@ -152,8 +154,8 @@
 								@click="groupRoll($event, action)" 
 								class="btn btn-sm"
 								:class="{ 
-									'bg-red': actionHover === `${index}-disadvantage`,
-									'bg-green': actionHover === `${index}-advantage`
+									'bg-red': actionHover === `${index}-disadvantage` && toHit,
+									'bg-green': actionHover === `${index}-advantage` && toHit
 								}"
 								@mousemove="checkAdvantage($event, 'action', index)"
 								@mouseout="clearAdvantage()"
@@ -408,18 +410,16 @@
 					ac = parseInt(target.ac_bonus) + ac;
 				}
 
-				let toHit = [];
+				let attack_bonus = action.attack_bonus || 0;
+				let toHit;
 				let adv = ""
 				//If there is advantage roll twice
-				if(advantage) {
-					for(let i = 0; i <= 1; i++) {
-						let attack_bonus = action.attack_bonus || 0;
-						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
-					}
+				if(advantage) {	
+					toHit = this.rollD(e, 20, 2, attack_bonus);
 
 					//Define the position of the highest and lowest rolls in the array
-					highest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 0 : 1;
-					lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 1 : 0;
+					highest = (toHit.throws[0] >= toHit.throws[1]) ? 0 : 1;
+					lowest = (toHit.throws[0] >= toHit.throws[1]) ? 1 : 0;
 
 					//Set advantage message for snotify
 					let color = (advantage === 'advantage') ? 'green' : 'red'; 
@@ -428,7 +428,7 @@
 				//Roll once where there is no advantage/disadvantage
 				else {
 					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
-					toHit[highest] = this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
+					toHit = this.rollD(e, 20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
 				}
 
 				//Flip the positions of highest and lowest if there was disadvantage
@@ -437,12 +437,14 @@
 					lowest = (lowest === 0) ? 1 : 0;
 				}
 
+				toHit.total = toHit.throws[highest] + attack_bonus; //Add the attack bonus to the higest/lowest 'to hit' roll
+ 
 				//Roll the damage for all seperated rolls
 				//Roll if it's the first roll and rollOnce = true
 				//Roll if rollOnce is false
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
-					if(this.toHit && toHit[highest].throws[0] === 20) {
+					if(this.toHit && toHit.throws[highest] === 20) {
 						crit = true;
 						if(this.criticalSettings['.value']) {
 							critDouble = true;
@@ -456,7 +458,7 @@
 					for(let c = 0; c < critRoll; c++) {
 						for(let roll in rolls) {
 							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
-							let rolled = this.rollD(dice[1], dice[0]) //roll the dice
+							let rolled = this.rollD(e, dice[1], dice[0]) //roll the dice
 							let damage = rolled.total; //roll the dice
 	
 							allDamageRolls.push(rolled.throws);
@@ -487,7 +489,7 @@
 					//All rolls should be seperate (different damage or same damage and to hit)
 					//All rolls are together (same damge, no to hit) and there was no roll before
 					if(this.share_rolls && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
-						this.shareRoll(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+						this.shareRoll(targets, toHit.throws[highest], total, action['attack_bonus'], action['damage_bonus']);
 					} else {
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
@@ -513,7 +515,7 @@
 				this.rolledDamage = totalDamage; //For animation
 
 				if(this.toHit) {
-					let toHitRoll = toHit[highest].throws[0];
+					let toHitRoll = toHit.throws[highest];
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
@@ -524,19 +526,19 @@
 						toHitRoll = '<span class="red">natural 1</span>'; //form HTML fo snotify
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
-					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
+					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit.throws[lowest]}</span>` : ``;
 
-					this.rolledToHit = toHit[highest].total; //For animation
+					this.rolledToHit = toHit.total; //For animation
 
 					//Form HTML for snotify
 					hits = `<div class="roll">
 						${(adv) ? adv : ``}
 						<div class="top">
 							${ignoredRoll}
-							${toHitRoll}${toHit[highest].mod}
+							${toHitRoll}${toHit.mod}
 						</div>
-						<h2 id="toHitRoll">${toHit[highest].total}</h2>
+						<h2 id="toHitRoll">${toHit.total}</h2>
 						<div class="bottom">
 							${hitOrMiss}
 						</div>

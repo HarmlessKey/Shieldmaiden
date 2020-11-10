@@ -12,10 +12,17 @@ export const dice = {
 		}
 	},
 	methods: {
-		rollD(d=20, n=1, m=0, notify=false) {
+		rollD(e, d=20, n=1, m=0, notify=false) {
 			m = parseInt(m); //Removes + from modifier
-			const add = (a, b) => a + b
-			let throws = []
+			const add = (a, b) => a + b;
+			let throws = [];
+			
+			//Roll with advantage or disadvantage when a single d20 is rolled
+			if(n === 1 && d === 20 && (e.shiftKey || e.ctrlKey)) {
+				console.log('advantage')
+				// n = 2;
+			}
+
 			for (var i=0; i < n; i++) {
 				throws.push(Math.ceil(Math.random() * d))
 			}

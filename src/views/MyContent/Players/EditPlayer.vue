@@ -6,7 +6,7 @@
 		
 		<template v-else-if="player">
 			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control === $store.getters.getUser.uid) || $route.name != 'Edit Character'">
-
+				
 				<!-- GIVE OUT CONTROL -->
 				<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
 					<GiveCharacterControl :playerId="playerId" :control="player.control" />
@@ -16,7 +16,7 @@
 					<hk-card header="Basic Info" >
 						<q-input 
 							v-if="$route.name != 'Edit Character'"
-							dark filled square dense
+							dark filled square
 							label="Player name"
 							autocomplete="off"  
 							type="text" 
@@ -30,7 +30,7 @@
 						<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
 						
 						<q-input 
-							dark filled square dense
+							dark filled square
 							label="Character name"
 							autocomplete="off"  
 							type="text" 
@@ -66,9 +66,9 @@
 					</hk-card>
 					<hk-card header="Level & Base Stats">
 						<div class="row q-col-gutter-md">
-							<div class="col-12 col-md-6 mb-2">
+							<div class="col-12 col-md-6">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Experience points"
 									autocomplete="off" 
 									type="number" 
@@ -87,9 +87,9 @@
 								</q-input>				
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
 							</div>
-							<div class="col-12 col-md-6 mb-2">
+							<div class="col-12 col-md-6">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									clearable
 									label="Level override"
 									autocomplete="off"
@@ -105,7 +105,7 @@
 							</div>
 							<div class="col-12 col-md-4">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Hit points"
 									autocomplete="off"  id="maxHp" 
 									type="number" 
@@ -122,7 +122,7 @@
 							</div>
 							<div class="col-12 col-md-4">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Armor class"
 									autocomplete="off"  
 									id="ac" 
@@ -139,7 +139,7 @@
 							</div>
 							<div class="col-12 col-md-4">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Spell save DC"
 									autocomplete="off"  
 									id="save_dc" 
@@ -155,10 +155,12 @@
 
 				<!-- ABILITY SCORES -->
 				<hk-card header="Ability Scores & Senses" class="ability-card">
+
+					<h6 class="mb-2">Ability scores</h6>
 					<div class="row q-col-gutter-md">
 						<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								:label="ability.ability.capitalize()"
 								autocomplete="off"  
 								type="number" 
@@ -182,11 +184,11 @@
 					</div>
 
 					<!-- SENSES -->
-					<h5 class="mt-3">Senses</h5>
+					<h6 class="mt-3 mb-2">Senses</h6>
 					<div class="row q-col-gutter-md">
 						<div  class="col-12 col-md-4 mb-2">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Passive perception"
 								autocomplete="off" 
 								type="number" 
@@ -201,7 +203,7 @@
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Passive investigation"
 								autocomplete="off"
 								type="number" 
@@ -216,7 +218,7 @@
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Passive insight"
 								autocomplete="off"
 								type="number" 
@@ -493,11 +495,14 @@
 			},
 		},
 		mounted() {
-			let custom = db.ref(`npcs/${this.userId}`);
-			custom.on('value', async (snapshot) => {
-				this.npcs = snapshot.val();
-			});
-			this.loadingNpcs = false;
+			if(this.$route.name === 'AddPlayers') {
+				this.$set(this.player, "strength", 10);
+				this.$set(this.player, "dexterity", 10);
+				this.$set(this.player, "constitution", 10);
+				this.$set(this.player, "intelligence", 10);
+				this.$set(this.player, "wisdom", 10);
+				this.$set(this.player, "charisma", 10);
+			}
 		},
 		methods: {
 			...mapActions([
@@ -512,11 +517,9 @@
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
 					this.$snotify.error('You have too many players.', 'Error');
 				} else {
-					// THIS IS UGLY
-					delete this.player['.value']
-					delete this.player['.key']
+					delete this.player['.value'];
+					delete this.player['.key'];
 
-					// UGLY ENDS HERE
 					this.$validator.validateAll().then((result) => {
 						if (result) {
 							db.ref('players/' + this.userId).push(this.player);

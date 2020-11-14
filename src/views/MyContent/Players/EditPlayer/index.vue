@@ -1,86 +1,99 @@
 <template>
-	<div v-if="base_values.general && !base_values.general.build" class="build-type">
-		<h3>How do you want to do this?</h3>
-		<div class="types">
-			<b-card header="Advanced" @click="build = 'advanced'" :class="{ active: build === 'advanced' }">
-				<p>Create a complete character sheet that you can use as player in your games.</p>
-				<template slot="footer">
-					<a class="btn btn-block">Choose</a>
-				</template>
-			</b-card>
-			<b-card header="Simple" @click="build = 'simple'" :class="{ active: build === 'simple' }">
-				<p>Create a character with only basic stats needed for use in Harmless Key. This can't be used as a full character reference in your games, but just works for the our combat tracker.</p>
-				<template slot="footer">
-					<a class="btn btn-block">Choose</a>
-				</template>
-			</b-card>
-			<b-card header="Import">
-				<p>(Coming soon)</p>
-				<p>Import a character from DnDBeyond. Copy your character sheet over, so it can be used in our combat tracker.</p>
-				<template slot="footer">
-					<a class="btn btn-block disabled">Choose</a>
-				</template>
-			</b-card>
+	<div ref="builder">
+		<div v-if="base_values.general && !base_values.general.build" class="build-type">
+			<h3>How do you want to do this?</h3>
+			<div class="types">
+				<b-card header="Advanced" @click="build = 'advanced'" :class="{ active: build === 'advanced' }">
+					<p>Create a complete character sheet that you can use as player in your games.</p>
+					<template slot="footer">
+						<a class="btn btn-block">Choose</a>
+					</template>
+				</b-card>
+				<b-card header="Simple" @click="build = 'simple'" :class="{ active: build === 'simple' }">
+					<p>Create a character with only basic stats needed for use in Harmless Key. This can't be used as a full character reference in your games, but just works for the our combat tracker.</p>
+					<template slot="footer">
+						<a class="btn btn-block">Choose</a>
+					</template>
+				</b-card>
+				<b-card header="Import">
+					<p>(Coming soon)</p>
+					<p>Import a character from DnDBeyond. Copy your character sheet over, so it can be used in our combat tracker.</p>
+					<template slot="footer">
+						<a class="btn btn-block disabled">Choose</a>
+					</template>
+				</b-card>
+			</div>
+			<div class="d-flex justify-content-center mt-5">
+				<a class="btn btn-lg" @click="setBuildType('advanced')">Create character</a>
+			</div>
 		</div>
-		<div class="d-flex justify-content-center mt-5">
-			<a class="btn btn-lg" @click="setBuildType('advanced')">Create character</a>
-		</div>
-	</div>
 
-	<div v-else-if="base_values.general && base_values.general.build === 'advanced'" class="content">
-		<ul class="tabs">
-			<li 
-				v-for="({value, label}, i) in tabs"
-				@click="current_tab = value"
-				:class="{ active: current_tab === value }"
-				:key="`tab-${i}`"
+		<div v-else-if="base_values.general && base_values.general.build === 'advanced'" class="content">
+			<q-tabs
+				v-model="current_tab"
+				dark
+				dense
+				align="left"
+				no-caps
 			>
-				{{ label }}
-			</li>
-		</ul>
-		<div class="tab-content" v-if="base_values.class">
-			<Computed 
-				:hit_point_type="base_values.general.hit_point_type"
-				:modifiers="modifiers"
-				:classes="base_values.class.classes"
-				:race="base_values.race"
-				:computed="computed_values" 
-			/>
-			<General 
-				v-if="current_tab === 'general'"
-				:general="base_values.general" 
-				:character_class="base_values.class"
-				:playerId="playerId" 
-				:userId="userId"
-				@change="compute"
-			/>
-			<Race
-				v-if="current_tab === 'race'"
-				:character_race="base_values.race" 
-				:playerId="playerId"
-				:userId="userId"
-				:modifiers="race_modifiers"
-				@change="compute"
-			/>
-			<Class
-				v-if="current_tab === 'class'"
-				:base_class="base_values.class" 
-				:hit_point_type="base_values.general.hit_point_type"
-				:advancement="base_values.general.advancement"
-				:playerId="playerId"
-				:userId="userId"
-				:modifiers="class_modifiers"
-				:computed="computed_values"
-				@change="compute"
-			/>
-			<Abilities
-				v-if="current_tab === 'abilities'"
-				:base_abilities="base_values.abilities"
-				:playerId="playerId"
-				:userId="userId"
-				:modifiers="ability_modifiers"
-				@change="compute"
-			/>
+				<q-tab 
+					v-for="({value, label}, i) in tabs" 
+					:name="value"
+					:label="label"
+					:key="`tab-${i}`"
+				/>
+			</q-tabs>
+			<div class="tab-content" v-if="base_values.class">
+				<Computed 
+					:hit_point_type="base_values.general.hit_point_type"
+					:modifiers="modifiers"
+					:classes="base_values.class.classes"
+					:race="base_values.race"
+					:computed="computed_values" 
+				/>
+				<General 
+					v-if="current_tab === 'general'"
+					:general="base_values.general" 
+					:character_class="base_values.class"
+					:playerId="playerId" 
+					:userId="userId"
+					@change="compute"
+				/>
+				<Race
+					v-if="current_tab === 'race'"
+					:character_race="base_values.race" 
+					:playerId="playerId"
+					:userId="userId"
+					:modifiers="race_modifiers"
+					@change="compute"
+				/>
+				<Class
+					v-if="current_tab === 'class'"
+					:base_class="base_values.class" 
+					:hit_point_type="base_values.general.hit_point_type"
+					:advancement="base_values.general.advancement"
+					:playerId="playerId"
+					:userId="userId"
+					:modifiers="class_modifiers"
+					:computed="computed_values"
+					@change="compute"
+				/>
+				<Abilities
+					v-if="current_tab === 'abilities'"
+					:base_abilities="base_values.abilities"
+					:playerId="playerId"
+					:userId="userId"
+					:modifiers="ability_modifiers"
+					@change="compute"
+				/>
+				<Equipment
+					v-if="current_tab === 'equipment'"
+					:playerId="playerId"
+					:userId="userId"
+					:modifiers="equipment_modifiers"
+					@change="compute"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -99,6 +112,7 @@
 	import Race from './race';
 	import Class from './class';
 	import Abilities from './abilities';
+	import Equipment from './equipment';
 	
 
 	export default {
@@ -113,11 +127,13 @@
 			General,
 			Race,
 			Class,
-			Abilities
+			Abilities,
+			Equipment
 		},
 		data() {
 			return {
 				playerId: this.$route.params.id,
+				width: 0,
 				build: 'advanced',
 				tabs: [
 					{ value: 'general', label: "General" },
@@ -143,14 +159,21 @@
 				},
 			}
 		},
+		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+		},
 		computed: {
 			...mapGetters([
 				'tier',
 				'players',
 				'overencumbered',
 			]),
-			//User ID needs to be different if it is
-			//an external controlled character
+			//User ID needs to be different 
+			//if it is an external controlled character
 			userId() {
 				if(this.$route.name === 'Edit Character') {
 					let id = undefined
@@ -186,6 +209,13 @@
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
 					return origin[0] === 'class';
+				});
+				return modifiers;
+			},
+			equipment_modifiers() {
+				const modifiers = this.modifiers.filter(mod => {
+					const origin = mod.origin.split(".");
+					return origin[0] === 'equipment';
 				});
 				return modifiers;
 			},
@@ -240,14 +270,8 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			showSlide(type) {
-				this.setSlide({
-					show: true,
-					type,
-				})
+			setSize() {
+				this.width = this.$refs.builder.clientWidth;
 			},
 			setBuildType() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(this.build);
@@ -597,32 +621,11 @@
 		background-image: url('../../../../assets/_img/styles/paper-bg.png');
 		background-position: top left;
 		display: grid;
-		grid-template-rows: 30px 1fr;
+		grid-template-rows: 40px 1fr;
 		overflow: hidden;
 		height: calc(100vh - 60px);
 		background-color: #000;
 		
-		.tabs {
-			height: 30px;
-			list-style: none;
-			padding: 0;
-			display: flex;
-			justify-content: flex-start;
-			user-select: none;
-			border-bottom: solid 1px #5c5757;
-
-			li {
-				cursor: pointer;
-				padding: 0 10px;
-
-				&.active {
-					color: #2c97de;
-				}
-				&:first-child {
-					padding-left: 0;
-				}
-			}
-		}
 		.tab-content {
 			padding-top: 20px;
 			overflow: scroll;

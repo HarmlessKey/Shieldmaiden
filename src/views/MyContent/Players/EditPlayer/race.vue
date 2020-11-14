@@ -92,7 +92,6 @@
 </template>
 
 <script>
-	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import ModifierTable from './modifier-table.vue';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
@@ -108,7 +107,6 @@
 			"userId"
 		],
 		components: {
-			GiveCharacterControl,
 			Modifier,
 			ModifierTable
 		},

@@ -1,19 +1,19 @@
 <template>
 	<div class="side">
-			<q-tabs
-        v-model="tab"
-				dark
-				indicator-color="transparent"
-				dense
-				align="left"
-      >
-        <q-tab name="log" icon="fas fa fa-scroll-old" />
-        <q-tab name="damage" icon="fas fa-swords" />
-        <q-tab name="requests" icon="fas fa-bell">
-					<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
-						<div>{{ Object.keys(encounter.requests).length }}</div>
-					</div>
-        </q-tab>
+		<q-tabs
+			v-model="tab"
+			dark
+			indicator-color="transparent"
+			dense
+			align="left"
+		>
+			<q-tab name="log" icon="fas fa fa-scroll-old" />
+			<q-tab name="damage" icon="fas fa-swords" />
+			<q-tab name="requests" icon="fas fa-bell">
+				<div class="notifications bg-red white animated zoomIn" v-if="encounter.requests && Object.keys(encounter.requests).length > 0">
+					<div>{{ Object.keys(encounter.requests).length }}</div>
+				</div>
+			</q-tab>
 		</q-tabs>
 		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<q-tab-panels v-model="tab" class="bg-transparent">

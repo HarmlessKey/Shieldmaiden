@@ -90,6 +90,7 @@
 					v-if="current_tab === 'equipment'"
 					:playerId="playerId"
 					:userId="userId"
+					:equipment="computed_values.equipment"
 					:modifiers="equipment_modifiers"
 					@change="compute"
 				/>
@@ -105,7 +106,7 @@
 	import { dice } from '@/mixins/dice.js';
 	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { skills } from '@/mixins/skills.js';
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import Computed from './computed';
 	import General from './general';

@@ -135,7 +135,14 @@
 					</q-input>
 				</div>
 				<div class="col-12 col-md-3">
-					<q-checkbox size="lg" dark v-model="effect.primary" label="Add primary stat" :false-value="null" indeterminate-value="something-else" />
+					<q-checkbox 
+						size="lg" 
+						dark 
+						v-model="effect.primary" 
+						label="Add primary stat" 
+						:false-value="null" 
+						indeterminate-value="something-else"
+					/>
 				</div>
 			</template>
 			<!-- DAMAGE TYPES -->

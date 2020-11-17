@@ -78,6 +78,8 @@
 						<Modifier-table 
 							:modifiers="trait_modifiers(key)" 
 							:origin="`race.trait.${key}`"
+							:userId="userId"
+							:playerId="playerId"
 							@edit="editModifier"
 						/>
 					</div>

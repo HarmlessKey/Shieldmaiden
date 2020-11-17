@@ -15,39 +15,39 @@
 			</h3>
 			<q-list dark square class="accordion">
 				<q-expansion-item
-					v-for="(weapon, index) in items"
-					:key="`weapon-${index}`"
+					v-for="(item, index) in items"
+					:key="`item-${value}-${index}`"
 					dark switch-toggle-side
-					:group="`weapons`"
+					:group="value"
 				>
 					<template v-slot:header>
 						<q-item-section avatar>
 							<q-checkbox 
 								dark
-								:value="weapon.equipped"
+								:value="item.equipped"
 								:false-value="null"
 								indeterminate-value="something-else"
-								@input="equipItem($event, weapon['.key'])"
+								@input="equipItem($event, item['.key'])"
 							>
 								<q-tooltip anchor="top middle" self="center middle">
-									{{ weapon.equipped ? "Unequip" : "Equip" }}
+									{{ item.equipped ? "Unequip" : "Equip" }}
 								</q-tooltip>
 							</q-checkbox>
 						</q-item-section>
-						<q-item-section avatar>
-							<i :class="weapon.weapon_type.split('_')[1] === 'melee' ? 'fas fa-sword' : 'fas fa-bow-arrow'">
+						<q-item-section avatar v-if="value === 'weapon'">
+							<i :class="item.weapon_type.split('_')[1] === 'melee' ? 'fas fa-sword' : 'fas fa-bow-arrow'">
 								<q-tooltip anchor="top middle" self="center middle">
-									{{ weapon.weapon_type.split("_")[1].capitalize() }}
+									{{ item.weapon_type.split("_")[1].capitalize() }}
 								</q-tooltip>
 							</i>
 						</q-item-section>
 						<q-item-section>
-							{{ weapon.name }}
+							{{ item.name }}
 						</q-item-section>
 						<q-item-section avatar>
 							<div class="actions">
 								<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
-								<a class="gray-light" @click.stop="removeItem(weapon['.key'])">
+								<a class="gray-light" @click.stop="removeItem(item['.key'])">
 									<i class="fas fa-trash-alt"/>
 								</a>
 							</div>
@@ -60,121 +60,21 @@
 							dark 
 							size="sm"
 							class="mb-2"
-							:value="weapon.equipped" 
+							:value="item.equipped" 
 							:false-value="null" 
 							indeterminate-value="something-else"
 							label="Equipped"
-							@input="equipItem($event, weapon['.key'])"
+							@input="equipItem($event, item['.key'])"
 						/>
 
-						<q-input
-							dark filled square dense
-							label="Name"
-							v-model="weapon.name"
-							class="mb-2"
-						/>
+						<Weapon v-model="items[index]" @input="updateWeapon" />
 
-						<q-select 
-							dark filled square dense
-							label="Ability"
-							emit-value
-							map-options
-							:options="abilities"
-							v-model="weapon.ability"
-							class="mb-3"
-						/>
-
-						<div class="mb-2">Base damage</div>
-						<div class="row q-col-gutter-md mb-2">
-							<div class="col">
-								<q-input
-									dark filled square dense
-									placeholder="Base damage"
-									v-model="weapon.damage"
-								/>
-							</div>
-							<div class="col">
-								<q-select 
-									dark filled square dense
-									placeholder="Damage type"
-									emit-value
-									map-options
-									:options="weapon_damage_types"
-									v-model="weapon.damage_type"
-								/>
-							</div>
-						</div>
-
-						<q-input
-							dark filled square dense
-							label="Versatile damage"
-							v-model="weapon.versatile"
-							class="mb-2"
-						/>
-
-						<template v-if="weapon.weapon_type.split('_')[1] === 'ranged'">
-							<div class="mb-2">Range</div>
-							<div class="row q-col-gutter-md mb-2">
-								<div class="col">
-									<q-input
-										dark filled square dense
-										type="number"
-										label="Normal range"
-										:value="weapon.range ? weapon.range.split('/')[0] : undefined"
-									/>
-								</div>
-								<div class="col">
-									<q-input
-										dark filled square dense
-										type="number"
-										label="Long range"
-										:value="weapon.range ? weapon.range.split('/')[1] : undefined"
-									/>
-								</div>
-							</div>
-						</template>
-
-						<template v-else>
-							<div class="mb-2">Thrown</div>
-							<div class="row q-col-gutter-md mb-2" v-if="!weapon.range">
-								<div class="col">
-									<q-input
-										dark filled square dense
-										type="number"
-										label="Normal range"
-										:value="weapon.thrown ? weapon.thrown.split('/')[0] : undefined"
-									/>
-								</div>
-								<div class="col">
-									<q-input
-										dark filled square dense
-										type="number"
-										label="Long range"
-										:value="weapon.thrown ? weapon.thrown.split('/')[1] : undefined"
-									/>
-								</div>
-							</div>
-						</template>
-
-						<div>
-							<q-checkbox 
-								dark 
-								size="sm"
-								v-model="weapon.light"
-								:disable="weapon.heavy"
-								:false-value="null" 
-								indeterminate-value="something-else"
-								label="Light"
-							/>
-						</div>
-						<q-checkbox 
-							dark 
-							size="sm"
-							v-model="weapon.heavy"
-							:disable="weapon.light" 
-							:false-value="null" 
-							indeterminate-value="something-else"
-							label="Heavy"
+						<Modifier-table 
+							:modifiers="item.modifiers || []" 
+							:origin="`equipment.${item['.key']}`"
+							:userId="userId"
+							:playerId="playerId"
+							@edit="editModifier"
 						/>
 					</div>
 				</q-expansion-item>
@@ -243,19 +143,25 @@
 				</hk-card>
 			</div>
 		</q-dialog>
+
+		<!-- MODIFIER MODAL -->
+		<q-dialog v-model="modifier_modal">
+      <Modifier :value="modifier" :userId="userId" :playerId="playerId" @save="modifierSaved" />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import ModifierTable from './modifier-table.vue';
-	import Modifier from './modifier.vue';
+	import ModifierTable from '../modifier-table.vue';
+	import Modifier from '../modifier.vue';
 	import { db } from '@/firebase';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
 	import { damageTypes } from '@/mixins/damageTypes.js';
+	import Weapon from './weapon.vue'
 
 	export default {
-		name: 'CharacterRace',
+		name: 'Equipment',
 		mixins: [abilities, weapons, damageTypes],
 		props: [
 			"equipment",
@@ -265,11 +171,14 @@
 		],
 		components: {
 			Modifier,
-			ModifierTable
+			ModifierTable,
+			Weapon
 		},
 		data() {
 			return {
 				addModal: false,
+				modifier_modal: false,
+				modifier: {},
 				new_item: undefined
 			}
 		},
@@ -297,11 +206,6 @@
 				];
 				return types;
 			},
-			weapon_damage_types() {
-				return this.damage_types.filter(type => {
-					return ["piercing", "slashing", "bludgeoning"].includes(type.value);
-				});
-			},
 			money() {
 				return this.equipment.money;
 			},
@@ -312,6 +216,13 @@
 					}).map(obj => {
 						let weapon = obj[1];
 						weapon['.key'] = obj[0];
+
+						//Modifiers
+						weapon.modifiers = this.modifiers.filter(mod => {
+							const origin = mod.origin.split(".");
+							return origin[1] === obj[0];
+						});
+
 						return weapon;
 					});
 					return weapons;
@@ -368,6 +279,14 @@
 				//Remove the item
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).remove();
 			},
+			editModifier(e) {
+				this.modifier_modal = true;
+				this.modifier = e.modifier;
+			},
+			modifierSaved() {
+				this.modifier_modal = false;
+				this.$emit("change", "modifier.saved");
+			},
 			setWeapon(weapon) {
 				this.$set(this.new_item, 'value', weapon.value);
 				this.$set(this.new_item, 'name', weapon.label);
@@ -393,9 +312,16 @@
 				if(weapon.special) this.$set(this.new_item, 'special', weapon.special);
 			},
 			equipItem(e, key) {
-				const item = this.equipment.items[key];
-
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}/equipped`).set(e);
+				const equipped = (e) ? "equipped" : "unequipped";
+				this.$emit("change", `equipment.item_${equipped}`);
+			},
+			updateWeapon(e) {
+				const weapon = {...e}; //copy the object
+				const key = weapon['.key'];
+				delete weapon['.key'];
+				delete weapon.modifiers; //The object holds modifiers for display, these can't be added into firebase
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).update(weapon);
 			}
 		},
 	}
@@ -423,5 +349,9 @@
 	}
 	.new-item {
 		min-width: 350px;
+
+		.hk-card {
+			height: 100%;
+		}
 	}
 </style>

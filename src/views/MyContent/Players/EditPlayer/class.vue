@@ -466,6 +466,8 @@
 												<Modifier-table 
 													:modifiers="feature_modifiers(classKey, level, key)" 
 													:origin="`race.trait.${key}`"
+													:userId="userId"
+													:playerId="playerId"
 													@edit="editModifier"
 												/>
 											</template>

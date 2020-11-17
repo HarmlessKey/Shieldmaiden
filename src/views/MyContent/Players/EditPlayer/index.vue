@@ -220,52 +220,9 @@
 				});
 				return modifiers;
 			},
-			feat_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[0] === 'feat';
-				});
-				return modifiers;
-			},
 			ability_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
 					return mod.target === 'ability';
-				});
-				return modifiers;
-			},
-			saving_throw_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'saving_throw';
-				});
-				return modifiers;
-			},
-			hp_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'hp';
-				});
-				return modifiers;
-			},
-			ac_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'ac';
-				});
-				return modifiers;
-			},
-			skill_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'skill';
-				});
-				return modifiers;
-			},
-			speed_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'speed';
-				});
-				return modifiers;
-			},
-			initiative_modifiers() {
-				const modifiers = this.modifiers.filter(mod => {
-					return mod.target === 'initiative';
 				});
 				return modifiers;
 			}
@@ -277,11 +234,17 @@
 			setBuildType() {
 				db.ref(`characters_base/${this.userId}/${this.playerId}/general/build`).set(this.build);
 			},
+			modifierFilter(modifiers, type) {
+				const filtered = modifiers.filter(mod => {
+					return mod.target === type;
+				});
+				return filtered;
+			},
 			compute(origin) {
 				// eslint-disable-next-line
 				console.log("change made. Origin: ", origin);
 				origin = origin.split(".");
-				let modifiers = this.modifiers;
+				let modifiers = [...this.modifiers]; //Copy the modifiers so they can be manipulated during the compute
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
@@ -373,6 +336,22 @@
 						}
 					}
 				}
+
+				//If modifiers are linked to an item, the item must be equipped in order for the modifier to apply
+				//if the item is not equipped, remove the modifier from the modifier list.
+				if(this.computed_values.equipment) {
+					for(const [itemKey, item] of Object.entries(this.computed_values.equipment.items)) {
+						for(const index in modifiers) {
+							const modifier = modifiers[index];
+							const origin = modifier.origin.split(".");
+
+							//Remove the modifier if the item is not equipped
+							if(origin[0] === "equipment" && origin[1] === itemKey && !item.equipped) {
+								delete modifiers[index];
+							}
+						}
+					}
+				}
 				
 				//Ability score maximums
 				let ability_max = {
@@ -389,7 +368,7 @@
 
 				//Add Ability Score Modifiers
 				for(let [key, value] of Object.entries(ability_scores)) {
-					for(const modifier of this.ability_modifiers) {
+					for(const modifier of this.modifierFilter(modifiers, "ability")) {
 						if(modifier.subtarget === key && modifier.type === 'bonus') {
 							value = value + parseInt(modifier.value);
 						}
@@ -415,7 +394,7 @@
 				computed_hp = computed_hp + (computed_level * this.calcMod(ability_scores.constitution));
 
 				//Add HP modifiers
-				for(const modifier of this.hp_modifiers) {
+				for(const modifier of this.modifierFilter(modifiers, "hp")) {
 					computed_hp = this.addModifier(computed_hp, modifier, proficiency, ability_scores, computed_level, classes);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/hit_points`).set(computed_hp);
@@ -439,7 +418,7 @@
 				let initiative = this.calcMod(ability_scores.dexterity);
 
 				//Add Initiative Modifiers	
-				for(const modifier of this.initiative_modifiers) {
+				for(const modifier of this.modifierFilter(modifiers, "initiative")) {
 					initiative = this.addModifier(initiative, modifier, proficiency, ability_scores, computed_level, classes);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
@@ -451,7 +430,7 @@
 				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
 
 				//Add AC Modifiers	
-				for(const modifier of this.ac_modifiers) {
+				for(const modifier of this.modifierFilter(modifiers, "ac")) {
 					armor_class = this.addModifier(armor_class, modifier, proficiency, ability_scores, computed_level, classes);
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/armor_class`).set(armor_class);
@@ -461,7 +440,7 @@
 					let speed = (this.base_values.race.walking_speed) ? parseInt(this.base_values.race.walking_speed) : 0;
 
 					//Add Speed Modifiers	
-					for(const modifier of this.speed_modifiers) {
+					for(const modifier of this.modifierFilter(modifiers, "speed")) {
 						speed = this.addModifier(speed, modifier, proficiency, ability_scores, computed_level, classes);
 					}
 					db.ref(`characters_computed/${this.userId}/${this.playerId}/display/speed`).set(speed);
@@ -474,7 +453,7 @@
 					bonuses: {}
 				};
 				for(const skill in this.skillList) {
-					for(const modifier of this.skill_modifiers) {
+					for(const modifier of this.modifierFilter(modifiers, "skill")) {
 						//Save skill proficiencies as a boolean, don't save the bonus
 						//This get's calculated front end, same goes for expertise
 						//This way expertise can easily only be added if the proficiency is also true
@@ -499,10 +478,10 @@
 					bonuses: {}
 				};
 				for(const ability in ability_scores) {
-					for(const modifier of this.saving_throw_modifiers) {
+					for(const modifier of this.modifierFilter(modifiers, "saving_throw")) {
 						//Save saving throw proficiencies as a boolean, don't save the bonus
 						//This get's calculated front end
-						//This way it's easy tho show what saving throws have proficiency
+						//This way it's easy to show what saving throws have proficiency
 						if(ability === modifier.subtarget) {
 							if(modifier.type === "proficiency") {
 								saving_throws.proficiencies[ability] = true;

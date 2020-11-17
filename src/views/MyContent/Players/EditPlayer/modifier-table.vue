@@ -54,6 +54,14 @@
 			origin: {
 				type: String,
 				required: true
+			},
+			userId: {
+				type: String,
+				required: true
+			},
+			playerId: {
+				type: String,
+				required: true
 			}
 		},
 		data() {
@@ -94,6 +102,7 @@
 				this.$emit('edit', { modifier, origin: this.origin });
 			},
 			deleteModifier(key) {
+				console.log(key)
 				db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
 				this.$emit("change", "modifier.deleted");
 			},

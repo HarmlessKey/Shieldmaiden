@@ -468,6 +468,7 @@
 													:origin="`race.trait.${key}`"
 													:userId="userId"
 													:playerId="playerId"
+													:info="featureModInfo"
 													@edit="editModifier"
 												/>
 											</template>
@@ -630,6 +631,7 @@
 				roll_hp_modal: false,
 				experience_modal: false,
 				spells_known_modal: false,
+				featureModInfo: "<p>These modifiers only apply to your character if it meets the level requirement for this class.</p>",
 				armor_types: [
 					{ value: "light", label: "Light armor" },
 					{ value: "medium", label: "Medium armor" },

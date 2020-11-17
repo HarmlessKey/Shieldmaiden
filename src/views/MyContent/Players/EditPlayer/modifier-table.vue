@@ -1,8 +1,24 @@
 <template>
 	<div>
 		<h4 class="title">
-			Modifiers 
-			{{ modifiers.length > 0 ? `( ${modifiers.length} )` : `` }}
+			<span>
+				{{ title ? title : "Modifiers" }} 
+				{{ modifiers.length > 0 ? `( ${modifiers.length} )` : `` }}
+				<a v-if="info">
+					<q-icon name="info" >
+						<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+							<q-card dark square>
+								<q-card-section class="bg-gray-active">
+									<b>{{ title ? title : "Modifiers" }}</b>
+								</q-card-section>
+								<q-card-section>
+									<div v-html="info" />
+								</q-card-section>
+							</q-card>
+						</q-menu>
+					</q-icon>
+				</a>
+			</span>
 			<a @click="newModifier(origin), modal = true">
 				<i class="fas fa-plus green" />
 				Add Modifier
@@ -62,6 +78,14 @@
 			playerId: {
 				type: String,
 				required: true
+			},
+			title: {
+				type: String,
+				required: false
+			},
+			info: {
+				type: String,
+				required: false
 			}
 		},
 		data() {

@@ -75,6 +75,8 @@
 							:userId="userId"
 							:playerId="playerId"
 							@edit="editModifier"
+							title="Character modifiers"
+							:info="modifierInfo"
 						/>
 					</div>
 				</q-expansion-item>
@@ -104,6 +106,39 @@
 
 						<div class="form-item mb-3" v-if="new_item.type === 'weapon'">
 							<q-select dark filled square dense v-model="new_item.name" :options="weaponList" label="Weapon">
+								<template v-slot:selected v-if="new_item.name">
+									<span class="mr-1">
+										{{ new_item.name  }}
+									</span>
+								</template>
+								<template v-slot:option="scope">
+									<q-item :key="`weapon-category-${scope.index}`">
+										<q-item-section>
+											<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+										</q-item-section>
+									</q-item>
+
+									<template v-for="weapon in scope.opt.weapons">
+										<q-item
+											v-if="!['simple_melee', 'simple_ranged', 'martial_melee', 'martial_ranged'].includes(weapon.value)"
+											:key="weapon.value"
+											clickable
+											v-ripple
+											v-close-popup
+											@click="setWeapon(weapon)"
+											:active="new_item.name === weapon.label"
+										>
+											<q-item-section>
+												<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+											</q-item-section>
+										</q-item>
+									</template>
+									<q-separator />
+								</template>
+							</q-select>
+						</div>
+						<div class="form-item mb-3" v-if="new_item.type === 'armor'">
+							<q-select dark filled square dense v-model="new_item.name" :options="armor_types" label="Armor">
 								<template v-slot:selected v-if="new_item.name">
 									<span class="mr-1">
 										{{ new_item.name  }}
@@ -179,7 +214,8 @@
 				addModal: false,
 				modifier_modal: false,
 				modifier: {},
-				new_item: undefined
+				new_item: undefined,
+				modifierInfo: "<p>These modifiers apply to your character, not the item and only when the item is equipped.</p>"
 			}
 		},
 		computed: {

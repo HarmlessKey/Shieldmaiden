@@ -485,7 +485,7 @@
 
 		<!-- MODIFIER MODAL -->
 		<q-dialog v-model="modifier_modal">
-      <Modifier :value="modifier" :userId="userId" :playerId="playerId" @save="modifierSaved" />
+      <Modifier :value="modifier" :userId="userId" :playerId="playerId" :classes="classes" @save="modifierSaved" />
 		</q-dialog>
 
 		<!-- ROLLED HP MODAL -->

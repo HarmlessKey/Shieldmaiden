@@ -245,6 +245,8 @@
 				console.log("change made. Origin: ", origin);
 				origin = origin.split(".");
 				let modifiers = [...this.modifiers]; //Copy the modifiers so they can be manipulated during the compute
+				let armor = undefined;
+				let shield = undefined;
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
@@ -337,22 +339,42 @@
 					}
 				}
 
-				//If modifiers are linked to an item, the item must be equipped in order for the modifier to apply
-				//if the item is not equipped, remove the modifier from the modifier list.
+				//Equipment related modifier removals
+				//Also track if armor or shields are equipped
 				if(this.computed_values.equipment) {
 					for(const [itemKey, item] of Object.entries(this.computed_values.equipment.items)) {
+
+						//Check modifiers need to be removed
 						for(const index in modifiers) {
 							const modifier = modifiers[index];
 							const origin = modifier.origin.split(".");
 
+							//If modifiers are linked to an item, the item must be equipped in order for the modifier to apply
 							//Remove the modifier if the item is not equipped
 							if(origin[0] === "equipment" && origin[1] === itemKey && !item.equipped) {
 								delete modifiers[index];
 							}
+
+							//If armor is worn and the modifier has the restriction that it can't, remove the modifier
+							if(modifier.restrictions) {
+								if(item.type === "armor" && item.equipped && modifier.restrictions.includes("no_armor")) {
+									delete modifiers[index];
+								}
+								if(item.type === "shield" && item.equipped && modifier.restrictions.includes("no_shield")) {
+									delete modifiers[index];
+								}
+							}
+						}
+						//Set armor and shield
+						if(item.type === "armor" && item.equipped) {
+							armor = item;
+						}
+						if(item.type === "shield" && item.equipped) {
+							shield = item;
 						}
 					}
 				}
-				
+
 				//Ability score maximums
 				let ability_max = {
 					strength: 20,
@@ -424,10 +446,25 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/initiative`).set(initiative);
 
 				//Armor Class
-				let armor_class = 10; //Base is always 10 (phb 14)
+				let armor_class = (armor) ? armor.armor_class : 10; //Base is always 10 (phb 14)
 
-				//Check if armor is equiped
-				armor_class = armor_class + this.calcMod(ability_scores.dexterity);
+				//Check if armor and or shield is equiped
+				let ac_dex_mod = this.calcMod(ability_scores.dexterity);
+				let shield_mod = 0;
+
+				if(armor) {
+					ac_dex_mod = (armor.dex_mod) ? ac_dex_mod : 0; //Set the dex modifier to 0 if the armor does not allow Dex.
+					
+					//If the armor allows dex but there is a maximum, reduce the dex mod to that maximum when it is higher
+					if(armor.dex_max && ac_dex_mod > armor.dex_max) {
+						ac_dex_mod = armor.dex_max;
+					}
+				}
+				if(shield) {
+					shield_mod = shield.armor_class_mod;
+				}
+
+				armor_class = armor_class + ac_dex_mod + shield_mod;
 
 				//Add AC Modifiers	
 				for(const modifier of this.modifierFilter(modifiers, "ac")) {

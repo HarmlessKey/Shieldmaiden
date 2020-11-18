@@ -138,10 +138,12 @@
 					<div class="form-item my-3">
 						<q-select 
 							dark filled square dense 
+							emit-value
+							map-options
 							multiple 
 							clearable 
 							v-model="modifier.restrictions" 
-							options="modifier_restrictions" 
+							:options="modifier_restrictions" 
 							label="Restrictions"
 						/>
 					</div>
@@ -428,6 +430,11 @@
 					text += ".";
 					return text;
 				}
+			},
+			deleteScaling() {
+				this.modifier.scaling_type = null;
+				this.modifier.scale_value = null;
+				this.modifier.scale_size = null;
 			}
 		}
 	}

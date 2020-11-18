@@ -453,7 +453,7 @@ export const weapons = {
 				{ 
 					value: "heavy", 
 					label: "Heavy armor",
-					armr: [
+					armor: [
 						{
 							type: "heavy",
 							value: "ring_mail",
@@ -488,10 +488,10 @@ export const weapons = {
 							value: "plate",
 							label: "Plate",
 							cost: 150000,
-							armor_class: 15,
+							armor_class: 18,
 							strength_required: 15,
 							stealth_disadvantage: true,
-							weigth: 40
+							weigth: 65
 						},
 					]
 				},
@@ -500,6 +500,7 @@ export const weapons = {
 					label: "Shield",
 					armor: [
 						{
+							type: "shield",
 							value: "shield",
 							label: "Shield",
 							cost: 1000,

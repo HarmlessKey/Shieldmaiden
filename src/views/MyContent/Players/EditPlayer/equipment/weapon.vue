@@ -1,5 +1,6 @@
 <template>
 	<div class="weapon">
+		<div class="mb-2">{{ title }}</div>
 		<q-input
 			dark filled square dense
 			label="Name"
@@ -15,7 +16,24 @@
 			:options="abilities"
 			v-model="weapon.ability"
 			class="mb-3"
-		/>
+		>
+			<template v-slot:append>
+				<q-icon name="info" class="pointer blue">
+					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+						<q-card dark square>
+							<q-card-section class="bg-gray-active">
+								<b>Dexterity maximum</b>
+							</q-card-section>
+
+							<q-card-section>
+								What ability does your character use to wield this weapon?<br/>
+								The modifier of this ability will be added to both the to hit and the damage roll.
+							</q-card-section>
+						</q-card>
+					</q-menu>
+				</q-icon>
+			</template>
+		</q-select>
 
 		<div class="mb-2">Base damage</div>
 		<div class="row q-col-gutter-md mb-2">
@@ -133,6 +151,10 @@
 		computed: {
 			weapon() {
 				return this.value;
+			},
+			title() {
+				const type = this.weapon.weapon_type.split("_");
+				return `${type[0].capitalize()} ${type[1]} weapon: ${this.weapon.value.replace("_", " ").capitalize()}`
 			},
 			weapon_damage_types() {
 				return this.damage_types.filter(type => {

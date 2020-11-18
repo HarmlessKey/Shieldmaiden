@@ -27,7 +27,8 @@
 								:value="item.equipped"
 								:false-value="null"
 								indeterminate-value="something-else"
-								@input="equipItem($event, item['.key'])"
+								:disable="checkEquipped(item.type) > 0 && !item.equipped"
+								@input="equipItem($event, item.type, item['.key'])"
 							>
 								<q-tooltip anchor="top middle" self="center middle">
 									{{ item.equipped ? "Unequip" : "Equip" }}
@@ -55,7 +56,7 @@
 					</template>
 
 					<!-- WEAPON -->
-					<div v-if="value === 'weapon'" class="accordion-body">
+					<div class="accordion-body">
 						<q-checkbox 
 							dark 
 							size="sm"
@@ -63,11 +64,13 @@
 							:value="item.equipped" 
 							:false-value="null" 
 							indeterminate-value="something-else"
+							:disable="checkEquipped(item.type) > 0 && !item.equipped"
 							label="Equipped"
-							@input="equipItem($event, item['.key'])"
+							@input="equipItem($event, item.type, item['.key'])"
 						/>
 
-						<Weapon v-model="items[index]" @input="updateWeapon" />
+						<Weapon v-if="value === 'weapon'" v-model="items[index]" @input="updateItem" />
+						<Armor v-if="['armor', 'shield'].includes(value)" v-model="items[index]" @input="updateItem" />
 
 						<Modifier-table 
 							:modifiers="item.modifiers || []" 
@@ -108,7 +111,7 @@
 							<q-select dark filled square dense v-model="new_item.name" :options="weaponList" label="Weapon">
 								<template v-slot:selected v-if="new_item.name">
 									<span class="mr-1">
-										{{ new_item.name  }}
+										{{ new_item.name }}
 									</span>
 								</template>
 								<template v-slot:option="scope">
@@ -147,22 +150,29 @@
 								<template v-slot:option="scope">
 									<q-item :key="`weapon-category-${scope.index}`">
 										<q-item-section>
-											<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.category }}</q-item-label>
+											<q-item-label overline class="text-weight-bold text-white">{{ scope.opt.label }}</q-item-label>
 										</q-item-section>
 									</q-item>
 
-									<template v-for="weapon in scope.opt.weapons">
+									<template v-for="armor in scope.opt.armor">
 										<q-item
-											v-if="!['simple_melee', 'simple_ranged', 'martial_melee', 'martial_ranged'].includes(weapon.value)"
-											:key="weapon.value"
+											:key="armor.value"
 											clickable
 											v-ripple
 											v-close-popup
-											@click="setWeapon(weapon)"
-											:active="new_item.name === weapon.label"
+											@click="setArmor(armor)"
+											:active="new_item.name === armor.label"
 										>
 											<q-item-section>
-												<q-item-label v-html="weapon.label" class="q-ml-lg" ></q-item-label>
+												<q-item-label v-html="armor.label" class="q-ml-lg" ></q-item-label>
+											</q-item-section>
+											<q-item-section avatar>
+												<div class="ac_wrapper">
+													<i class="fas fa-shield" ></i>
+													<span class="ac">
+														{{ armor.armor_class_mod ? `+${armor.armor_class_mod}` : armor.armor_class }}
+													</span>
+												</div>
 											</q-item-section>
 										</q-item>
 									</template>
@@ -194,6 +204,7 @@
 	import { weapons } from '@/mixins/armorAndWeapons.js';
 	import { damageTypes } from '@/mixins/damageTypes.js';
 	import Weapon from './weapon.vue'
+	import Armor from './armor.vue'
 
 	export default {
 		name: 'Equipment',
@@ -207,7 +218,8 @@
 		components: {
 			Modifier,
 			ModifierTable,
-			Weapon
+			Weapon,
+			Armor
 		},
 		data() {
 			return {
@@ -267,7 +279,7 @@
 			armor() {
 				if(this.equipment && this.equipment.items) {
 					const armor = Object.entries(this.equipment.items).filter(item => {
-						return item[1].type === 'armor';
+						return ["armor", "shield"].includes(item[1].type);
 					}).map(obj => {
 						let armor = obj[1];
 						armor['.key'] = obj[0];
@@ -309,8 +321,22 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items`).push(this.new_item);
 				this.addModal = false;
 			},
+			checkEquipped(type) {
+				//Check if an item of this type is allready equiped
+				return Object.entries(this.equipment.items).filter(item => {
+					return item[1].type === type && item[1].equipped;
+				}).length;
+			},
 			removeItem(key) {
-				//Remove modifiers if the item is equipped
+				//Delete all modifiers linked to the item
+				const linked_modifiers = this.modifiers.filter(mod => {
+					const origin = mod.origin.split(".");
+					return origin[1] === key;
+				});
+
+				for(const modifier of linked_modifiers) {
+					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
+				}
 
 				//Remove the item
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).remove();
@@ -347,17 +373,39 @@
 				if(weapon.reach) this.$set(this.new_item, 'reach', weapon.reach);
 				if(weapon.special) this.$set(this.new_item, 'special', weapon.special);
 			},
-			equipItem(e, key) {
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}/equipped`).set(e);
-				const equipped = (e) ? "equipped" : "unequipped";
-				this.$emit("change", `equipment.item_${equipped}`);
+			setArmor(armor) {
+				this.$set(this.new_item, 'value', armor.value);
+				this.$set(this.new_item, 'name', armor.label);
+				this.$set(this.new_item, 'armor_type', armor.type);
+
+				console.log(armor)
+
+				//Shield
+				if(armor.type === "shield") {
+					this.$set(this.new_item, 'type', 'shield');
+					this.$set(this.new_item, 'armor_class_mod', armor.armor_class_mod);
+				} else {
+					this.$set(this.new_item, 'armor_class', armor.armor_class);
+				}
+
+				if(armor.dex_mod) this.$set(this.new_item, 'dex_mod', armor.dex_mod);
+				if(armor.dex_max) this.$set(this.new_item, 'dex_max', armor.dex_max);
+				if(armor.stealth_disadvantage) this.$set(this.new_item, 'stealth_disadvantage', armor.stealth_disadvantage);
+				if(armor.strenght_required) this.$set(this.new_item, 'strength_required', armor.strenght_required);
 			},
-			updateWeapon(e) {
-				const weapon = {...e}; //copy the object
-				const key = weapon['.key'];
-				delete weapon['.key'];
-				delete weapon.modifiers; //The object holds modifiers for display, these can't be added into firebase
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).update(weapon);
+			equipItem(e, type, key) {
+				if(!e || type === "item" || !this.checkEquipped(type)) {
+					db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}/equipped`).set(e);
+					const equipped = (e) ? "equipped" : "unequipped";
+					this.$emit("change", `equipment.item_${equipped}`);
+				}
+			},
+			updateItem(e) {
+				const item = {...e}; //copy the object
+				const key = item['.key'];
+				delete item['.key'];
+				delete item.modifiers; //The object holds modifiers for display, these can't be added into firebase
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).update(item);
 			}
 		},
 	}
@@ -388,6 +436,29 @@
 
 		.hk-card {
 			height: 100%;
+		}
+	}
+	.ac_wrapper {
+		position: relative;
+		width: 30px;
+		height: 32px;
+
+		i, .ac {
+			position: absolute;
+			line-height: 32px;
+			text-align: center;
+			right: 0;
+			top: 0;
+			width: 30px
+		}
+		i {
+			font-size: 30px;
+			color: #5c5757;
+		}
+		.ac {
+			font-weight: bold;
+			color: #fff;
+			margin-top: -1px;
 		}
 	}
 </style>

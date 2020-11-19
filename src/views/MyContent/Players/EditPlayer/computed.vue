@@ -109,14 +109,14 @@
 
 <style lang="scss" scoped>
 	.computed {
-		width: 100%;
+		background-image: url('../../../../assets/_img/styles/paper-bg.png');
+		background-position: top left;
+		grid-row: span 2;
+		height: 100%;
 		padding: 15px;
 		display: grid;
-		grid-template-columns: 68px max-content max-content 1fr;
-		grid-column-gap: 15px;
-		margin-bottom: 15px;
-		background-color: rgba(0, 0, 0, .5);
-		border: solid 1px #5c5757;
+		background-color: #000;
+		width: 350px;
 
 		.image {
 			width: 68px;

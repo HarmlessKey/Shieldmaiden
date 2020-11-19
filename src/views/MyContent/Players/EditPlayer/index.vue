@@ -29,72 +29,74 @@
 		</div>
 
 		<div v-else-if="base_values.general && base_values.general.build === 'advanced'" class="content">
-			<q-tabs
-				v-model="current_tab"
-				dark
-				dense
-				align="left"
-				no-caps
-			>
-				<q-tab 
-					v-for="({value, label}, i) in tabs" 
-					:name="value"
-					:label="label"
-					:key="`tab-${i}`"
-				/>
-			</q-tabs>
-			<div class="tab-content" v-if="base_values.class">
-				<Computed 
-					:hit_point_type="base_values.general.hit_point_type"
-					:modifiers="modifiers"
-					:classes="base_values.class.classes"
-					:race="base_values.race"
-					:computed="computed_values" 
-				/>
-				<General 
-					v-if="current_tab === 'general'"
-					:general="base_values.general" 
-					:character_class="base_values.class"
-					:playerId="playerId" 
-					:userId="userId"
-					@change="compute"
-				/>
-				<Race
-					v-if="current_tab === 'race'"
-					:character_race="base_values.race" 
-					:playerId="playerId"
-					:userId="userId"
-					:modifiers="race_modifiers"
-					@change="compute"
-				/>
-				<Class
-					v-if="current_tab === 'class'"
-					:base_class="base_values.class" 
-					:hit_point_type="base_values.general.hit_point_type"
-					:advancement="base_values.general.advancement"
-					:playerId="playerId"
-					:userId="userId"
-					:modifiers="class_modifiers"
-					:computed="computed_values"
-					@change="compute"
-				/>
-				<Abilities
-					v-if="current_tab === 'abilities'"
-					:base_abilities="base_values.abilities"
-					:playerId="playerId"
-					:userId="userId"
-					:modifiers="ability_modifiers"
-					@change="compute"
-				/>
-				<Equipment
-					v-if="current_tab === 'equipment'"
-					:playerId="playerId"
-					:userId="userId"
-					:equipment="computed_values.equipment"
-					:modifiers="equipment_modifiers"
-					@change="compute"
-				/>
+			<div class="tabs">
+				<q-tabs
+					v-model="current_tab"
+					dark
+					dense
+					align="left"
+					no-caps
+				>
+					<q-tab 
+						v-for="({value, label}, i) in tabs" 
+						:name="value"
+						:label="label"
+						:key="`tab-${i}`"
+					/>
+				</q-tabs>
+				<div class="tab-content" v-if="base_values.class">
+					<General 
+						v-if="current_tab === 'general'"
+						:general="base_values.general" 
+						:character_class="base_values.class"
+						:playerId="playerId" 
+						:userId="userId"
+						@change="compute"
+					/>
+					<Race
+						v-if="current_tab === 'race'"
+						:character_race="base_values.race" 
+						:playerId="playerId"
+						:userId="userId"
+						:modifiers="race_modifiers"
+						@change="compute"
+					/>
+					<Class
+						v-if="current_tab === 'class'"
+						:base_class="base_values.class" 
+						:hit_point_type="base_values.general.hit_point_type"
+						:advancement="base_values.general.advancement"
+						:playerId="playerId"
+						:userId="userId"
+						:modifiers="class_modifiers"
+						:computed="computed_values"
+						@change="compute"
+					/>
+					<Abilities
+						v-if="current_tab === 'abilities'"
+						:base_abilities="base_values.abilities"
+						:playerId="playerId"
+						:userId="userId"
+						:modifiers="ability_modifiers"
+						@change="compute"
+					/>
+					<Equipment
+						v-if="current_tab === 'equipment'"
+						:playerId="playerId"
+						:userId="userId"
+						:equipment="computed_values.equipment"
+						:modifiers="equipment_modifiers"
+						@change="compute"
+					/>
+				</div>
 			</div>
+			<Computed 
+				:hit_point_type="base_values.general.hit_point_type"
+				:modifiers="modifiers"
+				:classes="base_values.class.classes"
+				:race="base_values.race"
+				:computed="computed_values" 
+			/>
 		</div>
 	</div>
 </template>
@@ -635,16 +637,18 @@
 		}
 	}
 	.content {
-		background-image: url('../../../../assets/_img/styles/paper-bg.png');
-		background-position: top left;
+		padding: 0 0 0 20px !important;
 		display: grid;
-		grid-template-rows: 40px 1fr;
+		grid-template-columns: 1fr 350px;
+		grid-template-rows: 55px 1fr;
 		overflow: hidden;
-		height: calc(100vh - 60px);
-		background-color: #000;
+		height: calc(100vh - 50px);
 		
-		.tab-content {
+		.tabs {
 			padding-top: 20px;
+		}
+		.tab-content {
+			padding: 20px 20px 0 0;
 			overflow: scroll;
 
 			&::-webkit-scrollbar {

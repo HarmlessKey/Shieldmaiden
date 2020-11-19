@@ -69,8 +69,13 @@
 							@input="equipItem($event, item.type, item['.key'])"
 						/>
 
-						<Weapon v-if="value === 'weapon'" v-model="items[index]" @input="updateItem" />
-						<Armor v-if="['armor', 'shield'].includes(value)" v-model="items[index]" @input="updateItem" />
+						<Weapon v-if="value === 'weapon'" v-model="items[index]" @input="updateItem" :proficient="checkProficiency(item.type, item.weapon_type, item.value)" />
+
+						<Armor v-if="['armor', 'shield'].includes(value)" v-model="items[index]" @input="updateItem" :proficient="checkProficiency(item.type, item.armor_type)" />
+
+						<div v-if="value === 'item'">
+
+						</div>
 
 						<Modifier-table 
 							:modifiers="item.modifiers || []" 
@@ -212,6 +217,7 @@
 		props: [
 			"equipment",
 			"modifiers",
+			"proficiencies",
 			"playerId", 
 			"userId"
 		],
@@ -283,6 +289,13 @@
 					}).map(obj => {
 						let armor = obj[1];
 						armor['.key'] = obj[0];
+
+						//Modifiers
+						armor.modifiers = this.modifiers.filter(mod => {
+							const origin = mod.origin.split(".");
+							return origin[1] === obj[0];
+						});
+
 						return armor;
 					});
 					return armor;
@@ -295,6 +308,13 @@
 					}).map(obj => {
 						let item = obj[1];
 						item['.key'] = obj[0];
+
+						//Modifiers
+						item.modifiers = this.modifiers.filter(mod => {
+							const origin = mod.origin.split(".");
+							return origin[1] === obj[0];
+						});
+
 						return item;
 					});
 					return items;
@@ -406,6 +426,21 @@
 				delete item['.key'];
 				delete item.modifiers; //The object holds modifiers for display, these can't be added into firebase
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/equipment/items/${key}`).update(item);
+			},
+			checkProficiency(type, category, value) {
+				if(this.proficiencies) {
+					if(type === 'weapon' && this.proficiencies.weapon) {
+						if(this.proficiencies.weapon.includes(category) || this.proficiencies.weapon.includes(value)) {
+							return true;
+						}
+					}
+					if(type === 'armor' && this.proficiencies.armor) {
+						if(this.proficiencies.armor.includes(category)) {
+							return true;
+						}
+					}
+				}
+					return false;
 			}
 		},
 	}

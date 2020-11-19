@@ -1,6 +1,17 @@
 <template>
 	<div class="armor">
 		<div class="mb-2">
+			<i 
+				class="mr-1"
+				:class="{
+					'fas fa-check green': proficient,
+					'fas fa-times red': !proficient
+				}"
+			>
+				<q-tooltip anchor="top middle" self="bottom middle">
+					{{ proficient ? "Proficient" : "Not proficient" }}
+				</q-tooltip>
+			</i>
 			{{ title }}
 		</div>
 		<q-input
@@ -88,6 +99,10 @@
 			value: {
 				type: Object,
 				required: true
+			},
+			proficient: {
+				type: Boolean,
+				default: false
 			}
 		},
 		computed: {

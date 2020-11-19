@@ -3,7 +3,7 @@
 		<h3>General Character Info</h3>
 		<div class="form-item mb-3">
 			<q-input 
-				dark filled square dense
+				dark filled square
 				label="Player name"
 				@change="savePlayerName()"
 				autocomplete="off"  
@@ -17,7 +17,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-input 
-				dark filled square dense
+				dark filled square
 				label="Character name"
 				@change="saveCharacterName()"
 				autocomplete="off"  
@@ -39,7 +39,7 @@
 			/>
 			<div>
 				<q-input
-					dark filled square dense
+					dark filled square
 					label="Avatar"
 					@change="saveAvatar()"
 					autocomplete="off"  
@@ -55,7 +55,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-select 
-				dark filled square dense map-options emit-value
+				dark filled square map-options emit-value
 				@input="saveAdvancement()"
 				v-model="character.advancement" 
 				:options="advancement_options" 
@@ -64,7 +64,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-select 
-				dark filled square dense map-options emit-value
+				dark filled square map-options emit-value
 				@input="saveHpType()"
 				v-model="character.hit_point_type" 
 				:options="hit_point_options" 

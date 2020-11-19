@@ -28,12 +28,18 @@
 			</div>
 		</div>
 
-		<div v-else-if="base_values.general && base_values.general.build === 'advanced'" class="content">
+		<div 
+			v-else-if="base_values.general && base_values.general.build === 'advanced'"
+			class="content"
+			:class="{
+				medium: width <= 1100 && width > 576,
+				small: width <= 576
+			}"
+		>
 			<div class="tabs">
 				<q-tabs
 					v-model="current_tab"
 					dark
-					dense
 					align="left"
 					no-caps
 				>
@@ -44,6 +50,8 @@
 						:key="`tab-${i}`"
 					/>
 				</q-tabs>
+			</div>
+			<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
 				<div class="tab-content" v-if="base_values.class">
 					<General 
 						v-if="current_tab === 'general'"
@@ -86,10 +94,11 @@
 						:userId="userId"
 						:equipment="computed_values.equipment"
 						:modifiers="equipment_modifiers"
+						:proficiencies="computed_values.sheet.proficiencies"
 						@change="compute"
 					/>
 				</div>
-			</div>
+			</q-scroll-area>
 			<Computed 
 				:hit_point_type="base_values.general.hit_point_type"
 				:modifiers="modifiers"
@@ -266,6 +275,7 @@
 					//Create class object for sheet
 					classes[key] = {
 						class: value.name || null,
+						subclass: value.subclass || null,
 						level
 					}
 					
@@ -376,6 +386,20 @@
 						}
 					}
 				}
+
+				//WEAPON/ARMOR PROFICIENCIES
+				let proficiencies = {
+					weapon: [],
+					armor: []
+				}
+				for(const type of ["weapon", "armor"]) {
+					for(const modifier of this.modifierFilter(modifiers, type)) {
+						if(modifier.type === 'proficiency') {
+							proficiencies[type].push(modifier.subtarget);
+						}
+					}
+				}
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/proficiencies`).set(proficiencies);
 
 				//Ability score maximums
 				let ability_max = {
@@ -637,24 +661,22 @@
 		}
 	}
 	.content {
-		padding: 0 0 0 20px !important;
+		padding: 0 !important;
 		display: grid;
-		grid-template-columns: 1fr 350px;
-		grid-template-rows: 55px 1fr;
+		grid-template-columns: 1fr;
+		grid-template-rows: 48px 1fr;
 		overflow: hidden;
 		height: calc(100vh - 50px);
-		
+		background: #262626;
+
 		.tabs {
-			padding-top: 20px;
+			background: #191919;
+		}
+		.q-scrollarea {
+			height: 100%;
 		}
 		.tab-content {
-			padding: 20px 20px 0 0;
-			overflow: scroll;
-
-			&::-webkit-scrollbar {
-				display: none !important;
-			}
+			padding: 20px;
 		}
-		
 	}
 </style>

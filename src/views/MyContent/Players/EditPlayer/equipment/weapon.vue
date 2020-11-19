@@ -1,6 +1,19 @@
 <template>
 	<div class="weapon">
-		<div class="mb-2">{{ title }}</div>
+		<div class="mb-2">
+			<i 
+				class="mr-1"
+				:class="{
+					'fas fa-check green': proficient,
+					'fas fa-times red': !proficient
+				}"
+			>
+				<q-tooltip anchor="top middle" self="bottom middle">
+					{{ proficient ? "Proficient" : "Not proficient" }}
+				</q-tooltip>
+			</i>
+			{{ title }}
+		</div>
 		<q-input
 			dark filled square dense
 			label="Name"
@@ -142,6 +155,10 @@
 			value: {
 				type: Object,
 				required: true
+			},
+			proficient: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {

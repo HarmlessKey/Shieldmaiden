@@ -1,5 +1,5 @@
 <template>
-	<div class="pb-5">
+	<div class="pb-3">
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
 			<h3 class="pointer" @click="experience_modal = !experience_modal">

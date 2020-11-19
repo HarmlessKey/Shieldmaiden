@@ -330,7 +330,6 @@
 			top: 50px;
 			right: -300px; 
 			height: calc(100vh - 50px);
-			overflow: scroll;
 			z-index: 96;
 			background: #302f2f;
 			overflow: scroll;

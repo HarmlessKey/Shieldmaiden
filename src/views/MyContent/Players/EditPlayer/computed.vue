@@ -75,7 +75,16 @@
 					<h6>Initiative</h6>
 					<div class="value">
 						<span class="gray-hover">
-							{{ character.display.initiative >= 0 ? "+" : "-" }}</span>{{ Math.abs(character.display.initiative) }}
+							{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
+							<span
+								:class="{
+									'green': checkAdvantage('initiative') === 'advantage',
+									'red': checkAdvantage('initiative') === 'disadvantage'
+								}"
+							>{{ Math.abs(character.display.initiative) }}</span>
+							<q-tooltip anchor="top middle" self="center middle">
+								Roll {{ checkAdvantage('initiative') ? `with ${checkAdvantage('initiative')}` : `` }}
+							</q-tooltip>
 					</div>
 				</div>
 			</div>
@@ -88,7 +97,16 @@
 						<div class="ability">{{ label.substring(0, 3) }}</div>
 						<div class="mod">
 							<span class="gray-hover" v-if="calcMod(computed.sheet.abilities[value]) !== 0">
-								{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}
+								{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>
+								<span 
+									:class="{
+										'green': checkAdvantage('abilities', value) === 'advantage',
+										'red': checkAdvantage('abilities', value) === 'disadvantage'
+									}"
+								>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}</span>
+								<q-tooltip anchor="top middle" self="center middle">
+									Roll {{ checkAdvantage('abilities', value) ? `with ${checkAdvantage('abilities', value)}` : `` }}
+								</q-tooltip>
 						</div>
 						<div class="score">{{ computed.sheet.abilities[value] }}</div>
 					</div>
@@ -99,7 +117,7 @@
 				<h4>Saving throws</h4>
 				<div class="columns">
 					<ul class="list">
-						<li v-for="({mod, proficient}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
+						<li v-for="({mod, proficient, advantage_disadvantage}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
 							<span class="type">
 								<i 
 									class="mr-2"
@@ -108,14 +126,22 @@
 										'far fa-dot-circle': proficient
 									}"
 								>
-									<q-tooltip anchor="top middle" self="bottom middle" v-if="proficient">
+									<q-tooltip anchor="top middle" self="center middle" v-if="proficient">
 										Proficient
 									</q-tooltip>
 								</i>
 								{{ key.capitalize() }}
 							</span>
 							<span class="value">
-								{{ mod >= 0 ? "+" : "-" }}{{ mod }}
+								{{ mod >= 0 ? "+" : "-" }}<span 
+									:class="{ 
+										'green': advantage_disadvantage === 'advantage',
+										'red': advantage_disadvantage === 'disadvantage'
+									}"
+								>{{ mod }}</span>
+								<q-tooltip anchor="top middle" self="center middle">
+									Roll {{ advantage_disadvantage ? `with ${advantage_disadvantage}` : `` }}
+								</q-tooltip>
 							</span>
 						</li>
 					</ul>
@@ -183,6 +209,7 @@
 				if(this.computed.sheet && this.computed.sheet.abilities && this.computed.sheet.saving_throws) {
 					const proficiencies = this.computed.sheet.saving_throws.proficiencies || {};
 					const bonuses = this.computed.sheet.saving_throws.bonuses || {};
+					const advantage_disadvantage = (this.computed.sheet.advantage_disadvantage) ? this.computed.sheet.advantage_disadvantage.saving_throws : {};
 
 					for(const ability of Object.values(this.abilities)) {
 						let saving_throw = {};
@@ -190,6 +217,11 @@
 						const proficient = proficiencies[ability.value];
 						const bonus = bonuses[ability.value] || 0;
 						saving_throw.mod = this.calcMod(score) + bonus;
+
+						//Check advantage/disadvantage
+						if(advantage_disadvantage && (advantage_disadvantage[ability.value] || advantage_disadvantage["all"])) {
+							saving_throw.advantage_disadvantage = advantage_disadvantage[ability.value];
+						}
 
 						//Check and add proficiency bonus
 						if(proficient) {
@@ -213,6 +245,15 @@
 			...mapActions([
 				'setSlide'
 			]),
+			checkAdvantage(type, subtype) {
+				const sheet = this.computed.sheet
+				if(sheet && sheet.advantage_disadvantage && sheet.advantage_disadvantage[type]) {
+					if(subtype) {
+						return sheet.advantage_disadvantage[type][subtype];
+					} return sheet.advantage_disadvantage[type];
+				}
+				return false;
+			}
 		}
 	}
 </script>

@@ -879,6 +879,7 @@
 						db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
 					}
 				}
+				this.$emit("change", "class.proficiencies_updated");
 			},
 			setWeaponProficiencies(weapon, classKey) {
 				const current = this.proficiencies[classKey]['weapon'];

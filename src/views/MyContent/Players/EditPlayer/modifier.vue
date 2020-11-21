@@ -52,8 +52,14 @@
 					<!-- SKILLS -->
 					<div class="form-item mb-3" v-if="modifier.target === 'skill'">
 						<label for="type">Skill</label>
-						<q-select dark filled square dense map-options emit-value option-value="value
-						" option-label="skill" v-model="modifier.subtarget" :options="Object.values(skillList)" label="Skill" />
+						<q-select 
+							dark filled square dense 
+							map-options emit-value 
+							option-value="value"
+							option-label="skill" v-model="modifier.subtarget" 
+							:options="Object.values(skillList)" 
+							label="Skill"
+						/>
 					</div>
 
 					<!-- WEAPONS -->

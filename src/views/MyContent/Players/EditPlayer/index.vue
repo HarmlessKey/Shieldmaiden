@@ -258,6 +258,7 @@
 				let modifiers = [...this.modifiers]; //Copy the modifiers so they can be manipulated during the compute
 				let armor = undefined;
 				let shield = undefined;
+				let advantage_disadvantage = {};
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
@@ -390,7 +391,7 @@
 				//WEAPON/ARMOR PROFICIENCIES
 				let proficiencies = {
 					weapon: [],
-					armor: []
+					armor: [],
 				}
 				for(const type of ["weapon", "armor"]) {
 					for(const modifier of this.modifierFilter(modifiers, type)) {
@@ -400,6 +401,24 @@
 					}
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/proficiencies`).set(proficiencies);
+
+				//Set disadvantages if not proficient
+				if(armor && !proficiencies.armor.includes(armor.armor_type) || shield && !proficiencies.armor.includes("shield")) {
+					advantage_disadvantage = {
+						abilities: {
+							strength: "disadvantage",
+							dexterity: "disadvantage"
+						},
+						saving_throws: {
+							strength: "disadvantage",
+							dexterity: "disadvantage"
+						},
+						attack_rolls: {
+							strength: "disadvantage",
+							dexterity: "disadvantage"
+						}
+					}
+				}
 
 				//Ability score maximums
 				let ability_max = {
@@ -582,6 +601,9 @@
 					}
 				}
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/senses`).set(senses); 
+
+				//Save advantage_disadvantage
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/advantage_disadvantage`).set(advantage_disadvantage); 
 
 				//Clear the proficiency tracker
 				this.proficiency_tracker = [];

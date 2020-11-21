@@ -82,20 +82,49 @@
 
 			<hr>
 
-			<div class="abilities" v-if="abilities">
-				<div v-for="(score, ability) in abilities" :key="`score-${ability}`">
-					<div class="ability">{{ ability.substring(0, 3) }}</div>
-					<div class="mod">
-						<span class="gray-hover" v-if="calcMod(score) !== 0">
-							{{ calcMod(score) > 0 ? "+" : "-" }}</span>{{ Math.abs(calcMod(score)) }}
+			<template v-if="computed.sheet && computed.sheet.abilities">
+				<div class="abilities">
+					<div v-for="{value, label} in abilities" :key="`score-${value}`">
+						<div class="ability">{{ label.substring(0, 3) }}</div>
+						<div class="mod">
+							<span class="gray-hover" v-if="calcMod(computed.sheet.abilities[value]) !== 0">
+								{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}
+						</div>
+						<div class="score">{{ computed.sheet.abilities[value] }}</div>
 					</div>
-					<div class="score">{{ score }}</div>
 				</div>
-			</div>
+
+				<hr>
+
+				<h4>Saving throws</h4>
+				<div class="columns">
+					<ul class="list">
+						<li v-for="({mod, proficient}, key) in saving_throws" :key="`saving_throw-${key}`" class="pointer">
+							<span class="type">
+								<i 
+									class="mr-2"
+									:class="{
+										'far fa-circle': !proficient,
+										'far fa-dot-circle': proficient
+									}"
+								>
+									<q-tooltip anchor="top middle" self="bottom middle" v-if="proficient">
+										Proficient
+									</q-tooltip>
+								</i>
+								{{ key.capitalize() }}
+							</span>
+							<span class="value">
+								{{ mod >= 0 ? "+" : "-" }}{{ mod }}
+							</span>
+						</li>
+					</ul>
+				</div>
+			</template>
 
 			<div v-if="character.sheet.senses">
 				<h4>Senses</h4>
-				<ul class="senses">
+				<ul class="list">
 					<li v-for="(sense, key) in character.sheet.senses" :key="key">
 						<span class="type">
 							<i 
@@ -128,10 +157,11 @@
 <script>
 	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
+	import { abilities } from '@/mixins/abilities.js';
 
 	export default {
 		name: 'CharacterComputed',
-		mixins: [general],
+		mixins: [general, abilities],
 		props: [
 			"hit_point_type",
 			"modifiers",
@@ -148,8 +178,29 @@
 			character() {
 				return (this.computed) ? this.computed : {};
 			},
-			abilities() {
-				return (this.computed.sheet) ? this.computed.sheet.abilities : undefined;
+			saving_throws() {
+				let saving_throws = {};
+				if(this.computed.sheet && this.computed.sheet.abilities && this.computed.sheet.saving_throws) {
+					const proficiencies = this.computed.sheet.saving_throws.proficiencies || {};
+					const bonuses = this.computed.sheet.saving_throws.bonuses || {};
+
+					for(const ability of Object.values(this.abilities)) {
+						let saving_throw = {};
+						let score = this.computed.sheet.abilities[ability.value];
+						const proficient = proficiencies[ability.value];
+						const bonus = bonuses[ability.value] || 0;
+						saving_throw.mod = this.calcMod(score) + bonus;
+
+						//Check and add proficiency bonus
+						if(proficient) {
+							saving_throw.proficient = true;
+							saving_throw.mod = saving_throw.mod + this.computed.display.proficiency;
+						}
+
+						saving_throws[ability.value] = saving_throw;
+					}
+				}
+				return saving_throws;
 			},
 			hp_modifiers() {
 				const modifiers = this.modifiers.filter(mod => {
@@ -231,6 +282,7 @@
 					font-size: 35px;
 					font-weight: bold;
 					font-family: 'Fredericka the Great', cursive !important;
+					color: #fff;
 				}
 			}
 		}
@@ -256,16 +308,17 @@
 					font-size: 45px;
 					font-weight: bold;
 					font-family: 'Fredericka the Great', cursive !important;
+					color: #fff;
 				}
 				.ft {
 					font-size: 15px;
 				}
 			}
 		}
-		.senses {
+		.list {
 			list-style: none;
 			padding: 0;
-			margin: 0;
+			margin: 0 0 20px 0;
 
 			li {
 				display: flex;
@@ -276,8 +329,15 @@
 				.value {
 					font-family: 'Fredericka the Great', cursive !important;
 					font-size: 20px;
+					color: #fff;
 				}
 			}
+		}
+		.columns {
+			height: 128px;
+			column-count: 2;
+			column-gap: 15px;
+			column-rule: 1px solid #5c5757;
 		}
 	}
 	.toggle {

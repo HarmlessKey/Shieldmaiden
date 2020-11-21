@@ -502,6 +502,11 @@
 				if(this.base_values.race) {
 					let speed = (this.base_values.race.walking_speed) ? parseInt(this.base_values.race.walking_speed) : 0;
 
+					//Heavy armor reduces speed by 10 if the character is not strong enough
+					if(armor && armor.strength_required > ability_scores["strength"]) {
+						speed = speed - 10;
+					}
+
 					//Add Speed Modifiers	
 					for(const modifier of this.modifierFilter(modifiers, "speed")) {
 						speed = this.addModifier(speed, modifier, proficiency, ability_scores, computed_level, classes);

@@ -12,9 +12,9 @@
 				<div class="form-item mb-3">
 					<div class="mb-3">Origin: {{ modifier_origin }}</div>
 					<q-input
+						autocomplete="off"
 						dark filled square dense
 						label="Name"
-						autocomplete="off"
 						id="name"
 						type="text"
 						v-model="modifier.name"
@@ -39,8 +39,14 @@
 					</div>
 
 					<!-- ABILITES -->
-					<div class="form-item mb-3" v-if="modifier.target === 'ability'">
-						<q-select dark filled square dense map-options emit-value v-model="modifier.subtarget" :options="abilities" label="Ability" />
+					<div class="form-item mb-3" v-if="['ability', 'saving_throw'].includes(modifier.target)">
+						<q-select 
+							dark filled square dense 
+							map-options emit-value 
+							v-model="modifier.subtarget" 
+							:options="abilities" 
+							label="Ability"
+						/>
 					</div>
 
 					<!-- SKILLS -->
@@ -348,8 +354,13 @@
 				return [
 						{
 							value: "ability",
-							label: "Abillity Score",
+							label: "Abillity score",
 							disable: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
+						},
+						{
+							value: "saving_throw",
+							label: "Saving throw",
+							disable: ["set", "expertise"].includes(this.modifier.type)
 						},
 						{
 							value: "skill",
@@ -362,7 +373,7 @@
 						},
 						{
 							value: "hp",
-							label: "Hit Points",
+							label: "Hit points",
 							disable: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
 						},
 						{

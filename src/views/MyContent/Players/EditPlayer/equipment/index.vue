@@ -398,8 +398,6 @@
 				this.$set(this.new_item, 'name', armor.label);
 				this.$set(this.new_item, 'armor_type', armor.type);
 
-				console.log(armor)
-
 				//Shield
 				if(armor.type === "shield") {
 					this.$set(this.new_item, 'type', 'shield');
@@ -411,7 +409,7 @@
 				if(armor.dex_mod) this.$set(this.new_item, 'dex_mod', armor.dex_mod);
 				if(armor.dex_max) this.$set(this.new_item, 'dex_max', armor.dex_max);
 				if(armor.stealth_disadvantage) this.$set(this.new_item, 'stealth_disadvantage', armor.stealth_disadvantage);
-				if(armor.strenght_required) this.$set(this.new_item, 'strength_required', armor.strenght_required);
+				if(armor.strength_required) this.$set(this.new_item, 'strength_required', armor.strength_required);
 			},
 			equipItem(e, type, key) {
 				if(!e || type === "item" || !this.checkEquipped(type)) {

@@ -145,6 +145,7 @@
 		data() {
 			return {
 				playerId: this.$route.params.id,
+				advantage_disadvantage: {},
 				width: 0,
 				build: 'advanced',
 				tabs: [
@@ -258,7 +259,6 @@
 				let modifiers = [...this.modifiers]; //Copy the modifiers so they can be manipulated during the compute
 				let armor = undefined;
 				let shield = undefined;
-				let advantage_disadvantage = {};
 
 				const hit_point_type = this.base_values.general.hit_point_type;
 
@@ -403,19 +403,28 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/proficiencies`).set(proficiencies);
 
 				//Set disadvantages if not proficient
-				if(armor && !proficiencies.armor.includes(armor.armor_type) || shield && !proficiencies.armor.includes("shield")) {
-					advantage_disadvantage = {
-						abilities: {
-							strength: "disadvantage",
-							dexterity: "disadvantage"
-						},
-						saving_throws: {
-							strength: "disadvantage",
-							dexterity: "disadvantage"
-						},
-						attack_rolls: {
-							strength: "disadvantage",
-							dexterity: "disadvantage"
+				//Advantage/disadvantage is saved as an integer
+				//Every advantage adds 1 and every disadvantage removes 1
+				//A postive end result results in advantage a negative in disadvantage
+				if(armor || shield) {
+					let value = 0;
+					if(armor && !proficiencies.armor.includes(armor.armor_type)) value = value - 1;
+					if(shield && !proficiencies.armor.includes("shield")) value = value - 1;
+					
+					if(value !== 0) {
+						this.advantage_disadvantage = {
+							abilities: {
+								strength: value,
+								dexterity: value
+							},
+							saving_throws: {
+								strength: value,
+								dexterity: value
+							},
+							attack_rolls: {
+								strength: value,
+								dexterity: value
+							}
 						}
 					}
 				}
@@ -603,7 +612,8 @@
 				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/senses`).set(senses); 
 
 				//Save advantage_disadvantage
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/advantage_disadvantage`).set(advantage_disadvantage); 
+				db.ref(`characters_computed/${this.userId}/${this.playerId}/sheet/advantage_disadvantage`).set(this.advantage_disadvantage); 
+				this.advantage_disadvantage = {};
 
 				//Clear the proficiency tracker
 				this.proficiency_tracker = [];
@@ -650,6 +660,28 @@
 				if(modifier.type === 'ability') {
 					newValue = newValue + this.calcMod(ability_scores[modifier.ability_modifier]);
 				}
+				if(['advantage', 'disadvantage'].includes(modifier.type)) {
+					let value = (modifier.type === 'advantage') ? 1 : -1;
+
+					//Check if advantage or disadvantage was already set
+					if(this.advantage_disadvantage[modifier.target]) {
+						if(modifier.subtarget) {
+							const current = this.advantage_disadvantage[modifier.target][modifier.subtarget];
+							value = (current !== undefined) ? current + value : value;
+						} else {
+							const current = this.advantage_disadvantage[modifier.target];
+							value = (current !== undefined) ? current + value : value;
+						}
+					}
+
+					//Set the new values
+					if(modifier.subtarget) {
+						this.$set(this.advantage_disadvantage[modifier.target], modifier.subtarget, value);
+					} else {
+						this.$set(this.advantage_disadvantage, modifier.target, value);
+					}
+				}
+				
 				return newValue;
 			}
 		}

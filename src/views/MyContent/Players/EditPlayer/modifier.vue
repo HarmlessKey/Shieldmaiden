@@ -308,6 +308,14 @@
 					{
 						value: "expertise",
 						label: "Expertise"
+					},
+					{
+						value: "advantage",
+						label: "Advantage"
+					},
+					{
+						value: "disadvantage",
+						label: "Disadvantage"
 					}
 				],
 				type_info: {
@@ -375,27 +383,28 @@
 						},
 						{
 							value: "ac",
-							label: "Armor Class"
+							label: "Armor Class",
+							disable: ["advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "hp",
 							label: "Hit points",
-							disable: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
+							disable: ["ability", "proficiency", "expertise", "advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "armor",
 							label: "Armor",
-							disable: ["bonus", "set", "ability", "expertise"].includes(this.modifier.type)
+							disable: ["bonus", "set", "ability", "expertise", "advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "weapon",
 							label: "Weapon",
-							disable: ["bonus", "set", "ability", "expertise"].includes(this.modifier.type)
+							disable: ["bonus", "set", "ability", "expertise", "advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "speed",
 							label: "Speed",
-							disable: ["ability", "proficiency", "expertise"].includes(this.modifier.type)
+							disable: ["ability", "proficiency", "expertise", "advantage", "disadvantage"].includes(this.modifier.type)
 						},
 						{
 							value: "initiative",

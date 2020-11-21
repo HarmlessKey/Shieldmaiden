@@ -219,8 +219,9 @@
 						saving_throw.mod = this.calcMod(score) + bonus;
 
 						//Check advantage/disadvantage
-						if(advantage_disadvantage && (advantage_disadvantage[ability.value] || advantage_disadvantage["all"])) {
-							saving_throw.advantage_disadvantage = advantage_disadvantage[ability.value];
+						if(advantage_disadvantage && advantage_disadvantage[ability.value]) {
+							const advantage = advantage_disadvantage[ability.value];
+							saving_throw.advantage_disadvantage = (advantage > 0) ? "advantage" : "disadvantage";
 						}
 
 						//Check and add proficiency bonus
@@ -246,11 +247,15 @@
 				'setSlide'
 			]),
 			checkAdvantage(type, subtype) {
-				const sheet = this.computed.sheet
+				const sheet = this.computed.sheet;
+				let advantage = 0;
 				if(sheet && sheet.advantage_disadvantage && sheet.advantage_disadvantage[type]) {
-					if(subtype) {
-						return sheet.advantage_disadvantage[type][subtype];
-					} return sheet.advantage_disadvantage[type];
+					if(subtype && sheet.advantage_disadvantage[type][subtype] !== undefined) {
+						advantage = sheet.advantage_disadvantage[type][subtype];
+						return (advantage > 0) ? "advantage" : "disadvantage";
+					} else if (!subtype) {
+						return (sheet.advantage_disadvantage[type] > 0) ? "advantage" : "disadvantage";
+					}
 				}
 				return false;
 			}

@@ -479,7 +479,7 @@ export const weapons = {
 							label: "Splint",
 							cost: 20000,
 							armor_class: 17,
-							strenth_required: 15,
+							strength_required: 15,
 							stealth_disadvantage: true,
 							weigth: 60
 						},

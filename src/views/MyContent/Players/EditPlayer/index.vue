@@ -406,24 +406,30 @@
 				//Advantage/disadvantage is saved as an integer
 				//Every advantage adds 1 and every disadvantage removes 1
 				//A postive end result results in advantage a negative in disadvantage
-				if(armor || shield) {
-					let value = 0;
-					if(armor && !proficiencies.armor.includes(armor.armor_type)) value = value - 1;
-					if(shield && !proficiencies.armor.includes("shield")) value = value - 1;
-					
-					if(value !== 0) {
-						this.advantage_disadvantage = {
-							abilities: {
-								strength: value,
-								dexterity: value
+				if(armor && !proficiencies.armor.includes(armor.armor_type) || shield && !proficiencies.armor.includes("shield")) {
+					this.advantage_disadvantage = {
+						abilities: {
+							strength: {
+								disadvantage: true
 							},
-							saving_throws: {
-								strength: value,
-								dexterity: value
+							dexterity: {
+								disadvantage: true
+							}
+						},
+						saving_throws: {
+							strength: {
+								disadvantage: true
 							},
-							attack_rolls: {
-								strength: value,
-								dexterity: value
+							dexterity: {
+								disadvantage: true
+							}
+						},
+						attack_rolls: {
+							strength: {
+								disadvantage: true
+							},
+							dexterity: {
+								disadvantage: true
 							}
 						}
 					}
@@ -661,27 +667,26 @@
 					newValue = newValue + this.calcMod(ability_scores[modifier.ability_modifier]);
 				}
 				if(['advantage', 'disadvantage'].includes(modifier.type)) {
-					let value = (modifier.type === 'advantage') ? 1 : -1;
 
-					//Check if advantage or disadvantage was already set
-					if(this.advantage_disadvantage[modifier.target]) {
-						if(modifier.subtarget) {
-							const current = this.advantage_disadvantage[modifier.target][modifier.subtarget];
-							value = (current !== undefined) ? current + value : value;
+					//Check if there is a subtarget
+					if(modifier.subtarget) {
+						if(this.advantage_disadvantage[modifier.target]) {
+							if(this.advantage_disadvantage[modifier.target][modifier.subtarget]) {
+								this.$set(this.advantage_disadvantage[modifier.target][modifier.subtarget], modifier.type, true);
+							} else {
+								this.$set(this.advantage_disadvantage[modifier.target], modifier.subtarget, { [modifier.type]: true });
+							}
 						} else {
-							const current = this.advantage_disadvantage[modifier.target];
-							value = (current !== undefined) ? current + value : value;
+							this.$set(this.advantage_disadvantage, modifier.target, { [modifier.subtarget]: { [modifier.type]: true }});
+						}
+					} else {
+						if(this.advantage_disadvantage[modifier.target]) {
+							this.$set(this.advantage_disadvantage[modifier.target], modifier.type, true);
+						} else {
+							this.$set(this.advantage_disadvantage, modifier.target, { [modifier.type]: true });
 						}
 					}
-
-					//Set the new values
-					if(modifier.subtarget) {
-						this.$set(this.advantage_disadvantage[modifier.target], modifier.subtarget, value);
-					} else {
-						this.$set(this.advantage_disadvantage, modifier.target, value);
-					}
 				}
-				
 				return newValue;
 			}
 		}

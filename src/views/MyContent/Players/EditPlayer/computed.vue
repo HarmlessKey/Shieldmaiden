@@ -78,12 +78,12 @@
 							{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
 							<span
 								:class="{
-									'green': checkAdvantage('initiative') === 'advantage',
-									'red': checkAdvantage('initiative') === 'disadvantage'
+									'green': checkAdvantage('initiative').advantage && !checkAdvantage('initiative').disadvantage,
+									'red': checkAdvantage('initiative').disadvantage && !checkAdvantage('initiative').advantage
 								}"
 							>{{ Math.abs(character.display.initiative) }}</span>
 							<q-tooltip anchor="top middle" self="center middle">
-								Roll {{ checkAdvantage('initiative') ? `with ${checkAdvantage('initiative')}` : `` }}
+								Roll {{ Object.values(checkAdvantage('initiative')).length === 1 ? `with ${Object.keys(checkAdvantage('initiative'))[0]}` : `` }}
 							</q-tooltip>
 					</div>
 				</div>
@@ -100,12 +100,12 @@
 								{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>
 								<span 
 									:class="{
-										'green': checkAdvantage('abilities', value) === 'advantage',
-										'red': checkAdvantage('abilities', value) === 'disadvantage'
+										'green': checkAdvantage('abilities', value).advantage && !checkAdvantage('abilities', value).disadvantage,
+										'red': checkAdvantage('abilities', value).disadvantage && !checkAdvantage('abilities', value).advantage
 									}"
 								>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}</span>
 								<q-tooltip anchor="top middle" self="center middle">
-									Roll {{ checkAdvantage('abilities', value) ? `with ${checkAdvantage('abilities', value)}` : `` }}
+									Roll {{ Object.values(checkAdvantage('abilities', value)).length === 1 ? `with ${Object.keys(checkAdvantage('abilities', value))[0]}` : `` }}
 								</q-tooltip>
 						</div>
 						<div class="score">{{ computed.sheet.abilities[value] }}</div>
@@ -135,12 +135,12 @@
 							<span class="value">
 								{{ mod >= 0 ? "+" : "-" }}<span 
 									:class="{ 
-										'green': advantage_disadvantage === 'advantage',
-										'red': advantage_disadvantage === 'disadvantage'
+										'green': advantage_disadvantage.avantage && !advantage_disadvantage.disadvantage,
+										'red': advantage_disadvantage.disadvantage && !advantage_disadvantage.avantage
 									}"
 								>{{ mod }}</span>
 								<q-tooltip anchor="top middle" self="center middle">
-									Roll {{ advantage_disadvantage ? `with ${advantage_disadvantage}` : `` }}
+									Roll {{ Object.values(advantage_disadvantage).length === 1 ? `with ${Object.keys(advantage_disadvantage)[0]}` : `` }}
 								</q-tooltip>
 							</span>
 						</li>
@@ -219,10 +219,7 @@
 						saving_throw.mod = this.calcMod(score) + bonus;
 
 						//Check advantage/disadvantage
-						if(advantage_disadvantage && advantage_disadvantage[ability.value]) {
-							const advantage = advantage_disadvantage[ability.value];
-							saving_throw.advantage_disadvantage = (advantage > 0) ? "advantage" : "disadvantage";
-						}
+						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
 
 						//Check and add proficiency bonus
 						if(proficient) {
@@ -246,18 +243,17 @@
 			...mapActions([
 				'setSlide'
 			]),
-			checkAdvantage(type, subtype) {
+			checkAdvantage(type, subtype=undefined) {
 				const sheet = this.computed.sheet;
-				let advantage = 0;
+				let returnObj;
 				if(sheet && sheet.advantage_disadvantage && sheet.advantage_disadvantage[type]) {
-					if(subtype && sheet.advantage_disadvantage[type][subtype] !== undefined) {
-						advantage = sheet.advantage_disadvantage[type][subtype];
-						return (advantage > 0) ? "advantage" : "disadvantage";
-					} else if (!subtype) {
-						return (sheet.advantage_disadvantage[type] > 0) ? "advantage" : "disadvantage";
+					if(subtype) {
+						returnObj = sheet.advantage_disadvantage[type][subtype];
+					} else {
+						returnObj = sheet.advantage_disadvantage[type];
 					}
 				}
-				return false;
+				return (returnObj) ? returnObj : {};
 			}
 		}
 	}

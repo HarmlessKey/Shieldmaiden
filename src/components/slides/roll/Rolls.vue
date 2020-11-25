@@ -3,7 +3,7 @@
 		<ul class="rolls">
 			<li v-for="(roll, i) in rolls" :key="`roll-${i}`">
 				 <h3>
-					 <span class="title">
+					 <span class="title truncate" :title="roll.title">
 					 	{{ roll.title }}
 					 </span>
 					 <span class="date">

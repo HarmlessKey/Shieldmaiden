@@ -80,7 +80,7 @@
 				<span class="saves">
 					<span 
 						class="save" 
-						@click="rollD($event, 20, 1, save.score, `${save.save} save`, true)"
+						@click="rollD($event, 20, 1, save.score, `${data.name}: ${save.save} save`, true)"
 						v-for="save in savingThrows" 
 						:key="save.save">
 						{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}

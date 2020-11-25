@@ -1,3 +1,5 @@
+import { mapActions } from 'vuex';
+
 export const dice = {
 	data() {
 		return {
@@ -12,19 +14,45 @@ export const dice = {
 		}
 	},
 	methods: {
-		rollD(e, d=20, n=1, m=0, notify=false) {
+		...mapActions([
+			'setRoll'
+		]),
+		rollD(e, d=20, n=1, m=0, title, notify=false, advantage_disadvantage={}) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
 			let throws = [];
+			let ignored = undefined;
 			
-			//Roll with advantage or disadvantage when a single d20 is rolled
+			//Check for advantage with advantage or disadvantage when a single d20 is rolled
 			if(n === 1 && d === 20 && (e.shiftKey || e.ctrlKey)) {
-				console.log('advantage')
-				// n = 2;
-			}
+				const type = (e.shiftKey) ? "advantage" : "disadvantage";
+				advantage_disadvantage[type] = true;
 
+				//Only roll with advantage/disadvantage if only 1 is present they cancel eachother out
+				if(Object.keys(advantage_disadvantage).length === 1) {
+					n = 2;
+				}
+			} else {
+				advantage_disadvantage = {};
+			}
+			
+			//Roll the dice
 			for (var i=0; i < n; i++) {
 				throws.push(Math.ceil(Math.random() * d))
+			}
+
+			//Roll with advantage/disadvantage
+			if(Object.keys(advantage_disadvantage).length === 1) {
+				let ignoredRoll = (throws[0] < throws[1]) ? 0 : 1; //ignore the lowest roll
+				
+				//With disadvantage, ignore the highest roll
+				if(advantage_disadvantage.disadvantage) {
+					ignoredRoll = (throws[0] > throws[1]) ? 0 : 1;
+				}
+
+				ignored = throws[ignoredRoll];
+				throws.splice(ignoredRoll, 1);
+				n = 1;
 			}
 
 			let s = ''
@@ -37,25 +65,38 @@ export const dice = {
 			let showRoll = (m !== 0) ? n + 'd' + d + s + m : n + 'd' + d;
 
 			let roll = {
+				title,
 				roll: showRoll,
 				mod: s + m,
 				throws: throws,
 				total: sumTotal,
+				advantage_disadvantage,
+				ignored
 			}
+
+			console.log(roll)
 			
 			if(notify) {
+				let advantage;
+				if(ignored) {
+					const type = Object.keys(advantage_disadvantage)[0].charAt(0).capitalize();
+					const color = (type === "A") ? "green" : "red";
+					advantage = `<b class="${color}">${type}</b> <span class="gray-hover">${ignored}</span> `;
+				}
+
 				this.animateTrigger = !this.animateTrigger;
 				this.$snotify.html(
 					`<div class="snotifyToast__body roll">
-						<div class="roll_title">${notify}</div>
+						<div class="roll_title">${title}</div>
 						<div class="rolled" id="roll">${roll.total}</div>
-						<div class="roll_title">${sumThrows}${roll.mod}</div>
+						<div class="roll_title">${advantage ? advantage : ''}${sumThrows}${roll.mod}</div>
 					</div> `, {
 					timeout: 3000,
 					closeOnClick: true
 				});
 				this.rolled = roll.total;
 			}
+			this.setRoll(roll);
 			return roll;
 		},
 		rollD6(n=1,m=0) {

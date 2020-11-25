@@ -33,7 +33,7 @@
 					<div
 						class="ability"
 						:key="index" 
-						@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
+						@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${data.name}: ${ability.ability} check`, true)"
 						v-if="data[ability.ability]">
 							<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 							{{ data[ability.ability] }}
@@ -53,7 +53,7 @@
 					<span class="saves">
 						<span 
 							class="save" 
-							@click="rollD($event, 20, 1, save.score, `${save.save} save`)"
+							@click="rollD($event, 20, 1, save.score, `${data.name}: ${save.save} save`, true)"
 							v-for="save in savingThrows" 
 							:key="save.save">
 							{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}

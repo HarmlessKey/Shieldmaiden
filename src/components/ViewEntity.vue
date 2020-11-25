@@ -41,7 +41,7 @@
 				<div
 					class="ability"
 					:key="index" 
-					@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
+					@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${data.name}: ${ability.ability} check`, true)"
 					v-if="data[ability.ability]">
 						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 						{{ data[ability.ability] }}
@@ -59,7 +59,7 @@
 			<h3>Skills</h3>
 			<div class="playerSkills">
 				<div :value="key" v-for="(skill, key) in skillList" :key="key">
-					<span class="playerSkill" @click="rollD($event, 20, 1, skillModifier(skill, key), `${skill.skill} check`)">
+					<span class="playerSkill" @click="rollD($event, 20, 1, skillModifier(skill, key), `${data.name}: ${skill.skill} check`, true)">
 						<span class="truncate">
 							<template v-if="data.skills && data.skills.includes(key)">
 								<i v-if="data.skills_expertise && data.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
@@ -80,7 +80,7 @@
 				<span class="saves">
 					<span 
 						class="save" 
-						@click="rollD($event, 20, 1, save.score, `${save.save} save`)"
+						@click="rollD($event, 20, 1, save.score, `${save.save} save`, true)"
 						v-for="save in savingThrows" 
 						:key="save.save">
 						{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}

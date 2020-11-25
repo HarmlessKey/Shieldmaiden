@@ -79,7 +79,7 @@
 				'set_initiative'
 			]),
 			rollMonster(e, key, entity) {
-				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity));
+				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
@@ -106,7 +106,7 @@
 						dex = entity.dexterity;
 					}
 				}
-				let roll = this.rollD(e, 20, 1, this.calcMod(dex)).total;
+				let roll = this.rollD(e, 20, 1, this.calcMod(dex), "Group initiative").total;
 
 				for(let i in this.selected) {
 					key = this.selected[i]

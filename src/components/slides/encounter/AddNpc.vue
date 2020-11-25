@@ -189,7 +189,7 @@
 			},
 			rollInitiative(e) {
 				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
-				const roll = this.rollD(e, 20, 1, mod);
+				const roll = this.rollD(e, 20, 1, mod, `${this.entity.name ? this.entity.name : "Unnamed"}: Initiative`);
 				this.$set(this.entity, "initiative", roll.total);
 			},
 			set(id, type) {

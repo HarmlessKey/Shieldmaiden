@@ -112,7 +112,7 @@
 									<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 									<div 
 										class="mod bg-gray-dark"
-										@click="rollD($event, 20, 1, modifier(entities[key][ability.ability]), `${ability.ability} check`)"
+										@click="rollD($event, 20, 1, modifier(entities[key][ability.ability]), `${entities[key].name}: ${ability.ability} check`, true)"
 									>
 										{{ modifier(entities[key][ability.ability]) }}
 										<q-tooltip anchor="top middle" self="center middle">
@@ -122,7 +122,7 @@
 									<div 
 										class="mod bg-gray-dark"
 										v-if="entities[key].entityType === 'npc'"
-										@click="rollD($event, 20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${ability.ability} save`)"
+										@click="rollD($event, 20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${entities[key].name}: ${ability.ability} save`, true)"
 									>
 										{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
 										<q-tooltip anchor="top middle" self="center middle">

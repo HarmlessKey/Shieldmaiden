@@ -393,8 +393,6 @@
 				var total = 0;
 				var allDamageRolls = [];
 				var critInfo = '';
-				var highest = 0;
-				var lowest = undefined;
 				let advantage = this.advantage;
 
 				if(e.shiftKey) {
@@ -411,40 +409,26 @@
 				}
 
 				let attack_bonus = action.attack_bonus || 0;
+				let advantage_disadvantage = {};
 				let toHit;
 				let adv = ""
-				//If there is advantage roll twice
+				//If there is advantage/disadvantage set required properties
 				if(advantage) {	
-					toHit = this.rollD(e, 20, 2, attack_bonus);
-
-					//Define the position of the highest and lowest rolls in the array
-					highest = (toHit.throws[0] >= toHit.throws[1]) ? 0 : 1;
-					lowest = (toHit.throws[0] >= toHit.throws[1]) ? 1 : 0;
+					advantage_disadvantage[advantage] = true;
 
 					//Set advantage message for snotify
 					let color = (advantage === 'advantage') ? 'green' : 'red'; 
 					adv = `<small class="${color} advantage">${advantage}</small>`;	
 				} 
-				//Roll once where there is no advantage/disadvantage
-				else {
-					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
-					toHit = this.rollD(e, 20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
-				}
 
-				//Flip the positions of highest and lowest if there was disadvantage
-				if(advantage === 'disadvantage') {
-					highest = (highest === 0) ? 1 : 0;
-					lowest = (lowest === 0) ? 1 : 0;
-				}
+				toHit = this.rollD(e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_disadvantage);
 
-				toHit.total = toHit.throws[highest] + attack_bonus; //Add the attack bonus to the higest/lowest 'to hit' roll
- 
 				//Roll the damage for all seperated rolls
 				//Roll if it's the first roll and rollOnce = true
 				//Roll if rollOnce is false
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
-					if(this.toHit && toHit.throws[highest] === 20) {
+					if(this.toHit && toHit.throws[0] === 20) {
 						crit = true;
 						if(this.criticalSettings['.value']) {
 							critDouble = true;
@@ -458,12 +442,11 @@
 					for(let c = 0; c < critRoll; c++) {
 						for(let roll in rolls) {
 							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
-							let rolled = this.rollD(e, dice[1], dice[0]) //roll the dice
+							let rolled = this.rollD(e, dice[1], dice[0], 0, `${this.current.name} ${action.name}`) //roll the dice
 							let damage = rolled.total; //roll the dice
 	
 							allDamageRolls.push(rolled.throws);
 							total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
-	
 						}
 					}
 					//Set the roll that needs to be used when rolling damage only once
@@ -489,7 +472,7 @@
 					//All rolls should be seperate (different damage or same damage and to hit)
 					//All rolls are together (same damge, no to hit) and there was no roll before
 					if(this.share_rolls && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
-						this.shareRoll(targets, toHit.throws[highest], total, action['attack_bonus'], action['damage_bonus']);
+						this.shareRoll(targets, toHit.throws[0], total, action['attack_bonus'], action['damage_bonus']);
 					} else {
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
@@ -515,7 +498,7 @@
 				this.rolledDamage = totalDamage; //For animation
 
 				if(this.toHit) {
-					let toHitRoll = toHit.throws[highest];
+					let toHitRoll = toHit.throws[0];
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
@@ -527,7 +510,7 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit.throws[lowest]}</span>` : ``;
+					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
 
 					this.rolledToHit = toHit.total; //For animation
 

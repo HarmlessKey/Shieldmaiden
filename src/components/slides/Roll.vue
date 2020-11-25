@@ -14,14 +14,14 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<q-input dark filled square dense v-if="die == 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
+			<q-input dark filled square dense v-if="die === 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
 				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
 			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
-			<button class="btn" @click="roll($event, die, item)"><i :class="item.icon"></i></button>
+			<button class="btn" @click="roll($event, parseInt(die), item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
 		<template v-if="log">
@@ -79,7 +79,7 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(e, die, item.n, item.mod, `${item.n}d${die} roll`);
+				let roll = this.rollD(e, die, item.n, item.mod, `${item.n}d${die} roll`, true);
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20

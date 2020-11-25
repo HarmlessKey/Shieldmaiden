@@ -41,7 +41,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				reminderId: this.$route.params.id,
 				triggerInfo: {
 					'startTurn': "When the entity with the <b>Start of turn</b> reminder gets its turn, the notification will show. You can use this reminder when a spell causes the entity to take damage on the start of their turn.",

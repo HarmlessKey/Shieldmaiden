@@ -140,7 +140,7 @@
 		},
 		data(){
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				general: {
 					'keyBinds': { 
 						name: 'Show Keybinds', 

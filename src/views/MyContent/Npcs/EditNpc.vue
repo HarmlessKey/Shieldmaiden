@@ -530,7 +530,7 @@
 		},
 		data() {
 			return {
-				userId: this.$route.params.userid || this.$store.getters.getUser.uid,
+				userId: this.$route.params.userid || this.$store.getters.user.uid,
 				npcId: this.$route.params.id,
 				quick: false,
 				search: '',

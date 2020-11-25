@@ -226,7 +226,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				untaggedColumns: {
 					name: {
 						label: 'Name',

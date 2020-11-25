@@ -165,7 +165,7 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				newCampaign: '',
 				image: false,

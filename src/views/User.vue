@@ -79,7 +79,7 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				userId: this.$route.params.userid,
 				campaigns: undefined,
 				loadingCampaigns: true

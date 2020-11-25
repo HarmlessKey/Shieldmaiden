@@ -65,19 +65,21 @@
 				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
-				<div v-if="toHit" class="advantage d-sm-none d-flex justify-content-between">
-					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
-						<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
-						Advantage
-					</button>
-					<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
-						<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
-						Disadvantage
-					</button>
-				</div>
-				<p class="mt-3 d-none d-sm-block">
-					<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
-				</p>
+				<template v-if="toHit">
+					<div class="setAdvantage d-sm-none d-flex justify-content-between">
+						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
+							<i v-if="advantage === 'advantage'" class="fas fa-check"></i>
+							Advantage
+						</button>
+						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
+							<i v-if="advantage === 'disadvantage'" class="fas fa-check"></i>
+							Disadvantage
+						</button>
+					</div>
+					<p class="mt-3 d-none d-sm-block">
+						<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+					</p>
+				</template>
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
@@ -116,22 +118,16 @@
 							data-vv-as="Custom Modifier"
 						/>
 					</div>
-					<div>
+					<hk-roll>
 						<button 
 							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
 							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
-							:class="{ 
-								'bg-red': actionHover === `custom-disadvantage`,
-								'bg-green': actionHover === `custom-advantage`
-							}"
-							@mousemove="checkAdvantage($event, 'action', 'custom')"
-							@mouseout="clearAdvantage()"
 						>
 							<i class="fas fa-dice-d20"></i>
 							<span class="d-none d-md-inline ml-1">Roll</span>
 						</button>
-					</div>
+					</hk-roll>
 				</div>
 				<p class="validate red" v-if="errors.has('custom_roll')">
 					{{ errors.first('custom_roll') }}
@@ -147,23 +143,19 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button 
-								v-if="action['damage_dice']" 
-								@click="groupRoll($event, action)" 
-								class="btn btn-sm"
-								:class="{ 
-									'bg-red': actionHover === `${index}-disadvantage`,
-									'bg-green': actionHover === `${index}-advantage`
-								}"
-								@mousemove="checkAdvantage($event, 'action', index)"
-								@mouseout="clearAdvantage()"
-							>
-								<i class="fas fa-dice-d20"></i>
-								<span class="d-none d-md-inline ml-1">Roll</span>
-								<q-tooltip anchor="center right" self="center left">
-									Roll {{ action.name }}
-								</q-tooltip>
-							</button>
+							<hk-roll>
+								<button 
+									v-if="action['damage_dice']" 
+									@click="groupRoll($event, action)" 
+									class="btn btn-sm"
+								>
+									<i class="fas fa-dice-d20"></i>
+									<span class="d-none d-md-inline ml-1">Roll</span>
+									<q-tooltip anchor="center right" self="center left">
+										Roll {{ action.name }}
+									</q-tooltip>
+								</button>
+							</hk-roll>
 						</span>
 						<q-slide-transition>
 							<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
@@ -182,13 +174,15 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
-								<i class="fas fa-dice-d20"></i>
-								<span class="d-none d-md-inline ml-1">Roll</span>
-								<q-tooltip anchor="center right" self="center left">
-									Roll {{ action.name }}
-								</q-tooltip>
-							</button>
+							<hk-roll>
+								<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
+									<i class="fas fa-dice-d20"></i>
+									<span class="d-none d-md-inline ml-1">Roll</span>
+									<q-tooltip anchor="center right" self="center left">
+										Roll {{ action.name }}
+									</q-tooltip>
+								</button>
+							</hk-roll>
 						</span>
 						<q-slide-transition>
 							<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
@@ -219,7 +213,7 @@
 			return {
 				rollInfo: false,
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				showAction: undefined,
@@ -382,7 +376,7 @@
 			},
 			roll(e, action, target, rollCounter) {
 				event.stopPropagation();
-				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
+				var rolls = action.damage_dice.replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
 				let crit = false;
 				let critDouble = false;
@@ -391,8 +385,6 @@
 				var total = 0;
 				var allDamageRolls = [];
 				var critInfo = '';
-				var highest = 0;
-				var lowest = undefined;
 				let advantage = this.advantage;
 
 				if(e.shiftKey) {
@@ -408,33 +400,21 @@
 					ac = parseInt(target.ac_bonus) + ac;
 				}
 
-				let toHit = [];
+				let attack_bonus = action.attack_bonus || 0;
+				let advantage_disadvantage = {};
+				let toHit;
 				let adv = ""
-				//If there is advantage roll twice
-				if(advantage) {
-					for(let i = 0; i <= 1; i++) {
-						let attack_bonus = action.attack_bonus || 0;
-						toHit[i] =  this.rollD(20, 1, attack_bonus); //Roll the to hit, d20 + attack bonus
-					}
-
-					//Define the position of the highest and lowest rolls in the array
-					highest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 0 : 1;
-					lowest = (toHit[0].throws[0] >= toHit[1].throws[0]) ? 1 : 0;
+				//If there is advantage/disadvantage set required properties
+				if(advantage) {	
+					advantage_disadvantage[advantage] = true;
 
 					//Set advantage message for snotify
 					let color = (advantage === 'advantage') ? 'green' : 'red'; 
 					adv = `<small class="${color} advantage">${advantage}</small>`;	
-				} 
-				//Roll once where there is no advantage/disadvantage
-				else {
-					highest = 0; //You roll once, so 0 will be the hightest roll (important later)
-					toHit[highest] = this.rollD(20, 1, action['attack_bonus']); //Roll the to hit, d20 + attack bonus
 				}
 
-				//Flip the positions of highest and lowest if there was disadvantage
-				if(advantage === 'disadvantage') {
-					highest = (highest === 0) ? 1 : 0;
-					lowest = (lowest === 0) ? 1 : 0;
+				if(this.toHit) {
+					toHit = this.rollD(e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_disadvantage);
 				}
 
 				//Roll the damage for all seperated rolls
@@ -442,27 +422,32 @@
 				//Roll if rollOnce is false
 				if((rollCounter == 0 && this.rollOnce) || !this.rollOnce){
 					//Check if it was a crit
-					if(this.toHit && toHit[highest].throws[0] === 20) {
+					if(this.toHit && toHit.throws[0] === 20) {
 						crit = true;
 						if(this.criticalSettings['.value']) {
 							critDouble = true;
 						} else {
-							critInfo = `<div><small>The damage dice were rolled twice.</small></div>`;
+							critInfo = `<div><b class="red">Crit!</b> The damage dice were rolled twice.</div>`;
 							critRoll = 2;
 						}
 					}
 
-					//Roll the damage. Twice if it was a crit and critsettings are set to roll twice
-					for(let c = 0; c < critRoll; c++) {
-						for(let roll in rolls) {
-							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
-							let rolled = this.rollD(dice[1], dice[0]) //roll the dice
-							let damage = rolled.total; //roll the dice
-	
-							allDamageRolls.push(rolled.throws);
-							total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
-	
+					
+					for(const index in rolls) {
+						let modifier = 0;
+						const dice = rolls[index].split('d'); //split amount from type of dice [1]d[6]
+						const diceCount = dice[0]*critRoll; //Roll the damage dice twice if it was a crit and critsettings are set to roll twice
+						
+						//For the last roll, include the damage modifier, this is just to show it in saved rolls
+						if(parseInt(index)+1 === rolls.length) {
+							modifier = action.damage_bonus;
 						}
+						
+						const rolled = this.rollD(e, dice[1], diceCount, modifier, `${this.current.name} ${action.name}`); //roll the dice
+						const damage = rolled.throwsTotal; //save damage without the damage bonus
+
+						allDamageRolls.push(rolled.throws);
+						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
 					}
 					//Set the roll that needs to be used when rolling damage only once
 					if(this.rollOnce) {
@@ -487,7 +472,8 @@
 					//All rolls should be seperate (different damage or same damage and to hit)
 					//All rolls are together (same damge, no to hit) and there was no roll before
 					if(this.share_rolls && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
-						this.shareRoll(targets, toHit[highest].throws[0], total, action['attack_bonus'], action['damage_bonus']);
+						const toHitRoll = (this.toHit) ? toHit.throws[0] : 0;
+						this.shareRoll(targets, toHitRoll, total, action.attack_bonus, action.damage_bonus);
 					} else {
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
@@ -495,7 +481,7 @@
 				//Check if it was a critical hit and rolled damage should be doubled, not be rolled twice
 				if(critDouble) {
 					//Form HTML for snotify
-					critInfo = `<div><small>The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
+					critInfo = `<div><b class="red">Crit!</b> The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</div>`;
 					total = parseInt(total*2);
 				}
 				//Add the damage modifier
@@ -513,7 +499,7 @@
 				this.rolledDamage = totalDamage; //For animation
 
 				if(this.toHit) {
-					let toHitRoll = toHit[highest].throws[0];
+					let toHitRoll = toHit.throws[0];
 
 					//If the to hit roll is a 20, it is a critical hit
 					if(toHitRoll === 20) {
@@ -524,19 +510,19 @@
 						toHitRoll = '<span class="red">natural 1</span>'; //form HTML fo snotify
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
-					let hitOrMiss = (toHit[highest].total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit[lowest].throws[0]}</span>` : ``;
+					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
+					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
 
-					this.rolledToHit = toHit[highest].total; //For animation
+					this.rolledToHit = toHit.total; //For animation
 
 					//Form HTML for snotify
 					hits = `<div class="roll">
 						${(adv) ? adv : ``}
 						<div class="top">
 							${ignoredRoll}
-							${toHitRoll}${toHit[highest].mod}
+							${toHitRoll}${toHit.mod}
 						</div>
-						<h2 id="toHitRoll">${toHit[highest].total}</h2>
+						<h2 id="toHitRoll">${toHit.total}</h2>
 						<div class="bottom">
 							${hitOrMiss}
 						</div>
@@ -563,14 +549,6 @@
 							</div>
 						</div>
 						${critInfo}
-
-						<a data-toggle="collapse" href="#rolls-${rollCounter}" role="button" >
-							Damage Rolls <i class="fal fa-chevron-down"></i>
-						</a>
-						<p id="rolls-${rollCounter}" class="collapse">
-							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
-							Rolls: ${allDamageRolls}
-						</p>
 					</div> `, {
 					timeout: 0,
 					closeOnClick: false,
@@ -713,6 +691,17 @@
 		.span {
 			grid-column: span 2;
 		}
+
+		.advantage:hover {
+			.btn {
+				background-color: #83b547;
+			}
+		}
+		.disadvantage:hover {
+			.btn {
+				background-color: #cc3e4a;
+			}
+		}
 	}
 	ul.roll {
 		margin-bottom: 30px;
@@ -738,9 +727,19 @@
 			.btn {
 				min-width: 60px;
 			}
+			.advantage:hover {
+				.btn {
+					background-color: #83b547;
+				}
+			}
+			.disadvantage:hover {
+				.btn {
+					background-color: #cc3e4a;
+				}
+			}
 		}
 	}
-	.advantage {
+	.setAdvantage {
 		margin-top: 20px;
 
 		.btn {

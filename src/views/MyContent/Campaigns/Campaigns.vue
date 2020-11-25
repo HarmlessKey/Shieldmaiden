@@ -223,6 +223,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'tier',
 				'campaigns',
 				'userInfo',
@@ -231,9 +232,6 @@
 				'overencumbered',
 				'content_count',
 			]),
-			...mapGetters({
-				user: 'getUser'
-			}),
 			_campaigns: function() {
 				return _.chain(this.campaigns)
 				.filter(function(campaign, key) {

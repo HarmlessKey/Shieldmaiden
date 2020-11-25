@@ -1,11 +1,5 @@
 <template>
 	<div>
-		<h2>
-			Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span>
-			<q-tooltip anchor="bottom middle" self="center middle">
-				Press [r] to show/hide
-			</q-tooltip>
-		</h2>
 		<div class="roller">
 			<span>Die</span>
 			<span>#</span>
@@ -14,44 +8,34 @@
 			<span>Result</span>
 		</div>
 		<div v-for="(item, die) in dice" class="roller" :key="die">
-			<q-input dark filled square dense v-if="die == 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
+			<q-input dark filled square dense v-if="die === 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
 				<span class="ml-1 gray-hover">d{{die}}</span>
 			</div>
 			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
-			<button class="btn" @click="roll(die, item)"><i :class="item.icon"></i></button>
+			<button class="btn" @click="roll($event, parseInt(die), item)"><i :class="item.icon"></i></button>
 			<span class="blue">{{ item.result }}</span>
 		</div>
 		<template v-if="log">
 			<hr>
-			<h2>Your rolls</h2>
-			<ul class="log">
-				<li v-for="(item, index) in log" :key="index">
-					<h3 v-if="item.total == 'Natural 1' || item.total == 'Natural 20'" 
-						class="font-weight-bold"
-						:class="[{
-							'red': item.total == 'Natural 1',
-							'green': item.total == 'Natural 20'}]
-					">
-						{{ item.total }}!
-					</h3>
-					<h3 v-else class="gray-hover">{{ item.roll }}: 
-						<b class="blue">{{ item.total }}</b>
-					</h3>
-					<p>{{ item.throws }} {{ item.mod }}</p>
-				</li>
-			</ul>
+			<h2>Recent rolls</h2>
+			<Rolls :rolls="log" />
 		</template>
 	</div>
 </template>
 
 <script>
 	import { dice } from '@/mixins/dice.js'
+	import Rolls from './Rolls';
 
 	export default {
+		name: "DiceRoller",
 		mixins: [dice],
+		components: {
+			Rolls
+		},
 		data() {
 			return {
 				result: '',
@@ -69,7 +53,7 @@
 			}
 		},
 		methods: {
-			roll(d, item) {
+			roll(e, d, item) {
 				item.n = (item.n > 999) ? 999 : item.n;
 				item.mod = (item.mod > 999) ? 999 : item.mod;
 				item.mod = (item.mod < -999) ? -999 : item.mod;
@@ -79,20 +63,19 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(die, item.n, item.mod, `${item.n}d${die} roll`);
+				let roll = this.rollD(e, die, item.n, item.mod, `${item.n}d${die} roll`, true);
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20
-				if(item.n == 1 && die == 20) {
-					let throws = '"'+roll.throws+'"'
-					if(throws.substring(5, 0) == '"1"') {
-						roll.total = 'Natural 1';
-					}
-					else if(throws.substring(5, 0) == '"20"') {
-						roll.total = 'Natural 20';
-					}
-					
-				}
+				// if(item.n == 1 && die == 20) {
+				// 	let throws = '"'+roll.throws+'"'
+				// 	if(throws.substring(5, 0) == '"1"') {
+				// 		roll.total = 'Natural 1';
+				// 	}
+				// 	else if(throws.substring(5, 0) == '"20"') {
+				// 		roll.total = 'Natural 20';
+				// 	}
+				// }
 				this.log.unshift(roll);
 			}
 		}

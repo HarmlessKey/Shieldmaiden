@@ -29,20 +29,16 @@
 			</span>
 			<hr>
 			<div class="abilities">
-				<template v-for="(ability, index) in abilities">
+				<hk-roll v-for="(ability, index) in abilities" 	:key="index" tooltip="Roll">
 					<div
 						class="ability"
-						:key="index" 
-						@click="rollD(20, 1, modifier(data[ability.ability]), `${ability.ability} check`)"
+						@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${data.name}: ${ability.ability.capitalize()} check`, true)"
 						v-if="data[ability.ability]">
 							<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
 							{{ data[ability.ability] }}
 							({{ modifier(data[ability.ability]) }})
-							<q-tooltip anchor="top middle" self="center middle">
-								Roll
-							</q-tooltip>
 					</div>
-				</template>
+				</hk-roll>
 			</div>
 			<hr>
 
@@ -51,13 +47,14 @@
 				<template v-if="savingThrows.length > 0">
 					<b>Saving Throws </b>
 					<span class="saves">
-						<span 
-							class="save" 
-							@click="rollD(20, 1, save.score, `${save.save} save`)"
-							v-for="save in savingThrows" 
-							:key="save.save">
-							{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
-						</span>
+						<hk-roll tooltip="Roll save" v-for="save in savingThrows" :key="save.save">
+							<span 
+								class="save" 
+								@click="rollD($event, 20, 1, save.score, `${data.name}: ${save.save.capitalize()} save`, true)"
+							>
+								{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
+							</span>
+						</hk-roll>
 					</span>
 					<br/>
 				</template>
@@ -292,7 +289,7 @@
 	.attributes, .stats {
 		color: #58170D;
 		
-		.skills .skill, .saves .save {
+		.skills .skill, .saves .hk-roll {
 			&::after {
 				content: ', ';
 			}
@@ -300,15 +297,26 @@
 				content: '';
 			}
 		}
-		.saves .save {
-			cursor: pointer;
-		}
+		.saves{
+			user-select: none;
+
+			.save {
+				cursor: pointer;
+			}
+			.advantage .save:hover {
+				color: #83b547
+			}
+			.disadvantage .save:hover {
+				color: #cc3e4a
+			}
+		} 
 	}
 	hr {
 		border-top: 2px solid rgb(165,42,42);
 		margin: 10px 0;
 	}
 	.abilities {
+		user-select: none;
 		color: #58170D;
 		display: grid;
 		grid-template-columns: 	repeat(6, 40px);
@@ -323,6 +331,12 @@
 		}
 		.ability {
 			cursor: pointer;
+		}
+		.advantage .ability:hover {
+			color: #83b547
+		}
+		.disadvantage .ability:hover {
+			color: #cc3e4a
 		}
 	}
 }

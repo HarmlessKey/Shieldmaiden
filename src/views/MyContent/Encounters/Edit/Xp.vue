@@ -39,7 +39,7 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-                user: this.$store.getters.getUser,
+                user: this.$store.getters.user,
                 setOverwrite: false,
                 overwriteAmount: undefined
 			} 

@@ -58,7 +58,7 @@
 		],
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				controlUser: undefined,
 				findUser: undefined,
 				foundUser: undefined,

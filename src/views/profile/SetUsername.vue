@@ -42,12 +42,10 @@ export default {
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'userInfo',
 				'poster',
-			]),
-			...mapGetters({
-				user: 'user'
-			})
+			])
 		},
 		methods: {
 			checkUsername() {

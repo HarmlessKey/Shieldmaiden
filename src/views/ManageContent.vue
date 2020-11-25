@@ -106,22 +106,15 @@
 		metaInfo: {
 			title: 'Manage Content',
 		},
-		data() {
-			return {
-		
-			}
-		},
 		computed: {
 			...mapGetters([
+				'user',
 				'tier',
 				'campaigns',
 				'allEncounters',
 				'players',
 				'npcs',
-			]),
-			...mapGetters({
-				user: 'user'
-			}),
+			])
 		},
 		methods: {
 			confirmDelete(key, type, name) {

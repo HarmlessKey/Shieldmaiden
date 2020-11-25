@@ -192,16 +192,14 @@ export default {
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'campaigns',
 				'players',
 				'npcs',
 				'userInfo',
 				'tier',
 				'voucher',
-			]),
-			...mapGetters({
-				user: 'user'
-			})
+			])
 		},
 		methods: {
 			resetPassword() {

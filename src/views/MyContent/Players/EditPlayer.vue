@@ -5,7 +5,7 @@
 		</div>
 		
 		<template v-else-if="player">
-			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control === $store.getters.getUser.uid) || $route.name != 'Edit Character'">
+			<div id="players" class="container-fluid scrollable-content" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 
 				<!-- GIVE OUT CONTROL -->
 				<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
@@ -466,13 +466,13 @@
 			userId() {
 				if(!this.isOwner()) {
 					let id = undefined
-					let user = db.ref(`character_control/${this.$store.getters.getUser.uid}/${this.$route.params.id}`);
+					let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
 					user.on('value' , (snapshot) => {
 						id = snapshot.val().user
 					});
 					return id;
 				} else {
-					return this.$store.getters.getUser.uid;
+					return this.$store.getters.user.uid;
 				}
 			},
 			skills: {

@@ -220,10 +220,10 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				newEncounter: '',
-				copy: window.location.host + '/track-encounter/' + this.$store.getters.getUser.uid,
+				copy: window.location.host + '/track-encounter/' + this.$store.getters.user.uid,
 				add: false,
 				currentPage: 1,
 				collapsed: false,

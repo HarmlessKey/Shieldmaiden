@@ -1,5 +1,4 @@
-import { db, auth } from '@/firebase'
-import Vue from 'vue'
+import { db } from '@/firebase';
 
 const campaigns_ref = db.ref('campaigns/');
 const encounters_ref = db.ref('encounters');
@@ -7,19 +6,15 @@ const players_ref = db.ref('players');
 const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
 const tiers_ref = db.ref('tiers');
-const settings_ref = db.ref('settings');
 
 export const content_module = {
 	state: {
-		user: {},
 		userInfo: undefined,
 		
 		tier: undefined,
 		voucher: undefined,
 		overencumbered: undefined,
 		content_count: {},
-		
-		slide: {},
 
 		campaign: {},
 		campaigns: {},
@@ -28,16 +23,10 @@ export const content_module = {
 		players: {},
 		npcs: {},
 
-		poster: undefined,
-		side_collapsed: true,
-		side_small_screen: false,
-		share_rolls: false,
-
+		poster: undefined
 	},
 	getters: {
-		getUser: function( state ) { return state.user; },
 		userInfo: function( state ) { return state.userInfo; },
-		getSlide: function( state ) { return state.slide; },
 		encounters: function( state ) { return state.encounters; },
 		allEncounters: function( state ) { return state.allEncounters; },
 		players: function( state ) { return state.players; },
@@ -48,90 +37,12 @@ export const content_module = {
 		voucher: function( state ) { return state.voucher;},
 		overencumbered: function( state ) { return state.overencumbered; },
 		content_count: function( state ) { return state.content_count; },
-		poster: function( state ) { return state.poster; },
-		side_collapsed: function( state ) { return state.side_collapsed; },
-		side_small_screen: function( state ) { return state.side_small_screen; },
-		share_rolls: function( state ) { return state.share_rolls; }
+		poster: function( state ) { return state.poster; }
 	},
 	mutations: {
-		SET_USER(state) { state.user = auth.currentUser; },
 		SET_USERINFO(state, payload) { state.userInfo = payload; },
 		SET_TIER(state, payload) { state.tier = payload; },
 		SET_VOUCHER(state, payload) { state.voucher = payload; },
-		setSlide(state, payload) {
-			//Function to compare 2 arrays
-			//Needed to check if the data of the slide is the same
-			var isEqual = function (value, other) {
-
-				// Get the value type
-				var type = Object.prototype.toString.call(value);
-			
-				// If the two objects are not the same type, return false
-				if (type !== Object.prototype.toString.call(other)) return false;
-			
-				// If items are not an object or array, return false
-				if (['[object Array]', '[object Object]'].indexOf(type) < 0) return false;
-			
-				// Compare the length of the length of the two items
-				var valueLen = type === '[object Array]' ? value.length : Object.keys(value).length;
-				var otherLen = type === '[object Array]' ? other.length : Object.keys(other).length;
-				if (valueLen !== otherLen) return false;
-			
-				// Compare two items
-				var compare = function (item1, item2) {
-			
-					// Get the object type
-					var itemType = Object.prototype.toString.call(item1);
-			
-					// If an object or array, compare recursively
-					if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
-						if (!isEqual(item1, item2)) return false;
-					}
-			
-					// Otherwise, do a simple comparison
-					else {
-			
-						// If the two items are not the same type, return false
-						if (itemType !== Object.prototype.toString.call(item2)) return false;
-			
-						// Else if it's a function, convert to a string and compare
-						// Otherwise, just compare
-						if (itemType === '[object Function]') {
-							if (item1.toString() !== item2.toString()) return false;
-						} else {
-							if (item1 !== item2) return false;
-						}
-			
-					}
-				};
-			
-				// Compare properties
-				if (type === '[object Array]') {
-					for (var i = 0; i < valueLen; i++) {
-						if (compare(value[i], other[i]) === false) return false;
-					}
-				} else {
-					for (var key in value) {
-						if (value.hasOwnProperty(key)) {
-							if (compare(value[key], other[key]) === false) return false;
-						}
-					}
-				}
-				// If nothing failed, return true
-				return true;
-			
-			};
-
-			if(state.slide.type != payload.type) {
-				state.slide = false
-				setTimeout(() => state.slide = payload, 100);
-			} else if(!isEqual(state.slide.data, payload.data) && payload.data != undefined) {
-				state.slide = false
-				setTimeout(() => state.slide = payload, 100);
-			} else {
-				state.slide = false
-			}
-		},
 		SET_PLAYERS(state, payload) {
 			if (payload) state.players = payload
 		},
@@ -174,18 +85,11 @@ export const content_module = {
 					state.overencumbered = false
 			}
 		},
-		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
-		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
-		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
-		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
-		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); }
+		CLEAR_ENCOUNTERS(state) { state.encounters = {} }
 	},
 	actions: {
-		setUser({ commit }) {
-			commit('SET_USER');
-		},
-		async setUserInfo({ commit, dispatch, state }) {
-			let user = await users_ref.child(state.user.uid)
+		async setUserInfo({ commit, dispatch, rootGetters }) {
+			let user = await users_ref.child(rootGetters.user.uid)
 			user.on('value', async user_snapshot => {
 				let user_info = user_snapshot.val();
 				
@@ -216,7 +120,7 @@ export const content_module = {
 						let end_date = new Date(user_info.voucher.date).toISOString();
 						
 						if (server_today > end_date) {
-							dispatch("remove_voucher", state.user.uid);
+							dispatch("remove_voucher", rootGetters.user.uid);
 							voucher = undefined;
 						} else {
 							path = `tiers/${user_info.voucher.id}`;
@@ -286,71 +190,70 @@ export const content_module = {
 				commit('SET_USERINFO', user_info);
 			});
 		},
-		setSlide({ commit }, payload) { commit('setSlide', payload); },
 		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },
 		setEncounterId({ commit }, value) { commit('SET_ENCOUNTER_ID', value); },
-		fetchEncounter({ commit, state}, { cid, eid }) {
-			commit("SET_CAMPAIGN_ID", cid)
-			commit("SET_ENCOUNTER_ID", eid)
-			const uid = state.user.uid;
+		fetchEncounter({ commit, rootGetters}, { cid, eid }) {
+			commit("SET_CAMPAIGN_ID", cid);
+			commit("SET_ENCOUNTER_ID", eid);
+			const uid = rootGetters.user.uid;
 			const path = `${uid}/${cid}/${eid}`;
 			const encounter = encounters_ref.child(path);
 			encounter.on('value', snapshot => {
 				commit('SET_ENCOUNTER', snapshot.val())
 			})
 		},
-		fetchEncounters({ commit, state }, { cid }) {
-			const uid = state.user.uid
+		fetchEncounters({ commit, rootGetters }, { cid }) {
+			const uid = rootGetters.user.uid;
 			const path = `${uid}/${cid}`;
 			let encounters = encounters_ref.child(path)
 			encounters.on('value', snapshot => {
 				commit('SET_ENCOUNTERS', snapshot.val())
 			})
 		},
-		fetchAllEncounters({ commit, state }) {
-			const uid = state.user.uid
+		fetchAllEncounters({ commit, rootGetters }) {
+			const uid = rootGetters.user.uid
 			let encounters = encounters_ref.child(uid)
 			encounters.on('value', snapshot => {
 				commit('SET_ALLENCOUNTERS', snapshot.val())
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
-		fetchPlayers({ commit, state }) {
-			const uid = state.user.uid
+		fetchPlayers({ commit, rootGetters }) {
+			const uid = rootGetters.user.uid
 			const players = players_ref.child(uid)
 			players.on('value', snapshot => {
 				commit('SET_PLAYERS', snapshot.val())
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
-		fetchNpcs({ commit, state }) {
-			const uid = state.user.uid
+		fetchNpcs({ commit, rootGetters }) {
+			const uid = rootGetters.user.uid
 			const npcs = npcs_ref.child(uid)
 			npcs.on('value', snapshot => {
 				commit('SET_NPCS', snapshot.val())
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
-		fetchCampaign({ commit, state }, { cid }) {
+		fetchCampaign({ commit, rootGetters }, { cid }) {
 			commit("SET_CAMPAIGN_ID", cid)
 			
-			const uid = state.user.uid;
+			const uid = rootGetters.user.uid;
 			const path = `${uid}/${cid}`;
 			const campaign = campaigns_ref.child(path);
 			campaign.on('value', snapshot => {
 				commit('SET_CAMPAIGN', snapshot.val())
 			})
 		},
-		fetchCampaigns({ commit, state }) {
-			const uid = state.user.uid
+		fetchCampaigns({ commit, rootGetters }) {
+			const uid = rootGetters.user.uid
 			let campaigns = campaigns_ref.child(uid)
 			campaigns.on('value', snapshot => {
 				commit('SET_CAMPAIGNS', snapshot.val())
 				commit('CHECK_ENCUMBRANCE');
 			})
 		},
-		remove_voucher( { state }) {
-			db.ref(`users/${state.user.uid}/voucher`).remove()
+		remove_voucher( { rootGetters }) {
+			db.ref(`users/${rootGetters.user.uid}/voucher`).remove()
 		},
 		setPoster({ state }) {
 			db.ref('posters').once('value', snapshot => {
@@ -362,37 +265,6 @@ export const content_module = {
 		},
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS");
-		},
-		toggleSideCollapsed({ commit, state }) {
-			const uid = state.user.uid;
-			let collapsed_ref = settings_ref.child(uid).child('general/side_collapsed');
-			
-			commit("TOGGLE_SIDE_COLLAPSE");
-			
-			let collapsed = state.side_collapsed;
-			if (collapsed === false){
-				collapsed_ref.remove();
-			}
-			else
-				collapsed_ref.set(true)
-
-		},
-		setSideCollapsed({ commit, state }) {
-			const uid = state.user.uid;
-			let general = settings_ref.child(uid).child('general');
-			general.on('value', snapshot => {
-				let collapse = false;
-				if (snapshot.val())
-					collapse = snapshot.val().side_collapsed;
-
-				commit("SET_SIDE_COLLAPSE", collapse);
-			})
-		},
-		setSideSmallScreen({ commit }, payload) {
-			commit("SET_SIDE_SMALL_SCREEN", payload)
-		},
-		setShareRolls({ commit }, payload) {
-			commit("SET_SHARE_ROLLS", payload)
-		},
+		}
 	},
 };

@@ -120,7 +120,7 @@
 				'npcs',
 			]),
 			...mapGetters({
-				user: 'getUser'
+				user: 'user'
 			}),
 		},
 		methods: {

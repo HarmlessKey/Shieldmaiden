@@ -97,7 +97,7 @@
 		props: ['id'],
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				spellId: this.$route.params.id,
 				edit: false,
 				loading: true,

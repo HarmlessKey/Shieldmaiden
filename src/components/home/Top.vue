@@ -93,7 +93,7 @@
 				'userInfo',
 			]),
 			...mapGetters({
-				user: 'getUser'
+				user: 'user'
 			})
 		}
 	}

@@ -811,13 +811,13 @@ const mutations = {
 }
 
 const actions = {
-	async init_Encounter({ commit, rootState }, { cid, eid, demo }) {
+	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
 		commit("SET_DEMO", demo);
-		commit("SET_UID", rootState.content.user.uid);
+		commit("SET_UID", rootGetters.user.uid);
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
 		commit("CLEAR_ENTITIES");
-		const uid = rootState.content.user.uid;
+		const uid = rootGetters.user.uid;
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path);
 

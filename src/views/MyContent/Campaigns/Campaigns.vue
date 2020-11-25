@@ -232,7 +232,7 @@
 				'content_count',
 			]),
 			...mapGetters({
-				user: 'getUser'
+				user: 'user'
 			}),
 			_campaigns: function() {
 				return _.chain(this.campaigns)

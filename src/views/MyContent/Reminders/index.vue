@@ -97,7 +97,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				columns: {
 					title: {
 						label: 'Title',

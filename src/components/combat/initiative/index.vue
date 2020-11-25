@@ -116,7 +116,7 @@
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				setShadowPlayer: 0,
 				setShadowNPC: 0,
 				setShadowOverview: 0,

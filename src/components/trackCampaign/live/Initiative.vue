@@ -229,7 +229,7 @@
 		data() {
 			return {
 				dmId: this.$route.params.userid,
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				characters: [],
 
 				//Multitargeting needs variables

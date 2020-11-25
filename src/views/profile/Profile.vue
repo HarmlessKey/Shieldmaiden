@@ -200,7 +200,7 @@ export default {
 				'voucher',
 			]),
 			...mapGetters({
-				user: 'getUser'
+				user: 'user'
 			})
 		},
 		methods: {

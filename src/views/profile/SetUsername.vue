@@ -46,7 +46,7 @@ export default {
 				'poster',
 			]),
 			...mapGetters({
-				user: 'getUser'
+				user: 'user'
 			})
 		},
 		methods: {

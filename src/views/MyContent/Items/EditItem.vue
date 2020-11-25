@@ -200,7 +200,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				itemId: this.$route.params.id,
 				search: ["name"],
                 searched: undefined,

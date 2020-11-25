@@ -129,7 +129,7 @@
 			// Dispatch route parameters to store
 
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				width: 0

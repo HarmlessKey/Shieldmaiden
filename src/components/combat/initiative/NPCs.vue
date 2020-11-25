@@ -38,12 +38,11 @@
 						placeholder="0"
 					>
 						<template v-slot:append>
-							<a @click="rollMonster($event, entity.key, entity)">
-							<q-icon size="small" name="fas fa-dice-d20"/>
-							<q-tooltip anchor="top middle" self="center middle">
-								1d20 + {{ calcMod(entity.dexterity) }}
-							</q-tooltip>
-						</a>
+							<hk-roll :tooltip="`1d20 + ${calcMod(entity.dexterity)}`">
+								<a @click="rollMonster($event, entity.key, entity)">
+									<q-icon size="small" name="fas fa-dice-d20"/>
+								</a>
+							</hk-roll>
 						</template>
 					</q-input>
 				</div>
@@ -51,9 +50,11 @@
 			</li>
 		</ul>
 		<div class="pl-2 pr-3">
-			<a class="btn btn-block" @click="(selected.length === 0) ? rollAll($event) : rollGroup($event)">
-				<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
-			</a>
+			<hk-roll tooltip="Roll">
+				<a class="btn btn-block" @click="(selected.length === 0) ? rollAll($event) : rollGroup($event)">
+					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+				</a>
+			</hk-roll>
 		</div>
 	</div>
 </template>
@@ -155,19 +156,7 @@
 			}
 		}
 	}
-	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .9);
-		overflow: hidden;
-	}
-	.players {
-		grid-area: players;
-	}
-	.npcs {
-		grid-area: npcs;
-	}
-	.set {
-		grid-area: set;
-	}
+
 	ul.entities {
 		padding:0 15px 0 10px;
 
@@ -187,7 +176,19 @@
 				line-height: 44px;
 				text-align: center;
 			}
+			.advantage a:hover {
+				color: #83b547 !important;
+			}
+			.disadvantage a:hover {
+				color: #cc3e4a !important;
+			}
 		}
+	}
+	.advantage .btn:hover {
+		background-color: #83b547;
+	}
+	.disadvantage .btn:hover {
+		background-color: #cc3e4a;
 	}
 }
 .initiative-move {

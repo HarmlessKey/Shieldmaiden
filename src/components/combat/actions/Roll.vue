@@ -384,7 +384,7 @@
 			},
 			roll(e, action, target, rollCounter) {
 				event.stopPropagation();
-				var rolls = action['damage_dice'].replace(/\s+/g, ''); //remove spaces
+				var rolls = action.damage_dice.replace(/\s+/g, ''); //remove spaces
 				rolls = rolls.split('+'); //seperate the rolls
 				let crit = false;
 				let critDouble = false;
@@ -419,9 +419,11 @@
 					//Set advantage message for snotify
 					let color = (advantage === 'advantage') ? 'green' : 'red'; 
 					adv = `<small class="${color} advantage">${advantage}</small>`;	
-				} 
+				}
 
-				toHit = this.rollD(e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_disadvantage);
+				if(this.toHit) {
+					toHit = this.rollD(e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_disadvantage);
+				}
 
 				//Roll the damage for all seperated rolls
 				//Roll if it's the first roll and rollOnce = true
@@ -433,21 +435,27 @@
 						if(this.criticalSettings['.value']) {
 							critDouble = true;
 						} else {
-							critInfo = `<div><small>The damage dice were rolled twice.</small></div>`;
+							critInfo = `<div><b class="red">Crit!</b> The damage dice were rolled twice.</div>`;
 							critRoll = 2;
 						}
 					}
 
-					//Roll the damage. Twice if it was a crit and critsettings are set to roll twice
-					for(let c = 0; c < critRoll; c++) {
-						for(let roll in rolls) {
-							let dice = rolls[roll].split('d'); //split amount from type of dice [1]d[6]
-							let rolled = this.rollD(e, dice[1], dice[0], 0, `${this.current.name} ${action.name}`) //roll the dice
-							let damage = rolled.total; //roll the dice
-	
-							allDamageRolls.push(rolled.throws);
-							total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
+					
+					for(const index in rolls) {
+						let modifier = 0;
+						const dice = rolls[index].split('d'); //split amount from type of dice [1]d[6]
+						const diceCount = dice[0]*critRoll; //Roll the damage dice twice if it was a crit and critsettings are set to roll twice
+						
+						//For the last roll, include the damage modifier, this is just to show it in saved rolls
+						if(parseInt(index)+1 === rolls.length) {
+							modifier = action.damage_bonus;
 						}
+						
+						const rolled = this.rollD(e, dice[1], diceCount, modifier, `${this.current.name} ${action.name}`); //roll the dice
+						const damage = rolled.throwsTotal; //save damage without the damage bonus
+
+						allDamageRolls.push(rolled.throws);
+						total = parseInt(total) + parseInt(damage); //Add the rolls to the total damage
 					}
 					//Set the roll that needs to be used when rolling damage only once
 					if(this.rollOnce) {
@@ -472,7 +480,8 @@
 					//All rolls should be seperate (different damage or same damage and to hit)
 					//All rolls are together (same damge, no to hit) and there was no roll before
 					if(this.share_rolls && ((rollCounter == 0 && this.rollOnce) || !this.rollOnce || this.toHit)) {
-						this.shareRoll(targets, toHit.throws[0], total, action['attack_bonus'], action['damage_bonus']);
+						const toHitRoll = (this.toHit) ? toHit.throws[0] : 0;
+						this.shareRoll(targets, toHitRoll, total, action.attack_bonus, action.damage_bonus);
 					} else {
 						db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(false);
 					}
@@ -480,7 +489,7 @@
 				//Check if it was a critical hit and rolled damage should be doubled, not be rolled twice
 				if(critDouble) {
 					//Form HTML for snotify
-					critInfo = `<div><small>The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</small></div>`;
+					critInfo = `<div><b class="red">Crit!</b> The rolled damage was doubled.<br/> (was ${total}, changed to ${parseInt(total*2)})</div>`;
 					total = parseInt(total*2);
 				}
 				//Add the damage modifier
@@ -548,14 +557,6 @@
 							</div>
 						</div>
 						${critInfo}
-
-						<a data-toggle="collapse" href="#rolls-${rollCounter}" role="button" >
-							Damage Rolls <i class="fal fa-chevron-down"></i>
-						</a>
-						<p id="rolls-${rollCounter}" class="collapse">
-							<span class="gray-hover">${action['damage_dice']} + ${action['damage_bonus']}</span><br/>
-							Rolls: ${allDamageRolls}
-						</p>
 					</div> `, {
 					timeout: 0,
 					closeOnClick: false,

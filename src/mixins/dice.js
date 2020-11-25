@@ -74,8 +74,6 @@ export const dice = {
 				advantage_disadvantage,
 				ignored
 			}
-
-			console.log(roll)
 			
 			if(notify) {
 				let advantage;

@@ -66,13 +66,13 @@
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
 				<template v-if="toHit">
-					<div class="advantage d-sm-none d-flex justify-content-between">
+					<div class="setAdvantage d-sm-none d-flex justify-content-between">
 						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
-							<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
+							<i v-if="advantage === 'advantage'" class="fas fa-check"></i>
 							Advantage
 						</button>
 						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
-							<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
+							<i v-if="advantage === 'disadvantage'" class="fas fa-check"></i>
 							Disadvantage
 						</button>
 					</div>
@@ -118,22 +118,16 @@
 							data-vv-as="Custom Modifier"
 						/>
 					</div>
-					<div>
+					<hk-roll>
 						<button 
 							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
 							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
-							:class="{ 
-								'bg-red': actionHover === `custom-disadvantage` && toHit,
-								'bg-green': actionHover === `custom-advantage` && toHit
-							}"
-							@mousemove="checkAdvantage($event, 'action', 'custom')"
-							@mouseout="clearAdvantage()"
 						>
 							<i class="fas fa-dice-d20"></i>
 							<span class="d-none d-md-inline ml-1">Roll</span>
 						</button>
-					</div>
+					</hk-roll>
 				</div>
 				<p class="validate red" v-if="errors.has('custom_roll')">
 					{{ errors.first('custom_roll') }}
@@ -149,23 +143,19 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button 
-								v-if="action['damage_dice']" 
-								@click="groupRoll($event, action)" 
-								class="btn btn-sm"
-								:class="{ 
-									'bg-red': actionHover === `${index}-disadvantage` && toHit,
-									'bg-green': actionHover === `${index}-advantage` && toHit
-								}"
-								@mousemove="checkAdvantage($event, 'action', index)"
-								@mouseout="clearAdvantage()"
-							>
-								<i class="fas fa-dice-d20"></i>
-								<span class="d-none d-md-inline ml-1">Roll</span>
-								<q-tooltip anchor="center right" self="center left">
-									Roll {{ action.name }}
-								</q-tooltip>
-							</button>
+							<hk-roll>
+								<button 
+									v-if="action['damage_dice']" 
+									@click="groupRoll($event, action)" 
+									class="btn btn-sm"
+								>
+									<i class="fas fa-dice-d20"></i>
+									<span class="d-none d-md-inline ml-1">Roll</span>
+									<q-tooltip anchor="center right" self="center left">
+										Roll {{ action.name }}
+									</q-tooltip>
+								</button>
+							</hk-roll>
 						</span>
 						<q-slide-transition>
 							<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
@@ -184,13 +174,15 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
-								<i class="fas fa-dice-d20"></i>
-								<span class="d-none d-md-inline ml-1">Roll</span>
-								<q-tooltip anchor="center right" self="center left">
-									Roll {{ action.name }}
-								</q-tooltip>
-							</button>
+							<hk-roll>
+								<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
+									<i class="fas fa-dice-d20"></i>
+									<span class="d-none d-md-inline ml-1">Roll</span>
+									<q-tooltip anchor="center right" self="center left">
+										Roll {{ action.name }}
+									</q-tooltip>
+								</button>
+							</hk-roll>
 						</span>
 						<q-slide-transition>
 							<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
@@ -699,6 +691,17 @@
 		.span {
 			grid-column: span 2;
 		}
+
+		.advantage:hover {
+			.btn {
+				background-color: #83b547;
+			}
+		}
+		.disadvantage:hover {
+			.btn {
+				background-color: #cc3e4a;
+			}
+		}
 	}
 	ul.roll {
 		margin-bottom: 30px;
@@ -724,9 +727,19 @@
 			.btn {
 				min-width: 60px;
 			}
+			.advantage:hover {
+				.btn {
+					background-color: #83b547;
+				}
+			}
+			.disadvantage:hover {
+				.btn {
+					background-color: #cc3e4a;
+				}
+			}
 		}
 	}
-	.advantage {
+	.setAdvantage {
 		margin-top: 20px;
 
 		.btn {

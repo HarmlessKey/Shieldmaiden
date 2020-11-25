@@ -48,8 +48,8 @@
 						</q-tooltip>
 					</a>
 					<a class="icon roll" 
-						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/Roll'})"
-						@click="setSlide({show: true, type: 'slides/Roll'})">
+						v-shortkey="['r']" @shortkey="setSlide({show: true, type: 'slides/roll/index'})"
+						@click="setSlide({show: true, type: 'slides/roll/index'})">
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Dice roller
 						</q-tooltip>

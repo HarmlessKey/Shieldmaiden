@@ -1,11 +1,5 @@
 <template>
 	<div>
-		<h2>
-			Dice Roller <span class="gray-hover ml-2 text-lowercase d-none d-sm-inline">[r]</span>
-			<q-tooltip anchor="bottom middle" self="center middle">
-				Press [r] to show/hide
-			</q-tooltip>
-		</h2>
 		<div class="roller">
 			<span>Die</span>
 			<span>#</span>
@@ -26,32 +20,22 @@
 		</div>
 		<template v-if="log">
 			<hr>
-			<h2>Your rolls</h2>
-			<ul class="log">
-				<li v-for="(item, index) in log" :key="index">
-					<h3 v-if="item.total == 'Natural 1' || item.total == 'Natural 20'" 
-						class="font-weight-bold"
-						:class="[{
-							'red': item.total == 'Natural 1',
-							'green': item.total == 'Natural 20'}]
-					">
-						{{ item.total }}!
-					</h3>
-					<h3 v-else class="gray-hover">{{ item.roll }}: 
-						<b class="blue">{{ item.total }}</b>
-					</h3>
-					<p>{{ item.throws }} {{ item.mod }}</p>
-				</li>
-			</ul>
+			<h2>Recent rolls</h2>
+			<Rolls :rolls="log" />
 		</template>
 	</div>
 </template>
 
 <script>
 	import { dice } from '@/mixins/dice.js'
+	import Rolls from './Rolls';
 
 	export default {
+		name: "DiceRoller",
 		mixins: [dice],
+		components: {
+			Rolls
+		},
 		data() {
 			return {
 				result: '',
@@ -83,16 +67,15 @@
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20
-				if(item.n == 1 && die == 20) {
-					let throws = '"'+roll.throws+'"'
-					if(throws.substring(5, 0) == '"1"') {
-						roll.total = 'Natural 1';
-					}
-					else if(throws.substring(5, 0) == '"20"') {
-						roll.total = 'Natural 20';
-					}
-					
-				}
+				// if(item.n == 1 && die == 20) {
+				// 	let throws = '"'+roll.throws+'"'
+				// 	if(throws.substring(5, 0) == '"1"') {
+				// 		roll.total = 'Natural 1';
+				// 	}
+				// 	else if(throws.substring(5, 0) == '"20"') {
+				// 		roll.total = 'Natural 20';
+				// 	}
+				// }
 				this.log.unshift(roll);
 			}
 		}

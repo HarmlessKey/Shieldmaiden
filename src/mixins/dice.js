@@ -59,16 +59,17 @@ export const dice = {
 			if (Math.sign(m) >= 0) {
 				s = '+'
 			}
-			let sumThrows = throws.reduce(add);
-			let sumTotal = sumThrows + parseInt(m);
+			const sumThrows = throws.reduce(add);
+			const sumTotal = sumThrows + parseInt(m);
 
-			let showRoll = (m !== 0) ? n + 'd' + d + s + m : n + 'd' + d;
+			const showRoll = (m !== 0) ? `${n}d${d}${s}${m}` : `${n}d${d}`;
 
-			let roll = {
+			const roll = {
 				title,
 				roll: showRoll,
 				mod: s + m,
 				throws: throws,
+				throwsTotal: sumThrows,
 				total: sumTotal,
 				advantage_disadvantage,
 				ignored

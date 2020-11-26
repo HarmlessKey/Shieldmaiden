@@ -64,12 +64,8 @@
 							<tr 
 								:key="entity.key" 
 								:class="{ pointer: characters.length !== 0, 'targeted': targeted.includes(entity.key) }"
-								@mousedown="characters.length !== 0 ? start($event, entity.key) : null" 
-								@mouseleave="characters.length !== 0 ? stop() : null" 
-								@mouseup="characters.length !== 0 ? stop() : null" 
-								@touchstart="characters.length !== 0 ? start($event, entity.key) : null" 
-								@touchend="characters.length !== 0 ? stop() : null" 
-								@touchcancel="characters.length !== 0 ? stop() : null"
+								v-touch-hold.mouse="event => target(event, 'multi', entity.key)"
+								@click="target($event, 'single', entity.key)"
 							>
 								<td class="init">
 									<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue"></i>
@@ -231,13 +227,7 @@
 				dmId: this.$route.params.userid,
 				userId: this.$store.getters.user.uid,
 				characters: [],
-
-				//Multitargeting needs variables
-				targeted: [],
-				interval:false,
-				counter: 0,
-				event: undefined,
-				key: undefined
+				targeted: []
 			}
 		},
 		firebase() {
@@ -272,11 +262,6 @@
 			}
 		},
 		watch: {
-			counter(newValue) {
-				if(newValue > 8) {
-					this.stop()
-				}
-			},
 			lastRoll(roll, oldRoll) {
 				//Check if the roll has not been shown before
 				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
@@ -357,35 +342,11 @@
 
 				return returnTargets.join("");
 			},
-			start(e, key) {
-				//Check how long the item is being pressed
-				if(!this.interval){
-					this.interval = setInterval(() => this.counter++, 30);
-					this.event = e;
-					this.key = key;
-				}
-			},
-			stop(){
-				//If and item was pressed, see if it was long or short
-				if(this.interval) {
-					let longPress = this.counter >= 8;
-	
-					this.target({
-						longPress,
-						e: this.event,
-						key: this.key
-					})
-				}
-				//Reset all values
-				clearInterval(this.interval)
-				this.interval = false;
-				this.counter = 0;
-				this.key = undefined;
-			},
-			target({longPress, e, key}) {
+			target(e, type, key) {
+				//Select the target
 				let targeted = this.targeted;
 
-				if(longPress || e.shiftKey) {
+				if(type === "multi" || e.shiftKey) {
 					if(!targeted.includes(key)) {
 						targeted.push(key);
 					} else {
@@ -394,7 +355,7 @@
 						});
 					}
 				} else {
-					if(targeted.length === 0 || targeted != key) {
+					if(targeted.length === 0 || targeted[0] !== key) {
 						targeted = [key];
 					} else {
 						targeted = [];
@@ -605,10 +566,6 @@
 
 			th {
 				padding: 5px 0;
-
-				&.init {
-					text-align: left !important;
-				}
 			}
 			td {
 				padding: 5px 0;
@@ -623,9 +580,6 @@
 				}
 				&.init, &.ac {
 					width: 35px;
-				}
-				&.init {
-					text-align: left !important;
 				}
 			}			
 		}

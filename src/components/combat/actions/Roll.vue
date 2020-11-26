@@ -357,7 +357,6 @@
 				}
 
 				let attack_bonus = action.attack_bonus || 0;
-				let advantage_disadvantage = {};
 				let toHit;
 				let adv = "";
 				//If there is advantage/disadvantage set required properties

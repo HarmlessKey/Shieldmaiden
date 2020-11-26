@@ -72,7 +72,7 @@
 								</span>
 
 								<div class="target" 
-								v-touch-hold.mouse="event => selectTarget(event, 'multi', entity.key)"
+									v-touch-hold.mouse="event => selectTarget(event, 'multi', entity.key)"
 									@click="selectTarget($event, 'single', entity.key)"
 									v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
 									<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />

@@ -29,14 +29,22 @@
 			</span>
 			<hr>
 			<div class="abilities">
-				<hk-roll v-for="(ability, index) in abilities" 	:key="index" tooltip="Roll">
-					<div
-						class="ability"
-						@click="rollD($event, 20, 1, modifier(data[ability.ability]), `${data.name}: ${ability.ability.capitalize()} check`, true)"
-						v-if="data[ability.ability]">
-							<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
-							{{ data[ability.ability] }}
-							({{ modifier(data[ability.ability]) }})
+				<hk-roll 
+					v-for="(ability, index) in abilities"	
+					:key="index" 
+					tooltip="Roll"
+					:roll="{
+						d: 20, 
+						n: 1, 
+						m: modifier(data[ability.ability]),
+						title: `${data.name}: ${ability.ability.capitalize()} check`, 
+						notify: true
+					}"
+				>
+					<div v-if="data[ability.ability]" class="ability">
+						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+						{{ data[ability.ability] }}
+						({{ modifier(data[ability.ability]) }})
 					</div>
 				</hk-roll>
 			</div>
@@ -47,11 +55,19 @@
 				<template v-if="savingThrows.length > 0">
 					<b>Saving Throws </b>
 					<span class="saves">
-						<hk-roll tooltip="Roll save" v-for="save in savingThrows" :key="save.save">
-							<span 
-								class="save" 
-								@click="rollD($event, 20, 1, save.score, `${data.name}: ${save.save.capitalize()} save`, true)"
-							>
+						<hk-roll 
+							tooltip="Roll save" 
+							v-for="save in savingThrows" 
+							:key="save.save"
+							:roll="{
+								d: 20, 
+								n: 1, 
+								m: save.score,
+								title: `${data.name}: ${save.save.capitalize()} save`, 
+								notify: true
+							}"
+						>
+							<span class="save">
 								{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
 							</span>
 						</hk-roll>

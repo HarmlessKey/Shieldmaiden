@@ -24,9 +24,11 @@ export const dice = {
 			let ignored = undefined;
 			
 			//Check for advantage with advantage or disadvantage when a single d20 is rolled
-			if(n === 1 && d === 20 && (e.shiftKey || e.ctrlKey)) {
-				const type = (e.shiftKey) ? "advantage" : "disadvantage";
-				advantage_disadvantage[type] = true;
+			if(n === 1 && d === 20 && (e.shiftKey || e.ctrlKey || Object.keys(advantage_disadvantage).length > 0)) {
+				if(e.shiftKey || e.ctrlKey) {
+					const type = (e.shiftKey) ? "advantage" : "disadvantage";
+					advantage_disadvantage[type] = true;
+				}
 
 				//Only roll with advantage/disadvantage if only 1 is present they cancel eachother out
 				if(Object.keys(advantage_disadvantage).length === 1) {

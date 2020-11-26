@@ -38,8 +38,11 @@
 						placeholder="0"
 					>
 						<template v-slot:append>
-							<hk-roll :tooltip="`1d20 + ${calcMod(entity.dexterity)}`">
-								<a @click="rollMonster($event, entity.key, entity)">
+							<hk-roll 
+								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
+								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
+							>
+								<a>
 									<q-icon size="small" name="fas fa-dice-d20"/>
 								</a>
 							</hk-roll>
@@ -50,8 +53,11 @@
 			</li>
 		</ul>
 		<div class="pl-2 pr-3">
-			<hk-roll tooltip="Roll">
-				<a class="btn btn-block" @click="(selected.length === 0) ? rollAll($event) : rollGroup($event)">
+			<hk-roll 
+				tooltip="Roll"
+				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
+			>
+				<a class="btn btn-block">
 					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
 				</a>
 			</hk-roll>
@@ -79,8 +85,9 @@
 				'setSlide',
 				'set_initiative'
 			]),
-			rollMonster(e, key, entity) {
-				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`);
+			rollMonster(e, key, entity, advantage_disadvantage) {
+				const advantage_object = (advantage_disadvantage) ? advantage_disadvantage : {};
+				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`, false, advantage_object);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
@@ -89,8 +96,8 @@
 			},
 			rollAll(e) {
 				for (let i in this.npcs) {
-					let key = this.npcs[i].key
-					this.rollMonster(e, key, this.npcs[i])
+					let key = this.npcs[i].key;
+					this.rollMonster(e.e, key, this.npcs[i], e.advantage_disadvantage);
 				}
 			},
 			rollGroup(e) {
@@ -107,17 +114,18 @@
 						dex = entity.dexterity;
 					}
 				}
-				let roll = this.rollD(e, 20, 1, this.calcMod(dex), "Group initiative").total;
+				const advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
+				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", false, advantage_object).total;
 
 				for(let i in this.selected) {
-					key = this.selected[i]
-					entity = this.npcs[key]
-					entity.initiative = roll
+					key = this.selected[i];
+					entity = this.npcs[key];
+					entity.initiative = roll;
 
 					this.set_initiative({
 						key: entity.key,
 						initiative: entity.initiative
-					})
+					});
 				}
 				this.selected = []
 			},

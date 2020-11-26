@@ -72,12 +72,9 @@
 								</span>
 
 								<div class="target" 
-									@mousedown="start($event, entity.key)"
-									@touchstart="start($event, entity.key)" 
-									@mouseleave="stop" 
-									@mouseup="stop" 
-									@touchcancel="stop" 
-									v-shortkey="[i]" @shortkey="set_targeted({ longPress: false, e: $event, key: entity.key })">
+								v-touch-hold.mouse="event => selectTarget(event, 'multi', entity.key)"
+									@click="selectTarget($event, 'single', entity.key)"
+									v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
 									<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
 								</div>
 								<a class="options">
@@ -175,13 +172,7 @@
 			return {
 				userId: (auth.currentUser) ? auth.currentUser.uid : undefined,
 				currentTarget: {},
-				setShadow: 0,
-
-				//Multitargeting needs variables
-				interval:false,
-				counter: 0,
-				event: undefined,
-				key: undefined
+				setShadow: 0
 			}
 		},
 		computed: {
@@ -251,13 +242,6 @@
 				}
 			}
 		},
-		watch: {
-			counter(newValue) {
-				if(newValue > 8) {
-					this.stop()
-				}
-			}
-		},
 		methods: {
 			...mapActions([
 				'setSlide',
@@ -266,31 +250,6 @@
 				'set_stable',
 				'remove_entity',
 			]),
-			start(e, key) {
-				//Check how long the item is being pressed
-				if(!this.interval){
-					this.interval = setInterval(() => this.counter++, 30);
-					this.event = e;
-					this.key = key;
-				}
-			},
-			stop(){
-				//If and item was pressed, see if it was long or short
-				if(this.interval) {
-					let longPress = (this.counter >= 8) ? true : false;
-	
-					this.set_targeted({
-						longPress,
-						e: this.event,
-						key: this.key
-					});
-				}
-				//Reset all values
-				clearInterval(this.interval)
-				this.interval = false;
-				this.counter = 0;
-				this.key = undefined;
-			},
 			edit(key, entity, entityType) {
 				let editType = undefined;
 				switch(entityType) {
@@ -342,9 +301,17 @@
 					]
 				});
 			},
+			selectTarget(e, type, key) {
+				type = (e.shiftKey) ? "multi" : type;
+				//Select the target
+				this.set_targeted({
+					type,
+					key
+				});
+			},
 			cycle_target(event) {
 				const lastSelected = this.targeted[this.targeted.length - 1];
-				const longPress = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? false : true; //Multitarget or not
+				const type = (event.srcKey === 'upSingle' || event.srcKey === 'downSingle') ? "single" : "multi"; //Multitarget or not
 				//Create array with keys of all targets
 				const targetsArray = this._targets.map(function (target) {
 					return target.key;
@@ -362,8 +329,7 @@
 
 				//Select the target
 				this.set_targeted({
-					longPress,
-					e: event,
+					type,
 					key: target
 				});
 				

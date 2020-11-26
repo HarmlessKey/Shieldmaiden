@@ -66,18 +66,11 @@
 
 				<!-- ADVANTAGE / DISADVANTAGE -->
 				<template v-if="toHit">
-					<div class="setAdvantage d-sm-none d-flex justify-content-between">
-						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
-							<i v-if="advantage === 'advantage'" class="fas fa-check"></i>
-							Advantage
-						</button>
-						<button class="btn btn-sm bg-gray-hover mb-3" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
-							<i v-if="advantage === 'disadvantage'" class="fas fa-check"></i>
-							Disadvantage
-						</button>
-					</div>
+					<p class="mt-3 d-sm-none d-block">
+						<q-icon name="info" size="sm" class="info" /> Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
+					</p>
 					<p class="mt-3 d-none d-sm-block">
-						<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>
+						<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>.
 					</p>
 				</template>
 				
@@ -118,10 +111,14 @@
 							data-vv-as="Custom Modifier"
 						/>
 					</div>
-					<hk-roll>
+					<hk-roll 
+						tooltip="Roll" 
+						tooltipPosition="right"
+						@roll="groupRoll($event, custom_roll)"
+						:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
+					>
 						<button 
 							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
-							@click="groupRoll($event, custom_roll)" 
 							class="btn btn-sm"
 						>
 							<i class="fas fa-dice-d20"></i>
@@ -143,17 +140,14 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<hk-roll>
-								<button 
-									v-if="action['damage_dice']" 
-									@click="groupRoll($event, action)" 
-									class="btn btn-sm"
-								>
+							<hk-roll 
+								:tooltip="`Roll ${action.name}`" 
+								tooltipPosition="right"
+								@roll="groupRoll($event, action)"
+							>
+								<button v-if="action['damage_dice']" class="btn btn-sm">
 									<i class="fas fa-dice-d20"></i>
 									<span class="d-none d-md-inline ml-1">Roll</span>
-									<q-tooltip anchor="center right" self="center left">
-										Roll {{ action.name }}
-									</q-tooltip>
 								</button>
 							</hk-roll>
 						</span>
@@ -174,13 +168,14 @@
 								<span>{{ action.name }}</span>
 								<i class="fas fa-caret-down"></i>
 							</a>
-							<hk-roll>
-								<button v-if="action['damage_dice']" @click="groupRoll($event, action)" class="btn btn-sm">
+							<hk-roll 
+								:tooltip="`Roll ${action.name}`" 
+								tooltipPosition="right"
+								@roll="groupRoll($event, action)"
+							>
+								<button v-if="action['damage_dice']" class="btn btn-sm">
 									<i class="fas fa-dice-d20"></i>
 									<span class="d-none d-md-inline ml-1">Roll</span>
-									<q-tooltip anchor="center right" self="center left">
-										Roll {{ action.name }}
-									</q-tooltip>
 								</button>
 							</hk-roll>
 						</span>
@@ -218,7 +213,6 @@
 				encounterId: this.$route.params.encid,
 				showAction: undefined,
 				showLegendary: undefined,
-				advantage: false,
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
@@ -296,38 +290,6 @@
 				'setSlide',
 				'setShareRolls',
 			]),
-			checkKeyPress(e) {
-				if(e.type === "keydown") {
-					if(this.actionHover) {
-						let hover = this.actionHover.split("-");
-						if(e.key === "Shift") {
-							this.actionHover = `${hover[0]}-advantage`;
-						} else if(e.key === "Control") {
-							this.actionHover = `${hover[0]}-disadvantage`;
-						}
-					} else if(this.legendaryHover) {
-						let hover = this.legendaryHover.split("-");
-						if(e.key === "Shift") {
-							this.legendaryHover = `${hover[0]}-advantage`;
-						} else if(e.key === "Control") {
-							this.legendaryHover = `${hover[0]}-disadvantage`;
-						} 
-					}
-				}
-				if(e.type === "keyup") {
-					if(this.actionHover) {
-						let hover = this.actionHover.split("-");
-						if(e.key === "Shift" || e.key === "Control") {
-							this.actionHover = `${hover[0]}-undefined`;
-						}
-					} else if(this.legendaryHover) {
-						let hover = this.legendaryHover.split("-");
-						if(e.key === "Shift" || e.key === "Control") {
-							this.legendaryHover = `${hover[0]}-undefined`;
-						}
-					}
-				}
-			},
 			displayStats(entity) {
 				var stats;
 				if(entity.transformed == true) {
@@ -351,13 +313,6 @@
 					this.showAction = (this.showAction === index) ? undefined : index;
 				} else if(type === 'legendary') {
 					this.showLegendary = (this.showLegendary === index) ? undefined : index;
-				}
-			},
-			setAdvantage(value) {
-				if(this.advantage == value) {
-					this.advantage = false;
-				} else {
-					this.advantage = value;
 				}
 			},
 			groupRoll(e, action) {
@@ -385,12 +340,13 @@
 				var total = 0;
 				var allDamageRolls = [];
 				var critInfo = '';
-				let advantage = this.advantage;
+				let advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
 
-				if(e.shiftKey) {
-					advantage = "advantage";
-				} else if(e.ctrlKey) {
-					advantage = "disadvantage";
+				if(e.e.shiftKey) {
+					advantage_object["advantage"] = true;
+				} 
+				if(e.e.ctrlKey) {
+					advantage_object["disadvantage"] = true;
 				}
 
 				var ac = parseInt(this.displayStats(target).ac);
@@ -403,18 +359,16 @@
 				let attack_bonus = action.attack_bonus || 0;
 				let advantage_disadvantage = {};
 				let toHit;
-				let adv = ""
+				let adv = "";
 				//If there is advantage/disadvantage set required properties
-				if(advantage) {	
-					advantage_disadvantage[advantage] = true;
-
+				if(Object.keys(advantage_object).length === 1) {	
 					//Set advantage message for snotify
-					let color = (advantage === 'advantage') ? 'green' : 'red'; 
-					adv = `<small class="${color} advantage">${advantage}</small>`;	
+					let color = (Object.keys(advantage_object)[0] === 'advantage') ? 'green' : 'red'; 
+					adv = `<small class="${color} advantage">${Object.keys(advantage_object)[0]}</small>`;	
 				}
 
 				if(this.toHit) {
-					toHit = this.rollD(e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_disadvantage);
+					toHit = this.rollD(e.e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_object);
 				}
 
 				//Roll the damage for all seperated rolls
@@ -443,7 +397,7 @@
 							modifier = action.damage_bonus;
 						}
 						
-						const rolled = this.rollD(e, dice[1], diceCount, modifier, `${this.current.name} ${action.name}`); //roll the dice
+						const rolled = this.rollD(e.e, dice[1], diceCount, modifier, `${this.current.name} ${action.name}`); //roll the dice
 						const damage = rolled.throwsTotal; //save damage without the damage bonus
 
 						allDamageRolls.push(rolled.throws);
@@ -511,7 +465,7 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (advantage) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
+					let ignoredRoll = (Object.keys(advantage_object).length === 1) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
 
 					this.rolledToHit = toHit.total; //For animation
 
@@ -589,7 +543,6 @@
 					]
 				});
 				this.animateTrigger = !this.animateTrigger;
-				this.advantage = false; //turn advantage off
 			},
 			shareRoll(targets, toHit, damage, hitMod, damageMod) {
 				var showRoll = {
@@ -630,23 +583,6 @@
 					}
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
-			},
-			checkAdvantage(e, type, index) {
-				let advantage;
-
-				if(e.shiftKey) {
-					advantage = "advantage"
-				} else if(e.ctrlKey) {
-					advantage = "disadvantage"
-				}
-
-				if(type === 'action') {
-					this.actionHover = `${index}-${advantage}`;
-				} 
-				if(type === 'legendary') {
-					this.legendaryHover = `${index}-${advantage}`;
-				} 
-				
 			},
 			clearAdvantage() {
 				this.actionHover = undefined;

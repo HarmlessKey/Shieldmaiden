@@ -5,11 +5,11 @@
 			:class="advantage ? advantage : ''"
 			@mousemove="checkAdvantage($event)"
 			@mouseout="clearAdvantage()"
-			v-touch-hold.mouse="showDialog"
+			v-touch-hold.mouse="!disabled ? showDialog : null"
 			@click="roll ? rollDice($event) : emit($event)"
 		>
 			<slot name="default"/>
-			<q-tooltip anchor="top middle" self="center middle" v-if="tooltip">
+			<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
 				{{ tooltip }} {{ advantage ? `with ${advantage}` : `` }}
 			</q-tooltip>
 			<q-popup-proxy no-parent-event ref="rollPopup">
@@ -44,19 +44,44 @@
 		name: 'hk-roll',
 		mixins: [dice],
 		props: {
+			roll: {
+				type: Object,
+				required: false
+			},
 			tooltip: {
 				type: String,
 				required: false
 			},
-			roll: {
-				type: Object,
-				required: false
+			tooltipPosition: {
+				type: String,
+				required: false,
+				default: "top"
+			},
+			disabled: {
+				type: Boolean,
+				required: false,
+				default: false
 			}
 		},
 		data() {
 			return {
 				advantage: undefined,
 				rollDialog: false
+			}
+		},
+		computed: {
+			position() {
+				if(this.tooltipPosition === "right") {
+					return {
+						anchor: "center right", 
+						self: "center left"
+					}
+				} else {
+					return {
+						anchor: "top middle", 
+						self: "center middle"
+					}
+				}
 			}
 		},
 		created() {

@@ -189,7 +189,7 @@
 				}
 				this.set_turn({turn, round})
 				if(!this.demo) db.ref(`encounters/${this.path}/lastRoll`).set(false);
-				this.set_targeted({ e: 'untarget', key: 'all' });
+				this.set_targeted({ type: 'untarget', key: 'all' });
 				this.checkReminders(this.current, 'endTurn');
 			},
 			prevTurn() {
@@ -203,7 +203,7 @@
 					turn = 0
 				}
 				this.set_turn({turn, round});
-				this.set_targeted({ e: 'untarget', key: 'all' });
+				this.set_targeted({ type: 'untarget', key: 'all' });
 			},
 			confirmFinish() {
 				this.$snotify.error('Are you sure you want to finish the encounter?', 'Finish Encounter', {

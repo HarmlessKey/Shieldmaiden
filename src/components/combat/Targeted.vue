@@ -109,26 +109,36 @@
 									v-if="entities[key][ability.ability]"
 									class="ability"
 								>
-									<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
-									<div 
-										class="mod bg-gray-dark"
-										@click="rollD($event, 20, 1, modifier(entities[key][ability.ability]), `${entities[key].name}: ${ability.ability} check`, true)"
+									<hk-roll 
+										tooltip="Roll check"
+										:roll="{
+											d: 20, 
+											n: 1, 
+											m: modifier(entities[key][ability.ability]), 
+											title: `${entities[key].name}: ${ability.ability} check`, 
+											notify: true
+										}"
 									>
-										{{ modifier(entities[key][ability.ability]) }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Roll check
-										</q-tooltip>
-									</div>
-									<div 
-										class="mod bg-gray-dark"
+										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+										<div class="mod bg-gray-dark">
+											{{ modifier(entities[key][ability.ability]) }}
+										</div>
+									</hk-roll>
+									<hk-roll
 										v-if="entities[key].entityType === 'npc'"
-										@click="rollD($event, 20, 1, entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), `${entities[key].name}: ${ability.ability} save`, true)"
+										tooltip="Roll save"
+										:roll="{
+											d: 20, 
+											n: 1, 
+											m: entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 
+											title: `${entities[key].name}: ${ability.ability} save`, 
+											notify: true
+										}"
 									>
-										{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Roll save
-										</q-tooltip>
-									</div>
+										<div class="mod bg-gray-dark">
+											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+										</div>
+									</hk-roll>
 								</div>
 							</template>
 						</div>
@@ -372,6 +382,14 @@
 					cursor: pointer;
 					line-height: 25px;
 					margin-top: 1px;
+				}
+				.advantage .mod:hover {
+					color: #fff;
+					background-color: #83b547 !important;
+				}
+				.disadvantage .mod:hover {
+					color: #fff;
+					background-color: #cc3e4a !important;
 				}
 			}
 		}

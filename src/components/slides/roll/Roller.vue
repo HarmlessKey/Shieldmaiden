@@ -15,7 +15,17 @@
 			</div>
 			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
-			<button class="btn" @click="roll($event, parseInt(die), item)"><i :class="item.icon"></i></button>
+			
+			<hk-roll v-if="die == 20 && item.n == 1"
+				@roll="roll($event, parseInt(die), item)"
+			>
+				<button class="btn"">
+					<i :class="item.icon"></i>
+				</button>
+			</hk-roll>
+
+			<button v-else class="btn" @click="roll($event, parseInt(die), item)"><i :class="item.icon"></i></button>
+			
 			<span class="blue">{{ item.result }}</span>
 		</div>
 		<template v-if="log">
@@ -54,6 +64,11 @@
 		},
 		methods: {
 			roll(e, d, item) {
+				// Check if e is wrapped in other e
+				if ('e' in e) {
+					e = e.e
+				}
+
 				item.n = (item.n > 999) ? 999 : item.n;
 				item.mod = (item.mod > 999) ? 999 : item.mod;
 				item.mod = (item.mod < -999) ? -999 : item.mod;
@@ -100,6 +115,7 @@
 
 		.btn {
 			height: 40px;
+			width: 40px;
 		}
 		.icon {
 			height: 100%;
@@ -121,5 +137,11 @@
 			font-size: 20px !important;
 			margin-bottom: 5px !important;
 		}
+	}
+	.advantage .btn:hover {
+		background-color: #83b547;
+	}
+	.disadvantage .btn:hover {
+		background-color: #cc3e4a;
 	}
 </style>

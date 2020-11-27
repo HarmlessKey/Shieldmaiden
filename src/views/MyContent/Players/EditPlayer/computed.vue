@@ -87,7 +87,10 @@
 						>
 							<span class="gray-hover">
 								{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
-								<span class="int">{{ Math.abs(character.display.initiative) }}</span>
+								<span 
+									class="int"
+									:class="Object.keys(checkAdvantage('initiative')).length === 1 ? Object.keys(checkAdvantage('initiative'))[0] : ''"
+								>{{ Math.abs(character.display.initiative) }}</span>
 						</hk-roll>
 					</div>
 				</div>
@@ -100,17 +103,23 @@
 					<div v-for="{value, label} in abilities" :key="`score-${value}`">
 						<div class="ability">{{ label.substring(0, 3) }}</div>
 						<div class="mod">
-							<span class="gray-hover" v-if="calcMod(computed.sheet.abilities[value]) !== 0">
-								{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>
-								<span 
-									:class="{
-										'green': checkAdvantage('abilities', value).advantage && !checkAdvantage('abilities', value).disadvantage,
-										'red': checkAdvantage('abilities', value).disadvantage && !checkAdvantage('abilities', value).advantage
-									}"
+							<hk-roll
+								tooltip="Roll"
+								:roll="{
+									d: 20,
+									n: 1,
+									m: calcMod(computed.sheet.abilities[value]),
+									title: `${value.capitalize()} check`,
+									notify: true,
+									advantage: checkAdvantage('abilities', value)
+								}"
+							>
+								<span class="gray-hover" v-if="calcMod(computed.sheet.abilities[value]) !== 0">
+									{{ calcMod(computed.sheet.abilities[value]) > 0 ? "+" : "-" }}</span>
+								<span class="int"
+									:class="Object.keys(checkAdvantage('abilities', value)).length === 1 ? Object.keys(checkAdvantage('abilities', value))[0] : ''"
 								>{{ Math.abs(calcMod(computed.sheet.abilities[value])) }}</span>
-								<q-tooltip anchor="top middle" self="center middle">
-									Roll {{ Object.values(checkAdvantage('abilities', value)).length === 1 ? `with ${Object.keys(checkAdvantage('abilities', value))[0]}` : `` }}
-								</q-tooltip>
+							</hk-roll>
 						</div>
 						<div class="score">{{ computed.sheet.abilities[value] }}</div>
 					</div>
@@ -137,15 +146,21 @@
 								{{ key.capitalize() }}
 							</span>
 							<span class="value">
-								{{ mod >= 0 ? "+" : "-" }}<span 
-									:class="{ 
-										'green': advantage_disadvantage.avantage && !advantage_disadvantage.disadvantage,
-										'red': advantage_disadvantage.disadvantage && !advantage_disadvantage.avantage
+								<hk-roll
+									tooltip="Roll"
+									:roll="{
+										d: 20,
+										n: 1,
+										m: mod,
+										title: `${key.capitalize()} save`,
+										notify: true,
+										advantage: advantage_disadvantage
 									}"
-								>{{ mod }}</span>
-								<q-tooltip anchor="top middle" self="center middle">
-									Roll {{ Object.values(advantage_disadvantage).length === 1 ? `with ${Object.keys(advantage_disadvantage)[0]}` : `` }}
-								</q-tooltip>
+								>
+									{{ mod >= 0 ? "+" : "-" }}<span class="int"
+										:class="Object.keys(advantage_disadvantage).length === 1 ? Object.keys(advantage_disadvantage)[0] : ''"
+									>{{ mod }}</span>
+								</hk-roll>
 							</span>
 						</li>
 					</ul>
@@ -223,7 +238,11 @@
 						saving_throw.mod = this.calcMod(score) + bonus;
 
 						//Check advantage/disadvantage
-						saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
+						if(advantage_disadvantage) {
+							saving_throw.advantage_disadvantage = (advantage_disadvantage[ability.value]) ? advantage_disadvantage[ability.value] : {};
+						} else {
+							saving_throw.advantage_disadvantage = {};
+						}
 
 						//Check and add proficiency bonus
 						if(proficient) {
@@ -355,13 +374,6 @@
 					font-weight: bold;
 					font-family: 'Fredericka the Great', cursive !important;
 					color: #fff;
-
-					.advantage .int {
-						color: #83b547;
-					}
-					.disadvantage .int {
-						color: #cc3e4a;
-					}
 				}
 				.ft {
 					font-size: 15px;
@@ -391,6 +403,23 @@
 			column-count: 2;
 			column-gap: 15px;
 			column-rule: 1px solid #5c5757;
+		}
+		.advantage {
+			color: #83b547 !important;
+			&:hover .int {
+				color: #83b547 !important;
+			}
+		}
+		.disadvantage {
+			color: #cc3e4a;
+			&:hover .int {
+				color: #cc3e4a !important;
+			}
+		}
+		.neutral {
+			&:hover .int {
+				color: inherit !important;
+			}
 		}
 	}
 	.toggle {

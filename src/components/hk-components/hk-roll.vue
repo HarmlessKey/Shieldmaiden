@@ -2,7 +2,7 @@
 	<span>
 		<span 
 			class="hk-roll"
-			:class="Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''"
+			:class="Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : 'neutral'"
 			@mousemove="checkAdvantage($event)"
 			@mouseout="clearAdvantage()"
 			v-touch-hold.mouse="!disabled ? showDialog : null"

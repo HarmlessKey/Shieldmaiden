@@ -138,8 +138,8 @@
 		name: 'Track',
 		data(){
 			return {
-				userId: this.$store.getters.getUser.uid,
-				copy: window.location.host + '/user/' + this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
+				copy: window.location.host + '/user/' + this.$store.getters.user.uid,
 				general: {
 					'meters': { 
 						entity: 'player',

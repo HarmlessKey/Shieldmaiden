@@ -53,7 +53,7 @@
 		mixins: [setHP],
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				storageLog: JSON.parse(localStorage.getItem(this.$route.params.encid)),
 				environment: {
 					key: 'environment',

@@ -38,12 +38,14 @@
 						placeholder="0"
 					>
 						<template v-slot:append>
-							<a @click="rollMonster(entity.key, entity)">
-							<q-icon size="small" name="fas fa-dice-d20"/>
-							<q-tooltip anchor="top middle" self="center middle">
-								1d20 + {{ calcMod(entity.dexterity) }}
-							</q-tooltip>
-						</a>
+							<hk-roll 
+								:tooltip="`1d20 + ${calcMod(entity.dexterity)}`"
+								@roll="rollMonster($event.e, entity.key, entity, $event.advantage_disadvantage)"
+							>
+								<a>
+									<q-icon size="small" name="fas fa-dice-d20"/>
+								</a>
+							</hk-roll>
 						</template>
 					</q-input>
 				</div>
@@ -51,9 +53,14 @@
 			</li>
 		</ul>
 		<div class="pl-2 pr-3">
-			<a class="btn btn-block" @click="(selected.length === 0) ? rollAll() : rollGroup()">
-				<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
-			</a>
+			<hk-roll 
+				tooltip="Roll"
+				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
+			>
+				<a class="btn btn-block">
+					<i class="fas fa-dice-d20"></i> Roll {{ selected.length === 0 ? "all" : "selected"}}
+				</a>
+			</hk-roll>
 		</div>
 	</div>
 </template>
@@ -78,21 +85,22 @@
 				'setSlide',
 				'set_initiative'
 			]),
-			rollMonster(key, entity) {
-				let roll = this.rollD(20, 1, this.calcMod(entity.dexterity));
+			rollMonster(e, key, entity, advantage_disadvantage) {
+				const advantage_object = (advantage_disadvantage) ? advantage_disadvantage : {};
+				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`, false, advantage_object);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
 					initiative: entity.initiative
 				})
 			},
-			rollAll() {
+			rollAll(e) {
 				for (let i in this.npcs) {
-					let key = this.npcs[i].key
-					this.rollMonster(key, this.npcs[i])
+					let key = this.npcs[i].key;
+					this.rollMonster(e.e, key, this.npcs[i], e.advantage_disadvantage);
 				}
 			},
-			rollGroup() {
+			rollGroup(e) {
 				let dex = Infinity
 				let i
 				let key
@@ -106,17 +114,18 @@
 						dex = entity.dexterity;
 					}
 				}
-				let roll = this.rollD(20,1,this.calcMod(dex)).total;
+				const advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
+				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", false, advantage_object).total;
 
 				for(let i in this.selected) {
-					key = this.selected[i]
-					entity = this.npcs[key]
-					entity.initiative = roll
+					key = this.selected[i];
+					entity = this.npcs[key];
+					entity.initiative = roll;
 
 					this.set_initiative({
 						key: entity.key,
 						initiative: entity.initiative
-					})
+					});
 				}
 				this.selected = []
 			},
@@ -155,19 +164,7 @@
 			}
 		}
 	}
-	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .9);
-		overflow: hidden;
-	}
-	.players {
-		grid-area: players;
-	}
-	.npcs {
-		grid-area: npcs;
-	}
-	.set {
-		grid-area: set;
-	}
+
 	ul.entities {
 		padding:0 15px 0 10px;
 
@@ -187,7 +184,19 @@
 				line-height: 44px;
 				text-align: center;
 			}
+			.advantage a:hover {
+				color: #83b547 !important;
+			}
+			.disadvantage a:hover {
+				color: #cc3e4a !important;
+			}
 		}
+	}
+	.advantage .btn:hover {
+		background-color: #83b547;
+	}
+	.disadvantage .btn:hover {
+		background-color: #cc3e4a;
 	}
 }
 .initiative-move {

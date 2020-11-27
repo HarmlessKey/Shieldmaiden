@@ -96,7 +96,7 @@
 		],
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				dmId: this.$route.params.userid,
 				campaignId: this.$route.params.campid,
 				damage_types: [

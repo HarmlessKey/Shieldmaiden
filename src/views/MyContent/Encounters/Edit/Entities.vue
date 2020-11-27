@@ -6,7 +6,7 @@
 		<div class="players bg-gray mb-1" v-if="campaign.players">
 			<div v-for="(player, key) in campaign.players" 
 			:key="key"
-			@click="add(key, 'player', players[key].character_name)" 
+			@click="add($event, key, 'player', players[key].character_name)" 
 		>
 			<div class="d-flex justify-content-left">
 				<template v-if="checkPlayer(key) < 0">
@@ -24,7 +24,7 @@
 			<p>Add players to your campaign first.</p>
 			<router-link :to="'/campaigns/' + campaignId" class="btn btn-block">Go to campaign</router-link>
 		</div>
-		<a v-else class="btn" @click="addAllPlayers()">Add all</a>
+		<a v-else class="btn" @click="addAllPlayers($event)">Add all</a>
 	</div>
 	<p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
 	<hr>
@@ -61,13 +61,13 @@
 				placeholder="1" 
 				v-model="to_add[data.row['.key']]"
 			/>
-			<a @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom)">
+			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add with average HP
 				</q-tooltip>
 			</a>
-			<a @click="multi_add(data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
+			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
 				<i class="fas fa-dice-d20"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add with rolled HP
@@ -107,7 +107,7 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				monsters: undefined,
 				loadingNpcs: true,
 				auto_npcs: [],
@@ -185,16 +185,16 @@
 				'fetchCampaign',
 				'setSlide'
 				]),
-			multi_add(id,type,name,custom=false,rollHp=false) {
+			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
 				}
 				for (let i = 0; i < this.to_add[id]; i++ ) {
-					this.add(id,type,name,custom,rollHp)
+					this.add(e, id,type,name,custom,rollHp)
 				}
 				this.to_add[id] = 1
 			},
-			add( id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
+			add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
 				let entity = {
 					id: id,
 					name: name,
@@ -231,7 +231,7 @@
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(dice[1], dice[0], mod);
+							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
 
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -255,7 +255,7 @@
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(dice[1], dice[0], mod);
+							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
 							
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -271,7 +271,7 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 					const companions = this.players[id].companions;
 					for (let key in companions) {
-						this.add( key, 'companion', this.npcs[key].name , true, false, id )
+						this.add(e, key, 'companion', this.npcs[key].name , true, false, id )
 					}
 				}
 				else if (type == 'companion') {
@@ -298,10 +298,10 @@
 					});
 				}
 			},
-			addAllPlayers() {
+			addAllPlayers(e) {
 				for(let player in this.campaign.players) {
 					let name = this.players[player].character_name;
-					this.add(player, 'player', name)
+					this.add(e, player, 'player', name)
 				}
 			},
 			checkPlayer(id) {

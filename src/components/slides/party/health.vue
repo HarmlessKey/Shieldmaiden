@@ -43,7 +43,7 @@
 	export default {
 		data() {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				tempHp: undefined,
 				maxHpMod: undefined,

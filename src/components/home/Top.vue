@@ -88,13 +88,11 @@
 		},
 		computed: {
 			...mapGetters([
+				'user',
 				'tier',
 				'voucher',
 				'userInfo',
-			]),
-			...mapGetters({
-				user: 'getUser'
-			})
+			])
 		}
 	}
 </script>

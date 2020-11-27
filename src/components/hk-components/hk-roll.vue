@@ -2,7 +2,7 @@
 	<span>
 		<span 
 			class="hk-roll"
-			:class="advantage ? advantage : ''"
+			:class="Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''"
 			@mousemove="checkAdvantage($event)"
 			@mouseout="clearAdvantage()"
 			v-touch-hold.mouse="!disabled ? showDialog : null"
@@ -10,7 +10,7 @@
 		>
 			<slot name="default"/>
 			<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
-				{{ tooltip }} {{ advantage ? `with ${advantage}` : `` }}
+				{{ tooltip }} {{ Object.keys(advantage).length === 1 ? `with ${Object.keys(advantage)[0]}` : `` }}
 			</q-tooltip>
 			<q-popup-proxy no-parent-event ref="rollPopup">
 				<q-list class="bg-gray gray-light" square dark :breakpoint="576">
@@ -65,11 +65,21 @@
 		},
 		data() {
 			return {
-				advantage: undefined,
+				advantageSetter: undefined,
 				rollDialog: false
 			}
 		},
 		computed: {
+			advantage: {
+				get() {
+					let advantage = (this.roll && this.roll.advantage) ? JSON.parse(JSON.stringify(this.roll.advantage)) : {};
+					return (this.advantageSetter) ? this.advantageSetter : advantage;
+				},
+				set(newValue) {
+					let advantage = (this.roll && this.roll.advantage) ? JSON.parse(JSON.stringify(this.roll.advantage)) : newValue;
+					this.advantageSetter = advantage;
+				}
+			},
 			position() {
 				if(this.tooltipPosition === "right") {
 					return {
@@ -98,32 +108,32 @@
 			checkKeyPress(e) {
 				if(e.type === "keydown") {
 					if(e.key === "Shift") {
-						this.advantage = "advantage";
+						this.$set(this.advantage, "advantage", true);
 					} else if(e.key === "Control") {
-						this.advantage = "disadvantage";
+						this.$set(this.advantage, "disadvantage", true);
 					}
 				}
 				if(e.type === "keyup") {
 					if(e.key === "Shift" || e.key === "Control") {
-						this.advantage = undefined;
+						this.advantage = {};
 					}
 				}
 			},
 			checkAdvantage(e) {
 				if(e.shiftKey) {
-					this.advantage = "advantage"
+					this.$set(this.advantage, "advantage", true);
 				} else if(e.ctrlKey) {
-					this.advantage = "disadvantage"
+					this.$set(this.advantage, "disadvantage", true);
 				} 			
 			},
 			clearAdvantage() {
-				this.advantage = undefined;
+				this.advantage = {};
 			},
 			showDialog() {
 				this.$refs.rollPopup.show();
 			},
 			rollDice(e, advantage_disadvantage=undefined) {
-				let advantage_object = (this.roll && this.roll.advantage) ? this.roll.advantage : {};
+				let advantage_object = (this.roll && this.roll.advantage) ? JSON.parse(JSON.stringify(this.roll.advantage)) : {};
 
 				if(advantage_disadvantage) {
 					advantage_object[advantage_disadvantage] = true;

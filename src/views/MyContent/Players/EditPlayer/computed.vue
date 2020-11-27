@@ -74,17 +74,21 @@
 				<div class="initiative" v-if="character.display.initiative">
 					<h6>Initiative</h6>
 					<div class="value">
-						<span class="gray-hover">
-							{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
-							<span
-								:class="{
-									'green': checkAdvantage('initiative').advantage && !checkAdvantage('initiative').disadvantage,
-									'red': checkAdvantage('initiative').disadvantage && !checkAdvantage('initiative').advantage
-								}"
-							>{{ Math.abs(character.display.initiative) }}</span>
-							<q-tooltip anchor="top middle" self="center middle">
-								Roll {{ Object.values(checkAdvantage('initiative')).length === 1 ? `with ${Object.keys(checkAdvantage('initiative'))[0]}` : `` }}
-							</q-tooltip>
+						<hk-roll
+							tooltip="Roll"
+							:roll="{
+								d: 20,
+								n: 1,
+								m: character.display.initiative,
+								title: 'Initiative roll',
+								notify: true,
+								advantage: checkAdvantage('initiative')
+							}"
+						>
+							<span class="gray-hover">
+								{{ character.display.initiative >= 0 ? "+" : "-" }}</span>
+								<span class="int">{{ Math.abs(character.display.initiative) }}</span>
+						</hk-roll>
 					</div>
 				</div>
 			</div>
@@ -351,6 +355,13 @@
 					font-weight: bold;
 					font-family: 'Fredericka the Great', cursive !important;
 					color: #fff;
+
+					.advantage .int {
+						color: #83b547;
+					}
+					.disadvantage .int {
+						color: #cc3e4a;
+					}
 				}
 				.ft {
 					font-size: 15px;

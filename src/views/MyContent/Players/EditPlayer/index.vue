@@ -190,13 +190,13 @@
 			userId() {
 				if(this.$route.name === 'Edit Character') {
 					let id = undefined
-					let user = db.ref(`character_control/${this.$store.getters.getUser.uid}/${this.$route.params.id}`);
+					let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
 					user.on('value' , (snapshot) => {
 						id = snapshot.val().user
 					});
 					return id;
 				} else {
-					return this.$store.getters.getUser.uid;
+					return this.$store.getters.user.uid;
 				}
 			},
 			//Turn modifiers into an array, but save the keys

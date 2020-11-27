@@ -113,7 +113,7 @@
 		],
 		data() {
 			return {
-				userId: this.$store.getters.getUser.uid,
+				userId: this.$store.getters.user.uid,
 				entityKey: this.data,
 				action: 'remove',
 				tab: "premade",

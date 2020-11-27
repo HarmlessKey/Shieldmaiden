@@ -11,10 +11,11 @@ import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
 import Meta from 'vue-meta';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
-import HkTable from './components/hk-components/hk-table'
-import HkCard from './components/hk-components/hk-card'
-import HkCardDeck from './components/hk-components/hk-card-deck'
-import Icon from './components/Icon'
+import HkTable from './components/hk-components/hk-table';
+import HkCard from './components/hk-components/hk-card';
+import HkCardDeck from './components/hk-components/hk-card-deck';
+import HkRoll from './components/hk-components/hk-roll';
+import Icon from './components/Icon';
 import './quasar';
 
 const options = {
@@ -27,6 +28,7 @@ const options = {
 Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
 Vue.component('hk-card-deck', HkCardDeck);
+Vue.component('hk-roll', HkRoll);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})

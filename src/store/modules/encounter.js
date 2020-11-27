@@ -437,34 +437,7 @@ const mutations = {
 		}
 	},
 	SET_ENCOUNTER(state, payload) { state.encounter = payload },
-	SET_TARGETED(state, {longPress, e, key}) {
-		if(e === 'untarget') {
-			if(key === 'all') {
-				state.targeted = [];
-			}
-			else {
-				state.targeted = state.targeted.filter(function(value){
-					return value != key;
-				});
-			}
-		} else {
-			if(longPress || e.shiftKey) {
-				if(!state.targeted.includes(key)) {
-					state.targeted.push(key);
-				} else {
-					state.targeted = state.targeted.filter(function(value){
-						return value != key;
-					});
-				}
-			} else {
-				if(state.targeted.length === 0 || state.targeted != key) {
-					state.targeted = [key];
-				} else {
-					state.targeted = [];
-				}
-			}
-		}
-	},
+	SET_TARGETED(state, payload) { Vue.set(state, "targeted", payload); },
 	SET_TURN(state, {turn, round}) {
 		Vue.set(state.encounter, 'round', round);
 		Vue.set(state.encounter, 'turn', turn);
@@ -811,13 +784,13 @@ const mutations = {
 }
 
 const actions = {
-	async init_Encounter({ commit, rootState }, { cid, eid, demo }) {
+	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
 		commit("SET_DEMO", demo);
-		commit("SET_UID", rootState.content.user.uid);
+		commit("SET_UID", rootGetters.user.uid);
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
 		commit("CLEAR_ENTITIES");
-		const uid = rootState.content.user.uid;
+		const uid = rootGetters.user.uid;
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path);
 
@@ -854,7 +827,42 @@ const actions = {
 	set_meters({ commit }, payload) { commit("SET_METERS", payload) },
 	set_active({ commit }, payload) { commit("SET_ACTIVE", payload) },
 	set_hidden({ commit }, payload) { commit("SET_HIDDEN", payload) },
-	set_targeted({ commit }, payload) { commit('SET_TARGETED', payload); },
+	set_targeted({ state, commit }, {type, key}) {
+		let targeted = state.targeted
+
+		//Untarget
+		if(type === 'untarget') {
+			if(key === 'all') {
+				targeted = [];
+			}
+			else {
+				targeted = state.targeted.filter(function(value){
+					return value !== key;
+				});
+			}
+		}
+
+		//Multitargeting
+		else if(type === "multi") {
+			if(!targeted.includes(key)) {
+				targeted.push(key);
+			} else {
+				targeted = targeted.filter(function(value){
+					return value != key;
+				});
+			}
+		} 
+
+		//Single targeting
+		else {
+			if(targeted.length === 0 || targeted[0] !== key) {
+				targeted = [key];
+			} else {
+				targeted = [];
+			}
+		}
+		commit('SET_TARGETED', targeted);
+	},
 	set_initiative({ commit }, payload) { commit('SET_INITIATIVE', payload) },
 	update_round({ commit, state}) {
 		for (let key in state.entities) {

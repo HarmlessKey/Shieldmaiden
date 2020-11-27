@@ -54,7 +54,7 @@
 			return {
 				is_small: false,
 				showInfo: false,
-				copy: window.origin + '/user/' + this.$store.getters.getUser.uid,
+				copy: window.origin + '/user/' + this.$store.getters.user.uid,
 			}
 		},
 		methods: {

@@ -429,7 +429,6 @@
 								<p class="validate red" 
 									v-if="errors.has('name_'+action.type+index.toString())">
 									{{ errors.first('name_'+action.type+index.toString()) }}
-									Allowed format: "2d6" or "2d6+1d8".
 								</p>
 								<q-input 
 									dark filled square dense
@@ -458,9 +457,13 @@
 									class="mb-2" 
 									v-model="ability.damage_bonus" 
 									:name="`damage_bonus_${action.type}${index}`"
-									v-validate="'numeric'"
+									v-validate="'integer'"
 									placeholder="Damage Bonus"
 								/>
+								<p class="validate red" 
+									v-if="errors.has('damage_bonus_'+action.type+index.toString())">
+									{{ errors.first('damage_bonus_'+action.type+index.toString()) }}
+								</p>
 
 								<q-input 
 									dark filled square dense
@@ -471,9 +474,13 @@
 									class="mb-2" 
 									v-model="ability.attack_bonus" 
 									:name="`attack_bonus_${action.type}${index}`"
-									v-validate="'numeric'"
+									v-validate="'integer'"
 									placeholder="Attack Bonus"
 								/>
+								<p class="validate red" 
+									v-if="errors.has('attack_bonus_'+action.type+index.toString())">
+									{{ errors.first('attack_bonus_'+action.type+index.toString()) }}
+								</p>
 								<q-input
 									dark filled square dense
 									label="Description"
@@ -523,7 +530,7 @@
 		},
 		data() {
 			return {
-				userId: this.$route.params.userid || this.$store.getters.getUser.uid,
+				userId: this.$route.params.userid || this.$store.getters.user.uid,
 				npcId: this.$route.params.id,
 				quick: false,
 				search: '',

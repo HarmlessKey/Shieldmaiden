@@ -194,7 +194,7 @@
 		},
 		data () {
 			return {
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				target: '',
 				tweenedNumber: 0
 			}

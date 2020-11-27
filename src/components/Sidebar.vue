@@ -12,7 +12,7 @@
 				'slideIn': $route.meta.sidebar === false
 			}">
 			<div>
-				<template v-if="$store.getters.getUser">
+				<template v-if="$store.getters.user">
 					<h3>DM Content</h3>
 					<q-list @click="setSideSmallScreen(false)">
 						<q-item clickable v-ripple to="/campaigns">

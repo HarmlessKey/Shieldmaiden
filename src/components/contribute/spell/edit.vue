@@ -129,7 +129,7 @@ export default {
 	},
 	data() {
 		return {
-			userId: this.$store.getters.getUser.uid,
+			userId: this.$store.getters.user.uid,
 			id: this.$route.params.id,
 			loading: true,
 			levels: ["Cantrip",

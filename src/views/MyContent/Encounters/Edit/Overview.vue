@@ -173,7 +173,7 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.getUser,
+				user: this.$store.getters.user,
 				slide: this.$store.getters.getSlide,
 				showOverview: false,
 				encDifficulty: undefined,

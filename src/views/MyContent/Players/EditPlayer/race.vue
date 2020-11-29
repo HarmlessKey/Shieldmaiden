@@ -3,7 +3,7 @@
 		<h3>Race</h3>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square dense
+				dark filled square
 				label="Race" 
 				@change="saveRaceName()"
 				autocomplete="off"  
@@ -14,7 +14,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square dense
+				dark filled square
 				label="Base walking speed" 
 				@change="saveRaceSpeed()"
 				autocomplete="off"  
@@ -25,7 +25,7 @@
 		</div>
 		<div class="form-item mb-3">
 			<q-input
-				dark filled square dense
+				dark filled square
 				type="textarea"
 				label="Race description"
 				@change="saveRaceDescription()"
@@ -164,7 +164,7 @@
 				}
 
 				//Delete trait
-				db.ref(`characters_base/${this.userId}/${this.playerId}/trait/${key}`).remove();
+				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits/${key}`).remove();
 				this.$emit("change", "race.trait_removed");
 			},
 			confirmDelete(key, name) {
@@ -187,7 +187,8 @@
 	h3 {
 		font-family: 'Fredericka the Great', cursive !important;
 		font-size: 25px !important;
-		margin: 40px 0 20px 0 !important;
+		margin: 0 0 20px 0 !important;
+		color: #fff;
 	}
 	.hk-table {
 		margin-bottom: 30px;

@@ -726,15 +726,12 @@
 	}
 	.content {
 		padding: 0 !important;
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-template-rows: 48px 1fr;
-		overflow: hidden;
 		height: calc(100vh - 50px);
 		background: #262626;
 
 		.tabs {
 			background: #191919;
+			width: calc(100% - 48px);
 		}
 		.q-scrollarea {
 			height: 100%;

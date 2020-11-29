@@ -37,7 +37,7 @@ Vue.use(VueCookies);
 Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
-Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
+Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea', '.q-editor__content'] })
 
 
 require('./functions.js')

@@ -176,12 +176,12 @@
 <style lang="scss" scoped>
 	.avatar {
 		display: grid;
-		grid-template-columns: 68px 1fr;
-		grid-column-gap: 15px;
+		grid-template-columns: 56px 1fr;
+		grid-column-gap: 10px;
 
 		.image {
-			width: 68px;
-			height: 68px;
+			width: 55px;
+			height: 55px;
 			border: solid 1px #5c5757;
 			background-position: center top;
 			background-repeat: no-repeat;
@@ -191,6 +191,7 @@
 	h3 {
 		font-family: 'Fredericka the Great', cursive !important;
 		font-size: 25px !important;
-		margin: 40px 0 20px 0 !important;
+		margin: 0 0 20px 0 !important;
+		color: #fff;
 	}
 </style>

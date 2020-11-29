@@ -1663,16 +1663,21 @@ html body {
 		}
 	}
 
-	.q-tabs--dense {
-		.q-tab {
-			min-height: 35px;
+	.q-tabs {
+		&--dense {
+			.q-tab {
+				min-height: 35px;
 
-			&__icon {
-				font-size: 15px;
+				&__icon {
+					font-size: 15px;
+				}
+			}
+			.q-tabs__arrow {
+				line-height: 35px;
 			}
 		}
 		.q-tabs__arrow {
-			line-height: 35px;
+			line-height: 48px;
 			font-size: 30px;
 			text-shadow: 0px 0px 3px #000;
 			color: #fff;

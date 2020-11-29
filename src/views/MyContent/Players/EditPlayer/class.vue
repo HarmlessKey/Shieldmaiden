@@ -440,28 +440,64 @@
 													/>
 												</div>
 
-												<label :for="`${classKey}-${level}-description`">
-													<a @click="setSlide({show: true, type: 'slides/characterBuilder/Descriptions'})">
-														<i class="fas fa-info-circle"/>
-													</a>
+												<div :for="`${classKey}-${level}-description`" class="mb-2">
 													Description
-													<a v-if="edit_feature_description === key" @click="editFeature(classKey, level, key, 'description'), edit_feature_description = undefined"><i class="fas fa-check green"/></a>
-													<a v-else @click="edit_feature_description = key"><i class="fas fa-pencil-alt"/></a>
-												</label>
-												<q-input
-													dark filled square
-													v-if="edit_feature_description === key"
-													:value="subclass.features[`level_${level}`][key].description"
-													:id="`${classKey}-${level}-description`"
+												</div>
+												<q-editor
+													square dark
+													:toolbar="[
+        										['bold', 'italic', 'underline'],
+														['unordered', 'ordered'],
+														['character', 'class'],
+														['preview']
+													]"
+													:ref="`description-${classKey}-${level}-${key}`"
+													@paste.native="evt => pasteCapture(evt, classKey, level, key)"
 													name="description"
-													label="Description"
+													v-model="subclass.features[`level_${level}`][key].description"
 													v-validate="'max:5000'"
 													maxlength="5001"
 													data-vv-as="Description"
-													autogrow
-												/>
-												<vue-markdown v-else name="description_preview" :source="replaceDescriptionStats(feature.description, computed.sheet ? computed.sheet.classes[classKey] : undefined)"></vue-markdown>
-																
+													@blur="editFeature(classKey, level, key, 'description')"
+												>
+													<template v-slot:character>
+														<q-btn-dropdown
+															square dark dense no-caps
+															:ref="`character-${classKey}-${level}-${key}`"
+															no-wrap
+															unelevated
+															label="Character stats"
+															size="sm"
+														>
+															<div class="bg-gray gray-light">
+																<q-list dense dark square>
+																	<template v-for="(stat_group, groupKey) in character_stats" >
+																		<q-item :key="`character-group-${classKey}-${level}-${key}-${groupKey}`">
+																			<span class="text-weight-bold text-white mt-2">{{ groupKey }}</span>
+																		</q-item>
+																	
+																		<q-item 
+																			v-for="({stat, ref}, statKey) in stat_group"
+																			:key="`character-stat-${classKey}-${level}-${key}-${groupKey}-${statKey}`"
+																			tag="label" 
+																			clickable @click="addStat('character', ref, classKey, level, key)"
+																		>
+																			<q-item-section class="pl-3">{{ stat }}</q-item-section>
+																		</q-item>
+																	</template>
+																</q-list>
+															</div>
+														</q-btn-dropdown>
+													</template>
+													<template v-slot:preview>
+														<q-btn icon="fas fa-eye" size="sm" flat round padding="xs" @click="descriptionPreview(feature, classKey)">
+															<q-tooltip anchor="top middle" self="center middle">
+																Preview
+															</q-tooltip>
+														</q-btn>
+													</template>
+												</q-editor>
+
 												<!-- Modifiers -->
 												<Modifier-table 
 													:modifiers="feature_modifiers(classKey, level, key)" 
@@ -579,6 +615,13 @@
 				</div>
 			</hk-card>
 		</q-dialog>
+
+			<!-- SPELLS KNOWN MODAL -->
+			<q-dialog v-model="description_dialog" v-if="description_dialog">
+				<hk-card :header="feature_preview.feature.name">
+					<div v-html="replaceDescriptionStats(feature_preview.feature.description, computed.sheet ? computed.sheet.classes[feature_preview.classKey] : undefined)" />
+				</hk-card>
+			</q-dialog>
 	</div>
 </template>
 
@@ -631,6 +674,8 @@
 				roll_hp_modal: false,
 				experience_modal: false,
 				spells_known_modal: false,
+				feature_preview: {},
+				description_dialog: false,
 				featureModInfo: "<p>These modifiers only apply to your character if it meets the level requirement for this class.</p>",
 				armor_types: [
 					{ value: "light", label: "Light armor" },
@@ -655,27 +700,83 @@
 				showClass: 0,
 				xp: undefined,
 				edit_feature_description: undefined,
-				columns: {
-					name: {
-						label: 'Name',
-						truncate: true,
-						sortable: true,
-					},
-					target: {
-						label: 'Target',
-					},
-					type: {
-						label: 'Type',
-					},
-					value: {
-						label: 'Value',
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
-					}
+				character_stats: {
+					'General': [
+						{
+							stat: "Proficiency bonus",
+							ref: "[proficiency]"
+						},
+						{
+							stat: "Character level",
+							ref: "[character_level]"
+						}
+					],
+					'Class': [
+						{
+							stat: "Class level",
+							ref: "[class_level]"
+						},
+						{
+							stat: "Spell attack modifier",
+							ref: "[spell_attack]"
+						},
+						{
+							stat: "Spell save DC",
+							ref: "[spell_save_dc]"
+						}
+					],
+					'Ability scores': [
+						{
+							stat: "Strength",
+							ref: "[str]"
+						},
+						{
+							stat: "Dexterity",
+							ref: "[dex]"
+						},
+						{
+							stat: "Constitution",
+							ref: "[con]"
+						},
+						{
+							stat: "Intelligence",
+							ref: "[int]"
+						},
+						{
+							stat: "Wisdom",
+							ref: "[wis]"
+						},
+						{
+							stat: "Charisma",
+							ref: "[cha]"
+						},
+					],
+					'Ability modifiers': [
+						{
+							stat: "Strength modifier",
+							ref: "[str_mod]"
+						},
+						{
+							stat: "Dexterity modifier",
+							ref: "[dex_mod]"
+						},
+						{
+							stat: "Constitution modifier",
+							ref: "[con_mod]"
+						},
+						{
+							stat: "Intelligence modifier",
+							ref: "[int_mod]"
+						},
+						{
+							stat: "Wisdom modifier",
+							ref: "[wis_mod]"
+						},
+						{
+							stat: "Charisma mod",
+							ref: "[cha_mod]"
+						},
+					]
 				}
 			}
 		},
@@ -1086,6 +1187,48 @@
 
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes`).push(newClass);
 				this.$emit("change", "class.added_class");
+			},
+
+			//Prevent pasting of text with markup
+			pasteCapture (evt, classKey, level) {
+				const description_ref = `description-${classKey}-${level}`
+
+				let text, onPasteStripFormattingIEPaste
+				evt.preventDefault()
+				if (evt.originalEvent && evt.originalEvent.clipboardData.getData) {
+					text = evt.originalEvent.clipboardData.getData('text/plain')
+					this.$refs[description_ref].runCmd('insertText', text)
+				}
+				else if (evt.clipboardData && evt.clipboardData.getData) {
+					text = evt.clipboardData.getData('text/plain')
+					this.$refs[description_ref].runCmd('insertText', text)
+				}
+				else if (window.clipboardData && window.clipboardData.getData) {
+					if (!onPasteStripFormattingIEPaste) {
+						onPasteStripFormattingIEPaste = true
+						this.$refs[description_ref].runCmd('ms-pasteTextOnly', text)
+					}
+					onPasteStripFormattingIEPaste = false
+				}
+			},
+
+			//Add a stat to a feature description
+			addStat(type, name, classKey, level, key) {
+				const description_ref = `description-${classKey}-${level}-${key}`;
+				const menu_ref = `${type}-${classKey}-${level}-${key}`;
+
+				const edit = this.$refs[description_ref][0];
+
+				this.$refs[menu_ref][0].hide();
+				edit.caret.restore();
+				edit.runCmd('insertHTML', `${name}`)
+				edit.focus()
+			},
+
+			descriptionPreview(feature, classKey) {
+				this.feature_preview.feature = feature;
+				this.feature_preview.classKey = classKey;
+				this.description_dialog = true;
 			}
 		}
 	}

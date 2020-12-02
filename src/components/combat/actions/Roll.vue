@@ -19,7 +19,7 @@
 				</b>
 			</p>
 
-			<template v-if="current.actions">
+			<template v-if="['npc', 'environment'].includes(current.entityType)">
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
 					<div class="d-flex justify-content-between">
@@ -132,59 +132,60 @@
 				</p>
 
 				<!-- ACTIONS -->
-				<h3 class="mt-3">Actions</h3>
-				<ul class="roll">
-					<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
-						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light" @click="setShow('action', index)">
-								<span>{{ action.name }}</span>
-								<i class="fas fa-caret-down"></i>
-							</a>
-							<hk-roll 
-								:tooltip="`Roll ${action.name}`" 
-								tooltipPosition="right"
-								@roll="groupRoll($event, action)"
-							>
-								<button v-if="action['damage_dice']" class="btn btn-sm">
-									<i class="fas fa-dice-d20"></i>
-									<span class="d-none d-md-inline ml-1">Roll</span>
-								</button>
-							</hk-roll>
-						</span>
-						<q-slide-transition>
-							<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
-						</q-slide-transition>
-					</li>
-				</ul>
-			</template>
+				<template v-if="current.actions">
+					<h3 class="mt-3">Actions</h3>
+					<ul class="roll">
+						<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
+							<span class="d-flex justify-content-between">
+								<a class="d-flex justify-content-between gray-light" @click="setShow('action', index)">
+									<span>{{ action.name }}</span>
+									<i class="fas fa-caret-down"></i>
+								</a>
+								<hk-roll 
+									:tooltip="`Roll ${action.name}`" 
+									tooltipPosition="right"
+									@roll="groupRoll($event, action)"
+								>
+									<button v-if="action['damage_dice']" class="btn btn-sm">
+										<i class="fas fa-dice-d20"></i>
+										<span class="d-none d-md-inline ml-1">Roll</span>
+									</button>
+								</hk-roll>
+							</span>
+							<q-slide-transition>
+								<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
+							</q-slide-transition>
+						</li>
+					</ul>
+				</template>
 
-			<!-- LEGENDARY ACTIONS -->
-			<template v-if="current.legendary_actions">
-				<h3>Legendary Actions</h3>
-				<ul class="roll">
-					<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
-						<span class="d-flex justify-content-between">
-							<a class="d-flex justify-content-between gray-light" @click="setShow('legendary', index)">
-								<span>{{ action.name }}</span>
-								<i class="fas fa-caret-down"></i>
-							</a>
-							<hk-roll 
-								:tooltip="`Roll ${action.name}`" 
-								tooltipPosition="right"
-								@roll="groupRoll($event, action)"
-							>
-								<button v-if="action['damage_dice']" class="btn btn-sm">
-									<i class="fas fa-dice-d20"></i>
-									<span class="d-none d-md-inline ml-1">Roll</span>
-								</button>
-							</hk-roll>
-						</span>
-						<q-slide-transition>
-							<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
-						</q-slide-transition>
-					</li>
-				</ul>
-
+				<!-- LEGENDARY ACTIONS -->
+				<template v-if="current.legendary_actions">
+					<h3>Legendary Actions</h3>
+					<ul class="roll">
+						<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
+							<span class="d-flex justify-content-between">
+								<a class="d-flex justify-content-between gray-light" @click="setShow('legendary', index)">
+									<span>{{ action.name }}</span>
+									<i class="fas fa-caret-down"></i>
+								</a>
+								<hk-roll 
+									:tooltip="`Roll ${action.name}`" 
+									tooltipPosition="right"
+									@roll="groupRoll($event, action)"
+								>
+									<button v-if="action['damage_dice']" class="btn btn-sm">
+										<i class="fas fa-dice-d20"></i>
+										<span class="d-none d-md-inline ml-1">Roll</span>
+									</button>
+								</hk-roll>
+							</span>
+							<q-slide-transition>
+								<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
+							</q-slide-transition>
+						</li>
+					</ul>
+				</template>	
 			</template>
 		</template>
 		<p v-else-if="current.entityType === 'player'">

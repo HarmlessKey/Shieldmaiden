@@ -34,11 +34,7 @@
 				target: this.data,
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
-				encounterId: this.$route.params.encid,
-				environment: {
-					key: "environment",
-					name: "Environment"
-				},
+				encounterId: this.$route.params.encid
 			}
 		},
 		computed: {

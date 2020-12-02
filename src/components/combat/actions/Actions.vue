@@ -14,17 +14,17 @@
 						<q-item-section avatar>
 							<icon 
 								class="img" 
-								v-if="['monster', 'player', 'companion'].includes(entities[doneBy].img)" 
-								:icon="entities[doneBy].img" 
-								:fill="entities[doneBy].color_label" 
-								:style="entities[doneBy].color_label ? `border-color: ${entities[doneBy].color_label}` : ``" 
+								v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" 
+								:icon="entitiesList[doneBy].img" 
+								:fill="entitiesList[doneBy].color_label" 
+								:style="entitiesList[doneBy].color_label ? `border-color: ${entitiesList[doneBy].color_label}` : ``" 
 							/>
 							<span 
 								v-else 
 								class="img" 
 								:style="{
-									'background-image': 'url(' + entities[doneBy].img + ')',
-									'border-color': entities[doneBy].color_label ? entities[doneBy].color_label : ``
+									'background-image': 'url(' + entitiesList[doneBy].img + ')',
+									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
 								}
 							"/>
 						</q-item-section>
@@ -45,7 +45,7 @@
 						@click="doneBy = scope.opt.key"
 					>
 						<q-item-section avatar>
-							<icon v-if="['monster', 'player', 'companion'].includes(scope.opt.img)" class="img" :icon="scope.opt.img" :fill="scope.opt.color_label" :style="scope.opt.color_label ? `border-color: ${scope.opt.color_label}` : ``" />
+							<icon v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" class="img" :icon="scope.opt.img" :fill="scope.opt.color_label" :style="scope.opt.color_label ? `border-color: ${scope.opt.color_label}` : ``" />
 							<span 
 								v-else 
 								class="img" 
@@ -83,10 +83,10 @@
 
 			<q-tab-panels v-model="tab" class="bg-transparent">
 					<q-tab-panel name="manual">
-						<Manual :current="entities[doneBy]" :targeted="targeted" />
+						<Manual :current="entitiesList[doneBy]" :targeted="targeted" />
 					</q-tab-panel>
 					<q-tab-panel name="roll">
-						<Roll :current="entities[doneBy]" />
+						<Roll :current="entitiesList[doneBy]" />
 					</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -133,13 +133,29 @@
 				'targeted',
 			]),
 			_active: function() {
-				return _.chain(this.entities)
+				let active = _.chain(this.entities)
 				.filter(function(entity, key) {
 					entity.key = key
 					return !entity.down;
 				})
 				.sortBy('name' , 'asc')
-				.value()
+				.value();
+				active.unshift({
+					key: "environment",
+					name: "Environment",
+					img: "environment"
+				});
+				return active;
+			},
+			entitiesList() {
+				let list = this.entities;
+				list.environment = {
+					key: "environment",
+					name: "Environment",
+					img: "environment",
+					entityType: "environment"
+				};
+				return list;
 			},
 			doneBy: {
 				get() {

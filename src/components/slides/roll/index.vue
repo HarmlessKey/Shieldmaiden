@@ -4,7 +4,6 @@
 			v-model="tab"
 			dark
 			inline-label
-			dense
 			no-caps
 		>
 			<q-tab 
@@ -63,4 +62,7 @@
 </script>
 
 <style lang="scss" scoped>
+	.q-tab-panel {
+		padding: 16px 0;
+	}
 </style>

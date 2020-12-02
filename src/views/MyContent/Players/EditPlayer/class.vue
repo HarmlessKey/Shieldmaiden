@@ -773,7 +773,7 @@
 							ref: "[wis_mod]"
 						},
 						{
-							stat: "Charisma mod",
+							stat: "Charisma modifier",
 							ref: "[cha_mod]"
 						},
 					]

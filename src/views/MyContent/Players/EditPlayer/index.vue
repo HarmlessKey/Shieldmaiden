@@ -726,8 +726,7 @@
 	}
 	.content {
 		padding: 0 !important;
-		height: calc(100vh - 50px);
-		background: #262626;
+		height: calc(100vh - 98px);
 
 		.tabs {
 			background: #191919;

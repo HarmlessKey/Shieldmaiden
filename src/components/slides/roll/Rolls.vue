@@ -78,6 +78,7 @@
 	ul.rolls {
 		padding: 0;
 		list-style: none;
+		margin: 0;
 
 		li {
 			border-bottom: solid 1px #5c5757;

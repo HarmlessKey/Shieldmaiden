@@ -16,15 +16,17 @@
 			<q-input dark filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input dark filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>
 			
-			<hk-roll v-if="die == 20 && item.n == 1"
+			<hk-roll 
+				tooltip="1d20 roll"
+				v-if="die == 20 && item.n == 1"
 				@roll="roll($event, parseInt(die), item)"
 			>
-				<button class="btn"">
+				<button class="btn">
 					<i :class="item.icon"></i>
 				</button>
 			</hk-roll>
 
-			<button v-else class="btn" @click="roll($event, parseInt(die), item)"><i :class="item.icon"></i></button>
+			<button v-else class="btn" @click="roll($event, die, item)"><i :class="item.icon"></i></button>
 			
 			<span class="blue">{{ item.result }}</span>
 		</div>
@@ -78,7 +80,7 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(e, die, item.n, item.mod, `${item.n}d${die} roll`, true);
+				let roll = this.rollD(e, parseInt(die), item.n, item.mod, `${item.n}d${die} roll`, true);
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20

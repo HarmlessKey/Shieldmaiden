@@ -1,5 +1,5 @@
 <template>
-	<div class="hk-card">
+	<div class="hk-card" @click="emit">
 		<slot name="image"/>
 		<slot name="header" class="card-header">
 			<div v-if="header" class="card-header">
@@ -30,6 +30,11 @@
 			footer: {
 				type: String,
 				deafault: undefined
+			}
+		},
+		methods: {
+			emit() {
+				this.$emit('click');
 			}
 		}
 	}

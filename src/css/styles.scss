@@ -798,7 +798,7 @@ html body {
 	/* ACCORDION */
 	.accordion {
 		.q-item {
-			background-color: $gray-dark;
+			background-color: $gray;
 			margin-bottom: 1px;
 
 			&__section--avatar {
@@ -808,6 +808,12 @@ html body {
 		.accordion-body {
 			background-color: $gray-darker;
 			padding: 20px;
+
+			.hk-table {
+				.hk-table-column {
+					background-color: $gray-dark;
+				}
+			}
 		}
 	}
 	
@@ -843,6 +849,7 @@ html body {
 			border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 		}
 		.card-body {
+			flex: 1 1 auto;
 			min-height: 1px;
 			padding: 1.25rem;
 			
@@ -854,9 +861,16 @@ html body {
 			padding: 0.75rem 1.25rem;
 			background-color: rgba(0, 0, 0, 0.03);
 			border-top: 1px solid rgba(0, 0, 0, 0.125);
+			align-self: bottom;
 		}
 		.card-image {
 			width: 100%;
+		}
+
+		.accordion {
+			.q-item {
+				background-color: $gray-dark;
+			}
 		}
 	}
 
@@ -882,7 +896,7 @@ html body {
 			background: $gray;
 
 			&.hk-table-header {
-				background: none;
+				background: none !important;
 				padding: 5px 12px !important;
 				font-weight: bold;
 			}

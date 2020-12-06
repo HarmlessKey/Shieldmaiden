@@ -35,9 +35,11 @@
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" 
-						:to="'/players/' + data.row.key" 
-						v-b-tooltip.hover title="Edit">{{ data.row.display.character_name }}
+					<router-link class="mx-2" :to="'/players/' + data.row.key">
+						{{ data.row.display.character_name }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Edit
+						</q-tooltip>
 					</router-link>
 				</template>
 

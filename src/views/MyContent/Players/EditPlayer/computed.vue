@@ -167,7 +167,7 @@
 				</div>
 			</template>
 
-			<div v-if="character.sheet.senses">
+			<div v-if="character.sheet && character.sheet.senses">
 				<h4>Senses</h4>
 				<ul class="list">
 					<li v-for="(sense, key) in character.sheet.senses" :key="key">
@@ -188,9 +188,9 @@
 				</ul>
 			</div>
 
-			<pre>
+			<!-- <pre>
 				{{ character }}
-			</pre>
+			</pre> -->
 		</div>
 		<div class="toggle bg-gray-dark" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
 			<i v-if="!showOverview" class="fal fa-file-spreadsheet"></i>

@@ -338,178 +338,180 @@
 										Level {{ level }}
 										<a @click="addFeature(classKey, level)">Add feature</a>
 									</h4>
-									<q-expansion-item
-										v-for="(feature, key, index) in subclass.features[`level_${level}`]"
-										:key="`feature-${key}`"
-										dark switch-toggle-side
-										:group="`features-${classKey}-${level}`"
-									>
-										<template v-slot:header>
-											<q-item-section avatar>
-												<q-icon size="xs" :name="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'">
-													<q-tooltip anchor="top middle" self="center middle">
-														{{ subclass.features[`level_${level}`][key].display ? "Displayed on Sheet" : "Hidden on Sheet" }}
-													</q-tooltip>
-												</q-icon>
-											</q-item-section>
-											<q-item-section>
-												{{ 
-													key === "--asi" 
-														? `${subclass.features[`level_${level}`][key].type === 'asi' 
-															? `Ability Score Increase` 
-															: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
-														: feature.name 
-												}}
-											</q-item-section>
-											<q-item-section avatar>
-												<div class="actions">
-													<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
-													<a 
-														class="gray-light" 
-														v-if="key !== '--asi'" 
-														@click="confirmDeleteFeature(classKey, level, key, feature.name)"
-													>
-														<i class="fas fa-trash-alt"/>
-													</a>
-												</div>
-											</q-item-section>
-										</template>
-
-										<div class="accordion-body">
-											<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
-											<template  v-if="key === '--asi'">
-												<p>
-													When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-													You can’t increase an ability score above 20. (phb 15)
-												</p>
-												<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
-
-												<q-select
-													dark filled square dense
-													class="mb-3"
-													placeholder="ASI or Feat"
-													emit-value
-													map-options
-													:options="[
-														{ value: 'asi', label: 'Abilitiy Score Increase' }, 
-														{ value: 'feat', label: 'Feat' }
-													]"
-													@input="saveFeatureType(classKey, level, $event)"
-													:value="subclass.features[`level_${level}`][key].type"
-												/>
+									<template v-if="subclass.features">
+										<q-expansion-item
+											v-for="(feature, key, index) in subclass.features[`level_${level}`]"
+											:key="`feature-${key}`"
+											dark switch-toggle-side
+											:group="`features-${classKey}-${level}`"
+										>
+											<template v-slot:header>
+												<q-item-section avatar>
+													<q-icon size="xs" :name="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'">
+														<q-tooltip anchor="top middle" self="center middle">
+															{{ subclass.features[`level_${level}`][key].display ? "Displayed on Sheet" : "Hidden on Sheet" }}
+														</q-tooltip>
+													</q-icon>
+												</q-item-section>
+												<q-item-section>
+													{{ 
+														key === "--asi" 
+															? `${subclass.features[`level_${level}`][key].type === 'asi' 
+																? `Ability Score Increase` 
+																: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
+															: feature.name 
+													}}
+												</q-item-section>
+												<q-item-section avatar>
+													<div class="actions">
+														<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
+														<a 
+															class="gray-light" 
+															v-if="key !== '--asi'" 
+															@click="confirmDeleteFeature(classKey, level, key, feature.name)"
+														>
+															<i class="fas fa-trash-alt"/>
+														</a>
+													</div>
+												</q-item-section>
 											</template>
 
-											<!-- ASI -->	
-											<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
-												<p>Choose 2 abilities to increase with 1 point</p>
-												<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
+											<div class="accordion-body">
+												<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
+												<template  v-if="key === '--asi'">
+													<p>
+														When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
+														You can’t increase an ability score above 20. (phb 15)
+													</p>
+													<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
+
 													<q-select
-														dark filled square
-														:label="`Ability ${i}`"
-														:options="abilities"
+														dark filled square dense
+														class="mb-3"
+														placeholder="ASI or Feat"
 														emit-value
 														map-options
-														v-model="asi_modifier(classKey, level, key, i).subtarget"
-														name="asi"
-														@input="saveASI($event, classKey, level, key, i)"
+														:options="[
+															{ value: 'asi', label: 'Abilitiy Score Increase' }, 
+															{ value: 'feat', label: 'Feat' }
+														]"
+														@input="saveFeatureType(classKey, level, $event)"
+														:value="subclass.features[`level_${level}`][key].type"
 													/>
+												</template>
+
+												<!-- ASI -->	
+												<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
+													<p>Choose 2 abilities to increase with 1 point</p>
+													<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
+														<q-select
+															dark filled square
+															:label="`Ability ${i}`"
+															:options="abilities"
+															emit-value
+															map-options
+															v-model="asi_modifier(classKey, level, key, i).subtarget"
+															name="asi"
+															@input="saveASI($event, classKey, level, key, i)"
+														/>
+													</div>
 												</div>
+
+												<!-- CUSTOM FEATURE -->
+												<template v-else>
+													<div class="form-item mb-3">
+														<q-checkbox 
+															dark 
+															:value="subclass.features[`level_${level}`][key].display"
+															label="Display on character sheet" 
+															:false-value="null" 
+															indeterminate-value="something-else" 
+															@input="editFeature(classKey, level, key, 'display')"
+														/>
+													</div>
+													<div class="form-item mb-3">
+														<q-input 
+															dark filled square dense
+															@change="editFeature(classKey, level, key, 'name')"
+															autocomplete="off"  
+															:id="`name-${level}-${index}`" 
+															type="text" 
+															:value="subclass.features[`level_${level}`][key].name" 
+															:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"
+														/>
+													</div>
+
+													<div :for="`${classKey}-${level}-description`" class="mb-2">
+														Description
+													</div>
+													<q-editor
+														square dark
+														:toolbar="[
+															['bold', 'italic', 'underline'],
+															['unordered', 'ordered'],
+															['character', 'class'],
+															['preview']
+														]"
+														:ref="`description-${classKey}-${level}-${key}`"
+														@paste.native="evt => pasteCapture(evt, classKey, level, key)"
+														name="description"
+														v-model="subclass.features[`level_${level}`][key].description"
+														v-validate="'max:5000'"
+														maxlength="5001"
+														data-vv-as="Description"
+														@blur="editFeature(classKey, level, key, 'description')"
+													>
+														<template v-slot:character>
+															<q-btn-dropdown
+																square dark dense no-caps
+																:ref="`character-${classKey}-${level}-${key}`"
+																no-wrap
+																unelevated
+																label="Character stats"
+																size="sm"
+															>
+																<div class="bg-gray gray-light">
+																	<q-list dense dark square>
+																		<template v-for="(stat_group, groupKey) in character_stats" >
+																			<q-item :key="`character-group-${classKey}-${level}-${key}-${groupKey}`">
+																				<span class="text-weight-bold text-white mt-2">{{ groupKey }}</span>
+																			</q-item>
+																		
+																			<q-item 
+																				v-for="({stat, ref}, statKey) in stat_group"
+																				:key="`character-stat-${classKey}-${level}-${key}-${groupKey}-${statKey}`"
+																				tag="label" 
+																				clickable @click="addStat('character', ref, classKey, level, key)"
+																			>
+																				<q-item-section class="pl-3">{{ stat }}</q-item-section>
+																			</q-item>
+																		</template>
+																	</q-list>
+																</div>
+															</q-btn-dropdown>
+														</template>
+														<template v-slot:preview>
+															<q-btn icon="fas fa-eye" size="sm" flat round padding="xs" @click="descriptionPreview(feature, classKey)">
+																<q-tooltip anchor="top middle" self="center middle">
+																	Preview
+																</q-tooltip>
+															</q-btn>
+														</template>
+													</q-editor>
+
+													<!-- Modifiers -->
+													<Modifier-table 
+														:modifiers="feature_modifiers(classKey, level, key)" 
+														:origin="`race.trait.${key}`"
+														:userId="userId"
+														:playerId="playerId"
+														:info="featureModInfo"
+														@edit="editModifier"
+													/>
+												</template>
 											</div>
-
-											<!-- CUSTOM FEATURE -->
-											<template v-else>
-												<div class="form-item mb-3">
-													<q-checkbox 
-														dark 
-														:value="subclass.features[`level_${level}`][key].display"
-														label="Display on character sheet" 
-														:false-value="null" 
-														indeterminate-value="something-else" 
-														@input="editFeature(classKey, level, key, 'display')"
-													/>
-												</div>
-												<div class="form-item mb-3">
-													<q-input 
-														dark filled square dense
-														@change="editFeature(classKey, level, key, 'name')"
-														autocomplete="off"  
-														:id="`name-${level}-${index}`" 
-														type="text" 
-														:value="subclass.features[`level_${level}`][key].name" 
-														:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"
-													/>
-												</div>
-
-												<div :for="`${classKey}-${level}-description`" class="mb-2">
-													Description
-												</div>
-												<q-editor
-													square dark
-													:toolbar="[
-        										['bold', 'italic', 'underline'],
-														['unordered', 'ordered'],
-														['character', 'class'],
-														['preview']
-													]"
-													:ref="`description-${classKey}-${level}-${key}`"
-													@paste.native="evt => pasteCapture(evt, classKey, level, key)"
-													name="description"
-													v-model="subclass.features[`level_${level}`][key].description"
-													v-validate="'max:5000'"
-													maxlength="5001"
-													data-vv-as="Description"
-													@blur="editFeature(classKey, level, key, 'description')"
-												>
-													<template v-slot:character>
-														<q-btn-dropdown
-															square dark dense no-caps
-															:ref="`character-${classKey}-${level}-${key}`"
-															no-wrap
-															unelevated
-															label="Character stats"
-															size="sm"
-														>
-															<div class="bg-gray gray-light">
-																<q-list dense dark square>
-																	<template v-for="(stat_group, groupKey) in character_stats" >
-																		<q-item :key="`character-group-${classKey}-${level}-${key}-${groupKey}`">
-																			<span class="text-weight-bold text-white mt-2">{{ groupKey }}</span>
-																		</q-item>
-																	
-																		<q-item 
-																			v-for="({stat, ref}, statKey) in stat_group"
-																			:key="`character-stat-${classKey}-${level}-${key}-${groupKey}-${statKey}`"
-																			tag="label" 
-																			clickable @click="addStat('character', ref, classKey, level, key)"
-																		>
-																			<q-item-section class="pl-3">{{ stat }}</q-item-section>
-																		</q-item>
-																	</template>
-																</q-list>
-															</div>
-														</q-btn-dropdown>
-													</template>
-													<template v-slot:preview>
-														<q-btn icon="fas fa-eye" size="sm" flat round padding="xs" @click="descriptionPreview(feature, classKey)">
-															<q-tooltip anchor="top middle" self="center middle">
-																Preview
-															</q-tooltip>
-														</q-btn>
-													</template>
-												</q-editor>
-
-												<!-- Modifiers -->
-												<Modifier-table 
-													:modifiers="feature_modifiers(classKey, level, key)" 
-													:origin="`race.trait.${key}`"
-													:userId="userId"
-													:playerId="playerId"
-													:info="featureModInfo"
-													@edit="editModifier"
-												/>
-											</template>
-										</div>
-									</q-expansion-item>
+										</q-expansion-item>
+									</template>
 								</template>
 							</q-list>
 						</template>

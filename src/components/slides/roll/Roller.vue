@@ -19,7 +19,7 @@
 			<hk-roll 
 				tooltip="1d20 roll"
 				v-if="die == 20 && item.n == 1"
-				@roll="roll($event, parseInt(die), item)"
+				@roll="roll($event, die, item)"
 			>
 				<button class="btn">
 					<i :class="item.icon"></i>
@@ -66,9 +66,11 @@
 		},
 		methods: {
 			roll(e, d, item) {
+				let advantage = {};
 				// Check if e is wrapped in other e
 				if ('e' in e) {
-					e = e.e
+					advantage = e.advantage_disadvantage;
+					e = e.e;
 				}
 
 				item.n = (item.n > 999) ? 999 : item.n;
@@ -80,7 +82,7 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(e, parseInt(die), item.n, item.mod, `${item.n}d${die} roll`, true);
+				let roll = this.rollD(e, parseInt(die), item.n, item.mod, `${item.n}d${die} roll`, true, advantage);
 				item.result = roll.total;
 
 				//Show Natural 1 or Natural 20

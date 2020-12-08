@@ -42,7 +42,11 @@ export const trackEncounter = {
 			if(encounterImg) {
 				var img = encounterImg;
 			} else {
-				if(entity.id) {
+				if(!entity.entityType) {
+					let playerImg = player.avatar;
+					img = playerImg || 'player';
+				}
+				else if(entity.id) {
 					if(entity.entityType == 'player') {
 						let playerImg = player.avatar;
 						img = playerImg || 'player';
@@ -65,7 +69,7 @@ export const trackEncounter = {
 					img = 'monster';
 				}
 			}
-			return img
+			return img;
 		},
 		displayNPCField(field, entity) {
 			const defaults = {name: true, health: false, ac: false};

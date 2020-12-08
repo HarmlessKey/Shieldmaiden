@@ -25,12 +25,12 @@
 						<template>
 							<li v-for="entity in _meters[type]" class="health" :key="entity.key">
 								<icon 
-									v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img" 
-									:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
+									v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.key], npcs[entity.key]))" class="img" 
+									:icon="displayImg(entity, players[entity.key], npcs[entity.key])" 
 									:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
 								/>
 								<div v-else class="img" :style="{ 
-									backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.id], npcs[entity.id]) + '\')',
+									backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.key], npcs[entity.key]) + '\')',
 									borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
 								}"/>
 								<q-linear-progress 
@@ -158,38 +158,6 @@
 			},
 		},
 		methods: {
-			img(entity) {
-				var img = '';
-
-				//In campaign overview image is obtained different
-				if(this.campaign) {
-					let playerImg = this.players[entity.key].avatar;
-					img = (playerImg) ? playerImg : require('@/assets/_img/styles/player.svg');
-				}
-
-				//Encounter overview image
-				else if(entity.id) {
-					if(entity.entityType == 'player') {
-						let playerImg = this.players[entity.id].avatar;
-						img = (playerImg) ? playerImg : require('@/assets/_img/styles/player.svg');
-					}
-					if(entity.entityType == 'npc') {
-						if(entity.npc == 'custom') {
-							let npcImg = this.npcs[entity.id].avatar;
-							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-						}
-						else {
-							let npcImg = entity.avatar;
-
-							img = (npcImg) ? npcImg : require('@/assets/_img/styles/monster.svg');
-						}
-					}
-				}
-				else {
-					img = require('@/assets/_img/styles/monster.svg');
-				}
-				return img
-			},
 			percentageMeters(input, type, subtype) {
 				//Highest = 100%
 				//lower is percentage of highest

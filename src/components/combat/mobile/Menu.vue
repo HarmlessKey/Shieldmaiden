@@ -169,7 +169,7 @@
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.remove_entity({key: key}); this.dialog.options = false, this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.dialog.options = false, this.$snotify.remove(toast.id); }, bold: false},
 					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});

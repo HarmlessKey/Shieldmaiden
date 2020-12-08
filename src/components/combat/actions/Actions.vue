@@ -29,7 +29,7 @@
 							"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="entities[doneBy].name"/>
+							<q-item-label v-html="entitiesList[doneBy].name"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -148,7 +148,7 @@
 				return active;
 			},
 			entitiesList() {
-				let list = this.entities;
+				let list = {...this.entities};
 				list.environment = {
 					key: "environment",
 					name: "Environment",

@@ -175,6 +175,132 @@ const getters = {
 	}
 }
 
+const actions = {
+	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
+		commit("SET_DEMO", demo);
+		commit("SET_UID", rootGetters.user.uid);
+		commit("SET_CAMPAIGN_ID", cid);
+		commit("SET_ENCOUNTER_ID", eid);
+		commit("CLEAR_ENTITIES");
+		const uid = rootGetters.user.uid;
+		const path = `${uid}/${cid}/${eid}`;
+		commit("SET_PATH", path);
+
+		//Set the entities when it's not a demo encounter
+		if(!demo) {
+			const encounter = await encounters_ref.child(path);
+			await encounter.once('value', snapshot => {
+				commit('SET_ENCOUNTER', snapshot.val());
+				for (let key in snapshot.val().entities) {
+					commit('ADD_ENTITY', {rootState, key});
+				}
+			})
+		} else {
+			commit('SET_ENCOUNTER', demoEncounter);
+			for (let key in demoEncounter.entities) {
+				commit('ADD_ENTITY', {rootState, key});
+			}
+		}
+		commit('INITIALIZED');
+	},
+	track_Encounter({ commit, state }, demo) {
+		if(!demo) {
+			const path = state.path
+			const encounter = encounters_ref.child(path);
+			encounter.on('value', snapshot => {
+				commit('SET_ENCOUNTER', snapshot.val());
+			});
+		} else {
+			commit('SET_ENCOUNTER', demoEncounter);
+		}
+	},
+	set_turn({ commit }, payload) { commit("SET_TURN", payload) },
+	set_log({ commit }, payload) { commit("SET_LOG", payload) },
+	set_meters({ commit }, payload) { commit("SET_METERS", payload) },
+	set_active({ commit }, payload) { commit("SET_ACTIVE", payload) },
+	set_hidden({ commit }, payload) { commit("SET_HIDDEN", payload) },
+	set_targeted({ state, commit }, {type, key}) {
+		let targeted = state.targeted
+
+		//Untarget
+		if(type === 'untarget') {
+			if(key === 'all') {
+				targeted = [];
+			}
+			else {
+				targeted = state.targeted.filter(function(value){
+					return value !== key;
+				});
+			}
+		}
+
+		//Multitargeting
+		else if(type === "multi") {
+			if(!targeted.includes(key)) {
+				targeted.push(key);
+			} else {
+				targeted = targeted.filter(function(value){
+					return value != key;
+				});
+			}
+		} 
+
+		//Single targeting
+		else {
+			if(targeted.length === 0 || targeted[0] !== key) {
+				targeted = [key];
+			} else {
+				targeted = [];
+			}
+		}
+		commit('SET_TARGETED', targeted);
+	},
+	set_initiative({ commit }, payload) { commit('SET_INITIATIVE', payload) },
+	update_round({ commit, state}) {
+		for (let key in state.entities) {
+			let e = state.entities[key]
+			if (e.curHp <= 0 && e.entityType != 'player') {
+				commit('SET_DOWN', {key:key, value:true})
+			}
+			if (e.curHp > 0 && e.down == true) {
+				commit('SET_DOWN', {key:key, value:false})
+			}
+			if(e.addNextRound == true) {
+				commit('ADD_NEXT_ROUND', {key:key, action: 'set'})
+			}
+		}
+	},
+	add_next_round({ commit }, payload) {
+		event.stopPropagation(); //So target is not unselected when clicked
+		commit('ADD_NEXT_ROUND', payload);
+	},
+	set_hp({ commit }, payload) {
+		commit('SET_HP', payload);
+	},
+	set_condition({ commit }, payload) { commit('SET_CONDITION', payload); },
+	set_save({ commit }, payload) { commit('SET_SAVE', payload); },
+	set_stable({ commit }, payload) { commit('SET_STABLE', payload); },
+	edit_entity({ commit }, payload) { commit('EDIT_ENTITY', payload); },
+	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
+	transform_entity({ commit }, payload) { commit('TRANSFORM_ENTITY', payload); },
+	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
+	add_entity_demo({ commit, rootState }, entity) { 
+		//generate semi random id
+		let key = Date.now() + Math.random().toString(36).substring(4);
+		Vue.set(demoEncounter.entities, key, entity);
+
+		commit('ADD_ENTITY', {rootState, key});
+	},
+	remove_entity({ commit, state }, key) {
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
+		commit('REMOVE_ENTITY', key);
+	},
+	set_dead({ commit }, payload) { commit('SET_DEAD', payload); },
+	set_finished({ commit }) { commit('FINISH'); },
+	reset_store({ commit }) { commit("RESET_STORE"); },
+	set_targetReminder({ commit }, payload) { commit('SET_TARGETREMINDER', payload); },
+}
+
 const mutations = {
 	async ADD_ENTITY(state, {rootState, key}) {
 		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
@@ -592,12 +718,9 @@ const mutations = {
 			}
 		}
 	},
-	REMOVE_ENTITY(state, {key}) {
-		Vue.delete(state.entities, key)
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
-	},
+	REMOVE_ENTITY(state, key) { Vue.delete(state.entities, key); },
 	SET_DOWN(state, {key, value}) {
-		state.entities[key].down = value
+		Vue.set(state.entities[key], down, value);
 		if(!state.demo) {
 			if (value) {
 				encounters_ref.child(`${state.path}/entities/${key}/down`).set(true);
@@ -781,129 +904,6 @@ const mutations = {
 			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder);
 		}
 	},
-}
-
-const actions = {
-	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
-		commit("SET_DEMO", demo);
-		commit("SET_UID", rootGetters.user.uid);
-		commit("SET_CAMPAIGN_ID", cid);
-		commit("SET_ENCOUNTER_ID", eid);
-		commit("CLEAR_ENTITIES");
-		const uid = rootGetters.user.uid;
-		const path = `${uid}/${cid}/${eid}`;
-		commit("SET_PATH", path);
-
-		//Set the entities when it's not a demo encounter
-		if(!demo) {
-			const encounter = await encounters_ref.child(path);
-			await encounter.once('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val());
-				for (let key in snapshot.val().entities) {
-					commit('ADD_ENTITY', {rootState, key});
-				}
-			})
-		} else {
-			commit('SET_ENCOUNTER', demoEncounter);
-			for (let key in demoEncounter.entities) {
-				commit('ADD_ENTITY', {rootState, key});
-			}
-		}
-		commit('INITIALIZED');
-	},
-	track_Encounter({ commit, state }, demo) {
-		if(!demo) {
-			const path = state.path
-			const encounter = encounters_ref.child(path);
-			encounter.on('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val());
-			});
-		} else {
-			commit('SET_ENCOUNTER', demoEncounter);
-		}
-	},
-	set_turn({ commit }, payload) { commit("SET_TURN", payload) },
-	set_log({ commit }, payload) { commit("SET_LOG", payload) },
-	set_meters({ commit }, payload) { commit("SET_METERS", payload) },
-	set_active({ commit }, payload) { commit("SET_ACTIVE", payload) },
-	set_hidden({ commit }, payload) { commit("SET_HIDDEN", payload) },
-	set_targeted({ state, commit }, {type, key}) {
-		let targeted = state.targeted
-
-		//Untarget
-		if(type === 'untarget') {
-			if(key === 'all') {
-				targeted = [];
-			}
-			else {
-				targeted = state.targeted.filter(function(value){
-					return value !== key;
-				});
-			}
-		}
-
-		//Multitargeting
-		else if(type === "multi") {
-			if(!targeted.includes(key)) {
-				targeted.push(key);
-			} else {
-				targeted = targeted.filter(function(value){
-					return value != key;
-				});
-			}
-		} 
-
-		//Single targeting
-		else {
-			if(targeted.length === 0 || targeted[0] !== key) {
-				targeted = [key];
-			} else {
-				targeted = [];
-			}
-		}
-		commit('SET_TARGETED', targeted);
-	},
-	set_initiative({ commit }, payload) { commit('SET_INITIATIVE', payload) },
-	update_round({ commit, state}) {
-		for (let key in state.entities) {
-			let e = state.entities[key]
-			if (e.curHp <= 0 && e.entityType != 'player') {
-				commit('SET_DOWN', {key:key, value:true})
-			}
-			if (e.curHp > 0 && e.down == true) {
-				commit('SET_DOWN', {key:key, value:false})
-			}
-			if(e.addNextRound == true) {
-				commit('ADD_NEXT_ROUND', {key:key, action: 'set'})
-			}
-		}
-	},
-	add_next_round({ commit }, payload) {
-		event.stopPropagation(); //So target is not unselected when clicked
-		commit('ADD_NEXT_ROUND', payload);
-	},
-	set_hp({ commit }, payload) {
-		commit('SET_HP', payload);
-	},
-	set_condition({ commit }, payload) { commit('SET_CONDITION', payload); },
-	set_save({ commit }, payload) { commit('SET_SAVE', payload); },
-	set_stable({ commit }, payload) { commit('SET_STABLE', payload); },
-	edit_entity({ commit }, payload) { commit('EDIT_ENTITY', payload); },
-	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
-	transform_entity({ commit }, payload) { commit('TRANSFORM_ENTITY', payload); },
-	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
-	add_entity_demo({ commit, rootState }, entity) { 
-		//generate semi random id
-		let key = Date.now() + Math.random().toString(36).substring(4);
-		Vue.set(demoEncounter.entities, key, entity);
-
-		commit('ADD_ENTITY', {rootState, key});
-	},
-	remove_entity({ commit }, payload) { commit('REMOVE_ENTITY', payload); },
-	set_dead({ commit }, payload) { commit('SET_DEAD', payload); },
-	set_finished({ commit }) { commit('FINISH'); },
-	reset_store({ commit }) { commit("RESET_STORE"); },
-	set_targetReminder({ commit }, payload) { commit('SET_TARGETREMINDER', payload); },
 }
 
 export const encounter_module = {

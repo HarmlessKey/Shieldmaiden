@@ -1,37 +1,46 @@
 <template>
 	<div v-if="entities">
-		<ul v-for="(type, index) in types" :key="index">
-			<h2>{{ type.name }}</h2>
-			<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-				<icon v-if="entity.img === 'monster' || entity.img === 'player'" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
-				<span 
-					v-else class="img" 
-					:style="{
-						'background-image': 'url(' + entity.img + ')',
-						'border-color': entity.color_label ? entity.color_label : ``
-					}"
-				/>
-				<q-linear-progress size="30px" color="negative" :value="percentage(entity[type.name], type.name)/100" >
-					<div class="info">
-						<span class="name">
-							{{ entity.name }}.
-							<q-tooltip anchor="center right" self="center left">
-								{{ entity.name }}
-							</q-tooltip>
-						</span>
-						<b class="numbers">
-							<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
-							<template v-else>{{ entity[type.name] | numeral('0.0a') }}</template>
-							<template v-if="entity[type.over]">
-								(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
-								<template v-else>{{ entity[type.over] | numeral('0.0a') }} </template> 
-								<small>over</small>)
-							</template>
-						</b>
-					</div>
-				</q-linear-progress>
-			</li>
-		</ul>
+		<h2>Damage meters</h2>
+		<template v-for="(type, index) in types">
+			<div v-if="_meters[type.name].length > 0" :key="`meters-${index}`">
+				<h3>{{ type.name.capitalize() }}</h3>
+				<ul>
+					<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
+						<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+						<span 
+							v-else class="img" 
+							:style="{
+								'background-image': 'url(' + entity.img + ')',
+								'border-color': entity.color_label ? entity.color_label : ``
+							}"
+						/>
+						<q-linear-progress 
+							size="30px" 
+							:color="type.name === 'damage' ? 'negative' : 'positive'" 
+							:value="percentage(entity[type.name], type.name)/100"
+						>
+							<div class="info">
+								<span class="name">
+									{{ entity.name }}.
+									<q-tooltip anchor="center right" self="center left">
+										{{ entity.name }}
+									</q-tooltip>
+								</span>
+								<b class="numbers">
+									<template v-if="entity[type.name] < 10000">{{ entity[type.name] }}</template>
+									<template v-else>{{ entity[type.name] | numeral('0.0a') }}</template>
+									<template v-if="entity[type.over]">
+										(<template v-if="entity[type.over] < 10000">{{ entity[type.over] }} </template>
+										<template v-else>{{ entity[type.over] | numeral('0.0a') }} </template> 
+										<small>over</small>)
+									</template>
+								</b>
+							</div>
+						</q-linear-progress>
+					</li>
+				</ul>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -94,9 +103,15 @@
 </script>
 
 <style lang="scss" scoped>
+h3 {
+	font-size: 15px !important;
+	line-height: 25px;
+	margin-bottom: 5px !important;
+}
 ul {
 	user-select: none;
 	padding: 0;
+	margin: 0;
 	list-style: none;
 
 	li {

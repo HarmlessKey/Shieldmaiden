@@ -127,7 +127,6 @@
 .q-scrollarea { 
 	height: calc(100% - 30px);
 	background: rgba(38, 38, 38, .9);
-	padding-top: 20px;
 }
 
 .tab-content {

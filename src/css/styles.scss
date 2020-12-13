@@ -372,6 +372,9 @@ html body {
 		&-block {
 			display: block;
 		}
+		&-table-cell {
+			display: table-cell;
+		}
 		&-inline {
 			display: inline;
 
@@ -1701,6 +1704,9 @@ html body {
 			&-block {
 				display: block !important;
 			}
+			&-table-cell {
+				display: table-cell !important;
+			}
 			&-inline {
 				display: inline !important;
 	
@@ -1725,6 +1731,9 @@ html body {
 			}
 			&-block {
 				display: block !important;
+			}
+			&-table-cell {
+				display: table-cell !important;
 			}
 			&-inline {
 				display: inline !important;
@@ -1751,6 +1760,9 @@ html body {
 			&-block {
 				display: block !important;
 			}
+			&-table-cell {
+				display: table-cell !important;
+			}
 			&-inline {
 				display: inline !important;
 	
@@ -1775,6 +1787,9 @@ html body {
 			}
 			&-block {
 				display: block !important;
+			}
+			&-table-cell {
+				display: table-cell !important;
 			}
 			&-inline {
 				display: inline !important;

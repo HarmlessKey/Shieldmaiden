@@ -720,7 +720,7 @@ const mutations = {
 	},
 	REMOVE_ENTITY(state, key) { Vue.delete(state.entities, key); },
 	SET_DOWN(state, {key, value}) {
-		Vue.set(state.entities[key], down, value);
+		Vue.set(state.entities[key], 'down', value);
 		if(!state.demo) {
 			if (value) {
 				encounters_ref.child(`${state.path}/entities/${key}/down`).set(true);

@@ -361,9 +361,19 @@ const actions = {
 			}
 		}
 	},
-	add_next_round({ commit }, payload) {
+	add_next_round({ state, commit },  {key, action, value}) {
 		event.stopPropagation(); //So target is not unselected when clicked
-		commit('ADD_NEXT_ROUND', payload);
+
+		if(action === 'tag') {
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'addNextRound', value});
+		}
+		else if(action === 'set') {
+			if(!state.demo) {
+				encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
+				encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove();
+			}
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'active', value: true});
+		}
 	},
 
 	/**
@@ -986,18 +996,6 @@ const mutations = {
 
 		//INIT needs to be updated in firebase
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);
-	},
-	ADD_NEXT_ROUND(state, {key, action, value}) {
-		if(action == 'tag') {
-			state.entities[key].addNextRound = value;
-		}
-		else if(action == 'set') {
-			Vue.set(state.entities[key], 'active', true);
-			if(!state.demo) {
-				encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
-				encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove();
-			}
-		}
 	},
 }
 

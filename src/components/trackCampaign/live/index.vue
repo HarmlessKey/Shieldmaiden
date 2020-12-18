@@ -31,6 +31,7 @@
 						:players="players"
 						:npcs="npcs"
 						:playerSettings="playerSettings"
+						:width="width"
 						:npcSettings="npcSettings"
 						@newRoll="pushRoll"
 					/>

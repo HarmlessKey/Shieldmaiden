@@ -1,5 +1,9 @@
 <template>
-	<div v-if="targets && allEntities && players && campPlayers" class="initiative-wrapper">
+	<div 
+		v-if="targets && allEntities && players && campPlayers" 
+		class="initiative-wrapper"
+		ref="initiative"
+	>
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
 			<!-- MOBILE -->
@@ -45,18 +49,19 @@
 				<table class="initiative-list targets">
 					<thead>
 						<th class="init">In.</th>
-						<th></th>
+						<th class="image"></th>
 						<th class="ac"><i class="fas fa-shield"></i></th>
 						<th>Name</th>
 						<th class="hp"><i class="fas fa-heart"></i></th>
-						<th class="d-none d-md-table-cell">Conditions</th>
+						<th class="conditions"></th>
 					</thead>
 					<tbody 
 						class="entities"
 						name="entities"
 						is="transition-group"
 						enter-active-class="animated fadeIn"
-						leave-active-class="animated fadeOut">
+						leave-active-class="animated fadeOut"
+					>
 						<template v-for="(entity, index) in targets">
 							<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">
 								<td colspan="6">Top of the round</td>
@@ -87,112 +92,168 @@
 										}"
 									/>
 								</td>
-						<td class="ac">
-							<template v-if="
-								(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-								|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
-								<span class="ac" :class="{ 
-										'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
-										'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
-									}"  
-									v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
-								>
-									{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
-									</q-tooltip>
-								</span>
-								<span class="ac" v-else>
-									{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Armor class
-									</q-tooltip>
-								</span>
-							</template>
-							<span v-else class="gray-hover">?</span>
-						</td>
+								<td class="ac">
+									<template v-if="
+										(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+										|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
+										<span class="ac" :class="{ 
+												'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
+												'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
+											}"  
+											v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
+										>
+											{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+											</q-tooltip>
+										</span>
+										<span class="ac" v-else>
+											{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Armor class
+											</q-tooltip>
+										</span>
+									</template>
+									<span v-else class="gray-hover">?</span>
+								</td>
 
-						<td class="name">
-							<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
-								<template v-if="displayNPCField('name', entity)">
-									{{ entity.name }}
+								<td class="name">
+									<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
+										<template v-if="displayNPCField('name', entity)">
+											{{ entity.name }}
+										</template>
+										<template v-else>
+											? ? ?
+										</template>
+									</span>
+									<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
+									<template v-else>{{ players[entity.key].character_name }}</template>
+								</td>
+
+							<td class="hp">
+								<template v-if="
+									(playerSettings.health === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+									|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
+								">
+									<Health	
+										:entity="entity" 
+										:campPlayers="campPlayers" 
+										:campCompanions="campCompanions"
+										:players="players"
+										:npcs="npcs" 
+									/>
+								</template>
+								<template v-else-if="
+									(playerSettings.health === 'obscured' && (entity.entityType === 'player' || entity.entityType === 'companion'))
+									|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
+								">
+								<template v-if="entity.curHp == 0">
+									<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
+									</template>
+									<i v-else class="fas" :class="{
+											'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
+											'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
+											'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
+										}"
+									/>
 								</template>
 								<template v-else>
-									? ? ?
-								</template>
-							</span>
-							<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
-							<template v-else>{{ players[entity.key].character_name }}</template>
-						</td>
-
-						<td class="hp">
-							<template v-if="
-								(playerSettings.health === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-								|| (entity.entityType === 'npc' && displayNPCField('health', entity) === true)
-							">
-								<Health	
-									:entity="entity" 
-									:campPlayers="campPlayers" 
-									:campCompanions="campCompanions"
-									:players="players"
-									:npcs="npcs" 
-								/>
-							</template>
-							<template v-else-if="
-								(playerSettings.health === 'obscured' && (entity.entityType === 'player' || entity.entityType === 'companion'))
-								|| (entity.entityType == 'npc' && displayNPCField('health', entity) === 'obscured')
-							">
-							<template v-if="entity.curHp == 0">
-								<span class="gray-hover"><i class="fas fa-skull-crossbones red"></i></span>
-								</template>
-								<i v-else class="fas" :class="{
-										'green fa-heart': percentage(entity.curHp, entity.maxHp) == 100,
-										'orange fa-heart-broken': percentage(entity.curHp, entity.maxHp) < 100 && percentage(entity.curHp, entity.maxHp) > 33,
-										'red fa-heartbeat': percentage(entity.curHp, entity.maxHp) <= 33,
-									}"
-								/>
-							</template>
-							<template v-else>
-								<span class="gray-hover">
-									<template v-if="entity.curHp == 0">
-										<i class="fas fa-skull-crossbones red"></i>
-									</template>
-									<template v-else>? ? ?</template>
-								</span>
-							</template>
-						</td>
-
-						<td class="conditions d-none d-md-table-cell">
-							<div class="d-flex justify-content-right" v-if="
-							entity.conditions &&
-							((playerSettings.conditions === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-								|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
-							">
-								<template v-for="(condition, key) in entity.conditions">
-									<div :key="key" v-if="conditions[key]">
-											<span class="n" v-if="key == 'exhaustion'">
-												{{ entity.conditions[key] }}
-											</span>
-											<svg
-												v-else
-												class="icon text" 
-												viewBox="0 0 512 512">
-												<path :d="conditions[key].icon" fill-opacity="1"></path>
-												<q-tooltip anchor="top middle" self="center middle">
-													{{ key.capitalize() }}
-												</q-tooltip>
-											</svg>
-											</div>
+									<span class="gray-hover">
+										<template v-if="entity.curHp == 0">
+											<i class="fas fa-skull-crossbones red"></i>
 										</template>
-									</div>
-								</td>
-							</tr>
-						</template>
-					</tbody>
-				</table>
-			</div>
-		</q-scroll-area>
-	</div>
+										<template v-else>? ? ?</template>
+									</span>
+								</template>
+							</td>		
+
+							<td 
+								class="conditions" 
+								v-if="
+									((playerSettings.conditions === undefined && (entity.entityType === 'player' 
+									|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
+									|| entity.entityType === 'companion'))
+							">
+								<div class="d-flex justify-content-right" v-if="entity.conditions">
+									<template v-for="({value, name}, index) in returnConditions(entity.conditions)">
+										<div 
+											class="condition" 
+											:key="`condition-${entity.key}-${value}`"
+											v-if="index+1 <= conditionCount"
+										>
+											<span class="n" v-if="value === 'exhaustion'">
+												{{ entity.conditions[value] }}
+											</span>
+											<icon :icon="value" class="img" fill="#cc3e4a" />
+											<q-tooltip anchor="top middle" self="center middle">
+												{{ name }}
+												{{ value === 'exhaustion' ? entity.conditions[value] : "" }}
+											</q-tooltip>
+										</div>
+									</template>
+									<b 
+										v-if="Object.keys(entity.conditions).length > conditionCount"
+										class="condtion"
+										:key="`more-conditions-${entity.key}`"
+									>
+										+{{ Object.keys(entity.conditions).length - conditionCount }}
+										<q-tooltip anchor="top middle" self="center middle">
+											{{ Object.keys(entity.conditions).length - conditionCount }}
+											more conditions
+										</q-tooltip>
+									</b>
+
+									<!-- All conditions -->
+									<q-popup-proxy square prevent>
+										<div class="bg-gray gray-light">
+											<q-list>
+												<q-item>
+													<q-item-section>
+														<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
+															<template v-if="displayNPCField('name', entity)">
+																{{ entity.name }}
+															</template>
+															<template v-else>
+																? ? ?
+															</template>
+														</span>
+														<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
+														<template v-else>{{ players[entity.key].character_name }}</template>
+													</q-item-section>
+													<q-item-section avatar>
+															{{ Object.keys(entity.conditions).length }}
+													</q-item-section>
+												</q-item>
+												<q-separator/>
+												<q-item 
+													clickable v-close-popup 
+													v-for="({value, name}, index) in returnConditions(entity.conditions)"
+													:key="`condition-list-${entity.key}-${value}`"
+												>
+													<q-item-section avatar>
+														<icon :icon="value" fill="#cc3e4a" />
+													</q-item-section>
+													<q-item-section>
+														<span>
+															{{ name }}
+															<b v-if="value === 'exhaustion'">
+																{{ entity.conditions[value] }}
+															</b>
+														</span>
+													</q-item-section>
+												</q-item>
+											</q-list>
+										</div>
+									</q-popup-proxy>
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</q-scroll-area>
+</div>
 </template>
 
 <script>
@@ -200,12 +261,13 @@
 	import { general } from '@/mixins/general.js';
 	import { mapActions } from 'vuex';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { conditions } from '@/mixins/conditions.js';
 
 	import Health from './Health.vue';
 
 	export default {
 		name: 'Initiative',
-		mixins: [general, trackEncounter],
+		mixins: [general, trackEncounter, conditions],
 		components: {
 			Health,
 		},
@@ -219,26 +281,45 @@
 			'players',
 			'playerSettings',
 			'npcs',
-			'npcSettings',
-			'width'
+			'npcSettings'
 		],
 		data() {
 			return {
 				dmId: this.$route.params.userid,
 				userId: this.$store.getters.user.uid,
+				width: 0,
 				characters: [],
 				targeted: []
 			}
 		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					asObject: true,
-				},
-			}
-		},
 		computed: {
+			/**
+			 * Returns how many conditions can be shown
+			 */
+			conditionCount() {
+				if(this.width < 400) {
+					return 1
+				}
+				if(this.width < 450) {
+					return 2
+				}
+				if(this.width < 550) {
+					return 3
+				}
+				if(this.width < 600) {
+					return 4
+				}
+				if(this.width < 750) {
+					return 6
+				}
+				if(this.width < 850) {
+					return 7
+				}
+				if(this.width < 900) {
+					return 8
+				}
+				return 9;
+			},
 			lastRoll() {
 				if(this.encounter) {
 					return this.encounter.lastRoll;
@@ -246,6 +327,12 @@
 			}
 		},
 		mounted() {
+			this.$nextTick(function() {
+				window.addEventListener('resize', this.setSize);
+				//Init
+				this.setSize();
+			});
+
 			//Check if user has control over a character in the campaign
 			if(this.userId) {
 				const allCampaignPlayers = Object.keys(this.campPlayers);
@@ -310,6 +397,9 @@
 			...mapActions([
 				'setSlide'
 			]),
+			setSize() {
+				this.width = this.$refs.initiative.clientWidth;
+			},
 			notificationTargets(targets) {
 				let returnTargets = [];
 				for(const key of targets) {
@@ -394,10 +484,21 @@
 						type: 'manual'
 					}
 				})
-			}
+			},
+			returnConditions(conditions) {
+				let returnConditions = [];
+				for(const key in conditions) {
+					returnConditions.push(
+						this.conditionList.filter(item => {
+							return item.value === key;
+						})[0]
+					);
+				}
+				return returnConditions;
+			},
 		},
 		beforeDestroy() {
-			window.removeEventListener('resize', this.getWindowWidth);
+			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>
@@ -433,10 +534,17 @@
 				width: 100%;
 				border-spacing: 0 5px;
 				user-select: none;
+				table-layout: fixed;
 
 				th.ac, th.init {
 					text-align: center;
 					width: 38px;
+				}
+				th.image {
+					width: 43px;
+				}
+				th.conditions {
+					max-width: 200px;
 				}
 
 				tbody {
@@ -478,24 +586,30 @@
 						td.ac {
 							font-weight: bold;
 						}
+						td.hp {
+							white-space: nowrap;
+						}
 						td.name {
 							overflow: hidden;
 							white-space: nowrap;
 							text-overflow: ellipsis;
-							max-width:0;
+							max-width: 0;
 						}
 						td.image {
 							padding: 0;
-							width: 45px;
+							max-width: 43px;
 
 							.img {
-								width: 43px;
-								height: 43px;
+								width: 41px;
+								height: 41px;
 								border: solid 1px #b2b2b2;
 								background-size: cover;
 								background-position: center top;
 							}
 
+						}
+						td.conditions {
+							max-width: 200px;
 						}
 						&.targeted {
 							td {
@@ -523,18 +637,27 @@
 			.conditions {
 				padding: 9px 10px;
 
-				svg, .n {
-					width: 24px;
-					height: 24px;
-					line-height: 20px;
-					fill: #cc3e4a;
-					padding: 2px;
-					margin: 0;
-					display: block;
-					font-size: 16px;
-					text-align: center;
-					color: #cc3e4a;
+				.condition {
+					position: relative;
+					cursor: pointer;
+					user-select: none;
+					
+					.img {
+						margin-right: 5px;
+						display: block;
+						width: 20px;
+						height: 20px;
+					}
+					.n {
+						font-size: 13px;
+						line-height: 13px;
+						position: absolute;
+						color: #cc3e4a;
+						top: -5px;
+						left: 2px;
+					}
 				}
+				
 			}
 			.entities-move {
 				transition: transform .6s;

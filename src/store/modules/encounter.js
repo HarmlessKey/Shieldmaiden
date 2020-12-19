@@ -117,9 +117,10 @@ const demoEncounter = {
 	"turn" : 0
 }
 
-const encounters_ref = db.ref('encounters')
-const campaigns_ref = db.ref('campaigns')
-const monsters_ref = db.ref('monsters')
+const encounters_ref = db.ref('encounters');
+const campaigns_ref = db.ref('campaigns');
+const monsters_ref = db.ref('monsters');
+const players_ref = db.ref('players');
 
 const getDefaultState = () => {
 	return {
@@ -236,6 +237,46 @@ const actions = {
 		commit("SET_ROUND", round);
 	},
 	set_log({ commit }, payload) { commit("SET_LOG", payload) },
+
+	/**
+	 * Edit entity properties
+	 * 
+	 * @param {string} key Entity key
+	 * @param {string} type damage, healing, damageTaken, healingTaken
+	 * @param {integer} amount amount of damage or healing done
+	 */
+	edit_entity_prop({ state, commit }, {key, entityType, prop, value}) {
+		const encounterEntity = `encounters/${state.uid}/${state.campaignId}/${state.encounterId}/entities/${key}`
+		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}/${prop}`;
+		const campaignCompanion = `campaigns/${state.uid}/${state.campaignId}/companions/${key}/${prop}`;
+		
+		if(!value) value = null;
+		if(value && ["ac", "ac_bonus"].includes(prop)) value = parseInt(value);
+		
+		// Update player
+		if(entityType === 'player') {
+			if(["ac_bonus"].includes(prop)) {
+				db.ref(`${campaignPlayer}}`).set(value);
+			}
+			else if(["ac"].includes(prop)) {
+				db.ref(`players/${state.uid}/${key}/${prop}`).set(value);
+			}
+
+		}
+
+		// Update companions
+		if(entityType === 'companion') {
+			db.ref(`${campaignCompanion}`).set(value);
+		}
+
+		// Update NPC
+		if(entityType === 'npc') {
+			db.ref(`${encounterPath}/${prop}`).set(value);
+		}
+		
+		// Update the store
+		commit("SET_ENTITY_PROPERTY", {key, prop, value});
+	},
 
 	/**
 	 * Update damage meters

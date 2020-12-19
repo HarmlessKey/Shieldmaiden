@@ -500,7 +500,6 @@
 							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
 						}
 
-
 						//Only update in an encounter
 						if(this.location === 'encounter') {
 							//create full object to send to store

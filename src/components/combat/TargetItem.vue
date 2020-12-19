@@ -8,6 +8,30 @@
 				<q-tooltip anchor="top middle" self="center middle">
 					Initiative
 				</q-tooltip>
+				<q-popup-edit 
+					square
+					v-model="editable_entity._initiative" 
+					content-class="bg-gray text-white"
+				>
+					<div>{{ entity.name }}</div>
+          <q-input 
+						dark filled square dense utofocus 
+						label="Initiative"
+						type="number" 
+						color="white" 
+						v-model="editable_entity.initiative" 
+					/>
+					<div class="d-flex justify-content-end mt-2">
+						<q-btn flat class="mr-1 bg-gray" v-close-popup>Cancel</q-btn>
+						<q-btn
+							color="primary"
+							v-close-popup 
+							@click.stop="set_initiative({key: entity.key, initiative: editable_entity.initiative})"
+						>
+							Save
+						</q-btn>
+					</div>
+        </q-popup-edit>
 			</span>
 
 			<!-- HIDDEN -->
@@ -65,6 +89,61 @@
 						Armor class
 					</q-tooltip>
 				</span>
+				<q-popup-edit 
+					square
+					v-model="editable_entity._initiative" 
+					content-class="bg-gray text-white"
+				>
+					<div class="mb-1">{{ entity.name }}</div>
+          <q-input 
+						dark filled square dense 
+						label="Armor class bonus"
+						type="number" 
+						color="white" 
+						v-model="editable_entity.ac_bonus" 
+					>
+						<q-icon slot="append" name="fas fa-shield-check" />
+						<q-btn
+							slot="after"
+							flat dense
+							color="primary"
+							icon="check"
+							v-close-popup 
+							@click.stop="edit_entity_prop({
+								key: entity.key, 
+								entityType: entity.entityType,
+								prop: 'ac_bonus',
+								value: editable_entity.ac_bonus
+							})"
+						/>
+					</q-input>
+          <q-input 
+						class="mt-2"
+						dark filled square dense 
+						label="Override armor class"
+						type="number" 
+						color="white" 
+						v-model="editable_entity.ac" 
+					>
+						<q-icon slot="append" name="fas fa-shield" />
+						<q-btn
+							slot="after"
+							flat dense
+							color="primary"
+							icon="check"
+							v-close-popup 
+							@click.stop="edit_entity_prop({
+								key: entity.key, 
+								entityType: entity.entityType,
+								prop: 'ac',
+								value: editable_entity.ac
+							})"
+						/>
+					</q-input>
+					<div class="d-flex justify-content-end mt-2">
+						<q-btn flat class="mr-1 bg-gray" v-close-popup>Close</q-btn>
+					</div>
+        </q-popup-edit>
 			</div>
 
 			<!-- HEALT BAR -->
@@ -196,7 +275,8 @@
 			return {
 				user: this.$store.getters.user,
 				target: '',
-				tweenedNumber: 0
+				tweenedNumber: 0,
+				entitySetter: undefined
 			}
 		},
 		firebase() {
@@ -216,7 +296,15 @@
 				return this.tweenedNumber.toFixed(0);
 			},
 			entity() {
-				return this.entities[this.item]
+				return this.entities[this.item];
+			},
+			editable_entity: {
+				get() {
+					return (this.entitySetter) ? this.entitySetter : {...this.entity};
+				},
+				set(newValue) {
+					this.entitySetter = newValue;
+				}
 			},
 			number() {
 				// eslint-disable-next-line
@@ -234,6 +322,8 @@
 			...mapActions([
 				'setSlide',
 				'add_next_round',
+				'set_initiative',
+				'edit_entity_prop'
 			]),
 			showCondition(key) {
 				//Stop other functions so target is not deselected

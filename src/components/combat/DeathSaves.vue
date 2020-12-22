@@ -37,7 +37,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	// import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 	import ViewEntity from '@/components/ViewEntity.vue';
 	import Conditions from '@/components/combat/Conditions.vue';

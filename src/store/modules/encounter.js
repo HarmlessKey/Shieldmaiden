@@ -1,4 +1,5 @@
 import { db } from '@/firebase';
+import { faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
 import Vue from 'vue';
 
 const demoPlayers = {
@@ -246,32 +247,122 @@ const actions = {
 	 * @param {integer} amount amount of damage or healing done
 	 */
 	edit_entity_prop({ state, commit }, {key, entityType, prop, value}) {
+		// Save paths for firebase
 		const encounterEntity = `encounters/${state.uid}/${state.campaignId}/${state.encounterId}/entities/${key}`
-		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}/${prop}`;
-		const campaignCompanion = `campaigns/${state.uid}/${state.campaignId}/companions/${key}/${prop}`;
+		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}`;
+		const campaignCompanion = `campaigns/${state.uid}/${state.campaignId}/companions/${key}`;
+
+		// Entity values
+		const entity = state.entities[key];
+		const maxHpMod = (entity.maxHpMod) ? entity.maxHpMod : 0;
+		let maxHp = entity.maxHp;
+		let curHp = entity.curHp;
 		
-		if(!value) value = null;
-		if(value && ["ac", "ac_bonus"].includes(prop)) value = parseInt(value);
+		if(value === undefined) value = null;
+		if(value && ["maxHp", "curHp", "tempHp", "maxHpMod", "ac", "ac_bonus"].includes(prop)) value = parseInt(value);
 		
+		// HANDLE VALUES
+
+		// Current hit poins
+		if(prop === 'curHp') {
+			if(!value || value < 0) value = 0;
+			if(value > maxHp) value = maxHp;
+		}
+
+		// Maximum hit points
+		if(prop === 'maxHp') {
+			if(!value || value < 0) value = 0;
+
+			// CurHp can't be > maxHp
+			if(curHp > value) {
+				curHp = value;
+
+				if(!state.demo) {
+					if(entityType === "player") db.ref(`${campaignPlayer}/curHp`).set(curHp);
+					if(entityType === "compantion") db.ref(`${campaignCompanion}/curHp`).set(curHp);
+					if(entityType === "npc") db.ref(`${encounterEntity}/curHp`).set(curHp);
+				}
+				commit("SET_ENTITY_PROPERTY", {key, prop: "curHp", value: curHp});
+			}
+		}
+
+		// Maximum hit point modifier
+		if(prop === 'maxHpMod') {
+			// New maximum HP needs to be updated (only in the store)
+			if(maxHpMod) {
+				maxHp = (maxHpMod > 0) ? parseInt(maxHp - maxHpMod) : parseInt(maxHp + Math.abs(maxHpMod));
+			}
+			maxHp = parseInt(maxHp + value); // New maxHp
+
+			// Current hitpoints need to be modified too
+			if(maxHpMod === 0) {
+				//If there was no current mod
+				//only modify curHp if maxHpMod = positive
+				if(value > 0) {
+					curHp = parseInt(curHp + value);
+				}
+			} else if(value === 0) {
+				//if the new mod is 0, check if the old mod was positive
+				//If so, remove it from the curHp
+				if(maxHpMod > 0) {
+					curHp = parseInt(curHp - maxHpMod);
+				}
+			} else {
+				//If the new mod is positive
+				if(value > 0) {
+					//check if the current mod was positive too
+					if(maxHpMod > 0) {
+						//if so, first substract current mod, then add new
+						curHp = parseInt(parseInt(curHp) - maxHpMod + value);
+					} else {
+						//else only add the new mod
+						curHp = parseInt(parseInt(curHp) + value);
+					}
+				} else if(value < 0) {
+					//if the new mod is negative,
+					//but the current is positive, still substract current
+					if(maxHpMod > 0) {
+						curHp = parseInt(parseInt(curHp) - maxHpMod);
+					}
+				}
+			}
+			curHp = (curHp > maxHp) ? maxHp : curHp; // CurHp can never be > maxHp
+
+			// Save Current and Max HP
+			for(const hpType of ["maxHp", "curHp"]) {
+				const newValue = (hpType === "maxHp") ? maxHp : curHp;
+
+				if(hpType === "curHp" && !state.demo) {
+					if(entityType === "player") db.ref(`${campaignPlayer}/${hpType}`).set(newValue);
+					if(entityType === "compantion") db.ref(`${campaignCompanion}/${hpType}`).set(newValue);
+					if(entityType === "npc") db.ref(`${encounterEntity}/${hpType}`).set(newValue);
+				}
+				commit("SET_ENTITY_PROPERTY", {key, prop: hpType, value: newValue});
+			}
+		}
+
 		// Update player
 		if(entityType === 'player') {
-			if(["ac_bonus"].includes(prop)) {
-				db.ref(`${campaignPlayer}}`).set(value);
+			// Some player properties are stored in the campaign
+			if(["ac_bonus", "curHp", "maxHpMod"].includes(prop)) {
+				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
 			}
-			else if(["ac"].includes(prop)) {
-				db.ref(`players/${state.uid}/${key}/${prop}`).set(value);
+			// Some player properties are stored under player
+			else if(["ac", "maxHp"].includes(prop)) {
+				if(!state.demo) db.ref(`players/${state.uid}/${key}/${prop}`).set(value);
 			}
+			// Other player properties are stored in the encounter
 
 		}
 
-		// Update companions
+		// Update companion
 		if(entityType === 'companion') {
-			db.ref(`${campaignCompanion}`).set(value);
+			if(!state.demo) db.ref(`${campaignCompanion}/${prop}`).set(value);
 		}
 
 		// Update NPC
 		if(entityType === 'npc') {
-			db.ref(`${encounterPath}/${prop}`).set(value);
+			if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
 		}
 		
 		// Update the store
@@ -372,6 +463,7 @@ const actions = {
 	 * @param {number} initiative
 	 */
 	set_initiative({ commit, state }, {key, initiative}) { 
+		if(!initiative) initiative = 0;
 		initiative = parseInt(initiative)
 
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(initiative);

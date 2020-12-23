@@ -2,13 +2,13 @@
 	<div>
 		<ul class="rolls">
 			<li v-for="(roll, i) in rolls" :key="`roll-${i}`">
-				 <h3>
-					 <span class="title truncate" :title="roll.title">
-					 	{{ roll.title }}
-					 </span>
-					 <span class="date">
-						 {{ showTime(roll.date) }}
-					 </span>
+					<h3>
+						<span class="title truncate" :title="roll.title">
+							{{ roll.title }}
+						</span>
+						<span class="date">
+							{{ showTime(roll.date) }}
+						</span>
 					</h3>
 					<div class="result" @click="setShowRolls(i)">
 						<span class="roll">

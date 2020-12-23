@@ -145,6 +145,24 @@
 							Discord
 						</q-tooltip>
 					</q-item>
+					<q-item clickable v-ripple link tag="a" href="https://www.instagram.com/harmlesskey" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-instagram"></i>
+						</q-item-section>
+						<q-item-section class="title">Instagram</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Instagram
+						</q-tooltip>
+					</q-item>
+					<q-item clickable v-ripple link tag="a" href="https://twitter.com/KeyHarmless" target="_blank">
+						<q-item-section avatar>
+							<i class="fab fa-twitter-square"></i>
+						</q-item-section>
+						<q-item-section class="title">Twitter</q-item-section>
+						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+							Twitter
+						</q-tooltip>
+					</q-item>
 					<q-item clickable v-ripple link tag="a" href="https://www.facebook.com/harmlesskey" target="_blank">
 						<q-item-section avatar>
 							<i class="fab fa-facebook"></i>

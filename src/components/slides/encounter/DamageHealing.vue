@@ -13,8 +13,7 @@
 </template>
 
 <script>
-	import _ from 'lodash';
-	import { mapActions, mapGetters } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import TargetItem from '@/components/combat/TargetItem.vue';

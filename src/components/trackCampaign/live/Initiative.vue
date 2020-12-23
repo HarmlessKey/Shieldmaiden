@@ -227,7 +227,7 @@
 												<q-separator/>
 												<q-item 
 													clickable v-close-popup 
-													v-for="({value, name}, index) in returnConditions(entity.conditions)"
+													v-for="({value, name}) in returnConditions(entity.conditions)"
 													:key="`condition-list-${entity.key}-${value}`"
 												>
 													<q-item-section avatar>

@@ -227,7 +227,7 @@
 			}
 		},
 		watch: {
-			alive(newVal, oldVal) {
+			alive(newVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}

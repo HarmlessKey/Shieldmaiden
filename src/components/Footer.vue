@@ -48,6 +48,12 @@
 									<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
 								</li>
 								<li>
+									<a href="https://www.instagram.com/harmlesskey" target="_blank">Instagram</a>
+								</li>
+								<li>
+									<a href="https://twitter.com/KeyHarmless" target="_blank">Twitter</a>
+								</li>
+								<li>
 									<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
 								</li>
 								<li>

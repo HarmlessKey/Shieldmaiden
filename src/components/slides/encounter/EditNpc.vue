@@ -157,8 +157,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'EditEntity',

@@ -45,7 +45,10 @@
 					</q-tooltip>
 				</a>
 				
-				<a @click="edit(target.key, target.entityType)">
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })" 
+					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })"
+				>
 					<span class="icon"><i class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit

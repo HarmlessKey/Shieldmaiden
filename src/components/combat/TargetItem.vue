@@ -9,6 +9,8 @@
 					square
 					anchor="bottom middle" self="top middle"
 					content-class="bg-gray px-2 py-2"
+					transition-show="scale" 
+					transition-hide="scale"
 				>
 					<div class="mb-1">Edit {{ entity.name }}</div>
           <q-input 
@@ -32,39 +34,62 @@
 			</span>
 
 			<!-- HIDDEN -->
-			<span 
-				v-if="entity.hidden" 
-				class="img" 
+			<div  
+				class="img-wrapper" 
 				:style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
 			>
-				<i class="fas fa-eye-slash red" />
-				<q-tooltip anchor="top middle" self="center middle">
-					Hidden
-				</q-tooltip>
-			</span>
-
-			<!-- TRANSFORMED -->
-			<span 
-				v-else-if="entity.transformed == true" 
-				class="img" 
-				:style="entity.color_label ? `border-color: ${entity.color_label}; color: ${entity.color_label}` : ``"
-			>
-				<i class="fas fa-paw-claws" />
-				<q-tooltip anchor="top middle" self="center middle">
-					Transformed
-				</q-tooltip>
-			</span>
-
-			<!-- AVATAR -->
-			<template v-else>
+				<span class="img" v-if="entity.hidden">
+					<i class="fas fa-eye-slash red" />
+					<q-tooltip anchor="top middle" self="center middle">
+						Hidden
+					</q-tooltip>
+				</span>
+				<span class="img" v-else-if="entity.transformed">
+					<i class="fas fa-paw-claws" />
+					<q-tooltip anchor="top middle" self="center middle">
+						Transformed
+					</q-tooltip>
+				</span>
+				<template v-else>
 				<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
-				<span 
-					v-else class="img" 
-					:style="{
-						'background-image': 'url(' + entity.img + ')',
-						'border-color': entity.color_label ? entity.color_label : ``
-					}"/>
-			</template>
+					<span 
+						v-else class="img" 
+						:style="{ 'background-image': 'url(' + entity.img + ')' }"
+					/>
+				</template>
+
+				<q-popup-proxy 
+					v-if="entity.entityType === 'npc'" 
+					square
+					anchor="bottom middle" self="top middle"
+					content-class="bg-gray px-2 py-2"
+					transition-show="scale" 
+					transition-hide="scale"
+				>
+					<div class="mb-1">Edit {{ entity.name }}</div>
+					<q-color 
+						square dark flat
+						v-model="editable_entity.color_label" 
+						:palette="hkColors" 
+						default-view="palette"
+					/>
+					<div class="d-flex justify-content-end mt-2">
+						<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
+						<q-btn
+							color="primary"
+							v-close-popup 
+							@click.stop="edit_entity_prop({
+								key: entity.key, 
+								enityType: entity.entityType, 
+								prop: 'color_label', 
+								value: editable_entity.color_label
+							})"
+						>
+							Save
+						</q-btn>
+					</div>
+				</q-popup-proxy>
+			</div>
 
 			<!-- ARMOR CLASS -->
 			<div class="ac_wrapper" @click.stop>
@@ -92,6 +117,8 @@
 					square
 					anchor="bottom middle" self="top middle"
 					content-class="bg-gray px-2 py-2"
+					transition-show="scale" 
+					transition-hide="scale"
 				>
 					<div class="mb-1">{{ entity.name }}</div>
           <q-input 
@@ -195,6 +222,8 @@
 								square
 								anchor="bottom middle" self="top middle" 
 								content-class="bg-gray px-2 py-2"
+								transition-show="scale" 
+								transition-hide="scale"
 							>
 								<div class="mb-1">{{ entity.name }}</div>
 								<q-input 
@@ -375,7 +404,15 @@
 				user: this.$store.getters.user,
 				target: '',
 				tweenedNumber: 0,
-				entitySetter: undefined
+				entitySetter: undefined,
+				hkColors: [
+					"#88b3ce",
+					"#9ac16a",
+					"#c45e66",
+					"#db815e",
+					"#e2da5f",
+					"#9b7aba"
+				],
 			}
 		},
 		firebase() {

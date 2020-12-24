@@ -242,10 +242,12 @@ const actions = {
 
 	/**
 	 * Edit entity properties
+	 * edits entity properties in the store and firebase
 	 * 
 	 * @param {string} key Entity key
-	 * @param {string} type damage, healing, damageTaken, healingTaken
-	 * @param {integer} amount amount of damage or healing done
+	 * @param {string} entiType player, npc, companion
+	 * @param {string} prop property to edit 
+	 * @param {string} value user's input value for the property
 	 */
 	edit_entity_prop({ state, commit }, {key, entityType, prop, value}) {
 		// Save paths for firebase
@@ -256,8 +258,8 @@ const actions = {
 		// Entity values
 		const entity = state.entities[key];
 		const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
-		const maxHpIncMod = entity.maxHp; // In the story maxHp is saved inc maxHpMod
-		// Returns maxHp without maxHpMod
+		const maxHpIncMod = entity.maxHp; // In the store maxHp is saved inc maxHpMod
+		// Below returns maxHp without maxHpMod, needed for some changes
 		let maxHp = (maxHpMod > 0) ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
 		let curHp = entity.curHp;
 		
@@ -265,6 +267,16 @@ const actions = {
 		if(value && ["maxHp", "curHp", "tempHp", "maxHpMod", "ac", "ac_bonus"].includes(prop)) value = parseInt(value);
 		
 		// HANDLE VALUES
+
+		// Name
+		if(prop === 'name') {
+			if(!value) value = "Invalid name";
+		}
+
+		// Armor class
+		if(prop === 'ac') {
+			if(!value || value < 0) value = 1;
+		}
 
 		// Current hit poins
 		if(prop === 'curHp') {
@@ -277,7 +289,7 @@ const actions = {
 			const valueIncMod = (maxHpMod) ? value + maxHpMod : value;
 			if(!value || value < 0) value = 0;
 
-			// CurHp can't be > maxHp
+			// CurHp can't be > (maxHp + maxHpMod)
 			if(curHp > valueIncMod) {
 				curHp = valueIncMod;
 
@@ -292,7 +304,7 @@ const actions = {
 
 		// Maximum hit point modifier
 		if(prop === 'maxHpMod') {
-			// New maximum HP needs to be updated (only in the store)
+			// New maxHp needs to be updated (only in the store)
 			maxHp = parseInt(maxHp + value); // New maxHp
 
 			// Current hitpoints need to be modified too
@@ -329,7 +341,7 @@ const actions = {
 			}
 			curHp = (curHp > maxHp) ? maxHp : curHp; // CurHp can never be > maxHp
 
-			// Save Current and Max HP (maxHp only in the store)
+			// Save curHp and maxHp (maxHp only in the store)
 			for(const hpType of ["maxHp", "curHp"]) {
 				const newValue = (hpType === "maxHp") ? maxHp : curHp;
 				
@@ -343,6 +355,8 @@ const actions = {
 			}
 		}
 
+		// UPDATE FIREBASE
+
 		// Update player
 		if(entityType === 'player') {
 			// Some player properties are stored in the campaign
@@ -350,8 +364,9 @@ const actions = {
 				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
 			}
 			// Some player properties are stored under player
-			else if(["ac", "maxHp"].includes(prop)) {
-				if(!state.demo) db.ref(`players/${state.uid}/${key}/${prop}`).set(value);
+			else if(["ac", "maxHp", "name"].includes(prop)) {
+				const saveProp = (prop === "name") ? "character_name" : prop;
+				if(!state.demo) db.ref(`players/${state.uid}/${key}/${saveProp}`).set(value);
 			}
 			// Other player properties are stored in the encounter
 			else {
@@ -361,7 +376,7 @@ const actions = {
 
 		// Update companion
 		if(entityType === 'companion') {
-			if(["maxHp"].includes(prop)) {
+			if(["maxHp", "name"].includes(prop)) {
 				if(!state.demo) db.ref(`npcs/${state.uid}/${key}/${prop}`).set(value);
 			} else {
 				if(!state.demo) db.ref(`${campaignCompanion}/${prop}`).set(value);

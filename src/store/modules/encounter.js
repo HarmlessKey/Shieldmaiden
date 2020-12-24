@@ -1,5 +1,4 @@
 import { db } from '@/firebase';
-import { faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
 import Vue from 'vue';
 
 const demoPlayers = {
@@ -121,7 +120,6 @@ const demoEncounter = {
 const encounters_ref = db.ref('encounters');
 const campaigns_ref = db.ref('campaigns');
 const monsters_ref = db.ref('monsters');
-const players_ref = db.ref('players');
 
 const getDefaultState = () => {
 	return {
@@ -239,6 +237,9 @@ const actions = {
 	},
 	set_log({ commit }, payload) { commit("SET_LOG", payload) },
 
+	edit_entity({ commit }, payload) { commit('EDIT_ENTITY', payload); },
+	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
+
 	/**
 	 * Edit entity properties
 	 * 
@@ -254,8 +255,10 @@ const actions = {
 
 		// Entity values
 		const entity = state.entities[key];
-		const maxHpMod = (entity.maxHpMod) ? entity.maxHpMod : 0;
-		let maxHp = entity.maxHp;
+		const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
+		const maxHpIncMod = entity.maxHp; // In the story maxHp is saved inc maxHpMod
+		// Returns maxHp without maxHpMod
+		let maxHp = (maxHpMod > 0) ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
 		let curHp = entity.curHp;
 		
 		if(value === undefined) value = null;
@@ -266,20 +269,21 @@ const actions = {
 		// Current hit poins
 		if(prop === 'curHp') {
 			if(!value || value < 0) value = 0;
-			if(value > maxHp) value = maxHp;
+			if(value > maxHpIncMod) value = maxHpIncMod;
 		}
 
 		// Maximum hit points
 		if(prop === 'maxHp') {
+			const valueIncMod = (maxHpMod) ? value + maxHpMod : value;
 			if(!value || value < 0) value = 0;
 
 			// CurHp can't be > maxHp
-			if(curHp > value) {
-				curHp = value;
+			if(curHp > valueIncMod) {
+				curHp = valueIncMod;
 
 				if(!state.demo) {
 					if(entityType === "player") db.ref(`${campaignPlayer}/curHp`).set(curHp);
-					if(entityType === "compantion") db.ref(`${campaignCompanion}/curHp`).set(curHp);
+					if(entityType === "companion") db.ref(`${campaignCompanion}/curHp`).set(curHp);
 					if(entityType === "npc") db.ref(`${encounterEntity}/curHp`).set(curHp);
 				}
 				commit("SET_ENTITY_PROPERTY", {key, prop: "curHp", value: curHp});
@@ -289,9 +293,6 @@ const actions = {
 		// Maximum hit point modifier
 		if(prop === 'maxHpMod') {
 			// New maximum HP needs to be updated (only in the store)
-			if(maxHpMod) {
-				maxHp = (maxHpMod > 0) ? parseInt(maxHp - maxHpMod) : parseInt(maxHp + Math.abs(maxHpMod));
-			}
 			maxHp = parseInt(maxHp + value); // New maxHp
 
 			// Current hitpoints need to be modified too
@@ -328,13 +329,14 @@ const actions = {
 			}
 			curHp = (curHp > maxHp) ? maxHp : curHp; // CurHp can never be > maxHp
 
-			// Save Current and Max HP
+			// Save Current and Max HP (maxHp only in the store)
 			for(const hpType of ["maxHp", "curHp"]) {
 				const newValue = (hpType === "maxHp") ? maxHp : curHp;
-
+				
+				// Save new curHp in firebase
 				if(hpType === "curHp" && !state.demo) {
 					if(entityType === "player") db.ref(`${campaignPlayer}/${hpType}`).set(newValue);
-					if(entityType === "compantion") db.ref(`${campaignCompanion}/${hpType}`).set(newValue);
+					if(entityType === "companion") db.ref(`${campaignCompanion}/${hpType}`).set(newValue);
 					if(entityType === "npc") db.ref(`${encounterEntity}/${hpType}`).set(newValue);
 				}
 				commit("SET_ENTITY_PROPERTY", {key, prop: hpType, value: newValue});
@@ -352,12 +354,18 @@ const actions = {
 				if(!state.demo) db.ref(`players/${state.uid}/${key}/${prop}`).set(value);
 			}
 			// Other player properties are stored in the encounter
-
+			else {
+				if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
+			}
 		}
 
 		// Update companion
 		if(entityType === 'companion') {
-			if(!state.demo) db.ref(`${campaignCompanion}/${prop}`).set(value);
+			if(["maxHp"].includes(prop)) {
+				if(!state.demo) db.ref(`npcs/${state.uid}/${key}/${prop}`).set(value);
+			} else {
+				if(!state.demo) db.ref(`${campaignCompanion}/${prop}`).set(value);
+			}
 		}
 
 		// Update NPC
@@ -365,7 +373,12 @@ const actions = {
 			if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
 		}
 		
-		// Update the store
+		// UPDATE STORE
+
+		// Save maxHp including maxHpMod in the store
+		if(prop === 'maxHp') {
+			value = (maxHpMod) ? value + maxHpMod : value;
+		}
 		commit("SET_ENTITY_PROPERTY", {key, prop, value});
 	},
 
@@ -689,8 +702,6 @@ const actions = {
 			commit("DELETE_ENTITY_PROPERTY", {key, prop: 'stable'});
 		}
 	},
-	edit_entity({ commit }, payload) { commit('EDIT_ENTITY', payload); },
-	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
 
 	/**
 	 * Transform an entity so it has different HP and AC
@@ -940,7 +951,7 @@ const mutations = {
 				
 				entity.name = db_player.character_name;
 				entity.ac = parseInt(db_player.ac);
-				entity.maxHp = (entity.maxHpMod !== 0) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
+				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
 				entity.strength = db_player.strength;
 				entity.dexterity = db_player.dexterity;
 				entity.constitution = db_player.constitution;
@@ -969,13 +980,13 @@ const mutations = {
 					entity.tempHp = campaignCompanion.tempHp;
 					entity.ac_bonus = campaignCompanion.ac_bonus;
 					entity.maxHpMod = campaignCompanion.maxHpMod;
+					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
 
 					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
 					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
 					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
 					entity.ac = data_npc.ac;
-					entity.maxHp = data_npc.maxHp;
 
 					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 
@@ -1005,7 +1016,9 @@ const mutations = {
 
 					entity.curHp = db_entity.curHp;
 					entity.tempHp = db_entity.tempHp;
+					entity.maxHpMod = db_entity.maxHpMod;
 					entity.ac_bonus = db_entity.ac_bonus;
+					entity.maxHp = (entity.maxHpMod) ? parseInt(db_entity.maxHp + entity.maxHpMod) : parseInt(db_entity.maxHp);
 
 					if(db_entity.transformed) {
 						entity.transformed = true;

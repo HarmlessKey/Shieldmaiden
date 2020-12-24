@@ -101,7 +101,7 @@
 						color="white" 
 						v-model="editable_entity.ac_bonus" 
 					>
-						<q-icon slot="append" name="fas fa-shield-check" />
+						<q-icon slot="append" size="xs" name="fas fa-shield-check" />
 						<q-btn
 							slot="after"
 							flat dense
@@ -124,7 +124,7 @@
 						color="white" 
 						v-model="editable_entity.ac" 
 					>
-						<q-icon slot="append" name="fas fa-shield" />
+						<q-icon slot="append" size="xs" name="fas fa-shield" />
 						<q-btn
 							slot="after"
 							flat dense
@@ -158,8 +158,8 @@
 
 					<!-- HEALTH -->
 					<template v-if="entity.active">
-						<template v-if="entity.curHp > 0">
-							<span class="hp" @click.stop>
+						<span class="hp" @click.stop>
+							<template v-if="entity.curHp > 0">
 								<span class="current">{{ animatedNumber }}</span>
 								<span class="max">
 									{{ displayStats().maxHp }}
@@ -173,109 +173,8 @@
 										Temp HP
 									</q-tooltip>
 								</span>
-								<q-popup-proxy
-									square
-									anchor="bottom middle" self="top middle" 
-									content-class="bg-gray px-2 py-2"
-								>
-									<div class="mb-1">{{ entity.name }}</div>
-									<q-input 
-										dark filled square dense 
-										label="Current hit points"
-										type="number" 
-										color="white" 
-										v-model="editable_entity.curHp" 
-									>
-										<q-icon slot="append" name="fas fa-heart" />
-										<q-btn
-											slot="after"
-											flat dense
-											color="primary"
-											icon="check"
-											v-close-popup 
-											@click.stop="edit_entity_prop({
-												key: entity.key, 
-												entityType: entity.entityType,
-												prop: 'curHp',
-												value: editable_entity.curHp
-											})"
-										/>
-									</q-input>
-									<q-input 
-										dark filled square dense 
-										class="my-2"
-										label="Temporary hit points"
-										type="number" 
-										color="white" 
-										v-model="editable_entity.tempHp" 
-									>
-										<q-icon slot="append" name="fas fa-stopwatch" />
-										<q-btn
-											slot="after"
-											flat dense
-											color="primary"
-											icon="check"
-											v-close-popup 
-											@click.stop="edit_entity_prop({
-												key: entity.key, 
-												entityType: entity.entityType,
-												prop: 'tempHp',
-												value: editable_entity.tempHp
-											})"
-										/>
-									</q-input>
-									<q-input 
-										dark filled square dense 
-										label="Maxium hit point modifier"
-										type="number" 
-										color="white" 
-										v-model="editable_entity.maxHpMod" 
-									>
-										<q-icon slot="append" name="fas fa-plus" />
-										<q-btn
-											slot="after"
-											flat dense
-											color="primary"
-											icon="check"
-											v-close-popup 
-											@click.stop="edit_entity_prop({
-												key: entity.key, 
-												entityType: entity.entityType,
-												prop: 'maxHpMod',
-												value: editable_entity.maxHpMod
-											})"
-										/>
-									</q-input>
-									<hr/>
-									<q-input 
-										dark filled square dense 
-										label="Override maximum hit points"
-										type="number" 
-										color="white" 
-										v-model="editable_entity.maxHp" 
-									>
-										<q-btn
-											slot="after"
-											flat dense
-											color="primary"
-											icon="check"
-											v-close-popup 
-											@click.stop="edit_entity_prop({
-												key: entity.key, 
-												entityType: entity.entityType,
-												prop: 'maxHp',
-												value: editable_entity.maxHp
-											})"
-										/>
-									</q-input>
-									<div class="d-flex justify-content-end mt-2">
-										<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
-									</div>
-								</q-popup-proxy>
-							</span>
-						</template>
-						<template v-else>
-							<div class="hp">
+							</template>
+							<template v-else>
 								<div v-if="entity.stable">
 									<i class="fas fa-fist-raised green"></i> Stable
 								</div>
@@ -283,13 +182,115 @@
 									<i class="fas fa-skull-crossbones red"></i> Dead
 								</div>
 								<div v-else class="hp d-flex justify-content-end">
-									<div v-for="(check, index) in entity.saves" :key="index">
-										<span v-show="check == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
-										<span v-show="check == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+									<div v-for="index in 5" :key="index">
+										<span v-show="entity.saves[index] == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
+										<span v-show="entity.saves[index] == 'fail'" class="save red"><i class="fas fa-times"></i></span>
+										<span v-show="!entity.saves[index]" class="save gray-hover"><i class="fas fa-dot-circle"></i></span>
 									</div>
 								</div>
-							</div>
-						</template>
+							</template>
+
+							<!-- Quick edit HP -->
+							<q-popup-proxy
+								square
+								anchor="bottom middle" self="top middle" 
+								content-class="bg-gray px-2 py-2"
+							>
+								<div class="mb-1">{{ entity.name }}</div>
+								<q-input 
+									dark filled square dense 
+									label="Current hit points"
+									type="number" 
+									color="white" 
+									v-model="editable_entity.curHp" 
+								>
+									<q-icon slot="append" size="xs" name="fas fa-heart" />
+									<q-btn
+										slot="after"
+										flat dense
+										color="primary"
+										icon="check"
+										v-close-popup 
+										@click.stop="edit_entity_prop({
+											key: entity.key, 
+											entityType: entity.entityType,
+											prop: 'curHp',
+											value: editable_entity.curHp
+										})"
+									/>
+								</q-input>
+								<q-input 
+									dark filled square dense 
+									class="my-2"
+									label="Temporary hit points"
+									type="number" 
+									color="white" 
+									v-model="editable_entity.tempHp" 
+								>
+									<q-icon slot="append" size="xs" name="fas fa-stopwatch" />
+									<q-btn
+										slot="after"
+										flat dense
+										color="primary"
+										icon="check"
+										v-close-popup 
+										@click.stop="edit_entity_prop({
+											key: entity.key, 
+											entityType: entity.entityType,
+											prop: 'tempHp',
+											value: editable_entity.tempHp
+										})"
+									/>
+								</q-input>
+								<q-input 
+									dark filled square dense 
+									label="Maxium hit point modifier"
+									type="number" 
+									color="white" 
+									v-model="editable_entity.maxHpMod" 
+								>
+									<q-icon slot="append" size="xs" name="fas fa-plus" />
+									<q-btn
+										slot="after"
+										flat dense
+										color="primary"
+										icon="check"
+										v-close-popup 
+										@click.stop="edit_entity_prop({
+											key: entity.key, 
+											entityType: entity.entityType,
+											prop: 'maxHpMod',
+											value: editable_entity.maxHpMod
+										})"
+									/>
+								</q-input>
+								<hr/>
+								<q-input 
+									dark filled square dense 
+									label="Override maximum hit points"
+									type="number" 
+									color="white" 
+									v-model="editable_entity.maxHp" 
+								>
+									<q-btn
+										slot="after"
+										flat dense
+										color="primary"
+										icon="check"
+										v-close-popup 
+										@click.stop="edit_entity_prop({
+											key: entity.key, 
+											entityType: entity.entityType,
+											prop: 'maxHp',
+											value: editable_entity.maxHp
+										})"
+									/>
+								</q-input>
+								<div class="d-flex justify-content-end mt-2">
+									<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+								</div>
+							</q-popup-proxy>
+						</span>
 					</template>
 
 					<!-- IDLE ACTIONS -->
@@ -398,7 +399,13 @@
 			},
 			editable_entity: {
 				get() {
-					return (this.entitySetter) ? this.entitySetter : {...this.entity};
+					let entity = {...this.entity};
+
+					//remove maxHp mod
+					const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
+					entity.maxHp = (maxHpMod > 0) ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
+
+					return (this.entitySetter) ? this.entitySetter : entity;
 				},
 				set(newValue) {
 					this.entitySetter = newValue;
@@ -421,7 +428,8 @@
 				'setSlide',
 				'add_next_round',
 				'set_initiative',
-				'edit_entity_prop'
+				'edit_entity_prop',
+				'display_maxHp'
 			]),
 			showCondition(key) {
 				//Stop other functions so target is not deselected

@@ -7,7 +7,7 @@
 		<!-- ACTIONS -->
 		<div class="actions" v-if="characters.length !== 0">
 			<!-- MOBILE -->
-			<div v-if="width <= 576">
+			<div v-if="screenWidth <= 576">
 				<q-tabs
 					dark
 					inline-label
@@ -281,7 +281,8 @@
 			'players',
 			'playerSettings',
 			'npcs',
-			'npcSettings'
+			'npcSettings',
+			'screenWidth'
 		],
 		data() {
 			return {

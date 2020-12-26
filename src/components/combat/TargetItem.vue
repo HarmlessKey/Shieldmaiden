@@ -183,7 +183,7 @@
 					<!-- HEALTH -->
 					<template v-if="entity.active">
 						<span class="hp" @click.stop>
-							<template v-if="entity.curHp > 0">
+							<template v-if="entity.curHp > 0 || entity.entityType === 'npc'">
 								<span class="current">{{ animatedNumber }}</span>
 								<span class="max">
 									{{ displayStats().maxHp }}
@@ -272,7 +272,7 @@
 									<hr/>
 									<q-input 
 										dark filled square dense 
-										label="Overrid current hit points"
+										label="Override current hit points"
 										type="number" 
 										color="white"
 										class="mb-2"
@@ -374,7 +374,6 @@
 					</div>
 				</div>
 			</q-linear-progress>
-
 		</div>
 
 		<!-- REMINDERS -->

@@ -36,7 +36,7 @@
 
 			<small>
 				Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 
-				Damage and healing is handled as the rulebook describes it should work for Wild Shape.
+				Damage and healing is handled as the Player's Handbook describes it should work for Wild Shape (phb 67).
 			</small>
 		</template>
 	</div>

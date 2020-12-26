@@ -234,48 +234,42 @@
 
 		<!-- MULTIPLE ENTITIES -->
 		<template v-else>
-			<div class="d-flex justify-content-between">
-				<q-input 
-					dark filled square
-					label="AC Bonus"
-					autocomplete="off"
-					type="number" 
-					name="ac_bonus" 
-					v-model="entity.ac_bonus"
-					placeholder="AC Bonus"
-					@change="editValue('ac_bonus', entity.ac_bonus)"
-				/>
+			<q-input 
+				dark filled square
+				label="AC Bonus"
+				autocomplete="off"
+				type="number" 
+				name="ac_bonus" 
+				v-model="ac_bonus"
+				placeholder="AC Bonus"
+				@change="editValue('ac_bonus', ac_bonus)"
+			/>
 
-				<q-input 
-					dark filled square
-					label="Temp HP"
-					autocomplete="off"
-					type="number" 
-					name="tempHp" 
-					class="mx-1"
-					v-model="entity.tempHp"
-					placeholder="Temporary Hit Points"
-					@change="editValue('tempHp', entity.tempHp)"
-				/>
+			<q-input 
+				dark filled square
+				label="Temp HP"
+				autocomplete="off"
+				type="number" 
+				name="tempHp" 
+				class="my-2"
+				v-model="tempHp"
+				placeholder="Temporary Hit Points"
+				@change="editValue('tempHp', tempHp)"
+			/>
 
-				<q-input 
-					dark filled square
-					label-slot
-					autocomplete="off"
-					type="number" 
-					name="maxHpMod"
-					min="0"
-					v-model="entity.maxHpMod"
-					placeholder="Modifier"
-					@change="editValue('maxHpMod', entity.maxHpMod)"
-				>
-					<template v-slot:label>
-						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
-						Max HP Mod
-					</template>
-				</q-input>
-			</div>
-			<p>
+			<q-input 
+				dark filled square
+				label="Max HP Modifier"
+				autocomplete="off"
+				type="number" 
+				name="maxHpMod"
+				min="0"
+				v-model="maxHpMod"
+				placeholder="Modifier"
+				@change="editValue('maxHpMod', maxHpMod)"
+			/>
+
+			<p class="mt-4">
 				These values will be set for all targeted entities. 
 				If one of the entities allready has this value set,
 				it will be <span class="red">overwritten</span> with the new value.
@@ -302,6 +296,9 @@
 				encounterId: this.$route.params.encid,
 				npcSettings: undefined,
 				entity_settings: undefined,
+				maxHpMod: undefined,
+				tempHp: undefined,
+				ac_bonus: undefined,
 				hkColors: [
 					"#88b3ce",
 					"#9ac16a",

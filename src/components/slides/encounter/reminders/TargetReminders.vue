@@ -66,7 +66,6 @@
 							</div>
 							<div v-if="varOptions === key" class="variables">
 								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-									<label>{{ var_key }}</label>
 									<q-select 
 										dark filled square dense
 										:label="var_key"
@@ -215,21 +214,9 @@
 			background: #191919;
 		}
 	}
-	ul.nav-tabs {
-		border-bottom: solid 3px #494747;
-		height: 41px;
-		margin: 0;
 
-		.nav-link {
-			color: #b2b2b2 !important;
-			border-bottom: solid 3px #494747 !important;
-
-			&.active {
-				color: #2c97de !important;
-				background: none !important;
-				border-color: #2c97de !important;
-			}
-		}
+	.q-tab-panel {
+		padding: 15px 0;
 	}
 
 	ul.premade {

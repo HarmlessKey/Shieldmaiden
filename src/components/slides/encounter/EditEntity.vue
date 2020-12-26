@@ -7,6 +7,8 @@
 			</li>
 		</ul>
 		<hr>
+
+		<!-- SINGLE ENTITY -->
 		<template v-if="entity">
 			<a 
 				v-if="entity.transformed"
@@ -70,50 +72,50 @@
 				</q-input>
 			</div>
 
-		<!-- Initiative, AC bonus and TempHp -->
-		<hr>
-		<div class="d-flex justify-content-between">
-			<q-input 
-				dark filled square
-				label="AC Bonus"
-				autocomplete="off"
-				type="number" 
-				name="ac_bonus" 
-				v-model="entity.ac_bonus"
-				placeholder="AC Bonus"
-				@change="editValue('ac_bonus', entity.ac_bonus)"></q-input>
+			<!-- Initiative, AC bonus and TempHp -->
+			<hr>
+			<div class="d-flex justify-content-between">
+				<q-input 
+					dark filled square
+					label="AC Bonus"
+					autocomplete="off"
+					type="number" 
+					name="ac_bonus" 
+					v-model="entity.ac_bonus"
+					placeholder="AC Bonus"
+					@change="editValue('ac_bonus', entity.ac_bonus)"></q-input>
 
-			<q-input 
-				dark filled square
-				label="Temp HP"
-				autocomplete="off"
-				type="number" 
-				name="tempHp" 
-				class="mx-1"
-				v-model="entity.tempHp"
-				placeholder="Temporary Hit Points"
-				@change="editValue('tempHp', entity.tempHp)"></q-input>
+				<q-input 
+					dark filled square
+					label="Temp HP"
+					autocomplete="off"
+					type="number" 
+					name="tempHp" 
+					class="mx-1"
+					v-model="entity.tempHp"
+					placeholder="Temporary Hit Points"
+					@change="editValue('tempHp', entity.tempHp)"></q-input>
 
-			<q-input 
-				dark filled square
-				label-slot
-				autocomplete="off"
-				type="number" 
-				name="maxHpMod"
-				min="0"
-				v-model="entity.maxHpMod"
-				placeholder="Modifier"
-				@change="editValue('maxHpMod', entity.maxHpMod)"
-			>
-				<template v-slot:label>
+				<q-input 
+					dark filled square
+					label-slot
+					autocomplete="off"
+					type="number" 
+					name="maxHpMod"
+					min="0"
+					v-model="entity.maxHpMod"
+					placeholder="Modifier"
+					@change="editValue('maxHpMod', entity.maxHpMod)"
+				>
+					<template v-slot:label>
 						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
 						Max HP Mod
 					</template>
-			</q-input>
-		</div>
+				</q-input>
+			</div>
 
-		<!-- Override values: AC, maxHp, curHp -->
-		<hr>
+			<!-- Override values: AC, maxHp, curHp -->
+			<hr>
 			<h2 class="mb-2">Override</h2>
 			<div class="d-flex justify-content-between">
 				<q-input 
@@ -212,7 +214,7 @@
 					</q-item>
 					<template v-slot:option="scope">
 						<q-item
-							clickable dense
+							clickable
 							v-ripple
 							v-close-popup
 							:active="isActive(setting.key, scope.opt)"
@@ -228,6 +230,56 @@
 					</template>
 				</q-select>
 			</template>
+		</template>
+
+		<!-- MULTIPLE ENTITIES -->
+		<template v-else>
+			<div class="d-flex justify-content-between">
+				<q-input 
+					dark filled square
+					label="AC Bonus"
+					autocomplete="off"
+					type="number" 
+					name="ac_bonus" 
+					v-model="entity.ac_bonus"
+					placeholder="AC Bonus"
+					@change="editValue('ac_bonus', entity.ac_bonus)"
+				/>
+
+				<q-input 
+					dark filled square
+					label="Temp HP"
+					autocomplete="off"
+					type="number" 
+					name="tempHp" 
+					class="mx-1"
+					v-model="entity.tempHp"
+					placeholder="Temporary Hit Points"
+					@change="editValue('tempHp', entity.tempHp)"
+				/>
+
+				<q-input 
+					dark filled square
+					label-slot
+					autocomplete="off"
+					type="number" 
+					name="maxHpMod"
+					min="0"
+					v-model="entity.maxHpMod"
+					placeholder="Modifier"
+					@change="editValue('maxHpMod', entity.maxHpMod)"
+				>
+					<template v-slot:label>
+						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						Max HP Mod
+					</template>
+				</q-input>
+			</div>
+			<p>
+				These values will be set for all targeted entities. 
+				If one of the entities allready has this value set,
+				it will be <span class="red">overwritten</span> with the new value.
+			</p>
 		</template>
 	</div>
 </template>

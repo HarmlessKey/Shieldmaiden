@@ -4,7 +4,7 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})">
+				<a v-if="targeted.length > 0" @click="set_targeted({type: 'untarget', key: 'all'})">
 					<i class="fas fa-times red"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Untarget all
@@ -84,6 +84,15 @@
 						[m] Reminders
 					</q-tooltip>
 				</a>
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })" 
+					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })"
+				>
+					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[e] Edit
+					</q-tooltip>
+				</a>
 			</div>
 		</h2>
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
@@ -98,7 +107,7 @@
 					<div v-for="key in targeted" :key="`target-${key}`" class="target">
 						<div class="health">
 							<TargetItem :item="key" />
-							<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})">
+							<a class="clear bg-gray-dark" @click="set_targeted({type: 'untarget', key})">
 								<i class="fas fa-times red"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Untarget

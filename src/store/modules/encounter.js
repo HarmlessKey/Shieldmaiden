@@ -237,9 +237,6 @@ const actions = {
 	},
 	set_log({ commit }, payload) { commit("SET_LOG", payload) },
 
-	edit_entity({ commit }, payload) { commit('EDIT_ENTITY', payload); },
-	edit_player({ commit }, payload) { commit('EDIT_PLAYER', payload); },
-
 	/**
 	 * Edit entity properties
 	 * edits entity properties in the store and firebase
@@ -1177,33 +1174,7 @@ const mutations = {
 			const parsed = JSON.stringify(state.log);
 			if(!state.demo) localStorage.setItem(state.encounterId, parsed);
 		}
-	},
-	EDIT_ENTITY(state, {key, entity}) {
-		Vue.set(state.entities[key], 'name', entity.name);
-		Vue.set(state.entities[key], 'initiative', entity.initiative);
-		Vue.set(state.entities[key], 'ac', entity.ac);
-		Vue.set(state.entities[key], 'maxHp', entity.maxHp);
-		Vue.set(state.entities[key], 'curHp', entity.curHp);
-		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus);
-		Vue.set(state.entities[key], 'tempHp', entity.tempHp);
-		Vue.set(state.entities[key], 'color_label', entity.color_label);
-
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).update(entity);
-	},
-	EDIT_PLAYER(state, {key, entity}) {
-		Vue.set(state.entities[key], 'initiative', entity.initiative);
-		Vue.set(state.entities[key], 'ac', entity.ac);
-		Vue.set(state.entities[key], 'curHp', entity.curHp);
-		Vue.set(state.entities[key], 'ac_bonus', entity.ac_bonus);
-		Vue.set(state.entities[key], 'tempHp', entity.tempHp);
-		Vue.set(state.entities[key], 'maxHpMod', entity.maxHpMod);
-
-		entity.maxHp = entity.maxHp + entity.maxHpMod;
-		Vue.set(state.entities[key], 'maxHp', entity.maxHp);
-
-		//INIT needs to be updated in firebase
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(entity.initiative);
-	},
+	}
 }
 
 export const encounter_module = {

@@ -8,6 +8,13 @@
 		</ul>
 		<hr>
 		<template v-if="entity">
+			<a 
+				v-if="entity.transformed"
+				class="btn btn-block bg-red mb-2" 
+				@click="transform_entity({key: entity.key, remove: true})"
+			>
+				Remove transformation
+			</a>
 			<q-input 
 				v-if="entity.entityType === 'npc'"
 				dark filled square
@@ -89,14 +96,20 @@
 
 			<q-input 
 				dark filled square
-				label="Max HP modifier"
+				label-slot
 				autocomplete="off"
 				type="number" 
 				name="maxHpMod"
 				min="0"
 				v-model="entity.maxHpMod"
-				placeholder="Max HP modifier"
-				@change="editValue('maxHpMod', entity.maxHpMod)"></q-input>
+				placeholder="Modifier"
+				@change="editValue('maxHpMod', entity.maxHpMod)"
+			>
+				<template v-slot:label>
+						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						Max HP Mod
+					</template>
+			</q-input>
 		</div>
 
 		<!-- Override values: AC, maxHp, curHp -->
@@ -105,35 +118,54 @@
 			<div class="d-flex justify-content-between">
 				<q-input 
 					dark filled square
-					label="Armor class"
+					label-slot
 					autocomplete="off"
 					class="mr-1"
 					type="number" 
 					name="ac" 
 					min="1"
 					v-model="entity.ac"
-					placeholder="Armor Class"></q-input>
-
+					@change="editValue('ac', entity.ac)"
+				>
+					<template v-slot:label>
+						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						Armor class
+					</template>
+				</q-input>
 				<q-input 
 					dark filled square
-					label="Max HP"
+					label-slot
 					autocomplete="off"
 					class="mr-1"
 					type="number" 
 					name="maxHp" 
 					min="0"
 					v-model="entity.maxHp"
-					placeholder="Maximum Hit Points"></q-input>
+					placeholder="Maximum Hit Points"
+					@change="editValue('maxHp', entity.maxHp)"
+				>
+					<template v-slot:label>
+						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						Max HP
+					</template>
+				</q-input>
 
 				<q-input 
 					dark filled square
-					label="Current HP"
 					autocomplete="off"
+					label-slot
 					type="number" 
-					name="maxHp" 
+					name="curHp" 
 					min="0"
 					v-model="entity.curHp"
-					placeholder="Current Hit Points"></q-input>
+					placeholder="Current Hit Points"
+					@change="editValue('curHp', entity.curHp)"
+				>	
+					<template v-slot:label>
+						<i v-if="entity.transformed" class="fas fa-paw-claws green" />
+						Cur HP
+					</template>
+				</q-input>
 			</div>
 
 			<!-- Display settings NPC's (Player screen) -->
@@ -150,36 +182,16 @@
 					</a>
 				</span>
 
-				<!-- <ul class="settings">
-					<li v-for="(setting, key) in npcsOptions" class="d-flex justify-content-between" :key="key">
-						<span><i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}</span>
-						<div>
-
-							<a v-for="option in setting.options"
-								:key="option.name" 
-								@click="setSetting(key, option.value)" class="ml-2"
-								:class="[ isActive(key, option) ? option.color : 'gray-light' ]">
-									<span class="d-none d-md-inline mr-1">
-										<template v-if="isActive(key, option)">{{ option.name }}</template>
-										<template v-else>{{ option.action }}</template>
-									</span>
-									<i :class="option.icon"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										{{ isActive(key, option) ? option.name : option.action }}
-									</q-tooltip>
-							</a>
-						</div>
-					</li>
-				</ul> -->
+				<!-- NPC DISPLAY SETTING -->
 				<q-select 
-					dark filled square
+					dark filled square dense
 					v-for="(setting, index) in npcsOptions"
 					:options="setting.options"
 					:value="index"
 					class="mb-1"
 					:key="`setting-${index}`"
 				>
-					<q-item slot="selected">
+					<q-item slot="selected" dense>
 						<q-item-section avatar>
 							<q-icon :name="setting.icon" size="small" />
 						</q-item-section>
@@ -200,7 +212,7 @@
 					</q-item>
 					<template v-slot:option="scope">
 						<q-item
-							clickable
+							clickable dense
 							v-ripple
 							v-close-popup
 							:active="isActive(setting.key, scope.opt)"
@@ -291,6 +303,14 @@
 					if(this.targeted.length === 1) {
 						let entity = {...this.entities[this.targeted[0]]};
 
+						// Edit different properties for transformed entities
+						if(entity.transformed) {
+							entity.maxHp = entity.transformedMaxHp;
+							entity.curHp = entity.transformedCurHp;
+							entity.ac = entity.transformedAc;
+							entity.maxHpMod = entity.transformedMaxHpMod;
+						}
+
 						//remove maxHp mod
 						const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
 						entity.maxHp = (maxHpMod > 0) ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
@@ -318,7 +338,8 @@
 		methods: {
 			...mapActions([
 				'set_initiative',
-				'edit_entity_prop'
+				'edit_entity_prop',
+				'transform_entity'
 			]),
 			editValue(prop, value) {
 				for(const key of this.targeted) {

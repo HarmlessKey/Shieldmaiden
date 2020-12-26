@@ -98,7 +98,7 @@
 												</q-item>
 												<q-item 
 													clickable v-close-popup 
-													@click="edit(entity.key, entities[entity.key], entity.entityType)"
+													@click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })"
 												>
 													<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
 													<q-item-section>Edit</q-item-section>
@@ -250,35 +250,6 @@
 				'set_stable',
 				'remove_entity',
 			]),
-			edit(key, entity, entityType) {
-				let editType = undefined;
-				switch(entityType) {
-					case 'player':
-						editType = 'slides/EditPlayer';
-						break;
-					case 'companion':
-						editType = 'slides/encounter/EditCompanion';
-						break;
-					case 'npc':
-						editType = 'slides/encounter/EditNpc';
-						break;
-				}
-
-				if(key) {
-					this.setSlide({
-						show: true,
-						type: editType,
-						data: {
-							key: key,
-							location: 'encounter'
-						}
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Edit entity', {
-					});
-				}
-			},
 			setHidden(key, hidden) {
 				if(key) {
 					this.set_hidden({

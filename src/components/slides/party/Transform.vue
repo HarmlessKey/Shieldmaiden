@@ -5,7 +5,7 @@
 		<div class="row q-col-gutter-md mb-2">
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Armor class"
 					autocomplete="off"
 					type="number" 
@@ -17,7 +17,7 @@
 			
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Hit points"
 					autocomplete="off"
 					type="number" 

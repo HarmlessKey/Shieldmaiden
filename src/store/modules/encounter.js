@@ -257,53 +257,81 @@ const actions = {
 
 		// Entity values
 		const entity = state.entities[key];
-		const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
-		const maxHpIncMod = entity.maxHp; // In the store maxHp is saved inc maxHpMod
+		let maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
+		let maxHpIncMod = entity.maxHp; // In the store maxHp is saved inc maxHpMod
 		// Below returns maxHp without maxHpMod, needed for some changes
 		let maxHp = (maxHpMod > 0) ? entity.maxHp - maxHpMod : entity.maxHp + Math.abs(maxHpMod);
 		let curHp = entity.curHp;
 		
 		if(value === undefined) value = null;
-		if(value && ["maxHp", "curHp", "tempHp", "maxHpMod", "ac", "ac_bonus"].includes(prop)) value = parseInt(value);
+		if(	value && 
+			["maxHp", 
+				"curHp", 
+				"tempHp", 
+				"maxHpMod", 
+				"ac", 
+				"ac_bonus", 
+				"transformedMaxHp", 
+				"transformedCurHp", 
+				"transformedAc", 
+				"transformedMaxHpMod"
+			].includes(prop)) value = parseInt(value);
+
+		// Check if the entity was transformed
+		if(entity.transformed) {
+			if(prop === "maxHp") prop = "transformedMaxHp";
+			if(prop === "curHp") prop = "transformedCurHp";
+			if(prop === "ac") prop = "transformedAc";
+			if(prop === "maxHpMod") prop = "transformedMaxHpMod";
+
+			maxHpMod = (entity.transformedMaxHpMod) ? parseInt(entity.transformedMaxHpMod) : 0;
+			maxHpIncMod = entity.transformedMaxHp;
+			// Below returns maxHp without maxHpMod, needed for some changes
+			maxHp = (maxHpMod > 0) ? entity.transformedMaxHp - maxHpMod : entity.transformedMaxHp + Math.abs(maxHpMod);
+			curHp = entity.transformedCurHp;
+		}
 		
 		// HANDLE VALUES
 
 		// Name
-		if(prop === 'name') {
+		if(prop === "name") {
 			if(!value) value = "Invalid name";
 		}
 
 		// Armor class
-		if(prop === 'ac') {
+		if(prop === "ac" || prop === "transformedAc") {
 			if(!value || value < 0) value = 1;
 		}
 
 		// Current hit poins
-		if(prop === 'curHp') {
+		if(prop === "curHp" || prop === "transformedCurHp") {
 			if(!value || value < 0) value = 0;
 			if(value > maxHpIncMod) value = maxHpIncMod;
 		}
 
 		// Maximum hit points
-		if(prop === 'maxHp') {
+		if(prop === "maxHp" || prop === "transformedMaxHp") {
 			const valueIncMod = (maxHpMod) ? value + maxHpMod : value;
 			if(!value || value < 0) value = 0;
 
 			// CurHp can't be > (maxHp + maxHpMod)
 			if(curHp > valueIncMod) {
 				curHp = valueIncMod;
-
+				
+				// For transformed entities, a different prop must be created
+				const curHpPropPlayer = (entity.transformed) ? "transformed/curHp" : "curHp"; // For player/companion
+				const curHpProp = (entity.transformed) ? "transformedCurHp" : "curHp";
 				if(!state.demo) {
-					if(entityType === "player") db.ref(`${campaignPlayer}/curHp`).set(curHp);
-					if(entityType === "companion") db.ref(`${campaignCompanion}/curHp`).set(curHp);
-					if(entityType === "npc") db.ref(`${encounterEntity}/curHp`).set(curHp);
+					if(entityType === "player") db.ref(`${campaignPlayer}/${curHpPropPlayer}`).set(curHp);
+					if(entityType === "companion") db.ref(`${campaignCompanion}/${curHpPropPlayer}`).set(curHp);
+					if(entityType === "npc") db.ref(`${encounterEntity}/${curHpProp}`).set(curHp);
 				}
-				commit("SET_ENTITY_PROPERTY", {key, prop: "curHp", value: curHp});
+				commit("SET_ENTITY_PROPERTY", {key, prop: curHpProp, value: curHp});
 			}
 		}
 
 		// Maximum hit point modifier
-		if(prop === 'maxHpMod') {
+		if(prop === "maxHpMod" || prop === "transformedMaxHpMod") {
 			// New maxHp needs to be updated (only in the store)
 			maxHp = parseInt(maxHp + value); // New maxHp
 
@@ -345,13 +373,17 @@ const actions = {
 			for(const hpType of ["maxHp", "curHp"]) {
 				const newValue = (hpType === "maxHp") ? maxHp : curHp;
 				
+				// For transformed entities, a different prop must be created
+				const hpPropPlayer = (entity.transformed) ? `transformed/${hpType}` : hpType; // For player/companion
+				const hpProp = (entity.transformed) ? `transformed${hpType.capitalize()}` : hpType;
+				
 				// Save new curHp in firebase
 				if(hpType === "curHp" && !state.demo) {
-					if(entityType === "player") db.ref(`${campaignPlayer}/${hpType}`).set(newValue);
-					if(entityType === "companion") db.ref(`${campaignCompanion}/${hpType}`).set(newValue);
-					if(entityType === "npc") db.ref(`${encounterEntity}/${hpType}`).set(newValue);
+					if(entityType === "player") db.ref(`${campaignPlayer}/${hpPropPlayer}`).set(newValue);
+					if(entityType === "companion") db.ref(`${campaignCompanion}/${hpPropPlayer}`).set(newValue);
+					if(entityType === "npc") db.ref(`${encounterEntity}/${hpProp}`).set(newValue);
 				}
-				commit("SET_ENTITY_PROPERTY", {key, prop: hpType, value: newValue});
+				commit("SET_ENTITY_PROPERTY", {key, prop: hpProp, value: newValue});
 			}
 		}
 
@@ -362,6 +394,16 @@ const actions = {
 			// Some player properties are stored in the campaign
 			if(["ac_bonus", "curHp", "maxHpMod"].includes(prop)) {
 				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
+			}
+			// When a player is transformed
+			if(["transformedMaxHp", "transformedCurHp", "transformedAc", "transformedMaxHpMod"].includes(prop)) {
+				let saveProp;
+				if(prop === "transformedMaxHp") saveProp = "maxHp";
+				if(prop === "transformedCurHp") saveProp = "curHp";
+				if(prop === "transformedAc") saveProp = "ac";
+				if(prop === "transformedMaxHpMod") saveProp = "maxHpMod";
+
+				if(!state.demo) db.ref(`${campaignPlayer}/transformed/${saveProp}`).set(value);
 			}
 			// Some player properties are stored under player
 			else if(["ac", "maxHp", "name"].includes(prop)) {
@@ -375,7 +417,7 @@ const actions = {
 		}
 
 		// Update companion
-		if(entityType === 'companion') {
+		if(entityType === "companion") {
 			if(["maxHp", "name"].includes(prop)) {
 				if(!state.demo) db.ref(`npcs/${state.uid}/${key}/${prop}`).set(value);
 			} else {
@@ -384,14 +426,14 @@ const actions = {
 		}
 
 		// Update NPC
-		if(entityType === 'npc') {
+		if(entityType === "npc") {
 			if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
 		}
 		
 		// UPDATE STORE
 
 		// Save maxHp including maxHpMod in the store
-		if(prop === 'maxHp') {
+		if(prop === "maxHp" || prop === "transformedMaxHp") {
 			value = (maxHpMod) ? value + maxHpMod : value;
 		}
 		commit("SET_ENTITY_PROPERTY", {key, prop, value});
@@ -604,6 +646,7 @@ const actions = {
 				// Remove transformation in the store
 				commit('SET_ENTITY_PROPERTY', { key, prop: 'transformed', value: false });
 				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedMaxHp' });
+				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedMaxHpMod' });
 				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedCurHp' });
 				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedAc' });
 			}
@@ -755,12 +798,12 @@ const actions = {
 					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(entity);
 				}
 			}
+			// Update store
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformed', value: true });
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedMaxHp', value: entity.maxHp });
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedCurHp', value: entity.maxHp });
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedAc', value: entity.ac });
 		}
-		// Update store
-		commit('SET_ENTITY_PROPERTY', { key, prop: 'transformed', value: true });
-		commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedMaxHp', value: entity.maxHp });
-		commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedCurHp', value: entity.maxHp });
-		commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedAc', value: entity.ac });
 	},
 	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
 	add_entity_demo({ commit, rootState }, entity) { 
@@ -952,9 +995,10 @@ const mutations = {
 				//Get player transformed from campaign
 				if(campaignPlayer.transformed) {
 					entity.transformed = true;
-					entity.transformedMaxHp = campaignPlayer.transformed.maxHp;
 					entity.transformedCurHp = campaignPlayer.transformed.curHp;
 					entity.transformedAc = campaignPlayer.transformed.ac;
+					entity.transformedMaxHpMod = campaignPlayer.transformed.maxHpMod || 0;
+					entity.transformedMaxHp = campaignPlayer.transformed.maxHp + entity.transformedMaxHpMod;
 				} else {
 					entity.transformed = false;
 				}
@@ -1008,9 +1052,10 @@ const mutations = {
 					//Get player transformed from campaign
 					if(campaignCompanion.transformed) {
 						entity.transformed = true;
-						entity.transformedMaxHp = campaignCompanion.transformed.maxHp;
 						entity.transformedCurHp = campaignCompanion.transformed.curHp;
 						entity.transformedAc = campaignCompanion.transformed.ac;
+						entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
 					} else {
 						entity.transformed = false;
 					}
@@ -1037,9 +1082,10 @@ const mutations = {
 
 					if(db_entity.transformed) {
 						entity.transformed = true;
-						entity.transformedMaxHp = db_entity.transformed.maxHp;
 						entity.transformedCurHp = db_entity.transformed.curHp;
 						entity.transformedAc = db_entity.transformed.ac;
+						entity.transformedMaxHpMod = db_entity.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = db_entity.transformed.maxHp + entity.transformedMaxHpMod;
 					} else {
 						entity.transformed = false;
 					}

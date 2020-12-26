@@ -2,9 +2,8 @@
 	<div>
 		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
-			<span class="initiative" v-if="initiative" @click.stop>
-				<i v-if="targeted.includes(entity.key)" class="fas fa-crosshairs blue" />
-				<template v-else>{{ entity.initiative }}</template>
+			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
+				{{ entity.initiative }}
 				<q-popup-proxy 
 					square
 					anchor="bottom middle" self="top middle"
@@ -80,7 +79,7 @@
 							v-close-popup 
 							@click.stop="edit_entity_prop({
 								key: entity.key, 
-								enityType: entity.entityType, 
+								entityType: entity.entityType, 
 								prop: 'color_label', 
 								value: editable_entity.color_label
 							})"
@@ -151,6 +150,7 @@
 						color="white" 
 						v-model="editable_entity.ac" 
 					>
+						<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
 						<q-icon slot="append" size="xs" name="fas fa-shield" />
 						<q-btn
 							slot="after"
@@ -228,29 +228,7 @@
 								<div class="mb-1">{{ entity.name }}</div>
 								<q-input 
 									dark filled square dense 
-									label="Current hit points"
-									type="number" 
-									color="white" 
-									v-model="editable_entity.curHp" 
-								>
-									<q-icon slot="append" size="xs" name="fas fa-heart" />
-									<q-btn
-										slot="after"
-										flat dense
-										color="primary"
-										icon="check"
-										v-close-popup 
-										@click.stop="edit_entity_prop({
-											key: entity.key, 
-											entityType: entity.entityType,
-											prop: 'curHp',
-											value: editable_entity.curHp
-										})"
-									/>
-								</q-input>
-								<q-input 
-									dark filled square dense 
-									class="my-2"
+									class="mb-2"
 									label="Temporary hit points"
 									type="number" 
 									color="white" 
@@ -278,6 +256,7 @@
 									color="white" 
 									v-model="editable_entity.maxHpMod" 
 								>
+									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
 									<q-icon slot="append" size="xs" name="fas fa-plus" />
 									<q-btn
 										slot="after"
@@ -296,11 +275,46 @@
 								<hr/>
 								<q-input 
 									dark filled square dense 
+									label="Overrid current hit points"
+									type="number" 
+									color="white"
+									class="mb-2"
+									v-model="editable_entity.curHp" 
+								>
+									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+									<q-icon slot="append" size="xs" name="fas fa-heart" />
+									<q-btn
+										slot="after"
+										flat dense
+										color="primary"
+										icon="check"
+										v-close-popup 
+										@click.stop="edit_entity_prop({
+											key: entity.key, 
+											entityType: entity.entityType,
+											prop: 'curHp',
+											value: editable_entity.curHp
+										})"
+									/>
+								</q-input>
+								<q-input 
+									dark filled square dense 
 									label="Override maximum hit points"
 									type="number" 
 									color="white" 
 									v-model="editable_entity.maxHp" 
 								>
+									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+									<span 
+										slot="append" 
+										v-if="displayStats().maxHpMod"
+										:class="displayStats().maxHpMod > 0 ? 'green' : 'red'"
+									>
+										{{ displayStats().maxHpMod > 0 ? `+${displayStats().maxHpMod}` : displayStats().maxHpMod }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Modifier
+										</q-tooltip>
+									</span>
 									<q-btn
 										slot="after"
 										flat dense
@@ -434,9 +448,20 @@
 			entity() {
 				return this.entities[this.item];
 			},
+			/**
+			 * Copy of the entity object that can be edited with quick edits
+			 */
 			editable_entity: {
 				get() {
 					let entity = {...this.entity};
+
+					// Edit different properties for transformed entities
+					if(entity.transformed) {
+						entity.maxHp = entity.transformedMaxHp;
+						entity.curHp = entity.transformedCurHp;
+						entity.ac = entity.transformedAc;
+						entity.maxHpMod = entity.transformedMaxHpMod;
+					}
 
 					//remove maxHp mod
 					const maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
@@ -498,6 +523,7 @@
 					stats = {
 						ac: this.entity.transformedAc,
 						maxHp: this.entity.transformedMaxHp,
+						maxHpMod: this.entity.transformedMaxHpMod,
 						curHp: this.entity.transformedCurHp,
 					}
 				}
@@ -505,6 +531,7 @@
 					stats = {
 						ac: this.entity.ac,
 						maxHp: this.entity.maxHp,
+						maxHpMod: this.entity.maxHpMod,
 						curHp: this.entity.curHp,
 					}
 				}

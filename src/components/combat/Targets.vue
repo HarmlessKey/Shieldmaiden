@@ -98,14 +98,14 @@
 												</q-item>
 												<q-item 
 													clickable v-close-popup 
-													@click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: targeted })"
+													@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 												>
 													<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
 													<q-item-section>Edit</q-item-section>
 												</q-item>
 												<q-item 
 													clickable v-close-popup 
-													@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entity.key})"
+													@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 												>
 													<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
 													<q-item-section>Reminders</q-item-section>
@@ -126,14 +126,14 @@
 												</q-item>
 												<q-item 
 													clickable v-close-popup 
-													@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+													@click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 												>
 													<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
 													<q-item-section>Conditions</q-item-section>
 												</q-item>
 												<q-item 
 													clickable v-close-popup 
-													@click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: entity,})"
+													@click="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 												>
 													<q-item-section avatar><i class="fas fa-swords"></i></q-item-section>
 													<q-item-section>Do damage/healing</q-item-section>

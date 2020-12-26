@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Edit entity</h2>
+		<h2>Edit {{ entity ? "entity" : "entities" }}</h2>
 		<ul class="targets">
 			<li v-for="(target, i) in targeted" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />

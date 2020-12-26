@@ -12,21 +12,20 @@
 		<q-tabs
 			v-else
 			dark
-			inline-label
 			no-caps
 			indicator-color="transparent"
 		>
 			<q-tab 
-				v-for="({name, icon}, index) in tabs"
+				v-for="({name, icon, slide}, index) in tabs"
 				:key="`tab-${index}`" 
 				:name="name" 
 				:icon="icon"
 				@click="
-					(name === 'info') ? 
+					(slide) ? 
 					setSlide({
 						show: true,
-						type: 'combat/TargetInfo',
-						data: { key: targeted[0] }
+						type: slide.type,
+						data: slide.data
 					}) : dialog[name] = !dialog[name]"
 			/>
 		</q-tabs>
@@ -59,7 +58,7 @@
 					<q-item 
 						v-if="targeted.length === 1"
 						clickable v-close-popup 
-						@click="edit(entities[targeted[0]].key, entities[targeted[0]], entities[targeted[0]].entityType)"
+						@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 					>
 						<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
 						<q-item-section>Edit</q-item-section>
@@ -140,20 +139,35 @@
 				let tabs = [];
 
 				if(this.targeted.length) {
-
 					tabs.push({
 						name: "damage",
+						label: "Actions",
 						icon: "fas fa-swords",
 					},
 					{
+						name: "edit",
+						label: "Edit",
+						icon: "fas fa-pencil-alt",
+						slide: {
+							type: 'slides/encounter/EditEntity',
+							data: {}
+						}
+					},
+					{
 						name: "options",
+						label: "Options",
 						icon: "fas fa-ellipsis-h"
 					})
 				}
 				if(this.targeted.length === 1) {
 					tabs.push(	{
 						name: "info",
-						icon: "info"
+						label: "Info",
+						icon: "info",
+						slide: {
+							type: 'combat/TargetInfo',
+							data: { key: this.targeted[0] }
+						}
 					});
 				}
 				if(this.targeted.length)
@@ -173,35 +187,6 @@
 					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
-			},
-			edit(key, entity, entityType) {
-				let editType = undefined;
-				switch(entityType) {
-					case 'player':
-						editType = 'slides/EditPlayer';
-						break;
-					case 'companion':
-						editType = 'slides/encounter/EditCompanion';
-						break;
-					case 'npc':
-						editType = 'slides/encounter/EditNpc';
-						break;
-				}
-
-				if(key) {
-					this.setSlide({
-						show: true,
-						type: editType,
-						data: {
-							key: key,
-							location: 'encounter'
-						}
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Edit entity', {
-					});
-				}
 			},
 			setHidden(key, hidden) {
 				if(key) {

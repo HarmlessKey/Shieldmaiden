@@ -7,27 +7,28 @@
 				<q-popup-proxy 
 					square
 					anchor="bottom middle" self="top middle"
-					content-class="bg-gray px-2 py-2"
 					transition-show="scale" 
 					transition-hide="scale"
 				>
-					<div class="mb-1">Edit {{ entity.name }}</div>
-          <q-input 
-						dark filled square dense utofocus 
-						label="Initiative"
-						type="number" 
-						color="white" 
-						v-model="editable_entity.initiative" 
-					/>
-					<div class="d-flex justify-content-end mt-2">
-						<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
-						<q-btn
-							color="primary"
-							v-close-popup 
-							@click.stop="set_initiative({key: entity.key, initiative: editable_entity.initiative})"
-						>
-							Save
-						</q-btn>
+					<div class="bg-gray px-2 py-2">
+						<div class="mb-1">Edit {{ entity.name }}</div>
+						<q-input 
+							dark filled square dense utofocus 
+							label="Initiative"
+							type="number" 
+							color="white" 
+							v-model="editable_entity.initiative" 
+						/>
+						<div class="d-flex justify-content-end mt-2">
+							<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
+							<q-btn
+								color="primary"
+								v-close-popup 
+								@click.stop="set_initiative({key: entity.key, initiative: editable_entity.initiative})"
+							>
+								Save
+							</q-btn>
+						</div>
 					</div>
         </q-popup-proxy>
 			</span>
@@ -61,31 +62,32 @@
 					v-if="entity.entityType === 'npc'" 
 					square
 					anchor="bottom middle" self="top middle"
-					content-class="bg-gray px-2 py-2"
 					transition-show="scale" 
 					transition-hide="scale"
 				>
-					<div class="mb-1">Edit {{ entity.name }}</div>
-					<q-color 
-						square dark flat
-						v-model="editable_entity.color_label" 
-						:palette="hkColors" 
-						default-view="palette"
-					/>
-					<div class="d-flex justify-content-end mt-2">
-						<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
-						<q-btn
-							color="primary"
-							v-close-popup 
-							@click.stop="edit_entity_prop({
-								key: entity.key, 
-								entityType: entity.entityType, 
-								prop: 'color_label', 
-								value: editable_entity.color_label
-							})"
-						>
-							Save
-						</q-btn>
+					<div class="bg-gray px-2 py-2">
+						<div class="mb-1">Edit {{ entity.name }}</div>
+						<q-color 
+							square dark flat
+							v-model="editable_entity.color_label" 
+							:palette="hkColors" 
+							default-view="palette"
+						/>
+						<div class="d-flex justify-content-end mt-2">
+							<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
+							<q-btn
+								color="primary"
+								v-close-popup 
+								@click.stop="edit_entity_prop({
+									key: entity.key, 
+									entityType: entity.entityType, 
+									prop: 'color_label', 
+									value: editable_entity.color_label
+								})"
+							>
+								Save
+							</q-btn>
+						</div>
 					</div>
 				</q-popup-proxy>
 			</div>
@@ -102,72 +104,67 @@
 					v-if="entity.ac_bonus"
 				>
 					{{ displayStats().ac + entity.ac_bonus}}
-					<q-tooltip anchor="top middle" self="center middle">
-						Armor class + {{ entity.ac_bonus }}
-					</q-tooltip>
 				</span>
 				<span class="ac" v-else>
 					{{ displayStats().ac }}
-					<q-tooltip anchor="top middle" self="center middle">
-						Armor class
-					</q-tooltip>
 				</span>
 				<q-popup-proxy
 					square
 					anchor="bottom middle" self="top middle"
-					content-class="bg-gray px-2 py-2"
 					transition-show="scale" 
 					transition-hide="scale"
 				>
-					<div class="mb-1">{{ entity.name }}</div>
-          <q-input 
-						dark filled square dense 
-						label="Armor class bonus"
-						type="number" 
-						color="white" 
-						v-model="editable_entity.ac_bonus" 
-					>
-						<q-icon slot="append" size="xs" name="fas fa-shield-check" />
-						<q-btn
-							slot="after"
-							flat dense
-							color="primary"
-							icon="check"
-							v-close-popup 
-							@click.stop="edit_entity_prop({
-								key: entity.key, 
-								entityType: entity.entityType,
-								prop: 'ac_bonus',
-								value: editable_entity.ac_bonus
-							})"
-						/>
-					</q-input>
-          <q-input 
-						class="mt-2"
-						dark filled square dense 
-						label="Override armor class"
-						type="number" 
-						color="white" 
-						v-model="editable_entity.ac" 
-					>
-						<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
-						<q-icon slot="append" size="xs" name="fas fa-shield" />
-						<q-btn
-							slot="after"
-							flat dense
-							color="primary"
-							icon="check"
-							v-close-popup 
-							@click.stop="edit_entity_prop({
-								key: entity.key, 
-								entityType: entity.entityType,
-								prop: 'ac',
-								value: editable_entity.ac
-							})"
-						/>
-					</q-input>
-					<div class="d-flex justify-content-end mt-2">
-						<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+					<div class="bg-gray px-2 py-2">
+						<div class="mb-1">{{ entity.name }}</div>
+						<q-input 
+							dark filled square dense 
+							label="Armor class bonus"
+							type="number" 
+							color="white" 
+							v-model="editable_entity.ac_bonus" 
+						>
+							<q-icon slot="append" size="xs" name="fas fa-shield-check" />
+							<q-btn
+								slot="after"
+								flat dense
+								color="primary"
+								icon="check"
+								v-close-popup 
+								@click.stop="edit_entity_prop({
+									key: entity.key, 
+									entityType: entity.entityType,
+									prop: 'ac_bonus',
+									value: editable_entity.ac_bonus
+								})"
+							/>
+						</q-input>
+						<q-input 
+							class="mt-2"
+							dark filled square dense 
+							label="Override armor class"
+							type="number" 
+							color="white" 
+							v-model="editable_entity.ac" 
+						>
+							<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+							<q-icon slot="append" size="xs" name="fas fa-shield" />
+							<q-btn
+								slot="after"
+								flat dense
+								color="primary"
+								icon="check"
+								v-close-popup 
+								@click.stop="edit_entity_prop({
+									key: entity.key, 
+									entityType: entity.entityType,
+									prop: 'ac',
+									value: editable_entity.ac
+								})"
+							/>
+						</q-input>
+						<div class="d-flex justify-content-end mt-2">
+							<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+						</div>
 					</div>
         </q-popup-proxy>
 			</div>
@@ -221,116 +218,117 @@
 							<q-popup-proxy
 								square
 								anchor="bottom middle" self="top middle" 
-								content-class="bg-gray px-2 py-2"
 								transition-show="scale" 
 								transition-hide="scale"
 							>
-								<div class="mb-1">{{ entity.name }}</div>
-								<q-input 
-									dark filled square dense 
-									class="mb-2"
-									label="Temporary hit points"
-									type="number" 
-									color="white" 
-									v-model="editable_entity.tempHp" 
-								>
-									<q-icon slot="append" size="xs" name="fas fa-stopwatch" />
-									<q-btn
-										slot="after"
-										flat dense
-										color="primary"
-										icon="check"
-										v-close-popup 
-										@click.stop="edit_entity_prop({
-											key: entity.key, 
-											entityType: entity.entityType,
-											prop: 'tempHp',
-											value: editable_entity.tempHp
-										})"
-									/>
-								</q-input>
-								<q-input 
-									dark filled square dense 
-									label="Maxium hit point modifier"
-									type="number" 
-									color="white" 
-									v-model="editable_entity.maxHpMod" 
-								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
-									<q-icon slot="append" size="xs" name="fas fa-plus" />
-									<q-btn
-										slot="after"
-										flat dense
-										color="primary"
-										icon="check"
-										v-close-popup 
-										@click.stop="edit_entity_prop({
-											key: entity.key, 
-											entityType: entity.entityType,
-											prop: 'maxHpMod',
-											value: editable_entity.maxHpMod
-										})"
-									/>
-								</q-input>
-								<hr/>
-								<q-input 
-									dark filled square dense 
-									label="Overrid current hit points"
-									type="number" 
-									color="white"
-									class="mb-2"
-									v-model="editable_entity.curHp" 
-								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
-									<q-icon slot="append" size="xs" name="fas fa-heart" />
-									<q-btn
-										slot="after"
-										flat dense
-										color="primary"
-										icon="check"
-										v-close-popup 
-										@click.stop="edit_entity_prop({
-											key: entity.key, 
-											entityType: entity.entityType,
-											prop: 'curHp',
-											value: editable_entity.curHp
-										})"
-									/>
-								</q-input>
-								<q-input 
-									dark filled square dense 
-									label="Override maximum hit points"
-									type="number" 
-									color="white" 
-									v-model="editable_entity.maxHp" 
-								>
-									<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
-									<span 
-										slot="append" 
-										v-if="displayStats().maxHpMod"
-										:class="displayStats().maxHpMod > 0 ? 'green' : 'red'"
+								<div class="bg-gray px-2 py-2">
+									<div class="mb-1">{{ entity.name }}</div>
+									<q-input 
+										dark filled square dense 
+										class="mb-2"
+										label="Temporary hit points"
+										type="number" 
+										color="white" 
+										v-model="editable_entity.tempHp" 
 									>
-										{{ displayStats().maxHpMod > 0 ? `+${displayStats().maxHpMod}` : displayStats().maxHpMod }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Modifier
-										</q-tooltip>
-									</span>
-									<q-btn
-										slot="after"
-										flat dense
-										color="primary"
-										icon="check"
-										v-close-popup 
-										@click.stop="edit_entity_prop({
-											key: entity.key, 
-											entityType: entity.entityType,
-											prop: 'maxHp',
-											value: editable_entity.maxHp
-										})"
-									/>
-								</q-input>
-								<div class="d-flex justify-content-end mt-2">
-									<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+										<q-icon slot="append" size="xs" name="fas fa-stopwatch" />
+										<q-btn
+											slot="after"
+											flat dense
+											color="primary"
+											icon="check"
+											v-close-popup 
+											@click.stop="edit_entity_prop({
+												key: entity.key, 
+												entityType: entity.entityType,
+												prop: 'tempHp',
+												value: editable_entity.tempHp
+											})"
+										/>
+									</q-input>
+									<q-input 
+										dark filled square dense 
+										label="Maxium hit point modifier"
+										type="number" 
+										color="white" 
+										v-model="editable_entity.maxHpMod" 
+									>
+										<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+										<q-icon slot="append" size="xs" name="fas fa-plus" />
+										<q-btn
+											slot="after"
+											flat dense
+											color="primary"
+											icon="check"
+											v-close-popup 
+											@click.stop="edit_entity_prop({
+												key: entity.key, 
+												entityType: entity.entityType,
+												prop: 'maxHpMod',
+												value: editable_entity.maxHpMod
+											})"
+										/>
+									</q-input>
+									<hr/>
+									<q-input 
+										dark filled square dense 
+										label="Overrid current hit points"
+										type="number" 
+										color="white"
+										class="mb-2"
+										v-model="editable_entity.curHp" 
+									>
+										<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+										<q-icon slot="append" size="xs" name="fas fa-heart" />
+										<q-btn
+											slot="after"
+											flat dense
+											color="primary"
+											icon="check"
+											v-close-popup 
+											@click.stop="edit_entity_prop({
+												key: entity.key, 
+												entityType: entity.entityType,
+												prop: 'curHp',
+												value: editable_entity.curHp
+											})"
+										/>
+									</q-input>
+									<q-input 
+										dark filled square dense 
+										label="Override maximum hit points"
+										type="number" 
+										color="white" 
+										v-model="editable_entity.maxHp" 
+									>
+										<q-icon v-if="entity.transformed" slot="prepend" name="fas fa-paw-claws green"/>
+										<span 
+											slot="append" 
+											v-if="displayStats().maxHpMod"
+											:class="displayStats().maxHpMod > 0 ? 'green' : 'red'"
+										>
+											{{ displayStats().maxHpMod > 0 ? `+${displayStats().maxHpMod}` : displayStats().maxHpMod }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Modifier
+											</q-tooltip>
+										</span>
+										<q-btn
+											slot="after"
+											flat dense
+											color="primary"
+											icon="check"
+											v-close-popup 
+											@click.stop="edit_entity_prop({
+												key: entity.key, 
+												entityType: entity.entityType,
+												prop: 'maxHp',
+												value: editable_entity.maxHp
+											})"
+										/>
+									</q-input>
+									<div class="d-flex justify-content-end mt-2">
+										<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+									</div>
 								</div>
 							</q-popup-proxy>
 						</span>

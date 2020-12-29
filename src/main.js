@@ -16,6 +16,7 @@ import HkTable from './components/hk-components/hk-table';
 import HkCard from './components/hk-components/hk-card';
 import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
+import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
 import './quasar';
 
@@ -30,6 +31,7 @@ Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
 Vue.component('hk-card-deck', HkCardDeck);
 Vue.component('hk-roll', HkRoll);
+Vue.component('hk-loader', HkLoader);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options); 
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})

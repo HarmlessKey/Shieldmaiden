@@ -1,5 +1,5 @@
 <template>
-	<div ref="encounter">
+	<div ref="encounter" v-if="initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -84,6 +84,9 @@
 			</template>
 		</div>
 	</div>
+	<div v-else class="combat-wrapper" ref="encounter">
+		<hk-loader />
+	</div>
 </template>
 
 <script>
@@ -126,8 +129,6 @@
 			DemoOverlay
 		},
 		data() {
-			// Dispatch route parameters to store
-
 			return {
 				userId: this.$store.getters.user.uid,
 				demo: this.$route.name === "Demo",
@@ -147,17 +148,17 @@
 			if(this.$route.name !== "Demo") {
 				this.track()
 			}
+			this.init_Encounter({
+				cid: this.$route.params.campid, 
+				eid: this.$route.params.encid,
+				demo: this.demo
+			});
 		},
 		mounted() {
 			this.$nextTick(function() {
 				window.addEventListener('resize', this.setSize);
 				//Init
 				this.setSize();
-			});
-			this.init_Encounter({
-				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid,
-				demo: this.demo
 			});
 			this.track_Encounter(this.demo);
 		},

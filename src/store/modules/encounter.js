@@ -189,23 +189,28 @@ const actions = {
 		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path);
 
-		//Set the entities when it's not a demo encounter
-		if(!demo) {
-			const encounter = await encounters_ref.child(path);
-			await encounter.once('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val());
-				for (let key in snapshot.val().entities) {
+		try {
+			//Set the entities when it's not a demo encounter
+			if(!demo) {
+				const encounter = await encounters_ref.child(path);
+				await encounter.once('value', snapshot => {
+					commit('SET_ENCOUNTER', snapshot.val());
+					for (let key in snapshot.val().entities) {
+						commit('ADD_ENTITY', {rootState, key});
+					}
+				})
+			} 
+			else {
+				commit('SET_ENCOUNTER', demoEncounter);
+				for (let key in demoEncounter.entities) {
 					commit('ADD_ENTITY', {rootState, key});
 				}
-			})
-		} 
-		else {
-			commit('SET_ENCOUNTER', demoEncounter);
-			for (let key in demoEncounter.entities) {
-				commit('ADD_ENTITY', {rootState, key});
 			}
+		} catch(error) {
+			console.error(error);
+		} finally {
+			commit('INITIALIZED');
 		}
-		commit('INITIALIZED');
 	},
 	track_Encounter({ commit, state }, demo) {
 		if(!demo) {

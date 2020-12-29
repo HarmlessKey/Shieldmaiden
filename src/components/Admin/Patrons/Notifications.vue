@@ -108,7 +108,7 @@
 			},
 		},
 		methods: {
-			setSHow(key) {
+			setShow(key) {
 				this.show = (this.show === key) ? undefined : key;
 			}
 		}

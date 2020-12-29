@@ -6,6 +6,8 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
 					<h1>{{ user.username }}</h1>
+					<p>{{ user.email }}</p>
+					<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
 					<p><i class="gray-hover">{{ id }}</i></p>
 				</div>
 				<div class="col-12 col-md-4">
@@ -65,6 +67,18 @@
 					<div v-else class="loader"> <span>Loading characters....</span></div>
 				</hk-card>
 			</hk-card-deck>
+
+			<hk-card header="Patreon email">
+				<h3>Link a Patreon account</h3>
+
+				<q-input
+					dark filled square dense
+					type="email"
+					label="Patreon Email"
+					v-model="user.patreon_email">
+				</q-input>
+				<a class="btn" @click="setPatronEmail()">Save</a>
+			</hk-card>
 
 			<hk-card header="Voucher">
 				<h3>Gift user a subscription</h3>
@@ -249,6 +263,17 @@
 							position: "rightTop"
 						});
 					}
+				});
+			},
+			setPatronEmail() {
+				if (this.user.patreon_email == "") {
+					db.ref(`users/${this.id}/patreon_email`).remove()	
+				}
+				else {
+					db.ref(`users/${this.id}/patreon_email`).set(this.user.patreon_email)
+				}
+				this.$snotify.success('Patreon email linked.', 'Saved!', {
+					position: "rightTop"
 				});
 			},
 			makeDate(input) {

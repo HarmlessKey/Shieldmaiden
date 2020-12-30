@@ -233,7 +233,7 @@
 		</template>
 
 		<!-- MULTIPLE ENTITIES -->
-		<template v-else>
+		<template v-else-if="edit_targets.length > 1">
 			<q-input 
 				dark filled square
 				label="AC Bonus"
@@ -275,6 +275,12 @@
 				it will be <span class="red">overwritten</span> with the new value.
 			</p>
 		</template>
+
+		<template v-else>
+			<p class="mt-4">
+				Select one or multiple targets to edit.
+			</p>
+		</template>
 	</div>
 </template>
 
@@ -284,7 +290,7 @@
 	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
-		name: 'EditCompanion',
+		name: 'EditEntity',
 		components: {
 			TargetItem
 		},
@@ -349,7 +355,6 @@
 				'targeted',
 			]),
 			edit_targets: function() {
-				console.log(this.data)
 				if (this.data !== undefined && this.data.length > 0)
 					return this.data;
 				else 
@@ -381,7 +386,7 @@
 			},
 		},
 		mounted() {
-			if(!this.demo) {
+			if(!this.demo && this.entity !== undefined) {
 				const npcSettings_ref = db.ref(`settings/${this.userId}/track/npc`);
 				npcSettings_ref.on('value', async (snapshot) => {
 					this.npcSettings = snapshot.val();

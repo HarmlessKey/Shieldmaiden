@@ -52,7 +52,7 @@
 			</q-item>
 			<q-item 
 				clickable v-close-popup 
-				@click="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
+				@click="setSlide({show: true, type: 'slides/encounter/DamageHealing' })"
 			>
 				<q-item-section avatar><i class="fas fa-swords"></i></q-item-section>
 				<q-item-section>Do damage/healing</q-item-section>
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'TargetMenu',
@@ -79,6 +79,11 @@
 			return {
 
 			}
+		},
+		computed: {
+			...mapGetters([
+				'entities',
+			])
 		},
 		methods: {
 			...mapActions([

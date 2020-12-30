@@ -357,8 +357,8 @@
 			edit_targets: function() {
 				if (this.data !== undefined && this.data.length > 0)
 					return this.data;
-				else 
-					return this.targeted;
+				
+				return this.targeted;
 			},
 			entity: {
 				get() {

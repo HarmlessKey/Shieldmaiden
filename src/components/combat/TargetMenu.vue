@@ -24,7 +24,7 @@
 			</q-item>
 			<q-item 
 				clickable v-close-popup 
-				@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
+				@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: [entity.key] })"
 			>
 				<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
 				<q-item-section>Reminders</q-item-section>

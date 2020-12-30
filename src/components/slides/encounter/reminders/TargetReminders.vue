@@ -1,41 +1,42 @@
 <template>
 	<div class="pb-5" v-if="entities">
 		<h2>Set Reminders</h2>
-		<ul class="targets">
-			<li v-for="(target, i) in targeted" :key="`target=${i}`">
-				<TargetItem  :item="target" :i="i" />
-			</li>
-		</ul>
-		<hr>
-		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
-			<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
-				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
-					{{ title(reminder) }}
-					<span class="delete"><i class="fas fa-times"></i></span>
-					<q-tooltip anchor="top middle" self="center middle">
-						Remove {{ reminder.title }}
-					</q-tooltip>
-				</a>
+		<template v-if="reminder_targets.length > 0">
+			<ul class="targets">
+				<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
+					<TargetItem  :item="target" :i="i" />
+				</li>
+			</ul>
+			<hr>
+			<div v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
+				<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[reminder_targets[0]].reminders" :key="key">
+					<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
+						{{ title(reminder) }}
+						<span class="delete"><i class="fas fa-times"></i></span>
+						<q-tooltip anchor="top middle" self="center middle">
+							Remove {{ reminder.title }}
+						</q-tooltip>
+					</a>
+				</div>
 			</div>
-		</div>
 
-		<q-tabs
-			v-model="tab"
-			dark
-			inline-label
-			dense
-			no-caps
-		>
-			<q-tab 
-				v-for="({name, icon, label}, index) in tabs"
-				:key="`tab-${index}`" 
-				:name="name" 
-				:icon="icon"
-				:label="label"
-			/>
-		</q-tabs>
+			<q-tabs
+				v-model="tab"
+				dark
+				inline-label
+				dense
+				no-caps
+			>
+				<q-tab 
+					v-for="({name, icon, label}, index) in tabs"
+					:key="`tab-${index}`" 
+					:name="name" 
+					:icon="icon"
+					:label="label"
+				/>
+			</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
+			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel name="premade">
 					<ul class="premade">
 					<li v-for="(reminder, key) in premade" :key="key"
@@ -89,7 +90,13 @@
 					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
 					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
 				</q-tab-panel>
-		</q-tab-panels>
+			</q-tab-panels>
+		</template>
+		<template v-else>
+			<p class="mt-4">
+				Select one or multiple targets to add a reminder.
+			</p>
+		</template>
 	</div>
 </template>
 
@@ -113,7 +120,6 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				entityKey: this.data,
 				action: 'remove',
 				tab: "premade",
 				tabs: [
@@ -137,6 +143,11 @@
 				'entities',
 				'targeted'
 			]),
+			reminder_targets: function() {
+				if (this.data !== undefined && this.data.length > 0)
+					return this.data;
+				return this.targeted;
+			}
 		},
 		methods: {
 			...mapActions([
@@ -144,7 +155,7 @@
 			]),
 			addReminder(type, reminder = false, selectedVars=undefined) {
 					if(type === 'premade') {
-						for(const target of this.targeted) {
+						for(const target of this.reminder_targets) {
 							let key = reminder['.key'] || reminder.key;
 							delete reminder['.key'];
 
@@ -165,7 +176,7 @@
 					else if(type === 'custom') {
 						this.validation.validateAll().then((result) => {	
 							if (result) {
-								for(const target of this.targeted) {
+								for(const target of this.reminder_targets) {
 									this.set_targetReminder({
 										action: 'add',
 										entity: target,
@@ -184,7 +195,7 @@
 			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
-					entity: this.targeted[0],
+					entity: this.reminder_targets[0],
 					key: key,
 				})
 			},

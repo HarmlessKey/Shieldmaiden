@@ -1,16 +1,20 @@
 <template>
-		<div class="roll-for-initiative">
+	<div class="loading">
 			<div>
 				<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-				<h2>Roll for initiative!</h2>
+				<h2>Loading...</h2>
 			</div>
 		</div>
 </template>
 
 <script>
-	export default {
-		name: 'roll-for-initiative',
-		computed: {
+export default {
+    name: 'hk-loader',
+    data() {
+			return {
+			}
+    },
+    computed: {
 			//Random die color
 			dieColor() {
 				let number = Math.ceil(Math.random() * 6)
@@ -24,49 +28,42 @@
 					case 6: return 'yellow';
 				}
 			},
-		}
-	}
+    }
+}
 </script>
 
 <style lang="scss" scoped>
-	.roll-for-initiative {
-		height: calc(100vh - 50px);
-		z-index: 99;
+	.loading {
+		min-height: 300px;
+		height: 100%;
 		width: 100%;
-		left: 0;
-		position: fixed;
-		top: 50px;
 		background: rgba(38, 38, 38, .5);
 		text-align: center;
+		display: grid;
+		align-content: center;
 
-		> div {
-			position: absolute;
-			top: 48%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-		}
 		.die {
 			display: inline-block;
-			width: 155px; 
-			height: 155px;
-			background-size: 155px 155px;
+			width: 100px; 
+			height: 100px;
+			background-size: 100px 100px;
 			background-position: center;
 			background-repeat: no-repeat;
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 
 			&.spin {
 				margin-right: 10px;
-				font-size: 40px;
 				animation: spin 1.5s ease infinite;
 			}
 		}
 		h2 {
 			font-weight: bold;
-			font-size: 50px;
+			font-size: 25px;
 			text-transform: none;
 			color: #fff;
 			text-shadow: 0 0 8px #000;
-			line-height: 60px;
+			line-height: 50px;
+			letter-spacing: 2px;
 		}
 	}
 	@keyframes spin {

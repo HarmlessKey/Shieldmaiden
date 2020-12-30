@@ -1113,6 +1113,7 @@ html body {
 		}
 		.ac_wrapper {
 			position: relative;
+			cursor: pointer;
 	
 			i, .ac {
 				position: absolute;
@@ -1180,6 +1181,7 @@ html body {
 	
 			.hp {
 				text-align: right;
+				cursor: pointer;
 				
 				.current {
 					font-size: 18px;

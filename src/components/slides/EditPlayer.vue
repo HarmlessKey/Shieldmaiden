@@ -19,7 +19,7 @@
 		<template v-else>
 			<div v-if="location == 'encounter'" class="mb-3">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="initiative"
 					type="number" 
 					name="initiative"
@@ -66,7 +66,7 @@
 			<div class="row q-col-gutter-md mb-2">
 				<div class="col">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="AC bonus"
 						type="number" 
 						name="ac_bonus" 
@@ -77,7 +77,7 @@
 
 				<div class="col">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="Temp HP"
 						type="number" 
 						name="tempHp" 
@@ -88,7 +88,7 @@
 
 				<div class="col" v-if="!entity.transformed">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="Max HP Mod"
 						type="number" 
 						name="maxHpMod" 
@@ -105,7 +105,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Cur HP"
 								type="number" 
 								name="t-curHp" 
@@ -125,7 +125,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Cur HP"
 								class="text-center"
 								type="number" 
@@ -142,7 +142,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 	
-								dark filled square dense
+								dark filled square
 								label="Max HP"	
 								class="text-center"
 								type="number" 
@@ -162,7 +162,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Max HP"
 								class="text-center"
 								type="number" 
@@ -180,7 +180,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Armor class"
 								class="text-center"
 								type="number" 
@@ -200,7 +200,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Armor class"
 								class="text-center"
 								type="number" 
@@ -215,7 +215,7 @@
 					</div>
 					<div class="col">
 						<q-input 
-							dark filled square dense
+							dark filled square
 							label="Level"
 							class="text-center"
 							type="number" 
@@ -260,7 +260,7 @@
 				</div>
 
 				<q-input 
-					dark square filled dense
+					dark square filled
 					class="text-center"
 					type="number" 
 					name="xp" 
@@ -312,23 +312,17 @@
 			}
 		},
 		mounted() {
-			if(!this.demo) {
-				var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
-				entity.on('value', async (snapshot) => {
-					this.entity = snapshot.val();
-					this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
-					this.maxHpMod = snapshot.val().maxHpMod;
-				});
-			}
+			var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
+			entity.on('value', async (snapshot) => {
+				this.entity = snapshot.val();
+				this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
+				this.maxHpMod = snapshot.val().maxHpMod;
+			});
 		},
 		firebase() {
 			return {
 				playerBase: {
 					source:	db.ref(`players/${this.userId}/${this.entityKey}`),
-					asObject: true
-				},
-				initiative: {
-					source:	db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.entityKey}/initiative`),
 					asObject: true
 				},
 				advancement: {
@@ -396,15 +390,7 @@
 				this.setTransform = false;
 			},
 			removeTransform() {
-				if(this.location === 'encounter') {
-					this.transform_entity({
-						key: this.entity.key,
-						remove: true
-					})
-					this.entity.transformed = false;
-				} else {
-					db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/transformed`).remove();
-				}
+				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/transformed`).remove();
 			},
 			stabilize() {
 				db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
@@ -486,8 +472,7 @@
 							if(this.entity.transformed.curHp <= 0) {
 								this.$delete(this.entity, 'transformed');
 							}
-						}
-								
+						}				
 
 						//Update Firebase apart from store, cause it can be edited where there is no store.
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`).set(this.entity);
@@ -498,18 +483,6 @@
 							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/saves`).remove();
 							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/stable`).remove();
 							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}/dead`).remove();
-						}
-
-
-						//Only update in an encounter
-						if(this.location === 'encounter') {
-							//create full object to send to store
-							this.entity.initiative = this.initiative['.value'];
-							this.entity.ac = this.playerBase.ac;
-							this.entity.maxHp = this.playerBase.maxHp;
-
-							//Update store
-							this.edit_player({key: this.entityKey, entity: this.entity});
 						}
 						
 						this.setSlide(false);

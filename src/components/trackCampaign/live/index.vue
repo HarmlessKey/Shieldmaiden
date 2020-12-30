@@ -31,7 +31,7 @@
 						:players="players"
 						:npcs="npcs"
 						:playerSettings="playerSettings"
-						:width="width"
+						:screenWidth="width"
 						:npcSettings="npcSettings"
 						@newRoll="pushRoll"
 					/>
@@ -129,7 +129,7 @@
 							:npcs="npcs"
 							:playerSettings="playerSettings"
 							:npcSettings="npcSettings"
-							:width="width"
+							:screenWidth="width"
 							@newRoll="pushRoll"
 						/>
 					</q-tab-panel>

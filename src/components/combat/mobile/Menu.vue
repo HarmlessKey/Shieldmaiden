@@ -39,7 +39,7 @@
 
 		<!-- DAMAGE / HEALING -->
 		<q-dialog square v-model="dialog.options">
-			<!-- <div class="bg-gray">
+			<div class="bg-gray">
 				<q-list>
 					<q-item>
 						<q-item-section>
@@ -103,8 +103,7 @@
 						<q-item-section>Remove</q-item-section>
 					</q-item>
 				</q-list>
-			</div> -->
-			<target-menu :entity="entity" />
+			</div>
 		</q-dialog>
 	</div>
 

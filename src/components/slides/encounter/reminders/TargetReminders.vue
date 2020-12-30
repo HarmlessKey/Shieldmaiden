@@ -92,11 +92,9 @@
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
-		<template v-else>
-			<p class="mt-4">
-				Select one or multiple targets to add a reminder.
-			</p>
-		</template>
+		<p v-else class="mt-4">
+			Select one or multiple targets to add a reminder.
+		</p>
 	</div>
 </template>
 

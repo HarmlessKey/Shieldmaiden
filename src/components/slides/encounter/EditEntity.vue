@@ -276,11 +276,9 @@
 			</p>
 		</template>
 
-		<template v-else>
-			<p class="mt-4">
-				Select one or multiple targets to edit.
-			</p>
-		</template>
+		<p class="mt-4" v-else>
+			Select one or multiple targets to edit.
+		</p>
 	</div>
 </template>
 

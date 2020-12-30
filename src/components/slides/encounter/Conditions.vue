@@ -69,11 +69,9 @@
 				</q-expansion-item>
 			</q-list>
 		</template>
-		<template v-else>
-			<p class="mt-4">
-				Select one or multiple targets to add or remove conditions.
-			</p>
-		</template>
+		<p v-else class="mt-4">
+			Select one or multiple targets to add or remove conditions.
+		</p>
 	</div>
 </template>
 

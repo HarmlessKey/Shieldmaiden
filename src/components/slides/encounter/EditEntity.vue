@@ -2,7 +2,7 @@
 	<div>
 		<h2>Edit {{ entity ? "entity" : "entities" }}</h2>
 		<ul class="targets">
-			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+			<li v-for="(target, i) in edit_targets" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
@@ -288,6 +288,7 @@
 		components: {
 			TargetItem
 		},
+		props: ['data'],
 		data() {
 			return {
 				demo: this.$route.name === "Demo",
@@ -347,10 +348,17 @@
 				'entities',
 				'targeted',
 			]),
+			edit_targets: function() {
+				console.log(this.data)
+				if (this.data !== undefined && this.data.length > 0)
+					return this.data;
+				else 
+					return this.targeted;
+			},
 			entity: {
 				get() {
-					if(this.targeted.length === 1) {
-						let entity = {...this.entities[this.targeted[0]]};
+					if(this.edit_targets.length === 1) {
+						let entity = {...this.entities[this.edit_targets[0]]};
 
 						// Edit different properties for transformed entities
 						if(entity.transformed) {
@@ -391,7 +399,7 @@
 				'transform_entity'
 			]),
 			editValue(prop, value) {
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					const entity = this.entities[key];
 					this.edit_entity_prop({
 						key,

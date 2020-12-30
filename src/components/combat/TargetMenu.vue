@@ -17,7 +17,7 @@
 			</q-item>
 			<q-item 
 				clickable v-close-popup 
-				@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
+				@click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: [entity.key] })"
 			>
 				<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
 				<q-item-section>Edit</q-item-section>

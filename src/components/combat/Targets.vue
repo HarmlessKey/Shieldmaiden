@@ -80,7 +80,7 @@
 								<a class="options">
 									<i class="fal fa-ellipsis-v"></i>
 									<q-popup-proxy square dark anchor="bottom right" self="top right" :breakpoint="576">
-										<div class="bg-gray gray-light">
+										<!-- <div class="bg-gray gray-light">
 											<q-list>
 												<q-item>
 													<q-item-section>
@@ -147,7 +147,8 @@
 													<q-item-section>Remove</q-item-section>
 												</q-item>
 											</q-list>
-										</div>
+										</div> -->
+										<target-menu :entity="entity" />
 									</q-popup-proxy>
 								</a>
 							</li>
@@ -163,10 +164,11 @@
 	import { db, auth } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex';
 	import TargetItem from '@/components/combat/TargetItem.vue';
+	import TargetMenu from '@/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Targets',
-		components: {TargetItem},
+		components: {TargetItem, TargetMenu},
 		props: ['_active','_idle'],
 		data() {
 			return {

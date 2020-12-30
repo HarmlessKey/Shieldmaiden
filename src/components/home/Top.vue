@@ -51,10 +51,6 @@
 
 						<div class="button-container">
 							<router-link v-if="!userInfo" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
-							<a href="https://discord.gg/fhmKBM7" target="_blank" class="large-link" :class="{'not-logged': !userInfo}">
-								<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
-								<div class="text">Join our Discord</div>
-							</a>
 						</div>
 						
 						<!-- PATREON -->
@@ -165,6 +161,12 @@
 
 						.btn {
 							text-shadow: none;
+
+							&.btn-lg {
+								padding: 0.5rem 1rem;
+								font-size: 1.50rem;
+								line-height: 2;
+							}
 						}
 						.large-link {
 							text-shadow: none;

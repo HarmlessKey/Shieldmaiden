@@ -39,7 +39,7 @@
 
 		<!-- DAMAGE / HEALING -->
 		<q-dialog square v-model="dialog.options">
-			<div class="bg-gray">
+			<!-- <div class="bg-gray">
 				<q-list>
 					<q-item>
 						<q-item-section>
@@ -103,7 +103,8 @@
 						<q-item-section>Remove</q-item-section>
 					</q-item>
 				</q-list>
-			</div>
+			</div> -->
+			<target-menu :entity="entity" />
 		</q-dialog>
 	</div>
 
@@ -114,13 +115,15 @@
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import Manual from '@/components/combat/actions/Manual.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import TargetMenu from '@/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Menu',
 		components: {
 			Actions,
 			Manual,
-			Roll
+			Roll,
+			TargetMenu,
 		},
 		props: ["entities", "settings", "current"],
 		data () {

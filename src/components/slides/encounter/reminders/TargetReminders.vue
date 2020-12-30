@@ -1,13 +1,13 @@
 <template>
 	<div class="pb-5" v-if="entities">
 		<h2>Set Reminders</h2>
+		<ul class="targets">
+			<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
+				<TargetItem  :item="target" :i="i" />
+			</li>
+		</ul>
+		<hr>
 		<template v-if="reminder_targets.length > 0">
-			<ul class="targets">
-				<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
-					<TargetItem  :item="target" :i="i" />
-				</li>
-			</ul>
-			<hr>
 			<div v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
 				<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[reminder_targets[0]].reminders" :key="key">
 					<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">

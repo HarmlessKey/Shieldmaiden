@@ -2,7 +2,7 @@
 	<div class="pb-5">
 		<h2>Set Conditions</h2>
 		<ul class="targets">
-			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+			<li v-for="(target, i) in edit_targets" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
@@ -97,6 +97,12 @@
 				'entities',
 				'targeted'
 			]),
+			edit_targets: function() {
+				if (this.data !== undefined && this.data.length > 0)
+					return this.data;
+				else 
+					return this.targeted;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -106,7 +112,7 @@
 			set(condition) {
 				const action = (this.checkAll(condition)) ? 'remove' : 'add';
 
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					this.set_condition({
 						action, 
 						key, 
@@ -117,7 +123,7 @@
 			setExhausted(level) {
 				var action = (level === 0) ? 'remove' : 'add';
 
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					this.set_condition({
 						action, 
 						key, 
@@ -131,7 +137,7 @@
 			},
 			//Checks if all targets have a certain condition
 			checkAll(condition) {
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					if(!this.check(condition, key)) {
 						return false;
 					}
@@ -141,7 +147,7 @@
 			checkExhaustion() {
 				let exhaustion = undefined;
 
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					const targetsExhaustion = this.entities[key].conditions.exhaustion;
 
 					if(targetsExhaustion && !exhaustion) {

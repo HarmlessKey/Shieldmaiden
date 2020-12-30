@@ -45,7 +45,7 @@
 			</q-item>
 			<q-item 
 				clickable v-close-popup 
-				@click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
+				@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: [entity.key] })"
 			>
 				<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
 				<q-item-section>Conditions</q-item-section>

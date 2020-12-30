@@ -1,14 +1,20 @@
 <template>
 	<div>
 		<h2>Damage / heal</h2>
-
+		
 		<ul class="targets">
 			<li v-for="(target, i) in targeted" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
+		<hr>
 
-		<Actions class="mt-3" :settings="settings" :select-entity="true" />
+		<Actions v-if="targeted.length > 0" class="mt-3" :settings="settings" :select-entity="true" />
+
+		<p  v-else class="mt-4">
+			Select one or multiple targets to deal damage or heal.
+		</p>
+
 	</div>
 </template>
 

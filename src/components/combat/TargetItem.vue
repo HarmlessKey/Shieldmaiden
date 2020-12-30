@@ -9,6 +9,7 @@
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
+					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name }}</div>
@@ -64,6 +65,7 @@
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
+					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name }}</div>
@@ -113,6 +115,7 @@
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
+					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">{{ entity.name }}</div>
@@ -220,6 +223,7 @@
 								anchor="bottom middle" self="top middle" 
 								transition-show="scale" 
 								transition-hide="scale"
+								:breakpoint="576"
 							>
 								<div class="bg-gray px-2 py-2">
 									<div class="mb-1">{{ entity.name }}</div>

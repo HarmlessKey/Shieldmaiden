@@ -65,7 +65,7 @@
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
-						@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entities[targeted[0]].key})"
+						@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 					>
 						<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
 						<q-item-section>Reminders</q-item-section>
@@ -88,7 +88,7 @@
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
-						@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+						@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted[0]]})"
 					>
 						<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
 						<q-item-section>Conditions</q-item-section>
@@ -114,13 +114,15 @@
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import Manual from '@/components/combat/actions/Manual.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import TargetMenu from '@/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Menu',
 		components: {
 			Actions,
 			Manual,
-			Roll
+			Roll,
+			TargetMenu,
 		},
 		props: ["entities", "settings", "current"],
 		data () {

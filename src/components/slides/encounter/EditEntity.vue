@@ -2,7 +2,7 @@
 	<div>
 		<h2>Edit {{ entity ? "entity" : "entities" }}</h2>
 		<ul class="targets">
-			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+			<li v-for="(target, i) in edit_targets" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
@@ -233,7 +233,7 @@
 		</template>
 
 		<!-- MULTIPLE ENTITIES -->
-		<template v-else>
+		<template v-else-if="edit_targets.length > 1">
 			<q-input 
 				dark filled square
 				label="AC Bonus"
@@ -275,6 +275,10 @@
 				it will be <span class="red">overwritten</span> with the new value.
 			</p>
 		</template>
+
+		<p class="mt-4" v-else>
+			Select one or multiple targets to edit.
+		</p>
 	</div>
 </template>
 
@@ -284,10 +288,11 @@
 	import TargetItem from '@/components/combat/TargetItem.vue';
 
 	export default {
-		name: 'EditCompanion',
+		name: 'EditEntity',
 		components: {
 			TargetItem
 		},
+		props: ['data'],
 		data() {
 			return {
 				demo: this.$route.name === "Demo",
@@ -347,10 +352,16 @@
 				'entities',
 				'targeted',
 			]),
+			edit_targets: function() {
+				if (this.data !== undefined && this.data.length > 0)
+					return this.data;
+				
+				return this.targeted;
+			},
 			entity: {
 				get() {
-					if(this.targeted.length === 1) {
-						let entity = {...this.entities[this.targeted[0]]};
+					if(this.edit_targets.length === 1) {
+						let entity = {...this.entities[this.edit_targets[0]]};
 
 						// Edit different properties for transformed entities
 						if(entity.transformed) {
@@ -373,7 +384,7 @@
 			},
 		},
 		mounted() {
-			if(!this.demo) {
+			if(!this.demo && this.entity !== undefined) {
 				const npcSettings_ref = db.ref(`settings/${this.userId}/track/npc`);
 				npcSettings_ref.on('value', async (snapshot) => {
 					this.npcSettings = snapshot.val();
@@ -391,7 +402,7 @@
 				'transform_entity'
 			]),
 			editValue(prop, value) {
-				for(const key of this.targeted) {
+				for(const key of this.edit_targets) {
 					const entity = this.entities[key];
 					this.edit_entity_prop({
 						key,

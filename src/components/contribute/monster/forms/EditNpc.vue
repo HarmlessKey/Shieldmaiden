@@ -4,83 +4,109 @@
 			<hk-card header="Basic Info">
 				<!-- NAME -->
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Name"
 					autocomplete="off"  
 					type="text" 
-					class="mb-2" 
 					v-model="npc.name" 
-					v-validate="'max:35|required'" 
-					maxlength="35"
-					data-vv-as="Name"
 					name="name" 
+					:rules="[val => !!val || 'The name is required']"
 				/>
-				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
 				<!-- SIZE -->
-				<q-input 
-					dark filled square dense
+				<q-select
+					dark filled square
 					label="Size"
-					autocomplete="off" 
-					type="text" 
 					class="mb-2" 
 					v-model="npc.size"
-					maxlenght="30"
-					name="size" 
+					:options="monster_sizes"
+					:rules="[val => !!val || 'Pick a size']"
 				/>
 				
 				<!-- TYPE -->
 				<div class="row q-col-gutter-md">
-					<div class="col-12 col-md-6">
-						<q-input 
-							dark filled square dense
+					<div class="col-12" :class="{'col-md-6': npc.type && monster_subtypes[npc.type] }">
+						<q-select
+							dark filled square
 							label="Type"
-							autocomplete="off" 
-							type="text" 
 							class="mb-2" 
-							v-model="npc.type" 
-							name="type" 
-							id="type"
+							v-model="npc.type"
+							:options="monster_types"
+							:rules="[val => !!val || 'Pick a type']"
 						/>
 					</div>
-					<div class="col-12 col-md-6">
-						<q-input 
-							dark filled square dense
+					<div class="col-12 col-md-6" v-if="npc.type && monster_subtypes[npc.type]">
+						<q-select
+							dark filled square
 							label="Subtype"
-							autocomplete="off" 
-							type="text"
-							class="mb-2"
-							v-model="npc.subtype" 
-							name="subtype" 
-							id="subtype"
-							placeholder="Subtype"
+							class="mb-2" 
+							v-model="npc.subtype"
+							:options="monster_subtypes[npc.type]"
+							:rules="[val => !!val || 'Pick a subtype']"
 						/>
 					</div>
 				</div>
 
 				<!-- ALIGNMENT -->
-				<q-input 
-					dark filled square dense
-					label="Alignment"
-					autocomplete="off" 
-					type="text" 
+				<q-select
+					dark filled square
+					label="Type"
 					class="mb-2" 
-					v-model="npc.alignment" 
-					name="alignment" 
-					placeholder="Alignment"
+					v-model="npc.alignment"
+					:options="monster_alignment"
 				/>
 
 				<!-- SPEED -->
-				<q-input 
-					dark filled square dense
-					label="Speed"
-					autocomplete="off"  
-					type="text" 
-					class="mb-2" 
-					v-model="npc.speed" 
-					name="speed" 
-					placeholder="Speed"
-				/>
+				<div class="row q-col-gutter-md">
+					<div class="col">
+						<q-input 
+							dark filled square
+							label="Walking speed"
+							autocomplete="off"  
+							type="number" 
+							class="mb-2" 
+							v-model="npc.walk_speed" 
+							suffix="ft."
+						>
+						</q-input>
+					</div>
+					<div class="col">
+						<q-input 
+							dark filled square
+							label="Swimming speed"
+							autocomplete="off"  
+							type="number" 
+							class="mb-2" 
+							v-model="npc.swim_speed" 
+							suffix="ft."
+						>
+						</q-input>
+					</div>
+					<div class="col">
+						<q-input 
+							dark filled square
+							label="Flying speed"
+							autocomplete="off"  
+							type="number" 
+							class="mb-2" 
+							v-model="npc.fly_speed" 
+							suffix="ft."
+						>
+						</q-input>
+					</div>
+					<div class="col">
+						<q-input 
+							dark filled square
+							label="Burrow speed"
+							autocomplete="off"  
+							type="number" 
+							class="mb-2" 
+							v-model="npc.burrow_speed" 
+							suffix="ft."
+						>
+						</q-input>
+					</div>
+				</div>
 
 				<!-- SENSES -->
 				<q-input 
@@ -95,43 +121,38 @@
 				/>
 
 				<!-- LANGUAGES -->
-				<q-input 
-					dark filled square dense
+				<q-select
+					dark filled square
 					label="Languages"
-					autocomplete="off" 
-					type="text" 
 					class="mb-2" 
-					v-model="npc.languages" 
-					name="Languages" 
-					id="languages"
-					placeholder="Languages"
+					multiple
+					v-model="npc.languages"
+					:options="languages"
 				/>
 
 				<!-- CR -->
 				<q-select 
-					dark filled square dense
+					dark filled square
 					label="Challenge rating"
 					v-model="npc.challenge_rating" 
 					class="mb-2"
-					:options="[0]"
+					:options="Object.keys(monster_challenge_rating)"
+					:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 				>
-					<template v-slot:option>
+					<template v-slot:option="scope">
 						<q-list dark>
-							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0, $forceUpdate()">0</q-item>
-							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.125, $forceUpdate()">1/8</q-item>
-							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.25, $forceUpdate()">1/4</q-item>
-							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 0.5, $forceUpdate()">1/2</q-item>
-							<q-item 
-								v-for="index in 24"
-								:key="`cr-${index}`"
-								clickable v-ripple v-close-popup 
-								@click="npc.challenge_rating = index, $forceUpdate()"
-							>
-								{{ index }}
+							<q-item clickable v-ripple v-close-popup @click="$set(npc, 'challenge_rating', scope.opt)">
+								<q-item-section>{{ scope.opt }}</q-item-section>
+								<q-item-section avatar>{{ monster_challenge_rating[scope.opt].xp }} xp</q-item-section>
 							</q-item>
-							<q-item clickable v-ripple v-close-popup @click="npc.challenge_rating = 30, $forceUpdate()">30</q-item>
 						</q-list>
 					</template>
+					<div slot="after" v-if="npc.challenge_rating" class="pr-3">
+						+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+						<q-tooltip anchor="top middle" self="center middle">
+							Proficiency bonus
+						</q-tooltip>
+					</div>
 				</q-select>
 
 				<!-- AVATAR -->
@@ -157,21 +178,18 @@
 						<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 					</div>
 				</div>
-
-				<!-- FRIENDLY NPC -->
-				<q-checkbox size="lg" dark v-model="npc.friendly" label="Add as friendly" :false-value="null" indeterminate-value="something-else" />
 			</hk-card>
 
 			<hk-card header="Health & Armor Class">
 				<div class="row q-col-gutter-md">
 					<div class="col-12 col-md-4">
 						<q-input 
-							dark filled square dense
+							dark filled square
 							label="Armor class"
 							autocomplete="off"  
 							type="number" 
 							class="mb-2" 
-							v-model="npc.ac" 
+							v-model="npc.armor_class" 
 							v-validate="'required'" 
 							name="ac" 
 							data-vv-as="Armor class"
@@ -184,13 +202,13 @@
 					</div>
 					<div class="col-12 col-md-4">
 						<q-input 
-							dark filled square dense
+							dark filled square
 							label="Hit points"
 							autocomplete="off"  
 							type="number" 
 							class="mb-2" 
 							:class="{'input': true, 'error': errors.has('Hit Points') }" 
-							v-model="npc.maxHp" 
+							v-model="npc.hit_points" 
 							v-validate="'required'" 
 							name="hp" 
 							data-vv-as="Hit Points"
@@ -203,7 +221,7 @@
 					</div>
 					<div class="col-12 col-md-4">
 						<q-input 
-							dark filled square dense
+							dark filled square
 							label="Hit dice"
 							autocomplete="off" 
 							type="text" 
@@ -242,89 +260,140 @@
 			<!-- ABILITY SCORES -->
 			<hk-card header="Ability Scores">
 				<div class="row q-col-gutter-md">
-					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
+					<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
 						<q-input 
-							dark filled square dense
-							:label="ability.ability.capitalize()"
+							dark filled square
+							:label="ability.capitalize()"
 							autocomplete="off"  
 							type="number" 
-							v-model="npc[ability.ability]" 
-							:name="ability.ability"
-						/>
-					</div>
-				</div>
-			</hk-card>
-
-			<!-- SAVING THROWS -->
-			<hk-card header="Saving Throws">
-				<div class="row q-col-gutter-md">
-					<div v-for="(ability, index) in abilities" :key="index" class="col-4 col-md-2 mb-2">
-						<q-input 
-							dark filled square dense
-							:label="ability.ability.capitalize()"
-							autocomplete="off"  
-							type="number" 
-							v-model="npc[ability.ability+'_save']" 
-							:name="ability.ability"
-						/>
+							v-model="npc[ability]" 
+							:name="ability"
+						>
+							<q-checkbox 
+								slot="append"
+								size="xs" 
+								dark 
+								v-model="npc.saving_throws" 
+								:val="ability"
+								:false-value="null" 
+								indeterminate-value="something-else" 
+							>
+								<q-tooltip anchor="top middle" self="center middle">
+									Saving throw proficiency
+								</q-tooltip>
+							</q-checkbox>
+						</q-input>
 					</div>
 				</div>
 			</hk-card>
 
 			<!-- SKILLS -->
-			<hk-card header="Skills">
-				<div class="skills">
-					<q-input
-						dark filled square dense
-						:label="skill.capitalize()"
-						v-for="(skill, index) in skills" 
-						:key="index"
-						autocomplete="off"
-						type="number" 
-						class="mb-2" 
-						v-model="npc[skill]" 
-					/>
-				</div>
-			</hk-card>
+			<hk-card>
+					<div class="card-header" slot="header">
+						Skills
+						<span>
+							+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+							<q-tooltip anchor="top middle" self="center middle">
+								Proficiency bonus
+						</q-tooltip>
+						</span>
+					</div>
+
+					<div class="skills">
+						<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
+							<q-checkbox 
+								size="xs" 
+								dark
+								:val="key" 
+								v-model="npc.skills_expertise" 
+								:false-value="null" indeterminate-value="something-else"
+								:disable="npc.skills ? !npc.skills.includes(key) : true"
+							>
+								<template slot:label>
+									+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}
+								</template>
+								<q-tooltip anchor="top middle" self="center middle">
+									Expertise
+								</q-tooltip>
+							</q-checkbox>
+
+							<q-checkbox 
+								size="xs" 
+								dark
+								:val="key" 
+								v-model="skills" 
+								:false-value="null" indeterminate-value="something-else"
+							>
+								<template slot:label>
+									<div class="skill">
+										<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+										{{ skill.skill  }}
+										<div class="mod">
+											{{ 
+												calculateSkillModifier(
+													calcMod(npc[skill.ability]),
+													npc.skills ? (
+													npc.skills.includes(key) ? 
+													(npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : '')
+													: 0) : 0,
+													npc.skills_expertise ? npc.skills_expertise.includes(key) : false
+												) 
+											}}
+										</div>
+									</div>
+								</template>
+								<q-tooltip anchor="top middle" self="center middle">
+									Proficiency
+								</q-tooltip>
+							</q-checkbox>
+						</div>
+					</div>
+				</hk-card>
 			
 			<!-- DEFENSES -->
 			<hk-card header="Resistances & Vulnerabilities">
-				<q-input 
-					dark filled square dense
+				<q-select 
+					dark filled square
 					label="Damage vulnerabilities"
 					autocomplete="off"  
-					type="text"
 					class="mb-2" 
+					multiple
+					:options="damage_types"
 					v-model="npc.damage_vulnerabilities" 
-					name="damage_vulnerabilities" 
 				/>
 
-				<q-input 
-					dark filled square dense
+				<q-select 
+					dark filled square
 					label="Damage resistances"
 					autocomplete="off"  
 					type="text" 
 					class="mb-2" 
+					multiple
+					:options="damage_types"
 					v-model="npc.damage_resistances" 
 					name="damage_resistances" 
 				/>
 
-				<q-input 
-					dark filled square dense
+				<q-select 
+					dark filled square
 					label="Damage immunities"
 					autocomplete="off"  
 					type="text" 
 					class="mb-2" 
+					multiple
+					:options="damage_types"
 					v-model="npc.damage_immunities" 
 					name="damage_immunities"
 				/>
 
-				<q-input 
-					dark filled square dense
+				<q-select 
+					dark filled square
 					label="Condition immunities"
 					autocomplete="off"  
 					type="text" 
 					class="mb-2" 
+					multiple
+					:options="condition_list"
 					v-model="npc.condition_immunities" 
 					name="condition_immunities" 
 				/>
@@ -367,7 +436,7 @@
 						<div class="accordion-body">
 							<div>
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Name"
 									autocomplete="off" 
 									id="name"
@@ -384,7 +453,7 @@
 									{{ errors.first('name_'+action.type+index.toString()) }}
 								</p>
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Damage dice"
 									autocomplete="off" 
 									type="text" 
@@ -454,14 +523,33 @@
 <script>
 	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
+	import { abilities } from '@/mixins/abilities.js';
+	import { languages } from '@/mixins/languages.js';
+	import { skills } from '@/mixins/skills.js';
+	import { conditions } from '@/mixins/conditions.js';
+	import { damage_types } from '@/mixins/damageTypes.js';
+	import { monsterMixin } from '@/mixins/monster.js';
 
 
 	export default {
 		name: 'EditNpcForm',
 		props: ['monster'],
-		mixins: [general],
+		mixins: [
+			general, 
+			abilities, 
+			skills, 
+			monsterMixin,
+			languages,
+			damage_types,
+			conditions,
+		],
 		data() {
 			return {
+				actions: [
+					{ type: 'special_abilities', name: 'Special Abilities' },
+					{ type: 'actions', name: 'Actions' },
+					{ type: 'legendary_actions', name: 'Legendary Actions' }
+				],
 			}
 		},
 		computed: {
@@ -472,6 +560,19 @@
 				set(newValue) {
 					this.$emit('update', newValue);
 				}
+			},
+			skills: {
+				get() {
+					return this.npc.skills ? this.npc.skills : [];
+				},
+				set(newValue) {
+					this.$set(this.npc, 'skills', newValue);
+				}
+			},
+			condition_list() {
+				return this.conditionList.map(item => {
+					return item.value;
+				});
 			}
 		},
 		mounted() {
@@ -481,6 +582,45 @@
 			...mapActions([
 				'setSlide'
 			]),
+			add(type) {
+				if(type == 'actions') {
+					if(this.npc.actions == undefined) {
+						this.npc.actions = [];
+					}
+					this.npc.actions.push({
+						name: 'New Action',
+					});
+				}
+				else if(type == 'legendary_actions') {
+					if(this.npc.legendary_actions === undefined) {
+						this.npc.legendary_actions = [];
+					}
+					this.npc.legendary_actions.push({
+						name: 'New Legendary Action',
+					});
+				}
+				else if(type == 'special_abilities') {
+					if(this.npc.special_abilities === undefined) {
+						this.npc.special_abilities = [];
+					}
+					this.npc.special_abilities.push({
+						name: 'New Special Ability',
+					});
+				}
+				this.$forceUpdate(); //IMPORTANT
+			},
+			remove(index, type) {
+				if(type == 'actions'){
+					this.$delete(this.npc.actions, index);
+				}
+				else if(type == 'special_abilities'){
+					this.$delete(this.npc.special_abilities, index);
+				}
+				else if(type == 'legendary_actions'){
+					this.$delete(this.npc.legendary_actions, index);
+				}
+				this.$forceUpdate(); //IMPORTANT
+			},
 		}
 	}
 </script>
@@ -530,7 +670,21 @@
 			}
 		}
 		.skills {
-			columns: 2;
+			columns: 3;
+
+			.skill {
+				width: 100%;
+				display: grid;
+				grid-template-columns: 45px 1fr min-content;
+
+				.abillity {
+					text-transform: uppercase;
+					text-align: center;
+				}
+				.mod {
+					margin-left: 8px;
+				}
+			}
 		}
 	}
 	.save {

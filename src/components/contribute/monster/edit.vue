@@ -8,7 +8,7 @@
 		<div class="monster-wrapper" v-if="canEdit()">
 			<template v-if="(old_monster && monster)">
 				
-				<div class="form">
+				<q-form @submit="store_monster()">
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_monster">
 
@@ -18,6 +18,13 @@
 										<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
 										<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
 									</div>
+									<a 
+										class="btn btn-block mb-3" 
+										@click="parse_old_monster()">
+											<i class="fas fa-wand-magic"></i>
+											<span class="d-none d-md-inline ml-1">Parse to new monster</span>
+									</a>
+									<pre>{{ old_monster }}</pre>
 									<div class="monster-card" v-if="preview_monster === 'old'">
 										<ViewMonster :data="old_monster" />
 									</div>
@@ -29,25 +36,19 @@
 							<EditNpc :monster="monster" />
 						</div>
 					</div>
-				</div>
-				<div class="save">
-					<div class="d-flex justify-content-start">
-						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-							<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
-						</div>	
-						<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+					<div class="save">
+						<div class="d-flex justify-content-start">
+							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
+							</div>	
+							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+						</div>
+						<div>
+							<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+							<q-btn label="Save" type="submit" color="primary"/>
+						</div>
 					</div>
-					<div>
-						<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-						<button 
-							:disabled="errors.items && errors.items.length > 0"
-							class="btn" 
-							@click="store_monster()"
-						>
-							<i class="fas fa-check"></i> Save
-						</button>
-					</div>
-				</div>
+				</q-form>
 			</template>
 		</div>
 	</div>
@@ -59,6 +60,9 @@ import Crumble from '@/components/crumble/Compendium.vue';
 import ViewMonster from '@/components/ViewMonster.vue';
 import EditNpc from './forms/EditNpc.vue';
 import { general } from '@/mixins/general.js';
+import { abilities } from '@/mixins/abilities.js';
+import { skills } from '@/mixins/skills.js';
+import { monsterMixin } from '@/mixins/monster.js';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -68,7 +72,7 @@ export default {
 		ViewMonster,
 		EditNpc
 	},
-	mixins: [general],
+	mixins: [general, abilities, skills, monsterMixin],
 	metaInfo() {
 		return {
 			title: this.old_monster.name + ' | D&D 5th Edition',
@@ -119,9 +123,144 @@ export default {
 		preview(type) {
 			this.preview_monster = type;
 		},
-		parse_old_monster() {
-			
+		parse_old_monster() {			
+			this.$set(this.monster, "name", this.old_monster.name);
+			this.$set(this.monster, "size", this.old_monster.size.toLowerCase().capitalize());
+			this.$set(this.monster, "type", this.old_monster.type.toLowerCase().capitalize());
+			this.$set(this.monster, "subtype", this.old_monster.subtype.toLowerCase().capitalize());
+			this.$set(this.monster, "alignment", this.old_monster.alignment.toLowerCase().capitalize());
+			this.$set(this.monster, "challenge_rating", this.old_monster.challenge_rating);
+			this.$set(this.monster, "armor_class", parseInt(this.old_monster.armor_class));
+			this.$set(this.monster, "hit_points", parseInt(this.old_monster.hit_points));
+			this.$set(this.monster, "hit_dice", this.old_monster.hit_dice);
 
+			const proficiency = this.monster_challenge_rating[this.monster.challenge_rating].proficiency;
+
+			// Abilities & Saving Throws
+			this.$set(this.monster, "saving_throws", []);
+			for(const ability of this.abilities) {
+				this.$set(this.monster, ability, this.old_monster[ability]);
+
+				if(this.old_monster[`${ability}_save`]) {
+					this.monster.saving_throws.push(ability);
+				}
+			}
+
+			// Skills
+			this.$set(this.monster, "skills", []);
+			this.$set(this.monster, "skills_expertise", []);
+			for(const skill of Object.values(this.skillList)) {
+				const modifier = this.old_monster[skill.value];
+
+				// Save proficiency
+				if(modifier) {
+					this.monster.skills.push(skill.value).value;
+
+					// Check for expertise
+					// If the modifier in old_monster is higher than the ability_mod + proficiency
+					// that means there is expertise
+					if(modifier > proficiency + this.calcMod(this.monster[skill.ability])) {
+						this.monster.skills_expertise.push(skill.value)
+					}
+				}
+			}
+
+			// Speed
+			const speed = this.old_monster.speed.split(",");
+
+			for(const index in speed) {
+				const current_speed = speed[index].replace("ft.", "").trim();
+
+				if(index == 0) {
+					this.$set(this.monster, "walk_speed", parseInt(current_speed));
+				} else {
+					const other_speed = current_speed.split(" ");
+					const type = `${other_speed[0]}_speed`;
+					this.$set(this.monster, type, parseInt(other_speed[1]));
+				}
+			}
+
+
+			// Languages
+			const languages = this.old_monster.languages.split(",");
+
+			this.$set(this.monster, "languages", []);
+			for(const language of languages) {
+				this.monster.languages.push(
+					language.toLowerCase().trim().capitalize()
+				);
+			}
+
+			// Defenses
+			const damage_resistances = this.old_monster.damage_resistances.split(",");
+			const damage_vulnerabilities = this.old_monster.damage_vulnerabilities.split(",");
+			const damage_immunities = this.old_monster.damage_immunities.split(",");
+			const condition_immunities = this.old_monster.condition_immunities.split(",");
+
+			this.$set(this.monster, "damage_resistances", []);
+			this.$set(this.monster, "damage_vulnerabilities", []);
+			this.$set(this.monster, "damage_immunities", []);
+			this.$set(this.monster, "condition_immunities", []);
+			for(const resistance of damage_resistances) {
+				this.monster.damage_resistances.push(
+					resistance.trim().toLowerCase()
+				);
+			}
+			for(const vulnerability of damage_vulnerabilities) {
+				this.monster.damage_vulnerabilities.push(
+					vulnerability.trim().toLowerCase()
+				);
+			}
+			for(const immunity of damage_immunities) {
+				this.monster.damage_immunities.push(
+					immunity.trim().toLowerCase()
+				);
+			}
+			for(const immunity of condition_immunities) {
+				this.monster.condition_immunities.push(
+					immunity.trim().toLowerCase()
+				);
+			}
+
+			// Special abilities
+			this.$set(this.monster, "special_abilities", []);
+			for(const ability of this.old_monster.special_abilities) {
+				delete ability.attack_bonus;
+				this.monster.special_abilities.push(ability);
+			}
+			
+			// Actions
+			this.$set(this.monster, "actions", []);
+			for(const ability of this.old_monster.actions) {
+				const newAbility = {
+					name: ability.name,
+					desc: ability.desc
+				};
+
+				if(ability.damage_dice) {
+					// Check if it's a targeted action or saving throw
+					if(ability.attack_bonus !== 0) {
+						newAbility.type = "targeted";
+						newAbility.attack_bonus = ability.attack_bonus;
+					} else {
+						newAbility.type = "saving_throw";
+						newAbility.save_ability = "";
+					}
+
+					newAbility.rolls = [];
+					for(const damage in ability.damage_dice.split("+")) {
+						const input = damage.split("d");
+						newAbility.rolls.push({
+							dice_count: input[0],
+							dice_type: input[1],
+							damage_type: ""
+						})
+					}
+				}
+
+				this.monster.actions.push(newAbility);
+			}
+			
 		},
 		update() {
 			this.$forceUpdate();
@@ -130,6 +269,7 @@ export default {
 		
 
 		async store_monster() {
+			console.log('saved')
 			delete this.monster['.value'];
 			delete this.monster['.key'];
 
@@ -187,12 +327,15 @@ export default {
 		height: calc(100vh - 174px) !important;
 		grid-template-rows: auto 60px;
 	
-		.form {
+		.q-form {
 			overflow-x: hidden;
 			overflow-y: scroll;
 	
 			&::-webkit-scrollbar {
 				display: none;
+			}
+			pre {
+				overflow: auto;
 			}
 			.old_monster {
 				position: -webkit-sticky;

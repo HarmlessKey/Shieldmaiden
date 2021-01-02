@@ -117,11 +117,7 @@
 				</q-slide-transition>
 			</template>
 		</div>
-		<div v-else class="loader">
-			<slot name="table-loading">
-				Loading data...
-			</slot>
-		</div>
+		<hk-loader v-else />
 
 		<q-pagination
 			class="pagination"

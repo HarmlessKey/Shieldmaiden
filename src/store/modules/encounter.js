@@ -536,7 +536,7 @@ const actions = {
 	 */
 	set_initiative({ commit, state }, {key, initiative}) { 
 		if(!initiative) initiative = 0;
-		initiative = parseInt(initiative)
+		initiative = Number(initiative)
 
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(initiative);
 		commit('SET_ENTITY_PROPERTY', {key, prop: 'initiative', value: initiative});

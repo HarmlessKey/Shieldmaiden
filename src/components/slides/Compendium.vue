@@ -2,7 +2,7 @@
 	<div>
 		<h2>Compendium</h2>
 		<i>What are you looking for?</i>
-
+<!-- 
 		<div class="options d-flex justify-content-start">
 			<a v-for="(type, name) in types" :key="name"
 				@click="setType(name)"
@@ -14,12 +14,31 @@
 					{{ name }}
 				</q-tooltip>
 			</a>
-		</div>
+		</div> -->
+
+		<q-tabs
+				v-model="current"
+				dark
+				no-caps
+				class="my-3"
+			>
+				<q-tab 
+					v-for="({name, label, icon}, index) in types" 
+					:name="name" 
+					:icon="icon" 
+					@click="setType(name)"
+					:key="`tab-${index}`"
+				>
+					<q-tooltip anchor="top middle" self="center middle">
+						{{ label }}
+					</q-tooltip>
+				</q-tab>
+		</q-tabs>
 
 		<template v-if="current">
 			<q-input 
 				dark filled square dense
-				placeholder="Search"
+				:placeholder="`Search ${current}`"
 				type="text" 
 				class="mb-2"
 				autocomplete="off" 
@@ -62,10 +81,10 @@
 <script>
 	import { db } from '@/firebase'
 
-	import Monster from '@/components/compendium/Monster.vue'
-	import Item from '@/components/compendium/Item.vue'
-	import Spell from '@/components/compendium/Spell.vue'
-	import Condition from '@/components/compendium/Condition.vue'
+	import Monster from '@/components/compendium/Monster.vue';
+	import Item from '@/components/compendium/Item.vue';
+	import Spell from '@/components/compendium/Spell.vue';
+	import Condition from '@/components/compendium/Condition.vue';
 
 	export default {
 		components: {
@@ -76,12 +95,12 @@
 		},
 		data() {
 			return {
-				types: {
-					'monsters': { icon: 'fas fa-dragon' },
-					'items': { icon: 'fas fa-treasure-chest' },
-					'spells': { icon: 'fas fa-wand-magic' },
-					'conditions': { icon: 'fas fa-skull-crossbones' },
-				},
+				types: [
+					{ name: 'monsters', label: 'Monsters', icon: 'fas fa-dragon' },
+					{ name: 'items', label: 'Items', icon: 'fas fa-treasure-chest' },
+					{ name: 'spells', label: 'Spells', icon: 'fas fa-wand-magic' },
+					{ name: 'conditions', label: 'Conditions', icon: 'fas fa-skull-crossbones' },
+				],
 				current: undefined,
 				show: undefined,
 				search: '',

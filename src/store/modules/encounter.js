@@ -394,7 +394,7 @@ const actions = {
 		// Update player
 		if(entityType === 'player') {
 			// Some player properties are stored in the campaign
-			if(["ac_bonus", "curHp", "maxHpMod"].includes(prop)) {
+			if(["ac_bonus", "curHp", "maxHpMod", "tempHp"].includes(prop)) {
 				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
 			}
 			// When a player is transformed
@@ -408,7 +408,7 @@ const actions = {
 				if(!state.demo) db.ref(`${campaignPlayer}/transformed/${saveProp}`).set(value);
 			}
 			// Some player properties are stored under player
-			else if(["ac", "maxHp", "name"].includes(prop)) {
+			else if(["ac", "maxHp", "name", "tempHp"].includes(prop)) {
 				const saveProp = (prop === "name") ? "character_name" : prop;
 				if(!state.demo) db.ref(`players/${state.uid}/${key}/${saveProp}`).set(value);
 			}

@@ -289,66 +289,66 @@
 
 			<!-- SKILLS -->
 			<hk-card>
-					<div class="card-header" slot="header">
-						Skills
-						<span>
-							+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+				<div class="card-header" slot="header">
+					Skills
+					<span>
+						+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+						<q-tooltip anchor="top middle" self="center middle">
+							Proficiency bonus
+					</q-tooltip>
+					</span>
+				</div>
+
+				<div class="skills">
+					<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
+						<q-checkbox 
+							size="xs" 
+							dark
+							:val="key" 
+							v-model="npc.skills_expertise" 
+							:false-value="null" indeterminate-value="something-else"
+							:disable="npc.skills ? !npc.skills.includes(key) : true"
+						>
+							<template slot:label>
+								+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}
+							</template>
 							<q-tooltip anchor="top middle" self="center middle">
-								Proficiency bonus
-						</q-tooltip>
-						</span>
-					</div>
+								Expertise
+							</q-tooltip>
+						</q-checkbox>
 
-					<div class="skills">
-						<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
-							<q-checkbox 
-								size="xs" 
-								dark
-								:val="key" 
-								v-model="npc.skills_expertise" 
-								:false-value="null" indeterminate-value="something-else"
-								:disable="npc.skills ? !npc.skills.includes(key) : true"
-							>
-								<template slot:label>
-									+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}
-								</template>
-								<q-tooltip anchor="top middle" self="center middle">
-									Expertise
-								</q-tooltip>
-							</q-checkbox>
-
-							<q-checkbox 
-								size="xs" 
-								dark
-								:val="key" 
-								v-model="skills" 
-								:false-value="null" indeterminate-value="something-else"
-							>
-								<template slot:label>
-									<div class="skill">
-										<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
-										{{ skill.skill  }}
-										<div class="mod">
-											{{ 
-												calculateSkillModifier(
-													calcMod(npc[skill.ability]),
-													npc.skills ? (
-													npc.skills.includes(key) ? 
-													(npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : '')
-													: 0) : 0,
-													npc.skills_expertise ? npc.skills_expertise.includes(key) : false
-												) 
-											}}
-										</div>
+						<q-checkbox 
+							size="xs" 
+							dark
+							:val="key" 
+							v-model="skills" 
+							:false-value="null" indeterminate-value="something-else"
+						>
+							<template slot:label>
+								<div class="skill">
+									<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+									{{ skill.skill  }}
+									<div class="mod">
+										{{ 
+											calculateSkillModifier(
+												calcMod(npc[skill.ability]),
+												npc.skills ? (
+												npc.skills.includes(key) ? 
+												(npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : '')
+												: 0) : 0,
+												npc.skills_expertise ? npc.skills_expertise.includes(key) : false
+											) 
+										}}
 									</div>
-								</template>
-								<q-tooltip anchor="top middle" self="center middle">
-									Proficiency
-								</q-tooltip>
-							</q-checkbox>
-						</div>
+								</div>
+							</template>
+							<q-tooltip anchor="top middle" self="center middle">
+								Proficiency
+							</q-tooltip>
+						</q-checkbox>
 					</div>
-				</hk-card>
+				</div>
+			</hk-card>
 			
 			<!-- DEFENSES -->
 			<hk-card header="Resistances & Vulnerabilities">
@@ -446,69 +446,12 @@
 									v-model="ability.name" 
 									:name="`name_${action.type}${index}`" 
 									placeholder="Name"
-									v-validate="'required'"
 								/>
-								<p class="validate red" 
-									v-if="errors.has('name_'+action.type+index.toString())">
-									{{ errors.first('name_'+action.type+index.toString()) }}
-								</p>
-								<q-input 
-									dark filled square
-									label="Damage dice"
-									autocomplete="off" 
-									type="text" 
-									class="mb-2" 
-									v-model="ability.damage_dice" 
-									:name="'damage_dice_'+action.type+index"
-									data-vv-as="Damage Dice"
-									placeholder="Damage Dice"
-									v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
-								/>
-								<p class="validate red" 
-									v-if="errors.has('damage_dice_'+action.type+index.toString())">
-									{{ errors.first('damage_dice_'+action.type+index.toString()) }}
-									Allowed format: "2d6" or "2d6+1d8".
-								</p>
-
-								<q-input 
-									dark filled square dense
-									label="Damage bonus"
-									autocomplete="off" 
-									id="damage_bonus"
-									type="number" 
-									class="mb-2" 
-									v-model="ability.damage_bonus" 
-									:name="`damage_bonus_${action.type}${index}`"
-									v-validate="'integer'"
-									placeholder="Damage Bonus"
-								/>
-								<p class="validate red" 
-									v-if="errors.has('damage_bonus_'+action.type+index.toString())">
-									{{ errors.first('damage_bonus_'+action.type+index.toString()) }}
-								</p>
-
-								<q-input 
-									dark filled square dense
-									label="Attack/to hit bonus"
-									autocomplete="off" 
-									id="attack_bonus"
-									type="number" 
-									class="mb-2" 
-									v-model="ability.attack_bonus" 
-									:name="`attack_bonus_${action.type}${index}`"
-									v-validate="'integer'"
-									placeholder="Attack Bonus"
-								/>
-								<p class="validate red" 
-									v-if="errors.has('attack_bonus_'+action.type+index.toString())">
-									{{ errors.first('attack_bonus_'+action.type+index.toString()) }}
-								</p>
 								<q-input
 									dark filled square dense
 									label="Description"
 									v-model="ability.desc" 
 									name="desc"
-									v-validate=""
 									autogrow
 								/>
 							</div>

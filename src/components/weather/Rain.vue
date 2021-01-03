@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper" :class="intensity">
+	<div class="wrapper" :class="intensity.toLowerCase()">
 		<div class="rain layer1 a"></div>
 		<div class="rain layer1"></div> 
 		<div class="rain layer2 a"></div>
@@ -16,15 +16,10 @@
 			intensity: {
 				type: String,
 				default: "light"
+			},
+			effects: {
+				type: Array
 			}
-		},
-		data() {
-			return {
-	
-			}
-		},
-		methods: {
-
 		}
 	};
 </script>
@@ -34,18 +29,7 @@
 		margin-left: -50px;
     width: calc(150% + 50px);
     height: 150%;
-
-		&:before {
-			content: '';
-			background: white;
-			position: absolute;
-			width: calc(150% + 50px);
-			height: 100%;
-			opacity: 0;
-			animation: lightning 8s linear infinite;
-		}
-
-
+		
 		$s1:"";
 		$s2:"";
 		$s3:"";
@@ -135,7 +119,7 @@
 
 		// Heavy
 		&.heavy {
-			transform: rotate(-15deg);
+			// transform: rotate(-15deg);
 
 			.layer1 {
 				width: 1px;
@@ -168,15 +152,5 @@
 			100% {
 				transform: translateY(200vh); 
 			}
-	}
-	@keyframes lightning {
-		0% { opacity: 0; }
-		10% { opacity: 0; }
-		11% { opacity: .7; }
-		12% { opacity: 0; }
-		15% { opacity: 0; }
-		16% { opacity: .7; }
-		17% { opacity: 0; }
-		100% { opacity: 0; }
 	}
 </style>

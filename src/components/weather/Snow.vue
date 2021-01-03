@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper" :class="intensity">
+	<div class="wrapper" :class="intensity.toLowerCase()">
 		<div class="snow layer1 a"></div>
 		<div class="snow layer1"></div> 
 		<div class="snow layer2 a"></div>
@@ -16,15 +16,13 @@
 			intensity: {
 				type: String,
 				default: "light"
+			},
+			effects: {
+				type: Array
 			}
 		},
-		data() {
-			return {
-	
-			}
-		},
-		methods: {
-
+		components: {
+			Fog: () => import('./Fog')
 		}
 	};
 </script>
@@ -34,7 +32,6 @@
 		margin-left: -50px;
     width: calc(100% + 50px);
     height: 100%;
-
 
 		$s1:"";
 		$s2:"";

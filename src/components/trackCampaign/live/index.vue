@@ -6,7 +6,7 @@
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
 			<div class="weather">
-				<Snow intensity="heavy" />
+				<Rain intensity="heavy" />
 			</div>
 			<Turns 
 				:encounter="encounter" 
@@ -187,6 +187,7 @@
 	import Rolls from './Rolls.vue';
 	import RollForInitiative from './RollForInitiative.vue';
 	import Snow from '@/components/weather/Snow.vue';
+	import Rain from '@/components/weather/Rain.vue';
 
 	export default {
 		name: 'live',
@@ -196,7 +197,8 @@
 			Meters,
 			Rolls,
 			RollForInitiative,
-			Snow
+			Snow,
+			Rain
 		},
 		props: [
 			"encounter", 

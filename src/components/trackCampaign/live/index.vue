@@ -5,6 +5,9 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
+			<div class="weather">
+				<Snow intensity="heavy" />
+			</div>
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
@@ -17,6 +20,7 @@
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
 			/>
+
 
 			<!-- DESKTOP -->
 			<div class="track desktop" v-if="width > 576">
@@ -182,6 +186,7 @@
 	import Meters from '../Meters.vue';
 	import Rolls from './Rolls.vue';
 	import RollForInitiative from './RollForInitiative.vue';
+	import Snow from '@/components/weather/Snow.vue';
 
 	export default {
 		name: 'live',
@@ -190,7 +195,8 @@
 			Initiative,
 			Meters,
 			Rolls,
-			RollForInitiative
+			RollForInitiative,
+			Snow
 		},
 		props: [
 			"encounter", 
@@ -355,6 +361,14 @@
 </script>
 
 <style lang="scss" scoped>
+.weather {
+	overflow: hidden;
+	position: absolute; 
+	left: 0;
+	top: 60px;
+	height: calc(100% - 60px);
+	width: 100%;
+}
 .track {
 	max-width: 1250px;
 	margin: auto;
@@ -402,7 +416,7 @@
 		grid-template-columns: 1fr;
 
 		.transparent-bg {
-			background: rgba(38, 38, 38, .5);
+			background: rgba(38, 38, 38, .3);
 		}
 		.q-tab-panel {
 			padding: 0 15px;
@@ -417,6 +431,12 @@
 @media only screen and (max-width: 1000px) {
 	.track.desktop {
 		grid-template-columns: 3fr 2fr;
+	}
+}
+@media only screen and (max-width: 576px) {
+	.weather {
+		top: 120px;
+		height: calc(100% - 120px);
 	}
 }
 </style>

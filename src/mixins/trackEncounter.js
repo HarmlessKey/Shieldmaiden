@@ -37,7 +37,7 @@ export const trackEncounter = {
 		},
 		displayImg(entity, player, npc) {
 			//Check what image should be displayed
-			let encounterImg = entity.avatar; //img linked within the encounter
+			let encounterImg = (entity) ? entity.avatar : undefined; //img linked within the encounter
 
 			if(encounterImg) {
 				var img = encounterImg;
@@ -48,17 +48,17 @@ export const trackEncounter = {
 				}
 				else if(entity.id) {
 					if(entity.entityType == 'player') {
-						let playerImg = player.avatar;
+						let playerImg = (player) ? player.avatar : undefined;
 						img = playerImg || 'player';
 					}
 					if(entity.entityType == 'companion') {
-						let companionImg = npc.avatar;
+						let companionImg = (npc) ? npc.avatar : undefined;
 						img = companionImg || 'companion';
 						
 					}
 					if(entity.entityType == 'npc') {						
 						if(entity.npc == 'custom') {
-							let npcImg = npc.avatar;
+							let npcImg = (npc) ? npc.avatar : undefined;
 							img = npcImg || 'monster';
 
 						} else {

@@ -32,8 +32,18 @@
 <style lang="scss" scoped>
 	.wrapper {
 		margin-left: -50px;
-    width: calc(100% + 50px);
-    height: 100%;
+    width: calc(150% + 50px);
+    height: 150%;
+
+		&:before {
+			content: '';
+			background: white;
+			position: absolute;
+			width: calc(150% + 50px);
+			height: 100%;
+			opacity: 0;
+			animation: lightning 8s linear infinite;
+		}
 
 
 		$s1:"";
@@ -125,7 +135,10 @@
 
 		// Heavy
 		&.heavy {
+			transform: rotate(-15deg);
+
 			.layer1 {
+				width: 1px;
 				height: 180px;
 				animation-duration: .3s;
 
@@ -135,7 +148,7 @@
 			}
 			.layer2 {
 				height: 130px;
-				animation-duration: .6s;
+				animation-duration: .4s;
 
 				&.a {
 					animation-delay: -.3s;
@@ -143,7 +156,7 @@
 			}
 			.layer3 {
 					height: 100px;
-					animation-duration: .8s;
+					animation-duration: .6s;
 
 					&.a {
 						animation-delay: -.4s;
@@ -152,6 +165,18 @@
 		}
 	}
 	@keyframes fall {
-			100% {transform: translateY(200vh); }
+			100% {
+				transform: translateY(200vh); 
+			}
+	}
+	@keyframes lightning {
+		0% { opacity: 0; }
+		10% { opacity: 0; }
+		11% { opacity: .7; }
+		12% { opacity: 0; }
+		15% { opacity: 0; }
+		16% { opacity: .7; }
+		17% { opacity: 0; }
+		100% { opacity: 0; }
 	}
 </style>

@@ -6,7 +6,7 @@
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
 			<div class="weather">
-				<Rain intensity="heavy" />
+				<Rain intensity="medium" />
 			</div>
 			<Turns 
 				:encounter="encounter" 

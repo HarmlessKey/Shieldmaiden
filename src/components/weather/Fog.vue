@@ -44,7 +44,16 @@
   top: 0;
   width: 100%;
   filter: blur(1px) grayscale(0.2) saturate(1.2) sepia(0.2);
-  background: rgba(168, 168, 168, .1);
+  
+  &.light {
+    background: rgba(168, 168, 168, .1);
+  }
+  &.medium {
+    background: rgba(168, 168, 168, .3);
+  }
+  &.heavy {
+    background: rgba(168, 168, 168, .6);
+  }
 
   #foglayer_01, #foglayer_02, #foglayer_03 {
     height: 100%;

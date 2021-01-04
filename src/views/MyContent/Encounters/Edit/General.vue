@@ -43,8 +43,8 @@
 			Weather effects
 			<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
 				<q-tooltip anchor="top middle" self="center middle">
-						Weather preview
-					</q-tooltip>
+					Weather preview
+				</q-tooltip>
 			</q-icon>
 		</h3>
 		<q-list dense>
@@ -61,7 +61,11 @@
 						:min="0"
 						:max="3"
 						markers
+						dark
 					/>
+				</q-item-section>
+				<q-item-section avatar>
+					{{ intensity(key) }}
 				</q-item-section>
 			</q-item>
 		</q-list>
@@ -88,6 +92,7 @@
 											:min="0"
 											:max="3"
 											markers
+											dark
 										/>
 									</q-item-section>
 								</q-item>
@@ -164,19 +169,19 @@
 					}
 				})
 			},
-			setWeatherType(type) {
-				if(this.weather.type === type) {
-					this.$set(this.weather, 'type', undefined);
-				} else {
-					this.$set(this.weather, 'type', type);
+			intensity(type) {
+				const value = this.weather[type];
+				if(value === 0) return "Off";
+
+				if(["rain", "snow", "fog"].includes(type)) {
+					if(value === 1) return "Light";
+					if(value === 2) return "Medium";
+					if(value === 3) return "Heavy";
 				}
-			},
-			addEffect(effect) {
-				const index = this.weather.effects.indexOf(effect);
-				if(index >= 0) {
-					this.$delete(this.weather.effects, index);
-				} else {
-					this.weather.effects.push(effect);
+				if(type === 'lightning') {
+					if(value === 1) return "6m interval";
+					if(value === 2) return "3m interval";
+					if(value === 3) return "1m interval";
 				}
 			}
 		}

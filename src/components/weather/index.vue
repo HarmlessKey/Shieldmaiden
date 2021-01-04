@@ -1,7 +1,7 @@
 <template>
 	<div class="weather-wrapper">
-		<div class="lightning" v-if="weather.lightning > 0" />
 		<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
+		<Lightning v-if="weather.lightning > 0" :intensity="weather.lightning" />
 		<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
 		<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
 	</div>
@@ -17,9 +17,10 @@ export default {
 			}
 		},
 		components: {
+			Fog: () => import('./Fog'),
+			Lightning: () => import('./Lightning'),
 			Rain: () => import('./Rain'),
-			Snow: () => import('./Snow'),
-			Fog: () => import('./Fog')
+			Snow: () => import('./Snow')
 		},
     data() {
 			return {
@@ -48,24 +49,5 @@ export default {
 		overflow: hidden;
     width: 100%;
     height: 100%;
-
-		.lightning {
-			background: white;
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			opacity: 0;
-			animation: lightning 60s linear infinite;
-		}
-	}
-	@keyframes lightning {
-		0% { opacity: 0; }
-		10.9% { opacity: 0; }
-		11% { opacity: .7; }
-		11.1% { opacity: 0; }
-		11.4% { opacity: 0; }
-		11.6% { opacity: .7; }
-		11.9% { opacity: 0; }
-		100% { opacity: 0; }
 	}
 </style>

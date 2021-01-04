@@ -5,7 +5,7 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
-			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
+			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length">
 				<Weather :weather="encounter.weather" />
 			</div>
 			<Turns 
@@ -367,6 +367,7 @@
 	top: 60px;
 	height: calc(100% - 60px);
 	width: 100%;
+	pointer-events: none;
 }
 .track {
 	max-width: 1250px;

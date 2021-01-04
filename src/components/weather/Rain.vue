@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper" :class="intensity.toLowerCase()">
+	<div class="wrapper" :class="intensityClass">
 		<div class="rain layer1 a"></div>
 		<div class="rain layer1"></div> 
 		<div class="rain layer2 a"></div>
@@ -19,6 +19,13 @@
 			},
 			effects: {
 				type: Array
+			}
+		},
+		computed: {
+			intensityClass() {
+				const intensities = ["light", "medium", "heavy"];
+				const index = this.intensity - 1;
+				return intensities[index];	
 			}
 		}
 	};

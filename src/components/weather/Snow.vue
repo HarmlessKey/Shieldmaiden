@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper" :class="intensity.toLowerCase()">
+	<div class="wrapper" :class="intensityClass">
 		<div class="snow layer1 a"></div>
 		<div class="snow layer1"></div> 
 		<div class="snow layer2 a"></div>
@@ -21,8 +21,12 @@
 				type: Array
 			}
 		},
-		components: {
-			Fog: () => import('./Fog')
+		computed: {
+			intensityClass() {
+				const intensities = ["light", "medium", "heavy"];
+				const index = this.intensity - 1;
+				return intensities[index];	
+			}
 		}
 	};
 </script>
@@ -131,7 +135,7 @@
 				animation-duration: 4s;
 
 				&.a {
-					animation-delay: -3s;
+					animation-delay: -2s;
 				}
 			}
 			.layer2 {
@@ -140,7 +144,7 @@
 				animation-duration: 6s;
 
 				&.a {
-					animation-delay: -4s;
+					animation-delay: -3s;
 				}
 			}
 			.layer3 {
@@ -149,7 +153,7 @@
 					animation-duration: 8s;
 
 					&.a {
-						animation-delay: -5s;
+						animation-delay: -4s;
 				}
 			}
 		}

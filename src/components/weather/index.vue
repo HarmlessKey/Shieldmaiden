@@ -1,13 +1,9 @@
 <template>
 	<div class="weather-wrapper">
-		<div class="lightning" v-if="weather.effects.includes('Lightning')" />
-		<Fog v-if="weather.effects.includes('Fog')" />
-		<component 
-			v-if="weather.type && component"
-			:is="component" 
-			:intensity="weather.intensity" 
-			:effects="weather.effects" 
-		/>
+		<div class="lightning" v-if="weather.lightning > 0" />
+		<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
+		<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
+		<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
 	</div>
 </template>
 
@@ -21,6 +17,8 @@ export default {
 			}
 		},
 		components: {
+			Rain: () => import('./Rain'),
+			Snow: () => import('./Snow'),
 			Fog: () => import('./Fog')
 		},
     data() {
@@ -65,9 +63,9 @@ export default {
 		10.9% { opacity: 0; }
 		11% { opacity: .7; }
 		11.1% { opacity: 0; }
-		11.3% { opacity: 0; }
-		11.4% { opacity: .7; }
-		11.8% { opacity: 0; }
+		11.4% { opacity: 0; }
+		11.6% { opacity: .7; }
+		11.9% { opacity: 0; }
 		100% { opacity: 0; }
 	}
 </style>

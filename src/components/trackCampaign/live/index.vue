@@ -5,8 +5,8 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
-			<div class="weather">
-				<Weather :weather="{ type: 'Snow', intensity: 'light'}" />
+			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
+				<Weather :weather="encounter.weather" />
 			</div>
 			<Turns 
 				:encounter="encounter" 

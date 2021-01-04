@@ -47,29 +47,7 @@
 				</q-tooltip>
 			</q-icon>
 		</h3>
-		<q-list dense>
-			<q-item v-for="({name, icon}, key) in weather_effects" :key="`effect-${key}`">
-				<q-item-section dark avatar>
-					<q-icon :name="icon" />
-					<q-tooltip anchor="top middle" self="center right">
-						{{ name }}
-					</q-tooltip>
-				</q-item-section>
-				<q-item-section>
-					<q-slider
-						v-model="weather[key]"
-						:min="0"
-						:max="3"
-						markers
-						dark
-					/>
-				</q-item-section>
-				<q-item-section avatar>
-					{{ intensity(key) }}
-				</q-item-section>
-			</q-item>
-		</q-list>
-
+		<EditWeather v-model="weather" />
 
 		<button class="btn btn-lg mt-3" @click="edit()">Save</button>
 
@@ -80,23 +58,9 @@
 					<q-space />
 
 					<q-btn-dropdown stretch flat label="Weather" dark square>
-						<div class="bg-gray">
-							<q-list dark dense>
-								<q-item v-for="({icon}, key) in weather_effects" :key="`effect-${key}`">
-									<q-item-section avatar>
-										<q-icon :name="icon" />
-									</q-item-section>
-									<q-item-section>
-										<q-slider
-											v-model="weather[key]"
-											:min="0"
-											:max="3"
-											markers
-											dark
-										/>
-									</q-item-section>
-								</q-item>
-							</q-list>
+						<div class="bg-gray edit-weather">
+							<q-item-label header>Weather effects</q-item-label>
+							<EditWeather v-model="weather" />
 						</div>
 					</q-btn-dropdown>
 
@@ -115,11 +79,13 @@
 
 <script>
     import { db } from '@/firebase';
-    import { mapActions, mapGetters } from 'vuex';
+		import { mapActions, mapGetters } from 'vuex';
+		import EditWeather from './Weather';
 
 	export default {
 		name: 'General',
 		components: {
+			EditWeather,
 			Weather: () => import('@/components/weather')
 		},
 		data() {
@@ -208,9 +174,6 @@
 	}
 }
 .q-card {
-	.q-field {
-		width: 120px;
-	}
 	.preview {
 		overflow: hidden;
 		height: calc(100% - 50px);
@@ -228,5 +191,8 @@
 			width: 100%;
 		}
 	}
+}
+.edit-weather {
+	min-width: 200px;
 }
 </style>

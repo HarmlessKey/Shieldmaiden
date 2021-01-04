@@ -14,11 +14,8 @@
 		name: "Snow",
 		props: {
 			intensity: {
-				type: String,
-				default: "light"
-			},
-			effects: {
-				type: Array
+				type: Number,
+				default: 1
 			}
 		},
 		computed: {
@@ -40,12 +37,12 @@
 		$s1:"";
 		$s2:"";
 		$s3:"";
-		@for $i from 1 through 300 {
+		@for $i from 1 through 800 {
 			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 			$s2: $s2 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 			$s3: $s3 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 
-			@if $i < 300 {
+			@if $i < 800 {
 				$s1: $s1 + ",";
 				$s2: $s2 + ",";
 				$s3: $s3 + ",";
@@ -67,7 +64,7 @@
 			height: 40px;
 			box-shadow: #{$s1};
 			animation-duration: 2s;
-			opacity: .6;
+			opacity: .5;
 
 			&.a {
 				animation-delay: -1s;
@@ -78,7 +75,7 @@
 			height: 20px;
 			box-shadow: #{$s2};
 			animation-duration: 3s;
-			opacity: .5;
+			opacity: .4;
 
 			&.a {
 				animation-delay: -2s;
@@ -89,7 +86,7 @@
 				height: 10px;
 				box-shadow: #{$s3};
 				animation-duration: 4s;
-				opacity: .4;
+				opacity: .3;
 
 				&.a {
 					animation-delay: -3s;
@@ -130,7 +127,7 @@
 
 			.layer1 {
 				width: 1px;
-				height: 180px;
+				height: 160px;
 				animation-duration: .3s;
 
 				&.a {
@@ -138,7 +135,7 @@
 				}
 			}
 			.layer2 {
-				height: 130px;
+				height: 110px;
 				animation-duration: .4s;
 
 				&.a {
@@ -146,7 +143,7 @@
 				}
 			}
 			.layer3 {
-					height: 100px;
+					height: 90px;
 					animation-duration: .6s;
 
 					&.a {
@@ -157,7 +154,7 @@
 	}
 	@keyframes fall {
 			100% {
-				transform: translateY(200vh) rotate(-5deg); 
+				transform: translateY(200vh); 
 			}
 	}
 </style>

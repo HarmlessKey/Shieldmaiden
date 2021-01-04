@@ -20,11 +20,8 @@
     name: "Fog",
     props: {
 			intensity: {
-				type: String,
-				default: "light"
-			},
-			effects: {
-				type: Array
+				type: Number,
+				default: 1
 			}
 		},
 		computed: {

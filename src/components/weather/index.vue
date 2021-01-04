@@ -3,6 +3,7 @@
 		<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
 		<Lightning v-if="weather.lightning > 0" :intensity="weather.lightning" />
 		<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
+		<Hail v-if="weather.hail > 0" :intensity="weather.hail" />
 		<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
 	</div>
 </template>
@@ -20,6 +21,7 @@ export default {
 			Fog: () => import('./Fog'),
 			Lightning: () => import('./Lightning'),
 			Rain: () => import('./Rain'),
+			Hail: () => import('./Hail'),
 			Snow: () => import('./Snow')
 		},
     data() {

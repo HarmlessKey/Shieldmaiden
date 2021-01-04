@@ -1,17 +1,17 @@
 <template>
 	<div class="wrapper" :class="intensityClass">
-		<div class="snow layer1 a"></div>
-		<div class="snow layer1"></div> 
-		<div class="snow layer2 a"></div>
-		<div class="snow layer2"></div>
-		<div class="snow layer3 a"></div>
-		<div class="snow layer3"></div>
+		<div class="hail layer1 a"></div>
+		<div class="hail layer1"></div> 
+		<div class="hail layer2 a"></div>
+		<div class="hail layer2"></div>
+		<div class="hail layer3 a"></div>
+		<div class="hail layer3"></div>
 	</div>
 </template>
 
 <script>
 	export default {
-		name: "Snow",
+		name: "Hail",
 		props: {
 			intensity: {
 				type: Number,
@@ -37,18 +37,18 @@
 		$s1:"";
 		$s2:"";
 		$s3:"";
-		@for $i from 1 through 400 {
+		@for $i from 1 through 500 {
 			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 			$s2: $s2 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 			$s3: $s3 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + #fff;
 
-			@if $i < 400 {
+			@if $i < 500 {
 				$s1: $s1 + ",";
 				$s2: $s2 + ",";
 				$s3: $s3 + ",";
 			}
 		}
-		.snow {
+		.hail {
 			border-radius: 50%;
 			opacity: 0.9;
 			position: absolute;
@@ -60,66 +60,63 @@
 
 		// Light (default)
 		.layer1 {
-			width: .6rem;
-			height: .6rem;
-			filter: blur(1.5px);
+			width: .3rem;
+			height: .3rem;
 			box-shadow: #{$s1};
-			animation-duration: 10s;
+			animation-duration: 1.2s;
 
 			&.a {
-				animation-delay: -5s;
+				animation-delay: -.7s;
 			}
 		}
 		.layer2 {
-			width: .4rem;
-			height: .4rem;
-			filter: blur(3px);
+			width: .2rem;
+			height: .2rem;
 			box-shadow: #{$s2};
-			animation-duration: 12s;
+			animation-duration: 2.2s;
 
 			&.a {
-				animation-delay: -6s;
+				animation-delay: -1.7s;
 			}
 		}
 		.layer3 {
-				width: .2rem;
-				height: .2rem;
-				filter: blur(6px);
+				width: .1rem;
+				height: .1rem;
 				box-shadow: #{$s3};
-				animation-duration: 14s;
+				animation-duration: 3.2s;
 
 				&.a {
-					animation-delay: -7s;
-			}
+					animation-delay: -2.7s;
+				}
 		}
 
 		// Medium
 		&.medium {
 			.layer1 {
-				width: .8rem;
-				height: .8rem;
-				animation-duration: 8s;
+				width: .4rem;
+				height: .4rem;
+				animation-duration: 1s;
 
 				&.a {
-					animation-delay: -4s;
+					animation-delay: -.5s;
 				}
 			}
 			.layer2 {
-				width: .6rem;
-				height: .6rem;
-				animation-duration: 10s;
+				width: .3rem;
+				height: .3rem;
+				animation-duration: 2s;
 
 				&.a {
-					animation-delay: -5s;
+					animation-delay: -1.5s;
 				}
 			}
 			.layer3 {
-				width: .4rem;
-				height: .4rem;
-				animation-duration: 12s;
+				width: .2rem;
+				height: .2rem;
+				animation-duration: 3s;
 
 				&.a {
-					animation-delay: -6s;
+					animation-delay: -2.5s;
 				}
 			}
 		}
@@ -127,37 +124,37 @@
 		// Heavy
 		&.heavy {
 			.layer1 {
-				width: 1rem;
-				height: 1rem;
-				animation-duration: 4s;
+				width: .5rem;
+				height: .5rem;
+				animation-duration: .7s;
 
 				&.a {
-					animation-delay: -2s;
+					animation-delay: -.3s;
 				}
 			}
 			.layer2 {
-				width: .8rem;
-				height: .8rem;
-				animation-duration: 6s;
+				width: .4rem;
+				height: .4rem;
+				animation-duration: .8s;
 
 				&.a {
-					animation-delay: -3s;
+					animation-delay: -.4s;
 				}
 			}
 			.layer3 {
-					width: .6rem;
-					height: .6rem;
-					animation-duration: 8s;
+					width: .3rem;
+					height: .3rem;
+					animation-duration: .9s;
 
 					&.a {
-						animation-delay: -4s;
+					animation-delay: -.5s;
 				}
 			}
 		}
 	}
 	@keyframes fall {
 			100% { 
-				transform: translateY(200vh) rotate(-20deg);
+				transform: translateY(200vh);
 			}
 	}
 </style>

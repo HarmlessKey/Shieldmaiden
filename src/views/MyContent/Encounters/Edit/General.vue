@@ -131,6 +131,7 @@
 				weather_effects: {
 					rain: { name: "Rain", icon: "fas fa-cloud-showers" },
 					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
+					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" }
 				},
@@ -173,16 +174,17 @@
 				const value = this.weather[type];
 				if(value === 0) return "Off";
 
-				if(["rain", "snow", "fog"].includes(type)) {
-					if(value === 1) return "Light";
-					if(value === 2) return "Medium";
-					if(value === 3) return "Heavy";
-				}
 				if(type === 'lightning') {
 					if(value === 1) return "6m interval";
 					if(value === 2) return "3m interval";
 					if(value === 3) return "1m interval";
 				}
+				else {
+					if(value === 1) return "Light";
+					if(value === 2) return "Medium";
+					if(value === 3) return "Heavy";
+				}
+				
 			}
 		}
 	}

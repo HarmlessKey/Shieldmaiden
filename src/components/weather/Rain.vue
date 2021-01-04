@@ -150,7 +150,7 @@
 	}
 	@keyframes fall {
 			100% {
-				transform: translateY(200vh); 
+				transform: translateY(200vh) rotate(-5deg); 
 			}
 	}
 </style>

@@ -3,10 +3,10 @@
 		<div class="lightning" v-if="weather.effects.includes('Lightning')" />
 		<Fog v-if="weather.effects.includes('Fog')" />
 		<component 
+			v-if="weather.type && component"
 			:is="component" 
 			:intensity="weather.intensity" 
 			:effects="weather.effects" 
-			v-if="component"
 		/>
 	</div>
 </template>
@@ -57,17 +57,17 @@ export default {
 			width: 100%;
 			height: 100%;
 			opacity: 0;
-			animation: lightning 8s linear infinite;
+			animation: lightning 60s linear infinite;
 		}
 	}
 	@keyframes lightning {
 		0% { opacity: 0; }
-		10% { opacity: 0; }
+		10.9% { opacity: 0; }
 		11% { opacity: .7; }
-		12% { opacity: 0; }
-		15% { opacity: 0; }
-		16% { opacity: .7; }
-		17% { opacity: 0; }
+		11.1% { opacity: 0; }
+		11.3% { opacity: 0; }
+		11.4% { opacity: .7; }
+		11.8% { opacity: 0; }
 		100% { opacity: 0; }
 	}
 </style>

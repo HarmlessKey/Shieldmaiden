@@ -114,7 +114,7 @@
 			}
 			.layer3 {
 				width: .6rem;
-				height: .7rem;
+				height: .6rem;
 				animation-duration: 12s;
 
 				&.a {
@@ -126,18 +126,18 @@
 		// Heavy
 		&.heavy {
 			.layer1 {
-				width: 1.5rem;
-				height: 1.5rem;
-				animation-duration: 6s;
+				width: 1.2rem;
+				height: 1.2rem;
+				animation-duration: 4s;
 
 				&.a {
 					animation-delay: -3s;
 				}
 			}
 			.layer2 {
-				width: 1.2rem;
-				height: 1.2rem;
-				animation-duration: 8s;
+				width: 1rem;
+				height: 1rem;
+				animation-duration: 6s;
 
 				&.a {
 					animation-delay: -4s;
@@ -146,7 +146,7 @@
 			.layer3 {
 					width: 0.8rem;
 					height: 0.8rem;
-					animation-duration: 10s;
+					animation-duration: 8s;
 
 					&.a {
 						animation-delay: -5s;
@@ -155,6 +155,8 @@
 		}
 	}
 	@keyframes fall {
-			100% {transform: translateY(200vh); }
+			100% { 
+				transform: translateY(200vh) rotate(-20deg);
+			}
 	}
 </style>

@@ -123,7 +123,7 @@
 
 				</q-toolbar>
 				<div class="preview" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
-					<div class="weathter" v-if="weather.type">
+					<div class="weathter" v-if="weather.type || weather.effects.length > 0">
 						<Weather :weather="weather" :key="JSON.stringify(weather)" />
 					</div>
 				</div>

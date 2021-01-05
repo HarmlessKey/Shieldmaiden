@@ -1,5 +1,5 @@
 <template>
-	<div class="turns d-flex justify-content-center">
+	<div class="turns d-flex justify-content-center bg-gray-dark">
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round">
 			<div class="mr-3">
 				<div>Round</div>
@@ -62,6 +62,10 @@
 				? ? ?
 			</span>
 		</h1>
+		<a @click="setWeather" class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
+			<i v-if="weather" class="fas fa-cloud-showers"></i>
+			<i v-else class="fas fa-cloud hide"></i>
+		</a>
 	</div>
 </template>
 
@@ -91,15 +95,21 @@
 		data() {
 			return {
 				userId: this.$route.params.userid,
+				weather: true
 			}
 		},
+		methods: {
+			setWeather() {
+				this.weather = !this.weather;
+				this.$emit('setWeather', this.weather);
+			}
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	.turns {
 		grid-area: top;
-		background: rgba(38, 38, 38, .9);
 		text-transform: uppercase;
 		height: 60px;
 		padding: 10px;
@@ -126,6 +136,23 @@
 		h1 {
 			line-height: 40px;
 			margin-left: 20px;
+		}
+		.weather {
+			position: absolute;
+			right: 0;
+			top: 0;
+			height: 60px;
+			width: 60px;
+			line-height: 60px;
+			text-align: center;
+			color: #fff;
+			font-size: 25px;
+
+			.hide {
+				font-size: 19px;
+				vertical-align: 7px;
+				opacity: .5;
+			}
 		}
 	}
 </style>

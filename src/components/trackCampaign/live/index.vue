@@ -5,9 +5,10 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
-			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length">
+			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length && weather">
 				<Weather :weather="encounter.weather" />
 			</div>
+
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
@@ -19,8 +20,8 @@
 				:npcs="npcs"
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
+				@setWeather="setWeather"
 			/>
-
 
 			<!-- DESKTOP -->
 			<div class="track desktop" v-if="width > 576">
@@ -210,6 +211,7 @@
 				setSideDisplay: undefined,
 				counter: 0,
 				rolls: [],
+				weather: true,
 				panels: [
 					{
 						label: "Initiative list",
@@ -354,6 +356,9 @@
 				if(roll) {
 					this.rolls.unshift(roll);
 				}
+			},
+			setWeather(value) {
+				this.weather = value;
 			}
 		}
 	}

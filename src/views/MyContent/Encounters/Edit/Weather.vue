@@ -19,7 +19,7 @@
 			</q-item-section>
 		</q-item>
 	</q-list>
-</template>1
+</template>
 
 <script>
 	export default {

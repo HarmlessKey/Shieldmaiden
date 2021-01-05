@@ -52,7 +52,7 @@
 		<button class="btn btn-lg mt-3" @click="edit()">Save</button>
 
 		<q-dialog v-model="image" full-height full-width>
-			<q-card>
+			<q-card dark>
 				<q-toolbar class="bg-gray-dark">
 					<div>Background preview</div>
 					<q-space />
@@ -94,29 +94,31 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
 				image: false,
+				weatherSetter: undefined,
+				weather: {},
 				weather_effects: {
 					rain: { name: "Rain", icon: "fas fa-cloud-showers" },
 					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
 					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" }
-				},
-				basicModel: 0
+				}
 			} 
 		},
 		computed: {
 			...mapGetters([
 				'encounter',
-			]),
-			weather() {
-				return this.encounter.weather || {};
-			}
+			])
 		},
 		mounted() {
 			this.fetchEncounter({
 				cid: this.campaignId, 
 				eid: this.encounterId, 
 			})
+
+			if(this.encounter && this.encounter.weather) {
+				this.weather = this.encounter.weather;
+			}
 		},
 		methods: {
 			...mapActions([

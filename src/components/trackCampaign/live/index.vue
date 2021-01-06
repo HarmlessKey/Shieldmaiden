@@ -5,6 +5,10 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
+			<div class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length && weather">
+				<Weather :weather="encounter.weather" />
+			</div>
+
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
@@ -16,6 +20,7 @@
 				:npcs="npcs"
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
+				@setWeather="setWeather"
 			/>
 
 			<!-- DESKTOP -->
@@ -190,7 +195,8 @@
 			Initiative,
 			Meters,
 			Rolls,
-			RollForInitiative
+			RollForInitiative,
+			Weather: () => import('@/components/weather')
 		},
 		props: [
 			"encounter", 
@@ -205,6 +211,7 @@
 				setSideDisplay: undefined,
 				counter: 0,
 				rolls: [],
+				weather: true,
 				panels: [
 					{
 						label: "Initiative list",
@@ -349,12 +356,24 @@
 				if(roll) {
 					this.rolls.unshift(roll);
 				}
+			},
+			setWeather(value) {
+				this.weather = value;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+.weather {
+	overflow: hidden;
+	position: absolute; 
+	left: 0;
+	top: 60px;
+	height: calc(100% - 60px);
+	width: 100%;
+	pointer-events: none;
+}
 .track {
 	max-width: 1250px;
 	margin: auto;
@@ -402,7 +421,7 @@
 		grid-template-columns: 1fr;
 
 		.transparent-bg {
-			background: rgba(38, 38, 38, .5);
+			background: rgba(38, 38, 38, .3);
 		}
 		.q-tab-panel {
 			padding: 0 15px;
@@ -417,6 +436,12 @@
 @media only screen and (max-width: 1000px) {
 	.track.desktop {
 		grid-template-columns: 3fr 2fr;
+	}
+}
+@media only screen and (max-width: 576px) {
+	.weather {
+		top: 120px;
+		height: calc(100% - 120px);
 	}
 }
 </style>

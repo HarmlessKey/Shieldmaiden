@@ -17,34 +17,42 @@
 						<template v-else>{{ tier.benefits.campaigns }}</template>
 					) </span>
 				</span>
-				<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="setAdd(!add)"><i class="fas fa-plus green"></i></a>
+				<a v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" @click="add = !add"><i class="fas fa-plus green"></i></a>
 			</h2>
 
-			<div v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')">
-				<q-input 
-					dark filled square dense
-					type="text" 
-					autocomplete="off"
-					:class="{'input': true, 'error': errors.has('newCampaign') }" 
-					v-model="newCampaign" 
-					v-validate="'required'"
-					data-vv-as="New Campaign" 
-					name="newCampaign"
-					@change="addCampaign()"
-					label="New campaign name"
-				/>
-				<q-select
-					dark filled square dense
-					label="Advancement"
-					class="mt-2" 
-					v-model="advancement" 
-					:options="advancement_options"
-				/>
+			<q-dialog 
+				v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')"
+				square
+				v-model="add"
+			>
+				<div>
+					<q-form @submit="addCampaign">
+						<hk-card header="New campaign" class="mb-0">
+							<q-input 
+								dark filled square
+								type="text" 
+								autocomplete="off"
+								v-model="newCampaign" 
+								name="newCampaign"
+								label="Title"
+								:rules="[ val => val && val.length > 0 || 'Enter a title']"
+							/>
+							<q-select
+								dark filled square
+								label="Advancement"
+								class="mt-2" 
+								v-model="advancement" 
+								:options="advancement_options"
+							/>
 
-				<p class="validate red" v-if="errors.has('newCampaign')">{{ errors.first('newCampaign') }}</p>
-
-				<button class="btn"><i class="fas fa-plus"></i> Add</button>
-			</div>
+							<div slot="footer" class="card-footer d-flex justify-end">
+								<q-btn v-close-popup label="Cancel" class="mr-1" />
+								<q-btn type="submit" color="primary" label="Add campaign" />
+							</div>
+						</hk-card>
+					</q-form>
+				</div>
+			</q-dialog>
 
 			<OutOfSlots 
 				v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
@@ -149,28 +157,29 @@
 
 			<!-- CREATE FIRST CAMPAIGN -->
 			<div class="first-campaign" v-else>
-				<h2>Create your first campaign</h2>
-				<q-input 
-					dark filled square dense
-					type="text" 
-					autocomplete="off"
-					v-model="newCampaign" 
-					v-validate="'required'"
-					data-vv-as="Campaign Title" 
-					name="firstCampaign"
-					@change="addCampaign()"
-					label="Title of your first campaign"
-				/>
-				<q-select 
-					dark filled square dense
-					label="Advancement"
-					class="mt-2" 
-					v-model="advancement" 
-					:options="advancement_options"
-				/>
-				<p class="validate red" v-if="errors.has('firstCampaign')">{{ errors.first('firstCampaign') }}</p>
-				
-				<button class="btn btn-lg bg-green btn-block mt-4">Create campaign</button>
+				<q-form @submit="addCampaign">
+					<hk-card header="First campaign">
+						<h2 class="mt-0">Create your first campaign</h2>
+						<q-input 
+							dark filled square
+							type="text" 
+							autocomplete="off"
+							v-model="newCampaign" 
+							name="firstCampaign"
+							label="Title of your first campaign"
+							:rules="[ val => val && val.length > 0 || 'Enter a title for your campaign']"
+						/>
+						<q-select 
+							dark filled square
+							label="Advancement"
+							class="mt-2" 
+							v-model="advancement" 
+							:options="advancement_options"
+						/>
+						
+						<q-btn class="btn btn-lg bg-green btn-block mt-4" type="submit" label="Create campaign" />
+					</hk-card>
+				</q-form>
 			</div>
 
 		</template>
@@ -251,27 +260,19 @@
 			...mapActions([
 				'clearEncounters'
 			]),
-			setAdd(value) {
-				this.add = value
-			},
 			addCampaign() {
-				this.$validator.validateAll().then((result) => {
-					if (result && (this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
-						db.ref('campaigns/' + this.user.uid).push({
-							campaign: this.newCampaign,
-							advancement: this.advancement,
-							timestamp: Date.now(),
-						});
-						this.newCampaign = '';
-						this.$snotify.success('Campaign added.', 'Critical hit!', {
-							position: "rightTop"
-						});
-						this.$validator.reset();
-					} 
-					else {
-						//console.log('Not valid');
-					}
-				})
+				if ((this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
+					db.ref('campaigns/' + this.user.uid).push({
+						campaign: this.newCampaign,
+						advancement: this.advancement,
+						timestamp: Date.now(),
+					});
+					this.newCampaign = '';
+					this.$snotify.success('Campaign added.', 'Critical hit!', {
+						position: "rightTop"
+					});
+					this.$validator.reset();
+				}
 			},
 			confirmDelete(key, name) {
 				this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {

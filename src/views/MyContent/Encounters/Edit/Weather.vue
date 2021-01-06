@@ -8,7 +8,7 @@
 				</q-tooltip>
 			</q-item-section>
 			<q-item-section>
-				<q-item-label caption>{{ intensity(key) }}</q-item-label>
+				<q-item-label caption><b>{{ name }}</b>: {{ intensity(key) }}</q-item-label>
 				<q-slider
 					v-model="weather[key]"
 					:min="0"

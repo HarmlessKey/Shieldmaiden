@@ -195,6 +195,6 @@
 	}
 }
 .edit-weather {
-	min-width: 200px;
+	min-width: 240px;
 }
 </style>

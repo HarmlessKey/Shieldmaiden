@@ -67,10 +67,10 @@
 					<q-btn flat round dense icon="close" class="q-mr-sm" v-close-popup />
 
 				</q-toolbar>
-				<div class="preview" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
-					<div class="weathter" v-if="Object.keys(weather).length > 0">
-						<Weather :weather="weather" :key="JSON.stringify(weather)" />
-					</div>
+				<div class="preview">
+					
+						<Weather :weather="weather" :key="JSON.stringify(weather)" :background="encounter.background" />
+					
 				</div>
 			</q-card>
 		</q-dialog>
@@ -183,15 +183,6 @@
 		position: relative;
 		background-size: cover;
 		background-position: center top;
-
-		.weather {
-			overflow: hidden;
-			position: absolute; 
-			left: 0;
-			top: 50px;
-			height: calc(100% - 50px);
-			width: 100%;
-		}
 	}
 }
 .edit-weather {

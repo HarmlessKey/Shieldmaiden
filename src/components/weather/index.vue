@@ -1,10 +1,17 @@
 <template>
-	<div class="weather-wrapper">
-		<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
-		<Lightning v-if="weather.lightning > 0" :intensity="weather.lightning" />
-		<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
-		<Hail v-if="weather.hail > 0" :intensity="weather.hail" />
-		<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
+	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-gray-dark`">
+		<div 
+			class="weather-wrapper" 
+			:style="{ backgroundImage: 'url(\'' + background + '\')' }"
+			:class="(lightning && showWeather) ? lightning : ''"
+		>
+			<template v-if="showWeather">
+				<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
+				<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
+				<Hail v-if="weather.hail > 0" :intensity="weather.hail" />
+				<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
+			</template>
+		</div>
 	</div>
 </template>
 
@@ -15,11 +22,18 @@ export default {
 			weather: {
 				type: Object,
 				required: true
+			},
+			background: {
+				type: String,
+				required: false
+			},
+			showWeather: {
+				type: Boolean,
+				default: true
 			}
 		},
 		components: {
 			Fog: () => import('./Fog'),
-			Lightning: () => import('./Lightning'),
 			Rain: () => import('./Rain'),
 			Hail: () => import('./Hail'),
 			Snow: () => import('./Snow')
@@ -30,26 +44,68 @@ export default {
 			}
     },
     computed: {
-			loader() {
-				return () => import(`./${this.weather.type}.vue`)
+			lightning() {
+				if(this.weather.lightning > 0) {
+					const intensities = ["light", "medium", "heavy"];
+					const index = this.weather.lightning - 1;
+					return intensities[index];	
+				} return false;
 			}
-    },
-    mounted() {
-      this.loader()
-				.then(() => {
-						this.component = () => this.loader()
-				})
-				.catch(() => {
-						this.component = () => import('./Rain.vue')
-				})
-    },
+    }
 }
 </script>
 
 <style lang="scss" scoped>
-	.weather-wrapper {
-		overflow: hidden;
-    width: 100%;
-    height: 100%;
+	.light {
+		width: 100%;
+		height: 100%;
+
+		.weather-wrapper {
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			background-position: center top;
+
+			&.light {
+				animation: lightnings 360s linear infinite;
+				@keyframes lightnings {
+					0% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.87% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.9% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					0.93% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.99% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					1% { filter: brightness(1); opacity: 1; background-color: unset; }
+					100% { filter: brightness(1); opacity: 1; background-color: unset; }
+				}
+			}
+			&.medium {
+				animation: lightningm 180s linear infinite;
+				@keyframes lightningm {
+					0% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.85% { filter: brightness(1); opacity: 1; background-color: unset; }
+					0.9% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
+					1% { filter: brightness(1); opacity: 1; background-color: unset; }
+					1.05% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					1.1% { filter: brightness(1); opacity: 1; background-color: unset; }
+					100% { filter: brightness(1); opacity: 1; background-color: unset; }
+				}
+			}
+			&.heavy {
+				animation: lightning 60s linear infinite;
+				@keyframes lightning {
+					0% { filter: brightness(1); opacity: 1; background-color: unset; }
+					1.8% { filter: brightness(1); opacity: 1; background-color: unset; }
+					1.9% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					2% { filter: brightness(1); opacity: 1; background-color: unset; }
+					2.4% { filter: brightness(1); opacity: 1; background-color: unset; }
+					2.6% { filter: brightness(2); opacity: .3; background-color: #fff; }
+					2.9% { filter: brightness(1); opacity: 1; background-color: unset; }
+					100% { filter: brightness(1); opacity: 1; background-color: unset;}
+				}
+			}
+		}
 	}
 </style>

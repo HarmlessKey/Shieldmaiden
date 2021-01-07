@@ -1,17 +1,16 @@
 <template>
 	<div class="track-wrapper" >
+		<div 
+			v-if="encounter.background || (encounter.weather && Object.keys(encounter.weather).length && weather)"
+			class="weather" 
+		>
+			<Weather :weather="encounter.weather" :background="encounter.background" :show-weather="weather" />
+		</div>
 		<!-- ROLL FOR INITIATIVE -->
 		<RollForInitiative v-if="encounter.round === 0" />
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
-			<div 
-				v-if="encounter.background || (encounter.weather && Object.keys(encounter.weather).length && weather)"
-				class="weather" 
-			>
-				<Weather :weather="encounter.weather" :background="encounter.background" :show-weather="weather" />
-			</div>
-
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"

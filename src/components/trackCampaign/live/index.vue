@@ -376,6 +376,8 @@
 	height: calc(100% - 60px);
 	width: 100%;
 	pointer-events: none;
+	background-size: cover;
+	background-position: center top;
 }
 .track {
 	max-width: 1250px;

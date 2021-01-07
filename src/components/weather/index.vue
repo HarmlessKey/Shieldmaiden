@@ -5,7 +5,7 @@
 			:style="{ backgroundImage: 'url(\'' + background + '\')' }"
 			:class="(lightning && showWeather) ? lightning : ''"
 		>
-			<template v-if="showWeather">
+			<template v-if="weather && showWeather">
 				<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
 				<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
 				<Hail v-if="weather.hail > 0" :intensity="weather.hail" />
@@ -21,7 +21,7 @@ export default {
 		props: {
 			weather: {
 				type: Object,
-				required: true
+				required: false
 			},
 			background: {
 				type: String,
@@ -45,7 +45,7 @@ export default {
     },
     computed: {
 			lightning() {
-				if(this.weather.lightning > 0) {
+				if(this.weather && this.weather.lightning > 0) {
 					const intensities = ["light", "medium", "heavy"];
 					const index = this.weather.lightning - 1;
 					return intensities[index];	

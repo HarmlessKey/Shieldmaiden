@@ -1,5 +1,5 @@
 <template>
-	<div class="turns d-flex justify-content-center bg-gray-dark">
+	<div class="turns d-flex justify-content-center bg-gray-darker">
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round">
 			<div class="mr-3">
 				<div>Round</div>

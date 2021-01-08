@@ -601,11 +601,14 @@
 							max-width: 43px;
 
 							.img {
-								width: 41px;
-								height: 41px;
+								width: 42px;
+								height: 42px;
 								border: solid 1px #b2b2b2;
 								background-size: cover;
 								background-position: center top;
+							}
+							svg.img {
+								margin-bottom: -6px;
 							}
 
 						}

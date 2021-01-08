@@ -47,7 +47,7 @@
 		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<div>
 				<table class="initiative-list targets">
-					<thead>
+					<thead class='white text-shadow'>
 						<th class="init">In.</th>
 						<th class="image"></th>
 						<th class="ac"><i class="fas fa-shield"></i></th>

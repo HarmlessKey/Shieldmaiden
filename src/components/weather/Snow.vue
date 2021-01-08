@@ -64,10 +64,10 @@
 			height: .6rem;
 			filter: blur(1.5px);
 			box-shadow: #{$s1};
-			animation-duration: 10s;
+			animation-duration: 11s;
 
 			&.a {
-				animation-delay: -5s;
+				animation-delay: 5.7s;
 			}
 		}
 		.layer2 {
@@ -75,10 +75,10 @@
 			height: .4rem;
 			filter: blur(3px);
 			box-shadow: #{$s2};
-			animation-duration: 12s;
+			animation-duration: 13s;
 
 			&.a {
-				animation-delay: -6s;
+				animation-delay: -6.5s;
 			}
 		}
 		.layer3 {
@@ -86,7 +86,7 @@
 				height: .2rem;
 				filter: blur(6px);
 				box-shadow: #{$s3};
-				animation-duration: 14s;
+				animation-duration: 15s;
 
 				&.a {
 					animation-delay: -7s;
@@ -129,35 +129,35 @@
 			.layer1 {
 				width: 1rem;
 				height: 1rem;
-				animation-duration: 4s;
+				animation-duration: 6s;
 
 				&.a {
-					animation-delay: -2s;
+					animation-delay: -2.9s;
 				}
 			}
 			.layer2 {
 				width: .8rem;
 				height: .8rem;
-				animation-duration: 6s;
+				animation-duration: 8s;
 
 				&.a {
-					animation-delay: -3s;
+					animation-delay: -3.9s;
 				}
 			}
 			.layer3 {
 					width: .6rem;
 					height: .6rem;
-					animation-duration: 8s;
+					animation-duration: 10s;
 
 					&.a {
-						animation-delay: -4s;
+						animation-delay: -5s;
 				}
 			}
 		}
 	}
 	@keyframes fall {
 			100% { 
-				transform: translateY(200vh) rotate(-20deg);
+				transform: translateY(230vh) rotate(-10deg);
 			}
 	}
 </style>

@@ -20,24 +20,28 @@
 					</div>
 						
 					<!-- SHOW PLAYERS -->
-					<div v-if="campaign.players" class="players">
-						<div 
-							v-for="(player, key) in campaign.players" 
-							:key="key"
-							class="img"
-						>
-							<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-							<img v-else src="@/assets/_img/styles/player.svg" />
-							<q-tooltip anchor="top middle" self="center middle">
-								{{ player.character_name }}
-							</q-tooltip>
+					<template v-if="campaign.players">
+						<div class="players">
+							<div 
+								v-for="(player, key) in campaign.players" 
+								:key="key"
+								class="img"
+							>
+								<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+								<img v-else src="@/assets/_img/styles/player.svg" />
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ player.character_name }}
+								</q-tooltip>
+							</div>
 						</div>
-					</div>
 
-					<h2 v-if="campaign.players">
-						{{ Object.keys(campaign.players).length }} players
-					</h2>
+						<h2> {{ Object.keys(campaign.players).length }} players</h2>
+					</template>
+					<template v-else>
 
+						<div class="no-players"></div>
+						<h2>No players added yet</h2>
+					</template>
 					<div class="d-flex justify-content-center">
 						<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
 					</div>
@@ -166,6 +170,9 @@
 				h2 {
 					text-align: center;
 					margin-bottom: 30px;
+				}
+				.no-players {
+					min-height: 65px;
 				}
 				.players {
 					margin-bottom: 20px;

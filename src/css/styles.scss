@@ -101,6 +101,28 @@ html body {
 		color: $gray-light;
 	}
 
+	.text-shadow {
+		text-shadow: 0 0 5px #000;
+		&-3 {
+			text-shadow: 0 0 3px #000;
+		}
+		&-4 {
+			text-shadow: 0 0 4px #000;
+		}
+		&-5 {
+			text-shadow: 0 0 5px #000;
+		}
+		&-6 {
+			text-shadow: 0 0 6px #000;
+		}
+		&-7 {
+			text-shadow: 0 0 7px #000;
+		}
+		&-8 {
+			text-shadow: 0 0 8px #000;
+		}
+	}
+
 /* 3. Heading */
 /*********************************************/
 	h1, h2, h3, h4, h5, h6 { 

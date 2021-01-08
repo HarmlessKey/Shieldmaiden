@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3 class="mt-3">DM Rolls</h3>
+		<h3 class="mt-3 white text-shadow">DM Rolls</h3>
 		<ul class="rolls">
 			<li v-for="(roll, index) in rolls" :key="`roll-${index}`">
 				<div class="targets">
@@ -69,8 +69,6 @@
 
 <style lang="scss" scoped>
 	h3 {
-		text-shadow: 0 0 8px #000;
-		color: #fff;
 		margin-bottom: 6px !important;
 	}
 	ul.rolls {

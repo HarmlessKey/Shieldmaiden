@@ -6,6 +6,7 @@
 			inline-label
 			dense
 			no-caps
+			class="white text-shadow"
 		>
 			<q-tab 
 				v-for="({name, label}, index) in tabs"

@@ -1,93 +1,93 @@
 <template>
 	<div id="targets">
-			<h2 
-				class="componentHeader d-flex justify-content-between" 
-				:class="{ shadow : setShadow > 0 }">
-				<span>
-					<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+		<h2 
+			class="componentHeader d-flex justify-content-between" 
+			:class="{ shadow : setShadow > 0 }">
+			<span>
+				<i class="fas fa-helmet-battle"></i> Targets ({{ _targets.length }})
+			</span>
+			<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
+				v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
+				class="gray-hover text-capitalize">
+				<i class="fas fa-plus green"></i>
+				<span class="d-none d-md-inline ml-1">
+					Add
+					<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
 				</span>
-				<a @click="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
-					v-shortkey="['a']" @shortkey="setSlide({show: true, type: 'slides/encounter/AddNpc'})"
-					class="gray-hover text-capitalize">
-					<i class="fas fa-plus green"></i>
-					<span class="d-none d-md-inline ml-1">
-						Add
-						<span v-if="showKeybinds.keyBinds === undefined" class="gray-hover d-none d-sm-inline text-lowercase">[a]</span>
-					</span>
-					<q-tooltip anchor="top middle" self="center middle">
-						Add NPC
-					</q-tooltip>
-				</a>
-			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
-				<div v-shortkey="{
-					downSingle: ['arrowdown'], 
-					downMultiple: ['shift', 'arrowdown'],
-					upSingle: ['arrowup'], 
-					upMultiple: ['shift', 'arrowup']
+				<q-tooltip anchor="top middle" self="center middle">
+					Add NPC
+				</q-tooltip>
+			</a>
+		</h2>
+		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+			<div v-shortkey="{
+				downSingle: ['arrowdown'], 
+				downMultiple: ['shift', 'arrowdown'],
+				upSingle: ['arrowup'], 
+				upMultiple: ['shift', 'arrowup']
 				}" 
 				@shortkey="cycle_target"
 			>
-					<template v-for="{group, targets} in groups">
-						<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
-							<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
-						</h2>
-						<transition-group
-							:key="group"
-							tag="ul" 
-							class="targets"
-							:class="`${group}_targets`"
-							name="group" 
-							enter-active-class="animated fadeInUp" 
-							leave-active-class="animated fadeOutDown"
+				<template v-for="{group, targets} in groups">
+					<h2 :key="`header-${group}`" v-if="group !== 'active' && targets.length > 0">
+						<i v-if="group === 'down'" class="fas fa-skull-crossbones red" /> {{ group.capitalize() }} ({{ targets.length }})
+					</h2>
+					<transition-group
+						:key="group"
+						tag="ul" 
+						class="targets"
+						:class="`${group}_targets`"
+						name="group" 
+						enter-active-class="animated fadeInUp" 
+						leave-active-class="animated fadeOutDown"
+					>
+						<li 
+							v-for="(entity, i) in targets"
+							class="d-flex justify-content-between" 
+							:key="entity.key" 
+							:class="{ 
+								'targeted': targeted.includes(entity.key), 
+								'top': _active[0].key === entity.key && encounter.turn !== 0
+							}"
 						>
-							<li 
-								v-for="(entity, i) in targets"
-								class="d-flex justify-content-between" 
-								:key="entity.key" 
-								:class="{ 
-									'targeted': targeted.includes(entity.key), 
-									'top': _active[0].key === entity.key && encounter.turn !== 0
-								}"
+							<span 
+								class="topinfo d-flex justify-content-between" 
+								v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
 							>
-								<span 
-									class="topinfo d-flex justify-content-between" 
-									v-if="group === 'active' && _active[0].key == entity.key && encounter.turn != 0"
-								>
-									Top of the round
-									<div>
-										<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
-											+ {{ Object.keys(_addedNextRound).length }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Added next round
-											</q-tooltip>
-										</span>
-										<span class="red" v-if="Object.keys(_activeDown).length > 0">
-											<span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Removed next round
-											</q-tooltip>
-										</span>
-									</div>
-								</span>
-
-								<div class="target" 
-									v-touch-hold.mouse="event => selectTarget(event, 'multi', entity.key)"
-									@click="selectTarget($event, 'single', entity.key)"
-									v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
-									<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
+								Top of the round
+								<div>
+									<span class="green" v-if="Object.keys(_addedNextRound).length > 0">
+										+ {{ Object.keys(_addedNextRound).length }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Added next round
+										</q-tooltip>
+									</span>
+									<span class="red" v-if="Object.keys(_activeDown).length > 0">
+										<span class="gray-hover mx-1">|</span>- {{ Object.keys(_activeDown).length }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Removed next round
+										</q-tooltip>
+									</span>
 								</div>
-								<a class="options">
-									<i class="fal fa-ellipsis-v"></i>
-									<q-popup-proxy square dark anchor="bottom right" self="top right" :breakpoint="576">
-										<target-menu :entity="entity" />
-									</q-popup-proxy>
-								</a>
-							</li>
-						</transition-group>
-					</template>
-				</div>
-			</q-scroll-area>
+							</span>
+
+							<div class="target" 
+								v-touch-hold.mouse="event => selectTarget(event, 'multi', entity.key)"
+								@click="selectTarget($event, 'single', entity.key)"
+								v-shortkey="[i]" @shortkey="set_targeted({ type: 'single', key: entity.key })">
+								<TargetItem :item="entity.key" :i="i" :initiative="true" :showReminders="true" />
+							</div>
+							<a class="options">
+								<i class="fal fa-ellipsis-v"></i>
+								<q-popup-proxy square dark anchor="bottom right" self="top right" :breakpoint="576">
+									<target-menu :entity="entity" />
+								</q-popup-proxy>
+							</a>
+						</li>
+					</transition-group>
+				</template>
+			</div>
+		</q-scroll-area>
 	</div>
 </template>
 

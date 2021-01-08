@@ -312,12 +312,19 @@
 			}
 		},
 		mounted() {
-			var entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
+			const entity = db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${this.entityKey}`)
 			entity.on('value', async (snapshot) => {
 				this.entity = snapshot.val();
 				this.entity.saves = (snapshot.val().saves) ? snapshot.val().saves : {};
 				this.maxHpMod = snapshot.val().maxHpMod;
 			});
+
+			if(this.isXpAdvancement()) {
+				if(this.playerBase.experience === undefined) {
+					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(0);
+					this.playerBase.experience = 0;
+				}
+			}
 		},
 		firebase() {
 			return {
@@ -373,8 +380,7 @@
 				}
 			},
 			isXpAdvancement() {
-				let adv =  this.advancement['.value'] != 'milestone';
-				return adv
+				return this.advancement['.value'] !== 'milestone';
 			},
 			set_save(check, index) {
 				if(check === 'unset') {

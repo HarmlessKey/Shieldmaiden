@@ -267,6 +267,8 @@
 			targeted(newValue) {
 				if(newValue.length > 1) {
 					this.toHit = false;
+				} else {
+					this.toHit = true;
 				}
 			},
 			animateTrigger() {

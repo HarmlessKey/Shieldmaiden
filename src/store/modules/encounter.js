@@ -562,8 +562,9 @@ const actions = {
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: true})
-				commit('DELETE_ENTITY_PROPERTY', {key, prop: 'addNextRound'})
+				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
+				commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: true});
+				commit('DELETE_ENTITY_PROPERTY', {key, prop: 'addNextRound'});
 			}
 		}
 	},

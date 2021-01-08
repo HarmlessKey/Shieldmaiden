@@ -31,7 +31,7 @@
 <style lang="scss" scoped>
 	.wrapper {
 		margin-left: -50px;
-    width: calc(150% + 50px);
+    width: calc(150% + 100px);
     height: 150%;
 		
 		$s1:"";

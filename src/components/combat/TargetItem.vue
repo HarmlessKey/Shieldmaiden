@@ -340,7 +340,7 @@
 
 					<!-- IDLE ACTIONS -->
 					<div v-else class="text-right">
-						<span class="green" 
+						<span class="white" 
 							v-if="entity.addNextRound == true"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 							<i class="fas fa-check"></i>

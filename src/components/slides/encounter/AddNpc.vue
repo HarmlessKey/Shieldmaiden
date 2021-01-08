@@ -1,91 +1,85 @@
 <template>
 	<div class="pb-5">
 		<h2>Add <span class="blue">{{ entity.name }}</span></h2>
-		<q-input 
-			dark filled square dense
-			autocomplete="off"
-			label="Name"
-			type="text" 
-			name="name" 
-			v-model="entity.name"
-			:class="{'input': true, 'error': errors.has('name') }"
-			v-validate="'required'"
-			placeholder="Name"
-		/>
-		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-		<hr>
-		<div class="row q-col-gutter-md mb-2">
-			<div class="col">
-				<q-input 
-					dark filled square dense
-					autocomplete="off"
-					label="Initiative"
-					type="number" 
-					name="initiative"
-					min="0"
-					v-model="entity.initiative"
-					:class="{'input': true, 'error': errors.has('initiative') }"
-					v-validate="'required'"
-				>
-					<template v-slot:append>
-						<a @click="rollInitiative">
-						<q-icon size="small" name="fas fa-dice-d20"/>
-						<q-tooltip anchor="top middle" self="center middle">
-							1d20 {{ dexterity ? `+ ${calcMod(dexterity)}` : `` }}
-						</q-tooltip>
-					</a>
-					</template>
-				</q-input>
-				<p class="validate red" v-if="errors.has('initiative')">{{ errors.first('initiative') }}</p>
+		<q-form @submit="add()">
+			<q-input 
+				dark filled square
+				autocomplete="off"
+				label="Name"
+				type="text" 
+				name="name" 
+				v-model="entity.name"
+				:rules="[ val => val && val.length > 0 || 'Enter a name']"
+			/>
+			<hr>
+			<div class="row q-col-gutter-md mb-2">
+				<div class="col">
+					<q-input 
+						:key="`initiative-${entity.initiative}`"
+						dark filled square
+						autocomplete="off"
+						label="Initiative"
+						type="number" 
+						name="initiative"
+						min="0"
+						v-model="entity.initiative"
+						:rules="[ val => val && val.length > 0 || 'Required']"
+					>
+						<template v-slot:append>
+							<a @click="rollInitiative">
+							<q-icon size="small" name="fas fa-dice-d20"/>
+							<q-tooltip anchor="top middle" self="center middle">
+								1d20 {{ dexterity ? `+ ${calcMod(dexterity)}` : `` }}
+							</q-tooltip>
+						</a>
+						</template>
+					</q-input>
+				</div>
+				<div class="col">
+					<q-input 
+						dark filled square
+						autocomplete="off"
+						label="Armor class"
+						type="number" 
+						name="ac"
+						min="1"
+						v-model="entity.ac"
+						:rules="[ val => val && val.length > 0 || 'Required']"
+					/>
+				</div>
+				<div class="col">
+					<q-input 
+						dark filled square
+						autocomplete="off"
+						label="Hit points"
+						type="number" 
+						name="maxHp"
+						min="1"
+						v-model="entity.maxHp"
+						:rules="[ val => val && val.length > 0 || 'Required']"
+					/>
+				</div>
 			</div>
-			<div class="col">
-				<q-input 
-					dark filled square dense
-					autocomplete="off"
-					label="Armor class"
-					type="number" 
-					name="ac"
-					min="1"
-					v-model="entity.ac"
-					:class="{'input': true, 'error': errors.has('ac') }"
-					v-validate="'required'"
-				/>
-				<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-			</div>
-			<div class="col">
-				<q-input 
-					dark filled square dense
-					autocomplete="off"
-					label="Hit points"
-					type="number" 
-					name="maxHp"
-					min="1"
-					:class="{'input': true, 'error': errors.has('maxHp') }"
-					v-validate="'required'"
-					v-model="entity.maxHp"
-				/>
-				<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-			</div>
-		</div>
-		<label class="my-2">When to add</label>
-		<q-btn-toggle
-			class="mt-2"
-			v-model="addMoment"
-			spread
-			no-caps
-			flat
-			dark
-			:options="options"
-			toggle-color="primary"
-		/>
-		<hr>
-		<button class="btn btn-block mb-3" @click="add()">Add</button>
+			<label class="my-2">When to add</label>
+			<q-btn-toggle
+				class="mt-2"
+				v-model="addMoment"
+				spread
+				no-caps
+				flat
+				dark
+				:options="options"
+				toggle-color="primary"
+			/>
+			<hr>
+			<q-btn class="btn btn-block mb-3" type="submit" label="Add" />
+		</q-form>
 
 		<h2>Copy an NPC from below</h2>
 		
 		<p>Search all NPC's, including your custom.</p>
 		<q-input 
-			dark filled square dense
+			dark filled square
 			label="Search NPC"
 			type="text" 
 			autocomplete="off" 

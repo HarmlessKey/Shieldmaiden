@@ -353,8 +353,34 @@
 						}
 
 						if(!this.demo) {
+							// Add player
 							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).set(entity);
-							this.add_entity(key)
+							this.add_entity(key);
+
+							// Add companions
+							const companions = player.companions;
+							for (let Key in companions) {
+								const companion = this.npcs[Key];
+								let companionEntity = {
+									entityType: "companion",
+									curHp: companion.maxHp,
+									initiative: this.playerInitiative[key],
+									name: companion.name,
+									key: Key,
+									id: Key
+								};
+								
+								if(this.addMoment === 'next') {
+									companionEntity.addNextRound = true;
+									companionEntity.active = false;
+								} else {
+									companionEntity.active = true;
+								}
+
+								db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${Key}`).set(companionEntity);
+								this.add_entity(Key);
+							}
+
 						} else {
 							this.add_entity_demo(this.entity);
 						}

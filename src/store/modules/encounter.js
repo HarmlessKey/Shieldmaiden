@@ -817,6 +817,13 @@ const actions = {
 		commit('ADD_ENTITY', {rootState, key});
 	},
 	remove_entity({ commit, state }, key) {
+		// First untarget if targeted
+		const targeted = state.targeted.filter(target => {
+			return target !== key;
+		})
+		commit('SET_TARGETED', targeted);
+		
+		// Then remove from encounter
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
 		commit('REMOVE_ENTITY', key);
 	},

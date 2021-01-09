@@ -29,6 +29,7 @@
 						name="name" 
 						v-model="entity.name"
 						:rules="[ val => val && val.length > 0 || 'Enter a name']"
+						no-error-icon
 					/>
 					<hr>
 					<div class="row q-col-gutter-md mb-2">
@@ -42,6 +43,7 @@
 								min="0"
 								v-model="entity.initiative"
 								:rules="[ val => val >= 1 || 'Min = 1']"
+								no-error-icon
 							>
 								<template v-slot:append>
 									<a @click="rollInitiative">
@@ -63,6 +65,7 @@
 								min="1"
 								v-model="entity.ac"
 								:rules="[ val => val >= 1 || 'Min = 1']"
+								no-error-icon
 							/>
 						</div>
 						<div class="col">
@@ -75,6 +78,7 @@
 								min="1"
 								v-model="entity.maxHp"
 								:rules="[ val => val >= 1 || 'Min = 1']"
+								no-error-icon
 							/>
 						</div>
 					</div>
@@ -123,9 +127,9 @@
 				</ul>
 			</q-tab-panel>
 			<q-tab-panel name="player">
-				<q-form @submit="addPlayer()">
+				<q-form @submit="addPlayer()" v-if="Object.keys(excludedPlayers).length > 0">
 					<ul class="entities">
-						<template v-for="(player, key) in players">
+						<template v-for="(player, key) in excludedPlayers">
 							<li v-if="!Object.keys(entities).includes(key)" :key="key">
 								<q-checkbox 
 									slot="append"
@@ -138,18 +142,41 @@
 									:label="player.character_name"
 								/>
 								<q-input 
-									dark filled square
+									dark square dense
 									type="number" 
 									label="Initiative"
 									v-model="playerInitiative[key]"
-									error-message="Set initiative"
 									:error="!isValid(key)"
+									error-message="Set initiative"
+									no-error-icon
 								/>
 							</li>
 						</template>
 					</ul>
-					<q-btn v-if="selectedPlayers.length > 0" class="btn btn-block" type="submit" :label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`" />
+
+					<label class="my-2">When to add</label>
+					<q-btn-toggle
+						class="my-2"
+						v-model="addMoment"
+						spread
+						no-caps
+						flat
+						dark
+						:options="options"
+						toggle-color="primary"
+					/>
+				
+					<q-btn 
+						v-if="selectedPlayers.length > 0" 
+						class="btn btn-block" 
+						type="submit" 
+						:label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`"
+					/>
 				</q-form>
+				<p v-else>
+					<b class="red">No players available</b><br/>
+					There are no players in this campaign that are not in the current encounter.
+				</p>
 			</q-tab-panel>
 		</q-tab-panels>
 	</div>
@@ -166,6 +193,7 @@
 		mixins: [general, dice],
 		data() {
 			return {
+				test: undefined,
 				demo: this.$route.name === "Demo",
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
@@ -218,6 +246,15 @@
 				'players',
 				'entities'
 			]),
+			excludedPlayers() {
+				let players = {};
+				for(const [key, value] of Object.entries(this.players)) {
+					if(!Object.keys(this.entities).includes(key)) {
+						players[key] = value;
+					}
+				}
+				return players;
+			}
 		},
 		methods: {
 			...mapActions([
@@ -291,33 +328,37 @@
 				}
 			},
 			isValid(key) {
-				return (this.selectedPlayers.includes(key) && this.playerInitiative[key] > 0) || !this.selectedPlayers.includes(key);
+				return (this.selectedPlayers.includes(key) && this.playerInitiative[key] > 0) 
+					|| !this.selectedPlayers.includes(key);
 			},
 			addPlayer() {
-				
 				for(const key of this.selectedPlayers) {
-					console.log(this.players[key])
-					const player = this.players[key];
+					if(this.playerInitiative[key] > 0) {
+						const player = this.players[key];
 
-					const entity = {
-						entityType: "player",
-						curHp: player.maxHp,
-						ac: player.ac
-					};
+						const entity = {
+							entityType: "player",
+							curHp: player.maxHp,
+							initiative: this.playerInitiative[key],
+							name: player.character_name,
+							key: key,
+							id: key
+						};
 
-					if(this.addMoment === 'next') {
-						entity.addNextRound = true;
-						entity.active = false;
-					} else {
-						entity.active = true;
+						if(this.addMoment === 'next') {
+							entity.addNextRound = true;
+							entity.active = false;
+						} else {
+							entity.active = true;
+						}
+
+						if(!this.demo) {
+							db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${key}`).set(entity);
+							this.add_entity(key)
+						} else {
+							this.add_entity_demo(this.entity);
+						}
 					}
-
-					// if(!this.demo) {
-					// 	db.ref('encounters/' + this.userId + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
-					// 	this.add_entity(key)
-					// } else {
-					// 	this.add_entity_demo(this.entity);
-					// }
 				}
 			}
 		}

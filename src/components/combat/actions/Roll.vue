@@ -132,60 +132,34 @@
 				</p>
 
 				<!-- ACTIONS -->
-				<template v-if="current.actions">
-					<h3 class="mt-3">Actions</h3>
-					<ul class="roll">
-						<li v-for="(action, index) in current.actions" :key="index" class="bg-gray-active">
-							<span class="d-flex justify-content-between">
-								<a class="d-flex justify-content-between gray-light" @click="setShow('action', index)">
-									<span>{{ action.name }}</span>
-									<i class="fas fa-caret-down"></i>
-								</a>
-								<hk-roll 
-									:tooltip="`Roll ${action.name}`" 
-									tooltipPosition="right"
-									@roll="groupRoll($event, action)"
-								>
-									<button v-if="action['damage_dice']" class="btn btn-sm">
-										<i class="fas fa-dice-d20"></i>
-										<span class="d-none d-md-inline ml-1">Roll</span>
-									</button>
-								</hk-roll>
-							</span>
-							<q-slide-transition>
-								<p v-show="showAction === index" class="py-2 pr-1">{{ action.desc }}</p>
-							</q-slide-transition>
-						</li>
-					</ul>
-				</template>
-
-				<!-- LEGENDARY ACTIONS -->
-				<template v-if="current.legendary_actions">
-					<h3>Legendary Actions</h3>
-					<ul class="roll">
-						<li v-for="(action, index) in current.legendary_actions" :key="index" class="bg-gray-active">
-							<span class="d-flex justify-content-between">
-								<a class="d-flex justify-content-between gray-light" @click="setShow('legendary', index)">
-									<span>{{ action.name }}</span>
-									<i class="fas fa-caret-down"></i>
-								</a>
-								<hk-roll 
-									:tooltip="`Roll ${action.name}`" 
-									tooltipPosition="right"
-									@roll="groupRoll($event, action)"
-								>
-									<button v-if="action['damage_dice']" class="btn btn-sm">
-										<i class="fas fa-dice-d20"></i>
-										<span class="d-none d-md-inline ml-1">Roll</span>
-									</button>
-								</hk-roll>
-							</span>
-							<q-slide-transition>
-								<p v-show="showLegendary" class="py-2 pr-1">{{ action.desc }}</p>
-							</q-slide-transition>
-						</li>
-					</ul>
-				</template>	
+				<div v-for="(action_type, index) in action_types" :key="index" class="action-type">
+					<template v-if="current[action_type.value]">
+						<h4 class="mt-3">{{ action_type.label }}</h4>
+						<ul class="roll">
+							<li v-for="(action, index) in current[action_type.value]" :key="index" class="bg-gray-active">
+								<span class="d-flex justify-content-between">
+									<a class="d-flex justify-content-between gray-light" @click="setShow(action_type.value, index)">
+										<span>{{ action.name }}</span>
+										<i class="fas fa-caret-down"></i>
+									</a>
+									<hk-roll 
+										:tooltip="`Roll ${action.name}`" 
+										tooltipPosition="right"
+										@roll="groupRoll($event, action)"
+									>
+										<button v-if="action['damage_dice']" class="btn btn-sm">
+											<i class="fas fa-dice-d20"></i>
+											<span class="d-none d-md-inline ml-1">Roll</span>
+										</button>
+									</hk-roll>
+								</span>
+								<q-slide-transition>
+									<p v-show="active_action === `${action_type.value}-${index}`" class="py-2 pr-1">{{ action.desc }}</p>
+								</q-slide-transition>
+							</li>
+						</ul>
+					</template>
+				</div>
 			</template>
 		</template>
 		<p v-else-if="current.entityType === 'player'">
@@ -212,16 +186,13 @@
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				showAction: undefined,
-				showLegendary: undefined,
+				active_action: undefined,
 				rollOptions: ['toHit', 'damage'],
 				setToHit: undefined,
 				rollOnce: true,
 				animateTrigger: false,
 				rolledDamage: 0,
 				rolledToHit: 0,
-				actionHover: undefined,
-				legendaryHover: undefined,
 				custom_roll: {
 					name: 'Custom Roll',
 					attack_bonus: undefined,
@@ -232,6 +203,11 @@
 					{ label: 'To hit', value: 'toHit' },
 					{ label: 'Damage', value: 'damage' },
 					{ label: 'Modifiers', value: 'modifiers' },
+				],
+				action_types: [
+					{ label: "Special Abilities", value: 'special_abilities' },
+					{ label: 'Actions', value: 'actions' }, 
+					{ label: 'Legendary Actions', value: 'legendary_actions' }
 				],
 				aoeRoll: undefined
 			}
@@ -267,6 +243,8 @@
 			targeted(newValue) {
 				if(newValue.length > 1) {
 					this.toHit = false;
+				} else {
+					this.toHit = true;
 				}
 			},
 			animateTrigger() {
@@ -310,11 +288,12 @@
 				return stats
 			},
 			setShow(type, index) {
-				if(type === 'action') {
-					this.showAction = (this.showAction === index) ? undefined : index;
-				} else if(type === 'legendary') {
-					this.showLegendary = (this.showLegendary === index) ? undefined : index;
-				}
+				this.active_action = this.active_action === `${type}-${index}` ? undefined : `${type}-${index}`;
+				// if(type === 'action') {
+				// 	this.showAction = (this.showAction === index) ? undefined : index;
+				// } else if(type === 'legendary') {
+				// 	this.showLegendary = (this.showLegendary === index) ? undefined : index;
+				// }
 			},
 			groupRoll(e, action) {
 				for(let i in this.targeted) {
@@ -584,10 +563,6 @@
 				}
 				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
 			},
-			clearAdvantage() {
-				this.actionHover = undefined;
-				this.legendaryHover = undefined;
-			},
 			animateValue(id, start, end, duration) {
 				if (start === end) return;
 				const range = end - start;
@@ -639,38 +614,46 @@
 			}
 		}
 	}
-	ul.roll {
-		margin-bottom: 30px;
-		padding: 0;
-		list-style: none;
+	.action-type {
+		margin-bottom: 10px;
+		&:last-child {
+			margin-bottom: 30px;
+		}
+		h4 {
+			font-size: 16px;
+		}
+		ul.roll {
+			padding: 0;
+			list-style: none;
+			margin-top: 5px;
+			li {
+				padding-left: 5px;
+				margin-bottom: 2px;
 
-		li {
-			padding-left: 5px;
-			margin-bottom: 2px;
+				a {
+					width: 100%;
+					padding: 5px;
 
-			a {
-				width: 100%;
-				padding: 5px;
+					&:hover {
+						text-decoration: none;
+					}
 
-				&:hover {
-					text-decoration: none;
+					i {
+						margin-top: 3px;
+					}
 				}
-
-				i {
-					margin-top: 3px;
-				}
-			}
-			.btn {
-				min-width: 60px;
-			}
-			.advantage:hover {
 				.btn {
-					background-color: #83b547;
+					min-width: 60px;
 				}
-			}
-			.disadvantage:hover {
-				.btn {
-					background-color: #cc3e4a;
+				.advantage:hover {
+					.btn {
+						background-color: #83b547;
+					}
+				}
+				.disadvantage:hover {
+					.btn {
+						background-color: #cc3e4a;
+					}
 				}
 			}
 		}

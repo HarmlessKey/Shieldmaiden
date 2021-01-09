@@ -562,12 +562,13 @@ const actions = {
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				commit('ADD_NEXT_ROUND', {key:key, action: 'set'})
+				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
+				commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: true});
+				commit('DELETE_ENTITY_PROPERTY', {key, prop: 'addNextRound'});
 			}
 		}
 	},
 	add_next_round({ state, commit },  {key, action, value}) {
-		event.stopPropagation(); //So target is not unselected when clicked
 
 		if(action === 'tag') {
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'addNextRound', value});

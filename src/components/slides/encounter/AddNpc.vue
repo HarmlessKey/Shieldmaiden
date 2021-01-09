@@ -130,7 +130,7 @@
 				<q-form @submit="addPlayer()" v-if="Object.keys(excludedPlayers).length > 0">
 					<ul class="entities">
 						<template v-for="(player, key) in excludedPlayers">
-							<li v-if="!Object.keys(entities).includes(key)" :key="key">
+							<li v-if="!Object.keys(entities).includes(key)" :key="key" class="players">
 								<q-checkbox 
 									slot="append"
 									size="s" 
@@ -142,9 +142,9 @@
 									:label="player.character_name"
 								/>
 								<q-input 
-									dark square dense
+									dark filled square dense
 									type="number" 
-									label="Initiative"
+									placeholder="Initiative"
 									v-model="playerInitiative[key]"
 									:error="!isValid(key)"
 									error-message="Set initiative"
@@ -156,7 +156,7 @@
 
 					<label class="my-2">When to add</label>
 					<q-btn-toggle
-						class="my-2"
+						class="mt-2"
 						v-model="addMoment"
 						spread
 						no-caps
@@ -165,7 +165,7 @@
 						:options="options"
 						toggle-color="primary"
 					/>
-				
+					<hr>
 					<q-btn 
 						v-if="selectedPlayers.length > 0" 
 						class="btn btn-block" 
@@ -373,9 +373,21 @@
 
 		li {
 			margin-bottom:5px;
+			padding: 0 10px;
 
+			&.players {
+				margin-bottom: 25px;
+			}
 			a {
 				font-size:14px;
+			}
+			.q-field {
+				width: 90px;
+				padding: 0;
+
+				.row {
+					padding: 0;
+				}
 			}
 		}
 	}

@@ -3,20 +3,21 @@
 		<h2>Add entity</h2>
 
 		<q-tabs
-				v-model="tab"
-				dark
-				inline-label
-				dense
-				no-caps
-			>
-				<q-tab 
-					v-for="({name, icon, label}, index) in tabs"
-					:key="`tab-${index}`" 
-					:name="name" 
-					:icon="icon"
-					:label="label"
-				/>
-			</q-tabs>
+			v-if="!demo"
+			v-model="tab"
+			dark
+			inline-label
+			dense
+			no-caps
+		>
+			<q-tab 
+				v-for="({name, icon, label}, index) in tabs"
+				:key="`tab-${index}`" 
+				:name="name" 
+				:icon="icon"
+				:label="label"
+			/>
+		</q-tabs>
 
 		<q-tab-panels v-model="tab" class="bg-transparent mt-3">
 			<q-tab-panel name="npc">
@@ -247,13 +248,10 @@
 				'entities'
 			]),
 			excludedPlayers() {
-				let players = {};
-				for(const [key, value] of Object.entries(this.players)) {
-					if(!Object.keys(this.entities).includes(key)) {
-						players[key] = value;
-					}
-				}
-				return players;
+				// Filter players for only in campaign and not in current encounter
+				return Object.fromEntries(Object.entries(this.players).filter(([key, player]) => {
+					return player.campaign_id === this.campaignId && !Object.keys(this.entities).includes(key);
+				}));
 			}
 		},
 		methods: {

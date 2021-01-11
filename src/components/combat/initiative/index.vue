@@ -1,6 +1,9 @@
 <template>
 	<div id="container" v-if="width > 576">
-		<Turns />
+		<!-- <Turns /> -->
+		<Turns 
+			:next="_active[0]"
+		/>
 		<div class="players">
 			<h2 
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">

@@ -75,18 +75,18 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in idle" v-bind:key="entity.key">
 				<icon 
-						v-if="['monster', 'player', 'companion'].includes(entity.img)" 
-						class="img pointer" 
-						:icon="entity.img" 
-						:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-					/>
-					<span 
-						v-else class="img pointer" 
-						:style="{
-							'background-image': 'url(' + entity.img + ')',
-							'border-color': entity.color_label ? entity.color_label : ``
-						}"
-					/>
+					v-if="['monster', 'player', 'companion'].includes(entity.img)" 
+					class="img pointer" 
+					:icon="entity.img" 
+					:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+				/>
+				<span 
+					v-else class="img pointer" 
+					:style="{
+						'background-image': 'url(' + entity.img + ')',
+						'border-color': entity.color_label ? entity.color_label : ``
+					}"
+				/>
 				<span class="d-flex justify-content-between">
 					{{ entity.name }}
 					<span>{{ entity.initiative }}</span>
@@ -206,13 +206,16 @@
 				line-height: 44px;
 				text-align: center;
 			}
-			// css for surprised icon
-			svg.icon {
-				width: 20px;
-			}
+			
 		}
 	}
 }
+
+// css for surprised icon
+svg.icon {
+	width: 20px;
+}
+
 .initiative-move {
   transition: transform .5s;
 }

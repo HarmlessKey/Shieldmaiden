@@ -132,15 +132,15 @@ export const conditions = {
 					],
 					"name" : "Stunned"
 				},
-				{
-					"value": "surprised",
-					"condition": "You are surprised",
-					"effects": [
-						"A surprised creature can't move or take an action on it's first turn of the combat, and it can't take a reaction until that turn ends.",
-						"A member of a group can be surprised even if the other members aren't."
-					],
-					"name": "Surprised"
-				},
+				// {
+				// 	"value": "surprised",
+				// 	"condition": "You are surprised",
+				// 	"effects": [
+				// 		"A surprised creature can't move or take an action on it's first turn of the combat, and it can't take a reaction until that turn ends.",
+				// 		"A member of a group can be surprised even if the other members aren't."
+				// 	],
+				// 	"name": "Surprised"
+				// },
 				{
 					"value": "unconscious",
 					"condition" : "You are unconscious",

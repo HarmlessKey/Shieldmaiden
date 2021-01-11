@@ -871,7 +871,6 @@ const actions = {
 	 * @param {object} reminder full reminder object, or integer with rounds
 	 */
 	set_targetReminder({ state, commit }, {action, entity, key, reminder, type}) {
-
 		// Add a new reminder
 		if(action === 'add') {
 			if(type === 'premade') {

@@ -20,9 +20,8 @@ export const remindersMixin = {
 					"trigger": "startTurn"
 				},
 				"surprised": {
-					".key": "suprised",
+					".key": "surprised",
 					"action": "notitfy",
-					// "action": "remove",
 					"color": "orange-light",
 					"notify": "Is surprised",
 					"title": "Surprised",

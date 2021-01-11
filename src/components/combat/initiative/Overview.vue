@@ -3,6 +3,11 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
 				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
+				<icon 
+					v-else-if="entity.conditions.surprised" 
+					class="img pointer orange"
+					icon="surprised" 
+				/>
 				<template v-else>
 					<icon 
 						v-if="['monster', 'player', 'companion'].includes(entity.img)" 

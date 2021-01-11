@@ -126,7 +126,7 @@
 						Leave
 					</router-link>
 				</span>
-				<a class="btn" @click="set_turn({turn: 0, round: 1})">
+				<a class="btn" @click="startEncounter()">
 					Start 
 					<span class="ml-1 d-none d-md-inline"> 
 						encounter <i class="fas fa-arrow-right"></i>
@@ -145,7 +145,7 @@
 	export default {
 		name: 'Turns',
 		mixins: [remindersMixin],
-		props: ['active_len', 'current'],
+		props: ['active_len', 'current', 'next'],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
@@ -164,7 +164,6 @@
 			...mapGetters([
 				'encounter',
 				'path',
-				'entities',
 			]),
 		},
 		methods: {
@@ -177,6 +176,10 @@
 			]),
 			reload() {
 				this.$router.go();
+			},
+			startEncounter() {
+				this.set_turn({turn: 0, round: 1});
+				this.checkReminders(this.next, 'startTurn');
 			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1

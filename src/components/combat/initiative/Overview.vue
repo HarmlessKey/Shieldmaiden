@@ -3,6 +3,11 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
 				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
+				<icon 
+					v-else-if="entity.reminders.surprised" 
+					class="img pointer orange"
+					icon="surprised" 
+				/>
 				<template v-else>
 					<icon 
 						v-if="['monster', 'player', 'companion'].includes(entity.img)" 
@@ -23,6 +28,24 @@
 					<b class="blue">{{ entity.initiative }}</b>
 				</div>
 				<div class="actions">
+					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
+					<!-- <a v-if="!entity.conditions.surprised" class="pointer" @click="set_condition({action:'add', key: entity.key, condition:'surprised'})"> -->
+					<a v-if="!entity.reminders.surprised" class="pointer" @click="setSurprised(entity.key, true)">
+						
+						<icon icon="surprised" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Set surprised
+						</q-tooltip>
+					</a>
+					<!-- <a v-else class="pointer" @click="set_condition({action:'remove', key: entity.key, condition:'surprised'})"> -->
+					<a v-else class="pointer" @click="setSurprised(entity.key, false)">
+
+						<icon icon="character" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Remove surprised
+						</q-tooltip>
+					</a>
+					<!-- Hide / Unhide Entity -->
 					<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
 						<i class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
@@ -84,10 +107,11 @@
 <script>
 	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
+	import { remindersMixin } from '@/mixins/reminders';
 
 	export default {
 		name: 'SetInitiativeNPC',
-		mixins: [general],
+		mixins: [general, remindersMixin],
 		props: ['active', 'idle'],
 		data () {
 			return {
@@ -98,8 +122,23 @@
 			...mapActions([
 				'set_active',
 				'set_hidden',
-				'set_initiative'
+				'set_initiative',
+				'set_condition',
+				'set_targetReminder',
 			]),
+			setSurprised(entity_key, value) {
+				const reminder = this.premade.surprised;
+				delete reminder['.key'];
+				let action = value ? 'add' : 'remove';
+
+				this.set_targetReminder({
+					action: action,
+					entity: entity_key,
+					key: 'surprised',
+					reminder: reminder,
+					type: 'premade',
+				})
+			},
 		}
 	}
 </script>
@@ -166,6 +205,10 @@
 				font-size: 20px;
 				line-height: 44px;
 				text-align: center;
+			}
+			// css for surprised icon
+			svg.icon {
+				width: 20px;
 			}
 		}
 	}

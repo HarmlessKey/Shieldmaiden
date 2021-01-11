@@ -23,6 +23,20 @@
 					<b class="blue">{{ entity.initiative }}</b>
 				</div>
 				<div class="actions">
+					<!-- Surprise / Unsurprise Entity -->
+					<a v-if="!entity.conditions.surprised" class="pointer" @click="set_condition({action:'add', key: entity.key, condition:'surprised'})">
+						<icon icon="surprised" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Set surprised
+						</q-tooltip>
+					</a>
+					<a v-else class="pointer" @click="set_condition({action:'remove', key: entity.key, condition:'surprised'})">
+						<icon icon="character" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Remove surprised
+						</q-tooltip>
+					</a>
+					<!-- Hide / Unhide Entity -->
 					<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
 						<i class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
@@ -98,7 +112,8 @@
 			...mapActions([
 				'set_active',
 				'set_hidden',
-				'set_initiative'
+				'set_initiative',
+				'set_condition',
 			]),
 		}
 	}
@@ -166,6 +181,10 @@
 				font-size: 20px;
 				line-height: 44px;
 				text-align: center;
+			}
+			// css for surprised icon
+			svg.icon {
+				width: 20px;
 			}
 		}
 	}

@@ -213,6 +213,8 @@
 
 // css for surprised icon
 svg.icon {
+	position: relative;
+	top: 3px;
 	width: 20px;
 }
 

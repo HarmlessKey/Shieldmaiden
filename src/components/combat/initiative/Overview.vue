@@ -212,10 +212,13 @@
 }
 
 // css for surprised icon
-svg.icon {
-	position: relative;
-	top: 3px;
-	width: 20px;
+.actions {
+	i, svg.icon {
+		vertical-align: middle;
+	}
+	svg.icon {
+		width: 20px;
+	}
 }
 
 .initiative-move {

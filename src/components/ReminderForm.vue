@@ -53,21 +53,20 @@
 				type="radio"
 				v-model="reminder.action"
 			/>
-			<template v-if="reminder.action == 'notify'">
-				<q-input 
-					dark filled square dense
-					label="Notification"
-					class="mt-2"
-					name="notification" 
-					v-validate="'required|max:999|variable_check'" 
-					maxLength="999"
-					v-model="reminder.notify"
-					autogrow
-				/>
-				<p class="validate red" v-if="errors.has('notification')">{{ errors.first('notification') }}</p>
-				<small>(You'll get the option to keep or remove the reminder.)</small>
-			</template>
-			<small v-else>(You'll still be notified.)</small>
+			<small v-if="reminder.action == 'notify'">(You'll get the option to keep or remove the reminder.)</small>
+			<small v-else>(Reminder will be removed, but you'll still be notified.)</small>
+			
+			<q-input 
+				dark filled square dense
+				label="Notification"
+				class="mt-2"
+				name="notification" 
+				v-validate="'max:999|variable_check'" 
+				maxLength="999"
+				v-model="reminder.notify"
+				autogrow
+			/>
+			<p class="validate red" v-if="errors.has('notification')">{{ errors.first('notification') }}</p>
 		</div>
 
 		<!-- VARIABLES -->

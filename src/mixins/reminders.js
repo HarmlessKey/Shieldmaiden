@@ -16,7 +16,7 @@ export const remindersMixin = {
 					".key": "reaction",
 					"action": "remove",
 					"color": "red-light",
-					"title": "Reaction regained",
+					"title": "Reaction used",
 					"trigger": "startTurn"
 				},
 				"surprised": {

@@ -8,8 +8,8 @@ export const remindersMixin = {
 					".key": "concentratrion",
 					"action": "notify",
 					"color": "blue-light",
-					"notify": "Target was concentrating. Roll to see if it keeps their concentration.",
 					"title": "Concentrating",
+					"notify": "Target was concentrating. Roll to see if it keeps their concentration.",
 					"trigger": "damage"
 				},
 				"reaction": {
@@ -17,14 +17,15 @@ export const remindersMixin = {
 					"action": "remove",
 					"color": "red-light",
 					"title": "Reaction used",
+					"notify": "Reaction regained",
 					"trigger": "startTurn"
 				},
 				"surprised": {
 					".key": "surprised",
 					"action": "remove",
 					"color": "orange-light",
-					"notify": "Is surprised",
 					"title": "Is surprised",
+					"notify": "Is surprised",
 					"trigger": "startTurn"
 				}
 			}
@@ -112,6 +113,7 @@ export const remindersMixin = {
 
 			//Create buttons for notification
 			if(target.reminders[key].action !== 'remove') {
+				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Keep reminder?';
 				var buttons = [
 					{ 
 						text: 'Keep Reminder', 
@@ -132,7 +134,8 @@ export const remindersMixin = {
 					},
 				]
 			} else {
-				notify = 'reminder removed';
+				console.log(target.reminders[key])
+				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Reminder removed';
 				buttons = '';
 			}
 

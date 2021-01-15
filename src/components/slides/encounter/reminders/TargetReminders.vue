@@ -8,17 +8,11 @@
 		</ul>
 		<hr>
 		<template v-if="reminder_targets.length > 0">
-			<div v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
-				<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[reminder_targets[0]].reminders" :key="key">
-					<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
-						{{ title(reminder) }}
-						<span class="delete"><i class="fas fa-times"></i></span>
-						<q-tooltip anchor="top middle" self="center middle">
-							Remove {{ reminder.title }}
-						</q-tooltip>
-					</a>
-				</div>
-			</div>
+			<Reminders 
+				v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders" 
+				:entity="entities[reminder_targets[0]]"
+				class="mb-2"
+			/>
 
 			<q-tabs
 				v-model="tab"
@@ -104,13 +98,15 @@
 	import ReminderForm from '@/components/ReminderForm';
 	import { remindersMixin } from '@/mixins/reminders';
 	import TargetItem from '@/components/combat/TargetItem.vue';
+	import Reminders from '@/components/combat/Reminders.vue';
 
 	export default {
 		name: 'TargetReminders',
 		mixins: [remindersMixin],
 		components: {
 			ReminderForm,
-			TargetItem
+			TargetItem,
+			Reminders
 		},
 		props: [
 			'data',
@@ -152,40 +148,40 @@
 				'set_targetReminder',
 			]),
 			addReminder(type, reminder = false, selectedVars=undefined) {
-					if(type === 'premade') {
-						for(const target of this.reminder_targets) {
-							let key = reminder['.key'] || reminder.key;
-							delete reminder['.key'];
+				if(type === 'premade') {
+					for(const target of this.reminder_targets) {
+						let key = reminder['.key'] || reminder.key;
+						delete reminder['.key'];
 
-							if(selectedVars) {
-								reminder.selectedVars = selectedVars;
-							}
-
-							this.set_targetReminder({
-								action: 'add',
-								entity: target,
-								key,
-								type: 'premade',
-								reminder: reminder
-							});
-							reminder['.key'] = key;
+						if(selectedVars) {
+							reminder.selectedVars = selectedVars;
 						}
-					}
-					else if(type === 'custom') {
-						this.validation.validateAll().then((result) => {	
-							if (result) {
-								for(const target of this.reminder_targets) {
-									this.set_targetReminder({
-										action: 'add',
-										entity: target,
-										type: 'custom',
-										reminder: this.customReminder
-									});
-								}
-								this.customReminder = {};
-							}
+
+						this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							key,
+							type: 'premade',
+							reminder: reminder
 						});
+						reminder['.key'] = key;
 					}
+				}
+				else if(type === 'custom') {
+					this.validation.validateAll().then((result) => {	
+						if (result) {
+							for(const target of this.reminder_targets) {
+								this.set_targetReminder({
+									action: 'add',
+									entity: target,
+									type: 'custom',
+									reminder: this.customReminder
+								});
+							}
+							this.customReminder = {};
+						}
+					});
+				}
 			},
 			setValidation(validate) {
 				this.validation = validate;

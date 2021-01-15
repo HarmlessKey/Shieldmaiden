@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-input 
-			dark filled square dense
+			dark filled square
 			label="Title"
 			type="text"
 			autocomplete="off"
@@ -12,14 +12,14 @@
 		/>
 		<p class="validate red" v-if="errors.has('title')">{{ errors.first('title') }}</p>
 
-		<div class="colors d-flex justify-content-between my-2">
+		<div class="colors d-flex justify-content-between my-3">
 			<a v-for="(color, index) in colors" :key="index" class="color" :class="'bg-'+color" @click="setColor(color)">
 				<span v-show="color == reminder.color"><i class="fas fa-check"></i></span>
 			</a>
 		</div>
 
 		<q-select 
-			dark filled square dense
+			dark filled square
 			map-options
 			emit-value
 			label="Trigger"
@@ -31,9 +31,9 @@
 		/>
 		<p class="validate red" v-if="errors.has('trigger')">{{ errors.first('trigger') }}</p>
 
-		<div v-if="reminder.trigger === 'timed'" class="mb-2">
+		<div v-if="reminder.trigger === 'timed'" class="my-2">
 			<q-input 
-				dark filled square dense
+				dark filled square
 				label="Rounds"
 				name="rounds"
 				type="number" 
@@ -41,25 +41,33 @@
 				v-validate="'required|max_value:99'"
 				min="1"
 				max="99"
+				hint="One minute is 10 rounds"
 			/>
 			<p class="validate red" v-if="errors.has('rounds')">{{ errors.first('rounds') }}</p>
-			<small>(One minute is 10 rounds)</small>
 		</div>
 
 		<div class="mb-3">
-			<q-option-group
-				:options="actions"
-				label="Action"
-				type="radio"
-				v-model="reminder.action"
-			/>
-			<small v-if="reminder.action == 'notify'">(You'll get the option to keep or remove the reminder.)</small>
-			<small v-else>(Reminder will be removed, but you'll still be notified.)</small>
+			<q-field
+				dark
+				:hint="
+					reminder.action == 'notify' 
+					? 'You\'ll get the option to keep or remove the reminder.'
+					: 'Reminder will be removed, but you\'ll still be notified'
+				"
+			>
+				<q-option-group
+					dark
+					:options="actions"
+					label="Action"
+					type="radio"
+					v-model="reminder.action"
+				/>
+			</q-field>
 			
 			<q-input 
-				dark filled square dense
+				dark filled square
 				label="Notification"
-				class="mt-2"
+				class="mt-3"
 				name="notification" 
 				v-validate="'max:999|variable_check'" 
 				maxLength="999"
@@ -89,7 +97,7 @@
 			</label>
 			<div class="mb-3">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="New variable name"
 					name="var_name"
 					type="text" 
@@ -133,7 +141,7 @@
 						</button>
 					</div>
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="Option"
 						:disable="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
 						:name="'option'+key"

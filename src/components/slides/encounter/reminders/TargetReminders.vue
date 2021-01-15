@@ -152,40 +152,40 @@
 				'set_targetReminder',
 			]),
 			addReminder(type, reminder = false, selectedVars=undefined) {
-					if(type === 'premade') {
-						for(const target of this.reminder_targets) {
-							let key = reminder['.key'] || reminder.key;
-							delete reminder['.key'];
+				if(type === 'premade') {
+					for(const target of this.reminder_targets) {
+						let key = reminder['.key'] || reminder.key;
+						delete reminder['.key'];
 
-							if(selectedVars) {
-								reminder.selectedVars = selectedVars;
-							}
-
-							this.set_targetReminder({
-								action: 'add',
-								entity: target,
-								key,
-								type: 'premade',
-								reminder: reminder
-							});
-							reminder['.key'] = key;
+						if(selectedVars) {
+							reminder.selectedVars = selectedVars;
 						}
-					}
-					else if(type === 'custom') {
-						this.validation.validateAll().then((result) => {	
-							if (result) {
-								for(const target of this.reminder_targets) {
-									this.set_targetReminder({
-										action: 'add',
-										entity: target,
-										type: 'custom',
-										reminder: this.customReminder
-									});
-								}
-								this.customReminder = {};
-							}
+
+						this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							key,
+							type: 'premade',
+							reminder: reminder
 						});
+						reminder['.key'] = key;
 					}
+				}
+				else if(type === 'custom') {
+					this.validation.validateAll().then((result) => {	
+						if (result) {
+							for(const target of this.reminder_targets) {
+								this.set_targetReminder({
+									action: 'add',
+									entity: target,
+									type: 'custom',
+									reminder: this.customReminder
+								});
+							}
+							this.customReminder = {};
+						}
+					});
+				}
 			},
 			setValidation(validate) {
 				this.validation = validate;

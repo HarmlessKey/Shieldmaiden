@@ -4,12 +4,13 @@
 			<div class="container">
 				<!-- <img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" /> -->
 				<div v-if="play_animation"
+					@click="replay()"
 					@mouseover="video_hover = true" 
 					@mouseleave="video_hover = false"
 				>
 					<div class="video-controls" v-if="video_hover">
 						<span>
-							<i @click="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
+							<i @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
 							<q-tooltip anchor="bottom middle" self="center middle">
 								Mute
 							</q-tooltip>
@@ -202,7 +203,7 @@
 			opacity: .3;
 			
 			i {
-				margin: 0 5px;
+				padding: 5px;
 				cursor: pointer;
 			}
 		}
@@ -239,6 +240,9 @@
 						font-style: italic;
 						text-transform: none;
 						margin-bottom: 50px !important;
+					}
+					h4 {
+						font-size: 15px; 
 					}
 					.menu {
 						display: grid;
@@ -321,6 +325,13 @@
 				.large-link {
 					margin: auto !important;
 				}
+			}
+			.video-controls {
+				width: 100%;
+				padding: 0 10px;
+				font-size: 20px;
+				display: flex;
+				justify-content: space-between;
 			}
 			.animated-video {
 				width: 170%;

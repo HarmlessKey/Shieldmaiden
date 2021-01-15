@@ -2,50 +2,73 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
-				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
+				<!-- <img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" /> -->
+				<div v-if="play_animation"
+					@click="replay()"
+					@mouseover="video_hover = true" 
+					@mouseleave="video_hover = false"
+				>
+					<div class="video-controls" v-if="video_hover">
+						<span>
+							<i @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
+							<q-tooltip anchor="bottom middle" self="center middle">
+								Mute
+							</q-tooltip>
+						</span>
+						<span>
+							<i @click="replay()" class="fas fa-redo-alt"></i>
+							<q-tooltip anchor="bottom middle" self="center middle">
+								Replay
+							</q-tooltip>
+						</span>
+					</div>
+					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
+						:muted="muted" autoplay playsinline
+					></video>
+				</div>
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!userInfo">
-							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
+							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
-						<div v-else>
-							<div class="menu">
-								<router-link to="campaigns">
-									<i class="fas fa-dungeon"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Campaigns
-									</q-tooltip>
-								</router-link>
-								<router-link to="players">
-									<i class="fas fa-users"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Players
-									</q-tooltip>
-								</router-link>
-								<router-link to="npcs">
-									<i class="fas fa-dragon"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										NPC's
-									</q-tooltip>
-								</router-link>
-								<router-link to="reminders">
-									<i class="fas fa-stopwatch"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Reminders
-									</q-tooltip>
-								</router-link>
-								<router-link to="items">
-									<i class="far fa-staff"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Items
-									</q-tooltip>
-								</router-link>
-							</div>
+						<div v-else class="mt-3">
+							<q-tabs
+								dark
+								no-caps
+							>
+								<q-route-tab 
+									v-for="({name, icon, label}, index) in tabs"
+									:key="`tab-${index}`" 
+									:to="`/${name}`" 
+									:icon="icon"
+									:label="label"
+								/>
+							</q-tabs>
 							<div class="share">
-								<PlayerLink />
+								<h2>Share your encounters</h2>
+								<q-input
+									dark filled square
+									:value="copy"
+									autocomplete="off"
+									type="text"
+									hint="With this link your players can track the initiative list of you active encounter"
+								>
+									<span slot="prepend" class="blue pointer" @click="setSlide({show: true, type: 'PlayerLink'})">
+										<q-icon  size="xs"  name="fas fa-qrcode" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Show QR-code
+										</q-tooltip>
+									</span>
+									<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
+										<q-tooltip anchor="top middle" self="center middle">
+											Click to copy
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<input :value="copy" id="copy" type="hidden" />
 							</div>
 						</div>
 
@@ -75,12 +98,37 @@
 
 <script>
 	import PlayerLink from '../PlayerLink';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Top',
 		components: {
 			PlayerLink
+		},
+		data() {
+			return {
+				play_animation: true,
+				muted: true,
+				video_hover: false,
+				copy: window.origin + '/user/' + this.$store.getters.user.uid,
+				tabs: [
+					{
+						name: "campaigns",
+						label: "Campaigns",
+						icon: "fas fa-dungeon"
+					},
+					{
+						name: "players",
+						label: "players",
+						icon: "fas fa-users"
+					},
+					{
+						name: "npcs",
+						label: "NPC's",
+						icon: "fas fa-dragon"
+					}
+				]
+			}
 		},
 		computed: {
 			...mapGetters([
@@ -88,7 +136,45 @@
 				'tier',
 				'voucher',
 				'userInfo',
-			])
+			]),
+		},
+		methods: {
+			...mapActions([
+				'setSlide'
+			]),
+			replay() {
+				const player = this.$refs.video;
+				player.currentTime = 0;
+				player.play();
+			},
+			copyLink() {
+
+				let toCopy = document.querySelector('#copy')
+				toCopy.setAttribute('type', 'text') //hidden
+				toCopy.select()
+
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'Successful' : 'Unsuccessful';
+
+					this.$snotify.success(msg, 'Link Copied!', {
+						position: "rightTop"
+					});
+				} catch (err) {
+					alert('Something went wrong, unable to copy');
+				}
+
+				/* unselect the range */
+				toCopy.setAttribute('type', 'hidden')
+				window.getSelection().removeAllRanges()
+			},
+		},
+		mounted() {
+			const navigator = window.navigator;
+			const ua = navigator.userAgent.toLowerCase()
+			const hasMediaCapabilities = !!(navigator.mediaCapabilities && navigator.mediaCapabilities.decodingInfo)
+			const isSafari = ((ua.indexOf('safari') != -1) && (!(ua.indexOf('chrome')!= -1) && (ua.indexOf('version/')!= -1)))
+			this.play_animation = !(isSafari && hasMediaCapabilities);
 		}
 	}
 </script>
@@ -98,14 +184,35 @@
 		background-image: url('../../assets/_img/styles/paper-bg.png');
 		color: #fff;
 		background-position: top center;
-		padding: 50px 0 170px 0;
+		padding: 0 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;
+		overflow: hidden;
+
+		.animated-video {
+			width: 100%;
+			margin: -8% 0 -15%;
+			pointer-events: none;
+		}
+		.video-controls {
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			margin-top: 20px;
+			z-index: 10;
+			opacity: .3;
+			
+			i {
+				padding: 5px;
+				cursor: pointer;
+			}
+		}
 
 		.logo {
 			display: block;
 			margin-left: auto;
 			margin-right: auto;
+			padding-top: 50px;
 			width: 70%;
 			max-width: 400px;
 			filter: drop-shadow(2px 2px 1px  #000);
@@ -134,6 +241,9 @@
 						text-transform: none;
 						margin-bottom: 50px !important;
 					}
+					h4 {
+						font-size: 15px; 
+					}
 					.menu {
 						display: grid;
 						justify-content: center;
@@ -147,12 +257,14 @@
 						}
 					}
 					.share {
+						h2 {
+							font-family: 'Fredericka the Great', cursive;
+							text-align: center;
+							font-size: 25px;
+						}
 						text-align: left;
 						font-size: 15px;
 						margin: 40px 0;
-						padding: 20px 0;
-						border-top: solid 1px #5c5757;
-						border-bottom: solid 1px #5c5757;
 					}
 					.button-container {
 						display: flex;
@@ -193,16 +305,51 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 550px) { 
-	.button-container {
-		display: block !important;
-
-		.btn {
-			margin-bottom: 20px;
-		}
-		.large-link {
-			margin: auto !important;
+	@media only screen and (max-width: 767px) {
+		.top {
+			.animated-video {
+					width: 150%;
+					margin: -14% 0 -20% -25%;
+					pointer-events: none;
+				}
 		}
 	}
-}
+	@media only screen and (max-width: 567px) {
+		.top {
+			.button-container {
+				display: block !important;
+
+				.btn {
+					margin-bottom: 20px;
+				}
+				.large-link {
+					margin: auto !important;
+				}
+			}
+			.video-controls {
+				width: 100%;
+				padding: 0 10px;
+				font-size: 20px;
+				display: flex;
+				justify-content: space-between;
+			}
+			.animated-video {
+				width: 170%;
+				margin: -14% 0 -20% -35%;
+				pointer-events: none;
+			}
+			.container-fluid {
+				.container {
+					.content-box {
+						h1 {
+							font-size: 30px;
+						}
+						h3 {
+							font-size: 20px !important;
+						}
+					}
+				}
+			}
+		}
+	}
 </style>

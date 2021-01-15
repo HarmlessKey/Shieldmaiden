@@ -55,8 +55,7 @@
 		</section>
 		<Footer />
 		<div class="patreon bg-black d-flex justify-content-end">
-			Like what we do?
-			<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="ml-2 btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
+			<router-link to="/demo" class="ml-2 btn bg-green">Demo Encounter</router-link>
 		</div>
 	</div>
 </template>

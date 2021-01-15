@@ -144,6 +144,7 @@
 		padding: 0 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;
+		overflow: hidden;
 
 		.animated-video {
 			width: 100%;
@@ -255,16 +256,32 @@
 			}
 		}
 	}
-	@media only screen and (max-width: 550px) { 
-	.button-container {
-		display: block !important;
-
-		.btn {
-			margin-bottom: 20px;
-		}
-		.large-link {
-			margin: auto !important;
+	@media only screen and (max-width: 767px) {
+		.top {
+			.animated-video {
+					width: 150%;
+					margin: -14% 0 -20% -25%;
+					pointer-events: none;
+				}
 		}
 	}
-}
+	@media only screen and (max-width: 567px) {
+		.top {
+			.button-container {
+				display: block !important;
+
+				.btn {
+					margin-bottom: 20px;
+				}
+				.large-link {
+					margin: auto !important;
+				}
+			}
+			.animated-video {
+					width: 170%;
+					margin: -18% 0 -25% -35%;
+					pointer-events: none;
+				}
+		}
+	}
 </style>

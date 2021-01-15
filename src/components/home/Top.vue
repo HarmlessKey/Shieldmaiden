@@ -25,7 +25,7 @@
 						:muted="muted" autoplay playsinline
 					></video>
 				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!userInfo">
@@ -117,7 +117,7 @@
 				'tier',
 				'voucher',
 				'userInfo',
-			])
+			]),
 		},
 		methods: {
 			replay() {
@@ -125,6 +125,13 @@
 				player.currentTime = 0;
 				player.play();
 			}
+		},
+		mounted() {
+			const navigator = window.navigator;
+			const ua = navigator.userAgent.toLowerCase()
+			const hasMediaCapabilities = !!(navigator.mediaCapabilities && navigator.mediaCapabilities.decodingInfo)
+			const isSafari = ((ua.indexOf('safari') != -1) && (!(ua.indexOf('chrome')!= -1) && (ua.indexOf('version/')!= -1)))
+			this.play_animation = !(isSafari && hasMediaCapabilities);
 		}
 	}
 </script>
@@ -160,6 +167,7 @@
 			display: block;
 			margin-left: auto;
 			margin-right: auto;
+			padding-top: 50px;
 			width: 70%;
 			max-width: 400px;
 			filter: drop-shadow(2px 2px 1px  #000);

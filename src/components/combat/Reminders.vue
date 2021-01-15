@@ -1,6 +1,29 @@
 <template>
-	<div v-if="entity.reminders.length > 0" class="row q-col-gutter-md reminders">
-		<div class="col-3" v-for="(reminder, key) in entity.reminders" :key="key">
+	<div 
+		v-if="entity.reminders && Object.keys(entity.reminders).length > 0" 
+		class="reminders truncate-chip-labels" 
+	>
+		<q-chip 
+			v-for="(reminder, key) in entity.reminders" 
+			clickable
+			:key="key" 
+			square 
+			size="12px"
+			:icon="reminder.icon"
+			class=""
+			:class="'bg-'+reminder.color"
+			@click="setSlide({
+				show: true, 
+				type: 'slides/encounter/reminders/Reminder',
+				data: {
+					key,
+					entity
+			}})" 
+		>
+			<q-avatar v-if="reminder.rounds"><b>{{ reminder.rounds }}</b></q-avatar>
+			<q-item-label>{{ title(reminder) }}</q-item-label>
+		</q-chip>
+		<!-- <div class="col-3" v-for="(reminder, key) in entity.reminders" :key="key">
 			<a 
 				@click="setSlide({
 					show: true, 
@@ -17,7 +40,7 @@
 					Show {{ title(reminder) }}
 				</q-tooltip>
 			</a>
-		</div>
+		</div> -->
 	</div>
 </template>
 
@@ -47,22 +70,17 @@
 
 <style lang="scss" scoped>
 	.reminders {
-		font-size: 11px;
-		list-style: none;
+		margin-top: 4px;
+		margin-left: -4px;
 
-		a {
+		.q-chip {
 			color: #fff !important;
-			position: relative;
-			padding: 3px;
-			padding-right: 15px;
-			text-shadow: 1px 1px #000;
+			border-radius: 0;
+			cursor: pointer;
 
-			.counter {
-				position: absolute;
-				right: 5px;
-				color: #fff !important;
-				font-size: 12px;
-				display: inline-block;
+			.q-avatar {
+				border-radius: 0;
+				background: rgba(0, 0, 0, .4);
 			}
 		}
 	}

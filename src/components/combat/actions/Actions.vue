@@ -62,6 +62,14 @@
 				</template>
 			</q-select>
 			<p class="validate red" v-if="errors.has('doneBy')">{{ errors.first('doneBy') }}</p>
+
+			<div 
+				v-if="doneBy && entitiesList[doneBy].reminders && entitiesList[doneBy].reminders.reaction"
+				class="reaction-used bg-red px-1 py-2 white mb-2 d-flex justify-between" 
+			>
+				<span>Reaction used</span>
+				<q-icon name="fas fa-exclamation"/>
+			</div>
 		</template>
 
 		<template v-if="doneBy">
@@ -210,5 +218,11 @@
 		background-size: cover;
 		background-position: top center;
 		border: solid 1px #b2b2b2;
+	}
+	.reaction-used {
+		font-size: 15px;
+		i {
+			margin: 4px 5px 0 0;
+		}
 	}
 </style>

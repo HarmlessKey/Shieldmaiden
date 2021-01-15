@@ -47,7 +47,7 @@
 
 <style lang="scss" scoped>
 .conditions {
-	margin: 5px 0 10px 0;
+	margin-top: 8px;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 30px);
 	grid-auto-rows: 30px;

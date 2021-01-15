@@ -220,9 +220,9 @@
 		border: solid 1px #b2b2b2;
 	}
 	.reaction-used {
+		font-size: 15px;
 		i {
-			line-height: 18px;
-			margin-right: 5px;
+			margin: 4px 5px 0 0;
 		}
 	}
 </style>

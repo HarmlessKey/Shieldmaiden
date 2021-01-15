@@ -9,13 +9,13 @@
 				>
 					<div class="video-controls" v-if="video_hover">
 						<span>
-							<i @click="muted = !muted" class="fas gray-hover" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
+							<i @click="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
 							<q-tooltip anchor="bottom middle" self="center middle">
 								Mute
 							</q-tooltip>
 						</span>
 						<span>
-							<i @click="replay()" class="fas gray-hover fa-redo-alt"></i>
+							<i @click="replay()" class="fas fa-redo-alt"></i>
 							<q-tooltip anchor="bottom middle" self="center middle">
 								Replay
 							</q-tooltip>
@@ -29,45 +29,45 @@
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!userInfo">
-							<div class="text-center gray-hover mb-4">Built by 2 guys with a passion for the game.</div>
+							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
-						<div v-else>
-							<div class="menu">
-								<router-link to="campaigns">
-									<i class="fas fa-dungeon"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Campaigns
-									</q-tooltip>
-								</router-link>
-								<router-link to="players">
-									<i class="fas fa-users"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Players
-									</q-tooltip>
-								</router-link>
-								<router-link to="npcs">
-									<i class="fas fa-dragon"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										NPC's
-									</q-tooltip>
-								</router-link>
-								<router-link to="reminders">
-									<i class="fas fa-stopwatch"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Reminders
-									</q-tooltip>
-								</router-link>
-								<router-link to="items">
-									<i class="far fa-staff"></i>
-									<q-tooltip anchor="bottom middle" self="center middle">
-										Items
-									</q-tooltip>
-								</router-link>
-							</div>
+						<div v-else class="mt-3">
+							<q-tabs
+								dark
+								no-caps
+							>
+								<q-route-tab 
+									v-for="({name, icon, label}, index) in tabs"
+									:key="`tab-${index}`" 
+									:to="`/${name}`" 
+									:icon="icon"
+									:label="label"
+								/>
+							</q-tabs>
 							<div class="share">
-								<PlayerLink />
+								<h2>Share your encounters</h2>
+								<q-input
+									dark filled square
+									:value="copy"
+									autocomplete="off"
+									type="text"
+									hint="With this link your players can track the initiative list of you active encounter"
+								>
+									<span slot="prepend" class="blue pointer" @click="setSlide({show: true, type: 'PlayerLink'})">
+										<q-icon  size="xs"  name="fas fa-qrcode" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Show QR-code
+										</q-tooltip>
+									</span>
+									<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
+										<q-tooltip anchor="top middle" self="center middle">
+											Click to copy
+										</q-tooltip>
+									</q-icon>
+								</q-input>
+								<input :value="copy" id="copy" type="hidden" />
 							</div>
 						</div>
 
@@ -97,7 +97,7 @@
 
 <script>
 	import PlayerLink from '../PlayerLink';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
 		name: 'Top',
@@ -109,6 +109,24 @@
 				play_animation: true,
 				muted: true,
 				video_hover: false,
+				copy: window.origin + '/user/' + this.$store.getters.user.uid,
+				tabs: [
+					{
+						name: "campaigns",
+						label: "Campaigns",
+						icon: "fas fa-dungeon"
+					},
+					{
+						name: "players",
+						label: "players",
+						icon: "fas fa-users"
+					},
+					{
+						name: "npcs",
+						label: "NPC's",
+						icon: "fas fa-dragon"
+					}
+				]
 			}
 		},
 		computed: {
@@ -120,11 +138,35 @@
 			]),
 		},
 		methods: {
+			...mapActions([
+				'setSlide'
+			]),
 			replay() {
 				const player = this.$refs.video;
 				player.currentTime = 0;
 				player.play();
-			}
+			},
+			copyLink() {
+
+				let toCopy = document.querySelector('#copy')
+				toCopy.setAttribute('type', 'text') //hidden
+				toCopy.select()
+
+				try {
+					var successful = document.execCommand('copy');
+					var msg = successful ? 'Successful' : 'Unsuccessful';
+
+					this.$snotify.success(msg, 'Link Copied!', {
+						position: "rightTop"
+					});
+				} catch (err) {
+					alert('Something went wrong, unable to copy');
+				}
+
+				/* unselect the range */
+				toCopy.setAttribute('type', 'hidden')
+				window.getSelection().removeAllRanges()
+			},
 		},
 		mounted() {
 			const navigator = window.navigator;
@@ -157,6 +199,7 @@
 			transform: translateX(-50%);
 			margin-top: 20px;
 			z-index: 10;
+			opacity: .3;
 			
 			i {
 				margin: 0 5px;
@@ -210,12 +253,14 @@
 						}
 					}
 					.share {
+						h2 {
+							font-family: 'Fredericka the Great', cursive;
+							text-align: center;
+							font-size: 25px;
+						}
 						text-align: left;
 						font-size: 15px;
 						margin: 40px 0;
-						padding: 20px 0;
-						border-top: solid 1px #5c5757;
-						border-bottom: solid 1px #5c5757;
 					}
 					.button-container {
 						display: flex;
@@ -278,10 +323,22 @@
 				}
 			}
 			.animated-video {
-					width: 170%;
-					margin: -18% 0 -25% -35%;
-					pointer-events: none;
+				width: 170%;
+				margin: -14% 0 -20% -35%;
+				pointer-events: none;
+			}
+			.container-fluid {
+				.container {
+					.content-box {
+						h1 {
+							font-size: 30px;
+						}
+						h3 {
+							font-size: 20px !important;
+						}
+					}
 				}
+			}
 		}
 	}
 </style>

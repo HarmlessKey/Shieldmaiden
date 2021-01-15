@@ -2,7 +2,29 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<!-- <img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" /> -->
+				<div v-if="play_animation"
+					@mouseover="video_hover = true" 
+					@mouseleave="video_hover = false"
+				>
+					<div class="video-controls" v-if="video_hover">
+						<span>
+							<i @click="muted = !muted" class="fas gray-hover" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
+							<q-tooltip anchor="bottom middle" self="center middle">
+								Mute
+							</q-tooltip>
+						</span>
+						<span>
+							<i @click="replay()" class="fas gray-hover fa-redo-alt"></i>
+							<q-tooltip anchor="bottom middle" self="center middle">
+								Replay
+							</q-tooltip>
+						</span>
+					</div>
+					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent.webm" 
+						:muted="muted" autoplay playsinline
+					></video>
+				</div>
 				<img v-else class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" />
 				<div class="content-box">
 					<div class="text">
@@ -82,6 +104,13 @@
 		components: {
 			PlayerLink
 		},
+		data() {
+			return {
+				play_animation: true,
+				muted: true,
+				video_hover: false,
+			}
+		},
 		computed: {
 			...mapGetters([
 				'user',
@@ -89,6 +118,13 @@
 				'voucher',
 				'userInfo',
 			])
+		},
+		methods: {
+			replay() {
+				const player = this.$refs.video;
+				player.currentTime = 0;
+				player.play();
+			}
 		}
 	}
 </script>
@@ -98,9 +134,27 @@
 		background-image: url('../../assets/_img/styles/paper-bg.png');
 		color: #fff;
 		background-position: top center;
-		padding: 50px 0 170px 0;
+		padding: 0 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #000;
+
+		.animated-video {
+			width: 100%;
+			margin: -8% 0 -15%;
+			pointer-events: none;
+		}
+		.video-controls {
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			margin-top: 20px;
+			z-index: 10;
+			
+			i {
+				margin: 0 5px;
+				cursor: pointer;
+			}
+		}
 
 		.logo {
 			display: block;

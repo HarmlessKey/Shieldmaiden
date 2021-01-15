@@ -868,6 +868,7 @@ html body {
 			border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 		}
 		.card-body {
+			flex: 1 1 auto;
 			min-height: 1px;
 			padding: 1.25rem;
 			

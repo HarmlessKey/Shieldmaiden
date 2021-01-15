@@ -21,7 +21,7 @@
 							</q-tooltip>
 						</span>
 					</div>
-					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent.webm" 
+					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
 						:muted="muted" autoplay playsinline
 					></video>
 				</div>

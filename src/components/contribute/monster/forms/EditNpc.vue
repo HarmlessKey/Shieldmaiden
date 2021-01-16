@@ -175,7 +175,6 @@
 							name="avatar" 
 							placeholder="Image URL"
 						/>
-						<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 					</div>
 				</div>
 			</hk-card>
@@ -403,7 +402,7 @@
 			<hk-card v-for="(action, index) in actions" :key="index">
 				<div slot="header" class="card-header d-flex justify-content-between">
 					{{ action.name }}
-					<a class="gray-hover text-capitalize" @click="add(action.type)">
+					<a class="gray-hover text-capitalize" @click="add(action.category)">
 						<i class="fas fa-plus green"></i>
 						<span class="d-none d-md-inline ml-1">Add</span>
 						<q-tooltip anchor="top middle" self="center middle">
@@ -414,17 +413,17 @@
 
 				<q-list dark square :class="`accordion`">
 					<q-expansion-item
-						v-for="(ability, index) in npc[action.type]" 
+						v-for="(ability, index) in npc[action.category]" 
 						:key="index"
 						dark switch-toggle-side
 						:group="action.name"
 					>
 						<template v-slot:header>
 							<q-item-section>
-								{{ index + 1 }}. {{ ability.name }}
+								{{ ability.name }}
 							</q-item-section>
 							<q-item-section avatar>
-								<a @click="remove(index, action.type)" class="remove">
+								<a @click="remove(index, action.category)" class="remove">
 									<i class="fas fa-trash-alt red" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove
@@ -444,22 +443,156 @@
 									class="mb-2" 
 									maxlength="30"
 									v-model="ability.name" 
-									:name="`name_${action.type}${index}`" 
+									:name="`name_${action.category}${index}`" 
 									placeholder="Name"
 								/>
 								<q-input
-									dark filled square dense
+									dark filled square
 									label="Description"
 									v-model="ability.desc" 
 									name="desc"
+									class="mb-2"
 									autogrow
 								/>
+
+								<template v-if="action.category !== 'special_abilities'">
+									<div class="row q-col-gutter-md">
+										<!-- ACTION TYPE -->
+										<div class="col">
+											<q-select 
+												dark filled square
+												map-options
+												emit-value
+												label="Action type"
+												:options="Object.values(attack_type)"
+												v-model="ability.type"
+												class="mb-2"
+											/>
+										</div>
+
+										<!-- SAVE -->
+										<template v-if="ability.type === 'save'">
+											<div class="col">
+												<q-select 
+													dark filled square
+													map-options
+													emit-value
+													label="Save ability"
+													:options="abilities"
+													v-model="ability.save_ability"
+												/>
+											</div>
+											<div class="col">
+												<q-input
+													dark filled square
+													type="number"
+													label="Save DC"
+													v-model="ability.save_dc"
+												/>
+											</div>
+										</template>
+
+										<template v-else-if="!['healing', 'other'].includes(ability.type)">
+											<div class="col">
+												<q-input
+													dark filled square
+													type="number"
+													label="Attack modifier"
+													v-model="ability.attack_bonus"
+												/>
+											</div>
+										</template>
+									</div>
+
+									<!-- ACTION ROLLS -->
+									<div class="hk-card mt-3 rolls" v-if="ability.type !== 'other'">
+										<div class="card-header d-flex justify-content-between">
+											<span><i class="fas fa-dice-d20"/> Rolls</span>
+											<a 
+												class="gray-light text-capitalize" 
+												@click="newRoll(index, action.category, ability.type)"
+											>
+												<i class="fas fa-plus green"></i>
+												<span class="d-none d-md-inline ml-1">Add</span>
+												<q-tooltip anchor="top middle" self="center middle">
+													Add roll
+												</q-tooltip>
+											</a>
+										</div>
+										<hk-table 
+											v-if="ability.rolls"
+											:items="ability.rolls"
+											:columns="rollColumns"
+											:showHeader="false"
+										>
+											<template slot="roll" slot-scope="data">
+												{{ data.row.dice_count }}d{{ data.row.dice_type }}
+												<template v-if="data.row.fixed_val !== undefined">
+													{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
+												</template>
+											</template>
+
+											<span slot="type" slot-scope="data">
+												<span v-if="ability.type === 'healing'" class="healing">
+													Healing
+												</span>
+												<template v-else>
+													<span :class="data.row.damage_type">
+														{{ data.row.damage_type }} 
+													</span> damage
+												</template>
+											</span>
+
+											<template slot="fail" slot-scope="data" v-if="ability.type !== 'healing'">
+												{{ ability.type === "save" ? `Save: ${data.row.save_fail_mod}` : `Miss: ${data.row.miss_mod}` }}
+											</template>
+
+											<!-- ACTIONS -->
+											<div slot="actions" slot-scope="data" class="actions">
+												<a class="ml-2" @click="editRoll(index, action.category, ability.type, data.index, data.row)">
+													<i class="fas fa-pencil-alt"></i>
+													<q-tooltip anchor="top middle" self="center middle">
+														Edit
+													</q-tooltip>
+												</a>
+												<a class="ml-2" @click="deleteRoll(index, action.category, data.index)">
+													<i class="fas fa-trash-alt"></i>
+													<q-tooltip anchor="top middle" self="center middle">
+														Delete
+													</q-tooltip>
+												</a>
+											</div>
+										</hk-table>
+									</div>
+								</template>
 							</div>
 						</div>
 					</q-expansion-item>
 				</q-list>
 			</hk-card>
 		</div>
+
+		<q-dialog square v-model="action_dialog">
+			<div >
+				<q-form @submit="saveRoll()">
+					<hk-card :header="(edit_roll_index !== undefined) ? 'Edit roll' : 'New roll'" class="mb-0">
+						<ActionModifier 
+							v-if="roll && edit_action.type"
+							v-model="roll"
+							:action_type="edit_action.type" 
+						/>
+						<div v-else>
+							Select an action type first
+						</div>
+
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn color="primary" type="submit" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
+						</div>
+					</hk-card>
+				</q-form>
+			</div>
+		</q-dialog>
 	</div>
 </template>
 
@@ -472,11 +605,15 @@
 	import { conditions } from '@/mixins/conditions.js';
 	import { damage_types } from '@/mixins/damageTypes.js';
 	import { monsterMixin } from '@/mixins/monster.js';
+	import ActionModifier from './ActionModifier';
 
 
 	export default {
 		name: 'EditNpcForm',
 		props: ['monster'],
+		components: {
+			ActionModifier
+		},
 		mixins: [
 			general, 
 			abilities, 
@@ -488,11 +625,67 @@
 		],
 		data() {
 			return {
+				action_dialog: false,
+				edit_action: {},
+				edit_roll_index: undefined,
+				roll: undefined,
+				rollColumns: {
+					roll: {
+						maxContent: true
+					},
+					type: {
+						truncate: true
+					},
+					fail: {
+						truncate: true
+					},
+					actions: {
+						noPadding: true,
+						maxContent: true
+					}
+				},
 				actions: [
-					{ type: 'special_abilities', name: 'Special Abilities' },
-					{ type: 'actions', name: 'Actions' },
-					{ type: 'legendary_actions', name: 'Legendary Actions' }
+					{ category: 'special_abilities', name: 'Special Abilities' },
+					{ category: 'actions', name: 'Actions' },
+					{ category: 'legendary_actions', name: 'Legendary Actions' }
 				],
+				attack_type: {
+					"melee_weapon": { 
+						label: "Melee weapon", 
+						value: "melee_weapon",
+						hint: "A melee weapon attack"
+					},
+					"ranged_weapon": { 
+						label: "Ranged weapon", 
+						value: "ranged_weapon",
+						hint: "A ranged weapon attack"
+					},
+					"spell_attack": { 
+						label: "Spell attack", 
+						value: "spell_attack",
+						hint: "A spell attack that has to hit"
+					},
+					"save": { 
+						label: "Save", 
+						value: "save",
+						hint: "An attack that requires a saving throw"
+					},
+					"damage": { 
+						label: "Damage", 
+						value: "damage",
+						hint: "Damage without a to hit or saving throw"
+					},
+					"healing": { 
+						label: "Healing", 
+						value: "healing",
+						hint: "Restores hit points to a target"
+					},
+					"other": { 
+						label: "Other", 
+						value: "other",
+						hint: "An action without damage or healing"
+					},
+				},
 			}
 		},
 		computed: {
@@ -525,8 +718,14 @@
 			...mapActions([
 				'setSlide'
 			]),
-			add(type) {
-				if(type == 'actions') {
+
+			/**
+			 * Add a new action
+			 * 
+			 * @param {string} category actions / lengedary_actions / special_abilities
+			 */
+			add(category) {
+				if(category == 'actions') {
 					if(this.npc.actions == undefined) {
 						this.npc.actions = [];
 					}
@@ -534,7 +733,7 @@
 						name: 'New Action',
 					});
 				}
-				else if(type == 'legendary_actions') {
+				else if(category == 'legendary_actions') {
 					if(this.npc.legendary_actions === undefined) {
 						this.npc.legendary_actions = [];
 					}
@@ -542,7 +741,7 @@
 						name: 'New Legendary Action',
 					});
 				}
-				else if(type == 'special_abilities') {
+				else if(category == 'special_abilities') {
 					if(this.npc.special_abilities === undefined) {
 						this.npc.special_abilities = [];
 					}
@@ -550,20 +749,85 @@
 						name: 'New Special Ability',
 					});
 				}
-				this.$forceUpdate(); //IMPORTANT
+				this.$forceUpdate();
 			},
-			remove(index, type) {
-				if(type == 'actions'){
+
+			/**
+			 * Remove an action
+			 * 
+			 * @param {integer} index index of the action
+			 * @param {string} category actions / lengedary_actions / special_abilities
+			 */
+			remove(index, category) {
+				if(category == 'actions'){
 					this.$delete(this.npc.actions, index);
 				}
-				else if(type == 'special_abilities'){
+				else if(category == 'special_abilities'){
 					this.$delete(this.npc.special_abilities, index);
 				}
-				else if(type == 'legendary_actions'){
+				else if(category == 'legendary_actions'){
 					this.$delete(this.npc.legendary_actions, index);
 				}
-				this.$forceUpdate(); //IMPORTANT
+				this.$forceUpdate();
 			},
+
+			/**
+			 * Add a new roll object to an action or legendary action
+			 * 
+			 * @param {Integer} index index of the action
+			 * @param {string} type type of the action
+			 */
+			newRoll(index, category, type) {
+				// We need some information about the action the roll is stored under
+				this.edit_action = {
+					index,
+					category,
+					type
+				}
+				this.edit_roll_index = undefined; // It's new, so no edit index
+				this.roll = {}; // Create an empty new roll
+				this.action_dialog = true;
+			},
+
+			/**
+			 * Edit a roll object of an action or legendary action
+			 * 
+			 * @param {integer} index index of the action
+			 * @param {index} roll_index of the roll
+			 * @param {string} category actions / legendary_actions
+			 * @param {object} roll the object to edit
+			 */
+			editRoll(index, category, type, roll_index, roll) {
+				// We need some information about the action the roll is stored under
+				this.edit_action = {
+					index,
+					category,
+					type
+				}
+				this.edit_roll_index = roll_index;
+				this.roll = roll;
+				this.action_dialog = true;
+			},
+			cancelRoll() {
+				this.action_dialog = false;
+				this.edit_roll_index = undefined;
+				this.roll_action_type = undefined;
+				this.roll = undefined;
+			},
+			saveRoll() {
+				let action = this.npc[this.edit_action.category][this.edit_action.index];
+
+				if(this.edit_roll_index === undefined) {
+					action.rolls = (!action.rolls) ? [] : action.rolls;
+					action.rolls.push(this.roll);
+				} else {
+					this.$set(action.rolls, this.edit_roll_index, this.roll);
+				}
+				this.action_dialog = false;
+			},
+			deleteRoll(index, category, roll_index) {
+				this.$delete(this.npc[category][index].rolls, roll_index);
+			}
 		}
 	}
 </script>
@@ -574,31 +838,8 @@
 
 	.form {
 		overflow-x: hidden;
-		overflow-y: scroll;
+		overflow-y: auto;
 
-		&::-webkit-scrollbar {
-			display: none;
-		}
-
-		ul {
-			padding: 0;
-
-			&.entities {
-				li {
-					margin-bottom: 3px;
-				}
-			}
-		}
-		a.tab {
-			display: inline-block;
-			padding: 10px;
-			margin-bottom: 1px;
-
-			&.active {
-				background-color: #262626;
-				color: #b2b2b2 !important;
-			}
-		}
 		.avatar {
 			display: grid;
 			grid-template-columns: 56px 1fr;
@@ -629,16 +870,14 @@
 				}
 			}
 		}
-	}
-	.save {
-		display: flex;
-		justify-content: flex-end;
-		padding: 10px 0;
-		border-top: solid 1px #5c5757;
+		.hk-card {
+			&.rolls {
+				margin-bottom: 0;
 
-		.error {
-			margin: 0 10px 0 0;
-			line-height: 40px;
+				.card-header {
+					margin-bottom: 1px;
+				}
+			}
 		}
 	}
 }

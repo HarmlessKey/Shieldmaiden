@@ -201,19 +201,20 @@ html body {
 	.bg-yellow-light { background-color: $yellow-light !important; }
 
 
-	.Acid { color: $acid; }
-	.Bludgening { color: $bludgening; }
-	.Cold { color: $cold; }
-	.Fire { color: $fire; }
-	.Force{ color: $force; }
-	.Lightning { color: $lightning; }
-	.Necrotic { color: $necrotic; }
-	.Piercing { color: $piercing; }
-	.Poison { color: $poison; }
-	.Psychic { color: $psychic; }
-	.Radiant { color: $radiant; }
-	.Slashing { color: $slashing; }
-	.Thunder { color: $thunder; }
+	.healing { color: $green; }
+	.acid { color: $acid; }
+	.bludgeoning { color: $bludgening; }
+	.cold { color: $cold; }
+	.fire { color: $fire; }
+	.force{ color: $force; }
+	.lightning { color: $lightning; }
+	.necrotic { color: $necrotic; }
+	.piercing { color: $piercing; }
+	.poison { color: $poison; }
+	.psychic { color: $psychic; }
+	.radiant { color: $radiant; }
+	.slashing { color: $slashing; }
+	.thunder { color: $thunder; }
 
 	//MARGINGS
 	.m {
@@ -883,6 +884,12 @@ html body {
 		}
 		.card-image {
 			width: 100%;
+		}
+
+		.hk-card {
+			.card-header {
+				background-color: rgba(0, 0, 0, .3);
+			}
 		}
 	}
 

@@ -64,6 +64,7 @@ import { abilities } from '@/mixins/abilities.js';
 import { skills } from '@/mixins/skills.js';
 import { monsterMixin } from '@/mixins/monster.js';
 import { mapGetters } from 'vuex';
+import { damage_types } from '@/mixins/damageTypes.js';
 
 export default {
 	name: 'MonsterEdit',
@@ -72,7 +73,7 @@ export default {
 		ViewMonster,
 		EditNpc
 	},
-	mixins: [general, abilities, skills, monsterMixin],
+	mixins: [general, abilities, skills, monsterMixin, damage_types],
 	metaInfo() {
 		return {
 			title: this.old_monster.name + ' | D&D 5th Edition',
@@ -180,7 +181,6 @@ export default {
 				}
 			}
 
-
 			// Languages
 			const languages = this.old_monster.languages.split(",");
 
@@ -231,34 +231,74 @@ export default {
 			
 			// Actions
 			this.$set(this.monster, "actions", []);
-			for(const ability of this.old_monster.actions) {
-				const newAbility = {
-					name: ability.name,
-					desc: ability.desc
-				};
+			this.$set(this.monster, "legendary_actions", []);
 
-				if(ability.damage_dice) {
-					// Check if it's a targeted action or saving throw
-					if(ability.attack_bonus !== 0) {
-						newAbility.type = "targeted";
-						newAbility.attack_bonus = ability.attack_bonus;
-					} else {
-						newAbility.type = "saving_throw";
-						newAbility.save_ability = "";
-					}
+			for(const action_type of ["actions", "legendary_actions"]) {
+				for(const ability of this.old_monster[action_type]) {
+					const newAbility = {
+						name: ability.name,
+						desc: ability.desc,
+						type: "other"
+					};
+					let fail_miss = "";
 
-					newAbility.rolls = [];
-					for(const damage in ability.damage_dice.split("+")) {
-						const input = damage.split("d");
-						newAbility.rolls.push({
-							dice_count: input[0],
-							dice_type: input[1],
-							damage_type: ""
+					if(ability.damage_dice) {
+						// Check if it's a targeted action or saving throw
+						if(ability.attack_bonus !== 0) {
+							newAbility.type = "melee_weapon";
+							newAbility.attack_bonus = ability.attack_bonus;
+							fail_miss = "miss_mod";
+						} else {
+							newAbility.type = "save";
+							newAbility.save_dc = "";
+							fail_miss = "save_fail_mod";
+
+							// Find the ability
+							for(const ab of this.abilities) {
+								if(ability.desc.toLowerCase().search(ab) > -1) {
+									newAbility.save_ability = ab;
+								}
+							}
+						}
+
+						// Create an array of damage types found in the description
+						let damage_types = [];
+						for(const type of this.damage_types) {
+							const position = ability.desc.toLowerCase().search(type);
+							if(position > -1 && !damage_types.includes(type)) {
+								// Make sure they're in the correct order
+								if(damage_types[0] && position > ability.desc.toLowerCase().search(damage_types[0])) {
+									damage_types.push(type);
+								} else {
+									damage_types.unshift(type);
+								}
+							}
+						}
+
+						newAbility.rolls = [];
+						ability.damage_dice.split("+").forEach((damage, index) => {
+							const input = damage.split("d");
+							const damage_type = (damage_types[index]) ? damage_types[index] : undefined;
+
+							let newRoll = {
+								dice_count: input[0],
+								dice_type: input[1],
+								damage_type
+							};
+							newRoll[fail_miss] = 0.5;
+
+							newAbility.rolls.push(newRoll);
 						})
-					}
-				}
 
-				this.monster.actions.push(newAbility);
+						// Check if there is a damage bonus
+						// Add it only once (tot the first roll by default, this might be wrong...)
+						if(ability.damage_bonus && newAbility.rolls.length > 0) {
+							newAbility.rolls[0].fixed_val = ability.damage_bonus;
+						}
+					}
+
+					this.monster[action_type].push(newAbility);
+				}
 			}
 			
 		},

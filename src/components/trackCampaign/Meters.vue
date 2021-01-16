@@ -6,6 +6,7 @@
 			inline-label
 			dense
 			no-caps
+			class="white text-shadow"
 		>
 			<q-tab 
 				v-for="({name, label}, index) in tabs"
@@ -22,8 +23,8 @@
 						name="entities" 
 						enter-active-class="animated fadeInUp" 
 						leave-active-class="animated fadeOutDown">
-						<template>
-							<li v-for="entity in _meters[type]" class="health" :key="entity.key">
+						<template v-for="entity in _meters[type]">
+							<li v-if="entity" class="health" :key="entity.key">
 								<icon 
 									v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.key], npcs[entity.key]))" class="img" 
 									:icon="displayImg(entity, players[entity.key], npcs[entity.key])" 

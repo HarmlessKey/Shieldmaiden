@@ -101,6 +101,28 @@ html body {
 		color: $gray-light;
 	}
 
+	.text-shadow {
+		text-shadow: 0 0 5px #000;
+		&-3 {
+			text-shadow: 0 0 3px #000;
+		}
+		&-4 {
+			text-shadow: 0 0 4px #000;
+		}
+		&-5 {
+			text-shadow: 0 0 5px #000;
+		}
+		&-6 {
+			text-shadow: 0 0 6px #000;
+		}
+		&-7 {
+			text-shadow: 0 0 7px #000;
+		}
+		&-8 {
+			text-shadow: 0 0 8px #000;
+		}
+	}
+
 /* 3. Heading */
 /*********************************************/
 	h1, h2, h3, h4, h5, h6 { 
@@ -127,29 +149,29 @@ html body {
 
 	/* 4. Classes */
 	/*********************************************/
-	.gray { color: $gray !important; }
-	.gray-light { color: $gray-light !important; }
-	.gray-darker { color: $gray-darker !important; }
-	.gray-dark { color: $gray-dark !important; }
-	.gray-hover { color: $gray-hover !important; }
-	.gray-active { color: $gray-active !important; }
-	.green { color: $green !important; }
-	.blue { color: $blue!important; }
-	.red { color: $red !important; }
-	.black { color: $black !important; }
-	.patreon-red { color: $patreon-red !important; }
-	.discord-purple { color: $discord-purple !important; }
-	.white { color: $white !important; }
-	.orange { color: $orange !important; }
-	.yellow { color: $yellow !important; }
-	.purple { color: $purple !important; }
-	.discord-purple { color: $discord-purple !important; }
-	.blue-light { color: $blue-light !important; }
-	.facebook-blue { color: $facebook-blue !important; }
-	.green-light { color: $green-light !important; }
-	.orange-light { color: $orange-light !important; }
-	.red-light { color: $red-light !important; }
-	.yellow-light { color: $yellow-light !important; }
+	.gray { color: $gray !important; path { fill: $gray !important;} }
+	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
+	.gray-darker { color: $gray-darker !important; path { fill: $gray-darker !important;} }
+	.gray-dark { color: $gray-dark !important; path { fill: $gray-dark !important;} }
+	.gray-hover { color: $gray-hover !important; path { fill: $gray-hover !important;} }
+	.gray-active { color: $gray-active !important; path { fill: $gray-active !important;} }
+	.green { color: $green !important; path { fill: $green !important;} }
+	.blue { color: $blue!important; path { fill: $blue!important;} }
+	.red { color: $red !important; path { fill: $red !important;} }
+	.black { color: $black !important; path { fill: $black !important;} }
+	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
+	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
+	.white { color: $white !important; path { fill: $white !important;} }
+	.orange { color: $orange !important; path { fill: $orange !important;} }
+	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
+	.purple { color: $purple !important; path { fill: $purple !important;} }
+	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
+	.blue-light { color: $blue-light !important; path { fill: $blue-light !important;} }
+	.facebook-blue { color: $facebook-blue !important; path { fill: $facebook-blue !important;} }
+	.green-light { color: $green-light !important; path { fill: $green-light !important;} }
+	.orange-light { color: $orange-light !important; path { fill: $orange-light !important;} }
+	.red-light { color: $red-light !important; path { fill: $red-light !important;} }
+	.yellow-light { color: $yellow-light !important; path { fill: $yellow-light !important;} }
 
 	.copper { color: $copper !important; fill: $copper !important; }
 	.silver { color: $silver !important; fill: $silver !important; }
@@ -846,6 +868,7 @@ html body {
 			border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 		}
 		.card-body {
+			flex: 1 1 auto;
 			min-height: 1px;
 			padding: 1.25rem;
 			

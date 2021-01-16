@@ -41,7 +41,16 @@
 				>
 					<span class="icon"><i class="fas fa-paw-claws"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
-						[t] transform
+						[t] Transform
+					</q-tooltip>
+				</a>
+
+				<a @click="setHidden()"
+					v-shortkey="['h']" @shortkey="setHidden()"
+				>
+					<span class="icon"><i class="fas fa-eye"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[h] Hide
 					</q-tooltip>
 				</a>
 				
@@ -84,6 +93,16 @@
 						[m] Reminders
 					</q-tooltip>
 				</a>
+
+				<a @click="setHidden()"
+					v-shortkey="['h']" @shortkey="setHidden()"
+				>
+					<span class="icon"><i class="fas fa-eye"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[h] Hide
+					</q-tooltip>
+				</a>
+
 				<a 
 					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
 					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
@@ -235,7 +254,8 @@
 				'set_save',
 				'set_dead',
 				'set_stable',
-				'set_targetReminder'
+				'set_targetReminder',
+				'set_hidden'
 			]),
 			showCondition(show) {
 				event.stopPropagation();
@@ -269,6 +289,14 @@
 						location: 'encounter'
 					}
 				})
+			},
+			setHidden() {
+				for(const key of this.targeted) {
+					this.set_hidden({
+						key,
+						hidden: !this.entities[key].hidden
+					});
+				}
 			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)

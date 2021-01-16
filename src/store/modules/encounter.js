@@ -394,7 +394,7 @@ const actions = {
 		// Update player
 		if(entityType === 'player') {
 			// Some player properties are stored in the campaign
-			if(["ac_bonus", "curHp", "maxHpMod"].includes(prop)) {
+			if(["ac_bonus", "curHp", "maxHpMod", "tempHp"].includes(prop)) {
 				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
 			}
 			// When a player is transformed
@@ -408,7 +408,7 @@ const actions = {
 				if(!state.demo) db.ref(`${campaignPlayer}/transformed/${saveProp}`).set(value);
 			}
 			// Some player properties are stored under player
-			else if(["ac", "maxHp", "name"].includes(prop)) {
+			else if(["ac", "maxHp", "name", "tempHp"].includes(prop)) {
 				const saveProp = (prop === "name") ? "character_name" : prop;
 				if(!state.demo) db.ref(`players/${state.uid}/${key}/${saveProp}`).set(value);
 			}
@@ -536,7 +536,7 @@ const actions = {
 	 */
 	set_initiative({ commit, state }, {key, initiative}) { 
 		if(!initiative) initiative = 0;
-		initiative = parseInt(initiative)
+		initiative = Number(initiative)
 
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(initiative);
 		commit('SET_ENTITY_PROPERTY', {key, prop: 'initiative', value: initiative});
@@ -562,12 +562,13 @@ const actions = {
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				commit('ADD_NEXT_ROUND', {key:key, action: 'set'})
+				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
+				commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: true});
+				commit('DELETE_ENTITY_PROPERTY', {key, prop: 'addNextRound'});
 			}
 		}
 	},
 	add_next_round({ state, commit },  {key, action, value}) {
-		event.stopPropagation(); //So target is not unselected when clicked
 
 		if(action === 'tag') {
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'addNextRound', value});
@@ -816,6 +817,13 @@ const actions = {
 		commit('ADD_ENTITY', {rootState, key});
 	},
 	remove_entity({ commit, state }, key) {
+		// First untarget if targeted
+		const targeted = state.targeted.filter(target => {
+			return target !== key;
+		})
+		commit('SET_TARGETED', targeted);
+		
+		// Then remove from encounter
 		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
 		commit('REMOVE_ENTITY', key);
 	},
@@ -863,7 +871,6 @@ const actions = {
 	 * @param {object} reminder full reminder object, or integer with rounds
 	 */
 	set_targetReminder({ state, commit }, {action, entity, key, reminder, type}) {
-
 		// Add a new reminder
 		if(action === 'add') {
 			if(type === 'premade') {

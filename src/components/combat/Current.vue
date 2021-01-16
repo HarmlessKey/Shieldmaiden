@@ -14,8 +14,8 @@
 
 					<TargetItem :item="current.key" class="mb-2" />
 
-					<Reminders :entity="current" />
 					<Conditions :entity="current" />
+					<Reminders :entity="current" />
 				</template>
 				<div v-else class="loader"><span>Loading current...</span></div>
 			</div>

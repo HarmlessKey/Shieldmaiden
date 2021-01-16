@@ -47,7 +47,7 @@
 		<q-scroll-area dark :thumb-style="{ width: '5px'}">
 			<div>
 				<table class="initiative-list targets">
-					<thead>
+					<thead class='white text-shadow'>
 						<th class="init">In.</th>
 						<th class="image"></th>
 						<th class="ac"><i class="fas fa-shield"></i></th>
@@ -601,11 +601,14 @@
 							max-width: 43px;
 
 							.img {
-								width: 41px;
-								height: 41px;
+								width: 42px;
+								height: 42px;
 								border: solid 1px #b2b2b2;
 								background-size: cover;
 								background-position: center top;
+							}
+							svg.img {
+								margin-bottom: -6px;
 							}
 
 						}

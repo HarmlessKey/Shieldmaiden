@@ -1,10 +1,12 @@
 <template>
-	<div class="track-wrapper" :style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }">
+	<div class="track-wrapper" >
+		
 		<!-- ROLL FOR INITIATIVE -->
 		<RollForInitiative v-if="encounter.round === 0" />
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else-if="!encounter.finished">
+			
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
@@ -16,6 +18,7 @@
 				:npcs="npcs"
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
+				@setWeather="setWeather"
 			/>
 
 			<!-- DESKTOP -->
@@ -43,6 +46,7 @@
 						inline-label
 						dense
 						no-caps
+						class='white text-shadow'
 					>
 						<q-tab 
 							v-for="({name, icon, label}, index) in tabs"
@@ -170,6 +174,12 @@
 				</div>
 			</div>
 		</template>
+		<div 
+			v-if="encounter.background || (encounter.weather && Object.keys(encounter.weather).length && weather)"
+			class="weather" 
+		>
+			<Weather :weather="encounter.weather" :background="encounter.background" :show-weather="weather" />
+		</div>
 	</div>
 </template>
 
@@ -190,7 +200,8 @@
 			Initiative,
 			Meters,
 			Rolls,
-			RollForInitiative
+			RollForInitiative,
+			Weather: () => import('@/components/weather')
 		},
 		props: [
 			"encounter", 
@@ -205,6 +216,7 @@
 				setSideDisplay: undefined,
 				counter: 0,
 				rolls: [],
+				weather: true,
 				panels: [
 					{
 						label: "Initiative list",
@@ -349,18 +361,34 @@
 				if(roll) {
 					this.rolls.unshift(roll);
 				}
+			},
+			setWeather(value) {
+				this.weather = value;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+.weather {
+	overflow: hidden;
+	position: absolute; 
+	left: 0;
+	top: 60px;
+	height: calc(100% - 60px);
+	width: 100%;
+	pointer-events: none;
+	background-size: cover;
+	background-position: center top;
+}
 .track {
 	max-width: 1250px;
 	margin: auto;
 	width: 100%;
 	height: calc(100% - 60px);
 	display: grid;
+	position: relative;
+	z-index: 1;
 	
 
 	&.desktop {
@@ -402,7 +430,7 @@
 		grid-template-columns: 1fr;
 
 		.transparent-bg {
-			background: rgba(38, 38, 38, .5);
+			background: rgba(38, 38, 38, .3);
 		}
 		.q-tab-panel {
 			padding: 0 15px;
@@ -417,6 +445,12 @@
 @media only screen and (max-width: 1000px) {
 	.track.desktop {
 		grid-template-columns: 3fr 2fr;
+	}
+}
+@media only screen and (max-width: 576px) {
+	.weather {
+		top: 120px;
+		height: calc(100% - 120px);
 	}
 }
 </style>

@@ -378,7 +378,6 @@
 					</div>
 				</hk-card>
 
-	
 				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
@@ -416,7 +415,6 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
-				npcs: {},
 				companions_to_delete: [],
 				columns: {
 					avatar: {
@@ -450,7 +448,7 @@
 				'tier',
 				'players',
 				'overencumbered',
-				// 'npcs',
+				'npcs',
 			]),
 			_companions: function() {
 				let comps = [];
@@ -591,8 +589,8 @@
 			searchNPC() {
 				this.searchResults = []
 				this.searching = true
-				for (var i in this.npcs) {
-					var m = this.npcs[i];
+				for (const i in this.npcs) {
+					const m = this.npcs[i];
 					m.key = i;
 					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
 						this.noResult = ''

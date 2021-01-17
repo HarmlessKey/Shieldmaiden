@@ -234,71 +234,90 @@ export default {
 			this.$set(this.monster, "legendary_actions", []);
 
 			for(const action_type of ["actions", "legendary_actions"]) {
-				for(const ability of this.old_monster[action_type]) {
-					const newAbility = {
-						name: ability.name,
-						desc: ability.desc,
-						type: "other"
-					};
-					let fail_miss = "";
+				if(this.old_monster[action_type]) {
+					for(const ability of this.old_monster[action_type]) {
+						const newAbility = {
+							name: ability.name,
+							desc: ability.desc,
+							type: "other"
+						};
+						let fail_miss = "";
 
-					if(ability.damage_dice) {
-						// Check if it's a targeted action or saving throw
-						if(ability.attack_bonus !== 0) {
-							newAbility.type = "melee_weapon";
-							newAbility.attack_bonus = ability.attack_bonus;
-							fail_miss = "miss_mod";
-						} else {
-							newAbility.type = "save";
-							newAbility.save_dc = "";
-							fail_miss = "save_fail_mod";
+						if(ability.damage_dice || ability.desc.toLowerCase().match(/(saving throw)/g)) {
+							// Find the range
+							const range = ability.desc.toLowerCase().match(/(range|reach).[0-9]+(\/[0-9]+)*/g);
 
-							// Find the ability
-							for(const ab of this.abilities) {
-								if(ability.desc.toLowerCase().search(ab) > -1) {
-									newAbility.save_ability = ab;
+							if(range) newAbility.range = range[0].split(" ")[1];
+
+							// Check if it's a targeted action or saving throw
+							if(ability.attack_bonus && ability.attack_bonus !== 0) {
+								if(ability.desc.toLowerCase().match(/(melee weapon)/g)) newAbility.type = "melee_weapon";
+								else if(ability.desc.toLowerCase().match(/(ranged weapon)/g)) newAbility.type = "ranged_weapon";
+								else newAbility.type = "damage";
+
+								newAbility.attack_bonus = ability.attack_bonus;
+								fail_miss = "miss_mod";
+							} else {
+								newAbility.type = "save";
+								fail_miss = "save_fail_mod";
+
+								const save_dc = ability.desc.match(/(DC).([0-9]+)/g);
+								if(save_dc) {
+									newAbility.save_dc = save_dc[0].split(" ")[1];
+								}
+
+								// Find the ability
+								for(const ab of this.abilities) {
+									if(ability.desc.toLowerCase().search(ab) > -1) {
+										newAbility.save_ability = ab;
+									}
+								}
+							}
+
+							// Create an array of damage types found in the description
+							let damage_types = [];
+							for(const type of this.damage_types) {
+								const position = ability.desc.toLowerCase().search(type);
+								if(position > -1 && !damage_types.includes(type)) {
+									// Make sure they're in the correct order
+									if(damage_types[0] && position > ability.desc.toLowerCase().search(damage_types[0])) {
+										damage_types.push(type);
+									} else {
+										damage_types.unshift(type);
+									}
+								}
+							}
+
+							newAbility.rolls = [];
+							if(ability.damage_dice) {
+								ability.damage_dice.split("+").forEach((damage, index) => {
+									const input = damage.split("d");
+									const damage_type = (damage_types[index]) ? damage_types[index] : undefined;
+
+									let newRoll = {
+										dice_count: input[0],
+										dice_type: input[1],
+										damage_type
+									};
+									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
+
+									newAbility.rolls.push(newRoll);
+								})
+
+								// Check if there is a damage bonus
+								// Add it only once (to the first roll by default, this might be wrong in some cases)
+								if(ability.damage_bonus && newAbility.rolls.length > 0) {
+									newAbility.rolls[0].fixed_val = ability.damage_bonus;
 								}
 							}
 						}
 
-						// Create an array of damage types found in the description
-						let damage_types = [];
-						for(const type of this.damage_types) {
-							const position = ability.desc.toLowerCase().search(type);
-							if(position > -1 && !damage_types.includes(type)) {
-								// Make sure they're in the correct order
-								if(damage_types[0] && position > ability.desc.toLowerCase().search(damage_types[0])) {
-									damage_types.push(type);
-								} else {
-									damage_types.unshift(type);
-								}
-							}
-						}
-
-						newAbility.rolls = [];
-						ability.damage_dice.split("+").forEach((damage, index) => {
-							const input = damage.split("d");
-							const damage_type = (damage_types[index]) ? damage_types[index] : undefined;
-
-							let newRoll = {
-								dice_count: input[0],
-								dice_type: input[1],
-								damage_type
-							};
-							newRoll[fail_miss] = 0.5;
-
-							newAbility.rolls.push(newRoll);
-						})
-
-						// Check if there is a damage bonus
-						// Add it only once (tot the first roll by default, this might be wrong...)
-						if(ability.damage_bonus && newAbility.rolls.length > 0) {
-							newAbility.rolls[0].fixed_val = ability.damage_bonus;
-						}
+						this.monster[action_type].push(newAbility);
 					}
-
-					this.monster[action_type].push(newAbility);
 				}
+			}
+			if(this.monster.legendary_actions.length > 0) {
+				this.monster.lengendary_count = 3;
 			}
 			
 		},

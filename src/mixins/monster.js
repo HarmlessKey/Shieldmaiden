@@ -3,9 +3,9 @@ export const monsterMixin = {
 		return {
 			monster_challenge_rating: {
 				0:  { proficiency: 2,  xp: 10 },
-				'0.125':  { proficiency: 2,  xp: 25 },
-				'0.25':  { proficiency: 2,  xp: 50 },
-				'0.5':  { proficiency: 2,  xp: 100 },
+				0.125:  { proficiency: 2,  xp: 25 },
+				0.25:  { proficiency: 2,  xp: 50 },
+				0.5:  { proficiency: 2,  xp: 100 },
 				1:  { proficiency: 2,  xp: 200 },
 				2:  { proficiency: 2,  xp: 450 },
 				3:  { proficiency: 2,  xp: 700 },

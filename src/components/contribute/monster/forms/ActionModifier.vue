@@ -94,7 +94,7 @@
 				v-model="roll.save_fail_mod"
 				class="mb-3"
 				hint="The effect if the target makes a successful saving throw."
-				:rules="[val => !!val || 'What happens on a succesful save?']"
+				:rules="[val => val !== undefined || 'What happens on a succesful save?']"
 			/>
 			<q-select 
 				v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
@@ -106,7 +106,7 @@
 				v-model="roll.miss_mod"
 				class="mb-3"
 				hint="The effect if the attack is a miss."
-				:rules="[val => !!val || 'What happens on a miss?']"
+				:rules="[val => val !== undefined || 'What happens on a miss?']"
 			/>
 		</div>
 

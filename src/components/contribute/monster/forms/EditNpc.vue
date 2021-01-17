@@ -50,7 +50,7 @@
 				<!-- ALIGNMENT -->
 				<q-select
 					dark filled square
-					label="Type"
+					label="Alignment"
 					class="mb-2" 
 					v-model="npc.alignment"
 					:options="monster_alignment"
@@ -267,6 +267,10 @@
 							type="number" 
 							v-model="npc[ability]" 
 							:name="ability"
+							:suffix="
+								npc[ability] !== undefined 
+								? `(${calcMod(npc[ability]) <= 0 ? calcMod(npc[ability]) : `+${calcMod(npc[ability])}` })` 
+								: ''"
 						>
 							<q-checkbox 
 								slot="append"
@@ -411,6 +415,16 @@
 					</a>
 				</div>
 
+				<q-input 
+					v-if="action.category === 'legendary_actions'"
+					dark filled square
+					label="Count"
+					v-model="npc.lengendary_count"
+					type="number"
+					class="mb-3"
+					hint="Amount of legendary actions per turn."
+				/>
+
 				<q-list dark square :class="`accordion`">
 					<q-expansion-item
 						v-for="(ability, index) in npc[action.category]" 
@@ -504,6 +518,14 @@
 										</template>
 									</div>
 
+									<q-input
+										dark filled square
+										:label="ability.type === 'melee_weapon' ? 'Reach' : 'Range'"
+										v-model="ability.range"
+										:rules="[val => val.match(/^[0-9]+(\/[0-9]+)*$/g) || 'Allowed format: 5 or 20/60']"
+										suffix="ft."
+									/>
+
 									<!-- ACTION ROLLS -->
 									<div class="hk-card mt-3 rolls" v-if="ability.type !== 'other'">
 										<div class="card-header d-flex justify-content-between">
@@ -519,6 +541,8 @@
 												</q-tooltip>
 											</a>
 										</div>
+
+										<!-- ROLLS TABLE -->
 										<hk-table 
 											v-if="ability.rolls"
 											:items="ability.rolls"
@@ -534,17 +558,22 @@
 
 											<span slot="type" slot-scope="data">
 												<span v-if="ability.type === 'healing'" class="healing">
-													Healing
+													<i class="fas fa-heart" /> Healing
 												</span>
 												<template v-else>
 													<span :class="data.row.damage_type">
-														{{ data.row.damage_type }} 
+														<i :class="damage_type_icons[data.row.damage_type]" /> 
+														{{ data.row.damage_type.capitalize() }} 
 													</span> damage
 												</template>
 											</span>
 
 											<template slot="fail" slot-scope="data" v-if="ability.type !== 'healing'">
-												{{ ability.type === "save" ? `Save: ${data.row.save_fail_mod}` : `Miss: ${data.row.miss_mod}` }}
+												{{ 
+													ability.type === "save" 
+													? `Save: ${application[data.row.save_fail_mod]}` 
+													: `Miss: ${application[data.row.miss_mod]}`
+												}}
 											</template>
 
 											<!-- ACTIONS -->
@@ -573,9 +602,13 @@
 		</div>
 
 		<q-dialog square v-model="action_dialog">
-			<div >
+			<div v-if="Object.keys(edit_action).length > 0">
 				<q-form @submit="saveRoll()">
 					<hk-card :header="(edit_roll_index !== undefined) ? 'Edit roll' : 'New roll'" class="mb-0">
+
+						<p>
+							{{ npc[edit_action.category][edit_action.index].desc }}
+						</p>
 						<ActionModifier 
 							v-if="roll && edit_action.type"
 							v-model="roll"
@@ -643,6 +676,11 @@
 						noPadding: true,
 						maxContent: true
 					}
+				},
+				application: {
+					0: "No effect",
+					0.5: "Half damage",
+					1: "Full damage"
 				},
 				actions: [
 					{ category: 'special_abilities', name: 'Special Abilities' },

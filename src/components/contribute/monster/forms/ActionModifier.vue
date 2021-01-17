@@ -191,7 +191,6 @@ export default {
 			],
 			save_fail_mod: [
 				{ label: "No effect", value: 0},
-				// { label: "¼", value: 0.25},
 				{ label: "Half damage", value: 0.5},
 				{ label: "Full damage", value: 1},
 			],
@@ -203,7 +202,3 @@ export default {
 	}
 };
 </script>
-
-<style lang="scss" scoped>
-
-</style>

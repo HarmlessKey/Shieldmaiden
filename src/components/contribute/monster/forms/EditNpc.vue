@@ -189,15 +189,13 @@
 							type="number" 
 							class="mb-2" 
 							v-model="npc.armor_class" 
-							v-validate="'required'" 
 							name="ac" 
-							data-vv-as="Armor class"
+							:rules="[val => !!val || 'AC is required']"
 						>
 							<template v-slot:append>
 								<q-icon name="fas fa-shield" size="xs" />
 							</template>
 						</q-input>
-						<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 					</div>
 					<div class="col-12 col-md-4">
 						<q-input 
@@ -206,17 +204,14 @@
 							autocomplete="off"  
 							type="number" 
 							class="mb-2" 
-							:class="{'input': true, 'error': errors.has('Hit Points') }" 
 							v-model="npc.hit_points" 
-							v-validate="'required'" 
 							name="hp" 
-							data-vv-as="Hit Points"
+							:rules="[val => !!val || 'HP is required']"
 						>
 							<template v-slot:append>
 								<q-icon name="fas fa-heart" size="xs" />
 							</template>
 						</q-input>
-						<p class="validate red" v-if="errors.has('hp')">{{ errors.first('hp') }}</p>
 					</div>
 					<div class="col-12 col-md-4">
 						<q-input 
@@ -226,10 +221,9 @@
 							type="text" 
 							class="mb-2" 
 							v-model="npc.hit_dice"  
-							v-validate="{ regex:/^[0-9]+d[0-9]+$/ }"
 							name="hit_dice" 
 							id="hitdice"
-							data-vv-as="Hit Dice"
+							:rules="[val => (!val || val.match(/^[0-9]+d[0-9]+$/)) || 'Allowed format: 2d6']"
 						>
 							<template v-slot:append>
 								<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
@@ -247,11 +241,6 @@
 								</q-icon>
 							</template>				
 						</q-input>
-						<p class="validate red" 
-							v-if="errors.has('hit_dice')">
-							{{ errors.first('hit_dice') }}
-							Allowed format: "2d6".
-						</p>
 					</div>
 				</div>
 			</hk-card>
@@ -452,16 +441,26 @@
 									class="mb-2" 
 									maxlength="30"
 									v-model="ability.name" 
-									:name="`name_${action.category}${index}`" 
-									placeholder="Name"
+								/>
+								<q-input 
+									dark filled square
+									label="Recharge"
+									autocomplete="off" 
+									id="name"
+									type="text" 
+									class="mb-3" 
+									v-model="ability.recharge" 
+									:rules="[val => (!val || val.match(/^([0-9]+)-([0-9]+)$/)) || 'Allowed format: 5-6']"
 								/>
 								<q-input
 									dark filled square
 									label="Description"
+									autocomplete="off" 
 									v-model="ability.desc" 
 									name="desc"
-									class="mb-2"
+									class="mb-3"
 									autogrow
+									:rules="[val => (!val || val.length < 1500) || 'Can\'t be over 1500 characters']"
 								/>
 
 								<template v-if="action.category !== 'special_abilities'">
@@ -513,13 +512,37 @@
 										</template>
 									</div>
 
-									<q-input
-										dark filled square
-										:label="ability.type === 'melee_weapon' ? 'Reach' : 'Range'"
-										v-model="ability.range"
-										:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 5 or 20/60']"
-										suffix="ft."
-									/>
+									<div class="row q-col-gutter-md">
+										<div class="col">
+											<q-input
+												dark filled square
+												:label="ability.type === 'melee_weapon' ? 'Reach' : 'Range'"
+												v-model="ability.range"
+												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 5 or 20/60']"
+												suffix="ft."
+											/>
+										</div>
+										<div class="col">
+											<q-select 
+												dark filled square
+												emit-value
+												map-options
+												label="AOE type"
+												:options="aoe_types"
+												v-model="npc.aoe_type"
+											/>
+										</div>
+										<div class="col">
+											<q-input 
+												dark filled square
+												label="AOE size"
+												type="number"
+												v-model="npc.aoe_size"
+												suffix="ft."
+												:disable="!npc.aoe_type"
+											/>
+										</div>
+									</div>
 
 									<!-- ACTION ROLLS -->
 									<div class="hk-card mt-3 rolls" v-if="ability.type !== 'other'">
@@ -681,6 +704,16 @@
 					{ category: 'special_abilities', name: 'Special Abilities' },
 					{ category: 'actions', name: 'Actions' },
 					{ category: 'legendary_actions', name: 'Legendary Actions' }
+				],
+				aoe_types: [
+					{ label: "None", value: undefined },
+					{ label: "Cone", value: "cone" },
+					{ label: "Cube", value: "cube" },
+					{ label: "Cylinder", value: "cylinder" },
+					{ label: "Line", value: "line" },
+					{ label: "Sphere", value: "sphere" },
+					{ label: "Square", value: "square" },
+					{ label: "Square Feet", value: "square feet" },
 				],
 				attack_type: {
 					"melee_weapon": { 
@@ -926,6 +959,7 @@
 				margin-bottom: 0;
 
 				.card-header {
+					padding: 12px 10px;
 					margin-bottom: 1px;
 				}
 			}

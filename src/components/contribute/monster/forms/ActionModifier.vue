@@ -10,21 +10,32 @@
 			v-model="roll.damage_type"
 			class="mb-2"
 			:rules="[val => !!val || 'Select a damage type']"
+			hint="Select the damage type"
 		>
-			<template v-slot:append>
-				<q-icon name="info" @click.stop>
-					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card dark square>
-							<q-card-section class="bg-gray-active">
-								<b>Damage type</b>
-							</q-card-section>
-
-							<q-card-section>
-								Select the damage type of this roll.
-							</q-card-section>
-						</q-card>
-					</q-menu>
-				</q-icon>
+			<template v-slot:selected>
+				<span v-if="roll.damage_type" dense>
+					<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
+					{{ roll.damage_type.capitalize() }}
+				</span>
+				<span v-else>
+					Damage type
+				</span>
+			</template>
+			<template v-slot:option="scope">
+				<q-item
+					clickable
+					v-ripple
+					v-close-popup
+					:active="roll.damage_type === scope.opt"
+					@click="roll.damage_type = scope.opt"
+				>
+					<q-item-section avatar>
+						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+					</q-item-section>
+					<q-item-section>
+						<q-item-label v-html="scope.opt.capitalize()"/>
+					</q-item-section>
+				</q-item>
 			</template>
 		</q-select>
 				

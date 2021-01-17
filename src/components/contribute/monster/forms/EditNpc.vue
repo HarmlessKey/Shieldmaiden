@@ -356,38 +356,33 @@
 			<!-- DEFENSES -->
 			<hk-card header="Resistances & Vulnerabilities">
 				<q-select 
+					v-for="type in ['damage_vulnerabilities', 'damage_resistances', 'damage_immunities']"
 					dark filled square
-					label="Damage vulnerabilities"
+					:label="`Damage ${type.split('_')[1]}`"
 					autocomplete="off"  
-					class="mb-2" 
+					class="mb-3" 
 					multiple
 					:options="damage_types"
-					v-model="npc.damage_vulnerabilities" 
-				/>
-
-				<q-select 
-					dark filled square
-					label="Damage resistances"
-					autocomplete="off"  
-					type="text" 
-					class="mb-2" 
-					multiple
-					:options="damage_types"
-					v-model="npc.damage_resistances" 
-					name="damage_resistances" 
-				/>
-
-				<q-select 
-					dark filled square
-					label="Damage immunities"
-					autocomplete="off"  
-					type="text" 
-					class="mb-2" 
-					multiple
-					:options="damage_types"
-					v-model="npc.damage_immunities" 
-					name="damage_immunities"
-				/>
+					v-model="npc[type]" 
+					:key="type"
+					:hint="resistanceInfo(type)"
+				>
+					<template v-slot:option="scope">
+						<q-item
+							clickable
+							v-ripple
+							:active="npc[type] && npc[type].includes(scope.opt)"
+							@click="setResistance(type, scope.opt)"
+						>
+							<q-item-section avatar>
+								<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+							</q-item-section>
+							<q-item-section>
+								<q-item-label v-html="scope.opt.capitalize()"/>
+							</q-item-section>
+						</q-item>
+					</template>
+				</q-select>
 
 				<q-select 
 					dark filled square
@@ -522,7 +517,7 @@
 										dark filled square
 										:label="ability.type === 'melee_weapon' ? 'Reach' : 'Range'"
 										v-model="ability.range"
-										:rules="[val => val.match(/^[0-9]+(\/[0-9]+)*$/g) || 'Allowed format: 5 or 20/60']"
+										:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 5 or 20/60']"
 										suffix="ft."
 									/>
 
@@ -756,6 +751,24 @@
 			...mapActions([
 				'setSlide'
 			]),
+			resistanceInfo(type) {
+				if(type === "damage_resistances") {
+					return "Half of the damage is taken for these damage types"
+				}
+				if(type === "damage_vulnerabilities") {
+					return "Double damage is taken for these damage types"
+				}
+				return "No damage is taken for these damage types"
+			},
+			setResistance(type, value) {
+				if(!this.npc[type]) {
+					this.$set(this.npc, type, [value]);
+				} else if(this.npc[type].includes(value)) {
+					this.$delete(this.npc[type], this.npc[type].indexOf(value));
+				} else {
+					this.npc[type].push(value);
+				}
+			},
 
 			/**
 			 * Add a new action

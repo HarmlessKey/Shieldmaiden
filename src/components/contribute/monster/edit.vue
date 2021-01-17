@@ -202,24 +202,32 @@ export default {
 			this.$set(this.monster, "damage_immunities", []);
 			this.$set(this.monster, "condition_immunities", []);
 			for(const resistance of damage_resistances) {
-				this.monster.damage_resistances.push(
-					resistance.trim().toLowerCase()
-				);
+				if(resistance) {
+					this.monster.damage_resistances.push(
+						resistance.trim().toLowerCase()
+					);
+				}
 			}
 			for(const vulnerability of damage_vulnerabilities) {
-				this.monster.damage_vulnerabilities.push(
-					vulnerability.trim().toLowerCase()
-				);
+				if(vulnerability) {
+					this.monster.damage_vulnerabilities.push(
+						vulnerability.trim().toLowerCase()
+					);
+				}
 			}
 			for(const immunity of damage_immunities) {
-				this.monster.damage_immunities.push(
-					immunity.trim().toLowerCase()
-				);
+				if(immunity) {
+					this.monster.damage_immunities.push(
+						immunity.trim().toLowerCase()
+					);
+				}
 			}
 			for(const immunity of condition_immunities) {
-				this.monster.condition_immunities.push(
-					immunity.trim().toLowerCase()
-				);
+				if(immunity) {
+					this.monster.condition_immunities.push(
+						immunity.trim().toLowerCase()
+					);
+				}
 			}
 
 			// Special abilities

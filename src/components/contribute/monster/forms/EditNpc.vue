@@ -128,6 +128,8 @@
 					multiple
 					v-model="npc.languages"
 					:options="languages"
+					use-input
+					new-value-mode="add-unique"
 				/>
 
 				<!-- CR -->
@@ -386,7 +388,7 @@
 				/>
 			</hk-card>
 
-			<!-- ACTIONS / ABILITIES -->
+			<!-- ACTIONS CATEGORIES -->
 			<hk-card v-for="{name, category} in actions" :key="category">
 				<div slot="header" class="card-header d-flex justify-content-between">
 					{{ name }}
@@ -409,6 +411,7 @@
 					hint="Amount of legendary actions per turn."
 				/>
 
+				<!-- ABILITIES -->
 				<q-list dark square :class="`accordion`">
 					<q-expansion-item
 						v-for="(ability, ability_index) in npc[category]" 
@@ -434,9 +437,18 @@
 							<div>
 								<q-input 
 									dark filled square
+									label="Legendary actions"
+									autocomplete="off" 
+									type="number" 
+									class="mb-3" 
+									v-model="ability.legendary_cost" 
+									hint="How many legendary actions does this cost?"
+								/>
+
+								<q-input 
+									dark filled square
 									label="Name"
 									autocomplete="off" 
-									id="name"
 									type="text" 
 									class="mb-2" 
 									maxlength="30"
@@ -447,7 +459,6 @@
 									dark filled square
 									label="Recharge"
 									autocomplete="off" 
-									id="name"
 									type="text" 
 									class="mb-3" 
 									v-model="ability.recharge" 
@@ -497,6 +508,7 @@
 										</div>
 									</div>
 
+									<!-- ACTIONS -->
 									<div v-for="(action, action_index) in ability.action_list" :key="`action-${action_index}`">
 										<label class="group mt-3">Type of action</label>
 										<div class="row q-col-gutter-md">
@@ -535,7 +547,7 @@
 												</div>
 											</template>
 
-											<template v-else-if="!['healing', 'other'].includes(action.type)">
+											<template v-else-if="!['healing', 'damage', 'other'].includes(action.type)">
 												<div class="col">
 													<q-input
 														dark filled square

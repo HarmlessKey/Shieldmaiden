@@ -62,6 +62,7 @@ import EditNpc from './forms/EditNpc.vue';
 import { general } from '@/mixins/general.js';
 import { abilities } from '@/mixins/abilities.js';
 import { skills } from '@/mixins/skills.js';
+import { languages } from '@/mixins/languages.js';
 import { monsterMixin } from '@/mixins/monster.js';
 import { mapGetters } from 'vuex';
 import { damage_types } from '@/mixins/damageTypes.js';
@@ -73,7 +74,14 @@ export default {
 		ViewMonster,
 		EditNpc
 	},
-	mixins: [general, abilities, skills, monsterMixin, damage_types],
+	mixins: [
+		general, 
+		abilities, 
+		skills, 
+		monsterMixin, 
+		damage_types,
+		languages
+	],
 	metaInfo() {
 		return {
 			title: this.old_monster.name + ' | D&D 5th Edition',
@@ -192,36 +200,32 @@ export default {
 			}
 
 			// Defenses
-			const damage_resistances = this.old_monster.damage_resistances.split(",");
-			const damage_vulnerabilities = this.old_monster.damage_vulnerabilities.split(",");
-			const damage_immunities = this.old_monster.damage_immunities.split(",");
+			let defenses = {
+				damage_resistances: this.old_monster.damage_resistances.split(","),
+				damage_vulnerabilities: this.old_monster.damage_vulnerabilities.split(","),
+				damage_immunities: this.old_monster.damage_immunities.split(","),
+			}
 			const condition_immunities = this.old_monster.condition_immunities.split(",");
 
-			this.$set(this.monster, "damage_resistances", []);
-			this.$set(this.monster, "damage_vulnerabilities", []);
-			this.$set(this.monster, "damage_immunities", []);
+			const resistances = [
+				"damage_resistances",
+				"damage_vulnerabilities",
+				"damage_immunities",
+			];
+
+			for(const resistance_type of resistances) {
+				this.$set(this.monster, resistance_type, []);
+
+				for(const defense of defenses[resistance_type]) {
+					if(defense && this.damage_types.includes(defense.trim().toLowerCase())) {
+						this.monster[resistance_type].push(
+							defense.trim().toLowerCase()
+						);
+					}
+				}
+			}
+
 			this.$set(this.monster, "condition_immunities", []);
-			for(const resistance of damage_resistances) {
-				if(resistance) {
-					this.monster.damage_resistances.push(
-						resistance.trim().toLowerCase()
-					);
-				}
-			}
-			for(const vulnerability of damage_vulnerabilities) {
-				if(vulnerability) {
-					this.monster.damage_vulnerabilities.push(
-						vulnerability.trim().toLowerCase()
-					);
-				}
-			}
-			for(const immunity of damage_immunities) {
-				if(immunity) {
-					this.monster.damage_immunities.push(
-						immunity.trim().toLowerCase()
-					);
-				}
-			}
 			for(const immunity of condition_immunities) {
 				if(immunity) {
 					this.monster.condition_immunities.push(

@@ -192,7 +192,8 @@ export default {
 				{ label: "Full damage", value: 1},
 			],
 			specials: {
-				siphon: { label: "Heal caster", value: "siphon", info: "On a hit, the caster is healed for half of the damage done." },
+				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
+				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
 				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
 			}
 		};

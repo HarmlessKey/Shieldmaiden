@@ -32,7 +32,7 @@
 							</router-link>
 							<div slot="actions" slot-scope="data" class="actions">
 								<a 
-									v-if="Object.keys(taggedMonsters).length === 0"
+									v-if="Object.keys(taggedMonster).length === 0"
 									@click="tag(data.row['.key'], data.row.name)"
 								>
 									<i class="fas fa-plus"></i>
@@ -49,11 +49,11 @@
 					<hk-card>
 						<div class="card-header" slot="header">
 							Your Tagged Monster
-							<span v-if="taggedMonsters">{{ Object.keys(taggedMonsters).length }}</span>
+							<span v-if="taggedMonster">{{ Object.keys(taggedMonster).length }}</span>
 						</div>
 
 						<hk-table
-							:items="taggedMonsters"
+							:items="taggedMonster"
 							:columns="taggedColumns"
 						>
 							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
@@ -259,6 +259,7 @@
 			return {
 				allMonsters: db.ref('monsters'),
 				finishedMonsters: db.ref('new_monsters').orderByChild('metadata/finished').equalTo(true),
+				taggedMonster: db.ref('new_monsters').orderByChild('metadata/tagged').equalTo(this.userId),
 				admins: db.ref('users').orderByChild('admin').equalTo(true),
 				contributors: db.ref('users').orderByChild('contribute').equalTo(true),
 			}

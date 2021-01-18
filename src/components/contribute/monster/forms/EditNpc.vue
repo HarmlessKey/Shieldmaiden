@@ -387,20 +387,20 @@
 			</hk-card>
 
 			<!-- ACTIONS / ABILITIES -->
-			<hk-card v-for="(action, index) in actions" :key="index">
+			<hk-card v-for="{name, category} in actions" :key="category">
 				<div slot="header" class="card-header d-flex justify-content-between">
-					{{ action.name }}
-					<a class="gray-hover text-capitalize" @click="add(action.category)">
+					{{ name }}
+					<a class="gray-hover text-capitalize" @click="add(category)">
 						<i class="fas fa-plus green"></i>
 						<span class="d-none d-md-inline ml-1">Add</span>
 						<q-tooltip anchor="top middle" self="center middle">
-							Add {{ action.name }}
+							Add {{ name }}
 						</q-tooltip>
 					</a>
 				</div>
 
 				<q-input 
-					v-if="action.category === 'legendary_actions'"
+					v-if="category === 'legendary_actions'"
 					dark filled square
 					label="Count"
 					v-model="npc.lengendary_count"
@@ -411,17 +411,17 @@
 
 				<q-list dark square :class="`accordion`">
 					<q-expansion-item
-						v-for="(ability, index) in npc[action.category]" 
-						:key="index"
+						v-for="(ability, ability_index) in npc[category]" 
+						:key="`ability-${ability_index}`"
 						dark switch-toggle-side
-						:group="action.name"
+						:group="name"
 					>
 						<template v-slot:header>
 							<q-item-section>
 								{{ ability.name }}
 							</q-item-section>
 							<q-item-section avatar>
-								<a @click="remove(index, action.category)" class="remove">
+								<a @click="remove(ability_index, category)" class="remove">
 									<i class="fas fa-trash-alt red" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove
@@ -443,6 +443,7 @@
 									v-model="ability.name" 
 								/>
 								<q-input 
+									v-if="category !== 'special_abilities'"
 									dark filled square
 									label="Recharge"
 									autocomplete="off" 
@@ -458,60 +459,12 @@
 									autocomplete="off" 
 									v-model="ability.desc" 
 									name="desc"
-									class="mb-3"
 									autogrow
 									:rules="[val => (!val || val.length < 1500) || 'Can\'t be over 1500 characters']"
 								/>
 
-								<template v-if="action.category !== 'special_abilities'">
-									<div class="row q-col-gutter-md">
-										<!-- ACTION TYPE -->
-										<div class="col">
-											<q-select 
-												dark filled square
-												map-options
-												emit-value
-												label="Action type"
-												:options="Object.values(attack_type)"
-												v-model="ability.type"
-												class="mb-2"
-											/>
-										</div>
-
-										<!-- SAVE -->
-										<template v-if="ability.type === 'save'">
-											<div class="col">
-												<q-select 
-													dark filled square
-													map-options
-													emit-value
-													label="Save ability"
-													:options="abilities"
-													v-model="ability.save_ability"
-												/>
-											</div>
-											<div class="col">
-												<q-input
-													dark filled square
-													type="number"
-													label="Save DC"
-													v-model="ability.save_dc"
-												/>
-											</div>
-										</template>
-
-										<template v-else-if="!['healing', 'other'].includes(ability.type)">
-											<div class="col">
-												<q-input
-													dark filled square
-													type="number"
-													label="Attack modifier"
-													v-model="ability.attack_bonus"
-												/>
-											</div>
-										</template>
-									</div>
-
+								<template v-if="category !== 'special_abilities'">
+									<label class="group mt-3">Range & area of effect</label>
 									<div class="row q-col-gutter-md">
 										<div class="col">
 											<q-input
@@ -544,72 +497,127 @@
 										</div>
 									</div>
 
-									<!-- ACTION ROLLS -->
-									<div class="hk-card mt-3 rolls" v-if="ability.type !== 'other'">
-										<div class="card-header d-flex justify-content-between">
-											<span><i class="fas fa-dice-d20"/> Rolls</span>
-											<a 
-												class="gray-light text-capitalize" 
-												@click="newRoll(index, action.category, ability.type)"
-											>
-												<i class="fas fa-plus green"></i>
-												<span class="d-none d-md-inline ml-1">Add</span>
-												<q-tooltip anchor="top middle" self="center middle">
-													Add roll
-												</q-tooltip>
-											</a>
+									<div v-for="(action, action_index) in ability.action_list" :key="`action-${action_index}`">
+										<label class="group mt-3">Type of action</label>
+										<div class="row q-col-gutter-md">
+											<!-- ACTION TYPE -->
+											<div class="col">
+												<q-select 
+													dark filled square
+													map-options
+													emit-value
+													label="Action type"
+													:options="Object.values(attack_type)"
+													v-model="action.type"
+													class="mb-2"
+												/>
+											</div>
+
+											<!-- SAVE -->
+											<template v-if="action.type === 'save'">
+												<div class="col">
+													<q-select 
+														dark filled square
+														map-options
+														emit-value
+														label="Save ability"
+														:options="abilities"
+														v-model="action.save_ability"
+													/>
+												</div>
+												<div class="col">
+													<q-input
+														dark filled square
+														type="number"
+														label="Save DC"
+														v-model="action.save_dc"
+													/>
+												</div>
+											</template>
+
+											<template v-else-if="!['healing', 'other'].includes(action.type)">
+												<div class="col">
+													<q-input
+														dark filled square
+														type="number"
+														label="Attack modifier"
+														v-model="action.attack_bonus"
+													/>
+												</div>
+											</template>
 										</div>
 
-										<!-- ROLLS TABLE -->
-										<hk-table 
-											v-if="ability.rolls"
-											:items="ability.rolls"
-											:columns="rollColumns"
-											:showHeader="false"
-										>
-											<template slot="roll" slot-scope="data">
-												{{ data.row.dice_count }}d{{ data.row.dice_type }}
-												<template v-if="data.row.fixed_val !== undefined">
-													{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
-												</template>
-											</template>
+										<template v-if="action.type !== 'other'">
+											
 
-											<span slot="type" slot-scope="data">
-												<span v-if="ability.type === 'healing'" class="healing">
-													<i class="fas fa-heart" /> Healing
-												</span>
-												<template v-else>
-													<span :class="data.row.damage_type">
-														<i :class="damage_type_icons[data.row.damage_type]" /> 
-														{{ data.row.damage_type.capitalize() }} 
-													</span> damage
-												</template>
-											</span>
+											<!-- ACTION ROLLS -->
+											<div class="hk-card mt-3 rolls">
+												<div class="card-header d-flex justify-content-between">
+													<span><i class="fas fa-dice-d20"/> Rolls</span>
+													<a 
+														class="gray-light text-capitalize" 
+														@click="newRoll(ability_index, category, action_index, action.type)"
+													>
+														<i class="fas fa-plus green"></i>
+														<span class="d-none d-md-inline ml-1">Add</span>
+														<q-tooltip anchor="top middle" self="center middle">
+															Add roll
+														</q-tooltip>
+													</a>
+												</div>
 
-											<template slot="fail" slot-scope="data" v-if="ability.type !== 'healing'">
-												{{ 
-													ability.type === "save" 
-													? `Save: ${application[data.row.save_fail_mod]}` 
-													: `Miss: ${application[data.row.miss_mod]}`
-												}}
-											</template>
+												<!-- ROLLS TABLE -->
+												<hk-table 
+													v-if="action.rolls"
+													:items="action.rolls"
+													:columns="rollColumns"
+													:showHeader="false"
+												>
+													<template slot="roll" slot-scope="data">
+														{{ data.row.dice_count }}d{{ data.row.dice_type }}
+														<template v-if="data.row.fixed_val !== undefined">
+															{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
+														</template>
+													</template>
 
-											<!-- ACTIONS -->
-											<div slot="actions" slot-scope="data" class="actions">
-												<a class="ml-2" @click="editRoll(index, action.category, ability.type, data.index, data.row)">
-													<i class="fas fa-pencil-alt"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Edit
-													</q-tooltip>
-												</a>
-												<a class="ml-2" @click="deleteRoll(index, action.category, data.index)">
-													<i class="fas fa-trash-alt"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Delete
-													</q-tooltip>
-												</a>
+													<span slot="type" slot-scope="data">
+														<span v-if="action.type === 'healing'" class="healing">
+															<i class="fas fa-heart" /> Healing
+														</span>
+														<template v-else>
+															<span :class="data.row.damage_type">
+																<i :class="damage_type_icons[data.row.damage_type]" /> 
+																{{ data.row.damage_type.capitalize() }} 
+															</span> damage
+														</template>
+													</span>
+
+													<template slot="fail" slot-scope="data" v-if="action.type !== 'healing'">
+														{{ 
+															action.type === "save" 
+															? `Save: ${application[data.row.save_fail_mod]}` 
+															: `Miss: ${application[data.row.miss_mod]}`
+														}}
+													</template>
+
+													<!-- ACTIONS -->
+													<div slot="actions" slot-scope="data" class="actions">
+														<a class="ml-2" @click="editRoll(ability_index, category, action_index, action.type, data.index, data.row)">
+															<i class="fas fa-pencil-alt"></i>
+															<q-tooltip anchor="top middle" self="center middle">
+																Edit
+															</q-tooltip>
+														</a>
+														<a class="ml-2" @click="deleteRoll(ability_index, category, action_index, data.index)">
+															<i class="fas fa-trash-alt"></i>
+															<q-tooltip anchor="top middle" self="center middle">
+																Delete
+															</q-tooltip>
+														</a>
+													</div>
+												</hk-table>
 											</div>
-										</hk-table>
+										</template>
 									</div>
 								</template>
 							</div>
@@ -625,7 +633,7 @@
 					<hk-card :header="(edit_roll_index !== undefined) ? 'Edit roll' : 'New roll'" class="mb-0">
 
 						<p>
-							{{ npc[edit_action.category][edit_action.index].desc }}
+							{{ npc[edit_action.category][edit_action.ability_index].desc }}
 						</p>
 						<ActionModifier 
 							v-if="roll && edit_action.type"
@@ -858,14 +866,17 @@
 			/**
 			 * Add a new roll object to an action or legendary action
 			 * 
-			 * @param {Integer} index index of the action
-			 * @param {string} type type of the action
+			 * @param {Integer} ability_index index of the ability
+			 * @param {string} category actions / legendary_actions
+			 * @param {Integer} action_index index of the action
+			 * @param {string} type type of the action 'melee_weapon' etc.
 			 */
-			newRoll(index, category, type) {
+			newRoll(ability_index, category, action_index, type) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
-					index,
 					category,
+					ability_index,
+					action_index,
 					type
 				}
 				this.edit_roll_index = undefined; // It's new, so no edit index
@@ -876,16 +887,19 @@
 			/**
 			 * Edit a roll object of an action or legendary action
 			 * 
-			 * @param {integer} index index of the action
-			 * @param {index} roll_index of the roll
+			 * @param {integer} ability_index index of the ability
 			 * @param {string} category actions / legendary_actions
+			 * @param {integer} action_index index of the action
+			 * @param {string} type type of the action 'melee_weapon' etc.
+			 * @param {index} roll_index of the roll
 			 * @param {object} roll the object to edit
 			 */
-			editRoll(index, category, type, roll_index, roll) {
+			editRoll(ability_index, category, action_index, type, roll_index, roll) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
-					index,
 					category,
+					ability_index,
+					action_index,
 					type
 				}
 				this.edit_roll_index = roll_index;
@@ -899,7 +913,8 @@
 				this.roll = undefined;
 			},
 			saveRoll() {
-				let action = this.npc[this.edit_action.category][this.edit_action.index];
+				const ability = this.npc[this.edit_action.category][this.edit_action.ability_index];
+				let action = ability.action_list[this.edit_action.action_index];
 
 				if(this.edit_roll_index === undefined) {
 					action.rolls = (!action.rolls) ? [] : action.rolls;
@@ -909,8 +924,8 @@
 				}
 				this.action_dialog = false;
 			},
-			deleteRoll(index, category, roll_index) {
-				this.$delete(this.npc[category][index].rolls, roll_index);
+			deleteRoll(ability_index, category, action_index, roll_index) {
+				this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
 			}
 		}
 	}
@@ -924,6 +939,13 @@
 		overflow-x: hidden;
 		overflow-y: auto;
 
+		label.group {
+			display: block;
+			line-height: 30px;
+			margin-bottom: 10px;
+			border-bottom: solid 1px #5c5757;
+			width: 100%;
+		}
 		.avatar {
 			display: grid;
 			grid-template-columns: 56px 1fr;

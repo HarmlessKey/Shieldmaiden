@@ -12,13 +12,10 @@
 			:rules="[val => !!val || 'Select a damage type']"
 			hint="Select the damage type"
 		>
-			<template v-slot:selected>
-				<span v-if="roll.damage_type" dense>
+			<template v-slot:selected v-if="roll.damage_type">
+				<span>
 					<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
 					{{ roll.damage_type.capitalize() }}
-				</span>
-				<span v-else>
-					Damage type
 				</span>
 			</template>
 			<template v-slot:option="scope">
@@ -27,7 +24,7 @@
 					v-ripple
 					v-close-popup
 					:active="roll.damage_type === scope.opt"
-					@click="roll.damage_type = scope.opt"
+					@click="$set(roll, 'damage_type', scope.opt)"
 				>
 					<q-item-section avatar>
 						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>

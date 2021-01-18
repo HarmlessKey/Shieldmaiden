@@ -244,10 +244,18 @@ export default {
 			for(const action_type of ["actions", "legendary_actions"]) {
 				if(this.old_monster[action_type]) {
 					for(const ability of this.old_monster[action_type]) {
+						// Store a list of actions in the list
+						// We will use only 1 action now, for damage or healing
+						// But later we might want to add conditions and reminder
+						// These might be applied in a different way, so with a different action
 						const newAbility = {
 							name: ability.name,
 							desc: ability.desc,
-							type: "other"
+							action_list: [
+								{
+									type: "other",
+								}
+							]
 						};
 						let fail_miss = "";
 
@@ -259,25 +267,25 @@ export default {
 
 							// Check if it's a targeted action or saving throw
 							if(ability.attack_bonus && ability.attack_bonus !== 0) {
-								if(ability.desc.toLowerCase().match(/(melee weapon)/g)) newAbility.type = "melee_weapon";
-								else if(ability.desc.toLowerCase().match(/(ranged weapon)/g)) newAbility.type = "ranged_weapon";
-								else newAbility.type = "damage";
+								if(ability.desc.toLowerCase().match(/(melee weapon)/g)) newAbility.action_list[0].type = "melee_weapon";
+								else if(ability.desc.toLowerCase().match(/(ranged weapon)/g)) newAbility.action_list[0].type = "ranged_weapon";
+								else newAbility.action_list[0].type = "damage";
 
-								newAbility.attack_bonus = ability.attack_bonus;
+								newAbility.action_list[0].attack_bonus = ability.attack_bonus;
 								fail_miss = "miss_mod";
 							} else {
-								newAbility.type = "save";
+								newAbility.action_list[0].type = "save";
 								fail_miss = "save_fail_mod";
 
 								const save_dc = ability.desc.match(/(DC).([0-9]+)/g);
 								if(save_dc) {
-									newAbility.save_dc = save_dc[0].split(" ")[1];
+									newAbility.action_list[0].save_dc = save_dc[0].split(" ")[1];
 								}
 
 								// Find the ability
 								for(const ab of this.abilities) {
 									if(ability.desc.toLowerCase().search(ab) > -1) {
-										newAbility.save_ability = ab;
+										newAbility.action_list[0].save_ability = ab;
 									}
 								}
 							}
@@ -296,7 +304,7 @@ export default {
 								}
 							}
 
-							newAbility.rolls = [];
+							newAbility.action_list[0].rolls = [];
 							if(ability.damage_dice) {
 								ability.damage_dice.split("+").forEach((damage, index) => {
 									const input = damage.split("d");
@@ -309,13 +317,13 @@ export default {
 									};
 									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
 
-									newAbility.rolls.push(newRoll);
+									newAbility.action_list[0].rolls.push(newRoll);
 								})
 
 								// Check if there is a damage bonus
 								// Add it only once (to the first roll by default, this might be wrong in some cases)
-								if(ability.damage_bonus && newAbility.rolls.length > 0) {
-									newAbility.rolls[0].fixed_val = ability.damage_bonus;
+								if(ability.damage_bonus && newAbility.action_list[0].rolls.length > 0) {
+									newAbility.action_list[0].rolls[0].fixed_val = ability.damage_bonus;
 								}
 							}
 						}

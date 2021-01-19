@@ -54,7 +54,7 @@
 									:value="copy"
 									autocomplete="off"
 									type="text"
-									hint="With this link your players can track the initiative list of you active encounter"
+									hint="With this link your players can track the initiative list of your active encounter"
 								>
 									<span slot="prepend" class="blue pointer" @click="setSlide({show: true, type: 'PlayerLink'})">
 										<q-icon  size="xs"  name="fas fa-qrcode" />

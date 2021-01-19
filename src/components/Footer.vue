@@ -4,7 +4,7 @@
 			<div class="content">
 				<div class="row q-col-gutter-md">
 					<div class="col-12 col-md-3 logo-container">
-						<img class="logo" src="../assets/_img/logo/logo-cyan.svg" />
+						<img class="logo" src="../assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 					</div>
 
 					<div class="col-12 col-md-9 links">
@@ -69,13 +69,13 @@
 		<div class="bottom">
 			<div class="content">
 				<small class="d-flex justify-content-between mb-3">
-					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" href="https://game-icons.net">https://game-icons.net</a>.</span>
+					<span>Icons made by Delapouite, Lorc and Skoll. Available on <a target="_blank" rel="noopener" href="https://game-icons.net">https://game-icons.net</a>.</span>
 					<router-link to="/privacy-policy">Privacy Policy</router-link>
 				</small>
 				<small>
 					©{{ year }} Harmless Key | All Rights Reserved<br/>
 					Dungeons & Dragons, D&D, their respective logos, and all Wizards titles and characters are property of Wizards of the Coast LLC in the U.S.A. and other countries. ©{{ year }} Wizards.<br/>
-					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a>
+					All content is provided under terms of the <a href="./SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
 				</small>
 			</div>
 		</div>

@@ -22,9 +22,10 @@
 							</q-tooltip>
 						</span>
 					</div>
-					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
+					<video 
+						ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
 						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
-					></video>
+					/>
 				</div>
 				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">

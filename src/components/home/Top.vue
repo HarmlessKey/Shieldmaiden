@@ -26,7 +26,7 @@
 						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
 					></video>
 				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!userInfo">

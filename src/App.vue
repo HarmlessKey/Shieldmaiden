@@ -62,7 +62,7 @@
 				},
 				{ name: "twitter:card", content: "summary" },
 				{ name: "twitter:title", content: "Combat Tracker D&D | Harmless Key" },
-				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full"  },
+				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
 				{
 					name: "twitter:description",
 					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
@@ -77,6 +77,7 @@
 					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
 				{	property: "og:url", content: `https://harmlesskey.com/${this.$route.path}` },
+				{	property: "og:url", content: `https://harmlesskey.com/harmless_key_logo_full.png` },
 				{	property: "og:image:type", content: "image/png" },
 				{	property: "og:image:alt", content: "Harmless Key Logo" },
 			]

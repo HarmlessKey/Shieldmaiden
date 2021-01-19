@@ -22,7 +22,7 @@
     "vue-analytics": "^5.22.1",
     "vue-cookies": "^1.5.7",
     "vue-markdown": "^2.2.4",
-    "vue-meta": "^1.5.8",
+    "vue-meta": "^2.4.0",
     "vue-numeral-filter": "^1.1.1",
     "vue-qr": "^1.5.3",
     "vue-router": "^3.0.1",

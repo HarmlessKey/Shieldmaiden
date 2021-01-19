@@ -10,7 +10,7 @@
 
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-6">
-					<img class="image" src="@/assets/_img/home/track-encounter.gif"/>
+					<img class="image" src="@/assets/_img/home/track-encounter.gif" alt="Share initiative Harmless Key" />
 				</div>
 				<div class="col-12 col-md-6">
 					<h3>Shows everything you need</h3>

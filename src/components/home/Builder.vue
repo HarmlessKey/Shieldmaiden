@@ -8,7 +8,7 @@
 				</span>
 			</div>
 
-			<img class="image" src="@/assets/_img/home/encounter-builder.gif"/>
+			<img class="image" src="@/assets/_img/home/encounter-builder.gif" alt="Harmless Key encounter builder preview"/>
 
 			<div class="text-center">
 				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>

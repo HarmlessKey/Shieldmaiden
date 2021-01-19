@@ -1,7 +1,7 @@
 {
   "name": "Combat Tracker D&D | Harmless Key",
   "short_name": "Harmless Key",
-  "start_url": "index.html",
+  "start_url": ".",
   "description": "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
   "orientation": "portrait",
   "icons": [
@@ -18,7 +18,7 @@
       "purpose": "maskable any"
     }
   ],
-  "theme_color": "#2c97de",
+  "theme_color": "#000",
   "background_color": "#191919",
   "display": "standalone"
 }

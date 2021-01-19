@@ -4,7 +4,7 @@
 			<h1>Updates</h1>
 			<p>Check the latest updates on our Discord.</p>
 
-			<a href="https://discord.gg/gCXJZCs" target="_blank" class="large-link">
+			<a href="https://discord.gg/gCXJZCs" target="_blank" rel="noopener" class="large-link">
 				<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 				<div class="text">Harmless Key Discord</div>
 			</a>

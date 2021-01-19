@@ -35,7 +35,7 @@
 					</li>
 				</ul>
 				<div slot="footer" v-if="t.price != 'Free'">
-					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" class="btn btn-block bg-patreon-red">Join {{ t.price }} tier</a>
+					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" rel="noopener" class="btn btn-block bg-patreon-red">Join {{ t.price }} tier</a>
 				</div>
 			</hk-card>
 		</hk-card-deck>

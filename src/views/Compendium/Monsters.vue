@@ -7,7 +7,7 @@
 			<p>
 				If you can't find a monster, 
 				it is because we are only allowed to store 
-				monsters from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
+				monsters from the <a href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD</a>.
 			</p>
 
 			<hk-table

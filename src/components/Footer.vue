@@ -42,25 +42,24 @@
 							<h2 class="gray-light">Follow us</h2>
 							<ul>
 								<li>
-									<a href="https://www.patreon.com/harmlesskey" target="_blank">Patreon</a>
+									<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a>
 								</li>
 								<li>
-									<a href="https://discord.gg/fhmKBM7" target="_blank">Discord</a>
+									<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a>
 								</li>
 								<li>
-									<a href="https://www.instagram.com/harmlesskey" target="_blank">Instagram</a>
+									<a href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener">Instagram</a>
 								</li>
 								<li>
-									<a href="https://twitter.com/KeyHarmless" target="_blank">Twitter</a>
+									<a href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">Twitter</a>
 								</li>
 								<li>
-									<a href="https://www.facebook.com/harmlesskey" target="_blank">Facebook</a>
+									<a href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener">Facebook</a>
 								</li>
 								<li>
-									<a href="https://www.reddit.com/r/HarmlessKey" target="_blank">Reddit</a>
+									<a href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener">Reddit</a>
 								</li>
 							</ul>
-							<!-- <a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-patreon-red mb-4"><i class="fab fa-patreon black"></i> Support us</a> -->
 						</div>
 					</div>
 				</div>

@@ -72,10 +72,10 @@
 								<h3>Payment Declined</h3>
 								<p>
 									Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
-									Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
+									Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
 								</p>
 							</div>
-							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank">Cancel subscription</a></small>
+							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank" rel="noopener">Cancel subscription</a></small>
 							<hr>
 						</div>
 

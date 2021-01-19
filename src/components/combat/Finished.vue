@@ -22,7 +22,7 @@
 			</div>
 
 			<q-slide-transition v-if="!tier || tier.name === 'Free'">
-				<a href="https://www.patreon.com/join/harmlesskey" target="_blank"  class="patreon bg-patreon-red" v-show="patreon">
+				<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener"  class="patreon bg-patreon-red" v-show="patreon">
 					Enjoying Harmless Key? <b>Please support us on <q-icon name="fab fa-patreon black" /> Patreon.</b>
 					<a class="close red" @click.prevent="patreon = false">
 						<q-icon name="fas fa-times" size="small" />

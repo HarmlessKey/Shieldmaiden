@@ -127,7 +127,7 @@
 				<hr>
 				<h3>Follow us</h3>
 				<q-list @click="setSideSmallScreen(false)">
-					<q-item clickable v-ripple link tag="a" href="https://www.patreon.com/harmlesskey" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-patreon patreon-red"></i>
 						</q-item-section>
@@ -136,7 +136,7 @@
 							Patreon
 						</q-tooltip>
 					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://discord.gg/fhmKBM7" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-discord"></i>
 						</q-item-section>
@@ -145,7 +145,7 @@
 							Discord
 						</q-tooltip>
 					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.instagram.com/harmlesskey" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://www.instagram.com/harmlesskey" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-instagram"></i>
 						</q-item-section>
@@ -154,7 +154,7 @@
 							Instagram
 						</q-tooltip>
 					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://twitter.com/KeyHarmless" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://twitter.com/KeyHarmless" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-twitter-square"></i>
 						</q-item-section>
@@ -163,7 +163,7 @@
 							Twitter
 						</q-tooltip>
 					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.facebook.com/harmlesskey" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://www.facebook.com/harmlesskey" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-facebook"></i>
 						</q-item-section>
@@ -172,7 +172,7 @@
 							Facebook
 						</q-tooltip>
 					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.reddit.com/r/HarmlessKey" target="_blank">
+					<q-item clickable v-ripple link tag="a" href="https://www.reddit.com/r/HarmlessKey" target="_blank" rel="noopener">
 						<q-item-section avatar>
 							<i class="fab fa-reddit-alien"></i>
 						</q-item-section>

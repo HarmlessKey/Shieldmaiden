@@ -16,7 +16,7 @@
 			</div>
 			<div class="d-flex justify-content-end">
 				<div class="area d-flex justify-content-end">
-					<a href="https://discord.gg/fhmKBM7" target="_blank" class="icon">
+					<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener" class="icon">
 						<i class="fab fa-discord"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Discord

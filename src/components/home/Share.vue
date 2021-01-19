@@ -10,7 +10,10 @@
 
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-6">
-					<img class="image" src="@/assets/_img/home/track-encounter.gif" alt="Share initiative Harmless Key" />
+					<video 
+						class="video" src="@/assets/_img/home/track-encounter.mp4" 
+						muted autoplay playsinline alt="Share initative screen Harmless Key D&D Combat Tracker" loop
+					/>
 				</div>
 				<div class="col-12 col-md-6">
 					<h3>Shows everything you need</h3>
@@ -50,7 +53,7 @@
 		min-height: calc(100vh - 50px - 55px);
 		background-color: #111111;
 
-		.image {
+		.video {
 			width: 100%;
 			margin-bottom: 30px;
 		}

@@ -155,6 +155,7 @@
 			...mapGetters([
 				'campaignId',
 				'encounterId',
+				'encounter',
 				'entities',
 				'path',
 			]),
@@ -203,6 +204,16 @@
 					db.ref(`broadcast/${this.userId}/live`).set(this.$route.params.campid)
 				}
 			},
+		},
+		mounted() {
+			if (this.encounter.audio !== undefined) {
+				this.$snotify.success('Audio link found', 'Follow it?', {
+					buttons: [
+						{ text: 'Yes', action: (toast) => { window.open(this.encounter.audio, '_blank'); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			}
 		}
 	}
 </script>

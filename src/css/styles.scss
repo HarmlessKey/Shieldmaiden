@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 /*
 	Table of content
@@ -75,6 +76,7 @@ html body {
 	color: $gray-light;
 	font-size: 15px;
 	font-family: 'Raleway', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 	position: relative;
 	
 	.view {

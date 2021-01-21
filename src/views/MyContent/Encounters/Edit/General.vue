@@ -139,6 +139,9 @@
 				'encounter',
 			]),
 			audio_link_type() {
+				// This link type identification will fail sometimes
+				// Example: https://geo.music.apple.com/us/album/spotify/1528894349?i=1528894351&itsct=music_box&itscg=30200&ct=songs_spotify&app=music&ls=1
+				// Check for keyword in url root not in whole string
 				if (this.encounter.audio !== undefined) {
 					if (this.encounter.audio.includes("spotify"))
 						return "spotify"

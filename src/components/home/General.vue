@@ -8,7 +8,7 @@
 				</span>
 			</div>
 
-			<div class="row q-col-gutter-md">
+			<div class="row q-col-gutter-xl">
 				<div class="col-12 col-md-6">
 					<video 
 						class="video" src="@/assets/_img/home/multitargeting.mp4" 

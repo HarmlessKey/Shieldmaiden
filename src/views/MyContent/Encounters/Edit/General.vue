@@ -13,28 +13,14 @@
 			v-model="encounter.encounter"/>
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-		<!-- <div class="audio">
-			<div class="img">
-				<q-icon name="fas fa-image"/>
-			</div>
-			<q-input
-				dark filled square
-				autocomplete="off"
-				v-validate="'url'" type="text"
-				name="audio"
-				data-vv-as="Audio"
-				v-model="encounter.audio"
-				placeholder="Audio URL" />
-			<p class="validate red" v-if="errors.has('audio')">{{ errors.first('audio') }}</p>
-		</div> -->
-
-		<div class="audio mb-3">
+		<div class="audio">
 			<div 
-				v-if="encounter.audio" 
+				v-if="encounter.audio && !errors.has('audio')" 
 				class="img pointer" >
 				<a :href="encounter.audio" target="_blank" rel="noopener">
 					<q-icon v-if="audio_link_type == 'spotify'" class="fab fa-spotify"></q-icon>
 					<q-icon v-else-if="audio_link_type == 'youtube'" class="fab fa-youtube"></q-icon>
+					<q-icon v-else-if="audio_link_type == 'apple'" class="fab fa-itunes"></q-icon>
 					<q-icon v-else class="fas fa-play"></q-icon>
 				</a>
 			</div>
@@ -58,7 +44,7 @@
 
 		<div class="background mb-3">
 			<div 
-				v-if="encounter.background" 
+				v-if="encounter.background && !errors.has('background')" 
 				class="img pointer" 
 				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
 				@click="image = true"
@@ -158,6 +144,8 @@
 						return "spotify"
 					else if (this.encounter.audio.includes("youtube"))
 						return "youtube"
+					else if (this.encounter.audio.includes("apple"))
+						return "apple"
 				}
 				return undefined
 			}

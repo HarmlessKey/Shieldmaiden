@@ -13,6 +13,49 @@
 			v-model="encounter.encounter"/>
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
+		<!-- <div class="audio">
+			<div class="img">
+				<q-icon name="fas fa-image"/>
+			</div>
+			<q-input
+				dark filled square
+				autocomplete="off"
+				v-validate="'url'" type="text"
+				name="audio"
+				data-vv-as="Audio"
+				v-model="encounter.audio"
+				placeholder="Audio URL" />
+			<p class="validate red" v-if="errors.has('audio')">{{ errors.first('audio') }}</p>
+		</div> -->
+
+		<div class="audio mb-3">
+			<div 
+				v-if="encounter.audio" 
+				class="img pointer" >
+				<a :href="encounter.audio" target="_blank" rel="noopener">
+					<q-icon v-if="audio_link_type == 'spotify'" class="fab fa-spotify"></q-icon>
+					<q-icon v-else-if="audio_link_type == 'youtube'" class="fab fa-youtube"></q-icon>
+					<q-icon v-else class="fas fa-play"></q-icon>
+				</a>
+			</div>
+			<div class="img" v-else>
+				<q-icon name="fas fa-music"/>
+			</div>
+			<div>
+				<q-input 
+					dark filled square
+					label="Audio"
+					autocomplete="off" 
+					v-validate="'url'" type="text"
+					data-vv-as="Audio"
+					name="audio" 
+					v-model="encounter.audio" 
+					class="mb-2"
+					placeholder="Audio URL"/>
+				<p class="validate red" v-if="errors.has('audio')">{{ errors.first('audio') }}</p>
+			</div>
+		</div>
+
 		<div class="background mb-3">
 			<div 
 				v-if="encounter.background" 
@@ -108,7 +151,16 @@
 		computed: {
 			...mapGetters([
 				'encounter',
-			])
+			]),
+			audio_link_type() {
+				if (this.encounter.audio !== undefined) {
+					if (this.encounter.audio.includes("spotify"))
+						return "spotify"
+					else if (this.encounter.audio.includes("youtube"))
+						return "youtube"
+				}
+				return undefined
+			}
 		},
 		mounted() {
 			this.fetchEncounter({
@@ -124,7 +176,7 @@
 			...mapActions([
 				'fetchEncounter'
 			]),
-      edit() {
+			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
@@ -159,7 +211,7 @@
 </script>
 
 <style lang="scss" scoped>
-.background {
+.background, .audio {
 	display: grid;
 	grid-template-columns: 56px 1fr;
 	grid-column-gap: 10px;

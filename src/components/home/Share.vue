@@ -9,13 +9,15 @@
 			</div>
 
 			<div class="row q-col-gutter-xl">
-				<div class="col-12 col-md-6 video-wrapper">
-					<div class="video">
-						<video 
-							src="@/assets/_img/home/track-encounter.mp4" 
-							muted autoplay playsinline alt="Share initative screen Harmless Key D&D Combat Tracker" loop
-						/>
-						<div class="info">An example of how your players can follow your encounters.</div>
+				<div class="col-12 col-md-6">
+					<div class="video-wrapper">
+						<div class="video">
+							<video 
+								src="@/assets/_img/home/track-encounter.mp4" 
+								muted autoplay playsinline alt="Share initative screen Harmless Key D&D Combat Tracker" loop
+							/>
+							<div class="info">An example of how your players can follow your encounters.</div>
+						</div>
 					</div>
 				</div>
 				<div class="col-12 col-md-6">
@@ -76,11 +78,22 @@
 				.info {
 					text-align: center;
 					font-style: italic;
-					padding: 10px 50px;
+					padding: 10px 50px 20px 50px;
 					position: absolute;
 					bottom: 0;
 					opacity: .5;
-					line-height: 25px;
+					font-size: 12px;
+					line-height: 20px;
+				}
+			}
+
+		}
+		@media only screen and (max-width: 567px) { 
+			.video-wrapper {
+				padding: 0 50px !important;
+
+				.info {
+					padding: 10px 20px 20px 20px !important;
 				}
 			}
 		}

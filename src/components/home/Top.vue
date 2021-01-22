@@ -63,9 +63,14 @@
 											Show QR-code
 										</q-tooltip>
 									</span>
-									<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
+									<q-icon v-if="!share_available" slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
 										<q-tooltip anchor="top middle" self="center middle">
 											Click to copy
+										</q-tooltip>
+									</q-icon>
+									<q-icon v-else slot="append" size="xs" class="blue pointer" @click="share()" name="fas fa-share-alt">
+										<q-tooltip anchor="top middle" self="center middle">
+											Click to share
 										</q-tooltip>
 									</q-icon>
 								</q-input>
@@ -79,7 +84,6 @@
 						
 						<!-- PATREON -->
 						<div>
-							<!-- <pre>{{ tier }}</pre> -->
 							<template v-if="tier && userInfo && userInfo.patron">
 									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
 							</template>
@@ -139,7 +143,10 @@
 			]),
 			copy() {
 				return (this.$store.getters.user) ? window.origin + '/user/' + this.$store.getters.user.uid : undefined;
-			}
+			},
+			share_available() {
+				return navigator.share !== undefined;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -171,6 +178,16 @@
 				toCopy.setAttribute('type', 'hidden')
 				window.getSelection().removeAllRanges()
 			},
+			share() {
+				if (navigator.share) {
+					navigator.share({
+						title: 'Harmless Key',
+						text: 'Share your encounters with your players!',
+						url: this.copy,
+					})
+					.catch((error) => console.log('Error sharing', error));
+				}
+			}
 		},
 		mounted() {
 			const navigator = window.navigator;

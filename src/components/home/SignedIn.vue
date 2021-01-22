@@ -4,6 +4,35 @@
 			<router-link to="/home">
 				<img class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" alt="Harmless Key logo" />
 			</router-link>
+			
+			<router-link 
+				v-if="active_campaign"
+				:to="`/encounters/${active_campaign.key}`" 
+				class="mb-5"
+			>
+				<hk-card 
+					:style="[
+						active_campaign.background
+						? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
+						: { backgroundImage: `url(${require('@/assets/_img/campaign-background.jpg')})` }
+					]"
+				>
+					<div slot="header" class="card-header truncate">
+						{{ active_campaign.campaign }}
+					</div>
+					<div class="card-body" slot="default">
+						Continue campaign
+					</div>
+					<div slot="footer" class="card-footer">
+						<small class="date">
+							<span class="gray-light">Started:</span> {{ makeDate(active_campaign.timestamp, true) }}
+						</small>
+					</div>
+				</hk-card>
+			</router-link>
+			<router-link v-else to="/campaigns" class="first">
+				<h2>Create a campaign</h2>
+			</router-link>
 
 			<div class="row q-col-gutter-lg">
 				<div class="col-12 col-md-6">
@@ -63,9 +92,11 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
+	import { general } from '@/mixins/general.js';
 
 	export default {
 		name: 'SignedIn',
+		mixins: [general],
 		data() {
 			return {
 				play_animation: true,
@@ -118,9 +149,24 @@
 				'tier',
 				'voucher',
 				'userInfo',
+				'campaigns'
 			]),
-			copy() {
-				return (this.$store.getters.user) ? window.origin + '/user/' + this.$store.getters.user.uid : undefined;
+			active_campaign() {
+				if(this.campaigns && this.userInfo) {
+					if(this.userInfo && this.userInfo.active_campaign) {
+						let campaign = this.campaigns[this.userInfo.active_campaign];
+						campaign.key = this.userInfo.active_campaign;
+						return campaign;
+					} else {
+						const campaignKey = Object.keys(this.campaigns)[0];
+						let campaign = this.campaigns[campaignKey];
+						campaign.key = campaignKey;
+						return campaign;
+					}
+				}
+				else {
+					return undefined;
+				}
 			}
 		},
 		methods: {
@@ -137,12 +183,61 @@
 		color: #fff;
 		background-position: top center;
 		background-color: #000;
-		overflow: hidden;
+		overflow: auto;
 		height: calc(100vh - 50px);
-		padding-bottom: 78px;
+		padding-bottom: 98px;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 
 		.container {
 			padding-top: 30px;
+
+			.hk-card {
+				background-position: top center;
+				background-size: cover;
+				box-shadow: 5px 5px 10px rgba(0, 0, 0, .5);
+				color: #fff;
+				cursor: pointer;
+
+				.card-header {
+					background-color: rgba(0, 0, 0, .5);
+					text-align: center;
+					text-transform: uppercase;
+				}
+				.card-body {
+					padding: 0;
+					text-align: center;
+					font-family: 'Fredericka the Great', cursive;
+					font-size: 40px;
+					text-transform: uppercase;
+					text-shadow: 3px 3px 3px rgba(0, 0, 0, 1);
+				}
+				.card-footer {
+					padding: 0;
+
+					.date {
+						display: block;
+						padding: 5px;
+						width: 100%;
+						text-align: center;
+						background-color: rgba(0, 0, 0, .5);
+					}
+				}
+
+				&:hover {
+					color: #fff;
+				}
+			}
+
+			.first {
+				h2 {
+					color: #fff;
+					font-size: 30px !important;
+					text-align: center;
+				}
+			}
 
 			.q-item {
 				background-color: #232323;
@@ -173,6 +268,13 @@
 				left: 0;
 				width: 100%;
 				padding: 20px 20px 20px 20px;
+			}
+			@media only screen and (max-width: 576px) {
+				.hk-card {
+					.card-body {
+						font-size: 25px;
+					}
+				}
 			}
 		}
 	}

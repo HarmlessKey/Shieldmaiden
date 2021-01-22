@@ -93,6 +93,8 @@
 	import _ from 'lodash';
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
+
+	import { audio } from '@/mixins/audio';
 	
 	import Finished from '@/components/combat/Finished.vue';
 	import DemoFinished from '@/components/combat/DemoFinished.vue';
@@ -128,18 +130,13 @@
 			OverEncumbered,
 			DemoOverlay
 		},
+		mixins: [ audio ],
 		data() {
 			return {
 				userId:  this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				width: 0,
-				audio_icons: {
-					spotify: "fab fa-spotify",
-					youtube: "fab fa-youtube",
-					apple: "fab fa-apple",
-					none: "fas fa-music-alt",
-				},
 			}
 		},
 		firebase() {
@@ -177,9 +174,9 @@
 					position: "top",
 					progress: true,
 					timeout: 7500,
-					icon: this.audio_icons[this.audio_link_type],
+					icon: this.audio_icons[this.audio_link_type].icon,
 					actions: [
-						{ label: 'Yes', color: 'white', handler: () => { window.open(this.encounter.audio, '_blank'); } },
+						{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
 						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
 					]
 				})
@@ -248,20 +245,6 @@
 				if(this.encounter) {
 					return this.encounter.requests;
 				}
-			},
-			audio_link_type() {
-				// This link type identification will fail sometimes
-				// Example: https://geo.music.apple.com/us/album/spotify/1528894349?i=1528894351&itsct=music_box&itscg=30200&ct=songs_spotify&app=music&ls=1
-				// Check for keyword in url root not in whole string
-				if (this.encounter.audio !== undefined) {
-					if (this.encounter.audio.includes("spotify"))
-						return "spotify";
-					else if (this.encounter.audio.includes("youtube"))
-						return "youtube";
-					else if (this.encounter.audio.includes("apple"))
-						return "apple";
-				}
-				return "none"
 			},
 		},
 		watch: {

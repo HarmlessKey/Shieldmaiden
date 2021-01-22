@@ -30,7 +30,7 @@
 				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">
 					<div class="text">
-						<template v-if="!userInfo">
+						<template v-if="!$store.getters.user">
 							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
@@ -74,7 +74,7 @@
 						</div>
 
 						<div class="button-container">
-							<router-link v-if="!userInfo" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link v-if="!$store.getters.user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
 						</div>
 						
 						<!-- PATREON -->
@@ -111,7 +111,6 @@
 				play_animation: true,
 				muted: true,
 				video_hover: false,
-				copy: window.origin + '/user/' + this.$store.getters.user.uid,
 				tabs: [
 					{
 						name: "campaigns",
@@ -138,6 +137,9 @@
 				'voucher',
 				'userInfo',
 			]),
+			copy() {
+				return (this.$store.getters.user) ? window.origin + '/user/' + this.$store.getters.user.uid : undefined;
+			}
 		},
 		methods: {
 			...mapActions([

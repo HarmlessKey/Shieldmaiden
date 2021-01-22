@@ -4,21 +4,25 @@
   "start_url": ".",
   "description": "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
   "orientation": "portrait",
+  "theme_color": "#000",
+  "background_color": "#c5eaf4",
+  "display": "standalone",
+  "categories": [
+    "games",
+    "entertainment"
+  ],
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/img/icons/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/img/icons/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     }
-  ],
-  "theme_color": "#000",
-  "background_color": "#c5eaf4",
-  "display": "standalone"
+  ]
 }

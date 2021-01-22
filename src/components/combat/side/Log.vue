@@ -53,7 +53,7 @@
 		mixins: [setHP],
 		data() {
 			return {
-				user: this.$store.getters.user,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				storageLog: JSON.parse(localStorage.getItem(this.$route.params.encid)),
 				environment: {
 					key: 'environment',
@@ -63,7 +63,7 @@
 		firebase() {
 			return {
 				showKeybinds: {
-					source: db.ref(`settings/${this.user.uid}/general`),
+					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
 				}
 			}

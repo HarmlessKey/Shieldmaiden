@@ -20,6 +20,10 @@
 									{{ broadcasting['.value'] !== $route.params.campid ? "Go live" : "Cancel broadcast" }}
 								</q-item-section>
 							</q-item>
+							<q-item v-if="encounter.audio" clickable v-close-popup  @click="open_audio_link(encounter.audio)">
+								<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
+								<q-item-section>Audio Link</q-item-section>
+							</q-item>
 							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
 								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
 								<q-item-section>Settings</q-item-section>
@@ -141,15 +145,16 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { remindersMixin } from '@/mixins/reminders';
+	import { audio } from '@/mixins/audio';
 
 	export default {
 		name: 'Turns',
-		mixins: [remindersMixin],
+		mixins: [remindersMixin, audio],
 		props: ['active_len', 'current', 'next'],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			}
 		},
 		firebase() {

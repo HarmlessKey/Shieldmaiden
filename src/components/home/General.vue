@@ -8,14 +8,14 @@
 				</span>
 			</div>
 
-			<div class="row q-col-gutter-md">
-				<div class="col-12 col-md-6">
+			<div class="row q-col-gutter-xl">
+				<div class="col-12 col-md-8">
 					<video 
 						class="video" src="@/assets/_img/home/multitargeting.mp4" 
 						muted autoplay playsinline alt="Initiative tracker Harmless Key multitargeting demo" loop
 					/>
 				</div>
-				<div class="col-12 col-md-6">
+				<div class="col-12 col-md-4">
 					<h3>We track everything in combat</h3>
 					
 					<ul>

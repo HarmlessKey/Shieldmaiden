@@ -72,6 +72,15 @@ export const routes = [{
 	}
 },
 {
+	path: '/home',
+	name: 'landingpage',
+	component: Home,
+	meta: {
+		sidebar: false,
+		offline: true
+	},
+},
+{
 	path: '/demo',
 	name: 'Demo',
 	component: RunEncounter,

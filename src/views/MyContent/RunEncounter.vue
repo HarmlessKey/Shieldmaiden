@@ -93,7 +93,7 @@
 	import _ from 'lodash';
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
-
+	
 	import Finished from '@/components/combat/Finished.vue';
 	import DemoFinished from '@/components/combat/DemoFinished.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
@@ -133,7 +133,13 @@
 				userId: this.$store.getters.user.uid,
 				demo: this.$route.name === "Demo",
 				target: undefined,
-				width: 0
+				width: 0,
+				audio_icons: {
+					spotify: "fab fa-spotify",
+					youtube: "fab fa-youtube",
+					apple: "fab fa-apple",
+					none: "fas fa-music-alt",
+				},
 			}
 		},
 		firebase() {
@@ -161,6 +167,23 @@
 				this.setSize();
 			});
 			this.track_Encounter(this.demo);
+
+			// Create notify if encounter has audio link
+			if (this.encounter.audio !== undefined) {
+				this.$q.notify({
+					message: 'Audio link found',
+					caption: 'Would you like to follow it?',
+					color: "blue-light",
+					position: "top",
+					progress: true,
+					timeout: 7500,
+					icon: this.audio_icons[this.audio_link_type],
+					actions: [
+						{ label: 'Yes', color: 'white', handler: () => { window.open(this.encounter.audio, '_blank'); } },
+						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
+					]
+				})
+			}
 		},
 		computed: {
 			...mapGetters([
@@ -225,7 +248,21 @@
 				if(this.encounter) {
 					return this.encounter.requests;
 				}
-			}
+			},
+			audio_link_type() {
+				// This link type identification will fail sometimes
+				// Example: https://geo.music.apple.com/us/album/spotify/1528894349?i=1528894351&itsct=music_box&itscg=30200&ct=songs_spotify&app=music&ls=1
+				// Check for keyword in url root not in whole string
+				if (this.encounter.audio !== undefined) {
+					if (this.encounter.audio.includes("spotify"))
+						return "spotify";
+					else if (this.encounter.audio.includes("youtube"))
+						return "youtube";
+					else if (this.encounter.audio.includes("apple"))
+						return "apple";
+				}
+				return "none"
+			},
 		},
 		watch: {
 			alive(newVal) {

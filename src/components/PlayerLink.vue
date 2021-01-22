@@ -102,7 +102,7 @@
 				if (navigator.share) {
 					navigator.share({
 						title: 'Harmless Key',
-						text: 'Share your encounters with your players!',
+						text: 'Follow my campaigns on Harmless Key!',
 						url: this.copy,
 					})
 					.catch((error) => console.log('Error sharing', error));

@@ -71,7 +71,7 @@
 			</div>
 
 			<!-- PATREON -->
-			<div>
+			<div class="mt-4">
 				<h4 
 					v-if="tier && userInfo && userInfo.patron"
 					class="text-center patreon-red"
@@ -99,9 +99,6 @@
 		mixins: [general],
 		data() {
 			return {
-				play_animation: true,
-				muted: true,
-				video_hover: false,
 				dm_tabs: [
 					{
 						name: "campaigns",
@@ -240,12 +237,8 @@
 			}
 
 			.q-item {
-				background-color: #232323;
+				background-color: rgba(0, 0, 0, .5);
 				margin-bottom: 1px;
-
-				&:hover {
-					background-color: #000;
-				}
 			}
 
 			.logo {
@@ -274,6 +267,10 @@
 					.card-body {
 						font-size: 25px;
 					}
+				}
+				.q-item {
+					padding: 18px 20px;
+					font-size: 16px;
 				}
 			}
 		}

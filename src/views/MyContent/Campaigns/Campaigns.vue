@@ -21,7 +21,7 @@
 			</h2>
 
 			<q-dialog 
-				v-if="add && (content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')"
+				v-if="(content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')"
 				square
 				v-model="add"
 			>
@@ -70,8 +70,8 @@
 				tag="div" 
 				class="row q-col-gutter-md mt-3" 
 				name="campaigns" 
-				enter-active-class="animated flash" 
-				leave-active-class="animated bounceOutLeft">
+				enter-active-class="animated fadeIn" 
+				leave-active-class="animated fadeOut">
 				<div class="col-12 col-md-6 col-lg-4" v-for="campaign in _campaigns" :key="campaign.key">
 					<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<div slot="header" class="card-header">
@@ -274,6 +274,7 @@
 						position: "rightTop"
 					});
 					this.$validator.reset();
+					this.add = false;
 				}
 			},
 			confirmDelete(key, name) {

@@ -55,6 +55,7 @@
 		</section>
 		<Footer />
 		<div class="patreon bg-black d-flex justify-content-end">
+			<router-link to="/sign-up" class="btn">Create Account</router-link>
 			<router-link to="/demo" class="ml-2 btn bg-green">Demo Encounter</router-link>
 		</div>
 	</div>

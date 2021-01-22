@@ -183,7 +183,7 @@
 			return {
 				rollInfo: false,
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				active_action: undefined,

@@ -99,7 +99,7 @@
 						</div>
 					</q-popup-proxy>
 				</div>
-				<router-link v-else to="/sign-in" class="ml-2">Sign in</router-link>
+				<router-link v-else to="/sign-in" class="px-2">Sign in</router-link>
 			</div>
 		</div>
 	</header>
@@ -160,6 +160,7 @@
 				})
 			},
 			signOut: function() {
+				this.$store.commit("SET_USER", undefined)
 				auth.signOut()
 				.then(() => {
 					this.$router.replace('/');

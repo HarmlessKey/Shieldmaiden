@@ -1,5 +1,5 @@
 
-import { store } from './store/store'
+import { store } from './store/store';
 
 const Home = () => import('@/views/Home.vue');
 
@@ -67,7 +67,8 @@ export const routes = [{
 	name: 'home',
 	component: Home,
 	meta: {
-		sidebar: false
+		sidebar: false,
+		offline: true
 	}
 },
 {
@@ -75,7 +76,8 @@ export const routes = [{
 	name: 'Demo',
 	component: RunEncounter,
 	meta: {
-		sidebar: false
+		sidebar: false,
+		offline: true
 	},
 },
 //COMPENDIUM
@@ -186,12 +188,18 @@ export const routes = [{
 {
 	path: '/about-us',
 	name: 'About Us',
-	component: AboutUs
+	component: AboutUs,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/documentation',
 	name: 'Documentation',
-	component: Documentation
+	component: Documentation,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/feedback',

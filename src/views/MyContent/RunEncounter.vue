@@ -130,7 +130,7 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.user.uid,
+				userId:  this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				width: 0

@@ -18,14 +18,11 @@
 				v-if="encounter.audio && !errors.has('audio')" 
 				class="img pointer" >
 				<a :href="encounter.audio" target="_blank" rel="noopener">
-					<q-icon v-if="audio_link_type == 'spotify'" class="fab fa-spotify"></q-icon>
-					<q-icon v-else-if="audio_link_type == 'youtube'" class="fab fa-youtube"></q-icon>
-					<q-icon v-else-if="audio_link_type == 'apple'" class="fab fa-itunes"></q-icon>
-					<q-icon v-else class="fas fa-play"></q-icon>
+					<q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon>
 				</a>
 			</div>
 			<div class="img" v-else>
-				<q-icon name="fas fa-music"/>
+				<q-icon name="fas fa-music-alt"/>
 			</div>
 			<div>
 				<q-input 
@@ -129,7 +126,13 @@
 					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" }
-				}
+				},
+				audio_icons: {
+					spotify: { icon: "fab fa-spotify", color: "#20B954" },
+					youtube: { icon: "fab fa-youtube", color: "#FF0000" },
+					apple: { icon: "fab fa-apple", color: "#FFF" },
+					none: { icon: "fas fa-music-alt", color: "#FFF" },
+				},
 			} 
 		},
 		computed: {
@@ -142,14 +145,14 @@
 				// Check for keyword in url root not in whole string
 				if (this.encounter.audio !== undefined) {
 					if (this.encounter.audio.includes("spotify"))
-						return "spotify"
+						return "spotify";
 					else if (this.encounter.audio.includes("youtube"))
-						return "youtube"
+						return "youtube";
 					else if (this.encounter.audio.includes("apple"))
-						return "apple"
+						return "apple";
 				}
-				return undefined
-			}
+				return "none"
+			},
 		},
 		mounted() {
 			this.fetchEncounter({
@@ -211,7 +214,7 @@
 				return false;
 
 			},
-		}
+		},
 	}
 </script>
 

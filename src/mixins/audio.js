@@ -24,5 +24,11 @@ export const audio = {
 			}
 			return "none"
 		},
+	},
+	methods: {
+		open_audio_link(url) {
+			console.log(url)
+			window.open(url, '_blank');
+		}
 	}
 }

@@ -176,7 +176,7 @@
 					timeout: 7500,
 					icon: this.audio_icons[this.audio_link_type].icon,
 					actions: [
-						{ label: 'Yes', color: 'white', handler: () => { window.open(this.encounter.audio, '_blank'); } },
+						{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
 						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
 					]
 				})

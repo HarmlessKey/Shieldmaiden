@@ -32,7 +32,7 @@
 					dark filled square
 					label="Audio"
 					autocomplete="off" 
-					
+					:rules="[ val => (!val ||  url_or_uri(val)) || 'Not a valid URL or URI']"
 					name="audio" 
 					v-model="encounter.audio" 
 					class="mb-2"
@@ -106,8 +106,8 @@
 
 <script>
     import { db } from '@/firebase';
-		import { mapActions, mapGetters } from 'vuex';
-		import EditWeather from './Weather';
+	import { mapActions, mapGetters } from 'vuex';
+	import EditWeather from './Weather';
 
 	export default {
 		name: 'General',
@@ -193,8 +193,24 @@
 					if(value === 2) return "Medium";
 					if(value === 3) return "Heavy";
 				}
-				
-			}
+			},
+			url_or_uri(val) {
+				// Check if val is url
+				const url_expr = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+				const url_regex = new RegExp(url_expr);
+				if (val.match(url_regex)) {
+					return true;
+				}
+				// Check if val is spotify URI
+				const spotify_expr  = /^spotify:.+/gi;
+				const spotify_regex = new RegExp(spotify_expr);
+				if (val.match(spotify_regex)) {
+					return true;
+				}
+
+				return false;
+
+			},
 		}
 	}
 </script>

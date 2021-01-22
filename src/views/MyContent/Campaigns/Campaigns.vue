@@ -8,7 +8,7 @@
 
 			<h2 class="mt-3 d-flex justify-content-between">
 				<span>
-					Your Campaigns 
+					Your Campaigns
 					<span v-if="campaigns && tier">( 
 						<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
 							{{ Object.keys(campaigns).length }}
@@ -86,29 +86,29 @@
 									class="fas fa-eye green"
 								>
 									<q-tooltip anchor="top middle" self="center middle">
-											Public campaign
-										</q-tooltip>
+										Public campaign
+									</q-tooltip>
 								</i>
 								<i v-else class="fas fa-eye-slash red">
 									<q-tooltip anchor="top middle" self="center middle">
-											Private campaign
-										</q-tooltip>
+										Private campaign
+									</q-tooltip>
 								</i>
 
 								<router-link class="text-capitalize gray-hover" :to="'/campaigns/' + campaign.key">
-										<i class="fas fa-pencil"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Edit
-										</q-tooltip>
+									<i class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
 								</router-link>
 								<a
 									class="gray-hover text-capitalize"
 									@click="confirmDelete(campaign.key, campaign.campaign)"
 								>
-										<i class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Delete
-										</q-tooltip>
+									<i class="fas fa-trash-alt"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Delete
+									</q-tooltip>
 								</a>
 							</span>
 						</div>
@@ -127,7 +127,7 @@
 								</div>
 
 								<div class="col">
-										<router-link :to="'/encounters/' + campaign.key">
+									<router-link :to="'/encounters/' + campaign.key">
 										<i class="fas fa-swords"></i><br/>
 										<template v-if="allEncounters && allEncounters[campaign.key]">
 											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
@@ -240,6 +240,7 @@
 				'players',
 				'overencumbered',
 				'content_count',
+				'active_campaign'
 			]),
 			_campaigns: function() {
 				return _.chain(this.campaigns)
@@ -258,7 +259,8 @@
 		},
 		methods: {
 			...mapActions([
-				'clearEncounters'
+				'clearEncounters',
+				'deleteCampaign',
 			]),
 			addCampaign() {
 				if ((this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
@@ -277,15 +279,15 @@
 			confirmDelete(key, name) {
 				this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
 					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Yes', action: (toast) => { this.deleteCampaign( {campaign_id: key }); this.$snotify.remove(toast.id); }, bold: false},
 						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},
-			deleteCampaign(key) {
-				db.ref('campaigns/'+ this.user.uid).child(key).remove();
-				db.ref('encounters/'+ this.user.uid).child(key).remove();
-			},
+			// deleteCampaign(key) {
+			// 	db.ref('campaigns/'+ this.user.uid).child(key).remove();
+			// 	db.ref('encounters/'+ this.user.uid).child(key).remove();
+			// },
 			assignPlayers() {
 				for (let campaignId in this.campaigns) {
 					for (let playerId in this.campaigns[campaignId].players) {

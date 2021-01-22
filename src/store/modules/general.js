@@ -48,8 +48,8 @@ export const general_module = {
 			}	
 		},
 		toggleSideCollapsed({ commit, state, rootGetters }) {
-			const uid = rootGetters.user.uid;
-			let collapsed_ref = settings_ref.child(uid).child('general/side_collapsed');
+			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+			let collapsed_ref = (uid) ? settings_ref.child(uid).child('general/side_collapsed') : false;
 			
 			commit("TOGGLE_SIDE_COLLAPSE");
 			
@@ -62,15 +62,18 @@ export const general_module = {
 
 		},
 		setSideCollapsed({ commit, rootGetters }) {
-			const uid = rootGetters.user.uid;
-			let general = settings_ref.child(uid).child('general');
-			general.on('value', snapshot => {
-				let collapse = false;
-				if (snapshot.val())
-					collapse = snapshot.val().side_collapsed;
+			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 
-				commit("SET_SIDE_COLLAPSE", collapse);
-			})
+			if(uid) {
+				let general = settings_ref.child(uid).child('general');
+				general.on('value', snapshot => {
+					let collapse = false;
+					if (snapshot.val())
+						collapse = snapshot.val().side_collapsed;
+
+					commit("SET_SIDE_COLLAPSE", collapse);
+				})
+			}
 		},
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload)

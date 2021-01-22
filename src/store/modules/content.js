@@ -89,171 +89,189 @@ export const content_module = {
 	},
 	actions: {
 		async setUserInfo({ commit, dispatch, rootGetters }) {
-			let user = await users_ref.child(rootGetters.user.uid)
-			user.on('value', async user_snapshot => {
-				let user_info = user_snapshot.val();
-				
-				//Fetch patron info with email
-				let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
+			if(rootGetters.user) {
+				let user = await users_ref.child(rootGetters.user.uid)
+				user.on('value', async user_snapshot => {
+					let user_info = user_snapshot.val();
+					
+					//Fetch patron info with email
+					let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
 
-				// User always basic reward tier
-				let path = `tiers/basic`
+					// User always basic reward tier
+					let path = `tiers/basic`
 
-				let today_ms = 0
-				await db.ref('/.info/serverTimeOffset')
-					.once('value')
-					.then(function stv(data) {
-						today_ms = data.val() + Date.now();
-					}, function (err) {
-					return err;
-				});
-				
-				let server_today = new Date(today_ms).toISOString();
+					let today_ms = 0
+					await db.ref('/.info/serverTimeOffset')
+						.once('value')
+						.then(function stv(data) {
+							today_ms = data.val() + Date.now();
+						}, function (err) {
+						return err;
+					});
+					
+					let server_today = new Date(today_ms).toISOString();
 
-				// If user has voucher use this
-				if (user_info.voucher){
-					let voucher = user_info.voucher
+					// If user has voucher use this
+					if (user_info.voucher){
+						let voucher = user_info.voucher
 
-					if (user_info.voucher.date === undefined){
-						path = `tiers/${user_info.voucher.id}`;
-					} else {
-						let end_date = new Date(user_info.voucher.date).toISOString();
-						
-						if (server_today > end_date) {
-							dispatch("remove_voucher", rootGetters.user.uid);
-							voucher = undefined;
-						} else {
+						if (user_info.voucher.date === undefined){
 							path = `tiers/${user_info.voucher.id}`;
-						}
-					}
-					commit('SET_VOUCHER', voucher);
-				}
-				let vouch_tiers = db.ref(path)
-				vouch_tiers.on('value', voucher_snap => {
-					// Get the order of voucher/basic
-					let voucher_order = voucher_snap.val().order;
-					// Search email in patrons
-					let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
-					patrons.on('value' , async patron_snapshot => {
-						// If user patron check if patron tier is higher than voucher/basic tier
-						if(patron_snapshot.val()) {
-							let key = Object.keys(patron_snapshot.val())[0];
-							let patron_data = patron_snapshot.val()[key];
-							let pledge_end = new Date(patron_data.pledge_end).toISOString();
-
-							// Compare patron tiers to find highest tier checking order in FB
-							let patron_tierlist = Object.keys(patron_data.tiers);
+						} else {
+							let end_date = new Date(user_info.voucher.date).toISOString();
 							
-							let highest_order = 0
-							let highest_tier = 'basic'
-							if (patron_tierlist.length > 1) {
-								for (let i in patron_tierlist) {
-									let tier_id = patron_tierlist[i]
-									// SMART AWAIT ASYNC CONSTRUCTION #bless Key
-									await tiers_ref.child(tier_id).once('value', tier_snapshot => {
-										let tier_order = tier_snapshot.val().order
-										if (tier_order > highest_order) {
-											highest_order = tier_order
-											highest_tier = tier_id
-										}
-									})
-								}
+							if (server_today > end_date) {
+								dispatch("remove_voucher", rootGetters.user.uid);
+								voucher = undefined;
 							} else {
-								highest_tier = patron_tierlist[0]
+								path = `tiers/${user_info.voucher.id}`;
 							}
+						}
+						commit('SET_VOUCHER', voucher);
+					}
+					let vouch_tiers = db.ref(path)
+					vouch_tiers.on('value', voucher_snap => {
+						// Get the order of voucher/basic
+						let voucher_order = voucher_snap.val().order;
+						// Search email in patrons
+						let patrons = db.ref('new_patrons').orderByChild('email').equalTo(email)
+						patrons.on('value' , async patron_snapshot => {
+							// If user patron check if patron tier is higher than voucher/basic tier
+							if(patron_snapshot.val()) {
+								let key = Object.keys(patron_snapshot.val())[0];
+								let patron_data = patron_snapshot.val()[key];
+								let pledge_end = new Date(patron_data.pledge_end).toISOString();
 
-							//Get tier info
-							let patron_tier = db.ref(`tiers/${highest_tier}`);
-							patron_tier.on('value' , tier_snapshot => {
-								//Save Patron info under UserInfo
-								user_info.patron = {
-									last_charge_status: patron_data.last_charge_status,
-									pledge_end,
-									tier: tier_snapshot.val().name
-								};
-
-								if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
-									commit('SET_TIER', tier_snapshot.val())
+								// Compare patron tiers to find highest tier checking order in FB
+								let patron_tierlist = Object.keys(patron_data.tiers);
+								
+								let highest_order = 0
+								let highest_tier = 'basic'
+								if (patron_tierlist.length > 1) {
+									for (let i in patron_tierlist) {
+										let tier_id = patron_tierlist[i]
+										// SMART AWAIT ASYNC CONSTRUCTION #bless Key
+										await tiers_ref.child(tier_id).once('value', tier_snapshot => {
+											let tier_order = tier_snapshot.val().order
+											if (tier_order > highest_order) {
+												highest_order = tier_order
+												highest_tier = tier_id
+											}
+										})
+									}
 								} else {
-									commit('SET_TIER', voucher_snap.val())
+									highest_tier = patron_tierlist[0]
 								}
+
+								//Get tier info
+								let patron_tier = db.ref(`tiers/${highest_tier}`);
+								patron_tier.on('value' , tier_snapshot => {
+									//Save Patron info under UserInfo
+									user_info.patron = {
+										last_charge_status: patron_data.last_charge_status,
+										pledge_end,
+										tier: tier_snapshot.val().name
+									};
+
+									if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
+										commit('SET_TIER', tier_snapshot.val())
+									} else {
+										commit('SET_TIER', voucher_snap.val())
+									}
+									commit('CHECK_ENCUMBRANCE');
+								});
+							}
+							// If not patron use voucher/basic tier
+							else {
+								commit('SET_TIER', voucher_snap.val())
 								commit('CHECK_ENCUMBRANCE');
-							});
-						}
-						// If not patron use voucher/basic tier
-						else {
-							commit('SET_TIER', voucher_snap.val())
-							commit('CHECK_ENCUMBRANCE');
-						}
-					})
+							}
+						})
+					});
+					commit('SET_USERINFO', user_info);
 				});
-				commit('SET_USERINFO', user_info);
-			});
+			}
 		},
 		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },
 		setEncounterId({ commit }, value) { commit('SET_ENCOUNTER_ID', value); },
 		fetchEncounter({ commit, rootGetters}, { cid, eid }) {
-			commit("SET_CAMPAIGN_ID", cid);
-			commit("SET_ENCOUNTER_ID", eid);
-			const uid = rootGetters.user.uid;
-			const path = `${uid}/${cid}/${eid}`;
-			const encounter = encounters_ref.child(path);
-			encounter.on('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val())
-			})
+			if(rootGetters.user) {
+				commit("SET_CAMPAIGN_ID", cid);
+				commit("SET_ENCOUNTER_ID", eid);
+				const uid = rootGetters.user.uid;
+				const path = `${uid}/${cid}/${eid}`;
+				const encounter = encounters_ref.child(path);
+				encounter.on('value', snapshot => {
+					commit('SET_ENCOUNTER', snapshot.val())
+				});
+			}
 		},
 		fetchEncounters({ commit, rootGetters }, { cid }) {
-			const uid = rootGetters.user.uid;
-			const path = `${uid}/${cid}`;
-			let encounters = encounters_ref.child(path)
-			encounters.on('value', snapshot => {
-				commit('SET_ENCOUNTERS', snapshot.val())
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid;
+				const path = `${uid}/${cid}`;
+				let encounters = encounters_ref.child(path)
+				encounters.on('value', snapshot => {
+					commit('SET_ENCOUNTERS', snapshot.val())
+				});
+			}
 		},
 		fetchAllEncounters({ commit, rootGetters }) {
-			const uid = rootGetters.user.uid
-			let encounters = encounters_ref.child(uid)
-			encounters.on('value', snapshot => {
-				commit('SET_ALLENCOUNTERS', snapshot.val())
-				commit('CHECK_ENCUMBRANCE');
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid
+				let encounters = encounters_ref.child(uid)
+				encounters.on('value', snapshot => {
+					commit('SET_ALLENCOUNTERS', snapshot.val())
+					commit('CHECK_ENCUMBRANCE');
+				});
+			}
 		},
 		fetchPlayers({ commit, rootGetters }) {
-			const uid = rootGetters.user.uid
-			const players = players_ref.child(uid)
-			players.on('value', snapshot => {
-				commit('SET_PLAYERS', snapshot.val())
-				commit('CHECK_ENCUMBRANCE');
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid
+				const players = players_ref.child(uid)
+				players.on('value', snapshot => {
+					commit('SET_PLAYERS', snapshot.val())
+					commit('CHECK_ENCUMBRANCE');
+				});
+			}
 		},
 		fetchNpcs({ commit, rootGetters }) {
-			const uid = rootGetters.user.uid
-			const npcs = npcs_ref.child(uid)
-			npcs.on('value', snapshot => {
-				commit('SET_NPCS', snapshot.val())
-				commit('CHECK_ENCUMBRANCE');
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid
+				const npcs = npcs_ref.child(uid)
+				npcs.on('value', snapshot => {
+					commit('SET_NPCS', snapshot.val())
+					commit('CHECK_ENCUMBRANCE');
+				});
+			}
 		},
 		fetchCampaign({ commit, rootGetters }, { cid }) {
 			commit("SET_CAMPAIGN_ID", cid)
 			
-			const uid = rootGetters.user.uid;
-			const path = `${uid}/${cid}`;
-			const campaign = campaigns_ref.child(path);
-			campaign.on('value', snapshot => {
-				commit('SET_CAMPAIGN', snapshot.val())
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid;
+				const path = `${uid}/${cid}`;
+				const campaign = campaigns_ref.child(path);
+				campaign.on('value', snapshot => {
+					commit('SET_CAMPAIGN', snapshot.val())
+				});
+			}
 		},
 		fetchCampaigns({ commit, rootGetters }) {
-			const uid = rootGetters.user.uid
-			let campaigns = campaigns_ref.child(uid)
-			campaigns.on('value', snapshot => {
-				commit('SET_CAMPAIGNS', snapshot.val())
-				commit('CHECK_ENCUMBRANCE');
-			})
+			if(rootGetters.user) {
+				const uid = rootGetters.user.uid
+				let campaigns = campaigns_ref.child(uid)
+				campaigns.on('value', snapshot => {
+					commit('SET_CAMPAIGNS', snapshot.val())
+					commit('CHECK_ENCUMBRANCE');
+				});
+			}
 		},
 		remove_voucher( { rootGetters }) {
-			db.ref(`users/${rootGetters.user.uid}/voucher`).remove()
+			if(rootGetters.user) {
+				db.ref(`users/${rootGetters.user.uid}/voucher`).remove()
+			}
 		},
 		setPoster({ state }) {
 			db.ref('posters').once('value', snapshot => {

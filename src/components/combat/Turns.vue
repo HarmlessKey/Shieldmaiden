@@ -149,7 +149,7 @@
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			}
 		},
 		firebase() {

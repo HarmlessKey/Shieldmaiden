@@ -423,6 +423,16 @@ html body {
 			justify-content: flex-end;
 		}
 	}
+
+	.offline {
+		position: fixed;
+		top: 50px;
+		width: 100%;
+		background: $red;
+		color: $white;
+		z-index: 99;
+		text-align: center;
+	}
 	
 	.disabled {
 		cursor: forbidden !important;

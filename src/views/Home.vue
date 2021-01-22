@@ -1,64 +1,67 @@
 <template>
-	<div class="home" v-if="diceColors.length > 0" v-on:scroll="handleScroll">
-		<section id="top">
-			<Top />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="overview">
-			<Overview />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="general">
-			<General />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="builder">
-			<Builder />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="share">
-			<Share />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="campaign">
-			<Campaign />
-		</section>
-		<Footer />
-		<div class="patreon bg-black d-flex justify-content-end">
-			<router-link to="/sign-up" class="btn">Create Account</router-link>
-			<router-link to="/demo" class="ml-2 btn bg-green">Demo Encounter</router-link>
-		</div>
+	<div class="home" v-if="!$store.getters.user || $route.path === '/home'" v-on:scroll="handleScroll">
+		<template v-if="diceColors.length > 0">
+			<section id="top">
+				<Top />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="overview">
+				<Overview />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="general">
+				<General />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="builder">
+				<Builder />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="share">
+				<Share />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="campaign">
+				<Campaign />
+			</section>
+			<Footer />
+			<div class="patreon bg-black d-flex justify-content-end">
+				<router-link to="/sign-up" class="btn">Create Account</router-link>
+				<router-link to="/demo" class="ml-2 btn bg-green">Demo Encounter</router-link>
+			</div>
+		</template>
 	</div>
+	<SignedIn v-else />
 </template>
 
 <script>
@@ -69,6 +72,7 @@
 	import Builder from '@/components/home/Builder.vue'
 	import Campaign from '@/components/home/Campaign.vue'
 	import Footer from '@/components/Footer.vue'
+	import SignedIn from '@/components/home/SignedIn.vue'
 
 	export default {
 		name: 'home',
@@ -79,7 +83,8 @@
 			Share,
 			Builder,
 			Campaign,
-			Footer
+			Footer,
+			SignedIn
 		},
 		data() {
 			return {
@@ -157,6 +162,4 @@
 		z-index: 97;
 	}
 }
-
-
 </style>

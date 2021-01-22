@@ -2,7 +2,6 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<!-- <img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" /> -->
 				<div v-if="play_animation"
 					@click="replay()"
 					@mouseover="video_hover = true" 
@@ -30,64 +29,19 @@
 				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">
 					<div class="text">
-						<template v-if="!$store.getters.user">
+						<template>
 							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
-						<div v-else class="mt-3">
-							<q-tabs
-								dark
-								no-caps
-							>
-								<q-route-tab 
-									v-for="({name, icon, label}, index) in tabs"
-									:key="`tab-${index}`" 
-									:to="`/${name}`" 
-									:icon="icon"
-									:label="label"
-								/>
-							</q-tabs>
-							<div class="share">
-								<h2>Share your encounters</h2>
-								<q-input
-									dark filled square
-									:value="copy"
-									autocomplete="off"
-									type="text"
-									hint="With this link your players can track the initiative list of your active encounter"
-								>
-									<span slot="prepend" class="blue pointer" @click="setSlide({show: true, type: 'PlayerLink'})">
-										<q-icon  size="xs"  name="fas fa-qrcode" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Show QR-code
-										</q-tooltip>
-									</span>
-									<q-icon v-if="!share_available" slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
-										<q-tooltip anchor="top middle" self="center middle">
-											Click to copy
-										</q-tooltip>
-									</q-icon>
-									<q-icon v-else slot="append" size="xs" class="blue pointer" @click="share()" name="fas fa-share-alt">
-										<q-tooltip anchor="top middle" self="center middle">
-											Click to share
-										</q-tooltip>
-									</q-icon>
-								</q-input>
-								<input :value="copy" id="copy" type="hidden" />
-							</div>
-						</div>
 
 						<div class="button-container">
-							<router-link v-if="!$store.getters.user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
 						</div>
 						
 						<!-- PATREON -->
 						<div>
-							<template v-if="tier && userInfo && userInfo.patron">
-									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
-							</template>
-							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
 
 						<a class="next" href="#general">
@@ -102,91 +56,20 @@
 </template>
 
 <script>
-	import PlayerLink from '../PlayerLink';
-	import { mapGetters, mapActions } from 'vuex';
-
 	export default {
 		name: 'Top',
-		components: {
-			PlayerLink
-		},
 		data() {
 			return {
 				play_animation: true,
 				muted: true,
-				video_hover: false,
-				tabs: [
-					{
-						name: "campaigns",
-						label: "Campaigns",
-						icon: "fas fa-dungeon"
-					},
-					{
-						name: "players",
-						label: "players",
-						icon: "fas fa-users"
-					},
-					{
-						name: "npcs",
-						label: "NPC's",
-						icon: "fas fa-dragon"
-					}
-				]
+				video_hover: false
 			}
 		},
-		computed: {
-			...mapGetters([
-				'user',
-				'tier',
-				'voucher',
-				'userInfo',
-			]),
-			copy() {
-				return (this.$store.getters.user) ? window.origin + '/user/' + this.$store.getters.user.uid : undefined;
-			},
-			share_available() {
-				return navigator.share !== undefined;
-			},
-		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
 			replay() {
 				const player = this.$refs.video;
 				player.currentTime = 0;
 				player.play();
-			},
-			copyLink() {
-
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text') //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
-			share() {
-				if (navigator.share) {
-					navigator.share({
-						title: 'Harmless Key',
-						text: 'Share your encounters with your players!',
-						url: this.copy,
-					})
-					.catch((error) => console.log('Error sharing', error));
-				}
 			}
 		},
 		mounted() {

@@ -15,6 +15,7 @@ export const content_module = {
 		voucher: undefined,
 		overencumbered: undefined,
 		content_count: {},
+		active_campaign: undefined, 
 
 		campaign: {},
 		campaigns: {},
@@ -37,55 +38,65 @@ export const content_module = {
 		voucher: function( state ) { return state.voucher;},
 		overencumbered: function( state ) { return state.overencumbered; },
 		content_count: function( state ) { return state.content_count; },
-		poster: function( state ) { return state.poster; }
+		poster: function( state ) { return state.poster; },
+		active_campaign: function( state ) { return state.active_campaign; },
 	},
 	mutations: {
 		SET_USERINFO(state, payload) { state.userInfo = payload; },
 		SET_TIER(state, payload) { state.tier = payload; },
 		SET_VOUCHER(state, payload) { state.voucher = payload; },
 		SET_PLAYERS(state, payload) {
-			if (payload) state.players = payload
+			if (payload) state.players = payload;
 		},
 		SET_NPCS(state, payload) {
-			if (payload) state.npcs = payload
+			if (payload) state.npcs = payload;
 		},
 		SET_CAMPAIGN(state, payload) {
-			if (payload) state.campaign = payload
+			if (payload) state.campaign = payload;
 		},
 		SET_CAMPAIGNS(state, payload) {
-			if (payload) state.campaigns = payload
+			if (payload) state.campaigns = payload;
+		},
+		SET_ACTIVE_CAMPAIGN(state, payload) {
+			if (payload) state.active_campaign = payload;
 		},
 		SET_ENCOUNTERS(state, payload) {
-			if (payload) state.encounters = payload
+			if (payload) state.encounters = payload;
 		},
 		SET_ALLENCOUNTERS(state, payload) {
-			if (payload) state.allEncounters = payload
+			if (payload) state.allEncounters = payload;
 		},
 		CHECK_ENCUMBRANCE(state) {
-			let count = {}
-			count.campaigns = Object.keys(state.campaigns).length
-			count.players = Object.keys(state.players).length
-			count.npcs = Object.keys(state.npcs).length
-			count.encounters = 0
+			let count = {};
+			count.campaigns = Object.keys(state.campaigns).length;
+			count.players = Object.keys(state.players).length;
+			count.npcs = Object.keys(state.npcs).length;
+			count.encounters = 0;
 			for (let key in state.allEncounters) {
-				let n = Object.keys(state.allEncounters[key]).length
+				let n = Object.keys(state.allEncounters[key]).length;
 				if (n > count.encounters) {
-					count.encounters = n
+					count.encounters = n;
 				}
 			}
-			state.content_count = count
+			state.content_count = count;
 			if (state.tier) {
-				let benefits = state.tier.benefits
+				let benefits = state.tier.benefits;
 				if (count.campaigns > benefits.campaigns ||
 						count.encounters > benefits.encounters ||
 						count.npcs > benefits.npcs ||
 						count.players > benefits.players )
-					state.overencumbered = true
+					state.overencumbered = true;
 				else
-					state.overencumbered = false
+					state.overencumbered = false;
 			}
 		},
-		CLEAR_ENCOUNTERS(state) { state.encounters = {} }
+		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
+		DELETE_CAMPAIGN(state, { campaign_id }) {
+			delete state.campaigns[campaign_id];
+		},
+		DELETE_ENCOUNTER(state, { encounter_id }){
+			delete state.encounters[encounter_id]
+		}
 	},
 	actions: {
 		async setUserInfo({ commit, dispatch, rootGetters }) {
@@ -283,6 +294,23 @@ export const content_module = {
 		},
 		clearEncounters({ commit }) {
 			commit("CLEAR_ENCOUNTERS");
+		},
+		setActiveCampaign({ commit, rootGetters }, { campaign_id }) {
+			db.ref(`users/${rootGetters.user.uid}/active_campaign`).set(campaign_id);
+			commit("SET_ACTIVE_CAMPAIGN", campaign_id);
+		},
+		deleteCampaign({ commit, getters, rootGetters }, { campaign_id }) {
+			if (campaign_id === getters.active_campaign ) {
+				db.ref(`users/${rootGetters.user.uid}/active_campaign`).remove();
+			}
+			db.ref('campaigns/'+ rootGetters.user.uid).child(campaign_id).remove();
+			db.ref('encounters/'+ rootGetters.user.uid).child(campaign_id).remove();
+			
+			commit("DELETE_CAMPAIGN", campaign_id);
+			for (let encounter_id in getters.encounters) {
+				commit("DELETE_ENCOUNTER", {encounter_id});
+			}
 		}
+		
 	},
 };

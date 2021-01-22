@@ -50,7 +50,7 @@
 						v-if="user"
 						class="icon"
 						@click="setSlide({show: true, type: 'PlayerLink'})">
-						<i class="fas fa-link"></i>
+						<i class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
 							Player link
 						</q-tooltip>

@@ -40,6 +40,7 @@ const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
+const Offline = () => import('@/views/Offline.vue');
 const MyContent = () => import('@/views/MyContent/Campaigns/Campaigns.vue');
 const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue');
 const Encounters = () => import('@/views/MyContent/Encounters');
@@ -615,6 +616,11 @@ export const routes = [{
 	path: '/404',
 	name: '404',
 	component: Error404
+},
+{
+	path: '/offline',
+	name: 'Offline',
+	component: Offline
 },
 {
 	path: '*',

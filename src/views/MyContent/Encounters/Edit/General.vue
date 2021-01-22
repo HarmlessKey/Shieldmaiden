@@ -13,9 +13,33 @@
 			v-model="encounter.encounter"/>
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
+		<div class="audio">
+			<div 
+				v-if="encounter.audio && !errors.has('audio')" 
+				class="img pointer" >
+				<a :href="encounter.audio" target="_blank" rel="noopener">
+					<q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon>
+				</a>
+			</div>
+			<div class="img" v-else>
+				<q-icon name="fas fa-music-alt"/>
+			</div>
+			<div>
+				<q-input 
+					dark filled square
+					label="Audio"
+					autocomplete="off" 
+					:rules="[ val => (!val ||  url_or_uri(val)) || 'Not a valid URL or URI']"
+					name="audio" 
+					v-model="encounter.audio" 
+					class="mb-2"
+					placeholder="Audio URL"/>
+			</div>
+		</div>
+
 		<div class="background mb-3">
 			<div 
-				v-if="encounter.background" 
+				v-if="encounter.background && !errors.has('background')" 
 				class="img pointer" 
 				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
 				@click="image = true"
@@ -29,7 +53,7 @@
 					dark filled square
 					label="Background"
 					autocomplete="off" 
-					v-validate="'url'" type="text" 
+					:rules="[ val => (!val || is_url(val)) || 'Not a valid URL']" 
 					name="background" 
 					data-vv-as="Background"
 					v-model="encounter.background" 
@@ -79,8 +103,8 @@
 
 <script>
     import { db } from '@/firebase';
-		import { mapActions, mapGetters } from 'vuex';
-		import EditWeather from './Weather';
+	import { mapActions, mapGetters } from 'vuex';
+	import EditWeather from './Weather';
 
 	export default {
 		name: 'General',
@@ -102,13 +126,33 @@
 					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
 					fog: { name: "Fog", icon: "fas fa-fog" }
-				}
+				},
+				audio_icons: {
+					spotify: { icon: "fab fa-spotify", color: "#20B954" },
+					youtube: { icon: "fab fa-youtube", color: "#FF0000" },
+					apple: { icon: "fab fa-apple", color: "#FFF" },
+					none: { icon: "fas fa-music-alt", color: "#FFF" },
+				},
 			} 
 		},
 		computed: {
 			...mapGetters([
 				'encounter',
-			])
+			]),
+			audio_link_type() {
+				// This link type identification will fail sometimes
+				// Example: https://geo.music.apple.com/us/album/spotify/1528894349?i=1528894351&itsct=music_box&itscg=30200&ct=songs_spotify&app=music&ls=1
+				// Check for keyword in url root not in whole string
+				if (this.encounter.audio !== undefined) {
+					if (this.encounter.audio.includes("spotify"))
+						return "spotify";
+					else if (this.encounter.audio.includes("youtube"))
+						return "youtube";
+					else if (this.encounter.audio.includes("apple"))
+						return "apple";
+				}
+				return "none"
+			},
 		},
 		mounted() {
 			this.fetchEncounter({
@@ -124,7 +168,7 @@
 			...mapActions([
 				'fetchEncounter'
 			]),
-      edit() {
+			edit() {
 				this.$validator.validateAll().then((result) => {
 					if (result) {
 						this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
@@ -152,14 +196,30 @@
 					if(value === 2) return "Medium";
 					if(value === 3) return "Heavy";
 				}
-				
-			}
-		}
+			},
+			url_or_uri(val) {
+				// Check if val is url
+				const url_expr = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+				const url_regex = new RegExp(url_expr);
+				if (val.match(url_regex)) {
+					return true;
+				}
+				// Check if val is spotify URI
+				const spotify_expr  = /^spotify:.+/gi;
+				const spotify_regex = new RegExp(spotify_expr);
+				if (val.match(spotify_regex)) {
+					return true;
+				}
+
+				return false;
+
+			},
+		},
 	}
 </script>
 
 <style lang="scss" scoped>
-.background {
+.background, .audio {
 	display: grid;
 	grid-template-columns: 56px 1fr;
 	grid-column-gap: 10px;

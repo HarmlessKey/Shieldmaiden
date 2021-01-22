@@ -154,6 +154,7 @@
 			...mapGetters([
 				'campaignId',
 				'encounterId',
+				'encounter',
 				'entities',
 				'path',
 			]),

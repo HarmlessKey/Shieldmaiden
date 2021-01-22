@@ -32,13 +32,11 @@
 					dark filled square
 					label="Audio"
 					autocomplete="off" 
-					v-validate="'url'" type="text"
-					data-vv-as="Audio"
+					
 					name="audio" 
 					v-model="encounter.audio" 
 					class="mb-2"
 					placeholder="Audio URL"/>
-				<p class="validate red" v-if="errors.has('audio')">{{ errors.first('audio') }}</p>
 			</div>
 		</div>
 

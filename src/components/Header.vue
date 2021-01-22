@@ -6,23 +6,31 @@
 					class="menu"
 					@click.stop="setSideSmallScreen(!$store.getters.side_small_screen)"
 				>
-					<i class="fas fa-bars"></i>
+					<i class="fas" :class="$store.getters.side_small_screen ? 'fa-times' : 'fa-bars'"/>
 				</div>
 				<router-link to="/" class="logo d-flex justify-content-start" :class="{ home: $route.meta.sidebar === false }">
 					<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg" alt="logo icon"/>
 					<img class="wordmark d-none d-md-block" src="../assets/_img/logo/logo-wordmark.svg" alt="Harmless Key"/>
 				</router-link>
-				
 			</div>
+
 			<div class="d-flex justify-content-end">
-				<div class="area d-flex justify-content-end">
-					<a href="https://discord.gg/fhmKBM7" target="_blank" class="icon">
-						<i class="fab fa-discord"></i>
-						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-							Discord
-						</q-tooltip>
-					</a>
+				<div class="d-none d-sm-flex">
+					<div 
+						v-for="{name, icon, url} in social_media"
+						class="area d-flex justify-content-end"
+						:key="name"
+					>
+						<a class="icon" :href="url" target="_blank" rel="noopener">
+							<i :class="icon" />
+							<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
+								{{ name }}
+							</q-tooltip>
+						</a>
+					</div>
+					<q-separator vertical dark inset class="mx-1" />
 				</div>
+
 				<div class="area d-flex justify-content-end">
 					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
@@ -55,6 +63,7 @@
 						</q-tooltip>
 					</a>
 				</div>
+				<q-separator vertical dark inset class="mx-1" />
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
@@ -104,7 +113,34 @@
 		data() {
 			return {
 				user: auth.currentUser,
-				enviroment: process.env.NODE_ENV
+				enviroment: process.env.NODE_ENV,
+				social_media: [
+					{
+						name: "Discord",
+						icon: "fab fa-discord",
+						url: "https://discord.gg/fhmKBM7"
+					},
+					{
+						name: "Reddit",
+						icon: "fab fa-reddit-alien",
+						url: "https://www.reddit.com/r/HarmlessKey"
+					},
+					{
+						name: "Facebook",
+						icon: "fab fa-facebook",
+						url: "https://www.facebook.com/harmlesskey"
+					},
+					{
+						name: "Instagram",
+						icon: "fab fa-instagram",
+						url: "https://www.instagram.com/harmlesskey"
+					},
+					{
+						name: "Twitter",
+						icon: "fab fa-twitter-square",
+						url: "https://twitter.com/KeyHarmless"
+					},
+				]
 			}
 		},
 		computed: {
@@ -139,6 +175,9 @@
 	cursor: pointer;
 	width: 20px;
 	text-align: center;
+	line-height: 50px;
+	height: 50px;
+	padding: 0 15px;
 }
 .logo {
 	position: absolute;
@@ -164,19 +203,20 @@ a {
 }
 a.icon {
 	cursor: pointer;
-	font-size: 16px;
+	font-size: 18px;
 	text-align: center;
-	height: 24px;
+	height: 50px;
 	width: 24px;
-	margin-left: 5px;
-	line-height: 24px !important;
+	margin-left: 8px;
+	line-height: 50px !important;
 
 	&:hover {
 		color: #fff !important;
 	}
 	&.roll {
+		margin-left: 5px;
 		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-no-border.svg');
-		background-size: 19px 19px;
+		background-size: 22px 22px;
 		background-position: center;
 		background-repeat: no-repeat;
 	}
@@ -184,14 +224,14 @@ a.icon {
 .user	{
 	cursor: pointer;
 	font-size: 15px;
-	padding: 0 5px 5px 10px;
-	line-height: 25px !important;
+	padding: 12px 15px 12px 10px;
+	line-height: 26px !important;
+	height: 50px ;
 	display: block;
 
 	.img {
-		margin-top: 3px;
-		width: 25px;
-		height: 25px;
+		width: 26px;
+		height: 26px;
 		border-radius: 50%;
 		display: inline-block;
 		background-size: cover;
@@ -199,9 +239,7 @@ a.icon {
 	}
 }
 .area {
-	padding: 3px 10px;
-	border-right: solid 1px #494747;
-	height: 30px;
+	height: 50px;
 }
 
 #header.hidden-sidebar {
@@ -210,9 +248,32 @@ a.icon {
 	}
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 575px) {
 	.logo {
-		left: 40px;
+		left: 50px !important;
+	}
+	.menu {
+		font-size: 25px;
+	}
+	a.icon {
+		font-size: 25px;
+		padding: 0 20px;
+		width: 25px;
+		
+		&.roll {
+			padding-left: 30px;
+			background-size: 27px 27px;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+	}
+	.user {
+		padding: 10px 15px 10px 10px;
+
+		.img {
+			height: 30px;
+			width: 30px;
+		}
 	}
 }
 </style>

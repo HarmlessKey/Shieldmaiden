@@ -22,11 +22,12 @@
 							</q-tooltip>
 						</span>
 					</div>
-					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
-						:muted="muted" autoplay playsinline
-					></video>
+					<video 
+						ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
+						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
+					/>
 				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">
 					<div class="text">
 						<template v-if="!userInfo">
@@ -82,7 +83,7 @@
 							<template v-if="tier && userInfo && userInfo.patron">
 									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
 							</template>
-							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
 
 						<a class="next" href="#general">

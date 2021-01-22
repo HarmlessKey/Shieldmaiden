@@ -12,13 +12,13 @@
       "purpose": "maskable any"
     },
     {
-      "src": "/android-chrome-152x152.png",
-      "sizes": "152x152",
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     }
   ],
   "theme_color": "#000",
-  "background_color": "#191919",
+  "background_color": "#c5eaf4",
   "display": "standalone"
 }

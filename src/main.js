@@ -7,6 +7,7 @@ import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
 import { store } from './store/store';
 import { routes } from './routes';
+import Validation from './validation';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
@@ -44,6 +45,7 @@ Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 
 require('./functions.js')
+Vue.use(Validation)
 
 // Set-up and use the Vue Router
 // Pass in your routes and then

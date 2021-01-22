@@ -56,7 +56,7 @@
 					dark filled square
 					label="Background"
 					autocomplete="off" 
-					v-validate="'url'" type="text" 
+					:rules="[ val => (!val || is_url(val)) || 'Not a valid URL']" 
 					name="background" 
 					data-vv-as="Background"
 					v-model="encounter.background" 

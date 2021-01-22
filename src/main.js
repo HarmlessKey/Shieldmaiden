@@ -18,6 +18,7 @@ import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
 import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
+import './register-sw';
 import './quasar';
 
 const options = {

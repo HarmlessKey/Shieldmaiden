@@ -196,10 +196,10 @@
 	}
 }
 a {
-	color:#b2b2b2 !important;
+	color:$gray-light !important;
 
 	&:hover {
-		color: #2c97de !important;
+		color: $blue !important;
 	}
 }
 a.icon {
@@ -212,7 +212,7 @@ a.icon {
 	line-height: 50px !important;
 
 	&:hover {
-		color: #fff !important;
+		color:$white !important;
 	}
 	&.roll {
 		margin-left: 5px;

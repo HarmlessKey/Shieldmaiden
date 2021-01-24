@@ -125,9 +125,9 @@ ul {
 			display: none;
 
 			a {
-				background: #cc3e4a;
+				background:$red;
 				text-align: center;
-				color: #fff !important;
+				color:$white !important;
 				display: block;
 				position: absolute;
 				line-height: 28px;

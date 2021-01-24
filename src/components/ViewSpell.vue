@@ -471,13 +471,13 @@
 				line-height: 30px;
 				text-align: center;
 				cursor: pointer;
-				background-color: #191919;
+				background-color:$gray-dark;
 				user-select: none;
 				margin: 0 3px;
 
 				&.selected {
-					background-color: #2c97de;
-					color: #fff; 
+					background-color: $blue;
+					color:$white; 
 				}
 				&.disabled {
 					opacity: .4;
@@ -507,7 +507,7 @@
 			padding: 2px 5px;
 
 			&:hover {
-				background-color: #191919;
+				background-color:$gray-dark;
 			}
 			.icon {
 				padding: 3px 0;
@@ -529,12 +529,12 @@
 					line-height: 28px;
 					top: 0;
 					left: 0;
-					color: #191919;
+					color:$gray-dark;
 				}
 
 				&.green, &.red, &.blue {
 					span {
-						color: #fff;
+						color:$white;
 					}
 				}
 			}

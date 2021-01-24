@@ -251,7 +251,7 @@ ul.select-amount {
 	li {
 		display: grid;
 		grid-template-columns: 1fr max-content;
-		background-color: #191919;
+		background-color:$gray-dark;
 		margin-bottom: 1px;
 
 		.name {
@@ -265,7 +265,7 @@ ul.select-amount {
 				padding: 0 5px;
 				margin-right: 1px;
 				line-height: 28px;
-				color: #fff;
+				color:$white;
 				user-select: none;
 				cursor: pointer;
 

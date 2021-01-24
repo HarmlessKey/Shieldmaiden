@@ -274,10 +274,10 @@
 		text-align: center;
 		width: 25px;
 		font-size: 18px;
-		color: #b2b2b2 !important;
+		color: $gray-light !important;
 
 		&:hover {
-			color: #2c97de !important;
+			color: $blue !important;
 		}
 	}
 	.dropdown-menu {
@@ -305,16 +305,16 @@ ul.targets {
 		margin-bottom: 8px;
 		border: solid 1px transparent;
 		cursor: pointer;
-		background: #191919;
+		background:$gray-dark;
 
 		&.targeted {
-			border-color: #2c97de !important;
+			border-color: $blue !important;
 			box-shadow: 0px 0px 10px rgba(44, 151, 222, .5);
 		}
 	}
 	&.active_targets li:first-child {
 		margin-bottom: 20px;
-		border-color: #83b547;
+		border-color: $green;
 		box-shadow: 0px 0px 10px rgba(131, 181, 71, .5);
 	}
 	li.top {
@@ -328,7 +328,7 @@ ul.targets {
 			width: 100%;
 			position: absolute;
 			top: -25px;
-			border-bottom: solid 1px #b2b2b2;
+			border-bottom: solid 1px $gray-light;
 		}
 	}
 }

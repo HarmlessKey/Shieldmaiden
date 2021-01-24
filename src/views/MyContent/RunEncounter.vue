@@ -340,7 +340,7 @@
 .combat-wrapper {
 	background-size: cover !important;
 	background-position: center bottom !important;
-	background-color: #191919;
+	background-color:$gray-dark;
 	height: calc(100vh - 50px);
 
 	.finished {

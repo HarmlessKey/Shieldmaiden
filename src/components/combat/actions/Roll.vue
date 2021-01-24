@@ -605,12 +605,12 @@
 
 		.advantage:hover {
 			.btn {
-				background-color: #83b547;
+				background-color: $green;
 			}
 		}
 		.disadvantage:hover {
 			.btn {
-				background-color: #cc3e4a;
+				background-color:$red;
 			}
 		}
 	}
@@ -647,12 +647,12 @@
 				}
 				.advantage:hover {
 					.btn {
-						background-color: #83b547;
+						background-color: $green;
 					}
 				}
 				.disadvantage:hover {
 					.btn {
-						background-color: #cc3e4a;
+						background-color:$red;
 					}
 				}
 			}

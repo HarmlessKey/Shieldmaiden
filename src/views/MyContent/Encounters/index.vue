@@ -521,7 +521,7 @@
 		padding: 20px;
 
 		&.bg-green {
-			color: #fff;
+			color:$white;
 			animation: blink normal 3s infinite ease-in-out;
 		}
 		h3 {

@@ -271,7 +271,7 @@
 
 
 		&:hover {
-			color: #2c97de !important;
+			color: $blue !important;
 		}
 	}
 	.round-info {
@@ -331,7 +331,7 @@
 		display: block !important;
 	}
 	.edit {
-		color: #b2b2b2;
+		color: $gray-light;
 	}
 	.round-info {
 		.header {

@@ -197,9 +197,9 @@
 	.signed {
 		padding-top: 30px;
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color: #fff;
+		color:$white;
 		background-position: top center;
-		background-color: #000;
+		background-color:$black;
 		overflow: auto;
 		height: calc(100vh - 50px);
 		padding-bottom: 98px;
@@ -214,7 +214,7 @@
 				background-position: top center;
 				background-size: cover;
 				box-shadow: 5px 5px 10px rgba(0, 0, 0, .5);
-				color: #fff;
+				color:$white;
 				cursor: pointer;
 
 				.card-header {
@@ -243,13 +243,13 @@
 				}
 
 				&:hover {
-					color: #fff;
+					color:$white;
 				}
 			}
 
 			.first {
 				h2 {
-					color: #fff;
+					color:$white;
 					font-size: 30px !important;
 					text-align: center;
 				}
@@ -285,7 +285,7 @@
 				width: 100%;
 				padding: 20px 10px 20px 10px;
 				backdrop-filter: blur(2px);
-				border-top: solid 1px #5c5757;
+				border-top: solid 1px$gray-hover;
 				background-color: rgba(0, 0, 0, .5);
 
 				.btn {

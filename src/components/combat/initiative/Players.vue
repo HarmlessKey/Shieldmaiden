@@ -118,14 +118,14 @@
 
 		li {
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 
 			&:hover {
 				background: #141414 !important;
 			}
 
 			&.selected {
-				border-color: #2c97de;
+				border-color: $blue;
 			}
 			.img {
 				font-size: 20px;

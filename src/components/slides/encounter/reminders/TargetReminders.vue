@@ -216,7 +216,7 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 		}
 	}
 
@@ -225,26 +225,26 @@
 	}
 
 	ul.premade {
-		color: #fff;
+		color:$white;
 		list-style: none;
 		padding: 0;
 
 		li {
 			margin-bottom: 3px;
-			background-color: #191919;
+			background-color:$gray-dark;
 
 			.title {
 				padding: 5px;
 			}
 			a.add {
 				display: block;
-				background: #191919;
+				background:$gray-dark;
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
 			}
 			.variables {
-				border-top: solid 3px #262626;
+				border-top: solid 3px$gray;
 				padding: 10px;
 			}
 		}
@@ -254,7 +254,7 @@
 		font-size: 11px;
 
 		a {
-			color: #fff !important;
+			color:$white !important;
 			position: relative;
 			padding: 3px;
 
@@ -266,7 +266,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color: #fff !important;
+					color:$white !important;
 					font-size: 12px;
 					display: inline-block;
 					

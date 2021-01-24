@@ -72,10 +72,10 @@
 <style lang="scss" scoped>
 	.card {
 			border: solid 1px transparent !important;
-			background: #232323 !important;
+			background: $gray-darker !important;
 				
 			&.current {
-				border-color: #e85b46 !important;
+				border-color: $patreon-red !important;
 			}
 			h2 {
 				margin-bottom: 0 !important;

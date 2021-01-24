@@ -140,7 +140,7 @@
 			.qr {
 				display: flex;
 				justify-content: center;
-				border: solid 1px #5c5757;
+				border: solid 1px$gray-hover;
 				width: 100%;
 				padding: 20px 0;
 			}

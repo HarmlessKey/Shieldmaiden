@@ -302,7 +302,7 @@
 	}
 	ul.entities {
 		li {
-			background-color: #191919 !important;
+			background-color:$gray-dark !important;
 		}
 	}
 }

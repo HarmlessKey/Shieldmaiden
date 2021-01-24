@@ -194,10 +194,10 @@
 			padding: 0;
 		}
 		.list-group {
-			border-top: solid 1px #191919 !important;
+			border-top: solid 1px$gray-dark !important;
 
 			.list-group-item {
-				border-bottom: solid 1px #191919 !important;
+				border-bottom: solid 1px$gray-dark !important;
 			}
 		}
 		&.encounters {

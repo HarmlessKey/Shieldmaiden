@@ -17,12 +17,12 @@
       },
       fill: {
         type: String,
-        default: "#b2b2b2"
+        default: "$gray-light"
       }
     },
     computed: {
       fillColor() {
-        return (this.fill === null) ? "#b2b2b2" : this.fill;
+        return (this.fill === null) ? "$gray-light" : this.fill;
       }
     },
 		data() {

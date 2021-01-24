@@ -317,9 +317,9 @@
 		padding: 20px;
 
 		h2.head {
-			color: #fff;
+			color:$white;
 			margin-top: 20px;
-			text-shadow: 0 0 8px #000;
+			text-shadow: 0 0 8px$black;
 			font-size: 25px !important;
 			text-align: center;
 		}
@@ -330,10 +330,10 @@
 			font-size: 30px;
 			margin-bottom: 25px;
 			position: relative;
-			color: #fff;
+			color:$white;
 
 			.close {
-				background: #000;
+				background:$black;
 				position: absolute;
 				top: 0;
 				right: 0;
@@ -345,14 +345,14 @@
 		.actions {
 			display: flex;
 			justify-content: space-between;
-			border-bottom: solid 1px #fff;
+			border-bottom: solid 1px$white;
 			margin-bottom: 20px;
 			padding-bottom: 5px;
-			color: #fff;
+			color:$white;
 
 			.right {
 				a {
-					color: #fff !important;
+					color:$white !important;
 					margin-left: 10px;
 				}
 			}
@@ -361,15 +361,15 @@
 		.q-tabs {
 			.q-tab {
 				&.q-tab--active {
-					background: #302f2f !important;
-					color: #2c97de;
+					background:$gray-active !important;
+					color: $blue;
 				}
 			}
 		}
 
 		.nav {
 			.nav-link.active {
-				background-color: #302f2f !important;
+				background-color:$gray-active !important;
 			}
 		}
 

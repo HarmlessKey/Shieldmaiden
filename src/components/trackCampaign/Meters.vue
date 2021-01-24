@@ -174,8 +174,8 @@
 
 		h3 {
 			text-transform: capitalize;
-			color: #fff;
-			text-shadow: 0 0 3px  #000;
+			color:$white;
+			text-shadow: 0 0 3px $black;
 			font-size: 12px !important;
 			font-weight: bold !important;
 			margin: 20px 0 0 0 !important;
@@ -196,7 +196,7 @@
 				margin-bottom: 3px;
 
 				.img {
-					background-color: #191919;
+					background-color:$gray-dark;
 					background-position: center top;
 					background-repeat: no-repeat;
 					background-size: cover;
@@ -212,7 +212,7 @@
 					position: relative;
 
 					.info {
-						color: #b2b2b2;
+						color: $gray-light;
 						width: 100%;
 						position: absolute;
 						left: 0;

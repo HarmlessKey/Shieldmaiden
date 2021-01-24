@@ -66,7 +66,7 @@
 		width: 20px;
 		height: 20px;
 		margin-right: 5px;
-		fill: #b2b2b2;
+		fill: $gray-light;
 	}
 	ul {
 		margin-top: 20px;

@@ -85,11 +85,11 @@
 <style lang="scss" scoped>
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color: #fff;
+		color:$white;
 		background-position: top center;
 		padding: 0 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #000;
+		background-color:$black;
 		overflow: hidden;
 
 		.animated-video {
@@ -118,7 +118,7 @@
 			padding-top: 50px;
 			width: 70%;
 			max-width: 400px;
-			filter: drop-shadow(2px 2px 1px  #000);
+			filter: drop-shadow(2px 2px 1px $black);
 		}
 		.container-fluid {
 
@@ -130,7 +130,7 @@
 					margin: auto;
 					max-width: 800px;
 					padding: 25px 20px 20px 20px;
-					text-shadow: 2px 2px 1px #000;
+					text-shadow: 2px 2px 1px$black;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
@@ -156,7 +156,7 @@
 						margin-top: 20px;
 
 						a {
-							color: #fff !important;
+							color:$white !important;
 						}
 					}
 					.share {
@@ -185,7 +185,7 @@
 						}
 						.large-link {
 							text-shadow: none;
-							box-shadow: 2px 2px 1px #000;
+							box-shadow: 2px 2px 1px$black;
 							font-size: 20px;
 	
 							&.not-logged {

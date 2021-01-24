@@ -66,8 +66,8 @@
 				width: 100%;
 				height: calc(100% - 10px);
 				overflow: hidden;
-				border: solid 8px #000;
-				background-color: #000;
+				border: solid 8px$black;
+				background-color:$black;
 				border-radius: 10px;
 				position: relative;
 

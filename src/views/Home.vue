@@ -55,9 +55,15 @@
 				<Campaign />
 			</section>
 			<Footer />
-			<div class="patreon bg-black d-flex justify-content-end">
-				<router-link to="/sign-up" class="btn">Create Account</router-link>
-				<router-link to="/demo" class="ml-2 btn bg-green">Demo Encounter</router-link>
+			<div class="bottom-actions d-flex justify-content-center">
+				<template v-if="!$store.getters.user">
+					<router-link to="/sign-up" class="btn btn-lg">Create Account</router-link>
+					<router-link to="/demo" class="ml-2 btn btn-lg bg-green">Demo Encounter</router-link>
+				</template>
+				<router-link v-else to="/content" class="ml-2 btn btn-lg bg-green">
+					<i class="fas fa-treasure-chest"/>
+					My content
+				</router-link>
 			</div>
 		</template>
 	</div>
@@ -129,7 +135,7 @@
 <style lang="scss" scoped>
 
 .home {
-	padding-bottom: 55px;
+	padding-bottom: 85px;
 	overflow-y: scroll;
 	height: 100vh;
 
@@ -152,14 +158,16 @@
 		background-repeat: no-repeat;
 		z-index: 97;
 	}
-	.patreon {
+	.bottom-actions {
+		background: rgba(0, 0, 0, .3);
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		padding: 10px;
-		height: 55px;
+		padding: 20px 10px;
+		height: 85px;
 		line-height: 33px;
 		z-index: 97;
+		backdrop-filter: blur(3px);
 	}
 }
 </style>

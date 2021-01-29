@@ -12,9 +12,9 @@
 					</div>
 					<!-- DATA -->
 					<h3>Your data</h3>
-					<b-list-group class="data">
+					<q-list class="data">
 						<!-- Campaigns -->
-						<b-list-group-item to="/campaigns">
+						<q-item to="/campaigns" class="justify-content-between">
 								<div>
 									<i class="fas fa-dungeon mr-1"></i> Campaigns
 								</div>
@@ -25,10 +25,10 @@
 									<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.campaigns }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
 						<!-- Players -->
-						<b-list-group-item to="/players">
+						<q-item to="/players" class="justify-content-between">
 								<div>
 									<i class="fas fa-user mr-1"></i> Players
 								</div>
@@ -39,10 +39,10 @@
 									<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.players }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
 						<!-- NPC's -->
-						<b-list-group-item  to="/npcs">
+						<q-item  to="/npcs" class="justify-content-between">
 								<div>
 									<i class="fas fa-dragon mr-1"></i> NPC's
 								</div>
@@ -53,9 +53,9 @@
 									<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.npcs }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
-					</b-list-group>
+					</q-list>
 					<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-patreon-red mt-3" to="/patreon">Need more?</router-link>
 
 					<!-- HAS A SUBSCRIPTION -->

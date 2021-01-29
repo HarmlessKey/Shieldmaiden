@@ -96,7 +96,6 @@
 							<p v-if="tier.name == 'Deity'" class="gray-hover">You have unlimited power.</p>
 							<ul class="benefits">
 								<li v-for="(benefit, key) in tier.benefits" :key="key">
-									<template v-if="key == 'ads'">Ads are removed</template>
 									<template v-if="key == 'campaigns'">
 										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
 										<span v-else class="green">{{ benefit }}</span> campaign slots

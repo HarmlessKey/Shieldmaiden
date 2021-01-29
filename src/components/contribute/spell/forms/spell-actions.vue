@@ -156,7 +156,7 @@ export default {
 				{ label: "Ranged Weapon", value: "ranged_weapon" },
 				{ label: "Spell Attack", value: "spell_attack" },
 				{ label: "Spell Save", value: "spell_save" },
-				{ label: "Healing Spell", value: "healing_spell" },
+				{ label: "Healing", value: "healing" },
 				{ label: "Damage", value: "damage" },
 				{ label: "Other", value: "other" },
 			],
@@ -179,7 +179,7 @@ export default {
 				this.spell.actions = [];
 			}
 			this.spell.actions.push({
-				type: "spell attack",
+				type: "spell_attack",
 				name: "New action",
 				modifiers: [],
 				conditions: [],

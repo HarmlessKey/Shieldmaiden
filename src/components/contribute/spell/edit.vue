@@ -8,7 +8,7 @@
 		<div class="spell-wrapper" v-if="canEdit()">
 			<template v-if="(old_spell && spell)">
 				
-				<div class="form">
+				<q-form @submit="store_spell()">
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
@@ -31,7 +31,7 @@
 
 									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank" rel="noopener">{{ old_spell.name }}</a></h1>
 									<i class="mb-3 d-block" v-if="old_spell.school">
-										{{ levels[old_spell.level] }}
+										{{ spell_levels[old_spell.level] }}
 										{{ old_spell.school.name }}
 									</i>
 
@@ -72,12 +72,10 @@
 						</div>
 
 						<div class="col-12 col-md-8">
-							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-							<!-- SPELL ACTIONS -->
-							<spell-actions v-model='spell' @validation="setValidators" />
+							<EditSpell :spell="spell" />
 						</div>
 					</div>
-				</div>
+				</q-form>
 				<div class="save">
 					<div class="d-flex justify-content-start">
 						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
@@ -87,13 +85,7 @@
 					</div>
 					<div>
 						<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-						<button 
-							:disabled="errors.items && errors.items.length > 0"
-							class="btn" 
-							@click="store_spell()"
-						>
-							<i class="fas fa-check"></i> Save
-						</button>
+						<q-btn label="Save" type="submit" color="primary"/>
 					</div>
 				</div>
 			</template>
@@ -102,23 +94,22 @@
 </template>
 
 <script>
-import { db } from '@/firebase'
-import Crumble from '@/components/crumble/Compendium.vue'
-import basicInfo from '@/components/contribute/spell/forms/basic-info.vue'
-import spellActions from '@/components/contribute/spell/forms/spell-actions.vue'
-import ViewSpell from '@/components/ViewSpell.vue'
-import { general } from '@/mixins/general.js'
-import { mapGetters } from 'vuex'
+import { db } from '@/firebase';
+import Crumble from '@/components/crumble/Compendium.vue';
+import EditSpell from '@/components/contribute/spell/forms/EditSpell.vue';
+import ViewSpell from '@/components/ViewSpell.vue';
+import { general } from '@/mixins/general';
+import { spells } from '@/mixins/spells';
+import { mapGetters } from 'vuex';
 
 export default {
-	name: 'SpellEdit',
+	name: 'ContribSpellEdit',
 	components: {
 		Crumble,
-		basicInfo,
-		spellActions,
 		ViewSpell,
+		EditSpell,
 	},
-	mixins: [general],
+	mixins: [general, spells],
 	metaInfo() {
 		return {
 			title: this.old_spell.name + ' | D&D 5th Edition',
@@ -132,10 +123,7 @@ export default {
 			userId: this.$store.getters.user.uid,
 			id: this.$route.params.id,
 			loading: true,
-			levels: ["Cantrip",
-				"1st","2nd","3rd",
-				"4th","5th","6th",
-				"7th","8th","9th"],
+			
 			validators: {},
 			spell: {},
 			unsaved_changes: false,
@@ -323,22 +311,22 @@ export default {
 		update() {
 			this.$forceUpdate();
 		},
-		setValidators(validators) {
-			// Receives validator lists from basic info and spell actions
-			for (let v in validators) {
-				this.validators[v] = validators[v];
-			}
-		},
-		async validate_validators() {
-			// loops through all available validators to check if the forms
-			// are all valid. This happens async.
-			for (let v in this.validators) {
-				let validator = this.validators[v];
-				let temp = await validator.validateAll()
-				if (temp == false) return false;
-			}
-			return true;
-		},
+		// setValidators(validators) {
+		// 	// Receives validator lists from basic info and spell actions
+		// 	for (let v in validators) {
+		// 		this.validators[v] = validators[v];
+		// 	}
+		// },
+		// async validate_validators() {
+		// 	// loops through all available validators to check if the forms
+		// 	// are all valid. This happens async.
+		// 	for (let v in this.validators) {
+		// 		let validator = this.validators[v];
+		// 		let temp = await validator.validateAll()
+		// 		if (temp == false) return false;
+		// 	}
+		// 	return true;
+		// },
 
 		async store_spell() {
 			delete this.spell['.value'];

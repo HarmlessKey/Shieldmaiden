@@ -1286,6 +1286,12 @@ html body {
 			li {
 				padding-left: 0;
 				grid-template-columns: 55px auto max-content;
+
+				.overview-item {
+					display: grid;
+					grid-template-columns: auto 20px;
+					grid-gap: 5px;
+				}	
 			}
 		}
 	}

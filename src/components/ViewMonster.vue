@@ -276,7 +276,7 @@
 
 .monster {
 	padding: 10px;
-	color: #000;
+	color:$black;
 	font-family: 'Times New Roman', Times, serif;
 
 	h2 {
@@ -320,10 +320,10 @@
 				cursor: pointer;
 			}
 			.advantage .save:hover {
-				color: #83b547
+				color: $green
 			}
 			.disadvantage .save:hover {
-				color: #cc3e4a
+				color:$red
 			}
 		} 
 	}
@@ -349,10 +349,10 @@
 			cursor: pointer;
 		}
 		.advantage .ability:hover {
-			color: #83b547
+			color: $green
 		}
 		.disadvantage .ability:hover {
-			color: #cc3e4a
+			color:$red
 		}
 	}
 }

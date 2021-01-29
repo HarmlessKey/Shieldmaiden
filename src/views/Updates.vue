@@ -4,7 +4,7 @@
 			<h1>Updates</h1>
 			<p>Check the latest updates on our Discord.</p>
 
-			<a href="https://discord.gg/gCXJZCs" target="_blank" class="large-link">
+			<a href="https://discord.gg/gCXJZCs" target="_blank" rel="noopener" class="large-link">
 				<div class="icon bg-discord-purple"><i class="fab fa-discord white"></i></div>
 				<div class="text">Harmless Key Discord</div>
 			</a>
@@ -53,12 +53,12 @@
 
 			li {
 				font-size: 13px;
-				border-bottom: solid 1px #302f2f;
+				border-bottom: solid 1px$gray-active;
 
 				a {
-					color: #b2b2b2 !important;
+					color: $gray-light !important;
 					padding: 15px 5px;
-					border-top: solid 1px #302f2f;
+					border-top: solid 1px$gray-active;
 
 					&:hover {
 						text-decoration: none;

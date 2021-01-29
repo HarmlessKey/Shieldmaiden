@@ -10,7 +10,7 @@
 			<p>
 				If you can't find a item, 
 				it is because we are only allowed to store 
-				items from the <a href="../SRD-OGL_V5.1.pdf" target="_blank">SRD</a>.
+				items from the <a href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD</a>.
 			</p>
 
 			<hk-table

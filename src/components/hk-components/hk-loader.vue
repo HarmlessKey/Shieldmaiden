@@ -56,8 +56,8 @@ export default {
 			font-weight: bold;
 			font-size: 25px;
 			text-transform: none;
-			color: #fff;
-			text-shadow: 0 0 8px #000;
+			color:$white;
+			text-shadow: 0 0 8px$black;
 			line-height: 50px;
 			letter-spacing: 2px;
 		}

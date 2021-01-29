@@ -177,7 +177,7 @@
 		width: 15px;
 		height: 15px;
 		border-radius: 50%;
-		background:   #cc3e4a;
+		background:  $red;
 		text-align: center;
 		font-size: 12px;
 		line-height: 15px;
@@ -190,7 +190,7 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 		}
 	}
 	ul.conditions {
@@ -200,7 +200,7 @@
 		font-size: 16px;
 
 		a {
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 		}
 		.icon {
 			width: 25px;
@@ -212,8 +212,8 @@
 			margin-bottom: 15px;
 
 			.shown {
-				color: #b2b2b2;
-				background: #302f2f;
+				color: $gray-light;
+				background:$gray-active;
 				padding: 20px;
 
 				ul {

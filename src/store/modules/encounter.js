@@ -178,15 +178,15 @@ const actions = {
 	 * @param {boolean} demo Wether this is the demo encounter
 	 */
 	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
+		// Create the path to the encounter in firebase
+		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+		const path = `${uid}/${cid}/${eid}`;
+
 		commit("SET_DEMO", demo);
-		commit("SET_UID", rootGetters.user.uid);
+		commit("SET_UID", uid);
 		commit("SET_CAMPAIGN_ID", cid);
 		commit("SET_ENCOUNTER_ID", eid);
 		commit("CLEAR_ENTITIES");
-
-		// Create the path to the encounter in firebase
-		const uid = rootGetters.user.uid;
-		const path = `${uid}/${cid}/${eid}`;
 		commit("SET_PATH", path);
 
 		try {

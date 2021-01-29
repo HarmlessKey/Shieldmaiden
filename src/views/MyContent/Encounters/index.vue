@@ -303,6 +303,9 @@
 			}),
 			this.setCurHp();
 			this.removeGhostPlayers();
+			this.setActiveCampaign({ 
+				campaign_id: this.campaignId 
+			});
 		},
 		computed: {
 			...mapGetters([
@@ -363,6 +366,7 @@
 			...mapActions([
 				'fetchEncounters',
 				'fetchCampaign',
+				'setActiveCampaign',
 			]),
 			addEncounter() {
 				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
@@ -517,7 +521,7 @@
 		padding: 20px;
 
 		&.bg-green {
-			color: #fff;
+			color:$white;
 			animation: blink normal 3s infinite ease-in-out;
 		}
 		h3 {

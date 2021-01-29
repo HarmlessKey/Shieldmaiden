@@ -514,11 +514,11 @@
 		justify-content: space-between;
 		height: 35px;
 		line-height: 35px;
-		border-bottom: solid 2px #fff;
+		border-bottom: solid 2px$white;
 
 		.right {
 			a {
-				color: #fff !important;
+				color:$white !important;
 				margin-left: 10px;
 			}
 		}
@@ -555,7 +555,7 @@
 							font-size: 12px;
 							padding: 10px 0 5px 0;
 							border: none;
-							border-bottom: solid 1px #fff;
+							border-bottom: solid 1px$white;
 							cursor: default;
 
 							&:hover {
@@ -603,7 +603,7 @@
 							.img {
 								width: 42px;
 								height: 42px;
-								border: solid 1px #b2b2b2;
+								border: solid 1px $gray-light;
 								background-size: cover;
 								background-position: center top;
 							}
@@ -617,21 +617,21 @@
 						}
 						&.targeted {
 							td {
-								border-color: #2c97de;
+								border-color: $blue;
 							}
 						}
 						&:hover {
 							@media only screen and (min-width: 576px) {
 								td {
-									border-color: #fff;
+									border-color:$white;
 								}
 							}
 						}
 					}
 					tr td:first-child, thead th {
-						color: #fff;
+						color:$white;
 						background: none;
-						text-shadow: 0 0 3px  #000;
+						text-shadow: 0 0 3px $black;
 					}
 					tr td:first-child, thead th:first-child {
 						text-align: center;
@@ -656,7 +656,7 @@
 						font-size: 13px;
 						line-height: 13px;
 						position: absolute;
-						color: #cc3e4a;
+						color:$red;
 						top: -5px;
 						left: 2px;
 					}
@@ -677,7 +677,7 @@
 			position: fixed;
 			bottom: 0;
 			z-index: 90;
-			background: #191919;
+			background:$gray-dark;
 			left: 0;
 			width: 100%;
 			border: none;

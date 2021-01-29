@@ -125,7 +125,7 @@ ul {
 		margin-bottom: 1px;
 
 		.img {
-			background-color: #191919;
+			background-color:$gray-dark;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;

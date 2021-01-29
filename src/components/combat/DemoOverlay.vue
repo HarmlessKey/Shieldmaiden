@@ -60,7 +60,7 @@
 		grid-template-columns: 1fr max-content;
 		grid-template-rows: max-content;
 		padding: 20px;
-		box-shadow: 0px 0px 15px #000;
+		box-shadow: 0px 0px 15px$black;
 		transition: bottom .5s linear;
 		grid-gap: 20px;
 
@@ -83,7 +83,7 @@
         display: block;
         cursor: pointer;
         line-height: 50px;
-        color: #fff !important;
+        color:$white !important;
 
         i {
             transition: transform .5s linear;

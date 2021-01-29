@@ -29,7 +29,7 @@
 											<span class="d-none d-md-inline ml-1">Parse to new spell</span>
 									</a>
 
-									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank">{{ old_spell.name }}</a></h1>
+									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank" rel="noopener">{{ old_spell.name }}</a></h1>
 									<i class="mb-3 d-block" v-if="old_spell.school">
 										{{ levels[old_spell.level] }}
 										{{ old_spell.school.name }}
@@ -435,7 +435,7 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			padding: 10px 0;
-			border-top: solid 1px #5c5757;
+			border-top: solid 1px$gray-hover;
 	
 			.unsaved_changes {
 				padding: 10px;

@@ -172,9 +172,9 @@
 
 		a {
 			text-align: center;
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 			border-radius: 50%;
-			background-color: #302f2f;
+			background-color:$gray-active;
 			width: 30px;
 			height: 30px;
 			display: block;
@@ -184,7 +184,7 @@
 				background-color: #494747;
 			}
 			&.active {
-				color: #2c97de !important;
+				color: $blue !important;
 			}
 		}
 	}
@@ -194,7 +194,7 @@
 		
 		li {
 			display: grid;
-			background-color: #191919;
+			background-color:$gray-dark;
 			grid-template-columns: max-content auto;
 			margin-bottom: 1px;
 			vertical-align: center;

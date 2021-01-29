@@ -183,7 +183,7 @@
 			return {
 				rollInfo: false,
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				active_action: undefined,
@@ -605,12 +605,12 @@
 
 		.advantage:hover {
 			.btn {
-				background-color: #83b547;
+				background-color: $green;
 			}
 		}
 		.disadvantage:hover {
 			.btn {
-				background-color: #cc3e4a;
+				background-color:$red;
 			}
 		}
 	}
@@ -647,12 +647,12 @@
 				}
 				.advantage:hover {
 					.btn {
-						background-color: #83b547;
+						background-color: $green;
 					}
 				}
 				.disadvantage:hover {
 					.btn {
-						background-color: #cc3e4a;
+						background-color:$red;
 					}
 				}
 			}

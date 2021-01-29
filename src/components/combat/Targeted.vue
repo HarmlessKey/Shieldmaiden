@@ -389,7 +389,7 @@
 		grid-template-columns: 1fr 35px;
 		grid-template-rows: 35px;
 		grid-gap: 0;
-		background: #191919;
+		background:$gray-dark;
 
 		.clear {
 			display: block;
@@ -402,7 +402,7 @@
 	}
 	.target {
 		margin-bottom: 10px;
-		border: solid 1px #191919;
+		border: solid 1px$gray-dark;
 		
 		.scores {
 			width: 100%;
@@ -424,12 +424,12 @@
 					margin-top: 1px;
 				}
 				.advantage .mod:hover {
-					color: #fff;
-					background-color: #83b547 !important;
+					color:$white;
+					background-color: $green !important;
 				}
 				.disadvantage .mod:hover {
-					color: #fff;
-					background-color: #cc3e4a !important;
+					color:$white;
+					background-color:$red !important;
 				}
 			}
 		}
@@ -438,18 +438,18 @@
 		margin: 20px -3px 0 -3px;
 
 		a {
-			background-color: #b2b2b2;
+			background-color: $gray-light;
 			margin: 0 3px;
 			display: block;
 			width: 100%;
 			text-align: center;
-			color: #191919 !important;
+			color:$gray-dark !important;
 			line-height: 35px;
 			font-size: 15px;
 
 			&:hover {
-				background: #5c5757;
-				color: #fff !important;
+				background:$gray-hover;
+				color:$white !important;
 			}
 		}
 	}
@@ -467,9 +467,9 @@
 			height: 30px;
 			line-height: 26px;
 			text-align: center;
-			fill: #cc3e4a;
-			color: #cc3e4a;
-			background-color: #302f2f;
+			fill:$red;
+			color:$red;
+			background-color:$gray-active;
 			padding: 2px;
 			cursor: pointer;
 		}

@@ -7,6 +7,7 @@ import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
 import { store } from './store/store';
 import { routes } from './routes';
+import Validation from './validation';
 import Snotify, { SnotifyPosition } from 'vue-snotify'
 import VueCookies from 'vue-cookies'
 import Vuebar from 'vuebar';
@@ -19,6 +20,8 @@ import HkRoll from './components/hk-components/hk-roll';
 import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
 import './quasar';
+import './registerServiceWorker';
+import { Notify } from 'quasar';
 
 const options = {
 	toast: {
@@ -33,7 +36,7 @@ Vue.component('hk-card-deck', HkCardDeck);
 Vue.component('hk-roll', HkRoll);
 Vue.component('hk-loader', HkLoader);
 Vue.component('icon', Icon);
-Vue.use(Snotify, options); 
+Vue.use(Snotify, options);
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);
 Vue.use(VueCookies);
@@ -44,6 +47,7 @@ Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
 
 
 require('./functions.js')
+Vue.use(Validation)
 
 // Set-up and use the Vue Router
 // Pass in your routes and then
@@ -61,7 +65,7 @@ const router = new VueRouter({
 Vue.use(VueAnalytics, {
 	id: 'UA-134177767-1',
 	router
-})
+});
 
 // Check before each page load whether the page requires authentication/
 // if it does check whether the user is signed into the web app or
@@ -71,11 +75,24 @@ router.beforeEach((to, from, next) => {
 
 	const currentUser = auth.currentUser; //Check if there is a user
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)
+	const offline = to.matched.some(record => record.meta.offline); //Check if route is offline available
 	const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin); //Check if Admin is needed for the page (defined in routes)
 	const requiresContribute = to.matched.some(record => record.meta.requiresContribute); //Check if Contribute is needed for the page (defined in routes)
 
+
+	// Check if a user is offline, if the page is not available offline, send to home
+	if(!navigator.onLine && !offline) {
+		Notify.create({
+			message: "Page not available offline, redirected to home.",
+			icon: "fas fa-wifi-slash",
+			color: "negative",
+			position: "top"
+		})
+		next('/');
+	}
+
 	//Check if someone is logged in and if Auth is needed
-	if (requiresAuth && !currentUser) {
+	else if (requiresAuth && !currentUser) {
 		next('/sign-in'); //no user, but auth is needed
 	} else if (requiresAuth && currentUser) {
 		//Auth is needed and there is a user

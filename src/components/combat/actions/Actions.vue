@@ -217,7 +217,7 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px #b2b2b2;
+		border: solid 1px $gray-light;
 	}
 	.reaction-used {
 		font-size: 15px;

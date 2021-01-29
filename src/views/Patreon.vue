@@ -22,7 +22,7 @@
 					This way you can help us in achieving this goal and benifit from the extra's that come with it.
 				</p>
 
-				<a class="btn bg-patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank"><i class="fab fa-patreon black"></i> Support us</a>
+				<a class="btn bg-patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"><i class="fab fa-patreon black"></i> Support us</a>
 			</div>
 		<Footer class="mt-5" />
 		</div>

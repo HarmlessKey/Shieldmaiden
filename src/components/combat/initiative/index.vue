@@ -107,7 +107,6 @@
 	import Overview from './Overview.vue';
 
 	export default {
-
 		name: 'SetInitiative',
 		props: ['_active', '_idle', 'width'],
 		components: {
@@ -119,7 +118,7 @@
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				setShadowPlayer: 0,
 				setShadowNPC: 0,
 				setShadowOverview: 0,
@@ -155,6 +154,7 @@
 			...mapGetters([
 				'campaignId',
 				'encounterId',
+				'encounter',
 				'entities',
 				'path',
 			]),
@@ -209,13 +209,13 @@
 
 <style lang="scss" scoped>
 #container {
-	padding: 10px;
+	padding: 5px;
 	width: 100vw;
 	height: calc(100% - 50px);
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	grid-template-rows: 60px auto;
-	grid-gap: 10px;
+	grid-gap: 5px;
 	grid-template-areas: 
 	"turns turns turns"
 	"players npcs set";
@@ -302,7 +302,7 @@
 	}
 	ul.entities {
 		li {
-			background-color: #191919 !important;
+			background-color:$gray-dark !important;
 		}
 	}
 }

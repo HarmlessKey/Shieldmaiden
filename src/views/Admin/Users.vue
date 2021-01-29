@@ -197,7 +197,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: #b2b2b2;
+			color: $gray-light;
 		}
 		&:last-child::after {
 			content: '';

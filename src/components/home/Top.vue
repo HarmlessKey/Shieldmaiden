@@ -2,7 +2,6 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<!-- <img  v-if="!userInfo" class="logo" src="@/assets/_img/logo/logo-cyan.svg" /> -->
 				<div v-if="play_animation"
 					@click="replay()"
 					@mouseover="video_hover = true" 
@@ -22,67 +21,27 @@
 							</q-tooltip>
 						</span>
 					</div>
-					<video ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
-						:muted="muted" autoplay playsinline
-					></video>
+					<video 
+						ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
+						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
+					/>
 				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" />
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
 				<div class="content-box">
 					<div class="text">
-						<template v-if="!userInfo">
+						<template>
 							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
 							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
 							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
 						</template>
-						<div v-else class="mt-3">
-							<q-tabs
-								dark
-								no-caps
-							>
-								<q-route-tab 
-									v-for="({name, icon, label}, index) in tabs"
-									:key="`tab-${index}`" 
-									:to="`/${name}`" 
-									:icon="icon"
-									:label="label"
-								/>
-							</q-tabs>
-							<div class="share">
-								<h2>Share your encounters</h2>
-								<q-input
-									dark filled square
-									:value="copy"
-									autocomplete="off"
-									type="text"
-									hint="With this link your players can track the initiative list of you active encounter"
-								>
-									<span slot="prepend" class="blue pointer" @click="setSlide({show: true, type: 'PlayerLink'})">
-										<q-icon  size="xs"  name="fas fa-qrcode" />
-										<q-tooltip anchor="top middle" self="center middle">
-											Show QR-code
-										</q-tooltip>
-									</span>
-									<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
-										<q-tooltip anchor="top middle" self="center middle">
-											Click to copy
-										</q-tooltip>
-									</q-icon>
-								</q-input>
-								<input :value="copy" id="copy" type="hidden" />
-							</div>
-						</div>
 
 						<div class="button-container">
-							<router-link v-if="!userInfo" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
 						</div>
 						
 						<!-- PATREON -->
 						<div>
-							<!-- <pre>{{ tier }}</pre> -->
-							<template v-if="tier && userInfo && userInfo.patron">
-									<h4 class="text-center patreon-red"><i class="patreon-red fas fa-heart"></i> Thanks for your '{{ userInfo.patron.tier}}' support.</h4>
-							</template>
-							<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
 
 						<a class="next" href="#general">
@@ -97,77 +56,21 @@
 </template>
 
 <script>
-	import PlayerLink from '../PlayerLink';
-	import { mapGetters, mapActions } from 'vuex';
-
 	export default {
 		name: 'Top',
-		components: {
-			PlayerLink
-		},
 		data() {
 			return {
 				play_animation: true,
 				muted: true,
-				video_hover: false,
-				copy: window.origin + '/user/' + this.$store.getters.user.uid,
-				tabs: [
-					{
-						name: "campaigns",
-						label: "Campaigns",
-						icon: "fas fa-dungeon"
-					},
-					{
-						name: "players",
-						label: "players",
-						icon: "fas fa-users"
-					},
-					{
-						name: "npcs",
-						label: "NPC's",
-						icon: "fas fa-dragon"
-					}
-				]
+				video_hover: false
 			}
 		},
-		computed: {
-			...mapGetters([
-				'user',
-				'tier',
-				'voucher',
-				'userInfo',
-			]),
-		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
 			replay() {
 				const player = this.$refs.video;
 				player.currentTime = 0;
 				player.play();
-			},
-			copyLink() {
-
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text') //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
+			}
 		},
 		mounted() {
 			const navigator = window.navigator;
@@ -182,11 +85,11 @@
 <style lang="scss" scoped>
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color: #fff;
+		color:$white;
 		background-position: top center;
 		padding: 0 0 170px 0;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #000;
+		background-color:$black;
 		overflow: hidden;
 
 		.animated-video {
@@ -215,7 +118,7 @@
 			padding-top: 50px;
 			width: 70%;
 			max-width: 400px;
-			filter: drop-shadow(2px 2px 1px  #000);
+			filter: drop-shadow(2px 2px 1px $black);
 		}
 		.container-fluid {
 
@@ -227,7 +130,7 @@
 					margin: auto;
 					max-width: 800px;
 					padding: 25px 20px 20px 20px;
-					text-shadow: 2px 2px 1px #000;
+					text-shadow: 2px 2px 1px$black;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
@@ -253,7 +156,7 @@
 						margin-top: 20px;
 
 						a {
-							color: #fff !important;
+							color:$white !important;
 						}
 					}
 					.share {
@@ -282,7 +185,7 @@
 						}
 						.large-link {
 							text-shadow: none;
-							box-shadow: 2px 2px 1px #000;
+							box-shadow: 2px 2px 1px$black;
 							font-size: 20px;
 	
 							&.not-logged {

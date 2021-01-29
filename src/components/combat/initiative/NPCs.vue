@@ -170,14 +170,14 @@
 
 		li {
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 
 			&:hover {
 				background: #141414 !important;
 			}
 
 			&.selected {
-				border-color: #2c97de;
+				border-color: $blue;
 			}
 			.img {
 				font-size: 20px;
@@ -185,18 +185,18 @@
 				text-align: center;
 			}
 			.advantage a:hover {
-				color: #83b547 !important;
+				color: $green !important;
 			}
 			.disadvantage a:hover {
-				color: #cc3e4a !important;
+				color:$red !important;
 			}
 		}
 	}
 	.advantage .btn:hover {
-		background-color: #83b547;
+		background-color: $green;
 	}
 	.disadvantage .btn:hover {
-		background-color: #cc3e4a;
+		background-color:$red;
 	}
 }
 .initiative-move {

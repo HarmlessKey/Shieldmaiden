@@ -8,9 +8,12 @@
 				</span>
 			</div>
 
-			<div class="row q-col-gutter-md">
+			<div class="row q-col-gutter-xl">
 				<div class="col-12 col-md-6">
-					<img class="image" src="@/assets/_img/home/player-overview.gif"/>
+					<video 
+						class="video" src="@/assets/_img/home/player-overview.mp4" 
+						muted autoplay playsinline alt="D&D Combat Tracker Harmless Key player overview" loop
+					/>
 				</div>
 				<div class="col-12 col-md-6">
 					<h3>More than an encounter tool,<br/> if you want it to be.</h3>
@@ -44,7 +47,7 @@
 		ul {
 			margin-bottom: 30px;
 		}
-		img {
+		video {
 			width: 100%;
 			margin-bottom: 30px;
 		}

@@ -7,7 +7,7 @@
         <div>
             <b>Payment declined!</b><br/>
             Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
-            Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
+            Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
         </div>
         <a @click="hide = true"><i class="fas fa-times"></i></a>
 	</div>
@@ -43,7 +43,7 @@
         justify-content: space-between;
 
         a {
-            color: #fff !important;
+            color:$white !important;
         }
     }
     .hide_declined {

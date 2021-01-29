@@ -26,9 +26,14 @@
 					autocomplete="off"
 					type="text"
 				>
-					<q-icon slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
+					<q-icon v-if="!share_available" slot="append" size="xs" class="blue pointer" @click="copyLink()" name="fas fa-copy">
 						<q-tooltip anchor="top middle" self="center middle">
 							Click to copy
+						</q-tooltip>
+					</q-icon>
+					<q-icon v-else slot="append" size="xs" class="blue pointer" @click="share()" name="fas fa-share-alt">
+						<q-tooltip anchor="top middle" self="center middle">
+							Click to share
 						</q-tooltip>
 					</q-icon>
 				</q-input>
@@ -55,6 +60,11 @@
 				is_small: false,
 				showInfo: false,
 				copy: window.origin + '/user/' + this.$store.getters.user.uid,
+			}
+		},
+		computed: {
+			share_available() {
+				return navigator.share !== undefined;
 			}
 		},
 		methods: {
@@ -88,6 +98,16 @@
 				toCopy.setAttribute('type', 'hidden')
 				window.getSelection().removeAllRanges()
 			},
+			share() {
+				if (navigator.share) {
+					navigator.share({
+						title: 'Harmless Key',
+						text: 'Follow my campaigns on Harmless Key!',
+						url: this.copy,
+					})
+					.catch((error) => console.log('Error sharing', error));
+				}
+			},
 		},
 		mounted() {
 			this.$nextTick(function() {
@@ -120,7 +140,7 @@
 			.qr {
 				display: flex;
 				justify-content: center;
-				border: solid 1px #5c5757;
+				border: solid 1px$gray-hover;
 				width: 100%;
 				padding: 20px 0;
 			}

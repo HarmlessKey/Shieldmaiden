@@ -345,7 +345,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		background-size: cover;
 		background-position: center top;
 		margin-right: 5px;
-		background-color: #302f2f;
+		background-color:$gray-active;
 		cursor: pointer;
 	}
 }

@@ -136,7 +136,7 @@
 		height: calc(100vh - 50px);
 		background-size: cover;
 		background-position: center bottom;
-		background-color: #191919;
+		background-color:$gray-dark;
 		width: 100vw;
 		position: relative;
 

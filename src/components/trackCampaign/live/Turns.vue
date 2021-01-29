@@ -131,7 +131,7 @@
 			background-size: cover;
 			background-position: center top;
 			margin-left: 15px;
-			border: solid 1px #b2b2b2;
+			border: solid 1px $gray-light;
 		}
 		h1 {
 			line-height: 40px;
@@ -145,7 +145,7 @@
 			width: 60px;
 			line-height: 60px;
 			text-align: center;
-			color: #fff;
+			color:$white;
 			font-size: 25px;
 
 			.hide {

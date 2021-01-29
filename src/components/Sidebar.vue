@@ -127,58 +127,19 @@
 				<hr>
 				<h3>Follow us</h3>
 				<q-list @click="setSideSmallScreen(false)">
-					<q-item clickable v-ripple link tag="a" href="https://www.patreon.com/harmlesskey" target="_blank">
+					<q-item 
+						v-for="{name, icon, url} in social_media"
+						clickable v-ripple link tag="a" 
+						:href="url" 
+						target="_blank" rel="noopener"
+						:key="name"
+					>
 						<q-item-section avatar>
-							<i class="fab fa-patreon patreon-red"></i>
+							<i :class="icon"></i>
 						</q-item-section>
-						<q-item-section class="title">Patreon</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Patreon
-						</q-tooltip>
-					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://discord.gg/fhmKBM7" target="_blank">
-						<q-item-section avatar>
-							<i class="fab fa-discord"></i>
-						</q-item-section>
-						<q-item-section class="title">Discord</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Discord
-						</q-tooltip>
-					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.instagram.com/harmlesskey" target="_blank">
-						<q-item-section avatar>
-							<i class="fab fa-instagram"></i>
-						</q-item-section>
-						<q-item-section class="title">Instagram</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Instagram
-						</q-tooltip>
-					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://twitter.com/KeyHarmless" target="_blank">
-						<q-item-section avatar>
-							<i class="fab fa-twitter-square"></i>
-						</q-item-section>
-						<q-item-section class="title">Twitter</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Twitter
-						</q-tooltip>
-					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.facebook.com/harmlesskey" target="_blank">
-						<q-item-section avatar>
-							<i class="fab fa-facebook"></i>
-						</q-item-section>
-						<q-item-section class="title">Facebook</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Facebook
-						</q-tooltip>
-					</q-item>
-					<q-item clickable v-ripple link tag="a" href="https://www.reddit.com/r/HarmlessKey" target="_blank">
-						<q-item-section avatar>
-							<i class="fab fa-reddit-alien"></i>
-						</q-item-section>
-						<q-item-section class="title">Reddit</q-item-section>
-						<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-							Reddit
+						<q-item-section class="title">{{ name }} </q-item-section>
+						<q-tooltip v-if="$store.getters.side_collapsed" anchor="center right" self="center left">
+							{{ name }}
 						</q-tooltip>
 					</q-item>
 				</q-list>
@@ -191,7 +152,7 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex'
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Sidebar',
@@ -199,6 +160,38 @@
 			return {
 				small_screen: window.innerWidth < 600,
 				man_col: false,
+				social_media: [
+					{
+						name: "Patreon",
+						icon: "fab fa-patreon patreon-red",
+						url: "https://www.patreon.com/harmlesskey"
+					},
+					{
+						name: "Discord",
+						icon: "fab fa-discord",
+						url: "https://discord.gg/fhmKBM7"
+					},
+					{
+						name: "Instagram",
+						icon: "fab fa-instagram",
+						url: "https://www.instagram.com/harmlesskey"
+					},
+					{
+						name: "Twitter",
+						icon: "fab fa-twitter-square",
+						url: "https://twitter.com/KeyHarmless"
+					},
+					{
+						name: "Facebook",
+						icon: "fab fa-facebook",
+						url: "https://www.facebook.com/harmlesskey"
+					},
+					{
+						name: "Reddit",
+						icon: "fab fa-reddit-alien",
+						url: "https://www.reddit.com/r/HarmlessKey"
+					}
+				]
 			}
 		},
 		methods: {
@@ -235,10 +228,10 @@
 	height: calc(100vh - 50px);
 	position: relative;
 	padding-top:10px;
-	background: #262626;
+	background:$gray;
 	transition: width 0.5s linear;
 	z-index: 98;
-	border-right: 1px solid #302f2f;
+	border-right: 1px solid$gray-active;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-bottom: 40px;
@@ -250,15 +243,15 @@
 		font-weight: bold;
 		margin: 10px 0;
 		width: 250px;
-		color: #5c5757;
+		color:$gray-hover;
 	}
 	hr {
-		background-color: #302f2f;
+		background-color:$gray-active;
 	}
 	
 	.q-list {
 		.q-item {
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 			overflow: hidden;
 			width: 250px;
 			transition: padding-left 0.5s linear;
@@ -270,22 +263,22 @@
 
 			&.q-router-link--active {
 				i::before {	
-					color: #2c97de !important;
+					color: $blue !important;
 				}
 			}
 		}
 	}
 	#toggle-width {
-		background: #262626;
+		background:$gray;
 		height: 40px;
 		width: calc(100%);
 		position: fixed;
 		right: left;
 		bottom: 0;
 		padding: 0 20px;
-		border-top: 1px solid #302f2f;
+		border-top: 1px solid$gray-active;
 		cursor: pointer;
-		color: #b2b2b2;
+		color: $gray-light;
 		line-height: 40px;
 		font-size: 20px;
 		text-align: right;

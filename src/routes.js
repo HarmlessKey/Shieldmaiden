@@ -1,7 +1,8 @@
 
-import { store } from './store/store'
+import { store } from './store/store';
 
 const Home = () => import('@/views/Home.vue');
+const SignedIn = () => import('@/components/home/SignedIn.vue');
 
 const Compendium = () => import('@/views/Compendium/Overview.vue');
 const View = () => import('@/views/Compendium/View.vue');
@@ -43,6 +44,7 @@ const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
+const Offline = () => import('@/views/Offline.vue');
 const MyContent = () => import('@/views/MyContent/Campaigns/Campaigns.vue');
 const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue');
 const Encounters = () => import('@/views/MyContent/Encounters');
@@ -69,6 +71,26 @@ export const routes = [{
 	name: 'home',
 	component: Home,
 	meta: {
+		sidebar: false,
+		offline: true
+	}
+},
+{
+	path: '/home',
+	name: 'landingpage',
+	component: Home,
+	meta: {
+		sidebar: false,
+		offline: true
+	},
+},
+{
+	path: '/content',
+	name: 'content',
+	component: SignedIn,
+	meta: {
+		requiresContribute: true,
+		requiresAuth: true,
 		sidebar: false
 	}
 },
@@ -77,7 +99,8 @@ export const routes = [{
 	name: 'Demo',
 	component: RunEncounter,
 	meta: {
-		sidebar: false
+		sidebar: false,
+		offline: true
 	},
 },
 //COMPENDIUM
@@ -226,12 +249,18 @@ export const routes = [{
 {
 	path: '/about-us',
 	name: 'About Us',
-	component: AboutUs
+	component: AboutUs,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/documentation',
 	name: 'Documentation',
-	component: Documentation
+	component: Documentation,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/feedback',
@@ -656,6 +685,11 @@ export const routes = [{
 	path: '/404',
 	name: '404',
 	component: Error404
+},
+{
+	path: '/offline',
+	name: 'Offline',
+	component: Offline
 },
 {
 	path: '*',

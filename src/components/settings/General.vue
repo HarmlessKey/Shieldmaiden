@@ -238,12 +238,12 @@
 			margin-bottom: 50px !important;
 
 			td {
-				background: #191919 !important;
+				background:$gray-dark !important;
 				&.binds {
 					width: 150px;
 				}
 				.bind {
-					border: solid 1px #2c97de;
+					border: solid 1px $blue;
 					display: inline-block;
 					min-width: 20px;
 					padding: 0 5px;

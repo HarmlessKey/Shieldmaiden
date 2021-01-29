@@ -456,6 +456,7 @@ export default {
 		},
 		editRoll(index) {
 			this.edit_index = index;
+			this.roll = this.rolls[index];
 			this.roll_dialog = true;
 		},
 		saveRoll() {

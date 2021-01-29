@@ -1311,6 +1311,7 @@ html body {
 		}
 	}
 
+	// Q-INPUT FIELDS
 	.manual-input {
 		height: 90px;
 		font-size:50px;
@@ -1324,6 +1325,16 @@ html body {
 				input {
 					text-align: center;
 				}
+			}
+		}
+	}
+
+	.player-initiative {
+		.q-field__control {
+			padding: 0;
+
+			input {
+				padding-left: 12px;
 			}
 		}
 	}
@@ -1615,7 +1626,7 @@ html body {
 	}
 
 
-	/* QUALSAR */
+	/* QUASAR */
 	/*********************************************/
 	.q-pagination {
 		justify-content: center;

@@ -23,7 +23,7 @@
 					<q-input 
 						dark filled square dense
 						type="number" 
-						class="ml-2"
+						class="ml-2 player-initiative"
 						v-model="entity.initiative" 
 						min="0" 
 						max="99" 

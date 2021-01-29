@@ -68,7 +68,7 @@
 		</hk-table>
 
 		<q-dialog square v-model="roll_dialog">
-			<div if="edit_index">
+			<div v-if="edit_index">
 				<div class="row q-col-gutter-md">
 					<div class="col-12 col-md-4">
 						<q-select 

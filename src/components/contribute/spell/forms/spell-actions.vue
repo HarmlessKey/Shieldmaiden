@@ -67,11 +67,8 @@
 									label="Action name"
 									v-model="action.name"
 									autocomplete="off"
-									name="name"
 									class="mb-2"
 									title="Action Name"
-									v-validate="'max:100'"
-									data-vv-as="Action Name"
 									:rules="[val => (val && val.length < 100) || 'Too long']"
 									@change="$forceUpdate()"
 								/>
@@ -86,9 +83,7 @@
 									:options="abilities"
 									v-model="action.save"
 									:disable="action.type !== 'spell save'"
-									name="save"
 									class="mb-2"
-									data-vv-as="Save"
 									@input="$forceUpdate()"
 								/>
 							</div>
@@ -207,11 +202,11 @@ export default {
 		spellUpdate() {
 			this.spell = Object.assign({}, this.spell);
 		},
-		setValidation(validators) {
-			// This component just passes through all validators
-			// No form fields that need validation
-			this.$emit('validation', validators)
-		}
+		// setValidation(validators) {
+		// 	// This component just passes through all validators
+		// 	// No form fields that need validation
+		// 	this.$emit('validation', validators)
+		// }
 	},
 };
 </script>

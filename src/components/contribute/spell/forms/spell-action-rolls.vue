@@ -276,9 +276,9 @@
 									</a>
 								</h2>
 								<template v-for="(level_tier, tier_index) in roll.level_tiers">
-									<div class="row q-col-gutter-sm" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+									<div class="d-flex justify-content-between" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
 										<!-- HL LEVEL SCALE -->
-										<div class="col-12">
+										<div>
 											<q-input 
 												dark filled square
 												label="Scale size"
@@ -291,69 +291,67 @@
 												:data-vv-as="level_scaling"
 												@keyup="$forceUpdate()"
 											/>
-										</div>
-										<!-- HL PROJECTILE COUNT -->
-										<div class="col-12 col-md-2">
+
+											<!-- HL PROJECTILE COUNT -->
+											<div class="row q-col-gutter-sm mb-0">
+												<!-- HL DICE COUNT -->
+												<div class="col">
+													<q-input 
+														dark filled square
+														label="Dice count"
+														v-model="level_tier.dice_count"
+														autocomplete="off"
+														class="mb-2"
+														type="number"
+														@keyup="$forceUpdate()"
+													/>
+												</div>
+												<div class="col">
+													<!-- HL MODIFIER DICETYPE -->
+													<q-select 
+														dark filled square
+														map-options
+														emit-value
+														label="Dice type"
+														:options="dice_type"
+														v-model="level_tier.dice_type"
+														class="mb-2"
+														@input="$forceUpdate()"
+													/>
+												</div>
+												<div class="col">
+													<q-input 
+															dark filled square
+															label="Fixed value"
+															v-model="level_tier.fixed_val"
+															autocomplete="off"
+															class="mb-2"
+															type="number"
+															@keyup="$forceUpdate()"
+														/>
+												</div>
+											</div>
+
 											<q-input 
 												dark filled square
-												label="Count"
+												label="Projectile count"
 												v-model="level_tier.projectile_count"
 												autocomplete="off"
-												class="mb-2"
 												type="number"
 												@keyup="$forceUpdate()"
 											/>
+											
 										</div>
-										<!-- HL DICE COUNT -->
-										<div class="col-12 col-md-2">
-											<q-input 
-												dark filled square
-												label="Dice count"
-												v-model="level_tier.dice_count"
-												autocomplete="off"
-												class="mb-2"
-												type="number"
-												@keyup="$forceUpdate()"
-											/>
-										</div>
-										<div class="col-12 col-md-3">
-											<!-- HL MODIFIER DICETYPE -->
-											<q-select 
-												dark filled square
-												map-options
-												emit-value
-												label="Dice type"
-												:options="dice_type"
-												v-model="level_tier.dice_type"
-												class="mb-2"
-												@input="$forceUpdate()"
-											/>
-										</div>
-										<div class="col-12 col-md-3">
-											<!-- HL MODIFIER FIXED VALUE -->
-											<div class="d-flex justify-content-between">
-												<q-input 
-													dark filled square
-													label="Fixed value"
-													v-model="level_tier.fixed_val"
-													autocomplete="off"
-													class="mb-2"
-													type="number"
-													@keyup="$forceUpdate()"
-												/>
-												<a @click="remove_level_tier(tier_index)" class="remove">
-													<i class="fas fa-trash-alt red"></i>
-													<q-tooltip anchor="center right" self="center left">
-														Remove
-													</q-tooltip>
-												</a>
-											</div>
+										<div>
+											<a @click="remove_level_tier(tier_index)" class="remove">
+												<i class="fas fa-trash-alt red"></i>
+											</a>
 										</div>
 									</div>
 								</template>
 								<p v-if="roll.level_tiers && roll.level_tiers.length > 0">
 									<span v-for="(line, i) in create_spell_level_tier_description(roll.level_tiers)" :key="`tier-${i}`">
-										{{line}}<br>
+										{{line}}<br/>
 									</span>
 								</p>
 							</template>
@@ -389,7 +387,7 @@ export default {
 			},
 			set(newValue) {
 				this.$emit("input", newValue);
-				return newValue;
+				this.$forceUpdate();
 			}
 		},
 		shown_level_tiers() {
@@ -408,10 +406,6 @@ export default {
 			edit_index: undefined,
 			roll_dialog: false,
 			roll: undefined,
-			modifier_type: [
-				{label: "Damage", value: "damage"},
-				{label: "Healing", value: "healing"}
-			],
 			rollColumns: {
 				roll: {
 					maxContent: true
@@ -571,60 +565,14 @@ h2 {
 	border-bottom: solid 1px$gray-hover;
 	padding-bottom: 5px;
 }
-.row {
-	margin-bottom: 20px;
-}
-.card-header {
-	cursor: pointer;
-}
-.add-mod {
-	position: absolute;
-	top: -25px;
-	right: 20px;
-	z-index: 1;
-}
+.hk-card {
+		&.rolls {
+			margin-bottom: 0;
 
-.component_box {
-	background:$black;
-	width: 40px;
-	text-align: center;
-	line-height: 36px;
-	height: 36px;
-	font-size: 18px;
-	span {
-		color: white;
-	}
-}
-.component_box.selected {
-	background: $blue;
-}
-label {
-	display: flex;
-	justify-content: flex-start;
-}
-.remove {
-	padding-top: 7px;
-	margin-left: 10px;
-}
-.card {
-	.card-header {
-		cursor: pointer;
-		background-color:$gray-dark;
-
-		.caret {
-			display: inline-block;
-			padding-right: 5px;
-		}
-		&.collapsed {
-			.caret {
-				i.fa-caret-down {
-					transform: rotate(-90deg);
-				}
+			.card-header {
+				padding: 12px 10px;
+				margin-bottom: 1px;
 			}
 		}
 	}
-	.card-body {
-		background-color: $gray-darker;
-	}
-}
 </style>

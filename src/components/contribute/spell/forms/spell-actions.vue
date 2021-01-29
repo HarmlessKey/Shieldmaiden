@@ -125,6 +125,7 @@
 							:level_scaling="spell.level_scaling"
 							:level="spell.level"
 							:action_type="action.type"
+							@input="$forceUpdate()"
 						/>
 					</div>
 
@@ -201,12 +202,7 @@ export default {
 		},
 		spellUpdate() {
 			this.spell = Object.assign({}, this.spell);
-		},
-		// setValidation(validators) {
-		// 	// This component just passes through all validators
-		// 	// No form fields that need validation
-		// 	this.$emit('validation', validators)
-		// }
+		}
 	},
 };
 </script>

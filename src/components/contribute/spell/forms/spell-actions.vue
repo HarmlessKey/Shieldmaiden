@@ -119,15 +119,15 @@
 								</q-checkbox>
 							</div>
 						</div>
+						<!-- ROLLS -->
+						<spell-action-rolls
+							v-model="action.rolls" 
+							:level_scaling="spell.level_scaling"
+							:level="spell.level"
+							:action_type="action.type"
+						/>
 					</div>
 
-					<!-- ROLLS -->
-					<spell-action-rolls
-						v-model="action.rolls" 
-						:level_scaling="spell.level_scaling"
-						:level="spell.level"
-						:action_type="action.type"
-					/>
 				</q-expansion-item>
 			</q-list>
 		</hk-card>

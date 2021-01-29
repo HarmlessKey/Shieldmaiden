@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-select 
-			v-if="action_type !== 'healing spell'"
+			v-if="action_type !== 'healing'"
 			dark filled square
 			map-options
 			emit-value
@@ -91,32 +91,30 @@
 		</div>
 
 		<!-- FAIL MODIFIER -->
-		<div class="col-12 col-md-3">
-			<q-select 
-				v-if="action_type === 'save'"
-				dark filled square
-				map-options
-				emit-value
-				label="Succesful save"
-				:options="save_fail_mod"
-				v-model="roll.save_fail_mod"
-				class="mb-3"
-				hint="The effect if the target makes a successful saving throw."
-				:rules="[val => val !== undefined || 'What happens on a succesful save?']"
-			/>
-			<q-select 
-				v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
-				dark filled square
-				map-options
-				emit-value
-				label="Miss modifier"
-				:options="save_fail_mod"
-				v-model="roll.miss_mod"
-				class="mb-3"
-				hint="The effect if the attack is a miss."
-				:rules="[val => val !== undefined || 'What happens on a miss?']"
-			/>
-		</div>
+		<q-select 
+			v-if="action_type === 'save'"
+			dark filled square
+			map-options
+			emit-value
+			label="Succesful save"
+			:options="save_fail_mod"
+			v-model="roll.save_fail_mod"
+			class="mb-3"
+			hint="The effect if the target makes a successful saving throw."
+			:rules="[val => val !== undefined || 'What happens on a succesful save?']"
+		/>
+		<q-select 
+			v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
+			dark filled square
+			map-options
+			emit-value
+			label="Miss modifier"
+			:options="save_fail_mod"
+			v-model="roll.miss_mod"
+			class="mb-3"
+			hint="The effect if the attack is a miss."
+			:rules="[val => val !== undefined || 'What happens on a miss?']"
+		/>
 
 		<hr>
 		<!-- SPECIAL ACTIONS -->

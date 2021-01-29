@@ -6,7 +6,7 @@
 				<span><i class="fas fa-dice-d20"/> Rolls</span>
 				<a 
 					class="gray-light text-capitalize" 
-					@click="add_modifier()"
+					@click="newRoll()"
 				>
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
@@ -27,7 +27,6 @@
 			<template slot="roll" slot-scope="data">
 				{{data.row.projectile_count ? `${data.row.projectile_count}x`: ""}}
 				{{data.row.dice_count}}{{data.row.dice_type ? "d" : ""}}{{data.row.dice_type}}{{data.row.fixed_val ? "+" : ""}}{{data.row.fixed_val}} 
-				{{data.row.damage_type}}
 			</template>
 
 			<span slot="type" slot-scope="data">
@@ -58,7 +57,7 @@
 						Edit
 					</q-tooltip>
 				</a>
-				<a class="ml-2" @click="remove_modifier(data.index)">
+				<a class="ml-2" @click="removeRoll(data.index)">
 					<i class="fas fa-trash-alt"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Delete
@@ -68,324 +67,303 @@
 		</hk-table>
 
 		<q-dialog square v-model="roll_dialog">
-			<div v-if="edit_index">
-				<div class="row q-col-gutter-md">
-					<div class="col-12 col-md-4">
-						<q-select 
-							dark filled square dense
-							map-options
-							emit-value
-							label="Subtype"
-							:options="modifier_subtype"
-							v-model="rolls[edit_index].subtype"
-							:disable="action_type === 'healing_spell'"
-							class="mb-2"
-							v-validate="'required'"
-							data-vv-as="Modifier Subtype"
-							@change="$forceUpdate()"
-						>
-							<template v-slot:append>
-								<q-icon name="info" @click.stop>
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Damage type</b>
-											</q-card-section>
-
-											<q-card-section>
-												Select the damage type for this rolls[edit_index].
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-							</template>
-						</q-select>
-						<p class="validate red" v-if="errors.has(`modifier_subtype-${edit_index}`)">{{ errors.first(`modifier_subtype-${edit_index}`) }}</p>
-					</div>
-			
-					<div class="col-12 col-md-3">
-						<!-- SPELL FAIL MODIFIER -->
-						<template v-if="action_type === 'spell save'">
+			<div v-if="roll">
+				<q-form @submit="saveRoll()">
+					<hk-card :header="(edit_index !== undefined) ? 'Edit roll' : 'New roll'" class="mb-0">
+						<div>
 							<q-select 
-								dark filled square dense
+								v-if="action_type !== 'healing'"
+								dark filled square
+								map-options
+								emit-value
+								label="Damage type"
+								:options="damage_types"
+								v-model="roll.damage_type"
+								class="mb-2"
+								:rules="[val => !!val || 'Select a damage type']"
+							>
+								<template v-slot:selected v-if="roll.damage_type">
+									<span>
+										<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
+										{{ roll.damage_type.capitalize() }}
+									</span>
+								</template>
+								<template v-slot:option="scope">
+									<q-item
+										clickable
+										v-ripple
+										v-close-popup
+										:active="roll.damage_type === scope.opt"
+										@click="$set(roll, 'damage_type', scope.opt)"
+									>
+										<q-item-section avatar>
+											<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+										</q-item-section>
+										<q-item-section>
+											<q-item-label v-html="scope.opt.capitalize()"/>
+										</q-item-section>
+									</q-item>
+								</template>
+							</q-select>
+
+							<!-- ROLLS -->
+							<div class="row q-col-gutter-md mb-3">
+								<!-- DICE COUNT -->
+								<div class="col">
+									<q-input 
+										dark filled square
+										label="Dice count"
+										v-model="roll.dice_count"
+										autocomplete="off"
+										type="number"
+										class="mb-2"
+										@keyup="$forceUpdate()"
+									/>
+								</div>
+								<div class="col">
+
+									<!-- MODIFIER SUBTYPE -->
+									<q-select 
+										dark filled square
+										map-options
+										emit-value
+										:options="dice_type"
+										label="Dice type"
+										class="mb-2"
+										v-model="roll.dice_type"
+										@change="$forceUpdate()"
+									/>
+								</div>
+								<div class="col">
+									<!-- MODIFIER FIXED VALUE -->
+									<q-input 
+										dark filled square
+										label="Fixed value"
+										v-model="roll.fixed_val"
+										autocomplete="off"
+										class="mb-2"
+										@keyup="$forceUpdate()"
+									>
+										<template v-slot:append>
+											<q-icon name="info" @click.stop>
+												<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+													<q-card dark square>
+														<q-card-section class="bg-gray-active">
+															<b>Fixed</b>
+														</q-card-section>
+														<q-card-section>
+															Set the fixed value that is added on top of the rolled value.
+														</q-card-section>
+													</q-card>
+												</q-menu>
+											</q-icon>
+										</template>
+									</q-input>
+								</div>
+								<div class="col">
+									<q-checkbox 
+										size="lg" dark 
+										v-model="roll.primary" 
+										label="Primary" 
+										:false-value="null" 
+										indeterminate-value="something-else"
+										class="mb-2"
+									>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add primay stat modifier
+										</q-tooltip>
+									</q-checkbox>
+								</div>
+							</div>
+
+							<!-- PROJECTILE COUNT -->
+							<q-input 
+								dark filled square
+								label="Projectile count"
+								v-model="roll.projectile_count"
+								autocomplete="off"
+								class="mb-4"
+								type="number"
+								@keyup="$forceUpdate()"
+							>
+								<template v-slot:append>
+									<q-icon name="info" @click.stop>
+										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card dark square>
+												<q-card-section class="bg-gray-active">
+													<b>Projectile count</b>
+												</q-card-section>
+												<q-card-section>
+													Number of projectiles that are cast
+												</q-card-section>
+											</q-card>
+										</q-menu>
+									</q-icon>
+								</template>
+							</q-input>
+
+
+							<!-- SPELL FAIL MODIFIER -->
+							<q-select 
+								v-if="action_type === 'spell_save'"
+								dark filled square
 								map-options
 								emit-value
 								label="Succesful save"
+								class="mb-3"
 								:options="save_fail_mod"
-								v-model="rolls[edit_index].save_fail_mod"
-								:disable="action_type !== 'spell save'"
-								name="save_fail_mod"
-								class="mb-2"
-								data-vv-as="Save Fail Modifier"
-								@change="$forceUpdate()"
-							>
-								<template v-slot:append>
-									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
-													<b>Succesful save</b>
-												</q-card-section>
-												<q-card-section>
-													Select the effect of this modifier if the target makes a succesful saving throw.
-												</q-card-section>
-											</q-card>
-										</q-menu>
-									</q-icon>
-								</template>
-							</q-select>
-							<p class="validate red" v-if="errors.has(`save_fail_mod-${edit_index}`)">{{ errors.first(`save_fail_mod-${edit_index}`) }}</p>
-						</template>
-						<template v-if="action_type === 'spell attack' || action_type === 'melee weapon' || action_type === 'ranged weapon'">
+								v-model="roll.save_fail_mod"
+								hint="The effect if the target makes a successful saving throw."
+								:rules="[val => val !== undefined || 'What happens on a succesful save?']"
+							/>
 							<q-select 
-								dark filled square dense
+								v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
+								dark filled square
 								map-options
 								emit-value
-								label="Miss modifier"
+								label="Miss effect"
+								class="mb-3"
 								:options="save_fail_mod"
-								v-model="rolls[edit_index].miss_mod"
-								:name="`miss_mod-${edit_index}`"
+								v-model="roll.miss_mod"
+								hint="The effect if the attack is a miss."
+								:rules="[val => val !== undefined || 'What happens on a miss?']"
+							/>
+
+							<hr>
+							<!-- SPECIAL ACTIONS -->
+							<q-select 
+								dark filled square
+								map-options
+								emit-value
+								label="Special"
+								:options="Object.values(specials)"
+								v-model="roll.special"
 								class="mb-2"
-								v-validate="'required'"
-								data-vv-as="Miss Modifier"
 								@change="$forceUpdate()"
+								clearable
 							>
 								<template v-slot:append>
-									<q-icon name="info" @click.stop>
+									<q-icon name="info" v-if="roll.special" @click.stop>
 										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 											<q-card dark square>
 												<q-card-section class="bg-gray-active">
-													<b>Missed attack</b>
+													<b>{{ specials[roll.special].label }}</b>
 												</q-card-section>
 												<q-card-section>
-													Select the effect of this modifier if the attack was a miss.
+													{{ specials[roll.special].info }}
 												</q-card-section>
 											</q-card>
 										</q-menu>
 									</q-icon>
 								</template>
 							</q-select>
-							<p class="validate red" v-if="errors.has(`miss_mod-${edit_index}`)">{{ errors.first(`miss_mod-${edit_index}`) }}</p>
-						</template>
-					</div>
 
-					<!-- SPECIAL ACTIONS -->
-					<div class="col-12 col-md-3">
-						<q-select 
-							dark filled square dense
-							map-options
-							emit-value
-							label="Special"
-							:options="Object.values(specials)"
-							v-model="rolls[edit_index].special"
-							:name="`modifier_special-${edit_index}`"
-							class="mb-2"
-							@change="$forceUpdate()"
-						>
-							<template v-slot:append>
-								<q-icon name="info" v-if="rolls[edit_index].special" @click.stop>
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>{{ specials[rolls[edit_index].special].label }}</b>
-											</q-card-section>
-											<q-card-section>
-												{{ specials[rolls[edit_index].special].info }}
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-							</template>
-						</q-select>
-					</div>
-					<!-- PROJECTILE COUNT -->
-					<div class="col-12 col-md-2">
-						<q-input 
-							dark filled square dense
-							label="Count"
-							v-model="rolls[edit_index].projectile_count"
-							autocomplete="off"
-							class="mb-2"
-							type="number"
-							@keyup="$forceUpdate()"
-						>
-							<template v-slot:append>
-								<q-icon name="info" @click.stop>
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Projectile count</b>
-											</q-card-section>
-											<q-card-section>
-												Number of projectiles that are cast
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-							</template>
-						</q-input>
-					</div>
-				</div>
-				<div class="row q-col-gutter-md">
-					<!-- DICE COUNT -->
-					<div class="col-12 col-md-3">
-						<q-input 
-							dark filled square dense
-							label="Dice count"
-							v-model="rolls[edit_index].dice_count"
-							autocomplete="off"
-							name="dice_count"
-							class="mb-2"
-							type="number"
-							@keyup="$forceUpdate()"
-						/>
-					</div>
-					<div class="col-12 col-md-3">
-						<!-- MODIFIER SUBTYPE -->
-						<q-select 
-							dark filled square dense
-							map-options
-							emit-value
-							:options="dice_type"
-							label="Dice type"
-							v-model="rolls[edit_index].dice_type"
-							class="mb-2"
-							@change="$forceUpdate()"
-						/>
-					</div>
-					<div class="col-12 col-md-3">
-						<!-- MODIFIER FIXED VALUE -->
-						<q-input 
-							dark filled square dense
-							label="Application"
-							v-model="rolls[edit_index].fixed_val"
-							autocomplete="off"
-							class="mb-2"
-							type="number"
-							@keyup="$forceUpdate()"
-						>
-							<template v-slot:append>
-								<q-icon name="info" @click.stop>
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Fixed</b>
-											</q-card-section>
-											<q-card-section>
-												Set the fixed value that is added on top of the rolled value.
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-							</template>
-						</q-input>
-					</div>
-					<div class="col-12 col-md-3">
-					<q-checkbox size="lg" dark v-model="rolls[edit_index].primary" label="Primary" :false-value="null" indeterminate-value="something-else">
-						<q-tooltip anchor="top middle" self="center middle">
-							Add primay stat modifier
-						</q-tooltip>
-					</q-checkbox>
-				</div>
-				</div>
-				<template v-if="level_scaling != undefined && level_scaling != 'none'">
-					<!-- HIGHER LEVEL MODIFIER -->
-					<h2 class="d-flex justify-content-between mt-3">
-						Scaling
-						<a 
-							v-if="level_tier_addable(edit_index)"
-							class="gray-hover text-capitalize" 
-							@click="add_level_tier(edit_index)"
-						>
-							<i class="fas fa-plus green"></i>
-							<q-tooltip anchor="center right" self="center left">
-								Add level tier
-							</q-tooltip>
-						</a>
-					</h2>
-					<template v-for="(level_tier, tier_index) in rolls[edit_index].level_tiers">
-						<div class="row q-col-gutter-md" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
-							<!-- HL LEVEL SCALE -->
-							<div class="col-12 col-md-2">
-								<q-input 
-									dark filled square dense
-									:label="level_scaling.capitalizeEach()"
-									v-model="level_tier.level"
-									autocomplete="off"
-									:name="`level-${edit_index}`"
-									class="mb-2"
-									v-validate="'required'"
-									type="number"
-									:data-vv-as="level_scaling"
-									@keyup="$forceUpdate()"
-								/>
-								<p class="validate red" v-if="errors.has(`level-${edit_index}`)">{{ errors.first(`level-${edit_index}`) }}</p>
-							</div>
-							<!-- HL PROJECTILE COUNT -->
-							<div class="col-12 col-md-2">
-								<q-input 
-									dark filled square dense
-									label="Count"
-									v-model="level_tier.projectile_count"
-									autocomplete="off"
-									class="mb-2"
-									type="number"
-									@keyup="$forceUpdate()"
-								/>
-							</div>
-							<!-- HL DICE COUNT -->
-							<div class="col-12 col-md-2">
-								<q-input 
-									dark filled square dense
-									label="Dice count"
-									v-model="level_tier.dice_count"
-									autocomplete="off"
-									class="mb-2"
-									type="number"
-									@keyup="$forceUpdate()"
-								/>
-							</div>
-							<div class="col-12 col-md-3">
-								<!-- HL MODIFIER DICETYPE -->
-								<q-select 
-									dark filled square dense
-									map-options
-									emit-value
-									label="Dice type"
-									:options="dice_type"
-									v-model="level_tier.dice_type"
-									class="mb-2"
-									@change="$forceUpdate()"
-								/>
-							</div>
-							<div class="col-12 col-md-3">
-								<!-- HL MODIFIER FIXED VALUE -->
-								<div class="d-flex justify-content-between">
-									<q-input 
-										dark filled square dense
-										label="Fixed value"
-										v-model="level_tier.fixed_val"
-										autocomplete="off"
-										class="mb-2"
-										type="number"
-										@keyup="$forceUpdate()"
-									/>
-									<a @click="remove_level_tier(edit_index, tier_index)" class="remove">
-										<i class="fas fa-trash-alt red"></i>
+							<template v-if="level_scaling !== undefined && level_scaling !== 'none'">
+								<!-- HIGHER LEVEL MODIFIER -->
+								<h2 class="d-flex justify-content-between mt-3">
+									<span>
+										<i class="fas fa-chart-line"></i> Scaling
+									</span>
+									<a 
+										v-if="level_tier_addable()"
+										class="gray-hover text-capitalize" 
+										@click="add_level_tier()"
+									>
+										<i class="fas fa-plus green"></i>
 										<q-tooltip anchor="center right" self="center left">
-											Remove
+											Add level tier
 										</q-tooltip>
 									</a>
-								</div>
-							</div>
+								</h2>
+								<template v-for="(level_tier, tier_index) in roll.level_tiers">
+									<div class="row q-col-gutter-sm" v-if="tier_index < shown_level_tiers" :key="`level-tier-${tier_index}`">
+										<!-- HL LEVEL SCALE -->
+										<div class="col-12">
+											<q-input 
+												dark filled square
+												label="Scale size"
+												v-model="level_tier.level"
+												autocomplete="off"
+												:name="`level-${edit_index}`"
+												class="mb-2"
+												v-validate="'required'"
+												type="number"
+												:data-vv-as="level_scaling"
+												@keyup="$forceUpdate()"
+											/>
+										</div>
+										<!-- HL PROJECTILE COUNT -->
+										<div class="col-12 col-md-2">
+											<q-input 
+												dark filled square
+												label="Count"
+												v-model="level_tier.projectile_count"
+												autocomplete="off"
+												class="mb-2"
+												type="number"
+												@keyup="$forceUpdate()"
+											/>
+										</div>
+										<!-- HL DICE COUNT -->
+										<div class="col-12 col-md-2">
+											<q-input 
+												dark filled square
+												label="Dice count"
+												v-model="level_tier.dice_count"
+												autocomplete="off"
+												class="mb-2"
+												type="number"
+												@keyup="$forceUpdate()"
+											/>
+										</div>
+										<div class="col-12 col-md-3">
+											<!-- HL MODIFIER DICETYPE -->
+											<q-select 
+												dark filled square
+												map-options
+												emit-value
+												label="Dice type"
+												:options="dice_type"
+												v-model="level_tier.dice_type"
+												class="mb-2"
+												@input="$forceUpdate()"
+											/>
+										</div>
+										<div class="col-12 col-md-3">
+											<!-- HL MODIFIER FIXED VALUE -->
+											<div class="d-flex justify-content-between">
+												<q-input 
+													dark filled square
+													label="Fixed value"
+													v-model="level_tier.fixed_val"
+													autocomplete="off"
+													class="mb-2"
+													type="number"
+													@keyup="$forceUpdate()"
+												/>
+												<a @click="remove_level_tier(tier_index)" class="remove">
+													<i class="fas fa-trash-alt red"></i>
+													<q-tooltip anchor="center right" self="center left">
+														Remove
+													</q-tooltip>
+												</a>
+											</div>
+										</div>
+									</div>
+								</template>
+								<p v-if="roll.level_tiers && roll.level_tiers.length > 0">
+									<span v-for="(line, i) in create_spell_level_tier_description(roll.level_tiers)" :key="`tier-${i}`">
+										{{line}}<br>
+									</span>
+								</p>
+							</template>
 						</div>
-					</template>
-					<p v-if="rolls[edit_index].level_tiers && rolls[edit_index].level_tiers.length > 0">
-						<span v-for="(line, i) in create_spell_level_tier_description(rolls[edit_index].level_tiers)" :key="`tier-${i}`">
-							{{line}}<br>
-						</span>
-					</p>
-				</template>
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
+						</div>
+					</hk-card>
+				</q-form>
 			</div>
 		</q-dialog>
 	</div>
@@ -393,9 +371,11 @@
 
 <script>
 import numeral from 'numeral';
+import { damage_types } from '@/mixins/damageTypes.js';
 
 export default {
 	name: 'spell-action-rolls',
+	mixins: [damage_types],
 	props: {
 		value: Array,
 		level_scaling: String,
@@ -427,6 +407,7 @@ export default {
 		return {
 			edit_index: undefined,
 			roll_dialog: false,
+			roll: undefined,
 			modifier_type: [
 				{label: "Damage", value: "damage"},
 				{label: "Healing", value: "healing"}
@@ -446,21 +427,6 @@ export default {
 					maxContent: true
 				}
 			},
-			modifier_subtype: [
-				{ label: "Acid", value: "acid" },
-				{ label: "Bludgeoning", value: "bludgeoning" },
-				{ label: "Cold", value: "cold" },
-				{ label: "Fire", value: "fire" },
-				{ label: "Force", value: "force" },
-				{ label: "Lightning", value: "lightning" },
-				{ label: "Necrotic", value: "necrotic" },
-				{ label: "Piercing", value: "piercing" },
-				{ label: "Poison", value: "poison" },
-				{ label: "Psychic", value: "psychic" },
-				{ label: "Radiant", value: "radiant" },
-				{ label: "Slashing", value: "slashing" },
-				{ label: "Thunder", value: "thunder" },
-			],
 			dice_type: [
 				{ label: "d4", value: 4 }, 
 				{ label: "d6", value: 6 },
@@ -481,53 +447,66 @@ export default {
 				{ label: "Full damage", value: 1},
 			],
 			specials: {
-				siphon: { label: "Heal caster", value: "siphon", info: "On a hit, the caster is healed for half of the damage done." },
+				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
+				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
 				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
 			}
 		};
 	},
 	methods: {
-		add_modifier() {
-			let modifiers = this.modifiers;
-			if(modifiers === undefined) {
-				modifiers = []
-			}
-			modifiers.push({
-				level_tiers: [],
-			});
-			this.$emit("input", modifiers)
-			this.$forceUpdate(); //IMPORTANT
+		newRoll() {
+			this.edit_index = undefined; // It's new, so no edit index
+			this.roll = {
+			}; // Create an empty new roll
+			this.roll_dialog = true;
 		},
 		editRoll(index) {
 			this.edit_index = index;
 			this.roll_dialog = true;
 		},
-		remove_modifier(index) {
-			this.$delete(this.modifiers, index)
-			this.$forceUpdate()
-		},
-		setPrimary(modifier) {
-			if (modifier.primary == undefined) {
-				modifier.primary = false
+		saveRoll() {
+			if(this.edit_index === undefined) {
+				let rolls = (!this.rolls) ? [] : this.rolls;
+				rolls.push(this.roll);
+				this.rolls = rolls;
+			} else {
+				this.$set(this.rolls, this.edit_index, this.roll);
 			}
-			modifier.primary = !modifier.primary
-			this.$forceUpdate(); //IMPORTANT
-		},
-		add_level_tier(index) {
-			if(!this.modifiers[index].level_tiers) {
-				this.modifiers[index].level_tiers = [];
-			}
-			this.modifiers[index].level_tiers.push({});
+			this.roll = {};
+			this.roll_dialog = false;
 			this.$forceUpdate();
 		},
-		remove_level_tier(edit_index, tier_index) {
-			this.$delete(this.modifiers[edit_index].level_tiers, tier_index)
-			this.$forceUpdate()
+		cancelRoll() {
+			this.roll_dialog = false;
+			this.edit_index = undefined;
+			this.roll = undefined;
 		},
-		level_tier_addable(index) {
-			if (this.level_scaling == "spell scale" && 
-					this.modifiers[index].level_tiers &&
-					this.modifiers[index].level_tiers.length >= 1) {
+		removeRoll(index) {
+			this.$delete(this.rolls, index);
+			this.$forceUpdate();
+		},
+		setPrimary(roll) {
+			if (roll.primary == undefined) {
+				roll.primary = false
+			}
+			roll.primary = !roll.primary
+			this.$forceUpdate(); //IMPORTANT
+		},
+		add_level_tier() {
+			if(!this.roll.level_tiers) {
+				this.roll.level_tiers = [];
+			}
+			this.roll.level_tiers.push({});
+			this.$forceUpdate();
+		},
+		remove_level_tier(tier_index) {
+			this.$delete(this.roll.level_tiers, tier_index);
+			this.$forceUpdate();
+		},
+		level_tier_addable() {
+			if (this.level_scaling == "spell_scale" && 
+					this.roll.level_tiers &&
+					this.roll.level_tiers.length >= 1) {
 				return false
 			}
 			return true
@@ -535,13 +514,13 @@ export default {
 		create_spell_level_tier_description(level_tiers) {
 			// Generates description for each level tier for spell level scaling
 			let description = []
-			if (this.level_scaling == "character level") {
+			if (this.level_scaling === "character_level") {
 				description = ["This spell's damage/projectiles increases when your character reaches a higher level."]
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
 					let count_txt = `${tier.projectile_count} projectile${tier.projectile_count > 1 ? 's' : ''}`
 					let level_txt = `at ${numeral(tier.level).format('0o')} level`
-					let damage_txt = 'this spell modifier does ';
+					let damage_txt = 'this spell roll does ';
 					damage_txt += (tier.dice_count || tier.dice_type) ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
 					damage_txt += (tier.fixed_val) ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 
@@ -552,13 +531,13 @@ export default {
 					description.push(new_line)
 				}
 			} 
-			else if (this.level_scaling == "spell scale") {
+			else if (this.level_scaling == "spell_scale") {
 				let tier = level_tiers[0]
 				// Opening line
 				let level_txt = "When you cast this spell using a spell slot of "
 				level_txt += `${numeral(parseInt(this.level) + 1).format('0o')} level or higher,`
 				// Damage modifier text
-				let damage_txt = 'the damage of this modifier increases by '
+				let damage_txt = 'the damage of this roll increases by '
 				damage_txt += tier.dice_count || tier.dice_type ? `${tier.dice_count || "..."}d${tier.dice_type || "..."}` : '';
 				damage_txt += tier.fixed_val ? `${(tier.dice_count || tier.dice_type) ? "+" : ""}${tier.fixed_val || ""}` : '';
 				// Projectile count text
@@ -569,11 +548,11 @@ export default {
 				let text = `${level_txt} ${tier.projectile_count ? count_txt : ''} ${tier.projectile_count && tier.dice_count ? "and " : ''}${tier.dice_count ? damage_txt : ''} ${slot_txt}`
 				description = [text]
 			} 
-			else if (this.level_scaling == "spell level") {
+			else if (this.level_scaling == "spell_level") {
 				for (let index in level_tiers) {
 					let tier = level_tiers[index]
 					let new_line = "When you cast this spell using a "
-					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell modifier does `
+					new_line += `${numeral(tier.level).format('0o')}-level spell slot, this spell roll does `
 					new_line += `${tier.dice_count || "..."}d${tier.dice_type || "..."}${tier.fixed_val ? "+" : ""}${tier.fixed_val || ""} damage.`
 
 					description.push(new_line)

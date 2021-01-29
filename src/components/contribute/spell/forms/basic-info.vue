@@ -452,9 +452,9 @@ export default {
 			],
 			lvl_scaling: [
 				{ label: "None", value: "none" },
-				{ label: "Character Level", value: "character level" },
-				{ label: "Spell Scale", value: "spell scale" },
-				{ label: "Spell Level", value: "spell level" },
+				{ label: "Character Level", value: "character_level" },
+				{ label: "Spell Scale", value: "spell_scale" },
+				{ label: "Spell Level", value: "spell_level" },
 			],
 			classes: [
 				{ label: "Bard", value: "bard" },

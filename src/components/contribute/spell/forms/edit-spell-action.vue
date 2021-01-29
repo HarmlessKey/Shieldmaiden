@@ -90,7 +90,7 @@
 		</q-tabs>
 		<q-tab-panels v-model="tab" dark>
 			<q-tab-panel name="modifiers">
-				<spell-action-modifiers 
+				<spell-action-rolls
 					v-model="spell_action.modifiers" 
 					:level_scaling="level_scaling"
 					:level="level"
@@ -132,7 +132,7 @@
 </template>
 
 <script>
-import spellActionModifiers from '@/components/contribute/spell/forms/spell-action-modifiers.vue';
+import spellActionRolls from '@/components/contribute/spell/forms/spell-action-rolls.vue';
 import spellActionConditions from '@/components/contribute/spell/forms/spell-action-conditions.vue';
 import spellActionNotifications from '@/components/contribute/spell/forms/spell-action-notifications.vue';
 import spellActionEffects from '@/components/contribute/spell/forms/spell-action-effects.vue';
@@ -147,7 +147,7 @@ export default {
 		spell: Object,
 	},
 	components: {
-		spellActionModifiers,
+		spellActionRolls,
 		spellActionConditions,
 		spellActionNotifications,
 		spellActionEffects

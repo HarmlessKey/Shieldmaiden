@@ -2,7 +2,7 @@
 	<div class="form">
 		<basic-info v-model='spell' :levels='spell_levels' />
 		<!-- SPELL ACTIONS -->
-		<spell-actions v-model='spell' />
+		<spell-actions v-model="spell" />
 	</div>
 </template>
 

@@ -8,7 +8,7 @@
 		<div class="spell-wrapper" v-if="canEdit()">
 			<template v-if="(old_spell && spell)">
 				
-				<q-form @submit="store_spell()">
+				<q-form @submit="store_spell()" ref="spellFormRef" greedy>
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
@@ -75,19 +75,19 @@
 							<EditSpell :spell="spell" />
 						</div>
 					</div>
+					<div class="save">
+						<div class="d-flex justify-content-start">
+							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+							</div>	
+							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+						</div>
+						<div>
+							<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+							<q-btn label="Save" type="submit" color="primary"/>
+						</div>
+					</div>
 				</q-form>
-				<div class="save">
-					<div class="d-flex justify-content-start">
-						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-							<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
-						</div>	
-						<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
-					</div>
-					<div>
-						<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-						<q-btn label="Save" type="submit" color="primary"/>
-					</div>
-				</div>
 			</template>
 		</div>
 	</div>
@@ -270,7 +270,10 @@ export default {
 
 			// Make spell responsive
 			this.spell = Object.assign({}, this.spell);
-			this.validate_validators();
+
+			this.$nextTick(function(){
+				this.$refs.spellFormRef.validate();
+			})
 
 		},
 		parse_spell_str(text) {

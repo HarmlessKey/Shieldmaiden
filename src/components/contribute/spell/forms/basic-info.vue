@@ -11,56 +11,39 @@
 			<!-- NAME -->
 			<div class="col-12 col-md-6">
 				<q-input
-					dark filled square dense
+					dark filled square
 					label="Name" 
 					v-model="spell.name"
-					name="name"
-					title="Name"
-					type="text"
 					class="mb-2"
-					:class="{'input': true, 'error': errors.has('name') }"
-					v-validate="'required|max:100'"
+					:rules="[val => !val ? 'Required': (val.length > 100) ? 'Max char. length: 100' : true]"
 					maxlength="101"
 					autocomplete="off"
-					data-vv-as="Name"
-					placeholde="Name"
 				/>
-				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 			</div>
 
 			<!-- LEVEL -->
 			<div class="col-12 col-md-3">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value map-options
 					label="Level"
 					:options="levels"
 					v-model="spell.level"
-					id="spell_level"
-					name="spell_level"
-					title="Spell Level"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="Spell Level"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('spell_level')">{{ errors.first('pper') }}</p>
 			</div>
 
 			<!-- SCHOOL -->
 			<div class="col-12 col-md-3">
 				<q-select
-					dark filled square dense
+					dark filled square
 					emit-value map-options
 					label="School"
 					v-model="spell.school"
-					id="spell_school"
-					name="spell_school"
-					title="Spell School"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="Spell School"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('spell_school')">{{ errors.first('spell_school') }}</p>
 			</div>
 		</div>
 
@@ -68,40 +51,32 @@
 			<!-- CAST TIME -->
 			<div class="col-12 col-md-2">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Cast time"
 					v-model="spell.cast_time_nr"
 					autocomplete="off"
-					name="cast_time_nr"
 					class="mb-2"
-					v-validate="'required|numeric|max:999'"
+					:rules="[val => !val ? 'Required' : (val > 999) ? 'Max: 999' : true]"
 					type="number"
-					data-vv-as="Cast Time"
 					></q-input>
-					<p class="validate red" v-if="errors.has('cast_time_nr')">{{ errors.first('cast_time_nr') }}</p>
 			</div>
 
 			<!-- CAST TIME TYPE -->
 			<div class="col-12 col-md-3">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value map-options
 					label="Cast type"
 					:options="cast_time_type"
 					v-model="spell.cast_time_type"
-					id="cast_time_type"
-					name="cast_time_type"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="Casting Type"
-					@change="clearErrors()"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('cast_time_type')">{{ errors.first('cast_time_type') }}</p>	
 			</div>
 			<!-- REACTION TIME DESCRIPTION -->
 			<div>
 				<q-input 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Reaction time description"
@@ -109,7 +84,6 @@
 					:disable="spell.cast_time_type !== 'reaction'"
 					autocomplete="off"
 					class="mb-2"
-					type="text"
 				/>
 			</div>
 		</div>
@@ -135,27 +109,24 @@
 			<!-- MATERIAL COMPONENT DESCRIPTION -->
 			<div class="col-12 col-md-9" v-if="spell.components">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Material components description"
 					v-model="spell.material_description"
 					:disable="!spell.components['material']"
 					autocomplete="off"
-					name="material_description"
 					class="mb-2"
 					type="text"
-					v-validate="'required'"
-					data-vv-as="Material Component Description"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('material_description')">{{ errors.first('material_description') }}</p>
 			</div>
 		</div>
 		<div class="row q-col-gutter-md">
 			<!-- RANGE TYPE -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Range type"
@@ -163,35 +134,29 @@
 					v-model="spell.range_type"
 					name="range_type"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="Range Type"
-					@change="clearErrors()"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('range_type')">{{ errors.first('range_type') }}</p>
 			</div>
 
 			<!-- RANGE -->
 			<div class="col-12 col-md-4">
 				<q-input 
-					dark filled square dense
-					label="Rangee ft."
+					dark filled square
+					label="Range ft."
 					v-model="spell.range"
 					:disable="spell.range_type !== 'ranged'"
 					autocomplete="off"
-					name="range"
-					v-validate="'required|numeric|max:999'"
 					class="mb-2"
 					type="number"
-					data-vv-as="Range"
+					:rules="[val => !val ? 'Required' : (val > 999) ? 'Max: 999' : true]"
 					/>
-					<p class="validate red" v-if="errors.has('range')">{{ errors.first('range') }}</p>
 			</div>
 
 			<!-- CLASSES -->
 			<div class="col-12 col-md-4" v-if="spell.classes">
 				<div>
 					<q-select
-						dark filled square dense
+						dark filled square
 						emit-value
 						map-options
 						v-model="spell.classes"
@@ -206,107 +171,89 @@
 			<!-- DURATION -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Duration type"
 					:options="dur_type"
 					v-model="spell.duration_type"
-					name="duration_type"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="Duration Type"
-					@change="clearErrors()"
+					:rules="[val => !val ? 'Required' : (val > 999) ? 'Max: 999' : true]"
 				/>
-				<p class="validate red" v-if="errors.has('duration_type')">{{ errors.first('duration_type') }}</p>
 			</div>
 
 			<!-- DURATION N -->
 			<div class="col-12 col-md-4">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Duration #"
 					v-model="spell.duration_n"
 					:disable="!dur_type_time.includes(spell.duration_type)"
 					autocomplete="off"
-					name="duration_n"
-					v-validate="'required|numeric|max:999'"
 					class="mb-2"
 					type="number"
-					data-vv-as="Duriation #"
+					:rules="[val => !val ? 'Required' : (val > 999) ? 'Max: 999' : true]"
 				/>
-				<p class="validate red" v-if="errors.has('duration_n')">{{ errors.first('duration_n') }}</p>
 			</div>
 
 			<!-- DURATION SCALE -->
 			<div class="col-12 col-md-4">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Time scale"
 					:options="dur_time"
 					v-model="spell.duration_scale"
 					:disable="!dur_type_time.includes(spell.duration_type)"
-					name="duration_scale"
-					v-validate="'required'"
 					class="mb-2"
-					data-vv-as="Duriation scale"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('duration_scale')">{{ errors.first('duration_scale') }}</p>
 			</div>
 		</div>
 		<div class="row q-col-gutter-md">
 			<div class="col-12 col-md-6">
 				<!-- AOE TYPE -->
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="AOE type"
 					:options="aoe_type"
 					v-model="spell.aoe_type"
-					name="aoe_type"
 					class="mb-2"
-					v-validate="'required'"
-					data-vv-as="AOE Type"
-					@change="clearErrors()"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('aoe_type')">{{ errors.first('aoe_type') }}</p>
 			</div>
 			<div class="col-12 col-md-6">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="AOE Size ft."
 					v-model="spell.aoe_size"
 					:disable="spell.aoe_type === 'none'"
 					autocomplete="off"
-					name="aoe_size"
 					class="mb-2"
 					type="number"
-					v-validate="'required'"
-					data-vv-as="AOE Size"
+					:rules="[val => !!val || 'Required']"
 				/>
-				<p class="validate red" v-if="errors.has('aoe_size')">{{ errors.first('aoe_size') }}</p>
 			</div>
 		</div>
 		<div class="row q-col-gutter-md spell_row">
 			<!-- RITUAL -->
 			<div class="col-12 col-md-2">
-				<q-checkbox size="lg" dark v-model="spell.ritual" val="lg" label="Ritual" />
+				<q-checkbox size="lg" dark v-model="spell.ritual" val="lg" label="Ritual" :false-value="null" />
 			</div>
 			<!-- LEVEL SCALING -->
 			<div class="col-12 col-md-5">
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					:options="lvl_scaling"
 					label="Spell scaling"
 					v-model="spell.level_scaling"
-					name="level_scaling"
-					v-validate="'required'"
 					class="mb-2"
+					:rules="[val => !!val || 'Required']"
 					@change="$forceUpdate()"
 				>
 					<template v-slot:append>
@@ -324,36 +271,30 @@
 						</q-icon>
 					</template>
 				</q-select>
-				<p class="validate red" v-if="errors.has('level_scaling')">{{ errors.first('level_scaling') }}</p>
 			</div>
 			<!-- SOURCE BOOK -->
 			<div class="col-12 col-md-5">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Source"
 					v-model="spell.source"
 					autocomplete="off"
-					name="source"
-					class="mb-2"
-					v-validate="'max:30'"
 					maxlength="31"
-					data-vv-as="Source"
+					class="mb-2"
+					:rules="[val => val.length <= 30 || 'Max char length: 30']"
 				/>
-				<p class="validate red" v-if="errors.has('source')">{{ errors.first('source') }}</p>
 			</div>
 		</div>
 		<div class="row q-col-gutter-md">
 			<!-- DESCRIPTION -->
 			<div class="col-12 col-md-6">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Description"
 					v-model="spell.description"
-					name="description"
 					class="mb-2"
-					v-validate="'required|max:5000'"
 					maxlength="5001"
-					data-vv-as="Description"
+					:rules="[val => val.length <= 5000 || 'Max char length: 5000']"
 					autogrow
 				>
 					<template v-slot:append>
@@ -377,20 +318,16 @@
 						</q-icon>
 					</template>
 				</q-input>
-				<p class="validate red" v-if="errors.has('description')">{{ errors.first('description') }}</p>
 
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="At higher levels"
 					v-model="spell.higher_level"
-					name="higher_level"
 					class="mb-2"
-					v-validate="'max:1000'"
 					maxlength="1001"
-					data-vv-as="At Higher Levels"
+					:rules="[val => val.length <= 5000 || 'Max char length: 5000']"
 					autogrow
 				/>
-				<p class="validate red" v-if="errors.has('higher_level')">{{ errors.first('higher_level') }}</p>
 			</div>
 			<div class="col-12 col-md-6">
 				<label for="description_preview">Preview</label>
@@ -545,10 +482,6 @@ export default {
 				this.spell.components = {'verbal':0,'somatic':0,'material':0};
 			}
 			this.spell.components[comp] = !this.spell.components[comp];
-
-			this.$nextTick(() => {
-				this.clearErrors();
-			});
 		},
 		setRitual() {
 			let yn = ["yes", "no"]
@@ -557,10 +490,6 @@ export default {
 			}
 			this.spell.ritual = !this.spell.ritual
 		},
-		clearErrors() {
-			this.$validator.errors.clear();
-			this.$validator.validateAll();
-		}
 	},
 	computed: {
 		spell: {
@@ -572,21 +501,9 @@ export default {
 				return newValue;
 			}
 		},
-		validator() {
-			// Validator object to propagate to parent
-			return {'basic-info': this.$validator};
-		}
 	},
-	watch: {
-		spell: {
-			handler() {
-				// Emits validation on every change
-				this.$emit('validation', this.validator);
-			},
-			immediate: true,
-			deep: true,
-		}
-	},
+	// watch: {
+	// },
 };
 </script>
 

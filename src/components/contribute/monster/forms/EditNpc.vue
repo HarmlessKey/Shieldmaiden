@@ -158,7 +158,7 @@
 				</q-select>
 
 				<!-- AVATAR -->
-				<div class="avatar">
+				<!-- <div class="avatar">
 					<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
 					<div class="img" v-else>
 						<img src="@/assets/_img/styles/monster.svg" />
@@ -178,7 +178,7 @@
 							placeholder="Image URL"
 						/>
 					</div>
-				</div>
+				</div> -->
 			</hk-card>
 
 			<hk-card header="Health & Armor Class">
@@ -401,6 +401,39 @@
 					</a>
 				</div>
 
+				<!-- SPELL CASTING -->
+				<template v-if="['innate_spells', 'spells'].includes(category)">
+					<div class="row q-gutter-md">
+						<div class="col">
+							<q-select 
+								dark filled square
+								map-options
+								emit-value
+								label="Casting ability"
+								:options="abilities"
+								v-model="npc.casting_ability"
+							/>
+						</div>
+						<div class="col">
+							<q-input
+								dark filled square
+								type="number"
+								:label="`Spell save DC`"
+								v-model="npc.save_dc"
+							/>
+						</div>
+						<div class="col">
+							<q-input
+								dark filled square
+								type="number"
+								:label="`Spell attack`"
+								v-model="npc.spell_attack"
+							/>
+						</div>
+					</div>
+				</template>
+
+				<!-- LEGENDARY ACTIONS -->
 				<q-input 
 					v-if="category === 'legendary_actions'"
 					dark filled square
@@ -720,7 +753,14 @@
 					0.5: "Half damage",
 					1: "Full damage"
 				},
+				caster_types: [
+					{ label: "Not a caster" , value: null },
+					{ label: "Spell caster", value: "caster" },
+					{ label: "Innate spell caster", value: "innate" }
+				],
 				actions: [
+					{ category: 'innate_spells', name: 'Innate spells' },
+					{ category: 'spells', name: 'Spells' },
 					{ category: 'special_abilities', name: 'Special Abilities' },
 					{ category: 'actions', name: 'Actions' },
 					{ category: 'legendary_actions', name: 'Legendary Actions' }
@@ -826,33 +866,15 @@
 			/**
 			 * Add a new action
 			 * 
-			 * @param {string} category actions / lengedary_actions / special_abilities
+			 * @param {string} category spells / actions / lengedary_actions / special_abilities
 			 */
 			add(category) {
-				if(category == 'actions') {
-					if(this.npc.actions == undefined) {
-						this.npc.actions = [];
-					}
-					this.npc.actions.push({
-						name: 'New Action',
-					});
+				if(this.npc[category] === undefined) {
+					this.npc[category] = [];
 				}
-				else if(category == 'legendary_actions') {
-					if(this.npc.legendary_actions === undefined) {
-						this.npc.legendary_actions = [];
-					}
-					this.npc.legendary_actions.push({
-						name: 'New Legendary Action',
-					});
-				}
-				else if(category == 'special_abilities') {
-					if(this.npc.special_abilities === undefined) {
-						this.npc.special_abilities = [];
-					}
-					this.npc.special_abilities.push({
-						name: 'New Special Ability',
-					});
-				}
+				this.npc[category].push({
+					name: `New`
+				});
 				this.$forceUpdate();
 			},
 
@@ -860,18 +882,10 @@
 			 * Remove an action
 			 * 
 			 * @param {integer} index index of the action
-			 * @param {string} category actions / lengedary_actions / special_abilities
+			 * @param {string} category spells / actions / lengedary_actions / special_abilities
 			 */
 			remove(index, category) {
-				if(category == 'actions'){
-					this.$delete(this.npc.actions, index);
-				}
-				else if(category == 'special_abilities'){
-					this.$delete(this.npc.special_abilities, index);
-				}
-				else if(category == 'legendary_actions'){
-					this.$delete(this.npc.legendary_actions, index);
-				}
+				this.$delete(this.npc[category], index);
 				this.$forceUpdate();
 			},
 

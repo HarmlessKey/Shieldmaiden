@@ -201,9 +201,9 @@ export default {
 
 			// Defenses
 			let defenses = {
-				damage_resistances: this.old_monster.damage_resistances.split(","),
-				damage_vulnerabilities: this.old_monster.damage_vulnerabilities.split(","),
-				damage_immunities: this.old_monster.damage_immunities.split(","),
+				damage_resistances: this.old_monster.damage_resistances,
+				damage_vulnerabilities: this.old_monster.damage_vulnerabilities,
+				damage_immunities: this.old_monster.damage_immunities,
 			}
 			const condition_immunities = this.old_monster.condition_immunities.split(",");
 
@@ -216,11 +216,9 @@ export default {
 			for(const resistance_type of resistances) {
 				this.$set(this.monster, resistance_type, []);
 
-				for(const defense of defenses[resistance_type]) {
-					if(defense && this.damage_types.includes(defense.trim().toLowerCase())) {
-						this.monster[resistance_type].push(
-							defense.trim().toLowerCase()
-						);
+				for(const type of this.damage_types) {
+					if(defenses[resistance_type].toLowerCase().search(type) > -1 && !this.monster[resistance_type].includes(type)) {
+						this.monster[resistance_type].push(type);
 					}
 				}
 			}

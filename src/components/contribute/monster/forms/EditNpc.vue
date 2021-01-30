@@ -645,7 +645,7 @@
 						<p>
 							{{ npc[edit_action.category][edit_action.ability_index].desc }}
 						</p>
-						<ActionModifier 
+						<ActionRoll 
 							v-if="roll && edit_action.type"
 							v-model="roll"
 							:action_type="edit_action.type" 
@@ -674,14 +674,14 @@
 	import { conditions } from '@/mixins/conditions.js';
 	import { damage_types } from '@/mixins/damageTypes.js';
 	import { monsterMixin } from '@/mixins/monster.js';
-	import ActionModifier from './ActionModifier';
+	import ActionRoll from '@/components/ActionRoll';
 
 
 	export default {
 		name: 'EditNpcForm',
 		props: ['monster'],
 		components: {
-			ActionModifier
+			ActionRoll
 		},
 		mixins: [
 			general, 

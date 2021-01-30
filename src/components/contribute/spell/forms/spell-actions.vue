@@ -1,15 +1,5 @@
 <template>
 	<div>
-		<!-- <edit-spell-action 
-			v-if="edit_index !== undefined" 
-			v-model="spell.actions[edit_index]"
-			:action_index="edit_index"
-			:level_scaling="spell.level_scaling"
-			:level="spell.level"
-			@spellUpdate="spellUpdate()"
-			@saved="saved_action()"
-			@validation="setValidation"
-		/> -->
 		<hk-card >
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Spell actions
@@ -21,7 +11,11 @@
 					</q-tooltip>
 				</a>
 			</div>
-			<p>Spell actions are the parts of a spell that can be rolled. By adding spell actions to your spell, it can be used during encounters to quickly apply damage or healing and to set conditions and reminders.</p>
+			<p>
+				Spell actions are the parts of a spell that can be rolled. 
+				By adding spell actions to your spell, it can be used during 
+				encounters to quickly apply damage or healing.
+			</p>
 			
 			<q-list dark square :class="`accordion`">
 				<q-expansion-item

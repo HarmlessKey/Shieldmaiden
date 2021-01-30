@@ -17,6 +17,15 @@
 				class="mb-2"
 			/>
 			<div class="row q-col-gutter-sm">
+				<div class="col" v-if="casting.category === 'caster'">
+					<q-input 
+						dark filled square
+						label="Caster level"
+						v-model="npc[`${casting.category}_level`]"
+						type="number"
+						class="mb-3"
+					/>
+				</div>
 				<div class="col">
 					<q-input 
 						dark filled square

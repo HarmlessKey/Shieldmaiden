@@ -193,7 +193,7 @@
 						name="ac" 
 						:rules="[val => !!val || 'AC is required']"
 					>
-						<template v-slot:append>
+						<template v-slot:prepend>
 							<q-icon name="fas fa-shield" size="xs" />
 						</template>
 					</q-input>
@@ -209,7 +209,7 @@
 						name="hp" 
 						:rules="[val => !!val || 'HP is required']"
 					>
-						<template v-slot:append>
+						<template v-slot:prepend>
 							<q-icon name="fas fa-heart" size="xs" />
 						</template>
 					</q-input>

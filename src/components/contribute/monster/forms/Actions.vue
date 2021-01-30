@@ -29,13 +29,16 @@
 					:key="`ability-${ability_index}`"
 					dark switch-toggle-side
 					:group="name"
+					:name="name"
+					enter-active-class="animated fadeIn" 
+					leave-active-class="animated fadeOut"
 				>
 					<template v-slot:header>
 						<q-item-section>
 							{{ ability.name }}
 						</q-item-section>
 						<q-item-section avatar>
-							<a @click="remove(ability_index, category)" class="remove">
+							<a @click.stop="remove(ability_index, category)" class="remove">
 								<i class="fas fa-trash-alt red" />
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove

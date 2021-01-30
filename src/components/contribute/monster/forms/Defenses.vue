@@ -13,6 +13,14 @@
 				:key="type"
 				:hint="resistanceInfo(type)"
 			>
+				<template slot="prepend">
+					<div class="defense" :class="type">
+						<i class="fas fa-shield"></i>
+						<span>
+							{{ type === "damage_vulnerabilities" ? "V" : type === "damage_resistances" ? "R" : "I" }}
+						</span>
+					</div>
+				</template>
 				<template v-slot:option="scope">
 					<q-item
 						clickable
@@ -40,7 +48,11 @@
 				:options="condition_list"
 				v-model="npc.condition_immunities" 
 				name="condition_immunities" 
-			/>
+			>
+				<template slot="prepend">
+					<i class="fas fa-fist-raised green" />
+				</template>
+			</q-select>
 		</hk-card>
 	</div>
 </template>
@@ -99,4 +111,33 @@
 </script>
 
 <style lang="scss" scoped>
+.defense {
+	position: relative;
+	width: 23px;
+	font-size: 23px;
+	text-align: center;
+	line-height: 28px;
+
+	span {
+		font-size: 15px;
+		text-align: center;
+		font-weight: bold;
+		position: absolute;
+		width: 23px;
+		line-height: 27px;
+		top: 0;
+		left: 0;
+		color: $white;
+	}
+	
+	&.damage_vulnerabilities {
+		color: $red;
+	}
+	&.damage_resistances {
+		color: $orange;
+	}
+	&.damage_immunities {
+		color: $green;
+	}
+}
 </style>

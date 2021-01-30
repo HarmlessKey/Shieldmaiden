@@ -1,42 +1,48 @@
 <template>
 	<div>
 		<hk-card header="Resistances & Vulnerabilities">
-			<q-select 
-				v-for="type in ['damage_vulnerabilities', 'damage_resistances', 'damage_immunities']"
-				dark filled square
-				:label="`Damage ${type.split('_')[1]}`"
-				autocomplete="off"  
-				class="mb-3" 
-				multiple
-				:options="damage_types"
-				v-model="npc[type]" 
-				:key="type"
-				:hint="resistanceInfo(type)"
-			>
-				<template slot="prepend">
-					<div class="defense" :class="type">
-						<i class="fas fa-shield"></i>
-						<span>
-							{{ type === "damage_vulnerabilities" ? "V" : type === "damage_resistances" ? "R" : "I" }}
-						</span>
-					</div>
-				</template>
-				<template v-slot:option="scope">
-					<q-item
-						clickable
-						v-ripple
-						:active="npc[type] && npc[type].includes(scope.opt)"
-						@click="setResistance(type, scope.opt)"
+			<div class="row q-col-gutter-md mb-2">
+				<div 
+					v-for="type in ['damage_vulnerabilities', 'damage_resistances', 'damage_immunities']"
+					class="col" 
+					:key="type"
+				>
+					<q-select 
+						dark filled square
+						:label="`Damage ${type.split('_')[1]}`"
+						autocomplete="off"  
+						class="mb-3" 
+						multiple
+						:options="damage_types"
+						v-model="npc[type]" 
+						:hint="resistanceInfo(type)"
 					>
-						<q-item-section avatar>
-							<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-						</q-item-section>
-						<q-item-section>
-							<q-item-label v-html="scope.opt.capitalize()"/>
-						</q-item-section>
-					</q-item>
-				</template>
-			</q-select>
+						<template slot="prepend">
+							<div class="defense" :class="type">
+								<i class="fas fa-shield"></i>
+								<span>
+									{{ type === "damage_vulnerabilities" ? "V" : type === "damage_resistances" ? "R" : "I" }}
+								</span>
+							</div>
+						</template>
+						<template v-slot:option="scope">
+							<q-item
+								clickable
+								v-ripple
+								:active="npc[type] && npc[type].includes(scope.opt)"
+								@click="setResistance(type, scope.opt)"
+							>
+								<q-item-section avatar>
+									<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+								</q-item-section>
+								<q-item-section>
+									<q-item-label v-html="scope.opt.capitalize()"/>
+								</q-item-section>
+							</q-item>
+						</template>
+					</q-select>
+				</div>
+			</div>
 
 			<q-select 
 				dark filled square
@@ -51,6 +57,21 @@
 			>
 				<template slot="prepend">
 					<i class="fas fa-fist-raised green" />
+				</template>
+				<template v-slot:option="scope">
+					<q-item
+						clickable
+						v-ripple
+						:active="npc.condition_immunities && npc.condition_immunities.includes(scope.opt)"
+						@click="setCondition(scope.opt)"
+					>
+						<q-item-section avatar>
+							<icon :icon="scope.opt" />
+						</q-item-section>
+						<q-item-section>
+							<q-item-label v-html="scope.opt.capitalize()"/>
+						</q-item-section>
+					</q-item>
 				</template>
 			</q-select>
 		</hk-card>
@@ -90,12 +111,12 @@
 		methods: {
 			resistanceInfo(type) {
 				if(type === "damage_resistances") {
-					return "Half of the damage is taken for these damage types"
+					return "Half of the damage is taken"
 				}
 				if(type === "damage_vulnerabilities") {
-					return "Double damage is taken for these damage types"
+					return "Double damage is taken"
 				}
-				return "No damage is taken for these damage types"
+				return "No damage is taken"
 			},
 			setResistance(type, value) {
 				if(!this.npc[type]) {
@@ -104,6 +125,15 @@
 					this.$delete(this.npc[type], this.npc[type].indexOf(value));
 				} else {
 					this.npc[type].push(value);
+				}
+			},
+			setCondition(value) {
+				if(!this.npc.condition_immunities) {
+					this.$set(this.npc, "condition_immunities", [value]);
+				} else if(this.npc.condition_immunities.includes(value)) {
+					this.$delete(this.npc.condition_immunities, this.npc.condition_immunities.indexOf(value));
+				} else {
+					this.npc.condition_immunities.push(value);
 				}
 			},
 		}

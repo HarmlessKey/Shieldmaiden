@@ -57,6 +57,7 @@
 							class="mb-3" 
 							v-model="ability.legendary_cost" 
 							hint="How many legendary actions does this cost?"
+							@keyup="$forceUpdate()"
 						/>
 
 						<q-input 
@@ -66,7 +67,8 @@
 							type="text" 
 							class="mb-2" 
 							maxlength="30"
-							v-model="ability.name" 
+							v-model="ability.name"
+							@keyup="$forceUpdate()"
 						/>
 						<q-input 
 							v-if="category !== 'special_abilities'"
@@ -76,7 +78,8 @@
 							type="text" 
 							class="mb-3" 
 							v-model="ability.recharge" 
-							:rules="[val => (!val || val.match(/^([0-9]+)-([0-9]+)$/)) || 'Allowed format: 5-6']"
+							:rules="[val => (!val || val.match(/^[0-9]+(-[0-9]+)*$/)) || 'Allowed format: 6 or 5-6']"
+							@keyup="$forceUpdate()"
 						/>
 						<q-input
 							dark filled square
@@ -86,6 +89,7 @@
 							name="desc"
 							autogrow
 							:rules="[val => (!val || val.length < 1500) || 'Can\'t be over 1500 characters']"
+							@keyup="$forceUpdate()"
 						/>
 
 						<template v-if="category !== 'special_abilities'">

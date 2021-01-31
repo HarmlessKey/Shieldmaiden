@@ -49,9 +49,33 @@
 				</div>
 
 				<q-list dark v-if="npc[`${casting.category}_spells`]">
-					<q-item v-for="(name, key) in npc[`${casting.category}_spells`]" :key="key">
+					<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
+						<q-item-section avatar v-if="casting.category === 'innate'">
+							{{ spell.limit === Infinity ? "At will" : `${spell.limit}/day` }}
+							<q-popup-edit dark square v-model.number="spell.limit">
+								<q-checkbox 
+									size="sm" dark 
+									v-model="spell.limit"
+									label="At will" 
+									:true-value="Infinity" 
+									:false-value="1"
+									:indeterminate-value="null"
+									class="mb-2"
+									@input="$forceUpdate()"
+								/>
+								<q-input 
+									dark
+									v-model.number="spell.limit" 
+									label="Limit"
+									type="number" 
+									:disable="spell.limit === Infinity" 
+									suffix="/day"
+									@keyup="$forceUpdate()"
+								/>
+							</q-popup-edit>
+						</q-item-section>
 						<q-item-section>
-							{{ name.capitalizeEach() }}
+							{{ spell.name.capitalizeEach() }}
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click="removeSpell(key)">
@@ -164,7 +188,13 @@
 				if(!this.npc[`${this.category}_spells`]) {
 					this.$set(this.npc, `${this.category}_spells`, {})
 				}
-				this.npc[`${this.category}_spells`][key] = name;
+
+				let spell = {
+					name
+				}
+				if(this.category === 'innate') spell.limit = Infinity;
+
+				this.npc[`${this.category}_spells`][key] = spell;
 				this.$forceUpdate();
 			},
 			removeSpell(key) {

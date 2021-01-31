@@ -4,7 +4,11 @@
 			<hk-card v-for="casting in caster_types" :key="casting.category">
 				<div slot="header" class="card-header d-flex justify-content-between">
 					{{ casting.name }}
-					<a class="gray-hover text-capitalize" @click="openDialog(casting.category)">
+					<a 
+						v-if="npc[`${casting.category}_ability`]"
+						class="gray-hover text-capitalize" 
+						@click="openDialog(casting.category)"
+					>
 						<i class="fas fa-plus green"></i>
 						<span class="d-none d-md-inline ml-1">Add spell</span>
 					</a>
@@ -17,76 +21,111 @@
 					:options="abilities"
 					v-model="npc[`${casting.category}_ability`]"
 					class="mb-2"
+					@input="setCaster($event, casting.category)"
 				/>
-				<div class="row q-col-gutter-sm">
-					<div class="col" v-if="casting.category === 'caster'">
-						<q-input 
-							dark filled square
-							label="Caster level"
-							v-model="npc[`${casting.category}_level`]"
-							type="number"
-							class="mb-3"
-						/>
-					</div>
-					<div class="col">
-						<q-input 
-							dark filled square
-							label="Save DC"
-							v-model="npc[`${casting.category}_save_dc`]"
-							type="number"
-							class="mb-3"
-						/>
-					</div>
-					<div class="col">
-						<q-input 
-							dark filled square
-							label="Spell attack"
-							v-model="npc[`${casting.category}_spell_attack`]"
-							type="number"
-							class="mb-3"
-						/>
-					</div>
-				</div>
 
-				<q-list dark v-if="npc[`${casting.category}_spells`]">
-					<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
-						<q-item-section avatar v-if="casting.category === 'innate'">
-							{{ spell.limit === Infinity ? "At will" : `${spell.limit}/day` }}
-							<q-popup-edit dark square v-model.number="spell.limit">
-								<q-checkbox 
-									size="sm" dark 
-									v-model="spell.limit"
-									label="At will" 
-									:true-value="Infinity" 
-									:false-value="1"
-									:indeterminate-value="null"
-									class="mb-2"
-									@input="$forceUpdate()"
-								/>
-								<q-input 
-									dark
-									v-model.number="spell.limit" 
-									label="Limit"
-									type="number" 
-									:disable="spell.limit === Infinity" 
-									suffix="/day"
-									@keyup="$forceUpdate()"
-								/>
-							</q-popup-edit>
-						</q-item-section>
-						<q-item-section>
-							{{ spell.name.capitalizeEach() }}
-						</q-item-section>
-						<q-item-section avatar>
-							<a @click="removeSpell(key)">
-								<i class="fas fa-trash-alt red" />
-								<q-tooltip anchor="top middle" self="center middle">
-									Remove spell
-								</q-tooltip>
-							</a>
-						</q-item-section>
-					</q-item>
-				</q-list>
+				<template v-if="npc[`${casting.category}_ability`]">
+					<div class="row q-col-gutter-sm">
+						<div class="col" v-if="casting.category === 'caster'">
+							<q-input 
+								dark filled square
+								label="Caster level"
+								v-model="npc[`${casting.category}_level`]"
+								type="number"
+								class="mb-3"
+							/>
+						</div>
+						<div class="col">
+							<q-input 
+								dark filled square
+								label="Save DC"
+								v-model="npc[`${casting.category}_save_dc`]"
+								type="number"
+								class="mb-3"
+							/>
+						</div>
+						<div class="col">
+							<q-input 
+								dark filled square
+								label="Spell attack"
+								v-model="npc[`${casting.category}_spell_attack`]"
+								type="number"
+								class="mb-3"
+							/>
+						</div>
+					</div>
+
+					<!-- SPELL SLOTS -->
+					<template v-if="npc[`${casting.category}_spell_slots`]">
+						<label class="d-block mb-3">Spell slots</label>
+						<div class="slots">
+							<div v-for="level in 9" :key="`level-${level}`" class="slot">
+								<div class="level">{{ level | numeral("Oo") }}</div>
+								<div class="handling">
+									<div 
+										class="up" 
+										:class="{ disable: npc[`${casting.category}_spell_slots`][level] >= 9 }"
+										@click="setSpellSlot('up', level)"
+									>
+										<i class="fas fa-chevron-up"/>
+									</div>
+									<input v-model.number="npc[`${casting.category}_spell_slots`][level]" @keyup="$forceUpdate()" />
+									<div 
+										class="down" 
+										:class="{ disable: npc[`${casting.category}_spell_slots`][level] <= 0 }"
+										@click="setSpellSlot('down', level)"
+									>
+										<i class="fas fa-chevron-down"/>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<template v-if="npc[`${casting.category}_spells`]">
+						<label class="d-block mb-2">Spells</label>
+						<q-list dark>
+							<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
+								<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
+									{{ spell.limit === Infinity ? "At will" : `${spell.limit}/day` }}
+									<q-popup-edit dark square v-model.number="spell.limit">
+										<q-checkbox 
+											size="sm" dark 
+											v-model="spell.limit"
+											label="At will" 
+											:true-value="Infinity" 
+											:false-value="1"
+											:indeterminate-value="undefined"
+											:toggle-indeterminate="false"
+											class="mb-2"
+											@input="$forceUpdate()"
+										/>
+										<q-input 
+											dark
+											v-model.number="spell.limit" 
+											label="Limit"
+											type="number" 
+											:disable="spell.limit === Infinity" 
+											suffix="/day"
+											@keyup="$forceUpdate()"
+										/>
+									</q-popup-edit>
+								</q-item-section>
+								<q-item-section>
+									{{ spell.name.capitalizeEach() }}
+								</q-item-section>
+								<q-item-section avatar>
+									<a @click="removeSpell(key)">
+										<i class="fas fa-trash-alt red" />
+										<q-tooltip anchor="top middle" self="center middle">
+											Remove spell
+										</q-tooltip>
+									</a>
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</template>
+				</template>
 			</hk-card>
 		</hk-card-deck>
 
@@ -168,13 +207,39 @@
 			}
 		},
 		methods: {
+			setCaster(value, category) {
+				if(value && category === "caster" && !this.npc[`${category}_spell_slots`]) {
+					this.npc[`${category}_spell_slots`] = {};
+				}
+				if(!value) {
+					this.$delete(this.npc, `${category}_save_dc`);
+					this.$delete(this.npc, `${category}_spell_attack`);
+					this.$delete(this.npc, `${category}_spell_slots`);
+					this.$delete(this.npc, `${category}_spells`);
+				}
+			},
+			setSpellSlot(direction, level) {
+				const current = (this.npc.caster_spell_slots[level]) ? this.npc.caster_spell_slots[level] : 0;
+				let newVal;
+				if(direction === "up") newVal = current + 1;
+				if(direction === "down") newVal = current - 1;
+
+				if(newVal > 9) newVal = 9;
+				if(newVal <= 0) {
+					this.$delete(this.npc.caster_spell_slots, level);
+				} else {
+					this.$set(this.npc.caster_spell_slots, level, newVal);
+				}
+				this.$forceUpdate();
+			},
 			openDialog(category) {
 				this.category = category;
 				this.spells_dialog = true;
 			},
 			searchSpells() {
 				if(this.spell_name) {
-					let spells = db.ref(`spells`).orderByChild('name').startAt(this.spell_name).endAt(this.spell_name+"\uf8ff");
+					let spells = db.ref(`spells`).orderByChild('name').startAt(this.spell_name.capitalizeEach()).endAt(this.spell_name.capitalizeEach()
+					+"\uf8ff");
 
 					// Check username
 					spells.on('value' , (snapshot) => {
@@ -208,5 +273,51 @@
 	.q-item {
 		background-color: $gray-dark;
 		margin-bottom: 1px;
+	}
+	.slots {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 20px;
+
+		.slot {
+			max-width: 40px;
+			text-align: center;
+			color: $white;
+
+			.handling {
+				margin-top: 5px;
+				background-color: rgba(255, 255, 255, .07);
+
+				.up, .down {
+					background-color: rgba(255, 255, 255, .07);
+					font-size: 11px;
+					color: $gray-light;
+					padding: 5px 0;
+					cursor: pointer;
+
+					&:hover {
+						color: $white
+					}
+					.disable {
+						opacity: .5;
+					}
+				}
+				input {
+					border: none; 
+					width: 100%;
+					text-align: center;
+					background: none;
+					font-size: 18px;
+					height: 35px;
+					line-height: 35px;
+					font-weight: bold;
+					color: $white;
+
+					&:focus {
+						outline: none;
+					}
+				}
+			}
+		}
 	}
 </style>

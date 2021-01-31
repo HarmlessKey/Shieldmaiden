@@ -338,6 +338,9 @@ export default {
 			this.spell.changed = true;
 			this.spell.checked = false;
 
+			// Firebase can't be searched without case sensitivity
+			this.spell.name = this.spell.name.toLowerCase();
+
 			if(this.spell.cast_time_nr) {
 				parseInt(this.spell.cast_time_nr);
 			}

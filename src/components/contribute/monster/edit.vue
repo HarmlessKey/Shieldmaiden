@@ -344,9 +344,7 @@ export default {
 		update() {
 			this.$forceUpdate();
 		},
-		
-		
-
+	
 		async store_monster() {
 			console.log('saved')
 			delete this.monster['.value'];
@@ -355,7 +353,9 @@ export default {
 			this.monster.changed = true;
 			this.monster.checked = false;
 
-		
+			// Firebase can't be searched without case sensitivity
+			this.monster.name = this.monster.name.toLowerCase();
+
 			db.ref(`new_monsters/${this.id}`).set(this.monster);
 			this.$snotify.success('Monster Saved.', 'Critical hit!', {
 				position: "rightTop"

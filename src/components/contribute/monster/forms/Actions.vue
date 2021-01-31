@@ -49,6 +49,7 @@
 
 					<div class="accordion-body">
 						<q-input 
+							v-if="category === 'legendary_actions'"
 							dark filled square
 							label="Legendary actions"
 							autocomplete="off" 

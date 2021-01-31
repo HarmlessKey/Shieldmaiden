@@ -74,7 +74,7 @@
 				/>
 			</div>
 			<!-- REACTION TIME DESCRIPTION -->
-			<div>
+			<div class="col-12 col-md-7" v-if="spell.cast_time_type === 'reaction'">
 				<q-input 
 					dark filled square
 					emit-value
@@ -107,7 +107,7 @@
 				</div>
 			</div>
 			<!-- MATERIAL COMPONENT DESCRIPTION -->
-			<div class="col-12 col-md-9" v-if="spell.components">
+			<div class="col-12 col-md-9" v-if="spell.components.material">
 				<q-input 
 					dark filled square
 					emit-value
@@ -153,7 +153,7 @@
 			</div>
 
 			<!-- CLASSES -->
-			<div class="col-12 col-md-4" v-if="spell.classes">
+			<div class="col-12 col-md-4">
 				<div>
 					<q-select
 						dark filled square
@@ -472,6 +472,7 @@ export default {
 			],
 			classes_selected: null,
 		};
+	mounted() {
 	},
 	methods: {
 		...mapActions([
@@ -482,6 +483,7 @@ export default {
 				this.spell.components = {'verbal':0,'somatic':0,'material':0};
 			}
 			this.spell.components[comp] = !this.spell.components[comp];
+			this.$forceUpdate()
 		},
 		setRitual() {
 			let yn = ["yes", "no"]

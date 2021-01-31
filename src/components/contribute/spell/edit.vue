@@ -139,21 +139,29 @@ export default {
 	},
 	firebase() {
 		return {
-			spell: {
-				source: db.ref(`new_spells/${this.id}`),
-				asObject: true,
-				readyCallback: () => {
-					this.loading = false
-					this.fb_spell_json = JSON.stringify(this.spell);
-					this.unsaved_changes = false
-				}
-			},
+			// spell: {
+			// 	source: db.ref(`new_spells/${this.id}`),
+			// 	asObject: true,
+			// 	readyCallback: () => {
+			// 		this.loading = false
+			// 		this.fb_spell_json = JSON.stringify(this.spell);
+			// 		this.unsaved_changes = false
+			// 	}
+			// },
 			old_spell: {
 				source: db.ref(`spells/${this.id}`),
 				asObject: true,
 				readyCallback: () => this.loading = false
 			}
 		}
+	},
+	mounted() {
+		const spell_ref = db.ref(`new_spells/${this.id}`);
+		spell_ref.once('value', (snapshot) => {
+			console.log(snapshot.val());
+			this.spell = snapshot.val();
+			this.spell.components = {}
+		})
 	},
 	methods: {
 		canEdit() {
@@ -331,7 +339,8 @@ export default {
 		// 	return true;
 		// },
 
-		async store_spell() {
+		store_spell() {
+			console.log("STore spell called")
 			delete this.spell['.value'];
 			delete this.spell['.key'];
 
@@ -348,20 +357,22 @@ export default {
 				parseInt(this.spell.duration_n);
 			}
 
+			console.log(this.spell)
 			
-			if (await this.validate_validators() === true) {
-				db.ref(`new_spells/${this.id}`).set(this.spell);
-				this.$snotify.success('Spell Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
-				this.validators = {};
-				this.unsaved_changes = false;
-				this.fb_spell_json = JSON.stringify(this.spell);
-			} else {
-				this.$snotify.error('Form Not Valid', 'Critical miss!', {
-					position: "rightTop"
-				});
-			}
+			// if (await this.validate_validators() === true) {
+			// 	db.ref(`new_spells/${this.id}`).set(this.spell);
+			// 	this.$snotify.success('Spell Saved.', 'Critical hit!', {
+			// 		position: "rightTop"
+			// 	});
+			// 	this.validators = {};
+			// 	this.unsaved_changes = false;
+			// 	this.fb_spell_json = JSON.stringify(this.spell);
+			// } else {
+			// 	this.$snotify.error('Form Not Valid', 'Critical miss!', {
+			// 		position: "rightTop"
+			// 	});
+			// }
+			console.log(this.$ref.spellFormRef.submit())
 		},
 		cancel_changes() {
 			this.spell = JSON.parse(this.fb_spell_json);
@@ -392,7 +403,6 @@ export default {
 			next()
 		}
 	}
-
 }
 </script>
 

@@ -69,7 +69,10 @@
 									>
 										<i class="fas fa-chevron-up"/>
 									</div>
-									<input v-model.number="npc[`${casting.category}_spell_slots`][level]" @keyup="$forceUpdate()" />
+									<input 
+										v-model.number="npc[`${casting.category}_spell_slots`][level]" 
+										@keyup="checkSpellSlot(level)"
+									/>
 									<div 
 										class="down" 
 										:class="{ disable: npc[`${casting.category}_spell_slots`][level] <= 0 }"
@@ -229,6 +232,15 @@
 					this.$delete(this.npc.caster_spell_slots, level);
 				} else {
 					this.$set(this.npc.caster_spell_slots, level, newVal);
+				}
+				this.$forceUpdate();
+			},
+			checkSpellSlot(level) {
+				const value = this.npc.caster_spell_slots[level];
+
+				if(value > 9) this.$set(this.npc.caster_spell_slots, level, 9);
+				if(value <= 0) {
+					this.$delete(this.npc.caster_spell_slots, level);
 				}
 				this.$forceUpdate();
 			},

@@ -2,15 +2,25 @@
 	<div>
 		<hk-card header="Basic Info">
 			<!-- NAME -->
-			<q-input 
-				dark filled square
-				label="Name"
-				autocomplete="off"  
-				type="text" 
-				v-model="npc.name" 
-				name="name" 
-				:rules="[val => !!val || 'The name is required']"
-			/>
+			<div class="row q-col-gutter-md">
+				<div class="col-9">
+					<q-input 
+						dark filled square
+						label="Name"
+						autocomplete="off"  
+						v-model="npc.name" 
+						:rules="[val => !!val || 'The name is required']"
+					/>
+				</div>
+				<div class="col-3">
+					<q-input 
+						dark filled square
+						label="Source"
+						autocomplete="off"  
+						v-model="npc.source" 
+					/>
+				</div>
+			</div>
 
 			<!-- SIZE -->
 			<q-select
@@ -50,17 +60,17 @@
 			<q-select
 				dark filled square
 				label="Alignment"
-				class="mb-2" 
+				class="mb-4" 
 				v-model="npc.alignment"
 				:options="monster_alignment"
 			/>
 
 			<!-- SPEED -->
-			<div class="row q-col-gutter-md">
+			<div class="row q-col-gutter-sm mb-3">
 				<div class="col">
 					<q-input 
 						dark filled square
-						label="Walking speed"
+						label="Walk speed"
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
@@ -72,7 +82,7 @@
 				<div class="col">
 					<q-input 
 						dark filled square
-						label="Swimming speed"
+						label="Swim speed"
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
@@ -84,7 +94,7 @@
 				<div class="col">
 					<q-input 
 						dark filled square
-						label="Flying speed"
+						label="Fly speed"
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
@@ -105,19 +115,45 @@
 					>
 					</q-input>
 				</div>
+				<div class="col">
+					<q-input 
+						dark filled square
+						label="Climb speed"
+						autocomplete="off"  
+						type="number" 
+						class="mb-2" 
+						v-model="npc.climb_speed" 
+						suffix="ft."
+					>
+					</q-input>
+				</div>
 			</div>
 
 			<!-- SENSES -->
-			<q-input 
-				dark filled square dense
-				label="Senses"
-				autocomplete="off"
-				type="text" 
-				class="mb-2" 
-				v-model="npc.senses" 
-				name="senses" 
-				placeholder="Senses"
-			/>
+			<div v-for="sense in senses" :key="sense" class="row q-col-gutter-md mb-3">
+				<div class="col-3">
+					<q-checkbox dark :label="sense.capitalize()" :false-value="null" indeterminate-value="" />
+				</div>
+				<div class="col">
+					<q-input 
+						dark square dense
+						label="Range"
+						autocomplete="off"
+						type="text" 
+						v-model="npc[sense]" 
+						suffix="ft."
+					/>
+				</div>
+				<div class="col">
+					<q-input 
+						dark square dense
+						label="Comments"
+						autocomplete="off"
+						type="text" 
+						v-model="npc[sense]" 
+					/>
+				</div>
+			</div>
 
 			<!-- LANGUAGES -->
 			<q-select
@@ -157,7 +193,7 @@
 			</q-select>
 
 			<!-- AVATAR -->
-			<div class="avatar">
+			<!-- <div class="avatar">
 				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
 				<div class="img" v-else>
 					<img src="@/assets/_img/styles/monster.svg" />
@@ -177,7 +213,7 @@
 						placeholder="Image URL"
 					/>
 				</div>
-			</div>
+			</div> -->
 		</hk-card>
 
 		<hk-card header="Health & Armor Class">
@@ -263,6 +299,12 @@
 		],
 		data() {
 			return {
+				senses: [
+					"blindsight",
+					"darkvision",
+					"tremorsense",
+					"truesight"
+				]
 			}
 		},
 		computed: {

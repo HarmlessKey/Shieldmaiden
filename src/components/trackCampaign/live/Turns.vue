@@ -67,7 +67,7 @@
 				<i v-if="weather" class="fas fa-cloud-showers"></i>
 				<i v-else class="fas fa-cloud hide"></i>
 			</a>
-			<a @click="toggleFullscreen" class="full">
+			<a @click="$q.fullscreen.toggle()" class="full">
 				<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
 				<q-tooltip anchor="bottom middle" self="top middle">
 					Fullscreen
@@ -112,7 +112,7 @@
 				this.$emit('setWeather', this.weather);
 			},
 			toggleFullscreen(e) {
-				const target = e.target.parentNode.parentNode.parentNode.parentNode;
+				const target = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
 				this.$q.fullscreen.toggle(target)
 					.then(() => {

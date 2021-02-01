@@ -5,7 +5,7 @@
 		ref="initiative"
 	>
 		<!-- ACTIONS -->
-		<div class="actions" v-if="characters.length !== 0">
+		<div class="actions" v-if="characters.length !== 0" :class="{ hidden: $q.fullscreen.isActive }">
 			<!-- MOBILE -->
 			<div v-if="screenWidth <= 576">
 				<q-tabs

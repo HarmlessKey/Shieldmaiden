@@ -134,7 +134,7 @@
 			<q-select
 				dark filled square
 				label="Languages"
-				class="mb-2"
+				class="mb-4"
 				multiple
 				v-model="npc.languages"
 				:options="languages"

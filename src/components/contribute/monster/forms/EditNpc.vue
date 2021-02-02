@@ -3,6 +3,8 @@
 		<div class="form">
 			<BasicInfo v-model="npc" />
 
+			<Senses v-model="npc" />
+
 			<AbilityScores v-model="npc" />
 
 			<Skills v-model="npc" />
@@ -19,6 +21,7 @@
 <script>
 	import { mapActions } from 'vuex';
 	import BasicInfo from './BasicInfo';
+	import Senses from './Senses';
 	import AbilityScores from './AbilityScores';
 	import Skills from './Skills';
 	import Defenses from './Defenses';
@@ -30,6 +33,7 @@
 		props: ['monster'],
 		components: {
 			BasicInfo,
+			Senses,
 			AbilityScores,
 			Skills,
 			Defenses,

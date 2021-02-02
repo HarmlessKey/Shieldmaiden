@@ -4,14 +4,13 @@
 			<div class="row q-col-gutter-md mb-2">
 				<div 
 					v-for="type in ['damage_vulnerabilities', 'damage_resistances', 'damage_immunities']"
-					class="col" 
+					class="col-12 col-md-4" 
 					:key="type"
 				>
 					<q-select 
 						dark filled square
 						:label="`Damage ${type.split('_')[1]}`"
 						autocomplete="off"  
-						class="mb-3" 
 						multiple
 						:options="damage_types"
 						v-model="npc[type]" 
@@ -49,7 +48,7 @@
 				label="Condition immunities"
 				autocomplete="off"  
 				type="text" 
-				class="mb-2" 
+				class="mt-3 mb-2" 
 				multiple
 				:options="condition_list"
 				v-model="npc.condition_immunities" 

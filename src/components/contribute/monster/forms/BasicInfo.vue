@@ -130,27 +130,38 @@
 			</div>
 
 			<!-- SENSES -->
-			<div v-for="sense in senses" :key="sense" class="row q-col-gutter-md mb-3">
+			<label class="d-block mb-3">Senses</label>
+			<div v-for="sense in senses" :key="sense" class="row q-col-gutter-md mb-2">
 				<div class="col-3">
-					<q-checkbox dark :label="sense.capitalize()" :false-value="null" indeterminate-value="" />
-				</div>
-				<div class="col">
-					<q-input 
-						dark square dense
-						label="Range"
-						autocomplete="off"
-						type="text" 
-						v-model="npc[sense]" 
-						suffix="ft."
+					<q-checkbox 
+						dark 
+						:label="sense.capitalize()" 
+						:false-value="null" 
+						indeterminate-value="something else"
+						:value="npc.senses && npc.senses[sense] ? npc.senses[sense][sense] : null"
+						@input="setSense($event, sense)"
 					/>
 				</div>
 				<div class="col">
 					<q-input 
-						dark square dense
+						dark filled square dense
+						label="Range"
+						autocomplete="off"
+						type="number" 
+						:value="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" 
+						suffix="ft."
+						:disable="!npc.senses || !npc.senses[sense]"
+						@input="$event => $set(npc.senses[sense], 'range', $event)"
+					/>
+				</div>
+				<div class="col">
+					<q-input 
+						dark filled square dense
 						label="Comments"
 						autocomplete="off"
-						type="text" 
-						v-model="npc[sense]" 
+						:value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"
+						:disable="!npc.senses || !npc.senses[sense]"
+						@input="$event => $set(npc.senses[sense], 'comments', $event)"
 					/>
 				</div>
 			</div>
@@ -159,7 +170,7 @@
 			<q-select
 				dark filled square
 				label="Languages"
-				class="mb-2" 
+				class="mt-4 mb-2"
 				multiple
 				v-model="npc.languages"
 				:options="languages"
@@ -314,6 +325,18 @@
 				},	
 				set(newValue) {
 					this.$emit('input', newValue);
+				}
+			}
+		},
+		methods: {
+			setSense(value, sense) {
+				if(value) {
+					let val = {};
+					val[sense] = true;
+					if(!this.npc.senses) this.$set(this.npc, "senses", {});
+					this.$set(this.npc.senses, sense, val);
+				} else {
+					this.$delete(this.npc.senses, sense);
 				}
 			}
 		}

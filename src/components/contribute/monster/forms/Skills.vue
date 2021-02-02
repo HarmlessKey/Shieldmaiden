@@ -12,7 +12,7 @@
 			</div>
 
 			<div class="skills">
-				<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
+				<div v-for="(skill, key) in skillList" :key="key">
 					<q-checkbox 
 						size="xs" 
 						dark
@@ -106,18 +106,28 @@
 	.skills {
 		columns: 3;
 
-		.skill {
-			width: 100%;
-			display: grid;
-			grid-template-columns: 45px 1fr min-content;
-
-			.abillity {
-				text-transform: uppercase;
-				text-align: center;
+			.skill {
+				width: 100%;
+				display: grid;
+				grid-template-columns: 45px 1fr max-content;
+	
+				.abillity {
+					text-transform: uppercase;
+					text-align: center;
+				}
+				.mod {
+					margin-left: 8px;
+				}
 			}
-			.mod {
-				margin-left: 8px;
-			}
+	}
+	@media only screen and (max-width: 1250px) { 
+		.skills {
+			columns: 2;
+		}
+	}
+	@media only screen and (max-width: 890px) { 
+		.skills {
+			columns: 1;
 		}
 	}
 </style>

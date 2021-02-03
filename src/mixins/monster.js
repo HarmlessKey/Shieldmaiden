@@ -87,6 +87,7 @@ export const monsterMixin = {
 				"Undead"
 			],
 			monster_alignment: [
+				"Any",
 				"Lawful Good",
 				"Neutral Good",
 				"Chaotic Good",

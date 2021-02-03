@@ -1,14 +1,23 @@
 <template>
 	<div>
 		<hk-card>
-			<div class="card-header" slot="header">
-				Skills
-				<span>
-					+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+			<div class="card-header d-flex justify-content-between" slot="header">
+				<div>
+					Skills
+					<span>
+						+<b class="blue">{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}</b>
+						<q-tooltip anchor="top middle" self="center middle">
+							Proficiency bonus
+					</q-tooltip>
+					</span>
+				</div>
+				<a class="gray-hover text-capitalize" @click="modifier_dialog = true">
+					<i class="fas fa-plus green"></i>
+					<span class="d-none d-md-inline ml-1">Modifiers</span>
 					<q-tooltip anchor="top middle" self="center middle">
-						Proficiency bonus
-				</q-tooltip>
-				</span>
+						Skill modifiers
+					</q-tooltip>
+				</a>
 			</div>
 
 			<div class="skills">
@@ -42,14 +51,7 @@
 								{{ skill.skill  }}
 								<div class="mod">
 									{{ 
-										calculateSkillModifier(
-											calcMod(npc[skill.ability]),
-											npc.skills ? (
-											npc.skills.includes(key) ? 
-											(npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : '')
-											: 0) : 0,
-											npc.skills_expertise ? npc.skills_expertise.includes(key) : false
-										) 
+										skillModifier(skill, key)
 									}}
 								</div>
 							</div>
@@ -61,6 +63,26 @@
 				</div>
 			</div>
 		</hk-card>
+
+		<q-dialog v-model="modifier_dialog" dark square>
+			<hk-card header="Skill modifiers">
+				<div class="modifiers">
+					<q-input
+						v-for="(skill, key) in skillList"
+						:key="`mod-${key}`"
+						dark filled square
+						class="mb-2"
+						type="number"
+						:label="skill.skill"
+						:value="npc.skill_modifiers ? npc.skill_modifiers[key] : null"
+						@input="setModifier($event, key)"
+					/>
+				</div>
+				<div class="card-footer d-flex justify-content-end" slot="footer">
+					<q-btn class="bg-gray" @click="modifier_dialog = false" label="Close" />
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -79,6 +101,7 @@
 		],
 		data() {
 			return {
+				modifier_dialog: false
 			}
 		},
 		computed: {
@@ -98,6 +121,36 @@
 					this.$set(this.npc, 'skills', newValue);
 				}
 			},
+		},
+		methods: {
+			setModifier(value, skill) {
+				if(value) {
+					if(this.npc.skill_modifiers) {
+						this.$set(this.npc.skill_modifiers, skill, value);
+					} else {
+						let val = {};
+						val[skill] = value;
+						this.$set(this.npc, "skill_modifiers", val);
+					}
+				} else {
+					this.$delete(this.npc.skill_modifiers, skill);
+				}
+			},
+			skillModifier(skill, key) {
+				let mod = this.calculateSkillModifier(
+					this.calcMod(this.npc[skill.ability]),
+					this.npc.skills ? (
+					this.npc.skills.includes(key) ? 
+					(this.npc.challenge_rating ?this. monster_challenge_rating[this.npc.challenge_rating].proficiency : '')
+					: 0) : 0,
+					this.npc.skills_expertise ? this.npc.skills_expertise.includes(key) : false
+				);
+
+				if(this.npc.skill_modifiers && this.npc.skill_modifiers[key]) {
+					mod = parseInt(mod) + parseInt(this.npc.skill_modifiers[key]);
+				}
+				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
+			}
 		}
 	}
 </script>
@@ -106,19 +159,22 @@
 	.skills {
 		columns: 3;
 
-			.skill {
-				width: 100%;
-				display: grid;
-				grid-template-columns: 45px 1fr max-content;
-	
-				.abillity {
-					text-transform: uppercase;
-					text-align: center;
-				}
-				.mod {
-					margin-left: 8px;
-				}
+		.skill {
+			width: 100%;
+			display: grid;
+			grid-template-columns: 45px 1fr max-content;
+
+			.abillity {
+				text-transform: uppercase;
+				text-align: center;
 			}
+			.mod {
+				margin-left: 8px;
+			}
+		}
+	}
+	.modifiers {
+		columns: 2;
 	}
 	@media only screen and (max-width: 1250px) { 
 		.skills {

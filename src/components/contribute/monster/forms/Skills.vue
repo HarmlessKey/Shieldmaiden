@@ -124,6 +124,9 @@
 		},
 		methods: {
 			setModifier(value, skill) {
+				if(value > 99) value = 99;
+				if(value < -99) value = -99;
+				
 				if(value) {
 					if(this.npc.skill_modifiers) {
 						this.$set(this.npc.skill_modifiers, skill, value);

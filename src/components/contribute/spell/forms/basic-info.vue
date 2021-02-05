@@ -345,6 +345,7 @@
 
 import VueMarkdown from 'vue-markdown';
 import { mapActions } from 'vuex';
+import { validation } from '@/mixins/validation';
 
 export default {
 
@@ -352,6 +353,7 @@ export default {
 	props: {
 		value: Object
 	},
+	mixins: [ validation ],
 	components: {
 		VueMarkdown
 	},

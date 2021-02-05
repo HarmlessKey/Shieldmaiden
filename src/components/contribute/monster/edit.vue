@@ -58,7 +58,7 @@
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
 import ViewMonster from '@/components/ViewMonster.vue';
-import EditNpc from './forms/EditNpc.vue';
+import EditNpc from './forms';
 import { general } from '@/mixins/general.js';
 import { abilities } from '@/mixins/abilities.js';
 import { skills } from '@/mixins/skills.js';

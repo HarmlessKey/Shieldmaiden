@@ -96,7 +96,7 @@
 <script>
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
-import EditSpell from '@/components/contribute/spell/forms/EditSpell.vue';
+import EditSpell from '@/components/contribute/spell/forms';
 import ViewSpell from '@/components/ViewSpell.vue';
 import { general } from '@/mixins/general';
 import { spells } from '@/mixins/spells';
@@ -217,11 +217,11 @@ export default {
 			delete this.spell.casting_time;
 
 			// Parse components
-			this.spell.components = {'verbal': false,'somatic': false ,'material': false};
+			this.spell.components = [];
 			for (let i in this.old_spell.components) {
-				if (this.old_spell.components[i] == "V") {this.spell.components.verbal = true}
-				if (this.old_spell.components[i] == "S") {this.spell.components.somatic = true}
-				if (this.old_spell.components[i] == "M") {this.spell.components.material = true}
+				if (this.old_spell.components[i] == "V") {this.spell.components.push("verbal")}
+				if (this.old_spell.components[i] == "S") {this.spell.components.push("somatic")}
+				if (this.old_spell.components[i] == "M") {this.spell.components.push("material")}
 			}
 			if (this.old_spell.material) {
 				this.spell.material_description = this.parse_spell_str(this.old_spell.material);

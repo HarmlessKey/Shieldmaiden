@@ -33,6 +33,7 @@
 					</q-checkbox>
 				</div>
 			</div>
+			{{ npc.saving_throws }}
 		</hk-card>
 	</div>
 </template>

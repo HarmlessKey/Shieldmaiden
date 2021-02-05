@@ -27,7 +27,7 @@
 					dark filled square
 					emit-value map-options
 					label="Level"
-					:options="levels"
+					:options="spell_levels"
 					v-model="spell.level"
 					class="mb-2"
 					:rules="[val => !!val || 'Required']"
@@ -39,6 +39,7 @@
 				<q-select
 					dark filled square
 					emit-value map-options
+					:options="spell_schools"
 					label="School"
 					v-model="spell.school"
 					class="mb-2"
@@ -67,7 +68,7 @@
 					dark filled square
 					emit-value map-options
 					label="Cast type"
-					:options="cast_time_type"
+					:options="spell_cast_time_types"
 					v-model="spell.cast_time_type"
 					class="mb-2"
 					:rules="[val => !!val || 'Required']"
@@ -77,8 +78,6 @@
 			<div class="col-12 col-md-7" v-if="spell.cast_time_type === 'reaction'">
 				<q-input 
 					dark filled square
-					emit-value
-					map-options
 					label="Reaction time description"
 					v-model="spell.cast_time_react_desc"
 					:disable="spell.cast_time_type !== 'reaction'"
@@ -89,32 +88,22 @@
 		</div>
 		<div class="row q-col-gutter-md">
 			<!-- COMPONENTS -->
-			<div class="col-12 col-md-3" v-if="spell.components">
-				<label for="components">Components</label>
-				<div class="components d-flex justify-content-start" name="components">
-					<a class="component_box mr-2" @click="setComponent('verbal')"
-						:class="{'selected': spell.components['verbal']}">
-						<span>V</span>
-					</a>
-					<a class="component_box mr-2" @click="setComponent('somatic')"
-						:class="{'selected': spell.components['somatic']}">
-						<span>S</span>
-					</a>
-					<a class="component_box" @click="setComponent('material')"
-						:class="{'selected': spell.components['material']}">
-						<span>M</span>
-					</a>
-				</div>
+			<div class="col-12 col-md-4">
+				<q-select 
+					dark filled square multiple
+					map-options emit-value
+					:options="spell_components"
+					v-model="spell.components"
+					label="Components"
+				/>
 			</div>
 			<!-- MATERIAL COMPONENT DESCRIPTION -->
-			<div class="col-12 col-md-9" v-if="spell.components.material">
+			<div class="col-12 col-md-8" v-if="spell.components && spell.components.includes('material')">
 				<q-input 
 					dark filled square
-					emit-value
-					map-options
 					label="Material components description"
 					v-model="spell.material_description"
-					:disable="!spell.components['material']"
+					:disable="!spell.components || !spell.components.includes('material')"
 					autocomplete="off"
 					class="mb-2"
 					type="text"
@@ -130,7 +119,7 @@
 					emit-value
 					map-options
 					label="Range type"
-					:options="range_type"
+					:options="spell_range_types"
 					v-model="spell.range_type"
 					name="range_type"
 					class="mb-2"
@@ -175,7 +164,7 @@
 					emit-value
 					map-options
 					label="Duration type"
-					:options="dur_type"
+					:options="spell_duration_types"
 					v-model="spell.duration_type"
 					class="mb-2"
 					:rules="[val => !val ? 'Required' : (val > 999) ? 'Max: 999' : true]"
@@ -188,7 +177,7 @@
 					dark filled square
 					label="Duration #"
 					v-model="spell.duration_n"
-					:disable="!dur_type_time.includes(spell.duration_type)"
+					:disable="!spell_duration_types_time.includes(spell.duration_type)"
 					autocomplete="off"
 					class="mb-2"
 					type="number"
@@ -203,9 +192,9 @@
 					emit-value
 					map-options
 					label="Time scale"
-					:options="dur_time"
+					:options="spell_duration_times"
 					v-model="spell.duration_scale"
-					:disable="!dur_type_time.includes(spell.duration_type)"
+					:disable="!spell_duration_types_time.includes(spell.duration_type)"
 					class="mb-2"
 					:rules="[val => !!val || 'Required']"
 				/>
@@ -219,7 +208,7 @@
 					emit-value
 					map-options
 					label="AOE type"
-					:options="aoe_type"
+					:options="aoe_types"
 					v-model="spell.aoe_type"
 					class="mb-2"
 					:rules="[val => !!val || 'Required']"
@@ -241,7 +230,13 @@
 		<div class="row q-col-gutter-md spell_row">
 			<!-- RITUAL -->
 			<div class="col-12 col-md-2">
-				<q-checkbox size="lg" dark v-model="spell.ritual" val="lg" label="Ritual" :false-value="null" />
+				<q-checkbox 
+					size="lg" dark 
+					v-model="spell.ritual"
+					label="Ritual" 
+					:false-value="null"
+					indeterminate-value="something else"
+				/>
 			</div>
 			<!-- LEVEL SCALING -->
 			<div class="col-12 col-md-5">
@@ -249,7 +244,7 @@
 					dark filled square
 					emit-value
 					map-options
-					:options="lvl_scaling"
+					:options="level_scaling"
 					label="Spell scaling"
 					v-model="spell.level_scaling"
 					class="mb-2"
@@ -346,118 +341,19 @@
 import VueMarkdown from 'vue-markdown';
 import { mapActions } from 'vuex';
 import { validation } from '@/mixins/validation';
+import { spells } from '@/mixins/spells';
 
 export default {
-
-	name: 'basic-info',
+	name: 'spells-BasicInfo',
 	props: {
 		value: Object
 	},
-	mixins: [ validation ],
+	mixins: [ validation, spells ],
 	components: {
 		VueMarkdown
 	},
 	data() {
-		return {
-			levels: [
-				{
-					value: 0,
-					label: "Cantrip"
-				},
-				{
-					value: 1,
-					label: "1st"
-				},
-				{
-					value: 2,
-					label: "2nd"
-				},
-				{
-					value: 3,
-					label: "3rd"
-				},
-				{
-					value: 4,
-					label: "4th"
-				},
-				{
-					value: 5,
-					label: "5th"
-				},
-				{
-					value: 5,
-					label: "6th"
-				},
-				{
-					value: 7,
-					label: "7th"
-				},
-				{
-					value: 8,
-					label: "8th"
-				},
-				{
-					value: 9,
-					label: "9th"
-				},
-			],
-			schools: [
-				{ label: "Abjuration", value: "abjuration" },
-				{ label: "Conjuration", value: "conjuration" },
-				{ label: "Divination", value: "divination" },
-				{ label: "Enchantment", value: "enchantment" },
-				{ label: "Evocation", value: "evocation" },
-				{ label: "Illusion", value: "illusion" },
-				{ label: "Necromancy", value: "necromancy" },
-				{ label: "Transmutation", value: "transmutation" },
-			],
-			cast_time_type: [
-				{ label: "Action", value: "action" },
-				{ label: "Bonus Action", value: "bonus action" }, 
-				{ label: "Reaction", value: "reaction" }, 
-				{ label: "Minute", value: "minute" }, 
-				{ label: "Hour", value: "hour" }, 
-				{ label: "No Action", value: "no action" }, 
-				{ label: "Special", value: "special" },
-			],
-			range_type: [
-				{ label: "Self", value: "self" },
-				{ label: "Touch", value: "touch" },
-				{ label: "Ranged", value: "ranged" },
-				{ label: "Sight", value: "sight" },
-				{ label: "Unlimited", value: "unlimited" },
-			],
-			dur_type: [
-				{ label: "Concentration", value: "concentration" },
-				{ label: "Instantaneous", value: "instantaneous" },
-				{ label: "Special", value: "special" },
-				{ label: "Time", value: "time" },
-				{ label: "Until Dispelled", value: "until dispelled" },
-				{ label: "Until Dispelled or Triggered", value: "until dispelled or triggered" },
-			],
-			dur_type_time: [ "concentration", "time" ],
-			dur_time: [
-				{ label: "Round", value: "round" },
-				{ label: "Minute", value: "minute" },
-				{ label: "Hour", value: "hour" },
-				{ label: "Day", value: "day" },
-			],
-			aoe_type: [
-				{ label: "None", value: "none" },
-				{ label: "Cone", value: "cone" },
-				{ label: "Cube", value: "cube" },
-				{ label: "Cylinder", value: "cylinder" },
-				{ label: "Line", value: "line" },
-				{ label: "Sphere", value: "sphere" },
-				{ label: "Square", value: "square" },
-				{ label: "Square Feet", value: "square feet" },
-			],
-			lvl_scaling: [
-				{ label: "None", value: "none" },
-				{ label: "Character Level", value: "character_level" },
-				{ label: "Spell Scale", value: "spell_scale" },
-				{ label: "Spell Level", value: "spell_level" },
-			],
+		return {	
 			classes: [
 				{ label: "Bard", value: "bard" },
 				{ label: "Barbarian", value: "barbarian" },
@@ -473,20 +369,12 @@ export default {
 				{ label: "Wizard", value: "wizard" },
 			],
 			classes_selected: null,
-		};
-	mounted() {
+		}
 	},
 	methods: {
 		...mapActions([
 			'setSlide'
 		]),
-		setComponent(comp) {
-			if (Object.keys(this.spell.components)[0]=="0") {
-				this.spell.components = {'verbal':0,'somatic':0,'material':0};
-			}
-			this.spell.components[comp] = !this.spell.components[comp];
-			this.$forceUpdate()
-		},
 		setRitual() {
 			let yn = ["yes", "no"]
 			if (yn.includes(this.spell.ritual)) {

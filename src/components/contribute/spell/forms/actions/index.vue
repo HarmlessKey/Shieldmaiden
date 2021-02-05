@@ -114,7 +114,7 @@
 							</div>
 						</div>
 						<!-- ROLLS -->
-						<spell-action-rolls
+						<Rolls
 							v-model="action.rolls" 
 							:level_scaling="spell.level_scaling"
 							:level="spell.level"
@@ -130,17 +130,17 @@
 </template>
 
 <script>
-import spellActionRolls from '@/components/contribute/spell/forms/spell-action-rolls.vue';
+import Rolls from './Rolls.vue';
 import { abilities } from '@/mixins/abilities.js';
 
 export default {
-	name: 'spell-actions',
+	name: 'spells-Actions',
 	mixins: [abilities],
 	props: {
 		value: Object,
 	},
 	components: {
-		spellActionRolls
+		Rolls
 	},
 	data() {
 		return {
@@ -175,27 +175,14 @@ export default {
 			}
 			this.spell.actions.push({
 				type: "spell_attack",
-				name: "New action",
-				modifiers: [],
-				conditions: [],
-				notifications: [],
-				effects: []
+				name: "New action"
 			});
 			this.$forceUpdate();
-		},
-		edit_action(index) {
-			this.edit_index = index;
-		},
-		saved_action() {
-			this.edit_index = undefined;
 		},
 		remove_action(index) {
 			this.$delete(this.spell.actions, index)
 			// Update points to actions in modifiers
 			this.$forceUpdate()
-		},
-		spellUpdate() {
-			this.spell = Object.assign({}, this.spell);
 		}
 	},
 };

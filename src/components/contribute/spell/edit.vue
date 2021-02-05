@@ -170,11 +170,6 @@ export default {
 		},
 		preview(type) {
 			this.preview_spell = type;
-			// if (type === 'old') {
-			// 	this.preview = 'old';
-			// } else {
-			// 	this.preview = 'new';
-			// }
 		},
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
@@ -183,10 +178,9 @@ export default {
 			// Check if the parsed value is actually a valid value (e.g. available in dropdown)
 			
 			// Parse simple values
-			// this.$set(this.spell, 'name', this.old_spell.name);
 			this.spell.name = this.old_spell.name;
 			this.spell.school = this.old_spell.school.name.toLowerCase();
-			this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false;
+			this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : null;
 			this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level;
 			this.spell.level_scaling = (this.old_spell.higher_level) ? undefined : "none";
 			
@@ -340,7 +334,7 @@ export default {
 		// },
 
 		store_spell() {
-			console.log("STore spell called")
+			console.log("Store spell called")
 			delete this.spell['.value'];
 			delete this.spell['.key'];
 

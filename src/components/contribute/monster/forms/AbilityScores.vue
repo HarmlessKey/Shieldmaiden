@@ -26,6 +26,7 @@
 						:false-value="null" 
 						indeterminate-value="something-else" 
 						label="Saving throw proficiency"
+						@input="$forceUpdate()"
 					>
 						<q-tooltip anchor="top middle" self="center middle">
 							Saving throw proficiency
@@ -33,7 +34,6 @@
 					</q-checkbox>
 				</div>
 			</div>
-			{{ npc.saving_throws }}
 		</hk-card>
 	</div>
 </template>
@@ -56,7 +56,9 @@
 		computed: {
 			npc: {
 				get() {
-					return this.value;
+					let value = this.value;
+					if(!value.saving_throws) value.saving_throws = [];
+					return value;
 				},	
 				set(newValue) {
 					this.$emit('input', newValue);

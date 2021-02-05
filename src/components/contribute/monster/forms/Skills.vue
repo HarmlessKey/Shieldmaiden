@@ -29,6 +29,7 @@
 						v-model="npc.skills_expertise" 
 						:false-value="null" indeterminate-value="something-else"
 						:disable="npc.skills ? !npc.skills.includes(key) : true"
+						@input="$forceUpdate()"
 					>
 						<template slot:label>
 							+{{ npc.challenge_rating ? monster_challenge_rating[npc.challenge_rating].proficiency : "" }}
@@ -107,7 +108,9 @@
 		computed: {
 			npc: {
 				get() {
-					return this.value;
+					let value = this.value;
+					if(!value.skills_expertise) value.skills_expertise = [];
+					return value;
 				},	
 				set(newValue) {
 					this.$emit('input', newValue);

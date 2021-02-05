@@ -78,7 +78,9 @@
 		// },
 		computed: {
 			animatedNumber: function() {
-				return this.tweenedNumber.toFixed(0);
+				if (this.tweenedNumber.toFixed) {
+					return this.tweenedNumber.toFixed(0);
+				}
 			},
 			camp_data: function() {
 				const key = this.entity.key;

@@ -211,7 +211,7 @@
 		.container {
 
 			.hk-card {
-				background-position: top center;
+				background-position: center;
 				background-size: cover;
 				box-shadow: 5px 5px 10px rgba(0, 0, 0, .5);
 				color:$white;

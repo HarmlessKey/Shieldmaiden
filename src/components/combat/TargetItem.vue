@@ -444,7 +444,9 @@
 				'targeted',
 			]),
 			animatedNumber() {
-				return this.tweenedNumber.toFixed(0);
+				if (this.tweenedNumber.toFixed) {
+					return this.tweenedNumber.toFixed(0);
+				}
 			},
 			entity() {
 				return this.entities[this.item];

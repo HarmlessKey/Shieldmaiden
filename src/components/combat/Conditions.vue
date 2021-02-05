@@ -63,15 +63,15 @@
 		height: 30px;
 		line-height: 26px;
 		text-align: center;
-		fill: #cc3e4a;
-		color: #cc3e4a;
-		background-color: #302f2f;
+		fill:$red;
+		color:$red;
+		background-color:$gray-active;
 		padding: 2px;
 		cursor: pointer;
 	}
 	.n {
 		position: absolute;
-		color: #cc3e4a;
+		color:$red;
 		top: 0;
 		left: 2px;
 	}

@@ -109,7 +109,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		color: #fff;
+		color:$white;
 		margin-bottom: 20px !important;
 	}
 	.track {

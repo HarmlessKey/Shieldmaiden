@@ -70,7 +70,7 @@
 
 		&.q-tab--active {
 			background: rgba(38, 38, 38, .9) !important;
-			color: #2c97de;
+			color: $blue;
 		}
 		.notifications {		
 			user-select: none;

@@ -14,12 +14,12 @@
 					/ {{ tier.benefits.campaigns }} )
 				</div>
 
-				<b-list-group>
-					<b-list-group-item v-for="(campaign, key) in campaigns" :key="key" class="d-flex justify-content-between">
+				<q-list>
+					<q-item v-for="(campaign, key) in campaigns" :key="key" class="d-flex justify-content-between">
 						{{ campaign.campaign }}
 						<span @click="confirmDelete(key, 'campaign', campaign.campaign)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-					</b-list-group-item>
-				</b-list-group>
+					</q-item>
+				</q-list>
 				
 				<div slot="footer">
 					<router-link class="btn" to="/campaigns">Show all</router-link>
@@ -33,20 +33,21 @@
 				<template v-for="(campaign, cKey) in campaigns">
 					<div :key="cKey">
 						<div class="p-2">
-							<span class="gray-hover">Campaign:</span> {{ campaign.campaign }}
+							<span class="gray-hover">Campaign:</span>
+							<router-link :key="cKey" :to="'/encounters/' + cKey">{{ campaign.campaign }}</router-link>
 							( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
 							/ {{ tier.benefits.encounters }} )
 						</div>
-						<b-list-group :key="cKey">
-							<b-list-group-item v-for="(encounter, key) in allEncounters[cKey]" :key="key" class="d-flex justify-content-between">
+						<q-list :key="cKey">
+							<q-item v-for="(encounter, key) in allEncounters[cKey]" :key="key" class="d-flex justify-content-between">
 								{{ encounter.encounter }}
 								<span @click="confirmDelete({ campKey: cKey, encKey: key }, 'encounter', encounter.encounter)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-							</b-list-group-item>
-						</b-list-group>
+							</q-item>
+						</q-list>
 					</div>
 				</template>
 				<div slot="footer">
-					<router-link class="btn" :key="cKey" :to="'/encounters/' + cKey">Show all</router-link>
+					
 				</div>
 			</hk-card>
 
@@ -61,12 +62,12 @@
 					/ {{ tier.benefits.players }} )
 				</div>
 
-				<b-list-group>
-					<b-list-group-item v-for="(player, key) in players" :key="key" class="d-flex justify-content-between">
+				<q-list>
+					<q-item v-for="(player, key) in players" :key="key" class="d-flex justify-content-between">
 						{{ player.character_name }}
 						<span @click="confirmDelete(key, 'player', player.character_name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-					</b-list-group-item>
-				</b-list-group>
+					</q-item>
+				</q-list>
 				<div slot="footer">
 					<router-link class="btn" to="/players">Show all</router-link>
 				</div>
@@ -83,12 +84,12 @@
 					/ {{ tier.benefits.npcs }} )
 				</div>
 
-				<b-list-group>
-					<b-list-group-item v-for="(npc, key) in npcs" :key="key" class="d-flex justify-content-between">
+				<q-list>
+					<q-item v-for="(npc, key) in npcs" :key="key" class="d-flex justify-content-between">
 						{{ npc.name }}
 						<span @click="confirmDelete(key, 'NPC', npc.name)" class="pointer"><i class="fas fa-trash-alt red"></i></span>
-					</b-list-group-item>
-				</b-list-group>
+					</q-item>
+				</q-list>
 				<div slot="footer">
 					<router-link class="btn" to="/npcs">Show all</router-link>
 				</div>
@@ -194,10 +195,10 @@
 			padding: 0;
 		}
 		.list-group {
-			border-top: solid 1px #191919 !important;
+			border-top: solid 1px$gray-dark !important;
 
 			.list-group-item {
-				border-bottom: solid 1px #191919 !important;
+				border-bottom: solid 1px$gray-dark !important;
 			}
 		}
 		&.encounters {

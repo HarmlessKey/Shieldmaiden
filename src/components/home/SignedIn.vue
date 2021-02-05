@@ -39,7 +39,7 @@
 					<h2>Dungeon Master</h2>					
 					<q-list dark class="mb-4">
 						<q-item 
-							v-for="({name, icon, label}, index) in dm_tabs" 
+							v-for="({name, icon, label, caption}, index) in dm_tabs" 
 							clickable v-ripple 
 							:to="`/${name}`"
 							:key="`dm-${index}`"
@@ -47,7 +47,13 @@
 							<q-item-section avatar>
 								<q-icon :name="icon" />
 							</q-item-section>
-							<q-item-section>{{ label }}</q-item-section>
+							<q-item-section>
+								<q-item-label>{{ label }}</q-item-label>
+								<q-item-label caption>{{ caption }}</q-item-label>
+							</q-item-section>
+							<q-item-section side>
+								<q-icon name="fas fa-chevron-right" />
+							</q-item-section>
 						</q-item>
 					</q-list>
 				</div>
@@ -56,7 +62,7 @@
 					<h2>Player</h2>					
 					<q-list dark>
 						<q-item 
-							v-for="({name, icon, label}, index) in player_tabs" 
+							v-for="({name, icon, label, caption}, index) in player_tabs" 
 							clickable v-ripple 
 							:to="`/${name}`"
 							:key="`player-${index}`"
@@ -64,7 +70,13 @@
 							<q-item-section avatar>
 								<q-icon :name="icon" />
 							</q-item-section>
-							<q-item-section>{{ label }}</q-item-section>
+							<q-item-section>
+								<q-item-label>{{ label }}</q-item-label>
+								<q-item-label caption>{{ caption }}</q-item-label>
+							</q-item-section>
+							<q-item-section side>
+								<q-icon name="fas fa-chevron-right" />
+							</q-item-section>
 						</q-item>
 					</q-list>
 				</div>
@@ -78,10 +90,10 @@
 				>
 					<i class="patreon-red fas fa-heart"/> Thanks for your '{{ userInfo.patron.tier}}' support.
 				</h4>
-				<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+				<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red text-center"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 			</div>
 
-			<div class="share bg-gray-dark">
+			<div class="share d-flex justify-content-center">
 				<a class="btn btn-lg btn-block bg-blue" @click="setSlide({ show: true, type: 'PlayerLink'})">
 					<i class="fas fa-share-alt"></i> Share your encounters
 				</a>
@@ -103,39 +115,46 @@
 					{
 						name: "campaigns",
 						label: "Campaigns",
-						icon: "fas fa-dungeon"
+						icon: "fas fa-dungeon",
+						caption: "Campaigns you're running"
 					},
 					{
 						name: "players",
 						label: "Players",
-						icon: "fas fa-users"
+						icon: "fas fa-users",
+						caption: "Players in your campaign"
 					},
 					{
 						name: "npcs",
 						label: "NPC's",
-						icon: "fas fa-dragon"
+						icon: "fas fa-dragon",
+						caption: "Your custom NPC's"
 					},
 					{
 						name: "reminders",
 						label: "Reminders",
-						icon: "fas fa-stopwatch"
+						icon: "fas fa-stopwatch",
+						caption: "Your custom reminders"
 					},
 					{
 						name: "items",
 						label: "Items",
-						icon: "fas fa-staff"
+						icon: "fas fa-staff",
+						caption: "Your custom items"
 					}
 				],
 				player_tabs: [
 					{
 						name: "characters",
 						label: "Characters",
-						icon: "fas fa-helmet-battle"
+						icon: "fas fa-helmet-battle",
+						caption: "Characters you play"
 					},
 					{
 						name: "followed",
 						label: "Following",
-						icon: "fas fa-users"
+						icon: "fas fa-users",
+						caption: "Other users you're following"
 					}
 				]
 			}
@@ -176,10 +195,11 @@
 
 <style lang="scss" scoped>
 	.signed {
+		padding-top: 30px;
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color: #fff;
+		color:$white;
 		background-position: top center;
-		background-color: #000;
+		background-color:$black;
 		overflow: auto;
 		height: calc(100vh - 50px);
 		padding-bottom: 98px;
@@ -189,13 +209,12 @@
 		}
 
 		.container {
-			padding-top: 30px;
 
 			.hk-card {
-				background-position: top center;
+				background-position: center;
 				background-size: cover;
 				box-shadow: 5px 5px 10px rgba(0, 0, 0, .5);
-				color: #fff;
+				color:$white;
 				cursor: pointer;
 
 				.card-header {
@@ -224,13 +243,13 @@
 				}
 
 				&:hover {
-					color: #fff;
+					color:$white;
 				}
 			}
 
 			.first {
 				h2 {
-					color: #fff;
+					color:$white;
 					font-size: 30px !important;
 					text-align: center;
 				}
@@ -239,6 +258,10 @@
 			.q-item {
 				background-color: rgba(0, 0, 0, .5);
 				margin-bottom: 1px;
+
+				.q-item__label--caption {
+					opacity: .5;
+				}
 			}
 
 			.logo {
@@ -260,7 +283,14 @@
 				bottom: 0;
 				left: 0;
 				width: 100%;
-				padding: 20px 20px 20px 20px;
+				padding: 20px 10px 20px 10px;
+				backdrop-filter: blur(2px);
+				border-top: solid 1px$gray-hover;
+				background-color: rgba(0, 0, 0, .5);
+
+				.btn {
+					max-width: 500px;
+				}
 			}
 			@media only screen and (max-width: 576px) {
 				.hk-card {
@@ -271,6 +301,7 @@
 				.q-item {
 					padding: 18px 20px;
 					font-size: 16px;
+					margin-bottom: 3px;
 				}
 			}
 		}

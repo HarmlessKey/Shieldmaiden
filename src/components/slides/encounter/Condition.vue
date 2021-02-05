@@ -120,16 +120,16 @@
 	svg {
 		width: 23px;
 		height: 23px;
-		color: #b2b2b2;
-		fill: #b2b2b2;
+		color: $gray-light;
+		fill: $gray-light;
 	}
 	.table {
 
 		td {
-			background: #302f2f;
+			background:$gray-active;
 
 			a {
-				color: #b2b2b2 !important;
+				color: $gray-light !important;
 				background: #494747;
 				line-height: 30px;
 				height: 30px;
@@ -137,8 +137,8 @@
 				text-align: center;
 
 				&.active {
-					background: #b2b2b2;
-					color: #302f2f !important;
+					background: $gray-light;
+					color:$gray-active !important;
 				}
 			}
 		}

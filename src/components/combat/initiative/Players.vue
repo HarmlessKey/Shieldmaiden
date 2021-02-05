@@ -17,20 +17,13 @@
 						{{ entity.curHp}} / {{entity.maxHp}}
 						<span v-if="entity.tempHp"> + {{ entity.tempHp }}</span>
 					</div>
-					<a @click="setSlide({
-						show: true,
-						type: 'slides/EditPlayer',
-						data: {
-							key: entity.key,
-							location: 'encounter'
-						}
-					})">
+					<a @click="setSlide({show: true, type: 'slides/encounter/EditEntity', data: [entity.key] })">
 						<i class="fas fa-pencil"></i>
 					</a>
 					<q-input 
 						dark filled square dense
 						type="number" 
-						class="ml-2"
+						class="ml-2 player-initiative"
 						v-model="entity.initiative" 
 						min="0" 
 						max="99" 
@@ -118,14 +111,14 @@
 
 		li {
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 
 			&:hover {
 				background: #141414 !important;
 			}
 
 			&.selected {
-				border-color: #2c97de;
+				border-color: $blue;
 			}
 			.img {
 				font-size: 20px;

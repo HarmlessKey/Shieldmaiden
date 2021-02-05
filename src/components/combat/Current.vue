@@ -141,7 +141,7 @@
 		}
 
 		.img {
-			background-color: #191919;
+			background-color:$gray-dark;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
@@ -156,13 +156,13 @@
 			line-height: 30px;
 			background-color:#191919;
 			font-weight:bold;
-			color:#b2b2b2;
+			color:$gray-light;
 			grid-area: ac;
 		}
 		.progress { 
 			height: 30px;
 			line-height: 30px;
-			background-color: #302f2f;
+			background-color:$gray-active;
 			position: relative;
 
 			span.hp, span.percentage {
@@ -196,9 +196,9 @@
 			height: 30px;
 			line-height: 26px;
 			text-align: center;
-			fill: #cc3e4a;
-			color: #cc3e4a;
-			background-color: #302f2f;
+			fill:$red;
+			color:$red;
+			background-color:$gray-active;
 			padding: 2px;
 			cursor: pointer;
 		}

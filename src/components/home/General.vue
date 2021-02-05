@@ -49,7 +49,7 @@
 	.general {
 		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #232323;
+		background-color: $gray-darker;
 
 		ul {
 			margin-bottom: 30px;

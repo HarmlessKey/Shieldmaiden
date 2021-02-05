@@ -306,7 +306,7 @@ export default {
 			width: 25px;
 			height: 25px;
 			padding: 2px 5px;
-			color: #fff !important;
+			color:$white !important;
 			margin-right: 5px;
 
 			&:last-child {
@@ -318,7 +318,7 @@ export default {
 		margin-bottom: 15px;
 
 		.var-title {
-			border-bottom: solid 1px #5c5757;
+			border-bottom: solid 1px$gray-hover;
 			padding-bottom: 3px;
 			margin-bottom: 10px;
 		}

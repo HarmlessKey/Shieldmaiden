@@ -49,7 +49,7 @@
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
 					// eslint-disable-next-line
 					(user) => {
-						this.$router.replace('campaigns')
+						this.$router.replace('content')
 					},
 					(err) => {
 						this.error = err.message;
@@ -60,7 +60,7 @@
 				const provider = new firebase.auth.GoogleAuthProvider();
 
 				auth.signInWithPopup(provider).then(() => {
-					this.$router.replace('campaigns');
+					this.$router.replace('content');
 				}).catch((err) => {
 					this.error = err.message;
 				});

@@ -143,9 +143,9 @@
 		}
 	}
 	.advantage .btn:hover {
-		background-color: #83b547;
+		background-color: $green;
 	}
 	.disadvantage .btn:hover {
-		background-color: #cc3e4a;
+		background-color:$red;
 	}
 </style>

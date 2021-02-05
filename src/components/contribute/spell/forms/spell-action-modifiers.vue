@@ -550,7 +550,7 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px #5c5757;
+	border-bottom: solid 1px$gray-hover;
 	padding-bottom: 5px;
 }
 .row {
@@ -567,7 +567,7 @@ h2 {
 }
 
 .component_box {
-	background: #000;
+	background:$black;
 	width: 40px;
 	text-align: center;
 	line-height: 36px;
@@ -578,7 +578,7 @@ h2 {
 	}
 }
 .component_box.selected {
-	background: #2c97de;
+	background: $blue;
 }
 label {
 	display: flex;
@@ -591,7 +591,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color: #191919;
+		background-color:$gray-dark;
 
 		.caret {
 			display: inline-block;
@@ -606,7 +606,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: #232323;
+		background-color: $gray-darker;
 	}
 }
 </style>

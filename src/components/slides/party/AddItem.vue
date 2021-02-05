@@ -177,7 +177,7 @@
 		margin-top: 20px;
 
 		div {
-			background-color: #191919;
+			background-color:$gray-dark;
 			padding: 10px;
 		}
 
@@ -191,7 +191,7 @@
 		display: grid;
 		grid-template-columns: auto max-content;
 		padding: 10px;
-		background-color: #191919;
+		background-color:$gray-dark;
 
 		a.item-name {
 			white-space: nowrap;

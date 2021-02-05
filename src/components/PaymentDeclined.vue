@@ -43,7 +43,7 @@
         justify-content: space-between;
 
         a {
-            color: #fff !important;
+            color:$white !important;
         }
     }
     .hide_declined {

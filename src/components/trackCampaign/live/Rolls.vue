@@ -85,7 +85,7 @@
 				margin-bottom: 10px;
 
 				.target {
-					background: #191919;
+					background:$gray-dark;
 					display: grid;
 					grid-template-columns: 30px 1fr;
 					font-size: 15px;
@@ -115,7 +115,7 @@
 					width: 100%;
 
 					div.roll {
-						border: solid 1px #5c5757;
+						border: solid 1px$gray-hover;
 						text-align: center;
 						padding: 5px 0;
 						flex-direction: column;
@@ -137,7 +137,7 @@
 						}
 						.advantage {
 							position: absolute;
-							background: #191919;
+							background:$gray-dark;
 							padding: 0 10px;
 							top: -5px;
 							left: 50%;

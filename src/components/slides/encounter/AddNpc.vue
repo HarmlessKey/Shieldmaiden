@@ -418,7 +418,7 @@
 	ul.nav {
 		a.nav-link {
 			&.active {
-				background: #302f2f !important;
+				background:$gray-active !important;
 			}
 		}
 	}

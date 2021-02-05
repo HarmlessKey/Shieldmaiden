@@ -81,7 +81,7 @@
 		padding: 10px;
 
 		a {
-			color:  #b2b2b2;
+			color:  $gray-light;
 			line-height: 35px;
 			width: 35px;
 			text-align: right;

@@ -435,7 +435,7 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			padding: 10px 0;
-			border-top: solid 1px #5c5757;
+			border-top: solid 1px$gray-hover;
 	
 			.unsaved_changes {
 				padding: 10px;

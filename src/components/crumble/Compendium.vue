@@ -1,24 +1,18 @@
 <template>
-	<div class="d-none d-md-block">
-		<ul class="crumble d-flex justify-content-left">
-			<li>
-				<router-link to="/">Home</router-link>
-			</li>
-			<li>
-				<i class="fas fa-chevron-right mr-2"></i>
-				<router-link :to="explodePath($route.path, 1)">Compendium</router-link>
-			</li>
+	<div>
+		<q-breadcrumbs>
+			<template v-slot:separator>
+        <q-icon
+          name="fas fa-chevron-right"
+        />
+      </template>
+			<q-breadcrumbs-el icon="fas fa-home-alt" to="/" />
 			<template v-if="$route.params.type || $route.meta.baseName">
-				<li>
-					<i class="fas fa-chevron-right mr-2"></i>
-					<router-link :to="explodePath($route.path, 2)">{{ $route.params.type || $route.meta.baseName }}</router-link>
-				</li>
-				<li v-if="name">
-					<i class="fas fa-chevron-right mr-2"></i>
-					{{ name }}
-				</li>
+				<q-breadcrumbs-el :label="$route.params.type || $route.meta.baseName" :to="explodePath($route.path, 2)" />
+				<q-breadcrumbs-el v-if="name" :label="name.capitalize()" />
 			</template>
-		</ul>
+		</q-breadcrumbs>
+		<hr>
 	</div>
 </template>
 

@@ -751,8 +751,8 @@
 			margin-bottom: 1px;
 
 			&.active {
-				background-color: #262626;
-				color: #b2b2b2 !important;
+				background-color:$gray;
+				color: $gray-light !important;
 			}
 		}
 		.avatar {
@@ -761,7 +761,7 @@
 			grid-column-gap: 10px;
 
 			.img {
-				border: solid 1px #b2b2b2;
+				border: solid 1px $gray-light;
 				width: 56px;
 				height: 56px;
 				background-size: cover;
@@ -776,7 +776,7 @@
 		display: flex;
 		justify-content: flex-end;
 		padding: 10px 0;
-		border-top: solid 1px #5c5757;
+		border-top: solid 1px$gray-hover;
 
 		.error {
 			margin: 0 10px 0 0;

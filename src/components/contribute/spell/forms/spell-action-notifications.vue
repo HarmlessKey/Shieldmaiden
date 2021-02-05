@@ -352,14 +352,14 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px #5c5757;
+	border-bottom: solid 1px$gray-hover;
 	padding-bottom: 5px;
 }
 label {
 	display: flex;
 	justify-content: flex-start;
 	&.var {
-		border-bottom: solid 1px #5c5757;
+		border-bottom: solid 1px$gray-hover;
 		padding-bottom: 5px;
 	}
 }
@@ -370,7 +370,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color: #191919;
+		background-color:$gray-dark;
 
 		.caret {
 			display: inline-block;
@@ -385,7 +385,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: #232323;
+		background-color: $gray-darker;
 	}
 }
 </style>

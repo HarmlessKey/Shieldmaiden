@@ -58,7 +58,7 @@
 				text-align: center;
 				font-weight: bold;
 				position: absolute;
-				color: #262626;
+				color:$gray;
 				font-size: 40px;
 				width: 20px;
 				height: 20px;

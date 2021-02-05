@@ -135,10 +135,9 @@ export const setHP = {
 					newHp: newhp,
 				})
 
-				//Check if a reminder is triggered on damage taken
-				this.checkReminders(target, 'damage');
-				
 			}
+			//Check if a reminder is triggered on damage taken
+			this.checkReminders(target, 'damage');
 
 			//Notification
 			if(notify) {

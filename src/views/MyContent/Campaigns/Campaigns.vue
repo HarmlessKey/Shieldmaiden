@@ -319,12 +319,12 @@
 			cursor: pointer;
 		}
 		h2.campaigns {
-			border-bottom: solid 1px #b2b2b2;
+			border-bottom: solid 1px $gray-light;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: #b2b2b2 !important;
+				color: $gray-light !important;
 
 				&:hover {
 					text-decoration: none;
@@ -349,8 +349,8 @@
 
 			&.warning {
 				.card-header {
-					background-color: #cc3e4a;
-					color: #fff;
+					background-color:$red;
+					color:$white;
 				}
 			}
 			.card-header {
@@ -373,7 +373,7 @@
 						margin-left: 10px;
 
 						&:hover {
-							color: #b2b2b2 !important;
+							color: $gray-light !important;
 						}
 					}
 				}
@@ -394,12 +394,12 @@
 					a {
 						width: 100%;
 						display: block;
-						color: #fff !important;
+						color:$white !important;
 						text-shadow: 5px 5px 5pxrgba(0, 0, 0, .5);
 
 						&:hover {
 							text-decoration: none;
-							color: #2c97de !important;
+							color: $blue !important;
 						}
 					}
 					svg {
@@ -418,7 +418,7 @@
 			}
 			&.openSlot {
 				height: 263px;
-				border: dashed 1px #b2b2b2 !important;
+				border: dashed 1px $gray-light !important;
 				background: none !important;
 
 				.card-body {

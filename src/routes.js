@@ -2,6 +2,7 @@
 import { store } from './store/store';
 
 const Home = () => import('@/views/Home.vue');
+const SignedIn = () => import('@/components/home/SignedIn.vue');
 
 const Compendium = () => import('@/views/Compendium/Overview.vue');
 const View = () => import('@/views/Compendium/View.vue');
@@ -79,6 +80,16 @@ export const routes = [{
 		sidebar: false,
 		offline: true
 	},
+},
+{
+	path: '/content',
+	name: 'content',
+	component: SignedIn,
+	meta: {
+		requiresContribute: true,
+		requiresAuth: true,
+		sidebar: false
+	}
 },
 {
 	path: '/demo',

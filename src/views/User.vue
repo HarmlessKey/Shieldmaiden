@@ -141,7 +141,7 @@
 		padding: 30px;
 
 		.hk-card {
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 			background-size: cover;
 			background-position: center bottom;
 
@@ -181,10 +181,10 @@
 					flex-wrap: nowrap;
 
 					.img {
-						background: #000;
+						background:$black;
 						height: 35px;
 						width: 35px;
-						border: solid 1px #fff;
+						border: solid 1px$white;
 						margin: 0 10px 10px 0;
 						box-sizing: border;
 

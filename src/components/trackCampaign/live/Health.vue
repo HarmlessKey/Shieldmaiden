@@ -78,7 +78,9 @@
 		// },
 		computed: {
 			animatedNumber: function() {
-				return this.tweenedNumber.toFixed(0);
+				if (this.tweenedNumber.toFixed) {
+					return this.tweenedNumber.toFixed(0);
+				}
 			},
 			camp_data: function() {
 				const key = this.entity.key;
@@ -196,14 +198,14 @@
 
 		tr:first-child {
 			td {
-				border-top: solid 1px #2c97de !important;
-				border-bottom: solid 1px #2c97de !important;
+				border-top: solid 1px $blue !important;
+				border-bottom: solid 1px $blue !important;
 			}
 			td:first-child {
-				border-left: solid 1px #2c97de !important;
+				border-left: solid 1px $blue !important;
 			}
 			td:last-child {
-				border-right: solid 1px #2c97de !important;
+				border-right: solid 1px $blue !important;
 			}
 		}
 		tr {
@@ -229,9 +231,9 @@
 		}
 		tr td:first-child, thead th {
 			text-align: center;
-			color: #fff;
+			color:$white;
 			background: none;
-			text-shadow: 0 0 3px  #000;
+			text-shadow: 0 0 3px $black;
 		}
 	}
 	.conditions {
@@ -240,7 +242,7 @@
 		svg {
 			width: 24px;
 			height: 24px;
-			fill: #cc3e4a;
+			fill:$red;
 			padding: 2px;
 			cursor: pointer;
 			margin: 0;

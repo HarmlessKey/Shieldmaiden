@@ -101,7 +101,7 @@
 
 <style lang="scss" scoped>
 	.footer {
-		background-color: #232323;
+		background-color: $gray-darker;
 
 		.top {
 			padding: 10px 0;
@@ -110,7 +110,7 @@
 				display: flex;
 				justify-content: flex-start;
 				height: 200px;
-				// background: #000;
+				// background:$black;
 
 				.logo {
 					width: 250px;
@@ -129,7 +129,7 @@
 
 						a {
 							font-size: 12px;
-							color: #b2b2b2 !important;
+							color: $gray-light !important;
 							text-transform: uppercase;
 						}
 					}
@@ -159,7 +159,7 @@
 			
 		}
 		.bottom {
-			background-color: #191919;
+			background-color:$gray-dark;
 		}
 	}
 </style>

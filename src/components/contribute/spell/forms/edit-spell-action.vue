@@ -264,14 +264,14 @@ ul.nav-tabs {
 	margin: 20px 0;
 
 	.nav-link {
-		color: #b2b2b2 !important;
+		color: $gray-light !important;
 		height: 37px;
 		border-bottom: solid 3px #494747 !important;
 
 		&.active {
-			color: #2c97de !important;
+			color: $blue !important;
 			background: none !important;
-			border-color: #2c97de !important;
+			border-color: $blue !important;
 		}
 	}
 }
@@ -281,7 +281,7 @@ ul.nav-tabs {
 }
 
 .component_box {
-	background: #000;
+	background:$black;
 	width: 40px;
 	text-align: center;
 	line-height: 36px;
@@ -292,6 +292,6 @@ ul.nav-tabs {
 	}
 }
 .component_box.selected {
-	background: #2c97de;
+	background: $blue;
 }
 </style>

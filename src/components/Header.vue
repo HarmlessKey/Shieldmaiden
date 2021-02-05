@@ -82,7 +82,7 @@
 									<q-item-section avatar><i class="fas fa-user"></i></q-item-section>
 									<q-item-section>Profile</q-item-section>
 								</q-item>
-								<q-item clickable v-close-popup to="/campaigns">
+								<q-item clickable v-close-popup to="/content">
 									<q-item-section avatar><i class="fas fa-treasure-chest"></i></q-item-section>
 									<q-item-section>My content</q-item-section>
 								</q-item>
@@ -163,7 +163,7 @@
 				this.$store.commit("SET_USER", undefined)
 				auth.signOut()
 				.then(() => {
-					this.$router.replace('/');
+					if(this.$route.path !== "/") this.$router.replace('/');
 				});
 			}
 		}
@@ -196,10 +196,10 @@
 	}
 }
 a {
-	color:#b2b2b2 !important;
+	color:$gray-light !important;
 
 	&:hover {
-		color: #2c97de !important;
+		color: $blue !important;
 	}
 }
 a.icon {
@@ -212,7 +212,7 @@ a.icon {
 	line-height: 50px !important;
 
 	&:hover {
-		color: #fff !important;
+		color:$white !important;
 	}
 	&.roll {
 		margin-left: 5px;

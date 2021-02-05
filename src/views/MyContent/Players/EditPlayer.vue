@@ -659,7 +659,7 @@
 		}
 
 		svg {
-			fill: #b2b2b2;
+			fill: $gray-light;
 			width: 20px;
 			height: 20px;
 		}
@@ -670,7 +670,7 @@
 		grid-column-gap: 10px;
 
 		.img {
-			border: solid 1px #b2b2b2;
+			border: solid 1px $gray-light;
 			display: block;
 			width: 56px;
 			height: 56px;

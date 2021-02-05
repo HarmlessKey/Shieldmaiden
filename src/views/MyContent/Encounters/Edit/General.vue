@@ -209,7 +209,7 @@
 	text-align: center;
 
 	.img {
-		border: solid 1px #b2b2b2;
+		border: solid 1px $gray-light;
 		display: block;
 		width: 56px;
 		height: 56px;

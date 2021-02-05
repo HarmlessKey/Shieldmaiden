@@ -285,11 +285,11 @@ h2 {
 h3 {
 	text-transform: none;
 	font-weight: bold !important;
-	border-bottom: solid 1px #5c5757;
+	border-bottom: solid 1px$gray-hover;
 	padding-bottom: 3px;
 }
 a {
-	color: #b2b2b2 !important;
+	color: $gray-light !important;
 }
 .abilities {
 	user-select: none;
@@ -308,17 +308,17 @@ a {
 		cursor: pointer;
 	}
 	.advantage .ability:hover {
-		color: #83b547
+		color: $green
 	}
 	.disadvantage .ability:hover {
-		color: #cc3e4a
+		color:$red
 	}
 }
 .playerSkills {
 	user-select: none;
 	column-count: 3;
 	column-gap: 20px;
-	column-rule: 1px solid #5c5757;
+	column-rule: 1px solid$gray-hover;
 
 
 	.playerSkill {
@@ -327,7 +327,7 @@ a {
 		cursor: pointer;
 
 		&:hover {
-			color: #fff;
+			color:$white;
 		}
 		i {
 			
@@ -339,10 +339,10 @@ a {
 		}
 	}
 	.advantage .playerSkill:hover {
-		color: #83b547
+		color: $green
 	}
 	.disadvantage .playerSkill:hover {
-		color: #cc3e4a
+		color:$red
 	}
 }
 .skills .skill, .saves .hk-roll {
@@ -360,10 +360,10 @@ a {
 		cursor: pointer;
 	}
 	.advantage .save:hover {
-		color: #83b547
+		color: $green
 	}
 	.disadvantage .save:hover {
-		color: #cc3e4a
+		color:$red
 	}
 }
 .smallWidth {

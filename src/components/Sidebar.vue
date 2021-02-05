@@ -228,10 +228,10 @@
 	height: calc(100vh - 50px);
 	position: relative;
 	padding-top:10px;
-	background: #262626;
+	background:$gray;
 	transition: width 0.5s linear;
 	z-index: 98;
-	border-right: 1px solid #302f2f;
+	border-right: 1px solid$gray-active;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-bottom: 40px;
@@ -243,15 +243,15 @@
 		font-weight: bold;
 		margin: 10px 0;
 		width: 250px;
-		color: #5c5757;
+		color:$gray-hover;
 	}
 	hr {
-		background-color: #302f2f;
+		background-color:$gray-active;
 	}
 	
 	.q-list {
 		.q-item {
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 			overflow: hidden;
 			width: 250px;
 			transition: padding-left 0.5s linear;
@@ -263,22 +263,22 @@
 
 			&.q-router-link--active {
 				i::before {	
-					color: #2c97de !important;
+					color: $blue !important;
 				}
 			}
 		}
 	}
 	#toggle-width {
-		background: #262626;
+		background:$gray;
 		height: 40px;
 		width: calc(100%);
 		position: fixed;
 		right: left;
 		bottom: 0;
 		padding: 0 20px;
-		border-top: 1px solid #302f2f;
+		border-top: 1px solid$gray-active;
 		cursor: pointer;
-		color: #b2b2b2;
+		color: $gray-light;
 		line-height: 40px;
 		font-size: 20px;
 		text-align: right;

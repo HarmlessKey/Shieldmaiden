@@ -22,7 +22,7 @@
 			:style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.id], npcs[current.id]) + '\')',
 			borderColor: current.color_label ? current.color_label : ``
 		}"/>
-		<h1 class="d-none d-md-flex justify-content-start">
+		<h2 class="d-none d-md-flex justify-content-start">
 			<span class="mr-3">
 				<!-- Companion name is stored in NPC data -->
 				<template v-if="current.entityType === 'npc' || current.entityType === 'companion'">
@@ -61,11 +61,19 @@
 			<span v-else class="gray-hover">
 				? ? ?
 			</span>
-		</h1>
-		<a @click="setWeather" class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
-			<i v-if="weather" class="fas fa-cloud-showers"></i>
-			<i v-else class="fas fa-cloud hide"></i>
-		</a>
+		</h2>
+		<span class="actions">
+			<a @click="setWeather" class="weather" v-if="encounter.weather && Object.keys(encounter.weather).length > 0">
+				<i v-if="weather" class="fas fa-cloud-showers"></i>
+				<i v-else class="fas fa-cloud hide"></i>
+			</a>
+			<a @click="$q.fullscreen.toggle()" class="full">
+				<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
+				<q-tooltip anchor="bottom middle" self="top middle">
+					Fullscreen
+				</q-tooltip>
+			</a>
+		</span>
 	</div>
 </template>
 
@@ -102,7 +110,20 @@
 			setWeather() {
 				this.weather = !this.weather;
 				this.$emit('setWeather', this.weather);
-			}
+			},
+			toggleFullscreen(e) {
+				const target = e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+
+				this.$q.fullscreen.toggle(target)
+					.then(() => {
+						// success!
+					})
+					.catch((err) => {
+						alert(err)
+						// uh, oh, error!!
+						// console.error(err)
+					})
+			},
 		}
 	}
 </script>
@@ -131,27 +152,44 @@
 			background-size: cover;
 			background-position: center top;
 			margin-left: 15px;
-			border: solid 1px #b2b2b2;
+			border: solid 1px $gray-light;
 		}
-		h1 {
+		h2 {
 			line-height: 40px;
 			margin-left: 20px;
 		}
-		.weather {
+		.actions {
 			position: absolute;
 			right: 0;
 			top: 0;
-			height: 60px;
-			width: 60px;
-			line-height: 60px;
-			text-align: center;
-			color: #fff;
-			font-size: 25px;
+			display: flex;
+			justify-content: flex-end;
 
-			.hide {
-				font-size: 19px;
-				vertical-align: 7px;
-				opacity: .5;
+			.weather {
+				height: 60px;
+				width: 60px;
+				line-height: 60px;
+				text-align: center;
+				color: $white;
+				font-size: 25px;
+
+				.hide {
+					font-size: 19px;
+					vertical-align: 7px;
+					opacity: .5;
+				}
+			}
+			.full {
+				height: 60px;
+				width: 60px;
+				line-height: 60px;
+				font-size: 25px;
+				text-align: center;
+				color: $gray-light;
+				
+				i {
+					vertical-align: -2px;
+				}
 			}
 		}
 	}

@@ -3,6 +3,9 @@
 		<Crumble :name="(monster.changed) ? monster.name : old_monster.name"/>
 		<h2 class="monsterTitle d-flex justify-content-between" v-if="old_monster">
 			{{ (monster.changed) ? monster.name : old_monster.name }}
+			<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: monster})">
+				<i class="fas fa-eye" />
+			</a>
 		</h2>
 		
 		<div class="monster-wrapper" v-if="canEdit()">
@@ -63,7 +66,7 @@ import { abilities } from '@/mixins/abilities.js';
 import { skills } from '@/mixins/skills.js';
 import { languages } from '@/mixins/languages.js';
 import { monsterMixin } from '@/mixins/monster.js';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { damage_types } from '@/mixins/damageTypes.js';
 
 export default {
@@ -124,6 +127,9 @@ export default {
 		}
 	},
 	methods: {
+		...mapActions([
+			'setSlide'
+		]),	
 		canEdit() {
 			return (this.old_monster.metadata && this.old_monster.metadata.tagged === this.userId) ||
 				this.userInfo.admin;

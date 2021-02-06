@@ -19,7 +19,6 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
 	import BasicInfo from './BasicInfo';
 	import Senses from './Senses';
 	import AbilityScores from './AbilityScores';
@@ -49,11 +48,6 @@
 					this.$emit('update', newValue);
 				}
 			}
-		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),	
 		}
 	}
 </script>

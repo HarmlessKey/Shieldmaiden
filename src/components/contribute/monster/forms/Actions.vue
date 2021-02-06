@@ -111,7 +111,7 @@
 										map-options
 										label="AOE type"
 										:options="aoe_types"
-										v-model="npc.aoe_type"
+										v-model="ability.aoe_type"
 									/>
 								</div>
 								<div class="col">
@@ -119,9 +119,9 @@
 										dark filled square
 										label="AOE size"
 										type="number"
-										v-model="npc.aoe_size"
+										v-model="ability.aoe_size"
 										suffix="ft."
-										:disable="!npc.aoe_type"
+										:disable="!ability.aoe_type"
 									/>
 								</div>
 							</div>

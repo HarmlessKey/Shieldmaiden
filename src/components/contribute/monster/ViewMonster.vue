@@ -1,7 +1,7 @@
 <template>
 	<div class="monster" ref="entity" :class="{ smallWidth: is_small }">
 		<div class="monster-stats">
-			<h2>{{ monster.name }}</h2>
+			<h2>{{ monster.name.capitalizeEach() }} <span v-if="monster.source" class="source">{{ monster.source }}</span></h2>
 			<span class="size">
 				<template v-if="monster.size">{{ monster.size }}</template>
 				<template v-if="monster.type"> {{ monster.type }}</template>
@@ -44,52 +44,90 @@
 					:roll="{
 						d: 20, 
 						n: 1, 
-						m: calcMod(data[ability]),
+						m: calcMod(monster[ability]),
 						title: `${monster.name}: ${ability.capitalize()} check`, 
 						notify: true
 					}"
 				>
-					<div v-if="data[ability]" class="ability">
+					<div v-if="monster[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
-						{{ data[ability] }}
-						({{ calcMod(data[ability]) }})
+						{{ monster[ability] }}
+						({{ calcMod(monster[ability]) }})
 					</div>
 				</hk-roll>
 			</div>
 			<hr>
 
-			<!-- SKILLS -->
 			<div class="stats mb-2">
-				<!-- <template v-if="savingThrows.length > 0">
+				<template v-if="monster.saving_throws">
 					<b>Saving Throws </b>
 					<span class="saves">
 						<hk-roll 
 							tooltip="Roll save" 
-							v-for="save in savingThrows" 
-							:key="save.save"
+							v-for="(ability, index) in monster.saving_throws" 
+							:key="ability"
 							:roll="{
 								d: 20, 
 								n: 1, 
-								m: save.score,
-								title: `${monster.name}: ${save.save.capitalize()} save`, 
+								m: calcMod(monster[ability]) + monster.proficiency,
+								title: `${monster.name}: ${ability.capitalize()} save`, 
 								notify: true
 							}"
 						>
 							<span class="save">
-								{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
+								{{ ability.substring(0,3).capitalize() }} 
+								+{{ 
+									calcMod(monster[ability]) + monster.proficiency 
+								}}{{ 
+									index+1 &lt; monster.saving_throws.length ? "," : ""
+								}}
 							</span>
 						</hk-roll>
 					</span>
 					<br/>
-				</template> -->
+				</template>
+				<template v-if="monster.skills"><b>Skills</b>
+					<span class="saves">
+						<hk-roll 
+							v-for="(skill, index) in monster.skills" 
+							:key="skill" 
+							:tooltip="`Roll ${skill}`"
+							:roll="{
+								d: 20, 
+								n: 1, 
+								m: skillModifier(skillList[skill].ability, skill),
+								title: `${skill} check`, 
+								notify: true
+							}"
+						>
+							<span class="save">
+								{{skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
+							</span>
+						</hk-roll>
+						<br/>
+					</span>
+				</template>
 				<template v-if="monster.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ monster.damage_vulnerabilities.join(", ") }}<br/></template>
 				<template v-if="monster.damage_resistances"><b>Damage resistances</b> {{ monster.damage_resistances.join(", ") }}<br/></template>
 				<template v-if="monster.damage_immunities"><b>Damage immunities</b> {{ monster.damage_immunities.join(", ") }}<br/></template>
 				<template v-if="monster.condition_immunities"><b>Condition immunities</b> {{ monster.condition_immunities.join(", ") }}<br/></template>
-				<template v-if="monster.senses"><b>Senses</b> {{ monster.senses }}<br/></template>
+
+				<b>Senses</b> 
+				<template v-if="monster.senses">
+					<span v-for="(sense, key) in monster.senses" :key="key">
+						{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
+							sense.comments ? `${sense.comments}` : ``
+						}},
+					</span>
+				</template>
+				passive Perception {{ passivePerception() }}<br/>
+
 				<template v-if="monster.languages"><b>Languages</b> {{ monster.languages.join(", ") }}<br/></template>
-				<template v-if="monster.challenge_rating"><b>Challenge Rating</b> {{ monster.challenge_rating }} ({{ monster_challenge_rating[monster.challenge_rating].xp }}XP)<br/></template>
-				<template v-if="monster.challenge_rating"><b>Proficiency bonus</b> +{{ monster_challenge_rating[monster.challenge_rating].proficiency }}</template>
+				<template v-if="monster.challenge_rating">
+					<b>Challenge Rating</b> {{ monster.challenge_rating }} 
+					({{ monster_challenge_rating[monster.challenge_rating].xp | numeral('0,0') }} XP)<br/>
+				</template>
+				<template v-if="monster.challenge_rating"><b>Proficiency bonus</b> +{{ monster.proficiency }}</template>
 			</div>
 
 			<h3>Skills</h3>
@@ -115,7 +153,7 @@
 							<i v-else class="far fa-circle"></i>
 							{{ skill.skill }}
 						</span>
-						<span>{{ skillModifier(skill, key) }}</span>
+						<span>{{ skillModifier(skill.ability, key) }}</span>
 					</span>
 				</hk-roll>
 			</div>
@@ -177,7 +215,9 @@
 		},
 		computed: {
 			monster() {
-				return this.data;
+				let monster = this.data;
+				monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
+				return monster;
 			}
 		},
 		methods: {
@@ -205,18 +245,21 @@
 					position: "centerTop"
 				});
 			},
-			skillModifier(skill, key) {
+			passivePerception() {
+				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
+			},
+			skillModifier(ability, skill) {
 				let mod = this.calculateSkillModifier(
-					this.calcMod(this.monster[skill.ability]),
+					this.calcMod(this.monster[ability]),
 					this.monster.skills ? (
-					this.monster.skills.includes(key) ? 
-					(this.monster.challenge_rating ?this. monster_challenge_rating[this.monster.challenge_rating].proficiency : '')
+					this.monster.skills.includes(skill) ? 
+					(this.monster.challenge_rating ? this.monster.proficiency : '')
 					: 0) : 0,
-					this.monster.skills_expertise ? this.monster.skills_expertise.includes(key) : false
+					this.monster.skills_expertise ? this.monster.skills_expertise.includes(skill) : false
 				);
 
-				if(this.monster.skill_modifiers && this.monster.skill_modifiers[key]) {
-					mod = parseInt(mod) + parseInt(this.monster.skill_modifiers[key]);
+				if(this.monster.skill_modifiers && this.monster.skill_modifiers[skill]) {
+					mod = parseInt(mod) + parseInt(this.monster.skill_modifiers[skill]);
 				}
 				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
 			}
@@ -239,20 +282,26 @@
 
 .monster {
 	padding: 10px;
-	color:$black;
-	font-family: 'Times New Roman', Times, serif;
+	color: $black;
+	font-family: Helvetica, sans-serif, serif;
 
 	h2 {
-		color: #58170D;
+		color: #6e1d10;
 		text-transform: none;
 		font-size: 32px;
 		margin-bottom: 0;
 		font-family: 'Playfair Display SC', serif;
 		font-weight: normal;
+
+		.source {
+			font-size: 15px;
+			font-family: Helvetica, sans-serif, serif;
+			color: $black;
+		}
 	}
 	h3 {
 		font-family: sans-serif;
-		color: #58170D;
+		color: #6e1d10;
 		border-bottom: solid 1px rgb(165,42,42);
 		font-size: 20px;
 		padding-bottom: 2px;
@@ -266,7 +315,7 @@
 		font-style: italic;
 	}
 	.attributes, .stats {
-		color: #58170D;
+		color: #6e1d10;
 		
 		.saves{
 			user-select: none;
@@ -329,7 +378,7 @@
 	}
 	.abilities {
 		user-select: none;
-		color: #58170D;
+		color: #6e1d10;
 		display: grid;
 		grid-template-columns: 	repeat(6, 40px);
 		grid-column-gap: 15px;

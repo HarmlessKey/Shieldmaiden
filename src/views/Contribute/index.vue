@@ -30,25 +30,15 @@
 		data() {
 			return {
 				items: {
-					// 'conditions': { 
-					// 	name: 'Conditions',
-					// 	url: 'conditions',
-					// 	icon: 'fas fa-skull-crossbones',
+					// 'spells': { 
+					// 	name: 'Spells',
+					// 	url: 'spells',
+					// 	icon: 'fas fa-wand-magic',
 					// },
-					// 'items': { 
-					// 	name: 'Items',
-					// 	url: 'items',
-					// 	icon: 'fas fa-treasure-chest',
-					// },
-					// 'monsters': { 
-					// 	name: 'Monsters',
-					// 	url: 'monsters',
-					// 	icon: 'fas fa-dragon',
-					// },
-					'spells': { 
-						name: 'Spells',
-						url: 'spells',
-						icon: 'fas fa-wand-magic',
+					'monsters': { 
+						name: 'Monsters',
+						url: 'monsters',
+						icon: 'fas fa-dragon',
 					},
 				},
 			}

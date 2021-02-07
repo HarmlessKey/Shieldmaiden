@@ -37,7 +37,7 @@
 		<div class="actions" v-if="spell.actions && !no_roll">
 			<h4 class="mb-3">Roll spell</h4>
 
-			<div class="input" v-if="spell.level_scaling === 'Character Level'">
+			<div class="input" v-if="spell.level_scaling === 'character_level'">
 				<q-input
 					dark filled square dense
 					label="Character level"
@@ -80,7 +80,7 @@
 
 			<!-- SPELL LEVEL INPUT -->
 			<template v-if="spell.level > 0">
-				<p>Select cast level</p>
+				<p>Select Casting level</p>
 				<div class="actions__levels">
 					<div 
 						class="level"
@@ -133,10 +133,12 @@
 						</template>
 						<template v-else>
 							<template v-if="advantage === 'advantage'">
-								<del class="gray-hover">{{ action.toHit.lowest.throws[0] }}</del> {{ action.toHit.highest.throws[0] + action.toHit.highest.mod }} = <b>{{ action.toHit.highest.total }}</b>
+								<del class="gray-hover">{{ action.toHit.lowest.throws[0] }}</del> 
+								{{ action.toHit.highest.throws[0] + action.toHit.highest.mod }} = <b>{{ action.toHit.highest.total }}</b>
 							</template>
 							<template v-else>
-								<del class="gray-hover">{{ action.toHit.highest.throws[0] }}</del> {{ action.toHit.lowest.throws[0] + action.toHit.lowest.mod }} = <b>{{ action.toHit.lowest.total }}</b>
+								<del class="gray-hover">{{ action.toHit.highest.throws[0] }}</del> 
+								{{ action.toHit.lowest.throws[0] + action.toHit.lowest.mod }} = <b>{{ action.toHit.lowest.total }}</b>
 							</template>
 						</template>
 					</div>
@@ -212,7 +214,7 @@
 					<h3>Resistances</h3>
 					<div v-for="(type, i) in rolled.damageTypes" :key="`type-${i}`" class="defenses">
 						<div class="icon">
-							<i :class="[returnDamageTypeIcon(type), type]"/> {{ type }}
+							<i :class="damage_type_icons[type]"/> {{ type.capitalize() }}
 						</div>
 						<div 
 							class="option"
@@ -268,10 +270,11 @@
 <script>
 	import { spells } from '@/mixins/spells.js';
 	import VueMarkdown from 'vue-markdown';
+	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
 		name: 'Spell',
-		mixins: [spells],
+		mixins: [spells, damage_types],
 		components: {
 			VueMarkdown
 		},
@@ -306,7 +309,7 @@
 				const n = this.spell.duration_n;
 				const scale = this.spell.duration_scale;
 
-				if(type === 'Concentration') {
+				if(type === 'concentration') {
 					let dur_scale = (n === 1) ? scale : scale+'s';
 					return `Concentration, up to ${n} ${dur_scale}`;
 				}
@@ -320,7 +323,7 @@
 				const type = this.spell.range_type;
 				const range = this.spell.range;
 
-				if(type === 'Ranged') {
+				if(type === 'ranged') {
 					return `${range} feet`;
 				}
 
@@ -331,7 +334,7 @@
 				let toHit = false;
 
 				for(let action of this.spell.actions) {
-					if(action.type === 'Melee Weapon' || action.type === 'Ranged Weapon' || action.type === 'Spell Attack') {
+					if(action.type === 'melee_weapon' || action.type === 'ranged_weapon' || action.type === 'spell_attack') {
 						toHit = true;
 					}
 				}
@@ -343,7 +346,7 @@
 				if(this.isToHit && this.toHitModifier === undefined) {
 					missing = true;
 				}
-				if(this.spell.level_scaling === 'Character Level' && this.casterLevel === undefined) {
+				if(this.spell.level_scaling === 'character_level' && this.casterLevel === undefined) {
 					missing = true;
 				}
 				return missing;
@@ -362,7 +365,7 @@
 				if(rolls.scaledRoll) {
 					total = total + rolls.scaledRoll.total;
 				}
-				if(action.type === 'Spell Save' && this.savingThrow === 'save') {
+				if(action.type === 'spell_save' && this.savingThrow === 'save') {
 					total = Math.floor(total * rolls.missSave);
 				}
 				if(action.toHit && this.hitOrMiss === 'miss') {

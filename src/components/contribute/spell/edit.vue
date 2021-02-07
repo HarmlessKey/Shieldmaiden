@@ -8,7 +8,7 @@
 		<div class="spell-wrapper" v-if="canEdit()">
 			<template v-if="(old_spell && spell)">
 				
-				<div class="form">
+				<q-form @submit="store_spell()" ref="spellFormRef" greedy>
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
@@ -31,7 +31,7 @@
 
 									<h1 class="spellTitle"><a v-if="old_spell.name" :href="`https://www.dndbeyond.com/spells/${toKebabCase(old_spell.name)}`" target="_blank" rel="noopener">{{ old_spell.name }}</a></h1>
 									<i class="mb-3 d-block" v-if="old_spell.school">
-										{{ levels[old_spell.level] }}
+										{{ spell_levels[old_spell.level] }}
 										{{ old_spell.school.name }}
 									</i>
 
@@ -72,53 +72,44 @@
 						</div>
 
 						<div class="col-12 col-md-8">
-							<basic-info v-model='spell' :levels='levels' @validation="setValidators" />
-							<!-- SPELL ACTIONS -->
-							<spell-actions v-model='spell' @validation="setValidators" />
+							<EditSpell :spell="spell" />
 						</div>
 					</div>
-				</div>
-				<div class="save">
-					<div class="d-flex justify-content-start">
-						<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-							<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
-						</div>	
-						<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+					<div class="save">
+						<div class="d-flex justify-content-start">
+							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
+							</div>	
+							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+						</div>
+						<div>
+							<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+							<q-btn label="Save" type="submit" color="primary"/>
+						</div>
 					</div>
-					<div>
-						<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-						<button 
-							:disabled="errors.items && errors.items.length > 0"
-							class="btn" 
-							@click="store_spell()"
-						>
-							<i class="fas fa-check"></i> Save
-						</button>
-					</div>
-				</div>
+				</q-form>
 			</template>
 		</div>
 	</div>
 </template>
 
 <script>
-import { db } from '@/firebase'
-import Crumble from '@/components/crumble/Compendium.vue'
-import basicInfo from '@/components/contribute/spell/forms/basic-info.vue'
-import spellActions from '@/components/contribute/spell/forms/spell-actions.vue'
-import ViewSpell from '@/components/ViewSpell.vue'
-import { general } from '@/mixins/general.js'
-import { mapGetters } from 'vuex'
+import { db } from '@/firebase';
+import Crumble from '@/components/crumble/Compendium.vue';
+import EditSpell from '@/components/contribute/spell/forms';
+import ViewSpell from '@/components/ViewSpell.vue';
+import { general } from '@/mixins/general';
+import { spells } from '@/mixins/spells';
+import { mapGetters } from 'vuex';
 
 export default {
-	name: 'SpellEdit',
+	name: 'ContribSpellEdit',
 	components: {
 		Crumble,
-		basicInfo,
-		spellActions,
 		ViewSpell,
+		EditSpell,
 	},
-	mixins: [general],
+	mixins: [general, spells],
 	metaInfo() {
 		return {
 			title: this.old_spell.name + ' | D&D 5th Edition',
@@ -132,10 +123,7 @@ export default {
 			userId: this.$store.getters.user.uid,
 			id: this.$route.params.id,
 			loading: true,
-			levels: ["Cantrip",
-				"1st","2nd","3rd",
-				"4th","5th","6th",
-				"7th","8th","9th"],
+			
 			validators: {},
 			spell: {},
 			unsaved_changes: false,
@@ -151,21 +139,29 @@ export default {
 	},
 	firebase() {
 		return {
-			spell: {
-				source: db.ref(`new_spells/${this.id}`),
-				asObject: true,
-				readyCallback: () => {
-					this.loading = false
-					this.fb_spell_json = JSON.stringify(this.spell);
-					this.unsaved_changes = false
-				}
-			},
+			// spell: {
+			// 	source: db.ref(`new_spells/${this.id}`),
+			// 	asObject: true,
+			// 	readyCallback: () => {
+			// 		this.loading = false
+			// 		this.fb_spell_json = JSON.stringify(this.spell);
+			// 		this.unsaved_changes = false
+			// 	}
+			// },
 			old_spell: {
 				source: db.ref(`spells/${this.id}`),
 				asObject: true,
 				readyCallback: () => this.loading = false
 			}
 		}
+	},
+	mounted() {
+		const spell_ref = db.ref(`new_spells/${this.id}`);
+		spell_ref.once('value', (snapshot) => {
+			console.log(snapshot.val());
+			this.spell = snapshot.val();
+			this.spell.components = {}
+		})
 	},
 	methods: {
 		canEdit() {
@@ -174,11 +170,6 @@ export default {
 		},
 		preview(type) {
 			this.preview_spell = type;
-			// if (type === 'old') {
-			// 	this.preview = 'old';
-			// } else {
-			// 	this.preview = 'new';
-			// }
 		},
 		parse_old_spell() {
 			// Parse values from old_spell object to new spell object
@@ -187,10 +178,9 @@ export default {
 			// Check if the parsed value is actually a valid value (e.g. available in dropdown)
 			
 			// Parse simple values
-			// this.$set(this.spell, 'name', this.old_spell.name);
 			this.spell.name = this.old_spell.name;
 			this.spell.school = this.old_spell.school.name.toLowerCase();
-			this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : false;
+			this.spell.ritual = (this.old_spell.ritual == 'yes') ? true : null;
 			this.spell.level = (this.old_spell.level == -1) ? 0 : this.old_spell.level;
 			this.spell.level_scaling = (this.old_spell.higher_level) ? undefined : "none";
 			
@@ -221,11 +211,11 @@ export default {
 			delete this.spell.casting_time;
 
 			// Parse components
-			this.spell.components = {'verbal': false,'somatic': false ,'material': false};
+			this.spell.components = [];
 			for (let i in this.old_spell.components) {
-				if (this.old_spell.components[i] == "V") {this.spell.components.verbal = true}
-				if (this.old_spell.components[i] == "S") {this.spell.components.somatic = true}
-				if (this.old_spell.components[i] == "M") {this.spell.components.material = true}
+				if (this.old_spell.components[i] == "V") {this.spell.components.push("verbal")}
+				if (this.old_spell.components[i] == "S") {this.spell.components.push("somatic")}
+				if (this.old_spell.components[i] == "M") {this.spell.components.push("material")}
 			}
 			if (this.old_spell.material) {
 				this.spell.material_description = this.parse_spell_str(this.old_spell.material);
@@ -282,7 +272,10 @@ export default {
 
 			// Make spell responsive
 			this.spell = Object.assign({}, this.spell);
-			this.validate_validators();
+
+			this.$nextTick(function(){
+				this.$refs.spellFormRef.validate();
+			})
 
 		},
 		parse_spell_str(text) {
@@ -323,29 +316,33 @@ export default {
 		update() {
 			this.$forceUpdate();
 		},
-		setValidators(validators) {
-			// Receives validator lists from basic info and spell actions
-			for (let v in validators) {
-				this.validators[v] = validators[v];
-			}
-		},
-		async validate_validators() {
-			// loops through all available validators to check if the forms
-			// are all valid. This happens async.
-			for (let v in this.validators) {
-				let validator = this.validators[v];
-				let temp = await validator.validateAll()
-				if (temp == false) return false;
-			}
-			return true;
-		},
+		// setValidators(validators) {
+		// 	// Receives validator lists from basic info and spell actions
+		// 	for (let v in validators) {
+		// 		this.validators[v] = validators[v];
+		// 	}
+		// },
+		// async validate_validators() {
+		// 	// loops through all available validators to check if the forms
+		// 	// are all valid. This happens async.
+		// 	for (let v in this.validators) {
+		// 		let validator = this.validators[v];
+		// 		let temp = await validator.validateAll()
+		// 		if (temp == false) return false;
+		// 	}
+		// 	return true;
+		// },
 
-		async store_spell() {
+		store_spell() {
+			console.log("Store spell called")
 			delete this.spell['.value'];
 			delete this.spell['.key'];
 
 			this.spell.changed = true;
 			this.spell.checked = false;
+
+			// Firebase can't be searched without case sensitivity
+			this.spell.name = this.spell.name.toLowerCase();
 
 			if(this.spell.cast_time_nr) {
 				parseInt(this.spell.cast_time_nr);
@@ -354,20 +351,22 @@ export default {
 				parseInt(this.spell.duration_n);
 			}
 
+			console.log(this.spell)
 			
-			if (await this.validate_validators() === true) {
-				db.ref(`new_spells/${this.id}`).set(this.spell);
-				this.$snotify.success('Spell Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
-				this.validators = {};
-				this.unsaved_changes = false;
-				this.fb_spell_json = JSON.stringify(this.spell);
-			} else {
-				this.$snotify.error('Form Not Valid', 'Critical miss!', {
-					position: "rightTop"
-				});
-			}
+			// if (await this.validate_validators() === true) {
+			// 	db.ref(`new_spells/${this.id}`).set(this.spell);
+			// 	this.$snotify.success('Spell Saved.', 'Critical hit!', {
+			// 		position: "rightTop"
+			// 	});
+			// 	this.validators = {};
+			// 	this.unsaved_changes = false;
+			// 	this.fb_spell_json = JSON.stringify(this.spell);
+			// } else {
+			// 	this.$snotify.error('Form Not Valid', 'Critical miss!', {
+			// 		position: "rightTop"
+			// 	});
+			// }
+			console.log(this.$ref.spellFormRef.submit())
 		},
 		cancel_changes() {
 			this.spell = JSON.parse(this.fb_spell_json);
@@ -398,7 +397,6 @@ export default {
 			next()
 		}
 	}
-
 }
 </script>
 

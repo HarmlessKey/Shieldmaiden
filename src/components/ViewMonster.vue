@@ -50,7 +50,6 @@
 			</div>
 			<hr>
 
-			<!-- SKILLS -->
 			<span class="stats">
 				<template v-if="savingThrows.length > 0">
 					<b>Saving Throws </b>
@@ -68,7 +67,7 @@
 							}"
 						>
 							<span class="save">
-								{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
+								{{ save.save.substring(0,3).capitalize() }} +{{ save.score }}
 							</span>
 						</hk-roll>
 					</span>
@@ -277,10 +276,10 @@
 .monster {
 	padding: 10px;
 	color:$black;
-	font-family: 'Times New Roman', Times, serif;
+	font-family: Helvetica, sans-serif, serif;
 
 	h2 {
-		color: #58170D;
+		color: #6e1d10;
 		text-transform: none;
 		font-size: 32px;
 		margin-bottom: 0;
@@ -289,7 +288,7 @@
 	}
 	h3 {
 		font-family: sans-serif;
-		color: #58170D;
+		color: #6e1d10;
 		border-bottom: solid 1px rgb(165,42,42);
 		font-size: 20px;
 		padding-bottom: 2px;
@@ -303,7 +302,7 @@
 		font-style: italic;
 	}
 	.attributes, .stats {
-		color: #58170D;
+		color: #6e1d10;
 		
 		.skills .skill, .saves .hk-roll {
 			&::after {
@@ -333,7 +332,7 @@
 	}
 	.abilities {
 		user-select: none;
-		color: #58170D;
+		color: #6e1d10;
 		display: grid;
 		grid-template-columns: 	repeat(6, 40px);
 		grid-column-gap: 15px;

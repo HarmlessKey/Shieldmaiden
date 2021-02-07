@@ -11,10 +11,13 @@ const Spells = () => import('@/views/Compendium/Spells.vue');
 const Conditions = () => import('@/views/Compendium/Conditions.vue');
 const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
+const Contribute = () => import('@/views/Contribute');
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
 const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
-const Contribute = () => import('@/views/Contribute');
+const Monsters_contrib = () => import('@/views/Contribute/Monsters.vue');
+const Monster_contrib = () => import('@/components/contribute/monster');
+const MonsterEdit = () => import('@/components/contribute/monster/edit.vue');
 
 const Sitemap = () => import('@/views/Sitemap.vue');
 const Privacy = () => import('@/views/Privacy.vue');
@@ -188,7 +191,45 @@ export const routes = [{
 	}),
 	meta: {
 		basePath: '/contribute',
-		baseName: 'Spells',
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters',
+	name: 'Contribute Monsters',
+	component: Monsters_contrib,
+	meta: {
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters/:id',
+	name: 'Contribute Monster',
+	component: Monster_contrib,
+	props: (route) => ({
+		id: route.query.id,
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters/:id/edit',
+	name: 'Edit Monster',
+	component: MonsterEdit,
+	props: (route) => ({
+		id: route.query.id,
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Monsters',
 		requiresContribute: true,
 		requiresAuth: true
 	}

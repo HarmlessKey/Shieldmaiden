@@ -52,7 +52,7 @@
 					<div v-if="monster[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 						{{ monster[ability] }}
-						({{ calcMod(monster[ability]) }})
+						({{ calcMod(monster[ability]) > 0 ? `+${calcMod(monster[ability])}` : calcMod(monster[ability]) }})
 					</div>
 				</hk-roll>
 			</div>

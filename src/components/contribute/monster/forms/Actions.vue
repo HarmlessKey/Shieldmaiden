@@ -232,7 +232,7 @@
 												</template>
 											</span>
 
-											<template slot="fail" slot-scope="data" v-if="action.type !== 'healing'">
+											<template slot="fail" slot-scope="data" v-if="!['healing', 'damage'].includes(action.type)">
 												{{ 
 													action.type === "save" 
 													? `Save: ${application[data.row.save_fail_mod]}` 

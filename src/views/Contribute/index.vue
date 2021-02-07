@@ -3,11 +3,13 @@
 	<div class="container">
 		<Crumble />
 		<h1>Contribute</h1>
-	
+		
 		<ul class="entities hasImg">
-			<li v-for="(item, index) in items" :key="index">
-				<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
-			</li>
+			<template v-for="(item, index) in items">
+				<li v-if="userInfo.contribute.includes(item.url)" :key="index">
+					<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path.replace(/\/$/, '')+'/'+item.url">{{ item.name }}</router-link>
+				</li>
+			</template>
 		</ul>
 	</div>
 	<Footer />
@@ -29,6 +31,7 @@
 		},
 		data() {
 			return {
+				userInfo: this.$store.getters.userInfo,
 				items: {
 					'spells': { 
 						name: 'Spells',

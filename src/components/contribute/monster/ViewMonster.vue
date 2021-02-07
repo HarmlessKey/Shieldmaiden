@@ -168,14 +168,24 @@
 					The {{ monster.name.capitalizeEach() }} is a {{ monster.caster_level | numeral('Oo')}}-level spellcaster.
 					It's spellcasting ability is {{ monster.caster_ability.capitalize() }}
 					(spell save DC {{ monster.caster_save_dc }}, 
-					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks).<br/>
-					The {{ monster.name.capitalizeEach() }} has the following spells prepared:			
+					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks). 
+					The {{ monster.name.capitalizeEach() }} has the following spells prepared:
 				</p>
-				<ul>
-					<li v-for="(spell, key) in monster.caster_spells" :key="key">
-						{{ spell.name.capitalize() }}
-					</li>
-				</ul>
+				<p>
+					<template v-for="level in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]" >
+						<div v-if="monster.caster_spell_slots[level] || (level === 0 && spellsForLevel(level).length > 0)" :key="`spell-${level}`">
+							<template v-if="level === 0">
+								Cantrips (at will):
+							</template>
+							<template v-else>
+								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
+							</template>
+							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+								{{ spell.name }}{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+							</i>
+						</div>
+					</template>
+				</p>
 			</template>
 			<template v-if="monster.special_abilities">
 				<p v-for="(ability, index) in monster.special_abilities" :key="`ability-${index}`">
@@ -279,6 +289,11 @@
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
+			},
+			spellsForLevel(level) {
+				return Object.values(this.monster.caster_spells).filter(item => { 
+						return item.level == level;
+				});
 			},
 			skillModifier(ability, skill) {
 				let mod = this.calculateSkillModifier(

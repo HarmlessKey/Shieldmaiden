@@ -114,7 +114,7 @@
 										/>
 									</q-popup-edit>
 								</q-item-section>
-								<q-item-section v-else avatar>
+								<q-item-section v-else avatar class="gray-light">
 									<template v-if="spell.level > 0">
 										{{ spell.level | numeral('Oo') }}
 									</template>

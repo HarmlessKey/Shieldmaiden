@@ -75,7 +75,7 @@
 										Edit
 									</q-tooltip>
 								</router-link>
-								<a @click="setSlide({show: true, type: 'ViewMonster', data: data.row })">
+								<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: data.row })">
 									<i class="fas fa-eye"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Preview

@@ -1,59 +1,63 @@
 <template>
-	<div class="content">
-		<Crumble :name="(monster.changed) ? monster.name : old_monster.name"/>
-		<h2 class="monsterTitle d-flex justify-content-between" v-if="old_monster">
-			{{ (monster.changed) ? monster.name : old_monster.name }}
-			<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: monster})">
-				<i class="fas fa-eye" />
-			</a>
-		</h2>
-		
-		<div class="monster-wrapper" v-if="canEdit()">
-			<template v-if="(old_monster && monster)">
-				
-				<q-form @submit="store_monster()">
-					<div class="row q-col-gutter-md">
-						<div class="col-12 col-md-4" id="old_monster">
-
-							<hk-card class="old_monster" >
-								<template v-if="!loading">
-									<div class="card-header d-flex justify-content-between" slot="header">
-										<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
-										<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
-									</div>
-									<a 
-										class="btn btn-block mb-3" 
-										@click="parse_old_monster()">
-											<i class="fas fa-wand-magic"></i>
-											<span class="d-none d-md-inline ml-1">Parse to new monster</span>
-									</a>
-									<div class="monster-card" v-if="preview_monster === 'old'">
-										<ViewMonster :data="old_monster" />
-									</div>
-								</template>
-								<hk-loader v-else />
-							</hk-card>
-						</div>
-						<div class="col-12 col-md-8">
-							<EditNpc :monster="monster" />
-						</div>
+	<q-form @submit="store_monster()">
+		<div class="monster-wrapper">
+			<div>
+				<Crumble :name="old_monster.name"/>
+				<h2 class="monsterTitle d-flex justify-content-between" v-if="old_monster">
+					<div>
+						{{ old_monster.name }}
+						<span v-if="unsaved_changes" class="red">
+							<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+						</span>	
 					</div>
-					<div class="save">
-						<div class="d-flex justify-content-start">
-							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
-							</div>	
-							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
-						</div>
-						<div>
-							<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary"/>
-						</div>
+					<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: monster})">
+						<i class="fas fa-eye" />
+					</a>
+				</h2>
+			</div>
+			
+			<div v-if="canEdit()" class="mid">
+				<div class="row q-col-gutter-md" v-if="(old_monster && monster)">
+					<div class="col-12 col-md-4 old_monster d-none d-lg-block">
+						<hk-card>
+							<template v-if="!loading">
+								<div class="card-header d-flex justify-content-between" slot="header">
+									<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
+									<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
+								</div>
+								<a 
+									class="btn btn-block mb-3" 
+									@click="parse_old_monster()">
+										<i class="fas fa-wand-magic"></i>
+										<span class="d-none d-md-inline ml-1">Parse to new monster</span>
+								</a>
+								<div class="monster-card" v-if="preview_monster === 'old'">
+									<ViewMonster :data="old_monster" />
+								</div>
+							</template>
+							<hk-loader v-else />
+						</hk-card>
 					</div>
-				</q-form>
-			</template>
+					
+					<div class="col-12 col-md-8 new">
+						<EditNpc :monster="monster" />
+					</div>
+				</div>
+			</div>
+			<div class="save" v-if="canEdit()">
+				<div class="d-flex justify-content-start">
+					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+						<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
+					</div>	
+					<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+				</div>
+				<div>
+					<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+					<q-btn label="Save" type="submit" color="primary"/>
+				</div>
+			</div>
 		</div>
-	</div>
+	</q-form>
 </template>
 
 <script>
@@ -401,47 +405,34 @@ export default {
 
 
 <style lang="scss" scoped>
-.content {
-	padding:0 20px;
+.monster-wrapper {
+	display: grid;
+	grid-template-rows: 105px 1fr 60px;
+	height: calc(100vh - 50px) !important;
+	padding: 20px 20px 0 20px;
 
-	.monster-wrapper {
-		display: grid;
-		height: calc(100vh - 174px) !important;
-		grid-template-rows: auto 60px;
-	
-		.q-form {
-			overflow-x: hidden;
-			overflow-y: scroll;
-	
+	.mid {
+		height: calc(100vh - 235px) !important;
+		
+		.old_monster, .new {
+			height: calc(100vh - 220px) !important;
+			overflow: auto;
+
 			&::-webkit-scrollbar {
 				display: none;
 			}
-			pre {
-				overflow: auto;
-			}
-			.old_monster {
-				position: -webkit-sticky;
-				position: sticky;
-				top: 0;
-				.card-header a.selected {
-					// font-weight: bold;
-					color: white !important;
-					cursor: default !important;
-				}
-			}
 		}
-	
-		.save {
-			display: flex;
-			justify-content: space-between;
-			padding: 10px 0;
-			border-top: solid 1px #5c5757;
-	
-			.unsaved_changes {
-				padding: 10px;
-				height: 38px;
-				margin-right: 10px;
-			}
+	}
+	.save {
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+		border-top: solid 1px #5c5757;
+
+		.unsaved_changes {
+			padding: 10px;
+			height: 38px;
+			margin-right: 10px;
 		}
 	}
 }

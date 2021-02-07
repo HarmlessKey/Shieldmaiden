@@ -7,6 +7,7 @@
         />
       </template>
 			<q-breadcrumbs-el icon="fas fa-home-alt" to="/" />
+			<q-breadcrumbs-el :label="$route.path.split('/')[1] === 'compendium' ? 'Compendium' : 'Contribute'" :to="`/${$route.path.split('/')[1]}`" />
 			<template v-if="$route.params.type || $route.meta.baseName">
 				<q-breadcrumbs-el :label="$route.params.type || $route.meta.baseName" :to="explodePath($route.path, 2)" />
 				<q-breadcrumbs-el v-if="name" :label="name.capitalize()" />

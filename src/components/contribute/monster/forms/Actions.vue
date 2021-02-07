@@ -35,7 +35,7 @@
 				>
 					<template v-slot:header>
 						<q-item-section>
-							{{ ability.name }}
+							{{ ability.name }}{{ ability.recharge ? ` (Recharge ${ability.recharge})` : `` }}{{ ability.limit ? ` (${ability.limit}/Day)` : `` }}
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click.stop="remove(ability_index, category)" class="remove">
@@ -64,23 +64,35 @@
 							dark filled square
 							label="Name"
 							autocomplete="off" 
-							type="text" 
 							class="mb-2" 
 							maxlength="30"
 							v-model="ability.name"
 							@keyup="$forceUpdate()"
 						/>
-						<q-input 
-							v-if="category !== 'special_abilities'"
-							dark filled square
-							label="Recharge"
-							autocomplete="off" 
-							type="text" 
-							class="mb-3" 
-							v-model="ability.recharge" 
-							:rules="[val => (!val || val.match(/^[0-9]+(-[0-9]+)*$/)) || 'Allowed format: 6 or 5-6']"
-							@keyup="$forceUpdate()"
-						/>
+
+						<div class="row q-col-gutter-md mb-2">
+							<div class="col" v-if="category !== 'special_abilities'">
+								<q-input
+									dark filled square
+									label="Recharge"
+									autocomplete="off" 
+									v-model="ability.recharge" 
+									:rules="[val => (!val || val.match(/^[0-9]+(-[0-9]+)*$/)) || 'Allowed format: 6 or 5-6']"
+									@keyup="$forceUpdate()"
+								/>
+							</div>
+							<div class="col">
+								<q-input 
+									dark filled square
+									label="Limited uses"
+									autocomplete="off" 
+									type="number" 
+									v-model="ability.limit" 
+									@keyup="$forceUpdate()"
+									suffix="/Day"
+								/>
+							</div>
+						</div>
 						<q-input
 							dark filled square
 							label="Description"

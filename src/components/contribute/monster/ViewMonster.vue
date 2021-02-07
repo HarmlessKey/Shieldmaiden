@@ -1,5 +1,5 @@
 <template>
-	<div class="monster" ref="entity" :class="{ smallWidth: is_small }">
+	<div class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
 		<div class="monster-stats">
 			<h2>{{ monster.name.capitalizeEach() }} <span v-if="monster.source" class="source">{{ monster.source }}</span></h2>
 			<span class="size">
@@ -162,7 +162,11 @@
 		
 			<template v-if="monster.special_abilities">
 				<p v-for="(ability, index) in monster.special_abilities" :key="`ability-${index}`">
-					<b><i>{{ ability.name }}</i></b> {{ ability.desc }}
+					<b><i>
+						{{ ability.name }}
+						{{ ability.limit ? `(${ability.limit}/Day)` : ``}}
+					</i></b>
+					{{ ability.desc }}
 				</p>
 			</template>
 		</div>
@@ -171,18 +175,28 @@
 			<template v-if="monster.actions">
 				<h3>Actions</h3>
 				<p v-for="(action, index) in monster.actions" :key="`action-${index}`">
-						<b><i>{{ action.name }}</i></b> {{ action.desc }}
+						<b><i>
+							{{ action.name }}
+							{{ action.recharge ? `(Recharge ${action.recharge})` : ``}}
+							{{ action.limit ? `(${action.limit}/Day)` : ``}}
+							</i></b>
+							{{ action.desc }}
 				</p>
 			</template>
 
 			<template v-if="monster.legendary_actions">
 				<h3>Legendary Actions</h3>
 				<p>
-					{{ monster.name }} can take 3 legendary actions, choosing from the options below. 
+					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count}} legendary actions, choosing from the options below. 
 					Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
 				</p>
 				<p v-for="(legendary_action, index) in monster.legendary_actions" :key="`legendary-${index}`">
-						<b><i>{{ legendary_action.name }}</i></b> {{ legendary_action.desc }}
+						<b><i>
+							{{ legendary_action.name }}
+							{{ legendary_action.recharge ? `(Recharge ${legendary_action.recharge})` : ``}}
+							{{ legendary_action.limit ? `(${legendary_action.limit}/Day)` : ``}}
+						</i></b> 
+						{{ legendary_action.desc }}
 				</p>
 			</template>
 		</div>

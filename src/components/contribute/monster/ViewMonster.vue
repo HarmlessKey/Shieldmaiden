@@ -159,7 +159,24 @@
 			</div>
 
 			<hr>
-		
+
+			<template v-if="monster.caster_ability">
+				<p>
+					<b><i>
+						Spellcasting
+					</i></b>
+					The {{ monster.name.capitalizeEach() }} is a {{ monster.caster_level | numeral('Oo')}}-level spellcaster.
+					It's spellcasting ability is {{ monster.caster_ability.capitalize() }}
+					(spell save DC {{ monster.caster_save_dc }}, 
+					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks).<br/>
+					The {{ monster.name.capitalizeEach() }} has the following spells prepared:			
+				</p>
+				<ul>
+					<li v-for="(spell, key) in monster.caster_spells" :key="key">
+						{{ spell.name.capitalize() }}
+					</li>
+				</ul>
+			</template>
 			<template v-if="monster.special_abilities">
 				<p v-for="(ability, index) in monster.special_abilities" :key="`ability-${index}`">
 					<b><i>
@@ -200,6 +217,7 @@
 				</p>
 			</template>
 		</div>
+		<pre>{{ monster }}</pre>
 	</div>
 </template>
 
@@ -389,6 +407,9 @@
 	hr {
 		border-top: 2px solid rgb(165,42,42);
 		margin: 10px 0;
+	}
+	ul {
+		padding-left: 20px;
 	}
 	.abilities {
 		user-select: none;

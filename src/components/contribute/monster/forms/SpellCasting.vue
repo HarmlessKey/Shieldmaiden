@@ -114,11 +114,19 @@
 										/>
 									</q-popup-edit>
 								</q-item-section>
+								<q-item-section v-else avatar>
+									<template v-if="spell.level > 0">
+										{{ spell.level | numeral('Oo') }}
+									</template>
+									<template v-else>
+										Cant
+									</template>
+								</q-item-section>
 								<q-item-section>
 									{{ spell.name.capitalizeEach() }}
 								</q-item-section>
 								<q-item-section avatar>
-									<a @click="removeSpell(key)">
+									<a @click="removeSpell(key, casting.category)">
 										<i class="fas fa-trash-alt red" />
 										<q-tooltip anchor="top middle" self="center middle">
 											Remove spell
@@ -157,7 +165,7 @@
 										class="fas fa-check" 
 										v-if="npc[`${category}_spells`] && Object.keys(npc[`${category}_spells`]).includes(key)"
 									/>
-									<a v-else @click="addSpell(key, spell.name.toLowerCase())">
+									<a v-else @click="addSpell(key, spell.name.toLowerCase(), spell.level)">
 										<i class="fas fa-plus green" />
 										<q-tooltip anchor="top middle" self="center middle">
 											Add spell
@@ -261,7 +269,7 @@
 					this.spells = undefined;
 				}
 			},
-			addSpell(key, name) {
+			addSpell(key, name, level) {
 				if(!this.npc[`${this.category}_spells`]) {
 					this.$set(this.npc, `${this.category}_spells`, {})
 				}
@@ -270,12 +278,13 @@
 					name
 				}
 				if(this.category === 'innate') spell.limit = Infinity;
+				if(this.category === 'caster') spell.level = level;
 
 				this.npc[`${this.category}_spells`][key] = spell;
 				this.$forceUpdate();
 			},
-			removeSpell(key) {
-				this.$delete(this.npc[`${this.category}_spells`], key);
+			removeSpell(key, category) {
+				this.$delete(this.npc[`${category}_spells`], key);
 			}
 		}
 	}

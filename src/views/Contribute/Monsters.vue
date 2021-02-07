@@ -4,6 +4,12 @@
 			<Crumble />
 			<h2><i class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
+			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(finishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
+			<div class="absolute-full flex flex-center white">
+        {{ Object.keys(finishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(finishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
+      </div>
+			</q-linear-progress>
+
 			<!-- UNTAGGED -->
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
@@ -328,5 +334,11 @@
 </script>
 
 <style lang="scss" scoped>
-	
+	.q-linear-progress {
+		.absolute-full {
+			height: 25px;
+			line-height: 25px;
+			font-size: 18px;
+		}
+	}
 </style>

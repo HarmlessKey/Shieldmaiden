@@ -30,11 +30,11 @@
 		data() {
 			return {
 				items: {
-					'spells': { 
-						name: 'Spells',
-						url: 'spells',
-						icon: 'fas fa-wand-magic',
-					},
+					// 'spells': { 
+					// 	name: 'Spells',
+					// 	url: 'spells',
+					// 	icon: 'fas fa-wand-magic',
+					// },
 					'monsters': { 
 						name: 'Monsters',
 						url: 'monsters',

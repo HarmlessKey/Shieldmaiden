@@ -35,7 +35,10 @@
 				>
 					<template v-slot:header>
 						<q-item-section>
-							{{ ability.name }}{{ ability.recharge ? ` (Recharge ${ability.recharge})` : `` }}{{ ability.limit ? ` (${ability.limit}/Day)` : `` }}
+							{{ ability.name }}
+							{{ ability.recharge ? `(Recharge ${ability.recharge})` : `` }}
+							{{ ability.limit ? `(${ability.limit}/Day)` : `` }}
+							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 						</q-item-section>
 						<q-item-section avatar>
 							<a @click.stop="remove(ability_index, category)" class="remove">
@@ -64,14 +67,14 @@
 							dark filled square
 							label="Name"
 							autocomplete="off" 
-							class="mb-2" 
+							class="mb-3" 
 							maxlength="30"
 							v-model="ability.name"
 							@keyup="$forceUpdate()"
 						/>
 
-						<div class="row q-col-gutter-md mb-2">
-							<div class="col" v-if="category !== 'special_abilities'">
+						<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
+							<div class="col" v-if="category === 'actions'">
 								<q-input
 									dark filled square
 									label="Recharge"

@@ -46,12 +46,11 @@
 				</div>
 				<div class="col-12 col-md-6" v-if="npc.type && monster_subtypes[npc.type]">
 					<q-select
-						dark filled square
+						dark filled square clearable
 						label="Subtype"
 						class="mb-2" 
 						v-model="npc.subtype"
 						:options="monster_subtypes[npc.type]"
-						:rules="[val => !!val || 'Pick a subtype']"
 					/>
 				</div>
 			</div>

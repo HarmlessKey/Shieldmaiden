@@ -303,7 +303,7 @@
 			innate_spell_levels() {
 				if(this.monster.innate_spells) {
 					let levels = [];
-					for(const spell of Object.values(this.monster.caster_spells)) {
+					for(const spell of Object.values(this.monster.innate_spells)) {
 						const limit = (spell.limit) ? spell.limit : 0;
 						if(!levels.includes(limit)) levels.push(limit);
 					}

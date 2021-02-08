@@ -91,7 +91,7 @@
 							<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
 								<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
 									{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
-									<q-popup-edit dark square v-model.number="spell.limit">
+									<q-popup-edit dark square v-model.number="spell.limit" buttons>
 										<q-checkbox 
 											size="sm" dark 
 											v-model="spell.limit"

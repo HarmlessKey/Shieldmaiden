@@ -251,8 +251,7 @@
 				<p v-for="(legendary_action, index) in monster.legendary_actions" :key="`legendary-${index}`">
 						<b><i>
 							{{ legendary_action.name }}
-							{{ legendary_action.recharge ? `(Recharge ${legendary_action.recharge})` : ``}}
-							{{ legendary_action.limit ? `(${legendary_action.limit}/Day)` : ``}}
+							{{ legendary_action.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}
 						</i></b> 
 						{{ legendary_action.desc }}
 				</p>

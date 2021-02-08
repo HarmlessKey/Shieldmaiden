@@ -114,16 +114,18 @@
 										v-model="ability.range"
 										:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 5 or 20/60']"
 										suffix="ft."
+										@keyup="$forceUpdate()"
 									/>
 								</div>
 								<div class="col">
 									<q-select 
-										dark filled square
+										dark filled square clearable
 										emit-value
 										map-options
 										label="AOE type"
 										:options="aoe_types"
 										v-model="ability.aoe_type"
+										@input="$forceUpdate()"
 									/>
 								</div>
 								<div class="col">
@@ -134,6 +136,7 @@
 										v-model="ability.aoe_size"
 										suffix="ft."
 										:disable="!ability.aoe_type"
+										@keyup="$forceUpdate()"
 									/>
 								</div>
 							</div>
@@ -152,6 +155,7 @@
 											:options="Object.values(attack_type)"
 											v-model="action.type"
 											class="mb-2"
+											@input="$forceUpdate()"
 										/>
 									</div>
 
@@ -165,6 +169,7 @@
 												label="Save ability"
 												:options="abilities"
 												v-model="action.save_ability"
+												@input="$forceUpdate()"
 											/>
 										</div>
 										<div class="col">
@@ -173,6 +178,7 @@
 												type="number"
 												label="Save DC"
 												v-model="action.save_dc"
+												@input="$forceUpdate()"
 											/>
 										</div>
 									</template>
@@ -184,6 +190,7 @@
 												type="number"
 												label="Attack modifier"
 												v-model="action.attack_bonus"
+												@keyup="$forceUpdate()"
 											/>
 										</div>
 									</template>
@@ -344,7 +351,6 @@
 					{ category: 'legendary_actions', name: 'Legendary Actions' }
 				],
 				aoe_types: [
-					{ label: "None", value: undefined },
 					{ label: "Cone", value: "cone" },
 					{ label: "Cube", value: "cube" },
 					{ label: "Cylinder", value: "cylinder" },

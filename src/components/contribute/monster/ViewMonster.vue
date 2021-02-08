@@ -244,15 +244,14 @@
 
 			<template v-if="monster.legendary_actions">
 				<h3>Legendary Actions</h3>
-				<p>
-					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count}} legendary actions, choosing from the options below. 
+				<p v-if="monster.lengendary_count">
+					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
 					Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
 				</p>
 				<p v-for="(legendary_action, index) in monster.legendary_actions" :key="`legendary-${index}`">
 						<b><i>
 							{{ legendary_action.name }}
-							{{ legendary_action.recharge ? `(Recharge ${legendary_action.recharge})` : ``}}
-							{{ legendary_action.limit ? `(${legendary_action.limit}/Day)` : ``}}
+							{{ legendary_action.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}
 						</i></b> 
 						{{ legendary_action.desc }}
 				</p>

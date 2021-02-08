@@ -90,13 +90,13 @@
 						<q-list dark>
 							<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
 								<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
-									{{ spell.limit === Infinity ? "At will" : `${spell.limit}/day` }}
+									{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
 									<q-popup-edit dark square v-model.number="spell.limit">
 										<q-checkbox 
 											size="sm" dark 
 											v-model="spell.limit"
 											label="At will" 
-											:true-value="Infinity" 
+											:true-value="0" 
 											:false-value="1"
 											:indeterminate-value="undefined"
 											:toggle-indeterminate="false"
@@ -108,7 +108,7 @@
 											v-model.number="spell.limit" 
 											label="Limit"
 											type="number" 
-											:disable="spell.limit === Infinity" 
+											:disable="spell.limit === 0" 
 											suffix="/day"
 											@keyup="$forceUpdate()"
 										/>
@@ -277,7 +277,7 @@
 				let spell = {
 					name
 				}
-				if(this.category === 'innate') spell.limit = Infinity;
+				if(this.category === 'innate') spell.limit = 0;
 				if(this.category === 'caster') spell.level = level;
 
 				this.npc[`${this.category}_spells`][key] = spell;

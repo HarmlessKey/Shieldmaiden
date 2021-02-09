@@ -208,6 +208,26 @@ export default {
 				);
 			}
 
+			// Senses
+			const senses = (this.old_monster.senses) ? this.old_monster.senses.split(",") : undefined;
+			
+			if(senses) {
+				this.$set(this.monster, "senses", {});
+				for(const sense of senses) {
+					for(const monster_sense of this.monster_senses) {
+						if(sense.trim().includes(monster_sense)) {
+							let new_sense = {};
+							new_sense[monster_sense] = true;
+							
+							if(sense.match(/([0-9])+/g)) {
+								new_sense.range = sense.match(/([0-9])+/g)[0];
+							}
+							this.$set(this.monster.senses, monster_sense, new_sense);
+						}
+					}
+				}
+			}
+
 			// Defenses
 			let defenses = {
 				damage_resistances: this.old_monster.damage_resistances,
@@ -242,10 +262,12 @@ export default {
 			}
 
 			// Special abilities
-			this.$set(this.monster, "special_abilities", []);
-			for(const ability of this.old_monster.special_abilities) {
-				delete ability.attack_bonus;
-				this.monster.special_abilities.push(ability);
+			if(this.old_monster.special_abilities) {
+				this.$set(this.monster, "special_abilities", []);
+				for(const ability of this.old_monster.special_abilities) {
+					delete ability.attack_bonus;
+					this.monster.special_abilities.push(ability);
+				}
 			}
 			
 			// Actions
@@ -269,6 +291,24 @@ export default {
 							]
 						};
 						let fail_miss = "";
+
+						if(action_type === "legendary_actions") newAbility.legendary_cost = 1;
+
+						// Find recharge, limit and legendary cost
+						if(ability.name.match(/\((.*?)\)/g)) {
+							const type = ability.name.match(/\((.*?)\)/g)[0];
+
+							if(type.toLowerCase().includes("recharge")){
+								newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
+							}
+							if(type.toLowerCase().includes("day")){
+								newAbility.limit = type.match(/([0-9])+/g)[0];
+							}
+							if(action_type === "legendary_actions" && type.toLowerCase().includes("costs")){
+								newAbility.legendary_cost = type.match(/([0-9])+/g)[0];
+							}
+							newAbility.name = newAbility.name.replace(type, "").trim();
+						}
 
 						if(ability.damage_dice || ability.desc.toLowerCase().match(/(saving throw)/g)) {
 							// Find the range

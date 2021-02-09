@@ -160,6 +160,7 @@
 
 			<hr>
 
+			<!-- SPELLCASTING -->
 			<template v-if="monster.caster_ability">
 				<p>
 					<b><i>
@@ -168,15 +169,55 @@
 					The {{ monster.name.capitalizeEach() }} is a {{ monster.caster_level | numeral('Oo')}}-level spellcaster.
 					It's spellcasting ability is {{ monster.caster_ability.capitalize() }}
 					(spell save DC {{ monster.caster_save_dc }}, 
-					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks).<br/>
-					The {{ monster.name.capitalizeEach() }} has the following spells prepared:			
+					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks). 
+					The {{ monster.name.capitalizeEach() }} has the following spells prepared:
 				</p>
-				<ul>
-					<li v-for="(spell, key) in monster.caster_spells" :key="key">
-						{{ spell.name.capitalize() }}
-					</li>
-				</ul>
+				<p>
+					<template v-for="level in caster_spell_levels" >
+						<div :key="`spell-${level}`">
+							<template v-if="level === 0">
+								Cantrips (at will):
+							</template>
+							<template v-else>
+								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
+							</template>
+							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+								{{ spell.name }}{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+							</i>
+						</div>
+					</template>
+				</p>
 			</template>
+
+			<!-- INNATE SPELLCASTING -->
+			<template v-if="monster.innate_ability">
+				<p>
+					<b><i>
+						Innate spellcasting
+					</i></b>
+					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is {{ monster.innate_ability.capitalize() }}
+					(spell save DC {{ monster.innate_save_dc }}, 
+					{{ monster.innate_spell_attack > 0 ? `+${monster.innate_spell_attack}` : monster.innate_spell_attack }} to hit with spell attacks). 
+					The {{ monster.name.capitalizeEach() }} can cast the following spells, requiring no material components:
+				</p>
+				<p>
+					<template v-for="limit in innate_spell_levels" >
+						<div :key="`spell-${limit}`">
+							<template v-if="limit === 0">
+								At will:
+							</template>
+							<template v-else>
+								{{ limit }}/day each:
+							</template>
+							<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+								{{ spell.name }}{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+							</i>
+						</div>
+					</template>
+				</p>
+			</template>
+
+
 			<template v-if="monster.special_abilities">
 				<p v-for="(ability, index) in monster.special_abilities" :key="`ability-${index}`">
 					<b><i>
@@ -203,21 +244,19 @@
 
 			<template v-if="monster.legendary_actions">
 				<h3>Legendary Actions</h3>
-				<p>
-					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count}} legendary actions, choosing from the options below. 
+				<p v-if="monster.lengendary_count">
+					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
 					Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
 				</p>
 				<p v-for="(legendary_action, index) in monster.legendary_actions" :key="`legendary-${index}`">
 						<b><i>
 							{{ legendary_action.name }}
-							{{ legendary_action.recharge ? `(Recharge ${legendary_action.recharge})` : ``}}
-							{{ legendary_action.limit ? `(${legendary_action.limit}/Day)` : ``}}
+							{{ legendary_action.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}
 						</i></b> 
 						{{ legendary_action.desc }}
 				</p>
 			</template>
 		</div>
-		<pre>{{ monster }}</pre>
 	</div>
 </template>
 
@@ -250,6 +289,25 @@
 				let monster = this.data;
 				monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
 				return monster;
+			},
+			caster_spell_levels() {
+				if(this.monster.caster_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.monster.caster_spells)) {
+						if(!levels.includes(spell.level)) levels.push(spell.level);
+					}
+					return levels.sort();
+				} return [];
+			},
+			innate_spell_levels() {
+				if(this.monster.innate_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.monster.innate_spells)) {
+						const limit = (spell.limit) ? spell.limit : 0;
+						if(!levels.includes(limit)) levels.push(limit);
+					}
+					return levels.sort();
+				} return [];
 			}
 		},
 		methods: {
@@ -279,6 +337,16 @@
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
+			},
+			spellsForLevel(level) {
+				return Object.values(this.monster.caster_spells).filter(item => { 
+					return item.level == level;
+				});
+			},
+			spellsForLimit(limit) {
+				return Object.values(this.monster.innate_spells).filter(item => { 
+					return item.limit == limit;
+				});
 			},
 			skillModifier(ability, skill) {
 				let mod = this.calculateSkillModifier(

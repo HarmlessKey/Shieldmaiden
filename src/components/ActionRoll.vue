@@ -106,6 +106,52 @@
 			</div>
 		</div>
 
+		<!-- VERSATILE -->
+		<template v-if="versatile">
+			<h2 class="d-flex justify-content-between mt-1">
+				<span>
+					Versatile roll
+				</span>
+			</h2>
+			<div class="row q-col-gutter-md mb-3">
+				<!-- DICE COUNT -->
+				<div class="col">
+					<q-input 
+						dark filled square
+						label="V. Dice count"
+						v-model="roll.versatile_dice_count"
+						autocomplete="off"
+						name="dice_count"
+						class="mb-2"
+						type="number"
+					/>
+				</div>
+				<div class="col">
+					<!-- MODIFIER SUBTYPE -->
+					<q-select 
+						dark filled square
+						map-options
+						emit-value
+						:options="dice_type"
+						label="V. Dice type"
+						v-model="roll.versatile_dice_type"
+						class="mb-2"
+					/>
+				</div>
+				<div class="col">
+					<!-- MODIFIER FIXED VALUE -->
+					<q-input 
+						dark filled square
+						label="V. Fixed value"
+						v-model="roll.versatile_fixed_val"
+						autocomplete="off"
+						class="mb-2"
+						type="number"
+					/>
+				</div>
+			</div>
+		</template>
+
 		<!-- PROJECTILE COUNT -->
 		<q-input 
 			dark filled square
@@ -299,6 +345,10 @@ export default {
 	props: {
 		value: Object,
 		action_type: String,
+		versatile: {
+			type: Boolean,
+			default: false
+		},
 		spell: {
 			type: Object,
 			default: undefined

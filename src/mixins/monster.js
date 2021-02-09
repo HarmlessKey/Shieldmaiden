@@ -88,7 +88,7 @@ export const monsterMixin = {
 			],
 			monster_alignment: [
 				"Any",
-				"Unalligned",
+				"Unaligned",
 				"Lawful Good",
 				"Neutral Good",
 				"Chaotic Good",

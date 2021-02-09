@@ -198,6 +198,16 @@
 										</div>
 									</template>
 								</div>
+								<q-checkbox 
+									v-if="['melee_weapon', 'ranged_weapon'].includes(action.type)"
+									dark
+									class="mt-2"
+									v-model="action.versatile" 
+									label="Versatile" 
+									:false-value="null" 
+									indeterminate-value="Questionable"
+									@input="$forceUpdate()"
+								/>
 
 								<template v-if="action.type !== 'other'">
 									<!-- ACTION ROLLS -->
@@ -206,7 +216,7 @@
 											<span><i class="fas fa-dice-d20"/> Rolls</span>
 											<a 
 												class="gray-light text-capitalize" 
-												@click="newRoll(ability_index, category, action_index, action.type)"
+												@click="newRoll(ability_index, category, action_index, action)"
 											>
 												<i class="fas fa-plus green"></i>
 												<span class="d-none d-md-inline ml-1">Add</span>
@@ -252,7 +262,7 @@
 
 											<!-- ACTIONS -->
 											<div slot="actions" slot-scope="data" class="actions">
-												<a class="ml-2" @click="editRoll(ability_index, category, action_index, action.type, data.index, data.row)">
+												<a class="ml-2" @click="editRoll(ability_index, category, action_index, action, data.index, data.row)">
 													<i class="fas fa-pencil-alt"></i>
 													<q-tooltip anchor="top middle" self="center middle">
 														Edit
@@ -286,7 +296,8 @@
 						<ActionRoll 
 							v-if="roll && edit_action.type"
 							v-model="roll"
-							:action_type="edit_action.type" 
+							:action_type="edit_action.type"
+							:versatile="edit_action.versatile"
 						/>
 						<div v-else>
 							Select an action type first
@@ -451,15 +462,16 @@
 			 * @param {Integer} ability_index index of the ability
 			 * @param {string} category actions / legendary_actions
 			 * @param {Integer} action_index index of the action
-			 * @param {string} type type of the action 'melee_weapon' etc.
+			 * @param {string} action full action object
 			 */
-			newRoll(ability_index, category, action_index, type) {
+			newRoll(ability_index, category, action_index, action) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
-					type
+					type: action.type,
+					versatile: action.versatile
 				}
 				this.edit_roll_index = undefined; // It's new, so no edit index
 				this.roll = {}; // Create an empty new roll
@@ -476,13 +488,14 @@
 			 * @param {index} roll_index of the roll
 			 * @param {object} roll the object to edit
 			 */
-			editRoll(ability_index, category, action_index, type, roll_index, roll) {
+			editRoll(ability_index, category, action_index, action, roll_index, roll) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
-					type
+					type: action.type,
+					versatile: action.versatilve
 				}
 				this.edit_roll_index = roll_index;
 				this.roll = roll;

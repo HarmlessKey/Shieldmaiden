@@ -88,6 +88,7 @@ export const monsterMixin = {
 			],
 			monster_alignment: [
 				"Any",
+				"Unalligned",
 				"Lawful Good",
 				"Neutral Good",
 				"Chaotic Good",
@@ -97,6 +98,12 @@ export const monsterMixin = {
 				"Lawful evil",
 				"Neutral evil",
 				"Chaotic evil",
+			],
+			monster_senses: [
+				"blindsight",
+				"darkvision",
+				"tremorsense",
+				"truesight"
 			]
 		}
 	},

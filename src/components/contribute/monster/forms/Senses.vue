@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<hk-card header="Senses">
-			<div v-for="sense in senses" :key="sense" class="row q-col-gutter-md mb-2">
+			<div v-for="sense in monster_senses" :key="sense" class="row q-col-gutter-md mb-2">
 				<div class="col-4 col-md-3">
 					<q-checkbox 
 						dark 
@@ -40,19 +40,12 @@
 </template>
 
 <script>
+import { monsterMixin } from '@/mixins/monster.js';
+
 	export default {
 		name: 'npc-Senses',
+		mixins: [monsterMixin],
 		props: ['value'],
-		data() {
-			return {
-				senses: [
-					"blindsight",
-					"darkvision",
-					"tremorsense",
-					"truesight"
-				]
-			}
-		},
 		computed: {
 			npc: {
 				get() {

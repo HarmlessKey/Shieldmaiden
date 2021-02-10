@@ -405,6 +405,8 @@ export default {
 				position: "rightTop"
 			});
 			this.unsaved_changes = false;
+			// Capitalize before stringyfy so changes found isn't triggered
+			this.monster.name = this.monster.name.capitalizeEach();
 			this.fb_monster_json = JSON.stringify(this.monster);
 		},
 		cancel_changes() {
@@ -421,6 +423,10 @@ export default {
 					this.unsaved_changes = true;
 				else
 					this.unsaved_changes = false;
+				
+				// Capitalize name
+				if (this.monster.name)
+					this.monster.name = this.monster.name.capitalizeEach();
 			},
 		}
 	},

@@ -8,7 +8,8 @@
 						dark filled square
 						label="Name"
 						autocomplete="off"  
-						v-model="npc.name" 
+						v-model="npc.name"
+						@input="capitalizeName"
 						:rules="[val => !!val || 'The name is required']"
 					/>
 				</div>
@@ -279,6 +280,12 @@
 				set(newValue) {
 					this.$emit('input', newValue);
 				}
+			}
+		},
+		methods: {
+			// Capitalizes every word in the name of the Npc
+			capitalizeName(val) {
+				this.npc.name = val.capitalizeEach();
 			}
 		}
 	}

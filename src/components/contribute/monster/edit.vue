@@ -23,6 +23,7 @@
 							<template v-if="!loading">
 								<div class="card-header d-flex justify-content-between" slot="header">
 									<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
+									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond Link</a>
 									<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
 								</div>
 								<a 
@@ -260,36 +261,13 @@ export default {
 					);
 				}
 			}
-
-			// Special abilities
-			if(this.old_monster.special_abilities) {
-				this.$set(this.monster, "special_abilities", []);
-				for(let ability of this.old_monster.special_abilities) {
-					delete ability.attack_bonus;
-
-					if(ability.name.match(/\((.*?)\)/g)) {
-						const type = ability.name.match(/\((.*?)\)/g)[0];
-
-						if(type.toLowerCase().includes("day")){
-							ability.limit = type.match(/([0-9])+/g)[0];
-							ability.limit_type = "day";
-						}
-						if(type.toLowerCase().includes("turn")){
-							ability.limit = type.match(/([0-9])+/g)[0];
-							ability.limit_type = "turn";
-						}
-						ability.name = ability.name.replace(type, "").trim();
-					}
-
-					this.monster.special_abilities.push(ability);
-				}
-			}
 			
 			// Actions
+			this.$set(this.monster, "special_abilities", []);
 			this.$set(this.monster, "actions", []);
 			this.$set(this.monster, "legendary_actions", []);
 
-			for(const action_type of ["actions", "legendary_actions"]) {
+			for(const action_type of ["special_abilities", "actions", "legendary_actions"]) {
 				if(this.old_monster[action_type]) {
 					for(const ability of this.old_monster[action_type]) {
 						// Store a list of actions in the list
@@ -428,6 +406,8 @@ export default {
 				position: "rightTop"
 			});
 			this.unsaved_changes = false;
+			// Capitalize before stringyfy so changes found isn't triggered
+			this.monster.name = this.monster.name.capitalizeEach();
 			this.fb_monster_json = JSON.stringify(this.monster);
 		},
 		cancel_changes() {
@@ -444,6 +424,10 @@ export default {
 					this.unsaved_changes = true;
 				else
 					this.unsaved_changes = false;
+				
+				// Capitalize name
+				if (this.monster.name)
+					this.monster.name = this.monster.name.capitalizeEach();
 			},
 		}
 	},

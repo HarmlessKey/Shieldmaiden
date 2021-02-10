@@ -56,7 +56,7 @@
 				<div class="col-12 col-md-4">
 					<hk-card v-for="({key, name, monsters}, index) in taggedMonsters" :key="`tagged-${index}`">
 						<div class="card-header" slot="header">
-							{{ name }}
+							{{ name.capitalizeEach() }}
 							<span v-if="monsters">{{ Object.keys(monsters).length }}</span>
 						</div>
 

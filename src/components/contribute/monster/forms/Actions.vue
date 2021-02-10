@@ -37,7 +37,7 @@
 						<q-item-section>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge})` : `` }}
-							{{ ability.limit ? `(${ability.limit}/${ability.limit ? ability.limit_type.capitalize() : `Day`})` : `` }}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize() : `Day`})` : `` }}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 						</q-item-section>
 						<q-item-section avatar>

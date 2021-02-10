@@ -56,7 +56,7 @@
 				<div class="col-12 col-md-4">
 					<hk-card v-for="({key, name, monsters}, index) in taggedMonsters" :key="`tagged-${index}`">
 						<div class="card-header" slot="header">
-							{{ name.capitalizeEach() }}
+							{{ name }}
 							<span v-if="monsters">{{ Object.keys(monsters).length }}</span>
 						</div>
 
@@ -64,7 +64,7 @@
 							:items="monsters"
 							:columns="taggedColumns"
 						>
-							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item.capitalizeEach() }}</router-link>
 
 							<div slot="actions" slot-scope="data" class="actions">
 								<router-link 

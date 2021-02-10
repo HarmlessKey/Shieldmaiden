@@ -260,15 +260,12 @@ export default {
 						immunity.trim().toLowerCase()
 					);
 				}
-			}
-			
-			// Actions
-			this.$set(this.monster, "special_abilities", []);
-			this.$set(this.monster, "actions", []);
-			this.$set(this.monster, "legendary_actions", []);
+			}			
 
-			for(const action_type of ["special_abilities", "actions", "legendary_actions"]) {
+			for(const action_type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
 				if(this.old_monster[action_type]) {
+					this.$set(this.monster, action_type, []);
+
 					for(const ability of this.old_monster[action_type]) {
 						// Store a list of actions in the list
 						// We will use only 1 action now, for damage or healing

@@ -37,7 +37,7 @@
 						<q-item-section>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge})` : `` }}
-							{{ ability.limit ? `(${ability.limit}/Day)` : `` }}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize() : `Day`})` : `` }}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 						</q-item-section>
 						<q-item-section avatar>
@@ -85,15 +85,25 @@
 								/>
 							</div>
 							<div class="col">
-								<q-input 
-									dark filled square
-									label="Limited uses"
-									autocomplete="off" 
-									type="number" 
-									v-model="ability.limit" 
-									@keyup="$forceUpdate()"
-									suffix="/Day"
-								/>
+								<div class="d-flex justify-content-start limit">
+									<q-input 
+										dark filled square
+										label="Limited uses"
+										autocomplete="off" 
+										type="number" 
+										v-model="ability.limit" 
+										@keyup="$forceUpdate()"
+									/>
+									<q-select
+										dark filled square
+										label="Limit type"
+										class="limit-type"
+										v-model="ability.limit_type"
+										:options="limit_types"
+										@input="$forceUpdate()"
+										prefix="/"
+									/>
+								</div>
 							</div>
 						</div>
 						<q-input
@@ -198,6 +208,16 @@
 										</div>
 									</template>
 								</div>
+								<q-checkbox 
+									v-if="['melee_weapon', 'ranged_weapon'].includes(action.type)"
+									dark
+									class="mt-2"
+									v-model="action.versatile" 
+									label="Versatile" 
+									:false-value="null" 
+									indeterminate-value="Questionable"
+									@input="$forceUpdate()"
+								/>
 
 								<template v-if="action.type !== 'other'">
 									<!-- ACTION ROLLS -->
@@ -206,7 +226,7 @@
 											<span><i class="fas fa-dice-d20"/> Rolls</span>
 											<a 
 												class="gray-light text-capitalize" 
-												@click="newRoll(ability_index, category, action_index, action.type)"
+												@click="newRoll(ability_index, category, action_index, action)"
 											>
 												<i class="fas fa-plus green"></i>
 												<span class="d-none d-md-inline ml-1">Add</span>
@@ -228,6 +248,12 @@
 												<template v-if="data.row.fixed_val !== undefined">
 													{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
 												</template>
+												<span v-if=" action.versatile && versatileRoll(data.row)">
+													| {{ versatileRoll(data.row) }}
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Versatile roll
+													</q-tooltip>
+												</span>
 											</template>
 
 											<span slot="type" slot-scope="data">
@@ -252,7 +278,7 @@
 
 											<!-- ACTIONS -->
 											<div slot="actions" slot-scope="data" class="actions">
-												<a class="ml-2" @click="editRoll(ability_index, category, action_index, action.type, data.index, data.row)">
+												<a class="ml-2" @click="editRoll(ability_index, category, action_index, action, data.index, data.row)">
 													<i class="fas fa-pencil-alt"></i>
 													<q-tooltip anchor="top middle" self="center middle">
 														Edit
@@ -286,7 +312,8 @@
 						<ActionRoll 
 							v-if="roll && edit_action.type"
 							v-model="roll"
-							:action_type="edit_action.type" 
+							:action_type="edit_action.type"
+							:versatile="edit_action.versatile"
 						/>
 						<div v-else>
 							Select an action type first
@@ -399,6 +426,10 @@
 						hint: "An action without damage or healing"
 					},
 				},
+				limit_types: [
+					"day",
+					"turn"
+				]
 			}
 		},
 		computed: {
@@ -451,15 +482,16 @@
 			 * @param {Integer} ability_index index of the ability
 			 * @param {string} category actions / legendary_actions
 			 * @param {Integer} action_index index of the action
-			 * @param {string} type type of the action 'melee_weapon' etc.
+			 * @param {string} action full action object
 			 */
-			newRoll(ability_index, category, action_index, type) {
+			newRoll(ability_index, category, action_index, action) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
-					type
+					type: action.type,
+					versatile: action.versatile
 				}
 				this.edit_roll_index = undefined; // It's new, so no edit index
 				this.roll = {}; // Create an empty new roll
@@ -476,13 +508,14 @@
 			 * @param {index} roll_index of the roll
 			 * @param {object} roll the object to edit
 			 */
-			editRoll(ability_index, category, action_index, type, roll_index, roll) {
+			editRoll(ability_index, category, action_index, action, roll_index, roll) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
-					type
+					type: action.type,
+					versatile: action.versatile
 				}
 				this.edit_roll_index = roll_index;
 				this.roll = roll;
@@ -508,6 +541,24 @@
 			},
 			deleteRoll(ability_index, category, action_index, roll_index) {
 				this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+			},
+			versatileRoll(roll) {
+				if(!roll.versatile_dice_count && !roll.versatile_dice_type && !roll.versatile_fixed_val) {
+					return undefined;
+				} else {
+					let returnRoll = {};
+	
+					returnRoll.dice_count = (roll.versatile_dice_count) ? roll.versatile_dice_count : roll.dice_count; 
+					returnRoll.dice_type = (roll.versatile_dice_type) ? roll.versatile_dice_type : roll.dice_type; 
+					returnRoll.fixed_val = (roll.versatile_fixed_val) ? roll.versatile_fixed_val : roll.fixed_val;
+
+					let fixed;
+					if(returnRoll.fixed_val !== undefined) {
+						fixed = (returnRoll.fixed_val < 0) ? ` - ${Math.abs(returnRoll.fixed_val)}` : ` + ${returnRoll.fixed_val}`;
+					}
+
+					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
+				}
 			}
 		}
 	}
@@ -531,6 +582,15 @@
 				padding: 12px 10px;
 				margin-bottom: 1px;
 			}
+		}
+	}
+	.limit {
+		.q-field {
+			width: 100%;
+		}
+		.limit-type {
+			width: 150px;
+			margin-left: 1px;
 		}
 	}
 </style>

@@ -117,7 +117,7 @@
 							@keyup="$forceUpdate()"
 						/>
 
-						<template v-if="category !== 'special_abilities'">
+						<template>
 							<label class="group mt-3">Range & area of effect</label>
 							<div class="row q-col-gutter-md">
 								<div class="col">
@@ -260,7 +260,7 @@
 												<span v-if="action.type === 'healing'" class="healing">
 													<i class="fas fa-heart" /> Healing
 												</span>
-												<template v-else>
+												<template v-else-if="data.row.damage_type">
 													<span :class="data.row.damage_type">
 														<i :class="damage_type_icons[data.row.damage_type]" /> 
 														{{ data.row.damage_type.capitalize() }} 

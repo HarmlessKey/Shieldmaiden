@@ -481,14 +481,13 @@
 			 * @param {string} category actions / lengedary_actions / special_abilities
 			 */
 			add(category) {
-				const action = (category === "special_abilities") 
-					? { name: "New" }
-					: {
-						name: "New",
-						action_list: [{
-							type: "melee_weapon"
-						}]
-					};
+				const type = (category === "actions") ? "melee_weapon" : (category === "legendary_actions") ? "save" : "other";
+				const action = {
+					name: "New",
+					action_list: [{
+						type
+					}]
+				};
 
 				if(this.npc[category] === undefined) {
 					this.npc[category] = [];

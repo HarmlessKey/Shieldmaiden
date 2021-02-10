@@ -303,6 +303,11 @@ export default {
 							}
 							if(type.toLowerCase().includes("day")){
 								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit_type = "day";
+							}
+							if(type.toLowerCase().includes("turn")){
+								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit_type = "turn";
 							}
 							if(action_type === "legendary_actions" && type.toLowerCase().includes("costs")){
 								newAbility.legendary_cost = type.match(/([0-9])+/g)[0];

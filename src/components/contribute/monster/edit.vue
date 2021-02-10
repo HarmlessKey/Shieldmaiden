@@ -23,6 +23,7 @@
 							<template v-if="!loading">
 								<div class="card-header d-flex justify-content-between" slot="header">
 									<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
+									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond Link</a>
 									<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
 								</div>
 								<a 

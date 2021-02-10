@@ -216,46 +216,27 @@
 					</template>
 				</p>
 			</template>
-
-
-			<template v-if="monster.special_abilities">
-				<p v-for="(ability, index) in monster.special_abilities" :key="`ability-${index}`">
-					<b><i>
-						{{ ability.name }}
-						{{ ability.limit ? `(${ability.limit}/Day)` : ``}}
-					</i></b>
-					{{ ability.desc }}
-				</p>
-			</template>
 		</div>
 
 		<div class="monster-actions">
-			<template v-if="monster.actions">
-				<h3>Actions</h3>
-				<p v-for="(action, index) in monster.actions" :key="`action-${index}`">
+			<div v-for="{category, name} in actions" :key="category">
+				<template v-if="monster[category] && monster[category].length > 0">
+					<h3 v-if="category !== 'special_abilities'">{{ name }}</h3>
+					<p v-if="monster.lengendary_count && category === 'legendary_actions'">
+						{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
+						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
+					</p>
+					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 						<b><i>
-							{{ action.name }}
-							{{ action.recharge ? `(Recharge ${action.recharge})` : ``}}
-							{{ action.limit ? `(${action.limit}/Day)` : ``}}
-							</i></b>
-							{{ action.desc }}
-				</p>
-			</template>
-
-			<template v-if="monster.legendary_actions">
-				<h3>Legendary Actions</h3>
-				<p v-if="monster.lengendary_count">
-					{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
-					Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
-				</p>
-				<p v-for="(legendary_action, index) in monster.legendary_actions" :key="`legendary-${index}`">
-						<b><i>
-							{{ legendary_action.name }}
-							{{ legendary_action.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}
-						</i></b> 
-						{{ legendary_action.desc }}
-				</p>
-			</template>
+							{{ ability.name }}
+							{{ ability.recharge ? `(Recharge ${action.recharge})` : ``}}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
+							{{ ability.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}			
+						</i></b>
+						{{ ability.desc }}
+					</p>
+				</template>
+			</div>
 		</div>
 	</div>
 </template>
@@ -282,6 +263,12 @@
 		data() {
 			return {
 				is_small: false,
+				actions: [
+					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
+					{ category: 'actions', name: 'Actions', name_single: 'Action' },
+					{ category: 'legendary_actions', name: 'Legendary Actions', name_single: 'Legendary action' },
+					{ category: 'reactions', name: 'Reactions', name_single: 'Reaction' }
+				],
 			}
 		},
 		computed: {

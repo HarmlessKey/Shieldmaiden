@@ -64,7 +64,7 @@
 							:items="monsters"
 							:columns="taggedColumns"
 						>
-							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item.capitalizeEach() }}</router-link>
 
 							<div slot="actions" slot-scope="data" class="actions">
 								<router-link 

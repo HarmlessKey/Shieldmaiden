@@ -23,6 +23,7 @@
 							<template v-if="!loading">
 								<div class="card-header d-flex justify-content-between" slot="header">
 									<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
+									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond Link</a>
 									<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
 								</div>
 								<a 
@@ -405,6 +406,8 @@ export default {
 				position: "rightTop"
 			});
 			this.unsaved_changes = false;
+			// Capitalize before stringyfy so changes found isn't triggered
+			this.monster.name = this.monster.name.capitalizeEach();
 			this.fb_monster_json = JSON.stringify(this.monster);
 		},
 		cancel_changes() {
@@ -421,6 +424,10 @@ export default {
 					this.unsaved_changes = true;
 				else
 					this.unsaved_changes = false;
+				
+				// Capitalize name
+				if (this.monster.name)
+					this.monster.name = this.monster.name.capitalizeEach();
 			},
 		}
 	},

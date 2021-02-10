@@ -108,11 +108,11 @@
 
 		<!-- VERSATILE -->
 		<template v-if="versatile">
-			<h2 class="d-flex justify-content-between mt-1">
+			<h3 class="d-flex justify-content-between mt-1">
 				<span>
 					Versatile roll
 				</span>
-			</h2>
+			</h3>
 			<div class="row q-col-gutter-md mb-3">
 				<!-- DICE COUNT -->
 				<div class="col">

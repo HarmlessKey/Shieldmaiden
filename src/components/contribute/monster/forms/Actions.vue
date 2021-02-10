@@ -238,6 +238,12 @@
 												<template v-if="data.row.fixed_val !== undefined">
 													{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
 												</template>
+												<span v-if=" action.versatile && versatileRoll(data.row)">
+													| {{ versatileRoll(data.row) }}
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Versatile roll
+													</q-tooltip>
+												</span>
 											</template>
 
 											<span slot="type" slot-scope="data">
@@ -495,7 +501,7 @@
 					ability_index,
 					action_index,
 					type: action.type,
-					versatile: action.versatilve
+					versatile: action.versatile
 				}
 				this.edit_roll_index = roll_index;
 				this.roll = roll;
@@ -521,6 +527,26 @@
 			},
 			deleteRoll(ability_index, category, action_index, roll_index) {
 				this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+			},
+			versatileRoll(roll) {
+				if(!roll.versatile_dice_count && !roll.versatile_dice_type && !roll.versatile_fixed_val) {
+					return undefined;
+				} else {
+					let returnRoll = {};
+	
+					returnRoll.dice_count = (roll.versatile_dice_count) ? roll.versatile_dice_count : roll.dice_count; 
+					returnRoll.dice_type = (roll.versatile_dice_type) ? roll.versatile_dice_type : roll.dice_type; 
+					returnRoll.fixed_val = (roll.versatile_fixed_val) ? roll.versatile_fixed_val : roll.fixed_val;
+
+					let fixed;
+					if(returnRoll.fixed_val !== undefined) {
+						fixed = (returnRoll.fixed_val < 0) ? `- ${Math.abs(returnRoll.fixed_val)}` : `+ ${returnRoll.fixed_val}`;
+					}
+
+					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
+				}
+
+				
 			}
 		}
 	}

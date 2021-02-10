@@ -264,8 +264,23 @@ export default {
 			// Special abilities
 			if(this.old_monster.special_abilities) {
 				this.$set(this.monster, "special_abilities", []);
-				for(const ability of this.old_monster.special_abilities) {
+				for(let ability of this.old_monster.special_abilities) {
 					delete ability.attack_bonus;
+
+					if(ability.name.match(/\((.*?)\)/g)) {
+						const type = ability.name.match(/\((.*?)\)/g)[0];
+
+						if(type.toLowerCase().includes("day")){
+							ability.limit = type.match(/([0-9])+/g)[0];
+							ability.limit_type = "day";
+						}
+						if(type.toLowerCase().includes("turn")){
+							ability.limit = type.match(/([0-9])+/g)[0];
+							ability.limit_type = "turn";
+						}
+						ability.name = ability.name.replace(type, "").trim();
+					}
+
 					this.monster.special_abilities.push(ability);
 				}
 			}

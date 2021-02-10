@@ -37,7 +37,7 @@
 						<q-item-section>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge})` : `` }}
-							{{ ability.limit ? `(${ability.limit}/Day)` : `` }}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit ? ability.limit_type.capitalize() : `Day`})` : `` }}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 						</q-item-section>
 						<q-item-section avatar>
@@ -85,15 +85,25 @@
 								/>
 							</div>
 							<div class="col">
-								<q-input 
-									dark filled square
-									label="Limited uses"
-									autocomplete="off" 
-									type="number" 
-									v-model="ability.limit" 
-									@keyup="$forceUpdate()"
-									suffix="/Day"
-								/>
+								<div class="d-flex justify-content-start limit">
+									<q-input 
+										dark filled square
+										label="Limited uses"
+										autocomplete="off" 
+										type="number" 
+										v-model="ability.limit" 
+										@keyup="$forceUpdate()"
+									/>
+									<q-select
+										dark filled square
+										label="Limit type"
+										class="limit-type"
+										v-model="ability.limit_type"
+										:options="limit_types"
+										@input="$forceUpdate()"
+										prefix="/"
+									/>
+								</div>
 							</div>
 						</div>
 						<q-input
@@ -416,6 +426,10 @@
 						hint: "An action without damage or healing"
 					},
 				},
+				limit_types: [
+					"day",
+					"turn"
+				]
 			}
 		},
 		computed: {
@@ -540,13 +554,11 @@
 
 					let fixed;
 					if(returnRoll.fixed_val !== undefined) {
-						fixed = (returnRoll.fixed_val < 0) ? `- ${Math.abs(returnRoll.fixed_val)}` : `+ ${returnRoll.fixed_val}`;
+						fixed = (returnRoll.fixed_val < 0) ? ` - ${Math.abs(returnRoll.fixed_val)}` : ` + ${returnRoll.fixed_val}`;
 					}
 
 					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
 				}
-
-				
 			}
 		}
 	}
@@ -570,6 +582,15 @@
 				padding: 12px 10px;
 				margin-bottom: 1px;
 			}
+		}
+	}
+	.limit {
+		.q-field {
+			width: 100%;
+		}
+		.limit-type {
+			width: 150px;
+			margin-left: 1px;
 		}
 	}
 </style>

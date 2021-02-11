@@ -4,9 +4,9 @@
 			<Crumble />
 			<h2><i class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
-			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(finishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
+			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
 			<div class="absolute-full flex flex-center white">
-        {{ Object.keys(finishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(finishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
+        {{ Object.keys(allFinishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
       </div>
 			</q-linear-progress>
 
@@ -286,7 +286,7 @@
 				allFinishedMonsters: db.ref('new_monsters').orderByChild('metadata/finished').equalTo(true),
 				taggedMonster: db.ref('new_monsters').orderByChild('metadata/tagged').equalTo(this.userId),
 				admins: db.ref('users').orderByChild('admin').equalTo(true),
-				contributors: db.ref('users').orderByChild('contribute').equalTo(true),
+				contributors: db.ref('users').orderByChild('contribute').startAt(0),
 			}
 		},
 		computed: {

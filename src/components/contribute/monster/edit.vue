@@ -22,9 +22,13 @@
 						<hk-card>
 							<template v-if="!loading">
 								<div class="card-header d-flex justify-content-between" slot="header">
-									<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
+									<a @click="preview = 'old'" :class="preview === 'old' ? 'blue' : 'gray-light'">
+										Old
+									</a>
 									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond Link</a>
-									<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
+									<a @click="preview = 'new'" :class="preview === 'new' ? 'blue' : 'gray-light'">
+										New
+									</a>
 								</div>
 								<a 
 									class="btn btn-block mb-3" 
@@ -32,9 +36,29 @@
 										<i class="fas fa-wand-magic"></i>
 										<span class="d-none d-md-inline ml-1">Parse to new monster</span>
 								</a>
-								<div class="monster-card" v-if="preview_monster === 'old'">
-									<ViewMonster :data="old_monster" />
-								</div>
+								<q-tabs
+									v-model="preview_type"
+									dark
+									inline-label
+									dense
+									no-caps
+								>
+									<q-tab name="card" label="Monster card"	/>
+									<q-tab name="json" label="JSON"	/>
+								</q-tabs>
+								<q-tab-panels v-model="preview_type" class="bg-transparent">
+									<q-tab-panel name="card">
+										<div class="monster-card">
+											<ViewMonster v-if="preview === 'old'" :data="old_monster" />
+											<ViewNewMonster v-else :data="monster" />
+										</div>
+									</q-tab-panel>
+									<q-tab-panel name="json">
+										<p>
+											{{ preview === 'old' ? old_monster : monster }}
+										</p>
+									</q-tab-panel>
+								</q-tab-panels>
 							</template>
 							<hk-loader v-else />
 						</hk-card>
@@ -65,6 +89,7 @@
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
 import ViewMonster from '@/components/ViewMonster.vue';
+import ViewNewMonster from '@/components/contribute/monster/ViewMonster.vue';
 import EditNpc from './forms';
 import { general } from '@/mixins/general.js';
 import { abilities } from '@/mixins/abilities.js';
@@ -79,6 +104,7 @@ export default {
 	components: {
 		Crumble,
 		ViewMonster,
+		ViewNewMonster,
 		EditNpc
 	},
 	mixins: [
@@ -105,7 +131,8 @@ export default {
 			monster: {},
 			unsaved_changes: false,
 			fb_monster_json: {},
-			preview_monster: 'old',
+			preview: "old",
+			preview_type: "card"
 		}
 	},
 	computed: {
@@ -138,9 +165,6 @@ export default {
 		canEdit() {
 			return (this.old_monster.metadata && this.old_monster.metadata.tagged === this.userId) ||
 				this.userInfo.admin;
-		},
-		preview(type) {
-			this.preview_monster = type;
 		},
 		parse_old_monster() {			
 			this.$set(this.monster, "name", this.old_monster.name);
@@ -465,6 +489,17 @@ export default {
 
 			&::-webkit-scrollbar {
 				display: none;
+			}
+			.q-tab-panel {
+				padding: 0;
+				
+				p {
+					box-shadow: inset 0 0 10px #000000;
+					margin: 0;
+					padding: 10px;
+					width: unset;
+					white-space: pre-wrap;
+				}
 			}
 		}
 	}

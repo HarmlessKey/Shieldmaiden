@@ -289,7 +289,6 @@ export default {
 							const type = ability.name.match(/\((.*?)\)/g)[0];
 
 							if(type.toLowerCase().includes("recharge")){
-								console.log(type)
 								if(type.match(/[0-9]+(-[0-9]+)*/)) {
 									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
 								} else {

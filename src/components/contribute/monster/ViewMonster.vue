@@ -231,7 +231,7 @@
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${action.recharge})` : ``}}
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
-							{{ ability.legendary_cost > 1 ? `(Costs ${legendary_action.legendary_cost} Actions)` : ``}}			
+							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
 						</i></b>
 						{{ ability.desc }}
 					</p>

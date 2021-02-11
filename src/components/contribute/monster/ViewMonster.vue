@@ -101,16 +101,24 @@
 							}"
 						>
 							<span class="save">
-								{{skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
+								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
 							</span>
 						</hk-roll>
 						<br/>
 					</span>
 				</template>
-				<template v-if="monster.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ monster.damage_vulnerabilities.join(", ") }}<br/></template>
-				<template v-if="monster.damage_resistances"><b>Damage resistances</b> {{ monster.damage_resistances.join(", ") }}<br/></template>
-				<template v-if="monster.damage_immunities"><b>Damage immunities</b> {{ monster.damage_immunities.join(", ") }}<br/></template>
-				<template v-if="monster.condition_immunities"><b>Condition immunities</b> {{ monster.condition_immunities.join(", ") }}<br/></template>
+				<template v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
+					<b>Damage vulnerabilities</b> {{ monster.damage_vulnerabilities.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.damage_resistances && monster.damage_resistances.length > 0">
+					<b>Damage resistances</b> {{ monster.damage_resistances.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.damage_immunities && monster.damage_immunities.length > 0">
+					<b>Damage immunities</b> {{ monster.damage_immunities.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
+					<b>Condition immunities</b> {{ monster.condition_immunities.join(", ") }}<br/>
+				</template>
 
 				<b>Senses</b> 
 				<template v-if="monster.senses">

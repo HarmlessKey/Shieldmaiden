@@ -65,7 +65,7 @@
 							<template v-slot:header>
 								<q-item-section>
 									{{ ability.name }}
-									{{ ability.recharge ? `(Recharge ${ability.recharge})` : `` }}
+									{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : `` }}
 									{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize() : `Day`})` : `` }}
 									{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : `` }}
 								</q-item-section>
@@ -103,13 +103,13 @@
 								/>
 
 								<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
-									<div class="col" v-if="category === 'actions'">
+									<div class="col">
 										<q-input
 											dark filled square
 											label="Recharge"
 											autocomplete="off" 
 											v-model="ability.recharge" 
-											:rules="[val => (!val || val.match(/^[0-9]+(-[0-9]+)*$/)) || 'Allowed format: 6 or 5-6']"
+											:rules="[val => (!val || val.match(/^[0-9]+(-[0-9]+)*$/) || val.match(/^(rest)*$/)) || 'Allowed format: 6, 5-6 or rest']"
 											@keyup="$forceUpdate()"
 										/>
 									</div>

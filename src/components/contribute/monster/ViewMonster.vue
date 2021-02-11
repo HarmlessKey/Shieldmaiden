@@ -229,7 +229,7 @@
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 						<b><i>
 							{{ ability.name }}
-							{{ ability.recharge ? `(Recharge ${ability.recharge})` : ``}}
+							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
 						</i></b>

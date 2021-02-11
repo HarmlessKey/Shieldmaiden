@@ -289,7 +289,12 @@ export default {
 							const type = ability.name.match(/\((.*?)\)/g)[0];
 
 							if(type.toLowerCase().includes("recharge")){
-								newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
+								console.log(type)
+								if(type.match(/[0-9]+(-[0-9]+)*/)) {
+									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
+								} else {
+									newAbility.recharge = "rest";
+								}
 							}
 							if(type.toLowerCase().includes("day")){
 								newAbility.limit = type.match(/([0-9])+/g)[0];

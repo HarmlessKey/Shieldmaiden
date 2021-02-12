@@ -234,7 +234,15 @@
 						{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
 						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
 					</p>
+	
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
+						<hk-roll 
+							v-if="ability.action_list && ability.action_list[0].type !== 'other'"
+							:tooltip="`Roll ${ability.name}`" 
+							@roll="roll($event, ability)"
+						>
+							<span class="roll-button" />
+						</hk-roll>
 						<b><i>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
@@ -255,6 +263,7 @@
 	import { abilities } from '@/mixins/abilities.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { skills } from '@/mixins/skills.js';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'NPC',
@@ -306,6 +315,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setActionRoll"
+			]),
 			setSize() {
 				let width = this.$refs.entity.clientWidth
 				let small = 300;
@@ -315,20 +327,8 @@
 				//sets new width on resize
 				this.width = this.$refs.entity.clientWidth;
 			},	
-			rollAbility(ability, score, type = 'roll') {
-				var modifier = (type === 'roll') ? parseInt(Math.floor((score - 10) / 2)) : score;
-				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + modifier;
-				if(modifier >= 0) {
-					var mod = '+' + modifier
-				}
-				else {
-					mod = modifier
-				}
-				
-				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
-					position: "centerTop"
-				});
+			roll(e, action) {
+				this.setActionRoll(this.rollAction(e, action));
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
@@ -498,6 +498,22 @@
 			color:$red
 		}
 	}
+}
+.roll-button {
+	display: inline-block;
+	cursor: pointer;
+	background-image: url('../../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+	height: 20px;
+	width: 20px;
+	background-position: center;
+	background-size: cover;
+	vertical-align: -5px;
+}
+.advantage .roll-button:hover {
+	background-image: url('../../../assets/_img/logo/logo-icon-no-shield-green.svg');
+}
+.disadvantage .roll-button:hover {
+	background-image: url('../../../assets/_img/logo/logo-icon-no-shield-red.svg');
 }
 .smallWidth {
 	.abilities {

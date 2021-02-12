@@ -870,6 +870,56 @@ html body {
 		}
 	}
 
+	/* HK ROLLS */
+	.hk-rolls {
+		top: 50px;
+		position: fixed;
+		display: flex;
+		z-index: 9999;
+		pointer-events: none;
+		width: 100%;
+
+		&.center-top {
+			justify-content: center;
+		}
+		.rolls {
+			pointer-events: auto;
+			width: 300px;
+			padding-top: 20px;
+
+			.roll {
+				.header {
+					display: grid;
+					grid-template-columns: auto max-content;
+					padding: 10px;
+					background: rgba(0, 0, 0, .2);
+		
+					a {
+						color: $gray-light;
+						&:hover {
+							color: $white;
+						}
+					}
+				}
+				.body {
+					.accordion {
+						.q-item {
+							background-color: $gray;
+
+							.slashing, .bludgeoning, .piercing {
+								color: $gray-light;
+							}
+
+							.q-focus-helper {
+								visibility: hidden;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/* HK TABLE */
 	.hk-table {
 

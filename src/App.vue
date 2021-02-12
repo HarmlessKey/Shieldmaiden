@@ -28,7 +28,8 @@
 			</div>
 		</transition>
 		
-		<vue-snotify></vue-snotify>
+		<vue-snotify />
+		<HkRolls />
 	</div>
 </template>
 
@@ -39,13 +40,15 @@
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
+	import HkRolls from './components/hk-components/hk-rolls'
 
 	export default {
 	components: {
 		navMain: Header,
 		Sidebar,
 		Slide,
-		PaymentDeclined
+		PaymentDeclined,
+		HkRolls
 	},
 	metaInfo() {
 		return {

@@ -115,6 +115,135 @@ export const dice = {
 		rollD100(n=1,m=0) {
 			return this.rollD(100,n,m)
 		},
+		rollAction(e, ability, castLevel, casterLevel, toHitModifier) {
+			let returnRoll = {
+				name: ability.name,
+				actions: [],
+				damageTypes: []
+			};
+			let advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
+			if(e.e.shiftKey) {
+				advantage_object["advantage"] = true;
+			} 
+			if(e.e.ctrlKey) {
+				advantage_object["disadvantage"] = true;
+			}
+
+			const actions = ability.action_list;
+			const scaleType = ability.level_scaling;
+			const spellLevel = ability.level;
+
+			let i = 0;
+			// LOOP OVER ALL ACTIONS
+			for(let action of actions) {
+				let type = action.type;
+				let attack_bonus = action.attack_bonus || toHitModifier;
+				let toHit = false;
+				returnRoll.actions[i] = { type, rolls: [] };
+
+				//If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
+				if(type === 'melee_weapon' || type === 'ranged_weapon' || type === 'spell_attack') {
+					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, false, advantage_object);
+					toHit = true;
+				}
+				if(type === 'save') {
+					returnRoll.actions[i].save_ability = action.save_ability;
+					returnRoll.actions[i].save_dc = action.save_dc;
+				}
+
+				for(let modifier of action.rolls) {
+					let damage_type = modifier.damage_type;
+					let dice_type = modifier.dice_type;
+					let dice_count = modifier.dice_count;
+					let fixed_val = (modifier.fixed_val) ? modifier.fixed_val : 0;
+					let modifierRoll = undefined;
+					let scaledRoll = undefined;
+					let scaledModifier = undefined;
+					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
+
+					//Create a list with al damage types for this action
+					//Only if it is not a healing spell
+					if(type !== 'healing' && damage_type) {
+						if(!returnRoll.damageTypes.includes(damage_type)) {
+							returnRoll.damageTypes.push(damage_type);
+						}
+					}
+
+					//Check if the action scales with the current roll
+					let tiers = modifier.level_tiers;
+					if(tiers) {
+						scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
+					
+						//Roll the scaledModifier
+						if(scaledModifier) {
+							scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
+						}
+					}
+					
+					//Roll the modifier
+					//If the modifier scales with character level, overwrite the modifierRoll with the scaledRoll
+					if(scaleType === 'character_level' && scaledModifier) {
+						modifierRoll = scaledRoll;
+						scaledRoll = undefined; //Only return the scaled modifierRoll
+					} else {
+						modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
+					}
+
+					//Push the rolled modifier to the array with all rolled modifiers
+					returnRoll.actions[i].rolls.push({
+						modifierRoll,
+						damage_type: modifier.damage_type,
+						scaledRoll,
+						missSave
+					});
+				}
+				i++;
+			}
+			return returnRoll;
+		},
+		__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType) {
+			let scaledModifier = undefined;
+
+			//SPELL SCALE
+			if(scaleType === 'spell_scale') {
+				let scale = tiers[0].level;
+				let dice_type = tiers[0].dice_type;
+				let dice_count = tiers[0].dice_count;
+				let fixed_val = tiers[0].fixed_val;
+
+				//Calculate the increase based on spell level, on what level the spell is cast and the scale
+				let increase = parseInt(Math.floor((castLevel - spellLevel) / scale));
+
+				//If there is an increase, 
+				if(increase) {
+					scaledModifier = {};
+					scaledModifier.dice_count = increase * dice_count;
+					scaledModifier.dice_type = dice_type;
+
+					//Check if there is a fixed value
+					//If there is one, add it for every scale level
+					//If the spell scales with 1 and is cast 3 levels higer, multiply the fixed value by 3
+					scaledModifier.fixed_val = (fixed_val) ? increase * fixed_val : 0;
+				}
+			}
+			//CHARACTER LEVEL
+			if(scaleType === 'character_level') {
+				tiers.sort((a, b) => (parseInt(a.level) > parseInt(b.level)) ? 1 : -1)
+
+				for(let tier of tiers) {
+					if(parseInt(casterLevel) >= parseInt(tier.level)) {
+						scaledModifier = {
+							dice_count: tier.dice_count,
+							dice_type: tier.dice_type,
+						};
+						if(tier.fixed_val) {
+							scaledModifier.fixed_val = tier.fixed_val;
+						}
+					}
+				}
+			}
+			return scaledModifier;
+		},
 		animateValue(id, start, end, duration) {
 			if (start === end) return;
 			const range = end - start;

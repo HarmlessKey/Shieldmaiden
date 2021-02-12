@@ -7,6 +7,7 @@ export const general_module = {
 	state: {
 		slide: {},
 		rolls: [],
+		action_rolls: [],
 		side_collapsed: true,
 		side_small_screen: false,
 		share_rolls: false,
@@ -14,25 +15,26 @@ export const general_module = {
 	getters: {
 		getSlide: function( state ) { return state.slide; },
 		rolls: function( state ) { return state.rolls; },
+		action_rolls: function( state ) { return state.action_rolls; },
 		side_collapsed: function( state ) { return state.side_collapsed; },
 		side_small_screen: function( state ) { return state.side_small_screen; },
 		share_rolls: function( state ) { return state.share_rolls; }
 	},
-	mutations: {
-		SET_SLIDE(state, payload) { Vue.set(state, 'slide', payload); },
-		SET_ROLLS(state, payload) { Vue.set(state, 'rolls', payload); },
-		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
-		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
-		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
-		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); }
-	},
 	actions: {
 		setRoll({ commit, state }, newRoll) {
-
 			let current = state.rolls;
 			newRoll.date = new Date();
 			current.unshift(newRoll);
 			commit("SET_ROLLS", current);
+		},
+		setActionRoll({ commit, state }, newRoll) {
+			let current = state.action_rolls;
+			newRoll.date = new Date();
+			current.unshift(newRoll);
+			commit("SET_ACTION_ROLLS", current);
+		},
+		removeActionRoll({ commit }, index) {
+			commit("REMOVE_ACTION_ROLL", index);
 		},
 		setSlide({ commit, state }, payload) {
 			let slide = state.slide;
@@ -81,5 +83,16 @@ export const general_module = {
 		setShareRolls({ commit }, payload) {
 			commit("SET_SHARE_ROLLS", payload)
 		},
+	},
+	mutations: {
+		SET_SLIDE(state, payload) { Vue.set(state, 'slide', payload); },
+		SET_ROLLS(state, payload) { Vue.set(state, 'rolls', payload); },
+		SET_ACTION_ROLLS(state, payload) { Vue.set(state, 'action_rolls', payload); },
+		CLEAR_ACTION_ROLLS(state) { Vue.set(state, 'action_rolls', []); },
+		REMOVE_ACTION_ROLL(state, payload) { Vue.delete(state.action_rolls, payload); },
+		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
+		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
+		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
+		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); }
 	},
 };

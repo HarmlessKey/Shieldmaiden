@@ -150,7 +150,7 @@ export default {
 				{ label: "Melee Weapon", value: "melee_weapon" },
 				{ label: "Ranged Weapon", value: "ranged_weapon" },
 				{ label: "Spell Attack", value: "spell_attack" },
-				{ label: "Spell Save", value: "spell_save" },
+				{ label: "Spell Save", value: "save" },
 				{ label: "Healing", value: "healing" },
 				{ label: "Damage", value: "damage" },
 				{ label: "Other", value: "other" },

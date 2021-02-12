@@ -72,6 +72,7 @@ Vue.use(VueAnalytics, {
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
 	store.dispatch('setSlide', false); //Always hide slide
+	store.commit("CLEAR_ACTION_ROLLS");
 
 	const currentUser = auth.currentUser; //Check if there is a user
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)

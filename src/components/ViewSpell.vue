@@ -113,7 +113,7 @@
 
 			<!-- ALL ACTIONS -->
 			<div v-for="(action, i) in rolled.actions" :key="`action-${i}`">
-				<h3 v-if="action.type === 'Spell Save'" class="d-flex justify-content-between">
+				<h3 v-if="action.type === 'save'" class="d-flex justify-content-between">
 					<span>{{ action.save }} saving throw</span>
 					<div class="save">
 						<a @click="setSave('save')" :class="savingThrow === 'save' ? 'green' : 'gray-light'">

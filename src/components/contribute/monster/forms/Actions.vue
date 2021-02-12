@@ -63,6 +63,15 @@
 							leave-active-class="animated fadeOut"
 						>
 							<template v-slot:header>
+								<q-item-section avatar>
+									<hk-roll 
+										v-if="ability.action_list && ability.action_list[0].type !== 'other'"
+										:tooltip="`Roll ${ability.name}`" 
+										@roll="rollAbility($event, ability)"
+									>
+										<span class="roll-button" />
+									</hk-roll>
+								</q-item-section>
 								<q-item-section>
 									{{ ability.name }}
 									{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : `` }}
@@ -417,6 +426,8 @@
 	import { damage_types } from '@/mixins/damageTypes.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import ActionRoll from '@/components/ActionRoll';
+	import { mapActions } from 'vuex';
+	import { dice } from '@/mixins/dice.js';
 	
 	export default {
 		name: 'npc-Actions',
@@ -425,7 +436,8 @@
 			general, 
 			abilities, 
 			monsterMixin,
-			damage_types
+			damage_types,
+			dice
 		],
 		components: {
 			ActionRoll
@@ -525,6 +537,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setActionRoll"
+			]),
 			/**
 			 * Add a new action
 			 * 
@@ -643,7 +658,10 @@
 			},
 			calcAverage(dice_type=0, dice_count=0, modifier=0) {
 				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
-			}
+			},
+			rollAbility(e, action) {
+				this.setActionRoll(this.rollAction(e, action));
+			},
 		}
 	}
 </script>
@@ -698,5 +716,21 @@
 			width: calc(50% - 1px);
 			margin-right: 1px;
 		}
+	}
+	.roll-button {
+		display: inline-block;
+		cursor: pointer;
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+		height: 20px;
+		width: 20px;
+		background-position: center;
+		background-size: cover;
+		vertical-align: -5px;
+	}
+	.advantage .roll-button:hover {
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-green.svg');
+	}
+	.disadvantage .roll-button:hover {
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-red.svg');
 	}
 </style>

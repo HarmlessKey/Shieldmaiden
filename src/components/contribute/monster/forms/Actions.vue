@@ -248,16 +248,39 @@
 												</div>
 											</template>
 										</div>
-										<q-checkbox 
-											v-if="['melee_weapon', 'ranged_weapon'].includes(action.type)"
-											dark
-											class="mt-2"
-											v-model="action.versatile" 
-											label="Versatile" 
-											:false-value="null" 
-											indeterminate-value="Questionable"
-											@input="$forceUpdate()"
-										/>
+										<div class="row q-col-gutter-md">
+											<div class="col-4 col-sm-3">
+												<q-checkbox 
+													v-if="['melee_weapon', 'ranged_weapon'].includes(action.type)"
+													dark
+													v-model="action.versatile" 
+													label="Versatile" 
+													:false-value="null" 
+													indeterminate-value="Questionable"
+													@input="$forceUpdate()"
+												/>
+											</div>
+											<template v-if="action.versatile">
+												<div class="col">
+													<q-input
+														dark filled square dense
+														type="text"
+														label="Option 1 name"
+														v-model="action.versatile_one"
+														@keyup="$forceUpdate()"
+													/>
+												</div>
+												<div class="col">
+													<q-input
+														dark filled square dense
+														type="text"
+														label="Option 2 name"
+														v-model="action.versatile_two"
+														@keyup="$forceUpdate()"
+													/>
+												</div>
+											</template>
+										</div>
 
 										<template v-if="action.type !== 'other'">
 											<!-- ACTION ROLLS -->

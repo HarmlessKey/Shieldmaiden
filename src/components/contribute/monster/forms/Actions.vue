@@ -310,17 +310,24 @@
 												>
 													<div slot="roll" slot-scope="data" class="roll">
 														<span>
-															{{ data.row.dice_count || '' }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
+															{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
+															({{ data.row.dice_count || '' }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
 															<template v-if="data.row.fixed_val && data.row.dice_count">
-																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
+																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }})
 															</template>
-															<template v-else>{{ data.row.fixed_val }}</template>
+															<template v-else>{{ data.row.fixed_val }})</template>
 															<q-tooltip v-if="action.versatile" anchor="top middle" self="bottom middle">
 																{{ action.versatile_one || "Enter versatile option" }}
 															</q-tooltip>
 														</span>
 														<span v-if="action.versatile && versatileRoll(data.row)">
-															| {{ versatileRoll(data.row) }}
+															| {{ 
+																calcAverage(
+																	data.row.versatile_dice_type || data.row.dice_type, 
+																	data.row.versatile_dice_count || data.row.dice_count, 
+																	data.row.verstatile_fixed_val || data.row.fixed_val) 
+																}}
+															({{ versatileRoll(data.row) }})
 															<q-tooltip anchor="top middle" self="bottom middle">
 																{{ action.versatile_two || "Enter versatile option" }}
 															</q-tooltip>
@@ -632,6 +639,9 @@
 
 					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
 				}
+			},
+			calcAverage(dice_type=0, dice_count=0, modifier=0) {
+				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
 			}
 		}
 	}

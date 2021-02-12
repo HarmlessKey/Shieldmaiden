@@ -268,6 +268,7 @@
 														label="Option 1 name"
 														v-model="action.versatile_one"
 														@keyup="$forceUpdate()"
+														:rules="[val => !!val || 'Option 1 is required']"
 													/>
 												</div>
 												<div class="col">
@@ -277,6 +278,7 @@
 														label="Option 2 name"
 														v-model="action.versatile_two"
 														@keyup="$forceUpdate()"
+														:rules="[val => !!val || 'Option 1 is required']"
 													/>
 												</div>
 											</template>
@@ -306,18 +308,23 @@
 													:columns="rollColumns"
 													:showHeader="false"
 												>
-													<template slot="roll" slot-scope="data">
-														{{ data.row.dice_count }}d{{ data.row.dice_type }}
-														<template v-if="data.row.fixed_val !== undefined">
-															{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
-														</template>
-														<span v-if=" action.versatile && versatileRoll(data.row)">
-															| {{ versatileRoll(data.row) }}
-															<q-tooltip anchor="top middle" self="bottom middle">
-																Versatile roll
+													<div slot="roll" slot-scope="data" class="roll">
+														<span>
+															{{ data.row.dice_count }}d{{ data.row.dice_type }}
+															<template v-if="data.row.fixed_val !== undefined">
+																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
+															</template>
+															<q-tooltip v-if="action.versatile" anchor="top middle" self="bottom middle">
+																{{ action.versatile_one || "Enter versatile option" }}
 															</q-tooltip>
 														</span>
-													</template>
+														<span v-if="action.versatile && versatileRoll(data.row)">
+															| {{ versatileRoll(data.row) }}
+															<q-tooltip anchor="top middle" self="bottom middle">
+																{{ action.versatile_two || "Enter versatile option" }}
+															</q-tooltip>
+														</span>
+													</div>
 
 													<span slot="type" slot-scope="data">
 														<span v-if="action.type === 'healing'" class="healing">
@@ -652,6 +659,13 @@
 			.card-header {
 				padding: 12px 10px;
 				margin-bottom: 1px;
+			}
+			.roll {
+				cursor: default;
+				
+				span:hover {
+					color: $gray-light;
+				}
 			}
 		}
 	}

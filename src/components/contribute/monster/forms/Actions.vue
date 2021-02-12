@@ -194,6 +194,42 @@
 										</div>
 									</div>
 
+									<!-- VERSATILE -->
+									<div class="row q-col-gutter-md">
+											<div class="col-4 col-sm-3">
+												<q-checkbox 
+													dark
+													v-model="ability.versatile" 
+													label="Versatile" 
+													:false-value="null" 
+													indeterminate-value="Questionable"
+													@input="$forceUpdate()"
+												/>
+											</div>
+											<template v-if="ability.versatile">
+												<div class="col">
+													<q-input
+														dark filled square dense
+														type="text"
+														label="Option 1 name"
+														v-model="ability.versatile_one"
+														@keyup="$forceUpdate()"
+														:rules="[val => !!val || 'Option 1 is required']"
+													/>
+												</div>
+												<div class="col">
+													<q-input
+														dark filled square dense
+														type="text"
+														label="Option 2 name"
+														v-model="ability.versatile_two"
+														@keyup="$forceUpdate()"
+														:rules="[val => !!val || 'Option 1 is required']"
+													/>
+												</div>
+											</template>
+										</div>
+
 									<!-- ACTIONS -->
 									<div v-for="(action, action_index) in ability.action_list" :key="`action-${action_index}`">
 										<label class="group mt-3">Type of action</label>
@@ -248,41 +284,6 @@
 												</div>
 											</template>
 										</div>
-										<div class="row q-col-gutter-md">
-											<div class="col-4 col-sm-3">
-												<q-checkbox 
-													v-if="['melee_weapon', 'ranged_weapon'].includes(action.type)"
-													dark
-													v-model="action.versatile" 
-													label="Versatile" 
-													:false-value="null" 
-													indeterminate-value="Questionable"
-													@input="$forceUpdate()"
-												/>
-											</div>
-											<template v-if="action.versatile">
-												<div class="col">
-													<q-input
-														dark filled square dense
-														type="text"
-														label="Option 1 name"
-														v-model="action.versatile_one"
-														@keyup="$forceUpdate()"
-														:rules="[val => !!val || 'Option 1 is required']"
-													/>
-												</div>
-												<div class="col">
-													<q-input
-														dark filled square dense
-														type="text"
-														label="Option 2 name"
-														v-model="action.versatile_two"
-														@keyup="$forceUpdate()"
-														:rules="[val => !!val || 'Option 1 is required']"
-													/>
-												</div>
-											</template>
-										</div>
 
 										<template v-if="action.type !== 'other'">
 											<!-- ACTION ROLLS -->
@@ -291,7 +292,7 @@
 													<span><i class="fas fa-dice-d20"/> Rolls</span>
 													<a 
 														class="gray-light text-capitalize" 
-														@click="newRoll(ability_index, category, action_index, action)"
+														@click="newRoll(ability_index, category, action_index, action, ability.versatile)"
 													>
 														<i class="fas fa-plus green"></i>
 														<span class="d-none d-md-inline ml-1">Add</span>
@@ -310,18 +311,26 @@
 												>
 													<div slot="roll" slot-scope="data" class="roll">
 														<span>
-															{{ data.row.dice_count }}d{{ data.row.dice_type }}
-															<template v-if="data.row.fixed_val !== undefined">
-																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
+															{{ calcAverage(data.row.dice_type, data.row.dice_count, data.row.fixed_val) }}
+															({{ data.row.dice_count || '' }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
+															<template v-if="data.row.fixed_val && data.row.dice_count">
+																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }})
 															</template>
-															<q-tooltip v-if="action.versatile" anchor="top middle" self="bottom middle">
-																{{ action.versatile_one || "Enter versatile option" }}
+															<template v-else>{{ data.row.fixed_val }})</template>
+															<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
+																{{ ability.versatile_one || "Enter versatile option" }}
 															</q-tooltip>
 														</span>
-														<span v-if="action.versatile && versatileRoll(data.row)">
-															| {{ versatileRoll(data.row) }}
+														<span v-if="ability.versatile && versatileRoll(data.row)">
+															| {{ 
+																calcAverage(
+																	data.row.versatile_dice_type || data.row.dice_type, 
+																	data.row.versatile_dice_count || data.row.dice_count, 
+																	data.row.versatile_fixed_val || data.row.fixed_val) 
+																}}
+															({{ versatileRoll(data.row) }})
 															<q-tooltip anchor="top middle" self="bottom middle">
-																{{ action.versatile_two || "Enter versatile option" }}
+																{{ ability.versatile_two || "Enter versatile option" }}
 															</q-tooltip>
 														</span>
 													</div>
@@ -348,7 +357,7 @@
 
 													<!-- ACTIONS -->
 													<div slot="actions" slot-scope="data" class="actions">
-														<a class="ml-2" @click="editRoll(ability_index, category, action_index, action, data.index, data.row)">
+														<a class="ml-2" @click="editRoll(ability_index, category, action_index, action, ability.versatile, data.index, data.row)">
 															<i class="fas fa-pencil-alt"></i>
 															<q-tooltip anchor="top middle" self="center middle">
 																Edit
@@ -556,14 +565,14 @@
 			 * @param {Integer} action_index index of the action
 			 * @param {string} action full action object
 			 */
-			newRoll(ability_index, category, action_index, action) {
+			newRoll(ability_index, category, action_index, action, versatile) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
 					type: action.type,
-					versatile: action.versatile
+					versatile
 				}
 				this.edit_roll_index = undefined; // It's new, so no edit index
 				this.roll = {}; // Create an empty new roll
@@ -580,14 +589,14 @@
 			 * @param {index} roll_index of the roll
 			 * @param {object} roll the object to edit
 			 */
-			editRoll(ability_index, category, action_index, action, roll_index, roll) {
+			editRoll(ability_index, category, action_index, action, versatile, roll_index, roll) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
 					type: action.type,
-					versatile: action.versatile
+					versatile
 				}
 				this.edit_roll_index = roll_index;
 				this.roll = roll;
@@ -631,6 +640,9 @@
 
 					return `${returnRoll.dice_count}d${returnRoll.dice_type}${fixed}`
 				}
+			},
+			calcAverage(dice_type=0, dice_count=0, modifier=0) {
+				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
 			}
 		}
 	}

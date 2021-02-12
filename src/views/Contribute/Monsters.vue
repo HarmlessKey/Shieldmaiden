@@ -4,9 +4,9 @@
 			<Crumble />
 			<h2><i class="fas fa-dragons"></i> Contribute to Monsters</h2>
 
-			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(finishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
+			<q-linear-progress dark stripe rounded size="25px" :value="Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length" color="primary" class="mb-4">
 			<div class="absolute-full flex flex-center white">
-        {{ Object.keys(finishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(finishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
+        {{ Object.keys(allFinishedMonsters).length }} / {{ Object.keys(allMonsters).length }} ({{ Math.floor(Object.keys(allFinishedMonsters).length / Object.keys(allMonsters).length * 100) }}%)
       </div>
 			</q-linear-progress>
 
@@ -64,7 +64,9 @@
 							:items="monsters"
 							:columns="taggedColumns"
 						>
-							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item.capitalizeEach() }}</router-link>
+							<router-link :to="'/contribute/monsters/' + data.row['.key']" slot="name" slot-scope="data">
+								{{ data.item ? data.item.capitalizeEach() : data.item }}
+							</router-link>
 
 							<div slot="actions" slot-scope="data" class="actions">
 								<router-link 
@@ -121,11 +123,22 @@
 							Finished Monsters
 							<span v-if="finishedMonsters">{{ Object.keys(finishedMonsters).length }}</span>
 						</div>
+
+						<q-checkbox
+							v-if="userInfo.admin"
+							dark
+							label="Only finished by others"
+							v-model="othersFinished"
+							indeterminate-value="Something else"
+							class="mb-3"
+						/>
+
 						<hk-table
-							:items="finishedMonsters"
+							:items="othersFinished ? finishedByOthers : finishedMonsters"
 							:columns="untaggedColumns"
 							:perPage="15"
 							:search="['name']"
+							class="mb-4"
 						>
 							<div slot="name" slot-scope="data" :class="isDifficult(data.row) ? 'red' : ''">
 								<span>{{ data.item.capitalizeEach() }}</span>
@@ -158,7 +171,7 @@
 										Preview
 									</q-tooltip>
 								</a>
-								<a>
+								<a v-if="userInfo.admin">
 									<i class="fas fa-info"></i>
 									<q-popup-proxy dark square>
 										<hk-card header="Info" class="mb-0">
@@ -166,6 +179,46 @@
 										</hk-card>
 									</q-popup-proxy>
 								</a>
+								<a v-if="userInfo.admin && userId !== data.row.metadata.finished_by" @click="approve(data.row['.key'])">
+									<i class="fas fa-check white"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Approve
+									</q-tooltip>
+								</a>
+							</div>
+						</hk-table>
+
+						<h3><i class="fas fa-check green"/> Approved monsters</h3>
+						<hk-table
+							:items="approvedMonsters"
+							:columns="untaggedColumns"
+							:perPage="15"
+						>
+							<div slot="name" slot-scope="data">
+								<span>{{ data.item.capitalizeEach() }}</span>
+							</div>
+							<div slot="actions" slot-scope="data" class="actions">
+								<a @click="setSlide({ show: true, type: 'contribute/monster/ViewMonster', data: data.row })">
+									<i class="fas fa-eye"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Preview
+									</q-tooltip>
+								</a>
+								<a v-if="userInfo.admin">
+									<i class="fas fa-info"></i>
+									<q-popup-proxy dark square>
+										<hk-card header="Info" class="mb-0">
+											Approved by: {{ getPlayerName(data.row.metadata.approved) }}<br/>
+											Finished by: {{ getPlayerName(data.row.metadata.finished_by) }}
+										</hk-card>
+									</q-popup-proxy>
+								</a>
+								<a v-if="userInfo.admin && userId !== data.row.metadata.finished_by" @click="disApprove(data.row['.key'])">
+									<i class="fas fa-times white"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Disapprove
+									</q-tooltip>
+								</a>		
 							</div>
 						</hk-table>
 					</hk-card>
@@ -198,6 +251,7 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
+				othersFinished: false,
 				untaggedColumns: {
 					name: {
 						label: 'Name',
@@ -229,10 +283,10 @@
 		firebase() {
 			return {
 				allMonsters: db.ref('monsters'),
-				finishedMonsters: db.ref('new_monsters').orderByChild('metadata/finished').equalTo(true),
+				allFinishedMonsters: db.ref('new_monsters').orderByChild('metadata/finished').equalTo(true),
 				taggedMonster: db.ref('new_monsters').orderByChild('metadata/tagged').equalTo(this.userId),
 				admins: db.ref('users').orderByChild('admin').equalTo(true),
-				contributors: db.ref('users').orderByChild('contribute').equalTo(true),
+				contributors: db.ref('users').orderByChild('contribute').startAt(0),
 			}
 		},
 		computed: {
@@ -250,6 +304,24 @@
 				return _.chain(this.allMonsters)
 					.filter(function(monster) {
 						return (('metadata' in monster) && ('tagged' in monster.metadata) && !('finished' in monster.metadata))
+					}).value();
+			},
+			finishedMonsters() {
+				return _.chain(this.allFinishedMonsters)
+					.filter(function(monster) {
+						return (!('approved' in monster.metadata))
+					}).value();
+			},
+			finishedByOthers() {
+				return this.finishedMonsters
+					.filter(monster => {
+						return (!('approved' in monster.metadata) && monster.metadata.finished_by !== this.userId)
+					});
+			},
+			approvedMonsters() {
+				return _.chain(this.allFinishedMonsters)
+					.filter(function(monster) {
+						return ('approved' in monster.metadata)
 					}).value();
 			},
 			taggedMonsters() {
@@ -328,7 +400,13 @@
 
 				db.ref(`monsters/${key}/metadata/finished`).set(true);
 				db.ref(`monsters/${key}/metadata/finished_by`).set(this.userId);
-			}
+			},
+			approve(key) {
+				db.ref(`new_monsters/${key}/metadata/approved`).set(this.userId);
+			},
+			disApprove(key) {
+				db.ref(`new_monsters/${key}/metadata/approved`).remove();
+			},
 		},
 	}
 </script>

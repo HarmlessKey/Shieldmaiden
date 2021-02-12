@@ -148,13 +148,24 @@
 
 								<template>
 									<label class="group mt-3">Range & area of effect</label>
-									<div class="row q-col-gutter-md">
+									<div class="row q-col-gutter-sm">
 										<div class="col">
 											<q-input
 												dark filled square
-												:label="ability.type === 'melee_weapon' ? 'Reach' : 'Range'"
+												class="reach"
+												label="Reach"
+												v-model="ability.reach"
+												type="number"
+												suffix="ft."
+												@keyup="$forceUpdate()"
+											/>
+										</div>
+										<div class="col">
+											<q-input
+												dark filled square
+												label="Range"
 												v-model="ability.range"
-												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 5 or 20/60']"
+												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)$/g)) || 'Allowed format: 20/60']"
 												suffix="ft."
 												@keyup="$forceUpdate()"
 											/>
@@ -628,6 +639,15 @@
 		.limit-type {
 			width: 150px;
 			margin-left: 1px;
+		}
+	}
+	.range {
+		.q-field {
+			width: 50%;
+		}
+		.reach {
+			width: calc(50% - 1px);
+			margin-right: 1px;
 		}
 	}
 </style>

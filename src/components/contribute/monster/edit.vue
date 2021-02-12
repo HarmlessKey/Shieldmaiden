@@ -335,8 +335,10 @@ export default {
 
 						if(ability.damage_dice || ability.desc.toLowerCase().match(/(saving throw)/g)) {
 							// Find the range
-							const range = ability.desc.toLowerCase().match(/(range|reach).[0-9]+(\/[0-9]+)*/g);
+							const reach = ability.desc.toLowerCase().match(/(reach).[0-9]+(\/[0-9]+)*/g);
+							const range = ability.desc.toLowerCase().match(/(range).[0-9]+(\/[0-9]+)*/g);
 
+							if(reach) newAbility.reach = reach[0].split(" ")[1];
 							if(range) newAbility.range = range[0].split(" ")[1];
 
 							// Check if it's a targeted action or saving throw

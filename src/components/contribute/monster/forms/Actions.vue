@@ -310,10 +310,11 @@
 												>
 													<div slot="roll" slot-scope="data" class="roll">
 														<span>
-															{{ data.row.dice_count }}d{{ data.row.dice_type }}
-															<template v-if="data.row.fixed_val !== undefined">
+															{{ data.row.dice_count || '' }}{{ data.row.dice_type ? `d${data.row.dice_type}` : `` }}
+															<template v-if="data.row.fixed_val && data.row.dice_count">
 																{{ (data.row.fixed_val &lt; 0) ? `- ${Math.abs(data.row.fixed_val)}` : `+ ${data.row.fixed_val}`  }}
 															</template>
+															<template v-else>{{ data.row.fixed_val }}</template>
 															<q-tooltip v-if="action.versatile" anchor="top middle" self="bottom middle">
 																{{ action.versatile_one || "Enter versatile option" }}
 															</q-tooltip>

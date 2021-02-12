@@ -104,8 +104,8 @@
 		}
 
 		h2 {
-			color: #fff;
-			text-shadow: 0 0 3px  #000;
+			color:$white;
+			text-shadow: 0 0 3px $black;
 			text-transform: none !important;
 			margin-bottom: 10px;
 		}
@@ -115,7 +115,7 @@
 			font-size: 35px;
 			text-align: center;
 			background: rgba(38, 38, 38, .8);
-			color: #fff;
+			color:$white;
 		}
 
 		.currency-wrapper {
@@ -140,7 +140,7 @@
 					border: none !important;
 					font-weight: bold;
 					font-size: 18px;
-					color: #fff !important;
+					color:$white !important;
 					opacity: 1 !important;
 				}
 				div {

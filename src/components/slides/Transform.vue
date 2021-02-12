@@ -2,39 +2,43 @@
 	<div class="pb-5">
 		<h2>Transform <span class="blue">{{ entity.name }}</span></h2>
 		<a v-if="entity.transformed" @click="remove()" class="btn btn-block bg-red">Remove transformation</a>
-		<div class="row q-col-gutter-md" v-else>
-			<div class="col">
-				<q-input 
-					dark square filled dense
-					label="Armor class"
-					autocomplete="off"
-					type="number" 
-					name="ac"
-					class="mb-2"
-					v-model="transAc"
-					v-validate="'required'"
-				/>
+		<template v-else>
+			<div class="row q-col-gutter-md">
+				<div class="col">
+					<q-input 
+						dark square filled
+						label="Armor class"
+						autocomplete="off"
+						type="number" 
+						name="ac"
+						class="mb-2"
+						v-model="transAc"
+						v-validate="'required'"
+					/>
+				</div>
+				
+				<div class="col">
+					<q-input 
+						dark square filled
+						label="Hit points"
+						autocomplete="off"
+						type="number" 
+						name="maxHp" 
+						v-model="transHp"
+						v-validate="'required'"
+					/>
+				</div>
+
 			</div>
-			
-			<div class="col">
-				<q-input 
-					dark square filled dense
-					label="Hit points"
-					autocomplete="off"
-					type="number" 
-					name="maxHp" 
-					v-model="transHp"
-					v-validate="'required'"
-				/>
-			</div>
-		</div>
-		<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
-		<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
-		<button class="btn btn-block mb-3" @click="edit()">Transform</button>
-		<small>
-			Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 
-			Damage and healing is handled as the rulebook describes it should work for Wild Shape.<br/>
-		</small>
+			<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+			<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+			<button class="btn btn-block mb-3" @click="edit()">Transform</button>
+
+			<small>
+				Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 
+				Damage and healing is handled as the Player's Handbook describes it should work for Wild Shape (phb 67).
+			</small>
+		</template>
 	</div>
 </template>
 

@@ -161,7 +161,7 @@
  .spellTitle {
 		font-size: 18px !important;
 		text-transform: none !important;
-		border-bottom: solid 1px #5c5757;
+		border-bottom: solid 1px$gray-hover;
 		padding-bottom: 5px;
 		margin-bottom: 5px;
 

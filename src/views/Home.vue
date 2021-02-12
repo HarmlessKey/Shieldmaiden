@@ -1,64 +1,73 @@
 <template>
-	<div class="home" v-if="diceColors.length > 0" v-on:scroll="handleScroll">
-		<section id="top">
-			<Top />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="overview">
-			<Overview />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="general">
-			<General />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="builder">
-			<Builder />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="share">
-			<Share />
-			<span 
-				class="die" 
-				:style="{ 
-					backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
-					transform: `rotate(${scrolled}deg)`
-				}">
-			</span>
-		</section>
-		<section id="campaign">
-			<Campaign />
-		</section>
-		<Footer />
-		<div class="patreon bg-black d-flex justify-content-end">
-			Like what we do?
-			<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="ml-2 btn bg-patreon-red"><i class="fab fa-patreon black"></i> Support us on Patreon</a>
-		</div>
+	<div class="home" v-if="!$store.getters.user || $route.path === '/home'" v-on:scroll="handleScroll">
+		<template v-if="diceColors.length > 0">
+			<section id="top">
+				<Top />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[0] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="overview">
+				<Overview />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[1] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="general">
+				<General />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[2] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="builder">
+				<Builder />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[3] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="share">
+				<Share />
+				<span 
+					class="die" 
+					:style="{ 
+						backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + diceColors[4] + '.svg') + ')',
+						transform: `rotate(${scrolled}deg)`
+					}">
+				</span>
+			</section>
+			<section id="campaign">
+				<Campaign />
+			</section>
+			<Footer />
+			<div class="bottom-actions d-flex justify-content-center">
+				<template v-if="!$store.getters.user">
+					<router-link to="/sign-up" class="btn btn-lg">Create Account</router-link>
+					<router-link to="/demo" class="ml-2 btn btn-lg bg-green">Demo Encounter</router-link>
+				</template>
+				<router-link v-else to="/content" class="ml-2 btn btn-lg bg-green">
+					<i class="fas fa-treasure-chest"/>
+					My content
+				</router-link>
+			</div>
+		</template>
 	</div>
+	<SignedIn v-else />
 </template>
 
 <script>
@@ -69,6 +78,7 @@
 	import Builder from '@/components/home/Builder.vue'
 	import Campaign from '@/components/home/Campaign.vue'
 	import Footer from '@/components/Footer.vue'
+	import SignedIn from '@/components/home/SignedIn.vue'
 
 	export default {
 		name: 'home',
@@ -79,7 +89,8 @@
 			Share,
 			Builder,
 			Campaign,
-			Footer
+			Footer,
+			SignedIn
 		},
 		data() {
 			return {
@@ -124,7 +135,7 @@
 <style lang="scss" scoped>
 
 .home {
-	padding-bottom: 55px;
+	padding-bottom: 85px;
 	overflow-y: scroll;
 	height: 100vh;
 
@@ -147,16 +158,16 @@
 		background-repeat: no-repeat;
 		z-index: 97;
 	}
-	.patreon {
+	.bottom-actions {
+		background: rgba(0, 0, 0, .3);
 		position: fixed;
 		bottom: 0;
 		width: 100%;
-		padding: 10px;
-		height: 55px;
+		padding: 20px 10px;
+		height: 85px;
 		line-height: 33px;
 		z-index: 97;
+		backdrop-filter: blur(3px);
 	}
 }
-
-
 </style>

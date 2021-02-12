@@ -261,12 +261,12 @@
 <style lang="scss" scoped>
 	.container-fluid {
 		h2 {
-			border-bottom: solid 1px #b2b2b2;
+			border-bottom: solid 1px $gray-light;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: #b2b2b2 !important;
+				color: $gray-light !important;
 
 				&:hover {
 					text-decoration: none;

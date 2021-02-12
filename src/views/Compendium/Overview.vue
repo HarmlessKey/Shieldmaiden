@@ -5,7 +5,7 @@
 		<h1>Compendium</h1>
 		<p>
 			All content is provided under terms of the 
-			<a href="./SRD-OGL_V5.1.pdf" target="_blank">Open Gaming License version 1.0a.</a>
+			<a href="./SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">Open Gaming License version 1.0a.</a>
 		</p>
 		<ul class="entities hasImg">
 			<li v-for="(item, index) in items" :key="index">

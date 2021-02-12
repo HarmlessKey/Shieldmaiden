@@ -1,20 +1,25 @@
 <template>
 	<div>
 		<h2>Damage / heal</h2>
-
+		
 		<ul class="targets">
 			<li v-for="(target, i) in targeted" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
+		<hr>
 
-		<Actions class="mt-3" :settings="settings" :select-entity="true" />
+		<Actions v-if="targeted.length > 0" class="mt-3" :settings="settings" :select-entity="true" />
+
+		<p  v-else class="mt-4">
+			Select one or multiple targets to deal damage or heal.
+		</p>
+
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash';
-	import { mapActions, mapGetters } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import TargetItem from '@/components/combat/TargetItem.vue';
@@ -53,7 +58,7 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 		}
 	}
 </style>

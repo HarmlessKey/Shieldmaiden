@@ -1,21 +1,36 @@
-export const damageTypes = {
+export const damage_types = {
 	data() {
 		return {
 			damage_types: [
-				{ value: "acid", label: "Acid" },
-				{ value: "bludgeoning", label: "Bludgeoning" },
-				{ value: "cold", label: "Cold" },
-				{ value: "fire", label: "Fire" },
-				{ value: "force", label: "Force" },
-				{ value: "lightning", label: "Lightning" },
-				{ value: "necrotic", label: "Necrotic" },
-				{ value: "piercing", label: "Piercing" },
-				{ value: "poison", label: "Poison" },
-				{ value: "psychic", label: "Psychic" },
-				{ value: "radiant", label: "Radiant" },
-				{ value: "slashing", label: "Slashing" },
-				{ value: "thunder", label: "Thunder" }
-			]
+				"acid",
+				"bludgeoning",
+				"cold",
+				"fire",
+				"force",
+				"lightning",
+				"necrotic",
+				"piercing",
+				"poison",
+				"psychic",
+				"radiant",
+				"slashing",
+				"thunder"
+			],
+			damage_type_icons: {
+				"acid": "fas fa-tint",
+				"bludgeoning": "fas fa-hammer-war",
+				"cold": "far fa-snowflake",
+				"fire": "fas fa-flame",
+				"force": "fas fa-sparkles",
+				"lightning": "fas fa-bolt",
+				"necrotic": "fas fa-skull",
+				"piercing": "far fa-bow-arrow",
+				"poison": "fas fa-flask-poison",
+				"psychic": "fas fa-brain",
+				"radiant": "fas fa-sun",
+				"slashing": "fas fa-sword",
+				"thunder": "far fa-waveform-path"
+			}
 		}
 	}
 }

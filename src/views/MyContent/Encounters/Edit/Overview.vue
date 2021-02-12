@@ -296,7 +296,7 @@
 			margin-bottom: 8px;
 		}
 		.diff-info {
-			background: #302f2f;
+			background:$gray-active;
 			padding: 10px 10px 0 10px;
 
 			span.left {
@@ -306,7 +306,7 @@
 
 			.progress-area {
 				.progress {
-					background-color: #232323 !important;
+					background-color: $gray-darker !important;
 				}
 				.diff {
 					display: none;
@@ -331,7 +331,7 @@
 			right: -300px; 
 			height: calc(100vh - 50px);
 			z-index: 96;
-			background: #302f2f;
+			background:$gray-active;
 			overflow: scroll;
 			width: 300px;
 			transition: right .5s linear,
@@ -339,7 +339,7 @@
 
 			&.show {
 				right: 0;
-				box-shadow: 0 10px 15px #000;
+				box-shadow: 0 10px 15px$black;
 			}
 
 			h3.header {
@@ -367,7 +367,7 @@
 			display: block;
 			cursor: pointer;
 			line-height: 50px;
-			color: #fff !important;
+			color:$white !important;
 
 			i {
 				transition: transform .5s linear;

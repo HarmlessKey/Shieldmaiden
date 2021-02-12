@@ -2,40 +2,35 @@
 	<div class="pb-5" v-if="entities">
 		<h2>Set Reminders</h2>
 		<ul class="targets">
-			<li v-for="(target, i) in targeted" :key="`target=${i}`">
+			<li v-for="(target, i) in reminder_targets" :key="`target=${i}`">
 				<TargetItem  :item="target" :i="i" />
 			</li>
 		</ul>
 		<hr>
-		<div v-if="targeted.length === 1 && entities[targeted[0]].reminders" class="row q-col-gutter-xs current justify-content-start">
-			<div class="col-3 truncate p-1" v-for="(reminder, key) in entities[targeted[0]].reminders" :key="key">
-				<a @click="removeReminder(key)" class="text-truncate d-block" :class="'bg-'+reminder.color">
-					{{ title(reminder) }}
-					<span class="delete"><i class="fas fa-times"></i></span>
-					<q-tooltip anchor="top middle" self="center middle">
-						Remove {{ reminder.title }}
-					</q-tooltip>
-				</a>
-			</div>
-		</div>
-
-		<q-tabs
-			v-model="tab"
-			dark
-			inline-label
-			dense
-			no-caps
-		>
-			<q-tab 
-				v-for="({name, icon, label}, index) in tabs"
-				:key="`tab-${index}`" 
-				:name="name" 
-				:icon="icon"
-				:label="label"
+		<template v-if="reminder_targets.length > 0">
+			<Reminders 
+				v-if="reminder_targets.length === 1 && entities[reminder_targets[0]].reminders" 
+				:entity="entities[reminder_targets[0]]"
+				class="mb-2"
 			/>
-		</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
+			<q-tabs
+				v-model="tab"
+				dark
+				inline-label
+				dense
+				no-caps
+			>
+				<q-tab 
+					v-for="({name, icon, label}, index) in tabs"
+					:key="`tab-${index}`" 
+					:name="name" 
+					:icon="icon"
+					:label="label"
+				/>
+			</q-tabs>
+
+			<q-tab-panels v-model="tab" class="bg-transparent">
 				<q-tab-panel name="premade">
 					<ul class="premade">
 					<li v-for="(reminder, key) in premade" :key="key"
@@ -66,7 +61,6 @@
 							</div>
 							<div v-if="varOptions === key" class="variables">
 								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-									<label>{{ var_key }}</label>
 									<q-select 
 										dark filled square dense
 										:label="var_key"
@@ -90,7 +84,11 @@
 					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
 					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
 				</q-tab-panel>
-		</q-tab-panels>
+			</q-tab-panels>
+		</template>
+		<p v-else class="mt-4">
+			Select one or multiple targets to add a reminder.
+		</p>
 	</div>
 </template>
 
@@ -100,13 +98,15 @@
 	import ReminderForm from '@/components/ReminderForm';
 	import { remindersMixin } from '@/mixins/reminders';
 	import TargetItem from '@/components/combat/TargetItem.vue';
+	import Reminders from '@/components/combat/Reminders.vue';
 
 	export default {
 		name: 'TargetReminders',
 		mixins: [remindersMixin],
 		components: {
 			ReminderForm,
-			TargetItem
+			TargetItem,
+			Reminders
 		},
 		props: [
 			'data',
@@ -114,7 +114,6 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				entityKey: this.data,
 				action: 'remove',
 				tab: "premade",
 				tabs: [
@@ -138,46 +137,51 @@
 				'entities',
 				'targeted'
 			]),
+			reminder_targets: function() {
+				if (this.data !== undefined && this.data.length > 0)
+					return this.data;
+				return this.targeted;
+			}
 		},
 		methods: {
 			...mapActions([
 				'set_targetReminder',
 			]),
 			addReminder(type, reminder = false, selectedVars=undefined) {
-					if(type === 'premade') {
-						for(const target of this.targeted) {
-							let key = reminder['.key'] || reminder.key;
-							delete reminder['.key'];
+				if(type === 'premade') {
+					for(const target of this.reminder_targets) {
+						let key = reminder['.key'] || reminder.key;
+						delete reminder['.key'];
 
-							if(selectedVars) {
-								reminder.selectedVars = selectedVars;
-							}
-
-							this.set_targetReminder({
-								action: 'add',
-								entity: target,
-								key,
-								type: 'premade',
-								reminder: reminder
-							});
-							reminder['.key'] = key;
+						if(selectedVars) {
+							reminder.selectedVars = selectedVars;
 						}
-					}
-					else if(type === 'custom') {
-						this.validation.validateAll().then((result) => {	
-							if (result) {
-								for(const target of this.targeted) {
-									this.set_targetReminder({
-										action: 'add',
-										entity: target,
-										type: 'custom',
-										reminder: this.customReminder
-									});
-								}
-								this.customReminder = {};
-							}
+
+						this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							key,
+							type: 'premade',
+							reminder: reminder
 						});
+						reminder['.key'] = key;
 					}
+				}
+				else if(type === 'custom') {
+					this.validation.validateAll().then((result) => {	
+						if (result) {
+							for(const target of this.reminder_targets) {
+								this.set_targetReminder({
+									action: 'add',
+									entity: target,
+									type: 'custom',
+									reminder: this.customReminder
+								});
+							}
+							this.customReminder = {};
+						}
+					});
+				}
 			},
 			setValidation(validate) {
 				this.validation = validate;
@@ -185,7 +189,7 @@
 			removeReminder(key) {
 				this.set_targetReminder({
 					action: 'remove',
-					entity: this.targeted[0],
+					entity: this.reminder_targets[0],
 					key: key,
 				})
 			},
@@ -212,47 +216,35 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 		}
 	}
-	ul.nav-tabs {
-		border-bottom: solid 3px #494747;
-		height: 41px;
-		margin: 0;
 
-		.nav-link {
-			color: #b2b2b2 !important;
-			border-bottom: solid 3px #494747 !important;
-
-			&.active {
-				color: #2c97de !important;
-				background: none !important;
-				border-color: #2c97de !important;
-			}
-		}
+	.q-tab-panel {
+		padding: 15px 0;
 	}
 
 	ul.premade {
-		color: #fff;
+		color:$white;
 		list-style: none;
 		padding: 0;
 
 		li {
 			margin-bottom: 3px;
-			background-color: #191919;
+			background-color:$gray-dark;
 
 			.title {
 				padding: 5px;
 			}
 			a.add {
 				display: block;
-				background: #191919;
+				background:$gray-dark;
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
 			}
 			.variables {
-				border-top: solid 3px #262626;
+				border-top: solid 3px$gray;
 				padding: 10px;
 			}
 		}
@@ -262,7 +254,7 @@
 		font-size: 11px;
 
 		a {
-			color: #fff !important;
+			color:$white !important;
 			position: relative;
 			padding: 3px;
 
@@ -274,7 +266,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color: #fff !important;
+					color:$white !important;
 					font-size: 12px;
 					display: inline-block;
 					

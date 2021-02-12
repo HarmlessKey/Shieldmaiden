@@ -12,9 +12,9 @@
 					</div>
 					<!-- DATA -->
 					<h3>Your data</h3>
-					<b-list-group class="data">
+					<q-list class="data">
 						<!-- Campaigns -->
-						<b-list-group-item to="/campaigns">
+						<q-item to="/campaigns" class="justify-content-between">
 								<div>
 									<i class="fas fa-dungeon mr-1"></i> Campaigns
 								</div>
@@ -25,10 +25,10 @@
 									<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.campaigns }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
 						<!-- Players -->
-						<b-list-group-item to="/players">
+						<q-item to="/players" class="justify-content-between">
 								<div>
 									<i class="fas fa-user mr-1"></i> Players
 								</div>
@@ -39,10 +39,10 @@
 									<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.players }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
 						<!-- NPC's -->
-						<b-list-group-item  to="/npcs">
+						<q-item  to="/npcs" class="justify-content-between">
 								<div>
 									<i class="fas fa-dragon mr-1"></i> NPC's
 								</div>
@@ -53,9 +53,9 @@
 									<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
 									<span v-else>{{ tier.benefits.npcs }}</span>
 								</div>
-						</b-list-group-item>
+						</q-item>
 
-					</b-list-group>
+					</q-list>
 					<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-patreon-red mt-3" to="/patreon">Need more?</router-link>
 
 					<!-- HAS A SUBSCRIPTION -->
@@ -72,10 +72,10 @@
 								<h3>Payment Declined</h3>
 								<p>
 									Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
-									Go to <a href="https://www.patreon.com" target="_blank">patreon.com</a> to check your payment details.
+									Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
 								</p>
 							</div>
-							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank">Cancel subscription</a></small>
+							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank" rel="noopener">Cancel subscription</a></small>
 							<hr>
 						</div>
 
@@ -96,7 +96,6 @@
 							<p v-if="tier.name == 'Deity'" class="gray-hover">You have unlimited power.</p>
 							<ul class="benefits">
 								<li v-for="(benefit, key) in tier.benefits" :key="key">
-									<template v-if="key == 'ads'">Ads are removed</template>
 									<template v-if="key == 'campaigns'">
 										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
 										<span v-else class="green">{{ benefit }}</span> campaign slots

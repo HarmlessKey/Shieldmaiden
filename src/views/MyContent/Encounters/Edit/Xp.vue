@@ -73,7 +73,7 @@
 
         &.strikeTrough {
             text-decoration: line-through;
-            color: #5c5757;
+            color:$gray-hover;
         }
     }
     .fas {

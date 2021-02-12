@@ -4,7 +4,7 @@
 		<h1>Planned updates</h1>
 		<p>Follow our planned updates on Trello.</p>
 
-		<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank" class="large-link">
+		<a href="https://trello.com/b/FGyjhDOt/harmless-key" target="_blank" rel="noopener" class="large-link">
 			<div class="icon"><i class="fab fa-trello"></i></div>
 			<div class="text">Harmless Key Trello.</div>
 		</a>
@@ -53,12 +53,12 @@
 
 			li {
 				font-size: 13px;
-				border-bottom: solid 1px #302f2f;
+				border-bottom: solid 1px$gray-active;
 
 				a {
-					color: #b2b2b2 !important;
+					color: $gray-light !important;
 					padding: 15px 5px;
-					border-top: solid 1px #302f2f;
+					border-top: solid 1px$gray-active;
 
 					&:hover {
 						text-decoration: none;

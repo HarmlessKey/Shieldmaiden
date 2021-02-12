@@ -6,6 +6,8 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
 					<h1>{{ user.username }}</h1>
+					<p>{{ user.email }}</p>
+					<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
 					<p><i class="gray-hover">{{ id }}</i></p>
 				</div>
 				<div class="col-12 col-md-4">
@@ -62,15 +64,39 @@
 							{{ character.character_name }}
 						</li>
 					</ul>
-					<div v-else class="loader"> <span>Loading characters....</span></div>
+					<div v-else class="loader"> <span>Loading characters...</span></div>
 				</hk-card>
 			</hk-card-deck>
+
+			<hk-card header="User info">
+				<q-select
+					dark filled square multiple
+					label="contribute"
+					class="mb-3"
+					:options="contributes"
+					v-model="user.contribute"
+					@input="setContribute($event)"
+				/>
+
+				<h3>Link a Patreon account</h3>
+
+				<q-input
+					dark filled square
+					type="email"
+					label="Patreon Email"
+					v-model="user.patreon_email">
+					<template #after>
+						<a class="btn" @click="setPatronEmail()">Save</a>
+					</template>
+				</q-input>
+				
+			</hk-card>
 
 			<hk-card header="Voucher">
 				<h3>Gift user a subscription</h3>
 
 				<q-select 
-					dark filled square dense
+					dark filled square
 					emit-value
 					map-options
 					label="Tier"
@@ -82,27 +108,30 @@
 				</q-select>
 				
 				<q-option-group
+					dark
 					v-model="duration"
 					:options="duration_options"
 				/>
 
 				<q-input 
 					v-if="duration === 'date'"
-					dark filled square dense
+					dark filled square
 					label="Date"
 					type="text"
 					v-validate="'required'"
 					data-vv-as="Date" 
 					name="date" 
 					placeholder="mm/dd/yyyy"
+					class="mb-2"
 					v-model="voucher.date"/>
 				<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
 
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Message"
 					v-model="voucher.message" 
 					name="message" 
+					class="mb-2"
 					autogrow
 				/>
 				<a class="btn" @click="setVoucher()">Save</a>
@@ -147,6 +176,10 @@
 						value: 'infinite',
 						label: 'Till cancelled'
 					}
+				],
+				contributes: [
+					"monsters",
+					"spells"
 				]
 			}
 		},
@@ -249,6 +282,25 @@
 							position: "rightTop"
 						});
 					}
+				});
+			},
+			setPatronEmail() {
+				if (this.user.patreon_email == "") {
+					db.ref(`users/${this.id}/patreon_email`).remove()	
+				}
+				else {
+					db.ref(`users/${this.id}/patreon_email`).set(this.user.patreon_email)
+				}
+				this.$snotify.success('Patreon email linked.', 'Saved!', {
+					position: "rightTop"
+				});
+			},
+			setContribute(value) {
+				value = (!value) ? null : value;
+				db.ref(`users/${this.id}/contribute`).set(value);
+
+				this.$snotify.success('Contribute set.', 'Saved!', {
+					position: "rightTop"
 				});
 			},
 			makeDate(input) {

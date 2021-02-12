@@ -20,6 +20,10 @@
 									{{ broadcasting['.value'] !== $route.params.campid ? "Go live" : "Cancel broadcast" }}
 								</q-item-section>
 							</q-item>
+							<q-item v-if="encounter.audio" clickable v-close-popup  @click="open_audio_link(encounter.audio)">
+								<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
+								<q-item-section>Audio Link</q-item-section>
+							</q-item>
 							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
 								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
 								<q-item-section>Settings</q-item-section>
@@ -126,7 +130,7 @@
 						Leave
 					</router-link>
 				</span>
-				<a class="btn" @click="set_turn({turn: 0, round: 1})">
+				<a class="btn" @click="startEncounter()">
 					Start 
 					<span class="ml-1 d-none d-md-inline"> 
 						encounter <i class="fas fa-arrow-right"></i>
@@ -141,15 +145,16 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { remindersMixin } from '@/mixins/reminders';
+	import { audio } from '@/mixins/audio';
 
 	export default {
 		name: 'Turns',
-		mixins: [remindersMixin],
-		props: ['active_len', 'current'],
+		mixins: [remindersMixin, audio],
+		props: ['active_len', 'current', 'next'],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user.uid
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			}
 		},
 		firebase() {
@@ -164,7 +169,6 @@
 			...mapGetters([
 				'encounter',
 				'path',
-				'entities',
 			]),
 		},
 		methods: {
@@ -177,6 +181,10 @@
 			]),
 			reload() {
 				this.$router.go();
+			},
+			startEncounter() {
+				this.set_turn({turn: 0, round: 1});
+				this.checkReminders(this.next, 'startTurn');
 			},
 			nextTurn() {
 				let turn = this.encounter.turn + 1
@@ -263,7 +271,7 @@
 
 
 		&:hover {
-			color: #2c97de !important;
+			color: $blue !important;
 		}
 	}
 	.round-info {
@@ -323,7 +331,7 @@
 		display: block !important;
 	}
 	.edit {
-		color: #b2b2b2;
+		color: $gray-light;
 	}
 	.round-info {
 		.header {

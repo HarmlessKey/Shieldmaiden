@@ -9,7 +9,7 @@
 
 <script>
 	export default {
-		name: 'live',
+		name: 'roll-for-initiative',
 		computed: {
 			//Random die color
 			dieColor() {
@@ -64,8 +64,8 @@
 			font-weight: bold;
 			font-size: 50px;
 			text-transform: none;
-			color: #fff;
-			text-shadow: 0 0 8px #000;
+			color:$white;
+			text-shadow: 0 0 8px$black;
 			line-height: 60px;
 		}
 	}

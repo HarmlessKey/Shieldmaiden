@@ -87,7 +87,7 @@
 				</div>
 			</div>
 
-			<a target="_blank" :href="'https://www.patreon.com/user/creators?u='+patron['.key']">Show on Patreon</a>
+			<a target="_blank" rel="noopener" :href="'https://www.patreon.com/user/creators?u='+patron['.key']">Show on Patreon</a>
 		</template>
 		<EditPatron v-else :editPatron="patron" />
 	</div>
@@ -159,7 +159,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: #b2b2b2;
+			color: $gray-light;
 		}
 		&:last-child::after {
 			content: '';

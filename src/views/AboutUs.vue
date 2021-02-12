@@ -176,7 +176,7 @@
 
 			.hk-card {
 				.img {
-					border: solid 1px #b2b2b2;
+					border: solid 1px $gray-light;
 					width: 80px;
 					height: 80px;
 					background-position: center top;

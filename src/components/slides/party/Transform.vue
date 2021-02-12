@@ -5,7 +5,7 @@
 		<div class="row q-col-gutter-md mb-2">
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Armor class"
 					autocomplete="off"
 					type="number" 
@@ -17,7 +17,7 @@
 			
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					dark filled square
 					label="Hit points"
 					autocomplete="off"
 					type="number" 
@@ -32,7 +32,7 @@
 		<button class="btn btn-block mb-3" @click="edit()">Transform</button>
 		<small>
 			Transform the entity into another creature. You can use this for a druid's Wild Shape, or for the Polymorph spell. 
-			Damage and healing is handled as the rulebook describes it should work for Wild Shape.<br/>
+			Damage and healing is handled as the Player's Handbook describes it should work for Wild Shape (phb 67).
 		</small>
 	</div>
 </template>

@@ -355,7 +355,7 @@
 			grid-column-gap: 10px;
 
 			.img {
-				border: solid 1px #b2b2b2;
+				border: solid 1px $gray-light;
 				display: block;
 				width: 56px;
 				height: 56px;
@@ -368,7 +368,7 @@
 			margin-bottom: 20px;
 
 			&.add-table {
-				border-bottom: solid 1px #5c5757;
+				border-bottom: solid 1px$gray-hover;
 				padding-bottom: 5px;
 
 				input[type=number] {
@@ -383,7 +383,7 @@
 
 			.header {
 				font-weight: bold;
-				border-bottom: solid 1px #5c5757;
+				border-bottom: solid 1px$gray-hover;
 				padding-bottom: 5px;
 				margin-bottom: 10px;
 			}
@@ -397,7 +397,7 @@
 		display: flex;
 		justify-content: flex-end;
 		padding: 10px 0;
-		border-top: solid 1px #5c5757;
+		border-top: solid 1px$gray-hover;
 
 		.error {
 			margin: 0 10px 0 0;

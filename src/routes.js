@@ -1,7 +1,8 @@
 
-import { store } from './store/store'
+import { store } from './store/store';
 
 const Home = () => import('@/views/Home.vue');
+const SignedIn = () => import('@/components/home/SignedIn.vue');
 
 const Compendium = () => import('@/views/Compendium/Overview.vue');
 const View = () => import('@/views/Compendium/View.vue');
@@ -10,10 +11,13 @@ const Spells = () => import('@/views/Compendium/Spells.vue');
 const Conditions = () => import('@/views/Compendium/Conditions.vue');
 const CompendiumItems = () => import('@/views/Compendium/Items.vue');
 
+const Contribute = () => import('@/views/Contribute');
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
 const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
-const Contribute = () => import('@/views/Contribute');
+const Monsters_contrib = () => import('@/views/Contribute/Monsters.vue');
+const Monster_contrib = () => import('@/components/contribute/monster');
+const MonsterEdit = () => import('@/components/contribute/monster/edit.vue');
 
 const Sitemap = () => import('@/views/Sitemap.vue');
 const Privacy = () => import('@/views/Privacy.vue');
@@ -40,6 +44,7 @@ const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
+const Offline = () => import('@/views/Offline.vue');
 const MyContent = () => import('@/views/MyContent/Campaigns/Campaigns.vue');
 const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue');
 const Encounters = () => import('@/views/MyContent/Encounters');
@@ -66,6 +71,26 @@ export const routes = [{
 	name: 'home',
 	component: Home,
 	meta: {
+		sidebar: false,
+		offline: true
+	}
+},
+{
+	path: '/home',
+	name: 'landingpage',
+	component: Home,
+	meta: {
+		sidebar: false,
+		offline: true
+	},
+},
+{
+	path: '/content',
+	name: 'content',
+	component: SignedIn,
+	meta: {
+		requiresContribute: true,
+		requiresAuth: true,
 		sidebar: false
 	}
 },
@@ -74,7 +99,8 @@ export const routes = [{
 	name: 'Demo',
 	component: RunEncounter,
 	meta: {
-		sidebar: false
+		sidebar: false,
+		offline: true
 	},
 },
 //COMPENDIUM
@@ -165,7 +191,45 @@ export const routes = [{
 	}),
 	meta: {
 		basePath: '/contribute',
-		baseName: 'Spells',
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters',
+	name: 'Contribute Monsters',
+	component: Monsters_contrib,
+	meta: {
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters/:id',
+	name: 'Contribute Monster',
+	component: Monster_contrib,
+	props: (route) => ({
+		id: route.query.id,
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Monsters',
+		requiresContribute: true,
+		requiresAuth: true
+	}
+},
+{
+	path: '/contribute/monsters/:id/edit',
+	name: 'Edit Monster',
+	component: MonsterEdit,
+	props: (route) => ({
+		id: route.query.id,
+	}),
+	meta: {
+		basePath: '/contribute',
+		baseName: 'Monsters',
 		requiresContribute: true,
 		requiresAuth: true
 	}
@@ -185,12 +249,18 @@ export const routes = [{
 {
 	path: '/about-us',
 	name: 'About Us',
-	component: AboutUs
+	component: AboutUs,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/documentation',
 	name: 'Documentation',
-	component: Documentation
+	component: Documentation,
+	meta: {
+		offline: true
+	}
 },
 {
 	path: '/feedback',
@@ -615,6 +685,11 @@ export const routes = [{
 	path: '/404',
 	name: '404',
 	component: Error404
+},
+{
+	path: '/offline',
+	name: 'Offline',
+	component: Offline
 },
 {
 	path: '*',

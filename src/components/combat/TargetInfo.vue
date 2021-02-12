@@ -6,9 +6,8 @@
 		/>
 		
 		<TargetItem :item="target.key" />
-
-		<Reminders :entity="target" />
 		<Conditions :entity="target" />
+		<Reminders :entity="target" />
 		<ViewEntity class="mt-3 hide" :data="target" />
 
 	</div>
@@ -70,5 +69,4 @@
 </script>
 
 <style lang="scss" scoped>
-
 </style>

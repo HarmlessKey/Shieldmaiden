@@ -2,13 +2,13 @@
 	<div>
 		<ul class="rolls">
 			<li v-for="(roll, i) in rolls" :key="`roll-${i}`">
-				 <h3>
-					 <span class="title truncate" :title="roll.title">
-					 	{{ roll.title }}
-					 </span>
-					 <span class="date">
-						 {{ showTime(roll.date) }}
-					 </span>
+					<h3>
+						<span class="title truncate" :title="roll.title">
+							{{ roll.title }}
+						</span>
+						<span class="date">
+							{{ showTime(roll.date) }}
+						</span>
 					</h3>
 					<div class="result" @click="setShowRolls(i)">
 						<span class="roll">
@@ -81,12 +81,12 @@
 		margin: 0;
 
 		li {
-			border-bottom: solid 1px #5c5757;
+			border-bottom: solid 1px$gray-hover;
 			padding: 5px 0;
 
 			h3 {
 				padding: 0 8px;
-				background-color: #302f2f;
+				background-color:$gray-active;
 				margin: 0 !important;
 				font-size: 15px;
 				display: grid;
@@ -99,7 +99,7 @@
 			.result {
 				cursor: pointer;
 				padding: 5px 8px;
-				background-color: #191919;
+				background-color:$gray-dark;
 				font-size: 18px;
 				line-height: 35px;
 				display: grid;
@@ -120,7 +120,7 @@
 				}
 			}
 			.rolls {
-				background: #232323;
+				background: $gray-darker;
 				padding: 5px 8px;
 			}
 		}

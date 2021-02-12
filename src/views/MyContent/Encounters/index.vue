@@ -34,20 +34,32 @@
 					</a>
 				</h2>
 
-				<q-input 
+				<q-dialog 
 					v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')"
-					dark filled square dense
-					label="Encounter title"
-					type="text" 
-					autocomplete="off" 
-					v-model="newEncounter"
-					v-validate="'required'" 
-					data-vv-as="New Encounter"
-					name="newEncounter" 
+					v-model="add" 
+					square
 				>
-					<q-icon slot="append" class="pointer green" name="fas fa-plus" size="xs" @click="addEncounter()" />
-				</q-input>
-				<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+					<div>
+						<q-form @submit="addEncounter">
+							<hk-card header="New encounter" class="mb-0">
+								<q-input 
+									dark filled square
+									label="Encounter title"
+									type="text" 
+									autocomplete="off" 
+									v-model="newEncounter"
+									:rules="[ val => val && val.length > 0 || 'Enter a title']"
+								/>
+								<p class="validate red" v-if="add && errors.has('newEncounter')">{{ errors.first('newEncounter') }}</p>
+
+								<div slot="footer" class="card-footer d-flex justify-content-end">
+									<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
+									<q-btn color="primary" type="submit" label="Add encounter" />
+								</div>
+							</hk-card>
+						</q-form>
+					</div>
+				</q-dialog>
 
 				<OutOfSlots 
 					v-else-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
@@ -55,24 +67,26 @@
 				/>
 
 				<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
-					<h2>Create encounter</h2>
-					<q-input
-						dark filled square dense
-						label="Encounter title" 
-						type="text" 
-						autocomplete="off"
-						v-model="newEncounter" 
-						v-validate="'required'"
-						data-vv-as="Encounter Title" 
-						name="firstEncounter"
-					/>
-					<p class="validate red" v-if="errors.has('firstEncounter')">{{ errors.first('firstEncounter') }}</p>
-					
-					<button class="btn btn-lg bg-green btn-block my-4" @click="addEncounter()">Create encounter</button>
+					<q-form @submit="addEncounter">
+						<hk-card header="Create encounter">
+							<h2 class="mt-0">First encounter</h2>
+								<q-input
+									dark filled square
+									label="Encounter title" 
+									type="text" 
+									autocomplete="off"
+									v-model="newEncounter" 
+									:rules="[ val => val && val.length > 0 || 'Enter a title']"
+								/>
+								
+								<q-btn class="btn btn-lg bg-green btn-block mt-4" label="Create encounter" type="submit" />
+						</hk-card>
+					</q-form>
 				</div>
 
 				<!-- ACTIVE ENCOUNTERS -->
 				<hk-table
+					v-if="_active.length > 0"
 					class="mb-4"
 					:items="_active"
 					:columns="activeColumns"
@@ -289,6 +303,9 @@
 			}),
 			this.setCurHp();
 			this.removeGhostPlayers();
+			this.setActiveCampaign({ 
+				campaign_id: this.campaignId 
+			});
 		},
 		computed: {
 			...mapGetters([
@@ -349,28 +366,24 @@
 			...mapActions([
 				'fetchEncounters',
 				'fetchCampaign',
+				'setActiveCampaign',
 			]),
 			addEncounter() {
-				this.$validator.validateAll().then((result) => {
-					if (result && (Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
-						db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
-							encounter: this.newEncounter, 
-							round: 0, 
-							turn: 0, 
-							finished: false,
-							timestamp: Date.now()
-						});
-						this.newEncounter = '';
-						this.$snotify.success('Encounter added.', 'Critical hit!', {
-							position: "rightTop"
-						});
-						this.$validator.reset();
-						this.add = false;
-					} 
-					else {
-						//console.log('Not valid');
-					}
-				})
+				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
+						encounter: this.newEncounter, 
+						round: 0, 
+						turn: 0, 
+						finished: false,
+						timestamp: Date.now()
+					});
+					this.newEncounter = '';
+					this.$snotify.success('Encounter added.', 'Critical hit!', {
+						position: "rightTop"
+					});
+					this.$validator.reset();
+					this.add = false;
+				}
 			},
 			deleteEncounter(key, encounter) {
 				this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
@@ -508,7 +521,7 @@
 		padding: 20px;
 
 		&.bg-green {
-			color: #fff;
+			color:$white;
 			animation: blink normal 3s infinite ease-in-out;
 		}
 		h3 {

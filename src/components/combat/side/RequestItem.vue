@@ -267,7 +267,7 @@
 		a {
 			display: flex;
 			justify-content: space-between;
-			color: #b2b2b2 !important;
+			color: $gray-light !important;
 
 			i {
 				transition: transform .2s linear;
@@ -331,12 +331,12 @@
 						line-height: 28px;
 						top: 0;
 						left: 0;
-						color: #191919;
+						color:$gray-dark;
 					}
 
 					&.green, &.red, &.blue {
 						span {
-							color: #fff;
+							color:$white;
 						}
 					}
 

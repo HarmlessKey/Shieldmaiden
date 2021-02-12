@@ -1,5 +1,5 @@
 <template>
-	<div ref="encounter">
+	<div ref="encounter" v-if="initialized">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -84,6 +84,9 @@
 			</template>
 		</div>
 	</div>
+	<div v-else class="combat-wrapper" ref="encounter">
+		<hk-loader />
+	</div>
 </template>
 
 <script>
@@ -91,6 +94,8 @@
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 
+	import { audio } from '@/mixins/audio';
+	
 	import Finished from '@/components/combat/Finished.vue';
 	import DemoFinished from '@/components/combat/DemoFinished.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
@@ -125,14 +130,13 @@
 			OverEncumbered,
 			DemoOverlay
 		},
+		mixins: [ audio ],
 		data() {
-			// Dispatch route parameters to store
-
 			return {
-				userId: this.$store.getters.user.uid,
+				userId:  this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				demo: this.$route.name === "Demo",
 				target: undefined,
-				width: 0
+				width: 0,
 			}
 		},
 		firebase() {
@@ -147,6 +151,11 @@
 			if(this.$route.name !== "Demo") {
 				this.track()
 			}
+			this.init_Encounter({
+				cid: this.$route.params.campid, 
+				eid: this.$route.params.encid,
+				demo: this.demo
+			});
 		},
 		mounted() {
 			this.$nextTick(function() {
@@ -154,12 +163,24 @@
 				//Init
 				this.setSize();
 			});
-			this.init_Encounter({
-				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid,
-				demo: this.demo
-			});
 			this.track_Encounter(this.demo);
+
+			// Create notify if encounter has audio link
+			if (this.encounter.audio !== undefined) {
+				this.$q.notify({
+					message: 'Audio link found',
+					caption: 'Would you like to follow it?',
+					color: "blue-light",
+					position: "top",
+					progress: true,
+					timeout: 7500,
+					icon: this.audio_icons[this.audio_link_type].icon,
+					actions: [
+						{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
+						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
+					]
+				})
+			}
 		},
 		computed: {
 			...mapGetters([
@@ -224,10 +245,10 @@
 				if(this.encounter) {
 					return this.encounter.requests;
 				}
-			}
+			},
 		},
 		watch: {
-			alive(newVal, oldVal) {
+			alive(newVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
 				}
@@ -319,7 +340,7 @@
 .combat-wrapper {
 	background-size: cover !important;
 	background-position: center bottom !important;
-	background-color: #191919;
+	background-color:$gray-dark;
 	height: calc(100vh - 50px);
 
 	.finished {

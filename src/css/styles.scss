@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 /*
 	Table of content
@@ -16,57 +17,6 @@
 	9. Number field
 */
 
-/* 1. Variables */
-/*********************************************/
-$gray: #262626;
-$gray-darker: #232323;
-$gray-dark: #191919;
-$gray-light: #b2b2b2;
-$gray-hover: #5c5757;
-$gray-active: #302f2f;
-$black: #000;
-$white: #FFF;
-$green: #83b547;
-$green-hover: #6e993b;
-$blue: #2c97de;
-$blue-hover: #247db7;
-$facebook-blue: #3C5A99;
-$red: #cc3e4a;
-$red-hover: #a3303a;
-$patreon-red: #e85b46;
-$discord-purple: #7289DA;
-$orange: #e76d3b;
-$yellow: #c1b947;
-$purple: #9b7aba;
-$blue-light: #88b3ce;
-$green-light: #9ac16a;
-$orange-light: #db815e;
-$red-light: #c45e66;
-$yellow-light: #e2da5f;
-
-$copper: #e76d3b;
-$silver: #dbdbdb;
-$electrum: #a2bade;
-$gold: #e2da5f;
-$platinum: #fff;
-
-$header-height: 50px;
-
-//damage type colors
-$acid: #83b547;
-$bludgening: #6d6767;
-$cold: #3b93ce;
-$fire:  #e63f21;
-$force:  #772caa;
-$lightning:  #88b3ce;
-$necrotic:  #614c75;
-$piercing:  #6d6767;
-$poison:  #83b547;
-$psychic:  #e63f21;
-$radiant:  #e2da5f;
-$slashing:  #6d6767;
-$thunder:  #e63f21;
-
 /* 2. Defaults */
 /*********************************************/
 html body {
@@ -74,7 +24,7 @@ html body {
 	background: $gray-dark;
 	color: $gray-light;
 	font-size: 15px;
-	font-family: 'Raleway', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 	position: relative;
 	
 	.view {
@@ -88,8 +38,7 @@ html body {
 	header {
 		display: block;
 		height: $header-height;
-		line-height: 30px;
-		padding: 10px;
+		line-height: 50px;
 		width: 100%;
 		background: $black;
 		border-bottom:solid 1px transparent;
@@ -101,6 +50,28 @@ html body {
 		color: $gray-light;
 	}
 
+	.text-shadow {
+		text-shadow: 0 0 5px #000;
+		&-3 {
+			text-shadow: 0 0 3px #000;
+		}
+		&-4 {
+			text-shadow: 0 0 4px #000;
+		}
+		&-5 {
+			text-shadow: 0 0 5px #000;
+		}
+		&-6 {
+			text-shadow: 0 0 6px #000;
+		}
+		&-7 {
+			text-shadow: 0 0 7px #000;
+		}
+		&-8 {
+			text-shadow: 0 0 8px #000;
+		}
+	}
+
 /* 3. Heading */
 /*********************************************/
 	h1, h2, h3, h4, h5, h6 { 
@@ -108,9 +79,11 @@ html body {
 		margin: 0;  
 	}
 	h1 {
-		font-size: 22px;
+		font-family: 'Fredericka the Great', cursive;
+		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
+		color: $white;
 	}
 	h2 {
 		font-size: 20px;
@@ -127,29 +100,29 @@ html body {
 
 	/* 4. Classes */
 	/*********************************************/
-	.gray { color: $gray !important; }
-	.gray-light { color: $gray-light !important; }
-	.gray-darker { color: $gray-darker !important; }
-	.gray-dark { color: $gray-dark !important; }
-	.gray-hover { color: $gray-hover !important; }
-	.gray-active { color: $gray-active !important; }
-	.green { color: $green !important; }
-	.blue { color: $blue!important; }
-	.red { color: $red !important; }
-	.black { color: $black !important; }
-	.patreon-red { color: $patreon-red !important; }
-	.discord-purple { color: $discord-purple !important; }
-	.white { color: $white !important; }
-	.orange { color: $orange !important; }
-	.yellow { color: $yellow !important; }
-	.purple { color: $purple !important; }
-	.discord-purple { color: $discord-purple !important; }
-	.blue-light { color: $blue-light !important; }
-	.facebook-blue { color: $facebook-blue !important; }
-	.green-light { color: $green-light !important; }
-	.orange-light { color: $orange-light !important; }
-	.red-light { color: $red-light !important; }
-	.yellow-light { color: $yellow-light !important; }
+	.gray { color: $gray !important; path { fill: $gray !important;} }
+	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
+	.gray-darker { color: $gray-darker !important; path { fill: $gray-darker !important;} }
+	.gray-dark { color: $gray-dark !important; path { fill: $gray-dark !important;} }
+	.gray-hover { color: $gray-hover !important; path { fill: $gray-hover !important;} }
+	.gray-active { color: $gray-active !important; path { fill: $gray-active !important;} }
+	.green { color: $green !important; path { fill: $green !important;} }
+	.blue { color: $blue!important; path { fill: $blue!important;} }
+	.red { color: $red !important; path { fill: $red !important;} }
+	.black { color: $black !important; path { fill: $black !important;} }
+	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
+	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
+	.white { color: $white !important; path { fill: $white !important;} }
+	.orange { color: $orange !important; path { fill: $orange !important;} }
+	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
+	.purple { color: $purple !important; path { fill: $purple !important;} }
+	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
+	.blue-light { color: $blue-light !important; path { fill: $blue-light !important;} }
+	.facebook-blue { color: $facebook-blue !important; path { fill: $facebook-blue !important;} }
+	.green-light { color: $green-light !important; path { fill: $green-light !important;} }
+	.orange-light { color: $orange-light !important; path { fill: $orange-light !important;} }
+	.red-light { color: $red-light !important; path { fill: $red-light !important;} }
+	.yellow-light { color: $yellow-light !important; path { fill: $yellow-light !important;} }
 
 	.copper { color: $copper !important; fill: $copper !important; }
 	.silver { color: $silver !important; fill: $silver !important; }
@@ -179,19 +152,20 @@ html body {
 	.bg-yellow-light { background-color: $yellow-light !important; }
 
 
-	.Acid { color: $acid; }
-	.Bludgening { color: $bludgening; }
-	.Cold { color: $cold; }
-	.Fire { color: $fire; }
-	.Force{ color: $force; }
-	.Lightning { color: $lightning; }
-	.Necrotic { color: $necrotic; }
-	.Piercing { color: $piercing; }
-	.Poison { color: $poison; }
-	.Psychic { color: $psychic; }
-	.Radiant { color: $radiant; }
-	.Slashing { color: $slashing; }
-	.Thunder { color: $thunder; }
+	.healing { color: $green; }
+	.acid { color: $acid; }
+	.bludgeoning { color: $bludgening; }
+	.cold { color: $cold; }
+	.fire { color: $fire; }
+	.force{ color: $force; }
+	.lightning { color: $lightning; }
+	.necrotic { color: $necrotic; }
+	.piercing { color: $piercing; }
+	.poison { color: $poison; }
+	.psychic { color: $psychic; }
+	.radiant { color: $radiant; }
+	.slashing { color: $slashing; }
+	.thunder { color: $thunder; }
 
 	//MARGINGS
 	.m {
@@ -372,6 +346,9 @@ html body {
 		&-block {
 			display: block;
 		}
+		&-table-cell {
+			display: table-cell;
+		}
 		&-inline {
 			display: inline;
 
@@ -396,6 +373,16 @@ html body {
 		&-end {
 			justify-content: flex-end;
 		}
+	}
+
+	.offline {
+		position: fixed;
+		top: 50px;
+		width: 100%;
+		background: $red;
+		color: $white;
+		z-index: 99;
+		text-align: center;
 	}
 	
 	.disabled {
@@ -561,6 +548,7 @@ html body {
 	}
 
 	.live {
+		font-family: 'Open Sans', sans-serif;
 		user-select: none;
 		display: inline-block;
 		color: $white;
@@ -568,7 +556,6 @@ html body {
 		padding: 5px 10px;
 		font-size: 12px;
 		border-radius: 10px;
-		min-width: 65px;
 		max-height: 25px;
 		line-height: normal;
 		text-transform: uppercase;
@@ -821,6 +808,7 @@ html body {
 		list-style: none;
 		padding: 0 0 15px 0;
 		border-bottom: solid 1px $gray-active;
+		margin-top: 0;
 
 		li {
 			margin-right: 10px;
@@ -870,6 +858,12 @@ html body {
 		.accordion {
 			.q-item {
 				background-color: $gray-dark;
+			}
+		}
+
+		.hk-card {
+			.card-header {
+				background-color: rgba(0, 0, 0, .3);
 			}
 		}
 	}
@@ -1124,6 +1118,7 @@ html body {
 		}
 		.ac_wrapper {
 			position: relative;
+			cursor: pointer;
 	
 			i, .ac {
 				position: absolute;
@@ -1191,6 +1186,7 @@ html body {
 	
 			.hp {
 				text-align: right;
+				cursor: pointer;
 				
 				.current {
 					font-size: 18px;
@@ -1310,6 +1306,12 @@ html body {
 			li {
 				padding-left: 0;
 				grid-template-columns: 55px auto max-content;
+
+				.overview-item {
+					display: grid;
+					grid-template-columns: auto 20px;
+					grid-gap: 5px;
+				}	
 			}
 		}
 	}
@@ -1335,6 +1337,7 @@ html body {
 		}
 	}
 
+	// Q-INPUT FIELDS
 	.manual-input {
 		height: 90px;
 		font-size:50px;
@@ -1348,6 +1351,16 @@ html body {
 				input {
 					text-align: center;
 				}
+			}
+		}
+	}
+
+	.player-initiative {
+		.q-field__control {
+			padding: 0;
+
+			input {
+				padding-left: 12px;
 			}
 		}
 	}
@@ -1639,7 +1652,7 @@ html body {
 	}
 
 
-	/* QUALSAR */
+	/* QUASAR */
 	/*********************************************/
 	.q-pagination {
 		justify-content: center;
@@ -1720,6 +1733,9 @@ html body {
 			&-block {
 				display: block !important;
 			}
+			&-table-cell {
+				display: table-cell !important;
+			}
 			&-inline {
 				display: inline !important;
 	
@@ -1744,6 +1760,9 @@ html body {
 			}
 			&-block {
 				display: block !important;
+			}
+			&-table-cell {
+				display: table-cell !important;
 			}
 			&-inline {
 				display: inline !important;
@@ -1770,6 +1789,9 @@ html body {
 			&-block {
 				display: block !important;
 			}
+			&-table-cell {
+				display: table-cell !important;
+			}
 			&-inline {
 				display: inline !important;
 	
@@ -1794,6 +1816,9 @@ html body {
 			}
 			&-block {
 				display: block !important;
+			}
+			&-table-cell {
+				display: table-cell !important;
 			}
 			&-inline {
 				display: inline !important;

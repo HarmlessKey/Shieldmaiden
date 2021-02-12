@@ -8,7 +8,10 @@
 				</span>
 			</div>
 
-			<img class="image" src="@/assets/_img/home/encounter-builder.gif"/>
+			<video 
+				class="video" src="@/assets/_img/home/encounter-builder.mp4" 
+				muted autoplay playsinline alt="Harmless Key logo animation" loop
+			/>
 
 			<div class="text-center">
 				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
@@ -36,7 +39,7 @@
 		.head {
 			padding-bottom: 30px;
 		}
-		.image {
+		.video {
 			width: 100%;
 			margin-bottom: 30px;
 		}

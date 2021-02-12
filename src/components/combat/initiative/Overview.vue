@@ -3,6 +3,11 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
 				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
+				<icon 
+					v-else-if="entity.reminders.surprised" 
+					class="img pointer orange"
+					icon="surprised" 
+				/>
 				<template v-else>
 					<icon 
 						v-if="['monster', 'player', 'companion'].includes(entity.img)" 
@@ -18,11 +23,29 @@
 						}"
 					/>
 				</template>
-				<div class="d-flex justify-content-between">
-					{{ entity.name }}
-					<b class="blue">{{ entity.initiative }}</b>
+				<div class="overview-item">
+					<div class="name truncate">{{ entity.name }}</div>
+					<b class="blue initiative">{{ entity.initiative }}</b>
 				</div>
 				<div class="actions">
+					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
+					<!-- <a v-if="!entity.conditions.surprised" class="pointer" @click="set_condition({action:'add', key: entity.key, condition:'surprised'})"> -->
+					<a v-if="!entity.reminders.surprised" class="pointer" @click="setSurprised(entity.key, true)">
+						
+						<icon icon="surprised" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Set surprised
+						</q-tooltip>
+					</a>
+					<!-- <a v-else class="pointer" @click="set_condition({action:'remove', key: entity.key, condition:'surprised'})"> -->
+					<a v-else class="pointer" @click="setSurprised(entity.key, false)">
+
+						<icon icon="character" class="icon"/>
+						<q-tooltip anchor="top middle" self="center middle">
+							Remove surprised
+						</q-tooltip>
+					</a>
+					<!-- Hide / Unhide Entity -->
 					<a v-if="!entity.hidden" class="pointer" @click="set_hidden({key: entity.key, hidden: true})">
 						<i class="fas fa-eye-slash"></i>
 						<q-tooltip anchor="top middle" self="center middle">
@@ -52,18 +75,18 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in idle" v-bind:key="entity.key">
 				<icon 
-						v-if="['monster', 'player', 'companion'].includes(entity.img)" 
-						class="img pointer" 
-						:icon="entity.img" 
-						:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-					/>
-					<span 
-						v-else class="img pointer" 
-						:style="{
-							'background-image': 'url(' + entity.img + ')',
-							'border-color': entity.color_label ? entity.color_label : ``
-						}"
-					/>
+					v-if="['monster', 'player', 'companion'].includes(entity.img)" 
+					class="img pointer" 
+					:icon="entity.img" 
+					:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+				/>
+				<span 
+					v-else class="img pointer" 
+					:style="{
+						'background-image': 'url(' + entity.img + ')',
+						'border-color': entity.color_label ? entity.color_label : ``
+					}"
+				/>
 				<span class="d-flex justify-content-between">
 					{{ entity.name }}
 					<span>{{ entity.initiative }}</span>
@@ -84,10 +107,11 @@
 <script>
 	import { mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
+	import { remindersMixin } from '@/mixins/reminders';
 
 	export default {
 		name: 'SetInitiativeNPC',
-		mixins: [general],
+		mixins: [general, remindersMixin],
 		props: ['active', 'idle'],
 		data () {
 			return {
@@ -98,69 +122,42 @@
 			...mapActions([
 				'set_active',
 				'set_hidden',
-				'set_initiative'
+				'set_initiative',
+				'set_condition',
+				'set_targetReminder',
 			]),
+			setSurprised(entity_key, value) {
+				const reminder = this.premade.surprised;
+				delete reminder['.key'];
+				let action = value ? 'add' : 'remove';
+
+				this.set_targetReminder({
+					action: action,
+					entity: entity_key,
+					key: 'surprised',
+					reminder: reminder,
+					type: 'premade',
+				})
+			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
 #container {
-	padding:10px;
-	width: 100vw;
-	height: calc(100% - 50px);
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
-	grid-template-rows: 60px auto;
-	grid-gap: 10px;
-	grid-template-areas: 
-	"turns turns turns"
-	"players npcs set";
-	position: absolute;
-
-	.q-scrollarea{
-		padding:0 0 15px 0;
-		height: calc(100% - 45px);
-	}
-	
-	h2 {
-		padding-left: 10px;
-
-		&.componentHeader {
-			padding: 10px 15px !important;
-			margin-bottom: 0 !important;
-
-			&.shadow {
-				box-shadow: 0 0 10px rgba(0,0,0,0.9); 
-			}
-		}
-	}
-	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .9);
-		overflow: hidden;
-	}
-	.players {
-		grid-area: players;
-	}
-	.npcs {
-		grid-area: npcs;
-	}
-	.set {
-		grid-area: set;
-	}
 	ul.entities {
 		padding:0 15px 0 10px;
 
 		li {
 			border: solid 1px transparent;
-			background: #191919;
+			background:$gray-dark;
 
 			&:hover {
 				background: #141414 !important;
 			}
 
 			&.selected {
-				border-color: #2c97de;
+				border-color: $blue;
 			}
 			.img {
 				font-size: 20px;
@@ -170,22 +167,18 @@
 		}
 	}
 }
+
+// css for surprised icon
+.actions {
+	i, svg.icon {
+		vertical-align: middle;
+	}
+	svg.icon {
+		width: 20px;
+	}
+}
+
 .initiative-move {
   transition: transform .5s;
-}
-@media only screen and (max-width: 600px) {
-	#container {
-		grid-template-columns: auto;
-		grid-template-rows: 60px 1fr 1fr 1fr;
-		grid-gap: 10px;
-		grid-template-areas:
-		"turns"
-		"players"
-		"npcs"
-		"set";
-	}
-	.players, .npcs, .set, .q-scrollarea {
-		overflow: visible !important;
-	}
 }
 </style>

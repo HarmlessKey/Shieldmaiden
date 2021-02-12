@@ -179,7 +179,7 @@
 				width: 100% !important;
 				&:hover, &.active {
 					background: none;
-					color: #2c97de !important;
+					color: $blue !important;
 				}
 			}
 		}

@@ -4,7 +4,7 @@
 
 			<div class="d-flex justify-content-between">
 				<span><i class="fas fa-crosshairs"></i> Targeted</span>
-				<a v-if="targeted.length > 0" @click="set_targeted({e: 'untarget', key: 'all'})">
+				<a v-if="targeted.length > 0" @click="set_targeted({type: 'untarget', key: 'all'})">
 					<i class="fas fa-times red"></i>
 					<q-tooltip anchor="top middle" self="center middle">
 						Untarget all
@@ -14,22 +14,22 @@
 
 			<!-- SINGLE TARGET OPTIONS -->
 			<div class="options d-flex justify-content-between" v-if="target">
-				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })"
-					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: target })">
+				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing' })"
+					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing' })">
 					<span class="icon"><i class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[d] Do damage / healing
 					</q-tooltip>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
-					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})">
+				<a @click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
+					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})">
 					<span class="icon"><i class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[c] Conditions
 					</q-tooltip>
 				</a>
-				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
-					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted })"
+				<a @click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
+					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 				>
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
@@ -41,11 +41,23 @@
 				>
 					<span class="icon"><i class="fas fa-paw-claws"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
-						[t] transform
+						[t] Transform
+					</q-tooltip>
+				</a>
+
+				<a @click="setHidden()"
+					v-shortkey="['h']" @shortkey="setHidden()"
+				>
+					<span class="icon"><i class="fas fa-eye"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[h] Hide
 					</q-tooltip>
 				</a>
 				
-				<a @click="edit(target.key, target.entityType)">
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
+					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
+				>
 					<span class="icon"><i class="fas fa-pencil"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[e] Edit
@@ -55,8 +67,8 @@
 
 			<!-- MULTITARGET OPTIONS -->
 			<div class="options d-flex justify-content-between" v-else-if="targeted.length > 0">
-				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
-					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing', data: targeted})"
+				<a @click="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
+					v-shortkey="['d']" @shortkey="setSlide({show: true, type: 'slides/encounter/DamageHealing'})"
 				>
 					<span class="icon"><i class="fas fa-swords"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
@@ -64,8 +76,8 @@
 					</q-tooltip>
 				</a>
 				<a 
-					@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
-					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions', data: targeted})"
+					@click="setSlide({show: true, type: 'slides/encounter/Conditions'})"
+					v-shortkey="['c']" @shortkey="setSlide({show: true, type: 'slides/encounter/Conditions'})"
 				>
 					<span class="icon"><i class="fas fa-flame"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
@@ -73,12 +85,31 @@
 					</q-tooltip>
 				</a>
 				<a 
-					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
-					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: targeted})"
+					@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
+					v-shortkey="['m']" @shortkey="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders'})"
 				>
 					<span class="icon"><i class="fas fa-stopwatch"></i></span>
 					<q-tooltip anchor="top middle" self="center middle">
 						[m] Reminders
+					</q-tooltip>
+				</a>
+
+				<a @click="setHidden()"
+					v-shortkey="['h']" @shortkey="setHidden()"
+				>
+					<span class="icon"><i class="fas fa-eye"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[h] Hide
+					</q-tooltip>
+				</a>
+
+				<a 
+					@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })" 
+					v-shortkey="['e']" @shortkey="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
+				>
+					<span class="icon"><i class="fas fa-pencil"></i></span>
+					<q-tooltip anchor="top middle" self="center middle">
+						[e] Edit
 					</q-tooltip>
 				</a>
 			</div>
@@ -95,7 +126,7 @@
 					<div v-for="key in targeted" :key="`target-${key}`" class="target">
 						<div class="health">
 							<TargetItem :item="key" />
-							<a class="clear bg-gray-dark" @click="set_targeted({e: 'untarget', key})">
+							<a class="clear bg-gray-dark" @click="set_targeted({type: 'untarget', key})">
 								<i class="fas fa-times red"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Untarget
@@ -223,7 +254,8 @@
 				'set_save',
 				'set_dead',
 				'set_stable',
-				'set_targetReminder'
+				'set_targetReminder',
+				'set_hidden'
 			]),
 			showCondition(show) {
 				event.stopPropagation();
@@ -257,6 +289,14 @@
 						location: 'encounter'
 					}
 				})
+			},
+			setHidden() {
+				for(const key of this.targeted) {
+					this.set_hidden({
+						key,
+						hidden: !this.entities[key].hidden
+					});
+				}
 			},
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100)
@@ -349,7 +389,7 @@
 		grid-template-columns: 1fr 35px;
 		grid-template-rows: 35px;
 		grid-gap: 0;
-		background: #191919;
+		background:$gray-dark;
 
 		.clear {
 			display: block;
@@ -362,7 +402,7 @@
 	}
 	.target {
 		margin-bottom: 10px;
-		border: solid 1px #191919;
+		border: solid 1px$gray-dark;
 		
 		.scores {
 			width: 100%;
@@ -384,12 +424,12 @@
 					margin-top: 1px;
 				}
 				.advantage .mod:hover {
-					color: #fff;
-					background-color: #83b547 !important;
+					color:$white;
+					background-color: $green !important;
 				}
 				.disadvantage .mod:hover {
-					color: #fff;
-					background-color: #cc3e4a !important;
+					color:$white;
+					background-color:$red !important;
 				}
 			}
 		}
@@ -398,18 +438,18 @@
 		margin: 20px -3px 0 -3px;
 
 		a {
-			background-color: #b2b2b2;
+			background-color: $gray-light;
 			margin: 0 3px;
 			display: block;
 			width: 100%;
 			text-align: center;
-			color: #191919 !important;
+			color:$gray-dark !important;
 			line-height: 35px;
 			font-size: 15px;
 
 			&:hover {
-				background: #5c5757;
-				color: #fff !important;
+				background:$gray-hover;
+				color:$white !important;
 			}
 		}
 	}
@@ -427,9 +467,9 @@
 			height: 30px;
 			line-height: 26px;
 			text-align: center;
-			fill: #cc3e4a;
-			color: #cc3e4a;
-			background-color: #302f2f;
+			fill:$red;
+			color:$red;
+			background-color:$gray-active;
 			padding: 2px;
 			cursor: pointer;
 		}

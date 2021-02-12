@@ -437,7 +437,7 @@
 
 <style lang="scss" scoped>
 	.group-actions {
-		border-bottom: solid 2px #b2b2b2;
+		border-bottom: solid 2px $gray-light;
 		height: 35px;
 		line-height: 35px;
 		display: grid;
@@ -472,10 +472,10 @@
 
 			a {
 				margin-left: 10px;
-				color: #fff !important;
+				color:$white !important;
 
 				&:hover {
-					color: #2c97de !important;
+					color: $blue !important;
 				}
 			}
 		}
@@ -493,23 +493,23 @@
 			background-size: cover;
 			background-position: top center;
 			background-color: black;
-			border: solid 1px #b2b2b2;
+			border: solid 1px $gray-light;
 			position: relative;
 
 			.transformed {
 				right: 0;
 				bottom: 0;
 				position: absolute;
-				background: #000;
+				background:$black;
 				padding: 0 2px;
-				border-left: solid 1px #b2b2b2;
-				border-top: solid 1px #b2b2b2;
+				border-left: solid 1px $gray-light;
+				border-top: solid 1px $gray-light;
 			}
 		}
 		.col {
 			min-height: 35px;
 			padding: 12px 10px;
-			background-color: #262626;
+			background-color:$gray;
 
 			&.header {
 				background: none;
@@ -534,7 +534,7 @@
 				padding: 9px 12px;
 
 				a {
-					color: #b2b2b2 !important;
+					color: $gray-light !important;
 					width: 28px;
 					height: 28px;
 					display: block;
@@ -544,7 +544,7 @@
 
 					&:hover {
 						text-decoration: none;
-						background-color: #302f2f;
+						background-color:$gray-active;
 					}
 				}
 			}

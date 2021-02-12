@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3 class="mt-3">DM Rolls</h3>
+		<h3 class="mt-3 white text-shadow">DM Rolls</h3>
 		<ul class="rolls">
 			<li v-for="(roll, index) in rolls" :key="`roll-${index}`">
 				<div class="targets">
@@ -69,8 +69,6 @@
 
 <style lang="scss" scoped>
 	h3 {
-		text-shadow: 0 0 8px #000;
-		color: #fff;
 		margin-bottom: 6px !important;
 	}
 	ul.rolls {
@@ -87,7 +85,7 @@
 				margin-bottom: 10px;
 
 				.target {
-					background: #191919;
+					background:$gray-dark;
 					display: grid;
 					grid-template-columns: 30px 1fr;
 					font-size: 15px;
@@ -117,7 +115,7 @@
 					width: 100%;
 
 					div.roll {
-						border: solid 1px #5c5757;
+						border: solid 1px$gray-hover;
 						text-align: center;
 						padding: 5px 0;
 						flex-direction: column;
@@ -139,7 +137,7 @@
 						}
 						.advantage {
 							position: absolute;
-							background: #191919;
+							background:$gray-dark;
 							padding: 0 10px;
 							top: -5px;
 							left: 50%;

@@ -9,18 +9,18 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
 	state: {
-		user: {}
+		user: undefined
 	},
 	getters: {
 		user: function( state ) { return state.user; },
 	},
 	actions: {
 		setUser({ commit }) {
-			commit('SET_USER');
+			commit('SET_USER', auth.currentUser);
 		}
 	},
 	mutations: {
-		SET_USER(state) { state.user = auth.currentUser; },
+		SET_USER(state, payload) { state.user = payload; },
 	},
 	modules: {
 		general: general_module,

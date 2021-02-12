@@ -12,21 +12,20 @@
 		<q-tabs
 			v-else
 			dark
-			inline-label
 			no-caps
 			indicator-color="transparent"
 		>
 			<q-tab 
-				v-for="({name, icon}, index) in tabs"
+				v-for="({name, icon, slide}, index) in tabs"
 				:key="`tab-${index}`" 
 				:name="name" 
 				:icon="icon"
 				@click="
-					(name === 'info') ? 
+					(slide) ? 
 					setSlide({
 						show: true,
-						type: 'combat/TargetInfo',
-						data: { key: targeted[0] }
+						type: slide.type,
+						data: slide.data
 					}) : dialog[name] = !dialog[name]"
 			/>
 		</q-tabs>
@@ -59,14 +58,14 @@
 					<q-item 
 						v-if="targeted.length === 1"
 						clickable v-close-popup 
-						@click="edit(entities[targeted[0]].key, entities[targeted[0]], entities[targeted[0]].entityType)"
+						@click="setSlide({show: true, type: 'slides/encounter/EditEntity' })"
 					>
 						<q-item-section avatar><i class="fas fa-pencil"></i></q-item-section>
 						<q-item-section>Edit</q-item-section>
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
-						@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders', data: entities[targeted[0]].key})"
+						@click="setSlide({show: true, type: 'slides/encounter/reminders/TargetReminders' })"
 					>
 						<q-item-section avatar><i class="fas fa-stopwatch"></i></q-item-section>
 						<q-item-section>Reminders</q-item-section>
@@ -89,7 +88,7 @@
 					</q-item>
 					<q-item 
 						clickable v-close-popup 
-						@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entity})"
+						@click="setSlide({show: true, type: 'slides/encounter/Conditions', data: entities[targeted[0]]})"
 					>
 						<q-item-section avatar><i class="fas fa-flame"></i></q-item-section>
 						<q-item-section>Conditions</q-item-section>
@@ -115,13 +114,15 @@
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import Manual from '@/components/combat/actions/Manual.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import TargetMenu from '@/components/combat/TargetMenu.vue';
 
 	export default {
 		name: 'Menu',
 		components: {
 			Actions,
 			Manual,
-			Roll
+			Roll,
+			TargetMenu,
 		},
 		props: ["entities", "settings", "current"],
 		data () {
@@ -140,20 +141,35 @@
 				let tabs = [];
 
 				if(this.targeted.length) {
-
 					tabs.push({
 						name: "damage",
+						label: "Actions",
 						icon: "fas fa-swords",
 					},
 					{
+						name: "edit",
+						label: "Edit",
+						icon: "fas fa-pencil-alt",
+						slide: {
+							type: 'slides/encounter/EditEntity',
+							data: {}
+						}
+					},
+					{
 						name: "options",
+						label: "Options",
 						icon: "fas fa-ellipsis-h"
 					})
 				}
 				if(this.targeted.length === 1) {
 					tabs.push(	{
 						name: "info",
-						icon: "info"
+						label: "Info",
+						icon: "info",
+						slide: {
+							type: 'combat/TargetInfo',
+							data: { key: this.targeted[0] }
+						}
 					});
 				}
 				if(this.targeted.length)
@@ -169,39 +185,10 @@
 			remove(key, name) {
 				this.$snotify.error('Are you sure you want to remove "' + name + '" from this encounter?', 'Delete character', {
 					buttons: [
-					{ text: 'Yes', action: (toast) => { this.remove_entity({key: key}); this.dialog.options = false, this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Yes', action: (toast) => { this.remove_entity(key); this.dialog.options = false, this.$snotify.remove(toast.id); }, bold: false},
 					{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
-			},
-			edit(key, entity, entityType) {
-				let editType = undefined;
-				switch(entityType) {
-					case 'player':
-						editType = 'slides/EditPlayer';
-						break;
-					case 'companion':
-						editType = 'slides/encounter/EditCompanion';
-						break;
-					case 'npc':
-						editType = 'slides/encounter/EditNpc';
-						break;
-				}
-
-				if(key) {
-					this.setSlide({
-						show: true,
-						type: editType,
-						data: {
-							key: key,
-							location: 'encounter'
-						}
-					})
-				}
-				else {
-					this.$snotify.error('Select a target', 'Edit entity', {
-					});
-				}
 			},
 			setHidden(key, hidden) {
 				if(key) {

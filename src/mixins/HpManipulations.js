@@ -7,7 +7,7 @@ export const setHP = {
 	data() {
 		return {
 			demo: this.$route.name === "Demo",
-			userId: this.$store.getters.user.uid,
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			campaignId: this.$route.params.campid,
 		}
 	},
@@ -135,10 +135,9 @@ export const setHP = {
 					newHp: newhp,
 				})
 
-				//Check if a reminder is triggered on damage taken
-				this.checkReminders(target, 'damage');
-				
 			}
+			//Check if a reminder is triggered on damage taken
+			this.checkReminders(target, 'damage');
 
 			//Notification
 			if(notify) {

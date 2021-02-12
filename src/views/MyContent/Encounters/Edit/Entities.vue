@@ -14,7 +14,7 @@
 					<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
 				</template>
 			</div>
-			<q-tooltip anchor="top middle" self="center middle">
+			<q-tooltip v-if="checkPlayer(key)" anchor="top middle" self="center middle">
 				Add {{ players[key].character_name }}
 			</q-tooltip>
 		</div>
@@ -345,7 +345,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		background-size: cover;
 		background-position: center top;
 		margin-right: 5px;
-		background-color: #302f2f;
+		background-color:$gray-active;
 		cursor: pointer;
 	}
 }

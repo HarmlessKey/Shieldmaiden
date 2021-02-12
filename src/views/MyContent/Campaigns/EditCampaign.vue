@@ -217,6 +217,12 @@
 				})
 			},
 			addPlayer(id) {
+				// Make sure the player has XP if advancement is experience
+				if(this.campaign.advancement === "experience" && this.players[id].experience === undefined) {
+					db.ref(`players/${this.user.uid}/${id}/experience`).set(0);
+				}
+
+				// Set the current HP
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
 					curHp: this.players[id].maxHp
 				});
@@ -289,7 +295,7 @@
 		text-align: center;
 
 		.img {
-			border: solid 1px #b2b2b2;
+			border: solid 1px $gray-light;
 			display: block;
 			width: 56px;
 			height: 56px;

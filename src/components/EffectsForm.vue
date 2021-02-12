@@ -347,7 +347,7 @@ export default {
 
 <style scoped lang="scss">
 .component_box {
-	background: #000;
+	background:$black;
 	width: 40px;
 	text-align: center;
 	line-height: 36px;
@@ -358,6 +358,6 @@ export default {
 	}
 }
 .component_box.selected {
-	background: #2c97de;
+	background: $blue;
 }
 </style>

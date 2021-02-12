@@ -8,12 +8,14 @@
 				</span>
 			</div>
 
-			<div class="row q-col-gutter-md">
-				<div class="col-12 col-md-6">
-					<img class="image" src="@/assets/_img/home/multitargeting.gif"/>
-					<!-- <iframe src="https://www.youtube.com/embed/2Xzs94mVCww" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+			<div class="row q-col-gutter-xl">
+				<div class="col-12 col-md-8">
+					<video 
+						class="video" src="@/assets/_img/home/multitargeting.mp4" 
+						muted autoplay playsinline alt="Initiative tracker Harmless Key multitargeting demo" loop
+					/>
 				</div>
-				<div class="col-12 col-md-6">
+				<div class="col-12 col-md-4">
 					<h3>We track everything in combat</h3>
 					
 					<ul>
@@ -47,7 +49,7 @@
 	.general {
 		padding-bottom: 170px;
 		min-height: calc(100vh - 50px - 55px);
-		background-color: #232323;
+		background-color: $gray-darker;
 
 		ul {
 			margin-bottom: 30px;
@@ -58,7 +60,7 @@
 			height: 300px;
 			margin-bottom: 30px;
 		}
-		img {
+		video {
 			width: 100%;
 			margin-bottom: 30px;
 		}

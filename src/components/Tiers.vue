@@ -7,7 +7,6 @@
 				<i v-else class="gray-hover sub">per month</i>
 				<ul>
 					<li v-for="(benefit, key) in t.benefits" :key="key">
-						<template v-if="key == 'ads'">Ads are removed</template>
 						<template v-if="key == 'campaigns'">
 							<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
 							<span v-else class="green">{{ benefit }}</span> Campaign slots
@@ -35,7 +34,7 @@
 					</li>
 				</ul>
 				<div slot="footer" v-if="t.price != 'Free'">
-					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" class="btn btn-block bg-patreon-red">Join {{ t.price }} tier</a>
+					<a :href="'https://www.patreon.com/join/harmlesskey/checkout?rid='+t['.key']" target="_blank" rel="noopener" class="btn btn-block bg-patreon-red">Join {{ t.price }} tier</a>
 				</div>
 			</hk-card>
 		</hk-card-deck>
@@ -72,10 +71,10 @@
 <style lang="scss" scoped>
 	.card {
 			border: solid 1px transparent !important;
-			background: #232323 !important;
+			background: $gray-darker !important;
 				
 			&.current {
-				border-color: #e85b46 !important;
+				border-color: $patreon-red !important;
 			}
 			h2 {
 				margin-bottom: 0 !important;

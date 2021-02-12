@@ -165,7 +165,7 @@
 												dark filled square
 												label="Range"
 												v-model="ability.range"
-												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)$/g)) || 'Allowed format: 20/60']"
+												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 20 or 20/60']"
 												suffix="ft."
 												@keyup="$forceUpdate()"
 											/>

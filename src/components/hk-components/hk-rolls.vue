@@ -124,7 +124,7 @@
 										</div>
 									</q-item-section>
 									<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
-										<b>{{ totalDamage(action, rolled) }}</b>
+										<b>{{ totalActionDamage(action, rolled) }}</b>
 									</q-item-section>
 								</template>
 								<div class="accordion-body">
@@ -160,7 +160,7 @@
 									<span v-if="resistances[rolled.damage_type] === 'v'"> * 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'r'"> / 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'i'"> no effect</span>
-									<span> = <b :class="rolled.damage_type">{{ totalDamage(action, rolled) }}</b></span>
+									<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled) }}</b></span>
 									</div>
 								</div>
 							</q-expansion-item>
@@ -188,7 +188,12 @@
 							</div>
 						</div> -->
 
-						<h3 class="mt-3">Final result: </h3>
+						<div class="total-damage">
+							<div>Total</div>
+							<div class="total">
+								{{ totalDamage() }}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -237,7 +242,7 @@ export default {
 			const color = (type === "A") ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
 		},
-		totalDamage(action, rolls) {
+		totalActionDamage(action, rolls) {
 			let total = parseInt(rolls.modifierRoll.total);
 
 			if(rolls.scaledRoll) {
@@ -257,6 +262,17 @@ export default {
 			}
 			if(this.resistances[rolls.damage_type] === 'i') {
 				total = 0;
+			}
+			return total;
+		},
+		totalDamage() {
+			let total = 0;
+			for(const roll of this.action_rolls) {
+				for(const action of roll.actions) {
+					for(const rolled of action.rolls) {
+						total = total + this.totalActionDamage(action, rolled);
+					}
+				}
 			}
 			return total;
 		},
@@ -300,8 +316,6 @@ export default {
 		border: solid 1px $gray-darker;
 		margin-bottom: 15px;
 
-		
-
 		.body {
 			padding: 15px;
 
@@ -324,9 +338,23 @@ export default {
 				font-size: 18px;
 				margin-bottom: 10px;
 				line-height: 30px;
+				padding: 0 5px;
 
 				.total {
 					font-size: 25px;
+					font-weight: bold;
+				}
+			}
+			.total-damage {
+				display: flex;
+				justify-content: space-between;
+				font-size: 20px;
+				margin-top: 10px;
+				line-height: 30px;
+				padding: 0 5px;
+
+				.total {
+					font-size: 28px;
 					font-weight: bold;
 				}
 			}

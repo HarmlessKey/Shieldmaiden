@@ -236,13 +236,37 @@
 					</p>
 	
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
-						<hk-roll 
-							v-if="ability.action_list && ability.action_list[0].type !== 'other'"
-							:tooltip="`Roll ${ability.name}`" 
-							@roll="roll($event, ability)"
-						>
-							<span class="roll-button" />
-						</hk-roll>
+						<template v-if="ability.action_list && ability.action_list[0].type !== 'other'">
+							<span v-if="ability.versatile" class="roll-button" @click.stop>
+								<q-popup-proxy square dark>
+									<q-list dark square>
+										<q-item clickable v-close-popup>
+											<q-item-section avatar>1</q-item-section>
+											<q-item-section>
+												<hk-roll @roll="roll($event, ability, 0)">
+													{{ ability.versatile_one || 'Option 1' }}
+												</hk-roll>
+											</q-item-section>
+										</q-item>
+										<q-item clickable v-close-popup>
+											<q-item-section avatar>2</q-item-section>
+											<q-item-section>
+												<hk-roll @roll="roll($event, ability, 1)">
+													{{ ability.versatile_two || 'Option 2' }}
+												</hk-roll>
+											</q-item-section>
+										</q-item>
+									</q-list>
+								</q-popup-proxy>
+							</span>
+							<hk-roll 
+								v-else
+								:tooltip="`Roll ${ability.name}`" 
+								@roll="roll($event, ability)"
+							>
+								<span class="roll-button" />
+							</hk-roll>
+						</template>
 						<b><i>
 							{{ ability.name }}
 							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
@@ -327,8 +351,12 @@
 				//sets new width on resize
 				this.width = this.$refs.entity.clientWidth;
 			},	
-			roll(e, action) {
-				this.setActionRoll(this.rollAction(e, action));
+			roll(e, action, versatile) {
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+				this.setActionRoll(this.rollAction(e, action, config));
 			},
 			passivePerception() {
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));

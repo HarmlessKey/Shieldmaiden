@@ -115,12 +115,27 @@ export const dice = {
 		rollD100(n=1,m=0) {
 			return this.rollD(100,n,m)
 		},
-		rollAction(e, ability, castLevel, casterLevel, toHitModifier) {
+		/**
+		 * Roll any spell or monster action
+		 * 
+		 * @param {object} e Event, holds info for advantage/disadvantege
+		 * @param {object} ability Full ability object
+		 * @param {object} config Holds configuration options {type, castLevel, casterLevel, toHitModifier, versatile}
+		 */
+		rollAction(e, ability, config={}) {
 			let returnRoll = {
 				name: ability.name,
 				actions: [],
 				damageTypes: []
 			};
+
+			if(config.versatile !== undefined) {
+				returnRoll.name = (config.versatile === 0) ? 
+					`${ability.name} (${ability.versatile_one || 'Option 1'})` : 
+					`${ability.name} (${ability.versatile_two || 'Option 2'})`;
+			}
+
+			// Check for advantage/disadvantage in the $event
 			let advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
 			if(e.e.shiftKey) {
 				advantage_object["advantage"] = true;
@@ -130,14 +145,14 @@ export const dice = {
 			}
 
 			const actions = ability.action_list;
-			const scaleType = ability.level_scaling;
-			const spellLevel = ability.level;
+			const scaleType = ability.level_scaling; // Only for spells
+			const spellLevel = ability.level; // Only for spells
 
 			let i = 0;
 			// LOOP OVER ALL ACTIONS
 			for(let action of actions) {
 				let type = action.type;
-				let attack_bonus = action.attack_bonus || toHitModifier;
+				let attack_bonus = action.attack_bonus || config.toHitModifier;
 				let toHit = false;
 				returnRoll.actions[i] = { type, rolls: [] };
 
@@ -161,27 +176,35 @@ export const dice = {
 					let scaledModifier = undefined;
 					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
 
-					//Create a list with al damage types for this action
-					//Only if it is not a healing spell
+					// Create a list with al damage types for this action
+					// Only if it is not a healing spell
 					if(type !== 'healing' && damage_type) {
 						if(!returnRoll.damageTypes.includes(damage_type)) {
 							returnRoll.damageTypes.push(damage_type);
 						}
 					}
 
-					//Check if the action scales with the current roll
+					// Check for versatile. 1 is the alternative option
+					// Changes only have to be made if the versatile roll is the alternative (1)
+					if(config.versatile === 1) {
+						dice_type = (modifier.versatile_dice_type) ? modifier.versatile_dice_type : dice_type;
+						dice_count = (modifier.versatile_dice_count) ? modifier.versatile_dice_count : dice_count;
+						fixed_val = (modifier.versatile_fixed_val) ? modifier.versatile_fixed_val : fixed_val;
+					}
+
+					// Check if the action scales with the current roll
 					let tiers = modifier.level_tiers;
 					if(tiers) {
-						scaledModifier = this.__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType);
+						scaledModifier = this.__levelScaling__(tiers, config.castLevel, spellLevel, config.casterLevel, scaleType);
 					
-						//Roll the scaledModifier
+						// Roll the scaledModifier
 						if(scaledModifier) {
 							scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
 						}
 					}
 					
-					//Roll the modifier
-					//If the modifier scales with character level, overwrite the modifierRoll with the scaledRoll
+					// Roll the modifier
+					// If the modifier scales with character level, overwrite the modifierRoll with the scaledRoll
 					if(scaleType === 'character_level' && scaledModifier) {
 						modifierRoll = scaledRoll;
 						scaledRoll = undefined; //Only return the scaled modifierRoll
@@ -189,7 +212,7 @@ export const dice = {
 						modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
 					}
 
-					//Push the rolled modifier to the array with all rolled modifiers
+					// Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({
 						modifierRoll,
 						damage_type: modifier.damage_type,

@@ -63,9 +63,31 @@
 							leave-active-class="animated fadeOut"
 						>
 							<template v-slot:header>
-								<q-item-section avatar>
+								<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other'">
+									<span v-if="ability.versatile" class="roll-button" @click.stop>
+										<q-popup-proxy square dark>
+											<q-list dark square>
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>1</q-item-section>
+													<q-item-section>
+														<hk-roll @roll="rollAbility($event, ability, 0)">
+															{{ ability.versatile_one || 'Option 1' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>2</q-item-section>
+													<q-item-section>
+														<hk-roll @roll="rollAbility($event, ability, 1)">
+															{{ ability.versatile_two || 'Option 2' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+											</q-list>
+										</q-popup-proxy>
+									</span>
 									<hk-roll 
-										v-if="ability.action_list && ability.action_list[0].type !== 'other'"
+										v-else
 										:tooltip="`Roll ${ability.name}`" 
 										@roll="rollAbility($event, ability)"
 									>
@@ -659,8 +681,12 @@
 			calcAverage(dice_type=0, dice_count=0, modifier=0) {
 				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
 			},
-			rollAbility(e, action) {
-				this.setActionRoll(this.rollAction(e, action));
+			rollAbility(e, action, versatile) {
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+				this.setActionRoll(this.rollAction(e, action, config));
 			},
 		}
 	}

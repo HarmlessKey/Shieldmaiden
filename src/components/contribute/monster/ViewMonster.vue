@@ -239,24 +239,39 @@
 						<template v-if="ability.action_list && ability.action_list[0].type !== 'other'">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
 								<q-popup-proxy square dark>
-									<q-list dark square>
-										<q-item clickable v-close-popup>
-											<q-item-section avatar>1</q-item-section>
+									<div class="bg-gray">
+										<q-item>
 											<q-item-section>
-												<hk-roll @roll="roll($event, ability, 0)">
-													{{ ability.versatile_one || 'Option 1' }}
-												</hk-roll>
+												<b>{{ ability.name }}</b>
 											</q-item-section>
 										</q-item>
-										<q-item clickable v-close-popup>
-											<q-item-section avatar>2</q-item-section>
-											<q-item-section>
-												<hk-roll @roll="roll($event, ability, 1)">
-													{{ ability.versatile_two || 'Option 2' }}
-												</hk-roll>
-											</q-item-section>
-										</q-item>
-									</q-list>
+										<q-list dark square>
+											<q-item clickable v-close-popup>
+												<q-item-section avatar>1</q-item-section>
+												<q-item-section>
+													<hk-roll 
+														:tooltip="`${ability.name} (${ability.versatile_one || 'Option 1'})`"
+														tooltipPosition="right"
+														@roll="roll($event, ability, 0)"
+													>
+														{{ ability.versatile_one || 'Option 1' }}
+													</hk-roll>
+												</q-item-section>
+											</q-item>
+											<q-item clickable v-close-popup>
+												<q-item-section avatar>2</q-item-section>
+												<q-item-section>
+													<hk-roll 
+														:tooltip="`${ability.name} (${ability.versatile_two || 'Option 2'})`"
+														tooltipPosition="right"
+														@roll="roll($event, ability, 1)"
+													>
+														{{ ability.versatile_two || 'Option 2' }}
+													</hk-roll>
+												</q-item-section>
+											</q-item>
+										</q-list>
+									</div>
 								</q-popup-proxy>
 							</span>
 							<hk-roll 

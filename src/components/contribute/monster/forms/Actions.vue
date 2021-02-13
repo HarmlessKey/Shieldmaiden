@@ -67,6 +67,11 @@
 									<span v-if="ability.versatile" class="roll-button" @click.stop>
 										<q-popup-proxy square dark>
 											<q-list dark square>
+												<q-item>
+													<q-item-section>
+														<b>{{ ability.name }}</b>
+													</q-item-section>
+												</q-item>
 												<q-item clickable v-close-popup>
 													<q-item-section avatar>1</q-item-section>
 													<q-item-section>

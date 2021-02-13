@@ -30,6 +30,7 @@ export const general_module = {
 		setActionRoll({ commit, state }, newRoll) {
 			let current = state.action_rolls;
 			newRoll.date = new Date();
+			newRoll.key = newRoll.date + Math.random().toString(36).substring(7);
 			current.unshift(newRoll);
 			commit("SET_ACTION_ROLLS", current);
 		},

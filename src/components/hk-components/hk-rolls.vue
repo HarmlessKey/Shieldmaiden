@@ -7,7 +7,7 @@
 			enter-active-class="animated fadeInDown" 
 			leave-active-class="animated fadeOutUp"
 		>
-			<div v-for="(roll, index) in action_rolls" :key="`roll-${JSON.stringify(roll)}`" class="roll">
+			<div v-for="(roll, index) in action_rolls" :key="`roll-${roll.key}`" class="roll">
 				<div class="header">
 					<div class="truncate">
 						{{ roll.name }}
@@ -38,15 +38,15 @@
 								<div 
 									class="total" 
 									:class="{
-										green: hitOrMiss === 'hit',
-										red: hitOrMiss === 'miss'
+										green: hitOrMiss[roll.key] === 'hit',
+										red: hitOrMiss[roll.key] === 'miss'
 									}"
 								>
 										{{ action.toHit.total }}
 								</div>
 							</div>
 							<q-btn-toggle
-								v-model="hitOrMiss"
+								v-model="hitOrMiss[roll.key]"
 								class="mb-3"
 								spread no-caps dark dense square
 								toggle-color="primary"
@@ -69,8 +69,8 @@
 									<span 
 										class="total" 
 										:class="{
-											green: savingThrowResult === 'fail',
-											red: savingThrowResult === 'save'
+											green: savingThrowResult[roll.key] === 'fail',
+											red: savingThrowResult[roll.key] === 'save'
 										}"
 									>
 											{{ action.save_dc }}
@@ -78,7 +78,7 @@
 								</div>
 							</div>
 							<q-btn-toggle
-								v-model="savingThrowResult"
+								v-model="savingThrowResult[roll.key]"
 								class="mb-3"
 								spread no-caps dark dense square
 								toggle-color="primary"
@@ -105,8 +105,8 @@
 												v-for="(defense, key) in defenses"
 												:key="key"
 												class="option"
-												@click.stop="setDefense(rolled.damage_type, key)"
-												:class="[{active: resistances[rolled.damage_type] === key}, key]"
+												@click.stop="setDefense(rolled.damage_type, key, roll.key)"
+												:class="[{active: resistances[roll.key] && resistances[roll.key][rolled.damage_type] === key}, key]"
 											>
 												<i class="fas fa-shield"></i>
 												<span>{{ key.capitalize() }}</span>
@@ -124,7 +124,7 @@
 										</div>
 									</q-item-section>
 									<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
-										<b>{{ totalActionDamage(action, rolled) }}</b>
+										<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
 									</q-item-section>
 								</template>
 								<div class="accordion-body">
@@ -136,10 +136,10 @@
 										Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
 										{{ rolled.scaledRoll.throws }}
 									</div>
-									<div v-if="savingThrowResult === 'save'" class="mt-3">
+									<div v-if="savingThrowResult[roll.key] === 'save'" class="mt-3">
 										Successful saving throw: <b>{{ missSaveEffect(rolled.missSave, 'text') }}</b>
 									</div>
-									<div v-if="hitOrMiss === 'miss'" class="mt-3">
+									<div v-if="hitOrMiss[roll.key] === 'miss'" class="mt-3">
 										Missed attack: <b>{{ missSaveEffect(rolled.missSave, 'text') }}</b>
 									</div>
 									<div v-if="resistances[rolled.damage_type] === 'v'" class="mt-3">
@@ -156,11 +156,11 @@
 									<b>Final result:</b> <br/>	
 									({{ rolled.modifierRoll.total }}
 									<span v-if="rolled.scaledRoll"> + {{ rolled.scaledRoll.total }}</span>)
-									<span v-if="savingThrowResult === 'save' || hitOrMiss === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
+									<span v-if="savingThrowResult[roll.key] === 'save' || hitOrMiss[roll.key] === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
 									<span v-if="resistances[rolled.damage_type] === 'v'"> * 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'r'"> / 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'i'"> no effect</span>
-									<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled) }}</b></span>
+									<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled, roll.key) }}</b></span>
 									</div>
 								</div>
 							</q-expansion-item>
@@ -191,7 +191,7 @@
 						<div class="total-damage">
 							<div>Total</div>
 							<div class="total">
-								{{ totalDamage() }}
+								{{ totalDamage(roll) }}
 							</div>
 						</div>
 					</div>
@@ -216,8 +216,8 @@ export default {
 				i: "Immune"
 			},
 			resistances: {},
-			savingThrowResult: undefined,
-			hitOrMiss: undefined,
+			savingThrowResult: {},
+			hitOrMiss: {},
 			resultColumns: {
 				total: {
 					maxContent: true
@@ -242,45 +242,44 @@ export default {
 			const color = (type === "A") ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
 		},
-		totalActionDamage(action, rolls) {
+		totalActionDamage(action, rolls, key) {
 			let total = parseInt(rolls.modifierRoll.total);
 
 			if(rolls.scaledRoll) {
 				total = total + rolls.scaledRoll.total;
 			}
-			if(action.type === 'save' && this.savingThrowResult === 'save') {
+			if(action.type === 'save' && this.savingThrowResult[key] === 'save') {
 				total = Math.floor(total * rolls.missSave);
 			}
-			if(action.toHit && this.hitOrMiss === 'miss') {
+			if(action.toHit && this.hitOrMiss[key] === 'miss') {
 				total = Math.floor(total * rolls.missSave);
 			}
-			if(this.resistances[rolls.damage_type] === 'v') {
+			if(this.resistances[key] && this.resistances[key][rolls.damage_type] === 'v') {
 				total = total * 2;
 			}
-			if(this.resistances[rolls.damage_type] === 'r') {
+			if(this.resistances[key] && this.resistances[key][rolls.damage_type] === 'r') {
 				total = Math.floor(total / 2);
 			}
-			if(this.resistances[rolls.damage_type] === 'i') {
+			if(this.resistances[key] && this.resistances[key][rolls.damage_type] === 'i') {
 				total = 0;
 			}
 			return total;
 		},
-		totalDamage() {
+		totalDamage(roll) {
 			let total = 0;
-			for(const roll of this.action_rolls) {
-				for(const action of roll.actions) {
-					for(const rolled of action.rolls) {
-						total = total + this.totalActionDamage(action, rolled);
-					}
+			for(const action of roll.actions) {
+				for(const rolled of action.rolls) {
+					total = total + this.totalActionDamage(action, rolled, roll.key);
 				}
 			}
 			return total;
 		},
-		setDefense(type, resistance) {
-			if(this.resistances[type] === resistance) {
-				this.$delete(this.resistances, type);
+		setDefense(type, resistance, key) {
+			if(!this.resistances[key]) this.$set(this.resistances, key, {});
+			if(this.resistances[key][type] === resistance) {
+				this.$delete(this.resistances[key], type);
 			} else {
-				this.$set(this.resistances, type, resistance);
+				this.$set(this.resistances[key], type, resistance);
 			}
 		},
 		missSaveEffect(effect, type) {

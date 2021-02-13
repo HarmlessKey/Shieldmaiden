@@ -105,6 +105,7 @@
 		if(auth.currentUser !== null){
 			this.setUser();
 			this.setUserInfo();
+			this.setUserSettings();
 			// players need prio!
 			this.fetchPlayers();
 			this.fetchNpcs();
@@ -128,6 +129,7 @@
 			'fetchNpcs',
 			'setUser',
 			'setUserInfo',
+			'setUserSettings',
 			'setSlide',
 			'setSideSmallScreen'
 		]),

@@ -7,6 +7,13 @@ export const dice = {
 			rolled: 0
 		}
 	},
+	computed: {
+		critSettings() {
+			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
+				return this.$store.getters.userSettings.encounter.critical;
+			} return undefined; // Default = undefined = roll twice
+		}
+	},
 	watch: {
 		animateTrigger() {
 			this.animateValue("roll", 0, this.rolled, 500);
@@ -144,7 +151,7 @@ export const dice = {
 				advantage_object["disadvantage"] = true;
 			}
 
-			const actions = ability.action_list;
+			const actions = ability.action_list; // All actions in the ability
 			const scaleType = ability.level_scaling; // Only for spells
 			const spellLevel = ability.level; // Only for spells
 
@@ -154,13 +161,19 @@ export const dice = {
 				let type = action.type;
 				let attack_bonus = action.attack_bonus || config.toHitModifier;
 				let toHit = false;
+				let crit = false;
 				returnRoll.actions[i] = { type, rolls: [] };
 
-				//If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
+				// If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'melee_weapon' || type === 'ranged_weapon' || type === 'spell_attack') {
 					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, false, advantage_object);
+					if(returnRoll.actions[i].toHit.throwsTotal === 20) {
+						returnRoll.actions[i].crit = true;
+						crit = true;
+					}
 					toHit = true;
 				}
+				// For a saving throw set the ability and DC for display
 				if(type === 'save') {
 					returnRoll.actions[i].save_ability = action.save_ability;
 					returnRoll.actions[i].save_dc = action.save_dc;
@@ -169,7 +182,7 @@ export const dice = {
 				for(let modifier of action.rolls) {
 					let damage_type = modifier.damage_type;
 					let dice_type = modifier.dice_type;
-					let dice_count = modifier.dice_count;
+					let dice_count = (crit && !this.critSettings) ? modifier.dice_count*2 : modifier.dice_count;
 					let fixed_val = (modifier.fixed_val) ? modifier.fixed_val : 0;
 					let modifierRoll = undefined;
 					let scaledRoll = undefined;
@@ -199,6 +212,8 @@ export const dice = {
 					
 						// Roll the scaledModifier
 						if(scaledModifier) {
+							// Double the dice count when it's a crit and crit setting are set to roll twice
+							if(crit && !this.critSettings) scaledModifier.dice_count = scaledModifier.dice_count*2;
 							scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
 						}
 					}
@@ -211,6 +226,10 @@ export const dice = {
 					} else {
 						modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
 					}
+
+					// Double the rolled damage (without the modifier [trhowsTotal])
+					// when it's a crit and crit settings are set to doulbe
+					if(crit && this.critSettings) modifierRoll.throwsTotal = modifierRoll.throwsTotal*2;
 
 					// Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({

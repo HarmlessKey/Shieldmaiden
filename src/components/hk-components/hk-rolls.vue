@@ -35,7 +35,18 @@
 										{{ parseInt(action.toHit.mod) > 0 ? `+ ${parseInt(action.toHit.mod)}` : `- ${Math.abs(action.toHit.mod)}` }}
 									</template>
 								</div>
-								<div 
+								<transition
+									v-if="action.toHit.throwsTotal == 20"
+									:name="`crit-transition-${roll.key}`"
+									enter-active-class="animated tada"
+									appear
+								>
+									<div class="total green">
+									NAT 20
+								</div>
+								</transition>
+								<div
+									v-else
 									class="total" 
 									:class="{
 										green: hitOrMiss[roll.key] === 'hit',
@@ -165,28 +176,6 @@
 								</div>
 							</q-expansion-item>
 						</q-list>
-
-						<!-- <div v-if="roll.damageTypes.length > 0" class="mt-3">
-							<h3>Targets defenses</h3>
-							<div v-for="(type, i) in roll.damageTypes" :key="`type-${i}`" class="defenses">
-								<div class="icon">
-									<i :class="damage_type_icons[type]"/> {{ type.capitalize() }}
-								</div>
-								<div 
-									v-for="(defense, key) in defenses"
-									:key="key"
-									class="option"
-									@click="setDefense(type, key)"
-									:class="[{active: resistances[type] === key}, key]"
-								>
-									<i class="fas fa-shield"></i>
-									<span>{{ key.capitalize() }}</span>
-									<q-tooltip anchor="top middle" self="center middle">
-										{{ defense }}
-									</q-tooltip>
-								</div>
-							</div>
-						</div> -->
 
 						<div class="total-damage">
 							<div>Total</div>
@@ -399,5 +388,8 @@ export default {
 				}
 			}
 		}
+	}
+	.tada {
+		animation-delay: .2s;
 	}
 </style>

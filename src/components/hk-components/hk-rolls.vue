@@ -151,7 +151,7 @@
 								<div class="accordion-body">
 									<div>
 										<b>Rolls: </b>
-										<template v-if="action.toHit.throwsTotal == 20">
+										<template v-if="action.toHit && action.toHit.throwsTotal == 20">
 											<b class="green">Crit!</b>
 											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
 										</template><br/>

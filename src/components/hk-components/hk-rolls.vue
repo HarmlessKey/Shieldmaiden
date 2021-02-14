@@ -63,7 +63,7 @@
 										red: hitOrMiss[roll.key] === 'miss'
 									}"
 								>
-										{{ action.toHit.total }}
+									{{ action.toHit.total }}
 								</div>
 							</div>
 							<q-btn-toggle
@@ -94,7 +94,7 @@
 											red: savingThrowResult[roll.key] === 'save'
 										}"
 									>
-											{{ action.save_dc }}
+										{{ action.save_dc }}
 									</span>
 								</div>
 							</div>

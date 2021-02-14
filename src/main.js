@@ -22,6 +22,7 @@ import Icon from './components/Icon';
 import './quasar';
 import './registerServiceWorker';
 import { Notify } from 'quasar';
+import 'animate.css';
 
 const options = {
 	toast: {

@@ -551,6 +551,7 @@
 	background-position: center;
 	background-size: cover;
 	vertical-align: -5px;
+	user-select: none;
 }
 .advantage .roll-button:hover {
 	background-image: url('../../../assets/_img/logo/logo-icon-no-shield-green.svg');

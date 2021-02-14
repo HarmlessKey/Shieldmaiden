@@ -11,7 +11,10 @@
 				</div>
 			</div>
 		</div>
-		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
+		<transition 
+			enter-active-class="animated animate__slideInRight" 
+			leave-active-class="animated animate__slideOutRight"
+		>	
 			<div v-if="slide.show == true" class="slide">
 				<a @click="hideSlide()" 
 					v-shortkey="['esc']" @shortkey="hideSlide()"

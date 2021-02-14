@@ -4,8 +4,8 @@
 			tag="div"
 			class="rolls"
 			name="rolls"
-			enter-active-class="animated fadeInDown" 
-			leave-active-class="animated fadeOutUp"
+			enter-active-class="animated animate__fadeInDown" 
+			leave-active-class="animated animate__fadeOutUp"
 		>
 			<div v-for="(roll, index) in action_rolls" :key="`roll-${roll.key}`" class="roll">
 				<div class="header">
@@ -36,14 +36,24 @@
 									</template>
 								</div>
 								<transition
-									v-if="action.toHit.throwsTotal == 20"
-									:name="`crit-transition-${roll.key}`"
-									enter-active-class="animated tada"
+									v-if="action.toHit.throwsTotal == 1"
+									:name="`${roll.key}`"
+									enter-active-class="animated animate__hinge"
 									appear
 								>
-									<div class="total green">
-									NAT 20
-								</div>
+									<div class="total crit red">
+										Crit <b>1</b>
+									</div>
+								</transition>
+								<transition
+									v-else-if="action.toHit.throwsTotal == 20"
+									name="heartBeat"
+									enter-active-class="animated animate__heartBeat"
+									appear
+								>
+									<div class="total crit green">
+										Crit <b>20</b>
+									</div>
 								</transition>
 								<div
 									v-else
@@ -113,7 +123,7 @@
 									<q-item-section>
 										<div class="defenses">
 											<div 
-												v-for="(defense, key) in defenses"
+												v-for="({name}, key) in defenses"
 												:key="key"
 												class="option"
 												@click.stop="setDefense(rolled.damage_type, key, roll.key)"
@@ -122,7 +132,7 @@
 												<i class="fas fa-shield"></i>
 												<span>{{ key.capitalize() }}</span>
 												<q-tooltip anchor="top middle" self="center middle">
-													{{ defense }}
+													{{ name }}
 												</q-tooltip>
 											</div>
 											<span 
@@ -140,8 +150,17 @@
 								</template>
 								<div class="accordion-body">
 									<div>
-										Rolls: {{ rolled.modifierRoll.roll }} = <b>{{ rolled.modifierRoll.total }}</b><br/>
+										<b>Rolls: </b>
+										<template v-if="action.toHit.throwsTotal == 20">
+											<b class="green">Crit!</b>
+											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
+										</template><br/>
+										{{ rolled.modifierRoll.roll }} = <b>{{ rolled.modifierRoll.total }}</b><br/>
 										{{ rolled.modifierRoll.throws }}
+									</div>
+									<div v-if="rolled.scaledRoll" class="mt-3">
+										Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
+										{{ rolled.scaledRoll.throws }}
 									</div>
 									<div v-if="rolled.scaledRoll" class="mt-3">
 										Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
@@ -153,25 +172,26 @@
 									<div v-if="hitOrMiss[roll.key] === 'miss'" class="mt-3">
 										Missed attack: <b>{{ missSaveEffect(rolled.missSave, 'text') }}</b>
 									</div>
-									<div v-if="resistances[rolled.damage_type] === 'v'" class="mt-3">
-										Vulnerable to {{ rolled.damage_type }}: <b>double damage</b>
-									</div>
-									<div v-if="resistances[rolled.damage_type] === 'r'" class="mt-3">
-										Resistant to {{ rolled.damage_type }}: <b>half damage</b>
-									</div>
-									<div v-if="resistances[rolled.damage_type] === 'i'" class="mt-3">
-										Immune to {{ rolled.damage_type }}: <b>no damage</b>
-									</div>
+									<template v-for="({name, value}, key) in defenses">
+										<div 
+											v-if="resistances[roll.key] && resistances[roll.key][rolled.damage_type] === key" 
+											class="mt-3"
+											:key="`defense-${name}`"
+										>
+											{{ name }} to {{ rolled.damage_type }}: <b>{{ value }} damage</b>
+										</div>
+									</template>
 									<hr>
 									<div>
-									<b>Final result:</b> <br/>	
-									({{ rolled.modifierRoll.total }}
-									<span v-if="rolled.scaledRoll"> + {{ rolled.scaledRoll.total }}</span>)
-									<span v-if="savingThrowResult[roll.key] === 'save' || hitOrMiss[roll.key] === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
-									<span v-if="resistances[rolled.damage_type] === 'v'"> * 2</span>
-									<span v-if="resistances[rolled.damage_type] === 'r'"> / 2</span>
-									<span v-if="resistances[rolled.damage_type] === 'i'"> no effect</span>
-									<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled, roll.key) }}</b></span>
+										<b>Final result:</b><br/>	
+										({{ rolled.modifierRoll.total }}<span v-if="rolled.scaledRoll"> + {{ rolled.scaledRoll.total }}</span>)
+										<span v-if="savingThrowResult[roll.key] === 'save' || hitOrMiss[roll.key] === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
+										<template v-if="resistances[roll.key]">
+											<span v-if="resistances[roll.key][rolled.damage_type] === 'v'"> * 2</span>
+											<span v-if="resistances[roll.key][rolled.damage_type] === 'r'"> / 2</span>
+											<span v-if="resistances[roll.key][rolled.damage_type] === 'i'"> no effect</span>
+										</template>
+										<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled, roll.key) }}</b></span>
 									</div>
 								</div>
 							</q-expansion-item>
@@ -200,9 +220,9 @@ export default {
 	data() {
 		return {
 			defenses: {
-				v: "Vulnerable",
-				r: "Resistant",
-				i: "Immune"
+				v: { name: "Vulnerable", value: "double" },
+				r: { name: "Resistant", value: "half" },
+				i: { name: "Immune", value: "no" }
 			},
 			resistances: {},
 			savingThrowResult: {},
@@ -220,7 +240,12 @@ export default {
 	computed: {
 		...mapGetters([
 			"action_rolls"
-		])
+		]),
+		critSettings() {
+			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
+				return this.$store.getters.userSettings.encounter.critical;
+			} return undefined; // Default = undefined = roll twice
+		}
 	},
 	methods: {
 		...mapActions([
@@ -321,12 +346,14 @@ export default {
 				}
 			}
 			.toHit {
+				position: relative;
 				display: flex;
 				justify-content: space-between;
 				font-size: 18px;
 				margin-bottom: 10px;
 				line-height: 30px;
 				padding: 0 5px;
+				z-index: 99;
 
 				.total {
 					font-size: 25px;
@@ -391,5 +418,8 @@ export default {
 	}
 	.tada {
 		animation-delay: .2s;
+	}
+	.hinge {
+		animation-delay: .5s;
 	}
 </style>

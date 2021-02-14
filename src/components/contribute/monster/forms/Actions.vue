@@ -59,8 +59,8 @@
 							dark switch-toggle-side
 							:group="name"
 							:name="name"
-							enter-active-class="animated fadeIn" 
-							leave-active-class="animated fadeOut"
+							enter-active-class="animated animate__fadeIn" 
+							leave-active-class="animated animate__fadeOut"
 						>
 							<template v-slot:header>
 								<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other'">

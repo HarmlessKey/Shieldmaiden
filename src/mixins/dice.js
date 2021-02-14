@@ -212,7 +212,7 @@ export const dice = {
 					
 						// Roll the scaledModifier
 						if(scaledModifier) {
-							// Double the dice count when it's a crit and crit setting are set to roll twice
+							// Double the dice count when it's a crit and crit settings are set to roll twice
 							if(crit && !this.critSettings) scaledModifier.dice_count = scaledModifier.dice_count*2;
 							scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
 						}
@@ -228,8 +228,11 @@ export const dice = {
 					}
 
 					// Double the rolled damage (without the modifier [trhowsTotal])
-					// when it's a crit and crit settings are set to doulbe
-					if(crit && this.critSettings) modifierRoll.throwsTotal = modifierRoll.throwsTotal*2;
+					// simply add [trhowsTotal] once more to the [total]
+					// Only when it's a crit and crit settings are set to doulbe
+					if(crit && this.critSettings) {
+						modifierRoll.total = modifierRoll.total + modifierRoll.throwsTotal;
+					}
 
 					// Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({
@@ -246,29 +249,29 @@ export const dice = {
 		__levelScaling__(tiers, castLevel, spellLevel, casterLevel, scaleType) {
 			let scaledModifier = undefined;
 
-			//SPELL SCALE
+			// SPELL SCALE
 			if(scaleType === 'spell_scale') {
 				let scale = tiers[0].level;
 				let dice_type = tiers[0].dice_type;
 				let dice_count = tiers[0].dice_count;
 				let fixed_val = tiers[0].fixed_val;
 
-				//Calculate the increase based on spell level, on what level the spell is cast and the scale
+				// Calculate the increase based on spell level, on what level the spell is cast and the scale
 				let increase = parseInt(Math.floor((castLevel - spellLevel) / scale));
 
-				//If there is an increase, 
+				// If there is an increase, 
 				if(increase) {
 					scaledModifier = {};
 					scaledModifier.dice_count = increase * dice_count;
 					scaledModifier.dice_type = dice_type;
 
-					//Check if there is a fixed value
-					//If there is one, add it for every scale level
-					//If the spell scales with 1 and is cast 3 levels higer, multiply the fixed value by 3
+					// Check if there is a fixed value
+					// If there is one, add it for every scale level
+					// If the spell scales with 1 and is cast 3 levels higer, multiply the fixed value by 3
 					scaledModifier.fixed_val = (fixed_val) ? increase * fixed_val : 0;
 				}
 			}
-			//CHARACTER LEVEL
+			// CHARACTER LEVEL
 			if(scaleType === 'character_level') {
 				tiers.sort((a, b) => (parseInt(a.level) > parseInt(b.level)) ? 1 : -1)
 

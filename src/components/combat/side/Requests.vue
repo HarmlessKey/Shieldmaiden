@@ -5,8 +5,8 @@
 			tag="ul" 
 			class="requests"
 			name="requests" 
-			enter-active-class="animated fadeInDown" 
-			leave-active-class="animated fadeOutRight"
+			enter-active-class="animated animate__fadeInDown" 
+			leave-active-class="animated animate__fadeOutRight"
 		>
 			<li v-for="(request, i) in _requests" class="request" :key="`request-${request.key}`">
 				<Request :request="request" :i="i" />

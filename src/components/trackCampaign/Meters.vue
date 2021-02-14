@@ -21,8 +21,8 @@
 					<h3>{{ type }} {{ doneTaken }}</h3>
 					<transition-group tag="ul" 
 						name="entities" 
-						enter-active-class="animated fadeInUp" 
-						leave-active-class="animated fadeOutDown">
+						enter-active-class="animated animate__fadeInUp" 
+						leave-active-class="animated animate__fadeOutDown">
 						<template v-for="entity in _meters[type]">
 							<li v-if="entity" class="health" :key="entity.key">
 								<icon 

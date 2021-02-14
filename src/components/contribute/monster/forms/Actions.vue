@@ -59,10 +59,46 @@
 							dark switch-toggle-side
 							:group="name"
 							:name="name"
-							enter-active-class="animated fadeIn" 
-							leave-active-class="animated fadeOut"
+							enter-active-class="animated animate__fadeIn" 
+							leave-active-class="animated animate__fadeOut"
 						>
 							<template v-slot:header>
+								<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other'">
+									<span v-if="ability.versatile" class="roll-button" @click.stop>
+										<q-popup-proxy square dark>
+											<q-list dark square>
+												<q-item>
+													<q-item-section>
+														<b>{{ ability.name }}</b>
+													</q-item-section>
+												</q-item>
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>1</q-item-section>
+													<q-item-section>
+														<hk-roll @roll="rollAbility($event, ability, 0)">
+															{{ ability.versatile_one || 'Option 1' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+												<q-item clickable v-close-popup>
+													<q-item-section avatar>2</q-item-section>
+													<q-item-section>
+														<hk-roll @roll="rollAbility($event, ability, 1)">
+															{{ ability.versatile_two || 'Option 2' }}
+														</hk-roll>
+													</q-item-section>
+												</q-item>
+											</q-list>
+										</q-popup-proxy>
+									</span>
+									<hk-roll 
+										v-else
+										:tooltip="`Roll ${ability.name}`" 
+										@roll="rollAbility($event, ability)"
+									>
+										<span class="roll-button" />
+									</hk-roll>
+								</q-item-section>
 								<q-item-section>
 									{{ ability.name }}
 									{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : `` }}
@@ -417,6 +453,8 @@
 	import { damage_types } from '@/mixins/damageTypes.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import ActionRoll from '@/components/ActionRoll';
+	import { mapActions } from 'vuex';
+	import { dice } from '@/mixins/dice.js';
 	
 	export default {
 		name: 'npc-Actions',
@@ -425,7 +463,8 @@
 			general, 
 			abilities, 
 			monsterMixin,
-			damage_types
+			damage_types,
+			dice
 		],
 		components: {
 			ActionRoll
@@ -525,6 +564,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setActionRoll"
+			]),
 			/**
 			 * Add a new action
 			 * 
@@ -643,7 +685,14 @@
 			},
 			calcAverage(dice_type=0, dice_count=0, modifier=0) {
 				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
-			}
+			},
+			rollAbility(e, action, versatile) {
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+				this.setActionRoll(this.rollAction(e, action, config));
+			},
 		}
 	}
 </script>
@@ -698,5 +747,22 @@
 			width: calc(50% - 1px);
 			margin-right: 1px;
 		}
+	}
+	.roll-button {
+		display: inline-block;
+		cursor: pointer;
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+		height: 20px;
+		width: 20px;
+		background-position: center;
+		background-size: cover;
+		vertical-align: -5px;
+		user-select: none;
+	}
+	.advantage .roll-button:hover {
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-green.svg');
+	}
+	.disadvantage .roll-button:hover {
+		background-image: url('../../../../assets/_img/logo/logo-icon-no-shield-red.svg');
 	}
 </style>

@@ -10,12 +10,15 @@
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item slot="selected">
+				<q-item dark slot="selected">
 					<q-item-section avatar>
 						<q-icon :name="setting.icon" class="gray-light" size="large" />
 					</q-item-section>
 					<q-item-section class="gray-light truncate">
-						{{ setting.name }}: {{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
+						<q-item-label>{{ setting.name }}</q-item-label>
+						<q-item-label caption>
+							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
+						</q-item-label>
 					</q-item-section>
 					<q-item-section side>
 						<q-icon 
@@ -144,7 +147,7 @@
 						type_settings: [
 							{
 								key: 'side_collapsed',
-								name: 'Side Menu Collapsed',
+								name: 'Side Menu',
 								icon: 'fas fa-bars',
 								info: 'Either set the sidebar to be fully visible or collapsed by default.',
 								options: [

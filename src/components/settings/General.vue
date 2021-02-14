@@ -1,131 +1,68 @@
 <template>
 	<div>
-		<ul class="settings">
-			<li v-for="(setting, key) in general" :key="key">
-				<div class="d-flex justify-content-between">
-					<span>
-						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
-						<a v-if="setting.info">
-							<q-icon name="info" v-if="setting.info">
-								<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-									<q-card dark square>
-										<q-card-section class="bg-gray-active">
-											<b>{{ setting.name }}</b>
-										</q-card-section>
+		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
+			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
+			<q-select 
+				dark filled square
+				v-for="(setting, index) in type_settings" 
+				:options="setting.options"
+				:value="index"
+				class="mb-1"
+				:key="`${type_key}-${index}`"
+			>
+				<q-item slot="selected">
+					<q-item-section avatar>
+						<q-icon :name="setting.icon" class="gray-light" size="large" />
+					</q-item-section>
+					<q-item-section class="gray-light truncate">
+						{{ setting.name }}: {{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
+					</q-item-section>
+					<q-item-section side>
+						<q-icon 
+							:name="displaySetting(type_key, setting.key, settings[setting.key]).icon" 
+							:class="displaySetting(type_key, setting.key, settings[setting.key]).color"
+							size="medium"
+						/>
+					</q-item-section>
+				</q-item>
+				<template v-slot:option="scope">
+					<q-item
+						clickable
+						v-ripple
+						v-close-popup
+						:active="scope.opt.value === settings[setting.key]"
+						@click="setSetting(setting.key, scope.opt.value)"
+					>
+						<q-item-section>
+							<q-item-label v-html="scope.opt.name"/>
+						</q-item-section>
+						<q-item-section avatar>
+							<q-icon :name="scope.opt.icon" size="small" :class="scope.opt.color" />
+						</q-item-section>
+					</q-item>
+				</template>
+				<span slot="after" v-if="setting.info">
+					<a @click.stop>
+						<q-icon name="info" v-if="setting.info" size="medium">
+							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>{{ setting.name }}</b>
+									</q-card-section>
 
-										<q-card-section>
-											<div v-html="setting.info" />
-											<Keybindings v-if="key === 'keyBinds'" :data="{ sm: true }" />
-										</q-card-section>
-									</q-card>
-								</q-menu>
-							</q-icon>
-						</a>
-					</span>
-					<div>
-						<a v-for="option in setting.options"
-							:key="option.name" 
-							@click="setSetting(key, option.value)" class="ml-2"
-							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]"
-						>
-								<span class="d-none d-md-inline mr-1">
-									<template v-if="option.value == settings[key]">{{ option.name }}</template>
-									<template v-if="option.value != settings[key]">{{ option.action }}</template>
-								</span>
-								<i :class="option.icon"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ option.value == settings[key] ? option.name : option.action }}
-								</q-tooltip>
-						</a>
-					</div>
-				</div>
-			</li>
-		</ul>
+									<q-card-section>
+										<div v-html="setting.info" />
+										<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</a>
+				</span>
+			</q-select>
+		</div>
 
-		<h3>Player overview</h3>
-		<ul class="settings">
-			<li v-for="(setting, key) in player" :key="key">
-				<div class="d-flex justify-content-between">
-					<span>
-						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
-						<a v-if="setting.info" class="ml-1">
-							<q-icon name="info" v-if="setting.info">
-								<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-									<q-card dark square>
-										<q-card-section class="bg-gray-active">
-											<b>{{ setting.name }}</b>
-										</q-card-section>
-
-										<q-card-section>
-											<div v-html="setting.info" />
-										</q-card-section>
-									</q-card>
-								</q-menu>
-							</q-icon>
-						</a>
-					</span>
-					<div>
-						<a v-for="option in setting.options"
-							:key="option.name" 
-							@click="setSetting(key, option.value)" class="ml-2"
-							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]"
-						>
-								<span class="d-none d-md-inline mr-1">
-									<template v-if="option.value == settings[key]">{{ option.name }}</template>
-									<template v-if="option.value != settings[key]">{{ option.action }}</template>
-								</span>
-								<i :class="option.icon"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ option.value == settings[key] ? option.name : option.action }}
-								</q-tooltip>
-						</a>
-					</div>
-				</div>
-			</li>
-		</ul>
-
-		<h3>User interface</h3>
-		<ul class="settings">
-			<li v-for="(setting, key) in ui" :key="key">
-				<div class="d-flex justify-content-between">
-					<span>
-						<i :class="setting.icon + ' gray-hover'"></i> {{ setting.name }}
-						<a v-if="setting.info" class="ml-1">
-							<q-icon name="info" v-if="setting.info">
-								<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-									<q-card dark square>
-										<q-card-section class="bg-gray-active">
-											<b>{{ setting.name }}</b>
-										</q-card-section>
-
-										<q-card-section>
-											<div v-html="setting.info" />
-										</q-card-section>
-									</q-card>
-								</q-menu>
-							</q-icon>
-						</a>
-					</span>
-					<div>
-						<a v-for="option in setting.options"
-							:key="option.name" 
-							@click="setSetting(key, option.value)" class="ml-2"
-							:class="[ option.value == settings[key] ? option.color : 'gray-light' ]"
-						>
-								<span class="d-none d-md-inline mr-1">
-									<template v-if="option.value == settings[key]">{{ option.name }}</template>
-									<template v-if="option.value != settings[key]">{{ option.action }}</template>
-								</span>
-								<i :class="option.icon"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ option.value == settings[key] ? option.name : option.action }}
-								</q-tooltip>
-						</a>
-					</div>
-				</div>
-			</li>
-		</ul>
-		<a class="btn" @click="setDefault()">Set default</a>
+		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
 	</div>
 </template>
 
@@ -141,67 +78,83 @@
 		data(){
 			return {
 				userId: this.$store.getters.user.uid,
-				general: {
-					'keyBinds': { 
-						name: 'Show Keybinds', 
-						icon: 'fas fa-keyboard',
-						info: '<p>Use these keybindings to perform actions quickly.<br/> With this setting you can show or hide the keybinds on the buttons that perform the actions.</p>',
-						infoWidth: '400px',
-						options: {
-							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
+				types: {
+					general: { 
+						type_settings: [
+							{ 
+								key: 'keyBinds',
+								name: 'Show Keybinds', 
+								icon: 'fas fa-keyboard',
+								info: '<p>Use these keybindings to perform actions quickly.<br/> With this setting you can show or hide the keybinds on the buttons that perform the actions.</p>',
+								infoWidth: '400px',
+								options: [
+									{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+									{ value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+								]
+							},
+						],
 					},
-				},
-				player: {
-					'passive_perception': { 
-						name: 'Passive Perception', 
-						icon: 'fas fa-eye',
-						info: 'Show passive perception in the player overview.',
-						options: {
-							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
+					player: { 
+						name: "Player", 
+						type_settings: [
+							{ 
+								key: 'passive_perception',
+								name: 'Passive Perception', 
+								icon: 'fas fa-eye',
+								info: 'Show passive perception in the player overview.',
+								options: [
+									{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+									{ value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+								]
+							},
+							{ 
+								key: 'passive_investigation',
+								name: 'Passive Invastigation', 
+								icon: 'fas fa-search',
+								info: 'Show passive investigation in the player overview.',
+								options: [
+									{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+									{ value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+								]
+							},
+							{ 
+								key: 'passive_insight',
+								name: 'Passive Insight', 
+								icon: 'fas fa-lightbulb-on',
+								info: 'Show passive insight in the player overview.',
+								options: [
+									{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+									{ value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+								]
+							},
+							{ 
+								key: 'save_dc',
+								name: 'Save DC', 
+								icon: 'fas fa-hand-holding-magic',
+								info: 'Show spell save DC in the player overview.',
+								options: [
+									{ value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
+									{ value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
+								]
+							},
+						],
 					},
-					'passive_investigation': { 
-						name: 'Passive Invastigation', 
-						icon: 'fas fa-search',
-						info: 'Show passive investigation in the player overview.',
-						options: {
-							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
+					ui: { 
+						name: "User interface", 
+						type_settings: [
+							{
+								key: 'side_collapsed',
+								name: 'Side Menu Collapsed',
+								icon: 'fas fa-bars',
+								info: 'Either set the sidebar to be fully visible or collapsed by default.',
+								options: [
+									{ value: true, name: 'Collapsed', action: 'Collapse', icon: 'fas fa-arrow-alt-to-left', color: 'red'},
+									{ value: undefined, name: 'Visible', action: 'Show', icon: 'fas fa-arrow-alt-to-right', color: 'green'},
+								]
+							},
+						]
 					},
-					'passive_insight': { 
-						name: 'Passive Insight', 
-						icon: 'fas fa-lightbulb-on',
-						info: 'Show passive insight in the player overview.',
-						options: {
-							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
-					},
-					'save_dc': { 
-						name: 'Save DC', 
-						icon: 'fas fa-hand-holding-magic',
-						info: 'Show spell save DC in the player overview.',
-						options: {
-							0: { value: false, name: 'Hidden', action: 'Hide', icon: 'fas fa-eye-slash', color: 'red' },
-							1: { value: undefined, name: 'Shown', action: 'Show', icon: 'fas fa-eye', color: 'green' },
-						}
-					},
-				},
-				ui: {
-					'side_collapsed': {
-						name: 'Side Menu Collapsed',
-						icon: 'fas fa-bars',
-						info: 'Either set the sidebar to be fully visible or collapsed by default.',
-						options: {
-							0: { value: true, name: 'Collapsed', action: 'Collapse', icon: 'fas fa-arrow-alt-to-left', color: 'red'},
-							1: { value: undefined, name: 'Visible', action: 'Show', icon: 'fas fa-arrow-alt-to-right', color: 'green'},
-						}
-					},
-				}
+				},				
 			}
 		},
 		firebase() {
@@ -222,6 +175,15 @@
 			},
 			setDefault() {
 				db.ref(`settings/${this.userId}/general`).remove();
+			},
+			displaySetting(type, key, value) {
+				let options = this.types[type].type_settings.filter(item => {
+					return item.key === key;
+				})[0].options;
+				const selected = options.filter(item => {
+					return item.value === value;
+				})[0];
+				return selected;
 			}
 		}
 	}
@@ -229,27 +191,9 @@
 </script>
 
 <style lang="scss" scoped>
-	.collapse {
-		border-top: solid 1px #494747;
-		margin-top: 20px;
-		padding: 20px;
-
-		table {
-			margin-bottom: 50px !important;
-
-			td {
-				background:$gray-dark !important;
-				&.binds {
-					width: 150px;
-				}
-				.bind {
-					border: solid 1px $blue;
-					display: inline-block;
-					min-width: 20px;
-					padding: 0 5px;
-					text-align: center;
-				}
-			}
+	.q-field__control {
+		.q-item {
+			width: 100%;
 		}
 	}
 </style>

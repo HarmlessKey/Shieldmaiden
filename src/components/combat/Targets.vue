@@ -38,8 +38,8 @@
 						class="targets"
 						:class="`${group}_targets`"
 						name="group" 
-						enter-active-class="animated fadeInUp" 
-						leave-active-class="animated fadeOutDown"
+						enter-active-class="animated animate__fadeInUp" 
+						leave-active-class="animated animate__fadeOutDown"
 					>
 						<li 
 							v-for="(entity, i) in targets"

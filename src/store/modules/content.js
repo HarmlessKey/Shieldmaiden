@@ -5,6 +5,7 @@ const encounters_ref = db.ref('encounters');
 const players_ref = db.ref('players');
 const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
+const settings_ref = db.ref('settings');
 const tiers_ref = db.ref('tiers');
 
 export const content_module = {
@@ -28,6 +29,7 @@ export const content_module = {
 	},
 	getters: {
 		userInfo: function( state ) { return state.userInfo; },
+		userSettings: function( state ) { return state.userSettings; },
 		encounters: function( state ) { return state.encounters; },
 		allEncounters: function( state ) { return state.allEncounters; },
 		players: function( state ) { return state.players; },
@@ -43,6 +45,7 @@ export const content_module = {
 	},
 	mutations: {
 		SET_USERINFO(state, payload) { state.userInfo = payload; },
+		SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
 		SET_TIER(state, payload) { state.tier = payload; },
 		SET_VOUCHER(state, payload) { state.voucher = payload; },
 		SET_PLAYERS(state, payload) {
@@ -202,6 +205,13 @@ export const content_module = {
 					commit('SET_USERINFO', user_info);
 				});
 			}
+		},
+		async setUserSettings({ commit, rootGetters }) {
+			let settings = await settings_ref.child(rootGetters.user.uid);
+			settings.on('value', async settings_snapshot => {
+				const user_settings = settings_snapshot.val();
+				commit('SET_USER_SETTINGS', user_settings);
+			});
 		},
 		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },
 		setEncounterId({ commit }, value) { commit('SET_ENCOUNTER_ID', value); },

@@ -70,8 +70,8 @@
 				tag="div" 
 				class="row q-col-gutter-md mt-3" 
 				name="campaigns" 
-				enter-active-class="animated fadeIn" 
-				leave-active-class="animated fadeOut">
+				enter-active-class="animated animate__fadeIn" 
+				leave-active-class="animated animate__fadeOut">
 				<div class="col-12 col-md-6 col-lg-4" v-for="campaign in _campaigns" :key="campaign.key">
 					<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<div slot="header" class="card-header">

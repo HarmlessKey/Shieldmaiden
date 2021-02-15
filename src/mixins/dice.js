@@ -214,7 +214,17 @@ export const dice = {
 						if(scaledModifier) {
 							// Double the dice count when it's a crit and crit settings are set to roll twice
 							if(crit && !this.critSettings) scaledModifier.dice_count = scaledModifier.dice_count*2;
-							scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
+							if(scaledModifier.dice_type && scaledModifier.dice_count) scaledRoll = this.rollD(e.e, scaledModifier.dice_type, scaledModifier.dice_count, scaledModifier.fixed_val);
+							// When there is nothing to roll, but only a fixed value
+							// still a roll must be created
+							else scaledRoll = {
+								title: ability.name,
+								roll: fixed_val,
+								mod: fixed_val,
+								throws: [],
+								throwsTotal: 0,
+								total: fixed_val
+							}
 						}
 					}
 					
@@ -224,7 +234,17 @@ export const dice = {
 						modifierRoll = scaledRoll;
 						scaledRoll = undefined; //Only return the scaled modifierRoll
 					} else {
-						modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
+						if(dice_type && dice_count) modifierRoll = this.rollD(e.e, dice_type, dice_count, fixed_val, `${ability.name}`);
+						// When there is nothing to roll, but only a fixed value
+						// still a roll must be created
+						else modifierRoll = {
+							title: ability.name,
+							roll: fixed_val,
+							mod: fixed_val,
+							throws: [],
+							throwsTotal: 0,
+							total: fixed_val
+						}
 					}
 
 					// Double the rolled damage (without the modifier [trhowsTotal])

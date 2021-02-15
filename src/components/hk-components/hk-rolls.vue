@@ -145,7 +145,12 @@
 										</div>
 									</q-item-section>
 									<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
-										<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
+										<q-item-label>
+											<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
+										</q-item-label>
+										<q-tooltip anchor="top middle" self="center middle">
+												{{ rolled.modifierRoll.roll }}
+										</q-tooltip>
 									</q-item-section>
 								</template>
 								<div class="accordion-body">
@@ -416,10 +421,10 @@ export default {
 			}
 		}
 	}
-	.tada {
+	.animate__heartBeat {
 		animation-delay: .2s;
 	}
-	.hinge {
+	.animate__hinge {
 		animation-delay: .5s;
 	}
 </style>

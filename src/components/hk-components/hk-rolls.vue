@@ -120,7 +120,13 @@
 								:group="`rolled-${index}`"
 							>
 								<template #header>
-									<q-item-section>
+									<q-item-section v-if="action.type === 'healing'">
+										<span class="type truncate green">
+												<i class="fas fa-heart"/> 
+												Healing
+											</span>
+									</q-item-section>
+									<q-item-section v-else>
 										<div class="defenses">
 											<div 
 												v-for="({name}, key) in defenses"
@@ -137,9 +143,9 @@
 											</div>
 											<span 
 												class="type truncate"
-												:class="action.type === 'healing' ? 'green' : rolled.damage_type"
+												:class="rolled.damage_type"
 											>
-												<i :class="action.type === 'healing' ? 'fas fa-heart' : damage_type_icons[rolled.damage_type]"/> 
+												<i :class="damage_type_icons[rolled.damage_type]"/> 
 												{{ rolled.damage_type }}
 											</span>
 										</div>
@@ -203,8 +209,8 @@
 						</q-list>
 
 						<div class="total-damage">
-							<div>Total</div>
-							<div class="total">
+							<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
+							<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
 								{{ totalDamage(roll) }}
 							</div>
 						</div>

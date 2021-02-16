@@ -176,10 +176,16 @@
 											<div 
 												v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
 												:key="`throw-${Throw}-${throw_index}`"
-												class="throw rotate"
+												class="throw"
 												:class="{
-													red: Throw === 1, green: Throw == rolled.modifierRoll.d}"
-												@click="reroll($event, rolled.modifierRoll, throw_index)"
+													red: Throw === 1, green: Throw == rolled.modifierRoll.d,
+													rotate: animateRoll === roll.key+rolled_index+throw_index
+													}"
+												@click="
+													animateRoll = roll.key+rolled_index+throw_index,
+													reroll($event, rolled.modifierRoll, throw_index)
+												"
+												@animationend="animateRoll = undefined"
 											>
 												<hk-animated-integer :value="Throw" onMount/>
 												<q-tooltip anchor="top middle" self="bottom middle">
@@ -263,6 +269,7 @@ export default {
 			resistances: {},
 			savingThrowResult: {},
 			hitOrMiss: {},
+			animateRoll: undefined,
 			resultColumns: {
 				total: {
 					maxContent: true

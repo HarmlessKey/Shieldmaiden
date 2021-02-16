@@ -42,7 +42,8 @@
 									appear
 								>
 									<div class="total crit red">
-										Crit <b>1</b>
+										Crit 
+										<b><hk-animated-integer :value="1" onMount /></b>
 									</div>
 								</transition>
 								<transition
@@ -52,7 +53,8 @@
 									appear
 								>
 									<div class="total crit green">
-										Crit <b>20</b>
+										Crit 
+										<b><hk-animated-integer :value="20" onMount /></b>
 									</div>
 								</transition>
 								<div
@@ -63,7 +65,7 @@
 										red: hitOrMiss[roll.key] === 'miss'
 									}"
 								>
-									{{ action.toHit.total }}
+									<hk-animated-integer :value="action.toHit.total" onMount />
 								</div>
 							</div>
 							<q-btn-toggle
@@ -152,7 +154,7 @@
 									</q-item-section>
 									<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
 										<q-item-label>
-											<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
+											<b><hk-animated-integer :value="totalActionDamage(action, rolled, roll.key)" /></b>
 										</q-item-label>
 										<q-tooltip anchor="top middle" self="center middle">
 												{{ rolled.modifierRoll.roll }}
@@ -166,17 +168,21 @@
 											<b class="green">Crit!</b>
 											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
 										</template><br/>
-										{{ rolled.modifierRoll.roll }} = <b>{{ rolled.modifierRoll.total }}</b><br/>
+										{{ rolled.modifierRoll.roll }} =
+										<b>
+											<hk-animated-integer :value="rolled.modifierRoll.total" />
+										</b><br/>
 										<div class="throws">
 											<div 
 												v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
 												:key="`throw-${Throw}-${throw_index}`"
-												class="throw"
-												:class="{red: Throw === 1, green: Throw == rolled.modifierRoll.d}"
+												class="throw rotate"
+												:class="{
+													red: Throw === 1, green: Throw == rolled.modifierRoll.d}"
 												@click="reroll($event, rolled.modifierRoll, throw_index)"
 											>
-												{{ Throw }}
-												<q-tooltip anchor="top middle" self="center middle">
+												<hk-animated-integer :value="Throw" onMount/>
+												<q-tooltip anchor="top middle" self="bottom middle">
 													Reroll {{ Throw }}
 												</q-tooltip>
 											</div>
@@ -208,14 +214,17 @@
 									<hr>
 									<div>
 										<b>Final result:</b><br/>	
-										({{ rolled.modifierRoll.total }}<span v-if="rolled.scaledRoll"> + {{ rolled.scaledRoll.total }}</span>)
+										(<hk-animated-integer :value="rolled.modifierRoll.total" /><span v-if="rolled.scaledRoll"> + 
+										{{ rolled.scaledRoll.total }}</span>)
 										<span v-if="savingThrowResult[roll.key] === 'save' || hitOrMiss[roll.key] === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
 										<template v-if="resistances[roll.key]">
 											<span v-if="resistances[roll.key][rolled.damage_type] === 'v'"> * 2</span>
 											<span v-if="resistances[roll.key][rolled.damage_type] === 'r'"> / 2</span>
 											<span v-if="resistances[roll.key][rolled.damage_type] === 'i'"> no effect</span>
 										</template>
-										<span> = <b :class="rolled.damage_type">{{ totalActionDamage(action, rolled, roll.key) }}</b></span>
+										<span> = <b :class="rolled.damage_type">
+											<hk-animated-integer :value="totalActionDamage(action, rolled, roll.key)" />
+										</b></span>
 									</div>
 								</div>
 							</q-expansion-item>
@@ -224,7 +233,7 @@
 						<div class="total-damage">
 							<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
 							<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
-								{{ totalDamage(roll) }}
+								<hk-animated-integer :value="totalDamage(roll)" onMount />
 							</div>
 						</div>
 					</div>
@@ -238,8 +247,10 @@
 import { mapGetters, mapActions } from "vuex";
 import { damage_types } from '@/mixins/damageTypes.js';
 import { dice } from '@/mixins/dice';
+import hkAnimatedInteger from './hk-animated-integer.vue';
 
 export default {
+  components: { hkAnimatedInteger },
 	name: 'hk-rolls',
 	mixins: [damage_types, dice],
 	data() {
@@ -463,6 +474,9 @@ export default {
 					&:hover {
 						border-color: $gray-light;
 					}
+					&.rotate {
+						animation: spin .2s linear;
+					}
 				}
 			}
 		}
@@ -473,4 +487,5 @@ export default {
 	.animate__hinge {
 		animation-delay: .5s;
 	}
+	@keyframes spin { 100% { transform: rotate(360deg); } }
 </style>

@@ -17,6 +17,7 @@ import HkTable from './components/hk-components/hk-table';
 import HkCard from './components/hk-components/hk-card';
 import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
+import HkAnimatedInteger from './components/hk-components/hk-animated-integer';
 import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
 import './quasar';
@@ -34,6 +35,7 @@ const options = {
 Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
 Vue.component('hk-card-deck', HkCardDeck);
+Vue.component('hk-animated-integer', HkAnimatedInteger);
 Vue.component('hk-roll', HkRoll);
 Vue.component('hk-loader', HkLoader);
 Vue.component('icon', Icon);

@@ -120,7 +120,13 @@
 								:group="`rolled-${index}`"
 							>
 								<template #header>
-									<q-item-section>
+									<q-item-section v-if="action.type === 'healing'">
+										<span class="type truncate green">
+												<i class="fas fa-heart"/> 
+												Healing
+											</span>
+									</q-item-section>
+									<q-item-section v-else>
 										<div class="defenses">
 											<div 
 												v-for="({name}, key) in defenses"
@@ -137,15 +143,20 @@
 											</div>
 											<span 
 												class="type truncate"
-												:class="action.type === 'healing' ? 'green' : rolled.damage_type"
+												:class="rolled.damage_type"
 											>
-												<i :class="action.type === 'healing' ? 'fas fa-heart' : damage_type_icons[rolled.damage_type]"/> 
+												<i :class="damage_type_icons[rolled.damage_type]"/> 
 												{{ rolled.damage_type }}
 											</span>
 										</div>
 									</q-item-section>
 									<q-item-section avatar :class="action.type === 'healing' ? 'green' : 'red'">
-										<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
+										<q-item-label>
+											<b>{{ totalActionDamage(action, rolled, roll.key) }}</b>
+										</q-item-label>
+										<q-tooltip anchor="top middle" self="center middle">
+												{{ rolled.modifierRoll.roll }}
+										</q-tooltip>
 									</q-item-section>
 								</template>
 								<div class="accordion-body">
@@ -156,7 +167,20 @@
 											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
 										</template><br/>
 										{{ rolled.modifierRoll.roll }} = <b>{{ rolled.modifierRoll.total }}</b><br/>
-										{{ rolled.modifierRoll.throws }}
+										<div class="throws">
+											<div 
+												v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
+												:key="`throw-${Throw}-${throw_index}`"
+												class="throw"
+												:class="{red: Throw === 1, green: Throw == rolled.modifierRoll.d}"
+												@click="reroll($event, rolled.modifierRoll, throw_index)"
+											>
+												{{ Throw }}
+												<q-tooltip anchor="top middle" self="center middle">
+													Reroll {{ Throw }}
+												</q-tooltip>
+											</div>
+										</div>
 									</div>
 									<div v-if="rolled.scaledRoll" class="mt-3">
 										Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
@@ -198,8 +222,8 @@
 						</q-list>
 
 						<div class="total-damage">
-							<div>Total</div>
-							<div class="total">
+							<div>Total {{ action.type === "healing" ? "healing" : "damage" }}</div>
+							<div class="total" :class="action.type === 'healing' ? 'green' : 'red'">
 								{{ totalDamage(roll) }}
 							</div>
 						</div>
@@ -213,10 +237,11 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { damage_types } from '@/mixins/damageTypes.js';
+import { dice } from '@/mixins/dice';
 
 export default {
 	name: 'hk-rolls',
-	mixins: [damage_types],
+	mixins: [damage_types, dice],
 	data() {
 		return {
 			defenses: {
@@ -295,6 +320,13 @@ export default {
 			} else {
 				this.$set(this.resistances[key], type, resistance);
 			}
+		},
+		reroll(e, roll, throw_index) {
+			const add = (a, b) => a + b;
+			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
+			this.$set(roll.throws, throw_index, newRoll.total);
+			this.$set(roll, "throwsTotal", roll.throws.reduce(add));
+			this.$set(roll, "total", roll.throwsTotal + parseInt(roll.mod));
 		},
 		missSaveEffect(effect, type) {
 			if(type === 'text') {
@@ -414,12 +446,31 @@ export default {
 					}
 				}
 			}
+			.throws {
+				display: flex;
+				flex-wrap: wrap;
+				margin-top: 5px;
+
+				.throw {
+					border: solid 1px $gray-hover;
+					padding: 1px 0;
+					width: 23px;
+					text-align: center;
+					margin-right: 2px;
+					cursor: pointer;
+					user-select: none;
+
+					&:hover {
+						border-color: $gray-light;
+					}
+				}
+			}
 		}
 	}
-	.tada {
+	.animate__heartBeat {
 		animation-delay: .2s;
 	}
-	.hinge {
+	.animate__hinge {
 		animation-delay: .5s;
 	}
 </style>

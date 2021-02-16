@@ -63,7 +63,7 @@
 							leave-active-class="animated animate__fadeOut"
 						>
 							<template v-slot:header>
-								<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other'">
+								<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 									<span v-if="ability.versatile" class="roll-button" @click.stop>
 										<q-popup-proxy square dark>
 											<q-list dark square>

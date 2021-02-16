@@ -234,9 +234,9 @@
 						{{ monster.name.capitalizeEach() }} can take {{ monster.lengendary_count }} legendary actions, choosing from the options below. 
 						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
 					</p>
-	
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
-						<template v-if="ability.action_list && ability.action_list[0].type !== 'other'">
+						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
+						<template v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
 								<q-popup-proxy square dark>
 									<div class="bg-gray">

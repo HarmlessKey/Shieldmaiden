@@ -168,29 +168,40 @@
 											<b class="green">Crit!</b>
 											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
 										</template><br/>
-										{{ rolled.modifierRoll.roll }} =
-										<b>
-											<hk-animated-integer :value="rolled.modifierRoll.total" />
-										</b><br/>
-										<div class="throws">
-											<div 
-												v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
-												:key="`throw-${Throw}-${throw_index}`"
-												class="throw"
-												:class="{
-													red: Throw === 1, green: Throw == rolled.modifierRoll.d,
-													rotate: animateRoll === roll.key+rolled_index+throw_index
-													}"
-												@click="
-													animateRoll = roll.key+rolled_index+throw_index,
-													reroll($event, rolled.modifierRoll, throw_index)
-												"
-												@animationend="animateRoll = undefined"
-											>
-												<hk-animated-integer :value="Throw" onMount/>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Reroll {{ Throw }}
-												</q-tooltip>
+										{{ rolled.modifierRoll.roll }}
+										<div class="d-flex justify-content-between">
+											<div class="throws">
+												<div 
+													v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
+													:key="`throw-${Throw}-${throw_index}`"
+													class="throw"
+													:class="{
+														red: Throw === 1, green: Throw == rolled.modifierRoll.d,
+														rotate: animateRoll === roll.key+rolled_index+throw_index
+														}"
+													@click="
+														animateRoll = roll.key+rolled_index+throw_index,
+														reroll($event, rolled.modifierRoll, throw_index)
+													"
+													@animationend="animateRoll = undefined"
+												>
+													<hk-animated-integer :value="Throw" onMount/>
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Reroll {{ Throw }}
+													</q-tooltip>
+												</div>
+											</div>
+											<div class="d-flex justify-content-end">
+												<template v-if="parseInt(rolled.modifierRoll.mod)">
+													<q-separator vertical dark />
+													<div class="throws-modifier">
+														{{ rolled.modifierRoll.mod }}
+													</div>
+												</template>
+												<q-separator vertical dark />
+												<div class="throws-total">
+													<hk-animated-integer :value="rolled.modifierRoll.total" />
+												</div>
 											</div>
 										</div>
 									</div>
@@ -378,6 +389,7 @@ export default {
 		background: $gray-dark;
 		border: solid 1px $gray-darker;
 		margin-bottom: 15px;
+		box-shadow: 0 1px 5px $black;
 
 		.body {
 			padding: 15px;
@@ -468,6 +480,7 @@ export default {
 				display: flex;
 				flex-wrap: wrap;
 				margin-top: 5px;
+				margin-right: 5px;
 
 				.throw {
 					border: solid 1px $gray-hover;
@@ -484,7 +497,19 @@ export default {
 					&.rotate {
 						animation: spin .2s linear;
 					}
+					&.green {
+						font-weight: bold;
+					}
 				}
+			}
+			.throws-modifier, .throws-total {
+				padding: 0 10px;
+				align-self: center;
+			}
+			.throws-total {
+				font-weight: bold;
+				font-size: 18px;
+				padding-right: 0;
 			}
 		}
 	}

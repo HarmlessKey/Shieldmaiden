@@ -224,7 +224,7 @@ export const dice = {
 								mod: fixed_val,
 								throws: [],
 								throwsTotal: 0,
-								total: fixed_val
+								total: parseInt(fixed_val)
 							}
 						}
 					}
@@ -244,7 +244,7 @@ export const dice = {
 							mod: fixed_val,
 							throws: [],
 							throwsTotal: 0,
-							total: fixed_val
+							total: parseInt(fixed_val)
 						}
 					}
 

@@ -244,8 +244,9 @@
 			<div v-if="isXpAdvancement()" class="pt-2">
 				<hr>
 				<h2>Experience Points</h2>
-				{{ setNumber(playerBase.experience) }}
-				<h2 class="text-center xp">{{ animatedNumber }}</h2>
+				<h2 class="text-center xp">
+					<hk-animated-integer :value="playerBase.experience" />
+				</h2>
 
 				<div class="level">
 					<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
@@ -306,8 +307,6 @@
 				entity: undefined,
 				maxHpMod: undefined,
 				xp: undefined,
-				number: 0,
-				tweenedNumber: 0,
 				setTransform: false
 			}
 		},
@@ -339,11 +338,6 @@
 			}
 		},
 		computed: {
-			animatedNumber: function() {
-				if (this.tweenedNumber.toFixed) {
-					return this.tweenedNumber.toFixed(0);
-				}
-			},
 			death_fails() {
 				let fails = 0;
 				for(let key in this.entity.saves) {
@@ -354,20 +348,11 @@
 				return fails;
 			},
 		},
-		watch: {
-			number: function(newValue) {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
-			}
-		},
 		methods: {
 			...mapActions([
 				'setSlide',
 				'edit_player',
 			]),
-			setNumber(value) {
-				this.number = value
-			},
 			addXp() {
 				if(this.xp) {
 					let newXp = parseInt(this.playerBase.experience) + parseInt(this.xp);

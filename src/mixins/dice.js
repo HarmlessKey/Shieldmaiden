@@ -76,6 +76,7 @@ export const dice = {
 			const roll = {
 				title,
 				roll: showRoll,
+				d,
 				mod: s + m,
 				throws: throws,
 				throwsTotal: sumThrows,

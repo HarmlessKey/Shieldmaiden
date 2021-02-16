@@ -167,7 +167,20 @@
 											{{ !critSettings ? "Rolled dice twice" : "Doubled rolled values"}}
 										</template><br/>
 										{{ rolled.modifierRoll.roll }} = <b>{{ rolled.modifierRoll.total }}</b><br/>
-										{{ rolled.modifierRoll.throws }}
+										<div class="throws">
+											<div 
+												v-for="(Throw, throw_index) in rolled.modifierRoll.throws"
+												:key="`throw-${Throw}-${throw_index}`"
+												class="throw"
+												:class="{red: Throw === 1, green: Throw == rolled.modifierRoll.d}"
+												@click="reroll($event, rolled.modifierRoll, throw_index)"
+											>
+												{{ Throw }}
+												<q-tooltip anchor="top middle" self="center middle">
+													Reroll {{ Throw }}
+												</q-tooltip>
+											</div>
+										</div>
 									</div>
 									<div v-if="rolled.scaledRoll" class="mt-3">
 										Scale ({{ selectedLevel }}): {{ rolled.scaledRoll.roll }} = <b>{{ rolled.scaledRoll.total }}</b><br/>
@@ -224,10 +237,11 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { damage_types } from '@/mixins/damageTypes.js';
+import { dice } from '@/mixins/dice';
 
 export default {
 	name: 'hk-rolls',
-	mixins: [damage_types],
+	mixins: [damage_types, dice],
 	data() {
 		return {
 			defenses: {
@@ -306,6 +320,13 @@ export default {
 			} else {
 				this.$set(this.resistances[key], type, resistance);
 			}
+		},
+		reroll(e, roll, throw_index) {
+			const add = (a, b) => a + b;
+			const newRoll = this.rollD(e, roll.d, 1, 0, `Reroll 1d${roll.d}`);
+			this.$set(roll.throws, throw_index, newRoll.total);
+			this.$set(roll, "throwsTotal", roll.throws.reduce(add));
+			this.$set(roll, "total", roll.throwsTotal + parseInt(roll.mod));
 		},
 		missSaveEffect(effect, type) {
 			if(type === 'text') {
@@ -422,6 +443,25 @@ export default {
 						span {
 							color: $white;
 						}
+					}
+				}
+			}
+			.throws {
+				display: flex;
+				flex-wrap: wrap;
+				margin-top: 5px;
+
+				.throw {
+					border: solid 1px $gray-hover;
+					padding: 1px 0;
+					width: 23px;
+					text-align: center;
+					margin-right: 2px;
+					cursor: pointer;
+					user-select: none;
+
+					&:hover {
+						border-color: $gray-light;
 					}
 				}
 			}

@@ -328,7 +328,7 @@
 													<span><i class="fas fa-dice-d20"/> Rolls</span>
 													<a 
 														class="gray-light text-capitalize" 
-														@click="newRoll(ability_index, category, action_index, action, ability.versatile)"
+														@click="newRoll(ability_index, ability, category, action_index, action)"
 													>
 														<i class="fas fa-plus green"></i>
 														<span class="d-none d-md-inline ml-1">Add</span>
@@ -379,7 +379,22 @@
 															<span :class="data.row.damage_type">
 																<i :class="damage_type_icons[data.row.damage_type]" /> 
 																{{ data.row.damage_type.capitalize() }} 
-															</span> damage
+																<q-tooltip v-if="ability.versatile" anchor="top middle" self="bottom middle">
+																	{{ ability.versatile_two || "Enter versatile option" }}
+																</q-tooltip>
+															</span>
+															<template 
+																v-if="ability.versatile && (data.row.versatile_damage_type && data.row.versatile_damage_type !== data.row.damage_type)" 
+															>
+																| <span :class="data.row.versatile_damage_type">
+																	<i :class="damage_type_icons[data.row.versatile_damage_type]" />
+																	{{ data.row.versatile_damage_type.capitalize() }} 
+																	<q-tooltip anchor="top middle" self="bottom middle">
+																		{{ ability.versatile_two || "Enter versatile option" }}
+																	</q-tooltip>
+																</span>
+															</template>
+															damage
 														</template>
 													</span>
 
@@ -393,7 +408,17 @@
 
 													<!-- ACTIONS -->
 													<div slot="actions" slot-scope="data" class="actions">
-														<a class="ml-2" @click="editRoll(ability_index, category, action_index, action, ability.versatile, data.index, data.row)">
+														<a class="ml-2"
+																@click="editRoll(
+																	ability_index, 
+																	ability,
+																	category, 
+																	action_index, 
+																	action,
+																	data.index,
+																	data.row
+																)"
+															>
 															<i class="fas fa-pencil-alt"></i>
 															<q-tooltip anchor="top middle" self="center middle">
 																Edit
@@ -430,7 +455,7 @@
 							v-if="roll && edit_action.type"
 							v-model="roll"
 							:action_type="edit_action.type"
-							:versatile="edit_action.versatile"
+							:versatile_options="edit_action.versatile"
 						/>
 						<div v-else>
 							Select an action type first
@@ -607,14 +632,18 @@
 			 * @param {Integer} action_index index of the action
 			 * @param {string} action full action object
 			 */
-			newRoll(ability_index, category, action_index, action, versatile) {
+			newRoll(ability_index, ability, category, action_index, action) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
 					type: action.type,
-					versatile
+					versatile: {
+						versatile: ability.versatile,
+						versatile_one: ability.versatile_one,
+						versatile_two: ability.versatile_two
+					}
 				}
 				this.edit_roll_index = undefined; // It's new, so no edit index
 				this.roll = {}; // Create an empty new roll
@@ -631,14 +660,18 @@
 			 * @param {index} roll_index of the roll
 			 * @param {object} roll the object to edit
 			 */
-			editRoll(ability_index, category, action_index, action, versatile, roll_index, roll) {
+			editRoll(ability_index, ability, category, action_index, action, roll_index, roll) {
 				// We need some information about the action the roll is stored under
 				this.edit_action = {
 					category,
 					ability_index,
 					action_index,
 					type: action.type,
-					versatile
+					versatile: {
+						versatile: ability.versatile,
+						versatile_one: ability.versatile_one,
+						versatile_two: ability.versatile_two
+					}
 				}
 				this.edit_roll_index = roll_index;
 				this.roll = roll;

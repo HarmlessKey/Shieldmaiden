@@ -133,8 +133,7 @@ export const dice = {
 		rollAction(e, ability, config={}) {
 			let returnRoll = {
 				name: ability.name,
-				actions: [],
-				damageTypes: []
+				actions: []
 			};
 
 			if(config.versatile !== undefined) {
@@ -190,17 +189,10 @@ export const dice = {
 					let scaledModifier = undefined;
 					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
 
-					// Create a list with al damage types for this action
-					// Only if it is not a healing spell
-					if(type !== 'healing' && damage_type) {
-						if(!returnRoll.damageTypes.includes(damage_type)) {
-							returnRoll.damageTypes.push(damage_type);
-						}
-					}
-
 					// Check for versatile. 1 is the alternative option
 					// Changes only have to be made if the versatile roll is the alternative (1)
 					if(config.versatile === 1) {
+						damage_type = (modifier.versatile_damage_type) ? modifier.versatile_damage_type : damage_type;
 						dice_type = (modifier.versatile_dice_type) ? modifier.versatile_dice_type : dice_type;
 						dice_count = (modifier.versatile_dice_count) ? modifier.versatile_dice_count : dice_count;
 						fixed_val = (modifier.versatile_fixed_val) ? modifier.versatile_fixed_val : fixed_val;
@@ -258,7 +250,7 @@ export const dice = {
 					// Push the rolled modifier to the array with all rolled modifiers
 					returnRoll.actions[i].rolls.push({
 						modifierRoll,
-						damage_type: modifier.damage_type,
+						damage_type,
 						scaledRoll,
 						missSave
 					});

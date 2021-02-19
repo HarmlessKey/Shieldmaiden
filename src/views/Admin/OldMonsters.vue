@@ -1,10 +1,15 @@
 <template>
-	<div class="content">
+	<div class="content" v-if="!loading">
 		<Crumble />
 		<h3>Tag current monsters with "old"</h3>
+		<p>{{ users.length }} users not yet tagged.</p>
 		<hk-loader v-if="tagging" name="Tagging monsters" />
-		<a v-else class="btn bnt-large" @click="tagMonsters()">Tag monsters with old</a>
+		<template v-else>
+			<a class="btn bnt-large mb-2" v-if="users.length > 0" @click="tagMonsters()">Tag monsters with old</a><br/>
+			<a class="btn bnt-large bg-red" @click="removeTags()">Remove tagged tag from users</a>
+		</template>
 	</div>
+	<hk-loader v-else name="Loading users" />
 </template>
 
 <script>
@@ -21,15 +26,31 @@
 		},
 		data() {
 			return {
+				loading: true,
 				tagging: false
 			}
 		},
 		firebase() {
 			return {
-				users: db.ref('search_users')
+				all_users: {
+					source: db.ref('search_users'),
+					readyCallback: () => this.loading = false
+				}
+			}
+		},
+		computed: {
+			users() {
+				return this.all_users.filter(user => {
+					return !user.tagged
+				});
 			}
 		},
 		methods: {
+			removeTags() {
+				for(const user of this.all_users) {
+					db.ref(`search_users/${user['.key']}/tagged`).remove();
+				}
+			},
 			async tagMonsters() {
 				this.tagging = true;
 				try {
@@ -37,14 +58,17 @@
 						const npc_ref = db.ref(`npcs/${user['.key']}`);
 						npc_ref.on('value', async (snapshot) => {
 							const npcs = snapshot.val();
-
 							if(npcs) {
-								for(const key of Object.keys(npcs)) {
-									db.ref(`npcs/${user['.key']}/${key}/old`).set(true);
-									console.log(user['.key'], key, "tagged");
+								console.log("USER:", user['.key']);
+								for(const [key, value] of Object.entries(npcs)) {
+									if(!value.old) {
+										db.ref(`npcs/${user['.key']}/${key}/old`).set(true);
+										console.log("- monster:", key, "tagged");
+									}
 								}
 							}
 						});
+						db.ref(`search_users/${user['.key']}/tagged`).set(true);
 					}
 				} catch (error) {
 					console.log(error)

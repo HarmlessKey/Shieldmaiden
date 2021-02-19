@@ -187,7 +187,7 @@
 					<template v-if="entity.active">
 						<span class="hp" @click.stop>
 							<template v-if="entity.curHp > 0 || entity.entityType === 'npc'">
-								<span class="current">{{ animatedNumber }}</span>
+								<hk-animated-integer :value="displayStats().curHp" class="current" />
 								<span class="max">
 									{{ displayStats().maxHp }}
 									<q-tooltip anchor="top middle" self="center middle">
@@ -394,8 +394,10 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
+import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 
 	export default {
+  components: { hkAnimatedInteger },
 		name: 'TargetItem',
 		props: {
 			item : {
@@ -418,7 +420,6 @@
 			return {
 				user: this.$store.getters.user || {},
 				target: '',
-				tweenedNumber: 0,
 				entitySetter: undefined,
 				hkColors: [
 					"#88b3ce",
@@ -443,9 +444,6 @@
 				'entities',
 				'targeted',
 			]),
-			animatedNumber() {
-				return this.tweenedNumber.toFixed(0);
-			},
 			entity() {
 				return this.entities[this.item];
 			},
@@ -473,17 +471,6 @@
 				set(newValue) {
 					this.entitySetter = newValue;
 				}
-			},
-			number() {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: this.displayStats().curHp });
-				return this.displayStats().curHp;
-			}
-		},
-		watch: {
-			number(newValue) {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			}
 		},
 		methods: {

@@ -1,70 +1,103 @@
 <template>
-	<div class="content">
-		<Crumble :name="(monster.changed) ? monster.name : old_monster.name"/>
-		<h2 class="monsterTitle d-flex justify-content-between" v-if="old_monster">
-			{{ (monster.changed) ? monster.name : old_monster.name }}
-		</h2>
-		
-		<div class="monster-wrapper" v-if="canEdit()">
-			<template v-if="(old_monster && monster)">
-				
-				<q-form @submit="store_monster()">
-					<div class="row q-col-gutter-md">
-						<div class="col-12 col-md-4" id="old_monster">
-
-							<hk-card class="old_monster" >
-								<template v-if="!loading">
-									<div class="card-header d-flex justify-content-between" slot="header">
-										<a @click="preview('old')" :class="preview_monster ==='old' ? 'selected' : ''">Old monster</a>
-										<a @click="preview('new')" :class="preview_monster ==='new' ? 'selected' : ''">New monster</a>
-									</div>
-									<a 
-										class="btn btn-block mb-3" 
-										@click="parse_old_monster()">
-											<i class="fas fa-wand-magic"></i>
-											<span class="d-none d-md-inline ml-1">Parse to new monster</span>
+	<q-form @submit="store_monster()">
+		<div class="monster-wrapper">
+			<div>
+				<Crumble :name="old_monster.name"/>
+				<h2 class="monsterTitle d-flex justify-content-between" v-if="old_monster">
+					<div>
+						{{ old_monster.name }}
+						<span v-if="unsaved_changes" class="red">
+							<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+						</span>	
+					</div>
+					<a @click="setSlide({show: true, type: 'contribute/monster/ViewMonster', data: monster})">
+						<i class="fas fa-eye" />
+					</a>
+				</h2>
+			</div>
+			
+			<div v-if="canEdit()" class="mid">
+				<div class="row q-col-gutter-md" v-if="(old_monster && monster)">
+					<div class="col-12 col-md-4 old_monster d-none d-lg-block">
+						<hk-card>
+							<template v-if="!loading">
+								<div class="card-header d-flex justify-content-between" slot="header">
+									<a @click="preview = 'old'" :class="preview === 'old' ? 'blue' : 'gray-light'">
+										Old
 									</a>
-									<pre>{{ old_monster }}</pre>
-									<div class="monster-card" v-if="preview_monster === 'old'">
-										<ViewMonster :data="old_monster" />
-									</div>
-								</template>
-								<hk-loader v-else />
-							</hk-card>
-						</div>
-						<div class="col-12 col-md-8">
-							<EditNpc :monster="monster" />
-						</div>
+									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond</a>
+									<a v-if="old_monster.name" :href="`https://5e.tools/bestiary.html#${encodeURIComponent(old_monster.name.trim().toLowerCase())}_mm`" target="_blank"><q-icon class="mr-2" name="fas fa-hammer"/>5e Tools</a>
+									<a @click="preview = 'new'" :class="preview === 'new' ? 'blue' : 'gray-light'">
+										New
+									</a>
+								</div>
+								<a 
+									class="btn btn-block mb-3" 
+									@click="parse_old_monster()">
+										<i class="fas fa-wand-magic"></i>
+										<span class="d-none d-md-inline ml-1">Parse to new monster</span>
+								</a>
+								<q-tabs
+									v-model="preview_type"
+									dark
+									inline-label
+									dense
+									no-caps
+								>
+									<q-tab name="card" label="Monster card"	/>
+									<q-tab name="json" label="JSON"	/>
+								</q-tabs>
+								<q-tab-panels v-model="preview_type" class="bg-transparent">
+									<q-tab-panel name="card">
+										<div class="monster-card">
+											<ViewMonster v-if="preview === 'old'" :data="old_monster" />
+											<ViewNewMonster v-else :data="monster" />
+										</div>
+									</q-tab-panel>
+									<q-tab-panel name="json">
+										<p>
+											{{ preview === 'old' ? old_monster : monster }}
+										</p>
+									</q-tab-panel>
+								</q-tab-panels>
+							</template>
+							<hk-loader v-else />
+						</hk-card>
 					</div>
-					<div class="save">
-						<div class="d-flex justify-content-start">
-							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
-								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
-							</div>	
-							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
-						</div>
-						<div>
-							<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary"/>
-						</div>
+					
+					<div class="col-12 col-md-8 new">
+						<EditNpc :monster="monster" />
 					</div>
-				</q-form>
-			</template>
+				</div>
+			</div>
+			<div class="save" v-if="canEdit()">
+				<div class="d-flex justify-content-start">
+					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
+						<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
+					</div>	
+					<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+				</div>
+				<div>
+					<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+					<q-btn label="Save" type="submit" color="primary"/>
+				</div>
+			</div>
 		</div>
-	</div>
+	</q-form>
 </template>
 
 <script>
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
 import ViewMonster from '@/components/ViewMonster.vue';
-import EditNpc from './forms/EditNpc.vue';
+import ViewNewMonster from '@/components/contribute/monster/ViewMonster.vue';
+import EditNpc from './forms';
 import { general } from '@/mixins/general.js';
 import { abilities } from '@/mixins/abilities.js';
 import { skills } from '@/mixins/skills.js';
 import { languages } from '@/mixins/languages.js';
 import { monsterMixin } from '@/mixins/monster.js';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { damage_types } from '@/mixins/damageTypes.js';
 
 export default {
@@ -72,6 +105,7 @@ export default {
 	components: {
 		Crumble,
 		ViewMonster,
+		ViewNewMonster,
 		EditNpc
 	},
 	mixins: [
@@ -98,7 +132,8 @@ export default {
 			monster: {},
 			unsaved_changes: false,
 			fb_monster_json: {},
-			preview_monster: 'old',
+			preview: "old",
+			preview_type: "card"
 		}
 	},
 	computed: {
@@ -125,12 +160,12 @@ export default {
 		}
 	},
 	methods: {
+		...mapActions([
+			'setSlide'
+		]),	
 		canEdit() {
 			return (this.old_monster.metadata && this.old_monster.metadata.tagged === this.userId) ||
 				this.userInfo.admin;
-		},
-		preview(type) {
-			this.preview_monster = type;
 		},
 		parse_old_monster() {			
 			this.$set(this.monster, "name", this.old_monster.name);
@@ -199,6 +234,26 @@ export default {
 				);
 			}
 
+			// Senses
+			const senses = (this.old_monster.senses) ? this.old_monster.senses.split(",") : undefined;
+			
+			if(senses) {
+				this.$set(this.monster, "senses", {});
+				for(const sense of senses) {
+					for(const monster_sense of this.monster_senses) {
+						if(sense.trim().includes(monster_sense)) {
+							let new_sense = {};
+							new_sense[monster_sense] = true;
+							
+							if(sense.match(/([0-9])+/g)) {
+								new_sense.range = sense.match(/([0-9])+/g)[0];
+							}
+							this.$set(this.monster.senses, monster_sense, new_sense);
+						}
+					}
+				}
+			}
+
 			// Defenses
 			let defenses = {
 				damage_resistances: this.old_monster.damage_resistances,
@@ -230,21 +285,12 @@ export default {
 						immunity.trim().toLowerCase()
 					);
 				}
-			}
+			}			
 
-			// Special abilities
-			this.$set(this.monster, "special_abilities", []);
-			for(const ability of this.old_monster.special_abilities) {
-				delete ability.attack_bonus;
-				this.monster.special_abilities.push(ability);
-			}
-			
-			// Actions
-			this.$set(this.monster, "actions", []);
-			this.$set(this.monster, "legendary_actions", []);
-
-			for(const action_type of ["actions", "legendary_actions"]) {
+			for(const action_type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
 				if(this.old_monster[action_type]) {
+					this.$set(this.monster, action_type, []);
+
 					for(const ability of this.old_monster[action_type]) {
 						// Store a list of actions in the list
 						// We will use only 1 action now, for damage or healing
@@ -261,10 +307,39 @@ export default {
 						};
 						let fail_miss = "";
 
+						if(action_type === "legendary_actions") newAbility.legendary_cost = 1;
+
+						// Find recharge, limit and legendary cost
+						if(ability.name.match(/\((.*?)\)/g)) {
+							const type = ability.name.match(/\((.*?)\)/g)[0];
+
+							if(type.toLowerCase().includes("recharge")){
+								if(type.match(/[0-9]+(-[0-9]+)*/)) {
+									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
+								} else {
+									newAbility.recharge = "rest";
+								}
+							}
+							if(type.toLowerCase().includes("day")){
+								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit_type = "day";
+							}
+							if(type.toLowerCase().includes("turn")){
+								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit_type = "turn";
+							}
+							if(action_type === "legendary_actions" && type.toLowerCase().includes("costs")){
+								newAbility.legendary_cost = type.match(/([0-9])+/g)[0];
+							}
+							newAbility.name = newAbility.name.replace(type, "").trim();
+						}
+
 						if(ability.damage_dice || ability.desc.toLowerCase().match(/(saving throw)/g)) {
 							// Find the range
-							const range = ability.desc.toLowerCase().match(/(range|reach).[0-9]+(\/[0-9]+)*/g);
+							const reach = ability.desc.toLowerCase().match(/(reach).[0-9]+(\/[0-9]+)*/g);
+							const range = ability.desc.toLowerCase().match(/(range).[0-9]+(\/[0-9]+)*/g);
 
+							if(reach) newAbility.reach = reach[0].split(" ")[1];
 							if(range) newAbility.range = range[0].split(" ")[1];
 
 							// Check if it's a targeted action or saving throw
@@ -334,7 +409,7 @@ export default {
 					}
 				}
 			}
-			if(this.monster.legendary_actions.length > 0) {
+			if(this.monster.legendary_actions && this.monster.legendary_actions.length > 0) {
 				this.monster.lengendary_count = 3;
 			}
 			
@@ -342,9 +417,7 @@ export default {
 		update() {
 			this.$forceUpdate();
 		},
-		
-		
-
+	
 		async store_monster() {
 			console.log('saved')
 			delete this.monster['.value'];
@@ -353,12 +426,16 @@ export default {
 			this.monster.changed = true;
 			this.monster.checked = false;
 
-		
+			// Firebase can't be searched without case sensitivity
+			this.monster.name = this.monster.name.toLowerCase();
+
 			db.ref(`new_monsters/${this.id}`).set(this.monster);
 			this.$snotify.success('Monster Saved.', 'Critical hit!', {
 				position: "rightTop"
 			});
 			this.unsaved_changes = false;
+			// Capitalize before stringyfy so changes found isn't triggered
+			this.monster.name = this.monster.name.capitalizeEach();
 			this.fb_monster_json = JSON.stringify(this.monster);
 		},
 		cancel_changes() {
@@ -375,6 +452,10 @@ export default {
 					this.unsaved_changes = true;
 				else
 					this.unsaved_changes = false;
+				
+				// Capitalize name
+				if (this.monster.name)
+					this.monster.name = this.monster.name.capitalizeEach();
 			},
 		}
 	},
@@ -396,47 +477,45 @@ export default {
 
 
 <style lang="scss" scoped>
-.content {
-	padding:0 20px;
+.monster-wrapper {
+	display: grid;
+	grid-template-rows: 105px 1fr 60px;
+	height: calc(100vh - 50px) !important;
+	padding: 20px 20px 0 20px;
 
-	.monster-wrapper {
-		display: grid;
-		height: calc(100vh - 174px) !important;
-		grid-template-rows: auto 60px;
-	
-		.q-form {
-			overflow-x: hidden;
-			overflow-y: scroll;
-	
+	.mid {
+		height: calc(100vh - 235px) !important;
+		
+		.old_monster, .new {
+			height: calc(100vh - 220px) !important;
+			overflow: auto;
+
 			&::-webkit-scrollbar {
 				display: none;
 			}
-			pre {
-				overflow: auto;
-			}
-			.old_monster {
-				position: -webkit-sticky;
-				position: sticky;
-				top: 0;
-				.card-header a.selected {
-					// font-weight: bold;
-					color: white !important;
-					cursor: default !important;
+			.q-tab-panel {
+				padding: 0;
+				
+				p {
+					box-shadow: inset 0 0 10px #000000;
+					margin: 0;
+					padding: 10px;
+					width: unset;
+					white-space: pre-wrap;
 				}
 			}
 		}
-	
-		.save {
-			display: flex;
-			justify-content: space-between;
-			padding: 10px 0;
-			border-top: solid 1px #5c5757;
-	
-			.unsaved_changes {
-				padding: 10px;
-				height: 38px;
-				margin-right: 10px;
-			}
+	}
+	.save {
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+		border-top: solid 1px #5c5757;
+
+		.unsaved_changes {
+			padding: 10px;
+			height: 38px;
+			margin-right: 10px;
 		}
 	}
 }

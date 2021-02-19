@@ -11,7 +11,10 @@
 				</div>
 			</div>
 		</div>
-		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
+		<transition 
+			enter-active-class="animated animate__slideInRight" 
+			leave-active-class="animated animate__slideOutRight"
+		>	
 			<div v-if="slide.show == true" class="slide">
 				<a @click="hideSlide()" 
 					v-shortkey="['esc']" @shortkey="hideSlide()"
@@ -28,7 +31,8 @@
 			</div>
 		</transition>
 		
-		<vue-snotify></vue-snotify>
+		<vue-snotify />
+		<HkRolls />
 	</div>
 </template>
 
@@ -39,13 +43,15 @@
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
+	import HkRolls from './components/hk-components/hk-rolls'
 
 	export default {
 	components: {
 		navMain: Header,
 		Sidebar,
 		Slide,
-		PaymentDeclined
+		PaymentDeclined,
+		HkRolls
 	},
 	metaInfo() {
 		return {
@@ -102,6 +108,7 @@
 		if(auth.currentUser !== null){
 			this.setUser();
 			this.setUserInfo();
+			this.setUserSettings();
 			// players need prio!
 			this.fetchPlayers();
 			this.fetchNpcs();
@@ -125,6 +132,7 @@
 			'fetchNpcs',
 			'setUser',
 			'setUserInfo',
+			'setUserSettings',
 			'setSlide',
 			'setSideSmallScreen'
 		]),

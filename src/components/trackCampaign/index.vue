@@ -9,6 +9,12 @@
 					<span class="title truncate">{{ campaign.campaign }}</span>
 					<span>
 						<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
+						<a @click="toggleFullscreen" class="full">
+							<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
+							<q-tooltip anchor="bottom middle" self="top middle">
+								Fullscreen
+							</q-tooltip>
+						</a>
 					</span>
 				</div>
 				<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
@@ -123,7 +129,20 @@
 						this.campaign = snapshot.val();
 					});
 				});
-			}
+			},
+			toggleFullscreen(e) {
+				const target = e.target.parentNode.parentNode.parentNode.parentNode;
+
+				this.$q.fullscreen.toggle(target)
+					.then(() => {
+						// success!
+					})
+					.catch((err) => {
+						alert(err)
+						// uh, oh, error!!
+						// console.error(err)
+					})
+			},
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.setSize);
@@ -153,6 +172,11 @@
 			.title {
 				text-align: center;
 				padding: 0 10px;
+			}
+			.full {
+				font-size: 25px;
+				color: $gray-light;
+				margin-left: 10px;
 			}
 		}
 		.campaign {

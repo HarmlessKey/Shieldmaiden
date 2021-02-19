@@ -1,4 +1,3 @@
-@import url("https://cdn.jsdelivr.net/npm/animate.css@3.5.2/animate.min.css");
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 @import "~vue-snotify/styles/material.css";
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
@@ -870,6 +869,56 @@ html body {
 		}
 	}
 
+	/* HK ROLLS */
+	.hk-rolls {
+		top: 50px;
+		position: fixed;
+		display: flex;
+		z-index: 9000;
+		pointer-events: none;
+		width: 100%;
+
+		&.center-top {
+			justify-content: center;
+		}
+		.rolls {
+			pointer-events: auto;
+			width: 300px;
+			padding-top: 20px;
+
+			.roll {
+				.header {
+					display: grid;
+					grid-template-columns: auto max-content;
+					padding: 10px;
+					background: rgba(0, 0, 0, .2);
+		
+					a {
+						color: $gray-light;
+						&:hover {
+							color: $white;
+						}
+					}
+				}
+				.body {
+					.accordion {
+						.q-item {
+							background-color: $gray;
+
+							.slashing, .bludgeoning, .piercing {
+								color: $gray-light;
+							}
+
+							.q-focus-helper {
+								visibility: hidden;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/* HK TABLE */
 	.hk-table {
 
@@ -1293,6 +1342,12 @@ html body {
 			li {
 				padding-left: 0;
 				grid-template-columns: 55px auto max-content;
+
+				.overview-item {
+					display: grid;
+					grid-template-columns: auto 20px;
+					grid-gap: 5px;
+				}	
 			}
 		}
 	}
@@ -1318,6 +1373,7 @@ html body {
 		}
 	}
 
+	// Q-INPUT FIELDS
 	.manual-input {
 		height: 90px;
 		font-size:50px;
@@ -1331,6 +1387,16 @@ html body {
 				input {
 					text-align: center;
 				}
+			}
+		}
+	}
+
+	.player-initiative {
+		.q-field__control {
+			padding: 0;
+
+			input {
+				padding-left: 12px;
 			}
 		}
 	}
@@ -1622,7 +1688,7 @@ html body {
 	}
 
 
-	/* QUALSAR */
+	/* QUASAR */
 	/*********************************************/
 	.q-pagination {
 		justify-content: center;

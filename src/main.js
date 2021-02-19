@@ -17,11 +17,13 @@ import HkTable from './components/hk-components/hk-table';
 import HkCard from './components/hk-components/hk-card';
 import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
+import HkAnimatedInteger from './components/hk-components/hk-animated-integer';
 import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
 import './quasar';
 import './registerServiceWorker';
 import { Notify } from 'quasar';
+import 'animate.css';
 
 const options = {
 	toast: {
@@ -33,6 +35,7 @@ const options = {
 Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
 Vue.component('hk-card-deck', HkCardDeck);
+Vue.component('hk-animated-integer', HkAnimatedInteger);
 Vue.component('hk-roll', HkRoll);
 Vue.component('hk-loader', HkLoader);
 Vue.component('icon', Icon);
@@ -72,6 +75,7 @@ Vue.use(VueAnalytics, {
 // redirect to the sign-in page to enable them to sign-in
 router.beforeEach((to, from, next) => {
 	store.dispatch('setSlide', false); //Always hide slide
+	store.commit("CLEAR_ACTION_ROLLS");
 
 	const currentUser = auth.currentUser; //Check if there is a user
 	const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //Check if Auth is needed for the page (defined in routes)

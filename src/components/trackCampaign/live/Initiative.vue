@@ -59,8 +59,8 @@
 						class="entities"
 						name="entities"
 						is="transition-group"
-						enter-active-class="animated fadeIn"
-						leave-active-class="animated fadeOut"
+						enter-active-class="animated animate__fadeIn"
+						leave-active-class="animated animate__fadeOut"
 					>
 						<template v-for="(entity, index) in targets">
 							<tr v-if="allEntities[0].key == entity.key && turn > 0 " :key="index" class="top">

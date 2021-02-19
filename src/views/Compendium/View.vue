@@ -4,16 +4,6 @@
 
 		<component :is="component" :id="id" v-if="component" @name="setName" />
 
-		<!-- GOOGLE ADS -->
-		<div v-if="(tier && !tier.benefits.ads) || tier == undefined" align="center">
-			<ins class="adsbygoogle"
-				style="display:block; margin-bottom:20px;"
-				data-ad-client="ca-pub-2711721977927243"
-				data-ad-slot="4341848074"
-				data-ad-format="auto"
-				data-full-width-responsive="true">
-			</ins>
-		</div>
 	</div>
 </template>
 
@@ -69,13 +59,6 @@
 			}	
 		},
 		mounted() {
-			this.$nextTick(function() {
-				// eslint-disable-next-line
-				if ($('ins').length > 0) {
-					// eslint-disable-next-line
-					(adsbygoogle = window.adsbygoogle || []).push({});
-				}
-			})
 			this.loader()
 				.then(() => {
 					this.component = () => this.loader()

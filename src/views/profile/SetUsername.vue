@@ -7,7 +7,7 @@
 						dark filled square dense
 						type="text" 
 						autocomplete="off"
-						placeholder="Username" 
+						label="Username" 
 						max-length="1" 
 						v-validate="'required|alpha_num|min:3'"
 						data-vv-as="Username" 

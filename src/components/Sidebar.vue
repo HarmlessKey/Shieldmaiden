@@ -1,7 +1,7 @@
 <template>
 	<transition 
-		enter-active-class="animated slideInLeft" 
-		leave-active-class="animated slideOutLeft"
+		enter-active-class="animated animate__slideInLeft" 
+		leave-active-class="animated animate__slideOutLeft"
 	>
 		<div 
 			@click.stop=""

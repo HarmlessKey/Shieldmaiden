@@ -638,6 +638,7 @@
 			addNpc() {
 				delete this.npc['.value']
 				delete this.npc['.key']
+				this.$set(this.npc, "old", true);
 
 				this.$validator.validateAll().then((result) => {
 					if (result) {
@@ -650,7 +651,8 @@
 				})
 			},
 			editNpc() {
-				delete this.npc['.key']
+				delete this.npc['.key'];
+				this.$set(this.npc, "old", true);
 
 				this.$validator.validateAll().then((result) => {
 					if (result) {

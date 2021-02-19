@@ -42,6 +42,11 @@
 						url: 'xml',
 						icon: 'fas fa-file-code',
 					},
+					'old-monsters': { 
+						name: 'Tag old monsters',
+						url: 'old-monsters',
+						icon: 'fas fa-dragon',
+					},
 				},
 			}
 		}

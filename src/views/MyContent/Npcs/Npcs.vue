@@ -24,6 +24,10 @@
 				</router-link>
 			</h2>
 
+			<a v-if="old_npcs.length > 0" class="btn btn-block bg-red mb-3" @click="old_dialog = true">
+				<i class="fas fa-wand-magic"></i> Update {{ old_npcs.length }} old NPCs
+			</a>
+
 			<hk-table
 				:columns="columns"
 				:items="_npcs"
@@ -36,8 +40,9 @@
 				</template>
 
 				<template slot="name" slot-scope="data">
+					<q-badge v-if="data.row.old" color="red" label="Deprecated" />
 					<router-link class="mx-2" :to="'/npcs/' + data.row.key">
-						{{ data.item }}
+						{{ data.item.capitalizeEach() }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
@@ -45,7 +50,15 @@
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/npcs/' + data.row.key">
+					<template v-if="data.row.old">
+						<a @click="parseNewNPC(data.row)">
+							<i class="fas fa-wand-magic"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Parse to new format
+							</q-tooltip>
+						</a>
+					</template>
+					<router-link v-else class="gray-hover mx-1" :to="'/npcs/' + data.row.key">
 						<i class="fas fa-pencil"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
@@ -84,21 +97,62 @@
 			</router-link>
 		</h3>
 		<div v-else class="loader"><span>Loading NPC's...</span></div>
+
+
+		<!-- PARSER DIALOG -->
+		<q-dialog dark square v-model="old_dialog">
+			<hk-card header="Deprecated NPC's">
+				<template v-if="!parsing">
+					<p>
+						We have upgraded our NPC's. You still have <b class="red">{{ old_npcs.length }}</b>
+						NPC's that are of the old format. For a better user experience, please upgrade them.
+					</p>
+					<p>Our parser does most of the work for you, but we do advise to double check your NPC's, especially the actions.</p>
+
+					<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
+
+					<div slot="footer" class="card-footer d-flex justify-content-end">
+						<q-btn class="bg-gray" v-close-popup>Later</q-btn>
+					</div>
+				</template>
+				<template v-else>
+					<h4 class="text-center mb-4">
+						<hk-animated-integer :value="parsed_counter" :class="{ green: parsed_counter === parse_total}" />/{{parse_total}} parsed
+					</h4>
+					<q-linear-progress v-if="parsed_counter !== parse_total" stripe rounded size="20px" :value="parsed_counter/parse_total" />
+					<template v-else>
+						<h2 class="text-center">
+							<i class="fas fa-check green"/>
+							Finished!
+						</h2>
+						<p>
+							All your old monster have succesfully been updated. 
+							Please make sure to double check them before use to correct any mistakes.
+						</p>
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<q-btn class="bg-blue white" v-close-popup>Close</q-btn>
+						</div>
+					</template>
+				</template>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import { mapGetters } from 'vuex'
-	import { db } from '@/firebase'
+	import _ from 'lodash';
+	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OutOfSlots from '@/components/OutOfSlots.vue';
+	import { mapGetters } from 'vuex';
+	import { db } from '@/firebase';
+	import { monsterMixin } from '@/mixins/monster';
 
 	export default {
 		name: 'Npcs',
 		metaInfo: {
 			title: 'NPC\'s'
 		},
+		mixins: [monsterMixin],
 		components: {
 			OverEncumbered,
 			OutOfSlots
@@ -106,6 +160,10 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
+				old_dialog: false,
+				parsed_counter: 0,
+				parse_total: 0,
+				parsing: false,
 				columns: {
 					avatar: {
 						width: 46,
@@ -143,8 +201,18 @@
 				.orderBy("name", 'asc')
 				.value()
 			},
+			old_npcs() {
+				return this._npcs.filter(npc => {
+					return npc.old
+				});
+			},
 			slotsLeft() {
 				return this.tier.benefits.npcs - Object.keys(this.npcs).length;
+			}
+		},
+		mounted() {
+			if(this.old_npcs.length > 0) {
+				this.old_dialog = true;
 			}
 		},
 		methods: {
@@ -198,6 +266,27 @@
 				}
 				//Remove NPC
 				db.ref('npcs/' + this.userId).child(key).remove(); 
+			},
+			parseAll() {
+				this.parsing = true;
+				this.parse_total = this.old_npcs.length;
+
+				for(const npc of this.old_npcs) {
+					console.log("Old:", npc);
+					const new_npc = this.parseNewNPC(npc);
+					console.log("New:", new_npc);
+					db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
+						this.parsed_counter++;
+					});
+				}
+				// for(let i = 1; i <= 500; i++) {
+				// 	db.ref(`npcs/${this.userId}/${this.old_npcs[0].key}/old`).set(true).then(() => {
+				// 		this.parsed_counter++;
+				// 	});
+				// }
+			},
+			parseNewNPC(npc) {
+				return this.parseMonster(npc);
 			}
 		}
 	}

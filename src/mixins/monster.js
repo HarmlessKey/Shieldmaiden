@@ -131,6 +131,7 @@ export const monsterMixin = {
 			new_monster.armor_class = (monster.ac) ? parseInt(monster.ac) : 1; // required
 			new_monster.hit_points = (monster.maxHp) ? parseInt(monster.maxHp) : 1; // required
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
+			if(monster.friendly) new_monster.friendly = true;
 
 			const proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
 

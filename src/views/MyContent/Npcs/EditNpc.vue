@@ -33,17 +33,16 @@
 
 			<!-- HANDLING -->
 			<div class="save">
-				<p class="error red" v-if="errors.items && errors.items.length > 0">There is an error in your form.</p>
-				<router-link to="/npcs" class="btn bg-gray mr-2">Cancel</router-link>
-				<button v-if="$route.name == 'AddNPC'" class="btn" @click="addNpc()"><i class="fas fa-plus"></i> Add NPC</button>
-				<button 
-					v-else 
-					:disabled="errors.items && errors.items.length > 0"
-					class="btn" 
-					@click="editNpc()"
-				>
-					<i class="fas fa-check"></i> Save
-				</button>
+				<div class="d-flex justify-content-start">
+					<div v-if="unsaved_changes" class="red unsaved_changes">
+						<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+					</div>	
+					<a v-if="unsaved_changes" class="btn bg-gray" @click="revert_changes()">Revert</a>
+				</div>
+				<div>
+					<router-link :to="`/npcs`" class="btn bg-gray mr-2">Cancel</router-link>
+					<q-btn label="Save" type="submit" color="primary"/>
+				</div>
 			</div>
 
 			<!-- COPY DIALOG -->
@@ -116,8 +115,11 @@
 		data() {
 			return {
 				userId: this.$route.params.userid || this.$store.getters.user.uid,
-				copy_dialog: false,
 				npcId: this.$route.params.id,
+				npc: {},
+				npc_copy: {},
+				copy_dialog: false,
+				unsaved_changes: false,
 				quick: false,
 				search: '',
 				searchResults: [],
@@ -145,7 +147,12 @@
 				abilities: db.ref('abilities'),
 				npc: {
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
-					asObject: true
+					asObject: true,
+					readyCallback: () => {
+						this.loading = false
+						this.npc_copy = JSON.stringify(this.npc);
+						this.unsaved_changes = false
+					}
 				},
 			}
 		},
@@ -155,24 +162,41 @@
 				'overencumbered',
 			]),
 		},
+		watch: {
+			npc: {
+				deep: true,
+				handler() {
+					if (JSON.stringify(this.npc) !== this.npc_copy) {
+						this.unsaved_changes = true;
+					} else {
+						this.unsaved_changes = false;
+					}
+					
+					// Capitalize name
+					if (this.npc.name) {
+						this.npc.name = this.npc.name.capitalizeEach();
+					}
+				},
+			}
+		},
 		methods: {
 			...mapActions([
 				'fetchCampaign',
 				'setSlide'
 			]),
 			isOwner() {
-				if (this.$route.name == 'Edit Companion')
-					return false
-				return true
+				if (this.$route.name == 'Edit Companion') {
+					return false;
+				} return true;
 			},
 			searchNPC() {
-				this.searchResults = []
-				this.searching = true
+				this.searchResults = [];
+				this.searching = true;
 				for (var i in this.npcs) {
 					var m = this.npcs[i]
 					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = ''
-						this.searchResults.push(m)
+						this.noResult = '';
+						this.searchResults.push(m);
 					}
 				}
 				if(this.searchResults == '' && this.search != '') {
@@ -184,37 +208,40 @@
 				this.searchResults = [];
 				this.search = '';
 			},
+			revert_changes() {
+				this.npc = JSON.parse(this.npc_copy);
+				this.unsaved_changes = false;
+			},
 			addNpc() {
 				delete this.npc['.value'];
 				delete this.npc['.key'];
 
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref('npcs/' + this.userId).push(this.npc);
-						this.$router.replace('/npcs')
-					} else {
-						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
-						});
-					}
-				})
+				db.ref('npcs/' + this.userId).push(this.npc);
+					
+				this.$snotify.success('Monster Saved.', 'Critical hit!', {
+					position: "rightTop"
+				});
+
+				this.unsaved_changes = false;
+
+				// Capitalize before stringyfy so changes found isn't triggered
+				this.monster.name = this.monster.name.capitalizeEach();
+				this.fb_monster_json = JSON.stringify(this.monster);
 			},
 			editNpc() {
 				delete this.npc['.key'];
 
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
-						if (this.isOwner()){
-							this.$router.replace('/npcs')
-						}
-						else {
-							this.$router.replace(`/characters/${this.npc.player_id}`)
-						}
-					} else {
-						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
-						});
-					}
-				})
+				db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
+					
+				this.$snotify.success('Monster Saved.', 'Critical hit!', {
+					position: "rightTop"
+				});
+
+				this.unsaved_changes = false;
+
+				// Capitalize before stringyfy so changes found isn't triggered
+				this.monster.name = this.monster.name.capitalizeEach();
+				this.fb_monster_json = JSON.stringify(this.monster);
 			},
 			add(type) {
 				if(type == 'actions') {
@@ -267,6 +294,18 @@
 				var str = name.toString()
 				return str
 			},
+		},
+		beforeRouteLeave (to, from, next) {
+			if (this.unsaved_changes) {
+				this.$snotify.error('There are unsaved changes in the form.\n Would you like to continue?', 'Unsaved Changes', {
+					buttons: [
+					{ text: 'Leave', action: (toast) => { next(); this.$snotify.remove(toast.id); }, bold: false},
+					{ text: 'Stay', action: (toast) => { next(false); this.$snotify.remove(toast.id); }, bold: true},
+					]
+				});
+			} else {
+				next()
+			}
 		}
 	}
 </script>

@@ -151,11 +151,11 @@
 				noResult: '',
 				tabs: [
 					{
-						name: false,
+						name: "advanced",
 						label: "Advanced build",
 					},
 					{
-						name: true,
+						name: "quick",
 						label: "Quick build",
 					}
 				]

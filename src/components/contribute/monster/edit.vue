@@ -419,7 +419,6 @@ export default {
 		},
 	
 		async store_monster() {
-			console.log('saved')
 			delete this.monster['.value'];
 			delete this.monster['.key'];
 

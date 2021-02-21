@@ -7,15 +7,38 @@
 	</div>
 	<q-form 
 		v-else-if="npc || $route.name == 'AddNPC'" 
-		@submit="{ ($route.name === 'AddNPC') ? addNPC() : editNPC() }"
+		@submit="{ ($route.name === 'AddNPC') ? addNpc() : editNpc() }"
 	>
 		<div class="content">
-			<div class="form">
-				<a v-if="$route.name === 'AddNPC'" class="btn btn-block" @click="copy_dialog = true">
-					<i class="fas fa-copy"></i>
-					Copy existing NPC
-				</a>
+			<div class="top">
+				<div class="d-flex justify-content-start">
+					<router-link class="back" to="/npcs"><i class="fas fa-chevron-left"/> Back</router-link>
+					<q-tabs
+						v-model="quick"
+						dark
+						inline-label
+						dense
+						no-caps
+					>
+						<q-tab 
+							v-for="({name, label}, index) in tabs"
+							:key="`tab-${index}`" 
+							:name="name" 
+							:label="label"
+						/>
+					</q-tabs>
+					<a v-if="$route.name === 'AddNPC'" class="btn" @click="copy_dialog = true">
+						<i class="fas fa-copy"></i>
+						Copy existing NPC
+					</a>
+				</div>
+				<div v-if="npc" class="d-none d-md-flex name">
+					<b v-if="npc.name">{{ npc.name}}</b>
+					<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }" />
+				</div>
+			</div>
 
+			<div class="form">
 				<BasicInfo v-model="npc" />
 
 				<Senses v-model="npc" />
@@ -34,10 +57,12 @@
 			<!-- HANDLING -->
 			<div class="save">
 				<div class="d-flex justify-content-start">
-					<div v-if="unsaved_changes" class="red unsaved_changes">
-						<i class="fas fa-exclamation-triangle"></i> Unsaved changes
-					</div>	
-					<a v-if="unsaved_changes" class="btn bg-gray" @click="revert_changes()">Revert</a>
+					<template v-if="unsaved_changes">
+						<div  class="red unsaved_changes">
+							<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+						</div>	
+						<a class="btn bg-gray" @click="revert_changes()">Revert</a>
+					</template>
 				</div>
 				<div>
 					<router-link :to="`/npcs`" class="btn bg-gray mr-2">Cancel</router-link>
@@ -124,6 +149,16 @@
 				search: '',
 				searchResults: [],
 				noResult: '',
+				tabs: [
+					{
+						name: false,
+						label: "Advanced build",
+					},
+					{
+						name: true,
+						label: "Quick build",
+					}
+				]
 			}
 		},
 		mounted() {
@@ -139,19 +174,16 @@
 					}
 				});
 				this.npcs = npcs;
-				this.loadingNpcs = false;
 			});
 		},
 		firebase() {
 			return {
-				abilities: db.ref('abilities'),
 				npc: {
 					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
 					asObject: true,
 					readyCallback: () => {
-						this.loading = false
 						this.npc_copy = JSON.stringify(this.npc);
-						this.unsaved_changes = false
+						this.unsaved_changes = false;
 					}
 				},
 			}
@@ -165,8 +197,8 @@
 		watch: {
 			npc: {
 				deep: true,
-				handler() {
-					if (JSON.stringify(this.npc) !== this.npc_copy) {
+				handler(newVal) {
+					if (JSON.stringify(newVal) !== this.npc_copy) {
 						this.unsaved_changes = true;
 					} else {
 						this.unsaved_changes = false;
@@ -225,8 +257,8 @@
 				this.unsaved_changes = false;
 
 				// Capitalize before stringyfy so changes found isn't triggered
-				this.monster.name = this.monster.name.capitalizeEach();
-				this.fb_monster_json = JSON.stringify(this.monster);
+				this.npc.name = this.npc.name.capitalizeEach();
+				this.npc_copy = JSON.stringify(this.npc);
 			},
 			editNpc() {
 				delete this.npc['.key'];
@@ -240,47 +272,8 @@
 				this.unsaved_changes = false;
 
 				// Capitalize before stringyfy so changes found isn't triggered
-				this.monster.name = this.monster.name.capitalizeEach();
-				this.fb_monster_json = JSON.stringify(this.monster);
-			},
-			add(type) {
-				if(type == 'actions') {
-					if(this.npc.actions == undefined) {
-						this.npc.actions = [];
-					}
-					this.npc.actions.push({
-						name: 'New Action',
-					});
-				}
-				else if(type == 'legendary_actions') {
-					if(this.npc.legendary_actions === undefined) {
-						this.npc.legendary_actions = [];
-					}
-					this.npc.legendary_actions.push({
-						name: 'New Legendary Action',
-					});
-				}
-				else if(type == 'special_abilities') {
-					if(this.npc.special_abilities === undefined) {
-						this.npc.special_abilities = [];
-					}
-					this.npc.special_abilities.push({
-						name: 'New Special Ability',
-					});
-				}
-				this.$forceUpdate(); //IMPORTANT
-			},
-			remove(index, type) {
-				if(type == 'actions'){
-					this.$delete(this.npc.actions, index);
-				}
-				else if(type == 'special_abilities'){
-					this.$delete(this.npc.special_abilities, index);
-				}
-				else if(type == 'legendary_actions'){
-					this.$delete(this.npc.legendary_actions, index);
-				}
-				this.$forceUpdate(); //IMPORTANT
+				this.npc.name = this.npc.name.capitalizeEach();
+				this.npc_copy = JSON.stringify(this.npc);
 			},
 			setQuick(input) {
 				if(input == 0) {
@@ -289,11 +282,7 @@
 				else {
 					this.quick = true
 				}
-			},
-			returnString(name) {
-				var str = name.toString()
-				return str
-			},
+			}
 		},
 		beforeRouteLeave (to, from, next) {
 			if (this.unsaved_changes) {
@@ -314,59 +303,50 @@
 .content {
 	display: grid;
 	height: calc(100vh - 50px) !important;
-	grid-template-rows: auto 60px;
+	grid-template-rows: 35px 1fr 60px;
 
+	.top {
+		display: flex;
+		justify-content: space-between;
+		border-bottom: solid 1px $gray-hover;
+
+		.back {
+			line-height: 35px;
+			margin-right: 10px;
+		}
+		.name {
+			user-select: none;
+			justify-content: flex-end;
+			line-height: 35px;
+
+			.img {
+				width: 31px;
+				height: 31px;
+				background-position: center top;
+				background-size: cover;
+				border: solid 1px $gray-hover;
+				margin: 2px 0 2px 5px;
+				border-radius: 50%;
+			}
+		}
+	}
 	.form {
+		padding-top: 5px;
 		overflow-x: hidden;
 		overflow-y: scroll;
 
 		&::-webkit-scrollbar {
 			display: none;
-		}
-
-		ul {
-			padding: 0;
-
-			&.entities {
-				li {
-					margin-bottom: 3px;
-				}
-			}
-		}
-		a.tab {
-			display: inline-block;
-			padding: 10px;
-			margin-bottom: 1px;
-
-			&.active {
-				background-color:$gray;
-				color: $gray-light !important;
-			}
-		}
-		.avatar {
-			display: grid;
-			grid-template-columns: 56px 1fr;
-			grid-column-gap: 10px;
-
-			.img {
-				border: solid 1px $gray-light;
-				width: 56px;
-				height: 56px;
-				background-size: cover;
-				background-position: center top;
-			}
-		}
-		.skills {
 			columns: 2;
 		}
 	}
 	.save {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		padding-top: 20px;
-		border-top: solid 1px$gray-hover;
+		border-top: solid 1px $gray-hover;
 
-		.error {
+		.unsaved_changes {
 			margin: 0 10px 0 0;
 			line-height: 40px;
 		}

@@ -23,6 +23,29 @@
 				</div>
 			</div>
 
+			<!-- AVATAR -->
+			<div class="avatar mb-3">
+				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
+				<div class="img" v-else>
+					<img src="@/assets/_img/styles/monster.svg" />
+				</div>
+				<div>
+					<q-input 
+						dark filled square
+						label="Avatar"
+						autocomplete="off"  
+						type="text" 
+						class="mb-2" 
+						:class="{'input': true, 'error': errors.has('avatar') }" 
+						v-model="npc.avatar" 
+						v-validate="'url'" 
+						data-vv-as="Avatar"
+						name="avatar" 
+						placeholder="Image URL"
+					/>
+				</div>
+			</div>
+
 			<!-- SIZE -->
 			<q-select
 				dark filled square
@@ -147,7 +170,6 @@
 				dark filled square
 				label="Challenge rating"
 				v-model="npc.challenge_rating" 
-				class="mb-2"
 				:options="Object.keys(monster_challenge_rating)"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 			>
@@ -166,29 +188,6 @@
 					</q-tooltip>
 				</div>
 			</q-select>
-
-			<!-- AVATAR -->
-			<!-- <div class="avatar">
-				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
-				<div class="img" v-else>
-					<img src="@/assets/_img/styles/monster.svg" />
-				</div>
-				<div>
-					<q-input 
-						dark filled square
-						label="Avatar"
-						autocomplete="off"  
-						type="text" 
-						class="mb-2" 
-						:class="{'input': true, 'error': errors.has('avatar') }" 
-						v-model="npc.avatar" 
-						v-validate="'url'" 
-						data-vv-as="Avatar"
-						name="avatar" 
-						placeholder="Image URL"
-					/>
-				</div>
-			</div> -->
 		</hk-card>
 
 		<hk-card header="Health & Armor Class">

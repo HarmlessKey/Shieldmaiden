@@ -1725,6 +1725,13 @@ html body {
 			}
 		}
 	}
+	.q-list {
+		.q-expansion-item {
+			.q-item__section.hidden-toggle {
+				display: none !important;
+			}
+		}
+	}
 
 	.q-tabs--dense {
 		.q-tab {

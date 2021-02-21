@@ -94,7 +94,8 @@
 						<Manual :current="entitiesList[doneBy]" :targeted="targeted" />
 					</q-tab-panel>
 					<q-tab-panel name="roll">
-						<Roll :current="entitiesList[doneBy]" />
+						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
+						<Roll v-else :current="entitiesList[doneBy]" />
 					</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -107,15 +108,18 @@
 	import { setHP } from '@/mixins/HpManipulations.js';
 
 	import Manual from '@/components/combat/actions/Manual.vue';
+	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
 		name: 'Actions',
 		components: {
 			Manual,
+			RollDeprecated,
 			Roll,
 		},
-		mixins: [setHP],
+		mixins: [setHP, damage_types],
 		props: {
 			current: {
 				type: Object

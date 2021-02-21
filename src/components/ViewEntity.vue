@@ -1,38 +1,60 @@
 <template>
-	<div class="pb-5" ref="entity" :class="{ smallWidth: is_small }">
-		<h2>{{ data.name }}</h2>
+	<div class="pb-1" ref="entity" :class="{ smallWidth: is_small }">
+		<h2>
+			<q-badge v-if="entity.old" label="DEPRECATED" color="red" />
+			{{ entity.name.capitalizeEach() }}
+			<small v-if="entity.source">{{ entity.source }}</small>
+		</h2>
+		<p v-if="entity.old" class="red">
+			Some values might not show, or show incorrectly. 
+			Please update your NPC at the
+			<router-link to="/npcs">NPC's page</router-link>.
+		</p>
 		<i>
-			<template v-if="data.size">{{ data.size }}</template>
-			<template v-if="data.type"> {{ data.type }}</template>
-			<span v-if="data.subtype">({{ data.subtype }})</span>
-			<template v-if="data.alignment">, {{ data.alignment }}</template>
+			<template v-if="entity.size">{{ entity.size }}</template>
+			<template v-if="entity.type"> {{ entity.type }}</template>
+			<span v-if="entity.subtype">({{ entity.subtype }})</span>
+			<template v-if="entity.alignment">, {{ entity.alignment }}</template>
 		</i>
 		<hr>
 		<p>
-			<template v-if="data.entityType === 'player'">
+			<template v-if="entity.entityType === 'player'">
 				<b>Level</b>: 
-				<span> {{ data.level || calculatedLevel(data.experience) }}</span><br/>
+				<span> {{ entity.level || calculatedLevel(entity.experience) }}</span><br/>
 			</template>
-			<template v-if="data.armor_class">
+			<template v-if="entity.armor_class">
 				<b>Armor Class</b>: 
-				<span> {{ data.armor_class }}</span><br/>
+				<span> {{ entity.armor_class }}</span><br/>
 			</template>
 			<template v-else>
 				<b>Armor Class</b>: 
-				<span> {{ data.ac }}</span><br/>
+				<span> {{ entity.ac }}</span><br/>
 			</template>
-			<template v-if="data.hit_points">
+			<template v-if="entity.hit_points">
 				<b>Hit Points</b>: 
-				<span> {{ data.hit_points }}</span>
+				<span> {{ entity.hit_points }}</span>
 			</template>
 			<template v-else>
 				<b>Hit Points</b>: 
-				<span> {{ data.maxHp }}</span>
+				<span> {{ entity.maxHp }}</span>
 			</template>
-			<template v-if="data.hit_dice"> {{ data.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
-			<template v-if="data.speed">
-				<br/><b>Speed</b>: 
-				<span> {{ data.speed }}</span>
+			<template v-if="entity.hit_dice"> {{ entity.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
+			<template v-if="entity.old || entity.entityType === 'player'">
+				<template v-if="entity.speed">
+					<br/><b>Speed</b>: 
+					<span> {{ entity.speed }}</span>
+				</template>
+			</template>
+			<template v-else>
+				<br/><b>Speed</b>: {{ entity.walk_speed ? entity.walk_speed : 0 }} ft.{{ 
+					entity.swim_speed ? `, swim ${entity.swim_speed} ft.` : `` 
+				}}{{ 
+					entity.fly_speed ? `, fly ${entity.fly_speed} ft.` : `` 
+				}}{{ 
+					entity.burrow_speed ? `, burrow ${entity.burrow_speed} ft.` : `` 
+				}}{{ 
+					entity.climb_speed ? `, climb ${entity.climb_speed} ft.` : ``
+				}}
 			</template>
 		</p>
 		<hr>
@@ -45,7 +67,7 @@
 					d: 20, 
 					n: 1, 
 					m: modifier(data[ability.ability]),
-					title: `${data.name}: ${ability.ability.capitalize()} check`, 
+					title: `${entity.name}: ${ability.ability.capitalize()} check`, 
 					notify: true
 				}"
 			>
@@ -58,8 +80,88 @@
 		</div>
 		<hr>
 
+		<p v-if="!entity.old && entity.entityType !== 'player'">
+			<template v-if="entity.saving_throws">
+				<b>Saving Throws </b>
+				<span class="saves">
+					<hk-roll 
+						tooltip="Roll save" 
+						v-for="(ability, index) in entity.saving_throws" 
+						:key="ability"
+						:roll="{
+							d: 20, 
+							n: 1, 
+							m: calcMod(data[ability]) + entity.proficiency,
+							title: `${entity.name}: ${ability.capitalize()} save`, 
+							notify: true
+						}"
+					>
+						<span class="save">
+							{{ ability.substring(0,3).capitalize() }} 
+							+{{ 
+								calcMod(data[ability]) + entity.proficiency 
+							}}{{ 
+								index+1 &lt; entity.saving_throws.length ? "," : ""
+							}}
+						</span>
+					</hk-roll>
+				</span>
+				<br/>
+			</template>
+			<template v-if="entity.skills">
+				<b>Skills</b>
+				<span class="saves">
+					<hk-roll 
+						v-for="(skill, index) in entity.skills" 
+						:key="skill" 
+						:tooltip="`Roll ${skill}`"
+						:roll="{
+							d: 20, 
+							n: 1, 
+							m: skillModifier(skillList[skill].ability, skill),
+							title: `${skill} check`, 
+							notify: true
+						}"
+					>
+						<span class="save">
+							{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; entity.skills.length ? "," : "" }}
+						</span>
+					</hk-roll>
+					<br/>
+				</span>
+			</template>
+			<template v-if="entity.damage_vulnerabilities && entity.damage_vulnerabilities.length > 0">
+				<b>Damage vulnerabilities</b> {{ entity.damage_vulnerabilities.join(", ") }}<br/>
+			</template>
+			<template v-if="entity.damage_resistances && entity.damage_resistances.length > 0">
+				<b>Damage resistances</b> {{ entity.damage_resistances.join(", ") }}<br/>
+			</template>
+			<template v-if="entity.damage_immunities && entity.damage_immunities.length > 0">
+				<b>Damage immunities</b> {{ entity.damage_immunities.join(", ") }}<br/>
+			</template>
+			<template v-if="entity.condition_immunities && entity.condition_immunities.length > 0">
+				<b>Condition immunities</b> {{ entity.condition_immunities.join(", ") }}<br/>
+			</template>
+
+			<b>Senses</b> 
+			<template v-if="entity.senses">
+				<span v-for="(sense, key) in entity.senses" :key="key">
+					{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
+						sense.comments ? `${sense.comments}` : ``
+					}},
+				</span>
+			</template>
+			passive Perception {{ passivePerception() }}<br/>
+
+			<template v-if="entity.languages"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
+			<template v-if="entity.challenge_rating">
+					<b>Challenge Rating</b> {{ entity.challenge_rating }} 
+					({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
+				</template>
+		</p>
+
 		<!-- SKILLS -->
-		<template v-if="data.entityType === 'player'">
+		<template v-if="!entity.old">
 			<h3>Skills</h3>
 			<div class="playerSkills">
 				<hk-roll 
@@ -70,14 +172,14 @@
 						d: 20, 
 						n: 1, 
 						m: skillModifier(skill, key),
-						title: `${data.name}: ${skill.skill} check`, 
+						title: `${entity.name}: ${skill.skill} check`, 
 						notify: true
 					}"
 				>
 					<span class="playerSkill">
 						<span class="truncate">
-							<template v-if="data.skills && data.skills.includes(key)">
-								<i v-if="data.skills_expertise && data.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+							<template v-if="entity.skills && entity.skills.includes(key)">
+								<i v-if="entity.skills_expertise && entity.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
 								<i v-else class="fas fa-circle"></i>
 							</template>
 							<i v-else class="far fa-circle"></i>
@@ -89,66 +191,28 @@
 			</div>
 			<hr>
 		</template>
-		<p>
-			<template v-if="savingThrows.length > 0">
-				<b>Saving Throws </b>
-				<span class="saves">
-					<hk-roll
-						tooltip="Roll Save" 
-						v-for="save in savingThrows" 
-						:key="save.save"
-						:roll="{
-							d: 20, 
-							n: 1, 
-							m: save.score,
-							title: `${data.name}: ${save.save.capitalize()} save`, 
-							notify: true
-						}"
-					>
-						<span class="save">
-							{{ save.save.substring(0,3).toUpperCase() }} +{{ save.score }}
-						</span>
-					</hk-roll>
-				</span>
-				<br/>
-			</template>
-			<template v-if="monsterSkills.length > 0">
-				<b>Skills </b>
-				<span class="skills">
-					<span class="skill" v-for="skill in monsterSkills" :key="skill.skill">
-						{{ skill.skill }} +{{ skill.score }}</span>
-				</span>
-				<br/>
-			</template>
-			<template v-if="data.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ data.damage_vulnerabilities }}<br/></template>
-			<template v-if="data.damage_resistances"><b>Damage resistances</b> {{ data.damage_resistances }}<br/></template>
-			<template v-if="data.damage_immunities"><b>Damage immunities</b> {{ data.damage_immunities }}<br/></template>
-			<template v-if="data.condition_immunities"><b>Condition immunities</b> {{ data.condition_immunities }}<br/></template>
-			<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
-			<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
-			<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }} ({{ challengeToXp[data.challenge_rating] }}XP)</template>
-		</p>
 
-		<template v-if="data.special_abilities">
-			<hr>
-			<p v-for="(ability, index) in data.special_abilities" :key="`ability-${index}`">
-				<b>{{ ability.name }}</b> {{ ability.desc }}
-			</p>
-		</template>
+		<div class="monster-actions" v-if="entity.entityType !== 'player'">
+			<div v-for="{category, name} in actions" :key="category">
+				<template v-if="entity[category] && entity[category].length > 0">
+					<h3 v-if="category !== 'special_abilities'">{{ name }}</h3>
+					<p v-if="entity.lengendary_count && category === 'legendary_actions'">
+						{{ entity.name.capitalizeEach() }} can take {{ entity.lengendary_count }} legendary actions, choosing from the options below. 
+						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ entity.name }} regains spent legendary actions at the start of their turn.
+					</p>
+					<p v-for="(ability, index) in entity[category]" :key="`${category}-${index}`">
+						<b><i>
+							{{ ability.name }}
+							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
+							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
+						</i></b>
+						{{ ability.desc }}
+					</p>
+				</template>
+			</div>
+		</div>
 
-		<template v-if="data.actions">
-			<h3>Actions</h3>
-			<p v-for="(action, index) in data.actions" :key="`action-${index}`">
-				<b>{{ action.name }}</b> {{ action.desc }}
-			</p>
-		</template>
-
-		<template v-if="data.legendary_actions">
-			<h3>Legendary Actions</h3>
-			<p v-for="(legendary_action, index) in data.legendary_actions" :key="`legendary-${index}`">
-				<b>{{ legendary_action.name }}</b> {{ legendary_action.desc }}
-			</p>
-		</template>
 	</div>
 </template>
 
@@ -157,78 +221,34 @@
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
 	import { skills } from '@/mixins/skills.js';
+	import { monsterMixin } from '@/mixins/monster.js';
 	import { experience } from '@/mixins/experience.js';
 
 	export default {
 		name: 'NPC',
-		mixins: [general, dice, experience, skills],
+		mixins: [general, dice, experience, skills, monsterMixin],
 		props: [
 		'data'
 		],
 		data() {
 			return {
 				is_small: false,
-				challengeToXp: {
-					0: 10,
-					'0.125': 25,
-					'0.25': 50,
-					'0.5': 100,
-					1: 200,
-					2: 450,
-					3: 700,
-					4: 1100,
-					5: 1800,
-					6: 2300,
-					7: 2900,
-					8: 3900,
-					9: 5000,
-					10: 5900,
-					11: 7200,
-					12: 8400,
-					13: 10000,
-					14: 11500,
-					15: 13000,
-					16: 15000,
-					17: 18000,
-					19: 22000,
-					20: 25000,
-					21: 33000,
-					22: 41000,
-					23: 50000,
-					24: 62000,
-					30: 155000,
-				}
+				actions: [
+					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
+					{ category: 'actions', name: 'Actions', name_single: 'Action' },
+					{ category: 'legendary_actions', name: 'Legendary Actions', name_single: 'Legendary action' },
+					{ category: 'reactions', name: 'Reactions', name_single: 'Reaction' }
+				],
 			}
 		},
 		computed: {
-			monsterSkills() {
-				let skills = [];
-				for(let key in this.skillList) {
-					let skill = this.skillList[key].skill;
-
-					if(this.data[key]) {
-						skills.push({
-							skill,
-							score: this.data[key]
-						})
-					}
+			entity() {
+				let entity = this.data;
+				if(entity.entityType === 'npc' && !entity.old) {
+					entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 				}
-				return skills;
+				return entity;
 			},
-			savingThrows() {
-				let saves = [];
-				for(let i in this.abilities) {
-					let save = this.abilities[i].ability;
-
-					if(this.data[`${save}_save`]) {
-						saves.push({
-							save,
-							score: this.data[`${save}_save`]
-						})
-					}
-				}
-				return saves;
-			}
 		},
 		firebase() {
 			return {
@@ -254,14 +274,17 @@
 					return mod;
 				}
 			},
+			passivePerception() {
+				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
+			},
 			skillModifier(skill, key) {
 				return this.calculateSkillModifier(
 					this.calcMod(this.data[skill.ability]),
-					this.data.skills ? (
-					this.data.skills.includes(key) ? 
-					this.returnProficiency(this.data.level ? this.data.level : this.calculatedLevel(this.data.experience)): 0) 
+					this.entity.skills ? (
+					this.entity.skills.includes(key) ? 
+					this.returnProficiency(this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience)): 0) 
 					: 0,
-					this.data.skills_expertise ? this.data.skills_expertise.includes(key) : false
+					this.entity.skills_expertise ? this.entity.skills_expertise.includes(key) : false
 				) 
 			}
 		},
@@ -281,6 +304,10 @@
 <style lang="scss" scoped>
 h2 {
 	margin-bottom:5px !important;
+
+	small {
+		font-size: 12px;
+	}
 }
 h3 {
 	text-transform: none;

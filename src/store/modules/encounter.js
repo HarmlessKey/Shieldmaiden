@@ -1,5 +1,8 @@
 import { db } from '@/firebase';
+import { skills } from '@/mixins/skills';
+import { abilities } from '@/mixins/abilities';
 import Vue from 'vue';
+
 
 const demoPlayers = {
 	'playerone': {
@@ -85,7 +88,7 @@ const demoEncounter = {
 			"key" : "monsterone",
 			"maxHp" : 21,
 			"name" : "Orc (1)",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 		"monstertwo" : {
 			"ac" : 13,
@@ -97,7 +100,7 @@ const demoEncounter = {
 			"key" : "monstertwo",
 			"maxHp" : 12,
 			"name" : "Orc (2)",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 		"monsterthree" : {
 			"ac" : 11,
@@ -109,7 +112,7 @@ const demoEncounter = {
 			"key" : "monstertwo",
 			"maxHp" : 72,
 			"name" : "Ogre",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 	},
 	"finished" : false,
@@ -1035,26 +1038,26 @@ const mutations = {
 			case 'npc':
 			case 'companion': 
 			{
-
 				let data_npc = {};
 				
+				// COMPANION
 				if (entity.entityType === 'companion') {
 
 					data_npc = rootState.content.npcs[key];
 
 					let campaignCompanion = rootState.content.campaigns[state.campaignId].companions[key];
-
+					
+					// Get companion status from campaign
 					entity.curHp = campaignCompanion.curHp;
 					entity.tempHp = campaignCompanion.tempHp;
 					entity.ac_bonus = campaignCompanion.ac_bonus;
 					entity.maxHpMod = campaignCompanion.maxHpMod;
 					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
-
 					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
 					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
 					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
-					entity.ac = data_npc.ac;
+					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
 
 					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 
@@ -1069,20 +1072,23 @@ const mutations = {
 						entity.transformed = false;
 					}
 				}
+
+				// NPC
 				else {
 
-					//Fetch data from API
-					if(entity.npc == 'api') {
+					//Fetch data from Firebase
+					if(entity.npc === 'srd' || entity.npc === 'api') {
 						let monsters = monsters_ref.child(entity.id);
 
 						data_npc = await monsters.once('value').then(function(snapshot) {
 							return snapshot.val()
-						})
+						});
 					}
 					else {
-						data_npc = rootState.content.npcs[entity.id]
+						data_npc = rootState.content.npcs[entity.id];
 					}
 
+					// Values from encounter
 					entity.curHp = db_entity.curHp;
 					entity.tempHp = db_entity.tempHp;
 					entity.maxHpMod = db_entity.maxHpMod;
@@ -1113,57 +1119,56 @@ const mutations = {
 				//without copying an existing
 				//it won't have data_npc
 				if(data_npc) {
+					entity.old = data_npc.old;
 					entity.size = data_npc.size;
 					entity.type = data_npc.type;
 					entity.subtype = data_npc.subtype;
 					entity.alignment = data_npc.alignment;
 					entity.challenge_rating = data_npc.challenge_rating;
 					entity.hit_dice = data_npc.hit_dice;
-					entity.speed = data_npc.speed;
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
+					if(data_npc.source) entity.source = data_npc.source;
+					
+					// Ability scores
+					for(const ability of abilities.data().abilities) {
+						entity[ability] = data_npc[ability];
+					}
+					
+					// Old NPC format values
+					if(data_npc.old) {
+						entity.speed = data_npc.speed;
 
-					entity.strength = data_npc.strength;
-					entity.dexterity = data_npc.dexterity;
-					entity.constitution = data_npc.constitution;
-					entity.intelligence = data_npc.intelligence;
-					entity.wisdom = data_npc.wisdom;
-					entity.charisma = data_npc.charisma;
+						for(const ability of abilities.data().abilities) {
+							entity[`${ability}_save`] = data_npc[`${ability}_save`];
+						}
+					
+						for(const skill in skills.data().skillList) {
+							if(entity[skill]) {
+								entity[skill] = data_npc[skill];
+							}
+						}
+					} 
+					// Current format values
+					else {
+						entity.saving_throws = data_npc.saving_throws;
+						entity.skills = data_npc.skills;
+						entity.skills_expertise = data_npc.skills_expertise;
 
-					entity.strength_save = data_npc.strength_save;
-					entity.dexterity_save = data_npc.dexterity_save;
-					entity.constitution_save = data_npc.constitution_save;
-					entity.intelligence_save = data_npc.intelligence_save;
-					entity.wisdom_save = data_npc.wisdom_save;
-					entity.charisma_save = data_npc.charisma_save;
-
-					entity.acrobatics = data_npc.acrobatics;
-					entity['animal Handling'] = data_npc['animal Handling'];
-					entity.arcana = data_npc.arcana;
-					entity.athletics = data_npc.athletics;
-					entity.deception = data_npc.deception;
-					entity.history = data_npc.history;
-					entity.insight = data_npc.insight;
-					entity.intimidation = data_npc.intimidation;
-					entity.investigation = data_npc.investigation;
-					entity.medicine = data_npc.medicine;
-					entity.nature = data_npc.nature;
-					entity.perception = data_npc.perception;
-					entity.performance = data_npc.performance;
-					entity.persuasion = data_npc.persuasion;
-					entity.religion = data_npc.religion;
-					entity['sleight of Hand'] = data_npc['sleight of Hand'];
-					entity.stealth = data_npc.stealth;
-					entity.survival = data_npc.survival;
-
-					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities;
-					entity.damage_resistances = data_npc.damage_resistances;
-					entity.damage_immunities = data_npc.damage_immunities;
-					entity.condition_immunities = data_npc.condition_immunities;
-
-					entity.special_abilities = data_npc.special_abilities;
-					entity.actions = data_npc.actions;
-					entity.legendary_actions = data_npc.legendary_actions;
+						for(const speed of ["walk_speed", "fly_speed", "swim_speed", "burrow_speed", "climb_speed"]) {
+							if(data_npc[speed]) entity[speed] = data_npc[speed];
+						}
+					}
+					
+					// Defenses
+					for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+						if(data_npc[defense]) entity[defense] = data_npc[defense];
+					}
+					
+					// Abilities
+					for(const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
+						if(data_npc[type]) entity[type] = data_npc[type];
+					}
 				}
 				break
 			}

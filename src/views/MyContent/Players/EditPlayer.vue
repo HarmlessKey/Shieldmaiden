@@ -234,6 +234,8 @@
 					</div>
 				</hk-card>
 
+				<Defenses v-model="player" />
+
 				<!-- SKILLS -->
 				<hk-card header="Skills">
 					<h5>
@@ -398,6 +400,7 @@
 	import { experience } from '@/mixins/experience.js';
 	import { skills } from '@/mixins/skills.js';
 	import { general } from '@/mixins/general.js';
+	import Defenses from './Defenses';
 
 	export default {
 		name: 'Players',
@@ -407,7 +410,8 @@
 		},
 		components: {
 			OverEncumbered,
-			GiveCharacterControl
+			GiveCharacterControl,
+			Defenses
 		},
 		data() {
 			return {

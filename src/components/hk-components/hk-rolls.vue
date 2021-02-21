@@ -18,6 +18,34 @@
 				</div>
 
 				<div class="body">
+					<!-- TARGET -->
+					<div class="target-item" v-if="roll.target">
+						<icon v-if="['monster', 'player', 'companion'].includes(roll.target.img)" class="img" :icon="roll.target.img" :fill="roll.target.color_label" :style="roll.target.color_label ? `border-color: ${roll.target.color_label}` : ``" />
+						<span 
+							v-else class="img" 
+							:style="{ 'background-image': 'url(' + roll.target.img + ')' }"
+						/>
+						<div class="ac_wrapper">
+							<i class="fas fa-shield" ></i>
+							<span 
+								class="ac" 
+								:class="{ 
+									'green': roll.target.ac_bonus > 0,
+									'red': roll.target.ac_bonus < 0 
+								}" 
+								v-if="roll.target.ac_bonus"
+							>
+								{{ displayStats(roll.target).ac + roll.target.ac_bonus}}
+							</span>
+							<span class="ac" v-else>
+								{{ displayStats(roll.target).ac }}
+							</span>
+						</div>
+						<div class="pl-2 truncate">
+							{{ roll.target.name }}
+						</div>
+					</div>
+
 					<!-- ALL ROLLED ACTIONS -->
 					<div v-for="(action, action_index) in roll.actions" :key="`action-${index}-${action_index}`">
 						<!-- TO HIT ROLL -->
@@ -255,6 +283,10 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="footer" v-if="roll.target">
+					<q-btn color="gray" class="full-width" label="Apply" no-caps />
+				</div>
 			</div>
 		</transition-group>
 	</div>
@@ -379,7 +411,27 @@ export default {
 					return 'no effect';
 				}
 			}
-		}
+		},
+		displayStats(target) {
+			var stats = '';
+			if(target.transformed) {
+				stats = {
+					ac: target.transformedAc,
+					maxHp: target.transformedMaxHp,
+					maxHpMod: target.transformedMaxHpMod,
+					curHp: target.transformedCurHp,
+				}
+			}
+			else {
+				stats = {
+					ac: target.ac,
+					maxHp: target.maxHp,
+					maxHpMod: target.maxHpMod,
+					curHp: target.curHp,
+				}
+			}
+			return stats
+		},
 	}
 }
 </script>
@@ -400,6 +452,15 @@ export default {
 			}
 			h3 {
 				font-size: 15px;
+			}
+
+			.target-item {
+				margin-bottom: 15px;
+				background-color: $gray;
+
+				.ac_wrapper {
+					background-color: $gray-darker;
+				}
 			}
 
 			.save {

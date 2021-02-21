@@ -915,6 +915,9 @@ html body {
 						}
 					}
 				}
+				.footer {
+					border-top: solid 1px $gray-darker;
+				}
 			}
 		}
 	}
@@ -1727,8 +1730,13 @@ html body {
 	}
 	.q-list {
 		.q-expansion-item {
-			.q-item__section.hidden-toggle {
-				display: none !important;
+			.q-item__section {
+				&.small-toggle {
+					padding-right: 10px;
+				}
+				&.hidden-toggle {
+					display: none !important;
+				}
 			}
 		}
 	}

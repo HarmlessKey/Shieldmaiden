@@ -245,6 +245,7 @@
 												<b>{{ ability.name }}</b>
 											</q-item-section>
 										</q-item>
+										<q-separator />
 										<q-list dark square>
 											<q-item clickable v-close-popup>
 												<q-item-section avatar>1</q-item-section>

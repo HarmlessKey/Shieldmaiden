@@ -52,7 +52,7 @@
 					</q-tooltip>
 				</span>
 				<template v-else>
-				<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+					<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 					<span 
 						v-else class="img" 
 						:style="{ 'background-image': 'url(' + entity.img + ')' }"

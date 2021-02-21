@@ -139,13 +139,19 @@
 								:key="`action-${index}`"
 								dark switch-toggle-side
 								expand-icon-class="hidden-toggle"
-								:icon="false"
 								:group="type"
 								:name="name"
 							>
 								<template v-slot:header>
 									<q-item-section>
-										<q-item-label><b>{{ action.name }}</b></q-item-label>
+										<q-item-label>
+											<b>{{ action.name }}</b>
+											<span class="gray-light">
+												{{ action.recharge ? `(Recharge ${action.recharge === 'rest' ? "after a Short or Long Rest" : action.recharge})` : ``}}
+												{{ action.limit ? `(${action.limit}/${action.limit_type ? action.limit_type.capitalize(): `Day`})` : ``}}
+												{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : ``}}
+											</span>
+										</q-item-label>
 										<q-item-label caption v-if="action.action_list && action.action_list[0].type !== 'other'">
 											<span v-if="action.action_list[0].rolls">
 												<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${index}-${roll_index}`">
@@ -184,9 +190,56 @@
 											</span>
 										</q-item-label>
 									</q-item-section>
+									<q-item-section avatar v-if="action.action_list && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
+										<span v-if="action.versatile" class="roll-button" @click.stop>
+											<q-popup-proxy square dark>
+												<div class="bg-gray">
+													<q-item>
+														<q-item-section>
+															<b>{{ action.name }}</b>
+														</q-item-section>
+													</q-item>
+													<q-separator />
+													<q-list dark square>
+														<q-item clickable v-close-popup>
+															<q-item-section avatar>1</q-item-section>
+															<q-item-section>
+																<hk-roll 
+																	:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
+																	tooltipPosition="right"
+																	@roll="roll($event, action, 0)"
+																>
+																	{{ action.versatile_one || 'Option 1' }}
+																</hk-roll>
+															</q-item-section>
+														</q-item>
+														<q-item clickable v-close-popup>
+															<q-item-section avatar>2</q-item-section>
+															<q-item-section>
+																<hk-roll 
+																	:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
+																	tooltipPosition="right"
+																	@roll="roll($event, action, 1)"
+																>
+																	{{ action.versatile_two || 'Option 2' }}
+																</hk-roll>
+															</q-item-section>
+														</q-item>
+													</q-list>
+												</div>
+											</q-popup-proxy>
+										</span>
+										<hk-roll 
+											v-else
+											:tooltip="`Roll ${action.name}`" 
+											@roll="roll($event, action)"
+										>
+											<span class="roll-button" />
+										</hk-roll>
+									</q-item-section>
 								</template>
 
-								<div class="accordion-body">
+								<div class="accordion-body description">
 									{{ action.desc }}
 								</div>
 							</q-expansion-item>
@@ -270,14 +323,28 @@
 		methods: {
 			...mapActions([
 				'setSlide',
+				'setActionRoll',
 				'setShareRolls',
 			]),
 			// groupRoll(e, action) {
 				
 			// },
-			// roll(e, action) {
-				
-			// },
+			roll(e, action, versatile) {
+				let roll;
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+
+				for(const key of this.targeted) {
+					const target = this.entities[key];
+
+					roll = this.rollAction(e, action, config);
+					roll.target = target;
+				}
+
+				this.setActionRoll(roll);
+			},
 			shareRoll(targets, toHit, damage, hitMod, damageMod) {
 				var showRoll = {
 					targets,
@@ -356,5 +423,25 @@
 	}
 	.q-tab-panel {
 		padding: 15px 0;
+	}
+	.description {
+		white-space: pre-line;
+	}
+	.roll-button {
+		display: inline-block;
+		cursor: pointer;
+		background-image: url('../../../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+		height: 20px;
+		width: 20px;
+		background-position: center;
+		background-size: cover;
+		vertical-align: -5px;
+		user-select: none;
+	}
+	.advantage .roll-button:hover {
+		background-image: url('../../../assets/_img/logo/logo-icon-no-shield-green.svg');
+	}
+	.disadvantage .roll-button:hover {
+		background-image: url('../../../assets/_img/logo/logo-icon-no-shield-red.svg');
 	}
 </style>

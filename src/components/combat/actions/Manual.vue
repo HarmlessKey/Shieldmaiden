@@ -190,7 +190,8 @@
 						//Update HP
 						for(let i in this.targeted) {
 							let key = this.targeted[i];
-							let amount = parseInt(this.manualAmount);
+							let amount = {};
+							amount[type] = parseInt(this.manualAmount);
 
 							//Half or doulbe amount
 							if(this.intensity[key] === 'half') {
@@ -200,7 +201,13 @@
 								amount = amount * 2;
 							}
 
-							this.setHP(amount, this.crit, this.entities[key], this.current, type)
+							// Set config for HpManipulation
+							const config = {
+								crit: this.crit,
+								log: true
+							};
+
+							this.setHP(amount, this.entities[key], this.current, config)
 						}
 
 						//Reset input fields

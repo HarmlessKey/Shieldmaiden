@@ -341,6 +341,7 @@
 
 					roll = this.rollAction(e, action, config);
 					roll.target = target;
+					roll.current = this.current;
 				}
 
 				this.setActionRoll(roll);

@@ -489,7 +489,7 @@
 						{ 
 							text: 'Hit', 
 							action: (toast) => { 
-								this.setHP(totalDamage, crit, target, this.current, 'damage')
+								this.setHP({ 'damage': totalDamage }, target, this.current, { crit })
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -498,7 +498,7 @@
 							//Does half of the damage rounded down
 							text: 'Half', 
 							action: (toast) => { 
-								this.setHP(Math.floor(totalDamage/2), crit, target, this.current, 'damage')
+								this.setHP({ 'damage': Math.floor(totalDamage/2) }, target, this.current, { crit })
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
@@ -507,7 +507,7 @@
 							//Does double of the damage
 							text: 'Double', 
 							action: (toast) => { 
-								this.setHP(parseInt(totalDamage*2), crit, target, this.current, 'damage')
+								this.setHP({ 'damage': parseInt(totalDamage*2) }, target, this.current, { crit })
 								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false

@@ -77,14 +77,7 @@
 								<b><hk-animated-integer :value="20" onMount /></b>
 							</div>
 						</transition>
-						<div
-							v-else
-							class="total" 
-							:class="{
-								green: hitOrMiss[action_index] === 'hit',
-								red: hitOrMiss[action_index] === 'miss'
-							}"
-						>
+						<div v-else class="total">
 							<hk-animated-integer :value="action.toHit.total" onMount />
 						</div>
 					</div>
@@ -278,10 +271,10 @@
 
 			<!-- TOTALS OF ALL ACTIONS -->
 			<template v-for="type in ['damage', 'healing']">
-				<div class="total-damage" :key="type" v-if="totalValue(roll)[type] !== undefined">
+				<div class="total-damage" :key="type" v-if="totalValue[type] !== undefined">
 					<div>Total {{ type }}</div>
 					<div class="total" :class="type === 'healing' ? 'green' : 'red'">
-						<hk-animated-integer :value="totalValue(roll)[type]" onMount />
+						<hk-animated-integer :value="totalValue[type]" onMount />
 					</div>
 				</div>
 			</template>
@@ -298,6 +291,7 @@
 import { mapActions } from "vuex";
 import { damage_types } from '@/mixins/damageTypes.js';
 import { dice } from '@/mixins/dice';
+import { setHP } from '@/mixins/HpManipulations';
 
 export default {
 	name: 'hk-single-roll',
@@ -311,7 +305,7 @@ export default {
 			required: true
 		}
 	},
-	mixins: [damage_types, dice],
+	mixins: [damage_types, dice, setHP],
 	data() {
 		return {
 			defenses: {
@@ -341,7 +335,37 @@ export default {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical;
 			} return undefined; // Default = undefined = roll twice
-		}
+		},
+		totalValue() {
+			let total = {};
+			
+			// Separate damage and healing
+			const healing_actions = this.roll.actions.filter((action, index) => {
+				action.index = index;
+				return action.type === 'healing';
+			});
+			const damage_actions = this.roll.actions.filter((action, index) => {
+				action.index = index;
+				return action.type !== 'healing';
+			});
+
+			if(healing_actions.length > 0) {
+				let healing_total = 0;
+				for(const action of healing_actions) {
+					healing_total = healing_total + this.totalActionValue(action, action.index);
+				}
+				total.healing = healing_total;
+			}
+
+			if(damage_actions.length > 0) {
+				let damage_total = 0;
+				for(const action of damage_actions) {
+					damage_total = damage_total + this.totalActionValue(action, action.index);
+				}
+				total.damage = damage_total;
+			}
+			return total;
+		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
@@ -368,11 +392,37 @@ export default {
 			return `<b class="${color}">${type}</b>`;
 		},
 		apply() {
+			// Create the info object for the log
+			let config = {
+				log: true,
+				ability: this.roll.name,
+				defenses: this.resistances
+			};
+			let actions = [];
+
 			this.roll.actions.forEach((action, index) => {
-				for(const rolled of action.rolls) {
-					console.log(index, this.totalRollValue(action, index, rolled))
+				let new_action = {
+					type: action.type
+				};
+				if(action.toHit) {
+					new_action.hitOrMiss = this.hitOrMiss[index];
+					if(action.toHit.throwsTotal === 20) new_action.crit = true;
 				}
+				if(action.type === "save") new_action.savingThrowResult = this.savingThrowResult[index];
+
+				new_action.rolls = [];
+				for(const rolled of action.rolls) {
+					let roll = {};
+					if(action.type !== "healing") roll.damage_type = rolled.damage_type;
+					roll.value = this.totalRollValue(action, index, rolled);
+					new_action.rolls.push(roll);
+				}
+				actions.push(new_action);
 			});
+			config.actions = actions;
+
+			this.setHP(this.totalValue, this.roll.target, this.roll.current, config);
+			this.removeActionRoll(this.index);
 		},
 		totalRollValue(action, action_index, rolls) {
 			let total = parseInt(rolls.modifierRoll.total);
@@ -404,36 +454,6 @@ export default {
 			});
 			return total;
 		},
-		totalValue(roll) {
-			let total = {};
-			
-			// Separate damage and healing
-			const healing_actions = roll.actions.filter((action, index) => {
-				action.index = index;
-				return action.type === 'healing';
-			});
-			const damage_actions = roll.actions.filter((action, index) => {
-				action.index = index;
-				return action.type !== 'healing';
-			});
-
-			if(healing_actions.length > 0) {
-				let healing_total = 0;
-				for(const action of healing_actions) {
-					healing_total = healing_total + this.totalActionValue(action, action.index);
-				}
-				total.healing = healing_total;
-			}
-
-			if(damage_actions.length > 0) {
-				let damage_total = 0;
-				for(const action of damage_actions) {
-					damage_total = damage_total + this.totalActionValue(action, action.index);
-				}
-				total.damage = damage_total;
-			}
-			return total;
-		},
 		setDefense(type, resistance, key) {
 			if(!this.resistances) this.$set(this.resistances, key, {});
 			if(this.resistances[type] === resistance) {
@@ -451,29 +471,17 @@ export default {
 		},
 		missSaveEffect(effect, type) {
 			if(type === 'text') {
-				if(effect === 1) {
-					return 'full damage';
-				}
-				if(effect === .5) {
-					return 'half damage';
-				}
-				if(effect === 0) {
-					return 'no damage';
-				}
+				if(effect === 1) return 'full damage';
+				if(effect === .5)	return 'half damage';
+				if(effect === 0) return 'no damage';
 			} else {
-				if(effect === 1) {
-					return '';
-				}
-				if(effect === .5) {
-					return '/ 2';
-				}
-				if(effect === 0) {
-					return 'no effect';
-				}
+				if(effect === 1) return '';
+				if(effect === .5) return '/ 2';
+				if(effect === 0) return 'no effect';
 			}
 		},
 		displayStats(target) {
-			var stats = '';
+			let stats = '';
 			if(target.transformed) {
 				stats = {
 					ac: target.transformedAc,

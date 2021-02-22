@@ -4,6 +4,8 @@
 				<h2 v-if="!encounter.finished">Combat log</h2>
 				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
 					<li v-for="(item, key) in log" :key="`item-${key}`">
+
+						<!-- Metadata -->
 						<div class="d-flex justify-content-between head">
 							<span>
 								Round: {{ item.round }}
@@ -11,21 +13,61 @@
 							</span>
 							{{ item.time }}
 						</div>
-						<b class="blue" v-if="item.crit">Critical hit! </b>
-						<template v-if="entities[item.by]">
-							{{ entities[item.by].name }} did
+
+						<!-- <template v-if="entities[item.by]">
+							{{ entities[item.by].name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }} did
 						</template>
-						<span :class="{ green: item.type == 'healing', red: item.type == 'damage' }">{{ item.amount }}</span>
-						<template v-if="item.by == 'environment'"> {{ item.by }}</template>
-						<template v-if="item.type == 'damage'"> {{ item.damageType }}</template>
-							<template v-if="entities[item.target]">
-								{{ item.type }} to {{ entities[item.target].name }}
-							</template>
-						<span v-if="item.over != 0">
-							({{ item.over }}
-							<template v-if="item.type == 'damage'">overkill</template>
-							<template v-else>overhealing</template>)
+						<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
+							{{ item.amount }}
+						</b>
+						{{ item.type }}
+						<template v-if="item.by === 'environment'">
+							{{ item.by }}
+						</template>
+						<template v-if="entities[item.target]">
+							to {{ entities[item.target].name }}.
+						</template> -->
+
+						<!-- ACTIONS -->
+						<div v-if="item.actions">
+							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
+								<!-- To hit -->
+								<span v-if="action.hitOrMiss">
+									{{ entities[item.by].name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }}
+									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
+										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
+									</span>
+									{{ entities[item.target].name.capitalizeEach() }} for
+								</span>
+
+								<!-- Saving throw -->
+								<span v-if="action.savingThrowResult">
+									{{ entities[item.target].name.capitalizeEach() }} had a
+									<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
+										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
+									</span>
+									save on and took
+								</span>
+
+								<!-- Rolls -->
+								<span v-for="(roll, roll_index) in action.rolls" :key="`roll-${key}-${index}-${roll_index}`">
+									<span :class="action.type !== 'healing' ? roll.damage_type : 'green'">
+										<b>{{ roll.value }}</b> 
+										{{ action.type !== "healing" ? roll.damage_type : "healing" }}
+									</span>
+									{{ action.type !== "healing" ? "damage" : "" }}
+									{{ roll_index+1 &lt; action.rolls.length ? "and" : "" }}
+								</span>
+							</span>
+						</div>
+
+						<!-- OVER -->
+						<span v-if="item.over > 0">
+							({{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }})
 						</span>
+
+
+						<!-- UNDO -->
 						<div class="undo" v-if="key == 0 && !encounter.finished">
 							<a 
 								@click="undo(key, item.amount, item.over, item.target, item.by, item.type)"
@@ -84,17 +126,18 @@
 					this.log = this.storageLog
 				}
 			},
-			undo(key, amount, over, target, by, type) {
+			undo(key, value, over, target, by, type) {
 				type = (type == 'damage') ? 'healing' : 'damage';
 				let undo = (over > 0) ? over : true; //Send the over value as undo true/false
-
 				let doneBy = (by == 'environment') ? this.environment : this.entities[by];
+				let amount = {};
+				amount[type] = value;
 				
-				this.setHP(amount, false, this.entities[target], doneBy, type, false, false, undo)
+				this.setHP(amount, this.entities[target], doneBy, { undo });
 				this.set_log({
 					action: 'unset',
 					value: key
-				})
+				});
 			}
 		}
 	}

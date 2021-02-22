@@ -33,39 +33,53 @@ export const setHP = {
 			'set_log',
 			'set_meters'
 		]),
-		setHP(amount, crit, target, current, type, log = true, notify = true, undo = false) {
-			amount = parseInt(amount);
 
-			if(type == 'damage') {
-				this.isDamage(target, crit, current, amount, log, notify, undo)
-			}
-			else {
-				this.isHealing(target, current, amount, log, notify, undo)
+		/**
+		 * Modifies the HP of a target and logs changes if needed
+		 * @param {object} amounts Object with total healing and damage done values
+		 * @param {object} target Full object of the target entity for whom HP will be modified
+		 * @param {Object} current Full object of the entity that performs the action
+		 * @param {object} config Hold options: crit, log, notify, undo, actions, defenses
+		 * 
+		 * The config holds the actions array with all damage/healing actions from 1 ability/roll
+		 * and an object with the defenses of the target
+		 * This is for logging purposes, it holds information about damage types
+		 */
+		setHP(amounts, target, current, config) {
+			for(let [type, amount] of Object.entries(amounts)) {
+				amount = parseInt(amount);
+
+				if(type === "damage") {
+					this.isDamage(amount, target, current, config);
+				} else {
+					this.isHealing(amount, target, current, config);
+				}
 			}
 		},
-		isDamage(target, crit, current, amount, log, notify, undo) {
+
+		isDamage(amount, target, current, config) {
 			var maxHp = parseInt(target.maxHp);
 			var curHp = parseInt(target.curHp);
 			var tempHp = parseInt(target.tempHp);
 			var transCurHp = parseInt(target.transformedCurHp);
-			var type = 'damage';
+			var type = "damage";
 			var over = 0;
 			var rest_amount = amount;
 
 			//Death saves at 0 hp, if automate is on
-			if(curHp == 0 && this.settings.automate !== false && (target.entityType === 'player' || target.entityType === 'companion')) {
+			if(curHp == 0 && this.settings.automate !== false && (target.entityType === "player" || target.entityType === "companion")) {
 				var n = parseInt(Object.keys(target.saves).length)
 				this.set_save({
 					key: target.key,
-					check: 'fail',
+					check: "fail",
 					index: n
 				})
-				if(crit) {
+				if(config.crit) {
 					n = parseInt(Object.keys(target.saves).length)
 
 					this.set_save({
 						key: target.key,
-						check: 'fail',
+						check: "fail",
 						index: n
 					})
 				}
@@ -140,7 +154,7 @@ export const setHP = {
 			this.checkReminders(target, 'damage');
 
 			//Notification
-			if(notify) {
+			if(config.notify) {
 				this.$q.notify({
 					message: 'Damage done',
 					caption: current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
@@ -152,21 +166,21 @@ export const setHP = {
 			}
 
 			//Add to log
-			if(log == true) {
-				this.addLog(type, crit, target, current, amount, over);
+			if(config.log) {
+				this.addLog(type, config.crit, target, current, amount, over, config);
 			}
 
 			//Add to damagemeters
 			//undo holds the value of ovherhealing, if there was any
-			if(undo) {
+			if(config.undo) {
 				amount = -amount
-				over = (undo !== true) ? -undo : 0;
+				over = (config.undo !== true) ? -config.undo : 0;
 				type = 'healing'
 			}
 			
 			//Campaign wide damage meters (no need to go through store)
 			if(!this.demo) {
-				if(!undo) {
+				if(!config.undo) {
 					this.set_meters({key: current.key, type: 'damage', amount}) //Damage done
 					this.set_meters({key: current.key, type: 'overkill', amount: over}) //Over damage done
 					this.set_meters({key: target.key, type: 'damageTaken', amount}) //Damage taken
@@ -195,7 +209,7 @@ export const setHP = {
 				}
 			}
 		},
-		isHealing(target, current, amount, log, notify, undo) {
+		isHealing(amount, target, current, config) {
 			if(target.transformed == true) {
 				var maxHp = parseInt(target.transformedMaxHp);
 				var curHp = parseInt(target.transformedCurHp);
@@ -236,7 +250,7 @@ export const setHP = {
 			})
 
 			//Notification
-			if(notify) {
+			if(config.notify) {
 				this.$q.notify({
 					message: 'Healing done!',
 					caption: current.name + ' did ' + amount + ' ' + type + ' to ' + target.name,
@@ -248,21 +262,21 @@ export const setHP = {
 				});
 			}
 			//Add to log
-			if(log == true) {
-				this.addLog(type, false, target, current, amount, over)
+			if(config.log) {
+				this.addLog(type, false, target, current, amount, over, config)
 			}
 			
 			//Add to damagemeters
 			//undo holds the value of overdamage, if there was any
-			if(undo) {
+			if(config.undo) {
 				amount = -amount
-				over = (undo !== true) ? -undo : 0;
+				over = (config.undo !== true) ? -config.undo : 0;
 				type = 'damage'
 			}
 
 			//Campaign wide healing meters (no need to go through store)
 			if(!this.demo) {
-				if(!undo) {
+				if(!config.undo) {
 					this.set_meters({key: current.key, type: 'healing', amount}) //Healing done
 					this.set_meters({key: current.key, type: 'overhealing', amount: over}) //Over healing done
 					this.set_meters({key: target.key, type: 'healingTaken', amount}) //Healing taken
@@ -291,7 +305,7 @@ export const setHP = {
 				}
 			}
 		},
-		addLog(type, crit, target, current, amount, over) {
+		addLog(type, crit, target, current, amount, over, config) {
 			var d = new Date();
 			var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 
@@ -299,7 +313,7 @@ export const setHP = {
 				this.log = JSON.parse(localStorage.getItem(this.encounterId));
 			}
 			else {
-				this.log = []
+				this.log = [];
 			}
 
 			var newLog = {
@@ -312,13 +326,16 @@ export const setHP = {
 				damageType: this.damageType,
 				target: target.key,
 				amount: amount,
-				over: over
-			}
+				over: over,
+				actions: config.actions,
+				defenses: config.defenses,
+				ability: config.ability
+			};
 			
 			this.set_log({
 				action: 'set',
 				value: newLog
-			})
+			});
 		},
 		async damageMeters(key, type, amount, entityType) {
 			let db_name = entityType + 's';

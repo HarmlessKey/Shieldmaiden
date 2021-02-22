@@ -243,8 +243,10 @@
 			},
 			apply(type) {
 				for(let key in this.final_results) {
-					let amount = Math.floor(this.final_results[key] * this.intensity[key]);
-					this.setHP(amount, false, this.entities[key], this.entities[this.request.player], type);
+					let amount = {};
+					amount[type] = Math.floor(this.final_results[key] * this.intensity[key]);
+
+					this.setHP(amount, this.entities[key], this.entities[this.request.player], {});
 				}
 				this.remove();
 			},

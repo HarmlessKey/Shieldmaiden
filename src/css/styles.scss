@@ -916,6 +916,8 @@ html body {
 					}
 				}
 				.footer {
+					display: flex;
+					justify-content: space-between;
 					border-top: solid 1px $gray-darker;
 				}
 			}

@@ -289,7 +289,8 @@
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
 						</i></b>
-						{{ ability.desc }}
+						<!-- <span v-html="parseDiceText(ability.desc)"></span> -->
+						<hk-dice-text :input_text="ability.desc"/>
 					</p>
 				</template>
 			</div>
@@ -304,10 +305,11 @@
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { skills } from '@/mixins/skills.js';
 	import { mapActions } from 'vuex';
-
+	
 	export default {
 		name: 'NPC',
 		mixins: [
+	
 			general, 
 			dice,
 			abilities,

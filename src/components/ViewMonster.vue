@@ -288,7 +288,7 @@
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
 						</i></b>
-						{{ ability.desc }}
+						<hk-dice-text :input_text="ability.desc"/>
 					</p>
 				</template>
 			</div>

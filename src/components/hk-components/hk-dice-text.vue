@@ -1,27 +1,27 @@
 <template>
-	<div class="hk-dice-text">
-		<span v-for="(line, index) in splitOnXdY(input_text)" :key="index">
-			<template v-if="line.dice === undefined">
+	<span class="hk-dice-text">
+		<span v-for="(line, index) in splitOnRollable(input_text)" :key="index">
+			<span v-if="line.dice === undefined">
 				{{ line.value }}
-			</template>
+			</span>
 			<hk-roll 
 				v-else
-				:tooltip="`Roll ${line.value}`"
+				:tooltip="`Roll ${dice2str(line.dice)}`"
 				:roll="{
 					d: line.dice.d, 
 					n: line.dice.n, 
 					m: line.dice.m,
-					title: roll_title || `Roll ${line.value}`,
+					title: roll_title || `Roll ${dice2str(line.dice)}`,
 					notify: true
 				}"
 			>
 				<strong class="text" style="cursor: pointer;">
-					{{ stripSpaces(line.value) }}
+					{{ line.value }}
 				</strong>
 			</hk-roll>
 		</span>
 
-	</div>
+	</span>
 </template>
 
 <script>
@@ -38,28 +38,49 @@
 			}
 		},
 		methods: {
-			splitOnXdY(input) {
-				const xdy_regex = /(\d+[dD]\d+\s?[+-]?\s?\d*)/g;
-				let output = input.split(xdy_regex)
-				console.log(output)
+			splitOnRollable(input) {
+				const rollable_regex = /(\d+[dD]\d+\s?[+-]?\s?\d*)|([+-]\s?\d+\sto\shit)/g;
+				let output = input.split(rollable_regex)
+				// console.log("output", output)
 				output = output.map((line) => {
 					return {value: line, dice: this.isXdY(line)}
 				})
-				console.log(output)
 				return output;
 			},
 			isXdY(input) {
-				const xdy_regex = /((\d+)[dD](\d+)\s?[+-]?\s?(\d*))/g;
-				let match = input.match(xdy_regex)
-				console.log(match)
+				//              =   (Number)[dD]( Dice  )          (Modifier)
+				const xdy_regex = /(?<n>\d+)[dD](?<d>\d+)\s?(?<m>[+-]?\s?\d*)/g;
+				let match = xdy_regex.exec(input);
+				// let match = input.match(xdy_regex)
 				if (match !== null) {
-					let dice = { d: 4, n: 2, m: 3 }
+					// console.log(match.groups.m)
+					let dice = { 
+						d: match.groups.d,
+						n: match.groups.n,
+						m: parseInt(this.stripSpaces(match.groups.m)) || 0
+					}
 					return dice;
+				}
+
+				const hit_regex = /(?<hit>[+-]\s?\d+)\sto\shit/g;
+				match = hit_regex.exec(input)
+				if (match !== null) {
+					let dice = {
+						d: 20,
+						n: 1,
+						m: match.groups.hit
+					}
+					return dice
 				}
 				return undefined;
 			},
 			stripSpaces(input) {
 				return input.replaceAll(' ', '')
+			},
+			dice2str(dice) {
+				let dice_str =  `${dice.n}d${dice.d}`;
+				dice_str += (dice.m > 0 ? `+${dice.m}` : `${dice.m}`);
+				return dice_str
 			}
 		}
 	}

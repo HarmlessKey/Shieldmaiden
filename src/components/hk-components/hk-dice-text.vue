@@ -8,8 +8,8 @@
 				v-else
 				:tooltip="`Roll ${dice2str(line.dice)}`"
 				:roll="{
-					d: line.dice.d, 
-					n: line.dice.n, 
+					n: line.dice.n,
+					d: line.dice.d,
 					m: line.dice.m,
 					title: roll_title || `Roll ${dice2str(line.dice)}`,
 					notify: true
@@ -39,43 +39,38 @@
 		},
 		methods: {
 			splitOnRollable(input) {
+				//                   =          xDy+z             |       X to hit
 				const rollable_regex = /(\d+[dD]\d+\s?[+-]?\s?\d*)|([+-]\s?\d+\sto\shit)/g;
 				let output = input.split(rollable_regex)
-				// console.log("output", output)
 				output = output.map((line) => {
-					return {value: line, dice: this.isXdY(line)}
+					return {value: line, dice: this.makeDice(line)}
 				})
 				return output;
 			},
-			isXdY(input) {
+			makeDice(input) {
 				//              =   (Number)[dD]( Dice  )          (Modifier)
 				const xdy_regex = /(?<n>\d+)[dD](?<d>\d+)\s?(?<m>[+-]?\s?\d*)/g;
 				let match = xdy_regex.exec(input);
-				// let match = input.match(xdy_regex)
 				if (match !== null) {
-					// console.log(match.groups.m)
 					let dice = { 
-						d: match.groups.d,
 						n: match.groups.n,
-						m: parseInt(this.stripSpaces(match.groups.m)) || 0
+						d: match.groups.d,
+						m: parseInt(match.groups.m.replaceAll(' ','')) || 0
 					}
 					return dice;
 				}
-
+				//              =  (  Hit modifier  )  to  hit
 				const hit_regex = /(?<hit>[+-]\s?\d+)\sto\shit/g;
 				match = hit_regex.exec(input)
 				if (match !== null) {
 					let dice = {
-						d: 20,
 						n: 1,
+						d: 20,
 						m: match.groups.hit
 					}
 					return dice
 				}
 				return undefined;
-			},
-			stripSpaces(input) {
-				return input.replaceAll(' ', '')
 			},
 			dice2str(dice) {
 				let dice_str =  `${dice.n}d${dice.d}`;

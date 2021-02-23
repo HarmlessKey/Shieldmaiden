@@ -14,30 +14,33 @@
 							{{ item.time }}
 						</div>
 
-						<!-- <template v-if="entities[item.by]">
-							{{ entities[item.by].name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }} did
-						</template>
-						<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
-							{{ item.amount }}
-						</b>
-						{{ item.type }}
-						<template v-if="item.by === 'environment'">
-							{{ item.by }}
-						</template>
-						<template v-if="entities[item.target]">
-							to {{ entities[item.target].name }}.
-						</template> -->
+						<!-- TOTAL -->
+						<div>
+							<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
+								{{ item.amount }} {{ item.type }}
+							</b>
+
+							<!-- OVER -->
+							<span v-if="item.over > 0">
+								- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
+							</span>
+						</div>
 
 						<!-- ACTIONS -->
 						<div v-if="item.actions">
 							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
 								<!-- To hit -->
+								<span v-if="action.manual">
+									{{ item.by_name.capitalizeEach() }} (manual input) did		
+								</span>
+
+								<!-- To hit -->
 								<span v-if="action.hitOrMiss">
-									{{ entities[item.by].name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }}
+									{{ item.by_name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }}
 									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 									</span>
-									{{ entities[item.target].name.capitalizeEach() }} for
+									{{ item.target_name.capitalizeEach() }} for
 								</span>
 
 								<!-- Saving throw -->
@@ -46,26 +49,25 @@
 									<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
 										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
 									</span>
-									save on and took
+									save {{ item.ability ? `on ${item.ability}` : `` }} and took
 								</span>
 
 								<!-- Rolls -->
 								<span v-for="(roll, roll_index) in action.rolls" :key="`roll-${key}-${index}-${roll_index}`">
-									<span :class="action.type !== 'healing' ? roll.damage_type : 'green'">
+									<span :class="action.type === 'healing' ? 'green' : roll.damage_type ? roll.damage_type : 'red'">
 										<b>{{ roll.value }}</b> 
-										{{ action.type !== "healing" ? roll.damage_type : "healing" }}
+										{{ action.type !== "healing" ? roll.damage_type : "" }}
 									</span>
-									{{ action.type !== "healing" ? "damage" : "" }}
+									{{ action.type !== "healing" ? "damage" : "healing" }}
 									{{ roll_index+1 &lt; action.rolls.length ? "and" : "" }}
+								</span>
+
+								<!-- MANUAL END -->
+								<span v-if="action.manual">
+									to {{ item.target_name.capitalizeEach() }}
 								</span>
 							</span>
 						</div>
-
-						<!-- OVER -->
-						<span v-if="item.over > 0">
-							({{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }})
-						</span>
-
 
 						<!-- UNDO -->
 						<div class="undo" v-if="key == 0 && !encounter.finished">

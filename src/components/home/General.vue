@@ -23,6 +23,8 @@
 						<li>Conditions</li>
 						<li>Concentration</li>
 						<li>Reactions used</li>
+						<li>Damage types</li>
+						<li>Resistance, vulnerability and immunity</li>
 						<li>Custom reminders for other effects</li>
 						<li>Multi-targeting (perfect for AOE damage)</li>
 						<li>Roll monster abilities and instantly apply damage</li>

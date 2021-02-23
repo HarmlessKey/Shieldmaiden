@@ -1,25 +1,45 @@
 <template>
 	<div>
-		<p v-if="targeted.length === 0">No target selected</p>
+		<p v-if="targeted.length === 0" class="red">No target selected</p>
 		<template v-else>
-			<p v-if="targeted.length === 1"><i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
-				<i class="fas fa-shield gray-hover"></i> Armor Class: 
-				<b class="blue">
-					<span :class="{ 
-							'green': entities[targeted[0]].ac_bonus > 0, 
-							'red': entities[targeted[0]].ac_bonus < 0 
-						}"
-						v-if="entities[targeted[0]].ac_bonus"
-					>
-						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
-						<q-tooltip anchor="top middle" self="center middle">
-							Armor Class + {{ entities[targeted[0]].ac_bonus }}
-						</q-tooltip>
-					</span>
-					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
-				</b>
-			</p>
 			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
+
+				<q-select 
+					dark filled square dense
+					clearable
+					map-options
+					emit-value
+					placeholder="Damage type"
+					:options="damage_types"
+					v-model="damage_type"
+					class="mb-2"
+				>
+					<template v-slot:selected>
+						<span v-if="damage_type">
+							<i :class="[damage_type_icons[damage_type], damage_type]"/>
+							{{ damage_type.capitalize() }} damage
+						</span>
+						<span v-else>
+							Damage type
+						</span>
+					</template>
+					<template v-slot:option="scope">
+						<q-item
+							clickable
+							v-ripple
+							v-close-popup
+							:active="damage_type === scope.opt"
+							@click="damage_type = scope.opt"
+						>
+							<q-item-section avatar>
+								<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
+							</q-item-section>
+							<q-item-section>
+								<q-item-label v-html="scope.opt.capitalize()"/>
+							</q-item-section>
+						</q-item>
+					</template>
+				</q-select>
 
 			<div class="manual">
 				<q-input 
@@ -92,11 +112,11 @@
 <script>
 	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
+	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
-
 		name: 'Manual',
-		mixins: [setHP],
+		mixins: [setHP, damage_types],
 		props: ['current', 'targeted'],
 		data: function() {
 			return {
@@ -104,7 +124,7 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				manualAmount: '',
-				damageType: '',
+				damage_type: '',
 				crit: false,
 				log: undefined,
 				intensitySetter: undefined
@@ -201,10 +221,23 @@
 								amount = amount * 2;
 							}
 
-							// Set config for HpManipulation
+							// Set config for HpManipulation and log
 							const config = {
 								crit: this.crit,
-								log: true
+								ability: "hk-manual",
+								log: true,
+								actions: [
+									{
+										type,
+										manual: true,
+										rolls: [
+											{
+												damage_type: this.damage_type,
+												value: amount[type]
+											}
+										]
+									}
+								]
 							};
 
 							this.setHP(amount, this.entities[key], this.current, config)
@@ -212,7 +245,7 @@
 
 						//Reset input fields
 						this.manualAmount = '';
-						this.damageType = '';
+						this.damage_type = '';
 						this.crit = false;
 					}
 					else {

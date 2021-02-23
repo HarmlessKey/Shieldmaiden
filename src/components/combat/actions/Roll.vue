@@ -240,7 +240,7 @@
 								</template>
 
 								<div class="accordion-body description">
-									{{ action.desc }}
+									<hk-dice-text :input_text="action.desc"/>
 								</div>
 							</q-expansion-item>
 						</q-list>

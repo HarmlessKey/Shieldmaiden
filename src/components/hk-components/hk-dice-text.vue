@@ -15,7 +15,7 @@
 					notify: true
 				}"
 			>
-				<strong class="text" style="cursor: pointer;">
+				<strong class="rollable">
 					{{ line.value }}
 				</strong>
 			</hk-roll>
@@ -42,10 +42,13 @@
 				//                   =          xDy+z             |       X to hit
 				const rollable_regex = /(\d+[dD]\d+\s?[+-]?\s?\d*)|([+-]\s?\d+\sto\shit)/g;
 				let output = input.split(rollable_regex)
-				output = output.map((line) => {
-					return {value: line, dice: this.makeDice(line)}
-				})
-				return output;
+				output = output
+							.filter((val) => !!val)
+							.map((line) => ({value: line, dice: this.makeDice(line)}))
+				// Filter out undefined
+				let ret = output.filter((val) => !!val);
+				console.log(ret)
+				return ret
 			},
 			makeDice(input) {
 				//              =   (Number)[dD]( Dice  )          (Modifier)
@@ -74,9 +77,29 @@
 			},
 			dice2str(dice) {
 				let dice_str =  `${dice.n}d${dice.d}`;
-				dice_str += (dice.m > 0 ? `+${dice.m}` : `${dice.m}`);
+				dice_str += dice.m ? `${dice.m}` : "";
 				return dice_str
 			}
 		}
 	}
 </script>
+
+<style lang="scss" scoped>
+.hk-dice-text {
+
+	.rollable {
+		cursor: pointer;
+
+		&:hover {
+			color: brown;
+		}
+	}
+
+	.advantage .rollable:hover {
+		color: $green
+	}
+	.disadvantage .rollable:hover {
+		color:$red
+	}
+}
+</style>

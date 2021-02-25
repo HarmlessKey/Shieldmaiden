@@ -326,9 +326,6 @@
 				'setActionRoll',
 				'setShareRolls',
 			]),
-			// groupRoll(e, action) {
-				
-			// },
 			roll(e, action, versatile) {
 				let roll;
 				const config = {
@@ -336,15 +333,21 @@
 					versatile
 				}
 
-				for(const key of this.targeted) {
-					const target = this.entities[key];
-
+				// Roll once for a saving throw
+				if(action.action_list[0].type === 'save') {
 					roll = this.rollAction(e, action, config);
-					roll.target = target;
-					roll.current = this.current;
 				}
 
-				this.setActionRoll(roll);
+				for(const key of this.targeted) {		
+					// Reroll for each target if it's not a saving trhow
+					if(action.action_list[0].type !== 'save') {
+						roll = this.rollAction(e, action, config);
+					}
+					roll.target = this.entities[key];
+					roll.current = this.current;
+
+					this.setActionRoll(roll);
+				}
 			},
 			shareRoll(targets, toHit, damage, hitMod, damageMod) {
 				var showRoll = {

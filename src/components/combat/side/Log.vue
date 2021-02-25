@@ -31,21 +31,21 @@
 							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
 								<!-- To hit -->
 								<span v-if="action.manual">
-									{{ item.by_name.capitalizeEach() }} (manual input) did		
+									<b>{{ item.by_name.capitalizeEach() }}</b> (manual input) did		
 								</span>
 
 								<!-- To hit -->
 								<span v-if="action.hitOrMiss">
-									{{ item.by_name.capitalizeEach() }}{{ item.ability ? `'s ${item.ability}` : `` }}
+									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `'s ${item.ability}` : `` }}
 									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 									</span>
-									{{ item.target_name.capitalizeEach() }} for
+									<b>{{ item.target_name.capitalizeEach() }}</b> for
 								</span>
 
 								<!-- Saving throw -->
 								<span v-if="action.savingThrowResult">
-									{{ entities[item.target].name.capitalizeEach() }} had a
+									<b>{{item.target_name.capitalizeEach() }}</b> had a
 									<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
 										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
 									</span>
@@ -64,7 +64,7 @@
 
 								<!-- MANUAL END -->
 								<span v-if="action.manual">
-									to {{ item.target_name.capitalizeEach() }}
+									to <b>{{ item.target_name.capitalizeEach() }}</b>
 								</span>
 							</span>
 						</div>

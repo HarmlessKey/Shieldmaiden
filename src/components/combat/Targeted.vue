@@ -134,10 +134,10 @@
 							</a>
 						</div>
 						<div class="scores">
-							<template v-for="(ability, index) in abilities">
+							<template v-for="({ability}, index) in abilities">
 								<div
 									:key="`score-${index}`" 
-									v-if="entities[key][ability.ability]"
+									v-if="entities[key][ability]"
 									class="ability"
 								>
 									<hk-roll 
@@ -145,29 +145,28 @@
 										:roll="{
 											d: 20, 
 											n: 1, 
-											m: modifier(entities[key][ability.ability]), 
-											title: `${entities[key].name}: ${ability.ability} check`, 
+											m: modifier(entities[key][ability]), 
+											title: `${entities[key].name}: ${ability} check`, 
 											notify: true
 										}"
 									>
-										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 										<div class="mod bg-gray-dark">
-											{{ modifier(entities[key][ability.ability]) }}
+											{{ modifier(entities[key][ability]) }}
 										</div>
 									</hk-roll>
 									<hk-roll
-										v-if="entities[key].entityType === 'npc'"
 										tooltip="Roll save"
 										:roll="{
 											d: 20, 
 											n: 1, 
-											m: entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 
-											title: `${entities[key].name}: ${ability.ability} save`, 
+											m: savingThrow(entities[key], ability), 
+											title: `${entities[key].name}: ${ability} save`, 
 											notify: true
 										}"
 									>
 										<div class="mod bg-gray-dark">
-											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+											{{ savingThrow(entities[key], ability) }}
 										</div>
 									</hk-roll>
 								</div>
@@ -197,10 +196,12 @@
 	import { dice } from '@/mixins/dice.js';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetInfo from '@/components/combat/TargetInfo.vue';
+	import { experience } from '@/mixins/experience.js';
+
 
 	export default {
 		name: 'Targeted',
-		mixins: [dice],
+		mixins: [dice, experience],
 		components: {
 			ViewEntity,
 			Conditions,
@@ -344,13 +345,18 @@
 				return stats
 			},
 			modifier(score) {
-				var mod = Math.floor((score - 10) / 2)
-				if(mod >= 0) {
-					return '+' + mod
+				let mod = Math.floor((score - 10) / 2);
+				return (mod > 0) ? `+${mod}` : mod;
+			},
+			savingThrow(entity, ability) {
+				let proficiency;
+				if(entity.entityType === "player") {
+					proficiency = this.returnProficiency(entity.level ? entity.level : this.calculatedLevel(entity.experience)) 
+				} else {
+					proficiency = entity.proficiency;
 				}
-				else {
-					return mod
-				}
+				const save = (entity.saving_throws && entity.saving_throws.includes(ability)) ? parseInt(this.modifier(entity[ability])) + proficiency : parseInt(this.modifier(entity[ability]));
+				return (save > 0) ? `+${save}` : save;
 			}
 		}
 	}

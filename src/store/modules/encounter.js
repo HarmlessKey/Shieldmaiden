@@ -1023,12 +1023,18 @@ const mutations = {
 				entity.name = db_player.character_name;
 				entity.ac = parseInt(db_player.ac);
 				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
-				entity.strength = db_player.strength;
-				entity.dexterity = db_player.dexterity;
-				entity.constitution = db_player.constitution;
-				entity.intelligence = db_player.intelligence;
-				entity.wisdom = db_player.wisdom;
-				entity.charisma = db_player.charisma;
+				
+				entity.saving_throws = [];
+				// Ability scores
+				for(const ability of abilities.data().abilities) {
+					entity[ability] = db_player[ability];
+					
+					// Saving throws
+					if(db_player[`${ability}-save-profficient`]) {
+						entity.saving_throws.push(ability);
+					}
+				}
+
 				entity.skills = db_player.skills;
 				entity.skills_expertise = db_player.skills_expertise;
 				entity.experience = db_player.experience;

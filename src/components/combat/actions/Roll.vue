@@ -345,6 +345,8 @@
 					if(action.action_list[0].type !== 'save') {
 						newRoll = this.rollAction(e, action, config);
 					}
+
+					// Set the target and current
 					this.$set(newRoll, "target", this.entities[key]);
 					this.$set(newRoll, "current", this.current);
 

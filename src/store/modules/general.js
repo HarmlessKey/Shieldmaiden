@@ -29,7 +29,6 @@ export const general_module = {
 		},
 		setActionRoll({ commit, state }, newRoll) {
 			let current = state.action_rolls;
-			delete newRoll.key;
 			let key = Date.now() + Math.random().toString(36).substring(7);
 			
 			// Shuffle the key

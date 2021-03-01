@@ -29,15 +29,16 @@ export const general_module = {
 		},
 		setActionRoll({ commit, state }, newRoll) {
 			let current = state.action_rolls;
-			newRoll.date = new Date();
+			delete newRoll.key;
+			let key = Date.now() + Math.random().toString(36).substring(7);
 			
-			// Shuffle the date
-			newRoll.date = newRoll.date.toString().split('');
-			newRoll.date.sort(() => {
+			// Shuffle the key
+			key = key.toString().split('');
+			key.sort(() => {
 				return 0.5 - Math.random();
 			}); 
-			newRoll.date = newRoll.date.join('');
-			newRoll.key = newRoll.date + Math.random().toString(36).substring(7);
+			key = key.join('');
+			Vue.set(newRoll, "key", key);
 			
 			current.unshift(newRoll);
 			commit("SET_ACTION_ROLLS", current);

@@ -3,6 +3,7 @@
 		<div class="header">
 			<div class="truncate">
 				{{ roll.name }}
+				{{ roll.key }}
 			</div>
 			<a @click="removeActionRoll(index)">
 				<i class="fas fa-times" />

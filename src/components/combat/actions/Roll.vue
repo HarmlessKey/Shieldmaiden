@@ -338,15 +338,17 @@
 					roll = this.rollAction(e, action, config);
 				}
 
-				for(const key of this.targeted) {		
+				for(const key of this.targeted) {
+					let newRoll = { ...roll };
+
 					// Reroll for each target if it's not a saving trhow
 					if(action.action_list[0].type !== 'save') {
-						roll = this.rollAction(e, action, config);
+						newRoll = this.rollAction(e, action, config);
 					}
-					roll.target = this.entities[key];
-					roll.current = this.current;
+					this.$set(newRoll, "target", this.entities[key]);
+					this.$set(newRoll, "current", this.current);
 
-					this.setActionRoll(roll);
+					this.setActionRoll(newRoll);
 				}
 			},
 			shareRoll(targets, toHit, damage, hitMod, damageMod) {

@@ -47,7 +47,7 @@
 							.map((line) => ({value: line, dice: this.makeDice(line)}))
 				// Filter out undefined
 				let ret = output.filter((val) => !!val);
-				console.log(ret)
+				// console.log(ret)
 				return ret
 			},
 			makeDice(input) {

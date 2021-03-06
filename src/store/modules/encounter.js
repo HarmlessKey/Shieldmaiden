@@ -872,7 +872,7 @@ const actions = {
 	 * @param {string} entity Entity key
 	 * @param {string} key Reminder key
 	 * @param {object} reminder full reminder object, or integer with rounds
-	 */
+	**/
 	set_targetReminder({ state, commit }, {action, entity, key, reminder, type}) {
 		// Add a new reminder
 		if(action === 'add') {
@@ -912,6 +912,28 @@ const actions = {
 			commit("UPDATE_REMINDER_ROUNDS", { entityKey: entity, key, rounds: reminder });
 		}
 	},
+
+	/**
+	 * Tracks use of abilities with limited uses
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 * @param {boolean} regain Wether a slot must be regained or spend
+	 */
+	set_limitedUses({ commit, state }, {key, index, category, regain=false}) {
+		const entity = state.entities[key];
+		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) ? entity.limited_uses[category][index] : 0;
+		
+		if(regain) {
+			used = used - 1;
+		} else {
+			used = used + 1;
+		}
+		
+		if(used < 0) used = 0;
+		commit("SET_LIMITED_USES", {key, category, index, value: used});
+	},
 	reset_store({ commit }) { commit("RESET_STORE"); },
 }
 
@@ -946,6 +968,10 @@ const mutations = {
 	DELETE_REMINDER(state, {entityKey, key}) { Vue.delete(state.entities[entityKey].reminders, key); },
 	REMOVE_ENTITY(state, key) { Vue.delete(state.entities, key); },
 	CLEAR_ENTITIES(state) { Vue.set(state, 'entities', {}); },
+	SET_LIMITED_USES(state, {key, category, index, value}) {
+		if(!state.entities[key].limited_uses[category]) Vue.set(state.entities[key].limited_uses, category, {});
+		Vue.set(state.entities[key].limited_uses[category], index, value);
+	},
 	
 	async ADD_ENTITY(state, {rootState, key}) {
 		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
@@ -970,6 +996,7 @@ const mutations = {
 		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
 		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
 		entity.color_label = (db_entity.color_label) ? db_entity.color_label : null;
+		entity.limited_uses = (db_entity.limited_uses) ? db_entity.limited_uses : {};
 
 		if (db_entity.meters) {
 			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
@@ -1111,9 +1138,6 @@ const mutations = {
 						entity.transformed = false;
 					}
 					if(!entity.avatar) {
-						//if an entity is quicly added during an ecnounter
-						//without copying an existing
-						//it won't have data_npc
 						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
 					}
 					else {
@@ -1134,6 +1158,8 @@ const mutations = {
 					entity.hit_dice = data_npc.hit_dice;
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
+					entity.lengendary_count = data_npc.lengendary_count;
+		
 					if(data_npc.source) entity.source = data_npc.source;
 					
 					// Ability scores

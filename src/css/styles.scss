@@ -870,6 +870,13 @@ html body {
 	}
 
 	/* HK ROLLS */
+	.hk-roll {
+		&.disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+	}
+
 	.hk-rolls {
 		top: 50px;
 		position: fixed;
@@ -884,7 +891,7 @@ html body {
 		.rolls {
 			pointer-events: auto;
 			width: 300px;
-			padding-top: 20px;
+			padding-top: 10px;
 
 			.roll {
 				.header {

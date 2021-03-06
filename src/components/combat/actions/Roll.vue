@@ -132,18 +132,33 @@
 				</q-tabs>
 
 				<q-tab-panels v-model="tab" class="bg-transparent">
-					<q-tab-panel :name="name" v-for="({name, type}, index) in action_types" :key="`panel-${index}`">
+					<q-tab-panel :name="name" v-for="({name, type}, type_index) in action_types" :key="`panel-${type_index}`">
+
+						<div v-if="type === 'legendary_actions' && current.lengendary_count" class="limited">
+							Actions used 
+							<template v-for="i in current.lengendary_count">
+								<span :key="`legendary-${i}`" class="mr-1">
+									<i class="far" :class="
+										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
+										? 'fa-dot-circle'
+										: 'fa-circle'
+										"
+									/>
+								</span>
+							</template>
+						</div>
+
 						<q-list v-if="current[type]" dark square :class="`accordion`">
 							<q-expansion-item 
-								v-for="(action, index) in current[type]" 
-								:key="`action-${index}`"
+								v-for="(action, action_index) in current[type]" 
+								:key="`action-${action_index}`"
 								dark switch-toggle-side
 								expand-icon-class="hidden-toggle"
 								:group="type"
 								:name="name"
 							>
 								<template v-slot:header>
-									<q-item-section>
+									<q-item-section :class="checkAvailable(type, action_index, action) ? '' : 'is-disabled'">
 										<q-item-label>
 											<b>{{ action.name }}</b>
 											<span class="gray-light">
@@ -153,10 +168,11 @@
 											</span>
 										</q-item-label>
 										<q-item-label caption v-if="action.action_list && action.action_list[0].type !== 'other'">
+											<!-- Rolls -->
 											<span v-if="action.action_list[0].rolls">
-												<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${index}-${roll_index}`">
+												<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
 													(<i :class="[
-														action.action_list[0].type === 'healing' ? 'fas fa-heart' : damage_type_icons[roll.damage_type],
+														action.action_list[0].type === 'healing' ? 'fas fa-heart green' : damage_type_icons[roll.damage_type],
 														roll.damage_type
 														]" /> 
 													{{ roll.dice_count || "" }}{{ roll.dice_type ? `d${roll.dice_type}` : ``}}<template v-if="roll.fixed_val && roll.dice_count">
@@ -168,25 +184,37 @@
 													</q-tooltip>
 												</span>
 											</span>
+											<!-- Reach -->
 											<span v-if="action.reach">
-												<span class="blue">&bull;</span> {{action.reach}}<small class="gray-hover">ft.</small>
+												<span class="blue">|</span> {{action.reach}}<small class="gray-hover">ft.</small>
 												<q-tooltip anchor="top middle" self="center middle">
 													Reach
 												</q-tooltip>
 											</span>
+											<!-- Range -->
 											<span v-if="action.range">
-												<span class="blue">&bull;</span> {{ action.range }}<small class="gray-hover">ft.</small>
+												<span class="blue">|</span> {{ action.range }}<small class="gray-hover">ft.</small>
 												<q-tooltip anchor="top middle" self="center middle">
 													Range
 												</q-tooltip>
 											</span>
+											<!-- Saving trow -->
 											<span v-if="action.action_list[0].type === 'save' && action.action_list[0].save_dc">
-												<span class="blue">&bull; </span>
+												<span class="blue">|</span>
 												<span v-if="action.action_list[0].save_ability">
 													{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
 												</span>
 												<span class="gray-hover">DC</span>
 												{{ action.action_list[0].save_dc }}
+											</span>
+											<!-- AOE -->
+											<span v-if="action.aoe_type">
+												<span class="blue">|</span>
+												{{ action.aoe_size }}<small class="gray-hover">ft.</small>
+												{{ action.aoe_type.capitalize() }}
+												<q-tooltip anchor="top middle" self="center middle">
+													Area of effect
+												</q-tooltip>
 											</span>
 										</q-item-label>
 									</q-item-section>
@@ -207,7 +235,8 @@
 																<hk-roll 
 																	:tooltip="`${action.name} (${action.versatile_one || 'Option 1'})`"
 																	tooltipPosition="right"
-																	@roll="roll($event, action, 0)"
+																	@roll="roll($event, acion_index, action, type, 0)"
+																	:disabled="!checkAvailable(type, action_index, action)"
 																>
 																	{{ action.versatile_one || 'Option 1' }}
 																</hk-roll>
@@ -219,7 +248,8 @@
 																<hk-roll 
 																	:tooltip="`${action.name} (${action.versatile_two || 'Option 2'})`"
 																	tooltipPosition="right"
-																	@roll="roll($event, action, 1)"
+																	@roll="roll($event, action_index, action, type, 1)"
+																	:disabled="!checkAvailable(type, action_index, action)"
 																>
 																	{{ action.versatile_two || 'Option 2' }}
 																</hk-roll>
@@ -232,15 +262,33 @@
 										<hk-roll 
 											v-else
 											:tooltip="`Roll ${action.name}`" 
-											@roll="roll($event, action)"
+											@roll="roll($event, action_index, action, type)"
+											:disabled="!checkAvailable(type, action_index, action)"
 										>
 											<span class="roll-button" />
 										</hk-roll>
 									</q-item-section>
+									<!-- Spend limited actions that can't be rolled -->
+									<q-item-section v-else-if="action.limit || action.recharge || action.legendary_cost" avatar>
+										<div 
+											v-if="checkAvailable(type, action_index, action)"
+											@click.stop="spendLimited(type, action.legendary_cost ? 'legendaries_used' : action_index)"
+										>
+											Use
+										</div>
+										<i v-else class="fas fa-ban gray-light" />
+									</q-item-section>
 								</template>
 
-								<div class="accordion-body description">
+								<div class="accordion-body description" v-if="action.desc">
 									<hk-dice-text :input_text="action.desc"/>
+									<div 
+										class="blue pointer mt-2" 
+										v-if="!checkAvailable(type, action_index, action) && !action.legendary_cost"
+										@click="spendLimited(type, action_index, true)"
+									>
+										Regain use
+									</div>
 								</div>
 							</q-expansion-item>
 						</q-list>
@@ -313,36 +361,45 @@
 		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'entities',
-				'turn',
-				'targeted',
-				'share_rolls'
+				"encounter",
+				"entities",
+				"turn",
+				"targeted",
+				"share_rolls"
 			])
 		},
 		methods: {
 			...mapActions([
-				'setSlide',
-				'setActionRoll',
-				'setShareRolls',
+				"setSlide",
+				"setActionRoll",
+				"setShareRolls",
+				"set_limitedUses"
 			]),
-			roll(e, action, versatile) {
+			roll(e, action_index, action, category, versatile) {
 				let roll;
 				const config = {
 					type: "monster_action",
 					versatile
 				}
 
-				// Roll once for a saving throw
-				if(action.action_list[0].type === 'save') {
+				// Roll once for AOE
+				if(action.aoe_type) {
 					roll = this.rollAction(e, action, config);
+				}
+
+				// Check for limited uses
+				if(action.limit || action.recharge) {
+					this.spendLimited(category, action_index);
+				}
+				if(action.legendary_cost) {
+					this.spendLimited(category, "legendaries_used");
 				}
 
 				for(const key of this.targeted) {
 					let newRoll = { ...roll };
 
-					// Reroll for each target if it's not a saving trhow
-					if(action.action_list[0].type !== 'save') {
+					// Reroll for each target if it's not AOE
+					if(!action.aoe_type) {
 						newRoll = this.rollAction(e, action, config);
 					}
 
@@ -351,6 +408,24 @@
 					this.$set(newRoll, "current", this.current);
 
 					this.setActionRoll(newRoll);
+				}
+			},
+			spendLimited(category, index, regain=false) {
+				this.set_limitedUses({key: this.current.key, index, category, regain});
+			},
+			checkAvailable(category, index, action) {
+				// If there are not limits to the use, return true
+				if(!action.limit && !action.recharge && !action.legendary_cost) return true;
+
+				// Otherwise, check if the ability is available
+				if(action.legendary_cost) {
+					return !this.current.limited_uses[category] || (action.legendary_cost <= (this.current.lengendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
+				}
+				if(action.limit) {
+					return !this.current.limited_uses[category] || (this.current.limited_uses[category][index] < action.limit);
+				}
+				if(action.recharge) {
+					return !this.current.limited_uses[category] || !this.current.limited_uses[category][index];
 				}
 			},
 			shareRoll(targets, toHit, damage, hitMod, damageMod) {
@@ -434,6 +509,13 @@
 	}
 	.description {
 		white-space: pre-line;
+	}
+	.limited {
+		font-size: 15px;
+		margin-bottom: 5px;
+	}
+	.is-disabled {
+		opacity: .3;
 	}
 	.roll-button {
 		display: inline-block;

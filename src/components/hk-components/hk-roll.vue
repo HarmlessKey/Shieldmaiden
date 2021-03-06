@@ -2,11 +2,11 @@
 	<span>
 		<span 
 			class="hk-roll"
-			:class="Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''"
+			:class="disabled ? 'disabled' : Object.keys(advantage).length === 1 ? Object.keys(advantage)[0] : ''"
 			@mousemove="checkAdvantage($event)"
 			@mouseout="clearAdvantage()"
 			v-touch-hold.mouse="!disabled ? showDialog : null"
-			@click.stop="roll ? rollDice($event) : emit($event)"
+			@click.stop="disabled ? null : roll ? rollDice($event) : emit($event)"
 		>
 			<slot name="default"/>
 			<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">

@@ -12,7 +12,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense utofocus 
 							label="Initiative"
@@ -68,7 +68,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-color 
 							square dark flat
 							v-model="editable_entity.color_label" 
@@ -118,7 +118,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">{{ entity.name }}</div>
+						<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense 
 							label="Armor class bonus"
@@ -180,7 +180,7 @@
 			>
 				<div class="absolute-full health-bar">
 					<div class="truncate">
-						{{ entity.name }}
+						{{ entity.name.capitalizeEach() }}
 					</div>
 
 					<!-- HEALTH -->
@@ -226,7 +226,7 @@
 								:breakpoint="576"
 							>
 								<div class="bg-gray px-2 py-2">
-									<div class="mb-1">{{ entity.name }}</div>
+									<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 									<q-input 
 										dark filled square dense 
 										class="mb-2"

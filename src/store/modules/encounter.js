@@ -921,18 +921,31 @@ const actions = {
 	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
 	 * @param {boolean} regain Wether a slot must be regained or spend
 	 */
-	set_limitedUses({ commit, state }, {key, index, category, regain=false}) {
+	set_limitedUses({ commit, state }, {key, index, category, regain=false, cost=1}) {
 		const entity = state.entities[key];
 		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) ? entity.limited_uses[category][index] : 0;
 		
 		if(regain) {
-			used = used - 1;
+			used = used - cost;
 		} else {
-			used = used + 1;
+			used = used + cost;
 		}
-		
 		if(used < 0) used = 0;
+
+		// Save the value in firebase and store
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).set(used);
 		commit("SET_LIMITED_USES", {key, category, index, value: used});
+	},
+	/**
+	 * Remove limeted uses of an ability
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 */
+	remove_limitedUses({ commit, state }, {key, category, index}) {
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).remove();
+		commit("REMOVE_LIMITED_USES", {key, category, index});
 	},
 	reset_store({ commit }) { commit("RESET_STORE"); },
 }
@@ -972,6 +985,7 @@ const mutations = {
 		if(!state.entities[key].limited_uses[category]) Vue.set(state.entities[key].limited_uses, category, {});
 		Vue.set(state.entities[key].limited_uses[category], index, value);
 	},
+	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
 	async ADD_ENTITY(state, {rootState, key}) {
 		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];

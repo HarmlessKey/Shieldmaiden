@@ -1,7 +1,7 @@
 <template>
 	<div v-if="current">
 		<p v-if="targeted.length === 0">No target selected</p>
-		<template v-else-if="current.entityType === 'npc' || 'companion'">
+		<template v-else-if="current.entityType !== 'player'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
 				<!-- ROLL OPTIONS -->
 				<template v-if="!demo">
@@ -272,7 +272,13 @@
 									<q-item-section v-else-if="action.limit || action.recharge || action.legendary_cost" avatar>
 										<div 
 											v-if="checkAvailable(type, action_index, action)"
-											@click.stop="spendLimited(type, action.legendary_cost ? 'legendaries_used' : action_index)"
+											class="blue"
+											@click.stop="spendLimited(
+												type, 
+												action.legendary_cost ? 'legendaries_used' : action_index,
+												false,
+												action.legendary_cost ? action.legendary_cost : 1
+											)"
 										>
 											Use
 										</div>
@@ -298,7 +304,7 @@
 				
 			</template>
 		</template>
-		<p v-else-if="current.entityType === 'player'">
+		<p v-else>
 			Most players want to roll their own attacks, you probably shouldn't take that away from them. ;)
 		</p>
 	</div>
@@ -392,7 +398,7 @@
 					this.spendLimited(category, action_index);
 				}
 				if(action.legendary_cost) {
-					this.spendLimited(category, "legendaries_used");
+					this.spendLimited(category, "legendaries_used", false, action.legendary_cost);
 				}
 
 				for(const key of this.targeted) {
@@ -410,16 +416,18 @@
 					this.setActionRoll(newRoll);
 				}
 			},
-			spendLimited(category, index, regain=false) {
-				this.set_limitedUses({key: this.current.key, index, category, regain});
+			spendLimited(category, index, regain=false, cost=1) {
+				this.set_limitedUses({key: this.current.key, index, category, regain, cost});
 			},
 			checkAvailable(category, index, action) {
-				// If there are not limits to the use, return true
+				// If there are not limits to the use, the ability is always available
 				if(!action.limit && !action.recharge && !action.legendary_cost) return true;
 
-				// Otherwise, check if the ability is available
+				// Otherwise, check if the ability is available and can be used
 				if(action.legendary_cost) {
-					return !this.current.limited_uses[category] || (action.legendary_cost <= (this.current.lengendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
+					return !this.current.limited_uses[category] || 
+						!this.current.limited_uses[category].legendaries_used || 
+						(action.legendary_cost <= (this.current.lengendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
 				}
 				if(action.limit) {
 					return !this.current.limited_uses[category] || (this.current.limited_uses[category][index] < action.limit);

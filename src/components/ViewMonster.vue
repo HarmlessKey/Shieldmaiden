@@ -100,6 +100,7 @@
 		</div>
 
 		<div class="monster-actions">
+			<!-- Actions -->
 			<template v-if="data.actions">
 				<h3>Actions</h3>
 				<p v-for="(action, index) in data.actions" :key="`action-${index}`">
@@ -107,6 +108,7 @@
 				</p>
 			</template>
 
+			<!-- Legendary Actions -->
 			<template v-if="data.legendary_actions">
 				<h3>Legendary Actions</h3>
 				<p>
@@ -115,6 +117,14 @@
 				</p>
 				<p v-for="(legendary_action, index) in data.legendary_actions" :key="`legendary-${index}`">
 						<b><i>{{ legendary_action.name }}</i></b> {{ legendary_action.desc }}
+				</p>
+			</template>
+			
+			<!-- Reactions -->
+			<template v-if="data.reactions">
+				<h3>Reactions</h3>
+				<p v-for="(action, index) in data.reactions" :key="`action-${index}`">
+						<b><i>{{ action.name }}</i></b> {{ action.desc }}
 				</p>
 			</template>
 		</div>

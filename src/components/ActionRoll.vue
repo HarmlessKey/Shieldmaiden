@@ -184,31 +184,17 @@
 		<!-- SPECIAL ACTIONS -->
 		<div class="col-12 col-md-3">
 			<q-select 
-				dark filled square
+				dark filled square multiple
 				map-options
 				emit-value
-				label="Special event"
+				label="Special events"
 				:options="Object.values(specials)"
-				v-model="roll.special"
+				v-model="special"
 				class="mb-3"
 				clearable
-				hint="Select the special event that happens on a hit"
-			>
-				<template v-slot:append>
-					<q-icon name="info" v-if="roll.special" @click.stop>
-						<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-							<q-card dark square>
-								<q-card-section class="bg-gray-active">
-									<b>{{ specials[roll.special].label }}</b>
-								</q-card-section>
-								<q-card-section>
-									{{ specials[roll.special].info }}
-								</q-card-section>
-							</q-card>
-						</q-menu>
-					</q-icon>
-				</template>
-			</q-select>
+				hint="Select the special events that happens on a hit"
+				:option-disable="opt => Object(opt) === opt ? opt.disable === true : true"
+			/>
 		</div>
 
 		<!-- SPELL SCALING -->
@@ -343,6 +329,29 @@ export default {
 				return 1;
 			} return 100;
 		},
+		specials() {
+			let specials = {
+				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
+				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
+				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
+			};
+			if(this.special) {
+				console.log(this.special)
+				if(this.special.includes("siphon_full")) specials.siphon_half.disable = true;
+				if(this.special.includes("siphon_half")) specials.siphon_full.disable = true;
+			}
+			return specials;
+		},
+		special: {
+			get() {
+				if(this.roll.special && typeof this.roll.special === "string") {
+					return [this.roll.special];
+				} return this.roll.special;
+			},
+			set(newVal) {
+				this.$set(this.roll, "special", newVal);
+			}
+		},
 		options() {
 			let options = [
 				{
@@ -379,11 +388,6 @@ export default {
 				{ label: "Half damage", value: 0.5},
 				{ label: "Full damage", value: 1},
 			],
-			specials: {
-				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
-				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
-				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
-			}
 		};
 	},
 	methods: {

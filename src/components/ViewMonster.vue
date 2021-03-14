@@ -224,6 +224,14 @@
 					</template>
 				</p>
 			</template>
+			
+			<!-- Reactions -->
+			<template v-if="data.reactions">
+				<h3>Reactions</h3>
+				<p v-for="(action, index) in data.reactions" :key="`action-${index}`">
+						<b><i>{{ action.name }}</i></b> {{ action.desc }}
+				</p>
+			</template>
 		</div>
 
 		<div class="monster-actions">

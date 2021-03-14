@@ -1215,6 +1215,20 @@ const mutations = {
 					for(const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
 						if(data_npc[type]) entity[type] = data_npc[type];
 					}
+
+					// Spellcasting
+					entity.caster_ability = data_npc.caster_ability;
+					entity.caster_save_dc = data_npc.caster_save_dc;
+					entity.caster_level = data_npc.caster_level;
+					entity.caster_spell_slots = data_npc.caster_spell_slots;
+					entity.caster_spell_attack = data_npc.caster_spell_attack;
+					entity.caster_spells = data_npc.caster_spells;
+
+					// Innate spellcasting
+					entity.innate_ability = data_npc.innate_ability;
+					entity.innate_save_dc = data_npc.innate_save_dc;
+					entity.innate_spell_attack = data_npc.innate_spell_attack;
+					entity.innate_spells = data_npc.innate_spells;
 				}
 				break
 			}

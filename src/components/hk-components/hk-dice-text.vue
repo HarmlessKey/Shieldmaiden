@@ -51,7 +51,7 @@
 				return ret
 			},
 			makeDice(input) {
-				//              =   (Number)[dD]( Dice  )          (Modifier)
+				//              =  (Number )[dD]( Dice  )          (Modifier)
 				const xdy_regex = /(?<n>\d+)[dD](?<d>\d+)\s?(?<m>[+-]?\s?\d*)/g;
 				let match = xdy_regex.exec(input);
 				if (match !== null) {
@@ -89,9 +89,10 @@
 
 	.rollable {
 		cursor: pointer;
+		user-select: none;
 
 		&:hover {
-			color: brown;
+			color: $blue;
 		}
 	}
 

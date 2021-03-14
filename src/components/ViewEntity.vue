@@ -66,15 +66,15 @@
 				:roll="{
 					d: 20, 
 					n: 1, 
-					m: modifier(data[ability.ability]),
-					title: `${entity.name}: ${ability.ability.capitalize()} check`, 
+					m: modifier(data[ability]),
+					title: `${entity.name}: ${ability.capitalize()} check`, 
 					notify: true
 				}"
 			>
-				<div v-if="data[ability.ability]" class="ability">
-					<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
-					{{ data[ability.ability] }}
-					({{ modifier(data[ability.ability]) }})
+				<div v-if="data[ability]" class="ability">
+					<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
+					{{ data[ability] }}
+					({{ modifier(data[ability]) }})
 				</div>
 			</hk-roll>
 		</div>
@@ -192,6 +192,63 @@
 			<hr>
 		</template>
 
+		<!-- SPELLCASTING -->
+		<template v-if="entity.caster_ability">
+			<p>
+				<b><i>
+					Spellcasting
+				</i></b>
+				The {{ entity.name.capitalizeEach() }} is a {{ entity.caster_level | numeral('Oo')}}-level spellcaster.
+				It's spellcasting ability is {{ entity.caster_ability.capitalize() }}
+				(spell save DC {{ entity.caster_save_dc }}, 
+				{{ entity.caster_spell_attack > 0 ? `+${entity.caster_spell_attack}` : entity.caster_spell_attack }} to hit with spell attacks). 
+				The {{ entity.name.capitalizeEach() }} has the following spells prepared:
+			</p>
+			<p>
+				<template v-for="level in caster_spell_levels" >
+					<div :key="`spell-${level}`">
+						<template v-if="level === 0">
+							Cantrips (at will):
+						</template>
+						<template v-else>
+							{{ level | numeral('Oo') }} level ({{ entity.caster_spell_slots[level] }} slots):
+						</template>
+						<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+							{{ spell.name }}{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+						</i>
+					</div>
+				</template>
+			</p>
+		</template>
+
+		<!-- INNATE SPELLCASTING -->
+		<template v-if="entity.innate_ability">
+			<p>
+				<b><i>
+					Innate spellcasting
+				</i></b>
+				The {{ entity.name.capitalizeEach() }}'s innate spellcasting ability is {{ entity.innate_ability.capitalize() }}
+				(spell save DC {{ entity.innate_save_dc }}, 
+				{{ entity.innate_spell_attack > 0 ? `+${entity.innate_spell_attack}` : entity.innate_spell_attack }} to hit with spell attacks). 
+				The {{ entity.name.capitalizeEach() }} can cast the following spells, requiring no material components:
+			</p>
+			<p>
+				<template v-for="limit in innate_spell_levels" >
+					<div :key="`spell-${limit}`">
+						<template v-if="limit === 0">
+							At will:
+						</template>
+						<template v-else>
+							{{ limit }}/day each:
+						</template>
+						<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+							{{ spell.name }}{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+						</i>
+					</div>
+				</template>
+			</p>
+		</template>
+
 		<div class="monster-actions" v-if="entity.entityType !== 'player'">
 			<div v-for="{category, name} in actions" :key="category">
 				<template v-if="entity[category] && entity[category].length > 0">
@@ -217,16 +274,23 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
 	import { skills } from '@/mixins/skills.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { experience } from '@/mixins/experience.js';
+	import { abilities } from '@/mixins/abilities.js';
 
 	export default {
 		name: 'NPC',
-		mixins: [general, dice, experience, skills, monsterMixin],
+		mixins: [
+			general, 
+			dice, 
+			experience, 
+			skills, 
+			monsterMixin,
+			abilities
+		],
 		props: [
 		'data'
 		],
@@ -249,10 +313,24 @@
 				}
 				return entity;
 			},
-		},
-		firebase() {
-			return {
-				abilities: db.ref('abilities')
+			caster_spell_levels() {
+				if(this.entity.caster_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.entity.caster_spells)) {
+						if(!levels.includes(spell.level)) levels.push(spell.level);
+					}
+					return levels.sort();
+				} return [];
+			},
+			innate_spell_levels() {
+				if(this.entity.innate_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.entity.innate_spells)) {
+						const limit = (spell.limit) ? spell.limit : 0;
+						if(!levels.includes(limit)) levels.push(limit);
+					}
+					return levels.sort();
+				} return [];
 			}
 		},
 		methods: {
@@ -286,7 +364,17 @@
 					: 0,
 					this.entity.skills_expertise ? this.entity.skills_expertise.includes(key) : false
 				) 
-			}
+			},
+			spellsForLevel(level) {
+				return Object.values(this.entity.caster_spells).filter(item => { 
+					return item.level == level;
+				});
+			},
+			spellsForLimit(limit) {
+				return Object.values(this.entity.innate_spells).filter(item => { 
+					return item.limit == limit;
+				});
+			},
 		},
 		mounted() {
 			this.$nextTick(function() {

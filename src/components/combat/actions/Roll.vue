@@ -116,10 +116,7 @@
 				<q-tabs
 					class="mt-3"
 					v-model="tab"
-					dark
-					inline-label
-					dense
-					no-caps
+					dark inline-label dense no-caps
 				>
 					<template v-for="({name, label, type}, index) in action_types">
 						<q-tab 
@@ -319,7 +316,7 @@
 
 
 	export default {
-		name: "Select",
+		name: "Roll",
 		mixins: [setHP, dice, damage_types],
 		props: ["current"],
 		data() {

@@ -90,12 +90,13 @@
 			</q-tabs>
 
 			<q-tab-panels v-model="tab" class="bg-transparent">
-					<q-tab-panel name="manual">
-						<Manual :current="entitiesList[doneBy]" :targeted="targeted" />
-					</q-tab-panel>
-					<q-tab-panel name="roll">
-						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
-						<Roll v-else :current="entitiesList[doneBy]" />
+					<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
+						<Manual v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
+						<template v-if="name === 'roll'">
+							<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
+							<Roll v-else :current="entitiesList[doneBy]" />
+						</template>
+						<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
 					</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -110,6 +111,7 @@
 	import Manual from '@/components/combat/actions/Manual.vue';
 	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
 	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
@@ -118,6 +120,7 @@
 			Manual,
 			RollDeprecated,
 			Roll,
+			Spellcasting
 		},
 		mixins: [setHP, damage_types],
 		props: {
@@ -132,11 +135,7 @@
 		data() {
 			return {
 				tabSetter: undefined,
-				tabs: [
-					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
-					{ name: "roll", label: "Roll", icon: "fas fa-dice-d20" }
-				],
-				doneBySetter: undefined 
+				doneBySetter: undefined
 			}
 		},
 		computed: {
@@ -168,6 +167,17 @@
 					entityType: "environment"
 				};
 				return list;
+			},
+			tabs() {
+				const current = this.entitiesList[this.doneBy];
+				let tabs = [
+					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
+					{ name: "roll", label: "Actions", icon: "fas fa-dice-d20" }	
+				];
+				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
+					tabs.push({ name: "spells", label: "Spellcasting", icon: "fas fa-wand-magic" })
+				}
+				return tabs;
 			},
 			doneBy: {
 				get() {

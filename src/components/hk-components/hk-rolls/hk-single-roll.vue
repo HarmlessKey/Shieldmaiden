@@ -481,11 +481,10 @@ export default {
 						entityType: this.roll.target.entityType,
 						prop: 'maxHpMod',
 						value
-					})
+					});
 				}
 			}
-
-			// this.removeActionRoll(this.index);
+			this.removeActionRoll(this.index);
 		},
 		totalRollValue(action, action_index, rolls) {
 			let total = parseInt(rolls.modifierRoll.total);

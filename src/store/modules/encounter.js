@@ -254,7 +254,7 @@ const actions = {
 	 * @param {string} prop property to edit 
 	 * @param {string} value user's input value for the property
 	 */
-	edit_entity_prop({ state, commit }, {key, entityType, prop, value}) {
+	edit_entity_prop({ state, commit, dispatch }, {key, entityType, prop, value}) {
 		// Save paths for firebase
 		const encounterEntity = `encounters/${state.uid}/${state.campaignId}/${state.encounterId}/entities/${key}`
 		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}`;
@@ -337,8 +337,16 @@ const actions = {
 
 		// Maximum hit point modifier
 		if(prop === "maxHpMod" || prop === "transformedMaxHpMod") {
+			// Negative maxHpMod can't be greater than the maxHp
+			if(value < 0) value = (Math.abs(value) > maxHp) ? -maxHp : value;
+
 			// New maxHp needs to be updated (only in the store)
 			maxHp = parseInt(maxHp + value); // New maxHp
+
+			// If the maxHp is 0, a target is dead
+			if(maxHp === 0) {
+				if(entity.entityType !== "npc") dispatch("set_dead", {key, action: "set"});
+			}
 
 			// Current hitpoints need to be modified too
 			if(maxHpMod === 0) {

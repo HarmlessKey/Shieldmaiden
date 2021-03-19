@@ -175,8 +175,8 @@
 			<!-- HEALT BAR -->
 			<q-linear-progress 
 				size="35px" 
-				:value="displayStats().curHp/displayStats().maxHp"
-				:color="hpBarColor(percentage(displayStats().curHp, displayStats().maxHp))" 
+				:value="percentage(displayStats().curHp, displayStats().maxHp)"
+				:color="hpBarColor(displayStats().curHp / displayStats().maxHp * 100)" 
 			>
 				<div class="absolute-full health-bar">
 					<div class="truncate">
@@ -341,7 +341,7 @@
 					<!-- IDLE ACTIONS -->
 					<div v-else class="text-right">
 						<span class="white" 
-							v-if="entity.addNextRound == true"
+							v-if="entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -349,7 +349,7 @@
 							</q-tooltip>
 						</span>
 						<span class="gray-hover" 
-							v-if="entity.addNextRound == false"
+							v-if="!entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -494,8 +494,8 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 				}})
 			},
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				const hp_percentage = (current === 0) ? 0 : current / max;
+				return hp_percentage;
 			},
 			hpBarColor(percentage) {
 				if(percentage < 33) {

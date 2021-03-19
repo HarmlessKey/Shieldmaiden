@@ -129,6 +129,8 @@ export const dice = {
 		 * @param {object} e Event, holds info for advantage/disadvantege
 		 * @param {object} ability Full ability object
 		 * @param {object} config Holds configuration options {type, castLevel, casterLevel, toHitModifier, versatile}
+		 * 
+		 * @returns {object}
 		 */
 		rollAction(e, ability, config={}) {
 			let returnRoll = {
@@ -188,6 +190,7 @@ export const dice = {
 					let scaledRoll = undefined;
 					let scaledModifier = undefined;
 					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
+					const special = (!modifier.special || modifier.length === 0) ? undefined : (modifier.special && Array.isArray(modifier.special)) ? modifier.special : [modifier.special];
 
 					// Check for versatile. 1 is the alternative option
 					// Changes only have to be made if the versatile roll is the alternative (1)
@@ -252,7 +255,8 @@ export const dice = {
 						modifierRoll,
 						damage_type,
 						scaledRoll,
-						missSave
+						missSave,
+						special
 					});
 				}
 				i++;

@@ -215,10 +215,10 @@
 
 							//Half or doulbe amount
 							if(this.intensity[key] === 'half') {
-								amount = Math.floor(amount / 2);
+								amount[type] = Math.floor(amount[type] / 2);
 							}
 							if(this.intensity[key] === 'double') {
-								amount = amount * 2;
+								amount[type] = amount[type] * 2;
 							}
 
 							// Set config for HpManipulation and log

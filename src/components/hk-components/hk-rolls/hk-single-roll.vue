@@ -191,7 +191,7 @@
 											:class="{
 												red: Throw === 1, green: Throw == rolled.modifierRoll.d,
 												rotate: animateRoll === roll.key+rolled_index+throw_index
-												}"
+											}"
 											@click="
 												animateRoll = roll.key+rolled_index+throw_index,
 												reroll($event, rolled.modifierRoll, throw_index)
@@ -243,18 +243,39 @@
 							</template>
 							<hr>
 							<div>
-								<b>Final result:</b><br/>	
+								<b>Final result</b><br/>	
 								(<hk-animated-integer :value="rolled.modifierRoll.total" /><span v-if="rolled.scaledRoll"> + 
 								{{ rolled.scaledRoll.total }}</span>)
-								<span v-if="savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'"> {{ missSaveEffect(rolled.missSave, 'calc') }}</span>
+								<span v-if="savingThrowResult[action_index] === 'save' || hitOrMiss[action_index] === 'miss'">
+									{{ missSaveEffect(rolled.missSave, 'calc') }}
+								</span>
 								<template v-if="resistances">
 									<span v-if="resistances[rolled.damage_type] === 'v'"> * 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'r'"> / 2</span>
 									<span v-if="resistances[rolled.damage_type] === 'i'"> no effect</span>
 								</template>
-								<span> = <b :class="rolled.damage_type">
+								<span> = <b :class="action.type === 'healing' ? 'green' : rolled.damage_type">
 									<hk-animated-integer :value="totalRollValue(action, action_index, rolled)" />
-								</b></span>
+								</b> 
+								{{ action.type === "healing" ? "healing" : rolled.damage_type }}
+								</span>
+							</div>
+
+							<!-- Special events -->
+							<div 
+								v-if="rolled.special && (savingThrowResult[action_index] === 'fail' || hitOrMiss[action_index] === 'hit')" 
+								class="mt-3"
+							>
+								<b>Events on {{ action.toHit ? "hit" : "failed save" }}</b><br/>	
+								<div v-for="(event, event_index) in rolled.special" :key="`event-${event_index}`">
+									{{ eventValues(event, totalRollValue(action, action_index, rolled)).name }}
+									<b :class="event === 'drain' ? 'red' : 'green'">
+										{{ eventValues(event, totalRollValue(action, action_index, rolled)).value }}
+									</b>
+									<q-tooltip anchor="center left" self="center right">
+										{{ event === "drain" ? "Reduces targets max HP" : "Heals caster"}}
+									</q-tooltip>
+								</div>
 							</div>
 						</div>
 					</q-expansion-item>
@@ -333,7 +354,7 @@ export default {
 		},
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
-				return this.$store.getters.userSettings.encounter.critical;
+				return this.$store.getters.userSettings.encounter.critical; // Double rolled values
 			} return undefined; // Default = undefined = roll twice
 		},
 		totalValue() {
@@ -372,7 +393,8 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			"removeActionRoll"
+			"removeActionRoll",
+			"edit_entity_prop",
 		]),
 		checkHitOrMiss() {
 			this.roll.actions.forEach((action, index) => {
@@ -399,6 +421,7 @@ export default {
 				defenses: this.resistances
 			};
 			let actions = [];
+			let specials = [];
 
 			this.roll.actions.forEach((action, index) => {
 				let new_action = {
@@ -415,14 +438,54 @@ export default {
 					let roll = {};
 					if(action.type !== "healing") roll.damage_type = rolled.damage_type;
 					roll.value = this.totalRollValue(action, index, rolled);
+
+					// Special events | only on a hit or failed save
+					if(rolled.special && (this.savingThrowResult[index] === "fail" || this.hitOrMiss[index] === "hit" )) {
+						for(const event of rolled.special) {
+							const special = {};
+							special[event] = this.eventValues(event, roll.value).value;
+							specials.push(special)
+						}
+					}
+
 					new_action.rolls.push(roll);
 				}
 				actions.push(new_action);
 			});
 			config.actions = actions;
 
+			// Apply the rolled damage/healing
 			this.setHP(this.totalValue, this.roll.target, this.roll.current, config);
-			this.removeActionRoll(this.index);
+
+			// Apply the special events
+			for(const special of specials) {
+				const event = Object.entries(special)[0];
+				if(event[0].includes("siphon")) {
+					const event_config = {
+						log: true,
+						ability: `${this.roll.name}: Siphon`,
+						actions: [
+							{
+								type: "healing",
+								rolls: [
+									{ value: event[1] }
+								]
+							}
+						]
+					};
+					this.setHP({ healing: event[1] }, this.roll.current, this.roll.current, event_config);
+				} else if(event[0] === "drain") {
+					const value = (this.roll.target.maxHpMod) ? this.roll.target.maxHpMod - event[1] : -event[1];
+					this.edit_entity_prop({
+						key: this.roll.target.key, 
+						entityType: this.roll.target.entityType,
+						prop: 'maxHpMod',
+						value
+					})
+				}
+			}
+
+			// this.removeActionRoll(this.index);
 		},
 		totalRollValue(action, action_index, rolls) {
 			let total = parseInt(rolls.modifierRoll.total);
@@ -500,6 +563,25 @@ export default {
 			}
 			return stats
 		},
+		eventValues(event, value) {
+			let returnObj = {
+				name: "",
+				value
+			};
+
+			if(event) {
+				// Drain = redus Max HP
+				if(event === "drain") {
+					returnObj.name = "Drain";
+				}
+				// Siphon = caster heals for damage done
+				if(event.includes("siphon")) {
+					returnObj.name = "Siphon";
+					returnObj.value = (event === "siphon_half") ? Math.floor(value/2) : value;
+				}
+			}
+			return returnObj;
+		}
 	}
 }
 </script>

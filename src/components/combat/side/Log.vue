@@ -29,14 +29,14 @@
 						<!-- ACTIONS -->
 						<div v-if="item.actions">
 							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
-								<!-- To hit -->
+								<!-- Manual -->
 								<span v-if="action.manual">
-									<b>{{ item.by_name.capitalizeEach() }}</b> (manual input) did		
+									<b>{{ item.by_name.capitalizeEach() }}</b> (manual input) did
 								</span>
 
 								<!-- To hit -->
 								<span v-if="action.hitOrMiss">
-									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `'s ${item.ability}` : `` }}
+									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
 									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
 									</span>
@@ -50,6 +50,12 @@
 										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
 									</span>
 									save {{ item.ability ? `on ${item.ability}` : `` }} and took
+								</span>
+
+								<!-- Healing -->
+								<span v-if="action.type === 'healing'">
+									<b>{{item.by_name.capitalizeEach() }}s</b> {{ item.ability }} healed
+									<b>{{item.target_name.capitalizeEach() }}</b> for
 								</span>
 
 								<!-- Rolls -->
@@ -82,7 +88,10 @@
 						</div>
 					</li>
 				</transition-group>
-				<p v-else>No log yet.</p>
+				<p v-else>
+					<b>There is no log yet.</b><br/>
+					Log items are created by doing damage or healing. From this log you can undo mistakes.
+				</p>
 			</template>
 		</div>
 </template>

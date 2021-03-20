@@ -133,16 +133,14 @@
 
 						<div v-if="type === 'legendary_actions' && current.lengendary_count" class="limited">
 							Actions used 
-							<template v-for="i in current.lengendary_count">
-								<span :key="`legendary-${i}`" class="mr-1">
-									<i class="far" :class="
-										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
-										? 'fa-dot-circle'
-										: 'fa-circle'
-										"
-									/>
-								</span>
-							</template>
+							<span v-for="i in current.lengendary_count" :key="`legendary-${i}`" class="mr-1">
+								<i class="far" :class="
+									current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
+									? 'fa-dot-circle'
+									: 'fa-circle'
+									"
+								/>
+							</span>
 						</div>
 
 						<q-list v-if="current[type]" dark square :class="`accordion`">

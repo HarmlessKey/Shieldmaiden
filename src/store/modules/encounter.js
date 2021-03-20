@@ -344,9 +344,7 @@ const actions = {
 			maxHp = parseInt(maxHp + value); // New maxHp
 
 			// If the maxHp is 0, a target is dead
-			if(maxHp === 0) {
-				if(entity.entityType !== "npc") dispatch("set_dead", {key, action: "set"});
-			}
+			if(maxHp === 0 && entity.entityType !== "npc") dispatch("set_dead", {key, action: "set"});
 
 			// Current hitpoints need to be modified too
 			if(maxHpMod === 0) {
@@ -1082,6 +1080,11 @@ const mutations = {
 					if(db_player[`${ability}-save-profficient`]) {
 						entity.saving_throws.push(ability);
 					}
+				}
+
+				// Defenses
+				for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+					if(db_player[defense]) entity[defense] = db_player[defense];
 				}
 
 				entity.skills = db_player.skills;

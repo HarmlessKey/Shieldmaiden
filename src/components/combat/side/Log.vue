@@ -64,8 +64,7 @@
 										<b>{{ roll.value }}</b> 
 										{{ action.type !== "healing" ? roll.damage_type : "" }}
 									</span>
-									{{ action.type !== "healing" ? "damage" : "healing" }}
-									{{ roll_index+1 &lt; action.rolls.length ? "and" : "" }}
+									{{ roll_index+1 &lt; action.rolls.length ? "and" : action.type !== "healing" ? "damage" : "healing" }}
 								</span>
 
 								<!-- MANUAL END -->
@@ -127,9 +126,6 @@
 				'log',
 				'entities',
 			]),
-		},
-		beforeMount() {
-			// this.setLog()
 		},
 		methods: {
 			setLog() {

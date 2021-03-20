@@ -334,7 +334,6 @@ export default {
 				r: { name: "Resistant", value: "half" },
 				i: { name: "Immune", value: "no" }
 			},
-			resistances: {},
 			savingThrowResult: {},
 			hitOrMiss: {},
 			animateRoll: undefined,
@@ -351,6 +350,25 @@ export default {
 	computed: {
 		roll() {
 			return this.value;
+		},
+		resistances() {
+			if(this.roll.target) {
+				let defenses = {};
+				let resistances = {
+					v: "damage_vulnerabilities",
+					r: "damage_resistances",
+					i: "damage_immunities"
+				}
+				// Defenses
+				for(const [key, defense] of Object.entries(resistances)) {
+					if(this.roll.target[defense]) {
+						for(const damage_type of this.roll.target[defense]) {
+							defenses[damage_type] = key;
+						}
+					}
+				}
+				return defenses;
+			} return {};
 		},
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
@@ -484,6 +502,7 @@ export default {
 					});
 				}
 			}
+			// Remove the roll
 			this.removeActionRoll(this.index);
 		},
 		totalRollValue(action, action_index, rolls) {
@@ -523,6 +542,7 @@ export default {
 			} else {
 				this.$set(this.resistances, type, resistance);
 			}
+			this.$forceUpdate();
 		},
 		reroll(e, roll, throw_index) {
 			const add = (a, b) => a + b;

@@ -2,7 +2,7 @@
 	<div id="current" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 			<i v-if="current.hidden" class="fas fa-eye-slash red"></i> 
-			{{ current.name }}
+			{{ current.name.capitalizeEach() }}
 		</h2>
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">

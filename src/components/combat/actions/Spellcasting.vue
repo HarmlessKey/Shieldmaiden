@@ -1,5 +1,8 @@
 <template>
 	<div v-if="current">
+		<h3 class="blue text-center">
+			<i class="fas fa-info-circle" /> Rollable spells are under development.
+		</h3>
 		<q-tabs
 			v-model="tab"
 			dark inline-label dense no-caps
@@ -56,14 +59,30 @@
 						</div>
 						<div v-else-if="tab === 'caster'" class="spell-level">
 							{{ level | numeral('Oo') }} level
-							<div class="limited">
-								<span v-for="i in current[`${tab}_spell_slots`][level]" :key="`slot-${i}`" class="ml-1">
+							<div class="slots">
+								<span 
+									v-for="i in current[`${tab}_spell_slots`][level]" 
+									:key="`slot-${i}`" 
+									class="ml-1"
+									@click="
+										(current.limited_uses[tab] && current.limited_uses[tab][level] >= i)
+										? useSpellSlot(level, tab, true)
+										: useSpellSlot(level, tab)
+									"
+								>
 									<i class="far" :class="
 										current.limited_uses[tab] && current.limited_uses[tab][level] >= i
 										? 'fa-dot-circle'
 										: 'fa-circle'
 										"
 									/>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ 
+											current.limited_uses[tab] && current.limited_uses[tab][level] >= i
+											? "Regain slot"
+											: "Spend slot"
+										}}
+									</q-tooltip>
 								</span>
 							</div>
 						</div>
@@ -107,12 +126,19 @@
 													: 'fa-circle'
 													"
 												/>
+												<q-tooltip anchor="top middle" self="center middle">
+													{{ 
+														current.limited_uses[tab] && current.limited_uses[tab][spell.key] >= i
+														? "Regain"
+														: "Spend"
+													}}
+												</q-tooltip>
 											</span>
 										</div>
 									</q-item-section>
 								</template>
 								<div class="accordion-body description">
-									{{ checkAvailable(tab, level, spell.key) }}
+									{{ spell.key }}
 								</div>
 							</q-expansion-item>
 						</q-list>				
@@ -248,12 +274,12 @@
 			.value {
 				font-size: 18px;
 				font-weight: bold;
-				color: $blue;
+				color: $white;
 			}
 		}
 		.display-levels {
 			display: flex;
-			justify-content: flex-start;
+			justify-content: center;
 			margin-bottom: 15px;
 			line-height: 20px;
 

@@ -133,14 +133,30 @@
 
 						<div v-if="type === 'legendary_actions' && current.lengendary_count" class="limited">
 							Actions used 
-							<span v-for="i in current.lengendary_count" :key="`legendary-${i}`" class="mr-1">
-								<i class="far" :class="
-									current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
-									? 'fa-dot-circle'
-									: 'fa-circle'
+							<div class="slots">
+								<span 
+									v-for="i in current.lengendary_count" 
+									:key="`legendary-${i}`" 
+									class="mr-1"
+									@click="
+										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
+										? spendLimited('legendary_actions', 'legendaries_used', true)
+										: spendLimited('legendary_actions', 'legendaries_used')
 									"
-								/>
-							</span>
+								>
+									<i class="far" :class="
+										current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
+										? 'fa-dot-circle' : 'fa-circle'
+										"
+									/>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ 
+											current.limited_uses['legendary_actions'] && current.limited_uses['legendary_actions'].legendaries_used >= i
+											? "Regain action" : "Spend action"
+										}}
+									</q-tooltip>
+								</span>
+							</div>
 						</div>
 
 						<q-list v-if="current[type]" dark square :class="`accordion`">
@@ -516,6 +532,17 @@
 	.limited {
 		font-size: 15px;
 		margin-bottom: 5px;
+		display: flex;
+		justify-content: space-between;
+
+		.slots {
+			span {
+				cursor: pointer;
+				&:hover {
+					color: $blue;
+				}
+			}
+		}
 	}
 	.is-disabled {
 		opacity: .3;

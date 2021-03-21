@@ -63,33 +63,15 @@
 							</div>
 							<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
 								<div
-									@click="setIntensity(key, 0)"
-									:class="{blue: intensity[key] === 0}"
+									v-for="{multiplier, name, label} in multipliers"
+									@click="setIntensity(key, multiplier)"
+									:class="{blue: intensity[key] === multiplier}"
+									:key="multiplier"
 								>
 									<i class="fas fa-circle"></i>
-									<span>0</span>
+									<span>{{ name }}</span>
 									<q-tooltip anchor="top middle" self="center middle">
-										No damage
-									</q-tooltip>
-								</div>
-								<div
-									@click="setIntensity(key, .5)"
-									:class="{blue: intensity[key] === .5}"
-								>
-									<i class="fas fa-circle"></i>
-									<span>½</span>
-									<q-tooltip anchor="top middle" self="center middle">
-										Half damage
-									</q-tooltip>
-								</div>
-								<div
-									@click="setIntensity(key, 1)"
-									:class="{blue: intensity[key] === 1}"
-								>
-									<i class="fas fa-circle"></i>
-									<span>1</span>
-									<q-tooltip anchor="top middle" self="center middle">
-										Full damage
+										{{ label }}
 									</q-tooltip>
 								</div>
 							</div>
@@ -137,6 +119,11 @@
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				multipliers: [
+					{ multiplier: 0, name: "0", label: "No damage" },
+					{ multiplier :.5, name: "½", label: "Half damage" },
+					{ multiplier: 1, name: "1", label: "Full damage" }
+				],
 				defenses: {
 					v: { name: "Vulnerable", value: "double" },
 					r: { name: "Resistant", value: "half" },

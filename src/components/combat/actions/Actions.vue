@@ -175,7 +175,7 @@
 					{ name: "roll", label: "Actions", icon: "fas fa-dice-d20" }	
 				];
 				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
-					tabs.push({ name: "spells", label: "Spellcasting", icon: "fas fa-wand-magic" })
+					tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
 				}
 				return tabs;
 			},

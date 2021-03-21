@@ -30,8 +30,8 @@
 						<div v-if="item.actions">
 							<span v-for="(action, index) in item.actions" :key="`action-${key}-${index}`">
 								<!-- Manual -->
-								<span v-if="action.manual">
-									<b>{{ item.by_name.capitalizeEach() }}</b> (manual input) did
+								<span v-if="(action.manual || action.request) && action.type === 'damage'">
+									<b>{{ item.by_name.capitalizeEach() }}s</b> {{ item.ability }} did
 								</span>
 
 								<!-- To hit -->
@@ -68,7 +68,7 @@
 								</span>
 
 								<!-- MANUAL END -->
-								<span v-if="action.manual">
+								<span v-if="(action.manual || action.request) && action.type === 'damage'">
 									to <b>{{ item.target_name.capitalizeEach() }}</b>
 								</span>
 							</span>

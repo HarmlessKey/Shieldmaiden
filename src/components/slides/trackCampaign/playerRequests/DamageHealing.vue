@@ -100,25 +100,25 @@
 				dmId: this.$route.params.userid,
 				campaignId: this.$route.params.campid,
 				damage_types: [
-					"Acid",
-					"Bludgeoning",
-					"Cold",
-					"Fire",
-					"Force",
-					"Lightning",
-					"Necrotic",
-					"Piercing",
-					"Poison",
-					"Psychic",
-					"Radiant",
-					"Slashing",
-					"Thunder"
+					"acid",
+					"bludgeoning",
+					"cold",
+					"fire",
+					"force",
+					"lightning",
+					"necrotic",
+					"piercing",
+					"poison",
+					"psychic",
+					"radiant",
+					"slashing",
+					"thunder"
 				],
 				type: 'damage',
 				damage: [
 					{
 						amount: '',
-						damage_type: 'Acid'
+						damage_type: 'acid'
 					}
 				],
 				healingAmount: '',
@@ -137,7 +137,7 @@
 				'setSlide'
 			]),
 			addInput() {
-				this.damage.push({ amount: '', damage_type: 'Acid' });
+				this.damage.push({ amount: '', damage_type: 'acid' });
 			},
 			removeInput(i) {
 				this.$delete(this.damage, i);

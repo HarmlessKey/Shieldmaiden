@@ -79,7 +79,7 @@
 			
 			<ul class="select-amount">
 				<li v-for="key in targeted" :key="`target-${key}`">
-					<div class="name truncate">{{ entities[key].name }}</div>
+					<div class="name truncate">{{ entities[key].name.capitalizeEach() }}</div>
 					<div class="selections">
 						<div 
 							class="select bg-gray-hover" 
@@ -224,7 +224,7 @@
 							// Set config for HpManipulation and log
 							const config = {
 								crit: this.crit,
-								ability: "hk-manual",
+								ability: "manual input",
 								log: true,
 								actions: [
 									{

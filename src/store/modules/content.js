@@ -320,7 +320,6 @@ export const content_module = {
 			for (let encounter_id in getters.encounters) {
 				commit("DELETE_ENCOUNTER", {encounter_id});
 			}
-		}
-		
+		}	
 	},
 };

@@ -95,6 +95,7 @@
 								:key="`${level}-${spell.key}`"
 								dark switch-toggle-side
 								expand-icon-class="hidden-toggle"
+								@show="showSpell = `${level}-${spell.key}`"
 								:group="tab"
 								:name="name"
 							>
@@ -138,7 +139,7 @@
 									</q-item-section>
 								</template>
 								<div class="accordion-body description">
-									{{ spell.key }}
+									<Spell :id="spell.key" :title="false" v-if="showSpell === `${level}-${spell.key}`" />
 								</div>
 							</q-expansion-item>
 						</q-list>				
@@ -153,21 +154,25 @@
 	import { mapGetters, mapActions } from "vuex";
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from '@/mixins/damageTypes.js';
-
+	import { damage_types } from "@/mixins/damageTypes.js";
+	import Spell from "@/components/compendium/Spell"
 
 	export default {
 		name: "Spellcasting",
 		mixins: [setHP, dice, damage_types],
 		props: ["current"],
+		components: {
+			Spell
+		},
 		data() {
 			return {
-				displaySetter: undefined
+				displaySetter: undefined,
+				showSpell: undefined
 			}
 		},
 		computed: {
 			...mapGetters([
-
+				"spells"
 			]),
 			tabs() {
 				let tabs = [];

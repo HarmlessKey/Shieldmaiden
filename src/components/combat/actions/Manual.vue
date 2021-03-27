@@ -310,13 +310,14 @@
 		grid-area: btn-dmg;
 	}
 	.dmg, .heal {
+		text-align: left;
 		position: relative;
-		padding: 5px 35px 5px 5px;
+		padding: 5px 35px 5px 8px;
 
 		img {
 			position: absolute;
 			height: 25px;
-			right: 5px;
+			right: 8px;
 		}
 	}
 }

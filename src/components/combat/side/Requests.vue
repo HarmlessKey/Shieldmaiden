@@ -2,15 +2,15 @@
 	<div>
 		<h2>Player requests</h2>
 		<transition-group 
-			tag="ul" 
-			class="requests"
+			tag="q-list" 
+			class="accordion"
 			name="requests" 
 			enter-active-class="animated animate__fadeInDown" 
 			leave-active-class="animated animate__fadeOutRight"
 		>
-			<li v-for="(request, i) in _requests" class="request" :key="`request-${request.key}`">
-				<Request :request="request" :i="i" />
-			</li>
+			<template v-for="(request, i) in _requests">
+				<Request :request="request" :i="i" :key="`request-${request.key}`" />
+			</template>
 		</transition-group>
 	</div>
 </template>

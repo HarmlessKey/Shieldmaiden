@@ -190,7 +190,12 @@
 								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
 							</template>
 							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
-								{{ spell.name }}{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+								<hk-popover>
+									{{ spell.name }}
+									<template #content>
+										<Spell :id="spell.key" />
+									</template>
+								</hk-popover>{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
 							</i>
 						</div>
 					</template>
@@ -218,7 +223,12 @@
 								{{ limit }}/day each:
 							</template>
 							<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
-								{{ spell.name }}{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+								<hk-popover>
+								{{ spell.name }}
+								<template #content>
+									<Spell :id="spell.key" />
+								</template>
+							</hk-popover>{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
 							</i>
 						</div>
 					</template>
@@ -385,14 +395,16 @@
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
 			spellsForLevel(level) {
-				return Object.values(this.monster.caster_spells).filter(item => { 
-					return item.level == level;
-				});
+				return Object.entries(this.entity.caster_spells).filter(([key, item]) => { 
+						item.key = key;
+						return item.level == level;
+					}).map(item => { return item[1] });
 			},
 			spellsForLimit(limit) {
-				return Object.values(this.monster.innate_spells).filter(item => { 
+				return Object.entries(this.entity.innate_spells).filter(([key, item]) => { 
+					item.key = key;
 					return item.limit == limit;
-				});
+				}).map(item => { return item[1] });
 			},
 			skillModifier(ability, skill) {
 				let mod = this.calculateSkillModifier(

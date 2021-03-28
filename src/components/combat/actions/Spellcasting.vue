@@ -155,7 +155,7 @@
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
 	import { damage_types } from "@/mixins/damageTypes.js";
-	import Spell from "@/components/compendium/Spell"
+	import Spell from "@/components/compendium/Spell";
 
 	export default {
 		name: "Spellcasting",

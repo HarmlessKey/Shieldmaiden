@@ -929,7 +929,9 @@ const actions = {
 	 */
 	set_limitedUses({ commit, state }, {key, index, category, regain=false, cost=1}) {
 		const entity = state.entities[key];
-		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) ? entity.limited_uses[category][index] : 0;
+		cost = parseInt(cost);
+		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) 
+			? parseInt(entity.limited_uses[category][index]) : 0;
 		
 		if(regain) {
 			used = used - cost;

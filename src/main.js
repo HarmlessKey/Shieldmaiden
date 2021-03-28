@@ -19,6 +19,7 @@ import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
 import HkAnimatedInteger from './components/hk-components/hk-animated-integer';
 import HkDiceText from './components/hk-components/hk-dice-text';
+import HkPopover from './components/hk-components/hk-popover';
 import HkLoader from './components/hk-components/hk-loader';
 import Icon from './components/Icon';
 import './quasar';
@@ -40,6 +41,7 @@ Vue.component('hk-animated-integer', HkAnimatedInteger);
 Vue.component('hk-roll', HkRoll);
 Vue.component('hk-loader', HkLoader);
 Vue.component('hk-dice-text', HkDiceText);
+Vue.component('hk-popover', HkPopover);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options);
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})

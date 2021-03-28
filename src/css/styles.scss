@@ -852,6 +852,12 @@ html body {
 				background-color: rgba(0, 0, 0, .3);
 			}
 		}
+		&.no-margin {
+			margin-bottom: 0;
+		}
+		&.small {
+			font-size: 12px;
+		}
 	}
 
 	/* HK CARD DECK */
@@ -1144,6 +1150,16 @@ html body {
 			td, th {
 				padding: 5px;
 			}
+		}
+	}
+
+	/* HK POPOVER */
+	.hk-popover {
+		user-select: none;
+		cursor: pointer;
+
+		&:hover {
+			color: $blue;
 		}
 	}
 

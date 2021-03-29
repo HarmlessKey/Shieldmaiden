@@ -29,12 +29,16 @@
 				<br/>
 			</template>
 		</p>
-		<hk-dice-text v-for="(desc, index) in spell.desc" :input_text="desc" :key="index"/>
+		<hk-dice-text 
+			v-for="(desc, index) in spell.desc" 
+			:input_text="parse_spell_str(desc)" 
+			:key="index"
+		/>
 
 		<p v-if="spell.higher_level">
 			At higher levels. 
 			<template v-for="higher in spell.higher_level">
-				{{ higher }}
+				{{ parse_spell_str(higher) }}
 			</template>
 		</p>
 	</div>
@@ -56,10 +60,6 @@
 				default: true
 			}
 		},
-		data() {
-			return {
-			}
-		},
 		computed: {
 			...mapGetters([
 				"get_spell",
@@ -77,7 +77,42 @@
 		methods: {
 			...mapActions([
 				"set_spell"
-			])
+			]),
+			parse_spell_str(text) {
+				// map to replace weird character with real character 
+				let rules = [
+					{
+						regex: /â€™/g,
+						// eslint-disable-next-line
+						replacement: '\'',
+					},
+					{
+						regex: /â€”/g,
+						// eslint-disable-next-line
+						replacement: '\-\-',
+					},
+					{
+						regex: /â€�/g,
+						// eslint-disable-next-line
+						replacement: '\"'
+					},
+					{
+						regex: /â€œ/g,
+						// eslint-disable-next-line
+						replacement: '\"'
+					},
+					{
+						regex: /â€“/g,
+						// eslint-disable-next-line
+						replacement: '\-\-'
+					},
+				];
+				rules.forEach(function(rule) {
+					text = text.replace(rule.regex, rule.replacement);
+				});
+
+				return text.trim();
+			},
 		}
 	}
 </script>

@@ -321,6 +321,7 @@
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { skills } from '@/mixins/skills.js';
 	import { mapActions } from 'vuex';
+	import Spell from "@/components/compendium/Spell"
 
 	export default {
 		name: 'NPC',
@@ -331,6 +332,9 @@
 			monsterMixin,
 			skills
 		],
+		components: {
+			Spell
+		},
 		props: [
 		'data'
 		],
@@ -395,13 +399,13 @@
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
 			spellsForLevel(level) {
-				return Object.entries(this.entity.caster_spells).filter(([key, item]) => { 
+				return Object.entries(this.monster.caster_spells).filter(([key, item]) => { 
 						item.key = key;
 						return item.level == level;
 					}).map(item => { return item[1] });
 			},
 			spellsForLimit(limit) {
-				return Object.entries(this.entity.innate_spells).filter(([key, item]) => { 
+				return Object.entries(this.monster.innate_spells).filter(([key, item]) => { 
 					item.key = key;
 					return item.limit == limit;
 				}).map(item => { return item[1] });

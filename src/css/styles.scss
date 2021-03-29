@@ -857,6 +857,14 @@ html body {
 		}
 		&.small {
 			font-size: 12px;
+			
+			.card-body {
+				padding: 1rem;
+			}
+			.card-header {
+				font-size: 15px;
+				padding: 0.50rem 1rem;
+			}
 		}
 	}
 

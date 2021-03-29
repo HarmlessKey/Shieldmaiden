@@ -16,8 +16,13 @@
 				:max-width="300" 
 				:no-margin="true" 
 				:small="true"
+				:header="header ? header : undefined"
 			>
-				<slot name="content" />
+				<slot name="content">
+					<template v-if="content">
+						{{ content }}
+					</template>
+				</slot>
 			</hk-card>
 		</q-popup-proxy>
 	</span>
@@ -31,9 +36,15 @@
 		props: {
 			hover: {
 				type: Boolean,
-				default: false
+				default: false,
+				required: false
 			},
-			label: {
+			content: {
+				type: String,
+				default: undefined,
+				required: false
+			},
+			header: {
 				type: String,
 				default: undefined,
 				required: false
@@ -47,7 +58,9 @@
 			}
 		},
 		methods: {
-			debounceFunc: _.debounce(function() { this.checkMenu() }, 300),
+			debounceCheck: _.debounce(function() { 
+				this.checkMenu();
+			}, 300),
 			checkMenu () {
 				if (this.itemHover || this.cardHover) {
 					this.menu = true;
@@ -57,11 +70,11 @@
 			}
 		},
 		watch: {
-			itemHover () {
-				this.debounceFunc();
+			itemHover() {
+				this.debounceCheck();
 			},
-			cardHover () {
-				this.debounceFunc();
+			cardHover() {
+				this.debounceCheck();
 			}
 		}
 	}

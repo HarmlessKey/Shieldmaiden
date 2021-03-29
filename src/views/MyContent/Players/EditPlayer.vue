@@ -82,7 +82,7 @@
 								>
 									<template v-slot:append>
 										<small><span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
-										<q-icon name="info" class="ml-1 pointer" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
+										<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
 									</template>
 								</q-input>				
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>

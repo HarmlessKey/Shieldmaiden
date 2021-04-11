@@ -335,6 +335,7 @@
 		components: {
 			Spell
 		},
+		
 		props: [
 		'data'
 		],

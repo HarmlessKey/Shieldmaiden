@@ -4,42 +4,7 @@
 		<template v-else>
 			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 
-				<q-select 
-					dark filled square dense
-					clearable
-					map-options
-					emit-value
-					placeholder="Damage type"
-					:options="damage_types"
-					v-model="damage_type"
-					class="mb-2"
-				>
-					<template v-slot:selected>
-						<span v-if="damage_type">
-							<i :class="[damage_type_icons[damage_type], damage_type]"/>
-							{{ damage_type.capitalize() }} damage
-						</span>
-						<span v-else>
-							Damage type
-						</span>
-					</template>
-					<template v-slot:option="scope">
-						<q-item
-							clickable
-							v-ripple
-							v-close-popup
-							:active="damage_type === scope.opt"
-							@click="damage_type = scope.opt"
-						>
-							<q-item-section avatar>
-								<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-							</q-item-section>
-							<q-item-section>
-								<q-item-label v-html="scope.opt.capitalize()"/>
-							</q-item-section>
-						</q-item>
-					</template>
-				</q-select>
+			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense class="mb-2"/>
 
 			<div class="manual">
 				<q-input 
@@ -127,14 +92,14 @@
 </template>
 
 <script>
-	import { mapGetters } from 'vuex';
-	import { setHP } from '@/mixins/HpManipulations.js';
-	import { damage_types } from '@/mixins/damageTypes.js';
+	import { mapGetters } from "vuex";
+	import { setHP } from "@/mixins/HpManipulations.js";
+	import { damage_types } from "@/mixins/damageTypes.js";
 
 	export default {
-		name: 'Manual',
+		name: "Manual",
 		mixins: [setHP, damage_types],
-		props: ['current', 'targeted'],
+		props: ["current"],
 		data() {
 			return {
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
@@ -160,7 +125,8 @@
 		},
 		computed: {
 			...mapGetters([
-				'entities'
+				'entities',
+				'targeted'
 			]),
 			multiplier: {
 				get() {		

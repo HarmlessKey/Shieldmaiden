@@ -5,7 +5,7 @@
 			<q-select 
 				dark filled square dense
 				name="doneBy"
-				:value="doneBy" 
+				:value="doneBy"
 				:options="_active"
 				v-validate="'required'"
 			>
@@ -72,6 +72,16 @@
 			</div>
 		</template>
 
+		<!-- ADVANTAGE / DISADVANTAGE -->
+		<template>
+			<p class="mt-3 d-sm-none d-block">
+				<q-icon name="info" size="medium" class="info" /> Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
+			</p>
+			<p class="mt-3 d-none d-sm-block">
+				<q-icon name="info" size="medium" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>.
+			</p>
+		</template>
+
 		<template v-if="doneBy">
 			<q-tabs
 				v-model="tab"
@@ -79,6 +89,7 @@
 				inline-label
 				dense
 				no-caps
+				class="bg-gray-light gray-dark"
 			>
 				<q-tab 
 					v-for="({name, icon, label}, index) in tabs"
@@ -90,14 +101,14 @@
 			</q-tabs>
 
 			<q-tab-panels v-model="tab" class="bg-transparent">
-					<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
-						<Manual v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
-						<template v-if="name === 'roll'">
-							<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
-							<Roll v-else :current="entitiesList[doneBy]" />
-						</template>
-						<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
-					</q-tab-panel>
+				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
+					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
+					<template v-if="name === 'roll'">
+						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
+						<Roll v-else :current="entitiesList[doneBy]" />
+					</template>
+					<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
+				</q-tab-panel>
 			</q-tab-panels>
 		</template>
 	</div>
@@ -108,7 +119,7 @@
 	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 
-	import Manual from '@/components/combat/actions/Manual.vue';
+	import Custom from '@/components/combat/actions/custom';
 	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
 	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
@@ -117,7 +128,7 @@
 	export default {
 		name: 'Actions',
 		components: {
-			Manual,
+			Custom,
 			RollDeprecated,
 			Roll,
 			Spellcasting
@@ -171,7 +182,7 @@
 			tabs() {
 				const current = this.entitiesList[this.doneBy];
 				let tabs = [
-					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
+					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" },
 					{ name: "roll", label: "Actions", icon: "fas fa-dice-d20" }	
 				];
 				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
@@ -222,6 +233,7 @@
 			}
 		}
 	}
+
 	.q-tab-panel {
 		padding: 15px 0 0 0 !important;
 	}

@@ -45,73 +45,6 @@
 					</q-slide-transition>
 				</template>
 
-				<!-- ADVANTAGE / DISADVANTAGE -->
-				<template>
-					<p class="mt-3 d-sm-none d-block">
-						<q-icon name="info" size="medium" class="info" /> Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
-					</p>
-					<p class="mt-3 d-none d-sm-block">
-						<q-icon name="info" size="medium" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>.
-					</p>
-				</template>
-				
-				<!-- CUSTOM ROLL -->
-				<h3>Custom Roll</h3>
-				<div class="custom-roll">
-					<div >
-						<q-input 
-							dark filled square dense
-							label="Hit mod"
-							autocomplete="off" 
-							type="number" 
-							v-model="custom_roll.attack_bonus" 
-							name="custom_hit"
-							data-vv-as="To Hit Modifier"
-						/>
-					</div>
-					<div>
-						<q-input 
-							dark filled square dense
-							label="Damage dice"
-							autocomplete="off" 
-							type="text" 
-							v-model="custom_roll.damage_dice" 
-							name="custom_roll"
-							data-vv-as="Custom Roll"
-							v-validate="{ regex:/^[0-9]+d[0-9]+(\+[0-9]+d[0-9]+)*$/ }"
-						/>
-					</div>
-					<div>
-						<q-input 
-							dark filled square dense
-							label="Modifier"
-							autocomplete="off" 
-							type="number" 
-							v-model="custom_roll.damage_bonus" 
-							name="custom_mod"
-							data-vv-as="Custom Modifier"
-						/>
-					</div>
-					<hk-roll 
-						tooltip="Roll" 
-						tooltipPosition="right"
-						@roll="groupRoll($event, custom_roll)"
-						:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
-					>
-						<button 
-							:disabled="(errors.items && errors.items.length > 0) || !custom_roll.damage_dice"
-							class="btn btn-sm"
-						>
-							<i class="fas fa-dice-d20"></i>
-							<span class="d-none d-md-inline ml-1">Roll</span>
-						</button>
-					</hk-roll>
-				</div>
-				<p class="validate red" v-if="errors.has('custom_roll')">
-					{{ errors.first('custom_roll') }}
-					Allowed format: "2d6" or "2d6+1d8".
-				</p>
-
 				<!-- ACTIONS -->
 				<q-tabs
 					class="mt-3"
@@ -496,32 +429,6 @@
 		font-size: 15px;
 		line-height: 25px;
 		margin-bottom: 5px;
-	}
-	.info {
-		vertical-align: -4px;
-	}
-	.custom-roll {
-		display: grid;
-		grid-template-columns: 50px 1fr 50px max-content;
-		grid-gap: 3px;
-
-		.btn {
-			height: 40px !important;
-		}
-		.span {
-			grid-column: span 2;
-		}
-
-		.advantage:hover {
-			.btn {
-				background-color: $green;
-			}
-		}
-		.disadvantage:hover {
-			.btn {
-				background-color:$red;
-			}
-		}
 	}
 	.q-tab-panel {
 		padding: 15px 0;

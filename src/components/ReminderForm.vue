@@ -184,9 +184,9 @@ export default {
 				{ value: 'timed', label: 'Timer' },
 			],
 			actions: [
-        { label: 'Notify on trigger', value: 'notify' },
-        { label: 'Remove on trigger', value: 'remove' }
-      ],
+				{ label: 'Notify on trigger', value: 'notify' },
+				{ label: 'Remove on trigger', value: 'remove' }
+			],
 			colors: [
 				'green-light',
 				'yellow-light',

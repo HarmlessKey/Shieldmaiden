@@ -29,15 +29,13 @@
 						data-vv-as="amount"
 						min="0"
 					/>
-					<q-select
+
+					<hk-dmg-type-select 
+						v-model="damage[i].damage_type" 
+						label="Damage type" 
+						dense 
 						:key="`type-${i}`"
-						dark filled square dense
-						emit-value
-						map-options
-						label="Damage type"
-						v-model="damage[i].damage_type"
-						:options="damage_types"
-						@change="$forceUpdate()"
+						@input="$forceUpdate()"
 						:class="{'no-delete': i === 0}"
 					/>
 					<a v-if="i > 0" @click="removeInput(i)" class="handle" :key="`remove-${i}`"><i class="fas fa-trash-alt red"></i></a>
@@ -82,13 +80,9 @@
 <script>
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
-	import Manual from '@/components/combat/actions/Manual.vue';
 	
 	export default {
 		name: 'damageHealing',
-		components: {
-			Manual,
-		},
 		props: [
 		'targeted',
 		'player',

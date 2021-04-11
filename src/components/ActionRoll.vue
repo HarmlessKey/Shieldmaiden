@@ -20,41 +20,11 @@
 				:key="`verstatile-panel-${index}`"
 				:name="option.name"
 			>
-				<q-select 
-					v-if="action_type !== 'healing'"
-					dark filled square
-					map-options
-					emit-value
+				<hk-dmg-type-select 
 					:label="`Damage type ${index == 1 ? option.label : ''}`"
-					:options="damage_types"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					class="mb-2"
-					:rules="[val => !!val || 'Select a damage type']"
-				>
-					<template v-slot:selected v-if="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]">
-						<span>
-							<i :class="[damage_type_icons[roll[`${index === 1 ? 'versatile_' : '' }damage_type`]], roll[`${index === 1 ? 'versatile_' : '' }damage_type`]]"/>
-							{{ roll[`${index === 1 ? 'versatile_' : '' }damage_type`].capitalize() }}
-						</span>
-					</template>
-					<template v-slot:option="scope">
-						<q-item
-							clickable
-							v-ripple
-							v-close-popup
-							:active="roll[`${index === 1 ? 'versatile_' : '' }damage_type`] === scope.opt"
-							@click="$set(roll, `${index === 1 ? 'versatile_' : '' }damage_type`, scope.opt)"
-						>
-							<q-item-section avatar>
-								<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-							</q-item-section>
-							<q-item-section>
-								<q-item-label v-html="scope.opt.capitalize()"/>
-							</q-item-section>
-						</q-item>
-					</template>
-				</q-select>
-					
+				/>
+
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->

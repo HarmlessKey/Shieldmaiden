@@ -12,7 +12,7 @@
 				</span>
 			</section>
 			<section id="overview">
-				<Overview />
+				<Feedback />
 				<span 
 					class="die" 
 					:style="{ 
@@ -71,20 +71,22 @@
 </template>
 
 <script>
-	import Top from '@/components/home/Top.vue'
-	import Overview from '@/components/home/Overview.vue'
-	import General from '@/components/home/General.vue'
-	import Share from '@/components/home/Share.vue'
-	import Builder from '@/components/home/Builder.vue'
-	import Campaign from '@/components/home/Campaign.vue'
-	import Footer from '@/components/Footer.vue'
-	import SignedIn from '@/components/home/SignedIn.vue'
+	import Top from '@/components/home/Top.vue';
+	import Overview from '@/components/home/Overview.vue';
+	import Feedback from '@/components/home/Feedback.vue';
+	import General from '@/components/home/General.vue';
+	import Share from '@/components/home/Share.vue';
+	import Builder from '@/components/home/Builder.vue';
+	import Campaign from '@/components/home/Campaign.vue';
+	import Footer from '@/components/Footer.vue';
+	import SignedIn from '@/components/home/SignedIn.vue';
 
 	export default {
 		name: 'home',
 		components: {
 			Top,
 			Overview,
+			Feedback,
 			General,
 			Share,
 			Builder,

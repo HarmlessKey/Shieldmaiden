@@ -13,20 +13,6 @@
 			<div class="top">
 				<div class="d-flex justify-content-start">
 					<router-link class="back" to="/npcs"><i class="fas fa-chevron-left"/> Back</router-link>
-					<q-tabs
-						v-model="quick"
-						dark
-						inline-label
-						dense
-						no-caps
-					>
-						<q-tab 
-							v-for="({name, label}, index) in tabs"
-							:key="`tab-${index}`" 
-							:name="name" 
-							:label="label"
-						/>
-					</q-tabs>
 					<a v-if="$route.name === 'AddNPC'" class="btn" @click="copy_dialog = true">
 						<i class="fas fa-copy"></i>
 						Copy existing NPC
@@ -46,7 +32,7 @@
 				<AbilityScores v-model="npc" />
 
 				<Skills v-model="npc" />
-				
+
 				<Defenses v-model="npc" />
 
 				<SpellCasting v-model="npc" />
@@ -113,13 +99,13 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
-	import BasicInfo from '@/components/contribute/monster/forms/BasicInfo';
-	import Senses from '@/components/contribute/monster/forms/Senses';
-	import AbilityScores from '@/components/contribute/monster/forms/AbilityScores';
-	import Skills from '@/components/contribute/monster/forms/Skills';
-	import Defenses from '@/components/contribute/monster/forms/Defenses';
-	import SpellCasting from '@/components/contribute/monster/forms/SpellCasting';
-	import Actions from '@/components/contribute/monster/forms/Actions';
+	import BasicInfo from '@/components/npcs/BasicInfo';
+	import Senses from '@/components/npcs/Senses';
+	import AbilityScores from '@/components/npcs/AbilityScores';
+	import Skills from '@/components/npcs/Skills';
+	import Defenses from '@/components/npcs/Defenses';
+	import SpellCasting from '@/components/npcs/SpellCasting';
+	import Actions from '@/components/npcs/Actions';
 
 	export default {
 		name: 'Npcs',
@@ -145,7 +131,6 @@
 				npc_copy: {},
 				copy_dialog: false,
 				unsaved_changes: false,
-				quick: false,
 				search: '',
 				searchResults: [],
 				noResult: '',
@@ -236,6 +221,7 @@
 				}
 			},
 			copy(npc) {
+				this.copy_dialog = false;
 				this.npc = npc;
 				this.searchResults = [];
 				this.search = '';

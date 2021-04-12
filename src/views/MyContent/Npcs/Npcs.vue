@@ -40,8 +40,11 @@
 				</template>
 
 				<template slot="name" slot-scope="data">
-					<q-badge v-if="data.row.old" color="red" label="Deprecated" />
-					<router-link class="mx-2" :to="'/npcs/' + data.row.key">
+					<template v-if="data.row.old">
+						<q-badge color="red" label="Deprecated" />
+						{{ data.item.capitalizeEach() }}
+					</template>
+					<router-link v-else class="mx-2" :to="'/npcs/' + data.row.key">
 						{{ data.item.capitalizeEach() }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
@@ -64,7 +67,7 @@
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete(data.row.key, data.row)">
+					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row)">
 						<i class="fas fa-trash-alt"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Delete
@@ -216,25 +219,31 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, npc) {
-				this.$snotify.error('Are you sure you want to delete ' + npc.name + '?', 'Delete NPC', {
-					timeout: false,
-					buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-							this.deleteNpc(key)
-							this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						},
-						{
-							text: 'No', action: (toast) => { 
+			confirmDelete(e, key, npc) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deleteNpc(key);
+				} else {
+					this.$snotify.error('Are you sure you want to delete ' + npc.name + '?', 'Delete NPC', {
+						timeout: false,
+						buttons: [
+							{
+								text: 'Yes', action: (toast) => { 
+								this.deleteNpc(key)
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: true
-						},
-					]
-				});
+								}, 
+								bold: false
+							},
+							{
+								text: 'No', action: (toast) => { 
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: true
+							},
+						]
+					});
+				}
+
 			},
 			deleteNpc(key) {
 				//Remove the NPC from all encounters
@@ -273,20 +282,16 @@
 
 				for(const npc of this.old_npcs) {
 					console.log("Old:", npc);
-					const new_npc = this.parseNewNPC(npc);
+					const new_npc = this.parseMonster(npc);
 					console.log("New:", new_npc);
 					db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
 						this.parsed_counter++;
 					});
 				}
-				// for(let i = 1; i <= 500; i++) {
-				// 	db.ref(`npcs/${this.userId}/${this.old_npcs[0].key}/old`).set(true).then(() => {
-				// 		this.parsed_counter++;
-				// 	});
-				// }
 			},
 			parseNewNPC(npc) {
-				return this.parseMonster(npc);
+				const new_npc = this.parseMonster(npc);
+				db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc);
 			}
 		}
 	}

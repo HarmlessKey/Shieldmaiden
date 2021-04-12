@@ -187,6 +187,15 @@
 					</q-tooltip>
 				</div>
 			</q-select>
+
+			<q-checkbox 
+				size="lg" dark 
+				v-model="npc.friendly" 
+				class="mt-3"
+				label="Add as friendly" 
+				:false-value="null" 
+				indeterminate-value="something-else"
+			/>
 		</hk-card>
 
 		<!-- HP & AC -->

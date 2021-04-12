@@ -969,6 +969,7 @@ html body {
 				display: flex;
 				justify-content: flex-end;
 				padding: 9px 12px;
+				user-select: none;
 
 				a {
 					color: $gray-light !important;

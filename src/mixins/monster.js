@@ -174,7 +174,7 @@ export const monsterMixin = {
 				for(const index in speed) {
 					const current_speed = speed[index].replace("ft.", "").trim();
 
-					if(index == 0) {
+					if(index == 0 && !isNaN(parseInt(current_speed))) {
 						new_monster.walk_speed = parseInt(current_speed);
 					} else {
 						const other_speed = current_speed.split(" ");

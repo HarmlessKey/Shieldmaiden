@@ -16,40 +16,53 @@
 					/>
 				</div>
 				<div class="col-12 col-md-4">
-					<h3>We track everything in combat</h3>
+					<h3>Combat tracker</h3>
 					
 					<ul>
 						<li>Current Hit Points</li>
+						<li>Roll monster abilities</li>
 						<li>Conditions</li>
-						<li>Concentration</li>
-						<li>Reactions used</li>
+						<li>Custom reminders </li>
 						<li>Damage types</li>
 						<li>Resistance, vulnerability and immunity</li>
-						<li>Custom reminders for other effects</li>
-						<li>Multi-targeting (perfect for AOE damage)</li>
-						<li>Roll monster abilities and instantly apply damage</li>
+						<li>Combat log</li>
+						<li>Multi-targeting</li>
+						<li>...and much more</li>
 					</ul>
+					<a @click="dialog = true">More info</a>
 
-					<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
 				</div>
 			</div>
-			<a href="#builder" class="next">
-				<div>Build encounters</div>
-				<i class="fas fa-chevron-down"></i>
-			</a>
+			<div class="d-flex justify-center">
+				<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+			</div>
 		</div>
+
+		<q-dialog v-model="dialog" square>
+			<Dialog />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
+	import Dialog from "./carousels/General";
+
 	export default {
-		name: 'General'
+		name: 'General',
+		components: {
+			Dialog
+		},
+		data() {
+			return {
+				dialog: false
+			}
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	.general {
-		padding-bottom: 170px;
+		padding-bottom: 100px;
 		min-height: calc(100vh - 50px - 55px);
 		background-color: $gray-darker;
 
@@ -57,11 +70,6 @@
 			margin-bottom: 30px;
 		}
 
-		iframe {
-			width: 100%;
-			height: 300px;
-			margin-bottom: 30px;
-		}
 		video {
 			width: 100%;
 			margin-bottom: 30px;

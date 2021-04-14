@@ -209,13 +209,13 @@
 					let last = -1;
 					let n = 0;
 					for (let i in this.encounter.entities) {
-						let match = this.encounter.entities[i].name.match(/^([a-zA-Z\s]+)(\((\d+)\))*/);
-						// let id = this.encounter.entities[i].id
-						if (match[1].trim() == entity.name) {
+						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d)\))$)|(?:^(.*)(?!\s\(\d\))$)/);
+						
+						let name = match[1] || match[3];
+						if (name == entity.name) {
 							n++;
-							if (parseInt(match[3]) > last) {
-								last = parseInt(match[3]);
-							}
+							let digit = parseInt(match[2]);
+							last = digit > last ? digit : last;
 						}
 					}
 					if (last > 0) {

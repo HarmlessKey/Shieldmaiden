@@ -222,7 +222,13 @@
 			},
 			copy(npc) {
 				this.copy_dialog = false;
+
+				// Remove unwanted data from the monster
+				delete npc.metadata;
+
 				this.npc = npc;
+
+				// Clear search
 				this.searchResults = [];
 				this.search = '';
 			},

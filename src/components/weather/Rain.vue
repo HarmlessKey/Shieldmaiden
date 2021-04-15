@@ -6,16 +6,21 @@
 		<div class="rain layer2"></div>
 		<div class="rain layer3 a"></div>
 		<div class="rain layer3"></div>
+		<!-- <audio v-if="audio" :src="audio_file" autoplay loop /> -->
 	</div>
 </template>
 
 <script>
 	export default {
-		name: "Snow",
+		name: "Rain",
 		props: {
 			intensity: {
 				type: Number,
 				default: 1
+			},
+			audio: {
+				type: Boolean,
+				default: false
 			}
 		},
 		computed: {
@@ -23,7 +28,10 @@
 				const intensities = ["light", "medium", "heavy"];
 				const index = this.intensity - 1;
 				return intensities[index];	
-			}
+			},
+			// audio_file() {
+			// 	return require(`@/assets/_audio/weather/rain/${this.intensity}.wav`);
+			// }
 		}
 	};
 </script>

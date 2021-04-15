@@ -82,7 +82,7 @@
 					},
 					{
 						name: "status",
-						icon: "fas fa-list",
+						icon: "fas fa-heartbeat",
 						title: "Status",
 						text: "The current status of entities is displayed. "+
 							"Think of hit points, armor class, conditions, etc."

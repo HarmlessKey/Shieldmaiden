@@ -14,17 +14,29 @@
 				borderless
 			/>
 		</div>
-		<q-btn-dropdown stretch flat dark square>
-			<template #label>
-				<i class="fas fa-cloud mr-1" /> Select effect
-			</template>
-			<div class="bg-gray edit-weather">
-				<q-item-label header>Weather effects</q-item-label>
-				<EditWeather v-model="weather" />
-			</div>
-		</q-btn-dropdown>
+		<div class="right">
+			<!-- <a @click="audio = !audio">
+				<i :class="audio ? 'fas fa-volume-up' : 'fas fa-volume-mute'" />
+			</a>
+			<q-separator vertical dark class="ml-3" /> -->
+			<q-btn-dropdown stretch flat dark square>
+				<template #label>
+					<i class="fas fa-cloud" />
+					<span class="ml-1 d-none d-md-inline-block">Select effect</span>
+				</template>
+				<div class="bg-gray edit-weather">
+					<q-item-label header>Weather effects</q-item-label>
+					<EditWeather v-model="weather" />
+				</div>
+			</q-btn-dropdown>
+		</div>
 	</div>
-	<Weather :weather="weather" :key="JSON.stringify(weather)" :background="image ? image : background" />
+	<Weather 
+		:weather="weather" 
+		:key="JSON.stringify(weather)" 
+		:background="image ? image : background"
+		:audio="audio"
+	/>
 </div>
 </template>
 
@@ -40,9 +52,11 @@
 		data() {
 			return {
 				background: require("../assets/_img/weather-background.jpg"),
+				audio: false,
 				image: null,
 				weather: {
-					rain: 1
+					rain: 1,
+					fog: 1
 				},
 				prevRoute: "/"
 			}
@@ -81,6 +95,10 @@
 			.left {
 				display: flex;
 				justify-content: flex-start;
+			}
+			.right {
+				display: flex;
+				justify-content: flex-end;
 			}
 		}
 	}

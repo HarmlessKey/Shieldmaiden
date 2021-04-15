@@ -60,6 +60,10 @@ export default {
 		width: 100%;
 		height: 100%;
 
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
 		.weather-wrapper {
 			overflow: hidden;
 			width: 100%;

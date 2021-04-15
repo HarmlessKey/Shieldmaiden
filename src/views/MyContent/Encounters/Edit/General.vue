@@ -92,9 +92,7 @@
 
 				</q-toolbar>
 				<div class="preview">
-					
-						<Weather :weather="weather" :key="JSON.stringify(weather)" :background="encounter.background" />
-					
+					<Weather :weather="weather" :key="JSON.stringify(weather)" :background="encounter.background" />				
 				</div>
 			</q-card>
 		</q-dialog>

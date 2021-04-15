@@ -25,6 +25,10 @@ html body {
 	font-size: 15px;
 	font-family: 'Open Sans', sans-serif;
 	position: relative;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 	
 	.view {
 		padding: 5px;

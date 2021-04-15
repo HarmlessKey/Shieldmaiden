@@ -1,5 +1,10 @@
 <template>
-	<div class="home" v-if="!$store.getters.user || $route.path === '/home'" v-on:scroll="handleScroll">
+	<q-scroll-area 
+		class="home" 
+		v-if="!$store.getters.user || $route.path === '/home'" 
+		dark :thumb-style="{ width: '10px'}"
+		v-on:scroll="handleScroll"
+	>
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top />
@@ -66,7 +71,7 @@
 				</router-link>
 			</div>
 		</template>
-	</div>
+	</q-scroll-area>
 	<SignedIn v-else />
 </template>
 
@@ -128,7 +133,7 @@
 		},
 		methods: {
 			handleScroll(e) {
-				this.scrolled = e.target.scrollTop;
+				this.scrolled = e.verticalPosition;
 			}
 		}
 	}
@@ -139,7 +144,7 @@
 .home {
 	padding-bottom: 85px;
 	overflow-y: scroll;
-	height: 100vh;
+	height: calc(100vh + 85px);
 
 	&::-webkit-scrollbar {
 		display: none;

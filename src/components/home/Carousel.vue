@@ -18,16 +18,19 @@
 				:name="name" 
 				:key="`slide-${index}`"
 				class="column no-wrap flex-center"
-			>
+			>	
 				<i class="icon" :class="icon" />
 				<h3 v-html="title" />
 				<p v-html="text" />
-				<router-link v-if="name === 'more'" to="sign-up" class="btn" >Create account</router-link>
+				<router-link v-if="name === 'more'" to="sign-up" class="btn bg-green" >Create account</router-link>
+				<router-link v-if="name === 'weather'" to="weather-demo" class="btn bg-green" >Weather demo</router-link>
 			</q-carousel-slide>
 		</q-carousel>
 
 		<div class="card-footer text-center" slot="footer">
-			<router-link to="/demo">Try demo encounter</router-link>
+			<router-link to="/demo" class="btn btn-block">
+				Try demo encounter
+			</router-link>
 		</div>
 	</hk-card>
 </template>
@@ -54,6 +57,9 @@
 </script>
 
 <style lang="scss" scoped>
+	.card-footer {
+		padding: 0 !important;
+	}
 	.q-carousel {
 		text-align: center;
 		margin: -20px;

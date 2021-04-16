@@ -885,6 +885,11 @@ html body {
 			margin-bottom: 0;
 			margin-left: 15px;
 		}
+		@media only screen and (max-width: 992px) {
+			.hk-card {
+				margin-bottom: 25px;
+			}
+		}
 	}
 
 	/* HK ROLLS */

@@ -44,11 +44,11 @@
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete(data.row['.key'], data.row.title)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
+					<a class="gray-hover" @click="confirmDelete($event, data.row['.key'], data.row.title)">
+						<i class="fas fa-trash-alt"></i>
+						<q-tooltip anchor="top middle" self="center middle">
+							Delete
+						</q-tooltip>
 					</a>
 				</div>
 			</hk-table>
@@ -138,25 +138,30 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, reminder) {
-				this.$snotify.error('Are you sure you want to delete ' + reminder + '?', 'Delete reminder', {
-					timeout: false,
-					buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-							this.deleteReminder(key)
-							this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						},
-						{
-							text: 'No', action: (toast) => { 
+			confirmDelete(e, key, reminder) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deleteReminder(key);
+				} else {
+					this.$snotify.error('Are you sure you want to delete ' + reminder + '?', 'Delete reminder', {
+						timeout: false,
+						buttons: [
+							{
+								text: 'Yes', action: (toast) => { 
+								this.deleteReminder(key)
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: true
-						},
-					]
-				});
+								}, 
+								bold: false
+							},
+							{
+								text: 'No', action: (toast) => { 
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: true
+							},
+						]
+					});
+				}
 			},
 			deleteReminder(key) {
 				//Remove player

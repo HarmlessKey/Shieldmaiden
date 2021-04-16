@@ -51,7 +51,7 @@
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete(data.row.key, data.row.name)">
+					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row.name)">
 						<i class="fas fa-trash-alt"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Delete
@@ -150,25 +150,30 @@
 			}
 		},
 		methods: {
-			confirmDelete(key, item) {
-				this.$snotify.error('Are you sure you want to delete ' + item + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
-					timeout: false,
-					buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-							this.deleteItem(key)
-							this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						},
-						{
-							text: 'No', action: (toast) => { 
+			confirmDelete(e, key, item) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deleteItem(key);
+				} else {
+					this.$snotify.error('Are you sure you want to delete ' + item + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
+						timeout: false,
+						buttons: [
+							{
+								text: 'Yes', action: (toast) => { 
+								this.deleteItem(key)
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: true
-						},
-					]
-				});
+								}, 
+								bold: false
+							},
+							{
+								text: 'No', action: (toast) => { 
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: true
+							},
+						]
+					});
+				}
 			},
 			deleteItem(key) {
 				//Remove the item from all inventories

@@ -134,7 +134,7 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a @click="deleteEncounter(data.row.key,data.row.encounter)">
+							<a @click="deleteEncounter($event, data.row.key,data.row.encounter)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
@@ -184,7 +184,7 @@
 										Reset
 									</q-tooltip>
 								</a>
-								<a class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)">
+								<a class="ml-2" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
 									<i class="fas fa-trash-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
@@ -385,23 +385,28 @@
 					this.add = false;
 				}
 			},
-			deleteEncounter(key, encounter) {
-				this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
-					timeout: 5000,
-					buttons: [
-					{
-						text: 'Yes', action: (toast) => { 
-							db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove(); 
-							this.$snotify.remove(toast.id); 
-						}, bold: false 
-					},
-					{
-						text: 'No', action: (toast) => { 
-							this.$snotify.remove(toast.id); 
-						}, 
-						bold: false },
-					]
-				});
+			deleteEncounter(e, key, encounter) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+				} else {
+					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
+						timeout: 5000,
+						buttons: [
+						{
+							text: 'Yes', action: (toast) => { 
+								db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+								this.$snotify.remove(toast.id); 
+							}, bold: false 
+						},
+						{
+							text: 'No', action: (toast) => { 
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false },
+						]
+					});
+				}
 			},
 			reset(id, hard=true) {
 				if (hard){

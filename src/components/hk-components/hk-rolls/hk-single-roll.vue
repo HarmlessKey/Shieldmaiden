@@ -288,6 +288,7 @@
 						<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
 					</div>
 				</div>
+					<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
 			</div>
 
 			<!-- TOTALS OF ALL ACTIONS -->

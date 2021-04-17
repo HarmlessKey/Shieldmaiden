@@ -273,6 +273,7 @@
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				tabSetter: undefined,
 				active_action: undefined,
 				rollOptions: ["toHit", "damage"],
 				setToHit: undefined,
@@ -280,7 +281,6 @@
 				animateTrigger: false,
 				rolledDamage: 0,
 				rolledToHit: 0,
-				tab: "special",
 				custom_roll: {
 					name: "Custom Roll",
 					attack_bonus: undefined,
@@ -316,7 +316,25 @@
 				"turn",
 				"targeted",
 				"share_rolls"
-			])
+			]),
+			tab: {
+				get() {
+					let tab = "actions";
+					if(!this.current.actions) {
+						tab = "special";
+						if(!this.current.special_abilities) {
+							tab = "legendary";
+							if(!this.current.legendary_actions) {
+								tab = "reactions";
+							}
+						}
+					} 
+					return this.tabSetter ? this.tabSetter : tab;
+				},
+				set(newVal) {
+					this.tabSetter = newVal;
+				}
+			}
 		},
 		methods: {
 			...mapActions([

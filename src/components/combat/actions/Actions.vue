@@ -182,9 +182,11 @@
 			tabs() {
 				const current = this.entitiesList[this.doneBy];
 				let tabs = [
-					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" },
-					{ name: "roll", label: "Actions", icon: "fas fa-dice-d20" }	
+					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
 				];
+				if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
+					tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
+				}
 				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
 					tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
 				}

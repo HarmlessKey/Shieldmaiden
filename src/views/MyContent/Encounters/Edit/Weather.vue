@@ -37,7 +37,8 @@
 					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
 					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
-					fog: { name: "Fog", icon: "fas fa-fog" }
+					fog: { name: "Fog", icon: "fas fa-fog" },
+					ash: { name: "Ash rain", icon: "fas fa-fire" },
 				}
 			} 
 		},

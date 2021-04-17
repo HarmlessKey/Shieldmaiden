@@ -10,6 +10,7 @@
 				<Rain v-if="weather.rain > 0" :intensity="weather.rain" :audio="audio" />
 				<Hail v-if="weather.hail > 0" :intensity="weather.hail" :audio="audio" />
 				<Snow v-if="weather.snow > 0" :intensity="weather.snow" :audio="audio" />
+				<Ash v-if="weather.ash > 0" :intensity="weather.ash" :audio="audio" />
 			</template>
 		</div>
 		<audio v-if="audio && thunder_interval" :src="thunder_audio" ref="thunder" autoplay />
@@ -41,7 +42,8 @@ export default {
 		Fog: () => import('./Fog'),
 		Rain: () => import('./Rain'),
 		Hail: () => import('./Hail'),
-		Snow: () => import('./Snow')
+		Snow: () => import('./Snow'),
+		Ash: () => import('./Ash'),
 	},
 	data() {
 		return {

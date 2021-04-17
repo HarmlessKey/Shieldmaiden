@@ -157,10 +157,10 @@
 				transform: translateX(-200px) translateY(0) rotate(0deg);
 			}
 			33% {
-        transform: translateX(200px) translateY(100vh) rotate(20deg);
+        transform: translateX(200px) translateY(75vh) rotate(20deg);
 			}
 			66% {
-				transform: translateX(-200px) translateY(150vh) rotate(60deg);
+				transform: translateX(0) translateY(150vh) rotate(60deg);
 			}
 			100% { 
 				transform: translateX(200px) translateY(230vh) rotate(40deg);

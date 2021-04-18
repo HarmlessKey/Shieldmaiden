@@ -9,7 +9,7 @@
 		:options="filtered_damage_types"
 		v-model="damage_type"
 		@filter="filterTypes"
-		:rules="required ? [val => !!val || 'Required'] : ''"
+		:rules="required ? [val => !!val || 'Required'] : []"
 		@focus="hide_selected = true"
 		@blur="hide_selected = false"
 	>

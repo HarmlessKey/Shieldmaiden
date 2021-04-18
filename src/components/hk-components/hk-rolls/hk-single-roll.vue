@@ -288,23 +288,24 @@
 						<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
 					</div>
 				</div>
-					<hk-animated-integer :value="totalActionValue(action, action_index)" onMount />
 			</div>
 
 			<!-- TOTALS OF ALL ACTIONS -->
 			<template v-for="type in ['damage', 'healing']">
-				<div class="total-damage" :key="type" v-if="totalValue[type] !== undefined">
+				<div class="total-damage" :key="type" v-if="totalValue(type) !== undefined">
 					<div>Total {{ type }}</div>
 					<div class="total" :class="type === 'healing' ? 'green' : 'red'">
-						<hk-animated-integer :value="totalValue[type]" onMount />
+						<hk-animated-integer :value="totalValue(type)" onMount />
 					</div>
 				</div>
 			</template>
 		</div>
 
 		<div class="footer" v-if="roll.target">
-			<q-btn color="gray" class="full-width" label="Cancel" icon="fas fa-times" no-caps @click="removeActionRoll(index)" />
-			<q-btn color="gray" class="full-width" label="Apply" icon="fas fa-check" no-caps @click="apply()" />
+			<q-btn color="gray" class="full-width" label="Full" no-caps @click="apply(1)" />
+			<q-btn color="gray" class="full-width" label="Half" no-caps @click="apply(.5)" />
+			<q-btn color="gray" class="full-width" label="Double" no-caps @click="apply(2)" />
+			<q-btn color="gray" class="full-width" icon="fas fa-times" no-caps @click="removeActionRoll(index)" size="sm" />
 		</div>
 	</div>
 </template>
@@ -376,36 +377,6 @@ export default {
 				return this.$store.getters.userSettings.encounter.critical; // Double rolled values
 			} return undefined; // Default = undefined = roll twice
 		},
-		totalValue() {
-			let total = {};
-			
-			// Separate damage and healing
-			const healing_actions = this.roll.actions.filter((action, index) => {
-				action.index = index;
-				return action.type === 'healing';
-			});
-			const damage_actions = this.roll.actions.filter((action, index) => {
-				action.index = index;
-				return action.type !== 'healing';
-			});
-
-			if(healing_actions.length > 0) {
-				let healing_total = 0;
-				for(const action of healing_actions) {
-					healing_total = healing_total + this.totalActionValue(action, action.index);
-				}
-				total.healing = healing_total;
-			}
-
-			if(damage_actions.length > 0) {
-				let damage_total = 0;
-				for(const action of damage_actions) {
-					damage_total = damage_total + this.totalActionValue(action, action.index);
-				}
-				total.damage = damage_total;
-			}
-			return total;
-		},
 	},
 	mounted() {
 		this.checkHitOrMiss();
@@ -432,12 +403,13 @@ export default {
 			const color = (type === "A") ? "green" : "red";
 			return `<b class="${color}">${type}</b>`;
 		},
-		apply() {
+		apply(multiplier) {
 			// Create the info object for the log
 			let config = {
 				log: true,
 				ability: this.roll.name,
-				defenses: this.resistances
+				defenses: this.resistances,
+				multiplier
 			};
 			let actions = [];
 			let specials = [];
@@ -456,7 +428,7 @@ export default {
 				for(const rolled of action.rolls) {
 					let roll = {};
 					if(action.type !== "healing") roll.damage_type = rolled.damage_type;
-					roll.value = this.totalRollValue(action, index, rolled);
+					roll.value = Math.floor(this.totalRollValue(action, index, rolled) * multiplier);
 
 					// Special events | only on a hit or failed save
 					if(rolled.special && (this.savingThrowResult[index] === "fail" || this.hitOrMiss[index] === "hit" )) {
@@ -473,8 +445,16 @@ export default {
 			});
 			config.actions = actions;
 
+			// Set the total value object
+			const totalDamage = this.totalValue("damage");
+			const totalHealing = this.totalValue("healing");
+			let totalValue = {};
+
+			if(totalDamage) totalValue.damage = Math.floor(totalDamage * multiplier);
+			if(totalHealing) totalValue.healing = Math.floor(totalHealing * multiplier);
+
 			// Apply the rolled damage/healing
-			this.setHP(this.totalValue, this.roll.target, this.roll.current, config);
+			this.setHP(totalValue, this.roll.target, this.roll.current, config);
 
 			// Apply the special events
 			for(const special of specials) {
@@ -513,27 +493,53 @@ export default {
 				total = total + rolls.scaledRoll.total;
 			}
 			if(action.type === 'save' && this.savingThrowResult[action_index] === 'save') {
-				total = Math.floor(total * rolls.missSave);
+				total = total * rolls.missSave;
 			}
 			if(action.toHit && this.hitOrMiss[action_index] === 'miss') {
-				total = Math.floor(total * rolls.missSave);
+				total = total * rolls.missSave;
 			}
 			if(this.resistances && this.resistances[rolls.damage_type] === 'v') {
 				total = total * 2;
 			}
 			if(this.resistances && this.resistances[rolls.damage_type] === 'r') {
-				total = Math.floor(total / 2);
+				total = total / 2;
 			}
 			if(this.resistances && this.resistances[rolls.damage_type] === 'i') {
 				total = 0;
 			}
-			return total;
+			return Math.floor(total);
 		},
 		totalActionValue(action, action_index) {
 			let total = 0;
 			action.rolls.forEach((roll) => {
 				total = total + this.totalRollValue(action, action_index, roll);
 			});
+			return total;
+		},
+		totalValue(type) {
+			let total = undefined;
+			let actions = [];
+			
+			if(type === "healing") {
+				// Separate damage and healing
+				actions = this.roll.actions.filter((action, index) => {
+					action.index = index;
+					return action.type === 'healing';
+				});
+			}
+			else {
+				actions = this.roll.actions.filter((action, index) => {
+					action.index = index;
+					return action.type !== 'healing';
+				});
+			}
+
+			if(actions.length > 0) {
+				total = 0;
+				for(const action of actions) {
+					total = total + this.totalActionValue(action, action.index);
+				}
+			}
 			return total;
 		},
 		setDefense(type, resistance, key) {

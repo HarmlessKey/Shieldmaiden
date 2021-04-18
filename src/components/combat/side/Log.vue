@@ -15,15 +15,20 @@
 						</div>
 
 						<!-- TOTAL -->
-						<div>
-							<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
-								{{ item.amount }} {{ item.type }}
-							</b>
+						<div class="d-flex justify-between">
+							<div>
+								<b :class="{ green: item.type == 'healing', red: item.type == 'damage' }">
+									{{ item.amount }} {{ item.type }}
+								</b>
 
-							<!-- OVER -->
-							<span v-if="item.over > 0">
-								- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
-							</span>
+								<!-- OVER -->
+								<span v-if="item.over > 0">
+									- {{ item.over }} {{ item.type === "damage" ? "overkill" : "overhealing" }}
+								</span>
+							</div>
+							<small v-if="item.multiplier && item.multiplier !== 1" class="blue"><b>
+								{{ (item.multiplier === .5) ? "HALVED" : "DOUBLED" }}
+							</b></small>
 						</div>
 
 						<!-- ACTIONS -->

@@ -331,7 +331,8 @@ export const setHP = {
 				over: over,
 				actions: config.actions,
 				defenses: config.defenses,
-				ability: config.ability
+				ability: config.ability,
+				multiplier: config.multiplier
 			};
 			
 			this.set_log({

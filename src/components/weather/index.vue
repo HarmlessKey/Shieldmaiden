@@ -99,6 +99,9 @@ export default {
 			height: 100%;
 			background-size: cover;
 			background-position: center top;
+			animation: imagezoom 30s ease-in-out infinite;
+			animation-direction: alternate-reverse;
+			overflow: hidden;
 
 			&.light {
 				animation: lightnings 360s linear infinite;
@@ -139,6 +142,14 @@ export default {
 					100% { filter: brightness(1); opacity: 1; background-color: unset;}
 				}
 			}
+		}
+	}
+	@keyframes imagezoom {
+		0% {
+			transform: scale(1);
+		}
+		100% {
+			transform: scale(1.25);
 		}
 	}
 </style>

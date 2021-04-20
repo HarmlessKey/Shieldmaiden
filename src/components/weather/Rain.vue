@@ -38,13 +38,16 @@
 
 <style lang="scss" scoped>
 	.wrapper {
-		margin-left: -50px;
+		position: absolute;
+		top: 0;
+		left: -50px;
     width: calc(150% + 100px);
     height: 150%;
 		
 		$s1:"";
 		$s2:"";
 		$s3:"";
+
 		@for $i from 1 through 800 {
 			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem +$white;
 			$s2: $s2 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem +$white;
@@ -162,7 +165,7 @@
 	}
 	@keyframes fall {
 			100% {
-				transform: translateY(200vh); 
+				transform: translateY(230vh); 
 			}
 	}
 </style>

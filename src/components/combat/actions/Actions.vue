@@ -73,14 +73,16 @@
 		</template>
 
 		<!-- ADVANTAGE / DISADVANTAGE -->
-		<template>
-			<p class="mt-3 d-sm-none d-block">
-				<q-icon name="info" size="medium" class="info" /> Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
-			</p>
-			<p class="mt-3 d-none d-sm-block">
-				<q-icon name="info" size="medium" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>.
-			</p>
-		</template>
+		<hk-tip value="advantage" title="Advantage &amp; disadvantage">
+			<template #content>
+				<span class="d-sm-none d-block">
+					Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
+				</span>
+				<span class="d-none d-sm-block">
+					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.
+				</span>
+			</template>
+		</hk-tip>
 
 		<template v-if="doneBy">
 			<q-tabs

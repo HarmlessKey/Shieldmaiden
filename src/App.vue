@@ -104,6 +104,7 @@
 	created() {
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
+		this.setTips();
 
 		if(auth.currentUser !== null){
 			this.setUser();
@@ -126,6 +127,7 @@
 	},
 	methods: {
 		...mapActions([
+			'setTips',
 			'fetchCampaigns',
 			'fetchAllEncounters',
 			'fetchPlayers',

@@ -1,7 +1,7 @@
 <template>
 	<div class="tip" v-if="!get_tip(value)">
 		<q-icon name="info" size="medium" color="yellow" class="tip__icon" />
-		<div>
+		<div class="tip__middle">
 			<div class="tip__title" v-if="hasTitle">
 				<slot name="title">
 					{{ title }}
@@ -67,11 +67,16 @@ export default {
 		justify-content: space-between;
 		border-left: solid 8px $yellow;
 		padding: 5px;
-		background-color: rgba(0, 0, 0, .1);
+		background-color: rgba(0, 0, 0, .2);
 		margin-bottom: 20px;
 
 		&__icon {
 			padding-right: 8px;
+		}
+		&__middle {
+			display: flex;
+			flex-wrap: wrap;
+			flex: 1;
 		}
 		&__title {
 			font-weight: bold;
@@ -79,6 +84,7 @@ export default {
 		&__close {
 			padding-left: 8px;
 			color: $gray-light;
+			line-height: 10px;
 
 			&:hover {
 				color: $white;

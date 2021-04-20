@@ -1,5 +1,23 @@
 <template>
 	<div>
+		<hk-tip value="initiative-overview" title="Actions">
+			<template #content>
+				<p>
+					<icon icon="surprised" class="icon white" /> 
+					Reminds you this entity was surprised when their turn starts.
+				</p>
+				<p>
+					<i class="fas fa-eye-slash white" />
+					Hides the entity from your players on the 
+					<a @click="setSlide({show: true, type: 'PlayerLink' })">track encounter screen</a>.
+				</p>
+				<span>
+					<i class="fas fa-minus white" /> 
+					Moves the entity to a seperate initiative 
+					list from where they can quickly be added.
+				</span>
+			</template>
+		</hk-tip>
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
 				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
@@ -125,6 +143,7 @@
 				'set_initiative',
 				'set_condition',
 				'set_targetReminder',
+				"setSlide"
 			]),
 			setSurprised(entity_key, value) {
 				const reminder = this.premade.surprised;
@@ -180,5 +199,13 @@
 
 .initiative-move {
   transition: transform .5s;
+}
+
+.tip {
+	margin: 0 15px 0 10px;
+
+	.icon {
+		width: 20px;
+	}
 }
 </style>

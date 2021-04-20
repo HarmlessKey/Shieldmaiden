@@ -1,5 +1,12 @@
 <template>
 	<div>
+		<hk-tip 
+			class="mx-3"
+			value="initiative-decimals" 
+			title="Initiateve decimals" 
+			content="Use decimals when multiple entities have the same initiative."
+		/>
+		
 		<ul class="entities hasImg">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
 				<icon 
@@ -135,7 +142,7 @@
 
 <style lang="scss" scoped>
 #container {
-	padding:10px;
+	padding: 10px;
 	width: 100vw;
 	height: calc(100% - 50px);
 	display: grid;

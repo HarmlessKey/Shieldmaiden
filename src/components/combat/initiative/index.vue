@@ -87,7 +87,7 @@
         <NPCs :npcs="_npcs" />
       </q-tab-panel>
       <q-tab-panel name="overview">
-				<a class="btn btn-block" @click="set_turn({turn: 0, round: 1})">
+				<a class="btn btn-block mb-3" @click="set_turn({turn: 0, round: 1})">
 					Start encounter
 				</a>
         <Overview :active="_active" :idle="_idle" />

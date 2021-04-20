@@ -75,11 +75,13 @@
 		<!-- ADVANTAGE / DISADVANTAGE -->
 		<hk-tip value="advantage" title="Advantage &amp; disadvantage">
 			<template #content>
-				<span class="d-sm-none d-block">
-					Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
-				</span>
-				<span class="d-none d-sm-block">
-					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.
+				<p class="mt-2">
+					On desktop<br/>
+					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.				
+				</p>
+				<span>
+					On touch screens<br/>
+					Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.	
 				</span>
 			</template>
 		</hk-tip>

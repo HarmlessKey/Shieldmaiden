@@ -2,77 +2,9 @@
 	<div v-if="current">
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else-if="current.entityType === 'npc' || 'companion'">
-			<p v-if="targeted.length === 1">
-				<i class="fas fa-crosshairs gray-hover"></i> Target: <b class="blue">{{ entities[targeted[0]].name }}</b><br/>
-				<i class="fas fa-shield gray-hover"></i> Armor Class: 
-				<b class="blue">
-					<span :class="{ 
-							'green': entities[targeted[0]].ac_bonus > 0, 
-							'red': entities[targeted[0]].ac_bonus < 0 
-						}" v-if="entities[targeted[0]].ac_bonus">
-						{{ displayStats(entities[targeted[0]]).ac + entities[targeted[0]].ac_bonus}}
-						<q-tooltip anchor="center right" self="center left">
-							Armor class + {{ entities[targeted[0]].ac_bonus }}
-						</q-tooltip>
-					</span>
-					<span v-else>{{ displayStats(entities[targeted[0]]).ac }}</span>
-				</b>
-			</p>
-
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
-				<!-- ROLL OPTIONS -->
-				<template v-if="!demo">
-					<div class="d-flex justify-content-between">
-						<q-checkbox 
-							dark :value="share_rolls" 
-							@input="setShareRolls($event)" 
-							indeterminate-value="something-else">
-								Share Rolls
-								<q-icon name="info" class="blue">
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px" prevent>
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Share rolls</b>
-											</q-card-section>
-
-											<q-card-section>
-												<p>
-													Check this box to share rolls with your players, 
-													they will be shown on the player screen when you are live.
-												</p>
-												<a @click="setSlide({show: true, type: 'PlayerLink'})">Link to your player screen</a>
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-						</q-checkbox>
-						<a class="ml-1" @click="rollInfo = !rollInfo"><i class="fas fa-cog"></i></a>
-					</div>
-					<q-slide-transition>
-						<div v-show="rollInfo" class="bg-gray-hover p-2 mb-2" id="rollOptions">
-							<q-option-group
-								dark
-								:options="options"
-								label="Display options open roll"
-								type="checkbox"
-								v-model="rollOptions"
-							/>
-							<small>Open rolls are shown on the player screen.</small>
-						</div>
-					</q-slide-transition>
-				</template>
 				<div><q-checkbox dark v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
 				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
-
-				<!-- ADVANTAGE / DISADVANTAGE -->
-				<template v-if="toHit">
-					<p class="mt-3 d-sm-none d-block">
-						<q-icon name="info" size="sm" class="info" /> Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.
-					</p>
-					<p class="mt-3 d-none d-sm-block">
-						<q-icon name="info" size="sm" class="info" /> Hold <b>Shift</b> for <span class="green">advantage</span>, <b>Ctrl</b> for <span class="red">disadvantage</span>.
-					</p>
-				</template>
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>

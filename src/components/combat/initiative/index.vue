@@ -17,7 +17,6 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
 				<span><i class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<!-- <q-checkbox dark v-model="selected" :true-value="Object.keys(_npcs).map(Number)" :false-value="[]" label="Select all" /> -->
 			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>

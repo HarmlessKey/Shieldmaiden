@@ -11,6 +11,7 @@ export const general_module = {
 		side_collapsed: true,
 		side_small_screen: false,
 		share_rolls: false,
+		broadcast: {}
 	},
 	getters: {
 		getSlide: function( state ) { return state.slide; },
@@ -18,7 +19,8 @@ export const general_module = {
 		action_rolls: function( state ) { return state.action_rolls; },
 		side_collapsed: function( state ) { return state.side_collapsed; },
 		side_small_screen: function( state ) { return state.side_small_screen; },
-		share_rolls: function( state ) { return state.share_rolls; }
+		share_rolls: function( state ) { return state.share_rolls; },
+		broadcast: function( state ) { return state.broadcast; },
 	},
 	actions: {
 		setRoll({ commit, state }, newRoll) {
@@ -92,6 +94,22 @@ export const general_module = {
 		setShareRolls({ commit }, payload) {
 			commit("SET_SHARE_ROLLS", payload)
 		},
+		setLive({state, rootGetters, commit}, { campaign_id, encounter_id }) {
+			if(state.broadcast.live === campaign_id) {
+				db.ref(`broadcast/${rootGetters.user.uid}`).remove();
+				commit("SET_BROADCAST", {});
+			} else {
+				let broadcast = { live: campaign_id };
+				if(encounter_id) broadcast.encounter = encounter_id;
+				db.ref(`broadcast/${rootGetters.user.uid}`).set(broadcast);
+				commit("SET_BROADCAST", broadcast);
+			}
+		},
+		setLiveEncounter({rootGetters, commit}, { encounter_id }) {
+			const encounter = (encounter_id) ? encounter_id : false;
+			db.ref(`broadcast/${rootGetters.user.uid}/encounter`).set(encounter);
+			commit("SET_BROADCAST_ENCOUNTER", encounter);
+		}
 	},
 	mutations: {
 		SET_SLIDE(state, payload) { Vue.set(state, 'slide', payload); },
@@ -102,6 +120,8 @@ export const general_module = {
 		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
 		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
 		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
-		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); }
+		SET_SHARE_ROLLS(state, payload) { Vue.set(state, 'share_rolls', payload); },
+		SET_BROADCAST(state, payload) { Vue.set(state, "broadcast", payload) },
+		SET_BROADCAST_ENCOUNTER(state, payload) { Vue.set(state.broadcast, "encounter", payload) }
 	},
 };

@@ -79,12 +79,14 @@
 				</div>
 
 				<hk-roll 
+					v-if="targeted.length > 0"
 					tooltip="Roll" 
 					tooltipPosition="right"
 					@roll="roll($event)"
 				>
 					<a class="btn btn-block">Roll</a>
 				</hk-roll>
+				<div v-else class="text-center text-bold red">Select a target</div>
 		</q-form>
 	</div>
 </template>

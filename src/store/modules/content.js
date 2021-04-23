@@ -25,7 +25,7 @@ export const content_module = {
 		players: {},
 		npcs: {},
 
-		poster: undefined
+		poster: undefined,
 	},
 	getters: {
 		userInfo: function( state ) { return state.userInfo; },
@@ -41,65 +41,7 @@ export const content_module = {
 		overencumbered: function( state ) { return state.overencumbered; },
 		content_count: function( state ) { return state.content_count; },
 		poster: function( state ) { return state.poster; },
-		active_campaign: function( state ) { return state.active_campaign; },
-	},
-	mutations: {
-		SET_USERINFO(state, payload) { state.userInfo = payload; },
-		SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
-		SET_TIER(state, payload) { state.tier = payload; },
-		SET_VOUCHER(state, payload) { state.voucher = payload; },
-		SET_PLAYERS(state, payload) {
-			if (payload) state.players = payload;
-		},
-		SET_NPCS(state, payload) {
-			if (payload) state.npcs = payload;
-		},
-		SET_CAMPAIGN(state, payload) {
-			if (payload) state.campaign = payload;
-		},
-		SET_CAMPAIGNS(state, payload) {
-			if (payload) state.campaigns = payload;
-		},
-		SET_ACTIVE_CAMPAIGN(state, payload) {
-			if (payload) state.active_campaign = payload;
-		},
-		SET_ENCOUNTERS(state, payload) {
-			if (payload) state.encounters = payload;
-		},
-		SET_ALLENCOUNTERS(state, payload) {
-			if (payload) state.allEncounters = payload;
-		},
-		CHECK_ENCUMBRANCE(state) {
-			let count = {};
-			count.campaigns = Object.keys(state.campaigns).length;
-			count.players = Object.keys(state.players).length;
-			count.npcs = Object.keys(state.npcs).length;
-			count.encounters = 0;
-			for (let key in state.allEncounters) {
-				let n = Object.keys(state.allEncounters[key]).length;
-				if (n > count.encounters) {
-					count.encounters = n;
-				}
-			}
-			state.content_count = count;
-			if (state.tier) {
-				let benefits = state.tier.benefits;
-				if (count.campaigns > benefits.campaigns ||
-						count.encounters > benefits.encounters ||
-						count.npcs > benefits.npcs ||
-						count.players > benefits.players )
-					state.overencumbered = true;
-				else
-					state.overencumbered = false;
-			}
-		},
-		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
-		DELETE_CAMPAIGN(state, { campaign_id }) {
-			delete state.campaigns[campaign_id];
-		},
-		DELETE_ENCOUNTER(state, { encounter_id }){
-			delete state.encounters[encounter_id]
-		}
+		active_campaign: function( state ) { return state.active_campaign; }
 	},
 	actions: {
 		async setUserInfo({ commit, dispatch, rootGetters }) {
@@ -320,6 +262,64 @@ export const content_module = {
 			for (let encounter_id in getters.encounters) {
 				commit("DELETE_ENCOUNTER", {encounter_id});
 			}
-		}	
+		}
+	},
+	mutations: {
+		SET_USERINFO(state, payload) { state.userInfo = payload; },
+		SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
+		SET_TIER(state, payload) { state.tier = payload; },
+		SET_VOUCHER(state, payload) { state.voucher = payload; },
+		SET_PLAYERS(state, payload) {
+			if (payload) state.players = payload;
+		},
+		SET_NPCS(state, payload) {
+			if (payload) state.npcs = payload;
+		},
+		SET_CAMPAIGN(state, payload) {
+			if (payload) state.campaign = payload;
+		},
+		SET_CAMPAIGNS(state, payload) {
+			if (payload) state.campaigns = payload;
+		},
+		SET_ACTIVE_CAMPAIGN(state, payload) {
+			if (payload) state.active_campaign = payload;
+		},
+		SET_ENCOUNTERS(state, payload) {
+			if (payload) state.encounters = payload;
+		},
+		SET_ALLENCOUNTERS(state, payload) {
+			if (payload) state.allEncounters = payload;
+		},
+		CHECK_ENCUMBRANCE(state) {
+			let count = {};
+			count.campaigns = Object.keys(state.campaigns).length;
+			count.players = Object.keys(state.players).length;
+			count.npcs = Object.keys(state.npcs).length;
+			count.encounters = 0;
+			for (let key in state.allEncounters) {
+				let n = Object.keys(state.allEncounters[key]).length;
+				if (n > count.encounters) {
+					count.encounters = n;
+				}
+			}
+			state.content_count = count;
+			if (state.tier) {
+				let benefits = state.tier.benefits;
+				if (count.campaigns > benefits.campaigns ||
+						count.encounters > benefits.encounters ||
+						count.npcs > benefits.npcs ||
+						count.players > benefits.players )
+					state.overencumbered = true;
+				else
+					state.overencumbered = false;
+			}
+		},
+		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
+		DELETE_CAMPAIGN(state, { campaign_id }) {
+			delete state.campaigns[campaign_id];
+		},
+		DELETE_ENCOUNTER(state, { encounter_id }){
+			delete state.encounters[encounter_id]
+		}
 	},
 };

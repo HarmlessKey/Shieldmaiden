@@ -12,23 +12,33 @@
 								</q-item-section>
 							</q-item>
 							<q-separator />
-							<q-item v-if="!demo" clickable v-close-popup @click="broadcast()">
+							<q-item 
+								v-if="!demo" clickable v-close-popup
+								@click="setSlide({
+									show: true, 
+									type: 'slides/Broadcast', 
+									data: { 
+										campaign_id: $route.params.campid,
+										encounter_id: $route.params.encid
+									}
+								})"
+							>
 								<q-item-section avatar>
-									<i class="far fa-dot-circle" :class="{ red: broadcasting['.value'] === $route.params.campid }"></i>
+									<i class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
 								</q-item-section>
 								<q-item-section>
-									{{ broadcasting['.value'] !== $route.params.campid ? "Go live" : "Cancel broadcast" }}
+									{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
 								</q-item-section>
 							</q-item>
-							<q-item v-if="encounter.audio" clickable v-close-popup  @click="open_audio_link(encounter.audio)">
+							<q-item v-if="encounter.audio" clickable v-close-popup @click="open_audio_link(encounter.audio)">
 								<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
 								<q-item-section>Audio Link</q-item-section>
 							</q-item>
-							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/Encounter'})">
+							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
 								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
 								<q-item-section>Settings</q-item-section>
 							</q-item>
-							<q-item clickable v-close-popup  @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 								<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
 								<q-item-section>Track settings</q-item-section>
 							</q-item>
@@ -56,7 +66,7 @@
 
 		<!-- TURNS & ROUNDS -->
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">	
-			<a  
+			<a
 				class="handler gray-light" 
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
@@ -96,9 +106,20 @@
 		
 		<div class="d-flex justify-content-end center">
 			<!-- BROADCASTING -->
-			<span v-if="!demo" @click="broadcast()" class="live mx-2" :class="{'active': broadcasting['.value'] === $route.params.campid }">
-				{{ broadcasting['.value'] !== $route.params.campid ? "Go " : "" }}
-				live
+			<span 
+				v-if="!demo"
+				@click="setSlide({
+					show: true, 
+					type: 'slides/Broadcast', 
+					data: { 
+						campaign_id: $route.params.campid,
+						encounter_id: $route.params.encid
+					}
+				})" 
+				class="live" 
+				:class="{'active': broadcast.live === $route.params.campid }"
+			>
+					{{ broadcast.live === $route.params.campid ? "" : "go" }} live
 			</span>
 
 			<template v-if="encounter.round > 0">
@@ -157,18 +178,11 @@
 				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			}
 		},
-		firebase() {
-			return {
-				broadcasting: {
-					source: db.ref(`broadcast/${this.userId}/live`),
-					asObject: true
-				}
-			}
-		},
 		computed: {
 			...mapGetters([
 				'encounter',
 				'path',
+				'broadcast'
 			]),
 		},
 		methods: {
@@ -177,7 +191,7 @@
 				'update_round',
 				'set_targeted',
 				'setSlide',
-				'set_finished'
+				'set_finished',
 			]),
 			reload() {
 				this.$router.go();
@@ -225,15 +239,7 @@
 			},
 			finish() {
 				this.set_finished();
-			},
-			broadcast() {
-				//Save the current campaign that is being broadcasted
-				if(this.broadcasting['.value'] == this.$route.params.campid) {
-					db.ref(`broadcast/${this.userId}/live`).remove()
-				} else {
-					db.ref(`broadcast/${this.userId}/live`).set(this.$route.params.campid)
-				}
-			},
+			}
 		}
 	}
 </script>

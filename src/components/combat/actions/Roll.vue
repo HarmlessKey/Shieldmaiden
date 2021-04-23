@@ -3,48 +3,6 @@
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else-if="current.entityType !== 'player'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
-				<!-- ROLL OPTIONS -->
-				<template v-if="!demo">
-					<div class="d-flex justify-content-between">
-						<q-checkbox 
-							dark :value="share_rolls" 
-							@input="setShareRolls($event)" 
-							indeterminate-value="something-else">
-								Share Rolls
-								<q-icon name="info" class="blue">
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px" prevent>
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Share rolls</b>
-											</q-card-section>
-
-											<q-card-section>
-												<p>
-													Check this box to share rolls with your players, 
-													they will be shown on the player screen when you are live.
-												</p>
-												<a @click="setSlide({show: true, type: 'PlayerLink'})">Link to your player screen</a>
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
-						</q-checkbox>
-						<a class="ml-1" @click="rollInfo = !rollInfo"><i class="fas fa-cog"></i></a>
-					</div>
-					<q-slide-transition>
-						<div v-show="rollInfo" class="bg-gray-hover p-2 mb-2" id="rollOptions">
-							<q-option-group
-								dark
-								:options="options"
-								label="Display options open roll"
-								type="checkbox"
-								v-model="rollOptions"
-							/>
-							<small>Open rolls are shown on the player screen.</small>
-						</div>
-					</q-slide-transition>
-				</template>
-
 				<!-- ACTIONS -->
 				<q-tabs
 					class="mt-3"

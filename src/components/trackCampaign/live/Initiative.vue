@@ -509,7 +509,7 @@
 		justify-content: space-between;
 		height: 35px;
 		line-height: 35px;
-		border-bottom: solid 2px$white;
+		border-bottom: solid 2px $white;
 
 		.right {
 			a {

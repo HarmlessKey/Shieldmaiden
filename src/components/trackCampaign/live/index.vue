@@ -452,4 +452,16 @@
 		height: calc(100% - 120px);
 	}
 }
+@media only screen and (min-width: 1250px) {
+	.track.desktop {
+		grid-gap: 30px;
+
+		.initiative {
+			padding-left: 30px;
+		}
+		.side {
+			padding-right: 30px;
+		}
+	}
+}
 </style>

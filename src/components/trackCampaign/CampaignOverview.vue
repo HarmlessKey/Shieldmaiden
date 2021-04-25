@@ -175,4 +175,16 @@
 			grid-template-columns: 3fr 2fr;
 		}
 	}
+	@media only screen and (min-width: 1250px) {
+		.track.desktop {
+			grid-gap: 30px;
+
+			.players {
+				padding-left: 30px;
+			}
+			.side {
+				padding-right: 30px;
+			}
+		}
+	}
 </style>

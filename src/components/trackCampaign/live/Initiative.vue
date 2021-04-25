@@ -116,7 +116,7 @@
 												</q-tooltip>
 											</span>
 										</template>
-										<span v-else class="gray-hover">?</span>
+										<span v-else class="value">?</span>
 									</div>
 								</td>
 

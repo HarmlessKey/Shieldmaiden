@@ -196,7 +196,7 @@
 				margin-bottom: 3px;
 
 				.img {
-					background-color:$gray-dark;
+					background-color: $gray-dark;
 					background-position: center top;
 					background-repeat: no-repeat;
 					background-size: cover;
@@ -240,6 +240,34 @@
 		}
 		.entities-move {
 			transition: transform .6s;
+		}
+	}
+	@media only screen and (min-width: 1250px) {
+		.meters {
+			ul {
+				li {
+					grid-template-columns: 40px 1fr;
+
+					.img {
+						width: 40px;
+						height: 40px;
+					}
+					.q-linear-progress { 
+						font-size: 18px !important;
+						height: 40px;
+						line-height: 40px;
+
+						.info {
+							.number {
+								padding: 0 8px;
+							}
+							span.name {
+								padding-left: 8px;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 </style>

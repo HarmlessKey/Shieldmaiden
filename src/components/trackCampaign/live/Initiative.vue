@@ -93,34 +93,37 @@
 									/>
 								</td>
 								<td class="ac">
-									<template v-if="
-										(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
-										|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
-										<span class="ac" :class="{ 
-												'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
-												'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
-											}"  
-											v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
-										>
-											{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
-											</q-tooltip>
-										</span>
-										<span class="ac" v-else>
-											{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Armor class
-											</q-tooltip>
-										</span>
-									</template>
-									<span v-else class="gray-hover">?</span>
+									<div class="ac_wrapper">
+										<i class="fas fa-shield" ></i>
+										<template v-if="
+											(playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion'))
+											|| (entity.entityType == 'npc' && displayNPCField('ac', entity) == true)">
+											<span class="value" :class="{ 
+													'green': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus > 0, 
+													'red': displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus < 0 
+												}"  
+												v-if="displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus"
+											>
+												{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac + displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+												<q-tooltip anchor="top middle" self="center middle">
+													Armor Class + {{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).bonus }}
+												</q-tooltip>
+											</span>
+											<span class="value" v-else>
+												{{ displayAc(entity, players[entity.key], npcs[entity.key], camp_data(entity)).ac }}
+												<q-tooltip anchor="top middle" self="center middle">
+													Armor class
+												</q-tooltip>
+											</span>
+										</template>
+										<span v-else class="gray-hover">?</span>
+									</div>
 								</td>
 
 								<td class="name">
 									<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
 										<template v-if="displayNPCField('name', entity)">
-											{{ entity.name }}
+											{{ entity.name.capitalizeEach() }}
 										</template>
 										<template v-else>
 											? ? ?
@@ -174,7 +177,7 @@
 									|| (entity.entityType == 'npc' && npcSettings.conditions === undefined))
 									|| entity.entityType === 'companion'))
 							">
-								<div class="d-flex justify-content-right" v-if="entity.conditions">
+								<div class="d-flex justify-content-end" v-if="entity.conditions">
 									<template v-for="({value, name}, index) in returnConditions(entity.conditions)">
 										<div 
 											class="condition" 
@@ -211,7 +214,7 @@
 													<q-item-section>
 														<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
 															<template v-if="displayNPCField('name', entity)">
-																{{ entity.name }}
+																{{ entity.name.capitalizeEach() }}
 															</template>
 															<template v-else>
 																? ? ?
@@ -298,26 +301,18 @@
 			 * Returns how many conditions can be shown
 			 */
 			conditionCount() {
-				if(this.width < 400) {
-					return 1
-				}
-				if(this.width < 450) {
-					return 2
-				}
-				if(this.width < 550) {
-					return 3
-				}
-				if(this.width < 600) {
-					return 4
-				}
-				if(this.width < 750) {
-					return 6
-				}
-				if(this.width < 850) {
-					return 7
-				}
-				if(this.width < 900) {
-					return 8
+				if(this.width < 400) return 1;
+				if(this.width < 450) return 2;
+				if(this.width < 550) return 3;
+				if(this.width < 600) return 4;
+				if(this.width < 750) return 6;
+				if(this.width < 850) return 7;
+				if(this.width < 900) return 8;
+				if(this.width >= 911) {
+					if(this.width < 930) return 4;
+					if(this.width < 960) return 5;
+					if(this.width < 1100) return 6;
+					return 7;
 				}
 				return 9;
 			},
@@ -537,9 +532,13 @@
 				user-select: none;
 				table-layout: fixed;
 
-				th.ac, th.init {
+				th.init {
 					text-align: center;
 					width: 38px;
+				}
+				th.ac {
+					text-align: center;
+					width: 44px;
 				}
 				th.image {
 					width: 43px;
@@ -555,7 +554,7 @@
 							font-size: 12px;
 							padding: 10px 0 5px 0;
 							border: none;
-							border-bottom: solid 1px$white;
+							border-bottom: solid 1px $white;
 							cursor: default;
 
 							&:hover {
@@ -580,12 +579,34 @@
 								border-right: solid 1px transparent;
 							}
 						}
-						td.init, td.ac, th.ac {
+						td.init {
 							width: 38px;
 							text-align: center;
 						}
 						td.ac {
-							font-weight: bold;
+							padding: 0 5px; 
+							width: 45px;
+
+							.ac_wrapper {
+								height: 44px;
+								position: relative;
+						
+								i, .value {
+									width: 100%;
+									position: absolute;
+									line-height: 44px;
+									text-align: center;
+								}
+								i {
+									font-size: 35px;
+									color: #5c5757;
+								}
+								.value {
+									font-weight: bold;
+									color: #fff;
+									margin-top: -1px;
+								}
+							}
 						}
 						td.hp {
 							white-space: nowrap;
@@ -656,7 +677,7 @@
 						font-size: 13px;
 						line-height: 13px;
 						position: absolute;
-						color:$red;
+						color: $red;
 						top: -5px;
 						left: 2px;
 					}
@@ -713,6 +734,80 @@
 	}
 	.q-tabs {
 		height: 60px;
+	}
+}
+@media only screen and (min-width: 1250px) {
+	.initiative-wrapper {
+		.q-scrollarea {
+			> div {
+				.initiative-list {
+					font-size: 25px;
+
+					th {
+						&.image {
+							width: 57px;
+						}
+						&.init {
+							width: 55px;
+						}
+						&.ac {
+							width: 59px;
+						}
+					}
+
+					tbody {			
+						tr {
+							td {
+								&.image {
+									max-width: 59px;
+
+									.img {
+										width: 57px;
+										height: 57px;
+									}
+									svg.img {
+										margin-bottom: -9px;
+									}
+								}
+								&.ac {
+									.ac_wrapper {
+										height: 44px;
+										position: relative;
+								
+										i, .value {
+											width: 100% !important;
+											position: absolute;
+											line-height: 44px;
+											text-align: center;
+										}
+										i {
+											font-size: 48px;
+											color: #5c5757;
+										}
+										.value {
+											font-weight: bold;
+											color: #fff;
+											margin-top: -1px;
+											font-size: 23px;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				.conditions {
+					padding-right: 15px;
+
+					.condition {				
+						.img {
+							width: 40px;
+							height: 40px;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 </style>

@@ -382,7 +382,6 @@
 	background-position: center top;
 }
 .track {
-	max-width: 1250px;
 	margin: auto;
 	width: 100%;
 	height: calc(100% - 60px);

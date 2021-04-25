@@ -93,13 +93,13 @@
 
 					// Npc max hp in entity
 					if (this.entity.entityType === 'npc')
-						maxHp = this.entity.maxHp;
+						maxHp = (this.entity.maxHpMod) ? parseInt(this.entity.maxHp) + this.entity.maxHpMod : this.entity.maxHp;
 
 					else if (this.entity.entityType === 'player')
-						maxHp = (this.camp_data.maxHpMod) ? this.players[key].maxHp + this.camp_data.maxHpMod : this.players[key].maxHp;
+						maxHp = (this.camp_data.maxHpMod) ? parseInt(this.players[key].maxHp) + this.camp_data.maxHpMod : this.players[key].maxHp;
 
 					else if (this.entity.entityType === 'companion')
-						maxHp = (this.camp_data.maxHpMod) ? this.npcs[key].maxHp + this.camp_data.maxHpMod : this.npcs[key].maxHp;
+						maxHp = (this.camp_data.maxHpMod) ? parseInt(this.npcs[key].maxHp) + this.camp_data.maxHpMod : this.npcs[key].maxHp;
 				}
 
 				ret = {
@@ -110,9 +110,7 @@
 
 				return ret;
 			}
-		},
-		methods: {
-		},
+		}
 	}
 </script>
 

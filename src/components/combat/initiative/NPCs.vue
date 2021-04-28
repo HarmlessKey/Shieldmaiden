@@ -61,7 +61,6 @@
 		</ul>
 		<div class="pl-2 pr-3">
 			<hk-roll 
-				tooltip="Roll"
 				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
 			>
 				<a class="btn btn-block">

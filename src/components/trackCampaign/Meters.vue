@@ -43,7 +43,7 @@
 									<div class="info">
 										<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
 										<span v-else class="name">
-											{{ entity.name }}
+											{{ entity.name.capitalizeEach() }}
 										</span>
 										<span class="numbers">
 											<span :class="{

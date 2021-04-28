@@ -32,7 +32,7 @@
 						<template>
 							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
 							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
-							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
+							<h3>The online tool for offline play.</h3>
 						</template>
 
 						<div class="button-container">

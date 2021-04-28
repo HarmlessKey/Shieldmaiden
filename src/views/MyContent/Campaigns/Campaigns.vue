@@ -39,6 +39,8 @@
 							/>
 							<q-select
 								dark filled square
+								emit-value
+								map-options
 								label="Advancement"
 								class="mt-2" 
 								v-model="advancement" 
@@ -171,6 +173,8 @@
 						/>
 						<q-select 
 							dark filled square
+							map-options
+							emit-value
 							label="Advancement"
 							class="mt-2" 
 							v-model="advancement" 
@@ -285,10 +289,6 @@
 					]
 				});
 			},
-			// deleteCampaign(key) {
-			// 	db.ref('campaigns/'+ this.user.uid).child(key).remove();
-			// 	db.ref('encounters/'+ this.user.uid).child(key).remove();
-			// },
 			assignPlayers() {
 				for (let campaignId in this.campaigns) {
 					for (let playerId in this.campaigns[campaignId].players) {
@@ -299,7 +299,6 @@
 							// Player in both this campaign as other campaign
 							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
 								buttons: [
-									// { text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
 									{ text: 'Ok', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 								]
 							});

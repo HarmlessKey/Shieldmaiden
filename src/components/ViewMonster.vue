@@ -1,7 +1,10 @@
 <template>
-	<div class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
+	<div v-if="monster" class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
 		<div class="monster-stats">
-			<h2>{{ monster.name.capitalizeEach() }} <span v-if="monster.source" class="source">{{ monster.source }}</span></h2>
+			<h2 v-if="monster.name">
+				{{ monster.name.capitalizeEach() }} 
+				<span v-if="monster.source" class="source">{{ monster.source }}</span>
+			</h2>
 			<span class="size">
 				<template v-if="monster.size">{{ monster.size }}</template>
 				<template v-if="monster.type"> {{ monster.type }}</template>
@@ -130,7 +133,7 @@
 				</template>
 				passive Perception {{ passivePerception() }}<br/>
 
-				<template v-if="monster.languages"><b>Languages</b> {{ monster.languages.join(", ") }}<br/></template>
+				<template v-if="monster.languages && monster.languages.length > 0"><b>Languages</b> {{ monster.languages.join(", ") }}<br/></template>
 				<template v-if="monster.challenge_rating">
 					<b>Challenge Rating</b> {{ monster.challenge_rating }} 
 					({{ monster_challenge_rating[monster.challenge_rating].xp | numeral('0,0') }} XP)<br/>
@@ -147,7 +150,7 @@
 					:roll="{
 						d: 20, 
 						n: 1, 
-						m: skillModifier(skill, key),
+						m: skillModifier(skill.ability, key),
 						title: `${skill.skill} check`, 
 						notify: true
 					}"
@@ -324,7 +327,7 @@
 	import Spell from "@/components/compendium/Spell"
 
 	export default {
-		name: 'NPC',
+		name: 'ViewMonster',
 		mixins: [
 			general, 
 			dice,
@@ -335,10 +338,7 @@
 		components: {
 			Spell
 		},
-		
-		props: [
-		'data'
-		],
+		props: ['data'],
 		data() {
 			return {
 				is_small: false,
@@ -353,7 +353,9 @@
 		computed: {
 			monster() {
 				let monster = this.data;
-				monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
+				if(this.monster_challenge_rating[monster.challenge_rating]) {
+					monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
+				}
 				return monster;
 			},
 			caster_spell_levels() {
@@ -372,7 +374,7 @@
 						const limit = (spell.limit) ? spell.limit : 0;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
-					return levels.sort();
+					return levels.sort().reverse();
 				} return [];
 			}
 		},
@@ -412,6 +414,7 @@
 				}).map(item => { return item[1] });
 			},
 			skillModifier(ability, skill) {
+				console.log(skill, this.calcMod(this.monster[ability]))
 				let mod = this.calculateSkillModifier(
 					this.calcMod(this.monster[ability]),
 					this.monster.skills ? (

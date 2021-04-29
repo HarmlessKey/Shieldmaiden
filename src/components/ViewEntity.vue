@@ -22,21 +22,11 @@
 				<b>Level</b>: 
 				<span> {{ entity.level || calculatedLevel(entity.experience) }}</span><br/>
 			</template>
-			<template v-if="entity.armor_class">
-				<b>Armor Class</b>: 
-				<span> {{ entity.armor_class }}</span><br/>
-			</template>
-			<template v-else>
-				<b>Armor Class</b>: 
-				<span> {{ entity.ac }}</span><br/>
-			</template>
-			<template v-if="entity.hit_points">
+			<b>Armor Class</b>: 
+			<span> {{ entity.armor_class ? entity.armor_class : entity.ac }}</span><br/>
+			<template>
 				<b>Hit Points</b>: 
-				<span> {{ entity.hit_points }}</span>
-			</template>
-			<template v-else>
-				<b>Hit Points</b>: 
-				<span> {{ entity.maxHp }}</span>
+				<span> {{ entity.hit_points ? entity.hit_points : entity.maxHp }}</span>
 			</template>
 			<template v-if="entity.hit_dice"> {{ entity.hit_dice ? `(${hitDiceStr(data)})` : '' }}</template>
 			<template v-if="entity.old || entity.entityType === 'player'">
@@ -153,11 +143,11 @@
 			</template>
 			passive Perception {{ passivePerception() }}<br/>
 
-			<template v-if="entity.languages"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
+			<template v-if="entity.languages && entity.languages.length > 0"><b>Languages</b> {{ entity.languages.join(", ") }}<br/></template>
 			<template v-if="entity.challenge_rating">
-					<b>Challenge Rating</b> {{ entity.challenge_rating }} 
-					({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
-				</template>
+				<b>Challenge Rating</b> {{ entity.challenge_rating }} 
+				({{ monster_challenge_rating[entity.challenge_rating].xp | numeral('0,0') }} XP)<br/>
+			</template>
 		</p>
 
 		<!-- SKILLS -->
@@ -343,7 +333,7 @@
 						const limit = (spell.limit) ? spell.limit : 0;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
-					return levels.sort();
+					return levels.sort().reverse();
 				} return [];
 			}
 		},
@@ -370,14 +360,18 @@
 				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
 			skillModifier(skill, key) {
-				return this.calculateSkillModifier(
+				let mod = this.calculateSkillModifier(
 					this.calcMod(this.data[skill.ability]),
 					this.entity.skills ? (
 					this.entity.skills.includes(key) ? 
 					this.returnProficiency(this.entity.level ? this.entity.level : this.calculatedLevel(this.entity.experience)): 0) 
 					: 0,
 					this.entity.skills_expertise ? this.entity.skills_expertise.includes(key) : false
-				) 
+				);
+				if(this.entity.skill_modifiers && this.entity.skill_modifiers[skill]) {
+					mod = parseInt(mod) + parseInt(this.entity.skill_modifiers[skill]);
+				}
+				return mod;
 			},
 			spellsForLevel(level) {
 				return Object.entries(this.entity.caster_spells).filter(([key, item]) => { 

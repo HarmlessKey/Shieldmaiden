@@ -12,7 +12,7 @@
 					</h3>
 					<div class="result" @click="setShowRolls(i)">
 						<span class="roll">
-							{{roll.roll}}:
+							{{ roll.roll }}:
 							(<span class="advantage" v-if="roll.ignored">
 								<span v-html="advantage(roll.advantage_disadvantage)"/> 
 								<span class="ignored gray-hover">
@@ -86,7 +86,7 @@
 
 			h3 {
 				padding: 0 8px;
-				background-color:$gray-active;
+				background-color: $gray-active;
 				margin: 0 !important;
 				font-size: 15px;
 				display: grid;
@@ -99,7 +99,7 @@
 			.result {
 				cursor: pointer;
 				padding: 5px 8px;
-				background-color:$gray-dark;
+				background-color: $gray-dark;
 				font-size: 18px;
 				line-height: 35px;
 				display: grid;

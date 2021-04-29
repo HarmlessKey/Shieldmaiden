@@ -6,23 +6,101 @@
 
 		<!-- ACTIVE ENCOUNTER -->
 		<template v-else>
-				<Turns 
-					:encounter="encounter" 
-					:current="_non_hidden_targets[0]"
-					:entities_len="Object.keys(_turnCount).length"
-					:turn="turn"
-					:campPlayers="campaign.players"
-					:campCompanions="campaign.companions"
-					:players="players"
-					:npcs="npcs"
-					:playerSettings="playerSettings"
-					:npcSettings="npcSettings"
-					@setWeather="setWeather"
-				/>
+			<Turns 
+				:encounter="encounter" 
+				:current="_non_hidden_targets[0]"
+				:entities_len="Object.keys(_turnCount).length"
+				:turn="turn"
+				:campPlayers="campaign.players"
+				:campCompanions="campaign.companions"
+				:players="players"
+				:npcs="npcs"
+				:playerSettings="playerSettings"
+				:npcSettings="npcSettings"
+				@setWeather="setWeather"
+			/>
 
-				<!-- DESKTOP -->
-				<div class="track desktop" v-if="width > 576">
-					<div class="initiative">
+			<!-- DESKTOP -->
+			<div class="track desktop" v-if="width > 576">
+				<div class="initiative">
+					<Initiative 
+						v-if="!encounter.finished"
+						:encounter="encounter" 
+						:targets="_non_hidden_targets"
+						:allEntities="_turnCount"
+						:turn="turn"
+						:campPlayers="campaign.players"
+						:campCompanions="campaign.companions"
+						:players="players"
+						:npcs="npcs"
+						:playerSettings="playerSettings"
+						:screenWidth="width"
+						:npcSettings="npcSettings"
+						@newRoll="pushRoll"
+					/>
+					<Rewards v-else :encounter="encounter"/>
+				</div>
+				<div class="side">
+					<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
+						<div class="meters-wrapper">
+							<Meters 
+								v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
+								:entities="encounter.entities" 
+								:npcs="npcs" 
+								:players="players"
+							/>
+						</div>
+					</q-scroll-area>
+				</div>
+				<div class="shares">
+					<Shares :shares="shares" />
+				</div>
+			</div>
+
+			<!-- MOBILE -->
+			<div v-else class="track mobile">
+				<div class="bg-gray-dark">
+					<q-select
+						dark filled square
+						v-model="panel"
+						:options="panels"
+					>
+						<template v-slot:selected>
+							<q-item>
+								<q-item-section avatar>
+									<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
+								</q-item-section>
+								<q-item-section>
+									<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
+								</q-item-section>
+							</q-item>
+						</template>
+						<template v-slot:option="scope">
+							<q-item
+								clickable
+								v-ripple
+								v-close-popup
+								:active="panel === scope.opt.value"
+								@click="panel = scope.opt.value"
+							>
+								<q-item-section avatar>
+									<q-icon :name="scope.opt.icon"/>
+								</q-item-section>
+								<q-item-section>
+									<q-item-label v-html="scope.opt.label"/>
+								</q-item-section>
+							</q-item>
+						</template>
+					</q-select>
+				</div>
+				<q-tab-panels 
+					v-model="panel"
+					animated
+					swipeable
+					infinite
+					class="transparent-bg"
+				>
+					<q-tab-panel name="initiative">
 						<Initiative 
 							v-if="!encounter.finished"
 							:encounter="encounter" 
@@ -34,129 +112,29 @@
 							:players="players"
 							:npcs="npcs"
 							:playerSettings="playerSettings"
-							:screenWidth="width"
 							:npcSettings="npcSettings"
+							:screenWidth="width"
 							@newRoll="pushRoll"
 						/>
 						<Rewards v-else :encounter="encounter"/>
-					</div>
-					<div class="side">
-						<q-tabs
-							v-model="sideDisplay"
-							dark
-							inline-label
-							dense
-							no-caps
-							class='white text-shadow'
-						>
-							<q-tab 
-								v-for="({name, icon, label}, index) in tabs"
-								:key="`tab-${index}`" 
-								:name="name" 
-								:icon="icon"
-								:label="label"
-							/>
-						</q-tabs>
-						<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
-							<div>
-								<div class="meters-wrapper">
-									<Meters 
-										v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
-										:entities="encounter.entities" 
-										:npcs="npcs" 
-										:players="players"
-									/>
-								</div>
-								<Rolls 
-									v-if="sideDisplay === 'rolls'"
-									:entities="encounter.entities" 
-									:npcs="npcs" 
-									:players="players" 
-									:rolls="rolls"
-								/>
-							</div>
-						</q-scroll-area>
-					</div>
-				</div>
-
-				<!-- MOBILE -->
-				<div v-else class="track mobile">
-					<div class="bg-gray-dark">
-						<q-select
-							dark filled square
-							v-model="panel"
-							:options="panels"
-						>
-							<template v-slot:selected>
-								<q-item>
-									<q-item-section avatar>
-										<q-icon :name="panels.filter( item => { return item.value === panel })[0].icon"/>
-									</q-item-section>
-									<q-item-section>
-										<q-item-label v-html="panels.filter( item => { return item.value === panel })[0].label"/>
-									</q-item-section>
-								</q-item>
-							</template>
-							<template v-slot:option="scope">
-								<q-item
-									clickable
-									v-ripple
-									v-close-popup
-									:active="panel === scope.opt.value"
-									@click="panel = scope.opt.value"
-								>
-									<q-item-section avatar>
-										<q-icon :name="scope.opt.icon"/>
-									</q-item-section>
-									<q-item-section>
-										<q-item-label v-html="scope.opt.label"/>
-									</q-item-section>
-								</q-item>
-							</template>
-						</q-select>
-					</div>
-					<q-tab-panels 
-						v-model="panel"
-						animated
-						swipeable
-						infinite
-						class="transparent-bg"
-					>
-						<q-tab-panel name="initiative">
-							<Initiative 
-								v-if="!encounter.finished"
-								:encounter="encounter" 
-								:targets="_non_hidden_targets"
-								:allEntities="_turnCount"
-								:turn="turn"
-								:campPlayers="campaign.players"
-								:campCompanions="campaign.companions"
-								:players="players"
-								:npcs="npcs"
-								:playerSettings="playerSettings"
-								:npcSettings="npcSettings"
-								:screenWidth="width"
-								@newRoll="pushRoll"
-							/>
-							<Rewards v-else :encounter="encounter"/>
-						</q-tab-panel>
-						<q-tab-panel name="meters" v-if="playerSettings.meters === undefined">
-							<Meters 
-								:entities="encounter.entities" 
-								:npcs="npcs" 
-								:players="players"
-							/>
-						</q-tab-panel>
-						<q-tab-panel name="rolls">
-							<Rolls 
-								:entities="encounter.entities" 
-								:npcs="npcs" 
-								:players="players" 
-								:rolls="rolls"
-							/>
-						</q-tab-panel>
-					</q-tab-panels>
-				</div>
+					</q-tab-panel>
+					<q-tab-panel name="meters" v-if="playerSettings.meters === undefined">
+						<Meters 
+							:entities="encounter.entities" 
+							:npcs="npcs" 
+							:players="players"
+						/>
+					</q-tab-panel>
+					<q-tab-panel name="rolls">
+						<Rolls 
+							:entities="encounter.entities" 
+							:npcs="npcs" 
+							:players="players" 
+							:rolls="rolls"
+						/>
+					</q-tab-panel>
+				</q-tab-panels>
+			</div>
 		</template>
 		<div 
 			v-if="encounter.background || (encounter.weather && Object.keys(encounter.weather).length && weather)"
@@ -185,6 +163,7 @@
 			Meters,
 			Rolls,
 			RollForInitiative,
+			Shares: () => import('../Shares'),
 			Rewards: () => import('./Rewards'),
 			Weather: () => import('@/components/weather')
 		},
@@ -192,7 +171,8 @@
 			"encounter", 
 			"campaign", 
 			"players", 
-			"width"
+			"width",
+			"shares"
 		],
 		data() {
 			return {
@@ -253,7 +233,7 @@
 				} , 'desc')
 				.value()
 			},
-			_allEntities: function() {
+			_allEntities() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
 					entity.key = key
@@ -267,13 +247,13 @@
 				} , 'desc')
 				.value()
 			},
-			_targets: function() {
+			_targets() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
 			},
-			_non_hidden: function() {
+			_non_hidden() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
 					entity.key = key
@@ -287,13 +267,13 @@
 				} , 'desc')
 				.value()
 			},
-			_hidden_count: function() {
+			_hidden_count() {
 				return _.filter(this.encounter.entities, function(entity, key) {
 					entity.key = key
 					return entity.active && !entity.down && entity.hidden;
 				}).length
 			},
-			_non_hidden_targets: function() {
+			_non_hidden_targets() {
 				let t = this.turn
 				let turns = Object.keys(this._non_hidden)
 				let order = turns.slice(t).concat(turns.slice(0,t))
@@ -376,13 +356,12 @@
 	
 
 	&.desktop {
-		grid-template-columns: 3fr 1fr;
+		grid-template-columns: 3fr 1fr minmax(250px, 330px);
 		grid-template-rows: 1fr;
 		grid-gap: 15px;
-		padding-top: 30px;
 
 		.initiative {
-			padding-left: 15px;
+			padding: 30px 0 0 15px;
 			overflow: hidden;
 
 			.q-scrollarea {
@@ -394,17 +373,14 @@
 			}
 		}
 		.side {
-			padding-right: 15px;
 			overflow: hidden;
+			padding-top: 30px;
 
 			.q-scrollarea {
 				height: calc(100% - 56px);
 
 				&.during-encounter {
 					height: calc(100% - 50px);
-				}
-				.meters-wrapper {
-					padding-top: 15px;
 				}
 			}
 		}
@@ -428,7 +404,7 @@
 
 @media only screen and (max-width: 1000px) {
 	.track.desktop {
-		grid-template-columns: 3fr 2fr;
+		grid-template-columns: 3fr 1fr minmax(200px, 250px);
 	}
 }
 @media only screen and (max-width: 576px) {
@@ -443,9 +419,6 @@
 
 		.initiative {
 			padding-left: 30px;
-		}
-		.side {
-			padding-right: 30px;
 		}
 	}
 }

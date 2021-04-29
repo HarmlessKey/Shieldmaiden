@@ -27,15 +27,13 @@
 				v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
 				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
 			>
-				<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" />
+				<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
 			</div>
 		</template>
 		<div v-else>
 			<div class="top d-flex justify-content-between">
 				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
 				Not found
-				<span>
-				</span>
 			</div>
 			<div class="container-fluid">
 				<div class="container entities">
@@ -75,7 +73,8 @@
 				encounter: undefined,
 				campaign: undefined,
 				tier: undefined,
-				width: 0
+				width: 0,
+				shares: []
 			}
 		},
 		firebase() {
@@ -88,6 +87,40 @@
 					source: db.ref(`broadcast/${this.userId}/live`),
 					asObject: true
 				},
+			}
+		},
+		computed: {
+			shared() {
+				if(this.campaign && this.broadcasting[".value"]) {
+					return this.campaign.shares;
+				}
+			}
+		},
+		watch: {
+			shared(share, oldShare) {
+				//Check if the roll has not been shown before
+				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
+				if(share && share.key !== oldShare.key) {
+					const notification = share.notification;
+					if(share.type === "roll") {
+						let advantage;
+						if(notification.advantage_disadvantage) {
+							const color = (notification.advantage_disadvantage === "a") ? "green" : "red";
+							advantage = `<b class="${color}">${notification.advantage_disadvantage.capitalize()}</b>`;
+						}
+
+						this.$snotify.html(
+							`<div class="snotifyToast__body roll">
+								<div class="roll_title truncate">${notification.entity_name ? `${notification.entity_name}: ` : ``}${notification.title}</div>
+								<div class="rolled" id="roll">${notification.total}</div>
+								<div class="roll_footer">${advantage ? advantage : ''}${notification.roll}</div>
+							</div> `, {
+							timeout: 8000,
+							closeOnClick: true
+						});
+					}
+					this.shares.unshift(share);
+				}
 			}
 		},
 		beforeMount() {

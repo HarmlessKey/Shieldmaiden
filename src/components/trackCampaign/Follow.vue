@@ -20,7 +20,7 @@
 	import { db } from '@/firebase'
 
 	export default {
-		name: 'Health',
+		name: 'Follow',
 		props: [
 			'entity',
 		],

@@ -568,9 +568,10 @@
 						cursor: pointer;
 
 						td {
-							background: rgba(38, 38, 38, .9);
+							background: rgba(0, 0, 0, .7);
 							border-top: solid 1px transparent;
 							border-bottom: solid 1px transparent;
+							backdrop-filter: blur(1px);
 
 							&:first-child {
 								border-left: solid 1px transparent;
@@ -618,6 +619,7 @@
 							max-width: 0;
 						}
 						td.image {
+							background-color: $black;
 							padding: 0;
 							max-width: 43px;
 

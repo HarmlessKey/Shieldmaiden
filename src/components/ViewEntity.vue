@@ -57,9 +57,11 @@
 					d: 20, 
 					n: 1, 
 					m: modifier(data[ability]),
-					title: `${entity.name}: ${ability.capitalize()} check`, 
+					title: `${ability.capitalize()} check`,
+					entity_name: entity.name.capitalizeEach(), 
 					notify: true
 				}"
+				:share="shares.includes('ability_rolls')"
 			>
 				<div v-if="data[ability]" class="ability">
 					<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
@@ -82,9 +84,11 @@
 							d: 20, 
 							n: 1, 
 							m: calcMod(data[ability]) + entity.proficiency,
-							title: `${entity.name}: ${ability.capitalize()} save`, 
+							title: `${ability.capitalize()} save`, 
+							entity_name: entity.name.capitalizeEach(), 
 							notify: true
 						}"
+						:share="shares.includes('save_rolls')"
 					>
 						<span class="save">
 							{{ ability.substring(0,3).capitalize() }} 
@@ -109,9 +113,11 @@
 							d: 20, 
 							n: 1, 
 							m: skillModifier(skillList[skill].ability, skill),
-							title: `${skill} check`, 
+							title: `${skill} check`,
+							entity_name: entity.name.capitalizeEach(),
 							notify: true
 						}"
+						:share="shares.includes('skill_rolls')"
 					>
 						<span class="save">
 							{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; entity.skills.length ? "," : "" }}
@@ -162,9 +168,11 @@
 						d: 20, 
 						n: 1, 
 						m: skillModifier(skill, key),
-						title: `${entity.name}: ${skill.skill} check`, 
+						title: `${skill.skill} check`, 
+						entity_name: entity.name.capitalizeEach(),
 						notify: true
 					}"
+					:share="shares.includes('skill_rolls')"
 				>
 					<span class="playerSkill">
 						<span class="truncate">
@@ -274,13 +282,14 @@
 </template>
 
 <script>
+	import { mapGetters } from "vuex";
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
 	import { skills } from '@/mixins/skills.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { experience } from '@/mixins/experience.js';
 	import { abilities } from '@/mixins/abilities.js';
-	import Spell from "@/components/compendium/Spell"
+	import Spell from "@/components/compendium/Spell";
 
 	export default {
 		name: 'ViewEntity',
@@ -310,6 +319,12 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+				"broadcast"
+			]),
+			shares() {
+				return this.broadcast.shares || [];
+			},
 			entity() {
 				let entity = JSON.parse(JSON.stringify(this.data));
 				if(entity.entityType === 'npc' && !entity.old) {

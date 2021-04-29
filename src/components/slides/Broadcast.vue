@@ -12,8 +12,46 @@
 			of your active encounter and you can choose to show them your rolls there as well.
 			Your encounters can be followed with the <a @click="setSlide({show: true, type: 'PlayerLink'})">player link.</a>
 		</p>
-
-		<q-checkbox dark v-model="shares" val="rolls" label="Share rolls" />
+		
+		<q-select
+			dark filled square
+			v-model="shares"
+			:options="options"
+			label="Share"
+			options-dense
+			multiple
+			emit-value
+			map-options
+			@input="sharesSelected"
+			:disable="!!broadcast.live"
+		>
+				<template #before-options>
+					<q-item>
+						<q-item-section>
+							<q-item-label>Select All</q-item-label>
+						</q-item-section>
+						<q-item-section side>
+							<q-checkbox dark v-model="all" @input="checkAll"/>
+						</q-item-section>
+					</q-item>
+				</template>
+				<template v-slot:option="scope">
+					<q-item
+						v-bind="scope.itemProps"
+						v-on="scope.itemEvents"      
+					>
+						<q-item-section>
+							<q-item-label v-html="scope.opt.label"/>
+						</q-item-section>
+						<q-item-section side>
+							<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
+						</q-item-section>
+					</q-item>
+				</template>
+				<template v-slot:append>
+				<q-icon v-if="shares.length > 0 && !broadcast.live" name="close" @click.stop="sharesCleared" class="cursor-pointer" />
+			</template>
+		</q-select>
 
 		<a class="btn btn-block mt-4" @click="live()" >
 			{{ broadcast.live === campaign_id ? "Stop broadcast" : "Go live" }}
@@ -31,11 +69,16 @@
 			return {
 				campaign_id: this.data.campaign_id,
 				encounter_id: this.data.encounter_id,
-				shares: [],
-				rolls: [
+				sharesSetter: undefined,
+				all: false,
+				options: [
 					{
 						label: "Action rolls",
 						value: "action_rolls"
+					},
+					{
+						label: "General rolls",
+						value: "general_rolls"
 					},
 					{
 						label: "Initiative rolls",
@@ -53,17 +96,22 @@
 						label: "Skill checks",
 						value: "skill_rolls"
 					},
-					{
-						label: "Skill checks",
-						value: "skill_rolls"
-					},
 				]
 			}
 		},
 		computed: {
 			...mapGetters([
 				"broadcast"
-			])
+			]),
+			shares: {
+				get() {
+					const shares = (this.broadcast.shares) ? this.broadcast.shares : [];
+					return (this.sharesSetter) ? this.sharesSetter : shares;
+				},
+				set(newVal) {
+					this.sharesSetter = newVal;
+				}
+			}
 		},
 		methods: {
 			...mapActions([
@@ -75,8 +123,28 @@
 					campaign_id: this.campaign_id, 
 					encounter_id: this.encounter_id,
 					shares: this.shares
-				})
-			}
+				});
+			},
+			checkAll (v) {
+				if (v) {
+					this.shares = this.options.map(v => v.value)
+					this.sharesSelected()
+					return
+				}
+				this.sharesCleared()
+			},
+			sharesSelected () {
+				if (this.shares.length === this.options.length) {
+					this.all = true
+				} else {
+					this.all = false
+				}
+			},
+			sharesCleared () {
+				this.all = false
+				this.shares = []
+				this.sharesSelected()
+			},
 		}
 	}
 </script>

@@ -48,9 +48,11 @@
 						d: 20, 
 						n: 1, 
 						m: calcMod(monster[ability]),
-						title: `${monster.name}: ${ability.capitalize()} check`, 
+						title: `${ability.capitalize()} check`, 
+						entity_name: monster.name.capitalizeEach(), 
 						notify: true
 					}"
+					:share="shares.includes('ability_rolls')"
 				>
 					<div v-if="monster[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
@@ -73,9 +75,11 @@
 								d: 20, 
 								n: 1, 
 								m: calcMod(monster[ability]) + monster.proficiency,
-								title: `${monster.name}: ${ability.capitalize()} save`, 
+								title: `${ability.capitalize()} save`, 
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
+							:share="shares.includes('save_rolls')"
 						>
 							<span class="save">
 								{{ ability.substring(0,3).capitalize() }} 
@@ -99,9 +103,11 @@
 								d: 20, 
 								n: 1, 
 								m: skillModifier(skillList[skill].ability, skill),
-								title: `${skill} check`, 
+								title: `${skill} check`,
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
+							:share="shares.includes('skill_rolls')"
 						>
 							<span class="save">
 								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
@@ -151,9 +157,11 @@
 						d: 20, 
 						n: 1, 
 						m: skillModifier(skill.ability, key),
-						title: `${skill.skill} check`, 
+						title: `${skill.skill} check`,
+						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
+					:share="shares.includes('skill_rolls')"
 				>
 					<span class="skill">
 						<span class="truncate">
@@ -323,7 +331,7 @@
 	import { abilities } from '@/mixins/abilities.js';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { skills } from '@/mixins/skills.js';
-	import { mapActions } from 'vuex';
+	import { mapActions, mapGetters } from 'vuex';
 	import Spell from "@/components/compendium/Spell"
 
 	export default {
@@ -351,6 +359,12 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+				"broadcast"
+			]),
+			shares() {
+				return this.broadcast.shares || [];
+			},
 			monster() {
 				let monster = this.data;
 				if(this.monster_challenge_rating[monster.challenge_rating]) {

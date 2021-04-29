@@ -42,7 +42,7 @@
 					/>
 				</template>
 				<div class="overview-item">
-					<div class="name truncate">{{ entity.name }}</div>
+					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
 					<b class="blue initiative">{{ entity.initiative }}</b>
 				</div>
 				<div class="actions">
@@ -86,7 +86,7 @@
 			</li>
 		</ul>
 	
-		<span class="d-flex justify-content-between pr-3">
+		<span class="d-flex justify-content-between pl-3">
 			<h2>Inactive</h2>
 		</span>
 

@@ -1,13 +1,19 @@
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from "vuex";
+import { db } from "@/firebase";
 
 export const dice = {
 	data() {
 		return {
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			animateTrigger: false,
 			rolled: 0
 		}
 	},
 	computed: {
+		...mapGetters([
+			"broadcast",
+			"user"
+		]),
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical;
@@ -22,9 +28,9 @@ export const dice = {
 	},
 	methods: {
 		...mapActions([
-			'setRoll'
+			"setRoll"
 		]),
-		rollD(e, d=20, n=1, m=0, title, notify=false, advantage_disadvantage={}) {
+		rollD(e, d=20, n=1, m=0, title, entity_name=undefined, notify=false, advantage_disadvantage={}, share) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
 			let throws = [];
@@ -75,6 +81,7 @@ export const dice = {
 
 			const roll = {
 				title,
+				entity_name,
 				roll: showRoll,
 				d,
 				mod: s + m,
@@ -96,15 +103,42 @@ export const dice = {
 				this.animateTrigger = !this.animateTrigger;
 				this.$snotify.html(
 					`<div class="snotifyToast__body roll">
-						<div class="roll_title">${title}</div>
+						<div class="roll_title truncate">${entity_name ? `${entity_name}: ` : ``}${title}</div>
 						<div class="rolled" id="roll">${roll.total}</div>
-						<div class="roll_title">${advantage ? advantage : ''}${sumThrows}${roll.mod}</div>
+						<div class="roll_footer">${advantage ? advantage : ''}${sumThrows}${roll.mod}</div>
 					</div> `, {
 					timeout: 3000,
 					closeOnClick: true
 				});
 				this.rolled = roll.total;
 			}
+			
+			//Save the roll in the encounter "shares" object
+			if(share && this.broadcast.live) {
+				const key = Date.now() + Math.random().toString(36).substring(4);
+				let share_roll = {...roll};
+				if(entity_name) share_roll.entity_name = entity_name;
+
+				// Remove unneeded properties
+				delete share_roll.throws;
+				delete share_roll.throwsTotal;
+				delete share_roll.d;
+				delete share_roll.mod;
+				delete share_roll.ignored;
+				if(!roll.ignored) {
+					delete share_roll.advantage_disadvantage;
+				} else {
+					share_roll.advantage_disadvantage = Object.keys(advantage_disadvantage)[0].charAt(0);
+				}
+				console.log(share_roll)
+				// Push the roll
+				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set({
+					key,
+					type: "roll",
+					notification: share_roll
+				});
+			}
+
 			this.setRoll(roll);
 			return roll;
 		},

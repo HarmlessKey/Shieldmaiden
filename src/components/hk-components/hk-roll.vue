@@ -61,6 +61,11 @@
 				type: Boolean,
 				required: false,
 				default: false
+			},
+			share: {
+				type: Boolean,
+				required: false,
+				default: false
 			}
 		},
 		data() {
@@ -146,8 +151,10 @@
 						this.roll.n,
 						this.roll.m,
 						this.roll.title,
+						this.roll.entity_name,
 						this.roll.notify ? this.roll.notify : false,
-						advantage_object
+						advantage_object,
+						this.share
 					);
 				} else {
 					this.emit(e, advantage_object);

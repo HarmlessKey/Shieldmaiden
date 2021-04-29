@@ -45,7 +45,8 @@
 						d: 20, 
 						n: 1, 
 						m: calcMod(monster[ability]),
-						title: `${monster.name}: ${ability.capitalize()} check`, 
+						title: `${ability.capitalize()} check`,
+						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
 				>
@@ -70,7 +71,8 @@
 								d: 20, 
 								n: 1, 
 								m: calcMod(monster[ability]) + monster.proficiency,
-								title: `${monster.name}: ${ability.capitalize()} save`, 
+								title: `${ability.capitalize()} save`,
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
 						>
@@ -96,7 +98,8 @@
 								d: 20, 
 								n: 1, 
 								m: skillModifier(skillList[skill].ability, skill),
-								title: `${skill} check`, 
+								title: `${skill} check`,
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
 						>
@@ -148,7 +151,8 @@
 						d: 20, 
 						n: 1, 
 						m: skillModifier(skill, key),
-						title: `${skill.skill} check`, 
+						title: `${skill.skill} check`,
+						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
 				>

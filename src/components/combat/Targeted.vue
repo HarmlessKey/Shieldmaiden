@@ -146,9 +146,11 @@
 											d: 20, 
 											n: 1, 
 											m: modifier(entities[key][ability]), 
-											title: `${entities[key].name}: ${ability} check`, 
+											title: `${ability.capitalize()} check`, 
+											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
+										:share="shares.includes('ability_rolls')"
 									>
 										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 										<div class="mod bg-gray-dark">
@@ -161,9 +163,11 @@
 											d: 20, 
 											n: 1, 
 											m: savingThrow(entities[key], ability), 
-											title: `${entities[key].name}: ${ability} save`, 
+											title: `${ability.capitalize()} save`,
+											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
+										:share="shares.includes('save_rolls')"
 									>
 										<div class="mod bg-gray-dark">
 											{{ savingThrow(entities[key], ability) }}
@@ -232,7 +236,11 @@
 				'entities',
 				'turn',
 				'targeted',
+				'broadcast'
 			]),
+			shares() {
+				return this.broadcast.shares || [];
+			},
 			target: function() {
 				if(this.targeted.length === 1) {
 					return this.entities[this.targeted[0]];

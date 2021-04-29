@@ -4,7 +4,7 @@
 			<li v-for="(roll, i) in rolls" :key="`roll-${i}`">
 					<h3>
 						<span class="title truncate" :title="roll.title">
-							{{ roll.title }}
+							{{ roll.entity_name ? `${roll.entity_name}: ` : ``}}{{ roll.title }}
 						</span>
 						<span class="date">
 							{{ showTime(roll.date) }}

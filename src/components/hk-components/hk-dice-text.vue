@@ -13,6 +13,7 @@
 					d: line.dice.d,
 					m: line.dice.m,
 					title: roll_title || `Roll ${dice2str(line.dice)}`,
+					entity_name,
 					notify: true
 				}"
 			>
@@ -34,6 +35,10 @@
 				default: undefined
 			},
 			roll_title: {
+				type: String,
+				default: undefined
+			},
+			entity_name: {
 				type: String,
 				default: undefined
 			}

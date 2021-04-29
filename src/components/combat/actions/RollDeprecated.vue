@@ -279,7 +279,7 @@
 				}
 
 				if(this.toHit) {
-					toHit = this.rollD(e.e, 20, 1, attack_bonus, `${this.current.name} ${action.name} to hit`, false, advantage_object);
+					toHit = this.rollD(e.e, 20, 1, attack_bonus, `${action.name} to hit`, this.current.name, false, advantage_object);
 				}
 
 				//Roll the damage for all seperated rolls
@@ -308,7 +308,7 @@
 							modifier = action.damage_bonus;
 						}
 						
-						const rolled = this.rollD(e.e, dice[1], diceCount, modifier, `${this.current.name} ${action.name}`); //roll the dice
+						const rolled = this.rollD(e.e, dice[1], diceCount, modifier, action.name, this.current.name); //roll the dice
 						const damage = rolled.throwsTotal; //save damage without the damage bonus
 
 						allDamageRolls.push(rolled.throws);

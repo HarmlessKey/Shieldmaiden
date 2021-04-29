@@ -98,7 +98,6 @@
 <script>
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex';
-	import { db } from '@/firebase';
 
 	import Turns from '@/components/combat/Turns.vue';
 	import Players from './Players.vue';
@@ -139,14 +138,6 @@
 						icon: "fas fa-list-ul"
 					}
 				]
-			}
-		},
-		firebase() {
-			return {
-				broadcasting: {
-					source: db.ref(`broadcast/${this.userId}/live`),
-					asObject: true
-				}
 			}
 		},
 		computed: {
@@ -193,15 +184,7 @@
 				} else if(this.panel === "overview") {
 					this.panel = (direction === "previous") ? "npcs" : "overview";
 				}
-			},
-			broadcast() {
-				//Save the current campaign that is being broadcasted
-				if(this.broadcasting['.value'] == this.$route.params.campid) {
-					db.ref(`broadcast/${this.userId}/live`).remove()
-				} else {
-					db.ref(`broadcast/${this.userId}/live`).set(this.$route.params.campid)
-				}
-			},
+			}
 		}
 	}
 </script>

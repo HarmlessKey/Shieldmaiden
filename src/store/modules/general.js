@@ -94,18 +94,18 @@ export const general_module = {
 		setShareRolls({ commit }, payload) {
 			commit("SET_SHARE_ROLLS", payload)
 		},
-		setLive({state, rootGetters, commit}, { campaign_id, encounter_id }) {
+		setLive({state, rootGetters, commit}, { campaign_id, encounter_id, shares }) {
 			if(state.broadcast.live === campaign_id) {
 				db.ref(`broadcast/${rootGetters.user.uid}`).remove();
 				commit("SET_BROADCAST", {});
 			} else {
-				let broadcast = { live: campaign_id };
+				let broadcast = { live: campaign_id, shares };
 				if(encounter_id) broadcast.encounter = encounter_id;
 				db.ref(`broadcast/${rootGetters.user.uid}`).set(broadcast);
 				commit("SET_BROADCAST", broadcast);
 			}
 		},
-		setLiveEncounter({rootGetters, commit}, { encounter_id }) {
+		setLiveEncounter({rootGetters, commit}, encounter_id) {
 			const encounter = (encounter_id) ? encounter_id : false;
 			db.ref(`broadcast/${rootGetters.user.uid}/encounter`).set(encounter);
 			commit("SET_BROADCAST_ENCOUNTER", encounter);

@@ -1663,17 +1663,27 @@ html body {
 					}
 				}
 				&.roll {
-					width: 100%;
+					width: calc(100% + 30px);
+					margin: -13px -15px -15px -15px;
 
 					.roll_title {
-						text-align: center;
+						background: $gray;
 						font-size: 15px;
+						padding: 10px;
+						text-align: center;
 					}
 					.rolled {
-						line-height: 90px;
+						line-height: 130px;
 						width: 100%;
 						text-align: center;
 						font-size: 80px;
+						font-weight: bold;
+					}
+					.roll_footer {
+						text-align: center;
+						padding: 10px;
+						font-size: 15px;
+						background-color: $gray;
 					}
 				}
 			}

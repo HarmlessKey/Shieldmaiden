@@ -234,7 +234,7 @@
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
+							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
 
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -260,7 +260,7 @@
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
+							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
 							
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;

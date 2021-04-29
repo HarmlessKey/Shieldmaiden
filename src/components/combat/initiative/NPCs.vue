@@ -23,7 +23,7 @@
 					}"
 				/>
 				<div class="truncate">
-					<q-checkbox dark v-model="selected" :val="i" :label="entity.name" />
+					<q-checkbox dark v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
 				</div>
 				
 				<div class="actions">
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 
@@ -86,6 +86,14 @@
 				selectAll: []
 			}
 		},
+		computed: {
+			...mapGetters([
+				"broadcast"
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
+			},
+		},
 		methods: {
 			...mapActions([
 				'setSlide',
@@ -93,7 +101,7 @@
 			]),
 			rollMonster(e, key, entity, advantage_disadvantage) {
 				const advantage_object = (advantage_disadvantage) ? advantage_disadvantage : {};
-				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`, false, advantage_object);
+				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), "Initiative", entity.name, false, advantage_object, this.share);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
@@ -121,7 +129,7 @@
 					}
 				}
 				const advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
-				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", false, advantage_object).total;
+				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", undefined, false, advantage_object, this.share).total;
 
 				for(let i in this.selected) {
 					key = this.selected[i];

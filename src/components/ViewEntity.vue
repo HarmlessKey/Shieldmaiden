@@ -230,7 +230,7 @@
 			<p>
 				<template v-for="limit in innate_spell_levels" >
 					<div :key="`spell-${limit}`">
-						<template v-if="limit === 0">
+						<template v-if="limit === Infinity">
 							At will:
 						</template>
 						<template v-else>
@@ -283,7 +283,7 @@
 	import Spell from "@/components/compendium/Spell"
 
 	export default {
-		name: 'NPC',
+		name: 'ViewEntity',
 		mixins: [
 			general, 
 			dice, 
@@ -311,7 +311,7 @@
 		},
 		computed: {
 			entity() {
-				let entity = this.data;
+				let entity = JSON.parse(JSON.stringify(this.data));
 				if(entity.entityType === 'npc' && !entity.old) {
 					entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 				}
@@ -330,7 +330,7 @@
 				if(this.entity.innate_spells) {
 					let levels = [];
 					for(const spell of Object.values(this.entity.innate_spells)) {
-						const limit = (spell.limit) ? spell.limit : 0;
+						const limit = (spell.limit) ? spell.limit : Infinity;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
 					return levels.sort().reverse();
@@ -382,6 +382,7 @@
 			spellsForLimit(limit) {
 				return Object.entries(this.entity.innate_spells).filter(([key, item]) => { 
 					item.key = key;
+					if(item.limit === 0) item.limit = Infinity;
 					return item.limit == limit;
 				}).map(item => { return item[1] });
 			},

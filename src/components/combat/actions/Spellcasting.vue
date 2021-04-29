@@ -1,8 +1,15 @@
 <template>
-	<div v-if="current">
-		<h3 class="blue text-center">
-			<i class="fas fa-info-circle" /> Rollable spells are under development.
-		</h3>
+	<div v-if="entity">
+		<hk-tip 
+			value="spells-development" 
+			title="Spells under development" 
+		>
+			<template slot="content">
+				Rollable spells are currently under development. Join our 
+				<a href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">Discord</a> 
+				to stay up to date on all our updates.
+			</template>
+		</hk-tip>
 		<q-tabs
 			v-model="tab"
 			dark inline-label dense no-caps
@@ -21,15 +28,15 @@
 				<div class="caster-info">
 					<div>
 						<div>Casting ability</div>
-						<div class="value">{{ current[`${name}_ability`].substring(0,3).toUpperCase() }}</div>
+						<div class="value">{{ entity[`${name}_ability`].substring(0,3).toUpperCase() }}</div>
 					</div>
 					<div class="mx-3">
 						<div>Save DC</div>
-						<div class="value">{{ current[`${name}_save_dc`] }}</div>
+						<div class="value">{{ entity[`${name}_save_dc`] }}</div>
 					</div>
 					<div>
 						<div>Attack modifier</div>
-						<div class="value">{{ (current[`${name}_spell_attack`] > 0) ? `+${current[`${name}_spell_attack`]}` : current[`${name}_spell_attack`] }}</div>
+						<div class="value">{{ (entity[`${name}_spell_attack`] > 0) ? `+${entity[`${name}_spell_attack`]}` : entity[`${name}_spell_attack`] }}</div>
 					</div>
 				</div>
 
@@ -54,31 +61,31 @@
 				<!-- SPELLS -->
 				<template v-for="level in spell_levels">
 					<div v-if="displayLevels.includes(level)" :key="`spell-${level}`">
-						<div v-if="level == 0" class="spell-level">
+						<div v-if="level == 0 || level === Infinity" class="spell-level">
 							{{ (tab === "caster") ? "Cantrips" : "At will" }}
 						</div>
 						<div v-else-if="tab === 'caster'" class="spell-level">
 							{{ level | numeral('Oo') }} level
 							<div class="slots">
 								<span 
-									v-for="i in current[`${tab}_spell_slots`][level]" 
+									v-for="i in entity[`${tab}_spell_slots`][level]" 
 									:key="`slot-${i}`" 
 									class="ml-1"
 									@click="
-										(current.limited_uses[tab] && current.limited_uses[tab][level] >= i)
+										(entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i)
 										? useSpellSlot(level, tab, true)
 										: useSpellSlot(level, tab)
 									"
 								>
 									<i class="far" :class="
-										current.limited_uses[tab] && current.limited_uses[tab][level] >= i
+										entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
 										? 'fa-dot-circle'
 										: 'fa-circle'
 										"
 									/>
 									<q-tooltip anchor="top middle" self="center middle">
 										{{ 
-											current.limited_uses[tab] && current.limited_uses[tab][level] >= i
+											entity.limited_uses[tab] && entity.limited_uses[tab][level] >= i
 											? "Regain slot"
 											: "Spend slot"
 										}}
@@ -110,26 +117,26 @@
 											Cast
 										</a>
 									</q-item-section>
-									<q-item-section avatar v-else-if="level > 0">
+									<q-item-section avatar v-else-if="level < Infinity">
 										<div class="slots">
 											<span 
 												v-for="i in level" :key="`limited-${i}`" 
 												class="ml-1"
 												@click.stop="
-													(current.limited_uses[tab] && current.limited_uses[tab][spell.key] >= i)
+													(entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i)
 													? useSpellSlot(spell.key, tab, true)
 													: useSpellSlot(spell.key, tab)
 												"
 											>
 												<i class="far" :class="
-													current.limited_uses[tab] && current.limited_uses[tab][spell.key] >= i
+													entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
 													? 'fa-dot-circle'
 													: 'fa-circle'
 													"
 												/>
 												<q-tooltip anchor="top middle" self="center middle">
 													{{ 
-														current.limited_uses[tab] && current.limited_uses[tab][spell.key] >= i
+														entity.limited_uses[tab] && entity.limited_uses[tab][spell.key] >= i
 														? "Regain"
 														: "Spend"
 													}}
@@ -174,13 +181,16 @@
 			...mapGetters([
 				"spells"
 			]),
+			entity() {
+				return JSON.parse(JSON.stringify(this.current));
+			},
 			tabs() {
 				let tabs = [];
-				if(this.current.innate_ability) tabs.push({
+				if(this.entity.innate_ability) tabs.push({
 					name: "innate",
 					label: "Innate spellcasting"
 				});
-				if(this.current.caster_ability) tabs.push({
+				if(this.entity.caster_ability) tabs.push({
 					name: "caster",
 					label: "Spellcasting"
 				});
@@ -192,17 +202,19 @@
 			spell_levels() {
 				let levels = [];
 
-				if(this.current[`${this.tab}_spells`]) {
+				if(this.entity[`${this.tab}_spells`]) {
 					if(this.tab === "caster") {
-						for(const spell of Object.values(this.current[`${this.tab}_spells`])) {
+						for(const spell of Object.values(this.entity[`${this.tab}_spells`])) {
 							if(!levels.includes(spell.level)) levels.push(spell.level);
 						}
+						levels = levels.sort();
 					} else {
-						for(const spell of Object.values(this.current[`${this.tab}_spells`])) {
+						for(const spell of Object.values(this.entity[`${this.tab}_spells`])) {
+							if(spell.limit == 0) spell.limit = Infinity;
 							if(!levels.includes(spell.limit)) levels.push(spell.limit);
 						}
+						levels = levels.sort().reverse();
 					}
-					levels = levels.sort();
 				} 
 				return levels;
 			},
@@ -221,12 +233,12 @@
 			]),
 			spellsForLevel(type, level) {
 				if(type === "caster") {
-					return Object.entries(this.current[`${type}_spells`]).filter(([key, item]) => { 
+					return Object.entries(this.entity[`${type}_spells`]).filter(([key, item]) => { 
 						item.key = key;
 						return item.level <= level;
 					}).map(item => { return item[1] });
 				} else {
-					return Object.entries(this.current[`${type}_spells`]).filter(([key, item]) => {
+					return Object.entries(this.entity[`${type}_spells`]).filter(([key, item]) => {
 						item.key = key;
 						return item.limit == level;
 					}).map(item => { return item[1] });
@@ -243,7 +255,7 @@
 			},
 			useSpellSlot(index, category, regain=false) {
 				this.set_limitedUses({
-					key: this.current.key, 
+					key: this.entity.key, 
 					index, 
 					category, 
 					regain 
@@ -251,15 +263,15 @@
 			},
 			checkAvailable(type, level, key) {
 				if(type === 'caster') {
-					return !this.current.limited_uses 
-						|| !this.current.limited_uses[type] 
-						|| !this.current.limited_uses[type][level]
-						|| this.current.limited_uses[type][level] < this.current[`${type}_spell_slots`][level]
+					return !this.entity.limited_uses 
+						|| !this.entity.limited_uses[type] 
+						|| !this.entity.limited_uses[type][level]
+						|| this.entity.limited_uses[type][level] < this.entity[`${type}_spell_slots`][level]
 				} else {
-					return !this.current.limited_uses 
-						|| !this.current.limited_uses[type] 
-						|| !this.current.limited_uses[type][key]
-						|| this.current.limited_uses[type][key] < level
+					return !this.entity.limited_uses 
+						|| !this.entity.limited_uses[type] 
+						|| !this.entity.limited_uses[type][key]
+						|| this.entity.limited_uses[type][key] < level
 				}
 			}
 		},

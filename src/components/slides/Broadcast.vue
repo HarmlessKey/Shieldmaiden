@@ -31,7 +31,33 @@
 			return {
 				campaign_id: this.data.campaign_id,
 				encounter_id: this.data.encounter_id,
-				shares: []
+				shares: [],
+				rolls: [
+					{
+						label: "Action rolls",
+						value: "action_rolls"
+					},
+					{
+						label: "Initiative rolls",
+						value: "initiative_rolls"
+					},
+					{
+						label: "Ability checks",
+						value: "ability_rolls"
+					},
+					{
+						label: "Saving throws",
+						value: "save_rolls"
+					},
+					{
+						label: "Skill checks",
+						value: "skill_rolls"
+					},
+					{
+						label: "Skill checks",
+						value: "skill_rolls"
+					},
+				]
 			}
 		},
 		computed: {

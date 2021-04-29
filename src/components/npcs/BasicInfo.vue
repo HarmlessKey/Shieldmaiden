@@ -169,13 +169,18 @@
 				dark filled square
 				label="Challenge rating"
 				v-model="npc.challenge_rating" 
-				:options="Object.keys(monster_challenge_rating)"
+				:options="Object.keys(monster_challenge_rating).sort()"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 			>
 				<template v-slot:option="scope">
 					<q-list dark>
 						<q-item clickable v-ripple v-close-popup @click="$set(npc, 'challenge_rating', scope.opt)">
-							<q-item-section>{{ scope.opt }}</q-item-section>
+							<q-item-section>{{ 
+								(scope.opt == 0.125) ? "&#8539;" : 
+								(scope.opt == 0.25) ? "&#xbc;" :
+								(scope.opt == 0.5) ? "&#xBD;" :
+								scope.opt
+							}}</q-item-section>
 							<q-item-section avatar>{{ monster_challenge_rating[scope.opt].xp }} xp</q-item-section>
 						</q-item>
 					</q-list>
@@ -208,7 +213,7 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.armor_class" 
+						v-model.number="npc.armor_class" 
 						name="ac" 
 						:rules="[val => !!val || 'AC is required']"
 					>
@@ -224,7 +229,7 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.hit_points" 
+						v-model.number="npc.hit_points" 
 						name="hp" 
 						:rules="[val => !!val || 'HP is required']"
 					>

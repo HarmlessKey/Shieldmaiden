@@ -219,7 +219,7 @@
 				<p>
 					<template v-for="limit in innate_spell_levels" >
 						<div :key="`spell-${limit}`">
-							<template v-if="limit === 0">
+							<template v-if="limit === Infinity">
 								At will:
 							</template>
 							<template v-else>
@@ -371,7 +371,7 @@
 				if(this.monster.innate_spells) {
 					let levels = [];
 					for(const spell of Object.values(this.monster.innate_spells)) {
-						const limit = (spell.limit) ? spell.limit : 0;
+						const limit = (spell.limit) ? spell.limit : Infinity;
 						if(!levels.includes(limit)) levels.push(limit);
 					}
 					return levels.sort().reverse();
@@ -410,11 +410,11 @@
 			spellsForLimit(limit) {
 				return Object.entries(this.monster.innate_spells).filter(([key, item]) => { 
 					item.key = key;
+					if(item.limit === 0) item.imit = Infinity;
 					return item.limit == limit;
 				}).map(item => { return item[1] });
 			},
 			skillModifier(ability, skill) {
-				console.log(skill, this.calcMod(this.monster[ability]))
 				let mod = this.calculateSkillModifier(
 					this.calcMod(this.monster[ability]),
 					this.monster.skills ? (

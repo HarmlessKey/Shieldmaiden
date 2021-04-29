@@ -1,6 +1,6 @@
 <template>
 	<div v-if="current">
-		<p v-if="targeted.length === 0">No target selected</p>
+		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
 		<template v-else-if="current.entityType !== 'player'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
 				<!-- ACTIONS -->

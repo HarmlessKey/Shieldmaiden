@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<p v-if="targeted.length === 0" class="red">No target selected</p>
+		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
 		<template v-else>
 			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 

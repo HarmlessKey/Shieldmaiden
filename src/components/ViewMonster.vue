@@ -52,7 +52,11 @@
 						entity_name: monster.name.capitalizeEach(), 
 						notify: true
 					}"
-					:share="shares.includes('ability_rolls')"
+					:share="shares.includes('ability_rolls') ? { 
+						encounter_id: encounterId,
+						entity_key: monster.key
+					} : null"
+					
 				>
 					<div v-if="monster[ability]" class="ability">
 						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
@@ -79,7 +83,10 @@
 								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
-							:share="shares.includes('save_rolls')"
+							:share="shares.includes('save_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: monster.key
+							} : null"
 						>
 							<span class="save">
 								{{ ability.substring(0,3).capitalize() }} 
@@ -107,7 +114,10 @@
 								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
-							:share="shares.includes('skill_rolls')"
+							:share="shares.includes('skill_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: monster.key
+							} : null"
 						>
 							<span class="save">
 								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
@@ -161,7 +171,10 @@
 						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
-					:share="shares.includes('skill_rolls')"
+					:share="shares.includes('skill_rolls') ? { 
+						encounter_id: encounterId,
+						entity_key: monster.key
+					} : null"
 				>
 					<span class="skill">
 						<span class="truncate">
@@ -360,6 +373,7 @@
 		},
 		computed: {
 			...mapGetters([
+				"encounterId",
 				"broadcast"
 			]),
 			shares() {

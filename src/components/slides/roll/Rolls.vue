@@ -81,7 +81,7 @@
 		margin: 0;
 
 		li {
-			border-bottom: solid 1px$gray-hover;
+			border-bottom: solid 1px $gray-hover;
 			padding: 5px 0;
 
 			h3 {

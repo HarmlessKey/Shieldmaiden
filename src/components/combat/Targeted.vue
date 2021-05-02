@@ -150,7 +150,10 @@
 											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
-										:share="shares.includes('ability_rolls')"
+										:share="shares.includes('ability_rolls') ? { 
+											encounter_id: encounterId,
+											entity_key: key
+										} : null"
 									>
 										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 										<div class="mod bg-gray-dark">
@@ -167,7 +170,10 @@
 											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
-										:share="shares.includes('save_rolls')"
+										:share="shares.includes('save_rolls') ? { 
+											encounter_id: encounterId,
+											entity_key: key
+										} : null"
 									>
 										<div class="mod bg-gray-dark">
 											{{ savingThrow(entities[key], ability) }}
@@ -233,6 +239,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'encounterId',
 				'entities',
 				'turn',
 				'targeted',

@@ -63,9 +63,9 @@
 				default: false
 			},
 			share: {
-				type: Boolean,
+				type: Object,
 				required: false,
-				default: false
+				default: null
 			}
 		},
 		data() {

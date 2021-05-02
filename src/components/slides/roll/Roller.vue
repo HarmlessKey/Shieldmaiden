@@ -41,6 +41,7 @@
 <script>
 	import { dice } from '@/mixins/dice.js'
 	import Rolls from './Rolls';
+	import { mapGetters } from "vuex";
 
 	export default {
 		name: "DiceRoller",
@@ -64,6 +65,15 @@
 				},
 			}
 		},
+		computed: {
+			...mapGetters([
+				"broadcast",
+				"encounterId"
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("general_rolls")) || false;
+			}
+		},
 		methods: {
 			roll(e, d, item) {
 				let advantage = {};
@@ -82,7 +92,14 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(e, parseInt(die), item.n, item.mod, `${item.n}d${die} roll`, undefined, true, advantage);
+				let roll = this.rollD(
+					e, parseInt(die), item.n, item.mod, 
+					`${item.n}d${die} roll`, 
+					undefined, true, advantage,
+					this.share ? {
+						encounter_id: this.encounterId
+					} : null
+				);
 				item.result = roll.total;
 
 				this.log.unshift(roll);

@@ -30,7 +30,7 @@ export const dice = {
 		...mapActions([
 			"setRoll"
 		]),
-		rollD(e, d=20, n=1, m=0, title, entity_name=undefined, notify=false, advantage_disadvantage={}, share) {
+		rollD(e, d=20, n=1, m=0, title, entity_name=undefined, notify=false, advantage_disadvantage={}, share=null) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
 			let throws = [];
@@ -81,7 +81,6 @@ export const dice = {
 
 			const roll = {
 				title,
-				entity_name,
 				roll: showRoll,
 				d,
 				mod: s + m,
@@ -91,6 +90,7 @@ export const dice = {
 				advantage_disadvantage,
 				ignored
 			}
+			if(entity_name) roll.entity_name = entity_name;
 			
 			if(notify) {
 				let advantage;
@@ -117,7 +117,6 @@ export const dice = {
 			if(share && this.broadcast.live) {
 				const key = Date.now() + Math.random().toString(36).substring(4);
 				let share_roll = {...roll};
-				if(entity_name) share_roll.entity_name = entity_name;
 
 				// Remove unneeded properties
 				delete share_roll.throws;
@@ -130,13 +129,18 @@ export const dice = {
 				} else {
 					share_roll.advantage_disadvantage = Object.keys(advantage_disadvantage)[0].charAt(0);
 				}
-				console.log(share_roll)
-				// Push the roll
-				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set({
+				
+				let share_object = {
 					key,
 					type: "roll",
 					notification: share_roll
-				});
+				}
+
+				if(share.encounter_id) share_object.encounter_id = share.encounter_id;
+				if(share.entity_key) share_object.entity_key = share.entity_key;
+				
+				// Push the roll
+				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share_object);
 			}
 
 			this.setRoll(roll);

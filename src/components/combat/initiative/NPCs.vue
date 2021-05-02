@@ -88,6 +88,7 @@
 		},
 		computed: {
 			...mapGetters([
+				"encounterId",
 				"broadcast"
 			]),
 			share() {
@@ -101,7 +102,14 @@
 			]),
 			rollMonster(e, key, entity, advantage_disadvantage) {
 				const advantage_object = (advantage_disadvantage) ? advantage_disadvantage : {};
-				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), "Initiative", entity.name, false, advantage_object, this.share);
+				let roll = this.rollD(
+					e, 20, 1, 
+					this.calcMod(entity.dexterity), 
+					"Initiative", entity.name, 
+					false, 
+					advantage_object, 
+					this.share ? { encounter_id: this.encounterId, entity_key: key } : null
+				);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
@@ -129,7 +137,15 @@
 					}
 				}
 				const advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
-				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", undefined, false, advantage_object, this.share).total;
+				const roll = this.rollD(
+					e.e, 20, 1, 
+					this.calcMod(dex), 
+					"Group initiative", 
+					undefined, 
+					false, 
+					advantage_object, 
+					this.share ? { encounter_id: this.encounterId } : null
+				).total;
 
 				for(let i in this.selected) {
 					key = this.selected[i];

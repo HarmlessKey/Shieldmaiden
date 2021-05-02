@@ -280,7 +280,13 @@
 			},
 			rollInitiative(e) {
 				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
-				const roll = this.rollD(e, 20, 1, mod, "Initiative", this.entity.name ? this.entity.name : "Unnamed", false, {}, this.share);
+				const roll = this.rollD(
+					e, 20, 1, mod, 
+					"Initiative", 
+					this.entity.name ? this.entity.name : "Unnamed", 
+					false, {}, 
+					this.share ? { encounter_id: this.encounterId } : null
+				);
 				this.$set(this.entity, "initiative", Number(roll.total));
 			},
 			set(id, type) {

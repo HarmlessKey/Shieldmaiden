@@ -52,8 +52,18 @@
 						</div>
 					</q-scroll-area>
 				</div>
-				<div class="shares">
-					<Shares :shares="shares" />
+				<div class="shares-bar" :class="{ shown: showShares }">
+					<div class="show" @click="showShares = !showShares">
+						<i class="fas fa-chevron-left" />
+					</div>
+					<Shares 
+						:shares="shares" 
+						:encounter_id="encounter.key" 
+						:entities="encounter.entities" 
+						:npcs="npcs" 
+						:players="players"
+						:npcSettings="npcSettings"
+					/>
 				</div>
 			</div>
 
@@ -182,6 +192,7 @@
 				counter: 0,
 				rolls: [],
 				weather: true,
+				showShares: false,
 				panels: [
 					{
 						label: "Initiative list",
@@ -356,7 +367,7 @@
 	
 
 	&.desktop {
-		grid-template-columns: 3fr 1fr minmax(250px, 330px);
+		grid-template-columns: 3fr 1fr minmax(200px, 250px);
 		grid-template-rows: 1fr;
 		grid-gap: 15px;
 
@@ -384,6 +395,14 @@
 				}
 			}
 		}
+		.shares-bar {
+			.show {
+				display: none;
+			}
+			.shares {
+				width: 100%;
+			}
+		}
 	}
 	&.mobile {
 		grid-template-rows: 60px 1fr;
@@ -402,19 +421,65 @@
 	}
 }
 
-@media only screen and (max-width: 1000px) {
-	.track.desktop {
-		grid-template-columns: 3fr 1fr minmax(200px, 250px);
-	}
-}
 @media only screen and (max-width: 576px) {
 	.weather {
 		top: 120px;
 		height: calc(100% - 120px);
 	}
 }
+@media only screen and (max-width: 900px) {
+	.track.desktop {
+		grid-template-columns: 2fr 1fr !important;
+
+		.side {
+			padding-right: 15px;
+		}
+		.shares-bar {
+			width: 250px;
+			position: absolute;
+			right: -250px;
+			display: flex;
+			justify-content: center;
+			transition: all .5s linear;
+
+			.show {
+				background-color: $blue;
+				color: $white;
+				display: block;
+				width: 18px;
+				text-align: center;
+				cursor: pointer;
+				height: 50px;
+				line-height: 50px;
+				position: absolute;
+				top: 50%;
+				left: -18px;
+				transform: translateY(-50%);
+
+				i {
+					transition: all .3s linear;
+				}
+			}
+			&.shown {
+				right: 0;
+
+				.show {
+					i {
+						transform: rotate(180deg);
+					}
+				}
+			}
+		}
+	}
+}
+@media only screen and (max-width: 992px) {
+	.track.desktop {
+		grid-template-columns: 3fr 1fr minmax(180px, 200px);
+	}
+}
 @media only screen and (min-width: 1250px) {
 	.track.desktop {
+		grid-template-columns: 3fr 1fr minmax(250px, 300px);
 		grid-gap: 30px;
 
 		.initiative {

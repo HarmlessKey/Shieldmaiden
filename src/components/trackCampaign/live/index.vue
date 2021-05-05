@@ -36,7 +36,6 @@
 						:playerSettings="playerSettings"
 						:screenWidth="width"
 						:npcSettings="npcSettings"
-						@newRoll="pushRoll"
 					/>
 					<Rewards v-else :encounter="encounter"/>
 				</div>
@@ -58,7 +57,7 @@
 					</div>
 					<Shares 
 						:shares="shares" 
-						:encounter_id="encounter.key" 
+						:encounterId="encounter.key" 
 						:entities="encounter.entities" 
 						:npcs="npcs" 
 						:players="players"
@@ -124,7 +123,6 @@
 							:playerSettings="playerSettings"
 							:npcSettings="npcSettings"
 							:screenWidth="width"
-							@newRoll="pushRoll"
 						/>
 						<Rewards v-else :encounter="encounter"/>
 					</q-tab-panel>
@@ -135,12 +133,14 @@
 							:players="players"
 						/>
 					</q-tab-panel>
-					<q-tab-panel name="rolls">
-						<Rolls 
+					<q-tab-panel name="shares">
+						<Shares 
+							:shares="shares" 
+							:encounterId="encounter.key" 
 							:entities="encounter.entities" 
 							:npcs="npcs" 
-							:players="players" 
-							:rolls="rolls"
+							:players="players"
+							:npcSettings="npcSettings"
 						/>
 					</q-tab-panel>
 				</q-tab-panels>
@@ -162,7 +162,6 @@
 	import Turns from './Turns.vue';
 	import Initiative from './Initiative.vue';
 	import Meters from '../Meters.vue';
-	import Rolls from './Rolls.vue';
 	import RollForInitiative from './RollForInitiative.vue';
 
 	export default {
@@ -171,7 +170,6 @@
 			Turns,
 			Initiative,
 			Meters,
-			Rolls,
 			RollForInitiative,
 			Shares: () => import('../Shares'),
 			Rewards: () => import('./Rewards'),
@@ -205,9 +203,9 @@
 						icon: "fas fa-swords"
 					},
 					{
-						label: "Shared rolls",
-						value: "rolls",
-						icon: "fas fa-dice-d20"
+						label: "Shares",
+						value: "shares",
+						icon: "fas fa-share"
 					}
 				]
 			}
@@ -333,11 +331,6 @@
 			}
 		},
 		methods: {
-			pushRoll(roll) {
-				if(roll) {
-					this.rolls.unshift(roll);
-				}
-			},
 			setWeather(value) {
 				this.weather = value;
 			}

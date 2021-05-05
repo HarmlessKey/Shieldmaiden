@@ -1,6 +1,7 @@
 import { db } from '@/firebase';
 import { skills } from '@/mixins/skills';
 import { abilities } from '@/mixins/abilities';
+import { monsterMixin } from '@/mixins/monster';
 import Vue from 'vue';
 
 
@@ -1186,6 +1187,8 @@ const mutations = {
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
 					entity.lengendary_count = data_npc.lengendary_count;
+
+					if(entity.challenge_rating) entity.proficiency = monsterMixin.data().monster_challenge_rating[entity.challenge_rating].proficiency;
 		
 					if(data_npc.source) entity.source = data_npc.source;
 					

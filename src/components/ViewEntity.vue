@@ -340,7 +340,7 @@
 			},
 			entity() {
 				let entity = JSON.parse(JSON.stringify(this.data));
-				if(entity.entityType === 'npc' && !entity.old) {
+				if(entity.entityType === 'npc' && !entity.old && !entity.proficiency) {
 					entity.proficiency = this.monster_challenge_rating[entity.challenge_rating].proficiency;
 				}
 				return entity;

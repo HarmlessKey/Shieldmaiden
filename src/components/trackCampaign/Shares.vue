@@ -1,11 +1,10 @@
 <template>
 	<div class="shares">
 		<q-scroll-area dark :thumb-style="{ width: '5px'}">
-			<!-- entities: {{ entities }} -->
 			<ul class="shared">
-				<template v-for="({type, encId: encounter_id, entity_key, notification}, index) in shares">
+				<template v-for="({type, encounter_id, entity_key, notification}, index) in shares">
 					<!-- Only show notifications with an encounter_id in that encounter -->
-					<template v-if="!encounter_id || !encId || encounter_id === encId">
+					<template v-if="(!encounterId && !encounter_id) || encounterId === encounter_id">
 						<!-- Rolls -->
 						<li v-if="type === 'roll'" :key="`roll-${index}`" class="roll">
 							<div>
@@ -80,7 +79,7 @@
 				type: Array,
 				default: undefined
 			},
-			encounter_id: {
+			encounterId: {
 				type: String,
 				default: undefined
 			},
@@ -120,7 +119,7 @@
 <style lang="scss" scoped>
 	.shares {
 		background-color: rgba(0, 0, 0, .7);
-		height: calc(100vh - 110px);
+		height: 100%;
 		backdrop-filter: blur(1px);
 
 		.q-scrollarea {
@@ -130,7 +129,7 @@
 			ul.shared {
 				padding: 0;
 				list-style: none;
-				margin: 0;
+				margin: 0 0 20px 0;
 
 				li.roll {
 					
@@ -207,6 +206,16 @@
 						}
 					}
 				}
+			}
+		}
+	}
+	@media only screen and (max-width: 576px) {
+		.shares {
+			background: none;
+			height: calc(100vh - 170px);
+
+			.q-scrollarea {
+				padding: 10px 5px 0 0;
 			}
 		}
 	}

@@ -99,7 +99,7 @@
 						name: "meters",
 						icon: "fas fa-swords",
 						title: "Damage/healing meters",
-						text: "Give your players a little insight in their character's worth by showing them "+
+						text: "Give your players a little insight in their characters worth by showing them "+
 							"how much damage and healing they did."
 					},
 					{
@@ -114,7 +114,8 @@
 						icon: "fas fa-cloud-showers",
 						title: "Weather effects",
 						text: "Add a layer with weather effects to your background. "+
-							"Isn't that battle on a winter landscape even better with intense snowfall?"
+							"Isn't that battle on a winter landscape even better with intense snowfall? "+
+							"Or what about ash raining down during combat in a burning village?"
 					},
 					{
 						name: "customization",

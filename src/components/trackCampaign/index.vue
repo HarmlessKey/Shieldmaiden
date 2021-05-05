@@ -18,7 +18,13 @@
 					</span>
 				</div>
 				<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-					<CampaignOverview :players="players" :campaign-players="campaign.players" :width="width" />
+					<CampaignOverview 
+						:players="players" 
+						:campaign-players="campaign.players" 
+						:width="width" 
+						:shares="shares"
+						:live="broadcasting['.value'] === $route.params.campid"
+					/>
 				</div>
 			</template>
 
@@ -99,8 +105,7 @@
 		watch: {
 			shared(share, oldShare) {
 				//Check if the roll has not been shown before
-				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
-				if(share && share.key !== oldShare.key) {
+				if((share && !oldShare) || (share && share.key !== oldShare.key)) {
 					const notification = share.notification;
 					if(share.type === "roll") {
 						let advantage;

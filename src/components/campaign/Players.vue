@@ -451,6 +451,7 @@
 			cursor: pointer;
 			grid-area: money;
 			line-height: 15px;
+			color: $white;
 
 			div {
 				margin-right: 10px;
@@ -509,10 +510,11 @@
 		.col {
 			min-height: 35px;
 			padding: 12px 10px;
-			background-color:$gray;
+			background-color: $gray;
 
 			&.header {
 				background: none;
+				color: $white;
 			}
 			&.ac {
 				text-align: center;

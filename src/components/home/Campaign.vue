@@ -68,7 +68,7 @@
 						icon: "fas fa-heartbeat",
 						title: "Player status",
 						text: "Keep track of player status outside combat.<br/>"+
-							"You have quick overview of their senses at hand and you "+
+							"You have a quick overview of their senses at hand and you "+
 							"always know how they're doing health wise."
 					},
 					{

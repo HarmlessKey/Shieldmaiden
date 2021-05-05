@@ -305,21 +305,10 @@
 				if(this.width < 450) return 2;
 				if(this.width < 550) return 3;
 				if(this.width < 600) return 4;
-				if(this.width < 750) return 6;
-				if(this.width < 850) return 7;
-				if(this.width < 900) return 8;
-				if(this.width >= 911) {
-					if(this.width < 930) return 4;
-					if(this.width < 960) return 5;
-					if(this.width < 1100) return 6;
-					return 7;
-				}
+				if(this.width < 750) return 5;
+				if(this.width < 850) return 6;
+				if(this.width < 900) return 7;
 				return 9;
-			},
-			lastRoll() {
-				if(this.encounter) {
-					return this.encounter.lastRoll;
-				}
 			}
 		},
 		mounted() {
@@ -344,89 +333,12 @@
 				});
 			}
 		},
-		watch: {
-			lastRoll(roll, oldRoll) {
-				//Check if the roll has not been shown before
-				//Some weird issue seems to trigger the watch multiple times when damage of the roll is applied
-				if(roll && roll.timestamp !== oldRoll.timestamp) {
-					this.$emit('newRoll', roll);
-
-					let crit;
-					if(roll.crit) {
-						crit = (roll.crit === 20) ? `<div class="advantage green">critical</div>` : `<div class="advantage red">critical</div>`;
-					}
-
-					let toHitDisplay;
-					if(roll.toHitTotal) {
-						toHitDisplay = `<div class="roll">`;
-						toHitDisplay += (crit) ? crit : ``;
-						toHitDisplay += (roll.toHit) ? `<div class="top">${roll.toHit} + ${roll.hitMod}</div>` : `<div class="top"></div>`;
-						toHitDisplay += `<h2><b>${roll.toHitTotal}</b></h2><div class="bottom">to hit</div>`;
-						toHitDisplay += `</div>`;
-					}
-
-					this.$snotify.html(
-						`<div class="snotifyToast__title">
-								${this.notificationTargets(roll.targets)}
-							</div>
-							<div class="snotifyToast__body">
-								<div class="display-rolls">
-									${(toHitDisplay) ? toHitDisplay : ``}
-
-									<div class="roll">
-										${roll.damageMod ? `<div class="top">${roll.damage} + ${roll.damageMod}</div>` : '<div class="top"></div>'}
-										<h2>
-											<b class="red">${roll.damageTotal}</b>
-										</h2>
-										<div class="bottom">damage</div>
-									</div>
-								</div>
-							</div>
-						</div> `, {
-						timeout: 8000,
-						closeOnClick: true
-					});
-				}
-			}
-		},
 		methods: {
 			...mapActions([
 				'setSlide'
 			]),
 			setSize() {
 				this.width = this.$refs.initiative.clientWidth;
-			},
-			notificationTargets(targets) {
-				let returnTargets = [];
-				for(const key of targets) {
-					const entity = this.encounter.entities[key];
-
-					let html = '<div class="target">';
-					html += `<div class="image" style="background-image: url(${entity.img});"></div>`;
-
-					//AC
-					if(this.playerSettings.ac === undefined && (entity.entityType === 'player' || entity.entityType === 'companion') 
-						|| (entity.entityType == 'npc' && this.displayNPCField('ac', entity) == true)) {
-						
-						const dispAC = this.displayAc(entity, this.players[entity.key], this.npcs[entity.key], this.camp_data(entity))
-						const ac = dispAC.ac
-						const bonus = dispAC.bonus;
-
-						html += `<div class="ac">`;
-						html += (bonus) ? ac + bonus : ac;
-						html += `</div>`;
-					} else {
-						html += `<div class="ac">?</div>`;
-					}
-
-
-					html += `<div class="name truncate">${this.encounter.entities[key].name}</div>`;
-					html += `</div>`;
-
-					returnTargets.push(html);
-				}
-
-				return returnTargets.join("");
 			},
 			target(e, type, key) {
 				//Select the target
@@ -716,23 +628,46 @@
 
 			th {
 				padding: 5px 0;
+
+				&.ac {
+					width: 33px;
+				}
 			}
-			td {
-				padding: 5px 0;
-
-				&.image {
-					width: 35px !important;
-
-					.img {
-						width: 33px !important;
-						height: 33px !important;
-					}
+			tbody {
+				tr {
+					td {
+						padding: 5px 0;
+		
+						&.image {
+							width: 35px;
+		
+							.img {
+								width: 33px;
+								height: 33px;
+							}
+						}
+						&.init {
+							width: 35px;
+						}
+						&.ac {
+							.ac_wrapper {
+								height: 31px;
+						
+								i, .value {
+									line-height: 31px;
+								}
+								i {
+									font-size: 22px;
+								}
+								.value {
+									font-size: 18px;
+								}
+							}
+						}
+					}			
 				}
-				&.init, &.ac {
-					width: 35px;
 				}
-			}			
-		}
+			}
 	}
 	.q-tabs {
 		height: 60px;
@@ -774,22 +709,14 @@
 								&.ac {
 									.ac_wrapper {
 										height: 44px;
-										position: relative;
 								
 										i, .value {
-											width: 100% !important;
-											position: absolute;
 											line-height: 44px;
-											text-align: center;
 										}
 										i {
 											font-size: 48px;
-											color: #5c5757;
 										}
 										.value {
-											font-weight: bold;
-											color: #fff;
-											margin-top: -1px;
 											font-size: 23px;
 										}
 									}

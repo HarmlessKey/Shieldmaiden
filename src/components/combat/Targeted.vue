@@ -370,7 +370,9 @@
 				} else {
 					proficiency = entity.proficiency;
 				}
-				const save = (entity.saving_throws && entity.saving_throws.includes(ability)) ? parseInt(this.modifier(entity[ability])) + proficiency : parseInt(this.modifier(entity[ability]));
+				const save = (entity.saving_throws && entity.saving_throws.includes(ability)) 
+					? parseInt(this.modifier(entity[ability])) + proficiency 
+					: parseInt(this.modifier(entity[ability]));
 				return (save > 0) ? `+${save}` : save;
 			}
 		}

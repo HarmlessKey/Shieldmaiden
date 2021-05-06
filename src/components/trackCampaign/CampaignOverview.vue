@@ -1,7 +1,9 @@
 <template>
 	<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 		<div class="players">
-			<h3>Campaign Players</h3>
+			<h3>Campaign Players
+				
+			</h3>
 			<q-scroll-area dark :thumb-style="{ width: '5px'}">
 				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
 			</q-scroll-area>
@@ -109,13 +111,8 @@
 			}
 		},
 		methods: {
-			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
-			},
-			maxHp(maxHp, maxHpMod) {
-				return maxHp + maxHpMod;
-			},
+
+			
 		}
 	}
 </script>

@@ -95,8 +95,8 @@
 								<q-item-section avatar>
 									<q-icon :name="scope.opt.icon"/>
 								</q-item-section>
-								<q-item-section>
 									<q-item-label v-html="scope.opt.label"/>
+								<q-item-section>
 								</q-item-section>
 							</q-item>
 						</template>
@@ -389,6 +389,8 @@
 			}
 		}
 		.shares-bar {
+			height: 100%;
+			
 			.show {
 				display: none;
 			}

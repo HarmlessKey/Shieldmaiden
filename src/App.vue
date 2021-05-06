@@ -81,10 +81,11 @@
 				{	property: "og:type", content: "website" },
 				{
 					property: "og:description",
+					name: "description",
 					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
 				{	property: "og:url", content: `https://harmlesskey.com${this.$route.path}` },
-				{	property: "og:image", content: `https://harmlesskey.com/linkedin.png` },
+				{	property: "og:image", name: "image", content: `https://harmlesskey.com/linkedin.png` },
 				{	property: "og:image:type", content: "image/png" },
 				{	property: "og:image:alt", content: "Harmless Key Logo" },
 			]

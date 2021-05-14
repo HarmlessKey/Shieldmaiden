@@ -104,13 +104,13 @@
 				// If there was a broadcast but it's disconnected
 				// But there still is a broadcast in the store
 				// Notify the user and let them restart the broadcast
-				if((oldVal && oldVal.live && !newVal) && this.storeBroadcast) {
+				if((oldVal && oldVal.live && !newVal) && (this.storeBroadcast && Object.keys(this.storeBroadcast).length > 0)) {
+					console.log(this.storeBroadcast)
 					this.$q.notify({
 						message: 'Broadcast interrupted',
 						caption: 'Would you like to continue your broadcast?',
 						color: "red",
 						position: "top",
-						progress: true,
 						timeout: 0,
 						icon: "far fa-dot-circle",
 						actions: [

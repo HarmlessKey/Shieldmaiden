@@ -134,7 +134,7 @@
 							</a>
 						</div>
 						<div class="scores">
-							<template v-for="({ability}, index) in abilities">
+							<template v-for="(ability, index) in abilities">
 								<div
 									:key="`score-${index}`" 
 									v-if="entities[key][ability]"
@@ -198,43 +198,24 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import ViewEntity from '@/components/ViewEntity.vue';
-	import Conditions from '@/components/combat/Conditions.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
+	import { abilities } from '@/mixins/abilities.js';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetInfo from '@/components/combat/TargetInfo.vue';
 	import { experience } from '@/mixins/experience.js';
-
+	
 
 	export default {
 		name: 'Targeted',
-		mixins: [dice, experience],
+		mixins: [dice, experience, abilities],
 		components: {
-			ViewEntity,
-			Conditions,
-			Reminders,
 			TargetItem,
 			TargetInfo
 		},
 		data() {
 			return {
 				setShadow: 0,
-			}
-		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					asObject: true,
-				},
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				},
-				abilities: db.ref('abilities')
 			}
 		},
 		computed: {

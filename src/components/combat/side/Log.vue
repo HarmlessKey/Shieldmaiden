@@ -4,7 +4,6 @@
 				<h2 v-if="!encounter.finished">Combat log</h2>
 				<transition-group v-if="entities && Object.keys(log).length > 0" tag="ul" name="log" enter-active-class="anitmated slideInDown">
 					<li v-for="(item, key) in log" :key="`item-${key}`">
-
 						<!-- Metadata -->
 						<div class="d-flex justify-content-between head">
 							<span>
@@ -40,7 +39,7 @@
 								</span>
 
 								<!-- To hit -->
-								<span v-if="action.hitOrMiss">
+								<span v-else-if="action.hitOrMiss">
 									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
 									<span :class="action.crit ? 'blue' : action.hitOrMiss === 'hit' ? 'green' : 'red'">
 										{{ action.crit ? "Critted" : action.hitOrMiss === "hit" ? "hit" : "missed" }}
@@ -49,7 +48,7 @@
 								</span>
 
 								<!-- Saving throw -->
-								<span v-if="action.savingThrowResult">
+								<span v-else-if="action.savingThrowResult">
 									<b>{{item.target_name.capitalizeEach() }}</b> had a
 									<span :class="action.savingThrowResult === 'save' ? 'green' : 'red'">
 										{{ action.savingThrowResult === 'save' ? "successful" : "failed" }}
@@ -58,9 +57,15 @@
 								</span>
 
 								<!-- Healing -->
-								<span v-if="action.type === 'healing'">
+								<span v-else-if="action.type === 'healing'">
 									<b>{{item.by_name.capitalizeEach() }}s</b> {{ item.ability }} healed
 									<b>{{item.target_name.capitalizeEach() }}</b> for
+								</span>
+
+								<!-- Damage rolls with no to hit or save -->
+								<span v-else>
+									<b>{{ item.by_name.capitalizeEach() }}</b>{{ item.ability ? `s ${item.ability}` : `` }}
+									damaged <b>{{ item.target_name.capitalizeEach() }}</b> for
 								</span>
 
 								<!-- Rolls -->
@@ -141,7 +146,7 @@
 			undo(key, value, over, target, by, type) {
 				type = (type == 'damage') ? 'healing' : 'damage';
 				let undo = (over > 0) ? over : true; //Send the over value as undo true/false
-				let doneBy = (by == 'environment') ? this.environment : this.entities[by];
+				let doneBy = (by === 'environment') ? this.environment : this.entities[by];
 				let amount = {};
 				amount[type] = value;
 				

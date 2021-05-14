@@ -6,7 +6,7 @@
 					<!-- Only show notifications with an encounter_id in that encounter -->
 					<template v-if="(!encounterId && !encounter_id) || encounterId === encounter_id">
 						<!-- Rolls -->
-						<li v-if="type === 'roll'" :key="`roll-${index}`" class="roll">
+						<li v-if="['roll', 'action_roll'].includes(type)" :key="`roll-${index}`" class="roll">
 							<div>
 								<h3>
 									<!-- IMAGE -->
@@ -50,14 +50,69 @@
 										</div>
 									</div>
 								</h3>
-								<div class="result">
-									<span class="roll">
-										<span v-html="advantage(notification.advantage_disadvantage)" /> 
-										{{ notification.roll }}
-									</span>
-									<span class="total white">
-										{{ notification.total }}
-									</span>
+								<div class="result-wrapper" :class="{ action: type === 'action_roll' }">
+									<div v-if="type === 'roll'" class="result">
+										<span class="roll">
+											<span v-if="notification.advantage_disadvantage" v-html="advantage(notification.advantage_disadvantage)" /> 
+											{{ notification.roll }}
+										</span>
+										<span class="total white">
+											{{ notification.total }}
+										</span>
+									</div>
+
+									<!-- ACTION ROLLS -->
+									<div v-else v-for="(action, index) of notification.actions" :key="`action-${index}`">
+										<div v-if="notification.targets" class="targets">
+											<template v-for="target in notification.targets">
+												<div v-if="entities && Object.keys(entities).includes(target)" :key="target">
+													<icon 
+														v-if="['monster', 'player', 'companion'].includes(displayImg(entities[target], players[target], npcs[target]))"
+														class="img"
+														:icon="displayImg(entities[target], players[target], npcs[target])" 
+														:fill="entities[target].color_label" :style="entities[target].color_label ? `border-color: ${entities[target].color_label}` : ``"
+													/>
+													<div 
+														v-else 
+														class="img"			 
+														:style="{ 
+															backgroundImage: 'url(\'' + displayImg(entities, players[target], npcs[target]) + '\')',
+															'border-color': entities[target].color_label ? entities[target].color_label : ''
+														}"
+													/>
+													<q-tooltip anchor="top middle" self="center middle">
+														{{ entities[target].name.capitalizeEach() }}
+													</q-tooltip>
+												</div>
+											</template>
+										</div>
+
+										<div v-if="action.toHit" class="result toHit">
+											<span class="roll">
+												<span class="icon">
+													<icon icon="swords" class="gray-light" />
+													<q-tooltip anchor="top middle" self="center middle">
+														To hit roll
+													</q-tooltip>
+												</span>
+												<span v-html="advantage(action.toHit.advantage_disadvantage)" /> 
+												{{ action.toHit.roll }}
+											</span>
+											<span class="total white">
+												{{ action.toHit.total }}
+											</span>
+										</div>
+
+										<div v-for="(roll, roll_index) in action.rolls" class="result " :key="`action-roll-${roll_index}`">
+											<span class="roll">
+												<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
+												{{ roll.roll }}
+											</span>
+											<span class="total" :class="roll.damage_type">
+												{{ roll.total }}
+											</span>
+										</div>
+									</div>
 								</div>
 							</div>
 						</li>
@@ -70,10 +125,11 @@
 
 <script>
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import { damage_types } from "@/mixins/damageTypes.js";
 
 	export default {
 		name: "Shares",
-		mixins: [trackEncounter],
+		mixins: [trackEncounter, damage_types],
 		props: {
 			shares: {
 				type: Array,
@@ -186,23 +242,74 @@
 							}
 						}
 					}
-					.result {
-						padding: 5px 8px;
+					.result-wrapper {
+						padding: 8px;
 						background-color: $gray-dark;
-						font-size: 18px;
-						line-height: 35px;
-						display: grid;
-						grid-template-columns: auto min-content;
 
-						.roll {
-							white-space: nowrap; 
-							overflow: hidden;
-							text-overflow: ellipsis;
+						.result {
+							font-size: 18px;
+							height: 35px;
+							line-height: 35px;
+							display: grid;
+							grid-template-columns: auto min-content;
+
+							.roll {
+								white-space: nowrap; 
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+							.total {
+								text-align: right;
+								white-space: nowrap;
+								font-size: 25px;
+							}
 						}
-						.total {
-							text-align: right;
-							white-space: nowrap;
-							font-size: 25px;
+						&.action {
+							.targets {
+								display: flex;
+								justify-content: center;
+								height: 25px;
+								margin: 10px 0;
+
+								.img {
+									background-color: $gray-dark;
+									background-position: center top;
+									background-repeat: no-repeat;
+									background-size: cover;
+									width: 23px; 
+									height: 23px;
+									border: solid 1px transparent;
+									margin: 0 2px;
+								}
+							}
+							.result {
+								padding: 3px 8px;
+								background: $black;
+								margin-bottom: 5px;
+								line-height: 29px;
+
+								&:last-child {
+									margin-bottom: 0;
+								}
+								&.toHit {
+									border-bottom: solid 1px $gray;
+									background: none;
+									padding: 0 3px 5px 3px;
+									height: 35px;
+									line-height: 30px;
+									
+									.roll {
+										display: flex;
+
+										.icon {
+											display: inline-block;
+											margin-right: 8px;
+											width: 30px;
+											height: 30px;
+										}
+									}
+								}
+							}
 						}
 					}
 				}

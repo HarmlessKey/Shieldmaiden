@@ -273,8 +273,11 @@
 				"entities",
 				"turn",
 				"targeted",
-				"share_rolls"
+				"broadcast"
 			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("action_rolls")) || false;
+			},
 			tab: {
 				get() {
 					let tab = "actions";
@@ -298,7 +301,6 @@
 			...mapActions([
 				"setSlide",
 				"setActionRoll",
-				"setShareRolls",
 				"set_limitedUses"
 			]),
 			roll(e, action_index, action, category, versatile) {
@@ -311,6 +313,7 @@
 				// Roll once for AOE
 				if(action.aoe_type) {
 					roll = this.rollAction(e, action, config);
+					if(this.share) this.shareRoll(roll, this.targeted);
 				}
 
 				// Check for limited uses
@@ -327,6 +330,7 @@
 					// Reroll for each target if it's not AOE
 					if(!action.aoe_type) {
 						newRoll = this.rollAction(e, action, config);
+						if(this.share) this.shareRoll(newRoll, [key]);
 					}
 
 					// Set the target and current
@@ -356,47 +360,49 @@
 					return !this.current.limited_uses[category] || !this.current.limited_uses[category][index];
 				}
 			},
-			shareRoll(targets, toHit, damage, hitMod, damageMod) {
-				var showRoll = {
-					targets,
-					timestamp: Date.now()
+			shareRoll(roll, targets) {
+				console.log(roll)
+				const key = Date.now() + Math.random().toString(36).substring(4);
+				let share = {
+					key,
+					type: "action_roll",
+					entity_key: this.current.key,
+					encounter_id: this.encounterId,
+					notification: {
+						title: roll.name,
+						targets,
+						actions: []
+					}
 				};
-
-				//Show to hit roll
-				if(this.toHit) {
-					if (Object.values(this.rollOptions).includes('toHit')) {
-						if(toHit === 20) {
-							showRoll.crit = 20;
-						} else if(toHit === 1) {
-							showRoll.crit = 1;
+				roll.actions.forEach((action, action_index) => {
+					share.notification.actions[action_index] = {
+						rolls: []
+					};
+					// To hit
+					if(action.toHit) {
+						const toHit = action.toHit;
+						share.notification.actions[action_index].toHit = {
+							roll: toHit.roll,
+							total: toHit.total
 						}
-						showRoll.toHitTotal = parseInt(toHit) + parseInt(hitMod);
-
-						//Show Modifier
-						if(Object.values(this.rollOptions).includes('modifiers')) {
-							showRoll.toHit = toHit;
-							if(hitMod) {
-								showRoll.hitMod = hitMod;
-							}
-						}
+						if(toHit.ignored) share.notification.actions[action_index].toHit.advantage_disadvantage = this.advantage(toHit.advantage_disadvantage);
 					}
-				}
 
-				//Show damage roll
-				if (Object.values(this.rollOptions).includes('damage')) {
-					showRoll.damageTotal = (damageMod) ? parseInt(damage) + parseInt(damageMod) : parseInt(damage);
-
-					//Show Modifier
-					if(Object.values(this.rollOptions).includes('modifiers')) {
-						showRoll.damage = damage;
-						if(damageMod) {
-							showRoll.damageMod = damageMod;
-						}
-					}
-				}
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/lastRoll`).set(showRoll)
+					//Rolls
+					action.rolls.forEach((roll, roll_index) => {
+						share.notification.actions[action_index].rolls[roll_index] = {
+							damage_type: roll.damage_type,
+							roll: roll.modifierRoll.roll,
+							total: roll.modifierRoll.total,
+						};
+					});
+				});
+				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+			},
+			advantage(input) {
+				return Object.keys(input)[0].charAt(0);
 			}
-		},
+		}
 	}
 </script>
 

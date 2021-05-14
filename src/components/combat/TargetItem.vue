@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="terget-item-wrapper">
 		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
@@ -530,15 +530,19 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 </script>
 
 <style lang="scss" scoped>
-ul.target-reminders {
-	padding-left: 30px;
-	list-style: none;
-	margin: 0;
-
-	li {
-		width: 20px;
-		height: 7px;
-		margin: 1px 1px 1px 0;
+.taret-item-wrapper {
+	width: 100%;
+	
+	ul.target-reminders {
+		padding-left: 30px;
+		list-style: none;
+		margin: 0;
+	
+		li {
+			width: 20px;
+			height: 7px;
+			margin: 1px 1px 1px 0;
+		}
 	}
 }
 </style>

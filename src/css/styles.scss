@@ -1182,12 +1182,10 @@ html body {
 	}
 
 	.target-item {
-		width: 100%;
 		display: grid;
 		grid-template-columns: 35px 35px 1fr;
 		grid-template-rows: auto;
 		grid-gap: 0;
-		
 		line-height: 35px;
 		user-select: none;
 	
@@ -1235,45 +1233,47 @@ html body {
 				position: relative;
 			}
 		}
-	
-		.health-bar { 
-			padding-left: 5px;
-			font-size: 13px;
-			display: grid;
-			grid-template-columns: auto max-content;
-			grid-column-gap: 5px;
-			line-height: 35px;
-			margin-right: 5px;
-			color: #fff;
-	
-			.conditions {
-				position: absolute;
-				right: 0;
-				top: 0;
-	
-				.condition {
-					display: block;
-					width: 12px;
-					height: 12px;
-					border: solid 1px #fff;
-					margin-left: 1px;
+		
+		.q-linear-progress {
+			.health-bar { 
+				padding-left: 5px;
+				font-size: 13px;
+				display: grid;
+				grid-template-columns: 1fr max-content;
+				grid-column-gap: 5px;
+				line-height: 35px;
+				margin-right: 5px;
+				color: #fff;
+		
+				.conditions {
+					position: absolute;
+					right: 0;
+					top: 0;
+		
+					.condition {
+						display: block;
+						width: 12px;
+						height: 12px;
+						border: solid 1px #fff;
+						margin-left: 1px;
+						cursor: pointer;
+					}
+				}
+		
+				.hp {
+					text-align: right;
 					cursor: pointer;
-				}
-			}
-	
-			.hp {
-				text-align: right;
-				cursor: pointer;
-				
-				.current {
-					font-size: 18px;
-					font-weight: bold;
-				}
-				.max, .temp {
-					opacity: .5;
-				}
-				.save {
-					margin-right: 4px;
+					
+					.current {
+						font-size: 18px;
+						font-weight: bold;
+					}
+					.max, .temp {
+						opacity: .5;
+					}
+					.save {
+						margin-right: 4px;
+					}
 				}
 			}
 		}

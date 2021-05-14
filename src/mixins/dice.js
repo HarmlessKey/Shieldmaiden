@@ -206,7 +206,7 @@ export const dice = {
 
 				// If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'melee_weapon' || type === 'ranged_weapon' || type === 'spell_attack') {
-					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, false, advantage_object);
+					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, undefined, false, advantage_object);
 					if(returnRoll.actions[i].toHit.throwsTotal === 20) {
 						returnRoll.actions[i].crit = true;
 						crit = true;

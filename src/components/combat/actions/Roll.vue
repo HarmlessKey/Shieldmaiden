@@ -361,7 +361,6 @@
 				}
 			},
 			shareRoll(roll, targets) {
-				console.log(roll)
 				const key = Date.now() + Math.random().toString(36).substring(4);
 				let share = {
 					key,

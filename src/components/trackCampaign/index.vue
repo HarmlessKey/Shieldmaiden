@@ -1,56 +1,56 @@
 <template>
-<div class="track-wrapper" ref="track">
-	<template v-if="campaign">
+	<div ref="track">
+		<template v-if="campaign">
 			<template v-if="!campaign.private">
-			<!-- NOT LIVE -->
-			<template v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
-				<div class="top">
-					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-					<span class="title truncate">{{ campaign.campaign }}</span>
-					<span>
-						<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
-						<a @click="toggleFullscreen" class="full">
-							<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
-							<q-tooltip anchor="bottom middle" self="top middle">
-								Fullscreen
-							</q-tooltip>
-						</a>
-					</span>
+				<!-- NOT LIVE -->
+				<div class="track-wrapper" v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
+					<div class="top">
+						<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+						<span class="title truncate">{{ campaign.campaign }}</span>
+						<span>
+							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
+							<a @click="toggleFullscreen" class="full">
+								<q-icon :name="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'" />
+								<q-tooltip anchor="bottom middle" self="top middle">
+									Fullscreen
+								</q-tooltip>
+							</a>
+						</span>
+					</div>
+					<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+						<CampaignOverview 
+							:players="players" 
+							:campaign-players="campaign.players" 
+							:width="width" 
+							:shares="shares"
+							:live="broadcasting['.value'] === $route.params.campid"
+						/>
+					</div>
 				</div>
-				<div class="campaign" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-					<CampaignOverview 
-						:players="players" 
-						:campaign-players="campaign.players" 
-						:width="width" 
-						:shares="shares"
-						:live="broadcasting['.value'] === $route.params.campid"
-					/>
+
+				<!-- LIVE -->
+				<div 
+					v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
+					:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
+				>
+					<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
 				</div>
 			</template>
-
-			<!-- LIVE -->
-			<div 
-				v-else-if="encounter && broadcasting['.value'] === $route.params.campid" 
-				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
-			>
-				<Live :encounter="encounter" :campaign="campaign" :players="players" :width="width" :shares="shares" />
-			</div>
-		</template>
-		<div v-else>
-			<div class="top d-flex justify-content-between">
-				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				Not found
-			</div>
-			<div class="container-fluid">
-				<div class="container entities">
-					<h2>Perception check failed</h2>
-					<p>It seems we rolled a little low, this campaign can't be found.<br/>
-						It is possible the campaign is set to private.</p>
+			<div v-else>
+				<div class="top d-flex justify-content-between">
+					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					Not found
+				</div>
+				<div class="container-fluid">
+					<div class="container entities">
+						<h2>Perception check failed</h2>
+						<p>It seems we rolled a little low, this campaign can't be found.<br/>
+							It is possible the campaign is set to private.</p>
+					</div>
 				</div>
 			</div>
-		</div>
-	</template>
-</div>
+		</template>
+	</div>
 </template>
 
 <script>
@@ -106,25 +106,27 @@
 			shared(share, oldShare) {
 				//Check if the roll has not been shown before
 				if((share && !oldShare) || (share && share.key !== oldShare.key)) {
-					const notification = share.notification;
-					if(share.type === "roll") {
-						let advantage;
-						if(notification.advantage_disadvantage) {
-							const color = (notification.advantage_disadvantage === "a") ? "green" : "red";
-							advantage = `<b class="${color}">${notification.advantage_disadvantage.capitalize()}</b>`;
-						}
+					if(!this.checkShare(share.key)) {
+						const notification = share.notification;
+						if(share.type === "roll") {
+							let advantage;
+							if(notification.advantage_disadvantage) {
+								const color = (notification.advantage_disadvantage === "a") ? "green" : "red";
+								advantage = `<b class="${color}">${notification.advantage_disadvantage.capitalize()}</b>`;
+							}
 
-						this.$snotify.html(
-							`<div class="snotifyToast__body roll">
-								<div class="roll_title truncate">${notification.entity_name ? `${notification.entity_name}: ` : ``}${notification.title}</div>
-								<div class="rolled" id="roll">${notification.total}</div>
-								<div class="roll_footer">${advantage ? advantage : ''}${notification.roll}</div>
-							</div> `, {
-							timeout: 8000,
-							closeOnClick: true
-						});
+							this.$snotify.html(
+								`<div class="snotifyToast__body roll">
+									<div class="roll_title truncate">${notification.entity_name ? `${notification.entity_name}: ` : ``}${notification.title}</div>
+									<div class="rolled" id="roll">${notification.total}</div>
+									<div class="roll_footer">${advantage ? advantage : ''}${notification.roll}</div>
+								</div> `, {
+								timeout: 8000,
+								closeOnClick: true
+							});
+						}
+						this.shares.unshift(share);
 					}
-					this.shares.unshift(share);
 				}
 			}
 		},
@@ -181,6 +183,11 @@
 						// console.error(err)
 					})
 			},
+			checkShare(key) {
+				return !!this.shares.filter(item => {
+					return item.key === key;
+				})[0];
+			}
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.setSize);

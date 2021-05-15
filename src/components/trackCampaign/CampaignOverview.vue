@@ -1,9 +1,7 @@
 <template>
 	<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 		<div class="players">
-			<h3>Campaign Players
-				
-			</h3>
+			<h3>Campaign Players</h3>
 			<q-scroll-area dark :thumb-style="{ width: '5px'}">
 				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
 			</q-scroll-area>
@@ -14,7 +12,10 @@
 				<Meters :entities="campaignPlayers" :players="players" :campaign="true" :npcs="{}" />
 			</q-scroll-area>
 		</div>
-		<div v-if="live" class="shares">
+		<div v-if="live" class="shares-bar" :class="{ shown: showShares }">
+			<div class="show" @click="showShares = !showShares">
+				<i class="fas fa-chevron-left" />
+			</div>
 			<Shares 
 				:shares="shares" 
 				:players="players"
@@ -96,6 +97,7 @@
 			return {
 				userId: this.$route.params.userid,
 				panel: "players",
+				showShares: false,
 				panels: [
 					{
 						label: "Campaign players",
@@ -139,6 +141,16 @@
 
 				.side {
 					padding-right: 0;
+				}
+				.shares-bar {
+					height: 100%;
+					
+					.show {
+						display: none;
+					}
+					.shares {
+						width: 100%;
+					}
 				}
 			}
 
@@ -186,7 +198,53 @@
 			display: none; 
 		}
 	}
+	@media only screen and (max-width: 900px) {
+		.track.desktop {
+			grid-template-columns: 2fr 1fr !important;
 
+			&.isLive {
+				.side {
+					padding-right: 15px !important;
+				}
+				.shares-bar {
+					width: 250px;
+					position: absolute;
+					right: -250px;
+					display: flex;
+					justify-content: center;
+					transition: all .5s linear;
+
+					.show {
+						background-color: $blue;
+						color: $white;
+						display: block;
+						width: 18px;
+						text-align: center;
+						cursor: pointer;
+						height: 50px;
+						line-height: 50px;
+						position: absolute;
+						top: 50%;
+						left: -18px;
+						transform: translateY(-50%);
+
+						i {
+							transition: all .3s linear;
+						}
+					}
+					&.shown {
+						right: 0;
+
+						.show {
+							i {
+								transform: rotate(180deg);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	@media only screen and (max-width: 992px) {
 		.track.desktop {
 			grid-template-columns: 3fr 2fr;

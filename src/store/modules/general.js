@@ -69,8 +69,7 @@ export const general_module = {
 				collapsed_ref.remove();
 			}
 			else
-				collapsed_ref.set(true)
-
+				collapsed_ref.set(true);
 		},
 		setSideCollapsed({ commit, rootGetters }) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
@@ -104,6 +103,11 @@ export const general_module = {
 			const encounter = (encounter_id) ? encounter_id : false;
 			db.ref(`broadcast/${rootGetters.user.uid}/encounter`).set(encounter);
 			commit("SET_BROADCAST_ENCOUNTER", encounter);
+		},
+		setLiveShares({state, commit}, shares) {
+			if(state.broadcast && state.broadcast.live) {
+				commit("SET_BROADCAST_SHARES", shares);
+			}
 		}
 	},
 	mutations: {
@@ -116,6 +120,7 @@ export const general_module = {
 		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
 		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
 		SET_BROADCAST(state, payload) { Vue.set(state, "broadcast", payload) },
-		SET_BROADCAST_ENCOUNTER(state, payload) { Vue.set(state.broadcast, "encounter", payload) }
+		SET_BROADCAST_ENCOUNTER(state, payload) { Vue.set(state.broadcast, "encounter", payload) },
+		SET_BROADCAST_SHARES(state, payload) { Vue.set(state.broadcast, "shares", payload) }
 	},
 };

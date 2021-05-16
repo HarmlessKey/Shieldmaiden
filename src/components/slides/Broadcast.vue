@@ -23,32 +23,31 @@
 			emit-value
 			map-options
 			@input="sharesSelected"
-			:disable="!!broadcast.live"
 		>
-				<template #before-options>
-					<q-item>
-						<q-item-section>
-							<q-item-label>Select All</q-item-label>
-						</q-item-section>
-						<q-item-section side>
-							<q-checkbox dark v-model="all" @input="checkAll"/>
-						</q-item-section>
-					</q-item>
-				</template>
-				<template v-slot:option="scope">
-					<q-item
-						v-bind="scope.itemProps"
-						v-on="scope.itemEvents"      
-					>
-						<q-item-section>
-							<q-item-label v-html="scope.opt.label"/>
-						</q-item-section>
-						<q-item-section side>
-							<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
-						</q-item-section>
-					</q-item>
-				</template>
-				<template v-slot:append>
+			<template #before-options>
+				<q-item>
+					<q-item-section>
+						<q-item-label>Select All</q-item-label>
+					</q-item-section>
+					<q-item-section side>
+						<q-checkbox dark v-model="all" @input="checkAll"/>
+					</q-item-section>
+				</q-item>
+			</template>
+			<template v-slot:option="scope">
+				<q-item
+					v-bind="scope.itemProps"
+					v-on="scope.itemEvents"      
+				>
+					<q-item-section>
+						<q-item-label v-html="scope.opt.label"/>
+					</q-item-section>
+					<q-item-section side>
+						<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
+					</q-item-section>
+				</q-item>
+			</template>
+			<template v-slot:append>
 				<q-icon v-if="shares.length > 0 && !broadcast.live" name="close" @click.stop="sharesCleared" class="cursor-pointer" />
 			</template>
 		</q-select>
@@ -116,6 +115,7 @@
 		methods: {
 			...mapActions([
 				"setLive",
+				"setLiveShares",
 				"setSlide"
 			]),
 			live() {
@@ -127,11 +127,11 @@
 			},
 			checkAll (v) {
 				if (v) {
-					this.shares = this.options.map(v => v.value)
-					this.sharesSelected()
+					this.shares = this.options.map(v => v.value);
+					this.sharesSelected();
 					return
 				}
-				this.sharesCleared()
+				this.sharesCleared();
 			},
 			sharesSelected () {
 				if (this.shares.length === this.options.length) {
@@ -139,11 +139,13 @@
 				} else {
 					this.all = false
 				}
+				if(this.broadcast.live) this.setLiveShares(this.shares);
 			},
 			sharesCleared () {
-				this.all = false
-				this.shares = []
-				this.sharesSelected()
+				this.all = false;
+				this.shares = [];
+				this.sharesSelected();
+				if(this.broadcast.live) this.setLiveShares(this.shares);
 			},
 		}
 	}

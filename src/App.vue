@@ -105,7 +105,6 @@
 				// But there still is a broadcast in the store
 				// Notify the user and let them restart the broadcast
 				if((oldVal && oldVal.live && !newVal) && (this.storeBroadcast && Object.keys(this.storeBroadcast).length > 0)) {
-					console.log(this.storeBroadcast)
 					this.$q.notify({
 						message: 'Broadcast interrupted',
 						caption: 'Would you like to continue your broadcast?',

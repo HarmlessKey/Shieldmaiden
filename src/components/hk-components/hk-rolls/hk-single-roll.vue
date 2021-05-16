@@ -450,8 +450,8 @@ export default {
 			const totalHealing = this.totalValue("healing");
 			let totalValue = {};
 
-			if(totalDamage) totalValue.damage = Math.floor(totalDamage * multiplier);
-			if(totalHealing) totalValue.healing = Math.floor(totalHealing * multiplier);
+			if(totalDamage !== undefined) totalValue.damage = Math.floor(totalDamage * multiplier);
+			if(totalHealing !== undefined) totalValue.healing = Math.floor(totalHealing * multiplier);
 
 			// Apply the rolled damage/healing
 			this.setHP(totalValue, this.roll.target, this.roll.current, config);

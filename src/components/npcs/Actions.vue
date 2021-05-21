@@ -45,10 +45,15 @@
 						v-if="category === 'legendary_actions'"
 						dark filled square
 						label="Count"
-						v-model="npc.lengendary_count"
+						v-model.number="npc.lengendary_count"
 						type="number"
 						class="my-3"
 						hint="Amount of legendary actions per turn."
+						@input="parseToInt($event, npc, 'lengendary_count')"
+						:rules="[
+							val => !!val || val === 0 || 'Required',
+							val => val <= 9 || 'Max is 9'
+						]"
 					/>
 
 					<!-- ABILITIES -->
@@ -123,9 +128,14 @@
 									autocomplete="off" 
 									type="number" 
 									class="mb-3" 
-									v-model="ability.legendary_cost" 
+									v-model.number="ability.legendary_cost" 
 									hint="How many legendary actions does this cost?"
+									@input="parseToInt($event, ability, 'legendary_cost')"
 									@keyup="$forceUpdate()"
+									:rules="[
+										val => !!val || val === 0 || 'Required',
+										val => val <= 9 || 'Max is 9'
+									]"
 								/>
 
 								<q-input 
@@ -133,9 +143,13 @@
 									label="Name"
 									autocomplete="off" 
 									class="mb-3" 
-									maxlength="30"
+									maxlength="51"
 									v-model="ability.name"
 									@keyup="$forceUpdate()"
+									:rules="[
+										val => !!val || 'Required',
+										val => val.length <= 50 || 'Max length is 50'
+									]"
 								/>
 
 								<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
@@ -156,11 +170,14 @@
 												label="Limited uses"
 												autocomplete="off" 
 												type="number" 
-												v-model="ability.limit" 
+												v-model.number="ability.limit"
+												@input="parseToInt($event, ability, 'limit')"
 												@keyup="$forceUpdate()"
+												:rules="[val => !val || val <= 9 || 'Max is 9']"
 											/>
 											<q-select
 												dark filled square
+												bottom-slots
 												label="Limit type"
 												class="limit-type"
 												v-model="ability.limit_type"
@@ -173,12 +190,14 @@
 								</div>
 								<q-input
 									dark filled square
+									counter
 									label="Description"
 									autocomplete="off" 
 									v-model="ability.desc" 
 									name="desc"
+									maxlength="2000"
 									autogrow
-									:rules="[val => (!val || val.length < 1500) || 'Can\'t be over 1500 characters']"
+									:rules="[val => (!val || val.length < 2000) || 'Can\'t be over 2000 characters']"
 									@keyup="$forceUpdate()"
 								/>
 
@@ -190,10 +209,12 @@
 												dark filled square
 												class="reach"
 												label="Reach"
-												v-model="ability.reach"
+												v-model.number="ability.reach"
 												type="number"
 												suffix="ft."
 												@keyup="$forceUpdate()"
+												@input="parseToInt($event, ability, 'reach')"
+												:rules="[val => !val || val <= 999 || 'Max is 999']"
 											/>
 										</div>
 										<div class="col">
@@ -222,10 +243,12 @@
 												dark filled square
 												label="AOE size"
 												type="number"
-												v-model="ability.aoe_size"
+												v-model.number="ability.aoe_size"
 												suffix="ft."
 												:disable="!ability.aoe_type"
 												@keyup="$forceUpdate()"
+												@input="parseToInt($event, ability, 'aoe_size')"
+												:rules="[val => !val || val <= 999 || 'Max is 999']"
 											/>
 										</div>
 									</div>
@@ -248,9 +271,13 @@
 														dark filled square dense
 														type="text"
 														label="Option 1 name"
+														maxlength="20"
 														v-model="ability.versatile_one"
 														@keyup="$forceUpdate()"
-														:rules="[val => !!val || 'Option 1 is required']"
+														:rules="[
+															val => !!val || 'Option 1 is required',
+															val => val.length <= 20 || 'Max length 20'
+														]"
 													/>
 												</div>
 												<div class="col">
@@ -258,9 +285,13 @@
 														dark filled square dense
 														type="text"
 														label="Option 2 name"
+														maxlength="20"
 														v-model="ability.versatile_two"
 														@keyup="$forceUpdate()"
-														:rules="[val => !!val || 'Option 1 is required']"
+														:rules="[
+															val => !!val || 'Option 2 is required',
+															val => val.length <= 20 || 'Max length 20'
+														]"
 													/>
 												</div>
 											</template>
@@ -302,8 +333,10 @@
 														dark filled square
 														type="number"
 														label="Save DC"
-														v-model="action.save_dc"
-														@input="$forceUpdate()"
+														v-model.number="action.save_dc"
+														@keyup="$forceUpdate()"
+														@input="parseToInt($event, action, 'save_dc')"
+														:rules="[val => !val || val <= 99 || 'Max is 99']"
 													/>
 												</div>
 											</template>
@@ -314,8 +347,10 @@
 														dark filled square
 														type="number"
 														label="Attack modifier"
-														v-model="action.attack_bonus"
+														v-model.number="action.attack_bonus"
 														@keyup="$forceUpdate()"
+														@input="parseToInt($event, action, 'attack_bonus')"
+														:rules="[val => !val || val <= 99 || 'Max is 99']"
 													/>
 												</div>
 											</template>
@@ -592,6 +627,13 @@
 			...mapActions([
 				"setActionRoll"
 			]),
+			parseToInt(value, object, property) {
+				if(value === undefined || value === "") {
+					this.$delete(object, property);
+				} else {
+					this.$set(object, property, parseInt(value));
+				}
+			},
 			/**
 			 * Add a new action
 			 * 
@@ -674,7 +716,7 @@
 					}
 				}
 				this.edit_roll_index = roll_index;
-				this.roll = roll;
+				this.roll = {...roll};
 				this.action_dialog = true;
 			},
 			cancelRoll() {
@@ -697,6 +739,7 @@
 			},
 			deleteRoll(ability_index, category, action_index, roll_index) {
 				this.$delete(this.npc[category][ability_index].action_list[action_index].rolls, roll_index);
+				this.$forceUpdate();
 			},
 			versatileRoll(roll) {
 				if(!roll.versatile_dice_count && !roll.versatile_dice_type && !roll.versatile_fixed_val) {
@@ -717,7 +760,9 @@
 				}
 			},
 			calcAverage(dice_type=0, dice_count=0, modifier=0) {
-				return Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier);
+				return (dice_type) 
+					? Math.floor(((parseInt(dice_type) + 1)/2)*parseInt(dice_count)) + parseInt(modifier)
+					: parseInt(modifier);
 			},
 			rollAbility(e, action, versatile) {
 				const config = {

@@ -30,27 +30,42 @@
 							<q-input 
 								dark filled square
 								label="Caster level"
-								v-model="npc[`${casting.category}_level`]"
+								v-model.number="npc[`${casting.category}_level`]"
+								@input="parseToInt(npc, `${casting.category}_level`)"
 								type="number"
 								class="mb-3"
+								:rules="[
+									val => !!val || 'Required',
+									val => val <= 20 || 'Max is 20'
+								]"
 							/>
 						</div>
 						<div class="col">
 							<q-input 
 								dark filled square
 								label="Save DC"
-								v-model="npc[`${casting.category}_save_dc`]"
+								v-model.number="npc[`${casting.category}_save_dc`]"
+								@input="parseToInt(npc, `${casting.category}_save_dc`)"
 								type="number"
 								class="mb-3"
+								:rules="[
+									val => !!val || 'Required',
+									val => val <= 99 || 'Max is 99'
+								]"
 							/>
 						</div>
 						<div class="col">
 							<q-input 
 								dark filled square
 								label="Spell attack"
-								v-model="npc[`${casting.category}_spell_attack`]"
+								v-model.number="npc[`${casting.category}_spell_attack`]"
+								@input="parseToInt(npc, `${casting.category}_spell_attack`)"
 								type="number"
 								class="mb-3"
+								:rules="[
+									val => !!val || 'Required',
+									val => val <= 99 || 'Max is 99'
+								]"
 							/>
 						</div>
 					</div>
@@ -218,6 +233,13 @@
 			}
 		},
 		methods: {
+			parseToInt(value, object, property) {
+				if(value === undefined || value === "") {
+					this.$delete(object, property);
+				} else {
+					this.$set(object, property, parseInt(value));
+				}
+			},
 			setCaster(value, category) {
 				if(value && category === "caster" && !this.npc[`${category}_spell_slots`]) {
 					this.npc[`${category}_spell_slots`] = {};

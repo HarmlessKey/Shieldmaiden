@@ -116,7 +116,7 @@
 									name="maxHp" 
 									placeholder="Maximum Hit Points*"
 								>
-									<q-icon slot="append" name="fas fa-heart" />
+									<q-icon slot="prepend" name="fas fa-heart" />
 								</q-input>
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 							</div>
@@ -133,7 +133,7 @@
 									data-vv-as="Armor Class"
 									name="ac" 
 								>
-									<q-icon slot="append" name="fas fa-shield" />
+									<q-icon slot="prepend" name="fas fa-shield" />
 								</q-input>
 								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 							</div>
@@ -146,8 +146,10 @@
 									min="0"
 									type="number" 
 									v-model="player.spell_save_dc" 
-									name="save_dc" 
-								/>
+									name="save_dc"
+								>
+									<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+								</q-input>
 							</div>
 						</div>
 					</hk-card>
@@ -198,7 +200,10 @@
 								v-validate="'numeric'" 
 								data-vv-as="Passive Perception"
 								name="pper" 
-								placeholder="Perception" />
+								placeholder="Perception"
+							>
+								<q-icon slot="prepend" name="fas fa-eye" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
@@ -213,7 +218,10 @@
 								v-validate="'numeric'" 
 								data-vv-as="Passive Investigation"
 								name="pinv" 
-								placeholder="Investigation" />
+								placeholder="Investigation" 
+							>
+								<q-icon slot="prepend" name="fas fa-search" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
@@ -228,7 +236,10 @@
 								v-validate="'numeric'" 
 								data-vv-as="pins"
 								name="pins" 
-								placeholder="Insight" />
+								placeholder="Insight"
+							>
+								<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
 						</div>
 					</div>

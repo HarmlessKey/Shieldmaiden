@@ -2,29 +2,35 @@
 	<div>
 		<hk-card header="Basic Info">
 			<!-- NAME -->
-			<div class="row q-col-gutter-md">
+			<div class="row q-col-gutter-md mb-2">
 				<div class="col-9">
 					<q-input 
 						dark filled square
 						label="Name"
+						maxlength="101"
 						autocomplete="off"  
 						v-model="npc.name"
 						@input="capitalizeName"
-						:rules="[val => !!val || 'The name is required']"
+						:rules="[
+							val => !!val || 'The name is required',
+							val => val.length <= 100 || 'Max length is 100'
+						]"
 					/>
 				</div>
 				<div class="col-3">
 					<q-input 
 						dark filled square
 						label="Source"
+						maxlength="20"
 						autocomplete="off"  
-						v-model="npc.source" 
+						v-model="npc.source"
+						:rules="[val => !val || val.length <= 20 || 'Max length is 20']"
 					/>
 				</div>
 			</div>
 
 			<!-- AVATAR -->
-			<div class="avatar mb-3">
+			<div class="avatar">
 				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
 				<div class="img" v-else>
 					<img src="@/assets/_img/styles/monster.svg" />
@@ -42,6 +48,7 @@
 						data-vv-as="Avatar"
 						name="avatar" 
 						placeholder="Image URL"
+						:rules="[val => !val || val.length <= 9999 || 'Max length is 9999']"
 					/>
 				</div>
 			</div>
@@ -89,7 +96,7 @@
 			/>
 
 			<!-- SPEED -->
-			<div class="row q-col-gutter-sm mb-3">
+			<div class="row q-col-gutter-sm">
 				<div class="col">
 					<q-input 
 						dark filled square
@@ -97,8 +104,10 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.walk_speed" 
+						v-model.number="npc.walk_speed" 
+						@input="parseToInt(npc, 'walk_speed')"
 						suffix="ft."
+						:rules="[val => !val || val <= 999 || 'Max is 999']"
 					>
 					</q-input>
 				</div>
@@ -109,8 +118,10 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.swim_speed" 
+						v-model.number="npc.swim_speed"
+						@input="parseToInt(npc, 'swim_speed')"
 						suffix="ft."
+						:rules="[val => !val || val <= 999 || 'Max is 999']"
 					>
 					</q-input>
 				</div>
@@ -121,8 +132,10 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.fly_speed" 
+						v-model.number="npc.fly_speed" 
+						@input="parseToInt(npc, 'fly_speed')"
 						suffix="ft."
+						:rules="[val => !val || val <= 999 || 'Max is 999']"
 					>
 					</q-input>
 				</div>
@@ -133,8 +146,10 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.burrow_speed" 
+						v-model.number="npc.burrow_speed"
+						@input="parseToInt(npc, 'burrow_speed')"
 						suffix="ft."
+						:rules="[val => !val || val <= 999 || 'Max is 999']"
 					>
 					</q-input>
 				</div>
@@ -145,8 +160,10 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model="npc.climb_speed" 
+						v-model.number="npc.climb_speed"
+						@input="parseToInt(npc, 'climb_speed')"
 						suffix="ft."
+						:rules="[val => !val || val <= 999 || 'Max is 999']"
 					>
 					</q-input>
 				</div>
@@ -155,8 +172,9 @@
 			<!-- LANGUAGES -->
 			<q-select
 				dark filled square
+				bottom-slots
 				label="Languages"
-				class="mb-4"
+				class="mb-2" 
 				multiple
 				v-model="npc.languages"
 				:options="languages"
@@ -169,7 +187,7 @@
 				dark filled square
 				label="Challenge rating"
 				v-model="npc.challenge_rating" 
-				:options="Object.keys(monster_challenge_rating).sort()"
+				:options="challenge_ratings"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 			>
 				<template v-slot:option="scope">
@@ -213,9 +231,13 @@
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
-						v-model.number="npc.armor_class" 
+						v-model.number="npc.armor_class"
+						@input="parseToInt(npc, 'armor_class')"
 						name="ac" 
-						:rules="[val => !!val || 'AC is required']"
+						:rules="[
+							val => !!val || 'AC is required',
+							val => val <= 99 || 'AC can\'t be higher than 99'
+						]"
 					>
 						<template v-slot:prepend>
 							<q-icon name="fas fa-shield" size="xs" />
@@ -230,8 +252,12 @@
 						type="number" 
 						class="mb-2" 
 						v-model.number="npc.hit_points" 
+						@input="parseToInt(npc, 'hit_points')"
 						name="hp" 
-						:rules="[val => !!val || 'HP is required']"
+						:rules="[
+							val => !!val || 'HP is required',
+							val => val <= 999 || 'HP can\'t be higher than 999'
+						]"
 					>
 						<template v-slot:prepend>
 							<q-icon name="fas fa-heart" size="xs" />
@@ -248,7 +274,10 @@
 						v-model="npc.hit_dice"  
 						name="hit_dice" 
 						id="hitdice"
-						:rules="[val => (!val || val.match(/^[0-9]+d[0-9]+$/)) || 'Allowed format: 2d6']"
+						:rules="[
+							val => (!val || val.match(/^[0-9]+d[0-9]+$/)) || 'Allowed format: 2d6',
+							val => !val || val.length <= 6 || 'Max length is 6'
+						]"
 					>
 						<template v-slot:append>
 							<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
@@ -287,9 +316,23 @@
 				set(newValue) {
 					this.$emit('input', newValue);
 				}
+			},
+			challenge_ratings() {
+				let crs = [];
+				for(const cr in this.monster_challenge_rating) {
+					crs.push(Number(cr));
+				}
+				return crs.sort(function(a, b){return a-b});
 			}
 		},
 		methods: {
+			parseToInt(value, object, property) {
+				if(value === undefined || value === "") {
+					this.$delete(object, property);
+				} else {
+					this.$set(object, property, parseInt(value));
+				}
+			},
 			// Capitalizes every word in the name of the Npc
 			capitalizeName(val) {
 				this.npc.name = val.capitalizeEach();

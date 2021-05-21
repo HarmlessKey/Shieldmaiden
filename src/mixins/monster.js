@@ -35,7 +35,12 @@ export const monsterMixin = {
 				22:  { proficiency: 7,  xp: 41000 },
 				23:  { proficiency: 7,  xp: 50000 },
 				24:  { proficiency: 7,  xp: 62000 },
-				30:  { proficiency: 9,  xp: 155000 },
+				25:  { proficiency: 7,  xp: 75000 },
+				26:  { proficiency: 7,  xp: 90000 },
+				27:  { proficiency: 7,  xp: 105000 },
+				28:  { proficiency: 7,  xp: 120000 },
+				29:  { proficiency: 7,  xp: 135000 },
+				30:  { proficiency: 9,  xp: 155000 }
 			},
 			monster_sizes: [
 				"Tiny",

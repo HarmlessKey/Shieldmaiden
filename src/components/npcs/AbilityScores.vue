@@ -8,8 +8,13 @@
 						:label="ability.capitalize()"
 						autocomplete="off"  
 						type="number" 
-						v-model="npc[ability]" 
+						v-model.number="npc[ability]" 
 						:name="ability"
+						@input="parseToInt($event, npc, ability)"
+						:rules="[
+							val => !!val || 'Required',
+							val => val <= 99 || 'Max is 99'
+						]"
 					>
 						<template #append>
 							{{ npc[ability] !== undefined 
@@ -62,6 +67,15 @@
 				},	
 				set(newValue) {
 					this.$emit('input', newValue);
+				}
+			}
+		},
+		methods: {
+			parseToInt(value, object, property) {
+			if(value === undefined || value === "") {
+					this.$delete(object, property);
+				} else {
+					this.$set(object, property, parseInt(value));
 				}
 			}
 		}

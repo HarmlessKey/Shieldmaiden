@@ -76,6 +76,7 @@
 						type="number"
 						:label="skill.skill"
 						:value="npc.skill_modifiers ? npc.skill_modifiers[key] : null"
+						:rules="[val => !val || val <= 99 || 'Max is 99']"
 						@input="setModifier($event, key)"
 					/>
 				</div>
@@ -132,10 +133,10 @@
 
 				if(value) {
 					if(this.npc.skill_modifiers) {
-						this.$set(this.npc.skill_modifiers, skill, value);
+						this.$set(this.npc.skill_modifiers, skill, parseInt(value));
 					} else {
 						let val = {};
-						val[skill] = value;
+						val[skill] = parseInt(value);
 						this.$set(this.npc, "skill_modifiers", val);
 					}
 				} else {

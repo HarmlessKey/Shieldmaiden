@@ -388,7 +388,7 @@
 				let width = size.width;
 				let small = 400;
 				let medium = 500;
-				let large = 700;
+				let large = 885;
 
 				this.is_large = (width >= large) ? true : false;
 				this.is_medium = (width <= medium) ? true : false;

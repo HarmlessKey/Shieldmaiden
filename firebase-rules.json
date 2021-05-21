@@ -32,7 +32,7 @@
         },
         "patreon_email": {
           ".write": "root.child('users').child(auth.uid).child('admin').exists()"
-        },
+        }
       },
       ".read": true,
       ".indexOn": [
@@ -114,10 +114,10 @@
             ".validate": "newData.isString() && newData.val().length <= 15"
           },
           "avatar": {
-            ".validate": "newData.isString() && newData.val().length <= 1000"
+            ".validate": "newData.isString() && newData.val().length <= 9999"
           },
           "size": {
-            ".validate": "newData.isString() && newData.val().length <= 15"
+            ".validate": "newData.isString() && newData.val().length <= 20"
           },
           "type": {
             ".validate": "newData.isString() && newData.val().length <= 25"
@@ -155,7 +155,7 @@
             ".validate": "newData.isInteger() && newData.val() <= 99"
           },
           "hit_points": {
-            ".validate": "newData.isInteger() && newData.val() <= 9999"
+            ".validate": "newData.isInteger() && newData.val() <= 999"
           },
           "hit_dice": {
             ".validate": "newData.isString() && newData.val().matches(/^[0-9]+d[0-9]+$/) && newData.val().lengh <= 10"
@@ -166,10 +166,10 @@
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               }
             },
             "darkvision": {
@@ -177,10 +177,10 @@
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               }
             },
             "tremorsense": {
@@ -188,10 +188,10 @@
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               }
             },
             "truesight": {
@@ -199,10 +199,10 @@
                 ".validate": "newData.isBoolean()"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               },
               "comments": {
-                ".validate": "newData.isString() && newData.val().length <= 100"
+                ".validate": "newData.isString() && newData.val().length <= 999"
               }
             }
           },
@@ -253,7 +253,7 @@
         
         },
         ".write": "root.child('users').child(auth.uid).child('admin').exists()",
-        ".read": true,
+        ".read": true
       }
     },
     "custom_items": {

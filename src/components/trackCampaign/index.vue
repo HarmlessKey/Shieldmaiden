@@ -1,5 +1,5 @@
 <template>
-	<div ref="track">
+	<div ref="track" class="track">
 		<template v-if="campaign">
 			<template v-if="!campaign.private">
 				<!-- NOT LIVE -->
@@ -50,10 +50,22 @@
 				</div>
 			</div>
 		</template>
+
+		<transition-group 
+			tag="div"
+			enter-active-class="animated animate__fadeInUp" 
+			leave-active-class="animated animate__fadeOutUp"
+			class="xp-wrapper"
+		>
+			<div v-for="(xp, index) in xpAward" class="xp" :key="`xp-${index}`" @click="$delete(xpAward, index)">
+				{{ xp > 0 ? `+${xp}` : xp }}<small>xp</small>
+			</div>
+		</transition-group>
 	</div>
 </template>
 
 <script>
+	import _ from "lodash";
 	import { db } from '@/firebase';
 
 	import Follow from '@/components/trackCampaign/Follow.vue';
@@ -80,7 +92,8 @@
 				campaign: undefined,
 				tier: undefined,
 				width: 0,
-				shares: []
+				shares: [],
+				xpAward: []
 			}
 		},
 		firebase() {
@@ -108,6 +121,8 @@
 				if((share && !oldShare) || (share && share.key !== oldShare.key)) {
 					if(!this.checkShare(share.key)) {
 						const notification = share.notification;
+
+						// Rolls
 						if(share.type === "roll") {
 							let advantage;
 							if(notification.advantage_disadvantage) {
@@ -125,6 +140,13 @@
 								closeOnClick: true
 							});
 						}
+
+						// XP gains 
+						if(share.type === "xp") {
+							this.xpAward.push(notification.amount);
+
+							this.debounceXpRemove();
+						}
 						this.shares.unshift(share);
 					}
 				}
@@ -141,6 +163,9 @@
 			});
 		},
 		methods: {
+			debounceXpRemove: _.debounce(function() {
+				this.xpAward = this.xpAward.slice(1);
+			}, 3000),
 			setSize() {
 				this.width = this.$refs.track.clientWidth;
 			},
@@ -196,6 +221,7 @@
 </script>
 
 <style lang="scss" scoped>
+.track {
 	.track-wrapper {
 		height: calc(100vh - 50px);
 		background-size: cover;
@@ -230,4 +256,29 @@
 			background-position: top center;
 		}
 	}
+	.xp-wrapper {
+		.xp {
+			position: absolute;
+			top: 33%;
+			width: 100%;
+			text-align: center;
+			font-size: 100px;
+			color: $white;
+			font-weight: bold;
+			text-shadow: 0 0  5px $black;
+			letter-spacing: -2px;
+			z-index: 2;
+			user-select: none;
+
+			.shadow {
+				width: 100%;
+				position:absolute;
+				top: 0;
+				text-shadow: 2px 2px 5px $black;
+				color: transparent;
+				z-index: -1;
+			}
+		}
+	}
+}
 </style>

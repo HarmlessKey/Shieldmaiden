@@ -283,7 +283,7 @@
 
 <script>
 	import { db } from '@/firebase';
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
 	import Transform from './party/Transform.vue';
 
@@ -338,6 +338,12 @@
 			}
 		},
 		computed: {
+			...mapGetters([
+				'broadcast'
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
+			},
 			death_fails() {
 				let fails = 0;
 				for(let key in this.entity.saves) {
@@ -360,9 +366,22 @@
 					if(newXp < 0) { newXp = 0; }
 					if(newXp > 355000) { newXp = 355000; }
 
-					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(
-						newXp
-					)
+					if(this.share) {
+						const key = Date.now() + Math.random().toString(36).substring(4);
+						let share = {
+							key,
+							type: "xp",
+							notification: {
+								amount: this.xp,
+								targets: [this.entityKey]
+							}
+						};
+						if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
+
+						db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+					}
+
+					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(newXp)
 					this.xp = undefined;
 				}
 			},

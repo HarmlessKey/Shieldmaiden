@@ -69,8 +69,16 @@
 				campaign_id: this.data.campaign_id,
 				encounter_id: this.data.encounter_id,
 				sharesSetter: undefined,
-				all: false,
-				options: [
+				all: false
+			}
+		},
+		computed: {
+			...mapGetters([
+				"broadcast",
+				"campaign"
+			]),
+			options() {
+				let options =[
 					{
 						label: "Action rolls",
 						value: "action_rolls"
@@ -94,14 +102,16 @@
 					{
 						label: "Skill checks",
 						value: "skill_rolls"
-					},
-				]
-			}
-		},
-		computed: {
-			...mapGetters([
-				"broadcast"
-			]),
+					}
+				];
+				if(this.campaign.advancement === "experience") {
+					options.push({
+						label: "Experience awards",
+						value: "xp"
+					});
+				}
+				return options;
+			},
 			shares: {
 				get() {
 					const shares = (this.broadcast.shares) ? this.broadcast.shares : [];

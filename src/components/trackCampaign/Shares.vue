@@ -116,6 +116,35 @@
 								</div>
 							</div>
 						</li>
+
+						<!-- XP AWARDS -->
+						<li v-if="type === 'xp'" :key="`roll-${index}`" class="xp">
+							<div class="bg-gray-dark py-2">
+								<div v-if="notification.targets" class="targets">
+									<template v-for="target in notification.targets">
+										<div v-if="players && Object.keys(players).includes(target)" :key="target">
+											<icon 
+												v-if="['player', 'companion'].includes(displayImg(players[target], players[target]))"
+												class="img"
+												:icon="displayImg(players[target], players[target])" 
+											/>
+											<div 
+												v-else 
+												class="img"			 
+												:style="{ 
+													backgroundImage: 'url(\'' + displayImg(players, players[target]) + '\')'
+												}"
+											/>
+											<q-tooltip anchor="top middle" self="center middle">
+												{{ players[target].character_name.capitalizeEach() }}
+											</q-tooltip>
+										</div>
+									</template>
+								</div>
+								{{ notification.amount > 0 ? `+${notification.amount}` : notification.amount }}
+								<small>xp</small>
+							</div>
+						</li>
 					</template>
 				</template>
 			</ul>
@@ -187,130 +216,136 @@
 				list-style: none;
 				margin: 0 0 20px 0;
 
-				li.roll {
-					
+				li {
 					border-bottom: solid 1px $gray-hover;
 					padding: 5px 0;
 
-					h3 {
-						display: grid;
-						grid-template-columns: 43px auto;
-						grid-gap: 5px;
-						padding-right: 8px;
-						background-color: $gray-active;
-						margin: 0 !important;
-						font-size: 15px;
-						height: 43px;
+					.targets {
+						display: flex;
+						justify-content: center;
+						height: 25px;
+						margin: 10px 0;
 
 						.img {
 							background-color: $gray-dark;
 							background-position: center top;
 							background-repeat: no-repeat;
 							background-size: cover;
-							width: 41px; 
-							height: 41px;
+							width: 23px; 
+							height: 23px;
 							border: solid 1px transparent;
-
-							&.logo {
-								background: none;
-								padding: 3px;
-							}
-						}
-						.header {
-							display: flex;
-							flex-flow: column wrap;
-
-							.name {
-								padding-top: 2px;
-								flex: 3 1 0%;
-								line-height: 18px;
-								height: 16px;
-								font-style: italic;
-								font-size: 12px;
-								width: calc(100% - 10px);
-							}
-							.title {
-								flex: 4 1 0%;
-								line-height: 18px;
-								height: 20px;
-								color: $white;
-								width: calc(100% - 10px);
-
-								&:only-child {
-									line-height: 42px;
-								}
-							}
+							margin: 0 2px;
 						}
 					}
-					.result-wrapper {
-						padding: 8px;
-						background-color: $gray-dark;
-
-						.result {
-							font-size: 18px;
-							height: 35px;
-							line-height: 35px;
+					&.roll {
+						h3 {
 							display: grid;
-							grid-template-columns: auto min-content;
+							grid-template-columns: 43px auto;
+							grid-gap: 5px;
+							padding-right: 8px;
+							background-color: $gray-active;
+							margin: 0 !important;
+							font-size: 15px;
+							height: 43px;
 
-							.roll {
-								white-space: nowrap; 
-								overflow: hidden;
-								text-overflow: ellipsis;
+							.img {
+								background-color: $gray-dark;
+								background-position: center top;
+								background-repeat: no-repeat;
+								background-size: cover;
+								width: 41px; 
+								height: 41px;
+								border: solid 1px transparent;
+
+								&.logo {
+									background: none;
+									padding: 3px;
+								}
 							}
-							.total {
-								text-align: right;
-								white-space: nowrap;
-								font-size: 25px;
+							.header {
+								display: flex;
+								flex-flow: column wrap;
+
+								.name {
+									padding-top: 2px;
+									flex: 3 1 0%;
+									line-height: 18px;
+									height: 16px;
+									font-style: italic;
+									font-size: 12px;
+									width: calc(100% - 10px);
+								}
+								.title {
+									flex: 4 1 0%;
+									line-height: 18px;
+									height: 20px;
+									color: $white;
+									width: calc(100% - 10px);
+
+									&:only-child {
+										line-height: 42px;
+									}
+								}
 							}
 						}
-						&.action {
-							.targets {
-								display: flex;
-								justify-content: center;
-								height: 25px;
-								margin: 10px 0;
+						.result-wrapper {
+							padding: 8px;
+							background-color: $gray-dark;
 
-								.img {
-									background-color: $gray-dark;
-									background-position: center top;
-									background-repeat: no-repeat;
-									background-size: cover;
-									width: 23px; 
-									height: 23px;
-									border: solid 1px transparent;
-									margin: 0 2px;
+							.result {
+								font-size: 18px;
+								height: 35px;
+								line-height: 35px;
+								display: grid;
+								grid-template-columns: auto min-content;
+
+								.roll {
+									white-space: nowrap; 
+									overflow: hidden;
+									text-overflow: ellipsis;
+								}
+								.total {
+									text-align: right;
+									white-space: nowrap;
+									font-size: 25px;
 								}
 							}
-							.result {
-								padding: 3px 8px;
-								background: $black;
-								margin-bottom: 5px;
-								line-height: 29px;
+							&.action {
+								.result {
+									padding: 3px 8px;
+									background: $black;
+									margin-bottom: 5px;
+									line-height: 29px;
 
-								&:last-child {
-									margin-bottom: 0;
-								}
-								&.toHit {
-									border-bottom: solid 1px $gray;
-									background: none;
-									padding: 0 3px 5px 3px;
-									height: 35px;
-									line-height: 30px;
-									
-									.roll {
-										display: flex;
+									&:last-child {
+										margin-bottom: 0;
+									}
+									&.toHit {
+										border-bottom: solid 1px $gray;
+										background: none;
+										padding: 0 3px 5px 3px;
+										height: 35px;
+										line-height: 30px;
+										
+										.roll {
+											display: flex;
 
-										.icon {
-											display: inline-block;
-											margin-right: 8px;
-											width: 30px;
-											height: 30px;
+											.icon {
+												display: inline-block;
+												margin-right: 8px;
+												width: 30px;
+												height: 30px;
+											}
 										}
 									}
 								}
 							}
 						}
+					}
+					&.xp {
+						color: $white;
+						text-align: center;
+						font-size: 25px;
 					}
 				}
 			}

@@ -158,7 +158,6 @@
 	import { db } from '@/firebase';
 	import Dmg from '@/components/combat/side/Dmg.vue';
 	import Log from '@/components/combat/side/Log.vue';
-	import Players from '@/components/campaign/Players.vue';
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { mapGetters } from 'vuex';
 
@@ -171,7 +170,7 @@
 		components: {
 			Dmg,
 			Log,
-			Players
+			Players: () => import('@/components/campaign/Players.vue')
 		},
 		data() {
 			return {

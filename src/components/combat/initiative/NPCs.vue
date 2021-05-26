@@ -4,7 +4,7 @@
 			class="mx-3"
 			value="initiative-decimals" 
 			title="Initiateve decimals" 
-			content="Use decimals when multiple entities have the same initiative."
+			content="Use decimals when multiple entities have the same initiative to change the order."
 		/>
 		
 		<ul class="entities hasImg">

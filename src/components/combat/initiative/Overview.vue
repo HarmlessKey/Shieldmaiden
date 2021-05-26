@@ -14,7 +14,7 @@
 				<span>
 					<i class="fas fa-minus white" /> 
 					Moves the entity to a seperate initiative 
-					list from where they can quickly be added.
+					list that is hidden for your players, from which they can quickly be added.
 				</span>
 			</template>
 		</hk-tip>

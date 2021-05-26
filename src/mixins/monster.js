@@ -374,17 +374,24 @@ export const monsterMixin = {
 							}
 
 							newAbility.action_list[0].rolls = [];
+							let actually_fixed = null;
 							if(ability.damage_dice) {
 								ability.damage_dice.split("+").forEach((damage, index) => {
-									const input = damage.split("d");
-									const damage_type = (damage_types[index]) ? damage_types[index] : "slashing";
 
+									const damage_type = (damage_types[index]) ? damage_types[index] : "slashing";
 									let newRoll = {
-										dice_count: input[0],
-										dice_type: input[1],
 										damage_type
 									};
-									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
+
+									const input = damage.split("d");
+									if (input.length == 2) {
+										newRoll.dice_count = input[0]
+										newRoll.dice_type = input[1]
+									} else {
+										actually_fixed = parseInt(input[0]) || null;
+									}
+									
+									newRoll.fail_miss = (fail_miss === "miss_mod") ? 0 : 0.5;
 
 									newAbility.action_list[0].rolls.push(newRoll);
 								})
@@ -393,6 +400,8 @@ export const monsterMixin = {
 								// Add it only once (to the first roll by default, this might be wrong in some cases)
 								if(ability.damage_bonus && newAbility.action_list[0].rolls.length > 0) {
 									newAbility.action_list[0].rolls[0].fixed_val = ability.damage_bonus;
+								} else if (actually_fixed) {
+									newAbility.action_list[0].rolls[0].fixed_val = actually_fixed;
 								}
 							}
 						}

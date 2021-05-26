@@ -310,11 +310,11 @@ export const monsterMixin = {
 
 						if(ability.damage_dice || (ability.desc && ability.desc.toLowerCase().match(/(saving throw)/g))) {
 							// Find the range
-							const reach = (ability.desc) ? ability.desc.toLowerCase().match(/(reach).[0-9]+(\/[0-9]+)*/g) : null;
-							const range = (ability.desc) ? ability.desc.toLowerCase().match(/(range).[0-9]+(\/[0-9]+)*/g) : null;
+							const reach = (ability.desc) ? ability.desc.toLowerCase().match(/reach\s?([0-9]+(?:\/[0-9]+)?)/g) : null;
+							const range = (ability.desc) ? ability.desc.toLowerCase().match(/range\s?([0-9]+(?:\/[0-9]+)?)/g) : null;
 
-							if(reach) newAbility.reach = reach[0].split(" ")[1];
-							if(range) newAbility.range = range[0].split(" ")[1];
+							if(reach) newAbility.reach = reach[1];
+							if(range) newAbility.range = range[1];
 
 							// Check if it's a targeted action or saving throw
 							if(ability.attack_bonus && ability.attack_bonus !== 0) {
@@ -328,9 +328,9 @@ export const monsterMixin = {
 								newAbility.action_list[0].type = "save";
 								fail_miss = "save_fail_mod";
 
-								const save_dc = (ability.desc) ? ability.desc.match(/(DC).([0-9]+)/g) : null;
+								const save_dc = (ability.desc) ? ability.desc.match(/DC\s?([0-9]+)/g) : null;
 								if(save_dc) {
-									newAbility.action_list[0].save_dc = save_dc[0].split(" ")[1];
+									newAbility.action_list[0].save_dc = save_dc[1];
 								}
 
 								// Find the ability

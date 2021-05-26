@@ -138,7 +138,7 @@ export const monsterMixin = {
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
 
-			const proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
+			const proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency;
 
 			// Abilities & Saving Throws
 			new_monster.saving_throws = [];

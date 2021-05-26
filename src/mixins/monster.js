@@ -271,8 +271,8 @@ export const monsterMixin = {
 						// But later we might want to add conditions and reminders
 						// These might be applied in a different way, so with a different action
 						const newAbility = {
-							name: ability.name | "",
-							desc: ability.desc | null,
+							name: ability.name || "Unnamed Ability",
+							desc: ability.desc || null,
 							action_list: [
 								{
 									type: "other",

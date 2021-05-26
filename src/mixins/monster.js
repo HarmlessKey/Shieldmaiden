@@ -140,6 +140,10 @@ export const monsterMixin = {
 
 			const proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency;
 
+			if(monster.name === "b") {
+				new_monster.test = undefined;
+			}
+
 			// Abilities & Saving Throws
 			new_monster.saving_throws = [];
 			for(const ability of this.abilities) {
@@ -256,7 +260,7 @@ export const monsterMixin = {
 							immunity.trim().toLowerCase()
 						);
 					}
-				}			
+				}
 			}
 
 

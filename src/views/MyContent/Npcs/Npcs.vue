@@ -40,10 +40,14 @@
 				</template>
 
 				<template slot="name" slot-scope="data">
-					<template v-if="data.row.old">
-						<q-badge color="red" label="Deprecated" />
+					<span v-if="data.row.old">
+						<q-badge v-if="data.row.error" color="red" label="ERROR"/>
+						<q-badge v-else color="red" label="Deprecated" />
 						{{ data.item.capitalizeEach() }}
-					</template>
+						<q-tooltip  v-if="data.row.error" anchor="top middle" self="center middle">
+							Contact us on Discord
+						</q-tooltip>
+					</span>
 					<router-link v-else class="mx-2" :to="'/npcs/' + data.row.key">
 						{{ data.item.capitalizeEach() }}
 						<q-tooltip anchor="top middle" self="center middle">
@@ -206,7 +210,7 @@
 			},
 			old_npcs() {
 				return this._npcs.filter(npc => {
-					return npc.old
+					return npc.old && !npc.error
 				});
 			},
 			slotsLeft() {
@@ -281,17 +285,44 @@
 				this.parse_total = this.old_npcs.length;
 
 				for(const npc of this.old_npcs) {
-					console.log("Old:", npc);
 					const new_npc = this.parseMonster(npc);
-					console.log("New:", new_npc);
-					db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
+					try {
+						db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
+							this.parsed_counter++;
+						});
+					} catch(error) {
+						console.warn("An error occured in monster: ", npc.name);
+						console.error(error);
+						db.ref(`npcs/${this.userId}/${npc.key}/error`).set(true);
+						this.$q.notify({
+							message: `Error in ${npc.name}`,
+							caption: 'There is an error in your mosnter, contact us on Discord to fix it.',
+							color: "red",
+							position: "top",
+							progress: true,
+							timeout: 2000
+						});
 						this.parsed_counter++;
-					});
+					}
 				}
 			},
 			parseNewNPC(npc) {
 				const new_npc = this.parseMonster(npc);
-				db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc);
+				try {
+					db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc);
+				} catch(error) {
+						console.warn("An error occured in monster: ", npc.name);
+						db.ref(`npcs/${this.userId}/${npc.key}/error`).set(true);
+						console.error(error);
+						this.$q.notify({
+							message: `Error in ${npc.name}`,
+							caption: 'There is an error in your monster, contact us on Discord to fix it.',
+							color: "red",
+							position: "top",
+							progress: true,
+							timeout: 2000
+						});
+				}
 			}
 		}
 	}

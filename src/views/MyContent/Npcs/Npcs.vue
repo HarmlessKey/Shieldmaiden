@@ -154,6 +154,14 @@
 	import { db } from '@/firebase';
 	import { monsterMixin } from '@/mixins/monster';
 
+
+	// function* getN() {
+	// 	const list = [1, 2, 3, 4]
+	// 	for (let i =0; i < 4; i++) {
+	// 		yield list[i];
+	// 	}
+	// }
+
 	export default {
 		name: 'Npcs',
 		metaInfo: {
@@ -171,6 +179,7 @@
 				parsed_counter: 0,
 				parse_total: 0,
 				parsing: false,
+				old_npcs_copy: undefined,
 				columns: {
 					avatar: {
 						width: 46,
@@ -280,29 +289,43 @@
 				//Remove NPC
 				db.ref('npcs/' + this.userId).child(key).remove(); 
 			},
-			parseAll() {
+			* getNPC () {
+				for (const npc of this.old_npcs_copy) {
+					yield npc;
+					
+				}
+			},
+			async parseAll() {
 				this.parsing = true;
 				this.parse_total = this.old_npcs.length;
 
-				for(const npc of this.old_npcs) {
+				this.old_npcs_copy = [...this.old_npcs];
+
+				let npcGen = this.getNPC();			
+				
+				for (let i=0; i < this.parse_total; i++) {
+					
+					const npc = npcGen.next().value;
+
 					const new_npc = this.parseMonster(npc);
 					try {
-						db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
+						await db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
+							console.log(npc.name)
 							this.parsed_counter++;
 						});
 					} catch(error) {
+						this.parsed_counter++;
 						console.warn("An error occured in monster: ", npc.name);
 						console.error(error);
 						db.ref(`npcs/${this.userId}/${npc.key}/error`).set(true);
-						this.$q.notify({
-							message: `Error in ${npc.name}`,
-							caption: 'There is an error in your mosnter, contact us on Discord to fix it.',
-							color: "red",
-							position: "top",
-							progress: true,
-							timeout: 2000
-						});
-						this.parsed_counter++;
+						// this.$q.notify({
+						// 	message: `Error in ${npc.name}`,
+						// 	caption: 'There is an error in your mosnter, contact us on Discord to fix it.',
+						// 	color: "red",
+						// 	position: "top",
+						// 	progress: true,
+						// 	timeout: 2000
+						// });
 					}
 				}
 			},

@@ -177,20 +177,34 @@ export const monsterMixin = {
 			if(new_monster.skills_expertise.length === 0) delete new_monster.skills_expertise;
 
 			// Speed
-			const speed = (monster.speed) ? monster.speed.split(",") : null;
 			
-			if(speed) {
-				for(const index in speed) {
-					const current_speed = speed[index].replace("ft.", "").trim();
-
-					if(index == 0 && !isNaN(parseInt(current_speed))) {
-						new_monster.walk_speed = parseInt(current_speed);
-					} else {
-						const other_speed = current_speed.split(" ");
-						const type = `${other_speed[0]}_speed`;
-						new_monster[type] = parseInt(other_speed[1]);
+			// const speeds = (monster.speed) ? monster.speed.match(/(\d)+\D*/g) : null;
+			
+			// const speed = (monster.speed) ? monster.speed.split(",") : null;
+			// console.log("speeds", speed)
+			// console.log("old speed", monster.speed)
+			if (monster.speed) {
+				const speed_types = ["swim", "fly", "burrow", "climb"];
+				let match = [];
+				let max = 10;
+				const reg = /(\d+)\D*/g;
+				while (max > 0 && (match = reg.exec(monster.speed))) {
+					max--; // FAILSAFE
+					const string = match[0];
+					const value = match[1];
+					let found = false;
+					for (const type of speed_types) {
+						if (string.toLowerCase().includes(type)) {
+							new_monster[`${type}_speed`] = value;
+							found = true;
+							break;
+						}
 					}
+					if (!found) new_monster.walk_speed = value;
 				}
+			}
+			else {
+				new_monster.walk_speed = 0;
 			}
 
 			// Languages

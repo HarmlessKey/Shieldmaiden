@@ -231,6 +231,14 @@ export const content_module = {
 				});
 			}
 		},
+		stopFetchNpcs({ rootGetters }) {
+			console.log("stopFetchNpc called")
+			if (rootGetters.user) {
+				const uid = rootGetters.user.uid;
+				const npcs = npcs_ref.child(uid)
+				npcs.off();
+			}
+		},
 		remove_voucher( { rootGetters }) {
 			if(rootGetters.user) {
 				db.ref(`users/${rootGetters.user.uid}/voucher`).remove()

@@ -150,7 +150,7 @@
 	import _ from 'lodash';
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
+	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { monsterMixin } from '@/mixins/monster';
 
@@ -232,6 +232,10 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				'fetchNpcs',
+				'stopFetchNpcs'
+			]),
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -299,18 +303,16 @@
 				this.parsing = true;
 				this.parse_total = this.old_npcs.length;
 
+				this.stopFetchNpcs();
 				this.old_npcs_copy = [...this.old_npcs];
+				let npcGen = this.getNPC();
 
-				let npcGen = this.getNPC();			
-				
-				for (let i=0; i < this.parse_total; i++) {
-					
-					const npc = npcGen.next().value;
+				for (const npc of npcGen) {
 
 					const new_npc = this.parseMonster(npc);
+
 					try {
 						await db.ref(`npcs/${this.userId}/${npc.key}`).set(new_npc).then(() => {
-							console.log(npc.name)
 							this.parsed_counter++;
 						});
 					} catch(error) {
@@ -318,16 +320,17 @@
 						console.warn("An error occured in monster: ", npc.name);
 						console.error(error);
 						db.ref(`npcs/${this.userId}/${npc.key}/error`).set(true);
-						// this.$q.notify({
-						// 	message: `Error in ${npc.name}`,
-						// 	caption: 'There is an error in your mosnter, contact us on Discord to fix it.',
-						// 	color: "red",
-						// 	position: "top",
-						// 	progress: true,
-						// 	timeout: 2000
-						// });
+						this.$q.notify({
+							message: `Error in ${npc.name}`,
+							caption: 'There is an error in your mosnter, contact us on Discord to fix it.',
+							color: "red",
+							position: "top",
+							progress: true,
+							timeout: 2000
+						});
 					}
 				}
+				this.fetchNpcs();
 			},
 			parseNewNPC(npc) {
 				const new_npc = this.parseMonster(npc);

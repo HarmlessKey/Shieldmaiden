@@ -126,14 +126,20 @@
 					<h4 class="text-center mb-4">
 						<hk-animated-integer :value="parsed_counter" :class="{ green: parsed_counter === parse_total}" />/{{parse_total}} parsed
 					</h4>
-					<q-linear-progress v-if="parsed_counter !== parse_total" stripe rounded size="20px" :value="parsed_counter/parse_total" />
+					<q-linear-progress v-if="(parsed_counter + error_counter) !== parse_total" stripe rounded size="20px" :value="parsed_counter/parse_total" />
 					<template v-else>
 						<h2 class="text-center">
 							<i class="fas fa-check green"/>
 							Finished!
 						</h2>
 						<p>
-							All your old monster have succesfully been updated. 
+							<template v-if="error_counter === 0">
+								All 
+							</template>
+							<template v-else>
+								Except for {{ error_counter }}, all 
+							</template>
+							your old monster have succesfully been updated. 
 							Please make sure to double check them before use to correct any mistakes.
 						</p>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
@@ -177,6 +183,7 @@
 				userId: this.$store.getters.user.uid,
 				old_dialog: false,
 				parsed_counter: 0,
+				error_counter: 0,
 				parse_total: 0,
 				parsing: false,
 				old_npcs_copy: undefined,
@@ -316,7 +323,7 @@
 							this.parsed_counter++;
 						});
 					} catch(error) {
-						this.parsed_counter++;
+						this.error_counter++;
 						console.warn("An error occured in monster: ", npc.name);
 						console.error(error);
 						db.ref(`npcs/${this.userId}/${npc.key}/error`).set(true);

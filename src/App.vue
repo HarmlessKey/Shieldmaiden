@@ -33,6 +33,25 @@
 		
 		<vue-snotify />
 		<HkRolls />
+
+		<!-- Announcements -->
+		<q-dialog v-model="announcement" position="top" persistent >
+			<q-banner class="bg-blue white">
+				<template v-slot:avatar>
+					<q-icon name="info" />
+				</template>
+				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
+				<p>
+					This update will have a great impact on all your custom NPCs.<br/>
+					Please visit our <b><a href="https://discord.gg/rqJ6UHArXR" target="_blank" rel="noopener" class="white">Discord</a></b> 
+					for more information.
+				</p>
+				<i>Are you prepared?</i>
+				<template v-slot:action>
+					<q-btn flat icon="close" @click="announcement = false" />
+				</template>
+			</q-banner>
+		</q-dialog>
 	</div>
 </template>
 
@@ -43,9 +62,13 @@
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
-	import HkRolls from './components/hk-components/hk-rolls'
+	import HkRolls from './components/hk-components/hk-rolls';
+	import { general } from './mixins/general';
+
 
 	export default {
+	name: "App",
+	mixins: [general],
 	components: {
 		navMain: Header,
 		Sidebar,
@@ -94,19 +117,29 @@
 	data() {
 		return {
 			user: auth.currentUser,
-			connection: navigator.onLine ? 'online' : 'offline'
+			connection: navigator.onLine ? 'online' : 'offline',
+			announcementSetter: undefined
 		}
 	},
 	computed: {
 		...mapGetters({
 				slide: 'getSlide',
-			})
+			}),
+			announcement: {
+				get() {
+					const announcement = (auth.currentUser !== null) ? true : false;
+					return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
+				},
+				set(newVal) {
+					this.announcementSetter = newVal;
+				}
+			}
 	},
 	created() {
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
 
-		if(auth.currentUser !== null){
+		if(auth.currentUser !== null) {
 			this.setUser();
 			this.setUserInfo();
 			this.setUserSettings();

@@ -1,3 +1,5 @@
+import numeral from 'numeral';
+
 export const general = {
 	methods: {
 		calcMod(val) {
@@ -33,14 +35,14 @@ export const general = {
 			let d = new Date(input)
 			let hours = (d.getHours() < 10) ? '0'+d.getHours() : d.getHours();
 			let minutes = (d.getMinutes() < 10) ? '0'+d.getMinutes() : d.getMinutes();
-			let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
+			// let seconds = (d.getSeconds() < 10) ? '0'+d.getSeconds() : d.getSeconds();
 
-			let time = hours + ":" + minutes + ":" + seconds;
+			let time = hours + ":" + minutes;
 			let date = (short) ?
 			d.getDate() + "-" + parseInt(d.getMonth() + 1) + "-" + d.getFullYear() :
-			d.getDate() + " " + monthNames[d.getMonth()] + " " + d.getFullYear();
+			monthNames[d.getMonth()] + " " + numeral(d.getDate()).format('0o') + " " + d.getFullYear();
 			
-			if(showTime) { return date + " - " + time; }
+			if(showTime) { return date + " at " + time; }
 			return date
 		},
 		toKebabCase(input) {

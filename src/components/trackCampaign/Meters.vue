@@ -25,15 +25,9 @@
 						leave-active-class="animated animate__fadeOutDown">
 						<template v-for="entity in _meters[type]">
 							<li v-if="entity" class="health" :key="entity.key">
-								<icon 
-									v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.key], npcs[entity.key]))" class="img" 
-									:icon="displayImg(entity, players[entity.key], npcs[entity.key])" 
-									:fill="entities[entity.key].color_label" :style="entities[entity.key].color_label ? `border-color: ${entities[entity.key].color_label}` : ``"
-								/>
-								<div v-else class="img" :style="{ 
-									backgroundImage: 'url(\'' + displayImg(entities[entity.key], players[entity.key], npcs[entity.key]) + '\')',
-									borderColor: entities[entity.key].color_label ? entities[entity.key].color_label : ``
-								}"/>
+								<div class="img">
+									<Avatar :entity="entity" :players="players" :npcs="npcs" />
+								</div>
 								<q-linear-progress 
 									size="30px" 
 									:value="percentageMeters(entity.meters[subtype], type, subtype)" 
@@ -41,9 +35,8 @@
 									class="bg-gray-active"
 								>
 									<div class="info">
-										<span v-if="campaign" class="name">{{ players[entity.key].character_name }}</span>
-										<span v-else class="name">
-											{{ entity.name.capitalizeEach() }}
+										<span class="name">
+											<Name :entity="entity" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
 										</span>
 										<span class="numbers">
 											<span :class="{
@@ -72,15 +65,22 @@
 <script>
 	import _ from 'lodash';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import Name from './live/Name';
+	import Avatar from './live/Avatar';
 
 	export default {
 		name: 'app',
 		mixins: [trackEncounter],
+		components: {
+			Name,
+			Avatar
+		},
 		props: [
 			'entities',
 			'campaign',
 			'players',
-			'npcs'
+			'npcs',
+			'npcSettings'
 		],
 		data() {
 			return {
@@ -196,14 +196,7 @@
 				margin-bottom: 3px;
 
 				.img {
-					background-color: $gray-dark;
-					background-position: center top;
-					background-repeat: no-repeat;
-					background-size: cover;
 					grid-area: img;
-					width: 30px; 
-					height: 30px;
-					border: solid 1px transparent;
 				}
 				.q-linear-progress { 
 					font-size: 15px !important;

@@ -47,6 +47,7 @@
 								:entities="encounter.entities" 
 								:npcs="npcs" 
 								:players="players"
+								:npcSettings="npcSettings"
 							/>
 						</div>
 					</q-scroll-area>
@@ -131,6 +132,7 @@
 							:entities="encounter.entities" 
 							:npcs="npcs" 
 							:players="players"
+							:npcSettings="npcSettings"
 						/>
 					</q-tab-panel>
 					<q-tab-panel name="shares">

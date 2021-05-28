@@ -78,19 +78,7 @@
 								</td>
 							
 								<td class="image">
-									<icon 
-										v-if="['monster', 'player', 'companion'].includes(displayImg(entity, players[entity.id], npcs[entity.id]))" class="img"
-										:icon="displayImg(entity, players[entity.id], npcs[entity.id])" 
-										:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-									/>
-									<div 
-										v-else 
-										class="img" 
-										:style="{ 
-											backgroundImage: 'url(\'' + displayImg(entity, players[entity.id], npcs[entity.id]) + '\')',
-											'border-color': entity.color_label ? entity.color_label : ''
-										}"
-									/>
+									<Avatar class="img" :entity="entity" :players="players" :npcs="npcs" />
 								</td>
 								<td class="ac">
 									<div class="ac_wrapper">
@@ -121,16 +109,12 @@
 								</td>
 
 								<td class="name">
-									<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
-										<template v-if="displayNPCField('name', entity)">
-											{{ entity.name.capitalizeEach() }}
-										</template>
-										<template v-else>
-											? ? ?
-										</template>
-									</span>
-									<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
-									<template v-else>{{ players[entity.key].character_name }}</template>
+									<Name 
+										:entity="entity" 
+										:players="players" 
+										:npcs="npcs" 
+										:npcSettings="npcSettings"
+									/>
 								</td>
 
 							<td class="hp">
@@ -212,16 +196,12 @@
 											<q-list>
 												<q-item>
 													<q-item-section>
-														<span v-if="entity.entityType === 'npc'" :style="entity.color_label ? `color: ${entity.color_label}` : ``">
-															<template v-if="displayNPCField('name', entity)">
-																{{ entity.name.capitalizeEach() }}
-															</template>
-															<template v-else>
-																? ? ?
-															</template>
-														</span>
-														<template v-else-if="entity.entityType == 'companion'">{{ npcs[entity.key].name }}</template>
-														<template v-else>{{ players[entity.key].character_name }}</template>
+														<Name 
+															:entity="entity" 
+															:players="players" 
+															:npcs="npcs" 
+															:npcSettings="npcSettings"
+														/>
 													</q-item-section>
 													<q-item-section avatar>
 															{{ Object.keys(entity.conditions).length }}
@@ -267,12 +247,16 @@
 	import { conditions } from '@/mixins/conditions.js';
 
 	import Health from './Health.vue';
+	import Name from './Name.vue';
+	import Avatar from './Avatar.vue';
 
 	export default {
 		name: 'Initiative',
 		mixins: [general, trackEncounter, conditions],
 		components: {
 			Health,
+			Name,
+			Avatar
 		},
 		props: [
 			'encounter',
@@ -538,9 +522,6 @@
 							.img {
 								width: 42px;
 								height: 42px;
-								border: solid 1px $gray-light;
-								background-size: cover;
-								background-position: center top;
 							}
 							svg.img {
 								margin-bottom: -6px;

@@ -17,23 +17,13 @@
 				</div>
 			</div>
 
-			<icon 
-				v-if="['monster', 'player', 'companion'].includes(displayImg(current, players[current.id], npcs[current.id]))" class="img d-none d-md-block"
-				:icon="displayImg(current, players[current.id], npcs[current.id])" 
-				:fill="current.color_label" :style="current.color_label ? `border-color: ${current.color_label}` : ``"
-			/>
-			<div v-else class="img d-none d-md-block" 
-				:style="{ backgroundImage: 'url(\'' + displayImg(current, players[current.id], npcs[current.id]) + '\')',
-				borderColor: current.color_label ? current.color_label : ``
-			}"/>
+			<div class="img d-none d-md-block">
+				<Avatar :entity="current" :players="players" :npcs="npcs" />
+			</div>
+
 			<h2 class="d-none d-md-flex justify-content-start">
 				<span class="mr-3">
-					<!-- Companion name is stored in NPC data -->
-					<template v-if="current.entityType === 'npc' || current.entityType === 'companion'">
-						<template v-if="displayNPCField('name', current)">{{ current.name }}</template>
-						<template v-else>? ? ?</template>
-					</template>
-					<template v-else>{{ players[current.key].character_name }}</template>
+					<Name :entity="current" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
 				</span>
 
 				<!-- Companion health is stored in campaign.companions -->
@@ -86,12 +76,16 @@
 	import { general } from '@/mixins/general.js';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 	import Health from './Health.vue';
+	import Name from './Name.vue';
+	import Avatar from './Avatar.vue';
 
 	export default {
 		name: 'app',
 		mixins: [general, trackEncounter],
 		components: {
 			Health,
+			Name,
+			Avatar
 		},
 		props: [
 			'encounter',
@@ -154,14 +148,12 @@
 		.img {
 			width: 40px;
 			height: 40px;
-			background-size: cover;
-			background-position: center top;
 			margin-left: 15px;
-			border: solid 1px $gray-light;
 		}
 		h2 {
 			line-height: 40px;
-			margin-left: 20px;
+			margin-left: 15px;
+			text-transform: none;
 		}
 		.actions {
 			position: absolute;

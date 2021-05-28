@@ -11,36 +11,14 @@
 								<h3>
 									<!-- IMAGE -->
 									<div class="img" v-if="entity_key && entities && Object.keys(entities).includes(entity_key)">
-										<icon 
-											v-if="['monster', 'player', 'companion'].includes(displayImg(entities[entity_key], players[entity_key], npcs[entity_key]))" class="img"
-											:icon="displayImg(entities[entity_key], players[entity_key], npcs[entity_key])" 
-											:fill="entities[entity_key].color_label" :style="entities[entity_key].color_label ? `border-color: ${entities[entity_key].color_label}` : ``"
-										/>
-										<div 
-											v-else 
-											class="img" 
-											:style="{ 
-												backgroundImage: 'url(\'' + displayImg(entities, players[entity_key], npcs[entity_key]) + '\')',
-												'border-color': entities[entity_key].color_label ? entities[entity_key].color_label : ''
-											}"
-										/>
+										<Avatar :entity="entities[entity_key]" :players="players" :npcs="npcs" />
 									</div>
 									<img class="img logo" v-else src="@/assets/_img/logo/logo-icon-no-shield-cyan.svg" />
 
 									<div class="header">
 										<!-- NAME -->
 										<div class="name truncate" v-if="entity_key && entities && Object.keys(entities).includes(entity_key)">
-											<span 
-												v-if="entities[entity_key].entityType === 'npc'" 
-												:style="entities[entity_key].color_label ? `color: ${entities[entity_key].color_label}` : ``"
-											>
-												<template v-if="displayNPCField('name', entities[entity_key])">
-													{{ entities[entity_key].name.capitalizeEach() }}
-												</template>
-												<template v-else>? ? ?</template>
-											</span>
-											<template v-else-if="entities[entity_key].entityType == 'companion'">{{ npcs[entity_key].name }}</template>
-											<template v-else>{{players[entity_key].character_name }}</template>
+											<Name :entity="entities[entity_key]" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
 										</div>
 										
 
@@ -65,23 +43,10 @@
 									<div v-else v-for="(action, index) of notification.actions" :key="`action-${index}`">
 										<div v-if="notification.targets" class="targets">
 											<template v-for="target in notification.targets">
-												<div v-if="entities && Object.keys(entities).includes(target)" :key="target">
-													<icon 
-														v-if="['monster', 'player', 'companion'].includes(displayImg(entities[target], players[target], npcs[target]))"
-														class="img"
-														:icon="displayImg(entities[target], players[target], npcs[target])" 
-														:fill="entities[target].color_label" :style="entities[target].color_label ? `border-color: ${entities[target].color_label}` : ``"
-													/>
-													<div 
-														v-else 
-														class="img"			 
-														:style="{ 
-															backgroundImage: 'url(\'' + displayImg(entities, players[target], npcs[target]) + '\')',
-															'border-color': entities[target].color_label ? entities[target].color_label : ''
-														}"
-													/>
+												<div v-if="entities && Object.keys(entities).includes(target)" :key="target" class="img">
+													<Avatar :entity="entities[target]" :players="players" :npcs="npcs" />
 													<q-tooltip anchor="top middle" self="center middle">
-														{{ entities[target].name.capitalizeEach() }}
+														<Name :entity="entities[target]" :players="players" :npcs="npcs" :npcSettings="npcSettings" />
 													</q-tooltip>
 												</div>
 											</template>
@@ -122,19 +87,8 @@
 							<div class="bg-gray-dark py-2">
 								<div v-if="notification.targets" class="targets">
 									<template v-for="target in notification.targets">
-										<div v-if="players && Object.keys(players).includes(target)" :key="target">
-											<icon 
-												v-if="['player', 'companion'].includes(displayImg(players[target], players[target]))"
-												class="img"
-												:icon="displayImg(players[target], players[target])" 
-											/>
-											<div 
-												v-else 
-												class="img"			 
-												:style="{ 
-													backgroundImage: 'url(\'' + displayImg(players, players[target]) + '\')'
-												}"
-											/>
+										<div v-if="players && Object.keys(players).includes(target)" :key="target" class="img">
+											<Avatar :entity="players[target]" :players="players" :npcs="npcs" />
 											<q-tooltip anchor="top middle" self="center middle">
 												{{ players[target].character_name.capitalizeEach() }}
 											</q-tooltip>
@@ -155,6 +109,8 @@
 <script>
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
 	import { damage_types } from "@/mixins/damageTypes.js";
+	import Name from "./live/Name";
+	import Avatar from "./live/Avatar";
 
 	export default {
 		name: "Shares",
@@ -185,10 +141,9 @@
 				default: undefined
 			}
 		},
-		data() {
-			return {
-				
-			}
+		components: {
+			Name,
+			Avatar
 		},
 		methods: {
 			advantage(input) {
@@ -227,13 +182,8 @@
 						margin: 10px 0;
 
 						.img {
-							background-color: $gray-dark;
-							background-position: center top;
-							background-repeat: no-repeat;
-							background-size: cover;
 							width: 23px; 
 							height: 23px;
-							border: solid 1px transparent;
 							margin: 0 2px;
 						}
 					}
@@ -249,13 +199,8 @@
 							height: 43px;
 
 							.img {
-								background-color: $gray-dark;
-								background-position: center top;
-								background-repeat: no-repeat;
-								background-size: cover;
-								width: 41px; 
-								height: 41px;
-								border: solid 1px transparent;
+								width: 42px; 
+								height: 42px;
 
 								&.logo {
 									background: none;

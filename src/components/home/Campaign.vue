@@ -69,14 +69,14 @@
 						title: "Player status",
 						text: "Keep track of player status outside combat.<br/>"+
 							"You have a quick overview of their senses at hand and you "+
-							"always know how they're doing health wise."
+							"always know how they're doing healthwise."
 					},
 					{
 						name: "loot",
 						icon: "fas fa-treasure-chest",
 						title: "Party loot",
-						text: "Hand out items to your players so they have an overview "+
-							"of their inventory. You can link loot to an encounter and award that once they've beaten it."
+						text: "Handing out items to your players this way offers them an overview "+
+							"of their inventory. You can link loot to an encounter and award it once the encounter is finished"
 					},
 					{
 						name: "currency",
@@ -90,7 +90,7 @@
 						icon: "fas fa-sparkles",
 						title: "Experience points",
 						text: "If you're using experience points in your games, you will love this. "+
-							"We do all the calculating, like the players levels and the XP worth of your encounters."+
+							"We do all the maths, like calculating the players' levels and the XP worth of your encounters."+
 							"You can simply award XP once an encouner is finished, or at any other time."
 					},
 				]

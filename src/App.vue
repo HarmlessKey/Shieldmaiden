@@ -237,7 +237,9 @@
 			}
 		},
 		closeAnnouncement() {
-			document.cookie = "announcement=true; expires=Wed, 3 Jun 2021 00:00:00 UTC; path=/";
+			const max_age = 24*60*60 // 24 hours in seconds
+
+			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
 			this.announcement = false;
 		}
 	}

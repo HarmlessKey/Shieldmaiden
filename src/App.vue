@@ -42,13 +42,13 @@
 				</template>
 				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
 				<p>
-					This update will have a great impact on all your custom NPCs.<br/>
+					This update will bring a massive NPC overhaul and will have a great impact on all your custom NPCs.<br/>
 					Please visit our <b><a href="https://discord.gg/rqJ6UHArXR" target="_blank" rel="noopener" class="white">Discord</a></b> 
 					for more information.
 				</p>
 				<i>Are you prepared?</i>
 				<template v-slot:action>
-					<q-btn flat icon="close" @click="announcement = false" />
+					<q-btn flat icon="close" @click="closeAnnouncement()" />
 				</template>
 			</q-banner>
 		</q-dialog>
@@ -118,7 +118,8 @@
 		return {
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
-			announcementSetter: undefined
+			announcementSetter: undefined,
+			announcement_cookie: false,
 		}
 	},
 	computed: {
@@ -127,7 +128,7 @@
 			}),
 			announcement: {
 				get() {
-					const announcement = (auth.currentUser !== null) ? true : false;
+					const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
 					return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
 				},
 				set(newVal) {
@@ -136,6 +137,15 @@
 			}
 	},
 	created() {
+		const cookies = document.cookie.split(';');
+
+		for (let cookie of cookies) {
+			const [key, val] = cookie.split('=');
+			if (key.trim() === 'announcement' && val === 'true') {				
+				console.log("cookie!")
+				this.announcement_cookie = true;
+			}
+		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
 
@@ -225,6 +235,10 @@
 						});
 				});
 			}
+		},
+		closeAnnouncement() {
+			document.cookie = "announcement=true; expires=Wed, 3 Jun 2021 00:00:00 UTC; path=/";
+			this.announcement = false;
 		}
 	}
 };

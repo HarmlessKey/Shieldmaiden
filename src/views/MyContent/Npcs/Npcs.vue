@@ -64,6 +64,12 @@
 								Parse to new format
 							</q-tooltip>
 						</a>
+						<a @click="setSlide({show: true, type: 'ViewOldMonster', data: data.row })">
+							<i class="fas fa-eye"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								View NPC
+							</q-tooltip>
+						</a>
 					</template>
 					<router-link v-else class="gray-hover mx-1" :to="'/npcs/' + data.row.key">
 						<i class="fas fa-pencil"></i>
@@ -241,7 +247,8 @@
 		methods: {
 			...mapActions([
 				'fetchNpcs',
-				'stopFetchNpcs'
+				'stopFetchNpcs',
+				'setSlide'
 			]),
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held

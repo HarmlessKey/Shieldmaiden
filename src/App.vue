@@ -35,19 +35,13 @@
 		<HkRolls />
 
 		<!-- Announcements -->
-		<q-dialog v-model="announcement" position="top" persistent >
+		<q-dialog v-model="announcement" position="top" persistent>
 			<q-banner class="bg-blue white">
 				<template v-slot:avatar>
 					<q-icon name="info" />
 				</template>
 				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
-				<p>
-					This update will bring a massive NPC overhaul and will have a great impact on all your custom NPCs.<br/>
-					Please visit our <b><a href="https://discord.gg/rqJ6UHArXR" target="_blank" rel="noopener" class="white">Discord</a></b> or
-					our <b><a href="/npc-overhaul" target="_blank" class="white" @click="closeAnnouncement()">NPC Overhaul</a></b> page
-					for more information.
-				</p>
-				<i>Are you prepared?</i>
+				<p>No announcement</p>
 				<template v-slot:action>
 					<q-btn flat icon="close" @click="closeAnnouncement()" />
 				</template>
@@ -119,7 +113,7 @@
 		return {
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
-			announcementSetter: undefined,
+			announcementSetter: false,
 			announcement_cookie: false,
 			broadcast: undefined
 		}
@@ -169,7 +163,6 @@
 		for (let cookie of cookies) {
 			const [key, val] = cookie.split('=');
 			if (key.trim() === 'announcement' && val === 'true') {				
-				console.log("cookie!")
 				this.announcement_cookie = true;
 			}
 		}
@@ -213,6 +206,12 @@
 		]),
 		hideSlide() {
 			this.setSlide(false)
+		},
+		closeAnnouncement() {
+			const max_age = 24*60*60 // 24 hours in seconds
+
+			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
+			this.announcement = false;
 		}
 	}
 };

@@ -275,7 +275,7 @@
 				width: 0,
 				is_small: false,
 				is_medium: false,
-				viewerId: this.$store.getters.user.uid,
+				viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				players: undefined,
 				loading: true
 			}

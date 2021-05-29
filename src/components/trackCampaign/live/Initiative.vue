@@ -1,6 +1,6 @@
 <template>
 	<div 
-		v-if="targets && allEntities && players && campPlayers" 
+		v-if="targets && allEntities && players && campPlayers && characters" 
 		class="initiative-wrapper"
 		ref="initiative"
 	>
@@ -287,7 +287,7 @@
 		data() {
 			return {
 				dmId: this.$route.params.userid,
-				userId: this.$store.getters.user.uid,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				width: 0,
 				characters: [],
 				targeted: []

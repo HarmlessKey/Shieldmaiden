@@ -33,6 +33,26 @@
 		
 		<vue-snotify />
 		<HkRolls />
+
+		<!-- Announcements -->
+		<q-dialog v-model="announcement" position="top" persistent >
+			<q-banner class="bg-blue white">
+				<template v-slot:avatar>
+					<q-icon name="info" />
+				</template>
+				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
+				<p>
+					This update will bring a massive NPC overhaul and will have a great impact on all your custom NPCs.<br/>
+					Please visit our <b><a href="https://discord.gg/rqJ6UHArXR" target="_blank" rel="noopener" class="white">Discord</a></b> or
+					our <b><a href="/npc-overhaul" target="_blank" class="white" @click="closeAnnouncement()">NPC Overhaul</a></b> page
+					for more information.
+				</p>
+				<i>Are you prepared?</i>
+				<template v-slot:action>
+					<q-btn flat icon="close" @click="closeAnnouncement()" />
+				</template>
+			</q-banner>
+		</q-dialog>
 	</div>
 </template>
 
@@ -43,9 +63,13 @@
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
-	import HkRolls from './components/hk-components/hk-rolls'
+	import HkRolls from './components/hk-components/hk-rolls';
+	import { general } from './mixins/general';
+
 
 	export default {
+	name: "App",
+	mixins: [general],
 	components: {
 		navMain: Header,
 		Sidebar,
@@ -95,6 +119,8 @@
 		return {
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
+			announcementSetter: undefined,
+			announcement_cookie: false,
 			broadcast: undefined
 		}
 	},
@@ -124,16 +150,34 @@
 	},
 	computed: {
 		...mapGetters({
-			slide: 'getSlide',
 			storeBroadcast: 'broadcast'
+			slide: 'getSlide',
 		}),
+			announcement: {
+				get() {
+					const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
+					return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
+				},
+				set(newVal) {
+					this.announcementSetter = newVal;
+				}
+			}
 	},
 	created() {
+		const cookies = document.cookie.split(';');
+
+		for (let cookie of cookies) {
+			const [key, val] = cookie.split('=');
+			if (key.trim() === 'announcement' && val === 'true') {				
+				console.log("cookie!")
+				this.announcement_cookie = true;
+			}
+		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
 		this.setTips();
 
-		if(auth.currentUser !== null){
+		if(auth.currentUser !== null) {
 			this.setUser();
 			this.setUserInfo();
 			this.setUserSettings();

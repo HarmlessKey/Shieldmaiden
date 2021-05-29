@@ -691,6 +691,11 @@ export const routes = [{
 	redirect: '/user/:userid',
 },
 {
+	path: '/npc-overhaul',
+	name: 'NPC overhaul',
+	component: () => import(/* webpackChunkName: "list" */ '@/views/Pages/npc_overhaul.vue'),
+},
+{
 	path: '/404',
 	name: '404',
 	component: Error404

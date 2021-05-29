@@ -150,18 +150,18 @@
 	},
 	computed: {
 		...mapGetters({
-			storeBroadcast: 'broadcast'
 			slide: 'getSlide',
+			storeBroadcast: 'broadcast'
 		}),
-			announcement: {
-				get() {
-					const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
-					return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
-				},
-				set(newVal) {
-					this.announcementSetter = newVal;
-				}
+		announcement: {
+			get() {
+				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
+				return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
+			},
+			set(newVal) {
+				this.announcementSetter = newVal;
 			}
+		}
 	},
 	created() {
 		const cookies = document.cookie.split(';');

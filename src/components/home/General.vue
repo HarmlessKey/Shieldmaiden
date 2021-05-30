@@ -125,8 +125,8 @@
 						name: "more",
 						icon: "fas fa-ellipsis-h",
 						title: "And a lot more",
-						text: "Possibilities are nearly endless so we can't possibly list all the things you can do with our <b>combat tracker</b>. "+
-						"Just try it and see if it offers what you need. We are constantly improving and increasing functionality."
+						text: "A complete overview of all available features would be far too extensive and would need to be updated constantly, since we are always working to improve and expand our <b>combat tracker</b>. "+
+						"Why don't you just give it a try and see if it offers what you need?"
 					},
 				]
 			}

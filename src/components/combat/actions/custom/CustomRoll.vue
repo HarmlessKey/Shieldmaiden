@@ -1,7 +1,7 @@
 <template>
 	<div v-if="current">
 		<q-btn-toggle
-			v-model="roll_type"
+			:value="roll_type"
 			class="mb-3"
 			spread no-caps dark dense square
 			toggle-color="primary"
@@ -11,6 +11,7 @@
 				{label: 'Save', value: 'save'},
 				{label: 'Heal', value: 'heal'}
 			]"
+			@input="setType"
 		/>
 		<q-form>
 			<q-input
@@ -92,11 +93,12 @@
 </template>
 
 <script>
+	import { db } from "@/firebase";
 	import { mapGetters, mapActions } from "vuex";
 	import { dice } from "@/mixins/dice.js";
 	import { setHP } from "@/mixins/HpManipulations.js";
-	import { damage_types } from '@/mixins/damageTypes.js';
-	import { abilities } from '@/mixins/abilities.js';
+	import { damage_types } from "@/mixins/damageTypes.js";
+	import { abilities } from "@/mixins/abilities.js";
 
 	export default {
 		name: "CustomRoll",
@@ -125,8 +127,12 @@
 				"encounter",
 				"entities",
 				"turn",
-				"targeted"
-			])
+				"targeted",
+				"broadcast"
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("action_rolls")) || false;
+			},
 		},
 		methods: {
 			...mapActions([
@@ -135,6 +141,15 @@
 				"setShareRolls",
 				"set_limitedUses"
 			]),
+			setType(value) {
+				this.custom_rolls = [
+					{
+						damage_type: "slashing",
+						roll: undefined
+					}
+				];
+				this.roll_type = value;
+			},
 			roll(e) {
 				let isValid = true;
 
@@ -158,6 +173,7 @@
 					// Roll once for AOE
 					if(this.roll_type === "save") {
 						roll = this.rollAction(e, action, config);
+						if(this.share) this.shareRoll(roll, this.targeted);
 					}
 
 					// Loop over all targets
@@ -167,6 +183,7 @@
 						// Reroll for each target if it's to hit or healing
 						if(this.roll_type !== "save") {
 							newRoll = this.rollAction(e, action, config);
+							if(this.share) this.shareRoll(newRoll, [key]);
 						}
 
 						// Set the target and current
@@ -220,6 +237,50 @@
 			},
 			removeRoll(index) {
 				if(index != 0) this.$delete(this.custom_rolls, index);
+			},
+			shareRoll(roll, targets) {
+				const key = Date.now() + Math.random().toString(36).substring(4);
+				let share = {
+					key,
+					type: "action_roll",
+					entity_key: this.current.key,
+					encounter_id: this.encounterId,
+					notification: {
+						title: roll.name,
+						targets,
+						actions: []
+					}
+				};
+				roll.actions.forEach((action, action_index) => {
+					const type = (action.type === "healing") ? "healing" : "damage";
+
+					share.notification.actions[action_index] = {
+						rolls: [],
+						type
+					};
+					// To hit
+					if(action.toHit) {
+						const toHit = action.toHit;
+						share.notification.actions[action_index].toHit = {
+							roll: toHit.roll,
+							total: toHit.total
+						}
+						if(toHit.ignored) share.notification.actions[action_index].toHit.advantage_disadvantage = this.advantage(toHit.advantage_disadvantage);
+					}
+
+					//Rolls
+					action.rolls.forEach((roll, roll_index) => {
+						share.notification.actions[action_index].rolls[roll_index] = {
+							damage_type: roll.damage_type || null,
+							roll: roll.modifierRoll.roll,
+							total: roll.modifierRoll.total,
+						};
+					});
+				});
+				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+			},
+			advantage(input) {
+				return Object.keys(input)[0].charAt(0);
 			}
 		}
 	}

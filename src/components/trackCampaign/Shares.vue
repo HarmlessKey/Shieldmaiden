@@ -70,10 +70,11 @@
 
 										<div v-for="(roll, roll_index) in action.rolls" class="result " :key="`action-roll-${roll_index}`">
 											<span class="roll">
-												<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
+												<i v-if="action.type === 'healing'" class="fas fa-heart green" />
+												<i v-else-if="roll.damage_type" :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
 												{{ roll.roll }}
 											</span>
-											<span class="total" :class="roll.damage_type">
+											<span class="total" :class="(action.type === 'healing') ? 'green' : roll.damage_type">
 												{{ roll.total }}
 											</span>
 										</div>

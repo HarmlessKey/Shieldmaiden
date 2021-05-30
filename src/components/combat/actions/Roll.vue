@@ -362,6 +362,7 @@
 			},
 			shareRoll(roll, targets) {
 				const key = Date.now() + Math.random().toString(36).substring(4);
+				console.log(roll)
 				let share = {
 					key,
 					type: "action_roll",
@@ -374,8 +375,13 @@
 					}
 				};
 				roll.actions.forEach((action, action_index) => {
+					
+					// Type
+					const type = (action.type === "healing") ? "healing" : "damage";
+
 					share.notification.actions[action_index] = {
-						rolls: []
+						rolls: [],
+						type
 					};
 					// To hit
 					if(action.toHit) {
@@ -390,7 +396,7 @@
 					//Rolls
 					action.rolls.forEach((roll, roll_index) => {
 						share.notification.actions[action_index].rolls[roll_index] = {
-							damage_type: roll.damage_type,
+							damage_type: roll.damage_type || null,
 							roll: roll.modifierRoll.roll,
 							total: roll.modifierRoll.total,
 						};

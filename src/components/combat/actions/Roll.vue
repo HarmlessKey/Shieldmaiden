@@ -106,7 +106,6 @@
 												<span v-if="action.action_list[0].save_ability">
 													{{ action.action_list[0].save_ability.substring(0, 3).toUpperCase() }}
 												</span>
-												<span class="gray-hover">DC</span>
 												{{ action.action_list[0].save_dc }}
 											</span>
 											<!-- AOE -->
@@ -172,19 +171,45 @@
 									</q-item-section>
 									<!-- Spend limited actions that can't be rolled -->
 									<q-item-section v-else-if="action.limit || action.recharge || action.legendary_cost" avatar>
-										<div 
-											v-if="checkAvailable(type, action_index, action)"
-											class="blue"
-											@click.stop="spendLimited(
-												type, 
-												action.legendary_cost ? 'legendaries_used' : action_index,
-												false,
-												action.legendary_cost ? action.legendary_cost : 1
-											)"
-										>
-											Use
+										<template v-if="action.legendary_cost || action.recharge">
+											<div 
+												v-if="checkAvailable(type, action_index, action)"
+												class="blue"
+												@click.stop="spendLimited(
+													type, 
+													action.legendary_cost ? 'legendaries_used' : action_index,
+													false,
+													action.legendary_cost ? action.legendary_cost : 1
+												)"
+											>
+												Use
+											</div>
+											<i v-else class="fas fa-ban gray-light" />
+										</template>
+										<div v-else class="slots">
+											<span 
+												v-for="i in parseInt(action.limit)" 
+												:key="`legendary-${i}`" 
+												class="mr-1"
+												@click.stop="
+													current.limited_uses[type] && current.limited_uses[type][action_index] >= i
+													? spendLimited(type, action_index, true)
+													: spendLimited(type, action_index)
+												"
+											>
+												<i class="far" :class="
+													current.limited_uses[type] && current.limited_uses[type][action_index] >= i
+													? 'fa-dot-circle' : 'fa-circle'
+													"
+												/>
+												<q-tooltip anchor="top middle" self="center middle">
+													{{ 
+														current.limited_uses[type] && current.limited_uses[type][action_index] >= i
+														? "Regain" : "Spend"
+													}}
+												</q-tooltip>
+											</span>
 										</div>
-										<i v-else class="fas fa-ban gray-light" />
 									</q-item-section>
 								</template>
 
@@ -192,7 +217,7 @@
 									<hk-dice-text :input_text="action.desc"/>
 									<div 
 										class="blue pointer mt-2" 
-										v-if="!checkAvailable(type, action_index, action) && !action.legendary_cost"
+										v-if="!checkAvailable(type, action_index, action) && action.recharge"
 										@click="spendLimited(type, action_index, true)"
 									>
 										Regain use
@@ -375,8 +400,6 @@
 					}
 				};
 				roll.actions.forEach((action, action_index) => {
-					
-					// Type
 					const type = (action.type === "healing") ? "healing" : "damage";
 
 					share.notification.actions[action_index] = {

@@ -2,7 +2,8 @@
 	<div id="current" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 			<span>
-				<i v-if="current.hidden" class="fas fa-eye-slash red"></i> 
+				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
+				<q-badge v-if="current.old" label="DEPRECATED" color="red" />
 				{{ current.name.capitalizeEach() }}
 			</span>
 			<a class="show" @click="showCard = !showCard">
@@ -12,6 +13,11 @@
 				</q-tooltip>
 			</a>
 		</h2>
+		<p v-if="current.old" class="red px-3">
+			Some values might not show, or show incorrectly. 
+			Please update your NPC at the
+			<router-link to="/npcs">NPC's page</router-link>.
+		</p>
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">
 				<DeathSaves 

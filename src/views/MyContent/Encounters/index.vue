@@ -227,7 +227,7 @@
 	import { db } from "@/firebase";
 
 	export default {
-		name: "EditCampaign",
+		name: "Encounters",
 		metaInfo: {
 			title: "Encounters"
 		},

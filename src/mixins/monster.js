@@ -411,7 +411,7 @@ export const monsterMixin = {
 			}
 			// Legendary action count
 			if(new_monster.legendary_actions && new_monster.legendary_actions.length > 0) {
-				new_monster.lengendary_count = 3;
+				new_monster.legendary_count = 3;
 			}
 			return new_monster;
 		}

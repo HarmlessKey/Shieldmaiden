@@ -22,11 +22,11 @@
 				<q-tab-panels v-model="tab" class="bg-transparent">
 					<q-tab-panel :name="name" v-for="({name, type}, type_index) in action_types" :key="`panel-${type_index}`">
 
-						<div v-if="type === 'legendary_actions' && current.lengendary_count" class="limited">
+						<div v-if="type === 'legendary_actions' && current.legendary_count" class="limited">
 							Actions used 
 							<div class="slots">
 								<span 
-									v-for="i in current.lengendary_count" 
+									v-for="i in current.legendary_count" 
 									:key="`legendary-${i}`" 
 									class="mr-1"
 									@click="
@@ -376,7 +376,7 @@
 				if(action.legendary_cost) {
 					return !this.current.limited_uses[category] || 
 						!this.current.limited_uses[category].legendaries_used || 
-						(action.legendary_cost <= (this.current.lengendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
+						(action.legendary_cost <= (this.current.legendary_count - this.current.limited_uses['legendary_actions'].legendaries_used));
 				}
 				if(action.limit) {
 					return !this.current.limited_uses[category] || (this.current.limited_uses[category][index] < action.limit);

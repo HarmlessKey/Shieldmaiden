@@ -45,7 +45,7 @@
 						v-if="category === 'legendary_actions'"
 						dark filled square
 						label="Count"
-						v-model="npc.lengendary_count"
+						v-model="npc.legendary_count"
 						type="number"
 						class="my-3"
 						hint="Amount of legendary actions per turn."

@@ -21,7 +21,7 @@
 						</div>
 					</template>
 				</template>
-				<span v-else class="text-italic gray-hover">No money</span>
+				<span v-else class="text-italic white">No money</span>
 			</div>
 			<div class="actions">
 				<template v-if="viewerIsUser">
@@ -74,7 +74,7 @@
 		<div 
 			v-if="players"
 			class="players" 
-			:class="{ xp: isXpAdvancement() }"
+			:class="{ xp: isXpAdvancement(), large: is_large }"
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
 			<div class="header"></div>
@@ -250,13 +250,14 @@
 								Level is overwritten
 							</q-tooltip>
 						</div>
-						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-gray-active" />
+						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-gray-light" />
 					</div>
 				</template>
 			</template>
 		</div>
 
 		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<q-resize-observer @resize="onResize" />
 	</div>
 </template>
 
@@ -275,6 +276,7 @@
 				width: 0,
 				is_small: false,
 				is_medium: false,
+				is_large: false,
 				viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				players: undefined,
 				loading: true
@@ -306,7 +308,7 @@
 				return this.userId === this.viewerId;
 			},
 			templateColumns() {
-				let templateColumns = 'max-content 40px auto ';
+				let templateColumns = 'max-content max-content auto ';
 
 				if(this.settings.passive_perception === undefined && !this.is_small) { 
 					templateColumns = templateColumns.concat(' max-content');
@@ -377,29 +379,23 @@
 				this.players = Object.values(campaignPlayers);
 				this.loading = false;
 			});
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
 		},
 		methods: {
 			...mapActions([
 				'setSlide',
 			]),
-			getWindowWidth() {
-				this.width = this.$refs.players.clientWidth;
-			},
-			setSize() {
-				let width = this.$refs.players.clientWidth
+			onResize (size) {
+				let width = size.width;
 				let small = 400;
 				let medium = 500;
+				let large = 885;
 
+				this.is_large = (width >= large) ? true : false;
 				this.is_medium = (width <= medium) ? true : false;
 				this.is_small = (width <= small) ? true : false;
 
 				//sets new width on resize
-				this.width = this.$refs.players.clientWidth;
+				this.width = size.width;
 			},
 			percentage(current, max) {
 				var percentage = Math.floor(current / max * 100)
@@ -428,9 +424,6 @@
 			isXpAdvancement(){
 				return this.campaign.advancement != 'milestone'
 			}
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
 		}
 	}
 </script>
@@ -450,7 +443,8 @@
 			justify-content: flex-start;
 			cursor: pointer;
 			grid-area: money;
-			line-height: 15px;
+			line-height: 35px;
+			color: $white;
 
 			div {
 				margin-right: 10px;
@@ -500,7 +494,7 @@
 				right: 0;
 				bottom: 0;
 				position: absolute;
-				background:$black;
+				background: $black;
 				padding: 0 2px;
 				border-left: solid 1px $gray-light;
 				border-top: solid 1px $gray-light;
@@ -509,10 +503,11 @@
 		.col {
 			min-height: 35px;
 			padding: 12px 10px;
-			background-color:$gray;
+			background-color: $gray;
 
 			&.header {
 				background: none;
+				color: $white;
 			}
 			&.ac {
 				text-align: center;
@@ -544,7 +539,7 @@
 
 					&:hover {
 						text-decoration: none;
-						background-color:$gray-active;
+						background-color: $gray-active;
 					}
 				}
 			}
@@ -556,6 +551,7 @@
 				grid-row: span 2;
 			}
 			.xp-bar {
+				background: rgba(0, 0, 0, .5);
 				display: flex;
 				justify-content: space-between;
 				height: 15px;
@@ -570,6 +566,33 @@
 				.q-linear-progress {
 					margin-top: 6px;
 					height: 3px;
+				}
+			}
+		}
+
+		&.large {
+			font-size: 25px;
+
+			.image {
+				height: 61px;
+				width: 61px;
+			}
+			.col {
+				padding: 12px 15px;
+			}
+
+			&.xp {
+				.image {
+					width: 84px;
+					height: 84px;
+				}
+				.xp-bar {
+					height: 22px;
+
+					.q-linear-progress {
+						margin-top: 8px;
+						height: 5px;
+					}
 				}
 			}
 		}

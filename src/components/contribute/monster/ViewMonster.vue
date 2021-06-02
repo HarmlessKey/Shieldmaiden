@@ -45,7 +45,8 @@
 						d: 20, 
 						n: 1, 
 						m: calcMod(monster[ability]),
-						title: `${monster.name}: ${ability.capitalize()} check`, 
+						title: `${ability.capitalize()} check`,
+						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
 				>
@@ -70,7 +71,8 @@
 								d: 20, 
 								n: 1, 
 								m: calcMod(monster[ability]) + monster.proficiency,
-								title: `${monster.name}: ${ability.capitalize()} save`, 
+								title: `${ability.capitalize()} save`,
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
 						>
@@ -96,7 +98,8 @@
 								d: 20, 
 								n: 1, 
 								m: skillModifier(skillList[skill].ability, skill),
-								title: `${skill} check`, 
+								title: `${skill} check`,
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
 						>
@@ -148,7 +151,8 @@
 						d: 20, 
 						n: 1, 
 						m: skillModifier(skill, key),
-						title: `${skill.skill} check`, 
+						title: `${skill.skill} check`,
+						entity_name: monster.name.capitalizeEach(),
 						notify: true
 					}"
 				>
@@ -245,6 +249,7 @@
 												<b>{{ ability.name }}</b>
 											</q-item-section>
 										</q-item>
+										<q-separator />
 										<q-list dark square>
 											<q-item clickable v-close-popup>
 												<q-item-section avatar>1</q-item-section>
@@ -288,7 +293,8 @@
 							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
 							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
 						</i></b>
-						{{ ability.desc }}
+						<!-- <span v-html="parseDiceText(ability.desc)"></span> -->
+						<hk-dice-text :input_text="ability.desc"/>
 					</p>
 				</template>
 			</div>
@@ -303,10 +309,11 @@
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { skills } from '@/mixins/skills.js';
 	import { mapActions } from 'vuex';
-
+	
 	export default {
 		name: 'NPC',
 		mixins: [
+	
 			general, 
 			dice,
 			abilities,

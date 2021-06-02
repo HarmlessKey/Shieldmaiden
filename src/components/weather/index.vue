@@ -6,52 +6,81 @@
 			:class="(lightning && showWeather) ? lightning : ''"
 		>
 			<template v-if="weather && showWeather">
-				<Fog v-if="weather.fog > 0" :intensity="weather.fog" />
-				<Rain v-if="weather.rain > 0" :intensity="weather.rain" />
-				<Hail v-if="weather.hail > 0" :intensity="weather.hail" />
-				<Snow v-if="weather.snow > 0" :intensity="weather.snow" />
+				<Fog v-if="weather.fog > 0" :intensity="weather.fog" :smoke="weather.smoke" :audio="audio" />
+				<Rain v-if="weather.rain > 0" :intensity="weather.rain" :audio="audio" />
+				<Hail v-if="weather.hail > 0" :intensity="weather.hail" :audio="audio" />
+				<Snow v-if="weather.snow > 0" :intensity="weather.snow" :audio="audio" />
+				<Ash v-if="weather.ash > 0" :intensity="weather.ash" :audio="audio" />
 			</template>
 		</div>
+		<audio v-if="audio && thunder_interval" :src="thunder_audio" ref="thunder" autoplay />
 	</div>
 </template>
 
 <script>
 export default {
-		name: 'Weather',
-		props: {
-			weather: {
-				type: Object,
-				required: false
-			},
-			background: {
-				type: String,
-				required: false
-			},
-			showWeather: {
-				type: Boolean,
-				default: true
-			}
+	name: 'Weather',
+	props: {
+		weather: {
+			type: Object,
+			required: false
 		},
-		components: {
-			Fog: () => import('./Fog'),
-			Rain: () => import('./Rain'),
-			Hail: () => import('./Hail'),
-			Snow: () => import('./Snow')
+		background: {
+			type: String,
+			required: false
 		},
-    data() {
-			return {
-				component: null,
-			}
-    },
-    computed: {
-			lightning() {
-				if(this.weather && this.weather.lightning > 0) {
-					const intensities = ["light", "medium", "heavy"];
-					const index = this.weather.lightning - 1;
-					return intensities[index];	
-				} return false;
-			}
-    }
+		showWeather: {
+			type: Boolean,
+			default: true
+		},
+		audio: {
+			type: Boolean,
+			default: false
+		}
+	},
+	components: {
+		Fog: () => import('./Fog'),
+		Rain: () => import('./Rain'),
+		Hail: () => import('./Hail'),
+		Snow: () => import('./Snow'),
+		Ash: () => import('./Ash'),
+	},
+	data() {
+		return {
+			component: null,
+			thunder_audio: undefined
+		}
+	},
+	computed: {
+		lightning() {
+			if(this.weather && this.weather.lightning > 0) {
+				const intensities = ["light", "medium", "heavy"];
+				const index = this.weather.lightning - 1;
+				return intensities[index];	
+			} return false;
+		},
+		thunder_interval() {
+			if(this.weather && this.weather.lightning > 0) {
+				const intervals = [360000, 180000, 60000];
+				const index = this.weather.lightning - 1;
+				return intervals[index];
+			} return false;
+		}
+	},
+	mounted() {
+		if(this.audio && this.weather && this.weather.lightning > 0) {
+			// this.thunder_audio = require("@/assets/_audio/weather/thunder.wav");
+			this.thunder();
+		}
+	},
+	methods: {
+		thunder() {
+			const vm = this;
+			setInterval(function() { 
+				vm.$refs.thunder.play(); 
+			}, vm.thunder_interval);
+		}
+	}
 }
 </script>
 
@@ -60,12 +89,19 @@ export default {
 		width: 100%;
 		height: 100%;
 
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
 		.weather-wrapper {
 			overflow: hidden;
 			width: 100%;
 			height: 100%;
 			background-size: cover;
 			background-position: center top;
+			animation: imagezoom 30s ease-in-out infinite;
+			animation-direction: alternate-reverse;
+			overflow: hidden;
 
 			&.light {
 				animation: lightnings 360s linear infinite;
@@ -106,6 +142,14 @@ export default {
 					100% { filter: brightness(1); opacity: 1; background-color: unset;}
 				}
 			}
+		}
+	}
+	@keyframes imagezoom {
+		0% {
+			transform: scale(1);
+		}
+		100% {
+			transform: scale(1.25);
 		}
 	}
 </style>

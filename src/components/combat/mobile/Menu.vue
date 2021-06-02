@@ -112,7 +112,6 @@
 <script>
 	import { mapActions, mapGetters } from 'vuex';
 	import Actions from '@/components/combat/actions/Actions.vue';
-	import Manual from '@/components/combat/actions/Manual.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
 	import TargetMenu from '@/components/combat/TargetMenu.vue';
 
@@ -120,7 +119,6 @@
 		name: 'Menu',
 		components: {
 			Actions,
-			Manual,
 			Roll,
 			TargetMenu,
 		},

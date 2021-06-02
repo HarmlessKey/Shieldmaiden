@@ -2,7 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import VueFire from 'vuefire'
 import VeeValidate from 'vee-validate';
-import { auth, db } from './firebase';
+import { auth, firebase, db } from './firebase';
 import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
 import { store } from './store/store';
@@ -18,7 +18,11 @@ import HkCard from './components/hk-components/hk-card';
 import HkCardDeck from './components/hk-components/hk-card-deck';
 import HkRoll from './components/hk-components/hk-roll';
 import HkAnimatedInteger from './components/hk-components/hk-animated-integer';
+import HkDiceText from './components/hk-components/hk-dice-text';
+import HkPopover from './components/hk-components/hk-popover';
 import HkLoader from './components/hk-components/hk-loader';
+import HkDmgTypeSelect from './components/hk-components/hk-dmg-type-select';
+import HkTip from './components/hk-components/hk-tip';
 import Icon from './components/Icon';
 import './quasar';
 import './registerServiceWorker';
@@ -38,6 +42,10 @@ Vue.component('hk-card-deck', HkCardDeck);
 Vue.component('hk-animated-integer', HkAnimatedInteger);
 Vue.component('hk-roll', HkRoll);
 Vue.component('hk-loader', HkLoader);
+Vue.component('hk-dice-text', HkDiceText);
+Vue.component('hk-popover', HkPopover);
+Vue.component('hk-dmg-type-select', HkDmgTypeSelect);
+Vue.component('hk-tip', HkTip);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options);
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
@@ -69,6 +77,36 @@ Vue.use(VueAnalytics, {
 	id: 'UA-134177767-1',
 	router
 });
+
+// Check if user is connected
+firebase.auth().onAuthStateChanged( function() {
+	const uid = firebase.auth().currentUser.uid;
+	const userStatusDatabaseRef = firebase.database().ref(`/status/${uid}`);
+	const userLiveDatabaseRef = firebase.database().ref(`/broadcast/${uid}`);
+
+	const isOfflineForDatabase = {
+		state: 'offline',
+		last_change: firebase.database.ServerValue.TIMESTAMP
+	}
+
+	const isOnlineForDatabase = {
+		state: 'online',
+		lastt_changed: firebase.database.ServerValue.TIMESTAMP
+	}
+
+	firebase.database().ref('.info/connected').on('value', function(snapshot) {
+		if(snapshot.val() == false) return;
+	
+		userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
+			userStatusDatabaseRef.set(isOnlineForDatabase);
+		});
+		
+		// Stop broadcast when connection is lost
+		userLiveDatabaseRef.onDisconnect().remove().then(function() {
+		});
+	});
+});
+
 
 // Check before each page load whether the page requires authentication/
 // if it does check whether the user is signed into the web app or

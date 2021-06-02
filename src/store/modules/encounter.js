@@ -1,5 +1,9 @@
 import { db } from '@/firebase';
+import { skills } from '@/mixins/skills';
+import { abilities } from '@/mixins/abilities';
+import { monsterMixin } from '@/mixins/monster';
 import Vue from 'vue';
+
 
 const demoPlayers = {
 	'playerone': {
@@ -85,7 +89,7 @@ const demoEncounter = {
 			"key" : "monsterone",
 			"maxHp" : 21,
 			"name" : "Orc (1)",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 		"monstertwo" : {
 			"ac" : 13,
@@ -97,7 +101,7 @@ const demoEncounter = {
 			"key" : "monstertwo",
 			"maxHp" : 12,
 			"name" : "Orc (2)",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 		"monsterthree" : {
 			"ac" : 11,
@@ -109,7 +113,7 @@ const demoEncounter = {
 			"key" : "monstertwo",
 			"maxHp" : 72,
 			"name" : "Ogre",
-			"npc" : "api"
+			"npc" : "srd"
 		},
 	},
 	"finished" : false,
@@ -251,7 +255,7 @@ const actions = {
 	 * @param {string} prop property to edit 
 	 * @param {string} value user's input value for the property
 	 */
-	edit_entity_prop({ state, commit }, {key, entityType, prop, value}) {
+	edit_entity_prop({ state, commit, dispatch }, {key, entityType, prop, value}) {
 		// Save paths for firebase
 		const encounterEntity = `encounters/${state.uid}/${state.campaignId}/${state.encounterId}/entities/${key}`
 		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}`;
@@ -334,8 +338,14 @@ const actions = {
 
 		// Maximum hit point modifier
 		if(prop === "maxHpMod" || prop === "transformedMaxHpMod") {
+			// Negative maxHpMod can't be greater than the maxHp
+			if(value < 0) value = (Math.abs(value) > maxHp) ? -maxHp : value;
+
 			// New maxHp needs to be updated (only in the store)
 			maxHp = parseInt(maxHp + value); // New maxHp
+
+			// If the maxHp is 0, a target is dead
+			if(maxHp === 0 && entity.entityType !== "npc") dispatch("set_dead", {key, action: "set"});
 
 			// Current hitpoints need to be modified too
 			if(maxHpMod === 0) {
@@ -869,7 +879,7 @@ const actions = {
 	 * @param {string} entity Entity key
 	 * @param {string} key Reminder key
 	 * @param {object} reminder full reminder object, or integer with rounds
-	 */
+	**/
 	set_targetReminder({ state, commit }, {action, entity, key, reminder, type}) {
 		// Add a new reminder
 		if(action === 'add') {
@@ -909,6 +919,43 @@ const actions = {
 			commit("UPDATE_REMINDER_ROUNDS", { entityKey: entity, key, rounds: reminder });
 		}
 	},
+
+	/**
+	 * Tracks use of abilities with limited uses
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 * @param {boolean} regain Wether a slot must be regained or spend
+	 */
+	set_limitedUses({ commit, state }, {key, index, category, regain=false, cost=1}) {
+		const entity = state.entities[key];
+		cost = parseInt(cost);
+		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) 
+			? parseInt(entity.limited_uses[category][index]) : 0;
+		
+		if(regain) {
+			used = used - cost;
+		} else {
+			used = used + cost;
+		}
+		if(used < 0) used = 0;
+
+		// Save the value in firebase and store
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).set(used);
+		commit("SET_LIMITED_USES", {key, category, index, value: used});
+	},
+	/**
+	 * Remove limeted uses of an ability
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 */
+	remove_limitedUses({ commit, state }, {key, category, index}) {
+		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).remove();
+		commit("REMOVE_LIMITED_USES", {key, category, index});
+	},
 	reset_store({ commit }) { commit("RESET_STORE"); },
 }
 
@@ -943,6 +990,11 @@ const mutations = {
 	DELETE_REMINDER(state, {entityKey, key}) { Vue.delete(state.entities[entityKey].reminders, key); },
 	REMOVE_ENTITY(state, key) { Vue.delete(state.entities, key); },
 	CLEAR_ENTITIES(state) { Vue.set(state, 'entities', {}); },
+	SET_LIMITED_USES(state, {key, category, index, value}) {
+		if(!state.entities[key].limited_uses[category]) Vue.set(state.entities[key].limited_uses, category, {});
+		Vue.set(state.entities[key].limited_uses[category], index, value);
+	},
+	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
 	async ADD_ENTITY(state, {rootState, key}) {
 		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
@@ -967,6 +1019,7 @@ const mutations = {
 		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
 		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
 		entity.color_label = (db_entity.color_label) ? db_entity.color_label : null;
+		entity.limited_uses = (db_entity.limited_uses) ? db_entity.limited_uses : {};
 
 		if (db_entity.meters) {
 			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
@@ -1020,12 +1073,23 @@ const mutations = {
 				entity.name = db_player.character_name;
 				entity.ac = parseInt(db_player.ac);
 				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
-				entity.strength = db_player.strength;
-				entity.dexterity = db_player.dexterity;
-				entity.constitution = db_player.constitution;
-				entity.intelligence = db_player.intelligence;
-				entity.wisdom = db_player.wisdom;
-				entity.charisma = db_player.charisma;
+				
+				entity.saving_throws = [];
+				// Ability scores
+				for(const ability of abilities.data().abilities) {
+					entity[ability] = db_player[ability];
+					
+					// Saving throws
+					if(db_player[`${ability}-save-profficient`]) {
+						entity.saving_throws.push(ability);
+					}
+				}
+
+				// Defenses
+				for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+					if(db_player[defense]) entity[defense] = db_player[defense];
+				}
+
 				entity.skills = db_player.skills;
 				entity.skills_expertise = db_player.skills_expertise;
 				entity.experience = db_player.experience;
@@ -1035,26 +1099,26 @@ const mutations = {
 			case 'npc':
 			case 'companion': 
 			{
-
 				let data_npc = {};
 				
+				// COMPANION
 				if (entity.entityType === 'companion') {
 
 					data_npc = rootState.content.npcs[key];
 
 					let campaignCompanion = rootState.content.campaigns[state.campaignId].companions[key];
-
+					
+					// Get companion status from campaign
 					entity.curHp = campaignCompanion.curHp;
 					entity.tempHp = campaignCompanion.tempHp;
 					entity.ac_bonus = campaignCompanion.ac_bonus;
 					entity.maxHpMod = campaignCompanion.maxHpMod;
 					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
-
 					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
 					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
 					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
-					entity.ac = data_npc.ac;
+					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
 
 					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 
@@ -1069,20 +1133,23 @@ const mutations = {
 						entity.transformed = false;
 					}
 				}
+
+				// NPC
 				else {
 
-					//Fetch data from API
-					if(entity.npc == 'api') {
+					//Fetch data from Firebase
+					if(entity.npc === 'srd' || entity.npc === 'api') {
 						let monsters = monsters_ref.child(entity.id);
 
 						data_npc = await monsters.once('value').then(function(snapshot) {
 							return snapshot.val()
-						})
+						});
 					}
 					else {
-						data_npc = rootState.content.npcs[entity.id]
+						data_npc = rootState.content.npcs[entity.id];
 					}
 
+					// Values from encounter
 					entity.curHp = db_entity.curHp;
 					entity.tempHp = db_entity.tempHp;
 					entity.maxHpMod = db_entity.maxHpMod;
@@ -1099,9 +1166,6 @@ const mutations = {
 						entity.transformed = false;
 					}
 					if(!entity.avatar) {
-						//if an entity is quicly added during an ecnounter
-						//without copying an existing
-						//it won't have data_npc
 						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
 					}
 					else {
@@ -1113,57 +1177,74 @@ const mutations = {
 				//without copying an existing
 				//it won't have data_npc
 				if(data_npc) {
+					entity.old = data_npc.old;
 					entity.size = data_npc.size;
 					entity.type = data_npc.type;
 					entity.subtype = data_npc.subtype;
 					entity.alignment = data_npc.alignment;
 					entity.challenge_rating = data_npc.challenge_rating;
 					entity.hit_dice = data_npc.hit_dice;
-					entity.speed = data_npc.speed;
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
+					entity.lengendary_count = data_npc.lengendary_count;
 
-					entity.strength = data_npc.strength;
-					entity.dexterity = data_npc.dexterity;
-					entity.constitution = data_npc.constitution;
-					entity.intelligence = data_npc.intelligence;
-					entity.wisdom = data_npc.wisdom;
-					entity.charisma = data_npc.charisma;
+					if(entity.challenge_rating) entity.proficiency = monsterMixin.data().monster_challenge_rating[entity.challenge_rating].proficiency;
+		
+					if(data_npc.source) entity.source = data_npc.source;
+					
+					// Ability scores
+					for(const ability of abilities.data().abilities) {
+						entity[ability] = data_npc[ability];
+					}
+					
+					// Old NPC format values
+					if(data_npc.old) {
+						entity.speed = data_npc.speed;
 
-					entity.strength_save = data_npc.strength_save;
-					entity.dexterity_save = data_npc.dexterity_save;
-					entity.constitution_save = data_npc.constitution_save;
-					entity.intelligence_save = data_npc.intelligence_save;
-					entity.wisdom_save = data_npc.wisdom_save;
-					entity.charisma_save = data_npc.charisma_save;
+						for(const ability of abilities.data().abilities) {
+							entity[`${ability}_save`] = data_npc[`${ability}_save`];
+						}
+					
+						for(const skill in skills.data().skillList) {
+							if(entity[skill]) {
+								entity[skill] = data_npc[skill];
+							}
+						}
+					} 
+					// Current format values
+					else {
+						entity.saving_throws = data_npc.saving_throws;
+						entity.skills = data_npc.skills;
+						entity.skills_expertise = data_npc.skills_expertise;
 
-					entity.acrobatics = data_npc.acrobatics;
-					entity['animal Handling'] = data_npc['animal Handling'];
-					entity.arcana = data_npc.arcana;
-					entity.athletics = data_npc.athletics;
-					entity.deception = data_npc.deception;
-					entity.history = data_npc.history;
-					entity.insight = data_npc.insight;
-					entity.intimidation = data_npc.intimidation;
-					entity.investigation = data_npc.investigation;
-					entity.medicine = data_npc.medicine;
-					entity.nature = data_npc.nature;
-					entity.perception = data_npc.perception;
-					entity.performance = data_npc.performance;
-					entity.persuasion = data_npc.persuasion;
-					entity.religion = data_npc.religion;
-					entity['sleight of Hand'] = data_npc['sleight of Hand'];
-					entity.stealth = data_npc.stealth;
-					entity.survival = data_npc.survival;
+						for(const speed of ["walk_speed", "fly_speed", "swim_speed", "burrow_speed", "climb_speed"]) {
+							if(data_npc[speed]) entity[speed] = data_npc[speed];
+						}
+					}
+					
+					// Defenses
+					for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+						if(data_npc[defense]) entity[defense] = data_npc[defense];
+					}
+					
+					// Abilities
+					for(const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
+						if(data_npc[type]) entity[type] = data_npc[type];
+					}
 
-					entity.damage_vulnerabilities = data_npc.damage_vulnerabilities;
-					entity.damage_resistances = data_npc.damage_resistances;
-					entity.damage_immunities = data_npc.damage_immunities;
-					entity.condition_immunities = data_npc.condition_immunities;
+					// Spellcasting
+					entity.caster_ability = data_npc.caster_ability;
+					entity.caster_save_dc = data_npc.caster_save_dc;
+					entity.caster_level = data_npc.caster_level;
+					entity.caster_spell_slots = data_npc.caster_spell_slots;
+					entity.caster_spell_attack = data_npc.caster_spell_attack;
+					entity.caster_spells = data_npc.caster_spells;
 
-					entity.special_abilities = data_npc.special_abilities;
-					entity.actions = data_npc.actions;
-					entity.legendary_actions = data_npc.legendary_actions;
+					// Innate spellcasting
+					entity.innate_ability = data_npc.innate_ability;
+					entity.innate_save_dc = data_npc.innate_save_dc;
+					entity.innate_spell_attack = data_npc.innate_spell_attack;
+					entity.innate_spells = data_npc.innate_spells;
 				}
 				break
 			}

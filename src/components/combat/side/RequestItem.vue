@@ -1,143 +1,111 @@
 <template>
-	<div>
-		<div class="d-flex justify-content-between head">
-			<span class="blue">{{ players[request.player].character_name }}</span>
-			<span>
-				Round: {{ request.round }},
-				Turn: {{ request.turn + 1 }}
-			</span>
-		</div>
-		<div class="title">
-			<a @click="showRequest = !showRequest">
-				<span>
-					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span> request
-				</span> 
-				<i class="fas fa-caret-down"></i>
-			</a>
-		</div>
-		<q-slide-transition>
-			<div v-show="showRequest" class="results">
-				<!-- DAMAGE -->
-				<template v-if="request.type === 'damage'">
-					<div v-for="(result, index) in results" :key="`result-${index}`">
-						<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
-						<div class="targets">
-							<template v-for="(target, key) in result.targets">
-								<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
-									{{ entities[key].name }}
-								</div>
-
-								<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
-									{{ target.amount }}
-								</div>
-
-								<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
-									<div 
-										@click="setDefense('v', index, key)"
-										:class="{red: target.defense === 'v'}"
-									>
-										<i class="fas fa-shield"></i>
-										<span>V</span>
-										<q-tooltip anchor="center right" self="center left">
-											Vulnerable
-										</q-tooltip>
-									</div>
-									<div 
-										@click="setDefense('r', index, key)"
-										:class="{green: target.defense === 'r'}"
-									>
-										<i class="fas fa-shield"></i>
-										<span>R</span>
-										<q-tooltip anchor="center right" self="center left">
-											Resistant
-										</q-tooltip>
-									</div>
-									<div 
-										@click="setDefense('i', index, key)"
-										:class="{green: target.defense === 'i'}"
-									>
-										<i class="fas fa-shield"></i>
-										<span>I</span>
-										<q-tooltip anchor="center right" self="center left">
-											Immune
-										</q-tooltip>
-									</div>
-								</div>
-							</template>
-						</div>
-
-					</div>
-
-					<!-- FINAL RESULTS -->
-					<div class="damage">Final values</div>
+	<q-expansion-item
+		class="request" 
+		dark switch-toggle-side
+		group="requests"
+	>
+		<template #header>
+			<q-item-section>
+				<q-item-label caption class="blue">{{ players[request.player].character_name }}</q-item-label>
+				<q-item-label>
+					{{ totalAmount }} <span :class="request.type === 'healing' ? 'green' : 'red'">{{ request.type }}</span>
+				</q-item-label> 
+			</q-item-section>
+			<q-item-label class="text-right">
+				<q-item-label caption>
+					Round: {{ request.round }}
+				</q-item-label>	
+				<q-item-label>
+					Turn: {{ request.turn + 1 }}
+				</q-item-label>	
+			</q-item-label>
+		</template>
+		<div class="accordion-body">
+			<!-- DAMAGE -->
+			<template v-if="request.type === 'damage'">
+				<div v-for="(result, index) in results" :key="`result-${index}`">
+					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
 					<div class="targets">
-						<template v-for="(final, key) in final_results">
-							<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
-								{{ entities[key].name }}
+						<template v-for="(target, key) in result.targets">
+							<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+								{{ entities[key].name.capitalizeEach() }}
 							</div>
-							<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
-								{{ Math.floor(final * intensity[key]) }}
+
+							<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
+								{{ target.amount }}
 							</div>
-							<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
-								<div
-									@click="setIntensity(key, 0)"
-									:class="{blue: intensity[key] === 0}"
+
+							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
+								<div 
+									v-for="({name}, defense_key) in defenses"
+									:key="defense_key"
+									class="option"
+									@click.stop="setDefense(defense_key, index, key)"
+									:class="[{active: target.defense === defense_key}, defense_key]"
 								>
-									<i class="fas fa-circle"></i>
-									<span>0</span>
-									<q-tooltip anchor="center right" self="center left">
-										No damage
-									</q-tooltip>
-								</div>
-								<div
-									@click="setIntensity(key, .5)"
-									:class="{blue: intensity[key] === .5}"
-								>
-									<i class="fas fa-circle"></i>
-									<span>½</span>
-									<q-tooltip anchor="center right" self="center left">
-										Half damage
-									</q-tooltip>
-								</div>
-								<div
-									@click="setIntensity(key, 1)"
-									:class="{blue: intensity[key] === 1}"
-								>
-									<i class="fas fa-circle"></i>
-									<span>1</span>
-									<q-tooltip anchor="center right" self="center left">
-										Full damage
+									<i class="fas fa-shield"></i>
+									<span>{{ defense_key.capitalize() }}</span>
+									<q-tooltip anchor="top middle" self="center middle">
+										{{ name }}
 									</q-tooltip>
 								</div>
 							</div>
 						</template>
 					</div>
 
-					<!-- ACTIONS -->
-					<div class="actions">
-						<button class="btn btn-sm bg-green" @click="apply('damage')">Apply</button>
-						<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
-					</div>
-				</template>
+				</div>
 
-				<!-- HEALING -->
-				<template v-else>
-					<div class="damage">Targets</div>
-					<div class="targets healing">
-						<div v-for="target in request.targets" :key="target">
-							<div class="name truncate bg-gray-dark" v-if="entities[target]">
-								{{ entities[target].name }}
+				<!-- FINAL RESULTS -->
+				<div class="damage">Final values</div>
+				<div class="targets">
+					<template v-for="(final, key) in final_results">
+						<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
+							{{ entities[key].name }}
+						</div>
+						<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
+							{{ Math.floor(final * intensity[key]) }}
+						</div>
+						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+							<div
+								v-for="{multiplier, name, label} in multipliers"
+								@click="setIntensity(key, multiplier)"
+								:class="{blue: intensity[key] === multiplier}"
+								:key="multiplier"
+							>
+								<i class="fas fa-circle"></i>
+								<span>{{ name }}</span>
+								<q-tooltip anchor="top middle" self="center middle">
+									{{ label }}
+								</q-tooltip>
 							</div>
 						</div>
+					</template>
+				</div>
+
+				<!-- ACTIONS -->
+				<div class="actions">
+					<button class="btn btn-sm bg-green" @click="apply('damage')">Apply</button>
+					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
+				</div>
+			</template>
+
+			<!-- HEALING -->
+			<template v-else>
+				<div class="damage">Targets</div>
+				<div class="targets healing">
+					<div v-for="target in request.targets" :key="target">
+						<div class="name truncate bg-gray-dark" v-if="entities[target]">
+							{{ entities[target].name }}
+						</div>
 					</div>
-					<div class="actions">
-						<button class="btn btn-sm bg-green" @click="apply('healing')">Apply</button>
-						<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
-					</div>
-				</template>
-			</div>
-		</q-slide-transition>
-	</div>
+				</div>
+				<div class="actions">
+					<button class="btn btn-sm bg-green" @click="apply('healing')">Apply</button>
+					<button class="btn btn-sm bg-red" @click="remove()">Decline</button>
+				</div>
+			</template>
+		</div>
+	</q-expansion-item>
 </template>
 
 <script>
@@ -154,6 +122,16 @@
 				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
+				multipliers: [
+					{ multiplier: 0, name: "0", label: "No damage" },
+					{ multiplier :.5, name: "½", label: "Half damage" },
+					{ multiplier: 1, name: "1", label: "Full damage" }
+				],
+				defenses: {
+					v: { name: "Vulnerable", value: "double" },
+					r: { name: "Resistant", value: "half" },
+					i: { name: "Immune", value: "no" }
+				},
 				final_results: {},
 				showRequest: false
 			}
@@ -176,15 +154,29 @@
 				let results = this.request.results;
 				let targets = this.request.targets;
 
-				for(let result of results) {
+				let resistances = {
+					v: "damage_vulnerabilities",
+					r: "damage_resistances",
+					i: "damage_immunities"
+				}
+
+				results.forEach(result => {
 					result.targets = {};
 
 					for(let target of targets) {
 						result.targets[target] = {};
 						result.targets[target].amount = result.amount;
 						result.targets[target].defense = '';
+
+						// Set defenses
+						for(const [key, defense] of Object.entries(resistances)) {
+							if(this.entities[target][defense] && this.entities[target][defense].includes(result.damage_type)) {
+								result.targets[target].defense = key;
+								result.targets[target].amount = this.updateAmount(key, result.targets[target].amount);
+							}
+						}
 					}
-				}
+				});
 				return results;
 			},
 			intensity() {
@@ -197,7 +189,7 @@
 				return targets;
 			}
 		},
-		beforeMount() {
+		mounted() {
 			this.final_results = this.setFinal(this.results);
 		},
 		methods: {
@@ -217,19 +209,22 @@
 				}
 				return final;
 			},
+			updateAmount(defense, amount) {
+				if(defense === 'v') {
+					return amount * 2;
+				} else if(defense === 'r') {
+					return Math.floor(amount / 2);
+				} else if(defense === 'i') {
+					return 0;
+				}
+			},
 			setDefense(defense, index, target) {
 				let amount = this.results[index].amount;
 
 				if(defense === this.results[index].targets[target].defense) {
 					defense = '';
 				} else {
-					if(defense === 'v') {
-						amount = amount * 2;
-					} else if(defense === 'r') {
-						amount = Math.floor(amount / 2);
-					} else if(defense === 'i') {
-						amount = 0;
-					}
+					amount = this.updateAmount(defense, amount);
 				}
 				this.$set(this.results[index].targets[target], 'defense', defense);
 				this.$set(this.results[index].targets[target], 'amount', amount);
@@ -243,8 +238,31 @@
 			},
 			apply(type) {
 				for(let key in this.final_results) {
-					let amount = Math.floor(this.final_results[key] * this.intensity[key]);
-					this.setHP(amount, false, this.entities[key], this.entities[this.request.player], type);
+					let amount = {};
+					amount[type] = Math.floor(this.final_results[key] * this.intensity[key]);
+
+					// Set config for HpManipulation and log
+					const config = {
+						crit: this.crit,
+						ability: "player request",
+						log: true,
+						actions: [
+							{
+								type,
+								request: true,
+								rolls: []
+							}
+						]
+					};
+					for(const result of this.results) {
+						let roll = {
+							damage_type: result.damage_type,
+							value: result.targets[key].amount
+						}
+						config.actions[0].rolls.push(roll);
+					}
+
+					this.setHP(amount, this.entities[key], this.entities[this.request.player], config);
 				}
 				this.remove();
 			},
@@ -256,34 +274,8 @@
 </script>
 
 <style lang="scss" scoped>
-	.head {
-		font-size: 11px;
-		margin-bottom: 5px;
-		font-style: italic;
-	}
-	.title {
-		font-size: 15px;
-		
-		a {
-			display: flex;
-			justify-content: space-between;
-			color: $gray-light !important;
-
-			i {
-				transition: transform .2s linear;
-			}
-			&.collapsed {
-				i.fa-caret-down {
-					transform: rotate(-90deg);
-				}
-			}
-			&:hover {
-				text-decoration: none;
-			}
-		}
-	}
-	.results {
-		padding-top: 15px;
+	.accordion-body {
+		background-color: rgba(0, 0, 0, .1) !important;
 
 		.damage {
 			font-size: 15px;
@@ -334,12 +326,13 @@
 						color:$gray-dark;
 					}
 
-					&.green, &.red, &.blue {
+					&.active {
+						&.i, &.r { color: $green; }
+						&.v { color: $red; }
 						span {
-							color:$white;
+							color: $white;
 						}
 					}
-
 				}
 			}
 			&.healing {

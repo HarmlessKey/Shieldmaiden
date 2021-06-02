@@ -25,6 +25,10 @@ html body {
 	font-size: 15px;
 	font-family: 'Open Sans', sans-serif;
 	position: relative;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 	
 	.view {
 		padding: 5px;
@@ -40,7 +44,7 @@ html body {
 		line-height: 50px;
 		width: 100%;
 		background: $black;
-		border-bottom:solid 1px transparent;
+		border-bottom: solid 1px transparent;
 		position:fixed;
 		top: 0;
 		z-index: 999;
@@ -852,6 +856,20 @@ html body {
 				background-color: rgba(0, 0, 0, .3);
 			}
 		}
+		&.no-margin {
+			margin-bottom: 0;
+		}
+		&.small {
+			font-size: 12px;
+			
+			.card-body {
+				padding: 1rem;
+			}
+			.card-header {
+				font-size: 15px;
+				padding: 0.50rem 1rem;
+			}
+		}
 	}
 
 	/* HK CARD DECK */
@@ -867,9 +885,21 @@ html body {
 			margin-bottom: 0;
 			margin-left: 15px;
 		}
+		@media only screen and (max-width: 992px) {
+			.hk-card {
+				margin-bottom: 25px;
+			}
+		}
 	}
 
 	/* HK ROLLS */
+	.hk-roll {
+		&.disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+	}
+
 	.hk-rolls {
 		top: 50px;
 		position: fixed;
@@ -884,7 +914,7 @@ html body {
 		.rolls {
 			pointer-events: auto;
 			width: 300px;
-			padding-top: 20px;
+			padding-top: 10px;
 
 			.roll {
 				.header {
@@ -915,6 +945,11 @@ html body {
 						}
 					}
 				}
+				.footer {
+					display: flex;
+					justify-content: space-between;
+					border-top: solid 1px $gray-darker;
+				}
 			}
 		}
 	}
@@ -943,6 +978,7 @@ html body {
 				display: flex;
 				justify-content: flex-end;
 				padding: 9px 12px;
+				user-select: none;
 
 				a {
 					color: $gray-light !important;
@@ -1094,8 +1130,8 @@ html body {
 						padding: 3px;
 						width: 46px;
 						height: 46px;
-						background-size:cover;
-						background-position:top center;
+						background-size: cover;
+						background-position: top center;
 						background-color: $black;
 						border: solid 1px $gray-light !important;
 				
@@ -1135,13 +1171,21 @@ html body {
 		}
 	}
 
+	/* HK POPOVER */
+	.hk-popover {
+		user-select: none;
+		cursor: pointer;
+
+		&:hover {
+			color: $blue;
+		}
+	}
+
 	.target-item {
-		width: 100%;
 		display: grid;
 		grid-template-columns: 35px 35px 1fr;
 		grid-template-rows: auto;
 		grid-gap: 0;
-		
 		line-height: 35px;
 		user-select: none;
 	
@@ -1189,45 +1233,47 @@ html body {
 				position: relative;
 			}
 		}
-	
-		.health-bar { 
-			padding-left: 5px;
-			font-size: 13px;
-			display: grid;
-			grid-template-columns: auto max-content;
-			grid-column-gap: 5px;
-			line-height: 35px;
-			margin-right: 5px;
-			color: #fff;
-	
-			.conditions {
-				position: absolute;
-				right: 0;
-				top: 0;
-	
-				.condition {
-					display: block;
-					width: 12px;
-					height: 12px;
-					border: solid 1px #fff;
-					margin-left: 1px;
+		
+		.q-linear-progress {
+			.health-bar { 
+				padding-left: 5px;
+				font-size: 13px;
+				display: grid;
+				grid-template-columns: 1fr max-content;
+				grid-column-gap: 5px;
+				line-height: 35px;
+				margin-right: 5px;
+				color: #fff;
+		
+				.conditions {
+					position: absolute;
+					right: 0;
+					top: 0;
+		
+					.condition {
+						display: block;
+						width: 12px;
+						height: 12px;
+						border: solid 1px #fff;
+						margin-left: 1px;
+						cursor: pointer;
+					}
+				}
+		
+				.hp {
+					text-align: right;
 					cursor: pointer;
-				}
-			}
-	
-			.hp {
-				text-align: right;
-				cursor: pointer;
-				
-				.current {
-					font-size: 18px;
-					font-weight: bold;
-				}
-				.max, .temp {
-					opacity: .5;
-				}
-				.save {
-					margin-right: 4px;
+					
+					.current {
+						font-size: 18px;
+						font-weight: bold;
+					}
+					.max, .temp {
+						opacity: .5;
+					}
+					.save {
+						margin-right: 4px;
+					}
 				}
 			}
 		}
@@ -1617,17 +1663,27 @@ html body {
 					}
 				}
 				&.roll {
-					width: 100%;
+					width: calc(100% + 30px);
+					margin: -13px -15px -15px -15px;
 
 					.roll_title {
-						text-align: center;
+						background: $gray;
 						font-size: 15px;
+						padding: 10px;
+						text-align: center;
 					}
 					.rolled {
-						line-height: 90px;
+						line-height: 130px;
 						width: 100%;
 						text-align: center;
 						font-size: 80px;
+						font-weight: bold;
+					}
+					.roll_footer {
+						text-align: center;
+						padding: 10px;
+						font-size: 15px;
+						background-color: $gray;
 					}
 				}
 			}
@@ -1717,6 +1773,18 @@ html body {
 		table {
 			td {
 				background-color: $gray-dark !important;
+			}
+		}
+	}
+	.q-list {
+		.q-expansion-item {
+			.q-item__section {
+				&.small-toggle {
+					padding-right: 10px;
+				}
+				&.hidden-toggle {
+					display: none !important;
+				}
 			}
 		}
 	}

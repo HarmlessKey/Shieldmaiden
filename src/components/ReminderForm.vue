@@ -81,19 +81,9 @@
 		<div class="mb-3" v-if="variables">
 			<label>
 				Variables 
-				<q-icon name="info" class="ml-1 pointer blue">
-					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card dark square>
-							<q-card-section class="bg-gray-active">
-								<b>Reminder variable</b>
-							</q-card-section>
-
-							<q-card-section>
-								{{ variableInfo }}
-							</q-card-section>
-						</q-card>
-					</q-menu>
-				</q-icon>
+				<hk-popover header="Reminder variable" :content="variableInfo">
+					<q-icon name="info" size="xs" class="blue" />
+				</hk-popover>
 			</label>
 			<div class="mb-3">
 				<q-input 
@@ -194,9 +184,9 @@ export default {
 				{ value: 'timed', label: 'Timer' },
 			],
 			actions: [
-        { label: 'Notify on trigger', value: 'notify' },
-        { label: 'Remove on trigger', value: 'remove' }
-      ],
+				{ label: 'Notify on trigger', value: 'notify' },
+				{ label: 'Remove on trigger', value: 'remove' }
+			],
 			colors: [
 				'green-light',
 				'yellow-light',

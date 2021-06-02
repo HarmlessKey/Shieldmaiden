@@ -5,8 +5,7 @@
 		<RollForInitiative v-if="encounter.round === 0" />
 
 		<!-- ACTIVE ENCOUNTER -->
-		<template v-else-if="!encounter.finished">
-			
+		<template v-else>
 			<Turns 
 				:encounter="encounter" 
 				:current="_non_hidden_targets[0]"
@@ -25,6 +24,7 @@
 			<div class="track desktop" v-if="width > 576">
 				<div class="initiative">
 					<Initiative 
+						v-if="!encounter.finished"
 						:encounter="encounter" 
 						:targets="_non_hidden_targets"
 						:allEntities="_turnCount"
@@ -36,45 +36,34 @@
 						:playerSettings="playerSettings"
 						:screenWidth="width"
 						:npcSettings="npcSettings"
-						@newRoll="pushRoll"
 					/>
+					<Rewards v-else :encounter="encounter"/>
 				</div>
 				<div class="side">
-					<q-tabs
-						v-model="sideDisplay"
-						dark
-						inline-label
-						dense
-						no-caps
-						class='white text-shadow'
-					>
-						<q-tab 
-							v-for="({name, icon, label}, index) in tabs"
-							:key="`tab-${index}`" 
-							:name="name" 
-							:icon="icon"
-							:label="label"
-						/>
-					</q-tabs>
 					<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
-						<div>
-							<div class="meters-wrapper">
-								<Meters 
-									v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
-									:entities="encounter.entities" 
-									:npcs="npcs" 
-									:players="players"
-								/>
-							</div>
-							<Rolls 
-								v-if="sideDisplay === 'rolls'"
+						<div class="meters-wrapper">
+							<Meters 
+								v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
 								:entities="encounter.entities" 
 								:npcs="npcs" 
-								:players="players" 
-								:rolls="rolls"
+								:players="players"
+								:npcSettings="npcSettings"
 							/>
 						</div>
 					</q-scroll-area>
+				</div>
+				<div class="shares-bar" :class="{ shown: showShares }">
+					<div class="show" @click="showShares = !showShares">
+						<i class="fas fa-chevron-left" />
+					</div>
+					<Shares 
+						:shares="shares" 
+						:encounterId="encounter.key" 
+						:entities="encounter.entities" 
+						:npcs="npcs" 
+						:players="players"
+						:npcSettings="npcSettings"
+					/>
 				</div>
 			</div>
 
@@ -107,8 +96,8 @@
 								<q-item-section avatar>
 									<q-icon :name="scope.opt.icon"/>
 								</q-item-section>
-								<q-item-section>
 									<q-item-label v-html="scope.opt.label"/>
+								<q-item-section>
 								</q-item-section>
 							</q-item>
 						</template>
@@ -123,6 +112,7 @@
 				>
 					<q-tab-panel name="initiative">
 						<Initiative 
+							v-if="!encounter.finished"
 							:encounter="encounter" 
 							:targets="_non_hidden_targets"
 							:allEntities="_turnCount"
@@ -134,44 +124,28 @@
 							:playerSettings="playerSettings"
 							:npcSettings="npcSettings"
 							:screenWidth="width"
-							@newRoll="pushRoll"
 						/>
+						<Rewards v-else :encounter="encounter"/>
 					</q-tab-panel>
 					<q-tab-panel name="meters" v-if="playerSettings.meters === undefined">
 						<Meters 
 							:entities="encounter.entities" 
 							:npcs="npcs" 
 							:players="players"
+							:npcSettings="npcSettings"
 						/>
 					</q-tab-panel>
-					<q-tab-panel name="rolls">
-						<Rolls 
+					<q-tab-panel name="shares">
+						<Shares 
+							:shares="shares" 
+							:encounterId="encounter.key" 
 							:entities="encounter.entities" 
 							:npcs="npcs" 
-							:players="players" 
-							:rolls="rolls"
+							:players="players"
+							:npcSettings="npcSettings"
 						/>
 					</q-tab-panel>
 				</q-tab-panels>
-			</div>
-		</template>
-
-		<!-- FINISHED -->
-		<template v-else>
-			<div class="turns">
-				<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
-				<span class="title truncate">Encounter Finished</span>
-				<span>
-					<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
-				</span>
-			</div>
-			<div class="track desktop">
-				<div class="initiative">
-					<Rewards :encounter="encounter"/>
-				</div>
-				<div class="side">
-					<Meters :entities="encounter.entities" :players="players" :npcs="npcs" />
-				</div>
 			</div>
 		</template>
 		<div 
@@ -190,7 +164,6 @@
 	import Turns from './Turns.vue';
 	import Initiative from './Initiative.vue';
 	import Meters from '../Meters.vue';
-	import Rolls from './Rolls.vue';
 	import RollForInitiative from './RollForInitiative.vue';
 
 	export default {
@@ -199,15 +172,17 @@
 			Turns,
 			Initiative,
 			Meters,
-			Rolls,
 			RollForInitiative,
+			Shares: () => import('../Shares'),
+			Rewards: () => import('./Rewards'),
 			Weather: () => import('@/components/weather')
 		},
 		props: [
 			"encounter", 
 			"campaign", 
 			"players", 
-			"width"
+			"width",
+			"shares"
 		],
 		data() {
 			return {
@@ -217,6 +192,7 @@
 				counter: 0,
 				rolls: [],
 				weather: true,
+				showShares: false,
 				panels: [
 					{
 						label: "Initiative list",
@@ -229,9 +205,9 @@
 						icon: "fas fa-swords"
 					},
 					{
-						label: "Shared rolls",
-						value: "rolls",
-						icon: "fas fa-dice-d20"
+						label: "Shares",
+						value: "shares",
+						icon: "fas fa-share"
 					}
 				]
 			}
@@ -268,7 +244,7 @@
 				} , 'desc')
 				.value()
 			},
-			_allEntities: function() {
+			_allEntities() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
 					entity.key = key
@@ -282,13 +258,13 @@
 				} , 'desc')
 				.value()
 			},
-			_targets: function() {
+			_targets() {
 				let t = this.encounter.turn
 				let turns = Object.keys(this._allEntities)
 				let order = turns.slice(t).concat(turns.slice(0,t))
 				return Array.from(order, i => this._allEntities[i])
 			},
-			_non_hidden: function() {
+			_non_hidden() {
 				return _.chain(this.encounter.entities)
 				.filter(function(entity, key) {
 					entity.key = key
@@ -302,13 +278,13 @@
 				} , 'desc')
 				.value()
 			},
-			_hidden_count: function() {
+			_hidden_count() {
 				return _.filter(this.encounter.entities, function(entity, key) {
 					entity.key = key
 					return entity.active && !entity.down && entity.hidden;
 				}).length
 			},
-			_non_hidden_targets: function() {
+			_non_hidden_targets() {
 				let t = this.turn
 				let turns = Object.keys(this._non_hidden)
 				let order = turns.slice(t).concat(turns.slice(0,t))
@@ -357,11 +333,6 @@
 			}
 		},
 		methods: {
-			pushRoll(roll) {
-				if(roll) {
-					this.rolls.unshift(roll);
-				}
-			},
 			setWeather(value) {
 				this.weather = value;
 			}
@@ -382,7 +353,6 @@
 	background-position: center top;
 }
 .track {
-	max-width: 1250px;
 	margin: auto;
 	width: 100%;
 	height: calc(100% - 60px);
@@ -392,13 +362,12 @@
 	
 
 	&.desktop {
-		grid-template-columns: 3fr 1fr;
+		grid-template-columns: 3fr 1fr minmax(200px, 250px);
 		grid-template-rows: 1fr;
 		grid-gap: 15px;
-		padding-top: 30px;
 
 		.initiative {
-			padding-left: 15px;
+			padding: 30px 0 0 15px;
 			overflow: hidden;
 
 			.q-scrollarea {
@@ -410,8 +379,8 @@
 			}
 		}
 		.side {
-			padding-right: 15px;
 			overflow: hidden;
+			padding-top: 30px;
 
 			.q-scrollarea {
 				height: calc(100% - 56px);
@@ -419,9 +388,16 @@
 				&.during-encounter {
 					height: calc(100% - 50px);
 				}
-				.meters-wrapper {
-					padding-top: 15px;
-				}
+			}
+		}
+		.shares-bar {
+			height: 100%;
+			
+			.show {
+				display: none;
+			}
+			.shares {
+				width: 100%;
 			}
 		}
 	}
@@ -442,15 +418,70 @@
 	}
 }
 
-@media only screen and (max-width: 1000px) {
-	.track.desktop {
-		grid-template-columns: 3fr 2fr;
-	}
-}
 @media only screen and (max-width: 576px) {
 	.weather {
 		top: 120px;
 		height: calc(100% - 120px);
+	}
+}
+@media only screen and (max-width: 900px) {
+	.track.desktop {
+		grid-template-columns: 2fr 1fr !important;
+
+		.side {
+			padding-right: 15px;
+		}
+		.shares-bar {
+			width: 250px;
+			position: absolute;
+			right: -250px;
+			display: flex;
+			justify-content: center;
+			transition: all .5s linear;
+
+			.show {
+				background-color: $blue;
+				color: $white;
+				display: block;
+				width: 18px;
+				text-align: center;
+				cursor: pointer;
+				height: 50px;
+				line-height: 50px;
+				position: absolute;
+				top: 50%;
+				left: -18px;
+				transform: translateY(-50%);
+
+				i {
+					transition: all .3s linear;
+				}
+			}
+			&.shown {
+				right: 0;
+
+				.show {
+					i {
+						transform: rotate(180deg);
+					}
+				}
+			}
+		}
+	}
+}
+@media only screen and (max-width: 992px) {
+	.track.desktop {
+		grid-template-columns: 3fr 1fr minmax(180px, 200px);
+	}
+}
+@media only screen and (min-width: 1250px) {
+	.track.desktop {
+		grid-template-columns: 3fr 1fr minmax(250px, 300px);
+		grid-gap: 30px;
+
+		.initiative {
+			padding-left: 30px;
+		}
 	}
 }
 </style>

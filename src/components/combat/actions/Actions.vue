@@ -5,7 +5,7 @@
 			<q-select 
 				dark filled square dense
 				name="doneBy"
-				:value="doneBy" 
+				:value="doneBy"
 				:options="_active"
 				v-validate="'required'"
 			>
@@ -29,7 +29,7 @@
 							"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="entitiesList[doneBy].name"/>
+							<q-item-label v-html="entitiesList[doneBy].name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 					<span v-else>
@@ -56,7 +56,7 @@
 							"/>
 						</q-item-section>
 						<q-item-section>
-							<q-item-label v-html="scope.opt.name"/>
+							<q-item-label v-html="scope.opt.name.capitalizeEach()"/>
 						</q-item-section>
 					</q-item>
 				</template>
@@ -72,6 +72,20 @@
 			</div>
 		</template>
 
+		<!-- ADVANTAGE / DISADVANTAGE -->
+		<hk-tip value="advantage" title="Advantage &amp; disadvantage">
+			<template #content>
+				<p class="mt-2">
+					On desktop<br/>
+					Hold <b>SHIFT</b> to roll with <span class="green">advantage</span>, <b>CTRL</b> for <span class="red">disadvantage</span>.				
+				</p>
+				<span>
+					On touch screens<br/>
+					Hold down on the button to roll with <span class="green">advantage</span> or <span class="red">disadvantage</span>.	
+				</span>
+			</template>
+		</hk-tip>
+
 		<template v-if="doneBy">
 			<q-tabs
 				v-model="tab"
@@ -79,6 +93,7 @@
 				inline-label
 				dense
 				no-caps
+				class="bg-gray-light gray-dark"
 			>
 				<q-tab 
 					v-for="({name, icon, label}, index) in tabs"
@@ -90,12 +105,14 @@
 			</q-tabs>
 
 			<q-tab-panels v-model="tab" class="bg-transparent">
-					<q-tab-panel name="manual">
-						<Manual :current="entitiesList[doneBy]" :targeted="targeted" />
-					</q-tab-panel>
-					<q-tab-panel name="roll">
-						<Roll :current="entitiesList[doneBy]" />
-					</q-tab-panel>
+				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
+					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
+					<template v-if="name === 'roll'">
+						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
+						<Roll v-else :current="entitiesList[doneBy]" />
+					</template>
+					<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
+				</q-tab-panel>
 			</q-tab-panels>
 		</template>
 	</div>
@@ -106,16 +123,21 @@
 	import { mapGetters } from 'vuex';
 	import { setHP } from '@/mixins/HpManipulations.js';
 
-	import Manual from '@/components/combat/actions/Manual.vue';
+	import Custom from '@/components/combat/actions/custom';
+	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
+	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
+	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
 		name: 'Actions',
 		components: {
-			Manual,
+			Custom,
+			RollDeprecated,
 			Roll,
+			Spellcasting
 		},
-		mixins: [setHP],
+		mixins: [setHP, damage_types],
 		props: {
 			current: {
 				type: Object
@@ -128,11 +150,7 @@
 		data() {
 			return {
 				tabSetter: undefined,
-				tabs: [
-					{ name: "manual", label: "Manual", icon: "fas fa-keyboard" },
-					{ name: "roll", label: "Roll", icon: "fas fa-dice-d20" }
-				],
-				doneBySetter: undefined 
+				doneBySetter: undefined
 			}
 		},
 		computed: {
@@ -164,6 +182,19 @@
 					entityType: "environment"
 				};
 				return list;
+			},
+			tabs() {
+				const current = this.entitiesList[this.doneBy];
+				let tabs = [
+					{ name: "manual", label: "Custom", icon: "fas fa-keyboard" }
+				];
+				if(current.special_abilities || current.actions || current.legendary_actions || current.reactions) {
+					tabs.push({ name: "roll", label: "Actions", icon: "fas fa-dice-d20" })
+				}
+				if(current.entityType !== "player" && (current.caster_ability || current.innate_ability)) {
+					tabs.push({ name: "spells", label: "Spells", icon: "fas fa-wand-magic" })
+				}
+				return tabs;
 			},
 			doneBy: {
 				get() {
@@ -208,6 +239,7 @@
 			}
 		}
 	}
+
 	.q-tab-panel {
 		padding: 15px 0 0 0 !important;
 	}

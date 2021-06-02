@@ -43,7 +43,7 @@
 	>
 	<template slot="name" slot-scope="data">
 		<a @click="setSlide({show: true, type: 'ViewMonster', data: data.row, classes: 'monster-card' })" :class="{ 'green': data.row.custom}">
-			{{ data.item }}
+			{{ data.item.capitalizeEach() }}
 		</a>
 	</template>
 
@@ -149,7 +149,7 @@
 			})
 
 			//GET NPCS
-			var monsters = db.ref(`monsters`);
+			const monsters = db.ref(`monsters`);
 			monsters.on('value', async (snapshot) => {
 				let monsters = snapshot.val();
 
@@ -157,13 +157,14 @@
 					monsters[key]['.key'] = key;
 					monsters[key].custom = false;
 				}
-				let custom = db.ref(`npcs/${this.user.uid}`);
+				const custom = db.ref(`npcs/${this.user.uid}`);
 				custom.on('value', async (snapshot) => {
 					let customNpcs = snapshot.val();
+
 					for(let key in customNpcs) {
 						customNpcs[key].custom = true;
 						customNpcs[key]['.key'] = key;
-						monsters.push(customNpcs[key]);
+						monsters[key] = customNpcs[key];
 					}
 				});
 				this.monsterArray = Object.values(monsters);
@@ -204,7 +205,8 @@
 				}
 				let HP = undefined;
 
-				if(type == 'npc') {
+				// NPC
+				if(type === 'npc') {
 					entity.active = true;
 					let last = -1;
 					let n = 0;
@@ -224,14 +226,15 @@
 						entity.name = `${entity.name} (${n})`;
 					}
 					
-					if(custom == false) {
+					// SRD NPC
+					if(!custom) {
 						let npc_data = this.monsters[id];
-						entity.npc = 'api';
+						entity.npc = 'srd';
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
+							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
 
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
@@ -242,10 +245,12 @@
 						}
 						entity.ac = npc_data.armor_class;
 					}
+
+					// CUSTOM NPC
 					else {
 						let npc_data = this.npcs[id];
 						entity.npc = 'custom';
-						entity.ac = npc_data.ac;
+						entity.ac = (npc_data.old) ? npc_data.ac : npc_data.armor_class;
 
 						if (npc_data.friendly) {
 							entity.friendly = true;
@@ -255,18 +260,20 @@
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
 
-							HP = this.rollD(e, dice[1], dice[0], mod, `${npc_data.name}: Hit points roll`);
+							HP = this.rollD(e, dice[1], dice[0], mod, "Hit points roll", npc_data.name);
 							
 							entity.curHp = HP.total;
 							entity.maxHp = HP.total;
 						}
 						else {
-							entity.curHp = npc_data.maxHp;
-							entity.maxHp = npc_data.maxHp;
+							entity.curHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
+							entity.maxHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
 						}
 					}
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
 				}
+
+				// PLAYER
 				else if (type == 'player') {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 					const companions = this.players[id].companions;
@@ -274,12 +281,16 @@
 						this.add(e, key, 'companion', this.npcs[key].name , true, false, id )
 					}
 				}
+
+				// COMPANION
 				else if (type == 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
-				if(type == 'npc') {
+
+				// NOTIFICATION
+				if(type === 'npc') {
 					let notifyHP = [];
 
 					if(HP) {

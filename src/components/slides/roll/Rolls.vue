@@ -4,7 +4,7 @@
 			<li v-for="(roll, i) in rolls" :key="`roll-${i}`">
 					<h3>
 						<span class="title truncate" :title="roll.title">
-							{{ roll.title }}
+							{{ roll.entity_name ? `${roll.entity_name}: ` : ``}}{{ roll.title }}
 						</span>
 						<span class="date">
 							{{ showTime(roll.date) }}
@@ -12,7 +12,7 @@
 					</h3>
 					<div class="result" @click="setShowRolls(i)">
 						<span class="roll">
-							{{roll.roll}}:
+							{{ roll.roll }}:
 							(<span class="advantage" v-if="roll.ignored">
 								<span v-html="advantage(roll.advantage_disadvantage)"/> 
 								<span class="ignored gray-hover">
@@ -81,12 +81,12 @@
 		margin: 0;
 
 		li {
-			border-bottom: solid 1px$gray-hover;
+			border-bottom: solid 1px $gray-hover;
 			padding: 5px 0;
 
 			h3 {
 				padding: 0 8px;
-				background-color:$gray-active;
+				background-color: $gray-active;
 				margin: 0 !important;
 				font-size: 15px;
 				display: grid;
@@ -99,7 +99,7 @@
 			.result {
 				cursor: pointer;
 				padding: 5px 8px;
-				background-color:$gray-dark;
+				background-color: $gray-dark;
 				font-size: 18px;
 				line-height: 35px;
 				display: grid;

@@ -19,7 +19,19 @@
 				:collapse="true"
 				classes="monster-table"
 			>
-				<router-link :to="'/compendium/monsters/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+				<router-link :to="'/compendium/monsters/' + data.row['.key']" slot="name" slot-scope="data">
+					{{ data.item.capitalizeEach() }}
+				</router-link>
+
+				<template slot="challenge_rating" slot-scope="data">
+					{{
+						(data.item == 0.125) ? "&#8539;" : 
+						(data.item == 0.25) ? "&#xbc;" :
+						(data.item == 0.5) ? "&#xBD;" :
+						data.item
+					}}
+				</template>
+
 
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">

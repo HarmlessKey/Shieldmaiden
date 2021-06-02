@@ -148,8 +148,8 @@
 			}
 		},
 		beforeMount() {
-			if(this.$route.name !== "Demo") {
-				this.track()
+			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
+				this.setLiveEncounter(this.$route.params.encid);
 			}
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
@@ -190,6 +190,7 @@
 				'entities',
 				'initialized',
 				'overencumbered',
+				'broadcast'
 			]),
 			_active: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
@@ -284,13 +285,13 @@
 			}
 		},
 		beforeRouteLeave (to, from, next) {
-			this.reset_store()
-			this.removeTrack()
-			next()
+			this.reset_store();
+			this.setLiveEncounter();
+			next();
 		},
 		beforeRouteUpdate(to, from, next) {
-			this.reset_store()
-			this.removeTrack()
+			this.reset_store();
+			this.setLiveEncounter();
 			next();
 		},
 		beforeDestroy() {
@@ -302,30 +303,19 @@
 				'track_Encounter',
 				'set_finished',
 				'reset_store',
-				'setSlide'
+				'setSlide',
+				'setLiveEncounter'
 			]),
 			setSize() {
 				this.width = this.$refs.encounter.clientWidth;
-			},
-			track() {
-				db.ref('broadcast/' + this.userId).update({
-					campaign: this.$route.params.campid,
-					encounter: this.$route.params.encid,
-				});
-			},
-			removeTrack() {
-				db.ref('broadcast/' + this.userId).update({
-					campaign: false,
-					encounter: false,
-				});
 			},
 			confirmFinish() {
 				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},

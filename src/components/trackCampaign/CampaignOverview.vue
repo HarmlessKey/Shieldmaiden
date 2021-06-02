@@ -1,5 +1,5 @@
 <template>
-	<div class="track desktop" v-if="width > 576">
+	<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 		<div class="players">
 			<h3>Campaign Players</h3>
 			<q-scroll-area dark :thumb-style="{ width: '5px'}">
@@ -11,6 +11,15 @@
 			<q-scroll-area dark :thumb-style="{ width: '5px'}">
 				<Meters :entities="campaignPlayers" :players="players" :campaign="true" :npcs="{}" />
 			</q-scroll-area>
+		</div>
+		<div v-if="live" class="shares-bar" :class="{ shown: showShares }">
+			<div class="show" @click="showShares = !showShares">
+				<i class="fas fa-chevron-left" />
+			</div>
+			<Shares 
+				:shares="shares" 
+				:players="players"
+			/>
 		</div>
 	</div>
 	<div v-else class="track mobile">
@@ -67,20 +76,28 @@
 </template>
 
 <script>
-	import Meters from '@/components/trackCampaign/Meters.vue';
-	import ViewPlayers from '@/components/campaign/Players.vue';
+	import Meters from "@/components/trackCampaign/Meters.vue";
+	import ViewPlayers from "@/components/campaign/Players.vue";
 
 	export default {
-		name: 'Players',
-		props: ['players', 'campaignPlayers', 'width'],
+		name: "Players",
+		props: [
+			"players", 
+			"campaignPlayers", 
+			"width", 
+			"shares", 
+			"live"
+		],
 		components: {
 			Meters,
-			ViewPlayers
+			ViewPlayers,
+			Shares: () => import('./Shares')
 		},
 		data() {
 			return {
 				userId: this.$route.params.userid,
-				panel: 'players',
+				panel: "players",
+				showShares: false,
 				panels: [
 					{
 						label: "Campaign players",
@@ -96,13 +113,8 @@
 			}
 		},
 		methods: {
-			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
-			},
-			maxHp(maxHp, maxHpMod) {
-				return maxHp + maxHpMod;
-			},
+
+			
 		}
 	}
 </script>
@@ -113,7 +125,6 @@
 		margin-bottom: 20px !important;
 	}
 	.track {
-		max-width: 1250px;
 		margin: auto;
 		width: 100%;
 		height: 100%;
@@ -124,14 +135,31 @@
 			grid-template-columns: 3fr 1fr;
 			grid-template-rows: 1fr;
 			grid-gap: 15px;
-			padding-top: 30px;
+
+			&.isLive {
+				grid-template-columns: 3fr 1fr minmax(200px, 250px);
+
+				.side {
+					padding-right: 0;
+				}
+				.shares-bar {
+					height: 100%;
+					
+					.show {
+						display: none;
+					}
+					.shares {
+						width: 100%;
+					}
+				}
+			}
 
 			.players {
-				padding-left: 15px;
+				padding: 30px 0 0 15px;
 				overflow: hidden;
 
 				.q-scrollarea {
-					height: calc(100% - 86px);
+					height: calc(100% - 55px);
 
 					> div {
 						padding-right: 6px;
@@ -139,11 +167,11 @@
 				}
 			}
 			.side {
-				padding-right: 15px;
+				padding: 30px 15px 0 0;
 				overflow: hidden;
 
 				.q-scrollarea {
-					height: calc(100% - 56px);
+					height: calc(100% - 55px);
 
 					&.during-encounter {
 						height: calc(100% - 50px);
@@ -170,10 +198,76 @@
 			display: none; 
 		}
 	}
+	@media only screen and (max-width: 900px) {
+		.track.desktop {
+			grid-template-columns: 2fr 1fr !important;
 
-	@media only screen and (max-width: 1000px) {
+			&.isLive {
+				.side {
+					padding-right: 15px !important;
+				}
+				.shares-bar {
+					width: 250px;
+					position: absolute;
+					right: -250px;
+					display: flex;
+					justify-content: center;
+					transition: all .5s linear;
+
+					.show {
+						background-color: $blue;
+						color: $white;
+						display: block;
+						width: 18px;
+						text-align: center;
+						cursor: pointer;
+						height: 50px;
+						line-height: 50px;
+						position: absolute;
+						top: 50%;
+						left: -18px;
+						transform: translateY(-50%);
+
+						i {
+							transition: all .3s linear;
+						}
+					}
+					&.shown {
+						right: 0;
+
+						.show {
+							i {
+								transform: rotate(180deg);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	@media only screen and (max-width: 992px) {
 		.track.desktop {
 			grid-template-columns: 3fr 2fr;
+
+			&.isLive {
+				grid-template-columns: 3fr 1fr minmax(180px, 200px);
+			}
+		}
+	}
+	@media only screen and (min-width: 1250px) {
+		.track.desktop {
+			grid-gap: 30px;
+
+			&.isLive {
+				grid-template-columns: 3fr 1fr minmax(250px, 300px);
+			}
+
+			.players {
+				padding-left: 30px;
+			}
+			.side {
+				padding-right: 30px;
+			}
 		}
 	}
 </style>

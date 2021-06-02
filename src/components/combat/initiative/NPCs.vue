@@ -1,5 +1,12 @@
 <template>
 	<div>
+		<hk-tip 
+			class="mx-3"
+			value="initiative-decimals" 
+			title="Initiateve decimals" 
+			content="Use decimals when multiple entities have the same initiative to change the order."
+		/>
+		
 		<ul class="entities hasImg">
 			<li v-for="(entity, i) in npcs" :key="entity.key">
 				<icon 
@@ -16,7 +23,7 @@
 					}"
 				/>
 				<div class="truncate">
-					<q-checkbox dark v-model="selected" :val="i" :label="entity.name" />
+					<q-checkbox dark v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
 				</div>
 				
 				<div class="actions">
@@ -54,7 +61,6 @@
 		</ul>
 		<div class="pl-2 pr-3">
 			<hk-roll 
-				tooltip="Roll"
 				@roll="(selected.length === 0) ? rollAll($event) : rollGroup($event)"
 			>
 				<a class="btn btn-block">
@@ -66,7 +72,7 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 
@@ -80,6 +86,15 @@
 				selectAll: []
 			}
 		},
+		computed: {
+			...mapGetters([
+				"encounterId",
+				"broadcast"
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
+			},
+		},
 		methods: {
 			...mapActions([
 				'setSlide',
@@ -87,7 +102,14 @@
 			]),
 			rollMonster(e, key, entity, advantage_disadvantage) {
 				const advantage_object = (advantage_disadvantage) ? advantage_disadvantage : {};
-				let roll = this.rollD(e, 20, 1, this.calcMod(entity.dexterity), `${entity.name}: Initiative`, false, advantage_object);
+				let roll = this.rollD(
+					e, 20, 1, 
+					this.calcMod(entity.dexterity), 
+					"Initiative", entity.name, 
+					false, 
+					advantage_object, 
+					this.share ? { encounter_id: this.encounterId, entity_key: key } : null
+				);
 				entity.initiative = roll.total
 				this.set_initiative({
 					key: key,
@@ -115,7 +137,15 @@
 					}
 				}
 				const advantage_object = (e.advantage_disadvantage) ? e.advantage_disadvantage : {};
-				const roll = this.rollD(e.e, 20, 1, this.calcMod(dex), "Group initiative", false, advantage_object).total;
+				const roll = this.rollD(
+					e.e, 20, 1, 
+					this.calcMod(dex), 
+					"Group initiative", 
+					undefined, 
+					false, 
+					advantage_object, 
+					this.share ? { encounter_id: this.encounterId } : null
+				).total;
 
 				for(let i in this.selected) {
 					key = this.selected[i];
@@ -135,7 +165,7 @@
 
 <style lang="scss" scoped>
 #container {
-	padding:10px;
+	padding: 10px;
 	width: 100vw;
 	height: calc(100% - 50px);
 	display: grid;

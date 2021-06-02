@@ -6,16 +6,21 @@
 		<div class="rain layer2"></div>
 		<div class="rain layer3 a"></div>
 		<div class="rain layer3"></div>
+		<!-- <audio v-if="audio" :src="audio_file" autoplay loop /> -->
 	</div>
 </template>
 
 <script>
 	export default {
-		name: "Snow",
+		name: "Rain",
 		props: {
 			intensity: {
 				type: Number,
 				default: 1
+			},
+			audio: {
+				type: Boolean,
+				default: false
 			}
 		},
 		computed: {
@@ -23,20 +28,26 @@
 				const intensities = ["light", "medium", "heavy"];
 				const index = this.intensity - 1;
 				return intensities[index];	
-			}
+			},
+			// audio_file() {
+			// 	return require(`@/assets/_audio/weather/rain/${this.intensity}.wav`);
+			// }
 		}
 	};
 </script>
 
 <style lang="scss" scoped>
 	.wrapper {
-		margin-left: -50px;
+		position: absolute;
+		top: 0;
+		left: -50px;
     width: calc(150% + 100px);
     height: 150%;
 		
 		$s1:"";
 		$s2:"";
 		$s3:"";
+
 		@for $i from 1 through 800 {
 			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem +$white;
 			$s2: $s2 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem +$white;
@@ -154,7 +165,7 @@
 	}
 	@keyframes fall {
 			100% {
-				transform: translateY(200vh); 
+				transform: translateY(230vh); 
 			}
 	}
 </style>

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="terget-item-wrapper">
 		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
@@ -12,7 +12,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense utofocus 
 							label="Initiative"
@@ -52,7 +52,7 @@
 					</q-tooltip>
 				</span>
 				<template v-else>
-				<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+					<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 					<span 
 						v-else class="img" 
 						:style="{ 'background-image': 'url(' + entity.img + ')' }"
@@ -68,7 +68,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-color 
 							square dark flat
 							v-model="editable_entity.color_label" 
@@ -118,7 +118,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">{{ entity.name }}</div>
+						<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense 
 							label="Armor class bonus"
@@ -175,12 +175,12 @@
 			<!-- HEALT BAR -->
 			<q-linear-progress 
 				size="35px" 
-				:value="displayStats().curHp/displayStats().maxHp"
-				:color="hpBarColor(percentage(displayStats().curHp, displayStats().maxHp))" 
+				:value="percentage(displayStats().curHp, displayStats().maxHp)"
+				:color="hpBarColor(displayStats().curHp / displayStats().maxHp * 100)" 
 			>
 				<div class="absolute-full health-bar">
 					<div class="truncate">
-						{{ entity.name }}
+						{{ entity.name.capitalizeEach() }}
 					</div>
 
 					<!-- HEALTH -->
@@ -226,7 +226,7 @@
 								:breakpoint="576"
 							>
 								<div class="bg-gray px-2 py-2">
-									<div class="mb-1">{{ entity.name }}</div>
+									<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 									<q-input 
 										dark filled square dense 
 										class="mb-2"
@@ -341,7 +341,7 @@
 					<!-- IDLE ACTIONS -->
 					<div v-else class="text-right">
 						<span class="white" 
-							v-if="entity.addNextRound == true"
+							v-if="entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -349,7 +349,7 @@
 							</q-tooltip>
 						</span>
 						<span class="gray-hover" 
-							v-if="entity.addNextRound == false"
+							v-if="!entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -494,8 +494,8 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 				}})
 			},
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				const hp_percentage = (current === 0) ? 0 : current / max;
+				return hp_percentage;
 			},
 			hpBarColor(percentage) {
 				if(percentage < 33) {
@@ -530,15 +530,19 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 </script>
 
 <style lang="scss" scoped>
-ul.target-reminders {
-	padding-left: 30px;
-	list-style: none;
-	margin: 0;
-
-	li {
-		width: 20px;
-		height: 7px;
-		margin: 1px 1px 1px 0;
+.taret-item-wrapper {
+	width: 100%;
+	
+	ul.target-reminders {
+		padding-left: 30px;
+		list-style: none;
+		margin: 0;
+	
+		li {
+			width: 20px;
+			height: 7px;
+			margin: 1px 1px 1px 0;
+		}
 	}
 }
 </style>

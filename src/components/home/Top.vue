@@ -30,9 +30,9 @@
 				<div class="content-box">
 					<div class="text">
 						<template>
-							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for the game.</div>
-							<h1>COMBAT TRACKER FOR D&D 5e.</h1>
-							<h3>We track everything in encounters, so you have the time to give your players the attention they deserve.</h3>
+							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
+							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
+							<h3>The online tool for offline play.</h3>
 						</template>
 
 						<div class="button-container">
@@ -43,11 +43,6 @@
 						<div>
 							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
 						</div>
-
-						<a class="next" href="#general">
-							<div>Learn more</div>
-							<i class="fas fa-chevron-down"></i>
-						</a>
 					</div>
 				</div>
 			</div>
@@ -87,7 +82,7 @@
 		background-image: url('../../assets/_img/styles/paper-bg.png');
 		color:$white;
 		background-position: top center;
-		padding: 0 0 170px 0;
+		padding: 0 0 75px 0;
 		min-height: calc(100vh - 50px - 55px);
 		background-color:$black;
 		overflow: hidden;

@@ -21,7 +21,7 @@
 						:value="npc.senses && npc.senses[sense] ? npc.senses[sense].range : undefined" 
 						suffix="ft."
 						:disable="!npc.senses || !npc.senses[sense]"
-						@input="$event => $set(npc.senses[sense], 'range', $event)"
+						@input="$event => !$event || $set(npc.senses[sense], 'range', $event)"
 					/>
 				</div>
 				<div class="col">
@@ -31,7 +31,7 @@
 						autocomplete="off"
 						:value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"
 						:disable="!npc.senses || !npc.senses[sense]"
-						@input="$event => $set(npc.senses[sense], 'comments', $event)"
+						@input="$event => !$event || $set(npc.senses[sense], 'comments', $event)"
 					/>
 				</div>
 			</div>

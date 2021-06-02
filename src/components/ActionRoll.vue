@@ -20,41 +20,13 @@
 				:key="`verstatile-panel-${index}`"
 				:name="option.name"
 			>
-				<q-select 
-					v-if="action_type !== 'healing'"
-					dark filled square
-					map-options
-					emit-value
+				<hk-dmg-type-select 
+					class="mb-3"
 					:label="`Damage type ${index == 1 ? option.label : ''}`"
-					:options="damage_types"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					class="mb-2"
-					:rules="[val => !!val || 'Select a damage type']"
-				>
-					<template v-slot:selected v-if="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]">
-						<span>
-							<i :class="[damage_type_icons[roll[`${index === 1 ? 'versatile_' : '' }damage_type`]], roll[`${index === 1 ? 'versatile_' : '' }damage_type`]]"/>
-							{{ roll[`${index === 1 ? 'versatile_' : '' }damage_type`].capitalize() }}
-						</span>
-					</template>
-					<template v-slot:option="scope">
-						<q-item
-							clickable
-							v-ripple
-							v-close-popup
-							:active="roll[`${index === 1 ? 'versatile_' : '' }damage_type`] === scope.opt"
-							@click="$set(roll, `${index === 1 ? 'versatile_' : '' }damage_type`, scope.opt)"
-						>
-							<q-item-section avatar>
-								<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-							</q-item-section>
-							<q-item-section>
-								<q-item-label v-html="scope.opt.capitalize()"/>
-							</q-item-section>
-						</q-item>
-					</template>
-				</q-select>
-					
+					required
+				/>
+
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->
@@ -62,7 +34,14 @@
 						<q-input 
 							dark filled square
 							:label="`Dice count ${index == 1 ? option.label : ''}`"
-							v-model="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
+							v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
+							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
+							:rules="[
+								val => !val || (val <= 99 && val > 0) || 'Min is 1, max is 99',
+								(roll[`${index === 1 ? 'versatile_' : '' }dice_type`]) ? val => !!val || 'Required' : ''
+							]"
+							min="1"
+							max="99"
 							autocomplete="off"
 							name="dice_count"
 							class="mb-2"
@@ -70,10 +49,11 @@
 						/>
 					</div>
 					<div class="col">
-						<!-- MODIFIER SUBTYPE -->
+						<!-- DICE TYPE -->
 						<q-select 
 							dark filled square
 							map-options emit-value
+							clearable
 							:label="`Dice type ${index == 1 ? option.label : ''}`"
 							:options="dice_type"
 							v-model="roll[`${index === 1 ? 'versatile_' : '' }dice_type`]"
@@ -86,23 +66,19 @@
 							dark filled square
 							:label="`Fixed value ${index == 1 ? option.label : ''}`"
 							v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
+							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
+							:rules="[val => !val || val <= 99 || 'Max is 99']"
 							autocomplete="off"
 							class="mb-2"
 							type="number"
 						>
 							<template v-slot:append>
-								<q-icon name="info" @click.stop>
-									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
-											<q-card-section class="bg-gray-active">
-												<b>Fixed</b>
-											</q-card-section>
-											<q-card-section>
-												Set the fixed value that is added on top of the rolled value.
-											</q-card-section>
-										</q-card>
-									</q-menu>
-								</q-icon>
+								<hk-popover 
+									header="Fixed value"
+									content="Set the fixed value that is added on top of the rolled value."
+								>
+									<q-icon name="info" />
+								</hk-popover>
 							</template>
 						</q-input>
 					</div>
@@ -137,20 +113,14 @@
 			@keyup="$forceUpdate()"
 		>
 			<template v-slot:append>
-				<q-icon name="info" @click.stop>
-					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card dark square>
-							<q-card-section class="bg-gray-active">
-								<b>Projectile count</b>
-							</q-card-section>
-							<q-card-section>
-								Number of projectiles that are cast. <br/>
-								Think of spells like <b>Magic Missile</b> (phb 257), 
-								where multiple projectiles are created for a single cast.
-							</q-card-section>
-						</q-card>
-					</q-menu>
-				</q-icon>
+				<hk-popover header="Projectile count">
+					<q-icon name="info" />
+					<template slot="content">
+						Number of projectiles that are cast. <br/>
+						Think of spells like <b>Magic Missile</b> (phb 257), 
+						where multiple projectiles are created for a single cast.
+					</template>
+				</hk-popover>
 			</template>
 		</q-input>
 
@@ -391,6 +361,13 @@ export default {
 		};
 	},
 	methods: {
+		parseToInt(value, object, property) {
+			if(value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
+			}
+		},
 		level_tier_addable() {
 			if (this.spell &&
 					this.spell.scaling === "spell_scale" && 
@@ -458,7 +435,7 @@ export default {
 				}
 			}
 			return description;
-		},
+		}
 	}
 };
 </script>

@@ -2,13 +2,25 @@
 	<q-list dense dark>
 		<q-item v-for="({name, icon}, key) in weather_effects" :key="`effect-${key}`">
 			<q-item-section dark avatar>
-				<q-icon :name="icon" />
+				<q-icon :name="icon" :class="(weather.smoke && key === 'fog') ? 'gray-hover' : ''" />
 				<q-tooltip anchor="top middle" self="center right">
 					{{ name }}
 				</q-tooltip>
 			</q-item-section>
 			<q-item-section>
-				<q-item-label caption><b>{{ name }}</b>: {{ intensity(key) }}</q-item-label>
+				<q-item-label caption>
+					<div class="d-flex justify-between">
+						<span><b>{{ name }}</b>: {{ intensity(key) }}</span>
+						<q-toggle
+							v-if="key === 'fog'"
+							label="Smoke"
+							size="xs"
+							v-model="weather.smoke"
+							indeterminate-value="something-else"
+							:false-value="null"
+						/>
+					</div>
+				</q-item-label>
 				<q-slider
 					v-model="weather[key]"
 					:min="0"
@@ -37,7 +49,8 @@
 					snow: { name: "Snow", icon: "fas fa-cloud-snow" },
 					hail: { name: "Hail", icon: "fas fa-cloud-hail" },
 					lightning: { name: "Lightning", icon: "fas fa-bolt" },
-					fog: { name: "Fog", icon: "fas fa-fog" }
+					fog: { name: "Fog", icon: "fas fa-fog" },
+					ash: { name: "Ash rain", icon: "fas fa-fire" },
 				}
 			} 
 		},
@@ -70,3 +83,9 @@
 		}
 	}
 </script>
+
+<style lang="scss" scoped>
+	.q-item__label {
+		line-height: 30px !important;
+	}
+</style>

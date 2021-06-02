@@ -1,13 +1,19 @@
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from "vuex";
+import { db } from "@/firebase";
 
 export const dice = {
 	data() {
 		return {
+			userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 			animateTrigger: false,
 			rolled: 0
 		}
 	},
 	computed: {
+		...mapGetters([
+			"broadcast",
+			"user"
+		]),
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical;
@@ -22,9 +28,9 @@ export const dice = {
 	},
 	methods: {
 		...mapActions([
-			'setRoll'
+			"setRoll"
 		]),
-		rollD(e, d=20, n=1, m=0, title, notify=false, advantage_disadvantage={}) {
+		rollD(e, d=20, n=1, m=0, title, entity_name=undefined, notify=false, advantage_disadvantage={}, share=null) {
 			m = parseInt(m); //Removes + from modifier
 			const add = (a, b) => a + b;
 			let throws = [];
@@ -84,6 +90,7 @@ export const dice = {
 				advantage_disadvantage,
 				ignored
 			}
+			if(entity_name) roll.entity_name = entity_name;
 			
 			if(notify) {
 				let advantage;
@@ -96,15 +103,46 @@ export const dice = {
 				this.animateTrigger = !this.animateTrigger;
 				this.$snotify.html(
 					`<div class="snotifyToast__body roll">
-						<div class="roll_title">${title}</div>
+						<div class="roll_title truncate">${entity_name ? `${entity_name}: ` : ``}${title}</div>
 						<div class="rolled" id="roll">${roll.total}</div>
-						<div class="roll_title">${advantage ? advantage : ''}${sumThrows}${roll.mod}</div>
+						<div class="roll_footer">${advantage ? advantage : ''}${sumThrows}${roll.mod}</div>
 					</div> `, {
 					timeout: 3000,
 					closeOnClick: true
 				});
 				this.rolled = roll.total;
 			}
+			
+			//Save the roll in the encounter "shares" object
+			if(share && this.broadcast.live) {
+				const key = Date.now() + Math.random().toString(36).substring(4);
+				let share_roll = {...roll};
+
+				// Remove unneeded properties
+				delete share_roll.throws;
+				delete share_roll.throwsTotal;
+				delete share_roll.d;
+				delete share_roll.mod;
+				delete share_roll.ignored;
+				if(!roll.ignored) {
+					delete share_roll.advantage_disadvantage;
+				} else {
+					share_roll.advantage_disadvantage = Object.keys(advantage_disadvantage)[0].charAt(0);
+				}
+				
+				let share_object = {
+					key,
+					type: "roll",
+					notification: share_roll
+				}
+
+				if(share.encounter_id) share_object.encounter_id = share.encounter_id;
+				if(share.entity_key) share_object.entity_key = share.entity_key;
+				
+				// Push the roll
+				db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share_object);
+			}
+
 			this.setRoll(roll);
 			return roll;
 		},
@@ -129,6 +167,8 @@ export const dice = {
 		 * @param {object} e Event, holds info for advantage/disadvantege
 		 * @param {object} ability Full ability object
 		 * @param {object} config Holds configuration options {type, castLevel, casterLevel, toHitModifier, versatile}
+		 * 
+		 * @returns {object}
 		 */
 		rollAction(e, ability, config={}) {
 			let returnRoll = {
@@ -166,7 +206,7 @@ export const dice = {
 
 				// If the action type is a spell attack, melee weapon or ranged weapon, roll to hit
 				if(type === 'melee_weapon' || type === 'ranged_weapon' || type === 'spell_attack') {
-					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, false, advantage_object);
+					returnRoll.actions[i].toHit = this.rollD(e.e, 20, 1, attack_bonus, `${ability.name} to hit`, undefined, false, advantage_object);
 					if(returnRoll.actions[i].toHit.throwsTotal === 20) {
 						returnRoll.actions[i].crit = true;
 						crit = true;
@@ -188,6 +228,7 @@ export const dice = {
 					let scaledRoll = undefined;
 					let scaledModifier = undefined;
 					let missSave = (toHit) ? modifier.miss_mod : modifier.save_fail_mod; //what happens on miss/failed save
+					const special = (!modifier.special || modifier.length === 0) ? undefined : (modifier.special && Array.isArray(modifier.special)) ? modifier.special : [modifier.special];
 
 					// Check for versatile. 1 is the alternative option
 					// Changes only have to be made if the versatile roll is the alternative (1)
@@ -252,7 +293,8 @@ export const dice = {
 						modifierRoll,
 						damage_type,
 						scaledRoll,
-						missSave
+						missSave,
+						special
 					});
 				}
 				i++;

@@ -14,12 +14,10 @@
 				}">
 					<hk-animated-integer :value="health.curHp" />
 				</span>
-				<span class="gray-hover">/</span>
-				<span :class="{ 
+				<span class="gray-hover">/</span><span :class="{ 
 					'green': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod > 0, 
 					'red': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod < 0
-				}">
-					{{ health.maxHp }}
+				}">{{ health.maxHp }}
 				</span>
 			<template v-if="health.tempHp">
 				+{{ health.tempHp }}
@@ -107,7 +105,6 @@
 					curHp: parseInt(curHp),
 					tempHp: parseInt(tempHp),
 				};
-
 				return ret;
 			}
 		}

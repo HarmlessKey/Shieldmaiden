@@ -3,7 +3,7 @@
 		<q-list>
 			<q-item>
 				<q-item-section>
-					<b>{{ entity.name }}</b>
+					<b>{{ entity.name.capitalizeEach() }}</b>
 				</q-item-section>
 			</q-item>
 			<q-separator />

@@ -41,6 +41,7 @@
 <script>
 	import { dice } from '@/mixins/dice.js'
 	import Rolls from './Rolls';
+	import { mapGetters } from "vuex";
 
 	export default {
 		name: "DiceRoller",
@@ -64,6 +65,15 @@
 				},
 			}
 		},
+		computed: {
+			...mapGetters([
+				"broadcast",
+				"encounterId"
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("general_rolls")) || false;
+			}
+		},
 		methods: {
 			roll(e, d, item) {
 				let advantage = {};
@@ -82,19 +92,16 @@
 				if (item.mod === '') {
 					item.mod = undefined
 				}
-				let roll = this.rollD(e, parseInt(die), item.n, item.mod, `${item.n}d${die} roll`, true, advantage);
+				let roll = this.rollD(
+					e, parseInt(die), item.n, item.mod, 
+					`${item.n}d${die} roll`, 
+					undefined, true, advantage,
+					this.share ? {
+						encounter_id: this.encounterId
+					} : null
+				);
 				item.result = roll.total;
 
-				//Show Natural 1 or Natural 20
-				// if(item.n == 1 && die == 20) {
-				// 	let throws = '"'+roll.throws+'"'
-				// 	if(throws.substring(5, 0) == '"1"') {
-				// 		roll.total = 'Natural 1';
-				// 	}
-				// 	else if(throws.substring(5, 0) == '"20"') {
-				// 		roll.total = 'Natural 20';
-				// 	}
-				// }
 				this.log.unshift(roll);
 			}
 		}

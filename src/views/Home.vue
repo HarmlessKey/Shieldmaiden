@@ -1,5 +1,10 @@
 <template>
-	<div class="home" v-if="!$store.getters.user || $route.path === '/home'" v-on:scroll="handleScroll">
+	<q-scroll-area 
+		class="home" 
+		v-if="!$store.getters.user || $route.path === '/home'" 
+		dark :thumb-style="{ width: '10px'}"
+		v-on:scroll="handleScroll"
+	>
 		<template v-if="diceColors.length > 0">
 			<section id="top">
 				<Top />
@@ -12,7 +17,7 @@
 				</span>
 			</section>
 			<section id="overview">
-				<Overview />
+				<Feedback />
 				<span 
 					class="die" 
 					:style="{ 
@@ -66,25 +71,27 @@
 				</router-link>
 			</div>
 		</template>
-	</div>
+	</q-scroll-area>
 	<SignedIn v-else />
 </template>
 
 <script>
-	import Top from '@/components/home/Top.vue'
-	import Overview from '@/components/home/Overview.vue'
-	import General from '@/components/home/General.vue'
-	import Share from '@/components/home/Share.vue'
-	import Builder from '@/components/home/Builder.vue'
-	import Campaign from '@/components/home/Campaign.vue'
-	import Footer from '@/components/Footer.vue'
-	import SignedIn from '@/components/home/SignedIn.vue'
+	import Top from '@/components/home/Top.vue';
+	import Overview from '@/components/home/Overview.vue';
+	import Feedback from '@/components/home/Feedback.vue';
+	import General from '@/components/home/General.vue';
+	import Share from '@/components/home/Share.vue';
+	import Builder from '@/components/home/Builder.vue';
+	import Campaign from '@/components/home/Campaign.vue';
+	import Footer from '@/components/Footer.vue';
+	import SignedIn from '@/components/home/SignedIn.vue';
 
 	export default {
 		name: 'home',
 		components: {
 			Top,
 			Overview,
+			Feedback,
 			General,
 			Share,
 			Builder,
@@ -126,7 +133,7 @@
 		},
 		methods: {
 			handleScroll(e) {
-				this.scrolled = e.target.scrollTop;
+				this.scrolled = e.verticalPosition;
 			}
 		}
 	}
@@ -137,7 +144,7 @@
 .home {
 	padding-bottom: 85px;
 	overflow-y: scroll;
-	height: 100vh;
+	height: calc(100vh + 85px);
 
 	&::-webkit-scrollbar {
 		display: none;

@@ -82,7 +82,7 @@
 								>
 									<template v-slot:append>
 										<small><span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
-										<q-icon name="info" class="ml-1 pointer" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
+										<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
 									</template>
 								</q-input>				
 								<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
@@ -116,7 +116,7 @@
 									name="maxHp" 
 									placeholder="Maximum Hit Points*"
 								>
-									<q-icon slot="append" name="fas fa-heart" />
+									<q-icon slot="prepend" name="fas fa-heart" />
 								</q-input>
 								<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 							</div>
@@ -133,7 +133,7 @@
 									data-vv-as="Armor Class"
 									name="ac" 
 								>
-									<q-icon slot="append" name="fas fa-shield" />
+									<q-icon slot="prepend" name="fas fa-shield" />
 								</q-input>
 								<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 							</div>
@@ -146,8 +146,10 @@
 									min="0"
 									type="number" 
 									v-model="player.spell_save_dc" 
-									name="save_dc" 
-								/>
+									name="save_dc"
+								>
+									<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+								</q-input>
 							</div>
 						</div>
 					</hk-card>
@@ -198,7 +200,10 @@
 								v-validate="'numeric'" 
 								data-vv-as="Passive Perception"
 								name="pper" 
-								placeholder="Perception" />
+								placeholder="Perception"
+							>
+								<q-icon slot="prepend" name="fas fa-eye" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
@@ -213,7 +218,10 @@
 								v-validate="'numeric'" 
 								data-vv-as="Passive Investigation"
 								name="pinv" 
-								placeholder="Investigation" />
+								placeholder="Investigation" 
+							>
+								<q-icon slot="prepend" name="fas fa-search" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
 						</div>
 						<div  class="col-12 col-md-4 mb-2">
@@ -228,11 +236,16 @@
 								v-validate="'numeric'" 
 								data-vv-as="pins"
 								name="pins" 
-								placeholder="Insight" />
+								placeholder="Insight"
+							>
+								<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+							</q-input>
 							<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
 						</div>
 					</div>
 				</hk-card>
+
+				<Defenses v-model="player" />
 
 				<!-- SKILLS -->
 				<hk-card header="Skills">
@@ -398,6 +411,7 @@
 	import { experience } from '@/mixins/experience.js';
 	import { skills } from '@/mixins/skills.js';
 	import { general } from '@/mixins/general.js';
+	import Defenses from './Defenses';
 
 	export default {
 		name: 'Players',
@@ -407,7 +421,8 @@
 		},
 		components: {
 			OverEncumbered,
-			GiveCharacterControl
+			GiveCharacterControl,
+			Defenses
 		},
 		data() {
 			return {

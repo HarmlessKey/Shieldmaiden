@@ -11,106 +11,89 @@
 
 				<h2 class="mt-3">Edit your campaign</h2>
 
-				<q-input 
-					dark filled square dense
-					label="name"
-					autocomplete="off"
-					v-validate="'required'" 
-					data-vv-as="Encounter Name" 
-					type="text" 
-					name="name" 
-					v-model="campaign.campaign"
-				/>
-				<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-
-				<q-select 
-					dark filled square dense
-					label="Advancement"
-					emit-value
-					map-options
-					class="my-2" 
-					v-model="campaign.advancement" 
-					:options="advancement_options" 
-				/>
-
-				<div class="background">
-					<div 
-						class="img pointer" 
-						v-if="campaign.background" 
-						:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
-						@click="image = true"
-					>
-					</div>
-					<div class="img" v-else>
-						<q-icon name="fas fa-image"/>
-					</div>
-					<div>
+				<hk-card-deck>
+					<hk-card header="General">
 						<q-input 
 							dark filled square
-							autocomplete="off" 
-							v-validate="'url'" type="text" 
-							name="backbround" 
-							data-vv-as="Background"
-							v-model="campaign.background" 
-							placeholder="Background URL"/>
-						<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
-					</div>
-				</div>
+							label="name"
+							autocomplete="off"
+							v-validate="'required'" 
+							data-vv-as="Encounter Name" 
+							type="text" 
+							name="name" 
+							v-model="campaign.campaign"
+						/>
+						<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-				<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
-					<span :class="{ 'green': !campaign.private }">
-						<i class="fas fa-eye"></i>
-						Public
-					</span>
-					/
-					<span :class="{ 'red': campaign.private }">
-						<i class="fas fa-eye-slash"></i>
-						Private
-					</span>
-				</div>
+						<q-select 
+							dark filled square
+							label="Advancement"
+							emit-value
+							map-options
+							class="my-2" 
+							v-model="campaign.advancement" 
+							:options="advancement_options" 
+						/>
 
-				<button class="btn mt-3" @click="edit()">Save</button>
-			</div>
-			
-			<h2>Add players</h2>
-			<div class="row q-col-gutter-md">
-				<div class="col-12 col-md-6">
-					<hk-card header="All Players">
-						<ul class="entities hasImg" v-if="players && campaign">
-							<li v-for="(player, key) in players" :key="key">
-								<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+						<div class="background">
+							<div 
+								class="img pointer" 
+								v-if="campaign.background" 
+								:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+								@click="image = true"
+							>
+							</div>
+							<div class="img" v-else>
+								<q-icon name="fas fa-image"/>
+							</div>
+							<div>
+								<q-input 
+									dark filled square
+									autocomplete="off" 
+									v-validate="'url'" type="text" 
+									name="backbround" 
+									data-vv-as="Background"
+									v-model="campaign.background" 
+									placeholder="Background URL"/>
+								<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
+							</div>
+						</div>
 
-								{{ player.character_name }}
-							
-								<span v-if="inOtherCampaign(key)">
-									<span class="d-none d-md-inline ml-1 gray-hover"><small>Different Campaign</small></span>
-									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
-								</span>
+						<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+							<span :class="{ 'green': !campaign.private }">
+								<i class="fas fa-eye"></i>
+								Public
+							</span>
+							/
+							<span :class="{ 'red': campaign.private }">
+								<i class="fas fa-eye-slash"></i>
+								Private
+							</span>
+							<hk-popover 
+								header="Private vs Public"
+							>
+								<i class="fas fa-info-circle blue" />
+								<template #content>
+									<p>
+										You can only share the inititiave list with your 
+										players if your campaign is set to public.
+									</p>
+									Private campaigns are hidden from your followers.
+								</template>
+							</hk-popover>
+						</div>
 
-								<span v-else-if="checkPlayer(key) >= 0">
-									<i class="fas fa-check"></i>
-									<span class="d-none d-md-inline ml-1 gray-hover"><small>Added</small></span>
-								</span>
-
-								<div v-else class="actions bg-gray">
-									<a class="gray-hover"
-									@click="addPlayer(key)">
-										<i class="fas fa-plus"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Add character
-										</q-tooltip>
-									</a>
-								</div>
-								
-							</li>
-						</ul>
-						<div v-else class="loader"><span>Loading Players...</span></div>
+						<button class="btn mt-3" @click="edit()">Save</button>
 					</hk-card>
-				</div>
 
-				<div class="col-12 col-md-6">
-					<hk-card header="Players in Campaign">
+					<!-- PLAYERS -->
+					<hk-card>
+						<div class="card-header d-flex justify-content-between" slot="header">
+							Players in Campaign
+							<a @click="players_dialog = true">
+								<i class="fas fa-plus green" />
+							</a>
+						</div>
 						<template v-if="players && campaign">
 							<ul class="entities hasImg" v-if="campaign.players">
 								<li v-for="(player, key) in campaign.players" :key="key">		
@@ -126,21 +109,62 @@
 									
 									<div class="actions">
 										<a class="gray-hover" @click="removePlayer(key)">
-											<i class="fas fa-minus"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Remove character
+											<i class="fas fa-trash-alt red"></i>
+											<q-tooltip anchor="top middle" self="center right">
+												Remove from campaign
 											</q-tooltip>
 										</a>
 									</div>
-									<i class="ml-3 far fa-ellipsis-v ml-3 d-inline d-sm-none"></i>
 								</li>
 							</ul>
+							<p v-else>
+								There are no players in this campaign yet.
+							</p>
+							
+							<a slot="footer" @click="players_dialog = true" class="btn btn-block">Add players</a>
 						</template>
-						<div v-else class="loader"><span>Loading Players...</span></div>
+						<hk-loader v-else name="players" />
 					</hk-card>
-				</div>
+				</hk-card-deck>
 			</div>
 		</div>
+
+		<q-dialog v-model="players_dialog">
+			<hk-card header="All Players" :min-width="300">
+				<div class="card-header d-flex justify-content-between" slot="header">
+					Add players
+					<q-btn icon="close" flat dense v-close-popup />
+				</div>
+
+				<ul class="entities hasImg" v-if="players && campaign">
+					<li v-for="(player, key) in players" :key="key">
+						<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
+						<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+						{{ player.character_name }}
+					
+						<span v-if="inOtherCampaign(key)">
+							<span class="d-none d-md-inline ml-1 gray-hover pr-2"><small>Different Campaign</small></span>
+						</span>
+
+						<span v-else-if="checkPlayer(key) >= 0">
+							<i class="fas fa-check pr-2"></i>
+						</span>
+
+						<div v-else class="actions bg-gray">
+							<a @click="addPlayer(key)">
+								<i class="fas fa-plus green"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Add character
+								</q-tooltip>
+							</a>
+						</div>
+						
+					</li>
+				</ul>
+				<div v-else class="loader"><span>Loading Players...</span></div>
+			</hk-card>
+		</q-dialog>
 
 		<q-dialog v-model="image">
 			<img :src="campaign.background" />
@@ -169,6 +193,7 @@
 				campaignId: this.$route.params.campid,
 				newCampaign: '',
 				image: false,
+				players_dialog: false,
 				advancement_options: [
 					{
 						value: "experience",

@@ -4,7 +4,13 @@
 
 		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
 			{{ campaign.campaign }}
-			<span @click="broadcast()" class="live" :class="{'active': broadcasting['.value'] == campaignId }">live</span>
+			<span 
+				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
+				class="live" 
+				:class="{'active': broadcast.live === campaignId }"
+			>
+					{{ broadcast.live === campaignId ? "" : "go" }} live
+			</span>
 		</h1>
 
 		<OverEncumbered v-if="overencumbered" />
@@ -134,7 +140,7 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a @click="deleteEncounter(data.row.key,data.row.encounter)">
+							<a @click="deleteEncounter($event, data.row.key,data.row.encounter)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
@@ -184,7 +190,7 @@
 										Reset
 									</q-tooltip>
 								</a>
-								<a class="ml-2" @click="deleteEncounter(data.row.key, data.row.encounter)">
+								<a class="ml-2" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
 									<i class="fas fa-trash-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
@@ -210,20 +216,20 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import Crumble from '@/components/crumble/MyContent.vue';
-	import PlayerLink from '@/components/PlayerLink.vue';
-	import Players from '@/components/campaign/Players.vue';
+	import _ from "lodash";
+	import OverEncumbered from "@/components/OverEncumbered.vue";
+	import OutOfSlots from "@/components/OutOfSlots.vue";
+	import Crumble from "@/components/crumble/MyContent.vue";
+	import PlayerLink from "@/components/PlayerLink.vue";
+	import Players from "@/components/campaign/Players.vue";
 
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from "vuex";
+	import { db } from "@/firebase";
 
 	export default {
-		name: 'EditCampaign',
+		name: "EditCampaign",
 		metaInfo: {
-			title: 'Encounters'
+			title: "Encounters"
 		},
 		components: {
 			Crumble,
@@ -236,37 +242,37 @@
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
-				newEncounter: '',
-				copy: window.location.host + '/track-encounter/' + this.$store.getters.user.uid,
+				newEncounter: "",
+				copy: window.location.host + "/track-encounter/" + this.$store.getters.user.uid,
 				add: false,
 				currentPage: 1,
 				collapsed: false,
 				activeColumns: {
 					encounter: {
-						label: 'Encounter',
+						label: "Encounter",
 						maxContent: true,
 						sortable: true
 					},
 					entities: {
-						label: 'Entities',
+						label: "Entities",
 						center: true
 					},
 					status: {
-						label: 'Status',
+						label: "Status",
 						truncate: true,
-						hide: 'sm'
+						hide: "sm"
 					},
 					round: {
-						label: 'Round',
+						label: "Round",
 						center: true,
 						truncate: true,
-						hide: 'md'
+						hide: "md"
 					},
 					turn: {
-						label: 'Turn',
+						label: "Turn",
 						center: true,
 						truncate: true,
-						hide: 'md'
+						hide: "md"
 					},
                     actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',
@@ -276,21 +282,13 @@
 				},
 				finishedColumns: {
 					encounter: {
-						label: 'Encounter',
+						label: "Encounter",
 					},
 					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true
                     }
-				}
-			}
-		},
-		firebase() {
-			return {
-				broadcasting: {
-					source: db.ref(`broadcast/${this.user.uid}/live`),
-					asObject: true
 				}
 			}
 		},
@@ -309,14 +307,15 @@
 		},
 		computed: {
 			...mapGetters([
-				'tier',
-				'encounters',
-				'overencumbered',
-				'content_count',
-				'campaign',
-				'players',
-				'playerInCampaign',
-				'side_collapsed',
+				"tier",
+				"encounters",
+				"overencumbered",
+				"content_count",
+				"campaign",
+				"players",
+				"playerInCampaign",
+				"side_collapsed",
+				"broadcast"
 			]),
 			_active: function() {
 				return _.chain(this.encounters)
@@ -367,6 +366,7 @@
 				'fetchEncounters',
 				'fetchCampaign',
 				'setActiveCampaign',
+				"setSlide"
 			]),
 			addEncounter() {
 				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
@@ -385,23 +385,28 @@
 					this.add = false;
 				}
 			},
-			deleteEncounter(key, encounter) {
-				this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
-					timeout: 5000,
-					buttons: [
-					{
-						text: 'Yes', action: (toast) => { 
-							db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove(); 
-							this.$snotify.remove(toast.id); 
-						}, bold: false 
-					},
-					{
-						text: 'No', action: (toast) => { 
-							this.$snotify.remove(toast.id); 
-						}, 
-						bold: false },
-					]
-				});
+			deleteEncounter(e, key, encounter) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+				} else {
+					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
+						timeout: 5000,
+						buttons: [
+						{
+							text: 'Yes', action: (toast) => { 
+								db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+								this.$snotify.remove(toast.id); 
+							}, bold: false 
+						},
+						{
+							text: 'No', action: (toast) => { 
+								this.$snotify.remove(toast.id); 
+							}, 
+							bold: false },
+						]
+					});
+				}
 			},
 			reset(id, hard=true) {
 				if (hard){
@@ -436,15 +441,6 @@
 
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
-			},
-			broadcast() {
-				//Save this is the current campaign that is being broadcasted
-
-				if(this.broadcasting['.value'] == this.campaignId) {
-					db.ref(`broadcast/${this.user.uid}/live`).remove()
-				} else {
-					db.ref(`broadcast/${this.user.uid}/live`).set(this.campaignId)
-				}
 			},
 			setCurHp() {
 				if(this.noCurHp) {

@@ -137,6 +137,7 @@
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				width: 0,
+				audio_notification: false,
 			}
 		},
 		firebase() {
@@ -165,22 +166,7 @@
 			});
 			this.track_Encounter(this.demo);
 
-			// Create notify if encounter has audio link
-			if (this.encounter.audio !== undefined) {
-				this.$q.notify({
-					message: 'Audio link found',
-					caption: 'Would you like to follow it?',
-					color: "blue-light",
-					position: "top",
-					progress: true,
-					timeout: 7500,
-					icon: this.audio_icons[this.audio_link_type].icon,
-					actions: [
-						{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
-						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
-					]
-				})
-			}
+			
 		},
 		computed: {
 			...mapGetters([
@@ -252,6 +238,28 @@
 			alive(newVal) {
 				if(newVal === 0 && this.initialized) {
 					this.confirmFinish()
+				}
+			},
+			encounter: {
+				deep: true,
+				handler(newValue) {
+					// Create notify if encounter has audio link
+					if (newValue !== undefined && newValue.audio !== undefined && this.audio_notification === false) {
+						this.audio_notification = true;
+						this.$q.notify({
+							message: 'Audio link found',
+							caption: 'Would you like to follow it?',
+							color: "blue-light",
+							position: "top",
+							progress: true,
+							timeout: 7500,
+							icon: this.audio_icons[this.audio_link_type].icon,
+							actions: [
+								{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
+								{ label: 'No', color: 'white', handler: () => { /* ... */ } }
+							]
+						})
+					}
 				}
 			},
 			requests: {

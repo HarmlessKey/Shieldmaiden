@@ -45,11 +45,11 @@
 						v-if="category === 'legendary_actions'"
 						dark filled square
 						label="Count"
-						v-model.number="npc.lengendary_count"
+						v-model.number="npc.legendary_count"
 						type="number"
 						class="my-3"
 						hint="Amount of legendary actions per turn."
-						@input="parseToInt($event, npc, 'lengendary_count')"
+						@input="parseToInt($event, npc, 'legendary_count')"
 						:rules="[
 							val => !!val || val === 0 || 'Required',
 							val => val <= 9 || 'Max is 9'

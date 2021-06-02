@@ -273,8 +273,8 @@
 			<div v-for="{category, name} in actions" :key="category">
 				<template v-if="entity[category] && entity[category].length > 0">
 					<h3 v-if="category !== 'special_abilities'">{{ name }}</h3>
-					<p v-if="entity.lengendary_count && category === 'legendary_actions'">
-						{{ entity.name.capitalizeEach() }} can take {{ entity.lengendary_count }} legendary actions, choosing from the options below. 
+					<p v-if="entity.legendary_count && category === 'legendary_actions'">
+						{{ entity.name.capitalizeEach() }} can take {{ entity.legendary_count }} legendary actions, choosing from the options below. 
 						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ entity.name }} regains spent legendary actions at the start of their turn.
 					</p>
 					<p v-for="(ability, index) in entity[category]" :key="`${category}-${index}`">

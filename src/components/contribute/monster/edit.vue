@@ -410,7 +410,7 @@ export default {
 				}
 			}
 			if(this.monster.legendary_actions && this.monster.legendary_actions.length > 0) {
-				this.monster.lengendary_count = 3;
+				this.monster.legendary_count = 3;
 			}
 			
 		},

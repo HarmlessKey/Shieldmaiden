@@ -1186,7 +1186,7 @@ const mutations = {
 					entity.hit_dice = data_npc.hit_dice;
 					entity.senses = data_npc.senses;
 					entity.languages = data_npc.languages;
-					entity.lengendary_count = data_npc.lengendary_count;
+					entity.legendary_count = data_npc.legendary_count;
 
 					if(entity.challenge_rating) entity.proficiency = monsterMixin.data().monster_challenge_rating[entity.challenge_rating].proficiency;
 		

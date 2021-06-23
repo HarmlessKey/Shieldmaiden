@@ -55,6 +55,13 @@
 						date: "7 May 2020"
 					},
 					{
+						source: '<i class="fab fa-discord discord-purple"></i> On Discord',
+						text: "I'm blown away by the quality and the attention to detail that you guys had while creating it. Honestly, "+
+						"I don't think that any of the more popular options [&#8230;] ever come close to the level of quality that Harmless Key has!",
+						link: "https://discord.com/channels/654675574488563714/654695745156284472/857324784127180810",
+						date: "23 June 2021"
+					},
+					{
 						source: '<i class="fab fa-patreon patreon-red"></i> On Patreon',
 						text: "Your tool is awesome and exactly what I was searching for. "+
 							"No more paper trash or excel sheets!",

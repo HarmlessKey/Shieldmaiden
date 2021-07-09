@@ -18,7 +18,6 @@
 </template>
 
 <script>
-	import VueMarkdown from 'vue-markdown';
 	import { abilities } from '@/mixins/abilities.js';
 	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';

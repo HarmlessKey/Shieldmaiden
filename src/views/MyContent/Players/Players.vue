@@ -206,7 +206,7 @@
 					});
 				}
 			},
-			confirmDelete(key, player, control) {
+			confirmDelete(key, player) {
 				this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
 					timeout: false,
 					buttons: [
@@ -230,8 +230,7 @@
 								bold: true
 							},
 						]
-					});
-				}
+				});
 			},
 			deletePlayer(key, player) {
 				//Remove from character control

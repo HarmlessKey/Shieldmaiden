@@ -18,15 +18,7 @@ export const dice = {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {
 				return this.$store.getters.userSettings.encounter.critical;
 			} return undefined; // Default = undefined = roll twice
-		}
-	},
-	watch: {
-		animateTrigger() {
-			this.animateValue("roll", 0, this.rolled, 500);
-			this.rolled = 0;
-		}
-	},
-	computed: {
+		},
 		dice_types() {		
 			return [
 				{ value: 4, text: "d4", average: this.calcAverage(4) },
@@ -36,6 +28,12 @@ export const dice = {
 				{ value: 12, text: "d12", average: this.calcAverage(12) },
 			];
 		} 
+	},
+	watch: {
+		animateTrigger() {
+			this.animateValue("roll", 0, this.rolled, 500);
+			this.rolled = 0;
+		}
 	},
 	methods: {
 		...mapActions([

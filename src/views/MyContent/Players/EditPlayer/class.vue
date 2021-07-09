@@ -410,7 +410,7 @@
 															:options="abilities"
 															emit-value
 															map-options
-															v-model="asi_modifier(classKey, level, key, i).subtarget"
+															:value="asi_modifier(classKey, level, key, i).subtarget"
 															name="asi"
 															@input="saveASI($event, classKey, level, key, i)"
 														/>
@@ -455,7 +455,7 @@
 														:ref="`description-${classKey}-${level}-${key}`"
 														@paste.native="evt => pasteCapture(evt, classKey, level, key)"
 														name="description"
-														v-model="subclass.features[`level_${level}`][key].description"
+														:value="subclass.features[`level_${level}`][key].description"
 														v-validate="'max:5000'"
 														maxlength="5001"
 														data-vv-as="Description"

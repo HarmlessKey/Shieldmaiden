@@ -20,20 +20,20 @@
 	import { db } from '@/firebase'
 
 	export default {
-		name: 'Health',
+		name: 'Follow',
 		props: [
 			'entity',
 		],
 		data() {
 			return {
-				user: this.$store.getters.user,
-				userId: this.$route.params.userid,
+				user: this.$store.getters ? this.$store.getters.user : undefined,
+				dmId: this.$route.params.userid,
 			}
 		},
 		firebase() {
 			return {
 				following: {
-					source: db.ref(`users/${this.user.uid}/follow/${this.userId}`),
+					source: db.ref(`users/${this.user.uid}/follow/${this.dmId}`),
 					asObject: true,
 				},
 			}
@@ -41,9 +41,9 @@
 		methods: {
 			follow(value) {
 				if(value) {
-					db.ref(`users/${this.user.uid}/follow/${this.userId}`).set(true)
+					db.ref(`users/${this.user.uid}/follow/${this.dmId}`).set(true)
 				} else {
-					db.ref(`users/${this.user.uid}/follow/${this.userId}`).remove()
+					db.ref(`users/${this.user.uid}/follow/${this.dmId}`).remove()
 				}
 			},
 		},

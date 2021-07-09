@@ -58,7 +58,7 @@
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete(data.row.key, data.row)">
+					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row)">
 							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
@@ -220,11 +220,18 @@
 						{
 							text: 'No', action: (toast) => { 
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: true
-						},
-					]
-				});
+								}, 
+								bold: false
+							},
+							{
+								text: 'No', action: (toast) => { 
+									this.$snotify.remove(toast.id); 
+								}, 
+								bold: true
+							},
+						]
+					});
+				}
 			},
 			deletePlayer(key, player) {
 				//Remove from character control

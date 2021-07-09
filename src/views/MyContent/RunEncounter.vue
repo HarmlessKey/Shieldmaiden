@@ -137,6 +137,7 @@
 				demo: this.$route.name === "Demo",
 				target: undefined,
 				width: 0,
+				audio_notification: false,
 			}
 		},
 		firebase() {
@@ -148,8 +149,8 @@
 			}
 		},
 		beforeMount() {
-			if(this.$route.name !== "Demo") {
-				this.track()
+			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
+				this.setLiveEncounter(this.$route.params.encid);
 			}
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
@@ -165,22 +166,7 @@
 			});
 			this.track_Encounter(this.demo);
 
-			// Create notify if encounter has audio link
-			if (this.encounter.audio !== undefined) {
-				this.$q.notify({
-					message: 'Audio link found',
-					caption: 'Would you like to follow it?',
-					color: "blue-light",
-					position: "top",
-					progress: true,
-					timeout: 7500,
-					icon: this.audio_icons[this.audio_link_type].icon,
-					actions: [
-						{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
-						{ label: 'No', color: 'white', handler: () => { /* ... */ } }
-					]
-				})
-			}
+			
 		},
 		computed: {
 			...mapGetters([
@@ -190,6 +176,7 @@
 				'entities',
 				'initialized',
 				'overencumbered',
+				'broadcast'
 			]),
 			_active: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
@@ -253,6 +240,28 @@
 					this.confirmFinish()
 				}
 			},
+			encounter: {
+				deep: true,
+				handler(newValue) {
+					// Create notify if encounter has audio link
+					if (newValue !== undefined && newValue.audio !== undefined && this.audio_notification === false) {
+						this.audio_notification = true;
+						this.$q.notify({
+							message: 'Audio link found',
+							caption: 'Would you like to follow it?',
+							color: "blue-light",
+							position: "top",
+							progress: true,
+							timeout: 7500,
+							icon: this.audio_icons[this.audio_link_type].icon,
+							actions: [
+								{ label: 'Yes', color: 'white', handler: () => { this.open_audio_link(this.encounter.audio) } },
+								{ label: 'No', color: 'white', handler: () => { /* ... */ } }
+							]
+						})
+					}
+				}
+			},
 			requests: {
 				deep: true,
 				handler(newValue, oldValue) {
@@ -284,13 +293,13 @@
 			}
 		},
 		beforeRouteLeave (to, from, next) {
-			this.reset_store()
-			this.removeTrack()
-			next()
+			this.reset_store();
+			this.setLiveEncounter();
+			next();
 		},
 		beforeRouteUpdate(to, from, next) {
-			this.reset_store()
-			this.removeTrack()
+			this.reset_store();
+			this.setLiveEncounter();
 			next();
 		},
 		beforeDestroy() {
@@ -302,30 +311,19 @@
 				'track_Encounter',
 				'set_finished',
 				'reset_store',
-				'setSlide'
+				'setSlide',
+				'setLiveEncounter'
 			]),
 			setSize() {
 				this.width = this.$refs.encounter.clientWidth;
-			},
-			track() {
-				db.ref('broadcast/' + this.userId).update({
-					campaign: this.$route.params.campid,
-					encounter: this.$route.params.encid,
-				});
-			},
-			removeTrack() {
-				db.ref('broadcast/' + this.userId).update({
-					campaign: false,
-					encounter: false,
-				});
 			},
 			confirmFinish() {
 				this.$snotify.error('All NPC\'s seem to be dead. Do you want to finish the encounter?', 'Finish Encounter', {
 					position: "centerCenter",
 					timeout: 0,
 					buttons: [
-					{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
-					{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						{ text: 'Finish', action: (toast) => { this.finish(); this.$snotify.remove(toast.id); }, bold: false},
+						{ text: 'Cancel', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 					]
 				});
 			},

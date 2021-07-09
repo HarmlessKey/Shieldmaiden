@@ -1,7 +1,7 @@
 <template>
 	<transition 
-		enter-active-class="animated slideInLeft" 
-		leave-active-class="animated slideOutLeft"
+		enter-active-class="animated animate__slideInLeft" 
+		leave-active-class="animated animate__slideOutLeft"
 	>
 		<div 
 			@click.stop=""
@@ -80,6 +80,29 @@
 							<q-item-section class="title">Following</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
 								Following
+							</q-tooltip>
+						</q-item>
+					</q-list>
+					<hr>
+				</template>
+				<template v-else>
+					<q-list @click="setSideSmallScreen(false)">
+						<q-item clickable v-ripple to="/sign-in" color="primary">
+							<q-item-section avatar>
+								<i class="fas fa-sign-in"></i>
+							</q-item-section>
+							<q-item-section class="title">Sign in</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Sign in
+							</q-tooltip>
+						</q-item>
+						<q-item clickable v-ripple to="/sign-up" color="primary">
+							<q-item-section avatar>
+								<i class="fas fa-user-plus"></i>
+							</q-item-section>
+							<q-item-section class="title">Create account</q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Create account
 							</q-tooltip>
 						</q-item>
 					</q-list>

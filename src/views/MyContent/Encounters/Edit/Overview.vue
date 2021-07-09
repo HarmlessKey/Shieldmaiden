@@ -9,15 +9,23 @@
 						<div class="advanced">
 							{{ encDifficulty[1] }}
 							<template v-if="encDifficulty['easy']">
-								<p>
-									<b>Party XP tresholds</b><br/>
-									<span :class="{ 'green': encDifficulty[0] === 'easy'}"><span class="left">Easy:</span> <span>{{ encDifficulty['easy'] }}</span></span><br/>
-									<span :class="{ 'yellow': encDifficulty[0] === 'medium'}"><span class="left">Medium:</span> <span>{{ encDifficulty['medium'] }}</span></span><br/>
-									<span :class="{ 'orange': encDifficulty[0] === 'hard'}"><span class="left">Hard:</span> <span>{{ encDifficulty['hard'] }}</span></span><br/>
-									<span :class="{ 'red': encDifficulty[0] === 'deadly'}"><span class="left">Deadly:</span> <span>{{ encDifficulty['deadly'] }}</span></span>
-								</p>
-								Total XP: <span class="blue">{{ encDifficulty['totalXp'] }}</span><br/>
-								Adjusted XP: <span class="blue">{{ encDifficulty['compare'] }}</span>
+								<div class="mb-3">
+									<div><b>Party XP tresholds</b></div>
+									<div :class="{ 'green': encDifficulty[0] === 'easy'}">
+										<span class="left">Easy:</span> <hk-animated-integer :value="encDifficulty['easy']"/>
+									</div>
+									<div :class="{ 'yellow': encDifficulty[0] === 'medium'}">
+										<span class="left">Medium:</span> <hk-animated-integer :value="encDifficulty['medium']"/>
+									</div>
+									<div :class="{ 'orange': encDifficulty[0] === 'hard'}">
+										<span class="left">Hard:</span> <hk-animated-integer :value="encDifficulty['hard']"/>
+									</div>
+									<div :class="{ 'red': encDifficulty[0] === 'deadly'}">
+										<span class="left">Deadly:</span> <hk-animated-integer :value="encDifficulty['deadly']"/>
+									</div>
+								</div>
+								Total XP: <hk-animated-integer :value="encDifficulty['totalXp']" class="blue" /><br/>
+								Adjusted XP: <hk-animated-integer :value="encDifficulty['compare']" class="blue" />
 							</template>
 						</div>
 						<q-circular-progress
@@ -84,7 +92,7 @@
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="green">
-								{{ data.item }}
+								{{ data.item.capitalizeEach() }}
 							</span>
 
 							<!-- ACTIONS -->
@@ -132,7 +140,7 @@
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="red">
-								{{ data.item }}
+								{{ data.item.capitalizeEach() }}
 							</span>
 
 							<div slot="actions" slot-scope="data" class="actions">
@@ -165,8 +173,10 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
+import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
+  components: { hkAnimatedInteger },
 		name: 'Overview',
 		mixins: [difficulty],
 		data() {

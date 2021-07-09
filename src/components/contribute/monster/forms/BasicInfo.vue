@@ -23,6 +23,29 @@
 				</div>
 			</div>
 
+			<!-- AVATAR -->
+			<div class="avatar mb-3">
+				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
+				<div class="img" v-else>
+					<img src="@/assets/_img/styles/monster.svg" />
+				</div>
+				<div>
+					<q-input 
+						dark filled square
+						label="Avatar"
+						autocomplete="off"  
+						type="text" 
+						class="mb-2" 
+						:class="{'input': true, 'error': errors.has('avatar') }" 
+						v-model="npc.avatar" 
+						v-validate="'url'" 
+						data-vv-as="Avatar"
+						name="avatar" 
+						placeholder="Image URL"
+					/>
+				</div>
+			</div>
+
 			<!-- SIZE -->
 			<q-select
 				dark filled square
@@ -129,7 +152,6 @@
 				</div>
 			</div>
 
-			
 			<!-- LANGUAGES -->
 			<q-select
 				dark filled square
@@ -147,7 +169,6 @@
 				dark filled square
 				label="Challenge rating"
 				v-model="npc.challenge_rating" 
-				class="mb-2"
 				:options="Object.keys(monster_challenge_rating)"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 			>
@@ -166,31 +187,9 @@
 					</q-tooltip>
 				</div>
 			</q-select>
-
-			<!-- AVATAR -->
-			<!-- <div class="avatar">
-				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
-				<div class="img" v-else>
-					<img src="@/assets/_img/styles/monster.svg" />
-				</div>
-				<div>
-					<q-input 
-						dark filled square
-						label="Avatar"
-						autocomplete="off"  
-						type="text" 
-						class="mb-2" 
-						:class="{'input': true, 'error': errors.has('avatar') }" 
-						v-model="npc.avatar" 
-						v-validate="'url'" 
-						data-vv-as="Avatar"
-						name="avatar" 
-						placeholder="Image URL"
-					/>
-				</div>
-			</div> -->
 		</hk-card>
 
+		<!-- HP & AC -->
 		<hk-card header="Health & Armor Class">
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
@@ -239,18 +238,12 @@
 					>
 						<template v-slot:append>
 							<small>{{ npc.hit_dice ? `(${hitDiceStr(npc)})` : '' }}</small>
-							<q-icon name="info" size="xs">
-								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-									<q-card dark square>
-										<q-card-section class="bg-gray-active">
-											<b>Hit Dice + Modifier</b>
-										</q-card-section>
-										<q-card-section>
-											The modifier is the NPC's Constitution modifier multiplied by the number of hit dice.
-										</q-card-section>
-									</q-card>
-								</q-menu>
-							</q-icon>
+							<hk-popover header="Hit Dice + Modifier">
+								<q-icon name="info" size="xs" class="blue" />
+								<template #content>
+									The modifier is the NPC's Constitution modifier multiplied by the number of hit dice.
+								</template>
+							</hk-popover>
 						</template>				
 					</q-input>
 				</div>

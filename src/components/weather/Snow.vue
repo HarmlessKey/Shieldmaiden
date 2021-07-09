@@ -157,8 +157,17 @@
 		}
 	}
 	@keyframes fall {
-			100% { 
-				transform: translateY(230vh) rotate(-10deg);
-			}
+		0% { 
+			transform: translateY(0) translateX(0);
+		}
+		33% { 
+			transform: translateY(76vh) translateX(25px);
+		}
+		66% { 
+			transform: translateY(152vh) translateX(-25px);
+		}
+		100% { 
+			transform: translateY(230vh) translateX(0);
+		}
 	}
 </style>

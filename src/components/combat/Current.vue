@@ -1,25 +1,41 @@
 <template>
 	<div id="current" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
-			<i v-if="current.hidden" class="fas fa-eye-slash red"></i> 
-			{{ current.name }}
+			<span>
+				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
+				<q-badge v-if="current.old" label="DEPRECATED" color="red" />
+				{{ current.name.capitalizeEach() }}
+			</span>
+			<a class="show" @click="showCard = !showCard">
+				<i :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
+				<q-tooltip anchor="top middle" self="center middle">
+					{{ showCard ? "Show actions" : "Show monster card" }}
+				</q-tooltip>
+			</a>
 		</h2>
+		<p v-if="current.old" class="red px-3">
+			Some values might not show, or show incorrectly. 
+			Please update your NPC at the
+			<router-link to="/npcs">NPC's page</router-link>.
+		</p>
 		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">
-				<template v-if="current">
-					<DeathSaves 
-						v-if="(current.entityType === 'player' || current.entityType === 'companion')" 
-						:target="current"
-					/>
+				<DeathSaves 
+					v-if="(current.entityType === 'player' || current.entityType === 'companion')" 
+					:target="current"
+				/>
 
-					<TargetItem :item="current.key" class="mb-2" />
-
-					<Conditions :entity="current" />
-					<Reminders :entity="current" />
-				</template>
-				<div v-else class="loader"><span>Loading current...</span></div>
+				<TargetItem :item="current.key" />
+					
+				<Conditions :entity="current" />
+				<Reminders :entity="current" />
 			</div>
-			<div class="px-3 py-3">
+
+			<div class="px-3 mb-1" v-if="showCard">
+				<ViewEntity :data="current" />
+			</div>
+
+			<div v-else class="px-3 py-3">
 				<Actions :current="current" :settings="settings" />
 			</div>
 		</q-scroll-area>
@@ -27,46 +43,42 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Reminders from '@/components/combat/Reminders.vue';
 	import Actions from '@/components/combat/actions/Actions.vue';
 	import { remindersMixin } from '@/mixins/reminders';
+	import { dice } from '@/mixins/dice';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import DeathSaves from '@/components/combat/DeathSaves.vue';
+	import ViewEntity from '@/components/ViewEntity.vue';
 
 	export default {
 		name: 'Current',
-		mixins: [remindersMixin],
+		mixins: [remindersMixin, dice],
 		components: {
 			Actions,
 			Conditions,
 			Reminders,
 			TargetItem,
-			DeathSaves
+			DeathSaves,
+			ViewEntity
 		},
 		props: ['current', 'next', 'settings'],
 		data() {
 			return {
 				setShadow: 0,
-			}
-		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					asObject: true,
-				}
+				showCard: false
 			}
 		},
 		watch: {
 			//Watch turn to trigger reminders when an entity starts their turn
 			turn(newVal, oldVal) {
 				this.checkReminders(this.current, 'startTurn');
+				this.showCard = false;
 
 				//Check if the turn went up or down	concidering round changes
-				//Fails with only 2 entities
+				//Fails with only 2 entities !!
 				if((newVal > oldVal && oldVal != 0) || 
 					(newVal > oldVal && oldVal === 0 && newVal === 1) || 
 					(newVal === 0 && oldVal > newVal && oldVal !== 1)
@@ -75,6 +87,48 @@
 				} else {
 					//Update next in initiative order
 					this.timedReminders(this.next, 'down');
+				}
+
+				// Check limited uses
+				if(this.current.limited_uses && Object.keys(this.current.limited_uses).length > 0) {
+					// Check all actions for limited uses that can be regained at the start of the turn
+					const categories = ["special_abilities", "actions", "legendary_actions", "reactions"];
+
+					for(const category of categories) {
+						if(this.current[category] && this.current.limited_uses[category]) {
+							this.current[category].forEach((ability, index) => {
+								// Remove abilities from limited uses
+								if((ability.limit && ability.limit_type === "turn") || ability.recharge) {
+									let remove = true;
+									// For recharge, roll to see if the ability is regained
+									if(ability.recharge && ability.recharge !== "rest" && this.current.limited_uses[category][index]) {
+										let values = ability.recharge.split("-");
+										const dice_type = (values.length > 1) ? values[1] : values[0];
+
+										const roll = this.rollD({}, dice_type, 1, 0, `Recharge ${ability.name}`).total;
+										if(roll < values[0]) remove = false; // Don't remove if the roll was too low
+
+										const title = (remove) ? `Recharged ${ability.name}` : `Recharge failed ${ability.name}`;
+										const message = `${roll} Was rolled for a recharge of ${ability.recharge}.`;
+
+										//Notify about the recharge
+										this.$snotify.warning(
+											message,
+											title, 
+											{
+												timeout: 0
+											}
+										);
+									}
+									if(remove) this.remove_limitedUses({key: this.current.key, category, index});
+								} 
+							});
+							// Remove legendaries_used
+							if(category === "legendary_actions") {
+								this.remove_limitedUses({key: this.current.key, category, index: "legendaries_used"});
+							}
+						}
+					}
 				}
 			}
 		},
@@ -88,7 +142,8 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				'setSlide',
+				'remove_limitedUses'
 			]),
 			percentage(current, max) {
 				var hp_percentage = Math.floor(current / max * 100);
@@ -110,97 +165,18 @@
 	.current {
 		padding: 10px;
 	}
+	
 	.q-scrollarea {
-		height: calc(100% - 30px);
+		height: calc(100% - 55px);
 	}
 	h2.componentHeader {
+		display: flex;
+		justify-content: space-between;
 		padding: 10px 15px !important;
 		margin-bottom: 0 !important;
 
 		&.shadow {
 			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
-		}
-	}
-	.btn.save {
-		width: 49.5%;
-	}
-	.health {
-		display: grid;
-		grid-template-columns: 30px 1fr;
-		grid-template-rows: auto;
-		grid-gap: 0;
-		grid-template-areas: 
-		"img hp-bar";
-
-		margin-bottom: 5px;
-
-		&.target {
-			grid-template-columns: 30px 30px 1fr;
-			grid-template-areas: 
-			"img ac hp-bar";
-		}
-
-		.img {
-			background-color:$gray-dark;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
-			font-size: 20px;
-			line-height: 30px;
-			text-align: center;
-			grid-area: img;
-			border: solid 1px transparent;
-		}
-		.ac {
-			text-align:center;
-			line-height: 30px;
-			background-color:#191919;
-			font-weight:bold;
-			color:$gray-light;
-			grid-area: ac;
-		}
-		.progress { 
-			height: 30px;
-			line-height: 30px;
-			background-color:$gray-active;
-			position: relative;
-
-			span.hp, span.percentage {
-				
-				color:#fff;
-				position: absolute;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-			span.hp {
-				text-align: right;
-				right: 5px;
-			}
-			span.percentage {
-				left: 5px;
-			}
-		}
-	}
-	.conditions {
-		margin-bottom: 10px;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, 30px);
-		grid-auto-rows: 30px;
-		grid-gap: 1px;
-
-		svg, .n {
-			display: block;
-			font-size: 16px;
-			width: 30px;
-			height: 30px;
-			line-height: 26px;
-			text-align: center;
-			fill:$red;
-			color:$red;
-			background-color:$gray-active;
-			padding: 2px;
-			cursor: pointer;
 		}
 	}
 }

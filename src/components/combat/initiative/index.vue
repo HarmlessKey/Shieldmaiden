@@ -17,7 +17,6 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
 				<span><i class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<!-- <q-checkbox dark v-model="selected" :true-value="Object.keys(_npcs).map(Number)" :false-value="[]" label="Select all" /> -->
 			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>
@@ -87,7 +86,7 @@
         <NPCs :npcs="_npcs" />
       </q-tab-panel>
       <q-tab-panel name="overview">
-				<a class="btn btn-block" @click="set_turn({turn: 0, round: 1})">
+				<a class="btn btn-block mb-3" @click="set_turn({turn: 0, round: 1})">
 					Start encounter
 				</a>
         <Overview :active="_active" :idle="_idle" />
@@ -99,7 +98,6 @@
 <script>
 	import _ from 'lodash'
 	import { mapActions, mapGetters } from 'vuex';
-	import { db } from '@/firebase';
 
 	import Turns from '@/components/combat/Turns.vue';
 	import Players from './Players.vue';
@@ -140,14 +138,6 @@
 						icon: "fas fa-list-ul"
 					}
 				]
-			}
-		},
-		firebase() {
-			return {
-				broadcasting: {
-					source: db.ref(`broadcast/${this.userId}/live`),
-					asObject: true
-				}
 			}
 		},
 		computed: {
@@ -194,15 +184,7 @@
 				} else if(this.panel === "overview") {
 					this.panel = (direction === "previous") ? "npcs" : "overview";
 				}
-			},
-			broadcast() {
-				//Save the current campaign that is being broadcasted
-				if(this.broadcasting['.value'] == this.$route.params.campid) {
-					db.ref(`broadcast/${this.userId}/live`).remove()
-				} else {
-					db.ref(`broadcast/${this.userId}/live`).set(this.$route.params.campid)
-				}
-			},
+			}
 		}
 	}
 </script>

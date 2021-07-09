@@ -2,7 +2,7 @@
 <div v-if="!loadingCampaigns">
 	<div class="top d-flex justify-content-between" v-if="!$route.params.campid">
 		<span><i class="fas fa-user"></i> {{ username['.value'] }}</span>
-		<Follow />
+		<Follow v-if="user"/>
 	</div>
 	<div class="container-fluid" v-if="!$route.params.campid">
 	
@@ -43,7 +43,7 @@
 						<h2>No players added yet</h2>
 					</template>
 					<div class="d-flex justify-content-center">
-						<router-link :to="`/user/${userId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+						<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
 					</div>
 
 					<template slot="footer">
@@ -83,8 +83,8 @@
 		},
 		data() {
 			return {
-				user: this.$store.getters.user,
-				userId: this.$route.params.userid,
+				user: this.$store.getters ? this.$store.getters.user : undefined,
+				dmId: this.$route.params.userid,
 				campaigns: undefined,
 				loadingCampaigns: true
 			}
@@ -92,17 +92,17 @@
 		firebase() {
 			return {
 				username: {
-					source: db.ref(`users/${this.userId}/username`),
+					source: db.ref(`users/${this.dmId}/username`),
 					asObject: true,
 				},
 				live: {
-					source: db.ref(`broadcast/${this.userId}/live`),
+					source: db.ref(`broadcast/${this.dmId}/live`),
 					asObject: true,
 				}
 			}
 		},
 		mounted() {
-			var campaigns = db.ref(`campaigns/${this.userId}`).orderByChild('private').equalTo(null);
+			var campaigns = db.ref(`campaigns/${this.dmId}`).orderByChild('private').equalTo(null);
 			campaigns.on('value', async (snapshot) => {
 				let campaigns = snapshot.val();
 				
@@ -111,7 +111,7 @@
 					campaigns[key]['.key'] = key;
 
 					for(let playerKey in campaigns[key].players) {
-						let getPlayer = db.ref(`players/${this.userId}/${playerKey}`);
+						let getPlayer = db.ref(`players/${this.dmId}/${playerKey}`);
 						await getPlayer.on('value', (snapshot) => {
 							campaigns[key].players[playerKey] = snapshot.val()
 						});

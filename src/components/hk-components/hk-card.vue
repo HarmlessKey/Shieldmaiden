@@ -1,5 +1,17 @@
 <template>
-	<div class="hk-card" @click="emit">
+	<div 
+		class="hk-card"
+		@click="emit"
+		:class="[
+			noMargin ? 'no-margin' : '',
+			small ? 'small' : '',
+		]"
+		:style="[
+			width ? { 'width': `${width}px` } : '',
+			maxWidth ? { 'max-width': `${maxWidth}px` } : '',
+			minWidth ? { 'min-width': `${minWidth}px` } : '',
+		]"
+	>
 		<slot name="image"/>
 		<slot name="header" class="card-header">
 			<div v-if="header" class="card-header">
@@ -30,6 +42,26 @@
 			footer: {
 				type: String,
 				deafault: undefined
+			},
+			width: {
+				type: Number,
+				default: undefined
+			},
+			minWidth: {
+				type: Number,
+				default: undefined
+			},
+			maxWidth: {
+				type: Number,
+				default: undefined
+			},
+			noMargin: {
+				type: Boolean,
+				default: false
+			},	
+			small: {
+				type: Boolean,
+				default: false
 			}
 		},
 		methods: {

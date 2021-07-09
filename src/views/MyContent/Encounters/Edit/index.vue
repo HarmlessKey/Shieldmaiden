@@ -63,7 +63,7 @@
 	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
-		name: 'EditCampaign',
+		name: 'EditEncounter',
 		metaInfo: {
 			title: 'Encounters'
 		},

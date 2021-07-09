@@ -115,7 +115,7 @@
 					<p v-if="noResult" class="red">{{ noResult }}</p>
 					<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
 						<span :class="{ 'blue': npc.origin == 'custom' }">
-							{{ npc.name }}
+							{{ npc.name.capitalizeEach() }}
 						</span>
 						<a class="gray-light" @click="set(npc['.key'], npc.origin)">
 							<i class="fas fa-copy blue"></i>
@@ -245,8 +245,12 @@
 			...mapGetters([
 				'npcs',
 				'players',
-				'entities'
+				'entities',
+				'broadcast'
 			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("initiative_rolls")) || false;
+			},
 			excludedPlayers() {
 				// Filter players for only in campaign and not in current encounter
 				return Object.fromEntries(Object.entries(this.players).filter(([key, player]) => {
@@ -276,7 +280,13 @@
 			},
 			rollInitiative(e) {
 				const mod = (this.dexterity) ? this.calcMod(this.dexterity) : 0;
-				const roll = this.rollD(e, 20, 1, mod, `${this.entity.name ? this.entity.name : "Unnamed"}: Initiative`);
+				const roll = this.rollD(
+					e, 20, 1, mod, 
+					"Initiative", 
+					this.entity.name ? this.entity.name : "Unnamed", 
+					false, {}, 
+					this.share ? { encounter_id: this.encounterId } : null
+				);
 				this.$set(this.entity, "initiative", Number(roll.total));
 			},
 			set(id, type) {

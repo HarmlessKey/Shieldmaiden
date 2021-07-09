@@ -16,10 +16,6 @@
 			<div class="text-center">
 				<router-link to="sign-up" class="btn btn-lg">Create your first encounter</router-link>
 			</div>
-				<a href="#share" class="next">
-					<div>Share initiative list</div>
-					<i class="fas fa-chevron-down"></i>
-				</a>
 		</div>
 	</div>
 </template>
@@ -32,8 +28,8 @@
 
 <style lang="scss" scoped>
 	.builder {
-		padding-bottom: 170px;
-		min-height: calc(100vh - 50px - 55px);
+		padding-bottom: 100px;
+		// min-height: calc(100vh - 50px - 55px);
 		background-color: #181818;
 
 		.head {

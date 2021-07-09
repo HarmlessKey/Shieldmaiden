@@ -1,9 +1,12 @@
 <template>
 	<div v-if="spell">
-		<h1 class="spellTitle">{{ spell.name }}</h1>
+		<h1 class="spellTitle" v-if="title">{{ spell.name }}</h1>
 		<i class="mb-3 d-block">
-			{{ levels[spell.level] }}
-			<span v-if="spell.school">{{ spell.school.name }}</span>
+			<template v-if="spell.level > 0">
+				{{ spell. level | numeral("oO") }} level
+			</template>
+			<template v-else>Cantrip</template>
+			<span v-if="spell.school"> {{ spell.school.name }}</span>
 		</i>
 
 		<p>
@@ -26,56 +29,97 @@
 				<br/>
 			</template>
 		</p>
-		<p v-for="(desc, index) in spell.desc" :key="index">
-			{{ desc }}
-		</p>
+		<hk-dice-text 
+			v-for="(desc, index) in spell.desc" 
+			:input_text="parse_spell_str(desc)" 
+			:key="index"
+		/>
 
 		<p v-if="spell.higher_level">
 			At higher levels. 
 			<template v-for="higher in spell.higher_level">
-				{{ higher }}
+				{{ parse_spell_str(higher) }}
 			</template>
 		</p>
 	</div>
+	<hk-loader v-else name="Loading spell" />
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from "vuex";
 
 	export default {
-		name: 'Spell',
-		props: ['id'],
-		data() {
-			return {
-				levels: {
-					'-1': 'Cantrip',
-					0: 'Cantrip',
-					1: '1st level',
-					2: '2nd level',
-					3: '3rd level',
-					4: '4th level',
-					5: '5th level',
-					6: '6th level',
-					7: '7th level',
-					8: '8th level',
-					9: '9th level',
-				},
+		name: "Spell",
+		props: {
+			id: {
+				type: String,
+				required: true
+			},
+			title: {
+				type: Boolean,
+				default: true
 			}
 		},
-		firebase() {
-			return {
-				spell: {
-					source: db.ref(`spells/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.spell.name)
-				}
+		computed: {
+			...mapGetters([
+				"get_spell",
+				"spells"
+			]),
+			spell() {
+				return this.get_spell(this.id);
 			}
+		},
+		beforeMount() {
+			if(!this.spells[this.id]) {
+				this.set_spell(this.id);
+			}
+		},
+		methods: {
+			...mapActions([
+				"set_spell"
+			]),
+			parse_spell_str(text) {
+				// map to replace weird character with real character 
+				let rules = [
+					{
+						regex: /â€™/g,
+						// eslint-disable-next-line
+						replacement: '\'',
+					},
+					{
+						regex: /â€”/g,
+						// eslint-disable-next-line
+						replacement: '\-\-',
+					},
+					{
+						regex: /â€�/g,
+						// eslint-disable-next-line
+						replacement: '\"'
+					},
+					{
+						regex: /â€œ/g,
+						// eslint-disable-next-line
+						replacement: '\"'
+					},
+					{
+						regex: /â€“/g,
+						// eslint-disable-next-line
+						replacement: '\-\-'
+					},
+				];
+				rules.forEach(function(rule) {
+					text = text.replace(rule.regex, rule.replacement);
+				});
+
+				return text.trim();
+			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
  .spellTitle {
+		font-size: 18px;
 		margin-bottom: 5px;
  }
  .url {

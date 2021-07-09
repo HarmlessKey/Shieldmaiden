@@ -1,8 +1,8 @@
 <template>
 	<div class="demo">
 		<transition 
-			enter-active-class="animated slideInBottom" 
-			leave-active-class="animated slideOutBottom"
+			enter-active-class="animated animate__slideInBottom" 
+			leave-active-class="animated animate__slideOutBottom"
 		>
 			<div class="grid bg-gray-dark" :class="{ hide: !showInfo }">
 				<div class="">

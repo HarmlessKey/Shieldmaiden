@@ -11,7 +11,10 @@
 				</div>
 			</div>
 		</div>
-		<transition enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight">	
+		<transition 
+			enter-active-class="animated animate__slideInRight" 
+			leave-active-class="animated animate__slideOutRight"
+		>	
 			<div v-if="slide.show == true" class="slide">
 				<a @click="hideSlide()" 
 					v-shortkey="['esc']" @shortkey="hideSlide()"
@@ -28,24 +31,45 @@
 			</div>
 		</transition>
 		
-		<vue-snotify></vue-snotify>
+		<vue-snotify />
+		<HkRolls />
+
+		<!-- Announcements -->
+		<q-dialog v-model="announcement" position="top" persistent>
+			<q-banner class="bg-blue white">
+				<template v-slot:avatar>
+					<q-icon name="info" />
+				</template>
+				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
+				<p>No announcement</p>
+				<template v-slot:action>
+					<q-btn flat icon="close" @click="closeAnnouncement()" />
+				</template>
+			</q-banner>
+		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import { auth, firebase, db } from './firebase'
+	import { auth, db } from './firebase'
 	import Header from './components/Header.vue';
 	import Sidebar from './components/Sidebar.vue';
 	import Slide from './components/Slide.vue';
 	import PaymentDeclined from './components/PaymentDeclined.vue';
 	import { mapActions, mapGetters } from 'vuex';
+	import HkRolls from './components/hk-components/hk-rolls';
+	import { general } from './mixins/general';
+
 
 	export default {
+	name: "App",
+	mixins: [general],
 	components: {
 		navMain: Header,
 		Sidebar,
 		Slide,
-		PaymentDeclined
+		PaymentDeclined,
+		HkRolls
 	},
 	metaInfo() {
 		return {
@@ -75,10 +99,11 @@
 				{	property: "og:type", content: "website" },
 				{
 					property: "og:description",
+					name: "description",
 					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
 				{	property: "og:url", content: `https://harmlesskey.com${this.$route.path}` },
-				{	property: "og:image", content: `https://harmlesskey.com/harmless_key_logo_full.png` },
+				{	property: "og:image", name: "image", content: `https://harmlesskey.com/linkedin.png` },
 				{	property: "og:image:type", content: "image/png" },
 				{	property: "og:image:alt", content: "Harmless Key Logo" },
 			]
@@ -87,21 +112,68 @@
 	data() {
 		return {
 			user: auth.currentUser,
-			connection: navigator.onLine ? 'online' : 'offline'
+			connection: navigator.onLine ? 'online' : 'offline',
+			announcementSetter: false,
+			announcement_cookie: false,
+			broadcast: undefined
 		}
+	},
+	watch: {
+		broadcast: {
+			handler(newVal, oldVal) {
+				// If there was a broadcast but it's disconnected
+				// But there still is a broadcast in the store
+				// Notify the user and let them restart the broadcast
+				if((oldVal && oldVal.live && !newVal) && (this.storeBroadcast && Object.keys(this.storeBroadcast).length > 0)) {
+					this.$q.notify({
+						message: 'Broadcast interrupted',
+						caption: 'Would you like to continue your broadcast?',
+						color: "red",
+						position: "top",
+						timeout: 0,
+						icon: "far fa-dot-circle",
+						actions: [
+							{ label: 'Yes', color: 'white', handler: () => { db.ref(`broadcast/${this.user.uid}`).set(oldVal) } },
+							{ label: 'No', color: 'white', handler: () => { this.setLive({ campaign_id: oldVal.live }) } }
+						]
+					});
+				}
+			},
+			deep: true
+		},
 	},
 	computed: {
 		...mapGetters({
-				slide: 'getSlide',
-			})
+			slide: 'getSlide',
+			storeBroadcast: 'broadcast'
+		}),
+		announcement: {
+			get() {
+				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
+				return (this.announcementSetter !== undefined) ? this.announcementSetter : announcement;
+			},
+			set(newVal) {
+				this.announcementSetter = newVal;
+			}
+		}
 	},
 	created() {
+		const cookies = document.cookie.split(';');
+
+		for (let cookie of cookies) {
+			const [key, val] = cookie.split('=');
+			if (key.trim() === 'announcement' && val === 'true') {				
+				this.announcement_cookie = true;
+			}
+		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
+		this.setTips();
 
-		if(auth.currentUser !== null){
+		if(auth.currentUser !== null) {
 			this.setUser();
 			this.setUserInfo();
+			this.setUserSettings();
 			// players need prio!
 			this.fetchPlayers();
 			this.fetchNpcs();
@@ -110,79 +182,36 @@
 		}
 	},
 	mounted() {
-		if(auth.currentUser !== null) {
-			this.checkUserStatus();
+		if(auth.currentUser !== null){
+			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
+			broadcastRef.on("value", (snapshot) => {
+				this.broadcast = snapshot.val();
+				this.$forceUpdate();
+			});
 		}
-	},
-	beforeDestroy() {
-		this.stopBroadcast();
 	},
 	methods: {
 		...mapActions([
-			'fetchCampaigns',
-			'fetchAllEncounters',
-			'fetchPlayers',
-			'fetchNpcs',
-			'setUser',
-			'setUserInfo',
-			'setSlide',
-			'setSideSmallScreen'
+			"setTips",
+			"fetchCampaigns",
+			"fetchAllEncounters",
+			"fetchPlayers",
+			"fetchNpcs",
+			"setUser",
+			"setUserInfo",
+			"setUserSettings",
+			"setSlide",
+			"setSideSmallScreen",
+			"setLive"
 		]),
 		hideSlide() {
 			this.setSlide(false)
 		},
-		checkUserStatus() {
-			// Fetch the current user's ID from Firebase Authentication.
-			const uid = auth.currentUser.uid;
+		closeAnnouncement() {
+			const max_age = 24*60*60 // 24 hours in seconds
 
-			if(uid) {
-				// Create a reference to this user's specific status node.
-				// This is where we will store data about being online/offline.
-				var userStatusDatabaseRef = firebase.database().ref(`/status/${uid}`);
-				var userLiveDatabaseRef = firebase.database().ref(`/broadcast/${uid}/live`);
-
-				// We'll create two constants which we will write to
-				// the Realtime database when this device is offline
-				// or online.
-				var isOfflineForDatabase = {
-						state: 'offline',
-						last_changed: firebase.database.ServerValue.TIMESTAMP,
-				};
-
-				var isOnlineForDatabase = {
-						state: 'online',
-						last_changed: firebase.database.ServerValue.TIMESTAMP,
-				};
-
-				// Create a reference to the special '.info/connected' path in
-				// Realtime Database. This path returns `true` when connected
-				// and `false` when disconnected.
-				db.ref('.info/connected').on('value', function(snapshot) {
-						// If we're not currently connected, don't do anything.
-						if (snapshot.val() == false) {
-								return;
-						}
-
-						// If we are currently connected, then use the 'onDisconnect()'
-						// method to add a set which will only trigger once this
-						// client has disconnected by closing the app,
-						// losing internet, or any other means.
-						userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
-								// The promise returned from .onDisconnect().set() will
-								// resolve as soon as the server acknowledges the onDisconnect()
-								// request, NOT once we've actually disconnected:
-								// https://firebase.google.com/docs/reference/js/firebase.database.OnDisconnect
-
-								// We can now safely set ourselves as 'online' knowing that the
-								// server will mark us as offline once we lose connection.
-								userStatusDatabaseRef.set(isOnlineForDatabase);
-						});
-						//Remove live on lost connection
-						userLiveDatabaseRef.onDisconnect().remove().then(function() {
-							userLiveDatabaseRef.remove();
-						});
-				});
-			}
+			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
+			this.announcement = false;
 		}
 	}
 };

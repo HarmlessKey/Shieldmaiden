@@ -137,7 +137,7 @@
 							<template v-for="(ability, index) in abilities">
 								<div
 									:key="`score-${index}`" 
-									v-if="entities[key][ability.ability]"
+									v-if="entities[key][ability]"
 									class="ability"
 								>
 									<hk-roll 
@@ -145,29 +145,38 @@
 										:roll="{
 											d: 20, 
 											n: 1, 
-											m: modifier(entities[key][ability.ability]), 
-											title: `${entities[key].name}: ${ability.ability} check`, 
+											m: modifier(entities[key][ability]), 
+											title: `${ability.capitalize()} check`, 
+											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
+										:share="shares.includes('ability_rolls') ? { 
+											encounter_id: encounterId,
+											entity_key: key
+										} : null"
 									>
-										<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
+										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
 										<div class="mod bg-gray-dark">
-											{{ modifier(entities[key][ability.ability]) }}
+											{{ modifier(entities[key][ability]) }}
 										</div>
 									</hk-roll>
 									<hk-roll
-										v-if="entities[key].entityType === 'npc'"
 										tooltip="Roll save"
 										:roll="{
 											d: 20, 
 											n: 1, 
-											m: entities[key][`${ability.ability}_save`] ? entities[key][`${ability.ability}_save`] : modifier(entities[key][ability.ability]), 
-											title: `${entities[key].name}: ${ability.ability} save`, 
+											m: savingThrow(entities[key], ability), 
+											title: `${ability.capitalize()} save`,
+											entity_name: entities[key].name.capitalizeEach(), 
 											notify: true
 										}"
+										:share="shares.includes('save_rolls') ? { 
+											encounter_id: encounterId,
+											entity_key: key
+										} : null"
 									>
 										<div class="mod bg-gray-dark">
-											{{ entities[key][`${ability.ability}_save`] ? `+${entities[key][`${ability.ability}_save`]}` : modifier(entities[key][ability.ability]) }}
+											{{ savingThrow(entities[key], ability) }}
 										</div>
 									</hk-roll>
 								</div>
@@ -189,22 +198,18 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import ViewEntity from '@/components/ViewEntity.vue';
-	import Conditions from '@/components/combat/Conditions.vue';
-	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
+	import { abilities } from '@/mixins/abilities.js';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import TargetInfo from '@/components/combat/TargetInfo.vue';
+	import { experience } from '@/mixins/experience.js';
+	
 
 	export default {
 		name: 'Targeted',
-		mixins: [dice],
+		mixins: [dice, experience, abilities],
 		components: {
-			ViewEntity,
-			Conditions,
-			Reminders,
 			TargetItem,
 			TargetInfo
 		},
@@ -213,25 +218,17 @@
 				setShadow: 0,
 			}
 		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					asObject: true,
-				},
-				showKeybinds: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true
-				},
-				abilities: db.ref('abilities')
-			}
-		},
 		computed: {
 			...mapGetters([
+				'encounterId',
 				'entities',
 				'turn',
 				'targeted',
+				'broadcast'
 			]),
+			shares() {
+				return this.broadcast.shares || [];
+			},
 			target: function() {
 				if(this.targeted.length === 1) {
 					return this.entities[this.targeted[0]];
@@ -344,13 +341,20 @@
 				return stats
 			},
 			modifier(score) {
-				var mod = Math.floor((score - 10) / 2)
-				if(mod >= 0) {
-					return '+' + mod
+				let mod = Math.floor((score - 10) / 2);
+				return (mod > 0) ? `+${mod}` : mod;
+			},
+			savingThrow(entity, ability) {
+				let proficiency;
+				if(entity.entityType === "player") {
+					proficiency = this.returnProficiency(entity.level ? entity.level : this.calculatedLevel(entity.experience)) 
+				} else {
+					proficiency = entity.proficiency;
 				}
-				else {
-					return mod
-				}
+				const save = (entity.saving_throws && entity.saving_throws.includes(ability)) 
+					? parseInt(this.modifier(entity[ability])) + proficiency 
+					: parseInt(this.modifier(entity[ability]));
+				return (save > 0) ? `+${save}` : save;
 			}
 		}
 	}

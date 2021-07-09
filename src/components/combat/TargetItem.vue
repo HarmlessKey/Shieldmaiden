@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="terget-item-wrapper">
 		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
@@ -12,7 +12,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense utofocus 
 							label="Initiative"
@@ -52,7 +52,7 @@
 					</q-tooltip>
 				</span>
 				<template v-else>
-				<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
+					<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
 					<span 
 						v-else class="img" 
 						:style="{ 'background-image': 'url(' + entity.img + ')' }"
@@ -68,7 +68,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">Edit {{ entity.name }}</div>
+						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-color 
 							square dark flat
 							v-model="editable_entity.color_label" 
@@ -118,7 +118,7 @@
 					:breakpoint="576"
 				>
 					<div class="bg-gray px-2 py-2">
-						<div class="mb-1">{{ entity.name }}</div>
+						<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							dark filled square dense 
 							label="Armor class bonus"
@@ -175,19 +175,19 @@
 			<!-- HEALT BAR -->
 			<q-linear-progress 
 				size="35px" 
-				:value="displayStats().curHp/displayStats().maxHp"
-				:color="hpBarColor(percentage(displayStats().curHp, displayStats().maxHp))" 
+				:value="percentage(displayStats().curHp, displayStats().maxHp)"
+				:color="hpBarColor(displayStats().curHp / displayStats().maxHp * 100)" 
 			>
 				<div class="absolute-full health-bar">
 					<div class="truncate">
-						{{ entity.name }}
+						{{ entity.name.capitalizeEach() }}
 					</div>
 
 					<!-- HEALTH -->
 					<template v-if="entity.active">
 						<span class="hp" @click.stop>
 							<template v-if="entity.curHp > 0 || entity.entityType === 'npc'">
-								<span class="current">{{ animatedNumber }}</span>
+								<hk-animated-integer :value="displayStats().curHp" class="current" />
 								<span class="max">
 									{{ displayStats().maxHp }}
 									<q-tooltip anchor="top middle" self="center middle">
@@ -226,7 +226,7 @@
 								:breakpoint="576"
 							>
 								<div class="bg-gray px-2 py-2">
-									<div class="mb-1">{{ entity.name }}</div>
+									<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 									<q-input 
 										dark filled square dense 
 										class="mb-2"
@@ -341,7 +341,7 @@
 					<!-- IDLE ACTIONS -->
 					<div v-else class="text-right">
 						<span class="white" 
-							v-if="entity.addNextRound == true"
+							v-if="entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: false})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -349,7 +349,7 @@
 							</q-tooltip>
 						</span>
 						<span class="gray-hover" 
-							v-if="entity.addNextRound == false"
+							v-if="!entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 							<i class="fas fa-check"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -394,8 +394,10 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
+import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 
 	export default {
+  components: { hkAnimatedInteger },
 		name: 'TargetItem',
 		props: {
 			item : {
@@ -418,7 +420,6 @@
 			return {
 				user: this.$store.getters.user || {},
 				target: '',
-				tweenedNumber: 0,
 				entitySetter: undefined,
 				hkColors: [
 					"#88b3ce",
@@ -443,11 +444,6 @@
 				'entities',
 				'targeted',
 			]),
-			animatedNumber() {
-				if (this.tweenedNumber.toFixed) {
-					return this.tweenedNumber.toFixed(0);
-				}
-			},
 			entity() {
 				return this.entities[this.item];
 			},
@@ -475,17 +471,6 @@
 				set(newValue) {
 					this.entitySetter = newValue;
 				}
-			},
-			number() {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: this.displayStats().curHp });
-				return this.displayStats().curHp;
-			}
-		},
-		watch: {
-			number(newValue) {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
 			}
 		},
 		methods: {
@@ -509,8 +494,8 @@
 				}})
 			},
 			percentage(current, max) {
-				var hp_percentage = Math.floor(current / max * 100)
-				return hp_percentage
+				const hp_percentage = (current === 0) ? 0 : current / max;
+				return hp_percentage;
 			},
 			hpBarColor(percentage) {
 				if(percentage < 33) {
@@ -545,15 +530,19 @@
 </script>
 
 <style lang="scss" scoped>
-ul.target-reminders {
-	padding-left: 30px;
-	list-style: none;
-	margin: 0;
-
-	li {
-		width: 20px;
-		height: 7px;
-		margin: 1px 1px 1px 0;
+.taret-item-wrapper {
+	width: 100%;
+	
+	ul.target-reminders {
+		padding-left: 30px;
+		list-style: none;
+		margin: 0;
+	
+		li {
+			width: 20px;
+			height: 7px;
+			margin: 1px 1px 1px 0;
+		}
 	}
 }
 </style>

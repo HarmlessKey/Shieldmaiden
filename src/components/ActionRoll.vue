@@ -1,156 +1,106 @@
 <template>
 	<div>
-		<q-select 
-			v-if="action_type !== 'healing'"
-			dark filled square
-			map-options
-			emit-value
-			label="Damage type"
-			:options="damage_types"
-			v-model="roll.damage_type"
-			class="mb-2"
-			:rules="[val => !!val || 'Select a damage type']"
-			hint="Select the damage type"
+		<q-tabs
+			v-if="options.length > 1"
+			v-model="tab"
+			dark
+			no-caps
 		>
-			<template v-slot:selected v-if="roll.damage_type">
-				<span>
-					<i :class="[damage_type_icons[roll.damage_type], roll.damage_type]"/>
-					{{ roll.damage_type.capitalize() }}
-				</span>
-			</template>
-			<template v-slot:option="scope">
-				<q-item
-					clickable
-					v-ripple
-					v-close-popup
-					:active="roll.damage_type === scope.opt"
-					@click="$set(roll, 'damage_type', scope.opt)"
-				>
-					<q-item-section avatar>
-						<q-icon :name="damage_type_icons[scope.opt]" :class="scope.opt"/>
-					</q-item-section>
-					<q-item-section>
-						<q-item-label v-html="scope.opt.capitalize()"/>
-					</q-item-section>
-				</q-item>
-			</template>
-		</q-select>
-				
-		<!-- ROLLS -->
-		<div class="row q-col-gutter-md mb-3">
-			<!-- DICE COUNT -->
-			<div class="col">
-				<q-input 
-					dark filled square
-					label="Dice count"
-					v-model="roll.dice_count"
-					autocomplete="off"
-					name="dice_count"
-					class="mb-2"
-					type="number"
-				/>
-			</div>
-			<div class="col">
-				<!-- MODIFIER SUBTYPE -->
-				<q-select 
-					dark filled square
-					map-options
-					emit-value
-					:options="dice_type"
-					label="Dice type"
-					v-model="roll.dice_type"
-					class="mb-2"
-				/>
-			</div>
-			<div class="col">
-				<!-- MODIFIER FIXED VALUE -->
-				<q-input 
-					dark filled square
-					label="Fixed value"
-					v-model="roll.fixed_val"
-					autocomplete="off"
-					class="mb-2"
-					type="number"
-				>
-					<template v-slot:append>
-						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
-										<b>Fixed</b>
-									</q-card-section>
-									<q-card-section>
-										Set the fixed value that is added on top of the rolled value.
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</template>
-				</q-input>
-			</div>
+			<q-tab 
+				v-for="(option, index) in options"
+				:key="`verstatile-tab-${index}`"
+				:name="option.name" 
+				:label="option.label"
+			/>
+		</q-tabs>
 
-			<!-- PRIMARY STAT -->
-			<div class="col" v-if="spell">
-				<q-checkbox 
-					size="lg" dark 
-					v-model="roll.primary" 
-					label="Primary" 
-					:false-value="null" 
-					indeterminate-value="something-else"
-					class="mb-2"
-				>
-					<q-tooltip anchor="top middle" self="center middle">
-						Add primay stat modifier
-					</q-tooltip>
-				</q-checkbox>
-			</div>
-		</div>
+		<q-tab-panels v-model="tab" class="bg-transparent">
+			<q-tab-panel
+				v-for="(option, index) in options"
+				:key="`verstatile-panel-${index}`"
+				:name="option.name"
+			>
+				<hk-dmg-type-select 
+					class="mb-3"
+					:label="`Damage type ${index == 1 ? option.label : ''}`"
+					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
+					required
+				/>
 
-		<!-- VERSATILE -->
-		<template v-if="versatile">
-			<h3 class="d-flex justify-content-between mt-1">
-				<span>
-					Versatile roll
-				</span>
-			</h3>
-			<div class="row q-col-gutter-md mb-3">
-				<!-- DICE COUNT -->
-				<div class="col">
-					<q-input 
-						dark filled square
-						label="V. Dice count"
-						v-model="roll.versatile_dice_count"
-						autocomplete="off"
-						name="dice_count"
-						class="mb-2"
-						type="number"
-					/>
+				<!-- ROLLS -->
+				<div class="row q-col-gutter-md mb-3">
+					<!-- DICE COUNT -->
+					<div class="col">
+						<q-input 
+							dark filled square
+							:label="`Dice count ${index == 1 ? option.label : ''}`"
+							v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
+							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
+							:rules="[
+								val => !val || (val <= 99 && val > 0) || 'Min is 1, max is 99',
+								(roll[`${index === 1 ? 'versatile_' : '' }dice_type`]) ? val => !!val || 'Required' : ''
+							]"
+							min="1"
+							max="99"
+							autocomplete="off"
+							name="dice_count"
+							class="mb-2"
+							type="number"
+						/>
+					</div>
+					<div class="col">
+						<!-- DICE TYPE -->
+						<q-select 
+							dark filled square
+							map-options emit-value
+							clearable
+							:label="`Dice type ${index == 1 ? option.label : ''}`"
+							:options="dice_type"
+							v-model="roll[`${index === 1 ? 'versatile_' : '' }dice_type`]"
+							class="mb-2"
+						/>
+					</div>
+					<div class="col">
+						<!-- MODIFIER FIXED VALUE -->
+						<q-input 
+							dark filled square
+							:label="`Fixed value ${index == 1 ? option.label : ''}`"
+							v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
+							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
+							:rules="[val => !val || val <= 99 || 'Max is 99']"
+							autocomplete="off"
+							class="mb-2"
+							type="number"
+						>
+							<template v-slot:append>
+								<hk-popover 
+									header="Fixed value"
+									content="Set the fixed value that is added on top of the rolled value."
+								>
+									<q-icon name="info" />
+								</hk-popover>
+							</template>
+						</q-input>
+					</div>
+
+					<!-- PRIMARY STAT -->
+					<div class="col" v-if="spell">
+						<q-checkbox 
+							size="lg" dark 
+							v-model="roll[`${index === 1 ? 'versatile_' : '' }primary`]" 
+							:label="`Primary ${index == 1 ? option.label : ''}`"
+							:false-value="null" 
+							indeterminate-value="something-else"
+							class="mb-2"
+						>
+							<q-tooltip anchor="top middle" self="center middle">
+								Add primay stat modifier
+							</q-tooltip>
+						</q-checkbox>
+					</div>
 				</div>
-				<div class="col">
-					<!-- MODIFIER SUBTYPE -->
-					<q-select 
-						dark filled square
-						map-options
-						emit-value
-						:options="dice_type"
-						label="V. Dice type"
-						v-model="roll.versatile_dice_type"
-						class="mb-2"
-					/>
-				</div>
-				<div class="col">
-					<!-- MODIFIER FIXED VALUE -->
-					<q-input 
-						dark filled square
-						label="V. Fixed value"
-						v-model="roll.versatile_fixed_val"
-						autocomplete="off"
-						class="mb-2"
-						type="number"
-					/>
-				</div>
-			</div>
-		</template>
+			</q-tab-panel>
+		</q-tab-panels>
 
 		<!-- PROJECTILE COUNT -->
 		<q-input 
@@ -163,20 +113,14 @@
 			@keyup="$forceUpdate()"
 		>
 			<template v-slot:append>
-				<q-icon name="info" @click.stop>
-					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card dark square>
-							<q-card-section class="bg-gray-active">
-								<b>Projectile count</b>
-							</q-card-section>
-							<q-card-section>
-								Number of projectiles that are cast. <br/>
-								Think of spells like <b>Magic Missile</b> (phb 257), 
-								where multiple projectiles are created for a single cast.
-							</q-card-section>
-						</q-card>
-					</q-menu>
-				</q-icon>
+				<hk-popover header="Projectile count">
+					<q-icon name="info" />
+					<template slot="content">
+						Number of projectiles that are cast. <br/>
+						Think of spells like <b>Magic Missile</b> (phb 257), 
+						where multiple projectiles are created for a single cast.
+					</template>
+				</hk-popover>
 			</template>
 		</q-input>
 
@@ -210,31 +154,17 @@
 		<!-- SPECIAL ACTIONS -->
 		<div class="col-12 col-md-3">
 			<q-select 
-				dark filled square
+				dark filled square multiple
 				map-options
 				emit-value
-				label="Special event"
+				label="Special events"
 				:options="Object.values(specials)"
-				v-model="roll.special"
+				v-model="special"
 				class="mb-3"
 				clearable
-				hint="Select the special event that happens on a hit"
-			>
-				<template v-slot:append>
-					<q-icon name="info" v-if="roll.special" @click.stop>
-						<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-							<q-card dark square>
-								<q-card-section class="bg-gray-active">
-									<b>{{ specials[roll.special].label }}</b>
-								</q-card-section>
-								<q-card-section>
-									{{ specials[roll.special].info }}
-								</q-card-section>
-							</q-card>
-						</q-menu>
-					</q-icon>
-				</template>
-			</q-select>
+				hint="Select the special events that happens on a hit"
+				:option-disable="opt => Object(opt) === opt ? opt.disable === true : true"
+			/>
 		</div>
 
 		<!-- SPELL SCALING -->
@@ -345,14 +275,14 @@ export default {
 	props: {
 		value: Object,
 		action_type: String,
-		versatile: {
-			type: Boolean,
-			default: false
+		versatile_options: {
+			type: Object,
+			default: () => { return {}; }
 		},
 		spell: {
 			type: Object,
 			default: undefined
-		}
+		},
 	},
 	mixins: [damage_types],
 	computed: {
@@ -369,9 +299,48 @@ export default {
 				return 1;
 			} return 100;
 		},
+		specials() {
+			let specials = {
+				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
+				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
+				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
+			};
+			if(this.special) {
+				console.log(this.special)
+				if(this.special.includes("siphon_full")) specials.siphon_half.disable = true;
+				if(this.special.includes("siphon_half")) specials.siphon_full.disable = true;
+			}
+			return specials;
+		},
+		special: {
+			get() {
+				if(this.roll.special && typeof this.roll.special === "string") {
+					return [this.roll.special];
+				} return this.roll.special;
+			},
+			set(newVal) {
+				this.$set(this.roll, "special", newVal);
+			}
+		},
+		options() {
+			let options = [
+				{
+					name: 0,
+				}
+			];
+			if(this.versatile_options.versatile) {
+				options[0].label = this.versatile_options.versatile_one || "Option 1";
+				options[1] = {
+					name: 1,
+					label: this.versatile_options.versatile_two || "Option 2"
+				}
+			}
+			return options;
+		},
 	},
 	data() {
 		return {
+			tab: 0,
 			modifier_type: [
 				{label: "Damage", value: "damage"},
 				{label: "Healing", value: "healing"}
@@ -389,14 +358,16 @@ export default {
 				{ label: "Half damage", value: 0.5},
 				{ label: "Full damage", value: 1},
 			],
-			specials: {
-				siphon_full: { label: "Heal caster full", value: "siphon_full", info: "On a hit, the caster is healed for all of the damage done." },
-				siphon_half: { label: "Heal caster half", value: "siphon_half", info: "On a hit, the caster is healed for half of the damage done." },
-				drain: { label: "Reduce max HP", value: "drain", info: "On a failed save the targets hit point maximum is reduced by an amount equal to the damage done." }
-			}
 		};
 	},
 	methods: {
+		parseToInt(value, object, property) {
+			if(value === undefined || value === "") {
+				this.$delete(object, property);
+			} else {
+				this.$set(object, property, parseInt(value));
+			}
+		},
 		level_tier_addable() {
 			if (this.spell &&
 					this.spell.scaling === "spell_scale" && 
@@ -464,7 +435,7 @@ export default {
 				}
 			}
 			return description;
-		},
+		}
 	}
 };
 </script>
@@ -475,5 +446,10 @@ h2 {
 	text-transform: none !important;
 	border-bottom: solid 1px $gray-hover;
 	padding-bottom: 5px;
+}
+.q-tab-panel {
+	padding: 15px 0 0 0 !important;
+	border-bottom: solid 1px $gray-hover;
+	margin-bottom: 15px;
 }
 </style>

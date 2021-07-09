@@ -39,6 +39,8 @@
 							/>
 							<q-select
 								dark filled square
+								emit-value
+								map-options
 								label="Advancement"
 								class="mt-2" 
 								v-model="advancement" 
@@ -70,8 +72,8 @@
 				tag="div" 
 				class="row q-col-gutter-md mt-3" 
 				name="campaigns" 
-				enter-active-class="animated fadeIn" 
-				leave-active-class="animated fadeOut">
+				enter-active-class="animated animate__fadeIn" 
+				leave-active-class="animated animate__fadeOut">
 				<div class="col-12 col-md-6 col-lg-4" v-for="campaign in _campaigns" :key="campaign.key">
 					<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
 						<div slot="header" class="card-header">
@@ -82,31 +84,29 @@
 
 							<span class="actions">
 								<i 
-									v-if="!campaign.private" 
-									class="fas fa-eye green"
+									class="mr-1"
+									:class="{
+										'fas fa-eye green': !campaign.private,
+										'fas fa-eye-slash red': campaign.private 
+									}"
 								>
-									<q-tooltip anchor="top middle" self="center middle">
-										Public campaign
-									</q-tooltip>
-								</i>
-								<i v-else class="fas fa-eye-slash red">
-									<q-tooltip anchor="top middle" self="center middle">
-										Private campaign
+									<q-tooltip anchor="top middle" self="bottom middle">
+										{{ campaign.private ? "Private campaign" : "Public campaign" }}
 									</q-tooltip>
 								</i>
 
 								<router-link class="text-capitalize gray-hover" :to="'/campaigns/' + campaign.key">
 									<i class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle">
+									<q-tooltip anchor="top middle" self="bottom middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a
 									class="gray-hover text-capitalize"
-									@click="confirmDelete(campaign.key, campaign.campaign)"
+									@click="confirmDelete($event, campaign.key, campaign.campaign)"
 								>
 									<i class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle">
+									<q-tooltip anchor="top middle" self="bottom middle">
 										Delete
 									</q-tooltip>
 								</a>
@@ -171,6 +171,8 @@
 						/>
 						<q-select 
 							dark filled square
+							map-options
+							emit-value
 							label="Advancement"
 							class="mt-2" 
 							v-model="advancement" 
@@ -277,18 +279,19 @@
 					this.add = false;
 				}
 			},
-			confirmDelete(key, name) {
-				this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
-					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteCampaign( {campaign_id: key }); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-					]
-				});
+			confirmDelete(e, key, name) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deleteCampaign({campaign_id: key });
+				} else {
+					this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
+						buttons: [
+							{ text: 'Yes', action: (toast) => { this.deleteCampaign({campaign_id: key }); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+						]
+					});
+				}
 			},
-			// deleteCampaign(key) {
-			// 	db.ref('campaigns/'+ this.user.uid).child(key).remove();
-			// 	db.ref('encounters/'+ this.user.uid).child(key).remove();
-			// },
 			assignPlayers() {
 				for (let campaignId in this.campaigns) {
 					for (let playerId in this.campaigns[campaignId].players) {
@@ -299,7 +302,6 @@
 							// Player in both this campaign as other campaign
 							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
 								buttons: [
-									// { text: 'Yes', action: (toast) => { this.deleteCampaign(key); this.$snotify.remove(toast.id); }, bold: false},
 									{ text: 'Ok', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 								]
 							});
@@ -370,10 +372,12 @@
 					top: 12px;
 
 					a {
-						margin-left: 10px;
+						color: $gray-light !important;
+						margin-left: 5px;
+						padding: 0 5px;
 
 						&:hover {
-							color: $gray-light !important;
+							color: $white !important;
 						}
 					}
 				}

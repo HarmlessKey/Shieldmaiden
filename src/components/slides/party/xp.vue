@@ -2,7 +2,7 @@
 	<div>
 		<h2>Award Experience</h2>
 		<q-input 
-			dark filled square dense
+			dark filled square
 			label="Amount"
 			class="text-center mb-3"
 			type="number" 
@@ -32,6 +32,7 @@
 			dark
 			:options="options"
 			toggle-color="primary"
+			class="mt-3"
 		/>
 
 		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>
@@ -73,8 +74,12 @@
 		computed: {
 			...mapGetters([
 				'campaign',
-				'players'
+				'players',
+				'broadcast'
 			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
+			},
 			allPlayers() {
 				let returnArray = [];
 	
@@ -130,6 +135,22 @@
 					amount = Math.floor(this.amount / this.awardTo.length)
 				}
 
+				// Share
+				if(this.share && amount !== 0) {
+					const key = Date.now() + Math.random().toString(36).substring(4);
+					let share = {
+						key,
+						type: "xp",
+						notification: {
+							amount,
+							targets: this.awardTo
+						}
+					};
+					if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
+
+					db.ref(`campaigns/${this.user.uid}/${this.broadcast.live}/shares`).set(share);
+				}
+
 				// AWARD XP
 				for(let index in this.awardTo) {
 					let key = this.awardTo[index];
@@ -144,7 +165,7 @@
 					}
 					db.ref(`players/${this.user.uid}/${key}/experience`).set(newAmount);
 				}
-				//In the finished encounter screen, set xp_awared to true
+				//In the finished encounter screen, set xp_awarded to true
 				//And update the amount awarded if it was changed
 				if(this.$route.name === 'RunEncounter') {
 					if(this.amount !== this.data.amount) {

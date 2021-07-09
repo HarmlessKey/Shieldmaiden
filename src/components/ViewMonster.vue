@@ -1,30 +1,41 @@
 <template>
-	<div class="monster" ref="entity" :class="{ smallWidth: is_small }">
+	<div v-if="monster" class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
 		<div class="monster-stats">
-			<h2>{{ data.name }}</h2>
+			<h2 v-if="monster.name">
+				{{ monster.name.capitalizeEach() }} 
+				<span v-if="monster.source" class="source">{{ monster.source }}</span>
+			</h2>
 			<span class="size">
-				<template v-if="data.size">{{ data.size }}</template>
-				<template v-if="data.type"> {{ data.type }}</template>
-				<span v-if="data.subtype">({{ data.subtype }})</span>
-				<template v-if="data.alignment">, {{ data.alignment }}</template>
+				<template v-if="monster.size">{{ monster.size }}</template>
+				<template v-if="monster.type"> {{ monster.type }}</template>
+				<span v-if="monster.subtype">({{ monster.subtype }})</span>
+				<template v-if="monster.alignment">, {{ monster.alignment }}</template>
 			</span>
 			<hr>
 			<span class="attributes">
-				<template v-if="data.armor_class">
-					<b>Armor Class: </b> {{ data.armor_class }}<br/>
+				<template v-if="monster.armor_class">
+					<b>Armor Class: </b> {{ monster.armor_class }}<br/>
 				</template>
 				<template v-else>
-					<b>Armor Class</b>: {{ data.ac }}<br/>
+					<b>Armor Class</b>: {{ monster.ac }}<br/>
 				</template>
-				<template v-if="data.hit_points">
-					<b>Hit Points</b>: {{ data.hit_points }}
+				<template v-if="monster.hit_points">
+					<b>Hit Points</b>: {{ monster.hit_points }}
 				</template>
 				<template v-else>
-					<b>Hit Points</b>: {{ data.maxHp }}
+					<b>Hit Points</b>: {{ monster.maxHp }}
 				</template>
-				<template v-if="data.hit_dice"> ({{ data.hit_dice ? hitDiceStr(data) : '' }})</template>
-				<template v-if="data.speed">
-					<br/><b>Speed</b>: {{ data.speed }}
+				<template v-if="monster.hit_dice"> ({{ monster.hit_dice ? hitDiceStr(data) : '' }})</template>
+				<template>
+					<br/><b>Speed</b>: {{ monster.walk_speed ? monster.walk_speed : 0 }} ft.{{ 
+						monster.swim_speed ? `, swim ${monster.swim_speed} ft.` : `` 
+					}}{{ 
+						monster.fly_speed ? `, fly ${monster.fly_speed} ft.` : `` 
+					}}{{ 
+						monster.burrow_speed ? `, burrow ${monster.burrow_speed} ft.` : `` 
+					}}{{ 
+						monster.climb_speed ? `, climb ${monster.climb_speed} ft.` : ``
+					}}
 				</template>
 			</span>
 			<hr>
@@ -36,193 +47,369 @@
 					:roll="{
 						d: 20, 
 						n: 1, 
-						m: modifier(data[ability.ability]),
-						title: `${data.name}: ${ability.ability.capitalize()} check`, 
+						m: calcMod(monster[ability]),
+						title: `${ability.capitalize()} check`, 
+						entity_name: monster.name.capitalizeEach(), 
 						notify: true
 					}"
+					:share="shares.includes('ability_rolls') ? { 
+						encounter_id: encounterId,
+						entity_key: monster.key
+					} : null"
+					
 				>
-					<div v-if="data[ability.ability]" class="ability">
-						<div class="abilityName">{{ ability.ability.substring(0,3).toUpperCase() }}</div>
-						{{ data[ability.ability] }}
-						({{ modifier(data[ability.ability]) }})
+					<div v-if="monster[ability]" class="ability">
+						<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
+						{{ monster[ability] }}
+						({{ calcMod(monster[ability]) > 0 ? `+${calcMod(monster[ability])}` : calcMod(monster[ability]) }})
 					</div>
 				</hk-roll>
 			</div>
 			<hr>
 
-			<span class="stats">
-				<template v-if="savingThrows.length > 0">
+			<div class="stats mb-2">
+				<template v-if="monster.saving_throws">
 					<b>Saving Throws </b>
 					<span class="saves">
 						<hk-roll 
 							tooltip="Roll save" 
-							v-for="save in savingThrows" 
-							:key="save.save"
+							v-for="(ability, index) in monster.saving_throws" 
+							:key="ability"
 							:roll="{
 								d: 20, 
 								n: 1, 
-								m: save.score,
-								title: `${data.name}: ${save.save.capitalize()} save`, 
+								m: calcMod(monster[ability]) + monster.proficiency,
+								title: `${ability.capitalize()} save`, 
+								entity_name: monster.name.capitalizeEach(),
 								notify: true
 							}"
+							:share="shares.includes('save_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: monster.key
+							} : null"
 						>
 							<span class="save">
-								{{ save.save.substring(0,3).capitalize() }} +{{ save.score }}
+								{{ ability.substring(0,3).capitalize() }} 
+								+{{ 
+									calcMod(monster[ability]) + monster.proficiency 
+								}}{{ 
+									index+1 &lt; monster.saving_throws.length ? "," : ""
+								}}
 							</span>
 						</hk-roll>
 					</span>
 					<br/>
 				</template>
-				<template v-if="monsterSkills.length > 0">
-					<b>Skills </b>
-					<span class="skills">
-						<span class="skill" v-for="skill in monsterSkills" :key="skill.skill">
-							{{ skill.skill }} +{{ skill.score }}
-						</span>
+				<template v-if="monster.skills"><b>Skills</b>
+					<span class="saves">
+						<hk-roll 
+							v-for="(skill, index) in monster.skills" 
+							:key="skill" 
+							:tooltip="`Roll ${skill}`"
+							:roll="{
+								d: 20, 
+								n: 1, 
+								m: skillModifier(skillList[skill].ability, skill),
+								title: `${skill} check`,
+								entity_name: monster.name.capitalizeEach(),
+								notify: true
+							}"
+							:share="shares.includes('skill_rolls') ? { 
+								encounter_id: encounterId,
+								entity_key: monster.key
+							} : null"
+						>
+							<span class="save">
+								{{ skill }} {{ skillModifier(skillList[skill].ability, skill) }}{{ index+1 &lt; monster.skills.length ? "," : "" }}
+							</span>
+						</hk-roll>
+						<br/>
 					</span>
-					<br/>
 				</template>
-				<template v-if="data.damage_vulnerabilities"><b>Damage vulnerabilities</b> {{ data.damage_vulnerabilities }}<br/></template>
-				<template v-if="data.damage_resistances"><b>Damage resistances</b> {{ data.damage_resistances }}<br/></template>
-				<template v-if="data.damage_immunities"><b>Damage immunities</b> {{ data.damage_immunities }}<br/></template>
-				<template v-if="data.condition_immunities"><b>Condition immunities</b> {{ data.condition_immunities }}<br/></template>
-				<template v-if="data.senses"><b>Senses</b> {{ data.senses }}<br/></template>
-				<template v-if="data.languages"><b>Languages</b> {{ data.languages }}<br/></template>
-				<template v-if="data.challenge_rating"><b>Challenge Rating</b> {{ data.challenge_rating }} ({{ challengeToXp[data.challenge_rating] }}XP)</template>
-			</span>
+				<template v-if="monster.damage_vulnerabilities && monster.damage_vulnerabilities.length > 0">
+					<b>Damage vulnerabilities</b> {{ monster.damage_vulnerabilities.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.damage_resistances && monster.damage_resistances.length > 0">
+					<b>Damage resistances</b> {{ monster.damage_resistances.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.damage_immunities && monster.damage_immunities.length > 0">
+					<b>Damage immunities</b> {{ monster.damage_immunities.join(", ") }}<br/>
+				</template>
+				<template v-if="monster.condition_immunities && monster.condition_immunities.length > 0">
+					<b>Condition immunities</b> {{ monster.condition_immunities.join(", ") }}<br/>
+				</template>
+
+				<b>Senses</b> 
+				<template v-if="monster.senses">
+					<span v-for="(sense, key) in monster.senses" :key="key">
+						{{ key }} {{ sense.range ? `${sense.range} ft.` : `` }}{{ 
+							sense.comments ? `${sense.comments}` : ``
+						}},
+					</span>
+				</template>
+				passive Perception {{ passivePerception() }}<br/>
+
+				<template v-if="monster.languages && monster.languages.length > 0"><b>Languages</b> {{ monster.languages.join(", ") }}<br/></template>
+				<template v-if="monster.challenge_rating">
+					<b>Challenge Rating</b> {{ monster.challenge_rating }} 
+					({{ monster_challenge_rating[monster.challenge_rating].xp | numeral('0,0') }} XP)<br/>
+				</template>
+				<template v-if="monster.challenge_rating"><b>Proficiency bonus</b> +{{ monster.proficiency }}</template>
+			</div>
+
+			<h3>Skills</h3>
+			<div class="skills">
+				<hk-roll 
+					v-for="(skill, key) in skillList" 
+					:key="key" 
+					:tooltip="`Roll ${key}`"
+					:roll="{
+						d: 20, 
+						n: 1, 
+						m: skillModifier(skill.ability, key),
+						title: `${skill.skill} check`,
+						entity_name: monster.name.capitalizeEach(),
+						notify: true
+					}"
+					:share="shares.includes('skill_rolls') ? { 
+						encounter_id: encounterId,
+						entity_key: monster.key
+					} : null"
+				>
+					<span class="skill">
+						<span class="truncate">
+							<template v-if="monster.skills && monster.skills.includes(key)">
+								<i v-if="monster.skills_expertise && monster.skills_expertise.includes(key)" class="far fa-dot-circle"></i>
+								<i v-else class="fas fa-circle"></i>
+							</template>
+							<i v-else class="far fa-circle"></i>
+							{{ skill.skill }}
+						</span>
+						<span>{{ skillModifier(skill.ability, key) }}</span>
+					</span>
+				</hk-roll>
+			</div>
+
 			<hr>
-		
-			<template v-if="data.special_abilities">
-				<p v-for="(ability, index) in data.special_abilities" :key="`ability-${index}`">
-					<b><i>{{ ability.name }}</i></b> {{ ability.desc }}
+
+			<!-- SPELLCASTING -->
+			<template v-if="monster.caster_ability">
+				<p>
+					<b><i>
+						Spellcasting
+					</i></b>
+					The {{ monster.name.capitalizeEach() }} is a {{ monster.caster_level | numeral('Oo')}}-level spellcaster.
+					It's spellcasting ability is {{ monster.caster_ability.capitalize() }}
+					(spell save DC {{ monster.caster_save_dc }}, 
+					{{ monster.caster_spell_attack > 0 ? `+${monster.caster_spell_attack}` : monster.caster_spell_attack }} to hit with spell attacks). 
+					The {{ monster.name.capitalizeEach() }} has the following spells prepared:
+				</p>
+				<p>
+					<template v-for="level in caster_spell_levels" >
+						<div :key="`spell-${level}`">
+							<template v-if="level === 0">
+								Cantrips (at will):
+							</template>
+							<template v-else>
+								{{ level | numeral('Oo') }} level ({{ monster.caster_spell_slots[level] }} slots):
+							</template>
+							<i v-for="(spell, index) in spellsForLevel(level)" :key="spell.name">
+								<hk-popover>
+									{{ spell.name }}
+									<template #content>
+										<Spell :id="spell.key" />
+									</template>
+								</hk-popover>{{ index+1 &lt; spellsForLevel(level).length ? "," : "" }}
+							</i>
+						</div>
+					</template>
+				</p>
+			</template>
+
+			<!-- INNATE SPELLCASTING -->
+			<template v-if="monster.innate_ability">
+				<p>
+					<b><i>
+						Innate spellcasting
+					</i></b>
+					The {{ monster.name.capitalizeEach() }}'s innate spellcasting ability is {{ monster.innate_ability.capitalize() }}
+					(spell save DC {{ monster.innate_save_dc }}, 
+					{{ monster.innate_spell_attack > 0 ? `+${monster.innate_spell_attack}` : monster.innate_spell_attack }} to hit with spell attacks). 
+					The {{ monster.name.capitalizeEach() }} can cast the following spells, requiring no material components:
+				</p>
+				<p>
+					<template v-for="limit in innate_spell_levels" >
+						<div :key="`spell-${limit}`">
+							<template v-if="limit === Infinity">
+								At will:
+							</template>
+							<template v-else>
+								{{ limit }}/day each:
+							</template>
+							<i v-for="(spell, index) in spellsForLimit(limit)" :key="spell.name">
+								<hk-popover>
+								{{ spell.name }}
+								<template #content>
+									<Spell :id="spell.key" />
+								</template>
+							</hk-popover>{{ index+1 &lt; spellsForLimit(limit).length ? "," : "" }}
+							</i>
+						</div>
+					</template>
+				</p>
+			</template>
+			
+			<!-- Reactions -->
+			<template v-if="data.reactions">
+				<h3>Reactions</h3>
+				<p v-for="(action, index) in data.reactions" :key="`action-${index}`">
+						<b><i>{{ action.name }}</i></b> {{ action.desc }}
 				</p>
 			</template>
 		</div>
 
 		<div class="monster-actions">
-			<template v-if="data.actions">
-				<h3>Actions</h3>
-				<p v-for="(action, index) in data.actions" :key="`action-${index}`">
-						<b><i>{{ action.name }}</i></b> {{ action.desc }}
-				</p>
-			</template>
-
-			<template v-if="data.legendary_actions">
-				<h3>Legendary Actions</h3>
-				<p>
-					{{ data.name }} can take 3 legendary actions, choosing from the options below. 
-					Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ data.name }} regains spent legendary actions at the start of their turn.
-				</p>
-				<p v-for="(legendary_action, index) in data.legendary_actions" :key="`legendary-${index}`">
-						<b><i>{{ legendary_action.name }}</i></b> {{ legendary_action.desc }}
-				</p>
-			</template>
+			<div v-for="{category, name} in actions" :key="category">
+				<template v-if="monster[category] && monster[category].length > 0">
+					<h3 v-if="category !== 'special_abilities'">{{ name }}</h3>
+					<p v-if="monster.legendary_count && category === 'legendary_actions'">
+						{{ monster.name.capitalizeEach() }} can take {{ monster.legendary_count }} legendary actions, choosing from the options below. 
+						Only one legendary action option can be used at a time and only at the end of another creature’s turn. {{ monster.name }} regains spent legendary actions at the start of their turn.
+					</p>
+					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
+						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
+						<template v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+							<span v-if="ability.versatile" class="roll-button" @click.stop>
+								<q-popup-proxy square dark>
+									<div class="bg-gray">
+										<q-item>
+											<q-item-section>
+												<b>{{ ability.name }}</b>
+											</q-item-section>
+										</q-item>
+										<q-list dark square>
+											<q-item clickable v-close-popup>
+												<q-item-section avatar>1</q-item-section>
+												<q-item-section>
+													<hk-roll 
+														:tooltip="`${ability.name} (${ability.versatile_one || 'Option 1'})`"
+														tooltipPosition="right"
+														@roll="roll($event, ability, 0)"
+													>
+														{{ ability.versatile_one || 'Option 1' }}
+													</hk-roll>
+												</q-item-section>
+											</q-item>
+											<q-item clickable v-close-popup>
+												<q-item-section avatar>2</q-item-section>
+												<q-item-section>
+													<hk-roll 
+														:tooltip="`${ability.name} (${ability.versatile_two || 'Option 2'})`"
+														tooltipPosition="right"
+														@roll="roll($event, ability, 1)"
+													>
+														{{ ability.versatile_two || 'Option 2' }}
+													</hk-roll>
+												</q-item-section>
+											</q-item>
+										</q-list>
+									</div>
+								</q-popup-proxy>
+							</span>
+							<hk-roll 
+								v-else
+								:tooltip="`Roll ${ability.name}`" 
+								@roll="roll($event, ability)"
+							>
+								<span class="roll-button" />
+							</hk-roll>
+						</template>
+						<b><i>
+							{{ ability.name }}
+							{{ ability.recharge ? `(Recharge ${ability.recharge === 'rest' ? "after a Short or Long Rest" : ability.recharge})` : ``}}
+							{{ ability.limit ? `(${ability.limit}/${ability.limit_type ? ability.limit_type.capitalize(): `Day`})` : ``}}
+							{{ ability.legendary_cost > 1 ? `(Costs ${ability.legendary_cost} Actions)` : ``}}			
+						</i></b>
+						<hk-dice-text v-if="ability.desc" :input_text="ability.desc"/>
+					</p>
+				</template>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
 	import { dice } from '@/mixins/dice.js';
+	import { abilities } from '@/mixins/abilities.js';
+	import { monsterMixin } from '@/mixins/monster.js';
+	import { skills } from '@/mixins/skills.js';
+	import { mapActions, mapGetters } from 'vuex';
+	import Spell from "@/components/compendium/Spell"
 
 	export default {
-		name: 'NPC',
-		mixins: [general, dice],
-		props: [
-		'data'
+		name: 'ViewMonster',
+		mixins: [
+			general, 
+			dice,
+			abilities,
+			monsterMixin,
+			skills
 		],
+		components: {
+			Spell
+		},
+		props: ['data'],
 		data() {
 			return {
 				is_small: false,
-				skills: [
-					'acrobatics',
-					'animal Handling',
-					'arcana',
-					'athletics',
-					'deception',
-					'history',
-					'insight',
-					'intimidation',
-					'investigation',
-					'medicine',
-					'nature',
-					'perception',
-					'performance',
-					'persuasion',
-					'religion',
-					'sleight of Hand',
-					'stealth',
-					'survival',
+				actions: [
+					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
+					{ category: 'actions', name: 'Actions', name_single: 'Action' },
+					{ category: 'legendary_actions', name: 'Legendary Actions', name_single: 'Legendary action' },
+					{ category: 'reactions', name: 'Reactions', name_single: 'Reaction' }
 				],
-				challengeToXp: {
-					0: 10,
-					'0.125': 25,
-					'0.25': 50,
-					'0.5': 100,
-					1: 200,
-					2: 450,
-					3: 700,
-					4: 1100,
-					5: 1800,
-					6: 2300,
-					7: 2900,
-					8: 3900,
-					9: 5000,
-					10: 5900,
-					11: 7200,
-					12: 8400,
-					13: 10000,
-					14: 11500,
-					15: 13000,
-					16: 15000,
-					17: 18000,
-					19: 22000,
-					20: 25000,
-					21: 33000,
-					22: 41000,
-					23: 50000,
-					24: 62000,
-					30: 155000,
-				}
 			}
 		},
 		computed: {
-			monsterSkills() {
-				let skills = [];
-				for(let i in this.skills) {
-					let skill = this.skills[i];
-
-					if(this.data[skill]) {
-						skills.push({
-							skill,
-							score: this.data[skill]
-						})
-					}
-				}
-				return skills;
+			...mapGetters([
+				"encounterId",
+				"broadcast"
+			]),
+			shares() {
+				return this.broadcast.shares || [];
 			},
-			savingThrows() {
-				let saves = [];
-				for(let i in this.abilities) {
-					let save = this.abilities[i].ability;
-
-					if(this.data[`${save}_save`]) {
-						saves.push({
-							save,
-							score: this.data[`${save}_save`]
-						})
-					}
+			monster() {
+				let monster = this.data;
+				if(this.monster_challenge_rating[monster.challenge_rating]) {
+					monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
 				}
-				return saves;
-			}
-		},
-		firebase() {
-			return {
-				abilities: db.ref('abilities')
+				return monster;
+			},
+			caster_spell_levels() {
+				if(this.monster.caster_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.monster.caster_spells)) {
+						if(!levels.includes(spell.level)) levels.push(spell.level);
+					}
+					return levels.sort();
+				} return [];
+			},
+			innate_spell_levels() {
+				if(this.monster.innate_spells) {
+					let levels = [];
+					for(const spell of Object.values(this.monster.innate_spells)) {
+						const limit = (spell.limit) ? spell.limit : Infinity;
+						if(!levels.includes(limit)) levels.push(limit);
+					}
+					return levels.sort().reverse();
+				} return [];
 			}
 		},
 		methods: {
+			...mapActions([
+				"setActionRoll"
+			]),
 			setSize() {
 				let width = this.$refs.entity.clientWidth
 				let small = 300;
@@ -231,30 +418,44 @@
 
 				//sets new width on resize
 				this.width = this.$refs.entity.clientWidth;
+			},	
+			roll(e, action, versatile) {
+				const config = {
+					type: "monster_action",
+					versatile
+				}
+				this.setActionRoll(this.rollAction(e, action, config));
 			},
-			modifier(score) {
-				var mod = Math.floor((score - 10) / 2)
-				if(mod > 0) {
-					return '+' + mod
-				}
-				else {
-					return mod
-				}
+			passivePerception() {
+				return 10 + parseInt(this.skillModifier('wisdom', 'perception'));
 			},
-			rollAbility(ability, score, type = 'roll') {
-				var modifier = (type === 'roll') ? parseInt(Math.floor((score - 10) / 2)) : score;
-				var roll = (Math.floor(Math.random() * 20) + 1);
-				var total = roll + modifier;
-				if(modifier >= 0) {
-					var mod = '+' + modifier
+			spellsForLevel(level) {
+				return Object.entries(this.monster.caster_spells).filter(([key, item]) => { 
+						item.key = key;
+						return item.level == level;
+					}).map(item => { return item[1] });
+			},
+			spellsForLimit(limit) {
+				return Object.entries(this.monster.innate_spells).filter(([key, item]) => { 
+					item.key = key;
+					if(item.limit === 0) item.imit = Infinity;
+					return item.limit == limit;
+				}).map(item => { return item[1] });
+			},
+			skillModifier(ability, skill) {
+				let mod = this.calculateSkillModifier(
+					this.calcMod(this.monster[ability]),
+					this.monster.skills ? (
+					this.monster.skills.includes(skill) ? 
+					(this.monster.challenge_rating ? this.monster.proficiency : '')
+					: 0) : 0,
+					this.monster.skills_expertise ? this.monster.skills_expertise.includes(skill) : false
+				);
+
+				if(this.monster.skill_modifiers && this.monster.skill_modifiers[skill]) {
+					mod = parseInt(mod) + parseInt(this.monster.skill_modifiers[skill]);
 				}
-				else {
-					mod = modifier
-				}
-				
-				this.$snotify.success(`${ability} ${type}.`, `${roll}${mod} = ${total}`, {
-					position: "centerTop"
-				});
+				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
 			}
 		},
 		mounted() {
@@ -275,7 +476,7 @@
 
 .monster {
 	padding: 10px;
-	color:$black;
+	color: $black;
 	font-family: Helvetica, sans-serif, serif;
 
 	h2 {
@@ -285,6 +486,12 @@
 		margin-bottom: 0;
 		font-family: 'Playfair Display SC', serif;
 		font-weight: normal;
+
+		.source {
+			font-size: 15px;
+			font-family: Helvetica, sans-serif, serif;
+			color: $black;
+		}
 	}
 	h3 {
 		font-family: sans-serif;
@@ -304,14 +511,6 @@
 	.attributes, .stats {
 		color: #6e1d10;
 		
-		.skills .skill, .saves .hk-roll {
-			&::after {
-				content: ', ';
-			}
-			&:last-child::after {
-				content: '';
-			}
-		}
 		.saves{
 			user-select: none;
 
@@ -326,9 +525,53 @@
 			}
 		} 
 	}
+	.skills {
+		user-select: none;
+		column-count: 3;
+		column-gap: 20px;
+		column-rule: 1px solid rgb(165,42,42);
+
+
+		.skill {
+			display: flex;
+			justify-content: space-between;
+			cursor: pointer;
+
+			&:hover {
+				color: rgb(165,42,42);
+			}
+			i {
+				
+				&.fa-circle {
+					margin: 0 3px;
+					font-size: 6px;
+					vertical-align: 2px;
+				}
+			}
+		}
+		.advantage .skill:hover {
+			color: $green
+		}
+		.disadvantage .skill:hover {
+			color:$red
+		}
+	}
+	.saves .hk-roll {
+		&::after {
+			content: ', ';
+		}
+		&:last-child::after {
+			content: '';
+		}
+	}
+
+
 	hr {
 		border-top: 2px solid rgb(165,42,42);
 		margin: 10px 0;
+	}
+	ul {
+		padding-left: 20px;
 	}
 	.abilities {
 		user-select: none;
@@ -355,11 +598,32 @@
 		}
 	}
 }
+.roll-button {
+	display: inline-block;
+	cursor: pointer;
+	background-image: url('../assets/_img/logo/logo-icon-no-shield-cyan.svg');
+	height: 20px;
+	width: 20px;
+	background-position: center;
+	background-size: cover;
+	vertical-align: -5px;
+	user-select: none;
+}
+.advantage .roll-button:hover {
+	background-image: url('../assets/_img/logo/logo-icon-no-shield-green.svg');
+}
+.disadvantage .roll-button:hover {
+	background-image: url('../assets/_img/logo/logo-icon-no-shield-red.svg');
+}
 .smallWidth {
 	.abilities {
 		grid-template-columns: 	repeat(3, auto);
 		grid-template-rows: auto auto;
 		grid-row-gap: 15px;
+	}
+
+	.skills {
+		column-count: 2;
 	}
 }
 

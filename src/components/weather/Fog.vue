@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper" :class="intensityClass">
+	<div class="wrapper" :class="[intensityClass, {'smoke': smoke}]">
 		<div id="foglayer_01" class="fog">
 			<div class="image01"></div>
 			<div class="image02"></div>
@@ -22,7 +22,11 @@
 			intensity: {
 				type: Number,
 				default: 1
-			}
+			},
+      smoke: {
+        type: Boolean,
+        default: false
+      }
 		},
 		computed: {
 			intensityClass() {
@@ -44,12 +48,24 @@
   
   &.light {
     background: rgba(168, 168, 168, .1);
+
+    &.smoke {
+      background: rgba(43, 43, 43, .3);
+    }
   }
   &.medium {
     background: rgba(168, 168, 168, .3);
+
+    &.smoke {
+      background: rgba(43, 43, 43, .6);
+    }
   }
   &.heavy {
     background: rgba(168, 168, 168, .6);
+
+    &.smoke {
+      background: rgba(43, 43, 43, .8);
+    }
   }
 
   #foglayer_01, #foglayer_02, #foglayer_03 {
@@ -69,6 +85,15 @@
   }
   #foglayer_02, #foglayer_03 {
     animation: foglayer_02_opacity 21s linear infinite, foglayer_moveme 20s linear infinite;
+  }
+
+  &.smoke {
+    #foglayer_01 {
+    filter: invert(1);
+  }
+  #foglayer_02, #foglayer_03 {
+    filter: invert(1);
+  }
   }
 
   /* ---------- Moving Fog ---------- */

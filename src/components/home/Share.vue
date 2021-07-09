@@ -2,19 +2,19 @@
 	<div class="share">
 		<div class="container">
 			<div class="head">
-				<h2>Share live initiative list with your players</h2>
+				<h2>Share a live initiative list with your players</h2>
 				<span>
 					Show your players a live initiative list of the encounter that updates as you play. Perfect for at the table or if you are hosting a podcast or stream.
 				</span>
 			</div>
 
-			<div class="row q-col-gutter-xl">
+			<div class="row q-col-gutter-xl mb-5">
 				<div class="col-12 col-md-6">
 					<div class="video-wrapper">
 						<div class="video">
 							<video 
 								src="@/assets/_img/home/track-encounter.mp4" 
-								muted autoplay playsinline alt="Share initative screen Harmless Key D&D Combat Tracker" loop
+								muted autoplay playsinline alt="Share initative screen Harmless Key D&amp;D Combat Tracker" loop
 							/>
 							<div class="info">An example of how your players can follow your encounters.</div>
 						</div>
@@ -23,40 +23,122 @@
 				<div class="col-12 col-md-6">
 					<h3>Shows everything you need</h3>
 					
-					<ul>
-						<li>Initiative with current on top</li>
-						<li>Live updates while playing</li>
-						<li>Players' current health</li>
-						<li>Conditions</li>
-						<li>Rolls (if you want)</li>
-						<li>Damage/healing meters</li>
-						<li>Atmosphere created by added personal background images</li>
-						<li>Weather effects like rain and snow</li>
-					</ul>
+					<q-list>
+						<q-item 
+							v-for="({name, icon, title}, index) in items"
+							:key="`item-${index}`"
+							clickable 
+							@click="setDialog(name)"
+						>
+							<q-item-section avatar>
+								<i :class="icon" />
+							</q-item-section>
+							<q-item-section>
+								{{ title }}
+							</q-item-section>
+							<q-item-section avatar>
+								<i class="fas fa-eye gray-hover" />
+							</q-item-section>
+						</q-item>
+					</q-list>
 
-					<p>Through different settings you decide what is and isn't visible for your players.</p>
-					<router-link to="sign-up" class="btn btn-lg">Try it now!</router-link>
 				</div>
 			</div>
-
-			<a class="next" href="#campaign">
-				<div>Campaign Manager</div>
-				<i class="fas fa-chevron-down"></i>
-			</a>
+			<div class="d-flex justify-center">
+				<router-link to="sign-up" class="btn btn-lg">Try Harmless Key now!</router-link>
+			</div>
 		</div>
+		
+		<q-dialog v-model="dialog" square>
+			<Carousel :slides="items" :slide="slide" />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
+	import Carousel from "./Carousel";
+
 	export default {
-		name: 'Share'
+		name: 'Share',
+		components: {
+			Carousel
+		},
+		data() {
+			return {
+				dialog: false,
+				slide: "hp",
+				items: [
+					{
+						name: "initiative",
+						icon: "fas fa-list",
+						title: "Initiative",
+						text: "Show the initiative list on a separate screen so your players always know what's going on."
+					},
+					{
+						name: "live",
+						icon: "fas fa-sync",
+						title: "Live updates",
+						text: "Every action you perform instantly updates the shared initiative list."
+					},
+					{
+						name: "status",
+						icon: "fas fa-heartbeat",
+						title: "Status",
+						text: "The current status of entities is displayed. "+
+							"Think of hit points, armor class, conditions, etc."
+					},
+					{
+						name: "rolls",
+						icon: "fas fa-dice-d20",
+						title: "Rolls",
+						text: "You can choose to share your rolls and instantly display them on the shared "+
+							"initiative list.<br/>"+
+							"Scare your players when you roll that natural 20!"
+					},
+					{
+						name: "meters",
+						icon: "fas fa-swords",
+						title: "Damage/healing meters",
+						text: "Give your players a little insight into their character's worth by showing them "+
+							"how much damage and healing they have done."
+					},
+					{
+						name: "atmosphere",
+						icon: "fas fa-image",
+						title: "Atmosphere",
+						text: "Add awesome background images that create the perfect atmosphere for your "+
+							"encounters, allowing your players to fully immerse themselves in your combat."
+					},
+					{
+						name: "weather",
+						icon: "fas fa-cloud-showers",
+						title: "Weather effects",
+						text: "Add a layer with weather effects to your background. "+
+							"Isn't that battle in a winter landscape even better with intense snowfall? "+
+							"Or what about ash raining down during combat in a burning village?"
+					},
+					{
+						name: "customization",
+						icon: "fas fa-cogs",
+						title: "Customization",
+						text: "Through loads of settings you can create the shared initiative screen "+
+							"that is perfect for your games. You decide what you want to show to or hide from your players."
+					},
+				]
+			}
+		},
+		methods: {
+			setDialog(slide) {
+				this.slide = slide;
+				this.dialog = true;
+			}
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	.share {
-		padding-bottom: 170px;
-		min-height: calc(100vh - 50px - 55px);
+		padding-bottom: 100px;
 		background-color: #111111;
 
 		.video-wrapper {
@@ -66,8 +148,8 @@
 				width: 100%;
 				height: calc(100% - 10px);
 				overflow: hidden;
-				border: solid 8px$black;
-				background-color:$black;
+				border: solid 8px $black;
+				background-color: $black;
 				border-radius: 10px;
 				position: relative;
 

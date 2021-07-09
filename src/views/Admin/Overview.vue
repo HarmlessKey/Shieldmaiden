@@ -41,7 +41,7 @@
 						name: 'Generate XML sitemap',
 						url: 'xml',
 						icon: 'fas fa-file-code',
-					},
+					}
 				},
 			}
 		}

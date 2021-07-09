@@ -1,4 +1,3 @@
-
 import { store } from './store/store';
 
 const Home = () => import('@/views/Home.vue');
@@ -32,6 +31,7 @@ const Settings = () => import('@/views/Settings.vue');
 const ResetPassword = () => import('@/views/ResetPassword.vue');
 const Patreon = () => import('@/views/Patreon.vue');
 const ManageContent = () => import('@/views/ManageContent.vue');
+const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
 const Admin = () => import('@/views/Admin/Overview.vue');
 const Users = () => import('@/views/Admin/Users.vue');
@@ -98,6 +98,15 @@ export const routes = [{
 	path: '/demo',
 	name: 'Demo',
 	component: RunEncounter,
+	meta: {
+		sidebar: false,
+		offline: true
+	},
+},
+{
+	path: '/weather-demo',
+	name: 'Weather demo',
+	component: WeatherDemo,
 	meta: {
 		sidebar: false,
 		offline: true
@@ -680,6 +689,11 @@ export const routes = [{
 {
 	path: '/track-encounter/:userid',
 	redirect: '/user/:userid',
+},
+{
+	path: '/npc-overhaul',
+	name: 'NPC overhaul',
+	component: () => import(/* webpackChunkName: "list" */ '@/views/Pages/npc_overhaul.vue'),
 },
 {
 	path: '/404',

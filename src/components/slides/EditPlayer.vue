@@ -244,8 +244,9 @@
 			<div v-if="isXpAdvancement()" class="pt-2">
 				<hr>
 				<h2>Experience Points</h2>
-				{{ setNumber(playerBase.experience) }}
-				<h2 class="text-center xp">{{ animatedNumber }}</h2>
+				<h2 class="text-center xp">
+					<hk-animated-integer :value="playerBase.experience" />
+				</h2>
 
 				<div class="level">
 					<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
@@ -282,7 +283,7 @@
 
 <script>
 	import { db } from '@/firebase';
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
 	import Transform from './party/Transform.vue';
 
@@ -306,8 +307,6 @@
 				entity: undefined,
 				maxHpMod: undefined,
 				xp: undefined,
-				number: 0,
-				tweenedNumber: 0,
 				setTransform: false
 			}
 		},
@@ -339,10 +338,11 @@
 			}
 		},
 		computed: {
-			animatedNumber: function() {
-				if (this.tweenedNumber.toFixed) {
-					return this.tweenedNumber.toFixed(0);
-				}
+			...mapGetters([
+				'broadcast'
+			]),
+			share() {
+				return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
 			},
 			death_fails() {
 				let fails = 0;
@@ -354,20 +354,11 @@
 				return fails;
 			},
 		},
-		watch: {
-			number: function(newValue) {
-				// eslint-disable-next-line
-				TweenLite.to(this.$data, 1, { tweenedNumber: newValue });
-			}
-		},
 		methods: {
 			...mapActions([
 				'setSlide',
 				'edit_player',
 			]),
-			setNumber(value) {
-				this.number = value
-			},
 			addXp() {
 				if(this.xp) {
 					let newXp = parseInt(this.playerBase.experience) + parseInt(this.xp);
@@ -375,9 +366,22 @@
 					if(newXp < 0) { newXp = 0; }
 					if(newXp > 355000) { newXp = 355000; }
 
-					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(
-						newXp
-					)
+					if(this.share) {
+						const key = Date.now() + Math.random().toString(36).substring(4);
+						let share = {
+							key,
+							type: "xp",
+							notification: {
+								amount: this.xp,
+								targets: [this.entityKey]
+							}
+						};
+						if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
+
+						db.ref(`campaigns/${this.userId}/${this.broadcast.live}/shares`).set(share);
+					}
+
+					db.ref(`players/${this.userId}/${this.entityKey}/experience`).set(newXp)
 					this.xp = undefined;
 				}
 			},

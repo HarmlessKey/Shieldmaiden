@@ -25,7 +25,8 @@
 									<a @click="preview = 'old'" :class="preview === 'old' ? 'blue' : 'gray-light'">
 										Old
 									</a>
-									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond Link</a>
+									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond</a>
+									<a v-if="old_monster.name" :href="`https://5e.tools/bestiary.html#${encodeURIComponent(old_monster.name.trim().toLowerCase())}_mm`" target="_blank"><q-icon class="mr-2" name="fas fa-hammer"/>5e Tools</a>
 									<a @click="preview = 'new'" :class="preview === 'new' ? 'blue' : 'gray-light'">
 										New
 									</a>
@@ -409,7 +410,7 @@ export default {
 				}
 			}
 			if(this.monster.legendary_actions && this.monster.legendary_actions.length > 0) {
-				this.monster.lengendary_count = 3;
+				this.monster.legendary_count = 3;
 			}
 			
 		},
@@ -418,7 +419,6 @@ export default {
 		},
 	
 		async store_monster() {
-			console.log('saved')
 			delete this.monster['.value'];
 			delete this.monster['.key'];
 

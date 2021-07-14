@@ -1,5 +1,5 @@
 <template>
-	<div ref="builder">
+	<div v-if="base_values">
 		<div v-if="base_values.general && !base_values.general.build" class="build-type">
 			<h3>How do you want to do this?</h3>
 			<div class="types">
@@ -115,30 +115,31 @@
 				:computed="computed_values" 
 			/>
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import { experience } from '@/mixins/experience.js';
-	import { general } from '@/mixins/general.js';
-	import { dice } from '@/mixins/dice.js';
-	import { spellSlots } from '@/mixins/spellSlots.js';
-	import { skills } from '@/mixins/skills.js';
-	import { mapGetters } from 'vuex';
-	import { db } from '@/firebase';
-	import Computed from './computed';
-	import General from './general';
-	import Race from './race';
-	import Class from './class';
-	import Abilities from './abilities';
-	import Equipment from './equipment';
+	import OverEncumbered from "@/components/OverEncumbered.vue";
+	import { experience } from "@/mixins/experience.js";
+	import { general } from "@/mixins/general.js";
+	import { dice } from "@/mixins/dice.js";
+	import { spellSlots } from "@/mixins/spellSlots.js";
+	import { skills } from "@/mixins/skills.js";
+	import { mapGetters, mapActions } from "vuex";
+	import { db } from "@/firebase";
+	import Computed from "./computed";
+	import General from "./general";
+	import Race from "./race";
+	import Class from "./class";
+	import Abilities from "./abilities";
+	import Equipment from "./equipment";
 	
 
 	export default {
-		name: 'Players',
+		name: "Players",
 		metaInfo: {
-			title: 'Character'
+			title: "Character"
 		},
 		mixins: [experience, general, dice, spellSlots, skills],
 		components: {
@@ -155,57 +156,60 @@
 				playerId: this.$route.params.id,
 				advantage_disadvantage: {},
 				width: 0,
-				build: 'advanced',
+				build: "advanced",
 				tabs: [
-					{ value: 'general', label: "General" },
-					{ value: 'race', label: "Race" },
-					{ value: 'class', label: "Class" },
-					{ value: 'abilities', label: "Abilities" },
-					{ value: 'equipment', label: "Equipment" },
-					{ value: 'actions', label: "Actions" },
-					{ value: 'background', label: "Background" },
+					{ value: "general", label: "General" },
+					{ value: "race", label: "Race" },
+					{ value: "class", label: "Class" },
+					{ value: "abilities", label: "Abilities" },
+					{ value: "equipment", label: "Equipment" },
+					{ value: "actions", label: "Actions" },
+					{ value: "background", label: "Background" },
 				],
-				current_tab: 'general'
+				current_tab: "general"
 			}
 		},
 		firebase() {
 			return {
-				base_values: {
-					source: db.ref(`characters_base/${this.userId}/${this.playerId}`),
-					asObject: true
-				},
+				// base_values: {
+				// 	source: db.ref(`characters_base/${this.userId}/${this.playerId}`),
+				// 	asObject: true
+				// },
 				computed_values: {
 					source: db.ref(`characters_computed/${this.userId}/${this.playerId}`),
 					asObject: true
 				},
 			}
 		},
-		mounted() {
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
+		beforeMount() {
+			// Is it the user's character or someone elses
+			if(this.$route.name === "Edit Character") {
+				let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
+				user.on("value" , (snapshot) => {
+					this.userId = snapshot.val().user
+				});
+			} else {
+				this.userId = this.$store.getters.user.uid;
+			}
+
+			// Check wether the character is already in the store, fetch if not
+			if(!this.characters[this.userId] || !this.characters[this.userId][this.playerId]) {
+				this.set_character({
+					userId: this.userId, 
+					key: this.playerId
+				});
+			}
 		},
 		computed: {
 			...mapGetters([
-				'tier',
-				'players',
-				'overencumbered',
+				"tier",
+				"players",
+				"overencumbered",
+				"characters",
+				"get_character"
 			]),
-			//User ID needs to be different 
-			//if it is an external controlled character
-			userId() {
-				if(this.$route.name === 'Edit Character') {
-					let id = undefined
-					let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
-					user.on('value' , (snapshot) => {
-						id = snapshot.val().user
-					});
-					return id;
-				} else {
-					return this.$store.getters.user.uid;
-				}
+			base_values() {
+				return this.get_character(this.userId, this.playerId);
 			},
 			//Turn modifiers into an array, but save the keys
 			modifiers() {
@@ -248,11 +252,13 @@
 			}
 		},
 		methods: {
-			setSize() {
-				this.width = this.$refs.builder.clientWidth;
+			...mapActions([
+				"set_character"
+			]),
+			setSize(size) {
+				this.width = size.width;
 			},
 			setBuild(type) {
-				console.log(type)
 				this.build = type;
 			},
 			setBuildType() {

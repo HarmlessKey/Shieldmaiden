@@ -8,7 +8,7 @@ export const content_spells = {
 		spells: {},
 	},
 	getters: {
-    spells: function(state) { return state.spells; },
+    spells: (state) => { return state.spells; },
     get_spell: (state) => (key) => {
       return state.spells[key];
     }

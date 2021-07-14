@@ -5,7 +5,7 @@
 			<q-input 
 				dark filled square
 				label="Player name"
-				@change="savePlayerName()"
+				@change="saveProp('general', 'player_name', character.player_name)"
 				autocomplete="off"  
 				type="text" 
 				v-model="character.player_name" 
@@ -19,7 +19,7 @@
 			<q-input 
 				dark filled square
 				label="Character name"
-				@change="saveCharacterName()"
+				@change="saveProp('general', 'character_name', character.character_name)"
 				autocomplete="off"  
 				type="text" 
 				v-model="character.character_name" 
@@ -41,7 +41,7 @@
 				<q-input
 					dark filled square
 					label="Avatar"
-					@change="saveAvatar()"
+					@change="saveProp('general', 'avatar', character.avatar)"
 					autocomplete="off"  
 					id="avatar" 
 					type="text" 
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+	import { mapActions } from "vuex";
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { db } from '@/firebase';
 
@@ -124,35 +125,40 @@
 			this.$validator.attach({ name:'avatar', rules: 'url' });
 		},
 		methods: {
-			savePlayerName() {
-				this.$validator.validate('player_name', this.character.player_name).then((result) => {
-					if (result) {
-						db.ref(`characters_base/${this.userId}/${this.playerId}/general/player_name`).set(this.character.player_name);
-					}
-				});
-			},
-			saveCharacterName() {
-				this.$validator.validate('character_name', this.character.character_name).then((result) => {
-					if (result) {
-						db.ref(`characters_base/${this.userId}/${this.playerId}/general/character_name`).set(this.character.character_name);
-						db.ref(`characters_computed/${this.userId}/${this.playerId}/display/character_name`).set(this.character.character_name);
-					}
-				});
-			},
-			saveAvatar() {
-				this.$validator.validate('avatar', this.character.avatar).then((result) => {
+			...mapActions([
+				"set_character_prop"
+			]),
+			saveProp(category, property, value) {
+				this.$validator.validate(property, value).then((result) => {
 					if(result) {
-						db.ref(`characters_base/${this.userId}/${this.playerId}/general/avatar`).set(this.character.avatar);
-						db.ref(`characters_computed/${this.userId}/${this.playerId}/display/avatar`).set(this.character.avatar);
+						this.set_character_prop({
+							userId: this.userId,
+							key: this.playerId,
+							category,
+							property,
+							value
+						});
 					}
 				});
 			},
 			saveAdvancement() {
 				if(this.character.advancement === 'experience' && !this.character_class.experience_points) {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/experience_points`).set(0);
+					this.set_character_prop({
+						userId: this.userId,
+						key: this.playerId,
+						category: "class",
+						property: "experience_points",
+						value: 0
+					});
 				}
 
-				db.ref(`characters_base/${this.userId}/${this.playerId}/general/advancement`).set(this.character.advancement);
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "general",
+					property: "advancement",
+					value: this.character.advancement
+				});
 				this.$emit("change", "general.advancement");
 			},
 			saveHpType() {
@@ -166,7 +172,13 @@
 						}
 					}
 				}
-				db.ref(`characters_base/${this.userId}/${this.playerId}/general/hit_point_type`).set(this.character.hit_point_type);
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "general",
+					property: "hit_point_type",
+					value: this.character.hit_point_type
+				});
 				this.$emit("change", "general.advancementhit_point_type");
 			}
 		}

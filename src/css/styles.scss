@@ -609,9 +609,6 @@ html body {
 	}
 
 	label.required:after {
-		// content: '\f069';
-		// font-family: FontAwesome;
-		// // font-
 		content: '*';
 		color: $red;
 		font-size: 25px;

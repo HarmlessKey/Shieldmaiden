@@ -58,7 +58,7 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { mapActions } from "vuex";
 
 	export default {
 		name: 'ModifierTable',
@@ -114,6 +114,9 @@
 		
 		},
 		methods: {
+			...mapActions([
+				"delete_modifier"
+			]),
 			newModifier(origin) {
 				const modifier = {
 					origin: origin,
@@ -126,8 +129,11 @@
 				this.$emit('edit', { modifier, origin: this.origin });
 			},
 			deleteModifier(key) {
-				console.log(key)
-				db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).remove();
+				this.delete_modifier({
+					userId: this.userId,
+					key: this.playerId,
+					modifier_key: key
+				});
 				this.$emit("change", "modifier.deleted");
 			},
 			editModifier(modifier) {

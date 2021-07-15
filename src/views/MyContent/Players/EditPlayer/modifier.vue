@@ -252,11 +252,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { skills } from '@/mixins/skills.js';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
 	import numeral from 'numeral';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'CharacterClass',
@@ -426,18 +426,32 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"add_modifier",
+				"edit_modifier"
+			]),
 			saveModifier() {
 				let modifier = this.modifier;
 
 				//Edit
 				if(modifier['.key']) {
 					const key = modifier['.key'];
-					delete modifier['.key'];
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${key}`).set(modifier);
+					delete modifier['.key']; // can't be pushed to firebase
+
+					this.edit_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier_key: key,
+						modifier
+					});
 				}
 				//New
 				else {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(this.modifier);
+					this.add_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier
+					});
 				}
 				this.$emit("save", "modifier.saved");
 			},

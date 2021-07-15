@@ -75,6 +75,24 @@ export const content_characters = {
     },
 
     //MODIFIERS CRUD
+    add_modifier({ commit }, { userId, key, modifier }) {
+      try {
+        characters_ref.child(`${userId}/${key}/modifiers`).push(modifier).then(res => {
+          const modifier_key = res.getKey(); //Returns the key of the added entry
+          commit("ADD_MODIFIER", { userId, key, modifier_key, modifier });
+        });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    edit_modifier({ commit }, { userId, key, modifier_key, modifier }) {
+      try {
+        characters_ref.child(`${userId}/${key}/modifiers/${modifier_key}`).set(modifier);
+        commit("EDIT_MODIFIER", { userId, key, modifier_key, modifier })
+      } catch(error) {
+        console.error(error);
+      }
+    },
     delete_modifier({ commit }, { userId, key, modifier_key }) {
       try {
         characters_ref.child(`${userId}/${key}/modifiers/${modifier_key}`).remove();
@@ -103,6 +121,8 @@ export const content_characters = {
       }
       Vue.set(state.computed_characters[userId], key, character);
     },
+
+    // RACE TRAITS
     ADD_TRAIT(state, { userId, key, trait_key, trait}) {
       if(!state.characters[userId][key].race) {
         Vue.set(state.characters[userId][key], "race", {});
@@ -117,6 +137,17 @@ export const content_characters = {
     },
     DELETE_TRAIT(state, { userId, key, trait_key }) {
       Vue.delete(state.characters[userId][key].race.traits, trait_key);
+    },
+
+    // MODIFIERS
+    ADD_MODIFIER(state, { userId, key, modifier_key, modifier}) {
+      if(!state.characters[userId][key].modifiers) {
+        Vue.set(state.characters[userId][key], "modifiers", {});
+      }
+      Vue.set(state.characters[userId][key].modifiers, modifier_key, modifier);
+    },
+    EDIT_MODIFIER(state, { userId, key, modifier_key, modifier}) {
+      Vue.set(state.characters[userId][key].modifiers, modifier_key, modifier);
     },
     DELETE_MODIFIER(state, { userId, key, modifier_key }) {
       Vue.delete(state.characters[userId][key].modifiers, modifier_key);

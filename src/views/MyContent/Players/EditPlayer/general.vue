@@ -120,9 +120,9 @@
 			}
 		},
 		created() {
-			this.$validator.attach({ name:'player_name', rules: 'required|max:30' });
-			this.$validator.attach({ name:'character_name', rules: 'required|max:35' });
-			this.$validator.attach({ name:'avatar', rules: 'url' });
+			this.$validator.attach({ name:"player_name", rules: "required|max:30" });
+			this.$validator.attach({ name:"character_name", rules: "required|max:35" });
+			this.$validator.attach({ name:"avatar", rules: "url" });
 		},
 		methods: {
 			...mapActions([
@@ -142,7 +142,7 @@
 				});
 			},
 			saveAdvancement() {
-				if(this.character.advancement === 'experience' && !this.character_class.experience_points) {
+				if(this.character.advancement === "experience" && !this.character_class.experience_points) {
 					this.set_character_prop({
 						userId: this.userId,
 						key: this.playerId,

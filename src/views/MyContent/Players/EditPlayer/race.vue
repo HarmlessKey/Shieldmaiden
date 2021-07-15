@@ -64,8 +64,8 @@
 
 					<div class="accordion-body">
 						<div class="form-item mb-3">
-							<q-input 
-								dark filled square dense
+							<q-input
+								dark filled square
 								@change="editTrait(key, 'name')"
 								autocomplete="off"
 								:id="`name-${index}`"
@@ -94,12 +94,12 @@
 </template>
 
 <script>
-	import ModifierTable from './modifier-table.vue';
-	import Modifier from './modifier.vue';
-	import { db } from '@/firebase';
+	import { mapActions } from "vuex";
+	import ModifierTable from "./modifier-table.vue";
+	import Modifier from "./modifier.vue";
 
 	export default {
-		name: 'CharacterRace',
+		name: "CharacterRace",
 		props: [
 			"character_race",
 			"modifiers",
@@ -124,6 +124,13 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"set_character_prop",
+				"add_trait",
+				"edit_trait",
+				"delete_trait",
+				"delete_modifier"
+			]),
 			trait_modifiers(key) {
 				const modifiers = this.modifiers.filter(mod => {
 					const origin = mod.origin.split(".");
@@ -136,35 +143,70 @@
 				this.modifier = e.modifier;
 			},
 			saveRaceName() {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_name`).set(this.race.race_name);
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/race`).set(this.race.race_name);
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "race",
+					property: "race_name",
+					value: this.race.race_name
+				});
 			},
 			saveRaceSpeed() {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/walking_speed`).set(this.race.walking_speed);
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "race",
+					property: "walking_speed",
+					value: this.race.walking_speed
+				});
 				this.$emit("change", "race.speed");
 			},
 			saveRaceDescription() {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/race_description`).set(this.race.race_description);
-				this.$emit("change", "race.description");
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "race",
+					property: "race_description",
+					value: this.race.race_description
+				});
 			},
 			addTrait() {
-				const trait = { name: "New Trait" }
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits`).push(trait);
+				const trait = { name: "New Trait" };
+
+				this.add_trait({
+					userId: this.userId,
+					key: this.playerId,
+					trait
+				});
 			},
 			editTrait(key, property) {
 				const value = this.race.traits[key][property];
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits/${key}/${property}`).set(value);
+				this.edit_trait({
+					userId: this.userId,
+					key: this.playerId,
+					trait_key: key,
+					property,
+					value
+				});
 			},
 			deleteTrait(key) {
 				//Delete all modifiers linked to this feat
 				const linked_modifiers = this.trait_modifiers(key);
 
 				for(const modifier of linked_modifiers) {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
+					this.delete_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier_key: modifier['.key']
+					});
 				}
 
 				//Delete trait
-				db.ref(`characters_base/${this.userId}/${this.playerId}/race/traits/${key}`).remove();
+				this.delete_trait({
+					userId: this.userId,
+					key: this.playerId,
+					trait_key: key
+				});
 				this.$emit("change", "race.trait_removed");
 			},
 			confirmDelete(key, name) {

@@ -41,7 +41,7 @@ export const characterMixin = {
 		 */
 		compute_character(base_character, origin) {
 			// eslint-disable-next-line
-			console.log("Change made. Origin: ", origin);
+			console.log("Character computed. Origin: ", origin);
 
 			const computed_character = {
 				display: {

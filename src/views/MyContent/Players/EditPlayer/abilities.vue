@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h3 class="text-center">Base ability scores</h3>
-		<div class="base_abilities">
+		<div class="base_abilities input">
 			<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
 				<q-input
 					dark filled square
@@ -14,16 +14,27 @@
 				/>
 			</div>
 		</div>
+
+		<h3 class="text-center">Computed ability scores</h3>
+		<div class="base_abilities">
+			<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
+				<div class="label">
+					{{ label.substring(3, 0).toUpperCase() }}
+				</div>
+				<h2 class="score">
+					{{ computed[value] || 0 }}
+				</h2>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
-	import { abilities } from '@/mixins/abilities.js';
-	import Modifier from './modifier.vue';
-	import { db } from '@/firebase';
+	import { abilities } from "@/mixins/abilities.js";
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'CharacterAbilities',
+		name: "CharacterAbilities",
 		mixins: [abilities],
 		props: [
 			"base_abilities",
@@ -32,9 +43,6 @@
 			"userId",
 			"modifiers"
 		],
-		components: {
-			Modifier
-		},
 		data() {
 			return {
 				modifier: {}
@@ -46,9 +54,19 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"set_character_prop"
+			]),
 			saveAbility(ability) {
 				const score = (this.ability_scores[ability]) ? parseInt(this.ability_scores[ability]) : 0;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/abilities/${ability}`).set(score);
+
+				this.set_character_prop({
+					userId: this.userId,
+					key: this.playerId,
+					category: "abilities",
+					property: ability,
+					value: score
+				});
 				this.$emit("change", `abilities.${ability}`);
 			}
 		}
@@ -63,17 +81,19 @@
 	}
 	.base_abilities {
 		width: 100%;
-		display: grid;
-		grid-template-columns: repeat(6, 100px);
-		grid-column-gap: 10px;
+		display: flex;
 		justify-content: center;
 		align-content: center;
+		margin: -5px;
 
 		.ability {
+			margin: 5px;
 			text-align: center;
+			min-width: 80px;
+			max-width: 100px;
 
-			label {
-				margin-bottom: 0;
+			.label {
+				margin-bottom: 10px;
 				font-weight: bold;
 				font-size: 12px;
 			}
@@ -82,10 +102,15 @@
 				font-size: 25px;
 				font-weight: bold;
 			}
+			.score {
+				font-family: 'Fredericka the Great', cursive !important;
+				font-size: 45px;
+				color: $white;
+			}
 		}
 	}
 	@media only screen and (max-width: 950px) {
-		.base_abilities {
+		.base_abilities.input {
 			grid-template-columns: repeat(3, 100px);
 			grid-template-rows: auto;
 			grid-row-gap: 20px;

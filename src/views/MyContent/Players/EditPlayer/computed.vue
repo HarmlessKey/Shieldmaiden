@@ -14,19 +14,19 @@
 					<div 
 						class="image"
 						:style="[
-							character.display.avatar ? { backgroundImage: 'url(\'' + character.display.avatar + '\')' } : 
+							avatar ? { backgroundImage: 'url(\'' + avatar + '\')' } : 
 							{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
 						]"
 					/>
 				</q-avatar>
 			</q-circular-progress>
 			<div class="general">
-				<h4>{{ character.display.character_name || "Unnamed Character" }}</h4>
-				Level {{ character.display.level }} &bull; {{ character.display.race }}
+				<h4>{{ character_name || "Unnamed Character" }}</h4>
+				Level {{ character.display.level }} &bull; {{ race ? race.race_name : "" }}
 				<template v-if="character.sheet && character.sheet.classes">
-					<div v-for="( subclass, index) in character.sheet.classes" :key="`class-${index}`">
-					{{ (subclass.level &lt; character.display.level) ? `${subclass.level}` : `` }} 
-					<b>{{ subclass.class }}</b>
+					<div v-for="( subclass, index) in classes" :key="`class-${index}`">
+					{{ (subclass.level &lt; character.display.level) ? `${subclass.level}` : `` }}
+					<b>{{ subclass.name }}</b>
 					<template v-if="subclass.subclass">
 						<span class="blue mx-1">&bull;</span>
 						<i>{{ subclass.subclass }}</i>
@@ -208,10 +208,8 @@
 		name: 'CharacterComputed',
 		mixins: [general, abilities],
 		props: [
-			"hit_point_type",
+			"base_values",
 			"modifiers",
-			"classes",
-			"race",
 			"computed"
 		],
 		data() {
@@ -222,6 +220,21 @@
 		computed: {
 			character() {
 				return (this.computed) ? this.computed : {};
+			},
+			race() {
+				return this.base_values.race;
+			},
+			hit_point_type() {
+				return this.base_values.general.hit_point_type;
+			},
+			classes() {
+				return this.base_values.class.classes;
+			},
+			avatar() {
+				return this.base_values.general.avatar;
+			},
+			character_name() {
+				return this.base_values.general.character_name;
 			},
 			saving_throws() {
 				let saving_throws = {};

@@ -24,7 +24,7 @@ export const content_characters = {
     }
   },
   actions: {
-   async set_character({ state, commit }, { userId, key }) {
+    async set_character({ state, commit }, { userId, key }) {
       const character = characters_ref.child(userId).child(key);
       
       if(!state.characters[userId] || !state.characters[userId][key]) {
@@ -38,9 +38,51 @@ export const content_characters = {
       commit('SET_COMPUTED_CHARACTER', { userId, key, character });
     },
     set_character_prop({ commit }, { userId, key, category, property, value }) {
-      characters_ref.child(`${userId}/${key}/${category}/${property}`).set(value);
-      commit("SET_CHARACTER_PROP", {userId, key, category, property, value});
-    }
+      try {
+        characters_ref.child(`${userId}/${key}/${category}/${property}`).set(value);
+        commit("SET_CHARACTER_PROP", {userId, key, category, property, value});
+      } catch(error) {
+        console.error(error);
+      }
+    },
+
+    // RACE TRAITS CRUD
+    add_trait({ commit }, { userId, key, trait }) {
+      try {
+        characters_ref.child(`${userId}/${key}/race/traits`).push(trait).then(res => {
+          const trait_key = res.getKey(); //Returns the key of the added entry
+          commit("ADD_TRAIT", { userId, key, trait_key, trait });
+        });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    edit_trait({ commit }, { userId, key, trait_key, property, value }) {
+      try {
+        characters_ref.child(`${userId}/${key}/race/traits/${trait_key}/${property}`).set(value);
+        commit("EDIT_TRAIT", { userId, key, trait_key, property, value })
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    delete_trait({ commit }, { userId, key, trait_key }) {
+      try {
+        characters_ref.child(`${userId}/${key}/race/traits/${trait_key}`).remove();
+        commit("DELETE_TRAIT", { userId, key, trait_key });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+
+    //MODIFIERS CRUD
+    delete_modifier({ commit }, { userId, key, modifier_key }) {
+      try {
+        characters_ref.child(`${userId}/${key}/modifiers/${modifier_key}`).remove();
+        commit("DELETE_MODIFIER", { userId, key, modifier_key });
+      } catch(error) {
+        console.error(error);
+      }
+    },
   },
   mutations: {
     SET_CHARACTER(state, {userId, key, character}) {
@@ -60,6 +102,24 @@ export const content_characters = {
         Vue.set(state.computed_characters, userId, {});
       }
       Vue.set(state.computed_characters[userId], key, character);
-    }
+    },
+    ADD_TRAIT(state, { userId, key, trait_key, trait}) {
+      if(!state.characters[userId][key].race) {
+        Vue.set(state.characters[userId][key], "race", {});
+      }
+      if(!state.characters[userId][key].race.traits) {
+        Vue.set(state.characters[userId][key].race, "traits", {});
+      }
+      Vue.set(state.characters[userId][key].race.traits, trait_key, trait);
+    },
+    EDIT_TRAIT(state, { userId, key, trait_key, property, value}) {
+      Vue.set(state.characters[userId][key].race.traits[trait_key], property, value);
+    },
+    DELETE_TRAIT(state, { userId, key, trait_key }) {
+      Vue.delete(state.characters[userId][key].race.traits, trait_key);
+    },
+    DELETE_MODIFIER(state, { userId, key, modifier_key }) {
+      Vue.delete(state.characters[userId][key].modifiers, modifier_key);
+    },
   }
 }

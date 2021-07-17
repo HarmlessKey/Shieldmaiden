@@ -101,6 +101,78 @@ export const content_characters = {
         console.error(error);
       }
     },
+
+    // CLASS
+    set_class_prop({ commit }, { userId, key, classKey, property, value }) {
+      try {
+        characters_ref.child(`${userId}/${key}/class/classes/${classKey}/${property}`).set(value);
+        commit("SET_CLASS_PROP", {userId, key, classKey, property, value});
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    set_xp({ state, commit} , { userId, key, value, type }) {
+      let newValue;
+      const currentVal = state.characters[userId][key].class.experience_points;
+      const change = parseInt(value);
+
+      if(type === "add") {
+        newValue = currentVal + change;
+        newValue = (newValue > 355000) ? 355000 : newValue;
+      } else {
+        newValue = currentVal - change;
+        newValue = (newValue < 0) ? 0 : newValue;
+      }
+      try {
+        characters_ref.child(`${userId}/${key}/class/experience_points`).set(newValue);
+        commit("SET_CHARACTER_PROP", { userId, key, category: "class", property: "experience_points", value: newValue });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    add_feature({ commit }, { userId, key, classKey, level, feature, feature_key }) {
+      try {
+        if(!feature_key) {
+          characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}`).push(feature).then(res => {
+            const feature_key = res.getKey(); //Returns the key of the added entry
+            commit("ADD_FEATURE", { userId, key, classKey, level, feature_key, feature });
+          });
+        } else {
+          characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}/${feature_key}`).set(feature);
+          commit("ADD_FEATURE", { userId, key, classKey, level, feature_key, feature });
+        }
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    set_feature_prop({ commit }, { userId, key, classKey, level, feature_key, property, value }) {
+      if(property === 'display') {
+        //when the value doesn't exist, it's false, and needs to be set to true
+        //So check if undefined and set to true if it was
+        value = (value === undefined) ? true : !value;
+
+        //Delete the prop if it was false
+        value = (!value) ? null : value;
+      }
+
+      //Remove value if undefined
+      if(value === undefined) value = null;
+
+      try {
+        characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}/${feature_key}/${property}`).set(value);
+        commit("SET_FEATURE_PROP", { userId, key, classKey, level, feature_key, property, value });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    delete_feature({ commit }, { userId, key, classKey, level, feature_key }) {
+      try {
+        characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}/${feature_key}`).remove();
+        commit("DELETE_FEATURE", { userId, key, classKey, level, feature_key });
+      } catch(error) {
+        console.error(error);
+      }
+    },
   },
   mutations: {
     SET_CHARACTER(state, {userId, key, character}) {
@@ -151,6 +223,28 @@ export const content_characters = {
     },
     DELETE_MODIFIER(state, { userId, key, modifier_key }) {
       Vue.delete(state.characters[userId][key].modifiers, modifier_key);
+    },
+
+    // CLASS
+    SET_CLASS_PROP(state, {userId, key, classKey, property, value}) {
+      Vue.set(state.characters[userId][key].class.classes[classKey], property, value);
+    },
+    ADD_FEATURE(state, { userId, key, classKey, level, feature_key, feature }) {
+      if(!state.characters[userId][key].class.classes[classKey].features) {
+        Vue.set(state.characters[userId][key].class.classes[classKey], "features", {});
+      }
+      if(!state.characters[userId][key].class.classes[classKey].features[`level_${level}`]) {
+        Vue.set(state.characters[userId][key].class.classes[classKey].features, `level_${level}`, {});
+      }
+      Vue.set(state.characters[userId][key].class.classes[classKey].features[`level_${level}`], feature_key, feature);
+    },
+
+    // FEATURES
+    SET_FEATURE_PROP(state, {userId, key, classKey, level, feature_key, property, value}) {
+      Vue.set(state.characters[userId][key].class.classes[classKey].features[`level_${level}`][feature_key], property, value);
+    },
+    DELETE_FEATURE(state, { userId, key, classKey, level, feature_key }) {
+      Vue.delete(state.characters[userId][key].class.classes[classKey].features[`level_${level}`], feature_key);
     },
   }
 }

@@ -110,9 +110,6 @@
 				}
 			}
 		},
-		computed: {
-		
-		},
 		methods: {
 			...mapActions([
 				"delete_modifier"

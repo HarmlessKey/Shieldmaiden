@@ -27,9 +27,7 @@ export const experience = {
 	},
 	methods: {
 		calculatedLevel(xp) {
-			if(!xp) {
-				xp = 0;
-			}
+			xp = (!xp) ? 0 : xp;
 			for(let level in this.xpTable) {
 				if(this.xpTable[level].xp > xp) {
 					return level - 1;
@@ -40,17 +38,23 @@ export const experience = {
 		returnProficiency(level) {
 			return this.xpTable[level].proficiency;
 		},
+		levelProgress(xp) {
+			const level = this.calculatedLevel(xp);
+			return xp - this.xpTable[level].xp;
+		},
+		levelRequired(xp) {
+			const level = this.calculatedLevel(xp);
+			return this.xpTable[level + 1].xp - this.xpTable[level].xp;
+		},
 		levelAdvancement(xp) {
-			if(!xp) {
-				xp = 0;
-			}
+			xp = (!xp) ? 0 : xp;
 			//Return full bar at lvl 20
 			if(xp >= 355000) {
 				return 100;
 			} else {
-				let level = this.calculatedLevel(xp);
-				let currentAmount = xp - this.xpTable[level].xp;
-				let neededAmount = this.xpTable[level + 1].xp - this.xpTable[level].xp;
+				const level = this.calculatedLevel(xp);
+				const currentAmount = xp - this.xpTable[level].xp;
+				const neededAmount = this.xpTable[level + 1].xp - this.xpTable[level].xp;
 
 				return currentAmount / neededAmount;
 			}

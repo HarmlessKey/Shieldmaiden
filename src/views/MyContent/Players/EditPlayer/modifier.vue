@@ -4,7 +4,7 @@
 			<span>
 				{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
 			</span>
-			<q-btn flat v-close-popup round dense icon="close" />
+			<q-btn flat v-close-popup round icon="close" />
 		</div>
 
 		<!-- MODIFIER -->
@@ -13,7 +13,7 @@
 					<div class="mb-3">Origin: {{ modifier_origin }}</div>
 					<q-input
 						autocomplete="off"
-						dark filled square dense
+						dark filled square
 						label="Name"
 						id="name"
 						type="text"
@@ -28,20 +28,20 @@
 
 				<!-- TYPE -->
 				<div class="form-item">
-					<q-select dark filled square dense map-options emit-value v-model="modifier.type" :options="modifier_types" label="Type" />
+					<q-select dark filled square map-options emit-value v-model="modifier.type" :options="modifier_types" label="Type" />
 				</div>
 				<small class="d-block mt-1" v-if="modifier.type"><b>{{ modifier.type.capitalize() }}</b>: {{ type_info[modifier.type] }}</small>
 
 				<template v-if="modifier.type">
 					<!-- TARGET -->
 					<div class="form-item my-3">
-						<q-select dark filled square dense map-options emit-value v-model="modifier.target" :options="modifier_targets" label="Modifier target" />
+						<q-select dark filled square map-options emit-value v-model="modifier.target" :options="modifier_targets" label="Modifier target" />
 					</div>
 
 					<!-- ABILITES -->
 					<div class="form-item mb-3" v-if="['ability', 'saving_throw'].includes(modifier.target)">
 						<q-select 
-							dark filled square dense 
+							dark filled square 
 							map-options emit-value 
 							v-model="modifier.subtarget" 
 							:options="abilities" 
@@ -53,7 +53,7 @@
 					<div class="form-item mb-3" v-if="modifier.target === 'skill'">
 						<label for="type">Skill</label>
 						<q-select 
-							dark filled square dense 
+							dark filled square 
 							map-options emit-value 
 							option-value="value"
 							option-label="skill" v-model="modifier.subtarget" 
@@ -64,7 +64,7 @@
 
 					<!-- WEAPONS -->
 					<div class="form-item mb-3" v-if="modifier.target === 'weapon'">
-						<q-select dark filled square dense v-model="modifier.subtarget" :options="weaponList" label="Weapon">
+						<q-select dark filled square v-model="modifier.subtarget" :options="weaponList" label="Weapon">
 							<template v-slot:option="scope">
 								<q-item :key="`weapon-category-${scope.index}`">
 									<q-item-section>
@@ -93,7 +93,7 @@
 
 					<!-- ARMOR -->
 					<div class="form-item mb-3" v-if="modifier.target === 'armor'">
-						<q-select dark filled square dense map-options emit-value v-model="modifier.subtarget" :options="armor_types" label="Armor" />
+						<q-select dark filled square map-options emit-value v-model="modifier.subtarget" :options="armor_types" label="Armor" />
 					</div>
 					
 					<!-- VALUE -->
@@ -101,7 +101,7 @@
 						<div class="row q-col-gutter-md">
 							<div class="col-9">
 								<q-input 
-									dark filled square dense
+									dark filled square
 									label="Value"
 									autocomplete="off"  
 									id="value" 
@@ -135,7 +135,7 @@
 					<!-- ABILITES -->
 					<div class="form-item mb-3" v-if="modifier.type === 'ability'">
 						<q-select 
-							dark filled square dense 
+							dark filled square 
 							map-options 
 							emit-value 
 							v-model="modifier.ability_modifier" 
@@ -149,7 +149,7 @@
 					<!-- RESTRICTIONS -->
 					<div class="form-item my-3">
 						<q-select 
-							dark filled square dense 
+							dark filled square 
 							emit-value
 							map-options
 							multiple 
@@ -173,7 +173,7 @@
 				<!-- VALUE -->
 				<div class="form-item mb-3">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="Initial value"
 						autocomplete="off"  
 						id="value" 
@@ -188,7 +188,7 @@
 				<!-- STARTING LEVELS -->
 				<div class="form-item mb-3" v-if="modifier.origin.split('.')[0] !== 'class'">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						label="Starting level"
 						autocomplete="off"  
 						id="start"
@@ -202,7 +202,7 @@
 
 				<!-- SCALING TYPE -->
 				<div class="form-item mb-3">
-					<q-select dark filled square dense map-options emit-value v-model="modifier.scaling_type" :options="scaling_types" label="Scaling type" />
+					<q-select dark filled square map-options emit-value v-model="modifier.scaling_type" :options="scaling_types" label="Scaling type" />
 				</div>
 				
 				<!-- LEVEL SCALING -->
@@ -210,7 +210,7 @@
 					<div class="row q-col-gutter-md mb-2">
 						<div class="col-6">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Scale size"
 								autocomplete="off"  
 								id="size" 
@@ -222,7 +222,7 @@
 						</div>
 						<div class="col-6">
 							<q-input 
-								dark filled square dense
+								dark filled square
 								label="Scale value"
 								autocomplete="off"  
 								id="scale_value" 

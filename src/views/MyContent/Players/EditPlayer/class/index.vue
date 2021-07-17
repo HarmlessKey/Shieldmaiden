@@ -2,11 +2,31 @@
 	<div class="pb-3">
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
-			<h3 class="pointer" @click="experience_modal = !experience_modal">
+			<h3 class="pointer text-center" @click="experience_modal = !experience_modal">
 				Experience points: <b>{{ Class.experience_points }}</b> 
 				<small class="ml-2"><i class="fas fa-pencil-alt"></i></small>
 			</h3>
-			<hr>
+			<div class="xp-bar">
+				<div class="xp-level">
+					{{ calculatedLevel(Class.experience_points) }}
+				</div>
+				<q-linear-progress size="25px" :value="levelAdvancement(Class.experience_points)" color="primary">
+					<div class="absolute-full d-flex justify-between">
+						<q-separator color="gray-active" vertical v-for="i in 11" :key="i" />
+					</div>
+					<div class="absolute-full flex flex-center">
+						<div class="white text-shadow-3">
+							<hk-animated-integer :value="levelProgress(Class.experience_points)" /> /
+							{{ levelRequired(Class.experience_points) }}
+							({{ Math.floor(levelAdvancement(Class.experience_points) * 100) }}%)
+						</div>
+					</div>
+					
+				</q-linear-progress>
+				<div class="xp-level" v-if="calculatedLevel(Class.experience_points) < 20">
+					{{ calculatedLevel(Class.experience_points) + 1 }}
+				</div>
+			</div>
 		</div>
 
 		<!-- CLASSES -->
@@ -30,7 +50,7 @@
 						<div class="level">
 							<div class="form-item mb-3">
 								<q-input
-									dark filled square dense
+									dark filled square
 									label="Class"
 									@change="saveClassName(classKey)"
 									autocomplete="off"
@@ -41,7 +61,7 @@
 							</div>
 							<div class="form-item mb-3">
 								<q-input
-									dark filled square dense
+									dark filled square
 									label="Subclass"
 									@change="saveClassSubclass(classKey)"
 									autocomplete="off"
@@ -52,7 +72,7 @@
 							</div>
 							<div class="form-item mb-3">
 								<q-select
-									dark filled square dense
+									dark filled square
 									label="Level"
 									v-model="subclass.level"
 									:options="levels"
@@ -191,7 +211,7 @@
 								<div class="accordion-body">
 									<div class="form-item mb-3">
 										<q-select 
-											dark filled square dense
+											dark filled square
 											label="Caster type"
 											v-model="subclass.caster_type" 
 											:options="caster_types" 
@@ -202,7 +222,7 @@
 									</div>
 									<div class="form-item mb-3">
 										<q-select 
-											dark filled square dense
+											dark filled square
 											label="Spell casting ability"
 											v-model="subclass.casting_ability"
 											emit-value
@@ -213,7 +233,7 @@
 									</div>
 									<div class="form-item mb-3">
 										<q-select 
-											dark filled square dense
+											dark filled square
 											label="Spell knowledge"
 											v-model="subclass.spell_knowledge"
 											emit-value
@@ -330,201 +350,19 @@
 
 						<!-- CLASS FEATURES -->
 						<h3>{{ subclass.name || "Class" }} features</h3>
-
-						<template >
-							<q-list dark square class="accordion hit_points" v-for="level in levels" :key="`features-${classKey}-${level}`">
-								<template v-if="subclass.level >= level">
-									<h4 class="feature-title">
-										Level {{ level }}
-										<a @click="addFeature(classKey, level)">Add feature</a>
-									</h4>
-									<template v-if="subclass.features">
-										<q-expansion-item
-											v-for="(feature, key, index) in subclass.features[`level_${level}`]"
-											:key="`feature-${key}`"
-											dark switch-toggle-side
-											:group="`features-${classKey}-${level}`"
-										>
-											<template v-slot:header>
-												<q-item-section avatar>
-													<q-icon size="xs" :name="subclass.features[`level_${level}`][key].display ? 'fas fa-eye' : 'fas fa-eye-slash'">
-														<q-tooltip anchor="top middle" self="center middle">
-															{{ subclass.features[`level_${level}`][key].display ? "Displayed on Sheet" : "Hidden on Sheet" }}
-														</q-tooltip>
-													</q-icon>
-												</q-item-section>
-												<q-item-section>
-													{{ 
-														key === "--asi" 
-															? `${subclass.features[`level_${level}`][key].type === 'asi' 
-																? `Ability Score Increase` 
-																: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
-															: feature.name 
-													}}
-												</q-item-section>
-												<q-item-section avatar>
-													<div class="actions">
-														<a class="gray-light mr-2"><i class="fas fa-pencil-alt"/></a>
-														<a 
-															class="gray-light" 
-															v-if="key !== '--asi'" 
-															@click="confirmDeleteFeature(classKey, level, key, feature.name)"
-														>
-															<i class="fas fa-trash-alt"/>
-														</a>
-													</div>
-												</q-item-section>
-											</template>
-
-											<div class="accordion-body">
-												<!-- FORCED FEATURE ON LEVELS 4, 8 12 16 and 19 -->
-												<template  v-if="key === '--asi'">
-													<p>
-														When you reach 4th level, and again at 8th, 12th, 16th, and 19th level, you can increase one ability score of your choice by 2, or you can increase two ability scores of your choice by 1.<br/>
-														You can’t increase an ability score above 20. (phb 15)
-													</p>
-													<p>Using the optional feats rule, you can forgo taking this feature to take a feat of your choice instead. (phb 165)</p>
-
-													<q-select
-														dark filled square dense
-														class="mb-3"
-														placeholder="ASI or Feat"
-														emit-value
-														map-options
-														:options="[
-															{ value: 'asi', label: 'Abilitiy Score Increase' }, 
-															{ value: 'feat', label: 'Feat' }
-														]"
-														@input="saveFeatureType(classKey, level, $event)"
-														:value="subclass.features[`level_${level}`][key].type"
-													/>
-												</template>
-
-												<!-- ASI -->	
-												<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
-													<p>Choose 2 abilities to increase with 1 point</p>
-													<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">
-														<q-select
-															dark filled square
-															:label="`Ability ${i}`"
-															:options="abilities"
-															emit-value
-															map-options
-															:value="asi_modifier(classKey, level, key, i).subtarget"
-															name="asi"
-															@input="saveASI($event, classKey, level, key, i)"
-														/>
-													</div>
-												</div>
-
-												<!-- CUSTOM FEATURE -->
-												<template v-else>
-													<div class="form-item mb-3">
-														<q-checkbox 
-															dark 
-															:value="subclass.features[`level_${level}`][key].display"
-															label="Display on character sheet" 
-															:false-value="null" 
-															indeterminate-value="something-else" 
-															@input="editFeature(classKey, level, key, 'display')"
-														/>
-													</div>
-													<div class="form-item mb-3">
-														<q-input 
-															dark filled square dense
-															@change="editFeature(classKey, level, key, 'name')"
-															autocomplete="off"  
-															:id="`name-${level}-${index}`" 
-															type="text" 
-															:value="subclass.features[`level_${level}`][key].name" 
-															:placeholder="key === 'asi' ? 'Feat name' : 'Feature name'"
-														/>
-													</div>
-
-													<div :for="`${classKey}-${level}-description`" class="mb-2">
-														Description
-													</div>
-													<q-editor
-														square dark
-														:toolbar="[
-															['bold', 'italic', 'underline'],
-															['unordered', 'ordered'],
-															['character', 'class'],
-															['preview']
-														]"
-														:ref="`description-${classKey}-${level}-${key}`"
-														@paste.native="evt => pasteCapture(evt, classKey, level, key)"
-														name="description"
-														:value="subclass.features[`level_${level}`][key].description"
-														v-validate="'max:5000'"
-														maxlength="5001"
-														data-vv-as="Description"
-														@blur="editFeature(classKey, level, key, 'description')"
-													>
-														<template v-slot:character>
-															<q-btn-dropdown
-																square dark dense no-caps
-																:ref="`character-${classKey}-${level}-${key}`"
-																no-wrap
-																unelevated
-																label="Character stats"
-																size="sm"
-															>
-																<div class="bg-gray gray-light">
-																	<q-list dense dark square>
-																		<template v-for="(stat_group, groupKey) in character_stats" >
-																			<q-item :key="`character-group-${classKey}-${level}-${key}-${groupKey}`">
-																				<span class="text-weight-bold text-white mt-2">{{ groupKey }}</span>
-																			</q-item>
-																		
-																			<q-item 
-																				v-for="({stat, ref}, statKey) in stat_group"
-																				:key="`character-stat-${classKey}-${level}-${key}-${groupKey}-${statKey}`"
-																				tag="label" 
-																				clickable @click="addStat('character', ref, classKey, level, key)"
-																			>
-																				<q-item-section class="pl-3">{{ stat }}</q-item-section>
-																			</q-item>
-																		</template>
-																	</q-list>
-																</div>
-															</q-btn-dropdown>
-														</template>
-														<template v-slot:preview>
-															<q-btn icon="fas fa-eye" size="sm" flat round padding="xs" @click="descriptionPreview(feature, classKey)">
-																<q-tooltip anchor="top middle" self="center middle">
-																	Preview
-																</q-tooltip>
-															</q-btn>
-														</template>
-													</q-editor>
-
-													<!-- Modifiers -->
-													<Modifier-table 
-														:modifiers="feature_modifiers(classKey, level, key)" 
-														:origin="`race.trait.${key}`"
-														:userId="userId"
-														:playerId="playerId"
-														:info="featureModInfo"
-														@edit="editModifier"
-													/>
-												</template>
-											</div>
-										</q-expansion-item>
-									</template>
-								</template>
-							</q-list>
-						</template>
+						<Features 
+							:playerId="playerId" 
+							:userId="userId" 
+							:subclass="subclass" 
+							:classKey="classKey" 
+							:modifiers="modifiers"
+							:classes="classes"
+						/>
 					</div>
 				</q-slide-transition>
 			</div>
 		</div>
 		<a @click="addClass()" class="d-block mt-4"><i class="fas fa-plus"/> Add a class</a>
-
-		<!-- MODIFIER MODAL -->
-		<q-dialog v-model="modifier_modal">
-      <Modifier :value="modifier" :userId="userId" :playerId="playerId" :classes="classes" @save="modifierSaved" />
-		</q-dialog>
 
 		<!-- ROLLED HP MODAL -->
 		<q-dialog v-model="roll_hp_modal" v-if="hit_point_type === 'rolled'">
@@ -533,13 +371,13 @@
 					<span>
 						Rolled HP {{ classes[editClass].name }}
 					</span>
-					<q-btn flat v-close-popup round dense icon="close" />
+					<q-btn flat v-close-popup round icon="close" />
 				</div>
 			
 				<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
 					<label :for="`level-${level}`">Level {{ level }}</label>
 					<q-input 
-						dark filled square dense
+						dark filled square
 						@change="setRolledHP(editClass, level)"
 						autocomplete="off" 
 						:id="`level-${level}`" 
@@ -564,21 +402,24 @@
 					<span>
 						Experience points
 					</span>
-					<q-btn flat v-close-popup round dense icon="close" />
+					<q-btn flat v-close-popup round icon="close" />
 				</div>
-				<h3 class="xp">{{ Class.experience_points }}<small>xp</small></h3>
+				<h3 class="xp">
+					<hk-animated-integer :value="Class.experience_points" /><small>xp</small>
+				</h3>
 				<div class="handle-xp">
 					<q-input 
-						dark filled square dense
+						dark filled square
 						autocomplete="off"
 						id="xp" 
 						type="number"
 						v-model="xp"
-						placeholder="Amount"/>
-						<div>
-							<a @click="handleXP('add')" class="btn bg-green">Add</a>
-							<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
-						</div>
+						placeholder="Amount"
+					/>
+					<div>
+						<a @click="handleXP('add')" class="btn bg-green">Add</a>
+						<a @click="handleXP('remove')" class="btn bg-red">Remove</a>
+					</div>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -590,7 +431,7 @@
 					<span>
 						Spells known 
 					</span>
-					<q-btn flat v-close-popup round dense icon="close" />
+					<q-btn flat v-close-popup round icon="close" />
 				</div>
 				<div class="spells-known" v-if="classes[editClass].spells_known">
 					<h3>Cantrips & Spells known</h3>
@@ -601,13 +442,13 @@
 									{{ i }}
 								</div>
 								<q-input 
-									dark filled square dense
+									dark filled square
 									v-model="classes[editClass].spells_known.cantrips[i]" 
 									:key="`cantrips-known-${i}`" @change="setSpellsKnown(editClass, 'cantrips', i)" 
 									:tabindex="`1${i < 10 ? `0${i}` : i}`"
 								/>
 								<q-input 
-									dark filled square dense
+									dark filled square
 									v-model="classes[editClass].spells_known.spells[i]"
 									:key="`spells-known-${i}`" @change="setSpellsKnown(editClass, 'spells', i)" 
 									:tabindex="`2${i < 10 ? `0${i}` : i}`"
@@ -637,11 +478,10 @@
 	import { spellSlots } from '@/mixins/spellSlots.js';
 	import { experience } from '@/mixins/experience.js';
 	import { general } from '@/mixins/general.js';
-	import ModifierTable from './modifier-table.vue';
-	import Modifier from './modifier.vue';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
 	import { characterDescriptions } from '@/mixins/characterDescriptions.js';
+	import Features from "./features";
 
 	export default {
 		name: 'CharacterClass',
@@ -667,8 +507,7 @@
 		components: {
 			VueMarkdown,
 			GiveCharacterControl,
-			ModifierTable,
-			Modifier
+			Features
 		},
 		data() {
 			return {
@@ -678,7 +517,6 @@
 				spells_known_modal: false,
 				feature_preview: {},
 				description_dialog: false,
-				featureModInfo: "<p>These modifiers only apply to your character if it meets the level requirement for this class.</p>",
 				armor_types: [
 					{ value: "light", label: "Light armor" },
 					{ value: "medium", label: "Medium armor" },
@@ -701,85 +539,7 @@
 				editClass: 0,
 				showClass: 0,
 				xp: undefined,
-				edit_feature_description: undefined,
-				character_stats: {
-					'General': [
-						{
-							stat: "Proficiency bonus",
-							ref: "[proficiency]"
-						},
-						{
-							stat: "Character level",
-							ref: "[character_level]"
-						}
-					],
-					'Class': [
-						{
-							stat: "Class level",
-							ref: "[class_level]"
-						},
-						{
-							stat: "Spell attack modifier",
-							ref: "[spell_attack]"
-						},
-						{
-							stat: "Spell save DC",
-							ref: "[spell_save_dc]"
-						}
-					],
-					'Ability scores': [
-						{
-							stat: "Strength",
-							ref: "[str]"
-						},
-						{
-							stat: "Dexterity",
-							ref: "[dex]"
-						},
-						{
-							stat: "Constitution",
-							ref: "[con]"
-						},
-						{
-							stat: "Intelligence",
-							ref: "[int]"
-						},
-						{
-							stat: "Wisdom",
-							ref: "[wis]"
-						},
-						{
-							stat: "Charisma",
-							ref: "[cha]"
-						},
-					],
-					'Ability modifiers': [
-						{
-							stat: "Strength modifier",
-							ref: "[str_mod]"
-						},
-						{
-							stat: "Dexterity modifier",
-							ref: "[dex_mod]"
-						},
-						{
-							stat: "Constitution modifier",
-							ref: "[con_mod]"
-						},
-						{
-							stat: "Intelligence modifier",
-							ref: "[int_mod]"
-						},
-						{
-							stat: "Wisdom modifier",
-							ref: "[wis_mod]"
-						},
-						{
-							stat: "Charisma modifier",
-							ref: "[cha_mod]"
-						},
-					]
-				}
+				edit_feature_description: undefined
 			}
 		},
 		computed: {
@@ -825,47 +585,23 @@
 		},
 		methods: {
 			...mapActions([
-				'setSlide'
+				"setSlide",
+				"set_xp",
+				"set_class_prop",
+				"add_feature"
 			]),
-			feature_modifiers(classKey, level, key) {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[1] == classKey && origin[2] == level && origin[3] === key;
-				});
-				return modifiers;
-			},
-			asi_modifier(classKey, level, key, index) {
-				const modifiers = this.modifiers.filter(mod => {
-					const origin = mod.origin.split(".");
-					return origin[1] == classKey && origin[2] == level && origin[3] == key && origin[4] == index;
-				});
-				return modifiers[0] || modifiers;
-			},
 			setShowClass(classKey){
 				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
 			},
-			editModifier(e) {
-				this.modifier_modal = true;
-				this.modifier = e.modifier;
-			},
-			modifierSaved() {
-				this.modifier_modal = false;
-				this.$emit("change", "modifier.saved");
-			},
+			
 			handleXP(type) {
 				if(this.xp) {
-					let newValue;
-					const currentVal = parseInt(this.Class.experience_points);
-					const change = parseInt(this.xp);
-
-					if(type === "add") {
-						newValue = currentVal + change;
-						newValue = (newValue > 355000) ? 355000 : newValue;
-					} else {
-						newValue = currentVal - change;
-						newValue = (newValue < 0) ? 0 : newValue;
-					}
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/experience_points`).set(newValue);
+					this.set_xp({
+						userId: this.userId,
+						key: this.playerId,
+						value: this.xp,
+						type
+					})
 					this.xp = undefined;
 				}
 			},
@@ -873,19 +609,15 @@
 				const value = parseInt(this.classes[classKey].level) + 1; 
 
 				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				if(value >= 4) {
-					const levels = [4, 8, 12, 16, 19];
-					for(const level of levels) {
-						if(value >= level) {
-							//If the object doesn't exist, create it
-							if(!this.classes[classKey].features || !this.classes[classKey].features[`level_${level}`] || !this.classes[classKey].features[`level_${level}`]['--asi']) {
-								db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/--asi/type`).set('asi');
-							}
-						}
-					}
-				}
+				this.setAsiFeature(classKey, value);
 
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/level`).set(value);
+				this.set_class_prop({
+					userId: this.userId,
+					key: this.playerId,
+					classKey,
+					property: "level",
+					value
+				});
 
 				//Open modal to roll HP
 				if(this.hit_point_type === "rolled") {
@@ -893,6 +625,28 @@
 					this.rolled_hp_modal = true;
 				}
 				this.$emit("change", "class.level_up");
+			},
+			setAsiFeature(classKey, value) {
+				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
+				if(value >= 4) {
+					const levels = [4, 8, 12, 16, 19];
+					for(const level of levels) {
+						if(value >= level) {
+							//If the object doesn't exist, create it
+							if(!this.classes[classKey].features || !this.classes[classKey].features[`level_${level}`] || !this.classes[classKey].features[`level_${level}`]['--asi']) {
+								const feature = { type: "asi" };
+								this.add_feature({
+									userId: this.userId,
+									key: this.playerId,
+									classKey,
+									level,
+									feature,
+									feature_key: "--asi"
+								});
+							}
+						}
+					}
+				}
 			},
 			classTotalHP(classKey, type) {
 				const hit_dice = this.dice_types.filter(dice => {
@@ -1051,24 +805,20 @@
 			},
 			saveClassLevel(key, value) {
 				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
-				if(value >= 4) {
-					const levels = [4, 8, 12, 16, 19];
-					for(const level of levels) {
-						if(value >= level) {
-							//If the object doesn't exist, create it
-							if(!this.classes[key].features || !this.classes[key].features[`level_${level}`] || !this.classes[key].features[`level_${level}`]['--asi']) {
-								db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}/--asi/type`).set('asi');
-							}
-						}
-					}
-				}
+				this.setAsiFeature(key, value);
 
 				//Check if rolled_hit_points exists and create it if not
 				if(this.hit_point_type === "rolled" && !this.classes[key].rolled_hit_points) {
 					const level = (key === 0) ? 2 : 1;
 					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/rolled_hit_points/${level}`).set(0);
 				}
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/level`).set(value);
+				this.set_class_prop({
+					userId: this.userId,
+					key: this.playerId,
+					classKey: key,
+					property: "level",
+					value
+				});
 				this.$emit("change", "class.level");
 			},
 			saveHitDice(key, value) {
@@ -1079,30 +829,6 @@
 				const value = (this.classes[key].base_armor_class) ? parseInt(this.classes[key].base_armor_class) : 0;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_armor_class`).set(value);
 				this.$emit("change", "class.armor_class");
-			},
-			addFeature(key, level) {
-				const feature = { name: `Level ${level} feature` }
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/features/level_${level}`).push(feature);
-			},
-			confirmDeleteFeature(classKey, level, key, name) {
-				this.$snotify.error('Are you sure you want to delete the the feature "' + name + '"?', 'Delete feature', {
-					buttons: [
-						{ text: 'Yes', action: (toast) => { this.deleteFeature(classKey, level, key); this.$snotify.remove(toast.id); }, bold: false},
-						{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-					]
-				});
-			},
-			deleteFeature(classKey, level, key) {
-				//Delete all modifiers linked to this feature
-				const linked_modifiers = this.feature_modifiers(classKey, level, key);
-
-				for(const modifier of linked_modifiers) {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
-				}
-
-				//Delete feature
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${key}`).remove();
-				this.$emit("change", "class.delete_feature");
 			},
 			confirmDeleteClass(classKey, name) {
 				this.$snotify.error(
@@ -1130,56 +856,8 @@
 					this.$emit("change", "class.delete_class");
 				}
 			},
-			/**
-			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19
-			 * Eiter Ability Score Improvement or Feat 
-			 **/
-			saveFeatureType(classKey, level, value) {
-				const linked_modifiers = this.feature_modifiers(classKey, level, '--asi');
-
-				//Delete linked modifiers when changing type
-				for(const modifier of linked_modifiers) {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
-				}				
-
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/--asi`).set({ type: value });
-				this.$emit("change", `class.edit_feature_level_${level}`);
-			},
-			saveASI(value, classKey, level, featureKey, index) {
-				const ability = (value) ? value : null;
-				const newModifier = {
-					origin: `class.${classKey}.${level}.${featureKey}.${index}`,
-					type: "bonus",
-					target: "ability",
-					subtarget: ability,
-					value: 1
-				}
-				if(this.asi_modifier(classKey, level, featureKey, index).subtarget) {
-					const mod_key = this.asi_modifier(classKey, level, featureKey, index)['.key'];
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${mod_key}`).update(newModifier);
-				} else {
-					db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
-				}
-				this.$emit("change", `class.set_asi.${level}`);
-			},
-			editFeature(classKey, level, featureKey, prop) {
-				let value = this.classes[classKey].features[`level_${level}`][featureKey][prop];
-
-				if(prop === 'display') {
-					//when the value doesn't exist, it's false, and needs to be set to true
-					//So check if undefined and set to true if it was
-					value = (value === undefined) ? true : !value;
-
-					//Delete the prop if it was false
-					value = (!value) ? null : value;
-				}
-
-				//Remove value if undefined
-				if(value === undefined) value = null;
-
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/${featureKey}/${prop}`).set(value);
-				this.$emit("change", "class.edit_feature");
-			},
+			
+			
 			addClass() {
 				let newClass = {
 					level: 1
@@ -1242,6 +920,30 @@
 			font-family: 'Fredericka the Great', cursive !important;
 		}
 	}
+	.xp-bar {
+		display: flex;
+		justify-content: space-between;
+
+		.xp-level {
+			font-family: 'Fredericka the Great', cursive !important;
+			color: $white;
+			font-size: 18px;
+
+			&:first-child {
+				padding-right: 10px;
+			}
+			&:last-child {
+				padding-left: 10px;
+			}
+		}
+
+		.q-linear-progress {
+			.white {
+				line-height: 25px;
+				font-size: 15px;
+			}
+		}
+	}
 	h3 {
 		font-family: 'Fredericka the Great', cursive !important;
 		font-size: 25px !important;
@@ -1267,7 +969,7 @@
 			}
 		}
 	}
-	.modal {
+	.card-body {
 		h3.xp {
 			margin-top: 0px !important;
 			font-size: 40px !important;
@@ -1283,19 +985,6 @@
 		display: flex;
 		justify-content: center;
 
-		.q-field {
-			height: 77px;
-			margin-right: 1px;
-			max-width: 150px;
-
-			&__control {
-				height: 90px;
-
-				input {
-					text-align: center;
-				}
-			}
-		}
 		a {
 			display: block;
 			margin-bottom: 1px;
@@ -1375,14 +1064,6 @@
 	}
 	.hidden {
 		visibility: hidden;
-	}
-	h4.feature-title {
-		display: flex;
-		justify-content: space-between;
-		font-size: 18px;
-		padding-bottom: 5px;
-		margin-bottom: 1px;
-		border-bottom: solid 1px #5c5757;
 	}
 	.hk-card {
 		margin-bottom: 1px !important;

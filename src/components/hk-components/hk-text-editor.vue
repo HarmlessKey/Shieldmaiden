@@ -27,6 +27,8 @@
 					</q-tooltip>
 				</button>
 			</div>
+
+			<!-- LISTS -->
 			<div class="group">
 				<button @click="editor.chain().focus().toggleBulletList().run()" class="module" :class="{ 'is-active': editor.isActive('bulletList') }">
 					<i class="fas fa-list-ul" />
@@ -41,6 +43,113 @@
 					</q-tooltip>
 				</button>
 			</div>
+
+			<!-- TABLES -->
+			<div class="group">
+				<button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="module">
+					<i class="fas fa-table" />
+					<q-tooltip anchor="top middle" self="center middle">
+						Insert table
+					</q-tooltip>
+				</button>
+				<q-btn-dropdown
+					v-show="editor.can().addRowBefore()"
+					square dark no-caps
+					no-wrap
+					unelevated
+					label="Rows"
+					size="sm"
+				>
+					<div class="bg-gray gray-light">
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().addRowBefore()"
+								clickable @click="editor.chain().focus().addRowBefore().run()"
+							>
+								<q-item-section class="pl-3">
+									Add row before
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().addRowAfter()"
+								clickable @click="editor.chain().focus().addRowAfter().run()"
+							>
+								<q-item-section class="pl-3">
+									Add row after
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().deleteRow()"
+								clickable @click="editor.chain().focus().deleteRow().run()"
+							>
+								<q-item-section class="pl-3">
+									Delete row
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</div>
+				</q-btn-dropdown>
+
+				<q-btn-dropdown
+					v-show="editor.can().addColumnBefore()"
+					square dark no-caps
+					no-wrap
+					unelevated
+					label="Columns"
+					size="sm"
+				>
+					<div class="bg-gray gray-light">
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().addColumnBefore()"
+								clickable @click="editor.chain().focus().addColumnBefore().run()"
+							>
+								<q-item-section class="pl-3">
+									Add column before
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().addColumnAfter()"
+								clickable @click="editor.chain().focus().addColumnAfter().run()"
+							>
+								<q-item-section class="pl-3">
+									Add column after
+								</q-item-section>
+							</q-item>
+						</q-list>
+						<q-list dark square>
+							<q-item 
+								tag="label" 
+								v-if="editor.can().deleteColumn()"
+								clickable @click="editor.chain().focus().deleteColumn().run()"
+							>
+								<q-item-section class="pl-3">
+									Delete column
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</div>
+				</q-btn-dropdown>
+				<button @click="editor.chain().focus().deleteTable().run()" class="module" v-show="editor.can().deleteTable()">
+					<i class="fas fa-trash-alt" />
+					<q-tooltip anchor="top middle" self="center middle">
+						Delete table
+					</q-tooltip>
+				</button>
+			</div>
+
+			<!-- CHARACTER STATS -->
 			<div class="group">
 				<q-btn-dropdown
 					square dark no-caps
@@ -80,6 +189,10 @@
 	import { Editor, EditorContent } from "@tiptap/vue-2";
 	import StarterKit from "@tiptap/starter-kit";
 	import Underline from "@tiptap/extension-underline";
+	import Table from "@tiptap/extension-table";
+	import TableRow from "@tiptap/extension-table-row";
+	import TableCell from "@tiptap/extension-table-cell";
+	import TableHeader from "@tiptap/extension-table-header";
 
 	export default {
 		name: "hk-text-editor",
@@ -90,7 +203,7 @@
 			}
 		},
 		components: {
-			EditorContent,
+			EditorContent
 		},
 		data() {
 			return {
@@ -207,7 +320,13 @@
 			this.editor = new Editor({
 				extensions: [
 					StarterKit,
-					Underline
+					Underline,
+					Table.configure({
+						resizable: true,
+					}),
+					TableRow,
+					TableHeader,
+					TableCell,
 				],
 				content: this.value,
 				onUpdate: () => {
@@ -240,6 +359,7 @@
 			border-bottom: solid 1px $gray-hover;
 			display: flex;
 			justify-content: flex-start;
+			flex-wrap: wrap;
 
 			.group {
 				display: flex;
@@ -273,18 +393,55 @@
 						background-color: $gray-hover;
 					}
 				}
+
+				.q-btn__wrapper {
+					padding: 4px;
+				}
 			}
 		}
 		.editor-content {
 			max-height: 400px;
 			overflow: auto;
 			padding: 10px;
+			resize: vertical;
 
 			.ProseMirror {
 				line-height: 30px;
 
 				&:focus {
 					outline: none;
+				}
+
+				.tableWrapper {
+					padding: 1rem 0;
+					overflow-x: auto;
+
+					table {
+						display: table;
+						border-collapse: separate;
+						box-sizing: border-box;
+						text-indent: initial;
+						border-spacing: 2px;
+						border-color: $gray-hover;
+
+						th, td {
+							min-width: 1em;
+							background: $gray-hover;
+							padding: 3px 5px;
+							vertical-align: top;
+							box-sizing: border-box;
+							position: relative;
+
+							p {
+								margin: 0;
+							}
+						}
+						th {
+							text-align: left;
+							font-weight: bold;
+							background: $gray-dark;
+						}
+					}
 				}
 			}
 		}

@@ -1079,7 +1079,7 @@ html body {
 			}
 		}
 	}
-	table.table, table {
+	table.table {
 		border-collapse: separate !important; 
 		border-spacing: 0 1px;
 		width: 100%;
@@ -1434,7 +1434,7 @@ html body {
 				}
 			}
 		}
-		table {
+		table.table {
 			tr {
 				td {
 					background-color: $gray-darker;
@@ -1848,6 +1848,7 @@ html body {
 	.q-notifications__list--top {
 		top: 120px;
 	}
+	
 
 	//RESPONSIVENESS
 	/*-----------------------------------*/

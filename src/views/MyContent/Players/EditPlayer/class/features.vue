@@ -116,7 +116,12 @@
 									<div :for="`${classKey}-${level}-description`" class="mb-2">
 										Description
 									</div>
-									<q-editor
+									<hk-text-editor 
+										:value="subclass.features[`level_${level}`][key].description"
+										@change="editFeature(classKey, level, key, 'description', $event)"
+									/>
+
+									<!-- <q-editor
 										square dark
 										:toolbar="[
 											['bold', 'italic', 'underline'],
@@ -169,7 +174,7 @@
 												</q-tooltip>
 											</q-btn>
 										</template>
-									</q-editor>
+									</q-editor> -->
 
 									<!-- Modifiers -->
 									<Modifier-table 
@@ -196,10 +201,11 @@
 </template>
 
 <script>
-	import { abilities } from '@/mixins/abilities.js';
+	import { abilities } from "@/mixins/abilities.js";
 	import { mapActions } from "vuex";
-	import Modifier from '../modifier.vue';
-	import ModifierTable from '../modifier-table.vue';
+	import Modifier from "../modifier.vue";
+	import ModifierTable from "../modifier-table.vue";
+	import HkTextEditor from "@/components/hk-components/hk-text-editor";
 
 	export default {
 		name: "CharacterClassFeatures",
@@ -215,91 +221,13 @@
 		components: {
 			Modifier,
 			ModifierTable,
+			HkTextEditor
 		},
 		data() {
 			return {
 				modifier_modal: false,
 				modifier: {},
 				featureModInfo: "<p>These modifiers only apply to your character if it meets the level requirement for this class.</p>",
-				character_stats: {
-					'General': [
-
-						{
-							stat: "Proficiency bonus",
-							ref: "[proficiency]"
-						},
-						{
-							stat: "Character level",
-							ref: "[character_level]"
-						}
-					],
-					'Class': [
-						{
-							stat: "Class level",
-							ref: "[class_level]"
-						},
-						{
-							stat: "Spell attack modifier",
-							ref: "[spell_attack]"
-						},
-						{
-							stat: "Spell save DC",
-							ref: "[spell_save_dc]"
-						}
-					],
-					'Ability scores': [
-						{
-							stat: "Strength",
-							ref: "[str]"
-						},
-						{
-							stat: "Dexterity",
-							ref: "[dex]"
-						},
-						{
-							stat: "Constitution",
-							ref: "[con]"
-						},
-						{
-							stat: "Intelligence",
-							ref: "[int]"
-						},
-						{
-							stat: "Wisdom",
-							ref: "[wis]"
-						},
-						{
-							stat: "Charisma",
-							ref: "[cha]"
-						},
-					],
-					'Ability modifiers': [
-						{
-							stat: "Strength modifier",
-							ref: "[str_mod]"
-						},
-						{
-							stat: "Dexterity modifier",
-							ref: "[dex_mod]"
-						},
-						{
-							stat: "Constitution modifier",
-							ref: "[con_mod]"
-						},
-						{
-							stat: "Intelligence modifier",
-							ref: "[int_mod]"
-						},
-						{
-							stat: "Wisdom modifier",
-							ref: "[wis_mod]"
-						},
-						{
-							stat: "Charisma modifier",
-							ref: "[cha_mod]"
-						},
-					]
-				}
 			}
 		},
 		computed: {

@@ -207,13 +207,13 @@
 	import { db } from '@/firebase';
 	import { abilities } from '@/mixins/abilities.js';
 	import { weapons } from '@/mixins/armorAndWeapons.js';
-	import { damageTypes } from '@/mixins/damageTypes.js';
+	import { damage_types } from '@/mixins/damageTypes.js';
 	import Weapon from './weapon.vue'
 	import Armor from './armor.vue'
 
 	export default {
 		name: 'Equipment',
-		mixins: [abilities, weapons, damageTypes],
+		mixins: [abilities, weapons, damage_types],
 		props: [
 			"equipment",
 			"modifiers",

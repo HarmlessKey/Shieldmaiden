@@ -146,11 +146,11 @@
 
 <script>
 	import { abilities } from '@/mixins/abilities.js';
-	import { damageTypes } from '@/mixins/damageTypes.js';
+	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
 		name: 'Weapon',
-		mixins: [abilities, damageTypes],
+		mixins: [abilities, damage_types],
 		props: {
 			value: {
 				type: Object,

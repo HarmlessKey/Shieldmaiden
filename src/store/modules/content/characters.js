@@ -130,16 +130,28 @@ export const content_characters = {
         console.error(error);
       }
     },
-    add_feature({ commit }, { userId, key, classKey, level, feature, feature_key }) {
+
+    /**
+     * Adds a new feature, or completely overwrites an existing feature with a new object
+     * 
+     * @param {string} userId userId of the owner of the character
+     * @param {string} key key of the character
+     * @param {string} classKey key of the class
+     * @param {string} level class level that the feature is linked to
+     * @param {object} feature the full feature object
+     * @param {string} feature_key key of the feature that has to be overwritten
+     * 
+     */
+    set_feature({ commit }, { userId, key, classKey, level, feature, feature_key }) {
       try {
         if(!feature_key) {
           characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}`).push(feature).then(res => {
             const feature_key = res.getKey(); //Returns the key of the added entry
-            commit("ADD_FEATURE", { userId, key, classKey, level, feature_key, feature });
+            commit("SET_FEATURE", { userId, key, classKey, level, feature_key, feature });
           });
         } else {
           characters_ref.child(`${userId}/${key}/class/classes/${classKey}/features/level_${level}/${feature_key}`).set(feature);
-          commit("ADD_FEATURE", { userId, key, classKey, level, feature_key, feature });
+          commit("SET_FEATURE", { userId, key, classKey, level, feature_key, feature });
         }
       } catch(error) {
         console.error(error);
@@ -229,7 +241,12 @@ export const content_characters = {
     SET_CLASS_PROP(state, {userId, key, classKey, property, value}) {
       Vue.set(state.characters[userId][key].class.classes[classKey], property, value);
     },
-    ADD_FEATURE(state, { userId, key, classKey, level, feature_key, feature }) {
+    
+    // FEATURES
+    SET_FEATURE_PROP(state, {userId, key, classKey, level, feature_key, property, value}) {
+      Vue.set(state.characters[userId][key].class.classes[classKey].features[`level_${level}`][feature_key], property, value);
+    },
+    SET_FEATURE(state, { userId, key, classKey, level, feature_key, feature }) {
       if(!state.characters[userId][key].class.classes[classKey].features) {
         Vue.set(state.characters[userId][key].class.classes[classKey], "features", {});
       }
@@ -237,11 +254,6 @@ export const content_characters = {
         Vue.set(state.characters[userId][key].class.classes[classKey].features, `level_${level}`, {});
       }
       Vue.set(state.characters[userId][key].class.classes[classKey].features[`level_${level}`], feature_key, feature);
-    },
-
-    // FEATURES
-    SET_FEATURE_PROP(state, {userId, key, classKey, level, feature_key, property, value}) {
-      Vue.set(state.characters[userId][key].class.classes[classKey].features[`level_${level}`][feature_key], property, value);
     },
     DELETE_FEATURE(state, { userId, key, classKey, level, feature_key }) {
       Vue.delete(state.characters[userId][key].class.classes[classKey].features[`level_${level}`], feature_key);

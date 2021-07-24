@@ -307,10 +307,12 @@
 		},
 		methods: {
 			...mapActions([
-				"add_feature",
+				"set_feature",
 				"set_feature_prop",
 				"delete_feature",
-				"delete_modifier"
+				"delete_modifier",
+				"add_modifier",
+				"edit_modifier"
 			]),
 			feature_modifiers(classKey, level, key) {
 				const modifiers = this.modifiers.filter(mod => {
@@ -330,7 +332,7 @@
 				if(!feature) {
 					feature = { name: `Level ${level} feature` }
 				}
-				this.add_feature({
+				this.set_feature({
 					userId: this.userId,
 					key: this.playerId,
 					classKey: key,
@@ -391,39 +393,57 @@
 			 * Save the type of feature that is chosen at levels 4, 8, 12, 16, 19
 			 * Eiter Ability Score Improvement or Feat 
 			 **/
-			// saveFeatureType(classKey, level, value) {
-			// 	const linked_modifiers = this.feature_modifiers(classKey, level, '--asi');
+			saveFeatureType(classKey, level, value) {
+				const linked_modifiers = this.feature_modifiers(classKey, level, '--asi');
 
-			// 	//Delete linked modifiers when changing type
-			// 	for(const modifier of linked_modifiers) {
-			// 		this.delete_modifier({
-			// 			userId: this.userId,
-			// 			key: this.playerId,
-			// 			modifier_key: modifier['.key']
-			// 		});
-			// 	}				
+				//Delete linked modifiers when changing type
+				for(const modifier of linked_modifiers) {
+					this.delete_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier_key: modifier['.key']
+					});
+				}
+				
+				this.set_feature({
+					userId: this.userId,
+					key: this.playerId,
+					classKey,
+					level,
+					feature: { type: value },
+					feature_key: "--asi"
+				});
 
-			// 	db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/features/level_${level}/--asi`).set({ type: value });
-			// 	this.$emit("change", `class.edit_feature_level_${level}`);
-			// },
+				this.$emit("change", `class.edit_feature_level_${level}`);
+			},
 			
-			// saveASI(value, classKey, level, featureKey, index) {
-			// 	const ability = (value) ? value : null;
-			// 	const newModifier = {
-			// 		origin: `class.${classKey}.${level}.${featureKey}.${index}`,
-			// 		type: "bonus",
-			// 		target: "ability",
-			// 		subtarget: ability,
-			// 		value: 1
-			// 	}
-			// 	if(this.asi_modifier(classKey, level, featureKey, index).subtarget) {
-			// 		const mod_key = this.asi_modifier(classKey, level, featureKey, index)['.key'];
-			// 		db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${mod_key}`).update(newModifier);
-			// 	} else {
-			// 		db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers`).push(newModifier);
-			// 	}
-			// 	this.$emit("change", `class.set_asi.${level}`);
-			// },
+			saveASI(value, classKey, level, featureKey, index) {
+				const ability = (value) ? value : null;
+				const newModifier = {
+					origin: `class.${classKey}.${level}.${featureKey}.${index}`,
+					type: "bonus",
+					target: "ability",
+					subtarget: ability,
+					value: 1
+				}
+				if(this.asi_modifier(classKey, level, featureKey, index).subtarget) {
+					const modifier_key = this.asi_modifier(classKey, level, featureKey, index)['.key'];
+
+					this.edit_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier_key,
+						modifier: newModifier
+					});
+				} else {
+					this.add_modifier({
+						userId: this.userId,
+						key: this.playerId,
+						modifier: newModifier
+					});
+				}
+				this.$emit("change", `class.set_asi.${level}`);
+			},
 			
 			editModifier(e) {
 				this.modifier_modal = true;

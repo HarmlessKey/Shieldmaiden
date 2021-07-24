@@ -357,6 +357,7 @@
 							:classKey="classKey" 
 							:modifiers="modifiers"
 							:classes="classes"
+							@change="emitChange"
 						/>
 					</div>
 				</q-slide-transition>
@@ -590,10 +591,12 @@
 				"set_class_prop",
 				"add_feature"
 			]),
+			emitChange(value) {
+				this.$emit("change", value)
+			},
 			setShowClass(classKey){
 				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
-			},
-			
+			},		
 			handleXP(type) {
 				if(this.xp) {
 					this.set_xp({

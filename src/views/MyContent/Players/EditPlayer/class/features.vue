@@ -118,6 +118,7 @@
 									</div>
 									<hk-text-editor 
 										:value="subclass.features[`level_${level}`][key].description"
+										:toolbar="['bold', 'italic', 'underline', 'ul', 'ol', 'table', 'character']"
 										@change="editFeature(classKey, level, key, 'description', $event)"
 									/>
 
@@ -227,11 +228,8 @@
 			return {
 				modifier_modal: false,
 				modifier: {},
-				featureModInfo: "<p>These modifiers only apply to your character if it meets the level requirement for this class.</p>",
+				featureModInfo: "These modifiers only apply to your character if it meets the level requirement for this class.",
 			}
-		},
-		computed: {
-			
 		},
 		methods: {
 			...mapActions([
@@ -270,8 +268,6 @@
 			},
 
 			editFeature(classKey, level, feature_key, property, value) {
-				// let value = this.classes[classKey].features[`level_${level}`][feature_key][property];
-
 				console.log(value)
 
 				this.set_feature_prop({

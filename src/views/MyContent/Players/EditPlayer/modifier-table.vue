@@ -4,20 +4,10 @@
 			<span>
 				{{ title ? title : "Modifiers" }} 
 				{{ modifiers.length > 0 ? `( ${modifiers.length} )` : `` }}
-				<a v-if="info">
-					<q-icon name="info" >
-						<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-							<q-card dark square>
-								<q-card-section class="bg-gray-active">
-									<b>{{ title ? title : "Modifiers" }}</b>
-								</q-card-section>
-								<q-card-section>
-									<div v-html="info" />
-								</q-card-section>
-							</q-card>
-						</q-menu>
-					</q-icon>
-				</a>
+
+				<hk-popover v-if="info" :header="title ? title : 'Modifiers'" :content="info">
+					<q-icon name="info blue" />
+				</hk-popover>
 			</span>
 			<a @click="newModifier(origin), modal = true">
 				<i class="fas fa-plus green" />
@@ -39,20 +29,20 @@
 				<template v-else-if="data.row.type === 'expertise'">Expertise</template>
 			</template>
 			<div slot="actions" slot-scope="data" class="actions">
-					<a class="gray-hover mx-1" 
-						@click="editModifier(data.row)">
-						<i class="fas fa-pencil"></i>
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit modifier
-						</q-tooltip>
-					</a>
-					<a class="gray-hover" @click="deleteModifier(data.row['.key'])">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete modifier
-							</q-tooltip>
-					</a>
-				</div>
+				<a class="gray-hover mx-1" 
+					@click="editModifier(data.row)">
+					<i class="fas fa-pencil"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Edit modifier
+					</q-tooltip>
+				</a>
+				<a class="gray-hover" @click="deleteModifier(data.row['.key'])">
+					<i class="fas fa-trash-alt"></i>
+					<q-tooltip anchor="top middle" self="center middle">
+						Delete modifier
+					</q-tooltip>
+				</a>
+			</div>
 		</hk-table>
 	</div>
 </template>

@@ -1,26 +1,35 @@
 <template>
 	<div class="hk-text-editor">
 		<div v-if="editor" class="menubar">
-			<div class="group">
-				<!-- <button v-for="({label, icon, action}, key) in modules " @click="action" :class="{ 'is-active': editor.isActive(key) }" :key="`module-${key}`">
-					<i :class="icon" />
-					<q-tooltip anchor="top middle" self="center middle">
-						{{ label }}
-					</q-tooltip>
-				</button> -->
-				<button @click="editor.chain().focus().toggleBold().run()" class="module" :class="{ 'is-active': editor.isActive('bold') }">
+			<div class="group" v-if="toolbar.some(item => ['bold', 'italic', 'underline'].includes(item))">
+				<button 
+					v-if="toolbar.includes('bold')"
+					class="module" 
+					:class="{ 'is-active': editor.isActive('bold') }"
+					@click="editor.chain().focus().toggleBold().run()" 
+				>
 					<i class="fas fa-bold" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Bold
 					</q-tooltip>
 				</button>
-				<button @click="editor.chain().focus().toggleItalic().run()" class="module" :class="{ 'is-active': editor.isActive('italic') }">
+				<button 
+					v-if="toolbar.includes('italic')"
+					class="module" 
+					:class="{ 'is-active': editor.isActive('italic') }"
+					@click="editor.chain().focus().toggleItalic().run()" 
+				>
 					<i class="fas fa-italic" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Italic
 					</q-tooltip>
 				</button>
-				<button @click="editor.chain().focus().toggleUnderline().run()" class="module" :class="{ 'is-active': editor.isActive('underline') }">
+				<button 
+					v-if="toolbar.includes('underline')"
+					class="module" 
+					:class="{ 'is-active': editor.isActive('underline') }"
+					@click="editor.chain().focus().toggleUnderline().run()" 
+				>
 					<i class="fas fa-underline" />
 					<q-tooltip anchor="top middle" self="center middle">
 						Underline
@@ -29,7 +38,7 @@
 			</div>
 
 			<!-- LISTS -->
-			<div class="group">
+			<div class="group" v-if="toolbar.some(item => ['ul', 'ol'].includes(item))">
 				<button @click="editor.chain().focus().toggleBulletList().run()" class="module" :class="{ 'is-active': editor.isActive('bulletList') }">
 					<i class="fas fa-list-ul" />
 					<q-tooltip anchor="top middle" self="center middle">
@@ -45,7 +54,7 @@
 			</div>
 
 			<!-- TABLES -->
-			<div class="group">
+			<div class="group" v-if="toolbar.includes('table')">
 				<button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()" class="module">
 					<i class="fas fa-table" />
 					<q-tooltip anchor="top middle" self="center middle">
@@ -96,7 +105,7 @@
 						</q-list>
 					</div>
 				</q-btn-dropdown>
-
+				
 				<q-btn-dropdown
 					v-show="editor.can().addColumnBefore()"
 					square dark no-caps
@@ -150,7 +159,7 @@
 			</div>
 
 			<!-- CHARACTER STATS -->
-			<div class="group">
+			<div class="group" v-if="toolbar.includes('character')">
 				<q-btn-dropdown
 					square dark no-caps
 					no-wrap
@@ -200,6 +209,10 @@
 			value: {
 				type: String,
 				default: undefined
+			},
+			toolbar: {
+				type: Array,
+				default: () => ['bold', 'italic', 'underline']
 			}
 		},
 		components: {
@@ -289,17 +302,6 @@
 				}
 			}
 		},
-		computed: {
-			modules() {
-				return {
-					bold: {
-						label: "Bold",
-						icon: "fas fa-bold",
-						action: this.editor.chain().focus().toggleBold().run()
-					}
-				}
-			}
-		},
 		watch: {
 			value(value) {
 				// HTML
@@ -315,7 +317,6 @@
 				this.editor.commands.setContent(this.value, false)
 			},
 		},
-
 		mounted() {
 			this.editor = new Editor({
 				extensions: [
@@ -341,12 +342,8 @@
 				},
 			})
 		},
-
 		beforeDestroy() {
 			this.editor.destroy()
-		},
-		methods: {
-
 		}
 	}
 </script>
@@ -405,41 +402,42 @@
 			padding: 10px;
 			resize: vertical;
 
-			.ProseMirror {
-				line-height: 30px;
+			> div {
+				height: 100%;
 
-				&:focus {
-					outline: none;
-				}
-
-				.tableWrapper {
-					padding: 1rem 0;
-					overflow-x: auto;
-
-					table {
-						display: table;
-						border-collapse: separate;
-						box-sizing: border-box;
-						text-indent: initial;
-						border-spacing: 2px;
-						border-color: $gray-hover;
-
-						th, td {
-							min-width: 1em;
-							background: $gray-hover;
-							padding: 3px 5px;
-							vertical-align: top;
-							box-sizing: border-box;
-							position: relative;
-
-							p {
-								margin: 0;
+				.ProseMirror {
+					line-height: 30px;
+					height: 100%;
+	
+					&:focus {
+						outline: none;
+					}
+	
+					.tableWrapper {
+						padding: 1rem 0;
+						overflow-x: auto;
+	
+						table {
+							display: table;
+							border-collapse: separate;
+							border-spacing: 1px;
+	
+							th, td {
+								padding: 5px;
+								background: $gray-hover;
+								vertical-align: top;
+								position: relative;
+								color: $white;
+	
+								p {
+									margin: 0;
+								}
 							}
-						}
-						th {
-							text-align: left;
-							font-weight: bold;
-							background: $gray-dark;
+							th {
+								text-align: left;
+								font-weight: bold;
+								background: $gray-dark;
+							}
 						}
 					}
 				}

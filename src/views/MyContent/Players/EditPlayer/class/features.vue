@@ -115,67 +115,26 @@
 
 									<div :for="`${classKey}-${level}-description`" class="mb-2">
 										Description
+										<a v-if="edit_description === `${level}-${key}`" @click="edit_description = undefined" class="ml-2">
+											<i class="fas fa-times red" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Cancel
+											</q-tooltip>
+										</a>
+										<a v-else @click="edit_description = `${level}-${key}`" class="ml-2">
+											<i class="fas fa-pencil-alt" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Edit
+											</q-tooltip>
+										</a>
 									</div>
-									<hk-text-editor 
+									<hk-text-editor
+										v-if="edit_description === `${level}-${key}`"
 										:value="subclass.features[`level_${level}`][key].description"
 										:toolbar="['bold', 'italic', 'underline', 'ul', 'ol', 'table', 'character']"
-										@change="editFeature(classKey, level, key, 'description', $event)"
+										@save="editFeature(classKey, level, key, 'description', $event), edit_description = undefined"
 									/>
-
-									<!-- <q-editor
-										square dark
-										:toolbar="[
-											['bold', 'italic', 'underline'],
-											['unordered', 'ordered'],
-											['character', 'class'],
-											['preview']
-										]"
-										:ref="`description-${classKey}-${level}-${key}`"
-										@paste.native="evt => pasteCapture(evt, classKey, level, key)"
-										name="description"
-										:value="subclass.features[`level_${level}`][key].description"
-										v-validate="'max:5000'"
-										maxlength="5001"
-										data-vv-as="Description"
-										@blur="value => editFeature(classKey, level, key, 'description', value)"
-									>
-										<template v-slot:character>
-											<q-btn-dropdown
-												square dark no-caps
-												:ref="`character-${classKey}-${level}-${key}`"
-												no-wrap
-												unelevated
-												label="Character stats"
-												size="sm"
-											>
-												<div class="bg-gray gray-light">
-													<q-list dark square>
-														<template v-for="(stat_group, groupKey) in character_stats" >
-															<q-item :key="`character-group-${classKey}-${level}-${key}-${groupKey}`">
-																<span class="text-weight-bold text-white mt-2">{{ groupKey }}</span>
-															</q-item>
-														
-															<q-item 
-																v-for="({stat, ref}, statKey) in stat_group"
-																:key="`character-stat-${classKey}-${level}-${key}-${groupKey}-${statKey}`"
-																tag="label" 
-																clickable @click="addStat('character', ref, classKey, level, key)"
-															>
-																<q-item-section class="pl-3">{{ stat }}</q-item-section>
-															</q-item>
-														</template>
-													</q-list>
-												</div>
-											</q-btn-dropdown>
-										</template>
-										<template v-slot:preview>
-											<q-btn icon="fas fa-eye" size="sm" flat round padding="xs" @click="descriptionPreview(feature, classKey)">
-												<q-tooltip anchor="top middle" self="center middle">
-													Preview
-												</q-tooltip>
-											</q-btn>
-										</template>
-									</q-editor> -->
+									<div v-else class="description" v-html="replaceDescriptionStats(subclass.features[`level_${level}`][key].description, classKey)" />
 
 									<!-- Modifiers -->
 									<Modifier-table 
@@ -207,10 +166,11 @@
 	import Modifier from "../modifier.vue";
 	import ModifierTable from "../modifier-table.vue";
 	import HkTextEditor from "@/components/hk-components/hk-text-editor";
+	import { characterDescriptions } from '@/mixins/characterDescriptions.js';
 
 	export default {
 		name: "CharacterClassFeatures",
-		mixins: [abilities],
+		mixins: [abilities, characterDescriptions],
 		props: [
 			"playerId",
 			"userId",
@@ -227,6 +187,7 @@
 		data() {
 			return {
 				modifier_modal: false,
+				edit_description: false,
 				modifier: {},
 				featureModInfo: "These modifiers only apply to your character if it meets the level requirement for this class.",
 			}

@@ -187,6 +187,12 @@
 					</div>
 				</q-btn-dropdown>
 			</div>
+
+			<div class="group actions" v-if="this.value !== this.newValue">
+				<button class="module" @click="save">
+					<i class="fas fa-check green mr-1" /> Save
+				</button>
+			</div>
 		</div>
 		<div class="editor-content">
 			<editor-content :editor="editor" spellcheck="false" />
@@ -221,6 +227,7 @@
 		data() {
 			return {
 				editor: null,
+				newValue: this.value,
 				character_stats: {
 					'General': [
 
@@ -317,6 +324,11 @@
 				this.editor.commands.setContent(this.value, false)
 			},
 		},
+		methods: {
+			save() {
+				this.$emit("save", this.newValue);
+			}
+		},
 		mounted() {
 			this.editor = new Editor({
 				extensions: [
@@ -332,6 +344,7 @@
 				content: this.value,
 				onUpdate: () => {
 					// HTML
+					this.newValue = this.editor.getHTML();
 					this.$emit('input', this.editor.getHTML())
 
 					// JSON
@@ -357,6 +370,7 @@
 			display: flex;
 			justify-content: flex-start;
 			flex-wrap: wrap;
+			padding-right: 70px;
 
 			.group {
 				display: flex;
@@ -372,7 +386,6 @@
 					border: none;
 					background: none;
 					color: $white;
-					width: 25px;
 					height: 25px;
 					line-height: 25px;
 					text-align: center;
@@ -393,6 +406,11 @@
 
 				.q-btn__wrapper {
 					padding: 4px;
+				}
+
+				&.actions {
+					position: absolute;
+					right: 21px;
 				}
 			}
 		}

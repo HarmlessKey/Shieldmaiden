@@ -459,13 +459,6 @@
 				</div>
 			</hk-card>
 		</q-dialog>
-
-			<!-- SPELLS KNOWN MODAL -->
-			<q-dialog v-model="description_dialog" v-if="description_dialog">
-				<hk-card :header="feature_preview.feature.name">
-					<div v-html="replaceDescriptionStats(feature_preview.feature.description, computed.sheet ? computed.sheet.classes[feature_preview.classKey] : undefined)" />
-				</hk-card>
-			</q-dialog>
 	</div>
 </template>
 
@@ -481,7 +474,6 @@
 	import { general } from '@/mixins/general.js';
 	import { db } from '@/firebase';
 	import { dice } from '@/mixins/dice.js';
-	import { characterDescriptions } from '@/mixins/characterDescriptions.js';
 	import Features from "./features";
 
 	export default {
@@ -493,8 +485,7 @@
 			skills, 
 			dice, 
 			spellSlots, 
-			experience,
-			characterDescriptions
+			experience
 		],
 		props: [
 			"base_class",

@@ -18,9 +18,9 @@
 						<template v-else>{{ tier.benefits.players }}</template>	
 						)
 				</span>
-				<a v-if="!overencumbered" to="/players/add-player" @click="addPlayer()">
+				<router-link v-if="!overencumbered" to="/players/add-player">
 					<i class="fas fa-plus green"></i> New Player
-				</a>
+				</router-link>
 			</h2>
 
 
@@ -30,13 +30,13 @@
 				:search="['character_name', 'campaign_name']"
 			>
 				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.row.display.avatar" :style="{ backgroundImage: 'url(\'' + data.row.display.avatar + '\')' }"></div>
+					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
 					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" :to="'/players/' + data.row.key">
-						{{ data.row.display.character_name }}
+					<router-link class="mx-2"  :to="'/players/' + data.row.key">
+						{{ data.item }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
@@ -48,7 +48,7 @@
 				</template>
 
 				<template slot="level" slot-scope="data">
-					{{ data.row.display.level }}
+					{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
@@ -173,52 +173,17 @@
 			}
 		},
 		methods: {
-			addPlayer() {
-				const character_base = {
-					general: {
-						character_name: "Unnamed Character",
-						advancement: "milestone",
-						hit_point_type: "fixed"
-					},
-					class: {
-						classes: {
-							0: {
-								level: 1
-							}
-						}
-					}
-				}
-				const character_computed = {
-					display: {
-						character_name: "Unnamed Character",
-						level: 1
-					}
-				}
-
-				//Add if not overencumbered
-				if(!this.overencumbered) {
-					db.ref(`characters_base/${this.userId}`).push(character_base).then(res => {
-						//Returns the key of the added entry
-						const key = res.getKey();
-
-						db.ref(`characters_computed/${this.userId}/${key}`).set(character_computed);
-						this.$router.replace(`/players/${key}`)
-					});
-				}
-			},
-			confirmDelete(key, player) {
-				this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
-					timeout: false,
-					buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key, player)
-							this.$snotify.remove(toast.id); 
-							}, 
-							bold: false
-						},
-						{
-							text: 'No', action: (toast) => { 
+			confirmDelete(e, key, player) {
+				//Instantly delete when shift is held
+				if(e.shiftKey) {
+					this.deletePlayer(key, player);
+				} else {
+					this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
+						timeout: false,
+						buttons: [
+							{
+								text: 'Yes', action: (toast) => { 
+								this.deletePlayer(key, player)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -230,7 +195,8 @@
 								bold: true
 							},
 						]
-				});
+					});
+				}
 			},
 			deletePlayer(key, player) {
 				//Remove from character control
@@ -257,8 +223,7 @@
 					}
 				}
 				//Remove player
-				db.ref('characters_computed/' + this.userId).child(key).remove(); 
-				db.ref('characters_base/' + this.userId).child(key).remove(); 
+				db.ref('players/' + this.userId).child(key).remove(); 
 			}
 		}
 	}

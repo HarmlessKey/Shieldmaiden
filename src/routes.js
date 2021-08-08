@@ -1,8 +1,5 @@
 import { store } from './store/store';
 
-const Home = () => import('@/views/Home.vue');
-const SignedIn = () => import('@/components/home/SignedIn.vue');
-
 const Compendium = () => import('@/views/Compendium/Overview.vue');
 const View = () => import('@/views/Compendium/View.vue');
 const Monsters = () => import('@/views/Compendium/Monsters.vue');
@@ -58,7 +55,6 @@ const Npcs = () => import('@/views/MyContent/Npcs/Npcs.vue');
 const EditNpc = () => import('@/views/MyContent/Npcs/EditNpc.vue');
 const Items = () => import('@/views/MyContent/Items/Items.vue');
 const EditItem = () => import('@/views/MyContent/Items/EditItem.vue');
-const RunEncounter = () => import('@/views/MyContent/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
 
 // This is where you add all your site routes
@@ -69,7 +65,7 @@ const User = () => import('@/views/User.vue');
 export const routes = [{
 	path: '',
 	name: 'home',
-	component: Home,
+	component: () => import("@/views/Home.vue"),
 	meta: {
 		sidebar: false,
 		offline: true
@@ -78,7 +74,7 @@ export const routes = [{
 {
 	path: '/home',
 	name: 'landingpage',
-	component: Home,
+	component: () => import("@/views/Home.vue"),
 	meta: {
 		sidebar: false,
 		offline: true
@@ -87,7 +83,7 @@ export const routes = [{
 {
 	path: '/content',
 	name: 'content',
-	component: SignedIn,
+	component: () => import('@/components/home/SignedIn.vue'),
 	meta: {
 		requiresContribute: true,
 		requiresAuth: true,
@@ -97,7 +93,7 @@ export const routes = [{
 {
 	path: '/demo',
 	name: 'Demo',
-	component: RunEncounter,
+	component: () => import('@/views/MyContent/RunEncounter.vue'),
 	meta: {
 		sidebar: false,
 		offline: true
@@ -326,7 +322,7 @@ export const routes = [{
 {
 	path: '/poster',
 	name: 'poster',
-	component: Home,
+	component: () => import("@/views/Home.vue"),
 	beforeEnter(to, from, next) {
 		store.dispatch("setPoster")
 		next('/')
@@ -567,6 +563,26 @@ export const routes = [{
 	}
 },
 {
+	path: '/characters-alpha',
+	name: 'Characters',
+	component: () => import("@/views/MyContent/CharactersAlpha"),
+	meta: {
+		basePath: '/characters-alpha',
+		title: 'Characters',
+		requiresAuth: true
+	}
+},
+{
+	path: '/characters-alpha/:id',
+	name: 'Edit Character',
+	component: () => import("@/views/MyContent/CharactersAlpha/EditCharacter"),
+	meta: {
+		basePath: '/characters-alpha',
+		title: 'Character',
+		requiresAuth: true
+	}
+},
+{
 	path: '/npcs',
 	name: 'Npcs',
 	component: Npcs,
@@ -659,7 +675,7 @@ export const routes = [{
 {
 	path: '/run-encounter/:campid/:encid',
 	name: 'RunEncounter',
-	component: RunEncounter,
+	component: () => import('@/views/MyContent/RunEncounter.vue'),
 	meta: {
 		basePath: '/campaigns',
 		title: 'Campaigns',

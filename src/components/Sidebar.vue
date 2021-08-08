@@ -73,6 +73,16 @@
 								Characters
 							</q-tooltip>
 						</q-item>
+						<q-item clickable v-ripple to="/characters-alpha">
+							<q-item-section avatar>
+								<i class="fad fa-helmet-battle"></i>
+							</q-item-section>
+							<q-item-section class="title">Characters</q-item-section>
+							<q-item-section avatar><q-badge>Alpha</q-badge></q-item-section>
+							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
+								Characters alpha
+							</q-tooltip>
+						</q-item>
 						<q-item clickable v-ripple to="/followed">
 							<q-item-section avatar>
 								<i class="fas fa-user-check"></i>

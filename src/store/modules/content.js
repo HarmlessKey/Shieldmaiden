@@ -2,7 +2,7 @@ import { db } from '@/firebase';
 
 const campaigns_ref = db.ref('campaigns/');
 const encounters_ref = db.ref('encounters');
-const players_ref = db.ref('player');
+const players_ref = db.ref('players');
 const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
 const settings_ref = db.ref('settings');

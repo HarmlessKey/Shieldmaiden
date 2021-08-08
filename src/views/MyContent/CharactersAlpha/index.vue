@@ -1,64 +1,46 @@
 <template>
-	<div class="content" v-if="tier">
-		<h1>Your players</h1>
-		<p>These are the players that you can use in your campaigns.</p>
+	<div class="content">
+		<h1>Your characters</h1>
 
-		<OverEncumbered v-if="overencumbered"/>
-		<OutOfSlots 
-			v-else-if="content_count.players >= tier.benefits.players"
-			type = 'players'
-		/>
-		<template v-if="players">
+		<template v-if="characters">
 			<h2 class="mt-3 d-flex justify-content-between">
-				<span>
-					Players ( 
-					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
-						/ 
-						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-						<template v-else>{{ tier.benefits.players }}</template>	
-						)
-				</span>
-				<a v-if="!overencumbered" to="/players/add-player" @click="addPlayer()">
-					<i class="fas fa-plus green"></i> New Player
+				<span>Characters</span>
+				<a @click="addCharacter">
+					<i class="fas fa-plus green"></i> New Character
 				</a>
 			</h2>
-
-
+			
 			<hk-table
 				:columns="columns"
-				:items="_players"
+				:items="_characters"
 				:search="['character_name', 'campaign_name']"
 			>
 				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.row.display.avatar" :style="{ backgroundImage: 'url(\'' + data.row.display.avatar + '\')' }"></div>
+					<div class="image" v-if="data.row.general.avatar" :style="{ backgroundImage: 'url(\'' + data.row.general.avatar + '\')' }"></div>
 					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2" :to="'/players/' + data.row.key">
-						{{ data.row.display.character_name }}
+					<router-link class="mx-2" :to="'/characters-alpha/' + data.row['.key']">
+						{{ data.row.general.character_name }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
 					</router-link>
 				</template>
 
-				<template slot="campaign_name" slot-scope="data">
-					{{ data.item }}
-				</template>
-
 				<template slot="level" slot-scope="data">
-					{{ data.row.display.level }}
+					{{ data.row.general.level }}
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/players/' + data.row.key">
+					<router-link class="gray-hover mx-1" :to="'/characters-alpha/' + data.row['.key']">
 						<i class="fas fa-pencil"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row)">
+					<a class="gray-hover" @click="confirmDelete(data.row['.key'], data.row.general)">
 							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
@@ -66,30 +48,7 @@
 					</a>
 				</div>
 			</hk-table>
-
-			<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-				<div 
-					class="openSlot"
-					v-for="index in slotsLeft"
-					:key="'open-slot-' + index"
-				>
-					<span>Open player slot</span>
-					<router-link v-if="!overencumbered" to="/players/add-player">
-						<i class="fas fa-plus green"></i>
-					</router-link>
-				</div>
-			</template>
-			<template v-if="!tier || tier.name === 'Free'">
-				<router-link class="openSlot none" to="/patreon">
-					Support us on Patreon for more slots.
-				</router-link>
-			</template>
 		</template>
-		<h3 v-else-if="players === null" class="mt-4">
-			<router-link v-if="!overencumbered" to="/players/add-player">
-				<i class="fas fa-plus green"></i> Create your first player
-			</router-link>
-		</h3>
 	</div>
 </template>
 
@@ -97,15 +56,14 @@
 	import _ from 'lodash';
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 
 	export default {
-		name: 'Players',
+		name: 'Characters',
 		mixins: [experience],
 		metaInfo: {
-			title: 'Players'
+			title: 'Characters Alpha'
 		},
 		components: {
 			OverEncumbered,
@@ -124,10 +82,6 @@
 						truncate: true,
 						sortable: true,
 					},
-					campaign_name: {
-						label: 'Campaign',
-						sortable: true,
-					},
 					level: {
 						label: 'Level',
 						// center: true,
@@ -142,38 +96,23 @@
 				}
 			}
 		},
+		firebase() {
+			return {
+				characters: db.ref(`characters_base/${this.userId}`)
+			}
+		},
 		computed: {
-			...mapGetters([
-				'tier',
-				'players',
-				'campaigns',
-				'allEncounters',
-				'overencumbered',
-				'content_count',
-			]),
-			_players: function() {
-				let vm = this;
-				return _.chain(this.players)
-				.filter(function(player, key) {
-					player.key = key
-					if (player.campaign_id) {
-						if (vm.campaigns[player.campaign_id] !== undefined)
-							player.campaign_name = vm.campaigns[player.campaign_id].campaign
-						else
-							player.campaign_id = undefined;
-					}
-
-					return player
+			_characters: function() {
+				return _.chain(this.characters)
+				.filter(function(character) {
+					return character;
 				})
 				.orderBy("character_name", 'asc')
 				.value()
-			},
-			slotsLeft() {
-				return this.tier.benefits.players - Object.keys(this.players).length
 			}
 		},
 		methods: {
-			addPlayer() {
+			addCharacter() {
 				const character_base = {
 					general: {
 						character_name: "Unnamed Character",
@@ -188,12 +127,6 @@
 						}
 					}
 				}
-				const character_computed = {
-					display: {
-						character_name: "Unnamed Character",
-						level: 1
-					}
-				}
 
 				//Add if not overencumbered
 				if(!this.overencumbered) {
@@ -201,63 +134,32 @@
 						//Returns the key of the added entry
 						const key = res.getKey();
 
-						db.ref(`characters_computed/${this.userId}/${key}`).set(character_computed);
-						this.$router.replace(`/players/${key}`)
+						this.$router.replace(`/characters-alpha/${key}`)
 					});
 				}
 			},
-			confirmDelete(key, player) {
-				this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
+			confirmDelete(key, character) {
+				this.$snotify.error('Are you sure you want to delete ' + character.character_name + '?', 'Delete character', {
 					timeout: false,
 					buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-							this.deletePlayer(key, player)
-							this.$snotify.remove(toast.id); 
+								this.deleteCharacter(key)
+								this.$snotify.remove(toast.id); 
 							}, 
 							bold: false
 						},
 						{
 							text: 'No', action: (toast) => { 
 								this.$snotify.remove(toast.id); 
-								}, 
-								bold: false
-							},
-							{
-								text: 'No', action: (toast) => { 
-									this.$snotify.remove(toast.id); 
-								}, 
-								bold: true
-							},
+							}, 
+							bold: false
+						}
 						]
 				});
 			},
-			deletePlayer(key, player) {
-				//Remove from character control
-				if(player.control) {
-					db.ref(`character_control/${player.control}`).child(key).remove(); 
-				}
-
-				for(let campaign in this.campaigns) {
-					//Remove player from campaigns
-					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
-
-					//Go over all encounters of the campaign
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-						for(let enc in this.allEncounters[campaign]) {
-
-							//Go over all entities in the encounter
-							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
-
-							// Remove companions from each encounter
-							for (let comp_key in player.companions) {
-								db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(comp_key).remove();
-							}
-						}
-					}
-				}
-				//Remove player
-				db.ref('characters_computed/' + this.userId).child(key).remove(); 
+			deleteCharacter(key) {
+				//Remove character
 				db.ref('characters_base/' + this.userId).child(key).remove(); 
 			}
 		}

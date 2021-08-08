@@ -45,7 +45,7 @@
 			}"
 		>
 			<div class="tabs">
-				<router-link to="/players">
+				<router-link to="/characters-alpha">
 				<i class="fas fa-chevron-left mr-1" />
 					Back
 				</router-link>

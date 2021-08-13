@@ -1002,30 +1002,30 @@ html body {
 
 		.hk-tooltip:hover::after,
 		.hk-tooltip:focus::after {
-				opacity: 1;
-				z-index: 100; 
+			opacity: 1;
+			z-index: 100; 
 		}
 
 		/*== speech bubble ==*/
 		.hk-tooltip::after {
-				background: $gray-hover;
-				border-radius: 5px;
-				font-weight: normal;
-				bottom: 100%;
-				color: $white;
-				content: attr(data-content);
-				padding: 8px;
-				transition: all .65s;
-				transform:  translate(-50%, 0);
-				font-size: 10px;
-				text-align: center;
-				min-width: 90px;
-				max-width: 150px;
+			background: $gray-hover;
+			border-radius: 5px;
+			font-weight: normal;
+			bottom: 100%;
+			color: $white;
+			content: attr(data-content);
+			padding: 8px;
+			transition: all .65s;
+			transform:  translate(-50%, 0);
+			font-size: 10px;
+			text-align: center;
+			min-width: 90px;
+			max-width: 150px;
 		}
 
 		.hk-tooltip:hover::after,
 		.hk-tooltip:focus::after  {
-				transition: all .65s;
+			transition: all .65s;
 		}
 	}
 

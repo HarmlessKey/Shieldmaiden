@@ -137,6 +137,29 @@ export const content_characters = {
         console.error(error);
       }
     },
+    add_class({ commit }, { userId, key }) {
+      const newClass = {
+        level: 1
+      };
+
+      try {
+        db.ref(`characters_base/${userId}/${key}/class/classes`).push(newClass).then(res => {
+          const class_key = res.getKey(); //Returns the key of the added entry
+          commit("ADD_CLASS", { userId, key, class_key, newClass });
+        });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+    delete_class({ commit }, { userId, key, class_key }) {
+      try {
+        characters_ref.child(`${userId}/${key}/class/classes/${class_key}`).remove();
+        commit("DELETE_CLASS", { userId, key, class_key });
+      } catch(error) {
+        console.error(error);
+      }
+    },
+
 
     /**
      * Adds a new feature, or completely overwrites an existing feature with a new object
@@ -253,6 +276,12 @@ export const content_characters = {
         Vue.set(state.characters[userId][key].class.classes[classKey], "rolled_hit_points", {});
       }
       Vue.set(state.characters[userId][key].class.classes[classKey].rolled_hit_points, level, value);
+    },
+    ADD_CLASS(state, { userId, key, class_key, newClass}) {
+      Vue.set(state.characters[userId][key].class.classes, class_key, newClass);
+    },
+    DELETE_CLASS(state, { userId, key, class_key }) {
+      Vue.delete(state.characters[userId][key].class.classes, class_key);
     },
     
     // FEATURES

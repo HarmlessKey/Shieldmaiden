@@ -84,10 +84,7 @@
 											v-close-popup
 											:active="subclass.level === scope.opt"
 											@click="saveClassLevel(classKey, scope.opt)"
-											:disable="
-												(advancement === 'experience' && scope.opt > (subclass.level + (calculatedLevel(Class.experience_points) - computed.display.level)))
-												|| (advancement === 'milestone' && scope.opt > (subclass.level + (20 - computed.display.level)) )
-											"
+											:disable="levelAvailable(subclass, scope.opt)"
 										>
 											{{ scope.opt }}
 										</q-item>
@@ -356,7 +353,15 @@
 				</q-slide-transition>
 			</div>
 		</div>
-		<a @click="addClass()" class="d-block mt-4"><i class="fas fa-plus"/> Add a class</a>
+
+		<!-- ADD CLASS -->
+		<a 
+			v-if="levelAvailable()"
+			@click="addClass()" 
+			class="d-block mt-4"
+		>
+			<i class="fas fa-plus"/> Add a class
+		</a>
 
 		<!-- ROLLED HP MODAL -->
 		<q-dialog v-model="roll_hp_modal" v-if="hit_point_type === 'rolled'">
@@ -367,27 +372,32 @@
 					</span>
 					<q-btn flat v-close-popup round icon="close" />
 				</div>
-			
-				<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-					<q-input 
-						dark filled square
-						@change="setRolledHP($event, editClass, level)"
-						autocomplete="off" 
-						:id="`level-${level}`" 
-						type="number"
-						v-model="classes[editClass].rolled_hit_points[level]" 
-						:label="`Level ${level}`"
-					>
-						<a 
-							slot="after"
-							:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
-							class="btn"
-							@click="rollHitDice(editClass, level)"
+
+				<template v-if="classes[editClass].hit_dice">
+					<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
+						<q-input 
+							dark filled square
+							@change="setRolledHP($event.target.value, editClass, level)"
+							autocomplete="off" 
+							:id="`level-${level}`" 
+							type="number"
+							:value="classes[editClass].rolled_hit_points ? classes[editClass].rolled_hit_points[level] : 0" 
+							:label="`Level ${level}`"
 						>
-							Roll
-						</a>
-					</q-input>
-				</div>
+							<a 
+								slot="after"
+								:class="{ hidden: classes[editClass].rolled_hit_points && classes[editClass].rolled_hit_points[level] }"
+								class="btn"
+								@click="rollHitDice(editClass, level)"
+							>
+								Roll
+							</a>
+						</q-input>
+					</div>
+				</template>
+				<p v-else class="red">
+					First set the class' hit dice.
+				</p>
 			</hk-card>
 		</q-dialog>
 
@@ -576,6 +586,9 @@
 				"set_xp",
 				"set_class_prop",
 				"set_rolled_hp",
+				"add_class",
+				"delete_class",
+				"delete_modifier",
 				"add_feature"
 			]),
 			emitChange(value) {
@@ -583,7 +596,19 @@
 			},
 			setShowClass(classKey){
 				this.showClass = (classKey === this.showClass) ? undefined : classKey; 
-			},		
+			},
+			levelAvailable(subclass, level) {
+				// Check if a level is available for a certain class (to disable unavailable levels in dropdown)
+				if(subclass && level) {
+					return (this.advancement === 'experience' && level > (subclass.level + (this.calculatedLevel(this.Class.experience_points) - this.computed.display.level)))
+						|| (this.advancement === 'milestone' && level > (subclass.level + (20 - this.computed.display.level)) )
+				} 
+				// Check if levels are available at all for the character (to hide add class button)
+				else {
+					return (this.advancement === 'experience' && this.calculatedLevel(this.Class.experience_points) > this.computed.display.level)
+					|| (this.advancement === 'milestone' && this.computed.display.level < 20)
+				}
+			},
 			handleXP(type) {
 				if(this.xp) {
 					this.set_xp({
@@ -667,7 +692,7 @@
 						total = total + total_rolled * average;
 					}
 					return total;
-				} 
+				}
 				// Return info about the total HP
 				else if(type === 'info') {
 					let info = (classKey == 0) ? "<p>Your main class starts with 1 full hit die and no average or rolled hit die for the first level.</p>" : "";
@@ -679,9 +704,11 @@
 			},
 			totalRolled(classKey) {
 				let totalRolled = 0;
-				for(const [key, value] of Object.entries(this.classes[classKey].rolled_hit_points)) {
-					if(this.classes[classKey].level >= key && value) {
-						totalRolled = totalRolled + parseInt(value);
+				if(this.classes[classKey].rolled_hit_points) {
+					for(const [key, value] of Object.entries(this.classes[classKey].rolled_hit_points)) {
+						if(this.classes[classKey].level >= key && value) {
+							totalRolled = totalRolled + parseInt(value);
+						}
 					}
 				}
 				return totalRolled;
@@ -800,25 +827,10 @@
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known/${type}/${level}`).set(value);
 				this.$emit("change", "class.spells_known");
 			},
-			saveClassName(key) {
-				const value = this.classes[key].name;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/name`).set(value);
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}/class`).set(value);
-			},
-			saveClassSubclass(key) {
-				const value = this.classes[key].subclass;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/subclass`).set(value);
-				db.ref(`characters_computed/${this.userId}/${this.playerId}/display/classes/${key}/subclass`).set(value);
-			},
 			saveClassLevel(key, value) {
 				//Make sure ASI feats exists for level 4, 8, 12, 16 and 19
 				this.setAsiFeature(key, value);
 
-				//Check if rolled_hit_points exists and create it if not
-				if(this.hit_point_type === "rolled" && !this.classes[key].rolled_hit_points) {
-					const level = (key === 0) ? 2 : 1;
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/rolled_hit_points/${level}`).set(0);
-				}
 				this.set_class_prop({
 					userId: this.userId,
 					key: this.playerId,
@@ -827,11 +839,6 @@
 					value
 				});
 				this.$emit("change", "class.level");
-			},
-			saveBaseArmorClass(key) {
-				const value = (this.classes[key].base_armor_class) ? parseInt(this.classes[key].base_armor_class) : 0;
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/base_armor_class`).set(value);
-				this.$emit("change", "class.armor_class");
 			},
 			confirmDeleteClass(classKey, name) {
 				this.$snotify.error(
@@ -843,6 +850,14 @@
 						]
 					});
 			},
+			addClass() {
+				this.add_class({
+					userId: this.userId,
+					key: this.playerId
+				});
+
+				this.$emit("change", "class.added_class");
+			},
 			deleteClass(classKey) {
 				if(classKey !== 0) {
 					//Delete all linked modifiers
@@ -850,69 +865,23 @@
 						const origin = modifier.origin.split(".");
 
 						if(origin[1] === classKey) {
-							db.ref(`characters_base/${this.userId}/${this.playerId}/modifiers/${modifier['.key']}`).remove();
+							this.delete_modifier({
+								userId: this.userId,
+								key: this.playerId,
+								modifier_key: modifier['.key']
+							});
 						}
 					}
 
 					//Delete class
-					db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}`).remove();
+					this.delete_class({
+						userId: this.userId,
+						key: this.playerId,
+						class_key: classKey
+					});
 					this.$emit("change", "class.delete_class");
 				}
 			},
-			
-			
-			addClass() {
-				let newClass = {
-					level: 1
-				};
-				//Set rolled HP for the first level to make sure the object exists
-				newClass.rolled_hit_points = (this.hit_point_type === "rolled") ? { 1: 0 } : null;
-
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes`).push(newClass);
-				this.$emit("change", "class.added_class");
-			},
-
-			//Prevent pasting of text with markup
-			pasteCapture (evt, classKey, level) {
-				const description_ref = `description-${classKey}-${level}`
-
-				let text, onPasteStripFormattingIEPaste
-				evt.preventDefault()
-				if (evt.originalEvent && evt.originalEvent.clipboardData.getData) {
-					text = evt.originalEvent.clipboardData.getData('text/plain')
-					this.$refs[description_ref].runCmd('insertText', text)
-				}
-				else if (evt.clipboardData && evt.clipboardData.getData) {
-					text = evt.clipboardData.getData('text/plain')
-					this.$refs[description_ref].runCmd('insertText', text)
-				}
-				else if (window.clipboardData && window.clipboardData.getData) {
-					if (!onPasteStripFormattingIEPaste) {
-						onPasteStripFormattingIEPaste = true
-						this.$refs[description_ref].runCmd('ms-pasteTextOnly', text)
-					}
-					onPasteStripFormattingIEPaste = false
-				}
-			},
-
-			//Add a stat to a feature description
-			addStat(type, name, classKey, level, key) {
-				const description_ref = `description-${classKey}-${level}-${key}`;
-				const menu_ref = `${type}-${classKey}-${level}-${key}`;
-
-				const edit = this.$refs[description_ref][0];
-
-				this.$refs[menu_ref][0].hide();
-				edit.caret.restore();
-				edit.runCmd('insertHTML', `${name}`)
-				edit.focus()
-			},
-
-			descriptionPreview(feature, classKey) {
-				this.feature_preview.feature = feature;
-				this.feature_preview.classKey = classKey;
-				this.description_dialog = true;
-			}
 		}
 	}
 </script>

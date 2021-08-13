@@ -139,7 +139,7 @@
 									<!-- Modifiers -->
 									<Modifier-table 
 										:modifiers="feature_modifiers(classKey, level, key)" 
-										:origin="`race.trait.${key}`"
+										:origin="`class.${classKey}.${level}.${key}`"
 										:userId="userId"
 										:playerId="playerId"
 										:info="featureModInfo"

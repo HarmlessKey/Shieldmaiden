@@ -52,7 +52,7 @@
 								<q-input
 									dark filled square
 									label="Class"
-									@change="saveClassName(classKey)"
+									@change="saveClassProp(subclass.name, classKey, 'name')"
 									autocomplete="off"
 									:id="`${classKey}-class`"
 									type="text"
@@ -63,7 +63,7 @@
 								<q-input
 									dark filled square
 									label="Subclass"
-									@change="saveClassSubclass(classKey)"
+									@change="saveClassProp(subclass.subclass, classKey, 'subclass')"
 									autocomplete="off"
 									:id="`${classKey}-subclass`"
 									type="text"
@@ -111,19 +111,21 @@
 									</q-item-section>
 									<q-item-section avatar>
 										<div class="d-flex justify-content-end">
-											<span v-if="subclass.hit_dice">
+											<div v-if="subclass.hit_dice">
 												{{ subclass.level }}d{{ subclass.hit_dice }}
 												<q-tooltip anchor="top middle" self="center middle">
 													Hit dice
 												</q-tooltip>
-											</span> |
-											<span v-if="computed.sheet && computed.sheet.abilities && computed.sheet.abilities.constitution">
+											</div>
+											<q-separator vertical dark class="mx-2" />
+											<div v-if="computed.sheet && computed.sheet.abilities && computed.sheet.abilities.constitution">
 												{{ calcMod(computed.sheet.abilities.constitution) > 0 ? "+" : "" }}{{ calcMod(computed.sheet.abilities.constitution) }}
 												<q-tooltip anchor="top middle" self="center middle">
 													Constitution modifier
 												</q-tooltip>
-											</span> |
-											<span>
+											</div>
+											<q-separator vertical dark class="mx-2" />
+											<div>
 												{{ classTotalHP(classKey, 'total') }}
 												<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 													<q-card dark square>
@@ -135,7 +137,7 @@
 														</q-card-section>
 													</q-card>
 												</q-menu>
-											</span>
+											</div>
 										</div>
 									</q-item-section>
 								</template>
@@ -143,7 +145,12 @@
 								<div class="accordion-body">
 									<p>Hit dice</p>
 									<div class="hit-dice">
-										<a v-for="{value, text} in dice_types" @click="saveHitDice(classKey, value)" :key="`d${value}-${classKey}`" :class="{ active: subclass.hit_dice === value }">
+										<a 
+											v-for="{value, text} in dice_types" 
+											@click="saveClassProp(value, classKey, 'hit_dice', true)" 
+											:key="`d${value}-${classKey}`"
+											:class="{ active: subclass.hit_dice === value }"
+											>
 											<i :class="`fas fa-dice-d${value}`"></i>
 											{{ text }}
 										</a>
@@ -175,35 +182,22 @@
 									</q-item-section>
 									<q-item-section avatar>
 										<div class="d-flex justify-content-end" v-if="subclass.casting_ability">
-											<span>
+											<hk-popover :header="`${subclass.name} spell attack`">
 												{{ computed.sheet.classes[classKey].spell_attack > 0 ? "+" : "" }}{{ computed.sheet.classes[classKey].spell_attack }}
-												<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-													<q-card dark square>
-														<q-card-section class="bg-gray-active">
-															<b>{{ subclass.name }} spell attack</b>
-														</q-card-section>
-														<q-card-section>
-															{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
-															Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
-														</q-card-section>
-													</q-card>
-												</q-menu>
-											</span> |
-											<span>
+												<template #content>
+													{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
+													Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+												</template>
+											</hk-popover>
+											<q-separator vertical dark class="mx-2" />
+											<hk-popover :header="`${subclass.name} spell save DC`">
 												{{ computed.sheet.classes[classKey].spell_save_dc }}
-												<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-													<q-card dark square>
-														<q-card-section class="bg-gray-active">
-															<b>{{ subclass.name }} spell save DC</b>
-														</q-card-section>
-														<q-card-section>
-															Base: <b>8</b><br/>
-															{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
-															Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
-														</q-card-section>
-													</q-card>
-												</q-menu>
-											</span>
+												<template #content>
+													Base: <b>8</b><br/>
+													{{ subclass.casting_ability.capitalize() }} modifier: <b>{{ computed.sheet.abilities ? calcMod(computed.sheet.abilities.wisdom) : 0 }}</b><br/>
+													Proficiency bonus: <b>{{ computed.display.proficiency }}</b>
+												</template>
+											</hk-popover>
 										</div>
 									</q-item-section>
 								</template>
@@ -347,7 +341,6 @@
 							</q-expansion-item>
 						</q-list>
 
-
 						<!-- CLASS FEATURES -->
 						<h3>{{ subclass.name || "Class" }} features</h3>
 						<Features 
@@ -376,24 +369,26 @@
 				</div>
 			
 				<div v-for="level in reversedLevels" :key="`roll-${level}`" class="roll_hp" :class="{ hidden: editClass === 0 && level === 1 }">
-					<label :for="`level-${level}`">Level {{ level }}</label>
 					<q-input 
 						dark filled square
-						@change="setRolledHP(editClass, level)"
+						@change="setRolledHP($event, editClass, level)"
 						autocomplete="off" 
 						:id="`level-${level}`" 
-						type="text"
+						type="number"
 						v-model="classes[editClass].rolled_hit_points[level]" 
-					/>
-					<a 
-						:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
-						class="btn"
-						@click="rollHitDice(editClass, level)"
+						:label="`Level ${level}`"
 					>
-						Roll
-					</a>
+						<a 
+							slot="after"
+							:class="{ hidden: classes[editClass].rolled_hit_points[level] }"
+							class="btn"
+							@click="rollHitDice(editClass, level)"
+						>
+							Roll
+						</a>
+					</q-input>
 				</div>
-			</hk-card>  
+			</hk-card>
 		</q-dialog>
 
 		<!-- EXPERIENCE MODAL -->
@@ -580,6 +575,7 @@
 				"setSlide",
 				"set_xp",
 				"set_class_prop",
+				"set_rolled_hp",
 				"add_feature"
 			]),
 			emitChange(value) {
@@ -597,6 +593,18 @@
 						type
 					})
 					this.xp = undefined;
+				}
+			},
+			saveClassProp(value, classKey, property, compute=false) {
+				this.set_class_prop({
+					userId: this.userId,
+					key: this.playerId,
+					classKey,
+					property,
+					value
+				});
+				if(compute) {
+					this.$emit("change", `class.${classKey}.${property}`);
 				}
 			},
 			levelUp(classKey) {
@@ -766,26 +774,31 @@
 				this.editClass = classKey;
 				this.spells_known_modal = true;
 			},
-			setRolledHP(classKey, level) {
+			setRolledHP(value, classKey, level) {
 				//Set rolled HP manually
-				const value = parseInt(this.classes[classKey].rolled_hit_points[level]) || 0;
+				value = parseInt(value) || 0;
 
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+				this.set_rolled_hp({
+					userId: this.userId,
+					key: this.playerId,
+					classKey,
+					level,
+					value
+				});
 				this.$emit("change", "class.rolled_hit_points");
+			},
+			rollHitDice(classKey, level) {
+				//Roll HP digitally
+				const hit_dice = this.classes[classKey].hit_dice;
+				const value = this.rollD({}, hit_dice, 1, 0).total;
+
+				this.setRolledHP(value, classKey, level);
 			},
 			setSpellsKnown(classKey, type, level) {
 				//Set spells known
 				const value = parseInt(this.classes[classKey].spells_known[type][level]) || 0;
 				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/spells_known/${type}/${level}`).set(value);
 				this.$emit("change", "class.spells_known");
-			},
-			rollHitDice(classKey, level) {
-				//Roll HP digitally
-				const hit_dice = this.classes[classKey].hit_dice;
-				const value = this.rollD(hit_dice, 1, 0).total;
-
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
-				this.$emit("change", "class.rolled_hit_points");
 			},
 			saveClassName(key) {
 				const value = this.classes[key].name;
@@ -814,10 +827,6 @@
 					value
 				});
 				this.$emit("change", "class.level");
-			},
-			saveHitDice(key, value) {
-				db.ref(`characters_base/${this.userId}/${this.playerId}/class/classes/${key}/hit_dice`).set(value);
-				this.$emit("change", "class.hit_dice");
 			},
 			saveBaseArmorClass(key) {
 				const value = (this.classes[key].base_armor_class) ? parseInt(this.classes[key].base_armor_class) : 0;
@@ -1040,11 +1049,11 @@
 	.roll_hp {
 		width: 100%;
 		display: grid;
-		grid-template-columns: 60px 60px max-content;
+		// grid-template-columns: 60px 60px max-content;
 		margin-bottom: 5px;
 		grid-column-gap: 10px;
-		grid-template-areas: 
-		"label input button";
+		// grid-template-areas: 
+		// "label input button";
 		justify-content: center;
 		align-content: center;
 

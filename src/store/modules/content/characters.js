@@ -1,6 +1,5 @@
 import { db } from '@/firebase';
 import Vue from 'vue';
-// import { characterMixin } from '@/mixins/character';
 
 const characters_ref = db.ref('characters_base');
 
@@ -130,6 +129,14 @@ export const content_characters = {
         console.error(error);
       }
     },
+    set_rolled_hp({ commit }, { userId, key, classKey, level, value }) {
+      try {
+        db.ref(`characters_base/${userId}/${key}/class/classes/${classKey}/rolled_hit_points/${level}`).set(value);
+        commit("SET_ROLLED_HP", { userId, key, classKey, level, value });
+      } catch(error) {
+        console.error(error);
+      }
+    },
 
     /**
      * Adds a new feature, or completely overwrites an existing feature with a new object
@@ -240,6 +247,12 @@ export const content_characters = {
     // CLASS
     SET_CLASS_PROP(state, {userId, key, classKey, property, value}) {
       Vue.set(state.characters[userId][key].class.classes[classKey], property, value);
+    },
+    SET_ROLLED_HP(state, {userId, key, classKey, level, value}) {
+      if(!state.characters[userId][key].class.classes[classKey].rolled_hit_points) {
+        Vue.set(state.characters[userId][key].class.classes[classKey], "rolled_hit_points", {});
+      }
+      Vue.set(state.characters[userId][key].class.classes[classKey].rolled_hit_points, level, value);
     },
     
     // FEATURES

@@ -1,84 +1,122 @@
 <template>
 	<div>
+		<h3>What method would you like to use?</h3>
 		<q-select
+			class="method"
 			dark filled square
 			label="Method"
+			placeholder="Select method"
 			:value="ability_score_method" 
 			:options="ability_score_methods" 
 			emit-value
 			map-options
 			@input="confirmMethodChange($event)"
 		/>
-		<h3 class="text-center">Base ability scores</h3>
 
-		<!-- STANDARD ARRAY -->
-		<div v-if="ability_score_method === 'standard_array'" class="base_abilities input">
-			<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-				<div>{{ label }}</div>
-				<q-select
-					dark filled square
-					placeholder="-"
-					:value="ability_scores[value]"
-					:options="standard_array"
-					emit-value
-					map-options
-					:option-disable="standardArrayDisable"
-					@input="saveAbility($event, value)"
-					clearable
-				/>
-			</div>
-		</div>
+		<template v-if="ability_score_method">
+			<h3 class="text-center">Base ability scores</h3>
 
-		<!-- POINT BUY -->
-		<template v-if="ability_score_method === 'point_buy'">
-			<div class="base_abilities input">
+			<!-- STANDARD ARRAY -->
+			<div v-if="ability_score_method === 'standard_array'" class="base_abilities input">
 				<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
 					<div>{{ label }}</div>
 					<q-select
 						dark filled square
 						placeholder="-"
 						:value="ability_scores[value]"
-						:options="point_buy.map(item => item.score)"
+						:options="standard_array"
 						emit-value
 						map-options
-						:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
+						:option-disable="standardArrayDisable"
 						@input="saveAbility($event, value)"
+						clearable
 					/>
 				</div>
 			</div>
-			<h3 class="text-center mb-1">Points remaining</h3>
-			<h3 class="text-center mt-0">
-				<span class="white">{{ point_buy_remaining }}</span>/{{ point_buy_max }}
-			</h3>
+
+			<!-- POINT BUY -->
+			<template v-if="ability_score_method === 'point_buy'">
+				<div class="base_abilities input">
+					<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
+						<div>{{ label }}</div>
+						<q-select
+							dark filled square
+							placeholder="-"
+							:value="ability_scores[value]"
+							:options="point_buy.map(item => item.score)"
+							emit-value
+							map-options
+							:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
+							@input="saveAbility($event, value)"
+						/>
+					</div>
+				</div>
+				<h3 class="text-center mb-1">Points remaining</h3>
+				<h3 class="text-center mt-0">
+					<span class="white">{{ point_buy_remaining }}</span>/{{ point_buy_max }}
+				</h3>
+			</template>
+
+			<!-- MANUAL -->
+			<div v-if="ability_score_method === 'manual'" class="base_abilities input">
+				<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
+					<div>{{ label }}</div>
+					<q-input
+						dark filled square
+						placeholder="-"
+						:id="value" 
+						@change="saveAbility($event.target.value, value)"
+						autocomplete="off"  
+						type="number"
+						:value="ability_scores[value]"
+					/>
+				</div>
+			</div>
+			<h3 class="text-center">Computed ability scores</h3>
+			<div class="base_abilities">
+				<div class="ability computed" v-for="{value, label} in abilities" :key="`base-${value}`">
+					<div class="label">
+						{{ label.substring(3, 0).toUpperCase() }}
+					</div>
+					<h2 class="score">
+						{{ computed[value] || 0 }}
+					</h2>
+				</div>
+			</div>
+		</template>
+		
+		<template v-else>
+			<p class="mt-3">Your DM probably told you what method you should use.</p>
+
+			<h4>1. Standard array (phb 13)</h4>
+			<p>
+				You get a standard set of scores you can divide over the abilities.<br/>
+				15, 14, 13, 12, 10, 8.
+			</p>
+
+			<h4>2. Point buy (phb 13)</h4>
+			<p>
+				You get 27 points to spend on your ability scores. The cost of each score is shown in the table below.<br/>
+				With this method, 15 is the highest ability score you can end up with and you can't have a score lower than 8.
+			</p>
+
+			<table class="table">
+				<tr>
+					<th>Score</th>
+					<th>Cost</th>
+				</tr>
+				<tbody>
+					<tr v-for="{score, cost} in point_buy" :key="score">
+						<td>{{ score }}</td>
+						<td>{{ cost }}</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h4>3. Manual</h4>
+			<p>Manually input the scores for each ability.</p>
 		</template>
 
-		<!-- MANUAL -->
-		<div v-if="ability_score_method === 'manual'" class="base_abilities input">
-			<div class="ability" v-for="{value, label} in abilities" :key="`base-${value}`">
-				<div>{{ label }}</div>
-				<q-input
-					dark filled square
-					placeholder="-"
-					:id="value" 
-					@change="saveAbility($event.target.value, value)"
-					autocomplete="off"  
-					type="number"
-					:value="ability_scores[value]"
-				/>
-			</div>
-		</div>
-
-		<h3 class="text-center">Computed ability scores</h3>
-		<div class="base_abilities">
-			<div class="ability computed" v-for="{value, label} in abilities" :key="`base-${value}`">
-				<div class="label">
-					{{ label.substring(3, 0).toUpperCase() }}
-				</div>
-				<h2 class="score">
-					{{ computed[value] || 0 }}
-				</h2>
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -164,7 +202,7 @@
 				return (this.base_abilities) ? this.base_abilities : {};
 			},
 			ability_score_method() {
-				return (this.method) ? this.method : "standard_array";
+				return this.method;
 			},
 			point_buy_remaining() {
 				let points = this.point_buy_max;
@@ -245,6 +283,9 @@
 		font-size: 25px !important;
 		margin: 40px 0 20px 0 !important;
 	}
+	h4 {
+		font-size: 18px;
+	}
 	.base_abilities {
 		width: 100%;
 		display: flex;
@@ -278,6 +319,15 @@
 				font-size: 45px;
 				color: $white;
 			}
+		}
+	}
+
+	.table {
+		max-width: 300px;
+		border-spacing: 1px;
+
+		td {
+			text-align: center;
 		}
 	}
 	@media only screen and (max-width: 950px) {

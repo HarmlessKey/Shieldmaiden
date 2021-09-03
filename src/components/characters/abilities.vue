@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3>What method would you like to use?</h3>
+		<h3>Ability scores</h3>
 		<q-select
 			class="method"
 			dark filled square
@@ -86,6 +86,7 @@
 		</template>
 		
 		<template v-else>
+			<h3>What method would you like to use?</h3>
 			<p class="mt-3">Your DM probably told you what method you should use.</p>
 
 			<h4>1. Standard array (phb 13)</h4>
@@ -228,14 +229,18 @@
 				return (!this.ability_scores || ability_score > value) ? false : score > this.point_buy_remaining;
 			},
 			confirmMethodChange(method) {
-				this.$snotify.error(
-					`Are you sure you want to change the method? Current ability scores will be reset.`, `Change method`, 
-					{
-						buttons: [
-							{ text: 'Yes', action: (toast) => { this.saveAbilityScoreMethod(method); this.$snotify.remove(toast.id); }, bold: false},
-							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-						]
-					});
+				if(!this.ability_score_method) {
+					this.saveAbilityScoreMethod(method);
+				} else {
+					this.$snotify.error(
+						`Are you sure you want to change the method? Current ability scores will be reset.`, `Change method`, 
+						{
+							buttons: [
+								{ text: 'Yes', action: (toast) => { this.saveAbilityScoreMethod(method); this.$snotify.remove(toast.id); }, bold: false},
+								{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
+							]
+						});
+				}
 			},
 			saveAbilityScoreMethod(method) {
 				const value = (method === "standard_array" || method === "manual") ? null : 8;
@@ -262,7 +267,7 @@
 				this.$emit("change", `abilities.ability_scores`);
 			},
 			saveAbility(score, ability) {
-				score = parseInt(score);
+				score = (score !== null) ? parseInt(score) : score;
 
 				this.set_character_prop({
 					userId: this.userId,

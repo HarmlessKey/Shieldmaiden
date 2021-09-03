@@ -189,10 +189,6 @@ export const content_characters = {
     },
     set_feature_prop({ commit }, { userId, key, classKey, level, feature_key, property, value }) {
       if(property === 'display') {
-        //when the value doesn't exist, it's false, and needs to be set to true
-        //So check if undefined and set to true if it was
-        value = (value === undefined) ? true : !value;
-
         //Delete the prop if it was false
         value = (!value) ? null : value;
       }

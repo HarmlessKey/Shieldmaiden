@@ -44,7 +44,7 @@ export const experience = {
 		},
 		levelRequired(xp) {
 			const level = this.calculatedLevel(xp);
-			return this.xpTable[level + 1].xp - this.xpTable[level].xp;
+			return (level < 20) ? this.xpTable[level + 1].xp - this.xpTable[level].xp : 0;
 		},
 		levelAdvancement(xp) {
 			xp = (!xp) ? 0 : xp;

@@ -3,10 +3,10 @@
 		<!-- EXPERIENCE -->
 		<div class="form-item mb-3" v-if="advancement === 'experience'">
 			<h3 class="pointer text-center" @click="experience_modal = !experience_modal">
-				Experience points: <b>{{ Class.experience_points }}</b> 
+				Experience points: <b><hk-animated-integer :value="Class.experience_points" /></b> 
 				<small class="ml-2"><i class="fas fa-pencil-alt"></i></small>
 			</h3>
-			<div class="xp-bar">
+			<div class="xp-bar" v-if="calculatedLevel(Class.experience_points) < 20">
 				<div class="xp-level">
 					{{ calculatedLevel(Class.experience_points) }}
 				</div>
@@ -603,7 +603,7 @@
 					return (this.advancement === 'experience' && level > (subclass.level + (this.calculatedLevel(this.Class.experience_points) - this.computed.display.level)))
 						|| (this.advancement === 'milestone' && level > (subclass.level + (20 - this.computed.display.level)) )
 				} 
-				// Check if levels are available at all for the character (to hide add class button)
+				// Check if levels are available at all for the character (to hide "Add class" button)
 				else {
 					return (this.advancement === 'experience' && this.calculatedLevel(this.Class.experience_points) > this.computed.display.level)
 					|| (this.advancement === 'milestone' && this.computed.display.level < 20)

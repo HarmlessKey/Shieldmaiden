@@ -5,7 +5,7 @@
 				<template v-if="subclass.level >= level">
 					<h4 class="feature-title">
 						Level {{ level }}
-						<a @click="addFeature(classKey, level)">
+						<a @click="addFeature(classKey, level)" class="gray-light">
 							Add feature
 							<i class="fas fa-plus green" />
 						</a>
@@ -26,12 +26,12 @@
 									</q-icon>
 								</q-item-section>
 								<q-item-section>
-									{{ 
+									{{
 										key === "--asi" 
-											? `${subclass.features[`level_${level}`][key].type === 'asi' 
-												? `Ability Score Increase` 
-												: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
-											: feature.name 
+										? `${subclass.features[`level_${level}`][key].type === 'asi' 
+										? `Ability Score Increase` 
+										: `Feat: ${subclass.features[`level_${level}`][key].name}`}` 
+										: feature.name 
 									}}
 								</q-item-section>
 								<q-item-section avatar>

@@ -72,7 +72,7 @@
 									/>
 								</template>
 
-								<!-- ASI -->	
+								<!-- ASI -->
 								<div v-if="subclass.features[`level_${level}`][key].type === 'asi'">
 									<p>Choose 2 abilities to increase with 1 point</p>
 									<div v-for="i in 2" :key="`asi-${level}-${i}`" class="asi mb-1">

@@ -95,6 +95,7 @@
 					<Abilities
 						v-if="current_tab === 'abilities'"
 						:base_abilities="base_values.abilities"
+						:method="base_values.general.ability_score_method"
 						:computed="computed_values.sheet.abilities"
 						:playerId="playerId"
 						:userId="userId"

@@ -14,7 +14,18 @@
 		/>
 
 		<template v-if="ability_score_method">
-			<h3 class="text-center">Base ability scores</h3>
+			<h3 class="text-center">
+				Base ability scores
+				<a 
+					v-if="ability_score_method === 'manual'"
+					@click="roll_dialog = !roll_dialog"
+				>
+					<i class="fas fa-dice-d20" />
+					<q-tooltip anchor="top middle" self="center middle">
+						Roll scores
+					</q-tooltip>
+				</a>
+			</h3>
 
 			<!-- STANDARD ARRAY -->
 			<div v-if="ability_score_method === 'standard_array'" class="base_abilities input">
@@ -44,6 +55,7 @@
 							placeholder="-"
 							:value="ability_scores[value]"
 							:options="point_buy.map(item => item.score)"
+							:option-label="label"
 							emit-value
 							map-options
 							:option-disable="opt => pointBuyDisable(opt, ability_scores[value])"
@@ -71,6 +83,63 @@
 						:value="ability_scores[value]"
 					/>
 				</div>
+
+				<q-dialog v-model="roll_dialog">
+					<hk-card>
+						<div slot="header" class="card-header d-flex justify-content-between">
+							<span>
+								Roll ability scores
+							</span>
+							<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
+						</div>
+
+						<button 
+							v-if="!rolls.filter(score => score.results.length).length"
+							class="btn btn-block mb-3" 
+							@click="rollAllAbilityScores()"
+						>
+							Roll all
+						</button>
+						<button v-else class="btn bg-red btn-block mb-3" @click="clearAllRolls()">Clear all</button>
+
+						<div class="ability-rolls">
+							<div v-for="i in [0, 1, 2, 3, 4, 5]" :key="`score-${i}`" class="score">
+								<div class="rolls">
+									<div class="d-flex justify-content-start">
+										<div 
+											v-for="roll in [0, 1, 2, 3]" 
+											class="roll"
+											:class="{ 
+												rolled: rolls[i].results[roll],
+												ignore: lowestRoll(rolls[i].results) === roll
+											}"
+											:key="`roll-${roll}`"
+										>
+											<hk-animated-integer v-if="rolls[i].results.length" :value="rolls[i].results[roll]" on-mount />
+											<template v-else>-</template>
+										</div>
+									</div>
+									<q-btn v-if="!rolls[i].results.length" flat size="sm" @click="rollAbilityScore(i)" icon="fas fa-dice-d20" />
+									<hk-animated-integer v-else class="total" :value="rolledTotal(i)" on-mount />
+								</div>
+
+								<q-select 
+									dark filled square dense
+									clearable
+									map-options
+									emit-value
+									:options="filterAbilities(i)"
+									v-model="rolls[i].ability"
+								/>
+							</div>
+						</div>
+
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<button class="btn bg-gray mr-2" @click="roll_dialog = false">Cancel</button>
+							<button class="btn bg-green" @click="applyRolledScores()" :disabled="rolls.filter(score => score.ability && score.results.length).length < 6">Apply</button>
+						</div>
+					</hk-card>
+				</q-dialog>
 			</div>
 			<h3 class="text-center">Computed ability scores</h3>
 			<div class="base_abilities">
@@ -118,16 +187,20 @@
 			<p>Manually input the scores for each ability.</p>
 		</template>
 
+
 	</div>
 </template>
 
 <script>
 	import { abilities } from "@/mixins/abilities.js";
+	import { dice } from "@/mixins/dice.js";
 	import { mapActions } from "vuex";
+import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 
 	export default {
+  components: { hkAnimatedInteger },
 		name: "CharacterAbilities",
-		mixins: [abilities],
+		mixins: [abilities, dice],
 		props: [
 			"base_abilities",
 			"method",
@@ -139,6 +212,7 @@
 		data() {
 			return {
 				modifier: {},
+				roll_dialog: false,
 				point_buy_max: 27,
 				ability_score_methods: [
 					{
@@ -195,6 +269,32 @@
 						score: 15,
 						cost: 9
 					}
+				],
+				rolls: [
+					{
+						results: [],
+						ability: ""
+					},
+					{
+						results: [],
+						ability: ""
+					},
+					{
+						results: [],
+						ability: ""
+					},
+					{
+						results: [],
+						ability: ""
+					},
+					{
+						results: [],
+						ability: ""
+					},
+					{
+						results: [],
+						ability: ""
+					},
 				]
 			}
 		},
@@ -277,6 +377,45 @@
 					value: score
 				});
 				this.$emit("change", `abilities.${ability}`);
+			},
+			rollAbilityScore(i) {
+				const roll = this.rollD({}, 6, 4, 0, "Ability score roll");
+				this.rolls[i].results = roll.throws;
+			},
+			rollAllAbilityScores() {
+				for(let i = 0; i < 6; i++) {
+					this.rollAbilityScore(i);
+				}
+			},
+			lowestRoll(rolls) {
+				const lowest_value = Array.min(rolls);
+				return rolls.indexOf(lowest_value);
+			},
+			filterAbilities(i) {
+				const used = this.rolls.filter(roll => roll.ability).map(roll => roll.ability);
+
+				return this.abilities.filter(ability => {
+					return !used.includes(ability.value) || this.rolls[i].ability === ability.value;
+				});
+			},
+			rolledTotal(i) {
+				let throws = [...this.rolls[i].results];
+				const lowest_index = this.lowestRoll(throws);
+				throws.splice(lowest_index, 1);
+				return throws.reduce((a, b) => a + b,0);
+			},
+			applyRolledScores() {
+				this.rolls.forEach((roll, i) => {
+					this.saveAbility(this.rolledTotal(i), roll.ability);
+				});
+				this.clearAllRolls();
+				this.roll_dialog = false;
+			},
+			clearAllRolls() {
+				for(const index in this.rolls) {
+					this.$set(this.rolls[index], "ability", "");
+					this.$set(this.rolls[index], "results", []);
+				}
 			}
 		}
 	}
@@ -335,11 +474,46 @@
 			text-align: center;
 		}
 	}
-	@media only screen and (max-width: 950px) {
-		.base_abilities.input {
-			grid-template-columns: repeat(3, 100px);
-			grid-template-rows: auto;
-			grid-row-gap: 20px;
+
+	.ability-rolls {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin: -10px;
+
+		.score {
+			background-color: $gray-dark;
+			margin: 10px;
+			width: 250px;
+
+			.rolls {
+				display: flex;
+				justify-content: space-between;
+				line-height: 30px;
+				padding: 10px;
+
+				.roll {
+					background: $gray-darker;
+					width: 30px;
+					height: 30px;
+					text-align: center;
+					margin-right: 2px;
+					color: $white;
+
+					&.rolled {
+						background-color: $blue;
+					}
+					&.ignore {
+						opacity: .5;
+					}
+				}
+				.total {
+					color: $white;
+					text-align: right;
+					font-size: 25px;
+				}
+			}
+
 		}
 	}
 </style>

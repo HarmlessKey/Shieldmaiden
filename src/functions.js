@@ -5,3 +5,7 @@ String.prototype.capitalize = function() {
 String.prototype.capitalizeEach = function(sep=' ') {
 	return this.split(sep).map((s) => s.capitalize()).join(sep);
 }
+
+Array.min = function( array ){
+	return Math.min.apply( Math, array );
+};

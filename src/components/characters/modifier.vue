@@ -4,7 +4,7 @@
 			<span>
 				{{ modifier['.key'] ? 'Edit' : 'New' }} modifier
 			</span>
-			<q-btn flat v-close-popup round icon="close" />
+			<q-btn flat v-close-popup round icon="close" size="xs" class="ml-2" />
 		</div>
 
 		<!-- MODIFIER -->

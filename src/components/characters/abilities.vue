@@ -479,12 +479,12 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
-		margin: -10px;
+		margin: -5px;
 
 		.score {
 			background-color: $gray-dark;
-			margin: 10px;
-			width: 250px;
+			margin: 5px;
+			min-width: 230px;
 
 			.rolls {
 				display: flex;

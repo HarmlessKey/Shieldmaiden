@@ -105,6 +105,11 @@
 
 		
 		<div class="d-flex justify-content-end center">
+			<span class="mr-3">
+				<hk-timer :value="settings.timer || 0" :key="encounter.turn" />
+				<i class="fas fa-stopwatch" />
+			</span>
+
 			<!-- BROADCASTING -->
 			<span 
 				v-if="!demo"
@@ -171,11 +176,11 @@
 	export default {
 		name: 'Turns',
 		mixins: [remindersMixin, audio],
-		props: ['active_len', 'current', 'next'],
+		props: ['active_len', 'current', 'next', 'settings'],
 		data () {
 			return {
 				demo: this.$route.name === "Demo",
-				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
+				userId: this.$store.getters.user ? this.$store.getters.user.uid : undefined
 			}
 		},
 		computed: {
@@ -184,6 +189,14 @@
 				'path',
 				'broadcast'
 			]),
+			timer: {
+				get() {
+					return (this.timerSetter !== undefined) ? this.timerSetter : this.settings.timer ? this.settings.timer : 0;
+				},
+				set(newVal) {
+					this.timerSetter = newVal;
+				}
+			}
 		},
 		methods: {
 			...mapActions([

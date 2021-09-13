@@ -23,6 +23,7 @@ import HkPopover from './components/hk-components/hk-popover';
 import HkLoader from './components/hk-components/hk-loader';
 import HkDmgTypeSelect from './components/hk-components/hk-dmg-type-select';
 import HkTip from './components/hk-components/hk-tip';
+import HkTimer from './components/hk-components/hk-timer';
 import Icon from './components/Icon';
 import './quasar';
 import './registerServiceWorker';
@@ -46,6 +47,7 @@ Vue.component('hk-dice-text', HkDiceText);
 Vue.component('hk-popover', HkPopover);
 Vue.component('hk-dmg-type-select', HkDmgTypeSelect);
 Vue.component('hk-tip', HkTip);
+Vue.component('hk-timer', HkTimer);
 Vue.component('icon', Icon);
 Vue.use(Snotify, options);
 Vue.use(VeeValidate, {fieldsBagName: 'formFields'})

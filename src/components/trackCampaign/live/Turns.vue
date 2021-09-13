@@ -4,6 +4,10 @@
 			Finished
 		</h2>
 		<template v-else>
+			<div class="timer">
+				<i class="fas fa-stopwatch" />
+				<hk-timer :value="timer || 0" :key="encounter.turn" />
+			</div >
 			<div class="round-info d-flex justify-content-center" v-if="encounter.round">
 				<div class="mr-3">
 					<div>Round</div>
@@ -98,6 +102,7 @@
 			'playerSettings',
 			'npcs',
 			'npcSettings',
+			'timer'
 		],
 		data() {
 			return {
@@ -133,6 +138,14 @@
 		text-transform: uppercase;
 		height: 60px;
 		padding: 10px;
+
+		.timer {
+			position: absolute;
+			left: 15px;
+			top: 0;
+			line-height: 60px;
+			font-size: 20px;
+		}
 
 		.round-info {
 			line-height: 12px;

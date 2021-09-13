@@ -105,7 +105,7 @@
 
 		
 		<div class="d-flex justify-content-end center">
-			<span class="mr-3">
+			<span class="timer">
 				<hk-timer :value="settings.timer || 0" :key="encounter.turn" />
 				<i class="fas fa-stopwatch" />
 			</span>
@@ -268,6 +268,7 @@
 	font-size: 20px;
 	grid-area: turns;
 	align-items: center;
+	position: relative;
 
 	.center {
 		align-items: center;
@@ -281,6 +282,9 @@
 		i {
 			vertical-align: -2px;
 		}
+	}
+	.timer {
+		margin-right: 20px;
 	}
 
 	.handler {
@@ -354,13 +358,32 @@
 	}
 	.round-info {
 		.header {
-			margin-top: 5px;
+			margin-top: 17px;
 		}
 
 		.number { 
 			font-weight: bold;
 			font-size: 18px !important;
 			line-height: 18px !important;
+		}
+	}
+	.timer {
+		display: flex;
+		flex-direction: row-reverse;
+		margin: 0;
+		font-size: 15px;
+		position: absolute;
+		line-height: 20px;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		border-bottom: solid 1px $gray-light;
+		padding: 0 10px;
+
+		i {
+			margin-right: 5px;
+			line-height: 20px;
+			font-size: 12px;
 		}
 	}
 }

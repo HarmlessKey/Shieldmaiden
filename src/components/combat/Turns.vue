@@ -189,14 +189,6 @@
 				'path',
 				'broadcast'
 			]),
-			timer: {
-				get() {
-					return (this.timerSetter !== undefined) ? this.timerSetter : this.settings.timer ? this.settings.timer : 0;
-				},
-				set(newVal) {
-					this.timerSetter = newVal;
-				}
-			}
 		},
 		methods: {
 			...mapActions([

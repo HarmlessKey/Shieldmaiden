@@ -37,44 +37,38 @@
       "purpose": "maskable"
     },
     {
-      "src": "/img/icons/app-icon-44x44.png",
+      "src": "/img/icons/ms/app-icon-44x44.png",
       "sizes": "44x44",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/small-tile-71x71.png",
+      "src": "/img/icons/ms/small-tile-71x71.png",
       "sizes": "71x71",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/medium-tile-150x150.png",
-      "sizes": "150x150",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/img/icons/wide-tile-350x150.png",
+      "src": "/img/icons/ms/wide-tile-350x150.png",
       "sizes": "350x150",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/large-tile-310x310.png",
+      "src": "/img/icons/ms/large-tile-310x310.png",
       "sizes": "310x310",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/store-logo-50x50.png",
+      "src": "/img/icons/ms/store-logo-50x50.png",
       "sizes": "50x50",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/splash-screen-630x300.png",
-      "sizes": "630x300",
+      "src": "/img/icons/ms/splash-screen-620x300.png",
+      "sizes": "620x300",
       "type": "image/png",
       "purpose": "any"
     }

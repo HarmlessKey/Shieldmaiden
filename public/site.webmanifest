@@ -13,19 +13,25 @@
   ],
   "icons": [
     {
-      "src": "/img/icons/android-chrome-transparent-192x192.png",
+      "src": "/img/icons/transparent-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/android-chrome-transparent-512x512.png",
+      "src": "/img/icons/maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/img/icons/transparent-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/icons/android-chrome-maskable-transparent-512x512.png",
+      "src": "/img/icons/maskable-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -35,6 +41,34 @@
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Campaigns",
+      "description": "The campaigns you are running.",
+      "url": "/campaigns",
+      "icons": [
+        {
+          "src": "/img/icons/shortcuts/campaigns-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "Characters",
+      "description": "Your player characters.",
+      "url": "/characters",
+      "icons": [
+        {
+          "src": "/img/icons/shortcuts/characters-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
     }
   ]
 }

@@ -25,6 +25,12 @@
       "purpose": "any"
     },
     {
+      "src": "/img/icons/android-chrome-maskable-transparent-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/img/icons/msapplication-icon-transparent-144x144.png",
       "sizes": "144x144",
       "type": "image/png",

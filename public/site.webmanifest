@@ -13,18 +13,6 @@
   ],
   "icons": [
     {
-      "src": "/img/icons/transparent-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/img/icons/maskable-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
       "src": "/img/icons/transparent-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -37,8 +25,56 @@
       "purpose": "maskable"
     },
     {
-      "src": "/img/icons/msapplication-icon-transparent-144x144.png",
-      "sizes": "144x144",
+      "src": "/img/icons/transparent-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/img/icons/app-icon-44x44.png",
+      "sizes": "44x44",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/small-tile-71x71.png",
+      "sizes": "71x71",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/medium-tile-150x150.png",
+      "sizes": "150x150",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/wide-tile-350x150.png",
+      "sizes": "350x150",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/large-tile-310x310.png",
+      "sizes": "310x310",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/store-logo-50x50.png",
+      "sizes": "50x50",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/splash-screen-630x300.png",
+      "sizes": "630x300",
       "type": "image/png",
       "purpose": "any"
     }

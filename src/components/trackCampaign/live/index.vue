@@ -18,6 +18,7 @@
 				:playerSettings="playerSettings"
 				:npcSettings="npcSettings"
 				@setWeather="setWeather"
+				:timer="timer['.value']"
 			/>
 
 			<!-- DESKTOP -->
@@ -225,6 +226,10 @@
 				playerSettings: {
 					source: db.ref(`settings/${this.userId}/track/player`),
 					asObject: true,
+				},
+				timer: {
+					source: db.ref(`settings/${this.userId}/encounter/timer`),
+					asObject: true
 				}
 			}
 		},

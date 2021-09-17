@@ -1,35 +1,9 @@
-# FROM alpine
+FROM nginx
 
-# RUN apk add thttpd
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+RUN rm -rf /usr/share/nginx/html/*
 
-# RUN adduser -D static
-# USER static
-# WORKDIR /home/static
+COPY ./dist /usr/share/nginx/html
 
-# COPY ./dist .
-
-# EXPOSE 8080
-
-# CMD ["thttpd", "-D", "-h", "0.0.0.0", "-p", "8080", "-d", "home/static", "-u", "static", "-l", "-", "-M", "60"]
-
-FROM node:12.22
-# Install python
-# RUN apk update || : && apk add python -y
-# RUN apt update || : && apt install python -y
-
-# ENV NODE_ENV=production
-RUN npm install -g http-server
-
-WORKDIR /usr/src/app
-COPY package.json ./
-COPY .npmrc ./
-
-# COPY ["package.json", "package-lock.json*", "./"]
-RUN npm install
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 8080
-CMD ["http-server", "dist"]
+EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]

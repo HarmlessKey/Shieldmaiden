@@ -12,7 +12,10 @@
 
 # CMD ["thttpd", "-D", "-h", "0.0.0.0", "-p", "8080", "-d", "home/static", "-u", "static", "-l", "-", "-M", "60"]
 
-FROM node:12-alpine3.14
+FROM node:12.22
+# Install python
+# RUN apk update || : && apk add python -y
+# RUN apt update || : && apt install python -y
 
 # ENV NODE_ENV=production
 RUN npm install -g http-server

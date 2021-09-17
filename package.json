@@ -6,8 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "docker": "docker build -t harmlesskey .",
-    "test": "run-s build docker"
+    "docker-build": "docker build -t harmlesskey/harmlesskey .",
+    "docker-push": "docker push harmlesskey/harmlesskey:latest",
+    "docker-run": "docker run -p 8081:80 -d --name Harmlesskey harmlesskey/harmlesskey"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.13",

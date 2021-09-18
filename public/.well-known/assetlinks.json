@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.harmlesskey.twa",
+    "sha256_cert_fingerprints": [
+      "B7:DF:9D:38:39:8C:9A:83:0D:80:CF:18:10:C0:B8:C8:88:C3:8A:68:5A:90:4E:12:84:C7:C9:79:0F:64:4E:D1"
+    ]
+  }
+}]

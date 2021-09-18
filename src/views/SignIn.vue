@@ -59,12 +59,22 @@
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				auth.signInWithPopup(provider).then(() => {
+				auth.signInWithRedirect(provider).then(() => {
+					alert('LOGGED IN!')
 					this.$router.replace('content');
 				}).catch((err) => {
+					alert('ERROR')
 					this.error = err.message;
 				});
 			},
 		},
+		mounted() {
+
+			// Redirect to content when user is logged in
+			if (auth.currentUser !== null) {
+				this.$router.replace('content');
+			}
+
+		}
 	}
 </script>

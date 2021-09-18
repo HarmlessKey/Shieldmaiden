@@ -105,8 +105,8 @@
 
 		
 		<div class="d-flex justify-content-end center">
-			<span class="timer">
-				<hk-timer :value="settings.timer || 0" :key="encounter.turn" />
+			<span v-if="encounter.round > 0" class="timer">
+				<hk-timer :value="timer || 0" :key="encounter.turn" />
 				<i class="fas fa-stopwatch" />
 			</span>
 
@@ -189,6 +189,9 @@
 				'path',
 				'broadcast'
 			]),
+			timer() {
+				return (this.settings) ? this.settings.timer : 0;
+			}
 		},
 		methods: {
 			...mapActions([

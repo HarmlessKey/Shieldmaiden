@@ -101,8 +101,12 @@ export const general_module = {
 		},
 		setLiveEncounter({rootGetters, commit}, encounter_id) {
 			const encounter = (encounter_id) ? encounter_id : false;
-			db.ref(`broadcast/${rootGetters.user.uid}/encounter`).set(encounter);
-			commit("SET_BROADCAST_ENCOUNTER", encounter);
+			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+
+			if(uid) {
+				db.ref(`broadcast/${uid}/encounter`).set(encounter);
+				commit("SET_BROADCAST_ENCOUNTER", encounter);
+			}
 		},
 		setLiveShares({state, commit}, shares) {
 			if(state.broadcast && state.broadcast.live) {

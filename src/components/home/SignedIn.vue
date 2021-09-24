@@ -171,12 +171,15 @@
 				if(this.campaigns && this.userInfo) {
 					if(this.userInfo && this.userInfo.active_campaign) {
 						let campaign = this.campaigns[this.userInfo.active_campaign];
-						campaign.key = this.userInfo.active_campaign;
+						if (campaign !== undefined)
+							campaign.key = this.userInfo.active_campaign;
+
 						return campaign;
 					} else {
 						const campaignKey = Object.keys(this.campaigns)[0];
 						let campaign = this.campaigns[campaignKey];
-						campaign.key = campaignKey;
+						if (campaign !== undefined)
+							campaign.key = campaignKey;
 						return campaign;
 					}
 				}

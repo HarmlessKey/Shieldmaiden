@@ -1,5 +1,6 @@
 import { db } from '@/firebase';
 import Vue from 'vue';
+import { browserDetect } from '../../functions';
 
 const settings_ref = db.ref('settings');
 
@@ -10,7 +11,8 @@ export const general_module = {
 		action_rolls: [],
 		side_collapsed: true,
 		side_small_screen: false,
-		broadcast: {}
+		broadcast: {},
+		browser: browserDetect()
 	},
 	getters: {
 		getSlide: function( state ) { return state.slide; },
@@ -19,6 +21,7 @@ export const general_module = {
 		side_collapsed: function( state ) { return state.side_collapsed; },
 		side_small_screen: function( state ) { return state.side_small_screen; },
 		broadcast: function( state ) { return state.broadcast; },
+		browser: function( state ) { return state.browser; },
 	},
 	actions: {
 		setRoll({ commit, state }, newRoll) {

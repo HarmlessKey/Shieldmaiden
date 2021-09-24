@@ -5,5 +5,5 @@ RUN rm -rf /usr/share/nginx/html/*
 
 COPY ./dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 443
 ENTRYPOINT ["nginx", "-g", "daemon off;"]

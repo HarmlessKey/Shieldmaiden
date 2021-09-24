@@ -42,39 +42,43 @@
 				email: '',
 				password: '',
 				error: '',
+				browser: this.$store.getters.browser
 			}
 		},
 		methods: {
 			signIn: function() {
 				auth.signInWithEmailAndPassword(this.email, this.password).then(
-					// eslint-disable-next-line
-					(user) => {
-						this.$router.replace('content')
+					() => {
+						this.$router.replace('content');
 					},
 					(err) => {
 						this.error = err.message;
 					}
-					);
+				);
 			},
 			googleSignIn() {
 				const provider = new firebase.auth.GoogleAuthProvider();
 
-				auth.signInWithRedirect(provider).then(() => {
-					alert('LOGGED IN!')
-					this.$router.replace('content');
-				}).catch((err) => {
-					alert('ERROR')
-					this.error = err.message;
-				});
+				if(this.browser === "Edge") {
+					auth.signInWithRedirect(provider).then(() => {
+						this.$router.replace('content');
+					}).catch((err) => {
+						this.error = err.message;
+					});
+				} else {
+					auth.signInWithPopup(provider).then(() => {
+						this.$router.replace('content');
+					}).catch((err) => {
+						this.error = err.message;
+					});
+				}
 			},
 		},
 		mounted() {
-
 			// Redirect to content when user is logged in
 			if (auth.currentUser !== null) {
 				this.$router.replace('content');
 			}
-
 		}
 	}
 </script>

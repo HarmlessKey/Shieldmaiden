@@ -410,6 +410,37 @@ html body {
 		}
 	}
 
+	.q-card.install-prompt {
+		color: $gray-darker;
+		max-width: 300px;
+		align-items: top;
+
+		.logo {
+			align-self: top;
+			width: 50px;
+			margin-right: 10px;
+
+			img {
+				width: 50px;
+			}
+		}
+		p {
+			margin-bottom: 10px;
+		}
+		.play-store {
+			width: 130px;
+		}
+		h4 {
+			margin-bottom: 5px;
+			font-size: 18px;
+			line-height: 20px;
+			font-weight: bold;
+		}
+		.q-checkbox {
+			margin-left: -7px;
+		}
+	}
+
 	.openSlot {
 		display: flex;
 		justify-content: space-between;

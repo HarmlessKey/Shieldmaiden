@@ -18,7 +18,6 @@
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
-  margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
 
@@ -31,10 +30,9 @@
 
   /* Animation center compensation - margins should be symmetric */
   /* remove if not needed */
-  margin-left: .2em;
 
   /* you can be more comfortable with increased icons size */
-  /* font-size: 120%; */
+  font-size: 120%;
 
   /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
@@ -46,9 +44,14 @@
 
 .hki {
   &-dragon:before { content: '\e800'; } /* '' */
+  &-monster:before { content: '\e800'; } /* '' */
+  &-spiked-wall:before { content: '\e801'; } /* '' */
+  &-environment:before { content: '\e801'; } /* '' */
   &-axe:before { content: '\e802'; } /* '' */
   &-hooded:before { content: '\e803'; } /* '' */
+  &-player:before { content: '\e803'; } /* '' */
   &-wolf:before { content: '\e804'; } /* '' */
+  &-companion:before { content: '\e804'; } /* '' */
   &-sword-break:before { content: '\e805'; } /* '' */
   &-swords-clash:before { content: '\e806'; } /* '' */
 }

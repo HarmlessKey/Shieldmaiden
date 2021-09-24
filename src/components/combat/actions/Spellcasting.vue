@@ -174,7 +174,8 @@
 		data() {
 			return {
 				displaySetter: undefined,
-				showSpell: undefined
+				showSpell: undefined,
+				tabSetter: undefined
 			}
 		},
 		computed: {
@@ -196,8 +197,14 @@
 				});
 				return tabs;
 			},
-			tab() {
-				return (this.tabs.length > 1) ? "innate" : this.tabs[0].name;
+			tab: {
+				get() {
+					const tab = (this.tabs.length > 1) ? "innate" : this.tabs[0].name;
+					return (this.tabSetter) ? this.tabSetter : tab;
+				},
+				set(newVal) {
+					this.tabSetter = newVal;
+				}
 			},
 			spell_levels() {
 				let levels = [];

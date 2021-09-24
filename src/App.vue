@@ -47,6 +47,31 @@
 				</template>
 			</q-banner>
 		</q-dialog>
+
+		<!-- Install Prompt -->
+		<q-dialog v-model="install_dialog" position="top" persistent>
+      <q-card class="install-prompt">
+        <q-card-section class="d-flex justify-content-start">
+					<div class="logo">
+						<img src="@/assets/_img/logo/logo-icon-cyan.svg" />
+					</div>
+					<div>
+						<h4>Install our app</h4>
+						<p>
+							Would you like to install Harmless Key on your device?
+						</p>
+						<q-checkbox v-model="never_show_install" label="Don't ask again" size="xs" indeterminate-value="indeterminate" />
+					</div>
+        </q-card-section>
+				<q-card-section>
+					<div class="d-flex justify-content-end">
+						<q-btn @click="install(false)" label="No thanks" class="mr-1" flat no-caps />
+						<img v-if="isAndroid" @click="install(true, 'android')" src="@/assets/_img/google-play-badge.png" class="play-store" />
+						<q-btn v-else @click="install(true, 'pwa')" label="Install" color="primary" no-caps />
+					</div>
+				</q-card-section>
+      </q-card>
+    </q-dialog>
 	</div>
 </template>
 
@@ -115,7 +140,11 @@
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
 			announcement_cookie: false,
-			broadcast: undefined
+			install_cookie: false,
+			broadcast: undefined,
+			deferredPrompt: null,
+			install_dialog: false,
+			never_show_install: false
 		}
 	},
 	watch: {
@@ -155,6 +184,10 @@
 			set(newVal) {
 				this.announcementSetter = newVal;
 			}
+		},
+		isAndroid() {
+			const userAgent = navigator.userAgent.toLowerCase();
+			return userAgent.indexOf("android") > -1;
 		}
 	},
 	created() {
@@ -164,6 +197,9 @@
 			const [key, val] = cookie.split('=');
 			if (key.trim() === 'announcement' && val === 'true') {				
 				this.announcement_cookie = true;
+			}
+			if (key.trim() === 'install' && val === 'true') {				
+				this.install_cookie = true;
 			}
 		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
@@ -189,6 +225,18 @@
 				this.$forceUpdate();
 			});
 		}
+
+		// Install prompt
+		window.addEventListener('beforeinstallprompt', (e) => {
+			// Prevent the mini-infobar from appearing on mobile
+			e.preventDefault();
+			// Stash the event so it can be triggered later.
+			if(!this.install_cookie) {
+				this.deferredPrompt = e;
+				// Update UI notify the user they can install the PWA
+				this.install_dialog = true;
+			}
+		});
 	},
 	methods: {
 		...mapActions([
@@ -212,11 +260,39 @@
 
 			document.cookie = `announcement=true; max-age=${max_age}; path=/`;
 			this.announcement = false;
+		},
+		async install(install, type) {
+			const cookie_duration = (this.never_show_install) ? (10*365*24*60*60) : (30*24*60*60);
+			
+			// If the user clicked install
+			if(install) {
+				if(type === "android") {
+					document.cookie = `install=true; max-age=${cookie_duration}; path=/`;
+					window.location= "market://details?id=com.harmlesskey.twa";
+					this.install_dialog = false;
+				} else {
+					// Show the install prompt
+					this.deferredPrompt.prompt();
+
+					// Wait for the user to respond to the prompt
+					const { outcome } = await this.deferredPrompt.userChoice;
+
+					// Set a cookie and hide the dialog if propmt was accepted
+					if(outcome === "accepted") {
+						document.cookie = `install=true; max-age=${cookie_duration}; path=/`;
+						this.deferredPrompt = null; // We've used the prompt, and can't use it again, throw it away
+						this.install_dialog = false;
+					}					
+				}
+			} else {
+				document.cookie = `install=true; max-age=${cookie_duration}; path=/`;
+				this.install_dialog = false;
+			}
 		}
 	}
 };
 </script>
 
 <style lang="scss" src="./css/styles.scss">
-	
+
 </style>

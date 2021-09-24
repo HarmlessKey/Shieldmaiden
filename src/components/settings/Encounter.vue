@@ -63,6 +63,46 @@
 					</a>
 				</span>
 			</q-select>
+			
+			<div class="timer">
+				<q-input 
+					dark square filled
+					type="number"
+					label="Minutes"
+					:value="timer.minutes"
+					@input="setTimer($event, 'minutes')"
+				>
+					<q-icon slot="prepend" size="medium" name="fas fa-stopwatch" class="mx-3" />
+					<template #append>:</template>
+				</q-input>
+				<q-input 
+					dark square filled
+					type="number"
+					max="59"
+					label="Seconds"
+					:value="timer.seconds"
+					@input="setTimer($event, 'seconds')"
+				>
+					<span slot="after" >
+						<a @click.stop>
+						<q-icon name="info" size="medium">
+							<q-menu square anchor="top middle" self="bottom middle" :max-width="'250px'">
+								<q-card dark square>
+									<q-card-section class="bg-gray-active">
+										<b>Turn timer</b>
+									</q-card-section>
+
+									<q-card-section>
+										<p>When a time is entered, the turn timer will count down from the time you entered.</p>
+										<p>Set to 0 or clear the value to have the timer count up again.</p>		
+									</q-card-section>
+								</q-card>
+							</q-menu>
+						</q-icon>
+					</a>
+					</span>
+				</q-input>
+			</div>
 		</div>
 		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
 	</div>
@@ -148,6 +188,18 @@
 				},
 			}
 		},
+		computed: {
+			timer() {
+				const total = this.settings.timer ? this.settings.timer : 0;
+				const minutes = Math.floor(total/60);
+				const seconds = total - (minutes*60);
+
+				return {
+					minutes,
+					seconds
+				};
+			}
+		},
 		methods: {
 			setSetting(type, value) {
 				if(value == undefined) {
@@ -167,6 +219,18 @@
 					return item.value === value;
 				})[0];
 				return selected;
+			},
+			setTimer(value, type) {
+				value = (value === "") ? 0 : value;
+				value = (value < 0) ? 0 : value;
+				value = (value > 59) ? 59 : value;
+				let total;
+				if(type === 'seconds') {
+					total = parseInt(parseInt(value) + this.timer.minutes*60);
+				} else {
+					total = parseInt(this.timer.seconds + parseInt(value)*60);
+				}
+				db.ref(`settings/${this.userId}/encounter/timer`).set(total);
 			}
 		}
 	}
@@ -177,5 +241,8 @@
 		.q-item {
 			width: 100%;
 		}
+	}
+	.timer {
+		display: flex;
 	}
 </style>

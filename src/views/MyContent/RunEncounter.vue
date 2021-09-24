@@ -31,6 +31,7 @@
 							:active_len="Object.keys(_active).length"
 							:current="_active[encounter.turn]"
 							:next="_active[encounter.turn + 1]"
+							:settings="settings"
 						/>
 						<Current 
 							:current="_active[encounter.turn]"
@@ -64,6 +65,7 @@
 						:active_len="Object.keys(_active).length"
 						:current="_active[encounter.turn]"
 						:next="_active[encounter.turn + 1]"
+						:settings="settings"
 					/>
 
 					<CurrentMobile 
@@ -165,8 +167,6 @@
 				this.setSize();
 			});
 			this.track_Encounter(this.demo);
-
-			
 		},
 		computed: {
 			...mapGetters([

@@ -7,52 +7,52 @@
 			<div class="top">
 				<Crumble />
 			</div>
-				<div class="mt-2 encounter_actions">
-					<q-tabs
-						v-model="tab"
-						dark
-						inline-label
-						dense
-						align="left"
-						:breakpoint="0"
-						no-caps
+			<div class="mt-2 encounter_actions">
+				<q-tabs
+					v-model="tab"
+					dark
+					inline-label
+					dense
+					align="left"
+					:breakpoint="0"
+					no-caps
+				>
+					<q-route-tab
+						exact replace
+						:to="'/encounters/' + $route.params.campid"
+						icon="fas fa-arrow-left"
+						label="Back"
+						class="pl-0"
 					>
-						<q-route-tab
-							exact replace
-							:to="'/encounters/' + $route.params.campid"
-							icon="fas fa-arrow-left"
-							label="Back"
-							class="pl-0"
-						>
-						</q-route-tab>
-						<q-tab 
-							v-for="({name, icon, label}, index) in tabs"
-							:key="`tab-${index}`" 
-							:name="name" 
-							:icon="icon"
-							:label="label"
-						/>
-					</q-tabs>
-					<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
-						<q-tab-panels v-model="tab" class="bg-transparent">
-							<q-tab-panel name="entities">
-									<Entities />
-							</q-tab-panel>
-							<q-tab-panel name="general">
-									<General />
-							</q-tab-panel>
-							<q-tab-panel name="loot">
-									<Loot />
-							</q-tab-panel>
-							<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
-									<Xp />
-							</q-tab-panel>
-						</q-tab-panels>
-					</q-scroll-area>
-				</div>
+					</q-route-tab>
+					<q-tab 
+						v-for="({name, icon, label}, index) in tabs"
+						:key="`tab-${index}`" 
+						:name="name" 
+						:icon="icon"
+						:label="label"
+					/>
+				</q-tabs>
+				<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
+					<q-tab-panels v-model="tab" class="bg-transparent">
+						<q-tab-panel name="entities">
+								<Entities />
+						</q-tab-panel>
+						<q-tab-panel name="general">
+								<General />
+						</q-tab-panel>
+						<q-tab-panel name="loot">
+								<Loot />
+						</q-tab-panel>
+						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
+								<Xp />
+						</q-tab-panel>
+					</q-tab-panels>
+				</q-scroll-area>
+			</div>
 
-				<!-- ENCOUNTER OVERVIEW -->
-				<Overview />
+			<!-- ENCOUNTER OVERVIEW -->
+			<Overview />
 		</div>
 	</div>
 </template>

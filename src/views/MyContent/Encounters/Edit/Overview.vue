@@ -74,21 +74,34 @@
 							:columns="entityColumns"
 							:showHeader="false"
 						>
-							<template slot="image" slot-scope="data">
-								<template v-if="data.row.entityType === 'player'">
-									<span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
-									<icon v-else icon="player" class="image" />
-								</template>
-								<template v-if="data.row.entityType === 'companion'">
-									<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-									<icon v-else icon="companion" class="image" />
-								</template>
-								<template v-else-if="data.row.entityType === 'npc'">
-									<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-									<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-									<icon v-else-if="data.row.friendly" icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
-								</template>
-							</template>
+							<div slot="image" slot-scope="data">
+								<!-- Player avatar -->
+								<span 
+									v-if="data.row.entityType === 'player'" 
+									:style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"
+									class="image"
+								>
+									<i v-if="!players[data.row.id].avatar" class="hki-player" />
+								</span>
+
+								<!-- Companion avatar -->
+								<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }">
+									<i v-if="!npcs[data.row.id].avatar" class="hki-companion" />
+								</span>
+
+								<!-- Friendly NPC avatar -->
+								<span 
+									v-else-if="data.row.entityType === 'npc'"
+									class="image" 
+									:style="{ 
+										backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+										'border-color': data.row.color_label ? data.row.color_label : ``,
+										'color': data.row.color_label ? data.row.color_label : ``
+									}"
+								>
+									<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+								</span>
+							</div>
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="green">
@@ -122,21 +135,18 @@
 							:columns="entityColumns"
 							:showHeader="false"
 						>
-							<template slot="image" slot-scope="data">
-								<span v-if="data.row.avatar" class="image" 
-									:style="{
-										backgroundImage: 'url(\'' + data.row.avatar + '\')',
-										'border-color': data.row.color_label ? data.row.color_label : ``
-									}" />
-								<span 
-									v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" 
-									class="image" 
-									:style="{ 
-										backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')', 
-										'border-color': data.row.color_label ? data.row.color_label : ``
-									}" />
-								<icon v-else icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
-							</template>
+							<span 
+								slot="image" 
+								slot-scope="data"
+								class="image" 
+								:style="{ 
+									backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+									'border-color': data.row.color_label ? data.row.color_label : ``,
+									'color': data.row.color_label ? data.row.color_label : ``
+								}"
+							>
+								<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+							</span>
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="red">
@@ -196,7 +206,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 				},
 				entityColumns: {
 					image: {
-						width: 46,
+					width: 46,
 						noPadding: true
 					},
 					name: {

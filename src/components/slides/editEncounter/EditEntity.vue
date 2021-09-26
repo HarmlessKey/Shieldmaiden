@@ -2,7 +2,7 @@
 
 <template>
 	<div class="pb-5">
-		<h2>Edit <span class="blue">{{ npc.name }}</span></h2>
+		<h2>Edit <b>{{ npc.name.capitalize() }}</b></h2>
 			<q-input 
 				dark filled square
 				label="Name"
@@ -15,18 +15,30 @@
 				placeholder="Name"/>
 			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
-			<q-input
-				dark filled square
-				label="Avatar"
-				type="text" 
-				:class="{'input': true, 'error': errors.has('avatar') }" 
-				v-model="npc.avatar" 
-				v-validate="'url'" 
-				data-vv-as="Avatar"
-				name="avatar" 
-				id="avatar" 
-				placeholder="Input URL"
-			/>
+			<div class="avatar">
+				<div 
+					class="img" 
+					:style="{ 
+						backgroundImage: 'url(\'' + npc.avatar + '\')',
+						'border-color': npc.color_label ? npc.color_label : ``,
+						'color': npc.color_label ? npc.color_label : ``
+					}"
+				>
+					<i v-if="!npc.avatar" class="hki-monster" />
+				</div>
+				<q-input
+					dark filled square
+					label="Avatar"
+					type="text" 
+					:class="{'input': true, 'error': errors.has('avatar') }" 
+					v-model="npc.avatar" 
+					v-validate="'url'" 
+					data-vv-as="Avatar"
+					name="avatar" 
+					id="avatar" 
+					placeholder="Input URL"
+				/>
+			</div>
 			<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 		<hr>
 			<q-input
@@ -83,7 +95,6 @@
 			<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
 		<button class="btn btn-block my-2" @click="edit()">Save</button>
 		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
-		<div class="img-container"><img :src="npc.avatar" /></div>
 	</div>
 </template>
 
@@ -135,9 +146,21 @@
 	};
 </script>
 
-<style scoped>
-	.img-container, img {
-		margin-top: 10px;
-		width: 100%;
+<style lang="scss" scoped>
+.avatar {
+	display: grid;
+	grid-template-columns: 56px 1fr;
+	grid-column-gap: 10px;
+
+	.img {
+		border: solid 1px $gray-light;
+		display: block;
+		width: 56px;
+		height: 56px;
+		background-size: cover;
+		background-position: center top;
+		font-size: 45px;
+		line-height: 56px;
 	}
+}
 </style>

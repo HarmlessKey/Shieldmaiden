@@ -18,7 +18,7 @@
 					<template v-slot:header>
 						<q-item-section>
 							<div class="d-flex justify-content-start">
-								<icon :icon="value" class="icon"/>
+								<i :class="`hki-${value}`" class="icon" />
 								{{ name }}
 							</div>
 						</q-item-section>
@@ -167,10 +167,14 @@
 </script>
 
 <style lang="scss" scoped>
-	.icon {
-		width: 25px;
-		height: 25px;
-		margin-right: 10px;
+	.q-item__section {
+		line-height: 27px;
+
+		.icon {
+			color: $gray-light;
+			font-size: 23px;
+			margin-right: 12px;
+		}
 	}
 	a .exhaustion {
 		display: block;
@@ -193,35 +197,34 @@
 			background:$gray-dark;
 		}
 	}
-	ul.conditions {
-		list-style: none;
-		padding: 0;
-		line-height: 25px;
-		font-size: 16px;
+	// ul.conditions {
+	// 	list-style: none;
+	// 	padding: 0;
+	// 	line-height: 25px;
+	// 	font-size: 16px;
 
-		a {
-			color: $gray-light !important;
-		}
-		.icon {
-			width: 25px;
-			height: 25px;
-			margin-right: 10px;
-		}
+	// 	a {
+	// 		color: $gray-light !important;
+	// 	}
+	// 	.icon {
+	// 		font-size: 25px;
+	// 		margin-right: 10px;
+	// 	}
 
-		li {
-			margin-bottom: 15px;
+	// 	li {
+	// 		margin-bottom: 15px;
 
-			.shown {
-				color: $gray-light;
-				background:$gray-active;
-				padding: 20px;
+	// 		.shown {
+	// 			color: $gray-light;
+	// 			background:$gray-active;
+	// 			padding: 20px;
 
-				ul {
-					padding: 15px 0 0 18px;
-					margin: 0;	
-				}
-				margin: 10px 0;				
-			}
-		}
-	}
+	// 			ul {
+	// 				padding: 15px 0 0 18px;
+	// 				margin: 0;	
+	// 			}
+	// 			margin: 10px 0;				
+	// 		}
+	// 	}
+	// }
 </style>

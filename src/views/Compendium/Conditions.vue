@@ -3,7 +3,7 @@
 	<div class="content">
 		<template v-if="!$route.params.id">
 		<Crumble />
-		<h1><i class="fas fa-skull-crossbones"></i> conditions</h1>
+		<h1><i class="fas fa-flame"></i> Conditions</h1>
 			<p>
 				If you can't find a condition, 
 				it is because we are only allowed to store 
@@ -11,22 +11,22 @@
 			</p>
 
 			<hk-table
-				:items="conditions"
+				:items="conditionList"
 				:columns="fields"
 				:perPage="15"
-				:loading="isBusy"
 				:search="['name']"
 				:collapse="true"
 			>
-				<router-link :to="'/compendium/conditions/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+				<div slot="name" slot-scope="data">
+					<i :class="`hki-${data.row.value}`" class="mr-2" />
+					<router-link :to="'/compendium/conditions/' + data.row.value">
+						{{ data.item }}
+					</router-link>
+				</div>
 
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">
-					<Condition :id="data.row['.key']" />
-				</div>
-				
-				<div slot="table-busy" class="loader">
-					<span>Loading conditions....</span>
+					<Condition :id="data.row.value" />
 				</div>
 			</hk-table>
 		</template>
@@ -36,13 +36,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Condition from '@/components/compendium/Condition.vue';
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Conditions',
+		mixins: [conditions],
 		components: {
 			Crumble,
 			Footer,
@@ -58,15 +59,6 @@
 						label: 'Name',
 						sortable: true
 					},
-				},
-				isBusy: true,
-			}
-		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					readyCallback: () => this.isBusy = false
 				}
 			}
 		}

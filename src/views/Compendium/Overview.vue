@@ -36,7 +36,7 @@
 					'conditions': { 
 						name: 'Conditions',
 						url: 'conditions',
-						icon: 'fas fa-skull-crossbones',
+						icon: 'fas fa-flame',
 					},
 					'items': { 
 						name: 'Items',

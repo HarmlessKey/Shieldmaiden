@@ -28,34 +28,24 @@
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
 
-  /* Animation center compensation - margins should be symmetric */
-  /* remove if not needed */
-
   /* you can be more comfortable with increased icons size */
   font-size: 120%;
 
   /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  /* Uncomment for 3D effect */
-  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
 .hki {
-  &-dragon:before { content: '\e800'; } /* '' */
-  &-monster:before { content: '\e800'; } /* '' */
-  &-spiked-wall:before { content: '\e801'; } /* '' */
-  &-environment:before { content: '\e801'; } /* '' */
+  &-dragon:before, &-monster:before { content: '\e800'; } /* '' */
+  &-spiked-wall:before, &-environment:before { content: '\e801'; } /* '' */
   &-axe:before { content: '\e802'; } /* '' */
-  &-hooded:before { content: '\e803'; } /* '' */
-  &-player:before { content: '\e803'; } /* '' */
-  &-wolf:before { content: '\e804'; } /* '' */
-  &-companion:before { content: '\e804'; } /* '' */
+  &-hooded:before, &-player:before { content: '\e803'; } /* '' */
+  &-wolf:before, &-companion:before { content: '\e804'; } /* '' */
   &-sword-break:before { content: '\e805'; } /* '' */
   &-swords-clash:before { content: '\e806'; } /* '' */
   &-heal:before { content: '\e807'; } /* '' */
-  &-incapacitated:before { content: '\e808'; } /* '' */
+  &-incapacitated:before, &-stunned:before { content: '\e808'; } /* '' */
   &-invisible:before { content: '\e809'; } /* '' */
   &-surprised:before { content: '\e80a'; } /* '' */
   &-paralyzed:before { content: '\e80b'; } /* '' */
@@ -66,7 +56,7 @@
   &-blinded:before { content: '\e810'; } /* '' */
   &-charmed:before { content: '\e811'; } /* '' */
   &-deafened:before { content: '\e812'; } /* '' */
-  &-exhaustion:before { content: '\e813'; } /* '' */
+  &-exhaustion:before, &-prone:before { content: '\e813'; } /* '' */
   &-frightened:before { content: '\e814'; } /* '' */
   &-grappled:before { content: '\e815'; } /* '' */
 }

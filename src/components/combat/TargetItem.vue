@@ -372,7 +372,8 @@
 							:key="key" 
 							@click="showCondition(key)">
 							<q-tooltip anchor="top middle" self="center middle">
-								{{ key }}
+								<i :class="`hki-${key}`" />
+								{{ key.capitalize() }}
 							</q-tooltip>
 						</div>
 					</div>

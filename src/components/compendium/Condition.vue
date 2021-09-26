@@ -1,9 +1,7 @@
 <template>
 	<div>
 		<h3>
-			<svg class="icon" viewBox="0 0 512 512">
-				<path :d="condition.icon" fill-opacity="1"></path>
-			</svg>
+			<i :class="`hki-${condition.value}`" />
 			{{ condition.name }}
 		</h3>
 		<i>{{ condition.condition }}</i>
@@ -15,7 +13,7 @@
 		</ul>
 
 		<!-- EXHAUSTION -->
-		<table v-if="condition['.key'] == 'exhaustion'" class="table">
+		<table v-if="condition.value === 'exhaustion'" class="table">
 			<thead>
 				<th>Level</th>
 				<th>Effect</th>
@@ -31,14 +29,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Condition',
 		props: ['id'],
+		mixins: [conditions],
 		data() {
 			return {
-				loading: true,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",
@@ -49,13 +47,9 @@
 				]
 			}
 		},
-		firebase() {
-			return {
-				condition: {
-					source: db.ref(`conditions/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.condition.name),
-				}
+		computed: {
+			condition() {
+				return this.conditionList.filter(item => item.value === this.id)[0];
 			}
 		}
 	}

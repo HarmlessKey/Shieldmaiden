@@ -1261,6 +1261,11 @@ html body {
 			line-height: 35px;
 			overflow: hidden;
 			border: solid 1px transparent;
+			
+			[class^="hki-"], [class*=" hki-"] {
+				font-size: 28px;
+				margin-left: -1px;
+			}
 	
 			span {
 				position: relative;

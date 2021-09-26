@@ -103,6 +103,11 @@
 	.footer {
 		background-color: $gray-darker;
 
+		.content {
+			margin: auto;
+			max-width: 1250px;
+		}
+
 		.top {
 			padding: 10px 0;
 
@@ -119,6 +124,7 @@
 			.links {
 				display: flex;
 				justify-content: flex-end;
+				padding-right: 20px;
 
 				div {
 					margin-left: 50px;

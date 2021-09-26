@@ -6,9 +6,6 @@
 		<div class="wrapper scrollable-content">
 			<div class="top">
 				<Crumble />
-				<router-link :to="'/encounters/' + $route.params.campid">
-					<i class="fas fa-arrow-left"></i> Back
-				</router-link>
 			</div>
 				<div class="mt-2 encounter_actions">
 					<q-tabs
@@ -20,6 +17,14 @@
 						:breakpoint="0"
 						no-caps
 					>
+						<q-route-tab
+							exact replace
+							:to="'/encounters/' + $route.params.campid"
+							icon="fas fa-arrow-left"
+							label="Back"
+							class="pl-0"
+						>
+						</q-route-tab>
 						<q-tab 
 							v-for="({name, icon, label}, index) in tabs"
 							:key="`tab-${index}`" 
@@ -126,10 +131,10 @@
 
 	.wrapper {
 		padding: 20px;
-		grid-gap: 10px;
+		grid-column-gap: 10px;
 		display: grid;
 		grid-template-columns: 2fr 1fr;
-		grid-template-rows: 80px 1fr;
+		grid-template-rows: max-content 1fr;
 		height: 100%;
 		grid-template-areas: 
 		"top top"
@@ -141,6 +146,11 @@
 		.encounter_actions {
 			grid-area: actions;
 			overflow-y: hidden;
+
+			.back {
+				line-height: 35px;
+				margin-right: 10px;
+			}
 
 			.q-scrollarea {
 				background:$gray-active !important;
@@ -170,7 +180,7 @@
 	}
 	@media only screen and (max-width: 768px) {
 		.wrapper {
-			grid-template-rows: 30px 1fr;
+			grid-template-rows: max-content 1fr;
 		}
 	}
 }

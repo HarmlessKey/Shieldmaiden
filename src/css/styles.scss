@@ -20,11 +20,12 @@
 /*********************************************/
 html body {
 	padding-top: $header-height;
-	background: $gray-dark;
-	color: $gray-light;
+	background: $neutral-11;
+	color: $white;
 	font-size: 15px;
 	font-family: 'Open Sans', sans-serif;
 	position: relative;
+	background-image: url('../assets/_img/styles/paper-bg.png');
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -43,14 +44,14 @@ html body {
 		height: $header-height;
 		line-height: 50px;
 		width: 100%;
-		background: $black;
+		background: $neutral-10;
 		border-bottom: solid 1px transparent;
 		position:fixed;
 		top: 0;
 		z-index: 999;
 	}
 	pre {
-		color: $gray-light;
+		color: $neutral-2;
 	}
 
 	.text-shadow {
@@ -86,7 +87,7 @@ html body {
 		font-size: 25px;
 		line-height: 40px;
 		margin-bottom: 15px;
-		color: $white;
+		color: $neutral-1;
 	}
 	h2 {
 		font-size: 20px;
@@ -103,6 +104,17 @@ html body {
 
 	/* 4. Classes */
 	/*********************************************/
+	.neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
+	.neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
+	.neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
+	.neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
+	.neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
+	.neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
+	.neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
+	.neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
+	.neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
+	.neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
+
 	.gray { color: $gray !important; path { fill: $gray !important;} }
 	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
 	.gray-darker { color: $gray-darker !important; path { fill: $gray-darker !important;} }
@@ -132,6 +144,17 @@ html body {
 	.electrum { color: $electrum !important; fill: $electrum !important; }
 	.gold { color: $gold !important; fill: $gold !important; }
 	.platinum { color: $platinum !important; fill: $platinum !important; }
+
+	.bg-neutral-1 { background-color: $neutral-1 !important; }
+	.bg-neutral-2 { background-color: $neutral-2 !important; }
+	.bg-neutral-3 { background-color: $neutral-3 !important; }
+	.bg-neutral-4 { background-color: $neutral-4 !important; }
+	.bg-neutral-5 { background-color: $neutral-5 !important; }
+	.bg-neutral-6 { background-color: $neutral-6 !important; }
+	.bg-neutral-7 { background-color: $neutral-7 !important; }
+	.bg-neutral-8 { background-color: $neutral-8 !important; }
+	.bg-neutral-9 { background-color: $neutral-9 !important; }
+	.bg-neutral-10 { background-color: $neutral-10 !important; }
 
 	.bg-gray { background-color: $gray !important; }
 	.bg-gray-light { background-color: $gray-light !important; }
@@ -393,7 +416,7 @@ html body {
 		opacity: .5 !important;
 	}
 
-	.invert { filter: invert(1); }
+	// .invert { filter: invert(1); }
 
 	.pointer {
 		cursor: pointer !important;
@@ -468,7 +491,7 @@ html body {
 		font-size: 20px;
 		line-height: 40px;
 		width: max-content;
-		border-radius: 5px;
+		border-radius: $border-radius;
 		display: flex;
 		justify-content: flex-start;
 		box-shadow: 3px 3px 10px $black;
@@ -502,6 +525,8 @@ html body {
 			display: none;
 		}
 		.content {
+			margin: auto;
+			max-width: 1250px;
 			padding: 20px;
 		}
 	}
@@ -585,11 +610,10 @@ html body {
 		font-family: 'Open Sans', sans-serif;
 		user-select: none;
 		display: inline-block;
-		color: $white;
-		background-color: $gray-hover;
+		background-color: $neutral-5;
 		padding: 5px 10px;
 		font-size: 12px;
-		border-radius: 10px;
+		border-radius: $border-radius;
 		max-height: 25px;
 		line-height: normal;
 		text-transform: uppercase;
@@ -603,14 +627,19 @@ html body {
 			border-radius: 50%;
 			margin-right: 5px;
 		}
-
+		
+		&:hover {
+			background-color: $neutral-4;
+		}
 		&.active {
 			background-color: $red;
-			color: $white;
 
 			&::before {
 				background-color: $white;
 				animation: fadeinout 1.3s linear infinite;
+			}
+			&:hover {
+				background-color: $red-hover;
 			}
 		}
 	}
@@ -689,7 +718,7 @@ html body {
 
 	.btn {
 		cursor: pointer;
-		border-radius: 0 !important;
+		border-radius: $border-radius;
 		background: $blue;
 		color: $white !important;
 		border: none;
@@ -722,20 +751,25 @@ html body {
 			padding: 0.25rem 0.5rem;
 			font-size: 0.875rem;
 			line-height: 1.5;
-			border-radius: 0.2rem;
+			border-radius: $border-radius;
 		}
 		&.btn-lg {
 			padding: 0.5rem 1rem;
 			font-size: 1.25rem;
 			line-height: 1.5;
-			border-radius: 0.3rem;
+			border-radius: $border-radius;
 		}
 		&.btn-block {
 			display: block;
     	width: 100%;
 		}
-		&.bg-green:hover { background-color:$green-hover !important; }
-		&.bg-red:hover { background-color:$red-hover !important; }
+		&.bg-green:hover { background-color: $green-hover !important; }
+		&.bg-red:hover { background-color: $red-hover !important; }
+		&.bg-neutral-5:hover { background-color: $neutral-4 !important; }
+
+		&.btn-square {
+			border-radius: 0;
+		}
 	}
 
 	a.logout { 
@@ -855,14 +889,33 @@ html body {
     min-width: 0;
     word-wrap: break-word;
     background-clip: border-box;
-		background-color: #262626;
+		background-color: $neutral-6;
 		margin-bottom: 20px;
+		border-radius: $border-radius;
+		overflow: hidden;
+		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, .125), 0 6px 2px 0 rgba(0, 0, 0, .1);
+		border: solid 1px $neutral-6;
 		
 		.card-header {
-			padding: 0.75rem 1.25rem;
+			padding: 15px;
 			margin-bottom: 0;
-			background-color: rgba(0, 0, 0, 0.1);
-			border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+			// background-color: rgba(0, 0, 0, 0.08);
+			background-color: $neutral-8;
+			border-bottom: 1px solid $neutral-6;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			min-height: 62px;
+
+			.btn {
+				background-color: $neutral-5;
+
+				&:hover {
+					background-color: $neutral-4;
+				}
+				transition: background-color .2s linear;
+			}
 		}
 		.card-body {
 			flex: 1 1 auto;
@@ -882,13 +935,34 @@ html body {
 			width: 100%;
 		}
 
-		.hk-card {
-			.card-header {
-				background-color: rgba(0, 0, 0, .3);
-			}
-		}
 		&.no-margin {
 			margin-bottom: 0;
+		}
+		&.no-padding {
+			.card-header {
+				padding: 0;
+			}
+			.card-body {
+				padding: 0;
+			}
+			.card-footer {
+				padding: 0;
+			}
+		}
+		&.no-padding-header {
+			.card-header {
+				padding: 0;
+			}
+		}
+		&.no-padding-body {
+			.card-body {
+				padding: 0;
+			}
+		}
+		&.no-padding-footer {
+			.card-footer {
+				padding: 0;
+			}
 		}
 		&.small {
 			font-size: 12px;
@@ -989,12 +1063,14 @@ html body {
 	.hk-table {
 
 		.hk-table-column {
-			background: $gray;
+			background: $neutral-8;
+			margin-right: 1px;
 
 			&.hk-table-header {
 				background: none;
 				padding: 5px 12px !important;
 				font-weight: bold;
+				background-color: $neutral-5;
 			}
 			.image {
 				width: 46px;
@@ -1002,8 +1078,8 @@ html body {
 				display: block;
 				background-size: cover;
 				background-position: top center;
-				border: solid 1px $gray-light;
-				background-color: $black;
+				border: solid 1px $neutral-2;
+				background-color: $neutral-9;
 			}
 			.actions {
 				display: flex;
@@ -1011,20 +1087,7 @@ html body {
 				padding: 9px 12px;
 				user-select: none;
 
-				a {
-					color: $gray-light !important;
-					width: 28px;
-					height: 28px;
-					display: block;
-					line-height: 28px;
-					text-align: center;
-					border-radius: 50%;
-
-					&:hover {
-						text-decoration: none;
-						background-color: $gray-active;
-					}
-				}
+				
 			}
 			.q-field {
 				width: 60px;
@@ -1054,23 +1117,10 @@ html body {
 		}
 	}
 
-	.hk-card {
-		.card-body {
-			.hk-table {
-				.hk-table-column, .hk-collapsed-column {
-					background: $gray-dark;
-
-					&.hk-table-header {
-						background: none;
-					}
-				}
-			}
-		}
-	}
 	.slide {
 		.hk-table {
 			.hk-table-column, .hk-collapsed-column {
-				background: $gray-dark;
+				background: $neutral-9;
 
 				&.hk-table-header {
 					background: none;
@@ -1426,21 +1476,25 @@ html body {
 	.hk-card, .slide {
 		ul.entities {
 			li {
-				background-color: $gray-darker;
+				background-color: $neutral-8;
+				border-radius: $border-radius;
+				overflow: hidden;
 
 				&:hover {
-					background-color: $gray-dark;
+					background-color: $neutral-7;
 				}
+				transition: background-color .2s linear;
 			}
 		}
 		table {
 			tr {
 				td {
-					background-color: $gray-darker;
+					background-color: $neutral-8;
 				}
 				&:hover td {
-					background-color: $gray-dark;
+					background-color: $neutral-7;
 				}
+				transition: background-color .2s linear;
 			}
 		}
 	}
@@ -1481,10 +1535,10 @@ html body {
 		width: 330px;
 		z-index: 99;
 		box-shadow: 0 10px 15px $black;
-		background: $gray;
+		background: $neutral-8;
 		display: grid;
 		grid-template-columns: auto;
-		grid-template-rows: 30px auto;
+		grid-template-rows: 40px auto;
 		grid-template-areas: 
 		"hide"
 		"content";
@@ -1494,13 +1548,13 @@ html body {
 			padding-left: 10px;
 			width: 100%;
 			font-size: 15px;
-			line-height: 30px;
+			line-height: 40px;
 			position: absolute;
 			right: 0px;
 			top: 0px;
 			z-index: 1000;
-			background: $gray-dark;
-			color: $white !important;
+			background: $neutral-9;
+			color: $neutral-1 !important;
 		}
 		.content {
 			padding: 15px;
@@ -1518,7 +1572,7 @@ html body {
 
 		.table {
 			td {
-				background-color: $gray-darker;
+				background-color: $neutral-9;
 			}
 		}
 	}
@@ -1577,7 +1631,7 @@ html body {
 	/* 7. Snotify overrides */
 	/*********************************************/
 	.snotifyToast {
-		border-radius: 0 !important;
+		border-radius: $border-radius !important;
 	}
 	.snotify-leftTop, .snotify-centerTop, .snotify-rightTop {
 		top: 60px !important;
@@ -1781,7 +1835,7 @@ html body {
 		}
 	}
 	.q-btn {
-		border-radius: 0;
+		border-radius: $border-radius;
 	}
 	.q-menu {
 		color: $gray-light;
@@ -1837,7 +1891,7 @@ html body {
 	}
 
 	.q-notification {
-		border-radius: 0;
+		border-radius: $border-radius;
 	}
 	.q-notifications__list--top {
 		top: 120px;

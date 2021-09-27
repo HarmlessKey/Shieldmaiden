@@ -1,5 +1,18 @@
 /* 1. Variables */
 /*********************************************/
+$neutral-11: #080808;
+$neutral-10: #191a1c;
+$neutral-9: #202225;
+$neutral-8: #292B2F;
+$neutral-7: #2F3136;
+$neutral-6: #36393F;
+$neutral-5: #3E4249;
+$neutral-4: #72767D;
+$neutral-3: #8E9297;
+$neutral-2: #B9BBBE;
+$neutral-1: #FFFFFF;
+
+
 $gray: #262626;
 $gray-darker: #232323;
 $gray-dark: #191919;
@@ -9,12 +22,12 @@ $gray-active: #302f2f;
 $black: #000;
 $white: #FFF;
 $green: #83b547;
-$green-hover: #6e993b;
+$green-hover: #9ddb51;
 $blue: #2c97de;
-$blue-hover: #247db7;
+$blue-hover: #36a9f5;
 $facebook-blue: #3C5A99;
 $red: #cc3e4a;
-$red-hover: #a3303a;
+$red-hover: #e8414f;
 $patreon-red: #e85b46;
 $discord-purple: #7289DA;
 $orange: #e76d3b;
@@ -32,7 +45,6 @@ $electrum: #a2bade;
 $gold: #e2da5f;
 $platinum: #fff;
 
-$header-height: 50px;
 
 //damage type colors
 $acid: #83b547;
@@ -48,3 +60,7 @@ $psychic:  #e63f21;
 $radiant:  #e2da5f;
 $slashing:  #6d6767;
 $thunder:  #e63f21;
+
+// Styling
+$header-height: 50px;
+$border-radius: 3px;

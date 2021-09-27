@@ -34,9 +34,8 @@
 				<h2>Create a campaign</h2>
 			</router-link>
 
-			<div class="row q-col-gutter-lg">
-				<div class="col-12 col-md-6">
-					<h2>Dungeon Master</h2>					
+			<hk-card-deck>
+				<hk-card header="Dungeon Master">
 					<q-list dark class="mb-4">
 						<q-item 
 							v-for="({name, icon, label, caption}, index) in dm_tabs" 
@@ -45,7 +44,7 @@
 							:key="`dm-${index}`"
 						>
 							<q-item-section avatar>
-								<q-icon :name="icon" />
+								<q-icon :name="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								<q-item-label>{{ label }}</q-item-label>
@@ -56,10 +55,9 @@
 							</q-item-section>
 						</q-item>
 					</q-list>
-				</div>
+				</hk-card>
 				
-				<div class="col-12 col-md-6">
-					<h2>Player</h2>					
+				<hk-card header="Player">
 					<q-list dark>
 						<q-item 
 							v-for="({name, icon, label, caption}, index) in player_tabs" 
@@ -68,7 +66,7 @@
 							:key="`player-${index}`"
 						>
 							<q-item-section avatar>
-								<q-icon :name="icon" />
+								<q-icon :name="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								<q-item-label>{{ label }}</q-item-label>
@@ -79,8 +77,8 @@
 							</q-item-section>
 						</q-item>
 					</q-list>
-				</div>
-			</div>
+				</hk-card>
+			</hk-card-deck>
 
 			<!-- PATREON -->
 			<div class="mt-4">
@@ -200,9 +198,8 @@
 	.signed {
 		padding-top: 30px;
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color:$white;
 		background-position: top center;
-		background-color:$black;
+		background-color: $neutral-11;
 		overflow: auto;
 		height: calc(100vh - 50px);
 		padding-bottom: 98px;
@@ -216,9 +213,7 @@
 			.hk-card {
 				background-position: center;
 				background-size: cover;
-				box-shadow: 5px 5px 10px rgba(0, 0, 0, .5);
-				color:$white;
-				cursor: pointer;
+				color: $white;
 
 				.card-header {
 					background-color: rgba(0, 0, 0, .5);
@@ -252,18 +247,17 @@
 
 			.first {
 				h2 {
-					color:$white;
 					font-size: 30px !important;
 					text-align: center;
 				}
 			}
 
 			.q-item {
-				background-color: rgba(0, 0, 0, .5);
+				background-color: $neutral-8;
 				margin-bottom: 1px;
 
 				.q-item__label--caption {
-					opacity: .5;
+					color: $neutral-4;
 				}
 			}
 

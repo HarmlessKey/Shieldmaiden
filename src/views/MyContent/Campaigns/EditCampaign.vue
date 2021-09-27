@@ -88,10 +88,10 @@
 
 					<!-- PLAYERS -->
 					<hk-card>
-						<div class="card-header d-flex justify-content-between" slot="header">
+						<div slot="header" class="card-header">
 							Players in Campaign
-							<a @click="players_dialog = true">
-								<i class="fas fa-plus green" />
+							<a @click="players_dialog = true" class="btn btn-sm">
+								<i class="fas fa-plus green mr-1" /> Add players
 							</a>
 						</div>
 						<template v-if="players && campaign">
@@ -121,7 +121,7 @@
 								There are no players in this campaign yet.
 							</p>
 							
-							<a slot="footer" @click="players_dialog = true" class="btn btn-block">Add players</a>
+							<a slot="footer" @click="players_dialog = true" class="btn btn-block btn-square">Add players</a>
 						</template>
 						<hk-loader v-else name="players" />
 					</hk-card>
@@ -131,7 +131,7 @@
 
 		<q-dialog v-model="players_dialog">
 			<hk-card header="All Players" :min-width="300">
-				<div class="card-header d-flex justify-content-between" slot="header">
+				<div slot="header" class="card-header">
 					Add players
 					<q-btn icon="close" flat dense v-close-popup />
 				</div>
@@ -144,14 +144,14 @@
 						{{ player.character_name }}
 					
 						<span v-if="inOtherCampaign(key)">
-							<span class="d-none d-md-inline ml-1 gray-hover pr-2"><small>Different Campaign</small></span>
+							<span class="d-none d-md-inline ml-1 neutral-3 pr-2"><small>Different Campaign</small></span>
 						</span>
 
 						<span v-else-if="checkPlayer(key) >= 0">
-							<i class="fas fa-check pr-2"></i>
+							<i class="fas fa-check pr-2 neutral-2"></i>
 						</span>
 
-						<div v-else class="actions bg-gray">
+						<div v-else class="actions">
 							<a @click="addPlayer(key)">
 								<i class="fas fa-plus green"></i>
 								<q-tooltip anchor="top middle" self="center middle">
@@ -320,7 +320,7 @@
 		text-align: center;
 
 		.img {
-			border: solid 1px $gray-light;
+			border: solid 1px $neutral-3;
 			display: block;
 			width: 56px;
 			height: 56px;

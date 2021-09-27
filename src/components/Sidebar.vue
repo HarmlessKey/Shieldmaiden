@@ -251,10 +251,10 @@
 	height: calc(100vh - 50px);
 	position: relative;
 	padding-top:10px;
-	background:$gray;
+	background: $neutral-8;
 	transition: width 0.5s linear;
 	z-index: 98;
-	border-right: 1px solid$gray-active;
+	border-right: 1px solid $neutral-7;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-bottom: 40px;
@@ -266,15 +266,15 @@
 		font-weight: bold;
 		margin: 10px 0;
 		width: 250px;
-		color:$gray-hover;
+		color: $neutral-4;
 	}
 	hr {
-		background-color:$gray-active;
+		background-color: $neutral-6;
 	}
 	
 	.q-list {
 		.q-item {
-			color: $gray-light !important;
+			color: $neutral-3 !important;
 			overflow: hidden;
 			width: 250px;
 			transition: padding-left 0.5s linear;
@@ -285,23 +285,21 @@
 			}
 
 			&.q-router-link--active {
-				i::before {	
-					color: $blue !important;
-				}
+				color: $neutral-1 !important;
 			}
 		}
 	}
 	#toggle-width {
-		background:$gray;
+		background: $neutral-8;
 		height: 40px;
 		width: calc(100%);
 		position: fixed;
 		right: left;
 		bottom: 0;
 		padding: 0 20px;
-		border-top: 1px solid$gray-active;
+		border-top: 1px solid $neutral-6;
 		cursor: pointer;
-		color: $gray-light;
+		color: $neutral-3;
 		line-height: 40px;
 		font-size: 20px;
 		text-align: right;

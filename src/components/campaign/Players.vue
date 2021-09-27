@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<div class="group-actions" ref="players">
+	<hk-card>
+		<div slot="header" class="card-header">
 			<div 
 				class="money" 
 				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
@@ -23,9 +23,10 @@
 				</template>
 				<span v-else class="text-italic white">No money</span>
 			</div>
-			<div class="actions">
+			<div class="d-flex justify-content-end">
 				<template v-if="viewerIsUser">
 					<a 
+						class="btn btn-sm mr-1"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/health'
@@ -36,6 +37,7 @@
 						</q-tooltip>
 					</a>
 					<a 
+						class="btn btn-sm mr-1"
 						v-if="isXpAdvancement()"
 						@click="setSlide({
 							show: true,
@@ -47,6 +49,7 @@
 							</q-tooltip>
 						</a>
 					<a 
+						class="btn btn-sm"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/Inventory'
@@ -58,6 +61,7 @@
 					</a>
 				</template>
 				<a 
+					class="btn btn-sm"
 					v-else-if="campaign.inventory && campaign.inventory.items"
 					@click="setSlide({
 						show: true,
@@ -231,7 +235,7 @@
 					</div>
 					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
 						<a 	
-							class="gray-hover" 
+							class="btn btn-sm bg-neutral-5" 
 							@click="setSlide({
 								show: true,
 								type: 'slides/EditPlayer',
@@ -258,7 +262,7 @@
 
 		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 		<q-resize-observer @resize="onResize" />
-	</div>
+	</hk-card>
 </template>
 
 <script>
@@ -429,47 +433,22 @@
 </script>
 
 <style lang="scss" scoped>
-	.group-actions {
-		border-bottom: solid 2px $gray-light;
-		height: 35px;
-		line-height: 35px;
-		display: grid;
-		grid-template-columns: auto max-content;
-		grid-template-areas: "money actions";
-		user-select: none;
-
+	.card-header {
 		.money {
 			display: flex;
 			justify-content: flex-start;
 			cursor: pointer;
 			grid-area: money;
-			line-height: 35px;
-			color: $white;
+			font-size: 18px;
 
 			div {
 				margin-right: 10px;
-				font-size: 16px;
 
 				img {
-					height: 12px;
+					height: 14px;
 				}
-
 				&:last-child {
 					margin: none;
-				}
-			}
-		}
-		.actions {
-			display: flex;
-			justify-content: flex-end;
-			grid-area: actions;
-
-			a {
-				margin-left: 10px;
-				color:$white !important;
-
-				&:hover {
-					color: $blue !important;
 				}
 			}
 		}
@@ -503,11 +482,17 @@
 		.col {
 			min-height: 35px;
 			padding: 12px 10px;
-			background-color: $gray;
+			background-color: $neutral-8;
 
 			&.header {
+				padding: 0 12px 5px 12px;
 				background: none;
 				color: $white;
+				min-height: 25px;
+
+				&.actions {
+					padding-top: 5px;
+				}
 			}
 			&.ac {
 				text-align: center;
@@ -527,21 +512,6 @@
 				display: flex;
 				justify-content: flex-end;
 				padding: 9px 12px;
-
-				a {
-					color: $gray-light !important;
-					width: 28px;
-					height: 28px;
-					display: block;
-					line-height: 28px;
-					text-align: center;
-					border-radius: 50%;
-
-					&:hover {
-						text-decoration: none;
-						background-color: $gray-active;
-					}
-				}
 			}
 		}
 		&.xp {

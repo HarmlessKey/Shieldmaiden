@@ -151,7 +151,7 @@
 
 			<template v-else>
 				<span class="d-none d-md-block">
-					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mr-2">
+					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mx-2">
 						<i class="fas fa-arrow-left"></i> 
 						Leave
 					</router-link>

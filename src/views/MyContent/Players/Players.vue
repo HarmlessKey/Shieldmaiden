@@ -8,8 +8,8 @@
 			v-else-if="content_count.players >= tier.benefits.players"
 			type = 'players'
 		/>
-		<template v-if="players">
-			<h2 class="mt-3 d-flex justify-content-between">
+		<hk-card v-if="players">
+			<div slot="header" class="card-header">
 				<span>
 					Players ( 
 					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
@@ -18,10 +18,10 @@
 						<template v-else>{{ tier.benefits.players }}</template>	
 						)
 				</span>
-				<router-link v-if="!overencumbered" to="/players/add-player">
+				<router-link class="btn btn-sm" v-if="!overencumbered" to="/players/add-player">
 					<i class="fas fa-plus green"></i> New Player
 				</router-link>
-			</h2>
+			</div>
 
 
 			<hk-table
@@ -52,13 +52,13 @@
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/players/' + data.row.key">
+					<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="'/players/' + data.row.key">
 						<i class="fas fa-pencil"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row)">
+					<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
 							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
@@ -84,12 +84,10 @@
 					Support us on Patreon for more slots.
 				</router-link>
 			</template>
-		</template>
-		<h3 v-else-if="players === null" class="mt-4">
-			<router-link v-if="!overencumbered" to="/players/add-player">
-				<i class="fas fa-plus green"></i> Create your first player
-			</router-link>
-		</h3>
+		</hk-card>
+		<router-link v-else-if="players === null && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
+			Create your first player
+		</router-link>
 	</div>
 </template>
 

@@ -67,8 +67,8 @@
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy square :offset="[9, 0]">
-						<div class="bg-gray gray-light">
+					<q-popup-proxy :offset="[9, 0]">
+						<div class="bg-neutral-10">
 							<q-list>
 								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
 									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
@@ -196,7 +196,7 @@
 	}
 }
 a {
-	color:$gray-light !important;
+	color: $neutral-3 !important;
 
 	&:hover {
 		color: $blue !important;
@@ -212,7 +212,7 @@ a.icon {
 	line-height: 50px !important;
 
 	&:hover {
-		color:$white !important;
+		color: $neutral-1 !important;
 	}
 	&.roll {
 		margin-left: 5px;

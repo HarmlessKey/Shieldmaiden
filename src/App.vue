@@ -3,7 +3,7 @@
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
-			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash"></i> No internet connection</div>
+			<div class="offline" v-if="connection === 'offline'"><i class="fas fa-wifi-slash mr-1"></i> No internet connection</div>
 			<div :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
 				<div class="scrollable-content">

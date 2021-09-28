@@ -24,6 +24,7 @@
 						<div slot="header" class="card-header">
 							<span>
 								<span>
+								<i class="fas fa-swords mr-1" />
 								Encounters
 								<span v-if="encounters">( 
 									<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
@@ -70,7 +71,6 @@
 						<!-- ACTIVE ENCOUNTERS -->
 						<hk-table
 							v-if="_active.length > 0"
-							class="mb-4"
 							:items="_active"
 							:columns="activeColumns"
 						>
@@ -133,56 +133,50 @@
 					</hk-card>
 					<hk-card  v-if="_finished != 0" header="Finished encounters">
 						<!-- FINISHED ENCOUNTERS -->
-						<template>
-							<h2>Finished Encounters</h2>
-							
-							<hk-table
-								class="mb-4"
-								:items="_finished"
-								:columns="finishedColumns"
-								:perPage="6"
-								:currentPage="currentPage"
-							>
-								<template slot="encounter" slot-scope="data">
-									<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-										{{ data.item }}
+						<hk-table
+							:items="_finished"
+							:columns="finishedColumns"
+							:perPage="6"
+							:currentPage="currentPage"
+						>
+							<template slot="encounter" slot-scope="data">
+								<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+									{{ data.item }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Run encounter
+									</q-tooltip>
+								</router-link>
+							</template>
+
+							<template slot="actions" slot-scope="data">
+								<div class="actions">
+									<router-link class="btn btn-sm bg-neutral-5" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+										<i class="fas fa-eye"></i>
 										<q-tooltip anchor="top middle" self="center middle">
-											Run encounter
+											View
 										</q-tooltip>
 									</router-link>
-								</template>
-
-								<template slot="actions" slot-scope="data">
-									<div class="actions">
-										<router-link :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-											<i class="fas fa-eye"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												View
-											</q-tooltip>
-										</router-link>
-										<a @click="reset(data.row.key, hard=false)">
-											<i class="fas fa-trash-restore-alt"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Unfinish
-											</q-tooltip>
-										</a>
-										<a @click="reset(data.row.key)">
-											<i class="fas fa-undo"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Reset
-											</q-tooltip>
-										</a>
-										<a class="ml-2" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
-											<i class="fas fa-trash-alt"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Delete
-											</q-tooltip>
-										</a>
-									</div>
-								</template>
-							</hk-table>
-
-						</template>
+									<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(data.row.key, hard=false)">
+										<i class="fas fa-trash-restore-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Unfinish
+										</q-tooltip>
+									</a>
+									<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(data.row.key)">
+										<i class="fas fa-undo"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Reset
+										</q-tooltip>
+									</a>
+									<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
+										<i class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
+									</a>
+								</div>
+							</template>
+						</hk-table>
 				
 						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
 					</hk-card>
@@ -283,11 +277,11 @@
 						truncate: true,
 						hide: "md"
 					},
-                    actions: {
+					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',
 						noPadding: true,
 						right: true
-                    }
+					}
 				},
 				finishedColumns: {
 					encounter: {
@@ -296,8 +290,9 @@
 					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',
 						noPadding: true,
+						maxContent: true,
 						right: true
-                    }
+					}
 				}
 			}
 		},

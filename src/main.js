@@ -29,6 +29,7 @@ import './quasar';
 import './registerServiceWorker';
 import { Notify } from 'quasar';
 import 'animate.css';
+import Ads from 'vue-google-adsense';
 
 const options = {
 	toast: {
@@ -57,6 +58,8 @@ Vue.use(Vuebar);
 Vue.use(Meta);
 Vue.use(vueNumeralFilterInstaller, { locale: 'en' });
 Vue.use(require('vue-shortkey'), { prevent: ['input', 'textarea'] })
+Vue.use(require('vue-script2'));
+Vue.use(Ads.Adsense);
 
 
 require('./functions.js')

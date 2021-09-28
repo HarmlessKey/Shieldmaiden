@@ -2,7 +2,7 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<div v-if="play_animation"
+				<!-- <div v-if="play_animation"
 					@click="replay()"
 					@mouseover="video_hover = true" 
 					@mouseleave="video_hover = false"
@@ -26,7 +26,8 @@
 						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
 					/>
 				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" />
+				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" /> -->
+				<hk-video />
 				<div class="content-box">
 					<div class="text">
 						<template>
@@ -51,28 +52,12 @@
 </template>
 
 <script>
+	import HkVideo from "@/components/hk-components/hk-video";
+
 	export default {
 		name: 'Top',
-		data() {
-			return {
-				play_animation: true,
-				muted: true,
-				video_hover: false
-			}
-		},
-		methods: {
-			replay() {
-				const player = this.$refs.video;
-				player.currentTime = 0;
-				player.play();
-			}
-		},
-		mounted() {
-			const navigator = window.navigator;
-			const ua = navigator.userAgent.toLowerCase()
-			const hasMediaCapabilities = !!(navigator.mediaCapabilities && navigator.mediaCapabilities.decodingInfo)
-			const isSafari = ((ua.indexOf('safari') != -1) && (!(ua.indexOf('chrome')!= -1) && (ua.indexOf('version/')!= -1)))
-			this.play_animation = !(isSafari && hasMediaCapabilities);
+		components: {
+			HkVideo
 		}
 	}
 </script>
@@ -87,25 +72,7 @@
 		background-color:$black;
 		overflow: hidden;
 
-		.animated-video {
-			width: 100%;
-			margin: -8% 0 -15%;
-			pointer-events: none;
-		}
-		.video-controls {
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
-			margin-top: 20px;
-			z-index: 10;
-			opacity: .3;
-			
-			i {
-				padding: 5px;
-				cursor: pointer;
-			}
-		}
-
+		
 		.logo {
 			display: block;
 			margin-left: auto;

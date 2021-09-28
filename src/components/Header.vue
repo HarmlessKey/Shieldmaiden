@@ -196,7 +196,7 @@
 	}
 }
 a {
-	color: $neutral-3 !important;
+	color: $neutral-2 !important;
 
 	&:hover {
 		color: $blue !important;

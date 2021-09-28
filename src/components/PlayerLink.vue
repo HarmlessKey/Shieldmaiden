@@ -1,27 +1,16 @@
 <template>
 	<div>
 		<div class="share" :class="{ small: is_small }" ref="share">
-			<div class="qr">
-				<vue-qr :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
+			<div class="qr-wrapper" v-if="qr">
+				<vue-qr class="qr" :text="copy" qid="testid" :size="110" colorLight="true" :margin="5"></vue-qr>
 			</div>
 			<div>
-				<h2>Share live initiative list</h2>
-				<p @click="showInfo = !showInfo">
+				<h2 v-if="title" class="mb-2">Share live initiative list</h2>
+				<p class="neutral-3">
 					Let your players follow your encounters. 
-					<a>
-						<i class="fas fa-info-circle"></i>
-					</a>
 				</p>
-				<q-slide-transition>
-					<p v-show="showInfo">
-						With this link your active encounter can be followed on different devices. 
-						Send it to your players so they can see it on their tablets or phones, 
-						or put it up on a second screen that everyone can see. 
-						You control what is displayed on the link through the <router-link to="/settings#track">settings</router-link>.
-					</p>
-				</q-slide-transition>
 				<q-input
-					dark filled square dense
+					dark filled square
 					:value="copy"
 					autocomplete="off"
 					type="text"
@@ -40,7 +29,7 @@
 				<input :value="copy" id="copy" type="hidden" />
 			</div>
 		</div>
-		<small>
+		<small v-if="info">
 			Make sure your campaign is set to <span class="green">Public</span>, or your followers won't be able to see it.
 			Then click the <span class="live">LIVE</span> icon in your campaign to share the initiative of the encounter that is active. You can stay live for your entire session, whenever you're not running an encounter, followers won't see what you're doing.
 		</small>
@@ -52,6 +41,20 @@
 	
 	export default {
 		name: 'PlayerLink',
+		props: {
+			qr: {
+				type: Boolean,
+				default: true
+			},
+			title: {
+				type: Boolean,
+				default: true
+			},
+			info: {
+				type: Boolean,
+				default: true
+			}
+		},
 		components: {
 				VueQr,
 		},
@@ -124,30 +127,32 @@
 
 <style lang="scss" scoped>
 	.share {
-		display: grid;
-		grid-template-columns: 110px auto;
-		grid-gap: 20px;
-		margin-bottom: 20px;
-
 		.copy {
 			word-break: break-all;
 		}
 
 		&.small {
-			grid-template-columns: 1fr;
-			grid-template-rows: auto auto;
-
-			.qr {
+			.qr-wrapper {
 				display: flex;
 				justify-content: center;
-				border: solid 1px$gray-hover;
+				border: solid 1px $neutral-4;
 				width: 100%;
 				padding: 20px 0;
+				background-color: $neutral-9;
+				border-radius: $border-radius;
+				margin-bottom: 20px;
+
+				.qr {
+					background-color: $neutral-1;
+					padding: 3px;
+					border-radius: $border-radius;
+				}
 			}
 		}
 	}
 	.home {
 		.share {
+			display: grid;
 			grid-template-columns: auto 110px;
 			grid-template-areas: "text qr";
 

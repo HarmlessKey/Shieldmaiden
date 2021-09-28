@@ -44,7 +44,7 @@ html body {
 		height: $header-height;
 		line-height: 50px;
 		width: 100%;
-		background: $neutral-10;
+		background: $neutral-7;
 		border-bottom: solid 1px transparent;
 		position:fixed;
 		top: 0;
@@ -404,11 +404,17 @@ html body {
 	.offline {
 		position: fixed;
 		top: 50px;
-		width: 100%;
+		max-width: 350px;
 		background: $red;
 		color: $white;
 		z-index: 99;
 		text-align: center;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0 10px;
+		font-size: 12px;
+		border-bottom-left-radius: $border-radius;
+		border-bottom-right-radius: $border-radius;
 	}
 	
 	.disabled {
@@ -530,8 +536,27 @@ html body {
 			padding: 20px;
 		}
 	}
+	.signed {
+		.video {
+			.animated-video {
+				transform:scale(1.8);
+			}
+			.video-controls {
+				width: 100%;
+				padding: 0 20px;
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
 	.home {
 		scroll-behavior: smooth;
+
+		.top {
+			.animated-video {
+				margin: -8% 0 -15%;
+			}
+		}
 
 		.content {
 			max-width: 1140px;
@@ -718,7 +743,7 @@ html body {
 
 	.btn {
 		cursor: pointer;
-		border-radius: $border-radius;
+		border-radius: $border-radius-small;
 		background: $blue;
 		color: $white !important;
 		border: none;
@@ -751,21 +776,30 @@ html body {
 			padding: 0.25rem 0.5rem;
 			font-size: 0.875rem;
 			line-height: 1.5;
-			border-radius: $border-radius;
 		}
 		&.btn-lg {
 			padding: 0.5rem 1rem;
 			font-size: 1.25rem;
 			line-height: 1.5;
-			border-radius: $border-radius;
 		}
 		&.btn-block {
 			display: block;
     	width: 100%;
 		}
+		&.btn-clear {
+			background: none;
+
+			&:hover {
+				background-color: $neutral-5;
+			}
+		}
 		&.bg-green:hover { background-color: $green-hover !important; }
 		&.bg-red:hover { background-color: $red-hover !important; }
 		&.bg-neutral-5:hover { background-color: $neutral-4 !important; }
+		&.bg-neutral-6:hover { background-color: $neutral-5 !important; }
+		&.bg-neutral-7:hover { background-color: $neutral-6 !important; }
+		&.bg-neutral-8:hover { background-color: $neutral-7 !important; }
+		&.bg-neutral-9:hover { background-color: $neutral-8 !important; }
 
 		&.btn-square {
 			border-radius: 0;
@@ -905,7 +939,6 @@ html body {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-
 			min-height: 62px;
 
 			.btn {
@@ -930,6 +963,9 @@ html body {
 			padding: 0.75rem 1.25rem;
 			background-color: rgba(0, 0, 0, 0.03);
 			border-top: 1px solid rgba(0, 0, 0, 0.125);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
 		}
 		.card-image {
 			width: 100%;
@@ -938,30 +974,29 @@ html body {
 		&.no-margin {
 			margin-bottom: 0;
 		}
-		&.no-padding {
-			.card-header {
-				padding: 0;
+		&.banner {
+			flex-direction: row;
+			min-height: 242px;
+
+			.card-image {
+				background-position: center;
+				background-size: cover;
 			}
 			.card-body {
-				padding: 0;
-			}
-			.card-footer {
-				padding: 0;
-			}
-		}
-		&.no-padding-header {
-			.card-header {
-				padding: 0;
-			}
-		}
-		&.no-padding-body {
-			.card-body {
-				padding: 0;
-			}
-		}
-		&.no-padding-footer {
-			.card-footer {
-				padding: 0;
+				flex: none;
+				width: 250px;
+				max-width: 50%;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+
+				h3 {
+					margin-bottom: 10px;
+				}
+
+				.btn {
+					align-self: flex-start;
+				}
 			}
 		}
 		&.small {

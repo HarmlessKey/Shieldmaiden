@@ -163,8 +163,7 @@
 				<div v-if="campaigns === undefined" class="loader"><span>Loading Campaigns...</span></div>
 			</div>
 			<div class="col-12 col-md-3">
-				<hk-card header="Sidebar">
-				</hk-card>
+				<ContentSideRight page="campaigns" />
 			</div>
 		</div>
 
@@ -216,6 +215,7 @@
 	import PlayerLink from '@/components/PlayerLink.vue'
 	import { db } from '@/firebase'
 	import { general } from '@/mixins/general.js'
+	import ContentSideRight from "@/components/ContentSideRight";
 
 	export default {
 		name: 'Campaigns',
@@ -228,6 +228,7 @@
 			PlayerLink,
 			OverEncumbered,
 			OutOfSlots,
+			ContentSideRight
 		},
 		data() {
 			return {

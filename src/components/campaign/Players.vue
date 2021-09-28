@@ -465,18 +465,18 @@
 			height: 46px;
 			background-size: cover;
 			background-position: top center;
-			background-color: black;
-			border: solid 1px $gray-light;
+			background-color: $neutral-10;
+			border: solid 1px $neutral-2;
 			position: relative;
 
 			.transformed {
 				right: 0;
 				bottom: 0;
 				position: absolute;
-				background: $black;
+				background: $neutral-10;
 				padding: 0 2px;
-				border-left: solid 1px $gray-light;
-				border-top: solid 1px $gray-light;
+				border-left: solid 1px $neutral-2;
+				border-top: solid 1px $neutral-2;
 			}
 		}
 		.col {
@@ -487,7 +487,7 @@
 			&.header {
 				padding: 0 12px 5px 12px;
 				background: none;
-				color: $white;
+				color: $neutral-1;
 				min-height: 25px;
 
 				&.actions {

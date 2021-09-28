@@ -1,7 +1,7 @@
 <template>
 	<div class="content" v-if="tier">
 		<h1>Your NPC's</h1>
-		<p>These are your custom NPC's that you can use in your campaigns.</p>
+		<p>These are your custom <i>Non-Player Characters</i> or monsters, that you can use in your campaigns.</p>
 
 		<OverEncumbered v-if="overencumbered"/>
 		<OutOfSlots 
@@ -9,8 +9,8 @@
 			type = 'npcs'
 		/>
 	
-		<template v-if="npcs">
-			<h2 class="mt-3 d-flex justify-content-between">
+		<hk-card v-if="npcs">
+			<div slot="header" class="card-header">
 				<span>
 					NPC's ( 
 					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
@@ -19,10 +19,10 @@
 					<template v-else>{{ tier.benefits.npcs }}</template>
 					)
 				</span>
-				<router-link v-if="!overencumbered" to="/npcs/add-npc">
+				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" to="/npcs/add-npc">
 					<i class="fas fa-plus green"></i> New NPC
 				</router-link>
-			</h2>
+			</div>
 
 			<a v-if="old_npcs.length > 0" class="btn btn-block bg-red mb-3" @click="old_dialog = true">
 				<i class="fas fa-wand-magic"></i> Update {{ old_npcs.length }} old NPCs
@@ -58,26 +58,26 @@
 
 				<div slot="actions" slot-scope="data" class="actions">
 					<template v-if="data.row.old">
-						<a @click="parseNewNPC(data.row)">
+						<a class="btn btn-sm bg-neutral-5 mx-1" @click="parseNewNPC(data.row)">
 							<i class="fas fa-wand-magic"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Parse to new format
 							</q-tooltip>
 						</a>
-						<a @click="setSlide({show: true, type: 'ViewOldMonster', data: data.row })">
+						<a class="btn btn-sm bg-neutral-5 mx-1" @click="setSlide({show: true, type: 'ViewOldMonster', data: data.row })">
 							<i class="fas fa-eye"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								View NPC
 							</q-tooltip>
 						</a>
 					</template>
-					<router-link v-else class="gray-hover mx-1" :to="'/npcs/' + data.row.key">
+					<router-link v-else class="btn btn-sm bg-neutral-5 mx-1" :to="'/npcs/' + data.row.key">
 						<i class="fas fa-pencil"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
 						</q-tooltip>
 					</router-link>
-					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row)">
+					<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
 						<i class="fas fa-trash-alt"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Delete
@@ -103,12 +103,10 @@
 					Support us on Patreon for more slots.
 				</router-link>
 			</template>
-		</template>
-		<h3 v-else-if="npcs === null" class="mt-4">
-			<router-link v-if="!overencumbered" to="/npcs/add-npc">
-				<i class="fas fa-plus green"></i> Create your first NPC
-			</router-link>
-		</h3>
+		</hk-card>
+		<router-link v-else-if="npcs === null && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
+			Create your first NPC
+		</router-link>
 		<div v-else class="loader"><span>Loading NPC's...</span></div>
 
 
@@ -200,7 +198,8 @@
 					},
 					name: {
 						label: 'Name',
-						truncate: true
+						truncate: true,
+						sortable: true
 					},
 					actions: {
 						label: '<i class="far fa-ellipsis-h"></i>',

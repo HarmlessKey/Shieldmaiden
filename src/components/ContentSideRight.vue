@@ -1,0 +1,106 @@
+<template>
+  <div>
+    <hk-card small>
+      <div slot="footer" class="card-footer">
+        <span>Support us to remove ads</span>
+        <router-link class="btn btn-sm bg-neutral-5" to="/patreon">
+          <i class="fab fa-patreon patreon-red" />
+        </router-link>
+      </div>
+      <Adsense
+          data-ad-client="ca-pub-2711721977927243"
+          data-ad-slot="2613883680">
+      </Adsense>
+    </hk-card>
+
+    <hk-card v-if="page === 'campaigns'">
+      <div slot="header" class="card-header">
+        <span>Share your adventures</span>
+        <a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'PlayerLink'})">
+          <i class="fas fa-qrcode" />
+        </a>
+      </div>
+      <PlayerLink :qr="false" :title="false" :info="false" />
+    </hk-card>
+
+    <hk-card small header="Join our community">
+      <a class="btn btn-block bg-neutral-8 mb-3" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
+        <i class="fab fa-discord discord-purple mr-2" /> Discord
+      </a>
+      <p class="neutral-2 text-center">
+        Join others on our Discord and be amongst the first to know about new updates.
+      </p>
+      <hr>
+      <div class="social d-flex justify-content-between">
+        <a 
+          v-for="{name, icon, url} in social_media" 
+          class="btn bg-neutral-8" 
+          :key="name"
+          :href="url" 
+          target="_blank" rel="noopener"
+        >
+          <i :class="icon" />
+        </a>
+      </div>
+    </hk-card>
+  </div>
+</template>
+
+<script>
+import { mapActions } from "vuex";
+
+export default {
+  name: "ContentSideRight",
+  props: {
+    page: String
+  },
+  components: {
+    PlayerLink: () => import("@/components/PlayerLink")
+  },
+  data() {
+    return {
+      social_media: [
+					{
+						name: "Patreon",
+						icon: "fab fa-patreon patreon-red",
+						url: "https://www.patreon.com/harmlesskey"
+					},
+					{
+						name: "Instagram",
+						icon: "fab fa-instagram",
+						url: "https://www.instagram.com/harmlesskey"
+					},
+					{
+						name: "Twitter",
+						icon: "fab fa-twitter",
+						url: "https://twitter.com/KeyHarmless"
+					},
+					{
+						name: "Facebook",
+						icon: "fab fa-facebook-f",
+						url: "https://www.facebook.com/harmlesskey"
+					},
+					{
+						name: "Reddit",
+						icon: "fab fa-reddit-alien",
+						url: "https://www.reddit.com/r/HarmlessKey"
+					}
+				]
+    }
+  },
+  computed: {
+    filtered_content() {
+      return this.content.filter(item => item.value !== this.page);
+    }
+  },
+  methods: {
+    ...mapActions([
+				"setSlide"
+			]),
+  }
+}
+</script>
+
+<style>
+
+</style>

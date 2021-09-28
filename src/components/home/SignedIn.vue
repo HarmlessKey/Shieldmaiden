@@ -1,87 +1,90 @@
 <template>
-	<div class="signed">
-		<div class="container">
-			<router-link to="/home">
-				<img class="logo" src="@/assets/_img/logo/logo-main-icon-left.svg" alt="Harmless Key logo" />
-			</router-link>
-			
-			<router-link 
-				v-if="active_campaign"
-				:to="`/encounters/${active_campaign.key}`" 
-				class="mb-5"
-			>
-				<hk-card 
-					:style="[
+	<div class="signed content">
+		<Crumble />
+		<div class="row q-col-gutter-md">		
+			<div class="col-12 col-md-9">
+				<!-- Continue Campaign -->
+				<hk-card v-if="active_campaign" class="banner">
+					<div 
+						slot="image"
+						class="card-image"
+						:style="[
 						active_campaign.background
 						? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
 						: { backgroundImage: `url(${require('@/assets/_img/campaign-background.jpg')})` }
-					]"
-				>
-					<div slot="header" class="card-header truncate">
-						{{ active_campaign.campaign }}
+					]"/>
+					<div>
+						<div class="neutral-4 mb-1">CONTINUE</div>
+						<h3 class="neutral-1">
+							<b>{{ active_campaign.campaign }}</b><br/>
+						</h3>
+						<p class="neutral-3">Dive right back into your adventure.</p>
 					</div>
-					<div class="card-body" slot="default">
-						Continue campaign
-					</div>
-					<div slot="footer" class="card-footer">
-						<small class="date">
-							<span class="gray-light">Started:</span> {{ makeDate(active_campaign.timestamp, true) }}
-						</small>
-					</div>
-				</hk-card>
-			</router-link>
-			<router-link v-else to="/campaigns" class="first">
-				<h2>Create a campaign</h2>
-			</router-link>
 
-			<hk-card-deck>
-				<hk-card header="Dungeon Master">
-					<q-list dark class="mb-4">
-						<q-item 
-							v-for="({name, icon, label, caption}, index) in dm_tabs" 
-							clickable v-ripple 
-							:to="`/${name}`"
-							:key="`dm-${index}`"
-						>
-							<q-item-section avatar>
-								<q-icon :name="icon" class="neutral-2" />
-							</q-item-section>
-							<q-item-section>
-								<q-item-label>{{ label }}</q-item-label>
-								<q-item-label caption>{{ caption }}</q-item-label>
-							</q-item-section>
-							<q-item-section side>
-								<q-icon name="fas fa-chevron-right" />
-							</q-item-section>
-						</q-item>
-					</q-list>
+					<router-link :to="`/encounters/${active_campaign.key}`" class="btn btn-sm">
+						Continue <span class="d-none d-md-inline">campaign</span>
+					</router-link>
 				</hk-card>
+				<router-link v-else to="/campaigns" class="first">
+					<h2>Create a campaign</h2>
+				</router-link>
+
+				<hk-card-deck>
+					<hk-card header="Dungeon Master">
+						<q-list dark class="mb-4">
+							<q-item 
+								v-for="({name, icon, label, caption}, index) in dm_tabs" 
+								clickable v-ripple 
+								:to="`/${name}`"
+								:key="`dm-${index}`"
+							>
+								<q-item-section avatar>
+									<q-icon :name="icon" class="neutral-2" />
+								</q-item-section>
+								<q-item-section>
+									<q-item-label>{{ label }}</q-item-label>
+									<q-item-label caption>{{ caption }}</q-item-label>
+								</q-item-section>
+								<q-item-section side>
+									<q-icon name="fas fa-chevron-right" />
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</hk-card>
 				
-				<hk-card header="Player">
-					<q-list dark>
-						<q-item 
-							v-for="({name, icon, label, caption}, index) in player_tabs" 
-							clickable v-ripple 
-							:to="`/${name}`"
-							:key="`player-${index}`"
-						>
-							<q-item-section avatar>
-								<q-icon :name="icon" class="neutral-2" />
-							</q-item-section>
-							<q-item-section>
-								<q-item-label>{{ label }}</q-item-label>
-								<q-item-label caption>{{ caption }}</q-item-label>
-							</q-item-section>
-							<q-item-section side>
-								<q-icon name="fas fa-chevron-right" />
-							</q-item-section>
-						</q-item>
-					</q-list>
+					<hk-card header="Player">
+						<q-list dark>
+							<q-item 
+								v-for="({name, icon, label, caption}, index) in player_tabs" 
+								clickable v-ripple 
+								:to="`/${name}`"
+								:key="`player-${index}`"
+							>
+								<q-item-section avatar>
+									<q-icon :name="icon" class="neutral-2" />
+								</q-item-section>
+								<q-item-section>
+									<q-item-label>{{ label }}</q-item-label>
+									<q-item-label caption>{{ caption }}</q-item-label>
+								</q-item-section>
+								<q-item-section side>
+									<q-icon name="fas fa-chevron-right" />
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</hk-card>
+				</hk-card-deck>
+			</div>
+			<div class="col-12 col-md-3">
+				<hk-card class="bg-neutral-9">
+					<hk-video />
 				</hk-card>
-			</hk-card-deck>
+				<ContentSideRight page="content" />
+			</div>
+
 
 			<!-- PATREON -->
-			<div class="mt-4">
+			<!-- <div class="mt-4">
 				<h4 
 					v-if="tier && userInfo && userInfo.patron"
 					class="text-center patreon-red"
@@ -95,7 +98,7 @@
 				<a class="btn btn-lg btn-block bg-blue" @click="setSlide({ show: true, type: 'PlayerLink'})">
 					<i class="fas fa-share-alt"></i> Share your encounters
 				</a>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </template>
@@ -103,10 +106,18 @@
 <script>
 	import { mapGetters, mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
+	import ContentSideRight from "@/components/ContentSideRight";
+	import HkVideo from "@/components/hk-components/hk-video";
+	import Crumble from "@/components/crumble/MyContent.vue"
 
 	export default {
 		name: 'SignedIn',
 		mixins: [general],
+		components: {
+			ContentSideRight,
+			HkVideo,
+			Crumble
+		},
 		data() {
 			return {
 				dm_tabs: [
@@ -208,43 +219,14 @@
 			display: none;
 		}
 
-		.container {
-
-			.hk-card {
-				background-position: center;
-				background-size: cover;
-				color: $white;
-
-				.card-header {
-					background-color: rgba(0, 0, 0, .5);
-					text-align: center;
-					text-transform: uppercase;
-				}
-				.card-body {
-					padding: 0;
-					text-align: center;
-					font-family: 'Fredericka the Great', cursive;
-					font-size: 40px;
-					text-transform: uppercase;
-					text-shadow: 3px 3px 3px rgba(0, 0, 0, 1);
-				}
-				.card-footer {
-					padding: 0;
-
-					.date {
-						display: block;
-						padding: 5px;
-						width: 100%;
-						text-align: center;
-						background-color: rgba(0, 0, 0, .5);
-					}
-				}
-
-				&:hover {
-					color:$white;
+		&.content {
+			.banner {
+				.image {
+					height: 100px;
+					width: 100px;
+					background-size: spread;
 				}
 			}
-
 			.first {
 				h2 {
 					font-size: 30px !important;

@@ -1,16 +1,7 @@
 <template>
-	<div class="content" v-if="tier">
-		<h1>Your Items</h1>
-		<p>These are your custom Items that you can use in your campaigns.</p>
-
-		<OverEncumbered v-if="overencumbered"/>
-		<OutOfSlots 
-			v-else-if="content_count.items >= tier.benefits.items"
-			type = 'items'
-		/>
-	
-		<template v-if="items">
-			<h2 class="mt-3 d-flex justify-content-between">
+	<div v-if="tier">
+		<hk-card v-if="items">
+			<div slot="header" class="card-header">
 				<span>
 					Items ( 
 					<span :class="{ 'green': true, 'red': content_count.items >= tier.benefits.items }">{{ Object.keys(items).length }}</span> 
@@ -19,65 +10,71 @@
 					<template v-else>{{ tier.benefits.items }}</template>
 					)
 				</span>
-				<router-link v-if="!overencumbered" to="/items/add-item">
+				<router-link v-if="!overencumbered" class="btn btn-sm bg-neutral-5" :to="`${$route.path}/add-item`">
 					<i class="fas fa-plus green"></i> New Item
 				</router-link>
-			</h2>
-
-			<hk-table
-				:columns="columns"
-				:items="_items"
-				:perPage="20"
-				:search="['name', 'type']"
-			>
-				<template slot="image" slot-scope="data">
-					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-					<img v-else class="image" src="@/assets/_img/styles/axe.svg" />
-				</template>
-
-				<template slot="name" slot-scope="data">
-					<router-link class="mx-2" :to="'/items/' + data.row.key">
-						{{ data.item }}
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-				</template>
-
-				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/items/' + data.row.key">
-						<i class="fas fa-pencil"></i>
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-					<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row.name)">
-						<i class="fas fa-trash-alt"></i>
-						<q-tooltip anchor="top middle" self="center middle">
-							Delete
-						</q-tooltip>
-					</a>
-				</div>
-			</hk-table>
-
-			<template v-if="slotsLeft > 0 && tier.benefits.items !== 'infinite'">
-				<div 
-					class="openSlot"
-					v-for="index in slotsLeft"
-					:key="'open-slot-' + index"
+			</div>
+			<div class="card-body">
+				<p class="neutral-2">These are your custom Items that you can use in your campaigns.</p>
+				<OutOfSlots 
+					v-if="content_count.items >= tier.benefits.items"
+					type = 'items'
+				/>
+				<hk-table
+					:columns="columns"
+					:items="_items"
+					:perPage="20"
+					:search="['name', 'type']"
 				>
-					<span>Open item slot</span>
-					<router-link v-if="!overencumbered" to="/items/add-items">
-						<i class="fas fa-plus green"></i>
+					<template slot="image" slot-scope="data">
+						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+						<img v-else class="image" src="@/assets/_img/styles/axe.svg" />
+					</template>
+
+					<template slot="name" slot-scope="data">
+						<router-link class="mx-2" :to="`${$route.path}/${data.row.key}`">
+							{{ data.item }}
+							<q-tooltip anchor="top middle" self="center middle">
+								Edit
+							</q-tooltip>
+						</router-link>
+					</template>
+
+					<div slot="actions" slot-scope="data" class="actions">
+						<router-link class="gray-hover mx-1" :to="`${$route.path}/${data.row.key}`">
+							<i class="fas fa-pencil"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Edit
+							</q-tooltip>
+						</router-link>
+						<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row.name)">
+							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
+						</a>
+					</div>
+				</hk-table>
+
+				<template v-if="slotsLeft > 0 && tier.benefits.items !== 'infinite'">
+					<div 
+						class="openSlot"
+						v-for="index in slotsLeft"
+						:key="'open-slot-' + index"
+					>
+						<span>Open item slot</span>
+						<router-link v-if="!overencumbered" to="/items/add-items">
+							<i class="fas fa-plus green"></i>
+						</router-link>
+					</div>
+				</template>
+				<template v-if="!tier || tier.name === 'Free'">
+					<router-link class="openSlot none" to="/patreon">
+						Support us on Patreon for more slots.
 					</router-link>
-				</div>
-			</template>
-			<template v-if="!tier || tier.name === 'Free'">
-				<router-link class="openSlot none" to="/patreon">
-					Support us on Patreon for more slots.
-				</router-link>
-			</template>
-		</template>
+				</template>
+			</div>
+		</hk-card>
 		<h3 v-else-if="items === null" class="mt-4">
 			<router-link v-if="!overencumbered" to="/items/add-item">
 				<i class="fas fa-plus green"></i> Create your first item

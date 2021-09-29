@@ -225,7 +225,7 @@
 	import _ from "lodash";
 	import OverEncumbered from "@/components/OverEncumbered.vue";
 	import OutOfSlots from "@/components/OutOfSlots.vue";
-	import Crumble from "@/components/crumble/MyContent.vue";
+	import Crumble from "@/components/crumble";
 	import PlayerLink from "@/components/PlayerLink.vue";
 	import Players from "@/components/campaign/Players.vue";
 

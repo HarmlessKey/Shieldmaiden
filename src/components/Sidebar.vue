@@ -15,7 +15,7 @@
 				<template v-if="$store.getters.user">
 					<h3>DM Content</h3>
 					<q-list @click="setSideSmallScreen(false)">
-						<q-item clickable v-ripple to="/campaigns">
+						<q-item clickable v-ripple to="/content/campaigns">
 							<q-item-section avatar>
 								<i class="fas fa-dungeon"></i>
 							</q-item-section>
@@ -24,7 +24,7 @@
 								Campaigns
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/players">
+						<q-item clickable v-ripple to="/content/players">
 							<q-item-section avatar>
 								<i class="fas fa-users"></i>
 							</q-item-section>
@@ -33,7 +33,7 @@
 								Players
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/npcs">
+						<q-item clickable v-ripple to="/content/npcs">
 							<q-item-section avatar>
 								<i class="fas fa-dragon"></i>
 							</q-item-section>
@@ -42,7 +42,7 @@
 								NPC's
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/reminders">
+						<q-item clickable v-ripple to="/content/reminders">
 							<q-item-section avatar>
 								<i class="fas fa-stopwatch"></i>
 							</q-item-section>
@@ -51,7 +51,7 @@
 								Reminders
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/items">
+						<q-item clickable v-ripple to="/content/items">
 							<q-item-section avatar>
 								<i class="fas fa-staff"></i>
 							</q-item-section>
@@ -64,7 +64,7 @@
 					<hr>
 					<h3>Player Content</h3>
 					<q-list @click="setSideSmallScreen(false)">
-						<q-item clickable v-ripple to="/characters">
+						<q-item clickable v-ripple to="/content/characters">
 							<q-item-section avatar>
 								<i class="fas fa-helmet-battle"></i>
 							</q-item-section>
@@ -287,6 +287,10 @@
 
 			&.q-router-link--active {
 				color: $neutral-1 !important;
+
+				.q-item__section--avatar {
+					color: $neutral-1 !important;
+				}
 			}
 		}
 	}

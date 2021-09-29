@@ -1,7 +1,6 @@
 <template>
 	<q-scroll-area 
 		class="home" 
-		v-if="!$store.getters.user || $route.path === '/home'" 
 		dark :thumb-style="{ width: '10px'}"
 		v-on:scroll="handleScroll"
 	>
@@ -72,7 +71,6 @@
 			</div>
 		</template>
 	</q-scroll-area>
-	<SignedIn v-else />
 </template>
 
 <script>
@@ -84,7 +82,6 @@
 	import Builder from '@/components/home/Builder.vue';
 	import Campaign from '@/components/home/Campaign.vue';
 	import Footer from '@/components/Footer.vue';
-	import SignedIn from '@/components/home/SignedIn.vue';
 
 	export default {
 		name: 'home',
@@ -96,8 +93,7 @@
 			Share,
 			Builder,
 			Campaign,
-			Footer,
-			SignedIn
+			Footer
 		},
 		data() {
 			return {

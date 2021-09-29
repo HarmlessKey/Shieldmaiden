@@ -544,7 +544,7 @@ html body {
 			padding: 20px;
 		}
 	}
-	.signed {
+	.content-side {
 		.video {
 			.animated-video {
 				margin-left: -2%;
@@ -833,7 +833,7 @@ html body {
     margin-bottom: 1rem;
     border: 0;
 		border-top: 1px solid rgba(0, 0, 0, 0.1);
-		background: $gray-hover;
+		background: $neutral-4;
 	}
 	.container {
 		width: 100%;
@@ -895,7 +895,7 @@ html body {
 	/* ACCORDION */
 	.accordion {
 		.q-item {
-			background-color: $gray-dark;
+			background-color: $neutral-9;
 			margin-bottom: 1px;
 
 			&__section--avatar {
@@ -903,23 +903,8 @@ html body {
 			}
 		}
 		.accordion-body {
-			background-color: $gray-darker;
+			background-color: $neutral-8;
 			padding: 20px;
-		}
-	}
-	
-	ul.crumble {
-		list-style: none;
-		padding: 0 0 15px 0;
-		border-bottom: solid 1px $gray-active;
-		margin-top: 0;
-
-		li {
-			margin-right: 10px;
-
-			a {
-				color: $gray-light !important;
-			}
 		}
 	}
 

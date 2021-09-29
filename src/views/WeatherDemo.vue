@@ -41,7 +41,7 @@
 </template>
 
 <script>
-	import EditWeather from './MyContent/Encounters/Edit/Weather';
+	import EditWeather from './Content/Encounters/Edit/Weather';
 
 	export default {
 		name: 'WeatherDemo',

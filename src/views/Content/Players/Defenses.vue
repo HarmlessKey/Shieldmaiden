@@ -14,7 +14,7 @@
 							autocomplete="off"  
 							multiple
 							:options="damage_types"
-							v-model="npc[type]" 
+							v-model="player[type]" 
 							:hint="resistanceInfo(type)"
 						>
 							<template slot="prepend">
@@ -29,7 +29,7 @@
 								<q-item
 									clickable
 									v-ripple
-									:active="npc[type] && npc[type].includes(scope.opt)"
+									:active="player[type] && player[type].includes(scope.opt)"
 									@click="setResistance(type, scope.opt)"
 								>
 									<q-item-section avatar>
@@ -52,7 +52,7 @@
 					class="mt-3 mb-2" 
 					multiple
 					:options="condition_list"
-					v-model="npc.condition_immunities" 
+					v-model="player.condition_immunities" 
 					name="condition_immunities" 
 				>
 					<template slot="prepend">
@@ -62,7 +62,7 @@
 						<q-item
 							clickable
 							v-ripple
-							:active="npc.condition_immunities && npc.condition_immunities.includes(scope.opt)"
+							:active="player.condition_immunities && player.condition_immunities.includes(scope.opt)"
 							@click="setCondition(scope.opt)"
 						>
 							<q-item-section avatar>
@@ -84,7 +84,7 @@
 	import { damage_types } from '@/mixins/damageTypes.js';
 
 	export default {
-		name: 'npc-Defenses',
+		name: 'player-Defenses',
 		props: ['value'],
 		mixins: [
 			conditions,
@@ -95,7 +95,7 @@
 			}
 		},
 		computed: {
-			npc: {
+			player: {
 				get() {
 					return this.value;
 				},	
@@ -120,21 +120,21 @@
 				return "No damage is taken"
 			},
 			setResistance(type, value) {
-				if(!this.npc[type]) {
-					this.$set(this.npc, type, [value]);
-				} else if(this.npc[type].includes(value)) {
-					this.$delete(this.npc[type], this.npc[type].indexOf(value));
+				if(!this.player[type]) {
+					this.$set(this.player, type, [value]);
+				} else if(this.player[type].includes(value)) {
+					this.$delete(this.player[type], this.player[type].indexOf(value));
 				} else {
-					this.npc[type].push(value);
+					this.player[type].push(value);
 				}
 			},
 			setCondition(value) {
-				if(!this.npc.condition_immunities) {
-					this.$set(this.npc, "condition_immunities", [value]);
-				} else if(this.npc.condition_immunities.includes(value)) {
-					this.$delete(this.npc.condition_immunities, this.npc.condition_immunities.indexOf(value));
+				if(!this.player.condition_immunities) {
+					this.$set(this.player, "condition_immunities", [value]);
+				} else if(this.player.condition_immunities.includes(value)) {
+					this.$delete(this.player.condition_immunities, this.player.condition_immunities.indexOf(value));
 				} else {
-					this.npc.condition_immunities.push(value);
+					this.player.condition_immunities.push(value);
 				}
 			},
 		}

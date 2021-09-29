@@ -87,7 +87,7 @@ export default {
 			line-height: 10px;
 
 			&:hover {
-				color: $white;
+				color: $neutral-1;
 			}
 		}
 	}

@@ -28,111 +28,112 @@
 							</a>
 						</div>
 
+						<div class="card-body">
+							<OutOfSlots 
+								v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
+								type = 'campaigns'
+							/>
 
-						<OutOfSlots 
-							v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
-							type = 'campaigns'
-						/>
+							<!-- NO PLAYERS YET -->
+							<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
+								<h2>Create players for your campaign</h2>
+								<router-link to="/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
+							</div>
 
-						<!-- NO PLAYERS YET -->
-						<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
-							<h2>Create players for your campaign</h2>
-							<router-link to="/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
-						</div>
-
-						<transition-group 
-							v-if="campaigns && Object.keys(campaigns).length > 0"
-							tag="div" 
-							class="row q-col-gutter-md mt-3" 
-							name="campaigns" 
-							enter-active-class="animated animate__fadeIn" 
-							leave-active-class="animated animate__fadeOut">
-							<div class="col-12 col-md-6" v-for="campaign in _campaigns" :key="campaign.key">
-								<hk-card 
-									no-padding-footer
-									:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
-								>
-									<div slot="header" class="card-header">
-										<span class="title">
-											<i 
-												class="mr-1"
-												:class="{
-													'fas fa-eye green': !campaign.private,
-													'fas fa-eye-slash red': campaign.private 
-												}"
-											>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													{{ campaign.private ? "Private campaign" : "Public campaign" }}
-												</q-tooltip>
-											</i>
-											{{ campaign.campaign }}
-										</span>
-
-										<span class="actions">
-											<router-link class="btn btn-sm mx-1" :to="'/campaigns/' + campaign.key">
-												<i class="fas fa-pencil"></i>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Edit
-												</q-tooltip>
-											</router-link>
-											<a
-												class="btn btn-sm"
-												@click="confirmDelete($event, campaign.key, campaign.campaign)"
-											>
-												<i class="fas fa-trash-alt"></i>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Delete
-												</q-tooltip>
-											</a>
-										</span>
-									</div>
-									<div v-if="campaign.advancement != 'milestone'" class="advancement">Experience</div>
-									<div v-else class="advancement">Milestone</div>
-									<div class="row q-col-gutter-md">
-										<div class="col">
-											<router-link :to="'/campaigns/' + campaign.key">
-												<i class="fas fa-users"></i><br/>
-												<template v-if="campaign.players"> {{ Object.keys(campaign.players).length }}</template>
-												<template v-else> Add</template>
-												<q-tooltip anchor="top middle" self="center middle">
-													Players
-												</q-tooltip>
-											</router-link>
+							<transition-group 
+								v-if="campaigns && Object.keys(campaigns).length > 0"
+								tag="div" 
+								class="row q-col-gutter-md" 
+								name="campaigns" 
+								enter-active-class="animated animate__fadeIn" 
+								leave-active-class="animated animate__fadeOut">
+								<div class="col-12 col-sm-6 col-md-4" v-for="campaign in _campaigns" :key="campaign.key">
+									<hk-card>
+										<!-- Image -->
+										<div slot="image" class="card-image" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+											<div class="d-flex justify-content-between px-2 py-2">
+												<i 
+													class="px-1 py-2"
+													:class="{
+														'fas fa-eye text-shadow-6 neutral-2': !campaign.private,
+														'fas fa-eye-slash text-shadow-6 neutral-2': campaign.private 
+													}"
+												>
+													<q-tooltip anchor="top middle" self="bottom middle">
+														{{ campaign.private ? "Private campaign" : "Public campaign" }}
+													</q-tooltip>
+												</i>
+												<div class="d-flex justify-content-end">
+													<router-link class="btn btn-sm btn-clear mx-1" :to="'/campaigns/' + campaign.key">
+														<i class="fas fa-pencil"></i>
+														<q-tooltip anchor="top middle" self="bottom middle">
+															Edit
+														</q-tooltip>
+													</router-link>
+													<a
+														class="btn btn-sm btn-clear"
+														@click="confirmDelete($event, campaign.key, campaign.campaign)"
+													>
+														<i class="fas fa-trash-alt"></i>
+														<q-tooltip anchor="top middle" self="bottom middle">
+															Delete
+														</q-tooltip>
+													</a>
+												</div>
+											</div>
 										</div>
 
-										<div class="col">
-											<router-link :to="'/encounters/' + campaign.key">
-												<i class="fas fa-swords"></i><br/>
+										<div class="card-body">
+											<div class="neutral-4 mb-2"> 
+												{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }} advancement
+											</div>
+											<h3 class="truncate">
+												{{ campaign.campaign }}
+											</h3>
+
+											<div class="mb-1">
+												<router-link class="btn btn-clear btn-sm" :to="'/campaigns/' + campaign.key">
+													<i class="fas fa-users mr-1 neutral-2"></i>
+													{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
+													players
+												</router-link>
+											</div>
+											
+											<router-link class="btn btn-clear btn-sm" :to="'/encounters/' + campaign.key">
+												<i class="fas fa-swords mr-2 neutral-2"></i>
 												<template v-if="allEncounters && allEncounters[campaign.key]">
 													<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
 														{{ Object.keys(allEncounters[campaign.key]).length }}
-													</span> 
-													/
-													<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
-													<template v-else>{{ tier.benefits.encounters }}</template>
+													</span>
 												</template>
-												<template v-else> Create</template>
-												<q-tooltip anchor="top middle" self="center middle">
-													Encounters
-												</q-tooltip>
+												<span v-else> 0</span> encounters
 											</router-link>
+											
+											<div class="mt-4">
+												<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn bg-green ">
+													<i class="fas fa-user"></i> Create players
+												</router-link>
+												<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green">
+													<i class="fas fa-plus"></i> Add players
+												</router-link>
+												<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green">
+													<i class="fas fa-swords"></i> Add encounters
+												</router-link>
+												<router-link :to="'/encounters/' + campaign.key" v-else class="btn">
+													Continue
+												</router-link>
+											</div>
 										</div>
-									</div>
-									<div slot="footer" class="card-footer">
-										<small class="date py-1 bg-gray-active"><span class="gray-hover">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
-										<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn btn-block bg-green btn-square">Create players</router-link>
-										<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn btn-block bg-green btn-square"><i class="fas fa-plus"></i> Add players</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn btn-block bg-green btn-square"><i class="fas fa-plus"></i> Create encounters</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else class="btn btn-block btn-square">Play <i class="fas fa-play"></i></router-link>
-									</div>
-								</hk-card>
-							</div>
-						</transition-group>
+										<div slot="footer" class="card-footer">
+											<small class="text-center neutral-3"><span class="">Created:</span> {{ makeDate(campaign.timestamp, true) }}</small>
+										</div>
+									</hk-card>
+								</div>
+							</transition-group>
 
-						<!-- CREATE FIRST CAMPAIGN -->
-						<div class="first-campaign" v-else>
-							<q-form @submit="addCampaign">
-								<hk-card header="First campaign">
+							<!-- CREATE FIRST CAMPAIGN -->
+							<div class="first-campaign" v-else>
+								<q-form @submit="addCampaign">
 									<h2 class="mt-0">Create your first campaign</h2>
 									<q-input 
 										dark filled square
@@ -154,8 +155,8 @@
 									/>
 									
 									<q-btn class="btn btn-lg bg-green btn-block mt-4" type="submit" label="Create campaign" />
-								</hk-card>
-							</q-form>
+								</q-form>
+							</div>
 						</div>
 					</hk-card>
 
@@ -176,24 +177,26 @@
 			<div>
 				<q-form @submit="addCampaign">
 					<hk-card header="New campaign" class="mb-0">
-						<q-input 
-							dark filled square
-							type="text" 
-							autocomplete="off"
-							v-model="newCampaign" 
-							name="newCampaign"
-							label="Title"
-							:rules="[ val => val && val.length > 0 || 'Enter a title']"
-						/>
-						<q-select
-							dark filled square
-							emit-value
-							map-options
-							label="Advancement"
-							class="mt-2" 
-							v-model="advancement" 
-							:options="advancement_options"
-						/>
+						<div class="card-body">
+							<q-input 
+								dark filled square
+								type="text" 
+								autocomplete="off"
+								v-model="newCampaign" 
+								name="newCampaign"
+								label="Title"
+								:rules="[ val => val && val.length > 0 || 'Enter a title']"
+							/>
+							<q-select
+								dark filled square
+								emit-value
+								map-options
+								label="Advancement"
+								class="mt-2" 
+								v-model="advancement" 
+								:options="advancement_options"
+							/>
+						</div>
 
 						<div slot="footer" class="card-footer d-flex justify-end">
 							<q-btn v-close-popup label="Cancel" class="mr-1" />
@@ -342,17 +345,11 @@
 		}
 	} 
 	.hk-card {
-		
 		.hk-card {
 			background-size: cover;
 			background-position: center bottom;
 	
-			&.warning {
-				.card-header {
-					background-color: $red;
-					color: $white;
-				}
-			}
+
 			.card-header {
 				background: rgba(38, 38, 38, .9) !important;
 	
@@ -370,7 +367,7 @@
 				}
 			}
 			.card-body {
-				background: rgba(38, 38, 38, .5);
+				background: $neutral-7;
 	
 				.advancement {
 					text-align: center;
@@ -385,7 +382,7 @@
 					a {
 						width: 100%;
 						display: block;
-						color:$white !important;
+						color:$neutral-1 !important;
 						text-shadow: 5px 5px 5pxrgba(0, 0, 0, .5);
 	
 						&:hover {
@@ -399,12 +396,12 @@
 				}
 			}
 			.card-footer {
-				padding: 0 !important;
+				padding: 3px 0 !important;
+				text-align: center;
 				
-				.date {
+				small {
+					display: inline-block;
 					width: 100%;
-					text-align: center;
-					display: block;
 				}
 			}
 			&.openSlot {

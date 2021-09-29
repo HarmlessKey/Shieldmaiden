@@ -405,11 +405,11 @@
 		justify-content: space-between;
 		height: 35px;
 		line-height: 35px;
-		border-bottom: solid 2px $white;
+		border-bottom: solid 2px $neutral-1;
 
 		.right {
 			a {
-				color:$white !important;
+				color:$neutral-1 !important;
 				margin-left: 10px;
 			}
 		}
@@ -450,7 +450,7 @@
 							font-size: 12px;
 							padding: 10px 0 5px 0;
 							border: none;
-							border-bottom: solid 1px $white;
+							border-bottom: solid 1px $neutral-1;
 							cursor: default;
 
 							&:hover {
@@ -539,13 +539,13 @@
 						&:hover {
 							@media only screen and (min-width: 576px) {
 								td {
-									border-color:$white;
+									border-color:$neutral-1;
 								}
 							}
 						}
 					}
 					tr td:first-child, thead th {
-						color:$white;
+						color:$neutral-1;
 						background: none;
 						text-shadow: 0 0 3px $black;
 					}

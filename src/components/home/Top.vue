@@ -2,31 +2,6 @@
 	<div class="top">
 		<div class="container-fluid">
 			<div class="container">
-				<!-- <div v-if="play_animation"
-					@click="replay()"
-					@mouseover="video_hover = true" 
-					@mouseleave="video_hover = false"
-				>
-					<div class="video-controls" v-if="video_hover">
-						<span>
-							<i @click.stop="muted = !muted" class="fas" :class="muted ? 'fa-volume-slash' : 'fa-volume-up'"></i>
-							<q-tooltip anchor="bottom middle" self="center middle">
-								Mute
-							</q-tooltip>
-						</span>
-						<span>
-							<i @click="replay()" class="fas fa-redo-alt"></i>
-							<q-tooltip anchor="bottom middle" self="center middle">
-								Replay
-							</q-tooltip>
-						</span>
-					</div>
-					<video 
-						ref="video" class="animated-video" src="@/assets/_vid/harmless-key-animation-transparent-compressed.webm" 
-						:muted="muted" autoplay playsinline alt="Harmless Key logo animation"
-					/>
-				</div>
-				<img v-else class="logo" src="@/assets/_img/logo/logo-cyan.svg" alt="Harmless Key logo" /> -->
 				<hk-video />
 				<div class="content-box">
 					<div class="text">
@@ -37,12 +12,15 @@
 						</template>
 
 						<div class="button-container">
-							<router-link to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link v-if="!$store.getters.user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
 						</div>
 						
 						<!-- PATREON -->
 						<div>
-							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red"><i class="fab fa-patreon"></i> Support us on Patreon</a>
+							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red">
+								<i class="fab fa-patreon"></i> Support us on Patreon
+							</a>
 						</div>
 					</div>
 				</div>
@@ -65,7 +43,7 @@
 <style lang="scss" scoped>
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color:$white;
+		color:$neutral-1;
 		background-position: top center;
 		padding: 0 0 75px 0;
 		min-height: calc(100vh - 50px - 55px);
@@ -118,7 +96,7 @@
 						margin-top: 20px;
 
 						a {
-							color:$white !important;
+							color:$neutral-1 !important;
 						}
 					}
 					.share {

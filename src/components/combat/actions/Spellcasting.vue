@@ -298,7 +298,7 @@
 			.value {
 				font-size: 18px;
 				font-weight: bold;
-				color: $white;
+				color: $neutral-1;
 			}
 		}
 		.display-levels {
@@ -316,7 +316,7 @@
 
 				&.active {
 					background-color: $blue;
-					color: $white;
+					color: $neutral-1;
 
 					&:hover {
 						background: $blue-hover;

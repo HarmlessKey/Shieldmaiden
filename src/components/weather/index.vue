@@ -108,10 +108,10 @@ export default {
 				@keyframes lightnings {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.87% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					0.93% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.99% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.99% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					1% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset; }
 				}
@@ -121,10 +121,10 @@ export default {
 				@keyframes lightningm {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					0.85% { filter: brightness(1); opacity: 1; background-color: unset; }
-					0.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					0.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					0.95% { filter: brightness(1); opacity: 1; background-color: unset; }
 					1% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.05% { filter: brightness(2); opacity: .3; background-color:$white; }
+					1.05% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					1.1% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset; }
 				}
@@ -134,10 +134,10 @@ export default {
 				@keyframes lightning {
 					0% { filter: brightness(1); opacity: 1; background-color: unset; }
 					1.8% { filter: brightness(1); opacity: 1; background-color: unset; }
-					1.9% { filter: brightness(2); opacity: .3; background-color:$white; }
+					1.9% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					2% { filter: brightness(1); opacity: 1; background-color: unset; }
 					2.4% { filter: brightness(1); opacity: 1; background-color: unset; }
-					2.6% { filter: brightness(2); opacity: .3; background-color:$white; }
+					2.6% { filter: brightness(2); opacity: .3; background-color:$neutral-1; }
 					2.9% { filter: brightness(1); opacity: 1; background-color: unset; }
 					100% { filter: brightness(1); opacity: 1; background-color: unset;}
 				}

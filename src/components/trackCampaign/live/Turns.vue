@@ -180,7 +180,7 @@
 				width: 60px;
 				line-height: 60px;
 				text-align: center;
-				color: $white;
+				color: $neutral-1;
 				font-size: 25px;
 
 				.hide {

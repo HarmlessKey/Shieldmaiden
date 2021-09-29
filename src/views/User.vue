@@ -184,7 +184,7 @@
 						background:$black;
 						height: 35px;
 						width: 35px;
-						border: solid 1px$white;
+						border: solid 1px$neutral-1;
 						margin: 0 10px 10px 0;
 						box-sizing: border;
 

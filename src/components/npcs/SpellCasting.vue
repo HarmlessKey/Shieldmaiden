@@ -325,7 +325,7 @@
 		.slot {
 			max-width: 40px;
 			text-align: center;
-			color: $white;
+			color: $neutral-1;
 
 			.handling {
 				margin-top: 5px;
@@ -339,7 +339,7 @@
 					cursor: pointer;
 
 					&:hover {
-						color: $white
+						color: $neutral-1
 					}
 					.disable {
 						opacity: .5;
@@ -354,7 +354,7 @@
 					height: 35px;
 					line-height: 35px;
 					font-weight: bold;
-					color: $white;
+					color: $neutral-1;
 
 					&:focus {
 						outline: none;

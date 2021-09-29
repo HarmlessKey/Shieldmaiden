@@ -339,7 +339,7 @@
 				&.i, &.r { color: $green; }
 				&.v { color: $red; }
 				span {
-					color: $white;
+					color: $neutral-1;
 				}
 			}
 		}
@@ -354,7 +354,7 @@
 			margin-left: 1px;
 			line-height: 28px;
 			background: $gray-hover;
-			color: $white;
+			color: $neutral-1;
 			user-select: none;
 			cursor: pointer;
 		}

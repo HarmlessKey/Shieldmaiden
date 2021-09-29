@@ -225,7 +225,7 @@
 									flex: 4 1 0%;
 									line-height: 18px;
 									height: 20px;
-									color: $white;
+									color: $neutral-1;
 									width: calc(100% - 10px);
 
 									&:only-child {
@@ -289,7 +289,7 @@
 						}
 					}
 					&.xp {
-						color: $white;
+						color: $neutral-1;
 						text-align: center;
 						font-size: 25px;
 					}

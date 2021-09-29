@@ -151,7 +151,7 @@
 		}
 		tr td:first-child, thead th {
 			text-align: center;
-			color:$white;
+			color:$neutral-1;
 			background: none;
 			text-shadow: 0 0 3px $black;
 		}

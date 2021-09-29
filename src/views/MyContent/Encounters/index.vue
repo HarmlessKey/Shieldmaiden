@@ -20,7 +20,6 @@
 				<!-- SHOW ENCOUNTERS -->
 				<div class="col-12 col-md-7">
 					<hk-card>
-					
 						<div slot="header" class="card-header">
 							<span>
 								<span>
@@ -44,141 +43,143 @@
 								New encounter
 							</a>
 						</div>
-
 				
+						<div class="card-body">
+							<OutOfSlots 
+								v-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
+								type='encounters'
+							/>
 
-						<OutOfSlots 
-							v-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
-							type='encounters'
-						/>
+							<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
+								<q-form @submit="addEncounter">
+									<h2 class="mt-0">First encounter</h2>
+										<q-input
+											dark filled square
+											label="Encounter title" 
+											type="text" 
+											autocomplete="off"
+											v-model="newEncounter" 
+											:rules="[ val => val && val.length > 0 || 'Enter a title']"
+										/>
+										
+										<q-btn class="btn btn-lg bg-green btn-block mt-4 px-0 py-0" label="Create encounter" no-caps type="submit" />
+								</q-form>
+							</div>
 
-						<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
-							<q-form @submit="addEncounter">
-								<h2 class="mt-0">First encounter</h2>
-									<q-input
-										dark filled square
-										label="Encounter title" 
-										type="text" 
-										autocomplete="off"
-										v-model="newEncounter" 
-										:rules="[ val => val && val.length > 0 || 'Enter a title']"
-									/>
-									
-									<q-btn class="btn btn-lg bg-green btn-block mt-4 px-0 py-0" label="Create encounter" no-caps type="submit" />
-							</q-form>
-						</div>
-
-						<!-- ACTIVE ENCOUNTERS -->
-						<hk-table
-							v-if="_active.length > 0"
-							:items="_active"
-							:columns="activeColumns"
-						>
-							<template slot="encounter" slot-scope="data">
-								<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-									{{ data.item }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Run encounter
-									</q-tooltip>
-								</router-link>
-								<template v-else>
-									{{ data.item }}
-								</template>
-							</template>
-							<template slot="entities" slot-scope="data">
-								<router-link :to="'/encounters/' + campaignId + '/' + data.row.key">
-									<span class="gray-light" v-if="data.row.entities">
-										{{ Object.keys(data.row.entities).length }}
-									</span>
-									<template v-else><i class="fas fa-plus"></i> Add</template>
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</router-link>
-							</template>
-
-							<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
-							<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
-
-							<template slot="actions" slot-scope="data">
-								<div class="actions">
-									<router-link 
-										v-if="data.row.entities" 
-										class="btn btn-sm bg-neutral-5"
-										:to="'/run-encounter/' + campaignId + '/' + data.row.key"
-									>
-										<i class="fas fa-play"></i>
+							<!-- ACTIVE ENCOUNTERS -->
+							<hk-table
+								v-if="_active.length > 0"
+								:items="_active"
+								:columns="activeColumns"
+							>
+								<template slot="encounter" slot-scope="data">
+									<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle">
 											Run encounter
 										</q-tooltip>
 									</router-link>
-									<a v-else class="disabled btn btn-sm bg-neutral-5">
-										<i class="fas fa-play"></i>
-									</a>
-									<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/encounters/' + campaignId + '/' + data.row.key">
-										<i class="fas fa-pencil-alt"></i>
+									<template v-else>
+										{{ data.item }}
+									</template>
+								</template>
+								<template slot="entities" slot-scope="data">
+									<router-link :to="'/encounters/' + campaignId + '/' + data.row.key">
+										<span class="gray-light" v-if="data.row.entities">
+											{{ Object.keys(data.row.entities).length }}
+										</span>
+										<template v-else><i class="fas fa-plus"></i> Add</template>
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
 										</q-tooltip>
 									</router-link>
-									<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key,data.row.encounter)">
-										<i class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Delete
-										</q-tooltip>
-									</a>
-								</div>
-							</template>
-						</hk-table>
+								</template>
+
+								<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
+								<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
+
+								<template slot="actions" slot-scope="data">
+									<div class="actions">
+										<router-link 
+											v-if="data.row.entities" 
+											class="btn btn-sm bg-neutral-5"
+											:to="'/run-encounter/' + campaignId + '/' + data.row.key"
+										>
+											<i class="fas fa-play"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Run encounter
+											</q-tooltip>
+										</router-link>
+										<a v-else class="disabled btn btn-sm bg-neutral-5">
+											<i class="fas fa-play"></i>
+										</a>
+										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/encounters/' + campaignId + '/' + data.row.key">
+											<i class="fas fa-pencil-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Edit
+											</q-tooltip>
+										</router-link>
+										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key,data.row.encounter)">
+											<i class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Delete
+											</q-tooltip>
+										</a>
+									</div>
+								</template>
+							</hk-table>
+						</div>
 					</hk-card>
 					<hk-card  v-if="_finished != 0" header="Finished encounters">
-						<!-- FINISHED ENCOUNTERS -->
-						<hk-table
-							:items="_finished"
-							:columns="finishedColumns"
-							:perPage="6"
-							:currentPage="currentPage"
-						>
-							<template slot="encounter" slot-scope="data">
-								<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-									{{ data.item }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Run encounter
-									</q-tooltip>
-								</router-link>
-							</template>
-
-							<template slot="actions" slot-scope="data">
-								<div class="actions">
-									<router-link class="btn btn-sm bg-neutral-5" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-										<i class="fas fa-eye"></i>
+						<div class="card-body">
+							<!-- FINISHED ENCOUNTERS -->
+							<hk-table
+								:items="_finished"
+								:columns="finishedColumns"
+								:perPage="6"
+								:currentPage="currentPage"
+							>
+								<template slot="encounter" slot-scope="data">
+									<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle">
-											View
+											Run encounter
 										</q-tooltip>
 									</router-link>
-									<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(data.row.key, hard=false)">
-										<i class="fas fa-trash-restore-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Unfinish
-										</q-tooltip>
-									</a>
-									<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(data.row.key)">
-										<i class="fas fa-undo"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Reset
-										</q-tooltip>
-									</a>
-									<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
-										<i class="fas fa-trash-alt"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Delete
-										</q-tooltip>
-									</a>
-								</div>
-							</template>
-						</hk-table>
-				
-						<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+								</template>
+
+								<template slot="actions" slot-scope="data">
+									<div class="actions">
+										<router-link class="btn btn-sm bg-neutral-5" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+											<i class="fas fa-eye"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												View
+											</q-tooltip>
+										</router-link>
+										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(data.row.key, hard=false)">
+											<i class="fas fa-trash-restore-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Unfinish
+											</q-tooltip>
+										</a>
+										<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(data.row.key)">
+											<i class="fas fa-undo"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Reset
+											</q-tooltip>
+										</a>
+										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
+											<i class="fas fa-trash-alt"></i>
+											<q-tooltip anchor="top middle" self="center middle">
+												Delete
+											</q-tooltip>
+										</a>
+									</div>
+								</template>
+							</hk-table>
+					
+							<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+						</div>
 					</hk-card>
 				</div>
 
@@ -198,18 +199,20 @@
 			<div>
 				<q-form @submit="addEncounter">
 					<hk-card header="New encounter" class="mb-0">
-						<q-input 
-							dark filled square
-							label="Encounter title"
-							type="text" 
-							autocomplete="off" 
-							v-model="newEncounter"
-							:rules="[ val => val && val.length > 0 || 'Enter a title']"
-						/>
+						<div class="card-body">
+							<q-input 
+								dark filled square
+								label="Encounter title"
+								type="text" 
+								autocomplete="off" 
+								v-model="newEncounter"
+								:rules="[ val => val && val.length > 0 || 'Enter a title']"
+							/>
 
-						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
-							<q-btn color="primary" type="submit" label="Add encounter" />
+							<div slot="footer" class="card-footer d-flex justify-content-end">
+								<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
+								<q-btn color="primary" type="submit" label="Add encounter" />
+							</div>
 						</div>
 					</hk-card>
 				</q-form>
@@ -521,7 +524,7 @@
 		padding: 20px;
 
 		&.bg-green {
-			color:$white;
+			color:$neutral-1;
 			animation: blink normal 3s infinite ease-in-out;
 		}
 		h3 {

@@ -446,7 +446,7 @@
 
 			.show {
 				background-color: $blue;
-				color: $white;
+				color: $neutral-1;
 				display: block;
 				width: 18px;
 				text-align: center;

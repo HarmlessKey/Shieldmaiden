@@ -322,7 +322,7 @@
 
 				&.selected {
 					background-color: $blue;
-					color:$white; 
+					color:$neutral-1; 
 				}
 				&.disabled {
 					opacity: .4;
@@ -379,7 +379,7 @@
 
 				&.green, &.red, &.blue {
 					span {
-						color:$white;
+						color:$neutral-1;
 					}
 				}
 			}

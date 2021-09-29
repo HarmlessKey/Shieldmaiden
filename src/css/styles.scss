@@ -3,6 +3,10 @@
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
+/* 2. Themes */
+/*********************************************/
+@import "./light.scss";
+
 /*
 	Table of content
 	1. Variables
@@ -21,7 +25,7 @@
 html body {
 	padding-top: $header-height;
 	background: $neutral-11;
-	color: $white;
+	color: $neutral-1;
 	font-size: 15px;
 	font-family: 'Open Sans', sans-serif;
 	position: relative;
@@ -55,24 +59,24 @@ html body {
 	}
 
 	.text-shadow {
-		text-shadow: 0 0 5px #000;
+		text-shadow: 0 0 5px $black;
 		&-3 {
-			text-shadow: 0 0 3px #000;
+			text-shadow: 0 0 3px $black;
 		}
 		&-4 {
-			text-shadow: 0 0 4px #000;
+			text-shadow: 0 0 4px $black;
 		}
 		&-5 {
-			text-shadow: 0 0 5px #000;
+			text-shadow: 0 0 5px $black;
 		}
 		&-6 {
-			text-shadow: 0 0 6px #000;
+			text-shadow: 0 0 6px $black;
 		}
 		&-7 {
-			text-shadow: 0 0 7px #000;
+			text-shadow: 0 0 7px $black;
 		}
 		&-8 {
-			text-shadow: 0 0 8px #000;
+			text-shadow: 0 0 8px $black;
 		}
 	}
 
@@ -97,9 +101,13 @@ html body {
 	h3 {
 		font-size: 18px;
 		margin-bottom: 15px;
-		line-height: 35px;
+		line-height: 33px;
 	}
-	
+	h4 {
+		font-size: 15px;
+		margin-bottom: 15px;
+		line-height: 30px;
+	}
 
 
 	/* 4. Classes */
@@ -127,7 +135,7 @@ html body {
 	.black { color: $black !important; path { fill: $black !important;} }
 	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
 	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
-	.white { color: $white !important; path { fill: $white !important;} }
+	.white { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.orange { color: $orange !important; path { fill: $orange !important;} }
 	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
 	.purple { color: $purple !important; path { fill: $purple !important;} }
@@ -406,7 +414,7 @@ html body {
 		top: 50px;
 		max-width: 350px;
 		background: $red;
-		color: $white;
+		color: $neutral-1;
 		z-index: 99;
 		text-align: center;
 		left: 50%;
@@ -509,7 +517,7 @@ html body {
 			background-color: $gray-hover;
 			padding: 20px 20px 15px 20px;
 			font-size: 40px;
-			color: $white;
+			color: $neutral-1;
 
 			i {
 				vertical-align: -5px;
@@ -539,6 +547,7 @@ html body {
 	.signed {
 		.video {
 			.animated-video {
+				margin-left: -2%;
 				transform:scale(1.8);
 			}
 			.video-controls {
@@ -589,7 +598,7 @@ html body {
 				display: block;
 				text-align: center;
 				margin: 0;
-				color: $white !important;
+				color: $neutral-1 !important;
 				position: absolute;
 				bottom: 70px;
 				left: 50%;
@@ -645,7 +654,7 @@ html body {
 
 		&::before { 
 			content: "";
-			background-color: $white;
+			background-color: $neutral-1;
 			display: inline-block;
 			height: 10px;
 			width: 10px;
@@ -660,7 +669,7 @@ html body {
 			background-color: $red;
 
 			&::before {
-				background-color: $white;
+				background-color: $neutral-1;
 				animation: fadeinout 1.3s linear infinite;
 			}
 			&:hover {
@@ -745,7 +754,7 @@ html body {
 		cursor: pointer;
 		border-radius: $border-radius-small;
 		background: $blue;
-		color: $white !important;
+		color: $neutral-1 !important;
 		border: none;
 		display: inline-block;
     font-weight: 400;
@@ -767,7 +776,7 @@ html body {
 		&.disabled {
 			cursor: not-allowed !important;
 			opacity: .3;
-			color: $white !important;
+			color: $neutral-1 !important;
 		}
 		&:hover {
 			background-color: $blue-hover;
@@ -839,7 +848,6 @@ html body {
 		background-position: center;
 		height: calc(100vh - 50px);
 		background-color: #000;
-		background-image: url('../assets/_img/styles/paper-bg.png');
 		padding: 100px 30px 0 30px;
 
 		#login {
@@ -928,7 +936,7 @@ html body {
 		border-radius: $border-radius;
 		overflow: hidden;
 		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, .125), 0 6px 2px 0 rgba(0, 0, 0, .1);
-		border: solid 1px $neutral-6;
+		border: solid 1px $neutral-5;
 		
 		.card-header {
 			padding: 15px;
@@ -960,7 +968,7 @@ html body {
 			}
 		}
 		.card-footer {
-			padding: 0.75rem 1.25rem;
+			padding: 12px 15px;
 			background-color: rgba(0, 0, 0, 0.03);
 			border-top: 1px solid rgba(0, 0, 0, 0.125);
 			display: flex;
@@ -969,6 +977,9 @@ html body {
 		}
 		.card-image {
 			width: 100%;
+			min-height: 200px;
+			background-position: center;
+			background-size: cover;
 		}
 
 		&.no-margin {
@@ -978,10 +989,6 @@ html body {
 			flex-direction: row;
 			min-height: 242px;
 
-			.card-image {
-				background-position: center;
-				background-size: cover;
-			}
 			.card-body {
 				flex: none;
 				width: 250px;
@@ -996,6 +1003,13 @@ html body {
 
 				.btn {
 					align-self: flex-start;
+				}
+			}
+			&-small {
+				flex-direction: column;
+
+				.card-body {
+
 				}
 			}
 		}
@@ -1066,7 +1080,7 @@ html body {
 					a {
 						color: $gray-light;
 						&:hover {
-							color: $white;
+							color: $neutral-1;
 						}
 					}
 				}

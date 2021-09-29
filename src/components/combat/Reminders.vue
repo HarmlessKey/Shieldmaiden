@@ -74,7 +74,7 @@
 		margin-left: -4px;
 
 		.q-chip {
-			color:$white !important;
+			color:$neutral-1 !important;
 			border-radius: 0;
 			cursor: pointer;
 

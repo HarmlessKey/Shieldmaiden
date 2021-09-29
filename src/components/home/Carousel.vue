@@ -70,7 +70,7 @@
 		}
 		h3 {
 			font-family: 'Fredericka the Great', cursive;
-			color: $white;
+			color: $neutral-1;
 			font-size: 25px;
 		}
 	}

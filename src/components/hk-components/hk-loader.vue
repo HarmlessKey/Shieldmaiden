@@ -56,7 +56,7 @@ export default {
 			font-weight: bold;
 			font-size: 25px;
 			text-transform: none;
-			color: $white;
+			color: $neutral-1;
 			text-shadow: 0 0 8px $black;
 			line-height: 50px;
 			letter-spacing: 2px;

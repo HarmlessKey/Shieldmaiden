@@ -77,7 +77,7 @@
 		</div>
 		<div 
 			v-if="players"
-			class="players" 
+			class="players card-body" 
 			:class="{ xp: isXpAdvancement(), large: is_large }"
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
@@ -260,7 +260,9 @@
 			</template>
 		</div>
 
-		<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<div slot="footer" class="card-footer">
+			<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		</div>
 		<q-resize-observer @resize="onResize" />
 	</hk-card>
 </template>
@@ -457,7 +459,6 @@
 		display: grid;
 		grid-auto-rows: max-content;
 		grid-row-gap: 1px;
-		margin: 10px 0 30px 0;
 		user-select: none;
 
 		.image {

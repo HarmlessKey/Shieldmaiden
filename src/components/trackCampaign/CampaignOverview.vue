@@ -121,7 +121,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		color:$white;
+		color:$neutral-1;
 		margin-bottom: 20px !important;
 	}
 	.track {
@@ -216,7 +216,7 @@
 
 					.show {
 						background-color: $blue;
-						color: $white;
+						color: $neutral-1;
 						display: block;
 						width: 18px;
 						text-align: center;

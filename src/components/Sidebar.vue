@@ -254,7 +254,7 @@
 	background: $neutral-8;
 	transition: width 0.5s linear;
 	z-index: 98;
-	border-right: 1px solid $neutral-7;
+	border-right: 1px solid $neutral-5;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-bottom: 40px;
@@ -266,7 +266,7 @@
 		font-weight: bold;
 		margin: 10px 0;
 		width: 250px;
-		color: $neutral-4;
+		color: $neutral-3;
 	}
 	hr {
 		background-color: $neutral-6;
@@ -282,6 +282,7 @@
 
 			.q-item__section--avatar {
 				min-width: 35px;
+				color: $neutral-4;
 			}
 
 			&.q-router-link--active {

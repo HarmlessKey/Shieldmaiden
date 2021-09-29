@@ -1,16 +1,91 @@
+:root {
+  --neutral-11: #080808; // custom
+  --neutral-10: #191a1c; //custom
+  --neutral-9: #202225; // Server sidebar
+  --neutral-8: #292B2F; // Sidebar Bottom
+  --neutral-7: #2F3136; // Sidebar
+  --neutral-6: #36393F; // Main background
+  --neutral-5: #3E4249; 
+  --neutral-4: #72767D; // Sidebar icon
+  --neutral-3: #8E9297; // Sidebar text
+  --neutral-2: #B9BBBE; // Icons header
+  --neutral-1: #FFFFFF; // Text
+
+  --green: #83b547;
+  --green-hover: #9ddb51;
+  --blue: #2c97de;
+  --blue-hover: #36a9f5;
+  --facebook-blue: #3C5A99;
+  --red: #cc3e4a;
+  --red-hover: #e8414f;
+  --patreon-red: #e85b46;
+  --discord-purple: #7289DA;
+  --orange: #e76d3b;
+  --yellow: #c1b947;
+  --purple: #9b7aba;
+  --blue-light: #88b3ce;
+  --green-light: #9ac16a;
+  --orange-light: #db815e;
+  --red-light: #c45e66;
+  --yellow-light: #e2da5f;
+
+  --copper: #e76d3b;
+  --silver: #dbdbdb;
+  --electrum: #a2bade;
+  --gold: #e2da5f;
+  --platinum: #fff;
+
+  //damage type colors
+  --acid: #83b547;
+  --bludgening: #6d6767;
+  --cold: #3b93ce;
+  --fire:  #e63f21;
+  --force:  #772caa;
+  --lightning:  #88b3ce;
+  --necrotic:  #614c75;
+  --piercing:  #6d6767;
+  --poison:  #83b547;
+  --psychic:  #e63f21;
+  --radiant:  #e2da5f;
+  --slashing:  #6d6767;
+  --thunder:  #e63f21;
+
+  // Styling
+  --header-height: 50px;
+  --border-radius: 4px;
+  --border-radius-small: 3px;
+}
+
+// Possible light theme
+[data-theme="light"] {
+  --neutral-11: #FFFFFF;
+  --neutral-10: #eeeeee;
+  --neutral-9: #e3e5e8;
+  --neutral-8: #E3E5E8; 
+  --neutral-7: #f2f3f5;
+  --neutral-6: #FFFFFF;
+  --neutral-5: #9ea5b1;
+  --neutral-4: #747f8d;
+  --neutral-3: #6a7480;
+  --neutral-2: #4f5660;
+  --neutral-1: #060607;
+}
+
+
+
 /* 1. Variables */
 /*********************************************/
-$neutral-11: #080808;
-$neutral-10: #191a1c;
-$neutral-9: #202225;
-$neutral-8: #292B2F;
-$neutral-7: #2F3136;
-$neutral-6: #36393F;
-$neutral-5: #3E4249;
-$neutral-4: #72767D;
-$neutral-3: #8E9297;
-$neutral-2: #B9BBBE;
-$neutral-1: #FFFFFF;
+$neutral-11: var(--neutral-11);
+$neutral-10: var(--neutral-10);
+$neutral-9: var(--neutral-9);
+$neutral-8: var(--neutral-8);
+$neutral-7: var(--neutral-7);
+$neutral-6: var(--neutral-6);
+$neutral-5: var(--neutral-5);
+$neutral-4: var(--neutral-4);
+$neutral-3: var(--neutral-3);
+$neutral-2: var(--neutral-2);
+$neutral-1: var(--neutral-1);
 
 
 $gray: #262626;
@@ -21,47 +96,47 @@ $gray-hover: #5c5757;
 $gray-active: #302f2f;
 $black: #000;
 $white: #FFF;
-$green: #83b547;
-$green-hover: #9ddb51;
-$blue: #2c97de;
-$blue-hover: #36a9f5;
-$facebook-blue: #3C5A99;
-$red: #cc3e4a;
-$red-hover: #e8414f;
-$patreon-red: #e85b46;
-$discord-purple: #7289DA;
-$orange: #e76d3b;
-$yellow: #c1b947;
-$purple: #9b7aba;
-$blue-light: #88b3ce;
-$green-light: #9ac16a;
-$orange-light: #db815e;
-$red-light: #c45e66;
-$yellow-light: #e2da5f;
 
-$copper: #e76d3b;
-$silver: #dbdbdb;
-$electrum: #a2bade;
-$gold: #e2da5f;
-$platinum: #fff;
+$green: var(--green);
+$green-hover: var(--green-hover);
+$blue: var(--blue);
+$blue-hover: var(--blue-hover);
+$facebook-blue: var(--facebook-blue);
+$red: var(--red);
+$red-hover: var(--red-hover);
+$patreon-red: var(--patreon-red);
+$discord-purple: var(--discord-purple);
+$orange: var(--orange);
+$yellow: var(--yellow);
+$purple: var(--purple);
+$blue-light: var(--blue-light);
+$green-light: var(--green-light);
+$orange-light: var(--orange-light);
+$red-light: var(--red-light);
+$yellow-light: var(--yellow-light);
 
+$copper: var(--copper);
+$silver: var(--silver);
+$electrum: var(--electrum);
+$gold: var(--gold);
+$platinum: var(--platinum);
 
 //damage type colors
-$acid: #83b547;
-$bludgening: #6d6767;
-$cold: #3b93ce;
-$fire:  #e63f21;
-$force:  #772caa;
-$lightning:  #88b3ce;
-$necrotic:  #614c75;
-$piercing:  #6d6767;
-$poison:  #83b547;
-$psychic:  #e63f21;
-$radiant:  #e2da5f;
-$slashing:  #6d6767;
-$thunder:  #e63f21;
+$acid: var(--acid);
+$bludgening: var(--bludgening);
+$cold: var(--cold);
+$fire:  var(--fire);
+$force:  var(--force);
+$lightning:  var(--lightning);
+$necrotic:  var(--necrotic);
+$piercing:  var(--piercing);
+$poison:  var(--poison);
+$psychic:  var(--psychic);
+$radiant:  var(--radiant);
+$slashing:  var(--slashing);
+$thunder:  var(--thunder);
 
 // Styling
-$header-height: 50px;
-$border-radius: 4px;
-$border-radius-small: 3px;
+$header-height: var(--header-height);
+$border-radius: var(--border-radius);
+$border-radius-small: var(--border-radius-small);

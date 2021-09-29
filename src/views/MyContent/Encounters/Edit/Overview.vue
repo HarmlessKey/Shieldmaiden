@@ -378,7 +378,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 			display: block;
 			cursor: pointer;
 			line-height: 50px;
-			color:$white !important;
+			color:$neutral-1 !important;
 
 			i {
 				transition: transform .5s linear;

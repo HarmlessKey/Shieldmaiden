@@ -428,11 +428,11 @@
 					margin-top: 1px;
 				}
 				.advantage .mod:hover {
-					color:$white;
+					color:$neutral-1;
 					background-color: $green !important;
 				}
 				.disadvantage .mod:hover {
-					color:$white;
+					color:$neutral-1;
 					background-color:$red !important;
 				}
 			}
@@ -453,7 +453,7 @@
 
 			&:hover {
 				background:$gray-hover;
-				color:$white !important;
+				color:$neutral-1 !important;
 			}
 		}
 	}

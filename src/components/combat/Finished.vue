@@ -316,7 +316,7 @@
 		padding: 20px;
 
 		h2.head {
-			color:$white;
+			color:$neutral-1;
 			margin-top: 20px;
 			text-shadow: 0 0 8px$black;
 			font-size: 25px !important;
@@ -329,7 +329,7 @@
 			font-size: 30px;
 			margin-bottom: 25px;
 			position: relative;
-			color:$white;
+			color:$neutral-1;
 
 			.close {
 				background:$black;
@@ -344,14 +344,14 @@
 		.actions {
 			display: flex;
 			justify-content: space-between;
-			border-bottom: solid 1px$white;
+			border-bottom: solid 1px$neutral-1;
 			margin-bottom: 20px;
 			padding-bottom: 5px;
-			color:$white;
+			color:$neutral-1;
 
 			.right {
 				a {
-					color:$white !important;
+					color:$neutral-1 !important;
 					margin-left: 10px;
 				}
 			}

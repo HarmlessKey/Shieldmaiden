@@ -218,6 +218,9 @@
 		}
 	},
 	mounted() {
+		//Set theme
+		document.documentElement.setAttribute("data-theme", "dark");
+
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {

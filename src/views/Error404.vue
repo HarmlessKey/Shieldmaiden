@@ -129,7 +129,7 @@
 						color: $gray-light;
 
 						&:hover {
-							color: $white;
+							color: $neutral-1;
 						}
 					}
 				}

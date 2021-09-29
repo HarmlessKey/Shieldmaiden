@@ -481,7 +481,7 @@ a {
 		cursor: pointer;
 
 		&:hover {
-			color:$white;
+			color:$neutral-1;
 		}
 		i {
 			

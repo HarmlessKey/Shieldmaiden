@@ -225,7 +225,7 @@
 	}
 
 	ul.premade {
-		color:$white;
+		color:$neutral-1;
 		list-style: none;
 		padding: 0;
 
@@ -254,7 +254,7 @@
 		font-size: 11px;
 
 		a {
-			color:$white !important;
+			color:$neutral-1 !important;
 			position: relative;
 			padding: 3px;
 
@@ -266,7 +266,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color:$white !important;
+					color:$neutral-1 !important;
 					font-size: 12px;
 					display: inline-block;
 					

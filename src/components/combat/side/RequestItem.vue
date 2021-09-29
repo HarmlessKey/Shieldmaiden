@@ -330,7 +330,7 @@
 						&.i, &.r { color: $green; }
 						&.v { color: $red; }
 						span {
-							color: $white;
+							color: $neutral-1;
 						}
 					}
 				}

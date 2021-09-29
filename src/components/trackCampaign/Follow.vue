@@ -52,7 +52,7 @@
 
 <style lang="scss" scoped>
 	.follow {
-		color:$white;
+		color:$neutral-1;
 
 		.hover-show {
 			display: none;

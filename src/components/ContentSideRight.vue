@@ -1,16 +1,18 @@
 <template>
   <div>
     <hk-card small>
+      <div class="card-body">
+        <Adsense
+            data-ad-client="ca-pub-2711721977927243"
+            data-ad-slot="2613883680">
+        </Adsense>
+      </div>
       <div slot="footer" class="card-footer">
         <span>Support us to remove ads</span>
         <router-link class="btn btn-sm bg-neutral-5" to="/patreon">
           <i class="fab fa-patreon patreon-red" />
         </router-link>
       </div>
-      <Adsense
-          data-ad-client="ca-pub-2711721977927243"
-          data-ad-slot="2613883680">
-      </Adsense>
     </hk-card>
 
     <hk-card v-if="page === 'campaigns'">
@@ -20,27 +22,31 @@
           <i class="fas fa-qrcode" />
         </a>
       </div>
-      <PlayerLink :qr="false" :title="false" :info="false" />
+      <div class="card-body">
+       <PlayerLink :qr="false" :title="false" :info="false" />
+      </div>
     </hk-card>
 
     <hk-card small header="Join our community">
-      <a class="btn btn-block bg-neutral-8 mb-3" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
-        <i class="fab fa-discord discord-purple mr-2" /> Discord
-      </a>
-      <p class="neutral-2 text-center">
-        Join others on our Discord and be amongst the first to know about new updates.
-      </p>
-      <hr>
-      <div class="social d-flex justify-content-between">
-        <a 
-          v-for="{name, icon, url} in social_media" 
-          class="btn bg-neutral-8" 
-          :key="name"
-          :href="url" 
-          target="_blank" rel="noopener"
-        >
-          <i :class="icon" />
+      <div class="card-body">
+        <a class="btn btn-block bg-neutral-8 mb-3" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">
+          <i class="fab fa-discord discord-purple mr-2" /> Discord
         </a>
+        <p class="neutral-2 text-center">
+          Join others on our Discord and be amongst the first to know about new updates.
+        </p>
+        <hr>
+        <div class="social d-flex justify-content-between">
+          <a 
+            v-for="{name, icon, url} in social_media" 
+            class="btn bg-neutral-8" 
+            :key="name"
+            :href="url" 
+            target="_blank" rel="noopener"
+          >
+            <i :class="icon" />
+          </a>
+        </div>
       </div>
     </hk-card>
   </div>
@@ -95,8 +101,8 @@ export default {
   },
   methods: {
     ...mapActions([
-				"setSlide"
-			]),
+      "setSlide"
+    ]),
   }
 }
 </script>

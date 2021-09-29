@@ -263,7 +263,7 @@
 			width: 100%;
 			text-align: center;
 			font-size: 100px;
-			color: $white;
+			color: $neutral-1;
 			font-weight: bold;
 			text-shadow: 0 0  5px $black;
 			letter-spacing: -2px;

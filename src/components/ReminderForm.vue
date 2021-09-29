@@ -296,7 +296,7 @@ export default {
 			width: 25px;
 			height: 25px;
 			padding: 2px 5px;
-			color:$white !important;
+			color:$neutral-1 !important;
 			margin-right: 5px;
 
 			&:last-child {

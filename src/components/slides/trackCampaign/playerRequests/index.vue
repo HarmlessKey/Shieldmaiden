@@ -140,7 +140,7 @@
 				height: 30px;
 				background-size: cover;
 				background-position: center top;
-				border: solid 1px$white;
+				border: solid 1px$neutral-1;
 			}
 			.name {
 				padding: 6px 10px;

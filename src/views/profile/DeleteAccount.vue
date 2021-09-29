@@ -102,7 +102,7 @@ export default {
 		text-align: center;
 
 		.warning {
-			color:$white;
+			color:$neutral-1;
 			padding: 10px;
 		}
 		#login {

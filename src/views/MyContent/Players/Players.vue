@@ -3,91 +3,99 @@
 		<h1>Your players</h1>
 		<p>These are the players that you can use in your campaigns.</p>
 
-		<OverEncumbered v-if="overencumbered"/>
-		<OutOfSlots 
-			v-else-if="content_count.players >= tier.benefits.players"
-			type = 'players'
-		/>
-		<hk-card v-if="players">
-			<div slot="header" class="card-header">
-				<span>
-					Players ( 
-					<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
-						/ 
-						<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-						<template v-else>{{ tier.benefits.players }}</template>	
-						)
-				</span>
-				<router-link class="btn btn-sm" v-if="!overencumbered" to="/players/add-player">
-					<i class="fas fa-plus green"></i> New Player
+		<div class="row q-col-gutter-md">
+			<div class="col-12 col-md-9">
+				<OverEncumbered v-if="overencumbered"/>
+				<OutOfSlots 
+					v-else-if="content_count.players >= tier.benefits.players"
+					type = 'players'
+				/>
+				<hk-card v-if="players">
+					<div slot="header" class="card-header">
+						<span>
+							Players ( 
+							<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+								/ 
+								<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
+								<template v-else>{{ tier.benefits.players }}</template>	
+								)
+						</span>
+						<router-link class="btn btn-sm" v-if="!overencumbered" to="/players/add-player">
+							<i class="fas fa-plus green"></i> New Player
+						</router-link>
+					</div>
+
+					<div class="card-body">
+						<hk-table
+							:columns="columns"
+							:items="_players"
+							:search="['character_name', 'campaign_name']"
+						>
+							<template slot="avatar" slot-scope="data">
+								<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+								<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+							</template>
+
+							<template slot="character_name" slot-scope="data">
+								<router-link class="mx-2"  :to="'/players/' + data.row.key">
+									{{ data.item }}
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</router-link>
+							</template>
+
+							<template slot="campaign_name" slot-scope="data">
+								{{ data.item }}
+							</template>
+
+							<template slot="level" slot-scope="data">
+								{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
+							</template>
+
+							<div slot="actions" slot-scope="data" class="actions">
+								<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="'/players/' + data.row.key">
+									<i class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</router-link>
+								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
+										<i class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
+								</a>
+							</div>
+						</hk-table>
+
+						<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
+							<div 
+								class="openSlot"
+								v-for="index in slotsLeft"
+								:key="'open-slot-' + index"
+							>
+								<span>Open player slot</span>
+								<router-link v-if="!overencumbered" to="/players/add-player">
+									<i class="fas fa-plus green"></i>
+								</router-link>
+							</div>
+						</template>
+						<template v-if="!tier || tier.name === 'Free'">
+							<router-link class="openSlot none" to="/patreon">
+								Support us on Patreon for more slots.
+							</router-link>
+						</template>
+					</div>
+				</hk-card>
+				<router-link v-else-if="players === null && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
+					Create your first player
 				</router-link>
 			</div>
-
-
-			<hk-table
-				:columns="columns"
-				:items="_players"
-				:search="['character_name', 'campaign_name']"
-			>
-				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
-				</template>
-
-				<template slot="character_name" slot-scope="data">
-					<router-link class="mx-2"  :to="'/players/' + data.row.key">
-						{{ data.item }}
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-				</template>
-
-				<template slot="campaign_name" slot-scope="data">
-					{{ data.item }}
-				</template>
-
-				<template slot="level" slot-scope="data">
-					{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
-				</template>
-
-				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="'/players/' + data.row.key">
-						<i class="fas fa-pencil"></i>
-						<q-tooltip anchor="top middle" self="center middle">
-							Edit
-						</q-tooltip>
-					</router-link>
-					<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-					</a>
-				</div>
-			</hk-table>
-
-			<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-				<div 
-					class="openSlot"
-					v-for="index in slotsLeft"
-					:key="'open-slot-' + index"
-				>
-					<span>Open player slot</span>
-					<router-link v-if="!overencumbered" to="/players/add-player">
-						<i class="fas fa-plus green"></i>
-					</router-link>
-				</div>
-			</template>
-			<template v-if="!tier || tier.name === 'Free'">
-				<router-link class="openSlot none" to="/patreon">
-					Support us on Patreon for more slots.
-				</router-link>
-			</template>
-		</hk-card>
-		<router-link v-else-if="players === null && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
-			Create your first player
-		</router-link>
+			<div class="col-12 col-md-3">
+				<ContentSideRight page="players" />
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -98,6 +106,7 @@
 	import { mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
+	import ContentSideRight from "@/components/ContentSideRight";
 
 	export default {
 		name: 'Players',
@@ -107,7 +116,8 @@
 		},
 		components: {
 			OverEncumbered,
-			OutOfSlots
+			OutOfSlots,
+			ContentSideRight
 		},
 		data() {
 			return {

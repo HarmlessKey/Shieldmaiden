@@ -187,7 +187,7 @@ ul {
 			a {
 				background:$red;
 				text-align: center;
-				color:$white !important;
+				color:$neutral-1 !important;
 				display: block;
 				position: absolute;
 				line-height: 28px;

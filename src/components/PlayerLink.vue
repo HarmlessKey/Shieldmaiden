@@ -6,8 +6,8 @@
 			</div>
 			<div>
 				<h2 v-if="title" class="mb-2">Share live initiative list</h2>
-				<p class="neutral-3">
-					Let your players follow your encounters. 
+				<p class="neutral-2">
+					Let your players follow a live initiative list. 
 				</p>
 				<q-input
 					dark filled square
@@ -29,10 +29,10 @@
 				<input :value="copy" id="copy" type="hidden" />
 			</div>
 		</div>
-		<small v-if="info">
+		<div class="mt-4" v-if="info">
 			Make sure your campaign is set to <span class="green">Public</span>, or your followers won't be able to see it.
 			Then click the <span class="live">LIVE</span> icon in your campaign to share the initiative of the encounter that is active. You can stay live for your entire session, whenever you're not running an encounter, followers won't see what you're doing.
-		</small>
+		</div>
 	</div>
 </template>
 

@@ -13,17 +13,19 @@
 						? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
 						: { backgroundImage: `url(${require('@/assets/_img/campaign-background.jpg')})` }
 					]"/>
-					<div>
-						<div class="neutral-4 mb-1">CONTINUE</div>
-						<h3 class="neutral-1">
-							<b>{{ active_campaign.campaign }}</b><br/>
-						</h3>
-						<p class="neutral-3">Dive right back into your adventure.</p>
-					</div>
+					<div class="card-body">
+						<div>
+							<div class="neutral-4 mb-1">CONTINUE</div>
+							<h3 class="neutral-1">
+								<b>{{ active_campaign.campaign }}</b><br/>
+							</h3>
+							<p class="neutral-3">Dive right back into your adventure.</p>
+						</div>
 
-					<router-link :to="`/encounters/${active_campaign.key}`" class="btn btn-sm">
-						Continue <span class="d-none d-md-inline">campaign</span>
-					</router-link>
+						<router-link :to="`/encounters/${active_campaign.key}`" class="btn btn-sm">
+							Continue <span class="d-none d-md-inline">campaign</span>
+						</router-link>
+					</div>
 				</hk-card>
 				<router-link v-else to="/campaigns" class="first">
 					<h2>Create a campaign</h2>
@@ -31,47 +33,51 @@
 
 				<hk-card-deck>
 					<hk-card header="Dungeon Master">
-						<q-list dark class="mb-4">
-							<q-item 
-								v-for="({name, icon, label, caption}, index) in dm_tabs" 
-								clickable v-ripple 
-								:to="`/${name}`"
-								:key="`dm-${index}`"
-							>
-								<q-item-section avatar>
-									<q-icon :name="icon" class="neutral-2" />
-								</q-item-section>
-								<q-item-section>
-									<q-item-label>{{ label }}</q-item-label>
-									<q-item-label caption>{{ caption }}</q-item-label>
-								</q-item-section>
-								<q-item-section side>
-									<q-icon name="fas fa-chevron-right" />
-								</q-item-section>
-							</q-item>
-						</q-list>
+						<div class="card-body">
+							<q-list dark class="mb-4">
+								<q-item 
+									v-for="({name, icon, label, caption}, index) in dm_tabs" 
+									clickable v-ripple 
+									:to="`/${name}`"
+									:key="`dm-${index}`"
+								>
+									<q-item-section avatar>
+										<q-icon :name="icon" class="neutral-2" />
+									</q-item-section>
+									<q-item-section>
+										<q-item-label>{{ label }}</q-item-label>
+										<q-item-label caption>{{ caption }}</q-item-label>
+									</q-item-section>
+									<q-item-section side>
+										<q-icon name="fas fa-chevron-right" />
+									</q-item-section>
+								</q-item>
+							</q-list>
+						</div>
 					</hk-card>
 				
 					<hk-card header="Player">
-						<q-list dark>
-							<q-item 
-								v-for="({name, icon, label, caption}, index) in player_tabs" 
-								clickable v-ripple 
-								:to="`/${name}`"
-								:key="`player-${index}`"
-							>
-								<q-item-section avatar>
-									<q-icon :name="icon" class="neutral-2" />
-								</q-item-section>
-								<q-item-section>
-									<q-item-label>{{ label }}</q-item-label>
-									<q-item-label caption>{{ caption }}</q-item-label>
-								</q-item-section>
-								<q-item-section side>
-									<q-icon name="fas fa-chevron-right" />
-								</q-item-section>
-							</q-item>
-						</q-list>
+						<div class="card-body">
+							<q-list dark>
+								<q-item 
+									v-for="({name, icon, label, caption}, index) in player_tabs" 
+									clickable v-ripple 
+									:to="`/${name}`"
+									:key="`player-${index}`"
+								>
+									<q-item-section avatar>
+										<q-icon :name="icon" class="neutral-2" />
+									</q-item-section>
+									<q-item-section>
+										<q-item-label>{{ label }}</q-item-label>
+										<q-item-label caption>{{ caption }}</q-item-label>
+									</q-item-section>
+									<q-item-section side>
+										<q-icon name="fas fa-chevron-right" />
+									</q-item-section>
+								</q-item>
+							</q-list>
+						</div>
 					</hk-card>
 				</hk-card-deck>
 			</div>
@@ -208,9 +214,7 @@
 <style lang="scss" scoped>
 	.signed {
 		padding-top: 30px;
-		background-image: url('../../assets/_img/styles/paper-bg.png');
 		background-position: top center;
-		background-color: $neutral-11;
 		overflow: auto;
 		height: calc(100vh - 50px);
 		padding-bottom: 98px;

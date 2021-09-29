@@ -174,7 +174,7 @@
 
 		h3 {
 			text-transform: capitalize;
-			color:$white;
+			color:$neutral-1;
 			text-shadow: 0 0 3px $black;
 			font-size: 12px !important;
 			font-weight: bold !important;

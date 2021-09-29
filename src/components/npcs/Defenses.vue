@@ -156,7 +156,7 @@
 		line-height: 27px;
 		top: 0;
 		left: 0;
-		color: $white;
+		color: $neutral-1;
 	}
 	
 	&.damage_vulnerabilities {

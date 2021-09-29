@@ -1,13 +1,6 @@
 <template>
-	<div class="container-fluid">
-		<div v-if="overencumbered" class='container'>
-			<OverEncumbered/>
-		</div>
-		<template v-else>
-			<h2>
-				<template v-if="$route.name === 'EditReminder'">Edit Reminder</template>
-				<template v-else>New Reminder</template>
-			</h2>
+	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
+		<div class="card-body">
 			<div class="reminder" v-if="reminder">
 				<reminder-form v-model="reminder" @validation="setValidation" />
 				<div class="trigger">
@@ -20,8 +13,8 @@
 			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
 			<button v-if="$route.name == 'AddReminder'" class="btn mt-3" @click="addReminder()"><i class="fas fa-plus"></i> Add reminder</button>
 			<button v-else class="btn mt-3" @click="editReminder()"><i class="fas fa-check"></i> Save</button>
-		</template>
-	</div>
+		</div>
+	</hk-card>
 </template>
 
 <script>

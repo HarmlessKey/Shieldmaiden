@@ -1,141 +1,128 @@
 <template>
 	<div>
-		<div v-if="overencumbered" class='content' style="display: block;">
-			<OverEncumbered/>
-		</div>
-		<div class="content" v-else>
-			<div class="info mb-3">
-				<Crumble />
+		<hk-card-deck>
+			<hk-card header="General">
+				<div class="card-body">
+					<q-input 
+						dark filled square
+						label="name"
+						autocomplete="off"
+						v-validate="'required'" 
+						data-vv-as="Encounter Name" 
+						type="text" 
+						name="name" 
+						v-model="campaign.campaign"
+					/>
+					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
-				<router-link to="/campaigns"><i class="fas fa-arrow-left"></i> Back</router-link>
+					<q-select 
+						dark filled square
+						label="Advancement"
+						emit-value
+						map-options
+						class="my-2" 
+						v-model="campaign.advancement" 
+						:options="advancement_options" 
+					/>
 
-				<h2 class="mt-3">Edit your campaign</h2>
-
-				<hk-card-deck>
-					<hk-card header="General">
-						<div class="card-body">
+					<div class="background">
+						<div 
+							class="img pointer" 
+							v-if="campaign.background" 
+							:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+							@click="image = true"
+						>
+						</div>
+						<div class="img" v-else>
+							<q-icon name="fas fa-image"/>
+						</div>
+						<div>
 							<q-input 
 								dark filled square
-								label="name"
-								autocomplete="off"
-								v-validate="'required'" 
-								data-vv-as="Encounter Name" 
-								type="text" 
-								name="name" 
-								v-model="campaign.campaign"
-							/>
-							<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-
-							<q-select 
-								dark filled square
-								label="Advancement"
-								emit-value
-								map-options
-								class="my-2" 
-								v-model="campaign.advancement" 
-								:options="advancement_options" 
-							/>
-
-							<div class="background">
-								<div 
-									class="img pointer" 
-									v-if="campaign.background" 
-									:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
-									@click="image = true"
-								>
-								</div>
-								<div class="img" v-else>
-									<q-icon name="fas fa-image"/>
-								</div>
-								<div>
-									<q-input 
-										dark filled square
-										autocomplete="off" 
-										v-validate="'url'" type="text" 
-										name="backbround" 
-										data-vv-as="Background"
-										v-model="campaign.background" 
-										placeholder="Background URL"/>
-									<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
-								</div>
-							</div>
-
-							<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
-								<span class="btn btn-clear">
-									<span :class="!campaign.private ? 'green' : 'neutral-2'">
-										<i class="fas fa-eye"></i>
-										Public
-									</span>
-								</span>
-								/
-								<span class="btn btn-clear mr-2">
-									<span :class="campaign.private ? 'red' : 'neutral-2'">
-										<i class="fas fa-eye-slash"></i>
-										Private
-									</span>
-								</span>
-								<hk-popover 
-									header="Private vs Public"
-								>
-									<i class="fas fa-info-circle blue" />
-									<template #content>
-										<p>
-											You can only share the inititiave list with your 
-											players if your campaign is set to public.
-										</p>
-										Private campaigns are hidden from your followers.
-									</template>
-								</hk-popover>
-							</div>
-
-							<button class="btn mt-3" @click="edit()">Save</button>
+								autocomplete="off" 
+								v-validate="'url'" type="text" 
+								name="backbround" 
+								data-vv-as="Background"
+								v-model="campaign.background" 
+								placeholder="Background URL"/>
+							<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
 						</div>
-					</hk-card>
+					</div>
 
-					<!-- PLAYERS -->
-					<hk-card>
-						<div slot="header" class="card-header">
-							Players in Campaign
-							<a @click="players_dialog = true" class="btn btn-sm">
-								<i class="fas fa-plus green mr-1" /> Add players
-							</a>
-						</div>
-						<div class="card-body">
-							<template v-if="players && campaign">
-								<ul class="entities hasImg" v-if="campaign.players">
-									<li v-for="(player, key) in campaign.players" :key="key">		
-										<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
-										<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
-
-										<div :class="{ 'red': inOtherCampaign(key) }">
-											{{ players[key].character_name }}
-											<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover">
-												<small>Different Campaign</small>
-											</span>
-										</div>
-										
-										<div class="actions">
-											<a class="gray-hover" @click="removePlayer(key)">
-												<i class="fas fa-trash-alt red"></i>
-												<q-tooltip anchor="top middle" self="center right">
-													Remove from campaign
-												</q-tooltip>
-											</a>
-										</div>
-									</li>
-								</ul>
-								<p v-else>
-									There are no players in this campaign yet.
+					<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+						<span class="btn btn-clear">
+							<span :class="!campaign.private ? 'green' : 'neutral-2'">
+								<i class="fas fa-eye"></i>
+								Public
+							</span>
+						</span>
+						/
+						<span class="btn btn-clear mr-2">
+							<span :class="campaign.private ? 'red' : 'neutral-2'">
+								<i class="fas fa-eye-slash"></i>
+								Private
+							</span>
+						</span>
+						<hk-popover 
+							header="Private vs Public"
+						>
+							<i class="fas fa-info-circle blue" />
+							<template #content>
+								<p>
+									You can only share the inititiave list with your 
+									players if your campaign is set to public.
 								</p>
-								
-								<a slot="footer" @click="players_dialog = true" class="btn btn-block btn-square">Add players</a>
+								Private campaigns are hidden from your followers.
 							</template>
-							<hk-loader v-else name="players" />
-						</div>
-					</hk-card>
-				</hk-card-deck>
-			</div>
-		</div>
+						</hk-popover>
+					</div>
+
+					<button class="btn mt-3" @click="edit()">Save</button>
+				</div>
+			</hk-card>
+
+			<!-- PLAYERS -->
+			<hk-card>
+				<div slot="header" class="card-header">
+					Players in Campaign
+					<a @click="players_dialog = true" class="btn btn-sm">
+						<i class="fas fa-plus green mr-1" /> Add players
+					</a>
+				</div>
+				<div class="card-body">
+					<template v-if="players && campaign">
+						<ul class="entities hasImg" v-if="campaign.players">
+							<li v-for="(player, key) in campaign.players" :key="key">		
+								<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
+								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+
+								<div :class="{ 'red': inOtherCampaign(key) }">
+									{{ players[key].character_name }}
+									<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover">
+										<small>Different Campaign</small>
+									</span>
+								</div>
+								
+								<div class="actions">
+									<a class="gray-hover" @click="removePlayer(key)">
+										<i class="fas fa-trash-alt red"></i>
+										<q-tooltip anchor="top middle" self="center right">
+											Remove from campaign
+										</q-tooltip>
+									</a>
+								</div>
+							</li>
+						</ul>
+						<p v-else>
+							There are no players in this campaign yet.
+						</p>
+						
+						<a slot="footer" @click="players_dialog = true" class="btn btn-block btn-square">Add players</a>
+					</template>
+					<hk-loader v-else name="players" />
+				</div>
+			</hk-card>
+		</hk-card-deck>
 
 		<q-dialog v-model="players_dialog">
 			<hk-card header="All Players" :min-width="300">
@@ -183,19 +170,13 @@
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/MyContent.vue'
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import { mapGetters, mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapGetters, mapActions } from "vuex";
+	import { db } from "@/firebase";
 
 	export default {
-		name: 'EditCampaign',
+		name: "EditCampaign",
 		metaInfo: {
-			title: 'Campaigns'
-		},
-		components: {
-			Crumble,
-			OverEncumbered,
+			title: "Campaigns"
 		},
 		data() {
 			return {

@@ -1,124 +1,116 @@
 <template>
-	<div class="content" v-if="tier">
-		<h1>Your NPC's</h1>
-		<p>These are your custom <i>Non-Player Characters</i> or monsters, that you can use in your campaigns.</p>
+	<div v-if="tier">
+		<hk-card>
+			<div slot="header" class="card-header">
+				<span>
+					NPC's ( 
+					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					/ 
+					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
+					<template v-else>{{ tier.benefits.npcs }}</template>
+					)
+				</span>
+				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
+					<i class="fas fa-plus green"></i> New NPC
+				</router-link>
+			</div>
 
-		<div class="row q-col-gutter-md">
-			<div class="col-12 col-md-9">
-				<OverEncumbered v-if="overencumbered"/>
-				<OutOfSlots 
-					v-else-if="content_count.npcs >= tier.benefits.npcs"
-					type = 'npcs'
-				/>
-			
-				<hk-card v-if="npcs">
-					<div slot="header" class="card-header">
-						<span>
-							NPC's ( 
-							<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
-							/ 
-							<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
-							<template v-else>{{ tier.benefits.npcs }}</template>
-							)
-						</span>
-						<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" to="/npcs/add-npc">
-							<i class="fas fa-plus green"></i> New NPC
-						</router-link>
-					</div>
+			<div class="card-body">
+				<p class="neutral-2">
+					These are your custom Non-Player Characters or monsters.
+				</p> 
+				<template v-if="npcs">
+					<OutOfSlots 
+						v-if="content_count.npcs >= tier.benefits.npcs"
+						type = 'npcs'
+					/>
+					
+					<a v-if="old_npcs.length > 0" class="btn btn-block bg-red mb-3" @click="old_dialog = true">
+						<i class="fas fa-wand-magic"></i> Update {{ old_npcs.length }} old NPCs
+					</a>
 
-					<div class="card-body">
-						<a v-if="old_npcs.length > 0" class="btn btn-block bg-red mb-3" @click="old_dialog = true">
-							<i class="fas fa-wand-magic"></i> Update {{ old_npcs.length }} old NPCs
-						</a>
-
-						<hk-table
-							:columns="columns"
-							:items="_npcs"
-							:perPage="20"
-							:search="['name', 'type']"
-						>
-							<template slot="avatar" slot-scope="data">
-								<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-								<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
-							</template>
-
-							<template slot="name" slot-scope="data">
-								<span v-if="data.row.old">
-									<q-badge v-if="data.row.error" color="red" label="ERROR"/>
-									<q-badge v-else color="red" label="Deprecated" />
-									{{ data.item.capitalizeEach() }}
-									<q-tooltip  v-if="data.row.error" anchor="top middle" self="center middle">
-										Contact us on Discord
-									</q-tooltip>
-								</span>
-								<router-link v-else class="mx-2" :to="'/npcs/' + data.row.key">
-									{{ data.item.capitalizeEach() }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</router-link>
-							</template>
-
-							<div slot="actions" slot-scope="data" class="actions">
-								<template v-if="data.row.old">
-									<a class="btn btn-sm bg-neutral-5 mx-1" @click="parseNewNPC(data.row)">
-										<i class="fas fa-wand-magic"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											Parse to new format
-										</q-tooltip>
-									</a>
-									<a class="btn btn-sm bg-neutral-5 mx-1" @click="setSlide({show: true, type: 'ViewOldMonster', data: data.row })">
-										<i class="fas fa-eye"></i>
-										<q-tooltip anchor="top middle" self="center middle">
-											View NPC
-										</q-tooltip>
-									</a>
-								</template>
-								<router-link v-else class="btn btn-sm bg-neutral-5 mx-1" :to="'/npcs/' + data.row.key">
-									<i class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</router-link>
-								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-									<i class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Delete
-									</q-tooltip>
-								</a>
-							</div>
-						</hk-table>
-
-						<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
-							<div 
-								class="openSlot"
-								v-for="index in slotsLeft"
-								:key="'open-slot-' + index"
-							>
-								<span>Open NPC slot</span>
-								<router-link v-if="!overencumbered" to="/npcs/add-npc">
-									<i class="fas fa-plus green"></i>
-								</router-link>
-							</div>
+					<hk-table
+						:columns="columns"
+						:items="_npcs"
+						:perPage="20"
+						:search="['name', 'type']"
+					>
+						<template slot="avatar" slot-scope="data">
+							<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
+							<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
 						</template>
-						<template v-if="!tier || tier.name === 'Free'">
-							<router-link class="openSlot none" to="/patreon">
-								Support us on Patreon for more slots.
+
+						<template slot="name" slot-scope="data">
+							<span v-if="data.row.old">
+								<q-badge v-if="data.row.error" color="red" label="ERROR"/>
+								<q-badge v-else color="red" label="Deprecated" />
+								{{ data.item.capitalizeEach() }}
+								<q-tooltip  v-if="data.row.error" anchor="top middle" self="center middle">
+									Contact us on Discord
+								</q-tooltip>
+							</span>
+							<router-link v-else class="mx-2" :to="`${$route.path}/${data.row.key}`">
+								{{ data.item.capitalizeEach() }}
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
 							</router-link>
 						</template>
-					</div>
-				</hk-card>
+
+						<div slot="actions" slot-scope="data" class="actions">
+							<template v-if="data.row.old">
+								<a class="btn btn-sm bg-neutral-5 mx-1" @click="parseNewNPC(data.row)">
+									<i class="fas fa-wand-magic"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Parse to new format
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm bg-neutral-5 mx-1" @click="setSlide({show: true, type: 'ViewOldMonster', data: data.row })">
+									<i class="fas fa-eye"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										View NPC
+									</q-tooltip>
+								</a>
+							</template>
+							<router-link v-else class="btn btn-sm bg-neutral-5 mx-1" :to="`${$route.path}/${data.row.key}`">
+								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</div>
+					</hk-table>
+
+					<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
+						<div 
+							class="openSlot"
+							v-for="index in slotsLeft"
+							:key="'open-slot-' + index"
+						>
+							<span>Open NPC slot</span>
+							<router-link v-if="!overencumbered" to="/npcs/add-npc">
+								<i class="fas fa-plus green"></i>
+							</router-link>
+						</div>
+					</template>
+					<template v-if="!tier || tier.name === 'Free'">
+						<router-link class="openSlot none" to="/patreon">
+							Support us on Patreon for more slots.
+						</router-link>
+					</template>
+				</template>
 				<router-link v-else-if="npcs === null && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
 					Create your first NPC
 				</router-link>
-				<div v-else class="loader"><span>Loading NPC's...</span></div>
 			</div>
-			<div class="col-12 col-md-3">
-				<ContentSideRight page="npcs" />
-			</div>
-		</div>
-
-
+		</hk-card>
+		
 		<!-- PARSER DIALOG -->
 		<q-dialog dark square v-model="old_dialog">
 			<hk-card header="Deprecated NPC's">
@@ -132,7 +124,7 @@
 					<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
 
 					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="bg-gray" v-close-popup>Later</q-btn>
+						<q-btn class="bg-neutral-8" v-close-popup>Later</q-btn>
 					</div>
 				</template>
 				<template v-else>
@@ -167,12 +159,10 @@
 
 <script>
 	import _ from 'lodash';
-	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import { mapActions, mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { monsterMixin } from '@/mixins/monster';
-	import ContentSideRight from "@/components/ContentSideRight";
 
 	export default {
 		name: 'Npcs',
@@ -181,9 +171,7 @@
 		},
 		mixins: [monsterMixin],
 		components: {
-			OverEncumbered,
-			OutOfSlots,
-			ContentSideRight
+			OutOfSlots
 		},
 		data() {
 			return {

@@ -1,18 +1,14 @@
 <template>
-	<div v-if="overencumbered" class='container'>
-		<OverEncumbered/>
-	</div>
-	<div v-else-if="npc && npc.old" class="deprecated">
+	<div v-if="npc && npc.old" class="deprecated">
 		<h2 class="red">Deprecated NPC</h2>
 	</div>
 	<q-form 
 		v-else-if="npc || $route.name == 'AddNPC'" 
 		@submit="{ ($route.name === 'AddNPC') ? addNpc() : editNpc() }"
 	>
-		<div class="content">
+		<div>
 			<div class="top">
 				<div class="d-flex justify-content-start">
-					<router-link class="back" to="/npcs"><i class="fas fa-chevron-left"/> Back</router-link>
 					<a v-if="$route.name === 'AddNPC'" class="btn" @click="copy_dialog = true">
 						<i class="fas fa-copy"></i>
 						Copy existing NPC
@@ -95,7 +91,6 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
@@ -114,7 +109,6 @@
 			title: 'NPC\'s'
 		},
 		components: {
-			OverEncumbered,
 			BasicInfo,
 			Senses,
 			AbilityScores,

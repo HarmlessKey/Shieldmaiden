@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="content-side">
+    <hk-card v-if="$route.path === '/content'" class="bg-neutral-9">
+      <hk-video />
+    </hk-card>
     <hk-card small>
       <div class="card-body">
         <Adsense
@@ -15,7 +18,7 @@
       </div>
     </hk-card>
 
-    <hk-card v-if="page === 'campaigns'">
+    <hk-card v-if="$route.path === '/content/campaigns'">
       <div slot="header" class="card-header">
         <span>Share your adventures</span>
         <a class="btn btn-sm bg-neutral-5" @click="setSlide({show: true, type: 'PlayerLink'})">
@@ -61,7 +64,8 @@ export default {
     page: String
   },
   components: {
-    PlayerLink: () => import("@/components/PlayerLink")
+    PlayerLink: () => import("@/components/PlayerLink"),
+    HkVideo: () => import("@/components/hk-components/hk-video"),
   },
   data() {
     return {

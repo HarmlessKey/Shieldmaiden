@@ -39,8 +39,8 @@
 		$s3:"";
 
 		@for $i from 1 through 400 {
-			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + $gray-darker;	
-			$s3: $s3 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + $gray-darker;
+			$s1: $s1 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + $black;	
+			$s3: $s3 + random(1000)*0.1vw + " " + random(1000)*0.1vh + " " + 0 + " " + random(50)*-0.01rem + $black;
 
 			@if $i < 400 {
 				$s1: $s1 + ",";

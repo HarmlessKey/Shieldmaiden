@@ -53,7 +53,7 @@
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/MyContent.vue'
+	import Crumble from '@/components/crumble'
 	import Loot from './Loot.vue'
 	import Xp from './Xp.vue'
 	import Entities from './Entities.vue'

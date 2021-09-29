@@ -1,8 +1,5 @@
 import { store } from './store/store';
 
-const Home = () => import('@/views/Home.vue');
-const SignedIn = () => import('@/components/home/SignedIn.vue');
-
 const Compendium = () => import('@/views/Compendium/Overview.vue');
 const View = () => import('@/views/Compendium/View.vue');
 const Monsters = () => import('@/views/Compendium/Monsters.vue');
@@ -45,20 +42,9 @@ const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
 const Offline = () => import('@/views/Offline.vue');
-const MyContent = () => import('@/views/MyContent/Campaigns/Campaigns.vue');
-const EditCampaign = () => import('@/views/MyContent/Campaigns/EditCampaign.vue');
-const Encounters = () => import('@/views/MyContent/Encounters');
-const EditEncounter = () => import('@/views/MyContent/Encounters/Edit');
-const Players = () => import('@/views/MyContent/Players/Players.vue');
-const EditPlayer = () => import('@/views/MyContent/Players/EditPlayer.vue');
-const Reminders = () => import('@/views/MyContent/Reminders');
-const EditReminder = () => import('@/views/MyContent/Reminders/EditReminder.vue');
-const Characters = () => import('@/views/MyContent/Characters');
-const Npcs = () => import('@/views/MyContent/Npcs/Npcs.vue');
-const EditNpc = () => import('@/views/MyContent/Npcs/EditNpc.vue');
-const Items = () => import('@/views/MyContent/Items/Items.vue');
-const EditItem = () => import('@/views/MyContent/Items/EditItem.vue');
-const RunEncounter = () => import('@/views/MyContent/RunEncounter.vue');
+const Encounters = () => import('@/views/Content/Encounters');
+const EditEncounter = () => import('@/views/Content/Encounters/Edit');
+const RunEncounter = () => import('@/views/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
 
 // This is where you add all your site routes
@@ -67,646 +53,626 @@ const User = () => import('@/views/User.vue');
 // the path & component to load
 
 export const routes = [{
-	path: '',
-	name: 'home',
-	component: Home,
-	meta: {
-		sidebar: false,
-		offline: true
-	}
-},
-{
-	path: '/home',
-	name: 'landingpage',
-	component: Home,
-	meta: {
-		sidebar: false,
-		offline: true
+		path: '',
+		name: 'home',
+		component: () => import('@/views/Home.vue'),
+		meta: {
+			sidebar: false,
+			offline: true
+		}
 	},
-},
-{
-	path: '/content',
-	name: 'content',
-	component: SignedIn,
-	meta: {
-		requiresContribute: true,
-		requiresAuth: true,
-		sidebar: false
-	}
-},
-{
-	path: '/demo',
-	name: 'Demo',
-	component: RunEncounter,
-	meta: {
-		sidebar: false,
-		offline: true
+	{
+		path: '/home',
+		name: 'landingpage',
+		component: () => import('@/views/Home.vue'),
+		meta: {
+			sidebar: false,
+			offline: true
+		},
 	},
-},
-{
-	path: '/weather-demo',
-	name: 'Weather demo',
-	component: WeatherDemo,
-	meta: {
-		sidebar: false,
-		offline: true
+
+	// CONTENT
+	{
+		path: "/content",
+		name: "Content",
+		component: () => import("@/views/Content"),
+		meta: {
+			requiresAuth: true
+		},
+		children: [
+			// Overview
+			{
+				path: "",
+				component: () => import("@/views/Content/ContentOverview.vue")
+			},
+			// Cammpaigns
+			{
+				path: "campaigns",
+				name: "Campaigns",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{	
+						path: "",
+						component: () => import("@/views/Content/Campaigns/Campaigns.vue"),
+					},
+					{
+						path: ":campid",
+						name: "Edit campaign",
+						component: () => import("@/views/Content/Campaigns/EditCampaign.vue"),
+						props: (route) => ({
+							id: route.query.campid
+						})
+					},
+				]
+			},
+			
+			// Players
+			{
+				path: "players",
+				name: "Players",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import("@/views/Content/Players")
+					},
+					{
+						path: "add-player",
+						name: "Add player",
+						component: () => import("@/views/Content/Players/EditPlayer.vue")
+					},
+					{
+						path: ":id",
+						name: "Edit player",
+						component: () => import("@/views/Content/Players/EditPlayer.vue")
+					},
+				]
+			},
+			// NPCs
+			{
+				path: "npcs",
+				name: "NPCs",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: '',
+						component: () => import('@/views/Content/Npcs/Npcs.vue')
+					},
+					{
+						path: 'add-npc',
+						name: 'Add NPC',
+						component: () => import('@/views/Content/Npcs/EditNpc.vue'),
+					},
+					{
+						path: ':id',
+						name: 'Edit NPC',
+						component: () => import('@/views/Content/Npcs/EditNpc.vue'),
+					}
+				]
+			},
+
+			// Reminders
+			{
+				path: "reminders",
+				name: "Reminders",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: '',
+						component: () => import('@/views/Content/Reminders')
+					},
+					{
+						path: 'add-reminder',
+						name: 'Add reminder',
+						component: () => import('@/views/Content/Reminders/EditReminder.vue')
+					},
+					{
+						path: ':id',
+						name: 'Edit reminder',
+						component: () => import('@/views/Content/Reminders/EditReminder.vue')
+					},
+				]
+			},
+
+			// Items
+			{
+				path: "items",
+				name: "Items",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: '',
+						component: () => import('@/views/Content/Items/Items.vue')
+					},
+					{
+						path: 'add-item',
+						name: 'Add item',
+						component: () => import('@/views/Content/Items/EditItem.vue')
+					},
+					{
+						path: ':id',
+						name: 'Edit item',
+						component: () => import('@/views/Content/Items/EditItem.vue')
+					}
+				]
+			},
+
+			// Characters
+			{
+				path: "characters",
+				name: "Characters",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: '',
+						component: () => import('@/views/Content/Characters'),
+					},
+					{
+						path: ':id',
+						name: 'Edit character',
+						component: () => import("@/views/Content/Players/EditPlayer.vue"),
+					},
+				]
+			},
+		]
 	},
-},
-//COMPENDIUM
-{
-	path: '/compendium',
-	name: 'Compendium',
-	component: Compendium
-},
-{
-	path: '/compendium/:type/:id',
-	name: 'View',
-	component: View,
 
-},
-{
-	path: '/compendium/monsters',
-	name: 'Monsters',
-	component: Monsters,
-	meta: {
-		baseName: 'Monsters',
-	}
-},
-{
-	path: '/compendium/spells',
-	name: 'Spells',
-	component: Spells,
-	meta: {
-		baseName: 'Spells',
-	}
-},
-{
-	path: '/compendium/conditions',
-	name: 'Conditions',
-	component: Conditions,
-	meta: {
-		baseName: 'Conditions',
-	}
-},
-{
-	path: '/compendium/items',
-	name: 'CompendiumItems',
-	component: CompendiumItems,
-	meta: {
-		baseName: 'items',
-	}
-},
-
-// CONTRUBUTE
-{
-	path: '/contribute',
-	name: 'Contribute',
-	component: Contribute,
-	meta: {
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/spells',
-	name: 'Contribute Spells',
-	component: Spells_contrib,
-	meta: {
-		baseName: 'Spells',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/spells/:id',
-	name: 'Contribute Spell',
-	component: Spell_contrib,
-	props: (route) => ({
-		id: route.query.id,
-	}),
-	meta: {
-		basePath: '/contribute',
-		baseName: 'Spells',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/spells/:id/edit',
-	name: 'Edit Spell',
-	component: SpellEdit,
-	props: (route) => ({
-		id: route.query.id,
-	}),
-	meta: {
-		basePath: '/contribute',
-		baseName: 'Monsters',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/monsters',
-	name: 'Contribute Monsters',
-	component: Monsters_contrib,
-	meta: {
-		baseName: 'Monsters',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/monsters/:id',
-	name: 'Contribute Monster',
-	component: Monster_contrib,
-	props: (route) => ({
-		id: route.query.id,
-	}),
-	meta: {
-		basePath: '/contribute',
-		baseName: 'Monsters',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-{
-	path: '/contribute/monsters/:id/edit',
-	name: 'Edit Monster',
-	component: MonsterEdit,
-	props: (route) => ({
-		id: route.query.id,
-	}),
-	meta: {
-		basePath: '/contribute',
-		baseName: 'Monsters',
-		requiresContribute: true,
-		requiresAuth: true
-	}
-},
-
-//STAND ALONE PAGES
-{
-	path: '/sitemap',
-	name: 'Sitemap',
-	component: Sitemap
-},
-{
-	path: '/privacy-policy',
-	name: 'Privacy Policy',
-	component: Privacy
-},
-{
-	path: '/about-us',
-	name: 'About Us',
-	component: AboutUs,
-	meta: {
-		offline: true
-	}
-},
-{
-	path: '/documentation',
-	name: 'Documentation',
-	component: Documentation,
-	meta: {
-		offline: true
-	}
-},
-{
-	path: '/feedback',
-	name: 'Feedback',
-	component: Feedback
-},
-{
-	path: '/updates',
-	name: 'Updates',
-	component: Updates
-},
-{
-	path: '/planned',
-	name: 'Planned',
-	component: Planned
-},
-{
-	path: '/sign-in',
-	name: 'signIn',
-	component: SignIn,
-	meta: {
-		sidebar: false
-	}
-},
-{
-	path: '/sign-up',
-	name: 'signUp',
-	component: SignUp,
-	meta: {
-		sidebar: false
-	}
-},
-{
-	path: '/forgot-password',
-	name: 'resetPassword',
-	component: ResetPassword,
-	meta: {
-		sidebar: false
-	}
-},
-{
-	path: '/patreon',
-	name: 'Patreon',
-	component: Patreon
-},
-{
-	path: '/manage-content',
-	name: 'manageContent',
-	component: ManageContent,
-	meta: {
-		requiresAuth: true
-	}
-},
-{
-	path: '/poster',
-	name: 'poster',
-	component: Home,
-	beforeEnter(to, from, next) {
-		store.dispatch("setPoster")
-		next('/')
-	}
-},
-
-//PROFILE
-{
-	path: '/profile',
-	name: 'profile',
-	component: Profile,
-	meta: {
-		requiresAuth: true
-	}
-},
-{
-	path: '/profile/delete-account',
-	name: 'deleteAccount',
-	component: DeleteAccount,
-	meta: {
-		requiresAuth: true
-	}
-},
-{
-	path: '/settings',
-	name: 'settings',
-	component: Settings,
-	meta: {
-		basePath: '/settings',
-		title: 'Settings',
-		requiresAuth: true
-	}
-},
-{
-	path: '/set-username',
-	name: 'Username',
-	component: Username,
-	meta: {
-		sidebar: false
-	}
-},
-{
-	path: '/followed',
-	name: 'followed',
-	component: Followed,
-	meta: {
-		requiresAuth: true
-	}
-},
-
-//ADMIN
-{
-	path: '/admin',
-	name: 'Admin',
-	component: Admin,
-	meta: {
-		basePath: '/admin',
-		title: 'admin',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/users',
-	name: 'Users',
-	component: Users,
-	meta: {
-		baseName: 'Users',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/users/:id',
-	name: 'User',
-	component: Users,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/admin',
-		baseName: 'Users',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/patrons',
-	name: 'Patrons',
-	component: Patrons,
-	meta: {
-		baseName: 'Patrons',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/patrons/new',
-	name: 'New patron',
-	component: NewPatron,
-	meta: {
-		baseName: 'Patrons',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/patrons/:id',
-	name: 'Patron',
-	component: Patrons,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/admin',
-		baseName: 'Patrons',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-{
-	path: '/admin/xml',
-	name: 'GenerateXML',
-	component: GenerateXML,
-	meta: {
-		basePath: '/admin',
-		baseName: 'Generate XML',
-		requiresAuth: true,
-		requiresAdmin: true
-	}
-},
-
-//USER CONTENT
-{
-	path: '/campaigns',
-	name: 'myContent',
-	component: MyContent,
-	props: (route) => ({
-		id: route.query.id
-	}),
-	meta: {
-		basePath: '/campaigns',
-		title: 'Campaigns',
-		requiresAuth: true
-	}
-},
-{
-	path: '/campaigns/:campid',
-	name: 'Edit Campaign',
-	component: EditCampaign,
-	props: (route) => ({
-		id: route.query.campid
-	}),
-	meta: {
-		basePath: '/campaigns',
-		title: 'Campaigns',
-		requiresAuth: true
-	}
-},
-{
-	path: '/players',
-	name: 'Players',
-	component: Players,
-	meta: {
-		basePath: '/players',
-		title: 'Players',
-		requiresAuth: true
-	}
-},
-{
-	path: '/players/add-player',
-	name: 'AddPlayers',
-	component: EditPlayer,
-	meta: {
-		basePath: '/players',
-		title: 'Players',
-		requiresAuth: true
-	}
-},
-{
-	path: '/players/:id',
-	name: 'EditPlayers',
-	component: EditPlayer,
-	meta: {
-		basePath: '/players',
-		title: 'Players',
-		requiresAuth: true
-	}
-},
-{
-	path: '/reminders',
-	name: 'Reminders',
-	component: Reminders,
-	meta: {
-		basePath: '/reminders',
-		title: 'Reminders',
-		requiresAuth: true
-	}
-},
-{
-	path: '/reminders/add-reminder',
-	name: 'AddReminder',
-	component: EditReminder,
-	meta: {
-		basePath: '/reminders',
-		title: 'Reminders',
-		requiresAuth: true
-	}
-},
-{
-	path: '/reminders/:id',
-	name: 'EditReminder',
-	component: EditReminder,
-	meta: {
-		basePath: '/reminders',
-		title: 'Reminders',
-		requiresAuth: true
-	}
-},
-{
-	path: '/characters',
-	name: 'Characters',
-	component: Characters,
-	meta: {
-		basePath: '/characters',
-		title: 'Characters',
-		requiresAuth: true
-	}
-},
-{
-	path: '/characters/:id',
-	name: 'Edit Character',
-	component: EditPlayer,
-	meta: {
-		basePath: '/characters',
-		title: 'Character',
-		requiresAuth: true
-	}
-},
-{
-	path: '/npcs',
-	name: 'Npcs',
-	component: Npcs,
-	meta: {
-		basePath: '/npcs',
-		title: 'NPCs',
-		requiresAuth: true
-	}
-},
-{
-	path: '/npcs/add-npc',
-	name: 'AddNPC',
-	component: EditNpc,
-	meta: {
-		basePath: '/npcs',
-		title: 'NPCs',
-		requiresAuth: true
-	}
-},
-{
-	path: '/npcs/:id',
-	name: 'EditNPC',
-	component: EditNpc,
-	meta: {
-		basePath: '/npcs',
-		title: 'NPCs',
-		requiresAuth: true
-	}
-},
-{
-	path: '/companions/:userid/:id',
-	name: 'Edit Companion',
-	component: EditNpc,
-	meta: {
-		basePath: '/companions',
-		title: 'Companion',
-		requiresAuth: true
-	}
-},
-{
-	path: '/items',
-	name: 'CustomItems',
-	component: Items,
-	meta: {
-		basePath: '/items',
-		title: 'items',
-		requiresAuth: true
-	}
-},
-{
-	path: '/items/add-item',
-	name: 'AddItem',
-	component: EditItem,
-	meta: {
-		basePath: '/items',
-		title: 'items',
-		requiresAuth: true
-	}
-},
-{
-	path: '/items/:id',
-	name: 'EditItem',
-	component: EditItem,
-	meta: {
-		basePath: '/items',
-		title: 'items',
-		requiresAuth: true
-	}
-},
-{
-	path: '/encounters/:campid',
-	name: 'Encounters',
-	component: Encounters,
-	meta: {
-		basePath: '/campaigns',
-		title: 'Campaigns',
-		requiresAuth: true
+	// DEMO ENCOUNTER
+	{
+		path: '/demo',
+		name: 'Demo',
+		component: RunEncounter,
+		meta: {
+			sidebar: false,
+			offline: true
+		},
 	},
-},
-{
-	path: '/encounters/:campid/:encid',
-	name: 'EditEncounter',
-	component: EditEncounter,
-	meta: {
-		basePath: '/campaigns',
-		title: 'Campaigns',
-		requiresAuth: true
-	}
-},
-{
-	path: '/run-encounter/:campid/:encid',
-	name: 'RunEncounter',
-	component: RunEncounter,
-	meta: {
-		basePath: '/campaigns',
-		title: 'Campaigns',
-		requiresAuth: true,
-		sidebar: false
+	{
+		path: '/weather-demo',
+		name: 'Weather demo',
+		component: WeatherDemo,
+		meta: {
+			sidebar: false,
+			offline: true
+		},
 	},
-},
-{
-	path: '/user/:userid',
-	name: 'Track User',
-	component: User,
-	meta: {
-		basePath: '/user',
-		title: 'User',
+	//COMPENDIUM
+	{
+		path: '/compendium',
+		name: 'Compendium',
+		component: Compendium
+	},
+	{
+		path: '/compendium/:type/:id',
+		name: 'View',
+		component: View,
+
+	},
+	{
+		path: '/compendium/monsters',
+		name: 'Monsters',
+		component: Monsters,
+		meta: {
+			baseName: 'Monsters',
+		}
+	},
+	{
+		path: '/compendium/spells',
+		name: 'Spells',
+		component: Spells,
+		meta: {
+			baseName: 'Spells',
+		}
+	},
+	{
+		path: '/compendium/conditions',
+		name: 'Conditions',
+		component: Conditions,
+		meta: {
+			baseName: 'Conditions',
+		}
+	},
+	{
+		path: '/compendium/items',
+		name: 'CompendiumItems',
+		component: CompendiumItems,
+		meta: {
+			baseName: 'items',
+		}
+	},
+
+	// CONTRUBUTE
+	{
+		path: '/contribute',
+		name: 'Contribute',
+		component: Contribute,
+		meta: {
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/spells',
+		name: 'Contribute Spells',
+		component: Spells_contrib,
+		meta: {
+			baseName: 'Spells',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/spells/:id',
+		name: 'Contribute Spell',
+		component: Spell_contrib,
+		props: (route) => ({
+			id: route.query.id,
+		}),
+		meta: {
+			basePath: '/contribute',
+			baseName: 'Spells',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/spells/:id/edit',
+		name: 'Edit Spell',
+		component: SpellEdit,
+		props: (route) => ({
+			id: route.query.id,
+		}),
+		meta: {
+			basePath: '/contribute',
+			baseName: 'Monsters',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/monsters',
+		name: 'Contribute Monsters',
+		component: Monsters_contrib,
+		meta: {
+			baseName: 'Monsters',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/monsters/:id',
+		name: 'Contribute Monster',
+		component: Monster_contrib,
+		props: (route) => ({
+			id: route.query.id,
+		}),
+		meta: {
+			basePath: '/contribute',
+			baseName: 'Monsters',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/contribute/monsters/:id/edit',
+		name: 'Edit Monster',
+		component: MonsterEdit,
+		props: (route) => ({
+			id: route.query.id,
+		}),
+		meta: {
+			basePath: '/contribute',
+			baseName: 'Monsters',
+			requiresContribute: true,
+			requiresAuth: true
+		}
+	},
+
+	//STAND ALONE PAGES
+	{
+		path: '/sitemap',
+		name: 'Sitemap',
+		component: Sitemap
+	},
+	{
+		path: '/privacy-policy',
+		name: 'Privacy Policy',
+		component: Privacy
+	},
+	{
+		path: '/about-us',
+		name: 'About Us',
+		component: AboutUs,
+		meta: {
+			offline: true
+		}
+	},
+	{
+		path: '/documentation',
+		name: 'Documentation',
+		component: Documentation,
+		meta: {
+			offline: true
+		}
+	},
+	{
+		path: '/feedback',
+		name: 'Feedback',
+		component: Feedback
+	},
+	{
+		path: '/updates',
+		name: 'Updates',
+		component: Updates
+	},
+	{
+		path: '/planned',
+		name: 'Planned',
+		component: Planned
+	},
+	{
+		path: '/sign-in',
+		name: 'signIn',
+		component: SignIn,
+		meta: {
+			sidebar: false
+		}
+	},
+	{
+		path: '/sign-up',
+		name: 'signUp',
+		component: SignUp,
+		meta: {
+			sidebar: false
+		}
+	},
+	{
+		path: '/forgot-password',
+		name: 'resetPassword',
+		component: ResetPassword,
+		meta: {
+			sidebar: false
+		}
+	},
+	{
+		path: '/patreon',
+		name: 'Patreon',
+		component: Patreon
+	},
+	{
+		path: '/manage-content',
+		name: 'manageContent',
+		component: ManageContent,
+		meta: {
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/poster',
+		name: 'poster',
+		component: () => import('@/views/Home.vue'),
+		beforeEnter(to, from, next) {
+			store.dispatch("setPoster")
+			next('/')
+		}
+	},
+
+	//PROFILE
+	{
+		path: '/profile',
+		name: 'profile',
+		component: Profile,
+		meta: {
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/profile/delete-account',
+		name: 'deleteAccount',
+		component: DeleteAccount,
+		meta: {
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/settings',
+		name: 'settings',
+		component: Settings,
+		meta: {
+			basePath: '/settings',
+			title: 'Settings',
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/set-username',
+		name: 'Username',
+		component: Username,
+		meta: {
+			sidebar: false
+		}
+	},
+	{
+		path: '/followed',
+		name: 'followed',
+		component: Followed,
+		meta: {
+			requiresAuth: true
+		}
+	},
+
+	//ADMIN
+	{
+		path: '/admin',
+		name: 'Admin',
+		component: Admin,
+		meta: {
+			basePath: '/admin',
+			title: 'admin',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/users',
+		name: 'Users',
+		component: Users,
+		meta: {
+			baseName: 'Users',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/users/:id',
+		name: 'User',
+		component: Users,
+		props: (route) => ({
+			id: route.query.id
+		}),
+		meta: {
+			basePath: '/admin',
+			baseName: 'Users',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/patrons',
+		name: 'Patrons',
+		component: Patrons,
+		meta: {
+			baseName: 'Patrons',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/patrons/new',
+		name: 'New patron',
+		component: NewPatron,
+		meta: {
+			baseName: 'Patrons',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/patrons/:id',
+		name: 'Patron',
+		component: Patrons,
+		props: (route) => ({
+			id: route.query.id
+		}),
+		meta: {
+			basePath: '/admin',
+			baseName: 'Patrons',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+	{
+		path: '/admin/xml',
+		name: 'GenerateXML',
+		component: GenerateXML,
+		meta: {
+			basePath: '/admin',
+			baseName: 'Generate XML',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
+	},
+
+	// REDIRECT OLD PATHS
+	{ path: "/campaigns", redirect: "/content/campaigns" },
+	{ path: "/players", redirect: "/content/players" },
+	{ path: "/characters", redirect: "/content/characters" },
+	{ path: "/npcs", redirect: "/content/npcs" },
+	{ path: "/reminders", redirect: "/content/reminders" },
+	{ path: "/items", redirect: "/content/items" },
+	
+	{
+		path: '/companions/:userid/:id',
+		name: 'Edit Companion',
+		component:  () => import('@/views/Content/Npcs/EditNpc.vue'),
+		meta: {
+			basePath: '/companions',
+			title: 'Companion',
+			requiresAuth: true
+		}
+	},
+	
+	{
+		path: '/encounters/:campid',
+		name: 'Encounters',
+		component: Encounters,
+		meta: {
+			basePath: '/campaigns',
+			title: 'Campaigns',
+			requiresAuth: true
+		},
+	},
+	{
+		path: '/encounters/:campid/:encid',
+		name: 'EditEncounter',
+		component: EditEncounter,
+		meta: {
+			basePath: '/campaigns',
+			title: 'Campaigns',
+			requiresAuth: true
+		}
+	},
+	{
+		path: '/run-encounter/:campid/:encid',
+		name: 'RunEncounter',
+		component: RunEncounter,
+		meta: {
+			basePath: '/campaigns',
+			title: 'Campaigns',
+			requiresAuth: true,
+			sidebar: false
+		},
+	},
+	{
+		path: '/user/:userid',
+		name: 'Track User',
+		component: User,
+		meta: {
+			basePath: '/user',
+			title: 'User',
+		}
+	},
+	{
+		path: '/user/:userid/:campid',
+		name: 'Track Campaign',
+		component: User,
+		meta: {
+			basePath: '/user',
+			title: 'User',
+			sidebar: false
+		}
+	},
+	{
+		path: '/track-encounter/:userid',
+		redirect: '/user/:userid',
+	},
+	{
+		path: '/npc-overhaul',
+		name: 'NPC overhaul',
+		component: () => import('@/views/Pages/npc_overhaul.vue'),
+	},
+	{
+		path: '/404',
+		name: '404',
+		component: Error404
+	},
+	{
+		path: '/offline',
+		name: 'Offline',
+		component: Offline
+	},
+	{
+		path: '*',
+		redirect: '/404'
 	}
-},
-{
-	path: '/user/:userid/:campid',
-	name: 'Track Campaign',
-	component: User,
-	meta: {
-		basePath: '/user',
-		title: 'User',
-		sidebar: false
-	}
-},
-{
-	path: '/track-encounter/:userid',
-	redirect: '/user/:userid',
-},
-{
-	path: '/npc-overhaul',
-	name: 'NPC overhaul',
-	component: () => import(/* webpackChunkName: "list" */ '@/views/Pages/npc_overhaul.vue'),
-},
-{
-	path: '/404',
-	name: '404',
-	component: Error404
-},
-{
-	path: '/offline',
-	name: 'Offline',
-	component: Offline
-},
-{
-	path: '*',
-	redirect: '/404'
-}
-]
+];

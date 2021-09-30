@@ -530,7 +530,8 @@
 			
 				.level {
 					display: block;
-					width: 25px;
+					width: min-content;
+					padding: 0 3px;
 					line-height: 15px;
 					text-align: center;
 				}
@@ -563,6 +564,9 @@
 					.q-linear-progress {
 						margin-top: 8px;
 						height: 5px;
+					}
+					.level {
+						line-height: 22px;
 					}
 				}
 			}

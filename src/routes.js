@@ -268,7 +268,7 @@ export const routes = [{
 			},
 			{
 				path: 'items',
-				name: 'CompendiumItems',
+				name: 'Items',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
@@ -518,7 +518,7 @@ export const routes = [{
 	},
 	{
 		path: '/followed',
-		name: 'followed',
+		name: 'Followed users',
 		component: Followed,
 		meta: {
 			requiresAuth: true

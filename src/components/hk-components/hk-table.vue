@@ -353,7 +353,7 @@
 				.sort {
 					width: 25px;
 					position: relative;
-					color: #494747;
+					color: $neutral-3;
 
 
 					.fas {
@@ -371,11 +371,11 @@
 			}
 		}
 		.hk-collapsed-column {
-			padding: 10px;
+			padding: 20px;
 
 			pre {
 				overflow: hidden;
-				color: #494747;
+				color: $neutral-8;
 			}
 		}
 	}

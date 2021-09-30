@@ -1,12 +1,5 @@
 import { store } from './store/store';
 
-const Compendium = () => import('@/views/Compendium/Overview.vue');
-const View = () => import('@/views/Compendium/View.vue');
-const Monsters = () => import('@/views/Compendium/Monsters.vue');
-const Spells = () => import('@/views/Compendium/Spells.vue');
-const Conditions = () => import('@/views/Compendium/Conditions.vue');
-const CompendiumItems = () => import('@/views/Compendium/Items.vue');
-
 const Contribute = () => import('@/views/Contribute');
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
@@ -217,6 +210,80 @@ export const routes = [{
 		]
 	},
 
+	//COMPENDIUM
+	{
+		path: '/compendium',
+		name: 'Compendium',
+		component: () => import('@/views/Compendium'),
+		children: [
+			{
+				path: "",
+				name: "Compendium",
+				component: () => import('@/views/Compendium/CompendiumOverview'),
+			},
+			{
+				path: 'monsters',
+				name: 'Monsters',
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Compendium/Monsters'),
+					},
+					{
+						path: ":id",
+						component: () => import('@/views/Compendium/View.vue'),
+					}
+				]
+			},
+			{
+				path: 'spells',
+				name: 'Spells',
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Compendium/Spells'),
+					},
+					{
+						path: ":id",
+						component: () => import('@/views/Compendium/View.vue')
+					}
+				]
+			},
+			{
+				path: 'conditions',
+				name: 'Conditions',
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Compendium/Conditions'),
+					},
+					{
+						path: ":id",
+						component: () => import('@/views/Compendium/View.vue')
+					}
+				]
+			},
+			{
+				path: 'items',
+				name: 'CompendiumItems',
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Compendium/Items'),
+					},
+					{
+						path: ":id",
+						component: () => import('@/views/Compendium/View.vue')
+					}
+				]
+			},
+		]
+	},
+
 	// DEMO ENCOUNTER
 	{
 		path: '/demo',
@@ -236,50 +303,7 @@ export const routes = [{
 			offline: true
 		},
 	},
-	//COMPENDIUM
-	{
-		path: '/compendium',
-		name: 'Compendium',
-		component: Compendium
-	},
-	{
-		path: '/compendium/:type/:id',
-		name: 'View',
-		component: View,
-
-	},
-	{
-		path: '/compendium/monsters',
-		name: 'Monsters',
-		component: Monsters,
-		meta: {
-			baseName: 'Monsters',
-		}
-	},
-	{
-		path: '/compendium/spells',
-		name: 'Spells',
-		component: Spells,
-		meta: {
-			baseName: 'Spells',
-		}
-	},
-	{
-		path: '/compendium/conditions',
-		name: 'Conditions',
-		component: Conditions,
-		meta: {
-			baseName: 'Conditions',
-		}
-	},
-	{
-		path: '/compendium/items',
-		name: 'CompendiumItems',
-		component: CompendiumItems,
-		meta: {
-			baseName: 'items',
-		}
-	},
+	
 
 	// CONTRUBUTE
 	{

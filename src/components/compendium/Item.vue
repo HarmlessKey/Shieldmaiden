@@ -1,5 +1,12 @@
 <template>
-	<ViewItem :data="item" />
+	<tag :is="cardView ? 'hk-card' : 'div'">
+		<div slot="header" :class="{ 'card-header': cardView }">
+			<h1>{{ item.name }}</h1>
+		</div>
+		<div :class="{ 'card-body': cardView }">
+			<ViewItem :data="item" />
+		</div>
+	</tag>
 </template>
 
 <script>
@@ -11,7 +18,16 @@
 		components: {
 			ViewItem
 		},
-		props: ['id'],
+		props: {
+			id: {
+				type: String,
+				required: true
+			},
+			cardView: {
+				type: Boolean,
+				default: false
+			}
+		},
 		firebase() {
 			return {
 				item: {

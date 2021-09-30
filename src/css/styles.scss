@@ -26,7 +26,7 @@ html body {
 	padding-top: $header-height;
 	background: $neutral-11;
 	color: $neutral-1;
-	font-size: 15px;
+	font-size: $font-size;
 	font-family: 'Open Sans', sans-serif;
 	position: relative;
 	background-image: url('../assets/_img/styles/paper-bg.png');
@@ -796,10 +796,10 @@ html body {
     	width: 100%;
 		}
 		&.btn-clear {
-			background: none;
+			background: none !important;
 
 			&:hover {
-				background-color: $neutral-5;
+				background-color: $neutral-5 !important;
 			}
 		}
 		&.bg-green:hover { background-color: $green-hover !important; }
@@ -941,6 +941,12 @@ html body {
 					background-color: $neutral-4;
 				}
 				transition: background-color .2s linear;
+			}
+			h1, h2, h3 {
+				font-size: $font-size;
+				font-family: 'Open Sans', sans-serif;
+				line-height: normal;
+				margin: 0;
 			}
 		}
 		.card-body {

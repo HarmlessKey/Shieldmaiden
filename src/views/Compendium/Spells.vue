@@ -1,17 +1,12 @@
 <template>
-<div class="grid">
-	<div class="content">
-
-		<!-- SPELL OVERVIEW -->
-		<template v-if="!$route.params.id">
-			<Crumble />
+	<hk-card>
+		<div slot="header" class="card-header">
 			<h1><i class="fas fa-wand-magic"></i> Spells</h1>
-			<p>
-				If you can't find a spell, 
-				it is because we are only allowed to store 
-				spells from the <a href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD</a>.
-			</p>
-
+			<span class="neutral-3">
+				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+			</span>
+		</div>
+		<div class="card-body">
 			<hk-table
 				:items="spells"
 				:columns="fields"
@@ -31,10 +26,8 @@
 					<span>Loading conditions....</span>
 				</div>
 			</hk-table>
-		</template>
-	</div>
-	<Footer />
-</div>
+		</div>
+	</hk-card>
 </template>
 
 <script>

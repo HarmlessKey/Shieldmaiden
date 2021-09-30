@@ -3,6 +3,21 @@
     <hk-card v-if="$route.path === '/content'" class="bg-neutral-9">
       <hk-video />
     </hk-card>
+
+    <!-- COMPENDIUM -->
+    <hk-card v-if="$route.path.split('/')[1] === 'compendium'">
+      <div slot="header" class="card-header">
+        <h2><i class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
+      </div>
+      <div class="card-body pt-2">
+        <hk-video />
+        <p class="neutral-2 mt-3 text-center">Try the most advanced initiative tracker on the internet.</p>
+
+        <router-link class="btn btn-block btn-sm bg-green" to="/demo">Demo encounter</router-link>
+      </div>
+    </hk-card>
+
+    <!-- ADSENSE -->
     <hk-card small>
       <div class="card-body">
         <Adsense
@@ -18,6 +33,7 @@
       </div>
     </hk-card>
 
+    <!-- CAMPAIGNS -->
     <hk-card v-if="$route.path === '/content/campaigns'">
       <div slot="header" class="card-header">
         <span>Share your adventures</span>

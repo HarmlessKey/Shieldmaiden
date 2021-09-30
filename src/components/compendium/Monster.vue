@@ -1,7 +1,15 @@
 <template>
-	<div class="monster-card">
+	<tag :is="cardView ? 'hk-card' : 'div'" v-if="monster">
+		<div slot="header" :class="{ 'card-header': cardView }">
+			<h1>
+				{{ monster.name.capitalize() }}
+			</h1>
+			<span class="neutral-3">
+				{{ monster.source }}
+			</span>
+		</div>
 		<ViewMonster :data="monster" />
-	</div>
+	</tag>
 </template>
 
 <script>
@@ -13,13 +21,22 @@
 		components: {
 			ViewMonster,
 		},
-		props: ['id'],
+		props: {
+			id: {
+				type: String,
+				required: true
+			},
+			cardView: {
+				type: Boolean,
+				default: false
+			}
+		},
 		firebase() {
 			return {
 				monster: {
 					source: db.ref(`monsters/${this.id}`),
 					asObject: true,
-					readyCallback: () => this.$emit('name', this.monster.name)
+					readyCallback: () => this.$emit('name', this.monster.name.capitalize())
 				}
 			}
 		}
@@ -27,7 +44,5 @@
 </script>
 
 <style lang="scss" scoped>
-.monster-card {
-	max-width: 600px;
-}
+
 </style>

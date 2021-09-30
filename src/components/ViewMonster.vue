@@ -475,7 +475,7 @@
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display+SC:700&display=swap');
 
 .monster {
-	padding: 10px;
+	padding: 20px;
 	color: $black;
 	font-family: Helvetica, sans-serif, serif;
 

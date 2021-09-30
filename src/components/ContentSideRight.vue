@@ -58,7 +58,8 @@
         <div class="social d-flex justify-content-between">
           <a 
             v-for="{name, icon, url} in social_media" 
-            class="btn bg-neutral-8" 
+            class="btn bg-neutral-8"
+            :class="{ 'btn-sm': width < 240 }"
             :key="name"
             :href="url" 
             target="_blank" rel="noopener"
@@ -68,6 +69,7 @@
         </div>
       </div>
     </hk-card>
+    <q-resize-observer @resize="setWidth"/>
   </div>
 </template>
 
@@ -85,6 +87,7 @@ export default {
   },
   data() {
     return {
+      width: 0,
       social_media: [
 					{
 						name: "Patreon",
@@ -123,6 +126,9 @@ export default {
     ...mapActions([
       "setSlide"
     ]),
+    setWidth(size) {
+      this.width = size.width;
+    }
   }
 }
 </script>

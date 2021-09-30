@@ -29,9 +29,9 @@
 				<input :value="copy" id="copy" type="hidden" />
 			</div>
 		</div>
-		<div class="mt-4" v-if="info">
+		<div class="mt-4 neutral-2" v-if="info">
 			Make sure your campaign is set to <span class="green">Public</span>, or your followers won't be able to see it.
-			Then click the <span class="live">LIVE</span> icon in your campaign to share the initiative of the encounter that is active. You can stay live for your entire session, whenever you're not running an encounter, followers won't see what you're doing.
+			Then click the <span class="live neutral-1">GO LIVE</span> icon in your campaign to share the initiative of the encounter that is active. You can stay live for your entire session, whenever you're not running an encounter, followers won't see what you're doing.
 		</div>
 	</div>
 </template>

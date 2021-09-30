@@ -1,62 +1,84 @@
 <template>
 <div v-if="!loadingCampaigns">
-	<div class="top d-flex justify-content-between" v-if="!$route.params.campid">
-		<span><i class="fas fa-user"></i> {{ username['.value'] }}</span>
-		<Follow v-if="user"/>
-	</div>
-	<div class="container-fluid" v-if="!$route.params.campid">
-	
-		<h2>Campaigns</h2>
-		<!-- CAMPAIGNS -->
-		<div v-if="campaigns" class="row q-col-gutter-md mt-3">
-			<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
-				<hk-card :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
+	<div class="content" v-if="!$route.params.campid">
+		<div class="d-flex justify-content-between">
+			<span><i class="fas fa-user mr-1"></i> {{ username['.value'] }}</span>
+		</div>
+		<hr>
+		<div class="row q-col-gutter-md">		
+			<div class="col-12 col-md-9">		
+				<hk-card>
 					<div slot="header" class="card-header">
-						<span class="title">
-							<i class="fas fa-dungeon"></i>
-							{{ campaign.campaign }}
-						</span>
-						<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
+						<span><i class="fas fa-dungeon mr-1"></i> Campaigns</span>
+						<Follow v-if="user"/>
 					</div>
-						
-					<!-- SHOW PLAYERS -->
-					<template v-if="campaign.players">
-						<div class="players">
-							<div 
-								v-for="(player, key) in campaign.players" 
-								:key="key"
-								class="img"
-							>
-								<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-								<img v-else src="@/assets/_img/styles/player.svg" />
-								<q-tooltip anchor="top middle" self="center middle">
-									{{ player.character_name }}
-								</q-tooltip>
+					<div class="card-body">
+						<!-- CAMPAIGNS -->
+						<div v-if="campaigns" class="row q-col-gutter-md">
+							<div class="col-12 col-md-6 col-lg-4" v-for="campaign in campaigns" :key="campaign['.key']">
+								<hk-card class="campaign">
+									<div 
+										slot="image" 
+										class="card-image" 
+										:style="[
+											campaign.background
+											? { backgroundImage: 'url(\'' +campaign.background + '\')' }
+											: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
+										]">
+										<span class="live active" v-if="live['.value'] == campaign['.key']">live</span>
+										<a 
+											v-if="!campaign.background" 
+											class="neutral-2 text-shadow-3 link" 
+											target="_blank" rel="noopener"
+											href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+											Image by Vecteezy
+										</a>
+									</div>
+
+									<div class="card-body">
+										
+										<!-- SHOW PLAYERS -->
+										<div v-if="campaign.players" class="players">
+											<div 
+												v-for="(player, key) in campaign.players" 
+												:key="key"
+												class="img"
+											>
+												<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
+												<img v-else src="@/assets/_img/styles/player.svg" />
+												<q-tooltip anchor="top middle" self="center middle">
+													{{ player.character_name }}
+												</q-tooltip>
+											</div>
+										</div>
+										
+										<h2 class="truncate" :class="{ 'no-players': !campaign.players }">		
+											{{ campaign.campaign }}
+										</h2>
+										<div class="d-flex justify-content-center">
+											<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+										</div>
+									
+									</div>
+									
+										
+
+									<div slot="footer" class="card-footer neutral-3">
+										Started: {{ makeDate(campaign.timestamp) }}
+									</div>
+								</hk-card>
 							</div>
 						</div>
-
-						<h2> {{ Object.keys(campaign.players).length }} players</h2>
-					</template>
-					<template v-else>
-
-						<div class="no-players"></div>
-						<h2>No players added yet</h2>
-					</template>
-					<div class="d-flex justify-content-center">
-						<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
+						<div v-else>
+							<p>This user has no public campaigns.</p>
+						</div>
 					</div>
-
-					<template slot="footer">
-						<small class="text-center d-block py-1 bg-gray-active">
-							<span class="gray-hover">Started:</span> {{ makeDate(campaign.timestamp) }}
-						</small>
-					</template>
 				</hk-card>
 			</div>
-		</div>
-		<div v-else>
-			<p>This user has no public campaigns.</p>
-		</div>
+			<div class="col-12 col-md-3">
+				<ContentSideRight />
+			</div>
+    </div>
 	</div>
 
 	<trackCampaign v-else />
@@ -65,21 +87,23 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import trackCampaign from '@/components/trackCampaign'
-	import { general } from '@/mixins/general.js'
+	import { db } from "@/firebase"
+	import trackCampaign from "@/components/trackCampaign"
+	import { general } from "@/mixins/general.js"
+	import ContentSideRight from "@/components/ContentSideRight";
 
-	import Follow from '@/components/trackCampaign/Follow.vue'
+	import Follow from "@/components/trackCampaign/Follow.vue"
 
 	export default {
-		name: 'TrackUser',
+		name: "TrackUser",
 		components: {
 			trackCampaign,
-			Follow
+			Follow,
+			ContentSideRight
 		},
 		mixins: [general],
 		metaInfo: {
-			title: 'Harmless Key'
+			title: "User page | Harmless Key"
 		},
 		data() {
 			return {
@@ -125,86 +149,69 @@
 </script>
 
 <style lang="scss" scoped>
-.top {
-	background: rgba(38, 38, 38, .9);
-	text-transform: uppercase;
-	height: 65px;
-	padding: 10px;
-	font-size: 15px;
-	line-height: 45px;
-}
-	.container-fluid {
+	.hk-card.campaign {
+		.card-image {
+			display: flex;
+			justify-content: flex-end;
 
-		&::-webkit-scrollbar { 
-			display: none; 
+			.live {
+				border: solid 1px $neutral-3;
+				line-height: 14px;
+			}
+			.link {
+				top: 8px;
+
+			}
 		}
-		padding: 30px;
+		.card-body {
+			border-top: solid 1px $neutral-5;
+			background-color: $neutral-8;
 
-		.hk-card {
-			color: $gray-light !important;
-			background-size: cover;
-			background-position: center bottom;
+			h2 {
+				text-align: center;
+				margin-bottom: 20px;
 
-			.card-header {
-				// position: relative;
-				background: rgba(38, 38, 38, .9);
-
-				span.title {
-					display: block;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					width: calc(100% - 55px);
-				}
-
-				.live {
-					position: absolute;
-					top: 8px;
-					right: 8px;
+				&.no-players {
+					margin-top: 20px;
 				}
 			}
-			.card-body {
-				height: 200px;
-				background: rgba(38, 38, 38, .5);
+			.players {
+				margin-top: -40px;
+				margin-bottom: 10px;
+				display: flex;
+				justify-content: center;
+				flex-wrap: nowrap;
+				z-index: 1;
+				position: relative;
 
-				h2 {
-					text-align: center;
-					margin-bottom: 30px;
-				}
-				.no-players {
-					min-height: 65px;
-				}
-				.players {
-					margin-bottom: 20px;
-					display: flex;
-					justify-content: center;
-					flex-wrap: nowrap;
+				.img {
+					background: $black;
+					height: 40px;
+					width: 40px;
+					border: solid 1px$neutral-1;
+					margin: 0 10px 10px 0;
+					box-sizing: border;
+					border-radius: $border-radius-small;
 
-					.img {
-						background:$black;
-						height: 35px;
-						width: 35px;
-						border: solid 1px$neutral-1;
-						margin: 0 10px 10px 0;
-						box-sizing: border;
+					div {
+						width: 100%;
+						height: 100%;
+						background-size: cover;
+						background-position: top center;
+						display: block;
+					}
 
-						div {
-							width: 100%;
-							height: 100%;
-							background-size: cover;
-							background-position: top center;
-							display: block;
-						}
-
-						&:last-child {
-							margin-right: 0;
-						}
+					&:last-child {
+						margin-right: 0;
 					}
 				}
 			}
-			&:hover {
-				text-decoration: none;
-			}
+		}
+		.card-footer {
+			display: block;
+			padding: 3px 0;
+			font-size: 12px;
+			text-align: center;
 		}
 	}
 </style>

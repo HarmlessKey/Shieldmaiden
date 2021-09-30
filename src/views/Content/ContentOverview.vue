@@ -6,13 +6,21 @@
 				slot="image"
 				class="card-image"
 				:style="[
-				active_campaign.background
-				? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
-				: { backgroundImage: `url(${require('@/assets/_img/campaign-background.jpg')})` }
-			]"/>
+					active_campaign.background
+					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
+					: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
+			]">
+				<a 
+					v-if="!active_campaign.background" 
+					class="neutral-2 text-shadow-3 link" 
+					target="_blank" rel="noopener"
+					href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+					Image by Vecteezy
+				</a>
+			</div>
 			<div class="card-body">
 				<div>
-					<div class="neutral-4 mb-1">CONTINUE</div>
+					<div class="neutral-4 mb-1">Continue</div>
 					<h3 class="neutral-1">
 						<b>{{ active_campaign.campaign }}</b><br/>
 					</h3>

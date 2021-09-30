@@ -44,8 +44,15 @@
 						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in _campaigns" :key="campaign.key">
 							<hk-card>
 								<!-- Image -->
-								<div slot="image" class="card-image" :style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }">
-									<div class="d-flex justify-content-between px-2 py-2">
+								<div 
+									slot="image" 
+									class="card-image" 
+									:style="[
+										campaign.background
+										? { backgroundImage: 'url(\'' +campaign.background + '\')' }
+										: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
+									]">
+									<div class="d-flex justify-content-between">
 										<i 
 											class="px-1 py-2"
 											:class="{
@@ -75,6 +82,13 @@
 											</a>
 										</div>
 									</div>
+									<a 
+										v-if="!campaign.background" 
+										class="neutral-2 text-shadow-3 link" 
+										target="_blank" rel="noopener"
+										href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+										Image by Vecteezy
+									</a>
 								</div>
 
 								<div class="card-body">
@@ -104,10 +118,10 @@
 									</router-link>
 									
 									<div class="mt-4">
-										<router-link to="/players" v-if="Object.keys(players).length === 0" class="btn bg-green ">
+										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn bg-green ">
 											<i class="fas fa-user"></i> Create players
 										</router-link>
-										<router-link :to="'/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green">
+										<router-link :to="'/content/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green">
 											<i class="fas fa-plus"></i> Add players
 										</router-link>
 										<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green">

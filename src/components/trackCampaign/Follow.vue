@@ -1,13 +1,18 @@
 <template>
-	<div class="follow d-flex justify-content-end">
-		<div v-if="user.uid" class="pr-2">
+	<div class="follow neutral-2">
+		<div v-if="user.uid">
 			<small v-if="!following['.value']">
-				<i class="fas fa-user-plus mr-1"></i> 
-				<a @click="follow(true)">Follow user</a>
+				Follow user
+				<a @click="follow(true)" class="btn btn-sm bg-neutral-5">
+					<i class="fas fa-user-plus mr-1"></i> 
+				</a>
 			</small>
 			<small v-else>
-				<span class="show"><i class="fas fa-user-check green"></i> Following user</span>
-				<a class="hover-show" @click="follow(false)"><i class="fas fa-user-minus red"></i> Unfollow</a>
+				<div class="d-none d-md-inline mr-2">Following user</div>
+				<a @click="follow(false)" class="btn btn-sm bg-neutral-5
+				">
+					<i class="fas fa-user-check green"></i> 
+				</a>
 			</small>
 		</div>
 		<small v-else>
@@ -17,12 +22,12 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
+	import { db } from "@/firebase"
 
 	export default {
-		name: 'Follow',
+		name: "Follow",
 		props: [
-			'entity',
+			"entity",
 		],
 		data() {
 			return {
@@ -51,19 +56,4 @@
 </script>
 
 <style lang="scss" scoped>
-	.follow {
-		color:$neutral-1;
-
-		.hover-show {
-			display: none;
-		}
-		&:hover {
-			.hover-show {
-				display: inline;
-			}
-			.show {
-				display: none;
-			}
-		}
-	}
 </style>

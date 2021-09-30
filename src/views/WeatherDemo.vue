@@ -2,7 +2,7 @@
 <div class="weather">
 	<div class="menu">
 		<div class="left">
-			<router-link :to="prevRoute" class="pl-2">
+			<router-link :to="prevRoute" class="ml-1 btn btn-sm btn-clear">
 				<i class="fas fa-chevron-left" />
 				Back
 			</router-link>
@@ -37,6 +37,9 @@
 		:background="image ? image : background"
 		:audio="audio"
 	/>
+	<a v-if="!image" class="link text-shadow-3" href="https://www.vecteezy.com/free-vector/tree" target="_blank" rel="noopener">
+		Image by Vecteezy
+	</a>
 </div>
 </template>
 
@@ -51,11 +54,11 @@
 		},
 		data() {
 			return {
-				background: require("../assets/_img/weather-background.jpg"),
+				background: require("../assets/_img/atmosphere/winter-landscape.webp"),
 				audio: false,
 				image: null,
 				weather: {
-					rain: 1,
+					snow: 1,
 					fog: 1
 				},
 				prevRoute: "/"
@@ -83,6 +86,9 @@
 		}
 
 		.menu {
+			position: absolute;
+			top: 0;
+			left: 0;
 			background: $gray-darker;
 			height: 36px;
 			width: 100%;
@@ -99,6 +105,16 @@
 			.right {
 				display: flex;
 				justify-content: flex-end;
+			}
+		}
+		.link {
+			position: absolute;
+			left: 10px;
+			bottom: 10px;
+			color: $neutral-2;
+
+			&:hover {
+				color: $neutral-1;
 			}
 		}
 	}

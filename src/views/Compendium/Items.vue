@@ -1,18 +1,12 @@
 <template>
-<div class="grid">
-	<div class="content">
-
-		<!-- ITEM OVERVIEW -->
-		<template v-if="!$route.params.id">
-			<Crumble />
-			<h1><i class="fas fa-treasure-chest"></i> Items</h1>
-			
-			<p>
-				If you can't find a item, 
-				it is because we are only allowed to store 
-				items from the <a href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD</a>.
-			</p>
-
+	<hk-card>
+		<div slot="header" class="card-header">
+			<h1><i class="fas fa-treasure-chest mr-2"></i>D&D 5e items</h1>
+			<span class="neutral-3">
+				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
+			</span>
+		</div>
+		<div class="card-body">
 			<hk-table
 				:items="items"
 				:columns="fields"
@@ -51,10 +45,8 @@
 					<span>Loading items....</span>
 				</div>
 			</hk-table>
-		</template>
-	</div>
-	<Footer />
-</div>
+		</div>
+	</hk-card>
 </template>
 
 <script>

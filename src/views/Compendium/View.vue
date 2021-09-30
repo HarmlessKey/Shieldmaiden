@@ -1,21 +1,14 @@
 <template>
-	<div class="content">
-		<Crumble :name="name" />
-
-		<component :is="component" :id="id" v-if="component" @name="setName" />
-
+	<div>
+		<component :is="component" :id="id" v-if="component" @name="setName" :card-view="true" />
 	</div>
 </template>
 
 <script>
-	import Crumble from '@/components/crumble/Compendium.vue'
 	import { mapGetters } from 'vuex'
 
 	export default {
 		name: 'ViewCompendium',
-		components: {
-			Crumble
-		},
 		metaInfo() {
 			return {
 				title: this.name + ' | D&D 5th Edition',
@@ -43,7 +36,7 @@
 				'tier',
 			]),
 			type() {
-				let type = this.$route.params.type;
+				let type = this.$route.path.split("/")[2];
 				if(type === 'conditions') { type = 'Condition'; }
 				if(type === 'items') { type = 'Item'; }
 				if(type === 'monsters') { type = 'Monster'; }

@@ -51,6 +51,7 @@
   --thunder:  #e63f21;
 
   // Styling
+  --font-size: 15px;
   --header-height: 50px;
   --border-radius: 4px;
   --border-radius-small: 3px;
@@ -137,6 +138,7 @@ $slashing:  var(--slashing);
 $thunder:  var(--thunder);
 
 // Styling
+$font-size: var(--font-size);
 $header-height: var(--header-height);
 $border-radius: var(--border-radius);
 $border-radius-small: var(--border-radius-small);

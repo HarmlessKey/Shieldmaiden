@@ -303,6 +303,7 @@
 		bottom: 0;
 		padding: 0 20px;
 		border-top: 1px solid $neutral-6;
+		border-right: 1px solid $neutral-5;
 		cursor: pointer;
 		color: $neutral-3;
 		line-height: 40px;

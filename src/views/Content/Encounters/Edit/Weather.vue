@@ -2,7 +2,7 @@
 	<q-list dense dark>
 		<q-item v-for="({name, icon}, key) in weather_effects" :key="`effect-${key}`">
 			<q-item-section dark avatar>
-				<q-icon :name="icon" :class="(weather.smoke && key === 'fog') ? 'gray-hover' : ''" />
+				<q-icon :name="icon" :class="(weather.smoke && key === 'fog') ? 'neutral-5' : ''" />
 				<q-tooltip anchor="top middle" self="center right">
 					{{ name }}
 				</q-tooltip>

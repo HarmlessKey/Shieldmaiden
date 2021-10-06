@@ -112,17 +112,18 @@
 		</hk-card>
 		
 		<!-- PARSER DIALOG -->
-		<q-dialog dark square v-model="old_dialog">
+		<q-dialog dark v-model="old_dialog">
 			<hk-card header="Deprecated NPC's">
 				<template v-if="!parsing">
-					<p>
-						We have upgraded our NPC's. You still have <b class="red">{{ old_npcs.length }}</b>
-						NPC's that are of the old format. For a better user experience, please upgrade them.
-					</p>
-					<p>Our parser does most of the work for you, but we do advise to double check your NPC's, especially the actions.</p>
+					<div class="card-body">
+						<p>
+							We have upgraded our NPC's. You still have <b class="red">{{ old_npcs.length }}</b>
+							NPC's that are of the old format. For a better user experience, please upgrade them.
+						</p>
+						<p>Our parser does most of the work for you, but we do advise to double check your NPC's, especially the actions.</p>
 
-					<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
-
+						<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
+					</div>
 					<div slot="footer" class="card-footer d-flex justify-content-end">
 						<q-btn class="bg-neutral-8" v-close-popup>Later</q-btn>
 					</div>
@@ -133,20 +134,22 @@
 					</h4>
 					<q-linear-progress v-if="(parsed_counter + error_counter) !== parse_total" stripe rounded size="20px" :value="parsed_counter/parse_total" />
 					<template v-else>
-						<h2 class="text-center">
-							<i class="fas fa-check green"/>
-							Finished!
-						</h2>
-						<p>
-							<template v-if="error_counter === 0">
-								All 
-							</template>
-							<template v-else>
-								Except for {{ error_counter }}, all 
-							</template>
-							your old monster have succesfully been updated. 
-							Please make sure to double check them before use to correct any mistakes.
-						</p>
+						<div class="card-body">
+							<h2 class="text-center">
+								<i class="fas fa-check green"/>
+								Finished!
+							</h2>
+							<p>
+								<template v-if="error_counter === 0">
+									All 
+								</template>
+								<template v-else>
+									Except for {{ error_counter }}, all 
+								</template>
+								your old monster have succesfully been updated. 
+								Please make sure to double check them before use to correct any mistakes.
+							</p>
+						</div>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
 							<q-btn class="bg-blue white" v-close-popup>Close</q-btn>
 						</div>

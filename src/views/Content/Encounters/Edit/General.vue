@@ -5,7 +5,7 @@
 			dark filled square
 			label="Name"
 			autocomplete="off"
-			class="mb-2"
+			class="mb-3"
 			v-validate="'required'" 
 			data-vv-as="Encounter Name" 
 			type="text" 
@@ -32,7 +32,6 @@
 					:rules="[ val => (!val ||  url_or_uri(val)) || 'Not a valid URL or URI']"
 					name="audio" 
 					v-model="encounter.audio" 
-					class="mb-2"
 					placeholder="Audio URL"/>
 			</div>
 		</div>
@@ -77,12 +76,12 @@
 
 		<q-dialog v-model="image" full-height full-width>
 			<q-card dark>
-				<q-toolbar class="bg-gray-dark">
+				<q-toolbar class="bg-neutral-9">
 					<div>Background preview</div>
 					<q-space />
 
 					<q-btn-dropdown stretch flat label="Weather" dark square>
-						<div class="bg-gray edit-weather">
+						<div class="bg-neutral-9 edit-weather">
 							<q-item-label header>Weather effects</q-item-label>
 							<EditWeather v-model="weather" />
 						</div>
@@ -207,7 +206,7 @@
 	text-align: center;
 
 	.img {
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-2;
 		display: block;
 		width: 56px;
 		height: 56px;

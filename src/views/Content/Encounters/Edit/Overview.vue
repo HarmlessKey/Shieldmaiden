@@ -61,9 +61,9 @@
 					</div> 
 					<hr class="mb-0">
 				</div>
-				<h3 v-else class="gray-hover">Calculating difficulty...</h3>
+				<h3 v-else class="neutral-3">Calculating difficulty...</h3>
 			</div>
-			<q-scroll-area dark class="bg-gray-active" :thumb-style="{ width: '5px'}">
+			<q-scroll-area dark class="bg-neutral-6" :thumb-style="{ width: '5px'}">
 				<div class="overview">          
 					<template v-if="encounter">
 						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
@@ -99,14 +99,14 @@
 							<div slot="actions" slot-scope="data" class="actions">
 								<a v-if="data.row.entityType === 'npc'" 
 									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
-									class="mr-2 gray-hover" 
+									class="mr-2 btn btn-sm bg-neutral-5" 
 								>
 									<i class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</a>
-								<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
+								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
 									<i class="fas fa-minus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove character
@@ -144,13 +144,13 @@
 							</span>
 
 							<div slot="actions" slot-scope="data" class="actions">
-								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 gray-hover">
+								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 btn btn-sm bg-neutral-5">
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
 									<i class="fas fa-pencil"></i>
 								</a>
-								<a class="gray-hover" @click="remove(data.row.key, data.row.name)">
+								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
 									<i class="fas fa-minus"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Remove character
@@ -203,7 +203,8 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 						truncate: true
 					},
 					actions: {
-						noPadding: true
+						noPadding: true,
+						maxContent: true
 					}
 				}
 			} 
@@ -303,10 +304,10 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 		overflow-y: hidden;
 
 		h3 {
-			margin-bottom: 8px;
+			margin-bottom: 10px;
 		}
 		.diff-info {
-			background:$gray-active;
+			background: $neutral-6;
 			padding: 10px 10px 0 10px;
 
 			span.left {
@@ -316,7 +317,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 
 			.progress-area {
 				.progress {
-					background-color: $gray-darker !important;
+					background-color: $neutral-8 !important;
 				}
 				.diff {
 					display: none;
@@ -342,7 +343,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 			height: calc(100vh - 50px);
 			overflow: scroll;
 			z-index: 96;
-			background:$gray-active;
+			background: $neutral-6;
 			overflow: scroll;
 			width: 300px;
 			transition: right .5s linear,

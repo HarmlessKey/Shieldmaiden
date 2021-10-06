@@ -346,9 +346,10 @@
 				text-align: right;
 			}
 			&.hk-table-column-sortable {
+				user-select: none;
 				cursor: pointer;
 				display: flex;
-				justify-content: flex-start;
+				justify-content: space-between;
 
 				.sort {
 					width: 25px;

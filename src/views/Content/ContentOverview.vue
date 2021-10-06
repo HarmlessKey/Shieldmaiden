@@ -1,24 +1,27 @@
 <template>
 	<div>
 		<!-- Continue Campaign -->
-		<hk-card v-if="active_campaign" class="banner">
+		<hk-card class="banner">
 			<div 
 				slot="image"
 				class="card-image"
+				:class="{ 'no-campaign': !active_campaign }"
 				:style="[
-					active_campaign.background
+					active_campaign && active_campaign.background
 					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
 					: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
 			]">
+				<h2 v-if="!active_campaign">No campaigns yet</h2>
 				<a 
-					v-if="!active_campaign.background" 
+					v-if="!active_campaign || !active_campaign.background" 
 					class="neutral-2 text-shadow-3 link" 
 					target="_blank" rel="noopener"
 					href="https://www.vecteezy.com/free-vector/fantasy-landscape">
 					Image by Vecteezy
 				</a>
 			</div>
-			<div class="card-body">
+			<!-- Active campaign -->
+			<div class="card-body" v-if="active_campaign">
 				<div>
 					<div class="neutral-4 mb-1">Continue</div>
 					<h3 class="neutral-1">
@@ -31,10 +34,21 @@
 					Continue <span class="d-none d-md-inline">campaign</span>
 				</router-link>
 			</div>
+			<!-- No acive campaign -->
+			<div v-else class="card-body">
+				<div>
+					<div class="neutral-4 mb-1">Campaigns</div>
+					<h3 class="neutral-1">
+						<b>No campaigns</b><br/>
+					</h3>
+					<p class="neutral-3">Start your first adventure.</p>
+				</div>
+
+				<router-link to="campaigns" class="btn btn-sm bg-green">
+					Create <span class="d-none d-md-inline">campaign</span>
+				</router-link>
+			</div>
 		</hk-card>
-		<router-link v-else to="/campaigns" class="first">
-			<h2>Create a campaign</h2>
-		</router-link>
 
 		<hk-card-deck>
 			<hk-card header="Dungeon Master">
@@ -223,7 +237,11 @@
 			color: $neutral-4;
 		}
 	}
-
+	.hk-card {
+		.card-image.no-campaign {
+			filter: grayscale(100%);
+		}
+	}
 	.logo {
 		width: 100%;
 		max-width: 300px;
@@ -245,7 +263,7 @@
 		width: 100%;
 		padding: 20px 10px 20px 10px;
 		backdrop-filter: blur(2px);
-		border-top: solid 1px$gray-hover;
+		border-top: solid 1px $gray-hover;
 		background-color: rgba(0, 0, 0, .5);
 
 		.btn {

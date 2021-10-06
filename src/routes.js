@@ -67,7 +67,6 @@ export const routes = [{
 	// CONTENT
 	{
 		path: "/content",
-		name: "Content",
 		component: () => import("@/views/Content"),
 		meta: {
 			requiresAuth: true
@@ -76,16 +75,17 @@ export const routes = [{
 			// Overview
 			{
 				path: "",
+				name: "Content",
 				component: () => import("@/views/Content/ContentOverview.vue")
 			},
 			// Cammpaigns
 			{
 				path: "campaigns",
-				name: "Campaigns",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{	
 						path: "",
+						name: "Campaigns",
 						component: () => import("@/views/Content/Campaigns/Campaigns.vue"),
 					},
 					{
@@ -102,11 +102,11 @@ export const routes = [{
 			// Players
 			{
 				path: "players",
-				name: "Players",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
+						name: "Players",
 						component: () => import("@/views/Content/Players")
 					},
 					{
@@ -124,11 +124,11 @@ export const routes = [{
 			// NPCs
 			{
 				path: "npcs",
-				name: "NPCs",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
+						name: "NPCs",
 						component: () => import('@/views/Content/Npcs/Npcs.vue')
 					},
 					{
@@ -147,11 +147,11 @@ export const routes = [{
 			// Reminders
 			{
 				path: "reminders",
-				name: "Reminders",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
+						name: "Reminders",
 						component: () => import('@/views/Content/Reminders')
 					},
 					{
@@ -170,11 +170,11 @@ export const routes = [{
 			// Items
 			{
 				path: "items",
-				name: "Items",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
+						name: "Items",
 						component: () => import('@/views/Content/Items/Items.vue')
 					},
 					{
@@ -193,11 +193,11 @@ export const routes = [{
 			// Characters
 			{
 				path: "characters",
-				name: "Characters",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
+						name: "Characters",
 						component: () => import('@/views/Content/Characters'),
 					},
 					{
@@ -213,7 +213,6 @@ export const routes = [{
 	//COMPENDIUM
 	{
 		path: '/compendium',
-		name: 'Compendium',
 		component: () => import('@/views/Compendium'),
 		children: [
 			{
@@ -223,11 +222,11 @@ export const routes = [{
 			},
 			{
 				path: 'monsters',
-				name: 'Monsters',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
+						name: 'Monsters',
 						component: () => import('@/views/Compendium/Monsters'),
 					},
 					{
@@ -238,11 +237,11 @@ export const routes = [{
 			},
 			{
 				path: 'spells',
-				name: 'Spells',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
+						name: 'Spells',
 						component: () => import('@/views/Compendium/Spells'),
 					},
 					{
@@ -253,11 +252,11 @@ export const routes = [{
 			},
 			{
 				path: 'conditions',
-				name: 'Conditions',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
+						name: 'Conditions',
 						component: () => import('@/views/Compendium/Conditions'),
 					},
 					{
@@ -268,11 +267,11 @@ export const routes = [{
 			},
 			{
 				path: 'items',
-				name: 'Items',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
+						name: 'Items',
 						component: () => import('@/views/Compendium/Items'),
 					},
 					{

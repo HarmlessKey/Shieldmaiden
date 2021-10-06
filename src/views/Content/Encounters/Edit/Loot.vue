@@ -21,16 +21,13 @@
 				/>
 			</div>
 		</div>
-		<div class="d-flex justify-content-center mt-3">
-				<!-- <button class="btn" @click="setCurrency()">Save currency</button> -->
-		</div>
 
 		<h3 class="d-flex justify-content-between mt-3">
 			<span>
 				<i class="far fa-staff"></i> Items
 				<span v-if="items">( {{ Object.keys(items).length }} )</span>
 			</span>
-			<a class="gray-hover" @click="addItem()">
+			<a class="btn btn-sm bg-neutral-5" @click="addItem()">
 				<i class="fas fa-plus green"></i>
 				<span class="d-none d-md-inline ml-1">Add</span>
 			</a>
@@ -38,17 +35,17 @@
 		<hr>
 		<template v-if="items">
 			<div v-for="(item, index) in items" :key="item['.key']">
-				<hk-card class="bg-gray mb-3">
+				<hk-card class="bg-neutral-7 mb-3">
 					<div slot="header" class="card-header d-flex justify-content-between">
 						{{ index + 1 }}. {{ item.public_name }}
 						<span>
-							<a @click="setEdit(item['.key'])" class="mr-3 gray-light">
+							<a  @click="setEdit(item['.key'])" class="btn btn-sm bg-neutral-5 mr-1">
 								<i class="fas fa-pencil"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
 							</a>
-							<a @click="removeItem(item['.key'])" class="red">
+							<a @click="removeItem(item['.key'])" class="btn btn-sm bg-neutral-5">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Remove
@@ -56,9 +53,9 @@
 							</a>
 						</span>
 					</div>
-					<div v-if="editItem === item['.key']">
+					<div v-if="editItem === item['.key']" class="card-body">
 						<q-input
-							dark filled square dense
+							dark filled square
 							label="Public name"
 							class="mb-3"
 							id="name"
@@ -70,7 +67,7 @@
 								<q-icon name="info" @click.stop class="pointer">
 									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 										<q-card dark square>
-											<q-card-section class="bg-gray-active">
+											<q-card-section class="bg-neutral-9">
 												<b>Public name</b>
 											</q-card-section>
 											<q-card-section>
@@ -84,7 +81,7 @@
 						</q-input>
 
 						<q-input
-							dark filled square dense
+							dark filled square
 							autogrow
 							label="Public description"
 							id="desc"
@@ -119,7 +116,7 @@
 							<q-icon name="info" class="blue pointer">
 								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
 									<q-card dark square>
-										<q-card-section class="bg-gray-active">
+										<q-card-section class="bg-neutral-9">
 											<b>Linked item</b>
 										</q-card-section>
 										<q-card-section>

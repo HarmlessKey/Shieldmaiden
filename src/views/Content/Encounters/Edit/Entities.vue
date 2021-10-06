@@ -3,7 +3,7 @@
 		<h3>Players</h3>
 
 		<!-- PLAYERS -->
-		<div class="players bg-gray mb-1" v-if="campaign.players">
+		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players">
 			<div v-for="(player, key) in campaign.players" 
 			:key="key"
 			@click="add($event, key, 'player', players[key].character_name)" 
@@ -52,7 +52,7 @@
 		<div class="monster-actions">
 			<q-input 
 				dark filled square dense
-				class="multi_nr" 
+				class="multi_nr ml-2" 
 				autocomplete="off" 
 				type="number" 
 				min="1"
@@ -61,13 +61,13 @@
 				placeholder="1" 
 				v-model="to_add[data.row['.key']]"
 			/>
-			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
+			<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add with average HP
 				</q-tooltip>
 			</a>
-			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
+			<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
 				<i class="fas fa-dice-d20"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Add with rolled HP
@@ -134,7 +134,8 @@
 					},
 					'actions': {
 						label: '',
-						noPadding: true
+						noPadding: true,
+						maxContent: true
 					}
 				},
 			} 
@@ -337,12 +338,6 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 	justify-content: flex-end;
 	height: 46px;
 	padding: 8px 10px 8px 0;
-	
-	a {
-		line-height: 30px;
-		height: 30px;
-		margin-left: 15px;
-	}
 }
 
 .players {
@@ -356,8 +351,10 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		background-size: cover;
 		background-position: center top;
 		margin-right: 5px;
-		background-color:$gray-active;
+		background-color: $neutral-10;
+		border-radius: $border-radius-small;
 		cursor: pointer;
+		border: solid 1px $neutral-5;
 	}
 }
 .multi_nr {

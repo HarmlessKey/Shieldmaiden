@@ -20,31 +20,20 @@
 <script>
 	export default {
 		name: 'Crumble',
-		data() {
-			return {
-
-			}
-		},
-		methods: {
-			
-		},
-		mounted() {
-			console.log(this.$route)
-		},
 		computed: {
-			crumbs: function() {
-      let pathArray = this.$route.path.split("/")
-      pathArray.shift()
-      let breadcrumbs = pathArray.reduce((breadcrumbArray, path, idx) => {
+			crumbs() {
+      let pathArray = this.$route.path.split("/");
+      pathArray.shift();
+      let breadcrumbs = pathArray.reduce((breadcrumbArray, path, i) => {
 					breadcrumbArray.push({
 						path: path,
-						to: breadcrumbArray[idx - 1]
-							? "/" + breadcrumbArray[idx - 1].path + "/" + path
+						to: breadcrumbArray[i - 1]
+							? "/" + breadcrumbArray[i - 1].path + "/" + path
 							: "/" + path,
-						name: this.$route.matched[idx].name || path,
+						name: this.$route.matched[i] ? this.$route.matched[i].name || path : path,
 					});
 					return breadcrumbArray;
-				}, [])
+				}, []);
 				return breadcrumbs;
 			}
 		}

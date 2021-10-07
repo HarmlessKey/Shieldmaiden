@@ -1,16 +1,16 @@
 <template>
-	<div class="container-fluid">
-		<Crumble />
-		<h1>Admin</h1>
-		<ul class="entities hasImg">
-			<li v-for="(item, index) in items" :key="index">
-				<i class="img mr-2" :class="item.icon"></i>
-				<div class="d-flex justify-content-between">
-					<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
-				</div>
-			</li>
-		</ul>
-	</div>
+	<hk-card header="Admin">
+		<div class="card-body">
+			<ul class="entities hasImg">
+				<li v-for="(item, index) in items" :key="index">
+					<i class="img mr-2" :class="item.icon"></i>
+					<div class="d-flex justify-content-between">
+						<router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</hk-card>
 </template>
 
 <script>

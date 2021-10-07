@@ -14,7 +14,6 @@
 					animated
 					transition-prev="slide-right"
 					transition-next="slide-left"
-					control-color="gray-light"
 					navigation
 					padding
 					arrows
@@ -28,7 +27,7 @@
 					>
 						<h3 v-html="source" />
 						<p v-html="text" />
-						<span class="gray-hover">
+						<span class="neutral-3">
 							{{ date }}
 						</span>
 						<template v-if="link">
@@ -137,7 +136,7 @@
 <style lang="scss" scoped>
 	.feedback {
 		padding: 100px 0;
-		background-color: #111111;
+		background-color: $neutral-10;
 
 		.head {
 			padding: 0 0 50px 0;

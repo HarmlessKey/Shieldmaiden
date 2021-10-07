@@ -456,7 +456,7 @@ html body {
 	}
 
 	.q-card.install-prompt {
-		color: $gray-darker;
+		color: $neutral-10;
 		max-width: 300px;
 		align-items: top;
 
@@ -503,39 +503,6 @@ html body {
 			text-align: center;
 			border-color: transparent;
 			background-color: $patreon-red;
-		}
-	}
-
-	a.large-link {
-		display: block;
-		background: $gray;
-		color: $gray-light !important;
-		font-size: 20px;
-		line-height: 40px;
-		width: max-content;
-		border-radius: $border-radius;
-		display: flex;
-		justify-content: flex-start;
-		box-shadow: 3px 3px 10px $black;
-		user-select: none;
-
-		.icon {
-			border-top-left-radius: 5px;
-			border-bottom-left-radius: 5px;
-			background-color: $gray-hover;
-			padding: 20px 20px 15px 20px;
-			font-size: 40px;
-			color: $neutral-1;
-
-			i {
-				vertical-align: -5px;
-			}
-		}
-		.text {
-			padding: 20px;
-		}
-		&:hover {
-			text-decoration: none;
 		}
 	}
 
@@ -824,7 +791,7 @@ html body {
 	}
 
 	a.logout { 
-		color: $gray-light!important;
+		color: $neutral-2 !important;
 		font-size: 20px;
 		cursor: pointer;
 		
@@ -884,7 +851,7 @@ html body {
 				margin-bottom: 1px;
 			}
 			.google {
-				background-color: $gray-light !important;
+				background-color: $neutral-2 !important;
 				color: #262626 !important;
 				height: 38px;
 				padding: 0 !important;
@@ -1093,7 +1060,8 @@ html body {
 					background: rgba(0, 0, 0, .2);
 		
 					a {
-						color: $gray-light;
+						color: $neutral-2;
+
 						&:hover {
 							color: $neutral-1;
 						}
@@ -1102,10 +1070,10 @@ html body {
 				.body {
 					.accordion {
 						.q-item {
-							background-color: $gray;
+							background-color: $neutral-6;
 
 							.slashing, .bludgeoning, .piercing {
-								color: $gray-light;
+								color: $neutral-2;
 							}
 
 							.q-focus-helper {
@@ -1117,7 +1085,7 @@ html body {
 				.footer {
 					display: flex;
 					justify-content: space-between;
-					border-top: solid 1px $gray-darker;
+					border-top: solid 1px $neutral-9;
 				}
 			}
 		}
@@ -1251,7 +1219,7 @@ html body {
 						background-size: cover;
 						background-position: top center;
 						background-color: $black;
-						border: solid 1px $gray-light !important;
+						border: solid 1px $neutral-3 !important;
 				
 						img {
 							width: 40px;
@@ -1262,7 +1230,7 @@ html body {
 				
 				&:focus {
 					td {
-						background-color: $gray-darker;
+						background-color: $neutral-9;
 					}
 					.actions {
 						display: flex !important;
@@ -1271,7 +1239,7 @@ html body {
 				&.openSlot {
 					td {	
 						background: none;
-						border: dashed 1px $gray-hover !important;
+						border: dashed 1px $neutral-4 !important;
 			
 						.slot {	
 							display: flex;
@@ -1430,7 +1398,7 @@ html body {
 	}
 
 	ul.settings {
-		border-top: solid 1px $gray-active;
+		border-top: solid 1px $neutral-5;
 		padding: 0 !important;
 		list-style: none;
 		margin-bottom: 60px;
@@ -1438,10 +1406,10 @@ html body {
 		li {
 			font-size: 13px;
 			padding: 15px 5px;
-			border-bottom: solid 1px $gray-active;
+			border-bottom: solid 1px $neutral-5;
 
 			.btn {
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 			}
 		}
 	}
@@ -1452,7 +1420,7 @@ html body {
 		
 		li {
 			display: grid;
-			background-color: $gray;
+			background-color: $neutral-8;
 			grid-template-columns: auto max-content;
 			margin-bottom: 1px;
 			vertical-align: center;
@@ -1466,7 +1434,7 @@ html body {
 				padding-right: 10px;
 
 				a {
-					color: $gray-light !important;
+					color: $neutral-2 !important;
 					margin-left: 10px;
 
 					&:hover {
@@ -1475,7 +1443,7 @@ html body {
 				}
 			}
 			&:hover {
-				background-color: $gray-darker;
+				background-color: $neutral-9;
 				
 				.hover-hide {
 					display: none;
@@ -1490,8 +1458,8 @@ html body {
 				display: block;
 				background-size: cover;
 				background-position: top center;
-				border: solid 1px $gray-light;
-				background-color: $black;
+				border: solid 1px $neutral-3;
+				background-color: $neutral-10;
 				font-size: 20px;
 				line-height: 44px;
 				text-align: center;
@@ -1659,10 +1627,10 @@ html body {
 
 		table tr td .actions {
 			display: none !important;
-			background-color: $gray-darker;
+			background-color: $neutral-9;
 			right: 20px;
 			a {
-				background: $gray-active;
+				background: $neutral-3;
 			}
 		}
 	}
@@ -1692,15 +1660,15 @@ html body {
 		}
 	}
 	.snotify-simple {
-		border: solid 1px $gray-hover;
+		border: solid 1px $neutral-5;
 		user-select: none;
 
 		.snotifyToast__inner {
 			padding: 13px 15px 15px 15px !important;
-			background-color: $gray-dark !important;
+			background-color: $neutral-8 !important;
 
 			.snotifyToast__title {
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 				width: 100%;
 				
 				.target {
@@ -1710,19 +1678,19 @@ html body {
 					line-height: 30px;
 					margin-bottom: 10px;
 					text-transform: none !important;
-					background-color: $gray-darker;
+					background-color: $neutral-10;
 					position: relative;
 					
 					.ac {
 						text-align: center;
-						background-color: $black;
+						background-color: $neutral-10;
 					}
 					.image {
 						width: 30px;
 						height: 30px;
 						background-size: cover;
 						background-position: center top;
-						background-color: $black;
+						background-color: $neutral-10;
 					}
 					.name {
 						padding: 0 10px;
@@ -1735,7 +1703,7 @@ html body {
 				}
 			}
 			.snotifyToast__body {
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 				width: 100%; 
 				
 				h2 {
@@ -1756,7 +1724,7 @@ html body {
 					margin-bottom: 10px;
 					
 					div.roll {
-						border: solid 1px $gray-hover;
+						border: solid 1px $neutral-3;
 						text-align: center;
 						padding: 5px 0;
 						flex-direction: column;
@@ -1778,7 +1746,7 @@ html body {
 						}
 						.advantage {
 							position: absolute;
-							background: $gray-dark;
+							background: $neutral-10;
 							padding: 0 10px;
 							top: -5px;
 							left: 50%;
@@ -1791,7 +1759,7 @@ html body {
 					margin: -13px -15px -15px -15px;
 
 					.roll_title {
-						background: $gray;
+						background: $neutral-8;
 						font-size: 15px;
 						padding: 10px;
 						text-align: center;
@@ -1807,13 +1775,13 @@ html body {
 						text-align: center;
 						padding: 10px;
 						font-size: 15px;
-						background-color: $gray;
+						background-color: $neutral-8;
 					}
 				}
 			}
 		}
 		.snotifyToast__buttons {
-			background: $gray-darker !important;
+			background: $neutral-9 !important;
 		}
 	}
 	.snotify-error {
@@ -1868,17 +1836,15 @@ html body {
 	.q-pagination {
 		justify-content: center;
 		.q-btn {
-			background-color: $gray;
+			background-color: $neutral-8;
 			margin-left: 1px;
-			color: $gray-light !important;
+			color: $neutral-2 !important;
 		}
 	}
 	.q-btn {
 		border-radius: $border-radius;
 	}
-	.q-menu {
-		color: $gray-light;
-		
+	.q-menu {		
 		.q-list {
 			.q-item {
 				&__section--avatar {
@@ -1886,7 +1852,7 @@ html body {
 				}
 			}
 			a.q-item {
-				color:$gray-light !important;
+				color: $neutral-2 !important;
 		
 				&:hover {
 					color: $blue !important;
@@ -1896,7 +1862,7 @@ html body {
 
 		table {
 			td {
-				background-color: $gray-dark !important;
+				background-color: $neutral-9 !important;
 			}
 		}
 	}
@@ -1925,7 +1891,7 @@ html body {
 			line-height: 35px;
 			font-size: 30px;
 			text-shadow: 0px 0px 3px #000;
-			color: #fff;
+			color: $neutral-1;
 		}
 	}
 

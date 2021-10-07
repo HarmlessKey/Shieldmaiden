@@ -1,5 +1,12 @@
 <template>
-	<div>
+	<div class="card-body">
+		<p>
+			Track encounter is what we call the link you can share with your party, 
+			or put up on a second screen for your party to see. 
+			In here players can follow the encounter, 
+			see who's turn it is and what the status of the entities within the encounter is. 
+			Below you can determine what should be visible on the track encounter screen.
+		</p>
 		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="d-block mb-3">
 			Share your adventures
 		</a>
@@ -16,9 +23,9 @@
 			>
 				<q-item dark slot="selected">
 					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="gray-light" size="large" />
+						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
-					<q-item-section class="gray-light truncate">
+					<q-item-section class="neutral-2 truncate">
 						<q-item-label>{{ setting.name }}</q-item-label>
 						<q-item-label caption>
 							{{ displaySetting(type_key, setting.key, settings[setting.entity] ? settings[setting.entity][setting.key] : undefined).name }}
@@ -51,9 +58,9 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
+							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark>
+									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>
 
@@ -69,7 +76,7 @@
 			</q-select>
 		</div>
 		
-		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
+		<a class="btn mt-3 bg-neutral-5" @click="setDefault()">Reset to default</a>
 	</div>
 </template>
 

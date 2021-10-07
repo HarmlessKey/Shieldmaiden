@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="card-body">
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
@@ -12,9 +12,9 @@
 			>
 				<q-item dark slot="selected">
 					<q-item-section avatar>
-						<q-icon :name="setting.icon" class="gray-light" size="large" />
+						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
-					<q-item-section class="gray-light truncate">
+					<q-item-section class="neutral-2 truncate">
 						<q-item-label>{{ setting.name }}</q-item-label>
 						<q-item-label caption>
 							{{ displaySetting(type_key, setting.key, settings[setting.key]).name }}
@@ -47,9 +47,9 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu square anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
+							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card dark>
+									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>
 
@@ -65,7 +65,7 @@
 			</q-select>
 		</div>
 
-		<a class="btn mt-3" @click="setDefault()">Reset to default</a>
+		<a class="btn bg-neutral-5 mt-3" @click="setDefault()">Reset to default</a>
 	</div>
 </template>
 

@@ -1,74 +1,65 @@
 <template>
 	<div v-if="!loading">
-		<Crumble :name="user.username" />
-
-		<div class="container">
-			<div class="row q-col-gutter-md">
-				<div class="col-12 col-md-4">
-					<h1>{{ user.username }}</h1>
-					<p>{{ user.email }}</p>
-					<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
-					<p><i class="gray-hover">{{ id }}</i></p>
-				</div>
-				<div class="col-12 col-md-4">
-					<h2>Status</h2>
-					<p v-if="status.state">
-						<i :class="{ 'green': status.state == 'online', 'gray-hover': status.state == 'offline' }" class="fas fa-circle"></i>
-						{{ status.state }}<br/>
-						<span v-if="status.state == 'offline'">Last online: {{ makeDate(status.last_changed) }}</span>
-					</p>
-					<p v-else>Unknown</p>
-				</div>
-				<div class="col-12 col-md-4">
-					<h2>Broadcasting</h2>
-					<p> 
-						<router-link :to="'/user/' + id">
-							<div class="live" :class="{ 'active': broadcast.live }">Live</div>
-						</router-link>
-					</p>
-				</div>
+		<hk-card>
+			<div class="card-header">
+				<span>
+					<i :class="{ 'green': status.state == 'online', 'neutral-3': status.state == 'offline' }" class="fas fa-circle"></i>
+					{{ user.username }}
+				</span>
+				<router-link :to="'/user/' + id">
+					<div class="live" :class="{ 'active': broadcast.live }">Live</div>
+				</router-link>
 			</div>
+			<div class="card-body">
+				<p>{{ user.email }}</p>
+				<p v-if="user.patreon_email">patron: {{ user.patreon_email }}</p>
+				<p><i class="neutral-3">{{ id }}</i></p>
+			</div>
+		</hk-card>
 
-			<hr>
+		<hk-card-deck class="mb-3">
+			<hk-card header="DM Data">
+				<div class="card-body data">
+					<span class="type">Campaigns: </span> 
+					<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
+					<template v-else>0</template><br/>
+					
+					<span class="type">Encounters: </span>
+					<template v-if="encounters">{{ encounter_count }}</template>
+					<template v-else>0</template><br/>
 
-			<hk-card-deck class="mb-3">
-				<hk-card header="DM Data">
-					<p class="data">
-						<span class="type">Campaigns: </span> 
-						<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
-						<template v-else>0</template><br/>
-						
-						<span class="type">Encounters: </span>
-						<template v-if="encounters">{{ encounter_count }}</template>
-						<template v-else>0</template><br/>
+					<span class="type">Players: </span> 
+					<template v-if="players">{{ Object.keys(players).length }}</template>
+					<template v-else>0</template><br/>
 
-						<span class="type">Players: </span> 
-						<template v-if="players">{{ Object.keys(players).length }}</template>
-						<template v-else>0</template><br/>
-
-						<span class="type">NPC's: </span> 
-						<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
-						<template v-else>0</template><br/>
-					</p>
-				</hk-card>
-				<hk-card header="Following">
+					<span class="type">NPC's: </span> 
+					<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
+					<template v-else>0</template><br/>
+				</div>
+			</hk-card>
+			<hk-card header="Following">
+				<div class="card-body">
 					<ul class="entities">
 						<li v-for="(followed, key) in user.followed" :key="key">
 							{{ followed }}
 						</li>
 					</ul>
-				</hk-card>
-				<hk-card header="Player Characters">
+				</div>
+			</hk-card>
+			<hk-card header="Player Characters">
+				<div class="card-body">
 					<ul class="entities" v-if="!loading_characters">
 						<li v-for="(character, key) in characters" :key="key">
 							{{ character.character_name }}
 						</li>
 					</ul>
 					<div v-else class="loader"> <span>Loading characters...</span></div>
-				</hk-card>
-			</hk-card-deck>
+				</div>
+			</hk-card>
+		</hk-card-deck>
 
-			<hk-card header="User info">
+		<hk-card header="User info">
+			<div class="card-body">
 				<q-select
 					dark filled square multiple
 					label="contribute"
@@ -89,10 +80,11 @@
 						<a class="btn" @click="setPatronEmail()">Save</a>
 					</template>
 				</q-input>
-				
-			</hk-card>
+			</div>
+		</hk-card>
 
-			<hk-card header="Voucher">
+		<hk-card header="Voucher">
+			<div class="card-body">
 				<h3>Gift user a subscription</h3>
 
 				<q-select 
@@ -135,8 +127,8 @@
 					autogrow
 				/>
 				<a class="btn" @click="setVoucher()">Save</a>
-			</hk-card>
-		</div>
+			</div>
+		</hk-card>
 	</div>
 </template>
 

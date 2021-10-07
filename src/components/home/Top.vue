@@ -6,7 +6,7 @@
 				<div class="content-box">
 					<div class="text">
 						<template>
-							<div class="text-center gray-light mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
+							<div class="text-center neutral-3 mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
 							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
 							<h3>The online tool for offline play.</h3>
 						</template>
@@ -43,11 +43,10 @@
 <style lang="scss" scoped>
 	.top {
 		background-image: url('../../assets/_img/styles/paper-bg.png');
-		color:$neutral-1;
 		background-position: top center;
 		padding: 0 0 75px 0;
 		min-height: calc(100vh - 50px - 55px);
-		background-color:$black;
+		background-color: $neutral-11;
 		overflow: hidden;
 
 		
@@ -70,7 +69,7 @@
 					margin: auto;
 					max-width: 800px;
 					padding: 25px 20px 20px 20px;
-					text-shadow: 2px 2px 1px$black;
+					text-shadow: 2px 2px 1px $black;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
@@ -96,7 +95,7 @@
 						margin-top: 20px;
 
 						a {
-							color:$neutral-1 !important;
+							color: $neutral-1 !important;
 						}
 					}
 					.share {
@@ -125,7 +124,7 @@
 						}
 						.large-link {
 							text-shadow: none;
-							box-shadow: 2px 2px 1px$black;
+							box-shadow: 2px 2px 1px $black;
 							font-size: 20px;
 	
 							&.not-logged {

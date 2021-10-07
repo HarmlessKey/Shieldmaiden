@@ -1,7 +1,5 @@
 <template>
 	<div>
-		<Crumble :name="patron.email" />
-
 		<div v-if="loading" class="loader"> <span>Loading patron....</span></div>
 
 		<h1 class="d-flex justify-content-between">
@@ -95,14 +93,12 @@
 
 <script>
 	import { db } from '@/firebase'
-	import Crumble from '@/components/crumble/Compendium.vue'
 	import { general } from '@/mixins/general.js'
 	import EditPatron from '@/views/Admin/Patrons/New.vue'
 
 	export default {
 		name: 'Patron',
 		components: {
-			Crumble,
 			EditPatron
 		},
 		mixins: [general],

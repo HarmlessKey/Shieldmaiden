@@ -8,12 +8,6 @@
 			<Encounter />
 		</hk-card>
 		<hk-card header="Track Encounter Settings" id="track">
-			<p class="mb-5">Track encounter is what we call the link you can share with your party, 
-				or put up on a second screen for your party to see. 
-				In here players can follow the encounter, 
-				see who's turn it is and what the status of the entities within the encounter is. 
-				Below you can determine what should be visible on the track encounter screen.
-			</p>
 			<Track />
 		</hk-card>
 	</div>

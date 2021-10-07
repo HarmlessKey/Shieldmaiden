@@ -208,11 +208,10 @@
 								v-model="newEncounter"
 								:rules="[ val => val && val.length > 0 || 'Enter a title']"
 							/>
-
-							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
-								<q-btn color="primary" type="submit" label="Add encounter" />
-							</div>
+						</div>
+						<div slot="footer" class="card-footer d-flex justify-content-end">
+							<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
+							<q-btn color="primary" type="submit" label="Add encounter" />
 						</div>
 					</hk-card>
 				</q-form>

@@ -59,16 +59,6 @@
 				<Campaign />
 			</section>
 			<Footer />
-			<div class="bottom-actions d-flex justify-content-center">
-				<template v-if="!$store.getters.user">
-					<router-link to="/sign-up" class="btn btn-lg">Create Account</router-link>
-					<router-link to="/demo" class="ml-2 btn btn-lg bg-green">Demo Encounter</router-link>
-				</template>
-				<router-link v-else to="/content" class="ml-2 btn btn-lg bg-green">
-					<i class="fas fa-treasure-chest"/>
-					My content
-				</router-link>
-			</div>
 		</template>
 	</q-scroll-area>
 </template>
@@ -101,7 +91,7 @@
 			}
 		},
 		metaInfo: {
-			title: 'Combat Tracker D&D | Harmless Key',
+			title: 'D&D Combat Tracker | Harmless Key',
 			meta: [
 				{ vmid: 'description', name: 'description', content: 'Initiative tracker for D&D 5e. Our tool keeps track of everything in encounters so even during combat you can give your players the attention they deserve.' }
 			]
@@ -138,9 +128,7 @@
 <style lang="scss" scoped>
 
 .home {
-	padding-bottom: 85px;
-	overflow-y: scroll;
-	height: calc(100vh + 85px);
+	height: calc(100vh - #{$header-height});
 
 	&::-webkit-scrollbar {
 		display: none;

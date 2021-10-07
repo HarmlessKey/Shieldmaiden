@@ -9,26 +9,26 @@
 
 					<div class="col-12 col-md-9 links">
 						<div v-if="user">
-							<h2 class="gray-light">Your content</h2>
+							<h2 class="neutral-4">Your content</h2>
 							<ul>
 								<li><router-link to="/settings">Settings</router-link></li>
 							</ul>
-							<h2 class="gray-light">DM</h2>
+							<h2 class="neutral-4">DM</h2>
 							<ul>
-								<li><router-link to="/campaigns">Campaigns</router-link></li>
-								<li><router-link to="/players">Players</router-link></li>
-								<li><router-link to="/npcs">NPC's</router-link></li>
-								<li><router-link to="/reminders">Reminders</router-link></li>
-								<li><router-link to="/items">Items</router-link></li>
+								<li><router-link to="/content/campaigns">Campaigns</router-link></li>
+								<li><router-link to="/content/players">Players</router-link></li>
+								<li><router-link to="/content/npcs">NPC's</router-link></li>
+								<li><router-link to="/content/reminders">Reminders</router-link></li>
+								<li><router-link to="/content/items">Items</router-link></li>
 							</ul>
-							<h2 class="gray-light">Player</h2>
+							<h2 class="neutral-4">Player</h2>
 							<ul>
 								<li><router-link to="/characters">Characters</router-link></li>
 								<li><router-link to="/followed">Following</router-link></li>
 							</ul>
 						</div>
 						<div>
-							<h2 class="gray-light">Quick Links</h2>
+							<h2 class="neutral-4">Quick Links</h2>
 							<ul>
 								<li><router-link to="/compendium">Compendium</router-link></li>
 								<li><router-link to="/feedback">Feedback</router-link></li>
@@ -39,7 +39,7 @@
 							</ul>
 						</div>
 						<div>
-							<h2 class="gray-light">Follow us</h2>
+							<h2 class="neutral-4">Follow us</h2>
 							<ul>
 								<li>
 									<a href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">Patreon</a>
@@ -101,7 +101,7 @@
 
 <style lang="scss" scoped>
 	.footer {
-		background-color: $gray-darker;
+		background-color: $neutral-9;
 
 		.top {
 			padding: 10px 0;
@@ -110,7 +110,6 @@
 				display: flex;
 				justify-content: flex-start;
 				height: 200px;
-				// background:$black;
 
 				.logo {
 					width: 250px;
@@ -129,8 +128,12 @@
 
 						a {
 							font-size: 12px;
-							color: $gray-light !important;
+							color: $neutral-2;
 							text-transform: uppercase;
+
+							&:hover {
+								color: $neutral-1;
+							}
 						}
 					}
 				}
@@ -152,14 +155,14 @@
 			h2 {
 				font-weight: bold !important;
 				font-size: 13px !important;
-				color: #494747 !important;
+				line-height: 25px;
 				margin-bottom: 10px;
 			}
 
 			
 		}
 		.bottom {
-			background-color:$gray-dark;
+			background-color: $neutral-10;
 		}
 	}
 </style>

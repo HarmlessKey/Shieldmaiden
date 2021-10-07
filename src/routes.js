@@ -23,10 +23,6 @@ const Patreon = () => import('@/views/Patreon.vue');
 const ManageContent = () => import('@/views/ManageContent.vue');
 const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
-const Admin = () => import('@/views/Admin/Overview.vue');
-const Users = () => import('@/views/Admin/Users.vue');
-const Patrons = () => import('@/views/Admin/Patrons');
-const NewPatron = () => import('@/views/Admin/Patrons/New.vue');
 const GenerateXML = () => import('@/views/Admin/GenerateXML.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
@@ -35,8 +31,8 @@ const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
 const Offline = () => import('@/views/Offline.vue');
-const Encounters = () => import('@/views/Content/Encounters');
-const EditEncounter = () => import('@/views/Content/Encounters/Edit');
+const Encounters = () => import('@/views/UserContent/Encounters');
+const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
 const RunEncounter = () => import('@/views/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
 
@@ -67,31 +63,34 @@ export const routes = [{
 	// CONTENT
 	{
 		path: "/content",
-		component: () => import("@/views/Content"),
+		component: () => import("@/views/View"),
+		name: "Content",
 		meta: {
 			requiresAuth: true
 		},
 		children: [
-			// Overview
 			{
 				path: "",
-				name: "Content",
-				component: () => import("@/views/Content/ContentOverview.vue")
+				meta: {
+					title: "Content"
+				},
+				component: () => import("@/views/UserContent"),
 			},
+			
 			// Cammpaigns
 			{
 				path: "campaigns",
+				name: "Campaigns",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{	
 						path: "",
-						name: "Campaigns",
-						component: () => import("@/views/Content/Campaigns/Campaigns.vue"),
+						component: () => import("@/views/UserContent/Campaigns/Campaigns.vue"),
 					},
 					{
 						path: ":campid",
 						name: "Edit campaign",
-						component: () => import("@/views/Content/Campaigns/EditCampaign.vue"),
+						component: () => import("@/views/UserContent/Campaigns/EditCampaign.vue"),
 						props: (route) => ({
 							id: route.query.campid
 						})
@@ -102,44 +101,44 @@ export const routes = [{
 			// Players
 			{
 				path: "players",
+				name: "Players",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
-						name: "Players",
-						component: () => import("@/views/Content/Players")
+						component: () => import("@/views/UserContent/Players"),
 					},
 					{
 						path: "add-player",
 						name: "Add player",
-						component: () => import("@/views/Content/Players/EditPlayer.vue")
+						component: () => import("@/views/UserContent/Players/EditPlayer.vue")
 					},
 					{
 						path: ":id",
 						name: "Edit player",
-						component: () => import("@/views/Content/Players/EditPlayer.vue")
+						component: () => import("@/views/UserContent/Players/EditPlayer.vue")
 					},
 				]
 			},
 			// NPCs
 			{
 				path: "npcs",
+				name: "NPCs",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
-						name: "NPCs",
-						component: () => import('@/views/Content/Npcs/Npcs.vue')
+						component: () => import('@/views/UserContent/Npcs/Npcs.vue')
 					},
 					{
 						path: 'add-npc',
 						name: 'Add NPC',
-						component: () => import('@/views/Content/Npcs/EditNpc.vue'),
+						component: () => import('@/views/UserContent/Npcs/EditNpc.vue')
 					},
 					{
 						path: ':id',
 						name: 'Edit NPC',
-						component: () => import('@/views/Content/Npcs/EditNpc.vue'),
+						component: () => import('@/views/UserContent/Npcs/EditNpc.vue')
 					}
 				]
 			},
@@ -147,22 +146,22 @@ export const routes = [{
 			// Reminders
 			{
 				path: "reminders",
+				name: "Reminders",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
-						name: "Reminders",
-						component: () => import('@/views/Content/Reminders')
+						component: () => import('@/views/UserContent/Reminders')
 					},
 					{
 						path: 'add-reminder',
 						name: 'Add reminder',
-						component: () => import('@/views/Content/Reminders/EditReminder.vue')
+						component: () => import('@/views/UserContent/Reminders/EditReminder.vue'),
 					},
 					{
 						path: ':id',
 						name: 'Edit reminder',
-						component: () => import('@/views/Content/Reminders/EditReminder.vue')
+						component: () => import('@/views/UserContent/Reminders/EditReminder.vue'),
 					},
 				]
 			},
@@ -170,22 +169,22 @@ export const routes = [{
 			// Items
 			{
 				path: "items",
+				name: "Items",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
-						name: "Items",
-						component: () => import('@/views/Content/Items/Items.vue')
+						component: () => import('@/views/UserContent/Items/Items.vue')
 					},
 					{
 						path: 'add-item',
 						name: 'Add item',
-						component: () => import('@/views/Content/Items/EditItem.vue')
+						component: () => import('@/views/UserContent/Items/EditItem.vue')
 					},
 					{
 						path: ':id',
 						name: 'Edit item',
-						component: () => import('@/views/Content/Items/EditItem.vue')
+						component: () => import('@/views/UserContent/Items/EditItem.vue')
 					}
 				]
 			},
@@ -193,17 +192,17 @@ export const routes = [{
 			// Characters
 			{
 				path: "characters",
+				name: "Characters",
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: '',
-						name: "Characters",
-						component: () => import('@/views/Content/Characters'),
+						component: () => import('@/views/UserContent/Characters')
 					},
 					{
 						path: ':id',
 						name: 'Edit character',
-						component: () => import("@/views/Content/Players/EditPlayer.vue"),
+						component: () => import("@/views/UserContent/Players/EditPlayer.vue")
 					},
 				]
 			},
@@ -213,74 +212,157 @@ export const routes = [{
 	//COMPENDIUM
 	{
 		path: '/compendium',
-		component: () => import('@/views/Compendium'),
+		name: "Compendium",
+		component: () => import('@/views/View'),
 		children: [
 			{
 				path: "",
-				name: "Compendium",
-				component: () => import('@/views/Compendium/CompendiumOverview'),
+				meta: { 
+					title: "Compendium D&D 5e"
+				},
+				component: () => import('@/views/Compendium')
 			},
 			{
 				path: 'monsters',
+				name: 'Monsters',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
-						name: 'Monsters',
-						component: () => import('@/views/Compendium/Monsters'),
+						component: () => import('@/views/Compendium/Monsters')
 					},
 					{
 						path: ":id",
-						component: () => import('@/views/Compendium/View.vue'),
+						name: "Monster",
+						component: () => import('@/views/Compendium/View.vue')
 					}
 				]
 			},
 			{
 				path: 'spells',
+				name: 'Spells',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
-						name: 'Spells',
-						component: () => import('@/views/Compendium/Spells'),
+						component: () => import('@/views/Compendium/Spells')
 					},
 					{
 						path: ":id",
+						name: "Spell",
 						component: () => import('@/views/Compendium/View.vue')
 					}
 				]
 			},
 			{
 				path: 'conditions',
+				name: 'Conditions',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
-						name: 'Conditions',
-						component: () => import('@/views/Compendium/Conditions'),
+						component: () => import('@/views/Compendium/Conditions')
 					},
 					{
 						path: ":id",
+						name: "Condition",
 						component: () => import('@/views/Compendium/View.vue')
 					}
 				]
 			},
 			{
 				path: 'items',
+				name: 'Items',
 				component: { render (c) { return c('router-view') }},
 				children: [
 					{
 						path: "",
-						name: 'Items',
-						component: () => import('@/views/Compendium/Items'),
+						component: () => import('@/views/Compendium/Items')
 					},
 					{
 						path: ":id",
+						name: "Item",
 						component: () => import('@/views/Compendium/View.vue')
 					}
 				]
 			},
 		]
+	},
+
+	// ADMIN
+	{
+		path: '/admin',
+		name: 'Admin',
+		component: () => import('@/views/View'),
+		meta: {
+			requiresAuth: true,
+			requiresAdmin: true
+		},
+		children: [
+			{
+				path: "",
+				component: () => import('@/views/Admin'),
+				meta: {
+					title: "Admin",
+				}
+			},
+			{
+				path: 'users',
+				name: 'Users',
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Admin/Users.vue')
+					},
+					{
+						path: ':id',
+						name: 'User',
+						component: () => import('@/views/Admin/Users.vue'),
+						props: (route) => ({
+							id: route.query.id
+						})
+					},
+				]
+			},
+			{
+				path: 'patrons',
+				name: 'Patrons',
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					baseName: 'Patrons',
+					requiresAuth: true,
+					requiresAdmin: true
+				},
+				children: [
+					{
+						path: "",
+						component: () => import('@/views/Admin/Patrons')
+					},
+					{
+						path: 'new',
+						name: 'New patron',
+						component: () => import('@/views/Admin/Patrons/New')
+					},
+					{
+						path: ':id',
+						name: 'Patron',
+						component: () => import('@/views/Admin/Patrons')
+					},
+				]
+			},
+		]
+	},
+	{
+		path: '/admin/xml',
+		name: 'GenerateXML',
+		component: GenerateXML,
+		meta: {
+			basePath: '/admin',
+			baseName: 'Generate XML',
+			requiresAuth: true,
+			requiresAdmin: true
+		}
 	},
 
 	// DEMO ENCOUNTER
@@ -524,88 +606,6 @@ export const routes = [{
 		}
 	},
 
-	//ADMIN
-	{
-		path: '/admin',
-		name: 'Admin',
-		component: Admin,
-		meta: {
-			basePath: '/admin',
-			title: 'admin',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/users',
-		name: 'Users',
-		component: Users,
-		meta: {
-			baseName: 'Users',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/users/:id',
-		name: 'User',
-		component: Users,
-		props: (route) => ({
-			id: route.query.id
-		}),
-		meta: {
-			basePath: '/admin',
-			baseName: 'Users',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/patrons',
-		name: 'Patrons',
-		component: Patrons,
-		meta: {
-			baseName: 'Patrons',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/patrons/new',
-		name: 'New patron',
-		component: NewPatron,
-		meta: {
-			baseName: 'Patrons',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/patrons/:id',
-		name: 'Patron',
-		component: Patrons,
-		props: (route) => ({
-			id: route.query.id
-		}),
-		meta: {
-			basePath: '/admin',
-			baseName: 'Patrons',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-	{
-		path: '/admin/xml',
-		name: 'GenerateXML',
-		component: GenerateXML,
-		meta: {
-			basePath: '/admin',
-			baseName: 'Generate XML',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
-	},
-
 	// REDIRECT OLD PATHS
 	{ path: "/campaigns", redirect: "/content/campaigns" },
 	{ path: "/players", redirect: "/content/players" },
@@ -617,7 +617,7 @@ export const routes = [{
 	{
 		path: '/companions/:userid/:id',
 		name: 'Edit Companion',
-		component:  () => import('@/views/Content/Npcs/EditNpc.vue'),
+		component:  () => import('@/views/UserContent/Npcs/EditNpc.vue'),
 		meta: {
 			basePath: '/companions',
 			title: 'Companion',

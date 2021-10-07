@@ -67,7 +67,7 @@
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy :offset="[9, 0]">
+					<q-popup-proxy dark :offset="[9, 0]">
 						<div class="bg-neutral-10">
 							<q-list>
 								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">

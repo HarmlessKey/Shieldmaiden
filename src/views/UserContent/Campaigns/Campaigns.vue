@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<template v-if="players && tier">
+	<div v-if="tier">
+		<template v-if="players">
 			<hk-card>
 				<div slot="header" class="card-header">
 					<span>
@@ -274,7 +274,7 @@
 				.value()
 			},
 			slotsLeft() {
-				return this.tier.benefits.campaigns - Object.keys(this.campaigns).length
+				return this.tier ? this.tier.benefits.campaigns - Object.keys(this.campaigns).length : 0;
 			}
 		},
 		methods: {

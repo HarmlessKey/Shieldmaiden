@@ -21,8 +21,10 @@
     <hk-card small>
       <div class="card-body">
         <Adsense
-            data-ad-client="ca-pub-2711721977927243"
-            data-ad-slot="2613883680">
+          data-ad-client="ca-pub-2711721977927243"
+          data-ad-slot="2613883680"
+          data-ad-test="on"
+        >
         </Adsense>
       </div>
       <div slot="footer" class="card-footer">

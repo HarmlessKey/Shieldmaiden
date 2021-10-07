@@ -12,7 +12,7 @@
 				</template>
 
 				<template slot="character_name" slot-scope="data">
-					<router-link :to="'/characters/' + data.row.key">
+					<router-link :to="`/content/characters/${data.row.key}`">
 						{{ data.row.character.character_name }}
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit
@@ -25,7 +25,7 @@
 				</template>
 
 				<div slot="actions" slot-scope="data" class="actions">
-					<router-link class="gray-hover mx-1" :to="'/characters/' + data.row.key">
+					<router-link class="btn btn-sm bg-neutral-5" :to="`/content/characters/${data.row.key}`">
 						<i class="fas fa-pencil"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Edit

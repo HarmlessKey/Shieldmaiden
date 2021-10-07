@@ -31,13 +31,13 @@
 							@click="setDialog(name)"
 						>
 							<q-item-section avatar>
-								<i :class="icon" />
+								<i :class="icon" class="neutral-2" />
 							</q-item-section>
 							<q-item-section>
 								{{ title }}
 							</q-item-section>
 							<q-item-section avatar>
-								<i class="fas fa-eye gray-hover" />
+								<i class="fas fa-eye neutral-3" />
 							</q-item-section>
 						</q-item>
 					</q-list>
@@ -139,7 +139,7 @@
 <style lang="scss" scoped>
 	.share {
 		padding-bottom: 100px;
-		background-color: #111111;
+		background-color: $neutral-9;
 
 		.video-wrapper {
 			padding: 0 80px;

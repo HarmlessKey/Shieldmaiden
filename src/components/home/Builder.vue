@@ -30,7 +30,7 @@
 	.builder {
 		padding-bottom: 100px;
 		// min-height: calc(100vh - 50px - 55px);
-		background-color: #181818;
+		background-color: $neutral-8;
 
 		.head {
 			padding-bottom: 30px;

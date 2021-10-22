@@ -729,7 +729,7 @@ html body {
 		cursor: pointer;
 		border-radius: $border-radius-small;
 		background: $blue;
-		color: $neutral-1 !important;
+		color: $neutral-1;
 		border: none;
 		display: inline-block;
     font-weight: 400;
@@ -745,13 +745,13 @@ html body {
 			background-color 0.15s ease-in-out;
 		
 		&:focus, &.active {
-			outline: none !important;
-			box-shadow: none !important;
+			outline: none;
+			box-shadow: none;
 		}
 		&.disabled {
-			cursor: not-allowed !important;
+			cursor: not-allowed;
 			opacity: .3;
-			color: $neutral-1 !important;
+			color: $neutral-1;
 		}
 		&:hover {
 			background-color: $blue-hover;

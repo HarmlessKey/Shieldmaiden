@@ -11,6 +11,9 @@
   --neutral-2: #B9BBBE; // Icons header
   --neutral-1: #FFFFFF; // Text
 
+  --black: #000;
+  --white: #FFF;
+
   --green: #83b547;
   --green-hover: #9ddb51;
   --blue: #2c97de;
@@ -88,8 +91,8 @@ $neutral-3: var(--neutral-3);
 $neutral-2: var(--neutral-2);
 $neutral-1: var(--neutral-1);
 
-$black: #000; // Keep
-$white: #FFF; // Keep
+$black: --black; // Keep
+$white: --white; // Keep
 
 $gray: #262626;
 $gray-darker: #232323;

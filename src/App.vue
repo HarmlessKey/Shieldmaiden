@@ -176,6 +176,9 @@
 			slide: 'getSlide',
 			storeBroadcast: 'broadcast'
 		}),
+		...mapGetters([
+			"theme"
+		]),
 		announcement: {
 			get() {
 				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
@@ -204,22 +207,22 @@
 		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
-		this.setTips();
+		this.initialize();
 
-		if(auth.currentUser !== null) {
-			this.setUser();
-			this.setUserInfo();
-			this.setUserSettings();
-			// players need prio!
-			this.fetchPlayers();
-			this.fetchNpcs();
-			this.fetchCampaigns();
-			this.fetchAllEncounters();
-		}
+		// if(auth.currentUser !== null) {
+		// 	this.setUser();
+		// 	this.setUserInfo();
+		// 	this.setUserSettings();
+		// 	// players need prio!
+		// 	this.fetchPlayers();
+		// 	this.fetchNpcs();
+		// 	this.fetchCampaigns();
+		// 	this.fetchAllEncounters();
+		// }
 	},
 	mounted() {
 		//Set theme
-		document.documentElement.setAttribute("data-theme", "dark");
+		document.documentElement.setAttribute("data-theme", this.theme);
 
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
@@ -243,7 +246,7 @@
 	},
 	methods: {
 		...mapActions([
-			"setTips",
+			"initialize",
 			"fetchCampaigns",
 			"fetchAllEncounters",
 			"fetchPlayers",

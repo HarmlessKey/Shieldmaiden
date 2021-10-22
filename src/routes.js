@@ -63,8 +63,8 @@ export const routes = [{
 	// CONTENT
 	{
 		path: "/content",
-		component: () => import("@/views/View"),
 		name: "Content",
+		component: () => import("@/views/View"),
 		meta: {
 			requiresAuth: true
 		},

@@ -18,6 +18,7 @@ export const content_module = {
 		content_count: {},
 		active_campaign: undefined, 
 
+		userSettings: {},
 		campaign: {},
 		campaigns: {},
 		allEncounters: {},
@@ -149,10 +150,18 @@ export const content_module = {
 			}
 		},
 		async setUserSettings({ commit, rootGetters }) {
-			let settings = await settings_ref.child(rootGetters.user.uid);
+			const uid = rootGetters.user.uid;
+			let settings = await settings_ref.child(uid);
 			settings.on('value', async settings_snapshot => {
-				const user_settings = settings_snapshot.val();
+				const user_settings = await settings_snapshot.val();
 				commit('SET_USER_SETTINGS', user_settings);
+			});
+
+			// Return a promise, so you can wait for it in the initialize function from store/general.js
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					resolve()
+				}, 1000)
 			});
 		},
 		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },

@@ -65,13 +65,26 @@
 			</q-select>
 		</div>
 
+		<h3 class="mt-3">Theme</h3>
+		<div class="theme">
+			<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+				<img src="@/assets/_img/dark.webp" />
+				Dark
+			</a>
+			<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+				<img src="@/assets/_img/light.webp" />
+				Light
+			</a>
+		</div>
+
 		<a class="btn bg-neutral-5 mt-3" @click="setDefault()">Reset to default</a>
 	</div>
 </template>
 
 <script>
 	import { db } from '@/firebase';
-	import Keybindings from '@/components/slides/Keybindings.vue'
+	import Keybindings from '@/components/slides/Keybindings.vue';
+	import { mapActions } from "vuex";
 
 	export default {
 		name: 'General',
@@ -169,6 +182,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setTheme"
+			]),
 			setSetting(type, value) {
 				if(value == undefined) {
 					db.ref(`settings/${this.userId}/general/${type}`).remove();
@@ -197,6 +213,33 @@
 	.q-field__control {
 		.q-item {
 			width: 100%;
+		}
+	}
+	.theme {
+		display: flex;
+		justify-content: flex-start;
+
+		a {
+			margin-right: 10px;
+			border: solid 1px transparent;
+			border-radius: $border-radius;
+			padding: 5px;
+			text-align: center;
+			color: $neutral-3;
+
+			&:hover, &.active {
+				border-color: $blue;
+				color: $neutral-1;
+			}
+			&:last-child {
+				margin: 0;
+			}
+			img {
+				width: 100%;
+				max-width: 250px;
+				display: block;
+				margin-bottom: 5px;
+			}
 		}
 	}
 </style>

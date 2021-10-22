@@ -1,4 +1,4 @@
-import { db } from '@/firebase';
+import { auth, db } from '@/firebase';
 import Vue from 'vue';
 import { browserDetect } from '../../functions';
 
@@ -6,6 +6,7 @@ const settings_ref = db.ref('settings');
 
 export const general_module = {
 	state: {
+		theme: undefined,
 		slide: {},
 		rolls: [],
 		action_rolls: [],
@@ -15,6 +16,7 @@ export const general_module = {
 		browser: browserDetect()
 	},
 	getters: {
+		theme: (state) => { return state.theme },
 		getSlide: function( state ) { return state.slide; },
 		rolls: function( state ) { return state.rolls; },
 		action_rolls: function( state ) { return state.action_rolls; },
@@ -24,6 +26,50 @@ export const general_module = {
 		browser: function( state ) { return state.browser; },
 	},
 	actions: {
+		// Initialize basic settings depending on a user being logged in or not.
+		async initialize({ dispatch }) {
+			dispatch("setTips");
+
+			if(auth.currentUser !== null) {
+					dispatch("setUser");
+					await dispatch("setUserSettings"); // wait for settings in order to set theme correctly
+					dispatch("setUserInfo");
+					// players need prio!
+					dispatch("fetchPlayers");
+					dispatch("fetchNpcs");
+					dispatch("fetchCampaigns");
+					dispatch("fetchAllEncounters");
+			}
+			// Theme set after user, so it can be taken from the userSettings
+			dispatch("setTheme");
+		},
+		setTheme({ commit, state, rootGetters }, theme) {
+			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
+			
+			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
+			if(!theme) {
+				if(uid) {
+					theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : "dark";
+				} else {
+					theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : "dark";
+				}
+				document.documentElement.setAttribute("data-theme", theme);
+				commit("SET_THEME", theme);
+			} 
+			// Set the new choosen theme
+			else {
+				if(theme !== state.theme) {
+					if(uid) {
+						settings_ref.child(uid).child("general/theme").set(theme);
+					} else {
+						localStorage.setItem("theme", theme);
+					}
+					document.documentElement.setAttribute("data-theme", theme);
+					commit("SET_THEME", theme);
+				}
+			}
+
+		},
 		setRoll({ commit, state }, newRoll) {
 			let current = state.rolls;
 			newRoll.date = new Date();
@@ -118,6 +164,7 @@ export const general_module = {
 		}
 	},
 	mutations: {
+		SET_THEME(state, payload) { Vue.set(state, 'theme', payload); },
 		SET_SLIDE(state, payload) { Vue.set(state, 'slide', payload); },
 		SET_ROLLS(state, payload) { Vue.set(state, 'rolls', payload); },
 		SET_ACTION_ROLLS(state, payload) { Vue.set(state, 'action_rolls', payload); },

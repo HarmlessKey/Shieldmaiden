@@ -1,5 +1,21 @@
 [data-theme="light"] {
 	body {
 		background: $neutral-10;
+
+		.btn {
+			color: $neutral-11;
+
+			&-clear {
+				color: $neutral-2;
+
+				&:hover {
+					color: $neutral-11;
+				}
+			}
+		}
+
+		.green {
+			color: $green-hover !important;
+		}
 	}
 }

@@ -114,7 +114,7 @@
 				</a>
 			</div>
 		</h2>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div class="current">
 				<!-- SINGLE TARGET -->
 				<template v-if="targeted.length === 1">

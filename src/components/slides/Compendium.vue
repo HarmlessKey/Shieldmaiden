@@ -18,7 +18,7 @@
 
 		<q-tabs
 				v-model="current"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				no-caps
 				class="my-3"
 			>
@@ -37,7 +37,7 @@
 
 		<template v-if="current">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				:placeholder="`Search ${current}`"
 				type="text" 
 				class="mb-2"

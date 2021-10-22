@@ -28,10 +28,25 @@
 							</q-tooltip>
 						</a>
 					</div>
-					<q-separator vertical dark inset class="mx-1" />
+					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 				</div>
 
 				<div class="area d-flex justify-content-end">
+					<a class="icon" v-if="!user">
+						<i class="fas fa-moon"/>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+							<div class="theme">
+								<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+									<img src="@/assets/_img/dark.webp" />
+									Dark
+								</a>
+								<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+									<img src="@/assets/_img/light.webp" />
+									Light
+								</a>
+							</div>
+						</q-popup-proxy>
+					</a>
 					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i class="fas fa-keyboard"/>
@@ -63,11 +78,11 @@
 						</q-tooltip>
 					</a>
 				</div>
-				<q-separator vertical dark inset class="mx-1" />
+				<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy dark :offset="[9, 0]">
+					<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 						<div class="bg-neutral-10">
 							<q-list>
 								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
@@ -151,7 +166,8 @@
 		methods: {
 			...mapActions([
 				'setSlide',
-				'setSideSmallScreen'
+				'setSideSmallScreen',
+				'setTheme'
 			]),
 			showSlide(type) {
 				this.setSlide({
@@ -220,6 +236,32 @@ a.icon {
 		background-size: 22px 22px;
 		background-position: center;
 		background-repeat: no-repeat;
+	}
+}
+.theme {
+	padding: 15px;
+	text-align: center;
+
+	a {
+		display: block;
+		margin-bottom: 10px;
+
+		&:last-child {
+			margin: 0;
+		}
+		border: solid 1px transparent;
+		border-radius: $border-radius;
+		padding: 3px;
+		color: $neutral-3;
+
+		&:hover, &.active {
+			border-color: $blue;
+			color: $neutral-1;
+		}
+		img {
+			max-width: 150px;
+			display: block;
+		}
 	}
 }
 .user	{

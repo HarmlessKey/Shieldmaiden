@@ -2,13 +2,13 @@
 	<div>
 		<h3 v-if="targeted.length === 0" class="red text-center">Select a target</h3>
 		<template v-else>
-			<q-checkbox dark v-model="crit" label="Critical hit" indeterminate-value="something-else" />
+			<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="crit" label="Critical hit" indeterminate-value="something-else" />
 
 			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense class="mb-2"/>
 
 			<div class="manual">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					type="number" 
 					v-model="manualAmount" 
 					v-validate="'numeric'" 

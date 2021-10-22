@@ -8,11 +8,11 @@
 		</ul>
 		<hr>
 		<template v-if="condition_targets.length > 0">
-			<q-list dark square :class="`accordion`">
+			<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 				<q-expansion-item
 					v-for="({value, name, condition, effects }, index) in conditionList"
 					:key="index"
-					dark switch-toggle-side
+					:dark="$store.getters.theme === 'dark'" switch-toggle-side
 					:group="name"
 				>
 					<template v-slot:header>

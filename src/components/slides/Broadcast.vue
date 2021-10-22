@@ -14,7 +14,7 @@
 		</p>
 		
 		<q-select
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			v-model="shares"
 			:options="options"
 			label="Share"
@@ -30,7 +30,7 @@
 						<q-item-label>Select All</q-item-label>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="all" @input="checkAll"/>
+						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="all" @input="checkAll"/>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -43,7 +43,7 @@
 						<q-item-label v-html="scope.opt.label"/>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
+						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
 					</q-item-section>
 				</q-item>
 			</template>

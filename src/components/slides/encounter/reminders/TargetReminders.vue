@@ -16,7 +16,7 @@
 
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps
@@ -62,7 +62,7 @@
 							<div v-if="varOptions === key" class="variables">
 								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
 									<q-select 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										:label="var_key"
 										:options="variable"
 										type="text" 

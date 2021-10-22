@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-input 
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Title"
 			type="text"
 			autocomplete="off"
@@ -19,7 +19,7 @@
 		</div>
 
 		<q-select 
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			map-options
 			emit-value
 			label="Trigger"
@@ -33,7 +33,7 @@
 
 		<div v-if="reminder.trigger === 'timed'" class="my-2">
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Rounds"
 				name="rounds"
 				type="number" 
@@ -48,7 +48,7 @@
 
 		<div class="mb-3">
 			<q-field
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				:hint="
 					reminder.action == 'notify' 
 					? 'You\'ll get the option to keep or remove the reminder.'
@@ -56,7 +56,7 @@
 				"
 			>
 				<q-option-group
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					:options="actions"
 					label="Action"
 					type="radio"
@@ -65,7 +65,7 @@
 			</q-field>
 			
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Notification"
 				class="mt-3"
 				name="notification" 
@@ -87,7 +87,7 @@
 			</label>
 			<div class="mb-3">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="New variable name"
 					name="var_name"
 					type="text" 
@@ -131,7 +131,7 @@
 						</button>
 					</div>
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Option"
 						:disable="selectOptions && reminder.selectedVars[key] === reminder.variables[key][i]"
 						:name="'option'+key"

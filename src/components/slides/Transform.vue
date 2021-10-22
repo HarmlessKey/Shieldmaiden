@@ -6,7 +6,7 @@
 			<div class="row q-col-gutter-md">
 				<div class="col">
 					<q-input 
-						dark square filled
+						:dark="$store.getters.theme === 'dark'" square filled
 						label="Armor class"
 						autocomplete="off"
 						type="number" 
@@ -19,7 +19,7 @@
 				
 				<div class="col">
 					<q-input 
-						dark square filled
+						:dark="$store.getters.theme === 'dark'" square filled
 						label="Hit points"
 						autocomplete="off"
 						type="number" 

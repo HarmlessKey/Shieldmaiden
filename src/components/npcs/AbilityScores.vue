@@ -5,7 +5,7 @@
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							:label="ability.capitalize()"
 							autocomplete="off"  
 							type="number" 
@@ -26,7 +26,7 @@
 					</div>
 					<div class="col pt-4">
 						<q-checkbox 
-							dark 
+							:dark="$store.getters.theme === 'dark'" 
 							v-model="npc.saving_throws" 
 							:val="ability"
 							:false-value="null" 

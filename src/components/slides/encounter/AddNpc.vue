@@ -5,7 +5,7 @@
 		<q-tabs
 			v-if="!demo"
 			v-model="tab"
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			inline-label
 			dense
 			no-caps
@@ -23,7 +23,7 @@
 			<q-tab-panel name="npc">
 				<q-form @submit="addNPC()">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						autocomplete="off"
 						label="Name"
 						type="text" 
@@ -36,7 +36,7 @@
 					<div class="row q-col-gutter-md mb-2">
 						<div class="col">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								autocomplete="off"
 								label="Initiative"
 								type="number" 
@@ -58,7 +58,7 @@
 						</div>
 						<div class="col">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								autocomplete="off"
 								label="Armor class"
 								type="number" 
@@ -71,7 +71,7 @@
 						</div>
 						<div class="col">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								autocomplete="off"
 								label="Hit points"
 								type="number" 
@@ -90,7 +90,7 @@
 						spread
 						no-caps
 						flat
-						dark
+						:dark="$store.getters.theme === 'dark'"
 						:options="options"
 						toggle-color="primary"
 					/>
@@ -102,7 +102,7 @@
 				
 				<p>Search all NPC's, including your custom.</p>
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Search NPC"
 					type="text" 
 					autocomplete="off" 
@@ -135,7 +135,7 @@
 								<q-checkbox 
 									slot="append"
 									size="s" 
-									dark 
+									:dark="$store.getters.theme === 'dark'" 
 									:false-value="undefined" 
 									indeterminate-value="something-else"
 									v-model="selectedPlayers"
@@ -143,7 +143,7 @@
 									:label="player.character_name"
 								/>
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									type="number" 
 									placeholder="Initiative"
 									v-model="playerInitiative[key]"
@@ -162,7 +162,7 @@
 						spread
 						no-caps
 						flat
-						dark
+						:dark="$store.getters.theme === 'dark'"
 						:options="options"
 						toggle-color="primary"
 					/>

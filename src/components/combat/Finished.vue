@@ -34,7 +34,7 @@
 				<div class="col-12 col-md-7 mb-4">
 						<q-tabs
 							v-model="tab"
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							indicator-color="transparent"
 							no-caps
 							dense
@@ -77,7 +77,7 @@
 									<div v-for="(coin, key) in currencies" :key="key">
 										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
 										<q-input
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											class="text-center"
 											:disable="encounter.currency_awarded"
 											autocomplete="off" 

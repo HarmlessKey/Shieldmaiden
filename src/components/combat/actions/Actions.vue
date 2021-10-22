@@ -3,7 +3,7 @@
 		<template v-if="selectEntity">
 			<p>Action performed by:</p>
 			<q-select 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				name="doneBy"
 				:value="doneBy"
 				:options="_active"
@@ -89,7 +89,7 @@
 		<template v-if="doneBy">
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps

@@ -41,7 +41,7 @@
 					<Rewards v-else :encounter="encounter"/>
 				</div>
 				<div class="side">
-					<q-scroll-area dark :thumb-style="{ width: '5px'}" class="during-encounter">
+					<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" class="during-encounter">
 						<div class="meters-wrapper">
 							<Meters 
 								v-if="sideDisplay === 'damage' && playerSettings.meters === undefined"
@@ -72,7 +72,7 @@
 			<div v-else class="track mobile">
 				<div class="bg-gray-dark">
 					<q-select
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						v-model="panel"
 						:options="panels"
 					>

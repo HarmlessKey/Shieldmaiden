@@ -12,8 +12,8 @@
 			<q-tooltip :anchor="position.anchor" :self="position.self" v-if="tooltip">
 				{{ tooltip }} {{ Object.keys(advantage).length === 1 ? `with ${Object.keys(advantage)[0]}` : `` }}
 			</q-tooltip>
-			<q-popup-proxy no-parent-event ref="rollPopup">
-				<q-list class="bg-gray gray-light" square dark :breakpoint="576">
+			<q-popup-proxy no-parent-event ref="rollPopup" :breakpoint="576">
+				<q-list class="bg-gray gray-light" square :dark="$store.getters.theme === 'dark'">
 					<q-item>
 						<q-item-section>
 							<b>{{ roll ? roll.title : tooltip }}</b>

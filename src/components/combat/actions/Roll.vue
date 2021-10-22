@@ -7,7 +7,7 @@
 				<q-tabs
 					class="mt-3"
 					v-model="tab"
-					dark inline-label dense no-caps
+					:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
 				>
 					<template v-for="({name, label, type}, index) in action_types">
 						<q-tab 
@@ -50,11 +50,11 @@
 							</div>
 						</div>
 
-						<q-list v-if="current[type]" dark square :class="`accordion`">
+						<q-list v-if="current[type]" :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 							<q-expansion-item 
 								v-for="(action, action_index) in current[type]" 
 								:key="`action-${action_index}`"
-								dark switch-toggle-side
+								:dark="$store.getters.theme === 'dark'" switch-toggle-side
 								expand-icon-class="hidden-toggle"
 								:group="type"
 								:name="name"
@@ -121,7 +121,7 @@
 									</q-item-section>
 									<q-item-section avatar v-if="action.action_list && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
 										<span v-if="action.versatile" class="roll-button" @click.stop>
-											<q-popup-proxy square dark>
+											<q-popup-proxy square :dark="$store.getters.theme === 'dark'">
 												<div class="bg-gray">
 													<q-item>
 														<q-item-section>
@@ -129,7 +129,7 @@
 														</q-item-section>
 													</q-item>
 													<q-separator />
-													<q-list dark square>
+													<q-list :dark="$store.getters.theme === 'dark'" square>
 														<q-item clickable v-close-popup>
 															<q-item-section avatar>1</q-item-section>
 															<q-item-section>

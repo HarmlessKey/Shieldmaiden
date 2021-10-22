@@ -32,7 +32,7 @@
 					<!-- DICE COUNT -->
 					<div class="col">
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							:label="`Dice count ${index == 1 ? option.label : ''}`"
 							v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
 							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
@@ -51,7 +51,7 @@
 					<div class="col">
 						<!-- DICE TYPE -->
 						<q-select 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							map-options emit-value
 							clearable
 							:label="`Dice type ${index == 1 ? option.label : ''}`"
@@ -63,7 +63,7 @@
 					<div class="col">
 						<!-- MODIFIER FIXED VALUE -->
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							:label="`Fixed value ${index == 1 ? option.label : ''}`"
 							v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
 							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
@@ -104,7 +104,7 @@
 
 		<!-- PROJECTILE COUNT -->
 		<q-input 
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Projectile count"
 			v-model="roll.projectile_count"
 			autocomplete="off"
@@ -127,7 +127,7 @@
 		<!-- FAIL MODIFIER -->
 		<q-select 
 			v-if="action_type === 'save'"
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			map-options
 			emit-value
 			label="Succesful save"
@@ -139,7 +139,7 @@
 		/>
 		<q-select 
 			v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			map-options
 			emit-value
 			label="Miss modifier"
@@ -154,7 +154,7 @@
 		<!-- SPECIAL ACTIONS -->
 		<div class="col-12 col-md-3">
 			<q-select 
-				dark filled square multiple
+				:dark="$store.getters.theme === 'dark'" filled square multiple
 				map-options
 				emit-value
 				label="Special events"
@@ -190,7 +190,7 @@
 					<!-- HL LEVEL SCALE -->
 					<div>
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Scale size"
 							v-model="level_tier.level"
 							autocomplete="off"
@@ -205,7 +205,7 @@
 							<!-- HL DICE COUNT -->
 							<div class="col">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Dice count"
 									v-model="level_tier.dice_count"
 									autocomplete="off"
@@ -217,7 +217,7 @@
 							<div class="col">
 								<!-- HL MODIFIER DICETYPE -->
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Dice type"
@@ -229,7 +229,7 @@
 							</div>
 							<div class="col">
 								<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Fixed value"
 										v-model="level_tier.fixed_val"
 										autocomplete="off"
@@ -241,7 +241,7 @@
 						</div>
 
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Projectile count"
 							v-model="level_tier.projectile_count"
 							autocomplete="off"

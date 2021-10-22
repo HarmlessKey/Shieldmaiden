@@ -1,7 +1,7 @@
 <template>
 	<q-expansion-item
 		class="request" 
-		dark switch-toggle-side
+		:dark="$store.getters.theme === 'dark'" switch-toggle-side
 		group="requests"
 	>
 		<template #header>

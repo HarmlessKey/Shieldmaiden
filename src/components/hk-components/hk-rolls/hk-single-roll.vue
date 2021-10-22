@@ -84,7 +84,7 @@
 					<q-btn-toggle
 						v-model="hitOrMiss[action_index]"
 						class="mb-3"
-						spread no-caps dark dense square
+						spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 						toggle-color="primary"
 						color="gray"
 						:options="[
@@ -116,7 +116,7 @@
 					<q-btn-toggle
 						v-model="savingThrowResult[action_index]"
 						class="mb-3"
-						spread no-caps dark dense square
+						spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 						toggle-color="primary"
 						color="gray"
 						:options="[
@@ -127,11 +127,11 @@
 				</template>
 
 				<!-- DAMAGE / HEALING ROLLS -->
-				<q-list dark square :class="`accordion`">
+				<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 					<q-expansion-item
 						v-for="(rolled, rolled_index) in action.rolls" 
 						:key="`rolled-${rolled_index}`"
-						dark switch-toggle-side
+						:dark="$store.getters.theme === 'dark'" switch-toggle-side
 						:group="`rolled-${index}`"
 					>
 						<template #header>
@@ -206,12 +206,12 @@
 									</div>
 									<div class="d-flex justify-content-end">
 										<template v-if="parseInt(rolled.modifierRoll.mod)">
-											<q-separator vertical dark />
+											<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 											<div class="throws-modifier">
 												{{ rolled.modifierRoll.mod }}
 											</div>
 										</template>
-										<q-separator vertical dark />
+										<q-separator vertical :dark="$store.getters.theme === 'dark'" />
 										<div class="throws-total">
 											<hk-animated-integer :value="rolled.modifierRoll.total" />
 										</div>

@@ -17,7 +17,7 @@
 
 				<template v-for="(input, i) in damage">
 					<q-input
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Amount"
 						:key="`damage-${i}`"
 						class="amount"
@@ -55,7 +55,7 @@
 
 		<template v-if="type === 'healing'">
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				autocomplete="off"
 				type="number" 
 				v-model="healingAmount" 

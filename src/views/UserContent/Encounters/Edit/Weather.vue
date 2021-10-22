@@ -1,7 +1,7 @@
 <template>
-	<q-list dense dark>
+	<q-list dense :dark="$store.getters.theme === 'dark'">
 		<q-item v-for="({name, icon}, key) in weather_effects" :key="`effect-${key}`">
-			<q-item-section dark avatar>
+			<q-item-section :dark="$store.getters.theme === 'dark'" avatar>
 				<q-icon :name="icon" :class="(weather.smoke && key === 'fog') ? 'neutral-5' : ''" />
 				<q-tooltip anchor="top middle" self="center right">
 					{{ name }}
@@ -26,7 +26,7 @@
 					:min="0"
 					:max="3"
 					markers
-					dark
+					:dark="$store.getters.theme === 'dark'"
 				/>
 			</q-item-section>
 		</q-item>

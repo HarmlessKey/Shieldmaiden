@@ -56,7 +56,7 @@
 			<q-dialog v-model="copy_dialog">
 				<hk-card header="Copy Existing NPC">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Search NPC"
 						type="text" 
 						autocomplete="off" 
@@ -69,7 +69,7 @@
 						</template>
 					</q-input>
 					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<q-list dark>
+					<q-list :dark="$store.getters.theme === 'dark'">
 						<q-item v-for="(npc, index) in searchResults" :key="index">
 							<q-item-section>
 								{{ npc.name.capitalizeEach() }}

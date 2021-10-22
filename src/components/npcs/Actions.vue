@@ -41,7 +41,7 @@
 						</h3>
 						<q-input
 							v-if="category === 'legendary_actions'"
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Count"
 							v-model.number="npc.legendary_count"
 							type="number"
@@ -55,11 +55,11 @@
 						/>
 
 						<!-- ABILITIES -->
-						<q-list dark square :class="`accordion`">
+						<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 							<q-expansion-item
 								v-for="(ability, ability_index) in npc[category]" 
 								:key="`ability-${ability_index}`"
-								dark switch-toggle-side
+								:dark="$store.getters.theme === 'dark'" switch-toggle-side
 								:group="name"
 								:name="name"
 								enter-active-class="animated animate__fadeIn" 
@@ -68,8 +68,8 @@
 								<template v-slot:header>
 									<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 										<span v-if="ability.versatile" class="roll-button" @click.stop>
-											<q-popup-proxy square dark>
-												<q-list dark square>
+											<q-popup-proxy square :dark="$store.getters.theme === 'dark'">
+												<q-list :dark="$store.getters.theme === 'dark'" square>
 													<q-item>
 														<q-item-section>
 															<b>{{ ability.name }}</b>
@@ -121,7 +121,7 @@
 								<div class="accordion-body">
 									<q-input 
 										v-if="category === 'legendary_actions'"
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Legendary actions"
 										autocomplete="off" 
 										type="number" 
@@ -137,7 +137,7 @@
 									/>
 
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Name"
 										autocomplete="off" 
 										class="mb-3" 
@@ -153,7 +153,7 @@
 									<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
 										<div class="col">
 											<q-input
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Recharge"
 												autocomplete="off" 
 												v-model="ability.recharge" 
@@ -164,7 +164,7 @@
 										<div class="col">
 											<div class="d-flex justify-content-start limit">
 												<q-input 
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													label="Limited uses"
 													autocomplete="off" 
 													type="number" 
@@ -174,7 +174,7 @@
 													:rules="[val => !val || val <= 9 || 'Max is 9']"
 												/>
 												<q-select
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													bottom-slots
 													label="Limit type"
 													class="limit-type"
@@ -187,7 +187,7 @@
 										</div>
 									</div>
 									<q-input
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										counter
 										label="Description"
 										autocomplete="off" 
@@ -204,7 +204,7 @@
 										<div class="row q-col-gutter-sm">
 											<div class="col">
 												<q-input
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													class="reach"
 													label="Reach"
 													v-model.number="ability.reach"
@@ -217,7 +217,7 @@
 											</div>
 											<div class="col">
 												<q-input
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													label="Range"
 													v-model="ability.range"
 													:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 20 or 20/60']"
@@ -227,7 +227,7 @@
 											</div>
 											<div class="col">
 												<q-select 
-													dark filled square clearable
+													:dark="$store.getters.theme === 'dark'" filled square clearable
 													emit-value
 													map-options
 													label="AOE type"
@@ -238,7 +238,7 @@
 											</div>
 											<div class="col">
 												<q-input 
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													label="AOE size"
 													type="number"
 													v-model.number="ability.aoe_size"
@@ -255,7 +255,7 @@
 										<div class="row q-col-gutter-md">
 												<div class="col-4 col-sm-3">
 													<q-checkbox 
-														dark
+														:dark="$store.getters.theme === 'dark'"
 														v-model="ability.versatile" 
 														label="Versatile" 
 														:false-value="null" 
@@ -266,7 +266,7 @@
 												<template v-if="ability.versatile">
 													<div class="col">
 														<q-input
-															dark filled square dense
+															:dark="$store.getters.theme === 'dark'" filled square dense
 															type="text"
 															label="Option 1 name"
 															maxlength="20"
@@ -280,7 +280,7 @@
 													</div>
 													<div class="col">
 														<q-input
-															dark filled square dense
+															:dark="$store.getters.theme === 'dark'" filled square dense
 															type="text"
 															label="Option 2 name"
 															maxlength="20"
@@ -302,7 +302,7 @@
 												<!-- ACTION TYPE -->
 												<div class="col">
 													<q-select 
-														dark filled square
+														:dark="$store.getters.theme === 'dark'" filled square
 														map-options
 														emit-value
 														label="Action type"
@@ -317,7 +317,7 @@
 												<template v-if="action.type === 'save'">
 													<div class="col">
 														<q-select 
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															map-options
 															emit-value
 															label="Save ability"
@@ -328,7 +328,7 @@
 													</div>
 													<div class="col">
 														<q-input
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															type="number"
 															label="Save DC"
 															v-model.number="action.save_dc"
@@ -342,7 +342,7 @@
 												<template v-else-if="!['healing', 'damage', 'other'].includes(action.type)">
 													<div class="col">
 														<q-input
-															dark filled square
+															:dark="$store.getters.theme === 'dark'" filled square
 															type="number"
 															label="Attack modifier"
 															v-model.number="action.attack_bonus"

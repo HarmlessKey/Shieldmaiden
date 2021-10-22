@@ -2,13 +2,13 @@
 	<div v-if="width > 576" class="track desktop" :class="{ isLive: live }">
 		<div class="players">
 			<h3>Campaign Players</h3>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 				<ViewPlayers :userId="userId" :campaignId="$route.params.campid" />
 			</q-scroll-area>
 		</div>
 		<div class="side">
 			<h3>Campaign wide meters</h3>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 				<Meters :entities="campaignPlayers" :players="players" :campaign="true" :npcs="{}" />
 			</q-scroll-area>
 		</div>
@@ -25,7 +25,7 @@
 	<div v-else class="track mobile">
 		<div class="bg-gray-dark">
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="panel"
 				:options="panels"
 			>

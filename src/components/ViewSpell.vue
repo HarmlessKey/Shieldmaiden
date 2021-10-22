@@ -39,7 +39,7 @@
 
 			<div class="input" v-if="spell.level_scaling === 'character_level'">
 				<q-input
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Character level"
 					id="casterLevel" 
 					type="number"
@@ -54,7 +54,7 @@
 			<!-- TO HIT MODIFIER INPUT -->
 			<div class="input" v-if="isToHit">
 				<q-input
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="To hit modifier"
 					id="toHit" 
 					type="text"

@@ -54,7 +54,7 @@
 								<q-form @submit="addEncounter">
 									<h2 class="mt-0">First encounter</h2>
 										<q-input
-											dark filled square
+											:dark="$store.getters.theme === 'dark'" filled square
 											label="Encounter title" 
 											type="text" 
 											autocomplete="off"
@@ -201,7 +201,7 @@
 					<hk-card header="New encounter" class="mb-0">
 						<div class="card-body">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Encounter title"
 								type="text" 
 								autocomplete="off" 

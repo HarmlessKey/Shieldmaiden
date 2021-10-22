@@ -3,7 +3,7 @@
 		<q-btn-toggle
 			:value="roll_type"
 			class="mb-3"
-			spread no-caps dark dense square
+			spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 			toggle-color="primary"
 			color="gray"
 			:options="[
@@ -16,14 +16,14 @@
 		<q-form>
 			<q-input
 				v-if="roll_type === 'attack'"
-				dark dennse filled square dense
+				:dark="$store.getters.theme === 'dark'" dennse filled square dense
 				type="number"
 				v-model="attack_bonus"
 				label="Attack bonus"
 			/>
 			<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
 				<q-select 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					map-options
 					emit-value
 					label="Save ability"
@@ -32,7 +32,7 @@
 					class="mr-1"
 				/>
 				<q-input
-					dark dennse filled square dense
+					:dark="$store.getters.theme === 'dark'" dennse filled square dense
 					type="number"
 					v-model="save_dc"
 					label="Save DC"
@@ -55,7 +55,7 @@
 				>
 					<q-input 
 						:ref="index"
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Roll"
 						autocomplete="off" 
 						v-model="custom_rolls[index].roll" 

@@ -9,7 +9,7 @@
 			<!-- MOBILE -->
 			<div v-if="screenWidth <= 576">
 				<q-tabs
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					inline-label
 					no-caps
 					indicator-color="transparent"
@@ -44,7 +44,7 @@
 		</div>
 
 		<!-- INITIATIVE LIST -->
-		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 			<div>
 				<table class="initiative-list targets">
 					<thead class='white text-shadow'>

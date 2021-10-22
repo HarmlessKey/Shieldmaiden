@@ -14,7 +14,7 @@
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-input 
-							dark filled square dense utofocus 
+							:dark="$store.getters.theme === 'dark'" filled square dense utofocus 
 							label="Initiative"
 							type="number" 
 							color="white" 
@@ -70,7 +70,7 @@
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-color 
-							square dark flat
+							square :dark="$store.getters.theme === 'dark'" flat
 							v-model="editable_entity.color_label" 
 							:palette="hkColors" 
 							default-view="palette"
@@ -120,7 +120,7 @@
 					<div class="bg-gray px-2 py-2">
 						<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 						<q-input 
-							dark filled square dense 
+							:dark="$store.getters.theme === 'dark'" filled square dense 
 							label="Armor class bonus"
 							type="number" 
 							color="white" 
@@ -143,7 +143,7 @@
 						</q-input>
 						<q-input 
 							class="mt-2"
-							dark filled square dense 
+							:dark="$store.getters.theme === 'dark'" filled square dense 
 							label="Override armor class"
 							type="number" 
 							color="white" 
@@ -228,7 +228,7 @@
 								<div class="bg-gray px-2 py-2">
 									<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 									<q-input 
-										dark filled square dense 
+										:dark="$store.getters.theme === 'dark'" filled square dense 
 										class="mb-2"
 										label="Temporary hit points"
 										type="number" 
@@ -251,7 +251,7 @@
 										/>
 									</q-input>
 									<q-input 
-										dark filled square dense 
+										:dark="$store.getters.theme === 'dark'" filled square dense 
 										label="Maxium hit point modifier"
 										type="number" 
 										color="white" 
@@ -275,7 +275,7 @@
 									</q-input>
 									<hr/>
 									<q-input 
-										dark filled square dense 
+										:dark="$store.getters.theme === 'dark'" filled square dense 
 										label="Override current hit points"
 										type="number" 
 										color="white"
@@ -299,7 +299,7 @@
 										/>
 									</q-input>
 									<q-input 
-										dark filled square dense 
+										:dark="$store.getters.theme === 'dark'" filled square dense 
 										label="Override maximum hit points"
 										type="number" 
 										color="white" 

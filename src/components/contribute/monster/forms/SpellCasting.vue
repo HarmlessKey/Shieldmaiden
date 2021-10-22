@@ -15,7 +15,7 @@
 				</div>
 
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					clearable
 					label="Spellcasting ability"
 					:options="abilities"
@@ -28,7 +28,7 @@
 					<div class="row q-col-gutter-sm">
 						<div class="col" v-if="casting.category === 'caster'">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Caster level"
 								v-model="npc[`${casting.category}_level`]"
 								type="number"
@@ -37,7 +37,7 @@
 						</div>
 						<div class="col">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Save DC"
 								v-model="npc[`${casting.category}_save_dc`]"
 								type="number"
@@ -46,7 +46,7 @@
 						</div>
 						<div class="col">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Spell attack"
 								v-model="npc[`${casting.category}_spell_attack`]"
 								type="number"
@@ -87,13 +87,13 @@
 
 					<template v-if="npc[`${casting.category}_spells`]">
 						<label class="d-block mb-2">Spells</label>
-						<q-list dark>
+						<q-list :dark="$store.getters.theme === 'dark'">
 							<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
 								<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
 									{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
-									<q-popup-edit dark square v-model.number="spell.limit" buttons>
+									<q-popup-edit :dark="$store.getters.theme === 'dark'" square v-model.number="spell.limit" buttons>
 										<q-checkbox 
-											size="sm" dark 
+											size="sm" :dark="$store.getters.theme === 'dark'" 
 											v-model="spell.limit"
 											label="At will" 
 											:true-value="0" 
@@ -104,7 +104,7 @@
 											@input="$forceUpdate()"
 										/>
 										<q-input 
-											dark
+											:dark="$store.getters.theme === 'dark'"
 											v-model.number="spell.limit" 
 											label="Limit"
 											type="number" 
@@ -144,7 +144,7 @@
 			<div>
 					<hk-card :header="(category === 'caster') ? 'Add spells' : 'Add innate spells'" class="mb-0">
 						<q-input
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Search spell"
 							v-model="spell_name"
 							class="mb-2"
@@ -155,7 +155,7 @@
 							</a>
 						</q-input>
 
-						<q-list dark v-if="spell_name && spells">
+						<q-list :dark="$store.getters.theme === 'dark'" v-if="spell_name && spells">
 							<q-item v-for="(spell, key) in spells" :key="key">
 								<q-item-section>
 									{{ spell.name }}

@@ -4,7 +4,7 @@
 			<hk-card header="General">
 				<div class="card-body">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="name"
 						autocomplete="off"
 						v-validate="'required'" 
@@ -16,7 +16,7 @@
 					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
 					<q-select 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Advancement"
 						emit-value
 						map-options
@@ -38,7 +38,7 @@
 						</div>
 						<div>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								autocomplete="off" 
 								v-validate="'url'" type="text" 
 								name="backbround" 

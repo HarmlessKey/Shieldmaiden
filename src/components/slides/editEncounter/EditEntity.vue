@@ -4,7 +4,7 @@
 	<div class="pb-5">
 		<h2>Edit <span class="blue">{{ npc.name }}</span></h2>
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Name"
 				type="text" 
 				name="name" 
@@ -16,7 +16,7 @@
 			<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 		<hr>
 			<q-input
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Avatar"
 				type="text" 
 				:class="{'input': true, 'error': errors.has('avatar') }" 
@@ -30,7 +30,7 @@
 			<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
 		<hr>
 			<q-input
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="npc.color_label"
 				label="Color label"
 				readonly
@@ -45,12 +45,12 @@
 			</q-input>
 		<hr>
 
-		<q-checkbox dark v-model="npc.friendly" label="Friendly NPC" color="positive" />
+		<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="npc.friendly" label="Friendly NPC" color="positive" />
 
 		<hr>
 			<div class="d-flex justify-content-between">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Armor class"
 					class="mr-2"
 					type="number" 
@@ -65,7 +65,7 @@
 				</q-input>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Hit points"
 
 					type="text" 

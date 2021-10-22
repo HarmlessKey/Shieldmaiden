@@ -11,7 +11,7 @@
 		</div>
 		<q-tabs
 			v-else
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			no-caps
 			indicator-color="transparent"
 		>

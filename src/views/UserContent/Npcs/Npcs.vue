@@ -112,7 +112,7 @@
 		</hk-card>
 		
 		<!-- PARSER DIALOG -->
-		<q-dialog dark v-model="old_dialog">
+		<q-dialog :dark="$store.getters.theme === 'dark'" v-model="old_dialog">
 			<hk-card header="Deprecated NPC's">
 				<template v-if="!parsing">
 					<div class="card-body">

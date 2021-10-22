@@ -19,7 +19,7 @@
 				</q-tooltip>
 			</a>
 		</h2>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div v-shortkey="{
 				downSingle: ['arrowdown'], 
 				downMultiple: ['shift', 'arrowdown'],
@@ -79,7 +79,7 @@
 							</div>
 							<a class="options">
 								<i class="fal fa-ellipsis-v"></i>
-								<q-popup-proxy square dark anchor="bottom right" self="top right" :breakpoint="576">
+								<q-popup-proxy square :dark="$store.getters.theme === 'dark'" anchor="bottom right" self="top right" :breakpoint="576">
 									<target-menu :entity="entity" />
 								</q-popup-proxy>
 							</a>

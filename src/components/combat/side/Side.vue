@@ -2,7 +2,7 @@
 	<div class="side">
 			<q-tabs
         v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				indicator-color="transparent"
 				dense
 				align="left"

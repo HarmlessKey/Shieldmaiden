@@ -1,6 +1,6 @@
 <template>
 	<q-select 
-		dark filled square
+		:dark="$store.getters.theme === 'dark'" filled square
 		:dense="dense"
 		:clearable="clearable"
 		:use-input="hide_selected"

@@ -61,7 +61,7 @@
 		<hk-card header="User info">
 			<div class="card-body">
 				<q-select
-					dark filled square multiple
+					:dark="$store.getters.theme === 'dark'" filled square multiple
 					label="contribute"
 					class="mb-3"
 					:options="contributes"
@@ -72,7 +72,7 @@
 				<h3>Link a Patreon account</h3>
 
 				<q-input
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					type="email"
 					label="Patreon Email"
 					v-model="user.patreon_email">
@@ -88,7 +88,7 @@
 				<h3>Gift user a subscription</h3>
 
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					emit-value
 					map-options
 					label="Tier"
@@ -100,14 +100,14 @@
 				</q-select>
 				
 				<q-option-group
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					v-model="duration"
 					:options="duration_options"
 				/>
 
 				<q-input 
 					v-if="duration === 'date'"
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Date"
 					type="text"
 					v-validate="'required'"
@@ -119,7 +119,7 @@
 				<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Message"
 					v-model="voucher.message" 
 					name="message" 

@@ -10,7 +10,7 @@
 					</q-tooltip>
 				</span>
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					:label="coin.name"
 					class="text-center"
 					autocomplete="off" 
@@ -55,7 +55,7 @@
 					</div>
 					<div v-if="editItem === item['.key']" class="card-body">
 						<q-input
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Public name"
 							class="mb-3"
 							id="name"
@@ -66,7 +66,7 @@
 							<template v-slot:append>
 								<q-icon name="info" @click.stop class="pointer">
 									<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-										<q-card dark square>
+										<q-card :dark="$store.getters.theme === 'dark'" square>
 											<q-card-section class="bg-neutral-9">
 												<b>Public name</b>
 											</q-card-section>
@@ -81,7 +81,7 @@
 						</q-input>
 
 						<q-input
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							autogrow
 							label="Public description"
 							id="desc"
@@ -114,8 +114,8 @@
 								</a>
 							</template>
 							<q-icon name="info" class="blue pointer">
-								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-									<q-card dark square>
+								<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+									<q-card :dark="$store.getters.theme === 'dark'">
 										<q-card-section class="bg-neutral-9">
 											<b>Linked item</b>
 										</q-card-section>

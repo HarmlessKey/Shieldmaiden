@@ -3,7 +3,7 @@
 		<div class="mb-2"><a @click="cancel">Cancel</a></div>
 		<h2>New Item</h2>
 		<q-input
-			dark filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square dense
 			label="Public name"
 			class="mb-3"
 			type="text" 
@@ -15,7 +15,7 @@
 			<template v-slot:append>
 				<q-icon name="info" @click.stop>
 					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card dark square>
+						<q-card :dark="$store.getters.theme === 'dark'" square>
 							<q-card-section class="bg-gray-active">
 								<b>Public name</b>
 							</q-card-section>
@@ -31,7 +31,7 @@
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
 		<q-input
-			dark filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square dense
 			autogrow
 			label="Public description"
 			class="mb-3" 
@@ -57,7 +57,7 @@
 
 		<h3>Link item</h3>
 		<q-input 
-			dark filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square dense
 			label="Search items"
 			type="text" 
 			autocomplete="off" 

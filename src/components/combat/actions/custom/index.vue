@@ -2,7 +2,7 @@
 	<div>
 		<q-tabs
 			v-model="tab"
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			inline-label
 			dense
 			no-caps

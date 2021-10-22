@@ -51,7 +51,7 @@
 	<div slot="actions" slot-scope="data">
 		<div class="monster-actions">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				class="multi_nr ml-2" 
 				autocomplete="off" 
 				type="number" 

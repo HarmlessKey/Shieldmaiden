@@ -25,7 +25,7 @@
 					<div v-for="(skill, key) in skillList" :key="key">
 						<q-checkbox 
 							size="xs" 
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							:val="key" 
 							v-model="npc.skills_expertise" 
 							:false-value="null" indeterminate-value="something-else"
@@ -42,7 +42,7 @@
 
 						<q-checkbox 
 							size="xs" 
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							:val="key" 
 							v-model="skills" 
 							:false-value="null" indeterminate-value="something-else"
@@ -67,14 +67,14 @@
 			</div>
 		</hk-card>
 
-		<q-dialog v-model="modifier_dialog" dark square>
+		<q-dialog v-model="modifier_dialog" :dark="$store.getters.theme === 'dark'" square>
 			<hk-card header="Skill modifiers">
 				<div class="card-body">
 					<div class="modifiers">
 						<q-input
 							v-for="(skill, key) in skillList"
 							:key="`mod-${key}`"
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							class="mb-2"
 							type="number"
 							:label="skill.skill"

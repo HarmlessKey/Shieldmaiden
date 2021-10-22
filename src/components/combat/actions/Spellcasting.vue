@@ -12,7 +12,7 @@
 		</hk-tip>
 		<q-tabs
 			v-model="tab"
-			dark inline-label dense no-caps
+			:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
 			:indicator-color="tabs.length === 1 ? 'transparent' : 'gray-light'"
 		>
 			<q-tab 
@@ -96,11 +96,11 @@
 						<div v-else>
 							{{ level }} each
 						</div>
-						<q-list dark square class="accordion mb-3">
+						<q-list :dark="$store.getters.theme === 'dark'" square class="accordion mb-3">
 							<q-expansion-item 
 								v-for="spell in spellsForLevel(tab, level)" 
 								:key="`${level}-${spell.key}`"
-								dark switch-toggle-side
+								:dark="$store.getters.theme === 'dark'" switch-toggle-side
 								expand-icon-class="hidden-toggle"
 								@show="showSpell = `${level}-${spell.key}`"
 								:group="tab"

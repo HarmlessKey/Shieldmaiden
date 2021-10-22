@@ -6,7 +6,7 @@
 			<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<p v-if="success" class="green"><i class="fas fa-check"></i> {{ success }}</p>
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
 				type="text" 
 				v-model="email" 

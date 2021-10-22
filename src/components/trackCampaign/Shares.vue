@@ -1,6 +1,6 @@
 <template>
 	<div class="shares">
-		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 			<ul class="shared">
 				<template v-for="({type, encounter_id, entity_key, notification}, index) in shares">
 					<!-- Only show notifications with an encounter_id in that encounter -->

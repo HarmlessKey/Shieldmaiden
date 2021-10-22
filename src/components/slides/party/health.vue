@@ -4,7 +4,7 @@
 		<div class="row q-col-gutter-md">
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Temporary HP"
 					type="number" 
 					name="tempHp" 
@@ -13,7 +13,7 @@
 			</div>
 			<div class="col">
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Maximum HP modifier" 
 					type="number" 
 					name="maxHpMod" 
@@ -25,7 +25,7 @@
 		<h3 class="mt-3">Set HP changes for:</h3>
 		<div v-for="(player, key) in campaign.players" :key="key">
 			<q-checkbox 
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				v-model="setFor" 
 				:val="key" 
 				:label="players[key].character_name"

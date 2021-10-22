@@ -18,7 +18,7 @@
 			Please update your NPC at the
 			<router-link to="/npcs">NPC's page</router-link>.
 		</p>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll"> 
 			<div class="current">
 				<DeathSaves 
 					v-if="(current.entityType === 'player' || current.entityType === 'companion')" 

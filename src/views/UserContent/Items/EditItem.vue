@@ -4,7 +4,7 @@
 			<hk-card header="Copy Existing Item" v-if="$route.name == 'Add item'">
 				<div class="card-body">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Search items"
 						type="text" 
 						autocomplete="off" 
@@ -41,7 +41,7 @@
 				<div class="card-body">
 					<!-- NAME -->
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Name"
 						autocomplete="off"  
 						type="text" 
@@ -63,7 +63,7 @@
 						</div>
 						<div>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="image"
 								autocomplete="off"  
 								type="text" 
@@ -79,7 +79,7 @@
 					</div>
 
 					<q-input
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Description"
 						autogrow
 						class="mb-4"
@@ -97,7 +97,7 @@
 						</span>
 						<span class="d-flex justify-content-end">
 							<q-input 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Columns"
 								type="number" 
 								v-validate="'numeric|max_value:10|min_value:1'" 
@@ -122,7 +122,7 @@
 							</h3>
 
 							<q-input 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Table name"
 								v-model="table.name" 
 								class="mb-3"
@@ -134,7 +134,7 @@
 							<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
 								<div v-for="(col, i) in table.columns" :key="i" class="header">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										v-model="table.header[i]" 
 										:placeholder="`Column header ${i+1}`"
 										v-validate="'max:100|required'"
@@ -148,7 +148,7 @@
 								<template v-for="(row, rowIndex) in table.rows">
 									<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											v-model="table.rows[rowIndex].columns[colIndex]" 
 											:placeholder="`Column ${colIndex+1}`"
 											v-validate="'max:100|required'"

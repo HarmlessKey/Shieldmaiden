@@ -7,7 +7,7 @@
 			<div class="mt-2 encounter_actions">
 				<q-tabs
 					v-model="tab"
-					dark
+					:dark="$store.getters.theme === 'dark'"
 					inline-label
 					dense
 					align="left"
@@ -30,7 +30,7 @@
 						:label="label"
 					/>
 				</q-tabs>
-				<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
+				<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}"> 
 					<q-tab-panels v-model="tab" class="bg-transparent">
 						<q-tab-panel name="entities">
 								<Entities />

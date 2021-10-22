@@ -19,7 +19,7 @@
 		<div v-else>
 			<label>Enter the full username or email.</label>
 			<q-input
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				label="Username or email"
 				v-model="findUser"
 				autocomplete="off"

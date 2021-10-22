@@ -63,7 +63,7 @@
 				</div>
 				<h3 v-else class="neutral-3">Calculating difficulty...</h3>
 			</div>
-			<q-scroll-area dark class="bg-neutral-6" :thumb-style="{ width: '5px'}">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" class="bg-neutral-6" :thumb-style="{ width: '5px'}">
 				<div class="overview">          
 					<template v-if="encounter">
 						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>

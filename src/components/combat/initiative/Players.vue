@@ -21,7 +21,7 @@
 						<i class="fas fa-pencil"></i>
 					</a>
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						type="number" 
 						class="ml-2 player-initiative"
 						v-model="entity.initiative" 

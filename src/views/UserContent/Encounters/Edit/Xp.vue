@@ -14,7 +14,7 @@
 		<div class="d-flex justify-content-between" v-if="setOverwrite">
 			<div class="input-group mb-3">
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					type="number" 
 					autocomplete="off" 
 					v-model="overwriteAmount" 

@@ -1,6 +1,6 @@
 <template>
 	<div class="rewards">
-		<q-scroll-area dark :thumb-style="{ width: '5px'}">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
 			<div>
 				<h2>Rewards</h2>
 				<template v-if="encounter.xp_awarded">
@@ -17,7 +17,7 @@
 							<div v-for="(coin, key) in currencies" :key="key">
 								<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									disable
 									:label="coin.name"
 									class="text-center"

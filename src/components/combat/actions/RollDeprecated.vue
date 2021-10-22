@@ -3,15 +3,15 @@
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else-if="current.entityType === 'npc' || 'companion'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
-				<div><q-checkbox dark v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
-				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
+				<div><q-checkbox :dark="$store.getters.theme === 'dark'" v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
+				<q-checkbox v-if="targeted.length > 1" :dark="$store.getters.theme === 'dark'" v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
 				<div class="custom-roll">
 					<div v-if="toHit">
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Hit mod"
 							autocomplete="off" 
 							type="number" 
@@ -22,7 +22,7 @@
 					</div>
 					<div :class="{ span: !toHit }">
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Damage dice"
 							autocomplete="off" 
 							type="text" 
@@ -34,7 +34,7 @@
 					</div>
 					<div>
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Modifier"
 							autocomplete="off" 
 							type="number" 

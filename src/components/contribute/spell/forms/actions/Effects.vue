@@ -14,11 +14,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(effect, eff_index) in effects"
 				:key="`effect-${eff_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="effects"
 			>
 				<template v-slot:header>
@@ -42,7 +42,7 @@
 					<div class="row q-col-gutter-md mt-3">
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								emit-value
 								map-options
 								label="Application"
@@ -57,7 +57,7 @@
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
 										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
+											<q-card :dark="$store.getters.theme === 'dark'" square>
 												<q-card-section class="bg-gray-active">
 													<b>Apply effect</b>
 												</q-card-section>
@@ -75,7 +75,7 @@
 						<!-- TARGETS -->
 						<div class="col-12 col-md-6">
 							<q-select
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								label="Target"
 								v-model="effect.target"
 								:options="targets"
@@ -88,7 +88,7 @@
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
 										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
+											<q-card :dark="$store.getters.theme === 'dark'" square>
 												<q-card-section class="bg-gray-active">
 													<b>Target</b>
 												</q-card-section>
@@ -124,7 +124,7 @@
 								<!-- HL LEVEL SCALE -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										:label="level_scaling.capitalizeEach()"
 										v-model="level_tier.level"
 										autocomplete="off"
@@ -140,7 +140,7 @@
 								<!-- HL DICE COUNT -->
 								<div class="col-12 col-md-2">
 									<q-input 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										label="Dice count"
 										v-model="level_tier.dice_count"
 										autocomplete="off"
@@ -153,7 +153,7 @@
 								<div class="col-12 col-md-3">
 									<label for="dice_type">Dice Type</label>
 									<q-select 
-										dark filled square dense
+										:dark="$store.getters.theme === 'dark'" filled square dense
 										emit-value
 										map-options
 										label="Dice type"
@@ -168,7 +168,7 @@
 								<div class="col-12 col-md-3">
 									<div class="d-flex justify-content-between">
 										<q-input 
-											dark filled square dense
+											:dark="$store.getters.theme === 'dark'" filled square dense
 											emit-value
 											map-options
 											label="Fixed value"

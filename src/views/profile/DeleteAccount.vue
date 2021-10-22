@@ -7,7 +7,7 @@
 		<div id="login" v-show="credentials">
 			<form v-on:submit.prevent>
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
 				type="text" 
 				v-model="email" 
@@ -16,7 +16,7 @@
 				class="email"
 			/>
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				autocomplete="off" 
 				type="password" 
 				v-model="password" 

@@ -17,11 +17,11 @@
 				encounters to quickly apply damage or healing.
 			</p>
 			
-			<q-list dark square :class="`accordion`">
+			<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 				<q-expansion-item
 					v-for="(action, action_index) in spell.actions" 
 					:key="`action-${action_index}`"
-					dark switch-toggle-side
+					:dark="$store.getters.theme === 'dark'" switch-toggle-side
 					group="actions"
 				>
 					<template v-slot:header>
@@ -43,7 +43,7 @@
 							<!-- ACTION TYPE -->
 							<div class="col-12 col-md-3">
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Attack type"
@@ -57,7 +57,7 @@
 							<!-- ACTION NAME -->
 							<div class="col-12 col-md-3">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Action name"
 									v-model="action.name"
 									autocomplete="off"
@@ -70,7 +70,7 @@
 							<!-- SAVE -->
 							<div class="col-12 col-md-2">
 								<q-select 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									map-options
 									emit-value
 									label="Save"
@@ -85,7 +85,7 @@
 							<div class="col-12 col-md-2">
 								<q-checkbox 
 									size="lg" 
-									dark 
+									:dark="$store.getters.theme === 'dark'" 
 									v-model="action.free" 
 									label="Free" 
 									:false-value="null" 
@@ -100,7 +100,7 @@
 							<!-- Seperate cast -->
 							<div class="col-12 col-md-2">
 								<q-checkbox 
-									size="lg" dark 
+									size="lg" :dark="$store.getters.theme === 'dark'" 
 									v-model="action.seperate" 
 									label="Seperate" 
 									:false-value="null" 

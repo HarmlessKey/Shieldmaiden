@@ -3,7 +3,7 @@
 		<!-- FILTERS -->
 		<div class="filters" v-if="search !== undefined">
 			<q-input 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				placeholder="Search"
 				type="text" 
 				class="mb-2"

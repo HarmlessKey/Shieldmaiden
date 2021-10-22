@@ -39,7 +39,7 @@
 								</a>
 								<q-tabs
 									v-model="preview_type"
-									dark
+									:dark="$store.getters.theme === 'dark'"
 									inline-label
 									dense
 									no-caps

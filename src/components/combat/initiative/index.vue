@@ -9,7 +9,7 @@
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Players</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
 				<Players :players="_players" />
 			</q-scroll-area>
 		</div>
@@ -17,7 +17,7 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
 				<span><i class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>
 		</div>
@@ -25,7 +25,7 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowOverview > 0 }">
 				<span>Active entities</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
 				<Overview :active="_active" :idle="_idle" />
 			</q-scroll-area>
 		</div>
@@ -37,7 +37,7 @@
 		
 		<div class="menu bg-gray-dark">
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="panel"
 				:options="panels"
 			>

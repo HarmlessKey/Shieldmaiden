@@ -10,7 +10,7 @@
 			<div class="col-12 col-md-4">
 				<template v-if="$route.path === '/admin/patrons/new'">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Patron ID"
 						autocomplete="off" 
 						id="patron_id"
@@ -26,7 +26,7 @@
 
 				<label for="email" class="mt-4">Email</label>
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Patron ID"
 					autocomplete="off" 
 					type="text"

@@ -2,7 +2,7 @@
 	<div>
 		<h2>Award Experience</h2>
 		<q-input 
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Amount"
 			class="text-center mb-3"
 			type="number" 
@@ -13,7 +13,7 @@
 		<h3 class="mt-3">Award experience to:</h3>
 		<div v-for="(player, key) in campaign.players" :key="key">
 			<q-checkbox 
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				v-model="awardTo" 
 				:val="key" 
 			>
@@ -29,7 +29,7 @@
 			spread
 			no-caps
 			flat
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			:options="options"
 			toggle-color="primary"
 			class="mt-3"

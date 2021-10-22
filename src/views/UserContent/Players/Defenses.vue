@@ -9,7 +9,7 @@
 						:key="type"
 					>
 						<q-select 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							:label="`Damage ${type.split('_')[1]}`"
 							autocomplete="off"  
 							multiple
@@ -45,7 +45,7 @@
 				</div>
 
 				<q-select 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Condition immunities"
 					autocomplete="off"  
 					type="text" 

@@ -53,7 +53,7 @@
 		<hk-card-deck>
 			<hk-card header="Dungeon Master">
 				<div class="card-body">
-					<q-list dark class="mb-4">
+					<q-list :dark="$store.getters.theme === 'dark'" class="mb-4">
 						<q-item 
 							v-for="({path, icon, label, caption}, index) in dm_tabs" 
 							clickable v-ripple 
@@ -77,7 +77,7 @@
 		
 			<hk-card header="Player">
 				<div class="card-body">
-					<q-list dark>
+					<q-list :dark="$store.getters.theme === 'dark'">
 						<q-item 
 							v-for="({path, icon, label, caption}, index) in player_tabs" 
 							clickable v-ripple 

@@ -14,11 +14,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(notification, not_index) in notifications"
 				:key="`notification-${not_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="conditions"
 			>
 				<template v-slot:header>
@@ -43,7 +43,7 @@
 						</div>
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								label="Application"
@@ -58,7 +58,7 @@
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
 										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
+											<q-card :dark="$store.getters.theme === 'dark'" square>
 												<q-card-section class="bg-gray-active">
 													<b>Apply reminder</b>
 												</q-card-section>
@@ -74,7 +74,7 @@
 							<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
 
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								label="Target"
@@ -89,7 +89,7 @@
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
 										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
+											<q-card :dark="$store.getters.theme === 'dark'" square>
 												<q-card-section class="bg-gray-active">
 													<b>Target</b>
 												</q-card-section>
@@ -110,7 +110,7 @@
 									<a class="ml-1">
 										<q-icon name="info" @click.stop>
 											<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-												<q-card dark square>
+												<q-card :dark="$store.getters.theme === 'dark'" square>
 													<q-card-section class="bg-gray-active">
 														<b>Variable scaling</b>
 													</q-card-section>
@@ -147,7 +147,7 @@
 											>
 												<div class="col-12 col-md-6">
 													<q-input 
-														dark filled square dense
+														:dark="$store.getters.theme === 'dark'" filled square dense
 														:label="level_scaling"
 														v-model="level_tier.level"
 														autocomplete="off"
@@ -163,7 +163,7 @@
 												<div class="col-12 col-md-6">
 													<div class="d-flex justify-content-between">
 														<q-input 
-															dark filled square dense
+															:dark="$store.getters.theme === 'dark'" filled square dense
 															label="Change"
 															v-model="level_tier.change"
 															autocomplete="off"

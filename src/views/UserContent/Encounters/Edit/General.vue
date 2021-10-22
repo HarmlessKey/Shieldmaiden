@@ -2,7 +2,7 @@
   <div>
 		<h3>General settings</h3>
 		<q-input
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Name"
 			autocomplete="off"
 			class="mb-3"
@@ -26,7 +26,7 @@
 			</div>
 			<div>
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Audio"
 					autocomplete="off" 
 					:rules="[ val => (!val ||  url_or_uri(val)) || 'Not a valid URL or URI']"
@@ -49,7 +49,7 @@
 			</div>
 			<div>
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Background"
 					autocomplete="off" 
 					:rules="[ val => (!val || is_url(val)) || 'Not a valid URL']" 
@@ -75,7 +75,7 @@
 		<button class="btn btn-lg mt-3" @click="edit()">Save</button>
 
 		<q-dialog v-model="image" full-height full-width>
-			<q-card dark>
+			<q-card :dark="$store.getters.theme === 'dark'">
 				<q-toolbar class="bg-neutral-9">
 					<div>Background preview</div>
 					<q-space />

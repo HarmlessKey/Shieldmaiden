@@ -15,7 +15,7 @@
 						<div class="card-body">
 							<q-input 
 								v-if="$route.name != 'Edit Character'"
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Player name"
 								autocomplete="off"  
 								type="text" 
@@ -29,7 +29,7 @@
 							<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
 							
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Character name"
 								autocomplete="off"  
 								type="text" 
@@ -49,7 +49,7 @@
 								</div>
 								<div>
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Avatar"
 										autocomplete="off"  
 										type="text" 
@@ -68,7 +68,7 @@
 							<div class="row q-col-gutter-md">
 								<div class="col-12 col-md-6">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Experience points"
 										autocomplete="off" 
 										type="number" 
@@ -89,7 +89,7 @@
 								</div>
 								<div class="col-12 col-md-6">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										clearable
 										label="Level override"
 										autocomplete="off"
@@ -105,7 +105,7 @@
 								</div>
 								<div class="col-12 col-md-4">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Hit points"
 										autocomplete="off"  id="maxHp" 
 										type="number" 
@@ -122,7 +122,7 @@
 								</div>
 								<div class="col-12 col-md-4">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Armor class"
 										autocomplete="off"  
 										id="ac" 
@@ -139,7 +139,7 @@
 								</div>
 								<div class="col-12 col-md-4">
 									<q-input 
-										dark filled square
+										:dark="$store.getters.theme === 'dark'" filled square
 										label="Spell save DC"
 										autocomplete="off"  
 										id="save_dc" 
@@ -163,7 +163,7 @@
 						<div class="row q-col-gutter-md">
 							<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									:label="ability.ability.capitalize()"
 									autocomplete="off"  
 									type="number" 
@@ -173,7 +173,7 @@
 									<q-checkbox 
 										slot="append"
 										size="xs" 
-										dark 
+										:dark="$store.getters.theme === 'dark'" 
 										v-model="player[`${ability.ability}-save-profficient`]" 
 										:false-value="null" 
 										indeterminate-value="something-else" 
@@ -191,7 +191,7 @@
 						<div class="row q-col-gutter-md">
 							<div  class="col-12 col-md-4 mb-2">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Passive perception"
 									autocomplete="off" 
 									type="number" 
@@ -209,7 +209,7 @@
 							</div>
 							<div  class="col-12 col-md-4 mb-2">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Passive investigation"
 									autocomplete="off"
 									type="number" 
@@ -227,7 +227,7 @@
 							</div>
 							<div  class="col-12 col-md-4 mb-2">
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Passive insight"
 									autocomplete="off"
 									type="number" 
@@ -261,7 +261,7 @@
 							<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
 								<q-checkbox 
 									size="xs" 
-									dark
+									:dark="$store.getters.theme === 'dark'"
 									:val="key" 
 									v-model="skills_expertise" 
 									:false-value="null" indeterminate-value="something-else"
@@ -277,7 +277,7 @@
 
 								<q-checkbox 
 									size="xs" 
-									dark
+									:dark="$store.getters.theme === 'dark'"
 									:val="key" 
 									v-model="skills" 
 									:false-value="null" indeterminate-value="something-else"
@@ -319,7 +319,7 @@
 							</div>
 							<div v-else>
 								<q-input 
-									dark filled square dense
+									:dark="$store.getters.theme === 'dark'" filled square dense
 									label="Search NPC"
 									type="text" 
 									autocomplete="off" 

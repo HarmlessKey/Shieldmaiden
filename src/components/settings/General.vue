@@ -1,16 +1,29 @@
 <template>
 	<div class="card-body">
+		<h3>Theme</h3>
+		<div class="theme">
+			<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+				<img src="@/assets/_img/dark.webp" />
+				Dark
+			</a>
+			<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+				<img src="@/assets/_img/light.webp" />
+				Light
+			</a>
+		</div>
+		<hr>
+		
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
@@ -47,8 +60,8 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark>
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>
@@ -63,18 +76,6 @@
 					</a>
 				</span>
 			</q-select>
-		</div>
-
-		<h3 class="mt-3">Theme</h3>
-		<div class="theme">
-			<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
-				<img src="@/assets/_img/dark.webp" />
-				Dark
-			</a>
-			<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
-				<img src="@/assets/_img/light.webp" />
-				Light
-			</a>
 		</div>
 
 		<a class="btn bg-neutral-5 mt-3" @click="setDefault()">Reset to default</a>
@@ -217,7 +218,7 @@
 	}
 	.theme {
 		display: flex;
-		justify-content: flex-start;
+		justify-content: center;
 
 		a {
 			margin-right: 10px;

@@ -144,7 +144,7 @@
 						<q-form @submit="addCampaign">
 							<h2 class="mt-0">Create your first campaign</h2>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								type="text" 
 								autocomplete="off"
 								v-model="newCampaign" 
@@ -153,7 +153,7 @@
 								:rules="[ val => val && val.length > 0 || 'Enter a title for your campaign']"
 							/>
 							<q-select 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								map-options
 								emit-value
 								label="Advancement"
@@ -182,7 +182,7 @@
 					<hk-card header="New campaign" class="mb-0">
 						<div class="card-body">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								type="text" 
 								autocomplete="off"
 								v-model="newCampaign" 
@@ -191,7 +191,7 @@
 								:rules="[ val => val && val.length > 0 || 'Enter a title']"
 							/>
 							<q-select
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								emit-value
 								map-options
 								label="Advancement"

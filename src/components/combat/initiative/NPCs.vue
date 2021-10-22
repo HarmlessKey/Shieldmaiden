@@ -23,7 +23,7 @@
 					}"
 				/>
 				<div class="truncate">
-					<q-checkbox dark v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
+					<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="selected" :val="i" :label="entity.name.capitalizeEach()" />
 				</div>
 				
 				<div class="actions">
@@ -34,7 +34,7 @@
 						</q-tooltip>
 					</a>
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						type="number" 
 						class="ml-3" 
 						min="0" 

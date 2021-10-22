@@ -3,7 +3,7 @@
 		<div class="mb-3" v-if="characters.length > 1">
 			<h5 class="mb-2">Who performs the action?</h5>
 			<q-select 
-				dark filled square dense
+				:dark="$store.getters.theme === 'dark'" filled square dense
 				name="doneBy"
 				:value="player" 
 				:options="characters"

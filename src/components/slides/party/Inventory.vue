@@ -23,7 +23,7 @@
 							</q-tooltip>
 						</span>
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							:label="coin.name"
 							class="text-center"
 							autocomplete="off" 

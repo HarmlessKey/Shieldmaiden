@@ -3,7 +3,7 @@
 		<h2>{{ data.item.public_name }}</h2>
 		<h3>Link item</h3>
 		<q-input 
-			dark filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square dense
 			placeholder="Search"
 			type="text" 
 			class="mb-2"

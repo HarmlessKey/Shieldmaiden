@@ -242,7 +242,7 @@
 						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
 						<template v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
-								<q-popup-proxy square dark>
+								<q-popup-proxy square :dark="$store.getters.theme === 'dark'">
 									<div class="bg-gray">
 										<q-item>
 											<q-item-section>
@@ -250,7 +250,7 @@
 											</q-item-section>
 										</q-item>
 										<q-separator />
-										<q-list dark square>
+										<q-list :dark="$store.getters.theme === 'dark'" square>
 											<q-item clickable v-close-popup>
 												<q-item-section avatar>1</q-item-section>
 												<q-item-section>

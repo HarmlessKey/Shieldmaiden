@@ -32,7 +32,7 @@
 				</div>
 
 				<div class="area d-flex justify-content-end">
-					<a class="icon" v-if="!user">
+					<a class="icon">
 						<i class="fas fa-moon"/>
 						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
 							<div class="theme">
@@ -83,7 +83,7 @@
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
 					<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
-						<div class="bg-neutral-10">
+						<div class="bg-neutral-8">
 							<q-list>
 								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
 									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
@@ -241,6 +241,7 @@ a.icon {
 .theme {
 	padding: 15px;
 	text-align: center;
+	background-color: $neutral-8;
 
 	a {
 		display: block;

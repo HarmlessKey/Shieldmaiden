@@ -1,12 +1,12 @@
 <template>
-	<div id="current" v-if="current">
+	<div id="current" class="bg-neutral-6-transparent" v-if="current">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 			<span>
 				<i v-if="current.hidden" class="fas fa-eye-slash red"></i>
 				<q-badge v-if="current.old" label="DEPRECATED" color="red" />
 				{{ current.name.capitalizeEach() }}
 			</span>
-			<a class="show" @click="showCard = !showCard">
+			<a class="btn btn-sm bg-neutral-5" @click="showCard = !showCard">
 				<i :class="showCard ? 'fas fa-swords' : 'fas fa-eye'"/>
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ showCard ? "Show actions" : "Show monster card" }}
@@ -158,7 +158,6 @@
 
 <style lang="scss" scoped>
 #current {
-	background: rgba(38, 38, 38, .9);
 	grid-area: current;
 	overflow: hidden;
 	
@@ -172,11 +171,14 @@
 	h2.componentHeader {
 		display: flex;
 		justify-content: space-between;
+		background-color: $neutral-8-transparent;
 		padding: 10px 15px !important;
 		margin-bottom: 0 !important;
+		line-height: 31px;
+		font-size: 18px;
 
 		&.shadow {
-			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
+			box-shadow: 0 0 10px rgba(0,0,0, 0.9); 
 		}
 	}
 }

@@ -193,7 +193,8 @@
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	created() {
+	async created() {		
+		await this.initialize();
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -207,18 +208,6 @@
 		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
-		this.initialize();
-
-		// if(auth.currentUser !== null) {
-		// 	this.setUser();
-		// 	this.setUserInfo();
-		// 	this.setUserSettings();
-		// 	// players need prio!
-		// 	this.fetchPlayers();
-		// 	this.fetchNpcs();
-		// 	this.fetchCampaigns();
-		// 	this.fetchAllEncounters();
-		// }
 	},
 	mounted() {
 		//Set theme

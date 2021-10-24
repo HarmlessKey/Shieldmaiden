@@ -150,17 +150,17 @@
 				},
 			}
 		},
-		beforeMount() {
+		async beforeMount() {
 			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
 				this.setLiveEncounter(this.$route.params.encid);
 			}
+		},
+		mounted() {
 			this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid,
 				demo: this.demo
 			});
-		},
-		mounted() {
 			this.$nextTick(function() {
 				window.addEventListener('resize', this.setSize);
 				//Init
@@ -338,7 +338,7 @@
 .combat-wrapper {
 	background-size: cover !important;
 	background-position: center bottom !important;
-	background-color:$gray-dark;
+	background-color: $neutral-10;
 	height: calc(100vh - 50px);
 
 	.finished {
@@ -392,7 +392,7 @@
 		"menu";
 
 		#turns {
-			border-bottom: solid 1px#191919;
+			border-bottom: solid 1px $neutral-9;
 		}
 		#current {
 			z-index: 90;

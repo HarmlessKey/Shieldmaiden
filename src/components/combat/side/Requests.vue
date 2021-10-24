@@ -81,7 +81,7 @@
 
 		li.request {
 			padding:10px 3px;
-			border-bottom: solid 1px #494747;
+			border-bottom: solid 1px $neutral-3;
 		}
 	}
 	.fadeInDown, .fadeOutRight {

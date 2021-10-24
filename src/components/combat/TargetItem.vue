@@ -1,17 +1,17 @@
 <template>
 	<div class="terget-item-wrapper">
-		<div class="target-item bg-gray-dark" :class="{ hasInitiative: initiative }">
+		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
 				{{ entity.initiative }}
 				<q-popup-proxy 
-					square
+					:dark="$store.getters.theme === 'dark'"
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
 					:breakpoint="576"
 				>
-					<div class="bg-gray px-2 py-2">
+					<div class="bg-neutral-8 px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							:dark="$store.getters.theme === 'dark'" filled square dense utofocus 
@@ -21,7 +21,7 @@
 							v-model="editable_entity.initiative" 
 						/>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
+							<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
 							<q-btn
 								color="primary"
 								v-close-popup 
@@ -65,13 +65,13 @@
 
 				<q-popup-proxy 
 					v-if="entity.entityType === 'npc'" 
-					square
+					:dark="$store.getters.theme === 'dark'"
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
 					:breakpoint="576"
 				>
-					<div class="bg-gray px-2 py-2">
+					<div class="bg-neutral-8 px-2 py-2">
 						<div class="mb-1">Edit {{ entity.name.capitalizeEach() }}</div>
 						<q-color 
 							square :dark="$store.getters.theme === 'dark'" flat
@@ -80,7 +80,7 @@
 							default-view="palette"
 						/>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-gray" v-close-popup>Cancel</q-btn>
+							<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
 							<q-btn
 								color="primary"
 								v-close-popup 
@@ -115,13 +115,13 @@
 					{{ displayStats().ac }}
 				</span>
 				<q-popup-proxy
-					square
+					:dark="$store.getters.theme === 'dark'"
 					anchor="bottom middle" self="top middle"
 					transition-show="scale" 
 					transition-hide="scale"
 					:breakpoint="576"
 				>
-					<div class="bg-gray px-2 py-2">
+					<div class="bg-neutral-8 px-2 py-2">
 						<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 						<q-input 
 							:dark="$store.getters.theme === 'dark'" filled square dense 
@@ -170,7 +170,7 @@
 							/>
 						</q-input>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+							<q-btn flat class="bg-neutral-8" v-close-popup>Close</q-btn>
 						</div>
 					</div>
         </q-popup-proxy>
@@ -216,20 +216,20 @@
 									<div v-for="index in 5" :key="index">
 										<span v-show="entity.saves[index] == 'succes'" class="save green"><i class="fas fa-check"></i></span> 
 										<span v-show="entity.saves[index] == 'fail'" class="save red"><i class="fas fa-times"></i></span>
-										<span v-show="!entity.saves[index]" class="save gray-hover"><i class="fas fa-dot-circle"></i></span>
+										<span v-show="!entity.saves[index]" class="save neutral-2"><i class="fas fa-dot-circle"></i></span>
 									</div>
 								</div>
 							</template>
 
 							<!-- Quick edit HP -->
 							<q-popup-proxy
-								square
+								:dark="$store.getters.theme === 'dark'"
 								anchor="bottom middle" self="top middle" 
 								transition-show="scale" 
 								transition-hide="scale"
 								:breakpoint="576"
 							>
-								<div class="bg-gray px-2 py-2">
+								<div class="bg-neutral-8 px-2 py-2">
 									<div class="mb-1">{{ entity.name.capitalizeEach() }}</div>
 									<q-input 
 										:dark="$store.getters.theme === 'dark'" filled square dense 
@@ -335,7 +335,7 @@
 										/>
 									</q-input>
 									<div class="d-flex justify-content-end mt-2">
-										<q-btn flat class="bg-gray" v-close-popup>Close</q-btn>
+										<q-btn flat class="bg-neutral-8" v-close-popup>Close</q-btn>
 									</div>
 								</div>
 							</q-popup-proxy>
@@ -352,7 +352,7 @@
 								Will be added next round
 							</q-tooltip>
 						</span>
-						<span class="gray-hover" 
+						<span class="neutral-2" 
 							v-if="!entity.addNextRound"
 							v-on:click.stop="add_next_round({key: entity.key, action: 'tag', value: true})">
 							<i class="fas fa-check"></i>
@@ -360,7 +360,7 @@
 								Click to add next round
 							</q-tooltip>
 						</span>
-						<span class="ml-2 gray-hover" 
+						<span class="ml-2 neutral-2" 
 							@click="add_next_round({key: entity.key, action: 'set'})">
 							<i class="fas fa-plus"></i>
 							<q-tooltip anchor="top middle" self="center middle">

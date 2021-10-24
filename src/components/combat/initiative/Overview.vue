@@ -3,7 +3,7 @@
 		<hk-tip value="initiative-overview" title="Actions">
 			<template #content>
 				<p>
-					<icon icon="surprised" class="icon white" /> 
+					<i class="hki-surprised" />
 					Reminds you this entity was surprised when their turn starts.
 				</p>
 				<p>
@@ -21,25 +21,18 @@
 		<ul class="entities hasImg">
 			<li v-for="(entity) in active" v-bind:key="entity.key">
 				<span v-if="entity.hidden" class="img"><i class="fas fa-eye-slash red"></i></span>
-				<icon 
-					v-else-if="entity.reminders.surprised" 
-					class="img pointer orange"
-					icon="surprised" 
-				/>
+				<span v-else-if="entity.reminders.surprised" class="img orange"><i class="hki hki-surprised"></i></span>
 				<template v-else>
-					<icon 
-						v-if="['monster', 'player', 'companion'].includes(entity.img)" 
-						class="img pointer" 
-						:icon="entity.img" 
-						:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-					/>
 					<span 
-						v-else class="img pointer" 
+						class="img pointer" 
 						:style="{
 							'background-image': 'url(' + entity.img + ')',
-							'border-color': entity.color_label ? entity.color_label : ``
+							'border-color': entity.color_label ? entity.color_label : ``,
+							'color': entity.color_label ? entity.color_label : ``
 						}"
-					/>
+					>
+						<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+					</span>
 				</template>
 				<div class="overview-item">
 					<div class="name truncate">{{ entity.name.capitalizeEach() }}</div>
@@ -47,18 +40,14 @@
 				</div>
 				<div class="actions">
 					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
-					<!-- <a v-if="!entity.conditions.surprised" class="pointer" @click="set_condition({action:'add', key: entity.key, condition:'surprised'})"> -->
 					<a v-if="!entity.reminders.surprised" class="pointer" @click="setSurprised(entity.key, true)">
-						
-						<icon icon="surprised" class="icon"/>
+						<i class="hki hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set surprised
 						</q-tooltip>
 					</a>
-					<!-- <a v-else class="pointer" @click="set_condition({action:'remove', key: entity.key, condition:'surprised'})"> -->
 					<a v-else class="pointer" @click="setSurprised(entity.key, false)">
-
-						<icon icon="character" class="icon"/>
+						<i class="hki hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Remove surprised
 						</q-tooltip>
@@ -76,7 +65,7 @@
 							Unhide
 						</q-tooltip>
 					</a>
-					<a class="pointer mr-2" @click="set_active({key: entity.key, active: false})">
+					<a class="pointer" @click="set_active({key: entity.key, active: false})">
 						<i class="fas fa-minus"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set inactive
@@ -86,25 +75,20 @@
 			</li>
 		</ul>
 	
-		<span class="d-flex justify-content-between pl-3">
-			<h2>Inactive</h2>
-		</span>
+		<h2>Inactive</h2>
 
 		<ul class="entities hasImg">
 			<li v-for="(entity) in idle" v-bind:key="entity.key">
-				<icon 
-					v-if="['monster', 'player', 'companion'].includes(entity.img)" 
-					class="img pointer" 
-					:icon="entity.img" 
-					:fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
-				/>
 				<span 
-					v-else class="img pointer" 
+					class="img pointer" 
 					:style="{
 						'background-image': 'url(' + entity.img + ')',
-						'border-color': entity.color_label ? entity.color_label : ``
+						'border-color': entity.color_label ? entity.color_label : ``,
+						'color': entity.color_label ? entity.color_label : ``
 					}"
-				/>
+				>
+					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+				</span>
 				<span class="d-flex justify-content-between">
 					{{ entity.name }}
 					<span>{{ entity.initiative }}</span>
@@ -163,49 +147,7 @@
 </script>
 
 <style lang="scss" scoped>
-#container {
-	ul.entities {
-		padding:0 15px 0 10px;
-
-		li {
-			border: solid 1px transparent;
-			background:$gray-dark;
-
-			&:hover {
-				background: #141414 !important;
-			}
-
-			&.selected {
-				border-color: $blue;
-			}
-			.img {
-				font-size: 20px;
-				line-height: 44px;
-				text-align: center;
-			}
-		}
+	ul.entities li {
+		padding-right: 3px;
 	}
-}
-
-// css for surprised icon
-.actions {
-	i, svg.icon {
-		vertical-align: middle;
-	}
-	svg.icon {
-		width: 20px;
-	}
-}
-
-.initiative-move {
-  transition: transform .5s;
-}
-
-.tip {
-	margin: 0 15px 0 10px;
-
-	.icon {
-		width: 20px;
-	}
-}
 </style>

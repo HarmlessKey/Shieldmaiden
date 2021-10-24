@@ -5,7 +5,6 @@
 			class="mb-3"
 			spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 			toggle-color="primary"
-			color="gray"
 			:options="[
 				{label: 'Attack', value: 'attack'},
 				{label: 'Save', value: 'save'},
@@ -288,7 +287,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		border-bottom: solid 1px $gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		margin: 15px 0 5px 0;
 		display: flex;
 		justify-content: space-between;
@@ -314,7 +313,7 @@
 	}
 	.disadvantage:hover {
 		.btn {
-			background-color:$red;
+			background-color: $red;
 		}
 	}
 	.q-field {

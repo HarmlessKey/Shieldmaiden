@@ -3,61 +3,59 @@
 		<div>
 			<a class="edit">
 				<i class="fas fa-cog"></i>
-				<q-popup-proxy square :breakpoint="576">
-					<div class="bg-gray gray-light">
-						<q-list>
-							<q-item>
-								<q-item-section>
-									<b>{{ encounter.encounter }}</b>
-								</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item 
-								v-if="!demo" clickable v-close-popup
-								@click="setSlide({
-									show: true, 
-									type: 'slides/Broadcast', 
-									data: { 
-										campaign_id: $route.params.campid,
-										encounter_id: $route.params.encid
-									}
-								})"
-							>
-								<q-item-section avatar>
-									<i class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
-								</q-item-section>
-								<q-item-section>
-									{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
-								</q-item-section>
-							</q-item>
-							<q-item v-if="encounter.audio" clickable v-close-popup @click="open_audio_link(encounter.audio)">
-								<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
-								<q-item-section>Audio Link</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
-								<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
-								<q-item-section>Settings</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
-								<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
-								<q-item-section>Track settings</q-item-section>
-							</q-item>
-							<q-item clickable v-close-popup v-if="demo" @click="reload">
-								<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
-								<q-item-section>Reset encounter</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item clickable v-close-popup :to="`/encounters/${$route.params.campid}`">
-								<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
-								<q-item-section>Leave encounter</q-item-section>
-							</q-item>
-							<q-separator />
-							<q-item clickable v-close-popup @click="confirmFinish()">
-								<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
-								<q-item-section>End encounter</q-item-section>
-							</q-item>
-						</q-list>
-					</div>
+				<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+					<q-list class="bg-neutral-8">
+						<q-item>
+							<q-item-section>
+								<b>{{ encounter.encounter }}</b>
+							</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item 
+							v-if="!demo" clickable v-close-popup
+							@click="setSlide({
+								show: true, 
+								type: 'slides/Broadcast', 
+								data: { 
+									campaign_id: $route.params.campid,
+									encounter_id: $route.params.encid
+								}
+							})"
+						>
+							<q-item-section avatar>
+								<i class="far fa-dot-circle" :class="{ red: broadcast.live === $route.params.campid }"></i>
+							</q-item-section>
+							<q-item-section>
+								{{ broadcast.live !== $route.params.campid ? "Go live" : "Stop broadcast" }}
+							</q-item-section>
+						</q-item>
+						<q-item v-if="encounter.audio" clickable v-close-popup @click="open_audio_link(encounter.audio)">
+							<q-item-section avatar><q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon></q-item-section>
+							<q-item-section>Audio Link</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/Encounter'})">
+							<q-item-section avatar><i class="fas fa-cogs"></i></q-item-section>
+							<q-item-section>Settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
+							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
+							<q-item-section>Track settings</q-item-section>
+						</q-item>
+						<q-item clickable v-close-popup v-if="demo" @click="reload">
+							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
+							<q-item-section>Reset encounter</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup :to="`/encounters/${$route.params.campid}`">
+							<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
+							<q-item-section>Leave encounter</q-item-section>
+						</q-item>
+						<q-separator />
+						<q-item clickable v-close-popup @click="confirmFinish()">
+							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+							<q-item-section>End encounter</q-item-section>
+						</q-item>
+					</q-list>
 				</q-popup-proxy>
 			</a>
 
@@ -67,7 +65,7 @@
 		<!-- TURNS & ROUNDS -->
 		<div class="round-info d-flex justify-content-center" v-if="encounter.round > 0">	
 			<a
-				class="handler gray-light" 
+				class="handler neutral-2" 
 				@click="prevTurn()"
 				v-shortkey="['shift', 'arrowleft']" @shortkey="prevTurn()"
 			>
@@ -85,12 +83,12 @@
 				<div>
 					<div class="header">Turn</div>
 					<div class="number">
-						{{ encounter.turn + 1 }}<span class="small gray-hover">/{{ active_len }}</span>
+						{{ encounter.turn + 1 }}<span class="neutral-3"><span class="neutral-4">/</span>{{ active_len }}</span>
 					</div>
 				</div>
 			</template>
 
-			<a class="handler gray-light" 
+			<a class="handler neutral-2" 
 				@click="nextTurn()" 
 				v-shortkey="['shift', 'arrowright']" @shortkey="nextTurn()">
 				<i class="fas fa-step-forward"></i>
@@ -99,7 +97,7 @@
 				</q-tooltip>
 			</a>
 		</div>
-		<div class="blue" v-else>
+		<div v-else>
 			Set Intitative
 		</div>
 
@@ -145,18 +143,18 @@
 						type: 'combat/side/Side'
 					})"
 				>
-					<q-icon name="info" />
+					<i class="fas fa-bars" />
 				</div>
 			</template>
 
 			<template v-else>
 				<span class="d-none d-md-block">
-					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-gray-dark mx-2">
+					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
 						<i class="fas fa-arrow-left"></i> 
 						Leave
 					</router-link>
 				</span>
-				<a class="btn" @click="startEncounter()">
+				<a class="btn ml-2" @click="startEncounter()">
 					Start 
 					<span class="ml-1 d-none d-md-inline"> 
 						encounter <i class="fas fa-arrow-right"></i>
@@ -259,7 +257,7 @@
 	padding: 10px;
 	font-size: 15px;
 	line-height: 40px;
-	background: rgba(38, 38, 38, .9);
+	background: $neutral-8-transparent;
 	font-size: 20px;
 	grid-area: turns;
 	align-items: center;
@@ -334,6 +332,7 @@
 		padding: 0;
 		display: none;
 		font-size: 28px;
+		color: $neutral-3;
 
 		.q-icon {
 			vertical-align: -4px;
@@ -349,7 +348,7 @@
 		display: block !important;
 	}
 	.edit {
-		color: $gray-light;
+		color: $neutral-3;
 	}
 	.round-info {
 		.header {
@@ -372,7 +371,7 @@
 		top: 0;
 		left: 50%;
 		transform: translateX(-50%);
-		border-bottom: solid 1px $gray-light;
+		border-bottom: solid 1px $neutral-4;
 		padding: 0 10px;
 
 		i {

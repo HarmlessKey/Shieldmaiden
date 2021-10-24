@@ -21,9 +21,9 @@
 						>
 							<div class="info">
 								<span class="name">
-									{{ entity.name }}.
+									{{ entity.name.capitalize() }}.
 									<q-tooltip anchor="center right" self="center left">
-										{{ entity.name }}
+										{{ entity.name.capitalize() }}
 									</q-tooltip>
 								</span>
 								<b class="numbers">
@@ -125,7 +125,7 @@ ul {
 		margin-bottom: 1px;
 
 		.img {
-			background-color:$gray-dark;
+			background-color: $neutral-8;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
@@ -137,7 +137,7 @@ ul {
 		.q-linear-progress { 
 			height: 30px;
 			line-height: 30px;
-			background-color: #494747;
+			background-color: $neutral-7;
 			position: relative;
 
 			.info {
@@ -153,7 +153,7 @@ ul {
 				"name numbers";
 
 				span.name, .numbers {
-					color:#191919;
+					color: $neutral-1;
 				}
 				.numbers {
 					text-align: right;

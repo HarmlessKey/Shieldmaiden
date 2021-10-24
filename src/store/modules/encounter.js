@@ -1043,7 +1043,9 @@ const mutations = {
 
 		switch(entity.entityType) {
 			case 'player': {
-				let campaignPlayer = (!state.demo) ? rootState.content.campaigns[state.campaignId].players[key] : demoPlayers[key];
+				const campaign = rootState.content.campaigns[state.campaignId];
+
+				let campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
 
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
 				entity.curHp = campaignPlayer.curHp;

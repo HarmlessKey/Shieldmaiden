@@ -75,7 +75,7 @@
       animated
       swipeable
       infinite
-      class="transparent-bg"
+      class="bg-neutral-6-transparent"
     >
       <q-tab-panel name="players">
 				<h2>Players</h2>
@@ -204,7 +204,7 @@
 	position: absolute;
 
 	.q-scrollarea{
-		padding:0 0 15px 0;
+		padding:0 15px 15px 15px;
 		height: calc(100% - 45px);
 	}
 	
@@ -221,7 +221,7 @@
 		}
 	}
 	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .8);
+		background: $neutral-6-transparent;
 		overflow: hidden;
 	}
 	.players {
@@ -277,14 +277,6 @@
 		}
 		.menu {
 			grid-area: menu;
-		}
-	}
-	.transparent-bg {
-		background: rgba(38, 38, 38, .8);
-	}
-	ul.entities {
-		li {
-			background-color:$gray-dark !important;
 		}
 	}
 }

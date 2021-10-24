@@ -18,22 +18,22 @@
 					@keypress="submitManual($event)"
 					autocomplete="off" 
 				/>
-				<button class="btn dmg bg-red" 
+				<button class="btn dmg bg-red white" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual('damage')"
 				>
 					Attack
-					<img src="@/assets/_img/styles/sword-break.png" />
+					<i class="hki hki-sword-break ml-3" />
 					<q-tooltip anchor="center right" self="center left">
 						Enter
 					</q-tooltip>
 				</button>
-				<button class="btn heal bg-green" 
+				<button class="btn heal bg-green white" 
 					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
 					@click="setManual('healing')"
 				>
 					Heal
-					<img src="@/assets/_img/styles/heal.png" />
+					<i class="hki hki-heal" />
 					<q-tooltip anchor="center right" self="center left">
 						Shift + Enter
 					</q-tooltip>
@@ -261,7 +261,7 @@
 <style lang="scss" scoped>
 .manual {
 	display:grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr max-content;
 	grid-template-rows: 40px 40px;
 	grid-gap: 10px;
 	grid-template-areas: 
@@ -276,15 +276,8 @@
 		grid-area: btn-dmg;
 	}
 	.dmg, .heal {
-		text-align: left;
-		position: relative;
-		padding: 5px 35px 5px 8px;
-
-		img {
-			position: absolute;
-			height: 25px;
-			right: 8px;
-		}
+		display: flex;
+		justify-content: space-between;
 	}
 }
 .select-amount {
@@ -298,11 +291,11 @@
 	}
 
 	.name {
-		background: $gray-dark;
+		background: $neutral-8;
 		padding: 5px;
 	}
 	.defenses {
-		background: $gray-dark;
+		background: $neutral-8;
 		display: grid;
 		grid-template-columns: 18px 18px 18px auto;
 		grid-column-gap: 5px;
@@ -321,7 +314,7 @@
 			font-size: 18px;
 			text-align: center;
 			line-height: 28px;
-			color: $gray-light;
+			color: $neutral-2;
 
 			span {
 				font-size: 12px;
@@ -332,7 +325,7 @@
 				line-height: 28px;
 				top: 0;
 				left: 0;
-				color: $gray-dark;
+				color: $neutral-8;
 			}
 
 			&.active {
@@ -347,13 +340,13 @@
 	.multipliers {
 		display: flex;
 		justify-content: flex-end;
-		background: $gray-dark;
+		background: $neutral-8;
 
 		.multiplier {
 			padding: 0 8px;
 			margin-left: 1px;
 			line-height: 28px;
-			background: $gray-hover;
+			background: $neutral-5;
 			color: $neutral-1;
 			user-select: none;
 			cursor: pointer;
@@ -366,6 +359,22 @@
 		font-weight: bold;
 		font-size: 15px;
 		color: $blue;
+	}
+}
+
+[data-theme="light"] {
+	.select-amount {
+		.defenses {
+			.option {
+				color: $neutral-4;
+
+				&.active {
+				span {
+					color: $neutral-11;
+				}
+			}
+			}
+		}
 	}
 }
 </style>

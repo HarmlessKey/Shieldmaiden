@@ -13,7 +13,7 @@
 		<q-tabs
 			v-model="tab"
 			:dark="$store.getters.theme === 'dark'" inline-label dense no-caps
-			:indicator-color="tabs.length === 1 ? 'transparent' : 'gray-light'"
+			:indicator-color="tabs.length === 1 ? 'transparent' : 'neutral-2'"
 		>
 			<q-tab 
 				v-for="({name, label}, index) in tabs"
@@ -308,7 +308,7 @@
 			line-height: 20px;
 
 			.level {
-				background-color: $gray-dark;
+				background-color: $neutral-5;
 				padding: 0 6px;
 				margin-right: 3px;
 				cursor: pointer;
@@ -323,7 +323,7 @@
 					}
 				}
 				&:hover {
-					background: $gray-darker;
+					background: $neutral-4;
 				}
 			}
 		}

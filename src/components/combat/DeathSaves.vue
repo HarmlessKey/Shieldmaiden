@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<template v-if="target.curHp === 0 && !target.stable && !target.dead">
-				<a @click="setSlide({show: true, type: 'slides/DeathSaves'})">What is this <i class="fas fa-question"></i></a>
+				<a class="btn btn-sm btn-clear" @click="setSlide({show: true, type: 'slides/DeathSaves'})">
+					What is this <i class="fas fa-question"></i>
+				</a>
 				<div class="px-1 my-3 d-flex justify-content-between">
 					<div v-for="(n, index) in 5" :key="index">
 						<template v-if="Object.keys(target.saves).length == n">
@@ -22,7 +24,7 @@
 							<span v-show="target.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
 							<span v-show="target.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
 						</template>
-						<span v-show="!target.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+						<span v-show="!target.saves[n]" class="neutral-2"><i class="fas fa-dot-circle"></i></span>
 					</div>
 				</div>
 				<div v-if="Object.keys(target.saves).length < 5" class="d-flex justify-content-between">

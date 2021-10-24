@@ -17,7 +17,7 @@
 								:style="{
 									'background-image': 'url(' + entitiesList[doneBy].img + ')',
 									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``,
-									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : `#b2b2b2`
+									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
 								}
 							">
 								<i v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
@@ -45,7 +45,7 @@
 								:style="{
 									'background-image': 'url(' + scope.opt.img + ')',
 									'border-color': scope.opt.color_label ? scope.opt.color_label : ``,
-									'color': scope.opt.color_label ? scope.opt.color_label : `#b2b2b2`
+									'color': scope.opt.color_label ? scope.opt.color_label : ``
 								}
 							">
 								<i v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
@@ -89,7 +89,7 @@
 				inline-label
 				dense
 				no-caps
-				class="bg-gray-light gray-dark"
+				class="bg-neutral-3 neutral-10"
 			>
 				<q-tab 
 					v-for="({name, icon, label}, index) in tabs"
@@ -245,9 +245,11 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-2;
 		font-size: 27px;
 		line-height: 35px;
+		background-color: $neutral-9;
+		color: $neutral-2;
 		
 		i {
 			vertical-align: 5px !important;
@@ -257,6 +259,13 @@
 		font-size: 15px;
 		i {
 			margin: 4px 5px 0 0;
+		}
+	}
+
+	[data-theme="light"] {
+		.img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

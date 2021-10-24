@@ -113,6 +113,9 @@ html body {
 
 	/* 4. Classes */
 	/*********************************************/
+	.white { color: $white !important; }
+	.black { color: $black !important; }
+	
 	.neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
 	.neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
@@ -136,7 +139,6 @@ html body {
 	.black { color: $black !important; path { fill: $black !important;} }
 	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
 	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
-	.white { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.orange { color: $orange !important; path { fill: $orange !important;} }
 	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
 	.purple { color: $purple !important; path { fill: $purple !important;} }
@@ -159,7 +161,13 @@ html body {
 	.bg-neutral-3 { background-color: $neutral-3 !important; }
 	.bg-neutral-4 { background-color: $neutral-4 !important; }
 	.bg-neutral-5 { background-color: $neutral-5 !important; }
-	.bg-neutral-6 { background-color: $neutral-6 !important; }
+	.bg-neutral-6 { 
+		background-color: $neutral-6 !important;
+
+		&-transparent {
+			background-color: $neutral-6-transparent !important;
+		}
+	}
 	.bg-neutral-7 { background-color: $neutral-7 !important; }
 	.bg-neutral-8 { background-color: $neutral-8 !important; }
 	.bg-neutral-9 { background-color: $neutral-9 !important; }
@@ -780,6 +788,7 @@ html body {
 		}
 		&.bg-green:hover { background-color: $green-hover !important; }
 		&.bg-red:hover { background-color: $red-hover !important; }
+		&.bg-neutral-4:hover { background-color: $neutral-3 !important; }
 		&.bg-neutral-5:hover { background-color: $neutral-4 !important; }
 		&.bg-neutral-6:hover { background-color: $neutral-5 !important; }
 		&.bg-neutral-7:hover { background-color: $neutral-6 !important; }
@@ -1295,12 +1304,12 @@ html body {
 				text-align: center;
 			}
 			i {
-				font-size: 25px;
-				color: #5c5757;
+				font-size: 28px;
+				color: $neutral-4;
 			}
 			.ac {
 				font-weight: bold;
-				color: #fff;
+				color: $neutral-1;
 				margin-top: -1px;
 			}
 		}
@@ -1308,7 +1317,7 @@ html body {
 			display: block;
 			width: 35px;
 			height: 35px;
-			background-color: #191919;
+			background-color: $neutral-9;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
@@ -1336,7 +1345,7 @@ html body {
 				grid-column-gap: 5px;
 				line-height: 35px;
 				margin-right: 5px;
-				color: #fff;
+				color: $neutral-1;
 		
 				.conditions {
 					position: absolute;
@@ -1347,7 +1356,7 @@ html body {
 						display: block;
 						width: 12px;
 						height: 12px;
-						border: solid 1px #fff;
+						border: solid 1px $neutral-1;
 						margin-left: 1px;
 						cursor: pointer;
 					}
@@ -1432,7 +1441,7 @@ html body {
 			margin-bottom: 1px;
 			vertical-align: center;
 			line-height: 46px;
-			padding: 0 5px;
+			padding: 0 10px;
 
 			.actions {
 				display: flex;
@@ -1467,7 +1476,7 @@ html body {
 				background-position: top center;
 				border: solid 1px $neutral-3;
 				background-color: $neutral-10;
-				font-size: 20px;
+				font-size: 35px;
 				line-height: 44px;
 				text-align: center;
 			}

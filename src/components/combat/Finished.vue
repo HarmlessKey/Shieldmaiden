@@ -1,18 +1,20 @@
 <template>
-	<div class="container-fluid">
+	<div class="content">
 		<h2 class="head">Encounter finished</h2>
 		<div class="container">
 			<div class="actions">
-				<router-link v-if="$route.name == 'RunEncounter'" :to="'/encounters/' + $route.params.campid"><i class="fas fa-chevron-left"></i> Leave</router-link>
+				<router-link v-if="$route.name == 'RunEncounter'" class="btn btn-sm btn-clear" :to="'/encounters/' + $route.params.campid">
+					<i class="fas fa-chevron-left"></i> Leave
+				</router-link>
 
 				<span class="right">
-					<a @click="reset(hard=false)">
+					<a class="btn btn-sm bg-neutral-5" @click="reset(hard=false)">
 						<i class="fas fa-trash-restore-alt"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Unfinish
 						</q-tooltip>
 					</a>
-					<a @click="reset()">
+					<a class="btn btn-sm bg-neutral-5" @click="reset()">
 						<i class="fas fa-undo"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Reset
@@ -31,119 +33,123 @@
 			</q-slide-transition>
 			
 			<div class="row q-col-gutter-md">
-				<div class="col-12 col-md-7 mb-4">
-						<q-tabs
-							v-model="tab"
-							:dark="$store.getters.theme === 'dark'"
-							indicator-color="transparent"
-							no-caps
-							dense
-							align="left"
-							inline-label
-						>
-							<q-tab :name="key" :icon="tab.icon" :label="tab.name" v-for="(tab, key) in tabs" :key="key" />
-					</q-tabs>
+				<div class="col-12 col-md-7">
+					<hk-card header="Overview">
+						<div class="card-body">
+							<q-tabs
+								v-model="tab"
+								:dark="$store.getters.theme === 'dark'"
+								indicator-color="transparent"
+								no-caps
+								dense
+								align="left"
+								inline-label
+							>
+								<q-tab :name="key" :icon="tab.icon" :label="tab.name" v-for="(tab, key) in tabs" :key="key" />
+							</q-tabs>
 
-					<q-tab-panels v-model="tab" class="bg-gray-active">
-						<q-tab-panel name="loot">
-							<h3>Encounter rewards</h3>
-							<!-- XP -->
-							<div class="xp bg-gray" v-if="campaign.advancement === 'experience' && encounter.xp">
-								<span class="amount">
-									{{ xpAmount }}
-									<span class="gray-hover">XP</span>
-								</span>
-								<a 
-									v-if="!encounter.xp_awarded"
-									class="btn" 
-									@click="setSlide({
-										show: true,
-										type: 'slides/party/xp',
-										data: {
-											amount: xpAmount,
-											entities: players
-										}
-								})">
-									Award <i class="far fa-chevron-double-right"></i>
-								</a>
-								<div v-else class="green">
-									<i class="fas fa-check"></i> Awarded
-								</div>
-							</div>
+							<q-tab-panels v-model="tab" class="bg-neutral-6">
+								<q-tab-panel name="loot" class="px-0">
+									<h3>Encounter rewards</h3>
+									<!-- XP -->
+									<div class="xp bg-neutral-8" v-if="campaign.advancement === 'experience' && encounter.xp">
+										<span class="amount">
+											{{ xpAmount }}
+											<span class="neutral-3">XP</span>
+										</span>
+										<a 
+											v-if="!encounter.xp_awarded"
+											class="btn" 
+											@click="setSlide({
+												show: true,
+												type: 'slides/party/xp',
+												data: {
+													amount: xpAmount,
+													entities: players
+												}
+										})">
+											Award <i class="far fa-chevron-double-right"></i>
+										</a>
+										<div v-else class="green">
+											<i class="fas fa-check"></i> Awarded
+										</div>
+									</div>
 
-							<!-- CURRENCY -->
-							<div class="currency bg-gray mb-3" v-if="encounter.currency">
-								<div class="currency-form">
-									<div v-for="(coin, key) in currencies" :key="key">
-										<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
-										<q-input
-											:dark="$store.getters.theme === 'dark'" filled square dense
-											class="text-center"
-											:disable="encounter.currency_awarded"
-											autocomplete="off" 
-											type="number" 
-											size="sm"
-											min="0" 
-											name="currency" 
-											v-validate="'numeric'"
-											data-vv-as="Currency"
-											v-model="encounter.currency[key]" :placeholder="coin.name"/>
+									<!-- CURRENCY -->
+									<div class="currency bg-neutral-8 mb-3" v-if="encounter.currency">
+										<div class="currency-form">
+											<div v-for="(coin, key) in currencies" :key="key">
+												<img :src="require(`@/assets/_img/currency/${coin.color}.svg`)" />
+												<q-input
+													:dark="$store.getters.theme === 'dark'" filled square dense
+													class="text-center"
+													:disable="encounter.currency_awarded"
+													autocomplete="off" 
+													type="number" 
+													size="sm"
+													min="0" 
+													name="currency" 
+													v-validate="'numeric'"
+													data-vv-as="Currency"
+													v-model="encounter.currency[key]" :placeholder="coin.name"/>
+											</div>
+										</div>
+										<div class="validate red mt-2 text-center" v-if="errors.has('currency')">{{ errors.first('currency') }}</div>
+										<div class="d-flex justify-content-center mt-3">
+											<a
+												v-if="!encounter.currency_awarded"
+												class="btn" 
+												:class="{ disabled: errors.has('currency') }" 
+												@click="awardCurrency"
+											>
+												Award <i class="far fa-chevron-double-right"></i>
+											</a>
+											<div v-else class="green">
+												<i class="fas fa-check"></i> Awarded
+											</div>
+										</div>
 									</div>
-								</div>
-								<div class="validate red mt-2 text-center" v-if="errors.has('currency')">{{ errors.first('currency') }}</div>
-								<div class="d-flex justify-content-center mt-3">
-									<a
-										v-if="!encounter.currency_awarded"
-										class="btn" 
-										:class="{ disabled: errors.has('currency') }" 
-										@click="awardCurrency"
-									>
-										Award <i class="far fa-chevron-double-right"></i>
-									</a>
-									<div v-else class="green">
-										<i class="fas fa-check"></i> Awarded
-									</div>
-								</div>
-							</div>
-							
-							<template v-if="encounter.loot">
-								<h3 class="d-flex justify-content-between">
-									Items
-									<a @click="awardItems(items)">Award all <i class="far fa-chevron-double-right"></i></a>
-								</h3>
-								<hk-table 
-									:items="items"
-									:columns="itemColumns"
-									:showHeader="false"
-								>
-									<template slot="actions" slot-scope="data">
-										<a class="btn m-1" @click="awardItems([data.row])">Award <i class="far fa-chevron-double-right"></i></a>
+									
+									<template v-if="encounter.loot">
+										<h3 class="d-flex justify-content-between">
+											Items
+											<a @click="awardItems(items)">Award all <i class="far fa-chevron-double-right"></i></a>
+										</h3>
+										<hk-table 
+											:items="items"
+											:columns="itemColumns"
+											:showHeader="false"
+										>
+											<template slot="actions" slot-scope="data">
+												<a class="btn m-1" @click="awardItems([data.row])">Award <i class="far fa-chevron-double-right"></i></a>
+											</template>
+										</hk-table>
 									</template>
-								</hk-table>
-							</template>
-							<template v-if="awardedItems">
-								<h3>Awarded Items</h3>
-								<hk-table 
-									:items="awardedItems"
-									:columns="itemColumns"
-									:showHeader="false"
-								>
-								</hk-table>
-							</template>
-						</q-tab-panel>
+									<template v-if="awardedItems">
+										<h3>Awarded Items</h3>
+										<hk-table 
+											:items="awardedItems"
+											:columns="itemColumns"
+											:showHeader="false"
+										>
+										</hk-table>
+									</template>
+								</q-tab-panel>
 
-						<q-tab-panel name="dmg">
-							<div class="row q-col-gutter-md">
-								<div class="col-12 col-md-6">
-									<Dmg />
-								</div>
-								<div class="col-12 col-md-6">
-									<h2>Log</h2>
-									<Log />
-								</div>
-							</div>
-						</q-tab-panel>
-					</q-tab-panels>
+								<q-tab-panel name="dmg">
+									<div class="row q-col-gutter-md">
+										<div class="col-12 col-md-6">
+											<Dmg />
+										</div>
+										<div class="col-12 col-md-6">
+											<h2>Log</h2>
+											<Log />
+										</div>
+									</div>
+								</q-tab-panel>
+							</q-tab-panels>
+						</div>
+					</hk-card>
 				</div>
 				<div class="col-12 col-md-5">
 					<Players :userId="userId" :campaignId="campaignId" />
@@ -312,103 +318,98 @@
 </script>
 
 <style lang="scss" scoped>
-	.container-fluid {
-		padding: 20px;
 
-		h2.head {
-			color:$neutral-1;
-			margin-top: 20px;
-			text-shadow: 0 0 8px$black;
-			font-size: 25px !important;
-			text-align: center;
+	h2.head {
+		color: $white;
+		margin-top: 20px;
+		text-shadow: 0 0 8px $black;
+		font-size: 25px !important;
+		text-align: center;
+	}
+	.patreon {
+		display: block;
+		padding: 10px;
+		text-align: center;
+		font-size: 30px;
+		margin-bottom: 25px;
+		position: relative;
+		color: $neutral-1;
+
+		.close {
+			background: $black;
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 5px;
+			height: 25px;
+			line-height: 10px;
 		}
-		.patreon {
-			display: block;
-			padding: 10px;
-			text-align: center;
-			font-size: 30px;
-			margin-bottom: 25px;
-			position: relative;
-			color:$neutral-1;
+	}
+	.actions {
+		display: flex;
+		justify-content: space-between;
+		border-bottom: solid 1px $neutral-1;
+		margin-bottom: 20px;
+		padding-bottom: 5px;
+		color: $neutral-1;
 
-			.close {
-				background:$black;
-				position: absolute;
-				top: 0;
-				right: 0;
-				padding: 5px;
+		.right {
+			a {
+				margin-left: 5px;
+			}
+		}
+	}
+
+	.q-tabs {
+		.q-tab {
+			&.q-tab--active {
+				background: $neutral-6 !important;
+				color: $blue;
+			}
+		}
+	}
+
+	.nav {
+		.nav-link.active {
+			background-color: $neutral-8-transparent !important;
+		}
+	}
+
+
+	.xp {
+		display: flex;
+		justify-content: space-between;
+		padding: 10px;
+		margin-bottom: 30px;
+		line-height: 35px;
+		
+
+		.amount {
+			font-size: 25px;
+		}
+	}
+
+	.currency {
+		padding: 30px 10px 20px 10px;
+
+		.currency-form {
+			margin: auto;
+			display: flex;
+			justify-content: center;
+			max-width: 400px;
+			text-align: center;
+
+			img {
 				height: 25px;
-				line-height: 10px;
+				margin-bottom: 10px;
 			}
-		}
-		.actions {
-			display: flex;
-			justify-content: space-between;
-			border-bottom: solid 1px$neutral-1;
-			margin-bottom: 20px;
-			padding-bottom: 5px;
-			color:$neutral-1;
+			div {
+				margin-right: 5px;
 
-			.right {
-				a {
-					color:$neutral-1 !important;
-					margin-left: 10px;
+				&:last-child {
+					margin-right: 0;
 				}
 			}
 		}
-
-		.q-tabs {
-			.q-tab {
-				&.q-tab--active {
-					background:$gray-active !important;
-					color: $blue;
-				}
-			}
-		}
-
-		.nav {
-			.nav-link.active {
-				background-color:$gray-active !important;
-			}
-		}
-
-
-		.xp {
-			display: flex;
-			justify-content: space-between;
-			padding: 10px;
-			margin-bottom: 30px;
-			line-height: 35px;
-			
-
-			.amount {
-				font-size: 25px;
-			}
-		}
-
-		.currency {
-			padding: 30px 10px 20px 10px;
-
-			.currency-form {
-				margin: auto;
-				display: flex;
-				justify-content: center;
-				max-width: 400px;
-				text-align: center;
-
-				img {
-					height: 25px;
-					margin-bottom: 10px;
-				}
-				div {
-					margin-right: 5px;
-
-					&:last-child {
-						margin-right: 0;
-					}
-				}
-			}
-		}
-
 	}
 </style>

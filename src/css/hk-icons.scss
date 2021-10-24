@@ -1,3 +1,15 @@
+/*
+TO UPDATE THE FONT
+
+1. Go to: fontello.com
+2. Import ../assets/hk-icon-font/harmless-key.svg
+3. Add svg's of the icons you wish to add
+4. Download the updated font
+5. Replace the files in ../assets/hk-icon-font with the files from /font folder in you download
+6. Add the classes to the CSS below (don't replace the existing CSS below, it's modified for HK)
+
+*/
+
 @font-face {
   font-family: 'harmless-key';
   src: url('../assets/hk-icon-font/harmless-key.eot?29559614');

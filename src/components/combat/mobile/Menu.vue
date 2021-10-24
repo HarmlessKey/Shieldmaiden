@@ -1,5 +1,5 @@
 <template>
-	<div class="menu bg-gray-dark">
+	<div class="menu bg-neutral-9">
 		<div v-if="targeted.length === 0" class="no-target red" 
 			@click="setSlide({
 				show: true,
@@ -31,19 +31,19 @@
 		</q-tabs>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog square v-model="dialog.damage">
-			<div class="bg-gray px-3 py-3">
+		<q-dialog v-model="dialog.damage" :dark="$store.getters.theme === 'dark'">
+			<div class="bg-neutral-7 px-3 py-3">
 				<Actions :current="current" :settings="settings" :select-entity="true" />
 			</div>
 		</q-dialog>
 
 		<!-- DAMAGE / HEALING -->
-		<q-dialog square v-model="dialog.options">
-			<div class="bg-gray">
+		<q-dialog v-model="dialog.options" :dark="$store.getters.theme === 'dark'">
+			<div class="bg-neutral-7">
 				<q-list>
 					<q-item>
 						<q-item-section>
-							<b>{{ (targeted.length === 1) ? entities[targeted[0]].name : `${targeted.length} targets` }}</b>
+							<b>{{ (targeted.length === 1) ? entities[targeted[0]].name.capitalize() : `${targeted.length} targets` }}</b>
 						</q-item-section>
 					</q-item>
 					<q-separator />

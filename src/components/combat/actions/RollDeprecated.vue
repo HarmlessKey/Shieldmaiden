@@ -68,9 +68,9 @@
 					<template v-if="current[action_type.value]">
 						<h4 class="mt-3">{{ action_type.label }}</h4>
 						<ul class="roll">
-							<li v-for="(action, index) in current[action_type.value]" :key="index" class="bg-gray-active">
+							<li v-for="(action, index) in current[action_type.value]" :key="index" class="bg-neutral-6">
 								<span class="d-flex justify-content-between">
-									<a class="d-flex justify-content-between gray-light" @click="setShow(action_type.value, index)">
+									<a class="d-flex justify-content-between neutral-2" @click="setShow(action_type.value, index)">
 										<span>{{ action.name }}</span>
 										<i class="fas fa-caret-down"></i>
 									</a>
@@ -376,7 +376,7 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (Object.keys(advantage_object).length === 1) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
+					let ignoredRoll = (Object.keys(advantage_object).length === 1) ? `<span class="neutral-2">${toHit.ignored}</span>` : ``;
 
 					this.rolledToHit = toHit.total; //For animation
 

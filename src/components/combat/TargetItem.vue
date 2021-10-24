@@ -37,7 +37,7 @@
 			<!-- HIDDEN -->
 			<div  
 				class="img-wrapper" 
-				:style="entity.color_label ? `border-color: ${entity.color_label}` : ``"
+				:style="entity.color_label ? `border-color: ${entity.color_label}; color: color: ${entity.color_label}` : ``"
 			>
 				<span class="img" v-if="entity.hidden">
 					<i class="fas fa-eye-slash red" />
@@ -51,13 +51,17 @@
 						Transformed
 					</q-tooltip>
 				</span>
-				<template v-else>
-					<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
-					<span 
-						v-else class="img" 
-						:style="{ 'background-image': 'url(' + entity.img + ')' }"
-					/>
-				</template>
+				<span 
+					v-else
+					class="img" 
+					:style="{ 
+						'background-image': 'url(' + entity.img + ')',
+						'border-color': entity.color_label ? entity.color_label : ``,
+						'color': entity.color_label ? entity.color_label : ``,
+					}"
+				>
+					<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+				</span>
 
 				<q-popup-proxy 
 					v-if="entity.entityType === 'npc'" 
@@ -98,12 +102,12 @@
 			<div class="ac_wrapper" @click.stop>
 				<i class="fas fa-shield" ></i>
 				<span 
+					v-if="entity.ac_bonus"
 					class="ac" 
 					:class="{ 
 						'green': entity.ac_bonus > 0,
 						'red': entity.ac_bonus < 0 
 					}" 
-					v-if="entity.ac_bonus"
 				>
 					{{ displayStats().ac + entity.ac_bonus}}
 				</span>
@@ -372,7 +376,8 @@
 							:key="key" 
 							@click="showCondition(key)">
 							<q-tooltip anchor="top middle" self="center middle">
-								{{ key }}
+								<i :class="`hki-${key}`" />
+								{{ key.capitalize() }}
 							</q-tooltip>
 						</div>
 					</div>

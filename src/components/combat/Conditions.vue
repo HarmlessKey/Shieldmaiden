@@ -13,7 +13,7 @@
 					<span class="n" v-if="key == 'exhaustion'">
 						{{ entity.conditions[key] }}
 					</span>
-					<icon :icon="key" class="icon" fill="#cc3e4a" />
+					<i :class="`hki-${key}`" class="icon" />
 					<q-tooltip anchor="top middle" self="center middle">
 						{{ key.capitalize() }}
 					</q-tooltip>
@@ -23,8 +23,8 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex'
-	import { db } from '@/firebase'
+	import { mapActions } from 'vuex';
+	import { db } from '@/firebase';
 
 	export default {
 		name: 'Conditions',
@@ -56,7 +56,7 @@
 	div {
 		position: relative;
 	}
-	svg {
+	.icon {
 		display: block;
 		font-size: 16px;
 		width: 30px;

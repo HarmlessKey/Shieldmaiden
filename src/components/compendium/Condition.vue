@@ -2,9 +2,7 @@
 	<tag :is="cardView ? 'hk-card' : 'div'">
 		<div slot="header" :class="{ 'card-header': cardView }">
 			<h1>
-				<svg class="icon" viewBox="0 0 512 512">
-					<path :d="condition.icon" fill-opacity="1"></path>
-				</svg>
+                <i :class="`hki-${condition.value}`" />
 				{{ condition.name }}
 			</h1>
 		</div>
@@ -51,7 +49,6 @@
 		},
 		data() {
 			return {
-				loading: true,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",
@@ -62,7 +59,7 @@
 				]
 			}
 		},
-		firebase() {
+        firebase() {
 			return {
 				condition: {
 					source: db.ref(`conditions/${this.id}`),
@@ -75,12 +72,6 @@
 </script>
 
 <style lang="scss" scoped>
-	svg.icon {
-		width: 20px;
-		height: 20px;
-		margin-right: 5px;
-		fill: $gray-light;
-	}
 	ul {
 		margin-top: 20px;
 		padding-left: 20px;

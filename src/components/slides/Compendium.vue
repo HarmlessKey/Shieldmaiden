@@ -99,7 +99,7 @@
 					{ name: 'monsters', label: 'Monsters', icon: 'fas fa-dragon' },
 					{ name: 'items', label: 'Items', icon: 'fas fa-treasure-chest' },
 					{ name: 'spells', label: 'Spells', icon: 'fas fa-wand-magic' },
-					{ name: 'conditions', label: 'Conditions', icon: 'fas fa-skull-crossbones' },
+					{ name: 'conditions', label: 'Conditions', icon: 'fas fa-flame' },
 				],
 				current: undefined,
 				show: undefined,

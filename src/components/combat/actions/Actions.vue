@@ -12,21 +12,16 @@
 				<template v-slot:selected>
 					<q-item v-if="doneBy" class="selected">
 						<q-item-section avatar>
-							<icon 
-								class="img" 
-								v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" 
-								:icon="entitiesList[doneBy].img" 
-								:fill="entitiesList[doneBy].color_label" 
-								:style="entitiesList[doneBy].color_label ? `border-color: ${entitiesList[doneBy].color_label}` : ``" 
-							/>
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + entitiesList[doneBy].img + ')',
-									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``
+									'border-color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : ``,
+									'color': entitiesList[doneBy].color_label ? entitiesList[doneBy].color_label : `#b2b2b2`
 								}
-							"/>
+							">
+								<i v-if="['monster', 'player', 'companion', 'environment'].includes(entitiesList[doneBy].img)" :class="`hki-${entitiesList[doneBy].img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="entitiesList[doneBy].name.capitalizeEach()"/>
@@ -45,15 +40,16 @@
 						@click="doneBy = scope.opt.key"
 					>
 						<q-item-section avatar>
-							<icon v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" class="img" :icon="scope.opt.img" :fill="scope.opt.color_label" :style="scope.opt.color_label ? `border-color: ${scope.opt.color_label}` : ``" />
 							<span 
-								v-else 
 								class="img" 
 								:style="{
 									'background-image': 'url(' + scope.opt.img + ')',
-									'border-color': scope.opt.color_label ? scope.opt.color_label : ``
+									'border-color': scope.opt.color_label ? scope.opt.color_label : ``,
+									'color': scope.opt.color_label ? scope.opt.color_label : `#b2b2b2`
 								}
-							"/>
+							">
+								<i v-if="['monster', 'player', 'companion', 'environment'].includes(scope.opt.img)" :class="`hki-${scope.opt.img}`" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="scope.opt.name.capitalizeEach()"/>
@@ -250,6 +246,12 @@
 		background-size: cover;
 		background-position: top center;
 		border: solid 1px $gray-light;
+		font-size: 27px;
+		line-height: 35px;
+		
+		i {
+			vertical-align: 5px !important;
+		}
 	}
 	.reaction-used {
 		font-size: 15px;

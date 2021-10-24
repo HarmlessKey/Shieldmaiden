@@ -1,7 +1,7 @@
 <template>
 	<div class="pb-5">
 		<h2>
-			<icon :icon="cond.value" class="icon" />
+			<i :class="`hki-${cond.value}`" />
 			{{ cond.name }}
 		</h2>
 
@@ -68,14 +68,6 @@
 				]
 			}
 		},
-		firebase() {
-			return {
-				// cond: {
-				// 	source: db.ref(`conditions/${this.condition}`),
-				// 	asObject: true
-				// }
-			}
-		},
 		computed: {
 			cond() {
 				return this.conditionList.filter(item => item.value === this.condition)[0];
@@ -117,11 +109,10 @@
 			margin-bottom: 10px;
 		}
 	}
-	svg {
-		width: 23px;
-		height: 23px;
-		color: $gray-light;
-		fill: $gray-light;
+	h2 {
+		i {
+			vertical-align: -2px;
+		}
 	}
 	.table {
 

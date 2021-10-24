@@ -33,13 +33,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Condition from '@/components/compendium/Condition.vue';
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Conditions',
+		mixins: [conditions],
 		components: {
 			Crumble,
 			Footer,
@@ -55,15 +56,6 @@
 						label: 'Name',
 						sortable: true
 					},
-				},
-				isBusy: true,
-			}
-		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					readyCallback: () => this.isBusy = false
 				}
 			}
 		}

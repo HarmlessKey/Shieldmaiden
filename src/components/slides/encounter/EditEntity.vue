@@ -465,7 +465,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 	.q-input {

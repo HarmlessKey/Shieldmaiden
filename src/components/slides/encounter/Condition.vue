@@ -5,9 +5,7 @@
 			{{ cond.name }}
 		</h2>
 
-		<span class="bg-gray-dark">
-			<TargetItem  :item="entity.key" />
-		</span>
+		<TargetItem  :item="entity.key" />
 
 		<hr>
 
@@ -28,7 +26,7 @@
 					<span v-if="entity.conditions['exhaustion'] >= index + 1"><i class="fas fa-check"></i></span>
 					<span v-else>{{ index + 1 }}</span>
 					</a></td>
-					<td :class="{'gray-hover': entity.conditions['exhaustion'] < index + 1}">{{ effect }}</td>
+					<td :class="{'neutral-2': entity.conditions['exhaustion'] < index + 1}">{{ effect }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -117,19 +115,19 @@
 	.table {
 
 		td {
-			background:$gray-active;
+			background: $neutral-9;
 
 			a {
-				color: $gray-light !important;
-				background: #494747;
+				color: $neutral-6 !important;
+				background: $neutral-2;
 				line-height: 30px;
 				height: 30px;
 				display: block;
 				text-align: center;
 
 				&.active {
-					background: $gray-light;
-					color:$gray-active !important;
+					background: $red;
+					color: $white !important;
 				}
 			}
 		}

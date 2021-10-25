@@ -126,6 +126,7 @@ html body {
 	.neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
 	.neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
 	.neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
+	.neutral-11 { color: $neutral-11 !important; path { fill: $neutral-11 !important;} }
 
 	.gray { color: $gray !important; path { fill: $gray !important;} }
 	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
@@ -172,6 +173,7 @@ html body {
 	.bg-neutral-8 { background-color: $neutral-8 !important; }
 	.bg-neutral-9 { background-color: $neutral-9 !important; }
 	.bg-neutral-10 { background-color: $neutral-10 !important; }
+	.bg-neutral-11 { background-color: $neutral-11 !important; }
 
 	.bg-gray { background-color: $gray !important; }
 	.bg-gray-light { background-color: $gray-light !important; }
@@ -1160,6 +1162,11 @@ html body {
 				&.hk-table-header {
 					background: none;
 				}
+			}
+		}
+		.target-item {
+			.ac_wrapper {
+				background-color: $neutral-5;
 			}
 		}
 	}

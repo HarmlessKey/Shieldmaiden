@@ -53,7 +53,7 @@
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
 								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
-									<i :class="reminder.variables ? 'fas fa-caret-right gray-light' : 'fas fa-plus green'"></i>
+									<i :class="reminder.variables ? 'fas fa-caret-right' : 'fas fa-plus green'"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Set
 									</q-tooltip>
@@ -72,7 +72,7 @@
 									/>
 									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
 								</div>
-								<a @click="addReminder('premade', reminder, selectedVars)" class="gray-light d-block mt-3">
+								<a @click="addReminder('premade', reminder, selectedVars)" class="d-block mt-3">
 									<i class="fas fa-plus green"></i> Add reminder
 								</a>
 							</div>
@@ -216,7 +216,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 
@@ -225,26 +224,26 @@
 	}
 
 	ul.premade {
-		color:$neutral-1;
+		color: $neutral-1;
 		list-style: none;
 		padding: 0;
 
 		li {
 			margin-bottom: 3px;
-			background-color:$gray-dark;
+			background-color: $neutral-5;
 
 			.title {
 				padding: 5px;
 			}
 			a.add {
 				display: block;
-				background:$gray-dark;
+				background: $neutral-9;
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
 			}
 			.variables {
-				border-top: solid 3px$gray;
+				border-top: solid 3px $neutral-4;
 				padding: 10px;
 			}
 		}
@@ -254,7 +253,7 @@
 		font-size: 11px;
 
 		a {
-			color:$neutral-1 !important;
+			color: $neutral-1 !important;
 			position: relative;
 			padding: 3px;
 
@@ -266,7 +265,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color:$neutral-1 !important;
+					color: $neutral-1 !important;
 					font-size: 12px;
 					display: inline-block;
 					

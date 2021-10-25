@@ -25,13 +25,13 @@
 
 						<q-item-section v-if="value === 'exhaustion'" avatar>
 							<a @click.stop>
-								<span class="exhaustion gray-dark" v-if="checkExhaustion() != undefined">
+								<span class="exhaustion neutral-11" v-if="checkExhaustion() != undefined">
 									{{ checkExhaustion() }}
 								</span>
 								<i v-else class="fas fa-plus-circle green" />
 
-								<q-popup-proxy square :breakpoint="576">
-									<div class="bg-gray gray-light">
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+									<div class="bg-neutral-8">
 										<q-list>
 											<q-item>
 												<q-item-section>Exhaustion</q-item-section>
@@ -171,7 +171,7 @@
 		line-height: 27px;
 
 		.icon {
-			color: $gray-light;
+			color: $neutral-3;
 			font-size: 23px;
 			margin-right: 12px;
 		}
@@ -194,37 +194,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
-	// ul.conditions {
-	// 	list-style: none;
-	// 	padding: 0;
-	// 	line-height: 25px;
-	// 	font-size: 16px;
-
-	// 	a {
-	// 		color: $gray-light !important;
-	// 	}
-	// 	.icon {
-	// 		font-size: 25px;
-	// 		margin-right: 10px;
-	// 	}
-
-	// 	li {
-	// 		margin-bottom: 15px;
-
-	// 		.shown {
-	// 			color: $gray-light;
-	// 			background:$gray-active;
-	// 			padding: 20px;
-
-	// 			ul {
-	// 				padding: 15px 0 0 18px;
-	// 				margin: 0;	
-	// 			}
-	// 			margin: 10px 0;				
-	// 		}
-	// 	}
-	// }
 </style>

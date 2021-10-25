@@ -117,7 +117,7 @@
 						<span :class="{ 'blue': npc.origin == 'custom' }">
 							{{ npc.name.capitalizeEach() }}
 						</span>
-						<a class="gray-light" @click="set(npc['.key'], npc.origin)">
+						<a class="neutral-2" @click="set(npc['.key'], npc.origin)">
 							<i class="fas fa-copy blue"></i>
 							<span class="d-none d-md-inline ml-1">Copy</span>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -161,7 +161,6 @@
 						v-model="addMoment"
 						spread
 						no-caps
-						flat
 						:dark="$store.getters.theme === 'dark'"
 						:options="options"
 						toggle-color="primary"
@@ -422,13 +421,6 @@
 				.row {
 					padding: 0;
 				}
-			}
-		}
-	}
-	ul.nav {
-		a.nav-link {
-			&.active {
-				background:$gray-active !important;
 			}
 		}
 	}

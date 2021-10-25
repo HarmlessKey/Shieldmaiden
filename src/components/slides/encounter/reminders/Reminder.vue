@@ -2,9 +2,7 @@
 	<div class="pb-5">
 		<h2>{{ title }}</h2>
 
-		<div class="bg-gray-dark">
-				<TargetItem  :item="entity.key" />
-		</div>
+		<TargetItem  :item="entity.key" />
 
 		<a 
 			class="btn btn-block bg-red my-3"
@@ -86,45 +84,3 @@
 		},
 	};
 </script>
-
-<style lang="scss" scoped>
-	ul {
-		padding-left: 20px;
-
-		&.exhaustion {
-			list-style: none !important;
-			padding-left: 5px;
-		}
-
-		li {
-			margin-bottom: 10px;
-		}
-	}
-	svg {
-		width: 23px;
-		height: 23px;
-		color: $gray-light;
-		fill: $gray-light;
-	}
-	.table {
-
-		td {
-			background:$gray-active;
-
-			a {
-				color: $gray-light !important;
-				background: #494747;
-				line-height: 30px;
-				height: 30px;
-				display: block;
-				text-align: center;
-
-				&.active {
-					background: $gray-light;
-					color:$gray-active !important;
-				}
-			}
-		}
-	}
-
-</style>

@@ -386,7 +386,7 @@
 		</div>
 
 		<!-- REMINDERS -->
-		<ul v-if="entity.reminders && showReminders" class="target-reminders d-flex justify-content-start">
+		<ul v-if="entity.reminders && showReminders" class="target-reminders">
 			<li v-for="(reminder, index) in entity.reminders" :key="index" :class="'bg-'+reminder.color">
 				<q-tooltip anchor="top middle" self="center middle">
 					{{ reminder.title }}
@@ -535,19 +535,20 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 </script>
 
 <style lang="scss" scoped>
-.taret-item-wrapper {
-	width: 100%;
-	
 	ul.target-reminders {
-		padding-left: 30px;
+		padding-left: 1px;
 		list-style: none;
 		margin: 0;
+		display: none;
+		display: flex;
+		justify-content: flex-start;
+		background: $neutral-7;
 	
 		li {
+			display: block;
 			width: 20px;
 			height: 7px;
 			margin: 1px 1px 1px 0;
 		}
 	}
-}
 </style>

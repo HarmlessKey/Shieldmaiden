@@ -1,6 +1,6 @@
 <template>
-	<hk-card>
-		<div slot="header" class="card-header">
+	<tag :is="cardView ? 'hk-card' : 'div'" :class="!cardView ? 'normal-view' : ''">
+		<div slot="header" :class="cardView ? 'card-header' : 'top-menu'">
 			<div 
 				class="money" 
 				:class="{ red: currency['.value'] >= maxCurrencyAmount }"
@@ -24,7 +24,7 @@
 				<span v-else class="text-italic white">No money</span>
 			</div>
 			<div class="d-flex justify-content-end">
-				<template v-if="viewerIsUser">
+				<template v-if="viewerIsUser && page !== 'user'">
 					<a 
 						class="btn btn-sm mr-1"
 						@click="setSlide({
@@ -61,7 +61,7 @@
 					</a>
 				</template>
 				<a 
-					class="btn btn-sm"
+					class="btn btn-sm bg-neutral-5"
 					v-else-if="campaign.inventory && campaign.inventory.items"
 					@click="setSlide({
 						show: true,
@@ -77,81 +77,76 @@
 		</div>
 		<div 
 			v-if="players"
-			class="players card-body" 
-			:class="{ xp: isXpAdvancement(), large: is_large }"
+			class="players" 
+			:class="{ xp: isXpAdvancement(), large: is_large, 'card-body': cardView }"
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
 			<div class="header"></div>
 			<div class="col header ac">
-				<i class="fas fa-shield"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					Armor class
-				</q-tooltip>
 			</div>
 			<div class="col header name"></div>
-			<div class="col header pp" v-if="settings.passive_perception === undefined && !is_small">
+			<div class="col header text-center pp" v-if="settings.passive_perception === undefined && !is_small">
 				<i class="fas fa-eye"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive perception
 				</q-tooltip>
 			</div>
-			<div class="col header pinv" v-if="settings.passive_investigation === undefined && !is_small">
+			<div class="col header text-center pinv" v-if="settings.passive_investigation === undefined && !is_small">
 				<i class="fas fa-search"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive investigation
 				</q-tooltip>
 			</div>
-			<div class="col header pins" v-if="settings.passive_insight === undefined && !is_medium">
+			<div class="col header text-center pins" v-if="settings.passive_insight === undefined && !is_medium">
 				<i class="fas fa-lightbulb-on"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Passive insight
 				</q-tooltip>
 			</div>
-			<div class="col header save" v-if="settings.save_dc === undefined && !is_medium">
+			<div class="col header text-center save" v-if="settings.save_dc === undefined && !is_medium">
 				<i class="fas fa-hand-holding-magic"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Save DC
 				</q-tooltip>
 			</div>
-			<div class="col header health">
+			<div class="col header text-center health">
 				<i class="fas fa-heart"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Health
 				</q-tooltip>
 			</div>
-			<div class="col header actions" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
+			<div class="col header text-right" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
 			<template v-for="(player, key) in players">
 				<template v-if="player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
 					<div 
 						class="image" 
 						:key="'image-'+key" 
-						:style="[
-							player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : 
-							{ backgroundImage: `url(${require('@/assets/_img/styles/player.svg')})`}
-						]
-					">
+						:style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"
+					>
 						<div class="transformed" v-if="player.transformed">
 							<i class="fas fa-paw-claws green"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Transformed
 							</q-tooltip>
 						</div>
-						<!-- <div v-if="player.avatar" :style="[player.avatar ? { backgroundImage: 'url(\'' + player.avatar + '\')' } : '@/assets/_img/styles/player.svg']"></div> -->
-						<!-- <img v-else src="@/assets/_img/styles/player.svg" />	 -->
+						<i v-if="!player.avatar" class="hki hki-player" />
 					</div>
 					<div class="col ac" :key="'ac-'+key">
-						<span :class="{ 
+						<i class="fas fa-shield" ></i>
+						<span 
+							v-if="player.ac_bonus"
+							class="value" 
+							:class="{ 
 								'green': player.ac_bonus > 0, 
 								'red': player.ac_bonus < 0 
-							}" 
-							v-if="player.ac_bonus">
-							{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Armor Class {{ player.ac_bonus }}
-							</q-tooltip>
+							}">
+								{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
+								<q-tooltip anchor="top middle" self="center middle">
+									Armor Class {{ player.ac_bonus }}
+								</q-tooltip>
 						</span>
-						<span v-else>{{ player.transformed ? player.transformed.ac : player.ac }}</span>
+						<span v-else class="value">{{ player.transformed ? player.transformed.ac : player.ac }}</span>
 					</div>
 					<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
 
@@ -206,7 +201,7 @@
 									'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
 									'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
 								}">{{ player.transformed.curHp }}</span>
-								<span class="gray-hover">/</span>
+								<span class="neutral-2">/</span>
 								<span>
 									{{ player.transformed.maxHp }}
 								</span>
@@ -217,7 +212,7 @@
 									'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
 									'green': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 76
 								}">{{ player.curHp }}</span>
-								<span class="gray-hover">/</span>
+								<span class="neutral-2">/</span>
 								<span :class="{ 
 										'green': player.maxHpMod > 0, 
 										'red': player.maxHpMod < 0 
@@ -230,7 +225,7 @@
 								</span>
 								<span v-else>{{ player.maxHp }}</span>
 							</template>
-							<span v-if="player.tempHp > 0" class="gray-hover">+{{ player.tempHp }}</span>
+							<span v-if="player.tempHp > 0" class="neutral-2">+{{ player.tempHp }}</span>
 						</template>
 					</div>
 					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
@@ -254,17 +249,17 @@
 								Level is overwritten
 							</q-tooltip>
 						</div>
-						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-gray-light" />
+						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-neutral-3" />
 					</div>
 				</template>
 			</template>
 		</div>
 
-		<div slot="footer" class="card-footer">
-			<button class="btn btn-block" @click="reset()" v-if="viewerIsUser"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<div slot="footer" class="card-footer" v-if="viewerIsUser && page !== 'user'">
+			<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
 		</div>
 		<q-resize-observer @resize="onResize" />
-	</hk-card>
+	</tag>
 </template>
 
 <script>
@@ -275,7 +270,18 @@
 
 	export default {
 		name: 'Players',
-		props: ['userId', 'campaignId'],
+		props: {
+			userId: {
+				type: String
+			}, 
+			campaignId: {
+				type: String
+			}, 
+			cardView: {
+				type: Boolean,
+				default: false
+			}
+		},
 		mixins: [experience, currencyMixin],
 		data() {
 			return {
@@ -312,6 +318,9 @@
 				//If the viewer is the user that runs the campaign
 				//Edit functions are enabled
 				return this.userId === this.viewerId;
+			},
+			page() {
+				return this.$route.path.split("/")[1];
 			},
 			templateColumns() {
 				let templateColumns = 'max-content max-content auto ';
@@ -435,23 +444,42 @@
 </script>
 
 <style lang="scss" scoped>
-	.card-header {
-		.money {
+	.normal-view {
+		.top-menu {
 			display: flex;
-			justify-content: flex-start;
-			cursor: pointer;
-			grid-area: money;
-			font-size: 18px;
+			justify-content: space-between;
+			border-bottom: solid 2px $white;
+			padding-bottom: 2px;
 
-			div {
-				margin-right: 10px;
+			.money {
+				text-shadow: 0 0 3px $black;
+				border-radius: $border-radius-small;
+				padding-left: 10px;
+				color: $white;
+			}
+		}
+		.players {
+			.col.header {
+				color: $white;
+			}
+		}
+	}
+	.money {
+		display: flex;
+		justify-content: flex-start;
+		cursor: pointer;
+		grid-area: money;
+		font-size: 18px;
+		line-height: 31px;
 
-				img {
-					height: 14px;
-				}
-				&:last-child {
-					margin: none;
-				}
+		div {
+			margin-right: 10px;
+
+			img {
+				height: 14px;
+			}
+			&:last-child {
+				margin: none;
 			}
 		}
 	}
@@ -469,15 +497,22 @@
 			background-color: $neutral-10;
 			border: solid 1px $neutral-2;
 			position: relative;
+			font-size: 36px;
+			text-align: center;
 
+			.hki:before {
+				vertical-align: 7px;
+				color: $neutral-2;
+			}
 			.transformed {
 				right: 0;
 				bottom: 0;
 				position: absolute;
-				background: $neutral-10;
+				background: $neutral-8;
 				padding: 0 2px;
 				border-left: solid 1px $neutral-2;
 				border-top: solid 1px $neutral-2;
+				font-size: 13px;
 			}
 		}
 		.col {
@@ -488,7 +523,7 @@
 			&.header {
 				padding: 0 12px 5px 12px;
 				background: none;
-				color: $neutral-1;
+				color: $neutral-3;
 				min-height: 25px;
 
 				&.actions {
@@ -498,6 +533,26 @@
 			&.ac {
 				text-align: center;
 				font-weight: bold;
+				position: relative;
+				padding: 0;
+				width: 45px;
+		
+				i, .value {
+					left: 5px;
+					position: absolute;
+					line-height: 49px;
+					width: 100%;
+					text-align: center;
+				}
+				i {
+					font-size: 35px;
+					color: $neutral-4;
+				}
+				.value {
+					font-weight: bold;
+					color: $white;
+					margin-top: -1px;
+				}
 			}
 			&.name {
 				white-space: nowrap;
@@ -520,13 +575,15 @@
 				width: 62px;
 				height: 62px;
 				grid-row: span 2;
+				font-size: 49px;
 			}
 			.xp-bar {
-				background: rgba(0, 0, 0, .5);
+				background: $neutral-8-transparent-8;
 				display: flex;
 				justify-content: space-between;
 				height: 15px;
 				width: 100%;
+				font-size: 12px;
 			
 				.level {
 					display: block;
@@ -548,21 +605,41 @@
 			.image {
 				height: 61px;
 				width: 61px;
+				font-size: 49px;
 			}
 			.col {
-				padding: 12px 15px;
+				line-height: 30px;
+				padding: 14px 15px;
+
+				&.header {
+					font-size: 18px;
+				}
+
+				&.ac {
+					padding: 0;
+					width: 54px;
+			
+					i, .value {
+						line-height: 61px;
+					}
+					i {
+						font-size: 45px;
+					}
+				}
 			}
 
 			&.xp {
 				.image {
 					width: 84px;
 					height: 84px;
+					font-size: 67px;
 				}
 				.xp-bar {
-					height: 22px;
+					height: 23px;
+					font-size: 18px;
 
 					.q-linear-progress {
-						margin-top: 8px;
+						margin-top: 9px;
 						height: 5px;
 					}
 					.level {

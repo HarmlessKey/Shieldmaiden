@@ -5,7 +5,7 @@
 				<!-- NOT LIVE -->
 				<div class="track-wrapper" v-if="!encounter || broadcasting['.value'] !== $route.params.campid">
 					<div class="top">
-						<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+						<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
 						<span class="title truncate">{{ campaign.campaign }}</span>
 						<span>
 							<span class="live" :class="{ active: broadcasting['.value'] == $route.params.campid }">live</span>
@@ -38,7 +38,7 @@
 			</template>
 			<div v-else>
 				<div class="top d-flex justify-content-between">
-					<router-link :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
+					<router-link class="btn btn-sm btn-clear" :to="`/user/${$route.params.userid}`"><i class="fas fa-chevron-left"></i> Back</router-link>
 					Not found
 				</div>
 				<div class="container-fluid">
@@ -226,17 +226,17 @@
 		height: calc(100vh - 50px);
 		background-size: cover;
 		background-position: center bottom;
-		background-color:$gray-dark;
+		background-color: $neutral-5;
 		width: 100vw;
 		position: relative;
 
 		.top {
 			grid-area: top;
-			background: rgba(38, 38, 38, .9);
+			background: $neutral-8;
 			text-transform: uppercase;
 			height: 60px;
-			line-height: 40px;
-			padding: 10px;
+			line-height: 30px;
+			padding: 15px 10px;
 			display: grid;
 			grid-template-columns: max-content auto max-content;
 
@@ -246,7 +246,7 @@
 			}
 			.full {
 				font-size: 25px;
-				color: $gray-light;
+				color: $neutral-2;
 				margin-left: 10px;
 			}
 		}

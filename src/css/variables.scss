@@ -12,7 +12,11 @@
   --neutral-1: #FFFFFF; // Text
 
   --neutral-6-transparent: rgba(54, 57, 63, .9);
+  --neutral-6-transparent-8: rgba(54, 57, 63, .8);
+  --neutral-6-transparent-7: rgba(54, 57, 63, .7);
+
   --neutral-8-transparent: rgba(41, 43, 47, .9);
+  --neutral-8-transparent-8: rgba(41, 43, 47, .8);
 
   --black: #000;
   --white: #FFF;
@@ -78,7 +82,11 @@
   --neutral-1: #060607;
 
   --neutral-6-transparent: rgba(255, 255, 255, .9);
+  --neutral-6-transparent-8: rgba(255, 255, 255, .8);
+  --neutral-6-transparent-7: rgba(255, 255, 255, .7);
+
   --neutral-8-transparent: rgba(220, 222, 224, .9);
+  --neutral-8-transparent-8: rgba(220, 222, 224, .8);
 
   --radiant:  #e2da5f;
 }
@@ -98,7 +106,11 @@ $neutral-2: var(--neutral-2);
 $neutral-1: var(--neutral-1);
 
 $neutral-6-transparent: var(--neutral-6-transparent);
+$neutral-6-transparent-8: var(--neutral-6-transparent-8);
+$neutral-6-transparent-7: var(--neutral-6-transparent-7);
+
 $neutral-8-transparent: var(--neutral-8-transparent);
+$neutral-8-transparent-8: var(--neutral-8-transparent-8);
 
 $black: var(--black); // Keep
 $white: var(--white); // Keep

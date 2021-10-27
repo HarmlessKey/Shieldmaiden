@@ -185,7 +185,7 @@
 
 				<!-- PLAYERS -->
 				<div class="col-12 col-md-5">
-					<Players :userId="user.uid" :campaignId="campaignId" />
+					<Players :userId="user.uid" :campaignId="campaignId" card-view />
 				</div>
 			</div>
 		</template>

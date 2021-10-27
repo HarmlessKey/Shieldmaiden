@@ -1,5 +1,5 @@
 <template>
-	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-gray-dark`">
+	<div class="light" :class="(background && lightning && showWeather) ? `bg-white` : `bg-neutral-5`">
 		<div 
 			class="weather-wrapper" 
 			:style="{ backgroundImage: 'url(\'' + background + '\')' }"

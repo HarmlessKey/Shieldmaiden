@@ -1,6 +1,7 @@
 <template>
 	<div class="shares">
 		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}">
+			<h3 class="text-center">Shared rolls</h3>
 			<ul class="shared">
 				<template v-for="({type, encounter_id, entity_key, notification}, index) in shares">
 					<!-- Only show notifications with an encounter_id in that encounter -->
@@ -34,7 +35,7 @@
 											<span v-if="notification.advantage_disadvantage" v-html="advantage(notification.advantage_disadvantage)" /> 
 											{{ notification.roll }}
 										</span>
-										<span class="total white">
+										<span class="total">
 											{{ notification.total }}
 										</span>
 									</div>
@@ -54,8 +55,8 @@
 
 										<div v-if="action.toHit" class="result toHit">
 											<span class="roll">
-												<span class="icon">
-													<icon icon="swords" class="gray-light" />
+												<span class="mr-1 neutral-2">
+													<i class="hki-sword-break" />
 													<q-tooltip anchor="top middle" self="center middle">
 														To hit roll
 													</q-tooltip>
@@ -63,7 +64,7 @@
 												<span v-html="advantage(action.toHit.advantage_disadvantage)" /> 
 												{{ action.toHit.roll }}
 											</span>
-											<span class="total white">
+											<span class="total">
 												{{ action.toHit.total }}
 											</span>
 										</div>
@@ -85,7 +86,7 @@
 
 						<!-- XP AWARDS -->
 						<li v-if="type === 'xp'" :key="`roll-${index}`" class="xp">
-							<div class="bg-gray-dark py-2">
+							<div class="bg-neutral-8 py-2 border-radius">
 								<div v-if="notification.targets" class="targets">
 									<template v-for="target in notification.targets">
 										<div v-if="players && Object.keys(players).includes(target)" :key="target" class="img">
@@ -159,9 +160,10 @@
 
 <style lang="scss" scoped>
 	.shares {
-		background-color: rgba(0, 0, 0, .7);
+		background-color: $neutral-6-transparent-7;
 		height: 100%;
 		backdrop-filter: blur(1px);
+		border-left: solid 1px $neutral-11;
 
 		.q-scrollarea {
 			padding: 10px 10px 0 10px;
@@ -173,7 +175,7 @@
 				margin: 0 0 20px 0;
 
 				li {
-					border-bottom: solid 1px $gray-hover;
+					border-bottom: solid 1px $neutral-2;
 					padding: 5px 0;
 
 					.targets {
@@ -186,15 +188,22 @@
 							width: 23px; 
 							height: 23px;
 							margin: 0 2px;
+
+							.avatar {
+								font-size: 16px;
+							}
 						}
 					}
 					&.roll {
+						
 						h3 {
+							border-top-left-radius: $border-radius;
+							border-top-right-radius: $border-radius;
 							display: grid;
 							grid-template-columns: 43px auto;
 							grid-gap: 5px;
 							padding-right: 8px;
-							background-color: $gray-active;
+							background-color: $neutral-8;
 							margin: 0 !important;
 							font-size: 15px;
 							height: 43px;
@@ -206,6 +215,10 @@
 								&.logo {
 									background: none;
 									padding: 3px;
+								}
+
+								.avatar {
+									font-size: 33px;
 								}
 							}
 							.header {
@@ -235,8 +248,10 @@
 							}
 						}
 						.result-wrapper {
+							border-bottom-left-radius: $border-radius;
+							border-bottom-right-radius: $border-radius;
 							padding: 8px;
-							background-color: $gray-dark;
+							background-color: $neutral-6;
 
 							.result {
 								font-size: 18px;
@@ -259,7 +274,7 @@
 							&.action {
 								.result {
 									padding: 3px 8px;
-									background: $black;
+									background: $neutral-8;
 									margin-bottom: 5px;
 									line-height: 29px;
 
@@ -267,7 +282,7 @@
 										margin-bottom: 0;
 									}
 									&.toHit {
-										border-bottom: solid 1px $gray;
+										border-bottom: solid 1px $neutral-4;
 										background: none;
 										padding: 0 3px 5px 3px;
 										height: 35px;
@@ -301,6 +316,7 @@
 		.shares {
 			background: none;
 			height: calc(100vh - 170px);
+			border: none;
 
 			.q-scrollarea {
 				padding: 10px 5px 0 0;

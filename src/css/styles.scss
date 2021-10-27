@@ -116,17 +116,17 @@ html body {
 	.white { color: $white !important; }
 	.black { color: $black !important; }
 	
-	.neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
-	.neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
-	.neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
-	.neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
-	.neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
-	.neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
-	.neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
-	.neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
-	.neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
-	.neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
-	.neutral-11 { color: $neutral-11 !important; path { fill: $neutral-11 !important;} }
+	.neutral-1, .text-neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
+	.neutral-2, .text-neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
+	.neutral-3, .text-neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
+	.neutral-4, .text-neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
+	.neutral-5, .text-neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
+	.neutral-6, .text-neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
+	.neutral-7, .text-neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
+	.neutral-8, .text-neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
+	.neutral-9, .text-neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
+	.neutral-10, .text-neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
+	.neutral-11, .text-neutral-11 { color: $neutral-11 !important; path { fill: $neutral-11 !important;} }
 
 	.gray { color: $gray !important; path { fill: $gray !important;} }
 	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
@@ -174,6 +174,9 @@ html body {
 	.bg-neutral-9 { background-color: $neutral-9 !important; }
 	.bg-neutral-10 { background-color: $neutral-10 !important; }
 	.bg-neutral-11 { background-color: $neutral-11 !important; }
+
+	.bg-white { background-color: $white !important; }
+	.bg-black { background-color: $black !important; }
 
 	.bg-gray { background-color: $gray !important; }
 	.bg-gray-light { background-color: $gray-light !important; }

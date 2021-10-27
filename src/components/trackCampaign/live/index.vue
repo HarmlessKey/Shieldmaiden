@@ -70,7 +70,7 @@
 
 			<!-- MOBILE -->
 			<div v-else class="track mobile">
-				<div class="bg-gray-dark">
+				<div class="bg-neutral-6">
 					<q-select
 						:dark="$store.getters.theme === 'dark'" filled square
 						v-model="panel"
@@ -411,7 +411,7 @@
 		grid-template-columns: 1fr;
 
 		.transparent-bg {
-			background: rgba(38, 38, 38, .3);
+			background: none;
 		}
 		.q-tab-panel {
 			padding: 0 15px;

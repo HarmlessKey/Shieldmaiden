@@ -4,9 +4,9 @@
 			<div>
 				<h2>Rewards</h2>
 				<template v-if="encounter.xp_awarded">
-					<h2>Experience Points</h2>
+					<h2 class="white">Experience Points</h2>
 					<div class="xp animated bounceIn" >
-						<span class="green">{{ xpAmount }} </span> <span class="gray-hover">XP</span>
+						<span class="green">{{ xpAmount }} </span> <span class="neutral-2">XP</span>
 					</div>
 				</template>
 
@@ -104,7 +104,7 @@
 		}
 
 		h2 {
-			color:$neutral-1;
+			color: $white;
 			text-shadow: 0 0 3px $black;
 			text-transform: none !important;
 			margin-bottom: 10px;
@@ -114,12 +114,12 @@
 			margin-bottom: 20px;
 			font-size: 35px;
 			text-align: center;
-			background: rgba(38, 38, 38, .8);
-			color:$neutral-1;
+			background: $neutral-8-transparent-8;
+			color: $neutral-1;
 		}
 
 		.currency-wrapper {
-			background: rgba(38, 38, 38, .8);
+			background: $neutral-8-transparent-8;
 			margin-bottom: 20px;
 			padding: 30px 0;
 
@@ -140,7 +140,7 @@
 					border: none !important;
 					font-weight: bold;
 					font-size: 18px;
-					color:$neutral-1 !important;
+					color: $neutral-1 !important;
 					opacity: 1 !important;
 				}
 				div {

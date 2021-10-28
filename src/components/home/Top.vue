@@ -6,7 +6,7 @@
 				<div class="content-box">
 					<div class="text">
 						<template>
-							<div class="text-center neutral-3 mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
+							<div class="text-center neutral-2 mb-4">Built by 2 guys with a passion for Dungeons and Dragons.</div>
 							<h1>COMBAT TRACKER FOR D&amp;D 5e.</h1>
 							<h3>The online tool for offline play.</h3>
 						</template>
@@ -18,7 +18,7 @@
 						
 						<!-- PATREON -->
 						<div>
-							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red">
+							<a href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red btn btn-lg btn-clear">
 								<i class="fab fa-patreon"></i> Support us on Patreon
 							</a>
 						</div>
@@ -69,7 +69,6 @@
 					margin: auto;
 					max-width: 800px;
 					padding: 25px 20px 20px 20px;
-					text-shadow: 2px 2px 1px $black;
 
 					h1 {
 						font-family: 'Fredericka the Great', cursive;
@@ -147,6 +146,14 @@
 			}
 		}
 	}
+
+	[data-theme="light"] {
+		.top {
+			background-image: none;
+			background-color: $neutral-9;
+		}
+	}
+
 	@media only screen and (max-width: 767px) {
 		.top {
 			.animated-video {

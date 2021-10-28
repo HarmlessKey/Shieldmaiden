@@ -63,14 +63,14 @@
 		height: 30px;
 		line-height: 26px;
 		text-align: center;
-		color: $red;
+		color: $neutral-2;
 		background-color: $neutral-8;
 		padding: 2px;
 		cursor: pointer;
 	}
 	.n {
 		position: absolute;
-		color: $red;
+		color: $neutral-1;
 		top: 0;
 		left: 2px;
 	}

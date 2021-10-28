@@ -161,7 +161,7 @@ export const content_module = {
 			return new Promise((resolve) => {
 				setTimeout(() => {
 					resolve()
-				}, 500)
+				}, 1000)
 			});
 		},
 		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },

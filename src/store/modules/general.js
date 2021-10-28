@@ -37,7 +37,7 @@ export const general_module = {
 					// players need prio!
 					dispatch("fetchPlayers");
 					dispatch("fetchNpcs");
-					await dispatch("fetchCampaigns");
+					dispatch("fetchCampaigns");
 					dispatch("fetchAllEncounters");
 			}
 			// Theme set after user, so it can be taken from the userSettings

@@ -1066,42 +1066,15 @@ html body {
 			pointer-events: auto;
 			width: 300px;
 			padding-top: 10px;
+			max-height: calc(100vh - 50px);
+			overflow-y: auto;
 
-			.roll {
-				.header {
-					display: grid;
-					grid-template-columns: auto max-content;
-					padding: 10px;
-					background: rgba(0, 0, 0, .2);
-		
-					a {
-						color: $neutral-2;
+			.q-btn {
+				pointer-events: auto;
+			}
 
-						&:hover {
-							color: $neutral-1;
-						}
-					}
-				}
-				.body {
-					.accordion {
-						.q-item {
-							background-color: $neutral-6;
-
-							.slashing, .bludgeoning, .piercing {
-								color: $neutral-2;
-							}
-
-							.q-focus-helper {
-								visibility: hidden;
-							}
-						}
-					}
-				}
-				.footer {
-					display: flex;
-					justify-content: space-between;
-					border-top: solid 1px $neutral-9;
-				}
+			&::-webkit-scrollbar {
+				display: none !important;
 			}
 		}
 	}
@@ -1796,6 +1769,7 @@ html body {
 						text-align: center;
 						font-size: 80px;
 						font-weight: bold;
+						background-color: $neutral-7;
 					}
 					.roll_footer {
 						text-align: center;

@@ -130,7 +130,7 @@
 		margin-top: 20px;
 
 		div {
-			background-color:$gray-dark;
+			background-color: $neutral-9;
 			padding: 10px;
 		}
 

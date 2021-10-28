@@ -20,7 +20,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
+					<i class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>
@@ -193,8 +193,8 @@
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	async created() {		
-		await this.initialize();
+	created() {		
+		this.initialize();
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -210,9 +210,6 @@
 		window.addEventListener('online', () => { this.connection = "online" });
 	},
 	mounted() {
-		//Set theme
-		document.documentElement.setAttribute("data-theme", this.theme);
-
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {

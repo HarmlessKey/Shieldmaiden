@@ -2,7 +2,7 @@
 	<tag :is="cardView ? 'hk-card' : 'div'">
 		<div slot="header" :class="{ 'card-header': cardView }">
 			<h1>
-                <i :class="`hki-${condition.value}`" />
+				<i :class="`hki-${condition.value}`" />
 				{{ condition.name }}
 			</h1>
 		</div>
@@ -33,10 +33,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Condition',
+		mixins: [conditions],
 		props: {
 			id: {
 				type: String,
@@ -59,13 +60,11 @@
 				]
 			}
 		},
-        firebase() {
-			return {
-				condition: {
-					source: db.ref(`conditions/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.condition.name),
-				}
+		computed: {
+			condition() {
+				return this.conditionList.filter(item => {
+					return item.value === this.id;
+				})[0];
 			}
 		}
 	}

@@ -33,7 +33,7 @@
 				<template v-for="(campaign, cKey) in campaigns">
 					<div :key="cKey">
 						<div class="p-2">
-							<span class="gray-hover">Campaign:</span>
+							<span class="neutral-2">Campaign:</span>
 							<router-link :key="cKey" :to="'/encounters/' + cKey">{{ campaign.campaign }}</router-link>
 							( <span :class="{ 'green': true, 'red': Object.keys(allEncounters[cKey]).length > tier.benefits.encounters }">{{ Object.keys(allEncounters[cKey]).length }}</span> 
 							/ {{ tier.benefits.encounters }} )
@@ -195,10 +195,10 @@
 			padding: 0;
 		}
 		.list-group {
-			border-top: solid 1px$gray-dark !important;
+			border-top: solid 1px $neutral-4 !important;
 
 			.list-group-item {
-				border-bottom: solid 1px$gray-dark !important;
+				border-bottom: solid 1px$neutral-4 !important;
 			}
 		}
 		&.encounters {

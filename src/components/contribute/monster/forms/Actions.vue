@@ -3,14 +3,14 @@
 		<hk-card>
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Abilities
-				<a class="gray-hover text-capitalize">
+				<a class="neutral-2 text-capitalize">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add
 					</q-tooltip>
-					<q-popup-proxy square>
-						<div class="bg-gray gray-light">
+					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+						<div class="bg-neutral-8">
 							<q-list>
 								<q-item 
 									v-for="{category, name_single} in actions" :key="`add-${category}`"
@@ -33,7 +33,7 @@
 				<div v-if="npc[category] && npc[category].length > 0" :key="category">
 					<h3 class="d-flex justify-content-between">
 						{{ name }}
-						<a class="gray-hover text-capitalize" @click="add(category)">
+						<a class="neutral-2 text-capitalize" @click="add(category)">
 							<i class="fas fa-plus green"></i>
 							<span class="d-none d-md-inline ml-1">Add</span>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -52,7 +52,7 @@
 					/>
 
 					<!-- ABILITIES -->
-					<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
+					<q-list :dark="$store.getters.theme === 'dark'" :class="`accordion`">
 						<q-expansion-item
 							v-for="(ability, ability_index) in npc[category]" 
 							:key="`ability-${ability_index}`"
@@ -327,7 +327,7 @@
 												<div class="card-header d-flex justify-content-between">
 													<span><i class="fas fa-dice-d20"/> Rolls</span>
 													<a 
-														class="gray-light text-capitalize" 
+														class="neutral-2 text-capitalize" 
 														@click="newRoll(ability_index, ability, category, action_index, action)"
 													>
 														<i class="fas fa-plus green"></i>
@@ -739,7 +739,7 @@
 		width: 100%;
 	}
 	h3 {
-		border-bottom: solid 1px $gray-hover;
+		border-bottom: solid 1px $neutral-2;
 		font-size: 15px;
 		margin-bottom: 1px;
 	}
@@ -758,7 +758,7 @@
 				cursor: default;
 				
 				span:hover {
-					color: $gray-light;
+					color: $neutral-2;
 				}
 			}
 		}

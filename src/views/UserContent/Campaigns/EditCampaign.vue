@@ -49,7 +49,7 @@
 						</div>
 					</div>
 
-					<div class="mt-3 gray-hover pointer" @click="setPrivate(!campaign.private)">
+					<div class="mt-3 neutral-2 pointer" @click="setPrivate(!campaign.private)">
 						<span class="btn btn-clear">
 							<span :class="!campaign.private ? 'green' : 'neutral-2'">
 								<i class="fas fa-eye"></i>
@@ -98,13 +98,13 @@
 
 								<div :class="{ 'red': inOtherCampaign(key) }">
 									{{ players[key].character_name }}
-									<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 gray-hover">
+									<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 neutral-2">
 										<small>Different Campaign</small>
 									</span>
 								</div>
 								
 								<div class="actions">
-									<a class="gray-hover" @click="removePlayer(key)">
+									<a class="neutral-2" @click="removePlayer(key)">
 										<i class="fas fa-trash-alt red"></i>
 										<q-tooltip anchor="top middle" self="center right">
 											Remove from campaign

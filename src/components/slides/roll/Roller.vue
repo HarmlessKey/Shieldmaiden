@@ -11,7 +11,7 @@
 			<q-input :dark="$store.getters.theme === 'dark'" filled square dense v-if="die === 'X'" min="0" max="999" type="number" v-model="item.x" name="x" />
 			<div v-else class="icon">
 				<i :class="item.icon"></i>
-				<span class="ml-1 gray-hover">d{{die}}</span>
+				<span class="ml-1 neutral-2">d{{die}}</span>
 			</div>
 			<q-input :dark="$store.getters.theme === 'dark'" filled square dense min="0" max="999" type="number" v-model="item.n" name="N" />
 			<q-input :dark="$store.getters.theme === 'dark'" filled square dense type="number" v-model="item.mod" max="999" min="-999" name="mod"/>

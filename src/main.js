@@ -73,9 +73,14 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
 	routes: routes,
+	scrollBehavior () {
+		const el = document.querySelector('.scrollable-content');
+		el.scrollLeft = 0;
+		el.scrollTop = 0;
+	},
 	linkActiveClass: "active", // active class for non-exact links.
 	linkExactActiveClass: "exact-active", // active class for *exact* links.
-	mode: 'history'
+	mode: 'history',
 });
 
 Vue.use(VueAnalytics, {

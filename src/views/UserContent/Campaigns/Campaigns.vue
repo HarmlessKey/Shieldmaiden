@@ -100,7 +100,7 @@
 									</h3>
 
 									<div class="mb-1">
-										<router-link class="btn btn-clear btn-sm" :to="'/campaigns/' + campaign.key">
+										<router-link class="btn btn-clear btn-sm" :to="'/content/campaigns/' + campaign.key">
 											<i class="fas fa-users mr-1 neutral-2"></i>
 											{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
 											players
@@ -402,7 +402,7 @@
 			}
 			&.openSlot {
 				height: 263px;
-				border: dashed 1px $gray-light !important;
+				border: dashed 1px $neutral-4 !important;
 				background: none !important;
 	
 				.card-body {

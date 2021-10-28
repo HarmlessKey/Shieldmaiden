@@ -176,7 +176,7 @@
 				</span>
 				<a 
 					v-if="level_tier_addable()"
-					class="gray-hover text-capitalize" 
+					class="neutral-2 text-capitalize" 
 					@click="add_level_tier()"
 				>
 					<i class="fas fa-plus green"></i>
@@ -444,12 +444,12 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px $gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 .q-tab-panel {
 	padding: 15px 0 0 0 !important;
-	border-bottom: solid 1px $gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	margin-bottom: 15px;
 }
 </style>

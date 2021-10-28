@@ -53,12 +53,12 @@
 
 			li {
 				font-size: 13px;
-				border-bottom: solid 1px$gray-active;
+				border-bottom: solid 1px $neutral-4;
 
 				a {
-					color: $gray-light !important;
+					color: $neutral-2 !important;
 					padding: 15px 5px;
-					border-top: solid 1px$gray-active;
+					border-top: solid 1px $neutral-4;
 
 					&:hover {
 						text-decoration: none;

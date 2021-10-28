@@ -11,7 +11,7 @@
 					</q-tooltip>
 					</span>
 				</div>
-				<a class="gray-hover text-capitalize" @click="modifier_dialog = true">
+				<a class="neutral-2 text-capitalize" @click="modifier_dialog = true">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Modifiers</span>
 					<q-tooltip anchor="top middle" self="center middle">
@@ -48,7 +48,7 @@
 					>
 						<template slot:label>
 							<div class="skill">
-								<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+								<div class="neutral-2 abillity">{{ skill.ability.substring(0,3) }}</div>
 								{{ skill.skill  }}
 								<div class="mod">
 									{{ 
@@ -80,7 +80,7 @@
 					/>
 				</div>
 				<div class="card-footer d-flex justify-content-end" slot="footer">
-					<q-btn class="bg-gray" @click="modifier_dialog = false" label="Close" />
+					<q-btn class="bg-neutral-5" @click="modifier_dialog = false" label="Close" />
 				</div>
 			</hk-card>
 		</q-dialog>

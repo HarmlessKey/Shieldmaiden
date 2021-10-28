@@ -3,7 +3,7 @@
 		<h2 class="d-flex justify-content-between">
 			<span><i class="fas fa-hand-holding-magic"/> Effects <template v-if="effects">( {{ effects.length }} )</template></span>
 			<a 
-				class="gray-light text-capitalize" 
+				class="neutral-2 text-capitalize" 
 				@click="add_effect()"
 			>
 				<i class="fas fa-plus green"></i>
@@ -28,7 +28,7 @@
 						{{ effect.effect.subtype }}
 					</q-item-section>
 					<q-item-section avatar>
-						<a @click="remove_effect(eff_index)" class="gray-hover text-capitalize">
+						<a @click="remove_effect(eff_index)" class="neutral-2 text-capitalize">
 							<i class="fas fa-trash-alt red"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Remove effect
@@ -56,9 +56,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card :dark="$store.getters.theme === 'dark'" square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Apply effect</b>
 												</q-card-section>
 
@@ -87,9 +87,9 @@
 							>							
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card :dark="$store.getters.theme === 'dark'" square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Target</b>
 												</q-card-section>
 												<q-card-section>
@@ -110,7 +110,7 @@
 								Scaling
 								<a 
 									v-if="level_tier_addable(eff_index)"
-									class="gray-hover text-capitalize" 
+									class="neutral-2 text-capitalize" 
 									@click="add_level_tier(eff_index)"
 								>
 									<i class="fas fa-plus green"></i>
@@ -370,14 +370,14 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 label {
 	display: flex;
 	justify-content: flex-start;
 	&.var {
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 	}
 }
@@ -388,7 +388,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color:$gray-dark;
+		background-color: $neutral-8;
 
 		.caret {
 			display: inline-block;
@@ -403,7 +403,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: $gray-darker;
+		background-color: $neutral-6;
 	}
 }
 </style>

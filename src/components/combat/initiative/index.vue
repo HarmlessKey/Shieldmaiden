@@ -35,7 +35,7 @@
 	<div v-else class="mobile-init">
 		<Turns />
 		
-		<div class="menu bg-gray-dark">
+		<div class="menu bg-neutral-8">
 			<q-select
 				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="panel"

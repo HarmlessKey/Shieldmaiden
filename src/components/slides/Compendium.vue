@@ -172,9 +172,8 @@
 
 		a {
 			text-align: center;
-			color: $gray-light !important;
+			color: $neutral-2 !important;
 			border-radius: 50%;
-			background-color:$gray-active;
 			width: 30px;
 			height: 30px;
 			display: block;
@@ -194,12 +193,12 @@
 		
 		li {
 			display: grid;
-			background-color:$gray-dark;
+			background-color: $neutral-9;
 			grid-template-columns: max-content auto;
 			margin-bottom: 1px;
 			vertical-align: center;
 			line-height: 46px;
-			padding: 0 5px;
+			padding: 0 10px;
 
 			.index {
 				padding-right: 10px;

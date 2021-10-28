@@ -108,16 +108,16 @@
 				<div class="d-flex justify-content-between var-title">
 					<span>{{ key }}</span>
 					<div>
-						<a @click="addOption(key)" class="mr-2">
-							<i class="fas fa-plus green"></i>
-							<q-tooltip anchor="top middle" self="bottom middle">
-								Add option
-							</q-tooltip>
-						</a>
-						<a @click="removeVar(key)">
-							<i class="fas fa-trash-alt red"></i>
+						<a @click="removeVar(key)" class="btn btn-sm bg-neutral-5">
+							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="bottom middle">
 								Remove variable
+							</q-tooltip>
+						</a>
+						<a @click="addOption(key)" class="btn btn-sm bg-neutral-5 ml-2">
+							<i class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="bottom middle">
+								Add option
 							</q-tooltip>
 						</a>
 					</div>
@@ -125,11 +125,6 @@
 
 				<!-- Options -->
 				<div v-for="(option, i) in variable" :key="`${key}-option-${i}`" class="option">
-					<div class="input-group-prepend" v-if="selectOptions">
-						<button class="btn btn-sm bg-gray" @click="setOption(key, reminder.variables[key][i])">
-							<i class="fas fa-check" :class="{ green: reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
-						</button>
-					</div>
 					<q-input 
 						:dark="$store.getters.theme === 'dark'" filled square
 						label="Option"
@@ -142,6 +137,11 @@
 						maxLength="30"
 						data-vv-as="option"
 					>
+						<div slot="before" v-if="selectOptions">
+							<button class="btn btn-sm bg-neutral-4" @click="setOption(key, reminder.variables[key][i])">
+								<i class="fas fa-check" :class="{ green: reminder.selectedVars[key] === reminder.variables[key][i] }"></i>
+							</button>
+						</div>
 						<template slot="append">
 							<q-icon 
 								name="fas fa-trash-alt" 
@@ -308,7 +308,7 @@ export default {
 		margin-bottom: 15px;
 
 		.var-title {
-			border-bottom: solid 1px$gray-hover;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 3px;
 			margin-bottom: 10px;
 		}

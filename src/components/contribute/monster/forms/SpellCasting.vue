@@ -6,7 +6,7 @@
 					{{ casting.name }}
 					<a 
 						v-if="npc[`${casting.category}_ability`]"
-						class="gray-hover text-capitalize" 
+						class="neutral-2 text-capitalize" 
 						@click="openDialog(casting.category)"
 					>
 						<i class="fas fa-plus green"></i>
@@ -114,7 +114,7 @@
 										/>
 									</q-popup-edit>
 								</q-item-section>
-								<q-item-section v-else avatar class="gray-light">
+								<q-item-section v-else avatar>
 									<template v-if="spell.level > 0">
 										{{ spell.level | numeral('Oo') }}
 									</template>
@@ -292,7 +292,7 @@
 
 <style lang="scss" scoped>
 	.q-item {
-		background-color: $gray-dark;
+		background-color: $neutral-8;
 		margin-bottom: 1px;
 	}
 	.slots {
@@ -312,7 +312,7 @@
 				.up, .down {
 					background-color: rgba(255, 255, 255, .07);
 					font-size: 11px;
-					color: $gray-light;
+					color: $neutral-1;
 					padding: 5px 0;
 					cursor: pointer;
 

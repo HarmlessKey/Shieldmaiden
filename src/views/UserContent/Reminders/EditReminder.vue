@@ -10,7 +10,7 @@
 					</template>
 				</div>
 			</div>
-			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
+			<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
 			<button v-if="$route.name == 'AddReminder'" class="btn mt-3" @click="addReminder()"><i class="fas fa-plus"></i> Add reminder</button>
 			<button v-else class="btn mt-3" @click="editReminder()"><i class="fas fa-check"></i> Save</button>
 		</div>
@@ -24,7 +24,7 @@
 	import { db } from '@/firebase'
 
 	export default {
-		name: 'Reminders',
+		name: 'EditReminder',
 		metaInfo: {
 			title: 'Reminders'
 		},
@@ -39,7 +39,7 @@
 				triggerInfo: {
 					'startTurn': "When the entity with the <b>Start of turn</b> reminder gets its turn, the notification will show. You can use this reminder when a spell causes the entity to take damage on the start of their turn.",
 					'endTurn': "When the entity with the <b>End of turn</b> reminder ends its, the notification will show. You can use this reminder when the entity is allowed to make a saving throw at the end of their turn.",
-					'damage': "A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perferct for when someone is concentrating.",
+					'damage': "A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perfect for when someone is concentrating.",
 					'timed': "A <b>timed</b> trigger is set with an amount of rounds. Each round lasts 6 seconds, making a duration of 1 minute last 10 rounds. During an encounter, whenever the entity with the reminder gets its turn, 1 round is removed from the counter. When the counter reaches 0, you receive a notification that the reminder has been removed."
 				},
 				reminder: {}
@@ -73,7 +73,7 @@
 				this.validation.validateAll().then((result) => {
 					if (result) {
 						db.ref('reminders/' + this.userId).push(this.reminder);
-						this.$router.replace(this.$route.meta.basePath)
+						this.$router.replace("/content/reminders")
 					}
 				});
 			},
@@ -83,7 +83,7 @@
 						delete this.reminder['.key'];
 						
 						db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
-						this.$router.replace(this.$route.meta.basePath);
+						this.$router.replace("/content/reminders");
 					}
 				});
 			}

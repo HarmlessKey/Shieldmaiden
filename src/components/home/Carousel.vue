@@ -7,7 +7,7 @@
 				animated
 				transition-prev="slide-right"
 				transition-next="slide-left"
-				control-color="gray-light"
+				control-color="neutral-2"
 				navigation
 				padding
 				arrows

@@ -153,7 +153,7 @@
 	grid-column-gap: 10px;
 
 	.img {
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-3;
 		display: block;
 		width: 56px;
 		height: 56px;

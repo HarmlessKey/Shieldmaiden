@@ -41,13 +41,13 @@
 					</template>
 
 					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="gray-hover mx-1" :to="`${$route.path}/${data.row.key}`">
+						<router-link class="neutral-2 mx-1" :to="`${$route.path}/${data.row.key}`">
 							<i class="fas fa-pencil"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Edit
 							</q-tooltip>
 						</router-link>
-						<a class="gray-hover" @click="confirmDelete($event, data.row.key, data.row.name)">
+						<a class="neutral-2" @click="confirmDelete($event, data.row.key, data.row.name)">
 							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
@@ -199,12 +199,12 @@
 		padding: 20px;
 
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

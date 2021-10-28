@@ -320,4 +320,9 @@ a.icon {
 		}
 	}
 }
+[data-theme="light"] {
+	a.icon.roll {
+		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-dark-no-border.svg');
+	}
+}
 </style>

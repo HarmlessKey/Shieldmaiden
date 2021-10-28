@@ -263,7 +263,7 @@
 		width: 100%;
 		padding: 20px 10px 20px 10px;
 		backdrop-filter: blur(2px);
-		border-top: solid 1px $gray-hover;
+		border-top: solid 1px $neutral-4;
 		background-color: rgba(0, 0, 0, .5);
 
 		.btn {

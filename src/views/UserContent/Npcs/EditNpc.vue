@@ -43,11 +43,11 @@
 						<div  class="red unsaved_changes">
 							<i class="fas fa-exclamation-triangle"></i> Unsaved changes
 						</div>	
-						<a class="btn bg-gray" @click="revert_changes()">Revert</a>
+						<a class="btn bg-neutral-5" @click="revert_changes()">Revert</a>
 					</template>
 				</div>
 				<div>
-					<router-link :to="`/npcs`" class="btn bg-gray mr-2">Cancel</router-link>
+					<router-link :to="`/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 					<q-btn label="Save" type="submit" color="primary"/>
 				</div>
 			</div>
@@ -75,7 +75,7 @@
 								{{ npc.name.capitalizeEach() }}
 							</q-item-section>
 							<q-item-section avatar>
-								<a class="gray-hover" @click="copy(npc)">
+								<a class="neutral-2" @click="copy(npc)">
 								<i class="fas fa-copy blue"/>
 								<q-tooltip anchor="top middle" self="center middle">
 									Copy NPC
@@ -294,7 +294,7 @@
 	.top {
 		display: flex;
 		justify-content: space-between;
-		border-bottom: solid 1px $gray-hover;
+		border-bottom: solid 1px $neutral-4;
 
 		.back {
 			line-height: 35px;
@@ -310,7 +310,7 @@
 				height: 31px;
 				background-position: center top;
 				background-size: cover;
-				border: solid 1px $gray-hover;
+				border: solid 1px $neutral-4;
 				margin: 2px 0 2px 5px;
 				border-radius: 50%;
 			}
@@ -330,7 +330,7 @@
 		display: flex;
 		justify-content: space-between;
 		padding-top: 20px;
-		border-top: solid 1px $gray-hover;
+		border-top: solid 1px $neutral-4;
 
 		.unsaved_changes {
 			margin: 0 10px 0 0;

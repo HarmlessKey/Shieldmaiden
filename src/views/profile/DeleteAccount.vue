@@ -29,7 +29,7 @@
 		</div>
 
 		<div class="d-flex justify-content-center">
-			<router-link class="btn bg-gray mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
+			<router-link class="btn bg-neutral-4 mr-2" to="/profile"><i class="fas fa-times"></i> Cancel</router-link>
 			<a v-if="!credentials" class="btn bg-red" @click="deleteUser()"><i class="fas fa-trash-alt"></i> Permanently Remove account</a>
 		</div>
 	</div>

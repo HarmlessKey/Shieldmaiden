@@ -71,9 +71,6 @@
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Baloo+Bhaina');
 	.grid {
-		background-image: url('../assets/_img/styles/paper-bg.png');
-		background-color: $black;
-
 		.container {
 			padding: 100px 0;
 			display: flex;
@@ -88,7 +85,7 @@
 			}
 			h3 {
 				margin-bottom:5px;
-				color: $gray-hover !important;
+				color: $neutral-3 !important;
 				font-weight: bold;
 			}
 			.die {
@@ -126,7 +123,7 @@
 				li {
 					margin-bottom: 3px;
 					a {
-						color: $gray-light;
+						color: $neutral-3;
 
 						&:hover {
 							color: $neutral-1;

@@ -52,30 +52,36 @@
 						<li v-for="(reminder, key) in personalReminders" :key="key">
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
-								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
-									<i :class="reminder.variables ? 'fas fa-caret-right' : 'fas fa-plus green'"></i>
+								<a 
+									class="add" 
+									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
+									:class="{ open: varOptions === key }"
+								>
+									<i :class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Set
 									</q-tooltip>
 								</a>
 							</div>
-							<div v-if="varOptions === key" class="variables">
-								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-									<q-select 
-										:dark="$store.getters.theme === 'dark'" filled square dense
-										:label="var_key"
-										:options="variable"
-										type="text" 
-										v-validate="'required'"
-										v-model="selectedVars[var_key]"
-										:name="var_key"
-									/>
-									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
+							<q-slide-transition>
+								<div v-if="varOptions === key" class="variables">
+									<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
+										<q-select 
+											:dark="$store.getters.theme === 'dark'" filled square dense
+											:label="var_key"
+											:options="variable"
+											type="text" 
+											v-validate="'required'"
+											v-model="selectedVars[var_key]"
+											:name="var_key"
+										/>
+										<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
+									</div>
+									<a @click="addReminder('premade', reminder, selectedVars)" class="btn btn-sm btn-clear mt-2">
+										<i class="fas fa-plus green"></i> Add reminder
+									</a>
 								</div>
-								<a @click="addReminder('premade', reminder, selectedVars)" class="d-block mt-3">
-									<i class="fas fa-plus green"></i> Add reminder
-								</a>
-							</div>
+							</q-slide-transition>
 						</li>
 					</ul>
 				</template>
@@ -230,7 +236,7 @@
 
 		li {
 			margin-bottom: 3px;
-			background-color: $neutral-5;
+			background-color: $neutral-9;
 
 			.title {
 				padding: 5px;
@@ -241,9 +247,20 @@
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
+				color: $neutral-1;
+
+				i {
+					transition: transform .2s linear;
+				}
+
+				&.open {
+					i {
+						transform: rotate(180deg);
+					}
+				}
 			}
 			.variables {
-				border-top: solid 3px $neutral-4;
+				border-top: solid 3px $neutral-8;
 				padding: 10px;
 			}
 		}

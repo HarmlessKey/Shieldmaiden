@@ -24,7 +24,7 @@
 					<i class="fas fa-cloud" />
 					<span class="ml-1 d-none d-md-inline-block">Select effect</span>
 				</template>
-				<div class="bg-gray edit-weather">
+				<div class="bg-neutral-11 edit-weather">
 					<q-item-label header>Weather effects</q-item-label>
 					<EditWeather v-model="weather" />
 				</div>
@@ -89,15 +89,18 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			background: $gray-darker;
+			background: $neutral-8;
 			height: 36px;
 			width: 100%;
 			z-index: 999;
 			position: relative;
 			display: flex;
 			justify-content: space-between;
-			line-height: 36px;
+			line-height: 31px;
 
+			a {
+				margin: 3px;
+			}
 			.left {
 				display: flex;
 				justify-content: flex-start;

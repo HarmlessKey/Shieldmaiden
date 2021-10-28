@@ -366,12 +366,12 @@
 		padding: 20px;
 
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

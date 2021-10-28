@@ -81,7 +81,7 @@
 										:disable="player.level > 0"
 									>
 										<template v-slot:append>
-											<small><span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
+											<small><span class="neutral-2">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
 											<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
 										</template>
 									</q-input>				
@@ -284,7 +284,7 @@
 								>
 									<template slot:label>
 										<div class="skill">
-											<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
+											<div class="neutral-2 abillity">{{ skill.ability.substring(0,3) }}</div>
 											{{ skill.skill  }}
 											<div class="mod">
 												{{ 
@@ -340,7 +340,7 @@
 											</a>
 											{{ npc.name }}
 										</div>
-										<a class="gray-hover" v-if="notAdded(npc)" @click="add(npc)">
+										<a class="neutral-2" v-if="notAdded(npc)" @click="add(npc)">
 											<i class="fas fa-plus green"></i>
 											<span class="d-none d-md-inline ml-1">Add</span>
 											<q-tooltip anchor="top middle" self="center middle">
@@ -373,14 +373,14 @@
 							</template>
 
 							<div slot="actions" slot-scope="data" class="actions">
-								<router-link class="gray-hover mx-1" :to="`/companions/${userId}/${data.row.key}`" >
+								<router-link class="neutral-2 mx-1" :to="`/companions/${userId}/${data.row.key}`" >
 									<i class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a v-if="isOwner()"
-									class="gray-hover"
+									class="neutral-2"
 									@click="confirmDelete(data.row.key)">
 									<i class="fas fa-trash-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
@@ -397,14 +397,14 @@
 					</div>
 				</hk-card>
 
-				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
+				<router-link :to="$route.meta.basePath" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
 			</div>
 		</template>
 		<div v-else-if="$route.name == 'Edit Character'">
 			<p class="red">You have no conrol over this character</p>
-			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Back</router-link>
+			<router-link :to="$route.meta.basePath" class="btn bg-neutral-5 mr-2 mt-3">Back</router-link>
 		</div>
 	</div>
 </template>
@@ -680,7 +680,7 @@
 		}
 
 		svg {
-			fill: $gray-light;
+			fill: $neutral-2;
 			width: 20px;
 			height: 20px;
 		}
@@ -691,7 +691,7 @@
 		grid-column-gap: 10px;
 
 		.img {
-			border: solid 1px $gray-light;
+			border: solid 1px $neutral-4;
 			display: block;
 			width: 56px;
 			height: 56px;

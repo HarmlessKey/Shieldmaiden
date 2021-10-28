@@ -40,22 +40,28 @@
 				following: []
 			}
 		},
-		async mounted() {
-			for(const key in this.userInfo.follow) {
-				let user = {};
-				user.key = key;
+		mounted() {
+			this.setFollowed();
+		},
+		methods: {
+			async setFollowed() {
+				const userInfo = this.userInfo || {};
+				for(const key in userInfo.follow) {
+					let user = {};
+					user.key = key;
 
-				let getUser = db.ref(`users/${key}`);
-				user.username = await getUser.once('value').then(function(snapshot) {
-					return snapshot.val().username
-				});
+					let getUser = db.ref(`users/${key}`);
+					user.username = await getUser.once('value').then(function(snapshot) {
+						return snapshot.val().username
+					});
 
-				let broadcasting = db.ref(`broadcast/${key}/live`);
-				user.live = await broadcasting.once('value').then(function(snapshot) {
-					return snapshot.val()
-				});
+					let broadcasting = db.ref(`broadcast/${key}/live`);
+					user.live = await broadcasting.once('value').then(function(snapshot) {
+						return snapshot.val()
+					});
 
-				this.following.push(user);
+					this.following.push(user);
+				}
 			}
 		},
 		computed: {
@@ -67,18 +73,12 @@
 </script>
 
 <style lang="scss" scoped>
-	.container {
-		padding-top: 30px;
+	ul.entities {
+		li {
+			padding: 10px;
 
-		ul.entities {
-			li {
-				.live {
-					line-height: 20px;
-					padding: 0px 10px;
-				}
-				i {
-					margin-top: 5px;
-				}
+			a {
+				line-height: 25px;
 			}
 		}
 	}

@@ -22,12 +22,12 @@
 						<hk-card>
 							<template v-if="!loading">
 								<div class="card-header d-flex justify-content-between" slot="header">
-									<a @click="preview = 'old'" :class="preview === 'old' ? 'blue' : 'gray-light'">
+									<a @click="preview = 'old'" :class="preview === 'old' ? 'blue' : 'neutral-1'">
 										Old
 									</a>
 									<a v-if="old_monster.name" :href="`https://www.dndbeyond.com/monsters/${toKebabCase(old_monster.name)}`" target="_blank"><q-icon class="mr-2" name="fas fa-eye-evil"/>DnD Beyond</a>
 									<a v-if="old_monster.name" :href="`https://5e.tools/bestiary.html#${encodeURIComponent(old_monster.name.trim().toLowerCase())}_mm`" target="_blank"><q-icon class="mr-2" name="fas fa-hammer"/>5e Tools</a>
-									<a @click="preview = 'new'" :class="preview === 'new' ? 'blue' : 'gray-light'">
+									<a @click="preview = 'new'" :class="preview === 'new' ? 'blue' : 'neutral-1'">
 										New
 									</a>
 								</div>
@@ -75,10 +75,10 @@
 					<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
 						<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the monster
 					</div>	
-					<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+					<a v-if="unsaved_changes" class="btn bg-neutral-5" @click="cancel_changes()">Revert</a>
 				</div>
 				<div>
-					<router-link :to="`/contribute/monsters/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
+					<router-link :to="`/contribute/monsters/${id}`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 					<q-btn label="Save" type="submit" color="primary"/>
 				</div>
 			</div>

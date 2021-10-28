@@ -137,7 +137,7 @@
 		}
 	}
 	.addCurrency {
-		border-top: solid 1px$gray-hover;
+		border-top: solid 1px $neutral-4;
 		margin-top: 20px; 
 		padding-top: 20px;
 			

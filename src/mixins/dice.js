@@ -97,7 +97,7 @@ export const dice = {
 				if(ignored) {
 					const type = Object.keys(advantage_disadvantage)[0].charAt(0).capitalize();
 					const color = (type === "A") ? "green" : "red";
-					advantage = `<b class="${color}">${type}</b> <span class="gray-hover">${ignored}</span> `;
+					advantage = `<b class="${color}">${type}</b> <span class="neutral-2">${ignored}</span> `;
 				}
 
 				this.animateTrigger = !this.animateTrigger;

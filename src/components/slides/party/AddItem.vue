@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<div class="mb-2"><a @click="cancel">Cancel</a></div>
+		<div class="mb-2"><a class="btn btn-sm btn-clear" @click="cancel">Cancel</a></div>
 		<h2>New Item</h2>
 		<q-input
-			:dark="$store.getters.theme === 'dark'" filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Public name"
 			class="mb-3"
 			type="text" 
@@ -14,9 +14,9 @@
 		>
 			<template v-slot:append>
 				<q-icon name="info" @click.stop>
-					<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-						<q-card :dark="$store.getters.theme === 'dark'" square>
-							<q-card-section class="bg-gray-active">
+					<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+						<q-card :dark="$store.getters.theme === 'dark'">
+							<q-card-section class="bg-neutral-9">
 								<b>Public name</b>
 							</q-card-section>
 							<q-card-section>
@@ -31,7 +31,7 @@
 		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
 
 		<q-input
-			:dark="$store.getters.theme === 'dark'" filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square
 			autogrow
 			label="Public description"
 			class="mb-3" 
@@ -57,7 +57,7 @@
 
 		<h3>Link item</h3>
 		<q-input 
-			:dark="$store.getters.theme === 'dark'" filled square dense
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Search items"
 			type="text" 
 			autocomplete="off" 
@@ -177,7 +177,7 @@
 		margin-top: 20px;
 
 		div {
-			background-color:$gray-dark;
+			background-color: $neutral-9;
 			padding: 10px;
 		}
 
@@ -191,7 +191,7 @@
 		display: grid;
 		grid-template-columns: auto max-content;
 		padding: 10px;
-		background-color:$gray-dark;
+		background-color: $neutral-9;
 
 		a.item-name {
 			white-space: nowrap;

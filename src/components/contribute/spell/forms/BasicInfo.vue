@@ -253,9 +253,9 @@
 				>
 					<template v-slot:append>
 						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card :dark="$store.getters.theme === 'dark'" square>
-									<q-card-section class="bg-gray-active">
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-card :dark="$store.getters.theme === 'dark'">
+									<q-card-section class="bg-neutral-8">
 										<b>At higer levels</b>
 									</q-card-section>
 									<q-card-section>
@@ -294,9 +294,9 @@
 				>
 					<template v-slot:append>
 						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card :dark="$store.getters.theme === 'dark'" square>
-									<q-card-section class="bg-gray-active">
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-card :dark="$store.getters.theme === 'dark'">
+									<q-card-section class="bg-neutral-8">
 										<b>Markdown</b>
 									</q-card-section>
 

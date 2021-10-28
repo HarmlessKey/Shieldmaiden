@@ -4,7 +4,7 @@
 			<template v-if="!loading">
 				<li v-for="(notification, key) in _notifications" :key="key">
 					<div>
-						<div class="mb-2 gray-hover">{{ makeDate(notification.timestamp, true) }} </div>
+						<div class="mb-2 neutral-2">{{ makeDate(notification.timestamp, true) }} </div>
 						<div class="member_info">
 							<span>{{ notification.attributes.full_name }}</span>
 							<span>{{ notification.trigger }}</span>

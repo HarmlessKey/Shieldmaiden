@@ -50,7 +50,7 @@
 							<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
 							<span v-show="entity.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
 						</template>
-						<span v-show="!entity.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+						<span v-show="!entity.saves[n]" class="neutral-2"><i class="fas fa-dot-circle"></i></span>
 					</div>
 				</div>
 				<div v-if="Object.keys(entity.saves).length < 5" class="d-flex justify-content-between">

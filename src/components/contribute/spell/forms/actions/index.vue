@@ -3,7 +3,7 @@
 		<hk-card >
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Spell actions
-				<a class="gray-hover text-capitalize" @click="add_action()">
+				<a class="neutral-2 text-capitalize" @click="add_action()">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">

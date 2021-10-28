@@ -5,7 +5,7 @@
 			<div class="card-header d-flex justify-content-between">
 				<span><i class="fas fa-dice-d20"/> Rolls</span>
 				<a 
-					class="gray-light text-capitalize" 
+					class="neutral-2 text-capitalize" 
 					@click="newRoll()"
 				>
 					<i class="fas fa-plus green"></i>

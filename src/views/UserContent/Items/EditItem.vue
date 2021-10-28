@@ -167,7 +167,7 @@
 				</div>
 				<div slot="footer" class="card-footer save">
 					<p class="error red" v-if="errors.items && errors.items.length > 0">There is an error in your form.</p>
-					<router-link to="/items" class="btn bg-gray mr-2">Cancel</router-link>
+					<router-link to="/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 					<button v-if="$route.name == 'AddItem'" class="btn" @click="addItem()"><i class="fas fa-plus"></i> Add Item</button>
 					<button 
 						v-else 

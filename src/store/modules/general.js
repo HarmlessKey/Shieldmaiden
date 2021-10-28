@@ -27,21 +27,24 @@ export const general_module = {
 	},
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
-		async initialize({ dispatch }) {
+		initialize({ dispatch }) {
 			dispatch("setTips");
 
 			if(auth.currentUser !== null) {
 					dispatch("setUser");
-					await dispatch("setUserSettings"); // wait for settings in order to set theme correctly
+					// first set the user settings in order to set theme correctly
+					dispatch("setUserSettings").then(() => {
+						dispatch("setTheme");
+					});
 					dispatch("setUserInfo");
 					// players need prio!
 					dispatch("fetchPlayers");
 					dispatch("fetchNpcs");
 					dispatch("fetchCampaigns");
 					dispatch("fetchAllEncounters");
+			} else {
+				dispatch("setTheme");
 			}
-			// Theme set after user, so it can be taken from the userSettings
-			dispatch("setTheme");
 		},
 		setTheme({ commit, state, rootGetters }, theme) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
@@ -68,7 +71,6 @@ export const general_module = {
 					commit("SET_THEME", theme);
 				}
 			}
-
 		},
 		setRoll({ commit, state }, newRoll) {
 			let current = state.rolls;

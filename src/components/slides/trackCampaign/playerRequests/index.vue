@@ -53,30 +53,15 @@
 		
 		<h5>Targets</h5>
 		<ul class="targeted">
-			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-gray-dark">
-				<icon 
-					v-if="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'monster' || displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) === 'player'" class="img" 
-					:icon="displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id])" 
-					:fill="displayTargeted[key].color_label" :style="displayTargeted[key].color_label ? `border-color: ${displayTargeted[key].color_label}` : ``"
-				/>
-				<div 
-					v-else
-					class="img" 
-					:style="{ 
-						backgroundImage: 'url(\'' + displayImg(displayTargeted[key], players[key], npcs[displayTargeted[key].id]) + '\')',
-						'border-color': displayTargeted[key].color_label ? displayTargeted[key].color_label : ''
-					}"
-				/>
+			<li v-for="(key) in targeted" :key="`target-${key}`" class="bg-neutral-9">
+				<Avatar class="img" :entity="displayTargeted[key]" :players="players" :npcs="npcs" />		
 				<div class="name truncate">
-					<template v-if="displayTargeted[key].entityType === 'npc'">
-						<template v-if="displayNPCField('name', displayTargeted[key])">
-							{{ displayTargeted[key].name }}
-						</template>
-						<template v-else>
-							? ? ?
-						</template>
-					</template>
-					<template v-else>{{ players[key].character_name }}</template>
+					<Name 
+						:entity="displayTargeted[key]" 
+						:players="players" 
+						:npcs="npcs" 
+						:npcSettings="npcSettings"
+					/>
 				</div>
 			</li>
 		</ul>
@@ -87,12 +72,16 @@
 <script>
 	import DamageHealing from './DamageHealing';
 	import { trackEncounter } from '@/mixins/trackEncounter.js';
+	import Avatar from '@/components/trackCampaign/live/Avatar.vue';
+	import Name from '@/components/trackCampaign/live/Name.vue';
 
 	export default {
 		name: 'playerRequests',
 		mixins: [trackEncounter],
 		components: {
 			DamageHealing,
+			Avatar,
+			Name
 		},
 		props: [
 		'data',
@@ -165,7 +154,8 @@
 		height: 35px;
 		background-size: cover;
 		background-position: top center;
-		border: solid 1px $gray-light;
+		border: solid 1px $neutral-1;
+		font-size: 21px;
 	}
 	
 </style>

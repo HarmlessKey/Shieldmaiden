@@ -2,7 +2,7 @@
 	<div v-if="monster" class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
 		<div class="monster-stats">
 			<h2 v-if="monster.name">
-				{{ monster.name.capitalizeEach() }} 
+				{{ monster.name.capitalizeEach() }}
 				<span v-if="monster.source" class="source">{{ monster.source }}</span>
 			</h2>
 			<span class="size">
@@ -576,18 +576,19 @@
 	.abilities {
 		user-select: none;
 		color: #6e1d10;
-		display: grid;
-		grid-template-columns: 	repeat(6, 40px);
-		grid-column-gap: 15px;
+		display: flex;
+		flex-wrap: wrap;
 		text-align: center;
 		font-size: 12px;
-		max-width: 650px;
+		margin: -10px;
+
 		
 		.abilityName {
 			font-size: 15px;
 			font-weight: bold;
 		}
 		.ability {
+			margin: 10px;
 			cursor: pointer;
 		}
 		.advantage .ability:hover {

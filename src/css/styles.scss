@@ -171,6 +171,7 @@ html body {
 
 	.bg-white { background-color: $white !important; }
 	.bg-black { background-color: $black !important; }
+	.bg-none { background: none !important; }
 
 	.bg-black { background-color: $black !important; }
 	.bg-green { background-color: $green !important; }
@@ -444,6 +445,12 @@ html body {
 
 	.pointer {
 		cursor: pointer !important;
+	}
+
+	.truncate-cell {
+		display: table;
+		table-layout: fixed;
+		width: 100%;
 	}
 	.truncate {
 		white-space: nowrap;
@@ -1406,7 +1413,7 @@ html body {
 		
 		li {
 			display: grid;
-			background-color: $neutral-8;
+			background-color: $neutral-7;
 			grid-template-columns: auto max-content;
 			margin-bottom: 1px;
 			vertical-align: center;
@@ -1464,7 +1471,7 @@ html body {
 			}
 		}
 	}
-	.hk-card, .slide {
+	.slide {
 		ul.entities {
 			li {
 				background-color: $neutral-8;
@@ -1482,10 +1489,6 @@ html body {
 				td {
 					background-color: $neutral-8;
 				}
-				&:hover td {
-					background-color: $neutral-7;
-				}
-				transition: background-color .2s linear;
 			}
 		}
 	}
@@ -1569,21 +1572,22 @@ html body {
 	}
 
 	//VIEW MONSTER
-	.monster-table {
-		.hk-table {
-			.hk-collapsed-column {
-				background-color: #f7e4ba !important;
-				background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
-				box-shadow: inset 0 0 10px rgba(0, 0, 0, .8);
+	.q-table {
+		border-spacing: 0 1px;
 
-				.monster {
-					column-count: 2;
+		.q-td {
+			background-color: $neutral-7;
+		}
 
-				}
-				.monster-card {
-					padding: 0;
-				}
+		.monster {
+			column-count: 2;
+
+			.skills {
+				column-count: 2;
 			}
+		}
+		.monster-card {
+			padding: 10px;
 		}
 	}
 	.monster-card {
@@ -1598,6 +1602,11 @@ html body {
 						column-count: 1;			
 					}
 				}
+			}
+		}
+		.q-table {
+			.monster {
+				column-count: 1;
 			}
 		}
 	}

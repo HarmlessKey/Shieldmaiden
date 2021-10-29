@@ -2,7 +2,7 @@
 	<tag :is="cardView ? 'hk-card' : 'div'" v-if="monster">
 		<div slot="header" :class="{ 'card-header': cardView }">
 			<h1>
-				{{ monster.name.capitalize() }}
+				{{ monster.name.capitalizeEach() }}
 			</h1>
 			<span class="neutral-3">
 				{{ monster.source }}

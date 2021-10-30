@@ -96,12 +96,13 @@
 										type="number" 
 										min="1"
 										max="20"
-										v-model="player.level" 
-										v-validate="'numeric|min_value:1|max_value:20'" 
-										data-vv-as="Level Override"
-										name="level"
+										:value="player.level" 
+										@input="parseToInt($event, player, 'level')"
+										:rules="[
+											val => (val >= 1 || val == undefined) || 'Minimum level is 1',
+											val => (val <= 20 || val == undefined) || 'Maximum level is 20'
+										]"
 									/>
-									<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
 								</div>
 								<div class="col-12 col-md-4">
 									<q-input 
@@ -110,11 +111,18 @@
 										autocomplete="off"  id="maxHp" 
 										type="number" 
 										min="1"
-										v-model="player.maxHp" 
-										v-validate="'numeric|required'" 
+										max="999"
+										:value="player.maxHp" 
+										v-validate="'numeric|required|min_value:1|max_value:999'" 
 										data-vv-as="Maxium Hit Points"
 										name="maxHp" 
 										placeholder="Maximum Hit Points*"
+										@input="parseToInt($event, player, 'maxHp')"
+										:rules="[
+											val => !!val || 'Required',
+											val => (val >= 1) || 'Minimum HP is 1',
+											val => (val <= 999) || 'Maximum HP is 999'
+										]"
 									>
 										<q-icon slot="prepend" name="fas fa-heart" />
 									</q-input>
@@ -127,15 +135,21 @@
 										autocomplete="off"  
 										id="ac" 
 										min="1"
+										max="99"
 										type="number" 
-										v-model="player.ac" 
-										v-validate="'numeric|required'" 
+										:value="player.ac" 
+										v-validate="'numeric|required|min_value:1|max_value:99'" 
 										data-vv-as="Armor Class"
-										name="ac" 
+										@input="parseToInt($event, player, 'ac')"
+										name="ac"
+										:rules="[
+											val => !!val || 'Required',
+											val => (val >= 1) || 'Minimum value is 1',
+											val => (val <= 99) || 'Maximum value is 99'
+										]"
 									>
 										<q-icon slot="prepend" name="fas fa-shield" />
 									</q-input>
-									<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
 								</div>
 								<div class="col-12 col-md-4">
 									<q-input 
@@ -143,10 +157,17 @@
 										label="Spell save DC"
 										autocomplete="off"  
 										id="save_dc" 
-										min="0"
+										min="1"
+										max="99"
 										type="number" 
-										v-model="player.spell_save_dc" 
+										v-validate="'numeric|min_value:1|max_value:99'"
+										:value="player.spell_save_dc" 
+										@input="parseToInt($event, player, 'spell_save_dc')"
 										name="save_dc"
+										:rules="[
+											val => (val >= 1 || val == undefined) || 'Minimum value is 1',
+											val => (val <= 99 || val == undefined) || 'Maximum value is 99'
+										]"
 									>
 										<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
 									</q-input>
@@ -167,8 +188,16 @@
 									:label="ability.ability.capitalize()"
 									autocomplete="off"  
 									type="number" 
+									min="1"
+									max="99"
 									v-model="player[ability.ability]" 
+									@input="parseToInt($event, player, ability.ability)"
+									v-validate="'numeric|min_value:1|max_value:99'"
 									:name="ability.ability"
+									:rules="[
+										val => (val >= 1 || val == undefined) || 'Min is 1',
+										val => (val <= 99 || val == undefined) || 'Max 99'
+									]"
 								>
 									<q-checkbox 
 										slot="append"
@@ -397,14 +426,14 @@
 					</div>
 				</hk-card>
 
-				<router-link :to="$route.meta.basePath" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
+				<router-link to="/content/players" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
 				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
 				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
 			</div>
 		</template>
 		<div v-else-if="$route.name == 'Edit Character'">
 			<p class="red">You have no conrol over this character</p>
-			<router-link :to="$route.meta.basePath" class="btn bg-neutral-5 mr-2 mt-3">Back</router-link>
+			<router-link to="/content/players" class="btn bg-neutral-5 mr-2 mt-3">Back</router-link>
 		</div>
 	</div>
 </template>
@@ -595,7 +624,7 @@
 								}
 							})
 						}
-						this.$router.replace(this.$route.meta.basePath)
+						this.$router.replace("/content/players")
 					} else {
 						//console.log('Not valid');
 					}
@@ -658,10 +687,19 @@
 				return true;
 			},
 			confirmDelete(index) {
-
 				this.$delete(this.player.companions, index)
 				this.companions_to_delete.push(index);
 			},
+			parseToInt(value, object, property) {
+				if(value === undefined || value === null || value === "") {
+					this.$set(object, property, null);
+				} else {
+					if(property === "level") {
+						value = (value > 20) ? 20 : (value < 1) ? 1 : value;
+					}
+					this.$set(object, property, parseInt(value));
+				}
+			}
 		}
 	}
 </script>

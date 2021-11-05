@@ -33,9 +33,8 @@
 
 				<!-- AVATAR -->
 				<div class="avatar">
-					<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
-					<div class="img" v-else>
-						<img src="@/assets/_img/styles/monster.svg" />
+					<div class="img" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }">
+						<i v-if="!npc.avatar" class="hki-monster" />
 					</div>
 					<div>
 						<q-input 
@@ -236,7 +235,7 @@
 							type="number" 
 							class="mb-2" 
 							v-model.number="npc.armor_class"
-							@input="parseToInt(npc, 'armor_class')"
+							@input="parseToInt($event, npc, 'armor_class')"
 							name="ac" 
 							:rules="[
 								val => !!val || 'AC is required',
@@ -256,7 +255,7 @@
 							type="number" 
 							class="mb-2" 
 							v-model.number="npc.hit_points" 
-							@input="parseToInt(npc, 'hit_points')"
+							@input="parseToInt($event, npc, 'hit_points')"
 							name="hp" 
 							:rules="[
 								val => !!val || 'HP is required',
@@ -358,6 +357,19 @@
 			height: 56px;
 			background-size: cover;
 			background-position: center top;
+			color: $neutral-2;
+			background-color: $neutral-9;
+			font-size: 45px;
+
+			i::before {
+				vertical-align: 5px;
+			}
+		}
+	}
+	[data-theme="light"] {
+		.avatar .img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

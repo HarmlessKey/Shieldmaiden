@@ -12,12 +12,12 @@
 				<template v-slot:selected>
 					<q-item v-if="player" class="selected">
 						<q-item-section avatar>
-							<icon v-if="!players[player].avatar" class="img" icon="player" />
 							<span 
-								v-else 
 								class="img" 
 								:style="{'background-image': 'url(' + players[player].avatar + ')'}
-							"/>
+							">
+								<i v-if="!players[player].avatar" class="hki-player" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="players[player].character_name"/>
@@ -36,12 +36,12 @@
 						@click="player = scope.opt"
 					>
 						<q-item-section avatar>
-							<icon v-if="!players[scope.opt].avatar" class="img" icon="player" />
-							<span 
-								v-else 
+							<span  
 								class="img" 
 								:style="{'background-image': 'url(' + players[scope.opt].avatar + ')'}
-							"/>
+							">
+								<i v-if="!players[scope.opt].avatar" class="hki-player" />
+							</span>
 						</q-item-section>
 						<q-item-section>
 							<q-item-label v-html="players[scope.opt].character_name"/>
@@ -129,7 +129,8 @@
 				height: 30px;
 				background-size: cover;
 				background-position: center top;
-				border: solid 1px$neutral-1;
+				border: solid 1px $neutral-1;
+				font-size: 21px;
 			}
 			.name {
 				padding: 6px 10px;
@@ -155,7 +156,16 @@
 		background-size: cover;
 		background-position: top center;
 		border: solid 1px $neutral-1;
-		font-size: 21px;
+		font-size: 27px;
+		text-align: center;
+		background-color: $neutral-9;
+		color: $neutral-2;
+	}
+	[data-theme="light"] {
+		.img {
+			background-color: $neutral-2;
+			color: $neutral-8;
+		}
 	}
 	
 </style>

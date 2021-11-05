@@ -56,7 +56,7 @@
 					name="condition_immunities" 
 				>
 					<template slot="prepend">
-						<i class="fas fa-fist-raised green" />
+						<i class="fas fa-fist-raised" />
 					</template>
 					<template v-slot:option="scope">
 						<q-item
@@ -66,7 +66,7 @@
 							@click="setCondition(scope.opt)"
 						>
 							<q-item-section avatar>
-								<icon :icon="scope.opt" />
+								<i :class="`hki-${scope.opt}`" />
 							</q-item-section>
 							<q-item-section>
 								<q-item-label v-html="scope.opt.capitalize()"/>

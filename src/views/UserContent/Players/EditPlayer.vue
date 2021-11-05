@@ -43,9 +43,8 @@
 							<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
 		
 							<div class="avatar">
-								<div class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-								<div class="img" v-else>
-									<img src="@/assets/_img/styles/player.svg" />
+								<div class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+									<i v-if="!player.avatar" class="hki-player" />
 								</div>
 								<div>
 									<q-input 
@@ -388,12 +387,13 @@
 							:items="_companions"
 						>
 							<template slot="avatar" slot-scope="data">
-								<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-								<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+								<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
+									<i v-if="!data.item" class="hki-monster" />
+								</div>
 							</template>
 
 							<template slot="name" slot-scope="data">
-								<router-link class="mx-2" :to="`/companions/${userId}/${data.row.key}`">
+								<router-link class="mx-2" :to="`/content/companions/${userId}/${data.row.key}`">
 										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
@@ -402,14 +402,14 @@
 							</template>
 
 							<div slot="actions" slot-scope="data" class="actions">
-								<router-link class="neutral-2 mx-1" :to="`/companions/${userId}/${data.row.key}`" >
+								<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`/content/companions/${userId}/${data.row.key}`" >
 									<i class="fas fa-pencil"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a v-if="isOwner()"
-									class="neutral-2"
+									class="btn btn-sm bg-neutral-5"
 									@click="confirmDelete(data.row.key)">
 									<i class="fas fa-trash-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
@@ -421,7 +421,6 @@
 						<div v-else-if="!isOwner()">
 							<p>You currently have no companions linked to your player character</p>
 							<p>Ask your DM to link an NPC to you character</p>
-							<!-- <router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link> -->
 						</div>
 					</div>
 				</hk-card>
@@ -705,64 +704,76 @@
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	padding: 20px;
 
-	label {
-		line-height: 37px;
-		margin-bottom: 0;
+label {
+	line-height: 37px;
+	margin-bottom: 0;
 
-		&.experience {
-			display: flex;
-			justify-content: space-between;
-		}
+	&.experience {
+		display: flex;
+		justify-content: space-between;
+	}
 
-		svg {
-			fill: $neutral-2;
-			width: 20px;
-			height: 20px;
+	svg {
+		fill: $neutral-2;
+		width: 20px;
+		height: 20px;
+	}
+}
+.avatar {
+	display: grid;
+	grid-template-columns: 56px 1fr;
+	grid-column-gap: 10px;
+
+	.img {
+		border: solid 1px $neutral-4;
+		display: block;
+		width: 56px;
+		height: 56px;
+		background-size: cover;
+		background-position: center top;
+		font-size: 45px;
+		color: $neutral-2;
+		background-color: $neutral-9;
+
+		i::before {
+			vertical-align: 5px;
 		}
 	}
-	.avatar {
+}
+.skills {
+	columns: 3;
+
+	.skill {
+		width: 100%;
 		display: grid;
-		grid-template-columns: 56px 1fr;
-		grid-column-gap: 10px;
+		grid-template-columns: 45px 1fr min-content;
 
-		.img {
-			border: solid 1px $neutral-4;
-			display: block;
-			width: 56px;
-			height: 56px;
-			background-size: cover;
-			background-position: center top;
+		.abillity {
+			text-transform: uppercase;
+			text-align: center;
+		}
+		.mod {
+			margin-left: 8px;
 		}
 	}
+}
+
+[data-theme="light"] {
+	.avatar .img {
+		background-color: $neutral-2;
+		color: $neutral-8;
+	}
+}
+
+@media only screen and (max-width: 1250px) { 
 	.skills {
-		columns: 3;
-
-		.skill {
-			width: 100%;
-			display: grid;
-			grid-template-columns: 45px 1fr min-content;
-
-			.abillity {
-				text-transform: uppercase;
-				text-align: center;
-			}
-			.mod {
-				margin-left: 8px;
-			}
-		}
+		columns: 2;
 	}
-	@media only screen and (max-width: 1250px) { 
-		.skills {
-			columns: 2;
-		}
-	}
-	@media only screen and (max-width: 890px) { 
-		.skills {
-			columns: 1;
-		}
+}
+@media only screen and (max-width: 890px) { 
+	.skills {
+		columns: 1;
 	}
 }
 </style>

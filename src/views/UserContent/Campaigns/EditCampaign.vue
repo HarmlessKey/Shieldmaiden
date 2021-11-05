@@ -92,9 +92,10 @@
 				<div class="card-body">
 					<template v-if="players && campaign">
 						<ul class="entities hasImg" v-if="campaign.players">
-							<li v-for="(player, key) in campaign.players" :key="key">		
-								<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }"></span>
-								<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+							<li v-for="(player, key) in campaign.players" :key="key">	
+								<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }">
+									<i v-if="!players[key].avatar" class="hki-player" />
+								</span>
 
 								<div :class="{ 'red': inOtherCampaign(key) }">
 									{{ players[key].character_name }}
@@ -134,8 +135,9 @@
 				<div class="card-body">
 					<ul class="entities hasImg" v-if="players && campaign">
 						<li v-for="(player, key) in players" :key="key">
-							<span v-if="player.avatar" class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></span>
-							<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+								<i v-if="!player.avatar" class="hki-player" />
+							</span>
 
 							{{ player.character_name }}
 						
@@ -155,7 +157,6 @@
 									</q-tooltip>
 								</a>
 							</div>
-							
 						</li>
 					</ul>
 					<div v-else class="loader"><span>Loading Players...</span></div>

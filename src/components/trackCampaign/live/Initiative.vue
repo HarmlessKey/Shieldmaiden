@@ -537,7 +537,7 @@
 						&:hover {
 							@media only screen and (min-width: 576px) {
 								td {
-									border-color: $neutral-1;
+									border-color: $blue;
 								}
 							}
 						}

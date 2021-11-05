@@ -36,8 +36,9 @@
 						:search="['name', 'type']"
 					>
 						<template slot="avatar" slot-scope="data">
-							<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-							<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+							<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
+								<i v-if="!data.item" class="hki-monster" />
+							</div>
 						</template>
 
 						<template slot="name" slot-scope="data">

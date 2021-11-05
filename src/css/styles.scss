@@ -1076,7 +1076,7 @@ html body {
 	/* HK TABLE */
 	.hk-table {
 
-		.hk-table-column {
+		&-column {
 			background: $neutral-8;
 			margin-right: 1px;
 
@@ -1094,7 +1094,12 @@ html body {
 				background-position: top center;
 				border: solid 1px $neutral-2;
 				background-color: $neutral-9;
+				color: $neutral-2;
 				font-size: 34px;
+
+				i::before {
+					vertical-align: 2px;
+				}
 			}
 			.actions {
 				display: flex;
@@ -1456,6 +1461,7 @@ html body {
 				font-size: 35px;
 				line-height: 44px;
 				text-align: center;
+				color: $neutral-2;
 			}
 		}
 		&.hasImg {

@@ -42,6 +42,15 @@
 			}
 		}
 
+		.hk-table {
+			&-column {
+				.image {
+					background-color: $neutral-2;
+					color: $neutral-8;
+				}
+			}
+		}
+
 		.target-item {
 			.img {
 				color: $neutral-8;

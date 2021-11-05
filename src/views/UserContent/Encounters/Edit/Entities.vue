@@ -10,8 +10,9 @@
 		>
 			<div class="d-flex justify-content-left">
 				<template v-if="checkPlayer(key) < 0">
-					<span v-if="players[key].avatar" class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"></span>
-					<span v-else class="img"><img src="@/assets/_img/styles/player.svg" /></span>
+					<span class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }">
+						<i v-if="!players[key].avatar" class="hki-player" />
+					</span>
 				</template>
 			</div>
 			<q-tooltip v-if="checkPlayer(key)" anchor="top middle" self="center middle">
@@ -351,10 +352,13 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		background-size: cover;
 		background-position: center top;
 		margin-right: 5px;
-		background-color: $neutral-10;
+		background-color: $neutral-9;
 		border-radius: $border-radius-small;
 		cursor: pointer;
 		border: solid 1px $neutral-5;
+		color: $neutral-2;
+		font-size: 26px;
+		text-align: center;
 	}
 }
 .multi_nr {
@@ -365,5 +369,11 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 }
 .hk-table {
 	margin-bottom: 30px;
+}
+[data-theme="light"] {
+	.players .img {
+		background-color: $neutral-2;
+		color: $neutral-8;
+	}
 }
 </style>

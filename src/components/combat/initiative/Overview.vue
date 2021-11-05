@@ -41,13 +41,13 @@
 				<div class="actions">
 					<!-- Surprise / Unsurprise Entity commented out code to add surprised condition -->
 					<a v-if="!entity.reminders.surprised" class="pointer" @click="setSurprised(entity.key, true)">
-						<i class="hki hki-surprised"></i>
+						<i class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Set surprised
 						</q-tooltip>
 					</a>
 					<a v-else class="pointer" @click="setSurprised(entity.key, false)">
-						<i class="hki hki-surprised"></i>
+						<i class="hki-surprised"></i>
 						<q-tooltip anchor="top middle" self="center middle">
 							Remove surprised
 						</q-tooltip>

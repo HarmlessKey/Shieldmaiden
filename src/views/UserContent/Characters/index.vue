@@ -7,8 +7,9 @@
 				:items="controlledCharacters"
 			>
 				<template slot="avatar" slot-scope="data">
-					<div class="image" v-if="data.row.character.avatar" :style="{ backgroundImage: 'url(\'' + data.row.character.avatar + '\')' }"></div>
-					<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+					<div class="image" :style="{ backgroundImage: 'url(\'' + data.row.character.avatar + '\')' }">
+						<i v-if="!data.row.character.avatar" class="hki-player" />
+					</div>
 				</template>
 
 				<template slot="character_name" slot-scope="data">

@@ -25,9 +25,8 @@
 
 			<!-- AVATAR -->
 			<div class="avatar mb-3">
-				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
-				<div class="img" v-else>
-					<img src="@/assets/_img/styles/monster.svg" />
+				<div class="img"  :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }">
+					<i v-if="!npc.avatar" class="hki-monster" />
 				</div>
 				<div>
 					<q-input 
@@ -291,11 +290,19 @@
 		grid-column-gap: 10px;
 
 		.img {
-			border: solid 1px #b2b2b2;
+			border: solid 1px $neutral-2;
 			width: 56px;
 			height: 56px;
 			background-size: cover;
 			background-position: center top;
+			background-color: $neutral-9;
+			color: $neutral-2;
+		}
+	}
+	[data-theme="light"] {
+		.avatar .img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

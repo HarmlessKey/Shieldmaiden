@@ -3,13 +3,13 @@
 		<h2 class="red">Deprecated NPC</h2>
 	</div>
 	<q-form 
-		v-else-if="npc || $route.name == 'AddNPC'" 
-		@submit="{ ($route.name === 'AddNPC') ? addNpc() : editNpc() }"
+		v-else-if="npc || $route.name == 'Add NPC'" 
+		@submit="{ ($route.name === 'Add NPC') ? addNpc() : editNpc() }"
 	>
 		<div>
 			<div class="top">
 				<div class="d-flex justify-content-start">
-					<a v-if="$route.name === 'AddNPC'" class="btn" @click="copy_dialog = true">
+					<a v-if="$route.name === 'Add NPC'" class="btn bg-neutral-5" @click="copy_dialog = true">
 						<i class="fas fa-copy"></i>
 						Copy existing NPC
 					</a>
@@ -47,7 +47,7 @@
 					</template>
 				</div>
 				<div>
-					<router-link :to="`/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+					<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 					<q-btn label="Save" type="submit" color="primary"/>
 				</div>
 			</div>
@@ -55,35 +55,37 @@
 			<!-- COPY DIALOG -->
 			<q-dialog v-model="copy_dialog">
 				<hk-card header="Copy Existing NPC">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Search NPC"
-						type="text" 
-						autocomplete="off" 
-						v-model="search" 
-						@keyup="searchNPC()"
-						class="mb-3"
-					>
-						<template v-slot:append>
-							<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
-						</template>
-					</q-input>
-					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<q-list :dark="$store.getters.theme === 'dark'">
-						<q-item v-for="(npc, index) in searchResults" :key="index">
-							<q-item-section>
-								{{ npc.name.capitalizeEach() }}
-							</q-item-section>
-							<q-item-section avatar>
-								<a class="neutral-2" @click="copy(npc)">
-								<i class="fas fa-copy blue"/>
-								<q-tooltip anchor="top middle" self="center middle">
-									Copy NPC
-								</q-tooltip>
-							</a>
-							</q-item-section>
-						</q-item>
-					</q-list>
+					<div class="card-body">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square dense
+							label="Search NPC"
+							type="text" 
+							autocomplete="off" 
+							v-model="search" 
+							@keyup="searchNPC()"
+							class="mb-3"
+						>
+							<template v-slot:append>
+								<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
+							</template>
+						</q-input>
+						<p v-if="noResult" class="red">{{ noResult }}</p>
+						<q-list :dark="$store.getters.theme === 'dark'">
+							<q-item v-for="(npc, index) in searchResults" :key="index">
+								<q-item-section>
+									{{ npc.name.capitalizeEach() }}
+								</q-item-section>
+								<q-item-section avatar>
+									<a class="neutral-2" @click="copy(npc)">
+									<i class="fas fa-copy blue"/>
+									<q-tooltip anchor="top middle" self="center middle">
+										Copy NPC
+									</q-tooltip>
+								</a>
+								</q-item-section>
+							</q-item>
+						</q-list>
+					</div>
 				</hk-card>
 			</q-dialog>
 		</div>
@@ -248,6 +250,8 @@
 			},
 			editNpc() {
 				delete this.npc['.key'];
+				delete this.npc['.value'];
+				console.log(this.npc)
 
 				db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
 					

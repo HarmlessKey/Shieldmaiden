@@ -6,14 +6,16 @@
 				<h3>{{ type.name.capitalize() }}</h3>
 				<ul>
 					<li v-for="(entity, index) in _meters[type.name]" :key="index" class="health">
-						<icon v-if="['monster', 'player', 'companion'].includes(entity.img)" class="img" :icon="entity.img" :fill="entity.color_label" :style="entity.color_label ? `border-color: ${entity.color_label}` : ``" />
-						<span 
-							v-else class="img" 
+						<div 
+							class="img" 
 							:style="{
 								'background-image': 'url(' + entity.img + ')',
-								'border-color': entity.color_label ? entity.color_label : ``
+								'border-color': entity.color_label ? entity.color_label : ``,
+								'color': entity.color_label ? entity.color_label : ``
 							}"
-						/>
+						>
+							<i v-if="['monster', 'player', 'companion'].includes(entity.img)" :class="`hki-${entity.img}`" />
+						</div>
 						<q-linear-progress 
 							size="30px" 
 							:color="type.name === 'damage' ? 'negative' : 'positive'" 
@@ -125,7 +127,8 @@ ul {
 		margin-bottom: 1px;
 
 		.img {
-			background-color: $neutral-8;
+			background-color: $neutral-9;
+			color: $neutral-2;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
@@ -133,6 +136,11 @@ ul {
 			width: 30px; 
 			height: 30px;
 			border: solid 1px transparent;
+			font-size: 22px;
+
+			i::before {
+				vertical-align: 1px;
+			}
 		}
 		.q-linear-progress { 
 			height: 30px;
@@ -168,6 +176,12 @@ ul {
 				}
 			}
 		}
+	}
+}
+[data-theme="light"] {
+	ul li .img {
+		background-color: $neutral-2;
+		color: $neutral-8;
 	}
 }
 </style>

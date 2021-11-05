@@ -12,11 +12,16 @@
 		<div class="card-body">
 			<!-- TARGET -->
 			<div class="target-item" v-if="roll.target">
-				<icon v-if="['monster', 'player', 'companion'].includes(roll.target.img)" class="img" :icon="roll.target.img" :fill="roll.target.color_label" :style="roll.target.color_label ? `border-color: ${roll.target.color_label}` : ``" />
 				<span 
-					v-else class="img" 
-					:style="{ 'background-image': 'url(' + roll.target.img + ')' }"
-				/>
+					class="img" 
+					:style="{ 
+						'background-image': 'url(' + roll.target.img + ')',
+						'border-color': roll.target.color_label ? roll.target.color_label : ``,
+						'color': roll.target.color_label ? roll.target.color_label : ``
+					}"
+				>
+					<i v-if="['monster', 'player', 'companion'].includes(roll.target.img)" :class="`hki-${roll.target.img}`" />
+				</span>
 				<div class="ac_wrapper">
 					<i class="fas fa-shield" ></i>
 					<span 

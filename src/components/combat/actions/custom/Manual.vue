@@ -23,7 +23,7 @@
 					@click="setManual('damage')"
 				>
 					Attack
-					<i class="hki hki-sword-break ml-3" />
+					<i class="hki-sword-break ml-3" />
 					<q-tooltip anchor="center right" self="center left">
 						Enter
 					</q-tooltip>
@@ -33,7 +33,7 @@
 					@click="setManual('healing')"
 				>
 					Heal
-					<i class="hki hki-heal" />
+					<i class="hki-heal" />
 					<q-tooltip anchor="center right" self="center left">
 						Shift + Enter
 					</q-tooltip>

@@ -130,7 +130,7 @@
 								Transformed
 							</q-tooltip>
 						</div>
-						<i v-if="!player.avatar" class="hki hki-player" />
+						<i v-if="!player.avatar" class="hki-player" />
 					</div>
 					<div class="col ac" :key="'ac-'+key">
 						<i class="fas fa-shield" ></i>
@@ -494,15 +494,15 @@
 			height: 46px;
 			background-size: cover;
 			background-position: top center;
-			background-color: $neutral-10;
+			background-color: $neutral-9;
 			border: solid 1px $neutral-2;
 			position: relative;
 			font-size: 36px;
 			text-align: center;
+			color: $neutral-2;
 
-			.hki:before {
-				vertical-align: 7px;
-				color: $neutral-2;
+			> i::before {
+				vertical-align: 5px;
 			}
 			.transformed {
 				right: 0;
@@ -647,6 +647,12 @@
 					}
 				}
 			}
+		}
+	}
+	[data-theme="light"] {
+		.players .image {
+			color: $neutral-8;
+			background-color: $neutral-2;
 		}
 	}
 </style>

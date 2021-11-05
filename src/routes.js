@@ -142,6 +142,27 @@ export const routes = [{
 					}
 				]
 			},
+			{
+				path: "companions",
+				name: "Companions",
+				component: { render (c) { return c('router-view') }},
+				children: [
+					{
+						path: '',
+						component: () => import('@/views/UserContent/Npcs/Npcs.vue')
+					},
+					{
+						path: ':id',
+						name: 'Edit NPC',
+						component: () => import('@/views/UserContent/Npcs/EditNpc.vue')
+					},
+					{
+						path: ':userid/:id',
+						name: 'Edit Companion',
+						component: () => import('@/views/UserContent/Npcs/EditNpc.vue')
+					}
+				]
+			},
 
 			// Reminders
 			{
@@ -613,17 +634,6 @@ export const routes = [{
 	{ path: "/npcs", redirect: "/content/npcs" },
 	{ path: "/reminders", redirect: "/content/reminders" },
 	{ path: "/items", redirect: "/content/items" },
-	
-	{
-		path: '/companions/:userid/:id',
-		name: 'Edit Companion',
-		component:  () => import('@/views/UserContent/Npcs/EditNpc.vue'),
-		meta: {
-			basePath: '/companions',
-			title: 'Companion',
-			requiresAuth: true
-		}
-	},
 	
 	{
 		path: '/encounters/:campid',

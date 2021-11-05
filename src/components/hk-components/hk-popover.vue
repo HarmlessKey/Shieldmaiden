@@ -6,6 +6,7 @@
 	>
 		<slot />
 		<q-popup-proxy 
+			:dark="$store.getters.theme === 'dark'"
 			v-model="menu"
 			square 
 			:breakpoint="576"
@@ -18,11 +19,13 @@
 				:small="true"
 				:header="header ? header : undefined"
 			>
-				<slot name="content">
-					<template v-if="content">
-						{{ content }}
-					</template>
-				</slot>
+				<div class="card-body">
+					<slot name="content">
+						<template v-if="content">
+							{{ content }}
+						</template>
+					</slot>
+				</div>
 			</hk-card>
 		</q-popup-proxy>
 	</span>

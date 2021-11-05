@@ -232,7 +232,7 @@
 						type="number" 
 						class="mb-2" 
 						v-model.number="npc.armor_class"
-						@input="parseToInt(npc, 'armor_class')"
+						@input="parseToInt($event, npc, 'armor_class')"
 						name="ac" 
 						:rules="[
 							val => !!val || 'AC is required',
@@ -252,7 +252,7 @@
 						type="number" 
 						class="mb-2" 
 						v-model.number="npc.hit_points" 
-						@input="parseToInt(npc, 'hit_points')"
+						@input="parseToInt($event, npc, 'hit_points')"
 						name="hp" 
 						:rules="[
 							val => !!val || 'HP is required',

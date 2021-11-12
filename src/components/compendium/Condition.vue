@@ -66,6 +66,11 @@
 					return item.value === this.id;
 				})[0];
 			}
+		},
+		beforeMount() {
+			if(this.$route.name === 'Condition') {
+				this.$root.$emit('route-name', this.condition.name);
+			}
 		}
 	}
 </script>

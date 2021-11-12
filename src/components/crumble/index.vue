@@ -20,6 +20,11 @@
 <script>
 	export default {
 		name: 'Crumble',
+		data() {
+			return {
+				last_name: undefined
+			}
+		},
 		computed: {
 			crumbs() {
       let pathArray = this.$route.path.split("/");
@@ -30,11 +35,24 @@
 						to: breadcrumbArray[i - 1]
 							? "/" + breadcrumbArray[i - 1].path + "/" + path
 							: "/" + path,
-						name: this.$route.matched[i] ? this.$route.matched[i].name || path : path,
+						name: this.$route.matched[i] ? this.$route.matched[i].meta.title || path : path,
 					});
 					return breadcrumbArray;
 				}, []);
+				if(this.last_name) breadcrumbs.at(-1).name = this.last_name;
 				return breadcrumbs;
+			}
+		},
+		mounted() {
+			// Replace the last name in breadcrumb with a value emitted from a component
+			this.$root.$on("route-name", (name) => {
+				this.last_name = name;
+			});
+		},
+		watch: {
+    '$route' () {
+			// Reset the 
+				this.last_name = undefined;
 			}
 		}
 	}

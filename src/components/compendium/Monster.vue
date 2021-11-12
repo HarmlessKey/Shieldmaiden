@@ -21,6 +21,11 @@
 		components: {
 			ViewMonster,
 		},
+		metaInfo() {
+			return {
+				title: `${this.monster.name ? this.monster.name.capitalizeEach() : "Monster"} | D&D 5e`,
+			}
+		},
 		props: {
 			id: {
 				type: String,
@@ -36,13 +41,11 @@
 				monster: {
 					source: db.ref(`monsters/${this.id}`),
 					asObject: true,
-					readyCallback: () => this.$emit('name', this.monster.name.capitalize())
+					readyCallback: () => {
+						this.$root.$emit('route-name', this.monster.name.capitalizeEach())
+					}
 				}
 			}
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

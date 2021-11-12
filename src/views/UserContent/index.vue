@@ -14,7 +14,7 @@
 				<h2 v-if="!active_campaign">No campaigns yet</h2>
 				<a 
 					v-if="!active_campaign || !active_campaign.background" 
-					class="neutral-2 text-shadow-3 link" 
+					class="white text-shadow-3 link" 
 					target="_blank" rel="noopener"
 					href="https://www.vecteezy.com/free-vector/fantasy-landscape">
 					Image by Vecteezy

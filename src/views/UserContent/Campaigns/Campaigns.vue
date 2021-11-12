@@ -56,8 +56,8 @@
 										<i 
 											class="px-1 py-2"
 											:class="{
-												'fas fa-eye text-shadow-6 neutral-2': !campaign.private,
-												'fas fa-eye-slash text-shadow-6 neutral-2': campaign.private 
+												'fas fa-eye text-shadow-6 white': !campaign.private,
+												'fas fa-eye-slash text-shadow-6 white': campaign.private 
 											}"
 										>
 											<q-tooltip anchor="top middle" self="bottom middle">
@@ -65,14 +65,14 @@
 											</q-tooltip>
 										</i>
 										<div class="d-flex justify-content-end">
-											<router-link class="btn btn-sm btn-clear mx-1" :to="`${$route.path}/${campaign.key}`">
+											<router-link class="btn btn-sm btn-clear white mx-1" :to="`${$route.path}/${campaign.key}`">
 												<i class="fas fa-pencil"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
 													Edit
 												</q-tooltip>
 											</router-link>
 											<a
-												class="btn btn-sm btn-clear"
+												class="btn btn-sm btn-clear white"
 												@click="confirmDelete($event, campaign.key, campaign.campaign)"
 											>
 												<i class="fas fa-trash-alt"></i>
@@ -84,7 +84,7 @@
 									</div>
 									<a 
 										v-if="!campaign.background" 
-										class="neutral-2 text-shadow-3 link" 
+										class="white text-shadow-3 link" 
 										target="_blank" rel="noopener"
 										href="https://www.vecteezy.com/free-vector/fantasy-landscape">
 										Image by Vecteezy

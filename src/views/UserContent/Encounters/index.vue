@@ -85,7 +85,7 @@
 								</template>
 								<template slot="entities" slot-scope="data">
 									<router-link :to="'/encounters/' + campaignId + '/' + data.row.key">
-										<span class="neutral-2" v-if="data.row.entities">
+										<span class="neutral-1" v-if="data.row.entities">
 											{{ Object.keys(data.row.entities).length }}
 										</span>
 										<template v-else><i class="fas fa-plus"></i> Add</template>

@@ -99,6 +99,7 @@ export const remindersMixin = {
 				let var_name = result.slice(1,-1);
 				return variables[var_name];
 			});
+			console.log(input)
 			return input;
 		},
 		__notify__(target, key) {
@@ -113,7 +114,7 @@ export const remindersMixin = {
 
 			//Create buttons for notification
 			if(target.reminders[key].action !== 'remove') {
-				notify = target.reminders[key].notify !== undefined ? target.reminders[key].notify : 'Keep reminder?';
+				notify = notify !== undefined ? notify : 'Keep reminder?';
 				var buttons = [
 					{ 
 						text: 'Keep Reminder', 

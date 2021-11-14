@@ -530,9 +530,6 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 </script>
 
 <style lang="scss" scoped>
-.taret-item-wrapper {
-	width: 100%;
-	
 	ul.target-reminders {
 		padding-left: 30px;
 		list-style: none;
@@ -544,5 +541,4 @@ import hkAnimatedInteger from '../hk-components/hk-animated-integer.vue';
 			margin: 1px 1px 1px 0;
 		}
 	}
-}
 </style>

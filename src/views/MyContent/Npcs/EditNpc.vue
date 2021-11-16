@@ -7,7 +7,7 @@
 	</div>
 	<q-form 
 		v-else-if="npc || $route.name == 'AddNPC'" 
-		@submit="{ ($route.name === 'AddNPC') ? addNpc() : editNpc() }"
+		@submit="saveNpc"
 	>
 		<div class="content">
 			<div class="top">
@@ -160,6 +160,7 @@
 				});
 				this.npcs = npcs;
 			});
+			this.npc_copy = JSON.stringify(this.npc);
 		},
 		firebase() {
 			return {
@@ -225,6 +226,8 @@
 
 				// Remove unwanted data from the monster
 				delete npc.metadata;
+				delete this.npc['.value'];
+				delete this.npc['.key'];
 
 				this.npc = npc;
 
@@ -236,26 +239,37 @@
 				this.npc = JSON.parse(this.npc_copy);
 				this.unsaved_changes = false;
 			},
+			/**
+			 * Checks if a new NPC must added, or an existing NPC must be saved.
+			**/
+			saveNpc() {
+				if(this.$route.name === "AddNPC" && !this.npc[".key"]) {
+					this.addNpc();
+				} else {
+					this.editNpc()
+				}
+			},
 			addNpc() {
-				delete this.npc['.value'];
-				delete this.npc['.key'];
+				db.ref('npcs/' + this.userId).push(this.npc).then((res) => {
+					this.$set(this.npc, ".key", res.getKey());
 
-				db.ref('npcs/' + this.userId).push(this.npc);
-					
-				this.$snotify.success('Monster Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
+					this.$snotify.success('Monster Saved.', 'Critical hit!', {
+						position: "rightTop"
+					});
 
-				this.unsaved_changes = false;
 
-				// Capitalize before stringyfy so changes found isn't triggered
-				this.npc.name = this.npc.name.capitalizeEach();
-				this.npc_copy = JSON.stringify(this.npc);
+					// Capitalize before stringyfy so changes found isn't triggered
+					this.npc.name = this.npc.name.capitalizeEach();
+					this.npc_copy = JSON.stringify(this.npc);
+					this.unsaved_changes = false;
+				});		
 			},
 			editNpc() {
-				delete this.npc['.key'];
+				const saveObject = JSON.parse(JSON.stringify(this.npc));
+				const key = this.npc['.key'];
+				delete saveObject['.key'];
 
-				db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
+				db.ref(`npcs/${this.userId}/${key}`).set(saveObject);
 					
 				this.$snotify.success('Monster Saved.', 'Critical hit!', {
 					position: "rightTop"

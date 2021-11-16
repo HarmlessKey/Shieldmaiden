@@ -4,15 +4,16 @@
 
 		<TargetItem  :item="entity.key" />
 
-		<a 
-			class="btn btn-block bg-red my-3"
-			@click="remove()"
-		>
+		<a class="btn btn-block bg-red my-3" @click="remove()">
 			Remove reminder
 		</a>
 
-		<reminder-form v-model="reminder" @validation="setValidation" :select-options="true" />
-		<button class="btn btn-block" @click="editReminder()">Save</button>
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(editReminder())">
+				<reminder-form v-model="reminder" :select-options="true" />
+				<button class="btn btn-block" :disabled="!valid">Save</button>
+			</q-form>
+		</ValidationObserver>
 	</div>
 </template>
 
@@ -66,20 +67,14 @@
 				this.setSlide(false);
 			},
 			editReminder() {
-				this.validation.validateAll().then((result) => {
-					// console.log(this.reminder)
-					delete this.reminder['.key'];
-
-					if (result) {
-						this.set_targetReminder({
-							action: 'update',
-							entity: this.data.entity.key,
-							key: this.data.key,
-							reminder: this.reminder
-						}); 
-						this.setSlide(false);
-					}
-				});
+				delete this.reminder['.key'];
+				this.set_targetReminder({
+					action: 'update',
+					entity: this.data.entity.key,
+					key: this.data.key,
+					reminder: this.reminder
+				}); 
+				this.setSlide(false);
 			}
 		},
 	};

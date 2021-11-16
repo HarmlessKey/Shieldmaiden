@@ -87,8 +87,12 @@
 				</template>
 				</q-tab-panel>
 				<q-tab-panel name="custom">
-					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
-					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
+					<ValidationObserver v-slot="{ handleSubmit, valid }">
+						<q-form @submit="handleSubmit(addReminder('custom', valid))">
+							<reminder-form v-model="customReminder" :variables="false"/>
+							<q-btn color="blue" type="submit" :disabled="!valid">Set</q-btn>
+						</q-form>
+					</ValidationObserver>
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -173,20 +177,16 @@
 						reminder['.key'] = key;
 					}
 				}
-				else if(type === 'custom') {
-					this.validation.validateAll().then((result) => {	
-						if (result) {
-							for(const target of this.reminder_targets) {
-								this.set_targetReminder({
-									action: 'add',
-									entity: target,
-									type: 'custom',
-									reminder: this.customReminder
-								});
-							}
-							this.customReminder = {};
-						}
-					});
+				else if(type === 'custom' && reminder) {
+					for(const target of this.reminder_targets) {
+						this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							type: 'custom',
+							reminder: this.customReminder
+						});
+					}
+					this.customReminder = {};
 				}
 			},
 			setValidation(validate) {

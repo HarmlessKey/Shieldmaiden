@@ -1,19 +1,23 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
-		<div class="card-body">
-			<div class="reminder" v-if="reminder">
-				<reminder-form v-model="reminder" @validation="setValidation" />
-				<div class="trigger">
-					<template v-if="reminder && reminder.trigger">
-						<h3>Trigger info</h3>
-						<div v-html="triggerInfo[reminder.trigger]" />
-					</template>
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(editReminder)">
+				<div class="card-body">
+					<div class="reminder" v-if="reminder">
+						<reminder-form v-model="reminder"/>
+						<div class="trigger">
+							<template v-if="reminder && reminder.trigger">
+								<h3>Trigger info</h3>
+								<div v-html="triggerInfo[reminder.trigger]" />
+							</template>
+						</div>
+					</div>
+					<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
+					<q-btn v-if="$route.name == 'AddReminder'" type="submit" color="blue" class="mt-3" :disabled="!valid"><i class="fas fa-plus mr-1"></i> Add reminder</q-btn>
+					<q-btn v-else color="blue" type="submit" class="mt-3" :disabled="!valid"><i class="fas fa-check mr-1"></i> Save</q-btn>
 				</div>
-			</div>
-			<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
-			<button v-if="$route.name == 'AddReminder'" class="btn mt-3" @click="addReminder()"><i class="fas fa-plus"></i> Add reminder</button>
-			<button v-else class="btn mt-3" @click="editReminder()"><i class="fas fa-check"></i> Save</button>
-		</div>
+			</q-form>
+		</ValidationObserver>
 	</hk-card>
 </template>
 
@@ -69,23 +73,14 @@
 			setValidation(validate) {
 				this.validation = validate;
 			},
-			addReminder() {
-				this.validation.validateAll().then((result) => {
-					if (result) {
-						db.ref('reminders/' + this.userId).push(this.reminder);
-						this.$router.replace("/content/reminders")
-					}
-				});
-			},
-			editReminder() {
-				this.validation.validateAll().then((result) => {
-					if (result) {
-						delete this.reminder['.key'];
-						
-						db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
-						this.$router.replace("/content/reminders");
-					}
-				});
+			editReminder() {		
+				if(this.$route.name == 'AddReminder') {
+					db.ref('reminders/' + this.userId).push(this.reminder);
+				} else {
+					delete this.reminder['.key'];
+					db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
+				}
+				this.$router.replace("/content/reminders");
 			}
 		}
 	}

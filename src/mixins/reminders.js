@@ -99,7 +99,6 @@ export const remindersMixin = {
 				let var_name = result.slice(1,-1);
 				return variables[var_name];
 			});
-			console.log(input)
 			return input;
 		},
 		__notify__(target, key) {

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
-import VueFire from 'vuefire'
-import VeeValidate from 'vee-validate';
+import VueFire from 'vuefire';
+import './vee-validate';
 import { auth, firebase, db } from './firebase';
 import VueRouter from 'vue-router';
 import VueAnalytics from 'vue-analytics'
@@ -37,6 +37,8 @@ const options = {
 	}
 }
 
+Vue.config.productionTip = false;
+
 Vue.component('hk-table', HkTable);
 Vue.component('hk-card', HkCard);
 Vue.component('hk-card-deck', HkCardDeck);
@@ -49,7 +51,6 @@ Vue.component('hk-dmg-type-select', HkDmgTypeSelect);
 Vue.component('hk-tip', HkTip);
 Vue.component('hk-timer', HkTimer);
 Vue.use(Snotify, options);
-Vue.use(VeeValidate, {fieldsBagName: 'formFields'})
 Vue.use(VueFire);
 Vue.use(VueCookies);
 Vue.use(Vuebar);

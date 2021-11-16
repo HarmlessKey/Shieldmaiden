@@ -31,7 +31,7 @@
 					<!-- NO PLAYERS YET -->
 					<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
 						<h2>Create players for your campaign</h2>
-						<router-link to="/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
+						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
 					</div>
 
 					<transition-group 
@@ -40,7 +40,8 @@
 						class="row q-col-gutter-md" 
 						name="campaigns" 
 						enter-active-class="animated animate__fadeIn" 
-						leave-active-class="animated animate__fadeOut">
+						leave-active-class="animated animate__fadeOut"
+					>
 						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in _campaigns" :key="campaign.key">
 							<hk-card>
 								<!-- Image -->
@@ -64,13 +65,19 @@
 												{{ campaign.private ? "Private campaign" : "Public campaign" }}
 											</q-tooltip>
 										</i>
-										<div class="d-flex justify-content-end">
-											<router-link class="btn btn-sm btn-clear white mx-1" :to="`${$route.path}/${campaign.key}`">
+										<div class="campaign-actions">
+											<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign.key }">
+												<i class="fas fa-user-plus"></i>
+												<q-tooltip anchor="top middle" self="bottom middle">
+													Add players
+												</q-tooltip>
+											</a>
+											<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign.key }">
 												<i class="fas fa-pencil"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
 													Edit
 												</q-tooltip>
-											</router-link>
+											</a>
 											<a
 												class="btn btn-sm btn-clear white"
 												@click="confirmDelete($event, campaign.key, campaign.campaign)"
@@ -100,14 +107,14 @@
 									</h3>
 
 									<div class="mb-1">
-										<router-link class="btn btn-clear btn-sm" :to="'/content/campaigns/' + campaign.key">
+										<a class="btn btn-clear btn-sm" @click="edit_players = { show: true, campaign: campaign.key }">
 											<i class="fas fa-users mr-1 neutral-2"></i>
 											{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
 											players
-										</router-link>
+										</a>
 									</div>
 									
-									<router-link class="btn btn-clear btn-sm" :to="'/encounters/' + campaign.key">
+									<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
 										<i class="fas fa-swords mr-2 neutral-2"></i>
 										<template v-if="allEncounters && allEncounters[campaign.key]">
 											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
@@ -118,16 +125,16 @@
 									</router-link>
 									
 									<div class="mt-4">
-										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn bg-green ">
+										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn ">
 											<i class="fas fa-user"></i> Create players
 										</router-link>
-										<router-link :to="'/content/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green">
+										<a @click="edit_players = { show: true, campaign: campaign.key }" v-else-if="!campaign.players" class="btn">
 											<i class="fas fa-plus"></i> Add players
-										</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green">
+										</a>
+										<router-link :to="`${$route.path}/${campaign.key}`" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn">
 											<i class="fas fa-swords"></i> Add encounters
 										</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else class="btn">
+										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
 											Continue
 										</router-link>
 									</div>
@@ -209,6 +216,16 @@
 				</q-form>
 			</div>
 		</q-dialog>
+
+		<!-- Edit campaign dialog -->
+		<q-dialog v-model="edit_campaign.show">
+			<EditCampaign :campaign-id="edit_campaign.campaign" />
+		</q-dialog>
+
+		<!-- Edit campaign dialog -->
+		<q-dialog v-model="edit_players.show">
+			<AddPlayers :campaign-id="edit_players.campaign" />
+		</q-dialog>
 	</div>
 </template>
 
@@ -219,6 +236,8 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
+	import EditCampaign from "./EditCampaign";
+	import AddPlayers from "./AddPlayers";
 
 	export default {
 		name: 'Campaigns',
@@ -227,12 +246,22 @@
 		},
 		mixins: [general],
 		components: {
-			OutOfSlots
+			OutOfSlots,
+			EditCampaign,
+			AddPlayers
 		},
 		data() {
 			return {
 				newCampaign: '',
 				add: false,
+				edit_players: {
+					show: false,
+					campaign: undefined
+				},
+				edit_campaign: {
+					show: false,
+					campaign: undefined
+				},
 				advancement: "experience",
 				advancement_options: [
 					{
@@ -345,21 +374,14 @@
 			background-size: cover;
 			background-position: center bottom;
 	
+			.campaign-actions {
+				.btn {
+					text-shadow: 0 0 6px $black;
+					margin-left: 2px;
 
-			.card-header {
-				background: rgba(38, 38, 38, .9) !important;
-	
-				span.title {
-					display: block;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					width: calc(100% - 60px);
-					font-size: 18px;
-				}
-				.actions {
-					display: flex;
-					justify-content: flex-end;
+					&:hover {
+						text-shadow: none;
+					}
 				}
 			}
 			.card-body {

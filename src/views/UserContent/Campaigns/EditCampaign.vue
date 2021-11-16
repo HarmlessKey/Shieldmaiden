@@ -1,172 +1,89 @@
 <template>
 	<div>
-		<hk-card-deck>
-			<hk-card header="General">
-				<div class="card-body">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square
-						label="name"
-						autocomplete="off"
-						v-validate="'required'" 
-						data-vv-as="Encounter Name" 
-						type="text" 
-						name="name" 
-						v-model="campaign.campaign"
-					/>
-					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-
-					<q-select 
-						:dark="$store.getters.theme === 'dark'" filled square
-						label="Advancement"
-						emit-value
-						map-options
-						class="my-2" 
-						v-model="campaign.advancement" 
-						:options="advancement_options" 
-					/>
-
-					<div class="background">
-						<div 
-							class="img pointer" 
-							v-if="campaign.background" 
-							:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
-							@click="image = true"
-						>
-						</div>
-						<div class="img" v-else>
-							<q-icon name="fas fa-image"/>
-						</div>
-						<div>
+		<ValidationObserver v-slot="{ handleSubmit }">
+			<q-form @submit="handleSubmit(edit)">
+				<hk-card header="Edit campaign" :min-width="300">
+					<div class="card-body">
+						<ValidationProvider rules="required" name="Title" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
-								autocomplete="off" 
-								v-validate="'url'" type="text" 
-								name="backbround" 
-								data-vv-as="Background"
-								v-model="campaign.background" 
-								placeholder="Background URL"/>
-							<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
-						</div>
-					</div>
+								label="Title"
+								autocomplete="off"
+								type="text" 
+								v-model="campaign.campaign"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
 
-					<div class="mt-3 neutral-2 pointer" @click="setPrivate(!campaign.private)">
-						<span class="btn btn-clear">
-							<span :class="!campaign.private ? 'green' : 'neutral-2'">
-								<i class="fas fa-eye"></i>
-								Public
-							</span>
-						</span>
-						/
-						<span class="btn btn-clear mr-2">
-							<span :class="campaign.private ? 'red' : 'neutral-2'">
-								<i class="fas fa-eye-slash"></i>
-								Private
-							</span>
-						</span>
-						<hk-popover 
-							header="Private vs Public"
-						>
-							<i class="fas fa-info-circle blue" />
-							<template #content>
-								<p>
-									You can only share the inititiave list with your 
-									players if your campaign is set to public.
-								</p>
-								Private campaigns are hidden from your followers.
-							</template>
-						</hk-popover>
-					</div>
+						<q-select 
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="Advancement"
+							emit-value
+							map-options
+							class="my-2" 
+							v-model="campaign.advancement" 
+							:options="advancement_options" 
+						/>
 
-					<button class="btn mt-3" @click="edit()">Save</button>
-				</div>
-			</hk-card>
-
-			<!-- PLAYERS -->
-			<hk-card>
-				<div slot="header" class="card-header">
-					Players in Campaign
-					<a @click="players_dialog = true" class="btn btn-sm">
-						<i class="fas fa-plus green mr-1" /> Add players
-					</a>
-				</div>
-				<div class="card-body">
-					<template v-if="players && campaign">
-						<ul class="entities hasImg" v-if="campaign.players">
-							<li v-for="(player, key) in campaign.players" :key="key">	
-								<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }">
-									<i v-if="!players[key].avatar" class="hki-player" />
-								</span>
-
-								<div :class="{ 'red': inOtherCampaign(key) }">
-									{{ players[key].character_name }}
-									<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 neutral-2">
-										<small>Different Campaign</small>
-									</span>
-								</div>
-								
-								<div class="actions">
-									<a class="neutral-2" @click="removePlayer(key)">
-										<i class="fas fa-trash-alt red"></i>
-										<q-tooltip anchor="top middle" self="center right">
-											Remove from campaign
-										</q-tooltip>
-									</a>
-								</div>
-							</li>
-						</ul>
-						<p v-else>
-							There are no players in this campaign yet.
-						</p>
-						
-						<a slot="footer" @click="players_dialog = true" class="btn btn-block btn-square">Add players</a>
-					</template>
-					<hk-loader v-else name="players" />
-				</div>
-			</hk-card>
-		</hk-card-deck>
-
-		<q-dialog v-model="players_dialog">
-			<hk-card header="All Players" :min-width="300">
-				<div slot="header" class="card-header">
-					Add players
-					<q-btn icon="close" flat dense v-close-popup />
-				</div>
-
-				<div class="card-body">
-					<ul class="entities hasImg" v-if="players && campaign">
-						<li v-for="(player, key) in players" :key="key">
-							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
-								<i v-if="!player.avatar" class="hki-player" />
-							</span>
-
-							{{ player.character_name }}
-						
-							<span v-if="inOtherCampaign(key)">
-								<span class="d-none d-md-inline ml-1 neutral-3 pr-2"><small>Different Campaign</small></span>
-							</span>
-
-							<span v-else-if="checkPlayer(key) >= 0">
-								<i class="fas fa-check pr-2 neutral-2"></i>
-							</span>
-
-							<div v-else class="actions">
-								<a @click="addPlayer(key)">
-									<i class="fas fa-plus green"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Add character
-									</q-tooltip>
-								</a>
+						<div class="background">
+							<div 
+								class="img pointer" 
+								v-if="campaign.background" 
+								:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+								@click="image = true"
+							>
 							</div>
-						</li>
-					</ul>
-					<div v-else class="loader"><span>Loading Players...</span></div>
-				</div>
-			</hk-card>
-		</q-dialog>
+							<div class="img" v-else>
+								<q-icon name="fas fa-image"/>
+							</div>
+							<div>
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									autocomplete="off" 
+									type="text" 
+									v-model="campaign.background"
+									placeholder="Background URL"
+								/>
+							</div>
+						</div>
 
-		<q-dialog v-model="image">
-			<img :src="campaign.background" />
-		</q-dialog>
+						<div class="mt-3 neutral-2 pointer" @click="setPrivate(!campaign.private)">
+							<span class="btn btn-clear">
+								<span :class="!campaign.private ? 'green' : 'neutral-2'">
+									<i class="fas fa-eye"></i>
+									Public
+								</span>
+							</span>
+							/
+							<span class="btn btn-clear mr-2">
+								<span :class="campaign.private ? 'red' : 'neutral-2'">
+									<i class="fas fa-eye-slash"></i>
+									Private
+								</span>
+							</span>
+							<hk-popover 
+								header="Private vs Public"
+							>
+								<i class="fas fa-info-circle blue" />
+								<template #content>
+									<p>
+										You can only share the inititiave list with your 
+										players if your campaign is set to public.
+									</p>
+									Private campaigns are hidden from your followers.
+								</template>
+							</hk-popover>
+						</div>
+
+					</div>
+					<div slot="footer" class="card-footer">
+						<q-btn class="bg-neutral-5 mr-2" label="Cancel" v-close-popup />
+						<q-btn color="blue" type="submit">Save</q-btn>
+					</div>
+				</hk-card>
+			</q-form>
+		</ValidationObserver>
 	</div>
 </template>
 
@@ -176,16 +93,10 @@
 
 	export default {
 		name: "EditCampaign",
-		metaInfo: {
-			title: "Campaigns"
-		},
+		props: ["campaignId"],
 		data() {
 			return {
 				user: this.$store.getters.user,
-				campaignId: this.$route.params.campid,
-				newCampaign: '',
-				image: false,
-				players_dialog: false,
 				advancement_options: [
 					{
 						value: "experience",
@@ -203,12 +114,8 @@
 				'campaigns',
 				'campaign',
 				'players',
-				'npcs',
-				'playerInCampaign',
-				'allEncounters',
-				'overencumbered'
+				'npcs'
 			]),
-
 		},
 		mounted() {
 			this.fetchCampaign({
@@ -222,74 +129,8 @@
 				'fetchNpcs',
 			]),
 			edit() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(
-							this.campaign
-						);
-						this.$snotify.success('Name changed.', 'Critical hit!', {
-							position: "rightTop"
-						});
-					}
-				})
-			},
-			addPlayer(id) {
-				// Make sure the player has XP if advancement is experience
-				if(this.campaign.advancement === "experience" && this.players[id].experience === undefined) {
-					db.ref(`players/${this.user.uid}/${id}/experience`).set(0);
-				}
-
-				// Set the current HP
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
-					curHp: this.players[id].maxHp
-				});
-				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
-				if (this.players[id].companions !== undefined) {
-					for (let key in this.players[id].companions) {
-						
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(key).set({
-							curHp: this.npcs[key].maxHp,
-						})
-					}
-				}
-			},
-			removePlayer(playerId) {
-				// Get companions of player
-				let companions = this.players[playerId].companions;
-
-				//First remove player from all encounters
-				for(let encounterId in this.allEncounters[this.campaignId]) {
-					//Remove player from encouner
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(playerId).remove();
-					if (companions !== undefined) {					
-						for (let companionId of Object.keys(companions)) {
-							db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(companionId).remove();
-						}
-					}
-				}
-
-				//Then remove from campaign
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(playerId).remove();
-				if (companions !== undefined) {
-					for (let companionId of Object.keys(companions)) {
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(companionId).remove();
-					}
-				}
-				if (this.players[playerId].campaign_id == this.campaignId) {
-					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
-				}
-			},
-			checkPlayer(playerId) {
-				if (this.campaign.players === undefined)
-					return -1
-
-				return (Object.keys(this.campaign.players).indexOf(playerId));
-			},
-			inOtherCampaign(playerId) {
-				if (this.campaigns[this.players[playerId].campaign_id] === undefined) {
-					this.players[playerId].campaign_id = undefined;
-				}
-				return (this.players[playerId].campaign_id !== undefined && this.players[playerId].campaign_id !== this.campaignId)
+				console.log("saved")
+				db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(this.campaign);
 			},
 			setPrivate(value) {
 				//Has to be removed on false

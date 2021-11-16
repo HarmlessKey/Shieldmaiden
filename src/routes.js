@@ -31,7 +31,6 @@ const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
 const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
 const Offline = () => import('@/views/Offline.vue');
-const Encounters = () => import('@/views/UserContent/Encounters');
 const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
 const RunEncounter = () => import('@/views/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
@@ -90,12 +89,31 @@ export const routes = [{
 					},
 					{
 						path: ":campid",
-						name: "Edit campaign",
-						component: () => import("@/views/UserContent/Campaigns/EditCampaign.vue"),
+						name: "Run campaign",
+						component: { render (c) { return c('router-view') }},
 						meta: {
-							title: "Edit campaign"
+							title: "Run campaign"
 						},
-					},
+						children: [
+							{
+								path: "",
+								name: "Run campaign",
+								component: () => import("@/views/UserContent/Encounters"),
+								meta: {
+									side: false
+								},
+							},
+							{
+								path: ':encid',
+								name: 'EditEncounter',
+								component: EditEncounter,
+								meta: {
+									title: 'Edit encounter',
+									side: false
+								}
+							},
+						]
+					}
 				]
 			},
 			
@@ -715,27 +733,9 @@ export const routes = [{
 	{ path: "/npcs", redirect: "/content/npcs" },
 	{ path: "/reminders", redirect: "/content/reminders" },
 	{ path: "/items", redirect: "/content/items" },
+	{ path: "/encounters/*", redirect: "/content/campaigns" },
 	
-	{
-		path: '/encounters/:campid',
-		name: 'Encounters',
-		component: Encounters,
-		meta: {
-			basePath: '/campaigns',
-			title: 'Campaigns',
-			requiresAuth: true
-		},
-	},
-	{
-		path: '/encounters/:campid/:encid',
-		name: 'EditEncounter',
-		component: EditEncounter,
-		meta: {
-			basePath: '/campaigns',
-			title: 'Campaigns',
-			requiresAuth: true
-		}
-	},
+
 	{
 		path: '/run-encounter/:campid/:encid',
 		name: 'RunEncounter',

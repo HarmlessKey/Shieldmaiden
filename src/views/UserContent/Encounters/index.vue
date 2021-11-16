@@ -1,7 +1,5 @@
 <template>
-	<div class="content">
-		<Crumble />
-
+	<div>
 		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
 			{{ campaign.campaign }}
 			<span 

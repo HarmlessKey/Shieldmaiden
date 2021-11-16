@@ -3,10 +3,11 @@
 	<div class="content">
 		<Crumble />
 		<div class="row q-col-gutter-md">		
-			<div class="col-12 col-md-9">
+			<div class="col-12" :class="{ 'col-md-9': !this.$route.meta || this.$route.meta.side !== false }">
         <router-view />
       </div>
-      <div class="col-12 col-md-3">
+      <div class="col-12 col-md-3" v-if="!this.$route.meta || this.$route.meta.side !== false">
+				{{ this.$route.meta.side }}
 				<ContentSideRight />
 			</div>
     </div>

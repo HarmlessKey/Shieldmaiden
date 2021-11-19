@@ -37,6 +37,11 @@
 						url: 'patrons',
 						icon: 'fab fa-patreon',
 					},
+					"export": {
+						name: "Export databases",
+						url: "export",
+						icon: "fas fa-file-export"
+					},
 					'xml': { 
 						name: 'Generate XML sitemap',
 						url: 'xml',

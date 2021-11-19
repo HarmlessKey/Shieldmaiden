@@ -109,8 +109,8 @@
 										<ValidationProvider rules="required|numeric|between:1,999" name="Max HP" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
-												label="Hit points"
-												autocomplete="off"  id="maxHp" 
+												label="Hit points *"
+												autocomplete="off"
 												type="number" 
 												min="1"
 												max="999"
@@ -129,7 +129,7 @@
 										<ValidationProvider rules="required|numeric|between:1,99" name="AC" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
-												label="Armor class"
+												label="Armor class *"
 												autocomplete="off"  
 												min="1"
 												max="99"

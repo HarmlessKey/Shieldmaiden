@@ -24,6 +24,7 @@ const ManageContent = () => import('@/views/ManageContent.vue');
 const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
 const GenerateXML = () => import('@/views/Admin/GenerateXML.vue');
+const ExportDatabase = () => import('@/views/Admin/ExportDatabase.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');

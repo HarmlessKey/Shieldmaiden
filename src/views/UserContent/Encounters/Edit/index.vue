@@ -20,7 +20,7 @@
 						icon="fas fa-arrow-left"
 						class="pl-0"
 						name="back"
-						:to="'/encounters/' + $route.params.campid"
+						:to="'/content/campaigns/' + $route.params.campid"
 					/>
 					<q-tab 
 						v-for="({name, icon, label}, index) in tabs"
@@ -33,16 +33,16 @@
 				<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
 					<q-tab-panels v-model="tab" class="bg-transparent">
 						<q-tab-panel name="entities">
-								<Entities />
+							<Entities />
 						</q-tab-panel>
 						<q-tab-panel name="general">
-								<General />
+							<General />
 						</q-tab-panel>
 						<q-tab-panel name="loot">
-								<Loot />
+							<Loot />
 						</q-tab-panel>
 						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
-								<Xp />
+							<Xp />
 						</q-tab-panel>
 					</q-tab-panels>
 				</q-scroll-area>
@@ -82,7 +82,6 @@
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.user,
 				tab: "entities"
 			} 
 		},
@@ -127,7 +126,6 @@
 	height: calc(100vh - 50px);
 
 	.wrapper {
-		padding: 10px;
 		grid-gap: 10px;
 		display: grid;
 		grid-template-columns: 2fr 1fr;

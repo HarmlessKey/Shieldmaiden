@@ -187,7 +187,7 @@
 				'fetchEncounter',
 				'fetchCampaign',
 				'setSlide'
-				]),
+			]),
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1

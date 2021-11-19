@@ -82,7 +82,7 @@
 									</template>
 								</template>
 								<template slot="entities" slot-scope="data">
-									<router-link :to="'/encounters/' + campaignId + '/' + data.row.key">
+									<router-link :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
 										<span class="neutral-1" v-if="data.row.entities">
 											{{ Object.keys(data.row.entities).length }}
 										</span>
@@ -111,7 +111,7 @@
 										<a v-else class="disabled btn btn-sm bg-neutral-5">
 											<i class="fas fa-play"></i>
 										</a>
-										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/encounters/' + campaignId + '/' + data.row.key">
+										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
 											<i class="fas fa-pencil-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Edit

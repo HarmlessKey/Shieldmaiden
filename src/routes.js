@@ -23,9 +23,6 @@ const Patreon = () => import('@/views/Patreon.vue');
 const ManageContent = () => import('@/views/ManageContent.vue');
 const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
-const GenerateXML = () => import('@/views/Admin/GenerateXML.vue');
-const ExportDatabase = () => import('@/views/Admin/ExportDatabase.vue');
-
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
@@ -412,32 +409,41 @@ export const routes = [{
 		meta: {
 			requiresAuth: true,
 			requiresAdmin: true,
+			side: false,
 			title: "Admin"
 		},
 		children: [
 			{
 				path: "",
 				name: 'Admin',
-				component: () => import('@/views/Admin')
+				component: () => import('@/views/Admin'),
+				meta: {
+					side: false
+				}
 			},
 			{
 				path: 'users',
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Users"
+					title: "Users",
+					side: false
 				},
 				children: [
 					{
 						path: "",
 						name: 'Users',
 						component: () => import('@/views/Admin/Users.vue'),
+						meta: {
+							side: false
+						}
 					},
 					{
 						path: ':id',
 						name: 'User',
 						component: () => import('@/views/Admin/Users.vue'),
 						meta: {
-							title: "User"
+							title: "User",
+							side: false
 						}
 					},
 				]
@@ -453,13 +459,17 @@ export const routes = [{
 						path: "",
 						name: 'Patrons',
 						component: () => import('@/views/Admin/Patrons'),
+						meta: {
+							side: false
+						}
 					},
 					{
 						path: 'new',
 						name: 'New patron',
 						component: () => import('@/views/Admin/Patrons/New'),
 						meta: {
-							title: "New patron"
+							title: "New patron",
+							side: false
 						}
 					},
 					{
@@ -467,23 +477,47 @@ export const routes = [{
 						name: 'Patron',
 						component: () => import('@/views/Admin/Patrons'),
 						meta: {
-							title: "Patron"
+							title: "Patron",
+							side: false
 						}
 					},
 				]
 			},
+			{
+				path: "export",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Export"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Export datases',
+						component: () => import('@/views/Admin/ExportDatabase.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
+			{
+				path: "xml",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Generate XML"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Generate XML',
+						component: () => import('@/views/Admin/GenerateXML.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			}
 		]
-	},
-	{
-		path: '/admin/xml',
-		name: 'GenerateXML',
-		component: GenerateXML,
-		meta: {
-			basePath: '/admin',
-			baseName: 'Generate XML',
-			requiresAuth: true,
-			requiresAdmin: true
-		}
 	},
 
 	// DEMO ENCOUNTER

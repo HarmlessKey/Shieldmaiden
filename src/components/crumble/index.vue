@@ -33,7 +33,7 @@
 					breadcrumbArray.push({
 						path: path,
 						to: breadcrumbArray[i - 1]
-							? "/" + breadcrumbArray[i - 1].path + "/" + path
+							? breadcrumbArray[i - 1].to + "/" + path
 							: "/" + path,
 						name: this.$route.matched[i] ? this.$route.matched[i].meta.title || path : path,
 					});

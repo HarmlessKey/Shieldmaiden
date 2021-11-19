@@ -11,8 +11,7 @@ export const dice = {
 	},
 	computed: {
 		...mapGetters([
-			"broadcast",
-			"user"
+			"broadcast"
 		]),
 		critSettings() {
 			if(this.$store.getters.userSettings && this.$store.getters.userSettings.encounter) {

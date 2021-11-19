@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
-import { required, length, max, min, max_value, min_value, alpha_dash} from "vee-validate/dist/rules";
+import { required, length, max, min, max_value, min_value, alpha_dash, numeric} from "vee-validate/dist/rules";
 
 extend("required", {
   ...required,
@@ -26,6 +26,27 @@ extend('length', length);
 extend('alpha_dash', {
   ...alpha_dash,
   message: "{_field_} may only contain alpha-numeric characters, dashes and underscores"
+});
+extend("numeric", numeric);
+
+// Value must be between 2 numbers
+extend("between", {
+  validate(value, { min, max } = {}) {
+    return Number(min) <= value && Number(max) >= value;
+  },
+  params: ["min", "max"],
+  message: "Must be between {min} and {max}"
+});
+
+// Validate url input
+extend('url', {
+  validate(value) {
+    if (value) {
+      const regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+      return regex.test(value);
+    } return false;
+  },
+  message: '{_field_} must be a valid URL',
 });
 
 // Check if variable used in a description, exists

@@ -1,13 +1,13 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit }">
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(edit)">
 				<hk-card header="Edit campaign" :min-width="300">
 					<div class="card-body">
 						<ValidationProvider rules="required" name="Title" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
-								label="Title"
+								label="Title *"
 								autocomplete="off"
 								type="text" 
 								v-model="campaign.campaign"
@@ -38,13 +38,17 @@
 								<q-icon name="fas fa-image"/>
 							</div>
 							<div>
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									autocomplete="off" 
-									type="text" 
-									v-model="campaign.background"
-									placeholder="Background URL"
-								/>
+								<ValidationProvider rules="url" name="Background" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										autocomplete="off" 
+										type="text" 
+										v-model="campaign.background"
+										placeholder="Background URL"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 						</div>
 
@@ -79,7 +83,7 @@
 					</div>
 					<div slot="footer" class="card-footer">
 						<q-btn class="bg-neutral-5 mr-2" label="Cancel" v-close-popup />
-						<q-btn color="blue" type="submit">Save</q-btn>
+						<q-btn color="blue" type="submit" :disabled="!valid">Save</q-btn>
 					</div>
 				</hk-card>
 			</q-form>
@@ -129,7 +133,6 @@
 				'fetchNpcs',
 			]),
 			edit() {
-				console.log("saved")
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(this.campaign);
 			},
 			setPrivate(value) {

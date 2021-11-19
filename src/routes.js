@@ -725,15 +725,6 @@ export const routes = [{
 			requiresAuth: true
 		}
 	},
-
-	// REDIRECT OLD PATHS
-	{ path: "/campaigns", redirect: "/content/campaigns" },
-	{ path: "/players", redirect: "/content/players" },
-	{ path: "/characters", redirect: "/content/characters" },
-	{ path: "/npcs", redirect: "/content/npcs" },
-	{ path: "/reminders", redirect: "/content/reminders" },
-	{ path: "/items", redirect: "/content/items" },
-	{ path: "/encounters/*", redirect: "/content/campaigns" },
 	
 
 	{
@@ -785,8 +776,18 @@ export const routes = [{
 		name: 'Offline',
 		component: Offline
 	},
+	
+	// REDIRECT OLD PATHS
+	{ path: "/campaigns", redirect: "/content/campaigns" },
+	{ path: "/players", redirect: "/content/players" },
+	{ path: "/characters", redirect: "/content/characters" },
+	{ path: "/npcs", redirect: "/content/npcs" },
+	{ path: "/reminders", redirect: "/content/reminders" },
+	{ path: "/items", redirect: "/content/items" },
+	{ path: "/encounters/*", redirect: "/content/campaigns" },
+
 	{
 		path: '*',
 		redirect: '/404'
-	}
+	},
 ];

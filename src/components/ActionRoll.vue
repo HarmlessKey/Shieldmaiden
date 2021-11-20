@@ -14,7 +14,7 @@
 			/>
 		</q-tabs>
 
-		<q-tab-panels v-model="tab" class="bg-transparent">
+		<q-tab-panels v-model="tab" class="bg-transparent" keep-alive>
 			<q-tab-panel
 				v-for="(option, index) in options"
 				:key="`verstatile-panel-${index}`"
@@ -23,19 +23,26 @@
 				
 				<hk-dmg-type-select 
 					class="mb-3"
-					:label="`Damage type ${index == 1 ? option.label : ''} *`"
+					:label="`Damage type ${index == 1 ? option.label : '*'}`"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					validation-rules="required"
+					:validation-rules="index === 0 ? 'required' : ''"
 				/>
 
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->
 					<div class="col">
-						<ValidationProvider rules="between:1,99|required" name="Dice count" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider 
+							:rules="{
+								between: [1, 9],
+								required: index === 0
+							}" 
+							:name="`Dice count ${index == 1 ? option.label : ''}`" 
+							v-slot="{ errors, invalid, validated }"
+						>
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
-								:label="`Dice count ${index == 1 ? option.label : ''} *`"
+								:label="`Dice count ${index == 1 ? option.label : '*'}`"
 								v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
 								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
 								min="1"

@@ -50,8 +50,8 @@
 			});
 		},
 		watch: {
-    '$route' () {
-			// Reset the 
+			'$route' () {
+				// Reset the 
 				this.last_name = undefined;
 			}
 		}

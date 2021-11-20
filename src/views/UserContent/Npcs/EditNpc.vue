@@ -2,94 +2,95 @@
 	<div v-if="npc && npc.old" class="deprecated">
 		<h2 class="red">Deprecated NPC</h2>
 	</div>
-	<q-form 
-		v-else-if="npc || $route.name == 'Add NPC'" 
-		@submit="saveNpc"
-	>
-		<div>
-			<div class="top">
-				<div class="d-flex justify-content-start">
-					<a v-if="$route.name === 'Add NPC'" class="btn bg-neutral-5" @click="copy_dialog = true">
-						<i class="fas fa-copy"></i>
-						Copy existing NPC
-					</a>
-				</div>
-				<div v-if="npc" class="d-none d-md-flex name">
-					<b v-if="npc.name">{{ npc.name}}</b>
-					<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }" />
-				</div>
-			</div>
-
-			<div class="form">
-				<BasicInfo v-model="npc" />
-
-				<Senses v-model="npc" />
-
-				<AbilityScores v-model="npc" />
-
-				<Skills v-model="npc" />
-
-				<Defenses v-model="npc" />
-
-				<SpellCasting v-model="npc" />
-
-				<Actions v-model="npc" />
-			</div>
-
-			<!-- HANDLING -->
-			<div class="save">
-				<div class="d-flex justify-content-start">
-					<template v-if="unsaved_changes">
-						<div  class="red unsaved_changes">
-							<i class="fas fa-exclamation-triangle"></i> Unsaved changes
-						</div>	
-						<a class="btn bg-neutral-5" @click="revert_changes()">Revert</a>
-					</template>
-				</div>
+	<div v-else-if="npc || $route.name == 'Add NPC'">
+		<ValidationObserver  v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(saveNpc)">
 				<div>
-					<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-					<q-btn label="Save" type="submit" color="primary"/>
-				</div>
-			</div>
-
-			<!-- COPY DIALOG -->
-			<q-dialog v-model="copy_dialog">
-				<hk-card header="Copy Existing NPC">
-					<div class="card-body">
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square dense
-							label="Search NPC"
-							type="text" 
-							autocomplete="off" 
-							v-model="search" 
-							@keyup="searchNPC()"
-							class="mb-3"
-						>
-							<template v-slot:append>
-								<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
-							</template>
-						</q-input>
-						<p v-if="noResult" class="red">{{ noResult }}</p>
-						<q-list :dark="$store.getters.theme === 'dark'">
-							<q-item v-for="(npc, index) in searchResults" :key="index">
-								<q-item-section>
-									{{ npc.name.capitalizeEach() }}
-								</q-item-section>
-								<q-item-section avatar>
-									<a class="neutral-2" @click="copy(npc)">
-									<i class="fas fa-copy blue"/>
-									<q-tooltip anchor="top middle" self="center middle">
-										Copy NPC
-									</q-tooltip>
-								</a>
-								</q-item-section>
-							</q-item>
-						</q-list>
+					<div class="top">
+						<div class="d-flex justify-content-start">
+							<a v-if="$route.name === 'Add NPC'" class="btn bg-neutral-5" @click="copy_dialog = true">
+								<i class="fas fa-copy"></i>
+								Copy existing NPC
+							</a>
+						</div>
+						<div v-if="npc" class="d-none d-md-flex name">
+							<b v-if="npc.name">{{ npc.name}}</b>
+							<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }" />
+						</div>
 					</div>
-				</hk-card>
-			</q-dialog>
-		</div>
-	</q-form>
+
+					<div class="form">
+						<BasicInfo v-model="npc" />
+
+						<Senses v-model="npc" />
+
+						<AbilityScores v-model="npc" />
+
+						<Skills v-model="npc" />
+
+						<Defenses v-model="npc" />
+
+						<SpellCasting v-model="npc" />
+
+						<Actions v-model="npc" />
+					</div>
+
+					<!-- HANDLING -->
+					<div class="save">
+						<div class="d-flex justify-content-start">
+							<template v-if="unsaved_changes">
+								<div  class="red unsaved_changes">
+									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+								</div>	
+								<a class="btn bg-neutral-5" @click="revert_changes()">Revert</a>
+							</template>
+						</div>
+						<div>
+							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+							<q-btn label="Save" type="submit" color="primary" :disabled="!valid" />
+						</div>
+					</div>
+					</div>
+			</q-form>
+		</ValidationObserver>
+
+		<!-- COPY DIALOG -->
+		<q-dialog v-model="copy_dialog">
+			<hk-card header="Copy Existing NPC">
+				<div class="card-body">
+					<q-input 
+						:dark="$store.getters.theme === 'dark'" filled square dense
+						label="Search NPC"
+						type="text" 
+						autocomplete="off" 
+						v-model="search" 
+						@keyup="searchNPC()"
+						class="mb-3"
+					>
+						<template v-slot:append>
+							<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
+						</template>
+					</q-input>
+					<p v-if="noResult" class="red">{{ noResult }}</p>
+					<q-list :dark="$store.getters.theme === 'dark'">
+						<q-item v-for="(npc, index) in searchResults" :key="index">
+							<q-item-section>
+								{{ npc.name.capitalizeEach() }}
+							</q-item-section>
+							<q-item-section avatar>
+								<a class="neutral-2" @click="copy(npc)">
+								<i class="fas fa-copy blue"/>
+								<q-tooltip anchor="top middle" self="center middle">
+									Copy NPC
+								</q-tooltip>
+							</a>
+							</q-item-section>
+						</q-item>
+					</q-list>
+				</div>
+			</hk-card>
+		</q-dialog>			
+	</div>
 </template>
 
 <script>

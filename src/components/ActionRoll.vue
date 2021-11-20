@@ -20,33 +20,34 @@
 				:key="`verstatile-panel-${index}`"
 				:name="option.name"
 			>
+				
 				<hk-dmg-type-select 
 					class="mb-3"
-					:label="`Damage type ${index == 1 ? option.label : ''}`"
+					:label="`Damage type ${index == 1 ? option.label : ''} *`"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
-					required
+					validation-rules="required"
 				/>
 
 				<!-- ROLLS -->
 				<div class="row q-col-gutter-md mb-3">
 					<!-- DICE COUNT -->
 					<div class="col">
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
-							:label="`Dice count ${index == 1 ? option.label : ''}`"
-							v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
-							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
-							:rules="[
-								val => !val || (val <= 99 && val > 0) || 'Min is 1, max is 99',
-								(roll[`${index === 1 ? 'versatile_' : '' }dice_type`]) ? val => !!val || 'Required' : ''
-							]"
-							min="1"
-							max="99"
-							autocomplete="off"
-							name="dice_count"
-							class="mb-2"
-							type="number"
-						/>
+						<ValidationProvider rules="between:1,99|required" name="Dice count" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								:label="`Dice count ${index == 1 ? option.label : ''} *`"
+								v-model.number="roll[`${index === 1 ? 'versatile_' : '' }dice_count`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }dice_count`)"
+								min="1"
+								max="99"
+								autocomplete="off"
+								name="dice_count"
+								class="mb-2"
+								type="number"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
 					</div>
 					<div class="col">
 						<!-- DICE TYPE -->
@@ -62,25 +63,28 @@
 					</div>
 					<div class="col">
 						<!-- MODIFIER FIXED VALUE -->
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
-							:label="`Fixed value ${index == 1 ? option.label : ''}`"
-							v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
-							@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
-							:rules="[val => !val || val <= 99 || 'Max is 99']"
-							autocomplete="off"
-							class="mb-2"
-							type="number"
-						>
-							<template v-slot:append>
-								<hk-popover 
-									header="Fixed value"
-									content="Set the fixed value that is added on top of the rolled value."
-								>
-									<q-icon name="info" />
-								</hk-popover>
-							</template>
-						</q-input>
+						<ValidationProvider rules="between:-99,99" name="Fixed value" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								:label="`Fixed value ${index == 1 ? option.label : ''}`"
+								v-model="roll[`${index === 1 ? 'versatile_' : '' }fixed_val`]"
+								@input="parseToInt($event, roll, `${index === 1 ? 'versatile_' : '' }fixed_val`)"
+								autocomplete="off"
+								class="mb-2"
+								type="number"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<template v-slot:append>
+									<hk-popover 
+										header="Fixed value"
+										content="Set the fixed value that is added on top of the rolled value."
+									>
+										<q-icon name="info" />
+									</hk-popover>
+								</template>
+							</q-input>
+						</ValidationProvider>
 					</div>
 
 					<!-- PRIMARY STAT -->
@@ -125,30 +129,34 @@
 		</q-input>
 
 		<!-- FAIL MODIFIER -->
-		<q-select 
-			v-if="action_type === 'save'"
-			:dark="$store.getters.theme === 'dark'" filled square
-			map-options
-			emit-value
-			label="Succesful save"
-			:options="save_fail_mod"
-			v-model="roll.save_fail_mod"
-			class="mb-3"
-			hint="The effect if the target makes a successful saving throw."
-			:rules="[val => val !== undefined || 'What happens on a succesful save?']"
-		/>
-		<q-select 
-			v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)"
-			:dark="$store.getters.theme === 'dark'" filled square
-			map-options
-			emit-value
-			label="Miss modifier"
-			:options="save_fail_mod"
-			v-model="roll.miss_mod"
-			class="mb-3"
-			hint="The effect if the attack is a miss."
-			:rules="[val => val !== undefined || 'What happens on a miss?']"
-		/>
+		<ValidationProvider v-if="action_type === 'save'" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
+			<q-select 		
+				:dark="$store.getters.theme === 'dark'" filled square
+				map-options
+				emit-value
+				label="Succesful save *"
+				:options="save_fail_mod"
+				v-model="roll.save_fail_mod"
+				class="mb-3"
+				hint="The effect if the target makes a successful saving throw."
+				:error="invalid && validated"
+				error-message="What happens on a succesful save?"
+			/>
+		</ValidationProvider>
+		<ValidationProvider v-if="['spell_attack', 'melee_weapon', 'ranged_weapon'].includes(action_type)" rules="required" name="Fixed value" v-slot="{ invalid, validated }">
+			<q-select 	
+				:dark="$store.getters.theme === 'dark'" filled square
+				map-options
+				emit-value
+				label="Miss modifier *"
+				:options="save_fail_mod"
+				v-model="roll.miss_mod"
+				class="mb-3"
+				hint="The effect if the attack is a miss."
+				:error="invalid && validated"
+				error-message="What happens on a miss?"
+			/>
+		</ValidationProvider>
 
 		<hr>
 		<!-- SPECIAL ACTIONS -->

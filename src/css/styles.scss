@@ -435,13 +435,18 @@ html body {
 		border-bottom-left-radius: $border-radius;
 		border-bottom-right-radius: $border-radius;
 	}
+
+	.saved {
+		animation: fadeout .3s linear;
+		animation-delay: 2s;
+	}
 	
 	.disabled {
 		cursor: forbidden !important;
 		opacity: .5 !important;
 	}
 
-	// .invert { filter: invert(1); }
+	.invert { filter: invert(1); }
 
 	.pointer {
 		cursor: pointer !important;
@@ -718,6 +723,10 @@ html body {
 	@keyframes fadeinout {
 		0%,100% { opacity: 0; }
 		50% { opacity: 1; }
+	}
+	@keyframes fadeout {
+		0% { opacity: 1; }
+		100% { opacity: 0; }
 	}
 
 

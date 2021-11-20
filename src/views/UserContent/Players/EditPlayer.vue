@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<ValidationObserver v-slot="{ handleSubmit, valid }" v-if="player">
+		<ValidationObserver v-if="player" v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(savePlayer)">
 				<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 

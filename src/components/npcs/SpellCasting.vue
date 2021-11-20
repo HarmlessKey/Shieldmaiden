@@ -28,46 +28,46 @@
 					<template v-if="npc[`${casting.category}_ability`]">
 						<div class="row q-col-gutter-sm">
 							<div class="col" v-if="casting.category === 'caster'">
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									label="Caster level"
-									v-model.number="npc[`${casting.category}_level`]"
-									@input="parseToInt(npc, `${casting.category}_level`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 20 || 'Max is 20'
-									]"
-								/>
+								<ValidationProvider rules="between:1,20|required" name="Caster level" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Caster level"
+										v-model.number="npc[`${casting.category}_level`]"
+										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 							<div class="col">
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									label="Save DC"
-									v-model.number="npc[`${casting.category}_save_dc`]"
-									@input="parseToInt(npc, `${casting.category}_save_dc`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 99 || 'Max is 99'
-									]"
-								/>
+								<ValidationProvider rules="between:1,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Save DC"
+										v-model.number="npc[`${casting.category}_save_dc`]"
+										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 							<div class="col">
-								<q-input 
-									:dark="$store.getters.theme === 'dark'" filled square
-									label="Spell attack"
-									v-model.number="npc[`${casting.category}_spell_attack`]"
-									@input="parseToInt(npc, `${casting.category}_spell_attack`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 99 || 'Max is 99'
-									]"
-								/>
+								<ValidationProvider rules="between:-10,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Spell attack"
+										v-model.number="npc[`${casting.category}_spell_attack`]"
+										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 						</div>
 
@@ -237,10 +237,10 @@
 			}
 		},
 		methods: {
-			parseToInt(value, object, property) {
+			parseToInt(value, object, property, valid) {
 				if(value === undefined || value === "") {
 					this.$delete(object, property);
-				} else {
+				} else if(valid) {
 					this.$set(object, property, parseInt(value));
 				}
 			},

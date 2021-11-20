@@ -2,6 +2,9 @@ import Vue from "vue";
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
 import { required, length, max, min, max_value, min_value, alpha_dash, numeric} from "vee-validate/dist/rules";
 
+Vue.component('ValidationProvider', ValidationProvider);
+Vue.component('ValidationObserver', ValidationObserver);
+
 extend("required", {
   ...required,
   message: "{_field_} is required"
@@ -38,6 +41,39 @@ extend("between", {
   message: "Must be between {min} and {max}"
 });
 
+// Recharge 1, 5-6 or rest
+extend('recharge', {
+  validate(value) {
+    if (value) {
+      const regex = /^[0-9]+(-[0-9]+)*$/;
+      return regex.test(value) || value === "rest";
+    } return false;
+  },
+  message: 'Allowed format: 6, 5-6 or rest6',
+});
+
+// Range
+extend('range', {
+  validate(value) {
+    if (value) {
+      const regex = /^[0-9]+(\/[0-9]+)*$/g;
+      return regex.test(value);
+    } return false;
+  },
+  message: 'Allowed format: 20 or 20/60',
+});
+
+// Hit dice
+extend('hit_dice', {
+  validate(value) {
+    if (value) {
+      const regex = /^[0-9]+d[0-9]+$/;
+      return regex.test(value);
+    } return false;
+  },
+  message: 'Allowed format: 2d6',
+});
+
 // Validate url input
 extend('url', {
   validate(value) {
@@ -65,6 +101,3 @@ extend('variable_check', {
     return true;
   }
 });
-
-Vue.component('ValidationProvider', ValidationProvider);
-Vue.component('ValidationObserver', ValidationObserver);

@@ -49,7 +49,7 @@ extend('recharge', {
       return regex.test(value) || value === "rest";
     } return false;
   },
-  message: 'Allowed format: 6, 5-6 or rest6',
+  message: 'Allowed format: 6, 5-6 or rest',
 });
 
 // Range

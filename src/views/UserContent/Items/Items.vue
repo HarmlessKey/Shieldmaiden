@@ -41,13 +41,13 @@
 					</template>
 
 					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="neutral-2 mx-1" :to="`${$route.path}/${data.row.key}`">
+						<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="`${$route.path}/${data.row.key}`">
 							<i class="fas fa-pencil"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Edit
 							</q-tooltip>
 						</router-link>
-						<a class="neutral-2" @click="confirmDelete($event, data.row.key, data.row.name)">
+						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row.name)">
 							<i class="fas fa-trash-alt"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								Delete
@@ -63,7 +63,7 @@
 						:key="'open-slot-' + index"
 					>
 						<span>Open item slot</span>
-						<router-link v-if="!overencumbered" to="/items/add-items">
+						<router-link v-if="!overencumbered" to="/content/items/add-item">
 							<i class="fas fa-plus green"></i>
 						</router-link>
 					</div>
@@ -76,7 +76,7 @@
 			</div>
 		</hk-card>
 		<h3 v-else-if="items === null" class="mt-4">
-			<router-link v-if="!overencumbered" to="/items/add-item">
+			<router-link v-if="!overencumbered" to="/content/items/add-item">
 				<i class="fas fa-plus green"></i> Create your first item
 			</router-link>
 		</h3>

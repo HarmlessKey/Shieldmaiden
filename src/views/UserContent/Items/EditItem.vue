@@ -1,7 +1,203 @@
 <template>
-	<div class="content" v-if="item || $route.name === 'Add item'">
-		<div class="form">
-			<hk-card header="Copy Existing Item" v-if="$route.name == 'Add item'">
+	<div v-if="item || $route.name === 'Add item'">
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(saveItem)">
+				<hk-card header="Your Item">
+					<div slot="header" class="card-header">
+						{{ item.name ? item.name : "New item" }}
+
+						<a v-if="$route.name == 'Add item'" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
+							Copy item
+							<i class="ml-1 fas fa-copy"/>
+						</a>
+					</div>
+					<div class="card-body">
+						<!-- NAME -->
+						<ValidationProvider rules="max:100|required" name="Name" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Name"
+								autocomplete="off"  
+								type="text" 
+								class="mb-2" 
+								v-model="item.name" 
+								maxlength="100"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+					
+						<!-- IMAGE -->
+						<div class="avatar">
+							<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
+							<div class="img" v-else>
+								<img src="@/assets/_img/styles/axe.svg" />
+							</div>
+							<div>
+								<ValidationProvider rules="url" name="Image" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Image"
+										autocomplete="off"  
+										type="text" 
+										v-model="item.image" 
+										placeholder="Image URL"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+							</div>
+						</div>
+
+						<ValidationProvider rules="max:5000" name="Description" v-slot="{ errors, invalid, validated }">
+							<q-input
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Description"
+								autogrow
+								autocomplete="off"  
+								type="text" 
+								v-model="item.desc" 
+								name="image" 
+								maxlength="5000"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+					</div>
+				</hk-card>
+
+				<hk-card>
+					<div slot="header" class="card-header">
+						<span>
+							<i class="fal fa-table"></i> Info Tables
+						</span>
+							<a slot="after"  class="btn bg-neutral-5">
+								<i class="fas fa-plus"></i> Add table
+								<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
+									<div class="bg-neutral-8 px-2 py-2" >
+											<p>Add a table</p>
+											<ValidationProvider rules="required|numeric|between:1,10" name="Columns" v-slot="{ errors, invalid, validated }">
+												<q-input 
+													:dark="$store.getters.theme === 'dark'" filled square
+													label="Columns"
+													type="number" 
+													max="10"
+													min="1"
+													class="mb-4"
+													v-model="columns"
+													:error="invalid && validated"
+													:error-message="errors[0]"
+													hint="How many columns?"
+												/>
+												<div class="d-flex justify-content-end mt-2">
+													<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
+													<q-btn
+														color="primary"
+														v-close-popup 
+														@click="!invalid ? addTable() : null"
+														:disabled="invalid"
+													>
+														Add table
+													</q-btn>
+												</div>
+											</ValidationProvider>
+									</div>
+								</q-popup-proxy>
+							</a>
+					</div>
+					<div class="card-body">
+						<q-list v-if="item.tables" :dark="$store.getters.theme === 'dark'" :class="`accordion`">
+							<ValidationObserver v-for="(table, tableIndex) in item.tables" v-slot="{ valid }" :key="tableIndex">
+								<q-expansion-item
+									:dark="$store.getters.theme === 'dark'" 
+									switch-toggle-side
+									:group="`table-${tableIndex}`"
+									:name="`table-${tableIndex}`"
+									enter-active-class="animated animate__fadeIn" 
+									leave-active-class="animated animate__fadeOut"
+								>
+									<template v-slot:header>
+										<q-item-section avatar v-if="!valid">
+											<q-icon name="error" color="red" />
+											<q-tooltip anchor="top middle" self="center middle">
+												Validation errors in table
+											</q-tooltip>
+										</q-item-section>
+										<q-item-section>
+											{{ table.name || 'Table ' + (parseInt(tableIndex)+1) }}
+										</q-item-section>
+										<q-item-section avatar>
+											<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
+										</q-item-section>
+									</template>
+
+									<div class="accordion-body">
+										<ValidationProvider rules="required|max:100" name="Table name" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Table name"
+												v-model="table.name" 
+												class="mb-3"
+												name="table name"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											/>
+										</ValidationProvider>
+
+										<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
+											<div v-for="(col, i) in table.columns" :key="i" class="header">
+												<ValidationProvider rules="required|max:100" :name="`Column header ${i+1}`" v-slot="{ errors, invalid, validated }">
+													<q-input 
+														:dark="$store.getters.theme === 'dark'" square dense
+														v-model="table.header[i]" 
+														:placeholder="`Column header ${i+1}`"
+														maxlength="100"
+														:error="invalid && validated"
+														:error-message="errors[0]"
+													/>
+												</ValidationProvider>
+											</div>
+											<a @click="addRow(tableIndex)" class="remove green"><i class="fas fa-plus"/></a>
+											<template v-for="(row, rowIndex) in table.rows">
+												<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
+													<ValidationProvider rules="required|max:100" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
+														<q-input 
+															:dark="$store.getters.theme === 'dark'" filled square dense
+															v-model="table.rows[rowIndex].columns[colIndex]" 
+															:placeholder="`Column ${colIndex+1}`"
+															maxlength="100"
+															:error="invalid && validated"
+															:error-message="errors[0]"
+														/>
+													</ValidationProvider>
+												</div>
+												<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i class="fas fa-trash-alt"></i></a>
+											</template>
+										</div>
+										<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
+									</div>
+								</q-expansion-item>
+							</ValidationObserver>
+						</q-list>
+					</div>
+				</hk-card>
+
+
+				<div class="save">
+					<router-link to="/content/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+					<q-btn 
+						type="submit"
+						:disabled="!valid"
+						color="primary" 
+					>
+						{{ $route.name === "Add item" ? "Add item" : "Save" }}
+					</q-btn>
+				</div>
+			</q-form>
+		</ValidationObserver>
+
+		<q-dialog v-model="copy_dialog">
+			<hk-card header="Copy Existing Item" :min-width="300">
 				<div class="card-body">
 					<q-input 
 						:dark="$store.getters.theme === 'dark'" filled square dense
@@ -36,152 +232,7 @@
 					</ul>
 				</div>
 			</hk-card>
-		
-			<hk-card header="Your Item">
-				<div class="card-body">
-					<!-- NAME -->
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Name"
-						autocomplete="off"  
-						type="text" 
-						class="mb-2" 
-						v-model="item.name" 
-						v-validate="'max:100|required'" 
-						maxlength="100"
-						data-vv-as="Name"
-						id="name"
-						name="name" 
-					/>
-					<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
-				
-					<!-- IMAGE -->
-					<div class="avatar">
-						<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
-						<div class="img" v-else>
-							<img src="@/assets/_img/styles/axe.svg" />
-						</div>
-						<div>
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square
-								label="image"
-								autocomplete="off"  
-								type="text" 
-								v-model="item.image" 
-								v-validate="'url'" 
-								data-vv-as="image"
-								name="image" 
-								id="image"
-								placeholder="Image URL"
-							/>
-							<p class="validate red" v-if="errors.has('image')">{{ errors.first('image') }}</p>
-						</div>
-					</div>
-
-					<q-input
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Description"
-						autogrow
-						class="mb-4"
-						autocomplete="off"  
-						type="text" 
-						v-model="item.desc" 
-						name="image" 
-						id="image"
-					/>
-
-					<!-- TABLE -->
-					<label class="d-flex justify-content-between add-table">
-						<span>
-							<i class="fal fa-table"></i> Info Tables
-						</span>
-						<span class="d-flex justify-content-end">
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square dense
-								label="Columns"
-								type="number" 
-								v-validate="'numeric|max_value:10|min_value:1'" 
-								max="10"
-								min="1"
-								name="columns"
-								v-model="columns"
-								class="mr-2"
-							/>
-							
-							<a @click="!errors.has('columns') ? addTable() : null" :class="{ disabled: errors.has('columns')}">
-								<i class="fas fa-plus"></i> Add table
-							</a>
-						</span>
-					</label>
-
-					<template v-if="item.tables">
-						<div v-for="(table, tableIndex) in item.tables" :key="tableIndex" class="mb-5">
-							<h3 class="d-flex justify-content-between">
-								<span>{{ table.name || 'Table ' + (parseInt(tableIndex)+1) }}</span>
-								<a class="red" @click="removeTable(tableIndex)"><i class="fas fa-trash-alt"></i></a>
-							</h3>
-
-							<q-input 
-								:dark="$store.getters.theme === 'dark'" filled square dense
-								label="Table name"
-								v-model="table.name" 
-								class="mb-3"
-								name="table name"
-								v-validate="'required'" 
-							/>
-							<p class="validate red" v-if="errors.has('table name')">{{ errors.first('table name') }}</p>
-
-							<div class="item-table" :style="{ 'grid-template-columns': `repeat(${table.columns}, auto) 30px` }">
-								<div v-for="(col, i) in table.columns" :key="i" class="header">
-									<q-input 
-										:dark="$store.getters.theme === 'dark'" filled square dense
-										v-model="table.header[i]" 
-										:placeholder="`Column header ${i+1}`"
-										v-validate="'max:100|required'"
-										maxlength="100"
-										:data-vv-as="`column header ${i+1}`"
-										:name="`column-header-${i+1}`"
-									/>
-									<p class="validate red" v-if="errors.has(`column-header-${i+1}`)">{{ errors.first(`column-header-${i+1}`) }}</p>
-								</div>
-								<div></div>
-								<template v-for="(row, rowIndex) in table.rows">
-									<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
-										<q-input 
-											:dark="$store.getters.theme === 'dark'" filled square dense
-											v-model="table.rows[rowIndex].columns[colIndex]" 
-											:placeholder="`Column ${colIndex+1}`"
-											v-validate="'max:100|required'"
-											maxlength="100"
-											:data-vv-as="`column ${colIndex+1}`"
-											:name="`cell-${rowIndex+1}-${colIndex+1}`"
-										/>
-										<p class="validate red" v-if="errors.has(`cell-${rowIndex+1}-${colIndex+1}`)">{{ errors.first(`cell-${rowIndex+1}-${colIndex+1}`) }}</p>
-									</div>
-									<a class="red remove" @click="removeRow(tableIndex, rowIndex)" :key="`remove-${rowIndex}`"><i class="fas fa-trash-alt"></i></a>
-								</template>
-							</div>
-							<a @click="addRow(tableIndex)" class="btn btn-block mt-4">Add Row</a>
-						</div>
-					</template>
-				</div>
-				<div slot="footer" class="card-footer save">
-					<p class="error red" v-if="errors.items && errors.items.length > 0">There is an error in your form.</p>
-					<router-link to="/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-					<button v-if="$route.name == 'AddItem'" class="btn" @click="addItem()"><i class="fas fa-plus"></i> Add Item</button>
-					<button 
-						v-else 
-						:disabled="errors.items && errors.items.length > 0"
-						class="btn" 
-						@click="editItem()"
-					>
-						<i class="fas fa-check"></i> Save
-					</button>
-				</div>
-			</hk-card>
-		</div>
-
-		
+		</q-dialog>	
 	</div>
 </template>
 
@@ -207,9 +258,10 @@
 				userId: this.$store.getters.user.uid,
 				itemId: this.$route.params.id,
 				search: ["name"],
-                searched: undefined,
+				searched: undefined,
 				foundItems: [],
-				columns: undefined
+				columns: undefined,
+				copy_dialog: false
 			}
 		},
 		mounted() {
@@ -252,7 +304,7 @@
 				let searchTerm = this.searched.toLowerCase();
 				let results = this.items.filter( function(row) {
 					for (let i in vm.search) {
-                        let key = vm.search[i];
+						let key = vm.search[i];
 						// If field is undefined don't return row
 						if (row[key] == undefined) {
 							return
@@ -272,42 +324,33 @@
 				this.item = item;
 				this.foundItems = [];
 				this.searched = '';
+				this.copy_dialog = false;
+			},
+			saveItem() {
+				if(this.$route.name === "Add item") {
+					this.addItem();
+				} else {
+					this.editItem();
+				}
 			},
 			addItem() {
-				// THIS IS UGLY
 				delete this.item['.value'];
 				delete this.item['.key'];
 
-				// UGLY ENDS HERE
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref('custom_items/' + this.userId).push(this.item);
-						this.$router.replace('/items')
-					} else {
-						//console.log('Not valid');
-					}
-				})
+				db.ref('custom_items/' + this.userId).push(this.item);
+				this.$router.replace('/content/items');
 			},
 			editItem() {
-				// THIS IS UGLY
-				delete this.item['.key']
+				delete this.item['.key'];
 
-				// UGLY ENDS HERE
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`custom_items/${this.userId}/${this.itemId}`).set(this.item);
-						this.$router.replace('/items')
-					} else {
-						this.$snotify.error('There is something wrong in your form, scroll up to fix it.', 'Error', {
-						});
-					}
-				})
+				db.ref(`custom_items/${this.userId}/${this.itemId}`).set(this.item);
+				this.$router.replace('/content/items');
 			},
 			addTable() {	
 				if(this.columns !== undefined) {
 					this.columns = parseInt(this.columns);
 					if(this.item.tables === undefined) {
-						this.item.tables = [];
+						this.$set(this.item, "tables", []);
 					}
 					this.item.tables.push({
 						columns: this.columns,
@@ -315,10 +358,9 @@
 						rows: [],
 					})
 				}
-				this.$forceUpdate();
 			},
 			addRow(key) {
-				var cols = []
+				var cols = [];
 
 				for(let i = 1; i <= this.item.tables[key].columns; i++) {
 					cols.push(undefined)
@@ -326,75 +368,44 @@
 				this.item.tables[key].rows.push({
 					columns: cols
 				})
-				this.$forceUpdate();
 			},
 			removeRow(tableIndex, rowIndex) {
 				this.$delete(this.item.tables[tableIndex].rows, rowIndex);
-				this.$forceUpdate(); //IMPORTANT
 			},
 			removeTable(key) {
 				this.$delete(this.item.tables, key);
-				this.$forceUpdate(); //IMPORTANT
 			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.content {
-	display: grid;
-	height: calc(100vh - 50px) !important;
-	grid-template-rows: auto 60px;
+	.avatar {
+		display: grid;
+		grid-template-columns: 56px 1fr;
+		grid-column-gap: 10px;
 
-	.form {
-		overflow-y: scroll;
-
-		&::-webkit-scrollbar {
-			display: none;
+		.img {
+			border: solid 1px $neutral-2;
+			display: block;
+			width: 56px;
+			height: 56px;
+			background-size: cover;
+			background-position: center top;
 		}
-		
-		.avatar {
-			display: grid;
-			grid-template-columns: 56px 1fr;
-			grid-column-gap: 10px;
+	}
 
-			.img {
-				border: solid 1px $neutral-2;
-				display: block;
-				width: 56px;
-				height: 56px;
-				background-size: cover;
-				background-position: center top;
-			}
-		}
-		label {
-			line-height: 37px;
-			margin-bottom: 20px;
+	.add-table {
+		border-bottom: solid 1px $neutral-3;
+		padding-bottom: 5px;
+	}
+	.item-table {
+		display: grid;
+		grid-template-rows: minmax(46px max-content);
 
-			&.add-table {
-				border-bottom: solid 1px $neutral-3;
-				padding-bottom: 5px;
-
-				input[type=number] {
-					max-width: 110px;
-					margin-right: 10px;
-				}
-			}
-		}
-		.item-table {
-			display: grid;
-			grid-template-rows: minmax(46px max-content);
-
-			.header {
-				font-weight: bold;
-				border-bottom: solid 1px $neutral-3;
-				padding-bottom: 5px;
-				margin-bottom: 10px;
-			}
-			.remove {
-				text-align: center;
-				line-height: 38px;
-			}
+		.remove {
+			text-align: center;
+			line-height: 38px;
 		}
 	}
 	.save {
@@ -406,8 +417,4 @@
 			line-height: 40px;
 		}
 	}
-}
-
-
-
 </style>

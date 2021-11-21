@@ -9,7 +9,7 @@
 					<q-tooltip anchor="top middle" self="center middle">
 						Add
 					</q-tooltip>
-					<q-popup-proxy square>
+					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 						<div class="bg-neutral-9">
 							<q-list>
 								<q-item 
@@ -65,14 +65,14 @@
 								>
 									<template v-slot:header>
 										<q-item-section avatar v-if="!valid">
-											<q-icon name="info" color="red" />
+											<q-icon name="error" color="red" />
 											<q-tooltip anchor="top middle" self="center middle">
 												Validation errors in ability
 											</q-tooltip>
 										</q-item-section>
 										<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 											<span v-if="ability.versatile" class="roll-button" @click.stop>
-												<q-popup-proxy square :dark="$store.getters.theme === 'dark'">
+												<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 													<q-list :dark="$store.getters.theme === 'dark'">
 														<q-item>
 															<q-item-section>

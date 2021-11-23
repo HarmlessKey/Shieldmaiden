@@ -144,6 +144,18 @@
 			}
 		},
 		mounted() {
+			if(this.npcId) {
+				const npc = db.ref(`npcs/${this.userId}/${this.npcId}`);
+
+				npc.on("value", (snapshot) => {
+					if(snapshot.val()) {
+						this.npc = snapshot.val();
+						this.npc_copy = JSON.stringify(this.npc);
+						this.unsaved_changes = false;
+					}
+				});
+			}
+
 			var npcs_ref = db.ref(`monsters`);
 			npcs_ref.on('value', async (snapshot) => {
 				let npcs = snapshot.val();
@@ -157,19 +169,6 @@
 				});
 				this.npcs = npcs;
 			});
-			this.npc_copy = JSON.stringify(this.npc);
-		},
-		firebase() {
-			return {
-				npc: {
-					source: db.ref(`npcs/${this.userId}/${this.npcId}`),
-					asObject: true,
-					readyCallback: () => {
-						this.npc_copy = JSON.stringify(this.npc);
-						this.unsaved_changes = false;
-					}
-				},
-			}
 		},
 		computed: {
 			...mapGetters([
@@ -238,41 +237,42 @@
 			 * Checks if a new NPC must added, or an existing NPC must be saved.
 			**/
 			saveNpc() {
-				if(this.$route.name === "AddNPC" && !this.npc[".key"]) {
+				if(this.$route.name === "AddNPC" && !this.npcId) {
 					this.addNpc();
 				} else {
-					this.editNpc()
+					this.editNpc();
 				}
 			},
 			addNpc() {
 				db.ref('npcs/' + this.userId).push(this.npc).then((res) => {
-					this.$set(this.npc, ".key", res.getKey());
+					// Set the npcId, so we know there is an existing NPC
+					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
+					this.$set(this, "npcId", res.getKey());
 
 					this.$snotify.success('Monster Saved.', 'Critical hit!', {
 						position: "rightTop"
 					});
 
-
 					// Capitalize before stringyfy so changes found isn't triggered
 					this.npc.name = this.npc.name.capitalizeEach();
 					this.npc_copy = JSON.stringify(this.npc);
 					this.unsaved_changes = false;
-				});	
+				});		
 			},
 			editNpc() {
-				delete this.npc['.key'];
-				delete this.npc['.value'];
+				const saveObject = JSON.parse(JSON.stringify(this.npc));
 
-				db.ref(`npcs/${this.userId}/${this.npcId}`).set(this.npc);
+				db.ref(`npcs/${this.userId}/${this.npcId}`).set(saveObject);
 					
 				this.$snotify.success('Monster Saved.', 'Critical hit!', {
 					position: "rightTop"
 				});
 
+				this.unsaved_changes = false;
+
 				// Capitalize before stringyfy so changes found isn't triggered
 				this.npc.name = this.npc.name.capitalizeEach();
 				this.npc_copy = JSON.stringify(this.npc);
-				this.unsaved_changes = false;
 			},
 			setQuick(input) {
 				if(input == 0) {

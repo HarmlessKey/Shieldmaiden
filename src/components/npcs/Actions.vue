@@ -286,12 +286,12 @@
 													</div>
 													<template v-if="ability.versatile">
 														<div class="col">
-															<ValidationProvider rules="max:20|required" name="Option 1" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider rules="max:25|required" name="Option 1" v-slot="{ errors, invalid, validated }">
 																<q-input
 																	:dark="$store.getters.theme === 'dark'" filled square dense
 																	type="text"
 																	label="Option 1 name"
-																	maxlength="20"
+																	maxlength="25"
 																	v-model="ability.versatile_one"
 																	@keyup="$forceUpdate()"
 																	:error="invalid && validated"
@@ -300,12 +300,12 @@
 															</ValidationProvider>
 														</div>
 														<div class="col">
-															<ValidationProvider rules="max:20|required" name="Option 2" v-slot="{ errors, invalid, validated }">
+															<ValidationProvider rules="max:25|required" name="Option 2" v-slot="{ errors, invalid, validated }">
 																<q-input
 																	:dark="$store.getters.theme === 'dark'" filled square dense
 																	type="text"
 																	label="Option 2 name"
-																	maxlength="20"
+																	maxlength="25"
 																	v-model="ability.versatile_two"
 																	@keyup="$forceUpdate()"
 																	:error="invalid && validated"

@@ -203,33 +203,37 @@
 				/>
 
 				<!-- CR -->
-				<q-select 
-					:dark="$store.getters.theme === 'dark'" filled square
-					label="Challenge rating *"
-					v-model="npc.challenge_rating" 
-					:options="challenge_ratings"
-					:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
-				>
-					<template v-slot:option="scope">
-						<q-list :dark="$store.getters.theme === 'dark'">
-							<q-item clickable v-ripple v-close-popup @click="$set(npc, 'challenge_rating', scope.opt)">
-								<q-item-section>{{ 
-									(scope.opt == 0.125) ? "&#8539;" : 
-									(scope.opt == 0.25) ? "&#xbc;" :
-									(scope.opt == 0.5) ? "&#xBD;" :
-									scope.opt
-								}}</q-item-section>
-								<q-item-section avatar>{{ monster_challenge_rating[scope.opt].xp }} xp</q-item-section>
-							</q-item>
-						</q-list>
-					</template>
-					<div slot="after" v-if="npc.challenge_rating" class="pr-3">
-						+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
-						<q-tooltip anchor="top middle" self="center middle">
-							Proficiency bonus
-						</q-tooltip>
-					</div>
-				</q-select>
+				<ValidationProvider rules="required" name="CR" v-slot="{ errors, invalid, validated }">
+					<q-select 
+						:dark="$store.getters.theme === 'dark'" filled square
+						label="Challenge rating *"
+						v-model="npc.challenge_rating" 
+						:options="challenge_ratings"
+						:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
+						:error="invalid && validated"
+						:error-message="errors[0]"
+					>
+						<template v-slot:option="scope">
+							<q-list :dark="$store.getters.theme === 'dark'">
+								<q-item clickable v-ripple v-close-popup @click="$set(npc, 'challenge_rating', scope.opt)">
+									<q-item-section>{{ 
+										(scope.opt == 0.125) ? "&#8539;" : 
+										(scope.opt == 0.25) ? "&#xbc;" :
+										(scope.opt == 0.5) ? "&#xBD;" :
+										scope.opt
+									}}</q-item-section>
+									<q-item-section avatar>{{ monster_challenge_rating[scope.opt].xp }} xp</q-item-section>
+								</q-item>
+							</q-list>
+						</template>
+						<div slot="after" v-if="npc.challenge_rating" class="pr-3">
+							+{{ monster_challenge_rating[npc.challenge_rating].proficiency }}
+							<q-tooltip anchor="top middle" self="center middle">
+								Proficiency bonus
+							</q-tooltip>
+						</div>
+					</q-select>
+				</ValidationProvider>
 
 				<q-checkbox 
 					size="lg" :dark="$store.getters.theme === 'dark'" 

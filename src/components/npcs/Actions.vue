@@ -271,12 +271,12 @@
 														dark filled square dense
 														type="text"
 														label="Option 1 name"
-														maxlength="20"
+														maxlength="25"
 														v-model="ability.versatile_one"
 														@keyup="$forceUpdate()"
 														:rules="[
 															val => !!val || 'Option 1 is required',
-															val => val.length <= 20 || 'Max length 20'
+															val => val.length <= 25 || 'Max length 25'
 														]"
 													/>
 												</div>
@@ -285,12 +285,12 @@
 														dark filled square dense
 														type="text"
 														label="Option 2 name"
-														maxlength="20"
+														maxlength="25"
 														v-model="ability.versatile_two"
 														@keyup="$forceUpdate()"
 														:rules="[
 															val => !!val || 'Option 2 is required',
-															val => val.length <= 20 || 'Max length 20'
+															val => val.length <= 25 || 'Max length 25'
 														]"
 													/>
 												</div>

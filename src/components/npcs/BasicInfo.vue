@@ -6,7 +6,7 @@
 				<div class="col-9">
 					<q-input 
 						dark filled square
-						label="Name"
+						label="Name *"
 						maxlength="101"
 						autocomplete="off"  
 						v-model="npc.name"
@@ -56,7 +56,7 @@
 			<!-- SIZE -->
 			<q-select
 				dark filled square
-				label="Size"
+				label="Size *"
 				class="mb-2" 
 				v-model="npc.size"
 				:options="monster_sizes"
@@ -68,7 +68,7 @@
 				<div class="col-12" :class="{'col-md-6': npc.type && monster_subtypes[npc.type] }">
 					<q-select
 						dark filled square
-						label="Type"
+						label="Type *"
 						class="mb-2" 
 						v-model="npc.type"
 						:options="monster_types"
@@ -185,10 +185,11 @@
 			<!-- CR -->
 			<q-select 
 				dark filled square
-				label="Challenge rating"
+				label="Challenge rating *"
 				v-model="npc.challenge_rating" 
 				:options="challenge_ratings"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
+				:rules="[val => !!val || 'CR is required']"
 			>
 				<template v-slot:option="scope">
 					<q-list dark>
@@ -227,7 +228,7 @@
 				<div class="col-12 col-md-4">
 					<q-input 
 						dark filled square
-						label="Armor class"
+						label="Armor class *"
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 
@@ -247,7 +248,7 @@
 				<div class="col-12 col-md-4">
 					<q-input 
 						dark filled square
-						label="Hit points"
+						label="Hit points *"
 						autocomplete="off"  
 						type="number" 
 						class="mb-2" 

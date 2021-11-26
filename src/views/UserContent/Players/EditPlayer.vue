@@ -413,10 +413,15 @@
 						</div>
 					</hk-card>
 
-					<div class="mt-3 d-flex justify-content-end">
+					<div class="mt-3 d-flex justify-content-end items-center">
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
 						<router-link to="/content/players" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-						<q-btn color="primary" type="submit" :disabled="!valid">
-							<i class="fas fa-check mr-1"></i> {{ $route.name == "Add player" ? "Add player" : "Save" }}
+						<q-btn color="primary" type="submit" no-caps>
+							{{ $route.name == "Add player" ? "Add player" : "Save" }}
 						</q-btn>
 					</div>
 				</div>

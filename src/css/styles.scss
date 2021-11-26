@@ -420,8 +420,17 @@ html body {
 		}
 	}
 	.items {
+		&-start {
+			align-items: start;
+		}
+		&-baseline {
+			align-items: baseline;
+		}
 		&-center {
 			align-items: center;
+		}
+		&-end {
+			align-items: end;
 		}
 	}
 

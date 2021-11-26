@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(edit)">
+			<q-form @submit="handleSubmit(edit)" greedy>
 				<hk-card header="Edit campaign" :min-width="300">
 					<div class="card-body">
 						<ValidationProvider rules="required" name="Title" v-slot="{ errors, invalid, validated }">
@@ -82,8 +82,13 @@
 
 					</div>
 					<div slot="footer" class="card-footer">
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
 						<q-btn class="bg-neutral-5 mr-2" label="Cancel" v-close-popup />
-						<q-btn color="blue" type="submit" :disabled="!valid">Save</q-btn>
+						<q-btn color="blue" type="submit" no-caps>Save</q-btn>
 					</div>
 				</hk-card>
 			</q-form>

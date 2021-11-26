@@ -522,8 +522,8 @@
 								</div>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" type="cancel" v-close-popup>Cancel</q-btn>
-								<q-btn color="primary" type="submit" :disabled="!valid" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
+								<q-btn class="mr-1" type="cancel" v-close-popup no-caps>Cancel</q-btn>
+								<q-btn color="primary" type="submit" no-caps :disabled="!valid" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
 							</div>
 						</hk-card>
 					</q-form>

@@ -85,6 +85,28 @@ extend('url', {
   message: '{_field_} must be a valid URL',
 });
 
+extend('audio', {
+  validate(value) {
+    if (value) {
+      // Check if value is url
+      const url_expr = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+      const url_regex = new RegExp(url_expr);
+      if (value.match(url_regex)) {
+        return true;
+      }
+      // Check if value is spotify URI
+      const spotify_expr  = /^spotify:.+/gi;
+      const spotify_regex = new RegExp(spotify_expr);
+      if (value.match(spotify_regex)) {
+        return true;
+      }
+
+      return false;
+    } return false;
+  },
+  message: '{_field_} must be a valid URL or URI',
+});
+
 // Check if variable used in a description, exists
 extend('variable_check', {
   message: field => `The ${field.toLowerCase()} contains undefined variables.`,

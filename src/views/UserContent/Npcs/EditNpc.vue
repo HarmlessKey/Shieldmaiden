@@ -4,7 +4,7 @@
 	</div>
 	<div v-else-if="npc || $route.name == 'Add NPC'">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveNpc)">
+			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
 						<div class="d-flex justify-content-start items-center">
@@ -60,10 +60,10 @@
 								</q-tooltip>
 							</q-icon>
 							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary" />
+							<q-btn label="Save" type="submit" color="primary" no-caps />
 						</div>
 					</div>
-					</div>
+				</div>
 			</q-form>
 		</ValidationObserver>
 

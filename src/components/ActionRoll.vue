@@ -21,6 +21,7 @@
 				:name="option.name"
 			>
 				<hk-dmg-type-select 
+					v-if="action_type !== 'healing'"
 					class="mb-3"
 					:label="`Damage type ${index == 1 ? option.label : ''}`"
 					v-model="roll[`${index === 1 ? 'versatile_' : '' }damage_type`]"
@@ -104,6 +105,7 @@
 
 		<!-- PROJECTILE COUNT -->
 		<q-input 
+			v-if="action_type !== 'healing'"
 			dark filled square
 			label="Projectile count"
 			v-model="roll.projectile_count"
@@ -150,22 +152,24 @@
 			:rules="[val => val !== undefined || 'What happens on a miss?']"
 		/>
 
-		<hr>
-		<!-- SPECIAL ACTIONS -->
-		<div class="col-12 col-md-3">
-			<q-select 
-				dark filled square multiple
-				map-options
-				emit-value
-				label="Special events"
-				:options="Object.values(specials)"
-				v-model="special"
-				class="mb-3"
-				clearable
-				hint="Select the special events that happens on a hit"
-				:option-disable="opt => Object(opt) === opt ? opt.disable === true : true"
-			/>
-		</div>
+		<template v-if="action_type !== 'healing'">
+			<hr>
+			<!-- SPECIAL ACTIONS -->
+			<div class="col-12 col-md-3">
+				<q-select 
+					dark filled square multiple
+					map-options
+					emit-value
+					label="Special events"
+					:options="Object.values(specials)"
+					v-model="special"
+					class="mb-3"
+					clearable
+					hint="Select the special events that happens on a hit"
+					:option-disable="opt => Object(opt) === opt ? opt.disable === true : true"
+				/>
+			</div>
+		</template>
 
 		<!-- SPELL SCALING -->
 		<template v-if="spell && spell.scaling !== undefined && spell.scaling !== 'none'">

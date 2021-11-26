@@ -8,6 +8,8 @@
 	<q-form 
 		v-else-if="npc || $route.name == 'AddNPC'" 
 		@submit="saveNpc"
+		@validation-error="validationErrors"
+		greedy
 	>
 		<div class="content">
 			<div class="top">
@@ -288,6 +290,12 @@
 				else {
 					this.quick = true
 				}
+			},
+			validationErrors() {
+				this.$snotify.error(
+					'There are validation errors in the form.\n It\'s possible they are within a collapsed ability.', 
+					'Validation error', 
+					{});
 			}
 		},
 		beforeRouteLeave (to, from, next) {

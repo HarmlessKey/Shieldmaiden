@@ -67,7 +67,7 @@
 										<q-item-section avatar v-if="!valid">
 											<q-icon name="error" color="red" />
 											<q-tooltip anchor="top middle" self="center middle">
-												Validation errors in ability
+												Validation errors
 											</q-tooltip>
 										</q-item-section>
 										<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">

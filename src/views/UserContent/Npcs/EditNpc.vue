@@ -7,8 +7,13 @@
 			<q-form @submit="handleSubmit(saveNpc)">
 				<div>
 					<div class="top">
-						<div class="d-flex justify-content-start">
-							<a v-if="$route.name === 'Add NPC'" class="btn bg-neutral-5" @click="copy_dialog = true">
+						<div class="d-flex justify-content-start items-center">
+							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
+							<a v-if="!npcId" class="btn bg-neutral-5" @click="copy_dialog = true">
 								<i class="fas fa-copy"></i>
 								Copy existing NPC
 							</a>
@@ -39,15 +44,23 @@
 					<div class="save">
 						<div class="d-flex justify-content-start">
 							<template v-if="unsaved_changes">
-								<div  class="red unsaved_changes">
+								<div  class="orange unsaved_changes">
 									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
 								</div>	
-								<a class="btn bg-neutral-5" @click="revert_changes()">Revert</a>
+								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
+									<i class="fas fa-undo" />
+									Revert
+								</a>
 							</template>
 						</div>
 						<div>
+							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+								<q-tooltip anchor="top middle" self="center middle">
+									There are validation errors
+								</q-tooltip>
+							</q-icon>
 							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary" :disabled="!valid" />
+							<q-btn label="Save" type="submit" color="primary" />
 						</div>
 					</div>
 					</div>
@@ -308,6 +321,7 @@
 		display: flex;
 		justify-content: space-between;
 		border-bottom: solid 1px $neutral-4;
+		align-items: center;
 
 		.back {
 			line-height: 35px;
@@ -342,16 +356,12 @@
 	.save {
 		display: flex;
 		justify-content: space-between;
-		padding-top: 20px;
-		border-top: solid 1px $neutral-4;
+		align-items: center;
 
 		.unsaved_changes {
 			margin: 0 10px 0 0;
-			line-height: 40px;
+			line-height: 31px;
 		}
 	}
 }
-
-
-
 </style>

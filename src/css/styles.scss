@@ -419,6 +419,11 @@ html body {
 			justify-content: flex-end;
 		}
 	}
+	.items {
+		&-center {
+			align-items: center;
+		}
+	}
 
 	.offline {
 		position: fixed;
@@ -1022,6 +1027,7 @@ html body {
 			.card-header {
 				font-size: 15px;
 				padding: 0.50rem 1rem;
+				min-height: 52px;
 			}
 		}
 	}

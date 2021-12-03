@@ -102,7 +102,14 @@
 						</q-input>
 					</ValidationProvider>
 				</div>
-				<q-btn color="primary" type="submit" class="my-3 full-width">Save</q-btn>
+				<div class="d-flex items-center my-3">
+					<q-btn color="primary" type="submit" class="full-width">Save</q-btn>
+					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-tooltip anchor="top middle" self="bottom right">
+							There are validation errors
+						</q-tooltip>
+					</q-icon>
+				</div>
 			</q-form>
 		</ValidationObserver>
 		<small>Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, use our <router-link to="/npcs">NPC creator</router-link>.</small>
@@ -110,8 +117,8 @@
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import { mapActions } from 'vuex'
+	import { db } from '@/firebase';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'EditNpc',

@@ -7,6 +7,7 @@
 		<slot />
 		<q-popup-proxy 
 			:dark="$store.getters.theme === 'dark'"
+			anchor="top middle" self="bottom middle"
 			v-model="menu"
 			square 
 			:breakpoint="576"

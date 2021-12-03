@@ -54,7 +54,7 @@
 						</ValidationProvider>
 
 						<!-- ABILITIES -->
-						<q-list :dark="$store.getters.theme === 'dark'" :class="`accordion`">
+						<q-list :dark="$store.getters.theme === 'dark'" class="accordion">
 							<ValidationObserver v-for="(ability, ability_index) in npc[category]" v-slot="{ valid }" :key="`ability-${ability_index}`">
 								<q-expansion-item
 									:dark="$store.getters.theme === 'dark'" switch-toggle-side

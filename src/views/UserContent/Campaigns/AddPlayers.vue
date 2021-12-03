@@ -45,7 +45,7 @@
 
 			</div>
 			<div slot="footer" class="card-footer">
-				<q-btn label="Close" v-close-popup />
+				<q-btn label="Close" no-caps v-close-popup />
 			</div>
 		</hk-card>
 
@@ -53,7 +53,7 @@
 			<hk-card header="All Players" :min-width="300">
 				<div slot="header" class="card-header">
 					Add players
-					<q-btn icon="close" flat dense v-close-popup />
+					<q-btn icon="close" no-caps flat dense v-close-popup />
 				</div>
 
 				<div class="card-body">

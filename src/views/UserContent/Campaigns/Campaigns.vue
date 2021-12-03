@@ -169,7 +169,7 @@
 								:options="advancement_options"
 							/>
 							
-							<q-btn class="btn btn-lg bg-green btn-block mt-4" type="submit" label="Create campaign" />
+							<q-btn class="btn btn-lg bg-green btn-block mt-4" no-caps type="submit" label="Create campaign" />
 						</q-form>
 					</div>
 				</div>
@@ -209,8 +209,8 @@
 						</div>
 
 						<div slot="footer" class="card-footer d-flex justify-end">
-							<q-btn v-close-popup label="Cancel" class="mr-1" />
-							<q-btn type="submit" color="primary" label="Add campaign" />
+							<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
+							<q-btn type="submit" no-caps color="primary" label="Add campaign" />
 						</div>
 					</hk-card>
 				</q-form>

@@ -290,7 +290,7 @@
 																<q-input
 																	:dark="$store.getters.theme === 'dark'" filled square dense
 																	type="text"
-																	label="Option 1 name"
+																	label="Option 1 name *"
 																	maxlength="25"
 																	v-model="ability.versatile_one"
 																	@keyup="$forceUpdate()"
@@ -304,7 +304,7 @@
 																<q-input
 																	:dark="$store.getters.theme === 'dark'" filled square dense
 																	type="text"
-																	label="Option 2 name"
+																	label="Option 2 name *"
 																	maxlength="25"
 																	v-model="ability.versatile_two"
 																	@keyup="$forceUpdate()"
@@ -522,7 +522,7 @@
 								</div>
 							</div>
 							<div slot="footer" class="card-footer d-flex justify-content-end">
-								<q-btn class="mr-1" type="cancel" v-close-popup no-caps>Cancel</q-btn>
+								<q-btn class="mr-1" v-close-popup no-caps>Cancel</q-btn>
 								<q-btn color="primary" type="submit" no-caps :disabled="!valid" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
 							</div>
 						</hk-card>

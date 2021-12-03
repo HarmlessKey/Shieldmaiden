@@ -90,10 +90,10 @@
 													hint="How many columns?"
 												/>
 												<div class="d-flex justify-content-end mt-2">
-													<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
+													<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
 													<q-btn
 														color="primary"
-														v-close-popup 
+														v-close-popup no-caps
 														@click="!invalid ? addTable() : null"
 														:disabled="invalid"
 													>
@@ -189,6 +189,7 @@
 						type="submit"
 						:disabled="!valid"
 						color="primary" 
+						no-caps
 					>
 						{{ $route.name === "Add item" ? "Add item" : "Save" }}
 					</q-btn>

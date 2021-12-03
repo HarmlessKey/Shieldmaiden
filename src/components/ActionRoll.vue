@@ -33,7 +33,10 @@
 					<!-- DICE COUNT -->
 					<div class="col">
 						<ValidationProvider 
-							rules="between:1,9" 
+							:rules="{
+								between: [1, 9],
+								required: !!roll[`${index === 1 ? 'versatile_' : '' }dice_type`]
+							}" 
 							:name="`Dice count ${index == 1 ? option.label : ''}`" 
 							v-slot="{ errors, invalid, validated }"
 						>

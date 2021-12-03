@@ -80,8 +80,8 @@
 							@input="$forceUpdate()"
 						/>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
-							<q-btn color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
+							<q-btn no-caps class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn no-caps color="primary" type="submit" :label="(edit_index !== undefined) ? 'Save' : 'Add'" />
 						</div>
 					</hk-card>
 				</q-form>

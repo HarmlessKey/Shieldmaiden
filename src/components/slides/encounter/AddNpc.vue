@@ -95,7 +95,7 @@
 						toggle-color="primary"
 					/>
 					<hr>
-					<q-btn class="btn btn-block mb-3" type="submit" label="Add" />
+					<q-btn class="btn btn-block mb-3" no-caps type="submit" label="Add" />
 				</q-form>
 
 				<h2>Copy an NPC from below</h2>
@@ -170,6 +170,7 @@
 						v-if="selectedPlayers.length > 0" 
 						class="btn btn-block" 
 						type="submit" 
+						no-caps
 						:label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`"
 					/>
 				</q-form>

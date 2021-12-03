@@ -90,7 +90,7 @@
 					<ValidationObserver v-slot="{ handleSubmit, valid }">
 						<q-form @submit="handleSubmit(addReminder('custom', valid))">
 							<reminder-form v-model="customReminder" :variables="false"/>
-							<q-btn color="blue" type="submit" :disabled="!valid">Set</q-btn>
+							<q-btn color="blue" no-caps type="submit" :disabled="!valid">Set</q-btn>
 						</q-form>
 					</ValidationObserver>
 				</q-tab-panel>

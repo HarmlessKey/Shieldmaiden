@@ -19,7 +19,7 @@
 				<i :class="audio ? 'fas fa-volume-up' : 'fas fa-volume-mute'" />
 			</a>
 			<q-separator vertical :dark="$store.getters.theme === 'dark'" class="ml-3" /> -->
-			<q-btn-dropdown stretch flat :dark="$store.getters.theme === 'dark'" square>
+			<q-btn-dropdown stretch no-caps flat :dark="$store.getters.theme === 'dark'" square>
 				<template #label>
 					<i class="fas fa-cloud" />
 					<span class="ml-1 d-none d-md-inline-block">Select effect</span>

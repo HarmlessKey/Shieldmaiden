@@ -462,8 +462,8 @@
 						</div>
 
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
-							<q-btn color="primary" type="submit" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
+							<q-btn class="mr-1" no-caps type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn color="primary" no-caps type="submit" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
 						</div>
 					</hk-card>
 				</q-form>

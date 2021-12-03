@@ -79,7 +79,7 @@
 				<EditWeather v-model="weather" />
 
 				<div class="d-flex justify-content-start items-center mt-3">
-					<q-btn color="primary" type="submit">Save</q-btn>
+					<q-btn color="primary" type="submit" no-caps>Save</q-btn>
 					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
 						<q-tooltip anchor="top middle" self="center middle">
 							There are validation errors
@@ -96,14 +96,14 @@
 					<div>Background preview</div>
 					<q-space />
 
-					<q-btn-dropdown stretch flat label="Weather" dark square>
+					<q-btn-dropdown stretch flat no-caps label="Weather" dark square>
 						<div class="bg-neutral-9 edit-weather">
 							<q-item-label header>Weather effects</q-item-label>
 							<EditWeather v-model="weather" />
 						</div>
 					</q-btn-dropdown>
 
-					<q-btn flat round dense icon="close" class="q-mr-sm" v-close-popup />
+					<q-btn flat round dense no-caps icon="close" class="q-mr-sm" v-close-popup />
 
 				</q-toolbar>
 				<div class="preview">

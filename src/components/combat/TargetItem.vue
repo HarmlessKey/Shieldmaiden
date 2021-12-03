@@ -21,10 +21,11 @@
 							v-model="editable_entity.initiative" 
 						/>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
+							<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
 							<q-btn
 								color="primary"
 								v-close-popup 
+								no-caps
 								@click.stop="set_initiative({key: entity.key, initiative: editable_entity.initiative})"
 							>
 								Save
@@ -80,10 +81,11 @@
 							default-view="palette"
 						/>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-neutral-8 mr-1" v-close-popup>Cancel</q-btn>
+							<q-btn flat class="bg-neutral-8 mr-1" no-caps v-close-popup>Cancel</q-btn>
 							<q-btn
 								color="primary"
 								v-close-popup 
+								no-caps
 								@click.stop="edit_entity_prop({
 									key: entity.key, 
 									entityType: entity.entityType, 
@@ -136,6 +138,7 @@
 								flat dense
 								color="primary"
 								icon="check"
+								no-caps
 								v-close-popup 
 								@click.stop="edit_entity_prop({
 									key: entity.key, 
@@ -158,6 +161,7 @@
 							<q-btn
 								slot="after"
 								flat dense
+								no-caps
 								color="primary"
 								icon="check"
 								v-close-popup 
@@ -170,7 +174,7 @@
 							/>
 						</q-input>
 						<div class="d-flex justify-content-end mt-2">
-							<q-btn flat class="bg-neutral-8" v-close-popup>Close</q-btn>
+							<q-btn flat no-caps class="bg-neutral-8" v-close-popup>Close</q-btn>
 						</div>
 					</div>
         </q-popup-proxy>
@@ -242,7 +246,7 @@
 										<q-icon slot="append" size="xs" name="fas fa-stopwatch" />
 										<q-btn
 											slot="after"
-											flat dense
+											flat dense no-caps
 											color="primary"
 											icon="check"
 											v-close-popup 
@@ -265,7 +269,7 @@
 										<q-icon slot="append" size="xs" name="fas fa-plus" />
 										<q-btn
 											slot="after"
-											flat dense
+											flat dense no-caps
 											color="primary"
 											icon="check"
 											v-close-popup 
@@ -290,7 +294,7 @@
 										<q-icon slot="append" size="xs" name="fas fa-heart" />
 										<q-btn
 											slot="after"
-											flat dense
+											flat dense no-caps
 											color="primary"
 											icon="check"
 											v-close-popup 
@@ -335,7 +339,7 @@
 										/>
 									</q-input>
 									<div class="d-flex justify-content-end mt-2">
-										<q-btn flat class="bg-neutral-8" v-close-popup>Close</q-btn>
+										<q-btn flat no-caps class="bg-neutral-8" v-close-popup>Close</q-btn>
 									</div>
 								</div>
 							</q-popup-proxy>

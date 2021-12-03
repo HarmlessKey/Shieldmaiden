@@ -87,7 +87,7 @@
 								There are validation errors
 							</q-tooltip>
 						</q-icon>
-						<q-btn class="bg-neutral-5 mr-2" label="Cancel" v-close-popup />
+						<q-btn class="bg-neutral-5 mr-2" label="Cancel" no-caps v-close-popup />
 						<q-btn color="blue" type="submit" no-caps>Save</q-btn>
 					</div>
 				</hk-card>

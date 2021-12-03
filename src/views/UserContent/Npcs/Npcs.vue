@@ -126,7 +126,7 @@
 						<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
 					</div>
 					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="bg-neutral-8" v-close-popup>Later</q-btn>
+						<q-btn class="bg-neutral-8" v-close-popup no-caps>Later</q-btn>
 					</div>
 				</template>
 				<template v-else>
@@ -152,7 +152,7 @@
 							</p>
 						</div>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="bg-blue white" v-close-popup>Close</q-btn>
+							<q-btn class="bg-blue white" no-caps v-close-popup>Close</q-btn>
 						</div>
 					</template>
 				</template>

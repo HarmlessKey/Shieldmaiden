@@ -84,7 +84,7 @@
 						</div>
 						<div>
 							<router-link :to="`/contribute/spells/${id}`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary"/>
+							<q-btn label="Save" no-caps type="submit" color="primary"/>
 						</div>
 					</div>
 				</q-form>

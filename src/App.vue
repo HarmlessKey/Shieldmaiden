@@ -43,7 +43,7 @@
 				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
 				<p>No announcement</p>
 				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" />
+					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
 				</template>
 			</q-banner>
 		</q-dialog>

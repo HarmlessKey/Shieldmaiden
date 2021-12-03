@@ -198,7 +198,7 @@
 					</div>
 
 					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="mr-1" type="cancel" v-close-popup>Close</q-btn>
+						<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
 					</div>
 				</hk-card>
 			</div>

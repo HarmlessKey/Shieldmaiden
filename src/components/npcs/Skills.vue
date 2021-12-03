@@ -88,7 +88,7 @@
 					</div>
 				</div>
 				<div class="card-footer d-flex justify-content-end" slot="footer">
-					<q-btn class="bg-neutral-5" @click="modifier_dialog = false" label="Close" />
+					<q-btn class="bg-neutral-5" no-caps @click="modifier_dialog = false" label="Close" />
 				</div>
 			</hk-card>
 		</q-dialog>

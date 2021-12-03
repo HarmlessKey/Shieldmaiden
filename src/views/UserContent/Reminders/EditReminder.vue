@@ -12,9 +12,16 @@
 							</template>
 						</div>
 					</div>
-					<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2 mt-3">Cancel</router-link>
-					<q-btn v-if="$route.name == 'AddReminder'" type="submit" color="blue" class="mt-3" :disabled="!valid"><i class="fas fa-plus mr-1"></i> Add reminder</q-btn>
-					<q-btn v-else color="blue" type="submit" class="mt-3" :disabled="!valid"><i class="fas fa-check mr-1"></i> Save</q-btn>
+					<div class="d-flex justify-content-start items-center">
+						<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+						<q-btn v-if="$route.name == 'AddReminder'" type="submit" color="blue" no-caps>Add reminder</q-btn>
+						<q-btn v-else color="blue" type="submit" no-caps>Save</q-btn>
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
+					</div>
 				</div>
 			</q-form>
 		</ValidationObserver>

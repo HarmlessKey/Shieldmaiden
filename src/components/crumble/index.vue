@@ -2,7 +2,7 @@
 	<div>
 		<q-breadcrumbs>
 			<template v-slot:separator>
-				<q-icon name="fas fa-chevron-right" />
+				/
 			</template>
 			<q-breadcrumbs-el icon="fas fa-home-alt" to="/" />
 			<q-breadcrumbs-el 
@@ -22,7 +22,7 @@
 		name: 'Crumble',
 		data() {
 			return {
-				last_name: undefined
+				last_route: undefined
 			}
 		},
 		computed: {
@@ -39,20 +39,20 @@
 					});
 					return breadcrumbArray;
 				}, []);
-				if(this.last_name) breadcrumbs.at(-1).name = this.last_name;
+				if(this.last_route) breadcrumbs.at(-1).name = this.last_route;
 				return breadcrumbs;
 			}
 		},
 		mounted() {
 			// Replace the last name in breadcrumb with a value emitted from a component
 			this.$root.$on("route-name", (name) => {
-				this.last_name = name;
+				this.last_route = name;
 			});
 		},
 		watch: {
 			'$route' () {
 				// Reset the 
-				this.last_name = undefined;
+				this.last_route = undefined;
 			}
 		}
 	}

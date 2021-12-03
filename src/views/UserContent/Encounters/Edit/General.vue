@@ -89,7 +89,6 @@
 			</q-form>
 		</ValidationObserver>
 
-
 		<q-dialog v-model="image" full-height full-width>
 			<q-card :dark="$store.getters.theme === 'dark'">
 				<q-toolbar class="bg-neutral-9">

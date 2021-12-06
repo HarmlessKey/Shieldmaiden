@@ -1,5 +1,5 @@
 <template>
-	<div v-if="monster" class="monster monster-card" ref="entity" :class="{ smallWidth: is_small }">
+	<div v-if="!loading" class="monster monster-card" ref="entity">
 		<div class="monster-stats">
 			<h2 v-if="monster.name">
 				{{ monster.name.capitalizeEach() }}
@@ -25,7 +25,7 @@
 				<template v-else>
 					<b>Hit Points</b>: {{ monster.maxHp }}
 				</template>
-				<template v-if="monster.hit_dice"> ({{ monster.hit_dice ? hitDiceStr(data) : '' }})</template>
+				<template v-if="monster.hit_dice"> ({{ monster.hit_dice ? hitDiceStr(monster) : '' }})</template>
 				<template>
 					<br/><b>Speed</b>: {{ monster.walk_speed ? monster.walk_speed : 0 }} ft.{{ 
 						monster.swim_speed ? `, swim ${monster.swim_speed} ft.` : `` 
@@ -260,9 +260,9 @@
 			</template>
 			
 			<!-- Reactions -->
-			<template v-if="data.reactions">
+			<template v-if="monster.reactions">
 				<h3>Reactions</h3>
-				<p v-for="(action, index) in data.reactions" :key="`action-${index}`">
+				<p v-for="(action, index) in monster.reactions" :key="`action-${index}`">
 						<b><i>{{ action.name }}</i></b> {{ action.desc }}
 				</p>
 			</template>
@@ -278,7 +278,7 @@
 					</p>
 					<p v-for="(ability, index) in monster[category]" :key="`${category}-${index}`">
 						<!-- Checks for type and rolls on index 0 so later more actions can be grouped under one ability -->
-						<template v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+						<template v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 							<span v-if="ability.versatile" class="roll-button" @click.stop>
 								<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 									<div class="bg-neutral-8">
@@ -336,6 +336,7 @@
 			</div>
 		</div>
 	</div>
+	<hk-loader v-else />
 </template>
 
 <script>
@@ -359,10 +360,24 @@
 		components: {
 			Spell
 		},
-		props: ['data'],
+		props: {
+			// If the monster is fetched in a parent component you can send the full mosnter object in de data prop
+			data: {
+				type: Object
+			},
+			// If the id prop is passed, the monster is fetched in the ViewMosnter component
+			id: {
+				type: String
+			},
+			// If the userId is passed, a custom monster will be fetched using the user (userId) and the id (monsterId) props
+			user: {
+				type: String
+			}
+		},
 		data() {
 			return {
-				is_small: false,
+				monster: {},
+				loading: true,
 				actions: [
 					{ category: 'special_abilities', name: 'Special Abilities', name_single: 'Special ability' },
 					{ category: 'actions', name: 'Actions', name_single: 'Action' },
@@ -371,6 +386,21 @@
 				],
 			}
 		},
+		beforeMount() {
+			if(this.data) {
+				this.monster = this.data;
+				this.loading = false;
+			} else {
+				this.get_monster({ key: this.id, userId: this.user}).then(result => {
+			
+					if(this.monster_challenge_rating[result.challenge_rating]) {
+						result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
+					}
+					this.monster = result;
+					this.loading = false;
+				});
+			}			
+		},
 		computed: {
 			...mapGetters([
 				"encounterId",
@@ -378,13 +408,6 @@
 			]),
 			shares() {
 				return this.broadcast.shares || [];
-			},
-			monster() {
-				let monster = this.data;
-				if(this.monster_challenge_rating[monster.challenge_rating]) {
-					monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
-				}
-				return monster;
 			},
 			caster_spell_levels() {
 				if(this.monster.caster_spells) {
@@ -407,18 +430,8 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				"setActionRoll"
-			]),
-			setSize() {
-				let width = this.$refs.entity.clientWidth
-				let small = 300;
-
-				this.is_small = (width <= small) ? true : false;
-
-				//sets new width on resize
-				this.width = this.$refs.entity.clientWidth;
-			},	
+			...mapActions("monsters", ["get_monster"]),
+			...mapActions(["setActionRoll"]),
 			roll(e, action, versatile) {
 				const config = {
 					type: "monster_action",
@@ -457,16 +470,6 @@
 				}
 				return (mod) >= 0 ? '+' + parseInt(mod) : parseInt(mod);
 			}
-		},
-		mounted() {
-			this.$nextTick(function() {
-				window.addEventListener('resize', this.setSize);
-				//Init
-				this.setSize();
-			});
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.setSize);
 		}
 	};
 </script>

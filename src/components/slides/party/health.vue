@@ -1,38 +1,60 @@
 <template>
 	<div>
 		<h2>Health Modifiers</h2>
-		<div class="row q-col-gutter-md">
-			<div class="col">
-				<q-input 
-					:dark="$store.getters.theme === 'dark'" filled square dense
-					label="Temporary HP"
-					type="number" 
-					name="tempHp" 
-					v-model="tempHp"
-				/>
-			</div>
-			<div class="col">
-				<q-input 
-					:dark="$store.getters.theme === 'dark'" filled square dense
-					label="Maximum HP modifier" 
-					type="number" 
-					name="maxHpMod" 
-					v-model="maxHpMod"
-				/>
-			</div>
-		</div>
-		
-		<h3 class="mt-3">Set HP changes for:</h3>
-		<div v-for="(player, key) in campaign.players" :key="key">
-			<q-checkbox 
-				:dark="$store.getters.theme === 'dark'"
-				v-model="setFor" 
-				:val="key" 
-				:label="players[key].character_name"
-			/>
-		</div>
 
-		<button class="btn btn-block my-3" @click="setHpModifiers()">Update health</button>
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(setHpModifiers)">
+				<div class="row q-col-gutter-md">
+					<div class="col">
+						<ValidationProvider rules="max_value:99" name="Temp HP" v-slot="{ errors, invalid, validated }">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="Temporary HP"
+							type="number" 
+							name="tempHp" 
+							v-model="tempHp"
+							:error="invalid && validated"
+							:error-message="errors[0]"
+						/>
+						</ValidationProvider>
+					</div>
+					<div class="col">
+						<ValidationProvider rules="max_value:99" name="Max HP mod" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Max HP mod" 
+								type="number" 
+								name="maxHpMod" 
+								v-model="maxHpMod"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
+					</div>
+				</div>
+				
+				<h3 class="mt-3">Set HP changes for:</h3>
+				<div v-for="(player, key) in campaign.players" :key="key">
+					<q-checkbox 
+						:dark="$store.getters.theme === 'dark'"
+						v-model="setFor" 
+						:val="key" 
+						:label="players[key].character_name"
+					/>
+				</div>
+
+				<div class="d-flex items-center mt-3">
+					<q-btn class="full-width" type="submit" color="primary" no-caps>
+						Update health
+					</q-btn>
+					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-tooltip anchor="top middle" self="bottom right">
+							There are validation errors
+						</q-tooltip>
+					</q-icon>
+				</div>
+			</q-form>
+		</ValidationObserver>
 	</div>
 </template>
 

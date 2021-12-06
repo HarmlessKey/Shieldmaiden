@@ -9,23 +9,23 @@
 
 <script>
 export default {
-    name: 'hk-loader',
-    props: ["name"],
-    computed: {
-			//Random die color
-			dieColor() {
-				let number = Math.ceil(Math.random() * 6)
+	name: 'hk-loader',
+	props: ["name"],
+	computed: {
+		//Random die color
+		dieColor() {
+			let number = Math.ceil(Math.random() * 6)
 
-				switch(number) {
-					case 1: return 'blue';
-					case 2: return 'cyan';
-					case 3: return 'green';
-					case 4: return 'orange';
-					case 5: return 'red';
-					case 6: return 'yellow';
-				}
-			},
-    }
+			switch(number) {
+				case 1: return 'blue';
+				case 2: return 'cyan';
+				case 3: return 'green';
+				case 4: return 'orange';
+				case 5: return 'red';
+				case 6: return 'yellow';
+			}
+		}
+	}
 }
 </script>
 
@@ -37,12 +37,13 @@ export default {
 		text-align: center;
 		display: grid;
 		align-content: center;
+		background: rgba(0, 0, 0, .1);
 
 		.die {
 			display: inline-block;
-			width: 100px; 
-			height: 100px;
-			background-size: 100px 100px;
+			width: 50px; 
+			height: 50px;
+			background-size: 50px 50px;
 			background-position: center;
 			background-repeat: no-repeat;
 			margin-bottom: 10px;
@@ -54,12 +55,13 @@ export default {
 		}
 		h2 {
 			font-weight: bold;
-			font-size: 25px;
+			font-size: 18px;
 			text-transform: none;
-			color: $neutral-1;
+			color: $white;
 			text-shadow: 0 0 8px $black;
-			line-height: 50px;
+			line-height: 25px;
 			letter-spacing: 2px;
+			margin-bottom: 0;
 		}
 	}
 	@keyframes spin {

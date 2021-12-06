@@ -6,7 +6,6 @@
 			label="Amount"
 			class="text-center mb-3"
 			type="number" 
-			name="amount" 
 			v-model="amount"
 		/>
 
@@ -28,11 +27,9 @@
 			v-model="awardType"
 			spread
 			no-caps
-			flat
 			:dark="$store.getters.theme === 'dark'"
 			:options="options"
-			toggle-color="primary"
-			class="mt-3"
+			toggle-color="green"
 		/>
 
 		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>

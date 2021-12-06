@@ -11,7 +11,7 @@
 				<div class="col-12 col-md-6 col-sm-4">
 					<q-input 
 						:dark="$store.getters.theme !== 'light'" 
-						v-model="query"
+						v-model="search"
 						borderless 
 						filled square
 						debounce="300" 
@@ -20,7 +20,7 @@
 						<q-icon slot="append" name="search" />
 					</q-input>
 				</div>
-				<div class="col-12 col-md-3 col-sm-4">
+				<div class="col-12 col-md-2 col-sm-3">
 					<q-select
 						:dark="$store.getters.theme !== 'light'" filled square
 						label="Type"
@@ -39,7 +39,7 @@
 						</template>
 					</q-select>
 				</div>
-				<div class="col-12 col-md-3 col-sm-4">
+				<div class="col-12 col-md-2 col-sm-3">
 					<q-select 
 						:dark="$store.getters.theme !== 'light'" filled square
 						label="Challenge rating"
@@ -69,24 +69,40 @@
 						</template>
 					</q-select>
 				</div>
+				<div class="col-12 col-md-2 col-sm-2 d-flex justify-content-end items-center">
+					<button class="btn" @click="filter()">Filter</button>
+				</div>
 			</div>
+			<p v-if="!loading && pagination.rowsNumber === 0" class="red">
+				Nothing found 
+				<template v-if="query.search">
+					for "{{query.search}}"
+				</template>
+				<template v-if="types">
+					with a type of {{ types.join(" or ")}}
+				</template>
+				<template v-if="challenge_rating && challenge_rating.length">
+					{{ types ? "and a" : "with a" }} CR of {{ challenge_rating.join(" or ")}}
+				</template>
+			</p>
+
 			<q-table
 				:data="monsters"
 				:columns="columns"
-				row-key=".key"
+				row-key="_id"
 				card-class="bg-none"
 				flat
 				:dark="$store.getters.theme !== 'light'"
 				:pagination.sync="pagination"
-				:loading="isBusy"
+				:loading="loading"
 				separator="none"
 				wrap-cells
 				@request="request"
 			>
-				<template v-slot:top>
-					
-				</template>
-
+				<div slot="loading">
+					<hk-loader name="monsters" />
+				</div>
+				
 				<template v-slot:header="props">
 					<q-tr :props="props">
 						<q-th auto-width />
@@ -115,7 +131,7 @@
 						>
 							<div class="truncate-cell">
 								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="'/compendium/monsters/' + props.key">
+									<router-link v-if="col.name === 'name'" :to="'/compendium/monsters/' + col.value.replace(/ /g, '-').toLowerCase()">
 										{{ col.value }}
 									</router-link>
 									<template v-else>{{ col.value }}</template>
@@ -125,53 +141,21 @@
 					</q-tr>
 					<q-tr v-if="props.expand" :props="props">
 						<q-td colspan="100%" class="px-0 py-0" auto-width>
-							<ViewMonster :data="props.row" />
+							<ViewMonster :id="props.key" />
 						</q-td>
 					</q-tr>
 				</template>
-
-				<hk-loader slot="loading" name="monsters" />
 			</q-table>
-			<!-- <hk-table
-				:items="monsters"
-				:columns="fields"
-				:perPage="15"
-				:loading="isBusy"
-				:search="['name']"
-				:collapse="true"
-				classes="monster-table"
-			>
-				<router-link :to="'/compendium/monsters/' + data.row['.key']" slot="name" slot-scope="data">
-					{{ data.item.capitalizeEach() }}
-				</router-link>
-
-				<template slot="challenge_rating" slot-scope="data">
-					{{
-						(data.item == 0.125) ? "&#8539;" : 
-						(data.item == 0.25) ? "&#xbc;" :
-						(data.item == 0.5) ? "&#xBD;" :
-						data.item
-					}}
-				</template>
-
-				<div slot="collapse" slot-scope="data">
-					<ViewMonster :data="data.row" />
-				</div>
-				
-				<div slot="table-busy" class="loader">
-					<span>Loading monsters....</span>
-				</div>
-			</hk-table> -->
 		</div>
 	</hk-card>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import ViewMonster from '@/components/ViewMonster.vue';
 	import { monsterMixin } from '@/mixins/monster.js';
+	import { mapActions } from "vuex";
 
 	export default {
 		name: 'Monsters',
@@ -186,8 +170,9 @@
 		},
 		data() {
 			return {
-				monsters: undefined,
-				query: "",
+				monsters: [],
+				search: "",
+				query: null,
 				challenge_rating: [],
 				types: null,
 				pagination: {
@@ -195,7 +180,7 @@
 					descending: false,
 					page: 1,
 					rowsPerPage: 15,
-					rowsNumber: 325
+					rowsNumber: 0
 				},
 				columns: [
 					{
@@ -222,21 +207,7 @@
 						format: val => this.cr(val)
 					}
 				],
-				fields: {
-					name: {
-						label: 'Name',
-						sortable: true
-					},
-					type: {
-						label: 'Type',
-						sortable: true
-					},
-					challenge_rating: {
-						label: 'CR',
-						sortable: true
-					},
-				},
-				isBusy: true,
+				loading: true,
 			}
 		},
 		computed: {
@@ -248,15 +219,11 @@
 				return crs.sort(function(a, b){return a-b});
 			}
 		},
-		firebase() {
-			return {
-				monsters: {
-					source: db.ref('monsters'),
-					readyCallback: () => this.isBusy = false
-				}
-			}
-		},
 		methods: {
+			...mapActions("monsters", [
+				"get_monsters",
+				"get_monster"
+			]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -270,9 +237,36 @@
 					this.challenge_rating = this.challenge_rating.filter(item => item !== cr);
 				}
 			},
+			filter() {
+				this.loading = true;
+				this.monsters = [];
+				this.pagination.page = 1;
+				this.query = {
+					search: this.search,
+					types: this.types,
+					cr: this.challenge_rating
+				}
+				this.fetchMonsters();
+			},
 			request(req) {
-				console.log(req);
+				this.pagination = req.pagination;
+				this.fetchMonsters();		
+			},
+			async fetchMonsters() {
+				await this.get_monsters({
+					pageNumber: this.pagination.page,
+					pageSize: this.pagination.rowsPerPage,
+					query: this.query,
+					sortBy: this.pagination.sortBy
+				}).then(result => {
+					this.pagination.rowsNumber = result.meta.count;
+					this.monsters = result.results;
+					this.loading = false;
+				});
 			}
+		},
+		async mounted() {
+			await this.fetchMonsters();
 		}
 	}
 </script>

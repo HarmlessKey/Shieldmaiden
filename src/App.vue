@@ -193,7 +193,7 @@
 			return userAgent.indexOf("android") > -1;
 		}
 	},
-	created() {		
+	created() {
 		this.initialize();
 		const cookies = document.cookie.split(';');
 

@@ -150,13 +150,13 @@
 				},
 			}
 		},
-		async beforeMount() {
+		beforeMount() {
 			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
 				this.setLiveEncounter(this.$route.params.encid);
 			}
 		},
-		mounted() {
-			this.init_Encounter({
+		async mounted() {
+			await this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid,
 				demo: this.demo
@@ -171,13 +171,13 @@
 		computed: {
 			...mapGetters([
 				'encounter',
-				'players',
 				'campaigns',
 				'entities',
 				'initialized',
 				'overencumbered',
 				'broadcast'
 			]),
+			...mapGetters("players", ["players"]),
 			_active: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
 

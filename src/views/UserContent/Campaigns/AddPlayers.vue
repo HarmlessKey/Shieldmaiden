@@ -119,13 +119,12 @@
 			...mapGetters([
 				'campaigns',
 				'campaign',
-				'players',
-				'npcs',
 				'playerInCampaign',
 				'allEncounters',
 				'overencumbered'
 			]),
-
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("players", ["players"]),
 		},
 		mounted() {
 			this.fetchCampaign({

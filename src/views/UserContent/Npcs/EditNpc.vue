@@ -156,17 +156,15 @@
 				]
 			}
 		},
-		mounted() {
+		async mounted() {
 			if(this.npcId) {
-				const npc = db.ref(`npcs/${this.userId}/${this.npcId}`);
+				const npc = await this.get_npc({ uid: this.userId, id: this.npcId });
 
-				npc.on("value", (snapshot) => {
-					if(snapshot.val()) {
-						this.npc = snapshot.val();
-						this.npc_copy = JSON.stringify(this.npc);
-						this.unsaved_changes = false;
-					}
-				});
+				if(npc) {
+					this.npc = npc;
+					this.npc_copy = JSON.stringify(npc);
+					this.unsaved_changes = false;
+				}
 			}
 
 			var npcs_ref = db.ref(`monsters`);
@@ -211,6 +209,7 @@
 				'fetchCampaign',
 				'setSlide'
 			]),
+			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {
 					return false;
@@ -250,17 +249,17 @@
 			 * Checks if a new NPC must added, or an existing NPC must be saved.
 			**/
 			saveNpc() {
-				if(this.$route.name === "AddNPC" && !this.npcId) {
+				if(this.$route.name === "Add NPC" && !this.npcId) {
 					this.addNpc();
 				} else {
 					this.editNpc();
 				}
 			},
 			addNpc() {
-				db.ref('npcs/' + this.userId).push(this.npc).then((res) => {
+				this.add_npc(this.npc).then((res) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
-					this.$set(this, "npcId", res.getKey());
+					this.$set(this, "npcId", res);
 
 					this.$snotify.success('Monster Saved.', 'Critical hit!', {
 						position: "rightTop"
@@ -270,22 +269,24 @@
 					this.npc.name = this.npc.name.capitalizeEach();
 					this.npc_copy = JSON.stringify(this.npc);
 					this.unsaved_changes = false;
-				});		
+				});			
 			},
 			editNpc() {
-				const saveObject = JSON.parse(JSON.stringify(this.npc));
+				this.edit_npc({ 
+					uid: this.userId,
+					id: this.npcId,
+					npc: this.npc
+				}).then(() => {
+					this.$snotify.success('Monster Saved.', 'Critical hit!', {
+						position: "rightTop"
+					});
 
-				db.ref(`npcs/${this.userId}/${this.npcId}`).set(saveObject);
-					
-				this.$snotify.success('Monster Saved.', 'Critical hit!', {
-					position: "rightTop"
+					this.unsaved_changes = false;
+	
+					// Capitalize before stringyfy so changes found isn't triggered
+					this.npc.name = this.npc.name.capitalizeEach();
+					this.npc_copy = JSON.stringify(this.npc);
 				});
-
-				this.unsaved_changes = false;
-
-				// Capitalize before stringyfy so changes found isn't triggered
-				this.npc.name = this.npc.name.capitalizeEach();
-				this.npc_copy = JSON.stringify(this.npc);
 			},
 			setQuick(input) {
 				if(input == 0) {

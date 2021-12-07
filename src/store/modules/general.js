@@ -27,21 +27,31 @@ export const general_module = {
 	},
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
-		initialize({ dispatch }) {
+		async initialize({ dispatch }) {
 			dispatch("setTips");
 
 			if(auth.currentUser !== null) {
-					dispatch("setUser");
-					// first set the user settings in order to set theme correctly
-					dispatch("setUserSettings").then(() => {
-						dispatch("setTheme");
-					});
-					dispatch("setUserInfo");
-					// players need prio!
-					dispatch("fetchPlayers");
-					dispatch("fetchNpcs");
-					dispatch("fetchCampaigns");
-					dispatch("fetchAllEncounters");
+				dispatch("setUser");
+				// first set the user settings in order to set theme correctly
+				dispatch("setUserSettings")
+					.then(() => {
+						// wait for all content to be fetched before checking encumbrance
+						return Promise.all([
+							dispatch("setTheme"),
+							dispatch("setUserInfo"),
+							// players need prio!
+							dispatch("players/fetch_players"),
+							dispatch("npcs/fetch_npcs"),
+							dispatch("fetchCampaigns"),
+							dispatch("fetchAllEncounters")
+						])
+					})
+					.then(() => {
+						dispatch("checkEncumbrance");
+					})
+					.catch(error => {
+						console.error("Something went wrong while initializing user content", error);
+					});			
 			} else {
 				dispatch("setTheme");
 			}

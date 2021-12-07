@@ -286,11 +286,11 @@
 				'campaigns',
 				'userInfo',
 				'allEncounters',
-				'players',
 				'overencumbered',
 				'content_count',
 				'active_campaign'
 			]),
+			...mapGetters("players", ["players"]),
 			_campaigns: function() {
 				return _.chain(this.campaigns)
 				.filter(function(campaign, key) {

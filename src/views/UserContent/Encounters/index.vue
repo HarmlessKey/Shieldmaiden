@@ -316,11 +316,11 @@
 				"overencumbered",
 				"content_count",
 				"campaign",
-				"players",
 				"playerInCampaign",
 				"side_collapsed",
 				"broadcast"
 			]),
+			...mapGetters("players", ["players"]),
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {

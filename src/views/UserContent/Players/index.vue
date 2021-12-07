@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<span>
 				Players ( 
-				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ content_count.players }}</span> 
 					/ 
 					<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
 					<template v-else>{{ tier.benefits.players }}</template>	
@@ -140,12 +140,12 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'players',
 				'campaigns',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
+			...mapGetters("players", ["players"]),
 			_players: function() {
 				let vm = this;
 				return _.chain(this.players)

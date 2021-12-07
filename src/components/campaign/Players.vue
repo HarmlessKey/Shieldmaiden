@@ -367,38 +367,35 @@
 					campaignPlayers[key]['.key'] = key;
 
 					//Get full player
-					const fullPlayer = db.ref(`players/${this.userId}/${key}`)
-					await fullPlayer.on('value', (snapshot) => {
-						//Create the player Object
-						if(snapshot.val()) {
-							campaignPlayers[key].character_name = snapshot.val().character_name;
-							campaignPlayers[key].avatar = snapshot.val().avatar;
-							campaignPlayers[key].level = snapshot.val().level;
-							campaignPlayers[key].maxHp = parseInt(snapshot.val().maxHp);
-							campaignPlayers[key].ac = parseInt(snapshot.val().ac);
-							campaignPlayers[key].experience = snapshot.val().experience;
-							campaignPlayers[key].passive_perception = snapshot.val().passive_perception;
-							campaignPlayers[key].passive_investigation = snapshot.val().passive_investigation;
-							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
-							campaignPlayers[key].passive_insight = snapshot.val().passive_insight;
-							campaignPlayers[key].spell_save_dc = snapshot.val().spell_save_dc;
-						}
-						//The player doesn't exist so remove it from the campaign
-						else if(this.viewerIsUser) {
-							// eslint-disable-next-line
-							console.error('Ghost Player Removed: ', key);
-							db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).remove();
-						}
-					});	
+					const fullPlayer = await this.get_player({ uid: this.userId, id: key });
+					//Create the player Object
+					if(fullPlayer) {
+						campaignPlayers[key].character_name = fullPlayer.character_name;
+						campaignPlayers[key].avatar = fullPlayer.avatar;
+						campaignPlayers[key].level = fullPlayer.level;
+						campaignPlayers[key].maxHp = parseInt(fullPlayer.maxHp);
+						campaignPlayers[key].ac = parseInt(fullPlayer.ac);
+						campaignPlayers[key].experience = fullPlayer.experience;
+						campaignPlayers[key].passive_perception = fullPlayer.passive_perception;
+						campaignPlayers[key].passive_investigation = fullPlayer.passive_investigation;
+						campaignPlayers[key].passive_insight = fullPlayer.passive_insight;
+						campaignPlayers[key].passive_insight = fullPlayer.passive_insight;
+						campaignPlayers[key].spell_save_dc = fullPlayer.spell_save_dc;
+					}
+					//The player doesn't exist so remove it from the campaign
+					else if(this.viewerIsUser) {
+						// eslint-disable-next-line
+						console.error('Ghost Player Removed: ', key);
+						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).remove();
+					}
 				}
-				this.players = Object.values(campaignPlayers);
+				this.players = (campaignPlayers) ? Object.values(campaignPlayers) : [];
 				this.loading = false;
 			});
 		},
 		methods: {
-			...mapActions([
-				'setSlide',
-			]),
+			...mapActions(["setSlide"]),
+			...mapActions("players", ["get_player"]),
 			onResize (size) {
 				let width = size.width;
 				let small = 400;

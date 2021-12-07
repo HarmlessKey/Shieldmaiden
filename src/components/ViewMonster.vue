@@ -365,12 +365,8 @@
 			data: {
 				type: Object
 			},
-			// If the id prop is passed, the monster is fetched in the ViewMosnter component
+			// If the id prop is passed, the monster is fetched in the ViewMonster component
 			id: {
-				type: String
-			},
-			// If the userId is passed, a custom monster will be fetched using the user (userId) and the id (monsterId) props
-			user: {
 				type: String
 			}
 		},
@@ -388,11 +384,14 @@
 		},
 		beforeMount() {
 			if(this.data) {
-				this.monster = this.data;
+				let monster = this.data;
+				if(this.monster_challenge_rating[monster.challenge_rating]) {
+					monster.proficiency = this.monster_challenge_rating[monster.challenge_rating].proficiency;
+				}
+				this.monster = monster;
 				this.loading = false;
 			} else {
-				this.get_monster({ key: this.id, userId: this.user}).then(result => {
-			
+				this.get_monster(this.id).then(result => {
 					if(this.monster_challenge_rating[result.challenge_rating]) {
 						result.proficiency = this.monster_challenge_rating[result.challenge_rating].proficiency;
 					}

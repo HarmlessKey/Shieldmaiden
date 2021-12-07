@@ -183,7 +183,7 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
-import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
+	import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
   components: { hkAnimatedInteger },
@@ -232,10 +232,11 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 			...mapGetters([
 				'encounter',
 				'campaign',
-				'players',
-				'npcs',
 				'overencumbered',
-				]),
+			]),
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("players", ["players"]),
+			
 			// eslint-disable-next-line
 			async _excludeFriendlies() {
 				if(this.encounter) {
@@ -293,7 +294,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 				'fetchEncounter',
 				'fetchCampaign',
 				'setSlide'
-				]),
+			]),
 			remove(id) {
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
 			},

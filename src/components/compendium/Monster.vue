@@ -51,7 +51,7 @@
 			...mapActions("monsters", ["get_monster"]),
 		},
 		mounted() {
-			this.get_monster({ key: this.id }).then(result => {
+			this.get_monster(this.id).then(result => {
 				this.monster = result;
 				this.$root.$emit('route-name', result.name.capitalizeEach());
 				this.loading = false;

@@ -4,10 +4,11 @@
 
 		<!-- PLAYERS -->
 		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players">
-			<div v-for="(player, key) in campaign.players" 
-			:key="key"
-			@click="add($event, key, 'player', players[key].character_name)" 
-		>
+			<div 
+				v-for="(player, key) in campaign.players" 
+				:key="key"
+				@click="add($event, key, 'player', players[key].character_name)" 
+			>
 			<div class="d-flex justify-content-left">
 				<template v-if="checkPlayer(key) < 0">
 					<span class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }">
@@ -141,7 +142,7 @@
 				},
 			} 
 		},
-		async mounted() {
+		mounted() {
 			this.fetchEncounter({
 				cid: this.campaignId, 
 				eid: this.encounterId, 
@@ -152,23 +153,20 @@
 
 			//GET NPCS
 			const monsters = db.ref(`monsters`);
-			monsters.on('value', async (snapshot) => {
+			monsters.on('value', (snapshot) => {
 				let monsters = snapshot.val();
 
 				for(let key in monsters) {
 					monsters[key]['.key'] = key;
 					monsters[key].custom = false;
 				}
-				const custom = db.ref(`npcs/${this.user.uid}`);
-				custom.on('value', async (snapshot) => {
-					let customNpcs = snapshot.val();
-
-					for(let key in customNpcs) {
-						customNpcs[key].custom = true;
-						customNpcs[key]['.key'] = key;
-						monsters[key] = customNpcs[key];
-					}
-				});
+				
+				const customNpcs = this.npcs;
+				for(let key in customNpcs) {
+					customNpcs[key].custom = true;
+					customNpcs[key]['.key'] = key;
+					monsters[key] = customNpcs[key];
+				}
 				this.monsterArray = Object.values(monsters);
 				this.monsters = monsters;
 				this.loadingNpcs = false;
@@ -177,10 +175,10 @@
 		computed: {
 			...mapGetters([
 				'encounter',
-				'campaign',
-				'players',
-				'npcs',
-				]),
+				'campaign'
+			]),
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("players", ["players"]),
 		},
 		methods: {
 			...mapActions([

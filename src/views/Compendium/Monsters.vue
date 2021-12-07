@@ -220,10 +220,7 @@
 			}
 		},
 		methods: {
-			...mapActions("monsters", [
-				"get_monsters",
-				"get_monster"
-			]),
+			...mapActions("monsters", ["get_monsters"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :

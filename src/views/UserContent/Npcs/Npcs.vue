@@ -4,7 +4,7 @@
 			<div slot="header" class="card-header">
 				<span>
 					NPC's ( 
-					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ content_count.npcs }}</span> 
 					/ 
 					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
 					<template v-else>{{ tier.benefits.npcs }}</template>
@@ -208,13 +208,13 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'npcs',
 				'campaigns',
 				'players',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
+			...mapGetters("npcs", ["npcs"]),
 			_npcs: function() {
 				return _.chain(this.npcs)
 				.filter(function(npc, key) {
@@ -244,6 +244,7 @@
 				'stopFetchNpcs',
 				'setSlide'
 			]),
+			...mapActions("npcs", ["delete_npc"]),
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -298,13 +299,12 @@
 						}
 					}
 				}
-				//Remove NPC
-				db.ref('npcs/' + this.userId).child(key).remove(); 
+				//Remove NPC from database and store
+				this.delete_npc(key);
 			},
 			* getNPC () {
 				for (const npc of this.old_npcs_copy) {
-					yield npc;
-					
+					yield npc;				
 				}
 			},
 			async parseAll() {

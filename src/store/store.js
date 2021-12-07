@@ -7,6 +7,8 @@ import { encounter_module } from '@/store/modules/encounter';
 import { content_module } from '@/store/modules/content';
 import { content_spells } from '@/store/modules/content/spells.js';
 import monsters from '@/store/modules/content/monsters.js';
+import npcs from '@/store/modules/userContent/npcs.js';
+import players from '@/store/modules/userContent/players.js';
 
 Vue.use(Vuex);
 
@@ -31,6 +33,8 @@ export const store = new Vuex.Store({
 		encounter: encounter_module,
 		spells: content_spells,
 		monsters: monsters,
+		npcs: npcs,
+		players: players,
 		tips: tips_module
 	}
 });

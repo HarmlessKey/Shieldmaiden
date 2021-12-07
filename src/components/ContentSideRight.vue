@@ -20,12 +20,12 @@
     <!-- ADSENSE -->
     <hk-card small>
       <div class="card-body">
-        <Adsense
+        <!-- <Adsense
           data-ad-client="ca-pub-2711721977927243"
           data-ad-slot="2613883680"
           data-ad-test="on"
         >
-        </Adsense>
+        </Adsense> -->
       </div>
       <div slot="footer" class="card-footer">
         <span>Support us to remove ads</span>

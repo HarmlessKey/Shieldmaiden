@@ -1,4 +1,5 @@
 import { db } from '@/firebase';
+import Vue from 'vue';
 
 const campaigns_ref = db.ref('campaigns/');
 const encounters_ref = db.ref('encounters');
@@ -174,7 +175,7 @@ export const content_module = {
 				const path = `${uid}/${cid}/${eid}`;
 				const encounter = encounters_ref.child(path);
 				encounter.on('value', snapshot => {
-					commit('SET_ENCOUNTER', snapshot.val())
+					commit('SET_ENCOUNTER', snapshot.val());
 				});
 			}
 		},
@@ -184,7 +185,7 @@ export const content_module = {
 				const path = `${uid}/${cid}`;
 				let encounters = encounters_ref.child(path)
 				encounters.on('value', snapshot => {
-					commit('SET_ENCOUNTERS', snapshot.val())
+					commit('SET_ENCOUNTERS', snapshot.val());
 				});
 			}
 		},
@@ -193,18 +194,16 @@ export const content_module = {
 				const uid = rootGetters.user.uid
 				let encounters = encounters_ref.child(uid)
 				encounters.on('value', snapshot => {
-					commit('SET_ALLENCOUNTERS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+					commit('SET_ALLENCOUNTERS', snapshot.val());
 				});
 			}
 		},
-		fetchPlayers({ commit, rootGetters }) {
+		async fetchPlayers({ commit, rootGetters }) {
 			if(rootGetters.user) {
 				const uid = rootGetters.user.uid
 				const players = players_ref.child(uid)
-				players.on('value', snapshot => {
-					commit('SET_PLAYERS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+				await players.on('value', snapshot => {
+					commit('SET_PLAYERS', snapshot.val());
 				});
 			}
 		},
@@ -213,8 +212,7 @@ export const content_module = {
 				const uid = rootGetters.user.uid
 				const npcs = npcs_ref.child(uid)
 				npcs.on('value', snapshot => {
-					commit('SET_NPCS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+					commit('SET_NPCS', snapshot.val());
 				});
 			}
 		},
@@ -226,7 +224,7 @@ export const content_module = {
 				const path = `${uid}/${cid}`;
 				const campaign = campaigns_ref.child(path);
 				campaign.on('value', snapshot => {
-					commit('SET_CAMPAIGN', snapshot.val())
+					commit('SET_CAMPAIGN', snapshot.val());
 				});
 			}
 		},
@@ -235,30 +233,28 @@ export const content_module = {
 				const uid = rootGetters.user.uid
 				let campaigns = campaigns_ref.child(uid)
 				campaigns.on('value', snapshot => {
-					commit('SET_CAMPAIGNS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+					commit('SET_CAMPAIGNS', snapshot.val());
 				});
 			}
 		},
 		stopFetchNpcs({ rootGetters }) {
-			console.log("stopFetchNpc called")
 			if (rootGetters.user) {
 				const uid = rootGetters.user.uid;
-				const npcs = npcs_ref.child(uid)
+				const npcs = npcs_ref.child(uid);
 				npcs.off();
 			}
 		},
 		remove_voucher( { rootGetters }) {
 			if(rootGetters.user) {
-				db.ref(`users/${rootGetters.user.uid}/voucher`).remove()
+				db.ref(`users/${rootGetters.user.uid}/voucher`).remove();
 			}
 		},
 		setPoster({ state }) {
 			db.ref('posters').once('value', snapshot => {
-				let count = snapshot.val()
-				let new_count = count + 1
-				db.ref('posters').set(new_count)
-				state.poster = true
+				let count = snapshot.val();
+				let new_count = count + 1;
+				db.ref('posters').set(new_count);
+				state.poster = true;
 			})
 		},
 		clearEncounters({ commit }) {
@@ -279,6 +275,34 @@ export const content_module = {
 			for (let encounter_id in getters.encounters) {
 				commit("DELETE_ENCOUNTER", {encounter_id});
 			}
+		},
+		checkEncumbrance({ state, commit, rootGetters }) {
+			let count = {};
+			let overencumbered = false;
+
+			count.campaigns = Object.keys(state.campaigns).length;
+			count.players = Object.keys(state.players).length;
+			count.npcs = Object.keys(rootGetters["npcs/npcs"]).length;
+			count.encounters = 0;
+			
+			for (let key in state.allEncounters) {
+				let n = Object.keys(state.allEncounters[key]).length;
+				if (n > count.encounters) {
+					count.encounters = n;
+				}
+			}
+			if (state.tier) {
+				let benefits = state.tier.benefits;
+				if (count.campaigns > benefits.campaigns ||
+						count.encounters > benefits.encounters ||
+						count.npcs > benefits.npcs ||
+						count.players > benefits.players
+				) {
+					overencumbered = true;
+				}
+			}
+			commit("SET_CONTENT_COUNT", count);
+			commit("SET_ENCUMBRANCE", overencumbered);
 		}
 	},
 	mutations: {
@@ -307,29 +331,31 @@ export const content_module = {
 		SET_ALLENCOUNTERS(state, payload) {
 			if (payload) state.allEncounters = payload;
 		},
-		CHECK_ENCUMBRANCE(state) {
-			let count = {};
-			count.campaigns = Object.keys(state.campaigns).length;
-			count.players = Object.keys(state.players).length;
-			count.npcs = Object.keys(state.npcs).length;
-			count.encounters = 0;
-			for (let key in state.allEncounters) {
-				let n = Object.keys(state.allEncounters[key]).length;
-				if (n > count.encounters) {
-					count.encounters = n;
-				}
-			}
-			state.content_count = count;
-			if (state.tier) {
-				let benefits = state.tier.benefits;
-				if (count.campaigns > benefits.campaigns ||
-						count.encounters > benefits.encounters ||
-						count.npcs > benefits.npcs ||
-						count.players > benefits.players )
-					state.overencumbered = true;
-				else
-					state.overencumbered = false;
-			}
+		SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value)},
+		SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value)},
+		CHECK_ENCUMBRANCE() {
+			// let count = {};
+			// count.campaigns = Object.keys(state.campaigns).length;
+			// count.players = Object.keys(state.players).length;
+			// count.npcs = Object.keys(state.npcs).length;
+			// count.encounters = 0;
+			// for (let key in state.allEncounters) {
+			// 	let n = Object.keys(state.allEncounters[key]).length;
+			// 	if (n > count.encounters) {
+			// 		count.encounters = n;
+			// 	}
+			// }
+			// state.content_count = count;
+			// if (state.tier) {
+			// 	let benefits = state.tier.benefits;
+			// 	if (count.campaigns > benefits.campaigns ||
+			// 			count.encounters > benefits.encounters ||
+			// 			count.npcs > benefits.npcs ||
+			// 			count.players > benefits.players )
+			// 		state.overencumbered = true;
+			// 	else
+			// 		state.overencumbered = false;
+			// }
 		},
 		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
 		DELETE_CAMPAIGN(state, { campaign_id }) {

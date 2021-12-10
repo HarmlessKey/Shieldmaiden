@@ -96,10 +96,16 @@
 
 	export default {
 		name: "AddPlayers",
-		props: ["campaignId"],
+		props: {
+			campaignId: {
+				type: String,
+				required: true
+			}
+		},
 		data() {
 			return {
 				user: this.$store.getters.user,
+				campaign: {},
 				newCampaign: '',
 				image: false,
 				players_dialog: false,
@@ -117,24 +123,22 @@
 		},
 		computed: {
 			...mapGetters([
-				'campaigns',
-				'campaign',
-				'playerInCampaign',
 				'allEncounters',
 				'overencumbered'
 			]),
 			...mapGetters("npcs", ["npcs"]),
 			...mapGetters("players", ["players"]),
 		},
-		mounted() {
-			this.fetchCampaign({
-				cid: this.campaignId, 
+		async mounted() {
+			await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			}).then(campaign => {
+				this.campaign = campaign;
 			});
 		},
 		methods: {
-			...mapActions([
-				'fetchCampaign'
-			]),
+			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player"]),
 			addPlayer(id) {
 				// Make sure the player has XP if advancement is experience
 				if(this.campaign.advancement === "experience" && this.players[id].experience === undefined) {
@@ -142,8 +146,10 @@
 				}
 
 				// Set the current HP
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(id).set({
-					curHp: this.players[id].maxHp
+				this.add_player({
+					id: this.campaignId,
+					playerId: id,
+					player: { curHp: this.players[id].maxHp }
 				});
 				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
 				if (this.players[id].companions !== undefined) {

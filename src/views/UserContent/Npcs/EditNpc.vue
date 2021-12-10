@@ -253,6 +253,7 @@
 				}
 			},
 			addNpc() {
+				delete this.npc.checked;
 				this.add_npc(this.npc).then((res) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
@@ -266,7 +267,13 @@
 					this.npc.name = this.npc.name.capitalizeEach();
 					this.npc_copy = JSON.stringify(this.npc);
 					this.unsaved_changes = false;
-				});			
+				}).catch(error => {
+					this.$snotify.error('Couldn\'t save mosnter.', 'Save failed', {
+						position: "rightTop"
+					});
+					console.error(error);
+					console.log(this.npc);
+				});
 			},
 			editNpc() {
 				this.edit_npc({ 

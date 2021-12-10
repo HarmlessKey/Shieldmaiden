@@ -197,7 +197,13 @@
 	},
 	created() {
 		this.initialize().then(() => {
-			console.log("initialized");
+
+			const roll = Math.floor(Math.random() * 6 + 15);
+
+			console.log(
+				`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
+				"color: #83b547;"
+			);
 			this.initialized = true;
 		});
 		const cookies = document.cookie.split(';');
@@ -238,13 +244,6 @@
 	methods: {
 		...mapActions([
 			"initialize",
-			"fetchCampaigns",
-			"fetchAllEncounters",
-			"fetchPlayers",
-			"fetchNpcs",
-			"setUser",
-			"setUserInfo",
-			"setUserSettings",
 			"setSlide",
 			"setSideSmallScreen",
 			"setLive"

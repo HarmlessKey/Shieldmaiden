@@ -319,7 +319,6 @@
 				"encounters",
 				"overencumbered",
 				"content_count",
-				"playerInCampaign",
 				"side_collapsed",
 				"broadcast"
 			]),

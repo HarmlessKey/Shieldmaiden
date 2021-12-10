@@ -44,11 +44,9 @@ export const general_module = {
 							dispatch("npcs/fetch_npcs"),
 							dispatch("campaigns/fetch_campaigns"),
 							dispatch("fetchAllEncounters"),
-							console.log("content fetched")
 						]);
 					})
 					.then(() => {
-						console.log("check encumbrance")
 						dispatch("checkEncumbrance");
 					})
 					.catch(error => {

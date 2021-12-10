@@ -263,7 +263,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 	import { currencyMixin } from '@/mixins/currency.js';
@@ -311,9 +311,6 @@
 			}
 		},
 		computed: {
-			...mapGetters([
-				'playerInCampaign',
-			]),
 			viewerIsUser() {
 				//If the viewer is the user that runs the campaign
 				//Edit functions are enabled

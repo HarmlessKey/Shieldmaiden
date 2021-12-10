@@ -44,6 +44,13 @@ const actions = {
     }
   },
 
+  /**
+   * Get a single campaign
+   * first try to find it in the store, then fetch if wasn't present
+   * 
+   * @param {string} uid userId
+   * @param {string} id campaignId
+   */
   async get_campaign({ state, commit, dispatch }, { uid, id }) {
     let campaign = (state.cached_campaigns[uid]) ? state.cached_campaigns[uid][id] : undefined;
 
@@ -93,7 +100,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        const id = await services.adCampaign(uid, campaign);
+        const id = await services.addCampaign(uid, campaign);
         commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
         return id;
       } catch(error) {
@@ -102,8 +109,28 @@ const actions = {
     }
   },
 
+  /**
+   * Adds a player to a campaign
+   * 
+   * @param {object} campaign 
+   * @returns {string} the id of the newly added campaign
+   */
+   async add_player({ rootGetters, commit, dispatch }, { id, playerId, player }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.addPlayer(uid, id, playerId, player);
+        commit("ADD_PLAYER", { uid, id, playerId, player });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
    /**
-   * Updates and existing campaign
+   * Edits and existing campaign
    * It is possible to edit the campaign of another user (for companions)
    * therefore we send the uid from where the function is called
    * 
@@ -148,6 +175,13 @@ const mutations = {
   SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
   SET_CACHED_CAMPAIGNS(state, { uid, campaigns }) { Vue.set(state.cached_campaigns, uid, campaigns); },
   SET_ACTIVE_CAMPAIGN(state, id) { Vue.set(state, "active_campaign", id); },
+  ADD_PLAYER(state, { uid, id, playerId, player }) { 
+    if(state.cached_campaigns[uid][id].players) {
+      Vue.set(state.cached_campaigns[uid][id].players, playerId, player);
+    } else {
+      Vue.set(state.cached_campaigns[uid][id], "players", { [playerId]: player });
+    }
+  },
   SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
     if(state.cached_campaigns[uid]) {
       Vue.set(state.cached_campaigns[uid], id, campaign);

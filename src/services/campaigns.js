@@ -51,6 +51,14 @@ export class campaignServices {
       throw error;
     });
   }
+
+  async addPlayer(uid, id, playerId, player) {
+    CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
   
 
   async deleteCampaign(uid, id) {

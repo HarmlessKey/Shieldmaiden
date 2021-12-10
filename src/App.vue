@@ -7,7 +7,8 @@
 			<div :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
 				<div class="scrollable-content">
-					<router-view/>
+					<router-view v-if="initialized" />
+					<hk-loader v-else />
 				</div>
 			</div>
 		</div>
@@ -136,6 +137,7 @@
 	},
 	data() {
 		return {
+			initialized: false,
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
@@ -194,7 +196,10 @@
 		}
 	},
 	created() {
-		this.initialize();
+		this.initialize().then(() => {
+			console.log("initialized");
+			this.initialized = true;
+		});
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {

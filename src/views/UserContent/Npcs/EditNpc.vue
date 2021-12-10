@@ -205,10 +205,7 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchCampaign',
-				'setSlide'
-			]),
+			...mapActions(["setSlide"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {

@@ -140,12 +140,12 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'campaigns',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
 			...mapGetters("players", ["players"]),
+			...mapGetters("campaigns", ["campaigns"]),
 			_players: function() {
 				let vm = this;
 				return _.chain(this.players)
@@ -164,7 +164,7 @@
 				.value()
 			},
 			slotsLeft() {
-				return this.tier.benefits.players - Object.keys(this.players).length
+				return this.tier.benefits.players - this.content_count.players
 			}
 		},
 		methods: {

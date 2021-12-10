@@ -183,8 +183,8 @@
 				'tier',
 				'voucher',
 				'userInfo',
-				'campaigns'
 			]),
+			...mapGetters("campaigns", ["campaigns"]),
 			active_campaign() {
 				if(this.campaigns && this.userInfo) {
 					if(this.userInfo && this.userInfo.active_campaign) {

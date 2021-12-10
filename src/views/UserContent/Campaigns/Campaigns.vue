@@ -7,7 +7,7 @@
 						Your Campaigns
 						<span v-if="campaigns && tier">( 
 							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
-								{{ Object.keys(campaigns).length }}
+								{{ content_count.campaigns }}
 							</span> / 
 							<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
 							<template v-else>{{ tier.benefits.campaigns }}</template>
@@ -29,13 +29,13 @@
 					/>
 
 					<!-- NO PLAYERS YET -->
-					<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
+					<div class="first-campaign pb-4" v-if="content_count.players === 0 && (content_count.campaigns > 0)">
 						<h2>Create players for your campaign</h2>
 						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
 					</div>
 
 					<transition-group 
-						v-if="campaigns && Object.keys(campaigns).length > 0"
+						v-if="campaigns && content_count.campaigns > 0"
 						tag="div" 
 						class="row q-col-gutter-md" 
 						name="campaigns" 
@@ -290,6 +290,7 @@
 				'content_count',
 				'active_campaign'
 			]),
+			...mapGetters("campaigns", ["campaigns"]),
 			...mapGetters("players", ["players"]),
 			_campaigns: function() {
 				return _.chain(this.campaigns)
@@ -340,12 +341,13 @@
 				}
 			},
 			assignPlayers() {
-				for (let campaignId in this.campaigns) {
-					for (let playerId in this.campaigns[campaignId].players) {
-						if (Object.keys(this.players[playerId]).indexOf('campaign_id') < 0) {
+				for (const [campaignId, campaign] of Object.entries(this.campaigns)) {
+					for (const playerId in campaign.players) {
+						const player = this.players[playerId];
+						if (!player.hasOwnProperty("campaign_id") || player.campaign_id === undefined) {
 							// Player not yet assigned to campaign
 							db.ref(`players/${this.user.uid}/${playerId}`).update({campaign_id: campaignId});
-						} else if (this.players[playerId].campaign_id !== campaignId) {
+						} else if (player.campaign_id !== campaignId) {
 							// Player in both this campaign as other campaign
 							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
 								buttons: [

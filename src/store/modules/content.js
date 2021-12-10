@@ -280,8 +280,8 @@ export const content_module = {
 			let count = {};
 			let overencumbered = false;
 
-			count.campaigns = Object.keys(state.campaigns).length;
-			count.players = Object.keys(state.players).length;
+			count.campaigns = Object.keys(rootGetters["campaigns/campaigns"]).length;
+			count.players = Object.keys(rootGetters["players/players"]).length;
 			count.npcs = Object.keys(rootGetters["npcs/npcs"]).length;
 			count.encounters = 0;
 			

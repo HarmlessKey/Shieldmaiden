@@ -245,6 +245,7 @@
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				campaign: {},
 				newEncounter: "",
 				copy: window.location.host + "/track-encounter/" + this.$store.getters.user.uid,
 				add: false,
@@ -296,18 +297,21 @@
 				}
 			}
 		},
-		mounted() {
-			this.fetchEncounters({
-				cid: this.campaignId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			}),
-			this.setCurHp();
-			this.removeGhostPlayers();
-			this.setActiveCampaign({ 
-				campaign_id: this.campaignId 
+		async mounted() {
+			await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			}).then((campaign) => {
+				console.log(campaign)
+				this.campaign = campaign;
+				this.setCurHp(campaign.players);
+				this.removeGhostPlayers(campaign.players);
+				this.checkAdvancement(campaign);
 			});
+			this.fetchEncounters({
+				cid: this.campaignId
+			}),
+			this.set_active_campaign(this.campaignId);
 		},
 		computed: {
 			...mapGetters([
@@ -315,7 +319,6 @@
 				"encounters",
 				"overencumbered",
 				"content_count",
-				"campaign",
 				"playerInCampaign",
 				"side_collapsed",
 				"broadcast"
@@ -351,7 +354,7 @@
 				//If not, it is set on mounted
 				let check = false;
 				if(this.campaign) {
-					for(var key in this.campaign.players) {
+					for(const key in this.campaign.players) {
 						if(this.campaign.players[key].curHp == undefined) {
 							check = true;
 						}
@@ -360,18 +363,17 @@
 				return check;
 			}
 		},
-		watch: {
-			campaign() {
-				this.checkAdvancement();
-			}
-		},
 		methods: {
 			...mapActions([
 				'fetchEncounters',
-				'fetchCampaign',
 				'setActiveCampaign',
 				"setSlide"
 			]),
+			...mapActions("campaigns", [
+				"get_campaign",
+				"set_active_campaign"
+			]),
+
 			addEncounter() {
 				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
@@ -446,10 +448,10 @@
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
 			},
-			setCurHp() {
+			setCurHp(players) {
 				if(this.noCurHp) {
 					//Stores player with curHp under campaign
-					for(var key in this.campaign.players) {
+					for(const key in players) {
 						if(this.campaign.players[key].curHp === undefined) {
 							db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
 								curHp: this.players[key].maxHp
@@ -459,8 +461,8 @@
 					this.noCurHp = false;
 				}
 			},
-			checkAdvancement() {
-				if(!this.campaign.advancement) {
+			checkAdvancement(campaign) {
+				if(!campaign.advancement) {
 					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?' ,'Set advancement', {
 						timeout: 0,
 						buttons: [
@@ -480,9 +482,9 @@
 					});
 				}
 			},
-			removeGhostPlayers() {
+			removeGhostPlayers(campaignPlayers) {
 				const players = Object.keys(this.players);
-				for(let key in this.campaign.players) {
+				for(let key in campaignPlayers) {
 					if(!players.includes(key)) {
 						// eslint-disable-next-line
 						console.error('Ghost Player Removed: ', key);

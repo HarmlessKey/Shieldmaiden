@@ -17,10 +17,9 @@ export class playerServices {
 
   async getPlayer(uid, id) {
     try {
-      const player = await PLAYERS_REF.child(uid).child(id).on('value', snapshot => {
+      const player = await PLAYERS_REF.child(uid).child(id).once('value', snapshot => {
         return snapshot;
       });
-      console.log("services get player", player.val())
       return player.val();
     } catch(error) {
       throw error;

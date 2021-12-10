@@ -33,7 +33,7 @@ export const general_module = {
 			if(auth.currentUser !== null) {
 				dispatch("setUser");
 				// first set the user settings in order to set theme correctly
-				dispatch("setUserSettings")
+				await dispatch("setUserSettings")
 					.then(() => {
 						// wait for all content to be fetched before checking encumbrance
 						return Promise.all([
@@ -42,11 +42,13 @@ export const general_module = {
 							// players need prio!
 							dispatch("players/fetch_players"),
 							dispatch("npcs/fetch_npcs"),
-							dispatch("fetchCampaigns"),
-							dispatch("fetchAllEncounters")
-						])
+							dispatch("campaigns/fetch_campaigns"),
+							dispatch("fetchAllEncounters"),
+							console.log("content fetched")
+						]);
 					})
 					.then(() => {
+						console.log("check encumbrance")
 						dispatch("checkEncumbrance");
 					})
 					.catch(error => {

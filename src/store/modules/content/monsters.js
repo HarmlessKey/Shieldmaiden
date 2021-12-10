@@ -19,10 +19,11 @@ const actions = {
     }
     return getters.monster_services;
   },
-  async get_monsters({ dispatch}, { pageNumber, pageSize, query, sortBy }) {
+
+  async get_monsters({ dispatch}, { pageNumber, pageSize, query, fields, sortBy }) {
     const services = await dispatch("get_monster_services");
     try {
-      const monsters = await services.getMonsters(pageNumber, pageSize, query, sortBy);
+      const monsters = await services.getMonsters(pageNumber, pageSize, query, fields, sortBy);
 
       return monsters;
     } catch(error) {

@@ -9,23 +9,32 @@ export class monsterServices {
     });
   }
 
-  async getMonsters(pageNumber = 1, pageSize = 15, query, sortBy = "name") {
-    console.log(pageNumber, pageSize, sortBy);
-    let params = "";
+  async getMonsters(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name") {
+    console.log(sortBy);
+
+    const skip = (pageNumber - 1)*pageSize;
+    const fieldsString = fields.join(" ");
+    let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;
+    
 
     if(query) {
-      params = [];
+      const queryParams = [];
       
       if(query.search) {
-        params.push(`name=${query.search}`);
+        queryParams.push(`name=${query.search}`);
       }
       if(query.types && query.types.length) {
         for(const type of query.types) {
-          params.push(`type[]=${type}`);
+          queryParams.push(`type[]=${type}`);
+        }
+      }
+      if(query.challenge_ratings && query.challenge_ratings.length) {
+        for(const cr of query.challenge_ratings) {
+          queryParams.push(`challenge_rating[]=${cr}`);
         }
       }
 
-      params = `?${params.join("&")}`;
+      params += `&${queryParams.join("&")}`;
     }
 
 

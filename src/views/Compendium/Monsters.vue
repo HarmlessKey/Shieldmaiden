@@ -241,7 +241,7 @@
 				this.query = {
 					search: this.search,
 					types: this.types,
-					cr: this.challenge_rating
+					challenge_ratings: this.challenge_rating
 				}
 				this.fetchMonsters();
 			},
@@ -254,6 +254,7 @@
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
+					fields: ["name", "type", "challenge_rating"],
 					sortBy: this.pagination.sortBy
 				}).then(result => {
 					this.pagination.rowsNumber = result.meta.count;

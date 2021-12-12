@@ -46,6 +46,11 @@
 						name: 'Generate XML sitemap',
 						url: 'xml',
 						icon: 'fas fa-file-code',
+					},
+					'monster-update': { 
+						name: 'Update monsters',
+						url: 'monster-update',
+						icon: 'fas fa-file-edit',
 					}
 				},
 			}

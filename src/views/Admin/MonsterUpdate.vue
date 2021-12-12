@@ -3,113 +3,9 @@
 		<Crumble />
 		<h3>Export a database</h3>
 		<p>
-			Updates monster values to their correct types. A lot of numbers were saved as strings, but now need to be changed to numbers.<br/>
-			Below are all values that must be integers.
+			Updates monster values to their correct types. A lot of numbers were saved as strings, but now need to be changed to numbers.
 		</p>
-		<ul>
-			<li>armor_class</li>
-			<li>hit_points</li>
-			<li>challenge_rating</li>
-			<li>proficiency</li>
 
-			<li>strength</li>
-			<li>dexterity</li>
-			<li>constitution</li>
-			<li>intelligence</li>
-			<li>wisdom</li>
-			<li>charisma</li>
-
-			<li>walk_speed</li>
-			<li>swim_speed</li>
-			<li>burrow_speed</li>
-			<li>fly_speed</li>
-			<li>climb_speed</li>
-
-			<li>senses.blindsight.range</li>
-			<li>senses.darkvision.range</li>
-			<li>senses.tremorsense.range</li>
-			<li>senses.truesight.range</li>
-
-			<li>caster_level</li>
-			<li>caster_save_dc</li>
-			<li>caster_spell_attack</li>
-			<li>caster_spell_slots[]</li>
-			<li>caster_spells[].level</li>
-
-			<li>innate_save_dc</li>
-			<li>innate_spell_attack</li>
-			<li>innate_spells[].limit</li>
-
-			<li>legendary_count</li>
-
-			<li>special_abilities[].limit</li>
-			<li>special_abilities[].reach</li>
-			<li>special_abilities[].aoe_size</li>
-			<li>special_abilities[].action_list[].attack_bonus</li>
-			<li>special_abilities[].action_list[].save_dc</li>
-			<li>special_abilities[].action_list[].rolls[].dice_count</li>
-			<li>special_abilities[].action_list[].rolls[].dice_type</li>
-			<li>special_abilities[].action_list[].rolls[].fixed_val</li>
-			<li>special_abilities[].action_list[].rolls[].versatile_dice_count</li>
-			<li>special_abilities[].action_list[].rolls[].versatile_dice_type</li>
-			<li>special_abilities[].action_list[].rolls[].versatile_fixed_val</li>
-			<li>special_abilities[].action_list[].rolls[].projectile_count</li>
-			<li>special_abilities[].action_list[].rolls[].miss_mod</li>
-			<li>special_abilities[].action_list[].rolls[].save_fail_mod</li>
-
-			<li>actions[].limit</li>
-			<li>actions[].reach</li>
-			<li>actions[].aoe_size</li>
-			<li>actions[].action_list[].attack_bonus</li>
-			<li>actions[].action_list[].save_dc</li>
-			<li>actions[].action_list[].rolls[].dice_count</li>
-			<li>actions[].action_list[].rolls[].dice_type</li>
-			<li>actions[].action_list[].rolls[].fixed_val</li>
-			<li>actions[].action_list[].rolls[].versatile_dice_count</li>
-			<li>actions[].action_list[].rolls[].versatile_dice_type</li>
-			<li>actions[].action_list[].rolls[].versatile_fixed_val</li>
-			<li>actions[].action_list[].rolls[].projectile_count</li>
-			<li>actions[].action_list[].rolls[].miss_mod</li>
-			<li>actions[].action_list[].rolls[].save_fail_mod</li>
-
-			<li>legendary_actions[].legendary_cost</li>
-			<li>legendary_actions[].limit</li>
-			<li>legendary_actions[].reach</li>
-			<li>legendary_actions[].aoe_size</li>
-			<li>legendary_actions[].action_list[].attack_bonus</li>
-			<li>legendary_actions[].action_list[].save_dc</li>
-			<li>legendary_actions[].action_list[].rolls[].dice_count</li>
-			<li>legendary_actions[].action_list[].rolls[].dice_type</li>
-			<li>legendary_actions[].action_list[].rolls[].fixed_val</li>
-			<li>legendary_actions[].action_list[].rolls[].versatile_dice_count</li>
-			<li>legendary_actions[].action_list[].rolls[].versatile_dice_type</li>
-			<li>legendary_actions[].action_list[].rolls[].versatile_fixed_val</li>
-			<li>legendary_actions[].action_list[].rolls[].projectile_count</li>
-			<li>legendary_actions[].action_list[].rolls[].miss_mod</li>
-			<li>legendary_actions[].action_list[].rolls[].save_fail_mod</li>
-
-			<li>reactions[].limit</li>
-			<li>reactions[].reach</li>
-			<li>reactions[].aoe_size</li>
-			<li>reactions[].action_list[].attack_bonus</li>
-			<li>reactions[].action_list[].save_dc</li>
-			<li>reactions[].action_list[].rolls[].dice_count</li>
-			<li>reactions[].action_list[].rolls[].dice_type</li>
-			<li>reactions[].action_list[].rolls[].fixed_val</li>
-			<li>reactions[].action_list[].rolls[].versatile_dice_count</li>
-			<li>reactions[].action_list[].rolls[].versatile_dice_type</li>
-			<li>reactions[].action_list[].rolls[].versatile_fixed_val</li>
-			<li>reactions[].action_list[].rolls[].projectile_count</li>
-			<li>reactions[].action_list[].rolls[].miss_mod</li>
-			<li>reactions[].action_list[].rolls[].save_fail_mod</li>
-		</ul>
-
-		<p>Some properties need to be removed</p>
-		<ul>
-			<li>checked</li>
-			<li>changed</li>
-			<li>metadata</li>
-		</ul>
 		<q-select
 			dark filled square
 			class="select"
@@ -117,7 +13,7 @@
 			v-model="ref"
 			:options="refs"
 		/>
-		<a class="btn bnt-large" @click="updateMonsters()" :disabled="!ref || loading">
+		<a class="btn bnt-large" @click="update()" :disabled="!ref || loading">
 			<i class="fas fa-file-edit" />
 			{{ ref ? `Update ${ref}` : "Select a reference" }}
 		</a>
@@ -137,7 +33,7 @@
 			Crumble
 		},
 		metaInfo: {
-			title: 'Admin | Export'
+			title: 'Admin | Update monsters'
 		},
 		data() {
 			return {
@@ -152,10 +48,65 @@
 					"actions",
 					"legendary_actions",
 					"reactions"
-				]
+				],
+				condition: [
+					"blinded",
+					"charmed",
+					"deafened",
+					"exhaustion",
+					"frightened",
+					"grappled",
+					"incapacitated",
+					"invisible",
+					"paralyzed",
+					"petrified",
+					"poisoned",
+					"prone",
+					"restrained",
+					"stunned",
+					"unconscious"
+				],
+				monster_types: [
+					"Aberration",
+					"Beast",
+					"Celestial",
+					"Construct",
+					"Dragon",
+					"Elemental",
+					"Fey",
+					"Fiend",
+					"Giant",
+					"Humanoid",
+					"Monstrosity",
+					"Ooze",
+					"Plant",
+					"Swarm of tiny beasts",
+					"Undead"
+				],
+				monster_alignment: [
+					"any",
+					"any alignment",
+					"unaligned",
+					"lawful good",
+					"neutral good",
+					"chaotic good",
+					"lawful neutral",
+					"neutral",
+					"chaotic neutral",
+					"lawful evil",
+					"neutral evil",
+					"chaotic evil",
+				],
 			}
 		},
-		methods: {	
+		methods: {
+			update() {
+				if(this.ref === "monsters") {
+					this.updateMonsters();
+				} else {
+					this.updateNpcs();
+				}
+			},
 			async updateMonsters() {
 				this.loading = true;
 
@@ -173,12 +124,54 @@
 					this.loading = false;
 				});	
 			},
+			async updateNpcs() {
+				this.loading = true;
+
+				//Fetch the data
+				const ref = db.ref("npcs");
+				await ref.once('value', (snapshot) => {
+					const users = snapshot.val();
+
+					for(let uid in users) {
+						const npcs = users[uid];
+						console.log(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
+						for(let key in npcs) {
+							let entry = npcs[key];
+							if(!entry.old) {
+								this.updateEntry({ uid, key, entry });
+							}
+						}		
+					}
+				}).then(() => {
+					this.loading = false;
+				});	
+			},
 			updateEntry({ uid, key, entry }) {
 				const ref = (uid) ? db.ref(`npcs/${uid}/${key}`) : db.ref(`monsters/${key}`);
 
 				delete entry.metadata;
 				delete entry.checked;
 				delete entry.changed;
+				delete entry.key;
+
+
+				if(entry.lengendary_count) {
+					entry.legendary_count = entry.lengendary_count;
+					delete entry.lengendary_count;
+				}
+				if(!entry.size) {
+					entry.size = "Medium";
+				}
+				if(!entry.type || !this.monster_types.includes(entry.type)) {
+					entry.type = "Beast";
+				}
+				if(entry.type === "Abberation") {
+					entry.type = "Aberration";
+				}
+
+				if(entry.alignment && !this.monster_alignment.includes(entry.alignment.toLowerCase())) {
+					entry.alignment = "Neutral";
+				}
 
 				entry.armor_class = parseInt(entry.armor_class);
 				entry.hit_points = parseInt(entry.hit_points);
@@ -260,6 +253,13 @@
 							entry.senses.truesight.range = parseInt(entry.senses.truesight.range);
 						}
 					}
+				}
+
+				// Remove invalid conditions
+				if(entry.condition_immunities) {
+					entry.condition_immunities = entry.condition_immunities.filter(condition => {
+						return this.condition.includes(condition);
+					});
 				}
 
 				if(entry.caster_level !== undefined) {
@@ -357,6 +357,9 @@
 											delete action.attack_bonus;
 										} else {
 											action.attack_bonus = parseInt(action.attack_bonus);
+											if(action.attack_bonus > 99) {
+												action.attack_bonus = 99;
+											}
 										}
 									}
 									if(action.save_dc !== undefined) {
@@ -369,6 +372,9 @@
 
 									if(action.rolls) {
 										for(const roll of action.rolls) {
+
+											delete roll.fail_miss;
+
 											if(roll.dice_count !== undefined) {
 												if(roll.dice_count === "") {
 													delete roll.dice_count;
@@ -441,8 +447,8 @@
 				}
 
 				try {
-					ref.set(entry);
-					console.log(`%c${entry.name} Successfully updated.`, "color: #83b547;")
+					if(!entry.old) ref.set(entry);
+					console.log(`%c${key} Successfully updated.`, "color: #83b547;" , entry);
 				} catch(error) {
 					console.error(`Couldn't update monster`, key, entry.name, error, entry);
 				}

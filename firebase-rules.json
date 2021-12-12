@@ -145,10 +145,10 @@
             ".validate": "newData.isString() && newData.val().matches(/^(Aberration|Beast|Celestial|Construct|Dragon|Elemental|Fey|Fiend|Giant|Humanoid|Monstrosity|Ooze|Plant|Swarm of tiny beasts|Undead)$/)"
           },
           "subtype": {
-            ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^(Any race|Dwarf|Elf|Gnoll|Gnome|Goblinoid|Grimlock|Human|Shapechanger|Kobold|Lizardfolk|Merfolk|Orc|Sahuagin|Demon|Devil|Shapechanger|Shapechanger|Titan|Shapechanger)$/))"
+            ".validate": "newData.isString() && newData.val().length <= 25"
           },
           "alignment": {
-            ".validate": "newData.isString() && newData.val().matches(/^(Any|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/)"
+            ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
           },
           "walk_speed": {
             ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
@@ -167,7 +167,7 @@
           },
           "languages": {
             "$langugeIndex": {
-              ".validate": "newData.isString() && newData.val().length <= 50"
+              ".validate": "newData.isString() && newData.val().length <= 100"
             }
           },
           "challenge_rating": {
@@ -535,7 +535,7 @@
                 ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
               },
               "aoe_type": {
                 ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
@@ -825,7 +825,8 @@
         },
         ".write": "root.child('users').child(auth.uid).child('admin').exists()",
         ".read": true
-      }
+      },
+      ".read": true
     },
     "custom_items": {
       "$uid": {

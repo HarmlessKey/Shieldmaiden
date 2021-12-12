@@ -107,7 +107,7 @@
 				<!-- SPEED -->
 				<div class="row q-col-gutter-sm">
 					<div class="col">
-						<ValidationProvider rules="max_value:999" name="Walk speed" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Walk speed" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Walk speed"
@@ -123,7 +123,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max_value:999" name="Swim speed" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Swim speed" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Swim speed"
@@ -139,7 +139,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max_value:999" name="Fly speed" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Fly speed" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Fly speed"
@@ -155,7 +155,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max_value:999" name="Burrow speed" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Burrow speed" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Burrow speed"
@@ -171,7 +171,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max_value:999" name="Climb speed" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:0,999" name="Climb speed" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Climb speed"
@@ -291,7 +291,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col-12 col-md-4">
-						<ValidationProvider rules="hit_dice|max:6" name="Hit dice" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="hit_dice|max:10" name="Hit dice" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Hit dice"

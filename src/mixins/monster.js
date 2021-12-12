@@ -81,7 +81,7 @@ export const monsterMixin = {
 				]
 			},
 			monster_types: [
-				"Abberation",
+				"Aberration",
 				"Beast",
 				"Celestial",
 				"Construct",

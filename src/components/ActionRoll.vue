@@ -34,7 +34,7 @@
 					<div class="col">
 						<ValidationProvider 
 							:rules="{
-								between: [1, 9],
+								between: [1, 99],
 								required: !!roll[`${index === 1 ? 'versatile_' : '' }dice_type`]
 							}" 
 							:name="`Dice count ${index == 1 ? option.label : ''}`" 

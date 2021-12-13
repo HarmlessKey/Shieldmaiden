@@ -1,7 +1,7 @@
 <template>
 	<div class="content">
 		<Crumble />
-		<h3>Export a database</h3>
+		<h3>Update monsters & NPCs</h3>
 		<p>
 			Updates monster values to their correct types. A lot of numbers were saved as strings, but now need to be changed to numbers.
 		</p>
@@ -26,9 +26,12 @@
 <script>
 	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
+	import { monsterMixin } from "@/mixins/monster";
+	import { skills} from "@/mixins/skills";
 
 	export default {
 		name: 'ExportDatabases',
+		mixins: [monsterMixin, skills],
 		components: {
 			Crumble
 		},
@@ -43,13 +46,81 @@
 					"monsters",
 					"npcs",
 				],
+				allowed_properties: [
+					"name",
+					"source",
+					"avatar",
+					"size",
+					"type",
+					"subtype",
+					"alignment",
+					"walk_speed",
+					"swim_speed",
+					"fly_speed",
+					"burrow_speed",
+					"climb_speed",
+					"languages",
+					"challenge_rating",
+					"proficiency",
+					"friendly",
+					"player_id",
+					"armor_class",
+					"hit_points",
+					"hit_dice",
+					"senses",
+					"strength",
+					"dexterity",
+					"constitution",
+					"intelligence",
+					"wisdom",
+					"charisma",
+					"saving_throws",
+					"skills",
+					"skills_expertise",
+					"skill_modifiers",
+					"damage_vulnerabilities",
+					"damage_resistances",
+					"damage_immunities",
+					"condition_immunities",
+					"caster_ability",
+					"caster_level",
+					"caster_save_dc",
+					"caster_spell_attack",
+					"caster_spell_slots",
+					"caster_spells",
+					"innate_ability",
+					"innate_save_dc",
+					"innate_spell_attack",
+					"innate_spells",
+					"special_abilities",
+					"actions",
+					"legendary_count",
+					"legendary_actions",
+					"reactions"
+				],
+				abilities_allowed_properties: [
+					"legendary_cost",
+					"name",
+					"recharge",
+					"limit",
+					"limit_type",
+					"desc",
+					"reach",
+					"range",
+					"aoe_type",
+					"aoe_size",
+					"versatile",
+					"versatile_one",
+					"versatile_two",
+					"action_list"
+				],
 				abilities: [
 					"special_abilities",
 					"actions",
 					"legendary_actions",
 					"reactions"
 				],
-				condition: [
+				conditions: [
 					"blinded",
 					"charmed",
 					"deafened",
@@ -96,6 +167,14 @@
 					"lawful evil",
 					"neutral evil",
 					"chaotic evil",
+				],
+				monster_sizes: [
+					"Tiny",
+					"Small",
+					"Medium",
+					"Large",
+					"Huge",
+					"Gargantuan"
 				],
 			}
 		},
@@ -144,22 +223,32 @@
 					}
 				}).then(() => {
 					this.loading = false;
+					console.log(`%cFINISHED.`, "color: #83b547;");
 				});	
 			},
-			updateEntry({ uid, key, entry }) {
+			async updateEntry({ uid, key, entry }) {
 				const ref = (uid) ? db.ref(`npcs/${uid}/${key}`) : db.ref(`monsters/${key}`);
 
-				delete entry.metadata;
-				delete entry.checked;
-				delete entry.changed;
-				delete entry.key;
+				// If a mosnter has old properties, parse it first
+				if(entry.hasOwnProperty("ac")) {
+					this.entry = await this.parseMonster(entry);
+				}
 
+				// Remove not allowed properties
+				for(const prop of Object.keys(entry)) {
+					if(!this.allowed_properties.includes(prop)) {
+						delete entry[prop];
+					}
+				}
 
+				if(!entry.name) {
+					entry.name = "Nameless NPC";
+				}
 				if(entry.lengendary_count) {
 					entry.legendary_count = entry.lengendary_count;
 					delete entry.lengendary_count;
 				}
-				if(!entry.size) {
+				if(!entry.size || !this.monster_sizes.includes(entry.type)) {
 					entry.size = "Medium";
 				}
 				if(!entry.type || !this.monster_types.includes(entry.type)) {
@@ -169,24 +258,39 @@
 					entry.type = "Aberration";
 				}
 
+				if(entry.hit_dice && !entry.hit_dice.match(/^[0-9]+d[0-9]+$/)) {
+					delete entry.hit_dice
+				}
+
 				if(entry.alignment && !this.monster_alignment.includes(entry.alignment.toLowerCase())) {
 					entry.alignment = "Neutral";
 				}
 
-				entry.armor_class = parseInt(entry.armor_class);
-				entry.hit_points = parseInt(entry.hit_points);
-				entry.challenge_rating = Number(entry.challenge_rating);
+				entry.armor_class = (entry.armor_class !== undefined) ? parseInt(entry.armor_class) : 10;
+				entry.hit_points = (entry.hit_points) ? parseInt(entry.hit_points) : 1;
+				entry.challenge_rating = (entry.challenge_rating !== undefined && !isNaN(entry.challenge_rating)) ? Number(entry.challenge_rating) : 0;
 
 				if(entry.proficiency !== undefined) {
 					entry.proficiency = parseInt(entry.proficiency);
 				}
 
-				entry.strength = parseInt(entry.strength);
-				entry.dexterity = parseInt(entry.dexterity);
-				entry.constitution = parseInt(entry.constitution);
-				entry.intelligence = parseInt(entry.intelligence);
-				entry.wisdom = parseInt(entry.wisdom);
-				entry.charisma = parseInt(entry.charisma);
+				if(entry.avatar && entry.avatar.length > 2000) {
+					entry.avatar = entry.avatar.substring(0, 2000);
+				}
+
+				entry.strength = (entry.strength) ? parseInt(entry.strength) : 10;
+				entry.dexterity = (entry.dexterity) ? parseInt(entry.dexterity) : 10;
+				entry.constitution = (entry.constitution) ? parseInt(entry.constitution) : 10;
+				entry.intelligence = (entry.intelligence) ? parseInt(entry.intelligence) : 10;
+				entry.wisdom = (entry.wisdom) ? parseInt(entry.wisdom) : 10;
+				entry.charisma = (entry.charisma) ? parseInt(entry.charisma) : 10;
+
+				entry.strength = (entry.strength > 99) ? 99 : entry.strength;
+				entry.dexterity = (entry.dexterity > 99) ? 99 : entry.dexterity;
+				entry.constitution = (entry.constitution > 99) ? 99 : entry.constitution;
+				entry.intelligence = (entry.intelligence > 99) ? 99 : entry.intelligence;
+				entry.wisdom = (entry.wisdom > 99) ? 99 : entry.wisdom;
+				entry.charisma = (entry.charisma > 99) ? 99 : entry.charisma;
 
 				if(entry.walk_speed !== undefined) {
 					if(entry.walk_speed === "") {
@@ -224,6 +328,16 @@
 					}
 				}
 
+				if(entry.skill_modifiers) {
+					for(let skill in entry.skill_modifiers) {
+						let mod = entry.skill_modifiers[skill];
+						entry.skill_modifiers[skill] = (mod > 99) ? 99 : parseInt(mod);
+						if(mod === 0) {
+							delete entry.skill_modifiers[skill];
+						}
+					}
+				}
+
 				if(entry.senses) {
 					if(entry.senses.blindsight && entry.senses.blindsight.range !== undefined) {
 						if(entry.senses.blindsight === "") {
@@ -256,17 +370,21 @@
 				}
 
 				// Remove invalid conditions
-				if(entry.condition_immunities) {
-					entry.condition_immunities = entry.condition_immunities.filter(condition => {
-						return this.condition.includes(condition);
-					});
+				if(entry.condition_immunities !== undefined) {
+					if(Array.isArray(entry.condition_immunities)) {
+						entry.condition_immunities = entry.condition_immunities.filter(condition => {
+							return this.conditions.includes(condition);
+						});
+					} else {
+						delete entry.condition_immunities;
+					}
 				}
 
 				if(entry.caster_level !== undefined) {
 					if(entry.caster_level === "") {
 						delete entry.caster_level;
 					} else {
-					entry.caster_level = parseInt(entry.caster_level);
+					entry.caster_level = (entry.caster_level < 1) ? 1 : parseInt(entry.caster_level);
 					}
 				}
 				if(entry.caster_save_dc !== undefined) {
@@ -321,12 +439,31 @@
 					const abilities = entry[type];
 					if(abilities) {
 						for(const ability of abilities) {
+							
+							// Remove not allowed properties
+							for(const prop of Object.keys(ability)) {
+								if(!this.abilities_allowed_properties.includes(prop)) {
+									delete ability[prop];
+								}
+							}
+
+							if(ability.desc && ability.desc.length > 2000) {
+								ability.desc = ability.desc.substring(0, 2000);
+							}
+
 							if(ability.legendary_cost !== undefined) {
 								if(ability.legendary_cost === "") {
 									delete ability.legendary_cost;
 								} else {
 									ability.legendary_cost = parseInt(ability.legendary_cost);
 								}
+							}
+							if(type === "legendary_actions" && ability.legendary_cost === undefined) {
+								ability.legendary_cost = 0;
+							}
+
+							if(ability.recharge === "") {
+								delete ability.recharge;
 							}
 							if(ability.limit !== undefined) {
 								if(ability.limit === "") {
@@ -341,6 +478,9 @@
 								} else {
 									ability.reach = parseInt(ability.reach);
 								}
+							}
+							if(ability.range === "") {
+								delete ability.range;
 							}
 							if(ability.aoe_size !== undefined) {
 								if(ability.aoe_size === "") {
@@ -376,8 +516,9 @@
 											delete roll.fail_miss;
 
 											if(roll.dice_count !== undefined) {
-												if(roll.dice_count === "") {
+												if(roll.dice_count === "" || roll.dice_count === 0 || roll.dice_count === "0") {
 													delete roll.dice_count;
+													delete roll.dice_type;
 												} else {
 													roll.dice_count = parseInt(roll.dice_count);
 												}
@@ -397,8 +538,9 @@
 												}
 											}
 											if(roll.versatile_dice_count !== undefined) {
-												if(roll.versatile_dice_count === "") {
+												if(roll.versatile_dice_count === "" || roll.versatile_dice_count === 0 || roll.versatile_dice_count === "0") {
 													delete roll.versatile_dice_count;
+													delete roll.versatile_dice_type;
 												} else {
 													roll.versatile_dice_count = parseInt(roll.versatile_dice_count);
 												}
@@ -418,7 +560,7 @@
 												}
 											}
 											if(roll.projectile_count !== undefined) {
-												if(roll.projectile_count === "") {
+												if(roll.projectile_count === "" || roll.projectile_count === 0 || roll.projectile_count === "0") {
 													delete roll.projectile_count;
 												} else {
 													roll.projectile_count = parseInt(roll.projectile_count);

@@ -201,6 +201,7 @@
 					}
 				}).then(() => {
 					this.loading = false;
+					console.log(`%cFINISHED.`, "color: #83b547;");
 				});	
 			},
 			async updateNpcs() {
@@ -213,13 +214,14 @@
 
 					for(let uid in users) {
 						const npcs = users[uid];
-						console.log(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
+						console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
 						for(let key in npcs) {
 							let entry = npcs[key];
 							if(!entry.old) {
 								this.updateEntry({ uid, key, entry });
 							}
-						}		
+						}
+						console.groupEnd();	
 					}
 				}).then(() => {
 					this.loading = false;
@@ -589,8 +591,10 @@
 				}
 
 				try {
-					if(!entry.old) ref.set(entry);
-					console.log(`%c${key} Successfully updated.`, "color: #83b547;" , entry);
+					ref.set(entry);
+					console.groupCollapsed(`%c${key} Successfully updated.`, "color: #83b547;");
+					console.log(key, entry);
+					console.groupEnd();
 				} catch(error) {
 					console.error(`Couldn't update monster`, key, entry.name, error, entry);
 				}

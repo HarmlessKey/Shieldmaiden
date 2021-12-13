@@ -29,6 +29,7 @@ export const monsterMixin = {
 				15:  { proficiency: 5,  xp: 13000 },
 				16:  { proficiency: 5,  xp: 15000 },
 				17:  { proficiency: 6,  xp: 18000 },
+				18:  { proficiency: 6,  xp: 20000 },
 				19:  { proficiency: 6,  xp: 22000 },
 				20:  { proficiency: 6,  xp: 25000 },
 				21:  { proficiency: 7,  xp: 33000 },
@@ -100,9 +101,9 @@ export const monsterMixin = {
 			monster_alignment: [
 				"Any",
 				"Unaligned",
-				"Lawful Good",
-				"Neutral Good",
-				"Chaotic Good",
+				"Lawful good",
+				"Neutral good",
+				"Chaotic good",
 				"Lawful neutral",
 				"Neutral",
 				"Chaotic neutral",
@@ -115,7 +116,24 @@ export const monsterMixin = {
 				"darkvision",
 				"tremorsense",
 				"truesight"
-			]
+			],
+			conditions: [
+				"blinded",
+				"charmed",
+				"deafened",
+				"exhaustion",
+				"frightened",
+				"grappled",
+				"incapacitated",
+				"invisible",
+				"paralyzed",
+				"petrified",
+				"poisoned",
+				"prone",
+				"restrained",
+				"stunned",
+				"unconscious"
+			],
 		}
 	},
 	methods: {
@@ -127,9 +145,9 @@ export const monsterMixin = {
 		parseMonster(monster) {
 			let new_monster = {};
 			new_monster.name = (monster.name) ? monster.name.toLowerCase() : "monster name"; // required
-			new_monster.challenge_rating = (monster.challenge_rating) ? monster.challenge_rating : 1; // required
-			if(monster.size) new_monster.size = monster.size.toLowerCase().capitalize();
-			if(monster.type) new_monster.type = monster.type.toLowerCase().capitalize();
+			new_monster.challenge_rating = (monster.challenge_rating && !isNaN(monster.challenge_rating)) ? monster.challenge_rating : 1; // required
+			if(monster.size) new_monster.size = monster.size.toLowerCase().capitalize(); // required
+			if(monster.type) new_monster.type = monster.type.toLowerCase().capitalize();	// required
 			if(monster.subtype) new_monster.subtype = monster.subtype.toLowerCase().capitalize();
 			if(monster.alignment) new_monster.alignment = monster.alignment.toLowerCase().capitalize();
 			if(monster.avatar) new_monster.avatar = monster.avatar;
@@ -137,11 +155,14 @@ export const monsterMixin = {
 			new_monster.hit_points = (monster.maxHp) ? parseInt(monster.maxHp) : 1; // required
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
-
+			
 			const proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency;
 
-			if(monster.name === "b") {
-				new_monster.test = undefined;
+			if(!new_monster.size || !this.monster_sizes.includes(new_monster.size)) {
+				new_monster.size = "Medium";
+			}
+			if(!new_monster.type || !this.monster_types.includes(new_monster.type)) {
+				new_monster.type = "Beast";
 			}
 
 			// Abilities & Saving Throws
@@ -177,12 +198,6 @@ export const monsterMixin = {
 			if(new_monster.skills_expertise.length === 0) delete new_monster.skills_expertise;
 
 			// Speed
-			
-			// const speeds = (monster.speed) ? monster.speed.match(/(\d)+\D*/g) : null;
-			
-			// const speed = (monster.speed) ? monster.speed.split(",") : null;
-			// console.log("speeds", speed)
-			// console.log("old speed", monster.speed)
 			if (monster.speed) {
 				const speed_types = ["swim", "fly", "burrow", "climb"];
 				let match = [];
@@ -231,7 +246,7 @@ export const monsterMixin = {
 							new_sense[monster_sense] = true;
 							
 							if(sense.match(/([0-9])+/g)) {
-								new_sense.range = sense.match(/([0-9])+/g)[0];
+								new_sense.range = parseInt(sense.match(/([0-9])+/g)[0]);
 							}
 							new_monster.senses[monster_sense] = new_sense;
 						}
@@ -268,15 +283,15 @@ export const monsterMixin = {
 
 			if(condition_immunities) {
 				new_monster.condition_immunities = [];
-				for(const immunity of condition_immunities) {
+				for(let immunity of condition_immunities) {
 					if(immunity) {
-						new_monster.condition_immunities.push(
-							immunity.trim().toLowerCase()
-						);
+						immunity = immunity.trim().toLowerCase();
+						if(this.conditions.includes(immunity)) {
+							new_monster.condition_immunities.push(immunity);
+						}
 					}
 				}
 			}
-
 
 			// Abilities
 			for(const action_type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
@@ -331,7 +346,7 @@ export const monsterMixin = {
 							const reach = (ability.desc) ? ability.desc.toLowerCase().match(/reach\s?([0-9]+(?:\/[0-9]+)?)/) : null;
 							const range = (ability.desc) ? ability.desc.toLowerCase().match(/range\s?([0-9]+(?:\/[0-9]+)?)/) : null;
 
-							if(reach) newAbility.reach = reach[1];
+							if(reach) newAbility.reach = parseInt(reach[1]);
 							if(range) newAbility.range = range[1];
 
 							// Check if it's a targeted action or saving throw
@@ -348,7 +363,7 @@ export const monsterMixin = {
 
 								const save_dc = (ability.desc) ? ability.desc.match(/DC\s?([0-9]+)/) : null;
 								if(save_dc) {
-									newAbility.action_list[0].save_dc = save_dc[1];
+									newAbility.action_list[0].save_dc = parseInt(save_dc[1]);
 								}
 
 								// Find the ability
@@ -385,13 +400,13 @@ export const monsterMixin = {
 
 									const input = damage.split("d");
 									if (input.length == 2) {
-										newRoll.dice_count = input[0]
-										newRoll.dice_type = input[1]
+										newRoll.dice_count = parseInt(input[0]);
+										newRoll.dice_type = parseInt(input[1]);
 									} else {
 										actually_fixed = parseInt(input[0]) || null;
 									}
 									
-									newRoll.fail_miss = (fail_miss === "miss_mod") ? 0 : 0.5;
+									newRoll[fail_miss] = (fail_miss === "miss_mod") ? 0 : 0.5;
 
 									newAbility.action_list[0].rolls.push(newRoll);
 								})
@@ -399,9 +414,9 @@ export const monsterMixin = {
 								// Check if there is a damage bonus
 								// Add it only once (to the first roll by default, this might be wrong in some cases)
 								if(ability.damage_bonus && newAbility.action_list[0].rolls.length > 0) {
-									newAbility.action_list[0].rolls[0].fixed_val = ability.damage_bonus;
+									newAbility.action_list[0].rolls[0].fixed_val = parseInt(ability.damage_bonus);
 								} else if (actually_fixed) {
-									newAbility.action_list[0].rolls[0].fixed_val = actually_fixed;
+									newAbility.action_list[0].rolls[0].fixed_val = parseInt(actually_fixed);
 								}
 							}
 						}

@@ -61,6 +61,9 @@
 						entry["_id"] = key;
 						delete entry["metadata"];
 						delete entry["changed"];
+
+						entry.url = entry.name.replace(/ /g, "-");
+						
 						data.push(entry);
 					}
 				}).then(() => {

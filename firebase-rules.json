@@ -148,7 +148,7 @@
             ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^(Any race|Dwarf|Elf|Gnoll|Gnome|Goblinoid|Grimlock|Human|Shapechanger|Kobold|Lizardfolk|Merfolk|Orc|Sahuagin|Demon|Devil|Shapechanger|Shapechanger|Titan|Shapechanger)$/))"
           },
           "alignment": {
-            ".validate": "newData.isString() && newData.val().matches(/^(Any|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/)"
+            ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
           },
           "walk_speed": {
             ".validate": "newData.isNumber()  && newData.val() >= 0 && newData.val() <= 999"
@@ -167,7 +167,7 @@
           },
           "languages": {
             "$langugeIndex": {
-              ".validate": "newData.isString() && newData.val().length <= 50"
+              ".validate": "newData.isString() && newData.val().length <= 100"
             }
           },
           "challenge_rating": {
@@ -179,6 +179,9 @@
           "friendly": {
             ".validate": "newData.isBoolean()"
           },
+          "player_id": {
+            ".validate": "newData.isString() && newData.val().length <= 50"
+          },
           "armor_class": {
             ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
           },
@@ -186,7 +189,7 @@
             ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
           },
           "hit_dice": {
-            ".validate": "newData.isString() && newData.val().matches(/^[0-9]+d[0-9]+$/) && newData.val().length <= 10"
+            ".validate": "newData.isString() && newData.val().length <= 10 && (newData.val().length === 0 ||newData.val().matches(/^[0-9]+d[0-9]+$/))"
           },
 
           // SENSES
@@ -381,10 +384,10 @@
           "caster_spells": {
             "$spellId": {
               "level": {
-                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+                ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 9"
               },
               "name": {
-                ".validate": "newData.isString() && newData.val().length <= 15"
+                ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "$other": { ".validate": false }
             }
@@ -405,7 +408,7 @@
                 ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
               },
               "name": {
-                ".validate": "newData.isString() && newData.val().length <= 15"
+                ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "$other": { ".validate": false }
             }
@@ -419,7 +422,7 @@
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "recharge": {
-                ".validate": "newData.isString() && (newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
               },
               "limit": {
                 ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
@@ -431,10 +434,10 @@
                 ".validate": "newData.isString() && newData.val().length <= 2000"
               },
               "reach": {
-                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
               },
               "aoe_type": {
                 ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
@@ -474,7 +477,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -486,7 +489,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "versatile_dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "versatile_fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -501,7 +504,9 @@
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
                       },
                       "special": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
                       },
                       "$other": { ".validate": false }
                     }
@@ -520,7 +525,7 @@
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "recharge": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
               },
               "limit": {
                 ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
@@ -532,10 +537,10 @@
                 ".validate": "newData.isString() && newData.val().length <= 2000"
               },
               "reach": {
-                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
               },
               "aoe_type": {
                 ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
@@ -575,7 +580,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -587,7 +592,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "versatile_dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "versatile_fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -602,7 +607,9 @@
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
                       },
                       "special": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
                       },
                       "$other": { ".validate": false }
                     }
@@ -621,13 +628,13 @@
             "$legendaryIndex": {
               ".validate": "newData.hasChildren(['name', 'legendary_cost'])",
               "legendary_cost": {
-                ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
+                ".validate":  "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9"
               },
               "name": {
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "recharge": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
               },
               "limit": {
                 ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
@@ -639,10 +646,10 @@
                 ".validate": "newData.isString() && newData.val().length <= 2000"
               },
               "reach": {
-                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
               },
               "aoe_type": {
                 ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
@@ -682,7 +689,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -694,7 +701,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "versatile_dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "versatile_fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -709,7 +716,9 @@
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
                       },
                       "special": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
                       },
                       "$other": { ".validate": false }
                     }
@@ -728,7 +737,7 @@
                 ".validate": "newData.isString() && newData.val().length <= 50"
               },
               "recharge": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(-[0-9]+)*$/) || newData.val().matches(/^(rest)$/))"
               },
               "limit": {
                 ".validate":  "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9"
@@ -740,10 +749,10 @@
                 ".validate": "newData.isString() && newData.val().length <= 2000"
               },
               "reach": {
-                ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999"
               },
               "range": {
-                ".validate": "newData.isString() && newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/)"
+                ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^[0-9]+(\\/[0-9]+)*$/))"
               },
               "aoe_type": {
                 ".validate": "newData.isString() && newData.val().matches(/^(cone|cube|cylinder|line|sphere|square|square feet)$/)"
@@ -783,7 +792,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -795,7 +804,7 @@
                         ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
                       },
                       "versatile_dice_type": {
-                        ".validate": "newData.isNumber() && newData.val() >= 4 && newData.val() <= 20"
+                        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 20"
                       },
                       "versatile_fixed_val": {
                         ".validate": "newData.isNumber() && newData.val() >= -99 && newData.val() <= 99"
@@ -810,7 +819,9 @@
                         ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2"
                       },
                       "special": {
-                        ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        "$specialIndex": {
+                          ".validate": "newData.isString() && newData.val().matches(/^(siphon_full|siphon_half|drain)$/)"
+                        }
                       },
                       "$other": { ".validate": false }
                     }
@@ -825,7 +836,8 @@
         },
         ".write": "root.child('users').child(auth.uid).child('admin').exists()",
         ".read": true
-      }
+      },
+      ".read": true
     },
     "custom_items": {
       "$uid": {

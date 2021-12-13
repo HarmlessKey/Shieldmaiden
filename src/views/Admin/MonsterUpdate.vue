@@ -1,26 +1,26 @@
 <template>
-	<div class="content">
-		<Crumble />
-		<h3>Update monsters & NPCs</h3>
-		<p>
-			Updates monster values to their correct types. A lot of numbers were saved as strings, but now need to be changed to numbers.
-		</p>
+	<hk-card header="Update monsters & NPCs">
+		<div class="card-body">
+			<p>
+				Updates monster values to their correct types. A lot of numbers were saved as strings, but now need to be changed to numbers.
+			</p>
 
-		<q-select
-			dark filled square
-			class="select"
-			label="Reference"
-			v-model="ref"
-			:options="refs"
-		/>
-		<a class="btn bnt-large" @click="update()" :disabled="!ref || loading">
-			<i class="fas fa-file-edit" />
-			{{ ref ? `Update ${ref}` : "Select a reference" }}
-		</a>
-		<span v-if="loading" class="ml-3">
-			<span class="loader" />
-		</span>
-	</div>
+			<q-select
+				dark filled square
+				class="select"
+				label="Reference"
+				v-model="ref"
+				:options="refs"
+			/>
+			<a class="btn bnt-large" @click="update()" :disabled="!ref || loading">
+				<i class="fas fa-file-edit" />
+				{{ ref ? `Update ${ref}` : "Select a reference" }}
+			</a>
+			<span v-if="loading" class="ml-3">
+				<span class="loader" />
+			</span>
+		</div>
+	</hk-card>
 </template>
 
 <script>

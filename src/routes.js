@@ -516,7 +516,24 @@ export const routes = [{
 						}
 					}
 				]
-			}
+			},
+			{
+				path: "monster-update",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Update monsters"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Update monsters',
+						component: () => import('@/views/Admin/MonsterUpdate.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
 		]
 	},
 

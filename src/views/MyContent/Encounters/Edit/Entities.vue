@@ -59,7 +59,8 @@
 				max="99"
 				name="name" 
 				placeholder="1" 
-				v-model="to_add[data.row['.key']]"
+				:value="to_add[data.row['.key']]"
+				@input="changeToAdd($event, data.row['.key'])"
 			/>
 			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
@@ -193,6 +194,15 @@
 				for (let i = 0; i < this.to_add[id]; i++ ) {
 					this.add(e, id,type,name,custom,rollHp)
 				}
+				
+				// NOTIFICATION
+				if(type === 'npc') {
+					
+					this.$snotify.success(`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, {
+						position: "centerTop"
+					});
+				}
+
 				this.to_add[id] = 1
 			},
 			add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
@@ -211,7 +221,7 @@
 					let last = -1;
 					let n = 0;
 					for (let i in this.encounter.entities) {
-						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d)\))$)|(?:^(.*)(?!\s\(\d\))$)/);
+						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d+)\))$)|(?:^(.*)(?!\s\(\d+\))$)/);
 						
 						let name = match[1] || match[3];
 						if (name == entity.name) {
@@ -289,25 +299,6 @@
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
 				}
 
-				// NOTIFICATION
-				if(type === 'npc') {
-					let notifyHP = [];
-
-					if(HP) {
-						notifyHP.total = HP.total
-						notifyHP.throws = ' [' + HP.throws + '] '
-						notifyHP.mod = HP.mod
-					}
-					else {
-						notifyHP.total = entity.maxHp;
-						notifyHP.throws = ''
-						notifyHP.mod = ''
-					}
-
-					this.$snotify.success('HP: ' + notifyHP.total + notifyHP.throws + notifyHP.mod, 'NPC added', {
-						position: "centerTop"
-					});
-				}
 			},
 			addAllPlayers(e) {
 				for(let player in this.campaign.players) {
@@ -322,7 +313,12 @@
 					return -1
 				}
 			},
-		}
+			changeToAdd(val, id) {
+				val = val > 99 ? 99 : val < 1 ? 1 : val;
+				this.$set(this.to_add, id, val)
+
+			}
+		},
 	}
 </script>
 

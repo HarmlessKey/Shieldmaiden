@@ -107,9 +107,10 @@
 				</div>
 			</hk-card>
 		</q-dialog>		
+		
 		<!-- Import Dialog  -->
 		<q-dialog v-model="import_dialog">
-			<hk-card header="Import NPC from JSON" minwidth="300">
+			<hk-card header="Import NPC from JSON" :minWidth="400">
 				<div class="card-body">
 					<q-file 
 						:dark="$store.getters.theme === 'dark'" 
@@ -123,22 +124,29 @@
 						</template>
 					</q-file>
 
-					<h4>
+					<h4 class="my-3">
 						OR
 					</h4>
+					<ValidationObserver  v-slot="{ handleSubmit }">
 
-					<q-form @submit="parse_JSON_input()">
-						<q-input
-							:dark="$store.getters.theme === 'dark'" 
-							filled square 
-							type="textarea"
-							v-model="json_input"
-							
-						></q-input>
-						<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
-							Parse Input
-						</q-btn>
-					</q-form>
+						<q-form @submit="handleSubmit(parse_JSON_input)">
+							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									type="textarea"
+									label="JSON Input"
+									v-model="json_input"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+
+							</ValidationProvider>
+							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+								Parse Input
+							</q-btn>
+						</q-form>
+					</ValidationObserver>
 				</div>
 			</hk-card>
 		</q-dialog>

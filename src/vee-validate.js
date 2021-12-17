@@ -123,3 +123,16 @@ extend('variable_check', {
     return true;
   }
 });
+
+extend('json', {
+  message: "This field contains invalid JSON",
+  validate: (value) => {
+    try {
+      JSON.parse(value);
+      return true;
+
+    } catch {
+      return false;
+    }
+  }
+})

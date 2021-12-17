@@ -85,6 +85,12 @@
 									Delete
 								</q-tooltip>
 							</a>
+							<a class="gray-hover" @click="downloadJSON(data.row)">
+								<i class="fas fa-brackets-curly"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Export JSON
+								</q-tooltip>
+							</a>
 						</div>
 					</hk-table>
 
@@ -245,6 +251,14 @@
 				'setSlide'
 			]),
 			...mapActions("npcs", ["delete_npc"]),
+			downloadJSON(npc) {
+				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(npc, null ,2)); 
+				var downloadAnchorNode = document.createElement('a'); 
+				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name + ".json");
+				document.body.appendChild(downloadAnchorNode);  // required for firefox 
+				downloadAnchorNode.click(); 
+				downloadAnchorNode.remove(); 
+			},
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {

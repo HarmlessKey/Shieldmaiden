@@ -10,6 +10,11 @@
 					<template v-else>{{ tier.benefits.npcs }}</template>
 					)
 				</span>
+				<a class="btn btn-sm bg-neutral-5"
+					@click="bulk_import_dialog = true"
+				>
+					Bulk Import NPCs
+				</a>
 				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
 					<i class="fas fa-plus green"></i> New NPC
 				</router-link>
@@ -164,6 +169,50 @@
 				</template>
 			</hk-card>
 		</q-dialog>
+
+		<!-- Bulk import dialog -->
+		<q-dialog v-model="bulk_import_dialog">
+			<hk-card header="Import NPC from JSON" :minWidth="400">
+				<div class="card-body">
+					<q-file 
+						:dark="$store.getters.theme === 'dark'" 
+						filled square 
+						accept=".json"
+						v-model="json_file" 
+						@input="loadJSON()"
+					>
+						<template v-slot:prepend>
+							<q-icon name="attach_file" />
+						</template>
+					</q-file>
+
+					<h4 class="my-3">
+						OR
+					</h4>
+					<ValidationObserver  v-slot="{ handleSubmit }">
+
+						<q-form @submit="handleSubmit(parseJSON)">
+							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									type="textarea"
+									label="JSON Input"
+									v-model="json_input"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+
+							</ValidationProvider>
+							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+								Parse Input
+							</q-btn>
+						</q-form>
+					</ValidationObserver>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 	</div>
 </template>
 
@@ -187,6 +236,9 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				old_dialog: false,
+				bulk_import_dialog: false,
+				json_file: undefined,
+				json_input: undefined,
 				parsed_counter: 0,
 				error_counter: 0,
 				parse_total: 0,
@@ -371,6 +423,34 @@
 							timeout: 2000
 						});
 				}
+			}, 
+			loadJSON() {
+				const fr = new FileReader();
+
+				fr.onload = e => {
+					const result = JSON.parse(e.target.result)
+					// const formatted = JSON.stringify(result, null, 2)
+					// console.log(formatted)
+					delete result.key
+
+					console.log(result)
+					
+					this.import_dialog = false
+					this.json_file = undefined
+
+				}
+
+				fr.readAsText(this.json_file)
+			},
+			parseJSON() {
+
+				let input = JSON.parse(this.json_input)
+				delete input.key
+				
+				this.npc = input
+
+				this.import_dialog = false
+				this.json_input = ""
 			}
 		}
 	}

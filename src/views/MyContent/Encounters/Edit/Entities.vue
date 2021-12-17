@@ -59,7 +59,8 @@
 				max="99"
 				name="name" 
 				placeholder="1" 
-				v-model="to_add[data.row['.key']]"
+				:value="to_add[data.row['.key']]"
+				@input="changeToAdd($event, data.row['.key'])"
 			/>
 			<a @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
 				<i class="fas fa-plus"></i>
@@ -312,7 +313,12 @@
 					return -1
 				}
 			},
-		}
+			changeToAdd(val, id) {
+				val = val > 99 ? 99 : val < 1 ? 1 : val;
+				this.$set(this.to_add, id, val)
+
+			}
+		},
 	}
 </script>
 

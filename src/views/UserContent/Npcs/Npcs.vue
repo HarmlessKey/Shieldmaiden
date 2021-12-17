@@ -79,13 +79,13 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
+							<a class="btn btn-sm bg-neutral-5 mx-1" @click="confirmDelete($event, data.row.key, data.row)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
 								</q-tooltip>
 							</a>
-							<a class="gray-hover" @click="downloadJSON(data.row)">
+							<a class="btn btn-sm bg-neutral-5 mx-1" @click="downloadJSON(data.row)">
 								<i class="fas fa-brackets-curly"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Export JSON
@@ -254,7 +254,7 @@
 			downloadJSON(npc) {
 				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(npc, null ,2)); 
 				var downloadAnchorNode = document.createElement('a'); 
-				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name + ".json");
+				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name.trim() + ".json");
 				document.body.appendChild(downloadAnchorNode);  // required for firefox 
 				downloadAnchorNode.click(); 
 				downloadAnchorNode.remove(); 

@@ -13,9 +13,13 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<a v-if="!npcId" class="btn bg-neutral-5" @click="copy_dialog = true">
+							<a v-if="!npcId" class="btn bg-neutral-5 mx-1" @click="copy_dialog = true">
 								<i class="fas fa-copy"></i>
 								Copy existing NPC
+							</a>
+							<a v-if="!npcId" class="btn bg-neutral-5" @click="import_dialog = true">
+								<i class="fas fa-file-upload"></i>
+								Import an NPC
 							</a>
 						</div>
 						<div v-if="npc" class="d-none d-md-flex name">
@@ -92,17 +96,52 @@
 							</q-item-section>
 							<q-item-section avatar>
 								<a class="neutral-2" @click="copy(npc)">
-								<i class="fas fa-copy blue"/>
-								<q-tooltip anchor="top middle" self="center middle">
-									Copy NPC
-								</q-tooltip>
-							</a>
+									<i class="fas fa-copy blue"/>
+									<q-tooltip anchor="top middle" self="center middle">
+										Copy NPC
+									</q-tooltip>
+								</a>
 							</q-item-section>
 						</q-item>
 					</q-list>
 				</div>
 			</hk-card>
-		</q-dialog>			
+		</q-dialog>		
+		<!-- Import Dialog  -->
+		<q-dialog v-model="import_dialog">
+			<hk-card header="Import NPC from JSON" minwidth="300">
+				<div class="card-body">
+					<q-file 
+						:dark="$store.getters.theme === 'dark'" 
+						filled square 
+						accept=".json"
+						v-model="json_file" 
+						@input="loadJSON()"
+					>
+						<template v-slot:prepend>
+							<q-icon name="attach_file" />
+						</template>
+					</q-file>
+
+					<h4>
+						OR
+					</h4>
+
+					<q-form @submit="parse_JSON_input()">
+						<q-input
+							:dark="$store.getters.theme === 'dark'" 
+							filled square 
+							type="textarea"
+							v-model="json_input"
+							
+						></q-input>
+						<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+							Parse Input
+						</q-btn>
+					</q-form>
+				</div>
+			</hk-card>
+		</q-dialog>
 	</div>
 </template>
 
@@ -140,10 +179,13 @@
 				npc: {},
 				npc_copy: {},
 				copy_dialog: false,
+				import_dialog: false,
 				unsaved_changes: false,
 				search: '',
 				searchResults: [],
 				noResult: '',
+				json_file: undefined,
+				json_input: "",
 				tabs: [
 					{
 						name: "advanced",
@@ -202,7 +244,8 @@
 						this.npc.name = this.npc.name.capitalizeEach();
 					}
 				},
-			}
+			},
+
 		},
 		methods: {
 			...mapActions(["setSlide"]),
@@ -299,6 +342,37 @@
 				else {
 					this.quick = true
 				}
+			},
+			loadJSON() {
+				const fr = new FileReader();
+
+				fr.onload = e => {
+					const result = JSON.parse(e.target.result)
+					// const formatted = JSON.stringify(result, null, 2)
+					// console.log(formatted)
+					delete result.key
+
+					this.npc = result
+					this.import_dialog = false
+					this.json_file = undefined
+
+					console.log(this.npc)
+				}
+
+				fr.readAsText(this.json_file)
+			},
+			parse_JSON_input() {
+
+				try {
+					this.npc = JSON.parse(this.json_input)
+					this.import_dialog = false
+					this.json_input = ""
+				} 
+				catch {
+					console.log("Invalid JSON")
+					this.$snotify.error("Invalid JSON")
+				}
+				
 			}
 		},
 		beforeRouteLeave (to, from, next) {
@@ -312,7 +386,7 @@
 			} else {
 				next()
 			}
-		}
+		},
 	}
 </script>
 

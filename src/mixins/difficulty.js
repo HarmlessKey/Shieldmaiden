@@ -287,15 +287,15 @@ export const difficulty = {
 				multiplier = 6
 			}
 
-			//Adjest multipliers for big or small groups
+			//Adjust multipliers for big or small groups
 			//Group smaller than 3, the multiplier is 1 higher
 			//So for 1 monster you do totalXp*1.5 instead of totalXp*1
 			if(nPlayers < 3) {
-				multiplier = multiplier + 1;
+				multiplier = multiplier + 1 > 6 ? 6 : multiplier + 1;
 			}
 			//For groups larger than 6, you use 1 multiplier lower.
 			if(nPlayers > 6) {
-				multiplier = multiplier - 1;
+				multiplier = multiplier - 1 < 0 ? 0 : multiplier - 1;
 			}
 
 			//Multiply the XP and return the new total

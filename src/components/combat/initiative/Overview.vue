@@ -9,7 +9,7 @@
 				<p>
 					<i class="fas fa-eye-slash white" />
 					Hides the entity from your players on the 
-					<a @click="setSlide({show: true, type: 'PlayerLink' })">track encounter screen</a>.
+					<a @click="setSlide({show: true, type: 'PlayerLink' })">public initiative list</a>.
 				</p>
 				<span>
 					<i class="fas fa-minus white" /> 

@@ -327,7 +327,7 @@
 					total = this.aoeRoll.total;
 				}
 
-				//If it was an open roll, save it, so it will be shared on the track encounter screen.
+				// If it was an open roll, save it, so it will be shared on the public initiative screen.
 				if(!this.demo) {
 					//If the damage is rolled once, show all targets with that roll
 					//Otherwise show 1 target per roll

@@ -10,7 +10,7 @@
 		<p>
 			When you're live, your players can see the initiative list 
 			of your active encounter and you can choose to show them your rolls there as well.
-			Your encounters can be followed with the <a @click="setSlide({show: true, type: 'PlayerLink'})">player link.</a>
+			Your encounters can be followed with your <a @click="setSlide({show: true, type: 'PlayerLink'})">public initiative link.</a>
 		</p>
 		
 		<q-select

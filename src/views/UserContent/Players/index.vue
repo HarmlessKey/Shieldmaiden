@@ -57,10 +57,10 @@
 							</q-tooltip>
 						</router-link>
 						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-								<i class="fas fa-trash-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Delete
-								</q-tooltip>
+							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
 						</a>
 					</div>
 				</hk-table>
@@ -93,7 +93,7 @@
 <script>
 	import _ from 'lodash';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 
@@ -168,6 +168,7 @@
 			}
 		},
 		methods: {
+			...mapActions("players", ["deletePlayer"]),
 			confirmDelete(e, key, player) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -218,7 +219,10 @@
 					}
 				}
 				//Remove player
-				db.ref('players/' + this.userId).child(key).remove(); 
+				this.deletePlayer({ 
+					id:key, 
+					companions: player.companions
+				});
 			}
 		}
 	}

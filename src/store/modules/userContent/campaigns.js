@@ -129,6 +129,26 @@ const actions = {
     }
   },
 
+  /**
+   * Deletes a player to a campaign
+   * 
+   * @param {object} campaign 
+   * @returns {string} the id of the newly added campaign
+   */
+   async delete_player({ rootGetters, commit, dispatch }, { id, playerId }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.deletePlayer(uid, id, playerId);
+        commit("DELETE_PLAYER", { uid, id, playerId });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
    /**
    * Edits and existing campaign
    * It is possible to edit the campaign of another user (for companions)
@@ -182,6 +202,7 @@ const mutations = {
       Vue.set(state.cached_campaigns[uid][id], "players", { [playerId]: player });
     }
   },
+  DELETE_PLAYER(state, { uid, id, playerId }) { Vue.delete(state.cached_campaigns[uid][id].players, playerId); },
   SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
     if(state.cached_campaigns[uid]) {
       Vue.set(state.cached_campaigns[uid], id, campaign);

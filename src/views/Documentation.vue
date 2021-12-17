@@ -84,7 +84,7 @@
 							<p>
 								<b>Background</b><br/>
 								A background image can be added to an encounter, this image is shown on the background (if you choose so) when you run the encounter. 
-								It is also shown on the background of the track encounter screen where your players can follow your active encounter. 
+								It is also shown on the background of the public initiative list where your players can follow your active encounter. 
 								It is mainly for this purpose we added the option of adding a background. It can really give some atmosphere to your encounters.
 							</p>
 
@@ -93,7 +93,7 @@
 								Loot is nothing more than a reminder that shows when you finish an encounter. 
 								You probably have thought of some loot your players might find if they manage to defeat your encounter. 
 								This will give you a simple overview when the encounter has ended. 
-								In your <router-link to="/settings">settings</router-link> you can even choose to you show it to your party on the track encounter screen. 
+								In your <router-link to="/settings">settings</router-link> you can even choose to you show it to your party on the public initiative list. 
 								This is set as hidden by default though.
 							</p>
 

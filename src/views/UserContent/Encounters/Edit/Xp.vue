@@ -37,35 +37,47 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-
+	import { mapActions } from "vuex";
+ 
 	export default {
 		name: 'XP',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			}
+		},
 		data() {
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
 				setOverwrite: false,
-				overwriteAmount: undefined
+				overwriteAmount: undefined,
+				xp: this.encounter.xp
 			} 
 		},
-		firebase() {
-			return {
-				xp: {
-					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp`),
-					asObject: true
-				}
-			}
-		},
 		methods: {
+			...mapActions("encounters", [
+				"set_xp", 
+			]),
 			setOverwriteAmount() {
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/overwrite').set(this.overwriteAmount);
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "overwrite",
+					value: this.overwriteAmount
+				});
 				this.setOverwrite = false;
 				this.overwriteAmount = undefined;
 			},
 			clearOverwrite() {
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/overwrite').remove();
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "overwrite",
+					value: null
+				});
 			}	
 		}
 	}

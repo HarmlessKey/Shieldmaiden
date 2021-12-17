@@ -59,6 +59,14 @@ export class campaignServices {
       throw error;
     });
   }
+
+  async deletePlayer(uid, id, playerId) {
+    CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).remove().then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
   
 
   async deleteCampaign(uid, id) {

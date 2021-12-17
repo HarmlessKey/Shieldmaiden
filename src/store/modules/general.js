@@ -43,14 +43,14 @@ export const general_module = {
 							dispatch("players/fetch_players"),
 							dispatch("npcs/fetch_npcs"),
 							dispatch("campaigns/fetch_campaigns"),
-							dispatch("fetchAllEncounters"),
+							dispatch("encounters/fetch_encounters"),
 						]);
 					})
 					.then(() => {
 						dispatch("checkEncumbrance");
 					})
 					.catch(error => {
-						console.error("Something went wrong while initializing user content", error);
+						throw error
 					});			
 			} else {
 				dispatch("setTheme");

@@ -183,11 +183,19 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
-	import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
-  components: { hkAnimatedInteger },
 		name: 'Overview',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		mixins: [difficulty],
 		data() {
 			return {
@@ -219,19 +227,8 @@
 				}
 			} 
 		},
-		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
-		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'campaign',
 				'overencumbered',
 			]),
 			...mapGetters("npcs", ["npcs"]),
@@ -290,18 +287,28 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchEncounter',
-				'fetchCampaign',
-				'setSlide'
+			...mapActions(['setSlide']),
+			...mapActions("encounters", [
+				"delete_entity",
+				"set_xp"
 			]),
 			remove(id) {
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+				this.delete_entity({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					entityId: id
+				});
 			},
 			async setDifficulty() {
 				this.encDifficulty = await this.difficulty(this.encounter.entities);
 
 				//Store the new xp value for the encounter
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "calculated",
+					value: this.encDifficulty['totalXp']
+				});
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
 			},
 		}

@@ -120,7 +120,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions } from 'vuex';
 
 	export default {
@@ -145,16 +144,22 @@
 			}
 		},
 		methods: {
+			...mapActions("encounters", ["edit_entity"]),
 			...mapActions([
 				'setSlide'
 			]),
 			edit() {
 				this.npc.curHp = this.npc.maxHp;
-				
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${this.encounterId}/entities/${this.npc.key}`).set(
-					this.npc
-				);
-				this.setSlide(false);	
+
+				this.edit_entity({
+					uid: this.userId,
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					entityId: this.npc.key,
+					entity: this.npc
+				}).then(() => {
+					this.setSlide(false);	
+				});
 			}
 		}
 	};

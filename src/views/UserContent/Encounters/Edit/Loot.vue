@@ -157,6 +157,16 @@
 
 	export default {
 		name: 'Loot',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		mixins: [currencyMixin],
 		data() {
 			return {
@@ -177,7 +187,8 @@
 			}
 		},
 		mounted() {
-				const items = db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`);
+			const items = db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`);
+
 			items.on('value', async (snapshot) => {
 				let items = snapshot.val()
 
@@ -208,19 +219,10 @@
 				}
 				this.loading = false;
 			});
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-						})
 		},
 		methods: {
 			...mapActions([
-				'fetchEncounter',
-					'fetchCampaign',
-					'setSlide'
+				'setSlide'
 			]),
 			setCurrency() {
 				delete this.currency['.key'];

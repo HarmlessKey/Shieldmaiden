@@ -231,7 +231,9 @@
 
 	.q-item {
 		background-color: $neutral-8;
-		margin-bottom: 1px;
+		margin-bottom: 3px;
+		border-radius: $border-radius;
+		border: solid 1px $neutral-5;
 
 		.q-item__label--caption {
 			color: $neutral-4;

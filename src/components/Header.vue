@@ -67,7 +67,7 @@
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-							Player link
+							Public initiative
 						</q-tooltip>
 					</a>
 					<a class="icon roll" 

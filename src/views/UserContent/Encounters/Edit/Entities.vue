@@ -101,6 +101,16 @@
 
 	export default {
 		name: 'Entities',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		mixins: [general, dice],
 		components: {
 			ViewMonster
@@ -143,14 +153,6 @@
 			} 
 		},
 		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
-
 			//GET NPCS
 			const monsters = db.ref(`monsters`);
 			monsters.on('value', (snapshot) => {
@@ -173,17 +175,15 @@
 			});
 		},
 		computed: {
-			...mapGetters([
-				'encounter',
-				'campaign'
-			]),
 			...mapGetters("npcs", ["npcs"]),
 			...mapGetters("players", ["players"]),
 		},
 		methods: {
+			...mapActions("encounters", [
+				"add_player_encounter", 
+				"add_npc_encounter"
+			]),
 			...mapActions([
-				'fetchEncounter',
-				'fetchCampaign',
 				'setSlide'
 			]),
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
@@ -270,15 +270,24 @@
 							entity.maxHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
 						}
 					}
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').push(entity);
+					this.add_npc_encounter({
+						campaignId: this.campaignId,
+						encounterId: this.encounterId,
+						npc: entity
+					});
 				}
 
 				// PLAYER
 				else if (type == 'player') {
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
+					this.add_player_encounter({
+						campaignId: this.campaignId,
+						encounterId: this.encounterId,
+						playerId: id,
+						player: entity
+					});
 					const companions = this.players[id].companions;
 					for (let key in companions) {
-						this.add(e, key, 'companion', this.npcs[key].name , true, false, id )
+						this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
 					}
 				}
 
@@ -286,7 +295,12 @@
 				else if (type == 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).set(entity);
+					this.add_player_encounter({
+						campaignId: this.campaignId,
+						encounterId: this.encounterId,
+						playerId: id,
+						player: entity
+					});
 				}
 
 				// NOTIFICATION

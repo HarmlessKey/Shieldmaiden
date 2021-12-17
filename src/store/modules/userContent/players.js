@@ -108,11 +108,34 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_player({ rootGetters, commit, dispatch }, id) {
+  async delete_player({ rootGetters, commit, dispatch }, { id, companions }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const campaigns = rootGetters["campaigns/campaigns"];
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
+        console.log(campaigns)
+        console.log(companions)
+        // for(let campaignId in campaigns) {
+				// 	//Remove player from campaigns
+        //   await dispatch("campaigns/delete_player", { id: campaignId, playerId: id  });
+				// 	// db.ref('campaigns/' + uid + '/' + campaignId + '/players').child(id).remove();
+
+				// 	//Go over all encounters of the campaign
+				// 	if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaignId) > -1) {
+				// 		for(let enc in this.allEncounters[campaignId]) {
+
+				// 			//Go over all entities in the encounter
+				// 			// db.ref(`encounters/${uid}/${campaignId}/${enc}/entities`).child(id).remove();
+
+				// 			// Remove companions from each encounter
+				// 			for (let comp_key in companions) {
+				// 				// db.ref(`encounters/${uid}/${campaignId}/${enc}/entities`).child(comp_key).remove();
+				// 			}
+				// 		}
+				// 	}
+				// }
+
         await services.deletePlayer(uid, id);
         commit("REMOVE_CACHED_PLAYER", { uid, id });
         return;

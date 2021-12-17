@@ -245,9 +245,9 @@
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				encounters: {},
 				campaign: {},
 				newEncounter: "",
-				copy: window.location.host + "/track-encounter/" + this.$store.getters.user.uid,
 				add: false,
 				currentPage: 1,
 				collapsed: false,
@@ -302,21 +302,20 @@
 				uid: this.user.uid,
 				id: this.campaignId
 			}).then((campaign) => {
-				console.log(campaign)
 				this.campaign = campaign;
 				this.setCurHp(campaign.players);
 				this.removeGhostPlayers(campaign.players);
 				this.checkAdvancement(campaign);
+				this.set_active_campaign(this.campaignId);
 			});
-			this.fetchEncounters({
-				cid: this.campaignId
-			}),
-			this.set_active_campaign(this.campaignId);
+
+			await this.get_campaign_encounters(this.campaignId).then(encounters => {
+				this.encounters = encounters;
+			});		
 		},
 		computed: {
 			...mapGetters([
 				"tier",
-				"encounters",
 				"overencumbered",
 				"content_count",
 				"side_collapsed",
@@ -363,16 +362,16 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchEncounters',
-				'setActiveCampaign',
-				"setSlide"
+			...mapActions(["setSlide"]),
+			...mapActions("encounters", [
+				"get_campaign_encounters",
+				"add_encounter",
+				"delete_encounter"
 			]),
 			...mapActions("campaigns", [
 				"get_campaign",
 				"set_active_campaign"
 			]),
-
 			addEncounter() {
 				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
 					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
@@ -393,14 +392,14 @@
 			deleteEncounter(e, key, encounter) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+					this.delete_encounter(this.campaignId, key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
 						timeout: 5000,
 						buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-								db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+								this.delete_encounter(this.campaignId, key);
 								this.$snotify.remove(toast.id); 
 							}, bold: false 
 						},
@@ -431,7 +430,6 @@
 							entity.curHp = entity.maxHp
 						}
 						entity.initiative = 0;
-
 
 						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
 
@@ -512,9 +510,6 @@
 	}
 	.live {
 		cursor: pointer;
-	}
-	.copy {
-		word-wrap: break-word;
 	}
 	.broadcast {
 		cursor: pointer;

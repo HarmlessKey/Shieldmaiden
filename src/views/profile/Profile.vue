@@ -141,11 +141,11 @@
 				</hk-card>
 			</div>
 
-			<!-- PLAYER LINK -->
+			<!-- PUBLIC INITIATIE LINK -->
 			<div class="col">
 				<hk-card>
 					<div class="card-header" slot="header">
-						<span><i class="fas fa-link"></i> Player Link</span>
+						<span><i class="fas fa-link"></i> Public initiative Link</span>
 					</div>
 					<div class="card-body">
 						<PlayerLink />

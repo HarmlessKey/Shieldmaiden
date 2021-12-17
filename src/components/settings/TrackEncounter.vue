@@ -1,11 +1,11 @@
 <template>
 	<div class="card-body">
 		<p>
-			Track encounter is what we call the link you can share with your party, 
-			or put up on a second screen for your party to see. 
-			In here players can follow the encounter, 
-			see who's turn it is and what the status of the entities within the encounter is. 
-			Below you can determine what should be visible on the track encounter screen.
+			The public initiative list is accessable through a link you can share with your party, 
+			or you can put it up on a second screen for your party to see. 
+			In here players can follow the encounter, see who's turn it is and what the status 
+			of the entities within the encounter is. Below you can determine what should be 
+			visible on the public initiative list.
 		</p>
 		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="d-block mb-3">
 			Share your adventures

@@ -93,7 +93,8 @@
 										v-if="!campaign.background" 
 										class="white text-shadow-3 link" 
 										target="_blank" rel="noopener"
-										href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+										href="https://www.vecteezy.com/free-vector/fantasy-landscape"
+									>
 										Image by Vecteezy
 									</a>
 								</div>
@@ -108,20 +109,23 @@
 
 									<div class="mb-1">
 										<a class="btn btn-clear btn-sm" @click="edit_players = { show: true, campaign: campaign.key }">
-											<i class="fas fa-users mr-1 neutral-2"></i>
+											<i class="fas fa-users mr-1 neutral-2" />
 											{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
 											players
 										</a>
 									</div>
 									
 									<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
-										<i class="fas fa-swords mr-2 neutral-2"></i>
-										<template v-if="allEncounters && allEncounters[campaign.key]">
-											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
-												{{ Object.keys(allEncounters[campaign.key]).length }}
+										<i class="fas fa-swords mr-2 neutral-2" />
+											<span 
+												:class="{ 
+													'green': campaign.encounters > 0, 
+													'red': campaign.encounters >= tier.benefits.encounters 
+												}"
+											>
+												{{ campaign.encounters }}
 											</span>
-										</template>
-										<span v-else> 0</span> encounters
+											encounters
 									</router-link>
 									
 									<div class="mt-4">
@@ -131,7 +135,7 @@
 										<a @click="edit_players = { show: true, campaign: campaign.key }" v-else-if="!campaign.players" class="btn">
 											<i class="fas fa-plus"></i> Add players
 										</a>
-										<router-link :to="`${$route.path}/${campaign.key}`" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn">
+										<router-link :to="`${$route.path}/${campaign.key}`" v-else-if="!campaign.encounters" class="btn">
 											<i class="fas fa-swords"></i> Add encounters
 										</router-link>
 										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
@@ -230,10 +234,10 @@
 </template>
 
 <script>
-	import _ from 'lodash'
+	import _ from 'lodash';
 	
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
 	import EditCampaign from "./EditCampaign";
@@ -276,7 +280,6 @@
 			}
 		},
 		mounted() {
-			this.clearEncounters()
 			this.assignPlayers()
 		},
 		computed: {
@@ -287,16 +290,19 @@
 				'userInfo',
 				'allEncounters',
 				'overencumbered',
-				'content_count',
-				'active_campaign'
+				'content_count'
 			]),
+			...mapGetters("encounters", ["encounters"]),
 			...mapGetters("campaigns", ["campaigns"]),
 			...mapGetters("players", ["players"]),
 			_campaigns: function() {
-				return _.chain(this.campaigns)
+				const vm = this;
+				return _.chain(JSON.parse(JSON.stringify(this.campaigns)))
 				.filter(function(campaign, key) {
-					campaign.key = key
-					return campaign
+					campaign.key = key;
+					campaign.encounters = (vm.encounters[key]) ? Object.keys(vm.encounters[key]).length : 0;
+
+					return campaign;
 				})
 				.orderBy(function(campaign){
 					return parseInt(campaign.timestamp)
@@ -304,14 +310,10 @@
 				.value()
 			},
 			slotsLeft() {
-				return this.tier ? this.tier.benefits.campaigns - Object.keys(this.campaigns).length : 0;
+				return this.tier ? this.tier.benefits.campaigns - this.content_count.campaigns : 0;
 			}
 		},
 		methods: {
-			...mapActions([
-				'clearEncounters',
-				'deleteCampaign',
-			]),
 			addCampaign() {
 				if ((this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
 					db.ref('campaigns/' + this.user.uid).push({

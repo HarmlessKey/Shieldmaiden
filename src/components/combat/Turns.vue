@@ -39,7 +39,7 @@
 						</q-item>
 						<q-item clickable v-close-popup @click="setSlide({show: true, type: 'settings/TrackEncounter'})">
 							<q-item-section avatar><i class="fas fa-desktop"></i></q-item-section>
-							<q-item-section>Track settings</q-item-section>
+							<q-item-section>Public initiatve settings</q-item-section>
 						</q-item>
 						<q-item clickable v-close-popup v-if="demo" @click="reload">
 							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>

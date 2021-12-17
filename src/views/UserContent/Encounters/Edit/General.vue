@@ -114,13 +114,23 @@
 </template>
 
 <script>
-    import { db } from '@/firebase';
-	import { mapActions, mapGetters } from 'vuex';
+	import { mapActions } from "vuex";
+
 	import EditWeather from './Weather';
 	import { audio } from '@/mixins/audio';
 
 	export default {
 		name: 'General',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		components: {
 			EditWeather,
 			Weather: () => import('@/components/weather')
@@ -143,34 +153,30 @@
 				},
 			} 
 		},
-		computed: {
-			...mapGetters([
-				'encounter',
-			]),
-		},
 		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			})
-
 			if(this.encounter && this.encounter.weather) {
 				this.weather = this.encounter.weather;
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchEncounter'
-			]),
+			...mapActions("encounters", ["edit_encounter"]),
 			edit() {
 				this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).update(
-					this.encounter
-				);
-				this.$snotify.success('Saved.', 'Critical hit!', {
-					position: "rightTop"
-				});
+				this.edit_encounter({
+					uid: this.user.uid,
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					value: this.encounter
+				}).then(() => {
+					this.$snotify.success('Saved.', 'Critical hit!', {
+						position: "rightTop"
+					});
+				}).catch(() => {
+					this.$snotify.error('Something went wrong saving the encounter.', 'Save failed', {
+						position: "rightTop"
+					});
+				})
 			},
 			intensity(type) {
 				const value = this.weather[type];

@@ -244,7 +244,10 @@
 				}
 
 				if(!entry.name) {
-					entry.name = "Nameless NPC";
+					entry.name = "nameless npc";
+				}
+				else {
+					entry.name = entry.name.toLowerCase();
 				}
 				if(entry.lengendary_count) {
 					entry.legendary_count = entry.lengendary_count;

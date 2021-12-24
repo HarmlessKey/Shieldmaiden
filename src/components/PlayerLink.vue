@@ -10,7 +10,7 @@
 					Let your players follow a live initiative list. 
 				</p>
 				<q-input
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					:value="copy"
 					autocomplete="off"
 					type="text"

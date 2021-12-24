@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Damage / heal</h2>
+		<h2>Do damage / heal</h2>
 		
 		<ul class="targets">
 			<li v-for="(target, i) in targeted" :key="`target=${i}`">
@@ -58,7 +58,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 </style>

@@ -154,13 +154,13 @@
 			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
 				this.setLiveEncounter(this.$route.params.encid);
 			}
-			this.init_Encounter({
+		},
+		async mounted() {
+			await this.init_Encounter({
 				cid: this.$route.params.campid, 
 				eid: this.$route.params.encid,
 				demo: this.demo
 			});
-		},
-		mounted() {
 			this.$nextTick(function() {
 				window.addEventListener('resize', this.setSize);
 				//Init
@@ -171,13 +171,13 @@
 		computed: {
 			...mapGetters([
 				'encounter',
-				'players',
 				'campaigns',
 				'entities',
 				'initialized',
 				'overencumbered',
 				'broadcast'
 			]),
+			...mapGetters("players", ["players"]),
 			_active: function() {
 				let order = (this.settings && this.settings.initOrder) ? 'asc' : 'desc'; 
 
@@ -338,7 +338,7 @@
 .combat-wrapper {
 	background-size: cover !important;
 	background-position: center bottom !important;
-	background-color:$gray-dark;
+	background-color: $neutral-10;
 	height: calc(100vh - 50px);
 
 	.finished {
@@ -392,7 +392,7 @@
 		"menu";
 
 		#turns {
-			border-bottom: solid 1px#191919;
+			border-bottom: solid 1px $neutral-9;
 		}
 		#current {
 			z-index: 90;

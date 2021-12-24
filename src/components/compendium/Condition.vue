@@ -2,9 +2,7 @@
 	<tag :is="cardView ? 'hk-card' : 'div'">
 		<div slot="header" :class="{ 'card-header': cardView }">
 			<h1>
-				<svg class="icon" viewBox="0 0 512 512">
-					<path :d="condition.icon" fill-opacity="1"></path>
-				</svg>
+				<i :class="`hki-${condition.value}`" />
 				{{ condition.name }}
 			</h1>
 		</div>
@@ -35,10 +33,11 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Condition',
+		mixins: [conditions],
 		props: {
 			id: {
 				type: String,
@@ -51,7 +50,6 @@
 		},
 		data() {
 			return {
-				loading: true,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",
@@ -62,25 +60,22 @@
 				]
 			}
 		},
-		firebase() {
-			return {
-				condition: {
-					source: db.ref(`conditions/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.condition.name),
-				}
+		computed: {
+			condition() {
+				return this.conditionList.filter(item => {
+					return item.value === this.id;
+				})[0];
+			}
+		},
+		beforeMount() {
+			if(this.$route.name === 'Condition') {
+				this.$root.$emit('route-name', this.condition.name);
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	svg.icon {
-		width: 20px;
-		height: 20px;
-		margin-right: 5px;
-		fill: $gray-light;
-	}
 	ul {
 		margin-top: 20px;
 		padding-left: 20px;

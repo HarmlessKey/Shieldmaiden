@@ -11,7 +11,7 @@
 			
 			<ul class="entities hasImg">
 				<li v-for="(item, index) in items" :key="index">
-					<i class="img mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
+					<i class="icon neutral-2 mr-2" :class="item.icon"></i> <router-link :to="$route.path+'/'+item.url">{{ item.name }}</router-link>
 				</li>
 			</ul>
 		</div>
@@ -28,7 +28,7 @@
 					'conditions': { 
 						name: 'Conditions',
 						url: 'conditions',
-						icon: 'fas fa-skull-crossbones',
+						icon: 'fas fa-flame',
 					},
 					'items': { 
 						name: 'Items',
@@ -47,19 +47,14 @@
 					},
 				},
 			}
-		},
-		beforeMount() {
-			//Because the component is loaded in another view, 
-			//the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	ul.entities {
 		li {
-			.img {
+			.icon {
 				border: none;
 				background: none;
 				text-align: center;

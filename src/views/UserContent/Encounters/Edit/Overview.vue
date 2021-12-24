@@ -63,7 +63,7 @@
 				</div>
 				<h3 v-else class="neutral-3">Calculating difficulty...</h3>
 			</div>
-			<q-scroll-area dark class="bg-neutral-6" :thumb-style="{ width: '5px'}">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" class="bg-neutral-6" :thumb-style="{ width: '5px'}">
 				<div class="overview">          
 					<template v-if="encounter">
 						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
@@ -74,21 +74,34 @@
 							:columns="entityColumns"
 							:showHeader="false"
 						>
-							<template slot="image" slot-scope="data">
-								<template v-if="data.row.entityType === 'player'">
-									<span v-if="players[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"></span>
-									<icon v-else icon="player" class="image" />
-								</template>
-								<template v-if="data.row.entityType === 'companion'">
-									<span v-if="npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-									<icon v-else icon="companion" class="image" />
-								</template>
-								<template v-else-if="data.row.entityType === 'npc'">
-									<span v-if="data.row.avatar" class="image" :style="{ backgroundImage: 'url(\'' + data.row.avatar + '\')' }"></span>
-									<span v-else-if="data.row.npc === 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" class="image" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }"></span>
-									<icon v-else-if="data.row.friendly" icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
-								</template>
-							</template>
+							<div slot="image" slot-scope="data">
+								<!-- Player avatar -->
+								<span 
+									v-if="data.row.entityType === 'player'" 
+									:style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"
+									class="image"
+								>
+									<i v-if="!players[data.row.id].avatar" class="hki-player" />
+								</span>
+
+								<!-- Companion avatar -->
+								<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }">
+									<i v-if="!npcs[data.row.id].avatar" class="hki-companion" />
+								</span>
+
+								<!-- Friendly NPC avatar -->
+								<span 
+									v-else-if="data.row.entityType === 'npc'"
+									class="image" 
+									:style="{ 
+										backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+										'border-color': data.row.color_label ? data.row.color_label : ``,
+										'color': data.row.color_label ? data.row.color_label : ``
+									}"
+								>
+									<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+								</span>
+							</div>
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="green">
@@ -122,21 +135,18 @@
 							:columns="entityColumns"
 							:showHeader="false"
 						>
-							<template slot="image" slot-scope="data">
-								<span v-if="data.row.avatar" class="image" 
-									:style="{
-										backgroundImage: 'url(\'' + data.row.avatar + '\')',
-										'border-color': data.row.color_label ? data.row.color_label : ``
-									}" />
-								<span 
-									v-else-if="data.row.npc == 'custom' && npcs[data.row.id] && npcs[data.row.id].avatar" 
-									class="image" 
-									:style="{ 
-										backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')', 
-										'border-color': data.row.color_label ? data.row.color_label : ``
-									}" />
-								<icon v-else icon="monster" class="image" :style="data.row.color_label ? `border-color: ${data.row.color_label}` : ``" :fill="data.row.color_label" />
-							</template>
+							<span 
+								slot="image" 
+								slot-scope="data"
+								class="image" 
+								:style="{ 
+									backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+									'border-color': data.row.color_label ? data.row.color_label : ``,
+									'color': data.row.color_label ? data.row.color_label : ``
+								}"
+							>
+								<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+							</span>
 
 							<!-- NAME -->
 							<span slot="name" slot-scope="data" class="red">
@@ -173,11 +183,19 @@
 	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
-import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-integer.vue';
 
 	export default {
-  components: { hkAnimatedInteger },
 		name: 'Overview',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		mixins: [difficulty],
 		data() {
 			return {
@@ -196,7 +214,7 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 				},
 				entityColumns: {
 					image: {
-						width: 46,
+					width: 46,
 						noPadding: true
 					},
 					name: {
@@ -209,23 +227,13 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 				}
 			} 
 		},
-		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
-		},
 		computed: {
 			...mapGetters([
-				'encounter',
-				'campaign',
-				'players',
-				'npcs',
 				'overencumbered',
-				]),
+			]),
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("players", ["players"]),
+			
 			// eslint-disable-next-line
 			async _excludeFriendlies() {
 				if(this.encounter) {
@@ -279,18 +287,28 @@ import hkAnimatedInteger from '../../../../components/hk-components/hk-animated-
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchEncounter',
-				'fetchCampaign',
-				'setSlide'
-				]),
+			...mapActions(['setSlide']),
+			...mapActions("encounters", [
+				"delete_entity",
+				"set_xp"
+			]),
 			remove(id) {
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/entities').child(id).remove();
+				this.delete_entity({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					entityId: id
+				});
 			},
 			async setDifficulty() {
 				this.encDifficulty = await this.difficulty(this.encounter.entities);
 
 				//Store the new xp value for the encounter
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "calculated",
+					value: this.encDifficulty['totalXp']
+				});
 				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
 			},
 		}

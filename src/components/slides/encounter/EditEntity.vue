@@ -19,7 +19,7 @@
 			</a>
 			<q-input 
 				v-if="entity.entityType === 'npc'"
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Name"
 				autocomplete="off"
 				type="text" 
@@ -32,7 +32,7 @@
 
 			<div class="d-flex justify-content-between mb-2">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Initiative"
 					autocomplete="off"
 					type="number" 
@@ -46,7 +46,7 @@
 				<!-- Color label (Only for NPC's) -->
 				<q-input
 					v-if="entity.entityType === 'npc'"
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					v-model="entity.color_label"
 					label="Color label"
 					readonly
@@ -60,7 +60,7 @@
 								transition-hide="scale"
 							>
 								<q-color 
-									square dark
+									square :dark="$store.getters.theme === 'dark'"
 									v-model="entity.color_label" 
 									:palette="hkColors" 
 									default-view="palette"
@@ -76,7 +76,7 @@
 			<hr>
 			<div class="d-flex justify-content-between">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="AC Bonus"
 					autocomplete="off"
 					type="number" 
@@ -86,7 +86,7 @@
 					@change="editValue('ac_bonus', entity.ac_bonus)"></q-input>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="Temp HP"
 					autocomplete="off"
 					type="number" 
@@ -97,7 +97,7 @@
 					@change="editValue('tempHp', entity.tempHp)"></q-input>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label-slot
 					autocomplete="off"
 					type="number" 
@@ -119,7 +119,7 @@
 			<h2 class="mb-2">Override</h2>
 			<div class="d-flex justify-content-between">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label-slot
 					autocomplete="off"
 					class="mr-1"
@@ -135,7 +135,7 @@
 					</template>
 				</q-input>
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label-slot
 					autocomplete="off"
 					class="mr-1"
@@ -153,7 +153,7 @@
 				</q-input>
 
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					autocomplete="off"
 					label-slot
 					type="number" 
@@ -186,7 +186,7 @@
 
 				<!-- NPC DISPLAY SETTING -->
 				<q-select 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					v-for="(setting, index) in npcsOptions"
 					:options="setting.options"
 					:value="index"
@@ -235,7 +235,7 @@
 		<!-- MULTIPLE ENTITIES -->
 		<template v-else-if="edit_targets.length > 1">
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="AC Bonus"
 				autocomplete="off"
 				type="number" 
@@ -246,7 +246,7 @@
 			/>
 
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Temp HP"
 				autocomplete="off"
 				type="number" 
@@ -258,7 +258,7 @@
 			/>
 
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Max HP Modifier"
 				autocomplete="off"
 				type="number" 
@@ -465,7 +465,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 	.q-input {

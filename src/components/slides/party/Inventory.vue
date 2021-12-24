@@ -23,7 +23,7 @@
 							</q-tooltip>
 						</span>
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square
 							:label="coin.name"
 							class="text-center"
 							autocomplete="off" 
@@ -72,7 +72,7 @@
 								{{ data.row.identified ? 'Identified' : 'Not Identified' }}
 							</q-tooltip>
 						</a>
-						<span v-else class="gray-hover mr-1">
+						<span v-else class="neutral-3 mr-1">
 							<i class="far fa-unlink"></i>
 							<q-tooltip anchor="top middle" self="center middle">
 								No linked item
@@ -268,7 +268,7 @@
 		}
 	}
 	.addCurrency {
-		border-top: solid 1px$gray-hover;
+		border-top: solid 1px $neutral-4;
 		margin-top: 20px; 
 		padding-top: 20px;
 			

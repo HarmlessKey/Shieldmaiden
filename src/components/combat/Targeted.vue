@@ -1,5 +1,5 @@
 <template>
-	<div id="targeted">
+	<div id="targeted" class="bg-neutral-6-transparent">
 		<h2 class="componentHeader" :class="{ shadow : setShadow > 0 }">
 
 			<div class="d-flex justify-content-between">
@@ -114,7 +114,7 @@
 				</a>
 			</div>
 		</h2>
-		<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
+		<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scroll">
 			<div class="current">
 				<!-- SINGLE TARGET -->
 				<template v-if="targeted.length === 1">
@@ -126,7 +126,7 @@
 					<div v-for="key in targeted" :key="`target-${key}`" class="target">
 						<div class="health">
 							<TargetItem :item="key" />
-							<a class="clear bg-gray-dark" @click="set_targeted({type: 'untarget', key})">
+							<a class="clear" @click="set_targeted({type: 'untarget', key})">
 								<i class="fas fa-times red"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Untarget
@@ -156,7 +156,7 @@
 										} : null"
 									>
 										<div class="abilityName">{{ ability.substring(0,3).toUpperCase() }}</div>
-										<div class="mod bg-gray-dark">
+										<div class="mod bg-neutral-8">
 											{{ modifier(entities[key][ability]) }}
 										</div>
 									</hk-roll>
@@ -175,7 +175,7 @@
 											entity_key: key
 										} : null"
 									>
-										<div class="mod bg-gray-dark">
+										<div class="mod bg-neutral-8">
 											{{ savingThrow(entities[key], ability) }}
 										</div>
 									</hk-roll>
@@ -362,7 +362,6 @@
 
 <style lang="scss" scoped>
 #targeted {
-	background: rgba(38, 38, 38, .9);
 	grid-area: targeted;
 	overflow: hidden;
 	
@@ -380,6 +379,9 @@
 	h2.componentHeader {
 		padding: 10px 15px 10px 10px !important;
 		margin-bottom: 0 !important;
+		line-height: 31px;
+		background-color: $neutral-8-transparent;
+		font-size: 18px;
 
 		&.shadow {
 			box-shadow: 0 0 10px rgba(0,0,0,0.9); 
@@ -393,7 +395,7 @@
 		grid-template-columns: 1fr 35px;
 		grid-template-rows: 35px;
 		grid-gap: 0;
-		background:$gray-dark;
+		background: $neutral-8;
 
 		.clear {
 			display: block;
@@ -406,7 +408,9 @@
 	}
 	.target {
 		margin-bottom: 10px;
-		border: solid 1px$gray-dark;
+		border: solid 1px $neutral-5;
+		border-radius: $border-radius-small;
+		background-color: $neutral-6;
 		
 		.scores {
 			width: 100%;
@@ -428,12 +432,12 @@
 					margin-top: 1px;
 				}
 				.advantage .mod:hover {
-					color:$neutral-1;
+					color: $neutral-1;
 					background-color: $green !important;
 				}
 				.disadvantage .mod:hover {
-					color:$neutral-1;
-					background-color:$red !important;
+					color: $neutral-1;
+					background-color: $red !important;
 				}
 			}
 		}
@@ -442,18 +446,19 @@
 		margin: 20px -3px 0 -3px;
 
 		a {
-			background-color: $gray-light;
+			background-color: $neutral-3;
 			margin: 0 3px;
 			display: block;
 			width: 100%;
 			text-align: center;
-			color:$gray-dark !important;
+			color: $neutral-10 !important;
 			line-height: 35px;
 			font-size: 15px;
+			border-radius: $border-radius-small;
 
 			&:hover {
-				background:$gray-hover;
-				color:$neutral-1 !important;
+				background: $neutral-4;
+				color: $neutral-2 !important;
 			}
 		}
 	}
@@ -471,9 +476,9 @@
 			height: 30px;
 			line-height: 26px;
 			text-align: center;
-			fill:$red;
-			color:$red;
-			background-color:$gray-active;
+			fill: $red;
+			color: $red;
+			background-color: $neutral-7;
 			padding: 2px;
 			cursor: pointer;
 		}

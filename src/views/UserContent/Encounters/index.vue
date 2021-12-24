@@ -1,7 +1,5 @@
 <template>
-	<div class="content">
-		<Crumble />
-
+	<div>
 		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
 			{{ campaign.campaign }}
 			<span 
@@ -54,7 +52,7 @@
 								<q-form @submit="addEncounter">
 									<h2 class="mt-0">First encounter</h2>
 										<q-input
-											dark filled square
+											:dark="$store.getters.theme === 'dark'" filled square
 											label="Encounter title" 
 											type="text" 
 											autocomplete="off"
@@ -84,8 +82,8 @@
 									</template>
 								</template>
 								<template slot="entities" slot-scope="data">
-									<router-link :to="'/encounters/' + campaignId + '/' + data.row.key">
-										<span class="gray-light" v-if="data.row.entities">
+									<router-link :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
+										<span class="neutral-1" v-if="data.row.entities">
 											{{ Object.keys(data.row.entities).length }}
 										</span>
 										<template v-else><i class="fas fa-plus"></i> Add</template>
@@ -113,7 +111,7 @@
 										<a v-else class="disabled btn btn-sm bg-neutral-5">
 											<i class="fas fa-play"></i>
 										</a>
-										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/encounters/' + campaignId + '/' + data.row.key">
+										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
 											<i class="fas fa-pencil-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Edit
@@ -140,7 +138,7 @@
 								:currentPage="currentPage"
 							>
 								<template slot="encounter" slot-scope="data">
-									<router-link class="gray-light" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+									<router-link class="neutral-2" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
 										{{ data.item }}
 										<q-tooltip anchor="top middle" self="center middle">
 											Run encounter
@@ -185,7 +183,7 @@
 
 				<!-- PLAYERS -->
 				<div class="col-12 col-md-5">
-					<Players :userId="user.uid" :campaignId="campaignId" />
+					<Players :userId="user.uid" :campaignId="campaignId" card-view />
 				</div>
 			</div>
 		</template>
@@ -201,7 +199,7 @@
 					<hk-card header="New encounter" class="mb-0">
 						<div class="card-body">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Encounter title"
 								type="text" 
 								autocomplete="off" 
@@ -210,8 +208,8 @@
 							/>
 						</div>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn v-close-popup class="mr-1" type="cancel">Cancel</q-btn>
-							<q-btn color="primary" type="submit" label="Add encounter" />
+							<q-btn v-close-popup class="mr-1" no-caps type="cancel">Cancel</q-btn>
+							<q-btn color="primary" type="submit" no-caps label="Add encounter" />
 						</div>
 					</hk-card>
 				</q-form>
@@ -247,8 +245,9 @@
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				encounters: {},
+				campaign: {},
 				newEncounter: "",
-				copy: window.location.host + "/track-encounter/" + this.$store.getters.user.uid,
 				add: false,
 				currentPage: 1,
 				collapsed: false,
@@ -298,31 +297,31 @@
 				}
 			}
 		},
-		mounted() {
-			this.fetchEncounters({
-				cid: this.campaignId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			}),
-			this.setCurHp();
-			this.removeGhostPlayers();
-			this.setActiveCampaign({ 
-				campaign_id: this.campaignId 
+		async mounted() {
+			await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			}).then((campaign) => {
+				this.campaign = campaign;
+				this.setCurHp(campaign.players);
+				this.removeGhostPlayers(campaign.players);
+				this.checkAdvancement(campaign);
+				this.set_active_campaign(this.campaignId);
 			});
+
+			await this.get_campaign_encounters(this.campaignId).then(encounters => {
+				this.encounters = encounters;
+			});		
 		},
 		computed: {
 			...mapGetters([
 				"tier",
-				"encounters",
 				"overencumbered",
 				"content_count",
-				"campaign",
-				"players",
-				"playerInCampaign",
 				"side_collapsed",
 				"broadcast"
 			]),
+			...mapGetters("players", ["players"]),
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -353,7 +352,7 @@
 				//If not, it is set on mounted
 				let check = false;
 				if(this.campaign) {
-					for(var key in this.campaign.players) {
+					for(const key in this.campaign.players) {
 						if(this.campaign.players[key].curHp == undefined) {
 							check = true;
 						}
@@ -362,17 +361,16 @@
 				return check;
 			}
 		},
-		watch: {
-			campaign() {
-				this.checkAdvancement();
-			}
-		},
 		methods: {
-			...mapActions([
-				'fetchEncounters',
-				'fetchCampaign',
-				'setActiveCampaign',
-				"setSlide"
+			...mapActions(["setSlide"]),
+			...mapActions("encounters", [
+				"get_campaign_encounters",
+				"add_encounter",
+				"delete_encounter"
+			]),
+			...mapActions("campaigns", [
+				"get_campaign",
+				"set_active_campaign"
 			]),
 			addEncounter() {
 				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
@@ -394,14 +392,14 @@
 			deleteEncounter(e, key, encounter) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+					this.delete_encounter(this.campaignId, key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
 						timeout: 5000,
 						buttons: [
 						{
 							text: 'Yes', action: (toast) => { 
-								db.ref('encounters/' + this.user.uid + '/' + this.campaignId).child(key).remove();
+								this.delete_encounter(this.campaignId, key);
 								this.$snotify.remove(toast.id); 
 							}, bold: false 
 						},
@@ -433,7 +431,6 @@
 						}
 						entity.initiative = 0;
 
-
 						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
 
 						//CLEAR LOG
@@ -448,10 +445,10 @@
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
 			},
-			setCurHp() {
+			setCurHp(players) {
 				if(this.noCurHp) {
 					//Stores player with curHp under campaign
-					for(var key in this.campaign.players) {
+					for(const key in players) {
 						if(this.campaign.players[key].curHp === undefined) {
 							db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
 								curHp: this.players[key].maxHp
@@ -461,8 +458,8 @@
 					this.noCurHp = false;
 				}
 			},
-			checkAdvancement() {
-				if(!this.campaign.advancement) {
+			checkAdvancement(campaign) {
+				if(!campaign.advancement) {
 					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?' ,'Set advancement', {
 						timeout: 0,
 						buttons: [
@@ -482,9 +479,9 @@
 					});
 				}
 			},
-			removeGhostPlayers() {
+			removeGhostPlayers(campaignPlayers) {
 				const players = Object.keys(this.players);
-				for(let key in this.campaign.players) {
+				for(let key in campaignPlayers) {
 					if(!players.includes(key)) {
 						// eslint-disable-next-line
 						console.error('Ghost Player Removed: ', key);
@@ -513,9 +510,6 @@
 	}
 	.live {
 		cursor: pointer;
-	}
-	.copy {
-		word-wrap: break-word;
 	}
 	.broadcast {
 		cursor: pointer;

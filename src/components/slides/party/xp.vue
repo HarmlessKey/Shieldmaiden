@@ -2,18 +2,17 @@
 	<div>
 		<h2>Award Experience</h2>
 		<q-input 
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			label="Amount"
 			class="text-center mb-3"
 			type="number" 
-			name="amount" 
 			v-model="amount"
 		/>
 
 		<h3 class="mt-3">Award experience to:</h3>
 		<div v-for="(player, key) in campaign.players" :key="key">
 			<q-checkbox 
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				v-model="awardTo" 
 				:val="key" 
 			>
@@ -28,11 +27,9 @@
 			v-model="awardType"
 			spread
 			no-caps
-			flat
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			:options="options"
-			toggle-color="primary"
-			class="mt-3"
+			toggle-color="green"
 		/>
 
 		<button class="btn btn-block my-3" @click="awardXP()">Award XP</button>

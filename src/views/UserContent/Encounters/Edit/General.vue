@@ -1,93 +1,108 @@
 <template>
   <div>
 		<h3>General settings</h3>
-		<q-input
-			dark filled square
-			label="Name"
-			autocomplete="off"
-			class="mb-3"
-			v-validate="'required'" 
-			data-vv-as="Encounter Name" 
-			type="text" 
-			name="name" 
-			v-model="encounter.encounter"/>
-		<p class="validate red" v-if="errors.has('name')">{{ errors.first('name') }}</p>
+		<ValidationObserver  v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(edit)" greedy>
+				<ValidationProvider rules="required" name="Name" v-slot="{ errors, invalid, validated }">
+					<q-input
+						:dark="$store.getters.theme === 'dark'" filled square
+						label="Name"
+						autocomplete="off"
+						class="mb-3"
+						v-model="encounter.encounter"
+						:error="invalid && validated"
+						:error-message="errors[0]"
+					/>
+				</ValidationProvider>
 
-		<div class="audio">
-			<div 
-				v-if="encounter.audio && !errors.has('audio')" 
-				class="img pointer" >
-				<a :href="encounter.audio" target="_blank" rel="noopener">
-					<q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon>
-				</a>
-			</div>
-			<div class="img" v-else>
-				<q-icon name="fas fa-music-alt"/>
-			</div>
-			<div>
-				<q-input 
-					dark filled square
-					label="Audio"
-					autocomplete="off" 
-					:rules="[ val => (!val ||  url_or_uri(val)) || 'Not a valid URL or URI']"
-					name="audio" 
-					v-model="encounter.audio" 
-					placeholder="Audio URL"/>
-			</div>
-		</div>
+				<ValidationProvider rules="audio" name="Audio" v-slot="{ errors, invalid, validated }">
+					<div class="audio">
+						<div 
+							v-if="encounter.audio && !invalid" 
+							class="img pointer" >
+							<a :href="encounter.audio" target="_blank" rel="noopener">
+								<q-icon :class="audio_icons[audio_link_type].icon" :style="`color:${audio_icons[audio_link_type].color};`"></q-icon>
+							</a>
+						</div>
+						<div class="img" v-else>
+							<q-icon name="fas fa-music-alt"/>
+						</div>
+						<div>
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Audio"
+								autocomplete="off" 
+								v-model="encounter.audio" 
+								placeholder="Audio URL"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</div>
+					</div>
+				</ValidationProvider>
 
-		<div class="background mb-3">
-			<div 
-				v-if="encounter.background && !errors.has('background')" 
-				class="img pointer" 
-				:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
-				@click="image = true"
-			>
-			</div>
-			<div class="img" v-else>
-				<q-icon name="fas fa-image"/>
-			</div>
-			<div>
-				<q-input 
-					dark filled square
-					label="Background"
-					autocomplete="off" 
-					:rules="[ val => (!val || is_url(val)) || 'Not a valid URL']" 
-					name="background" 
-					data-vv-as="Background"
-					v-model="encounter.background" 
-					class="mb-2"
-					placeholder="Background URL"/>
-				<p class="validate red" v-if="errors.has('background')">{{ errors.first('background') }}</p>
-			</div>
-		</div>
+				<ValidationProvider rules="url" name="Audio" v-slot="{ errors, invalid, validated }">
+					<div class="background mb-3">
+						<div 
+							v-if="encounter.background && !invalid" 
+							class="img pointer" 
+							:style="{ backgroundImage: 'url(\'' + encounter.background + '\')' }"
+							@click="image = true"
+						>
+						</div>
+						<div class="img" v-else>
+							<q-icon name="fas fa-image"/>
+						</div>
+						<div>
+								<q-input 
+									:dark="$store.getters.theme === 'dark'" filled square
+									label="Background"
+									autocomplete="off" 
+									v-model="encounter.background" 
+									class="mb-2"
+									placeholder="Background URL"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+						</div>
+					</div>
+				</ValidationProvider>
 
-		<h3>
-			Weather effects
-			<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
-				<q-tooltip anchor="top middle" self="center middle">
-					Weather preview
-				</q-tooltip>
-			</q-icon>
-		</h3>
-		<EditWeather v-model="weather" />
+				<h3>
+					Weather effects
+					<q-icon name="fas fa-eye" class="blue ml-1 pointer" @click="image = true">
+						<q-tooltip anchor="top middle" self="center middle">
+							Weather preview
+						</q-tooltip>
+					</q-icon>
+				</h3>
+				<EditWeather v-model="weather" />
 
-		<button class="btn btn-lg mt-3" @click="edit()">Save</button>
+				<div class="d-flex justify-content-start items-center mt-3">
+					<q-btn color="primary" type="submit" no-caps>Save</q-btn>
+					<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+						<q-tooltip anchor="top middle" self="center middle">
+							There are validation errors
+						</q-tooltip>
+					</q-icon>
+				</div>
+			</q-form>
+		</ValidationObserver>
 
 		<q-dialog v-model="image" full-height full-width>
-			<q-card dark>
+			<q-card :dark="$store.getters.theme === 'dark'">
 				<q-toolbar class="bg-neutral-9">
 					<div>Background preview</div>
 					<q-space />
 
-					<q-btn-dropdown stretch flat label="Weather" dark square>
+					<q-btn-dropdown stretch flat no-caps label="Weather" dark square>
 						<div class="bg-neutral-9 edit-weather">
 							<q-item-label header>Weather effects</q-item-label>
 							<EditWeather v-model="weather" />
 						</div>
 					</q-btn-dropdown>
 
-					<q-btn flat round dense icon="close" class="q-mr-sm" v-close-popup />
+					<q-btn flat round dense no-caps icon="close" class="q-mr-sm" v-close-popup />
 
 				</q-toolbar>
 				<div class="preview">
@@ -96,16 +111,26 @@
 			</q-card>
 		</q-dialog>
 	</div>
-</template>1
+</template>
 
 <script>
-    import { db } from '@/firebase';
-	import { mapActions, mapGetters } from 'vuex';
+	import { mapActions } from "vuex";
+
 	import EditWeather from './Weather';
 	import { audio } from '@/mixins/audio';
 
 	export default {
 		name: 'General',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			},
+			campaign: {
+				type: Object,
+				required: true
+			},
+		},
 		components: {
 			EditWeather,
 			Weather: () => import('@/components/weather')
@@ -128,37 +153,28 @@
 				},
 			} 
 		},
-		computed: {
-			...mapGetters([
-				'encounter',
-			]),
-		},
 		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			})
-
 			if(this.encounter && this.encounter.weather) {
 				this.weather = this.encounter.weather;
 			}
 		},
 		methods: {
-			...mapActions([
-				'fetchEncounter'
-			]),
+			...mapActions("encounters", ["edit_encounter"]),
 			edit() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
+				this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}`).update(
-							this.encounter
-						);
-						this.$snotify.success('Saved.', 'Critical hit!', {
-							position: "rightTop"
-						});
-					}
+				this.edit_encounter({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					value: this.encounter
+				}).then(() => {
+					this.$snotify.success('Saved.', 'Critical hit!', {
+						position: "rightTop"
+					});
+				}).catch(() => {
+					this.$snotify.error('Something went wrong saving the encounter.', 'Save failed', {
+						position: "rightTop"
+					});
 				})
 			},
 			intensity(type) {
@@ -175,24 +191,7 @@
 					if(value === 2) return "Medium";
 					if(value === 3) return "Heavy";
 				}
-			},
-			url_or_uri(val) {
-				// Check if val is url
-				const url_expr = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
-				const url_regex = new RegExp(url_expr);
-				if (val.match(url_regex)) {
-					return true;
-				}
-				// Check if val is spotify URI
-				const spotify_expr  = /^spotify:.+/gi;
-				const spotify_regex = new RegExp(spotify_expr);
-				if (val.match(spotify_regex)) {
-					return true;
-				}
-
-				return false;
-
-			},
+			}
 		},
 	}
 </script>

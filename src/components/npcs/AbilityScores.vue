@@ -4,29 +4,28 @@
 			<div class="card-body">
 				<div class="row q-col-gutter-md mb-3" v-for="(ability, index) in abilities" :key="index">
 					<div class="col-4 col-md-3">
-						<q-input 
-							dark filled square
-							:label="ability.capitalize()"
-							autocomplete="off"  
-							type="number" 
-							v-model.number="npc[ability]" 
-							:name="ability"
-							@input="parseToInt($event, npc, ability)"
-							:rules="[
-								val => !!val || 'Required',
-								val => val <= 99 || 'Max is 99'
-							]"
-						>
-							<template #append>
-								{{ npc[ability] !== undefined 
-								? calcMod(npc[ability]) &lt;= 0 ? calcMod(npc[ability]) : `+${calcMod(npc[ability])}` 
-								: '' }}
-							</template>
-						</q-input>
+						<ValidationProvider rules="required|between:0,99" :name="ability.capitalize()" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								:label="`${ability.capitalize()} *`"
+								autocomplete="off"  
+								type="number" 
+								v-model.number="npc[ability]" 
+								@input="parseToInt($event, npc, ability)"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<template #append>
+									{{ npc[ability] !== undefined 
+									? calcMod(npc[ability]) &lt;= 0 ? calcMod(npc[ability]) : `+${calcMod(npc[ability])}` 
+									: '' }}
+								</template>
+							</q-input>
+						</ValidationProvider>
 					</div>
 					<div class="col pt-4">
 						<q-checkbox 
-							dark 
+							:dark="$store.getters.theme === 'dark'" 
 							v-model="npc.saving_throws" 
 							:val="ability"
 							:false-value="null" 
@@ -74,7 +73,7 @@
 		},
 		methods: {
 			parseToInt(value, object, property) {
-			if(value === undefined || value === "") {
+				if(value === undefined || value === "") {
 					this.$delete(object, property);
 				} else {
 					this.$set(object, property, parseInt(value));

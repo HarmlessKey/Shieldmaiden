@@ -9,7 +9,7 @@
 				class="componentHeader" :class="{ shadow : setShadowPlayer > 0 }">
 				<span><i class="fas fa-helmet-battle"></i> Players</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollPlayer"> 
 				<Players :players="_players" />
 			</q-scroll-area>
 		</div>
@@ -17,7 +17,7 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowNPC > 0 }">
 				<span><i class="fas fa-dragon"></i> NPC's</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollNPC">
 				<NPCs :npcs="_npcs" />	
 			</q-scroll-area>
 		</div>
@@ -25,7 +25,7 @@
 			<h2 class="componentHeader" :class="{ shadow : setShadowOverview > 0 }">
 				<span>Active entities</span>
 			</h2>
-			<q-scroll-area dark :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
+			<q-scroll-area :dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '5px'}" v-on:scroll="shadow()" ref="scrollOverview">
 				<Overview :active="_active" :idle="_idle" />
 			</q-scroll-area>
 		</div>
@@ -35,9 +35,9 @@
 	<div v-else class="mobile-init">
 		<Turns />
 		
-		<div class="menu bg-gray-dark">
+		<div class="menu bg-neutral-8">
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-model="panel"
 				:options="panels"
 			>
@@ -75,7 +75,7 @@
       animated
       swipeable
       infinite
-      class="transparent-bg"
+      class="bg-neutral-6-transparent"
     >
       <q-tab-panel name="players">
 				<h2>Players</h2>
@@ -204,7 +204,7 @@
 	position: absolute;
 
 	.q-scrollarea{
-		padding:0 0 15px 0;
+		padding:0 15px 15px 15px;
 		height: calc(100% - 45px);
 	}
 	
@@ -221,7 +221,7 @@
 		}
 	}
 	.players, .npcs, .set {
-		background: rgba(38, 38, 38, .8);
+		background: $neutral-6-transparent;
 		overflow: hidden;
 	}
 	.players {
@@ -277,14 +277,6 @@
 		}
 		.menu {
 			grid-area: menu;
-		}
-	}
-	.transparent-bg {
-		background: rgba(38, 38, 38, .8);
-	}
-	ul.entities {
-		li {
-			background-color:$gray-dark !important;
 		}
 	}
 }

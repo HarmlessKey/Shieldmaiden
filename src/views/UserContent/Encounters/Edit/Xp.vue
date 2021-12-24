@@ -1,7 +1,13 @@
 <template>
 	<div>
 		<h2>Experience Points</h2>
-		<p>The amount of XP your encounter is worth. You can either choose to use the calculated amount based on the monsters in your encounter or overwrite it with whatever you think the encounter should be worth.</p>
+
+		<p>
+			The amount of XP your encounter is worth. 
+			You can either choose to use the calculated amount based on the monsters in your encounter 
+			or overwrite it with whatever you think the encounter should be worth.
+		</p>
+		
 		<div class="d-flex justify-content-start">
 			<span class="xp" :class="{ strikeTrough: xp.overwrite }">{{ xp.calculated }}</span>
 			<a @click="setOverwrite = !setOverwrite" class="ml-2" v-if="!xp.overwrite"><i class="fas fa-edit"></i></a>
@@ -14,7 +20,7 @@
 		<div class="d-flex justify-content-between" v-if="setOverwrite">
 			<div class="input-group mb-3">
 				<q-input 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					type="number" 
 					autocomplete="off" 
 					v-model="overwriteAmount" 
@@ -31,52 +37,63 @@
 </template>
 
 <script>
-    import { db } from '@/firebase';
-
+	import { mapActions } from "vuex";
+ 
 	export default {
-        name: 'XP',
+		name: 'XP',
+		props: {
+			encounter: {
+				type: Object,
+				required: true
+			}
+		},
 		data() {
 			return {
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-                user: this.$store.getters.user,
-                setOverwrite: false,
-                overwriteAmount: undefined
+				user: this.$store.getters.user,
+				setOverwrite: false,
+				overwriteAmount: undefined,
+				xp: this.encounter.xp
 			} 
 		},
-		firebase() {
-			return {
-				xp: {
-					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp`),
-					asObject: true
-                }
-			}
-		},
 		methods: {
-            setOverwriteAmount() {
-                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/overwrite').set(this.overwriteAmount);
-                this.setOverwrite = false;
-                this.overwriteAmount = undefined;
-            },
-            clearOverwrite() {
-                db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/overwrite').remove();
-            }
-			
+			...mapActions("encounters", [
+				"set_xp", 
+			]),
+			setOverwriteAmount() {
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "overwrite",
+					value: this.overwriteAmount
+				});
+				this.setOverwrite = false;
+				this.overwriteAmount = undefined;
+			},
+			clearOverwrite() {
+				this.set_xp({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					type: "overwrite",
+					value: null
+				});
+			}	
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-    .xp {
-        font-size: 40px;
-        font-weight: bold;
+	.xp {
+		font-size: 40px;
+		font-weight: bold;
 
-        &.strikeTrough {
-            text-decoration: line-through;
-            color: $neutral-3;
-        }
-    }
-    .fas {
-        line-height: 70px;
-    }
+		&.strikeTrough {
+			text-decoration: line-through;
+			color: $neutral-3;
+		}
+	}
+	.fas {
+		line-height: 70px;
+	}
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<q-scroll-area 
 		class="home" 
-		dark :thumb-style="{ width: '10px'}"
+		:dark="$store.getters.theme === 'dark'" :thumb-style="{ width: '10px'}"
 		v-on:scroll="handleScroll"
 	>
 		<template v-if="diceColors.length > 0">

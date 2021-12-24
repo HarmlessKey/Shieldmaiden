@@ -2,6 +2,7 @@
 @import "~vue-snotify/styles/material.css";
 @import url('https://fonts.googleapis.com/css?family=Fredericka+the+Great&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import "hk-icons.scss";
 
 /* 2. Themes */
 /*********************************************/
@@ -112,30 +113,27 @@ html body {
 
 	/* 4. Classes */
 	/*********************************************/
-	.neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
-	.neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
-	.neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
-	.neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
-	.neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
-	.neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
-	.neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
-	.neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
-	.neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
-	.neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
+	.white { color: $white !important; }
+	.black { color: $black !important; }
+	
+	.neutral-1, .text-neutral-1 { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
+	.neutral-2, .text-neutral-2 { color: $neutral-2 !important; path { fill: $neutral-2 !important;} }
+	.neutral-3, .text-neutral-3 { color: $neutral-3 !important; path { fill: $neutral-3 !important;} }
+	.neutral-4, .text-neutral-4 { color: $neutral-4 !important; path { fill: $neutral-4 !important;} }
+	.neutral-5, .text-neutral-5 { color: $neutral-5 !important; path { fill: $neutral-5 !important;} }
+	.neutral-6, .text-neutral-6 { color: $neutral-6 !important; path { fill: $neutral-6 !important;} }
+	.neutral-7, .text-neutral-7 { color: $neutral-7 !important; path { fill: $neutral-7 !important;} }
+	.neutral-8, .text-neutral-8 { color: $neutral-8 !important; path { fill: $neutral-8 !important;} }
+	.neutral-9, .text-neutral-9 { color: $neutral-9 !important; path { fill: $neutral-9 !important;} }
+	.neutral-10, .text-neutral-10 { color: $neutral-10 !important; path { fill: $neutral-10 !important;} }
+	.neutral-11, .text-neutral-11 { color: $neutral-11 !important; path { fill: $neutral-11 !important;} }
 
-	.gray { color: $gray !important; path { fill: $gray !important;} }
-	.gray-light { color: $gray-light !important; path { fill: $gray-light !important;} }
-	.gray-darker { color: $gray-darker !important; path { fill: $gray-darker !important;} }
-	.gray-dark { color: $gray-dark !important; path { fill: $gray-dark !important;} }
-	.gray-hover { color: $gray-hover !important; path { fill: $gray-hover !important;} }
-	.gray-active { color: $gray-active !important; path { fill: $gray-active !important;} }
 	.green { color: $green !important; path { fill: $green !important;} }
 	.blue { color: $blue!important; path { fill: $blue!important;} }
 	.red { color: $red !important; path { fill: $red !important;} }
 	.black { color: $black !important; path { fill: $black !important;} }
 	.patreon-red { color: $patreon-red !important; path { fill: $patreon-red !important;} }
 	.discord-purple { color: $discord-purple !important; path { fill: $discord-purple !important;} }
-	.white { color: $neutral-1 !important; path { fill: $neutral-1 !important;} }
 	.orange { color: $orange !important; path { fill: $orange !important;} }
 	.yellow { color: $yellow !important; path { fill: $yellow !important;} }
 	.purple { color: $purple !important; path { fill: $purple !important;} }
@@ -158,18 +156,23 @@ html body {
 	.bg-neutral-3 { background-color: $neutral-3 !important; }
 	.bg-neutral-4 { background-color: $neutral-4 !important; }
 	.bg-neutral-5 { background-color: $neutral-5 !important; }
-	.bg-neutral-6 { background-color: $neutral-6 !important; }
+	.bg-neutral-6 { 
+		background-color: $neutral-6 !important;
+
+		&-transparent {
+			background-color: $neutral-6-transparent !important;
+		}
+	}
 	.bg-neutral-7 { background-color: $neutral-7 !important; }
 	.bg-neutral-8 { background-color: $neutral-8 !important; }
 	.bg-neutral-9 { background-color: $neutral-9 !important; }
 	.bg-neutral-10 { background-color: $neutral-10 !important; }
+	.bg-neutral-11 { background-color: $neutral-11 !important; }
 
-	.bg-gray { background-color: $gray !important; }
-	.bg-gray-light { background-color: $gray-light !important; }
-	.bg-gray-darker { background-color: $gray-darker !important; }
-	.bg-gray-dark { background-color: $gray-dark !important; }
-	.bg-gray-hover { background-color: $gray-hover !important; }
-	.bg-gray-active { background-color: $gray-active !important; }
+	.bg-white { background-color: $white !important; }
+	.bg-black { background-color: $black !important; }
+	.bg-none { background: none !important; }
+
 	.bg-black { background-color: $black !important; }
 	.bg-green { background-color: $green !important; }
 	.bg-blue { background-color: $blue !important; }
@@ -416,6 +419,20 @@ html body {
 			justify-content: flex-end;
 		}
 	}
+	.items {
+		&-start {
+			align-items: start;
+		}
+		&-baseline {
+			align-items: baseline;
+		}
+		&-center {
+			align-items: center;
+		}
+		&-end {
+			align-items: end;
+		}
+	}
 
 	.offline {
 		position: fixed;
@@ -432,16 +449,27 @@ html body {
 		border-bottom-left-radius: $border-radius;
 		border-bottom-right-radius: $border-radius;
 	}
+
+	.saved {
+		animation: fadeout .3s linear;
+		animation-delay: 2s;
+	}
 	
 	.disabled {
 		cursor: forbidden !important;
 		opacity: .5 !important;
 	}
 
-	// .invert { filter: invert(1); }
+	.invert { filter: invert(1); }
 
 	.pointer {
 		cursor: pointer !important;
+	}
+
+	.truncate-cell {
+		display: table;
+		table-layout: fixed;
+		width: 100%;
 	}
 	.truncate {
 		white-space: nowrap;
@@ -559,7 +587,6 @@ html body {
 					font-size: 30px !important;
 					line-height: 50px;
 					text-align: center;
-					color: #fff;
 				}
 			}
 			h3 {
@@ -711,6 +738,10 @@ html body {
 		0%,100% { opacity: 0; }
 		50% { opacity: 1; }
 	}
+	@keyframes fadeout {
+		0% { opacity: 1; }
+		100% { opacity: 0; }
+	}
 
 
 	/* 4. Buttons and Links */
@@ -729,7 +760,7 @@ html body {
 		cursor: pointer;
 		border-radius: $border-radius-small;
 		background: $blue;
-		color: $neutral-1 !important;
+		color: $neutral-1;
 		border: none;
 		display: inline-block;
     font-weight: 400;
@@ -745,13 +776,13 @@ html body {
 			background-color 0.15s ease-in-out;
 		
 		&:focus, &.active {
-			outline: none !important;
-			box-shadow: none !important;
+			outline: none;
+			box-shadow: none;
 		}
 		&.disabled {
-			cursor: not-allowed !important;
+			cursor: not-allowed;
 			opacity: .3;
-			color: $neutral-1 !important;
+			color: $neutral-1;
 		}
 		&:hover {
 			background-color: $blue-hover;
@@ -779,6 +810,7 @@ html body {
 		}
 		&.bg-green:hover { background-color: $green-hover !important; }
 		&.bg-red:hover { background-color: $red-hover !important; }
+		&.bg-neutral-4:hover { background-color: $neutral-3 !important; }
 		&.bg-neutral-5:hover { background-color: $neutral-4 !important; }
 		&.bg-neutral-6:hover { background-color: $neutral-5 !important; }
 		&.bg-neutral-7:hover { background-color: $neutral-6 !important; }
@@ -937,7 +969,7 @@ html body {
 			background-color: rgba(0, 0, 0, 0.03);
 			border-top: 1px solid rgba(0, 0, 0, 0.125);
 			display: flex;
-			justify-content: space-between;
+			justify-content: flex-end;
 			align-items: center;
 		}
 		.card-image {
@@ -1004,6 +1036,7 @@ html body {
 			.card-header {
 				font-size: 15px;
 				padding: 0.50rem 1rem;
+				min-height: 52px;
 			}
 		}
 	}
@@ -1051,42 +1084,15 @@ html body {
 			pointer-events: auto;
 			width: 300px;
 			padding-top: 10px;
+			max-height: calc(100vh - 50px);
+			overflow-y: auto;
 
-			.roll {
-				.header {
-					display: grid;
-					grid-template-columns: auto max-content;
-					padding: 10px;
-					background: rgba(0, 0, 0, .2);
-		
-					a {
-						color: $neutral-2;
+			.q-btn {
+				pointer-events: auto;
+			}
 
-						&:hover {
-							color: $neutral-1;
-						}
-					}
-				}
-				.body {
-					.accordion {
-						.q-item {
-							background-color: $neutral-6;
-
-							.slashing, .bludgeoning, .piercing {
-								color: $neutral-2;
-							}
-
-							.q-focus-helper {
-								visibility: hidden;
-							}
-						}
-					}
-				}
-				.footer {
-					display: flex;
-					justify-content: space-between;
-					border-top: solid 1px $neutral-9;
-				}
+			&::-webkit-scrollbar {
+				display: none !important;
 			}
 		}
 	}
@@ -1094,7 +1100,7 @@ html body {
 	/* HK TABLE */
 	.hk-table {
 
-		.hk-table-column {
+		&-column {
 			background: $neutral-8;
 			margin-right: 1px;
 
@@ -1112,6 +1118,12 @@ html body {
 				background-position: top center;
 				border: solid 1px $neutral-2;
 				background-color: $neutral-9;
+				color: $neutral-2;
+				font-size: 34px;
+
+				i::before {
+					vertical-align: 2px;
+				}
 			}
 			.actions {
 				display: flex;
@@ -1149,6 +1161,11 @@ html body {
 				&.hk-table-header {
 					background: none;
 				}
+			}
+		}
+		.target-item {
+			.ac_wrapper {
+				background-color: $neutral-5;
 			}
 		}
 	}
@@ -1293,12 +1310,12 @@ html body {
 				text-align: center;
 			}
 			i {
-				font-size: 25px;
-				color: #5c5757;
+				font-size: 28px;
+				color: $neutral-4;
 			}
 			.ac {
 				font-weight: bold;
-				color: #fff;
+				color: $neutral-1;
 				margin-top: -1px;
 			}
 		}
@@ -1306,7 +1323,7 @@ html body {
 			display: block;
 			width: 35px;
 			height: 35px;
-			background-color: #191919;
+			background-color: $neutral-9;
 			background-position: center top;
 			background-repeat: no-repeat;
 			background-size: cover;
@@ -1314,6 +1331,11 @@ html body {
 			line-height: 35px;
 			overflow: hidden;
 			border: solid 1px transparent;
+			
+			[class^="hki-"], [class*=" hki-"] {
+				font-size: 28px;
+				margin-left: -1px;
+			}
 	
 			span {
 				position: relative;
@@ -1329,7 +1351,7 @@ html body {
 				grid-column-gap: 5px;
 				line-height: 35px;
 				margin-right: 5px;
-				color: #fff;
+				color: $neutral-1;
 		
 				.conditions {
 					position: absolute;
@@ -1340,7 +1362,7 @@ html body {
 						display: block;
 						width: 12px;
 						height: 12px;
-						border: solid 1px #fff;
+						border: solid 1px $neutral-1;
 						margin-left: 1px;
 						cursor: pointer;
 					}
@@ -1420,12 +1442,12 @@ html body {
 		
 		li {
 			display: grid;
-			background-color: $neutral-8;
+			background-color: $neutral-7;
 			grid-template-columns: auto max-content;
 			margin-bottom: 1px;
 			vertical-align: center;
 			line-height: 46px;
-			padding: 0 5px;
+			padding: 0 10px;
 
 			.actions {
 				display: flex;
@@ -1460,9 +1482,10 @@ html body {
 				background-position: top center;
 				border: solid 1px $neutral-3;
 				background-color: $neutral-10;
-				font-size: 20px;
+				font-size: 35px;
 				line-height: 44px;
 				text-align: center;
+				color: $neutral-2;
 			}
 		}
 		&.hasImg {
@@ -1478,7 +1501,7 @@ html body {
 			}
 		}
 	}
-	.hk-card, .slide {
+	.slide {
 		ul.entities {
 			li {
 				background-color: $neutral-8;
@@ -1496,10 +1519,6 @@ html body {
 				td {
 					background-color: $neutral-8;
 				}
-				&:hover td {
-					background-color: $neutral-7;
-				}
-				transition: background-color .2s linear;
 			}
 		}
 	}
@@ -1583,21 +1602,22 @@ html body {
 	}
 
 	//VIEW MONSTER
-	.monster-table {
-		.hk-table {
-			.hk-collapsed-column {
-				background-color: #f7e4ba !important;
-				background-image: url('../assets/_img/styles/monster-card-bg.png') !important;
-				box-shadow: inset 0 0 10px rgba(0, 0, 0, .8);
+	.q-table {
+		border-spacing: 0 1px;
 
-				.monster {
-					column-count: 2;
+		.q-td {
+			background-color: $neutral-7;
+		}
 
-				}
-				.monster-card {
-					padding: 0;
-				}
+		.monster {
+			column-count: 2;
+
+			.skills {
+				column-count: 2;
 			}
+		}
+		.monster-card {
+			padding: 10px;
 		}
 	}
 	.monster-card {
@@ -1612,6 +1632,11 @@ html body {
 						column-count: 1;			
 					}
 				}
+			}
+		}
+		.q-table {
+			.monster {
+				column-count: 1;
 			}
 		}
 	}
@@ -1770,6 +1795,7 @@ html body {
 						text-align: center;
 						font-size: 80px;
 						font-weight: bold;
+						background-color: $neutral-7;
 					}
 					.roll_footer {
 						text-align: center;
@@ -1875,6 +1901,25 @@ html body {
 				&.hidden-toggle {
 					display: none !important;
 				}
+			}
+		}
+	}
+
+	.q-table {
+		.q-field {
+			width: 60px;
+	
+			.row {
+				padding: 0;
+			}
+			&__control {
+				height: 26px;
+			}
+			input {
+				text-align: center;
+				height: 26px;
+				line-height: 26px;
+				padding: 0 5px;
 			}
 		}
 	}

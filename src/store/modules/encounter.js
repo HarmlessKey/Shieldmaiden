@@ -996,7 +996,8 @@ const mutations = {
 	},
 	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
-	async ADD_ENTITY(state, {rootState, key}) {
+	async ADD_ENTITY(state, { rootState, key}) {
+		const uid = (rootState.user) ? rootState.user.uid : undefined;
 		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
 		let entity = {
 			name: db_entity.name,
@@ -1043,7 +1044,9 @@ const mutations = {
 
 		switch(entity.entityType) {
 			case 'player': {
-				let campaignPlayer = (!state.demo) ? rootState.content.campaigns[state.campaignId].players[key] : demoPlayers[key];
+				const campaign = rootState.content.campaigns[state.campaignId];
+
+				let campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
 
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
 				entity.curHp = campaignPlayer.curHp;
@@ -1066,7 +1069,7 @@ const mutations = {
 				}
 
 				//get other values from the player
-				let db_player = (!state.demo) ? rootState.content.players[key] : demoPlayers[key];
+				let db_player = (!state.demo) ? rootState.players.cached_players[uid][key] : demoPlayers[key];
 
 				entity.img = (db_player.avatar) ? db_player.avatar : 'player';
 				
@@ -1136,7 +1139,6 @@ const mutations = {
 
 				// NPC
 				else {
-
 					//Fetch data from Firebase
 					if(entity.npc === 'srd' || entity.npc === 'api') {
 						let monsters = monsters_ref.child(entity.id);
@@ -1146,7 +1148,7 @@ const mutations = {
 						});
 					}
 					else {
-						data_npc = rootState.content.npcs[entity.id];
+						data_npc = rootState.npcs.cached_npcs[uid][entity.id];
 					}
 
 					// Values from encounter

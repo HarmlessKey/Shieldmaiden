@@ -19,7 +19,7 @@
 		<template v-else>
 			<div v-if="location == 'encounter'" class="mb-3">
 				<q-input 
-					dark filled square
+					:dark="$store.getters.theme === 'dark'" filled square
 					label="initiative"
 					type="number" 
 					name="initiative"
@@ -50,7 +50,7 @@
 							<span v-show="entity.saves[n] === 'succes'" class="green"><i class="fas fa-check"></i></span>
 							<span v-show="entity.saves[n] === 'fail'" class="red"><i class="fas fa-times"></i></span>
 						</template>
-						<span v-show="!entity.saves[n]" class="gray-hover"><i class="fas fa-dot-circle"></i></span>
+						<span v-show="!entity.saves[n]" class="neutral-2"><i class="fas fa-dot-circle"></i></span>
 					</div>
 				</div>
 				<div v-if="Object.keys(entity.saves).length < 5" class="d-flex justify-content-between">
@@ -66,7 +66,7 @@
 			<div class="row q-col-gutter-md mb-2">
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="AC bonus"
 						type="number" 
 						name="ac_bonus" 
@@ -77,7 +77,7 @@
 
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Temp HP"
 						type="number" 
 						name="tempHp" 
@@ -88,7 +88,7 @@
 
 				<div class="col" v-if="!entity.transformed">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Max HP Mod"
 						type="number" 
 						name="maxHpMod" 
@@ -105,7 +105,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Cur HP"
 								type="number" 
 								name="t-curHp" 
@@ -125,7 +125,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Cur HP"
 								class="text-center"
 								type="number" 
@@ -142,7 +142,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 	
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Max HP"	
 								class="text-center"
 								type="number" 
@@ -162,7 +162,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Max HP"
 								class="text-center"
 								type="number" 
@@ -180,7 +180,7 @@
 					<div class="col">
 						<template v-if="entity.transformed">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Armor class"
 								class="text-center"
 								type="number" 
@@ -200,7 +200,7 @@
 						</template>
 						<template v-else>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								label="Armor class"
 								class="text-center"
 								type="number" 
@@ -215,7 +215,7 @@
 					</div>
 					<div class="col">
 						<q-input 
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Level"
 							class="text-center"
 							type="number" 
@@ -261,7 +261,7 @@
 				</div>
 
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					class="text-center"
 					type="number" 
 					name="xp" 

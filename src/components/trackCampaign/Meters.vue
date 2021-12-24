@@ -2,7 +2,7 @@
 	<div class="meters">
 		<q-tabs
 			v-model="doneTaken"
-			dark
+			:dark="$store.getters.theme === 'dark'"
 			inline-label
 			dense
 			no-caps
@@ -29,10 +29,9 @@
 									<Avatar :entity="entity" :players="players" :npcs="npcs" />
 								</div>
 								<q-linear-progress 
-									size="30px" 
 									:value="percentageMeters(entity.meters[subtype], type, subtype)" 
-									color="black" 
-									class="bg-gray-active"
+									color="neutral-9" 
+									class="bg-neutral-5"
 								>
 									<div class="info">
 										<span class="name">
@@ -173,10 +172,10 @@
 		user-select: none;
 
 		h3 {
+			color: $white !important;
 			text-transform: capitalize;
-			color:$neutral-1;
 			text-shadow: 0 0 3px $black;
-			font-size: 12px !important;
+			font-size: 15px !important;
 			font-weight: bold !important;
 			margin: 20px 0 0 0 !important;
 		}
@@ -187,25 +186,30 @@
 
 			li {
 				display: grid;
-				grid-template-columns: 30px 1fr;
+				grid-template-columns: 45px 1fr;
 				grid-template-rows: auto;
-				grid-gap: 0;
+				grid-gap: 1px;
 				grid-template-areas: 
 				"img hp-bar";
 
-				margin-bottom: 3px;
+				margin-bottom: 5px;
+				height: 45px;
 
 				.img {
 					grid-area: img;
+					.avatar {
+						font-size: 30px;
+						height: 45px;
+					}
 				}
 				.q-linear-progress { 
 					font-size: 15px !important;
-					line-height: 30px;
-					height: 30px;
+					line-height: 45px;
+					height: 45px;
 					position: relative;
 
 					.info {
-						color: $gray-light;
+						color: $neutral-1;
 						width: 100%;
 						position: absolute;
 						left: 0;
@@ -218,11 +222,12 @@
 
 						.numbers {
 							text-align: right;
-							padding: 0 5px;
+							padding: 0 10px;
+							font-weight: bold;
 						}
 						span.name {
 							font-weight: bold !important;
-							padding-left: 5px;
+							padding-left: 10px;
 							white-space: nowrap; 
 							overflow: hidden;
 							text-overflow: ellipsis;
@@ -233,34 +238,6 @@
 		}
 		.entities-move {
 			transition: transform .6s;
-		}
-	}
-	@media only screen and (min-width: 1250px) {
-		.meters {
-			ul {
-				li {
-					grid-template-columns: 40px 1fr;
-
-					.img {
-						width: 40px;
-						height: 40px;
-					}
-					.q-linear-progress { 
-						font-size: 18px !important;
-						height: 40px;
-						line-height: 40px;
-
-						.info {
-							.number {
-								padding: 0 8px;
-							}
-							span.name {
-								padding-left: 8px;
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 </style>

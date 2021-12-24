@@ -3,14 +3,14 @@
 		<hk-card>
 			<div slot="header" class="card-header d-flex justify-content-between">
 				Abilities
-				<a class="gray-hover text-capitalize">
+				<a class="neutral-2 text-capitalize">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Add</span>
 					<q-tooltip anchor="top middle" self="center middle">
 						Add
 					</q-tooltip>
-					<q-popup-proxy square>
-						<div class="bg-gray gray-light">
+					<q-popup-proxy :dark="$store.getters.theme === 'dark'">
+						<div class="bg-neutral-8">
 							<q-list>
 								<q-item 
 									v-for="{category, name_single} in actions" :key="`add-${category}`"
@@ -33,7 +33,7 @@
 				<div v-if="npc[category] && npc[category].length > 0" :key="category">
 					<h3 class="d-flex justify-content-between">
 						{{ name }}
-						<a class="gray-hover text-capitalize" @click="add(category)">
+						<a class="neutral-2 text-capitalize" @click="add(category)">
 							<i class="fas fa-plus green"></i>
 							<span class="d-none d-md-inline ml-1">Add</span>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -43,7 +43,7 @@
 					</h3>
 					<q-input
 						v-if="category === 'legendary_actions'"
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Count"
 						v-model="npc.legendary_count"
 						type="number"
@@ -52,11 +52,11 @@
 					/>
 
 					<!-- ABILITIES -->
-					<q-list dark square :class="`accordion`">
+					<q-list :dark="$store.getters.theme === 'dark'" :class="`accordion`">
 						<q-expansion-item
 							v-for="(ability, ability_index) in npc[category]" 
 							:key="`ability-${ability_index}`"
-							dark switch-toggle-side
+							:dark="$store.getters.theme === 'dark'" switch-toggle-side
 							:group="name"
 							:name="name"
 							enter-active-class="animated animate__fadeIn" 
@@ -118,7 +118,7 @@
 							<div class="accordion-body">
 								<q-input 
 									v-if="category === 'legendary_actions'"
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Legendary actions"
 									autocomplete="off" 
 									type="number" 
@@ -129,7 +129,7 @@
 								/>
 
 								<q-input 
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Name"
 									autocomplete="off" 
 									class="mb-3" 
@@ -141,7 +141,7 @@
 								<div class="row q-col-gutter-md mb-2" v-if="category !== 'legendary_actions'">
 									<div class="col">
 										<q-input
-											dark filled square
+											:dark="$store.getters.theme === 'dark'" filled square
 											label="Recharge"
 											autocomplete="off" 
 											v-model="ability.recharge" 
@@ -152,7 +152,7 @@
 									<div class="col">
 										<div class="d-flex justify-content-start limit">
 											<q-input 
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Limited uses"
 												autocomplete="off" 
 												type="number" 
@@ -160,7 +160,7 @@
 												@keyup="$forceUpdate()"
 											/>
 											<q-select
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Limit type"
 												class="limit-type"
 												v-model="ability.limit_type"
@@ -172,7 +172,7 @@
 									</div>
 								</div>
 								<q-input
-									dark filled square
+									:dark="$store.getters.theme === 'dark'" filled square
 									label="Description"
 									autocomplete="off" 
 									v-model="ability.desc" 
@@ -187,7 +187,7 @@
 									<div class="row q-col-gutter-sm">
 										<div class="col">
 											<q-input
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												class="reach"
 												label="Reach"
 												v-model="ability.reach"
@@ -198,7 +198,7 @@
 										</div>
 										<div class="col">
 											<q-input
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="Range"
 												v-model="ability.range"
 												:rules="[val => (!val || val.match(/^[0-9]+(\/[0-9]+)*$/g)) || 'Allowed format: 20 or 20/60']"
@@ -208,7 +208,7 @@
 										</div>
 										<div class="col">
 											<q-select 
-												dark filled square clearable
+												:dark="$store.getters.theme === 'dark'" filled square clearable
 												emit-value
 												map-options
 												label="AOE type"
@@ -219,7 +219,7 @@
 										</div>
 										<div class="col">
 											<q-input 
-												dark filled square
+												:dark="$store.getters.theme === 'dark'" filled square
 												label="AOE size"
 												type="number"
 												v-model="ability.aoe_size"
@@ -234,7 +234,7 @@
 									<div class="row q-col-gutter-md">
 											<div class="col-4 col-sm-3">
 												<q-checkbox 
-													dark
+													:dark="$store.getters.theme === 'dark'"
 													v-model="ability.versatile" 
 													label="Versatile" 
 													:false-value="null" 
@@ -245,7 +245,7 @@
 											<template v-if="ability.versatile">
 												<div class="col">
 													<q-input
-														dark filled square dense
+														:dark="$store.getters.theme === 'dark'" filled square dense
 														type="text"
 														label="Option 1 name"
 														v-model="ability.versatile_one"
@@ -255,7 +255,7 @@
 												</div>
 												<div class="col">
 													<q-input
-														dark filled square dense
+														:dark="$store.getters.theme === 'dark'" filled square dense
 														type="text"
 														label="Option 2 name"
 														v-model="ability.versatile_two"
@@ -273,7 +273,7 @@
 											<!-- ACTION TYPE -->
 											<div class="col">
 												<q-select 
-													dark filled square
+													:dark="$store.getters.theme === 'dark'" filled square
 													map-options
 													emit-value
 													label="Action type"
@@ -288,7 +288,7 @@
 											<template v-if="action.type === 'save'">
 												<div class="col">
 													<q-select 
-														dark filled square
+														:dark="$store.getters.theme === 'dark'" filled square
 														map-options
 														emit-value
 														label="Save ability"
@@ -299,7 +299,7 @@
 												</div>
 												<div class="col">
 													<q-input
-														dark filled square
+														:dark="$store.getters.theme === 'dark'" filled square
 														type="number"
 														label="Save DC"
 														v-model="action.save_dc"
@@ -311,7 +311,7 @@
 											<template v-else-if="!['healing', 'damage', 'other'].includes(action.type)">
 												<div class="col">
 													<q-input
-														dark filled square
+														:dark="$store.getters.theme === 'dark'" filled square
 														type="number"
 														label="Attack modifier"
 														v-model="action.attack_bonus"
@@ -327,7 +327,7 @@
 												<div class="card-header d-flex justify-content-between">
 													<span><i class="fas fa-dice-d20"/> Rolls</span>
 													<a 
-														class="gray-light text-capitalize" 
+														class="neutral-2 text-capitalize" 
 														@click="newRoll(ability_index, ability, category, action_index, action)"
 													>
 														<i class="fas fa-plus green"></i>
@@ -462,8 +462,8 @@
 						</div>
 
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="mr-1" type="cancel" @click="cancelRoll()">Cancel</q-btn>
-							<q-btn color="primary" type="submit" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
+							<q-btn class="mr-1" no-caps type="cancel" @click="cancelRoll()">Cancel</q-btn>
+							<q-btn color="primary" no-caps type="submit" :label="(edit_roll_index !== undefined) ? 'Save' : 'Add'" />
 						</div>
 					</hk-card>
 				</q-form>
@@ -739,7 +739,7 @@
 		width: 100%;
 	}
 	h3 {
-		border-bottom: solid 1px $gray-hover;
+		border-bottom: solid 1px $neutral-2;
 		font-size: 15px;
 		margin-bottom: 1px;
 	}
@@ -758,7 +758,7 @@
 				cursor: default;
 				
 				span:hover {
-					color: $gray-light;
+					color: $neutral-2;
 				}
 			}
 		}

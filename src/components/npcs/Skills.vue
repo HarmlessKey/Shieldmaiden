@@ -11,7 +11,7 @@
 					</q-tooltip>
 					</span>
 				</div>
-				<a class="btn btn-sm bg-neutral-5" @click="modifier_dialog = true">
+				<a class="btn btn-sm bg-neutral-5" @click="setDialog()">
 					<i class="fas fa-plus green"></i>
 					<span class="d-none d-md-inline ml-1">Modifiers</span>
 					<q-tooltip anchor="top middle" self="center middle">
@@ -25,7 +25,7 @@
 					<div v-for="(skill, key) in skillList" :key="key">
 						<q-checkbox 
 							size="xs" 
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							:val="key" 
 							v-model="npc.skills_expertise" 
 							:false-value="null" indeterminate-value="something-else"
@@ -42,7 +42,7 @@
 
 						<q-checkbox 
 							size="xs" 
-							dark
+							:dark="$store.getters.theme === 'dark'"
 							:val="key" 
 							v-model="skills" 
 							:false-value="null" indeterminate-value="something-else"
@@ -67,25 +67,28 @@
 			</div>
 		</hk-card>
 
-		<q-dialog v-model="modifier_dialog" dark square>
+		<q-dialog v-model="modifier_dialog" :dark="$store.getters.theme === 'dark'">
 			<hk-card header="Skill modifiers">
 				<div class="card-body">
 					<div class="modifiers">
-						<q-input
-							v-for="(skill, key) in skillList"
-							:key="`mod-${key}`"
-							dark filled square
-							class="mb-2"
-							type="number"
-							:label="skill.skill"
-							:value="npc.skill_modifiers ? npc.skill_modifiers[key] : null"
-							:rules="[val => !val || val <= 99 || 'Max is 99']"
-							@input="setModifier($event, key)"
-						/>
+						<ValidationProvider v-for="(skill, key) in skillList" rules="between:-99,99" :name="skill.skill" v-slot="{ errors, invalid, validated }" :key="`mod-${key}`">
+							<q-input
+								:dark="$store.getters.theme === 'dark'" filled square
+								class="mb-2"
+								type="number"
+								:label="skill.skill"
+								v-model="npc.skill_modifiers[key]"
+								@change="setModifier(key)"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							>
+								<i class="fas fa-check green saved" slot="append" v-if="saved.includes(key)" @animationend="saved.splice(saved.indexOf(key), 1)" />
+							</q-input>
+						</ValidationProvider>
 					</div>
 				</div>
 				<div class="card-footer d-flex justify-content-end" slot="footer">
-					<q-btn class="bg-neutral-5" @click="modifier_dialog = false" label="Close" />
+					<q-btn class="bg-neutral-5" no-caps @click="modifier_dialog = false" label="Close" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -107,7 +110,8 @@
 		],
 		data() {
 			return {
-				modifier_dialog: false
+				modifier_dialog: false,
+				saved: []
 			}
 		},
 		computed: {
@@ -131,9 +135,17 @@
 			},
 		},
 		methods: {
-			setModifier(value, skill) {
+			setDialog() {
+				if(!this.npc.skill_modifiers) {
+					this.$set(this.npc, "skill_modifiers", []);
+				}
+				this.modifier_dialog = true;
+			},
+			setModifier(skill) {
+				let value = this.npc.skill_modifiers ? this.npc.skill_modifiers[skill] : null;
 				if(value > 99) value = 99;
 				if(value < -99) value = -99;
+				this.saved.push(skill);
 
 				if(value) {
 					if(this.npc.skill_modifiers) {

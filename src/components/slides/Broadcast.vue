@@ -10,11 +10,11 @@
 		<p>
 			When you're live, your players can see the initiative list 
 			of your active encounter and you can choose to show them your rolls there as well.
-			Your encounters can be followed with the <a @click="setSlide({show: true, type: 'PlayerLink'})">player link.</a>
+			Your encounters can be followed with your <a @click="setSlide({show: true, type: 'PlayerLink'})">public initiative link.</a>
 		</p>
 		
 		<q-select
-			dark filled square
+			:dark="$store.getters.theme === 'dark'" filled square
 			v-model="shares"
 			:options="options"
 			label="Share"
@@ -30,7 +30,7 @@
 						<q-item-label>Select All</q-item-label>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="all" @input="checkAll"/>
+						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="all" @input="checkAll"/>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -43,7 +43,7 @@
 						<q-item-label v-html="scope.opt.label"/>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox dark v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
+						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="shares" @input="sharesSelected" :val="scope.opt.value"/>
 					</q-item-section>
 				</q-item>
 			</template>

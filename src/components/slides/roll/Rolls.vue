@@ -15,13 +15,11 @@
 							{{ roll.roll }}:
 							(<span class="advantage" v-if="roll.ignored">
 								<span v-html="advantage(roll.advantage_disadvantage)"/> 
-								<span class="ignored gray-hover">
-									{{ roll.ignored }}
-								</span>
+								<span class="ignored neutral-3 text-strike mx-1">{{ roll.ignored }}</span> 
 							</span>{{ roll.throwsTotal }}){{ parseInt(roll.mod) !== 0 ? roll.mod : "" }}
 						</span>
 						<span class="total">
-							<span class="white">
+							<span>
 								{{roll.total}}
 							</span>
 						</span>
@@ -81,12 +79,13 @@
 		margin: 0;
 
 		li {
-			border-bottom: solid 1px $gray-hover;
-			padding: 5px 0;
+			margin-bottom: 10px;
+			border-radius: $border-radius;
+			overflow: hidden;
 
 			h3 {
 				padding: 0 8px;
-				background-color: $gray-active;
+				background-color: $neutral-9;
 				margin: 0 !important;
 				font-size: 15px;
 				display: grid;
@@ -99,7 +98,7 @@
 			.result {
 				cursor: pointer;
 				padding: 5px 8px;
-				background-color: $gray-dark;
+				background-color: $neutral-10;
 				font-size: 18px;
 				line-height: 35px;
 				display: grid;
@@ -120,7 +119,7 @@
 				}
 			}
 			.rolls {
-				background: $gray-darker;
+				background: $neutral-11;
 				padding: 5px 8px;
 			}
 		}

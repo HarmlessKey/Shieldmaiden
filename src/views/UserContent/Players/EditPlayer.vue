@@ -1,410 +1,435 @@
 <template>
 	<div>
-		<template v-if="player">
-			<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
+		<ValidationObserver v-if="player" v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(savePlayer)">
+				<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 
-				<!-- GIVE OUT CONTROL -->
-				<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
-					<div class="card-body">
-						<GiveCharacterControl :playerId="playerId" :control="player.control" />
-					</div>
-				</hk-card>
-
-				<hk-card-deck class="mb-4">
-					<hk-card header="Basic Info" >
+					<!-- GIVE OUT CONTROL -->
+					<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
 						<div class="card-body">
-							<q-input 
-								v-if="$route.name != 'Edit Character'"
-								dark filled square
-								label="Player name"
-								autocomplete="off"  
-								type="text" 
-								class="mb-2" 
-								v-model="player.player_name" 
-								v-validate="'max:15|required'" 
-								maxlength="15"
-								data-vv-as="Name"
-								name="player_name" 
-							/>
-							<p class="validate red" v-if="errors.has('player_name')">{{ errors.first('player_name') }}</p>
-							
-							<q-input 
-								dark filled square
-								label="Character name"
-								autocomplete="off"  
-								type="text" 
-								class="mb-2" 
-								v-model="player.character_name" 
-								v-validate="'max:35|required'" 
-								maxlength="35"
-								data-vv-as="Character Name"
-								name="character_name" 
-							/>
-							<p class="validate red" v-if="errors.has('character_name')">{{ errors.first('character_name') }}</p>
-		
-							<div class="avatar">
-								<div class="img" v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-								<div class="img" v-else>
-									<img src="@/assets/_img/styles/player.svg" />
-								</div>
-								<div>
+							<GiveCharacterControl :playerId="playerId" :control="player.control" />
+						</div>
+					</hk-card>
+
+					<hk-card-deck class="mb-4">
+						<hk-card header="Basic Info" >
+							<div class="card-body">
+								<ValidationProvider rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
 									<q-input 
-										dark filled square
-										label="Avatar"
+										v-if="$route.name !== 'Edit Character'"
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Player name *"
 										autocomplete="off"  
 										type="text" 
-										v-model="player.avatar"
-										v-validate="'url'"
-										data-vv-as="Avatar"
-										name="avatar"
-										placeholder="Image URL"/>
-									<p class="validate red" v-if="errors.has('avatar')">{{ errors.first('avatar') }}</p>
-								</div>
-							</div>
-						</div>
-					</hk-card>
-					<hk-card header="Level & Base Stats">
-						<div class="card-body">
-							<div class="row q-col-gutter-md">
-								<div class="col-12 col-md-6">
-									<q-input 
-										dark filled square
-										label="Experience points"
-										autocomplete="off" 
-										type="number" 
-										min="0"
-										max="355000"
-										v-model="player.experience" 
-										v-validate="'numeric|min_value:0|max_value:355000'" 
-										data-vv-as="experience"
-										name="experience" 
-										:disable="player.level > 0"
-									>
-										<template v-slot:append>
-											<small><span class="gray-hover">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
-											<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
-										</template>
-									</q-input>				
-									<p class="validate red" v-if="errors.has('experience')">{{ errors.first('experience') }}</p>
-								</div>
-								<div class="col-12 col-md-6">
-									<q-input 
-										dark filled square
-										clearable
-										label="Level override"
-										autocomplete="off"
-										type="number" 
-										min="1"
-										max="20"
-										v-model="player.level" 
-										v-validate="'numeric|min_value:1|max_value:20'" 
-										data-vv-as="Level Override"
-										name="level"
+										class="mb-2" 
+										v-model="player.player_name" 
+										maxlength="15"
+										:error="invalid && validated"
+										:error-message="errors[0]"
 									/>
-									<p class="validate red" v-if="errors.has('level')">{{ errors.first('level') }}</p>
-								</div>
-								<div class="col-12 col-md-4">
+								</ValidationProvider>
+								
+								<ValidationProvider rules="max:35|required" name="Character name" v-slot="{ errors, invalid, validated }">
 									<q-input 
-										dark filled square
-										label="Hit points"
-										autocomplete="off"  id="maxHp" 
-										type="number" 
-										min="1"
-										v-model="player.maxHp" 
-										v-validate="'numeric|required'" 
-										data-vv-as="Maxium Hit Points"
-										name="maxHp" 
-										placeholder="Maximum Hit Points*"
-									>
-										<q-icon slot="prepend" name="fas fa-heart" />
-									</q-input>
-									<p class="validate red" v-if="errors.has('maxHp')">{{ errors.first('maxHp') }}</p>
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Character name *"
+										autocomplete="off"
+										type="text" 
+										class="mb-2" 
+										v-model="player.character_name" 
+										maxlength="35"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
+			
+								<div class="avatar">
+									<div class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+										<i v-if="!player.avatar" class="hki-player" />
+									</div>
+									<div>
+										<ValidationProvider rules="url" name="Avatar" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Avatar"
+												autocomplete="off"  
+												type="text" 
+												v-model="player.avatar"
+												placeholder="Image URL"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											/>
+										</ValidationProvider>
+									</div>
 								</div>
-								<div class="col-12 col-md-4">
-									<q-input 
-										dark filled square
-										label="Armor class"
-										autocomplete="off"  
-										id="ac" 
-										min="1"
-										type="number" 
-										v-model="player.ac" 
-										v-validate="'numeric|required'" 
-										data-vv-as="Armor Class"
-										name="ac" 
-									>
-										<q-icon slot="prepend" name="fas fa-shield" />
-									</q-input>
-									<p class="validate red" v-if="errors.has('ac')">{{ errors.first('ac') }}</p>
+							</div>
+						</hk-card>
+						<hk-card header="Level & Base Stats">
+							<div class="card-body">
+								<div class="row q-col-gutter-md">
+									<div class="col-12 col-md-6">
+										<ValidationProvider rules="numeric|between:0,355000" name="XP" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Experience points"
+												autocomplete="off" 
+												type="number" 
+												min="0"
+												max="355000"
+												v-model="player.experience" 
+												:disable="player.level > 0"
+												:error="invalid && validated"
+												:error-message="errors[0]" 
+											>
+												<template v-slot:append>
+													<small><span class="neutral-2">level:</span> {{ player.level ? player.level : calculatedLevel(player.experience) }}</small>
+													<q-icon name="info" class="ml-1 pointer blue" size="xs" @click="setSlide({show: true, type: 'slides/xpTable'})"/>
+												</template>
+											</q-input>
+										</ValidationProvider>			
+									</div>
+									<div class="col-12 col-md-6">
+										<ValidationProvider rules="numeric|between:1,20" name="Level" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												clearable
+												label="Level override"
+												autocomplete="off"
+												type="number" 
+												min="1"
+												max="20"
+												:value="player.level" 
+												@input="parseToInt($event, player, 'level')"
+												:error="invalid && validated"
+												:error-message="errors[0]" 
+											/>
+										</ValidationProvider>
+									</div>
+									<div class="col-12 col-md-4">
+										<ValidationProvider rules="required|numeric|between:1,999" name="Max HP" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Hit points *"
+												autocomplete="off"
+												type="number" 
+												min="1"
+												max="999"
+												:value="player.maxHp" 
+												name="maxHp" 
+												placeholder="Maximum Hit Points*"
+												@input="parseToInt($event, player, 'maxHp')"
+												:error="invalid && validated"
+												:error-message="errors[0]" 
+											>
+												<q-icon slot="prepend" name="fas fa-heart" />
+											</q-input>
+										</ValidationProvider>
+									</div>
+									<div class="col-12 col-md-4">
+										<ValidationProvider rules="required|numeric|between:1,99" name="AC" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Armor class *"
+												autocomplete="off"  
+												min="1"
+												max="99"
+												type="number" 
+												:value="player.ac" 
+												@input="parseToInt($event, player, 'ac')"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											>
+												<q-icon slot="prepend" name="fas fa-shield" />
+											</q-input>
+										</ValidationProvider>
+									</div>
+									<div class="col-12 col-md-4">
+										<ValidationProvider rules="numeric|between:1,99" name="Save DC" v-slot="{ errors, invalid, validated }">
+											<q-input 
+												:dark="$store.getters.theme === 'dark'" filled square
+												label="Spell save DC"
+												autocomplete="off"  
+												min="1"
+												max="99"
+												type="number" 
+												:value="player.spell_save_dc" 
+												@input="parseToInt($event, player, 'spell_save_dc')"
+												:error="invalid && validated"
+												:error-message="errors[0]"
+											>
+												<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
+											</q-input>
+										</ValidationProvider>
+									</div>
 								</div>
-								<div class="col-12 col-md-4">
-									<q-input 
-										dark filled square
-										label="Spell save DC"
-										autocomplete="off"  
-										id="save_dc" 
-										min="0"
-										type="number" 
-										v-model="player.spell_save_dc" 
-										name="save_dc"
-									>
-										<q-icon slot="prepend" name="fas fa-hand-holding-magic" />
-									</q-input>
+							</div>
+						</hk-card>
+					</hk-card-deck>
+
+					<!-- ABILITY SCORES -->
+					<hk-card header="Ability Scores & Senses" class="ability-card">
+						<div class="card-body">
+							<h6 class="mb-2">Ability scores</h6>
+							<div class="row q-col-gutter-md">
+								<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
+									<ValidationProvider rules="numeric|between:1,99" :name="ability.ability" v-slot="{ errors, invalid, validated }">
+										<q-input 
+											:dark="$store.getters.theme === 'dark'" filled square
+											:label="ability.ability.capitalize()"
+											autocomplete="off"  
+											type="number" 
+											min="1"
+											max="99"
+											v-model="player[ability.ability]" 
+											@input="parseToInt($event, player, ability.ability)"
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										>
+											<q-checkbox 
+												slot="append"
+												size="xs" 
+												:dark="$store.getters.theme === 'dark'" 
+												v-model="player[`${ability.ability}-save-profficient`]" 
+												:false-value="null" 
+												indeterminate-value="something-else" 
+											>
+												<q-tooltip anchor="top middle" self="center middle">
+													Saving throw proficiency
+												</q-tooltip>
+											</q-checkbox>
+										</q-input>
+									</ValidationProvider>
+								</div>
+							</div>
+
+							<!-- SENSES -->
+							<h6 class="mt-3 mb-2">Senses</h6>
+							<div class="row q-col-gutter-md">
+								<div  class="col-12 col-md-4 mb-2">
+									<ValidationProvider rules="numeric|between:1,99" name="Passive perception" v-slot="{ errors, invalid, validated }">
+										<q-input 
+											:dark="$store.getters.theme === 'dark'" filled square
+											label="Passive perception"
+											autocomplete="off" 
+											type="number"
+											min="1"
+											max="99"
+											v-model="player.passive_perception" 
+											placeholder="Perception"
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										>
+											<q-icon slot="prepend" name="fas fa-eye" />
+										</q-input>
+									</ValidationProvider>
+								</div>
+								<div  class="col-12 col-md-4 mb-2">
+									<ValidationProvider rules="numeric|between:1,99" name="Passive investigation" v-slot="{ errors, invalid, validated }">
+										<q-input 
+											:dark="$store.getters.theme === 'dark'" filled square
+											label="Passive investigation"
+											autocomplete="off"
+											type="number" 
+											min="1"
+											max="99"
+											v-model="player.passive_investigation" 
+											placeholder="Investigation"
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										>
+											<q-icon slot="prepend" name="fas fa-search" />
+										</q-input>
+									</ValidationProvider>
+								</div>
+								<div  class="col-12 col-md-4 mb-2">
+									<ValidationProvider rules="numeric|between:1,99" name="Passive insight" v-slot="{ errors, invalid, validated }">
+										<q-input 
+											:dark="$store.getters.theme === 'dark'" filled square
+											label="Passive insight"
+											autocomplete="off"
+											type="number" 
+											min="1"
+											max="99"
+											v-model="player.passive_insight" 
+											placeholder="Insight"
+											:error="invalid && validated"
+											:error-message="errors[0]"
+										>
+											<q-icon slot="prepend" name="fas fa-lightbulb-on" />
+										</q-input>
+									</ValidationProvider>
 								</div>
 							</div>
 						</div>
 					</hk-card>
-				</hk-card-deck>
 
-				<!-- ABILITY SCORES -->
-				<hk-card header="Ability Scores & Senses" class="ability-card">
-					<div class="card-body">
-						<h6 class="mb-2">Ability scores</h6>
-						<div class="row q-col-gutter-md">
-							<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
-								<q-input 
-									dark filled square
-									:label="ability.ability.capitalize()"
-									autocomplete="off"  
-									type="number" 
-									v-model="player[ability.ability]" 
-									:name="ability.ability"
-								>
+					<Defenses v-model="player" />
+
+					<!-- SKILLS -->
+					<hk-card header="Skills">
+						<div class="card-body">
+							<h5>
+								Proficiency Bonus: 
+								+<b class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</b>
+							</h5>
+
+							<div class="skills">
+								<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
 									<q-checkbox 
-										slot="append"
 										size="xs" 
-										dark 
-										v-model="player[`${ability.ability}-save-profficient`]" 
-										:false-value="null" 
-										indeterminate-value="something-else" 
+										:dark="$store.getters.theme === 'dark'"
+										:val="key" 
+										v-model="skills_expertise" 
+										:false-value="null" indeterminate-value="something-else"
+										:disable="player.skills ? !player.skills.includes(key) : true"
 									>
+										<template slot:label>
+											+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
+										</template>
 										<q-tooltip anchor="top middle" self="center middle">
-											Saving throw proficiency
+											Expertise
 										</q-tooltip>
 									</q-checkbox>
-								</q-input>
-							</div>
-						</div>
 
-						<!-- SENSES -->
-						<h6 class="mt-3 mb-2">Senses</h6>
-						<div class="row q-col-gutter-md">
-							<div  class="col-12 col-md-4 mb-2">
-								<q-input 
-									dark filled square
-									label="Passive perception"
-									autocomplete="off" 
-									type="number" 
-									min="1"
-									max="20"
-									v-model="player.passive_perception" 
-									v-validate="'numeric'" 
-									data-vv-as="Passive Perception"
-									name="pper" 
-									placeholder="Perception"
-								>
-									<q-icon slot="prepend" name="fas fa-eye" />
-								</q-input>
-								<p class="validate red" v-if="errors.has('pper')">{{ errors.first('pper') }}</p>
-							</div>
-							<div  class="col-12 col-md-4 mb-2">
-								<q-input 
-									dark filled square
-									label="Passive investigation"
-									autocomplete="off"
-									type="number" 
-									min="1"
-									max="20"
-									v-model="player.passive_investigation" 
-									v-validate="'numeric'" 
-									data-vv-as="Passive Investigation"
-									name="pinv" 
-									placeholder="Investigation" 
-								>
-									<q-icon slot="prepend" name="fas fa-search" />
-								</q-input>
-								<p class="validate red" v-if="errors.has('pinv')">{{ errors.first('pinv') }}</p>
-							</div>
-							<div  class="col-12 col-md-4 mb-2">
-								<q-input 
-									dark filled square
-									label="Passive insight"
-									autocomplete="off"
-									type="number" 
-									min="1"
-									max="20"
-									v-model="player.passive_insight" 
-									v-validate="'numeric'" 
-									data-vv-as="pins"
-									name="pins" 
-									placeholder="Insight"
-								>
-									<q-icon slot="prepend" name="fas fa-lightbulb-on" />
-								</q-input>
-								<p class="validate red" v-if="errors.has('pins')">{{ errors.first('pins') }}</p>
-							</div>
-						</div>
-					</div>
-				</hk-card>
-
-				<Defenses v-model="player" />
-
-				<!-- SKILLS -->
-				<hk-card header="Skills">
-					<div class="card-body">
-						<h5>
-							Proficiency Bonus: 
-							+<b class="blue">{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}</b>
-						</h5>
-
-						<div class="skills">
-							<div v-for="(skill, key) in skillList" :key="key" class="d-flex justify-content-start">
-								<q-checkbox 
-									size="xs" 
-									dark
-									:val="key" 
-									v-model="skills_expertise" 
-									:false-value="null" indeterminate-value="something-else"
-									:disable="player.skills ? !player.skills.includes(key) : true"
-								>
-									<template slot:label>
-										+{{ returnProficiency(player.level ? player.level : calculatedLevel(player.experience)) }}
-									</template>
-									<q-tooltip anchor="top middle" self="center middle">
-										Expertise
-									</q-tooltip>
-								</q-checkbox>
-
-								<q-checkbox 
-									size="xs" 
-									dark
-									:val="key" 
-									v-model="skills" 
-									:false-value="null" indeterminate-value="something-else"
-								>
-									<template slot:label>
-										<div class="skill">
-											<div class="gray-hover abillity">{{ skill.ability.substring(0,3) }}</div>
-											{{ skill.skill  }}
-											<div class="mod">
-												{{ 
-													calculateSkillModifier(
-														calcMod(player[skill.ability]),
-														player.skills ? (
-														player.skills.includes(key) ? 
-														returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
-														: 0) : 0,
-														player.skills_expertise ? player.skills_expertise.includes(key) : false
-													) 
-												}}
+									<q-checkbox 
+										size="xs" 
+										:dark="$store.getters.theme === 'dark'"
+										:val="key" 
+										v-model="skills" 
+										:false-value="null" indeterminate-value="something-else"
+									>
+										<template slot:label>
+											<div class="skill">
+												<div class="neutral-2 abillity">{{ skill.ability.substring(0,3) }}</div>
+												{{ skill.skill  }}
+												<div class="mod">
+													{{ 
+														calculateSkillModifier(
+															calcMod(player[skill.ability]),
+															player.skills ? (
+															player.skills.includes(key) ? 
+															returnProficiency(player.level ? player.level : calculatedLevel(player.experience))
+															: 0) : 0,
+															player.skills_expertise ? player.skills_expertise.includes(key) : false
+														) 
+													}}
+												</div>
 											</div>
-										</div>
-									</template>
-									<q-tooltip anchor="top middle" self="center middle">
-										Proficiency
-									</q-tooltip>
-								</q-checkbox>
+										</template>
+										<q-tooltip anchor="top middle" self="center middle">
+											Proficiency
+										</q-tooltip>
+									</q-checkbox>
+								</div>
 							</div>
 						</div>
-					</div>
-				</hk-card>
+					</hk-card>
 
-				<hk-card header="Companions">
-					<div class="card-body">
-						<template v-if="isOwner()">
-							<div v-if="!npcs">
-								<p>You currently have no custom npcs created</p>
-								<p>First create a custom NPC to use as a companion</p>
-								<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
-							</div>
-							<div v-else>
-								<q-input 
-									dark filled square dense
-									label="Search NPC"
-									type="text" 
-									autocomplete="off" 
-									v-model="search" @keyup="searchNPC()"
-								>
-									<q-icon slot="append" size="xs" name="fas fa-search" @click="searchNPC()"/>
-								</q-input>
+					<hk-card header="Companions">
+						<div class="card-body">
+							<template v-if="isOwner()">
+								<div v-if="!npcs">
+									<p>You currently have no custom npcs created</p>
+									<p>First create a custom NPC to use as a companion</p>
+									<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
+								</div>
+								<div v-else>
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square dense
+										label="Search NPC"
+										type="text" 
+										autocomplete="off" 
+										v-model="search" @keyup="searchNPC()"
+									>
+										<q-icon slot="append" size="xs" name="fas fa-search" @click="searchNPC()"/>
+									</q-input>
 
-								<ul class="entities">
-									<p v-if="noResult" class="red">{{ noResult }}</p>
-									<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-										<div class="d-flex justify-content-left">
-											<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
-												<i class="fas fa-info-circle"></i>
+									<ul class="entities">
+										<p v-if="noResult" class="red">{{ noResult }}</p>
+										<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
+											<div class="d-flex justify-content-left">
+												<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
+													<i class="fas fa-info-circle"></i>
+													<q-tooltip anchor="top middle" self="center middle">
+														Show info
+													</q-tooltip>
+												</a>
+												{{ npc.name }}
+											</div>
+											<a class="neutral-2" v-if="notAdded(npc)" @click="add(npc)">
+												<i class="fas fa-plus green"></i>
+												<span class="d-none d-md-inline ml-1">Add</span>
 												<q-tooltip anchor="top middle" self="center middle">
-													Show info
+													Add companion
 												</q-tooltip>
 											</a>
-											{{ npc.name }}
-										</div>
-										<a class="gray-hover" v-if="notAdded(npc)" @click="add(npc)">
-											<i class="fas fa-plus green"></i>
-											<span class="d-none d-md-inline ml-1">Add</span>
-											<q-tooltip anchor="top middle" self="center middle">
-												Add companion
-											</q-tooltip>
-										</a>
-										<span v-else><small>Already added.</small></span>
-									</li>
-								</ul>
-							</div>
-						</template>
-
-						<!--  Companions table -->
-						<hk-table v-if="player.companions !== undefined"
-							:columns="columns"
-							:items="_companions"
-						>
-							<template slot="avatar" slot-scope="data">
-								<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-								<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+											<span v-else><small>Already added.</small></span>
+										</li>
+									</ul>
+								</div>
 							</template>
 
-							<template slot="name" slot-scope="data">
-								<router-link class="mx-2" :to="`/companions/${userId}/${data.row.key}`">
-										{{ data.item }}
+							<!--  Companions table -->
+							<hk-table v-if="player.companions !== undefined"
+								:columns="columns"
+								:items="_companions"
+							>
+								<template slot="avatar" slot-scope="data">
+									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
+										<i v-if="!data.item" class="hki-monster" />
+									</div>
+								</template>
+
+								<template slot="name" slot-scope="data">
+									<router-link class="mx-2" :to="`/content/companions/${userId}/${data.row.key}`">
+											{{ data.item }}
+											<q-tooltip anchor="top middle" self="center middle">
+												Edit
+											</q-tooltip>
+									</router-link>
+								</template>
+
+								<div slot="actions" slot-scope="data" class="actions">
+									<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`/content/companions/${userId}/${data.row.key}`" >
+										<i class="fas fa-pencil"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
 										</q-tooltip>
-								</router-link>
-							</template>
-
-							<div slot="actions" slot-scope="data" class="actions">
-								<router-link class="gray-hover mx-1" :to="`/companions/${userId}/${data.row.key}`" >
-									<i class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</router-link>
-								<a v-if="isOwner()"
-									class="gray-hover"
-									@click="confirmDelete(data.row.key)">
-									<i class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Delete
-									</q-tooltip>
-								</a>
+									</router-link>
+									<a v-if="isOwner()"
+										class="btn btn-sm bg-neutral-5"
+										@click="confirmDelete(data.row.key)">
+										<i class="fas fa-trash-alt"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Delete
+										</q-tooltip>
+									</a>
+								</div>
+							</hk-table>
+							<div v-else-if="!isOwner()">
+								<p>You currently have no companions linked to your player character</p>
+								<p>Ask your DM to link an NPC to you character</p>
 							</div>
-						</hk-table>
-						<div v-else-if="!isOwner()">
-							<p>You currently have no companions linked to your player character</p>
-							<p>Ask your DM to link an NPC to you character</p>
-							<!-- <router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link> -->
 						</div>
-					</div>
-				</hk-card>
+					</hk-card>
 
-				<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
-				<button v-if="$route.name == 'AddPlayers'" class="btn mt-3" @click="addPlayer()"><i class="fas fa-plus"></i> Add Player</button>
-				<button v-else class="btn mt-3" @click="editPlayer()"><i class="fas fa-check"></i> Save</button>
-			</div>
-		</template>
+					<div class="mt-3 d-flex justify-content-end items-center">
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
+						<router-link to="/content/players" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+						<q-btn color="primary" type="submit" no-caps>
+							{{ $route.name == "Add player" ? "Add player" : "Save" }}
+						</q-btn>
+					</div>
+				</div>
+			</q-form>
+		</ValidationObserver>
 		<div v-else-if="$route.name == 'Edit Character'">
 			<p class="red">You have no conrol over this character</p>
-			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Back</router-link>
+			<router-link to="/content/players" class="btn bg-neutral-5 mr-2 mt-3">Back</router-link>
 		</div>
 	</div>
 </template>
@@ -532,6 +557,13 @@
 					return false
 				return true
 			},
+			savePlayer() {
+				if(this.$route.name === "Add player") {
+					this.addPlayer();
+				} else {
+					this.editPlayer();
+				}
+			},
 			addPlayer() {
 				if(Object.keys(this.players).length >= this.tier.benefits.players) {
 					this.$snotify.error('You have too many players.', 'Error');
@@ -539,67 +571,57 @@
 					delete this.player['.value'];
 					delete this.player['.key'];
 
-					this.$validator.validateAll().then((result) => {
-						if (result) {
-							db.ref('players/' + this.userId).push(this.player);
-							this.$router.replace(this.$route.meta.basePath)
-						}
-					})
+					db.ref('players/' + this.userId).push(this.player);
+					this.$router.replace("/content/players");
 				}
 			},
 			editPlayer() {
-				delete this.player['.key']
+				delete this.player['.key'];
 
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
+				db.ref(`players/${this.userId}/${this.playerId}`).update(this.player);
 
-						// If player already in campaign, add companions to campaign
-						// IN FUTURE migrate this to add / remove companion functions
-						if (this.player.campaign_id !== undefined) {
-							let vm = this;
-							const player_data = this.player
-							const camp_ref = db.ref(`campaigns/${this.userId}/${this.player.campaign_id}`);
-							camp_ref.once('value').then(function(snapshot) {
-								let campaign = snapshot.val();
-								for (let comp_key in player_data.companions) {
-									// Add player id to npc data
-									db.ref(`npcs/${vm.userId}/${comp_key}`).update({'player_id': vm.playerId});
-									// If companion not yet in campaign, add it with npc data curHP
-									if (campaign.companions === undefined) {
-										camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
+				// If player already in campaign, add companions to campaign
+				// IN FUTURE migrate this to add / remove companion functions
+				if (this.player.campaign_id !== undefined) {
+					let vm = this;
+					const player_data = this.player
+					const camp_ref = db.ref(`campaigns/${this.userId}/${this.player.campaign_id}`);
+					camp_ref.once('value').then(function(snapshot) {
+						let campaign = snapshot.val();
+						for (let comp_key in player_data.companions) {
+							// Add player id to npc data
+							db.ref(`npcs/${vm.userId}/${comp_key}`).update({'player_id': vm.playerId});
+							// If companion not yet in campaign, add it with npc data curHP
+							if (campaign.companions === undefined) {
+								camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
+							}
+							else if (!Object.keys(campaign.companions).includes(comp_key)) {
+								camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
+							}
+							else {
+								// console.log('companion already added')
+							}
+						}
+						// Remove companion from campaign object and remove entity from all encounters in campaign
+						for (let comp_del_key of vm.companions_to_delete) {
+							if (campaign.companions !== undefined && Object.keys(campaign.companions).includes(comp_del_key)) {
+								camp_ref.child('companions').child(comp_del_key).remove();
+							}
+							// console.log(vm.userId);
+							db.ref(`npcs/${vm.userId}/${comp_del_key}`).child('player_id').remove();
+							const enc_ref = db.ref(`encounters/${vm.userId}/${player_data.campaign_id}`)
+							enc_ref.once('value').then(function(snapshot) {
+								const encounters = snapshot.val()
+								for (let encounter_key in encounters) {
+									if (Object.keys(encounters[encounter_key].entities).includes(comp_del_key)) {
+										enc_ref.child(`${encounter_key}/entities/${comp_del_key}`).remove();
 									}
-									else if (!Object.keys(campaign.companions).includes(comp_key)) {
-										camp_ref.child('companions').child(comp_key).set({'curHp': vm.npcs[comp_key].maxHp})
-									}
-									else {
-										// console.log('companion already added')
-									}
-								}
-								// Remove companion from campaign object and remove entity from all encounters in campaign
-								for (let comp_del_key of vm.companions_to_delete) {
-									if (campaign.companions !== undefined && Object.keys(campaign.companions).includes(comp_del_key)) {
-										camp_ref.child('companions').child(comp_del_key).remove();
-									}
-									// console.log(vm.userId);
-									db.ref(`npcs/${vm.userId}/${comp_del_key}`).child('player_id').remove();
-									const enc_ref = db.ref(`encounters/${vm.userId}/${player_data.campaign_id}`)
-									enc_ref.once('value').then(function(snapshot) {
-										const encounters = snapshot.val()
-										for (let encounter_key in encounters) {
-											if (Object.keys(encounters[encounter_key].entities).includes(comp_del_key)) {
-												enc_ref.child(`${encounter_key}/entities/${comp_del_key}`).remove();
-											}
-										}
-									})
 								}
 							})
 						}
-						this.$router.replace(this.$route.meta.basePath)
-					} else {
-						//console.log('Not valid');
-					}
-				});
+					})
+				}
+				this.$router.replace("/content/players");
 			},
 			showSlide(type) {
 				this.setSlide({
@@ -658,73 +680,94 @@
 				return true;
 			},
 			confirmDelete(index) {
-
 				this.$delete(this.player.companions, index)
 				this.companions_to_delete.push(index);
 			},
+			parseToInt(value, object, property) {
+				if(value === undefined || value === null || value === "") {
+					this.$set(object, property, null);
+				} else {
+					if(property === "level") {
+						value = (value > 20) ? 20 : (value < 1) ? 1 : value;
+					}
+					this.$set(object, property, parseInt(value));
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	padding: 20px;
 
-	label {
-		line-height: 37px;
-		margin-bottom: 0;
+label {
+	line-height: 37px;
+	margin-bottom: 0;
 
-		&.experience {
-			display: flex;
-			justify-content: space-between;
-		}
+	&.experience {
+		display: flex;
+		justify-content: space-between;
+	}
 
-		svg {
-			fill: $gray-light;
-			width: 20px;
-			height: 20px;
+	svg {
+		fill: $neutral-2;
+		width: 20px;
+		height: 20px;
+	}
+}
+.avatar {
+	display: grid;
+	grid-template-columns: 56px 1fr;
+	grid-column-gap: 10px;
+
+	.img {
+		border: solid 1px $neutral-4;
+		display: block;
+		width: 56px;
+		height: 56px;
+		background-size: cover;
+		background-position: center top;
+		font-size: 45px;
+		color: $neutral-2;
+		background-color: $neutral-9;
+
+		i::before {
+			vertical-align: 5px;
 		}
 	}
-	.avatar {
+}
+.skills {
+	columns: 3;
+
+	.skill {
+		width: 100%;
 		display: grid;
-		grid-template-columns: 56px 1fr;
-		grid-column-gap: 10px;
+		grid-template-columns: 45px 1fr min-content;
 
-		.img {
-			border: solid 1px $gray-light;
-			display: block;
-			width: 56px;
-			height: 56px;
-			background-size: cover;
-			background-position: center top;
+		.abillity {
+			text-transform: uppercase;
+			text-align: center;
+		}
+		.mod {
+			margin-left: 8px;
 		}
 	}
+}
+
+[data-theme="light"] {
+	.avatar .img {
+		background-color: $neutral-2;
+		color: $neutral-8;
+	}
+}
+
+@media only screen and (max-width: 1250px) { 
 	.skills {
-		columns: 3;
-
-		.skill {
-			width: 100%;
-			display: grid;
-			grid-template-columns: 45px 1fr min-content;
-
-			.abillity {
-				text-transform: uppercase;
-				text-align: center;
-			}
-			.mod {
-				margin-left: 8px;
-			}
-		}
+		columns: 2;
 	}
-	@media only screen and (max-width: 1250px) { 
-		.skills {
-			columns: 2;
-		}
-	}
-	@media only screen and (max-width: 890px) { 
-		.skills {
-			columns: 1;
-		}
+}
+@media only screen and (max-width: 890px) { 
+	.skills {
+		columns: 1;
 	}
 }
 </style>

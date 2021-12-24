@@ -2,7 +2,7 @@
 	<div v-if="campPlayers && campPlayers && players && npcs && (health.curHp > 0 || entity.entityType == 'npc')">
 		<span class="hp">
 			<span v-if="isTransformed(entity, camp_data)" class="mr-1">
-				<i class="fas fa-paw-claws"></i>
+				<i class="fas fa-paw-claws mr-2"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Transformed
 				</q-tooltip>
@@ -14,7 +14,7 @@
 				}">
 					<hk-animated-integer :value="health.curHp" />
 				</span>
-				<span class="gray-hover">/</span><span :class="{ 
+				<span class="neutral-2">/</span><span :class="{ 
 					'green': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod > 0, 
 					'red': (entity.entityType === 'player' || entity.entityType === 'companion') && camp_data.maxHpMod < 0
 				}">{{ health.maxHp }}
@@ -110,65 +110,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.table {
-		border-collapse: separate; 
-		border-spacing: 0 5px;
-
-		tr:first-child {
-			td {
-				border-top: solid 1px $blue !important;
-				border-bottom: solid 1px $blue !important;
-			}
-			td:first-child {
-				border-left: solid 1px $blue !important;
-			}
-			td:last-child {
-				border-right: solid 1px $blue !important;
-			}
-		}
-		tr {
-			td {
-				background: rgba(38, 38, 38, .9);
-			}
-			td.ac, th.ac {
-				width: 30px;
-				text-align: center;
-			}
-			td.ac {
-				font-weight: bold;
-			}
-			td.name {
-				width: 1%;
-				white-space: nowrap;
-			}
-			td.img {
-				width: 45px;
-				background-size: cover;
-				background-position: center top;
-			}
-		}
-		tr td:first-child, thead th {
-			text-align: center;
-			color:$neutral-1;
-			background: none;
-			text-shadow: 0 0 3px $black;
-		}
-	}
-	.conditions {
-		padding: 9px 10px;
-
-		svg {
-			width: 24px;
-			height: 24px;
-			fill:$red;
-			padding: 2px;
-			cursor: pointer;
-			margin: 0;
-		}
-	}
-	.entities-move {
-		transition: transform .6s;
-	}
-</style>

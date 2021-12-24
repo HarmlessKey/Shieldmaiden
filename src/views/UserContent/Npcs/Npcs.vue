@@ -4,12 +4,17 @@
 			<div slot="header" class="card-header">
 				<span>
 					NPC's ( 
-					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ Object.keys(npcs).length }}</span> 
+					<span :class="{ 'green': true, 'red': content_count.npcs >= tier.benefits.npcs }">{{ content_count.npcs }}</span> 
 					/ 
 					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
 					<template v-else>{{ tier.benefits.npcs }}</template>
 					)
 				</span>
+				<a class="btn btn-sm bg-neutral-5"
+					@click="bulk_import_dialog = true"
+				>
+					Bulk Import NPCs
+				</a>
 				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
 					<i class="fas fa-plus green"></i> New NPC
 				</router-link>
@@ -36,8 +41,9 @@
 						:search="['name', 'type']"
 					>
 						<template slot="avatar" slot-scope="data">
-							<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-							<img v-else class="image" src="@/assets/_img/styles/monster.svg" />
+							<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
+								<i v-if="!data.item" class="hki-monster" />
+							</div>
 						</template>
 
 						<template slot="name" slot-scope="data">
@@ -78,10 +84,16 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
+							<a class="btn btn-sm bg-neutral-5 mx-1" @click="confirmDelete($event, data.row.key, data.row)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
+								</q-tooltip>
+							</a>
+							<a class="btn btn-sm bg-neutral-5 mx-1" @click="downloadJSON(data.row)">
+								<i class="fas fa-brackets-curly"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Export JSON
 								</q-tooltip>
 							</a>
 						</div>
@@ -112,7 +124,7 @@
 		</hk-card>
 		
 		<!-- PARSER DIALOG -->
-		<q-dialog dark v-model="old_dialog">
+		<q-dialog :dark="$store.getters.theme === 'dark'" v-model="old_dialog">
 			<hk-card header="Deprecated NPC's">
 				<template v-if="!parsing">
 					<div class="card-body">
@@ -125,7 +137,7 @@
 						<a class="btn btn-block" @click="parseAll()">Parse all NPC's</a>
 					</div>
 					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="bg-neutral-8" v-close-popup>Later</q-btn>
+						<q-btn class="bg-neutral-8" v-close-popup no-caps>Later</q-btn>
 					</div>
 				</template>
 				<template v-else>
@@ -151,12 +163,56 @@
 							</p>
 						</div>
 						<div slot="footer" class="card-footer d-flex justify-content-end">
-							<q-btn class="bg-blue white" v-close-popup>Close</q-btn>
+							<q-btn class="bg-blue white" no-caps v-close-popup>Close</q-btn>
 						</div>
 					</template>
 				</template>
 			</hk-card>
 		</q-dialog>
+
+		<!-- Bulk import dialog -->
+		<q-dialog v-model="bulk_import_dialog">
+			<hk-card header="Import NPC from JSON" :minWidth="400">
+				<div class="card-body">
+					<q-file 
+						:dark="$store.getters.theme === 'dark'" 
+						filled square 
+						accept=".json"
+						v-model="json_file" 
+						@input="loadJSON()"
+					>
+						<template v-slot:prepend>
+							<q-icon name="attach_file" />
+						</template>
+					</q-file>
+
+					<h4 class="my-3">
+						OR
+					</h4>
+					<ValidationObserver  v-slot="{ handleSubmit }">
+
+						<q-form @submit="handleSubmit(parseJSON)">
+							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
+								<q-input
+									:dark="$store.getters.theme === 'dark'" 
+									filled square 
+									type="textarea"
+									label="JSON Input"
+									v-model="json_input"
+									:error="invalid && validated"
+									:error-message="errors[0]"
+								/>
+
+							</ValidationProvider>
+							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
+								Parse Input
+							</q-btn>
+						</q-form>
+					</ValidationObserver>
+				</div>
+			</hk-card>
+		</q-dialog>
+
 	</div>
 </template>
 
@@ -180,6 +236,9 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				old_dialog: false,
+				bulk_import_dialog: false,
+				json_file: undefined,
+				json_input: undefined,
 				parsed_counter: 0,
 				error_counter: 0,
 				parse_total: 0,
@@ -207,13 +266,13 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'npcs',
 				'campaigns',
 				'players',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
+			...mapGetters("npcs", ["npcs"]),
 			_npcs: function() {
 				return _.chain(this.npcs)
 				.filter(function(npc, key) {
@@ -243,6 +302,15 @@
 				'stopFetchNpcs',
 				'setSlide'
 			]),
+			...mapActions("npcs", ["delete_npc"]),
+			downloadJSON(npc) {
+				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(npc, null ,2)); 
+				var downloadAnchorNode = document.createElement('a'); 
+				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name.trim() + ".json");
+				document.body.appendChild(downloadAnchorNode);  // required for firefox 
+				downloadAnchorNode.click(); 
+				downloadAnchorNode.remove(); 
+			},
 			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -297,13 +365,12 @@
 						}
 					}
 				}
-				//Remove NPC
-				db.ref('npcs/' + this.userId).child(key).remove(); 
+				//Remove NPC from database and store
+				this.delete_npc(key);
 			},
 			* getNPC () {
 				for (const npc of this.old_npcs_copy) {
-					yield npc;
-					
+					yield npc;				
 				}
 			},
 			async parseAll() {
@@ -356,6 +423,34 @@
 							timeout: 2000
 						});
 				}
+			}, 
+			loadJSON() {
+				const fr = new FileReader();
+
+				fr.onload = e => {
+					const result = JSON.parse(e.target.result)
+					// const formatted = JSON.stringify(result, null, 2)
+					// console.log(formatted)
+					delete result.key
+
+					console.log(result)
+					
+					this.import_dialog = false
+					this.json_file = undefined
+
+				}
+
+				fr.readAsText(this.json_file)
+			},
+			parseJSON() {
+
+				let input = JSON.parse(this.json_input)
+				delete input.key
+				
+				this.npc = input
+
+				this.import_dialog = false
+				this.json_input = ""
 			}
 		}
 	}
@@ -366,12 +461,12 @@
 		padding: 20px;
 
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

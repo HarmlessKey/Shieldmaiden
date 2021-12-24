@@ -7,7 +7,7 @@
 						Your Campaigns
 						<span v-if="campaigns && tier">( 
 							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
-								{{ Object.keys(campaigns).length }}
+								{{ content_count.campaigns }}
 							</span> / 
 							<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
 							<template v-else>{{ tier.benefits.campaigns }}</template>
@@ -29,18 +29,19 @@
 					/>
 
 					<!-- NO PLAYERS YET -->
-					<div class="first-campaign pb-4" v-if="Object.keys(players).length === 0 && (campaigns && Object.keys(campaigns).length > 0)">
+					<div class="first-campaign pb-4" v-if="content_count.players === 0 && (content_count.campaigns > 0)">
 						<h2>Create players for your campaign</h2>
-						<router-link to="/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
+						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
 					</div>
 
 					<transition-group 
-						v-if="campaigns && Object.keys(campaigns).length > 0"
+						v-if="campaigns && content_count.campaigns > 0"
 						tag="div" 
 						class="row q-col-gutter-md" 
 						name="campaigns" 
 						enter-active-class="animated animate__fadeIn" 
-						leave-active-class="animated animate__fadeOut">
+						leave-active-class="animated animate__fadeOut"
+					>
 						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in _campaigns" :key="campaign.key">
 							<hk-card>
 								<!-- Image -->
@@ -56,23 +57,29 @@
 										<i 
 											class="px-1 py-2"
 											:class="{
-												'fas fa-eye text-shadow-6 neutral-2': !campaign.private,
-												'fas fa-eye-slash text-shadow-6 neutral-2': campaign.private 
+												'fas fa-eye text-shadow-6 white': !campaign.private,
+												'fas fa-eye-slash text-shadow-6 white': campaign.private 
 											}"
 										>
 											<q-tooltip anchor="top middle" self="bottom middle">
 												{{ campaign.private ? "Private campaign" : "Public campaign" }}
 											</q-tooltip>
 										</i>
-										<div class="d-flex justify-content-end">
-											<router-link class="btn btn-sm btn-clear mx-1" :to="`${$route.path}/${campaign.key}`">
+										<div class="campaign-actions">
+											<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign.key }">
+												<i class="fas fa-user-plus"></i>
+												<q-tooltip anchor="top middle" self="bottom middle">
+													Add players
+												</q-tooltip>
+											</a>
+											<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign.key }">
 												<i class="fas fa-pencil"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
 													Edit
 												</q-tooltip>
-											</router-link>
+											</a>
 											<a
-												class="btn btn-sm btn-clear"
+												class="btn btn-sm btn-clear white"
 												@click="confirmDelete($event, campaign.key, campaign.campaign)"
 											>
 												<i class="fas fa-trash-alt"></i>
@@ -84,9 +91,10 @@
 									</div>
 									<a 
 										v-if="!campaign.background" 
-										class="neutral-2 text-shadow-3 link" 
+										class="white text-shadow-3 link" 
 										target="_blank" rel="noopener"
-										href="https://www.vecteezy.com/free-vector/fantasy-landscape">
+										href="https://www.vecteezy.com/free-vector/fantasy-landscape"
+									>
 										Image by Vecteezy
 									</a>
 								</div>
@@ -100,34 +108,37 @@
 									</h3>
 
 									<div class="mb-1">
-										<router-link class="btn btn-clear btn-sm" :to="'/campaigns/' + campaign.key">
-											<i class="fas fa-users mr-1 neutral-2"></i>
+										<a class="btn btn-clear btn-sm" @click="edit_players = { show: true, campaign: campaign.key }">
+											<i class="fas fa-users mr-1 neutral-2" />
 											{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
 											players
-										</router-link>
+										</a>
 									</div>
 									
-									<router-link class="btn btn-clear btn-sm" :to="'/encounters/' + campaign.key">
-										<i class="fas fa-swords mr-2 neutral-2"></i>
-										<template v-if="allEncounters && allEncounters[campaign.key]">
-											<span :class="{ 'green': true, 'red': Object.keys(allEncounters[campaign.key]).length >= tier.benefits.encounters }">
-												{{ Object.keys(allEncounters[campaign.key]).length }}
+									<router-link class="btn btn-clear btn-sm" :to="`${$route.path}/${campaign.key}`">
+										<i class="fas fa-swords mr-2 neutral-2" />
+											<span 
+												:class="{ 
+													'green': campaign.encounters > 0, 
+													'red': campaign.encounters >= tier.benefits.encounters 
+												}"
+											>
+												{{ campaign.encounters }}
 											</span>
-										</template>
-										<span v-else> 0</span> encounters
+											encounters
 									</router-link>
 									
 									<div class="mt-4">
-										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn bg-green ">
+										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn ">
 											<i class="fas fa-user"></i> Create players
 										</router-link>
-										<router-link :to="'/content/campaigns/' + campaign.key" v-else-if="!campaign.players" class="btn bg-green">
+										<a @click="edit_players = { show: true, campaign: campaign.key }" v-else-if="!campaign.players" class="btn">
 											<i class="fas fa-plus"></i> Add players
-										</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else-if="!allEncounters || !allEncounters[campaign.key]" class="btn bg-green">
+										</a>
+										<router-link :to="`${$route.path}/${campaign.key}`" v-else-if="!campaign.encounters" class="btn">
 											<i class="fas fa-swords"></i> Add encounters
 										</router-link>
-										<router-link :to="'/encounters/' + campaign.key" v-else class="btn">
+										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
 											Continue
 										</router-link>
 									</div>
@@ -144,7 +155,7 @@
 						<q-form @submit="addCampaign">
 							<h2 class="mt-0">Create your first campaign</h2>
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								type="text" 
 								autocomplete="off"
 								v-model="newCampaign" 
@@ -153,7 +164,7 @@
 								:rules="[ val => val && val.length > 0 || 'Enter a title for your campaign']"
 							/>
 							<q-select 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								map-options
 								emit-value
 								label="Advancement"
@@ -162,7 +173,7 @@
 								:options="advancement_options"
 							/>
 							
-							<q-btn class="btn btn-lg bg-green btn-block mt-4" type="submit" label="Create campaign" />
+							<q-btn class="btn btn-lg bg-green btn-block mt-4" no-caps type="submit" label="Create campaign" />
 						</q-form>
 					</div>
 				</div>
@@ -182,7 +193,7 @@
 					<hk-card header="New campaign" class="mb-0">
 						<div class="card-body">
 							<q-input 
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								type="text" 
 								autocomplete="off"
 								v-model="newCampaign" 
@@ -191,7 +202,7 @@
 								:rules="[ val => val && val.length > 0 || 'Enter a title']"
 							/>
 							<q-select
-								dark filled square
+								:dark="$store.getters.theme === 'dark'" filled square
 								emit-value
 								map-options
 								label="Advancement"
@@ -202,23 +213,35 @@
 						</div>
 
 						<div slot="footer" class="card-footer d-flex justify-end">
-							<q-btn v-close-popup label="Cancel" class="mr-1" />
-							<q-btn type="submit" color="primary" label="Add campaign" />
+							<q-btn v-close-popup no-caps label="Cancel" class="mr-1" />
+							<q-btn type="submit" no-caps color="primary" label="Add campaign" />
 						</div>
 					</hk-card>
 				</q-form>
 			</div>
 		</q-dialog>
+
+		<!-- Edit campaign dialog -->
+		<q-dialog v-model="edit_campaign.show">
+			<EditCampaign :campaign-id="edit_campaign.campaign" />
+		</q-dialog>
+
+		<!-- Edit campaign dialog -->
+		<q-dialog v-model="edit_players.show">
+			<AddPlayers :campaign-id="edit_players.campaign" />
+		</q-dialog>
 	</div>
 </template>
 
 <script>
-	import _ from 'lodash'
+	import _ from 'lodash';
 	
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters, mapActions } from 'vuex';
+	import { mapGetters } from 'vuex';
 	import { db } from '@/firebase';
 	import { general } from '@/mixins/general.js';
+	import EditCampaign from "./EditCampaign";
+	import AddPlayers from "./AddPlayers";
 
 	export default {
 		name: 'Campaigns',
@@ -227,12 +250,22 @@
 		},
 		mixins: [general],
 		components: {
-			OutOfSlots
+			OutOfSlots,
+			EditCampaign,
+			AddPlayers
 		},
 		data() {
 			return {
 				newCampaign: '',
 				add: false,
+				edit_players: {
+					show: false,
+					campaign: undefined
+				},
+				edit_campaign: {
+					show: false,
+					campaign: undefined
+				},
 				advancement: "experience",
 				advancement_options: [
 					{
@@ -247,7 +280,6 @@
 			}
 		},
 		mounted() {
-			this.clearEncounters()
 			this.assignPlayers()
 		},
 		computed: {
@@ -257,16 +289,20 @@
 				'campaigns',
 				'userInfo',
 				'allEncounters',
-				'players',
 				'overencumbered',
-				'content_count',
-				'active_campaign'
+				'content_count'
 			]),
+			...mapGetters("encounters", ["encounters"]),
+			...mapGetters("campaigns", ["campaigns"]),
+			...mapGetters("players", ["players"]),
 			_campaigns: function() {
-				return _.chain(this.campaigns)
+				const vm = this;
+				return _.chain(JSON.parse(JSON.stringify(this.campaigns)))
 				.filter(function(campaign, key) {
-					campaign.key = key
-					return campaign
+					campaign.key = key;
+					campaign.encounters = (vm.encounters[key]) ? Object.keys(vm.encounters[key]).length : 0;
+
+					return campaign;
 				})
 				.orderBy(function(campaign){
 					return parseInt(campaign.timestamp)
@@ -274,14 +310,10 @@
 				.value()
 			},
 			slotsLeft() {
-				return this.tier ? this.tier.benefits.campaigns - Object.keys(this.campaigns).length : 0;
+				return this.tier ? this.tier.benefits.campaigns - this.content_count.campaigns : 0;
 			}
 		},
 		methods: {
-			...mapActions([
-				'clearEncounters',
-				'deleteCampaign',
-			]),
 			addCampaign() {
 				if ((this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
 					db.ref('campaigns/' + this.user.uid).push({
@@ -311,12 +343,13 @@
 				}
 			},
 			assignPlayers() {
-				for (let campaignId in this.campaigns) {
-					for (let playerId in this.campaigns[campaignId].players) {
-						if (Object.keys(this.players[playerId]).indexOf('campaign_id') < 0) {
+				for (const [campaignId, campaign] of Object.entries(this.campaigns)) {
+					for (const playerId in campaign.players) {
+						const player = this.players[playerId];
+						if (!player.hasOwnProperty("campaign_id") || player.campaign_id === undefined) {
 							// Player not yet assigned to campaign
 							db.ref(`players/${this.user.uid}/${playerId}`).update({campaign_id: campaignId});
-						} else if (this.players[playerId].campaign_id !== campaignId) {
+						} else if (player.campaign_id !== campaignId) {
 							// Player in both this campaign as other campaign
 							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
 								buttons: [
@@ -345,21 +378,14 @@
 			background-size: cover;
 			background-position: center bottom;
 	
+			.campaign-actions {
+				.btn {
+					text-shadow: 0 0 6px $black;
+					margin-left: 2px;
 
-			.card-header {
-				background: rgba(38, 38, 38, .9) !important;
-	
-				span.title {
-					display: block;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					width: calc(100% - 60px);
-					font-size: 18px;
-				}
-				.actions {
-					display: flex;
-					justify-content: flex-end;
+					&:hover {
+						text-shadow: none;
+					}
 				}
 			}
 			.card-body {
@@ -402,7 +428,7 @@
 			}
 			&.openSlot {
 				height: 263px;
-				border: dashed 1px $gray-light !important;
+				border: dashed 1px $neutral-4 !important;
 				background: none !important;
 	
 				.card-body {

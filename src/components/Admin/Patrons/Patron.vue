@@ -19,7 +19,7 @@
 				</a>
 			</span>
 		</h1>
-		<p><i class="gray-hover">{{ patron['.key'] }}</i></p>
+		<p><i class="neutral-2">{{ patron['.key'] }}</i></p>
 
 		<template v-if="!edit">
 			<div class="row q-col-gutter-md mb-2">
@@ -54,7 +54,7 @@
 				</div>
 				<div class="col">
 					<span :class="{ 'red': patron.last_charge_status == 'Declined', 'green': patron.last_charge_status == 'Paid' }">{{ patron.last_charge_status }}</span>
-					<span class="gray-hover"> ({{ makeDate(patron.last_charge_date) }})</span>
+					<span class="neutral-2"> ({{ makeDate(patron.last_charge_date) }})</span>
 				</div>
 			</div>
 
@@ -155,7 +155,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: $gray-light;
+			color: $neutral-1;
 		}
 		&:last-child::after {
 			content: '';

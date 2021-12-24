@@ -14,7 +14,7 @@
 				<h2 v-if="!active_campaign">No campaigns yet</h2>
 				<a 
 					v-if="!active_campaign || !active_campaign.background" 
-					class="neutral-2 text-shadow-3 link" 
+					class="white text-shadow-3 link" 
 					target="_blank" rel="noopener"
 					href="https://www.vecteezy.com/free-vector/fantasy-landscape">
 					Image by Vecteezy
@@ -53,7 +53,7 @@
 		<hk-card-deck>
 			<hk-card header="Dungeon Master">
 				<div class="card-body">
-					<q-list dark class="mb-4">
+					<q-list :dark="$store.getters.theme === 'dark'" class="mb-4">
 						<q-item 
 							v-for="({path, icon, label, caption}, index) in dm_tabs" 
 							clickable v-ripple 
@@ -77,7 +77,7 @@
 		
 			<hk-card header="Player">
 				<div class="card-body">
-					<q-list dark>
+					<q-list :dark="$store.getters.theme === 'dark'">
 						<q-item 
 							v-for="({path, icon, label, caption}, index) in player_tabs" 
 							clickable v-ripple 
@@ -183,8 +183,8 @@
 				'tier',
 				'voucher',
 				'userInfo',
-				'campaigns'
 			]),
+			...mapGetters("campaigns", ["campaigns"]),
 			active_campaign() {
 				if(this.campaigns && this.userInfo) {
 					if(this.userInfo && this.userInfo.active_campaign) {
@@ -231,7 +231,9 @@
 
 	.q-item {
 		background-color: $neutral-8;
-		margin-bottom: 1px;
+		margin-bottom: 3px;
+		border-radius: $border-radius;
+		border: solid 1px $neutral-5;
 
 		.q-item__label--caption {
 			color: $neutral-4;
@@ -263,7 +265,7 @@
 		width: 100%;
 		padding: 20px 10px 20px 10px;
 		backdrop-filter: blur(2px);
-		border-top: solid 1px $gray-hover;
+		border-top: solid 1px $neutral-4;
 		background-color: rgba(0, 0, 0, .5);
 
 		.btn {

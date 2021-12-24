@@ -2,7 +2,7 @@
 	<div v-if="overencumbered" class='container-fluid'>
 		<OverEncumbered/>
 	</div>
-	<div class="container-fluid" v-else-if="encounter">
+	<div class="container-fluid" v-else>
 		<div class="wrapper scrollable-content">
 			<div class="mt-2 encounter_actions">
 				<q-tabs
@@ -20,7 +20,7 @@
 						icon="fas fa-arrow-left"
 						class="pl-0"
 						name="back"
-						:to="'/encounters/' + $route.params.campid"
+						:to="'/content/campaigns/' + $route.params.campid"
 					/>
 					<q-tab 
 						v-for="({name, icon, label}, index) in tabs"
@@ -33,23 +33,23 @@
 				<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
 					<q-tab-panels v-model="tab" class="bg-transparent">
 						<q-tab-panel name="entities">
-								<Entities />
+							<Entities :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
 						<q-tab-panel name="general">
-								<General />
+							<General :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
 						<q-tab-panel name="loot">
-								<Loot />
+							<Loot :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
 						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
-								<Xp />
+							<Xp :encounter="encounter" :campaign="campaign" />
 						</q-tab-panel>
 					</q-tab-panels>
 				</q-scroll-area>
 			</div>
 
 			<!-- ENCOUNTER OVERVIEW -->
-			<Overview />
+			<Overview :encounter="encounter" :campaign="campaign" />
 		</div>
 	</div>
 </template>
@@ -80,17 +80,17 @@
 		},
 		data() {
 			return {
+				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
-				user: this.$store.getters.user,
+				campaign: {},
+				encounter: {},
 				tab: "entities"
 			} 
 		},
 		computed: {
 			...mapGetters([
-				"encounter",
-				"campaign",
-				"overencumbered",
+				"overencumbered"
 			]),
 			tabs() {
 				let tabs = {
@@ -104,20 +104,25 @@
 				return tabs;
 			}
 		},
-		mounted() {
-			this.fetchEncounter({
-				cid: this.campaignId, 
-				eid: this.encounterId, 
-			}),
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			})
+		async	mounted() {
+			await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			}).then((campaign) => {
+				this.campaign = campaign;
+			});
+
+			await this.get_encounter({
+				uid: this.user.uid,
+				campaignId: this.campaignId, 
+				id: this.encounterId
+			}).then(encounter => {
+				this.encounter = encounter;
+			});
 		},
 		methods: {
-			...mapActions([
-				"fetchEncounter",
-				"fetchCampaign"
-			])
+			...mapActions("campaigns", ["get_campaign"]),
+			...mapActions("encounters", ["get_encounter"]),
 		}
 	}
 </script>
@@ -127,7 +132,6 @@
 	height: calc(100vh - 50px);
 
 	.wrapper {
-		padding: 10px;
 		grid-gap: 10px;
 		display: grid;
 		grid-template-columns: 2fr 1fr;

@@ -4,7 +4,7 @@
 			<div v-for="sense in monster_senses" :key="sense" class="row q-col-gutter-md mb-2">
 				<div class="col-4 col-md-3">
 					<q-checkbox 
-						dark 
+						:dark="$store.getters.theme === 'dark'" 
 						:label="sense.capitalize()" 
 						:false-value="null" 
 						indeterminate-value="something else"
@@ -14,7 +14,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Range"
 						autocomplete="off"
 						type="number" 
@@ -26,7 +26,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Comments"
 						autocomplete="off"
 						:value="npc.senses && npc.senses[sense] ? npc.senses[sense].comments : undefined"

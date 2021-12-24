@@ -4,7 +4,7 @@
 			<hk-card header="Username">
 				<p>To continue, please first enter a username.</p>
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						type="text" 
 						autocomplete="off"
 						label="Username" 

@@ -16,7 +16,7 @@
 
 			<q-tabs
 				v-model="tab"
-				dark
+				:dark="$store.getters.theme === 'dark'"
 				inline-label
 				dense
 				no-caps
@@ -52,37 +52,47 @@
 						<li v-for="(reminder, key) in personalReminders" :key="key">
 							<div class="d-flex justify-content-between" :class="'bg-'+reminder.color">
 								<div class="title">{{ reminder.title }}</div>
-								<a class="add" @click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)">
-									<i :class="reminder.variables ? 'fas fa-caret-right gray-light' : 'fas fa-plus green'"></i>
+								<a 
+									class="add" 
+									@click="reminder.variables ? showVariableOptions(key) : addReminder('premade', reminder)"
+									:class="{ open: varOptions === key }"
+								>
+									<i :class="reminder.variables ? 'fas fa-chevron-down' : 'fas fa-plus green'"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Set
 									</q-tooltip>
 								</a>
 							</div>
-							<div v-if="varOptions === key" class="variables">
-								<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-									<q-select 
-										dark filled square dense
-										:label="var_key"
-										:options="variable"
-										type="text" 
-										v-validate="'required'"
-										v-model="selectedVars[var_key]"
-										:name="var_key"
-									/>
-									<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
+							<q-slide-transition>
+								<div v-if="varOptions === key" class="variables">
+									<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
+										<q-select 
+											:dark="$store.getters.theme === 'dark'" filled square dense
+											:label="var_key"
+											:options="variable"
+											type="text" 
+											v-validate="'required'"
+											v-model="selectedVars[var_key]"
+											:name="var_key"
+										/>
+										<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
+									</div>
+									<a @click="addReminder('premade', reminder, selectedVars)" class="btn btn-sm btn-clear mt-2">
+										<i class="fas fa-plus green"></i> Add reminder
+									</a>
 								</div>
-								<a @click="addReminder('premade', reminder, selectedVars)" class="gray-light d-block mt-3">
-									<i class="fas fa-plus green"></i> Add reminder
-								</a>
-							</div>
+							</q-slide-transition>
 						</li>
 					</ul>
 				</template>
 				</q-tab-panel>
 				<q-tab-panel name="custom">
-					<reminder-form v-model="customReminder" @validation="setValidation" :variables="false"/>
-					<button class="btn btn-block" @click="addReminder('custom')">Set</button>
+					<ValidationObserver v-slot="{ handleSubmit, valid }">
+						<q-form @submit="handleSubmit(addReminder('custom', valid))">
+							<reminder-form v-model="customReminder" :variables="false"/>
+							<q-btn color="blue" no-caps type="submit" :disabled="!valid">Set</q-btn>
+						</q-form>
+					</ValidationObserver>
 				</q-tab-panel>
 			</q-tab-panels>
 		</template>
@@ -167,20 +177,16 @@
 						reminder['.key'] = key;
 					}
 				}
-				else if(type === 'custom') {
-					this.validation.validateAll().then((result) => {	
-						if (result) {
-							for(const target of this.reminder_targets) {
-								this.set_targetReminder({
-									action: 'add',
-									entity: target,
-									type: 'custom',
-									reminder: this.customReminder
-								});
-							}
-							this.customReminder = {};
-						}
-					});
+				else if(type === 'custom' && reminder) {
+					for(const target of this.reminder_targets) {
+						this.set_targetReminder({
+							action: 'add',
+							entity: target,
+							type: 'custom',
+							reminder: this.customReminder
+						});
+					}
+					this.customReminder = {};
 				}
 			},
 			setValidation(validate) {
@@ -216,7 +222,6 @@
 		li {
 			margin-bottom: 2px !important;
 			border: solid 1px transparent;
-			background:$gray-dark;
 		}
 	}
 
@@ -225,26 +230,37 @@
 	}
 
 	ul.premade {
-		color:$neutral-1;
+		color: $neutral-1;
 		list-style: none;
 		padding: 0;
 
 		li {
 			margin-bottom: 3px;
-			background-color:$gray-dark;
+			background-color: $neutral-9;
 
 			.title {
 				padding: 5px;
 			}
 			a.add {
 				display: block;
-				background:$gray-dark;
+				background: $neutral-9;
 				padding: 5px 0;
 				width: 30px;
 				text-align: center;
+				color: $neutral-1;
+
+				i {
+					transition: transform .2s linear;
+				}
+
+				&.open {
+					i {
+						transform: rotate(180deg);
+					}
+				}
 			}
 			.variables {
-				border-top: solid 3px$gray;
+				border-top: solid 3px $neutral-8;
 				padding: 10px;
 			}
 		}
@@ -254,7 +270,7 @@
 		font-size: 11px;
 
 		a {
-			color:$neutral-1 !important;
+			color: $neutral-1 !important;
 			position: relative;
 			padding: 3px;
 
@@ -266,7 +282,7 @@
 				.delete {
 					position: absolute;
 					right: 5px;
-					color:$neutral-1 !important;
+					color: $neutral-1 !important;
 					font-size: 12px;
 					display: inline-block;
 					

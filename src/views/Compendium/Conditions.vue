@@ -9,18 +9,17 @@
 			</div>
 			<div class="card-body">
 				<hk-table
-					:items="conditions"
+					:items="conditionList"
 					:columns="fields"
 					:perPage="15"
-					:loading="isBusy"
 					:search="['name']"
 					:collapse="true"
 				>
-					<router-link :to="'/compendium/conditions/' + data.row['.key']" slot="name" slot-scope="data">{{ data.item }}</router-link>
+					<router-link :to="'/compendium/conditions/' + data.row.value" slot="name" slot-scope="data">{{ data.item }}</router-link>
 
 					<!-- COLLAPSE -->
 					<div slot="collapse" slot-scope="data">
-						<Condition :id="data.row['.key']" />
+						<Condition :id="data.row.value" />
 					</div>
 					
 					<div slot="table-busy" class="loader">
@@ -33,13 +32,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Condition from '@/components/compendium/Condition.vue';
+	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Conditions',
+		mixins: [conditions],
 		components: {
 			Crumble,
 			Footer,
@@ -55,15 +55,6 @@
 						label: 'Name',
 						sortable: true
 					},
-				},
-				isBusy: true,
-			}
-		},
-		firebase() {
-			return {
-				conditions: {
-					source: db.ref('conditions'),
-					readyCallback: () => this.isBusy = false
 				}
 			}
 		}

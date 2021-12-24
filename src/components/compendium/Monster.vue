@@ -1,25 +1,41 @@
 <template>
-	<tag :is="cardView ? 'hk-card' : 'div'" v-if="monster">
-		<div slot="header" :class="{ 'card-header': cardView }">
-			<h1>
-				{{ monster.name.capitalize() }}
-			</h1>
-			<span class="neutral-3">
-				{{ monster.source }}
-			</span>
+	<tag :is="cardView ? 'hk-card' : 'div'">
+		<div v-if="loading" :class="{ 'card-body': cardView }">
+			<hk-loader />
 		</div>
-		<ViewMonster :data="monster" />
+		<template v-else>
+			<div slot="header" :class="{ 'card-header': cardView }">
+				<h1 v-if="monster.name">
+					{{ monster.name.capitalizeEach() }}
+				</h1>
+				<span class="neutral-3">
+					{{ monster.source }}
+				</span>
+			</div>
+			<ViewMonster :data="monster" />
+		</template>
 	</tag>
 </template>
 
 <script>
-	import { db } from '@/firebase'
 	import ViewMonster from '@/components/ViewMonster.vue';
+	import { mapActions } from 'vuex';
 
 	export default {
 		name: 'Monster',
 		components: {
 			ViewMonster,
+		},
+		data() {
+			return {
+				monster: {},
+				loading: true
+			}
+		},
+		metaInfo() {
+			return {
+				title: `${this.monster.name ? this.monster.name.capitalizeEach() : "Monster"} | D&D 5e`,
+			}
 		},
 		props: {
 			id: {
@@ -31,18 +47,15 @@
 				default: false
 			}
 		},
-		firebase() {
-			return {
-				monster: {
-					source: db.ref(`monsters/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.monster.name.capitalize())
-				}
-			}
+		methods: {
+			...mapActions("monsters", ["get_monster"]),
+		},
+		mounted() {
+			this.get_monster(this.id).then(result => {
+				this.monster = result;
+				this.$root.$emit('route-name', result.name.capitalizeEach());
+				this.loading = false;
+			});
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-
-</style>

@@ -1,19 +1,30 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
-		<div class="card-body">
-			<div class="reminder" v-if="reminder">
-				<reminder-form v-model="reminder" @validation="setValidation" />
-				<div class="trigger">
-					<template v-if="reminder && reminder.trigger">
-						<h3>Trigger info</h3>
-						<div v-html="triggerInfo[reminder.trigger]" />
-					</template>
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
+			<q-form @submit="handleSubmit(editReminder)">
+				<div class="card-body">
+					<div class="reminder" v-if="reminder">
+						<reminder-form v-model="reminder"/>
+						<div class="trigger">
+							<template v-if="reminder && reminder.trigger">
+								<h3>Trigger info</h3>
+								<div v-html="triggerInfo[reminder.trigger]" />
+							</template>
+						</div>
+					</div>
+					<div class="d-flex justify-content-start items-center">
+						<router-link to="/content/reminders" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+						<q-btn v-if="$route.name == 'AddReminder'" type="submit" color="blue" no-caps>Add reminder</q-btn>
+						<q-btn v-else color="blue" type="submit" no-caps>Save</q-btn>
+						<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
+					</div>
 				</div>
-			</div>
-			<router-link :to="$route.meta.basePath" class="btn bg-gray mr-2 mt-3">Cancel</router-link>
-			<button v-if="$route.name == 'AddReminder'" class="btn mt-3" @click="addReminder()"><i class="fas fa-plus"></i> Add reminder</button>
-			<button v-else class="btn mt-3" @click="editReminder()"><i class="fas fa-check"></i> Save</button>
-		</div>
+			</q-form>
+		</ValidationObserver>
 	</hk-card>
 </template>
 
@@ -24,7 +35,7 @@
 	import { db } from '@/firebase'
 
 	export default {
-		name: 'Reminders',
+		name: 'EditReminder',
 		metaInfo: {
 			title: 'Reminders'
 		},
@@ -39,7 +50,7 @@
 				triggerInfo: {
 					'startTurn': "When the entity with the <b>Start of turn</b> reminder gets its turn, the notification will show. You can use this reminder when a spell causes the entity to take damage on the start of their turn.",
 					'endTurn': "When the entity with the <b>End of turn</b> reminder ends its, the notification will show. You can use this reminder when the entity is allowed to make a saving throw at the end of their turn.",
-					'damage': "A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perferct for when someone is concentrating.",
+					'damage': "A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perfect for when someone is concentrating.",
 					'timed': "A <b>timed</b> trigger is set with an amount of rounds. Each round lasts 6 seconds, making a duration of 1 minute last 10 rounds. During an encounter, whenever the entity with the reminder gets its turn, 1 round is removed from the counter. When the counter reaches 0, you receive a notification that the reminder has been removed."
 				},
 				reminder: {}
@@ -69,23 +80,14 @@
 			setValidation(validate) {
 				this.validation = validate;
 			},
-			addReminder() {
-				this.validation.validateAll().then((result) => {
-					if (result) {
-						db.ref('reminders/' + this.userId).push(this.reminder);
-						this.$router.replace(this.$route.meta.basePath)
-					}
-				});
-			},
-			editReminder() {
-				this.validation.validateAll().then((result) => {
-					if (result) {
-						delete this.reminder['.key'];
-						
-						db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
-						this.$router.replace(this.$route.meta.basePath);
-					}
-				});
+			editReminder() {		
+				if(this.$route.name == 'AddReminder') {
+					db.ref('reminders/' + this.userId).push(this.reminder);
+				} else {
+					delete this.reminder['.key'];
+					db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
+				}
+				this.$router.replace("/content/reminders");
 			}
 		}
 	}

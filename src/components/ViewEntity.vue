@@ -439,11 +439,11 @@ h2 {
 h3 {
 	text-transform: none;
 	font-weight: bold !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 3px;
 }
 a {
-	color: $gray-light !important;
+	color: $neutral-2 !important;
 }
 .abilities {
 	user-select: none;
@@ -472,7 +472,7 @@ a {
 	user-select: none;
 	column-count: 3;
 	column-gap: 20px;
-	column-rule: 1px solid$gray-hover;
+	column-rule: 1px solid $neutral-5;
 
 
 	.playerSkill {
@@ -481,7 +481,7 @@ a {
 		cursor: pointer;
 
 		&:hover {
-			color:$neutral-1;
+			color: $neutral-1;
 		}
 		i {
 			
@@ -517,7 +517,7 @@ a {
 		color: $green
 	}
 	.disadvantage .save:hover {
-		color:$red
+		color: $red
 	}
 }
 .smallWidth {

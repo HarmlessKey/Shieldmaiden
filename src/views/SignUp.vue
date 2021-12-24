@@ -6,7 +6,7 @@
 			<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<form v-on:submit.prevent>
 				<q-input
-					dark filled square dense 
+					:dark="$store.getters.theme === 'dark'" filled square dense 
 					autocomplete="off" 
 					class="email" 
 					type="email" 
@@ -14,7 +14,7 @@
 					v-model="email"
 				/>
 				<q-input
-					dark filled square dense 
+					:dark="$store.getters.theme === 'dark'" filled square dense 
 					autocomplete="off" 
 					type="password" 
 					placeholder="Password" 

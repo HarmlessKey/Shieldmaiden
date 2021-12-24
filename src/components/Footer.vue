@@ -32,7 +32,6 @@
 							<ul>
 								<li><router-link to="/compendium">Compendium</router-link></li>
 								<li><router-link to="/feedback">Feedback</router-link></li>
-								<li><router-link to="/planned">Planned</router-link></li>
 								<li><router-link to="/updates">Updates</router-link></li>
 								<li><router-link to="/documentation">Documentation</router-link></li>
 								<li><router-link to="/about-us">About us</router-link></li>
@@ -103,6 +102,11 @@
 	.footer {
 		background-color: $neutral-9;
 
+		.content {
+			margin: auto;
+			max-width: 1250px;
+		}
+
 		.top {
 			padding: 10px 0;
 
@@ -118,6 +122,7 @@
 			.links {
 				display: flex;
 				justify-content: flex-end;
+				padding-right: 20px;
 
 				div {
 					margin-left: 50px;
@@ -132,6 +137,10 @@
 							text-transform: uppercase;
 
 							&:hover {
+								color: $neutral-1;
+							}
+							&.active {
+								font-weight: bold;
 								color: $neutral-1;
 							}
 						}

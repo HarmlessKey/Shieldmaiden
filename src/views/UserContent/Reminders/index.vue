@@ -58,7 +58,7 @@
 						:key="'open-slot-' + index"
 					>
 						<span>Open reminder slot</span>
-						<router-link v-if="!overencumbered" to="/reminders/add-reminder">
+						<router-link v-if="!overencumbered" :to="`${$route.path}/add-reminder`">
 							<i class="fas fa-plus green"></i>
 						</router-link>
 					</div>
@@ -69,7 +69,7 @@
 					</router-link>
 				</template>
 			</template>
-			<router-link v-if="reminders === null && !overencumbered" to="/players/add-player">
+			<router-link v-if="reminders === null && !overencumbered" :to="`${$route.path}/add-reminder`">
 				<i class="fas fa-plus green"></i> Create your first reminder
 			</router-link>
 		</div>
@@ -171,12 +171,12 @@
 <style lang="scss" scoped>
 	.container-fluid {
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

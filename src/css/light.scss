@@ -1,5 +1,69 @@
 [data-theme="light"] {
 	body {
 		background: $neutral-10;
+
+		.btn {
+			color: $neutral-11;
+
+			&-clear {
+				color: $neutral-2;
+
+				&:hover {
+					color: $neutral-11;
+				}
+			}
+			&.bg-neutral-8, &.bg-neutral-9 {
+				color: $neutral-2;
+			}
+		}
+
+		.green {
+			color: $green-hover !important;
+		}
+
+		.live {
+			color: $neutral-11;
+
+			&::before {
+				background-color: $neutral-11;
+			}
+
+			&.active {	
+				&::before {
+					background-color: $neutral-11;
+				}
+			}
+		}
+
+		ul.entities {
+			.img {
+				background-color: $neutral-2;
+				color: $neutral-8;
+			}
+		}
+
+		.hk-table {
+			&-column {
+				.image {
+					background-color: $neutral-2;
+					color: $neutral-8;
+				}
+			}
+		}
+
+		.target-item {
+			.img {
+				color: $neutral-8;
+				background-color: $neutral-2;
+			}
+			.ac_wrapper {
+				i {
+					color: $neutral-2;
+				}
+				.ac {
+					color: $neutral-11;
+				}
+			}
+		}
 	}
 }

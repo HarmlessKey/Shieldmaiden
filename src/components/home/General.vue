@@ -43,7 +43,7 @@
 			</div>
 		</div>
 
-		<q-dialog v-model="dialog" square>
+		<q-dialog v-model="dialog">
 			<Carousel :slides="items" :slide="slide" />
 		</q-dialog>
 	</div>

@@ -3,7 +3,7 @@
 		<h2 class="d-flex justify-content-between">
 			<span><i class="fas fa-bell"/> Notifications <template v-if="notifications">( {{ notifications.length }} )</template></span>
 			<a 
-				class="gray-light text-capitalize" 
+				class="neutral-2 text-capitalize" 
 				@click="add_notification()"
 			>
 				<i class="fas fa-plus green"></i>
@@ -14,11 +14,11 @@
 			</a>
 		</h2>
 
-		<q-list dark square :class="`accordion`">
+		<q-list :dark="$store.getters.theme === 'dark'" square :class="`accordion`">
 			<q-expansion-item
 				v-for="(notification, not_index) in notifications"
 				:key="`notification-${not_index}`"
-				dark switch-toggle-side
+				:dark="$store.getters.theme === 'dark'" switch-toggle-side
 				group="conditions"
 			>
 				<template v-slot:header>
@@ -43,7 +43,7 @@
 						</div>
 						<div class="col-12 col-md-6">
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								label="Application"
@@ -57,9 +57,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Apply reminder</b>
 												</q-card-section>
 
@@ -74,7 +74,7 @@
 							<p class="validate red" v-if="errors.has(`application-${not_index}`)">{{ errors.first(`application-${not_index}`) }}</p>
 
 							<q-select 
-								dark filled square dense
+								:dark="$store.getters.theme === 'dark'" filled square dense
 								map-options
 								emit-value
 								label="Target"
@@ -88,9 +88,9 @@
 							>
 								<template v-slot:append>
 									<q-icon name="info" @click.stop>
-										<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-											<q-card dark square>
-												<q-card-section class="bg-gray-active">
+										<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+											<q-card :dark="$store.getters.theme === 'dark'">
+												<q-card-section class="bg-neutral-8">
 													<b>Target</b>
 												</q-card-section>
 
@@ -109,9 +109,9 @@
 									Variable scaling
 									<a class="ml-1">
 										<q-icon name="info" @click.stop>
-											<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-												<q-card dark square>
-													<q-card-section class="bg-gray-active">
+											<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+												<q-card :dark="$store.getters.theme === 'dark'">
+													<q-card-section class="bg-neutral-8">
 														<b>Variable scaling</b>
 													</q-card-section>
 
@@ -131,7 +131,7 @@
 											{{ key }}
 											<a 
 												v-if="level_tier_addable(not_index, key)"
-												class="gray-hover text-capitalize" 
+												class="neutral-2 text-capitalize" 
 												@click="add_level_tier(not_index, key)">
 													<i class="fas fa-plus green"></i>
 													<q-tooltip anchor="center right" self="center left">
@@ -147,7 +147,7 @@
 											>
 												<div class="col-12 col-md-6">
 													<q-input 
-														dark filled square dense
+														:dark="$store.getters.theme === 'dark'" filled square dense
 														:label="level_scaling"
 														v-model="level_tier.level"
 														autocomplete="off"
@@ -163,7 +163,7 @@
 												<div class="col-12 col-md-6">
 													<div class="d-flex justify-content-between">
 														<q-input 
-															dark filled square dense
+															:dark="$store.getters.theme === 'dark'" filled square dense
 															label="Change"
 															v-model="level_tier.change"
 															autocomplete="off"
@@ -352,14 +352,14 @@ export default {
 h2 {
 	font-size: 18px !important;
 	text-transform: none !important;
-	border-bottom: solid 1px$gray-hover;
+	border-bottom: solid 1px $neutral-4;
 	padding-bottom: 5px;
 }
 label {
 	display: flex;
 	justify-content: flex-start;
 	&.var {
-		border-bottom: solid 1px$gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		padding-bottom: 5px;
 	}
 }
@@ -370,7 +370,7 @@ label {
 .card {
 	.card-header {
 		cursor: pointer;
-		background-color:$gray-dark;
+		background-color: $neutral-8;
 
 		.caret {
 			display: inline-block;
@@ -385,7 +385,7 @@ label {
 		}
 	}
 	.card-body {
-		background-color: $gray-darker;
+		background-color: $neutral-6;
 	}
 }
 </style>

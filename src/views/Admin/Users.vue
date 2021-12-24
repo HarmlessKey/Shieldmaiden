@@ -23,9 +23,9 @@
 				>
 					<span slot="status" slot-scope="data">
 						<template v-if="data.item === 'online'">
-							<i :class="{ 'green': data.item === 'online', 'gray-hover': data.item === 'offline' }" class="fas fa-circle"></i>
+							<i :class="{ 'green': data.item === 'online', 'neutral-2': data.item === 'offline' }" class="fas fa-circle"></i>
 						</template>
-						<span v-else><i class="fas fa-circle gray-hover"></i></span>
+						<span v-else><i class="fas fa-circle neutral-2"></i></span>
 					</span>
 
 					<router-link :to="'/admin/users/' + data.row['.key']" slot="username" slot-scope="data">
@@ -199,7 +199,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: $gray-light;
+			color: $neutral-2;
 		}
 		&:last-child::after {
 			content: '';

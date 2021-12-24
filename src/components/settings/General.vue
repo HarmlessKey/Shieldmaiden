@@ -1,16 +1,29 @@
 <template>
 	<div class="card-body">
+		<h3>Theme</h3>
+		<div class="theme">
+			<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+				<img src="@/assets/_img/dark.webp" />
+				Dark
+			</a>
+			<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+				<img src="@/assets/_img/light.webp" />
+				Light
+			</a>
+		</div>
+		<hr>
+		
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
@@ -47,8 +60,8 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark>
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>
@@ -71,7 +84,8 @@
 
 <script>
 	import { db } from '@/firebase';
-	import Keybindings from '@/components/slides/Keybindings.vue'
+	import Keybindings from '@/components/slides/Keybindings.vue';
+	import { mapActions } from "vuex";
 
 	export default {
 		name: 'General',
@@ -169,6 +183,9 @@
 			}
 		},
 		methods: {
+			...mapActions([
+				"setTheme"
+			]),
 			setSetting(type, value) {
 				if(value == undefined) {
 					db.ref(`settings/${this.userId}/general/${type}`).remove();
@@ -197,6 +214,33 @@
 	.q-field__control {
 		.q-item {
 			width: 100%;
+		}
+	}
+	.theme {
+		display: flex;
+		justify-content: center;
+
+		a {
+			margin-right: 10px;
+			border: solid 1px transparent;
+			border-radius: $border-radius;
+			padding: 5px;
+			text-align: center;
+			color: $neutral-3;
+
+			&:hover, &.active {
+				border-color: $blue;
+				color: $neutral-1;
+			}
+			&:last-child {
+				margin: 0;
+			}
+			img {
+				width: 100%;
+				max-width: 250px;
+				display: block;
+				margin-bottom: 5px;
+			}
 		}
 	}
 </style>

@@ -1,11 +1,11 @@
 <template>
 	<div>
 		<div class="type d-flex justify-content-between">
-			<button class="btn bg-gray-hover mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
-				Damage <img src="@/assets/_img/styles/sword-break.png" />
+			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-red': type === 'damage' }" @click="type = 'damage'">
+				Damage <i class="hki-sword-break" />
 			</button>
-			<button class="btn bg-gray-hover mb-3" :class="{ 'bg-green': type === 'healing' }" @click="type = 'healing'">
-				Healing <img src="@/assets/_img/styles/heal.png" />
+			<button class="btn bg-neutral-4 mb-3" :class="{ 'bg-green': type === 'healing' }" @click="type = 'healing'">
+				Healing <i class="hki-heal" />
 			</button>
 		</div>
 
@@ -17,7 +17,7 @@
 
 				<template v-for="(input, i) in damage">
 					<q-input
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Amount"
 						:key="`damage-${i}`"
 						class="amount"
@@ -55,7 +55,7 @@
 
 		<template v-if="type === 'healing'">
 			<q-input 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				autocomplete="off"
 				type="number" 
 				v-model="healingAmount" 

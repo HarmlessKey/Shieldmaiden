@@ -1,7 +1,7 @@
 <template>
 	<div class="spell">
 		<div class="spell__title">
-			<h3>{{ spell.name }} <span class="source gray-hover">{{ spell.source }}</span></h3>
+			<h3>{{ spell.name }} <span class="source neutral-2">{{ spell.source }}</span></h3>
 			<i>
 				<template v-if="spell.level === 0">Cantrip </template>
 				<template v-else>{{ spell.level | numeral('0o') }}-level </template>
@@ -39,7 +39,7 @@
 
 			<div class="input" v-if="spell.level_scaling === 'character_level'">
 				<q-input
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Character level"
 					id="casterLevel" 
 					type="number"
@@ -54,7 +54,7 @@
 			<!-- TO HIT MODIFIER INPUT -->
 			<div class="input" v-if="isToHit">
 				<q-input
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="To hit modifier"
 					id="toHit" 
 					type="text"
@@ -68,11 +68,11 @@
 
 			<!-- ADVANTAGE INPUT -->
 			<div v-if="isToHit" class="advantage d-flex justify-content-between">
-				<button class="btn btn-sm bg-gray-hover" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
+				<button class="btn btn-sm bg-neutral-5" :class="{ 'bg-green': advantage == 'advantage' }" @click="setAdvantage('advantage')">
 					<i v-if="advantage == 'advantage'" class="fas fa-check"></i>
 					Advantage
 				</button>
-				<button class="btn btn-sm bg-gray-hover" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
+				<button class="btn btn-sm bg-neutral-5" :class="{ 'bg-green': advantage == 'disadvantage' }" @click="setAdvantage('disadvantage')">
 					<i v-if="advantage == 'disadvantage'" class="fas fa-check"></i>
 					Disadvantage
 				</button>
@@ -316,13 +316,13 @@
 				line-height: 30px;
 				text-align: center;
 				cursor: pointer;
-				background-color:$gray-dark;
+				background-color: $neutral-8;
 				user-select: none;
 				margin: 0 3px;
 
 				&.selected {
 					background-color: $blue;
-					color:$neutral-1; 
+					color: $neutral-1; 
 				}
 				&.disabled {
 					opacity: .4;
@@ -352,7 +352,7 @@
 			padding: 2px 5px;
 
 			&:hover {
-				background-color:$gray-dark;
+				background-color: $neutral-8;
 			}
 			.icon {
 				padding: 3px 0;
@@ -374,12 +374,12 @@
 					line-height: 28px;
 					top: 0;
 					left: 0;
-					color:$gray-dark;
+					color: $neutral-8;
 				}
 
 				&.green, &.red, &.blue {
 					span {
-						color:$neutral-1;
+						color: $neutral-1;
 					}
 				}
 			}

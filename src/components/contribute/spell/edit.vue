@@ -80,11 +80,11 @@
 							<div v-if="unsaved_changes" class="bg-red white unsaved_changes">
 								<i class="fas fa-exclamation-triangle"></i> There are unsaved changes in the spell
 							</div>	
-							<a v-if="unsaved_changes" class="btn bg-gray" @click="cancel_changes()">Revert</a>
+							<a v-if="unsaved_changes" class="btn bg-neutral-5" @click="cancel_changes()">Revert</a>
 						</div>
 						<div>
-							<router-link :to="`/contribute/spells/${id}`" class="btn bg-gray mr-2">Cancel</router-link>
-							<q-btn label="Save" type="submit" color="primary"/>
+							<router-link :to="`/contribute/spells/${id}`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+							<q-btn label="Save" no-caps type="submit" color="primary"/>
 						</div>
 					</div>
 				</q-form>
@@ -433,7 +433,7 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			padding: 10px 0;
-			border-top: solid 1px$gray-hover;
+			border-top: solid 1px $neutral-4;
 	
 			.unsaved_changes {
 				padding: 10px;

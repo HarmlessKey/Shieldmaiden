@@ -1,11 +1,11 @@
 <template>
 	<div class="card-body">
 		<p>
-			Track encounter is what we call the link you can share with your party, 
-			or put up on a second screen for your party to see. 
-			In here players can follow the encounter, 
-			see who's turn it is and what the status of the entities within the encounter is. 
-			Below you can determine what should be visible on the track encounter screen.
+			The public initiative list is accessable through a link you can share with your party, 
+			or you can put it up on a second screen for your party to see. 
+			In here players can follow the encounter, see who's turn it is and what the status 
+			of the entities within the encounter is. Below you can determine what should be 
+			visible on the public initiative list.
 		</p>
 		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="d-block mb-3">
 			Share your adventures
@@ -14,14 +14,14 @@
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
@@ -58,8 +58,8 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark>
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>

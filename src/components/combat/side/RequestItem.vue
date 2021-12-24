@@ -1,7 +1,7 @@
 <template>
 	<q-expansion-item
 		class="request" 
-		dark switch-toggle-side
+		:dark="$store.getters.theme === 'dark'" switch-toggle-side
 		group="requests"
 	>
 		<template #header>
@@ -27,15 +27,15 @@
 					<div class="damage">{{ result.amount}} {{ result.damage_type }}</div>
 					<div class="targets">
 						<template v-for="(target, key) in result.targets">
-							<div class="name truncate bg-gray-dark" :key="`name-${key}-${i}`" v-if="entities[key]">
+							<div class="name truncate bg-neutral-8" :key="`name-${key}-${i}`" v-if="entities[key]">
 								{{ entities[key].name.capitalizeEach() }}
 							</div>
 
-							<div class="amount bg-gray-dark" :key="`amount-${key}-${i}`">
+							<div class="amount bg-neutral-8" :key="`amount-${key}-${i}`">
 								{{ target.amount }}
 							</div>
 
-							<div class="defenses bg-gray-dark" :key="`defenses-${key}-${i}`">
+							<div class="defenses bg-neutral-8" :key="`defenses-${key}-${i}`">
 								<div 
 									v-for="({name}, defense_key) in defenses"
 									:key="defense_key"
@@ -59,13 +59,13 @@
 				<div class="damage">Final values</div>
 				<div class="targets">
 					<template v-for="(final, key) in final_results">
-						<div class="name truncate bg-gray-dark" v-if="entities[key]" :key="`final-name-${key}`">
+						<div class="name truncate bg-neutral-8" v-if="entities[key]" :key="`final-name-${key}`">
 							{{ entities[key].name }}
 						</div>
-						<div class="amount bg-gray-dark red" :key="`final-amount-${key}`">
+						<div class="amount bg-neutral-8 red" :key="`final-amount-${key}`">
 							{{ Math.floor(final * intensity[key]) }}
 						</div>
-						<div class="defenses bg-gray-dark" :key="`final-options-${key}`">
+						<div class="defenses bg-neutral-8" :key="`final-options-${key}`">
 							<div
 								v-for="{multiplier, name, label} in multipliers"
 								@click="setIntensity(key, multiplier)"
@@ -94,7 +94,7 @@
 				<div class="damage">Targets</div>
 				<div class="targets healing">
 					<div v-for="target in request.targets" :key="target">
-						<div class="name truncate bg-gray-dark" v-if="entities[target]">
+						<div class="name truncate bg-neutral-8" v-if="entities[target]">
 							{{ entities[target].name }}
 						</div>
 					</div>
@@ -279,7 +279,7 @@
 
 		.damage {
 			font-size: 15px;
-			border-bottom: solid 1px #494747;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 2px;
 		}
 		.targets {
@@ -323,7 +323,7 @@
 						line-height: 28px;
 						top: 0;
 						left: 0;
-						color:$gray-dark;
+						color: $neutral-9;
 					}
 
 					&.active {

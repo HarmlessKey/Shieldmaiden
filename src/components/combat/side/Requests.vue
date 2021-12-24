@@ -17,7 +17,7 @@
 			<p class="red">No requests have been made.</p>
 			<p>
 				Your players can do damage or healing request from the 
-				<a @click="setSlide({show: true, type: 'PlayerLink'})">track encounter screen</a>.
+				<a @click="setSlide({show: true, type: 'PlayerLink'})">public initiative list</a>.
 			</p>
 
 			<p>In order to do this, the following requirements must be met.</p>
@@ -29,8 +29,8 @@
 			</ol>
 
 			<p>
-				If the above is met, players can target entities from the initiative list 
-				on the track encounter screen and input the damage or healing they want to do.<br/>
+				If the above is met, players can target entities from the public initiative 
+				list and input the damage or healing they want to do.<br/>
 				You as a DM can then decide if you wish to apply this damage, or discard it.
 			</p>
 		</template>
@@ -81,7 +81,7 @@
 
 		li.request {
 			padding:10px 3px;
-			border-bottom: solid 1px #494747;
+			border-bottom: solid 1px $neutral-3;
 		}
 	}
 	.fadeInDown, .fadeOutRight {

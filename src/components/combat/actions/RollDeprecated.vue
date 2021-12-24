@@ -3,15 +3,15 @@
 		<p v-if="targeted.length === 0">No target selected</p>
 		<template v-else-if="current.entityType === 'npc' || 'companion'">
 			<template v-if="['npc', 'environment'].includes(current.entityType)">
-				<div><q-checkbox dark v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
-				<q-checkbox v-if="targeted.length > 1" dark v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
+				<div><q-checkbox :dark="$store.getters.theme === 'dark'" v-model="toHit" label="Roll to hit" indeterminate-value="something-else" /></div>
+				<q-checkbox v-if="targeted.length > 1" :dark="$store.getters.theme === 'dark'" v-model="rollOnce" label="Roll damage once" indeterminate-value="something-else" />
 				
 				<!-- CUSTOM ROLL -->
 				<h3>Custom Roll</h3>
 				<div class="custom-roll">
 					<div v-if="toHit">
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Hit mod"
 							autocomplete="off" 
 							type="number" 
@@ -22,7 +22,7 @@
 					</div>
 					<div :class="{ span: !toHit }">
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Damage dice"
 							autocomplete="off" 
 							type="text" 
@@ -34,7 +34,7 @@
 					</div>
 					<div>
 						<q-input 
-							dark filled square dense
+							:dark="$store.getters.theme === 'dark'" filled square dense
 							label="Modifier"
 							autocomplete="off" 
 							type="number" 
@@ -68,9 +68,9 @@
 					<template v-if="current[action_type.value]">
 						<h4 class="mt-3">{{ action_type.label }}</h4>
 						<ul class="roll">
-							<li v-for="(action, index) in current[action_type.value]" :key="index" class="bg-gray-active">
+							<li v-for="(action, index) in current[action_type.value]" :key="index" class="bg-neutral-6">
 								<span class="d-flex justify-content-between">
-									<a class="d-flex justify-content-between gray-light" @click="setShow(action_type.value, index)">
+									<a class="d-flex justify-content-between neutral-2" @click="setShow(action_type.value, index)">
 										<span>{{ action.name }}</span>
 										<i class="fas fa-caret-down"></i>
 									</a>
@@ -327,7 +327,7 @@
 					total = this.aoeRoll.total;
 				}
 
-				//If it was an open roll, save it, so it will be shared on the track encounter screen.
+				// If it was an open roll, save it, so it will be shared on the public initiative screen.
 				if(!this.demo) {
 					//If the damage is rolled once, show all targets with that roll
 					//Otherwise show 1 target per roll
@@ -376,7 +376,7 @@
 					}
 					//If the to hit is higher than or equal to target's AC, it hits
 					let hitOrMiss = (toHit.total >= ac) ? '<span class="green">HIT!</span>' : '<span class="red">MISS!</span>';
-					let ignoredRoll = (Object.keys(advantage_object).length === 1) ? `<span class="gray-hover">${toHit.ignored}</span>` : ``;
+					let ignoredRoll = (Object.keys(advantage_object).length === 1) ? `<span class="neutral-2">${toHit.ignored}</span>` : ``;
 
 					this.rolledToHit = toHit.total; //For animation
 

@@ -1,8 +1,7 @@
 import { db } from '@/firebase';
+import Vue from 'vue';
 
 const campaigns_ref = db.ref('campaigns/');
-const encounters_ref = db.ref('encounters');
-const players_ref = db.ref('players');
 const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
 const settings_ref = db.ref('settings');
@@ -18,6 +17,7 @@ export const content_module = {
 		content_count: {},
 		active_campaign: undefined, 
 
+		userSettings: {},
 		campaign: {},
 		campaigns: {},
 		allEncounters: {},
@@ -54,7 +54,7 @@ export const content_module = {
 					let email = (user_info.patreon_email) ? user_info.patreon_email : user_info.email;
 
 					// User always basic reward tier
-					let path = `tiers/basic`
+					let path = `tiers/basic`;
 
 					let today_ms = 0
 					await db.ref('/.info/serverTimeOffset')
@@ -134,13 +134,11 @@ export const content_module = {
 									} else {
 										commit('SET_TIER', voucher_snap.val())
 									}
-									commit('CHECK_ENCUMBRANCE');
 								});
 							}
 							// If not patron use voucher/basic tier
 							else {
 								commit('SET_TIER', voucher_snap.val())
-								commit('CHECK_ENCUMBRANCE');
 							}
 						})
 					});
@@ -149,63 +147,26 @@ export const content_module = {
 			}
 		},
 		async setUserSettings({ commit, rootGetters }) {
-			let settings = await settings_ref.child(rootGetters.user.uid);
+			const uid = rootGetters.user.uid;
+			let settings = await settings_ref.child(uid);
 			settings.on('value', async settings_snapshot => {
-				const user_settings = settings_snapshot.val();
+				const user_settings = await settings_snapshot.val();
 				commit('SET_USER_SETTINGS', user_settings);
 			});
-		},
-		setCampaignId({ commit }, value) { commit('SET_CAMPAIGN_ID', value); },
-		setEncounterId({ commit }, value) { commit('SET_ENCOUNTER_ID', value); },
-		fetchEncounter({ commit, rootGetters}, { cid, eid }) {
-			if(rootGetters.user) {
-				commit("SET_CAMPAIGN_ID", cid);
-				commit("SET_ENCOUNTER_ID", eid);
-				const uid = rootGetters.user.uid;
-				const path = `${uid}/${cid}/${eid}`;
-				const encounter = encounters_ref.child(path);
-				encounter.on('value', snapshot => {
-					commit('SET_ENCOUNTER', snapshot.val())
-				});
-			}
-		},
-		fetchEncounters({ commit, rootGetters }, { cid }) {
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid;
-				const path = `${uid}/${cid}`;
-				let encounters = encounters_ref.child(path)
-				encounters.on('value', snapshot => {
-					commit('SET_ENCOUNTERS', snapshot.val())
-				});
-			}
-		},
-		fetchAllEncounters({ commit, rootGetters }) {
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid
-				let encounters = encounters_ref.child(uid)
-				encounters.on('value', snapshot => {
-					commit('SET_ALLENCOUNTERS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
-				});
-			}
-		},
-		fetchPlayers({ commit, rootGetters }) {
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid
-				const players = players_ref.child(uid)
-				players.on('value', snapshot => {
-					commit('SET_PLAYERS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
-				});
-			}
+
+			// Return a promise, so you can wait for it in the initialize function from store/general.js
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					resolve()
+				}, 1000)
+			});
 		},
 		fetchNpcs({ commit, rootGetters }) {
 			if(rootGetters.user) {
 				const uid = rootGetters.user.uid
 				const npcs = npcs_ref.child(uid)
 				npcs.on('value', snapshot => {
-					commit('SET_NPCS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+					commit('SET_NPCS', snapshot.val());
 				});
 			}
 		},
@@ -217,47 +178,29 @@ export const content_module = {
 				const path = `${uid}/${cid}`;
 				const campaign = campaigns_ref.child(path);
 				campaign.on('value', snapshot => {
-					commit('SET_CAMPAIGN', snapshot.val())
-				});
-			}
-		},
-		fetchCampaigns({ commit, rootGetters }) {
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid
-				let campaigns = campaigns_ref.child(uid)
-				campaigns.on('value', snapshot => {
-					commit('SET_CAMPAIGNS', snapshot.val())
-					commit('CHECK_ENCUMBRANCE');
+					commit('SET_CAMPAIGN', snapshot.val());
 				});
 			}
 		},
 		stopFetchNpcs({ rootGetters }) {
-			console.log("stopFetchNpc called")
 			if (rootGetters.user) {
 				const uid = rootGetters.user.uid;
-				const npcs = npcs_ref.child(uid)
+				const npcs = npcs_ref.child(uid);
 				npcs.off();
 			}
 		},
 		remove_voucher( { rootGetters }) {
 			if(rootGetters.user) {
-				db.ref(`users/${rootGetters.user.uid}/voucher`).remove()
+				db.ref(`users/${rootGetters.user.uid}/voucher`).remove();
 			}
 		},
 		setPoster({ state }) {
 			db.ref('posters').once('value', snapshot => {
-				let count = snapshot.val()
-				let new_count = count + 1
-				db.ref('posters').set(new_count)
-				state.poster = true
+				let count = snapshot.val();
+				let new_count = count + 1;
+				db.ref('posters').set(new_count);
+				state.poster = true;
 			})
-		},
-		clearEncounters({ commit }) {
-			commit("CLEAR_ENCOUNTERS");
-		},
-		setActiveCampaign({ commit, rootGetters }, { campaign_id }) {
-			db.ref(`users/${rootGetters.user.uid}/active_campaign`).set(campaign_id);
-			commit("SET_ACTIVE_CAMPAIGN", campaign_id);
 		},
 		deleteCampaign({ commit, getters, rootGetters }, { campaign_id }) {
 			if (campaign_id === getters.active_campaign ) {
@@ -270,6 +213,37 @@ export const content_module = {
 			for (let encounter_id in getters.encounters) {
 				commit("DELETE_ENCOUNTER", {encounter_id});
 			}
+		},
+		checkEncumbrance({ state, commit, rootGetters }) {
+			let count = {};
+			let overencumbered = false;
+			
+			count.campaigns = Object.keys(rootGetters["campaigns/campaigns"]).length;
+			count.players = Object.keys(rootGetters["players/players"]).length;
+			count.npcs = Object.keys(rootGetters["npcs/npcs"]).length;
+			count.encounters = 0;
+			
+			// Count encounters for every campaign
+			// Save the highest count 
+			for (const campaignEncounters in Object.values(rootGetters["encounters/encounters"])) {
+				let n = Object.keys(campaignEncounters).length;
+				if (n > count.encounters) {
+					count.encounters = n;
+				}
+			}
+
+			if (state.tier) {
+				let benefits = state.tier.benefits;
+				if (count.campaigns > benefits.campaigns ||
+						count.encounters > benefits.encounters ||
+						count.npcs > benefits.npcs ||
+						count.players > benefits.players
+				) {
+					overencumbered = true;
+				}
+			}
+			commit("SET_CONTENT_COUNT", count);
+			commit("SET_ENCUMBRANCE", overencumbered);
 		}
 	},
 	mutations: {
@@ -298,30 +272,8 @@ export const content_module = {
 		SET_ALLENCOUNTERS(state, payload) {
 			if (payload) state.allEncounters = payload;
 		},
-		CHECK_ENCUMBRANCE(state) {
-			let count = {};
-			count.campaigns = Object.keys(state.campaigns).length;
-			count.players = Object.keys(state.players).length;
-			count.npcs = Object.keys(state.npcs).length;
-			count.encounters = 0;
-			for (let key in state.allEncounters) {
-				let n = Object.keys(state.allEncounters[key]).length;
-				if (n > count.encounters) {
-					count.encounters = n;
-				}
-			}
-			state.content_count = count;
-			if (state.tier) {
-				let benefits = state.tier.benefits;
-				if (count.campaigns > benefits.campaigns ||
-						count.encounters > benefits.encounters ||
-						count.npcs > benefits.npcs ||
-						count.players > benefits.players )
-					state.overencumbered = true;
-				else
-					state.overencumbered = false;
-			}
-		},
+		SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value)},
+		SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value)},
 		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
 		DELETE_CAMPAIGN(state, { campaign_id }) {
 			delete state.campaigns[campaign_id];

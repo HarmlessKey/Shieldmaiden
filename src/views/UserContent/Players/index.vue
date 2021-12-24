@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<span>
 				Players ( 
-				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ Object.keys(players).length }}</span> 
+				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ content_count.players }}</span> 
 					/ 
 					<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
 					<template v-else>{{ tier.benefits.players }}</template>	
@@ -27,8 +27,9 @@
 					:search="['character_name', 'campaign_name']"
 				>
 					<template slot="avatar" slot-scope="data">
-						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-						<img v-else class="image" src="@/assets/_img/styles/player.svg" />
+						<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
+							<i v-if="!data.item" class="hki-player" />
+						</div>
 					</template>
 
 					<template slot="character_name" slot-scope="data">
@@ -56,10 +57,10 @@
 							</q-tooltip>
 						</router-link>
 						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-								<i class="fas fa-trash-alt"></i>
-								<q-tooltip anchor="top middle" self="center middle">
-									Delete
-								</q-tooltip>
+							<i class="fas fa-trash-alt"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Delete
+							</q-tooltip>
 						</a>
 					</div>
 				</hk-table>
@@ -92,7 +93,7 @@
 <script>
 	import _ from 'lodash';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 
@@ -139,12 +140,12 @@
 		computed: {
 			...mapGetters([
 				'tier',
-				'players',
-				'campaigns',
 				'allEncounters',
 				'overencumbered',
 				'content_count',
 			]),
+			...mapGetters("players", ["players"]),
+			...mapGetters("campaigns", ["campaigns"]),
 			_players: function() {
 				let vm = this;
 				return _.chain(this.players)
@@ -163,10 +164,11 @@
 				.value()
 			},
 			slotsLeft() {
-				return this.tier.benefits.players - Object.keys(this.players).length
+				return this.tier.benefits.players - this.content_count.players
 			}
 		},
 		methods: {
+			...mapActions("players", ["deletePlayer"]),
 			confirmDelete(e, key, player) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -217,7 +219,10 @@
 					}
 				}
 				//Remove player
-				db.ref('players/' + this.userId).child(key).remove(); 
+				this.deletePlayer({ 
+					id:key, 
+					companions: player.companions
+				});
 			}
 		}
 	}
@@ -226,12 +231,12 @@
 <style lang="scss" scoped>
 	.container-fluid {
 		h2 {
-			border-bottom: solid 1px $gray-light;
+			border-bottom: solid 1px $neutral-4;
 			padding-bottom: 10px;
 
 			a {
 				text-transform: none;
-				color: $gray-light !important;
+				color: $neutral-2 !important;
 
 				&:hover {
 					text-decoration: none;

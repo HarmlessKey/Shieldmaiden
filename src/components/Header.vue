@@ -28,10 +28,25 @@
 							</q-tooltip>
 						</a>
 					</div>
-					<q-separator vertical dark inset class="mx-1" />
+					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 				</div>
 
 				<div class="area d-flex justify-content-end">
+					<a class="icon">
+						<i class="fas fa-moon"/>
+						<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+							<div class="theme">
+								<a @click="setTheme('dark')" :class="{ active: $store.getters.theme === 'dark' }">
+									<img src="@/assets/_img/dark.webp" />
+									Dark
+								</a>
+								<a @click="setTheme('light')" :class="{ active: $store.getters.theme === 'light' }">
+									<img src="@/assets/_img/light.webp" />
+									Light
+								</a>
+							</div>
+						</q-popup-proxy>
+					</a>
 					<a class="icon d-none d-md-block"
 						@click="setSlide({show: true, type: 'slides/Keybindings', data: {sm: true}})">
 						<i class="fas fa-keyboard"/>
@@ -52,7 +67,7 @@
 						@click="setSlide({show: true, type: 'PlayerLink'})">
 						<i class="fas fa-share-alt"></i>
 						<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-							Player link
+							Public initiative
 						</q-tooltip>
 					</a>
 					<a class="icon roll" 
@@ -63,12 +78,12 @@
 						</q-tooltip>
 					</a>
 				</div>
-				<q-separator vertical dark inset class="mx-1" />
+				<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
 				<div v-if="user" class="user">
 					<span class="img" :class="{ invert: enviroment === 'development' }" v-if="user.photoURL" :style="{'background-image': 'url(' + user.photoURL + ')'}"></span>
 					<i v-else class="fas fa-user"></i>
-					<q-popup-proxy dark :offset="[9, 0]">
-						<div class="bg-neutral-10">
+					<q-popup-proxy :dark="$store.getters.theme === 'dark'" :offset="[9, 0]">
+						<div class="bg-neutral-8">
 							<q-list>
 								<q-item clickable v-close-popup to="/admin" v-if="userInfo && userInfo.admin">
 									<q-item-section avatar><i class="fas fa-crown"></i></q-item-section>
@@ -151,7 +166,8 @@
 		methods: {
 			...mapActions([
 				'setSlide',
-				'setSideSmallScreen'
+				'setSideSmallScreen',
+				'setTheme'
 			]),
 			showSlide(type) {
 				this.setSlide({
@@ -222,6 +238,33 @@ a.icon {
 		background-repeat: no-repeat;
 	}
 }
+.theme {
+	padding: 15px;
+	text-align: center;
+	background-color: $neutral-8;
+
+	a {
+		display: block;
+		margin-bottom: 10px;
+
+		&:last-child {
+			margin: 0;
+		}
+		border: solid 1px transparent;
+		border-radius: $border-radius;
+		padding: 3px;
+		color: $neutral-3;
+
+		&:hover, &.active {
+			border-color: $blue;
+			color: $neutral-1;
+		}
+		img {
+			max-width: 150px;
+			display: block;
+		}
+	}
+}
 .user	{
 	cursor: pointer;
 	font-size: 15px;
@@ -275,6 +318,11 @@ a.icon {
 			height: 30px;
 			width: 30px;
 		}
+	}
+}
+[data-theme="light"] {
+	a.icon.roll {
+		background-image: url('../assets/_img/logo/logo-icon-no-shield-gray-dark-no-border.svg');
 	}
 }
 </style>

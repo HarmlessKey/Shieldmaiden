@@ -5,7 +5,7 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-9">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Name"
 						autocomplete="off"  
 						v-model="npc.name"
@@ -15,7 +15,7 @@
 				</div>
 				<div class="col-3">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Source"
 						autocomplete="off"  
 						v-model="npc.source" 
@@ -25,13 +25,12 @@
 
 			<!-- AVATAR -->
 			<div class="avatar mb-3">
-				<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }"></div>
-				<div class="img" v-else>
-					<img src="@/assets/_img/styles/monster.svg" />
+				<div class="img"  :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }">
+					<i v-if="!npc.avatar" class="hki-monster" />
 				</div>
 				<div>
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Avatar"
 						autocomplete="off"  
 						type="text" 
@@ -48,7 +47,7 @@
 
 			<!-- SIZE -->
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Size"
 				class="mb-2" 
 				v-model="npc.size"
@@ -60,7 +59,7 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12" :class="{'col-md-6': npc.type && monster_subtypes[npc.type] }">
 					<q-select
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Type"
 						class="mb-2" 
 						v-model="npc.type"
@@ -70,7 +69,7 @@
 				</div>
 				<div class="col-12 col-md-6" v-if="npc.type && monster_subtypes[npc.type]">
 					<q-select
-						dark filled square clearable
+						:dark="$store.getters.theme === 'dark'" filled square clearable
 						label="Subtype"
 						class="mb-2" 
 						v-model="npc.subtype"
@@ -81,7 +80,7 @@
 
 			<!-- ALIGNMENT -->
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Alignment"
 				class="mb-4" 
 				v-model="npc.alignment"
@@ -92,7 +91,7 @@
 			<div class="row q-col-gutter-sm mb-3">
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Walk speed"
 						autocomplete="off"  
 						type="number" 
@@ -104,7 +103,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Swim speed"
 						autocomplete="off"  
 						type="number" 
@@ -116,7 +115,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Fly speed"
 						autocomplete="off"  
 						type="number" 
@@ -128,7 +127,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Burrow speed"
 						autocomplete="off"  
 						type="number" 
@@ -140,7 +139,7 @@
 				</div>
 				<div class="col">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Climb speed"
 						autocomplete="off"  
 						type="number" 
@@ -154,7 +153,7 @@
 
 			<!-- LANGUAGES -->
 			<q-select
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Languages"
 				class="mb-4"
 				multiple
@@ -166,14 +165,14 @@
 
 			<!-- CR -->
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				label="Challenge rating"
 				v-model="npc.challenge_rating" 
 				:options="Object.keys(monster_challenge_rating)"
 				:suffix="npc.challenge_rating ? `${monster_challenge_rating[npc.challenge_rating].xp} xp ` : ``"
 			>
 				<template v-slot:option="scope">
-					<q-list dark>
+					<q-list :dark="$store.getters.theme === 'dark'">
 						<q-item clickable v-ripple v-close-popup @click="$set(npc, 'challenge_rating', scope.opt)">
 							<q-item-section>{{ scope.opt }}</q-item-section>
 							<q-item-section avatar>{{ monster_challenge_rating[scope.opt].xp }} xp</q-item-section>
@@ -194,7 +193,7 @@
 			<div class="row q-col-gutter-md">
 				<div class="col-12 col-md-4">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Armor class"
 						autocomplete="off"  
 						type="number" 
@@ -210,7 +209,7 @@
 				</div>
 				<div class="col-12 col-md-4">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Hit points"
 						autocomplete="off"  
 						type="number" 
@@ -226,7 +225,7 @@
 				</div>
 				<div class="col-12 col-md-4">
 					<q-input 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						label="Hit dice"
 						autocomplete="off" 
 						type="text" 
@@ -291,11 +290,19 @@
 		grid-column-gap: 10px;
 
 		.img {
-			border: solid 1px #b2b2b2;
+			border: solid 1px $neutral-2;
 			width: 56px;
 			height: 56px;
 			background-size: cover;
 			background-position: center top;
+			background-color: $neutral-9;
+			color: $neutral-2;
+		}
+	}
+	[data-theme="light"] {
+		.avatar .img {
+			background-color: $neutral-2;
+			color: $neutral-8;
 		}
 	}
 </style>

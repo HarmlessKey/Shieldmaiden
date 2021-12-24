@@ -37,10 +37,20 @@
 						url: 'patrons',
 						icon: 'fab fa-patreon',
 					},
+					"export": {
+						name: "Export databases",
+						url: "export",
+						icon: "fas fa-file-export"
+					},
 					'xml': { 
 						name: 'Generate XML sitemap',
 						url: 'xml',
 						icon: 'fas fa-file-code',
+					},
+					'monster-update': { 
+						name: 'Update monsters',
+						url: 'monster-update',
+						icon: 'fas fa-file-edit',
 					}
 				},
 			}

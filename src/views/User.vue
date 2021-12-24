@@ -45,7 +45,7 @@
 												class="img"
 											>
 												<div v-if="player.avatar" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"></div>
-												<img v-else src="@/assets/_img/styles/player.svg" />
+												<i v-else class="hki-player" />
 												<q-tooltip anchor="top middle" self="center middle">
 													{{ player.character_name }}
 												</q-tooltip>
@@ -57,12 +57,9 @@
 										</h2>
 										<div class="d-flex justify-content-center">
 											<router-link :to="`/user/${dmId}/${campaign['.key']}`" class="btn">View Campaign</router-link>
-										</div>
-									
+										</div>						
 									</div>
-									
-										
-
+			
 									<div slot="footer" class="card-footer neutral-3">
 										Started: {{ makeDate(campaign.timestamp) }}
 									</div>
@@ -185,13 +182,17 @@
 				position: relative;
 
 				.img {
-					background: $black;
+					background: $neutral-9;
+					color: $neutral-2;
 					height: 40px;
 					width: 40px;
-					border: solid 1px$neutral-1;
+					line-height: 40px;
+					border: solid 1px $neutral-1;
 					margin: 0 10px 10px 0;
 					box-sizing: border;
 					border-radius: $border-radius-small;
+					font-size: 28px;
+					text-align: center;
 
 					div {
 						width: 100%;
@@ -212,6 +213,12 @@
 			padding: 3px 0;
 			font-size: 12px;
 			text-align: center;
+		}
+	}
+	[data-theme="light"] {
+		.hk-card.campaign .card-body .players .img {
+			color: $neutral-8;
+			background: $neutral-1;
 		}
 	}
 </style>

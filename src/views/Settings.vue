@@ -7,7 +7,7 @@
 		<hk-card header="Run Encounter Settings" id="run">
 			<Encounter />
 		</hk-card>
-		<hk-card header="Track Encounter Settings" id="track">
+		<hk-card header="Public initiative list Settings" id="track">
 			<Track />
 		</hk-card>
 	</div>

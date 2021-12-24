@@ -3,9 +3,8 @@
 		<q-btn-toggle
 			:value="roll_type"
 			class="mb-3"
-			spread no-caps dark dense square
+			spread no-caps :dark="$store.getters.theme === 'dark'" dense square
 			toggle-color="primary"
-			color="gray"
 			:options="[
 				{label: 'Attack', value: 'attack'},
 				{label: 'Save', value: 'save'},
@@ -16,14 +15,14 @@
 		<q-form>
 			<q-input
 				v-if="roll_type === 'attack'"
-				dark dennse filled square dense
+				:dark="$store.getters.theme === 'dark'" dennse filled square dense
 				type="number"
 				v-model="attack_bonus"
 				label="Attack bonus"
 			/>
 			<div v-if="roll_type === 'save'" class="d-flex justify-content-between">
 				<q-select 
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					map-options
 					emit-value
 					label="Save ability"
@@ -32,7 +31,7 @@
 					class="mr-1"
 				/>
 				<q-input
-					dark dennse filled square dense
+					:dark="$store.getters.theme === 'dark'" dennse filled square dense
 					type="number"
 					v-model="save_dc"
 					label="Save DC"
@@ -55,7 +54,7 @@
 				>
 					<q-input 
 						:ref="index"
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Roll"
 						autocomplete="off" 
 						v-model="custom_rolls[index].roll" 
@@ -288,7 +287,7 @@
 
 <style lang="scss" scoped>
 	h3 {
-		border-bottom: solid 1px $gray-hover;
+		border-bottom: solid 1px $neutral-4;
 		margin: 15px 0 5px 0;
 		display: flex;
 		justify-content: space-between;
@@ -314,7 +313,7 @@
 	}
 	.disadvantage:hover {
 		.btn {
-			background-color:$red;
+			background-color: $red;
 		}
 	}
 	.q-field {

@@ -150,7 +150,7 @@
 	.tiers {
 		&::after {
 			content: ', ';
-			color: $gray-light;
+			color: $neutral-2;
 		}
 		&:last-child::after {
 			content: '';

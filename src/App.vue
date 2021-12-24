@@ -7,7 +7,8 @@
 			<div :class="{ hasSide: $route.meta.sidebar !== false }">
 				<Sidebar />
 				<div class="scrollable-content">
-					<router-view/>
+					<router-view v-if="initialized" />
+					<hk-loader v-else />
 				</div>
 			</div>
 		</div>
@@ -20,7 +21,7 @@
 					v-shortkey="['esc']" @shortkey="hideSlide()"
 					class="hide" 
 				>
-					<i class="far fa-chevron-double-right"></i> <span class="gray-hover ml-2 d-none d-sm-inline">[esc]</span>
+					<i class="far fa-chevron-double-right"></i> <span class="neutral-2 ml-2 d-none d-sm-inline">[esc]</span>
 					<q-tooltip anchor="bottom middle" self="center middle">
 						Hide [esc]
 					</q-tooltip>
@@ -43,7 +44,7 @@
 				<h3 class="mb-1">Update coming - {{ makeDate("2021-06-02T15:00:00.000Z", true) }} </h3>
 				<p>No announcement</p>
 				<template v-slot:action>
-					<q-btn flat icon="close" @click="closeAnnouncement()" />
+					<q-btn flat icon="close" @click="closeAnnouncement()" no-caps />
 				</template>
 			</q-banner>
 		</q-dialog>
@@ -136,6 +137,7 @@
 	},
 	data() {
 		return {
+			initialized: false,
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
@@ -176,6 +178,9 @@
 			slide: 'getSlide',
 			storeBroadcast: 'broadcast'
 		}),
+		...mapGetters([
+			"theme"
+		]),
 		announcement: {
 			get() {
 				const announcement = (auth.currentUser !== null && !this.announcement_cookie) ? true : false;
@@ -191,6 +196,16 @@
 		}
 	},
 	created() {
+		this.initialize().then(() => {
+
+			const roll = Math.floor(Math.random() * 6 + 15);
+
+			console.log(
+				`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
+				"color: #83b547;"
+			);
+			this.initialized = true;
+		});
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {
@@ -204,23 +219,8 @@
 		}
 		window.addEventListener('offline', () => { this.connection = "offline" });
 		window.addEventListener('online', () => { this.connection = "online" });
-		this.setTips();
-
-		if(auth.currentUser !== null) {
-			this.setUser();
-			this.setUserInfo();
-			this.setUserSettings();
-			// players need prio!
-			this.fetchPlayers();
-			this.fetchNpcs();
-			this.fetchCampaigns();
-			this.fetchAllEncounters();
-		}
 	},
 	mounted() {
-		//Set theme
-		document.documentElement.setAttribute("data-theme", "dark");
-
 		if(auth.currentUser !== null){
 			const broadcastRef = db.ref(`broadcast/${this.user.uid}`);
 			broadcastRef.on("value", (snapshot) => {
@@ -243,14 +243,7 @@
 	},
 	methods: {
 		...mapActions([
-			"setTips",
-			"fetchCampaigns",
-			"fetchAllEncounters",
-			"fetchPlayers",
-			"fetchNpcs",
-			"setUser",
-			"setUserInfo",
-			"setUserSettings",
+			"initialize",
 			"setSlide",
 			"setSideSmallScreen",
 			"setLive"

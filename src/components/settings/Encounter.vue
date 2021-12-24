@@ -3,14 +3,14 @@
 		<div v-for="({name, type_settings}, type_key) in types" :key="type_key">
 			<h3 class="mt-3 mb-1" v-if="name">{{ name }}</h3>
 			<q-select 
-				dark filled square
+				:dark="$store.getters.theme === 'dark'" filled square
 				v-for="(setting, index) in type_settings" 
 				:options="setting.options"
 				:value="index"
 				class="mb-1"
 				:key="`${type_key}-${index}`"
 			>
-				<q-item dark slot="selected">
+				<q-item :dark="$store.getters.theme === 'dark'" slot="selected">
 					<q-item-section avatar>
 						<q-icon :name="setting.icon" class="neutral-2" size="large" />
 					</q-item-section>
@@ -47,8 +47,8 @@
 				<span slot="after" v-if="setting.info">
 					<a @click.stop>
 						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu dark anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card dark>
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
+								<q-card :dark="$store.getters.theme === 'dark'">
 									<q-card-section class="bg-neutral-9">
 										<b>{{ setting.name }}</b>
 									</q-card-section>
@@ -66,7 +66,7 @@
 			
 			<div class="timer">
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					type="number"
 					label="Minutes"
 					:value="timer.minutes"
@@ -76,7 +76,7 @@
 					<template #append>:</template>
 				</q-input>
 				<q-input 
-					dark square filled
+					:dark="$store.getters.theme === 'dark'" square filled
 					type="number"
 					max="59"
 					label="Seconds"
@@ -87,7 +87,7 @@
 						<a @click.stop>
 						<q-icon name="info" size="medium">
 							<q-menu square anchor="top middle" self="bottom middle" :max-width="'250px'">
-								<q-card dark square>
+								<q-card :dark="$store.getters.theme === 'dark'" square>
 									<q-card-section class="bg-neutral-9">
 										<b>Turn timer</b>
 									</q-card-section>

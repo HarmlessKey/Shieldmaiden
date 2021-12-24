@@ -16,7 +16,7 @@
 
 				<div class="card-body">
 					<q-select 
-						dark filled square
+						:dark="$store.getters.theme === 'dark'" filled square
 						clearable
 						label="Spellcasting ability"
 						:options="abilities"
@@ -28,46 +28,46 @@
 					<template v-if="npc[`${casting.category}_ability`]">
 						<div class="row q-col-gutter-sm">
 							<div class="col" v-if="casting.category === 'caster'">
-								<q-input 
-									dark filled square
-									label="Caster level"
-									v-model.number="npc[`${casting.category}_level`]"
-									@input="parseToInt(npc, `${casting.category}_level`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 20 || 'Max is 20'
-									]"
-								/>
+								<ValidationProvider rules="between:1,20|required" name="Caster level" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Caster level"
+										v-model.number="npc[`${casting.category}_level`]"
+										@input="parseToInt(npc, `${casting.category}_level`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 							<div class="col">
-								<q-input 
-									dark filled square
-									label="Save DC"
-									v-model.number="npc[`${casting.category}_save_dc`]"
-									@input="parseToInt(npc, `${casting.category}_save_dc`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 99 || 'Max is 99'
-									]"
-								/>
+								<ValidationProvider rules="between:1,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Save DC"
+										v-model.number="npc[`${casting.category}_save_dc`]"
+										@input="parseToInt(npc, `${casting.category}_save_dc`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 							<div class="col">
-								<q-input 
-									dark filled square
-									label="Spell attack"
-									v-model.number="npc[`${casting.category}_spell_attack`]"
-									@input="parseToInt(npc, `${casting.category}_spell_attack`)"
-									type="number"
-									class="mb-3"
-									:rules="[
-										val => !!val || 'Required',
-										val => val <= 99 || 'Max is 99'
-									]"
-								/>
+								<ValidationProvider rules="between:-10,99|required" name="Save DC" v-slot="{ errors, invalid, validated }">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square
+										label="Spell attack"
+										v-model.number="npc[`${casting.category}_spell_attack`]"
+										@input="parseToInt(npc, `${casting.category}_spell_attack`, !invalid)"
+										type="number"
+										class="mb-3"
+										:error="invalid && validated"
+										:error-message="errors[0]"
+									/>
+								</ValidationProvider>
 							</div>
 						</div>
 
@@ -103,13 +103,13 @@
 
 						<template v-if="npc[`${casting.category}_spells`]">
 							<label class="d-block mb-2">Spells</label>
-							<q-list dark>
+							<q-list :dark="$store.getters.theme === 'dark'">
 								<q-item v-for="(spell, key) in npc[`${casting.category}_spells`]" :key="key">
 									<q-item-section avatar v-if="casting.category === 'innate'" class="pointer">
 										{{ spell.limit === 0 ? "At will" : `${spell.limit}/day` }}
-										<q-popup-edit dark square v-model.number="spell.limit" buttons>
+										<q-popup-edit :dark="$store.getters.theme === 'dark'" square v-model.number="spell.limit" buttons>
 											<q-checkbox 
-												size="sm" dark 
+												size="sm" :dark="$store.getters.theme === 'dark'" 
 												v-model="spell.limit"
 												label="At will" 
 												:true-value="0" 
@@ -120,7 +120,7 @@
 												@input="$forceUpdate()"
 											/>
 											<q-input 
-												dark
+												:dark="$store.getters.theme === 'dark'"
 												v-model.number="spell.limit" 
 												label="Limit"
 												type="number" 
@@ -162,7 +162,7 @@
 				<hk-card :header="(category === 'caster') ? 'Add spells' : 'Add innate spells'" class="mb-0">
 					<div class="card-body">
 						<q-input
-							dark filled square
+							:dark="$store.getters.theme === 'dark'" filled square
 							label="Search spell"
 							v-model="spell_name"
 							class="mb-2"
@@ -173,7 +173,7 @@
 							</a>
 						</q-input>
 
-						<q-list dark v-if="spell_name && spells">
+						<q-list :dark="$store.getters.theme === 'dark'" v-if="spell_name && spells">
 							<q-item v-for="(spell, key) in spells" :key="key">
 								<q-item-section>
 									{{ spell.name }}
@@ -198,7 +198,7 @@
 					</div>
 
 					<div slot="footer" class="card-footer d-flex justify-content-end">
-						<q-btn class="mr-1" type="cancel" v-close-popup>Close</q-btn>
+						<q-btn class="mr-1" type="cancel" no-caps v-close-popup>Close</q-btn>
 					</div>
 				</hk-card>
 			</div>
@@ -237,10 +237,10 @@
 			}
 		},
 		methods: {
-			parseToInt(value, object, property) {
+			parseToInt(value, object, property, valid) {
 				if(value === undefined || value === "") {
 					this.$delete(object, property);
-				} else {
+				} else if(valid) {
 					this.$set(object, property, parseInt(value));
 				}
 			},

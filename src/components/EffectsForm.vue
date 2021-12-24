@@ -3,7 +3,7 @@
 		<div class="row q-col-gutter-md mb-3">
 			<div class="col-12 col-md-3">
 				<q-select
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					emit-value
 					map-options
 					label="Effect type"
@@ -13,9 +13,9 @@
 				>
 					<template v-slot:append v-if="effect.type">
 						<q-icon name="info" @click.stop>
-							<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-								<q-card dark square>
-									<q-card-section class="bg-gray-active">
+							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+								<q-card :dark="$store.getters.theme === 'dark'">
+									<q-card-section class="bg-neutral-8">
 										<b>{{ effect.type.capitalize() }}</b>
 									</q-card-section>
 
@@ -34,7 +34,7 @@
 			<template v-if="effect.type">
 				<div class="col-12 col-md-3">
 					<q-select
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						emit-value
 						map-options
 						label="Effect subtype"
@@ -47,7 +47,7 @@
 				<!-- DURATION -->
 				<div class="col-12 col-md-3">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						v-model="effect.duration"
 						label="Duration"
 						type="number"
@@ -64,7 +64,7 @@
 				<!-- DURATION SCALE -->
 				<div class="col-12 col-md-3">
 					<q-select
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						emit-value
 						map-options
 						label="Time scale"
@@ -80,7 +80,7 @@
 				<!-- DICE COUNT -->
 				<div class="col-12 col-md-3">
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						v-model="effect.dice_count"
 						label="Dice count"
 						autocomplete="off"
@@ -95,7 +95,7 @@
 				<div class="col-12 col-md-3">
 					<!-- EFFECT DICE TYPE -->
 					<q-select
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						emit-value
 						map-options
 						label="Dice type"
@@ -107,7 +107,7 @@
 				<div class="col-12 col-md-3">
 					<!-- EFFECT FIXED VALUE -->
 					<q-input 
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Fixed value"
 						v-model="effect.fixed_val"
 						autocomplete="off"
@@ -120,9 +120,9 @@
 					>
 						<template v-slot:append>
 							<q-icon name="info" @click.stop>
-								<q-menu square anchor="top middle" self="bottom middle" max-width="250px">
-									<q-card dark square>
-										<q-card-section class="bg-gray-active">
+								<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" max-width="250px">
+									<q-card :dark="$store.getters.theme === 'dark'">
+										<q-card-section class="bg-neutral-8">
 											<b>Fixed value</b>
 										</q-card-section>
 										<q-card-section>
@@ -135,14 +135,14 @@
 					</q-input>
 				</div>
 				<div class="col-12 col-md-3">
-					<q-checkbox size="lg" dark v-model="effect.primary" label="Add primary stat" :false-value="null" indeterminate-value="something-else" />
+					<q-checkbox size="lg" :dark="$store.getters.theme === 'dark'" v-model="effect.primary" label="Add primary stat" :false-value="null" indeterminate-value="something-else" />
 				</div>
 			</template>
 			<!-- DAMAGE TYPES -->
 			<template v-if="hasField('damage_types')">
 				<div class="col-12 col-md-4">
 					<q-select
-						dark filled square dense
+						:dark="$store.getters.theme === 'dark'" filled square dense
 						label="Damage type"
 						name="damage_type"
 						v-model="effect.damage_type"
@@ -156,7 +156,7 @@
 			<!-- DESCRIPTION -->
 			<div class="col-12" v-if="hasField('description')">
 				<q-input
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					v-model="effect.description"
 					label="Description"
 					name="description"
@@ -171,7 +171,7 @@
 			<!-- ABILITIES -->
 			<div class="col-12 col-md-4" v-if="hasField('abilities')">
 				<q-select
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					label="Ability"
 					name="ability"
 					v-model="effect.ability"
@@ -186,7 +186,7 @@
 			<!-- SKILLS -->
 			<div class="col-12 col-md-4" v-if="hasField('skills')">
 				<q-select
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					map-options
 					emit-value
 					option-label="skill"
@@ -205,7 +205,7 @@
 			<!-- ATTACK -->
 			<div class="col-12 col-md-4" v-if="hasField('attack')">
 				<q-select
-					dark filled square dense
+					:dark="$store.getters.theme === 'dark'" filled square dense
 					map-options
 					emit-value
 					label="Made by/against"
@@ -222,7 +222,7 @@
 
 			<!-- MINIMUM -->
 			<div class="col-12 col-md-3" v-if="hasField('minimum')">
-				<q-checkbox size="lg" dark v-model="effect.minimum" label="Fixed value is minimum" :false-value="null" indeterminate-value="something-else" />
+				<q-checkbox size="lg" :dark="$store.getters.theme === 'dark'" v-model="effect.minimum" label="Fixed value is minimum" :false-value="null" indeterminate-value="something-else" />
 			</div>
 		</div>
 	</div>

@@ -1,21 +1,17 @@
 <template>
-	<div class="content">
-		<Crumble />
-		<h3>Download XML Sitemap</h3>
-		<p>Creates an XML with all URLs of the website for Google. Add this file in the public folder as sitemap.xml</p>
-		<a class="btn bnt-large" @click="downloadXml()">Download XML sitemap</a>
-	</div>
+	<hk-card header="Download XML Sitemap">
+		<div class="card-body">
+			<p>Creates an XML with all URLs of the website for Google. Add this file in the public folder as sitemap.xml</p>
+			<a class="btn bnt-large" @click="downloadXml()">Download XML sitemap</a>
+		</div>
+	</hk-card>
 </template>
 
 <script>
 	import { db } from '@/firebase';
-	import Crumble from '@/components/crumble/Compendium.vue';
 
 	export default {
 		name: 'XML',
-		components: {
-			Crumble
-		},
 		metaInfo: {
 			title: 'Admin | XML'
 		},
@@ -38,10 +34,6 @@
 					"http://harmlesskey.com/compendium/spells",
 					"http://harmlesskey.com/compendium/items"
 				]
-			}
-		},
-		firebase() {
-			return {
 			}
 		},
 		methods: {
@@ -198,6 +190,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-</style>

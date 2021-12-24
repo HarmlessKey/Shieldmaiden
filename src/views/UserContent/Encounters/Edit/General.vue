@@ -164,7 +164,6 @@
 				this.encounter.weather = (Object.keys(this.weather).length > 0) ? this.weather : null;
 
 				this.edit_encounter({
-					uid: this.user.uid,
 					campaignId: this.campaignId,
 					encounterId: this.encounterId,
 					value: this.encounter

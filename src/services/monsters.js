@@ -9,14 +9,15 @@ export class monsterServices {
     });
   }
 
-  async getMonsters(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name") {
-    console.log(sortBy);
-
+  async getMonsters(pageNumber = 1, pageSize = 15, query, fields=["ALL"], sortBy = "name", descending=false) {
     const skip = (pageNumber - 1)*pageSize;
     const fieldsString = fields.join(" ");
     let params = `?skip=${skip}&limit=${pageSize}&fields=${fieldsString}`;
-    
 
+    if(sortBy) {
+      params += `&sort=${sortBy}${descending ? ":desc" : ""}`;
+    }
+    
     if(query) {
       const queryParams = [];
       
@@ -36,8 +37,7 @@ export class monsterServices {
 
       params += `&${queryParams.join("&")}`;
     }
-
-
+    
     return this.HK.get(MONSTERS_REF + params).then((response) => {
       return response.data;
     }).catch((error) => {

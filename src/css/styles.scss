@@ -1905,6 +1905,25 @@ html body {
 		}
 	}
 
+	.q-table {
+		.q-field {
+			width: 60px;
+	
+			.row {
+				padding: 0;
+			}
+			&__control {
+				height: 26px;
+			}
+			input {
+				text-align: center;
+				height: 26px;
+				line-height: 26px;
+				padding: 0 5px;
+			}
+		}
+	}
+
 	.q-tabs--dense {
 		.q-tab {
 			min-height: 35px;

@@ -199,7 +199,7 @@
 						sortable: true
 					},
 					{
-						name: "cr",
+						name: "challenge_rating",
 						label: "CR",
 						field: "challenge_rating",
 						align: "left",
@@ -255,7 +255,8 @@
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
 					fields: ["name", "type", "challenge_rating"],
-					sortBy: this.pagination.sortBy
+					sortBy: this.pagination.sortBy,
+					descending: this.pagination.descending
 				}).then(result => {
 					this.pagination.rowsNumber = result.meta.count;
 					this.monsters = result.results;

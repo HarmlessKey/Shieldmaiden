@@ -186,7 +186,7 @@ const actions = {
   },
 
   /**
-   * Deletes a player from an encounter
+   * Deletes an entity from an encounter
    * 
    * @param {string} uid
    * @param {string} campaignId
@@ -208,16 +208,15 @@ const actions = {
   },
 
    /**
-   * Overwrites and existing encounter
-   * It is possible to edit the encounter of another user (for companions)
-   * therefore we send the uid from where the function is called
+   * Overwrites an existing encounter
    * 
    * @param {string} uid
    * @param {string} campaignId
    * @param {string} encounterId
    * @param {object} value
    */
-  async edit_encounter({ commit, dispatch }, { uid, campaignId, encounterId, value }) {
+  async edit_encounter({ rootGetters, commit, dispatch }, { campaignId, encounterId, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {

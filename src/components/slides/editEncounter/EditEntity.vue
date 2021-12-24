@@ -114,7 +114,7 @@
 		</ValidationObserver>
 		<small>
 			Slightly tweak your NPC for the current encounter. If you want to make a completely unique NPC, 
-			use our <router-link to="/npcs">NPC creator</router-link>.
+			use our <router-link to="/content/npcs">NPC creator</router-link>.
 		</small>
 	</div>
 </template>
@@ -125,11 +125,10 @@
 	export default {
 		name: 'EditNpc',
 		props: [
-		'data'
+		"data"
 		],
 		data() {
 			return {
-				userId: this.$store.getters.user.uid,
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				npc: {...this.data},
@@ -152,7 +151,6 @@
 				this.npc.curHp = this.npc.maxHp;
 
 				this.edit_entity({
-					uid: this.userId,
 					campaignId: this.campaignId,
 					encounterId: this.encounterId,
 					entityId: this.npc.key,

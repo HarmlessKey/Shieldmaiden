@@ -28,17 +28,28 @@
 		</div>
 		<a v-else class="btn" @click="addAllPlayers($event)">Add all</a>
 	</div>
-	<p><small>Missing players? <router-link :to="'/campaigns/'+campaignId">Add them to your campaign first</router-link>.</small></p>
+	<p><small>Missing players? <router-link to="/content/campaigns">Add them to your campaign first</router-link>.</small></p>
 	<hr>
 
 	<!-- MONSTERS -->
-	<h3>NPC's</h3>
+	<q-btn-toggle
+		v-if="content_count.npcs"
+		class="mb-3"
+		v-model="monster_resource"
+		spread
+		no-caps
+		toggle-color="primary"
+		:options="[
+			{label: 'Custom NPCs', value: 'custom'},
+			{label: 'SRD NPC\'s', value: 'srd'}
+		]"
+	/>
 
 	<hk-table 
-		:items="monsterArray"
+		v-if="monster_resource === 'custom'"
+		:items="_npcs"
 		:columns="monsterFields"
 		:perPage="15"
-		:loading="loadingNpcs"
 		:search="['name', 'type']"
 		:collapse="true"
 		classes="monster-table"
@@ -88,16 +99,116 @@
 		<span>Loading monsters...</span>
 	</div>
 </hk-table>
+
+	<template v-else>
+		<q-input 
+			:dark="$store.getters.theme !== 'light'" 
+			v-model="search"
+			borderless 
+			filled square
+			debounce="300" 
+			clearable
+			placeholder="Search SRD monster"
+			@input="filter"
+		>
+			<q-icon slot="append" name="search" />
+		</q-input>
+		<q-table
+			:data="monsters"
+			:columns="columns"
+			row-key="_id"
+			card-class="bg-none"
+			flat
+			:dark="$store.getters.theme !== 'light'"
+			:pagination.sync="pagination"
+			:loading="loading_monsters"
+			separator="none"
+			wrap-cells
+			@request="request"
+		>
+			<div slot="loading">
+				<hk-loader name="monsters" />
+			</div>
+			
+			<template v-slot:header="props">
+				<q-tr :props="props">
+					<q-th auto-width />
+					<q-th
+						v-for="col in props.cols"
+						:key="col.name"
+						:props="props"
+					>
+						{{ col.label }}
+					</q-th>
+				</q-tr>
+			</template>
+
+			<!-- Body -->
+			<template v-slot:body="props">
+				<q-tr :props="props">
+					<q-td auto-width>
+						<a  @click="props.expand = !props.expand">
+							<i class="fas" :class="props.expand ? 'fa-chevron-up' : 'fa-chevron-down'" />
+						</a>
+					</q-td>
+					<q-td
+						v-for="col in props.cols"
+						:key="col.name"
+						:props="props"
+					>
+						<div class="truncate-cell">
+							<div class="truncate">
+								<router-link v-if="col.name === 'name'" :to="'/compendium/monsters/' + col.value.replace(/ /g, '-').toLowerCase()">
+									{{ col.value }}
+								</router-link>
+								<div v-else-if="col.name === 'actions'" class="monster-actions">
+									<q-input 
+										:dark="$store.getters.theme === 'dark'" filled square dense
+										class="multi_nr ml-2" 
+										autocomplete="off" 
+										type="number" 
+										min="1"
+										max="99"
+										name="name" 
+										placeholder="1" 
+										v-model="to_add[props.key]"
+									/>
+									<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, false)">
+										<i class="fas fa-plus"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add with average HP
+										</q-tooltip>
+									</a>
+									<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, false, true)">
+										<i class="fas fa-dice-d20"></i>
+										<q-tooltip anchor="top middle" self="center middle">
+											Add with rolled HP
+										</q-tooltip>
+									</a>
+								</div>
+								<template v-else>{{ col.value }}</template>
+							</div>
+						</div>
+					</q-td>
+				</q-tr>
+				<q-tr v-if="props.expand" :props="props">
+					<q-td colspan="100%" class="px-0 py-0" auto-width>
+						<ViewMonster :id="props.key" />
+					</q-td>
+				</q-tr>
+			</template>
+		</q-table>
+	</template>
 </div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 	import ViewMonster from '@/components/ViewMonster.vue';
+	import _ from 'lodash';
 
 	export default {
 		name: 'Entities',
@@ -120,8 +231,6 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
-				monsters: undefined,
-				loadingNpcs: true,
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
@@ -150,35 +259,79 @@
 						maxContent: true
 					}
 				},
+				monster_resource_setter: undefined,
+				loading_monsters: true,
+				monsters: [],
+				search: "",
+				query: null,
+				pagination: {
+					sortBy: 'name',
+					descending: false,
+					page: 1,
+					rowsPerPage: 15,
+					rowsNumber: 0
+				},
+				columns: [
+					{
+						name: "name",
+						label: "Name",
+						field: "name",
+						sortable: true,
+						align: "left",
+						format: val => val.capitalizeEach()
+					},
+					{
+						name: "type",
+						label: "Type",
+						field: "type",
+						align: "left",
+						sortable: true
+					},
+					{
+						name: "challenge_rating",
+						label: "CR",
+						field: "challenge_rating",
+						align: "left",
+						sortable: true,
+						format: val => this.cr(val)
+					},
+					{
+						name: "actions",
+						label: "",
+						sortable: false,
+						align: "right"
+					}
+				]
 			} 
 		},
-		mounted() {
-			//GET NPCS
-			const monsters = db.ref(`monsters`);
-			monsters.on('value', (snapshot) => {
-				let monsters = snapshot.val();
-
-				for(let key in monsters) {
-					monsters[key]['.key'] = key;
-					monsters[key].custom = false;
-				}
-				
-				const customNpcs = this.npcs;
-				for(let key in customNpcs) {
-					customNpcs[key].custom = true;
-					customNpcs[key]['.key'] = key;
-					monsters[key] = customNpcs[key];
-				}
-				this.monsterArray = Object.values(monsters);
-				this.monsters = monsters;
-				this.loadingNpcs = false;
-			});
+		async mounted() {
+			await this.fetchMonsters();
 		},
 		computed: {
+			...mapGetters(["content_count"]),
 			...mapGetters("npcs", ["npcs"]),
 			...mapGetters("players", ["players"]),
+			monster_resource: {
+				get() {
+					const resource = (this.content_count.npcs) ? "custom" : "srd";
+					return (this.monster_resource_setter) ? this.monster_resource_setter : resource;
+				},
+				set(newVal) {
+					this.monster_resource_setter = newVal;
+				}
+			},
+			_npcs() {
+				return _.chain(this.npcs)
+				.filter((npc, key) => {
+					npc.key = key;
+					return npc;
+				})
+				.orderBy("name", 'asc')
+				.value()
+			},
 		},
 		methods: {
+			...mapActions("monsters", ["get_monsters", "get_monster"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 
 				"add_npc_encounter"
@@ -186,6 +339,39 @@
 			...mapActions([
 				'setSlide'
 			]),
+			cr(val) {
+				return (val == 0.125) ? "1/8" : 
+					(val == 0.25) ? "1/4" :
+					(val == 0.5) ? "1/2" :
+					val;
+			},
+			filter() {
+				this.loading_monsters = true;
+				this.monsters = [];
+				this.pagination.page = 1;
+				this.query = {
+					search: this.search
+				}
+				this.fetchMonsters();
+			},
+			request(req) {
+				this.pagination = req.pagination;
+				this.fetchMonsters();		
+			},
+			async fetchMonsters() {
+				await this.get_monsters({
+					pageNumber: this.pagination.page,
+					pageSize: this.pagination.rowsPerPage,
+					query: this.query,
+					fields: ["name", "type", "challenge_rating"],
+					sortBy: this.pagination.sortBy,
+					descending: this.pagination.descending
+				}).then(result => {
+					this.pagination.rowsNumber = result.meta.count;
+					this.monsters = result.results;
+					this.loading_monsters = false;
+				});
+			},
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
@@ -195,7 +381,7 @@
 				}
 				this.to_add[id] = 1
 			},
-			add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
+			async add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
 				let entity = {
 					id: id,
 					name: name,
@@ -228,8 +414,8 @@
 					
 					// SRD NPC
 					if(!custom) {
-						let npc_data = this.monsters[id];
-						entity.npc = 'srd';
+						let npc_data = await this.get_monster(id);
+						entity.npc = "srd";
 						if(rollHp && npc_data.hit_dice) {
 							let dice = npc_data.hit_dice.split('d');
 							let mod = dice[0] * this.calcMod(npc_data.constitution);
@@ -349,8 +535,14 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 .monster-actions {
 	display: flex;
 	justify-content: flex-end;
-	height: 46px;
-	padding: 8px 10px 8px 0;
+	align-items: center;
+
+	.multi_nr {
+		width: 45px;
+		height: 30px;
+		text-align: center;
+		margin-left: 4px;
+	}
 }
 
 .players {
@@ -373,12 +565,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type='number']::-webkit-i
 		text-align: center;
 	}
 }
-.multi_nr {
-	width: 45px;
-	height: 30px;
-	text-align: center;
-	margin-left: 4px;
-}
+
 .hk-table {
 	margin-bottom: 30px;
 }

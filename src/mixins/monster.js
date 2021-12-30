@@ -181,6 +181,8 @@ export const monsterMixin = {
 			new_monster.saving_throws = [];
 			for(const ability of this.abilities) {
 				new_monster[ability] = monster[ability] || 10;
+				new_monster[ability] = Math.min(new_monster[ability], 99)
+				new_monster[ability] = Math.max(new_monster[ability], 0)
 
 				if(monster[`${ability}_save`]) {
 					new_monster.saving_throws.push(ability);

@@ -151,9 +151,13 @@ export const monsterMixin = {
 			if(monster.subtype) new_monster.subtype = monster.subtype.toLowerCase().capitalize();
 			if(monster.alignment) new_monster.alignment = monster.alignment.toLowerCase().capitalize();
 			if(monster.avatar) new_monster.avatar = monster.avatar;
+			
 			new_monster.armor_class = (monster.ac) ? parseInt(monster.ac) : 1; // required
+			new_monster.armor_class = Math.min(new_monster.armor_class, 99); // limit AC to 99
+
 			new_monster.hit_points = (monster.maxHp) ? parseInt(monster.maxHp) : 1; // required
 			new_monster.hit_points = Math.min(new_monster.hit_points, 9999); // limit hit-points to 9999
+			
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
 			

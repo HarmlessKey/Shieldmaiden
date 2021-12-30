@@ -156,7 +156,12 @@ export const monsterMixin = {
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
 			
-			const proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency;
+			let proficiency = 0
+			if (this.monster_challenge_rating[new_monster.challenge_rating].proficiency) {
+				proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency
+			} else {
+				console.log(new_monster.challenge_rating)
+			}
 
 			if(!new_monster.size || !this.monster_sizes.includes(new_monster.size)) {
 				new_monster.size = "Medium";
@@ -260,7 +265,6 @@ export const monsterMixin = {
 				damage_vulnerabilities: monster.damage_vulnerabilities,
 				damage_immunities: monster.damage_immunities,
 			}
-			const condition_immunities = (monster.condition_immunities) ? monster.condition_immunities.split(",") : null;
 
 			const resistances = [
 				"damage_resistances",
@@ -280,6 +284,9 @@ export const monsterMixin = {
 				}
 				if(new_monster[resistance_type].length === 0) delete new_monster[resistance_type];
 			}
+
+			const condition_immunities = (monster.condition_immunities) ? monster.condition_immunities.split(",") : null;
+
 
 			if(condition_immunities) {
 				new_monster.condition_immunities = [];
@@ -319,13 +326,13 @@ export const monsterMixin = {
 						// Find recharge, limit and legendary cost
 						if(ability.name && ability.name.match(/\((.*?)\)/g)) {
 							const type = ability.name.match(/\((.*?)\)/g)[0];
-
+							
 							if(type.toLowerCase().includes("recharge")){
 								if(type.match(/[0-9]+(-[0-9]+)*/)) {
 									newAbility.recharge = type.match(/[0-9]+(-[0-9]+)*/)[0];
 								} else {
 									newAbility.recharge = "rest";
-								}
+								}								
 							}
 							if(type.toLowerCase().includes("day")){
 								newAbility.limit = type.match(/([0-9])+/g)[0];

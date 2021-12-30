@@ -114,7 +114,7 @@
 					"versatile_two",
 					"action_list"
 				],
-				abilities: [
+				action_abilities: [
 					"special_abilities",
 					"actions",
 					"legendary_actions",
@@ -217,23 +217,25 @@
 						console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
 						for(let key in npcs) {
 							let entry = npcs[key];
-							if(!entry.old) {
-								this.updateEntry({ uid, key, entry });
-							}
+							// if(!entry.old) {
+							this.updateEntry({ uid, key, entry });
+							// }
 						}
-						console.groupEnd();	
+						console.groupEnd();
+						const count_ref = db.ref(`search_npcs/${uid}/metadata/count`);
+						count_ref.set(Object.keys(npcs).length);
 					}
 				}).then(() => {
+
 					this.loading = false;
 					console.log(`%cFINISHED.`, "color: #83b547;");
 				});	
 			},
 			async updateEntry({ uid, key, entry }) {
 				const ref = (uid) ? db.ref(`npcs/${uid}/${key}`) : db.ref(`monsters/${key}`);
-
 				// If a mosnter has old properties, parse it first
-				if(entry.hasOwnProperty("ac")) {
-					this.entry = await this.parseMonster(entry);
+				if(entry.hasOwnProperty("ac") || entry.hasOwnProperty('old')) {
+					entry = await this.parseMonster(entry);
 				}
 
 				// Remove not allowed properties
@@ -440,7 +442,7 @@
 					}
 				}
 
-				for(const type of this.abilities) {
+				for(const type of this.action_abilities) {
 					const abilities = entry[type];
 					if(abilities) {
 						for(const ability of abilities) {
@@ -600,6 +602,29 @@
 					console.groupEnd();
 				} catch(error) {
 					console.error(`Couldn't update monster`, key, entry.name, error, entry);
+				}
+
+				if (uid) {
+					// Generate searchable NPC entry in search_npcs table
+					const searchable_npcs_fields = ['name', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type']
+					let searchable_entry = {}
+					for (const field of searchable_npcs_fields) {
+						if (entry[field]) {
+							searchable_entry[field] = entry[field]
+						}
+					}
+					
+					const search_ref = db.ref(`search_npcs/${uid}/results/${key}`);
+
+					try {
+						search_ref.set(searchable_entry)
+						// console.groupCollapsed(`%c${key} Successfully updated search npcs.`, "color: #83b547;")
+						// console.log(key, searchable_entry);
+						// console.groupEnd();
+					} catch(error) {
+						console.error(`Couldn't update search_npc table`, key, entry.name, error, searchable_entry)
+					}
+
 				}
 			}
 		}

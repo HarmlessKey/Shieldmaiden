@@ -233,12 +233,9 @@
 			},
 			async updateEntry({ uid, key, entry }) {
 				const ref = (uid) ? db.ref(`npcs/${uid}/${key}`) : db.ref(`monsters/${key}`);
-
 				// If a mosnter has old properties, parse it first
 				if(entry.hasOwnProperty("ac") || entry.hasOwnProperty('old')) {
-					// console.error("BEFORE PARSE", entry)
 					entry = await this.parseMonster(entry);
-					// console.error("AFTER PARSE", entry)
 				}
 
 				// Remove not allowed properties

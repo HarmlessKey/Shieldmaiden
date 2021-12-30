@@ -145,7 +145,7 @@ export const monsterMixin = {
 		parseMonster(monster) {
 			let new_monster = {};
 			new_monster.name = (monster.name) ? monster.name.toLowerCase() : "monster name"; // required
-			new_monster.challenge_rating = (monster.challenge_rating && !isNaN(monster.challenge_rating)) ? monster.challenge_rating : 1; // required
+			new_monster.challenge_rating = (Number(monster.challenge_rating) && !isNaN(monster.challenge_rating)) ? monster.challenge_rating : 1; // required
 			if(monster.size) new_monster.size = monster.size.toLowerCase().capitalize(); // required
 			if(monster.type) new_monster.type = monster.type.toLowerCase().capitalize();	// required
 			if(monster.subtype) new_monster.subtype = monster.subtype.toLowerCase().capitalize();
@@ -160,7 +160,7 @@ export const monsterMixin = {
 			if (this.monster_challenge_rating[new_monster.challenge_rating].proficiency) {
 				proficiency = this.monster_challenge_rating[new_monster.challenge_rating].proficiency
 			} else {
-				console.log(new_monster.challenge_rating)
+				console.log("challenge_rating",  new_monster.challenge_rating)
 			}
 
 			if(!new_monster.size || !this.monster_sizes.includes(new_monster.size)) {
@@ -241,7 +241,6 @@ export const monsterMixin = {
 
 			// Senses
 			const senses = (monster.senses) ? monster.senses.split(",") : null;
-			
 			if(senses) {
 				new_monster.senses = {};
 				for(const sense of senses) {
@@ -335,15 +334,15 @@ export const monsterMixin = {
 								}								
 							}
 							if(type.toLowerCase().includes("day")){
-								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 								newAbility.limit_type = "day";
 							}
 							if(type.toLowerCase().includes("turn")){
-								newAbility.limit = type.match(/([0-9])+/g)[0];
+								newAbility.limit = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 								newAbility.limit_type = "turn";
 							}
 							if(action_type === "legendary_actions" && type.toLowerCase().includes("costs")){
-								newAbility.legendary_cost = type.match(/([0-9])+/g)[0];
+								newAbility.legendary_cost = type.match(/([0-9])+/g) ? type.match(/([0-9])+/g)[0] : 1;
 							}
 							newAbility.name = newAbility.name.replace(type, "").trim();
 						}
@@ -409,6 +408,9 @@ export const monsterMixin = {
 									if (input.length == 2) {
 										newRoll.dice_count = parseInt(input[0]);
 										newRoll.dice_type = parseInt(input[1]);
+										if (isNaN(newRoll.dice_count)) {
+											console.log(damage)
+										}
 									} else {
 										actually_fixed = parseInt(input[0]) || null;
 									}

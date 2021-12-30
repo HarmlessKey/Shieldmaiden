@@ -1,8 +1,5 @@
 <template>
-	<div v-if="npc && npc.old" class="deprecated">
-		<h2 class="red">Deprecated NPC</h2>
-	</div>
-	<div v-else-if="npc || $route.name == 'Add NPC'">
+	<div v-if="npc || $route.name === 'Add NPC'">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
@@ -208,13 +205,11 @@
 		},
 		async mounted() {
 			if(this.npcId) {
-				const npc = await this.get_npc({ uid: this.userId, id: this.npcId });
-
-				if(npc) {
+				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
 					this.npc = npc;
 					this.npc_copy = JSON.stringify(npc);
 					this.unsaved_changes = false;
-				}
+				});
 			}
 
 			var npcs_ref = db.ref(`monsters`);

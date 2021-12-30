@@ -99,9 +99,8 @@
 				wrap-cells
 				@request="request"
 			>
-				<div slot="loading">
-					<hk-loader name="monsters" />
-				</div>
+				<div slot="no-data" />
+				<hk-loader slot="loading" name="monsters" />
 				
 				<template v-slot:header="props">
 					<q-tr :props="props">

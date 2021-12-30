@@ -153,6 +153,7 @@ export const monsterMixin = {
 			if(monster.avatar) new_monster.avatar = monster.avatar;
 			new_monster.armor_class = (monster.ac) ? parseInt(monster.ac) : 1; // required
 			new_monster.hit_points = (monster.maxHp) ? parseInt(monster.maxHp) : 1; // required
+			new_monster.hit_points = Math.min(new_monster.hit_points, 9999); // limit hit-points to 9999
 			if(monster.hit_dice) new_monster.hit_dice = monster.hit_dice;
 			if(monster.friendly) new_monster.friendly = true;
 			

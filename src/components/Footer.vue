@@ -8,25 +8,30 @@
 					</div>
 
 					<div class="col-12 col-md-9 links">
-						<div v-if="user">
-							<h2 class="neutral-4">Your content</h2>
-							<ul>
-								<li><router-link to="/settings">Settings</router-link></li>
-							</ul>
-							<h2 class="neutral-4">DM</h2>
-							<ul>
-								<li><router-link to="/content/campaigns">Campaigns</router-link></li>
-								<li><router-link to="/content/players">Players</router-link></li>
-								<li><router-link to="/content/npcs">NPC's</router-link></li>
-								<li><router-link to="/content/reminders">Reminders</router-link></li>
-								<li><router-link to="/content/items">Items</router-link></li>
-							</ul>
-							<h2 class="neutral-4">Player</h2>
-							<ul>
-								<li><router-link to="/characters">Characters</router-link></li>
-								<li><router-link to="/followed">Following</router-link></li>
-							</ul>
-						</div>
+						<template v-if="user">
+							<div>
+								<h2 class="neutral-4">DM Content</h2>
+								<ul>
+									<li><router-link to="/content/campaigns">Campaigns</router-link></li>
+									<li><router-link to="/content/players">Players</router-link></li>
+									<li><router-link to="/content/npcs">NPC's</router-link></li>
+									<li><router-link to="/content/reminders">Reminders</router-link></li>
+									<li><router-link to="/content/items">Items</router-link></li>
+								</ul>
+							</div>
+							<div>
+								<h2 class="neutral-4">Player Content</h2>
+								<ul>
+									<li><router-link to="/characters">Characters</router-link></li>
+									<li><router-link to="/followed">Following</router-link></li>
+								</ul>
+								<h2 class="neutral-4">Account</h2>
+								<ul>
+									<li><router-link to="/profile">Profile</router-link></li>
+									<li><router-link to="/settings">Settings</router-link></li>
+								</ul>
+							</div>
+						</template>
 						<div>
 							<h2 class="neutral-4">Quick Links</h2>
 							<ul>

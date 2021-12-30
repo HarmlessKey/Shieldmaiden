@@ -318,6 +318,9 @@ export const monsterMixin = {
 						// We will use only 1 action now, for damage or healing
 						// But later we might want to add conditions and reminders
 						// These might be applied in a different way, so with a different action
+						if (!ability) {
+							continue;
+						}
 						const newAbility = {
 							name: ability.name || "Unnamed Ability",
 							desc: ability.desc || null,

@@ -25,7 +25,7 @@ const convert_npc = (npc) => {
 export class npcServices {
 
   async getNpcs(uid, start, pageSize, query, sortBy, descending) {
-    sortBy = (!sortBy) ? "name" : sortBy;
+    sortBy = (!sortBy || query) ? "name" : sortBy;
     let call = SEARCH_NPCS_REF.child(`${uid}/results`).orderByChild(sortBy);
 
     if(query) {
@@ -75,6 +75,7 @@ export class npcServices {
 
   async addNpc(uid, npc, new_count) {
     try {
+      npc.name = npc.name.toLowerCase();
       const newNpc = await NPCS_REF.child(uid).push(npc);
       
       //Update search_npcs

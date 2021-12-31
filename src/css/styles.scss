@@ -548,6 +548,9 @@ html body {
 		}
 	}
 	.content-side {
+		position: sticky;
+		top: 16px;
+
 		.video {
 			.animated-video {
 				margin-left: -2%;

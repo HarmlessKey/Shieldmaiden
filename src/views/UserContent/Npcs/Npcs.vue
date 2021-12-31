@@ -43,6 +43,7 @@
 
 					<q-table
 						:data="npcs"
+						:visible-columns="visibleColumns"
 						:columns="columns"
 						row-key="key"
 						card-class="bg-none"
@@ -54,60 +55,43 @@
 						:rows-per-page-options="[0]"
 						@request="request"
 					>	
-						<template v-slot:header="props">
-							<q-tr :props="props">
-								<q-th
-									v-for="col in props.cols"
-									:key="col.name"
-									:props="props"
-								>
-									{{ col.label }}
-								</q-th>
-							</q-tr>
-						</template>
-
-						<!-- Body -->
-						<template v-slot:body="props">
-							<q-tr :props="props">
-								<q-td
-									v-for="col in props.cols"
-									:key="col.name"
-									:props="props"
-								>
-									<div class="truncate-cell">
-										<div class="truncate">
-											<router-link v-if="col.name === 'name'" :to="`${$route.path}/${props.key}`">
-												{{ col.value }}
-											</router-link>
-											<div v-else-if="col.name === 'actions'">
-												<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-													<i class="fas fa-pencil"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Edit
-													</q-tooltip>
-												</router-link>
-												<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.index)">
-													<i class="fas fa-trash-alt"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Delete
-													</q-tooltip>
-												</a>
-												<a class="btn btn-sm bg-neutral-5" @click="downloadJSON(props.key)">
-													<i class="fas fa-brackets-curly"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Export JSON
-													</q-tooltip>
-												</a>
-											</div>
-											<template v-else>{{ col.value }}</template>
-										</div>
+						<template v-slot:body-cell="props">
+							<q-td v-if="props.col.name !== 'actions'">
+								<div  class="truncate-cell">
+									<div class="truncate">
+										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+											{{ props.value }}
+										</router-link>
+										<template v-else>
+											{{ props.value }}
+										</template>
 									</div>
-								</q-td>
-							</q-tr>
+								</div>
+							</q-td>
+							<q-td v-else class="text-right d-flex justify-content-between">
+								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+									<i class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</router-link>
+								<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+									<i class="fas fa-trash-alt"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Delete
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm bg-neutral-5" @click="downloadJSON(props.key)">
+									<i class="fas fa-brackets-curly"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Export JSON
+									</q-tooltip>
+								</a>
+							</q-td>
 						</template>
-							<div slot="pagination">
-								1-{{npcs.length}} of {{(search && search.length >= 3) ? npcs.length : npc_count}}
-							</div>
+						<div slot="pagination">
+							1-{{npcs.length}} of {{(search && search.length >= 3) ? npcs.length : npc_count}}
+						</div>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="monsters" />
 					</q-table>
@@ -141,6 +125,7 @@
 				<router-link v-else-if="npcs === null && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
 					Create your first NPC
 				</router-link>
+				<q-resize-observer @resize="setSize" />
 			</div>
 		</hk-card>
 
@@ -186,7 +171,6 @@
 				</div>
 			</hk-card>
 		</q-dialog>
-
 	</div>
 </template>
 
@@ -214,24 +198,23 @@
 				loading_npcs: true,
 				npcs: [],
 				paginationSetter: undefined,
-				search: ""
+				search: "",
+				card_width: 0
 			}
 		},
 		computed: {
 			...mapGetters([
 				"tier",
-				"campaigns",
-				"players",
 				"allEncounters",
 				"overencumbered",
 			]),
+			...mapGetters("players", ["players"]),
+			...mapGetters("campaigns", ["campaigns"]),
 			...mapGetters("npcs", ["npc_count"]),
 			pagination: {
 				get() {
 					return (this.paginationSetter) ? this.paginationSetter : {
 						sortBy: "name",
-						descending: false,
-						page: 1,
 						rowsPerPage: 15,
 						rowsNumber: this.npc_count
 					};
@@ -271,6 +254,13 @@
 						align: "right"
 					}
 				]
+			},
+			visibleColumns() {
+				return (this.card_width > 600) ? 
+					["name", "type", "challenge_rating", "actions"] : 
+					(this.card_width > 450) ? 
+					["name", "type", "actions"] :
+					["name", "actions"];
 			},
 			slotsLeft() {
 				return this.tier.benefits.npcs - this.npc_count;
@@ -351,10 +341,11 @@
 				}
 
 			},
-			deleteNpc(key, index) {
+			async deleteNpc(key, index) {
 				//Remove the NPC from all encounters
 				for(let campaign in this.campaigns) {
 					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
+
 						//Go over all encounters of the campaign
 						for(let enc in this.allEncounters[campaign]) {
 							var entities = this.allEncounters[campaign][enc].entities;
@@ -379,8 +370,8 @@
 						}
 					}
 				}
-				//Remove NPC from database and store
-				console.log(index)
+				// Remove the NPC
+				this.npcs.splice(index, 1);
 				this.delete_npc(key);
 			},
 			loadJSON() {
@@ -410,6 +401,9 @@
 
 				this.import_dialog = false
 				this.json_input = ""
+			},
+			setSize(e) {
+				this.card_width = e.width;
 			}
 		}
 	}

@@ -10,14 +10,14 @@
 									There are validation errors
 								</q-tooltip>
 							</q-icon>
-							<a v-if="!npcId" class="btn bg-neutral-5 mx-1" @click="copy_dialog = true">
-								<i class="fas fa-copy"></i>
-								Copy existing NPC
-							</a>
-							<a v-if="!npcId" class="btn bg-neutral-5" @click="import_dialog = true">
-								<i class="fas fa-file-upload"></i>
-								Import an NPC
-							</a>
+							<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
+								<i class="fas fa-copy mr-2"></i>
+								Copy
+							</q-btn>
+							<q-btn v-if="!npcId" color="neutral-5" no-caps @click="import_dialog = true">
+								<i class="fas fa-file-upload mr-2"></i>
+								Import
+							</q-btn>
 						</div>
 						<div v-if="npc" class="d-none d-md-flex name">
 							<b v-if="npc.name">{{ npc.name}}</b>
@@ -43,18 +43,7 @@
 
 					<!-- HANDLING -->
 					<div class="save">
-						<div class="d-flex justify-content-start">
-							<template v-if="unsaved_changes">
-								<div  class="orange unsaved_changes">
-									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
-								</div>	
-								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
-									<i class="fas fa-undo" />
-									Revert
-								</a>
-							</template>
-						</div>
-						<div>
+						<div class="buttons">
 							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
@@ -62,6 +51,17 @@
 							</q-icon>
 							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 							<q-btn label="Save" type="submit" color="primary" no-caps />
+						</div>
+						<div class="d-flex justify-content-start unsaved_changes">
+							<template v-if="unsaved_changes">
+								<div  class="orange truncate mr-2 d-none d-md-block">
+									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+								</div>	
+								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
+									<i class="fas fa-undo" />
+									Revert
+								</a>
+							</template>
 						</div>
 					</div>
 				</div>
@@ -206,6 +206,7 @@
 		async mounted() {
 			if(this.npcId) {
 				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
+					npc.name = npc.name.capitalizeEach();
 					this.npc = npc;
 					this.npc_copy = JSON.stringify(npc);
 					this.unsaved_changes = false;
@@ -243,9 +244,7 @@
 					}
 					
 					// Capitalize name
-					if (this.npc.name) {
-						this.npc.name = this.npc.name.capitalizeEach();
-					}
+					this.npc.name = this.npc.name.capitalizeEach();
 				},
 			},
 
@@ -274,10 +273,6 @@
 			},
 			copy(npc) {
 				this.copy_dialog = false;
-
-				// Remove unwanted data from the monster
-				delete npc.metadata;
-
 				this.npc = npc;
 
 				// Clear search
@@ -286,10 +281,11 @@
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);
+				this.npc_copy = JSON.stringify(this.npc);
 				this.unsaved_changes = false;
 			},
 			/**
-			 * Checks if a new NPC must added, or an existing NPC must be saved.
+			 * Checks if a new NPC must be added, or an existing NPC must be saved.
 			**/
 			saveNpc() {
 				if(this.$route.name === "Add NPC" && !this.npcId) {
@@ -299,7 +295,6 @@
 				}
 			},
 			addNpc() {
-				delete this.npc.checked;
 				this.add_npc(this.npc).then((res) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
@@ -378,7 +373,7 @@
 				
 			}
 		},
-		beforeRouteLeave (to, from, next) {
+		beforeRouteLeave(to, from, next) {
 			if (this.unsaved_changes) {
 				this.$snotify.error('There are unsaved changes in the form.\n Would you like to continue?', 'Unsaved Changes', {
 					buttons: [
@@ -395,20 +390,13 @@
 
 <style lang="scss" scoped>
 .content {
-	display: grid;
-	height: calc(100vh - 50px) !important;
-	grid-template-rows: 35px 1fr 60px;
 
 	.top {
 		display: flex;
 		justify-content: space-between;
-		border-bottom: solid 1px $neutral-4;
 		align-items: center;
+		margin-bottom: 10px;
 
-		.back {
-			line-height: 35px;
-			margin-right: 10px;
-		}
 		.name {
 			user-select: none;
 			justify-content: flex-end;
@@ -425,25 +413,33 @@
 			}
 		}
 	}
-	.form {
-		padding-top: 5px;
-		overflow-x: hidden;
-		overflow-y: scroll;
-
-		&::-webkit-scrollbar {
-			display: none;
-			columns: 2;
-		}
-	}
 	.save {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		flex-wrap: wrap;
+		position: sticky;
+		bottom: 5px;
+		padding: 10px 10px;
+		margin: 5px 5px;
+		background: $neutral-8;
+		border-radius: $border-radius;
+		flex-direction: row-reverse;
 
 		.unsaved_changes {
 			margin: 0 10px 0 0;
 			line-height: 31px;
 		}
+		.buttons {
+			display: flex;
+			justify-content: flex-end;
+		}
+		@media only screen and (max-width: 343px) {
+			.buttons {
+				margin-bottom: 15px;
+			}
+		}
 	}
 }
+
 </style>

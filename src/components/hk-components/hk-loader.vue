@@ -2,7 +2,7 @@
 	<div class="loading">
 			<div>
 				<span class="die spin" :style="{ backgroundImage: 'url(' + require('@/assets/_img/logo/logo-icon-no-shield-' + dieColor + '.svg') + ')' }"></span>
-				<h2>Loading{{ name ? ` ${name}` : `` }}...</h2>
+				<h2>{{ prefix ? prefix : "Loading" }}{{ name ? ` ${name}` : `` }}...</h2>
 			</div>
 		</div>
 </template>
@@ -10,7 +10,14 @@
 <script>
 export default {
 	name: 'hk-loader',
-	props: ["name"],
+	props: {
+		name: {
+			type: String
+		},
+		prefix: {
+			type: String
+		}
+	},
 	computed: {
 		//Random die color
 		dieColor() {

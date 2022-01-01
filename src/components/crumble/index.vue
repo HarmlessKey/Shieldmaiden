@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="mb-3">
 		<q-breadcrumbs>
 			<template v-slot:separator>
 				/
@@ -13,7 +13,6 @@
 				{{ route.name }}
 			</q-breadcrumbs-el>
 		</q-breadcrumbs>
-		<hr>
 	</div>
 </template>
 

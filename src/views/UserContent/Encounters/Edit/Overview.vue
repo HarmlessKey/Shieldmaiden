@@ -1,143 +1,110 @@
 <template>
 	<div>
-		<div class="encounter_overview" :class="{ show: showOverview }">
-			<div>
-				<h3 class="header">Encounter overview</h3>
-				<div class="diff-info" v-if="encDifficulty">
-					<h5 class="mb-3">Difficulty</h5>
-					<div class="d-flex justify-content-between">
-						<div class="advanced">
-							{{ encDifficulty[1] }}
-							<template v-if="encDifficulty['easy']">
-								<div class="mb-3">
-									<div><b>Party XP tresholds</b></div>
-									<div :class="{ 'green': encDifficulty[0] === 'easy'}">
-										<span class="left">Easy:</span> <hk-animated-integer :value="encDifficulty['easy']"/>
-									</div>
-									<div :class="{ 'yellow': encDifficulty[0] === 'medium'}">
-										<span class="left">Medium:</span> <hk-animated-integer :value="encDifficulty['medium']"/>
-									</div>
-									<div :class="{ 'orange': encDifficulty[0] === 'hard'}">
-										<span class="left">Hard:</span> <hk-animated-integer :value="encDifficulty['hard']"/>
-									</div>
-									<div :class="{ 'red': encDifficulty[0] === 'deadly'}">
-										<span class="left">Deadly:</span> <hk-animated-integer :value="encDifficulty['deadly']"/>
-									</div>
-								</div>
-								Total XP: <hk-animated-integer :value="encDifficulty['totalXp']" class="blue" /><br/>
-								Adjusted XP: <hk-animated-integer :value="encDifficulty['compare']" class="blue" />
-							</template>
-						</div>
-						<q-circular-progress
-							class="d-none d-lg-block"
-							show-value
-							font-size="18px"
-							:value="encDifficulty['compare']/encDifficulty['deadly']*100"
-							size="165px"
-							:color="bars[encDifficulty[0]]"
-							track-color="dark"
-						>
-							{{ encDifficulty[0].capitalize() }}
-						</q-circular-progress>
+		<hk-card class="encounter_overview" :class="{ show: showOverview }">
+			<!-- DIFFICULTY -->
+			<div v-if="encDifficulty">
+				<div 
+					@click="showDifficulty = !showDifficulty" 
+					class="diff-header"
+				>
+					<div>
+						<q-icon name="info" size="sm" color="neutral-2 mr-1" />
+						Difficulty 
 					</div>
-					<div class="progress-area d-block d-lg-none">
-						<q-linear-progress 
-							size="20px" 
-							:value="encDifficulty['compare']/encDifficulty['deadly']" 
-							:color="bars[encDifficulty[0]]" 
-							class="q-mt-sm" 
-						/>
-						<span 
-							class="diff"
-							:class="{ 
-								'green': encDifficulty[0] == 'easy',
-								'yellow': encDifficulty[0] == 'medium',
-								'orange': encDifficulty[0] == 'hard',
-								'red': encDifficulty[0] == 'deadly'
-							}"
-						>
-							{{ encDifficulty[0] }}
-						</span>
-					</div> 
-					<hr class="mb-0">
+					<b 
+						:class="{ 
+							'green': encDifficulty[0] == 'easy',
+							'yellow': encDifficulty[0] == 'medium',
+							'orange': encDifficulty[0] == 'hard',
+							'red': encDifficulty[0] == 'deadly'
+						}"
+					>
+						{{ encDifficulty[0].capitalize() }}
+					</b>
 				</div>
-				<h3 v-else class="neutral-3">Calculating difficulty...</h3>
-			</div>
-			<q-scroll-area :dark="$store.getters.theme === 'dark'" class="bg-neutral-6" :thumb-style="{ width: '5px'}">
-				<div class="overview">          
-					<template v-if="encounter">
-						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
-
-						<hk-table
-							class="mb-4" 
-							:items="_friendlies"
-							:columns="entityColumns"
-							:showHeader="false"
-						>
-							<div slot="image" slot-scope="data">
-								<!-- Player avatar -->
-								<span 
-									v-if="data.row.entityType === 'player'" 
-									:style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"
-									class="image"
-								>
-									<i v-if="!players[data.row.id].avatar" class="hki-player" />
-								</span>
-
-								<!-- Companion avatar -->
-								<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }">
-									<i v-if="!npcs[data.row.id].avatar" class="hki-companion" />
-								</span>
-
-								<!-- Friendly NPC avatar -->
-								<span 
-									v-else-if="data.row.entityType === 'npc'"
-									class="image" 
-									:style="{ 
-										backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
-										'border-color': data.row.color_label ? data.row.color_label : ``,
-										'color': data.row.color_label ? data.row.color_label : ``
-									}"
-								>
-									<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
-								</span>
+				<div class="progress-area">
+					<q-linear-progress 
+						size="3px" 
+						:value="encDifficulty['compare']/encDifficulty['deadly']" 
+						:color="bars[encDifficulty[0]]" 
+					/>				
+				</div> 
+				<q-slide-transition>
+					<div class="diff-info" v-show="showDifficulty">
+						<div class="d-flex justify-content-between">
+							<div class="advanced">
+								{{ encDifficulty[1] }}
+								<template v-if="encDifficulty['easy']">
+									<div class="mb-3">
+										<div class="neutral-2"><b>Party XP tresholds</b></div>
+										<div :class="{ 'green': encDifficulty[0] === 'easy'}">
+											<span class="left">Easy:</span> <hk-animated-integer :value="encDifficulty['easy']"/>
+										</div>
+										<div :class="{ 'yellow': encDifficulty[0] === 'medium'}">
+											<span class="left">Medium:</span> <hk-animated-integer :value="encDifficulty['medium']"/>
+										</div>
+										<div :class="{ 'orange': encDifficulty[0] === 'hard'}">
+											<span class="left">Hard:</span> <hk-animated-integer :value="encDifficulty['hard']"/>
+										</div>
+										<div :class="{ 'red': encDifficulty[0] === 'deadly'}">
+											<span class="left">Deadly:</span> <hk-animated-integer :value="encDifficulty['deadly']"/>
+										</div>
+									</div>
+									Total XP: <hk-animated-integer :value="encDifficulty['totalXp']" class="blue" /><br/>
+									Adjusted XP: <hk-animated-integer :value="encDifficulty['compare']" class="blue" />
+								</template>
 							</div>
+							<q-circular-progress
+								class="d-none d-lg-block"
+								show-value
+								font-size="18px"
+								:value="encDifficulty['compare']/encDifficulty['deadly']*100"
+								size="165px"
+								:color="bars[encDifficulty[0]]"
+								track-color="dark"
+							>
+								{{ encDifficulty[0].capitalize() }}
+							</q-circular-progress>
+						</div>
+						<hr>
+						<small v-if="encDifficulty[0]">
+							{{ difficulty_info[encDifficulty[0]] }}
+							<span class="neutral-2">(dmg 82)</span>
+						</small>
+					</div>
+				</q-slide-transition>
+			</div>
+			<hk-loader v-else prefix="Calculating" name="difficulty" />
 
-							<!-- NAME -->
-							<span slot="name" slot-scope="data" class="green">
-								{{ data.item.capitalizeEach() }}
+			<!-- ENTITIES -->
+			<div class="overview">          
+				<template v-if="encounter">
+					<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
+
+					<hk-table
+						class="mb-4" 
+						:items="_friendlies"
+						:columns="entityColumns"
+						:showHeader="false"
+					>
+						<div slot="image" slot-scope="data">
+							<!-- Player avatar -->
+							<span 
+								v-if="data.row.entityType === 'player'" 
+								:style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"
+								class="image"
+							>
+								<i v-if="!players[data.row.id].avatar" class="hki-player" />
 							</span>
 
-							<!-- ACTIONS -->
-							<div slot="actions" slot-scope="data" class="actions">
-								<a v-if="data.row.entityType === 'npc'" 
-									@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
-									class="mr-2 btn btn-sm bg-neutral-5" 
-								>
-									<i class="fas fa-pencil"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Edit
-									</q-tooltip>
-								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-									<i class="fas fa-minus"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Remove character
-									</q-tooltip>
-								</a>
-							</div>
-						</hk-table>
+							<!-- Companion avatar -->
+							<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }">
+								<i v-if="!npcs[data.row.id].avatar" class="hki-companion" />
+							</span>
 
-						<h3>{{ Object.keys(_monsters).length }} Monsters</h3>
-
-						<hk-table 
-							:items="_monsters"
-							:columns="entityColumns"
-							:showHeader="false"
-						>
+							<!-- Friendly NPC avatar -->
 							<span 
-								slot="image" 
-								slot-scope="data"
+								v-else-if="data.row.entityType === 'npc'"
 								class="image" 
 								:style="{ 
 									backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
@@ -147,32 +114,77 @@
 							>
 								<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
 							</span>
+						</div>
 
-							<!-- NAME -->
-							<span slot="name" slot-scope="data" class="red">
-								{{ data.item.capitalizeEach() }}
-							</span>
+						<!-- NAME -->
+						<span slot="name" slot-scope="data" class="green">
+							{{ data.item.capitalizeEach() }}
+						</span>
 
-							<div slot="actions" slot-scope="data" class="actions">
-								<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 btn btn-sm bg-neutral-5">
+						<!-- ACTIONS -->
+						<div slot="actions" slot-scope="data" class="actions">
+							<a v-if="data.row.entityType === 'npc'" 
+								@click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" 
+								class="mr-2 btn btn-sm bg-neutral-5" 
+							>
+								<i class="fas fa-pencil"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Edit
 								</q-tooltip>
-									<i class="fas fa-pencil"></i>
-								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
-									<i class="fas fa-minus"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Remove character
-									</q-tooltip>
-								</a>
-							</div>
-						</hk-table>
-					</template>
-					<div v-else class="loader"><span>Loading entities...</span></div>
-				</div>
-			</q-scroll-area>
-		</div>
+							</a>
+							<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
+								<i class="fas fa-minus"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Remove character
+								</q-tooltip>
+							</a>
+						</div>
+					</hk-table>
+
+					<h3>{{ Object.keys(_monsters).length }} Monsters</h3>
+
+					<hk-table 
+						:items="_monsters"
+						:columns="entityColumns"
+						:showHeader="false"
+					>
+						<span 
+							slot="image" 
+							slot-scope="data"
+							class="image" 
+							:style="{ 
+								backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+								'border-color': data.row.color_label ? data.row.color_label : ``,
+								'color': data.row.color_label ? data.row.color_label : ``
+							}"
+						>
+							<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+						</span>
+
+						<!-- NAME -->
+						<span slot="name" slot-scope="data" class="red">
+							{{ data.item.capitalizeEach() }}
+						</span>
+
+						<div slot="actions" slot-scope="data" class="actions">
+							<a @click="setSlide({show: true, type: 'slides/editEncounter/EditEntity', data: data.row })" class="mr-2 btn btn-sm bg-neutral-5">
+							<q-tooltip anchor="top middle" self="center middle">
+								Edit
+							</q-tooltip>
+								<i class="fas fa-pencil"></i>
+							</a>
+							<a class="btn btn-sm bg-neutral-5" @click="remove(data.row.key, data.row.name)">
+								<i class="fas fa-minus"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Remove character
+								</q-tooltip>
+							</a>
+						</div>
+					</hk-table>
+				</template>
+				<div v-else class="loader"><span>Loading entities...</span></div>
+			</div>
+		</hk-card>
 		<div class="toggle bg-blue" :class="{ show: showOverview }"  @click="showOverview = !showOverview">
 			<i class="fas fa-chevron-left"></i>
 		</div>
@@ -180,7 +192,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
 
@@ -205,6 +216,7 @@
 				slide: this.$store.getters.getSlide,
 				showOverview: false,
 				encDifficulty: undefined,
+				showDifficulty: false,
 				bars: {
 					trivial: 'grey',
 					easy: 'positive',
@@ -309,7 +321,6 @@
 					type: "calculated",
 					value: this.encDifficulty['totalXp']
 				});
-				db.ref('encounters/' + this.user.uid + '/' + this.campaignId + '/' + this.encounterId + '/xp/calculated').set(this.encDifficulty['totalXp']);
 			},
 		}
 	}
@@ -317,16 +328,24 @@
 
 <style lang="scss" scoped>
 	.encounter_overview {
-		height: 100%;
+		position: sticky;
+		top: 10px;
 		grid-area: overview;
-		overflow-y: hidden;
 
 		h3 {
 			margin-bottom: 10px;
 		}
+		.diff-header {
+			background-color: $neutral-8;
+			display: flex;
+			justify-content: space-between;
+			line-height: 45px;
+			padding: 0 15px;
+			cursor: pointer;
+		}
 		.diff-info {
-			background: $neutral-6;
-			padding: 10px 10px 0 10px;
+			background: $neutral-7;
+			padding: 15px;
 
 			span.left {
 				width: 80px;
@@ -342,12 +361,8 @@
 				}
 			}
 		}
-		.q-scrollarea {
-			height: calc(100% - 290px) !important;
-
-			.overview {
-				padding: 15px 10px 30px 10px;
-			}
+		.overview {
+			padding: 15px;
 		}
 	}
 	.toggle {

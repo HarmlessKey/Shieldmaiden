@@ -37,8 +37,11 @@
 						filled square
 						debounce="300" 
 						clearable
-						placeholder="Search">
-						<q-icon slot="append" name="search" />
+						placeholder="Search"
+						@change="searchNpcs"
+					>
+						<q-icon slot="prepend" name="search" />
+						<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
 					</q-input>
 
 					<q-table
@@ -53,7 +56,7 @@
 						separator="none"
 						wrap-cells
 						:rows-per-page-options="[0]"
-						@request="request"
+						@request="load"
 					>	
 						<template v-slot:body-cell="props">
 							<q-td v-if="props.col.name !== 'actions'">
@@ -101,7 +104,7 @@
 						no-caps 
 						color="primary" 
 						label="Load more" 
-						@click="request({ pagination }, true)"
+						@click="load({ pagination }, true)"
 					/>
 
 					<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
@@ -269,13 +272,6 @@
 		async mounted() {
 			await this.fetchNpcs();
 		},
-		watch: {
-			search(newVal) {
-				if(!newVal || newVal.length >= 3) {
-					this.fetchNpcs();
-				}
-			}
-		},
 		methods: {
 			...mapActions(["setSlide"]),
 			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc"]),
@@ -296,9 +292,13 @@
 					return this.npcs.at(-1)[this.pagination.sortBy];
 				} return undefined;
 			},
-			request(req, loadMore=false) {
+			load(req, loadMore=false) {
 				this.pagination = req.pagination;
 				this.fetchNpcs(loadMore);
+			},
+			searchNpcs() {
+				this.loading_npcs = true;
+				this.fetchNpcs();
 			},
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 

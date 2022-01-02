@@ -434,6 +434,14 @@ html body {
 		}
 	}
 
+	.breadcrumb {
+		margin-bottom: 20px;
+		background: $neutral-9;
+		border-radius: $border-radius;
+		border: solid 1px $neutral-8;
+		padding: 10px 15px;
+	}
+
 	.offline {
 		position: fixed;
 		top: 50px;

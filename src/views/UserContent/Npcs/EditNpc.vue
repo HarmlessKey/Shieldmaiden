@@ -1,28 +1,22 @@
 <template>
-	<div v-if="npc || $route.name === 'Add NPC'">
+	<div v-if="!loading">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<div class="d-flex justify-content-start items-center">
-							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-								<q-tooltip anchor="top middle" self="center middle">
-									There are validation errors
-								</q-tooltip>
-							</q-icon>
-							<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
-								<i class="fas fa-copy mr-2"></i>
-								Copy
-							</q-btn>
-							<q-btn v-if="!npcId" color="neutral-5" no-caps @click="import_dialog = true">
-								<i class="fas fa-file-upload mr-2"></i>
-								Import
-							</q-btn>
-						</div>
-						<div v-if="npc" class="d-none d-md-flex name">
-							<b v-if="npc.name">{{ npc.name}}</b>
-							<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }" />
-						</div>
+						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
+						<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
+							<i class="fas fa-copy mr-2"></i>
+							Copy
+						</q-btn>
+						<q-btn v-if="!npcId" color="neutral-5" no-caps @click="import_dialog = true">
+							<i class="fas fa-file-upload mr-2"></i>
+							Import
+						</q-btn>
 					</div>
 
 					<div class="form">
@@ -70,44 +64,63 @@
 
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
-			<hk-card header="Copy Existing NPC">
+			<hk-card :minWidth="320">
+				<div slot="header" class="card-header">
+					<span>Copy Existing NPC</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
 				<div class="card-body">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Search NPC"
-						type="text" 
-						autocomplete="off" 
-						v-model="search" 
-						@keyup="searchNPC()"
+					<q-btn-toggle
+						v-if="npc_count"
 						class="mb-3"
-					>
-						<template v-slot:append>
-							<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
-						</template>
-					</q-input>
-					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<q-list :dark="$store.getters.theme === 'dark'">
-						<q-item v-for="(npc, index) in searchResults" :key="index">
-							<q-item-section>
-								{{ npc.name.capitalizeEach() }}
-							</q-item-section>
-							<q-item-section avatar>
-								<a class="neutral-2" @click="copy(npc)">
-									<i class="fas fa-copy blue"/>
-									<q-tooltip anchor="top middle" self="center middle">
-										Copy NPC
-									</q-tooltip>
-								</a>
-							</q-item-section>
-						</q-item>
-					</q-list>
+						:value="copy_resource"
+						spread
+						no-caps
+						toggle-color="primary"
+						@input="changeCopyResource($event)"
+						:options="[
+							{label: 'Custom NPCs', value: 'custom'},
+							{label: 'SRD monsters', value: 'srd'}
+						]"
+					/>
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							:label="copy_resource === 'custom' ? 'Search NPC' : 'Search monster'"
+							type="text" 
+							autocomplete="off" 
+							v-model="query" 
+							@change="search"
+							class="mb-3"
+							:error="!!noResult"
+							:error-message="noResult"
+						>
+							<template v-slot:append>
+								<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
+							</template>
+						</q-input>
+						<q-list :dark="$store.getters.theme === 'dark'">
+							<q-item v-for="(npc, index) in searchResults" :key="index" class="bg-neutral-8">
+								<q-item-section>
+									{{ npc.name.capitalizeEach() }}
+								</q-item-section>
+								<q-item-section avatar>
+									<a class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? npc.key : npc._id)">
+										<i class="fas fa-copy"/>
+									</a>
+								</q-item-section>
+							</q-item>
+						</q-list>
 				</div>
 			</hk-card>
 		</q-dialog>		
 		
 		<!-- Import Dialog  -->
 		<q-dialog v-model="import_dialog">
-			<hk-card header="Import NPC from JSON" :minWidth="400">
+			<hk-card :minWidth="400">
+				<div slot="header" class="card-header">
+					<span>Import NPC from JSON</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
 				<div class="card-body">
 					<q-file 
 						:dark="$store.getters.theme === 'dark'" 
@@ -148,6 +161,7 @@
 			</hk-card>
 		</q-dialog>
 	</div>
+	<hk-loader v-else name="NPC" />
 </template>
 
 <script>
@@ -182,13 +196,15 @@
 				userId: this.$route.params.userid || this.$store.getters.user.uid,
 				npcId: this.$route.params.id,
 				npc: {},
+				loading: false,
 				npc_copy: {},
 				copy_dialog: false,
+				copy_resource_setter: undefined,
 				import_dialog: false,
 				unsaved_changes: false,
-				search: '',
+				query: "",
 				searchResults: [],
-				noResult: '',
+				noResult: "",
 				json_file: undefined,
 				json_input: "",
 				tabs: [
@@ -205,11 +221,13 @@
 		},
 		async mounted() {
 			if(this.npcId) {
+				this.loading = true;
 				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
 					npc.name = npc.name.capitalizeEach();
 					this.npc = npc;
 					this.npc_copy = JSON.stringify(npc);
 					this.unsaved_changes = false;
+					this.loading = false;
 				});
 			}
 
@@ -232,6 +250,16 @@
 				'tier',
 				'overencumbered',
 			]),
+			...mapGetters("npcs", ["npc_count"]),
+			copy_resource: {
+				get() {
+					const resource = (this.npc_count) ? "custom" : "srd";
+					return (this.copy_resource_setter) ? this.copy_resource_setter : resource;
+				},
+				set(newVal) {
+					this.copy_resource_setter = newVal;
+				}
+			},
 		},
 		watch: {
 			npc: {
@@ -251,33 +279,55 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
+			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc", "fetch_npcs"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {
 					return false;
 				} return true;
 			},
-			searchNPC() {
+			changeCopyResource(value) {
+				this.copy_resource = value;
+				this.query = "";
 				this.searchResults = [];
-				this.searching = true;
-				for (var i in this.npcs) {
-					var m = this.npcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = '';
-						this.searchResults.push(m);
+				this.noResult = "";
+			},
+			async search() {
+				if(this.query) {
+					if(this.copy_resource === "custom") {
+						await this.fetch_npcs({
+						query: this.query
+					}).then(results => {
+						if(results && results.length) {
+							this.noResult = "";
+							this.searchResults = results;
+							this.loading_npcs = false;
+						} else {
+							this.searchResults = [];
+							this.noResult = 'Nothing found starting with "' + this.query + '"';
+						}
+					});
+					} else {
+						await this.get_monsters({ query: { search: this.query }}).then(results => {
+							if(results.meta.count === 0) {
+								this.noResult = 'No results for "' + this.query + '"';
+							} else {
+								this.noResult = "";
+								this.searchResults = results.results;
+							}
+						});
 					}
 				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
 			},
-			copy(npc) {
+			async copy(id) {
 				this.copy_dialog = false;
-				this.npc = npc;
+				this.npc = (this.copy_resource === "custom")
+					? await this.get_npc({ uid: this.userId, id })
+					: await this.get_monster(id);
 
 				// Clear search
 				this.searchResults = [];
-				this.search = '';
+				this.query = "";
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);
@@ -333,14 +383,6 @@
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},
-			setQuick(input) {
-				if(input == 0) {
-					this.quick = false
-				}
-				else {
-					this.quick = true
-				}
-			},
 			loadJSON() {
 				const fr = new FileReader();
 
@@ -393,7 +435,7 @@
 
 	.top {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-end;
 		align-items: center;
 		margin-bottom: 10px;
 
@@ -422,7 +464,8 @@
 		bottom: 5px;
 		padding: 10px 10px;
 		margin: 5px 5px;
-		background: $neutral-8;
+		background: $neutral-9;
+		border: solid 1px $neutral-8;
 		border-radius: $border-radius;
 		flex-direction: row-reverse;
 

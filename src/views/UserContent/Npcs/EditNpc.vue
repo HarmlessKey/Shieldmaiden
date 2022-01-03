@@ -70,46 +70,9 @@
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<q-btn-toggle
-						v-if="npc_count"
-						class="mb-3"
-						:value="copy_resource"
-						spread
-						no-caps
-						toggle-color="primary"
-						@input="changeCopyResource($event)"
-						:options="[
-							{label: 'Custom NPCs', value: 'custom'},
-							{label: 'SRD monsters', value: 'srd'}
-						]"
-					/>
-						<q-input 
-							:dark="$store.getters.theme === 'dark'" filled square
-							:label="copy_resource === 'custom' ? 'Search NPC' : 'Search monster'"
-							type="text" 
-							autocomplete="off" 
-							v-model="query" 
-							@change="search"
-							class="mb-3"
-							:error="!!noResult"
-							:error-message="noResult"
-						>
-							<template v-slot:append>
-								<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
-							</template>
-						</q-input>
-						<q-list :dark="$store.getters.theme === 'dark'">
-							<q-item v-for="(npc, index) in searchResults" :key="index" class="bg-neutral-8">
-								<q-item-section>
-									{{ npc.name.capitalizeEach() }}
-								</q-item-section>
-								<q-item-section avatar>
-									<a class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? npc.key : npc._id)">
-										<i class="fas fa-copy"/>
-									</a>
-								</q-item-section>
-							</q-item>
-						</q-list>
+					<q-scroll-area>
+						<CopyMonster @copy="copy" />
+					</q-scroll-area>
 				</div>
 			</hk-card>
 		</q-dialog>		
@@ -165,7 +128,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
 	import BasicInfo from '@/components/npcs/BasicInfo';
@@ -175,6 +137,7 @@
 	import Defenses from '@/components/npcs/Defenses';
 	import SpellCasting from '@/components/npcs/SpellCasting';
 	import Actions from '@/components/npcs/Actions';
+	import CopyMonster from "@/components/CopyMonster"
 
 	export default {
 		name: 'Npcs',
@@ -190,6 +153,7 @@
 			Defenses,
 			SpellCasting,
 			Actions,
+			CopyMonster
 		},
 		data() {
 			return {
@@ -202,21 +166,8 @@
 				copy_resource_setter: undefined,
 				import_dialog: false,
 				unsaved_changes: false,
-				query: "",
-				searchResults: [],
-				noResult: "",
 				json_file: undefined,
-				json_input: "",
-				tabs: [
-					{
-						name: "advanced",
-						label: "Advanced build",
-					},
-					{
-						name: "quick",
-						label: "Quick build",
-					}
-				]
+				json_input: ""
 			}
 		},
 		async mounted() {
@@ -230,36 +181,13 @@
 					this.loading = false;
 				});
 			}
-
-			var npcs_ref = db.ref(`monsters`);
-			npcs_ref.on('value', async (snapshot) => {
-				let npcs = snapshot.val();
-
-				let custom = db.ref(`npcs/${this.userId}`);
-				custom.on('value', async (snapshot) => {
-					let customNpcs = snapshot.val();
-					for(let key in customNpcs) {
-						npcs.push(customNpcs[key]);
-					}
-				});
-				this.npcs = npcs;
-			});
 		},
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters("npcs", ["npc_count"]),
-			copy_resource: {
-				get() {
-					const resource = (this.npc_count) ? "custom" : "srd";
-					return (this.copy_resource_setter) ? this.copy_resource_setter : resource;
-				},
-				set(newVal) {
-					this.copy_resource_setter = newVal;
-				}
-			},
+			...mapGetters("npcs", ["npc_count"])
 		},
 		watch: {
 			npc: {
@@ -273,61 +201,21 @@
 					
 					// Capitalize name
 					this.npc.name = this.npc.name.capitalizeEach();
-				},
-			},
-
+				}
+			}
 		},
 		methods: {
 			...mapActions(["setSlide"]),
 			...mapActions("monsters", ["get_monsters", "get_monster"]),
-			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc", "fetch_npcs"]),
+			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {
 					return false;
 				} return true;
 			},
-			changeCopyResource(value) {
-				this.copy_resource = value;
-				this.query = "";
-				this.searchResults = [];
-				this.noResult = "";
-			},
-			async search() {
-				if(this.query) {
-					if(this.copy_resource === "custom") {
-						await this.fetch_npcs({
-						query: this.query
-					}).then(results => {
-						if(results && results.length) {
-							this.noResult = "";
-							this.searchResults = results;
-							this.loading_npcs = false;
-						} else {
-							this.searchResults = [];
-							this.noResult = 'Nothing found starting with "' + this.query + '"';
-						}
-					});
-					} else {
-						await this.get_monsters({ query: { search: this.query }}).then(results => {
-							if(results.meta.count === 0) {
-								this.noResult = 'No results for "' + this.query + '"';
-							} else {
-								this.noResult = "";
-								this.searchResults = results.results;
-							}
-						});
-					}
-				}
-			},
-			async copy(id) {
+			copy(npc) {
 				this.copy_dialog = false;
-				this.npc = (this.copy_resource === "custom")
-					? await this.get_npc({ uid: this.userId, id })
-					: await this.get_monster(id);
-
-				// Clear search
-				this.searchResults = [];
-				this.query = "";
+				this.npc = npc;
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);
@@ -483,6 +371,9 @@
 			}
 		}
 	}
+}
+.q-scrollarea {
+	height: 300px;
 }
 
 </style>

@@ -44,8 +44,8 @@ const actions = {
         
         return _.chain(npcs)
 				.filter(function(npc, key) {
-					npc.key = key
-					return npc
+					npc.key = key;
+					return npc;
 				}).orderBy(sortBy, order).value();       
       } catch(error) {
         throw error;

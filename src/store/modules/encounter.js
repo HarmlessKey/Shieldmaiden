@@ -4,7 +4,6 @@ import { abilities } from '@/mixins/abilities';
 import { monsterMixin } from '@/mixins/monster';
 import Vue from 'vue';
 
-
 const demoPlayers = {
 	'playerone': {
 		character_name: 'Barbarian',
@@ -123,7 +122,6 @@ const demoEncounter = {
 
 const encounters_ref = db.ref('encounters');
 const campaigns_ref = db.ref('campaigns');
-const monsters_ref = db.ref('monsters');
 
 const getDefaultState = () => {
 	return {
@@ -142,7 +140,7 @@ const getDefaultState = () => {
 	}
 }
 
-const state = getDefaultState()
+const state = getDefaultState();
 
 const getters = {
 	entities: function( state ) { return state.entities },
@@ -181,7 +179,7 @@ const actions = {
 	 * @param {string} eid Encounter id
 	 * @param {boolean} demo Wether this is the demo encounter
 	 */
-	async init_Encounter({ commit, rootState, rootGetters }, { cid, eid, demo }) {
+	async init_Encounter({ commit, rootGetters, dispatch }, { cid, eid, demo }) {
 		// Create the path to the encounter in firebase
 		const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 		const path = `${uid}/${cid}/${eid}`;
@@ -196,18 +194,20 @@ const actions = {
 		try {
 			//Set the entities when it's not a demo encounter
 			if(!demo) {
-				const encounter = await encounters_ref.child(path);
-				await encounter.once('value', snapshot => {
-					commit('SET_ENCOUNTER', snapshot.val());
-					for (let key in snapshot.val().entities) {
-						commit('ADD_ENTITY', {rootState, key});
-					}
-				})
+				const encounter = await dispatch("encounters/get_encounter", {
+					uid,
+					campaignId: cid,
+					id: eid
+				});
+				commit("SET_ENCOUNTER", encounter);
+				for (let key in encounter.entities) {
+					dispatch("add_entity", key);
+				}
 			} 
 			else {
 				commit('SET_ENCOUNTER', demoEncounter);
 				for (let key in demoEncounter.entities) {
-					commit('ADD_ENTITY', {rootState, key});
+					dispatch("add_entity", key);
 				}
 			}
 		} catch(error) {
@@ -216,16 +216,268 @@ const actions = {
 			commit('INITIALIZED');
 		}
 	},
-	track_Encounter({ commit, state }, demo) {
-		if(!demo) {
-			const path = state.path
-			const encounter = encounters_ref.child(path);
-			encounter.on('value', snapshot => {
-				commit('SET_ENCOUNTER', snapshot.val());
-			});
-		} else {
-			commit('SET_ENCOUNTER', demoEncounter);
+	// track_Encounter({ commit, state }, demo) {
+	// 	if(!demo) {
+	// 		const path = state.path
+	// 		const encounter = encounters_ref.child(path);
+	// 		encounter.on('value', snapshot => {
+	// 			commit('SET_ENCOUNTER', snapshot.val());
+	// 		});
+	// 	} else {
+	// 		commit('SET_ENCOUNTER', demoEncounter);
+	// 	}
+	// },
+
+	async add_entity({ state, commit, rootGetters, dispatch }, key) {
+		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
+		const campaign = (!state.demo) ? await dispatch("campaigns/get_campaign", { uid, id: state.campaignId }) : undefined;
+
+		let entity = {
+			name: db_entity.name,
+			id: db_entity.id,
+			initiative: db_entity.initiative,
+			entityType: db_entity.entityType,
+			maxHp: db_entity.maxHp,
+			ac: parseInt(db_entity.ac),
+			active: db_entity.active
 		}
+
+		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
+		entity.npc = (db_entity.npc) ? db_entity.npc : false;
+		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
+		entity.down = (db_entity.down) ? db_entity.down : false;
+		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
+		entity.saves = (db_entity.saves) ? db_entity.saves : {};
+		entity.stable = (db_entity.stable) ? db_entity.stable : false;
+		entity.dead = (db_entity.dead) ? db_entity.dead : false;
+		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
+		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
+		entity.color_label = (db_entity.color_label) ? db_entity.color_label : null;
+		entity.limited_uses = (db_entity.limited_uses) ? db_entity.limited_uses : {};
+
+		if (db_entity.meters) {
+			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
+			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
+			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
+			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
+			entity.damageTaken = (db_entity.meters.damageTaken) ? db_entity.meters.damageTaken : 0;
+			entity.healingTaken = (db_entity.meters.healingTaken) ? db_entity.meters.healingTaken : 0;
+			entity.overkillTaken = (db_entity.meters.overkillTaken) ? db_entity.meters.overkillTaken : 0;
+			entity.overhealingTaken = (db_entity.meters.overhealingTaken) ? db_entity.meters.overhealingTaken : 0;
+		} else {
+			entity.damage = 0;
+			entity.healing = 0;
+			entity.overkill = 0;
+			entity.overhealing = 0;
+			entity.damageTaken = 0;
+			entity.healingTaken = 0;
+			entity.overkillTaken = 0;
+			entity.overhealingTaken = 0;
+		}
+
+		switch(entity.entityType) {
+			case 'player': {
+				let campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
+
+				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
+				entity.curHp = campaignPlayer.curHp;
+				entity.tempHp = campaignPlayer.tempHp;
+				entity.ac_bonus = campaignPlayer.ac_bonus;
+				entity.maxHpMod = campaignPlayer.maxHpMod;
+				entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
+				entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
+				entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
+				
+				//Get player transformed from campaign
+				if(campaignPlayer.transformed) {
+					entity.transformed = true;
+					entity.transformedCurHp = campaignPlayer.transformed.curHp;
+					entity.transformedAc = campaignPlayer.transformed.ac;
+					entity.transformedMaxHpMod = campaignPlayer.transformed.maxHpMod || 0;
+					entity.transformedMaxHp = campaignPlayer.transformed.maxHp + entity.transformedMaxHpMod;
+				} else {
+					entity.transformed = false;
+				}
+
+				//get other values from the player
+				let db_player = (!state.demo) ? await dispatch("players/get_player", { uid, id: key }) : demoPlayers[key];
+
+				entity.img = (db_player.avatar) ? db_player.avatar : 'player';
+				
+				entity.name = db_player.character_name;
+				entity.ac = parseInt(db_player.ac);
+				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
+				
+				entity.saving_throws = [];
+				// Ability scores
+				for(const ability of abilities.data().abilities) {
+					entity[ability] = db_player[ability];
+					
+					// Saving throws
+					if(db_player[`${ability}-save-profficient`]) {
+						entity.saving_throws.push(ability);
+					}
+				}
+
+				// Defenses
+				for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+					if(db_player[defense]) entity[defense] = db_player[defense];
+				}
+
+				entity.skills = db_player.skills;
+				entity.skills_expertise = db_player.skills_expertise;
+				entity.experience = db_player.experience;
+				entity.level = db_player.level;
+				break
+			}
+			case 'npc':
+			case 'companion': 
+			{
+				let data_npc = {};
+				
+				// COMPANION
+				if (entity.entityType === 'companion') {
+					data_npc = await dispatch("npcs/get_npc", { uid, id: key });
+					const campaignCompanion = campaign.companions[key];
+					
+					// Get companion status from campaign
+					entity.curHp = campaignCompanion.curHp;
+					entity.tempHp = campaignCompanion.tempHp;
+					entity.ac_bonus = campaignCompanion.ac_bonus;
+					entity.maxHpMod = campaignCompanion.maxHpMod;
+					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
+					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
+					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
+					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
+
+					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
+
+					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
+
+					//Get player transformed from campaign
+					if(campaignCompanion.transformed) {
+						entity.transformed = true;
+						entity.transformedCurHp = campaignCompanion.transformed.curHp;
+						entity.transformedAc = campaignCompanion.transformed.ac;
+						entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
+					} else {
+						entity.transformed = false;
+					}
+				}
+
+				// NPC
+				else {
+					//Fetch data from Firebase or API
+					if(entity.npc === 'srd' || entity.npc === 'api') {
+						data_npc = await dispatch("monsters/get_monster", entity.id);
+					}
+					else {
+						data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });
+					}
+
+					// Values from encounter
+					entity.curHp = db_entity.curHp;
+					entity.tempHp = db_entity.tempHp;
+					entity.maxHpMod = db_entity.maxHpMod;
+					entity.ac_bonus = db_entity.ac_bonus;
+					entity.maxHp = (entity.maxHpMod) ? parseInt(db_entity.maxHp + entity.maxHpMod) : parseInt(db_entity.maxHp);
+
+					if(db_entity.transformed) {
+						entity.transformed = true;
+						entity.transformedCurHp = db_entity.transformed.curHp;
+						entity.transformedAc = db_entity.transformed.ac;
+						entity.transformedMaxHpMod = db_entity.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = db_entity.transformed.maxHp + entity.transformedMaxHpMod;
+					} else {
+						entity.transformed = false;
+					}
+					if(!entity.avatar) {
+						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
+					}
+					else {
+						entity.img = entity.avatar;
+					}
+				}
+
+				//if an entity is quicly added during an ecnounter
+				//without copying an existing
+				//it won't have data_npc
+				if(data_npc) {
+					entity.old = data_npc.old;
+					entity.size = data_npc.size;
+					entity.type = data_npc.type;
+					entity.subtype = data_npc.subtype;
+					entity.alignment = data_npc.alignment;
+					entity.challenge_rating = data_npc.challenge_rating;
+					entity.hit_dice = data_npc.hit_dice;
+					entity.senses = data_npc.senses;
+					entity.languages = data_npc.languages;
+					entity.legendary_count = data_npc.legendary_count;
+
+					if(entity.challenge_rating) entity.proficiency = monsterMixin.data().monster_challenge_rating[entity.challenge_rating].proficiency;
+		
+					if(data_npc.source) entity.source = data_npc.source;
+					
+					// Ability scores
+					for(const ability of abilities.data().abilities) {
+						entity[ability] = data_npc[ability];
+					}
+					
+					// Old NPC format values
+					if(data_npc.old) {
+						entity.speed = data_npc.speed;
+
+						for(const ability of abilities.data().abilities) {
+							entity[`${ability}_save`] = data_npc[`${ability}_save`];
+						}
+					
+						for(const skill in skills.data().skillList) {
+							if(entity[skill]) {
+								entity[skill] = data_npc[skill];
+							}
+						}
+					} 
+					// Current format values
+					else {
+						entity.saving_throws = data_npc.saving_throws;
+						entity.skills = data_npc.skills;
+						entity.skills_expertise = data_npc.skills_expertise;
+
+						for(const speed of ["walk_speed", "fly_speed", "swim_speed", "burrow_speed", "climb_speed"]) {
+							if(data_npc[speed]) entity[speed] = data_npc[speed];
+						}
+					}
+					
+					// Defenses
+					for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
+						if(data_npc[defense]) entity[defense] = data_npc[defense];
+					}
+					
+					// Abilities
+					for(const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
+						if(data_npc[type]) entity[type] = data_npc[type];
+					}
+
+					// Spellcasting
+					entity.caster_ability = data_npc.caster_ability;
+					entity.caster_save_dc = data_npc.caster_save_dc;
+					entity.caster_level = data_npc.caster_level;
+					entity.caster_spell_slots = data_npc.caster_spell_slots;
+					entity.caster_spell_attack = data_npc.caster_spell_attack;
+					entity.caster_spells = data_npc.caster_spells;
+
+					// Innate spellcasting
+					entity.innate_ability = data_npc.innate_ability;
+					entity.innate_save_dc = data_npc.innate_save_dc;
+					entity.innate_spell_attack = data_npc.innate_spell_attack;
+					entity.innate_spells = data_npc.innate_spells;
+				}
+				break
+			}
+		}
+		commit("ADD_ENTITY", { key, entity })		
 	},
 
 	/**
@@ -251,7 +503,7 @@ const actions = {
 	 * edits entity properties in the store and firebase
 	 * 
 	 * @param {string} key Entity key
-	 * @param {string} entiType player, npc, companion
+	 * @param {string} entityType player, npc, companion
 	 * @param {string} prop property to edit 
 	 * @param {string} value user's input value for the property
 	 */
@@ -818,13 +1070,12 @@ const actions = {
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedAc', value: entity.ac });
 		}
 	},
-	add_entity({ commit, rootState }, key) { commit('ADD_ENTITY', {rootState, key}); },
-	add_entity_demo({ commit, rootState }, entity) { 
+	add_entity_demo({ dispatch }, entity) { 
 		//generate semi random id
 		let key = Date.now() + Math.random().toString(36).substring(4);
 		Vue.set(demoEncounter.entities, key, entity);
 
-		commit('ADD_ENTITY', {rootState, key});
+		dispatch("add_entity", key);
 	},
 	remove_entity({ commit, state }, key) {
 		// First untarget if targeted
@@ -996,263 +1247,7 @@ const mutations = {
 	},
 	REMOVE_LIMITED_USES(state, {key, category, index}) { Vue.delete(state.entities[key].limited_uses[category], index); },
 	
-	async ADD_ENTITY(state, { rootState, key}) {
-		const uid = (rootState.user) ? rootState.user.uid : undefined;
-		let db_entity = (!state.demo) ? state.encounter.entities[key] : demoEncounter.entities[key];
-		let entity = {
-			name: db_entity.name,
-			id: db_entity.id,
-			initiative: db_entity.initiative,
-			entityType: db_entity.entityType,
-			maxHp: db_entity.maxHp,
-			ac: parseInt(db_entity.ac),
-			active: db_entity.active
-		}
-
-		entity.hidden = (db_entity.hidden) ? db_entity.hidden : false;
-		entity.npc = (db_entity.npc) ? db_entity.npc : false;
-		entity.avatar = (db_entity.avatar) ? db_entity.avatar : false;
-		entity.down = (db_entity.down) ? db_entity.down : false;
-		entity.addNextRound = (db_entity.addNextRound) ? db_entity.addNextRound : false;
-		entity.saves = (db_entity.saves) ? db_entity.saves : {};
-		entity.stable = (db_entity.stable) ? db_entity.stable : false;
-		entity.dead = (db_entity.dead) ? db_entity.dead : false;
-		entity.conditions = (db_entity.conditions) ? db_entity.conditions : {};
-		entity.reminders = (db_entity.reminders) ? db_entity.reminders : {};
-		entity.color_label = (db_entity.color_label) ? db_entity.color_label : null;
-		entity.limited_uses = (db_entity.limited_uses) ? db_entity.limited_uses : {};
-
-		if (db_entity.meters) {
-			entity.damage = (db_entity.meters.damage) ? db_entity.meters.damage : 0;
-			entity.healing = (db_entity.meters.healing) ? db_entity.meters.healing : 0;
-			entity.overkill = (db_entity.meters.overkill) ? db_entity.meters.overkill : 0;
-			entity.overhealing = (db_entity.meters.overhealing) ? db_entity.meters.overhealing : 0;
-			entity.damageTaken = (db_entity.meters.damageTaken) ? db_entity.meters.damageTaken : 0;
-			entity.healingTaken = (db_entity.meters.healingTaken) ? db_entity.meters.healingTaken : 0;
-			entity.overkillTaken = (db_entity.meters.overkillTaken) ? db_entity.meters.overkillTaken : 0;
-			entity.overhealingTaken = (db_entity.meters.overhealingTaken) ? db_entity.meters.overhealingTaken : 0;
-		} else {
-			entity.damage = 0;
-			entity.healing = 0;
-			entity.overkill = 0;
-			entity.overhealing = 0;
-			entity.damageTaken = 0;
-			entity.healingTaken = 0;
-			entity.overkillTaken = 0;
-			entity.overhealingTaken = 0;
-		}
-
-		switch(entity.entityType) {
-			case 'player': {
-				const campaign = rootState.content.campaigns[state.campaignId];
-
-				let campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
-
-				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
-				entity.curHp = campaignPlayer.curHp;
-				entity.tempHp = campaignPlayer.tempHp;
-				entity.ac_bonus = campaignPlayer.ac_bonus;
-				entity.maxHpMod = campaignPlayer.maxHpMod;
-				entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
-				entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
-				entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
-				
-				//Get player transformed from campaign
-				if(campaignPlayer.transformed) {
-					entity.transformed = true;
-					entity.transformedCurHp = campaignPlayer.transformed.curHp;
-					entity.transformedAc = campaignPlayer.transformed.ac;
-					entity.transformedMaxHpMod = campaignPlayer.transformed.maxHpMod || 0;
-					entity.transformedMaxHp = campaignPlayer.transformed.maxHp + entity.transformedMaxHpMod;
-				} else {
-					entity.transformed = false;
-				}
-
-				//get other values from the player
-				let db_player = (!state.demo) ? rootState.players.cached_players[uid][key] : demoPlayers[key];
-
-				entity.img = (db_player.avatar) ? db_player.avatar : 'player';
-				
-				entity.name = db_player.character_name;
-				entity.ac = parseInt(db_player.ac);
-				entity.maxHp = (entity.maxHpMod) ? parseInt(db_player.maxHp + entity.maxHpMod) : parseInt(db_player.maxHp);
-				
-				entity.saving_throws = [];
-				// Ability scores
-				for(const ability of abilities.data().abilities) {
-					entity[ability] = db_player[ability];
-					
-					// Saving throws
-					if(db_player[`${ability}-save-profficient`]) {
-						entity.saving_throws.push(ability);
-					}
-				}
-
-				// Defenses
-				for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
-					if(db_player[defense]) entity[defense] = db_player[defense];
-				}
-
-				entity.skills = db_player.skills;
-				entity.skills_expertise = db_player.skills_expertise;
-				entity.experience = db_player.experience;
-				entity.level = db_player.level;
-				break
-			}
-			case 'npc':
-			case 'companion': 
-			{
-				let data_npc = {};
-				
-				// COMPANION
-				if (entity.entityType === 'companion') {
-
-					data_npc = rootState.content.npcs[key];
-
-					let campaignCompanion = rootState.content.campaigns[state.campaignId].companions[key];
-					
-					// Get companion status from campaign
-					entity.curHp = campaignCompanion.curHp;
-					entity.tempHp = campaignCompanion.tempHp;
-					entity.ac_bonus = campaignCompanion.ac_bonus;
-					entity.maxHpMod = campaignCompanion.maxHpMod;
-					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
-					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
-					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
-					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
-
-					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
-
-					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
-
-					//Get player transformed from campaign
-					if(campaignCompanion.transformed) {
-						entity.transformed = true;
-						entity.transformedCurHp = campaignCompanion.transformed.curHp;
-						entity.transformedAc = campaignCompanion.transformed.ac;
-						entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
-						entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
-					} else {
-						entity.transformed = false;
-					}
-				}
-
-				// NPC
-				else {
-					//Fetch data from Firebase
-					if(entity.npc === 'srd' || entity.npc === 'api') {
-						let monsters = monsters_ref.child(entity.id);
-
-						data_npc = await monsters.once('value').then(function(snapshot) {
-							return snapshot.val()
-						});
-					}
-					else {
-						data_npc = rootState.npcs.cached_npcs[uid][entity.id];
-					}
-
-					// Values from encounter
-					entity.curHp = db_entity.curHp;
-					entity.tempHp = db_entity.tempHp;
-					entity.maxHpMod = db_entity.maxHpMod;
-					entity.ac_bonus = db_entity.ac_bonus;
-					entity.maxHp = (entity.maxHpMod) ? parseInt(db_entity.maxHp + entity.maxHpMod) : parseInt(db_entity.maxHp);
-
-					if(db_entity.transformed) {
-						entity.transformed = true;
-						entity.transformedCurHp = db_entity.transformed.curHp;
-						entity.transformedAc = db_entity.transformed.ac;
-						entity.transformedMaxHpMod = db_entity.transformed.maxHpMod || 0;
-						entity.transformedMaxHp = db_entity.transformed.maxHp + entity.transformedMaxHpMod;
-					} else {
-						entity.transformed = false;
-					}
-					if(!entity.avatar) {
-						entity.img = (data_npc && data_npc.avatar) ? data_npc.avatar : 'monster';
-					}
-					else {
-						entity.img = entity.avatar;
-					}
-				}
-
-				//if an entity is quicly added during an ecnounter
-				//without copying an existing
-				//it won't have data_npc
-				if(data_npc) {
-					entity.old = data_npc.old;
-					entity.size = data_npc.size;
-					entity.type = data_npc.type;
-					entity.subtype = data_npc.subtype;
-					entity.alignment = data_npc.alignment;
-					entity.challenge_rating = data_npc.challenge_rating;
-					entity.hit_dice = data_npc.hit_dice;
-					entity.senses = data_npc.senses;
-					entity.languages = data_npc.languages;
-					entity.legendary_count = data_npc.legendary_count;
-
-					if(entity.challenge_rating) entity.proficiency = monsterMixin.data().monster_challenge_rating[entity.challenge_rating].proficiency;
-		
-					if(data_npc.source) entity.source = data_npc.source;
-					
-					// Ability scores
-					for(const ability of abilities.data().abilities) {
-						entity[ability] = data_npc[ability];
-					}
-					
-					// Old NPC format values
-					if(data_npc.old) {
-						entity.speed = data_npc.speed;
-
-						for(const ability of abilities.data().abilities) {
-							entity[`${ability}_save`] = data_npc[`${ability}_save`];
-						}
-					
-						for(const skill in skills.data().skillList) {
-							if(entity[skill]) {
-								entity[skill] = data_npc[skill];
-							}
-						}
-					} 
-					// Current format values
-					else {
-						entity.saving_throws = data_npc.saving_throws;
-						entity.skills = data_npc.skills;
-						entity.skills_expertise = data_npc.skills_expertise;
-
-						for(const speed of ["walk_speed", "fly_speed", "swim_speed", "burrow_speed", "climb_speed"]) {
-							if(data_npc[speed]) entity[speed] = data_npc[speed];
-						}
-					}
-					
-					// Defenses
-					for(const defense of ["damage_vulnerabilities", "damage_resistances", "damage_immunities", "condition_immunities"]) {
-						if(data_npc[defense]) entity[defense] = data_npc[defense];
-					}
-					
-					// Abilities
-					for(const type of ["special_abilities", "actions", "legendary_actions", "reactions"]) {
-						if(data_npc[type]) entity[type] = data_npc[type];
-					}
-
-					// Spellcasting
-					entity.caster_ability = data_npc.caster_ability;
-					entity.caster_save_dc = data_npc.caster_save_dc;
-					entity.caster_level = data_npc.caster_level;
-					entity.caster_spell_slots = data_npc.caster_spell_slots;
-					entity.caster_spell_attack = data_npc.caster_spell_attack;
-					entity.caster_spells = data_npc.caster_spells;
-
-					// Innate spellcasting
-					entity.innate_ability = data_npc.innate_ability;
-					entity.innate_save_dc = data_npc.innate_save_dc;
-					entity.innate_spell_attack = data_npc.innate_spell_attack;
-					entity.innate_spells = data_npc.innate_spells;
-				}
-				break
-			}
-		}
-		Vue.set(state.entities, key, entity);
-	},
+	ADD_ENTITY(state, { key, entity }) { Vue.set(state.entities, key, entity); },
 	SET_LOG(state, {action, value}) {
 		if(localStorage.getItem(state.encounterId) && Object.keys(state.log) == 0) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));

@@ -166,7 +166,7 @@
 				//Init
 				this.setSize();
 			});
-			this.track_Encounter(this.demo);
+			// this.track_Encounter(this.demo);
 		},
 		computed: {
 			...mapGetters([
@@ -308,7 +308,6 @@
 		methods: {
 			...mapActions([
 				'init_Encounter',
-				'track_Encounter',
 				'set_finished',
 				'reset_store',
 				'setSlide',

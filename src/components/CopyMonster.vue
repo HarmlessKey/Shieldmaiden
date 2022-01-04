@@ -110,9 +110,10 @@
 					? await this.get_npc({ uid: this.userId, id })
 					: await this.get_monster(id);
 
-					// Remove id or key
+					// Remove properties not needed for custom monsters
 					delete npc._id;
 					delete npc.key;
+					delete npc.url;
 
 					this.$emit("copy", npc);
 

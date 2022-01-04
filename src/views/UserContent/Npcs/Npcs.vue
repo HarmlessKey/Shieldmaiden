@@ -11,7 +11,7 @@
 					)
 				</span>
 				<a class="btn btn-sm bg-neutral-5"
-					@click="bulk_import_dialog = true"
+					@click="import_dialog = true"
 				>
 					Bulk Import NPCs
 				</a>
@@ -137,44 +137,10 @@
 		</hk-card>
 
 		<!-- Bulk import dialog -->
-		<q-dialog v-model="bulk_import_dialog">
+		<q-dialog v-model="import_dialog">
 			<hk-card header="Import NPC from JSON" :minWidth="400">
 				<div class="card-body">
-					<q-file 
-						:dark="$store.getters.theme === 'dark'" 
-						filled square 
-						accept=".json"
-						v-model="json_file" 
-						@input="loadJSON()"
-					>
-						<template v-slot:prepend>
-							<q-icon name="attach_file" />
-						</template>
-					</q-file>
-
-					<h4 class="my-3">
-						OR
-					</h4>
-					<ValidationObserver  v-slot="{ handleSubmit }">
-
-						<q-form @submit="handleSubmit(parseJSON)">
-							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
-								<q-input
-									:dark="$store.getters.theme === 'dark'" 
-									filled square 
-									type="textarea"
-									label="JSON Input"
-									v-model="json_input"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-
-							</ValidationProvider>
-							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
-								Parse Input
-							</q-btn>
-						</q-form>
-					</ValidationObserver>
+					<ImportNPC @imported="imported"/>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -186,6 +152,7 @@
 	import { mapActions, mapGetters } from "vuex";
 	import { db } from "@/firebase";
 	import { monsterMixin } from "@/mixins/monster";
+	import ImportNPC from "@/components/ImportNPC.vue";
 
 	export default {
 		name: "Npcs",
@@ -194,14 +161,13 @@
 		},
 		mixins: [monsterMixin],
 		components: {
-			OutOfSlots
-		},
+    OutOfSlots,
+    ImportNPC
+},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				bulk_import_dialog: false,
-				json_file: undefined,
-				json_input: undefined,
+				import_dialog: false,
 				loading_npcs: true,
 				npcs: [],
 				paginationSetter: undefined,
@@ -378,33 +344,13 @@
 				this.npcs.splice(index, 1);
 				this.delete_npc(key);
 			},
-			loadJSON() {
-				const fr = new FileReader();
-
-				fr.onload = e => {
-					const result = JSON.parse(e.target.result)
-					// const formatted = JSON.stringify(result, null, 2)
-					// console.log(formatted)
-					delete result.key
-
-					console.log(result)
-					
-					this.import_dialog = false
-					this.json_file = undefined
-
+			imported(npcs) {
+				if (!(npcs instanceof Array)) {
+					npcs = [npcs];
 				}
-
-				fr.readAsText(this.json_file)
-			},
-			parseJSON() {
-
-				let input = JSON.parse(this.json_input)
-				delete input.key
-				
-				this.npc = input
-
-				this.import_dialog = false
-				this.json_input = ""
+				this.import_dialog = false;
+				console.log(npcs)
+				// DO A LOOP TO IMPORT NPCS
 			},
 			setSize(e) {
 				this.card_width = e.width;

@@ -110,18 +110,65 @@ const actions = {
   },
 
   /**
-   * Adds a player to a campaign
+   * Add a new player to the campaign
    * 
-   * @param {object} campaign 
-   * @returns {string} the id of the newly added campaign
+   * @param {string} id campaignId
+   * @param {string} playerId 
+   * @param {object} player 
    */
    async add_player({ rootGetters, commit, dispatch }, { id, playerId, player }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
+        await services.editPlayer(uid, id, playerId, player);
+        commit("SET_PLAYER", { uid, id, playerId, player });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Overwrites an existing player with a new object
+   * 
+   * @param {string} id campaignId
+   * @param {string} playerId 
+   * @param {object} player 
+   */
+   async edit_campaign_player({ rootGetters, commit, dispatch }, { id, playerId, player }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
         await services.addPlayer(uid, id, playerId, player);
         commit("ADD_PLAYER", { uid, id, playerId, player });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Updates a single property for a player
+   * 
+   * @param {string} uid
+   * @param {string} campaignId 
+   * @param {string} playerId 
+   * @param {string} property 
+   * @param {string} value 
+   */
+   async update_campaign_player({ commit, dispatch }, { uid, campaignId, playerId, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      const path = `/players/${playerId}`;
+      try {
+        await services.updateCampaign(
+          uid, campaignId, path, { [property]: value }
+        );
+        commit("UPDATE_CAMPAIGN_PLAYER", { uid, campaignId, playerId, property, value });
         return;
       } catch(error) {
         throw error;
@@ -171,6 +218,56 @@ const actions = {
     }
   },
 
+  async set_death_save({ dispatch, commit, rootGetters }, { campaignId, playerId, index, value } ) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      const path = `/players/${playerId}/saves`;
+      try {
+        await services.updateCampaign(
+          uid, campaignId, path, { [index]: value }
+        );
+        commit("SET_DEATH_SAVE", { uid, campaignId, playerId, index, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async stabilize_player({ dispatch }, { uid, campaignId, playerId } ) {
+    const update = {
+      dead: null,
+      saves: null,
+      stable: true
+    }
+    for(const [property, value] of Object.entries(update)) {
+      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+    }
+  },
+
+  async kill_player({ dispatch }, { uid, campaignId, playerId } ) {
+    const update = {
+      stable: null,
+      dead: true
+    }
+    for(const [property, value] of Object.entries(update)) {
+      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+    }
+  },
+
+  async revive_player({ dispatch }, { uid, campaignId, playerId, curHp } ) {
+    const update = {
+      dead: null,
+      saves: null,
+      stable: null,
+      curHp
+    };
+    for(const [property, value] of Object.entries(update)) {
+      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+    }
+  },
+
   /**
    * Deletes an existing campaign
    * A user can only delete their own campaign's so use uid from the store
@@ -189,7 +286,27 @@ const actions = {
         throw error;
       }
     }
-  }
+  },
+
+  /**
+   * Update the "share" property with the latest value
+   * Shares can be seen by players on the public intiative list
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async set_share({ rootGetters, dispatch }, { id, share }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.setShare(uid, id, share);
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
 };
 const mutations = {
   SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
@@ -202,7 +319,31 @@ const mutations = {
       Vue.set(state.cached_campaigns[uid][id], "players", { [playerId]: player });
     }
   },
+  SET_PLAYER(state, { uid, id, playerId, player }) {
+    Vue.set(state.cached_campaigns[uid][id].players, playerId, player);
+  },
   DELETE_PLAYER(state, { uid, id, playerId }) { Vue.delete(state.cached_campaigns[uid][id].players, playerId); },
+  UPDATE_CAMPAIGN_PLAYER(state, { uid, campaignId, playerId, property, value }) {
+    if(value === null) {
+      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId], property);
+    } else {
+      Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], property, value);
+    }
+  },
+  SET_DEATH_SAVE(state, { uid, campaignId, playerId, index, value }) {
+    if(value === null) {
+      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId].saves, index);
+    } else {
+      if(state.cached_campaigns[uid][campaignId].players[playerId].saves) {
+        console.log(index)
+        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId].saves, index, value);
+      } else {
+        // We are using indexes from 1-5 to store death saves.
+        // To have an empty space we don't look at in the array we add null at the 0 index
+        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], "saves", [null, value]);
+      }
+    }
+  },
   SET_CACHED_CAMPAIGN(state, { uid, id, campaign }) { 
     if(state.cached_campaigns[uid]) {
       Vue.set(state.cached_campaigns[uid], id, campaign);

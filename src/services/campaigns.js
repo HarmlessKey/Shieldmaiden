@@ -52,7 +52,25 @@ export class campaignServices {
     });
   }
 
+  // Updates a campaign
+  async updateCampaign(uid, id, path, value) {
+    path = `${uid}/${id}${path}`
+    CAMPAIGNS_REF.child(path).update(value).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
   async addPlayer(uid, id, playerId, player) {
+    CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
+  async editPlayer(uid, id, playerId, player) {
     CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
       return;
     }).catch((error) => {
@@ -76,5 +94,13 @@ export class campaignServices {
     } catch(error){
       throw error;
     }
+  }
+
+  async setShare(uid, id, share) {
+    CAMPAIGNS_REF.child(uid).child(id).child("shares").set(share).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
   }
 }

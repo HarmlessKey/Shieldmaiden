@@ -81,7 +81,7 @@ const actions = {
   },
 
    /**
-   * Updates and existing player
+   * Overwrites and existing player
    * It is possible to edit the player of another user (for companions)
    * therefore we send the uid from where the function is called
    * 
@@ -95,6 +95,26 @@ const actions = {
       try {
         await services.editPlayer(uid, id, player);
         commit("SET_CACHED_PLAYER", { uid, id, player });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Sets the experience points of a player
+   * 
+   * @param {string} uid
+   * @param {string} id 
+   * @param {object} player 
+   */
+   async set_player_xp({ commit, dispatch }, { uid, id, value }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.updatePlayer(uid, id, "", { "experience": value });
+        commit("SET_XP", { uid, id, value });
         return;
       } catch(error) {
         throw error;
@@ -156,6 +176,7 @@ const mutations = {
     }
   },
   REMOVE_CACHED_PLAYER(state, { uid, id }) { Vue.delete(state.cached_players[uid], id); },
+  SET_XP(state, { uid, id, value }) { Vue.set(state.cached_players[uid][id], "experience", value); },
 };
 
 export default {

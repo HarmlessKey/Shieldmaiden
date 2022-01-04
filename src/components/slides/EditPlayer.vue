@@ -250,37 +250,37 @@
 
 					<q-btn no-caps label="Save" class="full-width" color="primary" type="submit" />
 				</q-form>
-				<div v-if="isXpAdvancement() && playerBase.experience !== undefined" class="pt-2">
-					<hr>
-					<h2>Experience Points</h2>
-					<h2 class="text-center xp">
-						<hk-animated-integer :value="playerBase.experience" />
-					</h2>
-
-					<div class="level">
-						<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
-						<q-linear-progress size="25px" :value="levelAdvancement(playerBase.experience)" color="primary">
-							<div class="absolute-full flex flex-center">
-								<div class="white">
-									{{ Math.floor(levelAdvancement(playerBase.experience) * 100) }}%
-								</div>
-							</div>
-						</q-linear-progress>
-						<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
-					</div>
-
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" square filled
-						class="text-center"
-						type="number" 
-						name="xp" 
-						v-model="xp"
-						label="Award XP"
-					/>
-
-					<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
-				</div>
 			</ValidationObserver>
+			<div v-if="isXpAdvancement() && playerBase.experience !== undefined" class="pt-2">
+				<hr>
+				<h2>Experience Points</h2>
+				<h2 class="text-center xp">
+					<hk-animated-integer :value="playerBase.experience" />
+				</h2>
+
+				<div class="level">
+					<div class="current">{{ calculatedLevel(playerBase.experience) }}</div>
+					<q-linear-progress size="25px" :value="levelAdvancement(playerBase.experience)" color="primary">
+						<div class="absolute-full flex flex-center">
+							<div class="white">
+								{{ Math.floor(levelAdvancement(playerBase.experience) * 100) }}%
+							</div>
+						</div>
+					</q-linear-progress>
+					<div class="next" v-if="calculatedLevel(playerBase.experience) < 20">{{ calculatedLevel(playerBase.experience) + 1 }}</div>
+				</div>
+
+				<q-input 
+					:dark="$store.getters.theme === 'dark'" square filled
+					class="text-center"
+					type="number" 
+					name="xp" 
+					v-model="xp"
+					label="Award XP"
+				/>
+
+				<button class="btn btn-block my-3" @click="addXp()">Award {{ xp }} XP</button>
+			</div>
 		</template>
 	</div>
 	<div v-else-if="demo">
@@ -370,6 +370,7 @@
 				"stabilize_player", 
 				"kill_player", 
 				"revive_player", 
+				"update_campaign_player",
 				"edit_campaign_player",
 				"set_share",
 				"set_death_save"

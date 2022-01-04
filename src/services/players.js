@@ -43,6 +43,16 @@ export class playerServices {
     });
   }
 
+  // Updates a player
+  async updatePlayer(uid, id, path, value) {
+    path = `${uid}/${id}${path}`
+    PLAYERS_REF.child(path).update(value).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
   async deletePlayer(uid, id) {
     try {
       PLAYERS_REF.child(uid).child(id).remove();

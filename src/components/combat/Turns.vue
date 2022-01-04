@@ -45,15 +45,14 @@
 							<q-item-section avatar><i class="far fa-sync-alt"></i></q-item-section>
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
+						<q-item clickable v-close-popup @click="confirmFinish()">
+							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+							<q-item-section>Finish encounter</q-item-section>
+						</q-item>
 						<q-separator />
 						<q-item clickable v-close-popup :to="`/content/campaigns/${$route.params.campid}`">
 							<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
 							<q-item-section>Leave encounter</q-item-section>
-						</q-item>
-						<q-separator />
-						<q-item clickable v-close-popup @click="confirmFinish()">
-							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
-							<q-item-section>End encounter</q-item-section>
 						</q-item>
 					</q-list>
 				</q-popup-proxy>

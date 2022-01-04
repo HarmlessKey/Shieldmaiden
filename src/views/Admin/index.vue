@@ -51,6 +51,11 @@
 						name: 'Update monsters',
 						url: 'monster-update',
 						icon: 'fas fa-file-edit',
+					},
+					'generate-search-table': {
+						name: "Generate search table",
+						url: 'search-table',
+						icon: 'fas fa-print-search',
 					}
 				},
 			}

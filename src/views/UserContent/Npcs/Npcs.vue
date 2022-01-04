@@ -10,14 +10,21 @@
 					<template v-else>{{ tier.benefits.npcs }}</template>
 					)
 				</span>
-				<a class="btn btn-sm bg-neutral-5"
-					@click="import_dialog = true"
-				>
-					Bulk Import NPCs
-				</a>
-				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
-					<i class="fas fa-plus green"></i> New NPC
-				</router-link>
+				<span>
+					<a class="btn btn-sm bg-neutral-5 mr-2"
+						@click="exportAll()"
+					>
+						Export NPCs
+					</a>
+					<a class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import NPCs
+					</a>
+					<router-link class="btn btn-sm bg-neutral-5 mr-2" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
+						<i class="fas fa-plus green"></i> New NPC
+					</router-link>
+				</span>
 			</div>
 
 			<div class="card-body">
@@ -88,7 +95,7 @@
 										Delete
 									</q-tooltip>
 								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="downloadJSON(props.key)">
+								<a class="btn btn-sm bg-neutral-5" @click="exportNPC(props.key)">
 									<i class="fas fa-brackets-curly"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Export JSON
@@ -244,7 +251,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc", "add_npc"]),
+			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc", "add_npc", "get_all_npcs"]),
 			async fetchNpcs(loadMore=false) {
 				await this.fetch_npcs({
 					startAfter: this.getStartAfterResult(loadMore),
@@ -275,15 +282,6 @@
 					(val == 0.25) ? "1/4" :
 					(val == 0.5) ? "1/2" :
 					val;
-			},
-			async downloadJSON(id) {
-				const npc = await this.get_npc({ uid: this.userId, id });
-				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(npc, null ,2)); 
-				var downloadAnchorNode = document.createElement('a'); 
-				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name.trim() + ".json");
-				document.body.appendChild(downloadAnchorNode);  // required for firefox 
-				downloadAnchorNode.click(); 
-				downloadAnchorNode.remove(); 
 			},
 			confirmDelete(e, key, npc, index) {
 				//Instantly delete when shift is held
@@ -356,7 +354,32 @@
 			},
 			setSize(e) {
 				this.card_width = e.width;
-			}
+			},
+			async exportAll() {
+				const all_npcs = await this.get_all_npcs();
+				const json_export = Object.values(all_npcs);
+				this.downloadJSON(json_export);
+			},
+			async exportNPC(id) {
+				const npc = await this.get_npc({ uid: this.userId, id });
+				this.downloadJSON(npc);
+			},
+			async downloadJSON(data) {
+				let filename = "export.json"
+				if (data instanceof Array) {
+					filename = "harmlesskey_npcs.json";
+				}
+				else {
+					filename = data.name.trim() + ".json";
+				}
+
+				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null ,2)); 
+				var downloadAnchorNode = document.createElement('a'); 
+				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", filename);
+				document.body.appendChild(downloadAnchorNode);  // required for firefox 
+				downloadAnchorNode.click();
+				downloadAnchorNode.remove();
+			},
 		}
 	}
 </script>

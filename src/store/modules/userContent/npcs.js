@@ -79,7 +79,7 @@ const actions = {
       const services = await dispatch("get_npc_services");
       try {
         const npc = await services.getNpc(uid, id);
-        commit("SET_CACHED_NPC", { uid, npc });
+        commit("SET_CACHED_NPC", { uid, id, npc });
         return npc;
       } catch(error) {
         throw error;
@@ -152,13 +152,33 @@ const actions = {
         throw error;
       }
     }
+  },
+
+  /**
+   * Gets all NPCs from a USER
+   */
+  async get_all_npcs({ rootGetters, commit, dispatch }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if (uid) {
+      const services = await dispatch("get_npc_services");
+
+      try {
+        const all_npcs = await services.getAllNpcs(uid);
+        commit("SET_CACHED_NPCS", { uid, npcs:all_npcs })
+        return all_npcs;
+      } catch(error) {
+        throw error;
+      }
+    }
   }
+
+
 };
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
   SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
   SET_CACHED_NPCS(state, { uid, npcs }) { Vue.set(state.cached_npcs, uid, npcs); },
-  SET_CACHED_NPC(state, { uid, id, npc }) { 
+  SET_CACHED_NPC(state, { uid, id, npc }) {
     if(state.cached_npcs[uid]) {
       Vue.set(state.cached_npcs[uid], id, npc);
     } else {

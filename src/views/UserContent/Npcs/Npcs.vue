@@ -244,7 +244,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc"]),
+			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc", "add_npc"]),
 			async fetchNpcs(loadMore=false) {
 				await this.fetch_npcs({
 					startAfter: this.getStartAfterResult(loadMore),
@@ -344,13 +344,15 @@
 				this.npcs.splice(index, 1);
 				this.delete_npc(key);
 			},
-			imported(npcs) {
+			async imported(npcs) {
 				if (!(npcs instanceof Array)) {
 					npcs = [npcs];
 				}
 				this.import_dialog = false;
-				console.log(npcs)
-				// DO A LOOP TO IMPORT NPCS
+				for (const npc of npcs) {
+					await this.add_npc(npc);
+				}
+				this.$snotify.success(`Imported ${npcs.length} Monsters`, 'Critical hit!', {position: "rightTop"});
 			},
 			setSize(e) {
 				this.card_width = e.width;

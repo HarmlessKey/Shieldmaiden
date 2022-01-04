@@ -73,6 +73,9 @@
 		},
 		methods: {
 			async update() {
+				if (this.ref === undefined) {
+					return
+				}
 				this.loading = true;
 
 				//Fetch the data

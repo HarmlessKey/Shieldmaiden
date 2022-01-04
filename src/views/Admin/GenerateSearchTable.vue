@@ -43,16 +43,31 @@
 				loading: false,
 				ref: undefined,
 				refs: [
-					"npcs"
+					'npcs',
+					'custom_items',
+					'reminders',
+					'players',
+					'encounters',
+					'campaigns',
 				],
 				search_ref: {
 					'npcs': 'search_npcs',
-					'items': 'search_items',
+					'custom_items': 'search_custom_items',
+					'reminders': 'search_reminders',
 					'spells': 'search_spells',
-					'conditions': 'search_conditions'
+					'conditions': 'search_conditions',
+					'players': 'search_players',
+					'encounters': 'search_encounters',
+					'campaigns': 'search_campaigns',
 				},
 				search_fields: {
-					'npcs': ['name', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type']
+					'npcs': ['name', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type'],
+					'custom_items': ['name'],
+					'reminders': ['name'],
+					'players': ['character_name:name', 'campaign_id'],
+					'encounters': ['encounter:name', 'round', 'turn', 'entities:entity_count->count'],
+					'campaigns': ['campaign:name', 'timestamp', 'advancement', 'players:player_count->count']
+
 				}
 			}
 		},
@@ -62,25 +77,82 @@
 
 				//Fetch the data
 				const ref = db.ref(this.ref);
-				await ref.once('value', (snapshot) => {
+				await ref.once('value', async (snapshot) => {
 					const users = snapshot.val();
 
 					for(let uid in users) {
-						const entries = users[uid];
-						console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
-						for(let key in entries) {
-							let entry = entries[key];
-							const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-							const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${key}`);
-							try {
-								search_ref.set(search_entry)
-							} catch(error) {
-								console.error(`Couldn't update search_npc table`, key, entry.name, error, search_entry)
-							}	
+						
+						if (this.ref === 'encounters') {
+							const campaigns = users[uid];
+							for (const cid in campaigns) {
+								console.group(`%cUser: ${uid}, Campaign: ${cid}`, "color: #2c97de; font-weight: bold;")
+								const entries = campaigns[cid]
+
+								for (const key in entries) {
+									let entry = entries[key];
+									const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
+									const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/results/${key}`);
+									try {
+										search_ref.set(search_entry)
+									} catch(error) {
+										console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
+									}
+								}
+								console.groupEnd();
+								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/metadata/count`);
+								count_ref.set(Object.keys(entries).length);
+							}
 						}
-						console.groupEnd();
-						const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-						count_ref.set(Object.keys(entries).length);
+
+						else if (this.ref === 'campaigns') {
+							const campaigns = users[uid];
+							for (const cid in campaigns) {
+								console.group(`%cUser: ${uid}, Campaign: ${cid}`, "color: #2c97de; font-weight: bold;")
+								const campaign = campaigns[cid]
+
+								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
+								const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
+
+								const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
+								const camp_encs = await camp_enc_ref.once('value', (snapshot) => {
+									return snapshot.val();
+								})
+
+								search_entry.encounter_count = Object.keys(camp_encs).length;
+								
+								try {
+									search_ref.set(search_entry)
+								} catch(error) {
+									console.error(`Couldn't update ${this.search_ref[this.ref]} table`, cid, campaign.campaign, error, search_entry)
+								}
+
+								console.groupEnd();
+								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
+								count_ref.set(Object.keys(campaigns).length);
+							}
+							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
+							count_ref.set(Object.keys(campaigns).length);
+						}
+
+
+						else {
+							const entries = users[uid];
+							console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
+
+							for(let key in entries) {
+								let entry = entries[key];
+								const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
+								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${key}`);
+								try {
+									search_ref.set(search_entry)
+								} catch(error) {
+									console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
+								}	
+							}
+							console.groupEnd();
+							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
+							count_ref.set(Object.keys(entries).length);
+						}
 					}
 				}).then(() => {
 
@@ -91,8 +163,18 @@
 			extractFields(entry, fields) {
 				let searchable_entry = {}
 				for (const field of fields) {
-					if (entry[field]) {
-						searchable_entry[field] = entry[field]
+					const [field_name, func] = field.split('->')
+					let [og_field, s_field] = field_name.split(':')
+					if (s_field === undefined) {
+						s_field = og_field;
+					}
+					if (entry[og_field]) {
+						if (func === 'count') {
+							searchable_entry[s_field] = Object.keys(entry[og_field]).length
+						}
+						else {
+							searchable_entry[s_field] = entry[og_field]
+						}
 					}
 				}
 

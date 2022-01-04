@@ -24,7 +24,6 @@ const actions = {
     const services = await dispatch("get_monster_services");
     try {
       const monsters = await services.getMonsters(pageNumber, pageSize, query, fields, sortBy, descending);
-
       return monsters;
     } catch(error) {
       console.error(error);

@@ -214,6 +214,7 @@
 		&.componentHeader {
 			padding: 10px 15px !important;
 			margin-bottom: 0 !important;
+			background-color: $neutral-8-transparent;
 
 			&.shadow {
 				box-shadow: 0 0 10px rgba(0,0,0,0.9); 

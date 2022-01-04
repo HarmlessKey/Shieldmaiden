@@ -1,52 +1,51 @@
 <template>
-	<div v-if="overencumbered" class='container-fluid'>
+	<div v-if="overencumbered">
 		<OverEncumbered/>
 	</div>
-	<div class="container-fluid" v-else>
-		<div class="wrapper scrollable-content">
-			<div class="mt-2 encounter_actions">
-				<q-tabs
-					v-model="tab"
-					dark
-					inline-label
-					dense
-					align="left"
-					:breakpoint="0"
-					no-caps
-				>
-					<q-route-tab
-						exact replace
-						label="Back"
-						icon="fas fa-arrow-left"
-						class="pl-0"
-						name="back"
-						:to="'/content/campaigns/' + $route.params.campid"
-					/>
-					<q-tab 
-						v-for="({name, icon, label}, index) in tabs"
-						:key="`tab-${index}`" 
-						:name="name" 
-						:icon="icon"
-						:label="label"
-					/>
-				</q-tabs>
-				<q-scroll-area dark :thumb-style="{ width: '5px'}"> 
-					<q-tab-panels v-model="tab" class="bg-transparent">
-						<q-tab-panel name="entities">
-							<Entities :encounter="encounter" :campaign="campaign" />
-						</q-tab-panel>
-						<q-tab-panel name="general">
-							<General :encounter="encounter" :campaign="campaign" />
-						</q-tab-panel>
-						<q-tab-panel name="loot">
-							<Loot :encounter="encounter" :campaign="campaign" />
-						</q-tab-panel>
-						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
-							<Xp :encounter="encounter" :campaign="campaign" />
-						</q-tab-panel>
-					</q-tab-panels>
-				</q-scroll-area>
-			</div>
+	<div v-else>
+		<div class="wrapper">
+			<hk-card>
+				<div class="tabs">
+					<q-tabs
+						v-model="tab"
+						dark
+						inline-label
+						align="justify"
+						:breakpoint="0"
+						no-caps
+					>
+						<q-route-tab
+							exact replace
+							label="Back"
+							icon="fas fa-arrow-left"
+							class="pl-0"
+							name="back"
+							:to="'/content/campaigns/' + $route.params.campid"
+						/>
+						<q-tab 
+							v-for="({name, icon, label}, index) in tabs"
+							:key="`tab-${index}`" 
+							:name="name" 
+							:icon="icon"
+							:label="label"
+						/>
+					</q-tabs>
+				</div>
+				<q-tab-panels v-model="tab" class="bg-transparent">
+					<q-tab-panel name="entities">
+						<Entities :encounter="encounter" :campaign="campaign" />
+					</q-tab-panel>
+					<q-tab-panel name="general">
+						<General :encounter="encounter" :campaign="campaign" />
+					</q-tab-panel>
+					<q-tab-panel name="loot">
+						<Loot :encounter="encounter" :campaign="campaign" />
+					</q-tab-panel>
+					<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
+						<Xp :encounter="encounter" :campaign="campaign" />
+					</q-tab-panel>
+				</q-tab-panels>
+			</hk-card>
 
 			<!-- ENCOUNTER OVERVIEW -->
 			<Overview :encounter="encounter" :campaign="campaign" />
@@ -128,20 +127,18 @@
 </script>
 
 <style lang="scss" scoped>
-.container-fluid {
-	height: calc(100vh - 50px);
 
 	.wrapper {
 		grid-gap: 10px;
 		display: grid;
 		grid-template-columns: 2fr 1fr;
 		grid-template-rows: 1fr;
-		height: 100%;
 		grid-template-areas: 
 		"actions overview";
 
-		.top {
-			grid-area: top;
+		.tabs {
+			background-color: $neutral-8;
+			border-bottom: 1px solid $neutral-6;
 		}
 		.encounter_actions {
 			grid-area: actions;
@@ -172,5 +169,5 @@
 			overflow: visible !important;
 		}
 	}
-}
+
 </style>

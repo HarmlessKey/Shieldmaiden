@@ -1,4 +1,4 @@
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { db } from '@/firebase';
 import { experience } from '@/mixins/experience.js';
 
@@ -14,6 +14,16 @@ export const difficulty = {
 				'hard',
 				'deadly',
 			],
+			difficulty_info: {
+				easy: "An easy encounter doesn't tax the characters' resources or put them in serious peril. " +
+					"They might lose a few hit points, but victory is pretty much guaranteed.",
+				medium: "A medium encounter usually has one or two scary moments for the players, "+
+					"but the characters should emerge victorious with no casualties. One or more of them might need to use healing resources.",
+				hard: "A hard encounter could go badly for the adventurers. Weaker characters might get taken out of the fight, "+
+					"and there's a slim chance that on or more characters might die.",
+				deadly: "A deadly encounter could be lethal for one or more player characters. "+
+					"Survival often requires good tactics and quick thinking, and the party risks defeat."
+			},
 			multipliers: {
 				0: 0.5,
 				1: 1,
@@ -45,12 +55,18 @@ export const difficulty = {
 				15: 13000,
 				16: 15000,
 				17: 18000,
+				18: 20000,
 				19: 22000,
 				20: 25000,
 				21: 33000,
 				22: 41000,
 				23: 50000,
 				24: 62000,
+				25: 75000,
+				26: 90000,
+				27: 105000,
+				28: 120000,
+				29: 135000,
 				30: 155000,
 			},
 			tresholds: {
@@ -118,12 +134,11 @@ export const difficulty = {
 		}
 	},
 	computed: {
-		...mapGetters([
-			'players',
-			'npcs',
-		]),
+		...mapGetters("players", ["players"]),
 	},
 	methods: {
+		...mapActions("npcs", ["get_npc"]),
+		...mapActions("monsters", ["get_monster"]),
 		async difficulty(entities) {
 			var totalXp = 0;
 			var nMonsters = 0;
@@ -134,43 +149,24 @@ export const difficulty = {
 			
 			//Loop over all entities
 			for(let key in entities) {
-				let entity = entities[key]
+				let entity = entities[key];
 
 				//Calculate Monsters XP
-				if(entity.entityType == 'npc') {
-					
-					//If an entity has no CR, return an error
-					if(entity.npc == 'npc' && !this.npcs[entity.id].challenge_rating) {
+				if(entity.entityType === 'npc') {
+					const npc = (entity.npc === "custom") ? await this.get_npc({ uid: this.user.uid, id: entity.id }) : await this.get_monster(entity.id);
+					const rating = npc.challenge_rating;
+
+					// If there is no rating for a monster, difficulty can't be calculated
+					if(rating === undefined) {
 						let error = {
 							0: 'error',
 							1: 'An NPC with no challenge rating is added.',
 						}
 						return error;
 					}
-					let rating = 0
-
-					//Custom NPC CR
-					if (entity.npc == 'custom') {
-						if(!this.npcs[entity.id]) {
-							let error = {
-								0: 'error',
-								1: 'An NPC with no challenge rating is added.',
-							}
-							return error;
-						} else {
-							rating = this.npcs[entity.id].challenge_rating
-						}
-					} 
-
-					//SRD monster CR
-					else {
-						let monsters = this.monsters_ref.child(entity.id);
-						rating = await monsters.once('value').then(function(snapshot) {
-							return snapshot.val().challenge_rating
-						})
-					}
+					
 					//Get the XP
-					let xp = this.challenge[rating]
+					const xp = this.challenge[rating];
 					
 					//Only add the NPC to the difficulty, if it's not friendly
 					if(!entity.friendly) {
@@ -181,7 +177,7 @@ export const difficulty = {
 				diff['nMonsters'] = nMonsters;
 
 				//Calculate Player tresholds
-				if(entity.entityType == 'player') {
+				if(entity.entityType === 'player') {
 					let playerLevel = (!this.players[entity.id].level) ? this.calculatedLevel(this.players[entity.id].experience) : this.players[entity.id].level;
 
 					//If there is a player without a level, return an error

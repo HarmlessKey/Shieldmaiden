@@ -1,31 +1,22 @@
 <template>
-	<div v-if="npc && npc.old" class="deprecated">
-		<h2 class="red">Deprecated NPC</h2>
-	</div>
-	<div v-else-if="npc || $route.name == 'Add NPC'">
+	<div v-if="!loading">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
 					<div class="top">
-						<div class="d-flex justify-content-start items-center">
-							<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
-								<q-tooltip anchor="top middle" self="center middle">
-									There are validation errors
-								</q-tooltip>
-							</q-icon>
-							<a v-if="!npcId" class="btn bg-neutral-5 mx-1" @click="copy_dialog = true">
-								<i class="fas fa-copy"></i>
-								Copy existing NPC
-							</a>
-							<a v-if="!npcId" class="btn bg-neutral-5" @click="import_dialog = true">
-								<i class="fas fa-file-upload"></i>
-								Import an NPC
-							</a>
-						</div>
-						<div v-if="npc" class="d-none d-md-flex name">
-							<b v-if="npc.name">{{ npc.name}}</b>
-							<div class="img" v-if="npc.avatar" :style="{ backgroundImage: 'url(\'' + npc.avatar + '\')' }" />
-						</div>
+						<q-icon v-if="!valid" name="error" color="red" size="sm" class="mr-2">
+							<q-tooltip anchor="top middle" self="center middle">
+								There are validation errors
+							</q-tooltip>
+						</q-icon>
+						<q-btn v-if="!npcId" class="mx-1" color="neutral-5" no-caps @click="copy_dialog = true">
+							<i class="fas fa-copy mr-2"></i>
+							Copy
+						</q-btn>
+						<q-btn v-if="!npcId" color="neutral-5" no-caps @click="import_dialog = true">
+							<i class="fas fa-file-upload mr-2"></i>
+							Import
+						</q-btn>
 					</div>
 
 					<div class="form">
@@ -46,18 +37,7 @@
 
 					<!-- HANDLING -->
 					<div class="save">
-						<div class="d-flex justify-content-start">
-							<template v-if="unsaved_changes">
-								<div  class="orange unsaved_changes">
-									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
-								</div>	
-								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
-									<i class="fas fa-undo" />
-									Revert
-								</a>
-							</template>
-						</div>
-						<div>
+						<div class="buttons">
 							<q-icon v-if="!valid" name="error" color="red" size="md" class="mr-2">
 								<q-tooltip anchor="top middle" self="center middle">
 									There are validation errors
@@ -66,6 +46,17 @@
 							<router-link :to="`/content/npcs`" class="btn bg-neutral-5 mr-2">Cancel</router-link>
 							<q-btn label="Save" type="submit" color="primary" no-caps />
 						</div>
+						<div class="d-flex justify-content-start unsaved_changes">
+							<template v-if="unsaved_changes">
+								<div  class="orange truncate mr-2 d-none d-md-block">
+									<i class="fas fa-exclamation-triangle"></i> Unsaved changes
+								</div>	
+								<a class="btn btn-sm bg-neutral-5" @click="revert_changes()">
+									<i class="fas fa-undo" />
+									Revert
+								</a>
+							</template>
+						</div>
 					</div>
 				</div>
 			</q-form>
@@ -73,48 +64,29 @@
 
 		<!-- COPY DIALOG -->
 		<q-dialog v-model="copy_dialog">
-			<hk-card header="Copy Existing NPC">
+			<hk-card :minWidth="320">
+				<div slot="header" class="card-header">
+					<span>Copy Existing NPC</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
 				<div class="card-body">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Search NPC"
-						type="text" 
-						autocomplete="off" 
-						v-model="search" 
-						@keyup="searchNPC()"
-						class="mb-3"
-					>
-						<template v-slot:append>
-							<q-icon name="fas fa-search" size="xs" @click="searchNPC()" />
-						</template>
-					</q-input>
-					<p v-if="noResult" class="red">{{ noResult }}</p>
-					<q-list :dark="$store.getters.theme === 'dark'">
-						<q-item v-for="(npc, index) in searchResults" :key="index">
-							<q-item-section>
-								{{ npc.name.capitalizeEach() }}
-							</q-item-section>
-							<q-item-section avatar>
-								<a class="neutral-2" @click="copy(npc)">
-									<i class="fas fa-copy blue"/>
-									<q-tooltip anchor="top middle" self="center middle">
-										Copy NPC
-									</q-tooltip>
-								</a>
-							</q-item-section>
-						</q-item>
-					</q-list>
+					<CopyMonster @copy="copy" />
 				</div>
 			</hk-card>
 		</q-dialog>		
 		
 		<!-- Import Dialog  -->
 		<q-dialog v-model="import_dialog">
-			<hk-card header="Import NPC from JSON" :minWidth="400">
+			<hk-card :minWidth="400">
+				<div slot="header" class="card-header">
+					<span>Import NPC from JSON</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
 				<div class="card-body">
 					<q-file 
 						:dark="$store.getters.theme === 'dark'" 
 						filled square 
+						label="Select or drag a file"
 						accept=".json"
 						v-model="json_file" 
 						@input="loadJSON()"
@@ -151,10 +123,10 @@
 			</hk-card>
 		</q-dialog>
 	</div>
+	<hk-loader v-else name="NPC" />
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
 	import BasicInfo from '@/components/npcs/BasicInfo';
@@ -164,6 +136,7 @@
 	import Defenses from '@/components/npcs/Defenses';
 	import SpellCasting from '@/components/npcs/SpellCasting';
 	import Actions from '@/components/npcs/Actions';
+	import CopyMonster from "@/components/CopyMonster"
 
 	export default {
 		name: 'Npcs',
@@ -179,63 +152,41 @@
 			Defenses,
 			SpellCasting,
 			Actions,
+			CopyMonster
 		},
 		data() {
 			return {
 				userId: this.$route.params.userid || this.$store.getters.user.uid,
 				npcId: this.$route.params.id,
 				npc: {},
+				loading: false,
 				npc_copy: {},
 				copy_dialog: false,
+				copy_resource_setter: undefined,
 				import_dialog: false,
 				unsaved_changes: false,
-				search: '',
-				searchResults: [],
-				noResult: '',
 				json_file: undefined,
-				json_input: "",
-				tabs: [
-					{
-						name: "advanced",
-						label: "Advanced build",
-					},
-					{
-						name: "quick",
-						label: "Quick build",
-					}
-				]
+				json_input: ""
 			}
 		},
 		async mounted() {
 			if(this.npcId) {
-				const npc = await this.get_npc({ uid: this.userId, id: this.npcId });
-
-				if(npc) {
+				this.loading = true;
+				await this.get_npc({ uid: this.userId, id: this.npcId }).then(npc => {
+					npc.name = npc.name.capitalizeEach();
 					this.npc = npc;
 					this.npc_copy = JSON.stringify(npc);
 					this.unsaved_changes = false;
-				}
-			}
-
-			var npcs_ref = db.ref(`monsters`);
-			npcs_ref.on('value', async (snapshot) => {
-				let npcs = snapshot.val();
-
-				let custom = db.ref(`npcs/${this.userId}`);
-				custom.on('value', async (snapshot) => {
-					let customNpcs = snapshot.val();
-					for(let key in customNpcs) {
-						npcs.push(customNpcs[key]);
-					}
+					this.loading = false;
 				});
-				this.npcs = npcs;
-			});
+			}
 		},
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
 			]),
+			...mapGetters("npcs", ["npc_count"])
 		},
 		watch: {
 			npc: {
@@ -248,53 +199,30 @@
 					}
 					
 					// Capitalize name
-					if (this.npc.name) {
-						this.npc.name = this.npc.name.capitalizeEach();
-					}
-				},
-			},
-
+					this.npc.name = this.npc.name.capitalizeEach();
+				}
+			}
 		},
 		methods: {
 			...mapActions(["setSlide"]),
+			...mapActions("monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {
 					return false;
 				} return true;
 			},
-			searchNPC() {
-				this.searchResults = [];
-				this.searching = true;
-				for (var i in this.npcs) {
-					var m = this.npcs[i]
-					if (m.name.toLowerCase().includes(this.search.toLowerCase()) && this.search != '') {
-						this.noResult = '';
-						this.searchResults.push(m);
-					}
-				}
-				if(this.searchResults == '' && this.search != '') {
-					this.noResult = 'No results for "' + this.search + '"';
-				}
-			},
 			copy(npc) {
 				this.copy_dialog = false;
-
-				// Remove unwanted data from the monster
-				delete npc.metadata;
-
 				this.npc = npc;
-
-				// Clear search
-				this.searchResults = [];
-				this.search = '';
 			},
 			revert_changes() {
 				this.npc = JSON.parse(this.npc_copy);
+				this.npc_copy = JSON.stringify(this.npc);
 				this.unsaved_changes = false;
 			},
 			/**
-			 * Checks if a new NPC must added, or an existing NPC must be saved.
+			 * Checks if a new NPC must be added, or an existing NPC must be saved.
 			**/
 			saveNpc() {
 				if(this.$route.name === "Add NPC" && !this.npcId) {
@@ -304,7 +232,6 @@
 				}
 			},
 			addNpc() {
-				delete this.npc.checked;
 				this.add_npc(this.npc).then((res) => {
 					// Set the npcId, so we know there is an existing NPC
 					// even though we are on the AddNPC route, this we won't create multiple when hitting save again
@@ -343,14 +270,6 @@
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},
-			setQuick(input) {
-				if(input == 0) {
-					this.quick = false
-				}
-				else {
-					this.quick = true
-				}
-			},
 			loadJSON() {
 				const fr = new FileReader();
 
@@ -372,18 +291,18 @@
 			parse_JSON_input() {
 
 				try {
-					this.npc = JSON.parse(this.json_input)
-					this.import_dialog = false
-					this.json_input = ""
+					this.npc = JSON.parse(this.json_input);
+					this.import_dialog = false;
+					this.json_input = "";
 				} 
 				catch {
-					console.log("Invalid JSON")
-					this.$snotify.error("Invalid JSON")
+					console.log("Invalid JSON");
+					this.$snotify.error("Invalid JSON");
 				}
 				
 			}
 		},
-		beforeRouteLeave (to, from, next) {
+		beforeRouteLeave(to, from, next) {
 			if (this.unsaved_changes) {
 				this.$snotify.error('There are unsaved changes in the form.\n Would you like to continue?', 'Unsaved Changes', {
 					buttons: [
@@ -400,20 +319,13 @@
 
 <style lang="scss" scoped>
 .content {
-	display: grid;
-	height: calc(100vh - 50px) !important;
-	grid-template-rows: 35px 1fr 60px;
 
 	.top {
 		display: flex;
-		justify-content: space-between;
-		border-bottom: solid 1px $neutral-4;
+		justify-content: flex-end;
 		align-items: center;
+		margin-bottom: 10px;
 
-		.back {
-			line-height: 35px;
-			margin-right: 10px;
-		}
 		.name {
 			user-select: none;
 			justify-content: flex-end;
@@ -430,25 +342,35 @@
 			}
 		}
 	}
-	.form {
-		padding-top: 5px;
-		overflow-x: hidden;
-		overflow-y: scroll;
-
-		&::-webkit-scrollbar {
-			display: none;
-			columns: 2;
-		}
-	}
 	.save {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		flex-wrap: wrap;
+		position: sticky;
+		bottom: 5px;
+		padding: 10px 10px;
+		margin: 5px 5px;
+		background: $neutral-9;
+		border: solid 1px $neutral-8;
+		border-radius: $border-radius;
+		flex-direction: row-reverse;
 
 		.unsaved_changes {
 			margin: 0 10px 0 0;
 			line-height: 31px;
 		}
+		.buttons {
+			display: flex;
+			justify-content: flex-end;
+		}
+		@media only screen and (max-width: 343px) {
+			.buttons {
+				margin-bottom: 15px;
+			}
+		}
 	}
 }
+
+
 </style>

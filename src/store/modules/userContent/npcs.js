@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import { npcServices } from "@/services/npcs"; 
+import _ from "lodash";
 
 
 const state = {
   npc_services: null,
-  cached_npcs: {}
+  cached_npcs: {},
+  npc_count: 0,
+  npcs: []
 };
 
 const getters = {
@@ -14,6 +17,7 @@ const getters = {
       return state.cached_npcs[uid] || {};
     } return {};
   },
+  npc_count: (state) => { return state.npc_count; },
   npc_services: (state) => { return state.npc_services; }
 };
 
@@ -29,13 +33,37 @@ const actions = {
    * Fetches all the npcs for a user
    * and stores them in cached_npcs.uid
    */
-  async fetch_npcs({ rootGetters, commit, dispatch }) {
+  async fetch_npcs({ rootGetters, dispatch }, { startAfter, pageSize, query, sortBy, descending }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_npc_services");
+      sortBy = (!sortBy || query) ? "name" : sortBy;
+      try {
+        const npcs = await services.getNpcs(uid, startAfter, pageSize, query, sortBy, descending);
+        const order = (descending) ? "desc" : "asc";
+        
+        return _.chain(npcs)
+				.filter(function(npc, key) {
+					npc.key = key;
+					return npc;
+				}).orderBy(sortBy, order).value();       
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Fetches the total count of npcs for a user
+   * and stores it in npc_count
+   */
+   async fetch_npc_count({ rootGetters, commit, dispatch }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        const npcs = await services.getNpcs(uid);
-        commit("SET_CACHED_NPCS", { uid, npcs });
+        const count = await services.getNpcCount(uid);
+        commit("SET_NPC_COUNT", count);
         return;
       } catch(error) {
         throw error;
@@ -52,6 +80,7 @@ const actions = {
       try {
         const npc = await services.getNpc(uid, id);
         commit("SET_CACHED_NPC", { uid, npc });
+        return npc;
       } catch(error) {
         throw error;
       }
@@ -66,12 +95,14 @@ const actions = {
    * @param {object} npc 
    * @returns {string} the id of the newly added npc
    */
-  async add_npc({ rootGetters, commit, dispatch }, npc) {
+  async add_npc({ rootGetters, commit, state, dispatch }, npc) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const new_count = state.npc_count + 1;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        const id = await services.addNpc(uid, npc);
+        const id = await services.addNpc(uid, npc, new_count);
+        commit("SET_NPC_COUNT", new_count);
         commit("SET_CACHED_NPC", { uid, id, npc });
         return id;
       } catch(error) {
@@ -108,13 +139,14 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_npc({ rootGetters, commit, dispatch }, id) {
+  async delete_npc({ rootGetters, commit, state, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const new_count = state.npc_count - 1;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.deleteNpc(uid, id);
-        commit("REMOVE_CACHED_NPC", { uid, id });
+        await services.deleteNpc(uid, id, new_count);
+        commit("SET_NPC_COUNT", new_count);
         return;
       } catch(error) {
         throw error;
@@ -124,6 +156,7 @@ const actions = {
 };
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
+  SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
   SET_CACHED_NPCS(state, { uid, npcs }) { Vue.set(state.cached_npcs, uid, npcs); },
   SET_CACHED_NPC(state, { uid, id, npc }) { 
     if(state.cached_npcs[uid]) {

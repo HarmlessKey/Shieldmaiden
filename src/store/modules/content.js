@@ -220,7 +220,7 @@ export const content_module = {
 			
 			count.campaigns = Object.keys(rootGetters["campaigns/campaigns"]).length;
 			count.players = Object.keys(rootGetters["players/players"]).length;
-			count.npcs = Object.keys(rootGetters["npcs/npcs"]).length;
+			count.npcs = rootGetters["npcs/npc_count"];
 			count.encounters = 0;
 			
 			// Count encounters for every campaign

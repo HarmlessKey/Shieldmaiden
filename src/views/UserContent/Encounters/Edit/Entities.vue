@@ -1,5 +1,5 @@
 <template>
-	<div v-if="monsters">
+	<div>
 		<h3>Players</h3>
 
 		<!-- PLAYERS -->
@@ -41,77 +41,112 @@
 		toggle-color="primary"
 		:options="[
 			{label: 'Custom NPCs', value: 'custom'},
-			{label: 'SRD NPC\'s', value: 'srd'}
+			{label: 'SRD monsters', value: 'srd'}
 		]"
 	/>
 
-	<hk-table 
-		v-if="monster_resource === 'custom'"
-		:items="_npcs"
-		:columns="monsterFields"
-		:perPage="15"
-		:search="['name', 'type']"
-		:collapse="true"
-		classes="monster-table"
-	>
-	<template slot="name" slot-scope="data">
-		<a @click="setSlide({show: true, type: 'ViewMonster', data: data.row, classes: 'monster-card' })" :class="{ 'green': data.row.custom}">
-			{{ data.item.capitalizeEach() }}
-		</a>
+	<!-- CUSTOM NPCs -->
+	<template v-if="monster_resource === 'custom'">
+		<q-input 
+			:dark="$store.getters.theme !== 'light'" 
+			v-model="searchNpc"
+			borderless 
+			filled square
+			debounce="300" 
+			clearable
+			placeholder="Search custom NPCs"
+			@change="searchNpcs"
+			@clear="searchNpcs"
+		>
+			<q-icon slot="prepend" name="search" />
+			<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
+		</q-input>
+		<q-table		
+			:data="npcs"
+			:visible-columns="visibleColumns"
+			:columns="columns"
+			row-key="key"
+			card-class="bg-none"
+			flat
+			:dark="$store.getters.theme !== 'light'"
+			:loading="loading_npcs"
+			separator="none"
+			wrap-cells
+			:pagination.sync="npc_pagination"
+			:rows-per-page-options="[0]"
+			@request="load"
+		>	
+			<template v-slot:body-cell="props">
+				<q-td v-if="props.col.name !== 'actions'">
+					<div  class="truncate-cell">
+						<div class="truncate">
+							<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+								{{ props.value }}
+							</router-link>
+							<template v-else>
+								{{ props.value }}
+							</template>
+						</div>
+					</div>
+				</q-td>
+				<q-td v-else class="text-right d-flex justify-content-between">
+					<div class="monster-actions">
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square dense
+							class="multi_nr ml-2" 
+							autocomplete="off" 
+							type="number" 
+							min="1"
+							max="99"
+							name="name" 
+							placeholder="1" 
+							v-model="to_add[props.key]"
+						/>
+						<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, props.key, 'npc', props.row.name, true)">
+							<i class="fas fa-plus"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Add with average HP
+							</q-tooltip>
+						</a>
+						<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, props.key, 'npc', props.row.name, true, true)">
+							<i class="fas fa-dice-d20"></i>
+							<q-tooltip anchor="top middle" self="center middle">
+								Add with rolled HP
+							</q-tooltip>
+						</a>
+					</div>
+				</q-td>
+			</template>
+			<div slot="pagination">
+				1-{{npcs.length}} of {{(searchNpc && searchNpc.length) ? npcs.length : npc_count}}
+			</div>
+			<div slot="no-data" />
+			<hk-loader slot="loading" name="monsters" />
+		</q-table>
+		<q-btn 
+			v-if="!searchNpc && npcs.length < npc_count"
+			slot="bottom-row"
+			no-caps 
+			color="primary" 
+			label="Load more" 
+			@click="load({ pagination: npc_pagination }, true)"
+		/>
 	</template>
 
-	<!-- ACTIONS -->
-	<div slot="actions" slot-scope="data">
-		<div class="monster-actions">
-			<q-input 
-				:dark="$store.getters.theme === 'dark'" filled square dense
-				class="multi_nr ml-2" 
-				autocomplete="off" 
-				type="number" 
-				min="1"
-				max="99"
-				name="name" 
-				placeholder="1" 
-				v-model="to_add[data.row['.key']]"
-			/>
-			<a class="btn btn-sm bg-neutral-5 mx-1" @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom)">
-				<i class="fas fa-plus"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					Add with average HP
-				</q-tooltip>
-			</a>
-			<a class="btn btn-sm bg-neutral-5" @click="multi_add($event, data.row['.key'], 'npc', data.row.name, data.row.custom, true)">
-				<i class="fas fa-dice-d20"></i>
-				<q-tooltip anchor="top middle" self="center middle">
-					Add with rolled HP
-				</q-tooltip>
-			</a>
-		</div>
-	</div>
-
-	<!-- COLLAPSE -->
-	<div slot="collapse" slot-scope="data">
-		<ViewMonster :data="data.row" />
-	</div>
-
-	<!-- LOADER -->
-	<div slot="table-loading" class="loader">
-		<span>Loading monsters...</span>
-	</div>
-</hk-table>
-
+	<!-- SRD MONSTERS -->
 	<template v-else>
 		<q-input 
 			:dark="$store.getters.theme !== 'light'" 
-			v-model="search"
+			v-model="searchMonster"
 			borderless 
 			filled square
 			debounce="300" 
 			clearable
 			placeholder="Search SRD monster"
-			@input="filter"
+			@change="filter"
 		>
-			<q-icon slot="append" name="search" />
+			<q-icon slot="prepend" name="search" />
+			<q-btn slot="after" no-caps color="primary" label="Search" @click="filter" />
 		</q-input>
 		<q-table
 			:data="monsters"
@@ -124,6 +159,7 @@
 			:loading="loading_monsters"
 			separator="none"
 			wrap-cells
+			:visible-columns="visibleColumns"
 			@request="request"
 		>
 			<div slot="loading">
@@ -199,6 +235,7 @@
 			</template>
 		</q-table>
 	</template>
+	<q-resize-observer @resize="setSize" />
 </div>
 </template>
 
@@ -208,7 +245,6 @@
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
 	import ViewMonster from '@/components/ViewMonster.vue';
-	import _ from 'lodash';
 
 	export default {
 		name: 'Entities',
@@ -231,6 +267,7 @@
 				campaignId: this.$route.params.campid,
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
+				width: 0,
 				auto_npcs: [],
 				viewNPC: [],
 				slide: this.$store.getters.getSlide,
@@ -261,8 +298,11 @@
 				},
 				monster_resource_setter: undefined,
 				loading_monsters: true,
+				loading_npcs: true,
 				monsters: [],
-				search: "",
+				npcs: [],
+				searchMonster: "",
+				searchNpc: "",
 				query: null,
 				pagination: {
 					sortBy: 'name',
@@ -271,6 +311,7 @@
 					rowsPerPage: 15,
 					rowsNumber: 0
 				},
+				npcPaginationSetter: undefined,
 				columns: [
 					{
 						name: "name",
@@ -306,38 +347,48 @@
 		},
 		async mounted() {
 			await this.fetchMonsters();
+			await this.fetchNpcs();
 		},
 		computed: {
 			...mapGetters(["content_count"]),
-			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("npcs", ["npc_count"]),
 			...mapGetters("players", ["players"]),
 			monster_resource: {
 				get() {
-					const resource = (this.content_count.npcs) ? "custom" : "srd";
+					const resource = (this.npc_count) ? "custom" : "srd";
 					return (this.monster_resource_setter) ? this.monster_resource_setter : resource;
 				},
 				set(newVal) {
 					this.monster_resource_setter = newVal;
 				}
 			},
-			_npcs() {
-				return _.chain(this.npcs)
-				.filter((npc, key) => {
-					npc.key = key;
-					return npc;
-				})
-				.orderBy("name", 'asc')
-				.value()
+			npc_pagination: {
+				get() {
+					return (this.npcPaginationSetter) ? this.npcPaginationSetter : {
+						sortBy: "name",
+						rowsPerPage: 15,
+						rowsNumber: this.npc_count
+					};
+				},
+				set(newVal) {
+					this.npcPaginationSetter = newVal;
+				}
+			},
+			visibleColumns() {
+				return (this.width > 600) ? 
+					["name", "type", "challenge_rating", "actions"] : 
+					(this.width > 450) ? 
+					["name", "type", "actions"] :
+					["name", "actions"];
 			},
 		},
 		methods: {
+			...mapActions(["setSlide"]),
 			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("npcs", ["fetch_npcs", "get_npc"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 
 				"add_npc_encounter"
-			]),
-			...mapActions([
-				'setSlide'
 			]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
@@ -350,13 +401,21 @@
 				this.monsters = [];
 				this.pagination.page = 1;
 				this.query = {
-					search: this.search
+					search: this.searchMonster
 				}
 				this.fetchMonsters();
+			},
+			searchNpcs() {
+				this.loading_npcs = true;
+				this.fetchNpcs();
 			},
 			request(req) {
 				this.pagination = req.pagination;
 				this.fetchMonsters();		
+			},
+			load(req, loadMore=false) {
+				this.npc_pagination = req.pagination;
+				this.fetchNpcs(loadMore);
 			},
 			async fetchMonsters() {
 				await this.get_monsters({
@@ -371,6 +430,23 @@
 					this.monsters = result.results;
 					this.loading_monsters = false;
 				});
+			},
+			async fetchNpcs(loadMore=false) {
+				await this.fetch_npcs({
+					startAfter: this.getStartAfterResult(loadMore),
+					pageSize: this.npc_pagination.rowsPerPage,
+					query: this.searchNpc,
+					sortBy: this.npc_pagination.sortBy,
+					descending: this.npc_pagination.descending
+				}).then(results => {
+					this.npcs = (loadMore) ? this.npcs.concat(results) : results;
+					this.loading_npcs = false;
+				});
+			},
+			getStartAfterResult(loadMore) {
+				if(this.npcs.length && loadMore) {
+					return this.npcs.at(-1)[this.npc_pagination.sortBy];
+				} return undefined;
 			},
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
@@ -434,7 +510,7 @@
 
 					// CUSTOM NPC
 					else {
-						let npc_data = this.npcs[id];
+						let npc_data = await this.get_npc({ uid: this.user.uid, id });
 						entity.npc = 'custom';
 						entity.ac = (npc_data.old) ? npc_data.ac : npc_data.armor_class;
 
@@ -522,6 +598,9 @@
 					return -1
 				}
 			},
+			setSize(e) {
+				this.width = e.width;
+			}
 		}
 	}
 </script>

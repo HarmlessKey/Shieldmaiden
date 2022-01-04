@@ -434,6 +434,14 @@ html body {
 		}
 	}
 
+	.breadcrumb {
+		margin-bottom: 20px;
+		background: $neutral-9;
+		border-radius: $border-radius;
+		border: solid 1px $neutral-8;
+		padding: 10px 15px;
+	}
+
 	.offline {
 		position: fixed;
 		top: 50px;
@@ -548,6 +556,9 @@ html body {
 		}
 	}
 	.content-side {
+		position: sticky;
+		top: 16px;
+
 		.video {
 			.animated-video {
 				margin-left: -2%;
@@ -926,10 +937,13 @@ html body {
 		background-color: $neutral-6;
 		margin-bottom: 20px;
 		border-radius: $border-radius;
-		overflow: hidden;
+		overflow: auto;
 		box-shadow: 0 3px 7px 0 rgba(0, 0, 0, .125), 0 6px 2px 0 rgba(0, 0, 0, .1);
 		border: solid 1px $neutral-5;
 		
+		&::-webkit-scrollbar {
+			display: none !important;
+		}
 		.card-header {
 			padding: 15px;
 			margin-bottom: 0;

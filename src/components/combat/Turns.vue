@@ -46,7 +46,7 @@
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
 						<q-separator />
-						<q-item clickable v-close-popup :to="`/encounters/${$route.params.campid}`">
+						<q-item clickable v-close-popup :to="`/content/campaigns/${$route.params.campid}`">
 							<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
 							<q-item-section>Leave encounter</q-item-section>
 						</q-item>
@@ -149,7 +149,7 @@
 
 			<template v-else>
 				<span class="d-none d-md-block">
-					<router-link v-if="!demo" :to="'/encounters/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
+					<router-link v-if="!demo" :to="'/content/campaigns/' + $route.params.campid" class="btn bg-neutral-8 ml-2">
 						<i class="fas fa-arrow-left"></i> 
 						Leave
 					</router-link>

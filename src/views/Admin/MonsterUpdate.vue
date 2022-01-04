@@ -609,7 +609,7 @@
 					const searchable_npcs_fields = ['name', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type']
 					let searchable_entry = {}
 					for (const field of searchable_npcs_fields) {
-						if (entry[field]) {
+						if (entry.hasOwnProperty(field)) {
 							searchable_entry[field] = entry[field]
 						}
 					}

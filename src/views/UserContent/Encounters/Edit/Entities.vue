@@ -56,6 +56,7 @@
 			clearable
 			placeholder="Search custom NPCs"
 			@change="searchNpcs"
+			@clear="searchNpcs"
 		>
 			<q-icon slot="prepend" name="search" />
 			<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
@@ -71,6 +72,7 @@
 			:loading="loading_npcs"
 			separator="none"
 			wrap-cells
+			:pagination.sync="npc_pagination"
 			:rows-per-page-options="[0]"
 			@request="load"
 		>	
@@ -116,18 +118,18 @@
 				</q-td>
 			</template>
 			<div slot="pagination">
-				1-{{npcs.length}} of {{(searchNpc && searchNpc.length >= 3) ? npcs.length : npc_count}}
+				1-{{npcs.length}} of {{(searchNpc && searchNpc.length) ? npcs.length : npc_count}}
 			</div>
 			<div slot="no-data" />
 			<hk-loader slot="loading" name="monsters" />
 		</q-table>
 		<q-btn 
-			v-if="npcs.length < npc_count"
+			v-if="!searchNpc && npcs.length < npc_count"
 			slot="bottom-row"
 			no-caps 
 			color="primary" 
 			label="Load more" 
-			@click="load({ npc_pagination }, true)"
+			@click="load({ pagination: npc_pagination }, true)"
 		/>
 	</template>
 
@@ -412,7 +414,7 @@
 				this.fetchMonsters();		
 			},
 			load(req, loadMore=false) {
-				this.pagination = req.pagination;
+				this.npc_pagination = req.pagination;
 				this.fetchNpcs(loadMore);
 			},
 			async fetchMonsters() {

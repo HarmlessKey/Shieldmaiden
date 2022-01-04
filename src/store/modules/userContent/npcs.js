@@ -37,6 +37,7 @@ const actions = {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_npc_services");
+      sortBy = (!sortBy || query) ? "name" : sortBy;
       try {
         const npcs = await services.getNpcs(uid, startAfter, pageSize, query, sortBy, descending);
         const order = (descending) ? "desc" : "asc";
@@ -45,7 +46,7 @@ const actions = {
 				.filter(function(npc, key) {
 					npc.key = key
 					return npc
-				}).orderBy("name", order).value();       
+				}).orderBy(sortBy, order).value();       
       } catch(error) {
         throw error;
       }

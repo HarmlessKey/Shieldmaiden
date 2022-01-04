@@ -70,9 +70,7 @@
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<q-scroll-area>
-						<CopyMonster @copy="copy" />
-					</q-scroll-area>
+					<CopyMonster @copy="copy" />
 				</div>
 			</hk-card>
 		</q-dialog>		
@@ -88,6 +86,7 @@
 					<q-file 
 						:dark="$store.getters.theme === 'dark'" 
 						filled square 
+						label="Select or drag a file"
 						accept=".json"
 						v-model="json_file" 
 						@input="loadJSON()"
@@ -292,13 +291,13 @@
 			parse_JSON_input() {
 
 				try {
-					this.npc = JSON.parse(this.json_input)
-					this.import_dialog = false
-					this.json_input = ""
+					this.npc = JSON.parse(this.json_input);
+					this.import_dialog = false;
+					this.json_input = "";
 				} 
 				catch {
-					console.log("Invalid JSON")
-					this.$snotify.error("Invalid JSON")
+					console.log("Invalid JSON");
+					this.$snotify.error("Invalid JSON");
 				}
 				
 			}
@@ -372,8 +371,6 @@
 		}
 	}
 }
-.q-scrollarea {
-	height: 300px;
-}
+
 
 </style>

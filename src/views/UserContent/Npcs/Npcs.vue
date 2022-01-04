@@ -39,6 +39,9 @@
 						clearable
 						placeholder="Search"
 						@change="searchNpcs"
+						@clear="searchNpcs"
+						:error="search !== undefined && !npcs.length"
+						:error-message='`No NPCs found starting with "${search}"`'
 					>
 						<q-icon slot="prepend" name="search" />
 						<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
@@ -55,6 +58,7 @@
 						:loading="loading_npcs"
 						separator="none"
 						wrap-cells
+						:pagination.sync="pagination"
 						:rows-per-page-options="[0]"
 						@request="load"
 					>	
@@ -93,13 +97,13 @@
 							</q-td>
 						</template>
 						<div slot="pagination">
-							1-{{npcs.length}} of {{(search && search.length >= 3) ? npcs.length : npc_count}}
+							1-{{npcs.length}} of {{(search && search.length) ? npcs.length : npc_count}}
 						</div>
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="monsters" />
 					</q-table>
 					<q-btn 
-						v-if="npcs.length < npc_count"
+						v-if="!search && npcs.length < npc_count"
 						slot="bottom-row"
 						no-caps 
 						color="primary" 

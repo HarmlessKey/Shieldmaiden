@@ -61,10 +61,10 @@
 					'campaigns': 'search_campaigns',
 				},
 				search_fields: {
-					'npcs': ['name', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type'],
+					'npcs': ['name->lower', 'challenge_rating', 'alignment', 'armor_class', 'hit_points', 'size', 'type'],
 					'custom_items': ['name'],
 					'reminders': ['name'],
-					'players': ['character_name:name', 'campaign_id'],
+					'players': ['character_name', 'campaign_id', 'companions'],
 					'encounters': ['encounter:name', 'round', 'turn', 'entities:entity_count->count'],
 					'campaigns': ['campaign:name', 'timestamp', 'advancement', 'players:player_count->count']
 
@@ -84,7 +84,7 @@
 					const users = snapshot.val();
 
 					for(let uid in users) {
-						
+
 						if (this.ref === 'encounters') {
 							const campaigns = users[uid];
 							for (const cid in campaigns) {
@@ -174,6 +174,9 @@
 					if (entry[og_field]) {
 						if (func === 'count') {
 							searchable_entry[s_field] = Object.keys(entry[og_field]).length
+						}
+						if (func === 'lower') {
+							searchable_entry[s_field] = entry[og_field].toLowerCase()
 						}
 						else {
 							searchable_entry[s_field] = entry[og_field]

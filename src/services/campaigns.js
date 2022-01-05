@@ -86,6 +86,13 @@ export class campaignServices {
     });
   }
   
+  async deleteCompanion(uid, id, companionId) {
+    CAMPAIGNS_REF.child(uid).child(id).child(`companions/${companionId}`).remove().then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
 
   async deleteCampaign(uid, id) {
     try {

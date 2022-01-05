@@ -180,7 +180,48 @@ const actions = {
   },
 
   /**
-   * Deletes a player to a campaign
+   * Add a new player to the campaign
+   * 
+   * @param {string} id campaignId
+   * @param {string} companionId 
+   * @param {object} player 
+   */
+   async update_companion({ dispatch }, { uid, id, companionId, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        const path = `/companions/${companionId}`;
+        await services.updateCampaign(uid, id, path, { [property]: value });
+        // commit("SET_COMPANION_PROP", { uid, id, companionId, property, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes a companion from a campaign
+   * 
+   * @param {object} campaign 
+   * @returns {string} the id of the newly added campaign
+   */
+   async delete_companion({ rootGetters, commit, dispatch }, { id, companionId }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.deleteCompanion(uid, id, companionId);
+        commit("DELETE_COMPANION", { uid, id, companionId });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes a player from a campaign
    * 
    * @param {object} campaign 
    * @returns {string} the id of the newly added campaign
@@ -191,6 +232,10 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {
         await services.deletePlayer(uid, id, playerId);
+
+        // IF PLAYER HAS COMPANION, ALSO DELETE COMPANION FROM CAMPAIGN
+        // Get the player with players/get_player
+
         commit("DELETE_PLAYER", { uid, id, playerId });
         return;
       } catch(error) {
@@ -325,7 +370,16 @@ const mutations = {
   SET_PLAYER(state, { uid, id, playerId, player }) {
     Vue.set(state.cached_campaigns[uid][id].players, playerId, player);
   },
-  DELETE_PLAYER(state, { uid, id, playerId }) { Vue.delete(state.cached_campaigns[uid][id].players, playerId); },
+  DELETE_PLAYER(state, { uid, id, playerId }) { 
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
+      Vue.delete(state.cached_campaigns[uid][id].players, playerId); 
+    }
+  },
+  DELETE_COMPANION(state, { uid, id, companionId }) { 
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
+      Vue.delete(state.cached_campaigns[uid][id].companions, companionId); 
+    }
+  },
   UPDATE_CAMPAIGN_PLAYER(state, { uid, campaignId, playerId, property, value }) {
     if(value === null) {
       Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId], property);

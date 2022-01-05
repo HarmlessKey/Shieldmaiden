@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loading">
+	<div class="content__edit" v-if="!loading">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
@@ -265,7 +265,7 @@
 </script>
 
 <style lang="scss" scoped>
-.content {
+.content__edit {
 
 	.top {
 		display: flex;
@@ -289,34 +289,7 @@
 			}
 		}
 	}
-	.save {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-wrap: wrap;
-		position: sticky;
-		bottom: 5px;
-		padding: 10px 10px;
-		margin: 5px 5px;
-		background: $neutral-9;
-		border: solid 1px $neutral-8;
-		border-radius: $border-radius;
-		flex-direction: row-reverse;
-
-		.unsaved_changes {
-			margin: 0 10px 0 0;
-			line-height: 31px;
-		}
-		.buttons {
-			display: flex;
-			justify-content: flex-end;
-		}
-		@media only screen and (max-width: 343px) {
-			.buttons {
-				margin-bottom: 15px;
-			}
-		}
-	}
+	
 }
 
 

@@ -154,6 +154,27 @@ const actions = {
   },
 
   /**
+   * Updates a single (non nested) property of an NPC
+   * 
+   * @param {string} uid
+   * @param {string} id 
+   * @param {string} property 
+   * @param {string|number} value 
+   */
+   async update_npc_prop({ commit, dispatch }, { uid, id, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_npc_services");
+      try {
+        await services.updateNpc(uid, id, "", { [property]: value});
+        commit("SET_CACHED_NPC_PROP", { uid, id, property, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
    * Deletes an existing NPC
    * A user can only delete their own NPC's so use uid from the store
    * 
@@ -169,7 +190,9 @@ const actions = {
         
         // DELETE COMPANION FROM PLAYER
         // A player might have this NPC as a companion, this needs to be deleted now.
-        
+        // the NPC has a player_id if so. Easy to delete
+        // But companion must then also be deleted from the campaign the player is in
+
         commit("REMOVE_NPC", id);
         commit("REMOVE_CACHED_NPC", { uid, id });
         commit("SET_NPC_COUNT", new_count);
@@ -209,6 +232,11 @@ const mutations = {
       Vue.set(state.cached_npcs[uid], id, npc);
     } else {
       Vue.set(state.cached_npcs, uid, { [id]: npc });
+    }
+  },
+  SET_CACHED_NPC_PROP(state, { uid, id, property, value}) {
+    if(state.cached_npcs[uid] && state.cached_npcs[uid][id]) {
+      Vue.set(state.cached_npcs[uid][id], property, value);
     }
   },
   SET_NPC(state, { id, search_npc }) {

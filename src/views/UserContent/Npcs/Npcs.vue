@@ -44,7 +44,7 @@
 						filled square
 						debounce="300" 
 						clearable
-						placeholder="Search"
+						placeholder="Search NPCs"
 					>
 						<q-icon slot="prepend" name="search" />
 					</q-input>

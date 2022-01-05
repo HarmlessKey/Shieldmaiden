@@ -107,6 +107,23 @@ export class npcServices {
   }
 
   /**
+   * Updates a specific property in an existing NPC
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of NPC to edit
+   * @param {string} path Path to parent the property that must be updated
+   * @param {object} value Object with { proptery: value }
+   */
+  async updateNpc(uid, id, path, value) {
+    path = `${uid}/${id}${path}`
+    NPCS_REF.child(path).update(value).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
+  /**
    * Deletes an existing NPC in both 'npcs' and 'search_npcs' ref
    * 
    * @param {String} uid ID of active user

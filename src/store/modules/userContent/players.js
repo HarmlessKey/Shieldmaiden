@@ -64,7 +64,7 @@ const actions = {
     .filter(function(player, key) {
       player.key = key;
       return player;
-    }).orderBy("name", "asc").value();
+    }).orderBy("character_name", "asc").value();
 
     return players;
   },
@@ -128,7 +128,19 @@ const actions = {
       const services = await dispatch("get_player_services");
       try {
         const search_player = convert_player(player);
-        const id = await services.adPlayer(uid, player, new_count, search_player);
+        const id = await services.addPlayer(uid, player, new_count, search_player);
+
+        // If there are companions, save the playerId in the NPC (So the player can edit this specific NPC)
+        if(player.companions) {
+          for(const npcId of Object.keys(player.companions)) {
+						await dispatch("npcs/update_npc_prop", { 
+              uid, 
+              id: npcId, 
+              property: "player_id",
+              value: id 
+            }, { root: true });
+					}
+        }
         commit("SET_PLAYER_COUNT", new_count);
         commit("SET_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
@@ -148,12 +160,52 @@ const actions = {
    * @param {string} id 
    * @param {object} player 
    */
-  async edit_player({ commit, dispatch }, { uid, id, player }) {
+  async edit_player({ commit, dispatch }, { uid, id, player, companions, deleted_companions }) {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
         const search_player = convert_player(player);
         await services.editPlayer(uid, id, player, search_player);
+        
+        // If there are companions, save the playerId in the NPC (So the player can edit this specific NPC)
+        for(const companion of companions) {
+          await dispatch("npcs/update_npc_prop", { 
+            uid, 
+            id: companion.key, 
+            property: "player_id",
+            value: id 
+          }, { root: true });
+          
+          // If the player is in a campaign, update the companion's curHp in the campaign
+          if(player.campaign_id) {
+            await dispatch("campaigns/update_companion", { 
+              uid, 
+              id: player.campaign_id,
+              companionId: companion.key, 
+              property: "curHp",
+              value: companion.hit_points 
+            }, { root: true });
+          }
+        }
+
+        // Remove the player_id from an NPC if that NPC was removed as a companion
+        for(const companionId of deleted_companions) {
+          await dispatch("npcs/update_npc_prop", { 
+            uid, 
+            id: companionId, 
+            property: "player_id",
+            value: null
+          }, { root: true });
+          
+          // If the player is in a campaign, delete the companion from the campaign
+          if(player.campaign_id) {
+            await dispatch("campaigns/delete_companion", { 
+              id: player.campaign_id,
+              companionId, 
+            }, { root: true });
+          }
+        }
+
         commit("SET_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
         return;
@@ -168,7 +220,7 @@ const actions = {
    * 
    * @param {string} uid
    * @param {string} id 
-   * @param {object} player 
+   * @param {number} value 
    */
    async set_player_xp({ commit, dispatch }, { uid, id, value }) {
     if(uid) {
@@ -176,6 +228,26 @@ const actions = {
       try {
         await services.updatePlayer(uid, id, "", { "experience": value });
         commit("SET_XP", { uid, id, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Removes the companion link from a player
+   * 
+   * @param {string} uid
+   * @param {string} playerId 
+   * @param {string} id companionId
+   */
+   async delete_companion({ commit, dispatch }, { uid, playerId, id }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.updatePlayer(uid, playerId, "/companions", { [id]: null });
+        commit("REMOVE_COMPANION", { uid, playerId, id });
         return;
       } catch(error) {
         throw error;
@@ -197,8 +269,11 @@ const actions = {
       try {    
         // Check if control over the character is given to a player
         const control = await services.getPlayerProp(uid, id, "control");
-        console.log(control);
-        // await services.deletePlayer(uid, id, control, new_count);
+        await services.deletePlayer(uid, id, control, new_count);
+
+        // If player had companions
+        // DELETE COMPANION FROM CAMPAING
+        // DELETE player_id FROM NPC
 
         commit("REMOVE_PLAYER", id);
         commit("REMOVE_CACHED_PLAYER", { uid, id });
@@ -231,8 +306,22 @@ const mutations = {
       Vue.set(state.cached_players, uid, { [id]: player });
     }
   },
-  REMOVE_CACHED_PLAYER(state, { uid, id }) { Vue.delete(state.cached_players[uid], id); },
-  SET_XP(state, { uid, id, value }) { Vue.set(state.cached_players[uid][id], "experience", value); },
+  REMOVE_CACHED_PLAYER(state, { uid, id }) { 
+    if(state.cached_players[uid]) {
+      Vue.delete(state.cached_players[uid], id);
+    }
+  },
+  SET_XP(state, { uid, id, value }) { 
+    Vue.set(state.cached_players[uid][id], "experience", value);
+  },
+  REMOVE_COMPANION(state, { uid, playerId, id }) {
+    if(state.cached_players[uid] && state.cached_players[uid][playerId]) {
+      Vue.delete(state.cached_players[uid][playerId].campanions, id);
+    }
+    if(state.players) {
+      Vue.delete(state.players[playerId][id].companions, id);
+    }
+  }
 };
 
 export default {

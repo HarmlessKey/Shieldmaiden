@@ -68,7 +68,7 @@ const actions = {
 
     return npcs;
   },
-
+  
   /**
    * Fetches the total count of npcs for a user
    * and stores it in npc_count
@@ -181,15 +181,15 @@ const actions = {
   },
 
   /**
-   * Gets all NPCs from a USER
+   * Gets all REAL NPCs from a USER
    */
-  async get_all_npcs({ rootGetters, commit, dispatch }) {
+  async get_full_npcs({ rootGetters, commit, dispatch }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if (uid) {
       const services = await dispatch("get_npc_services");
 
       try {
-        const all_npcs = await services.getAllNpcs(uid);
+        const all_npcs = await services.getFullllNpcs(uid);
         commit("SET_CACHED_NPCS", { uid, npcs:all_npcs })
         return all_npcs;
       } catch(error) {

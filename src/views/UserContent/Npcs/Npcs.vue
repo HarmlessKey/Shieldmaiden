@@ -153,7 +153,7 @@
 	export default {
 		name: "Npcs",
 		metaInfo: {
-			title: "NPC's"
+			title: "NPCs"
 		},
 		mixins: [monsterMixin],
 		components: {
@@ -282,7 +282,7 @@
 				this.card_width = e.width;
 			},
 			async exportAll() {
-				const all_npcs = await this.get_all_npcs();
+				const all_npcs = await this.get_full_npcs();
 				const json_export = Object.values(all_npcs);
 				this.downloadJSON(json_export);
 			},

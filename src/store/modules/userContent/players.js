@@ -267,7 +267,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        const player = await services.get_player(uid, id);
+        const player = await dispatch("get_player", { uid, id });
 
         // Delete player from campaign
         if(player.campaing_id) {

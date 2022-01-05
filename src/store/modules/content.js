@@ -2,7 +2,6 @@ import { db } from '@/firebase';
 import Vue from 'vue';
 
 const campaigns_ref = db.ref('campaigns/');
-const npcs_ref = db.ref('npcs');
 const users_ref = db.ref('users');
 const settings_ref = db.ref('settings');
 const tiers_ref = db.ref('tiers');
@@ -161,15 +160,6 @@ export const content_module = {
 				}, 1000)
 			});
 		},
-		fetchNpcs({ commit, rootGetters }) {
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid
-				const npcs = npcs_ref.child(uid)
-				npcs.on('value', snapshot => {
-					commit('SET_NPCS', snapshot.val());
-				});
-			}
-		},
 		fetchCampaign({ commit, rootGetters }, { cid }) {
 			commit("SET_CAMPAIGN_ID", cid)
 			
@@ -180,13 +170,6 @@ export const content_module = {
 				campaign.on('value', snapshot => {
 					commit('SET_CAMPAIGN', snapshot.val());
 				});
-			}
-		},
-		stopFetchNpcs({ rootGetters }) {
-			if (rootGetters.user) {
-				const uid = rootGetters.user.uid;
-				const npcs = npcs_ref.child(uid);
-				npcs.off();
 			}
 		},
 		remove_voucher( { rootGetters }) {
@@ -219,7 +202,7 @@ export const content_module = {
 			let overencumbered = false;
 			
 			count.campaigns = Object.keys(rootGetters["campaigns/campaigns"]).length;
-			count.players = Object.keys(rootGetters["players/players"]).length;
+			count.players = rootGetters["players/player_count"];
 			count.npcs = rootGetters["npcs/npc_count"];
 			count.encounters = 0;
 			

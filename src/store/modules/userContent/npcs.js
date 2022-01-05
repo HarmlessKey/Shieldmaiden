@@ -2,21 +2,33 @@ import Vue from 'vue';
 import { npcServices } from "@/services/npcs"; 
 import _ from "lodash";
 
+// Converts a full npc to a search_npc
+const convert_npc = (npc) => {
+	const properties = [
+		"name",
+		"challenge_rating",
+    "avatar",
+		"type"
+	];
+  const returnNpc = {};
+	
+	for(const prop of properties) {
+    if(npc.hasOwnProperty(prop)) {
+      returnNpc[prop] = (prop === "name") ? npc[prop].toLowerCase() : npc[prop];
+    }
+	}
+	return returnNpc;
+}
 
 const state = {
   npc_services: null,
   cached_npcs: {},
   npc_count: 0,
-  npcs: []
+  npcs: undefined
 };
 
 const getters = {
-  npcs: (state, getters, rootState, rootGetters) => { 
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      return state.cached_npcs[uid] || {};
-    } return {};
-  },
+  npcs: (state) => { return state.npcs; },
   npc_count: (state) => { return state.npc_count; },
   npc_services: (state) => { return state.npc_services; }
 };
@@ -33,24 +45,28 @@ const actions = {
    * Fetches all the npcs for a user
    * and stores them in cached_npcs.uid
    */
-  async fetch_npcs({ rootGetters, dispatch }, { startAfter, pageSize, query, sortBy, descending }) {
+  async get_npcs({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
+    let npcs_object = (state.npcs) ? state.npcs : undefined;
+
+    if(!npcs_object && uid) {
       const services = await dispatch("get_npc_services");
-      sortBy = (!sortBy || query) ? "name" : sortBy;
       try {
-        const npcs = await services.getNpcs(uid, startAfter, pageSize, query, sortBy, descending);
-        const order = (descending) ? "desc" : "asc";
+        npcs_object = await services.getNpcs(uid);
         
-        return _.chain(npcs)
-				.filter(function(npc, key) {
-					npc.key = key;
-					return npc;
-				}).orderBy(sortBy, order).value();       
+        commit("SET_NPCS", npcs_object);
       } catch(error) {
         throw error;
       }
     }
+    // Convert object to sorted array
+    const npcs = _.chain(npcs_object)
+    .filter(function(npc, key) {
+      npc.key = key;
+      return npc;
+    }).orderBy("name", "asc").value();
+
+    return npcs;
   },
 
   /**
@@ -79,7 +95,7 @@ const actions = {
       const services = await dispatch("get_npc_services");
       try {
         const npc = await services.getNpc(uid, id);
-        commit("SET_CACHED_NPC", { uid, npc });
+        commit("SET_CACHED_NPC", { uid, id, npc });
         return npc;
       } catch(error) {
         throw error;
@@ -101,8 +117,10 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        const id = await services.addNpc(uid, npc, new_count);
+        const search_npc = convert_npc(npc);
+        const id = await services.addNpc(uid, npc, new_count, search_npc);
         commit("SET_NPC_COUNT", new_count);
+        commit("SET_NPC", { id, search_npc });
         commit("SET_CACHED_NPC", { uid, id, npc });
         return id;
       } catch(error) {
@@ -124,7 +142,9 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.editNpc(uid, id, npc);
+        const search_npc = convert_npc(npc);
+        await services.editNpc(uid, id, npc, search_npc);
+        commit("SET_NPC", { id, search_npc });
         commit("SET_CACHED_NPC", { uid, id, npc });
         return;
       } catch(error) {
@@ -146,7 +166,13 @@ const actions = {
       const services = await dispatch("get_npc_services");
       try {
         await services.deleteNpc(uid, id, new_count);
+        commit("REMOVE_NPC", id);
+        commit("REMOVE_CACHED_NPC", { uid, id });
         commit("SET_NPC_COUNT", new_count);
+
+        // DELETE COMPANION FROM PLAYER
+        // A player might have this NPC as a companion, this needs to be deleted now.
+        
         return;
       } catch(error) {
         throw error;
@@ -157,7 +183,7 @@ const actions = {
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
   SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
-  SET_CACHED_NPCS(state, { uid, npcs }) { Vue.set(state.cached_npcs, uid, npcs); },
+  SET_NPCS(state, value) { Vue.set(state, "npcs", value); },
   SET_CACHED_NPC(state, { uid, id, npc }) { 
     if(state.cached_npcs[uid]) {
       Vue.set(state.cached_npcs[uid], id, npc);
@@ -165,7 +191,21 @@ const mutations = {
       Vue.set(state.cached_npcs, uid, { [id]: npc });
     }
   },
-  REMOVE_CACHED_NPC(state, { uid, id }) { Vue.delete(state.cached_npcs[uid], id); },
+  SET_NPC(state, { id, search_npc }) {
+    if(state.npcs) {
+      Vue.set(state.npcs, id, search_npc);
+    } else {
+      Vue.set(state, "npcs", { [id]: search_npc });
+    }
+  },
+  REMOVE_NPC(state, id) { 
+    console.log("remove", id)
+    Vue.delete(state.npcs, id); },
+  REMOVE_CACHED_NPC(state, { uid, id }) {
+    if(state.cached_npcs[uid]) {
+      Vue.delete(state.cached_npcs[uid], id);
+    }
+  },
 };
 
 export default {

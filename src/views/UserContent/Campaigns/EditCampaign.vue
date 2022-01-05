@@ -130,12 +130,10 @@
 			this.fetchCampaign({
 				cid: this.campaignId, 
 			});
-			this.fetchNpcs();
 		},
 		methods: {
 			...mapActions([
-				'fetchCampaign',
-				'fetchNpcs',
+				'fetchCampaign'
 			]),
 			edit() {
 				db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(this.campaign);

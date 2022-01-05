@@ -235,6 +235,8 @@
 										max="20"
 										v-model="playerBase.level"
 										:clearable="isXpAdvancement()"
+										:error="invalid && validated"
+										:error-message="errors[0]"
 									>
 										<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
 											{{ calculatedLevel(playerBase.experience) }}

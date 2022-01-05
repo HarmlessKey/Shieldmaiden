@@ -3,7 +3,7 @@
 		<div slot="header" class="card-header">
 			<span>
 				Players ( 
-				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ content_count.players }}</span> 
+				<span :class="{ 'green': true, 'red': player_count >= tier.benefits.players }">{{ player_count }}</span> 
 					/ 
 					<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
 					<template v-else>{{ tier.benefits.players }}</template>	
@@ -18,12 +18,12 @@
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
 			<template v-if="players">
 				<OutOfSlots
-					v-if="content_count.players >= tier.benefits.players"
+					v-if="player_count >= tier.benefits.players"
 					type = 'players'
 				/>
 				<hk-table
 					:columns="columns"
-					:items="_players"
+					:items="players"
 					:search="['character_name', 'campaign_name']"
 				>
 					<template slot="avatar" slot-scope="data">
@@ -91,7 +91,6 @@
 </template>
 
 <script>
-	import _ from 'lodash';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { db } from '@/firebase';
@@ -142,29 +141,11 @@
 				'tier',
 				'allEncounters',
 				'overencumbered',
-				'content_count',
 			]),
-			...mapGetters("players", ["players"]),
+			...mapGetters("players", ["players", "player_count"]),
 			...mapGetters("campaigns", ["campaigns"]),
-			_players: function() {
-				let vm = this;
-				return _.chain(this.players)
-				.filter(function(player, key) {
-					player.key = key
-					if (player.campaign_id) {
-						if (vm.campaigns[player.campaign_id] !== undefined)
-							player.campaign_name = vm.campaigns[player.campaign_id].campaign
-						else
-							player.campaign_id = undefined;
-					}
-
-					return player
-				})
-				.orderBy("character_name", 'asc')
-				.value()
-			},
 			slotsLeft() {
-				return this.tier.benefits.players - this.content_count.players
+				return this.tier.benefits.players - this.player_count
 			}
 		},
 		methods: {

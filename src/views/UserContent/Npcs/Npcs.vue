@@ -24,7 +24,7 @@
 				<p class="neutral-2">
 					These are your custom Non-Player Characters or monsters.
 				</p> 
-				<template v-if="npcs">
+				<template>
 					<OutOfSlots 
 						v-if="npc_count >= tier.benefits.npcs"
 						type="npcs"
@@ -38,13 +38,8 @@
 						debounce="300" 
 						clearable
 						placeholder="Search"
-						@change="searchNpcs"
-						@clear="searchNpcs"
-						:error="search !== undefined && !npcs.length"
-						:error-message='`No NPCs found starting with "${search}"`'
 					>
 						<q-icon slot="prepend" name="search" />
-						<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
 					</q-input>
 
 					<q-table
@@ -57,10 +52,9 @@
 						:dark="$store.getters.theme !== 'light'"
 						:loading="loading_npcs"
 						separator="none"
+						:pagination="{ rowsPerPage: 15 }"
+						:filter="search"
 						wrap-cells
-						:pagination.sync="pagination"
-						:rows-per-page-options="[0]"
-						@request="load"
 					>	
 						<template v-slot:body-cell="props">
 							<q-td v-if="props.col.name !== 'actions'">
@@ -96,11 +90,8 @@
 								</a>
 							</q-td>
 						</template>
-						<div slot="pagination">
-							1-{{npcs.length}} of {{(search && search.length) ? npcs.length : npc_count}}
-						</div>
 						<div slot="no-data" />
-						<hk-loader slot="loading" name="monsters" />
+						<hk-loader slot="loading" name="NPCs" />
 					</q-table>
 					<q-btn 
 						v-if="!search && npcs.length < npc_count"
@@ -129,7 +120,7 @@
 						</router-link>
 					</template>
 				</template>
-				<router-link v-else-if="npcs === null && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
+				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
 					Create your first NPC
 				</router-link>
 				<q-resize-observer @resize="setSize" />
@@ -184,7 +175,6 @@
 <script>
 	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import { mapActions, mapGetters } from "vuex";
-	import { db } from "@/firebase";
 	import { monsterMixin } from "@/mixins/monster";
 
 	export default {
@@ -204,7 +194,6 @@
 				json_input: undefined,
 				loading_npcs: true,
 				npcs: [],
-				paginationSetter: undefined,
 				search: "",
 				card_width: 0
 			}
@@ -212,24 +201,12 @@
 		computed: {
 			...mapGetters([
 				"tier",
-				"allEncounters",
 				"overencumbered",
 			]),
 			...mapGetters("players", ["players"]),
 			...mapGetters("campaigns", ["campaigns"]),
 			...mapGetters("npcs", ["npc_count"]),
-			pagination: {
-				get() {
-					return (this.paginationSetter) ? this.paginationSetter : {
-						sortBy: "name",
-						rowsPerPage: 15,
-						rowsNumber: this.npc_count
-					};
-				},
-				set(newVal) {
-					this.paginationSetter = newVal;
-				}
-			},
+
 			columns() {
 				return [
 					{
@@ -274,36 +251,12 @@
 			}
 		},
 		async mounted() {
-			await this.fetchNpcs();
+			this.npcs = await this.get_npcs();
+			this.loading_npcs = false;
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc"]),
-			async fetchNpcs(loadMore=false) {
-				await this.fetch_npcs({
-					startAfter: this.getStartAfterResult(loadMore),
-					pageSize: this.pagination.rowsPerPage,
-					query: this.search,
-					sortBy: this.pagination.sortBy,
-					descending: this.pagination.descending
-				}).then(results => {
-					this.npcs = (loadMore) ? this.npcs.concat(results) : results;
-					this.loading_npcs = false;
-				});
-			},
-			getStartAfterResult(loadMore) {
-				if(this.npcs.length && loadMore) {
-					return this.npcs.at(-1)[this.pagination.sortBy];
-				} return undefined;
-			},
-			load(req, loadMore=false) {
-				this.pagination = req.pagination;
-				this.fetchNpcs(loadMore);
-			},
-			searchNpcs() {
-				this.loading_npcs = true;
-				this.fetchNpcs();
-			},
+			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
@@ -346,36 +299,7 @@
 
 			},
 			async deleteNpc(key, index) {
-				//Remove the NPC from all encounters
-				for(let campaign in this.campaigns) {
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-
-						//Go over all encounters of the campaign
-						for(let enc in this.allEncounters[campaign]) {
-							var entities = this.allEncounters[campaign][enc].entities;
-
-							//Go over all entites in the encounter
-							for(let entityKey in entities) {
-								let npcId = entities[entityKey].id;
-								
-								//If the entity has the same id, delete it
-								if(npcId == key) {
-									db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities/${entityKey}`).remove();
-								}
-							}
-						}
-					}
-				}
-				// Remove NPC as companion from players
-				for (let playerKey in this.players) {
-					for (let companionKey in this.players[playerKey].companions) {
-						if (companionKey === key) {
-							db.ref(`players/${this.userId}/${playerKey}/companions/`).child(key).remove();
-						}
-					}
-				}
-				// Remove the NPC
-				this.npcs.splice(index, 1);
+				this.npcs.splice(index, 1)
 				this.delete_npc(key);
 			},
 			loadJSON() {
@@ -412,7 +336,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	
-</style>

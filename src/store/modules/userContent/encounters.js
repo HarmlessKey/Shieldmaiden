@@ -86,13 +86,18 @@ const actions = {
     if(!encounter) {
       const services = await dispatch("get_encounter_services");
       try {
-        const encounter = await services.getEncounter(uid, campaignId, id);
-        commit("SET_CACHED_ENCOUNTER", { uid, encounter });
-        return encounter;
+        encounter = await services.getEncounter(uid, campaignId, id);
       } catch(error) {
         throw error;
       }
     }
+
+    // REMOVE NON EXISTING NPCs
+    // REMOVE NON EXISTING PLAYERS
+    // REMOVE NON EXISTING COMPANIONS
+    // REMOVE NON EXISTING ITEM LINKS FROM LOOT
+
+    commit("SET_CACHED_ENCOUNTER", { uid, campaignId, id, encounter });
     return encounter;
   },
 
@@ -110,7 +115,7 @@ const actions = {
       const services = await dispatch("get_encounter_services");
       try {
         const id = await services.addEncounter(uid, campaignId, encounter);
-        commit("SET_CACHED_ENCOUNTER", { uid, id, value: encounter });
+        commit("SET_CACHED_ENCOUNTER", { uid, campaignId, id, encounter });
         return id;
       } catch(error) {
         throw error;
@@ -221,7 +226,7 @@ const actions = {
       const services = await dispatch("get_encounter_services");
       try {
         await services.editEncounter(uid, campaignId, encounterId, value);
-        commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId, value });
+        commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId, encounter: value });
         return;
       } catch(error) {
         throw error;
@@ -285,15 +290,15 @@ const mutations = {
   DELETE_ENTITY(state, { uid, campaignId, encounterId, entityId }) { 
     Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
   },
-  SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, value }) { 
+  SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, encounter }) { 
     if(state.cached_encounters[uid]) {
       if(state.cached_encounters[uid][campaignId]) {
-        Vue.set(state.cached_encounters[uid][campaignId], encounterId, value);
+        Vue.set(state.cached_encounters[uid][campaignId], encounterId, encounter);
       } else {
-        Vue.set(state.cached_encounters[uid], campaignId, { [encounterId]: value });
+        Vue.set(state.cached_encounters[uid], campaignId, { [encounterId]: encounter });
       }
     } else {
-      Vue.set(state.cached_encounters, uid, { [campaignId]: { [encounterId]: value } });
+      Vue.set(state.cached_encounters, uid, { [campaignId]: { [encounterId]: encounter } });
     }
   },
   REMOVE_CACHED_ENCOUNTER(state, { uid, campaignId, id }) { Vue.delete(state.cached_encounters[uid][campaignId], id); },

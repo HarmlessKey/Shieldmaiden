@@ -1,19 +1,18 @@
 import Vue from 'vue';
 import { playerServices } from "@/services/players"; 
+import _ from 'lodash';
 
 
 const state = {
   player_services: null,
+  players: [],
+  player_count: 0,
   cached_players: {}
 };
 
 const getters = {
-  players: (state, getters, rootState, rootGetters) => {
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      return state.cached_players[uid] || {};
-    } return {};
-  },
+  players: (state) => { return state.players; },
+  player_count: (state) => { return state.player_count; },
   player_services: (state) => { return state.player_services; }
 };
 
@@ -29,13 +28,26 @@ const actions = {
    * Fetches all the players for a user
    * and stores them in cached_players.uid
    */
-  async fetch_players({ rootGetters, commit, dispatch }) {
+  async get_players({ rootGetters, commit, dispatch }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        const players = await services.getPlayers(uid);
-        commit("SET_CACHED_PLAYERS", { uid, players });
+        const search_players = await services.getPlayers(uid);
+
+        // Set player count
+        if(search_players.metadata && search_players.metadata.count) {
+          commit("SET_PLAYER_COUNT", search_players.metadata.count);
+        }
+
+        const players = _.chain(search_players.results)
+          .filter(function(player, key) {
+            player.key = key;
+            return player;
+          }).orderBy("name", "asc").value(); 
+
+        // Set player list
+        commit("SET_PLAYERS", players);
         return;
       } catch(error) {
         throw error;
@@ -51,12 +63,23 @@ const actions = {
       const services = await dispatch("get_player_services");
       try {
         const player = await services.getPlayer(uid, id);
-        commit("SET_CACHED_PLAYER", { uid, player });
+        commit("SET_CACHED_PLAYER", { uid, id, player });
+        return player;
       } catch(error) {
         throw error;
       }
     }
     return player;
+  },
+
+  async get_owner_id({dispatch}, { uid, playerId }) {
+    const services = await dispatch("get_player_services");
+    try {
+      const userId = await services.getOwner(uid, playerId);
+      return userId.user;
+    } catch(error) {
+      throw error;
+    }
   },
 
   /**
@@ -167,6 +190,8 @@ const actions = {
 };
 const mutations = {
   SET_PLAYER_SERVICES(state, payload) { Vue.set(state, "player_services", payload); },
+  SET_PLAYERS(state, payload) { Vue.set(state, "players", payload); },
+  SET_PLAYER_COUNT(state, value) { Vue.set(state, "player_count", value); },
   SET_CACHED_PLAYERS(state, { uid, players }) { Vue.set(state.cached_players, uid, players); },
   SET_CACHED_PLAYER(state, { uid, id, player }) { 
     if(state.cached_players[uid]) {

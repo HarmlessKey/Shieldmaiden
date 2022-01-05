@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<ValidationObserver v-if="player" v-slot="{ handleSubmit, valid }">
+	<div v-if="!loading">
+		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(savePlayer)">
 				<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 
@@ -328,51 +328,18 @@
 					<hk-card header="Companions">
 						<div class="card-body">
 							<template v-if="isOwner()">
-								<div v-if="!npcs">
+								<div v-if="!npc_count">
 									<p>You currently have no custom npcs created</p>
 									<p>First create a custom NPC to use as a companion</p>
-									<router-link class="btn bg-green" to="/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
+									<router-link class="btn bg-green" to="/content/npcs"><i class="fas fa-plus"></i>Add an NPC</router-link>
 								</div>
-								<div v-else>
-									<q-input 
-										:dark="$store.getters.theme === 'dark'" filled square dense
-										label="Search NPC"
-										type="text" 
-										autocomplete="off" 
-										v-model="search" @keyup="searchNPC()"
-									>
-										<q-icon slot="append" size="xs" name="fas fa-search" @click="searchNPC()"/>
-									</q-input>
-
-									<ul class="entities">
-										<p v-if="noResult" class="red">{{ noResult }}</p>
-										<li v-for="(npc, index) in searchResults" :key="index" class="d-flex justify-content-between">
-											<div class="d-flex justify-content-left">
-												<a @click="setSlide({show: true, type: 'ViewEntity', data: npc})" class="mr-2">
-													<i class="fas fa-info-circle"></i>
-													<q-tooltip anchor="top middle" self="center middle">
-														Show info
-													</q-tooltip>
-												</a>
-												{{ npc.name }}
-											</div>
-											<a class="neutral-2" v-if="notAdded(npc)" @click="add(npc)">
-												<i class="fas fa-plus green"></i>
-												<span class="d-none d-md-inline ml-1">Add</span>
-												<q-tooltip anchor="top middle" self="center middle">
-													Add companion
-												</q-tooltip>
-											</a>
-											<span v-else><small>Already added.</small></span>
-										</li>
-									</ul>
-								</div>
+								<CopyMonster v-else @copy="add" :custom-only="true" :disabled-custom="npcsAsCompanion" />
 							</template>
 
 							<!--  Companions table -->
 							<hk-table v-if="player.companions !== undefined"
 								:columns="columns"
-								:items="_companions"
+								:items="companions"
 							>
 								<template slot="avatar" slot-scope="data">
 									<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
@@ -427,11 +394,8 @@
 				</div>
 			</q-form>
 		</ValidationObserver>
-		<div v-else-if="$route.name == 'Edit Character'">
-			<p class="red">You have no conrol over this character</p>
-			<router-link to="/content/players" class="btn bg-neutral-5 mr-2 mt-3">Back</router-link>
-		</div>
 	</div>
+	<hk-loader v-else name="player" />
 </template>
 
 <script>
@@ -443,6 +407,7 @@
 	import { skills } from '@/mixins/skills.js';
 	import { general } from '@/mixins/general.js';
 	import Defenses from './Defenses';
+	import CopyMonster from '../../../components/CopyMonster.vue';
 
 	export default {
 		name: 'Players',
@@ -453,15 +418,17 @@
 		components: {
 			OverEncumbered,
 			GiveCharacterControl,
-			Defenses
+			Defenses,
+			CopyMonster
 		},
 		data() {
 			return {
 				playerId: this.$route.params.id,
-				search: '',
-				searchResults: [],
-				noResult: '',
+				userId: undefined,
+				player: {},
+				loading: false,
 				companions_to_delete: [],
+				companions: [],
 				columns: {
 					avatar: {
 						width: 46,
@@ -482,45 +449,16 @@
 		},
 		firebase() {
 			return {
-				abilities: db.ref('abilities'),
-				player: {
-					source: db.ref(`players/${this.userId}/${this.playerId}`),
-					asObject: true
-				}
+				abilities: db.ref('abilities')
 			}
 		},
 		computed: {
 			...mapGetters([
 				'tier',
-				'players',
 				'overencumbered',
-				'npcs',
 			]),
-			_companions: function() {
-				let comps = [];
-				if (Object.keys(this.npcs).length > 0) {
-					for (let key in this.player.companions) {
-						let npc = this.npcs[key];
-						npc.key = key;
-						comps.push(npc);
-					}
-				}
-				return comps;
-			},
-			//User ID needs te be different if it is
-			//an external controlled character
-			userId() {
-				if(!this.isOwner()) {
-					let id = undefined
-					let user = db.ref(`character_control/${this.$store.getters.user.uid}/${this.$route.params.id}`);
-					user.on('value' , (snapshot) => {
-						id = snapshot.val().user
-					});
-					return id;
-				} else {
-					return this.$store.getters.user.uid;
-				}
-			},
+			...mapGetters("npcs", ["npc_count"]),
+			...mapGetters("players", ["players"]),
 			skills: {
 				get() {
 					return this.player.skills ? this.player.skills : [];
@@ -537,8 +475,19 @@
 					this.$set(this.player, 'skills_expertise', newValue);
 				}
 			},
+			npcsAsCompanion() {
+				const companions = [];
+				for(const player of this.players) {
+					if(player.companions) {
+						for(const key in player.companions) {
+							companions.push(key);
+						}
+					}
+				}
+				return companions;
+			}
 		},
-		mounted() {
+		async mounted() {
 			if(this.$route.name === 'AddPlayers') {
 				this.$set(this.player, "strength", 10);
 				this.$set(this.player, "dexterity", 10);
@@ -547,15 +496,39 @@
 				this.$set(this.player, "wisdom", 10);
 				this.$set(this.player, "charisma", 10);
 			}
+
+			//User ID needs te be different if it is
+			//an external controlled character
+			if(!this.isOwner()) {
+				this.userId = await this.get_owner_id({ uid: this.$store.getters.user.uid, playerId: this.playerId });
+			} else {
+				this.userId = this.$store.getters.user.uid;
+			}
+
+			if(this.playerId) {
+				this.loading = true;
+				await this.get_player({ uid: this.userId, id: this.playerId }).then(async (player) => {
+					this.player = player;
+
+					let comps = [];
+					for (let key in this.player.companions) {
+						let npc = await this.get_npc({ uid: this.userId, id: key});
+						npc.key = key;
+						comps.push(npc);
+					}
+					this.companions = comps;
+					this.loading = false;
+				});
+			}
 		},
 		methods: {
 			...mapActions([
 				'setSlide'
 			]),
+			...mapActions("players", ["get_player", "get_owner_id"]),
+			...mapActions("npcs", ["get_npc"]),
 			isOwner() {
-				if (this.$route.name == 'Edit Character')
-					return false
-				return true
+				return (this.$route.name === 'Edit player');
 			},
 			savePlayer() {
 				if(this.$route.name === "Add player") {
@@ -644,40 +617,20 @@
 					this.noResult = 'No results for "' + this.search + '"';
 				}
 			},
-			add(npc) {
+			add({ npc, id }) {
 				if (this.player.companions === undefined) {
 					this.$set(this.player, 'companions', {});
 				}
 
-				this.$set(this.player.companions, npc.key, true);
-
-				this.searchResults = [];
-				this.search = '';
+				this.$set(this.player.companions, id, true);
+				this.companions.push(npc)
 
 				// If companion was deleted before saving, undelete it
-				if (this.companions_to_delete.indexOf(npc.key) > -1) {
-					this.companions_to_delete.splice(this.companions_to_delete.indexOf(npc.key), 1);
+				if (this.companions_to_delete.indexOf(id) > -1) {
+					this.companions_to_delete.splice(this.companions_to_delete.indexOf(id), 1);
 				}
 
 				this.$forceUpdate();
-			},
-			notAdded(npc) {
-				let key = npc.key;
-				// Check for companion in player
-				for (let i in this.player.companions) {
-					if (i == key)
-						return false;
-				}
-				// Check for companion in all other players (no own)
-				for (let pI in this.players) {
-					if (this.player['.key'] !== pI) {
-						for (let i in this.players[pI].companions) {
-							if (i == key)
-								return false;
-						}
-					}
-				}
-				return true;
 			},
 			confirmDelete(index) {
 				this.$delete(this.player.companions, index)

@@ -212,7 +212,7 @@
 					return false;
 				} return true;
 			},
-			copy(npc) {
+			copy({ npc }) {
 				this.copy_dialog = false;
 				this.npc = npc;
 			},

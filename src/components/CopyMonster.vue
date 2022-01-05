@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-btn-toggle
-			v-if="npc_count"
+			v-if="npc_count && !customOnly"
 			class="mb-3"
 			:value="copy_resource"
 			spread
@@ -16,6 +16,7 @@
 			<q-input 
 				:dark="$store.getters.theme === 'dark'" filled square
 				:label="copy_resource === 'custom' ? 'Search NPC' : 'Search monster'"
+				@keydown.enter.prevent.stop="search"
 				type="text" 
 				autocomplete="off" 
 				v-model="query" 
@@ -29,12 +30,17 @@
 				</template>
 			</q-input>
 			<q-list :dark="$store.getters.theme === 'dark'">
-				<q-item v-for="(npc, index) in searchResults" :key="index" class="bg-neutral-8">
+				<q-item 
+					v-for="(npc, index) in searchResults" 
+					:key="index" 
+					class="bg-neutral-8"
+					:disabled="disabledCustom.includes(npc.key)"
+				>
 					<q-item-section>
 						{{ npc.name.capitalizeEach() }}
 					</q-item-section>
 					<q-item-section avatar>
-						<a class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? npc.key : npc._id)">
+						<a v-if="!disabledCustom.includes(npc.key)" class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? npc.key : npc._id)">
 							<i class="fas fa-copy"/>
 						</a>
 					</q-item-section>
@@ -48,6 +54,16 @@
 
 	export default {
 		name: "CopyMonster",
+		props: {
+			customOnly: {
+				type: Boolean,
+				default: false
+			},
+			disabledCustom: {
+				type: Array,
+				default: () => { return []; }
+			}
+		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
@@ -61,7 +77,7 @@
 			...mapGetters("npcs", ["npc_count"]),
 			copy_resource: {
 				get() {
-					const resource = (this.npc_count) ? "custom" : "srd";
+					const resource = (this.npc_count || this.customOnly) ? "custom" : "srd";
 					return (this.copy_resource_setter) ? this.copy_resource_setter : resource;
 				},
 				set(newVal) {
@@ -115,7 +131,7 @@
 					delete npc.key;
 					delete npc.url;
 
-					this.$emit("copy", npc);
+					this.$emit("copy", { npc, id });
 
 				// Clear search
 				this.searchResults = [];

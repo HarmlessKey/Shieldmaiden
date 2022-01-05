@@ -50,7 +50,16 @@
 						wrap-cells
 					>
 						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
+
+							<q-td
+								v-if="props.col.name === 'image'"
+								class="avatar"
+								:style="props.value ? `background-image: url(${props.value})` : ''"
+							>
+								<i v-if="!props.value" class="hki-axe" />
+							</q-td>
+
+							<q-td v-else-if="props.col.name !== 'actions'">
 								<div class="truncate-cell">
 									<div class="truncate">
 										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
@@ -84,67 +93,6 @@
 
 				</template>
 
-
-
-
-				<!-- <br>
-				<br>
-
-
-				<hk-table
-					:columns="columns"
-					:items="items"
-					:perPage="20"
-					:search="['name', 'type']"
-				>
-					<template slot="image" slot-scope="data">
-						<div class="image" v-if="data.item" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }"></div>
-						<img v-else class="image" src="@/assets/_img/styles/axe.svg" />
-					</template>
-
-					<template slot="name" slot-scope="data">
-						<router-link class="mx-2" :to="`${$route.path}/${data.row.key}`">
-							{{ data.item }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="`${$route.path}/${data.row.key}`">
-							<i class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row.name)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.items !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open item slot</span>
-						<router-link v-if="!overencumbered" to="/content/items/add-item">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="!tier || tier.name === 'Free'">
-					<router-link class="openSlot none" to="/patreon">
-						Support us on Patreon for more slots.
-					</router-link>
-				</template>
-			-->
 			</div>
 		</hk-card>
 		<h3 v-else-if="items === null" class="mt-4">
@@ -181,9 +129,8 @@
 				columns: [
 					{
 						name: "image",
-						label: "Image",
+						label: "",
 						field: "image",
-						sortable: true,
 						align: "left",
 					},
 					{
@@ -201,28 +148,12 @@
 				],
 			}
 		},
-		// firebase() {
-		// 	return {
-		// 		items: db.ref(`custom_items/${this.userId}`)
-		// 	}
-		// },
 		computed: {
 			...mapGetters([
-				// 'campaigns',
-				// 'item_count',
 				'tier',
 				'overencumbered',
 			]),
 			...mapGetters('items', ["item_count"]),
-			// _items: function() {
-			// 	return _.chain(this.items)
-			// 	.filter(function(item) {
-			// 		item.key = item['.key']
-			// 		return item
-			// 	})
-			// 	.orderBy("name", 'asc')
-			// 	.value()
-			// },
 			slotsLeft() {
 				return this.tier.benefits.items - Object.keys(this.items).length;
 			}
@@ -259,46 +190,30 @@
 				}
 			},
 			deleteItem(key, index) {
-
-				//Remove the item from all inventories
-				// for(let campaignKey in this.campaigns) {
-				// 	let campaign = this.campaigns[campaignKey];
-
-				// 	if(campaign.inventory) {
-				// 		for(let itemKey in campaign.inventory.items) {
-				// 			let linked_item = campaign.inventory.items[itemKey].linked_item;
-
-				// 			if(linked_item === key){
-				// 				db.ref(`campaigns/${this.userId}/${campaignKey}/inventory/items/${itemKey}`).child('linked_item').remove();
-				// 			}
-				// 		}
-				// 	}
-				// }
 				//Remove item
 				this.items.splice(index, 1);
 				this.delete_item(key);
-				// db.ref('custom_items/' + this.userId).child(key).remove(); 
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.container-fluid {
-		padding: 20px;
+	// .container-fluid {
+	// 	padding: 20px;
 
-		h2 {
-			border-bottom: solid 1px $neutral-4;
-			padding-bottom: 10px;
+	// 	h2 {
+	// 		border-bottom: solid 1px $neutral-4;
+	// 		padding-bottom: 10px;
 
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
+	// 		a {
+	// 			text-transform: none;
+	// 			color: $neutral-2 !important;
 
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
+	// 			&:hover {
+	// 				text-decoration: none;
+	// 			}
+	// 		}
+	// 	}
+	// }
 </style>

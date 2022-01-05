@@ -1,7 +1,7 @@
 <template>
 	<div class="content__edit" v-if="item || $route.name === 'Add item'">
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveItem)">
+			<q-form @submit="handleSubmit(saveItem(valid))">
 				<hk-card header="Your Item">
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
@@ -329,7 +329,11 @@
 			// 	this.searched = '';
 			// 	this.copy_dialog = false;
 			// },
-			saveItem() {
+			saveItem(valid) {
+				if (!valid) {
+					this.$snotify.error("There are validation errors.", "Critical miss!", { position: "rightTop" });
+					return;
+				}
 				if(this.$route.name === "Add item" && !this.itemId) {
 					this.addItem();
 				} else {

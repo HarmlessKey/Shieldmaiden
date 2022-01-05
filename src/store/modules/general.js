@@ -42,6 +42,7 @@ export const general_module = {
 							// players need prio!
 							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
+							dispatch("items/fetch_item_count"),
 							dispatch("campaigns/fetch_campaigns"),
 							dispatch("encounters/fetch_encounters"),
 						]);

@@ -3,8 +3,19 @@ import { db } from "@/firebase";
 const NPCS_REF = db.ref("npcs");
 const SEARCH_NPCS_REF = db.ref("search_npcs");
 
+/**
+ * NPC Firebase Service
+ * CRUD interface implementation for Firebase
+ * Updates both 'npcs' and 'search_npcs' ref on CRUD
+ */
 export class npcServices {
 
+  /**
+   * Get all the npcs from the search_npcs reference
+   * 
+   * @param {String} uid ID of active user
+   * @returns All the content of search_npcs reference
+   */
   async getNpcs(uid) {
     try {
       const npcs = await SEARCH_NPCS_REF.child(`${uid}/results`).once('value', snapshot => {
@@ -16,6 +27,12 @@ export class npcServices {
     }
   }
 
+  /**
+   * Get the number of NPCs that a user has from the search_npcs reference
+   * 
+   * @param {String} uid ID of active user
+   * @returns Number of npcs of a user
+   */
   async getNpcCount(uid) {
     try {
       const path = `${uid}/metadata/count`;
@@ -28,6 +45,13 @@ export class npcServices {
     }
   }
 
+  /**
+   * Get an entire NPC from npcs reference
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of the requested NPC
+   * @returns An entire NPC from the npcs reference
+   */
   async getNpc(uid, id) {
     console.log(`NPC ${id} fetched from database`)
     try {
@@ -40,6 +64,16 @@ export class npcServices {
     }
   }
 
+  /**
+   * Adds an NPC to the 'npcs' ref and the 'search_npcs' ref.
+   * Also updates the count metadata in 'search_npcs'
+   * 
+   * @param {String} uid ID of active user
+   * @param {Object} npc NPC to add
+   * @param {Int} new_count Updated number of NPCs
+   * @param {Object} search_npc Compressed NPC
+   * @returns Key of the newly added NPC
+   */
   async addNpc(uid, npc, new_count, search_npc) {
     try {
       npc.name = npc.name.toLowerCase();
@@ -55,6 +89,14 @@ export class npcServices {
     }
   }
 
+  /**
+   * Updates an existing NPC in both 'npcs' and 'search_npcs' ref
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of NPC to edit
+   * @param {Object} npc Edited NPC
+   * @param {Object} search_npc Compressed NPC
+   */
   async editNpc(uid, id, npc, search_npc) {
     NPCS_REF.child(uid).child(id).set(npc).then(() => {
       SEARCH_NPCS_REF.child(`${uid}/results/${id}`).set(search_npc);
@@ -64,6 +106,13 @@ export class npcServices {
     });
   }
 
+  /**
+   * Deletes an existing NPC in both 'npcs' and 'search_npcs' ref
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of NPC to edit
+   * @param {Int} new_count Updated number of NPCs
+   */
   async deleteNpc(uid, id, new_count) {
     try {
       NPCS_REF.child(uid).child(id).remove();
@@ -77,7 +126,7 @@ export class npcServices {
     }
   }
 
-  async getAllNpcs(uid) {
+  async getFullNpcs(uid) {
     try {
       const all_npcs = await NPCS_REF.child(uid).once('value', (snapshot) => {
 

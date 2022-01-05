@@ -62,7 +62,7 @@
 				},
 				search_fields: {
 					'npcs': ['name->lower', 'challenge_rating', 'type', 'avatar'],
-					'custom_items': ['name'],
+					'custom_items': ['name', 'image'],
 					'reminders': ['name'],
 					'players': ['character_name', 'campaign_id', 'companions', 'avatar'],
 					'encounters': ['encounter:name', 'round', 'turn', 'entities:entity_count->count'],

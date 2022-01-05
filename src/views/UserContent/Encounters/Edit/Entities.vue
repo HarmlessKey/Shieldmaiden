@@ -384,7 +384,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["fetch_npcs", "get_npc"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 

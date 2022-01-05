@@ -429,7 +429,7 @@
 			}
 		},
 		methods: {
-			...mapActions("monsters", ["get_monster"]),
+			...mapActions("api_monsters", ["get_monster"]),
 			...mapActions(["setActionRoll"]),
 			roll(e, action, versatile) {
 				const config = {

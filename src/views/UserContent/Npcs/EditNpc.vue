@@ -172,7 +172,7 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {

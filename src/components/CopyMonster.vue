@@ -94,7 +94,7 @@
 			this.npcs = await this.get_npcs();
 		},
 		methods: {
-			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
 			changeCopyResource(value) {
 				this.copy_resource = value;

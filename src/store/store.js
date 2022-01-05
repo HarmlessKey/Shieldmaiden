@@ -6,7 +6,8 @@ import { tips_module } from '@/store/modules/tips';
 import { encounter_module } from '@/store/modules/encounter';
 import { content_module } from '@/store/modules/content';
 import { content_spells } from '@/store/modules/content/spells.js';
-import monsters from '@/store/modules/content/monsters.js';
+import api_monsters from '@/store/modules/content/monsters.js';
+import api_items from '@/store/modules/content/items.js';
 import campaigns from '@/store/modules/userContent/campaigns.js';
 import npcs from '@/store/modules/userContent/npcs.js';
 import items from '@/store/modules/userContent/items.js';
@@ -36,7 +37,8 @@ export const store = new Vuex.Store({
 		encounter: encounter_module,
 		spells: content_spells,
 		campaigns: campaigns,
-		monsters: monsters,
+		api_monsters: api_monsters,
+		api_items: api_items,
 		npcs: npcs,
 		items: items,
 		players: players,

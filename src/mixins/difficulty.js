@@ -138,7 +138,7 @@ export const difficulty = {
 	},
 	methods: {
 		...mapActions("npcs", ["get_npc"]),
-		...mapActions("monsters", ["get_monster"]),
+		...mapActions("api_monsters", ["get_monster"]),
 		async difficulty(entities) {
 			var totalXp = 0;
 			var nMonsters = 0;

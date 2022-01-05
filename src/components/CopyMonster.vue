@@ -70,7 +70,8 @@
 				query: "",
 				searchResults: [],
 				noResult: "",
-				copy_resource_setter: undefined
+				copy_resource_setter: undefined,
+				npcs: []
 			}
 		},
 		computed: {
@@ -85,9 +86,12 @@
 				}
 			},
 		},
+		async mounted() {
+			this.npcs = await this.get_npcs();
+		},
 		methods: {
 			...mapActions("monsters", ["get_monsters", "get_monster"]),
-			...mapActions("npcs", ["get_npc", "fetch_npcs"]),
+			...mapActions("npcs", ["get_npcs", "get_npc"]),
 			changeCopyResource(value) {
 				this.copy_resource = value;
 				this.query = "";
@@ -97,9 +101,10 @@
 			async search() {
 				if(this.query) {
 					if(this.copy_resource === "custom") {
-						await this.fetch_npcs({
-						query: this.query
-					}).then(results => {
+						const results = this.npcs.filter(npc => {
+							return npc.name.toLowerCase().includes(this.query.toLowerCase())
+						});
+
 						if(results && results.length) {
 							this.noResult = "";
 							this.searchResults = results;
@@ -108,7 +113,6 @@
 							this.searchResults = [];
 							this.noResult = 'Nothing found starting with "' + this.query + '"';
 						}
-					});
 					} else {
 						await this.get_monsters({ query: { search: this.query }}).then(results => {
 							if(results.meta.count === 0) {
@@ -119,6 +123,9 @@
 							}
 						});
 					}
+				} else {
+					this.noResult = "";
+					this.searchResults = [];
 				}
 			},
 			async copy(id) {

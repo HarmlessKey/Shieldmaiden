@@ -66,7 +66,7 @@
 					'reminders': ['name'],
 					'players': ['character_name', 'campaign_id', 'companions', 'avatar'],
 					'encounters': ['encounter:name', 'round', 'turn', 'entities:entity_count->count'],
-					'campaigns': ['campaign:name', 'timestamp', 'advancement', 'players:player_count->count']
+					'campaigns': ['campaign:name', 'timestamp', 'advancement', 'players:player_count->count', 'private']
 
 				}
 			}

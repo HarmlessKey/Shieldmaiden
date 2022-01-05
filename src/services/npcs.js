@@ -76,4 +76,18 @@ export class npcServices {
       throw error;
     }
   }
+
+  async getAllNpcs(uid) {
+    try {
+      const all_npcs = await NPCS_REF.child(uid).once('value', (snapshot) => {
+
+        return snapshot;
+      })
+
+      return all_npcs.val();
+
+    } catch(error) {
+      throw error;
+    }
+  }
 }

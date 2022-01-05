@@ -10,14 +10,21 @@
 					<template v-else>{{ tier.benefits.npcs }}</template>
 					)
 				</span>
-				<a class="btn btn-sm bg-neutral-5"
-					@click="bulk_import_dialog = true"
-				>
-					Bulk Import NPCs
-				</a>
-				<router-link class="btn btn-sm bg-neutral-5" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
-					<i class="fas fa-plus green"></i> New NPC
-				</router-link>
+				<span>
+					<a class="btn btn-sm bg-neutral-5 mr-2"
+						@click="exportAll()"
+					>
+						Export NPCs
+					</a>
+					<a class="btn btn-sm bg-neutral-5 mr-2"
+						@click="import_dialog = true"
+					>
+						Import NPCs
+					</a>
+					<router-link class="btn btn-sm bg-neutral-5 mr-2" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
+						<i class="fas fa-plus green"></i> New NPC
+					</router-link>
+				</span>
 			</div>
 
 			<div class="card-body">
@@ -82,7 +89,7 @@
 										Delete
 									</q-tooltip>
 								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="downloadJSON(props.key)">
+								<a class="btn btn-sm bg-neutral-5" @click="exportNPC(props.key)">
 									<i class="fas fa-brackets-curly"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Export JSON
@@ -128,44 +135,10 @@
 		</hk-card>
 
 		<!-- Bulk import dialog -->
-		<q-dialog v-model="bulk_import_dialog">
+		<q-dialog v-model="import_dialog">
 			<hk-card header="Import NPC from JSON" :minWidth="400">
 				<div class="card-body">
-					<q-file 
-						:dark="$store.getters.theme === 'dark'" 
-						filled square 
-						accept=".json"
-						v-model="json_file" 
-						@input="loadJSON()"
-					>
-						<template v-slot:prepend>
-							<q-icon name="attach_file" />
-						</template>
-					</q-file>
-
-					<h4 class="my-3">
-						OR
-					</h4>
-					<ValidationObserver  v-slot="{ handleSubmit }">
-
-						<q-form @submit="handleSubmit(parseJSON)">
-							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
-								<q-input
-									:dark="$store.getters.theme === 'dark'" 
-									filled square 
-									type="textarea"
-									label="JSON Input"
-									v-model="json_input"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-
-							</ValidationProvider>
-							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
-								Parse Input
-							</q-btn>
-						</q-form>
-					</ValidationObserver>
+					<ImportNPC @imported="imported"/>
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -176,6 +149,7 @@
 	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import { mapActions, mapGetters } from "vuex";
 	import { monsterMixin } from "@/mixins/monster";
+	import ImportNPC from "@/components/ImportNPC.vue";
 
 	export default {
 		name: "Npcs",
@@ -184,14 +158,13 @@
 		},
 		mixins: [monsterMixin],
 		components: {
-			OutOfSlots
-		},
+    OutOfSlots,
+    ImportNPC
+},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				bulk_import_dialog: false,
-				json_file: undefined,
-				json_input: undefined,
+				import_dialog: false,
 				loading_npcs: true,
 				npcs: [],
 				search: "",
@@ -263,15 +236,6 @@
 					(val == 0.5) ? "1/2" :
 					val;
 			},
-			async downloadJSON(id) {
-				const npc = await this.get_npc({ uid: this.userId, id });
-				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(npc, null ,2)); 
-				var downloadAnchorNode = document.createElement('a'); 
-				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", npc.name.trim() + ".json");
-				document.body.appendChild(downloadAnchorNode);  // required for firefox 
-				downloadAnchorNode.click(); 
-				downloadAnchorNode.remove(); 
-			},
 			confirmDelete(e, key, npc, index) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -302,37 +266,44 @@
 				this.npcs.splice(index, 1)
 				this.delete_npc(key);
 			},
-			loadJSON() {
-				const fr = new FileReader();
-
-				fr.onload = e => {
-					const result = JSON.parse(e.target.result)
-					// const formatted = JSON.stringify(result, null, 2)
-					// console.log(formatted)
-					delete result.key
-
-					console.log(result)
-					
-					this.import_dialog = false
-					this.json_file = undefined
-
+			async imported(npcs) {
+				if (!(npcs instanceof Array)) {
+					npcs = [npcs];
 				}
-
-				fr.readAsText(this.json_file)
-			},
-			parseJSON() {
-
-				let input = JSON.parse(this.json_input)
-				delete input.key
-				
-				this.npc = input
-
-				this.import_dialog = false
-				this.json_input = ""
+				this.import_dialog = false;
+				for (const npc of npcs) {
+					await this.add_npc(npc);
+				}
+				this.$snotify.success(`Imported ${npcs.length} Monsters`, 'Critical hit!', {position: "rightTop"});
 			},
 			setSize(e) {
 				this.card_width = e.width;
-			}
+			},
+			async exportAll() {
+				const all_npcs = await this.get_all_npcs();
+				const json_export = Object.values(all_npcs);
+				this.downloadJSON(json_export);
+			},
+			async exportNPC(id) {
+				const npc = await this.get_npc({ uid: this.userId, id });
+				this.downloadJSON(npc);
+			},
+			async downloadJSON(data) {
+				let filename = "export.json"
+				if (data instanceof Array) {
+					filename = "harmlesskey_npcs.json";
+				}
+				else {
+					filename = data.name.trim() + ".json";
+				}
+
+				var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null ,2)); 
+				var downloadAnchorNode = document.createElement('a'); 
+				downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", filename);
+				document.body.appendChild(downloadAnchorNode);  // required for firefox 
+				downloadAnchorNode.click();
+				downloadAnchorNode.remove();
+			},
 		}
 	}
 </script>

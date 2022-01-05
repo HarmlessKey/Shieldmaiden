@@ -83,42 +83,7 @@
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<q-file 
-						:dark="$store.getters.theme === 'dark'" 
-						filled square 
-						label="Select or drag a file"
-						accept=".json"
-						v-model="json_file" 
-						@input="loadJSON()"
-					>
-						<template v-slot:prepend>
-							<q-icon name="attach_file" />
-						</template>
-					</q-file>
-
-					<h4 class="my-3">
-						OR
-					</h4>
-					<ValidationObserver  v-slot="{ handleSubmit }">
-
-						<q-form @submit="handleSubmit(parse_JSON_input)">
-							<ValidationProvider rules="json" name="JSON" v-slot="{ errors, invalid, validated}">
-								<q-input
-									:dark="$store.getters.theme === 'dark'" 
-									filled square 
-									type="textarea"
-									label="JSON Input"
-									v-model="json_input"
-									:error="invalid && validated"
-									:error-message="errors[0]"
-								/>
-
-							</ValidationProvider>
-							<q-btn class="btn btn-sm my-2" color="primary" no-caps type="submit" :disabled="!json_input">
-								Parse Input
-							</q-btn>
-						</q-form>
-					</ValidationObserver>
+					<ImportNPC @imported="imported" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -136,7 +101,8 @@
 	import Defenses from '@/components/npcs/Defenses';
 	import SpellCasting from '@/components/npcs/SpellCasting';
 	import Actions from '@/components/npcs/Actions';
-	import CopyMonster from "@/components/CopyMonster"
+	import CopyMonster from "@/components/CopyMonster";
+	import ImportNPC from "@/components/ImportNPC";
 
 	export default {
 		name: 'Npcs',
@@ -152,7 +118,8 @@
 			Defenses,
 			SpellCasting,
 			Actions,
-			CopyMonster
+			CopyMonster,
+			ImportNPC
 		},
 		data() {
 			return {
@@ -165,8 +132,8 @@
 				copy_resource_setter: undefined,
 				import_dialog: false,
 				unsaved_changes: false,
-				json_file: undefined,
-				json_input: ""
+				// json_file: undefined,
+				// json_input: ""
 			}
 		},
 		async mounted() {
@@ -214,6 +181,17 @@
 			},
 			copy({ npc }) {
 				this.copy_dialog = false;
+				this.npc = npc;
+			},
+			imported(npc) {
+				if (npc instanceof Array) {
+					if (npc.length > 1) {
+						this.$snotify.warning("Imported first in list", "Multiple NPCs")
+					}
+					npc = npc[0]
+				}
+				
+				this.import_dialog = false;
 				this.npc = npc;
 			},
 			revert_changes() {
@@ -270,37 +248,37 @@
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},
-			loadJSON() {
-				const fr = new FileReader();
+			// loadJSON() {
+			// 	const fr = new FileReader();
 
-				fr.onload = e => {
-					const result = JSON.parse(e.target.result)
-					// const formatted = JSON.stringify(result, null, 2)
-					// console.log(formatted)
-					delete result.key
+			// 	fr.onload = e => {
+			// 		const result = JSON.parse(e.target.result)
+			// 		// const formatted = JSON.stringify(result, null, 2)
+			// 		// console.log(formatted)
+			// 		delete result.key
 
-					this.npc = result
-					this.import_dialog = false
-					this.json_file = undefined
+			// 		this.npc = result
+			// 		this.import_dialog = false
+			// 		this.json_file = undefined
 
-					console.log(this.npc)
-				}
+			// 		console.log(this.npc)
+			// 	}
 
-				fr.readAsText(this.json_file)
-			},
-			parse_JSON_input() {
+			// 	fr.readAsText(this.json_file)
+			// },
+			// parse_JSON_input() {
 
-				try {
-					this.npc = JSON.parse(this.json_input);
-					this.import_dialog = false;
-					this.json_input = "";
-				} 
-				catch {
-					console.log("Invalid JSON");
-					this.$snotify.error("Invalid JSON");
-				}
+			// 	try {
+			// 		this.npc = JSON.parse(this.json_input);
+			// 		this.import_dialog = false;
+			// 		this.json_input = "";
+			// 	} 
+			// 	catch {
+			// 		console.log("Invalid JSON");
+			// 		this.$snotify.error("Invalid JSON");
+			// 	}
 				
-			}
+			// }
 		},
 		beforeRouteLeave(to, from, next) {
 			if (this.unsaved_changes) {

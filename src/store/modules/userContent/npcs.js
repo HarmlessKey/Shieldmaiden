@@ -178,7 +178,27 @@ const actions = {
         throw error;
       }
     }
+  },
+
+  /**
+   * Gets all NPCs from a USER
+   */
+  async get_all_npcs({ rootGetters, commit, dispatch }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if (uid) {
+      const services = await dispatch("get_npc_services");
+
+      try {
+        const all_npcs = await services.getAllNpcs(uid);
+        commit("SET_CACHED_NPCS", { uid, npcs:all_npcs })
+        return all_npcs;
+      } catch(error) {
+        throw error;
+      }
+    }
   }
+
+
 };
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },

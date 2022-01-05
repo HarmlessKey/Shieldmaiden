@@ -534,6 +534,23 @@ export const routes = [{
 					}
 				]
 			},
+			{
+				path: "search-table",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Generate search table"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Generate search table',
+						component: () => import('@/views/Admin/GenerateSearchTable.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
 		]
 	},
 

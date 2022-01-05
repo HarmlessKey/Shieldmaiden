@@ -1,5 +1,5 @@
 <template>
-	<div v-if="item || $route.name === 'Add item'">
+	<div class="content__edit" v-if="item || $route.name === 'Add item'">
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveItem)">
 				<hk-card header="Your Item">
@@ -185,15 +185,16 @@
 
 
 				<div class="save">
-					<router-link to="/content/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-					<q-btn 
-						type="submit"
-						:disabled="!valid"
-						color="primary" 
-						no-caps
-					>
-						{{ $route.name === "Add item" ? "Add item" : "Save" }}
-					</q-btn>
+					<div class="buttons">
+						<router-link to="/content/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+						<q-btn 
+							type="submit"
+							color="primary" 
+							no-caps
+						>
+							{{ $route.name === "Add item" ? "Add item" : "Save" }}
+						</q-btn>
+					</div>
 				</div>
 			</q-form>
 		</ValidationObserver>

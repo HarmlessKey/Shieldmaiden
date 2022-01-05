@@ -164,17 +164,17 @@
 		},
 		methods: {
 			...mapActions("items", ["get_items", "delete_item", "get_item"]),
-			confirmDelete(e, key, item) {
+			confirmDelete(e, key, item, index) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteItem(key);
+					this.deleteItem(key, index);
 				} else {
-					this.$snotify.error('Are you sure you want to delete ' + item + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
+					this.$snotify.error('Are you sure you want to delete ' + item.name + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteItem(key)
+								this.deleteItem(key, index)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false

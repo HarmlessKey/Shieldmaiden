@@ -6,10 +6,11 @@
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
 
-						<a v-if="$route.name == 'Add item'" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
+						<!-- TODO: Copy Items via API -->
+						<!-- <a v-if="$route.name == 'Add item' && !itemId" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
 							Copy item
 							<i class="ml-1 fas fa-copy"/>
-						</a>
+						</a> -->
 					</div>
 					<div class="card-body">
 						<!-- NAME -->
@@ -19,7 +20,7 @@
 								label="Name"
 								autocomplete="off"  
 								type="text" 
-								class="mb-2" 
+								class="mb-2"
 								v-model="item.name" 
 								maxlength="100"
 								:error="invalid && validated"
@@ -297,6 +298,9 @@
 		methods: {
 			...mapActions(['setSlide']),
 			...mapActions('items', ["get_item", "add_item", "edit_item"]),
+
+		// TODO: Copy fucntionality needs to be fixed with API calls
+
 			// searchItems() {
 			// 	const vm = this;
 			// 	let searchTerm = this.searched.toLowerCase();
@@ -332,10 +336,8 @@
 				}
 			},
 			addItem() {
-				// delete this.item['.value'];
-				// delete this.item['.key'];
 				this.add_item(this.item).then((key) => {
-					this.$set(this, "npcId", key);
+					this.$set(this, "itemId", key);
 
 					this.$snotify.success("Item Saved.", 'Critical hit!', {
 						position: "rightTop"
@@ -343,6 +345,9 @@
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
+
+					this.$router.replace(`/content/items/${key}`);
+
 
 				}, error => {
 					this.$snotify.error("Couldn't save monster.", "Save failed", {

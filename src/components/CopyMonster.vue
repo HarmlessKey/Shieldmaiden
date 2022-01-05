@@ -41,7 +41,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a v-if="!disabledCustom.includes(npc.key)" class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? npc.key : npc._id)">
-							<i class="fas fa-copy"/>
+							<i class="fas" :class="add ? 'fa-plus' : 'fa-copy'"/>
 						</a>
 					</q-item-section>
 				</q-item>
@@ -56,6 +56,10 @@
 		name: "CopyMonster",
 		props: {
 			customOnly: {
+				type: Boolean,
+				default: false
+			},
+			add: {
 				type: Boolean,
 				default: false
 			},
@@ -102,7 +106,7 @@
 				if(this.query) {
 					if(this.copy_resource === "custom") {
 						const results = this.npcs.filter(npc => {
-							return npc.name.toLowerCase().includes(this.query.toLowerCase())
+							return npc.name.toLowerCase().includes(this.query.toLowerCase());
 						});
 
 						if(results && results.length) {
@@ -149,5 +153,7 @@
 </script>
 
 <style lang="scss" scoped>
-
+	.q-item {
+		margin-bottom: 1px;
+	}
 </style>

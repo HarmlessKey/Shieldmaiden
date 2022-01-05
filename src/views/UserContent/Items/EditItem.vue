@@ -240,7 +240,6 @@
 <script>
 	import OverEncumbered from '@/components/OverEncumbered.vue'
 	import { skills } from '@/mixins/skills.js'
-	import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
 	import { general } from '@/mixins/general.js'
 
@@ -258,6 +257,8 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				itemId: this.$route.params.id,
+				item: {},
+				// Copy item data -> new component?
 				search: ["name"],
 				searched: undefined,
 				foundItems: [],
@@ -265,29 +266,13 @@
 				copy_dialog: false
 			}
 		},
-		mounted() {
-			var items = db.ref(`items`);
-			items.on('value', async (snapshot) => {
-				let items = snapshot.val();
-				items = Object.values(items);
-
-				let custom = db.ref(`custom_items/${this.userId}`);
-				custom.on('value', async (snapshot) => {
-					let customItems = snapshot.val();
-					for(let key in customItems) {
-						items.push(customItems[key]);
-					}
-				});
-				this.items = items;
-				this.loadingItems = false;
-			});
-		},
-		firebase() {
-			return {
-				item: {
-					source: db.ref(`custom_items/${this.userId}/${this.itemId}`),
-					asObject: true
-				},
+		async mounted() {
+			if (this.itemId) {
+				this.loading = true;
+				this.item = await this.get_item({ uid: this.userId, id: this.itemId });
+				this.item_copy = JSON.stringify(this.item);
+				this.unsaved_changes = false;
+				this.loading = false;
 			}
 		},
 		computed: {
@@ -295,57 +280,98 @@
 				'tier',
 				'overencumbered',
 			]),
+			...mapGetters("items", ["item_count"])
+		},
+		watch: {
+			item: {
+				deep: true,
+				handler(newVal) {
+					if (JSON.stringify(newVal) !== this.item.copy) {
+						this.unsaved_changes = true;
+					} else {
+						this.unsaved_changes = false;
+					}
+				}
+			}
 		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchItems() {
-				const vm = this;
-				let searchTerm = this.searched.toLowerCase();
-				let results = this.items.filter( function(row) {
-					for (let i in vm.search) {
-						let key = vm.search[i];
-						// If field is undefined don't return row
-						if (row[key] == undefined) {
-							return
-						}
-						if (row[key].toLowerCase().includes(searchTerm)){
-							return row;
-						}
-					}
-				});
-				if(searchTerm === '') {
-					this.foundItems = [];
-				} else {
-					this.foundItems = results;
-				}
-			},
-			copy(item) {
-				this.item = item;
-				this.foundItems = [];
-				this.searched = '';
-				this.copy_dialog = false;
-			},
+			...mapActions(['setSlide']),
+			...mapActions('items', ["get_item", "add_item", "edit_item"]),
+			// searchItems() {
+			// 	const vm = this;
+			// 	let searchTerm = this.searched.toLowerCase();
+			// 	let results = this.items.filter( function(row) {
+			// 		for (let i in vm.search) {
+			// 			let key = vm.search[i];
+			// 			// If field is undefined don't return row
+			// 			if (row[key] == undefined) {
+			// 				return
+			// 			}
+			// 			if (row[key].toLowerCase().includes(searchTerm)){
+			// 				return row;
+			// 			}
+			// 		}
+			// 	});
+			// 	if(searchTerm === '') {
+			// 		this.foundItems = [];
+			// 	} else {
+			// 		this.foundItems = results;
+			// 	}
+			// },
+			// copy(item) {
+			// 	this.item = item;
+			// 	this.foundItems = [];
+			// 	this.searched = '';
+			// 	this.copy_dialog = false;
+			// },
 			saveItem() {
-				if(this.$route.name === "Add item") {
+				if(this.$route.name === "Add item" && !this.itemId) {
 					this.addItem();
 				} else {
 					this.editItem();
 				}
 			},
 			addItem() {
-				delete this.item['.value'];
-				delete this.item['.key'];
+				// delete this.item['.value'];
+				// delete this.item['.key'];
+				this.add_item(this.item).then((key) => {
+					this.$set(this, "npcId", key);
 
-				db.ref('custom_items/' + this.userId).push(this.item);
-				this.$router.replace('/content/items');
+					this.$snotify.success("Item Saved.", 'Critical hit!', {
+						position: "rightTop"
+					});
+
+					this.item_copy = JSON.stringify(this.item);
+					this.unsaved_changes = false;
+
+				}, error => {
+					this.$snotify.error("Couldn't save monster.", "Save failed", {
+						position: "rightTop"
+					})
+					console.error(error)
+					console.log(this.item)
+				});
 			},
 			editItem() {
-				delete this.item['.key'];
 
-				db.ref(`custom_items/${this.userId}/${this.itemId}`).set(this.item);
-				this.$router.replace('/content/items');
+				this.edit_item({
+					uid: this.userId,
+					id: this.itemId,
+					item: this.item
+				}).then(() => {
+					this.$snotify.success("Item Saved.", 'Critical hit!', {
+						position: "rightTop"
+					});
+
+					this.item_copy = JSON.stringify(this.item);
+					this.unsaved_changes = false;
+				}, error => {
+					this.$snotify.error("Couldn't save monster.", "Save failed", {
+						position: "rightTop"
+					})
+					console.error(error)
+					console.log(this.item)
+				});
 			},
 			addTable() {	
 				if(this.columns !== undefined) {

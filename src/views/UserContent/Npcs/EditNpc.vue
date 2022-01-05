@@ -108,7 +108,7 @@
 		name: 'Npcs',
 		mixins: [general],
 		metaInfo: {
-			title: 'NPC\'s'
+			title: 'NPCs'
 		},
 		components: {
 			BasicInfo,
@@ -248,37 +248,6 @@
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},
-			// loadJSON() {
-			// 	const fr = new FileReader();
-
-			// 	fr.onload = e => {
-			// 		const result = JSON.parse(e.target.result)
-			// 		// const formatted = JSON.stringify(result, null, 2)
-			// 		// console.log(formatted)
-			// 		delete result.key
-
-			// 		this.npc = result
-			// 		this.import_dialog = false
-			// 		this.json_file = undefined
-
-			// 		console.log(this.npc)
-			// 	}
-
-			// 	fr.readAsText(this.json_file)
-			// },
-			// parse_JSON_input() {
-
-			// 	try {
-			// 		this.npc = JSON.parse(this.json_input);
-			// 		this.import_dialog = false;
-			// 		this.json_input = "";
-			// 	} 
-			// 	catch {
-			// 		console.log("Invalid JSON");
-			// 		this.$snotify.error("Invalid JSON");
-			// 	}
-				
-			// }
 		},
 		beforeRouteLeave(to, from, next) {
 			if (this.unsaved_changes) {

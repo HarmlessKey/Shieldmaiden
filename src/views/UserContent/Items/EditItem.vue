@@ -6,11 +6,10 @@
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
 
-						<!-- TODO: Copy Items via API -->
-						<!-- <a v-if="$route.name == 'Add item' && !itemId" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
+						<a v-if="$route.name == 'Add item' && !itemId" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
 							Copy item
 							<i class="ml-1 fas fa-copy"/>
-						</a> -->
+						</a>
 					</div>
 					<div class="card-body">
 						<!-- NAME -->
@@ -133,7 +132,7 @@
 									</template>
 
 									<div class="accordion-body">
-										<ValidationProvider rules="required|max:100" name="Table name" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider rules="max:100" name="Table name" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Table name"
@@ -161,12 +160,12 @@
 											<a @click="addRow(tableIndex)" class="remove green"><i class="fas fa-plus"/></a>
 											<template v-for="(row, rowIndex) in table.rows">
 												<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
-													<ValidationProvider rules="required|max:100" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider rules="required|max:5000" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
 														<q-input 
 															:dark="$store.getters.theme === 'dark'" filled square dense
 															v-model="table.rows[rowIndex].columns[colIndex]" 
 															:placeholder="`Column ${colIndex+1}`"
-															maxlength="100"
+															maxlength="5000"
 															:error="invalid && validated"
 															:error-message="errors[0]"
 														/>
@@ -260,8 +259,6 @@
 				userId: this.$store.getters.user.uid,
 				itemId: this.$route.params.id,
 				item: {},
-				// Copy item data -> new component?
-				search: ["name"],
 				searched: undefined,
 				foundItems: [],
 				columns: undefined,
@@ -299,36 +296,31 @@
 		methods: {
 			...mapActions(['setSlide']),
 			...mapActions('items', ["get_item", "add_item", "edit_item"]),
+			...mapActions('api_items', ["get_api_items", "get_api_item"]),
 
-		// TODO: Copy fucntionality needs to be fixed with API calls
+			async searchItems() {
+				if (this.searched.length >= 3) {
+					const api_items= await this.get_api_items({
+						pageNumber: 1,
+						pageSize: 0,
+						fields: ['name'],
+						query: {search: this.searched},
+					})
+					this.foundItems = api_items.results
+				}
 
-			// searchItems() {
-			// 	const vm = this;
-			// 	let searchTerm = this.searched.toLowerCase();
-			// 	let results = this.items.filter( function(row) {
-			// 		for (let i in vm.search) {
-			// 			let key = vm.search[i];
-			// 			// If field is undefined don't return row
-			// 			if (row[key] == undefined) {
-			// 				return
-			// 			}
-			// 			if (row[key].toLowerCase().includes(searchTerm)){
-			// 				return row;
-			// 			}
-			// 		}
-			// 	});
-			// 	if(searchTerm === '') {
-			// 		this.foundItems = [];
-			// 	} else {
-			// 		this.foundItems = results;
-			// 	}
-			// },
-			// copy(item) {
-			// 	this.item = item;
-			// 	this.foundItems = [];
-			// 	this.searched = '';
-			// 	this.copy_dialog = false;
-			// },
+				else {
+					this.foundItems = []
+				}
+			},
+			async copy(item) {
+				console.log(item);
+				this.item = await this.get_api_item(item._id);
+				console.log("after get", this.item)
+				this.foundItems = [];
+				this.searched = '';
+				this.copy_dialog = false;
+			},
 			saveItem(valid) {
 				if (!valid) {
 					this.$snotify.error("There are validation errors.", "Critical miss!", { position: "rightTop" });
@@ -351,7 +343,7 @@
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
 
-					this.$router.replace(`/content/items/${key}`);
+					this.$router.replace(`/content/items`);
 
 
 				}, error => {
@@ -363,7 +355,7 @@
 				});
 			},
 			editItem() {
-
+				
 				this.edit_item({
 					uid: this.userId,
 					id: this.itemId,
@@ -375,6 +367,7 @@
 
 					this.item_copy = JSON.stringify(this.item);
 					this.unsaved_changes = false;
+					this.$router.replace(`/content/items`);
 				}, error => {
 					this.$snotify.error("Couldn't save monster.", "Save failed", {
 						position: "rightTop"

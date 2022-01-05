@@ -111,7 +111,7 @@ export class npcServices {
    * 
    * @param {String} uid ID of active user
    * @param {String} id ID of NPC to edit
-   * @param {string} path Path to parent the property that must be updated
+   * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
    * @param {object} value Object with { proptery: value }
    */
   async updateNpc(uid, id, path, value) {

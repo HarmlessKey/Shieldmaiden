@@ -266,14 +266,40 @@ const actions = {
     const new_count = state.player_count - 1;
     if(uid) {
       const services = await dispatch("get_player_services");
-      try {    
-        // Check if control over the character is given to a player
-        const control = await services.getPlayerProp(uid, id, "control");
-        await services.deletePlayer(uid, id, control, new_count);
+      try {
+        const player = await services.get_player(uid, id);
 
-        // If player had companions
-        // DELETE COMPANION FROM CAMPAING
-        // DELETE player_id FROM NPC
+        // Delete player from campaign
+        if(player.campaing_id) {
+          await dispatch("campaigns/delete_player", 
+            { id: player.campaign_id, playerId: id }, 
+            { root: true }
+          );
+        }
+
+        // Check if there were companions
+        if(player.companions) {
+          for(const companionId of Object.keys(player.companions)) {
+            // Delete companion from campaign
+            if(player.campaign_id) {           
+              await dispatch("campaigns/delete_companion", 
+                { id: player.campaign_id, companionId }, 
+                { root: true }
+              );
+            }
+
+            // Delete player_id from NPC
+            await dispatch("npcs/update_npc_prop", { 
+              uid,
+              id: companionId,
+              property: "player_id",
+              value: null 
+            }, { root: true });
+          }
+        }
+
+        // Check if control over the character is given to a player
+        await services.deletePlayer(uid, id, player.control, new_count);
 
         commit("REMOVE_PLAYER", id);
         commit("REMOVE_CACHED_PLAYER", { uid, id });

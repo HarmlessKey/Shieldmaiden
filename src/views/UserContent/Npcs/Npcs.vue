@@ -64,7 +64,14 @@
 						wrap-cells
 					>	
 						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
+							<q-td 
+								v-if="props.col.name === 'avatar'" 
+								class="avatar"
+								:style="props.value ? `background-image: url('${props.value}')` : ''"
+							>
+								<i v-if="!props.value" class="hki-monster" />
+							</q-td>
+							<q-td v-else-if="props.col.name !== 'actions'">
 								<div  class="truncate-cell">
 									<div class="truncate">
 										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
@@ -100,14 +107,6 @@
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="NPCs" />
 					</q-table>
-					<q-btn 
-						v-if="!search && npcs.length < npc_count"
-						slot="bottom-row"
-						no-caps 
-						color="primary" 
-						label="Load more" 
-						@click="load({ pagination }, true)"
-					/>
 
 					<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
 						<div 
@@ -168,7 +167,43 @@
 				loading_npcs: true,
 				npcs: [],
 				search: "",
-				card_width: 0
+				card_width: 0,
+				columns: [
+					{
+						name: "avatar",
+						label: "",
+						field: "avatar",
+						align: "left"
+					},
+					{
+						name: "name",
+						label: "Name",
+						field: "name",
+						sortable: true,
+						align: "left",
+						format: val => val.capitalizeEach()
+					},
+					{
+						name: "type",
+						label: "Type",
+						field: "type",
+						align: "left",
+						sortable: true
+					},
+					{
+						name: "challenge_rating",
+						label: "CR",
+						field: "challenge_rating",
+						align: "left",
+						sortable: true,
+						format: val => this.cr(val)
+					},
+					{
+						name: "actions",
+						label: "",
+						align: "right"
+					}
+				]
 			}
 		},
 		computed: {
@@ -179,45 +214,12 @@
 			...mapGetters("players", ["players"]),
 			...mapGetters("campaigns", ["campaigns"]),
 			...mapGetters("npcs", ["npc_count"]),
-
-			columns() {
-				return [
-					{
-						name: "name",
-						label: "Name",
-						field: "name",
-						sortable: !this.search || this.search.length < 3,
-						align: "left",
-						format: val => val.capitalizeEach()
-					},
-					{
-						name: "type",
-						label: "Type",
-						field: "type",
-						align: "left",
-						sortable: !this.search || this.search.length < 3
-					},
-					{
-						name: "challenge_rating",
-						label: "CR",
-						field: "challenge_rating",
-						align: "left",
-						sortable: !this.search || this.search.length < 3,
-						format: val => this.cr(val)
-					},
-					{
-						name: "actions",
-						label: "",
-						align: "right"
-					}
-				]
-			},
 			visibleColumns() {
 				return (this.card_width > 600) ? 
-					["name", "type", "challenge_rating", "actions"] : 
+					["avatar", "name", "type", "challenge_rating", "actions"] : 
 					(this.card_width > 450) ? 
-					["name", "type", "actions"] :
-					["name", "actions"];
+					["avatar", "name", "type", "actions"] :
+					["avatar", "name", "actions"];
 			},
 			slotsLeft() {
 				return this.tier.benefits.npcs - this.npc_count;
@@ -262,8 +264,8 @@
 				}
 
 			},
-			async deleteNpc(key, index) {
-				this.npcs.splice(index, 1)
+			deleteNpc(key, index) {
+				this.npcs.splice(index, 1);
 				this.delete_npc(key);
 			},
 			async imported(npcs) {

@@ -40,7 +40,7 @@ export const general_module = {
 							dispatch("setTheme"),
 							dispatch("setUserInfo"),
 							// players need prio!
-							dispatch("players/get_player_count"),
+							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
 							dispatch("campaigns/fetch_campaigns"),
 							dispatch("encounters/fetch_encounters"),

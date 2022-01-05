@@ -45,7 +45,7 @@ export class npcServices {
       npc.name = npc.name.toLowerCase();
       const newNpc = await NPCS_REF.child(uid).push(npc);
       
-      //Update search_npcs
+      // Update search_npcs
       SEARCH_NPCS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
 

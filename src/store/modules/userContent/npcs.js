@@ -42,8 +42,8 @@ const actions = {
   },
 
   /**
-   * Fetches all the npcs for a user
-   * and stores them in cached_npcs.uid
+   * Fetches all the search_npcs for a user
+   * and stores them in npcs
    */
   async get_npcs({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
@@ -166,13 +166,13 @@ const actions = {
       const services = await dispatch("get_npc_services");
       try {
         await services.deleteNpc(uid, id, new_count);
-        commit("REMOVE_NPC", id);
-        commit("REMOVE_CACHED_NPC", { uid, id });
-        commit("SET_NPC_COUNT", new_count);
-
+        
         // DELETE COMPANION FROM PLAYER
         // A player might have this NPC as a companion, this needs to be deleted now.
         
+        commit("REMOVE_NPC", id);
+        commit("REMOVE_CACHED_NPC", { uid, id });
+        commit("SET_NPC_COUNT", new_count);
         return;
       } catch(error) {
         throw error;
@@ -219,8 +219,8 @@ const mutations = {
     }
   },
   REMOVE_NPC(state, id) { 
-    console.log("remove", id)
-    Vue.delete(state.npcs, id); },
+    Vue.delete(state.npcs, id);
+  },
   REMOVE_CACHED_NPC(state, { uid, id }) {
     if(state.cached_npcs[uid]) {
       Vue.delete(state.cached_npcs[uid], id);

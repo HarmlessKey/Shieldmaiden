@@ -16,54 +16,75 @@
 
 		<div class="card-body">
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
-			<template v-if="players">
+			<template>
 				<OutOfSlots
 					v-if="player_count >= tier.benefits.players"
 					type = 'players'
 				/>
-				<hk-table
-					:columns="columns"
-					:items="players"
-					:search="['character_name', 'campaign_name']"
+
+				<q-input 
+					:dark="$store.getters.theme !== 'light'" 
+					v-model="search"
+					borderless 
+					filled square
+					debounce="300" 
+					clearable
+					placeholder="Search"
 				>
-					<template slot="avatar" slot-scope="data">
-						<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
-							<i v-if="!data.item" class="hki-player" />
-						</div>
-					</template>
+					<q-icon slot="prepend" name="search" />
+				</q-input>
 
-					<template slot="character_name" slot-scope="data">
-						<router-link class="mx-2"  :to="`${$route.path}/${data.row.key}`">
-							{{ data.item }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
+				<q-table
+					:data="players"
+					:columns="columns"
+					row-key="key"
+					card-class="bg-none"
+					flat
+					:dark="$store.getters.theme !== 'light'"
+					:loading="loading_players"
+					separator="none"
+					:pagination="{ rowsPerPage: 15 }"
+					:filter="search"
+					wrap-cells
+				>	
+					<template v-slot:body-cell="props">
+						<q-td 
+							v-if="props.col.name === 'avatar'" 
+							class="avatar"
+							:style="props.value ? `background-image: url('${props.value}')` : ''"
+						>
+							<i v-if="!props.value" class="hki-player" />
+						</q-td>
+						<q-td v-else-if="props.col.name !== 'actions'">
+							<div  class="truncate-cell">
+								<div class="truncate">
+									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ props.value }}
+									</router-link>
+									<template v-else>
+										{{ props.value }}
+									</template>
+								</div>
+							</div>
+						</q-td>
+						<q-td v-else class="text-right d-flex justify-content-between">
+							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</q-td>
 					</template>
-
-					<template slot="campaign_name" slot-scope="data">
-						{{ data.item }}
-					</template>
-
-					<template slot="level" slot-scope="data">
-						{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`${$route.path}/${data.row.key}`">
-							<i class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table>
+					<div slot="no-data" />
+					<hk-loader slot="loading" name="NPCs" />
+				</q-table>
 
 				<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
 					<div 
@@ -83,17 +104,17 @@
 					</router-link>
 				</template>
 			</template>
-			<router-link v-else-if="players === null && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
+			<router-link v-if="!players.length && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
 				Create your first player
 			</router-link>
 		</div>
+		<q-resize-observer @resize="setSize" />
 	</hk-card>
 </template>
 
 <script>
 	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import { mapGetters, mapActions } from 'vuex';
-	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 
 	export default {
@@ -107,60 +128,59 @@
 		},
 		data() {
 			return {
-				userId: this.$store.getters.user.uid,
-				columns: {
-					avatar: {
-						width: 46,
-						noPadding: true
+				loading_players: true,
+				players: [],
+				search: "",
+				card_width: 0,
+				columns: [
+					{
+						name: "avatar",
+						label: "",
+						field: "avatar",
+						align: "left"
 					},
-					character_name: {
-						label: 'Character Name',
-						truncate: true,
+					{
+						name: "name",
+						label: "Name",
+						field: "character_name",
 						sortable: true,
+						align: "left"
 					},
-					campaign_name: {
-						label: 'Campaign',
-						sortable: true,
-					},
-					level: {
-						label: 'Level',
-						// center: true,
-						// sortable: true,
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				}
+				]
 			}
 		},
 		computed: {
 			...mapGetters([
 				'tier',
-				'allEncounters',
 				'overencumbered',
 			]),
-			...mapGetters("players", ["players", "player_count"]),
-			...mapGetters("campaigns", ["campaigns"]),
+			...mapGetters("players", ["player_count"]),
 			slotsLeft() {
 				return this.tier.benefits.players - this.player_count
 			}
 		},
+		async mounted() {
+			this.players = await this.get_players();
+			this.loading_players = false;
+		},
 		methods: {
-			...mapActions("players", ["deletePlayer"]),
-			confirmDelete(e, key, player) {
+			...mapActions("players", ["get_players", "delete_player"]),
+			confirmDelete(e, key, player, index) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deletePlayer(key, player);
+					this.deletePlayer(key, index);
 				} else {
-					this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
+					this.$snotify.error('Are you sure you want to delete ' + player.character_name + '?', 'Delete player', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deletePlayer(key, player)
+								this.deletePlayer(key, index)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -175,55 +195,13 @@
 					});
 				}
 			},
-			deletePlayer(key, player) {
-				//Remove from character control
-				if(player.control) {
-					db.ref(`character_control/${player.control}`).child(key).remove(); 
-				}
-
-				for(let campaign in this.campaigns) {
-					//Remove player from campaigns
-					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
-
-					//Go over all encounters of the campaign
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-						for(let enc in this.allEncounters[campaign]) {
-
-							//Go over all entities in the encounter
-							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
-
-							// Remove companions from each encounter
-							for (let comp_key in player.companions) {
-								db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(comp_key).remove();
-							}
-						}
-					}
-				}
-				//Remove player
-				this.deletePlayer({ 
-					id:key, 
-					companions: player.companions
-				});
-			}
+			deletePlayer(key, index) {
+				this.players.splice(index, 1);
+				this.delete_player(key);
+			},
+			setSize(e) {
+				this.card_width = e.width;
+			},
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.container-fluid {
-		h2 {
-			border-bottom: solid 1px $neutral-4;
-			padding-bottom: 10px;
-
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
-
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
-
-</style>

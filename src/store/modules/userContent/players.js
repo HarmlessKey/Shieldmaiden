@@ -2,10 +2,27 @@ import Vue from 'vue';
 import { playerServices } from "@/services/players"; 
 import _ from 'lodash';
 
+// Converts a full player to a search_player
+const convert_player = (player) => {
+	const properties = [
+		"character_name",
+    "avatar",
+    "campaign_id",
+    "companions"
+	];
+  const returnPlayer = {};
+	
+	for(const prop of properties) {
+    if(player.hasOwnProperty(prop)) {
+      returnPlayer[prop] = player[prop];
+    }
+	}
+	return returnPlayer;
+}
 
 const state = {
   player_services: null,
-  players: [],
+  players: undefined,
   player_count: 0,
   cached_players: {}
 };
@@ -25,34 +42,31 @@ const actions = {
   },
 
   /**
-   * Fetches all the players for a user
-   * and stores them in cached_players.uid
+   * Fetches all the search_players for a user
+   * and stores them in players
    */
-  async get_players({ rootGetters, commit, dispatch }) {
+   async get_players({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
+    let players_object = (state.players) ? state.players : undefined;
+
+    if(!players_object && uid) {
       const services = await dispatch("get_player_services");
       try {
-        const search_players = await services.getPlayers(uid);
-
-        // Set player count
-        if(search_players.metadata && search_players.metadata.count) {
-          commit("SET_PLAYER_COUNT", search_players.metadata.count);
-        }
-
-        const players = _.chain(search_players.results)
-          .filter(function(player, key) {
-            player.key = key;
-            return player;
-          }).orderBy("name", "asc").value(); 
-
-        // Set player list
-        commit("SET_PLAYERS", players);
-        return;
+        players_object = await services.getPlayers(uid);
+        
+        commit("SET_PLAYERS", players_object);
       } catch(error) {
         throw error;
       }
     }
+    // Convert object to sorted array
+    const players = _.chain(players_object)
+    .filter(function(player, key) {
+      player.key = key;
+      return player;
+    }).orderBy("name", "asc").value();
+
+    return players;
   },
 
   async get_player({ state, commit, dispatch }, { uid, id }) {
@@ -72,6 +86,24 @@ const actions = {
     return player;
   },
 
+  /**
+   * Fetches the total count of players for a user
+   * and stores it in player_count
+   */
+   async fetch_player_count({ rootGetters, commit, dispatch }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        const count = await services.getPlayerCount(uid);
+        commit("SET_PLAYER_COUNT", count);
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   async get_owner_id({dispatch}, { uid, playerId }) {
     const services = await dispatch("get_player_services");
     try {
@@ -89,12 +121,16 @@ const actions = {
    * @param {object} player 
    * @returns {string} the id of the newly added player
    */
-  async add_player({ rootGetters, commit, dispatch }, player) {
+  async add_player({ state, rootGetters, commit, dispatch }, player) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const new_count = state.player_count + 1;
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        const id = await services.adPlayer(uid, player);
+        const search_player = convert_player(player);
+        const id = await services.adPlayer(uid, player, new_count, search_player);
+        commit("SET_PLAYER_COUNT", new_count);
+        commit("SET_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
         return id;
       } catch(error) {
@@ -116,7 +152,9 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        await services.editPlayer(uid, id, player);
+        const search_player = convert_player(player);
+        await services.editPlayer(uid, id, player, search_player);
+        commit("SET_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
         return;
       } catch(error) {
@@ -151,36 +189,20 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_player({ rootGetters, commit, dispatch }, { id, companions }) {
+  async delete_player({ state, rootGetters, commit, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const campaigns = rootGetters["campaigns/campaigns"];
+    const new_count = state.player_count - 1;
     if(uid) {
       const services = await dispatch("get_player_services");
-      try {
-        console.log(campaigns)
-        console.log(companions)
-        // for(let campaignId in campaigns) {
-				// 	//Remove player from campaigns
-        //   await dispatch("campaigns/delete_player", { id: campaignId, playerId: id  });
-				// 	// db.ref('campaigns/' + uid + '/' + campaignId + '/players').child(id).remove();
+      try {    
+        // Check if control over the character is given to a player
+        const control = await services.getPlayerProp(uid, id, "control");
+        console.log(control);
+        // await services.deletePlayer(uid, id, control, new_count);
 
-				// 	//Go over all encounters of the campaign
-				// 	if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaignId) > -1) {
-				// 		for(let enc in this.allEncounters[campaignId]) {
-
-				// 			//Go over all entities in the encounter
-				// 			// db.ref(`encounters/${uid}/${campaignId}/${enc}/entities`).child(id).remove();
-
-				// 			// Remove companions from each encounter
-				// 			for (let comp_key in companions) {
-				// 				// db.ref(`encounters/${uid}/${campaignId}/${enc}/entities`).child(comp_key).remove();
-				// 			}
-				// 		}
-				// 	}
-				// }
-
-        await services.deletePlayer(uid, id);
+        commit("REMOVE_PLAYER", id);
         commit("REMOVE_CACHED_PLAYER", { uid, id });
+        commit("SET_PLAYER_COUNT", new_count);
         return;
       } catch(error) {
         throw error;
@@ -192,7 +214,16 @@ const mutations = {
   SET_PLAYER_SERVICES(state, payload) { Vue.set(state, "player_services", payload); },
   SET_PLAYERS(state, payload) { Vue.set(state, "players", payload); },
   SET_PLAYER_COUNT(state, value) { Vue.set(state, "player_count", value); },
-  SET_CACHED_PLAYERS(state, { uid, players }) { Vue.set(state.cached_players, uid, players); },
+  SET_PLAYER(state, { id, search_player }) {
+    if(state.players) {
+      Vue.set(state.players, id, search_player);
+    } else {
+      Vue.set(state, "players", { [id]: search_player });
+    }
+  },
+  REMOVE_PLAYER(state, id) { 
+    Vue.delete(state.players, id);
+  },
   SET_CACHED_PLAYER(state, { uid, id, player }) { 
     if(state.cached_players[uid]) {
       Vue.set(state.cached_players[uid], id, player);

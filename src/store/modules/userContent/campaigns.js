@@ -59,6 +59,9 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {
         const campaign = await services.getCampaign(uid, id);
+
+        // REMOVE NON EXISTING PLAYERS
+
         commit("SET_CACHED_CAMPAIGN", { uid, campaign });
         return campaign;
       } catch(error) {

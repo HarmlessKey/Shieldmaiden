@@ -163,7 +163,7 @@
 			this.loading_items = false;
 		},
 		methods: {
-			...mapActions("items", ["get_items", "delete_item", "get_item"]),
+			...mapActions("items", ["get_items", "delete_item"]),
 			confirmDelete(e, key, item, index) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {

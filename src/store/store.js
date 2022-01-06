@@ -11,6 +11,7 @@ import api_items from '@/store/modules/content/items.js';
 import campaigns from '@/store/modules/userContent/campaigns.js';
 import npcs from '@/store/modules/userContent/npcs.js';
 import items from '@/store/modules/userContent/items.js';
+import reminders from '@/store/modules/userContent/reminders.js';
 import players from '@/store/modules/userContent/players.js';
 import encounters from '@/store/modules/userContent/encounters.js';
 
@@ -41,6 +42,7 @@ export const store = new Vuex.Store({
 		api_items: api_items,
 		npcs: npcs,
 		items: items,
+		reminders: reminders,
 		players: players,
 		encounters: encounters,
 		tips: tips_module

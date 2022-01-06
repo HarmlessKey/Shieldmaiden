@@ -3,7 +3,7 @@
 		<div class="card-header">
 			<span>
 				Reminders ( 
-				<span :class="{ 'green': true, 'red': content_count.reminders >= tier.benefits.reminders }">{{ Object.keys(reminders).length }}</span> 
+				<span :class="{ 'green': true, 'red': reminder_count.reminders >= tier.benefits.reminders }">{{ Object.keys(reminders).length }}</span> 
 					/ 
 					<i v-if="tier.benefits.reminders == 'infinite'" class="far fa-infinity"></i> 
 					<template v-else>{{ tier.benefits.reminders }}</template>	
@@ -15,13 +15,61 @@
 		</div>
 		<div class="card-body">
 			<p class="neutral-2">Reminders create useful notifications during encounters, so you don't forget someone was concentrating for instance.</p>
-			<template v-if="reminders">
+			<!-- <template v-if="reminders"> -->
 				<OutOfSlots 
-					v-if="content_count.reminders >= tier.benefits.reminders"
+					v-if="reminder_count.reminders >= tier.benefits.reminders"
 					type = 'reminders'
 				/>
 
-				<hk-table
+				<q-table
+						:data="reminders"
+						:columns="columns"
+						row-key="key"
+						card-class="bg-none"
+						flat
+						:dark="$store.getters.theme !== 'light'"
+						:loading="loading_reminders"
+						separator="none"
+						:pagination="{ rowsPerPage: 15 }"
+						:filter="search"
+						wrap-cells
+					>
+						<template v-slot:body-cell="props">
+
+							<q-td v-if="props.col.name !== 'actions'">
+								<div class="truncate-cell">
+									<div class="truncate"> 
+										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+											{{ props.value }}
+										</router-link>
+										<template v-else>
+											{{ props.value }}
+										</template>
+									</div>
+								</div>
+							</q-td>
+
+							<q-td v-else class="text-right d-flex justify-content-between">
+								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+									<i class="fas fa-pencil"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Edit
+									</q-tooltip>
+								</router-link>
+								<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+									<i class="fas fa-trash-alt"></i>
+									<q-tooltip anchor="top middle" self="center middle">
+										Delete
+									</q-tooltip>
+								</a>
+							</q-td>
+						</template>
+					
+					
+					</q-table>
+
+
+				<!-- <hk-table
 					:columns="columns"
 					:items="reminders"
 					:search="['title']"
@@ -49,9 +97,9 @@
 							</q-tooltip>
 						</a>
 					</div>
-				</hk-table>
+				</hk-table> -->
 
-				<template v-if="slotsLeft > 0 && tier.benefits.reminders !== 'infinite'">
+				<!-- <template v-if="slotsLeft > 0 && tier.benefits.reminders !== 'infinite'">
 					<div 
 						class="openSlot"
 						v-for="index in slotsLeft"
@@ -71,17 +119,15 @@
 			</template>
 			<router-link v-if="reminders === null && !overencumbered" :to="`${$route.path}/add-reminder`">
 				<i class="fas fa-plus green"></i> Create your first reminder
-			</router-link>
+			</router-link> -->
 		</div>
 	</hk-card>
 </template>
 
 <script>
-	import _ from 'lodash';
-	import OverEncumbered from '@/components/OverEncumbered.vue';
+	// import OverEncumbered from '@/components/OverEncumbered.vue';
 	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
-	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
 
 	export default {
 		name: 'Reminders',
@@ -89,63 +135,86 @@
 			title: 'Reminders'
 		},
 		components: {
-			OverEncumbered,
+			// OverEncumbered,
 			OutOfSlots
 		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				columns: {
-					title: {
-						label: 'Title',
-						truncate: true,
+				loading_reminders: true,
+				reminders: [],
+				search: "",
+
+				columns: [
+					{
+						name: "title",
+						label: "Title",
+						field: "title",
 						sortable: true,
+						align: "left",
 					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				}
+				]
+				// columns: {
+				// 	title: {
+				// 		label: 'Title',
+				// 		truncate: true,
+				// 		sortable: true,
+				// 	},
+				// 	actions: {
+				// 		label: '<i class="far fa-ellipsis-h"></i>',
+				// 		noPadding: true,
+				// 		right: true,
+				// 		maxContent: true
+				// 	}
+				// }
 			}
 		},
-		firebase() {
-			return {
-				reminders: db.ref(`reminders/${this.userId}`)
-			}
-		},
+		// firebase() {
+		// 	return {
+		// 		reminders: db.ref(`reminders/${this.userId}`)
+		// 	}
+		// },
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
-				'content_count',
 			]),
-			_reminders: function() {
-				return _.chain(this.reminders)
-				.filter(function(reminder, key) {
-					reminder.key = key
-					return reminder
-				})
-				.orderBy("title", 'asc')
-				.value()
-			},
+			...mapGetters('reminders', ['reminder_count']),
+			// _reminders: function() {
+			// 	return _.chain(this.reminders)
+			// 	.filter(function(reminder, key) {
+			// 		reminder.key = key
+			// 		return reminder
+			// 	})
+			// 	.orderBy("title", 'asc')
+			// 	.value()
+			// },
 			slotsLeft() {
 				return this.tier.benefits.reminders - Object.keys(this.reminders).length
 			}
 		},
+		async mounted() {
+			this.reminders = await this.get_reminders();
+			this.loading_reminders = false;
+		},
 		methods: {
-			confirmDelete(e, key, reminder) {
+			...mapActions("reminders", ["get_reminders", "delete_reminder"]),
+			confirmDelete(e, key, reminder, index) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteReminder(key);
+					this.deleteReminder(key, index);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + reminder + '?', 'Delete reminder', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteReminder(key)
+								this.deleteReminder(key, index)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -160,9 +229,10 @@
 					});
 				}
 			},
-			deleteReminder(key) {
+			deleteReminder(key, index) {
 				//Remove player
-				db.ref(`reminders/${this.userId}`).child(key).remove(); 
+				this.reminders.splice(index, 1);
+				this.delete_reminder;
 			}
 		}
 	}

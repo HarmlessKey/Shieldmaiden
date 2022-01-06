@@ -48,9 +48,14 @@ export class campaignServices {
     });
   }
 
-  async addCampaign(uid, campaign) {
+  async addCampaign(uid, campaign, new_count, search_campaign) {
     try {
       const newCampaign = await CAMPAIGNS_REF.child(uid).push(campaign);
+
+      // Update search_campaigns
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/metadata/count`).set(new_count);
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${newCampaign.key}`).set(search_campaign);
+
       return newCampaign.key;
     } catch(error) {
       throw error;
@@ -65,10 +70,20 @@ export class campaignServices {
     });
   }
 
-  // Updates a campaign
-  async updateCampaign(uid, id, path, value) {
-    path = `${uid}/${id}${path}`
-    CAMPAIGNS_REF.child(path).update(value).then(() => {
+  /**
+   * Updates a specific property in an existing campaign
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of campaign to edit
+   * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
+   * @param {object} value Object with { proptery: value }
+   * @param {boolean} update_search Wether or not search_campaigns must be updated
+   */
+  async updateCampaign(uid, id, path, value, update_search=false) {
+    CAMPAIGNS_REF.child(`${uid}/${id}${path}`).update(value).then(() => {
+      if(update_search) {
+        SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${id}${path}`).update(value);
+      }
       return;
     }).catch((error) => {
       throw error;
@@ -83,7 +98,6 @@ export class campaignServices {
       throw error;
     });
   }
-
 
   async addPlayer(uid, id, playerId, player) {
     CAMPAIGNS_REF.child(uid).child(id).child(`players/${playerId}`).set(player).then(() => {
@@ -117,9 +131,13 @@ export class campaignServices {
     });
   }
 
-  async deleteCampaign(uid, id) {
+  async deleteCampaign(uid, id, new_count) {
     try {
       CAMPAIGNS_REF.child(uid).child(id).remove();
+
+      //Update search_players
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/metadata/count`).set(new_count);
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
       throw error;

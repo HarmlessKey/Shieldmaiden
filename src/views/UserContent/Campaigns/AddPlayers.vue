@@ -52,7 +52,7 @@
 				</div>
 
 				<div class="card-body">
-					<ul class="entities hasImg" v-if="players && campaign">
+					<ul class="entities hasImg">
 						<li v-for="player in players" :key="player.key">
 							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
 								<i v-if="!player.avatar" class="hki-player" />
@@ -78,7 +78,6 @@
 							</div>
 						</li>
 					</ul>
-					<div v-else class="loader"><span>Loading Players...</span></div>
 				</div>
 			</hk-card>
 		</q-dialog>

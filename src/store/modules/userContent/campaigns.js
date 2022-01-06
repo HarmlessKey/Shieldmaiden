@@ -3,25 +3,25 @@ import { campaignServices } from "@/services/campaigns";
 import _ from 'lodash';
 
 // Converts a full campaign to a search_campaign
-// const convert_campaign = (campaign) => {
-// 	const properties = [
-// 		"name",
-//    "background",
-//    "player_count",
-//    "encounter_count",
-//    "advancement",
-//    "timestamp",
-//    "private"
-// 	];
-//   const returnCampaign = {};
+const convert_campaign = (campaign) => {
+	const properties = [
+    "name",
+    "background",
+    "player_count",
+    "encounter_count",
+    "advancement",
+    "timestamp",
+    "private"
+	];
+  const returnCampaign = {};
 	
-// 	for(const prop of properties) {
-//     if(campaign.hasOwnProperty(prop)) {
-//       returnCampaign[prop] = campaign[prop];
-//     }
-// 	}
-// 	return returnCampaign;
-// }
+	for(const prop of properties) {
+    if(campaign.hasOwnProperty(prop)) {
+      returnCampaign[prop] = campaign[prop];
+    }
+	}
+	return returnCampaign;
+}
 
 const state = {
   campaign_services: null,
@@ -32,7 +32,17 @@ const state = {
 };
 
 const getters = {
-  campaigns: (state) => { return state.campaigns; },
+  campaigns: (state) => { 
+    // Convert object to sorted array
+    return _.chain(state.campaigns)
+    .filter((campaign, key) => {
+      campaign.key = key;
+      return campaign;
+    }).orderBy((campaign) => {
+      return parseInt(campaign.timestamp)
+    } , 'asc')
+    .value();
+  },
   campaign_count: (state) => { return state.campaign_count; },
   campaign_services: (state) => { return state.campaign_services; }
 };
@@ -51,28 +61,18 @@ const actions = {
    */
    async get_campaigns({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    let campaigns_object = (state.campaigns) ? state.campaigns : undefined;
+    let campaigns = (state.campaigns) ? state.campaigns : undefined;
 
-    if(!campaigns_object && uid) {
+    if(!campaigns && uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        campaigns_object = await services.getCampaigns(uid);
+        campaigns = await services.getCampaigns(uid);
         
-        commit("SET_CAMPAIGNS", campaigns_object);
+        commit("SET_CAMPAIGNS", campaigns);
       } catch(error) {
         throw error;
       }
     }
-    // Convert object to sorted array
-    const campaigns = _.chain(campaigns_object)
-    .filter((campaign, key) => {
-      campaign.key = key;
-      return campaign;
-    }).orderBy((campaign) => {
-      return parseInt(campaign.timestamp)
-    } , 'asc')
-    .value()
-
     return campaigns;
   },
 
@@ -150,11 +150,60 @@ const actions = {
    */
   async add_campaign({ rootGetters, commit, dispatch }, campaign) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const new_count = state.campaign_count + 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        const id = await services.addCampaign(uid, campaign);
-        commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
+        const search_campaign = convert_campaign(campaign);
+        const id = await services.addCampaign(uid, campaign, new_count, search_campaign);
+        commit("SET_CAMPAIGN", { uid, id, search_campaign });
+        return id;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Updates and existing campaign
+   * Only updates properties that are present search_campaigns
+   * 
+   * @param {string} uid
+   * @param {string} id 
+   * @param {object} campaign 
+   */
+   async update_campaign({ commit, dispatch }, { uid, id, campaign }) {
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        const search_campaign = convert_campaign(campaign);
+        await services.updateCampaign(uid, id, "", search_campaign, true);
+        commit("SET_CAMPAIGN", { uid, id, search_campaign });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes a campaign
+   * - Deletes all encounter for this campaign
+   * 
+   * @param {object} id 
+   */
+   async delete_campaign({ rootGetters, commit, dispatch }, id) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const new_count = state.campaign_count - 1;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.deleteCampaign(uid, id, new_count);
+
+        // DELETE ALL ENCOUNTER OF CAMPAIGN
+
+        commit("REMOVE_CAMPAIGN", id);
+        commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
         return id;
       } catch(error) {
         throw error;
@@ -351,28 +400,6 @@ const actions = {
     }
   },
 
-   /**
-   * Edits and existing campaign
-   * It is possible to edit the campaign of another user (for companions)
-   * therefore we send the uid from where the function is called
-   * 
-   * @param {string} uid
-   * @param {string} id 
-   * @param {object} campaign 
-   */
-  async edit_campaign({ commit, dispatch }, { uid, id, campaign }) {
-    if(uid) {
-      const services = await dispatch("get_campaign_services");
-      try {
-        await services.editCampaign(uid, id, campaign);
-        commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
-        return;
-      } catch(error) {
-        throw error;
-      }
-    }
-  },
-
   async set_death_save({ dispatch, commit, rootGetters }, { campaignId, playerId, index, value } ) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
@@ -424,26 +451,6 @@ const actions = {
   },
 
   /**
-   * Deletes an existing campaign
-   * A user can only delete their own campaign's so use uid from the store
-   * 
-   * @param {string} id 
-   */
-  async delete_campaign({ rootGetters, commit, dispatch }, id) {
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      const services = await dispatch("get_campaign_services");
-      try {
-        await services.deleteCampaign(uid, id);
-        commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
-        return;
-      } catch(error) {
-        throw error;
-      }
-    }
-  },
-
-  /**
    * Update the "share" property with the latest value
    * Shares can be seen by players on the public intiative list
    * 
@@ -485,7 +492,11 @@ const mutations = {
       Vue.set(state.cached_campaigns, uid, { [id]: campaign });
     }
   },
-  REMOVE_CACHED_CAMPAIGN(state, { uid, id }) { Vue.delete(state.cached_campaigns[uid], id); },
+  REMOVE_CACHED_CAMPAIGN(state, { uid, id }) { 
+    if(state.cached_campaigns[uid]) {
+      Vue.delete(state.cached_campaigns[uid], id);
+    }
+  },
   
   // CAMPAIGN PLAYERS
   ADD_PLAYER(state, { uid, id, playerId, player }) { 

@@ -278,6 +278,10 @@ const actions = {
    * Deletes an existing player
    * A user can only delete their own player's so use uid from the store
    * 
+   * - Deletes player from the campaign it's in
+   * - Deletes companions from the campaing (if the player had companions)
+   * - Removes the player from character_control
+   * 
    * @param {string} id 
    */
   async delete_player({ state, rootGetters, commit, dispatch }, id) {

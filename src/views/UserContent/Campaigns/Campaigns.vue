@@ -229,7 +229,7 @@
 
 		<!-- Edit campaign dialog -->
 		<q-dialog v-model="edit_campaign.show">
-			<EditCampaign :campaign="edit_campaign.campaign" />
+			<EditCampaign :campaign="edit_campaign.campaign" @close="edit_campaign.show = false" />
 		</q-dialog>
 
 		<!-- Edit campaign dialog -->
@@ -260,7 +260,6 @@
 		},
 		data() {
 			return {
-				campaigns: [],
 				newCampaign: '',
 				add: false,
 				edit_players: {
@@ -285,7 +284,7 @@
 			}
 		},
 		async mounted() {
-			this.campaigns = await this.get_campaigns();
+			await this.get_campaigns();
 		},
 		computed: {
 			...mapGetters([
@@ -295,36 +294,38 @@
 				'overencumbered'
 			]),
 			...mapGetters("players", ["player_count"]),
-			...mapGetters("campaigns", ["campaign_count"]),
+			...mapGetters("campaigns", ["campaign_count", "campaigns"]),
 			slotsLeft() {
 				return this.tier ? this.tier.benefits.campaigns - this.campaign_count : 0;
 			}
 		},
 		methods: {
-			...mapActions("campaigns", ["get_campaigns"]),
-			addCampaign() {
+			...mapActions("campaigns", ["get_campaigns", "add_campaign", "delete_campaign"]),
+			async addCampaign() {
 				if ((this.campaign_count < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
-					db.ref('campaigns/' + this.user.uid).push({
+					const campaign = {
 						campaign: this.newCampaign,
 						advancement: this.advancement,
 						timestamp: Date.now(),
-					});
+					};
+
+					await this.add_campaign(campaign);
+
 					this.newCampaign = '';
 					this.$snotify.success('Campaign added.', 'Critical hit!', {
 						position: "rightTop"
 					});
-					this.$validator.reset();
 					this.add = false;
 				}
 			},
 			confirmDelete(e, key, name) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteCampaign({campaign_id: key });
+					this.delete_campaign(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
 						buttons: [
-							{ text: 'Yes', action: (toast) => { this.deleteCampaign({campaign_id: key }); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'Yes', action: (toast) => { this.delete_campaign(key); this.$snotify.remove(toast.id); }, bold: false},
 							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 						]
 					});

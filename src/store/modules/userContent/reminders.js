@@ -5,14 +5,13 @@ import _ from "lodash";
 // Converts a full reminder to a search_reminder
 const convert_reminder = (reminder) => {
 	const properties = [
-		"name",
-		"image"
+		"title",
 	];
 	const returnReminder = {};
 	
 	for(const prop of properties) {
 		if(reminder.hasOwnProperty(prop)) {
-			returnReminder[prop] = (prop === "name") ? reminder[prop].toLowerCase() : reminder[prop];
+			returnReminder[prop] = reminder[prop];
 		}
 	}
 	return returnReminder;

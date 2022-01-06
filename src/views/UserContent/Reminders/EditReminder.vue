@@ -1,7 +1,7 @@
 <template>
 	<hk-card :header="$route.name === 'Edit reminder' ? 'Edit reminder' : 'New reminder'">
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(editReminder)">
+			<q-form @submit="handleSubmit(saveReminder(valid))">
 				<div class="card-body">
 					<div class="reminder" v-if="reminder">
 						<reminder-form v-model="reminder"/>
@@ -30,9 +30,8 @@
 
 <script>
 	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import { mapGetters } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 	import ReminderForm from '@/components/ReminderForm';
-	import { db } from '@/firebase'
 
 	export default {
 		name: 'EditReminder',
@@ -47,21 +46,17 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				reminderId: this.$route.params.id,
+				reminder: {},
+				reminder_copy: {},
+				loading: true,
+				unsaved_changes: false,
+
 				triggerInfo: {
 					'startTurn': "When the entity with the <b>Start of turn</b> reminder gets its turn, the notification will show. You can use this reminder when a spell causes the entity to take damage on the start of their turn.",
 					'endTurn': "When the entity with the <b>End of turn</b> reminder ends its, the notification will show. You can use this reminder when the entity is allowed to make a saving throw at the end of their turn.",
 					'damage': "A notification will show when an entity with this <b>On damage taken</b> reminder takes damage. Perfect for when someone is concentrating.",
 					'timed': "A <b>timed</b> trigger is set with an amount of rounds. Each round lasts 6 seconds, making a duration of 1 minute last 10 rounds. During an encounter, whenever the entity with the reminder gets its turn, 1 round is removed from the counter. When the counter reaches 0, you receive a notification that the reminder has been removed."
 				},
-				reminder: {}
-			}
-		},
-		firebase() {
-			return {
-				storedReminder: {
-					source: db.ref(`reminders/${this.userId}/${this.reminderId}`),
-					asObject: true
-				}
 			}
 		},
 		computed: {
@@ -71,23 +66,72 @@
 				'overencumbered',
 			])
 		},
-		mounted() {
-			if(this.reminderId) {
-				this.reminder = this.storedReminder;
+		watch: {
+			reminder: {
+				deep: true,
+				handler(newVal) {
+					if (JSON.stringify(newVal) !== this.reminder_copy) {
+						this.unsaved_changes = true;
+					} else {
+						this.unsaved_changes = false;
+					}
+				}
 			}
 		},
+		async mounted() {
+			if(this.reminderId) {
+				this.loading = true;
+				this.reminder = await this.get_reminder({ uid: this.userId, id: this.reminderId });
+				this.reminder_copy = JSON.stringify(this.reminder);
+				this.unsaved_changes = false;
+				this.loading = false;
+			}
+			
+		},
 		methods: {
-			setValidation(validate) {
-				this.validation = validate;
-			},
-			editReminder() {		
-				if(this.$route.name == 'AddReminder') {
-					db.ref('reminders/' + this.userId).push(this.reminder);
-				} else {
-					delete this.reminder['.key'];
-					db.ref(`reminders/${this.userId}/${this.reminderId}`).set(this.reminder);
+			...mapActions('reminders', ['get_reminder', 'add_reminder', 'edit_reminder']),
+
+			saveReminder(valid) {
+				if (!valid) {
+					this.$snotify.error("There are validation errors.", "Critical miss!", { position: "rightTop" });
+					return
 				}
-				this.$router.replace("/content/reminders");
+				if (this.$route.name == "Add reminder" && !this.reminderId) {
+					this.addReminder();
+				}
+				else {
+					this.editReminder();
+				}
+
+			},
+			async addReminder() {
+				console.log("Add reminder")
+				this.add_reminder(this.reminder)
+					.then(key => {
+						this.$set(this, "reminderId", key);
+						this.$snotify.success("Reminder Saved.", "Critical hit!", { position: "rightTop" })
+						this.reminder_copy = JSON.stringify(this.reminder);
+						this.unsaved_changes = false;
+						this.$router.replace(`/content/reminders`);
+					}, error => {
+						this.$snotify.error("Couldn't save reminder.", "Save failed", { position: "rightTop" })
+						console.error(error)
+						console.log(this.reminder)
+					})
+			},
+			async editReminder() {
+				console.log("edit reminder")
+				await this.edit_reminder({
+					uid: this.uid,
+					id: this.reminderId,
+					reminder: this.reminder,
+				})
+
+				this.$snotify.success("Reminder Saved.", 'Critical hit!', { position: "rightTop" });
+
+				this.reminder_copy = JSON.stringify(this.reminder);
+				this.unsaved_changes = false;
+				this.$router.replace(`/content/reminders`);
 			}
 		}
 	}

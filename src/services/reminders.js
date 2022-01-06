@@ -78,7 +78,7 @@ export class reminderServices {
    */
 	async addReminder(uid, reminder, new_count, search_reminder) {
     try {
-      reminder.name = reminder.name.toLowerCase();
+      reminder.title = reminder.title.toLowerCase();
       const newReminder = await REMINDERS_REF.child(uid).push(reminder);
       
       //Update search_reminders

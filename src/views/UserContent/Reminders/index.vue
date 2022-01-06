@@ -68,37 +68,6 @@
 					
 					</q-table>
 
-
-				<!-- <hk-table
-					:columns="columns"
-					:items="reminders"
-					:search="['title']"
-				>
-					<template slot="title" slot-scope="data">
-						<router-link class="mx-2" :to="`${$route.path}/${data.row['.key']}`">
-							{{ data.item }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`${$route.path}/${data.row['.key']}`">
-							<i class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row['.key'], data.row.title)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table> -->
-
 				<!-- <template v-if="slotsLeft > 0 && tier.benefits.reminders !== 'infinite'">
 					<div 
 						class="openSlot"
@@ -159,41 +128,14 @@
 						align: "right"
 					}
 				]
-				// columns: {
-				// 	title: {
-				// 		label: 'Title',
-				// 		truncate: true,
-				// 		sortable: true,
-				// 	},
-				// 	actions: {
-				// 		label: '<i class="far fa-ellipsis-h"></i>',
-				// 		noPadding: true,
-				// 		right: true,
-				// 		maxContent: true
-				// 	}
-				// }
 			}
 		},
-		// firebase() {
-		// 	return {
-		// 		reminders: db.ref(`reminders/${this.userId}`)
-		// 	}
-		// },
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
 			]),
 			...mapGetters('reminders', ['reminder_count']),
-			// _reminders: function() {
-			// 	return _.chain(this.reminders)
-			// 	.filter(function(reminder, key) {
-			// 		reminder.key = key
-			// 		return reminder
-			// 	})
-			// 	.orderBy("title", 'asc')
-			// 	.value()
-			// },
 			slotsLeft() {
 				return this.tier.benefits.reminders - Object.keys(this.reminders).length
 			}
@@ -239,19 +181,19 @@
 </script>
 
 <style lang="scss" scoped>
-	.container-fluid {
-		h2 {
-			border-bottom: solid 1px $neutral-4;
-			padding-bottom: 10px;
+	// .container-fluid {
+	// 	h2 {
+	// 		border-bottom: solid 1px $neutral-4;
+	// 		padding-bottom: 10px;
 
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
+	// 		a {
+	// 			text-transform: none;
+	// 			color: $neutral-2 !important;
 
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
+	// 			&:hover {
+	// 				text-decoration: none;
+	// 			}
+	// 		}
+	// 	}
+	// }
 </style>

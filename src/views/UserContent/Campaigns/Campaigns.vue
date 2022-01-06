@@ -80,7 +80,7 @@
 											</a>
 											<a
 												class="btn btn-sm btn-clear white"
-												@click="confirmDelete($event, campaign.key, campaign.campaign)"
+												@click="confirmDelete($event, campaign.key, campaign.name)"
 											>
 												<i class="fas fa-trash-alt"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
@@ -304,7 +304,7 @@
 			async addCampaign() {
 				if ((this.campaign_count < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
 					const campaign = {
-						campaign: this.newCampaign,
+						name: this.newCampaign,
 						advancement: this.advancement,
 						timestamp: Date.now(),
 					};

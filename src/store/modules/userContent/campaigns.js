@@ -359,7 +359,7 @@ const actions = {
   /**
    * Deletes a companion from a campaign
    * 
-   * @param {object} campaign 
+   * @param {object} id campaignId 
    * @returns {string} the id of the newly added campaign
    */
    async delete_companion({ rootGetters, commit, dispatch }, { id, companionId }) {
@@ -378,21 +378,33 @@ const actions = {
 
   /**
    * Deletes a player from a campaign
+   * - Remove 1 from player_count
+   * - Remove the campaign_id from the player
+   * - Delete the companions of the player from the campaign
    * 
    * @param {object} campaign 
    * @returns {string} the id of the newly added campaign
    */
-   async delete_player({ rootGetters, commit, dispatch }, { id, playerId }) {
+   async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const campaign = state.campaigns[id];
+    const new_count = campaign.player_count - 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
-      try {
-        await services.deletePlayer(uid, id, playerId);
+      try {     
+        // Delete campaign_id
+        await dispatch("players/set_campaign_id", { uid, playerId: player.key, value: null }, { root: true })
 
-        // IF PLAYER HAS COMPANION, ALSO DELETE COMPANION FROM CAMPAIGN
-        // Get the player with players/get_player
+        // Delete companions
+        if(player.companions) {
+          for(const companionId of player.companions) {
+            await dispatch("delete_companion", { id, companionId });
+          }
+        }
 
-        commit("DELETE_PLAYER", { uid, id, playerId });
+        await services.deletePlayer(uid, id, player.key);
+        await dispatch("update_player_count", { id, new_count });
+        commit("DELETE_PLAYER", { uid, id, playerId: player.key });
         return;
       } catch(error) {
         throw error;

@@ -129,7 +129,6 @@
 		data() {
 			return {
 				loading_players: true,
-				players: [],
 				search: "",
 				card_width: 0,
 				columns: [
@@ -159,13 +158,13 @@
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters("players", ["player_count"]),
+			...mapGetters("players", ["player_count", "players"]),
 			slotsLeft() {
 				return this.tier.benefits.players - this.player_count
 			}
 		},
 		async mounted() {
-			this.players = await this.get_players();
+			await this.get_players();
 			this.loading_players = false;
 		},
 		methods: {

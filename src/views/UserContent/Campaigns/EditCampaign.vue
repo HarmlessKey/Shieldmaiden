@@ -53,14 +53,14 @@
 							</div>
 						</div>
 						<div class="mt-3 neutral-2 pointer">
-							<span class="btn btn-clear" @click="$set(campaign, 'private', null)">
+							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
 								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
 									<i class="fas fa-eye"></i>
 									Public
 								</span>
 							</span>
 							/
-							<span class="btn btn-clear mr-2" @click="$set(campaign, 'private', true)">
+							<span class="btn btn-clear mr-2" @click="$set(editCampaign, 'private', true)">
 								<span :class="editCampaign.private ? 'red' : 'neutral-2'">
 									<i class="fas fa-eye-slash"></i>
 									Private
@@ -119,12 +119,8 @@
 						value: "milestone",
 						label: "Milestone"
 					}
-				]
-			}
-		},
-		computed: {
-			editCampaign() {
-				return { ...this.campaign };
+				],
+				editCampaign: {...this.campaign}
 			}
 		},
 		methods: {

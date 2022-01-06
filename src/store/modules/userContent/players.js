@@ -28,7 +28,14 @@ const state = {
 };
 
 const getters = {
-  players: (state) => { return state.players; },
+  players: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.players)
+    .filter((player, key) => {
+      player.key = key;
+      return player;
+    }).orderBy("character_name", "asc").value();
+  },
   player_count: (state) => { return state.player_count; },
   player_services: (state) => { return state.player_services; }
 };
@@ -47,24 +54,19 @@ const actions = {
    */
    async get_players({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    let players_object = (state.players) ? state.players : undefined;
+    let players = (state.players) ? state.players : undefined;
 
-    if(!players_object && uid) {
+    if(!players && uid) {
       const services = await dispatch("get_player_services");
       try {
-        players_object = await services.getPlayers(uid);
+        players = await services.getPlayers(uid);
         
-        commit("SET_PLAYERS", players_object);
+        commit("SET_PLAYERS", players);
       } catch(error) {
         throw error;
       }
     }
-    // Convert object to sorted array
-    const players = _.chain(players_object)
-    .filter((player, key) => {
-      player.key = key;
-      return player;
-    }).orderBy("character_name", "asc").value();
+    
     return players;
   },
 

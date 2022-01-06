@@ -23,7 +23,7 @@
 						</div>
 						
 						<div class="actions items-center pr-0">
-							<a class="btn btn-sm bg-neutral-5" @click="removePlayer(key)">
+							<a class="btn btn-sm bg-neutral-5" @click="removePlayer(player)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center right">
 									Remove from campaign
@@ -86,7 +86,6 @@
 
 <script>
 	import { mapGetters, mapActions } from "vuex";
-	import { db } from "@/firebase";
 
 	export default {
 		name: "AddPlayers",
@@ -100,8 +99,6 @@
 			return {
 				user: this.$store.getters.user,
 				image: false,
-				players: [],
-				campaign_players: [],
 				players_dialog: false,
 			}
 		},
@@ -110,17 +107,18 @@
 				'allEncounters',
 				'overencumbered'
 			]),
-		},
-		async mounted() {
-			await this.get_players().then(players => {
-				this.players = players;
-				this.campaign_players = players.filter(player => {
+			...mapGetters("players", ["players"]),
+			campaign_players() {
+				return this.players.filter(player => {
 					return player.campaign_id === this.campaign.key;
 				});
-			});
+			}
+		},
+		async mounted() {
+			await this.get_players();
 		},
 		methods: {
-			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player"]),
+			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player", "delete_player"]),
 			...mapActions("players", ["get_players"]),
 			addPlayer(id) {
 				// Set the current HP
@@ -129,31 +127,11 @@
 					campaign: this.campaign
 				});
 			},
-			removePlayer(playerId) {
-				// Get companions of player
-				let companions = this.players[playerId].companions;
-
-				//First remove player from all encounters
-				for(let encounterId in this.allEncounters[this.campaignId]) {
-					//Remove player from encouner
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(playerId).remove();
-					if (companions !== undefined) {					
-						for (let companionId of Object.keys(companions)) {
-							db.ref(`encounters/${this.user.uid}/${this.campaignId}/${encounterId}/entities`).child(companionId).remove();
-						}
-					}
-				}
-
-				//Then remove from campaign
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players`).child(playerId).remove();
-				if (companions !== undefined) {
-					for (let companionId of Object.keys(companions)) {
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(companionId).remove();
-					}
-				}
-				if (this.players[playerId].campaign_id == this.campaignId) {
-					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
-				}
+			async removePlayer(player) {
+				await this.delete_player({
+					id: this.campaign.key,
+					player
+				});
 			},
 			checkPlayer(campaign_id) {
 				return (campaign_id === this.campaign.key);

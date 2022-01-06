@@ -201,9 +201,10 @@ export const content_module = {
 			let count = {};
 			let overencumbered = false;
 			
-			count.campaigns = Object.keys(rootGetters["campaigns/campaigns"]).length;
+			count.campaigns = rootGetters["campaigns/campaign_count"];
 			count.players = rootGetters["players/player_count"];
 			count.npcs = rootGetters["npcs/npc_count"];
+			count.items = rootGetters["items/item_count"];
 			count.encounters = 0;
 			
 			// Count encounters for every campaign
@@ -220,6 +221,7 @@ export const content_module = {
 				if (count.campaigns > benefits.campaigns ||
 						count.encounters > benefits.encounters ||
 						count.npcs > benefits.npcs ||
+						count.items > benefits.items ||
 						count.players > benefits.players
 				) {
 					overencumbered = true;

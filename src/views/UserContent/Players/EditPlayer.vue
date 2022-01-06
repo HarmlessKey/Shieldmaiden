@@ -558,7 +558,7 @@
 							npc.key = key;
 							comps.push(npc);
 						} 
-						// The NPC can't be found, so it was deleted. Also delete it as a companion
+						// The NPC can't be found, so it was deleted. Also delete it as a companion from the player
 						else {
 							this.delete_companion({ uid: this.userId, playerId: this.playerId, id: key });
 						}
@@ -576,8 +576,8 @@
 				"get_player", 
 				"get_owner_id", 
 				"add_player",
-				"edit_player", 
-				"get_players", 
+				"edit_player",
+				"get_players",
 				"delete_companion"
 			]),
 			...mapActions("npcs", ["get_npc"]),

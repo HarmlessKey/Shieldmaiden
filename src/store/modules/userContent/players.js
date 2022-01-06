@@ -5,7 +5,7 @@ import _ from 'lodash';
 // Converts a full player to a search_player
 const convert_player = (player) => {
 	const properties = [
-		"character_name",
+    "character_name",
     "avatar",
     "campaign_id",
     "companions"
@@ -61,11 +61,10 @@ const actions = {
     }
     // Convert object to sorted array
     const players = _.chain(players_object)
-    .filter(function(player, key) {
+    .filter((player, key) => {
       player.key = key;
       return player;
     }).orderBy("character_name", "asc").value();
-
     return players;
   },
 
@@ -236,6 +235,26 @@ const actions = {
   },
 
   /**
+   * Updates the campaign_id of a player
+   * 
+   * @param {string} uid
+   * @param {string} playerId 
+   * @param {number} value 
+   */
+   async set_campaign_id({ commit, dispatch }, { uid, playerId, value }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.updatePlayer(uid, playerId, "", { "campaign_id": value }, true);
+        commit("SET_CAMPAIGN_ID", { uid, playerId, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
    * Removes the companion link from a player
    * 
    * @param {string} uid
@@ -246,7 +265,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        await services.updatePlayer(uid, playerId, "/companions", { [id]: null });
+        await services.updatePlayer(uid, playerId, "/companions", { [id]: null }, true);
         commit("REMOVE_COMPANION", { uid, playerId, id });
         return;
       } catch(error) {
@@ -341,11 +360,19 @@ const mutations = {
     Vue.set(state.cached_players[uid][id], "experience", value);
   },
   REMOVE_COMPANION(state, { uid, playerId, id }) {
-    if(state.cached_players[uid] && state.cached_players[uid][playerId]) {
+    if(state.cached_players[uid] && state.cached_players[uid][playerId] && state.cached_players[uid][playerId].campanions) {
       Vue.delete(state.cached_players[uid][playerId].campanions, id);
     }
-    if(state.players) {
-      Vue.delete(state.players[playerId][id].companions, id);
+    if(state.players && state.players[playerId] && state.players[playerId].companions) {
+      Vue.delete(state.players[playerId].companions, id);
+    }
+  },
+  SET_CAMPAIGN_ID(state, { uid, playerId, value }) {
+    if(state.cached_players[uid] && state.cached_players[uid][playerId]) {
+      Vue.set(state.cached_players[uid][playerId], "campaign_id", value);
+    }
+    if(state.players && state.players[playerId]) {
+      Vue.set(state.players[playerId], "campaign_id", value);
     }
   }
 };

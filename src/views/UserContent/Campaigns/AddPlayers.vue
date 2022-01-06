@@ -9,40 +9,35 @@
 				</a>
 			</div>
 			<div class="card-body">
-				<template v-if="players && campaign">
-					<ul class="entities hasImg" v-if="campaign.players">
-						<li v-for="(player, key) in campaign.players" :key="key">	
-							<span class="img" :style="{ backgroundImage: 'url(\''+ players[key].avatar + '\')' }">
-								<i v-if="!players[key].avatar" class="hki-player" />
+				<ul class="entities hasImg" v-if="campaign_players.length">
+					<li v-for="player in campaign_players" :key="player.key">	
+						<span class="img" :style="{ backgroundImage: 'url(\''+ player.avatar + '\')' }">
+							<i v-if="!player.avatar" class="hki-player" />
+						</span>
+
+						<div :class="{ 'red': inOtherCampaign(player.campaign_id) }">
+							{{ player.character_name }}
+							<span v-if="inOtherCampaign(player.campaign_id)" class="d-none d-md-inline ml-1 neutral-2">
+								<small>Different Campaign</small>
 							</span>
-
-							<div :class="{ 'red': inOtherCampaign(key) }">
-								{{ players[key].character_name }}
-								<span v-if="inOtherCampaign(key)" class="d-none d-md-inline ml-1 neutral-2">
-									<small>Different Campaign</small>
-								</span>
-							</div>
-							
-							<div class="actions">
-								<a class="neutral-2" @click="removePlayer(key)">
-									<i class="fas fa-trash-alt"></i>
-									<q-tooltip anchor="top middle" self="center right">
-										Remove from campaign
-									</q-tooltip>
-								</a>
-							</div>
-						</li>
-					</ul>
-					<div v-else>
-						<p>
-							There are no players in this campaign yet.
-						</p>
-						<a @click="players_dialog = true" class="btn btn-block">Add players</a>
-					</div>
-					
-				</template>
-				<hk-loader v-else name="players" />
-
+						</div>
+						
+						<div class="actions items-center pr-0">
+							<a class="btn btn-sm bg-neutral-5" @click="removePlayer(key)">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center right">
+									Remove from campaign
+								</q-tooltip>
+							</a>
+						</div>
+					</li>
+				</ul>
+				<div v-else>
+					<p>
+						There are no players in this campaign yet.
+					</p>
+					<a @click="players_dialog = true" class="btn btn-block">Add players</a>
+				</div>
 			</div>
 			<div slot="footer" class="card-footer">
 				<q-btn label="Close" no-caps v-close-popup />
@@ -58,23 +53,23 @@
 
 				<div class="card-body">
 					<ul class="entities hasImg" v-if="players && campaign">
-						<li v-for="(player, key) in players" :key="key">
+						<li v-for="player in players" :key="player.key">
 							<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
 								<i v-if="!player.avatar" class="hki-player" />
 							</span>
 
 							{{ player.character_name }}
 						
-							<span v-if="inOtherCampaign(key)">
+							<span v-if="inOtherCampaign(player.campaign_id)">
 								<span class="d-none d-md-inline ml-1 neutral-3 pr-2"><small>Different Campaign</small></span>
 							</span>
 
-							<span v-else-if="checkPlayer(key) >= 0">
+							<span v-else-if="checkPlayer(player.campaign_id)">
 								<i class="fas fa-check pr-2 neutral-2"></i>
 							</span>
 
-							<div v-else class="actions">
-								<a @click="addPlayer(key)">
+							<div v-else class="actions items-center pr-0">
+								<a @click="addPlayer(player.key)" class="btn btn-sm bg-neutral-5">
 									<i class="fas fa-plus green"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Add character
@@ -97,28 +92,18 @@
 	export default {
 		name: "AddPlayers",
 		props: {
-			campaignId: {
-				type: String,
+			campaign: {
+				type: Object,
 				required: true
 			}
 		},
 		data() {
 			return {
 				user: this.$store.getters.user,
-				campaign: {},
-				newCampaign: '',
 				image: false,
+				players: [],
+				campaign_players: [],
 				players_dialog: false,
-				advancement_options: [
-					{
-						value: "experience",
-						label: "Experience"
-					},
-					{
-						value: "milestone",
-						label: "Milestone"
-					}
-				]
 			}
 		},
 		computed: {
@@ -126,40 +111,24 @@
 				'allEncounters',
 				'overencumbered'
 			]),
-			...mapGetters("npcs", ["npcs"]),
-			...mapGetters("players", ["players"]),
 		},
 		async mounted() {
-			await this.get_campaign({
-				uid: this.user.uid,
-				id: this.campaignId
-			}).then(campaign => {
-				this.campaign = campaign;
+			await this.get_players().then(players => {
+				this.players = players;
+				this.campaign_players = players.filter(player => {
+					return player.campaign_id === this.campaign.key;
+				});
 			});
 		},
 		methods: {
 			...mapActions("campaigns", ["campaigns", "get_campaign", "add_player"]),
+			...mapActions("players", ["get_players"]),
 			addPlayer(id) {
-				// Make sure the player has XP if advancement is experience
-				if(this.campaign.advancement === "experience" && this.players[id].experience === undefined) {
-					db.ref(`players/${this.user.uid}/${id}/experience`).set(0);
-				}
-
 				// Set the current HP
 				this.add_player({
-					id: this.campaignId,
 					playerId: id,
-					player: { curHp: this.players[id].maxHp }
+					campaign: this.campaign
 				});
-				db.ref(`players/${this.user.uid}/${id}`).update({campaign_id: this.campaignId});
-				if (this.players[id].companions !== undefined) {
-					for (let key in this.players[id].companions) {
-						
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/companions`).child(key).set({
-							curHp: this.npcs[key].maxHp,
-						})
-					}
-				}
 			},
 			removePlayer(playerId) {
 				// Get companions of player
@@ -187,26 +156,12 @@
 					db.ref(`players/${this.user.uid}/${playerId}/campaign_id`).remove();
 				}
 			},
-			checkPlayer(playerId) {
-				if (this.campaign.players === undefined)
-					return -1
-
-				return (Object.keys(this.campaign.players).indexOf(playerId));
+			checkPlayer(campaign_id) {
+				return (campaign_id === this.campaign.key);
 			},
-			inOtherCampaign(playerId) {
-				if (this.campaigns[this.players[playerId].campaign_id] === undefined) {
-					this.players[playerId].campaign_id = undefined;
-				}
-				return (this.players[playerId].campaign_id !== undefined && this.players[playerId].campaign_id !== this.campaignId)
+			inOtherCampaign(campaign_id) {
+				return (campaign_id !== undefined && campaign_id !== this.campaign.key)
 			},
-			setPrivate(value) {
-				//Has to be removed on false
-				if(value === false) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).remove();
-				} else {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value);
-				}
-			}
 		}
 	}
 </script>

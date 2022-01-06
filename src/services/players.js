@@ -88,10 +88,20 @@ export class playerServices {
     });
   }
 
-  // Updates a player
-  async updatePlayer(uid, id, path, value) {
-    path = `${uid}/${id}${path}`
-    PLAYERS_REF.child(path).update(value).then(() => {
+  /**
+   * Updates a specific property in an existing player
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of player to edit
+   * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
+   * @param {object} value Object with { proptery: value }
+   * @param {boolean} update_search Wether or not search_players must be updated
+   */
+  async updatePlayer(uid, id, path, value, update_search=false) {
+    PLAYERS_REF.child(`${uid}/${id}${path}`).update(value).then(() => {
+      if(update_search) {
+        SEARCH_PLAYERS_REF.child(`${uid}/results/${id}${path}`).update(value);
+      }
       return;
     }).catch((error) => {
       throw error;

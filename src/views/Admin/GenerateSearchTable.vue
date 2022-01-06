@@ -65,8 +65,9 @@
 					'custom_items': ['name', 'image'],
 					'reminders': ['title'],
 					'players': ['character_name', 'campaign_id', 'companions', 'avatar'],
-					'encounters': ['encounter:name', 'round', 'turn', 'entities:entity_count->count'],
-					'campaigns': ['campaign:name', 'timestamp', 'advancement', 'background', 'players:player_count->count', 'private']
+					// remove encounter:name and campaign:name after db name field conversion
+					'encounters': ['encounter:name', 'name', 'round', 'turn', 'entities:entity_count->count'],
+					'campaigns': ['campaign:name', 'name', 'timestamp', 'advancement', 'background', 'players:player_count->count', 'private']
 
 				}
 			}
@@ -87,54 +88,63 @@
 
 						if (this.ref === 'encounters') {
 							const campaigns = users[uid];
+							console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
 							for (const cid in campaigns) {
-								console.group(`%cUser: ${uid}, Campaign: ${cid}`, "color: #2c97de; font-weight: bold;")
 								const entries = campaigns[cid]
 
 								for (const key in entries) {
 									let entry = entries[key];
+
+									// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
+									// await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(entry.encounter);
+									// await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
+
 									const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
 									const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/results/${key}`);
 									try {
-										search_ref.set(search_entry)
+										await search_ref.set(search_entry)
 									} catch(error) {
 										console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
 									}
 								}
-								console.groupEnd();
 								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/metadata/count`);
-								count_ref.set(Object.keys(entries).length);
+								await count_ref.set(Object.keys(entries).length);
 							}
+							console.groupEnd();
 						}
 
 						else if (this.ref === 'campaigns') {
 							const campaigns = users[uid];
+							console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
 							for (const cid in campaigns) {
-								console.group(`%cUser: ${uid}, Campaign: ${cid}`, "color: #2c97de; font-weight: bold;")
 								const campaign = campaigns[cid]
+
+								// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
+								// await db.ref(`campaigns/${uid}/${cid}/name`).set(campaign.campaign);
+								// await db.ref(`campaigns/${uid}/${cid}/campaign`).remove();
 
 								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
 								const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
-
 								const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
-								const camp_encs = await camp_enc_ref.once('value', (snapshot) => {
-									return snapshot.val();
-								})
+								const camp_encs = await camp_enc_ref.once('value');
 
-								search_entry.encounter_count = Object.keys(camp_encs).length;
+								// Campaign has no encounters yet
+								if (camp_encs.val() !== null) {
+									search_entry.encounter_count = Object.keys(camp_encs.val()).length;
+								}
 								
 								try {
-									search_ref.set(search_entry)
+									await search_ref.set(search_entry)
 								} catch(error) {
 									console.error(`Couldn't update ${this.search_ref[this.ref]} table`, cid, campaign.campaign, error, search_entry)
 								}
 
-								console.groupEnd();
 								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-								count_ref.set(Object.keys(campaigns).length);
+								await count_ref.set(Object.keys(campaigns).length);
 							}
+							console.groupEnd();
 							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-							count_ref.set(Object.keys(campaigns).length);
+							await count_ref.set(Object.keys(campaigns).length);
 						}
 
 
@@ -147,21 +157,20 @@
 								const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
 								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${key}`);
 								try {
-									search_ref.set(search_entry)
+									await search_ref.set(search_entry)
 								} catch(error) {
 									console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
 								}	
 							}
 							console.groupEnd();
 							const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-							count_ref.set(Object.keys(entries).length);
+							await count_ref.set(Object.keys(entries).length);
 						}
 					}
-				}).then(() => {
-
-					this.loading = false;
-					console.log(`%cFINISHED.`, "color: #83b547;");
-				});
+				})
+				
+				this.loading = false;
+				console.log(`%cFINISHED.`, "color: #83b547;");
 			},
 			extractFields(entry, fields) {
 				let searchable_entry = {}
@@ -175,7 +184,7 @@
 						if (func === 'count') {
 							searchable_entry[s_field] = Object.keys(entry[og_field]).length
 						}
-						if (func === 'lower') {
+						else if (func === 'lower') {
 							searchable_entry[s_field] = entry[og_field].toLowerCase()
 						}
 						else {

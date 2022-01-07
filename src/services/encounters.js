@@ -86,9 +86,22 @@ export class encounterServices {
     try {
       ENCOUNTERS_REF.child(`${uid}/${campaignId}`).child(id).remove();
 
-      //Update search_players
+      //Update search_encounters
       SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}/count`).set(new_count);
       SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${id}`).remove();
+      return;
+    } catch(error){
+      throw error;
+    }
+  }
+
+  async deleteCampaignEncounters(uid, campaignId) {
+    try {
+      ENCOUNTERS_REF.child(`${uid}`).child(campaignId).remove();
+
+      //Update search_encounters
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}`).remove();
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}`).remove();
       return;
     } catch(error){
       throw error;

@@ -173,7 +173,7 @@ const actions = {
    */
   async add_campaign({ rootGetters, commit, dispatch }, campaign) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.campaign_count + 1;
+    const new_count = (state.campaign_count) ? state.campaign_count + 1 : 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
@@ -231,6 +231,7 @@ const actions = {
         await services.deleteCampaign(uid, id, new_count);
 
         // DELETE ALL ENCOUNTER OF CAMPAIGN
+        dispatch("encounters/delete_campaign_encounters", id, { root: true });
 
         commit("REMOVE_CAMPAIGN", id);
         commit("REMOVE_CACHED_CAMPAIGN", { uid, id });

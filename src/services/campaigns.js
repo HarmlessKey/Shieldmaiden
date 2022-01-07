@@ -135,7 +135,7 @@ export class campaignServices {
     try {
       CAMPAIGNS_REF.child(uid).child(id).remove();
 
-      //Update search_players
+      //Update search_campaigns
       SEARCH_CAMPAIGNS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).child(id).remove();
       return;

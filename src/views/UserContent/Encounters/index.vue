@@ -26,7 +26,7 @@
 									Encounters
 									<span v-if="encounters">( 
 										<span :class="{ 'green': true, 'red': encounter_count >= tier.benefits.encounters }">
-											{{ encounter_count }}
+											{{ encounter_count || 0 }}
 										</span> / 
 										<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
 										<template v-else>{{ tier.benefits.encounters }}</template>

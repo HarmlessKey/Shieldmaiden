@@ -144,7 +144,7 @@ const actions = {
   async add_encounter({ state, rootGetters, dispatch, commit }, { campaignId, encounter }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     const search_encounter = convert_encounter(encounter);
-    const new_count = state.encounter_count[campaignId] + 1;
+    const new_count = (state.encounter_count[campaignId]) ? state.encounter_count[campaignId] + 1 : 1;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
@@ -318,7 +318,25 @@ const actions = {
         commit("REMOVE_ENCOUNTER", { campaignId, type, id });
         commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
         commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
-        return id;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes all encounter of a campaign
+   * 
+   * @param {string} campaignId 
+   */
+   async delete_campaign_encounters({ rootGetters, dispatch, commit }, campaignId) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.deleteCampaignEncounters(uid, campaignId);
+        commit("REMOVE_CAMPAIGN_ENCOUNTERS", campaignId);
+        commit("REMOVE_CACHED_ENCOUNTERS", { uid, campaignId });
       } catch(error) {
         throw error;
       }
@@ -345,6 +363,11 @@ const mutations = {
   REMOVE_ENCOUNTER(state, { campaignId, type, id }) {
     if(state.encounters[campaignId] && state.encounters[campaignId][type]) {
       Vue.delete(state.encounters[campaignId][type], id);
+    }
+  },
+  REMOVE_CAMPAIGN_ENCOUNTERS(state, campaignId) {
+    if(state.encounters[campaignId] && state.encounters[campaignId]) {
+      Vue.delete(state.encounters, campaignId);
     }
   },
   SET_ENCOUNTERS(state, { campaignId, type, encounters }) {
@@ -381,6 +404,11 @@ const mutations = {
   REMOVE_CACHED_ENCOUNTER(state, { uid, campaignId, id }) {
     if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId]) {
       Vue.delete(state.cached_encounters[uid][campaignId], id);
+    }
+  },
+  REMOVE_CACHED_ENCOUNTERS(state, { uid, campaignId }) {
+    if(state.cached_encounters[uid]) {
+      Vue.delete(state.cached_encounters[uid], campaignId);
     }
   },
   EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity}) { 

@@ -399,8 +399,10 @@ const mutations = {
   DELETE_ENTITY(state, { uid, campaignId, encounterId, entityId }) { 
     Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
   },
+  // eslint-disable-next-line no-unused-vars
   UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
-    Vue.set(state.encounter_entity_count[campaignId][encounterId], count);
+    // UPDATE ENCOUNTER OBJECT
+    // Vue.set(state.encounters[campaignId][encounterId], count);
   },
   SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, encounter }) { 
     if(state.cached_encounters[uid]) {

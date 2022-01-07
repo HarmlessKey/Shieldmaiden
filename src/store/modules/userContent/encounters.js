@@ -5,7 +5,8 @@ import { encounterServices } from "@/services/encounters";
 const state = {
   encounter_services: null,
   active_encounter: undefined,
-  cached_encounters: {}
+  cached_encounters: {},
+  encounter_entity_count: {},
 };
 
 const getters = {
@@ -14,6 +15,9 @@ const getters = {
     if(uid) {
       return state.cached_encounters[uid] || {};
     } return {};
+  },
+  encounter_entity_count: (state) => (campaignId) => {
+    return state.encounter_entity_count[campaignId];
   },
   encounter_services: (state) => { return state.encounter_services; }
 };
@@ -138,6 +142,9 @@ const actions = {
       try {
         const entityId = await services.addNpc(uid, campaignId, encounterId, npc);
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId, entity: npc });
+       
+        const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
         return;
       } catch(error) {
         throw error;
@@ -160,6 +167,9 @@ const actions = {
       try {
         await services.addPlayer(uid, campaignId, encounterId, playerId, player);
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId: playerId, entity: player });
+        
+        const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
         return;
       } catch(error) {
         console.error(error);
@@ -205,6 +215,9 @@ const actions = {
       try {
         await services.deleteEntity(uid, campaignId, encounterId, entityId);
         commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
+        
+        const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
         return;
       } catch(error) {
         throw error;
@@ -289,6 +302,9 @@ const mutations = {
   },
   DELETE_ENTITY(state, { uid, campaignId, encounterId, entityId }) { 
     Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
+  },
+  UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
+    Vue.set(state.encounter_entity_count[campaignId][encounterId], count);
   },
   SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, encounter }) { 
     if(state.cached_encounters[uid]) {

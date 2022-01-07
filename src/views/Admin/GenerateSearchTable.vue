@@ -89,6 +89,7 @@
 						if (this.ref === 'encounters') {
 							const campaigns = users[uid];
 							console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
+
 							for (const cid in campaigns) {
 								const entries = campaigns[cid]
 
@@ -100,14 +101,14 @@
 									// await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
 
 									const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-									const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/results/${key}`);
+									const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`);
 									try {
 										await search_ref.set(search_entry)
 									} catch(error) {
 										console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
 									}
 								}
-								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/${cid}/metadata/count`);
+								const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
 								await count_ref.set(Object.keys(entries).length);
 							}
 							console.groupEnd();
@@ -125,13 +126,13 @@
 
 								const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
 								const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
-								const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
-								const camp_encs = await camp_enc_ref.once('value');
+								// const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
+								// const camp_encs = await camp_enc_ref.once('value');
 
-								// Campaign has no encounters yet
-								if (camp_encs.val() !== null) {
-									search_entry.encounter_count = Object.keys(camp_encs.val()).length;
-								}
+								// // Campaign has no encounters yet
+								// if (camp_encs.val() !== null) {
+								// 	search_entry.encounter_count = Object.keys(camp_encs.val()).length;
+								// }
 								
 								try {
 									await search_ref.set(search_entry)

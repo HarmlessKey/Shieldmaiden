@@ -1,7 +1,7 @@
 import { db } from "@/firebase";
 
 const ENCOUNTERS_REF = db.ref("encounters");
-const SEARCH_ENCOUNTERS_REF = db.ref("encounters");
+const SEARCH_ENCOUNTERS_REF = db.ref("search_encounters");
 
 export class encounterServices {
 
@@ -71,12 +71,14 @@ export class encounterServices {
 
   // Adds a player to the encounter
   async addPlayer(uid, campaignId, encounterId, playerId, player) {
-    const path = `${uid}/${campaignId}/${encounterId}/entities/${playerId}`;
-    ENCOUNTERS_REF.child(path).set(player).then(() => {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/entities/${playerId}`;
+      ENCOUNTERS_REF.child(path).set(player);
+
       return;
-    }).catch((error) => {
-      throw error;
-    });
+    } catch(err) {
+      throw err;
+    }
   }
 
   // Adds an NPC to the encounter
@@ -84,6 +86,7 @@ export class encounterServices {
     try {
       const path = `${uid}/${campaignId}/${encounterId}/entities`;
       const newNpc = await ENCOUNTERS_REF.child(path).push(npc);
+      
       return newNpc.key;
     } catch(error) {
       throw error;
@@ -92,17 +95,35 @@ export class encounterServices {
 
   // Deletes and entity from the encounter (either a player or npc)
   async deleteEntity(uid, campaignId, encounterId, entityId) {
-    const path = `${uid}/${campaignId}/${encounterId}/entities/${entityId}`;
-    ENCOUNTERS_REF.child(path).remove().then(() => {
-      return;
-    }).catch((error) => {
-      throw error;
-    });
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/entities/${entityId}`;
+      ENCOUNTERS_REF.child(path).remove();
+
+    } catch(err) {
+      throw err;
+    }
   }
-  
+
+  /**
+   * Update entity count in the search table of search_encounters
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {String} encounterId Encounter ID
+   * @param {Int} diff Difference to add or subtract from entity count
+   */
+  async updateEntityCount(uid, campaignId, encounterId, diff) {
+     // Update entity count in search_table
+     const entity_count_path = `${uid}/results/${campaignId}/${encounterId}/entity_count`;
+     let entity_count = await SEARCH_ENCOUNTERS_REF.child(entity_count_path).once('value');
+     SEARCH_ENCOUNTERS_REF.child(entity_count_path).set(entity_count.val() + diff);
+     return entity_count + diff;
+  }
+
   async deleteEncounter(uid, campaignId, id) {
     try {
       ENCOUNTERS_REF.child(uid).child(campaignId).child(id).remove();
+      SEARCH_ENCOUNTERS_REF.child(uid).child
       return;
     } catch(error){
       throw error;

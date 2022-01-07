@@ -1,24 +1,48 @@
 import Vue from 'vue';
 import { encounterServices } from "@/services/encounters"; 
+import _ from 'lodash';
 
+// Converts a full encounter to a search_encounter
+const convert_encounter = (encounter) => {
+	const properties = [
+    "name",
+    "round",
+    "turn",
+    "finished"
+	];
+  const returnEncounter = {};
+	
+	for(const prop of properties) {
+    if(encounter.hasOwnProperty(prop)) {
+      returnEncounter[prop] = encounter[prop];
+    }
+	}
+	return returnEncounter;
+}
 
 const state = {
   encounter_services: null,
   active_encounter: undefined,
   cached_encounters: {},
-  encounter_entity_count: {},
+  encounters: {},
+  encounter_count: {}
 };
 
 const getters = {
-  encounters: (state, getters, rootState, rootGetters) => {
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      return state.cached_encounters[uid] || {};
-    } return {};
+  get_encounters: (state) => (campaignId, type) => {
+    const encounters = state.encounters[campaignId][type];
+    // Convert object to sorted array
+    return _.chain(encounters)
+    .filter((campaign, key) => {
+      campaign.key = key;
+      return campaign;
+    }).orderBy((campaign) => {
+      return parseInt(campaign.timestamp)
+    } , 'asc')
+    .value();
   },
-  encounter_entity_count: (state) => (campaignId) => {
-    return state.encounter_entity_count[campaignId];
-  },
+  encounter_count: (state) => { return state.encounter_count; },
+  get_encounter_count: (state) => (campaignId) => { return state.encounter_count[campaignId]; },
   encounter_services: (state) => { return state.encounter_services; }
 };
 
@@ -31,47 +55,51 @@ const actions = {
   },
 
   /**
-   * Fetches all the encounters for a user
-   * and stores them in cached_encounters.uid
-   */
-  async fetch_encounters({ rootGetters, commit, dispatch }) {
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      const services = await dispatch("get_encounter_services");
-      try {
-        const encounters = await services.getEncounters(uid);
-        commit("SET_CACHED_ENCOUNTERS", { uid, encounters });
-        return;
-      } catch(error) {
-        throw error;
-      }
-    }
-  },
-
-  /**
    * Gets all encounters for a single campaign
    * first try to find it in the store, then fetch if wasn't present
    * 
    * @param {string} uid userId
    * @param {string} id encounterId
    */
-   async get_campaign_encounters({ state, rootGetters, commit, dispatch }, campaignId) {
+   async get_campaign_encounters({ state, rootGetters, commit, dispatch }, { campaignId, finished=false }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    let encounters = (state.cached_encounters[uid]) 
-      ? state.cached_encounters[uid][campaignId] : undefined;
+    const type = (finished) ? "finished" : "active";
+    let encounters = (state.encounters[campaignId] && state.encounters[campaignId][type]) 
+    ? state.encounters[campaignId][type] : undefined;
 
     // The encounter is not in the store and needs to be fetched from the database
     if(!encounters) {
       const services = await dispatch("get_encounter_services");
       try {
-        const encounters = await services.getCampaignEncounters(uid, campaignId);
-        commit("SET_CACHED_CAMPAIGN_ENCOUNTERS", { uid, campaignId, encounters });
-        return encounters;
+        encounters = await services.getCampaignEncounters(uid, campaignId, finished);
+        commit("SET_ENCOUNTERS", { campaignId, type, encounters: encounters || {} });
       } catch(error) {
         throw error;
       }
     }
     return encounters;
+  },
+
+  /**
+   * Fetches the total count of encounter for each campaign
+   * and stores it in encounter_count
+   */
+   async fetch_encounter_count({ rootGetters, commit, dispatch }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const count = await services.getEncounterCount(uid);
+        if(count) {
+          for(const [campaignId, metadata] of Object.entries(count)) {
+            commit("SET_ENCOUNTER_COUNT", { campaignId, count: metadata.count });
+          }
+        }
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
   },
 
   /**
@@ -105,21 +133,24 @@ const actions = {
     return encounter;
   },
 
-
   /**
    * Adds a newly created encounter for a user
    * A user can only add encounters for themselves so we use the uid from the store
    * 
+   * @param {string} campaignId 
    * @param {object} encounter 
    * @returns {string} the id of the newly added encounter
    */
-  async add_encounter({ rootGetters, commit, dispatch }, campaignId, encounter) {
+  async add_encounter({ state, rootGetters, dispatch, commit }, { campaignId, encounter }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const search_encounter = convert_encounter(encounter);
+    const new_count = state.encounter_count[campaignId] + 1;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        const id = await services.addEncounter(uid, campaignId, encounter);
-        commit("SET_CACHED_ENCOUNTER", { uid, campaignId, id, encounter });
+        const id = await services.addEncounter(uid, campaignId, encounter, new_count, search_encounter);
+        commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        commit("SET_ENCOUNTER", { uid, campaignId, type: "active", id, encounter: search_encounter });
         return id;
       } catch(error) {
         throw error;
@@ -273,16 +304,21 @@ const actions = {
    * Deletes an existing encounter
    * A user can only delete their own encounter's so use uid from the store
    * 
+   * @param {string} campaignId 
    * @param {string} id 
    */
-  async delete_encounter({ rootGetters, commit, dispatch }, campaignId, id) {
+   async delete_encounter({ state, rootGetters, dispatch, commit }, { campaignId, id, finished }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const type = (finished) ? "finished" : "active";
+    const new_count = state.encounter_count[campaignId] - 1;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        await services.deleteEncounter(uid, campaignId, id);
-        commit("REMOVE_CACHED_ENCOUNTER", { uid, campaignId, id });
-        return;
+        await services.deleteEncounter(uid, campaignId, id, new_count);
+        commit("REMOVE_ENCOUNTER", { campaignId, type, id });
+        commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
+        commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        return id;
       } catch(error) {
         throw error;
       }
@@ -292,7 +328,32 @@ const actions = {
 const mutations = {
   SET_ENCOUNTER_SERVICES(state, payload) { Vue.set(state, "encounter_services", payload); },
   SET_CACHED_ENCOUNTERS(state, { uid, encounters }) { Vue.set(state.cached_encounters, uid, encounters); },
-  SET_CACHED_CAMPAIGN_ENCOUNTERS(state, { uid, campaignId, encounters }) { Vue.set(state.cached_encounters[uid], campaignId, encounters); },
+  SET_ENCOUNTER_COUNT(state, { campaignId, count }) {
+    Vue.set(state.encounter_count, campaignId, count);
+  },
+  SET_ENCOUNTER(state, { campaignId, type, id, encounter }) {
+    if(state.encounters[campaignId]) {
+      if(state.encounters[campaignId][type]) {
+        Vue.set(state.encounters[campaignId][type], id, encounter);
+      } else {
+        Vue.set(state.encounters[campaignId], type, { [id]: encounter });
+      }
+    } else {
+      Vue.set(state.encounters, campaignId, { [type]: { [id]: encounter }});
+    }
+  },
+  REMOVE_ENCOUNTER(state, { campaignId, type, id }) {
+    if(state.encounters[campaignId] && state.encounters[campaignId][type]) {
+      Vue.delete(state.encounters[campaignId][type], id);
+    }
+  },
+  SET_ENCOUNTERS(state, { campaignId, type, encounters }) {
+    if(state.encounters[campaignId]) {
+      Vue.set(state.encounters[campaignId], type, encounters);
+    } else {
+      Vue.set(state.encounters, campaignId, { [type]: encounters });
+    }
+  },
   ADD_ENTITY(state, { uid, campaignId, encounterId, entityId, entity }) { 
     if(state.cached_encounters[uid][campaignId][encounterId].entities) {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
@@ -317,7 +378,11 @@ const mutations = {
       Vue.set(state.cached_encounters, uid, { [campaignId]: { [encounterId]: encounter } });
     }
   },
-  REMOVE_CACHED_ENCOUNTER(state, { uid, campaignId, id }) { Vue.delete(state.cached_encounters[uid][campaignId], id); },
+  REMOVE_CACHED_ENCOUNTER(state, { uid, campaignId, id }) {
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId]) {
+      Vue.delete(state.cached_encounters[uid][campaignId], id);
+    }
+  },
   EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity}) { 
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
   },

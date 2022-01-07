@@ -39,13 +39,12 @@ export const general_module = {
 						return Promise.all([
 							dispatch("setTheme"),
 							dispatch("setUserInfo"),
-							// players need prio!
 							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
 							dispatch("items/fetch_item_count"),
 							dispatch("campaigns/fetch_campaign_count"),
-							dispatch("reminders/fetch_reminder_count"),
-							dispatch("encounters/fetch_encounters"),
+							dispatch("encounters/fetch_encounter_count"),
+							dispatch("reminders/fetch_reminder_count")
 						]);
 					})
 					.then(() => {

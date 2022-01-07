@@ -246,12 +246,12 @@
 					</div>
 					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement">
 						<div class="level" :class="{red: isXpAdvancement && players[key].level}">
-							{{ players[key].level ? players[key].level : calculatedLevel(player.experience) }}
+							{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}
 							<q-tooltip anchor="top middle" self="center middle" v-if="players[key].level">
 								Level is overwritten
 							</q-tooltip>
 						</div>
-						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-neutral-3" />
+						<q-linear-progress size="3px" :value="levelAdvancement(players[key].experience)" color="primary" class="bg-neutral-3" />
 					</div>
 				</template>
 			</template>

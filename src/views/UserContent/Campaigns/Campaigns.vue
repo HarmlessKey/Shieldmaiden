@@ -119,13 +119,13 @@
 										<i class="fas fa-swords mr-2 neutral-2" />
 											<span 
 												:class="{ 
-													'green': campaign.encounter_count, 
-													'red': campaign.encounter_count >= tier.benefits.encounters 
+													'green': get_encounter_count(campaign.key), 
+													'red': get_encounter_count(campaign.key) >= tier.benefits.encounters 
 												}"
 											>
-												{{ campaign.encounter_count }}
+												{{ get_encounter_count(campaign.key) || 0 }}
 											</span>
-											encounter{{ campaign.encounter_count === 1 ? "" : "s" }}
+											encounter{{ get_encounter_count(campaign.key) === 1 ? "" : "s" }}
 									</router-link>
 									
 									<div class="mt-4">
@@ -139,7 +139,7 @@
 											<i class="fas fa-plus"></i> Add players
 										</a>
 										<router-link 
-											v-else-if="!campaign.encounter_count" class="btn"
+											v-else-if="!get_encounter_count(campaign.key)" class="btn"
 											:to="`${$route.path}/${campaign.key}`" 
 										>
 											<i class="fas fa-swords"></i> Add encounters
@@ -295,6 +295,7 @@
 			]),
 			...mapGetters("players", ["player_count"]),
 			...mapGetters("campaigns", ["campaign_count", "campaigns"]),
+			...mapGetters("encounters", ["get_encounter_count"]),
 			slotsLeft() {
 				return this.tier ? this.tier.benefits.campaigns - this.campaign_count : 0;
 			}

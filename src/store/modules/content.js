@@ -209,8 +209,8 @@ export const content_module = {
 			
 			// Count encounters for every campaign
 			// Save the highest count 
-			for (const campaignEncounters in Object.values(rootGetters["encounters/encounters"])) {
-				let n = Object.keys(campaignEncounters).length;
+			for (const campaign of Object.values(rootGetters["encounters/encounter_count"])) {
+				let n = campaign.count || 0;
 				if (n > count.encounters) {
 					count.encounters = n;
 				}

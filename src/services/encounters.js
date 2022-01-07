@@ -7,21 +7,30 @@ export class encounterServices {
 
   async getEncounters(uid) {
     try {
-      const encounters = await ENCOUNTERS_REF.child(uid).once('value', snapshot => {
-        return snapshot;
-      });
+      const encounters = await ENCOUNTERS_REF.child(uid).once('value');
       return encounters.val();
     } catch(error) {
       throw error;
     }
   }
 
-  async getCampaignEncounters(uid, campaignId) {
+  async getEncounterCount(uid) {
     try {
-      const path = `${uid}/${campaignId}/results`;
-      const encounters = await SEARCH_ENCOUNTERS_REF.child(path).once('value', snapshot => {
-        return snapshot;
-      });
+      const path = `${uid}/metadata`;
+      const count = await SEARCH_ENCOUNTERS_REF.child(path).once('value');
+      return count.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  async getCampaignEncounters(uid, campaignId, finished) {
+    try {
+      const path = `${uid}/results/${campaignId}`;
+      const encounters = await SEARCH_ENCOUNTERS_REF.child(path)
+      .orderByChild("finished")
+      .equalTo(finished)
+      .once('value');
       return encounters.val();
     } catch(error) {
       throw error;
@@ -39,10 +48,14 @@ export class encounterServices {
     }
   }
 
-  async addEncounter(uid, campaignId, encounter) {
+  async addEncounter(uid, campaignId, encounter, new_count, search_encounter) {
     try {
-      const path = `${uid}/${campaignId}`;
-      const newEncounter = await ENCOUNTERS_REF.child(path).push(encounter);
+      const newEncounter = await ENCOUNTERS_REF.child(uid).child(campaignId).push(encounter);
+
+      // Update search_encounters
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}/count`).set(new_count);
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${newEncounter.key}`).set(search_encounter);
+
       return newEncounter.key;
     } catch(error) {
       throw error;
@@ -67,6 +80,19 @@ export class encounterServices {
     }).catch((error) => {
       throw error;
     });
+  }
+
+  async deleteEncounter(uid, campaignId, id, new_count) {
+    try {
+      ENCOUNTERS_REF.child(`${uid}/${campaignId}`).child(id).remove();
+
+      //Update search_players
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}/count`).set(new_count);
+      SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${id}`).remove();
+      return;
+    } catch(error){
+      throw error;
+    }
   }
 
   // Adds a player to the encounter
@@ -118,15 +144,5 @@ export class encounterServices {
      let entity_count = await SEARCH_ENCOUNTERS_REF.child(entity_count_path).once('value');
      SEARCH_ENCOUNTERS_REF.child(entity_count_path).set(entity_count.val() + diff);
      return entity_count + diff;
-  }
-
-  async deleteEncounter(uid, campaignId, id) {
-    try {
-      ENCOUNTERS_REF.child(uid).child(campaignId).child(id).remove();
-      SEARCH_ENCOUNTERS_REF.child(uid).child
-      return;
-    } catch(error){
-      throw error;
-    }
   }
 }

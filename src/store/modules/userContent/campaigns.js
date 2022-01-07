@@ -8,7 +8,6 @@ const convert_campaign = (campaign) => {
     "name",
     "background",
     "player_count",
-    "encounter_count",
     "advancement",
     "timestamp",
     "private"
@@ -28,7 +27,7 @@ const state = {
   active_campaign: undefined,
   cached_campaigns: {},
   campaign: undefined,
-  campaign_count: 0,
+  campaign_count: 0
 };
 
 const getters = {
@@ -67,7 +66,6 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {
         campaigns = await services.getCampaigns(uid);
-        
         commit("SET_CAMPAIGNS", campaigns);
       } catch(error) {
         throw error;
@@ -200,10 +198,16 @@ const actions = {
    */
    async update_campaign({ commit, dispatch }, { uid, id, campaign }) {
     if(uid) {
-      const services = await dispatch("get_campaign_services");
       try {
+        const services = await dispatch("get_campaign_services");
         const search_campaign = convert_campaign(campaign);
         await services.updateCampaign(uid, id, "", search_campaign, true);
+
+        // Update all the props in the cached campaign
+        for(const [property, value] of Object.entries(campaign)) {
+          commit("SET_CACHED_PROP", { uid, id, property, value });
+        }
+
         commit("SET_CAMPAIGN", { uid, id, search_campaign });
         return;
       } catch(error) {
@@ -237,6 +241,8 @@ const actions = {
       }
     }
   },
+
+
 
   /**
    * Add a new player to the campaign

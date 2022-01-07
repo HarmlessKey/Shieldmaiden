@@ -171,25 +171,26 @@
 						<div class="card-body">
 							<h6 class="mb-2">Ability scores</h6>
 							<div class="row q-col-gutter-md">
-								<div v-for="(ability, index) in abilities" :key="index" class="col-6 col-md-2 mb-2">
-									<ValidationProvider rules="numeric|between:1,99" :name="ability.ability" v-slot="{ errors, invalid, validated }">
+								<div v-for="ability in abilities" :key="ability" class="col-6 col-md-2 mb-2">
+									<ValidationProvider rules="numeric|between:1,99" :name="ability" v-slot="{ errors, invalid, validated }">
 										<q-input 
 											:dark="$store.getters.theme === 'dark'" filled square
-											:label="ability.ability.capitalize()"
+											:label="ability.capitalize()"
 											autocomplete="off"  
 											type="number" 
 											min="1"
 											max="99"
-											v-model="player[ability.ability]" 
-											@input="parseToInt($event, player, ability.ability)"
+											v-model="player[ability]" 
+											@input="parseToInt($event, player, ability)"
 											:error="invalid && validated"
 											:error-message="errors[0]"
 										>
+											<!-- eslint-disable -->
 											<q-checkbox 
 												slot="append"
 												size="xs" 
 												:dark="$store.getters.theme === 'dark'" 
-												v-model="player[`${ability.ability}-save-profficient`]" 
+												v-model="player[`${ability}-save-profficient`]" 
 												:false-value="null" 
 												indeterminate-value="something-else" 
 											>
@@ -438,16 +439,16 @@
 	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
-	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
 	import { skills } from '@/mixins/skills.js';
 	import { general } from '@/mixins/general.js';
 	import Defenses from './Defenses';
 	import CopyMonster from '../../../components/CopyMonster.vue';
+	import { abilities } from "@/mixins/abilities";
 
 	export default {
 		name: 'Players',
-		mixins: [experience, skills, general],
+		mixins: [experience, skills, general, abilities],
 		metaInfo: {
 			title: 'Players'
 		},
@@ -465,7 +466,6 @@
 				player: {},
 				loading: false,
 				companions_to_delete: [],
-				npcsAsCompanion: [],
 				companions: [],
 				columns: {
 					avatar: {
@@ -485,18 +485,13 @@
 				}
 			}
 		},
-		firebase() {
-			return {
-				abilities: db.ref('abilities')
-			}
-		},
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
 			]),
 			...mapGetters("npcs", ["npc_count"]),
-			...mapGetters("players", ["player_count"]),
+			...mapGetters("players", ["player_count", "players"]),
 			skills: {
 				get() {
 					return this.player.skills ? this.player.skills : [];
@@ -512,16 +507,25 @@
 				set(newValue) {
 					this.$set(this.player, 'skills_expertise', newValue);
 				}
+			},
+			npcsAsCompanion() {
+				const companions = [];
+				for(const player of this.players) {
+					if(player.companions) {
+						for(const key in player.companions) {
+							companions.push(key);
+						}
+					}
+				}
+				return companions;
 			}
 		},
 		async mounted() {
-			if(this.$route.name === 'AddPlayers') {
-				this.$set(this.player, "strength", 10);
-				this.$set(this.player, "dexterity", 10);
-				this.$set(this.player, "constitution", 10);
-				this.$set(this.player, "intelligence", 10);
-				this.$set(this.player, "wisdom", 10);
-				this.$set(this.player, "charisma", 10);
+			await this.get_players();
+			if(this.$route.name === 'Add player') {
+				for(const ability of this.abilities) {
+					this.$set(this.player, ability, 10);
+				}
 			}
 
 			//User ID needs te be different if it is
@@ -531,19 +535,6 @@
 			} else {
 				this.userId = this.$store.getters.user.uid;
 			}
-
-			// Check what NPCs are used as companions
-			await this.get_players().then(players => {
-				const companions = [];
-				for(const player of players) {
-					if(player.companions) {
-						for(const key in player.companions) {
-							companions.push(key);
-						}
-					}
-				}
-				this.npcsAsCompanion = companions;
-			});
 
 			if(this.playerId) {
 				this.loading = true;

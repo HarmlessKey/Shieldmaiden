@@ -1,6 +1,7 @@
 import { db } from "@/firebase";
 
 const ENCOUNTERS_REF = db.ref("encounters");
+const SEARCH_ENCOUNTERS_REF = db.ref("encounters");
 
 export class encounterServices {
 
@@ -15,9 +16,10 @@ export class encounterServices {
     }
   }
 
-  async getCampaignEncounters(uid, id) {
+  async getCampaignEncounters(uid, campaignId) {
     try {
-      const encounters = await ENCOUNTERS_REF.child(uid).child(id).once('value', snapshot => {
+      const path = `${uid}/${campaignId}/results`;
+      const encounters = await SEARCH_ENCOUNTERS_REF.child(path).once('value', snapshot => {
         return snapshot;
       });
       return encounters.val();

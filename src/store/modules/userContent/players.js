@@ -22,7 +22,7 @@ const convert_player = (player) => {
 
 const state = {
   player_services: null,
-  players: undefined,
+  players: {},
   player_count: 0,
   cached_players: {}
 };
@@ -56,7 +56,7 @@ const actions = {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let players = (state.players) ? state.players : undefined;
 
-    if(!players && uid) {
+    if((!players || !Object.keys(players).length ) && uid) {
       const services = await dispatch("get_player_services");
       try {
         players = await services.getPlayers(uid);
@@ -77,9 +77,8 @@ const actions = {
     if(!player) {
       const services = await dispatch("get_player_services");
       try {
-        const player = await services.getPlayer(uid, id);
+        player = await services.getPlayer(uid, id);
         commit("SET_CACHED_PLAYER", { uid, id, player });
-        return player;
       } catch(error) {
         throw error;
       }
@@ -161,7 +160,7 @@ const actions = {
    * @param {string} id 
    * @param {object} player 
    */
-  async edit_player({ commit, dispatch }, { uid, id, player, companions, deleted_companions }) {
+  async edit_player({ commit, dispatch }, { uid, id, player, companions=[], deleted_companions=[] }) {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {

@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
-			{{ campaign.campaign }}
+		<h1 class="mb-3 d-flex justify-content-between">
+			{{ campaign.name }}
 			<span 
 				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
 				class="live" 
@@ -183,7 +183,10 @@
 
 				<!-- PLAYERS -->
 				<div class="col-12 col-md-5">
-					<Players :userId="user.uid" :campaignId="campaignId" card-view />
+					<Players v-if="!loading_campaign" :userId="user.uid" :campaignId="campaignId" card-view />
+					<hk-card v-else>
+						<hk-loader name="campaign" />
+					</hk-card>
 				</div>
 			</div>
 		</template>
@@ -246,6 +249,7 @@
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				encounters: {},
+				loading_campaign: true,
 				campaign: {},
 				newEncounter: "",
 				add: false,
@@ -298,16 +302,12 @@
 			}
 		},
 		async mounted() {
-			await this.get_campaign({
+			this.campaign = await this.get_campaign({
 				uid: this.user.uid,
 				id: this.campaignId
-			}).then((campaign) => {
-				this.campaign = campaign;
-				this.setCurHp(campaign.players);
-				this.removeGhostPlayers(campaign.players);
-				this.checkAdvancement(campaign);
-				this.set_active_campaign(this.campaignId);
 			});
+			this.set_active_campaign(this.campaignId);
+			this.loading_campaign = false;
 
 			await this.get_campaign_encounters(this.campaignId).then(encounters => {
 				this.encounters = encounters;
@@ -321,7 +321,6 @@
 				"side_collapsed",
 				"broadcast"
 			]),
-			...mapGetters("players", ["players"]),
 			_active: function() {
 				return _.chain(this.encounters)
 				.filter(function(encounter, key) {
@@ -346,19 +345,6 @@
 					return parseInt(encounter.timestamp)
 				} , 'asc')
 				.value()
-			},
-			noCurHp() {
-				//Checks if all players have their curHp set
-				//If not, it is set on mounted
-				let check = false;
-				if(this.campaign) {
-					for(const key in this.campaign.players) {
-						if(this.campaign.players[key].curHp == undefined) {
-							check = true;
-						}
-					}
-				}
-				return check;
 			}
 		},
 		methods: {
@@ -444,50 +430,6 @@
 
 				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
 
-			},
-			setCurHp(players) {
-				if(this.noCurHp) {
-					//Stores player with curHp under campaign
-					for(const key in players) {
-						if(this.campaign.players[key].curHp === undefined) {
-							db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-								curHp: this.players[key].maxHp
-							});
-						}
-					}
-					this.noCurHp = false;
-				}
-			},
-			checkAdvancement(campaign) {
-				if(!campaign.advancement) {
-					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?' ,'Set advancement', {
-						timeout: 0,
-						buttons: [
-						{
-							text: 'Experience', action: (toast) => { 
-								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('experience'); 
-								this.$snotify.remove(toast.id); 
-							}, bold: false 
-						},
-						{
-							text: 'Milestone', action: (toast) => { 
-								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('milestone');
-								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false },
-						]
-					});
-				}
-			},
-			removeGhostPlayers(campaignPlayers) {
-				const players = Object.keys(this.players);
-				for(let key in campaignPlayers) {
-					if(!players.includes(key)) {
-						// eslint-disable-next-line
-						console.error('Ghost Player Removed: ', key);
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).remove();
-					}
-				}
 			}
 		}
 	}

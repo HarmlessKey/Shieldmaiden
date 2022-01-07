@@ -103,10 +103,6 @@
 			}
 		},
 		computed: {
-			...mapGetters([
-				'allEncounters',
-				'overencumbered'
-			]),
 			...mapGetters("players", ["players"]),
 			campaign_players() {
 				return this.players.filter(player => {

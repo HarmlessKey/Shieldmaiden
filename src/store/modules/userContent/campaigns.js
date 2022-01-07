@@ -96,26 +96,51 @@ const actions = {
 
   /**
    * Get a single campaign
-   * first try to find it in the store, then fetch if wasn't present
+   * - first try to find it in the store, then fetch if wasn't present
+   * - Check advancement
+   * - Set current hit points
+   * - Remove ghost players
    * 
    * @param {string} uid userId
    * @param {string} id campaignId
    */
   async get_campaign({ state, commit, dispatch }, { uid, id }) {
     let campaign = (state.cached_campaigns[uid]) ? state.cached_campaigns[uid][id] : undefined;
+    const services = await dispatch("get_campaign_services");
 
     // The campaign is not in the store and needs to be fetched from the database
     if(!campaign) {
-      const services = await dispatch("get_campaign_services");
       try {
-        const campaign = await services.getCampaign(uid, id);
-
-        // REMOVE NON EXISTING PLAYERS
-
-        commit("SET_CACHED_CAMPAIGN", { uid, campaign });
-        return campaign;
+        campaign = await services.getCampaign(uid, id);
+        commit("SET_CACHED_CAMPAIGN", { uid, id, campaign });
       } catch(error) {
         throw error;
+      }
+    }
+
+    // Check advancement
+    if(!campaign.advancement) {
+      await dispatch(
+        "set_campaign_prop", 
+        { id, property: "advancement", value: "milestone"}
+      );
+    }
+
+    // Remove ghost players
+    if(campaign.players) {
+      for(const [playerId, campaign_player] of Object.entries(campaign.players)) {
+        const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
+        if(!player) {
+          await await services.deletePlayer(uid, id, playerId);
+        } else {
+          // If the player has no curHp, set it
+          if(!campaign_player.curHp) {
+            await dispatch(
+              "update_campaign_player",
+              { uid, campaignId: id, playerId, property: "curHp", value: player.maxHp } 
+            );
+          }
+        }
       }
     }
     return campaign;
@@ -156,6 +181,7 @@ const actions = {
       try {
         const search_campaign = convert_campaign(campaign);
         const id = await services.addCampaign(uid, campaign, new_count, search_campaign);
+        commit("SET_CAMPAIGN_COUNT", new_count);
         commit("SET_CAMPAIGN", { uid, id, search_campaign });
         return id;
       } catch(error) {
@@ -204,6 +230,7 @@ const actions = {
 
         commit("REMOVE_CAMPAIGN", id);
         commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
+        commit("SET_CAMPAIGN_COUNT", new_count);
         return id;
       } catch(error) {
         throw error;
@@ -463,6 +490,27 @@ const actions = {
   },
 
   /**
+   * Updates a non-nested property of a campaign
+   * 
+   * @param {string} id campaignId
+   * @param {string} property 
+   * @param {any} value 
+   */
+   async set_campaign_prop({ rootGetters, commit, dispatch }, { id, property, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, id, "", { [property]: value });
+        commit("SET_CACHED_PROP", { uid, id, property, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
    * Update the "share" property with the latest value
    * Shares can be seen by players on the public intiative list
    * 
@@ -502,6 +550,11 @@ const mutations = {
       Vue.set(state.cached_campaigns[uid], id, campaign);
     } else {
       Vue.set(state.cached_campaigns, uid, { [id]: campaign });
+    }
+  },
+  SET_CACHED_PROP(state, { uid, id, property, value}) { 
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
+      Vue.set(state.cached_campaigns[uid][id], property, value);
     }
   },
   REMOVE_CACHED_CAMPAIGN(state, { uid, id }) { 

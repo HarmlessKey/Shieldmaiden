@@ -94,9 +94,8 @@ const actions = {
     if(!npc) {
       const services = await dispatch("get_npc_services");
       try {
-        const npc = await services.getNpc(uid, id);
+        npc = await services.getNpc(uid, id);
         commit("SET_CACHED_NPC", { uid, id, npc });
-        return npc;
       } catch(error) {
         throw error;
       }

@@ -313,11 +313,12 @@
 			...mapActions("players", ["get_player"]),
 			...mapActions("npcs", ["get_npc"]),
 			...mapActions("api_monsters", ["get_monster"]),
-			remove(id) {
-				this.delete_entity({
+			async remove(id) {
+				await this.delete_entity({
 					campaignId: this.campaignId,
 					encounterId: this.encounterId,
-					entityId: id
+					entityId: id,
+					type: this.encounter.finished ? "finished": "active"
 				});
 			},
 			async setDifficulty() {

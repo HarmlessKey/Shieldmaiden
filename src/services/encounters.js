@@ -156,7 +156,7 @@ export class encounterServices {
      // Update entity count in search_table
      const entity_count_path = `${uid}/results/${campaignId}/${encounterId}/entity_count`;
      let entity_count = await SEARCH_ENCOUNTERS_REF.child(entity_count_path).once('value');
-     SEARCH_ENCOUNTERS_REF.child(entity_count_path).set(entity_count.val() + diff);
-     return entity_count + diff;
+     await SEARCH_ENCOUNTERS_REF.child(entity_count_path).set(entity_count.val() + diff);
+     return entity_count.val() + diff;
   }
 }

@@ -433,12 +433,12 @@
 					this.loading_monsters = false;
 				});
 			},
-			multi_add(e, id,type,name,custom=false,rollHp=false) {
+			async multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
 				}
 				for (let i = 0; i < this.to_add[id]; i++ ) {
-					this.add(e, id,type,name,custom,rollHp)
+					await this.add(e, id,type,name,custom,rollHp)
 				}
 				this.to_add[id] = 1
 			},
@@ -517,20 +517,22 @@
 							entity.maxHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
 						}
 					}
-					this.add_npc_encounter({
+					await this.add_npc_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
-						npc: entity
+						npc: entity,
+						type: this.encounter.finished ? "finished": "active"
 					});
 				}
 
 				// PLAYER
 				else if (type == 'player') {
-					this.add_player_encounter({
+					await this.add_player_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
-						player: entity
+						player: entity,
+						type: this.encounter.finished ? "finished": "active"
 					});
 					const companions = this.campaign_players[id].companions;
 					for (let key in companions) {
@@ -546,7 +548,8 @@
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
-						player: entity
+						player: entity,
+						type: this.encounter.finished ? "finished": "active"
 					});
 				}
 

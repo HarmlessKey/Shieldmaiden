@@ -141,7 +141,7 @@ const actions = {
     }
     // REMOVE NON EXISTING ITEM LINKS FROM LOOT
 
-    commit("SET_CACHED_ENCOUNTER", { uid, campaignId, id, encounter });
+    commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
     return encounter;
   },
 
@@ -178,7 +178,7 @@ const actions = {
    * @param {object} npc 
    * @returns {string} the id of the newly added encounter
    */
-   async add_npc_encounter({ rootGetters, commit, dispatch }, { campaignId, encounterId, npc }) {
+   async add_npc_encounter({ rootGetters, commit, dispatch }, { campaignId, encounterId, type, npc }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_encounter_services");
@@ -187,7 +187,7 @@ const actions = {
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId, entity: npc });
        
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
-        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
+        await commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
         return;
       } catch(error) {
         throw error;
@@ -203,7 +203,7 @@ const actions = {
    * @param {string} playerId 
    * @param {object} player 
    */
-   async add_player_encounter({ rootGetters, commit, dispatch }, { campaignId, encounterId, playerId, player }) {
+   async add_player_encounter({ rootGetters, commit, dispatch }, { campaignId, encounterId, playerId, type, player }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_encounter_services");
@@ -212,7 +212,7 @@ const actions = {
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId: playerId, entity: player });
         
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
-        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
         return;
       } catch(error) {
         console.error(error);
@@ -251,7 +251,7 @@ const actions = {
    * @param {string} encounterId
    * @param {object} playerId 
    */
-   async delete_entity({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId }) {
+   async delete_entity({ rootGetters, commit, dispatch }, { campaignId, encounterId, type, entityId }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_encounter_services");
@@ -260,7 +260,7 @@ const actions = {
         commit("DELETE_ENTITY", { uid, campaignId, encounterId, entityId });
         
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, -1);
-        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, new_count });
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
         return;
       } catch(error) {
         throw error;
@@ -400,9 +400,11 @@ const mutations = {
     Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
   },
   // eslint-disable-next-line no-unused-vars
-  UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
+  UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, type, count }) {
     // UPDATE ENCOUNTER OBJECT
-    // Vue.set(state.encounters[campaignId][encounterId], count);
+    if (campaignId in state.encounters && type in state.encounters[campaignId] && encounterId in state.encounters[campaignId][type]) {
+      Vue.set(state.encounters[campaignId][type][encounterId], "entity_count", count);
+    }
   },
   SET_CACHED_ENCOUNTER(state, { uid, campaignId, encounterId, encounter }) { 
     if(state.cached_encounters[uid]) {

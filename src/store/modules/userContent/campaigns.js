@@ -27,6 +27,7 @@ const state = {
   active_campaign: undefined,
   cached_campaigns: {},
   campaign: undefined,
+  campaigns: {},
   campaign_count: 0
 };
 
@@ -58,11 +59,11 @@ const actions = {
    * Fetches all the search_campaigns for a user
    * and stores them in campaigns
    */
-   async get_campaigns({ rootGetters, dispatch, commit }) {
+   async get_campaigns({ state, rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let campaigns = (state.campaigns) ? state.campaigns : undefined;
 
-    if(!campaigns && uid) {
+    if((!campaigns || !Object.keys(campaigns).length) && uid) {
       const services = await dispatch("get_campaign_services");
       try {
         campaigns = await services.getCampaigns(uid);
@@ -129,7 +130,12 @@ const actions = {
       for(const [playerId, campaign_player] of Object.entries(campaign.players)) {
         const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
         if(!player) {
-          await await services.deletePlayer(uid, id, playerId);
+          await dispatch("delete_player", { 
+            id, 
+            player: { "key": playerId }, 
+            player_count: Object.keys(campaign.players).length
+          });
+          console.error(`Ghost player ${playerId} deleted`);
         } else {
           // If the player has no curHp, set it
           if(!campaign_player.curHp) {
@@ -242,8 +248,6 @@ const actions = {
       }
     }
   },
-
-
 
   /**
    * Add a new player to the campaign
@@ -416,13 +420,18 @@ const actions = {
    * - Remove the campaign_id from the player
    * - Delete the companions of the player from the campaign
    * 
+   * When the delete_player function is called during get_campaign, 
+   * it is possible the search_campaigns aren't fetched
+   * in this case the player_count can't be found in the store, but it's sent from the get_campaign function.
+   * 
    * @param {object} campaign 
+   * @param {number} player_count 
    * @returns {string} the id of the newly added campaign
    */
-   async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
+   async delete_player({ state, rootGetters, commit, dispatch }, { id, player, player_count=undefined }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const campaign = state.campaigns[id];
-    const new_count = campaign.player_count - 1;
+    const campaign = (state.campaigns) ? state.campaigns[id] : undefined;
+    const new_count = (campaign && player_count === undefined) ? campaign.player_count - 1 : player_count - 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {     
@@ -579,7 +588,9 @@ const mutations = {
     }
   },
   SET_PLAYER_COUNT(state, { id, new_count }) { 
-    Vue.set(state.campaigns[id], "player_count", new_count); 
+    if(state.campaigns && state.campaigns[id]) {
+      Vue.set(state.campaigns[id], "player_count", new_count); 
+    }
   },
   SET_PLAYER(state, { uid, id, playerId, player }) {
     if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {

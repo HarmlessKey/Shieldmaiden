@@ -106,6 +106,11 @@ const actions = {
    * Get a single encounter
    * first try to find it in the store, then fetch if wasn't present
    * 
+   * - Remove ghost NPCs
+   * - Remove ghost Players
+   * - Remove ghost Companions
+   * - Remove gost item links
+   * 
    * @param {string} uid userId
    * @param {string} campaignId campaignId
    * @param {string} id encounterId
@@ -124,9 +129,16 @@ const actions = {
       }
     }
 
-    // REMOVE NON EXISTING NPCs
-    // REMOVE NON EXISTING PLAYERS
-    // REMOVE NON EXISTING COMPANIONS
+    if(encounter.entities) {
+      // REMOVE NON EXISTING NPCs
+      // REMOVE NON EXISTING COMPANIONS
+      for(const [entityId, entity] of Object.entries(encounter.entities)) {
+        // REMOVE NON EXISTING PLAYERS
+        if(entity.entityType === "player") {
+          console.log(entityId, entity);
+        }
+      }
+    }
     // REMOVE NON EXISTING ITEM LINKS FROM LOOT
 
     commit("SET_CACHED_ENCOUNTER", { uid, campaignId, id, encounter });

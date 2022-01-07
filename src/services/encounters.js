@@ -37,9 +37,10 @@ export class encounterServices {
     }
   }
 
-  async getEncounter(uid, id) {
+  async getEncounter(uid, campaignId, id) {
     try {
-      const encounter = await ENCOUNTERS_REF.child(uid).child(id).once('value', snapshot => {
+      const path = `${uid}/${campaignId}/${id}`;
+      const encounter = await ENCOUNTERS_REF.child(path).once('value', snapshot => {
         return snapshot;
       });
       return encounter.val();

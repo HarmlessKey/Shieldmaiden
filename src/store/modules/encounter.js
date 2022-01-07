@@ -199,6 +199,7 @@ const actions = {
 					campaignId: cid,
 					id: eid
 				});
+				console.log(cid, eid, encounter)
 				commit("SET_ENCOUNTER", encounter);
 				for (let key in encounter.entities) {
 					dispatch("add_entity", key);
@@ -371,7 +372,7 @@ const actions = {
 				else {
 					//Fetch data from Firebase or API
 					if(entity.npc === 'srd' || entity.npc === 'api') {
-						data_npc = await dispatch("monsters/get_monster", entity.id);
+						data_npc = await dispatch("api_monsters/get_monster", entity.id);
 					}
 					else {
 						data_npc = await dispatch("npcs/get_npc", { uid, id: entity.id });

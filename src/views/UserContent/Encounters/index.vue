@@ -96,7 +96,7 @@
 													<div class="truncate">
 														<router-link 
 															v-if="props.col.name === 'name' && props.row.entity_count" 
-															:to="`run-encounter${campaignId}/${props.key}`"
+															:to="`/run-encounter/${campaignId}/${props.key}`"
 														>
 															{{ props.value }}
 														</router-link>

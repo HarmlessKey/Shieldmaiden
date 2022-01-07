@@ -1,5 +1,5 @@
 <template>
-	<div ref="encounter" v-if="initialized">
+	<div ref="encounter" v-if="!loading">
 		<div v-if="overencumbered && demo">
 			<OverEncumbered/>
 		</div>
@@ -87,7 +87,7 @@
 		</div>
 	</div>
 	<div v-else class="combat-wrapper" ref="encounter">
-		<hk-loader />
+		<hk-loader name="encounter" />
 	</div>
 </template>
 
@@ -137,9 +137,12 @@
 			return {
 				userId:  this.$store.getters.user ? this.$store.getters.user.uid : undefined,
 				demo: this.$route.name === "Demo",
+				campaignId: this.$route.params.campid, 
+				encounterId: this.$route.params.encid,
 				target: undefined,
 				width: 0,
 				audio_notification: false,
+				loading: true,
 			}
 		},
 		firebase() {
@@ -151,16 +154,21 @@
 			}
 		},
 		beforeMount() {
-			if(this.$route.name !== "Demo" && this.broadcast.live === this.$route.params.campid) {
-				this.setLiveEncounter(this.$route.params.encid);
+			if(this.$route.name !== "Demo" && this.broadcast.live === this.campaignId) {
+				this.setLiveEncounter(this.encounterId);
 			}
 		},
 		async mounted() {
+			if(!this.demo) {
+				await this.get_campaign({ uid: this.userId, id: this.campaignId });
+				await this.get_encounter({ uid: this.userId, campaignId: this.campaignId, id: this.encounterId });
+			}
 			await this.init_Encounter({
-				cid: this.$route.params.campid, 
-				eid: this.$route.params.encid,
+				cid: this.campaignId, 
+				eid: this.encounterId,
 				demo: this.demo
 			});
+			this.loading = false;
 			this.$nextTick(function() {
 				window.addEventListener('resize', this.setSize);
 				//Init
@@ -313,6 +321,8 @@
 				'setSlide',
 				'setLiveEncounter'
 			]),
+			...mapActions("campaigns", ["get_campaign"]),
+			...mapActions("encounters", ["get_encounter"]),
 			setSize() {
 				this.width = this.$refs.encounter.clientWidth;
 			},

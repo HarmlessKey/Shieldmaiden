@@ -56,7 +56,7 @@
 										Edit
 									</q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+								<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
 									<i class="fas fa-trash-alt"></i>
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete

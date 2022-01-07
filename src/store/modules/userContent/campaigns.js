@@ -130,11 +130,7 @@ const actions = {
       for(const [playerId, campaign_player] of Object.entries(campaign.players)) {
         const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
         if(!player) {
-          await dispatch("delete_player", { 
-            id, 
-            player: { "key": playerId }, 
-            player_count: Object.keys(campaign.players).length
-          });
+          await dispatch("delete_player", { id, player: { "key": playerId }});
           console.error(`Ghost player ${playerId} deleted`);
         } else {
           // If the player has no curHp, set it
@@ -179,14 +175,15 @@ const actions = {
    */
   async add_campaign({ rootGetters, commit, dispatch }, campaign) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = (state.campaign_count) ? state.campaign_count + 1 : 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
         const search_campaign = convert_campaign(campaign);
-        const id = await services.addCampaign(uid, campaign, new_count, search_campaign);
-        commit("SET_CAMPAIGN_COUNT", new_count);
+        const id = await services.addCampaign(uid, campaign, search_campaign);
         commit("SET_CAMPAIGN", { uid, id, search_campaign });
+
+        const new_count = await services.updateCampaignCount(uid, 1);
+        commit("SET_CAMPAIGN_COUNT", new_count);
         return id;
       } catch(error) {
         throw error;
@@ -230,19 +227,20 @@ const actions = {
    */
    async delete_campaign({ rootGetters, commit, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.campaign_count - 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        await services.deleteCampaign(uid, id, new_count);
+        await services.deleteCampaign(uid, id);
 
         // DELETE ALL ENCOUNTER OF CAMPAIGN
         dispatch("encounters/delete_campaign_encounters", id, { root: true });
 
         commit("REMOVE_CAMPAIGN", id);
         commit("REMOVE_CACHED_CAMPAIGN", { uid, id });
+        
+        const new_count = await services.updateCampaignCount(uid, -1);
         commit("SET_CAMPAIGN_COUNT", new_count);
-        return id;
+        return;
       } catch(error) {
         throw error;
       }
@@ -262,7 +260,7 @@ const actions = {
       try {
         const player = await dispatch("players/get_player", { uid, id: playerId }, { root: true });
         const campaign_player = { curHp: player.maxHp };
-        const new_count = (campaign.player_count) ? campaign.player_count + 1 : 1;
+        // const new_count = (campaign.player_count) ? campaign.player_count + 1 : 1;
 
         // If the campaign has experience advancement
         // make sure the player has experience points set
@@ -297,8 +295,10 @@ const actions = {
         }
 
         await services.addPlayer(uid, campaign.key, playerId, campaign_player);
-        await dispatch("update_player_count", { id: campaign.key, new_count });
         commit("SET_PLAYER", { uid, id: campaign.key, playerId, player });
+
+        const new_count = await services.updatePlayerCount(uid, campaign.key, 1);
+        commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
         return;
       } catch(error) {
         throw error;
@@ -428,10 +428,9 @@ const actions = {
    * @param {number} player_count 
    * @returns {string} the id of the newly added campaign
    */
-   async delete_player({ state, rootGetters, commit, dispatch }, { id, player, player_count=undefined }) {
+   async delete_player({ state, rootGetters, commit, dispatch }, { id, player }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     const campaign = (state.campaigns) ? state.campaigns[id] : undefined;
-    const new_count = (campaign && player_count === undefined) ? campaign.player_count - 1 : player_count - 1;
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {     
@@ -444,10 +443,11 @@ const actions = {
             await dispatch("delete_companion", { id, companionId });
           }
         }
-
         await services.deletePlayer(uid, id, player.key);
-        await dispatch("update_player_count", { id, new_count });
         commit("DELETE_PLAYER", { uid, id, playerId: player.key });
+
+        const new_count = await services.updatePlayerCount(uid, campaign.key, -1);
+        commit("SET_PLAYER_COUNT", { uid, id: campaign.key, new_count });
         return;
       } catch(error) {
         throw error;

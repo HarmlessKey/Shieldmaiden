@@ -49,12 +49,11 @@ export class encounterServices {
     }
   }
 
-  async addEncounter(uid, campaignId, encounter, new_count, search_encounter) {
+  async addEncounter(uid, campaignId, encounter, search_encounter) {
     try {
       const newEncounter = await ENCOUNTERS_REF.child(uid).child(campaignId).push(encounter);
 
       // Update search_encounters
-      SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}/count`).set(new_count);
       SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${newEncounter.key}`).set(search_encounter);
 
       return newEncounter.key;
@@ -83,12 +82,11 @@ export class encounterServices {
     });
   }
 
-  async deleteEncounter(uid, campaignId, id, new_count) {
+  async deleteEncounter(uid, campaignId, id) {
     try {
       ENCOUNTERS_REF.child(`${uid}/${campaignId}`).child(id).remove();
 
       //Update search_encounters
-      SEARCH_ENCOUNTERS_REF.child(`${uid}/metadata/${campaignId}/count`).set(new_count);
       SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${id}`).remove();
       return;
     } catch(error){
@@ -142,6 +140,20 @@ export class encounterServices {
     } catch(err) {
       throw err;
     }
+  }
+
+  /**
+   * Update entity count in the search table of search_encounters
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {Int} diff Difference to add or subtract from entity count
+   */
+  async updateEncounterCount(uid, campaignId, diff) {
+    const encounter_count_path = `${uid}/metadata/${campaignId}/count`;
+    let encounter_count = await SEARCH_ENCOUNTERS_REF.child(encounter_count_path).once('value');
+    await SEARCH_ENCOUNTERS_REF.child(encounter_count_path).set(encounter_count.val() + diff);
+    return encounter_count.val() + diff;
   }
 
   /**

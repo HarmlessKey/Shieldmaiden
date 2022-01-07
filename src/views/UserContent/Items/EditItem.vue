@@ -1,5 +1,5 @@
 <template>
-	<div class="content__edit" v-if="item || $route.name === 'Add item'">
+	<div class="content__edit">
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveItem(valid))">
 				<hk-card header="Your Item">
@@ -279,7 +279,6 @@
 				'tier',
 				'overencumbered',
 			]),
-			// ...mapGetters("items", ["item_count"])
 		},
 		watch: {
 			item: {
@@ -314,9 +313,7 @@
 				}
 			},
 			async copy(item) {
-				console.log(item);
 				this.item = await this.get_api_item(item._id);
-				console.log("after get", this.item)
 				this.foundItems = [];
 				this.searched = '';
 				this.copy_dialog = false;

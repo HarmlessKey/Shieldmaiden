@@ -48,12 +48,11 @@ export class campaignServices {
     });
   }
 
-  async addCampaign(uid, campaign, new_count, search_campaign) {
+  async addCampaign(uid, campaign, search_campaign) {
     try {
       const newCampaign = await CAMPAIGNS_REF.child(uid).push(campaign);
 
       // Update search_campaigns
-      SEARCH_CAMPAIGNS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${newCampaign.key}`).set(search_campaign);
 
       return newCampaign.key;
@@ -131,12 +130,11 @@ export class campaignServices {
     });
   }
 
-  async deleteCampaign(uid, id, new_count) {
+  async deleteCampaign(uid, id) {
     try {
       CAMPAIGNS_REF.child(uid).child(id).remove();
 
       //Update search_campaigns
-      SEARCH_CAMPAIGNS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
@@ -150,5 +148,32 @@ export class campaignServices {
     }).catch((error) => {
       throw error;
     });
+  }
+
+  /**
+   * Update campaign_count in the search table of search_campaigns
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from campaign count
+   */
+  async updateCampaignCount(uid, diff) {
+    const campaign_count_path = `${uid}/metadata/count`;
+    let campaign_count = await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).once('value');
+    await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).set(campaign_count.val() + diff);
+    return campaign_count.val() + diff;
+  }
+
+  /**
+   * Update player_count in the search table of search_campaigns
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {Int} diff Difference to add or subtract from player count
+   */
+   async updatePlayerCount(uid, campaignId, diff) {
+    const player_count_path = `${uid}/results/${campaignId}/player_count`;
+    let player_count = await SEARCH_CAMPAIGNS_REF.child(player_count_path).once('value');
+    await SEARCH_CAMPAIGNS_REF.child(player_count_path).set(player_count.val() + diff);
+    return player_count.val() + diff;
   }
 }

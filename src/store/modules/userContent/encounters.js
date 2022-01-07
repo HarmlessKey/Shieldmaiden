@@ -153,16 +153,17 @@ const actions = {
    * @param {object} encounter 
    * @returns {string} the id of the newly added encounter
    */
-  async add_encounter({ state, rootGetters, dispatch, commit }, { campaignId, encounter }) {
+  async add_encounter({ rootGetters, dispatch, commit }, { campaignId, encounter }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     const search_encounter = convert_encounter(encounter);
-    const new_count = (state.encounter_count[campaignId]) ? state.encounter_count[campaignId] + 1 : 1;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        const id = await services.addEncounter(uid, campaignId, encounter, new_count, search_encounter);
-        commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        const id = await services.addEncounter(uid, campaignId, encounter, search_encounter);
         commit("SET_ENCOUNTER", { uid, campaignId, type: "active", id, encounter: search_encounter });
+
+        const new_count = await services.updateEncounterCount(uid, campaignId, 1);
+        commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
         return id;
       } catch(error) {
         throw error;
@@ -319,16 +320,17 @@ const actions = {
    * @param {string} campaignId 
    * @param {string} id 
    */
-   async delete_encounter({ state, rootGetters, dispatch, commit }, { campaignId, id, finished }) {
+   async delete_encounter({ rootGetters, dispatch, commit }, { campaignId, id, finished }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     const type = (finished) ? "finished" : "active";
-    const new_count = state.encounter_count[campaignId] - 1;
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        await services.deleteEncounter(uid, campaignId, id, new_count);
+        await services.deleteEncounter(uid, campaignId, id);
         commit("REMOVE_ENCOUNTER", { campaignId, type, id });
         commit("REMOVE_CACHED_ENCOUNTER", { uid, id });
+
+        const new_count = await services.updateEncounterCount(uid, campaignId, -1);
         commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
       } catch(error) {
         throw error;

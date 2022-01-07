@@ -199,7 +199,6 @@ const actions = {
 					campaignId: cid,
 					id: eid
 				});
-				console.log(cid, eid, encounter)
 				commit("SET_ENCOUNTER", encounter);
 				for (let key in encounter.entities) {
 					dispatch("add_entity", key);
@@ -279,26 +278,28 @@ const actions = {
 
 		switch(entity.entityType) {
 			case 'player': {
-				let campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
+				const campaignPlayer = (!state.demo) ? campaign.players[key] : demoPlayers[key];
 
 				//get the curHp,tempHP, AC Bonus & Dead/Stable + Death Saves from the campaign
-				entity.curHp = campaignPlayer.curHp;
-				entity.tempHp = campaignPlayer.tempHp;
-				entity.ac_bonus = campaignPlayer.ac_bonus;
-				entity.maxHpMod = campaignPlayer.maxHpMod;
-				entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
-				entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
-				entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
-				
-				//Get player transformed from campaign
-				if(campaignPlayer.transformed) {
-					entity.transformed = true;
-					entity.transformedCurHp = campaignPlayer.transformed.curHp;
-					entity.transformedAc = campaignPlayer.transformed.ac;
-					entity.transformedMaxHpMod = campaignPlayer.transformed.maxHpMod || 0;
-					entity.transformedMaxHp = campaignPlayer.transformed.maxHp + entity.transformedMaxHpMod;
-				} else {
-					entity.transformed = false;
+				if(campaignPlayer) {
+					entity.curHp = campaignPlayer.curHp;
+					entity.tempHp = campaignPlayer.tempHp;
+					entity.ac_bonus = campaignPlayer.ac_bonus;
+					entity.maxHpMod = campaignPlayer.maxHpMod;
+					entity.saves = (campaignPlayer.saves) ? campaignPlayer.saves : {};
+					entity.stable = (campaignPlayer.stable) ? campaignPlayer.stable : false;
+					entity.dead = (campaignPlayer.dead) ? campaignPlayer.dead : false;
+					
+					//Get player transformed from campaign
+					if(campaignPlayer.transformed) {
+						entity.transformed = true;
+						entity.transformedCurHp = campaignPlayer.transformed.curHp;
+						entity.transformedAc = campaignPlayer.transformed.ac;
+						entity.transformedMaxHpMod = campaignPlayer.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = campaignPlayer.transformed.maxHp + entity.transformedMaxHpMod;
+					} else {
+						entity.transformed = false;
+					}
 				}
 
 				//get other values from the player

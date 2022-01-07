@@ -55,11 +55,9 @@
 			debounce="300" 
 			clearable
 			placeholder="Search custom NPCs"
-			@change="searchNpcs"
-			@clear="searchNpcs"
 		>
 			<q-icon slot="prepend" name="search" />
-			<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
+			<!-- <q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" /> -->
 		</q-input>
 		<q-table		
 			:data="npcs"
@@ -71,16 +69,15 @@
 			:dark="$store.getters.theme !== 'light'"
 			:loading="loading_npcs"
 			separator="none"
+			:pagination="{ rowsPerPage: 15 }"
+			:filter="searchNpc"
 			wrap-cells
-			:pagination.sync="npc_pagination"
-			:rows-per-page-options="[0]"
-			@request="load"
-		>	
+		>
 			<template v-slot:body-cell="props">
 				<q-td v-if="props.col.name !== 'actions'">
 					<div  class="truncate-cell">
 						<div class="truncate">
-							<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+							<router-link v-if="props.col.name === 'name'" :to="`/content/npcs/${props.key}`">
 								{{ props.value }}
 							</router-link>
 							<template v-else>
@@ -117,9 +114,6 @@
 					</div>
 				</q-td>
 			</template>
-			<div slot="pagination">
-				1-{{npcs.length}} of {{(searchNpc && searchNpc.length) ? npcs.length : npc_count}}
-			</div>
 			<div slot="no-data" />
 			<hk-loader slot="loading" name="monsters" />
 		</q-table>
@@ -346,8 +340,12 @@
 			} 
 		},
 		async mounted() {
+			console.log(this.campaign)
 			await this.fetchMonsters();
-			await this.fetchNpcs();
+			this.npcs = await this.get_npcs();
+			await this.get_players();
+			console.log(this.players);
+			this.loading_npcs = false;
 		},
 		computed: {
 			...mapGetters(["content_count"]),
@@ -385,7 +383,8 @@
 		methods: {
 			...mapActions(["setSlide"]),
 			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
-			...mapActions("npcs", ["fetch_npcs", "get_npc"]),
+			...mapActions("npcs", ["get_npcs", "get_npc"]),
+			...mapActions("players", ["get_players"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 
 				"add_npc_encounter"
@@ -407,16 +406,16 @@
 			},
 			searchNpcs() {
 				this.loading_npcs = true;
-				this.fetchNpcs();
+				// this.fetchNpcs();
 			},
 			request(req) {
 				this.pagination = req.pagination;
 				this.fetchMonsters();		
 			},
-			load(req, loadMore=false) {
-				this.npc_pagination = req.pagination;
-				this.fetchNpcs(loadMore);
-			},
+			// load(req, loadMore=false) {
+			// 	this.npc_pagination = req.pagination;
+			// 	// this.fetchNpcs(loadMore);
+			// },
 			async fetchMonsters() {
 				await this.get_monsters({
 					pageNumber: this.pagination.page,
@@ -431,18 +430,18 @@
 					this.loading_monsters = false;
 				});
 			},
-			async fetchNpcs(loadMore=false) {
-				await this.fetch_npcs({
-					startAfter: this.getStartAfterResult(loadMore),
-					pageSize: this.npc_pagination.rowsPerPage,
-					query: this.searchNpc,
-					sortBy: this.npc_pagination.sortBy,
-					descending: this.npc_pagination.descending
-				}).then(results => {
-					this.npcs = (loadMore) ? this.npcs.concat(results) : results;
-					this.loading_npcs = false;
-				});
-			},
+			// async fetchNpcs(loadMore=false) {
+			// 	// await this.fetch_npcs({
+			// 	// 	startAfter: this.getStartAfterResult(loadMore),
+			// 	// 	pageSize: this.npc_pagination.rowsPerPage,
+			// 	// 	query: this.searchNpc,
+			// 	// 	sortBy: this.npc_pagination.sortBy,
+			// 	// 	descending: this.npc_pagination.descending
+			// 	// }).then(results => {
+			// 	// 	this.npcs = (loadMore) ? this.npcs.concat(results) : results;
+			// 	// 	this.loading_npcs = false;
+			// 	// });
+			// },
 			getStartAfterResult(loadMore) {
 				if(this.npcs.length && loadMore) {
 					return this.npcs.at(-1)[this.npc_pagination.sortBy];

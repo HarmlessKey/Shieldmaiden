@@ -279,13 +279,13 @@
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters("items", ["item_count"])
+			// ...mapGetters("items", ["item_count"])
 		},
 		watch: {
 			item: {
 				deep: true,
 				handler(newVal) {
-					if (JSON.stringify(newVal) !== this.item.copy) {
+					if (JSON.stringify(newVal) !== this.item_copy) {
 						this.unsaved_changes = true;
 					} else {
 						this.unsaved_changes = false;
@@ -347,7 +347,7 @@
 
 
 				}, error => {
-					this.$snotify.error("Couldn't save monster.", "Save failed", {
+					this.$snotify.error("Couldn't save item.", "Save failed", {
 						position: "rightTop"
 					})
 					console.error(error)

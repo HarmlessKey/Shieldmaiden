@@ -77,7 +77,7 @@ const actions = {
 		if(uid) {
 			const services = await dispatch("get_reminder_services");
 			try {
-				const count = await services.getReminderCount(uid);
+				let count = await services.getReminderCount(uid) || 0;
 				commit("SET_REMINDER_COUNT", count);
 				return;
 			} catch(error) {

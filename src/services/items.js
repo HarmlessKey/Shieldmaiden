@@ -38,9 +38,7 @@ export class itemServices {
 	async getItemCount(uid) {
     try {
       const path = `${uid}/metadata/count`;
-      const count = await SEARCH_ITEMS_REF.child(path).once('value', snapshot => {
-        return snapshot;
-      });
+      let count = await SEARCH_ITEMS_REF.child(path).once('value');
       return count.val();
     } catch(error) {
       throw error;

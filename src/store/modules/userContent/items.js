@@ -22,7 +22,7 @@ const state = {
 	item_services: null,
 	cached_items: {},
 	item_count: 0,
-	items: undefined
+	items: undefined,
 }
 
 const getters = {
@@ -53,6 +53,9 @@ const actions = {
 			const services = await dispatch("get_item_services");
 			try {
 				items_object = await services.getItems(uid);
+				if (items_object === null) {
+					items_object = {}
+				}
 				
 				commit("SET_ITEMS", items_object);
 			} catch(error) {
@@ -65,7 +68,6 @@ const actions = {
 			item.key = key;
 			return item;
 		}).orderBy("name", "asc").value();
-
 		return items;
 	},
 
@@ -78,7 +80,7 @@ const actions = {
 		if(uid) {
 			const services = await dispatch("get_item_services");
 			try {
-				const count = await services.getItemCount(uid);
+				let count = await services.getItemCount(uid) || 0;
 				commit("SET_ITEM_COUNT", count);
 				return;
 			} catch(error) {

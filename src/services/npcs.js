@@ -18,9 +18,7 @@ export class npcServices {
    */
   async getNpcs(uid) {
     try {
-      const npcs = await SEARCH_NPCS_REF.child(`${uid}/results`).once('value', snapshot => {
-        return snapshot;
-      });
+      const npcs = await SEARCH_NPCS_REF.child(`${uid}/results`).once('value');
       return npcs.val();
     } catch(error) {
       throw error;
@@ -36,9 +34,7 @@ export class npcServices {
   async getNpcCount(uid) {
     try {
       const path = `${uid}/metadata/count`;
-      const count = await SEARCH_NPCS_REF.child(path).once('value', snapshot => {
-        return snapshot;
-      });
+      const count = await SEARCH_NPCS_REF.child(path).once('value');
       return count.val();
     } catch(error) {
       throw error;
@@ -55,9 +51,7 @@ export class npcServices {
   async getNpc(uid, id) {
     console.log(`NPC ${id} fetched from database`)
     try {
-      const npc = await NPCS_REF.child(uid).child(id).once('value', snapshot => {
-        return snapshot;
-      });
+      const npc = await NPCS_REF.child(uid).child(id).once('value');
       return npc.val();
     } catch(error) {
       throw error;

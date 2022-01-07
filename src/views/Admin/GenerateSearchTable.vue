@@ -66,7 +66,7 @@
 					'reminders': ['title'],
 					'players': ['character_name', 'campaign_id', 'companions', 'avatar'],
 					// remove encounter:name and campaign:name after db name field conversion
-					'encounters': ['encounter:name', 'name', 'round', 'turn', 'entities:entity_count->count'],
+					'encounters': ['encounter:name', 'finished', 'name', 'round', 'turn', 'entities:entity_count->count'],
 					'campaigns': ['campaign:name', 'name', 'timestamp', 'advancement', 'background', 'players:player_count->count', 'private']
 
 				}
@@ -180,7 +180,7 @@
 					if (s_field === undefined) {
 						s_field = og_field;
 					}
-					if (entry[og_field]) {
+					if (entry.hasOwnProperty(og_field)) {
 						if (func === 'count') {
 							searchable_entry[s_field] = Object.keys(entry[og_field]).length
 						}

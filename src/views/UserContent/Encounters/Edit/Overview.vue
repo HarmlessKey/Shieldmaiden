@@ -91,15 +91,15 @@
 							<!-- Player avatar -->
 							<span 
 								v-if="data.row.entityType === 'player'" 
-								:style="{ backgroundImage: 'url(\'' + players[data.row.id].avatar + '\')' }"
+								:style="{ backgroundImage: 'url(\'' + getPlayer(data.row.id).avatar + '\')' }"
 								class="image"
 							>
-								<i v-if="!players[data.row.id].avatar" class="hki-player" />
+								<i v-if="!getPlayer(data.row.id).avatar" class="hki-player" />
 							</span>
 
 							<!-- Companion avatar -->
-							<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + npcs[data.row.id].avatar + '\')' }">
-								<i v-if="!npcs[data.row.id].avatar" class="hki-companion" />
+							<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + getNpc(data.row).avatar + '\')' }">
+								<i v-if="!getNpc(data.row).avatar" class="hki-companion" />
 							</span>
 
 							<!-- Friendly NPC avatar -->
@@ -107,12 +107,12 @@
 								v-else-if="data.row.entityType === 'npc'"
 								class="image" 
 								:style="{ 
-									backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+									backgroundImage: 'url(\'' + data.row.avatar || getNpc(data.row).avatar + '\')', 
 									'border-color': data.row.color_label ? data.row.color_label : ``,
 									'color': data.row.color_label ? data.row.color_label : ``
 								}"
 							>
-								<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+								<i v-if="!data.row.avatar && (!getNpc(data.row) || !getNpc(data.row).avatar)" class="hki-monster" />
 							</span>
 						</div>
 
@@ -153,12 +153,12 @@
 							slot-scope="data"
 							class="image" 
 							:style="{ 
-								backgroundImage: 'url(\'' + data.row.avatar || npcs[data.row.id].avatar + '\')', 
+								backgroundImage: 'url(\'' + data.row.avatar || getNpc(data.row).avatar + '\')', 
 								'border-color': data.row.color_label ? data.row.color_label : ``,
 								'color': data.row.color_label ? data.row.color_label : ``
 							}"
 						>
-							<i v-if="!data.row.avatar && (!npcs[data.row.id] || !npcs[data.row.id].avatar)" class="hki-monster" />
+							<i v-if="!data.row.avatar && (!getNpc(data.row) || !getNpc(data.row).avatar)" class="hki-monster" />
 						</span>
 
 						<!-- NAME -->
@@ -192,6 +192,7 @@
 </template>
 
 <script>
+	import _ from 'lodash';
 	import { mapActions, mapGetters } from 'vuex';
 	import { difficulty } from '@/mixins/difficulty.js';
 
@@ -244,13 +245,12 @@
 				'overencumbered',
 			]),
 			...mapGetters("npcs", ["npcs"]),
-			...mapGetters("players", ["players"]),
+			// ...mapGetters("players", ["players"]),
 			
 			// eslint-disable-next-line
 			async _excludeFriendlies() {
 				if(this.encounter) {
-					// eslint-disable-next-line
-					var entities = await _.chain(this.encounter.entities)
+					var entities = _.chain(this.encounter.entities)
 					.filter(function(entity, key) {
 						entity.key = key
 						return !entity.friendly;
@@ -263,7 +263,6 @@
 			},
 			_friendlies() {
 				if(this.encounter) {
-					// eslint-disable-next-line
 					return _.chain(this.encounter.entities)
 					.filter(function(entity, key) {
 						entity.key = key
@@ -304,6 +303,9 @@
 				"delete_entity",
 				"set_xp"
 			]),
+			...mapActions("players", ["get_player"]),
+			...mapActions("npcs", ["get_npc"]),
+			...mapActions("api_monsters", ["get_monster"]),
 			remove(id) {
 				this.delete_entity({
 					campaignId: this.campaignId,
@@ -322,6 +324,16 @@
 					value: this.encDifficulty['totalXp']
 				});
 			},
+			getPlayer(id) {
+				return this.get_player({ uid: this.user.uid, id });
+			},
+			getNpc(entity) {
+				// check for npc type srd or api (api is legacy code)
+				if (entity.npc === "srd" || entity.npc === "api") {
+					return this.get_monster(entity.id);
+				}
+				return this.get_npc({ uid: this.user.uid, id: entity.id });
+			}
 		}
 	}
 </script>

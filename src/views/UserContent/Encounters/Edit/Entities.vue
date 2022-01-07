@@ -5,19 +5,19 @@
 		<!-- PLAYERS -->
 		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players">
 			<div 
-				v-for="(player, key) in campaign.players" 
+				v-for="(player, key) in players" 
 				:key="key"
-				@click="add($event, key, 'player', players[key].character_name)" 
+				@click="add($event, key, 'player', player.character_name)" 
 			>
 			<div class="d-flex justify-content-left">
 				<template v-if="checkPlayer(key) < 0">
-					<span class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }">
-						<i v-if="!players[key].avatar" class="hki-player" />
+					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+						<i v-if="!player.avatar" class="hki-player" />
 					</span>
 				</template>
 			</div>
 			<q-tooltip v-if="checkPlayer(key)" anchor="top middle" self="center middle">
-				Add {{ players[key].character_name }}
+				Add {{ player.character_name }}
 			</q-tooltip>
 		</div>
 
@@ -295,6 +295,7 @@
 				loading_npcs: true,
 				monsters: [],
 				npcs: [],
+				players: {},
 				searchMonster: "",
 				searchNpc: "",
 				query: null,
@@ -340,17 +341,17 @@
 			} 
 		},
 		async mounted() {
-			console.log(this.campaign)
+			for (const playerId in this.campaign.players) {
+				this.players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId});
+			}
+
 			await this.fetchMonsters();
 			this.npcs = await this.get_npcs();
-			await this.get_players();
-			console.log(this.players);
 			this.loading_npcs = false;
 		},
 		computed: {
 			...mapGetters(["content_count"]),
 			...mapGetters("npcs", ["npc_count"]),
-			...mapGetters("players", ["players"]),
 			monster_resource: {
 				get() {
 					const resource = (this.npc_count) ? "custom" : "srd";
@@ -384,7 +385,7 @@
 			...mapActions(["setSlide"]),
 			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
-			...mapActions("players", ["get_players"]),
+			...mapActions("players", ["get_players", "get_player"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 
 				"add_npc_encounter"
@@ -404,10 +405,10 @@
 				}
 				this.fetchMonsters();
 			},
-			searchNpcs() {
-				this.loading_npcs = true;
-				// this.fetchNpcs();
-			},
+			// searchNpcs() {
+			// 	this.loading_npcs = true;
+			// 	// this.fetchNpcs();
+			// },
 			request(req) {
 				this.pagination = req.pagination;
 				this.fetchMonsters();		
@@ -442,11 +443,11 @@
 			// 	// 	this.loading_npcs = false;
 			// 	// });
 			// },
-			getStartAfterResult(loadMore) {
-				if(this.npcs.length && loadMore) {
-					return this.npcs.at(-1)[this.npc_pagination.sortBy];
-				} return undefined;
-			},
+			// getStartAfterResult(loadMore) {
+			// 	if(this.npcs.length && loadMore) {
+			// 		return this.npcs.at(-1)[this.npc_pagination.sortBy];
+			// 	} return undefined;
+			// },
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1

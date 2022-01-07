@@ -89,7 +89,6 @@ const actions = {
   
   async get_npc({ state, commit, dispatch }, { uid, id }) {
     let npc = (state.cached_npcs[uid]) ? state.cached_npcs[uid][id] : undefined;
-
     // The npc is not in the store and needs to be fetched from the database
     if(!npc) {
       const services = await dispatch("get_npc_services");

@@ -230,6 +230,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
+        const campaign = await dispatch("get_campaign", { uid, id });
         await services.deleteCampaign(uid, id);
 
         // DELETE ALL ENCOUNTER OF CAMPAIGN
@@ -240,6 +241,11 @@ const actions = {
         
         const new_count = await services.updateCampaignCount(uid, -1);
         commit("SET_CAMPAIGN_COUNT", new_count);
+
+        for (const playerId in campaign.players) {
+          console.log(playerId)
+          dispatch("players/set_campaign_id", { uid, playerId, value: null }, { root: true });
+        }
         return;
       } catch(error) {
         throw error;

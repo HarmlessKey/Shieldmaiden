@@ -3,20 +3,20 @@
 		<h3>Players</h3>
 
 		<!-- PLAYERS -->
-		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players">
+		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players && addable > 0">
 			<div 
-				v-for="(player, key) in players" 
+				v-for="(player, key) in campaign_players" 
 				:key="key"
 				@click="add($event, key, 'player', player.character_name)" 
 			>
 			<div class="d-flex justify-content-left">
-				<template v-if="checkPlayer(key) < 0">
+				<template v-if="!player_in_encounter(key)">
 					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
 						<i v-if="!player.avatar" class="hki-player" />
 					</span>
 				</template>
 			</div>
-			<q-tooltip v-if="checkPlayer(key)" anchor="top middle" self="center middle">
+			<q-tooltip v-if="!player_in_encounter(key)" anchor="top middle" self="center middle">
 				Add {{ player.character_name }}
 			</q-tooltip>
 		</div>
@@ -251,6 +251,10 @@
 				type: Object,
 				required: true
 			},
+			campaign_players: {
+				type: Object,
+				required: true
+			}
 		},
 		mixins: [general, dice],
 		components: {
@@ -341,9 +345,6 @@
 			} 
 		},
 		async mounted() {
-			for (const playerId in this.campaign.players) {
-				this.players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId});
-			}
 
 			await this.fetchMonsters();
 			this.npcs = await this.get_npcs();
@@ -380,6 +381,15 @@
 					["name", "type", "actions"] :
 					["name", "actions"];
 			},
+			addable() {
+				let count = 0;
+				for (const playerId in this.campaign_players) {
+					if (!this.player_in_encounter(playerId)) {
+						++count;
+					}
+				}
+				return count
+			}
 		},
 		methods: {
 			...mapActions(["setSlide"]),
@@ -405,18 +415,10 @@
 				}
 				this.fetchMonsters();
 			},
-			// searchNpcs() {
-			// 	this.loading_npcs = true;
-			// 	// this.fetchNpcs();
-			// },
 			request(req) {
 				this.pagination = req.pagination;
 				this.fetchMonsters();		
 			},
-			// load(req, loadMore=false) {
-			// 	this.npc_pagination = req.pagination;
-			// 	// this.fetchNpcs(loadMore);
-			// },
 			async fetchMonsters() {
 				await this.get_monsters({
 					pageNumber: this.pagination.page,
@@ -431,23 +433,6 @@
 					this.loading_monsters = false;
 				});
 			},
-			// async fetchNpcs(loadMore=false) {
-			// 	// await this.fetch_npcs({
-			// 	// 	startAfter: this.getStartAfterResult(loadMore),
-			// 	// 	pageSize: this.npc_pagination.rowsPerPage,
-			// 	// 	query: this.searchNpc,
-			// 	// 	sortBy: this.npc_pagination.sortBy,
-			// 	// 	descending: this.npc_pagination.descending
-			// 	// }).then(results => {
-			// 	// 	this.npcs = (loadMore) ? this.npcs.concat(results) : results;
-			// 	// 	this.loading_npcs = false;
-			// 	// });
-			// },
-			// getStartAfterResult(loadMore) {
-			// 	if(this.npcs.length && loadMore) {
-			// 		return this.npcs.at(-1)[this.npc_pagination.sortBy];
-			// 	} return undefined;
-			// },
 			multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
@@ -547,7 +532,7 @@
 						playerId: id,
 						player: entity
 					});
-					const companions = this.players[id].companions;
+					const companions = this.campaign_players[id].companions;
 					for (let key in companions) {
 						this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
 					}
@@ -587,15 +572,15 @@
 			},
 			addAllPlayers(e) {
 				for(let player in this.campaign.players) {
-					let name = this.players[player].character_name;
+					let name = this.campaign_players[player].character_name;
 					this.add(e, player, 'player', name)
 				}
 			},
-			checkPlayer(id) {
+			player_in_encounter(id) {
 				if(this.encounter.entities) {
-					return (Object.keys(this.encounter.entities).indexOf(id))
+					return Object.keys(this.encounter.entities).indexOf(id) >= 0;
 				} else {
-					return -1
+					return false
 				}
 			},
 			setSize(e) {

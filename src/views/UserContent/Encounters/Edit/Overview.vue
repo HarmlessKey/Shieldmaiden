@@ -91,10 +91,10 @@
 							<!-- Player avatar -->
 							<span 
 								v-if="data.row.entityType === 'player'" 
-								:style="{ backgroundImage: 'url(\'' + getPlayer(data.row.id).avatar + '\')' }"
+								:style="{ backgroundImage: 'url(\'' + campaign_players[data.row.id].avatar + '\')' }"
 								class="image"
 							>
-								<i v-if="!getPlayer(data.row.id).avatar" class="hki-player" />
+								<i v-if="!campaign_players[data.row.id].avatar" class="hki-player" />
 							</span>
 
 							<!-- Companion avatar -->
@@ -207,6 +207,10 @@
 				type: Object,
 				required: true
 			},
+			campaign_players: {
+				type: Object,
+				required: true
+			}
 		},
 		mixins: [difficulty],
 		data() {
@@ -324,8 +328,10 @@
 					value: this.encDifficulty['totalXp']
 				});
 			},
-			getPlayer(id) {
-				return this.get_player({ uid: this.user.uid, id });
+			async getPlayer(id) {
+				const player = await this.get_player({ uid: this.user.uid, id });
+				console.log(player)
+				return player;
 			},
 			getNpc(entity) {
 				// check for npc type srd or api (api is legacy code)

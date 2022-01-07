@@ -34,7 +34,7 @@
 					</div>
 					<q-tab-panels v-model="tab" class="bg-transparent">
 						<q-tab-panel name="entities">
-							<Entities :encounter="encounter" :campaign="campaign" />
+							<Entities :encounter="encounter" :campaign="campaign" :campaign_players="campaign_players"/>
 						</q-tab-panel>
 						<q-tab-panel name="general">
 							<General :encounter="encounter" :campaign="campaign" />
@@ -51,7 +51,10 @@
 			</hk-card>
 
 			<!-- ENCOUNTER OVERVIEW -->
-			<Overview :encounter="encounter" :campaign="campaign" />
+			<Overview v-if="!loading" :encounter="encounter" :campaign="campaign" :campaign_players="campaign_players" />
+			<hk-card v-else>
+				<hk-loader />
+			</hk-card>
 		</div>
 	</div>
 </template>
@@ -87,6 +90,7 @@
 				encounterId: this.$route.params.encid,
 				campaign: {},
 				encounter: {},
+				campaign_players: {},
 				loading: true,
 				tab: "entities"
 			} 
@@ -119,11 +123,17 @@
 				id: this.encounterId
 			});
 
+			for (const playerId in this.campaign.players) {
+				this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
+			}
+			console.log(this.campaign_players)
+
 			this.loading = false;
 		},
 		methods: {
 			...mapActions("campaigns", ["get_campaign"]),
 			...mapActions("encounters", ["get_encounter"]),
+			...mapActions("players", ["get_player"]),
 		}
 	}
 </script>

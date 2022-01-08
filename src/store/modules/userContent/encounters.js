@@ -192,7 +192,7 @@ const actions = {
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId, entity: npc });
        
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
-        await commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
         return;
       } catch(error) {
         throw error;
@@ -217,7 +217,7 @@ const actions = {
         commit("ADD_ENTITY", { uid, campaignId, encounterId, entityId: playerId, entity: player });
         
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
-        await commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
+        commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, count: new_count });
         return;
       } catch(error) {
         console.error(error);

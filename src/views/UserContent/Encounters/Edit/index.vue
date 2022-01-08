@@ -126,7 +126,6 @@
 			for (const playerId in this.campaign.players) {
 				this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
 			}
-			console.log(this.campaign_players)
 
 			this.loading = false;
 		},

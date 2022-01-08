@@ -345,7 +345,6 @@
 			} 
 		},
 		async mounted() {
-
 			await this.fetchMonsters();
 			this.npcs = await this.get_npcs();
 			this.loading_npcs = false;
@@ -534,7 +533,8 @@
 					});
 					const companions = this.campaign_players[id].companions;
 					for (let key in companions) {
-						await this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
+						const companion = await this.get_npc({ uid: this.user.uid, id: key });
+						await this.add(e, key, 'companion', companion.name, true, false, id);
 					}
 				}
 

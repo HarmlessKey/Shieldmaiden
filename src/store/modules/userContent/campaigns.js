@@ -403,8 +403,8 @@ const actions = {
   /**
    * Deletes a companion from a campaign
    * 
-   * @param {object} id campaignId 
-   * @returns {string} the id of the newly added campaign
+   * @param {string} id campaignId 
+   * @param {string} companionId
    */
    async delete_companion({ rootGetters, commit, dispatch }, { id, companionId }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;

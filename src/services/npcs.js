@@ -134,13 +134,8 @@ export class npcServices {
 
   async getFullNpcs(uid) {
     try {
-      const all_npcs = await NPCS_REF.child(uid).once('value', (snapshot) => {
-
-        return snapshot;
-      })
-
+      const all_npcs = await NPCS_REF.child(uid).once('value');
       return all_npcs.val();
-
     } catch(error) {
       throw error;
     }

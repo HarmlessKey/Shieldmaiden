@@ -184,13 +184,23 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.deleteNpc(uid, id);
+        const npc = await dispatch("get_npc", { uid, id });
         
         // DELETE COMPANION FROM PLAYER
-        // A player might have this NPC as a companion, this needs to be deleted now.
-        // the NPC has a player_id if so. Easy to delete
-        // But companion must then also be deleted from the campaign the player is in
+        if(npc.player_id) {
+          const player = await dispatch("players/get_player", { uid, id: npc.player_id }, { root: true });
+          
+          // Remove the companion from the player
+          await dispatch("players/delete_companion", { uid, playerId: npc.player_id, id }, { root: true });
 
+          // Remove the companion from the campaign
+          if(player.campaign_id) {
+            await dispatch("campaigns/delete_companion", { id: player.campaign_id, companionId: id }, { root: true });
+          }
+        }
+
+        // Delete the NPC
+        await services.deleteNpc(uid, id);
         commit("REMOVE_NPC", id);
         commit("REMOVE_CACHED_NPC", { uid, id });
 

@@ -439,6 +439,14 @@
 				for (let i = 0; i < this.to_add[id]; i++ ) {
 					await this.add(e, id,type,name,custom,rollHp);
 				}
+
+				// Notification for NPCs
+				if(type === 'npc') {				
+					this.$snotify.success(`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, {
+						position: "centerTop"
+					});
+				}
+
 				this.to_add[id] = 1
 			},
 			async add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
@@ -457,7 +465,7 @@
 					let last = -1;
 					let n = 0;
 					for (let i in this.encounter.entities) {
-						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d)\))$)|(?:^(.*)(?!\s\(\d\))$)/);
+						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d+)\))$)|(?:^(.*)(?!\s\(\d+\))$)/);
 						
 						let name = match[1] || match[3];
 						if (name == entity.name) {
@@ -564,10 +572,6 @@
 						notifyHP.throws = ''
 						notifyHP.mod = ''
 					}
-
-					this.$snotify.success('HP: ' + notifyHP.total + notifyHP.throws + notifyHP.mod, 'NPC added', {
-						position: "centerTop"
-					});
 				}
 			},
 			async addAllPlayers(e) {

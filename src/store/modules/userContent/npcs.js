@@ -109,17 +109,18 @@ const actions = {
    * @param {object} npc 
    * @returns {string} the id of the newly added npc
    */
-  async add_npc({ rootGetters, commit, state, dispatch }, npc) {
+  async add_npc({ rootGetters, commit, dispatch }, npc) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.npc_count + 1;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
         const search_npc = convert_npc(npc);
-        const id = await services.addNpc(uid, npc, new_count, search_npc);
-        commit("SET_NPC_COUNT", new_count);
+        const id = await services.addNpc(uid, npc, search_npc);
         commit("SET_NPC", { id, search_npc });
         commit("SET_CACHED_NPC", { uid, id, npc });
+
+        const new_count = await services.updateNpcCount(uid, 1);
+        commit("SET_NPC_COUNT", new_count);
         return id;
       } catch(error) {
         throw error;
@@ -178,13 +179,12 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_npc({ rootGetters, commit, state, dispatch }, id) {
+  async delete_npc({ rootGetters, commit, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.npc_count - 1;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.deleteNpc(uid, id, new_count);
+        await services.deleteNpc(uid, id);
         
         // DELETE COMPANION FROM PLAYER
         // A player might have this NPC as a companion, this needs to be deleted now.
@@ -193,6 +193,8 @@ const actions = {
 
         commit("REMOVE_NPC", id);
         commit("REMOVE_CACHED_NPC", { uid, id });
+
+        const new_count = await services.updateNpcCount(uid, -1);
         commit("SET_NPC_COUNT", new_count);
         return;
       } catch(error) {

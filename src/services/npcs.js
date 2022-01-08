@@ -60,21 +60,18 @@ export class npcServices {
 
   /**
    * Adds an NPC to the 'npcs' ref and the 'search_npcs' ref.
-   * Also updates the count metadata in 'search_npcs'
    * 
    * @param {String} uid ID of active user
    * @param {Object} npc NPC to add
-   * @param {Int} new_count Updated number of NPCs
    * @param {Object} search_npc Compressed NPC
    * @returns Key of the newly added NPC
    */
-  async addNpc(uid, npc, new_count, search_npc) {
+  async addNpc(uid, npc, search_npc) {
     try {
       npc.name = npc.name.toLowerCase();
       const newNpc = await NPCS_REF.child(uid).push(npc);
       
       // Update search_npcs
-      SEARCH_NPCS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_NPCS_REF.child(`${uid}/results/${newNpc.key}`).set(search_npc);
 
       return newNpc.key;
@@ -122,14 +119,12 @@ export class npcServices {
    * 
    * @param {String} uid ID of active user
    * @param {String} id ID of NPC to edit
-   * @param {Int} new_count Updated number of NPCs
    */
-  async deleteNpc(uid, id, new_count) {
+  async deleteNpc(uid, id) {
     try {
       NPCS_REF.child(uid).child(id).remove();
 
       //Update search_npcs
-      SEARCH_NPCS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_NPCS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
@@ -149,5 +144,18 @@ export class npcServices {
     } catch(error) {
       throw error;
     }
+  }
+
+  /**
+   * Update npc_count in the search table of search_npcs
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from npc count
+   */
+   async updateNpcCount(uid, diff) {
+    const npc_count_path = `${uid}/metadata/count`;
+    let npc_count = await SEARCH_NPCS_REF.child(npc_count_path).once('value');
+    await SEARCH_NPCS_REF.child(npc_count_path).set(npc_count.val() + diff);
+    return npc_count.val() + diff;
   }
 }

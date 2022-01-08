@@ -82,6 +82,14 @@ export class encounterServices {
     });
   }
 
+  /**
+   * Delete a single encounter
+   * 
+   * @param {string} uid 
+   * @param {string} campaignId 
+   * @param {string} id 
+   * @returns 
+   */
   async deleteEncounter(uid, campaignId, id) {
     try {
       ENCOUNTERS_REF.child(`${uid}/${campaignId}`).child(id).remove();
@@ -94,6 +102,13 @@ export class encounterServices {
     }
   }
 
+  /**
+   * Delete all the encounters of a campaign.
+   * Called when deleting a campaign
+   * 
+   * @param {string} uid 
+   * @param {string} campaignId 
+   */
   async deleteCampaignEncounters(uid, campaignId) {
     try {
       ENCOUNTERS_REF.child(`${uid}`).child(campaignId).remove();
@@ -107,12 +122,33 @@ export class encounterServices {
     }
   }
 
-  // Adds a player to the encounter
+  /**
+   * Delete all finished encounters of a campaign
+   * 
+   * @param {string} uid 
+   * @param {string} campaignId 
+   */
+  async deleteFinishedEncounters(uid, campaignId) {
+    const encounters = await this.getCampaignEncounters(uid, campaignId, true);
+    for(const id in encounters) {
+      await this.deleteEncounter(uid, campaignId, id);
+    }
+    return encounters;
+  }
+
+  /**
+   * Adds a player to an encounter
+   * 
+   * @param {string} uid 
+   * @param {string} campaignId 
+   * @param {string} encounterId 
+   * @param {string} playerId 
+   * @param {object} player 
+   */
   async addPlayer(uid, campaignId, encounterId, playerId, player) {
     try {
       const path = `${uid}/${campaignId}/${encounterId}/entities/${playerId}`;
       ENCOUNTERS_REF.child(path).set(player);
-
       return;
     } catch(err) {
       throw err;

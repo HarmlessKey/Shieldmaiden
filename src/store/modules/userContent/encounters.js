@@ -319,7 +319,7 @@ const actions = {
 
   /**
    * Deletes an existing encounter
-   * A user can only delete their own encounter's so use uid from the store
+   * A user can only delete their own encounters so use uid from the store
    * 
    * @param {string} campaignId 
    * @param {string} id 
@@ -335,6 +335,36 @@ const actions = {
 
         const new_count = await services.updateEncounterCount(uid, campaignId, -1);
         commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+   /**
+   * Deletes all finished encounters of a campaign
+   * A user can only delete their own encounters so use uid from the store
+   * 
+   * @param {string} campaignId 
+   * @param {string} id 
+   */
+  async delete_finished_encounters({ rootGetters, dispatch, commit }, campaignId) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const encounters = await services.deleteFinishedEncounters(uid, campaignId);
+        
+        if(encounters) {
+          for(const id in encounters) {
+            commit("REMOVE_ENCOUNTER", { campaignId, id });
+            commit("REMOVE_CACHED_ENCOUNTER", { uid, campaignId, id });
+          }
+  
+          const diff = Object.keys(encounters).length;
+          const new_count = await services.updateEncounterCount(uid, campaignId, -diff);
+          commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        }
       } catch(error) {
         throw error;
       }

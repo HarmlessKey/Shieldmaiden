@@ -144,7 +144,10 @@
 						<hk-card  v-if="finished_encounters.length">
 							<div class="card-header">
 								<span>Finished encounters</span>
-								<a class="btn btn-sm bg-neutral-5">
+								<a 
+									class="btn btn-sm bg-neutral-5"
+									@click="deleteFinishedEncounters"
+								>
 									<i class="fas fa-trash-alt mr-1 red" />
 									Delete all
 								</a>
@@ -377,7 +380,8 @@
 			...mapActions("encounters", [
 				"get_campaign_encounters",
 				"add_encounter",
-				"delete_encounter"
+				"delete_encounter",
+				"delete_finished_encounters"
 			]),
 			...mapActions("campaigns", [
 				"get_campaign",
@@ -419,23 +423,39 @@
 					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
 						timeout: 5000,
 						buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-								this.delete_encounter({
-									campaignId: this.campaignId, 
-									id: key
-								});
-								this.$snotify.remove(toast.id); 
-							}, bold: false 
-						},
-						{
+							{
+								text: 'Yes', action: (toast) => { 
+									this.delete_encounter({
+										campaignId: this.campaignId, 
+										id: key
+									});
+									this.$snotify.remove(toast.id); 
+								}, bold: false 
+							},
+							{
 							text: 'No', action: (toast) => { 
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false },
+							}, bold: false },
 						]
 					});
 				}
+			},
+			async deleteFinishedEncounters() {
+				this.$snotify.error('Are you sure you want to delete all finished encounters?', 'Delete finished encounters', {
+						timeout: 5000,
+						buttons: [
+							{
+								text: 'Yes', action: async (toast) => { 
+									await this.delete_finished_encounters(this.campaignId);
+									this.$snotify.remove(toast.id); 
+								}, bold: false 
+							},
+							{
+							text: 'No', action: (toast) => { 
+								this.$snotify.remove(toast.id); 
+							}, bold: false },
+						]
+					});
 			},
 			reset(id, hard=true) {
 				if (hard){

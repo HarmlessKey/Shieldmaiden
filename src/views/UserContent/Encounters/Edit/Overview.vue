@@ -317,8 +317,7 @@
 				await this.delete_entity({
 					campaignId: this.campaignId,
 					encounterId: this.encounterId,
-					entityId: id,
-					type: this.encounter.finished ? "finished": "active"
+					entityId: id
 				});
 			},
 			async setDifficulty() {

@@ -17,7 +17,7 @@
 			<div class="row q-col-gutter-md">
 				<!-- SHOW ENCOUNTERS -->
 				<div class="col-12 col-md-7">
-					<template v-if="!loading_encounters">
+					<template v-if="!loading_active">
 						<hk-card>
 							<div slot="header" class="card-header">
 								<span>
@@ -135,62 +135,99 @@
 											</q-td>
 										</template>
 										<div slot="no-data" />
-										<hk-loader slot="loading" name="NPCs" />
 									</q-table>
 								</template>
 							</div>
 						</hk-card>
-						<hk-card  v-if="finished_encounters.length" header="Finished encounters">
-							<div class="card-body">
-								<!-- FINISHED ENCOUNTERS -->
-								<hk-table
-									:items="finished_encounters"
-									:columns="finishedColumns"
-									:perPage="6"
-									:currentPage="currentPage"
-								>
-									<template slot="encounter" slot-scope="data">
-										<router-link class="neutral-2" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-											{{ data.item }}
-											<q-tooltip anchor="top middle" self="center middle">
-												Run encounter
-											</q-tooltip>
-										</router-link>
-									</template>
 
-									<template slot="actions" slot-scope="data">
-										<div class="actions">
-											<router-link class="btn btn-sm bg-neutral-5" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+						<!-- FINISHED ENCOUNTERS -->
+						<hk-card  v-if="finished_encounters.length">
+							<div class="card-header">
+								<span>Finished encounters</span>
+								<a class="btn btn-sm bg-neutral-5">
+									<i class="fas fa-trash-alt mr-1 red" />
+									Delete all
+								</a>
+							</div>
+
+							<div class="card-body">
+								<q-table
+									:data="finished_encounters"
+									:columns="columns"
+									row-key="key"
+									card-class="bg-none"
+									flat
+									:dark="$store.getters.theme !== 'light'"
+									separator="none"
+									:pagination="{ rowsPerPage: 5 }"
+									wrap-cells
+								>	
+									<template v-slot:body-cell="props">
+										<q-td v-if="props.col.name !== 'actions'">
+											<div  class="truncate-cell">
+												<div class="truncate">
+													<router-link 
+														v-if="props.col.name === 'name' && props.row.entity_count" 
+														:to="`/run-encounter/${campaignId}/${props.key}`"
+													>
+														{{ props.value }}
+													</router-link>
+													<template v-else>
+														{{ props.value }}
+													</template>
+												</div>
+											</div>
+										</q-td>
+										<q-td v-else class="text-right d-flex justify-content-between">
+											<router-link class="btn btn-sm bg-neutral-5" :to="`/run-encounter/${campaignId}/${props.key}`">
 												<i class="fas fa-eye"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													View
 												</q-tooltip>
 											</router-link>
-											<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(data.row.key, hard=false)">
+											<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, hard=false)">
 												<i class="fas fa-trash-restore-alt"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Unfinish
 												</q-tooltip>
 											</a>
-											<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(data.row.key)">
+											<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(props.key)">
 												<i class="fas fa-undo"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Reset
 												</q-tooltip>
 											</a>
-											<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
+											<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, props.key, props.row.name)">
 												<i class="fas fa-trash-alt"></i>
 												<q-tooltip anchor="top middle" self="center middle">
 													Delete
 												</q-tooltip>
 											</a>
-										</div>
+										</q-td>
 									</template>
-								</hk-table>
-						
-								<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+									<div slot="no-data" />
+									<hk-loader slot="loading" name="NPCs" />
+								</q-table>
 							</div>
 						</hk-card>
+						<template v-else>
+							<template v-if="!loading_finished">
+								<q-banner 
+									v-if="finished_fetched" 
+									:dark="$store.getters.theme !== 'light'"
+									rounded inline-actions
+									class="mb-3"
+								>
+									No finished encounters found.
+									<q-btn slot="action" size="sm" flat padding="sm" no-caps icon="fas fa-times" @click="finished_fetched = false" />
+								</q-banner>
+								<button class="btn btn-block mb-2 bg-neutral-5" @click="getFinishedEncounters">Get finished encounters</button>
+								<p class="text-center"><small>Your finished encounters count towards your total.</small></p>
+							</template>
+							<hk-card v-else>
+								<hk-loader name="encounters" />
+							</hk-card>
+						</template>
 					</template>
 					<hk-card v-else>
 						<hk-loader name="encounters" />
@@ -265,7 +302,9 @@
 				campaignId: this.$route.params.campid,
 				encounters: {},
 				loading_campaign: true,
-				loading_encounters: true,
+				loading_active: true,
+				loading_finished: false,
+				finished_fetched: false,
 				campaign: {},
 				newEncounter: "",
 				add: false,
@@ -314,8 +353,7 @@
 			this.loading_campaign = false;
 
 			await this.get_campaign_encounters({ campaignId: this.campaignId });
-			await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });
-			this.loading_encounters = false;
+			this.loading_active = false;
 		},
 		computed: {
 			...mapGetters([
@@ -328,10 +366,10 @@
 				return this.get_encounter_count(this.campaignId);
 			},
 			active_encounters() {
-				return this.get_encounters(this.campaignId, "active");
+				return this.get_encounters(this.campaignId, false);
 			},
 			finished_encounters() {
-				return this.get_encounters(this.campaignId, "finished");
+				return this.get_encounters(this.campaignId, true);
 			}
 		},
 		methods: {
@@ -345,6 +383,12 @@
 				"get_campaign",
 				"set_active_campaign"
 			]),
+			async getFinishedEncounters() {
+				this.loading_finished = true;
+				await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });
+				this.loading_finished = false;
+				this.finished_fetched = true;
+			},
 			addEncounter() {
 				if ((this.encounter_count < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
 					this.add_encounter({
@@ -369,8 +413,7 @@
 				if(e.shiftKey) {
 					this.delete_encounter({ 
 						campaignId: this.campaignId, 
-						id: key, 
-						finished: encounter.finished
+						id: key
 					});
 				} else {
 					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
@@ -380,8 +423,7 @@
 							text: 'Yes', action: (toast) => { 
 								this.delete_encounter({
 									campaignId: this.campaignId, 
-									id: key,
-									finished: encounter.finished
+									id: key
 								});
 								this.$snotify.remove(toast.id); 
 							}, bold: false 

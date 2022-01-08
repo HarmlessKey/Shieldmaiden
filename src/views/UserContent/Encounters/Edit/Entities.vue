@@ -438,7 +438,7 @@
 					this.to_add[id] = 1
 				}
 				for (let i = 0; i < this.to_add[id]; i++ ) {
-					await this.add(e, id,type,name,custom,rollHp)
+					await this.add(e, id,type,name,custom,rollHp);
 				}
 				this.to_add[id] = 1
 			},
@@ -520,8 +520,7 @@
 					await this.add_npc_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
-						npc: entity,
-						type: this.encounter.finished ? "finished": "active"
+						npc: entity
 					});
 				}
 
@@ -531,12 +530,11 @@
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
-						player: entity,
-						type: this.encounter.finished ? "finished": "active"
+						player: entity
 					});
 					const companions = this.campaign_players[id].companions;
 					for (let key in companions) {
-						this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
+						await this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
 					}
 				}
 
@@ -544,12 +542,11 @@
 				else if (type == 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
-					this.add_player_encounter({
+					await this.add_player_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
-						player: entity,
-						type: this.encounter.finished ? "finished": "active"
+						player: entity
 					});
 				}
 
@@ -573,10 +570,10 @@
 					});
 				}
 			},
-			addAllPlayers(e) {
+			async addAllPlayers(e) {
 				for(let player in this.campaign.players) {
 					let name = this.campaign_players[player].character_name;
-					this.add(e, player, 'player', name)
+					await this.add(e, player, 'player', name)
 				}
 			},
 			player_in_encounter(id) {

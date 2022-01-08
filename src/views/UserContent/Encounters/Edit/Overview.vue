@@ -99,7 +99,11 @@
 								</span>
 
 								<!-- Companion avatar -->
-								<span v-if="data.row.entityType === 'companion'" :style="{ backgroundImage: 'url(\'' + entity_data[data.row.id].avatar + '\')' }">
+								<span 
+									v-if="data.row.entityType === 'companion'" 
+									:style="{ backgroundImage: 'url(\'' + entity_data[data.row.id].avatar + '\')' }"
+									class="image"
+								>
 									<i v-if="!entity_data[data.row.id].avatar" class="hki-companion" />
 								</span>
 
@@ -294,15 +298,15 @@
 				async handler() {
 					this.loading = true;
 					this.entity_data = await this.get_entity_data();
+					this.setDifficulty();
 					this.loading = false;
-
 				}
-				
 			}
 		},
 		async mounted() {
-				this.entity_data = await this.get_entity_data();
-				this.loading = false
+			this.entity_data = await this.get_entity_data();
+			this.loading = false;
+			await this.setDifficulty();
 		},
 		methods: {
 			...mapActions(['setSlide']),
@@ -322,7 +326,6 @@
 			},
 			async setDifficulty() {
 				this.encDifficulty = await this.difficulty(this.encounter.entities);
-
 				//Store the new xp value for the encounter
 				this.set_xp({
 					campaignId: this.campaignId,

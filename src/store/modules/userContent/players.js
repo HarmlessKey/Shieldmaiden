@@ -121,14 +121,13 @@ const actions = {
    * @param {object} player 
    * @returns {string} the id of the newly added player
    */
-  async add_player({ state, rootGetters, commit, dispatch }, player) {
+  async add_player({ rootGetters, commit, dispatch }, player) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.player_count + 1;
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
         const search_player = convert_player(player);
-        const id = await services.addPlayer(uid, player, new_count, search_player);
+        const id = await services.addPlayer(uid, player, search_player);
 
         // If there are companions, save the playerId in the NPC (So the player can edit this specific NPC)
         if(player.companions) {
@@ -141,9 +140,11 @@ const actions = {
             }, { root: true });
 					}
         }
-        commit("SET_PLAYER_COUNT", new_count);
         commit("SET_PLAYER", { id, search_player });
         commit("SET_CACHED_PLAYER", { uid, id, player });
+
+        const new_count = await services.updatePlayerCount(uid, 1);
+        commit("SET_PLAYER_COUNT", new_count);
         return id;
       } catch(error) {
         throw error;
@@ -285,9 +286,8 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_player({ state, rootGetters, commit, dispatch }, id) {
+  async delete_player({ rootGetters, commit, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.player_count - 1;
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
@@ -323,10 +323,12 @@ const actions = {
         }
 
         // Check if control over the character is given to a player
-        await services.deletePlayer(uid, id, player.control, new_count);
+        await services.deletePlayer(uid, id, player.control);
 
         commit("REMOVE_PLAYER", id);
         commit("REMOVE_CACHED_PLAYER", { uid, id });
+
+        const new_count = await services.updatePlayerCount(uid, -1);
         commit("SET_PLAYER_COUNT", new_count);
         return;
       } catch(error) {

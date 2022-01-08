@@ -65,12 +65,11 @@ export class playerServices {
     }
   }
 
-  async addPlayer(uid, player, new_count, search_player) {
+  async addPlayer(uid, player, search_player) {
     try {
       const newPlayer = await PLAYERS_REF.child(uid).push(player);
 
       // Update search_players
-      SEARCH_PLAYERS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_PLAYERS_REF.child(`${uid}/results/${newPlayer.key}`).set(search_player);
 
       return newPlayer.key;
@@ -108,7 +107,7 @@ export class playerServices {
     });
   }
 
-  async deletePlayer(uid, id, control, new_count) {
+  async deletePlayer(uid, id, control) {
     try {
       PLAYERS_REF.child(uid).child(id).remove();
 
@@ -118,11 +117,23 @@ export class playerServices {
       }
 
       //Update search_players
-      SEARCH_PLAYERS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_PLAYERS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
       throw error;
     }
+  }
+
+  /**
+   * Update player_count in the search table of search_players
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from player count
+   */
+   async updatePlayerCount(uid, diff) {
+    const player_count_path = `${uid}/metadata/count`;
+    let player_count = await SEARCH_PLAYERS_REF.child(player_count_path).once('value');
+    await SEARCH_PLAYERS_REF.child(player_count_path).set(player_count.val() + diff);
+    return player_count.val() + diff;
   }
 }

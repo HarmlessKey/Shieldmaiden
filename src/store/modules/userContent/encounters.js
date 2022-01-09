@@ -294,6 +294,82 @@ const actions = {
       }
     }
   },
+  
+  /**
+   * Finish or unfinish an encounter
+   * 
+   * @param {string} campaignId 
+   * @param {string} id encounterId
+   * @param {boolean} finished 
+   */
+  async finish_encounter({ rootGetters, dispatch, commit}, { campaignId, id, finished}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, id, "", { finished }, true);
+        commit("FINISH_ENCOUNTER", { uid, campaignId, id, finished });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Reset an encounter
+   * 
+   * @param {string} uid
+   * @param {string} campaignId
+   * @param {string} encounterId
+   */
+   async reset_encounter({ rootGetters, commit, dispatch }, { campaignId, id}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      try {
+        const encounter = await dispatch("get_encounter", { uid, campaignId, id });
+        if(encounter) {
+          // Reset entities
+          for(let entity of Object.values(encounter.entities)) {
+
+            // Values to remove
+            delete entity.tempHp;
+            delete entity.transformed;
+            delete entity.stabilized;
+            delete entity.down;
+            delete entity.ac_bonus;
+            delete entity.meters;
+            delete entity.hidden;
+
+            if(entity.entityType === 'npc') {
+              entity.curHp = entity.maxHp
+            }
+            entity.initiative = 0;  
+          }
+        }
+        
+        // Reset encounter values
+        delete encounter.xp_awarded;
+        delete encounter.currency_awarded;
+        encounter.finished = false;
+        encounter.turn = 0;
+        encounter.round = 0;
+
+        //CLEAR LOG in localStorage
+        localStorage.removeItem(id);
+        
+        // Update the encounter in the store and firebase
+        await dispatch("edit_encounter", { uid, campaignId, encounterId: id, value: encounter });
+
+        // Update the search_encounter in the store
+        let search_encounter = convert_encounter(encounter);
+        search_encounter.entity_count = Object.keys(encounter.entities).length;
+        commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
 
   /**
    * Saves the calculated XP value of an encounter
@@ -315,8 +391,30 @@ const actions = {
       }
     }
   },
-  
 
+  /**
+   * Update non-nested properties in an encounter with a single function
+   * 
+   * @param {string} campaignId 
+   * @param {string} encounterId 
+   * @param {string} property 
+   * @param {any} value 
+   * @param {boolean} update_search Should the property be updated in search_encounters? 
+   */
+  async update_encounter_prop({ rootGetters, commit, dispatch }, {campaignId, encounterId, property, value, update_search=false}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, "", { [property]: value }, update_search);
+        commit("SET_ENCOUNTER_PROP", { uid, campaignId, encounterId, property, value, update_search });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+  
   /**
    * Deletes an existing encounter
    * A user can only delete their own encounters so use uid from the store
@@ -372,7 +470,7 @@ const actions = {
   },
 
   /**
-   * Deletes all encounter of a campaign
+   * Deletes all encounters of a campaign
    * 
    * @param {string} campaignId 
    */
@@ -457,9 +555,28 @@ const mutations = {
   EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity}) { 
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
   },
-  SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value}) { 
-    Vue.set(state.cached_encounters[uid][campaignId][encounterId].xp, type, value);
+  SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value}) {
+    if(state.cached_encounters[uid][campaignId][encounterId].xp) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].xp, type, value);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId], "xp", { [type]: value });
+    }
   },
+  SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search}) {
+    if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {
+      Vue.set(state.encounters[campaignId][encounterId], property, value)
+    }
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId])
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId], property, value);
+  },
+  FINISH_ENCOUNTER(state, { uid, campaignId, id, finished }) {
+    if(state.encounters[campaignId] && state.encounters[campaignId][id]) {
+      Vue.set(state.encounters[campaignId][id], "finished", finished);
+    }
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][id]) {
+      Vue.set(state.cached_encounters[uid][campaignId][id], "finished", finished);
+    }
+  }
 };
 
 export default {

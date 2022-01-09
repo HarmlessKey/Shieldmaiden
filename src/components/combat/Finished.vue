@@ -3,7 +3,11 @@
 		<h2 class="head">Encounter finished</h2>
 		<div class="container">
 			<div class="actions">
-				<router-link v-if="$route.name == 'RunEncounter'" class="btn btn-sm btn-clear" :to="'/encounters/' + $route.params.campid">
+				<router-link 
+					v-if="$route.name == 'RunEncounter'" 
+					class="btn btn-sm btn-clear" 
+					:to="'/content/campaigns/' + $route.params.campid"
+				>
 					<i class="fas fa-chevron-left"></i> Leave
 				</router-link>
 
@@ -252,6 +256,10 @@
 				'init_Encounter',
 				'reset_store'
 			]),
+			...mapActions("encounters", [
+				"reset_encounter",
+				"finish_encounter"
+			]),
 			awardCurrency() {
 				let oldValue = 0;
 				if(this.campaign.inventory && this.campaign.inventory.currency) {
@@ -277,41 +285,11 @@
 			},
 			reset(hard=true) {
 				const id = this.encounterId;
-				if (hard){
-					for(let key in this.encounter.entities) {
-						let entity = this.encounter.entities[key];
-
-						//Remove values
-						delete entity.tempHp;
-						delete entity.transformed;
-						delete entity.stabilized;
-						delete entity.down;
-						delete entity.ac_bonus;
-						delete entity.meters;
-						delete entity.hidden;
-
-						if(entity.entityType == 'npc') {
-							entity.curHp = entity.maxHp;
-						}
-						entity.initiative = 0;
-
-
-						db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/entities/${key}`).set(entity);
-
-						//CLEAR LOG
-						localStorage.removeItem(id);
-					}
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/xp_awarded`).remove();
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/currency_awarded`).remove();
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/turn`).set(0);
-					db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/round`).set(0);
-					this.reset_store();
-					this.init_Encounter({
-						cid: this.$route.params.campid, 
-						eid: this.$route.params.encid
-					})
+				if(hard) {
+					this.reset_encounter({campaignId: this.campaignId, id});
+				} else {
+					this.finish_encounter({ campaignId: this.campaignId, id, finished: false });
 				}
-				db.ref(`encounters/${this.userId}/${this.campaignId}/${id}/finished`).set(false);
 			},
 		}
 	}

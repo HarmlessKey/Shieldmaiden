@@ -348,7 +348,7 @@ const actions = {
 					entity.tempHp = campaignCompanion.tempHp;
 					entity.ac_bonus = campaignCompanion.ac_bonus;
 					entity.maxHpMod = campaignCompanion.maxHpMod;
-					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.maxHp + entity.maxHpMod) : parseInt(data_npc.maxHp);
+					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.hit_points + entity.maxHpMod) : parseInt(data_npc.hit_points);
 					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
 					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
 					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
@@ -488,12 +488,22 @@ const actions = {
 	 * @param {integer} turn
 	 * @param {integer} round
 	 */
-	set_turn({ state, commit }, {turn, round}) { 
+	async set_turn({ state, commit, dispatch }, {turn, round}) { 
 		if(!state.demo) {
-			encounters_ref.child(state.path).update({
-				turn: turn,
-				round: round,
-			});
+			for(const property of ["turn", "round"]) {
+				const value = (property === "turn") ? turn : round;
+				await dispatch(
+					"encounters/update_encounter_prop", 
+					{
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						property,
+						value,
+						update_search: true
+					}, 
+					{ root: true }
+				);
+			}
 		}
 		commit("SET_TURN", turn);
 		commit("SET_ROUND", round);
@@ -1120,8 +1130,15 @@ const actions = {
 			commit('DELETE_ENTITY_PROPERTY', { key, prop: 'dead' });
 		}
 	},
-	set_finished({ state, commit }) { 
-		if(!state.demo) encounters_ref.child(`${state.path}/finished`).set(true);
+	async set_finished({ state, dispatch, commit }) { 
+		if(!state.demo) {
+			encounters_ref.child(`${state.path}/finished`).set(true);
+			await dispatch("encounters/finish_encounter", { 
+				campaignId: state.campaignId,
+				id: state.encounterId,
+				finished: true
+			}, { root: true });
+		}
 		commit('FINISH');
 	},
 

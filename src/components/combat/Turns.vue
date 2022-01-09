@@ -7,7 +7,7 @@
 					<q-list class="bg-neutral-8">
 						<q-item>
 							<q-item-section>
-								<b>{{ encounter.encounter }}</b>
+								<b>{{ encounter.name }}</b>
 							</q-item-section>
 						</q-item>
 						<q-separator />

@@ -79,7 +79,7 @@
 				<hk-loader v-else prefix="Calculating" name="difficulty" />
 				<!-- ENTITIES -->
 				<div class="overview">          
-					<template v-if="encounter">
+					<template v-if="encounter.entities">
 						<h3>{{ Object.keys(_friendlies).length }} Players and friendlies</h3>
 
 						<hk-table
@@ -190,7 +190,11 @@
 							</div>
 						</hk-table>
 					</template>
-					<div v-else class="loader"><span>Loading entities...</span></div>
+					<template v-else>
+						<h3>Add entities</h3>
+						<p>Add players and monsters to create your encounter.</p>
+						<button class="btn btn-block" @click="$emit('add-players')">Add all players</button>
+					</template>
 				</div>
 			</template>
 			<hk-loader v-else />
@@ -336,18 +340,20 @@
 			},
 			async get_entity_data() {
 				const entities = {};
-				for (const [key, entity] of Object.entries(this.encounter.entities)) {
-					if (entity.id in entities) {
-						continue
-					}
-					if (entity.entityType == 'player') {
-						entities[entity.id] = await this.get_player({ uid: this.user.uid, id: key });
-					}
-					else if (entity.npc === 'custom') {
-						entities[entity.id] = await this.get_npc({ uid: this.user.uid, id: entity.id })
-					}
-					else if (entity.npc === 'api' || entity.npc === 'srd') {
-						entities[entity.id] = await this.get_monster(entity.id);
+				if(this.encounter.entities) {
+					for (const [key, entity] of Object.entries(this.encounter.entities)) {
+						if (entity.id in entities) {
+							continue
+						}
+						if (entity.entityType == 'player') {
+							entities[entity.id] = await this.get_player({ uid: this.user.uid, id: key });
+						}
+						else if (entity.npc === 'custom') {
+							entities[entity.id] = await this.get_npc({ uid: this.user.uid, id: entity.id })
+						}
+						else if (entity.npc === 'api' || entity.npc === 'srd') {
+							entities[entity.id] = await this.get_monster(entity.id);
+						}
 					}
 				}
 				return entities;

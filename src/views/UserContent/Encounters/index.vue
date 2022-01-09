@@ -141,7 +141,7 @@
 						</hk-card>
 
 						<!-- FINISHED ENCOUNTERS -->
-						<hk-card  v-if="finished_encounters.length">
+						<hk-card v-if="finished_encounters.length">
 							<div class="card-header">
 								<span>Finished encounters</span>
 								<a 
@@ -211,9 +211,15 @@
 									<div slot="no-data" />
 									<hk-loader slot="loading" name="NPCs" />
 								</q-table>
+								<button 
+									v-if="encounter_count > (active_encounters.length + finished_encounters.length)"
+									class="btn btn-block mb-2 bg-neutral-5" 
+									@click="getFinishedEncounters">
+									Get all finished encounters
+								</button>
 							</div>
 						</hk-card>
-						<template v-else>
+						<template v-else-if="encounter_count > active_encounters.length">
 							<template v-if="!loading_finished">
 								<q-banner 
 									v-if="finished_fetched" 
@@ -285,7 +291,6 @@
 	import Players from "@/components/campaign/Players.vue";
 
 	import { mapGetters, mapActions } from "vuex";
-	import { db } from "@/firebase";
 
 	export default {
 		name: "Encounters",
@@ -337,7 +342,8 @@
 						name: "turn",
 						label: "Turn",
 						field: "turn",
-						align: "left"
+						align: "left",
+						format: val => val + 1
 					},
 					{
 						name: "actions",
@@ -381,7 +387,9 @@
 				"get_campaign_encounters",
 				"add_encounter",
 				"delete_encounter",
-				"delete_finished_encounters"
+				"delete_finished_encounters",
+				"finish_encounter",
+				"reset_encounter",
 			]),
 			...mapActions("campaigns", [
 				"get_campaign",
@@ -458,37 +466,11 @@
 					});
 			},
 			reset(id, hard=true) {
-				if (hard){
-					for(let key in this.encounters[id].entities) {
-						let entity = this.encounters[id].entities[key]
-
-						//Remove values
-						delete entity.tempHp
-						delete entity.transformed
-						delete entity.stabilized
-						delete entity.down
-						delete entity.ac_bonus
-						delete entity.meters
-						delete entity.hidden
-
-						if(entity.entityType == 'npc') {
-							entity.curHp = entity.maxHp
-						}
-						entity.initiative = 0;
-
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
-
-						//CLEAR LOG
-						localStorage.removeItem(id);
-					}
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/xp_awarded`).remove();
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/currency_awarded`).remove();
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0);
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0);
+				if(hard) {
+					this.reset_encounter({campaignId: this.campaignId, id});
+				} else {
+					this.finish_encounter({ campaignId: this.campaignId, id, finished: false });
 				}
-
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
-
 			}
 		}
 	}

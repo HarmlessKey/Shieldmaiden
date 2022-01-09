@@ -72,10 +72,22 @@ export class encounterServices {
     });
   }
 
-  // Updates an encounter
-  async updateEncounter(uid, campaignId, encounterId, path, value) {
-    path = `${uid}/${campaignId}/${encounterId}${path}`
-    ENCOUNTERS_REF.child(path).update(value).then(() => {
+  /**
+   * Updates a specific property in an existing campaign
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} campaignId ID of campaign 
+   * @param {String} encounterId ID of encounter to edit
+   * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
+   * @param {object} value Object with { proptery: value }
+   * @param {boolean} update_search Wether or not search_campaigns must be updated
+   */
+  async updateEncounter(uid, campaignId, encounterId, path, value, update_search=false) {
+    const update_path = `${uid}/${campaignId}/${encounterId}${path}`
+    await ENCOUNTERS_REF.child(update_path).update(value).then(async () => {
+      if(update_search) {
+        await SEARCH_ENCOUNTERS_REF.child(`${uid}/results/${campaignId}/${encounterId}${path}`).update(value);
+      }
       return;
     }).catch((error) => {
       throw error;

@@ -34,7 +34,12 @@
 					</div>
 					<q-tab-panels v-model="tab" class="bg-transparent">
 						<q-tab-panel name="entities">
-							<Entities :encounter="encounter" :campaign="campaign" :campaign_players="campaign_players"/>
+							<Entities 
+								:encounter="encounter" 
+								:campaign="campaign" 
+								:campaign_players="campaign_players"
+								:add-players="addPlayersTriggered"
+							/>
 						</q-tab-panel>
 						<q-tab-panel name="general">
 							<General :encounter="encounter" :campaign="campaign" />
@@ -51,7 +56,13 @@
 			</hk-card>
 
 			<!-- ENCOUNTER OVERVIEW -->
-			<Overview v-if="!loading" :encounter="encounter" :campaign="campaign" :campaign_players="campaign_players" />
+			<Overview 
+				v-if="!loading" 
+				:encounter="encounter" 
+				:campaign="campaign" 
+				:campaign_players="campaign_players"
+				@add-players="trigger"
+			/>
 			<hk-card v-else>
 				<hk-loader />
 			</hk-card>
@@ -91,6 +102,7 @@
 				campaign: {},
 				encounter: {},
 				campaign_players: {},
+				addPlayersTriggered: false,
 				loading: true,
 				tab: "entities"
 			} 
@@ -133,6 +145,10 @@
 			...mapActions("campaigns", ["get_campaign"]),
 			...mapActions("encounters", ["get_encounter"]),
 			...mapActions("players", ["get_player"]),
+			// Triggered from Overview component, to execute addAllPlayers() in Entities component
+			trigger() {
+				this.addPlayersTriggered = true;
+			}
 		}
 	}
 </script>

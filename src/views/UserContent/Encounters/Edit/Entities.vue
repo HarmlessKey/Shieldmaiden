@@ -254,6 +254,10 @@
 			campaign_players: {
 				type: Object,
 				required: true
+			},
+			addPlayers: {
+				type: Boolean,
+				default: false
 			}
 		},
 		mixins: [general, dice],
@@ -348,6 +352,12 @@
 			await this.fetchMonsters();
 			this.npcs = await this.get_npcs();
 			this.loading_npcs = false;
+		},
+		watch: {
+			// Prop is changed in parent to trigger addAllPlayers function
+			addPlayers() {
+				this.addAllPlayers();
+			}
 		},
 		computed: {
 			...mapGetters(["content_count"]),

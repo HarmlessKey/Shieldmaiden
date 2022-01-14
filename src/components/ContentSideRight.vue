@@ -17,20 +17,18 @@
       </div>
     </hk-card>
 
-    <!-- ADSENSE -->
-    <hk-card small>
+    <!-- SUPPORT US -->
+    <hk-card 
+      v-if="tier && tier.name === 'Free'"
+      header="Support Harmless Key"
+    >
       <div class="card-body">
-        <!-- <Adsense
-          data-ad-client="ca-pub-2711721977927243"
-          data-ad-slot="2613883680"
-          data-ad-test="on"
-        >
-        </Adsense> -->
-      </div>
-      <div slot="footer" class="card-footer">
-        <span>Support us to remove ads</span>
-        <router-link class="btn btn-sm bg-neutral-5" to="/patreon">
-          <i class="fab fa-patreon patreon-red" />
+        <p class="text-center">
+          Support us on Patreon and become a true <b>legend</b>!
+        </p>
+
+        <router-link to="/patreon" class="btn btn-block bg-patreon-red">
+          Support us
         </router-link>
       </div>
     </hk-card>
@@ -76,7 +74,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "ContentSideRight",
@@ -120,6 +118,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["tier"]),
     filtered_content() {
       return this.content.filter(item => item.value !== this.page);
     }

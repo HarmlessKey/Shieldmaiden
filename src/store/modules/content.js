@@ -205,6 +205,7 @@ export const content_module = {
 			count.players = rootGetters["players/player_count"];
 			count.npcs = rootGetters["npcs/npc_count"];
 			count.items = rootGetters["items/item_count"];
+			count.reminders = rootGetters["reminders/reminder_count"];
 			count.encounters = 0;
 			
 			// Count encounters for every campaign
@@ -222,6 +223,7 @@ export const content_module = {
 						count.encounters > benefits.encounters ||
 						count.npcs > benefits.npcs ||
 						count.items > benefits.items ||
+						count.reminders > benefits.reminders ||
 						count.players > benefits.players
 				) {
 					overencumbered = true;

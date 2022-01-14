@@ -1,7 +1,6 @@
 import { db } from '@/firebase';
 import Vue from 'vue';
 
-const campaigns_ref = db.ref('campaigns/');
 const users_ref = db.ref('users');
 const settings_ref = db.ref('settings');
 const tiers_ref = db.ref('tiers');
@@ -14,33 +13,17 @@ export const content_module = {
 		voucher: undefined,
 		overencumbered: undefined,
 		content_count: {},
-		active_campaign: undefined, 
-
 		userSettings: {},
-		campaign: {},
-		campaigns: {},
-		allEncounters: {},
-		encounters: {},
-		players: {},
-		npcs: {},
-
 		poster: undefined,
 	},
 	getters: {
 		userInfo: function( state ) { return state.userInfo; },
 		userSettings: function( state ) { return state.userSettings; },
-		encounters: function( state ) { return state.encounters; },
-		allEncounters: function( state ) { return state.allEncounters; },
-		players: function( state ) { return state.players; },
-		npcs: function( state ) { return state.npcs; },
-		campaign: function( state ) { return state.campaign; },
-		campaigns: function( state ) { return state.campaigns; },
 		tier: function( state ) { return state.tier; },
 		voucher: function( state ) { return state.voucher;},
 		overencumbered: function( state ) { return state.overencumbered; },
 		content_count: function( state ) { return state.content_count; },
 		poster: function( state ) { return state.poster; },
-		active_campaign: function( state ) { return state.active_campaign; }
 	},
 	actions: {
 		async setUserInfo({ commit, dispatch, rootGetters }) {
@@ -160,18 +143,6 @@ export const content_module = {
 				}, 1000)
 			});
 		},
-		fetchCampaign({ commit, rootGetters }, { cid }) {
-			commit("SET_CAMPAIGN_ID", cid)
-			
-			if(rootGetters.user) {
-				const uid = rootGetters.user.uid;
-				const path = `${uid}/${cid}`;
-				const campaign = campaigns_ref.child(path);
-				campaign.on('value', snapshot => {
-					commit('SET_CAMPAIGN', snapshot.val());
-				});
-			}
-		},
 		remove_voucher( { rootGetters }) {
 			if(rootGetters.user) {
 				db.ref(`users/${rootGetters.user.uid}/voucher`).remove();
@@ -184,18 +155,6 @@ export const content_module = {
 				db.ref('posters').set(new_count);
 				state.poster = true;
 			})
-		},
-		deleteCampaign({ commit, getters, rootGetters }, { campaign_id }) {
-			if (campaign_id === getters.active_campaign ) {
-				db.ref(`users/${rootGetters.user.uid}/active_campaign`).remove();
-			}
-			db.ref('campaigns/'+ rootGetters.user.uid).child(campaign_id).remove();
-			db.ref('encounters/'+ rootGetters.user.uid).child(campaign_id).remove();
-			
-			commit("DELETE_CAMPAIGN", campaign_id);
-			for (let encounter_id in getters.encounters) {
-				commit("DELETE_ENCOUNTER", {encounter_id});
-			}
 		},
 		checkEncumbrance({ state, commit, rootGetters }) {
 			let count = {};
@@ -237,36 +196,8 @@ export const content_module = {
 		SET_USERINFO(state, payload) { state.userInfo = payload; },
 		SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
 		SET_TIER(state, payload) { state.tier = payload; },
-		SET_VOUCHER(state, payload) { state.voucher = payload; },
-		SET_PLAYERS(state, payload) {
-			if (payload) state.players = payload;
-		},
-		SET_NPCS(state, payload) {
-			if (payload) state.npcs = payload;
-		},
-		SET_CAMPAIGN(state, payload) {
-			if (payload) state.campaign = payload;
-		},
-		SET_CAMPAIGNS(state, payload) {
-			if (payload) state.campaigns = payload;
-		},
-		SET_ACTIVE_CAMPAIGN(state, payload) {
-			if (payload) state.active_campaign = payload;
-		},
-		SET_ENCOUNTERS(state, payload) {
-			if (payload) state.encounters = payload;
-		},
-		SET_ALLENCOUNTERS(state, payload) {
-			if (payload) state.allEncounters = payload;
-		},
+		SET_VOUCHER(state, payload) { state.voucher = payload; },	
 		SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value)},
 		SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value)},
-		CLEAR_ENCOUNTERS(state) { state.encounters = {} },
-		DELETE_CAMPAIGN(state, { campaign_id }) {
-			delete state.campaigns[campaign_id];
-		},
-		DELETE_ENCOUNTER(state, { encounter_id }){
-			delete state.encounters[encounter_id]
-		}
 	},
 };

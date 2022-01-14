@@ -1,5 +1,24 @@
 <template>
 	<div>
+		<q-banner
+			:dark="$store.getters.theme !== 'light'"
+			rounded inline-actions
+			class="mb-3"
+		>
+			Welcome {{ userInfo.username }}
+			<q-btn 
+				slot="action" 
+				size="sm" 
+				flat padding="sm" 
+				no-caps 
+				icon="fas fa-sign-out" 
+				@click="signOut" 
+			>
+				<q-tooltip anchor="top middle" self="center middle">
+					Sign out
+				</q-tooltip>
+			</q-btn>
+		</q-banner>
 		<!-- Continue Campaign -->
 		<hk-card class="banner">
 			<div 
@@ -25,7 +44,7 @@
 				<div>
 					<div class="neutral-4 mb-1">Continue</div>
 					<h3 class="neutral-1">
-						<b>{{ active_campaign.campaign }}</b><br/>
+						<b>{{ active_campaign.name }}</b><br/>
 					</h3>
 					<p class="neutral-3">Dive right back into your adventure.</p>
 				</div>
@@ -99,36 +118,20 @@
 				</div>
 			</hk-card>
 		</hk-card-deck>
-
-
-		<!-- PATREON -->
-		<!-- <div class="mt-4">
-			<h4 
-				v-if="tier && userInfo && userInfo.patron"
-				class="text-center patreon-red"
-			>
-				<i class="patreon-red fas fa-heart"/> Thanks for your '{{ userInfo.patron.tier}}' support.
-			</h4>
-			<a v-else href="https://www.patreon.com/join/harmlesskey" target="_blank" rel="noopener" class="patreon-red text-center"><i class="fab fa-patreon"></i> Support us on Patreon</a>
-		</div>
-
-		<div class="share d-flex justify-content-center">
-			<a class="btn btn-lg btn-block bg-blue" @click="setSlide({ show: true, type: 'PlayerLink'})">
-				<i class="fas fa-share-alt"></i> Share your encounters
-			</a>
-		</div> -->
 	</div>
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex';
-	import { general } from '@/mixins/general.js';
+	import { mapGetters, mapActions } from "vuex";
+	import { general } from "@/mixins/general.js";
+	import { auth } from "@/firebase";
 
 	export default {
-		name: 'SignedIn',
+		name: "SignedIn",
 		mixins: [general],
 		data() {
 			return {
+				campaigns: {},
 				dm_tabs: [
 					{
 						path: "/content/campaigns",
@@ -177,14 +180,16 @@
 				]
 			}
 		},
+		async mounted() {
+			this.campaigns = await this.get_campaigns();
+		},
 		computed: {
 			...mapGetters([
-				'user',
-				'tier',
-				'voucher',
-				'userInfo',
+				"user",
+				"tier",
+				"userInfo",
+				"content_count"
 			]),
-			...mapGetters("campaigns", ["campaigns"]),
 			active_campaign() {
 				if(this.campaigns && this.userInfo) {
 					if(this.userInfo && this.userInfo.active_campaign) {
@@ -209,7 +214,15 @@
 		methods: {
 			...mapActions([
 				"setSlide"
-			])
+			]),
+			...mapActions("campaigns", ["get_campaigns"]),
+			signOut() {
+				this.$store.commit("SET_USER", undefined);
+				auth.signOut()
+				.then(() => {
+					if(this.$route.path !== "/") this.$router.replace("/");
+				});
+			}
 		}
 	}
 </script>
@@ -251,7 +264,7 @@
 	}
 
 	h2 {
-		font-family: 'Fredericka the Great', cursive;
+		font-family: "Fredericka the Great", cursive;
 		margin-bottom: 10px;
 	}
 	h4 {

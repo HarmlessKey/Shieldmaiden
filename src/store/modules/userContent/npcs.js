@@ -78,7 +78,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        const count = await services.getNpcCount(uid);
+        const count = await services.getNpcCount(uid) || 0;
         commit("SET_NPC_COUNT", count);
         return;
       } catch(error) {

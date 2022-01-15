@@ -29,8 +29,8 @@
 					/>
 
 					<!-- NO PLAYERS YET -->
-					<div class="first-campaign pb-4" v-if="!campaign_count && campaign_count">
-						<h2>Create players for your campaign</h2>
+					<div class="first-campaign pb-4" v-if="campaign_count && !player_count">
+						<h2>Create players for your campaigns</h2>
 						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
 					</div>
 
@@ -179,7 +179,7 @@
 								:options="advancement_options"
 							/>
 							
-							<q-btn class="btn btn-lg bg-green btn-block mt-4" no-caps type="submit" label="Create campaign" />
+							<q-btn class="btn btn-lg bg-green btn-block mt-4" padding="xs" no-caps type="submit" label="Create campaign" />
 						</q-form>
 					</div>
 				</div>

@@ -30,7 +30,6 @@
 					? { backgroundImage: 'url(\'' + active_campaign.background + '\')' }
 					: { backgroundImage: `url(${require('@/assets/_img/atmosphere/campaign-background.webp')})` }
 			]">
-				<h2 v-if="!active_campaign">No campaigns yet</h2>
 				<a 
 					v-if="!active_campaign || !active_campaign.background" 
 					class="white text-shadow-3 link" 

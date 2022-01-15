@@ -257,8 +257,10 @@
 			</template>
 		</div>
 		<hk-loader v-else name="players" />
-		<div slot="footer" class="card-footer" v-if="viewerIsUser && page !== 'user'">
-			<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<div slot="footer" v-if="viewerIsUser && page !== 'user'">
+			<button class="btn btn-block btn-square" @click="reset()">
+				<i class="fas fa-undo-alt"></i> Reset player health
+			</button>
 		</div>
 		<q-resize-observer @resize="onResize" />
 	</tag>

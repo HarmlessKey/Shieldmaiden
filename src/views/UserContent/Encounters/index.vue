@@ -13,7 +13,7 @@
 
 		<OverEncumbered v-if="overencumbered" />
 
-		<template v-else-if="tier">
+		<template v-else>
 			<div class="row q-col-gutter-md">
 				<!-- SHOW ENCOUNTERS -->
 				<div class="col-12 col-md-7">
@@ -24,7 +24,7 @@
 									<span>
 									<i class="fas fa-swords mr-1" />
 									Encounters
-									<span v-if="encounters">( 
+									<span>( 
 										<span :class="{ 'green': true, 'red': encounter_count >= tier.benefits.encounters }">
 											{{ encounter_count || 0 }}
 										</span> / 
@@ -49,7 +49,7 @@
 									type='encounters'
 								/>
 
-								<div class="first-encounter" v-if="encounter_count === 0">
+								<div class="first-encounter" v-if="!encounter_count">
 									<q-form @submit="addEncounter">
 										<h2 class="mt-0">First encounter</h2>
 											<q-input
@@ -61,12 +61,17 @@
 												:rules="[ val => val && val.length > 0 || 'Enter a title']"
 											/>
 											
-											<q-btn class="btn btn-lg bg-green btn-block mt-4 px-0 py-0" label="Create encounter" no-caps type="submit" />
+											<q-btn 
+												class="btn btn-lg bg-green btn-block mt-4" 
+												label="Create encounter" 
+												no-caps type="submit"
+												padding="0"
+											/>
 									</q-form>
 								</div>
 
 								<!-- ACTIVE ENCOUNTERS -->
-								<template v-if="active_encounters">
+								<template v-if="active_encounters.length">
 									<q-input 
 										:dark="$store.getters.theme !== 'light'" 
 										v-model="search"

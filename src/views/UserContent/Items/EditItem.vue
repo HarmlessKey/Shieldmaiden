@@ -31,7 +31,7 @@
 						<div class="avatar">
 							<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
 							<div class="img" v-else>
-								<img src="@/assets/_img/styles/axe.svg" />
+								<i class="hki-axe" />
 							</div>
 							<div>
 								<ValidationProvider rules="url" name="Image" v-slot="{ errors, invalid, validated }">
@@ -417,8 +417,12 @@
 			display: block;
 			width: 56px;
 			height: 56px;
+			line-height: 56px;
 			background-size: cover;
 			background-position: center top;
+			color: $neutral-2;
+			font-size: 41px;
+			text-align: center;
 		}
 	}
 

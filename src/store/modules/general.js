@@ -62,7 +62,7 @@ export const general_module = {
 			
 			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
 			if(!theme) {
-				if(uid) {
+				if(uid && rootGetters.userSettings) {
 					theme = (rootGetters.userSettings.general && rootGetters.userSettings.general.theme) ? rootGetters.userSettings.general.theme : "dark";
 				} else {
 					theme = (localStorage.getItem("theme")) ? localStorage.getItem("theme") : "dark";

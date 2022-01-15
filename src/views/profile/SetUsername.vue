@@ -1,25 +1,36 @@
 <template>
-	<div class="content container" v-if="user">
+	<div class="content" v-if="user">
 		<template v-if="!userInfo || !userInfo.username">
 			<hk-card header="Username">
-				<p>To continue, please first enter a username.</p>
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						type="text" 
-						autocomplete="off"
-						label="Username" 
-						max-length="1" 
-						v-validate="'required|alpha_num|min:3'"
-						data-vv-as="Username" 
-						name="username"
-						v-model="username" @keyup.native="checkUsername()" />
-					<button class="btn" :class="{
-						'disabled': check == 'unavailable' || errors.has('username'), 
-						}" @click="setUsername()"><i class="fas fa-check"></i> Save</button>
-				<p class="validate red pl-1" v-if="errors.has('username')">{{ errors.first('username') }}</p>
-				<p v-if="username" class="pl-1">
-					<span :class="{'green': check == 'available', 'red': check == 'unavailable'}">{{ username }}</span> is {{ check }}
-				</p>
+				<div class="card-body">
+					<h3>
+						Thank you for creating a <b>Harmless Key</b> account!</h3>
+					<p>To continue, please first enter a username.</p>
+						<ValidationProvider rules="required|alpha_num|min:3|max:20" name="Username" v-slot="{ errors, invalid, validated }">
+							<q-input 
+								:dark="$store.getters.theme === 'dark'" filled square
+								type="text" 
+								autocomplete="off"
+								label="Username" 
+								maxlength="20"
+								minlength="3"
+								v-model="username" @keyup.native="checkUsername()"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+							<p v-if="username" class="pl-1">
+								<i class="fas mr-1" :class="{'green fa-check': check == 'available', 'red fa-times': check === 'unavailable'}" />
+									<b>{{ username }}</b> is {{ check }}
+							</p>
+							<button 
+								class="btn btn-block" 
+								:class="{'disabled': check === 'unavailable' || invalid }" 
+								@click="setUsername(!invalid)"
+							>
+								Save
+							</button>
+						</ValidationProvider>
+				</div>
 			</hk-card>
 		</template>
 	</div>
@@ -63,48 +74,39 @@ export default {
 				});
 
 			},
-			setUsername() {
-				this.$validator.validateAll().then((result) => {
-					if (result && this.check === 'available') {
-						let user = {
-							username: this.username,
-							email: this.user.email
-						}
-						if (this.poster) user.poster = true;
-
-						db.ref(`users/${this.user.uid}`).update(user);
-
-						//Save searchable results in search_user
-						db.ref(`search_users`).child(this.user.uid).set({
-							username: this.username.toLowerCase(),
-							email: this.user.email.toLowerCase()
-						});
-
-						this.$snotify.success('Username saved.', 'Critical hit!', {
-							position: "centerTop"
-						});
-						this.$router.replace('/profile');
+			setUsername(valid) {
+				if (valid && this.check === "available") {
+					let user = {
+						username: this.username,
+						email: this.user.email
 					}
-				})
-			},
+					if (this.poster) user.poster = true;
+
+					db.ref(`users/${this.user.uid}`).update(user);
+
+					//Save searchable results in search_user
+					db.ref(`search_users`).child(this.user.uid).set({
+						username: this.username.toLowerCase(),
+						email: this.user.email.toLowerCase()
+					});
+
+					this.$snotify.success('Username saved.', 'Critical hit!', {
+						position: "centerTop"
+					});
+					this.$router.replace('/profile');
+				}
+			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.img {
-		width: 100px;
-		height: 100px;
-		margin-bottom: 20px;
-		border-radius: 50%;
-		display: block;
-		background-size: cover;
-		background-position: center top;
+.content {
+	max-width: 400px !important;
+
+	h3 {
+		font-size: 18px;
+		max-width: 250px;
 	}
-	.info {
-		span {
-			width: 80px;
-			display: inline-block;
-		}
-	}
+}
 </style>

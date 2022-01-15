@@ -452,9 +452,11 @@
 
 				// Notification for NPCs
 				if(type === 'npc') {				
-					this.$snotify.success(`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, {
-						position: "centerTop"
-					});
+					this.$snotify.success(
+						`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, 
+						"NPC added",
+						{ position: "centerTop" }
+					);
 				}
 
 				this.to_add[id] = 1

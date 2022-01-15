@@ -95,7 +95,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_player_services");
       try {
-        const count = await services.getPlayerCount(uid);
+        const count = await services.getPlayerCount(uid) || 0;
         commit("SET_PLAYER_COUNT", count);
         return;
       } catch(error) {

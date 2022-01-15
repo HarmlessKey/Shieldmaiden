@@ -37,13 +37,14 @@
 									</q-item-section>
 							</q-item>
 						</q-list>
-						<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-patreon-red mt-3" to="/patreon">Need more?</router-link>
+						<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-neutral-5 mt-3" to="/patreon">Need more?</router-link>
 					</div>
 				</hk-card>
 
 				<hk-card header="Your subscription">
+					<div class="card-body">
 					<!-- HAS A SUBSCRIPTION -->
-					<div v-if="tier && tier.name != 'Free'" class="card-body">
+					<template v-if="tier && tier.name !== 'Free'">
 						<!-- PATRON -->
 						<div v-if="userInfo.patron">
 							<h3><i class="fab fa-patreon patreon-red"></i> Patreon: <b>{{ userInfo.patron.tier }}</b></h3>
@@ -71,40 +72,43 @@
 							<hr>
 						</div>
 
-						<!-- TIER -->
-						<div>
-							<h3 class="mb-1">Subscription tier: <span class="patreon-red">{{ tier.name }}</span></h3>
-							<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>
-							<ul class="benefits">
-								<li v-for="(benefit, key) in tier.benefits" :key="key">
-									<template v-if="key == 'campaigns'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> campaign slots
-									</template>
-									<template v-if="key == 'encounters'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> encounter slots
-									</template>
-									<template v-if="key == 'players'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> player slots
-									</template>
-									<template v-if="key == 'npcs'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> NPC slots
-									</template>
-									<template v-if="key == 'reminders'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> Reminder slots
-									</template>
-									<template v-if="key == 'items'">
-										<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-										<span v-else class="green">{{ benefit }}</span> Item slots
-									</template>
-								</li>
-							</ul>
-						</div>
-					</div>
+					</template>
+					<!-- TIER -->
+					<h3 class="mb-1">Subscription tier: <span class="patreon-red">{{ tier.name }}</span></h3>
+					<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>					
+
+					<ul class="benefits">
+						<li v-for="(benefit, key) in tier.benefits" :key="key">
+							<template v-if="key == 'campaigns'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> campaign slot{{ benefit > 1 ? "s" : "" }}
+							</template>
+							<template v-if="key == 'encounters'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> encounter slots
+							</template>
+							<template v-if="key == 'players'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> player slots
+							</template>
+							<template v-if="key == 'npcs'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> NPC slots
+							</template>
+							<template v-if="key == 'reminders'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> Reminder slots
+							</template>
+							<template v-if="key == 'items'">
+								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
+								<span v-else class="green">{{ benefit }}</span> Item slots
+							</template>
+						</li>
+					</ul>
+					<router-link v-if="tier.name === 'Free'" class="btn btn-block bg-patreon-red mt-4" to="/patreon">
+						Support us for more slots
+					</router-link>
+				</div>
 			</hk-card>
 					
 				<!-- ACTIONS -->
@@ -129,7 +133,7 @@
 			<div class="col">
 				<hk-card>
 					<div class="card-header" slot="header">
-						<span><i class="fas fa-link"></i> Public initiative Link</span>
+						<span><i class="fas fa-link"></i> Public initiative link</span>
 					</div>
 					<div class="card-body">
 						<PlayerLink />
@@ -137,16 +141,6 @@
 				</hk-card>
 			</div>
 		</div>
-		
-		<hk-card v-if="!tier || tier.name === 'Free'">
-			<div class="card-header" slot="header">
-				Support us on Patreon
-			</div>
-			<div class="card-body">
-				<p>Get instant access to more storage.</p>
-				<Tiers />
-			</div>
-		</hk-card>
 	</div>
 </template>
 

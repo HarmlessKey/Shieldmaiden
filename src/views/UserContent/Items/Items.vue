@@ -1,6 +1,6 @@
 <template>
 	<div v-if="tier">
-		<hk-card v-if="items">
+		<hk-card>
 			<div slot="header" class="card-header">
 				<span>
 					Items ( 
@@ -18,7 +18,7 @@
 				<p class="neutral-2">
 					These are your custom Items that you can use in your campaigns.
 				</p>
-				<template>
+				<template v-if="items.length">
 					<OutOfSlots 
 						v-if="item_count.items >= tier.benefits.items"
 						type = 'items'
@@ -87,20 +87,16 @@
 								</a>
 							</q-td>
 						</template>
-					
-					
+						<div slot="no-data" />	
 					</q-table>
-
 				</template>
-
+				<h3 v-else class="mt-4">
+					<router-link v-if="!overencumbered" to="/content/items/add-item" class="btn bg-neutral-5">
+						<i class="fas fa-plus green mr-1"></i> Create your first item
+					</router-link>
+				</h3>
 			</div>
 		</hk-card>
-		<h3 v-else-if="items === null" class="mt-4">
-			<router-link v-if="!overencumbered" to="/content/items/add-item">
-				<i class="fas fa-plus green"></i> Create your first item
-			</router-link>
-		</h3>
-		<div v-else class="loader"><span>Loading items...</span></div>
 	</div>
 </template>
 

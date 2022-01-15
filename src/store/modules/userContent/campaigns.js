@@ -84,7 +84,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        const count = await services.getCampaignCount(uid);
+        const count = await services.getCampaignCount(uid) || 0;
         commit("SET_CAMPAIGN_COUNT", count);
         return;
       } catch(error) {

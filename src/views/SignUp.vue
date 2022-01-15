@@ -48,7 +48,7 @@
 				auth.createUserWithEmailAndPassword(this.email, this.password).then(
 					// eslint-disable-next-line
 					user => {
-						this.$router.replace('profile');
+						this.$router.replace('/profile');
 					},
 					err => {
 						this.error = err.message;
@@ -58,7 +58,7 @@
 				const provider = new firebase.auth.GoogleAuthProvider();
 
 				auth.signInWithPopup(provider).then(() => {
-					this.$router.replace('profile');
+					this.$router.replace('/profile');
 				}).catch((err) => {
 					this.error = err.message;
 				});

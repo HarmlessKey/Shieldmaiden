@@ -90,7 +90,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        const count = await services.getEncounterCount(uid);
+        const count = await services.getEncounterCount(uid) || 0;
         if(count) {
           for(const [campaignId, metadata] of Object.entries(count)) {
             commit("SET_ENCOUNTER_COUNT", { campaignId, count: metadata.count });

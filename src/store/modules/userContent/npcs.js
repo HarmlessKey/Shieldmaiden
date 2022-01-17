@@ -89,8 +89,12 @@ const actions = {
   
   async get_npc({ state, commit, dispatch }, { uid, id }) {
     let npc = (state.cached_npcs[uid]) ? state.cached_npcs[uid][id] : undefined;
+
     // The npc is not in the store and needs to be fetched from the database
-    if(!npc) {
+    // If the NPC is not found in firebase, it's returned null
+    // We don't have to check for null NPCs again, we know they don't exist
+    // Therefore we only do a call to firebase if npc === undefined
+    if(npc === undefined) {
       const services = await dispatch("get_npc_services");
       try {
         npc = await services.getNpc(uid, id);

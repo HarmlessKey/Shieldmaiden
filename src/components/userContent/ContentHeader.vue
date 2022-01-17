@@ -15,11 +15,19 @@
 			<slot name="actions-left" />
 			<template v-if="tier.benefits[type] === 'infinite' || (!overencumbered && content_count[type] < tier.benefits[type])">
 				<slot name="actions-right" />
+				<a 
+					v-if="type === 'campaigns'" 
+					class="btn btn-sm bg-neutral-5" 
+					@click="$emit('add')"
+				>
+					<i class="fas fa-plus green" /> New {{ type.slice(0, -1).capitalize() }}
+				</a>
 				<router-link
+					v-else
 					class="btn btn-sm bg-neutral-5" 
 					:to="`${$route.path}/add-${type.slice(0, -1)}`"
 				>
-					<i class="fas fa-plus green"></i> New {{ type.slice(0, -1).capitalize() }}
+					<i class="fas fa-plus green" /> New {{ type.slice(0, -1).capitalize() }}
 				</router-link>
 			</template>
 			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">

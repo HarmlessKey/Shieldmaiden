@@ -1,12 +1,12 @@
-import { db } from '@/firebase';
-import { skills } from '@/mixins/skills';
-import { abilities } from '@/mixins/abilities';
-import { monsterMixin } from '@/mixins/monster';
-import Vue from 'vue';
+import { db } from "@/firebase";
+import { skills } from "@/mixins/skills";
+import { abilities } from "@/mixins/abilities";
+import { monsterMixin } from "@/mixins/monster";
+import Vue from "vue";
 
 const demoPlayers = {
-	'playerone': {
-		character_name: 'Barbarian',
+	"playerone": {
+		character_name: "Barbarian",
 		maxHp: 41,
 		maxHpMod: 0,
 		curHp: 41,
@@ -18,10 +18,10 @@ const demoPlayers = {
 		wisdom: 8,
 		charisma:10,
 		experience: 2700,
-		skills: ['athletics', 'intimidation']
+		skills: ["athletics", "intimidation"]
 	},
-	'playertwo': {
-		character_name: 'Warlock',
+	"playertwo": {
+		character_name: "Warlock",
 		maxHp: 31,
 		maxHpMod: 0,
 		curHp: 31,
@@ -34,10 +34,10 @@ const demoPlayers = {
 		charisma:18,
 		tempHp: 6,
 		experience: 2700,
-		skills: ['persuasion', 'stealth']
+		skills: ["persuasion", "stealth"]
 	},
-	'playerthree': {
-		character_name: 'Druid',
+	"playerthree": {
+		character_name: "Druid",
 		maxHp: 34,
 		maxHpMod: 0,
 		curHp: 34,
@@ -54,7 +54,7 @@ const demoPlayers = {
 			curHp: 37
 		},
 		experience: 2700,
-		skills: ['animal Handling', 'medicine']
+		skills: ["animal Handling", "medicine"]
 	}
 }
 const demoEncounter = {
@@ -120,8 +120,8 @@ const demoEncounter = {
 	"turn" : 0
 }
 
-const encounters_ref = db.ref('encounters');
-const campaigns_ref = db.ref('campaigns');
+const encounters_ref = db.ref("encounters");
+const campaigns_ref = db.ref("campaigns");
 
 const getDefaultState = () => {
 	return {
@@ -201,13 +201,13 @@ const actions = {
 				});
 				commit("SET_ENCOUNTER", encounter);
 				for (let key in encounter.entities) {
-					dispatch("add_entity", key);
+					await dispatch("add_entity", key);
 				}
 			} 
 			else {
 				commit('SET_ENCOUNTER', demoEncounter);
 				for (let key in demoEncounter.entities) {
-					dispatch("add_entity", key);
+					await dispatch("add_entity", key);
 				}
 			}
 		} catch(error) {
@@ -343,29 +343,31 @@ const actions = {
 					data_npc = await dispatch("npcs/get_npc", { uid, id: key });
 					const campaignCompanion = campaign.companions[key];
 					
-					// Get companion status from campaign
-					entity.curHp = campaignCompanion.curHp;
-					entity.tempHp = campaignCompanion.tempHp;
-					entity.ac_bonus = campaignCompanion.ac_bonus;
-					entity.maxHpMod = campaignCompanion.maxHpMod;
-					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.hit_points + entity.maxHpMod) : parseInt(data_npc.hit_points);
-					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
-					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
-					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
+					if(campaignCompanion) {
+						// Get companion status from campaign
+						entity.curHp = campaignCompanion.curHp;
+						entity.tempHp = campaignCompanion.tempHp;
+						entity.ac_bonus = campaignCompanion.ac_bonus;
+						entity.maxHpMod = campaignCompanion.maxHpMod;
+						entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.hit_points + entity.maxHpMod) : parseInt(data_npc.hit_points);
+						entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
+						entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
+						entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
-					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
+						entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
 
-					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
+						entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 
-					//Get player transformed from campaign
-					if(campaignCompanion.transformed) {
-						entity.transformed = true;
-						entity.transformedCurHp = campaignCompanion.transformed.curHp;
-						entity.transformedAc = campaignCompanion.transformed.ac;
-						entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
-						entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
-					} else {
-						entity.transformed = false;
+						//Get player transformed from campaign
+						if(campaignCompanion.transformed) {
+							entity.transformed = true;
+							entity.transformedCurHp = campaignCompanion.transformed.curHp;
+							entity.transformedAc = campaignCompanion.transformed.ac;
+							entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
+							entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
+						} else {
+							entity.transformed = false;
+						}
 					}
 				}
 

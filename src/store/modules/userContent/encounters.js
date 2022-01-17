@@ -130,15 +130,48 @@ const actions = {
       }
     }
 
+    // Check for non-existing NPCs, Companions and Players
+    // Remove them from the encounter if they don't exist
     if(encounter.entities) {
-      // REMOVE NON EXISTING NPCs
-      // REMOVE NON EXISTING COMPANIONS
       for(const [entityId, entity] of Object.entries(encounter.entities)) {
+        // REMOVE NON EXISTING NPCs
+        if(entity.entityType === "npc" && entity.npc === "custom") {
+          const npc = await dispatch("npcs/get_npc", { uid, id: entity.id }, { root: true });
+          if(!npc) {
+            const npc_id = entity.id;
+            await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
+            delete encounter.entities[entityId];
+            console.warn(`Ghost NPC ${npc_id} deleted.`);
+          }
+        }
+        // REMOVE NON EXISTING COMPANIONS
+        if(entity.entityType === "companion") {
+          const companion = await dispatch("npcs/get_npc", { uid, id: entityId }, { root: true });
+          if(!companion) {
+            await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
+            delete encounter.entities[entityId];
+            console.warn(`Ghost companion ${entityId} deleted.`);
+          }
+        }
         // REMOVE NON EXISTING PLAYERS
         if(entity.entityType === "player") {
           const player = await dispatch("players/get_player", { uid, id: entityId }, { root: true });
           if(!player) {
-            await dispatch()
+            await dispatch("delete_entity", { campaignId, encounterId: id, entityId });
+            delete encounter.entities[entityId];
+            console.warn(`Ghost player ${entityId} deleted.`);
+
+            // Also remove companions
+            const companions = Object.values(encounter.entities).filter(item => {
+              return item.player === entityId && item.entityType === "companion";
+            });
+            if(companions.length) {
+              for(const companion of companions) {
+                console.warn(`Ghost companion ${companion.id} deleted.`);
+                await dispatch("delete_entity", { campaignId, encounterId: id, entityId: companion.key });
+                delete encounter.entities[companion.id];
+              }
+            }
           }
         }
       }
@@ -531,7 +564,9 @@ const mutations = {
     }
   },
   DELETE_ENTITY(state, { uid, campaignId, encounterId, entityId }) { 
-    Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
+    if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][encounterId]) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
+    }
   },
   // eslint-disable-next-line no-unused-vars
   UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {

@@ -2,7 +2,7 @@
 	<div v-if="tier">
 		<template>
 			<hk-card>
-				<ContentHeader type="campaigns" />
+				<ContentHeader type="campaigns" @add="add = !add" />
 
 				<div class="card-body">
 					<!-- NO PLAYERS YET -->

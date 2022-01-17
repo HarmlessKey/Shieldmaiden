@@ -131,7 +131,7 @@ const actions = {
         const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
         if(!player) {
           await dispatch("delete_player", { id, player: { "key": playerId }});
-          console.error(`Ghost player ${playerId} deleted`);
+          console.warn(`Ghost player ${playerId} deleted`);
         } else {
           // If the player has no curHp, set it
           if(!campaign_player.curHp) {
@@ -179,7 +179,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       const used_slots = await services.getCampaignCount(uid);
-      
+
       if(used_slots >= available_slots) {
         throw "Not enough slots";
       }

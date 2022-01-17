@@ -99,7 +99,7 @@
 	},
 	metaInfo() {
 		return {
-			title: 'Combat Tracker D&D | Harmless Key',
+			title: 'D&D Combat Tracker | Harmless Key',
 			author: 'Harmless Key',
 			htmlAttrs: {
 				lang: "en"
@@ -112,7 +112,7 @@
 					content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.'
 				},
 				{ name: "twitter:card", content: "summary" },
-				{ name: "twitter:title", content: "Combat Tracker D&D | Harmless Key" },
+				{ name: "twitter:title", content: "D&D Combat Tracker | Harmless Key" },
 				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
 				{
 					name: "twitter:description",
@@ -120,7 +120,7 @@
 				},
 				{ name: "twitter:site", content: "@KeyHarmless" },
 
-				{ property: "og:title", content: "Combat Tracker D&D | Harmless Key" },
+				{ property: "og:title", content: "D&D Combat Tracker | Harmless Key" },
 				{	property: "og:site_name", content: "harmlesskey.com" },
 				{	property: "og:type", content: "website" },
 				{

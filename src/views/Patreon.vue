@@ -1,36 +1,43 @@
 <template>
 	<div>
 		<div class="grid">
-			<div class="container">
-				<h1><i class="fab fa-patreon patreon-red"></i> Support us on Patreon <i class="fas fa-heart patreon-red"></i></h1>
-				<Tiers class="my-4" />
-				<h2>Why do I have to pay?</h2>
-				<p>
-					We wish we could offer the app for free. This is why we do have a free tier 
-					that should be sufficient for most users. If you manage your data well, 
-					you can get complete use out of our app without having to pay anything. 
-					All the features we develop will always be accessible for all users, without cost. You only pay for more storage.<br/>
-					Unfortunately creating an app brings some costs with it. 
-					We need to invest a lot of time in maintaining and expanding the app. 
-					And there are the costs of hosting Harmless Key, as our user base expands, the costs increase.
+			<div class="content">
+				<h1 class="text-center">Get a Harmless Key subscription</h1>
+				<p class="text-center">
+					We use Patreon for our subscriptions. Once you make a choice, you will be redirected to patreon.com to finish payment.<br/>
 				</p>
+				<Tiers class="mb-4" />
+				<hk-card header="Why do you have to pay?">
+					<div class="card-body">
+						<p>
+							We wish we could offer the app for free. This is why we do have a free tier 
+							that should be sufficient for most users. If you manage your data well, 
+							you can get complete use out of our app without having to pay anything. 
+							All the features we develop will always be accessible for all users, without cost. You only pay for more storage.<br/>
+							Unfortunately creating an app brings some costs with it. 
+							We need to invest a lot of time in maintaining and expanding the app. 
+							And there are the costs of hosting Harmless Key, as our user base expands, the costs increase.
+						</p>
 
-				<h2>Building together</h2>
-				<p>
-					Our goal is not to earn money, our goal is to create an app that is useful for the entire community. <br/>
-					To reach this goal, we will need support. This is why we have set up a Patreon. 
-					This way you can help us in achieving this goal and benifit from the extra's that come with it.
-				</p>
+						<h2>Building together</h2>
+						<p>
+							Our goal is not to earn money, our goal is to create an initiative tracker that is useful for the entire community. <br/>
+							To reach this goal, we will need support. This is why we have set up a Patreon. 
+							This way you can help us in achieving this goal and benifit from the extra's that come with it.
+						</p>
 
-				<a class="btn bg-patreon-red" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener"><i class="fab fa-patreon black"></i> Support us</a>
+						<a class="btn bg-patreon-red btn-block" href="https://www.patreon.com/harmlesskey" target="_blank" rel="noopener">
+							<i class="fab fa-patreon black"></i> Support us
+						</a>
+					</div>
+				</hk-card>
 			</div>
-		<Footer class="mt-5" />
+			<Footer />
 		</div>
 	</div>
 </template>
 
 <script>
-	import { auth } from '@/firebase.js'
 	import Tiers from '@/components/Tiers.vue'
 	import Footer from '@/components/Footer.vue'
 
@@ -38,19 +45,14 @@
 		name: 'home',
 		components: {
 			Tiers,
-			Footer,
+			Footer
 		},
 		metaInfo: {
-			title: 'Patreon',
+			title: 'Subscription',
 			meta: [
-				{ vmid: 'description', name: 'description', content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
+				{ vmid: 'description', name: 'description', content: 'Get a subscription for Harmless Key, the most advanced D&D combat tracker.' }
 			]
 		},
-		computed: {
-			user() {
-				return auth.currentUser
-			}
-		}
 	}
 </script>
 

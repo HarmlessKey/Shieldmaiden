@@ -158,9 +158,9 @@ export class campaignServices {
    */
   async updateCampaignCount(uid, diff) {
     const campaign_count_path = `${uid}/metadata/count`;
-    let campaign_count = await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).once('value');
-    await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).set(campaign_count.val() + diff);
-    return campaign_count.val() + diff;
+    let campaign_count = await this.getCampaignCount(uid);
+    await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).set(campaign_count + diff);
+    return campaign_count + diff;
   }
 
   /**

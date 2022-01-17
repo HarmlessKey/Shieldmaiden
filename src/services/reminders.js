@@ -48,14 +48,13 @@ export class reminderServices {
   }
 	
 	/**
-   * Get an entire reminder from 'reminders' reference
+   * Get a full reminder from 'reminders' reference
    * 
    * @param {String} uid ID of active user
    * @param {String} id ID of the requested reminder
-   * @returns An entire reminder from the 'reminders' reference
+   * @returns A full reminder from the 'reminders' reference
    */
 	async getReminder(uid, id) {
-    console.log(`Reminder ${id} fetched from database`)
     try {
       const reminder = await REMINDERS_REF.child(uid).child(id).once('value', snapshot => {
         return snapshot;
@@ -72,17 +71,15 @@ export class reminderServices {
    * 
    * @param {String} uid ID of active user
    * @param {Object} reminder Reminder to add
-   * @param {Int} new_count Updated number of reminders
    * @param {Object} search_reminder Compressed reminder
    * @returns Key of the newly added reminder
    */
-	async addReminder(uid, reminder, new_count, search_reminder) {
+	async addReminder(uid, reminder, search_reminder) {
     try {
       reminder.title = reminder.title.toLowerCase();
       const newReminder = await REMINDERS_REF.child(uid).push(reminder);
       
       //Update search_reminders
-      SEARCH_REMINDERS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_REMINDERS_REF.child(`${uid}/results/${newReminder.key}`).set(search_reminder);
 
       return newReminder.key;
@@ -113,18 +110,29 @@ export class reminderServices {
    * 
    * @param {String} uid ID of active user
    * @param {String} id ID of reminder to edit
-   * @param {Int} new_count Updated number of reminders
    */
-  async deleteReminder(uid, id, new_count) {
+  async deleteReminder(uid, id) {
     try {
       REMINDERS_REF.child(uid).child(id).remove();
 
       //Update search_reminders
-      SEARCH_REMINDERS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_REMINDERS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
       throw error;
     }
+  }
+
+  /**
+   * Update reminder_count in the search table of search_reminders
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from reminder count
+   */
+   async updateReminderCount(uid, diff) {
+    const reminder_count_path = `${uid}/metadata/count`;
+    let reminder_count = await SEARCH_REMINDERS_REF.child(reminder_count_path).once('value');
+    await SEARCH_REMINDERS_REF.child(reminder_count_path).set(reminder_count.val() + diff);
+    return reminder_count.val() + diff;
   }
 }

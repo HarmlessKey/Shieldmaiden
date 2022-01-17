@@ -149,8 +149,8 @@ export class npcServices {
    */
    async updateNpcCount(uid, diff) {
     const npc_count_path = `${uid}/metadata/count`;
-    let npc_count = await SEARCH_NPCS_REF.child(npc_count_path).once('value');
-    await SEARCH_NPCS_REF.child(npc_count_path).set(npc_count.val() + diff);
-    return npc_count.val() + diff;
+    let npc_count = await this.getNpcCount(uid);
+    await SEARCH_NPCS_REF.child(npc_count_path).set(npc_count + diff);
+    return npc_count + diff;
   }
 }

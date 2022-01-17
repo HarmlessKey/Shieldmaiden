@@ -1,29 +1,13 @@
 <template>
-	<div v-if="tier">
+	<div>
 		<hk-card>
-			<div slot="header" class="card-header">
-				<span>
-					Items ( 
-					<span :class="{ 'green': true, 'red': item_count.items >= tier.benefits.items }">{{ Object.keys(items).length }}</span> 
-					/ 
-					<i v-if="tier.benefits.items == 'infinite'" class="far fa-infinity"></i>
-					<template v-else>{{ tier.benefits.items }}</template>
-					)
-				</span>
-				<router-link v-if="!overencumbered" class="btn btn-sm bg-neutral-5" :to="`${$route.path}/add-item`">
-					<i class="fas fa-plus green"></i> New Item
-				</router-link>
-			</div>
+			<ContentHeader type="items" />
+
 			<div class="card-body">
 				<p class="neutral-2">
 					These are your custom Items that you can use in your campaigns.
 				</p>
 				<template v-if="items.length">
-					<OutOfSlots 
-						v-if="item_count.items >= tier.benefits.items"
-						type = 'items'
-					/>
-
 					<q-input
 						:dark="$store.getters.theme !== 'light'" 
 						v-model="search"
@@ -90,21 +74,22 @@
 						<div slot="no-data" />	
 					</q-table>
 				</template>
-				<h3 v-else class="mt-4">
-					<router-link v-if="!overencumbered" to="/content/items/add-item" class="btn bg-neutral-5">
-						<i class="fas fa-plus green mr-1"></i> Create your first item
+				<template v-if="item_count >= tier.benefits.items">
+					<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
+						Get more item slots
 					</router-link>
-				</h3>
+				</template>
+				<router-link v-if="!overencumbered && !items.length" to="/content/items/add-item" class="btn bg-neutral-5">
+					<i class="fas fa-plus green mr-1"></i> Create your first item
+				</router-link>
 			</div>
 		</hk-card>
 	</div>
 </template>
 
 <script>
-	// import _ from 'lodash'
-	// import OverEncumbered from '@/components/OverEncumbered.vue'
-	import OutOfSlots from '@/components/OutOfSlots.vue'
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex';
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Items',
@@ -112,8 +97,7 @@
 			title: 'Items'
 		},
 		components: {
-			// OverEncumbered,
-			OutOfSlots
+			ContentHeader
 		},
 		data() {
 			return {
@@ -149,10 +133,7 @@
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters('items', ["item_count"]),
-			slotsLeft() {
-				return this.tier.benefits.items - Object.keys(this.items).length;
-			}
+			...mapGetters("items", ["item_count"]),
 		},
 		async mounted() {
 			this.items = await this.get_items();
@@ -193,23 +174,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	// .container-fluid {
-	// 	padding: 20px;
-
-	// 	h2 {
-	// 		border-bottom: solid 1px $neutral-4;
-	// 		padding-bottom: 10px;
-
-	// 		a {
-	// 			text-transform: none;
-	// 			color: $neutral-2 !important;
-
-	// 			&:hover {
-	// 				text-decoration: none;
-	// 			}
-	// 		}
-	// 	}
-	// }
-</style>

@@ -175,8 +175,14 @@ const actions = {
    */
   async add_campaign({ rootGetters, commit, dispatch }, campaign) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const available_slots = rootGetters.tier.benefits.campaigns;
     if(uid) {
       const services = await dispatch("get_campaign_services");
+      const used_slots = await services.getCampaignCount(uid);
+      
+      if(used_slots >= available_slots) {
+        throw "Not enough slots";
+      }
       try {
         const search_campaign = convert_campaign(campaign);
         const id = await services.addCampaign(uid, campaign, search_campaign);
@@ -184,6 +190,7 @@ const actions = {
 
         const new_count = await services.updateCampaignCount(uid, 1);
         commit("SET_CAMPAIGN_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return id;
       } catch(error) {
         throw error;
@@ -241,9 +248,9 @@ const actions = {
         
         const new_count = await services.updateCampaignCount(uid, -1);
         commit("SET_CAMPAIGN_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
 
         for (const playerId in campaign.players) {
-          console.log(playerId)
           dispatch("players/set_campaign_id", { uid, playerId, value: null }, { root: true });
         }
         return;

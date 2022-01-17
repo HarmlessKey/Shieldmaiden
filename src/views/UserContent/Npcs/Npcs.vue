@@ -1,42 +1,20 @@
 <template>
 	<div v-if="tier">
 		<hk-card>
-			<div slot="header" class="card-header">
-				<span>
-					NPC's ( 
-					<span :class="{ 'green': true, 'red': npc_count >= tier.benefits.npcs }">{{ npc_count }}</span> 
-					/ 
-					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
-					<template v-else>{{ tier.benefits.npcs }}</template>
-					)
-				</span>
-				<span>
-					<a class="btn btn-sm bg-neutral-5 mr-2"
-						@click="exportAll()"
-					>
-						Export NPCs
-					</a>
-					<a class="btn btn-sm bg-neutral-5 mr-2"
-						@click="import_dialog = true"
-					>
-						Import NPCs
-					</a>
-					<router-link class="btn btn-sm bg-neutral-5 mr-2" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
-						<i class="fas fa-plus green"></i> New NPC
-					</router-link>
-				</span>
-			</div>
-
+			<ContentHeader type="npcs">
+				<a slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
+					Export NPCs
+				</a>
+				<a slot="actions-right" class="btn btn-sm bg-neutral-5 mx-2" @click="import_dialog = true">
+					Import NPCs
+				</a>
+			</ContentHeader>
+			
 			<div class="card-body">
 				<p class="neutral-2">
-					These are your custom Non-Player Characters or monsters.
+					These are your custom Non-Player Characters and monsters.
 				</p> 
-				<template>
-					<OutOfSlots 
-						v-if="npc_count >= tier.benefits.npcs"
-						type="npcs"
-					/>
-
+				<template v-if="npcs.length">
 					<q-input 
 						:dark="$store.getters.theme !== 'light'" 
 						v-model="search"
@@ -107,26 +85,13 @@
 						<div slot="no-data" />
 						<hk-loader slot="loading" name="NPCs" />
 					</q-table>
-
-					<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
-						<div 
-							class="openSlot"
-							v-for="index in slotsLeft"
-							:key="'open-slot-' + index"
-						>
-							<span>Open NPC slot</span>
-							<router-link v-if="!overencumbered" to="/npcs/add-npc">
-								<i class="fas fa-plus green"></i>
-							</router-link>
-						</div>
-					</template>
-					<template v-if="!tier || tier.name === 'Free'">
-						<router-link class="openSlot none" to="/patreon">
-							Support us on Patreon for more NPC slots.
-						</router-link>
-					</template>
 				</template>
-				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
+				<template v-if="!tier || tier.name === 'Free'">
+					<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
+						Get more NPC slots
+					</router-link>
+				</template>
+				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-block" to="/content/npcs/add-npc">
 					Create your first NPC
 				</router-link>
 				<q-resize-observer @resize="setSize" />
@@ -145,10 +110,10 @@
 </template>
 
 <script>
-	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import { mapActions, mapGetters } from "vuex";
 	import { monsterMixin } from "@/mixins/monster";
 	import ImportNPC from "@/components/ImportNPC.vue";
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: "Npcs",
@@ -157,8 +122,8 @@
 		},
 		mixins: [monsterMixin],
 		components: {
-    OutOfSlots,
-    ImportNPC
+    ImportNPC,
+		ContentHeader
 },
 		data() {
 			return {
@@ -213,16 +178,12 @@
 			]),
 			...mapGetters("players", ["players"]),
 			...mapGetters("campaigns", ["campaigns"]),
-			...mapGetters("npcs", ["npc_count"]),
 			visibleColumns() {
 				return (this.card_width > 600) ? 
 					["avatar", "name", "type", "challenge_rating", "actions"] : 
 					(this.card_width > 450) ? 
 					["avatar", "name", "type", "actions"] :
 					["avatar", "name", "actions"];
-			},
-			slotsLeft() {
-				return this.tier.benefits.npcs - this.npc_count;
 			}
 		},
 		async mounted() {

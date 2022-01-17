@@ -123,8 +123,15 @@ const actions = {
    */
   async add_player({ rootGetters, commit, dispatch }, player) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const available_slots = rootGetters.tier.benefits.players;
+
     if(uid) {
       const services = await dispatch("get_player_services");
+      const used_slots = await services.getPlayerCount(uid);
+
+      if(used_slots >= available_slots) {
+        throw "Not enough slots";
+      }
       try {
         const search_player = convert_player(player);
         const id = await services.addPlayer(uid, player, search_player);
@@ -145,6 +152,7 @@ const actions = {
 
         const new_count = await services.updatePlayerCount(uid, 1);
         commit("SET_PLAYER_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return id;
       } catch(error) {
         throw error;
@@ -330,6 +338,7 @@ const actions = {
 
         const new_count = await services.updatePlayerCount(uid, -1);
         commit("SET_PLAYER_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return;
       } catch(error) {
         throw error;

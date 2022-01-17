@@ -13,17 +13,19 @@ export const content_module = {
 		voucher: undefined,
 		overencumbered: undefined,
 		content_count: {},
+		slots_used: {},
 		userSettings: {},
 		poster: undefined,
 	},
 	getters: {
-		userInfo: function( state ) { return state.userInfo; },
-		userSettings: function( state ) { return state.userSettings; },
-		tier: function( state ) { return state.tier; },
-		voucher: function( state ) { return state.voucher;},
-		overencumbered: function( state ) { return state.overencumbered; },
-		content_count: function( state ) { return state.content_count; },
-		poster: function( state ) { return state.poster; },
+		userInfo(state) { return state.userInfo; },
+		userSettings(state) { return state.userSettings; },
+		tier(state) { return state.tier; },
+		voucher(state) { return state.voucher;},
+		overencumbered(state) { return state.overencumbered; },
+		content_count(state) { return state.content_count; },
+		slots_used(state) { return state.slots_used; },
+		poster(state) { return state.poster; },
 	},
 	actions: {
 		async setUserInfo({ commit, dispatch, rootGetters }) {
@@ -113,15 +115,15 @@ export const content_module = {
 										};
 	
 										if (tier_snapshot.val().order >= voucher_order && pledge_end >= server_today) {
-											commit('SET_TIER', tier_snapshot.val())
+											commit('SET_TIER', tier_snapshot.val());
 										} else {
-											commit('SET_TIER', voucher_snap.val())
+											commit('SET_TIER', voucher_snap.val());
 										}
 									});
 								}
 								// If not patron use voucher/basic tier
 								else {
-									commit('SET_TIER', voucher_snap.val())
+									commit('SET_TIER', voucher_snap.val());
 								}
 							})
 						});
@@ -129,6 +131,13 @@ export const content_module = {
 					}
 				});
 			}
+
+			// Return a promise, so you can wait for it in the initialize function from store/general.js
+			return new Promise((resolve) => {
+				setTimeout(() => {
+					resolve()
+				}, 1000)
+			});
 		},
 		async setUserSettings({ commit, rootGetters }) {
 			const uid = rootGetters.user.uid;
@@ -158,7 +167,7 @@ export const content_module = {
 				state.poster = true;
 			})
 		},
-		checkEncumbrance({ state, commit, rootGetters }) {
+		async checkEncumbrance({ state, commit, rootGetters }) {
 			let count = {};
 			let overencumbered = false;
 			
@@ -168,27 +177,41 @@ export const content_module = {
 			count.items = rootGetters["items/item_count"];
 			count.reminders = rootGetters["reminders/reminder_count"];
 			count.encounters = 0;
+
+			let used_slots = Object.values(count).reduce((sum, count) => sum + count, 0);
+
 			
 			// Count encounters for every campaign
 			// Save the highest count 
-			for (const campaign of Object.values(rootGetters["encounters/encounter_count"])) {
-				let n = campaign.count || 0;
+			for (const encounter_count of Object.values(rootGetters["encounters/encounter_count"])) {
+				let n = encounter_count || 0;
+				used_slots = used_slots + n; // Add every encounter to the total used slots
 				if (n > count.encounters) {
 					count.encounters = n;
 				}
 			}
-
-			if (state.tier) {
+			
+			if(state.tier) {
 				let benefits = state.tier.benefits;
-				if (count.campaigns > benefits.campaigns ||
-						count.encounters > benefits.encounters ||
-						count.npcs > benefits.npcs ||
-						count.items > benefits.items ||
-						count.reminders > benefits.reminders ||
-						count.players > benefits.players
-				) {
-					overencumbered = true;
+				let available_slots = Object.values(benefits).reduce((sum, count) => sum + count, 0);
+				
+				// Add encounter slots for every campaign above 1
+				const more_encounters = benefits.campaigns - 1;
+				if(more_encounters) {
+					for(let i = 1; i <= more_encounters; i++) {
+						available_slots = available_slots + benefits.encounters;
+					}
 				}
+				
+				// Check overencumbrance
+				overencumbered =  (count.campaigns > benefits.campaigns ||
+					count.encounters > benefits.encounters ||
+					count.npcs > benefits.npcs ||
+					count.items > benefits.items ||
+					count.reminders > benefits.reminders ||
+					count.players > benefits.players
+				);
+				commit("SET_SLOTS_USED", { available_slots, used_slots });
 			}
 			commit("SET_CONTENT_COUNT", count);
 			commit("SET_ENCUMBRANCE", overencumbered);
@@ -199,7 +222,10 @@ export const content_module = {
 		SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
 		SET_TIER(state, payload) { state.tier = payload; },
 		SET_VOUCHER(state, payload) { state.voucher = payload; },	
-		SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value)},
-		SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value)},
+		SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value); },
+		SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value); },
+		SET_SLOTS_USED(state, { available_slots, used_slots }) { 
+			Vue.set(state, "slots_used", { available_slots, used_slots });
+		},
 	},
 };

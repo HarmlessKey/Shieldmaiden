@@ -113,18 +113,27 @@ const actions = {
 	 * @param {object} item 
 	 * @returns {string} the id of the newly added item
 	 */
-	async add_item({ rootGetters, commit, state, dispatch }, item) {
+	async add_item({ rootGetters, commit, dispatch }, item) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		const new_count = state.item_count + 1;
+		const available_slots = rootGetters.tier.benefits.items;
+
 		if(uid) {
 			const services = await dispatch("get_item_services");
+			const used_slots = await services.getItemCount(uid);
+
+			if(used_slots >= available_slots) {
+				throw "Not enough slots";
+			}
 			try {
-				const search_item = convert_item(item);
-				const id = await services.addItem(uid, item, new_count, search_item);
-				commit("SET_ITEM_COUNT", new_count);
-				commit("SET_ITEM", { id, search_item });
-				commit("SET_CACHED_ITEM", { uid, id, item });
-				return id;
+					const search_item = convert_item(item);
+					const id = await services.addItem(uid, item, search_item);
+					commit("SET_ITEM", { id, search_item });
+					commit("SET_CACHED_ITEM", { uid, id, item });
+					
+					const new_count = await services.updateItemCount(uid, 1);
+					commit("SET_ITEM_COUNT", new_count);
+					dispatch("checkEncumbrance", "", { root: true });
+					return id;
 			} catch(error) {
 				throw error;
 			}
@@ -161,20 +170,18 @@ const actions = {
 	 * 
 	 * @param {string} id 
 	 */
-	async delete_item({ rootGetters, commit, state, dispatch }, id) {
+	async delete_item({ rootGetters, commit, dispatch }, id) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		const new_count = state.item_count - 1;
 		if(uid) {
 			const services = await dispatch("get_item_services");
 			try {
-				await services.deleteItem(uid, id, new_count);
+				await services.deleteItem(uid, id);
 				commit("REMOVE_ITEM", id);
 				commit("REMOVE_CACHED_ITEM", { uid, id });
-				commit("SET_ITEM_COUNT", new_count);
 
-				// DELETE COMPANION FROM PLAYER
-				// A player might have this item as a companion, this needs to be deleted now.
-				
+				const new_count = await services.updateItemCount(uid, -1);
+				commit("SET_ITEM_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
 				return;
 			} catch(error) {
 				throw error;
@@ -203,7 +210,6 @@ const mutations = {
     }
   },
   REMOVE_ITEM(state, id) { 
-    console.log("remove", id)
     Vue.delete(state.items, id); },
   REMOVE_CACHED_ITEM(state, { uid, id }) {
     if(state.cached_items[uid]) {

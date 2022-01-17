@@ -70,7 +70,7 @@
 												Validation errors
 											</q-tooltip>
 										</q-item-section>
-										<q-item-section avatar v-if="ability.action_list && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
+										<q-item-section avatar v-if="ability.action_list && ability.action_list[0] && ability.action_list[0].type !== 'other' && ability.action_list[0].rolls">
 											<span v-if="ability.versatile" class="roll-button" @click.stop>
 												<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 													<q-list :dark="$store.getters.theme === 'dark'">
@@ -215,7 +215,7 @@
 											<label class="group mt-3">Range & area of effect</label>
 											<div class="row q-col-gutter-sm">
 												<div class="col">
-													<ValidationProvider rules="between:1,999" name="Reach" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider rules="between:0,999" name="Reach" v-slot="{ errors, invalid, validated }">
 														<q-input
 															:dark="$store.getters.theme === 'dark'" filled square
 															class="reach"

@@ -111,8 +111,15 @@ const actions = {
    */
   async add_npc({ rootGetters, commit, dispatch }, npc) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    const available_slots = rootGetters.tier.benefits.npcs;
+
     if(uid) {
       const services = await dispatch("get_npc_services");
+      const used_slots = await services.getNpcCount(uid);
+      
+      if(used_slots >= available_slots) {
+        throw "Not enough slots";
+      }
       try {
         const search_npc = convert_npc(npc);
         const id = await services.addNpc(uid, npc, search_npc);
@@ -121,6 +128,7 @@ const actions = {
 
         const new_count = await services.updateNpcCount(uid, 1);
         commit("SET_NPC_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return id;
       } catch(error) {
         throw error;
@@ -206,6 +214,7 @@ const actions = {
 
         const new_count = await services.updateNpcCount(uid, -1);
         commit("SET_NPC_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return;
       } catch(error) {
         throw error;

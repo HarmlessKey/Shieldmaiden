@@ -132,8 +132,8 @@ export class playerServices {
    */
    async updatePlayerCount(uid, diff) {
     const player_count_path = `${uid}/metadata/count`;
-    let player_count = await SEARCH_PLAYERS_REF.child(player_count_path).once('value');
-    await SEARCH_PLAYERS_REF.child(player_count_path).set(player_count.val() + diff);
-    return player_count.val() + diff;
+    let player_count = await this.getPlayerCount(uid);
+    await SEARCH_PLAYERS_REF.child(player_count_path).set(player_count + diff);
+    return player_count + diff;
   }
 }

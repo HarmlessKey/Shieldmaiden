@@ -109,7 +109,7 @@
 	import Targeted from '@/components/combat/Targeted.vue';
 	import Side from '@/components/combat/side/Side.vue';
 	import SetInitiative from '@/components/combat/initiative';
-	import OverEncumbered from '@/components/OverEncumbered.vue';
+	import OverEncumbered from '@/components/userContent/OverEncumbered.vue';
 	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
 
 	export default {

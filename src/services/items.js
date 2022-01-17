@@ -53,7 +53,6 @@ export class itemServices {
    * @returns An entire item from the 'custom_items' reference
    */
 	async getItem(uid, id) {
-    console.log(`Item ${id} fetched from database`)
     try {
       const item = await ITEMS_REF.child(uid).child(id).once('value', snapshot => {
         return snapshot;
@@ -74,13 +73,12 @@ export class itemServices {
    * @param {Object} search_item Compressed item
    * @returns Key of the newly added item
    */
-	async addItem(uid, item, new_count, search_item) {
+	async addItem(uid, item, search_item) {
     try {
       item.name = item.name.toLowerCase();
       const newItem = await ITEMS_REF.child(uid).push(item);
       
       //Update search_custom_items
-      SEARCH_ITEMS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_ITEMS_REF.child(`${uid}/results/${newItem.key}`).set(search_item);
 
       return newItem.key;
@@ -111,18 +109,29 @@ export class itemServices {
    * 
    * @param {String} uid ID of active user
    * @param {String} id ID of item to edit
-   * @param {Int} new_count Updated number of items
    */
-  async deleteItem(uid, id, new_count) {
+  async deleteItem(uid, id) {
     try {
       ITEMS_REF.child(uid).child(id).remove();
 
       //Update search_custom_items
-      SEARCH_ITEMS_REF.child(`${uid}/metadata/count`).set(new_count);
       SEARCH_ITEMS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
       throw error;
     }
+  }
+
+  /**
+   * Update item_count in the search table of search_items
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from item count
+   */
+   async updateItemCount(uid, diff) {
+    const item_count_path = `${uid}/metadata/count`;
+    let item_count = await SEARCH_ITEMS_REF.child(item_count_path).once('value');
+    await SEARCH_ITEMS_REF.child(item_count_path).set(item_count.val() + diff);
+    return item_count.val() + diff;
   }
 }

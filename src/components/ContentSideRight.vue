@@ -17,22 +17,6 @@
       </div>
     </hk-card>
 
-    <!-- SUPPORT US -->
-    <hk-card 
-      v-if="tier && tier.name === 'Free'"
-      header="Support Harmless Key"
-    >
-      <div class="card-body">
-        <p class="text-center">
-          Support us on Patreon and become a true <b>legend</b>!
-        </p>
-
-        <router-link to="/patreon" class="btn btn-block bg-patreon-red">
-          Support us
-        </router-link>
-      </div>
-    </hk-card>
-
     <!-- CAMPAIGNS -->
     <hk-card v-if="$route.path === '/content/campaigns'">
       <div slot="header" class="card-header">
@@ -69,6 +53,31 @@
         </div>
       </div>
     </hk-card>
+
+    <!-- SUBSCRIPTION -->
+    <hk-card v-if="user && tier && $route.path.split('/')[1] === 'content'" small>
+      <div slot="header" class="card-header">
+        Subscription
+        <b>{{ tier.name }}</b>
+      </div>
+      <q-linear-progress 
+        v-if="tier.name !== 'Deity'"
+        :value="slots_used.used_slots / slots_used.available_slots"
+        color="neutral-4"
+        track-color="neutral-11"
+      />
+      <div>
+        <Tier />
+      </div>
+      <div slot="footer" v-if="tier.name !== 'Deity'">
+        <router-link 
+          to="/patreon" 
+          class="btn btn-block btn-square bg-patreon-red"
+        >
+          Upgrade
+        </router-link>
+      </div>
+    </hk-card>
     <q-resize-observer @resize="setWidth"/>
   </div>
 </template>
@@ -84,6 +93,7 @@ export default {
   components: {
     PlayerLink: () => import("@/components/PlayerLink"),
     HkVideo: () => import("@/components/hk-components/hk-video"),
+    Tier: () => import("@/components/userContent/Tier"),
   },
   data() {
     return {
@@ -118,7 +128,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["tier"]),
+    ...mapGetters(["user", "tier", "slots_used"]),
     filtered_content() {
       return this.content.filter(item => item.value !== this.page);
     }

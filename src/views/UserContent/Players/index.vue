@@ -1,27 +1,10 @@
 <template>
 	<hk-card v-if="tier">
-		<div slot="header" class="card-header">
-			<span>
-				Players ( 
-				<span :class="{ 'green': true, 'red': player_count >= tier.benefits.players }">{{ player_count }}</span> 
-					/ 
-					<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-					<template v-else>{{ tier.benefits.players }}</template>	
-					)
-			</span>
-			<router-link class="btn btn-sm" v-if="!overencumbered" :to="`${$route.path}/add-player`">
-				<i class="fas fa-plus green"></i> New Player
-			</router-link>
-		</div>
+		<ContentHeader type="players" />
 
 		<div class="card-body">
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
-			<template>
-				<OutOfSlots
-					v-if="player_count >= tier.benefits.players"
-					type = 'players'
-				/>
-
+			<template v-if="players.length">
 				<q-input 
 					:dark="$store.getters.theme !== 'light'" 
 					v-model="search"
@@ -85,26 +68,14 @@
 					<div slot="no-data" />
 					<hk-loader slot="loading" name="NPCs" />
 				</q-table>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open player slot</span>
-						<router-link v-if="!overencumbered" to="/players/add-player">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="!tier || tier.name === 'Free'">
-					<router-link class="openSlot none" to="/patreon">
-						Support us on Patreon for more slots.
-					</router-link>
-				</template>
 			</template>
-			<router-link v-if="!players.length && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
+
+			<template v-if="!tier || tier.name === 'Free'">
+				<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
+					Get more player slots
+				</router-link>
+			</template>
+			<router-link v-if="!players.length && !overencumbered" class="btn btn-block mt-4" to="/content/players/add-player">
 				Create your first player
 			</router-link>
 		</div>
@@ -113,9 +84,9 @@
 </template>
 
 <script>
-	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Players',
@@ -124,7 +95,7 @@
 			title: 'Players'
 		},
 		components: {
-			OutOfSlots
+			ContentHeader
 		},
 		data() {
 			return {
@@ -158,10 +129,7 @@
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters("players", ["player_count", "players"]),
-			slotsLeft() {
-				return this.tier.benefits.players - this.player_count
-			}
+			...mapGetters("players", ["players"])
 		},
 		async mounted() {
 			await this.get_players();

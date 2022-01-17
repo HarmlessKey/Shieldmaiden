@@ -24,6 +24,16 @@ export class encounterServices {
     }
   }
 
+  async getCampaignEncounterCount(uid, campaignId) {
+    try {
+      const path = `${uid}/metadata/${campaignId}/count`;
+      const count = await SEARCH_ENCOUNTERS_REF.child(path).once('value');
+      return count.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
   async getCampaignEncounters(uid, campaignId, finished) {
     try {
       const path = `${uid}/results/${campaignId}`;
@@ -199,9 +209,9 @@ export class encounterServices {
    */
   async updateEncounterCount(uid, campaignId, diff) {
     const encounter_count_path = `${uid}/metadata/${campaignId}/count`;
-    let encounter_count = await SEARCH_ENCOUNTERS_REF.child(encounter_count_path).once('value');
-    await SEARCH_ENCOUNTERS_REF.child(encounter_count_path).set(encounter_count.val() + diff);
-    return encounter_count.val() + diff;
+    let encounter_count = await this.getCampaignEncounterCount(uid, campaignId);
+    await SEARCH_ENCOUNTERS_REF.child(encounter_count_path).set(encounter_count + diff);
+    return encounter_count + diff;
   }
 
   /**

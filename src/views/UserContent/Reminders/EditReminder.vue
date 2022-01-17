@@ -29,7 +29,6 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import ReminderForm from '@/components/ReminderForm';
 
@@ -39,7 +38,6 @@
 			title: 'Reminders'
 		},
 		components: {
-			OverEncumbered,
 			ReminderForm
 		},
 		data() {

@@ -20,7 +20,6 @@ const SignUp = () => import('@/views/SignUp.vue');
 const Settings = () => import('@/views/Settings.vue');
 const ResetPassword = () => import('@/views/ResetPassword.vue');
 const Patreon = () => import('@/views/Patreon.vue');
-const ManageContent = () => import('@/views/ManageContent.vue');
 const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
@@ -70,6 +69,11 @@ export const routes = [{
 				path: "",
 				name: "Content",
 				component: () => import("@/views/UserContent"),
+			},
+			{
+				path: "manage",
+				name: "Manage content",
+				component: () => import("@/views/ManageContent"),
 			},
 			
 			// Cammpaigns
@@ -732,14 +736,6 @@ export const routes = [{
 		path: '/patreon',
 		name: 'Patreon',
 		component: Patreon
-	},
-	{
-		path: '/manage-content',
-		name: 'manageContent',
-		component: ManageContent,
-		meta: {
-			requiresAuth: true
-		}
 	},
 	{
 		path: '/poster',

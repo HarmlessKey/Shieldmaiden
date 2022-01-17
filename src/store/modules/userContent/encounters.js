@@ -64,8 +64,8 @@ const actions = {
    async get_campaign_encounters({ state, getters, rootGetters, commit, dispatch }, { campaignId, finished=false }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     const campaign_encounters = (state.encounters[campaignId]) ? state.encounters[campaignId] : {};
-    let encounters = (getters.get_encounters[campaignId, finished]) 
-      ? getters.encounters[campaignId, finished] : undefined;
+    let encounters = (getters.get_encounters(campaignId, finished).length) 
+      ? getters.get_encounters(campaignId, finished) : undefined;
 
     // The encounter is not in the store and needs to be fetched from the database
     if(!encounters) {
@@ -159,15 +159,23 @@ const actions = {
    */
   async add_encounter({ rootGetters, dispatch, commit }, { campaignId, encounter }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const search_encounter = convert_encounter(encounter);
+    const available_slots = rootGetters.tier.benefits.encounters;
+    
     if(uid) {
       const services = await dispatch("get_encounter_services");
+      const used_slots = await services.getCampaignEncounterCount(uid, campaignId);
+
+      if(used_slots >= available_slots) {
+        throw "Not enough slots";
+      }
       try {
+        const search_encounter = convert_encounter(encounter);
         const id = await services.addEncounter(uid, campaignId, encounter, search_encounter);
         commit("SET_ENCOUNTER", { uid, campaignId, id, encounter: search_encounter });
 
         const new_count = await services.updateEncounterCount(uid, campaignId, 1);
         commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        dispatch("checkEncumbrance", "", { root: true });
         return id;
       } catch(error) {
         throw error;
@@ -433,6 +441,7 @@ const actions = {
 
         const new_count = await services.updateEncounterCount(uid, campaignId, -1);
         commit("SET_ENCOUNTER_COUNT", { campaignId, count: new_count });
+        dispatch("checkEncumbrance", "", { root: true });
       } catch(error) {
         throw error;
       }

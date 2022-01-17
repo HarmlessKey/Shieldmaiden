@@ -57,7 +57,6 @@
 								autocomplete="off"  
 								type="text" 
 								v-model="item.desc" 
-								name="image" 
 								maxlength="5000"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -239,10 +238,9 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import { skills } from '@/mixins/skills.js'
-	import { mapActions, mapGetters } from 'vuex'
-	import { general } from '@/mixins/general.js'
+	import { skills } from '@/mixins/skills.js';
+	import { mapActions, mapGetters } from 'vuex';
+	import { general } from '@/mixins/general.js';
 
 
 	export default {
@@ -250,9 +248,6 @@
 		mixins: [general, skills],
 		metaInfo: {
 			title: 'Items'
-		},
-		components: {
-			OverEncumbered,
 		},
 		data() {
 			return {

@@ -126,7 +126,7 @@
 	import { auth } from "@/firebase";
 
 	export default {
-		name: "SignedIn",
+		name: "UserContent",
 		mixins: [general],
 		data() {
 			return {

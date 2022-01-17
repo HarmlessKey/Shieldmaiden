@@ -21,19 +21,23 @@
 			<hk-card header="DM Data">
 				<div class="card-body data">
 					<span class="type">Campaigns: </span> 
-					<template v-if="campaigns">{{ Object.keys(campaigns).length }}</template>
+					<template v-if="campaigns['.value']">{{ campaigns[".value"] }}</template>
 					<template v-else>0</template><br/>
 					
-					<span class="type">Encounters: </span>
-					<template v-if="encounters">{{ encounter_count }}</template>
-					<template v-else>0</template><br/>
-
 					<span class="type">Players: </span> 
-					<template v-if="players">{{ Object.keys(players).length }}</template>
+					<template v-if="players['.value']">{{ players[".value"] }}</template>
 					<template v-else>0</template><br/>
 
 					<span class="type">NPC's: </span> 
-					<template v-if="npcs">{{ Object.keys(npcs).length }}</template>
+					<template v-if="npcs['.value']">{{ npcs[".value"] }}</template>
+					<template v-else>0</template><br/>
+
+					<span class="type">Items: </span>
+					<template v-if="items['.value']">{{ items[".value"] }}</template>
+					<template v-else>0</template><br/>
+
+					<span class="type">Reminders: </span>
+					<template v-if="reminders['.value']">{{ reminders[".value"] }}</template>
 					<template v-else>0</template><br/>
 				</div>
 			</hk-card>
@@ -86,47 +90,50 @@
 		<hk-card header="Voucher">
 			<div class="card-body">
 				<h3>Gift user a subscription</h3>
+				<ValidationObserver v-slot="{ valid }">
+					<q-form>
+						<q-select 
+							:dark="$store.getters.theme === 'dark'" filled square
+							emit-value
+							map-options
+							label="Tier"
+							v-model="voucher.id"
+							:options="Object.values(tiers)"
+							option-label="name"
+							option-value=".key"
+						>
+						</q-select>
+						
+						<q-option-group
+							:dark="$store.getters.theme === 'dark'"
+							v-model="duration"
+							:options="duration_options"
+						/>
 
-				<q-select 
-					:dark="$store.getters.theme === 'dark'" filled square
-					emit-value
-					map-options
-					label="Tier"
-					v-model="voucher.id"
-					:options="Object.values(tiers)"
-					option-label="name"
-					option-value=".key"
-				>
-				</q-select>
-				
-				<q-option-group
-					:dark="$store.getters.theme === 'dark'"
-					v-model="duration"
-					:options="duration_options"
-				/>
+						<ValidationProvider v-if="duration === 'date'" rules="required" name="Date" v-slot="{ errors, invalid, validated }">
+							<q-input 	
+								:dark="$store.getters.theme === 'dark'" filled square
+								label="Date"
+								type="text"
+								placeholder="mm/dd/yyyy"
+								class="mb-2"
+								v-model="voucher.date"
+								:error="invalid && validated"
+								:error-message="errors[0]"
+							/>
+						</ValidationProvider>
 
-				<q-input 
-					v-if="duration === 'date'"
-					:dark="$store.getters.theme === 'dark'" filled square
-					label="Date"
-					type="text"
-					v-validate="'required'"
-					data-vv-as="Date" 
-					name="date" 
-					placeholder="mm/dd/yyyy"
-					class="mb-2"
-					v-model="voucher.date"/>
-				<p class="validate red" v-if="errors.has('date')">{{ errors.first('date') }}</p>
-
-				<q-input 
-					:dark="$store.getters.theme === 'dark'" filled square
-					label="Message"
-					v-model="voucher.message" 
-					name="message" 
-					class="mb-2"
-					autogrow
-				/>
-				<a class="btn" @click="setVoucher()">Save</a>
+						<q-input 
+							:dark="$store.getters.theme === 'dark'" filled square
+							label="Message"
+							v-model="voucher.message" 
+							name="message" 
+							class="mb-2"
+							autogrow
+						/>
+						<a class="btn" @click="setVoucher(valid)">Save</a>
+					</q-form>
+				</ValidationObserver>
 			</div>
 		</hk-card>
 	</div>
@@ -186,10 +193,26 @@
 					asObject: true
 				},
 				tiers: db.ref('tiers').orderByChild('order'),
-				campaigns: db.ref(`campaigns/${this.id}`),
-				encounters: db.ref(`encounters/${this.id}`),
-				players: db.ref(`players/${this.id}`),
-				npcs: db.ref(`npcs/${this.id}`),
+				campaigns: {
+					source: db.ref(`search_campaigns/${this.id}/metadata/count`),
+					asObject: true
+				},
+				players: {
+					source: db.ref(`search_players/${this.id}/metadata/count`),
+					asObject: true
+				},
+				npcs: {
+					source: db.ref(`search_npcs/${this.id}/metadata/count`),
+					asObject: true
+				},
+				items: {
+					source: db.ref(`search_items/${this.id}/metadata/count`),
+					asObject: true
+				},
+				reminders: {
+					source: db.ref(`search_reminders/${this.id}/metadata/count`),
+					asObject: true
+				} 
 			}
 		},
 		mounted() {
@@ -239,16 +262,6 @@
 				}
 				return array;
 			},
-			encounter_count() {
-				var count = 0;
-				
-				for(let cKey in this.campaigns) {
-					for(let eKey in this.encounters[cKey]) {
-						if(eKey != '.key') { count++ }
-					}
-				}
-				return count
-			},
 			voucher() {
 				if (this.user.voucher) {
 					return this.user.voucher
@@ -258,23 +271,22 @@
 			}				
 		},
 		methods: {
-			setVoucher() {
-				this.$validator.validateAll().then((result) => {
-					if (result) {
-						if(this.voucher.id == 'basic') {
-							db.ref(`users/${this.id}/voucher`).remove()
-						}
-						else {
-							if(this.duration == 'infinite') {
-								delete this.voucher.date
-							}
-							db.ref(`users/${this.id}/voucher`).set(this.voucher)
-						}
-						this.$snotify.success('Voucher given.', 'Voucher set!', {
-							position: "rightTop"
-						});
+			setVoucher(valid) {
+				console.log(valid)
+				if (valid) {
+					if(this.voucher.id === 'basic') {
+						db.ref(`users/${this.id}/voucher`).remove()
 					}
-				});
+					else {
+						if(this.duration === 'infinite') {
+							delete this.voucher.date
+						}
+						db.ref(`users/${this.id}/voucher`).set(this.voucher)
+					}
+					this.$snotify.success('Voucher given.', 'Voucher set!', {
+						position: "rightTop"
+					});
+				}
 			},
 			setPatronEmail() {
 				if (this.user.patreon_email == "") {

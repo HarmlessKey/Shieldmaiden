@@ -13,31 +13,13 @@
 						</div>
 					</div>
 				</hk-card>
-			<!-- Content -->
+				<!-- Content -->
 				<hk-card header="Your content">
 					<div class="card-body">
-						<q-list>
-							<!-- Campaigns -->
-							<q-item v-for="{type, icon} in content_types" :to="`/content/${type}`" :key="type">
-									<q-item-section avatar>
-										<i class="fas" :class="icon"/>
-									</q-item-section>
-									<q-item-section>
-										{{ type.capitalize() }}
-									</q-item-section>
-									<q-item-section side>
-										<div>
-											<span :class="{ 'green': true, 'red': content_count[type] >= tier.benefits[type] }"> 
-												{{ content_count[type] }}
-											</span> 
-											<span class="neutral-2"> / </span>
-											<i v-if="tier.benefits[type] == 'infinite'" class="far fa-infinity"></i>
-											<span v-else>{{ tier.benefits[type] }}</span>
-										</div>
-									</q-item-section>
-							</q-item>
-						</q-list>
-						<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-neutral-5 mt-3" to="/patreon">Need more?</router-link>
+						<Content />
+						<router-link v-if="tier.name != 'Deity'" class="btn btn-block bg-neutral-5 mt-3" to="/patreon">
+							Need more slots?
+						</router-link>
 					</div>
 				</hk-card>
 
@@ -71,40 +53,12 @@
 							</p>
 							<hr>
 						</div>
-
 					</template>
 					<!-- TIER -->
 					<h3 class="mb-1">Subscription tier: <span class="patreon-red">{{ tier.name }}</span></h3>
 					<p v-if="tier.name == 'Deity'" class="neutral-2">You have unlimited power.</p>					
 
-					<ul class="benefits">
-						<li v-for="(benefit, key) in tier.benefits" :key="key">
-							<template v-if="key == 'campaigns'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> campaign slot{{ benefit > 1 ? "s" : "" }}
-							</template>
-							<template v-if="key == 'encounters'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> encounter slots
-							</template>
-							<template v-if="key == 'players'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> player slots
-							</template>
-							<template v-if="key == 'npcs'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> NPC slots
-							</template>
-							<template v-if="key == 'reminders'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> Reminder slots
-							</template>
-							<template v-if="key == 'items'">
-								<i v-if="benefit == 'infinite'" class="green far fa-infinity"></i>
-								<span v-else class="green">{{ benefit }}</span> Item slots
-							</template>
-						</li>
-					</ul>
+					<Tier />
 					<router-link v-if="tier.name === 'Free'" class="btn btn-block bg-patreon-red mt-4" to="/patreon">
 						Support us for more slots
 					</router-link>
@@ -150,12 +104,17 @@
 	import { auth } from "@/firebase";
 	import { general } from "@/mixins/general.js";
 	import { mapGetters } from "vuex";
+	import Content from "@/components/userContent/Content";
+	import Tier from "@/components/userContent/Tier";
+
 
 export default {
 		name: "Profile",
 		components: {
 			Tiers,
 			PlayerLink,
+			Content,
+			Tier
 		},
 		mixins: [general],
 		metaInfo: {
@@ -238,16 +197,6 @@ export default {
 					display: inline-block;
 				}
 			}
-		}
-
-		ul.benefits {
-			padding: 0;
-			list-style: none;
-		}
-
-		.q-item {
-			background-color: $neutral-8;
-			margin-bottom: 1px;
 		}
 	}
 </style>

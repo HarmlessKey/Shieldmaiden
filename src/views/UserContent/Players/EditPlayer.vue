@@ -436,7 +436,6 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue';
 	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
@@ -453,7 +452,6 @@
 			title: 'Players'
 		},
 		components: {
-			OverEncumbered,
 			GiveCharacterControl,
 			Defenses,
 			CopyMonster

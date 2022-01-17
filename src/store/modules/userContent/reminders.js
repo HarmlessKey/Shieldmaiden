@@ -110,17 +110,26 @@ const actions = {
 	 * @param {object} reminder 
 	 * @returns {string} the id of the newly added reminder
 	 */
-	async add_reminder({ rootGetters, commit, state, dispatch }, reminder) {
+	async add_reminder({ rootGetters, commit, dispatch }, reminder) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		const new_count = state.reminder_count + 1;
+		const available_slots = rootGetters.tier.benefits.reminders;
+
 		if(uid) {
 			const services = await dispatch("get_reminder_services");
+			const used_slots = await services.getReminderCount(uid);
+
+			if(used_slots >= available_slots) {
+				throw "Not enough slots";
+			}
 			try {
 				const search_reminder = convert_reminder(reminder);
-				const id = await services.addReminder(uid, reminder, new_count, search_reminder);
-				commit("SET_REMINDER_COUNT", new_count);
+				const id = await services.addReminder(uid, reminder, search_reminder);
 				commit("SET_REMINDER", { id, search_reminder });
 				commit("SET_CACHED_REMINDER", { uid, id, reminder });
+
+				const new_count = await services.updateReminderCount(uid, 1);
+				commit("SET_REMINDER_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });
 				return id;
 			} catch(error) {
 				throw error;
@@ -158,20 +167,18 @@ const actions = {
 	 * 
 	 * @param {string} id 
 	 */
-	async delete_reminder({ rootGetters, commit, state, dispatch }, id) {
+	async delete_reminder({ rootGetters, commit, dispatch }, id) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		const new_count = state.reminder_count - 1;
 		if(uid) {
 			const services = await dispatch("get_reminder_services");
 			try {
-				await services.deleteReminder(uid, id, new_count);
+				await services.deleteReminder(uid, id);
 				commit("REMOVE_REMINDER", id);
 				commit("REMOVE_CACHED_REMINDER", { uid, id });
-				commit("SET_REMINDER_COUNT", new_count);
 
-				// DELETE COMPANION FROM PLAYER
-				// A player might have this reminder as a companion, this needs to be deleted now.
-				
+				const new_count = await services.updateReminderCount(uid, -1);
+				commit("SET_REMINDER_COUNT", new_count);
+				dispatch("checkEncumbrance", "", { root: true });	
 				return;
 			} catch(error) {
 				throw error;

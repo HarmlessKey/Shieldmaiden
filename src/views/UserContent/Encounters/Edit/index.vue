@@ -1,7 +1,16 @@
 <template>
-	<div v-if="overencumbered">
-		<OverEncumbered/>
-	</div>
+	<hk-card v-if="overencumbered" header="You're over encumbered">
+		<div class="card-body">
+			<p>
+				You can't edit an encounter when you are over encumbered, 
+				please resolve this first.
+			</p>
+
+			<router-link to="/content/manage" class="btn btn-lg btn-block bg-neutral-9">
+				Manage content
+			</router-link>
+		</div>
+	</hk-card>
 	<div v-else>
 		<div class="wrapper">
 			<hk-card>
@@ -71,13 +80,12 @@
 </template>
 
 <script>
-	import Crumble from "@/components/crumble";
 	import Loot from "./Loot.vue";
 	import Xp from "./Xp.vue";
 	import Entities from "./Entities.vue";
 	import Overview from "./Overview.vue";
 	import General from "./General.vue";
-	import OverEncumbered from "@/components/OverEncumbered.vue";
+	import OverEncumbered from "@/components/userContent/OverEncumbered.vue";
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {
@@ -86,7 +94,6 @@
 			title: "Encounters"
 		},
 		components: {
-			Crumble,
 			OverEncumbered,
 			Loot,
 			Xp,

@@ -31,7 +31,7 @@ export const general_module = {
 			dispatch("setTips");
 
 			if(auth.currentUser !== null) {
-				dispatch("setUser");
+				await dispatch("setUser");
 				// first set the user settings in order to set theme correctly
 				await dispatch("setUserSettings")
 					.then(() => {
@@ -47,8 +47,8 @@ export const general_module = {
 							dispatch("reminders/fetch_reminder_count")
 						]);
 					})
-					.then(() => {
-						dispatch("checkEncumbrance");
+					.then(async () => {
+						await dispatch("checkEncumbrance");
 					})
 					.catch(error => {
 						throw error

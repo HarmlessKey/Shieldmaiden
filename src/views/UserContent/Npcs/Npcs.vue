@@ -86,13 +86,12 @@
 						<hk-loader slot="loading" name="NPCs" />
 					</q-table>
 				</template>
-				<template v-if="!tier || tier.name === 'Free'">
-					<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
-						Get more NPC slots
-					</router-link>
-				</template>
-				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-block" to="/content/npcs/add-npc">
-					Create your first NPC
+
+				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/npcs/add-npc">
+					<i class="fas fa-plus green mr-1" /> Create your first NPC
+				</router-link>
+				<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+					Get more NPC slots
 				</router-link>
 				<q-resize-observer @resize="setSize" />
 			</div>

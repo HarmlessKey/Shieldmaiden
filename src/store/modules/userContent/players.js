@@ -344,6 +344,13 @@ const actions = {
         throw error;
       }
     }
+  },
+
+  clear_player_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
   }
 };
 const mutations = {
@@ -390,6 +397,10 @@ const mutations = {
     if(state.players && state.players[playerId]) {
       Vue.set(state.players[playerId], "campaign_id", value);
     }
+  },
+  CLEAR_STORE(state) {
+    Vue.set(state, "players", {});
+    Vue.set(state, "player_count", 0);
   }
 };
 

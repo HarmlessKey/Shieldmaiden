@@ -32,14 +32,20 @@
 							<h3><i class="fab fa-patreon patreon-red"></i> Patreon: <b>{{ userInfo.patron.tier }}</b></h3>
 							<p>Thank you so much for your support. <i class="patreon-red fas fa-heart"></i></p>
 
-							<div v-if="userInfo.patron.last_charge_status === 'Declined' && new Date(userInfo.patron.pledge_end) > new Date()" class="red">
-								<h3>Payment Declined</h3>
+							<div v-if="userInfo.patron.last_charge_status === 'Declined' && valid(userInfo.patron.pledge_end)">
+								<h3 class="red">Payment Declined</h3>
 								<p>
 									Your last payment on Patreon was declined, your subscription will automatically be cancelled on <b>{{ makeDate(userInfo.patron.pledge_end) }}</b>.<br/>
 									Go to <a href="https://www.patreon.com" target="_blank" rel="noopener">patreon.com</a> to check your payment details.
 								</p>
 							</div>
-							<small><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank" rel="noopener">Cancel subscription</a></small>
+							<div v-if="!valid(userInfo.patron.pledge_end)"> 
+								<p>Your subscription <b class="red">expired</b></p>
+								<a href="https://www.patreon.com/join/harmlesskey" target="_blank" class="btn bg-neutral-5">
+									<i class="fas fa-redo-alt blue mr-1" /> Renew
+								</a>
+							</div>
+							<small v-else><a href="https://www.patreon.com/join/harmlesskey/checkout?edit=1" target="_blank" rel="noopener">Cancel subscription</a></small>
 							<hr>
 						</div>
 
@@ -68,15 +74,15 @@
 				<!-- ACTIONS -->
 				<hk-card>
 					<div class="card-body actions">
-						<p v-if="resetError" class="red text-center"><i class="fas fa-exclamation-triangle"></i> {{ resetError }}</p>
-						<p v-if="resetSuccess" class="green text-center"><i class="fas fa-check"></i> {{ resetSuccess }}</p>
+						<p v-if="resetError" class="red text-center"><i class="fas fa-exclamation-triangle" /> {{ resetError }}</p>
+						<p v-if="resetSuccess" class="green text-center"><i class="fas fa-check" /> {{ resetSuccess }}</p>
 
 						<div class="d-flex justify-content-between">
 							<a @click="resetPassword()" class="btn btn-sm btn-clear">
-								<i class="fas fa-redo-alt blue mr-1"></i> Reset Password
+								<i class="fas fa-redo-alt blue mr-1" /> Reset Password
 							</a>
 							<router-link to="/profile/delete-account" class="btn btn-sm btn-clear">
-								<i class="fas fa-trash-alt red mr-1"></i> Delete account
+								<i class="fas fa-trash-alt red mr-1" /> Delete account
 							</router-link>
 						</div>
 					</div>
@@ -171,6 +177,9 @@ export default {
 					// An error happened.
 					vm.error = error.message;
 				});
+			},
+			valid(end) {
+				return new Date(end).toISOString() > new Date().toISOString();
 			}
 		}
 	}

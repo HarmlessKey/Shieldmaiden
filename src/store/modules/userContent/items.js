@@ -188,6 +188,13 @@ const actions = {
 			}
 		}
 	},
+
+	clear_item_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
+  }
 }
 
 
@@ -216,9 +223,11 @@ const mutations = {
       Vue.delete(state.cached_items[uid], id);
     }
   },
+	CLEAR_STORE(state) {
+    Vue.set(state, "items", undefined);
+    Vue.set(state, "item_count", 0);
+  }
 }
-
-
 
 export default {
 	namespaced: true,

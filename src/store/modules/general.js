@@ -6,28 +6,31 @@ const settings_ref = db.ref('settings');
 
 export const general_module = {
 	state: {
+		initialized: false,
 		theme: undefined,
 		slide: {},
 		rolls: [],
 		action_rolls: [],
 		side_collapsed: true,
 		side_small_screen: false,
-		broadcast: {},
 		browser: browserDetect()
 	},
 	getters: {
+		initialized: (state) => { return state.initialized },
 		theme: (state) => { return state.theme },
-		getSlide: function( state ) { return state.slide; },
-		rolls: function( state ) { return state.rolls; },
-		action_rolls: function( state ) { return state.action_rolls; },
-		side_collapsed: function( state ) { return state.side_collapsed; },
-		side_small_screen: function( state ) { return state.side_small_screen; },
-		broadcast: function( state ) { return state.broadcast; },
-		browser: function( state ) { return state.browser; },
+		getSlide(state) { return state.slide; },
+		rolls(state) { return state.rolls; },
+		action_rolls(state) { return state.action_rolls; },
+		side_collapsed(state) { return state.side_collapsed; },
+		side_small_screen(state) { return state.side_small_screen; },
+		browser(state) { return state.browser; },
 	},
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
-		async initialize({ dispatch }) {
+		async initialize({ state, dispatch, commit }) {
+			if(state.initialized) {
+				return;
+			}
 			dispatch("setTips");
 
 			if(auth.currentUser !== null) {
@@ -49,13 +52,37 @@ export const general_module = {
 					})
 					.then(async () => {
 						await dispatch("checkEncumbrance");
+
+						const roll = Math.floor(Math.random() * 6 + 15)
+						console.log(
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
+							"color: #83b547;"
+						);
+
+						commit("SET_INITIALIZED", true);
 					})
 					.catch(error => {
-						throw error
+						const roll = Math.floor(Math.random() * 15);
+						console.log(
+							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key failed.`,
+							"color: #cc3e4a;"
+						);
+						console.error(error);
 					});			
 			} else {
 				dispatch("setTheme");
-			}
+				commit("SET_INITIALIZED", true);
+			}		
+		},
+		/**
+		 * Forces reinitialization
+		 * Needed when signing in
+		 * First store was initialize without a user, but now it has a user.
+		 * By simply setting initialized to false 
+		 * the beforeEach() in main.js will take care of the rest
+		 */
+		reinitialize({ commit }) {
+			commit("SET_INITIALIZED", false);
 		},
 		setTheme({ commit, state, rootGetters }, theme) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
@@ -150,33 +177,10 @@ export const general_module = {
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload)
 		},
-		setLive({state, rootGetters, commit}, { campaign_id, encounter_id, shares }) {
-			if(state.broadcast.live === campaign_id) {
-				db.ref(`broadcast/${rootGetters.user.uid}`).remove();
-				commit("SET_BROADCAST", {});
-			} else {
-				let broadcast = { live: campaign_id, shares };
-				if(encounter_id) broadcast.encounter = encounter_id;
-				db.ref(`broadcast/${rootGetters.user.uid}`).set(broadcast);
-				commit("SET_BROADCAST", broadcast);
-			}
-		},
-		setLiveEncounter({rootGetters, commit}, encounter_id) {
-			const encounter = (encounter_id) ? encounter_id : false;
-			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-
-			if(uid) {
-				db.ref(`broadcast/${uid}/encounter`).set(encounter);
-				commit("SET_BROADCAST_ENCOUNTER", encounter);
-			}
-		},
-		setLiveShares({state, commit}, shares) {
-			if(state.broadcast && state.broadcast.live) {
-				commit("SET_BROADCAST_SHARES", shares);
-			}
-		}
+		
 	},
 	mutations: {
+		SET_INITIALIZED(state, payload) { Vue.set(state, "initialized", payload) },
 		SET_THEME(state, payload) { Vue.set(state, 'theme', payload); },
 		SET_SLIDE(state, payload) { Vue.set(state, 'slide', payload); },
 		SET_ROLLS(state, payload) { Vue.set(state, 'rolls', payload); },
@@ -185,9 +189,6 @@ export const general_module = {
 		REMOVE_ACTION_ROLL(state, payload) { Vue.delete(state.action_rolls, payload); },
 		TOGGLE_SIDE_COLLAPSE(state) { Vue.set(state, 'side_collapsed', !state.side_collapsed); },
 		SET_SIDE_COLLAPSE(state, payload) { Vue.set(state, 'side_collapsed', payload) },
-		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },
-		SET_BROADCAST(state, payload) { Vue.set(state, "broadcast", payload) },
-		SET_BROADCAST_ENCOUNTER(state, payload) { Vue.set(state.broadcast, "encounter", payload) },
-		SET_BROADCAST_SHARES(state, payload) { Vue.set(state.broadcast, "shares", payload) }
+		SET_SIDE_SMALL_SCREEN(state, payload) { Vue.set(state, 'side_small_screen', payload); },		
 	},
 };

@@ -70,13 +70,11 @@
 				</q-table>
 			</template>
 
-			<template v-if="!tier || tier.name === 'Free'">
-				<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
-					Get more player slots
-				</router-link>
-			</template>
-			<router-link v-if="!players.length && !overencumbered" class="btn btn-block mt-4" to="/content/players/add-player">
-				Create your first player
+			<router-link v-if="!players.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/players/add-player">
+				<i class="fas fa-plus green mr-1" /> Create your first player
+			</router-link>
+			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+				Get more player slots
 			</router-link>
 		</div>
 		<q-resize-observer @resize="setSize" />

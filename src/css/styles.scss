@@ -896,19 +896,16 @@ html body {
 	.login-container {
 		color: #fff;
 		background-position: center;
-		height: calc(100vh - 50px);
-		background-color: #000;
 		padding: 100px 30px 0 30px;
 
 		#login {
-			background-color: $neutral-6;
+			background-color: $neutral-7;
 			max-width: 360px;
 			margin: auto;
 			padding: 120px 30px 30px;
 			position: relative;
 			box-shadow: 5px 5px 10px #000;
 			border-radius: $border-radius;
-
 		
 			h1, h2 {
 				text-transform: none !important;

@@ -242,9 +242,14 @@ const actions = {
         throw error;
       }
     }
+  },
+
+  clear_npc_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
   }
-
-
 };
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
@@ -277,6 +282,10 @@ const mutations = {
       Vue.delete(state.cached_npcs[uid], id);
     }
   },
+  CLEAR_STORE(state) {
+    Vue.set(state, "npcs", undefined);
+    Vue.set(state, "npc_count", 0);
+  }
 };
 
 export default {

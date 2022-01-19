@@ -58,13 +58,13 @@
 
 							<q-td v-else class="text-right d-flex justify-content-between">
 								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i class="fas fa-pencil"></i>
+									<i class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
 								<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
-									<i class="fas fa-trash-alt"></i>
+									<i class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
 									</q-tooltip>
@@ -74,13 +74,13 @@
 						<div slot="no-data" />	
 					</q-table>
 				</template>
-				<template v-if="item_count >= tier.benefits.items">
-					<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
-						Get more item slots
-					</router-link>
+				<template >
 				</template>
-				<router-link v-if="!overencumbered && !items.length" to="/content/items/add-item" class="btn bg-neutral-5">
-					<i class="fas fa-plus green mr-1"></i> Create your first item
+				<router-link v-if="!overencumbered && !items.length" to="/content/items/add-item" class="btn btn-lg bg-neutral-5">
+					<i class="fas fa-plus green mr-1" /> Create your first item
+				</router-link>
+				<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+					Get more item slots
 				</router-link>
 			</div>
 		</hk-card>

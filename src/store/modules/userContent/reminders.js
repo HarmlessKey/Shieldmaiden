@@ -185,6 +185,13 @@ const actions = {
 			}
 		}
 	},
+
+	clear_reminder_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
+  }
 }
 
 
@@ -214,6 +221,10 @@ const mutations = {
       Vue.delete(state.cached_reminders[uid], id);
     }
   },
+	CLEAR_STORE(state) {
+    Vue.set(state, "reminders", undefined);
+    Vue.set(state, "reminder_count", 0);
+  }
 }
 
 

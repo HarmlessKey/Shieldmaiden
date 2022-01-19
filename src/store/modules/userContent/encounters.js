@@ -22,7 +22,6 @@ const convert_encounter = (encounter) => {
 
 const state = {
   encounter_services: null,
-  active_encounter: undefined,
   cached_encounters: {},
   encounters: {},
   encounter_count: {}
@@ -529,6 +528,13 @@ const actions = {
       }
     }
   },
+
+  clear_encounter_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
+  }
 };
 const mutations = {
   SET_ENCOUNTER_SERVICES(state, payload) { Vue.set(state, "encounter_services", payload); },
@@ -620,6 +626,10 @@ const mutations = {
     if(state.cached_encounters[uid] && state.cached_encounters[uid][campaignId] && state.cached_encounters[uid][campaignId][id]) {
       Vue.set(state.cached_encounters[uid][campaignId][id], "finished", finished);
     }
+  },
+  CLEAR_STORE(state) {
+    Vue.set(state, "encounters", {});
+    Vue.set(state, "encounter_count", {});
   }
 };
 

@@ -20,14 +20,14 @@
 					class="btn btn-sm bg-neutral-5" 
 					@click="$emit('add')"
 				>
-					<i class="fas fa-plus green" /> New {{ type.slice(0, -1).capitalize() }}
+					<i class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
 				</a>
 				<router-link
 					v-else
 					class="btn btn-sm bg-neutral-5" 
 					:to="`${$route.path}/add-${type.slice(0, -1)}`"
 				>
-					<i class="fas fa-plus green" /> New {{ type.slice(0, -1).capitalize() }}
+					<i class="fas fa-plus green" /> New {{ type.slice(0, -1) }}
 				</router-link>
 			</template>
 			<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">

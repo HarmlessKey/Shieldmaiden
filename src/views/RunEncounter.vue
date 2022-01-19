@@ -181,7 +181,7 @@
 				'encounter',
 				'campaigns',
 				'entities',
-				'initialized',
+				'encounter_initialized',
 				'overencumbered',
 				'broadcast'
 			]),
@@ -244,7 +244,7 @@
 		},
 		watch: {
 			alive(newVal) {
-				if(newVal === 0 && this.initialized) {
+				if(newVal === 0 && this.encounter_initialized) {
 					this.confirmFinish()
 				}
 			},

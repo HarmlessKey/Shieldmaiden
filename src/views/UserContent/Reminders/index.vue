@@ -54,13 +54,12 @@
 					<div slot="no-data" />
 				</q-table>
 			</template>
-			<template v-if="!tier || tier.name === 'Free'">
-				<router-link class="btn bg-neutral-8 btn-block" to="/patreon">
-					Get more reminder slots
-				</router-link>
-			</template>
-			<router-link v-if="!reminders.length && !overencumbered" :to="`${$route.path}/add-reminder`">
+
+			<router-link v-if="!reminders.length && !overencumbered" class="btn btn-lg bg-neutral-5" :to="`${$route.path}/add-reminder`">
 				<i class="fas fa-plus green"></i> Create your first reminder
+			</router-link>
+			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+				Get more reminder slots
 			</router-link>
 		</div>
 	</hk-card>

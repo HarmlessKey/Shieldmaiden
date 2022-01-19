@@ -26,7 +26,6 @@ const state = {
   campaign_services: null,
   active_campaign: undefined,
   cached_campaigns: {},
-  campaign: undefined,
   campaigns: {},
   campaign_count: 0
 };
@@ -558,6 +557,13 @@ const actions = {
       }
     }
   },
+
+  clear_campaign_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
+  }
 };
 const mutations = {
   SET_CAMPAIGN_SERVICES(state, payload) { Vue.set(state, "campaign_services", payload); },
@@ -654,6 +660,11 @@ const mutations = {
       Vue.delete(state.cached_campaigns[uid][id].companions, companionId); 
     }
   },
+  CLEAR_STORE(state) {
+    Vue.set(state, "active_campaign", undefined);
+    Vue.set(state, "campaigns", {});
+    Vue.set(state, "campaign_count", 0);
+  }
 };
 
 export default {

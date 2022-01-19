@@ -123,7 +123,6 @@
 <script>
 	import { mapGetters, mapActions } from "vuex";
 	import { general } from "@/mixins/general.js";
-	import { auth } from "@/firebase";
 
 	export default {
 		name: "UserContent",
@@ -212,15 +211,13 @@
 		},
 		methods: {
 			...mapActions([
-				"setSlide"
+				"setSlide",
+				"sign_out"
 			]),
 			...mapActions("campaigns", ["get_campaigns"]),
 			signOut() {
-				this.$store.commit("SET_USER", undefined);
-				auth.signOut()
-				.then(() => {
-					if(this.$route.path !== "/") this.$router.replace("/");
-				});
+				this.$router.replace("/");
+				this.sign_out();
 			}
 		}
 	}

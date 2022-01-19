@@ -136,7 +136,7 @@ const getDefaultState = () => {
 		log: [],
 		path: undefined,
 		track: undefined,
-		initialized: false,
+		encounter_initialized: false,
 	}
 }
 
@@ -155,7 +155,7 @@ const getters = {
 	campaignId: function( state ) { return state.campaignId },
 	encounterId: function( state ) { return state.encounterId },
 	path: function( state ) { return state.path },
-	initialized: function( state ) { return state.initialized },
+	encounter_initialized: function( state ) { return state.encounter_initialized },
 	log: function( state ) {
 		//If there is a storage log, set it in the store
 		if(localStorage.getItem(state.encounterId)) {
@@ -1241,8 +1241,8 @@ const mutations = {
 	SET_ENCOUNTER(state, payload) { Vue.set(state, 'encounter', payload); },
 	SET_TARGETED(state, payload) { Vue.set(state, "targeted", payload); },
 	SET_PATH(state, path) { Vue.set(state, 'path', path); },
-	INITIALIZED(state) { Vue.set(state, 'initialized', true); },
-	UNINITIALIZED(state) { Vue.set(state, 'initialized', false); },
+	INITIALIZED(state) { Vue.set(state, 'encounter_initialized', true); },
+	UNINITIALIZED(state) { Vue.set(state, 'encounter_initialized', false); },
 	RESET_STORE(state) { Object.assign(state, getDefaultState()); },
 
 	//ENCOUNTER MUTATIONS

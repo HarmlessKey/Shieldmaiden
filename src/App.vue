@@ -1,5 +1,5 @@
 <template>
-	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
+	<div id="app" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
@@ -137,7 +137,6 @@
 	},
 	data() {
 		return {
-			initialized: false,
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
@@ -179,6 +178,7 @@
 			storeBroadcast: 'broadcast'
 		}),
 		...mapGetters([
+			"initialized",
 			"theme"
 		]),
 		announcement: {
@@ -196,16 +196,6 @@
 		}
 	},
 	created() {
-		this.initialize().then(() => {
-
-			const roll = Math.floor(Math.random() * 6 + 15);
-
-			console.log(
-				`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
-				"color: #83b547;"
-			);
-			this.initialized = true;
-		});
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {

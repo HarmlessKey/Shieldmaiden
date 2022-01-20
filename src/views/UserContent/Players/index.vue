@@ -66,7 +66,7 @@
 						</q-td>
 					</template>
 					<div slot="no-data" />
-					<hk-loader slot="loading" name="NPCs" />
+					<hk-loader slot="loading" name="players" />
 				</q-table>
 			</template>
 
@@ -77,7 +77,6 @@
 				Get more player slots
 			</router-link>
 		</div>
-		<q-resize-observer @resize="setSize" />
 	</hk-card>
 </template>
 
@@ -99,7 +98,6 @@
 			return {
 				loading_players: true,
 				search: "",
-				card_width: 0,
 				columns: [
 					{
 						name: "avatar",
@@ -163,10 +161,7 @@
 			deletePlayer(key, index) {
 				this.players.splice(index, 1);
 				this.delete_player(key);
-			},
-			setSize(e) {
-				this.card_width = e.width;
-			},
+			}
 		}
 	}
 </script>

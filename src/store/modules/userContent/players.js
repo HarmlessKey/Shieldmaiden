@@ -24,7 +24,8 @@ const state = {
   player_services: null,
   players: {},
   player_count: 0,
-  cached_players: {}
+  cached_players: {},
+  characters: {}
 };
 
 const getters = {
@@ -34,6 +35,14 @@ const getters = {
     .filter((player, key) => {
       player.key = key;
       return player;
+    }).orderBy("character_name", "asc").value();
+  },
+  characters: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.characters)
+    .filter((character, key) => {
+      character.key = key;
+      return character;
     }).orderBy("character_name", "asc").value();
   },
   player_count: (state) => { return state.player_count; },
@@ -102,6 +111,34 @@ const actions = {
         throw error;
       }
     }
+  },
+
+  /**
+   * Fetches all the characters for a user
+   * and stores them in characters
+   */
+   async get_characters({ rootGetters, dispatch, commit }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    let characters = (state.characters) ? state.characters : undefined;
+
+    if((!characters || !Object.keys(characters).length) && uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        const entries = await services.getCharacters(uid);
+        
+        if(entries) {
+          characters = {};
+          for(const [playerId, value] of Object.entries(entries)) {
+            characters[playerId] = await services.getSearchPlayer(value.user, playerId);
+            characters[playerId].user_id = value.user;
+          }
+        }
+        commit("SET_CHARACTERS", characters);
+      } catch(error) {
+        throw error;
+      }
+    }
+    return characters;
   },
 
   async get_owner_id({dispatch}, { uid, playerId }) {
@@ -346,6 +383,48 @@ const actions = {
     }
   },
 
+  /**
+   * Give control over a player to another user
+   * 
+   * @param {string} user_id
+   * @param {string} id 
+   */
+   async give_out_control({ commit, dispatch, rootGetters }, { user_id, id }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.updatePlayer(uid, id, "", { "control": user_id });
+        await services.giveControl(uid, id, user_id);
+        commit("SET_CONTROL", { uid, id, user_id });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Removes the character control of a player
+   * - control property on the player must be removed too
+   * 
+   * @param {string} id playerId
+   * @param {string} owner_id uid of the user who created the player
+   */
+  async remove_control({ commit, dispatch }, { uid, id, owner_id }) {
+    if(uid) {
+      const services = await dispatch("get_player_services");
+      try {
+        await services.removeControl(uid, id);
+        await services.updatePlayer(owner_id, id, "", { control: null });
+        commit("REMOVE_CHARACTER", id);
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   clear_player_store({ commit, rootGetters }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
@@ -356,6 +435,7 @@ const actions = {
 const mutations = {
   SET_PLAYER_SERVICES(state, payload) { Vue.set(state, "player_services", payload); },
   SET_PLAYERS(state, payload) { Vue.set(state, "players", payload); },
+  SET_CHARACTERS(state, payload) { Vue.set(state, "characters", payload); },
   SET_PLAYER_COUNT(state, value) { Vue.set(state, "player_count", value); },
   SET_PLAYER(state, { id, search_player }) {
     if(state.players) {
@@ -366,6 +446,9 @@ const mutations = {
   },
   REMOVE_PLAYER(state, id) { 
     Vue.delete(state.players, id);
+  },
+  REMOVE_CHARACTER(state, id) { 
+    Vue.delete(state.characters, id);
   },
   SET_CACHED_PLAYER(state, { uid, id, player }) { 
     if(state.cached_players[uid]) {
@@ -381,6 +464,9 @@ const mutations = {
   },
   SET_XP(state, { uid, id, value }) { 
     Vue.set(state.cached_players[uid][id], "experience", value);
+  },
+  SET_CONTROL(state, { uid, id, user_id }) { 
+    Vue.set(state.cached_players[uid][id], "control", user_id);
   },
   REMOVE_COMPANION(state, { uid, playerId, id }) {
     if(state.cached_players[uid] && state.cached_players[uid][playerId] && state.cached_players[uid][playerId].campanions) {
@@ -401,6 +487,7 @@ const mutations = {
   CLEAR_STORE(state) {
     Vue.set(state, "players", {});
     Vue.set(state, "player_count", 0);
+    Vue.set(state, "characters", {});
   }
 };
 

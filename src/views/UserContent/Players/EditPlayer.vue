@@ -5,13 +5,13 @@
 				<div id="players" v-if="($route.name == 'Edit Character' && player.control === $store.getters.user.uid) || $route.name != 'Edit Character'">
 
 					<!-- GIVE OUT CONTROL -->
-					<hk-card header="Give out control" v-if="$route.name != 'AddPlayers' && $route.name != 'Edit Character'">
+					<hk-card header="Give out control" v-if="$route.name !== 'Add player' && $route.name !== 'Edit character'">
 						<div class="card-body">
 							<GiveCharacterControl :playerId="playerId" :control="player.control" />
 						</div>
 					</hk-card>
 
-					<hk-card-deck class="mb-4">
+					<hk-card-deck>
 						<hk-card header="Basic Info" >
 							<div class="card-body">
 								<ValidationProvider rules="max:15|required" name="Name" v-slot="{ errors, invalid, validated }">
@@ -436,7 +436,7 @@
 </template>
 
 <script>
-	import GiveCharacterControl from '@/components/GiveCharacterControl.vue';
+	import GiveCharacterControl from './GiveCharacterControl.vue';
 	import { mapGetters, mapActions } from 'vuex';
 	import { experience } from '@/mixins/experience.js';
 	import { skills } from '@/mixins/skills.js';

@@ -8,9 +8,7 @@ export class playerServices {
 
   async getPlayers(uid) {
     try {
-      const players = await SEARCH_PLAYERS_REF.child(`${uid}/results`).once('value', snapshot => {
-        return snapshot;
-      });
+      const players = await SEARCH_PLAYERS_REF.child(`${uid}/results`).once('value');
       return players.val();
     } catch(error) {
       throw error;
@@ -20,9 +18,7 @@ export class playerServices {
   async getPlayerCount(uid) {
     try {
       const path = `${uid}/metadata/count`;
-      const count = await SEARCH_PLAYERS_REF.child(path).once('value', snapshot => {
-        return snapshot;
-      });
+      const count = await SEARCH_PLAYERS_REF.child(path).once('value');
       return count.val();
     } catch(error) {
       throw error;
@@ -32,10 +28,26 @@ export class playerServices {
   async getPlayer(uid, id) {
     console.log(`Player ${id} fetched from database`);
     try {
-      const player = await PLAYERS_REF.child(uid).child(id).once('value', snapshot => {
-        return snapshot;
-      });
+      const player = await PLAYERS_REF.child(uid).child(id).once('value');
       return player.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  async getSearchPlayer(uid, id) {
+    try {
+      const search_player = await SEARCH_PLAYERS_REF.child(`${uid}/results/${id}`).once('value');
+      return search_player.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  async getCharacters(uid) {
+    try {
+      const characters = await CHARACTER_CONTROL_REF.child(uid).once('value');
+      return characters.val();
     } catch(error) {
       throw error;
     }
@@ -44,9 +56,7 @@ export class playerServices {
   // Fetches the UID of the owner of a player
   async getOwner(uid, playerId) {
     try {
-      const userId = await CHARACTER_CONTROL_REF.child(uid).child(playerId).once('value', snapshot => {
-        return snapshot;
-      });
+      const userId = await CHARACTER_CONTROL_REF.child(uid).child(playerId).once('value');
       return userId.val();
     } catch(error) {
       throw error;
@@ -56,9 +66,7 @@ export class playerServices {
   async getPlayerProp(uid, id, property) {
     const path = `${uid}/${id}/${property}`;
     try {
-      const value = await PLAYERS_REF.child(path).once('value', snapshot => {
-        return snapshot;
-      });
+      const value = await PLAYERS_REF.child(path).once('value');
       return value.val();
     } catch(error) {
       throw error;
@@ -118,6 +126,39 @@ export class playerServices {
 
       //Update search_players
       SEARCH_PLAYERS_REF.child(`${uid}/results`).child(id).remove();
+      return;
+    } catch(error){
+      throw error;
+    }
+  }
+
+  /**
+   * Give control over a character to another user
+   * 
+   * @param {string} uid uid of the owner of the characte
+   * @param {string} id id of the character
+   * @param {string} user_id uid of the user getting control
+   */
+  async giveControl(uid, id, user_id) {
+    const path = `${user_id}/${id}/user`;
+    CHARACTER_CONTROL_REF.child(path).set(uid).then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+  
+
+  /**
+   * Gives up control over character
+   * 
+   * @param {string} uid 
+   * @param {string} id 
+   * @returns 
+   */
+  async removeControl(uid, id) {
+    try {  
+      await CHARACTER_CONTROL_REF.child(uid).child(id).remove();
       return;
     } catch(error){
       throw error;

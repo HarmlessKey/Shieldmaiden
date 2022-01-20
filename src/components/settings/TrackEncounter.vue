@@ -7,7 +7,7 @@
 			of the entities within the encounter is. Below you can determine what should be 
 			visible on the public initiative list.
 		</p>
-		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="d-block mb-3">
+		<a @click="setSlide({ show: true, type: 'PlayerLink'})" class="btn bg-neutral-4 mb-3">
 			Share your adventures
 		</a>
 
@@ -55,41 +55,27 @@
 						</q-item-section>
 					</q-item>
 				</template>
-				<span slot="after" v-if="setting.info">
-					<a @click.stop>
-						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card :dark="$store.getters.theme === 'dark'">
-									<q-card-section class="bg-neutral-9">
-										<b>{{ setting.name }}</b>
-									</q-card-section>
-
-									<q-card-section>
-										<div v-html="setting.info" />
-										<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</a>
-				</span>
+				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
+					<q-icon name="info" size="sm" color="neutral-3" />
+					<div slot="content" v-html="setting.info" />
+				</hk-popover>
 			</q-select>
 		</div>
 		
-		<a class="btn mt-3 bg-neutral-5" @click="setDefault()">Reset to default</a>
+		<a class="btn mt-3 bg-neutral-5" @click="set_default_settings('track')">
+			Reset to default
+		</a>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapActions } from 'vuex';
+	import { mapGetters, mapActions } from 'vuex';
 
 	export default {
-		name: 'Track',
+		name: 'TrackEncounterSettings',
 		data(){
 			return {
 				userId: this.$store.getters.user.uid,
-				copy: window.location.host + '/user/' + this.$store.getters.user.uid,
 				types: {
 					general: {
 						type_settings: [
@@ -198,51 +184,29 @@
 				},
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/track`),
-					asObject: true,
-				}
+		computed: {
+			...mapGetters(["userSettings"]),
+			settings() {
+				return this.userSettings.track || {};
 			}
 		},
 		methods: {
 			...mapActions([
-				"setSlide"
+				"setSlide",
+				"update_settings",
+				"set_default_settings"
 			]),
-			setSetting(entity, type, value) {
-				if(value == undefined) {
-					db.ref(`settings/${this.userId}/track/${entity}/${type}`).remove();
-				} else {
-					db.ref(`settings/${this.userId}/track/${entity}/${type}`).set(value);
-				}
-			},
-			setDefault() {
-				db.ref(`settings/${this.userId}/track`).remove();
+			setSetting(sub_category, type, value) {
+				this.update_settings({
+					category: "track",
+					sub_category,
+					type,
+					value
+				});
 			},
 			selected(value, current) {
 				return value === current;
-			},
-			copyLink() {
-				let toCopy = document.querySelector('#copy')
-				toCopy.setAttribute('type', 'text')    //hidden
-				toCopy.select()
-
-				try {
-					var successful = document.execCommand('copy');
-					var msg = successful ? 'Successful' : 'Unsuccessful';
-
-					this.$snotify.success(msg, 'Link Copied!', {
-						position: "rightTop"
-					});
-				} catch (err) {
-					alert('Something went wrong, unable to copy');
-				}
-
-				/* unselect the range */
-				toCopy.setAttribute('type', 'hidden')
-				window.getSelection().removeAllRanges()
-			},
+			},			
 			displaySetting(type, key, value) {
 				let options = this.types[type].type_settings.filter(item => {
 					return item.key === key;

@@ -1,8 +1,7 @@
-import { auth, db } from '@/firebase';
+import { auth } from '@/firebase';
 import Vue from 'vue';
 import { browserDetect } from '../../functions';
 
-const settings_ref = db.ref('settings');
 
 export const general_module = {
 	state: {
@@ -28,19 +27,22 @@ export const general_module = {
 	actions: {
 		// Initialize basic settings depending on a user being logged in or not.
 		async initialize({ state, dispatch, commit }) {
-			if(state.initialized) {
-				return;
-			}
+			if(state.initialized) return;
+		
 			dispatch("setTips");
 
+			// In main.js before the Vue instance is rendered
+			// it's checked if there is a firebase authorization present.
+			// Therefore we can check here with 'auth' if there is a user.
 			if(auth.currentUser !== null) {
 				await dispatch("setUser");
 				// first set the user settings in order to set theme correctly
-				await dispatch("setUserSettings")
+				await dispatch("set_user_settings")
 					.then(() => {
 						// wait for all content to be fetched before checking encumbrance
 						return Promise.all([
 							dispatch("setTheme"),
+							dispatch("setSideCollapsed"),
 							dispatch("setUserInfo"),
 							dispatch("players/fetch_player_count"),
 							dispatch("npcs/fetch_npc_count"),
@@ -53,7 +55,7 @@ export const general_module = {
 					.then(async () => {
 						await dispatch("checkEncumbrance");
 
-						const roll = Math.floor(Math.random() * 6 + 15)
+						const roll = Math.floor(Math.random() * 6 + 15);
 						console.log(
 							`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
 							"color: #83b547;"
@@ -84,7 +86,7 @@ export const general_module = {
 		reinitialize({ commit }) {
 			commit("SET_INITIALIZED", false);
 		},
-		setTheme({ commit, state, rootGetters }, theme) {
+		setTheme({ commit, state, rootGetters, dispatch }, theme) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 			
 			// If no theme is specified, it's called from initialize() so set it to the previously choosen theme if it exists, or dark otherwise.
@@ -101,7 +103,11 @@ export const general_module = {
 			else {
 				if(theme !== state.theme) {
 					if(uid) {
-						settings_ref.child(uid).child("general/theme").set(theme);
+						dispatch("update_settings", { 
+							category: "general",
+							type: "theme",
+							value: theme
+						});
 					} else {
 						localStorage.setItem("theme", theme);
 					}
@@ -147,37 +153,29 @@ export const general_module = {
 				commit('SET_SLIDE', false);
 			}	
 		},
-		toggleSideCollapsed({ commit, state, rootGetters }) {
-			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
-			let collapsed_ref = (uid) ? settings_ref.child(uid).child('general/side_collapsed') : false;
+		toggleSideCollapsed({ commit, state, dispatch }) {
+			commit("TOGGLE_SIDE_COLLAPSE"); // First toggle
+			const collapsed = state.side_collapsed; // Then get from state
 			
-			commit("TOGGLE_SIDE_COLLAPSE");
-			
-			let collapsed = state.side_collapsed;
-			if (collapsed === false){
-				collapsed_ref.remove();
-			}
-			else
-				collapsed_ref.set(true);
+			// Then update in user settings
+			dispatch("update_settings", { 
+				category: "general",
+				type: "side_collapsed",
+				value: collapsed || undefined
+			});
 		},
 		setSideCollapsed({ commit, rootGetters }) {
 			const uid = rootGetters.user ? rootGetters.user.uid : undefined;
 
 			if(uid) {
-				let general = settings_ref.child(uid).child('general');
-				general.on('value', snapshot => {
-					let collapse = false;
-					if (snapshot.val())
-						collapse = snapshot.val().side_collapsed;
-
-					commit("SET_SIDE_COLLAPSE", collapse);
-				})
+				const collapsed = (rootGetters.userSettings.general && rootGetters.userSettings.general.side_collapsed) 
+					? rootGetters.userSettings.general.side_collapsed : false;
+				commit("SET_SIDE_COLLAPSE", collapsed);
 			}
 		},
 		setSideSmallScreen({ commit }, payload) {
 			commit("SET_SIDE_SMALL_SCREEN", payload)
 		},
-		
 	},
 	mutations: {
 		SET_INITIALIZED(state, payload) { Vue.set(state, "initialized", payload) },

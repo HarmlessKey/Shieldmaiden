@@ -26,10 +26,9 @@ const state = {
 }
 
 const getters = {
+	item_services: (state) => { return state.item_services },
 	items: (state) => { return state.items },
 	item_count: (state) => { return state.item_count },
-	item_services: (state) => { return state.item_services },
-	
 }
 
 const actions = {

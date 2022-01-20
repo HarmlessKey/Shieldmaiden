@@ -57,38 +57,28 @@
 						</q-item-section>
 					</q-item>
 				</template>
-				<span slot="after" v-if="setting.info">
-					<a @click.stop>
-						<q-icon name="info" v-if="setting.info" size="medium">
-							<q-menu :dark="$store.getters.theme === 'dark'" anchor="top middle" self="bottom middle" :max-width="setting.infoWidth || '250px'">
-								<q-card :dark="$store.getters.theme === 'dark'">
-									<q-card-section class="bg-neutral-9">
-										<b>{{ setting.name }}</b>
-									</q-card-section>
-
-									<q-card-section>
-										<div v-html="setting.info" />
-										<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
-									</q-card-section>
-								</q-card>
-							</q-menu>
-						</q-icon>
-					</a>
-				</span>
+				<hk-popover v-if="setting.info" slot="after" :header="setting.name">
+						<q-icon name="info" size="sm" color="neutral-3" />
+						<div slot="content">
+							<div v-html="setting.info" />
+							<Keybindings v-if="setting.key === 'keyBinds'" :data="{ sm: true }" />
+						</div>
+				</hk-popover>
 			</q-select>
 		</div>
 
-		<a class="btn bg-neutral-5 mt-3" @click="setDefault()">Reset to default</a>
+		<a class="btn bg-neutral-5 mt-3" @click="set_default_settings('general')">
+			Reset to default
+		</a>
 	</div>
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import Keybindings from '@/components/slides/Keybindings.vue';
-	import { mapActions } from "vuex";
+	import { mapGetters, mapActions } from "vuex";
 
 	export default {
-		name: 'General',
+		name: 'GeneralSettings',
 		components: {
 			Keybindings
 		},
@@ -174,27 +164,24 @@
 				},				
 			}
 		},
-		firebase() {
-			return {
-				settings: {
-					source: db.ref(`settings/${this.userId}/general`),
-					asObject: true,
-				},
+		computed: {
+			...mapGetters(["userSettings"]),
+			settings() {
+				return this.userSettings.general || {};
 			}
 		},
 		methods: {
 			...mapActions([
-				"setTheme"
+				"setTheme",
+				"update_settings",
+				"set_default_settings"
 			]),
 			setSetting(type, value) {
-				if(value == undefined) {
-					db.ref(`settings/${this.userId}/general/${type}`).remove();
-				} else {
-					db.ref(`settings/${this.userId}/general/${type}`).set(value);
-				}
-			},
-			setDefault() {
-				db.ref(`settings/${this.userId}/general`).remove();
+				this.update_settings({
+					category: "general",
+					type,
+					value
+				});
 			},
 			displaySetting(type, key, value) {
 				let options = this.types[type].type_settings.filter(item => {

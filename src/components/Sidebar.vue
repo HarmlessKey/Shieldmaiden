@@ -234,7 +234,6 @@
 					this.small_screen = false;
 				}
 			}
-			this.setSideCollapsed();
 		}, 
 	}
 </script>

@@ -1,12 +1,12 @@
 import { db, auth } from '@/firebase';
+import { userServices } from "@/services/user"; 
 import Vue from 'vue';
 
 const users_ref = db.ref('users');
-const settings_ref = db.ref('settings');
 const tiers_ref = db.ref('tiers');
 
-
 const	state = {
+	user_services: null,
 	user: undefined,
 	userInfo: undefined,
 	tier: undefined,
@@ -19,7 +19,8 @@ const	state = {
 	broadcast: {},
 };
 
-const getters ={
+const getters = {
+	user_services: (state) => { return state.user_services },
 	user: function( state ) { return state.user; },
 	userInfo(state) { return state.userInfo; },
 	userSettings(state) { return state.userSettings; },
@@ -33,6 +34,13 @@ const getters ={
 };
 
 const actions = {
+	async get_user_services({ getters, commit }) {
+		if (getters.user_services === null) {
+			commit("SET_USER_SERVICES", new userServices);
+		}
+		return getters.user_services;
+	},
+	
 	setUser({ commit }) {
 		commit("SET_USER", auth.currentUser);
 	},
@@ -149,20 +157,24 @@ const actions = {
 			}, 1000)
 		});
 	},
-	async setUserSettings({ commit, rootGetters }) {
+	async set_user_settings({ commit, dispatch, rootGetters }) {
 		const uid = rootGetters.user.uid;
-		let settings = await settings_ref.child(uid);
-		settings.on('value', async settings_snapshot => {
-			const user_settings = await settings_snapshot.val();
-			commit('SET_USER_SETTINGS', user_settings);
-		});
+		if(uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				const user_settings = await services.getSettings(uid);
+				commit('SET_USER_SETTINGS', user_settings);
+			} catch(error) {
+				throw error;
+			}
+		}
 
 		// Return a promise, so you can wait for it in the initialize function from store/general.js
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve()
-			}, 1000)
-		});
+		// return new Promise((resolve) => {
+		// 	setTimeout(() => {
+		// 		resolve()
+		// 	}, 1000)
+		// });
 	},
 	remove_voucher( { rootGetters }) {
 		if(rootGetters.user) {
@@ -172,7 +184,7 @@ const actions = {
 	setPoster({ state }) {
 		db.ref('posters').once('value', snapshot => {
 			let count = snapshot.val();
-			let new_count = count + 1;
+			const new_count = count + 1;
 			db.ref('posters').set(new_count);
 			state.poster = true;
 		})
@@ -190,7 +202,6 @@ const actions = {
 
 		let used_slots = Object.values(count).reduce((sum, count) => sum + count, 0);
 
-		
 		// Count encounters for every campaign
 		// Save the highest count 
 		for (const encounter_count of Object.values(rootGetters["encounters/encounter_count"])) {
@@ -251,6 +262,54 @@ const actions = {
 			commit("SET_BROADCAST_SHARES", shares);
 		}
 	},
+
+	/**
+	 * Update settings
+	 * 
+	 * @param {string} category general|encounter|track 
+	 * @param {string} sub_category undefined|npcs|players
+	 * @param {string} type  
+	 * @param {any} value  
+	 */
+	async update_settings({ commit, dispatch, rootGetters }, {category, sub_category, type, value}) {
+		const uid = rootGetters.user.uid;
+		if(uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.updateSettings(uid, category, sub_category, type, value);
+				commit('UPDATE_USER_SETTINGS', { category, sub_category, type, value });
+
+				// The sidebar collapse is stored in a variable in the general store
+				if(category === "general") dispatch("setSideCollapsed");
+			} catch(error) {
+				throw error;
+			}
+		}
+	},
+
+	/**
+	 * Restores default settings for a category
+	 * Default settings have no value, so we just delete the category from settings
+	 * 
+	 * @param {string} category general|encounter|track 
+	 * @param {string} sub_category undefined|npcs|players
+	 */
+	async set_default_settings({ commit, dispatch, rootGetters }, category) {
+		const uid = rootGetters.user.uid;
+		if(uid) {
+			const services = await dispatch("get_user_services");
+			try {
+				await services.setDefaultSettings(uid, category);
+				commit('SET_DEFAULT_SETTINGS', category);
+
+				// The sidebar collapse is stored in a variable in the general store
+				if(category === "general") dispatch("setSideCollapsed");
+			} catch(error) {
+				throw error;
+			}
+		}
+	},
+
 	// Signs out the user and cleares all content stores.
 	async sign_out({commit, dispatch}) {
 		// Clear content stores
@@ -268,11 +327,30 @@ const actions = {
 };
 
 const	mutations = {
-	SET_USER(state, payload) { state.user = payload; },
-	SET_USERINFO(state, payload) { state.userInfo = payload; },
-	SET_USER_SETTINGS(state, payload) { state.userSettings = payload; },
-	SET_TIER(state, payload) { state.tier = payload; },
-	SET_VOUCHER(state, payload) { state.voucher = payload; },	
+	SET_USER_SERVICES(state, payload) { Vue.set(state, "user_services", payload); },
+	SET_USER(state, payload) { Vue.set(state, "user", payload); },
+	SET_USERINFO(state, payload) { Vue.set(state, "userInfo", payload); },
+	SET_USER_SETTINGS(state, payload) { Vue.set(state, "userSettings", payload); },
+	UPDATE_USER_SETTINGS(state, { category, sub_category, type, value }) {
+		if(!sub_category) {
+			if(state.userSettings && state.userSettings[category]) {
+				Vue.set(state.userSettings[category], type, value); 
+			} else {
+				Vue.set(state.userSettings, category, { [type]: value });
+			}
+		} else if(state.userSettings && state.userSettings[category]) {
+			if(state.userSettings[category][sub_category]) {
+				Vue.set(state.userSettings[category][sub_category], type, value); 
+			} else {
+				Vue.set(state.userSettings[category], sub_category, { [type]: value });
+			}
+		} else {
+			Vue.set(state.userSettings, category, { [sub_category]: { [type]: value } });
+		}
+	},
+	SET_DEFAULT_SETTINGS(state, category) { Vue.delete(state.userSettings, category); },
+	SET_TIER(state, payload) { Vue.set(state, "tier", payload); },
+	SET_VOUCHER(state, payload) { Vue.set(state, "voucher", payload); },	
 	SET_ENCUMBRANCE(state, value) { Vue.set(state, "overencumbered", value); },
 	SET_CONTENT_COUNT(state, value) { Vue.set(state, "content_count", value); },
 	SET_SLOTS_USED(state, { available_slots, used_slots }) { 

@@ -91,7 +91,6 @@ export const routes = [{
 					},
 					{
 						path: ":campid",
-						name: "Run campaign",
 						component: { render (c) { return c('router-view') }},
 						meta: {
 							title: "Run campaign"

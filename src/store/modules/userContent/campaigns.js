@@ -26,7 +26,7 @@ const state = {
   campaign_services: null,
   active_campaign: undefined,
   cached_campaigns: {},
-  campaigns: {},
+  campaigns: undefined,
   campaign_count: 0
 };
 
@@ -62,11 +62,11 @@ const actions = {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let campaigns = (state.campaigns) ? state.campaigns : undefined;
 
-    if((!campaigns || !Object.keys(campaigns).length) && uid) {
+    if(!campaigns && uid) {
       const services = await dispatch("get_campaign_services");
       try {
         campaigns = await services.getCampaigns(uid);
-        commit("SET_CAMPAIGNS", campaigns);
+        commit("SET_CAMPAIGNS", campaigns || {});
       } catch(error) {
         throw error;
       }
@@ -662,7 +662,7 @@ const mutations = {
   },
   CLEAR_STORE(state) {
     Vue.set(state, "active_campaign", undefined);
-    Vue.set(state, "campaigns", {});
+    Vue.set(state, "campaigns", undefined);
     Vue.set(state, "campaign_count", 0);
   }
 };

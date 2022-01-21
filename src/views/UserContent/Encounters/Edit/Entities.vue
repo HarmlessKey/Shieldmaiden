@@ -302,7 +302,6 @@
 				loading_monsters: true,
 				loading_npcs: true,
 				monsters: [],
-				npcs: [],
 				players: {},
 				searchMonster: "",
 				searchNpc: "",
@@ -350,18 +349,19 @@
 		},
 		async mounted() {
 			await this.fetchMonsters();
-			this.npcs = await this.get_npcs();
+			this.loading_monsters = false;
+			await this.get_npcs();
 			this.loading_npcs = false;
 		},
 		watch: {
-			// Prop is changed in parent to trigger addAllPlayers function
+			// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
 			addPlayers() {
 				this.addAllPlayers();
 			}
 		},
 		computed: {
 			...mapGetters(["content_count"]),
-			...mapGetters("npcs", ["npc_count"]),
+			...mapGetters("npcs", ["npcs", "npc_count"]),
 			monster_resource: {
 				get() {
 					const resource = (this.npc_count) ? "custom" : "srd";

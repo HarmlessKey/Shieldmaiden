@@ -25,7 +25,6 @@ const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
-const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
 const Offline = () => import('@/views/Offline.vue');
 const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
@@ -296,6 +295,22 @@ export const routes = [{
 							title: "Edit character"
 						}
 					},
+				]
+			},
+
+			// Followed users
+			{
+				path: "followed",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Followed users"
+				},
+				children: [
+					{
+						path: '',
+						name: "Followed users",
+						component: () => import('@/views/UserContent/Followed.vue'),
+					}
 				]
 			},
 		]
@@ -782,16 +797,6 @@ export const routes = [{
 		}
 	},
 	{
-		path: '/followed',
-		name: 'Followed users',
-		component: Followed,
-		meta: {
-			requiresAuth: true
-		}
-	},
-	
-
-	{
 		path: '/run-encounter/:campid/:encid',
 		name: 'RunEncounter',
 		component: RunEncounter,
@@ -849,6 +854,7 @@ export const routes = [{
 	{ path: "/reminders", redirect: "/content/reminders" },
 	{ path: "/items", redirect: "/content/items" },
 	{ path: "/encounters/*", redirect: "/content/campaigns" },
+	{ path: "/followed", redirect: "/content/followed" },
 
 	{
 		path: '*',

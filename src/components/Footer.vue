@@ -22,8 +22,8 @@
 							<div>
 								<h2 class="neutral-4">Player Content</h2>
 								<ul>
-									<li><router-link to="/characters">Characters</router-link></li>
-									<li><router-link to="/followed">Following</router-link></li>
+									<li><router-link to="/content/characters">Characters</router-link></li>
+									<li><router-link to="/content/followed">Following</router-link></li>
 								</ul>
 								<h2 class="neutral-4">Account</h2>
 								<ul>

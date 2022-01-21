@@ -28,7 +28,14 @@ const state = {
 };
 
 const getters = {
-  npcs: (state) => { return state.npcs; },
+  npcs: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.npcs)
+    .filter((npc, key) => {
+      npc.key = key;
+      return npc;
+    }).orderBy("name", "asc").value();
+  },
   npc_count: (state) => { return state.npc_count; },
   npc_services: (state) => { return state.npc_services; }
 };
@@ -47,25 +54,17 @@ const actions = {
    */
   async get_npcs({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    let npcs_object = (state.npcs) ? state.npcs : undefined;
+    let npcs = (state.npcs) ? state.npcs : undefined;
 
-    if(!npcs_object && uid) {
+    if(!npcs && uid) {
       const services = await dispatch("get_npc_services");
       try {
-        npcs_object = await services.getNpcs(uid);
-        
-        commit("SET_NPCS", npcs_object);
+        npcs = await services.getNpcs(uid);  
+        commit("SET_NPCS", npcs || {});
       } catch(error) {
         throw error;
       }
     }
-    // Convert object to sorted array
-    const npcs = _.chain(npcs_object)
-    .filter(function(npc, key) {
-      npc.key = key;
-      return npc;
-    }).orderBy("name", "asc").value();
-
     return npcs;
   },
   
@@ -91,7 +90,7 @@ const actions = {
     let npc = (state.cached_npcs[uid]) ? state.cached_npcs[uid][id] : undefined;
 
     // The npc is not in the store and needs to be fetched from the database
-    // If the NPC is not found in firebase, it's returned null
+    // If the NPC is not found in firebase, it returns null
     // We don't have to check for null NPCs again, we know they don't exist
     // Therefore we only do a call to firebase if npc === undefined
     if(npc === undefined) {
@@ -235,8 +234,8 @@ const actions = {
       const services = await dispatch("get_npc_services");
 
       try {
-        const all_npcs = await services.getFullllNpcs(uid);
-        commit("SET_CACHED_NPCS", { uid, npcs:all_npcs })
+        const all_npcs = await services.getFullNpcs(uid);
+        commit("SET_CACHED_NPCS", { uid, npcs: all_npcs })
         return all_npcs;
       } catch(error) {
         throw error;
@@ -255,6 +254,9 @@ const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
   SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
   SET_NPCS(state, value) { Vue.set(state, "npcs", value); },
+  SET_CACHED_NPCS(state, { uid, npcs }) {
+    Vue.set(state.cached_npcs, uid, npcs);
+  },
   SET_CACHED_NPC(state, { uid, id, npc }) { 
     if(state.cached_npcs[uid]) {
       Vue.set(state.cached_npcs[uid], id, npc);

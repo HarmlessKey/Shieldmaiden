@@ -4,7 +4,7 @@
 			<hk-card>
 				<ContentHeader type="campaigns" @add="add = !add" />
 
-				<div class="card-body">
+				<div class="card-body" v-if="!loading_campaigns">
 					<!-- NO PLAYERS YET -->
 					<div class="first-campaign pb-4" v-if="campaign_count && !player_count">
 						<h2>Create players for your campaigns</h2>
@@ -177,6 +177,7 @@
 						</q-form>
 					</div>
 				</div>
+				<hk-loader v-else name="campaigns" />
 			</hk-card>
 
 		</template>
@@ -253,6 +254,7 @@
 		},
 		data() {
 			return {
+				loading_campaigns: true,
 				newCampaign: '',
 				add: false,
 				edit_players: {
@@ -278,6 +280,7 @@
 		},
 		async mounted() {
 			await this.get_campaigns();
+			this.loading_campaigns = false;
 		},
 		computed: {
 			...mapGetters([

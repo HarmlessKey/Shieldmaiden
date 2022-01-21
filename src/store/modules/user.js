@@ -17,6 +17,7 @@ const	state = {
 	userSettings: {},
 	poster: undefined,
 	broadcast: {},
+	followed: {}
 };
 
 const getters = {
@@ -31,6 +32,7 @@ const getters = {
 	slots_used(state) { return state.slots_used; },
 	poster(state) { return state.poster; },
 	broadcast(state) { return state.broadcast; },
+	followed(state) { return state.followed; },
 };
 
 const actions = {
@@ -263,6 +265,28 @@ const actions = {
 		}
 	},
 
+	async get_followed({ state, commit, dispatch }) {
+		const follow = (state.userInfo) ? state.userInfo.follow : undefined;
+    let followed = (state.followed) ? state.followed : undefined;
+
+    if(!followed || !Object.keys(followed).length) {
+      const services = await dispatch("get_user_services");
+      try {
+				followed = {};
+				for(const uid in follow) {
+					const user = await services.getSearchUser(uid);
+					if(user) {
+						followed[uid] = user.username;
+					}
+				}
+        commit("SET_FOLLOWED", followed);
+      } catch(error) {
+        throw error;
+      }
+    }
+    return followed;
+	},
+
 	/**
 	 * Update settings
 	 * 
@@ -356,6 +380,7 @@ const	mutations = {
 	SET_SLOTS_USED(state, { available_slots, used_slots }) { 
 		Vue.set(state, "slots_used", { available_slots, used_slots });
 	},
+	SET_FOLLOWED(state, payload) { Vue.set(state, "followed", payload); },
 	SET_BROADCAST(state, payload) { Vue.set(state, "broadcast", payload) },
 	SET_BROADCAST_ENCOUNTER(state, payload) { Vue.set(state.broadcast, "encounter", payload) },
 	SET_BROADCAST_SHARES(state, payload) { Vue.set(state.broadcast, "shares", payload) },

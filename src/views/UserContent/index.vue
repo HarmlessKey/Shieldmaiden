@@ -48,7 +48,7 @@
 					<p class="neutral-3">Dive right back into your adventure.</p>
 				</div>
 
-				<router-link :to="`/encounters/${active_campaign.key}`" class="btn btn-sm">
+				<router-link :to="`/content/campaigns/${active_campaign.key}`" class="btn btn-sm">
 					Continue <span class="d-none d-md-inline">campaign</span>
 				</router-link>
 			</div>
@@ -170,7 +170,7 @@
 						caption: "Characters you play"
 					},
 					{
-						path: "/followed",
+						path: "/content/followed",
 						label: "Following",
 						icon: "fas fa-users",
 						caption: "Other users you're following"

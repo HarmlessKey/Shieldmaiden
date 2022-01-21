@@ -2,7 +2,7 @@
 	<hk-card v-if="tier">
 		<ContentHeader type="players" />
 
-		<div class="card-body">
+		<div class="card-body" v-if="!loading_players">
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
 			<template v-if="players.length">
 				<q-input 
@@ -57,7 +57,7 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
@@ -77,6 +77,7 @@
 				Get more player slots
 			</router-link>
 		</div>
+		<hk-loader v-else name="players" />
 	</hk-card>
 </template>
 
@@ -133,17 +134,17 @@
 		},
 		methods: {
 			...mapActions("players", ["get_players", "delete_player"]),
-			confirmDelete(e, key, player, index) {
+			confirmDelete(e, key, player) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deletePlayer(key, index);
+					this.deletePlayer(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + player.character_name + '?', 'Delete player', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deletePlayer(key, index)
+								this.deletePlayer(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -158,8 +159,7 @@
 					});
 				}
 			},
-			deletePlayer(key, index) {
-				this.players.splice(index, 1);
+			deletePlayer(key) {
 				this.delete_player(key);
 			}
 		}

@@ -26,8 +26,15 @@ const state = {
 }
 
 const getters = {
+	items: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.items)
+    .filter((item, key) => {
+      item.key = key;
+      return item;
+    }).orderBy("name", "asc").value();
+  },
 	item_services: (state) => { return state.item_services },
-	items: (state) => { return state.items },
 	item_count: (state) => { return state.item_count },
 }
 
@@ -46,27 +53,17 @@ const actions = {
 	 */
 	async get_items({ rootGetters, dispatch, commit }) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		let items_object = (state.items) ? state.items : undefined;
+		let items = (state.items) ? state.items : undefined;
 
-		if(!items_object && uid) {
+		if(!items && uid) {
 			const services = await dispatch("get_item_services");
 			try {
-				items_object = await services.getItems(uid);
-				if (items_object === null) {
-					items_object = {}
-				}
-				
-				commit("SET_ITEMS", items_object);
+				items = await services.getItems(uid);
+				commit("SET_ITEMS", items || {});
 			} catch(error) {
 				throw error;
 			}
 		}
-		// Convert object to sorted array
-		const items = _.chain(items_object)
-		.filter(function(item, key) {
-			item.key = key;
-			return item;
-		}).orderBy("name", "asc").value();
 		return items;
 	},
 

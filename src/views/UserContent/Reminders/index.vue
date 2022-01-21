@@ -1,7 +1,7 @@
 <template>
 	<hk-card v-if="tier">
 		<ContentHeader type="reminders" />
-		<div class="card-body">
+		<div class="card-body" v-if="!loading_reminders">
 			<p class="neutral-2">
 				Reminders create useful notifications during encounters, 
 				so you don't forget someone was concentrating for instance.
@@ -43,7 +43,7 @@
 									Edit
 								</q-tooltip>
 							</router-link>
-							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
 								<i class="fas fa-trash-alt"></i>
 								<q-tooltip anchor="top middle" self="center middle">
 									Delete
@@ -62,6 +62,7 @@
 				Get more reminder slots
 			</router-link>
 		</div>
+		<hk-loader v-else name="reminders" />
 	</hk-card>
 </template>
 
@@ -81,9 +82,7 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				loading_reminders: true,
-				reminders: [],
 				search: "",
-
 				columns: [
 					{
 						name: "title",
@@ -104,25 +103,26 @@
 			...mapGetters([
 				'tier',
 				'overencumbered',
-			])
+			]),
+			...mapGetters("reminders", ["reminders"])
 		},
 		async mounted() {
-			this.reminders = await this.get_reminders();
+			await this.get_reminders();
 			this.loading_reminders = false;
 		},
 		methods: {
 			...mapActions("reminders", ["get_reminders", "delete_reminder"]),
-			confirmDelete(e, key, reminder, index) {
+			confirmDelete(e, key, reminder) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteReminder(key, index);
+					this.deleteReminder(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + reminder + '?', 'Delete reminder', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteReminder(key, index)
+								this.deleteReminder(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -137,9 +137,7 @@
 					});
 				}
 			},
-			deleteReminder(key, index) {
-				//Remove reminder
-				this.reminders.splice(index, 1);
+			deleteReminder(key) {
 				this.delete_reminder(key);
 			}
 		}

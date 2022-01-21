@@ -1,6 +1,6 @@
 <template>
 	<hk-card header="Your characters">
-		<div class="card-body">
+		<div class="card-body" v-if="!loading_characters">
 			<p class="neutral-2">These are the characters you play in other campaigns.</p>
 
 			<q-table
@@ -65,6 +65,7 @@
 			</q-table>
 			<p v-else>You have no control over other characters.</p>
 		</div>
+		<hk-loader v-else name="characters" />
 	</hk-card>
 </template>
 

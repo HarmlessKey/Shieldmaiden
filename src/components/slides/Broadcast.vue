@@ -1,6 +1,10 @@
 <template>
 	<div>
-		<hk-tip value="broadcast" title="Broadcast" content="Only when you're live, your players can see the initiative list of your active encounter." />
+		<hk-tip 
+			value="broadcast" 
+			title="Broadcast" 
+			content="Only when you're live, your players can see the initiative list of your active encounter." 
+		/>
 		<span 
 			class="live mb-3" 
 			:class="{'active': broadcast.live === campaign_id }">
@@ -66,19 +70,13 @@
 		props: ["data"],
 		data() {
 			return {
+				user: this.$store.getters.user,
 				campaign_id: this.data.campaign_id,
 				encounter_id: this.data.encounter_id,
+				campaign: {},
 				sharesSetter: undefined,
-				all: false
-			}
-		},
-		computed: {
-			...mapGetters([
-				"broadcast",
-				"campaign"
-			]),
-			options() {
-				let options =[
+				all: false,
+				options: [
 					{
 						label: "Action rolls",
 						value: "action_rolls"
@@ -103,15 +101,13 @@
 						label: "Skill checks",
 						value: "skill_rolls"
 					}
-				];
-				if(this.campaign.advancement === "experience") {
-					options.push({
-						label: "Experience awards",
-						value: "xp"
-					});
-				}
-				return options;
-			},
+				]
+			}
+		},
+		computed: {
+			...mapGetters([
+				"broadcast",
+			]),
 			shares: {
 				get() {
 					const shares = (this.broadcast.shares) ? this.broadcast.shares : [];
@@ -122,12 +118,25 @@
 				}
 			}
 		},
+		async mounted() {
+			this.campaign = await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaign_id
+			});
+			if(this.campaign.advancement === "experience") {
+				this.options.push({
+					label: "Experience awards",
+					value: "xp"
+				});
+			}
+		},
 		methods: {
 			...mapActions([
 				"setLive",
 				"setLiveShares",
 				"setSlide"
 			]),
+			...mapActions("campaigns", ["get_campaign"]),
 			live() {
 				this.setLive({
 					campaign_id: this.campaign_id, 

@@ -3,7 +3,7 @@
 		<hk-card>
 			<ContentHeader type="items" />
 
-			<div class="card-body">
+			<div class="card-body" v-if="!loading_items">
 				<p class="neutral-2">
 					These are your custom Items that you can use in your campaigns.
 				</p>
@@ -63,7 +63,7 @@
 										Edit
 									</q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
+								<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
 									<i class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
@@ -83,6 +83,7 @@
 					Get more item slots
 				</router-link>
 			</div>
+			<hk-loader v-else name="items" />
 		</hk-card>
 	</div>
 </template>
@@ -103,7 +104,6 @@
 			return {
 				userId: this.$store.getters.user.uid,
 				loading_items: true,
-				items: [],
 				search: "",
 				
 				columns: [
@@ -133,25 +133,25 @@
 				'tier',
 				'overencumbered',
 			]),
-			...mapGetters("items", ["item_count"]),
+			...mapGetters("items", ["items"]),
 		},
 		async mounted() {
-			this.items = await this.get_items();
+			await this.get_items();
 			this.loading_items = false;
 		},
 		methods: {
 			...mapActions("items", ["get_items", "delete_item"]),
-			confirmDelete(e, key, item, index) {
+			confirmDelete(e, key, item) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteItem(key, index);
+					this.deleteItem(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + item.name + '? It will also remove it from the campaign inventories it is linked to.', 'Delete item', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteItem(key, index)
+								this.deleteItem(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -166,9 +166,7 @@
 					});
 				}
 			},
-			deleteItem(key, index) {
-				//Remove item
-				this.items.splice(index, 1);
+			deleteItem(key) {
 				this.delete_item(key);
 			}
 		}

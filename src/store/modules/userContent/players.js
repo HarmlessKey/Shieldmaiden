@@ -22,10 +22,10 @@ const convert_player = (player) => {
 
 const state = {
   player_services: null,
-  players: {},
+  players: undefined,
   player_count: 0,
   cached_players: {},
-  characters: {}
+  characters: undefined
 };
 
 const getters = {
@@ -65,17 +65,15 @@ const actions = {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let players = (state.players) ? state.players : undefined;
 
-    if((!players || !Object.keys(players).length ) && uid) {
+    if(!players && uid) {
       const services = await dispatch("get_player_services");
       try {
-        players = await services.getPlayers(uid);
-        
-        commit("SET_PLAYERS", players);
+        players = await services.getPlayers(uid);   
+        commit("SET_PLAYERS", players || {});
       } catch(error) {
         throw error;
       }
     }
-    
     return players;
   },
 
@@ -121,7 +119,7 @@ const actions = {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     let characters = (state.characters) ? state.characters : undefined;
 
-    if((!characters || !Object.keys(characters).length) && uid) {
+    if(!characters && uid) {
       const services = await dispatch("get_player_services");
       try {
         const entries = await services.getCharacters(uid);
@@ -133,7 +131,7 @@ const actions = {
             characters[playerId].user_id = value.user;
           }
         }
-        commit("SET_CHARACTERS", characters);
+        commit("SET_CHARACTERS", characters || {});
       } catch(error) {
         throw error;
       }
@@ -485,9 +483,9 @@ const mutations = {
     }
   },
   CLEAR_STORE(state) {
-    Vue.set(state, "players", {});
+    Vue.set(state, "players", undefined);
     Vue.set(state, "player_count", 0);
-    Vue.set(state, "characters", {});
+    Vue.set(state, "characters", undefined);
   }
 };
 

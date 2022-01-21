@@ -10,7 +10,7 @@
 				</a>
 			</ContentHeader>
 			
-			<div class="card-body">
+			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">
 					These are your custom Non-Player Characters and monsters.
 				</p> 
@@ -63,21 +63,21 @@
 							</q-td>
 							<q-td v-else class="text-right d-flex justify-content-between">
 								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i class="fas fa-pencil"></i>
+									<i class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
-									<i class="fas fa-trash-alt"></i>
+								<a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
+									<i class="fas fa-arrow-alt-down" />
 									<q-tooltip anchor="top middle" self="center middle">
-										Delete
+										Download
 									</q-tooltip>
 								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="exportNPC(props.key)">
-									<i class="fas fa-brackets-curly"></i>
+								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
+									<i class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">
-										Export JSON
+										Delete
 									</q-tooltip>
 								</a>
 							</q-td>
@@ -95,6 +95,7 @@
 				</router-link>
 				<q-resize-observer @resize="setSize" />
 			</div>
+			<hk-loader v-else name="NPCs" />
 		</hk-card>
 
 		<!-- Bulk import dialog -->
@@ -123,13 +124,12 @@
 		components: {
     ImportNPC,
 		ContentHeader
-},
+		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
 				import_dialog: false,
 				loading_npcs: true,
-				npcs: [],
 				search: "",
 				card_width: 0,
 				columns: [
@@ -175,6 +175,7 @@
 				"tier",
 				"overencumbered",
 			]),
+			...mapGetters("npcs", ["npcs"]),
 			...mapGetters("players", ["players"]),
 			...mapGetters("campaigns", ["campaigns"]),
 			visibleColumns() {
@@ -186,29 +187,29 @@
 			}
 		},
 		async mounted() {
-			this.npcs = await this.get_npcs();
+			await this.get_npcs();
 			this.loading_npcs = false;
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc"]),
+			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
 					(val == 0.5) ? "1/2" :
 					val;
 			},
-			confirmDelete(e, key, npc, index) {
+			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteNpc(key, index);
+					this.deleteNpc(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + npc.name + '?', 'Delete NPC', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteNpc(key, index)
+								this.deleteNpc(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -224,8 +225,7 @@
 				}
 
 			},
-			deleteNpc(key, index) {
-				this.npcs.splice(index, 1);
+			deleteNpc(key) {
 				this.delete_npc(key);
 			},
 			async imported(npcs) {

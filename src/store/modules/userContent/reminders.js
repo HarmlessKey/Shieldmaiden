@@ -25,10 +25,16 @@ const state = {
 }
 
 const getters = {
-	reminders: (state) => { return state.reminders },
+	reminders: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.reminders)
+    .filter((reminder, key) => {
+      reminder.key = key;
+      return reminder;
+    }).orderBy("name", "asc").value();
+  },
 	reminder_count: (state) => { return state.reminder_count },
 	reminder_services: (state) => { return state.reminder_services },
-	
 }
 
 const actions = {
@@ -46,25 +52,17 @@ const actions = {
 	 */
 	async get_reminders({ rootGetters, dispatch, commit }) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-		let reminders_object = (state.reminders) ? state.reminders : undefined;
+		let reminders = (state.reminders) ? state.reminders : undefined;
 
-		if(!reminders_object && uid) {
+		if(!reminders && uid) {
 			const services = await dispatch("get_reminder_services");
 			try {
-				reminders_object = await services.getReminders(uid);
-				
-				commit("SET_REMINDERS", reminders_object);
+				reminders = await services.getReminders(uid);
+				commit("SET_REMINDERS", reminders || {});
 			} catch(error) {
 				throw error;
 			}
 		}
-		// Convert object to sorted array
-		const reminders = _.chain(reminders_object)
-		.filter(function(reminder, key) {
-			reminder.key = key;
-			return reminder;
-		}).orderBy("name", "asc").value();
-
 		return reminders;
 	},
 

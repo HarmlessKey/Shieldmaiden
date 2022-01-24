@@ -8,25 +8,24 @@ const Monsters_contrib = () => import('@/views/Contribute/Monsters.vue');
 const Monster_contrib = () => import('@/components/contribute/monster');
 const MonsterEdit = () => import('@/components/contribute/monster/edit.vue');
 
-const Sitemap = () => import('@/views/Sitemap.vue');
-const Privacy = () => import('@/views/Privacy.vue');
-const AboutUs = () => import('@/views/AboutUs.vue');
-const Documentation = () => import('@/views/Documentation.vue');
-const Planned = () => import('@/views/Planned.vue');
-const Feedback = () => import('@/views/Feedback.vue');
-const Updates = () => import('@/views/Updates.vue');
-const SignIn = () => import('@/views/SignIn.vue');
-const SignUp = () => import('@/views/SignUp.vue');
-const Settings = () => import('@/views/Settings.vue');
-const ResetPassword = () => import('@/views/ResetPassword.vue');
-const Patreon = () => import('@/views/Patreon.vue');
-const WeatherDemo = () => import('@/views/WeatherDemo.vue');
+const Sitemap = () => import('@/views/Pages/Sitemap.vue');
+const Privacy = () => import('@/views/Pages/Privacy.vue');
+const AboutUs = () => import('@/views/Pages/AboutUs.vue');
+const Documentation = () => import('@/views/Pages/Documentation.vue');
+const Feedback = () => import('@/views/Pages/Feedback.vue');
+const Updates = () => import('@/views/Pages/Updates.vue');
+const SignIn = () => import('@/views/Pages/SignIn.vue');
+const SignUp = () => import('@/views/Pages/SignUp.vue');
+const Settings = () => import('@/views/UserContent/Settings.vue');
+const ResetPassword = () => import('@/views/Pages/ResetPassword.vue');
+const Patreon = () => import('@/views/Pages/Patreon.vue');
+const WeatherDemo = () => import('@/views/Pages/WeatherDemo.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
-const Error404 = () => import('@/views/Error404.vue');
-const Offline = () => import('@/views/Offline.vue');
+const Error404 = () => import('@/views/Pages/Error404.vue');
+const Offline = () => import('@/views/Pages/Offline.vue');
 const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
 const RunEncounter = () => import('@/views/RunEncounter.vue');
 const User = () => import('@/views/User.vue');
@@ -42,7 +41,9 @@ export const routes = [{
 		component: () => import('@/views/Home.vue'),
 		meta: {
 			sidebar: false,
-			offline: true
+			offline: true,
+			description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+			title: "D&D Combat Tracker"
 		}
 	},
 	{
@@ -51,7 +52,9 @@ export const routes = [{
 		component: () => import('@/views/Home.vue'),
 		meta: {
 			sidebar: false,
-			offline: true
+			offline: true,
+			description: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.",
+			title: "D&D Combat Tracker"
 		},
 	},
 
@@ -68,11 +71,19 @@ export const routes = [{
 				path: "",
 				name: "Content",
 				component: () => import("@/views/UserContent"),
+				meta: {
+					description: "Your custom content on Harmless Key.",
+					title: "Content"
+				},
 			},
 			{
 				path: "manage",
 				name: "Manage content",
-				component: () => import("@/views/ManageContent"),
+				component: () => import("@/views/UserContent/ManageContent"),
+				meta: {
+					description: "Manage your content on Harmless Key.",
+					title: "Manage content"
+				},
 			},
 			
 			// Cammpaigns
@@ -80,13 +91,17 @@ export const routes = [{
 				path: "campaigns",
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Campaigns"
+					title: "Campaigns"		
 				},
 				children: [
 					{	
 						path: "",
 						name: "Campaigns",
 						component: () => import("@/views/UserContent/Campaigns/Campaigns.vue"),
+						meta: {
+							description: "Your campaigns on Harmless Key.",
+							title: "Campaigns"
+						},
 					},
 					{
 						path: ":campid",
@@ -100,7 +115,9 @@ export const routes = [{
 								name: "Run campaign",
 								component: () => import("@/views/UserContent/Encounters"),
 								meta: {
-									side: false
+									side: false,
+									description: "Run your campaign on Harmless Key.",
+									title: "Run campaign"
 								},
 							},
 							{
@@ -109,7 +126,8 @@ export const routes = [{
 								component: EditEncounter,
 								meta: {
 									title: 'Edit encounter',
-									side: false
+									side: false,
+									description: "Edit your Harmless Key encounter."
 								}
 							},
 						]
@@ -128,14 +146,19 @@ export const routes = [{
 					{
 						path: "",
 						name: "Players",
-						component: () => import("@/views/UserContent/Players")
+						component: () => import("@/views/UserContent/Players"),
+						meta: {
+							description: "Your players Harmless Key.",
+							title: "Players"
+						},
 					},
 					{
 						path: "add-player",
 						name: "Add player",
 						component: () => import("@/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
-							title: "Add player"
+								title: "Add player",
+								description: "Create a new player on Harmless Key."
 						}
 					},
 					{
@@ -143,7 +166,8 @@ export const routes = [{
 						name: "Edit player",
 						component: () => import("@/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
-							title: "Edit player"
+							title: "Edit player",
+							description: "Edit an existing player on Harmless Key."
 						}
 					}
 				]
@@ -160,13 +184,18 @@ export const routes = [{
 						path: "",
 						name: "NPCs",
 						component: () => import('@/views/UserContent/Npcs/Npcs.vue'),
+						meta: {
+								title: "NPCs",
+								description: "Your custom non-player characters on Harmless Key."
+						}
 					},
 					{
 						path: 'add-npc',
 						name: 'Add NPC',
 						component: () => import('@/views/UserContent/Npcs/EditNpc.vue'),
 						meta: {
-							title: "Add NPC"
+							title: "Add NPC",
+							description: "Create a new NPC on Harmless Key."
 						}
 					},
 					{
@@ -174,7 +203,8 @@ export const routes = [{
 						name: 'Edit NPC',
 						component: () => import('@/views/UserContent/Npcs/EditNpc.vue'),
 						meta: {
-							title: "Edit NPC"
+							title: "Edit NPC",
+							description: "Edit an existing NPC on Harmless Key."
 						}
 					}
 				]
@@ -189,14 +219,19 @@ export const routes = [{
 					{
 						path: '',
 						name: "Companions",
-						component: () => import('@/views/UserContent/Npcs/Npcs.vue')
+						component: () => import('@/views/UserContent/Npcs/Npcs.vue'),
+						meta: {
+							title: "Companions",
+							description: "Your custom companions Harmless Key."
+						}
 					},
 					{
 						path: ':id',
 						name: 'Edit Companion',
 						component: () => import('@/views/UserContent/Npcs/EditNpc.vue'),
 						meta: {
-							title: "Edit NPC"
+							title: "Edit Companion",
+							description: "Edit an existing companion on Harmless Key."
 						}
 					},
 					{
@@ -204,7 +239,8 @@ export const routes = [{
 						name: 'Edit companion',
 						component: () => import('@/views/UserContent/Npcs/EditNpc.vue'),
 						meta: {
-							title: "Edit companion"
+							title: "Edit companion",
+							description: "Edit an existing companion on Harmless Key."
 						}
 					}
 				]
@@ -221,14 +257,19 @@ export const routes = [{
 					{
 						path: '',
 						name: "Reminders",
-						component: () => import('@/views/UserContent/Reminders')
+						component: () => import('@/views/UserContent/Reminders'),
+						meta: {
+							title: "Reminders",
+							description: "Your custom reminders Harmless Key."
+						}
 					},
 					{
 						path: 'add-reminder',
 						name: 'Add reminder',
 						component: () => import('@/views/UserContent/Reminders/EditReminder.vue'),
 						meta: {
-							title: "Add reminder"
+							title: "Add reminder",
+							description: "Add a new reminder on Harmless Key."
 						}
 					},
 					{
@@ -236,7 +277,8 @@ export const routes = [{
 						name: 'Edit reminder',
 						component: () => import('@/views/UserContent/Reminders/EditReminder.vue'),
 						meta: {
-							title: "Edit reminder"
+							title: "Edit reminder",
+							description: "Edit an existing reminder Harmless Key."
 						}
 					},
 				]
@@ -253,14 +295,19 @@ export const routes = [{
 					{
 						path: '',
 						name: "Items",
-						component: () => import('@/views/UserContent/Items/Items.vue')
+						component: () => import('@/views/UserContent/Items/Items.vue'),
+						meta: {
+							title: "Items",
+							description: "Your custom reminders Harmless Key."
+						}
 					},
 					{
 						path: 'add-item',
 						name: 'Add item',
 						component: () => import('@/views/UserContent/Items/EditItem.vue'),
 						meta: {
-							title: "Add item"
+							title: "Add item",
+							description: "Add an existing item on Harmless Key."
 						}
 					},
 					{
@@ -268,7 +315,8 @@ export const routes = [{
 						name: 'Edit item',
 						component: () => import('@/views/UserContent/Items/EditItem.vue'),
 						meta: {
-							title: "Edit item"
+							title: "Edit item",
+							description: "Edit an existing item on Harmless Key."
 						}
 					}
 				]
@@ -286,13 +334,18 @@ export const routes = [{
 						path: '',
 						name: "Characters",
 						component: () => import('@/views/UserContent/Characters'),
+						meta: {
+							title: "Characters",
+							description: "Your player characters on Harmless Key."
+						}
 					},
 					{
 						path: ':id',
 						name: 'Edit character',
 						component: () => import("@/views/UserContent/Players/EditPlayer.vue"),
 						meta: {
-							title: "Edit character"
+							title: "Edit character",
+							description: "Edit an existing character on Harmless Key."
 						}
 					},
 				]
@@ -303,13 +356,17 @@ export const routes = [{
 				path: "followed",
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Followed users"
+					title: "Followed users",
 				},
 				children: [
 					{
 						path: '',
 						name: "Followed users",
 						component: () => import('@/views/UserContent/Followed.vue'),
+						meta: {
+							title: "Followed users",
+							description: "Other users you're following on Harmless Key."
+						}
 					}
 				]
 			},
@@ -327,26 +384,37 @@ export const routes = [{
 			{
 				path: "",
 				name: "Compendium",
-				component: () => import('@/views/Compendium')
+				component: () => import('@/views/Compendium'),
+				meta: {
+					title: "Compendium D&D 5e",
+					description: "Conditions, items, monsters and spells for Dungeons & Dragons 5th edition."
+				}
 			},
 			{
 				path: 'monsters',
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Monsters"
+					title: "Monsters D&D 5e",
+					description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
 				},
 				children: [
 					{
 						path: "",
 						name: 'Monsters',
 						component: () => import('@/views/Compendium/Monsters'),
+						meta: {
+							title: "Monsters D&D 5e",
+							description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
+						}
 					},
 					{
 						path: ":id",
 						name: "Monster",
 						component: () => import('@/views/Compendium/View.vue'),
 						meta: {
-							title: "Monster"
+							title: "Monster",
+							itle: "Monster D&D 5e",
+							description: "D&D 5th Edition monster."
 						}
 					}
 				]
@@ -355,13 +423,17 @@ export const routes = [{
 				path: 'spells',
 				component: { render (c) { return c('router-view') }},
 				meta: {
-					title: "Spells"
+					title: "Spells D&D 5e"
 				},
 				children: [
 					{
 						path: "",
-						name: 'Spells',
+						name: 'Spells D&D 5e',
 						component: () => import('@/views/Compendium/Spells'),
+						meta: {
+							title: "Spells D&D 5e",
+							description: "All spells from the SRD 5.1. Dungeons & Dragons 5th edition spells."
+						}
 					},
 					{
 						path: ":id",
@@ -579,7 +651,9 @@ export const routes = [{
 		component: RunEncounter,
 		meta: {
 			sidebar: false,
-			offline: true
+			offline: true,
+			title: "Encounter demo",
+			description: "Try running an encounter with Harmless Key, a Combat Tracker for Dungeons & Dragons 5th Edition."
 		},
 	},
 	{
@@ -588,7 +662,9 @@ export const routes = [{
 		component: WeatherDemo,
 		meta: {
 			sidebar: false,
-			offline: true
+			offline: true,
+			title: 'Weather effects.',
+			description: "Add weather effects to your encounters with Harmless Key, a Dungeons & Dragons Combat Tracker."
 		},
 	},
 	
@@ -684,19 +760,29 @@ export const routes = [{
 	{
 		path: '/sitemap',
 		name: 'Sitemap',
-		component: Sitemap
+		component: Sitemap,
+		meta: {
+			title: 'Sitemap',
+			description: "Sitemap of Harmless Key, a Combat Tracker for D&D."
+		}
 	},
 	{
 		path: '/privacy-policy',
 		name: 'Privacy Policy',
-		component: Privacy
+		component: Privacy,
+		meta: {
+			title: 'Privacy policy',
+			description: "Privacy policy for Harmless Key, a Combat Tracker for D&D."
+		}
 	},
 	{
 		path: '/about-us',
 		name: 'About Us',
 		component: AboutUs,
 		meta: {
-			offline: true
+			offline: true,
+			title: "About Harmless Key",
+			description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
 		}
 	},
 	{
@@ -704,30 +790,38 @@ export const routes = [{
 		name: 'Documentation',
 		component: Documentation,
 		meta: {
-			offline: true
+			offline: true,
+			title: "Documentation",
+			description: "Documentation for Harmless Key, a Combat Tracker for D&D."
 		}
 	},
 	{
 		path: '/feedback',
 		name: 'Feedback',
-		component: Feedback
+		component: Feedback,
+		meta: {
+			offline: true,
+			title: "Feedback",
+			description: "Leave feedback for Harmless Key, a Combat Tracker for D&D."
+		}
 	},
 	{
 		path: '/updates',
 		name: 'Updates',
-		component: Updates
-	},
-	{
-		path: '/planned',
-		name: 'Planned',
-		component: Planned
+		component: Updates,
+		meta: {
+			offline: true,
+			title: "Updates",
+			description: "Follow update on Harmless Key, a Combat Tracker for D&D."
+		}
 	},
 	{
 		path: '/sign-in',
 		name: 'signIn',
 		component: SignIn,
 		meta: {
-			sidebar: false
+			sidebar: false,
+			description: "Sign in to your account on Harmless Key, a Combat Tracker for D&D."
 		}
 	},
 	{
@@ -735,7 +829,9 @@ export const routes = [{
 		name: 'signUp',
 		component: SignUp,
 		meta: {
-			sidebar: false
+			sidebar: false,
+			title: "Sign up",
+			description: "Create an account for Harmless Key, a Combat Tracker for D&D"
 		}
 	},
 	{
@@ -743,13 +839,19 @@ export const routes = [{
 		name: 'resetPassword',
 		component: ResetPassword,
 		meta: {
-			sidebar: false
+			sidebar: false,
+			title: "Forgot password",
+			description: "Request to reset your Harmless Key password."
 		}
 	},
 	{
 		path: '/patreon',
 		name: 'Patreon',
-		component: Patreon
+		component: Patreon,
+		meta: {
+			title: 'Patreon support',
+			description: "Support Harmless Key on Patreon for more content slots and help our D&D Combat Tracker improve."
+		}
 	},
 	{
 		path: '/poster',
@@ -767,7 +869,9 @@ export const routes = [{
 		name: 'profile',
 		component: Profile,
 		meta: {
-			requiresAuth: true
+			requiresAuth: true,
+			title: "Profile",
+			description: "Your Harmless Key profile page."
 		}
 	},
 	{
@@ -793,7 +897,9 @@ export const routes = [{
 		name: 'Username',
 		component: Username,
 		meta: {
-			sidebar: false
+			sidebar: false,
+			title: "Set username",
+			description: "Set your username for Harmless Key."
 		}
 	},
 	{
@@ -801,39 +907,36 @@ export const routes = [{
 		name: 'RunEncounter',
 		component: RunEncounter,
 		meta: {
-			basePath: '/campaigns',
-			title: 'Campaigns',
+			title: 'Run encounter',
 			requiresAuth: true,
-			sidebar: false
+			sidebar: false,
+			description: "Run your encounter in Harmless Key, a Combat Tracker for D&D 5e."
 		},
 	},
 	{
 		path: '/user/:userid',
-		name: 'Track User',
+		name: 'Follow user',
 		component: User,
 		meta: {
 			basePath: '/user',
-			title: 'User',
+			title: 'User page',
+			description: "Follow the live initiative lists of your DM with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
 		}
 	},
 	{
 		path: '/user/:userid/:campid',
-		name: 'Track Campaign',
+		name: 'Follow campaign',
 		component: User,
 		meta: {
 			basePath: '/user',
-			title: 'User',
-			sidebar: false
+			title: 'Campaign',
+			sidebar: false,
+			description: "Campaign with live initiative list of the encounters with Harmless Key, a Dungeons & Dragons Initiavive Tracker."
 		}
 	},
 	{
 		path: '/track-encounter/:userid',
 		redirect: '/user/:userid',
-	},
-	{
-		path: '/npc-overhaul',
-		name: 'NPC overhaul',
-		component: () => import('@/views/Pages/npc_overhaul.vue'),
 	},
 	{
 		path: '/404',

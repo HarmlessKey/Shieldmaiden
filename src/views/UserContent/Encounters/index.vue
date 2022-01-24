@@ -308,9 +308,6 @@
 
 	export default {
 		name: "Encounters",
-		metaInfo: {
-			title: "Encounters"
-		},
 		components: {
 			Crumble,
 			PlayerLink,

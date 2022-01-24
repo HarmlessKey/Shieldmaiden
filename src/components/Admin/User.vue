@@ -149,11 +149,6 @@
 			Crumble
 		},
 		props: ['id'],
-		metaInfo() {
-			return {
-				title: 'Admin',
-			}
-		},
 		beforeMount() {
 			//Because the component is loaded in another view, 
 			//the scroll needs to be reset to 0

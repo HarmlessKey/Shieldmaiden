@@ -24,10 +24,7 @@
 			General: General,
 			Encounter: Encounter,
 			Track: TrackEncounter,
-		},
-		metaInfo: {
-			title: 'Settings'
-		},
+		}
 	}
 </script>
 

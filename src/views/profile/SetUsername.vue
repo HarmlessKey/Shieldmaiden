@@ -42,9 +42,6 @@
 
 export default {
 		name: 'Username',
-		metaInfo: {
-			title: 'Username'
-		},
 		data() {
 			return {
 				username: undefined,

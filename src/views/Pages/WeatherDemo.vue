@@ -44,7 +44,7 @@
 </template>
 
 <script>
-	import EditWeather from './UserContent/Encounters/Edit/Weather';
+	import EditWeather from '../UserContent/Encounters/Edit/Weather';
 
 	export default {
 		name: 'WeatherDemo',
@@ -54,7 +54,7 @@
 		},
 		data() {
 			return {
-				background: require("../assets/_img/atmosphere/winter-landscape.webp"),
+				background: require("../../assets/_img/atmosphere/winter-landscape.webp"),
 				audio: false,
 				image: null,
 				weather: {

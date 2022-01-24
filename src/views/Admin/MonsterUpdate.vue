@@ -35,9 +35,6 @@
 		components: {
 			Crumble
 		},
-		metaInfo: {
-			title: 'Admin | Update monsters'
-		},
 		data() {
 			return {
 				loading: false,

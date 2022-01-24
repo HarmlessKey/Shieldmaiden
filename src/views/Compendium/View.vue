@@ -5,21 +5,8 @@
 </template>
 
 <script>
-	import { mapGetters } from 'vuex'
-
 	export default {
 		name: 'ViewCompendium',
-		metaInfo() {
-			return {
-				title: this.name + ' | D&D 5th Edition',
-				meta: [
-					{ 
-					vmid: 'description', 
-					name: 'description', 
-					content: 'D&D 5th Edition ' + this.type + ': ' + this.name }
-				],
-			}
-		},
 		data() {
 			return {
 				component: null,
@@ -27,14 +14,7 @@
 				id: this.$route.params.id
 			}
 		},
-		firebase() {
-			return {
-			}
-		},
 		computed: {
-			...mapGetters([
-				'tier',
-			]),
 			type() {
 				let type = this.$route.path.split("/")[2];
 				if(type === 'conditions') { type = 'Condition'; }

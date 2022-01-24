@@ -1,7 +1,7 @@
 <template>
 	<div class="login-container">
 		<div id="login">
-			<img class="logo" src="../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
+			<img class="logo" src="../../assets/_img/logo/logo-main-alt.svg" alt="Harmless Key"/>
 			<h2>Sign in</h2>
 			<p v-if="error" class="red"><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
 			<form v-on:submit.prevent>

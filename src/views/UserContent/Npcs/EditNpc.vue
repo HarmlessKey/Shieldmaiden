@@ -105,11 +105,8 @@
 	import ImportNPC from "@/components/ImportNPC";
 
 	export default {
-		name: 'Npcs',
+		name: 'EditNpc',
 		mixins: [general],
-		metaInfo: {
-			title: 'NPCs'
-		},
 		components: {
 			BasicInfo,
 			Senses,

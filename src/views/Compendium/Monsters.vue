@@ -130,7 +130,7 @@
 						>
 							<div class="truncate-cell">
 								<div class="truncate">
-									<router-link v-if="col.name === 'name'" :to="'/compendium/monsters/' + col.value.replace(/ /g, '-').toLowerCase()">
+									<router-link v-if="col.name === 'name'" :to="`/compendium/monsters/${props.row.url}`">
 										{{ col.value }}
 									</router-link>
 									<template v-else>{{ col.value }}</template>
@@ -163,9 +163,6 @@
 			Crumble,
 			Footer,
 			ViewMonster
-		},
-		metaInfo: {
-			title: 'Monsters'
 		},
 		data() {
 			return {
@@ -253,7 +250,7 @@
 					pageNumber: this.pagination.page,
 					pageSize: this.pagination.rowsPerPage,
 					query: this.query,
-					fields: ["name", "type", "challenge_rating"],
+					fields: ["name", "type", "challenge_rating", "url"],
 					sortBy: this.pagination.sortBy,
 					descending: this.pagination.descending
 				}).then(result => {

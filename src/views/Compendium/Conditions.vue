@@ -45,9 +45,6 @@
 			Footer,
 			Condition
 		},
-		metaInfo: {
-			title: 'Conditions'
-		},
 		data() {
 			return {
 				fields: {

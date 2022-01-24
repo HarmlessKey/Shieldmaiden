@@ -70,6 +70,39 @@
 				default: false
 			}
 		},
+		metaInfo() {
+			return {
+				title: `${this.spell.name ? this.spell.name.capitalizeEach() : "Spell"} D&D 5e`,
+				meta: [
+					{ 
+						vmid: "description", 
+						name: "description", 
+						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.description}`
+					},
+					{
+						vmid: "og-title",
+						property: "og:title", 
+						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.description}`
+					},
+					{ 
+						vmid: "og-description", 
+						property: "og:description",
+						name: "description", 
+						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.description}`
+					},
+					{ 
+						vmid: "twitter-title",
+						name: "twitter:title", 
+						content: `${this.spell.name ? this.spell.name.capitalizeEach() : "Spell"} D&D 5e`
+					},
+					{ 
+						vmid: "twitter-description", 
+						name: "twitter:description",
+						content: `D&D 5th Edition: ${ this.spell.name ? this.spell.name.capitalizeEach() : "Spell" }. ${this.description}`
+					},
+				],
+			}
+		},
 		computed: {
 			...mapGetters([
 				"get_spell",
@@ -77,6 +110,9 @@
 			]),
 			spell() {
 				return this.get_spell(this.id);
+			},
+			description() {
+				return (this.spell && this.spell.desc) ? `${this.spell.desc.join(" ").substring(0, 120).trim()}...` : "";
 			}
 		},
 		beforeMount() {

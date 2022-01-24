@@ -34,9 +34,6 @@
 
 	export default {
 		name: 'EditReminder',
-		metaInfo: {
-			title: 'Reminders'
-		},
 		components: {
 			ReminderForm
 		},

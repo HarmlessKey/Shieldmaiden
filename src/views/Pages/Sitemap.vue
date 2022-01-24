@@ -25,10 +25,7 @@
 <script>
 
 	export default {
-		name: 'Sitemap',
-		metaInfo: {
-			title: 'Sitemap'
-		},
+		name: 'Sitemap'
 	}
 </script>
 

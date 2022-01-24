@@ -46,13 +46,7 @@
 		components: {
 			Tiers,
 			Footer
-		},
-		metaInfo: {
-			title: 'Subscription',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'Get a subscription for Harmless Key, the most advanced D&D combat tracker.' }
-			]
-		},
+		}
 	}
 </script>
 

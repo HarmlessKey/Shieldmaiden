@@ -32,11 +32,6 @@
 			ContentSideRight,
 			OverEncumbered
 		},
-		metaInfo() {
-			return {
-				title: this.$route.meta.title
-			}
-		},
 		computed: {
 			...mapGetters([
 				"overencumbered"

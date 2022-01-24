@@ -2,7 +2,7 @@
 <div class="grid">
 	<div class="container">
 		<div class="die">
-			<img src="../assets/_img/logo/logo-icon-no-shield-red.svg" alt="Harmless Key logo icon" />
+			<img src="../../assets/_img/logo/logo-icon-no-shield-red.svg" alt="Harmless Key logo icon" />
 			<span>404</span>
 		</div>
 		<div class="content">

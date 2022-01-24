@@ -43,9 +43,6 @@
 			Footer,
 			Spell
 		},
-		metaInfo: {
-			title: 'Spells'
-		},
 		data() {
 			return {
 				fields: {

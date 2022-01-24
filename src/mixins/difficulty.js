@@ -1,5 +1,4 @@
-import { mapGetters, mapActions } from 'vuex';
-import { db } from '@/firebase';
+import { mapActions } from 'vuex';
 import { experience } from '@/mixins/experience.js';
 
 export const difficulty = {
@@ -7,7 +6,7 @@ export const difficulty = {
 	mixins: [experience],
 	data() {
 		return {
-			monsters_ref: db.ref(`monsters`),
+			uid: this.$store.getters.user.uid,
 			difficulties: [
 				'easy',
 				'medium',
@@ -133,12 +132,13 @@ export const difficulty = {
 			}
 		}
 	},
-	computed: {
-		...mapGetters("players", ["players"]),
-	},
+	// computed: {
+		
+	// },
 	methods: {
 		...mapActions("npcs", ["get_npc"]),
-		...mapActions("monsters", ["get_monster"]),
+		...mapActions("api_monsters", ["get_monster"]),
+		...mapActions("players", ["get_player"]),
 		async difficulty(entities) {
 			var totalXp = 0;
 			var nMonsters = 0;
@@ -178,7 +178,8 @@ export const difficulty = {
 
 				//Calculate Player tresholds
 				if(entity.entityType === 'player') {
-					let playerLevel = (!this.players[entity.id].level) ? this.calculatedLevel(this.players[entity.id].experience) : this.players[entity.id].level;
+					const player = await this.get_player({ uid: this.uid, id: entity.id });
+					let playerLevel = (!player.level) ? this.calculatedLevel(player.experience) : player.level;
 
 					//If there is a player without a level, return an error
 					if(!playerLevel) {

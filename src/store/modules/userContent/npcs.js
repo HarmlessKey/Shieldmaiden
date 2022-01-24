@@ -2,20 +2,39 @@ import Vue from 'vue';
 import { npcServices } from "@/services/npcs"; 
 import _ from "lodash";
 
+// Converts a full npc to a search_npc
+const convert_npc = (npc) => {
+	const properties = [
+		"name",
+		"challenge_rating",
+    "avatar",
+		"type"
+	];
+  const returnNpc = {};
+	
+	for(const prop of properties) {
+    if(npc.hasOwnProperty(prop)) {
+      returnNpc[prop] = (prop === "name") ? npc[prop].toLowerCase() : npc[prop];
+    }
+	}
+	return returnNpc;
+}
 
 const state = {
   npc_services: null,
   cached_npcs: {},
   npc_count: 0,
-  npcs: []
+  npcs: undefined
 };
 
 const getters = {
-  npcs: (state, getters, rootState, rootGetters) => { 
-    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
-      return state.cached_npcs[uid] || {};
-    } return {};
+  npcs: (state) => {
+    // Convert object to sorted array
+    return _.chain(state.npcs)
+    .filter((npc, key) => {
+      npc.key = key;
+      return npc;
+    }).orderBy("name", "asc").value();
   },
   npc_count: (state) => { return state.npc_count; },
   npc_services: (state) => { return state.npc_services; }
@@ -30,29 +49,25 @@ const actions = {
   },
 
   /**
-   * Fetches all the npcs for a user
-   * and stores them in cached_npcs.uid
+   * Fetches all the search_npcs for a user
+   * and stores them in npcs
    */
-  async fetch_npcs({ rootGetters, dispatch }, { startAfter, pageSize, query, sortBy, descending }) {
+  async get_npcs({ rootGetters, dispatch, commit }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    if(uid) {
+    let npcs = (state.npcs) ? state.npcs : undefined;
+
+    if(!npcs && uid) {
       const services = await dispatch("get_npc_services");
-      sortBy = (!sortBy || query) ? "name" : sortBy;
       try {
-        const npcs = await services.getNpcs(uid, startAfter, pageSize, query, sortBy, descending);
-        const order = (descending) ? "desc" : "asc";
-        
-        return _.chain(npcs)
-				.filter(function(npc, key) {
-					npc.key = key;
-					return npc;
-				}).orderBy(sortBy, order).value();       
+        npcs = await services.getNpcs(uid);  
+        commit("SET_NPCS", npcs || {});
       } catch(error) {
         throw error;
       }
     }
+    return npcs;
   },
-
+  
   /**
    * Fetches the total count of npcs for a user
    * and stores it in npc_count
@@ -62,7 +77,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        const count = await services.getNpcCount(uid);
+        const count = await services.getNpcCount(uid) || 0;
         commit("SET_NPC_COUNT", count);
         return;
       } catch(error) {
@@ -75,12 +90,14 @@ const actions = {
     let npc = (state.cached_npcs[uid]) ? state.cached_npcs[uid][id] : undefined;
 
     // The npc is not in the store and needs to be fetched from the database
-    if(!npc) {
+    // If the NPC is not found in firebase, it returns null
+    // We don't have to check for null NPCs again, we know they don't exist
+    // Therefore we only do a call to firebase if npc === undefined
+    if(npc === undefined) {
       const services = await dispatch("get_npc_services");
       try {
-        const npc = await services.getNpc(uid, id);
+        npc = await services.getNpc(uid, id);
         commit("SET_CACHED_NPC", { uid, id, npc });
-        return npc;
       } catch(error) {
         throw error;
       }
@@ -95,15 +112,26 @@ const actions = {
    * @param {object} npc 
    * @returns {string} the id of the newly added npc
    */
-  async add_npc({ rootGetters, commit, state, dispatch }, npc) {
+  async add_npc({ rootGetters, commit, dispatch }, npc) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.npc_count + 1;
+    const available_slots = rootGetters.tier.benefits.npcs;
+
     if(uid) {
       const services = await dispatch("get_npc_services");
+      const used_slots = await services.getNpcCount(uid);
+      
+      if(used_slots >= available_slots) {
+        throw "Not enough slots";
+      }
       try {
-        const id = await services.addNpc(uid, npc, new_count);
-        commit("SET_NPC_COUNT", new_count);
+        const search_npc = convert_npc(npc);
+        const id = await services.addNpc(uid, npc, search_npc);
+        commit("SET_NPC", { id, search_npc });
         commit("SET_CACHED_NPC", { uid, id, npc });
+
+        const new_count = await services.updateNpcCount(uid, 1);
+        commit("SET_NPC_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return id;
       } catch(error) {
         throw error;
@@ -124,8 +152,31 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.editNpc(uid, id, npc);
+        const search_npc = convert_npc(npc);
+        await services.editNpc(uid, id, npc, search_npc);
+        commit("SET_NPC", { id, search_npc });
         commit("SET_CACHED_NPC", { uid, id, npc });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Updates a single (non nested) property of an NPC
+   * 
+   * @param {string} uid
+   * @param {string} id 
+   * @param {string} property 
+   * @param {string|number} value 
+   */
+   async update_npc_prop({ commit, dispatch }, { uid, id, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_npc_services");
+      try {
+        await services.updateNpc(uid, id, "", { [property]: value});
+        commit("SET_CACHED_NPC_PROP", { uid, id, property, value });
         return;
       } catch(error) {
         throw error;
@@ -139,14 +190,34 @@ const actions = {
    * 
    * @param {string} id 
    */
-  async delete_npc({ rootGetters, commit, state, dispatch }, id) {
+  async delete_npc({ rootGetters, commit, dispatch }, id) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
-    const new_count = state.npc_count - 1;
     if(uid) {
       const services = await dispatch("get_npc_services");
       try {
-        await services.deleteNpc(uid, id, new_count);
+        const npc = await dispatch("get_npc", { uid, id });
+        
+        // DELETE COMPANION FROM PLAYER
+        if(npc.player_id) {
+          const player = await dispatch("players/get_player", { uid, id: npc.player_id }, { root: true });
+          
+          // Remove the companion from the player
+          await dispatch("players/delete_companion", { uid, playerId: npc.player_id, id }, { root: true });
+
+          // Remove the companion from the campaign
+          if(player.campaign_id) {
+            await dispatch("campaigns/delete_companion", { id: player.campaign_id, companionId: id }, { root: true });
+          }
+        }
+
+        // Delete the NPC
+        await services.deleteNpc(uid, id);
+        commit("REMOVE_NPC", id);
+        commit("REMOVE_CACHED_NPC", { uid, id });
+
+        const new_count = await services.updateNpcCount(uid, -1);
         commit("SET_NPC_COUNT", new_count);
+        dispatch("checkEncumbrance", "", { root: true });
         return;
       } catch(error) {
         throw error;
@@ -155,37 +226,68 @@ const actions = {
   },
 
   /**
-   * Gets all NPCs from a USER
+   * Gets all REAL NPCs from a USER
    */
-  async get_all_npcs({ rootGetters, commit, dispatch }) {
+  async get_full_npcs({ rootGetters, commit, dispatch }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if (uid) {
       const services = await dispatch("get_npc_services");
 
       try {
-        const all_npcs = await services.getAllNpcs(uid);
-        commit("SET_CACHED_NPCS", { uid, npcs:all_npcs })
+        const all_npcs = await services.getFullNpcs(uid);
+        commit("SET_CACHED_NPCS", { uid, npcs: all_npcs })
         return all_npcs;
       } catch(error) {
         throw error;
       }
     }
+  },
+
+  clear_npc_store({ commit, rootGetters }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      commit("CLEAR_STORE");
+    }
   }
-
-
 };
 const mutations = {
   SET_NPC_SERVICES(state, payload) { Vue.set(state, "npc_services", payload); },
   SET_NPC_COUNT(state, value) { Vue.set(state, "npc_count", value); },
-  SET_CACHED_NPCS(state, { uid, npcs }) { Vue.set(state.cached_npcs, uid, npcs); },
-  SET_CACHED_NPC(state, { uid, id, npc }) {
+  SET_NPCS(state, value) { Vue.set(state, "npcs", value); },
+  SET_CACHED_NPCS(state, { uid, npcs }) {
+    Vue.set(state.cached_npcs, uid, npcs);
+  },
+  SET_CACHED_NPC(state, { uid, id, npc }) { 
     if(state.cached_npcs[uid]) {
       Vue.set(state.cached_npcs[uid], id, npc);
     } else {
       Vue.set(state.cached_npcs, uid, { [id]: npc });
     }
   },
-  REMOVE_CACHED_NPC(state, { uid, id }) { Vue.delete(state.cached_npcs[uid], id); },
+  SET_CACHED_NPC_PROP(state, { uid, id, property, value}) {
+    if(state.cached_npcs[uid] && state.cached_npcs[uid][id]) {
+      Vue.set(state.cached_npcs[uid][id], property, value);
+    }
+  },
+  SET_NPC(state, { id, search_npc }) {
+    if(state.npcs) {
+      Vue.set(state.npcs, id, search_npc);
+    } else {
+      Vue.set(state, "npcs", { [id]: search_npc });
+    }
+  },
+  REMOVE_NPC(state, id) { 
+    Vue.delete(state.npcs, id);
+  },
+  REMOVE_CACHED_NPC(state, { uid, id }) {
+    if(state.cached_npcs[uid]) {
+      Vue.delete(state.cached_npcs[uid], id);
+    }
+  },
+  CLEAR_STORE(state) {
+    Vue.set(state, "npcs", undefined);
+    Vue.set(state, "npc_count", 0);
+  }
 };
 
 export default {

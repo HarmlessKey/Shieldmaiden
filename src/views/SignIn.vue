@@ -33,23 +33,27 @@
 </template>
 
 <script>
-	import { firebase, auth } from '@/firebase'
+	import { firebase, auth } from "@/firebase";
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'login',
+		name: "SignIn",
 		data() {
 			return {
-				email: '',
-				password: '',
-				error: '',
-				browser: this.$store.getters.browser
+				email: "",
+				password: "",
+				error: "",
+				browser: this.$store.getters.browser,
+				user: this.$store.getters.user,
 			}
 		},
 		methods: {
-			signIn: function() {
-				auth.signInWithEmailAndPassword(this.email, this.password).then(
-					() => {
-						this.$router.replace('content');
+			...mapActions(["reinitialize"]),
+			async signIn() {
+				await auth.signInWithEmailAndPassword(this.email, this.password).then(
+					async () => {
+						await this.reinitialize();
+						this.$router.replace("/content");
 					},
 					(err) => {
 						this.error = err.message;
@@ -60,25 +64,21 @@
 				const provider = new firebase.auth.GoogleAuthProvider();
 
 				if(this.browser === "Edge") {
-					auth.signInWithRedirect(provider).then(() => {
-						this.$router.replace('content');
+					auth.signInWithRedirect(provider).then(async () => {
+						await this.reinitialize();
+						this.$router.replace("/content");
 					}).catch((err) => {
 						this.error = err.message;
 					});
 				} else {
-					auth.signInWithPopup(provider).then(() => {
-						this.$router.replace('content');
+					auth.signInWithPopup(provider).then(async () => {
+						await this.reinitialize();
+						this.$router.replace("/content");
 					}).catch((err) => {
 						this.error = err.message;
 					});
 				}
 			},
-		},
-		mounted() {
-			// Redirect to content when user is logged in
-			if (auth.currentUser !== null) {
-				this.$router.replace('content');
-			}
 		}
 	}
 </script>

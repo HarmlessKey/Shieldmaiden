@@ -1,13 +1,13 @@
 <template>
 	<div id="turns" class="d-flex justify-content-between">
 		<div>
-			<a class="edit">
+			<a class="btn btn-clear">
 				<i class="fas fa-cog"></i>
 				<q-popup-proxy :dark="$store.getters.theme === 'dark'" :breakpoint="576">
 					<q-list class="bg-neutral-8">
 						<q-item>
 							<q-item-section>
-								<b>{{ encounter.encounter }}</b>
+								<b>{{ encounter.name }}</b>
 							</q-item-section>
 						</q-item>
 						<q-separator />
@@ -46,12 +46,12 @@
 							<q-item-section>Reset encounter</q-item-section>
 						</q-item>
 						<q-item clickable v-close-popup @click="confirmFinish()">
-							<q-item-section avatar><i class="fas fa-times"></i></q-item-section>
+							<q-item-section avatar><i class="fas fa-check"></i></q-item-section>
 							<q-item-section>Finish encounter</q-item-section>
 						</q-item>
 						<q-separator />
 						<q-item clickable v-close-popup :to="`/content/campaigns/${$route.params.campid}`">
-							<q-item-section avatar><i class="fas fa-angle-left"></i></q-item-section>
+							<q-item-section avatar><i class="fas fa-chevron-left"></i></q-item-section>
 							<q-item-section>Leave encounter</q-item-section>
 						</q-item>
 					</q-list>

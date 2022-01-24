@@ -104,7 +104,7 @@
 			}
 		},
 		methods: {
-			...mapActions("monsters", ["get_monsters"]),
+			...mapActions("api_monsters", ["get_monsters"]),
 			setType(type) {
 				this.show = undefined //clear the previous selected item
 				this.current = type;

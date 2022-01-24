@@ -1,5 +1,5 @@
 <template>
-	<div id="app" class="container-fluid" @click="setSideSmallScreen(false)">
+	<div id="app" @click="setSideSmallScreen(false)">
 		<div>
 			<nav-main/>
 			<PaymentDeclined v-if="user !== null" />
@@ -99,7 +99,7 @@
 	},
 	metaInfo() {
 		return {
-			title: 'Combat Tracker D&D | Harmless Key',
+			title: 'D&D Combat Tracker | Harmless Key',
 			author: 'Harmless Key',
 			htmlAttrs: {
 				lang: "en"
@@ -112,7 +112,7 @@
 					content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.'
 				},
 				{ name: "twitter:card", content: "summary" },
-				{ name: "twitter:title", content: "Combat Tracker D&D | Harmless Key" },
+				{ name: "twitter:title", content: "D&D Combat Tracker | Harmless Key" },
 				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
 				{
 					name: "twitter:description",
@@ -120,7 +120,7 @@
 				},
 				{ name: "twitter:site", content: "@KeyHarmless" },
 
-				{ property: "og:title", content: "Combat Tracker D&D | Harmless Key" },
+				{ property: "og:title", content: "D&D Combat Tracker | Harmless Key" },
 				{	property: "og:site_name", content: "harmlesskey.com" },
 				{	property: "og:type", content: "website" },
 				{
@@ -137,7 +137,6 @@
 	},
 	data() {
 		return {
-			initialized: false,
 			user: auth.currentUser,
 			connection: navigator.onLine ? 'online' : 'offline',
 			announcementSetter: false,
@@ -179,6 +178,7 @@
 			storeBroadcast: 'broadcast'
 		}),
 		...mapGetters([
+			"initialized",
 			"theme"
 		]),
 		announcement: {
@@ -196,16 +196,6 @@
 		}
 	},
 	created() {
-		this.initialize().then(() => {
-
-			const roll = Math.floor(Math.random() * 6 + 15);
-
-			console.log(
-				`%cRolled ${roll} for a DC 15 initialize check.\nInitialization of Harmless Key successful.`,
-				"color: #83b547;"
-			);
-			this.initialized = true;
-		});
 		const cookies = document.cookie.split(';');
 
 		for (let cookie of cookies) {

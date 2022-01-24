@@ -1,12 +1,12 @@
 <template>
-	<div v-if="item || $route.name === 'Add item'">
+	<div class="content__edit">
 		<ValidationObserver v-slot="{ handleSubmit, valid }">
-			<q-form @submit="handleSubmit(saveItem)">
+			<q-form @submit="handleSubmit(saveItem(valid))">
 				<hk-card header="Your Item">
 					<div slot="header" class="card-header">
 						{{ item.name ? item.name : "New item" }}
 
-						<a v-if="$route.name == 'Add item'" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
+						<a v-if="$route.name == 'Add item' && !itemId" class="btn btn-sm bg-neutral-5" @click="copy_dialog = true">
 							Copy item
 							<i class="ml-1 fas fa-copy"/>
 						</a>
@@ -19,7 +19,7 @@
 								label="Name"
 								autocomplete="off"  
 								type="text" 
-								class="mb-2" 
+								class="mb-2"
 								v-model="item.name" 
 								maxlength="100"
 								:error="invalid && validated"
@@ -31,7 +31,7 @@
 						<div class="avatar">
 							<div class="img" v-if="item.image" :style="{ backgroundImage: 'url(\'' + item.image + '\')' }"></div>
 							<div class="img" v-else>
-								<img src="@/assets/_img/styles/axe.svg" />
+								<i class="hki-axe" />
 							</div>
 							<div>
 								<ValidationProvider rules="url" name="Image" v-slot="{ errors, invalid, validated }">
@@ -57,7 +57,6 @@
 								autocomplete="off"  
 								type="text" 
 								v-model="item.desc" 
-								name="image" 
 								maxlength="5000"
 								:error="invalid && validated"
 								:error-message="errors[0]"
@@ -132,7 +131,7 @@
 									</template>
 
 									<div class="accordion-body">
-										<ValidationProvider rules="required|max:100" name="Table name" v-slot="{ errors, invalid, validated }">
+										<ValidationProvider rules="max:100" name="Table name" v-slot="{ errors, invalid, validated }">
 											<q-input 
 												:dark="$store.getters.theme === 'dark'" filled square
 												label="Table name"
@@ -160,12 +159,12 @@
 											<a @click="addRow(tableIndex)" class="remove green"><i class="fas fa-plus"/></a>
 											<template v-for="(row, rowIndex) in table.rows">
 												<div v-for="(col, colIndex) in table.rows[rowIndex].columns" :key="`column-${rowIndex}-${colIndex}`">
-													<ValidationProvider rules="required|max:100" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
+													<ValidationProvider rules="required|max:5000" :name="`Column ${colIndex+1}`" v-slot="{ errors, invalid, validated }">
 														<q-input 
 															:dark="$store.getters.theme === 'dark'" filled square dense
 															v-model="table.rows[rowIndex].columns[colIndex]" 
 															:placeholder="`Column ${colIndex+1}`"
-															maxlength="100"
+															maxlength="5000"
 															:error="invalid && validated"
 															:error-message="errors[0]"
 														/>
@@ -184,15 +183,16 @@
 
 
 				<div class="save">
-					<router-link to="/content/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
-					<q-btn 
-						type="submit"
-						:disabled="!valid"
-						color="primary" 
-						no-caps
-					>
-						{{ $route.name === "Add item" ? "Add item" : "Save" }}
-					</q-btn>
+					<div class="buttons">
+						<router-link to="/content/items" class="btn bg-neutral-5 mr-2">Cancel</router-link>
+						<q-btn 
+							type="submit"
+							color="primary" 
+							no-caps
+						>
+							{{ $route.name === "Add item" ? "Add item" : "Save" }}
+						</q-btn>
+					</div>
 				</div>
 			</q-form>
 		</ValidationObserver>
@@ -238,11 +238,9 @@
 </template>
 
 <script>
-	import OverEncumbered from '@/components/OverEncumbered.vue'
-	import { skills } from '@/mixins/skills.js'
-	import { db } from '@/firebase'
-	import { mapActions, mapGetters } from 'vuex'
-	import { general } from '@/mixins/general.js'
+	import { skills } from '@/mixins/skills.js';
+	import { mapActions, mapGetters } from 'vuex';
+	import { general } from '@/mixins/general.js';
 
 
 	export default {
@@ -251,43 +249,24 @@
 		metaInfo: {
 			title: 'Items'
 		},
-		components: {
-			OverEncumbered,
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
 				itemId: this.$route.params.id,
-				search: ["name"],
+				item: {},
 				searched: undefined,
 				foundItems: [],
 				columns: undefined,
 				copy_dialog: false
 			}
 		},
-		mounted() {
-			var items = db.ref(`items`);
-			items.on('value', async (snapshot) => {
-				let items = snapshot.val();
-				items = Object.values(items);
-
-				let custom = db.ref(`custom_items/${this.userId}`);
-				custom.on('value', async (snapshot) => {
-					let customItems = snapshot.val();
-					for(let key in customItems) {
-						items.push(customItems[key]);
-					}
-				});
-				this.items = items;
-				this.loadingItems = false;
-			});
-		},
-		firebase() {
-			return {
-				item: {
-					source: db.ref(`custom_items/${this.userId}/${this.itemId}`),
-					asObject: true
-				},
+		async mounted() {
+			if (this.itemId) {
+				this.loading = true;
+				this.item = await this.get_item({ uid: this.userId, id: this.itemId });
+				this.item_copy = JSON.stringify(this.item);
+				this.unsaved_changes = false;
+				this.loading = false;
 			}
 		},
 		computed: {
@@ -296,56 +275,98 @@
 				'overencumbered',
 			]),
 		},
-		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			searchItems() {
-				const vm = this;
-				let searchTerm = this.searched.toLowerCase();
-				let results = this.items.filter( function(row) {
-					for (let i in vm.search) {
-						let key = vm.search[i];
-						// If field is undefined don't return row
-						if (row[key] == undefined) {
-							return
-						}
-						if (row[key].toLowerCase().includes(searchTerm)){
-							return row;
-						}
+		watch: {
+			item: {
+				deep: true,
+				handler(newVal) {
+					if (JSON.stringify(newVal) !== this.item_copy) {
+						this.unsaved_changes = true;
+					} else {
+						this.unsaved_changes = false;
 					}
-				});
-				if(searchTerm === '') {
-					this.foundItems = [];
-				} else {
-					this.foundItems = results;
+				}
+			}
+		},
+		methods: {
+			...mapActions(['setSlide']),
+			...mapActions('items', ["get_item", "add_item", "edit_item"]),
+			...mapActions('api_items', ["get_api_items", "get_api_item"]),
+
+			async searchItems() {
+				if (this.searched.length >= 3) {
+					const api_items= await this.get_api_items({
+						pageNumber: 1,
+						pageSize: 0,
+						fields: ['name'],
+						query: {search: this.searched},
+					})
+					this.foundItems = api_items.results
+				}
+
+				else {
+					this.foundItems = []
 				}
 			},
-			copy(item) {
-				this.item = item;
+			async copy(item) {
+				this.item = await this.get_api_item(item._id);
 				this.foundItems = [];
 				this.searched = '';
 				this.copy_dialog = false;
 			},
-			saveItem() {
-				if(this.$route.name === "Add item") {
+			saveItem(valid) {
+				if (!valid) {
+					this.$snotify.error("There are validation errors.", "Critical miss!", { position: "rightTop" });
+					return;
+				}
+				if(this.$route.name === "Add item" && !this.itemId) {
 					this.addItem();
 				} else {
 					this.editItem();
 				}
 			},
 			addItem() {
-				delete this.item['.value'];
-				delete this.item['.key'];
+				this.add_item(this.item).then((key) => {
+					this.$set(this, "itemId", key);
 
-				db.ref('custom_items/' + this.userId).push(this.item);
-				this.$router.replace('/content/items');
+					this.$snotify.success("Item Saved.", 'Critical hit!', {
+						position: "rightTop"
+					});
+
+					this.item_copy = JSON.stringify(this.item);
+					this.unsaved_changes = false;
+
+					this.$router.replace(`/content/items`);
+
+
+				}, error => {
+					this.$snotify.error("Couldn't save item.", "Save failed", {
+						position: "rightTop"
+					})
+					console.error(error)
+					console.log(this.item)
+				});
 			},
 			editItem() {
-				delete this.item['.key'];
+				
+				this.edit_item({
+					uid: this.userId,
+					id: this.itemId,
+					item: this.item
+				}).then(() => {
+					this.$snotify.success("Item Saved.", 'Critical hit!', {
+						position: "rightTop"
+					});
 
-				db.ref(`custom_items/${this.userId}/${this.itemId}`).set(this.item);
-				this.$router.replace('/content/items');
+					this.item_copy = JSON.stringify(this.item);
+					this.unsaved_changes = false;
+					this.$router.replace(`/content/items`);
+				}, error => {
+					this.$snotify.error("Couldn't save monster.", "Save failed", {
+						position: "rightTop"
+					})
+					console.error(error)
+					console.log(this.item)
+				});
 			},
 			addTable() {	
 				if(this.columns !== undefined) {
@@ -391,8 +412,12 @@
 			display: block;
 			width: 56px;
 			height: 56px;
+			line-height: 56px;
 			background-size: cover;
 			background-position: center top;
+			color: $neutral-2;
+			font-size: 41px;
+			text-align: center;
 		}
 	}
 

@@ -1,54 +1,58 @@
 <template>
 	<div>
-		<h1 v-if="campaign" class="mb-3 d-flex justify-content-between">
-			{{ campaign.campaign }}
+		<h1 class="mb-3 d-flex justify-content-between">
+			{{ campaign.name }}
 			<span 
 				@click="setSlide({show: true, type: 'slides/Broadcast', data: { campaign_id: campaignId } })" 
 				class="live" 
 				:class="{'active': broadcast.live === campaignId }"
 			>
-					{{ broadcast.live === campaignId ? "" : "go" }} live
+				{{ broadcast.live === campaignId ? "" : "go" }} live
 			</span>
 		</h1>
 
-		<OverEncumbered v-if="overencumbered" />
-
-		<template v-else-if="tier">
-			<div class="row q-col-gutter-md">
-				<!-- SHOW ENCOUNTERS -->
-				<div class="col-12 col-md-7">
+		<div class="row q-col-gutter-md">
+			<!-- SHOW ENCOUNTERS -->
+			<div class="col-12 col-md-7">
+				<template v-if="!loading_active">
 					<hk-card>
 						<div slot="header" class="card-header">
 							<span>
 								<span>
-								<i class="fas fa-swords mr-1" />
-								Encounters
-								<span v-if="encounters">( 
-									<span :class="{ 'green': true, 'red': Object.keys(encounters).length >= tier.benefits.encounters }">
-										{{ Object.keys(encounters).length }}
-									</span> / 
-									<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
-									<template v-else>{{ tier.benefits.encounters }}</template>
-								) </span>
-							</span>
+									<i class="fas fa-swords mr-1" />
+									Encounters
+									<span>( 
+										<span :class="
+											encounter_count > tier.benefits.encounters ? 'red' :
+											encounter_count == tier.benefits.encounters ? 'neutral-2' : 'green'
+										">
+											{{ encounter_count || 0 }}
+										</span> / 
+										<i v-if="tier.benefits.encounters == 'infinite'" class="far fa-infinity"></i>
+										<template v-else>{{ tier.benefits.encounters }}</template>
+									) </span>
+								</span>
 							</span>
 							<a 
-								v-if="Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite'" 
+								v-if="tier.benefits.encounters == 'infinite' || (!overencumbered && encounter_count < tier.benefits.encounters)" 
 								@click="add = !add"
 								class="btn btn-sm"
 							>
-								<i class="fas fa-plus green"></i>
+								<i class="fas fa-plus green" />
 								New encounter
 							</a>
+							<router-link v-else-if="overencumbered" class="btn btn-sm ml-1" to="/content/manage">
+								<i class="fas fa-box-full red mr-1"/>
+								Over encumbered
+							</router-link>
+							<router-link v-else class="btn btn-sm ml-1" to="/patreon">
+								<i class="fab fa-patreon patreon-red mr-1"/>
+								Get more slots
+							</router-link>
 						</div>
 				
 						<div class="card-body">
-							<OutOfSlots 
-								v-if="tier && Object.keys(encounters).length >= tier.benefits.encounters"
-								type='encounters'
-							/>
-
-							<div class="first-encounter" v-if="Object.keys(encounters).length === 0">
+							<div class="first-encounter" v-if="!encounter_count">
 								<q-form @submit="addEncounter">
 									<h2 class="mt-0">First encounter</h2>
 										<q-input
@@ -60,137 +64,213 @@
 											:rules="[ val => val && val.length > 0 || 'Enter a title']"
 										/>
 										
-										<q-btn class="btn btn-lg bg-green btn-block mt-4 px-0 py-0" label="Create encounter" no-caps type="submit" />
+										<q-btn 
+											class="btn btn-lg bg-green btn-block mt-4" 
+											label="Create encounter" 
+											no-caps type="submit"
+											padding="0"
+										/>
 								</q-form>
 							</div>
 
 							<!-- ACTIVE ENCOUNTERS -->
-							<hk-table
-								v-if="_active.length > 0"
-								:items="_active"
-								:columns="activeColumns"
-							>
-								<template slot="encounter" slot-scope="data">
-									<router-link v-if="data.row.entities" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-										{{ data.item }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Run encounter
-										</q-tooltip>
-									</router-link>
-									<template v-else>
-										{{ data.item }}
+							<template v-if="active_encounters.length">
+								<q-input 
+									:dark="$store.getters.theme !== 'light'" 
+									v-model="search"
+									borderless 
+									filled square
+									debounce="300" 
+									clearable
+									placeholder="Search encounter"
+								>
+									<q-icon slot="prepend" name="search" />
+								</q-input>
+								<q-table
+									:data="active_encounters"
+									:columns="columns"
+									row-key="key"
+									card-class="bg-none"
+									flat
+									:dark="$store.getters.theme !== 'light'"
+									separator="none"
+									:pagination="{ rowsPerPage: 15 }"
+									:filter="search"
+									wrap-cells
+								>	
+									<template v-slot:body-cell="props">
+										<q-td v-if="props.col.name !== 'actions'">
+											<div  class="truncate-cell">
+												<div class="truncate">
+													<router-link 
+														v-if="!overencumbered && props.col.name === 'name' && props.row.entity_count" 
+														:to="`/run-encounter/${campaignId}/${props.key}`"
+													>
+														{{ props.value }}
+													</router-link>
+													<template v-else>
+														{{ props.value }}
+													</template>
+												</div>
+											</div>
+										</q-td>
+										<q-td v-else class="text-right d-flex justify-content-between">
+											<router-link 
+												v-if="props.row.entity_count && !overencumbered" 
+												class="btn btn-sm bg-neutral-5 mr-1"
+												:to="'/run-encounter/' + campaignId + '/' + props.key"
+											>
+												<i class="fas fa-play"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Run encounter
+												</q-tooltip>
+											</router-link>
+											<a v-else class="disabled btn btn-sm mr-1 bg-neutral-5">
+												<i class="fas fa-play"></i>
+											</a>
+											<router-link 
+												v-if="!overencumbered"
+												class="mr-1 btn btn-sm bg-neutral-5" 
+												:to="'/content/campaigns/' + campaignId + '/' + props.key"
+											>
+												<i class="fas fa-pencil-alt"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Edit
+												</q-tooltip>
+											</router-link>
+											<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, props.key, props.row.name)">
+												<i class="fas fa-trash-alt"></i>
+												<q-tooltip anchor="top middle" self="center middle">
+													Delete
+												</q-tooltip>
+											</a>
+										</q-td>
 									</template>
-								</template>
-								<template slot="entities" slot-scope="data">
-									<router-link :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
-										<span class="neutral-1" v-if="data.row.entities">
-											{{ Object.keys(data.row.entities).length }}
-										</span>
-										<template v-else><i class="fas fa-plus"></i> Add</template>
-										<q-tooltip anchor="top middle" self="center middle">
-											Edit
-										</q-tooltip>
-									</router-link>
-								</template>
-
-								<span slot="status" slot-scope="data" v-if="data.row.round > 0" class="red">In progress</span>
-								<template slot="turn" slot-scope="data">{{ data.row.turn + 1 }}</template>
-
-								<template slot="actions" slot-scope="data">
-									<div class="actions">
-										<router-link 
-											v-if="data.row.entities" 
-											class="btn btn-sm bg-neutral-5"
-											:to="'/run-encounter/' + campaignId + '/' + data.row.key"
-										>
-											<i class="fas fa-play"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Run encounter
-											</q-tooltip>
-										</router-link>
-										<a v-else class="disabled btn btn-sm bg-neutral-5">
-											<i class="fas fa-play"></i>
-										</a>
-										<router-link class="mx-1 btn btn-sm bg-neutral-5" :to="'/content/campaigns/' + campaignId + '/' + data.row.key">
-											<i class="fas fa-pencil-alt"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Edit
-											</q-tooltip>
-										</router-link>
-										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key,data.row.encounter)">
-											<i class="fas fa-trash-alt"></i>
-											<q-tooltip anchor="top middle" self="center middle">
-												Delete
-											</q-tooltip>
-										</a>
-									</div>
-								</template>
-							</hk-table>
+									<div slot="no-data" />
+								</q-table>
+							</template>
 						</div>
 					</hk-card>
-					<hk-card  v-if="_finished != 0" header="Finished encounters">
-						<div class="card-body">
-							<!-- FINISHED ENCOUNTERS -->
-							<hk-table
-								:items="_finished"
-								:columns="finishedColumns"
-								:perPage="6"
-								:currentPage="currentPage"
-							>
-								<template slot="encounter" slot-scope="data">
-									<router-link class="neutral-2" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
-										{{ data.item }}
-										<q-tooltip anchor="top middle" self="center middle">
-											Run encounter
-										</q-tooltip>
-									</router-link>
-								</template>
 
-								<template slot="actions" slot-scope="data">
-									<div class="actions">
-										<router-link class="btn btn-sm bg-neutral-5" :to="'/run-encounter/' + campaignId + '/' + data.row.key">
+					<!-- FINISHED ENCOUNTERS -->
+					<hk-card v-if="finished_encounters.length">
+						<div class="card-header">
+							<span>Finished encounters</span>
+							<a 
+								class="btn btn-sm bg-neutral-5"
+								@click="deleteFinishedEncounters"
+							>
+								<i class="fas fa-trash-alt mr-1 red" />
+								Delete all
+							</a>
+						</div>
+
+						<div class="card-body">
+							<q-table
+								:data="finished_encounters"
+								:columns="columns"
+								row-key="key"
+								card-class="bg-none"
+								flat
+								:dark="$store.getters.theme !== 'light'"
+								separator="none"
+								:pagination="{ rowsPerPage: 5 }"
+								wrap-cells
+							>	
+								<template v-slot:body-cell="props">
+									<q-td v-if="props.col.name !== 'actions'">
+										<div  class="truncate-cell">
+											<div class="truncate">
+												<router-link 
+													v-if="props.col.name === 'name' && props.row.entity_count && !overencumbered" 
+													:to="`/run-encounter/${campaignId}/${props.key}`"
+												>
+													{{ props.value }}
+												</router-link>
+												<template v-else>
+													{{ props.value }}
+												</template>
+											</div>
+										</div>
+									</q-td>
+									<q-td v-else class="text-right d-flex justify-content-between">
+										<router-link 
+											v-if="!overencumbered"
+											class="btn btn-sm bg-neutral-5" 
+											:to="`/run-encounter/${campaignId}/${props.key}`"
+										>
 											<i class="fas fa-eye"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												View
 											</q-tooltip>
 										</router-link>
-										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(data.row.key, hard=false)">
+										<a class="btn btn-sm bg-neutral-5 ml-1" @click="reset(props.key, hard=false)">
 											<i class="fas fa-trash-restore-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Unfinish
 											</q-tooltip>
 										</a>
-										<a class="btn btn-sm bg-neutral-5 mx-1" @click="reset(data.row.key)">
+										<a v-if="!overencumbered" class="btn btn-sm bg-neutral-5 mx-1" @click="reset(props.key)">
 											<i class="fas fa-undo"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Reset
 											</q-tooltip>
 										</a>
-										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, data.row.key, data.row.encounter)">
+										<a class="btn btn-sm bg-neutral-5" @click="deleteEncounter($event, props.key, props.row.name)">
 											<i class="fas fa-trash-alt"></i>
 											<q-tooltip anchor="top middle" self="center middle">
 												Delete
 											</q-tooltip>
 										</a>
-									</div>
+									</q-td>
 								</template>
-							</hk-table>
-					
-							<div v-if="encounters === undefined" class="loader"><span>Loading encounters...</span></div>
+								<div slot="no-data" />
+								<hk-loader slot="loading" name="NPCs" />
+							</q-table>
+							<button 
+								v-if="encounter_count > (active_encounters.length + finished_encounters.length)"
+								class="btn btn-block mb-2 bg-neutral-5" 
+								@click="getFinishedEncounters">
+								Get all finished encounters
+							</button>
 						</div>
 					</hk-card>
-				</div>
-
-				<!-- PLAYERS -->
-				<div class="col-12 col-md-5">
-					<Players :userId="user.uid" :campaignId="campaignId" card-view />
-				</div>
+					<template v-else-if="encounter_count > active_encounters.length">
+						<template v-if="!loading_finished">
+							<q-banner 
+								v-if="finished_fetched" 
+								:dark="$store.getters.theme !== 'light'"
+								rounded inline-actions
+								class="mb-3"
+							>
+								No finished encounters found.
+								<q-btn slot="action" size="sm" flat padding="sm" no-caps icon="fas fa-times" @click="finished_fetched = false" />
+							</q-banner>
+							<button class="btn btn-block mb-2 bg-neutral-5" @click="getFinishedEncounters">Get finished encounters</button>
+							<p class="text-center"><small>Your finished encounters count towards your total.</small></p>
+						</template>
+						<hk-card v-else>
+							<hk-loader name="encounters" />
+						</hk-card>
+					</template>
+				</template>
+				<hk-card v-else>
+					<hk-loader name="encounters" />
+				</hk-card>
 			</div>
-		</template>
 
+			<!-- PLAYERS -->
+			<div class="col-12 col-md-5">
+				<Players v-if="!loading_campaign" :userId="user.uid" :campaignId="campaignId" card-view />
+				<hk-card v-else>
+					<hk-loader name="campaign" />
+				</hk-card>
+			</div>
+		</div>
+		
 		<!-- New encounter dialog -->
 		<q-dialog 
-			v-if="add && (Object.keys(encounters).length < tier.benefits.encounters || tier.benefits.encounters == 'infinite')"
+			v-if="add && (encounter_count < tier.benefits.encounters || tier.benefits.encounters == 'infinite')"
 			v-model="add" 
 			square
 		>
@@ -219,15 +299,12 @@
 </template>
 
 <script>
-	import _ from "lodash";
-	import OverEncumbered from "@/components/OverEncumbered.vue";
 	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import Crumble from "@/components/crumble";
 	import PlayerLink from "@/components/PlayerLink.vue";
 	import Players from "@/components/campaign/Players.vue";
 
 	import { mapGetters, mapActions } from "vuex";
-	import { db } from "@/firebase";
 
 	export default {
 		name: "Encounters",
@@ -237,7 +314,6 @@
 		components: {
 			Crumble,
 			PlayerLink,
-			OverEncumbered,
 			OutOfSlots,
 			Players
 		},
@@ -246,119 +322,76 @@
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
 				encounters: {},
+				loading_campaign: true,
+				loading_active: true,
+				loading_finished: false,
+				finished_fetched: false,
 				campaign: {},
 				newEncounter: "",
 				add: false,
 				currentPage: 1,
-				collapsed: false,
-				activeColumns: {
-					encounter: {
-						label: "Encounter",
-						maxContent: true,
-						sortable: true
+				search: undefined,
+				columns: [
+					{
+						name: "name",
+						label: "Name",
+						field: "name",
+						sortable: true,
+						align: "left"
 					},
-					entities: {
+					{
+						name: "entities",
 						label: "Entities",
-						center: true
+						field: "entity_count",
+						align: "left"
 					},
-					status: {
-						label: "Status",
-						truncate: true,
-						hide: "sm"
-					},
-					round: {
+					{
+						name: "round",
 						label: "Round",
-						center: true,
-						truncate: true,
-						hide: "md"
+						field: "round",
+						align: "left"
 					},
-					turn: {
+					{
+						name: "turn",
 						label: "Turn",
-						center: true,
-						truncate: true,
-						hide: "md"
+						field: "turn",
+						align: "left",
+						format: val => val + 1
 					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				},
-				finishedColumns: {
-					encounter: {
-						label: "Encounter",
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						maxContent: true,
-						right: true
-					}
-				}
+				]
 			}
 		},
 		async mounted() {
-			await this.get_campaign({
+			this.campaign = await this.get_campaign({
 				uid: this.user.uid,
 				id: this.campaignId
-			}).then((campaign) => {
-				this.campaign = campaign;
-				this.setCurHp(campaign.players);
-				this.removeGhostPlayers(campaign.players);
-				this.checkAdvancement(campaign);
-				this.set_active_campaign(this.campaignId);
 			});
+			this.set_active_campaign(this.campaignId);
+			this.loading_campaign = false;
 
-			await this.get_campaign_encounters(this.campaignId).then(encounters => {
-				this.encounters = encounters;
-			});		
+			await this.get_campaign_encounters({ campaignId: this.campaignId });
+			this.loading_active = false;
 		},
 		computed: {
 			...mapGetters([
 				"tier",
 				"overencumbered",
-				"content_count",
-				"side_collapsed",
 				"broadcast"
 			]),
-			...mapGetters("players", ["players"]),
-			_active: function() {
-				return _.chain(this.encounters)
-				.filter(function(encounter, key) {
-					encounter.key = key
-					return encounter.finished == false;
-				})
-				.orderBy(function(encounter){
-					if (encounter.order == undefined) {
-						encounter.order = 0
-					}
-					return parseInt(encounter.timestamp)
-				} , 'asc')
-				.value()
+			...mapGetters("encounters", ["get_encounters", "get_encounter_count"]),
+			encounter_count() {
+				return this.get_encounter_count(this.campaignId);
 			},
-			_finished: function() {
-				return _.chain(this.encounters)
-				.filter(function(encounter, key) {
-					encounter.key = key
-					return encounter.finished == true;
-				})
-				.orderBy(function(encounter){
-					return parseInt(encounter.timestamp)
-				} , 'asc')
-				.value()
+			active_encounters() {
+				return this.get_encounters(this.campaignId, false);
 			},
-			noCurHp() {
-				//Checks if all players have their curHp set
-				//If not, it is set on mounted
-				let check = false;
-				if(this.campaign) {
-					for(const key in this.campaign.players) {
-						if(this.campaign.players[key].curHp == undefined) {
-							check = true;
-						}
-					}
-				}
-				return check;
+			finished_encounters() {
+				return this.get_encounters(this.campaignId, true);
 			}
 		},
 		methods: {
@@ -366,127 +399,90 @@
 			...mapActions("encounters", [
 				"get_campaign_encounters",
 				"add_encounter",
-				"delete_encounter"
+				"delete_encounter",
+				"delete_finished_encounters",
+				"finish_encounter",
+				"reset_encounter",
 			]),
 			...mapActions("campaigns", [
 				"get_campaign",
 				"set_active_campaign"
 			]),
+			async getFinishedEncounters() {
+				this.loading_finished = true;
+				await this.get_campaign_encounters({ campaignId: this.campaignId, finished: true });
+				this.loading_finished = false;
+				this.finished_fetched = true;
+			},
 			addEncounter() {
-				if ((Object.keys(this.encounters).length < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
-					db.ref('encounters/' + this.user.uid + '/' + this.campaignId).push({
-						encounter: this.newEncounter, 
-						round: 0, 
-						turn: 0, 
-						finished: false,
-						timestamp: Date.now()
+				if ((this.encounter_count < this.tier.benefits.encounters || this.tier.benefits.encounters == 'infinite')) {
+					this.add_encounter({
+						campaignId: this.campaignId, 
+						encounter: {
+							name: this.newEncounter, 
+							round: 0, 
+							turn: 0, 
+							finished: false,
+							timestamp: Date.now()
+						}
 					});
-					this.newEncounter = '';
+					this.newEncounter = "";
 					this.$snotify.success('Encounter added.', 'Critical hit!', {
 						position: "rightTop"
 					});
-					this.$validator.reset();
 					this.add = false;
 				}
 			},
 			deleteEncounter(e, key, encounter) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.delete_encounter(this.campaignId, key);
+					this.delete_encounter({ 
+						campaignId: this.campaignId, 
+						id: key
+					});
 				} else {
 					this.$snotify.error('Are you sure you want to delete "' + encounter + '"?', 'Delete encounter', {
 						timeout: 5000,
 						buttons: [
-						{
-							text: 'Yes', action: (toast) => { 
-								this.delete_encounter(this.campaignId, key);
-								this.$snotify.remove(toast.id); 
-							}, bold: false 
-						},
-						{
+							{
+								text: 'Yes', action: (toast) => { 
+									this.delete_encounter({
+										campaignId: this.campaignId, 
+										id: key
+									});
+									this.$snotify.remove(toast.id); 
+								}, bold: false 
+							},
+							{
 							text: 'No', action: (toast) => { 
 								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false },
+							}, bold: false },
 						]
 					});
 				}
+			},
+			async deleteFinishedEncounters() {
+				this.$snotify.error('Are you sure you want to delete all finished encounters?', 'Delete finished encounters', {
+						timeout: 5000,
+						buttons: [
+							{
+								text: 'Yes', action: async (toast) => { 
+									await this.delete_finished_encounters(this.campaignId);
+									this.$snotify.remove(toast.id); 
+								}, bold: false 
+							},
+							{
+							text: 'No', action: (toast) => { 
+								this.$snotify.remove(toast.id); 
+							}, bold: false },
+						]
+					});
 			},
 			reset(id, hard=true) {
-				if (hard){
-					for(let key in this.encounters[id].entities) {
-						let entity = this.encounters[id].entities[key]
-
-						//Remove values
-						delete entity.tempHp
-						delete entity.transformed
-						delete entity.stabilized
-						delete entity.down
-						delete entity.ac_bonus
-						delete entity.meters
-						delete entity.hidden
-
-						if(entity.entityType == 'npc') {
-							entity.curHp = entity.maxHp
-						}
-						entity.initiative = 0;
-
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/entities/${key}`).set(entity);
-
-						//CLEAR LOG
-						localStorage.removeItem(id);
-					}
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/xp_awarded`).remove();
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/currency_awarded`).remove();
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/turn`).set(0);
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/round`).set(0);
-				}
-
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${id}/finished`).set(false);
-
-			},
-			setCurHp(players) {
-				if(this.noCurHp) {
-					//Stores player with curHp under campaign
-					for(const key in players) {
-						if(this.campaign.players[key].curHp === undefined) {
-							db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update({
-								curHp: this.players[key].maxHp
-							});
-						}
-					}
-					this.noCurHp = false;
-				}
-			},
-			checkAdvancement(campaign) {
-				if(!campaign.advancement) {
-					this.$snotify.warning('Are you using Experience or Milestone as advancment for this campaign?' ,'Set advancement', {
-						timeout: 0,
-						buttons: [
-						{
-							text: 'Experience', action: (toast) => { 
-								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('experience'); 
-								this.$snotify.remove(toast.id); 
-							}, bold: false 
-						},
-						{
-							text: 'Milestone', action: (toast) => { 
-								db.ref(`campaigns/${this.user.uid}/${this.campaignId}/advancement`).set('milestone');
-								this.$snotify.remove(toast.id); 
-							}, 
-							bold: false },
-						]
-					});
-				}
-			},
-			removeGhostPlayers(campaignPlayers) {
-				const players = Object.keys(this.players);
-				for(let key in campaignPlayers) {
-					if(!players.includes(key)) {
-						// eslint-disable-next-line
-						console.error('Ghost Player Removed: ', key);
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).remove();
-					}
+				if(hard) {
+					this.reset_encounter({campaignId: this.campaignId, id});
+				} else {
+					this.finish_encounter({ campaignId: this.campaignId, id, finished: false });
 				}
 			}
 		}
@@ -517,7 +513,7 @@
 		padding: 20px;
 
 		&.bg-green {
-			color:$neutral-1;
+			color: $neutral-1;
 			animation: blink normal 3s infinite ease-in-out;
 		}
 		h3 {

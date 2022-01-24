@@ -235,6 +235,8 @@
 										max="20"
 										v-model="playerBase.level"
 										:clearable="isXpAdvancement()"
+										:error="invalid && validated"
+										:error-message="errors[0]"
 									>
 										<span slot="append" v-if="isXpAdvancement()" :class="{ red: playerBase.level  }">
 											{{ calculatedLevel(playerBase.experience) }}
@@ -297,7 +299,7 @@
 	import Transform from './party/Transform.vue';
 
 	export default {
-		name: 'EditEntity',
+		name: 'EditPlayer',
 		mixins: [experience],
 		components: {
 			Transform
@@ -324,7 +326,7 @@
 		},
 		async mounted() {
 			await this.get_campaign({ uid: this.userId, id: this.campaignId }).then(result => {
-				const entity = result.players[this.entityKey]
+				const entity = result.players[this.entityKey];
 				this.entity = entity;
 				this.maxHpMod = entity.maxHpMod;
 				this.advancement = result.advancement;
@@ -501,7 +503,11 @@
 					player: this.entity
 				});
 				// Update the player
-				this.edit_player({ uid: this.userId, id: this.entityKey, player: this.playerBase });
+				this.edit_player({ 
+					uid: this.userId, 
+					id: this.entityKey, 
+					player: this.playerBase
+				});
 
 				//If the new curHp > 0, revive a player and set the new curHp 
 				if(this.entity.curHp > 0) {

@@ -1,87 +1,74 @@
 <template>
 	<hk-card v-if="tier">
-		<div class="card-header">
-			<span>
-				Reminders ( 
-				<span :class="{ 'green': true, 'red': content_count.reminders >= tier.benefits.reminders }">{{ Object.keys(reminders).length }}</span> 
-					/ 
-					<i v-if="tier.benefits.reminders == 'infinite'" class="far fa-infinity"></i> 
-					<template v-else>{{ tier.benefits.reminders }}</template>	
-					)
-			</span>
-			<router-link v-if="!overencumbered" class="btn btn-sm bg-neutral-5" :to="`${$route.path}/add-reminder`">
-				<i class="fas fa-plus green"></i> New Reminder
-			</router-link>
-		</div>
-		<div class="card-body">
-			<p class="neutral-2">Reminders create useful notifications during encounters, so you don't forget someone was concentrating for instance.</p>
-			<template v-if="reminders">
-				<OutOfSlots 
-					v-if="content_count.reminders >= tier.benefits.reminders"
-					type = 'reminders'
-				/>
+		<ContentHeader type="reminders" />
+		<div class="card-body" v-if="!loading_reminders">
+			<p class="neutral-2">
+				Reminders create useful notifications during encounters, 
+				so you don't forget someone was concentrating for instance.
+			</p>
 
-				<hk-table
+			<template v-if="reminders.length">
+				<q-table
+					:data="reminders"
 					:columns="columns"
-					:items="reminders"
-					:search="['title']"
+					row-key="key"
+					card-class="bg-none"
+					flat
+					:dark="$store.getters.theme !== 'light'"
+					:loading="loading_reminders"
+					separator="none"
+					:pagination="{ rowsPerPage: 15 }"
+					:filter="search"
+					wrap-cells
 				>
-					<template slot="title" slot-scope="data">
-						<router-link class="mx-2" :to="`${$route.path}/${data.row['.key']}`">
-							{{ data.item }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
+					<template v-slot:body-cell="props">
+
+						<q-td v-if="props.col.name !== 'actions'">
+							<div class="truncate-cell">
+								<div class="truncate"> 
+									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ props.value }}
+									</router-link>
+									<template v-else>
+										{{ props.value }}
+									</template>
+								</div>
+							</div>
+						</q-td>
+
+						<q-td v-else class="text-right d-flex justify-content-between">
+							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</q-td>
 					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`${$route.path}/${data.row['.key']}`">
-							<i class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row['.key'], data.row.title)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.reminders !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open reminder slot</span>
-						<router-link v-if="!overencumbered" :to="`${$route.path}/add-reminder`">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="!tier || tier.name === 'Free'">
-					<router-link class="openSlot none" to="/patreon">
-						Support us on Patreon for more slots.
-					</router-link>
-				</template>
+					<div slot="no-data" />
+				</q-table>
 			</template>
-			<router-link v-if="reminders === null && !overencumbered" :to="`${$route.path}/add-reminder`">
+
+			<router-link v-if="!reminders.length && !overencumbered" class="btn btn-lg bg-neutral-5" :to="`${$route.path}/add-reminder`">
 				<i class="fas fa-plus green"></i> Create your first reminder
 			</router-link>
+			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+				Get more reminder slots
+			</router-link>
 		</div>
+		<hk-loader v-else name="reminders" />
 	</hk-card>
 </template>
 
 <script>
-	import _ from 'lodash';
-	import OverEncumbered from '@/components/OverEncumbered.vue';
-	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
-	import { db } from '@/firebase';
+	import { mapActions, mapGetters } from 'vuex';
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Reminders',
@@ -89,52 +76,42 @@
 			title: 'Reminders'
 		},
 		components: {
-			OverEncumbered,
-			OutOfSlots
+			ContentHeader
 		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
-				columns: {
-					title: {
-						label: 'Title',
-						truncate: true,
+				loading_reminders: true,
+				search: "",
+				columns: [
+					{
+						name: "title",
+						label: "Title",
+						field: "title",
 						sortable: true,
+						align: "left",
 					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				}
-			}
-		},
-		firebase() {
-			return {
-				reminders: db.ref(`reminders/${this.userId}`)
+				]
 			}
 		},
 		computed: {
 			...mapGetters([
 				'tier',
 				'overencumbered',
-				'content_count',
 			]),
-			_reminders: function() {
-				return _.chain(this.reminders)
-				.filter(function(reminder, key) {
-					reminder.key = key
-					return reminder
-				})
-				.orderBy("title", 'asc')
-				.value()
-			},
-			slotsLeft() {
-				return this.tier.benefits.reminders - Object.keys(this.reminders).length
-			}
+			...mapGetters("reminders", ["reminders"])
+		},
+		async mounted() {
+			await this.get_reminders();
+			this.loading_reminders = false;
 		},
 		methods: {
+			...mapActions("reminders", ["get_reminders", "delete_reminder"]),
 			confirmDelete(e, key, reminder) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
@@ -161,27 +138,8 @@
 				}
 			},
 			deleteReminder(key) {
-				//Remove player
-				db.ref(`reminders/${this.userId}`).child(key).remove(); 
+				this.delete_reminder(key);
 			}
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.container-fluid {
-		h2 {
-			border-bottom: solid 1px $neutral-4;
-			padding-bottom: 10px;
-
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
-
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
-</style>

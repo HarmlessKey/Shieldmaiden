@@ -1,5 +1,5 @@
 <template>
-	<div v-if="!loading">
+	<div class="content__edit" v-if="!loading">
 		<ValidationObserver  v-slot="{ handleSubmit, valid }">
 			<q-form @submit="handleSubmit(saveNpc)" greedy>
 				<div>
@@ -108,7 +108,7 @@
 		name: 'Npcs',
 		mixins: [general],
 		metaInfo: {
-			title: 'NPC\'s'
+			title: 'NPCs'
 		},
 		components: {
 			BasicInfo,
@@ -172,14 +172,14 @@
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("monsters", ["get_monsters", "get_monster"]),
+			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
 			...mapActions("npcs", ["add_npc", "edit_npc", "get_npc"]),
 			isOwner() {
 				if (this.$route.name == 'Edit Companion') {
 					return false;
 				} return true;
 			},
-			copy(npc) {
+			copy({ npc }) {
 				this.copy_dialog = false;
 				this.npc = npc;
 			},
@@ -248,37 +248,6 @@
 					this.npc_copy = JSON.stringify(this.npc);
 				});
 			},
-			// loadJSON() {
-			// 	const fr = new FileReader();
-
-			// 	fr.onload = e => {
-			// 		const result = JSON.parse(e.target.result)
-			// 		// const formatted = JSON.stringify(result, null, 2)
-			// 		// console.log(formatted)
-			// 		delete result.key
-
-			// 		this.npc = result
-			// 		this.import_dialog = false
-			// 		this.json_file = undefined
-
-			// 		console.log(this.npc)
-			// 	}
-
-			// 	fr.readAsText(this.json_file)
-			// },
-			// parse_JSON_input() {
-
-			// 	try {
-			// 		this.npc = JSON.parse(this.json_input);
-			// 		this.import_dialog = false;
-			// 		this.json_input = "";
-			// 	} 
-			// 	catch {
-			// 		console.log("Invalid JSON");
-			// 		this.$snotify.error("Invalid JSON");
-			// 	}
-				
-			// }
 		},
 		beforeRouteLeave(to, from, next) {
 			if (this.unsaved_changes) {
@@ -296,7 +265,7 @@
 </script>
 
 <style lang="scss" scoped>
-.content {
+.content__edit {
 
 	.top {
 		display: flex;
@@ -320,34 +289,7 @@
 			}
 		}
 	}
-	.save {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-wrap: wrap;
-		position: sticky;
-		bottom: 5px;
-		padding: 10px 10px;
-		margin: 5px 5px;
-		background: $neutral-9;
-		border: solid 1px $neutral-8;
-		border-radius: $border-radius;
-		flex-direction: row-reverse;
-
-		.unsaved_changes {
-			margin: 0 10px 0 0;
-			line-height: 31px;
-		}
-		.buttons {
-			display: flex;
-			justify-content: flex-end;
-		}
-		@media only screen and (max-width: 343px) {
-			.buttons {
-				margin-bottom: 15px;
-			}
-		}
-	}
+	
 }
 
 

@@ -1,101 +1,90 @@
 <template>
 	<hk-card v-if="tier">
-		<div slot="header" class="card-header">
-			<span>
-				Players ( 
-				<span :class="{ 'green': true, 'red': content_count.players >= tier.benefits.players }">{{ content_count.players }}</span> 
-					/ 
-					<i v-if="tier.benefits.players == 'infinite'" class="far fa-infinity"></i> 
-					<template v-else>{{ tier.benefits.players }}</template>	
-					)
-			</span>
-			<router-link class="btn btn-sm" v-if="!overencumbered" :to="`${$route.path}/add-player`">
-				<i class="fas fa-plus green"></i> New Player
-			</router-link>
-		</div>
+		<ContentHeader type="players" />
 
-		<div class="card-body">
+		<div class="card-body" v-if="!loading_players">
 			<p class="neutral-2">These are the players you can use in your campaigns.</p>
-			<template v-if="players">
-				<OutOfSlots
-					v-if="content_count.players >= tier.benefits.players"
-					type = 'players'
-				/>
-				<hk-table
-					:columns="columns"
-					:items="_players"
-					:search="['character_name', 'campaign_name']"
+			<template v-if="players.length">
+				<q-input 
+					:dark="$store.getters.theme !== 'light'" 
+					v-model="search"
+					borderless 
+					filled square
+					debounce="300" 
+					clearable
+					placeholder="Search players"
 				>
-					<template slot="avatar" slot-scope="data">
-						<div class="image" :style="{ backgroundImage: 'url(\'' + data.item + '\')' }">
-							<i v-if="!data.item" class="hki-player" />
-						</div>
+					<q-icon slot="prepend" name="search" />
+				</q-input>
+
+				<q-table
+					:data="players"
+					:columns="columns"
+					row-key="key"
+					card-class="bg-none"
+					flat
+					:dark="$store.getters.theme !== 'light'"
+					:loading="loading_players"
+					separator="none"
+					:pagination="{ rowsPerPage: 15 }"
+					:filter="search"
+					wrap-cells
+				>	
+					<template v-slot:body-cell="props">
+						<q-td 
+							v-if="props.col.name === 'avatar'" 
+							class="avatar"
+							:style="props.value ? `background-image: url('${props.value}')` : ''"
+						>
+							<i v-if="!props.value" class="hki-player" />
+						</q-td>
+						<q-td v-else-if="props.col.name !== 'actions'">
+							<div  class="truncate-cell">
+								<div class="truncate">
+									<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+										{{ props.value }}
+									</router-link>
+									<template v-else>
+										{{ props.value }}
+									</template>
+								</div>
+							</div>
+						</q-td>
+						<q-td v-else class="text-right d-flex justify-content-between">
+							<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
+								<i class="fas fa-pencil"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Edit
+								</q-tooltip>
+							</router-link>
+							<a class="btn btn-sm bg-neutral-5 ml-2" @click="confirmDelete($event, props.key, props.row)">
+								<i class="fas fa-trash-alt"></i>
+								<q-tooltip anchor="top middle" self="center middle">
+									Delete
+								</q-tooltip>
+							</a>
+						</q-td>
 					</template>
-
-					<template slot="character_name" slot-scope="data">
-						<router-link class="mx-2"  :to="`${$route.path}/${data.row.key}`">
-							{{ data.item }}
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-					</template>
-
-					<template slot="campaign_name" slot-scope="data">
-						{{ data.item }}
-					</template>
-
-					<template slot="level" slot-scope="data">
-						{{ data.item ? data.item : calculatedLevel(data.row.experience) }}
-					</template>
-
-					<div slot="actions" slot-scope="data" class="actions">
-						<router-link class="btn btn-sm bg-neutral-5 mx-1" :to="`${$route.path}/${data.row.key}`">
-							<i class="fas fa-pencil"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Edit
-							</q-tooltip>
-						</router-link>
-						<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, data.row.key, data.row)">
-							<i class="fas fa-trash-alt"></i>
-							<q-tooltip anchor="top middle" self="center middle">
-								Delete
-							</q-tooltip>
-						</a>
-					</div>
-				</hk-table>
-
-				<template v-if="slotsLeft > 0 && tier.benefits.players !== 'infinite'">
-					<div 
-						class="openSlot"
-						v-for="index in slotsLeft"
-						:key="'open-slot-' + index"
-					>
-						<span>Open player slot</span>
-						<router-link v-if="!overencumbered" to="/players/add-player">
-							<i class="fas fa-plus green"></i>
-						</router-link>
-					</div>
-				</template>
-				<template v-if="!tier || tier.name === 'Free'">
-					<router-link class="openSlot none" to="/patreon">
-						Support us on Patreon for more slots.
-					</router-link>
-				</template>
+					<div slot="no-data" />
+					<hk-loader slot="loading" name="players" />
+				</q-table>
 			</template>
-			<router-link v-else-if="players === null && !overencumbered" class="btn btn-block mt-4" to="/players/add-player">
-				Create your first player
+
+			<router-link v-if="!players.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/players/add-player">
+				<i class="fas fa-plus green mr-1" /> Create your first player
+			</router-link>
+			<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+				Get more player slots
 			</router-link>
 		</div>
+		<hk-loader v-else name="players" />
 	</hk-card>
 </template>
 
 <script>
-	import _ from 'lodash';
-	import OutOfSlots from '@/components/OutOfSlots.vue';
 	import { mapGetters, mapActions } from 'vuex';
-	import { db } from '@/firebase';
 	import { experience } from '@/mixins/experience.js';
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Players',
@@ -104,82 +93,58 @@
 			title: 'Players'
 		},
 		components: {
-			OutOfSlots
+			ContentHeader
 		},
 		data() {
 			return {
-				userId: this.$store.getters.user.uid,
-				columns: {
-					avatar: {
-						width: 46,
-						noPadding: true
+				loading_players: true,
+				search: "",
+				columns: [
+					{
+						name: "avatar",
+						label: "",
+						field: "avatar",
+						align: "left"
 					},
-					character_name: {
-						label: 'Character Name',
-						truncate: true,
+					{
+						name: "name",
+						label: "Name",
+						field: "character_name",
 						sortable: true,
+						align: "left"
 					},
-					campaign_name: {
-						label: 'Campaign',
-						sortable: true,
-					},
-					level: {
-						label: 'Level',
-						// center: true,
-						// sortable: true,
-					},
-					actions: {
-						label: '<i class="far fa-ellipsis-h"></i>',
-						noPadding: true,
-						right: true,
-						maxContent: true
+					{
+						name: "actions",
+						label: "",
+						align: "right"
 					}
-				}
+				]
 			}
 		},
 		computed: {
 			...mapGetters([
 				'tier',
-				'allEncounters',
 				'overencumbered',
-				'content_count',
 			]),
-			...mapGetters("players", ["players"]),
-			...mapGetters("campaigns", ["campaigns"]),
-			_players: function() {
-				let vm = this;
-				return _.chain(this.players)
-				.filter(function(player, key) {
-					player.key = key
-					if (player.campaign_id) {
-						if (vm.campaigns[player.campaign_id] !== undefined)
-							player.campaign_name = vm.campaigns[player.campaign_id].campaign
-						else
-							player.campaign_id = undefined;
-					}
-
-					return player
-				})
-				.orderBy("character_name", 'asc')
-				.value()
-			},
-			slotsLeft() {
-				return this.tier.benefits.players - this.content_count.players
-			}
+			...mapGetters("players", ["players"])
+		},
+		async mounted() {
+			await this.get_players();
+			this.loading_players = false;
 		},
 		methods: {
-			...mapActions("players", ["deletePlayer"]),
+			...mapActions("players", ["get_players", "delete_player"]),
 			confirmDelete(e, key, player) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deletePlayer(key, player);
+					this.deletePlayer(key);
 				} else {
-					this.$snotify.error('Are you sure you want to delete ' + player.player_name + '?', 'Delete player', {
+					this.$snotify.error('Are you sure you want to delete ' + player.character_name + '?', 'Delete player', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deletePlayer(key, player)
+								this.deletePlayer(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -194,55 +159,9 @@
 					});
 				}
 			},
-			deletePlayer(key, player) {
-				//Remove from character control
-				if(player.control) {
-					db.ref(`character_control/${player.control}`).child(key).remove(); 
-				}
-
-				for(let campaign in this.campaigns) {
-					//Remove player from campaigns
-					db.ref('campaigns/' + this.userId + '/' + campaign + '/players').child(key).remove();
-
-					//Go over all encounters of the campaign
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-						for(let enc in this.allEncounters[campaign]) {
-
-							//Go over all entities in the encounter
-							db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(key).remove();
-
-							// Remove companions from each encounter
-							for (let comp_key in player.companions) {
-								db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities`).child(comp_key).remove();
-							}
-						}
-					}
-				}
-				//Remove player
-				this.deletePlayer({ 
-					id:key, 
-					companions: player.companions
-				});
+			deletePlayer(key) {
+				this.delete_player(key);
 			}
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.container-fluid {
-		h2 {
-			border-bottom: solid 1px $neutral-4;
-			padding-bottom: 10px;
-
-			a {
-				text-transform: none;
-				color: $neutral-2 !important;
-
-				&:hover {
-					text-decoration: none;
-				}
-			}
-		}
-	}
-
-</style>

@@ -1,48 +1,25 @@
 <template>
 	<div v-if="tier">
-		<template v-if="players">
+		<template>
 			<hk-card>
-				<div slot="header" class="card-header">
-					<span>
-						Your Campaigns
-						<span v-if="campaigns && tier">( 
-							<span :class="{ 'green': true, 'red': content_count.campaigns >= tier.benefits.campaigns }">
-								{{ content_count.campaigns }}
-							</span> / 
-							<i v-if="tier.benefits.campaigns == 'infinite'" class="far fa-infinity"></i>
-							<template v-else>{{ tier.benefits.campaigns }}</template>
-						) </span>
-					</span>
-					<a 
-						v-if="content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite'" 
-						@click="add = !add"
-						class="btn btn-sm"
-					>
-						<i class="fas fa-plus green mr-1"></i> New campaign
-					</a>
-				</div>
+				<ContentHeader type="campaigns" @add="add = !add" />
 
-				<div class="card-body">
-					<OutOfSlots 
-						v-if="tier && content_count.campaigns >= tier.benefits.campaigns"
-						type = 'campaigns'
-					/>
-
+				<div class="card-body" v-if="!loading_campaigns">
 					<!-- NO PLAYERS YET -->
-					<div class="first-campaign pb-4" v-if="content_count.players === 0 && (content_count.campaigns > 0)">
-						<h2>Create players for your campaign</h2>
+					<div class="first-campaign pb-4" v-if="campaign_count && !player_count">
+						<h2>Create players for your campaigns</h2>
 						<router-link to="/content/players" class="btn btn-lg bg-green btn-block mt-4">Create players</router-link>
 					</div>
 
 					<transition-group 
-						v-if="campaigns && content_count.campaigns > 0"
+						v-if="campaigns && campaign_count"
 						tag="div" 
 						class="row q-col-gutter-md" 
 						name="campaigns" 
 						enter-active-class="animated animate__fadeIn" 
 						leave-active-class="animated animate__fadeOut"
 					>
-						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in _campaigns" :key="campaign.key">
+						<div class="col-12 col-sm-6 col-md-4" v-for="campaign in campaigns" :key="campaign.key">
 							<hk-card>
 								<!-- Image -->
 								<div 
@@ -66,21 +43,23 @@
 											</q-tooltip>
 										</i>
 										<div class="campaign-actions">
-											<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign.key }">
-												<i class="fas fa-user-plus"></i>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Add players
-												</q-tooltip>
-											</a>
-											<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign.key }">
-												<i class="fas fa-pencil"></i>
-												<q-tooltip anchor="top middle" self="bottom middle">
-													Edit
-												</q-tooltip>
-											</a>
+											<template v-if="!overencumbered">
+												<a class="btn btn-sm btn-clear white" @click="edit_players = { show: true, campaign: campaign }">
+													<i class="fas fa-user-plus"></i>
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Add players
+													</q-tooltip>
+												</a>
+												<a class="btn btn-sm btn-clear white" @click="edit_campaign = { show: true, campaign: campaign }">
+													<i class="fas fa-pencil"></i>
+													<q-tooltip anchor="top middle" self="bottom middle">
+														Edit
+													</q-tooltip>
+												</a>
+											</template>
 											<a
 												class="btn btn-sm btn-clear white"
-												@click="confirmDelete($event, campaign.key, campaign.campaign)"
+												@click="confirmDelete($event, campaign.key, campaign.name)"
 											>
 												<i class="fas fa-trash-alt"></i>
 												<q-tooltip anchor="top middle" self="bottom middle">
@@ -104,14 +83,18 @@
 										{{ campaign.advancement !== "milestone" ? "Experience" : "Milestone" }} advancement
 									</div>
 									<h3 class="truncate">
-										{{ campaign.campaign }}
+										{{ campaign.name }}
 									</h3>
 
 									<div class="mb-1">
-										<a class="btn btn-clear btn-sm" @click="edit_players = { show: true, campaign: campaign.key }">
+										<a 
+											class="btn btn-clear btn-sm" 
+											@click="!overencumbered ? edit_players = { show: true, campaign: campaign } : null"
+											:disabled="overencumbered"
+										>
 											<i class="fas fa-users mr-1 neutral-2" />
-											{{ campaign.players ? Object.keys(campaign.players).length : "0" }}
-											players
+											{{ campaign.player_count ? campaign.player_count : "0" }}
+											player{{ campaign.player_count === 1 ? "" : "s" }}
 										</a>
 									</div>
 									
@@ -119,27 +102,44 @@
 										<i class="fas fa-swords mr-2 neutral-2" />
 											<span 
 												:class="{ 
-													'green': campaign.encounters > 0, 
-													'red': campaign.encounters >= tier.benefits.encounters 
+													'green': get_encounter_count(campaign.key), 
+													'red': get_encounter_count(campaign.key) > tier.benefits.encounters 
 												}"
 											>
-												{{ campaign.encounters }}
+												{{ get_encounter_count(campaign.key) || 0 }}
 											</span>
-											encounters
+											encounter{{ get_encounter_count(campaign.key) === 1 ? "" : "s" }}
 									</router-link>
 									
-									<div class="mt-4">
-										<router-link to="/content/players" v-if="Object.keys(players).length === 0" class="btn ">
+									<div class="mt-4" v-if="!overencumbered">
+										<router-link to="/content/players" v-if="!player_count" class="btn ">
 											<i class="fas fa-user"></i> Create players
 										</router-link>
-										<a @click="edit_players = { show: true, campaign: campaign.key }" v-else-if="!campaign.players" class="btn">
+										<a 
+											v-else-if="!campaign.player_count" class="btn"
+											@click="edit_players = { show: true, campaign: campaign }" 
+										>
 											<i class="fas fa-plus"></i> Add players
 										</a>
-										<router-link :to="`${$route.path}/${campaign.key}`" v-else-if="!campaign.encounters" class="btn">
+										<router-link 
+											v-else-if="!get_encounter_count(campaign.key)" class="btn"
+											:to="`${$route.path}/${campaign.key}`" 
+										>
 											<i class="fas fa-swords"></i> Add encounters
 										</router-link>
 										<router-link :to="`${$route.path}/${campaign.key}`" v-else class="btn bg-green">
 											Continue
+										</router-link>
+									</div>
+									<div v-else class="mt-4">
+										<router-link 
+											v-if="get_encounter_count(campaign.key) > tier.benefits.encounters"
+											:to="`${$route.path}/${campaign.key}`" class="btn bg-red"
+										>
+											Too many encounters
+										</router-link>
+										<router-link :to="`${$route.path}/${campaign.key}`" class="btn bg-neutral-5">
+											View campaign
 										</router-link>
 									</div>
 								</div>
@@ -173,10 +173,11 @@
 								:options="advancement_options"
 							/>
 							
-							<q-btn class="btn btn-lg bg-green btn-block mt-4" no-caps type="submit" label="Create campaign" />
+							<q-btn class="btn btn-lg bg-green btn-block mt-4" padding="xs" no-caps type="submit" label="Create campaign" />
 						</q-form>
 					</div>
 				</div>
+				<hk-loader v-else name="campaigns" />
 			</hk-card>
 
 		</template>
@@ -184,7 +185,7 @@
 			
 		<!-- New campaign dialog -->
 		<q-dialog 
-			v-if="(content_count.campaigns < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')"
+			v-if="(campaign_count < tier.benefits.campaigns || tier.benefits.encounters == 'infinite')"
 			square
 			v-model="add"
 		>
@@ -222,26 +223,23 @@
 		</q-dialog>
 
 		<!-- Edit campaign dialog -->
-		<q-dialog v-model="edit_campaign.show">
-			<EditCampaign :campaign-id="edit_campaign.campaign" />
+		<q-dialog v-if="!overencumbered" v-model="edit_campaign.show">
+			<EditCampaign :campaign="edit_campaign.campaign" @close="edit_campaign.show = false" />
 		</q-dialog>
 
 		<!-- Edit campaign dialog -->
-		<q-dialog v-model="edit_players.show">
-			<AddPlayers :campaign-id="edit_players.campaign" />
+		<q-dialog v-if="!overencumbered" v-model="edit_players.show">
+			<AddPlayers :campaign="edit_players.campaign" />
 		</q-dialog>
 	</div>
 </template>
 
-<script>
-	import _ from 'lodash';
-	
-	import OutOfSlots from '@/components/OutOfSlots.vue';
-	import { mapGetters } from 'vuex';
-	import { db } from '@/firebase';
+<script>	
+	import { mapGetters, mapActions } from 'vuex';
 	import { general } from '@/mixins/general.js';
 	import EditCampaign from "./EditCampaign";
 	import AddPlayers from "./AddPlayers";
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: 'Campaigns',
@@ -250,12 +248,13 @@
 		},
 		mixins: [general],
 		components: {
-			OutOfSlots,
 			EditCampaign,
-			AddPlayers
+			AddPlayers,
+			ContentHeader
 		},
 		data() {
 			return {
+				loading_campaigns: true,
 				newCampaign: '',
 				add: false,
 				edit_players: {
@@ -279,87 +278,53 @@
 				]
 			}
 		},
-		mounted() {
-			this.assignPlayers()
+		async mounted() {
+			await this.get_campaigns();
+			this.loading_campaigns = false;
 		},
 		computed: {
 			...mapGetters([
 				'user',
 				'tier',
-				'campaigns',
 				'userInfo',
-				'allEncounters',
-				'overencumbered',
-				'content_count'
+				'overencumbered'
 			]),
-			...mapGetters("encounters", ["encounters"]),
-			...mapGetters("campaigns", ["campaigns"]),
-			...mapGetters("players", ["players"]),
-			_campaigns: function() {
-				const vm = this;
-				return _.chain(JSON.parse(JSON.stringify(this.campaigns)))
-				.filter(function(campaign, key) {
-					campaign.key = key;
-					campaign.encounters = (vm.encounters[key]) ? Object.keys(vm.encounters[key]).length : 0;
-
-					return campaign;
-				})
-				.orderBy(function(campaign){
-					return parseInt(campaign.timestamp)
-				} , 'asc')
-				.value()
-			},
-			slotsLeft() {
-				return this.tier ? this.tier.benefits.campaigns - this.content_count.campaigns : 0;
-			}
+			...mapGetters("players", ["player_count"]),
+			...mapGetters("campaigns", ["campaign_count", "campaigns"]),
+			...mapGetters("encounters", ["get_encounter_count"])
 		},
 		methods: {
-			addCampaign() {
-				if ((this.content_count.campaigns < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
-					db.ref('campaigns/' + this.user.uid).push({
-						campaign: this.newCampaign,
+			...mapActions("campaigns", ["get_campaigns", "add_campaign", "delete_campaign"]),
+			async addCampaign() {
+				if ((this.campaign_count < this.tier.benefits.campaigns || this.tier.benefits.encounters == 'infinite')) {
+					const campaign = {
+						name: this.newCampaign,
 						advancement: this.advancement,
 						timestamp: Date.now(),
-					});
+					};
+
+					await this.add_campaign(campaign);
+
 					this.newCampaign = '';
 					this.$snotify.success('Campaign added.', 'Critical hit!', {
 						position: "rightTop"
 					});
-					this.$validator.reset();
 					this.add = false;
 				}
 			},
 			confirmDelete(e, key, name) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteCampaign({campaign_id: key });
+					this.delete_campaign(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete the campaign "' + name + '"?', 'Delete campaign', {
 						buttons: [
-							{ text: 'Yes', action: (toast) => { this.deleteCampaign({campaign_id: key }); this.$snotify.remove(toast.id); }, bold: false},
+							{ text: 'Yes', action: (toast) => { this.delete_campaign(key); this.$snotify.remove(toast.id); }, bold: false},
 							{ text: 'No', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
 						]
 					});
 				}
-			},
-			assignPlayers() {
-				for (const [campaignId, campaign] of Object.entries(this.campaigns)) {
-					for (const playerId in campaign.players) {
-						const player = this.players[playerId];
-						if (!player.hasOwnProperty("campaign_id") || player.campaign_id === undefined) {
-							// Player not yet assigned to campaign
-							db.ref(`players/${this.user.uid}/${playerId}`).update({campaign_id: campaignId});
-						} else if (player.campaign_id !== campaignId) {
-							// Player in both this campaign as other campaign
-							this.$snotify.error('You have players that are used in multiple campaigns. Please make sure a player is used only once.', {
-								buttons: [
-									{ text: 'Ok', action: (toast) => { this.$snotify.remove(toast.id); }, bold: true},
-								]
-							});
-						}
-					}
-				}
-			},
+			}
 		}
 	}
 </script>

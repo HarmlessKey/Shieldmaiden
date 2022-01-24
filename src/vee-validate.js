@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { extend, ValidationObserver,  ValidationProvider } from 'vee-validate';
-import { required, length, max, min, max_value, min_value, alpha_dash, numeric} from "vee-validate/dist/rules";
+import { required, length, max, min, max_value, min_value, alpha_dash, numeric, alpha_num} from "vee-validate/dist/rules";
 
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
@@ -31,6 +31,10 @@ extend('alpha_dash', {
   message: "{_field_} may only contain alpha-numeric characters, dashes and underscores"
 });
 extend("numeric", numeric);
+extend('alpha_num', {
+  ...alpha_num,
+  message: "{_field_} may only contain alpha-numeric characters"
+});
 
 // Value must be between 2 numbers
 extend("between", {

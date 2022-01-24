@@ -29,6 +29,7 @@
       let pathArray = this.$route.path.split("/");
       pathArray.shift();
       let breadcrumbs = pathArray.reduce((breadcrumbArray, path, i) => {
+				if(path) {
 					breadcrumbArray.push({
 						path: path,
 						to: breadcrumbArray[i - 1]
@@ -36,7 +37,8 @@
 							: "/" + path,
 						name: this.$route.matched[i] ? this.$route.matched[i].meta.title || path : path,
 					});
-					return breadcrumbArray;
+				}
+				return breadcrumbArray;
 				}, []);
 				if(this.last_route) breadcrumbs.at(-1).name = this.last_route;
 				return breadcrumbs;

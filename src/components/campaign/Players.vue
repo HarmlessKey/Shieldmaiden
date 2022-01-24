@@ -38,7 +38,7 @@
 					</a>
 					<a 
 						class="btn btn-sm mr-1"
-						v-if="isXpAdvancement()"
+						v-if="isXpAdvancement"
 						@click="setSlide({
 							show: true,
 							type: 'slides/party/xp'
@@ -76,9 +76,9 @@
 			</div>
 		</div>
 		<div 
-			v-if="players"
+			v-if="!loading"
 			class="players" 
-			:class="{ xp: isXpAdvancement(), large: is_large, 'card-body': cardView }"
+			:class="{ xp: isXpAdvancement, large: is_large, 'card-body': cardView }"
 			:style="{ 'grid-template-columns': templateColumns }"
 		>
 			<div class="header"></div>
@@ -117,12 +117,12 @@
 			</div>
 			<div class="col header text-right" v-if="viewerIsUser"><i class="far fa-ellipsis-h"></i></div>
 
-			<template v-for="(player, key) in players">
+			<template v-for="(player, key) in campaign.players">
 				<template v-if="player.curHp !== undefined"><!-- make sure incomplete players aren't displayed -->
 					<div 
 						class="image" 
 						:key="'image-'+key" 
-						:style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }"
+						:style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }"
 					>
 						<div class="transformed" v-if="player.transformed">
 							<i class="fas fa-paw-claws green"></i>
@@ -130,7 +130,7 @@
 								Transformed
 							</q-tooltip>
 						</div>
-						<i v-if="!player.avatar" class="hki-player" />
+						<i v-if="!players[key].avatar" class="hki-player" />
 					</div>
 					<div class="col ac" :key="'ac-'+key">
 						<i class="fas fa-shield" ></i>
@@ -141,42 +141,44 @@
 								'green': player.ac_bonus > 0, 
 								'red': player.ac_bonus < 0 
 							}">
-								{{ (player.transformed ? player.transformed.ac : player.ac) + player.ac_bonus }}
+								{{ (player.transformed ? player.transformed.ac : players[key].ac) + player.ac_bonus }}
 								<q-tooltip anchor="top middle" self="center middle">
 									Armor Class {{ player.ac_bonus }}
 								</q-tooltip>
 						</span>
-						<span v-else class="value">{{ player.transformed ? player.transformed.ac : player.ac }}</span>
+						<span v-else class="value">{{ player.transformed ? player.transformed.ac : players[key].ac }}</span>
 					</div>
-					<div class="col name" :key="'name-'+key">{{ player.character_name }}</div>
+					<div class="col name" :key="'name-'+key">
+						{{ players[key].character_name }}
+					</div>
 
 					<div 
 						class="col pp" 
 						v-if="settings.passive_perception === undefined && !is_small"
 						:key="'pp-'+key"
 					>
-						{{ player.passive_perception }}
+						{{ players[key].passive_perception }}
 					</div>
 					<div 
 						class="col pinv" 
 						v-if="settings.passive_investigation === undefined && !is_small"
 						:key="'pinv-'+key"
 					>
-						{{ player.passive_investigation }}
+						{{ players[key].passive_investigation }}
 					</div>
 					<div 
 						class="col pins" 
 						v-if="settings.passive_insight === undefined && !is_medium"
 						:key="'pins-'+key"
 					>
-						{{ player.passive_insight }}
+						{{ players[key].passive_insight }}
 					</div>
 					<div 
 						class="col save" 
 						v-if="settings.save_dc === undefined && !is_medium"
 						:key="'save-'+key"
 					>
-						{{ player.spell_save_dc }}
+						{{ players[key].spell_save_dc }}
 					</div>
 
 					<div class="col health" :key="'health-'+key">
@@ -208,9 +210,9 @@
 							</template>
 							<template v-else>
 								<span class="current" :class="{ 
-									'red': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 33, 
-									'orange': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) <= 76, 
-									'green': percentage(player.curHp, maxHp(player.maxHp, player.maxHpMod)) > 76
+									'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
+									'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 76, 
+									'green': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76
 								}">{{ player.curHp }}</span>
 								<span class="neutral-2">/</span>
 								<span :class="{ 
@@ -218,12 +220,12 @@
 										'red': player.maxHpMod < 0 
 									}" 
 									v-if="player.maxHpMod">
-									{{ maxHp(player.maxHp, player.maxHpMod) }}
+									{{ maxHp(players[key].maxHp, player.maxHpMod) }}
 									<q-tooltip anchor="top middle" self="center middle">
 										Max HP + {{ player.maxHpMod }}
 									</q-tooltip>
 								</span>
-								<span v-else>{{ player.maxHp }}</span>
+								<span v-else>{{ players[key].maxHp }}</span>
 							</template>
 							<span v-if="player.tempHp > 0" class="neutral-2">+{{ player.tempHp }}</span>
 						</template>
@@ -234,7 +236,7 @@
 							@click="setSlide({
 								show: true,
 								type: 'slides/EditPlayer',
-								data: { key: player['.key'], location: 'overview',}
+								data: { key, location: 'overview',}
 							})">
 							<i class="fas fa-pencil"></i>
 							<q-tooltip anchor="top middle" self="center middle">
@@ -242,21 +244,23 @@
 							</q-tooltip>
 						</a>
 					</div>
-					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement()">
-						<div class="level" :class="{red: isXpAdvancement() && player.level}">
-							{{ player.level ? player.level : calculatedLevel(player.experience) }}
-							<q-tooltip anchor="top middle" self="center middle" v-if="player.level">
+					<div class="xp-bar" :key="'xp-'+key" :style="{ 'grid-column': 'span ' + calcColspan }"  v-if="isXpAdvancement">
+						<div class="level" :class="{red: isXpAdvancement && players[key].level}">
+							{{ players[key].level ? players[key].level : calculatedLevel(players[key].experience) }}
+							<q-tooltip anchor="top middle" self="center middle" v-if="players[key].level">
 								Level is overwritten
 							</q-tooltip>
 						</div>
-						<q-linear-progress size="3px" :value="levelAdvancement(player.experience)" color="primary" class="bg-neutral-3" />
+						<q-linear-progress size="3px" :value="levelAdvancement(players[key].experience)" color="primary" class="bg-neutral-3" />
 					</div>
 				</template>
 			</template>
 		</div>
-
-		<div slot="footer" class="card-footer" v-if="viewerIsUser && page !== 'user'">
-			<button class="btn btn-block" @click="reset()"><i class="fas fa-undo-alt"></i> Reset Player Health</button>
+		<hk-loader v-else name="players" />
+		<div slot="footer" v-if="viewerIsUser && page !== 'user'">
+			<button class="btn btn-block btn-square" @click="reset()">
+				<i class="fas fa-undo-alt"></i> Reset player health
+			</button>
 		</div>
 		<q-resize-observer @resize="onResize" />
 	</tag>
@@ -290,16 +294,14 @@
 				is_medium: false,
 				is_large: false,
 				viewerId: this.$store.getters.user ? this.$store.getters.user.uid : undefined,
-				players: undefined,
-				loading: true
+				loading: true,
+				players: [],
+				campaign: {},
+				isXpAdvancement: false
 			}
 		},
 		firebase() {
 			return {
-				campaign:  {
-					source: db.ref(`campaigns/${this.userId}/${this.campaignId}`),
-					asObject: true
-				},
 				settings: {
 					source: db.ref(`settings/${this.userId}/general`),
 					asObject: true
@@ -355,44 +357,29 @@
 				return this.copperToPretty(this.currency['.value']);
 			}
 		},
-		mounted() {
-			const getPlayers = db.ref(`campaigns/${this.userId}/${this.campaignId}/players`);
-			getPlayers.on('value', async (snapshot) => {
-				let campaignPlayers = snapshot.val();
+		async mounted() {
+			await this.get_campaign({
+				uid: this.userId,
+				id: this.campaignId
+			}).then(async campaign => {
+				this.campaign = campaign;
+				this.isXpAdvancement = campaign.advancement !== "milestone";
 
-				for(let key in campaignPlayers) {	
-					campaignPlayers[key]['.key'] = key;
-
-					//Get full player
-					const fullPlayer = await this.get_player({ uid: this.userId, id: key });
-					//Create the player Object
-					if(fullPlayer) {
-						campaignPlayers[key].character_name = fullPlayer.character_name;
-						campaignPlayers[key].avatar = fullPlayer.avatar;
-						campaignPlayers[key].level = fullPlayer.level;
-						campaignPlayers[key].maxHp = parseInt(fullPlayer.maxHp);
-						campaignPlayers[key].ac = parseInt(fullPlayer.ac);
-						campaignPlayers[key].experience = fullPlayer.experience;
-						campaignPlayers[key].passive_perception = fullPlayer.passive_perception;
-						campaignPlayers[key].passive_investigation = fullPlayer.passive_investigation;
-						campaignPlayers[key].passive_insight = fullPlayer.passive_insight;
-						campaignPlayers[key].passive_insight = fullPlayer.passive_insight;
-						campaignPlayers[key].spell_save_dc = fullPlayer.spell_save_dc;
-					}
-					//The player doesn't exist so remove it from the campaign
-					else if(this.viewerIsUser) {
-						// eslint-disable-next-line
-						console.error('Ghost Player Removed: ', key);
-						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).remove();
+				const campaignPlayers = {};
+				for(const playerId in campaign.players) {
+					const player = await this.get_player({ uid: this.userId, id: playerId });
+					if(player) {
+						campaignPlayers[playerId] = player;
 					}
 				}
-				this.players = (campaignPlayers) ? Object.values(campaignPlayers) : [];
+				this.players = campaignPlayers;
 				this.loading = false;
-			});
+			});		
 		},
 		methods: {
 			...mapActions(["setSlide"]),
 			...mapActions("players", ["get_player"]),
+			...mapActions("campaigns", ["get_campaign"]),
 			onResize (size) {
 				let width = size.width;
 				let small = 400;
@@ -414,13 +401,10 @@
 				return parseInt((maxHpMod) ? maxHp + maxHpMod : maxHp);
 			},
 			reset() {
-				for(var i in this.players) {
-					let player = this.players[i];
-					let key = this.players[i]['.key'];
-
+				for(const [key, player] of Object.entries(this.players)) {
 					if(!player.dead) {
 						db.ref(`campaigns/${this.userId}/${this.campaignId}/players/${key}`).update({
-							curHp: this.players[i].maxHp,
+							curHp: player.maxHp,
 							tempHp: 0,
 							maxHpMod: 0
 						});
@@ -430,9 +414,6 @@
 					}
 				}
 			},
-			isXpAdvancement(){
-				return this.campaign.advancement != 'milestone'
-			}
 		}
 	}
 </script>

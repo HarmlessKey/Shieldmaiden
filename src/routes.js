@@ -20,13 +20,11 @@ const SignUp = () => import('@/views/SignUp.vue');
 const Settings = () => import('@/views/Settings.vue');
 const ResetPassword = () => import('@/views/ResetPassword.vue');
 const Patreon = () => import('@/views/Patreon.vue');
-const ManageContent = () => import('@/views/ManageContent.vue');
 const WeatherDemo = () => import('@/views/WeatherDemo.vue');
 
 const Profile = () => import('@/views/profile/Profile.vue');
 const Username = () => import('@/views/profile/SetUsername.vue');
 const DeleteAccount = () => import('@/views/profile/DeleteAccount.vue');
-const Followed = () => import('@/views/Followed.vue');
 const Error404 = () => import('@/views/Error404.vue');
 const Offline = () => import('@/views/Offline.vue');
 const EditEncounter = () => import('@/views/UserContent/Encounters/Edit');
@@ -71,6 +69,11 @@ export const routes = [{
 				name: "Content",
 				component: () => import("@/views/UserContent"),
 			},
+			{
+				path: "manage",
+				name: "Manage content",
+				component: () => import("@/views/ManageContent"),
+			},
 			
 			// Cammpaigns
 			{
@@ -87,7 +90,6 @@ export const routes = [{
 					},
 					{
 						path: ":campid",
-						name: "Run campaign",
 						component: { render (c) { return c('router-view') }},
 						meta: {
 							title: "Run campaign"
@@ -293,6 +295,22 @@ export const routes = [{
 							title: "Edit character"
 						}
 					},
+				]
+			},
+
+			// Followed users
+			{
+				path: "followed",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Followed users"
+				},
+				children: [
+					{
+						path: '',
+						name: "Followed users",
+						component: () => import('@/views/UserContent/Followed.vue'),
+					}
 				]
 			},
 		]
@@ -734,14 +752,6 @@ export const routes = [{
 		component: Patreon
 	},
 	{
-		path: '/manage-content',
-		name: 'manageContent',
-		component: ManageContent,
-		meta: {
-			requiresAuth: true
-		}
-	},
-	{
 		path: '/poster',
 		name: 'poster',
 		component: () => import('@/views/Home.vue'),
@@ -786,16 +796,6 @@ export const routes = [{
 			sidebar: false
 		}
 	},
-	{
-		path: '/followed',
-		name: 'Followed users',
-		component: Followed,
-		meta: {
-			requiresAuth: true
-		}
-	},
-	
-
 	{
 		path: '/run-encounter/:campid/:encid',
 		name: 'RunEncounter',
@@ -854,6 +854,7 @@ export const routes = [{
 	{ path: "/reminders", redirect: "/content/reminders" },
 	{ path: "/items", redirect: "/content/items" },
 	{ path: "/encounters/*", redirect: "/content/campaigns" },
+	{ path: "/followed", redirect: "/content/followed" },
 
 	{
 		path: '*',

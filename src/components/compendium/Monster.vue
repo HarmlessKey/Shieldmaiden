@@ -48,7 +48,7 @@
 			}
 		},
 		methods: {
-			...mapActions("monsters", ["get_monster"]),
+			...mapActions("api_monsters", ["get_monster"]),
 		},
 		mounted() {
 			this.get_monster(this.id).then(result => {

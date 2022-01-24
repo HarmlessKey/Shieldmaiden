@@ -3,21 +3,21 @@
 		<h3>Players</h3>
 
 		<!-- PLAYERS -->
-		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players">
+		<div class="players bg-neutral-8 border-radius mb-1" v-if="campaign.players && addable > 0">
 			<div 
-				v-for="(player, key) in campaign.players" 
+				v-for="(player, key) in campaign_players" 
 				:key="key"
-				@click="add($event, key, 'player', players[key].character_name)" 
+				@click="add($event, key, 'player', player.character_name)" 
 			>
 			<div class="d-flex justify-content-left">
-				<template v-if="checkPlayer(key) < 0">
-					<span class="img" :style="{ backgroundImage: 'url(\'' + players[key].avatar + '\')' }">
-						<i v-if="!players[key].avatar" class="hki-player" />
+				<template v-if="!player_in_encounter(key)">
+					<span class="img" :style="{ backgroundImage: 'url(\'' + player.avatar + '\')' }">
+						<i v-if="!player.avatar" class="hki-player" />
 					</span>
 				</template>
 			</div>
-			<q-tooltip v-if="checkPlayer(key)" anchor="top middle" self="center middle">
-				Add {{ players[key].character_name }}
+			<q-tooltip v-if="!player_in_encounter(key)" anchor="top middle" self="center middle">
+				Add {{ player.character_name }}
 			</q-tooltip>
 		</div>
 
@@ -55,11 +55,9 @@
 			debounce="300" 
 			clearable
 			placeholder="Search custom NPCs"
-			@change="searchNpcs"
-			@clear="searchNpcs"
 		>
 			<q-icon slot="prepend" name="search" />
-			<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
+			<!-- <q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" /> -->
 		</q-input>
 		<q-table		
 			:data="npcs"
@@ -71,16 +69,15 @@
 			:dark="$store.getters.theme !== 'light'"
 			:loading="loading_npcs"
 			separator="none"
+			:pagination="{ rowsPerPage: 15 }"
+			:filter="searchNpc"
 			wrap-cells
-			:pagination.sync="npc_pagination"
-			:rows-per-page-options="[0]"
-			@request="load"
-		>	
+		>
 			<template v-slot:body-cell="props">
 				<q-td v-if="props.col.name !== 'actions'">
 					<div  class="truncate-cell">
 						<div class="truncate">
-							<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
+							<router-link v-if="props.col.name === 'name'" :to="`/content/npcs/${props.key}`">
 								{{ props.value }}
 							</router-link>
 							<template v-else>
@@ -117,9 +114,6 @@
 					</div>
 				</q-td>
 			</template>
-			<div slot="pagination">
-				1-{{npcs.length}} of {{(searchNpc && searchNpc.length) ? npcs.length : npc_count}}
-			</div>
 			<div slot="no-data" />
 			<hk-loader slot="loading" name="monsters" />
 		</q-table>
@@ -257,6 +251,14 @@
 				type: Object,
 				required: true
 			},
+			campaign_players: {
+				type: Object,
+				required: true
+			},
+			addPlayers: {
+				type: Boolean,
+				default: false
+			}
 		},
 		mixins: [general, dice],
 		components: {
@@ -300,7 +302,7 @@
 				loading_monsters: true,
 				loading_npcs: true,
 				monsters: [],
-				npcs: [],
+				players: {},
 				searchMonster: "",
 				searchNpc: "",
 				query: null,
@@ -347,12 +349,19 @@
 		},
 		async mounted() {
 			await this.fetchMonsters();
-			await this.fetchNpcs();
+			this.loading_monsters = false;
+			await this.get_npcs();
+			this.loading_npcs = false;
+		},
+		watch: {
+			// Prop is changed in parent to trigger addAllPlayers function from Overview.vue
+			addPlayers() {
+				this.addAllPlayers();
+			}
 		},
 		computed: {
 			...mapGetters(["content_count"]),
-			...mapGetters("npcs", ["npc_count"]),
-			...mapGetters("players", ["players"]),
+			...mapGetters("npcs", ["npcs", "npc_count"]),
 			monster_resource: {
 				get() {
 					const resource = (this.npc_count) ? "custom" : "srd";
@@ -381,11 +390,21 @@
 					["name", "type", "actions"] :
 					["name", "actions"];
 			},
+			addable() {
+				let count = 0;
+				for (const playerId in this.campaign_players) {
+					if (!this.player_in_encounter(playerId)) {
+						++count;
+					}
+				}
+				return count
+			}
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("monsters", ["get_monsters", "get_monster"]),
-			...mapActions("npcs", ["fetch_npcs", "get_npc"]),
+			...mapActions("api_monsters", ["get_monsters", "get_monster"]),
+			...mapActions("npcs", ["get_npcs", "get_npc"]),
+			...mapActions("players", ["get_players", "get_player"]),
 			...mapActions("encounters", [
 				"add_player_encounter", 
 				"add_npc_encounter"
@@ -405,17 +424,9 @@
 				}
 				this.fetchMonsters();
 			},
-			searchNpcs() {
-				this.loading_npcs = true;
-				this.fetchNpcs();
-			},
 			request(req) {
 				this.pagination = req.pagination;
 				this.fetchMonsters();		
-			},
-			load(req, loadMore=false) {
-				this.npc_pagination = req.pagination;
-				this.fetchNpcs(loadMore);
 			},
 			async fetchMonsters() {
 				await this.get_monsters({
@@ -431,30 +442,23 @@
 					this.loading_monsters = false;
 				});
 			},
-			async fetchNpcs(loadMore=false) {
-				await this.fetch_npcs({
-					startAfter: this.getStartAfterResult(loadMore),
-					pageSize: this.npc_pagination.rowsPerPage,
-					query: this.searchNpc,
-					sortBy: this.npc_pagination.sortBy,
-					descending: this.npc_pagination.descending
-				}).then(results => {
-					this.npcs = (loadMore) ? this.npcs.concat(results) : results;
-					this.loading_npcs = false;
-				});
-			},
-			getStartAfterResult(loadMore) {
-				if(this.npcs.length && loadMore) {
-					return this.npcs.at(-1)[this.npc_pagination.sortBy];
-				} return undefined;
-			},
-			multi_add(e, id,type,name,custom=false,rollHp=false) {
+			async multi_add(e, id,type,name,custom=false,rollHp=false) {
 				if (!this.to_add[id]) {
 					this.to_add[id] = 1
 				}
 				for (let i = 0; i < this.to_add[id]; i++ ) {
-					this.add(e, id,type,name,custom,rollHp)
+					await this.add(e, id,type,name,custom,rollHp);
 				}
+
+				// Notification for NPCs
+				if(type === 'npc') {				
+					this.$snotify.success(
+						`${this.to_add[id]} NPC${this.to_add > 1? 's': ''} added succesfully`, 
+						"NPC added",
+						{ position: "centerTop" }
+					);
+				}
+
 				this.to_add[id] = 1
 			},
 			async add(e, id, type, name, custom = false, rollHp = false, companion_of = undefined ) {
@@ -473,7 +477,7 @@
 					let last = -1;
 					let n = 0;
 					for (let i in this.encounter.entities) {
-						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d)\))$)|(?:^(.*)(?!\s\(\d\))$)/);
+						let match = this.encounter.entities[i].name.match(/(?:^(.*)(?:\s\((\d+)\))$)|(?:^(.*)(?!\s\(\d+\))$)/);
 						
 						let name = match[1] || match[3];
 						if (name == entity.name) {
@@ -532,7 +536,7 @@
 							entity.maxHp = (npc_data.old) ? npc_data.maxHp : npc_data.hit_points;
 						}
 					}
-					this.add_npc_encounter({
+					await this.add_npc_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						npc: entity
@@ -541,15 +545,16 @@
 
 				// PLAYER
 				else if (type == 'player') {
-					this.add_player_encounter({
+					await this.add_player_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
 						player: entity
 					});
-					const companions = this.players[id].companions;
+					const companions = this.campaign_players[id].companions;
 					for (let key in companions) {
-						this.add(e, key, 'companion', this.npcs[key].name , true, false, id);
+						const companion = await this.get_npc({ uid: this.user.uid, id: key });
+						await this.add(e, key, 'companion', companion.name, true, false, id);
 					}
 				}
 
@@ -557,7 +562,7 @@
 				else if (type == 'companion') {
 					entity.npc = 'custom';
 					entity.player = companion_of;
-					this.add_player_encounter({
+					await this.add_player_encounter({
 						campaignId: this.campaignId,
 						encounterId: this.encounterId,
 						playerId: id,
@@ -579,23 +584,19 @@
 						notifyHP.throws = ''
 						notifyHP.mod = ''
 					}
-
-					this.$snotify.success('HP: ' + notifyHP.total + notifyHP.throws + notifyHP.mod, 'NPC added', {
-						position: "centerTop"
-					});
 				}
 			},
-			addAllPlayers(e) {
+			async addAllPlayers(e) {
 				for(let player in this.campaign.players) {
-					let name = this.players[player].character_name;
-					this.add(e, player, 'player', name)
+					let name = this.campaign_players[player].character_name;
+					await this.add(e, player, 'player', name)
 				}
 			},
-			checkPlayer(id) {
+			player_in_encounter(id) {
 				if(this.encounter.entities) {
-					return (Object.keys(this.encounter.entities).indexOf(id))
+					return Object.keys(this.encounter.entities).indexOf(id) >= 0;
 				} else {
-					return -1
+					return false
 				}
 			},
 			setSize(e) {

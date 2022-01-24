@@ -1,16 +1,29 @@
 import { db } from "@/firebase";
 
 const CAMPAIGNS_REF = db.ref("campaigns");
+const SEARCH_CAMPAIGNS_REF = db.ref("search_campaigns");
 const USERS_REF = db.ref("users");
 
 export class campaignServices {
 
   async getCampaigns(uid) {
     try {
-      const campaigns = await CAMPAIGNS_REF.child(uid).once('value', snapshot => {
+      const campaigns = await SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).once('value', snapshot => {
         return snapshot;
       });
       return campaigns.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  async getCampaignCount(uid) {
+    try {
+      const path = `${uid}/metadata/count`;
+      const count = await SEARCH_CAMPAIGNS_REF.child(path).once('value', snapshot => {
+        return snapshot;
+      });
+      return count.val();
     } catch(error) {
       throw error;
     }
@@ -35,9 +48,13 @@ export class campaignServices {
     });
   }
 
-  async addCampaign(uid, campaign) {
+  async addCampaign(uid, campaign, search_campaign) {
     try {
       const newCampaign = await CAMPAIGNS_REF.child(uid).push(campaign);
+
+      // Update search_campaigns
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${newCampaign.key}`).set(search_campaign);
+
       return newCampaign.key;
     } catch(error) {
       throw error;
@@ -52,10 +69,29 @@ export class campaignServices {
     });
   }
 
-  // Updates a campaign
-  async updateCampaign(uid, id, path, value) {
-    path = `${uid}/${id}${path}`
-    CAMPAIGNS_REF.child(path).update(value).then(() => {
+  /**
+   * Updates a specific property in an existing campaign
+   * 
+   * @param {String} uid ID of active user
+   * @param {String} id ID of campaign to edit
+   * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
+   * @param {object} value Object with { proptery: value }
+   * @param {boolean} update_search Wether or not search_campaigns must be updated
+   */
+  async updateCampaign(uid, id, path, value, update_search=false) {
+    CAMPAIGNS_REF.child(`${uid}/${id}${path}`).update(value).then(() => {
+      if(update_search) {
+        SEARCH_CAMPAIGNS_REF.child(`${uid}/results/${id}${path}`).update(value);
+      }
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
+
+  async updateSearchCampaign(uid, id, path, value) {
+    path = `${uid}/results/${id}${path}`
+    SEARCH_CAMPAIGNS_REF.child(path).update(value).then(() => {
       return;
     }).catch((error) => {
       throw error;
@@ -86,10 +122,20 @@ export class campaignServices {
     });
   }
   
+  async deleteCompanion(uid, id, companionId) {
+    CAMPAIGNS_REF.child(uid).child(id).child(`companions/${companionId}`).remove().then(() => {
+      return;
+    }).catch((error) => {
+      throw error;
+    });
+  }
 
   async deleteCampaign(uid, id) {
     try {
       CAMPAIGNS_REF.child(uid).child(id).remove();
+
+      //Update search_campaigns
+      SEARCH_CAMPAIGNS_REF.child(`${uid}/results`).child(id).remove();
       return;
     } catch(error){
       throw error;
@@ -102,5 +148,32 @@ export class campaignServices {
     }).catch((error) => {
       throw error;
     });
+  }
+
+  /**
+   * Update campaign_count in the search table of search_campaigns
+   * 
+   * @param {String} uid User ID
+   * @param {Int} diff Difference to add or subtract from campaign count
+   */
+  async updateCampaignCount(uid, diff) {
+    const campaign_count_path = `${uid}/metadata/count`;
+    let campaign_count = await this.getCampaignCount(uid);
+    await SEARCH_CAMPAIGNS_REF.child(campaign_count_path).set(campaign_count + diff);
+    return campaign_count + diff;
+  }
+
+  /**
+   * Update player_count in the search table of search_campaigns
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {Int} diff Difference to add or subtract from player count
+   */
+   async updatePlayerCount(uid, campaignId, diff) {
+    const player_count_path = `${uid}/results/${campaignId}/player_count`;
+    let player_count = await SEARCH_CAMPAIGNS_REF.child(player_count_path).once('value');
+    await SEARCH_CAMPAIGNS_REF.child(player_count_path).set(player_count.val() + diff);
+    return player_count.val() + diff;
   }
 }

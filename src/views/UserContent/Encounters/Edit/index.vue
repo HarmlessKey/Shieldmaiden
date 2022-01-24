@@ -1,66 +1,91 @@
 <template>
-	<div v-if="overencumbered">
-		<OverEncumbered/>
-	</div>
+	<hk-card v-if="overencumbered" header="You're over encumbered">
+		<div class="card-body">
+			<p>
+				You can't edit an encounter when you are over encumbered, 
+				please resolve this first.
+			</p>
+
+			<router-link to="/content/manage" class="btn btn-lg btn-block bg-neutral-9">
+				Manage content
+			</router-link>
+		</div>
+	</hk-card>
 	<div v-else>
 		<div class="wrapper">
 			<hk-card>
-				<div class="tabs">
-					<q-tabs
-						v-model="tab"
-						dark
-						inline-label
-						align="justify"
-						:breakpoint="0"
-						no-caps
-					>
-						<q-route-tab
-							exact replace
-							label="Back"
-							icon="fas fa-arrow-left"
-							class="pl-0"
-							name="back"
-							:to="'/content/campaigns/' + $route.params.campid"
-						/>
-						<q-tab 
-							v-for="({name, icon, label}, index) in tabs"
-							:key="`tab-${index}`" 
-							:name="name" 
-							:icon="icon"
-							:label="label"
-						/>
-					</q-tabs>
-				</div>
-				<q-tab-panels v-model="tab" class="bg-transparent">
-					<q-tab-panel name="entities">
-						<Entities :encounter="encounter" :campaign="campaign" />
-					</q-tab-panel>
-					<q-tab-panel name="general">
-						<General :encounter="encounter" :campaign="campaign" />
-					</q-tab-panel>
-					<q-tab-panel name="loot">
-						<Loot :encounter="encounter" :campaign="campaign" />
-					</q-tab-panel>
-					<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
-						<Xp :encounter="encounter" :campaign="campaign" />
-					</q-tab-panel>
-				</q-tab-panels>
+				<template v-if="!loading">
+					<div class="tabs">
+						<q-tabs
+							v-model="tab"
+							dark
+							inline-label
+							align="justify"
+							:breakpoint="0"
+							no-caps
+						>
+							<q-route-tab
+								exact replace
+								label="Back"
+								icon="fas fa-arrow-left"
+								class="pl-0"
+								name="back"
+								:to="'/content/campaigns/' + $route.params.campid"
+							/>
+							<q-tab 
+								v-for="({name, icon, label}, index) in tabs"
+								:key="`tab-${index}`" 
+								:name="name" 
+								:icon="icon"
+								:label="label"
+							/>
+						</q-tabs>
+					</div>
+					<q-tab-panels v-model="tab" class="bg-transparent">
+						<q-tab-panel name="entities">
+							<Entities 
+								:encounter="encounter" 
+								:campaign="campaign" 
+								:campaign_players="campaign_players"
+								:add-players="addPlayersTriggered"
+							/>
+						</q-tab-panel>
+						<q-tab-panel name="general">
+							<General :encounter="encounter" :campaign="campaign" />
+						</q-tab-panel>
+						<q-tab-panel name="loot">
+							<Loot :encounter="encounter" :campaign="campaign" />
+						</q-tab-panel>
+						<q-tab-panel name="xp" v-if="campaign.advancement === 'experience'">
+							<Xp :encounter="encounter" :campaign="campaign" />
+						</q-tab-panel>
+					</q-tab-panels>
+				</template>
+				<hk-loader v-else />
 			</hk-card>
 
 			<!-- ENCOUNTER OVERVIEW -->
-			<Overview :encounter="encounter" :campaign="campaign" />
+			<Overview 
+				v-if="!loading" 
+				:encounter="encounter" 
+				:campaign="campaign" 
+				:campaign_players="campaign_players"
+				@add-players="trigger"
+			/>
+			<hk-card v-else>
+				<hk-loader />
+			</hk-card>
 		</div>
 	</div>
 </template>
 
 <script>
-	import Crumble from "@/components/crumble";
 	import Loot from "./Loot.vue";
 	import Xp from "./Xp.vue";
 	import Entities from "./Entities.vue";
 	import Overview from "./Overview.vue";
 	import General from "./General.vue";
-	import OverEncumbered from "@/components/OverEncumbered.vue";
+	import OverEncumbered from "@/components/userContent/OverEncumbered.vue";
 	import { mapGetters, mapActions } from "vuex";
 
 	export default {
@@ -69,13 +94,12 @@
 			title: "Encounters"
 		},
 		components: {
-			Crumble,
 			OverEncumbered,
 			Loot,
 			Xp,
 			Entities,
 			Overview,
-			General
+			General,
 		},
 		data() {
 			return {
@@ -84,6 +108,9 @@
 				encounterId: this.$route.params.encid,
 				campaign: {},
 				encounter: {},
+				campaign_players: {},
+				addPlayersTriggered: false,
+				loading: true,
 				tab: "entities"
 			} 
 		},
@@ -104,24 +131,31 @@
 			}
 		},
 		async	mounted() {
-			await this.get_campaign({
+			this.campaign = await this.get_campaign({
 				uid: this.user.uid,
 				id: this.campaignId
-			}).then((campaign) => {
-				this.campaign = campaign;
-			});
+			})
 
-			await this.get_encounter({
+			this.encounter = await this.get_encounter({
 				uid: this.user.uid,
 				campaignId: this.campaignId, 
 				id: this.encounterId
-			}).then(encounter => {
-				this.encounter = encounter;
 			});
+
+			for (const playerId in this.campaign.players) {
+				this.campaign_players[playerId] = await this.get_player({ uid: this.user.uid, id: playerId })
+			}
+
+			this.loading = false;
 		},
 		methods: {
 			...mapActions("campaigns", ["get_campaign"]),
 			...mapActions("encounters", ["get_encounter"]),
+			...mapActions("players", ["get_player"]),
+			// Triggered from Overview component, to execute addAllPlayers() in Entities component
+			trigger() {
+				this.addPlayersTriggered = true;
+			}
 		}
 	}
 </script>

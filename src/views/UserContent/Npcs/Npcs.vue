@@ -1,42 +1,20 @@
 <template>
 	<div v-if="tier">
 		<hk-card>
-			<div slot="header" class="card-header">
-				<span>
-					NPC's ( 
-					<span :class="{ 'green': true, 'red': npc_count >= tier.benefits.npcs }">{{ npc_count }}</span> 
-					/ 
-					<i v-if="tier.benefits.npcs == 'infinite'" class="far fa-infinity"></i>
-					<template v-else>{{ tier.benefits.npcs }}</template>
-					)
-				</span>
-				<span>
-					<a class="btn btn-sm bg-neutral-5 mr-2"
-						@click="exportAll()"
-					>
-						Export NPCs
-					</a>
-					<a class="btn btn-sm bg-neutral-5 mr-2"
-						@click="import_dialog = true"
-					>
-						Import NPCs
-					</a>
-					<router-link class="btn btn-sm bg-neutral-5 mr-2" v-if="!overencumbered" :to="`${$route.path}/add-npc`">
-						<i class="fas fa-plus green"></i> New NPC
-					</router-link>
-				</span>
-			</div>
-
-			<div class="card-body">
+			<ContentHeader type="npcs">
+				<a slot="actions-left" class="btn btn-sm bg-neutral-5" @click="exportAll()">
+					Export NPCs
+				</a>
+				<a slot="actions-right" class="btn btn-sm bg-neutral-5 mx-2" @click="import_dialog = true">
+					Import NPCs
+				</a>
+			</ContentHeader>
+			
+			<div class="card-body" v-if="!loading_npcs">
 				<p class="neutral-2">
-					These are your custom Non-Player Characters or monsters.
+					These are your custom Non-Player Characters and monsters.
 				</p> 
-				<template v-if="npcs">
-					<OutOfSlots 
-						v-if="npc_count >= tier.benefits.npcs"
-						type="npcs"
-					/>
-
+				<template v-if="npcs.length">
 					<q-input 
 						:dark="$store.getters.theme !== 'light'" 
 						v-model="search"
@@ -44,14 +22,9 @@
 						filled square
 						debounce="300" 
 						clearable
-						placeholder="Search"
-						@change="searchNpcs"
-						@clear="searchNpcs"
-						:error="search !== undefined && !npcs.length"
-						:error-message='`No NPCs found starting with "${search}"`'
+						placeholder="Search NPCs"
 					>
 						<q-icon slot="prepend" name="search" />
-						<q-btn slot="after" no-caps color="primary" label="Search" @click="searchNpcs" />
 					</q-input>
 
 					<q-table
@@ -64,13 +37,19 @@
 						:dark="$store.getters.theme !== 'light'"
 						:loading="loading_npcs"
 						separator="none"
+						:pagination="{ rowsPerPage: 15 }"
+						:filter="search"
 						wrap-cells
-						:pagination.sync="pagination"
-						:rows-per-page-options="[0]"
-						@request="load"
 					>	
 						<template v-slot:body-cell="props">
-							<q-td v-if="props.col.name !== 'actions'">
+							<q-td 
+								v-if="props.col.name === 'avatar'" 
+								class="avatar"
+								:style="props.value ? `background-image: url('${props.value}')` : ''"
+							>
+								<i v-if="!props.value" class="hki-monster" />
+							</q-td>
+							<q-td v-else-if="props.col.name !== 'actions'">
 								<div  class="truncate-cell">
 									<div class="truncate">
 										<router-link v-if="props.col.name === 'name'" :to="`${$route.path}/${props.key}`">
@@ -84,63 +63,39 @@
 							</q-td>
 							<q-td v-else class="text-right d-flex justify-content-between">
 								<router-link class="btn btn-sm bg-neutral-5" :to="`${$route.path}/${props.key}`">
-									<i class="fas fa-pencil"></i>
+									<i class="fas fa-pencil" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Edit
 									</q-tooltip>
 								</router-link>
-								<a class="btn btn-sm bg-neutral-5 mx-2" @click="confirmDelete($event, props.key, props.row, props.rowIndex)">
-									<i class="fas fa-trash-alt"></i>
+								<a class="btn btn-sm bg-neutral-5 mx-2" @click="exportNPC(props.key)">
+									<i class="fas fa-arrow-alt-down" />
+									<q-tooltip anchor="top middle" self="center middle">
+										Download
+									</q-tooltip>
+								</a>
+								<a class="btn btn-sm bg-neutral-5" @click="confirmDelete($event, props.key, props.row)">
+									<i class="fas fa-trash-alt" />
 									<q-tooltip anchor="top middle" self="center middle">
 										Delete
 									</q-tooltip>
 								</a>
-								<a class="btn btn-sm bg-neutral-5" @click="exportNPC(props.key)">
-									<i class="fas fa-brackets-curly"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Export JSON
-									</q-tooltip>
-								</a>
 							</q-td>
 						</template>
-						<div slot="pagination">
-							1-{{npcs.length}} of {{(search && search.length) ? npcs.length : npc_count}}
-						</div>
 						<div slot="no-data" />
-						<hk-loader slot="loading" name="monsters" />
+						<hk-loader slot="loading" name="NPCs" />
 					</q-table>
-					<q-btn 
-						v-if="!search && npcs.length < npc_count"
-						slot="bottom-row"
-						no-caps 
-						color="primary" 
-						label="Load more" 
-						@click="load({ pagination }, true)"
-					/>
-
-					<template v-if="slotsLeft > 0 && tier.benefits.npcs !== 'infinite'">
-						<div 
-							class="openSlot"
-							v-for="index in slotsLeft"
-							:key="'open-slot-' + index"
-						>
-							<span>Open NPC slot</span>
-							<router-link v-if="!overencumbered" to="/npcs/add-npc">
-								<i class="fas fa-plus green"></i>
-							</router-link>
-						</div>
-					</template>
-					<template v-if="!tier || tier.name === 'Free'">
-						<router-link class="openSlot none" to="/patreon">
-							Support us on Patreon for more NPC slots.
-						</router-link>
-					</template>
 				</template>
-				<router-link v-else-if="npcs === null && !overencumbered" class="btn btn-block mt-4" to="/npcs/add-npc">
-					Create your first NPC
+
+				<router-link v-if="!npcs.length && !overencumbered" class="btn btn-lg bg-neutral-5" to="/content/npcs/add-npc">
+					<i class="fas fa-plus green mr-1" /> Create your first NPC
+				</router-link>
+				<router-link v-else-if="tier.name === 'Free'" class="btn bg-neutral-8 btn-block" to="/patreon">
+					Get more NPC slots
 				</router-link>
 				<q-resize-observer @resize="setSize" />
 			</div>
+			<hk-loader v-else name="NPCs" />
 		</hk-card>
 
 		<!-- Bulk import dialog -->
@@ -155,61 +110,40 @@
 </template>
 
 <script>
-	import OutOfSlots from "@/components/OutOfSlots.vue";
 	import { mapActions, mapGetters } from "vuex";
-	import { db } from "@/firebase";
 	import { monsterMixin } from "@/mixins/monster";
 	import ImportNPC from "@/components/ImportNPC.vue";
+	import ContentHeader from "@/components/userContent/ContentHeader";
 
 	export default {
 		name: "Npcs",
 		metaInfo: {
-			title: "NPC's"
+			title: "NPCs"
 		},
 		mixins: [monsterMixin],
 		components: {
-    OutOfSlots,
-    ImportNPC
-},
+    ImportNPC,
+		ContentHeader
+		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
 				import_dialog: false,
 				loading_npcs: true,
-				npcs: [],
-				paginationSetter: undefined,
 				search: "",
-				card_width: 0
-			}
-		},
-		computed: {
-			...mapGetters([
-				"tier",
-				"allEncounters",
-				"overencumbered",
-			]),
-			...mapGetters("players", ["players"]),
-			...mapGetters("campaigns", ["campaigns"]),
-			...mapGetters("npcs", ["npc_count"]),
-			pagination: {
-				get() {
-					return (this.paginationSetter) ? this.paginationSetter : {
-						sortBy: "name",
-						rowsPerPage: 15,
-						rowsNumber: this.npc_count
-					};
-				},
-				set(newVal) {
-					this.paginationSetter = newVal;
-				}
-			},
-			columns() {
-				return [
+				card_width: 0,
+				columns: [
+					{
+						name: "avatar",
+						label: "",
+						field: "avatar",
+						align: "left"
+					},
 					{
 						name: "name",
 						label: "Name",
 						field: "name",
-						sortable: !this.search || this.search.length < 3,
+						sortable: true,
 						align: "left",
 						format: val => val.capitalizeEach()
 					},
@@ -218,14 +152,14 @@
 						label: "Type",
 						field: "type",
 						align: "left",
-						sortable: !this.search || this.search.length < 3
+						sortable: true
 					},
 					{
 						name: "challenge_rating",
 						label: "CR",
 						field: "challenge_rating",
 						align: "left",
-						sortable: !this.search || this.search.length < 3,
+						sortable: true,
 						format: val => this.cr(val)
 					},
 					{
@@ -234,66 +168,48 @@
 						align: "right"
 					}
 				]
-			},
+			}
+		},
+		computed: {
+			...mapGetters([
+				"tier",
+				"overencumbered",
+			]),
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("players", ["players"]),
+			...mapGetters("campaigns", ["campaigns"]),
 			visibleColumns() {
 				return (this.card_width > 600) ? 
-					["name", "type", "challenge_rating", "actions"] : 
+					["avatar", "name", "type", "challenge_rating", "actions"] : 
 					(this.card_width > 450) ? 
-					["name", "type", "actions"] :
-					["name", "actions"];
-			},
-			slotsLeft() {
-				return this.tier.benefits.npcs - this.npc_count;
+					["avatar", "name", "type", "actions"] :
+					["avatar", "name", "actions"];
 			}
 		},
 		async mounted() {
-			await this.fetchNpcs();
+			await this.get_npcs();
+			this.loading_npcs = false;
 		},
 		methods: {
 			...mapActions(["setSlide"]),
-			...mapActions("npcs", ["fetch_npcs", "delete_npc", "get_npc", "add_npc", "get_all_npcs"]),
-			async fetchNpcs(loadMore=false) {
-				await this.fetch_npcs({
-					startAfter: this.getStartAfterResult(loadMore),
-					pageSize: this.pagination.rowsPerPage,
-					query: this.search,
-					sortBy: this.pagination.sortBy,
-					descending: this.pagination.descending
-				}).then(results => {
-					this.npcs = (loadMore) ? this.npcs.concat(results) : results;
-					this.loading_npcs = false;
-				});
-			},
-			getStartAfterResult(loadMore) {
-				if(this.npcs.length && loadMore) {
-					return this.npcs.at(-1)[this.pagination.sortBy];
-				} return undefined;
-			},
-			load(req, loadMore=false) {
-				this.pagination = req.pagination;
-				this.fetchNpcs(loadMore);
-			},
-			searchNpcs() {
-				this.loading_npcs = true;
-				this.fetchNpcs();
-			},
+			...mapActions("npcs", ["get_npcs", "delete_npc", "get_npc", "get_full_npcs"]),
 			cr(val) {
 				return (val == 0.125) ? "1/8" : 
 					(val == 0.25) ? "1/4" :
 					(val == 0.5) ? "1/2" :
 					val;
 			},
-			confirmDelete(e, key, npc, index) {
+			confirmDelete(e, key, npc) {
 				//Instantly delete when shift is held
 				if(e.shiftKey) {
-					this.deleteNpc(key, index);
+					this.deleteNpc(key);
 				} else {
 					this.$snotify.error('Are you sure you want to delete ' + npc.name + '?', 'Delete NPC', {
 						timeout: false,
 						buttons: [
 							{
 								text: 'Yes', action: (toast) => { 
-								this.deleteNpc(key, index)
+								this.deleteNpc(key)
 								this.$snotify.remove(toast.id); 
 								}, 
 								bold: false
@@ -309,37 +225,7 @@
 				}
 
 			},
-			async deleteNpc(key, index) {
-				//Remove the NPC from all encounters
-				for(let campaign in this.campaigns) {
-					if (this.allEncounters && Object.keys(this.allEncounters).indexOf(campaign) > -1) {
-
-						//Go over all encounters of the campaign
-						for(let enc in this.allEncounters[campaign]) {
-							var entities = this.allEncounters[campaign][enc].entities;
-
-							//Go over all entites in the encounter
-							for(let entityKey in entities) {
-								let npcId = entities[entityKey].id;
-								
-								//If the entity has the same id, delete it
-								if(npcId == key) {
-									db.ref(`encounters/${this.userId}/${campaign}/${enc}/entities/${entityKey}`).remove();
-								}
-							}
-						}
-					}
-				}
-				// Remove NPC as companion from players
-				for (let playerKey in this.players) {
-					for (let companionKey in this.players[playerKey].companions) {
-						if (companionKey === key) {
-							db.ref(`players/${this.userId}/${playerKey}/companions/`).child(key).remove();
-						}
-					}
-				}
-				// Remove the NPC
-				this.npcs.splice(index, 1);
+			deleteNpc(key) {
 				this.delete_npc(key);
 			},
 			async imported(npcs) {
@@ -356,7 +242,7 @@
 				this.card_width = e.width;
 			},
 			async exportAll() {
-				const all_npcs = await this.get_all_npcs();
+				const all_npcs = await this.get_full_npcs();
 				const json_export = Object.values(all_npcs);
 				this.downloadJSON(json_export);
 			},
@@ -383,7 +269,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	
-</style>

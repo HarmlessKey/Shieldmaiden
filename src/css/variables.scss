@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --neutral-11: #080808; // custom
   --neutral-10: #191a1c; //custom
   --neutral-9: #202225; // Server sidebar
@@ -69,6 +70,7 @@
 
 // Possible light theme
 [data-theme="light"] {
+  color-scheme: light;
   --neutral-11: #FFFFFF;
   --neutral-10: #eeeeee;
   --neutral-9: #e3e5e8;

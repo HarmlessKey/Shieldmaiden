@@ -23,6 +23,7 @@
 				label="Username or email"
 				v-model="findUser"
 				autocomplete="off"
+				@keydown.enter.prevent.stop="find_user()"
 			>
 				<q-icon slot="append" size="xs" class="blue pointer" @click="find_user()" name="fas fa-search">
 					<q-tooltip anchor="top middle" self="center middle">
@@ -39,7 +40,7 @@
 					Username: {{ Object.values(foundUser)[0].username }}<br/>
 					Email: {{ Object.values(foundUser)[0].email }}
 				</p>
-				<button class="btn mt-3 bg-green" @click="confirmGiveControl()">
+				<button class="btn mt-3 bg-green" @click.prevent="confirmGiveControl()">
 					Give control to {{ Object.values(foundUser)[0].username }}
 				</button>
 			</div>
@@ -48,13 +49,14 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
+	import { db } from "@/firebase";
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'GiveCharacterControl',
+		name: "GiveCharacterControl",
 		props: [
-			'playerId',
-			'control'
+			"playerId",
+			"control"
 		],
 		data() {
 			return {
@@ -64,41 +66,35 @@
 				foundUser: undefined,
 			}
 		},
-		computed: {
-		},
 		beforeMount() {
-			this.fetch_control()
+			this.fetch_control();
 		},
 		methods: {
+			...mapActions("players", ["give_out_control", "remove_control"]),
 			fetch_control() {
-				let player = db.ref(`players/${this.userId}/${this.playerId}/control`);
-				player.on('value' , (snapshot) => {
-					let key = snapshot.val()
+				if(this.control) {
+					let user = db.ref(`search_users/${this.control}`)
 
-					if(key) {
-						let user = db.ref(`users/${key}`)
-
-						user.on('value' , (snapshot) => {
-							this.controlUser = {
-								email : snapshot.val().email,
-								username: snapshot.val().username,
-							}
-						});
-					}
-				});
+					user.on("value" , (snapshot) => {
+						this.controlUser = {
+							email : snapshot.val().email,
+							username: snapshot.val().username,
+						}
+					});
+				}
 			},
 			find_user() {
-				let email = db.ref(`search_users`).orderByChild('email').equalTo(this.findUser.toLowerCase());
-				let username = db.ref(`search_users`).orderByChild('username').equalTo(this.findUser.toLowerCase());
+				let email = db.ref(`search_users`).orderByChild("email").equalTo(this.findUser.toLowerCase());
+				let username = db.ref(`search_users`).orderByChild("username").equalTo(this.findUser.toLowerCase());
 
 				// Check username
-				username.on('value' , (snapshot) => {
+				username.once("value" , (snapshot) => {
 					if(snapshot.exists()) {
 						this.foundUser = snapshot.val();
 						return
 					} else {
 						// Check email
-						email.on('value' , (snapshot) => {
+						email.once('value' , (snapshot) => {
 							if(snapshot.val()) {
 								this.foundUser = snapshot.val();
 								return
@@ -117,23 +113,26 @@
 					]
 				});
 			},
-			giveControl() {
-				let userKey = Object.keys(this.foundUser)[0];
+			async giveControl() {
+				let user_id = Object.keys(this.foundUser)[0];
 
-				db.ref(`players/${this.userId}/${this.playerId}/control`).set(userKey);
-				db.ref(`character_control/${userKey}/${this.playerId}`).set({
-					user: this.userId,
+				await this.give_out_control({
+					id: this.playerId,
+					user_id
 				});
+				this.controlUser = {
+					username: Object.values(this.foundUser)[0].username,
+					email: Object.values(this.foundUser)[0].email,
+				}
 			},
-			removeControl() {
-				db.ref(`character_control/${this.control}/${this.playerId}`).remove();
-				db.ref(`players/${this.userId}/${this.playerId}/control`).remove();
+			async removeControl() {
+				await this.remove_control({ 
+					uid: this.userId, 
+					id: this.playerId, 
+					owner_id: this.control 
+				});
 				this.controlUser = undefined;
 			},
 		}
 	};
 </script>
-
-<style lang="scss" scoped>
-
-</style>

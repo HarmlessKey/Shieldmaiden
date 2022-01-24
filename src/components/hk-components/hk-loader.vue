@@ -15,7 +15,8 @@ export default {
 			type: String
 		},
 		prefix: {
-			type: String
+			type: String,
+			default: undefined
 		}
 	},
 	computed: {

@@ -9,7 +9,7 @@
 						label="Name"
 						autocomplete="off"
 						class="mb-3"
-						v-model="encounter.encounter"
+						v-model="encounter.name"
 						:error="invalid && validated"
 						:error-message="errors[0]"
 					/>

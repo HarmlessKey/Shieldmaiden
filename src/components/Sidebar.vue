@@ -73,13 +73,13 @@
 								Characters
 							</q-tooltip>
 						</q-item>
-						<q-item clickable v-ripple to="/followed">
+						<q-item clickable v-ripple to="/content/followed">
 							<q-item-section avatar>
 								<i class="fas fa-user-check"></i>
 							</q-item-section>
-							<q-item-section class="title">Following</q-item-section>
+							<q-item-section class="title">Followed users</q-item-section>
 							<q-tooltip v-if=" $store.getters.side_collapsed" anchor="center right" self="center left">
-								Following
+								Followed users
 							</q-tooltip>
 						</q-item>
 					</q-list>
@@ -234,7 +234,6 @@
 					this.small_screen = false;
 				}
 			}
-			this.setSideCollapsed();
 		}, 
 	}
 </script>

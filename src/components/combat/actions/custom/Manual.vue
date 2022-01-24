@@ -6,40 +6,42 @@
 
 			<hk-dmg-type-select v-model="damage_type" placeholder="Damage type" clearable dense class="mb-2"/>
 
-			<div class="manual">
-				<q-input 
-					:dark="$store.getters.theme === 'dark'" filled square
-					type="number" 
-					v-model="manualAmount" 
-					v-validate="'numeric'" 
-					name="Manual Input" 
-					min="0"
-					class="manual-input"
-					@keypress="submitManual($event)"
-					autocomplete="off" 
-				/>
-				<button class="btn dmg bg-red white" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('damage')"
-				>
-					Attack
-					<i class="hki-sword-break ml-3" />
-					<q-tooltip anchor="center right" self="center left">
-						Enter
-					</q-tooltip>
-				</button>
-				<button class="btn heal bg-green white" 
-					:class="{disabled: errors.has('Manual Input') || manualAmount == ''}" 
-					@click="setManual('healing')"
-				>
-					Heal
-					<i class="hki-heal" />
-					<q-tooltip anchor="center right" self="center left">
-						Shift + Enter
-					</q-tooltip>
-				</button>
-			</div>
-			<p class="validate red" v-if="errors.has('Manual Input')">{{ errors.first('Manual Input') }}</p>
+			<ValidationProvider rules="min_value:0" name="Input" v-slot="{ errors, invalid, validated}">
+				<div class="manual">
+					<q-input 
+						:dark="$store.getters.theme === 'dark'" filled square
+						type="number" 
+						v-model="manualAmount" 
+						name="Manual Input" 
+						min="0"
+						class="manual-input"
+						@keypress="submitManual($event, !invalid)"
+						autocomplete="off"
+						:error="invalid && validated"
+						:error-message="errors[0]"
+					/>
+					<button class="btn dmg bg-red white" 
+						:class="{disabled: invalid || manualAmount === ''}" 
+						@click="setManual('damage', !invalid)"
+					>
+						Attack
+						<i class="hki-sword-break ml-3" />
+						<q-tooltip anchor="center right" self="center left">
+							Enter
+						</q-tooltip>
+					</button>
+					<button class="btn heal bg-green white" 
+						:class="{disabled: invalid || manualAmount === ''}" 
+						@click="setManual('healing', !invalid)"
+					>
+						Heal
+						<i class="hki-heal" />
+						<q-tooltip anchor="center right" self="center left">
+							Shift + Enter
+						</q-tooltip>
+					</button>
+				</div>
+			</ValidationProvider>
 			
 			<div class="select-amount" :class="{ 'has-defenses': damage_type }">
 				<div>Target</div>
@@ -193,11 +195,11 @@
 				else this.$set(this.resistances, target, defense);
 				this.$forceUpdate();
 			},
-			submitManual(e) {
+			submitManual(e, valid) {
 				if(e.key === 'Enter' && e.shiftKey) {
-					this.setManual('healing');
+					this.setManual('healing', valid);
 				} else if(e.key === 'Enter') {
-					this.setManual('damage');
+					this.setManual('damage', valid);
 				}
 			},
 			calculateAmount(target, type) {
@@ -213,46 +215,43 @@
 				}
 				return Math.floor(value);
 			},
-			setManual(type) {
-				this.$validator.validateAll().then((result) => {
-					if(result && this.manualAmount != '') {
+			setManual(type, valid) {
+				if(valid && this.manualAmount != '') {
+					//Update HP
+					for(let i in this.targeted) {
+						let key = this.targeted[i];
+						let amount = {};
+						amount[type] = parseInt(this.manualAmount);
 
-						//Update HP
-						for(let i in this.targeted) {
-							let key = this.targeted[i];
-							let amount = {};
-							amount[type] = parseInt(this.manualAmount);
+						amount[type] = this.calculateAmount(key, type);
 
-							amount[type] = this.calculateAmount(key, type);
+						// Set config for HpManipulation and log
+						const config = {
+							crit: this.crit,
+							ability: "manual input",
+							log: true,
+							actions: [
+								{
+									type,
+									manual: true,
+									rolls: [
+										{
+											damage_type: this.damage_type,
+											value: amount[type]
+										}
+									]
+								}
+							]
+						};
 
-							// Set config for HpManipulation and log
-							const config = {
-								crit: this.crit,
-								ability: "manual input",
-								log: true,
-								actions: [
-									{
-										type,
-										manual: true,
-										rolls: [
-											{
-												damage_type: this.damage_type,
-												value: amount[type]
-											}
-										]
-									}
-								]
-							};
-
-							this.setHP(amount, this.entities[key], this.current, config)
-						}
-
-						//Reset input fields
-						this.manualAmount = '';
-						this.damage_type = '';
-						this.crit = false;
+						this.setHP(amount, this.entities[key], this.current, config)
 					}
-				})
+
+					//Reset input fields
+					this.manualAmount = '';
+					this.damage_type = '';
+					this.crit = false;
+				}
 			},
 		},
 	}

@@ -483,6 +483,7 @@ html body {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: inherit;
 	}
 
 	.scroll {
@@ -553,6 +554,37 @@ html body {
 			margin: auto;
 			max-width: 1250px;
 			padding: 20px;
+
+			&__edit {
+				.save {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					flex-wrap: wrap;
+					position: sticky;
+					bottom: 5px;
+					padding: 10px 10px;
+					margin: 5px 5px;
+					background: $neutral-9;
+					border: solid 1px $neutral-8;
+					border-radius: $border-radius;
+					flex-direction: row-reverse;
+			
+					.unsaved_changes {
+						margin: 0 10px 0 0;
+						line-height: 31px;
+					}
+					.buttons {
+						display: flex;
+						justify-content: flex-end;
+					}
+					@media only screen and (max-width: 343px) {
+						.buttons {
+							margin-bottom: 15px;
+						}
+					}
+				}
+			}
 		}
 	}
 	.content-side {
@@ -864,19 +896,16 @@ html body {
 	.login-container {
 		color: #fff;
 		background-position: center;
-		height: calc(100vh - 50px);
-		background-color: #000;
 		padding: 100px 30px 0 30px;
 
 		#login {
-			background-color: $neutral-6;
+			background-color: $neutral-7;
 			max-width: 360px;
 			margin: auto;
 			padding: 120px 30px 30px;
 			position: relative;
 			box-shadow: 5px 5px 10px #000;
 			border-radius: $border-radius;
-
 		
 			h1, h2 {
 				text-transform: none !important;
@@ -1116,13 +1145,11 @@ html body {
 
 		&-column {
 			background: $neutral-8;
-			margin-right: 1px;
 
 			&.hk-table-header {
 				background: none;
 				padding: 5px 10px !important;
 				font-weight: bold;
-				background-color: $neutral-5;
 			}
 			.image {
 				width: 46px;
@@ -1539,7 +1566,7 @@ html body {
 
 	// Q-INPUT FIELDS
 	.manual-input {
-		height: 90px;
+		height: 110px;
 		font-size:50px;
 		
 		.q-field {
@@ -1621,6 +1648,21 @@ html body {
 
 		.q-td {
 			background-color: $neutral-7;
+
+			&.avatar {
+				padding: 0;
+				width: 46px;
+				height: 46px;
+				border: solid 1px $neutral-4;
+				background-size: cover;
+				background-position: center top;
+				background-color: $neutral-8;
+				color: $neutral-2;
+				text-align: center;
+				font-size: 33px;
+				line-height: 46px;
+				box-sizing: border-box;
+			}
 		}
 
 		.monster {

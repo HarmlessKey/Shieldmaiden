@@ -9,8 +9,9 @@
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Title *"
 								autocomplete="off"
-								type="text" 
-								v-model="campaign.campaign"
+								type="text"
+								class="mb-2"
+								v-model="editCampaign.name"
 								:error="invalid && validated"
 								:error-message="errors[0]"
 							/>
@@ -21,16 +22,16 @@
 							label="Advancement"
 							emit-value
 							map-options
-							class="my-2" 
-							v-model="campaign.advancement" 
+							class="mb-3" 
+							v-model="editCampaign.advancement" 
 							:options="advancement_options" 
 						/>
 
-						<div class="background">
+						<div class="background mt-2">
 							<div 
 								class="img pointer" 
-								v-if="campaign.background" 
-								:style="{ backgroundImage: 'url(\'' + campaign.background + '\')' }"
+								v-if="editCampaign.background" 
+								:style="{ backgroundImage: 'url(\'' + editCampaign.background + '\')' }"
 								@click="image = true"
 							>
 							</div>
@@ -43,7 +44,7 @@
 										:dark="$store.getters.theme === 'dark'" filled square
 										autocomplete="off" 
 										type="text" 
-										v-model="campaign.background"
+										v-model="editCampaign.background"
 										placeholder="Background URL"
 										:error="invalid && validated"
 										:error-message="errors[0]"
@@ -51,17 +52,16 @@
 								</ValidationProvider>
 							</div>
 						</div>
-
-						<div class="mt-3 neutral-2 pointer" @click="setPrivate(!campaign.private)">
-							<span class="btn btn-clear">
-								<span :class="!campaign.private ? 'green' : 'neutral-2'">
+						<div class="mt-3 neutral-2 pointer">
+							<span class="btn btn-clear" @click="$set(editCampaign, 'private', null)">
+								<span :class="!editCampaign.private ? 'green' : 'neutral-2'">
 									<i class="fas fa-eye"></i>
 									Public
 								</span>
 							</span>
 							/
-							<span class="btn btn-clear mr-2">
-								<span :class="campaign.private ? 'red' : 'neutral-2'">
+							<span class="btn btn-clear mr-2" @click="$set(editCampaign, 'private', true)">
+								<span :class="editCampaign.private ? 'red' : 'neutral-2'">
 									<i class="fas fa-eye-slash"></i>
 									Private
 								</span>
@@ -97,12 +97,16 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex";
-	import { db } from "@/firebase";
+	import { mapActions } from "vuex";
 
 	export default {
 		name: "EditCampaign",
-		props: ["campaignId"],
+		props: {
+			campaign: {
+				type: Object,
+				required: true
+			}
+		},
 		data() {
 			return {
 				user: this.$store.getters.user,
@@ -115,38 +119,19 @@
 						value: "milestone",
 						label: "Milestone"
 					}
-				]
+				],
+				editCampaign: {...this.campaign}
 			}
 		},
-		computed: {
-			...mapGetters([
-				'campaigns',
-				'campaign',
-				'players',
-				'npcs'
-			]),
-		},
-		mounted() {
-			this.fetchCampaign({
-				cid: this.campaignId, 
-			});
-			this.fetchNpcs();
-		},
 		methods: {
-			...mapActions([
-				'fetchCampaign',
-				'fetchNpcs',
-			]),
-			edit() {
-				db.ref(`campaigns/${this.user.uid}/${this.campaignId}`).update(this.campaign);
-			},
-			setPrivate(value) {
-				//Has to be removed on false
-				if(value === false) {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).remove();
-				} else {
-					db.ref(`campaigns/${this.user.uid}/${this.campaignId}/private`).set(value);
-				}
+			...mapActions("campaigns", ["update_campaign"]),
+			async edit() {
+				await this.update_campaign({ 
+					uid: this.user.uid, 
+					id: this.campaign.key, 
+					campaign: this.editCampaign
+				});
+				this.$emit("close");
 			}
 		}
 	}

@@ -167,7 +167,8 @@
 			...mapActions([
 				'setSlide',
 				'setSideSmallScreen',
-				'setTheme'
+				'setTheme',
+				'sign_out'
 			]),
 			showSlide(type) {
 				this.setSlide({
@@ -175,12 +176,9 @@
 					type,
 				})
 			},
-			signOut: function() {
-				this.$store.commit("SET_USER", undefined)
-				auth.signOut()
-				.then(() => {
-					if(this.$route.path !== "/") this.$router.replace('/');
-				});
+			signOut() {
+				if(this.$route.path !== "/") this.$router.replace('/');
+				this.sign_out();
 			}
 		}
 	};

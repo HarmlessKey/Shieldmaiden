@@ -1,7 +1,7 @@
 <template>
 	<hk-card>
 		<div slot="header" class="card-header">
-			<h1><i class="fas fa-treasure-chest mr-2"></i>D&D 5e items</h1>
+			<h1><i class="fas fa-treasure-chest mr-2" /> Items</h1>
 			<span class="neutral-3">
 				Resource <a class="btn btn-sm btn-clear" href="../SRD-OGL_V5.1.pdf" target="_blank" rel="noopener">SRD 5.1</a>
 			</span>
@@ -61,9 +61,6 @@
 			Crumble,
 			Footer,
 			ViewItem
-		},
-		metaInfo: {
-			title: 'Items'
 		},
 		data() {
 			return {

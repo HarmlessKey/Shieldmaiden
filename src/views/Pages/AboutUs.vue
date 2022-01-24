@@ -89,22 +89,22 @@
 					<p class="mb-5">This guy was nice enough to lend us his time and design the awesome logo for us. We couldn't be happier!</p>
 					<div class="row q-col-gutter-md">
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-green.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-green.svg"/>
 						</div>
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-blue.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-blue.svg"/>
 						</div>
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-red.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-red.svg"/>
 						</div>
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-orange.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-orange.svg"/>
 						</div>
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-cyan.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-cyan.svg"/>
 						</div>
 						<div class="col-4 col-sm-2 d-flex justify-content-center" style="height:120px;">
-							<img class="icon" src="../assets/_img/logo/logo-icon-yellow.svg"/>
+							<img class="icon" src="../../assets/_img/logo/logo-icon-yellow.svg"/>
 						</div>
 					</div>
 				</div>
@@ -123,12 +123,6 @@
 		name: 'home',
 		components: {
 			Footer,
-		},
-		metaInfo: {
-			title: 'About Harmless Key',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.' }
-			]
 		},
 		computed: {
 			user() {

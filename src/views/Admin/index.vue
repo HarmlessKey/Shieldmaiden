@@ -21,9 +21,6 @@
 		components: {
 			Crumble,
 		},
-		metaInfo: {
-			title: 'Admin'
-		},
 		data() {
 			return {
 				items: {

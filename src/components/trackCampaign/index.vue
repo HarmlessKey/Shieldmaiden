@@ -81,9 +81,6 @@
 			ViewPlayers,
 			Live
 		},
-		metaInfo: {
-			title: 'Harmless Key'
-		},
 		data() {
 			return {
 				user: this.$store.getters.user,

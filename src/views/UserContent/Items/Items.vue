@@ -94,9 +94,6 @@
 
 	export default {
 		name: 'Items',
-		metaInfo: {
-			title: 'Items'
-		},
 		components: {
 			ContentHeader
 		},

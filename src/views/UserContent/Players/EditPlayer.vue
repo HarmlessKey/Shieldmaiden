@@ -446,11 +446,8 @@
 	import { abilities } from "@/mixins/abilities";
 
 	export default {
-		name: 'Players',
+		name: 'EditPlayer',
 		mixins: [experience, skills, general, abilities],
-		metaInfo: {
-			title: 'Players'
-		},
 		components: {
 			GiveCharacterControl,
 			Defenses,

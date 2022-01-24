@@ -81,9 +81,6 @@
 		components: {
 			Crumble,
 		},
-		metaInfo: {
-			title: 'Admin | New Patron'
-		},
 		firebase() {
 			return {
 				tiers: {

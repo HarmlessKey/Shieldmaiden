@@ -243,9 +243,6 @@
 
 	export default {
 		name: 'Campaigns',
-		metaInfo: {
-			title: 'Campaigns'
-		},
 		mixins: [general],
 		components: {
 			EditCampaign,

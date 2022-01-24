@@ -110,14 +110,6 @@ export default {
 		EditSpell,
 	},
 	mixins: [general, spells],
-	metaInfo() {
-		return {
-			title: this.old_spell.name + ' | D&D 5th Edition',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'D&D 5th Edition Spell: ' + this.old_spell.name }
-			]
-		}
-	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,

@@ -26,9 +26,6 @@
 			Crumble,
 			Footer,
 		},
-		metaInfo: {
-			title: 'Contribute'
-		},
 		data() {
 			return {
 				userInfo: this.$store.getters.userInfo,

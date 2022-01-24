@@ -35,9 +35,6 @@
 		components: {
 			Crumble
 		},
-		metaInfo: {
-			title: 'Admin | Generate Search Table'
-		},
 		data() {
 			return {
 				loading: false,

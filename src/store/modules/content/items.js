@@ -42,8 +42,6 @@ const actions = {
     const cached = state.cached_items;
     let item = undefined;
 
-    console.log(id)
-
     // SRD Items
     if(isNaN(id)) {
       item = Object.values(cached).filter(item => {
@@ -64,7 +62,6 @@ const actions = {
         console.error(error);
       }
     }
-    console.log("store ret", item)
     return item;
   },
 };

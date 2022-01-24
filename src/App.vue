@@ -99,46 +99,83 @@
 	},
 	metaInfo() {
 		return {
-			title: 'D&D Combat Tracker | Harmless Key',
-			author: 'Harmless Key',
+			title: this.$route.meta.title || "D&D Combat Tracker",
+			titleTemplate: "%s | Harmless Key",
+			author: "Harmless Key",
 			htmlAttrs: {
 				lang: "en"
 			},
 			meta: [
-				{ charset: 'utf-8' },
+				{ charset: "utf-8" },
 				{ 
-					vmid: 'description', 
-					name: 'description', 
-					content: 'Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve.'
+					vmid: "description", 
+					name: "description", 
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
 				{ name: "twitter:card", content: "summary" },
-				{ name: "twitter:title", content: "D&D Combat Tracker | Harmless Key" },
+				{ 
+					vmid: "twitter-title",
+					name: "twitter:title", 
+					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key" 
+				},
 				{ name: "twitter:image", content: "https://harmlesskey.com/harmless_key_logo_full.png"  },
 				{
+					vmid: "twitter-description",
 					name: "twitter:description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
-				{ name: "twitter:site", content: "@KeyHarmless" },
-
-				{ property: "og:title", content: "D&D Combat Tracker | Harmless Key" },
-				{	property: "og:site_name", content: "harmlesskey.com" },
-				{	property: "og:type", content: "website" },
+				{ 
+					name: "twitter:site", 
+					content: "@KeyHarmless"
+				},
+				{ 
+					vmid: "og-title",
+					property: "og:title", 
+					content: this.$route.meta.title || "D&D Combat Tracker | Harmless Key"
+				},
+				{	
+					vmid: "og-site_name",
+					property: "og:site_name", 
+					content: "harmlesskey.com" },
+				{	
+					vmid: "og-type",
+					property: "og:type", 
+					content: "website"
+				},
 				{
+					vmid: "og-description",
 					property: "og:description",
 					name: "description",
-					content: "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
+					content: this.$route.meta.description || "Harmless Key is the initiative tracker for D&D 5e. We keep track of everything in encounters so even during combat you can give your players the attention they deserve."
 				},
-				{	property: "og:url", content: `https://harmlesskey.com${this.$route.path}` },
-				{	property: "og:image", name: "image", content: `https://harmlesskey.com/linkedin.png` },
-				{	property: "og:image:type", content: "image/png" },
-				{	property: "og:image:alt", content: "Harmless Key Logo" },
+				{	
+					vmid: "og-url",
+					property: "og:url", 
+					content: `https://harmlesskey.com${this.$route.path}`
+				},
+				{	
+					vmid: "og-image",
+					property: "og:image", 
+					name: "image", 
+					content: `https://harmlesskey.com/linkedin.png` 
+				},
+				{	
+					vmid: "og-image-type",
+					property: "og:image:type", 
+					content: "image/png"
+				},
+				{	
+					vmid: "og-image-alt",
+					property: "og:image:alt", 
+					content: "Harmless Key Logo"
+				},
 			]
 		}
 	},
 	data() {
 		return {
 			user: auth.currentUser,
-			connection: navigator.onLine ? 'online' : 'offline',
+			connection: navigator.onLine ? "online" : "offline",
 			announcementSetter: false,
 			announcement_cookie: false,
 			install_cookie: false,

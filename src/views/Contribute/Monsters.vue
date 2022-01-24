@@ -245,9 +245,6 @@
 			Monster,
 			ViewMonster
 		},
-		metaInfo: {
-			title: 'Monsters'
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

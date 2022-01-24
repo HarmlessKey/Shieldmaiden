@@ -93,9 +93,6 @@
 			Notifications
 		},
 		mixins: [general],
-		metaInfo: {
-			title: 'Admin | Patrons'
-		},
 		data() {
 			return {
 				id: this.$route.params.id,

@@ -89,9 +89,6 @@
 	export default {
 		name: 'Players',
 		mixins: [experience],
-		metaInfo: {
-			title: 'Players'
-		},
 		components: {
 			ContentHeader
 		},

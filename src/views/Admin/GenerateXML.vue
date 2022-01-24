@@ -9,12 +9,10 @@
 
 <script>
 	import { db } from '@/firebase';
+	import { mapActions } from "vuex";
 
 	export default {
 		name: 'XML',
-		metaInfo: {
-			title: 'Admin | XML'
-		},
 		data() {
 			return {
 				routes: [
@@ -25,7 +23,6 @@
 					"http://harmlesskey.com/sign-up",
 					"http://harmlesskey.com/sign-in",
 					"http://harmlesskey.com/privacy-policy",
-					"http://harmlesskey.com/planned",
 					"http://harmlesskey.com/updates",
 					"http://harmlesskey.com/feedback",
 					"http://harmlesskey.com/compendium",
@@ -36,7 +33,10 @@
 				]
 			}
 		},
+
 		methods: {
+			...mapActions("api_monsters", ["get_monsters",]),
+			...mapActions("api_items", ["get_api_items",]),
 			async downloadXml() {
 				const d = new Date();
 				const lastmodDate = `${d.getFullYear()}-${d.getMonth() < 10 ? '0'+d.getMonth() : d.getMonth() }-${d.getDate() < 10 ? '0'+d.getDate() : d.getDate() }`;
@@ -70,7 +70,7 @@
 
 				//CONDTIONS
 				const conditions_ref = db.ref('conditions');
-				await conditions_ref.on('value', (snapshot) => {
+				await conditions_ref.once('value', (snapshot) => {
 					let conditions = snapshot.val()
 
 					for(let key in conditions) {
@@ -94,58 +94,61 @@
 				});
 
 				//ITEMS
-				const items_ref = db.ref('items');
-				await items_ref.on('value', (snapshot) => {
-					let items = snapshot.val()
-
-					for(let key in items) {
-						let urlElement = xmlDoc.createElement("url");
-
-						//Add loc element
-						let loc = xmlDoc.createElement("loc");
-						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/items/${key}`);
-						loc.appendChild(url);
-						urlElement.appendChild(loc);
-
-						//Add lastmod element
-						let lastmod = xmlDoc.createElement("lastmod");
-						let date = xmlDoc.createTextNode(lastmodDate);
-						lastmod.appendChild(date);
-						urlElement.appendChild(lastmod);
-
-						//Add to urlset
-						urlset.appendChild(urlElement);
-					}
+				//MONSTERS
+				const items = await this.get_api_items({
+					pageNumber: 1,
+					pageSize: 0,
+					fields: ["url"]
 				});
+
+				for(const item of items.results) {
+					let urlElement = xmlDoc.createElement("url");
+
+					//Add loc element
+					let loc = xmlDoc.createElement("loc");
+					let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/items/${item.url.toLowerCase()}`);
+					loc.appendChild(url);
+					urlElement.appendChild(loc);
+
+					//Add lastmod element
+					let lastmod = xmlDoc.createElement("lastmod");
+					let date = xmlDoc.createTextNode(lastmodDate);
+					lastmod.appendChild(date);
+					urlElement.appendChild(lastmod);
+
+					//Add to urlset
+					urlset.appendChild(urlElement);
+				}
 
 				//MONSTERS
-				const monsters_ref = db.ref('monsters');
-				await monsters_ref.on('value', (snapshot) => {
-					let monsters = snapshot.val()
-
-					for(let key in monsters) {
-						let urlElement = xmlDoc.createElement("url");
-
-						//Add loc element
-						let loc = xmlDoc.createElement("loc");
-						let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/monsters/${key}`);
-						loc.appendChild(url);
-						urlElement.appendChild(loc);
-
-						//Add lastmod element
-						let lastmod = xmlDoc.createElement("lastmod");
-						let date = xmlDoc.createTextNode(lastmodDate);
-						lastmod.appendChild(date);
-						urlElement.appendChild(lastmod);
-
-						//Add to urlset
-						urlset.appendChild(urlElement);
-					}
+				const monsters = await this.get_monsters({
+					pageNumber: 1,
+					pageSize: 0,
+					fields: ["url"]
 				});
+		
+				for(const monster of monsters.results) {
+					let urlElement = xmlDoc.createElement("url");
+
+					//Add loc element
+					let loc = xmlDoc.createElement("loc");
+					let url = xmlDoc.createTextNode(`http://harmlesskey.com/compendium/monsters/${monster.url}`);
+					loc.appendChild(url);
+					urlElement.appendChild(loc);
+
+					//Add lastmod element
+					let lastmod = xmlDoc.createElement("lastmod");
+					let date = xmlDoc.createTextNode(lastmodDate);
+					lastmod.appendChild(date);
+					urlElement.appendChild(lastmod);
+
+					//Add to urlset
+					urlset.appendChild(urlElement);
+				}
 
 				//SPELLS
 				const spells_ref = db.ref('spells');
-				await spells_ref.on('value', (snapshot) => {
+				await spells_ref.once('value', (snapshot) => {
 					let spells = snapshot.val()
 
 					for(let key in spells) {

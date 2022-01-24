@@ -48,6 +48,39 @@
 				default: false
 			}
 		},
+		metaInfo() {
+			return {
+				title: `${this.condition.name ? this.condition.name.capitalizeEach() : "Condition"} D&D 5e`,
+				meta: [
+					{ 
+						vmid: "description", 
+						name: "description", 
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+					},
+					{
+						vmid: "og-title",
+						property: "og:title", 
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+					},
+					{ 
+						vmid: "og-description", 
+						property: "og:description",
+						name: "description", 
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+					},
+					{ 
+						vmid: "twitter-title",
+						name: "twitter:title", 
+						content: `${this.condition.name ? this.condition.name.capitalizeEach() : "Condition"} D&D 5e`
+					},
+					{ 
+						vmid: "twitter-description", 
+						name: "twitter:description",
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+					},
+				],
+			}
+		},
 		data() {
 			return {
 				effects: [
@@ -65,6 +98,9 @@
 				return this.conditionList.filter(item => {
 					return item.value === this.id;
 				})[0];
+			},
+			description() {
+				return (this.condition && this.condition.effects) ? `${this.condition.effects.join(" ").substring(0, 110).trim()}...` : "";
 			}
 		},
 		beforeMount() {

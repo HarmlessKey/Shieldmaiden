@@ -87,9 +87,6 @@
 		components: {
 			User
 		},
-		metaInfo: {
-			title: 'Admin | Users'
-		},
 		data() {
 			return {
 				id: this.$route.params.id,

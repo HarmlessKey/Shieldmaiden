@@ -32,9 +32,6 @@
 
 	export default {
 		name: 'ExportDatabases',
-		metaInfo: {
-			title: 'Admin | Export'
-		},
 		data() {
 			return {
 				loading: false,

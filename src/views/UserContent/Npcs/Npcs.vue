@@ -117,9 +117,6 @@
 
 	export default {
 		name: "Npcs",
-		metaInfo: {
-			title: "NPCs"
-		},
 		mixins: [monsterMixin],
 		components: {
     ImportNPC,

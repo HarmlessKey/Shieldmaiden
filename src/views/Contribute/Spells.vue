@@ -221,9 +221,6 @@
 			Spell,
 			ViewSpell
 		},
-		metaInfo: {
-			title: 'Spells'
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

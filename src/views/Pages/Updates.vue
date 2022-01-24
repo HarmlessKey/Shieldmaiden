@@ -20,9 +20,6 @@
 		name: 'Updates',
 		components: {
 			Footer,
-		},
-		metaInfo: {
-			title: 'Updates'
-		},
+		}
 	}
 </script>

@@ -72,9 +72,6 @@
 
 	export default {
 		name: 'Reminders',
-		metaInfo: {
-			title: 'Reminders'
-		},
 		components: {
 			ContentHeader
 		},

@@ -24,16 +24,6 @@ export class itemServices {
       if(query.search) {
         queryParams.push(`name=${query.search}`);
       }
-      // if(query.types && query.types.length) {
-      //   for(const type of query.types) {
-      //     queryParams.push(`type[]=${type}`);
-      //   }
-      // }
-      // if(query.challenge_ratings && query.challenge_ratings.length) {
-      //   for(const cr of query.challenge_ratings) {
-      //     queryParams.push(`challenge_rating[]=${cr}`);
-      //   }
-      // }
 
       params += `&${queryParams.join("&")}`;
     }

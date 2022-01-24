@@ -244,11 +244,8 @@
 
 
 	export default {
-		name: 'Items',
+		name: 'EditItem',
 		mixins: [general, skills],
-		metaInfo: {
-			title: 'Items'
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

@@ -123,9 +123,6 @@ export default {
 			Tier
 		},
 		mixins: [general],
-		metaInfo: {
-			title: "Profile"
-		},
 		data() {
 			return {
 				error: "",

@@ -76,9 +76,6 @@
 	export default {
 		name: 'Characters',
 		mixins: [experience],
-		metaInfo: {
-			title: 'Characters'
-		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,

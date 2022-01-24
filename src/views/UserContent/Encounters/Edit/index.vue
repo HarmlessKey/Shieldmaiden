@@ -90,9 +90,6 @@
 
 	export default {
 		name: "EditEncounter",
-		metaInfo: {
-			title: "Encounters"
-		},
 		components: {
 			OverEncumbered,
 			Loot,

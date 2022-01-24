@@ -113,10 +113,7 @@
 	import DemoOverlay from '@/components/combat/DemoOverlay.vue';
 
 	export default {
-		name: 'app',
-		metaInfo: {
-			title: 'Run Encounter'
-		},
+		name: 'RunEncounter',
 		components: {
 			Finished,
 			DemoFinished,

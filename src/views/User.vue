@@ -99,9 +99,6 @@
 			ContentSideRight
 		},
 		mixins: [general],
-		metaInfo: {
-			title: "User page | Harmless Key"
-		},
 		data() {
 			return {
 				user: this.$store.getters ? this.$store.getters.user : undefined,

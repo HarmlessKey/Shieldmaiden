@@ -20,9 +20,6 @@
 
 	export default {
 		name: 'Followed',
-		metaInfo: {
-			title: 'Followed Users',
-		},
 		components: {
 			Crumble
 		},

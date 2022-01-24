@@ -116,14 +116,6 @@ export default {
 		damage_types,
 		languages
 	],
-	metaInfo() {
-		return {
-			title: this.old_monster.name + ' | D&D 5th Edition',
-			meta: [
-				{ vmid: 'description', name: 'description', content: 'D&D 5th Edition Monster: ' + this.old_monster.name }
-			]
-		}
-	},
 	data() {
 		return {
 			userId: this.$store.getters.user.uid,

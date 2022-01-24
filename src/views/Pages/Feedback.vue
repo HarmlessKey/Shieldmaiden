@@ -35,10 +35,7 @@
 			Footer,
 			Crumble,
 			ContentSideRight
-		},
-		metaInfo: {
-			title: 'Feedback'
-		},
+		}
 	}
 </script>
 

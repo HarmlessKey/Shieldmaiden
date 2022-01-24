@@ -149,11 +149,6 @@
 			Crumble
 		},
 		props: ['id'],
-		beforeMount() {
-			//Because the component is loaded in another view, 
-			//the scroll needs to be reset to 0
-			window.scrollTo(0,0);
-		},
 		data() {
 			return {
 				loading: true,

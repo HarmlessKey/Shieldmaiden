@@ -67,7 +67,7 @@
 <script>
 	import { db } from '@/firebase'
 
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 	import Item from '@/components/compendium/Item.vue';
 	import Spell from '@/components/compendium/Spell.vue';
 	import Condition from '@/components/compendium/Condition.vue';

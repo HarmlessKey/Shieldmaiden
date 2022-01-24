@@ -135,7 +135,7 @@
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
-	import ViewItem from '@/components/ViewItem.vue';
+	import ViewItem from '@/components/compendium/Item.vue';
 	import AddItem from '@/components/slides/party/AddItem.vue';
 
 	export default {

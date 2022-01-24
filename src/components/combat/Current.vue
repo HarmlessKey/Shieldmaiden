@@ -51,7 +51,7 @@
 	import { dice } from '@/mixins/dice';
 	import TargetItem from '@/components/combat/TargetItem.vue';
 	import DeathSaves from '@/components/combat/DeathSaves.vue';
-	import ViewEntity from '@/components/ViewEntity.vue';
+	import ViewEntity from './ViewEntity.vue';
 
 	export default {
 		name: 'Current',

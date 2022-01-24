@@ -238,7 +238,7 @@
 	
 	import { dice } from '@/mixins/dice.js';
 	import { general } from '@/mixins/general.js';
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 
 	export default {
 		name: 'Entities',

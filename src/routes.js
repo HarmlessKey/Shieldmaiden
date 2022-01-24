@@ -4,9 +4,6 @@ const Contribute = () => import('@/views/Contribute');
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
 const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
-const Monsters_contrib = () => import('@/views/Contribute/Monsters.vue');
-const Monster_contrib = () => import('@/components/contribute/monster');
-const MonsterEdit = () => import('@/components/contribute/monster/edit.vue');
 
 const Sitemap = () => import('@/views/Pages/Sitemap.vue');
 const Privacy = () => import('@/views/Pages/Privacy.vue');
@@ -298,7 +295,7 @@ export const routes = [{
 						component: () => import('@/views/UserContent/Items/Items.vue'),
 						meta: {
 							title: "Items",
-							description: "Your custom reminders Harmless Key."
+							description: "Your custom items Harmless Key."
 						}
 					},
 					{
@@ -410,7 +407,7 @@ export const routes = [{
 					{
 						path: ":id",
 						name: "Monster",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Monster'),
 						meta: {
 							title: "Monster",
 							itle: "Monster D&D 5e",
@@ -438,7 +435,7 @@ export const routes = [{
 					{
 						path: ":id",
 						name: "Spell",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Spell'),
 						meta: {
 							title: "Spell"
 						}
@@ -456,11 +453,15 @@ export const routes = [{
 						path: "",
 						name: 'Conditions',
 						component: () => import('@/views/Compendium/Conditions'),
+						meta: {
+							title: "Conditions D&D 5e",
+							description: "All conditions from the SRD 5.1. Dungeons & Dragons 5th edition conditions."
+						}
 					},
 					{
 						path: ":id",
 						name: "Condition",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Condition'),
 						meta: {
 							title: "Condition"
 						}
@@ -478,11 +479,15 @@ export const routes = [{
 						path: "",
 						name: "CompendiumItems",
 						component: () => import('@/views/Compendium/Items'),
+						meta: {
+							title: "Items D&D 5e",
+							description: "All items from the SRD 5.1. Dungeons & Dragons 5th edition items."
+						}
 					},
 					{
 						path: ":id",
 						name: "Item",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Item'),
 						meta: {
 							title: "Item"
 						}
@@ -707,44 +712,6 @@ export const routes = [{
 		path: '/contribute/spells/:id/edit',
 		name: 'Edit Spell',
 		component: SpellEdit,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/monsters',
-		name: 'Contribute Monsters',
-		component: Monsters_contrib,
-		meta: {
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/monsters/:id',
-		name: 'Contribute Monster',
-		component: Monster_contrib,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/monsters/:id/edit',
-		name: 'Edit Monster',
-		component: MonsterEdit,
 		props: (route) => ({
 			id: route.query.id,
 		}),

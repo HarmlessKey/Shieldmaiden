@@ -1,88 +1,39 @@
 <template>
-	<tag :is="cardView ? 'hk-card' : 'div'">
-		<div slot="header" :class="{ 'card-header': cardView }">
-			<h1>
-				<i :class="`hki-${condition.value}`" />
-				{{ condition.name }}
-			</h1>
-		</div>
-		<div :class="{ 'card-body': cardView }">
-			<i>{{ condition.condition }}</i>
+	<div>
+		<i>{{ condition.condition }}</i>
 
-			<ul v-if="condition.effects">
-				<li v-for="(effect, index) in condition.effects" :key="index">
-					{{ effect }}
-				</li>
-			</ul>
+		<ul v-if="condition.effects">
+			<li v-for="(effect, index) in condition.effects" :key="index">
+				{{ effect }}
+			</li>
+		</ul>
 
-			<!-- EXHAUSTION -->
-			<table v-if="condition['.key'] == 'exhaustion'" class="table">
-				<thead>
-					<th>Level</th>
-					<th>Effect</th>
-				</thead>
-				<tbody>
-					<tr v-for="(effect, index) in effects" :key="index">
-						<td>{{ index + 1 }}</td>
-						<td>{{ effect }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</tag>
+		<!-- EXHAUSTION -->
+		<table v-if="condition.value == 'exhaustion'" class="table">
+			<thead>
+				<th>Level</th>
+				<th>Effect</th>
+			</thead>
+			<tbody>
+				<tr v-for="(effect, index) in effects" :key="index">
+					<td>{{ index + 1 }}</td>
+					<td>{{ effect }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </template>
 
 <script>
-	import { conditions } from '@/mixins/conditions.js';
 
 	export default {
 		name: 'Condition',
-		mixins: [conditions],
-		props: {
-			id: {
-				type: String,
-				required: true
-			},
-			cardView: {
-				type: Boolean,
-				default: false
-			}
-		},
-		metaInfo() {
-			return {
-				title: `${this.condition.name ? this.condition.name.capitalizeEach() : "Condition"} D&D 5e`,
-				meta: [
-					{ 
-						vmid: "description", 
-						name: "description", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
-					},
-					{
-						vmid: "og-title",
-						property: "og:title", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
-					},
-					{ 
-						vmid: "og-description", 
-						property: "og:description",
-						name: "description", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
-					},
-					{ 
-						vmid: "twitter-title",
-						name: "twitter:title", 
-						content: `${this.condition.name ? this.condition.name.capitalizeEach() : "Condition"} D&D 5e`
-					},
-					{ 
-						vmid: "twitter-description", 
-						name: "twitter:description",
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
-					},
-				],
-			}
-		},
+		props: [
+			'data'
+		],
 		data() {
 			return {
+				condition: this.data,
 				effects: [
 					"Disadvantage on ability checks",
 					"Speed halved",
@@ -92,23 +43,8 @@
 					"Death",
 				]
 			}
-		},
-		computed: {
-			condition() {
-				return this.conditionList.filter(item => {
-					return item.value === this.id;
-				})[0];
-			},
-			description() {
-				return (this.condition && this.condition.effects) ? `${this.condition.effects.join(" ").substring(0, 110).trim()}...` : "";
-			}
-		},
-		beforeMount() {
-			if(this.$route.name === 'Condition') {
-				this.$root.$emit('route-name', this.condition.name);
-			}
 		}
-	}
+	};
 </script>
 
 <style lang="scss" scoped>

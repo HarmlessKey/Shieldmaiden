@@ -97,7 +97,7 @@
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
 import EditSpell from '@/components/contribute/spell/forms';
-import ViewSpell from '@/components/ViewSpell.vue';
+import ViewSpell from './ViewSpell.vue';
 import { general } from '@/mixins/general';
 import { spells } from '@/mixins/spells';
 import { mapGetters } from 'vuex';

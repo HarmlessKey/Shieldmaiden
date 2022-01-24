@@ -50,7 +50,7 @@
 <script>
 	import { currencyMixin } from '@/mixins/currency.js';
 	import { db } from '@/firebase';
-	import ViewItem from '@/components/ViewItem.vue';
+	import ViewItem from '@/components/compendium/Item.vue';
 
 	export default {
 		mixins: [currencyMixin],

@@ -41,7 +41,6 @@
 <script>
 	// import { db } from '@/firebase'
 	import { mapActions, mapGetters } from 'vuex'
-	import ViewEntity from '@/components/ViewEntity.vue';
 	import Conditions from '@/components/combat/Conditions.vue';
 	import Reminders from '@/components/combat/Reminders.vue';
 	import { dice } from '@/mixins/dice.js';
@@ -52,7 +51,6 @@
 		mixins: [dice],
 		props: ["target"],
 		components: {
-			ViewEntity,
 			Conditions,
 			Reminders,
 			TargetItem

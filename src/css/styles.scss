@@ -212,6 +212,40 @@ html body {
 		}
 	}
 
+	.overflow {
+		&-hidden {
+			overflow: hidden;
+		}
+		&-auto {
+			overflow: auto;
+		}
+		&-scroll {
+			overflow: scroll;
+		}
+		&-x {
+			&-hidden {
+				overflow-x: hidden;
+			}
+			&-auto {
+				overflow-x: auto;
+			}
+			&-scroll {
+				overflow-x: scroll;
+			}
+		}
+		&-y {
+			&-hidden {
+				overflow-y: hidden;
+			}
+			&-auto {
+				overflow-y: auto;
+			}
+			&-scroll {
+				overflow-y: scroll;
+			}
+		}
+	}
+
 	//MARGINGS
 	.m {
 		&b, &y {

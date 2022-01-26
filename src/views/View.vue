@@ -7,11 +7,11 @@
 			<div class="col-12" :class="{ 'col-md-9': !this.$route.meta || this.$route.meta.side !== false }">
         <router-view />
       </div>
-      <div class="col-12 col-md-3" v-if="!this.$route.meta || this.$route.meta.side !== false">
-				{{ this.$route.meta.side }}
+      <div class="col-12 col-md-3" v-if="width > 978 && (!this.$route.meta || this.$route.meta.side !== false)">
 				<ContentSideRight />
 			</div>
     </div>
+		<q-resize-observer @resize="setSize" />
 	</div>
 	<Footer />
 </div>
@@ -32,6 +32,11 @@
 			ContentSideRight,
 			OverEncumbered
 		},
+		data() {
+			return {
+				width: 0
+			}
+		},
 		computed: {
 			...mapGetters([
 				"overencumbered"
@@ -39,6 +44,11 @@
 			show_overencumbered() {
 				const pathArray = this.$route.path.split("/");
 				return pathArray[1] === "content" && this.overencumbered;
+			}
+		},
+		methods: {
+			setSize(size) {
+				this.width = size.width;
 			}
 		}
 	}

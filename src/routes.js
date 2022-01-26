@@ -7,9 +7,7 @@ const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
 
 const Sitemap = () => import('@/views/Pages/Sitemap.vue');
 const Privacy = () => import('@/views/Pages/Privacy.vue');
-const AboutUs = () => import('@/views/Pages/AboutUs.vue');
 const Documentation = () => import('@/views/Pages/Documentation.vue');
-const Feedback = () => import('@/views/Pages/Feedback.vue');
 const Updates = () => import('@/views/Pages/Updates.vue');
 const SignIn = () => import('@/views/Pages/SignIn.vue');
 const SignUp = () => import('@/views/Pages/SignUp.vue');
@@ -743,14 +741,23 @@ export const routes = [{
 		}
 	},
 	{
-		path: '/about-us',
-		name: 'About Us',
-		component: AboutUs,
+		path: "/about-us",
+		component: () => import("@/views/View"),
 		meta: {
 			offline: true,
-			title: "About Harmless Key",
-			description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
-		}
+			title: "About us"
+		},
+		children: [
+			{
+				path: "",
+				name: "About us",
+				component: () => import("@/views/Pages/AboutUs"),
+				meta: {
+					title: "About us",
+					description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
+				}
+			}
+		]
 	},
 	{
 		path: '/documentation',
@@ -763,14 +770,23 @@ export const routes = [{
 		}
 	},
 	{
-		path: '/feedback',
-		name: 'Feedback',
-		component: Feedback,
+		path: "/feedback",
+		component: () => import("@/views/View"),
 		meta: {
 			offline: true,
-			title: "Feedback",
-			description: "Leave feedback for Harmless Key, a Combat Tracker for D&D."
-		}
+			title: "Feedback"
+		},
+		children: [
+			{
+				path: "",
+				name: "Feedback",
+				component: () => import("@/views/Pages/Feedback"),
+				meta: {
+					title: "Feedback",
+					description: "Leave feedback for Harmless Key, a Combat Tracker for D&D."
+				}
+			}
+		]
 	},
 	{
 		path: '/updates',

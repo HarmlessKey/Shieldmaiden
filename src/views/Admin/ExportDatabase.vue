@@ -8,6 +8,7 @@
 				<li>- ".key" is saved under "_id" for mongodb import.</li>
 				<li>- "metadata" is deleted.</li>
 				<li>- "changed" is deleted.</li>
+				<li>- "url" is generated, kebap-lowercase-name.</li>
 			</ul>
 			<q-select
 				dark filled square
@@ -40,6 +41,7 @@
 					"monsters",
 					"items",
 					"spells",
+					"conditions",
 				]
 			}
 		},
@@ -59,7 +61,9 @@
 						delete entry["metadata"];
 						delete entry["changed"];
 
-						entry.url = entry.name.replace(/ /g, "-");
+						// entry.name = entry.name.toLowerCase();
+						entry.url = entry.name.replace(/ /g, "-").toLowerCase();
+						
 						
 						data.push(entry);
 					}

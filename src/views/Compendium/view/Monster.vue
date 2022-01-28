@@ -80,7 +80,7 @@
 				this.$root.$emit('route-name', result.name.capitalizeEach());
 				this.monster.description = result.type;
 				this.monster.description += (result.subtype) ? ` ${result.subtype}, `: ", ";
-				this.monster.description += `${result.alignment}.`;
+				this.monster.description += `${result.alignment}. `;
 				this.monster.description += `Challenge rating: ${result.challenge_rating}. `
 				this.monster.description += `Armor class: ${result.armor_class}. Hit points: ${result.hit_points}. `;
 

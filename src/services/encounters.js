@@ -200,6 +200,18 @@ export class encounterServices {
     }
   }
 
+  // Adds a reminder to an entity in the encounter
+  async addReminder(uid, campaignId, encounterId, key, reminder) {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/entities/${key}/reminders`;
+      const newReminder = await ENCOUNTERS_REF.child(path).push(reminder);
+      
+      return newReminder.key;
+    } catch(error) {
+      throw error;
+    }
+  }
+
   /**
    * Update entity count in the search table of search_encounters
    * 

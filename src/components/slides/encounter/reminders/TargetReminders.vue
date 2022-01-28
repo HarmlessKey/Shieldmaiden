@@ -46,7 +46,7 @@
 					</li>
 				</ul>
 
-				<template v-if="personalReminders.length > 0">
+				<template v-if="personalReminders">
 					<h3>Personal</h3>
 					<ul class="premade">
 						<li v-for="(reminder, key) in personalReminders" :key="key">
@@ -65,21 +65,34 @@
 							</div>
 							<q-slide-transition>
 								<div v-if="varOptions === key" class="variables">
-									<div v-for="(variable, var_key) in reminder.variables" :key="var_key" class="mb-2">
-										<q-select 
-											:dark="$store.getters.theme === 'dark'" filled square dense
-											:label="var_key"
-											:options="variable"
-											type="text" 
-											v-validate="'required'"
-											v-model="selectedVars[var_key]"
-											:name="var_key"
-										/>
-										<small class="validate red" v-if="errors.has(var_key)">{{ errors.first(var_key) }}</small>
-									</div>
-									<a @click="addReminder('premade', reminder, selectedVars)" class="btn btn-sm btn-clear mt-2">
-										<i class="fas fa-plus green"></i> Add reminder
-									</a>
+									Select variable values
+									<ValidationObserver v-slot="{ valid }">
+										<ValidationProvider 
+											rules="required" 
+											:name="var_key" 
+											v-slot="{ errors, invalid, validated }"
+											v-for="(variable, var_key) in reminder.variables" :key="var_key"
+										>
+											<div class="mb-2">
+												<q-select 
+													:dark="$store.getters.theme === 'dark'" filled square dense
+													:label="var_key"
+													:options="variable"
+													type="text" 
+													v-model="selectedVars[var_key]"
+													:error="invalid && validated"
+													:error-message="errors[0]"
+												/>
+											</div>
+										</ValidationProvider>
+										<a 
+											@click="valid ? addReminder('premade', reminder, selectedVars) : null"
+											:disabled="!valid"
+											class="btn btn-sm btn-clear"
+										>
+											<i class="fas fa-plus green"></i> Add reminder
+										</a>
+									</ValidationObserver>
 								</div>
 							</q-slide-transition>
 						</li>
@@ -88,7 +101,7 @@
 				</q-tab-panel>
 				<q-tab-panel name="custom">
 					<ValidationObserver v-slot="{ handleSubmit, valid }">
-						<q-form @submit="handleSubmit(addReminder('custom', valid))">
+						<q-form @submit="handleSubmit(valid ? addReminder('custom') : null)">
 							<reminder-form v-model="customReminder" :variables="false"/>
 							<q-btn color="blue" no-caps type="submit" :disabled="!valid">Set</q-btn>
 						</q-form>
@@ -104,7 +117,6 @@
 
 <script>
 	import { mapActions, mapGetters } from 'vuex';
-	import { db } from '@/firebase';
 	import ReminderForm from '@/components/ReminderForm';
 	import { remindersMixin } from '@/mixins/reminders';
 	import TargetItem from '@/components/combat/TargetItem.vue';
@@ -124,6 +136,7 @@
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
+				personalReminders: undefined,
 				action: 'remove',
 				tab: "premade",
 				tabs: [
@@ -137,27 +150,26 @@
 				selectedVars: {}
 			}
 		},
-		firebase() {
-			return {
-				personalReminders: db.ref(`reminders/${this.userId}`)
-			}
-		},
 		computed: {
 			...mapGetters([
 				'entities',
 				'targeted'
 			]),
-			reminder_targets: function() {
+			reminder_targets() {
 				if (this.data !== undefined && this.data.length > 0)
 					return this.data;
 				return this.targeted;
 			}
 		},
+		async mounted() {
+			this.personalReminders = await this.get_full_reminders();
+		},
 		methods: {
 			...mapActions([
 				'set_targetReminder',
 			]),
-			addReminder(type, reminder = false, selectedVars=undefined) {
+			...mapActions("reminders", ["get_full_reminders"]),
+			async addReminder(type, reminder = false, selectedVars=undefined) {
 				if(type === 'premade') {
 					for(const target of this.reminder_targets) {
 						let key = reminder['.key'] || reminder.key;
@@ -167,7 +179,7 @@
 							reminder.selectedVars = selectedVars;
 						}
 
-						this.set_targetReminder({
+						await this.set_targetReminder({
 							action: 'add',
 							entity: target,
 							key,
@@ -177,7 +189,7 @@
 						reminder['.key'] = key;
 					}
 				}
-				else if(type === 'custom' && reminder) {
+				else if(type === 'custom') {
 					for(const target of this.reminder_targets) {
 						this.set_targetReminder({
 							action: 'add',
@@ -188,16 +200,6 @@
 					}
 					this.customReminder = {};
 				}
-			},
-			setValidation(validate) {
-				this.validation = validate;
-			},
-			removeReminder(key) {
-				this.set_targetReminder({
-					action: 'remove',
-					entity: this.reminder_targets[0],
-					key: key,
-				})
 			},
 			showVariableOptions(key) {
 				this.varOptions = (this.varOptions !== key) ? key : undefined;

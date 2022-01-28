@@ -991,24 +991,47 @@ const actions = {
 	 * @param {string} check set, unset, reset
 	 * @param {integer} index index of the check
 	 */
-	set_save({ commit }, {key, check, index}) { 
-		let db_name = state.entities[key].entityType + 's';
+	async set_save({ commit, rootGetters, dispatch }, {key, check, index}) { 
+		let type = state.entities[key].entityType + 's';
 		if(check == 'reset') {
-			//RESET SAVES
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+			if(!state.demo)  {
+				for(const property of ["stable", "saves"]) {
+					await dispatch("campaigns/update_campaign_entity", {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property,
+						value: null
+						}, { root: true });
+				}
+			}
 			commit("SET_ENTITY_PROPERTY", {key, prop: 'saves', value: {}});
-
-			//REMOVE STABLE
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
 			commit("SET_ENTITY_PROPERTY", {key, prop: 'stable', value: false});
 		}
 		else if(check === 'unset') {
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${index}`).remove();
+			if(!state.demo)  {
+				await dispatch("campaigns/set_death_save", {
+					campaignId: state.campaignId,
+					type,
+					id: key,
+					index,
+					value: null
+					}, { root: true });
+			}
 			commit("DELETE_SAVE", {key, index});
 		}
 		else {
 			const i = parseInt(index + 1);
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves/${i}`).set(check);
+			if(!state.demo)  {
+				await dispatch("campaigns/set_death_save", {
+					campaignId: state.campaignId,
+					type,
+					id: key,
+					index: i,
+					value: check
+					}, { root: true });
+			}
 			commit("SET_SAVE", {key, i, check});
 		}
 	},
@@ -1019,23 +1042,32 @@ const actions = {
 	 * @param {string} key Entity key
 	 * @param {string} action set, unset
 	 */
-	set_stable({ commit }, {key, action}) { 
-		let db_name = state.entities[key].entityType + 's';
+	async set_stable({ state, commit, rootGetters, dispatch }, {key, action}) { 
+		let type = state.entities[key].entityType + 's';
 		if(action === 'set') {
-			//RESET SAVES
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
+			if(!state.demo)  {
+				await dispatch("campaigns/stabilize_entity", {
+					uid: rootGetters.user.uid,
+					campaignId: state.campaignId,
+					type,
+					id: key
+					}, { root: true });
+			}
 			commit("SET_ENTITY_PROPERTY", {key, prop: 'saves', value: {}});
-
-			//REMOVE DEAD
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
 			commit("DELETE_ENTITY_PROPERTY", {key, prop: 'dead'});
-			
-			//SET STABLE
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).set(true);
 			commit("SET_ENTITY_PROPERTY", {key, prop: 'stable', value: true});
 		}
 		else if(action === 'unset') {
-			if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/stable`).remove();
+			if(!state.demo)  {
+				await dispatch("campaigns/update_campaign_entity", {
+					uid: rootGetters.user.uid,
+					campaignId: state.campaignId,
+					type,
+					id: key,
+					property: "stable",
+					value: null
+					}, { root: true });
+			}
 			commit("DELETE_ENTITY_PROPERTY", {key, prop: 'stable'});
 		}
 	},
@@ -1047,17 +1079,37 @@ const actions = {
 	 * @param {object} entity Holds transform properties (maxHp, ac)
 	 * @param {boolean} remove Must the transfomation be removed?
 	 */
-	transform_entity({ state, commit }, {key, entity, remove}) {
+	async transform_entity({ state, rootGetters, commit, dispatch }, {key, entity, remove}) {
 		if(remove) {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
-					encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "transformed",
+						value: null
+					}, { root: true });
 				} 
 				else if (state.entities[key].entityType === 'companion') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
+					await dispatch("campaigns/update_campaign_entity", { 
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: "companions",
+						id: key,
+						property: "transformed",
+						value: null
+					}, { root: true });
 				} 
 				else {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
+					await dispatch("campaigns/update_campaign_entity", { 
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: "players",
+						id: key,
+						property: "transformed",
+						value: null
+					}, { root: true });
 				}
 			}
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'transformed', value: false });
@@ -1068,13 +1120,33 @@ const actions = {
 		else {
 			if(!state.demo) {
 				if(state.entities[key].entityType === 'npc') {
-					encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(entity);
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "transformed",
+						value: entity
+					}, { root: true });
 				} 
 				else if (state.entities[key].entityType === 'companion') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(entity);
+					await dispatch("campaigns/update_campaign_entity", { 
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: "companions",
+						id: key,
+						property: "transformed",
+						value: entity
+					}, { root: true });
 				} 
 				else {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(entity);
+					await dispatch("campaigns/update_campaign_entity", { 
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: "players",
+						id: key,
+						property: "transformed",
+						value: entity
+					}, { root: true });
 				}
 			}
 			// Update store
@@ -1091,7 +1163,7 @@ const actions = {
 
 		dispatch("add_entity", key);
 	},
-	remove_entity({ commit, state }, key) {
+	async remove_entity({ commit, state, dispatch }, key) {
 		// First untarget if targeted
 		const targeted = state.targeted.filter(target => {
 			return target !== key;
@@ -1099,7 +1171,13 @@ const actions = {
 		commit('SET_TARGETED', targeted);
 		
 		// Then remove from encounter
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}`).remove();
+		if(!state.demo) {
+			await dispatch("encounters/delete_entity", { 
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key
+			}, { root: true });
+		}
 		commit('REMOVE_ENTITY', key);
 	},
 
@@ -1110,26 +1188,31 @@ const actions = {
 	 * @param {string} action set or unset
 	 * @param {boolean} revive must the target be revived?
 	 */
-	set_dead({ commit }, {key, action, revive=false}) { 
-		let db_name = state.entities[key].entityType + 's';
-		if(action === 'set') {
-			//SET DEAD
+	async set_dead({ state, rootGetters, commit, dispatch }, {key, revive=false}) { 
+		let type = state.entities[key].entityType + 's';
+		if(revive) {
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'curHp', value: 1 });
 			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).set(true);
-			}
-			commit('SET_ENTITY_PROPERTY', { key, prop: 'dead', value: true });
-		}
-		else if(action === 'unset') {
-			if(!state.demo) {
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/saves`).remove();
-				campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/dead`).remove();
-			}
-			if(revive) {
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'curHp', value: 1 });
-				if(!state.demo) campaigns_ref.child(`${state.uid}/${state.campaignId}/${db_name}/${key}/curHp`).set(1);
+				await dispatch("campaigns/revive_entity", {
+					uid: rootGetters.user.uid,
+					campaignId: state.campaignId,
+					type,
+					id: key,
+					curHp: 1
+				}, { root: true });
 			}
 			commit('DELETE_ENTITY_PROPERTY', { key, prop: 'dead' });
+		} else {
+			//SET DEAD
+			if(!state.demo) {
+				await dispatch("campaigns/kill_entity", { 
+					uid: rootGetters.user.uid,
+					campaignId: state.campaignId,
+					type,
+					id: key,
+				}, { root: true });
+			}
+			commit('SET_ENTITY_PROPERTY', { key, prop: 'dead', value: true });
 		}
 	},
 	async set_finished({ state, dispatch, commit }) { 
@@ -1152,20 +1235,36 @@ const actions = {
 	 * @param {string} key Reminder key
 	 * @param {object} reminder full reminder object, or integer with rounds
 	**/
-	set_targetReminder({ state, commit }, {action, entity, key, reminder, type}) {
+	async set_targetReminder({ state, commit, dispatch }, {action, entity, key, reminder, type}) {
 		// Add a new reminder
 		if(action === 'add') {
 			if(type === 'premade') {
-				if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder);
+				await dispatch(
+					"encounters/set_reminder", 
+					{
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entity,
+						key,
+						reminder,
+					}, 
+					{ root: true }
+				);
 				commit("SET_REMINDER", {entityKey: entity, key, reminder});
 			}
 			if(type === 'custom') {
 				if(!state.demo) {
-					encounters_ref.child(`${state.path}/entities/${entity}/reminders`).push(reminder)
-					.then(res => {
-						//Returns the key of the added entry
-						commit("SET_REMINDER", {entityKey: entity, key: res.getKey(), reminder});
-					});
+					key = await dispatch(
+						"encounters/add_reminder", 
+						{
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							key: entity,
+							reminder,
+						}, 
+						{ root: true }
+					);
+					commit("SET_REMINDER", {entityKey: entity, key, reminder});
 				} else {
 					let reminderKey = Date.now() + Math.random().toString(36).substring(4);
 					commit("SET_REMINDER", {entityKey: entity, key: reminderKey, reminder});
@@ -1175,19 +1274,56 @@ const actions = {
 
 		// Remove a reminder
 		else if(action === 'remove') {
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).remove();
+			if(!state.demo) {
+				await dispatch(
+					"encounters/set_reminder", 
+					{
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entity,
+						key,
+						reminder: null,
+					}, 
+					{ root: true }
+				);
+			}
 			commit("DELETE_REMINDER", {entityKey: entity, key});
 		}
 
 		// Update an existing reminder
 		else if(action === 'update') {
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}`).set(reminder);
+			if(!state.demo) {
+				await dispatch(
+					"encounters/set_reminder", 
+					{
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entity,
+						key,
+						reminder,
+					}, 
+					{ root: true }
+				);
+			}
 			commit("SET_REMINDER", {entityKey: entity, key, reminder});
 		}
 
 		// Update only the rounds property
 		else if(action === 'update-timer') {
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${entity}/reminders/${key}/rounds`).set(reminder);
+			if(!state.demo) {
+				await dispatch(
+					"encounters/update_reminder", 
+					{
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entity,
+						key,
+						property: "rounds",
+						value: reminder,
+					}, 
+					{ root: true }
+				);
+			}
 			commit("UPDATE_REMINDER_ROUNDS", { entityKey: entity, key, rounds: reminder });
 		}
 	},
@@ -1200,21 +1336,28 @@ const actions = {
 	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
 	 * @param {boolean} regain Wether a slot must be regained or spend
 	 */
-	set_limitedUses({ commit, state }, {key, index, category, regain=false, cost=1}) {
+	async set_limitedUses({ commit, state, dispatch }, {key, index, category, regain=false, cost=1}) {
 		const entity = state.entities[key];
 		cost = parseInt(cost);
 		let used = (entity.limited_uses[category] && entity.limited_uses[category][index]) 
 			? parseInt(entity.limited_uses[category][index]) : 0;
 		
-		if(regain) {
-			used = used - cost;
-		} else {
-			used = used + cost;
-		}
+		used = (regain) ? used - cost : used + cost;
 		if(used < 0) used = 0;
 
 		// Save the value in firebase and store
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).set(used);
+		await dispatch(
+			"encounters/update_limited_uses", 
+			{
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				key,
+				category,
+				index,
+				value: used,
+			}, 
+			{ root: true }
+		);
 		commit("SET_LIMITED_USES", {key, category, index, value: used});
 	},
 	/**
@@ -1224,8 +1367,19 @@ const actions = {
 	 * @param {integer} index index of the action or level of the spell slot used
 	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
 	 */
-	remove_limitedUses({ commit, state }, {key, category, index}) {
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/limited_uses/${category}/${index}`).remove();
+	async remove_limitedUses({ commit, state, dispatch }, {key, category, index}) {
+		await dispatch(
+			"encounters/update_limited_uses", 
+			{
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				key,
+				category,
+				index,
+				value: null,
+			}, 
+			{ root: true }
+		);
 		commit("REMOVE_LIMITED_USES", {key, category, index});
 	},
 	reset_store({ commit }) { commit("RESET_STORE"); },
@@ -1234,7 +1388,7 @@ const actions = {
 const mutations = {
 	//INITATIALIZE ENCOUNTER
 	TRACK(state, value) { Vue.set(state, 'track', value); },
-	SET_DEMO(state, value) { Vue.set(state, 'demo', value); },	
+	SET_DEMO(state, value) { Vue.set(state, 'demo', value); },
 	SET_UID(state, value) { Vue.set(state, 'uid', value); },
 	SET_CAMPAIGN_ID(state, value) { Vue.set(state, 'campaignId', value); },
 	SET_ENCOUNTER_ID(state, value) { Vue.set(state, 'encounterId', value); },

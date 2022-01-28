@@ -288,6 +288,111 @@ const actions = {
     }
   },
 
+   /**
+   * Set entity prop
+   * 
+   * @param {string} uid
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {object} entity
+   */
+    async set_entity_prop({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, property, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}`, { [property]: value });
+          commit("SET_ENTITY_PROP", { uid, campaignId, encounterId, entityId, property, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+  /**
+	 * Updates abilities with limited uses
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 * @param {number} value 
+	 */
+  async update_limited_uses({ rootGetters, dispatch, commit }, { campaignId, encounterId, key, category, index, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${key}/limited_uses/${category}`, { [index]: value });
+        commit("UPDATE_LIMITED_USES", { uid, campaignId, encounterId, key, category, index, value });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Adds a reminder to an entity
+	 * 
+	 * @param {string} key Entity key
+	 * @param {object} reminder full reminder object, or integer with rounds
+	 */
+  async add_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, key, reminder }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const reminder_key = await services.addReminder(uid, campaignId, encounterId, key, reminder);
+        commit("SET_REMINDER", { uid, campaignId, encounterId, entity: key, key: reminder_key, reminder });
+        return reminder_key;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Updates reminders on an entity
+	 * 
+	 * @param {string} entity Entity key
+	 * @param {string} key Reminder key
+	 * @param {string} property
+	 * @param {any} value
+	 */
+   async update_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, entity, key, property, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entity}/reminders/${key}`, { [property]: value });
+        commit("UPDATE_REMINDER", { uid, campaignId, encounterId, entity, key, property, value });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Sets reminders on an entity
+	 * 
+	 * @param {string} entity Entity key
+	 * @param {string} key Reminder key
+	 * @param {object} reminder full reminder object, or integer with rounds
+	 */
+   async set_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, entity, key, reminder }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entity}/reminders`, { [key]: reminder });
+        commit("SET_REMINDER", { uid, campaignId, encounterId, entity, key, reminder });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   /**
    * Deletes an entity from an encounter
    * 
@@ -334,7 +439,7 @@ const actions = {
       }
     }
   },
-  
+
   /**
    * Finish or unfinish an encounter
    * 
@@ -574,9 +679,7 @@ const mutations = {
       Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
     }
   },
-  // eslint-disable-next-line no-unused-vars
   UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
-    // UPDATE ENCOUNTER OBJECT
     if (campaignId in state.encounters && encounterId in state.encounters[campaignId]) {
       Vue.set(state.encounters[campaignId][encounterId], "entity_count", count);
     }
@@ -605,12 +708,36 @@ const mutations = {
   EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity}) { 
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
   },
+  SET_ENTITY_PROP(state, { uid, campaignId, encounterId, entityId, property, value}) { 
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property, value);
+  },
   SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value}) {
     if(state.cached_encounters[uid][campaignId][encounterId].xp) {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId].xp, type, value);
     } else {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId], "xp", { [type]: value });
     }
+  },
+  UPDATE_LIMITED_USES(state, { uid, campaignId, encounterId, key, category, index, value }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses) {
+      if(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category]) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category], index, value);
+      } else {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses, category, { [index]: value });
+      }
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId], "limited_uses", {[category]: { [index]: value }});
+    }
+  },
+  SET_REMINDER(state, { uid, campaignId, encounterId, entity, key, reminder }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders, key, reminder);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity], "reminders", { [key]: reminder });
+    }
+  },
+  UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key], property, value);
   },
   SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search}) {
     if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {

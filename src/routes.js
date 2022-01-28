@@ -390,7 +390,7 @@ export const routes = [{
 				component: { render (c) { return c('router-view') }},
 				meta: {
 					title: "Monsters D&D 5e",
-					description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
+					description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1"
 				},
 				children: [
 					{
@@ -399,7 +399,7 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Monsters'),
 						meta: {
 							title: "Monsters D&D 5e",
-							description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
+							description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1"
 						}
 					},
 					{
@@ -407,8 +407,7 @@ export const routes = [{
 						name: "Monster",
 						component: () => import('@/views/Compendium/view/Monster'),
 						meta: {
-							title: "Monster",
-							itle: "Monster D&D 5e",
+							title: "Monster D&D 5e",
 							description: "D&D 5th Edition monster."
 						}
 					}
@@ -427,7 +426,7 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Spells'),
 						meta: {
 							title: "Spells D&D 5e",
-							description: "All spells from the SRD 5.1. Dungeons & Dragons 5th edition spells."
+							description: "Dungeons & Dragons 5th edition spells. All spells from the SRD 5.1"
 						}
 					},
 					{
@@ -453,7 +452,7 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Conditions'),
 						meta: {
 							title: "Conditions D&D 5e",
-							description: "All conditions from the SRD 5.1. Dungeons & Dragons 5th edition conditions."
+							description: "Dungeons & Dragons 5th edition spells. All conditions from the SRD 5.1"
 						}
 					},
 					{
@@ -479,7 +478,7 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Items'),
 						meta: {
 							title: "Items D&D 5e",
-							description: "All items from the SRD 5.1. Dungeons & Dragons 5th edition items."
+							description: "Dungeons & Dragons 5th edition items. All items from the SRD 5.1"
 						}
 					},
 					{

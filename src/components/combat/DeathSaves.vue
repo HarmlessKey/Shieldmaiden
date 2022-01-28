@@ -31,10 +31,10 @@
 					<button class="btn save bg-green" @click="save('succes', Object.keys(target.saves).length)"><i class="fas fa-check"></i></button>
 					<button class="btn save bg-red" @click="save('fail', Object.keys(target.saves).length)"><i class="fas fa-times"></i></button>
 				</div>
-				<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive('set')"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
+				<a v-if="death_fails >= 3" class="btn btn-block bg-red my-3" @click="kill_revive(false)"><i class="fas fa-skull"></i> {{target.entityType.capitalize()}} died</a>
 				<a class="btn btn-block my-3" @click="set_stable({key: target.key, action: 'set'})"><i class="fas fa-heartbeat"></i> Stabilize</a>
 		</template>
-		<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive('unset')"><i class="fas fa-hand-holding-magic"></i> Revive</a>
+		<a v-else-if="target.dead" class="btn bg-green btn-block my-3" @click="kill_revive(true)"><i class="fas fa-hand-holding-magic"></i> Revive</a>
 	</div>
 </template>
 
@@ -54,11 +54,6 @@
 			Conditions,
 			Reminders,
 			TargetItem
-		},
-		data() {
-			return {
-				setShadow: 0,
-			}
 		},
 		computed: {
 			...mapGetters([
@@ -89,11 +84,10 @@
 					index
 				})
 			},
-			kill_revive(action) {
+			kill_revive(revive) {
 				this.set_dead({
 					key: this.target.key,
-					action: action,
-					revive: true
+					revive
 				})
 			},
 			stabilize() {

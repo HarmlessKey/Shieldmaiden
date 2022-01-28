@@ -309,13 +309,6 @@
 					index
 				})
 			},
-			kill_revive(action) {
-				this.set_dead({
-					key: this.target.key,
-					action: action,
-					revive: true
-				})
-			},
 			stabilize() {
 				this.set_stable({
 					key: this.target.key,

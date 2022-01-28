@@ -133,10 +133,10 @@ const actions = {
           console.warn(`Ghost player ${playerId} deleted`);
         } else {
           // If the player has no curHp, set it
-          if(!campaign_player.curHp) {
+          if(campaign_player.curHp === undefined) {
             await dispatch(
-              "update_campaign_player",
-              { uid, campaignId: id, playerId, property: "curHp", value: player.maxHp } 
+              "update_campaign_entity",
+              { uid, campaignId: id, type: "players", id: playerId, property: "curHp", value: player.maxHp } 
             );
           }
         }
@@ -227,7 +227,7 @@ const actions = {
 
   /**
    * Deletes a campaign
-   * - Deletes all encounter for this campaign
+   * - Deletes all encounters for this campaign
    * 
    * @param {object} id 
    */
@@ -350,8 +350,8 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        await services.addPlayer(uid, id, playerId, player);
-        commit("ADD_PLAYER", { uid, id, playerId, player });
+        await services.editPlayer(uid, id, playerId, player);
+        commit("SET_PLAYER", { uid, id, playerId, player });
         return;
       } catch(error) {
         throw error;
@@ -364,19 +364,20 @@ const actions = {
    * 
    * @param {string} uid
    * @param {string} campaignId 
+   * @param {string} type Entity type 
    * @param {string} playerId 
    * @param {string} property 
    * @param {string|number|boolean} value 
    */
-   async update_campaign_player({ commit, dispatch }, { uid, campaignId, playerId, property, value }) {
+   async update_campaign_entity({ commit, dispatch }, { uid, campaignId, type, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_campaign_services");
-      const path = `/players/${playerId}`;
+      const path = `/${type}/${id}`;
       try {
         await services.updateCampaign(
           uid, campaignId, path, { [property]: value }
         );
-        commit("UPDATE_CAMPAIGN_PLAYER", { uid, campaignId, playerId, property, value });
+        commit("UPDATE_CAMPAIGN_ENTITY", { uid, campaignId, type, id, property, value });
         return;
       } catch(error) {
         throw error;
@@ -467,16 +468,16 @@ const actions = {
     }
   },
 
-  async set_death_save({ dispatch, commit, rootGetters }, { campaignId, playerId, index, value } ) {
+  async set_death_save({ dispatch, commit, rootGetters }, { campaignId, type, id, index, value } ) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_campaign_services");
-      const path = `/players/${playerId}/saves`;
+      const path = `/${type}/${id}/saves`;
       try {
         await services.updateCampaign(
           uid, campaignId, path, { [index]: value }
         );
-        commit("SET_DEATH_SAVE", { uid, campaignId, playerId, index, value });
+        commit("SET_DEATH_SAVE", { uid, campaignId, type, id, index, value });
         return;
       } catch(error) {
         throw error;
@@ -484,28 +485,29 @@ const actions = {
     }
   },
 
-  async stabilize_player({ dispatch }, { uid, campaignId, playerId } ) {
+  async stabilize_entity({ dispatch }, { uid, campaignId, type, id } ) {
     const update = {
       dead: null,
       saves: null,
       stable: true
     }
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
-  async kill_player({ dispatch }, { uid, campaignId, playerId } ) {
+  async kill_entity({ dispatch }, { uid, campaignId, type, id } ) {
     const update = {
+      saves: null,
       stable: null,
       dead: true
     }
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
-  async revive_player({ dispatch }, { uid, campaignId, playerId, curHp } ) {
+  async revive_entity({ dispatch }, { uid, campaignId, type, id, curHp } ) {
     const update = {
       dead: null,
       saves: null,
@@ -513,7 +515,7 @@ const actions = {
       curHp
     };
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
@@ -625,24 +627,21 @@ const mutations = {
       Vue.delete(state.cached_campaigns[uid][id].players, playerId); 
     }
   },
-  UPDATE_CAMPAIGN_PLAYER(state, { uid, campaignId, playerId, property, value }) {
+  UPDATE_CAMPAIGN_ENTITY(state, { uid, campaignId, type, id, property, value }) {
     if(value === null) {
-      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId], property);
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id], property);
     } else {
-      Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], property, value);
+      Vue.set(state.cached_campaigns[uid][campaignId][type][id], property, value);
     }
   },
-  SET_DEATH_SAVE(state, { uid, campaignId, playerId, index, value }) {
+  SET_DEATH_SAVE(state, { uid, campaignId, type, id, index, value }) {
     if(value === null) {
-      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId].saves, index);
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id].saves, index);
     } else {
-      if(state.cached_campaigns[uid][campaignId].players[playerId].saves) {
-        console.log(index)
-        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId].saves, index, value);
+      if(state.cached_campaigns[uid][campaignId][type][id].saves) {
+        Vue.set(state.cached_campaigns[uid][campaignId][type][id].saves, index, value);
       } else {
-        // We are using indexes from 1-5 to store death saves.
-        // To have an empty space we ignore in the array we add null at the 0 index
-        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], "saves", [null, value]);
+        Vue.set(state.cached_campaigns[uid][campaignId][type][id], "saves", { [index]: value });
       }
     }
   },

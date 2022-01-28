@@ -67,17 +67,18 @@
 			}
 		},
 		methods: {
-			...mapActions("campaigns", ["update_campaign_player"]),
+			...mapActions("campaigns", ["update_campaign_entity"]),
 			edit() {
 				const transform = {
 					ac: parseInt(this.transAc),
 					maxHp: parseInt(this.transHp),
 					curHp: parseInt(this.transHp)
 				}
-				this.update_campaign_player({ 
+				this.update_campaign_entity({ 
 					uid: this.userId, 
 					campaignId: this.campaignId, 
-					playerId: this.entityKey,
+					type: "players",
+					id: this.entityKey,
 					property: "transformed",
 					value: transform
 				});

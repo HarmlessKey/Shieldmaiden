@@ -264,7 +264,6 @@ export default {
 		},
 		removeOption(key, i) {
 			
-			// let options = this.reminder.variables[key].splice(i, 1);
 			this.$delete(this.reminder.variables[key], i);
 			this.$forceUpdate();
 		},

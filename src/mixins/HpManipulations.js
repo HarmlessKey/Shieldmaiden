@@ -117,7 +117,7 @@ export const setHP = {
 			if(rest_amount > 0) {
 				var newhp = parseInt(curHp - rest_amount);
 
-				if(newhp <= 0) {
+				if(newhp <= 0 && target.entityType !== "npc") {
 					this.set_stable({
 						key: target.key,
 						action: 'unset',
@@ -229,7 +229,7 @@ export const setHP = {
 				})
 				this.set_dead({
 					key: target.key,
-					revive: true
+					action: "unset"
 				})
 			}
 

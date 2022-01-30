@@ -335,7 +335,7 @@
 			await this.get_player({ uid: this.userId, id: this.entityKey }).then(result => {
 				this.playerBase = result;
 				if(this.isXpAdvancement() && this.playerBase.experience === undefined) {
-					this.set_player_xp({ uid: this.userId, id: this.entityKey, value: 0 });
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: 0 });
 				}
 			});
 
@@ -366,7 +366,7 @@
 				'setSlide',
 				'edit_player',
 			]),
-			...mapActions("players", ["get_player", "edit_player", "set_player_xp"]),
+			...mapActions("players", ["get_player", "edit_player", "set_player_prop"]),
 			...mapActions("campaigns", [
 				"get_campaign", 
 				"stabilize_entity", 
@@ -397,7 +397,7 @@
 						if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
 						this.set_share({ id: this.broadcast.live, share });
 					}
-					this.set_player_xp({ uid: this.userId, id: this.entityKey, value: newXp });
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: newXp });
 					this.xp = undefined;
 				}
 			},

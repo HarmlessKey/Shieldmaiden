@@ -291,11 +291,11 @@ const actions = {
    /**
    * Set entity prop
    * 
-   * @param {string} uid
    * @param {string} campaignId
    * @param {string} encounterId
    * @param {string} entityId
-   * @param {object} entity
+   * @param {string} property
+   * @param {any} value
    */
     async set_entity_prop({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, property, value }) {
       const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
@@ -304,6 +304,75 @@ const actions = {
         try {
           await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}`, { [property]: value });
           commit("SET_ENTITY_PROP", { uid, campaignId, encounterId, entityId, property, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+    /**
+   * Set entity prop
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} type
+   * @param {number} value
+   */
+     async set_entity_meters({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, type, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/meters`, { [type]: value });
+          commit("SET_ENTITY_METERS", { uid, campaignId, encounterId, entityId, type, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+  /**
+   * Set transformed prop
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} property
+   * @param {any} value
+   */
+    async set_transformed_prop({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, property, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/transformed`, { [property]: value });
+          commit("SET_TRANSFORMED_PROP", { uid, campaignId, encounterId, entityId, property, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+    /**
+   * Set condition on an entity
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} condition
+   * @param {number|boolean} value
+   */
+     async set_entity_condition({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, condition, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/conditions`, { [condition]: value });
+          commit("SET_ENTITY_CONDITION", { uid, campaignId, encounterId, entityId, condition, value });
           return;
         } catch(error) {
           throw error;
@@ -709,7 +778,28 @@ const mutations = {
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
   },
   SET_ENTITY_PROP(state, { uid, campaignId, encounterId, entityId, property, value}) { 
-    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property, value);
+    if(value === null) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property, value);
+    }
+  },
+  SET_TRANSFORMED_PROP(state, { uid, campaignId, encounterId, entityId, property, value}) {
+    if(value === null) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transoformed, property);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed, property, value);
+    }
+  },
+  SET_ENTITY_METERS(state, { uid, campaignId, encounterId, entityId, type, value}) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters, type, value);
+  },
+  SET_ENTITY_CONDITION(state, { uid, campaignId, encounterId, entityId, condition, value}) { 
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions, condition, value);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "conditions", { [condition]: value });
+    }
   },
   SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value}) {
     if(state.cached_encounters[uid][campaignId][encounterId].xp) {

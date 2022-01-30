@@ -249,7 +249,6 @@
 				'set_targeted',
 				'setSlide',
 				'set_save',
-				'set_dead',
 				'set_stable',
 				'set_targetReminder',
 				'set_hidden'

@@ -1,4 +1,3 @@
-import { db } from "@/firebase";
 import { skills } from "@/mixins/skills";
 import { abilities } from "@/mixins/abilities";
 import { monsterMixin } from "@/mixins/monster";
@@ -120,8 +119,6 @@ const demoEncounter = {
 	"turn" : 0
 }
 
-const encounters_ref = db.ref("encounters");
-const campaigns_ref = db.ref("campaigns");
 
 const getDefaultState = () => {
 	return {
@@ -143,30 +140,30 @@ const getDefaultState = () => {
 const state = getDefaultState();
 
 const getters = {
-	entities: function( state ) { return state.entities },
-	demoEntities: function( state ) { return state.demoEntities },
-	track: function( state ) { return state.track },
-	active: function( state ) { return state.active },
-	idle: function( state ) { return state.idle },
-	down: function( state ) { return state.down },
-	targeted: function( state ) { return state.targeted },
-	encounter: function( state ) { return state.encounter },
-	uid: function( state ) { return state.uid },
-	campaignId: function( state ) { return state.campaignId },
-	encounterId: function( state ) { return state.encounterId },
-	path: function( state ) { return state.path },
-	encounter_initialized: function( state ) { return state.encounter_initialized },
-	log: function( state ) {
+	entities(state) { return state.entities },
+	demoEntities(state) { return state.demoEntities },
+	track(state) { return state.track },
+	active(state) { return state.active },
+	idle(state) { return state.idle },
+	down(state) { return state.down },
+	targeted(state) { return state.targeted },
+	encounter(state) { return state.encounter },
+	uid(state) { return state.uid },
+	campaignId(state) { return state.campaignId },
+	encounterId(state) { return state.encounterId },
+	path(state) { return state.path },
+	encounter_initialized(state) { return state.encounter_initialized },
+	log(state) {
 		//If there is a storage log, set it in the store
 		if(localStorage.getItem(state.encounterId)) {
 			state.log = JSON.parse(localStorage.getItem(state.encounterId));
 		}
 		return state.log;
 	},
-	turn: function( state ) {
+	turn(state) {
 		return (state.encounter) ? state.encounter.turn : undefined;
 	},
-	round: function( state ) {
+	round(state) {
 		return (state.encounter) ? state.encounter.round : undefined;
 	}
 }
@@ -216,17 +213,6 @@ const actions = {
 			commit('INITIALIZED');
 		}
 	},
-	// track_Encounter({ commit, state }, demo) {
-	// 	if(!demo) {
-	// 		const path = state.path
-	// 		const encounter = encounters_ref.child(path);
-	// 		encounter.on('value', snapshot => {
-	// 			commit('SET_ENCOUNTER', snapshot.val());
-	// 		});
-	// 	} else {
-	// 		commit('SET_ENCOUNTER', demoEncounter);
-	// 	}
-	// },
 
 	async add_entity({ state, commit, rootGetters, dispatch }, key) {
 		const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
@@ -521,12 +507,7 @@ const actions = {
 	 * @param {string} prop property to edit 
 	 * @param {string} value user's input value for the property
 	 */
-	edit_entity_prop({ state, commit, dispatch }, {key, entityType, prop, value}) {
-		// Save paths for firebase
-		const encounterEntity = `encounters/${state.uid}/${state.campaignId}/${state.encounterId}/entities/${key}`
-		const campaignPlayer = `campaigns/${state.uid}/${state.campaignId}/players/${key}`;
-		const campaignCompanion = `campaigns/${state.uid}/${state.campaignId}/companions/${key}`;
-
+	async edit_entity_prop({ state, rootGetters, commit, dispatch }, {key, entityType, prop, value}) {
 		// Entity values
 		const entity = state.entities[key];
 		let maxHpMod = (entity.maxHpMod) ? parseInt(entity.maxHpMod) : 0;
@@ -590,14 +571,29 @@ const actions = {
 			if(curHp > valueIncMod) {
 				curHp = valueIncMod;
 				
-				// For transformed entities, a different prop must be created
-				const curHpPropPlayer = (entity.transformed) ? "transformed/curHp" : "curHp"; // For player/companion
-				const curHpProp = (entity.transformed) ? "transformedCurHp" : "curHp";
 				if(!state.demo) {
-					if(entityType === "player") db.ref(`${campaignPlayer}/${curHpPropPlayer}`).set(curHp);
-					if(entityType === "companion") db.ref(`${campaignCompanion}/${curHpPropPlayer}`).set(curHp);
-					if(entityType === "npc") db.ref(`${encounterEntity}/${curHpProp}`).set(curHp);
+					if(entityType === "npc") {
+						const update_path = (entity.transformed) ? "set_transformed_prop" : "set_entity_prop";
+						await dispatch(`encounters/${update_path}`, { 
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: "curHp",
+							value: curHp
+						}, { root: true });
+					} else {
+						const update_path = (entity.transformed) ? "update_transformed_entity" : "update_campaign_entity";
+						await dispatch(`campaigns/${update_path}`, {
+							uid: rootGetters.user.uid,
+							campaignId: state.campaignId,
+							type: `${entityType}s`,
+							id: key,
+							property: "curHp",
+							value: curHp
+						}, { root: true });
+					}
 				}
+				const curHpProp = (entity.transformed) ? "transformedCurHp" : "curHp";
 				commit("SET_ENTITY_PROPERTY", {key, prop: curHpProp, value: curHp});
 			}
 		}
@@ -651,61 +647,123 @@ const actions = {
 			for(const hpType of ["maxHp", "curHp"]) {
 				const newValue = (hpType === "maxHp") ? maxHp : curHp;
 				
-				// For transformed entities, a different prop must be created
-				const hpPropPlayer = (entity.transformed) ? `transformed/${hpType}` : hpType; // For player/companion
-				const hpProp = (entity.transformed) ? `transformed${hpType.capitalize()}` : hpType;
-				
 				// Save new curHp in firebase
 				if(hpType === "curHp" && !state.demo) {
-					if(entityType === "player") db.ref(`${campaignPlayer}/${hpPropPlayer}`).set(newValue);
-					if(entityType === "companion") db.ref(`${campaignCompanion}/${hpPropPlayer}`).set(newValue);
-					if(entityType === "npc") db.ref(`${encounterEntity}/${hpProp}`).set(newValue);
+					if(entityType === "npc") {
+						const update_path = (entity.transformed) ? "set_transformed_prop" : "set_entity_prop";
+						await dispatch(`encounters/${update_path}`, { 
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: hpType,
+							value: curHp
+						}, { root: true });
+					} else {
+						const update_path = (entity.transformed) ? "update_transformed_entity" : "update_campaign_entity";
+						await dispatch(`campaigns/${update_path}`, {
+							uid: rootGetters.user.uid,
+							campaignId: state.campaignId,
+							type: `${entityType}s`,
+							id: key,
+							property: hpType,
+							value: curHp
+						}, { root: true });
+					}
 				}
+				const hpProp = (entity.transformed) ? `transformed${hpType.capitalize()}` : hpType;
 				commit("SET_ENTITY_PROPERTY", {key, prop: hpProp, value: newValue});
 			}
 		}
 
 		// UPDATE FIREBASE
-
-		// Update player
-		if(entityType === 'player') {
-			// Some player properties are stored in the campaign
-			if(["ac_bonus", "curHp", "maxHpMod", "tempHp"].includes(prop)) {
-				if(!state.demo) db.ref(`${campaignPlayer}/${prop}`).set(value);
-			}
-			// When a player is transformed
+		if(!state.demo) {
+			// Transformed
 			if(["transformedMaxHp", "transformedCurHp", "transformedAc", "transformedMaxHpMod"].includes(prop)) {
 				let saveProp;
 				if(prop === "transformedMaxHp") saveProp = "maxHp";
 				if(prop === "transformedCurHp") saveProp = "curHp";
 				if(prop === "transformedAc") saveProp = "ac";
 				if(prop === "transformedMaxHpMod") saveProp = "maxHpMod";
-
-				if(!state.demo) db.ref(`${campaignPlayer}/transformed/${saveProp}`).set(value);
+				
+				if(entityType === "npc") {
+					await dispatch(`encounters/set_transformed_prop`, { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: saveProp,
+						value
+					}, { root: true });
+				} else {
+					await dispatch(`campaigns/update_transformed_entity`, {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: `${entityType}s`,
+						id: key,
+						property: saveProp,
+						value
+					}, { root: true });
+				}
 			}
-			// Some player properties are stored under player
-			else if(["ac", "maxHp", "name", "tempHp"].includes(prop)) {
-				const saveProp = (prop === "name") ? "character_name" : prop;
-				if(!state.demo) db.ref(`players/${state.uid}/${key}/${saveProp}`).set(value);
+			// NPCs
+			// For NPCs all values are stored under the encounter
+			else if(entityType === "npc") {
+				await dispatch(`encounters/set_entity_prop`, { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: prop,
+					value
+				}, { root: true });
 			}
-			// Other player properties are stored in the encounter
+			// Players and Companions
+			// For players and companions values are stored in different places
+			// - Campaign
+			// - Player/NPC
+			// - Encounter
 			else {
-				if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
-			}
-		}
-
-		// Update companion
-		if(entityType === "companion") {
-			if(["maxHp", "name"].includes(prop)) {
-				if(!state.demo) db.ref(`npcs/${state.uid}/${key}/${prop}`).set(value);
-			} else {
-				if(!state.demo) db.ref(`${campaignCompanion}/${prop}`).set(value);
-			}
-		}
-
-		// Update NPC
-		if(entityType === "npc") {
-			if(!state.demo) db.ref(`${encounterEntity}/${prop}`).set(value);
+				// Campaign values
+				if(["ac_bonus", "curHp", "maxHpMod", "tempHp"].includes(prop)) {
+					await dispatch(`campaigns/update_campaign_entity`, {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type: `${entityType}s`,
+						id: key,
+						property: prop,
+						value
+					}, { root: true });	
+				} 
+				// Player/NPC values
+				else if(["ac", "maxHp", "name"].includes(prop)) {
+					if(entityType === "player") {
+						const saveProp = (prop === "name") ? "character_name" : prop;
+						await dispatch(`players/set_player_prop`, {
+							uid: rootGetters.user.uid,
+							id: key,
+							property: saveProp,
+							value
+						}, { root: true });
+					}
+					if(entityType === "companion") {
+						const saveProp = (prop === "maxHp") ? "hit_points" : prop;
+						await dispatch(`npcs/update_npc_prop`, {
+							uid: rootGetters.user.uid,
+							id: key,
+							property: saveProp,
+							value
+						}, { root: true });
+					}
+				} 
+				// Encounter values
+				else {
+					await dispatch(`encounters/set_entity_prop`, { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: prop,
+						value
+					}, { root: true });
+				}
+			} 
 		}
 		
 		// UPDATE STORE
@@ -724,17 +782,24 @@ const actions = {
 	 * @param {string} type damage, healing, damageTaken, healingTaken
 	 * @param {integer} amount amount of damage or healing done
 	 */
-	set_meters({ state, commit }, {key, type, amount}) { 
+	async set_meters({ state, commit, dispatch }, {key, type, amount}) { 
 		// Don't put environment damage in meters
 		if(key !== 'environment') {
-			let currentAmount = state.entities[key][type]; //Current damage/healing done/taken
-			if(currentAmount === undefined) { currentAmount = 0; } //if there is no damage/healing done/taken yet
+			let currentAmount = (state.entities[key][type]) ? state.entities[key][type] : 0; //Current damage/healing done/taken
 			let newAmount = parseInt(currentAmount) + parseInt(amount); //calculate the new amount
 
 			if(newAmount < 0) { newAmount = 0 } 
 
 			//Save the new values in Firebase and the store
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/meters/${type}`).set(newAmount);
+			if(!state.demo) {
+				await dispatch("encounters/set_entity_meters", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					type,
+					value: newAmount
+				}, { root: true });
+			}
 			commit('SET_ENTITY_PROPERTY', {key, prop: type, value: newAmount});
 		}
 	},
@@ -745,8 +810,16 @@ const actions = {
 	 * @param {string} key Entity key
 	 * @param {boolean} active active or not
 	 */
-	set_active({ state, commit }, {key, active}) {
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/active`).set(active);
+	async set_active({ state, commit, dispatch }, {key, active}) {
+		if(!state.demo) {
+			await dispatch("encounters/set_entity_prop", { 
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				property: "active",
+				value: active
+			}, { root: true });
+		}
 		commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: active});
 	},
 
@@ -756,8 +829,16 @@ const actions = {
 	 * @param {string} key Entity key
 	 * @param {boolean} hidden hidden or not
 	 */
-	set_hidden({ commit }, {key, hidden}) {
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/hidden`).set(hidden);
+	async set_hidden({ state, commit, dispatch }, {key, hidden}) {
+		if(!state.demo) {
+			await dispatch("encounters/set_entity_prop", { 
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				property: "hidden",
+				value: hidden
+			}, { root: true });
+		}
 		commit('SET_ENTITY_PROPERTY', {key, prop: 'hidden', value: hidden});
 	},
 
@@ -810,51 +891,88 @@ const actions = {
 	 * @param {string} key Entity key
 	 * @param {number} initiative
 	 */
-	set_initiative({ commit, state }, {key, initiative}) { 
-		if(!initiative) initiative = 0;
-		initiative = Number(initiative)
+	async set_initiative({ commit, state, dispatch }, {key, initiative}) { 
+		initiative = (!initiative) ? 0 : Number(initiative);
 
-		if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/initiative`).set(initiative);
+		if(!state.demo) {
+			await dispatch("encounters/set_entity_prop", { 
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				property: "initiative",
+				value: initiative
+			}, { root: true });
+		}
 		commit('SET_ENTITY_PROPERTY', {key, prop: 'initiative', value: initiative});
 	},
 
 	/**
 	 * Executes actions that need to happen on a round change
 	 */
-	update_round({ commit, state}) {
+	async update_round({ commit, state, dispatch }) {
 		// Loop over all entities
 		for (let key in state.entities) {
 			let e = state.entities[key];
 
-			// Set non players with 0 hp as down
-			if (e.curHp <= 0 && e.entityType != 'player') {
-				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/down`).set(true);
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'down', value: true });
+			// Set NPCs with 0 hp as down
+			if (e.curHp <= 0 && e.entityType === "npc") {
+				await dispatch("encounters/set_entity_prop", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: "down",
+					value: true
+				}, { root: true });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: true });
 			}
 			// If an entity has more than 0 hp, but is marked as down, remove the down mark
 			if (e.curHp > 0 && e.down) {
-				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/down`).remove();
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'down', value: false});
+				await dispatch("encounters/set_entity_prop", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: "down",
+					value: null
+				}, { root: true });
+				commit("SET_ENTITY_PROPERTY", { key, prop: "down", value: false});
 			}
 			// Check if the entity is not yet active, but needs to be added in the new round
 			if(e.addNextRound) {
-				if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
-				commit('SET_ENTITY_PROPERTY', {key, prop: 'active', value: true});
-				commit('DELETE_ENTITY_PROPERTY', {key, prop: 'addNextRound'});
+				await dispatch("encounters/set_entity_prop", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: "active",
+					value: true
+				}, { root: true });
+				commit("SET_ENTITY_PROPERTY", {key, prop: "active", value: true});
+				commit("DELETE_ENTITY_PROPERTY", {key, prop: "addNextRound"});
 			}
 		}
 	},
-	add_next_round({ state, commit },  {key, action, value}) {
+	async add_next_round({ state, commit, dispatch },  {key, action, value}) {
 
-		if(action === 'tag') {
-			commit('SET_ENTITY_PROPERTY', { key, prop: 'addNextRound', value});
+		if(action === "tag") {
+			commit("SET_ENTITY_PROPERTY", { key, prop: "addNextRound", value});
 		}
-		else if(action === 'set') {
+		else if(action === "set") {
 			if(!state.demo) {
-				encounters_ref.child(`${state.path}/entities/${key}/active`).set(true);
-				encounters_ref.child(`${state.path}/entities/${key}/addNextRound`).remove();
+				await dispatch("encounters/set_entity_prop", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: "active",
+					value: true
+				}, { root: true });
+				await dispatch("encounters/set_entity_prop", { 
+					campaignId: state.campaignId,
+					encounterId: state.encounterId,
+					entityId: key,
+					property: "addNextRound",
+					value: null
+				}, { root: true });
 			}
-			commit('SET_ENTITY_PROPERTY', { key, prop: 'active', value: true});
+			commit("SET_ENTITY_PROPERTY", { key, prop: "active", value: true});
 		}
 	},
 
@@ -866,80 +984,90 @@ const actions = {
 	 * @param {string} pool from what pool will the hit points be taken
 	 * @param {boolean} newHp The new hp
 	 */
-	set_hp({ state, commit }, {key, pool, newHp}) {
+	async set_hp({ state, rootGetters, commit, dispatch }, {key, pool, newHp}) {
+		const type = `${state.entities[key].entityType}s`;
 		// Check where the damage/healing should be done first
 		// First put damage in the tempHP
 		// Second in transformed HP
 		// And last in the actual current HP
-		if(pool === 'temp') {
+		if(pool === "temp") {
 			//if the damage was higher than the amount of tempHp, remove the tempHp
 			//Save the rest amount to put into transformed or curHp later
-			if(newHp <= 0) {
-				//Player tempHp is stored under campaign
+			newHp = (newHp <= 0) ? null : newHp;
+			if(!state.demo) {
 				//NPC tempHp is stored under encounter
-				if(!state.demo) {
-					if(state.entities[key].entityType === 'player') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).remove();
-					}
-					if(state.entities[key].entityType === 'companion') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).remove();
-					}
-					else {
-						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).remove();
-					}
+				if(type === "npcs") {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "tempHp",
+						value: newHp
+					}, { root: true });
+				} else {
+					//Player & companion tempHp is stored under campaign
+					await dispatch("campaigns/update_campaign_entity", {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property: "tempHp",
+						value: newHp
+					}, { root: true });
 				}
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'tempHp', value: undefined });
 			}
-			//if the damage was lower than the amount of tempHp, set a new tempHp
-			else {
-				//Player tempHp is stored under campaign
-				//NPC tempHp is stored under encounter
-				if(!state.demo) {
-					if(state.entities[key].entityType === 'player') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/tempHp`).set(newHp);
-					}
-					if(state.entities[key].entityType === 'companions') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/tempHp`).set(newHp);
-					}
-					else {
-						encounters_ref.child(`${state.path}/entities/${key}/tempHp`).set(newHp);
-					}
-				}
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'tempHp', value: newHp });
-			}
+			commit("SET_ENTITY_PROPERTY", { key, prop: "tempHp", value: newHp });
 		}
 		//If the target is transformed do damage in that health pool first
-		else if(pool === 'transformed') {
+		else if(pool === "transformed") {
+			// Update the store
 			if(newHp <= 0) {
 				if(!state.demo) {
-					if(state.entities[key].entityType === 'player') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).remove();
-					}
-					if(state.entities[key].entityType === 'companion') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).remove();
-					}
-					else {
-						encounters_ref.child(`${state.path}/entities/${key}/transformed`).remove();
+					if(type === "npcs") {
+						await dispatch("encounters/set_entity_prop", { 
+							campaignId: state.campaignId,
+							encounterId: state.encounterId,
+							entityId: key,
+							property: "transformed",
+							value: null
+						}, { root: true });
+					} else {
+						//Player & companion tempHp is stored under campaign
+						await dispatch("campaigns/update_campaign_entity", {
+							uid: rootGetters.user.uid,
+							campaignId: state.campaignId,
+							type,
+							id: key,
+							property: "transformed",
+							value: null
+						}, { root: true });
 					}
 				}
 				// Remove transformation in the store
-				commit('SET_ENTITY_PROPERTY', { key, prop: 'transformed', value: false });
-				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedMaxHp' });
-				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedMaxHpMod' });
-				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedCurHp' });
-				commit('DELETE_ENTITY_PROPERTY', { key, prop: 'transformedAc' });
-			}
-			else {
-				if(!state.demo) {
-					if(state.entities[key].entityType === 'player') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/transformed`).set(newHp);
-					}
-					if(state.entities[key].entityType === 'companion') {
-						campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/transformed`).set(newHp);
-					}
-					else {
-						encounters_ref.child(`${state.path}/entities/${key}/transformed`).set(newHp);
-					}
+				commit("SET_ENTITY_PROPERTY", { key, prop: "transformed", value: false });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedMaxHp" });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedMaxHpMod" });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedCurHp" });
+				commit("DELETE_ENTITY_PROPERTY", { key, prop: "transformedAc" });
+			} else {
+				if(type === "npcs") {
+					await dispatch("encounters/set_transformed_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "curHp",
+						value: null
+					}, { root: true });
+				} else {
+					//Player & companion transformed is stored under campaign
+					await dispatch("campaigns/update_transformed_entity", {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property: "curHp",
+						value: newHp
+					}, { root: true });
 				}
 				commit('SET_ENTITY_PROPERTY', { key, prop: 'transformedCurHp', value: newHp });
 			}
@@ -947,17 +1075,26 @@ const actions = {
 		//when target has no tempHp or is not transformed, set curHP
 		//Also put rest damage here
 		else {
-			//Players curHp is stored under the campaign
 			if(!state.demo) {
-				if(state.entities[key].entityType == 'player') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/players/${key}/curHp`).set(newHp);
-				}
-				if(state.entities[key].entityType == 'companion') {
-					campaigns_ref.child(`${state.uid}/${state.campaignId}/companions/${key}/curHp`).set(newHp);
-				}
-				else {
-					//NPC curHp is stored under the encounter
-					encounters_ref.child(`${state.path}/entities/${key}/curHp`).set(newHp);
+				//NPC curHp is stored under encounter
+				if(type === "npcs") {
+					await dispatch("encounters/set_entity_prop", { 
+						campaignId: state.campaignId,
+						encounterId: state.encounterId,
+						entityId: key,
+						property: "curHp",
+						value: newHp
+					}, { root: true });
+				} else {
+					//Player & companion curHp is stored under campaign
+					await dispatch("campaigns/update_campaign_entity", {
+						uid: rootGetters.user.uid,
+						campaignId: state.campaignId,
+						type,
+						id: key,
+						property: "curHp",
+						value: newHp
+					}, { root: true });
 				}
 			}
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'curHp', value: newHp });
@@ -972,14 +1109,21 @@ const actions = {
 	 * @param {string} condition Name of the condition
 	 * @param {integer} level level of exhaustion condition
 	 */
-	set_condition({ commit }, {action, key, condition, level}) { 
+	async set_condition({ state, commit, dispatch }, {action, key, condition, level}) { 
+		const value = (action === "remove") ? null : (condition === 'exhaustion') ? level : true;
+		if(!state.demo) {
+			await dispatch("encounters/set_entity_condition", { 
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				entityId: key,
+				condition,
+				value
+			}, { root: true });
+		}
 		if(action === 'add') {
-			const value = (condition === 'exhaustion') ? level : true;
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).set(value);
 			commit("SET_CONDITION", {key, condition, value});
 		}
-		else if(action === 'remove') {
-			if(!state.demo) encounters_ref.child(`${state.path}/entities/${key}/conditions/${condition}`).remove();
+		else {
 			commit("DELETE_CONDITION", {key, condition});
 		}
 	},
@@ -1188,9 +1332,9 @@ const actions = {
 	 * @param {string} action set or unset
 	 * @param {boolean} revive must the target be revived?
 	 */
-	async set_dead({ state, rootGetters, commit, dispatch }, {key, revive=false}) { 
+	async set_dead({ state, rootGetters, commit, dispatch }, {key, action="set"}) { 
 		let type = state.entities[key].entityType + 's';
-		if(revive) {
+		if(action === "revive") {
 			commit('SET_ENTITY_PROPERTY', { key, prop: 'curHp', value: 1 });
 			if(!state.demo) {
 				await dispatch("campaigns/revive_entity", {
@@ -1202,6 +1346,15 @@ const actions = {
 				}, { root: true });
 			}
 			commit('DELETE_ENTITY_PROPERTY', { key, prop: 'dead' });
+		} else if(action === "unset") {
+			await dispatch("campaigns/update_campaign_entity", {
+				uid: rootGetters.user.uid,
+				campaignId: state.campaignId,
+				type,
+				id: key,
+				property: "dead",
+				value: null
+				}, { root: true });
 		} else {
 			//SET DEAD
 			if(!state.demo) {
@@ -1217,7 +1370,6 @@ const actions = {
 	},
 	async set_finished({ state, dispatch, commit }) { 
 		if(!state.demo) {
-			encounters_ref.child(`${state.path}/finished`).set(true);
 			await dispatch("encounters/finish_encounter", { 
 				campaignId: state.campaignId,
 				id: state.encounterId,

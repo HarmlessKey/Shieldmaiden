@@ -105,9 +105,11 @@ export class npcServices {
    * @param {string} path Path to parent the property that must be updated (Only needed of the value is nested)
    * @param {object} value Object with { proptery: value }
    */
-  async updateNpc(uid, id, path, value) {
-    path = `${uid}/${id}${path}`
-    NPCS_REF.child(path).update(value).then(() => {
+  async updateNpc(uid, id, path, value, update_search=false) {
+    NPCS_REF.child(`${uid}/${id}${path}`).update(value).then(() => {
+      if(update_search) {
+        SEARCH_NPCS_REF.child(`${uid}/results/${id}${path}`).update(value);
+      }
       return;
     }).catch((error) => {
       throw error;

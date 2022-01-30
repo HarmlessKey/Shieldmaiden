@@ -250,7 +250,7 @@ const actions = {
         dispatch("checkEncumbrance", "", { root: true });
 
         for (const playerId in campaign.players) {
-          dispatch("players/set_campaign_id", { uid, playerId, value: null }, { root: true });
+          dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: null }, { root: true });
         }
         return;
       } catch(error) {
@@ -277,11 +277,11 @@ const actions = {
         // If the campaign has experience advancement
         // make sure the player has experience points set
         if(campaign.advancement === "experience" && player.experience === undefined) {
-          await dispatch("players/set_player_xp", {uid, id: playerId, value: 0 }, { root: true });
+          await dispatch("players/set_player_prop", {uid, id: playerId, property: "experience", value: 0 }, { root: true });
         }
 
         // Set the campaign_id on the player
-        await dispatch("players/set_campaign_id", { uid, playerId, value: campaign.key }, { root: true })
+        await dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: campaign.key }, { root: true })
 
         // Add companions
         if(player.companions) {
@@ -360,12 +360,12 @@ const actions = {
   },
 
   /**
-   * Updates a single property for a player
+   * Updates a single property for a player or compantion
    * 
    * @param {string} uid
    * @param {string} campaignId 
-   * @param {string} type Entity type 
-   * @param {string} playerId 
+   * @param {string} type Entity type players/companions
+   * @param {string} id entityId
    * @param {string} property 
    * @param {string|number|boolean} value 
    */
@@ -378,6 +378,32 @@ const actions = {
           uid, campaignId, path, { [property]: value }
         );
         commit("UPDATE_CAMPAIGN_ENTITY", { uid, campaignId, type, id, property, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Updates a transformed player or companion
+   * 
+   * @param {string} uid
+   * @param {string} campaignId 
+   * @param {string} type Entity type players/companions
+   * @param {string} id entityId
+   * @param {string} property 
+   * @param {number} value 
+   */
+   async update_transformed_entity({ commit, dispatch }, { uid, campaignId, type, id, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      const path = `/${type}/${id}/transformed`;
+      try {
+        await services.updateCampaign(
+          uid, campaignId, path, { [property]: value }
+        );
+        commit("UPDATE_TRANSFORMED_ENTITY", { uid, campaignId, type, id, property, value });
         return;
       } catch(error) {
         throw error;
@@ -448,7 +474,7 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {     
         // Delete campaign_id
-        await dispatch("players/set_campaign_id", { uid, playerId: player.key, value: null }, { root: true })
+        await dispatch("players/set_player_prop", { uid, id: player.key, property: "campaign_id", value: null }, { root: true })
 
         // Delete companions
         if(player.companions) {
@@ -632,6 +658,13 @@ const mutations = {
       Vue.delete(state.cached_campaigns[uid][campaignId][type][id], property);
     } else {
       Vue.set(state.cached_campaigns[uid][campaignId][type][id], property, value);
+    }
+  },
+  UPDATE_TRANSFORMED_ENTITY(state, { uid, campaignId, type, id, property, value }) {
+    if(value === null) {
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id].transformed, property);
+    } else {
+      Vue.set(state.cached_campaigns[uid][campaignId][type][id].transformed, property, value);
     }
   },
   SET_DEATH_SAVE(state, { uid, campaignId, type, id, index, value }) {

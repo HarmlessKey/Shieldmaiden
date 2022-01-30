@@ -21,7 +21,12 @@
 						entity
 				}})" 
 			>
-				<q-avatar v-if="reminder.rounds"><b>{{ reminder.rounds }}</b></q-avatar>
+				<q-avatar v-if="reminder.rounds">
+					<b>{{ reminder.rounds }}</b>
+					<q-tooltip anchor="top middle" self="center middle">
+						Ends in {{ reminder.rounds }} rounds
+					</q-tooltip>
+				</q-avatar>
 				<q-item-label>{{ title(reminder) }}</q-item-label>
 			</q-chip>
 		</template>

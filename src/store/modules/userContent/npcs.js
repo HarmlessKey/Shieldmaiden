@@ -174,9 +174,15 @@ const actions = {
    async update_npc_prop({ commit, dispatch }, { uid, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_npc_services");
+      const update_search = [
+        "name",
+        "challenge_rating",
+        "avatar",
+        "type"
+      ].includes(property);
       try {
-        await services.updateNpc(uid, id, "", { [property]: value});
-        commit("SET_CACHED_NPC_PROP", { uid, id, property, value });
+        await services.updateNpc(uid, id, "", { [property]: value}, update_search);
+        commit("SET_CACHED_NPC_PROP", { uid, id, property, value, update_search });
         return;
       } catch(error) {
         throw error;
@@ -264,9 +270,12 @@ const mutations = {
       Vue.set(state.cached_npcs, uid, { [id]: npc });
     }
   },
-  SET_CACHED_NPC_PROP(state, { uid, id, property, value}) {
+  SET_NPC_PROP(state, { uid, id, property, value, update_search }) {
     if(state.cached_npcs[uid] && state.cached_npcs[uid][id]) {
       Vue.set(state.cached_npcs[uid][id], property, value);
+    }
+    if(update_search && state.npcs && state.npcs[id]) {
+      Vue.set(state.npcs[id], property, value);
     }
   },
   SET_NPC(state, { id, search_npc }) {

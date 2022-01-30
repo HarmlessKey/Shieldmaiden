@@ -85,9 +85,10 @@
 				})
 			},
 			kill_revive(revive) {
+				const action = (revive) ? "revive" : "set";
 				this.set_dead({
 					key: this.target.key,
-					revive
+					action
 				})
 			},
 			stabilize() {

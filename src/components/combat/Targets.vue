@@ -251,12 +251,12 @@
 	}
 
 	h2 {
-		padding-left: 10px;
+		padding-left: 15px;
 		margin-bottom: 5px;
-		background-color: $neutral-8-transparent;
 		font-size: 18px;
 
 		&.componentHeader {
+			background-color: $neutral-8-transparent;
 			padding: 10px 15px;
 			margin-bottom: 0 !important;
 			line-height: 31px;

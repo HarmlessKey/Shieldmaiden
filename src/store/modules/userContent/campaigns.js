@@ -124,10 +124,19 @@ const actions = {
       );
     }
 
+    // Create a list with all companion ids
+    let player_companions = [];
+
     // Remove ghost players
     if(campaign.players) {
       for(const [playerId, campaign_player] of Object.entries(campaign.players)) {
         const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
+
+        // Save companions in list
+        if(player.companions) {
+          player_companions = player_companions.concat(Object.keys(player.companions));
+        }
+
         if(!player) {
           await dispatch("delete_player", { id, player: { "key": playerId }});
           console.warn(`Ghost player ${playerId} deleted`);
@@ -142,6 +151,31 @@ const actions = {
         }
       }
     }
+
+    // Remove ghost companions
+    if(campaign.companions) {
+      for(const [companionId, campaign_companion] of Object.entries(campaign.companions)) {
+        const companion = await dispatch("npcs/get_npc", { uid, id: companionId }, { root: true });
+        
+        // Delete companion if:
+        // - the NPC doesn't exit
+        // - there are no players with companions in this campaign
+        // - there is no player with this NPC as companion in the campaign
+        if(!companion || !player_companions.length || !player_companions.includes(companionId)) {
+          await dispatch("delete_companion", { id, companionId });
+          console.warn(`Ghost companion ${companionId} deleted`);
+        } else {
+          // If the companion has no curHp, set it
+          if(campaign_companion.curHp === undefined) {
+            await dispatch(
+              "update_campaign_entity",
+              { uid, campaignId: id, type: "companions", id: companionId, property: "curHp", value: companion.hit_points } 
+            );
+          }
+        }
+      }
+    }
+
     return campaign;
   },
 

@@ -182,7 +182,7 @@ const actions = {
       ].includes(property);
       try {
         await services.updateNpc(uid, id, "", { [property]: value}, update_search);
-        commit("SET_CACHED_NPC_PROP", { uid, id, property, value, update_search });
+        commit("SET_NPC_PROP", { uid, id, property, value, update_search });
         return;
       } catch(error) {
         throw error;

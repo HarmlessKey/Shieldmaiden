@@ -329,31 +329,29 @@ const actions = {
 					data_npc = await dispatch("npcs/get_npc", { uid, id: key });
 					const campaignCompanion = campaign.companions[key];
 					
-					if(campaignCompanion) {
-						// Get companion status from campaign
-						entity.curHp = campaignCompanion.curHp;
-						entity.tempHp = campaignCompanion.tempHp;
-						entity.ac_bonus = campaignCompanion.ac_bonus;
-						entity.maxHpMod = campaignCompanion.maxHpMod;
-						entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.hit_points + entity.maxHpMod) : parseInt(data_npc.hit_points);
-						entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
-						entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
-						entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
+					// Get companion status from campaign
+					entity.curHp = campaignCompanion.curHp;
+					entity.tempHp = campaignCompanion.tempHp;
+					entity.ac_bonus = campaignCompanion.ac_bonus;
+					entity.maxHpMod = campaignCompanion.maxHpMod;
+					
+					entity.maxHp = (entity.maxHpMod) ? parseInt(data_npc.hit_points + entity.maxHpMod) : parseInt(data_npc.hit_points);
+					entity.saves = (campaignCompanion.saves) ? campaignCompanion.saves : {};
+					entity.stable = (campaignCompanion.stable) ? campaignCompanion.stable : false;
+					entity.dead = (campaignCompanion.dead) ? campaignCompanion.dead : false;
 
-						entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
+					entity.ac = (data_npc.old) ? data_npc.ac : data_npc.armor_class;
+					entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
 
-						entity.img = (data_npc.avatar) ? data_npc.avatar : 'companion';
-
-						//Get player transformed from campaign
-						if(campaignCompanion.transformed) {
-							entity.transformed = true;
-							entity.transformedCurHp = campaignCompanion.transformed.curHp;
-							entity.transformedAc = campaignCompanion.transformed.ac;
-							entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
-							entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
-						} else {
-							entity.transformed = false;
-						}
+					//Get player transformed from campaign
+					if(campaignCompanion.transformed) {
+						entity.transformed = true;
+						entity.transformedCurHp = campaignCompanion.transformed.curHp;
+						entity.transformedAc = campaignCompanion.transformed.ac;
+						entity.transformedMaxHpMod = campaignCompanion.transformed.maxHpMod || 0;
+						entity.transformedMaxHp = campaignCompanion.transformed.maxHp + entity.transformedMaxHpMod;
+					} else {
+						entity.transformed = false;
 					}
 				}
 

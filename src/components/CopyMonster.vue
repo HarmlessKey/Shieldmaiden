@@ -75,11 +75,10 @@
 				searchResults: [],
 				noResult: "",
 				copy_resource_setter: undefined,
-				npcs: []
 			}
 		},
 		computed: {
-			...mapGetters("npcs", ["npc_count"]),
+			...mapGetters("npcs", ["npcs", "npc_count"]),
 			copy_resource: {
 				get() {
 					const resource = (this.npc_count || this.customOnly) ? "custom" : "srd";
@@ -91,7 +90,7 @@
 			},
 		},
 		async mounted() {
-			this.npcs = await this.get_npcs();
+			await this.get_npcs();
 		},
 		methods: {
 			...mapActions("api_monsters", ["get_monsters", "get_monster"]),

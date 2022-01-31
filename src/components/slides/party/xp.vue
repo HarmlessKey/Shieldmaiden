@@ -10,13 +10,13 @@
 		/>
 
 		<h3 class="mt-3">Award experience to:</h3>
-		<div v-for="(player, key) in campaign.players" :key="key">
+		<div v-for="(player, key) in players" :key="key">
 			<q-checkbox 
 				:dark="$store.getters.theme === 'dark'"
 				v-model="awardTo" 
 				:val="key" 
 			>
-				{{ players[key].character_name }}
+				{{ player.character_name }}
 				<span v-if="amount && awardTo.includes(key)" class="ml-2 blue">
 					({{ ((awardPlayer() &lt; 0) ? "" : "+") + awardPlayer() }})
 				</span>
@@ -25,8 +25,8 @@
 
 		<q-btn-toggle
 			v-model="awardType"
-			spread
-			no-caps
+			spread no-caps
+			class="mt-4"
 			:dark="$store.getters.theme === 'dark'"
 			:options="options"
 			toggle-color="green"
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
 	import { mapGetters, mapActions } from 'vuex'
 
 	export default {
@@ -59,31 +58,22 @@
 				encounterId: this.$route.params.encid,
 				amount: this.data.amount,
 				awardXp: this.data.entities,
+				campaign: {},
+				allPlayers: [],
+				players: {},
 				allSelected: true,
 				indeterminate: false,
 				options: [
-					{ label: 'Divide over', value: 'divide' },
-					{ label: 'Award to all', value: 'toAll' },
+					{ label: "Divide over", value: "divide" },
+					{ label: "Award to all", value: "toAll" },
 				],
-				awardType: 'divide'
+				awardType: "divide"
 			}
 		},
 		computed: {
-			...mapGetters([
-				'campaign',
-				'players',
-				'broadcast'
-			]),
+			...mapGetters(["broadcast"]),
 			share() {
 				return (this.broadcast.shares && this.broadcast.shares.includes("xp")) || false;
-			},
-			allPlayers() {
-				let returnArray = [];
-	
-				for(let key in this.campaign.players) {
-					returnArray.push(key)
-				}
-				return returnArray;
 			},
 			awardTo: {
 				get() {
@@ -94,6 +84,19 @@
 					return newValue;
 				}
 			}
+		},
+		async mounted() {
+			await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			}).then(async campaign => {
+				this.campaign = campaign;
+
+				for(const id in campaign.players) {
+					this.allPlayers.push(id);
+					this.$set(this.players, id, await this.get_player({ uid: this. user.uid, id }));
+				}
+			});
 		},
 		watch: {
 			awardTo(newVal) {
@@ -111,12 +114,10 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'setSlide',
-			]),
-			toggleAll(checked) {
-				this.awardTo = checked ? this.allPlayers : [];
-			},
+			...mapActions(["setSlide",]),
+			...mapActions("campaigns", ["get_campaign", "set_share"]),
+			...mapActions("players", ["get_player", "set_player_prop"]),
+			...mapActions("encounters", ["set_xp", "update_encounter_prop"]),
 			awardPlayer() {
 				let amount = this.amount;
 
@@ -135,7 +136,7 @@
 				// Share
 				if(this.share && amount !== 0) {
 					const key = Date.now() + Math.random().toString(36).substring(4);
-					let share = {
+					const share = {
 						key,
 						type: "xp",
 						notification: {
@@ -144,13 +145,11 @@
 						}
 					};
 					if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
-
-					db.ref(`campaigns/${this.user.uid}/${this.broadcast.live}/shares`).set(share);
+					this.set_share({ id: this.broadcast.live, share });
 				}
 
 				// AWARD XP
-				for(let index in this.awardTo) {
-					let key = this.awardTo[index];
+				for(const key of this.awardTo) {
 					let currentAmount = (this.players[key].experience) ? parseInt(this.players[key].experience) : 0;
 					let newAmount = currentAmount + amount;
 					
@@ -160,15 +159,20 @@
 					if(newAmount > 355000) {
 						newAmount = 355000;
 					}
-					db.ref(`players/${this.user.uid}/${key}/experience`).set(newAmount);
+					this.set_player_prop({ uid: this.user.uid, id: key, property: "experience", value: newAmount });
 				}
 				//In the finished encounter screen, set xp_awarded to true
 				//And update the amount awarded if it was changed
 				if(this.$route.name === 'RunEncounter') {
 					if(this.amount !== this.data.amount) {
-						db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp/overwrite`).set(this.amount);
+						this.set_xp({ campaignId: this.campaignId, encounterId: this.encounterId, type: "overwrite", value: this.amount })
 					}
-					db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/xp_awarded`).set(true);
+					this.update_encounter_prop({ 
+						campaignId: this.campaignId, 
+						encounterId: this.encounterId, 
+						property: "xp_awarded",
+						value: true
+					});
 				}
 				this.setSlide(false);
 			}

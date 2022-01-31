@@ -590,6 +590,7 @@ const actions = {
    * 
    * @param {string} campaignId
    * @param {string} encounterId
+   * @param {string} type calculated | overwrite
    * @param {object} value
    */
    async set_xp({ rootGetters, commit, dispatch }, { campaignId, encounterId, type, value }) {

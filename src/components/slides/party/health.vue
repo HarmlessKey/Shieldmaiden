@@ -6,7 +6,7 @@
 			<q-form @submit="handleSubmit(setHpModifiers)">
 				<div class="row q-col-gutter-md">
 					<div class="col">
-						<ValidationProvider rules="max_value:99" name="Temp HP" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:1,999" name="Temp HP" v-slot="{ errors, invalid, validated }">
 						<q-input 
 							:dark="$store.getters.theme === 'dark'" filled square
 							label="Temporary HP"
@@ -19,7 +19,7 @@
 						</ValidationProvider>
 					</div>
 					<div class="col">
-						<ValidationProvider rules="max_value:99" name="Max HP mod" v-slot="{ errors, invalid, validated }">
+						<ValidationProvider rules="between:-999,999" name="Max HP mod" v-slot="{ errors, invalid, validated }">
 							<q-input 
 								:dark="$store.getters.theme === 'dark'" filled square
 								label="Max HP mod" 
@@ -34,12 +34,12 @@
 				</div>
 				
 				<h3 class="mt-3">Set HP changes for:</h3>
-				<div v-for="(player, key) in campaign.players" :key="key">
+				<div v-for="(player, key) in players" :key="key">
 					<q-checkbox 
 						:dark="$store.getters.theme === 'dark'"
 						v-model="setFor" 
 						:val="key" 
-						:label="players[key].character_name"
+						:label="player.character_name"
 					/>
 				</div>
 
@@ -59,40 +59,39 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapActions } from 'vuex'
 
 	export default {
 		data() {
 			return {
 				user: this.$store.getters.user,
 				campaignId: this.$route.params.campid,
+				campaign: {},
+				allPlayers: [],
+				players: {},
 				tempHp: undefined,
 				maxHpMod: undefined,
 				awardHp: undefined
 			}
 		},
 		computed: {
-			...mapGetters([
-				'campaign',
-				'players'
-			]),
-			allPlayers() {
-				let returnArray = [];
-	
-				for(let key in this.campaign.players) {
-					returnArray.push(key)
-				}
-				return returnArray;
-			},
 			setFor: {
 				get() {
 					return (this.awardHp) ? this.awardHp : this.allPlayers;
 				},
 				set(newValue) {
 					this.awardHp = newValue;
-					return newValue;
 				}
+			}
+		},
+		async mounted() {
+			this.campaign = await this.get_campaign({
+				uid: this.user.uid,
+				id: this.campaignId
+			});
+			for(const id in this.campaign.players) {
+				this.allPlayers.push(id);
+				this.players[id] = await this.get_player({ uid: this. user.uid, id });
 			}
 		},
 		watch: {
@@ -111,28 +110,31 @@
 			}
 		},
 		methods: {
-			...mapActions([
-				'setSlide',
-			]),
-			toggleAll(checked) {
-				this.setFor = checked ? this.allPlayers : [];
-			},
-			setHpModifiers() {
+			...mapActions(["setSlide"]),
+			...mapActions("campaigns", ["get_campaign", "update_campaign_entity"]),
+			...mapActions("players", ["get_player"]),
+			async setHpModifiers() {
 				if(this.tempHp !== undefined) {
-					for(let i in this.setFor) {
-						let key = this.setFor[i];
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}/tempHp`).set(this.tempHp);
+					for(let key of this.setFor) {
+						await this.update_campaign_entity({ 
+							uid: this.user.uid,
+							campaignId: this.campaignId,
+							type: "players",
+							id: key,
+							property: "tempHp",
+							value: this.tempHp
+						});
 					}
 				}
 				if(this.maxHpMod !== undefined) {
 					this.maxHpMod = parseInt(this.maxHpMod);
-					for(let i in this.setFor) {
-						let key = this.setFor[i];
+					for(const key of this.setFor) {
+						const player = this.players[key];
 						let entity = this.campaign.players[key];
 
 						//Modify curHP with maxHpMod
 						if(entity.maxHpMod === 0) {
-							//If the there was no current mod
+							//If there was no current mod
 							//only modify curHp if maxHpMod = positive
 							if(this.maxHpMod > 0) {
 								entity.curHp = parseInt(parseInt(entity.curHp) + this.maxHpMod);
@@ -146,7 +148,7 @@
 						} else {
 							//If the new mod is positive
 							if(this.maxHpMod > 0) {
-								//check if the current mod was positive to0
+								//check if the current mod was positive to 0
 								if(entity.maxHpMod > 0) {
 									//if so, first substract current mod, then add new
 									entity.curHp = parseInt(parseInt(entity.curHp) - entity.maxHpMod + this.maxHpMod);
@@ -165,12 +167,21 @@
 						entity.maxHpMod = this.maxHpMod; //to store new in firebase
 
 						//CurHp can never be > maxHp
-						if(entity.curHp > (this.players[key].maxHp + entity.maxHpMod)) {
-							entity.curHp = parseInt(this.players[key].maxHp + entity.maxHpMod);
+						if(entity.curHp > (player.maxHp + entity.maxHpMod)) {
+							entity.curHp = parseInt(player.maxHp + entity.maxHpMod);
 						}
 
-						//Update Firebase apart from store, cause it can be edited where there is no store.
-						db.ref(`campaigns/${this.user.uid}/${this.campaignId}/players/${key}`).update(entity);
+						// Update curHp & maxHpMod
+						for(const property of ["curHp", "maxHpMod"]) {
+							await this.update_campaign_entity({ 
+								uid: this.user.uid,
+								campaignId: this.campaignId,
+								type: "players",
+								id: key,
+								property,
+								value: entity[property]
+							});
+						}
 					}
 				}
 				this.tempHp = undefined;
@@ -180,13 +191,3 @@
 		}
 	};
 </script>
-
-<style lang="scss">
-	.btn-group {
-		width: 100%;
-
-		label.btn {
-			width: 50% !important;
-		}
-	}
-</style>

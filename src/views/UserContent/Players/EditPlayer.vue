@@ -427,7 +427,7 @@
 		<q-dialog v-model="companion_dialog">
 			<hk-card header="Add companion" :min-width="320">
 				<div class="card-body">
-					<CopyMonster @copy="add" add custom-only :disabled-custom="npcsAsCompanion" />
+					<CopyContent @copy="add" type="monster" add custom-only :disabled-custom="npcsAsCompanion" />
 				</div>
 			</hk-card>
 		</q-dialog>
@@ -442,7 +442,7 @@
 	import { skills } from '@/mixins/skills.js';
 	import { general } from '@/mixins/general.js';
 	import Defenses from './Defenses';
-	import CopyMonster from '../../../components/CopyMonster.vue';
+	import CopyContent from '../../../components/CopyContent.vue';
 	import { abilities } from "@/mixins/abilities";
 
 	export default {
@@ -451,7 +451,7 @@
 		components: {
 			GiveCharacterControl,
 			Defenses,
-			CopyMonster
+			CopyContent
 		},
 		data() {
 			return {
@@ -597,15 +597,15 @@
 				});
 				this.$router.replace("/content/players");
 			},
-			add({ npc, id }) {
+			add({ result, id }) {
 				this.companion_dialog = false;
 				if (this.player.companions === undefined) {
 					this.$set(this.player, 'companions', {});
 				}
 
 				this.$set(this.player.companions, id, true);
-				npc.key = id;
-				this.companions.push(npc);
+				result.key = id;
+				this.companions.push(result);
 				this.npcsAsCompanion.push(id);
 
 				// If companion was deleted before saving, undelete it

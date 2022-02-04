@@ -116,6 +116,7 @@
 						field: "name",
 						sortable: true,
 						align: "left",
+						format: val => val.capitalizeEach()
 					},
 					{
 						name: "actions",

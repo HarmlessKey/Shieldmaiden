@@ -66,11 +66,11 @@
 		<q-dialog v-model="copy_dialog">
 			<hk-card :minWidth="320">
 				<div slot="header" class="card-header">
-					<span>Copy Existing NPC</span>
+					<span>Copy existing NPC</span>
 					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
 				</div>
 				<div class="card-body">
-					<CopyMonster @copy="copy" />
+					<CopyContent @copy="copy" type="monster" />
 				</div>
 			</hk-card>
 		</q-dialog>		
@@ -101,7 +101,7 @@
 	import Defenses from '@/components/npcs/Defenses';
 	import SpellCasting from '@/components/npcs/SpellCasting';
 	import Actions from '@/components/npcs/Actions';
-	import CopyMonster from "@/components/CopyMonster";
+	import CopyContent from "@/components/CopyContent";
 	import ImportNPC from "@/components/ImportNPC";
 
 	export default {
@@ -115,7 +115,7 @@
 			Defenses,
 			SpellCasting,
 			Actions,
-			CopyMonster,
+			CopyContent,
 			ImportNPC
 		},
 		data() {
@@ -176,9 +176,9 @@
 					return false;
 				} return true;
 			},
-			copy({ npc }) {
+			copy({ result }) {
 				this.copy_dialog = false;
-				this.npc = npc;
+				this.npc = result;
 			},
 			imported(npc) {
 				if (npc instanceof Array) {

@@ -176,6 +176,19 @@ const actions = {
       }
     }
     // REMOVE NON EXISTING ITEM LINKS FROM LOOT
+    if(encounter.loot) {
+      for(const [loot_id, loot] of Object.entries(encounter.loot)) {
+        if(loot.linked_item && loot.linked_item.custom) {
+          const item = await dispatch("items/get_item", { uid, id: loot.linked_item.key }, { root: true });
+
+          // If the item doesn't exist, remove the item link
+          if(!item) {
+            await dispatch("delete_encounter_item_link", { campaignId, encounterId: id, parent_item: loot_id });
+            delete loot.linked_item;
+          }
+        }
+      }
+    }
 
     commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
     return encounter;
@@ -915,7 +928,15 @@ const mutations = {
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item", item);
   },
   REMOVE_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item }) {
-    Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item");
+    if(
+      state.cached_encounters[uid] && 
+      state.cached_encounters[uid][campaignId] && 
+      state.cached_encounters[uid][campaignId][encounterId] &&
+      state.cached_encounters[uid][campaignId][encounterId].loot &&
+      state.cached_encounters[uid][campaignId][encounterId].loot[parent_item]
+    ) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item");
+    }
   },
   DELETE_LOOT(state, { uid, campaignId, encounterId, id }) {
     if(state.cached_encounters[uid] && 

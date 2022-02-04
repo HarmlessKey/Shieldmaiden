@@ -643,6 +643,23 @@ export const routes = [{
 					}
 				]
 			},
+			{
+				path: "restruct-db",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Restructure Database"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Restructure Database',
+						component: () => import('@/views/Admin/RestructDatabase.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
 		]
 	},
 

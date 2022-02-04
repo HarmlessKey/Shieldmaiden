@@ -54,114 +54,14 @@
 				this.loading = true;
 
 				if (this.ref === 'campaign_items') {
-					this.update_items();
+					await this.update_items();
 				}
 
-				//Fetch the data
-				// const ref = db.ref(this.ref);
-				// await ref.once('value', async (snapshot) => {
-				// 	const users = snapshot.val();
-
-				// 	for(let uid in users) {
-
-				// 		if (this.ref === 'encounters') {
-				// 			const campaigns = users[uid];
-				// 			console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
-
-				// 			for (const cid in campaigns) {
-				// 				const entries = campaigns[cid]
-
-				// 				for (const key in entries) {
-				// 					let entry = entries[key];
-
-				// 					// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
-				// 					// await db.ref(`encounters/${uid}/${cid}/${key}/name`).set(entry.encounter);
-				// 					// await db.ref(`encounters/${uid}/${cid}/${key}/encounter`).remove();
-
-				// 					const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-				// 					const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}/${key}`);
-				// 					try {
-				// 						await search_ref.set(search_entry)
-				// 					} catch(error) {
-				// 						console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
-				// 					}
-				// 				}
-				// 				const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/${cid}/count`);
-				// 				await count_ref.set(Object.keys(entries).length);
-				// 			}
-				// 			console.groupEnd();
-				// 		}
-
-				// 		else if (this.ref === 'campaigns') {
-				// 			const campaigns = users[uid];
-				// 			console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
-				// 			for (const cid in campaigns) {
-				// 				const campaign = campaigns[cid]
-
-				// 				// USE THIS TO CHANGE KEY FOR CAMPAIGN NAME FROM CAMPAING TO NAME
-				// 				// await db.ref(`campaigns/${uid}/${cid}/name`).set(campaign.campaign);
-				// 				// await db.ref(`campaigns/${uid}/${cid}/campaign`).remove();
-
-				// 				const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${cid}`);
-				// 				const search_entry = this.extractFields(campaign, this.search_fields[this.ref]);
-				// 				// const camp_enc_ref = db.ref(`encounters/${uid}/${cid}`)
-				// 				// const camp_encs = await camp_enc_ref.once('value');
-
-				// 				// // Campaign has no encounters yet
-				// 				// if (camp_encs.val() !== null) {
-				// 				// 	search_entry.encounter_count = Object.keys(camp_encs.val()).length;
-				// 				// }
-								
-				// 				try {
-				// 					await search_ref.set(search_entry)
-				// 				} catch(error) {
-				// 					console.error(`Couldn't update ${this.search_ref[this.ref]} table`, cid, campaign.campaign, error, search_entry)
-				// 				}
-
-				// 				const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-				// 				await count_ref.set(Object.keys(campaigns).length);
-				// 			}
-				// 			console.groupEnd();
-				// 			const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-				// 			await count_ref.set(Object.keys(campaigns).length);
-				// 		}
-
-
-				// 		else {
-				// 			const entries = users[uid];
-				// 			console.group(`%cUser: ${uid}`, "color: #2c97de; font-weight: bold;")
-
-				// 			for(let key in entries) {
-				// 				let entry = entries[key];
-				// 				const search_entry = this.extractFields(entry, this.search_fields[this.ref]);
-				// 				const search_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/results/${key}`);
-				// 				try {
-				// 					await search_ref.set(search_entry)
-				// 				} catch(error) {
-				// 					console.error(`Couldn't update ${this.search_ref[this.ref]} table`, key, entry.name, error, search_entry)
-				// 				}	
-				// 			}
-				// 			console.groupEnd();
-				// 			const count_ref = db.ref(`${this.search_ref[this.ref]}/${uid}/metadata/count`);
-				// 			await count_ref.set(Object.keys(entries).length);
-				// 		}
-				// 	}
-				// })
-				
-				// this.loading = false;
-				// console.log(`%cFINISHED.`, "color: #83b547;");
+				this.loading = false;
 			},
 			async update_items() {
-				// eslint-disable-next-line no-unused-vars
-				const item_ref = db.ref('items');
-				// eslint-disable-next-line no-unused-vars
-				const custom_item_ref = db.ref('custom_items');
 				const campaign_ref = db.ref('campaigns');
-				// eslint-disable-next-line no-unused-vars
 				const encounter_ref = db.ref('encounters');
-
-				// eslint-disable-next-line no-unused-vars
-				const item_type_cache = {};
 
 				await campaign_ref.once('value', async (snapshot) => {
 					const users = snapshot.val();
@@ -184,6 +84,14 @@
 											const custom_item = await db.ref(`custom_items/${uid}/${item.linked_item}`).once('value');
 											if (custom_item !== undefined) {
 												linked_item.custom = true;
+											}
+											else {
+												const srd_item = await db.ref(`items/${item.linked_item}`).once('value');
+												// if srd item also null => item is deleted, continue so not added again.
+												if (srd_item.val() === null) {
+													await db.ref(`campaigns/${uid}/${cid}/inventory/items/${item_key}`).remove();
+													continue;
+												}
 											}
 
 											item.linked_item = linked_item;
@@ -210,19 +118,29 @@
 									for (const item_key in encounter.loot) {
 										const item = encounter.loot[item_key];
 										if ('linked_item' in item && typeof item.linked_item === 'string') {
-											// Create linked_item object
+											// Create linked_item object, default to not custom item.
 											const linked_item = {
 												"custom": null,
 												"key": item.linked_item
 											}
 
+											// check if custom item
 											const custom_item = await db.ref(`custom_items/${uid}/${item.linked_item}`).once('value');
-											if (custom_item !== undefined) {
+											if (custom_item.val() !== null) {
 												linked_item.custom = true;
+											} 
+											else {
+												const srd_item = await db.ref(`items/${item.linked_item}`).once('value');
+												// if srd item also null => item is deleted, continue so not added again.
+												if (srd_item.val() === null) {
+													await db.ref(`encounters/${uid}/${cid}/${eid}/loot/${item_key}`).remove();
+													continue;
+												}
 											}
 
 											item.linked_item = linked_item;
 										}
+										// Remove full linked item artifact of the past
 										delete item.full_linked_item;
 										await db.ref(`encounters/${uid}/${cid}/${eid}/loot/${item_key}`).set(item);
 									}
@@ -231,36 +149,8 @@
 						}
 					}
 				})
-
-
-
-				this.loading = false;
-
 			},
 
-			// extractFields(entry, fields) {
-			// 	let searchable_entry = {}
-			// 	for (const field of fields) {
-			// 		const [field_name, func] = field.split('->')
-			// 		let [og_field, s_field] = field_name.split(':')
-			// 		if (s_field === undefined) {
-			// 			s_field = og_field;
-			// 		}
-			// 		if (entry.hasOwnProperty(og_field)) {
-			// 			if (func === 'count') {
-			// 				searchable_entry[s_field] = Object.keys(entry[og_field]).length
-			// 			}
-			// 			else if (func === 'lower') {
-			// 				searchable_entry[s_field] = entry[og_field].toLowerCase()
-			// 			}
-			// 			else {
-			// 				searchable_entry[s_field] = entry[og_field]
-			// 			}
-			// 		}
-			// 	}
-
-			// 	return searchable_entry;
-			// }
 		}
 	}
 </script>

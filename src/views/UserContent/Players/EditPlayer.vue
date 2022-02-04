@@ -427,7 +427,7 @@
 		<q-dialog v-model="companion_dialog">
 			<hk-card header="Add companion" :min-width="320">
 				<div class="card-body">
-					<CopyContent @copy="add" type="monster" add custom-only :disabled-custom="npcsAsCompanion" />
+					<CopyContent @copy="add" type="monster" button="plus" custom-only :disabled-custom="npcsAsCompanion" />
 				</div>
 			</hk-card>
 		</q-dialog>

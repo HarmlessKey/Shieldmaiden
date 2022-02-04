@@ -41,7 +41,7 @@
 					</q-item-section>
 					<q-item-section avatar>
 						<a v-if="!disabledCustom.includes(result.key)" class="btn btn-sm bg-neutral-5" @click="copy(copy_resource === 'custom' ? result.key : result._id)">
-							<i class="fas" :class="add ? 'fa-plus' : 'fa-copy'"/>
+							<i class="fas" :class="`fa-${button}`"/>
 						</a>
 					</q-item-section>
 				</q-item>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-	import { mapGetters, mapActions } from 'vuex'
+	import { mapGetters, mapActions } from "vuex";
 
 	export default {
 		name: "CopyContent",
@@ -60,14 +60,16 @@
 				required: true,
 				default: "monster"
 			},
+			// Only show custom options
 			customOnly: {
 				type: Boolean,
 				default: false
 			},
-			add: {
-				type: Boolean,
-				default: false
+			button: {
+				type: String,
+				default: "copy"
 			},
+			// Custom results that should be disabled
 			disabledCustom: {
 				type: Array,
 				default: () => { return []; }
@@ -165,9 +167,16 @@
 					this.searchResults = [];
 				}
 			},
+
+			/**
+			 * Emit the selected result
+			 * 
+			 * @param {string} id
+			 * @emits {object} result, id, recource (custom or SRD)
+			 */
 			async copy(id) {
 				if(this.returnId) {
-					this.$emit("copy", { id });
+					this.$emit("copy", { id, resource: this.copy_resource });
 				} else {
 					let result;
 
@@ -187,7 +196,7 @@
 					delete result.key;
 					delete result.url;
 
-					this.$emit("copy", { result, id });
+					this.$emit("copy", { result, id, resource: this.copy_resource });
 				}
 
 				// Clear search

@@ -629,6 +629,77 @@ const actions = {
       }
     }
   },
+
+  async add_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const id = await services.addLoot(uid, campaignId, encounterId, item);
+        commit("SET_LOOT", { uid, campaignId, encounterId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async update_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, id, item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.editLoot(uid, campaignId, encounterId, id, item);
+        commit("SET_LOOT", { uid, campaignId, encounterId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async delete_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, id}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.addLoot(uid, campaignId, encounterId, id);
+        commit("DELETE_LOOT", { uid, campaignId, encounterId, id });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async add_encounter_item_link({ rootGetters, commit, dispatch }, {campaignId, encounterId, parent_item, item }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/loot/${parent_item}`, { linked_item: item });
+        commit("ADD_ITEM_LINK", { uid, campaignId, encounterId, parent_item, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async delete_encounter_item_link({ rootGetters, commit, dispatch }, {campaignId, encounterId, parent_item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/loot/${parent_item}`, { linked_item: null });
+        commit("REMOVE_ITEM_LINK", { uid, campaignId, encounterId, parent_item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   
   /**
    * Deletes an existing encounter
@@ -825,6 +896,34 @@ const mutations = {
         Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders, key, reminder);
     } else {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity], "reminders", { [key]: reminder });
+    }
+  },
+  SET_LOOT(state, { uid, campaignId, encounterId, id, item }) {
+    if(
+      state.cached_encounters[uid] && 
+      state.cached_encounters[campaignId] && 
+      state.cached_encounters[campaignId][encounterId]
+    ) {
+      if(state.cached_encounters[uid][campaignId][encounterId].loot) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot, id, item);
+      } else {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId], "loot", { [id]: item });
+      }
+    }
+  },
+  ADD_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item, item }) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item", item);
+  },
+  REMOVE_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item }) {
+    Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item");
+  },
+  DELETE_LOOT(state, { uid, campaignId, encounterId, id }) {
+    if(state.cached_encounters[uid] && 
+      state.cached_encounters[campaignId] && 
+      state.cached_encounters[campaignId][encounterId] && 
+      state.cached_encounters[campaignId][encounterId].loot
+    ) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot, id);
     }
   },
   UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {

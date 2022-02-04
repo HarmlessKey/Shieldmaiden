@@ -62,7 +62,7 @@
 						delete entry["changed"];
 
 						// entry.name = entry.name.toLowerCase();
-						entry.url = entry.name.replace(/ /g, "-").toLowerCase();
+						entry.url = entry.name.toLowerCase().replace(/[\s/]/g, "-").replace(/['()]/g, '');
 						
 						
 						data.push(entry);

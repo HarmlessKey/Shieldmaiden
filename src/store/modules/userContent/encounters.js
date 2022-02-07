@@ -246,7 +246,7 @@ const actions = {
        
         const new_count = await services.updateEntityCount(uid, campaignId, encounterId, 1);
         commit("UPDATE_ENTITY_COUNT", { campaignId, encounterId, type, count: new_count });
-        return;
+        return entityId;
       } catch(error) {
         throw error;
       }

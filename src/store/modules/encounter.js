@@ -469,6 +469,44 @@ const actions = {
 	},
 
 	/**
+	 * Adds an NPC during an encounter
+	 * 
+	 * @param {object} npc
+	 */
+	async add_npc({ state, dispatch }, npc) {
+		if(!state.demo) {
+			const id = await dispatch("encounters/add_npc_encounter", {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				npc
+			}, { root: true });
+			await dispatch("add_entity", id);
+		} else {
+			await dispatch("add_entity_demo", npc);
+		}
+	},
+
+	/**
+	 * Adds a player or companion during an encounter
+	 * 
+	 * @param {id} id
+	 * @param {object} entity player or companion object
+	 */
+	async add_player({ state, dispatch }, { id, entity }) {
+		if(!state.demo) {
+			await dispatch("encounters/add_player_encounter", {
+				campaignId: state.campaignId,
+				encounterId: state.encounterId,
+				playerId: id,
+				player: entity
+			}, { root: true });
+			await dispatch("add_entity", id);
+		} else {
+			await dispatch("add_entity_demo", entity);
+		}
+	},
+
+	/**
 	 * Update turn and round
 	 * 
 	 * @param {integer} turn

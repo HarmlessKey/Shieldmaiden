@@ -34,7 +34,13 @@
 						<q-item-label>Select All</q-item-label>
 					</q-item-section>
 					<q-item-section side>
-						<q-checkbox :dark="$store.getters.theme === 'dark'" v-model="all" @input="checkAll"/>
+						<q-checkbox 
+							:dark="$store.getters.theme === 'dark'" 
+							v-model="all" 
+							@input="checkAll"
+							:indeterminate-value="false"
+							:false-value="null"
+						/>
 					</q-item-section>
 				</q-item>
 			</template>
@@ -75,7 +81,7 @@
 				encounter_id: this.data.encounter_id,
 				campaign: {},
 				sharesSetter: undefined,
-				all: false,
+				all: null,
 				options: [
 					{
 						label: "Action rolls",
@@ -155,8 +161,10 @@
 			sharesSelected () {
 				if (this.shares.length === this.options.length) {
 					this.all = true
-				} else {
+				} else if (this.shares.length) {
 					this.all = false
+				} else {
+					this.all = null
 				}
 				if(this.broadcast.live) this.setLiveShares(this.shares);
 			},

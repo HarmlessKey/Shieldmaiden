@@ -72,7 +72,6 @@
 									id="name"
 									type="text" 
 									v-model="item.public_name" 
-									name="name" 
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>

@@ -176,6 +176,22 @@ const actions = {
       }
     }
 
+    // Remove ghost items
+    if(campaign.inventory && campaign.inventory.items) {
+      for(const [item_id, item] of Object.entries(campaign.inventory.items)) {
+        if(item.linked_item && item.linked_item.custom) {
+          const linked_item = await dispatch("items/get_item", { uid, id: item.linked_item.key }, { root: true });
+
+          // If the item doesn't exist, remove the item link
+          if(!linked_item) {
+            await services.updateCampaign(uid, id, `/inventory/items/${item_id}`, { linked_item: null });
+            delete item.linked_item;
+            console.warn(`Ghost item link deleted from ${item.public_name}`);
+          }
+        }
+      }
+    }
+
     return campaign;
   },
 
@@ -620,6 +636,86 @@ const actions = {
     }
   },
 
+  /**
+   * Sets the currency in the inventory of a campaign
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async set_campaign_currency({ rootGetters, commit,  dispatch }, { campaignId, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, "/inventory", { currency: value });
+        commit("SET_CURRENCY", { uid, campaignId, value })
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Adds an item to a campaign inventory
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async add_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, item }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        const id = await services.addItem(uid, campaignId, item);
+        commit("SET_ITEM", { uid, campaignId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Identifies an item in a campaign, so players can see the linked item.
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async identify_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, id, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, `/inventory/items/${id}`, { identified: value });
+        commit("IDENTIFY_ITEM", { uid, campaignId, id, value })
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes an item from a campaign inventory
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async delete_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, id }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, `/inventory/items`, { [id]: null });
+        commit("DELETE_ITEM", { uid, campaignId, id })
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   clear_campaign_store({ commit, rootGetters }) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
@@ -725,6 +821,34 @@ const mutations = {
     if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
       Vue.delete(state.cached_campaigns[uid][id].companions, companionId); 
     }
+  },
+  SET_CURRENCY(state, { uid, campaignId, value}) {
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
+      if(state.cached_campaigns[uid][campaignId].inventory) {
+        Vue.set(state.cached_campaigns[uid][campaignId].inventory, "currency", value);
+      } else {
+        Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { currency: value });
+      }
+    }
+  },
+  SET_ITEM(state, { uid, campaignId, id, item }) {
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
+      if(state.cached_campaigns[uid][campaignId].inventory) {
+        if(state.cached_campaigns[uid][campaignId].inventory.items) {
+          Vue.set(state.cached_campaigns[uid][campaignId].inventory.items, id, item);
+        } else {
+          Vue.set(state.cached_campaigns[uid][campaignId], "items", { [id]: item });
+        }
+      } else {
+        Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { items: { [id]: item } });
+      }
+    }
+  },
+  IDENTIFY_ITEM(state, { uid, campaignId, id, value }) {
+    Vue.set(state.cached_campaigns[uid][campaignId].inventory.items[id], "identified", value);
+  },
+  DELETE_ITEM(state, { uid, campaignId, id }) {
+    Vue.delete(state.cached_campaigns[uid][campaignId].inventory.items, id);
   },
   CLEAR_STORE(state) {
     Vue.set(state, "active_campaign", undefined);

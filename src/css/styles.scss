@@ -709,13 +709,26 @@ html body {
 	}
 
 	.loader {
-		position: relative;
-		text-align: center;
-		line-height: 27px;
-		height: 27px;
+		line-height: 25px;
+		height: 25px;
+		padding-left: 25px;
+		color: $neutral-2;
 
-		span {
-			animation: fadeinout .9s linear infinite;
+		&:before {
+			content: "";
+			background-image: url("../assets/_img/logo/logo-icon-no-shield-cyan.svg");
+			background-size: cover;
+			box-sizing: border-box;
+			position: absolute;
+			width: 25px;
+			height: 25px;
+			margin-left: -30px;
+			animation: spinner 1s ease infinite;
+		}
+		&:after {
+			display: inline-block;
+			animation: ellipsis steps(1,end) 1s infinite;;
+			content: "";
 		}
 	}
 
@@ -755,23 +768,6 @@ html body {
 				background-color: $red-hover;
 			}
 		}
-	}
-
-	.loader:before {
-		content: '';
-		box-sizing: border-box;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 30px;
-		height: 30px;
-		margin-top: -15px;
-		margin-left: -15px;
-		border-radius: 50%;
-		border: 2px solid transparent;
-		border-top-color: $blue;
-		border-bottom-color: $blue;
-		animation: spinner .8s ease infinite;
 	}
 
 	.grow {
@@ -819,6 +815,14 @@ html body {
 		0% { opacity: 1; }
 		100% { opacity: 0; }
 	}
+
+	@keyframes ellipsis {
+		0%   { content: ''; }
+		25%  { content: '.'; }
+		50%  { content: '..'; }
+		75%  { content: '...'; }
+		100% { content: ''; }
+}
 
 
 	/* 4. Buttons and Links */

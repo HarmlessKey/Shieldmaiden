@@ -59,9 +59,6 @@
 					</div>
 				</li>
 			</template>
-			<li v-else>
-				<div class="loader"> <span>Loading patron....</span></div>
-			</li>
 		</ul>
 	</div>
 </template>

@@ -1,30 +1,41 @@
-import { db } from '@/firebase';
 import Vue from 'vue';
-
-const spells_ref = db.ref('spells');
+import { spellServices } from "@/services/api/spells"; 
 
 export const content_spells = {
   state: {
-		spells: {},
+    spell_services: null,
+		cached_spells: {},
 	},
 	getters: {
-    spells: function(state) { return state.spells; },
-    get_spell: (state) => (key) => {
-      return state.spells[key];
-    }
+    spell_services: (state) => { return state.spell_services; },
+    cached_spells: function(state) { return state.cached_spells; },
   },
   actions: {
-   set_spell({ state, commit }, key) {
-      const spell = spells_ref.child(key);
-      
-      if(!state.spells[key]) {
-        spell.on('value', snapshot => {
-          commit('SET_SPELL', { key, spell: snapshot.val() });
-        });
+    async get_spell_services({ getters, commit }) {
+      if(getters.spell_services === null) {
+        commit("SET_SPELL_SERVICES", new spellServices);
       }
-    }
+      return getters.spell_services;
+    },
+
+    async get_spell({ state, commit, dispatch }, id) {
+      let spell = (state.cached_spells) ? state.cached_spells[id] : undefined;
+      
+      // If the spell is not yet cached, fetch it
+      if(spell === undefined) {
+        const services = await dispatch("get_spell_services");
+        try {
+          spell = await services.getSpell(id);
+          commit("SET_CACHED_SPELL", { id, spell });
+        } catch(error) {
+          throw error;
+        }
+      }
+      return spell;
+    },
   },
   mutations: {
-    SET_SPELL(state, {key, spell}) { Vue.set(state.spells, key, spell) }
+    SET_SPELL_SERVICES(state, payload) { Vue.set(state, "spell_services", payload); },
+    SET_CACHED_SPELL(state, {id, spell}) { Vue.set(state.cached_spells, id, spell) }
   }
 }

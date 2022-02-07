@@ -19,7 +19,7 @@
 
 				<!-- COLLAPSE -->
 				<div slot="collapse" slot-scope="data">
-					<Spell :id="data.row['.key']" />
+					<Spell :data="data.row" />
 				</div>
 				
 				<div slot="table-busy" class="loader">

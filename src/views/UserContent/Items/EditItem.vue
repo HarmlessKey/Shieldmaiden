@@ -199,38 +199,12 @@
 
 		<q-dialog v-model="copy_dialog">
 			<hk-card header="Copy Existing Item" :min-width="300">
+				<div slot="header" class="card-header">
+					<span>Copy existing item</span>
+					<q-btn padding="xs" no-caps icon="fas fa-times" size="sm" flat v-close-popup />
+				</div>
 				<div class="card-body">
-					<q-input 
-						:dark="$store.getters.theme === 'dark'" filled square dense
-						label="Search items"
-						type="text" 
-						autocomplete="off" 
-						v-model="searched"
-						@keyup="searchItems()" 
-					>
-						<q-icon slot="append" name="fas fa-search" class="pointer" size="xs" @click="searchItems()" />
-					</q-input>
-					<div v-if="searched !== undefined && searched !== ''" class="green result-count" :class="{'red': Object.keys(foundItems).length === 0}">{{ Object.keys(foundItems).length }} results for {{ searched }}</div>
-					<ul class="entities mt-3" v-if="foundItems">
-						<li  v-for="(item, index) in foundItems" :key="'item-'+index" class="d-flex justify-content-between">
-							<div class="d-flex justify-content-left">
-								<a @click="setSlide({show: true, type: 'ViewItem', data: item})" class="mr-2">
-									<i class="fas fa-info-circle"></i>
-									<q-tooltip anchor="top middle" self="center middle">
-										Show info
-									</q-tooltip>
-								</a>
-								{{ item.name }}
-							</div>
-							<a class="neutral-2 mr-2" @click="copy(item)">
-								<i class="fas fa-copy blue"></i>
-								<span class="d-none d-md-inline ml-1">Copy</span>
-								<q-tooltip anchor="top middle" self="center middle">
-									Copy item
-								</q-tooltip>
-							</a>
-						</li>
-					</ul>
+					<CopyContent @copy="copy" type="item" />
 				</div>
 			</hk-card>
 		</q-dialog>	
@@ -241,11 +215,14 @@
 	import { skills } from '@/mixins/skills.js';
 	import { mapActions, mapGetters } from 'vuex';
 	import { general } from '@/mixins/general.js';
-
+	import CopyContent from "@/components/CopyContent";
 
 	export default {
 		name: 'EditItem',
 		mixins: [general, skills],
+		components: {
+			CopyContent
+		},
 		data() {
 			return {
 				userId: this.$store.getters.user.uid,
@@ -287,28 +264,10 @@
 		methods: {
 			...mapActions(['setSlide']),
 			...mapActions('items', ["get_item", "add_item", "edit_item"]),
-			...mapActions('api_items', ["get_api_items", "get_api_item"]),
 
-			async searchItems() {
-				if (this.searched.length >= 3) {
-					const api_items= await this.get_api_items({
-						pageNumber: 1,
-						pageSize: 0,
-						fields: ['name'],
-						query: {search: this.searched},
-					})
-					this.foundItems = api_items.results
-				}
-
-				else {
-					this.foundItems = []
-				}
-			},
-			async copy(item) {
-				this.item = await this.get_api_item(item._id);
-				this.foundItems = [];
-				this.searched = '';
+			copy({ result }) {
 				this.copy_dialog = false;
+				this.item = result;
 			},
 			saveItem(valid) {
 				if (!valid) {
@@ -333,7 +292,6 @@
 					this.unsaved_changes = false;
 
 					this.$router.replace(`/content/items`);
-
 
 				}, error => {
 					this.$snotify.error("Couldn't save item.", "Save failed", {

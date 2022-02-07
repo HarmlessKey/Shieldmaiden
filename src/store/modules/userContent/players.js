@@ -260,18 +260,19 @@ const actions = {
   },
 
   /**
-   * Sets the experience points of a player
+   * Sets the property of a player
    * 
    * @param {string} uid
    * @param {string} id 
    * @param {number} value 
    */
-   async set_player_xp({ commit, dispatch }, { uid, id, value }) {
+   async set_player_prop({ commit, dispatch }, { uid, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_player_services");
+      const update_search = ["character_name", "avater", "campaign_id"].includes(property);
       try {
-        await services.updatePlayer(uid, id, "", { "experience": value });
-        commit("SET_XP", { uid, id, value });
+        await services.updatePlayer(uid, id, "", { [property]: value }, update_search);
+        commit("SET_PLAYER_PROP", { uid, id, property, value, update_search });
         return;
       } catch(error) {
         throw error;
@@ -279,25 +280,6 @@ const actions = {
     }
   },
 
-  /**
-   * Updates the campaign_id of a player
-   * 
-   * @param {string} uid
-   * @param {string} playerId 
-   * @param {number} value 
-   */
-   async set_campaign_id({ commit, dispatch }, { uid, playerId, value }) {
-    if(uid) {
-      const services = await dispatch("get_player_services");
-      try {
-        await services.updatePlayer(uid, playerId, "", { "campaign_id": value }, true);
-        commit("SET_CAMPAIGN_ID", { uid, playerId, value });
-        return;
-      } catch(error) {
-        throw error;
-      }
-    }
-  },
 
   /**
    * Removes the companion link from a player
@@ -460,8 +442,13 @@ const mutations = {
       Vue.delete(state.cached_players[uid], id);
     }
   },
-  SET_XP(state, { uid, id, value }) { 
-    Vue.set(state.cached_players[uid][id], "experience", value);
+  SET_PLAYER_PROP(state, { uid, id, property, value, update_search }) { 
+    if(state.cached_players[uid] && state.cached_players[uid][id]) {
+      Vue.set(state.cached_players[uid][id], property, value);
+    }
+    if(update_search && state.players && state.players[id]) {
+      Vue.set(state.players[id], property, value);
+    }
   },
   SET_CONTROL(state, { uid, id, user_id }) { 
     Vue.set(state.cached_players[uid][id], "control", user_id);
@@ -472,14 +459,6 @@ const mutations = {
     }
     if(state.players && state.players[playerId] && state.players[playerId].companions) {
       Vue.delete(state.players[playerId].companions, id);
-    }
-  },
-  SET_CAMPAIGN_ID(state, { uid, playerId, value }) {
-    if(state.cached_players[uid] && state.cached_players[uid][playerId]) {
-      Vue.set(state.cached_players[uid][playerId], "campaign_id", value);
-    }
-    if(state.players && state.players[playerId]) {
-      Vue.set(state.players[playerId], "campaign_id", value);
     }
   },
   CLEAR_STORE(state) {

@@ -152,7 +152,7 @@
 <script>
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 	import { monsterMixin } from '@/mixins/monster.js';
 	import { mapActions } from "vuex";
 

@@ -39,7 +39,7 @@
 		},
 		computed: {
 			reminder() {
-				return this.entity.reminders[this.key];
+				return {...this.entity.reminders[this.key]};
 			},
 			title() {
 				let title = this.reminder.title;

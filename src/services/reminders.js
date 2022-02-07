@@ -65,6 +65,15 @@ export class reminderServices {
     }
   }
 
+  async getFullReminders(uid) {
+    try {
+      const all_reminders = await REMINDERS_REF.child(uid).once('value');
+      return all_reminders.val();
+    } catch(error) {
+      throw error;
+    }
+  }
+
 	/**
    * Adds an reminder to the 'reminders' ref and the 'search_reminders' ref.
    * Also updates the count metadata in 'search_reminders'

@@ -36,7 +36,6 @@
 				</div>
 			</li>
 		</ul>
-		<div v-else class="loader"><span>Loading Players...</span></div>
 	</div>
 </template>
 

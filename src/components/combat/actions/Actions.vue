@@ -104,8 +104,7 @@
 				<q-tab-panel :name="name" v-for="{name} in tabs" :key="`panel-${name}`">
 					<Custom v-if="name === 'manual'" :current="entitiesList[doneBy]" :targeted="targeted" />
 					<template v-if="name === 'roll'">
-						<RollDeprecated v-if="entitiesList[doneBy].old" :current="entitiesList[doneBy]" />
-						<Roll v-else :current="entitiesList[doneBy]" />
+						<Roll :current="entitiesList[doneBy]" />
 					</template>
 					<Spellcasting v-if="name === 'spells'" :current="entitiesList[doneBy]" />
 				</q-tab-panel>
@@ -120,7 +119,6 @@
 	import { setHP } from '@/mixins/HpManipulations.js';
 
 	import Custom from '@/components/combat/actions/custom';
-	import RollDeprecated from '@/components/combat/actions/RollDeprecated.vue';
 	import Roll from '@/components/combat/actions/Roll.vue';
 	import Spellcasting from '@/components/combat/actions/Spellcasting.vue';
 	import { damage_types } from '@/mixins/damageTypes.js';
@@ -129,7 +127,6 @@
 		name: 'Actions',
 		components: {
 			Custom,
-			RollDeprecated,
 			Roll,
 			Spellcasting
 		},

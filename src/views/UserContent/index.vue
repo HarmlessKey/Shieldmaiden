@@ -6,18 +6,44 @@
 			class="mb-3"
 		>
 			Welcome {{ userInfo.username }}
-			<q-btn 
-				slot="action" 
-				size="sm" 
-				flat padding="sm" 
-				no-caps 
-				icon="fas fa-sign-out" 
-				@click="signOut" 
-			>
-				<q-tooltip anchor="top middle" self="center middle">
-					Sign out
-				</q-tooltip>
-			</q-btn>
+			<template slot="action">
+				<q-btn 
+					size="sm" 
+					flat padding="sm"
+					color="neutral-2"
+					no-caps 
+					icon="fas fa-cogs" 
+					to="/settings" 
+				>
+					<q-tooltip anchor="top middle" self="center middle">
+						Settings
+					</q-tooltip>
+				</q-btn>
+				<q-btn 
+					size="sm" 
+					flat padding="sm"
+					color="neutral-2"
+					no-caps 
+					icon="fas fa-user" 
+					to="/profile" 
+				>
+					<q-tooltip anchor="top middle" self="center middle">
+						Profile
+					</q-tooltip>
+				</q-btn>
+				<q-btn 
+					size="sm" 
+					flat padding="sm"
+					color="neutral-2"
+					no-caps 
+					icon="fas fa-sign-out" 
+					@click="signOut" 
+				>
+					<q-tooltip anchor="top middle" self="center middle">
+						Sign out
+					</q-tooltip>
+				</q-btn>
+			</template>
 		</q-banner>
 		<!-- Continue Campaign -->
 		<hk-card class="banner">

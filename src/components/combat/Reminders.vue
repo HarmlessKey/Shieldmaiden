@@ -3,28 +3,16 @@
 		v-if="entity.reminders && Object.keys(entity.reminders).length > 0" 
 		class="reminders truncate-chip-labels" 
 	>
-		<q-chip 
-			v-for="(reminder, key) in entity.reminders" 
-			clickable
-			:key="key" 
-			square 
-			size="12px"
-			:icon="reminder.icon"
-			class=""
-			:class="'bg-'+reminder.color"
-			@click="setSlide({
-				show: true, 
-				type: 'slides/encounter/reminders/Reminder',
-				data: {
-					key,
-					entity
-			}})" 
-		>
-			<q-avatar v-if="reminder.rounds"><b>{{ reminder.rounds }}</b></q-avatar>
-			<q-item-label>{{ title(reminder) }}</q-item-label>
-		</q-chip>
-		<!-- <div class="col-3" v-for="(reminder, key) in entity.reminders" :key="key">
-			<a 
+		<template v-for="(reminder, key) in entity.reminders">
+			<q-chip 
+				v-if="reminder"
+				clickable
+				:key="key" 
+				square 
+				size="12px"
+				:icon="reminder.icon"
+				class=""
+				:class="'bg-'+reminder.color"
 				@click="setSlide({
 					show: true, 
 					type: 'slides/encounter/reminders/Reminder',
@@ -32,15 +20,16 @@
 						key,
 						entity
 				}})" 
-				class="truncate d-block" :class="'bg-'+reminder.color"
 			>
-				{{ title(reminder) }}
-				<span class="counter" v-if="reminder.rounds">{{ reminder.rounds }}</span>
-				<q-tooltip anchor="top middle" self="center middle">
-					Show {{ title(reminder) }}
-				</q-tooltip>
-			</a>
-		</div> -->
+				<q-avatar v-if="reminder.rounds">
+					<b>{{ reminder.rounds }}</b>
+					<q-tooltip anchor="top middle" self="center middle">
+						Ends in {{ reminder.rounds }} rounds
+					</q-tooltip>
+				</q-avatar>
+				<q-item-label>{{ title(reminder) }}</q-item-label>
+			</q-chip>
+		</template>
 	</div>
 </template>
 

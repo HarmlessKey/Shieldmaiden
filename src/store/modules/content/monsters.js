@@ -44,7 +44,7 @@ const actions = {
     // SRD Monsters
     if(isNaN(id)) {
       monster = Object.values(cached).filter(item => {
-        return item.name && item.name.replace(/ /g, "-").toLowerCase() === id;
+        return item.url === id;
       })[0];
     } else {
       monster = cached[id];
@@ -57,7 +57,7 @@ const actions = {
         monster = await services.getMonster(id);
         commit("SET_CACHED_MONSTER", monster);
       } catch(error) {
-        console.error(error);
+        throw error;
       }
     }
     return monster;

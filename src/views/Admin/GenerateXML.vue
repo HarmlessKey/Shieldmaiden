@@ -94,7 +94,6 @@
 				});
 
 				//ITEMS
-				//MONSTERS
 				const items = await this.get_api_items({
 					pageNumber: 1,
 					pageSize: 0,

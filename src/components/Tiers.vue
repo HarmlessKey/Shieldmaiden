@@ -40,7 +40,6 @@
 				</div>
 			</hk-card>
 		</hk-card-deck>
-		<div v-else class="loader"><span>Loading Tiers...</span></div>
 	</div>
 </template>
 

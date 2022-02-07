@@ -391,11 +391,13 @@
 
 		<!-- REMINDERS -->
 		<ul v-if="entity.reminders && showReminders" class="target-reminders">
-			<li v-for="(reminder, index) in entity.reminders" :key="index" :class="'bg-'+reminder.color">
-				<q-tooltip anchor="top middle" self="center middle">
-					{{ reminder.title }}
-				</q-tooltip>
-			</li>
+			<template v-for="(reminder, index) in entity.reminders">
+				<li v-if="reminder" :key="index" :class="'bg-'+reminder.color">
+					<q-tooltip anchor="top middle" self="center middle">
+						{{ reminder.title }}
+					</q-tooltip>
+				</li>
+			</template>
 		</ul>
 	</div>
 </template>

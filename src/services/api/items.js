@@ -36,9 +36,7 @@ export class itemServices {
   }
 
   async getItem(id) {
-    console.log(`Item ${id} fetched from DB`)
     return this.HK.get(`${ITEMS_REF}/${id}`).then((response) => {
-			console.log(response.data)
       return response.data;
     }).catch((error) => {
       throw error;

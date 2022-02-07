@@ -194,9 +194,74 @@ export class encounterServices {
     try {
       const path = `${uid}/${campaignId}/${encounterId}/entities/${entityId}`;
       ENCOUNTERS_REF.child(path).remove();
-
     } catch(err) {
       throw err;
+    }
+  }
+
+  // Adds a reminder to an entity in the encounter
+  async addReminder(uid, campaignId, encounterId, key, reminder) {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/entities/${key}/reminders`;
+      const newReminder = await ENCOUNTERS_REF.child(path).push(reminder);
+      
+      return newReminder.key;
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Adds an item to the loot of the encounter
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {String} encounterId Encounter ID
+   * @param {object} item
+   */
+  async addLoot(uid, campaignId, encounterId, item) {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/loot`;
+      const newItem = await ENCOUNTERS_REF.child(path).push(item);
+      return newItem.key;
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Edits an existing item to the loot of the encounter
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {String} encounterId Encounter ID
+   * @param {string} id Item ID
+   * @param {object} item
+   */
+   async editLoot(uid, campaignId, encounterId, id, item) {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/loot/${id}`;
+      await ENCOUNTERS_REF.child(path).set(item);
+      return;
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Edits an existing item to the loot of the encounter
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {String} encounterId Encounter ID
+   * @param {string} id Item ID
+   */
+   async deleteLoot(uid, campaignId, encounterId, id) {
+    try {
+      const path = `${uid}/${campaignId}/${encounterId}/loot/${id}`;
+      await ENCOUNTERS_REF.child(path).remove();
+    } catch(error) {
+      throw error;
     }
   }
 

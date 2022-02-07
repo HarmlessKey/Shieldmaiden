@@ -1,83 +1,83 @@
 <template>
-	<tag :is="cardView ? 'hk-card' : 'div'">
-		<div slot="header" :class="{ 'card-header': cardView }">
-			<h1>{{ item.name }}</h1>
+	<div v-if="!loading">
+		<h3 class="d-flex justify-content-between">
+			{{ item.name }}
+		</h3>
+
+		<i class="mb-3 d-block">
+			{{ item.type }}, 
+			<span :class="{ 
+				'white': item.rarity == 'common',
+				'green': item.rarity == 'uncommon',
+				'blue': item.rarity == 'rare',
+				'purple': item.rarity == 'very rare',
+				'orange': item.rarity == 'legendary',
+				'red-light': item.rarity == 'artifact',
+				}"
+			>
+				{{ item.rarity }}
+			</span>
+			<template v-if="item.requires_attunement"> ( {{ item.requires_attunement }} )</template>
+		</i>
+
+		<div style="white-space: pre-line">{{ item.desc }}</div>
+		
+		<div class="mt-3" v-for="(table, index) in item.tables" :key="index">
+			<h6 v-if="table.name">{{ table.name }}</h6>
+			<table class="table">
+				<thead>
+					<th v-for="head in table.header" :key="head">{{ head }}</th>
+				</thead>
+				<tbody>
+					<tr v-for="(row, i) in table.rows" :key="i">
+						<td v-for="(col, i) in table.rows[i].columns" :key="i">
+							{{ col }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-		<div :class="{ 'card-body': cardView }">
-			<ViewItem :data="item" />
-		</div>
-	</tag>
+	</div>
+	<hk-loader v-else name="item" />
 </template>
 
 <script>
-	import { db } from '@/firebase'
-	import ViewItem from '@/components/ViewItem.vue';
+	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Item',
-		components: {
-			ViewItem
-		},
-		metaInfo() {
-			return {
-				title: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`,
-				meta: [
-					{ 
-						vmid: "description", 
-						name: "description", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.description}`
-					},
-					{
-						vmid: "og-title",
-						property: "og:title", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.description}`
-					},
-					{ 
-						vmid: "og-description", 
-						property: "og:description",
-						name: "description", 
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.description}`
-					},
-					{ 
-						vmid: "twitter-title",
-						name: "twitter:title", 
-						content: `${this.item.name ? this.item.name.capitalizeEach() : "Item"} D&D 5e`
-					},
-					{ 
-						vmid: "twitter-description", 
-						name: "twitter:description",
-						content: `D&D 5th Edition item: ${ this.item.name ? this.item.name.capitalizeEach() : "Item" }. ${this.description}`
-					},
-				],
-			}
-		},
+		name: "Item",
 		props: {
-			id: {
-				type: String,
-				required: true
+			// If the item is fetched in a parent component you can send the full item object in de data prop
+			data: {
+				type: Object
 			},
-			cardView: {
-				type: Boolean,
-				default: false
+			// If the id prop is passed, the item is fetched in the Monster component
+			id: {
+				type: String
 			}
 		},
-		computed: {
-			description() {
-				return (this.item && this.item.desc) ? `${this.item.desc.substring(0, 110).trim()}...` : "";
-			}
-		},
-		firebase() {
+		data() {
 			return {
-				item: {
-					source: db.ref(`items/${this.id}`),
-					asObject: true,
-					readyCallback: () => this.$emit('name', this.item.name)
-				}
+				item: {},
+				loading: true
 			}
+		},
+		async beforeMount() {
+			if(this.data) {
+				this.item = this.data;
+				this.loading = false;
+			} else {
+				this.item = await this.get_api_item(this.id);
+				this.loading = false;
+			}			
+		},
+		methods: {
+			...mapActions("api_items", ["get_api_item"]),
 		}
-	}
+	};
 </script>
 
 <style lang="scss" scoped>
+
 
 </style>

@@ -176,6 +176,19 @@ const actions = {
       }
     }
     // REMOVE NON EXISTING ITEM LINKS FROM LOOT
+    if(encounter.loot) {
+      for(const [loot_id, loot] of Object.entries(encounter.loot)) {
+        if(loot.linked_item && loot.linked_item.custom) {
+          const item = await dispatch("items/get_item", { uid, id: loot.linked_item.key }, { root: true });
+
+          // If the item doesn't exist, remove the item link
+          if(!item) {
+            await dispatch("delete_encounter_item_link", { campaignId, encounterId: id, parent_item: loot_id });
+            delete loot.linked_item;
+          }
+        }
+      }
+    }
 
     commit("SET_CACHED_ENCOUNTER", { uid, campaignId, encounterId: id, encounter });
     return encounter;
@@ -288,6 +301,180 @@ const actions = {
     }
   },
 
+   /**
+   * Set entity prop
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} property
+   * @param {any} value
+   */
+    async set_entity_prop({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, property, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}`, { [property]: value });
+          commit("SET_ENTITY_PROP", { uid, campaignId, encounterId, entityId, property, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+    /**
+   * Set entity prop
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} type
+   * @param {number} value
+   */
+     async set_entity_meters({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, type, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/meters`, { [type]: value });
+          commit("SET_ENTITY_METERS", { uid, campaignId, encounterId, entityId, type, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+  /**
+   * Set transformed prop
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} property
+   * @param {any} value
+   */
+    async set_transformed_prop({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, property, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/transformed`, { [property]: value });
+          commit("SET_TRANSFORMED_PROP", { uid, campaignId, encounterId, entityId, property, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+    /**
+   * Set condition on an entity
+   * 
+   * @param {string} campaignId
+   * @param {string} encounterId
+   * @param {string} entityId
+   * @param {string} condition
+   * @param {number|boolean} value
+   */
+     async set_entity_condition({ rootGetters, commit, dispatch }, { campaignId, encounterId, entityId, condition, value }) {
+      const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+      if(uid) {
+        const services = await dispatch("get_encounter_services");
+        try {
+          await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entityId}/conditions`, { [condition]: value });
+          commit("SET_ENTITY_CONDITION", { uid, campaignId, encounterId, entityId, condition, value });
+          return;
+        } catch(error) {
+          throw error;
+        }
+      }
+    },
+
+  /**
+	 * Updates abilities with limited uses
+	 * 
+	 * @param {string} key Entity Key
+	 * @param {integer} index index of the action or level of the spell slot used
+	 * @param {string} category special_abilities, actions, legendary_actions, innate_spell, spell
+	 * @param {number} value 
+	 */
+  async update_limited_uses({ rootGetters, dispatch, commit }, { campaignId, encounterId, key, category, index, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${key}/limited_uses/${category}`, { [index]: value });
+        commit("UPDATE_LIMITED_USES", { uid, campaignId, encounterId, key, category, index, value });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Adds a reminder to an entity
+	 * 
+	 * @param {string} key Entity key
+	 * @param {object} reminder full reminder object, or integer with rounds
+	 */
+  async add_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, key, reminder }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const reminder_key = await services.addReminder(uid, campaignId, encounterId, key, reminder);
+        commit("SET_REMINDER", { uid, campaignId, encounterId, entity: key, key: reminder_key, reminder });
+        return reminder_key;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Updates reminders on an entity
+	 * 
+	 * @param {string} entity Entity key
+	 * @param {string} key Reminder key
+	 * @param {string} property
+	 * @param {any} value
+	 */
+   async update_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, entity, key, property, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entity}/reminders/${key}`, { [property]: value });
+        commit("UPDATE_REMINDER", { uid, campaignId, encounterId, entity, key, property, value });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+	 * Sets reminders on an entity
+	 * 
+	 * @param {string} entity Entity key
+	 * @param {string} key Reminder key
+	 * @param {object} reminder full reminder object, or integer with rounds
+	 */
+   async set_reminder({ rootGetters, dispatch, commit }, { campaignId, encounterId, entity, key, reminder }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/entities/${entity}/reminders`, { [key]: reminder });
+        commit("SET_REMINDER", { uid, campaignId, encounterId, entity, key, reminder });
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   /**
    * Deletes an entity from an encounter
    * 
@@ -334,7 +521,7 @@ const actions = {
       }
     }
   },
-  
+
   /**
    * Finish or unfinish an encounter
    * 
@@ -416,6 +603,7 @@ const actions = {
    * 
    * @param {string} campaignId
    * @param {string} encounterId
+   * @param {string} type calculated | overwrite
    * @param {object} value
    */
    async set_xp({ rootGetters, commit, dispatch }, { campaignId, encounterId, type, value }) {
@@ -454,6 +642,77 @@ const actions = {
       }
     }
   },
+
+  async add_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        const id = await services.addLoot(uid, campaignId, encounterId, item);
+        commit("SET_LOOT", { uid, campaignId, encounterId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async update_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, id, item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.editLoot(uid, campaignId, encounterId, id, item);
+        commit("SET_LOOT", { uid, campaignId, encounterId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async delete_encounter_loot({ rootGetters, commit, dispatch }, {campaignId, encounterId, id}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.addLoot(uid, campaignId, encounterId, id);
+        commit("DELETE_LOOT", { uid, campaignId, encounterId, id });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async add_encounter_item_link({ rootGetters, commit, dispatch }, {campaignId, encounterId, parent_item, item }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/loot/${parent_item}`, { linked_item: item });
+        commit("ADD_ITEM_LINK", { uid, campaignId, encounterId, parent_item, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  async delete_encounter_item_link({ rootGetters, commit, dispatch }, {campaignId, encounterId, parent_item}) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_encounter_services");
+      try {
+        await services.updateEncounter(uid, campaignId, encounterId, `/loot/${parent_item}`, { linked_item: null });
+        commit("REMOVE_ITEM_LINK", { uid, campaignId, encounterId, parent_item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
   
   /**
    * Deletes an existing encounter
@@ -574,9 +833,7 @@ const mutations = {
       Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities, entityId);
     }
   },
-  // eslint-disable-next-line no-unused-vars
   UPDATE_ENTITY_COUNT(state, { campaignId, encounterId, count }) {
-    // UPDATE ENCOUNTER OBJECT
     if (campaignId in state.encounters && encounterId in state.encounters[campaignId]) {
       Vue.set(state.encounters[campaignId][encounterId], "entity_count", count);
     }
@@ -605,12 +862,93 @@ const mutations = {
   EDIT_ENTITY(state, { uid, campaignId, encounterId, entityId, entity}) { 
     Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities, entityId, entity);
   },
+  SET_ENTITY_PROP(state, { uid, campaignId, encounterId, entityId, property, value}) { 
+    if(value === null) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], property, value);
+    }
+  },
+  SET_TRANSFORMED_PROP(state, { uid, campaignId, encounterId, entityId, property, value}) {
+    if(value === null) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transoformed, property);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].transformed, property, value);
+    }
+  },
+  SET_ENTITY_METERS(state, { uid, campaignId, encounterId, entityId, type, value}) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].meters, type, value);
+  },
+  SET_ENTITY_CONDITION(state, { uid, campaignId, encounterId, entityId, condition, value}) { 
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions) {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId].conditions, condition, value);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entityId], "conditions", { [condition]: value });
+    }
+  },
   SET_XP_VALUE(state, { uid, campaignId, encounterId, type, value}) {
     if(state.cached_encounters[uid][campaignId][encounterId].xp) {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId].xp, type, value);
     } else {
       Vue.set(state.cached_encounters[uid][campaignId][encounterId], "xp", { [type]: value });
     }
+  },
+  UPDATE_LIMITED_USES(state, { uid, campaignId, encounterId, key, category, index, value }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses) {
+      if(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category]) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses[category], index, value);
+      } else {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[key].limited_uses, category, { [index]: value });
+      }
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId], "limited_uses", {[category]: { [index]: value }});
+    }
+  },
+  SET_REMINDER(state, { uid, campaignId, encounterId, entity, key, reminder }) {
+    if(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders, key, reminder);
+    } else {
+      Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity], "reminders", { [key]: reminder });
+    }
+  },
+  SET_LOOT(state, { uid, campaignId, encounterId, id, item }) {
+    if(
+      state.cached_encounters[uid] && 
+      state.cached_encounters[campaignId] && 
+      state.cached_encounters[campaignId][encounterId]
+    ) {
+      if(state.cached_encounters[uid][campaignId][encounterId].loot) {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot, id, item);
+      } else {
+        Vue.set(state.cached_encounters[uid][campaignId][encounterId], "loot", { [id]: item });
+      }
+    }
+  },
+  ADD_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item, item }) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item", item);
+  },
+  REMOVE_ITEM_LINK(state, { uid, campaignId, encounterId, parent_item }) {
+    if(
+      state.cached_encounters[uid] && 
+      state.cached_encounters[uid][campaignId] && 
+      state.cached_encounters[uid][campaignId][encounterId] &&
+      state.cached_encounters[uid][campaignId][encounterId].loot &&
+      state.cached_encounters[uid][campaignId][encounterId].loot[parent_item]
+    ) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot[parent_item], "linked_item");
+    }
+  },
+  DELETE_LOOT(state, { uid, campaignId, encounterId, id }) {
+    if(state.cached_encounters[uid] && 
+      state.cached_encounters[campaignId] && 
+      state.cached_encounters[campaignId][encounterId] && 
+      state.cached_encounters[campaignId][encounterId].loot
+    ) {
+      Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot, id);
+    }
+  },
+  UPDATE_REMINDER(state, { uid, campaignId, encounterId, entity, key, property, value }) {
+    Vue.set(state.cached_encounters[uid][campaignId][encounterId].entities[entity].reminders[key], property, value);
   },
   SET_ENCOUNTER_PROP(state, { uid, campaignId, encounterId, property, value, update_search}) {
     if(update_search && state.encounters[campaignId] && state.encounters[campaignId][encounterId]) {

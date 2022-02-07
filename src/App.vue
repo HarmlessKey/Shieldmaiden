@@ -86,7 +86,6 @@
 	import HkRolls from './components/hk-components/hk-rolls';
 	import { general } from './mixins/general';
 
-
 	export default {
 	name: "App",
 	mixins: [general],

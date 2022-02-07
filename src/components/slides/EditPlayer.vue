@@ -335,7 +335,7 @@
 			await this.get_player({ uid: this.userId, id: this.entityKey }).then(result => {
 				this.playerBase = result;
 				if(this.isXpAdvancement() && this.playerBase.experience === undefined) {
-					this.set_player_xp({ uid: this.userId, id: this.entityKey, value: 0 });
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: 0 });
 				}
 			});
 
@@ -366,13 +366,13 @@
 				'setSlide',
 				'edit_player',
 			]),
-			...mapActions("players", ["get_player", "edit_player", "set_player_xp"]),
+			...mapActions("players", ["get_player", "edit_player", "set_player_prop"]),
 			...mapActions("campaigns", [
 				"get_campaign", 
-				"stabilize_player", 
-				"kill_player", 
-				"revive_player", 
-				"update_campaign_player",
+				"stabilize_entity", 
+				"kill_entity", 
+				"revive_entity", 
+				"update_campaign_entity",
 				"edit_campaign_player",
 				"set_share",
 				"set_death_save"
@@ -397,7 +397,7 @@
 						if(this.$route.name === 'RunEncounter') share.encounter_id = this.encounterId;
 						this.set_share({ id: this.broadcast.live, share });
 					}
-					this.set_player_xp({ uid: this.userId, id: this.entityKey, value: newXp });
+					this.set_player_prop({ uid: this.userId, id: this.entityKey, property: "experience", value: newXp });
 					this.xp = undefined;
 				}
 			},
@@ -405,10 +405,11 @@
 				return this.advancement !== 'milestone';
 			},
 			set_save(value, index) {
-				// index = (!value) ? index : parseInt(index + 1);
+				index = (value) ? index + 1 : index;
 				this.set_death_save({
 					campaignId: this.campaignId,
-					playerId: this.entityKey,
+					type: "players",
+					id: this.entityKey,
 					index,
 					value
 				});
@@ -417,22 +418,39 @@
 				this.setTransform = false;
 			},
 			removeTransform() {
-				this.update_campaign_player({ 
+				this.update_campaign_entity({ 
 					uid: this.userId, 
 					campaignId: this.campaignId, 
-					playerId: this.entityKey,
+					type: "players",
+					id: this.entityKey,
 					property: "transformed",
 					value: null
 				});
 			},
 			stabilize() {
-				this.stabilize_player({ uid: this.userId, campaignId: this.campaignId, playerId: this.entityKey });
+				this.stabilize_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey
+				});
 			},
 			kill() {
-				this.kill_player({ uid: this.userId, campaignId: this.campaignId, playerId: this.entityKey });
+				this.kill_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey
+				});
 			},
 			revive() {
-				this.revive_player({ uid: this.userId, campaignId: this.campaignId, playerId: this.entityKey, curHp: 1 });
+				this.revive_entity({ 
+					uid: this.userId, 
+					campaignId: this.campaignId, 
+					type: "players",
+					id: this.entityKey, 
+					curHp: 1
+				});
 			},
 			edit() {
 				if(this.location === 'encounter') {
@@ -511,7 +529,13 @@
 
 				//If the new curHp > 0, revive a player and set the new curHp 
 				if(this.entity.curHp > 0) {
-					this.revive_player({ uid: this.userId, campaignId: this.campaignId, playerId: this.entityKey, curHp: this.entity.curHp });
+					this.revive_entity({ 
+						uid: this.userId, 
+						campaignId: this.campaignId, 
+						type: "players",
+						id: this.entityKey, 
+						curHp: this.entity.curHp
+					});
 				}
 
 				this.setSlide(false);

@@ -151,6 +151,24 @@ export class campaignServices {
   }
 
   /**
+   * Adds an item to the inventory of a campaign
+   * 
+   * @param {String} uid User ID
+   * @param {String} campaignId Campaing ID
+   * @param {String} encounterId Encounter ID
+   * @param {object} item
+   */
+   async addItem(uid, campaignId, item) {
+    try {
+      const path = `${uid}/${campaignId}/inventory/items`;
+      const newItem = await CAMPAIGNS_REF.child(path).push(item);
+      return newItem.key;
+    } catch(error) {
+      throw error;
+    }
+  }
+
+  /**
    * Update campaign_count in the search table of search_campaigns
    * 
    * @param {String} uid User ID

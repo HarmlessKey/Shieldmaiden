@@ -34,8 +34,8 @@
 		</h3>
 		<hr>
 		<q-list v-if="items" :dark="$store.getters.theme === 'dark'" class="accordion">
-			<ValidationObserver v-for="(item, index) in items" :key="item['.key']" v-slot="{ handleSubmit, validate, valid }">
-				<q-form @submit="valid ? handleSubmit(saveItem(item, item['.key'])) : validate()" greedy>
+			<ValidationObserver v-for="(item, key) in items" :key="key" v-slot="{ handleSubmit, validate, valid }">
+				<q-form @submit="valid ? handleSubmit(saveItem(item, key)) : validate()" greedy>
 					<q-expansion-item
 						:dark="$store.getters.theme === 'dark'" switch-toggle-side
 						group="items"
@@ -43,17 +43,17 @@
 					>	
 						<template v-slot:header>
 							<q-item-section>
-								{{ index + 1 }}. {{ item.public_name }}
+								{{ item.public_name }}
 							</q-item-section>
 							<q-item-section avatar>
 								<span>
-									<a  @click="setEdit(item['.key'])" class="btn btn-sm bg-neutral-5 mr-1">
+									<a  @click="setEdit(key)" class="btn btn-sm bg-neutral-5 mr-1">
 										<i class="fas fa-pencil"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Edit
 										</q-tooltip>
 									</a>
-									<a @click="removeItem(item['.key'])" class="btn btn-sm bg-neutral-5">
+									<a @click="removeItem(key)" class="btn btn-sm bg-neutral-5">
 										<i class="fas fa-trash-alt"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Remove
@@ -72,7 +72,6 @@
 									id="name"
 									type="text" 
 									v-model="item.public_name" 
-									name="name" 
 									:error="invalid && validated"
 									:error-message="errors[0]"
 								>
@@ -80,8 +79,8 @@
 										slot="append" 
 										header="Public name" 
 										content="The public name is visible for players after you have awarded the item. You decide when you also want to share the information of the linked item."
-										>
-											<q-icon name="info" @click.stop class="pointer" />
+									>
+										<q-icon name="info" @click.stop class="pointer" />
 									</hk-popover>
 								</q-input>
 							</ValidationProvider>
@@ -101,26 +100,21 @@
 									:error-message="errors[0]"
 								/>
 							</ValidationProvider>
-							<p>
+							<div>
 								<a 
 									v-if="!item.linked_item"
 									class="btn btn-clear"
 									@click="setSlide({
 										show: true,
 										type: 'slides/editEncounter/LinkItem',
-										data: {
-											item: item
-										}
+										data: { item, key }
 									})"
 								>
 									<i class="far fa-link"></i> Link item
 								</a>
 								<template v-else>
-									<a class="btn btn-clear" @click="setSlide({show: true, type: 'ViewItem', data: item.full_linked_item })">
-										<i class="far fa-link mr-1"></i>
-										{{ item.full_linked_item.name }}
-									</a>
-									<a class="btn btn-clear mx-1" @click="unlink(item['.key'])">
+									<LinkedItem :linked-item="item.linked_item" />
+									<a class="btn btn-clear mx-1" @click="unlink(key)">
 										<i class="fas fa-unlink red"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Unlink
@@ -131,10 +125,10 @@
 									header="Linked item" 
 									content="The description of the linked item is not immideately shown when the item has been awarded. You can manualy set this to be visible for your players, once they are allowed to see it."
 								>
-									<q-icon name="info" class="blue pointer" />
+									<q-icon name="info" class="ml-1 pointer" size="sm" />
 								</hk-popover>
-							</p>
-							<div class="d-flex items-center">
+							</div>
+							<div class="d-flex items-center mt-4">
 								<q-btn no-caps color="primary" type="submit">Save</q-btn>
 								<q-icon v-if="!valid" name="error" color="red" size="md" class="ml-2">
 									<q-tooltip anchor="top middle" self="center middle">
@@ -151,12 +145,15 @@
 </template>
 
 <script>
-	import { db } from '@/firebase';
-	import { mapActions } from 'vuex';
-	import { currencyMixin } from '@/mixins/currency.js';
+	import { mapActions } from "vuex";
+	import { currencyMixin } from "@/mixins/currency.js";
+	import LinkedItem from "./LinkedItem";
 
 	export default {
-		name: 'Loot',
+		name: "Loot",
+		components: {
+			LinkedItem
+		},
 		props: {
 			encounter: {
 				type: Object,
@@ -174,88 +171,80 @@
 				encounterId: this.$route.params.encid,
 				user: this.$store.getters.user,
 				slide: this.$store.getters.getSlide,
-				items: {},
-				editItem: undefined
+				editItem: undefined,
+				currency: this.encounter.currency || {},
+				items: this.encounter.loot || {},
+				linked_items: {}
 			} 
 		},
-		firebase() {
-			return {
-				currency: {
-					source: db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/currency`),
-					asObject: true
-				}
-			}
-		},
-		mounted() {
-			const items = db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`);
-
-			items.on('value', async (snapshot) => {
-				let items = snapshot.val()
-
-				for(let key in items) {
-					let item = items[key];
-					items[key].full_linked_item = {};
-					items[key]['.key'] = key;
-
-					//Get Linked item
-					const linkedItem = db.ref(`items/${item.linked_item}`)
-					await linkedItem.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							items[key].full_linked_item = snapshot.val();
-						}
-					});
-					//Get Linked item
-					const linkedCustomItem = db.ref(`custom_items/${this.user.uid}/${item.linked_item}`)
-					await linkedCustomItem.on('value', (snapshot) => {
-						if(snapshot.val()) {
-							items[key].full_linked_item = snapshot.val();
-						}
-					});
-				}
-				if (items !== null) {
-					this.items = Object.values(items);
-				} else {
-					this.items = [];
-				}
-				this.loading = false;
-			});
-		},
 		methods: {
-			...mapActions([
-				'setSlide'
-			]),
-			setCurrency() {
-				delete this.currency['.key'];
-				delete this.currency['.value'];
-
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/currency`).set(
-					this.currency
-				);
+			...mapActions(["setSlide"]),
+			...mapActions(
+				"encounters", [
+					"update_encounter_prop", 
+					"add_encounter_loot",
+					"update_encounter_loot",
+					"delete_encounter_loot",
+					"delete_encounter_item_link"
+				]),
+			...mapActions("items", ["get_item"]),
+			...mapActions("api_items", ["get_api_item"]),
+			async setCurrency() {
+				await this.update_encounter_prop({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					property: "currency",
+					value: this.currency
+				});
 				this.$snotify.success('Currency was successfully saved.', 'Currency saved!', {
 					position: "rightTop"
 				});
+			},
+			async getItem(id, custom) {
+				let item;
+				if(custom) {
+					item = await this.get_item({ uid: this.user.uid, id });
+				} else {
+					item = await this.get_api_item(id);
+				}
+				return item;
 			},
 			setEdit(key) {
 				this.editItem = (this.editItem === key) ? undefined : key;
 			},
 			saveItem(item, key) {
-				item = JSON.parse(JSON.stringify(item));
 				delete item['.key'];
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}`).set(item);
+
+				this.update_encounter_loot({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					id: key,
+					item
+				});
 				this.$snotify.success('Your item was successfully saved.', 'Item saved!', {
 					position: "rightTop"
 				});
 			},
 			addItem() {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot`).push({
-					public_name: 'New Item'
+				this.add_encounter_loot({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					item: { public_name: "New item" }
 				});
 			},
-			removeItem(key) {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}`).remove();
+			async removeItem(id) {
+				await this.delete_encounter_loot({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					id
+				});
 			},
-			unlink(key) {
-				db.ref(`encounters/${this.user.uid}/${this.campaignId}/${this.encounterId}/loot/${key}/linked_item`).remove();
+			async unlink(parent_item) {
+				await this.delete_encounter_item_link({
+					campaignId: this.campaignId,
+					encounterId: this.encounterId,
+					parent_item
+				});
 			}
 		}
 	}

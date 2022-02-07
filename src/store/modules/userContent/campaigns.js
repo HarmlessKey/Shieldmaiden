@@ -124,24 +124,74 @@ const actions = {
       );
     }
 
+    // Create a list with all companion ids
+    let player_companions = [];
+
     // Remove ghost players
     if(campaign.players) {
       for(const [playerId, campaign_player] of Object.entries(campaign.players)) {
         const player = await dispatch("players/get_player", { uid, id: playerId}, { root: true });
+
+        // Save companions in list
+        if(player.companions) {
+          player_companions = player_companions.concat(Object.keys(player.companions));
+        }
+
         if(!player) {
           await dispatch("delete_player", { id, player: { "key": playerId }});
           console.warn(`Ghost player ${playerId} deleted`);
         } else {
           // If the player has no curHp, set it
-          if(!campaign_player.curHp) {
+          if(campaign_player.curHp === undefined) {
             await dispatch(
-              "update_campaign_player",
-              { uid, campaignId: id, playerId, property: "curHp", value: player.maxHp } 
+              "update_campaign_entity",
+              { uid, campaignId: id, type: "players", id: playerId, property: "curHp", value: player.maxHp } 
             );
           }
         }
       }
     }
+
+    // Remove ghost companions
+    if(campaign.companions) {
+      for(const [companionId, campaign_companion] of Object.entries(campaign.companions)) {
+        const companion = await dispatch("npcs/get_npc", { uid, id: companionId }, { root: true });
+        
+        // Delete companion if:
+        // - the NPC doesn't exit
+        // - there are no players with companions in this campaign
+        // - there is no player with this NPC as companion in the campaign
+        if(!companion || !player_companions.length || !player_companions.includes(companionId)) {
+          await dispatch("delete_companion", { id, companionId });
+          console.warn(`Ghost companion ${companionId} deleted`);
+        } else {
+          // If the companion has no curHp, set it
+          if(campaign_companion.curHp === undefined) {
+            await dispatch(
+              "update_campaign_entity",
+              { uid, campaignId: id, type: "companions", id: companionId, property: "curHp", value: companion.hit_points } 
+            );
+          }
+        }
+      }
+    }
+
+    // Remove ghost items
+    if(campaign.inventory && campaign.inventory.items) {
+      for(const [item_id, item] of Object.entries(campaign.inventory.items)) {
+        if(item.linked_item && item.linked_item.custom) {
+          const linked_item = await dispatch("items/get_item", { uid, id: item.linked_item.key }, { root: true });
+
+          // If the item doesn't exist, remove the item link
+          if(!linked_item) {
+            await services.updateCampaign(uid, id, `/inventory/items/${item_id}`, { linked_item: null });
+            delete item.linked_item;
+            console.warn(`Ghost item link deleted from ${item.public_name}`);
+          }
+        }
+      }
+    }
+
     return campaign;
   },
 
@@ -227,7 +277,7 @@ const actions = {
 
   /**
    * Deletes a campaign
-   * - Deletes all encounter for this campaign
+   * - Deletes all encounters for this campaign
    * 
    * @param {object} id 
    */
@@ -250,7 +300,7 @@ const actions = {
         dispatch("checkEncumbrance", "", { root: true });
 
         for (const playerId in campaign.players) {
-          dispatch("players/set_campaign_id", { uid, playerId, value: null }, { root: true });
+          dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: null }, { root: true });
         }
         return;
       } catch(error) {
@@ -277,11 +327,11 @@ const actions = {
         // If the campaign has experience advancement
         // make sure the player has experience points set
         if(campaign.advancement === "experience" && player.experience === undefined) {
-          await dispatch("players/set_player_xp", {uid, id: playerId, value: 0 }, { root: true });
+          await dispatch("players/set_player_prop", {uid, id: playerId, property: "experience", value: 0 }, { root: true });
         }
 
         // Set the campaign_id on the player
-        await dispatch("players/set_campaign_id", { uid, playerId, value: campaign.key }, { root: true })
+        await dispatch("players/set_player_prop", { uid, id: playerId, property: "campaign_id", value: campaign.key }, { root: true })
 
         // Add companions
         if(player.companions) {
@@ -350,8 +400,8 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_campaign_services");
       try {
-        await services.addPlayer(uid, id, playerId, player);
-        commit("ADD_PLAYER", { uid, id, playerId, player });
+        await services.editPlayer(uid, id, playerId, player);
+        commit("SET_PLAYER", { uid, id, playerId, player });
         return;
       } catch(error) {
         throw error;
@@ -360,23 +410,50 @@ const actions = {
   },
 
   /**
-   * Updates a single property for a player
+   * Updates a single property for a player or compantion
    * 
    * @param {string} uid
    * @param {string} campaignId 
-   * @param {string} playerId 
+   * @param {string} type Entity type players/companions
+   * @param {string} id entityId
    * @param {string} property 
    * @param {string|number|boolean} value 
    */
-   async update_campaign_player({ commit, dispatch }, { uid, campaignId, playerId, property, value }) {
+   async update_campaign_entity({ commit, dispatch }, { uid, campaignId, type, id, property, value }) {
     if(uid) {
       const services = await dispatch("get_campaign_services");
-      const path = `/players/${playerId}`;
+      const path = `/${type}/${id}`;
       try {
         await services.updateCampaign(
           uid, campaignId, path, { [property]: value }
         );
-        commit("UPDATE_CAMPAIGN_PLAYER", { uid, campaignId, playerId, property, value });
+        commit("UPDATE_CAMPAIGN_ENTITY", { uid, campaignId, type, id, property, value });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Updates a transformed player or companion
+   * 
+   * @param {string} uid
+   * @param {string} campaignId 
+   * @param {string} type Entity type players/companions
+   * @param {string} id entityId
+   * @param {string} property 
+   * @param {number} value 
+   */
+   async update_transformed_entity({ commit, dispatch }, { uid, campaignId, type, id, property, value }) {
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      const path = `/${type}/${id}/transformed`;
+      try {
+        await services.updateCampaign(
+          uid, campaignId, path, { [property]: value }
+        );
+        commit("UPDATE_TRANSFORMED_ENTITY", { uid, campaignId, type, id, property, value });
         return;
       } catch(error) {
         throw error;
@@ -447,7 +524,7 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {     
         // Delete campaign_id
-        await dispatch("players/set_campaign_id", { uid, playerId: player.key, value: null }, { root: true })
+        await dispatch("players/set_player_prop", { uid, id: player.key, property: "campaign_id", value: null }, { root: true })
 
         // Delete companions
         if(player.companions) {
@@ -467,16 +544,16 @@ const actions = {
     }
   },
 
-  async set_death_save({ dispatch, commit, rootGetters }, { campaignId, playerId, index, value } ) {
+  async set_death_save({ dispatch, commit, rootGetters }, { campaignId, type, id, index, value } ) {
     const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
     if(uid) {
       const services = await dispatch("get_campaign_services");
-      const path = `/players/${playerId}/saves`;
+      const path = `/${type}/${id}/saves`;
       try {
         await services.updateCampaign(
           uid, campaignId, path, { [index]: value }
         );
-        commit("SET_DEATH_SAVE", { uid, campaignId, playerId, index, value });
+        commit("SET_DEATH_SAVE", { uid, campaignId, type, id, index, value });
         return;
       } catch(error) {
         throw error;
@@ -484,28 +561,29 @@ const actions = {
     }
   },
 
-  async stabilize_player({ dispatch }, { uid, campaignId, playerId } ) {
+  async stabilize_entity({ dispatch }, { uid, campaignId, type, id } ) {
     const update = {
       dead: null,
       saves: null,
       stable: true
     }
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
-  async kill_player({ dispatch }, { uid, campaignId, playerId } ) {
+  async kill_entity({ dispatch }, { uid, campaignId, type, id } ) {
     const update = {
+      saves: null,
       stable: null,
       dead: true
     }
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
-  async revive_player({ dispatch }, { uid, campaignId, playerId, curHp } ) {
+  async revive_entity({ dispatch }, { uid, campaignId, type, id, curHp } ) {
     const update = {
       dead: null,
       saves: null,
@@ -513,7 +591,7 @@ const actions = {
       curHp
     };
     for(const [property, value] of Object.entries(update)) {
-      dispatch("update_campaign_player", { uid, campaignId, playerId, property, value });
+      dispatch("update_campaign_entity", { uid, campaignId, type, id, property, value });
     }
   },
 
@@ -551,6 +629,86 @@ const actions = {
       const services = await dispatch("get_campaign_services");
       try {
         await services.setShare(uid, id, share);
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Sets the currency in the inventory of a campaign
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async set_campaign_currency({ rootGetters, commit,  dispatch }, { campaignId, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, "/inventory", { currency: value });
+        commit("SET_CURRENCY", { uid, campaignId, value })
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Adds an item to a campaign inventory
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async add_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, item }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        const id = await services.addItem(uid, campaignId, item);
+        commit("SET_ITEM", { uid, campaignId, id, item });
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Identifies an item in a campaign, so players can see the linked item.
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async identify_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, id, value }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, `/inventory/items/${id}`, { identified: value });
+        commit("IDENTIFY_ITEM", { uid, campaignId, id, value })
+        return;
+      } catch(error) {
+        throw error;
+      }
+    }
+  },
+
+  /**
+   * Deletes an item from a campaign inventory
+   * 
+   * @param {string} id campaignId
+   * @param {object} share Share object 
+   */
+   async delete_campaign_item({ rootGetters, commit,  dispatch }, { campaignId, id }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+    if(uid) {
+      const services = await dispatch("get_campaign_services");
+      try {
+        await services.updateCampaign(uid, campaignId, `/inventory/items`, { [id]: null });
+        commit("DELETE_ITEM", { uid, campaignId, id })
         return;
       } catch(error) {
         throw error;
@@ -625,24 +783,28 @@ const mutations = {
       Vue.delete(state.cached_campaigns[uid][id].players, playerId); 
     }
   },
-  UPDATE_CAMPAIGN_PLAYER(state, { uid, campaignId, playerId, property, value }) {
+  UPDATE_CAMPAIGN_ENTITY(state, { uid, campaignId, type, id, property, value }) {
     if(value === null) {
-      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId], property);
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id], property);
     } else {
-      Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], property, value);
+      Vue.set(state.cached_campaigns[uid][campaignId][type][id], property, value);
     }
   },
-  SET_DEATH_SAVE(state, { uid, campaignId, playerId, index, value }) {
+  UPDATE_TRANSFORMED_ENTITY(state, { uid, campaignId, type, id, property, value }) {
     if(value === null) {
-      Vue.delete(state.cached_campaigns[uid][campaignId].players[playerId].saves, index);
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id].transformed, property);
     } else {
-      if(state.cached_campaigns[uid][campaignId].players[playerId].saves) {
-        console.log(index)
-        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId].saves, index, value);
+      Vue.set(state.cached_campaigns[uid][campaignId][type][id].transformed, property, value);
+    }
+  },
+  SET_DEATH_SAVE(state, { uid, campaignId, type, id, index, value }) {
+    if(value === null) {
+      Vue.delete(state.cached_campaigns[uid][campaignId][type][id].saves, index);
+    } else {
+      if(state.cached_campaigns[uid][campaignId][type][id].saves) {
+        Vue.set(state.cached_campaigns[uid][campaignId][type][id].saves, index, value);
       } else {
-        // We are using indexes from 1-5 to store death saves.
-        // To have an empty space we ignore in the array we add null at the 0 index
-        Vue.set(state.cached_campaigns[uid][campaignId].players[playerId], "saves", [null, value]);
+        Vue.set(state.cached_campaigns[uid][campaignId][type][id], "saves", { [index]: value });
       }
     }
   },
@@ -659,6 +821,34 @@ const mutations = {
     if(state.cached_campaigns[uid] && state.cached_campaigns[uid][id]) {
       Vue.delete(state.cached_campaigns[uid][id].companions, companionId); 
     }
+  },
+  SET_CURRENCY(state, { uid, campaignId, value}) {
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
+      if(state.cached_campaigns[uid][campaignId].inventory) {
+        Vue.set(state.cached_campaigns[uid][campaignId].inventory, "currency", value);
+      } else {
+        Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { currency: value });
+      }
+    }
+  },
+  SET_ITEM(state, { uid, campaignId, id, item }) {
+    if(state.cached_campaigns[uid] && state.cached_campaigns[uid][campaignId]) {
+      if(state.cached_campaigns[uid][campaignId].inventory) {
+        if(state.cached_campaigns[uid][campaignId].inventory.items) {
+          Vue.set(state.cached_campaigns[uid][campaignId].inventory.items, id, item);
+        } else {
+          Vue.set(state.cached_campaigns[uid][campaignId], "items", { [id]: item });
+        }
+      } else {
+        Vue.set(state.cached_campaigns[uid][campaignId], "inventory", { items: { [id]: item } });
+      }
+    }
+  },
+  IDENTIFY_ITEM(state, { uid, campaignId, id, value }) {
+    Vue.set(state.cached_campaigns[uid][campaignId].inventory.items[id], "identified", value);
+  },
+  DELETE_ITEM(state, { uid, campaignId, id }) {
+    Vue.delete(state.cached_campaigns[uid][campaignId].inventory.items, id);
   },
   CLEAR_STORE(state) {
     Vue.set(state, "active_campaign", undefined);

@@ -4,15 +4,10 @@ const Contribute = () => import('@/views/Contribute');
 const Spells_contrib = () => import('@/views/Contribute/Spells.vue');
 const Spell_contrib = () => import('@/components/contribute/spell');
 const SpellEdit = () => import('@/components/contribute/spell/edit.vue');
-const Monsters_contrib = () => import('@/views/Contribute/Monsters.vue');
-const Monster_contrib = () => import('@/components/contribute/monster');
-const MonsterEdit = () => import('@/components/contribute/monster/edit.vue');
 
 const Sitemap = () => import('@/views/Pages/Sitemap.vue');
 const Privacy = () => import('@/views/Pages/Privacy.vue');
-const AboutUs = () => import('@/views/Pages/AboutUs.vue');
 const Documentation = () => import('@/views/Pages/Documentation.vue');
-const Feedback = () => import('@/views/Pages/Feedback.vue');
 const Updates = () => import('@/views/Pages/Updates.vue');
 const SignIn = () => import('@/views/Pages/SignIn.vue');
 const SignUp = () => import('@/views/Pages/SignUp.vue');
@@ -298,7 +293,7 @@ export const routes = [{
 						component: () => import('@/views/UserContent/Items/Items.vue'),
 						meta: {
 							title: "Items",
-							description: "Your custom reminders Harmless Key."
+							description: "Your custom items Harmless Key."
 						}
 					},
 					{
@@ -395,7 +390,7 @@ export const routes = [{
 				component: { render (c) { return c('router-view') }},
 				meta: {
 					title: "Monsters D&D 5e",
-					description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
+					description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1"
 				},
 				children: [
 					{
@@ -404,16 +399,15 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Monsters'),
 						meta: {
 							title: "Monsters D&D 5e",
-							description: "All monsters from the SRD 5.1. Dungeons & Dragons 5th edition monsters."
+							description: "Dungeons & Dragons 5th edition monsters. All monsters from the SRD 5.1"
 						}
 					},
 					{
 						path: ":id",
 						name: "Monster",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Monster'),
 						meta: {
-							title: "Monster",
-							itle: "Monster D&D 5e",
+							title: "Monster D&D 5e",
 							description: "D&D 5th Edition monster."
 						}
 					}
@@ -432,13 +426,13 @@ export const routes = [{
 						component: () => import('@/views/Compendium/Spells'),
 						meta: {
 							title: "Spells D&D 5e",
-							description: "All spells from the SRD 5.1. Dungeons & Dragons 5th edition spells."
+							description: "Dungeons & Dragons 5th edition spells. All spells from the SRD 5.1"
 						}
 					},
 					{
 						path: ":id",
 						name: "Spell",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Spell'),
 						meta: {
 							title: "Spell"
 						}
@@ -456,11 +450,15 @@ export const routes = [{
 						path: "",
 						name: 'Conditions',
 						component: () => import('@/views/Compendium/Conditions'),
+						meta: {
+							title: "Conditions D&D 5e",
+							description: "Dungeons & Dragons 5th edition spells. All conditions from the SRD 5.1"
+						}
 					},
 					{
 						path: ":id",
 						name: "Condition",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Condition'),
 						meta: {
 							title: "Condition"
 						}
@@ -478,11 +476,15 @@ export const routes = [{
 						path: "",
 						name: "CompendiumItems",
 						component: () => import('@/views/Compendium/Items'),
+						meta: {
+							title: "Items D&D 5e",
+							description: "Dungeons & Dragons 5th edition items. All items from the SRD 5.1"
+						}
 					},
 					{
 						path: ":id",
 						name: "Item",
-						component: () => import('@/views/Compendium/View.vue'),
+						component: () => import('@/views/Compendium/view/Item'),
 						meta: {
 							title: "Item"
 						}
@@ -641,6 +643,23 @@ export const routes = [{
 					}
 				]
 			},
+			{
+				path: "restruct-db",
+				component: { render (c) { return c('router-view') }},
+				meta: {
+					title: "Restructure Database"
+				},
+				children: [
+					{
+						path: "",
+						name: 'Restructure Database',
+						component: () => import('@/views/Admin/RestructDatabase.vue'),
+						meta: {
+							side: false
+						}
+					}
+				]
+			},
 		]
 	},
 
@@ -717,44 +736,6 @@ export const routes = [{
 			requiresAuth: true
 		}
 	},
-	{
-		path: '/contribute/monsters',
-		name: 'Contribute Monsters',
-		component: Monsters_contrib,
-		meta: {
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/monsters/:id',
-		name: 'Contribute Monster',
-		component: Monster_contrib,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
-	{
-		path: '/contribute/monsters/:id/edit',
-		name: 'Edit Monster',
-		component: MonsterEdit,
-		props: (route) => ({
-			id: route.query.id,
-		}),
-		meta: {
-			basePath: '/contribute',
-			baseName: 'Monsters',
-			requiresContribute: true,
-			requiresAuth: true
-		}
-	},
 
 	//STAND ALONE PAGES
 	{
@@ -776,14 +757,23 @@ export const routes = [{
 		}
 	},
 	{
-		path: '/about-us',
-		name: 'About Us',
-		component: AboutUs,
+		path: "/about-us",
+		component: () => import("@/views/View"),
 		meta: {
 			offline: true,
-			title: "About Harmless Key",
-			description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
-		}
+			title: "About us"
+		},
+		children: [
+			{
+				path: "",
+				name: "About us",
+				component: () => import("@/views/Pages/AboutUs"),
+				meta: {
+					title: "About us",
+					description: "Harmless Key is a Combat Tracker for Dungeon and Dragons, created by 2 expierenced D&D players who were missing an initiative tracker that met their needs."
+				}
+			}
+		]
 	},
 	{
 		path: '/documentation',
@@ -796,14 +786,23 @@ export const routes = [{
 		}
 	},
 	{
-		path: '/feedback',
-		name: 'Feedback',
-		component: Feedback,
+		path: "/feedback",
+		component: () => import("@/views/View"),
 		meta: {
 			offline: true,
-			title: "Feedback",
-			description: "Leave feedback for Harmless Key, a Combat Tracker for D&D."
-		}
+			title: "Feedback"
+		},
+		children: [
+			{
+				path: "",
+				name: "Feedback",
+				component: () => import("@/views/Pages/Feedback"),
+				meta: {
+					title: "Feedback",
+					description: "Leave feedback for Harmless Key, a Combat Tracker for D&D."
+				}
+			}
+		]
 	},
 	{
 		path: '/updates',

@@ -15,22 +15,6 @@
 			</div>
 
 			<div class="d-flex justify-content-end">
-				<div class="d-none d-sm-flex">
-					<div 
-						v-for="{name, icon, url} in social_media"
-						class="area d-flex justify-content-end"
-						:key="name"
-					>
-						<a class="icon" :href="url" target="_blank" rel="noopener">
-							<i :class="icon" />
-							<q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 10]">
-								{{ name }}
-							</q-tooltip>
-						</a>
-					</div>
-					<q-separator vertical :dark="$store.getters.theme === 'dark'" inset class="mx-1" />
-				</div>
-
 				<div class="area d-flex justify-content-end">
 					<a class="icon">
 						<i class="fas fa-moon"/>
@@ -128,34 +112,7 @@
 		data() {
 			return {
 				user: auth.currentUser,
-				enviroment: process.env.NODE_ENV,
-				social_media: [
-					{
-						name: "Discord",
-						icon: "fab fa-discord",
-						url: "https://discord.gg/fhmKBM7"
-					},
-					{
-						name: "Reddit",
-						icon: "fab fa-reddit-alien",
-						url: "https://www.reddit.com/r/HarmlessKey"
-					},
-					{
-						name: "Facebook",
-						icon: "fab fa-facebook",
-						url: "https://www.facebook.com/harmlesskey"
-					},
-					{
-						name: "Instagram",
-						icon: "fab fa-instagram",
-						url: "https://www.instagram.com/harmlesskey"
-					},
-					{
-						name: "Twitter",
-						icon: "fab fa-twitter-square",
-						url: "https://twitter.com/KeyHarmless"
-					},
-				]
+				enviroment: process.env.NODE_ENV
 			}
 		},
 		computed: {

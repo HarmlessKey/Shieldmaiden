@@ -12,7 +12,7 @@
 					<div class="row q-col-gutter-md">
 						<div class="col-12 col-md-4" id="old_spell">
 							<hk-card header="Old Spell Description" v-if="loading">
-								<div  class="loader"> <span>Loading old_spell...</span></div>
+								<hk-loader name="old spell" />
 							</hk-card>
 							<hk-card class="old_spell" v-else>
 								
@@ -97,7 +97,7 @@
 import { db } from '@/firebase';
 import Crumble from '@/components/crumble/Compendium.vue';
 import EditSpell from '@/components/contribute/spell/forms';
-import ViewSpell from '@/components/ViewSpell.vue';
+import ViewSpell from './ViewSpell.vue';
 import { general } from '@/mixins/general';
 import { spells } from '@/mixins/spells';
 import { mapGetters } from 'vuex';

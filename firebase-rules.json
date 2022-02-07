@@ -2,10 +2,19 @@
   "rules": {
     "campaigns": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
         ".indexOn": "private"
       },
       ".read": true
+    },
+    "search_campaigns": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          ".indexOn": ["name"]
+        }
+      }
     },
     "users": {
       "$uid": {
@@ -87,6 +96,16 @@
        			"
         }, 
         ".read": true
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_players": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          ".indexOn": ["character_name"]
+        }
       }
     },
     "characters_computed": {
@@ -98,7 +117,8 @@
        			"
         }, 
         ".read": true
-      }
+      },
+      ".read": true
     },
     "characters_base": {
       "$uid": {
@@ -127,7 +147,9 @@
             root.child('character_control').child(auth.uid).child( data.child('player_id').val() ).child('user').val() === $uid
           ",
           ".validate": "newData.hasChildren(['name', 'size', 'type', 'challenge_rating', 'armor_class', 'hit_points', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'])",
-          
+          "harmless_key": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
           // BASIC INFO
           "name": {
             ".validate": "newData.isString() && newData.val().length <= 100"
@@ -145,7 +167,7 @@
             ".validate": "newData.isString() && newData.val().matches(/^(Aberration|Beast|Celestial|Construct|Dragon|Elemental|Fey|Fiend|Giant|Humanoid|Monstrosity|Ooze|Plant|Swarm of tiny beasts|Undead)$/)"
           },
           "subtype": {
-            ".validate": "newData.isString() && (newData.val().length === 0 || newData.val().matches(/^(Any race|Dwarf|Elf|Gnoll|Gnome|Goblinoid|Grimlock|Human|Shapechanger|Kobold|Lizardfolk|Merfolk|Orc|Sahuagin|Demon|Devil|Shapechanger|Shapechanger|Titan|Shapechanger)$/))"
+            ".validate": "newData.isString() && newData.val().length <= 25"
           },
           "alignment": {
             ".validate": "newData.isString() && newData.val().matches(/^(Any|Any alignment|Unaligned|Lawful Good|Neutral Good|Chaotic Good|Lawful neutral|Neutral|Chaotic neutral|Lawful evil|Neutral evil|Chaotic evil)$/i)"
@@ -186,7 +208,7 @@
             ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
           },
           "hit_points": {
-            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999"
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999"
           },
           "hit_dice": {
             ".validate": "newData.isString() && newData.val().length <= 10 && (newData.val().length === 0 ||newData.val().matches(/^[0-9]+d[0-9]+$/))"
@@ -266,7 +288,7 @@
 
           "saving_throws": {
             "$savingIndex": {
-              ".validate": "newData.isString() && newData.val().length <= 15"
+              ".validate": "newData.isString() && newData.val().matches(/^(strength|dexterity|constitution|intelligence|wisdom|charisma)$/)"
             }
           },
 
@@ -400,7 +422,7 @@
             ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
           },
           "innate_spell_attack": {
-            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 99"
+            ".validate": "newData.isNumber() && newData.val() >= -10 && newData.val() <= 99"
           },
           "innate_spells": {
             "$spellId": {
@@ -835,27 +857,60 @@
           "$other": { ".validate": false }
         },
         ".write": "root.child('users').child(auth.uid).child('admin').exists()",
-        ".read": true
+        ".read": true,
+        ".indexOn": ["name", "harmless_key"]
       },
-      ".read": true
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_npcs": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name", "challenge_rating", "type"]
+        }
+      }
     },
     "custom_items": {
       "$uid": {
         ".write": "$uid === auth.uid",
         ".read": true
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_custom_items": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name"]
+        }
       }
     },
     "encounters": {
       "$uid": {
-        ".write": "$uid === auth.uid",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('admin').exists()",
         ".read": true,
           
         // Allow all to write to requests
         "$campaignId": {
+          ".indexOn": "entities/id",
           "$encounterId": {
             "requests": {
               ".write": true
             }
+          }
+        }
+      },
+      ".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_encounters": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": {
+          "$campaignId": { 
+            ".indexOn": ["name", "finished"]
           }
         }
       }
@@ -918,7 +973,17 @@
       "$uid": {
         ".write": "$uid === auth.uid",  
         ".read": true
+      },
+  		".read": "root.child('users').child(auth.uid).child('admin').exists()"
+    },
+    "search_reminders": {
+      ".write": true,
+      ".read": true,
+      "$uid": {
+        "results": { 
+        	".indexOn": ["name"]
+        }
       }
-  	}
+    }
   }
 }

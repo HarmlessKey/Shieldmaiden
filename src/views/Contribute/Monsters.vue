@@ -234,7 +234,7 @@
 	import Crumble from '@/components/crumble/Compendium.vue';
 	import Footer from '@/components/Footer.vue';
 	import Monster from '@/components/compendium/Monster.vue';
-	import ViewMonster from '@/components/ViewMonster.vue';
+	import ViewMonster from '@/components/compendium/Monster.vue';
 	import { mapGetters, mapActions } from 'vuex';
 
 	export default {

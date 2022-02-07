@@ -53,7 +53,12 @@
 						name: "Generate search table",
 						url: 'search-table',
 						icon: 'fas fa-print-search',
-					}
+					},
+					'restruct-database': {
+						name: "Restructure Database",
+						url: 'restruct-db',
+						icon: 'fas fa-folder-tree',
+					},
 				},
 			}
 		}

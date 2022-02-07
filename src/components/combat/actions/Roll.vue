@@ -11,7 +11,7 @@
 				>
 					<template v-for="({name, label, type}, index) in action_types">
 						<q-tab 
-							v-if="current[type]"
+							v-if="current[type] && current[type].length"
 							:key="`tab-${index}`" 
 							:name="name" 
 							:label="label"
@@ -69,7 +69,7 @@
 												{{ action.legendary_cost > 1 ? `(Costs ${action.legendary_cost} Actions)` : ``}}
 											</span>
 										</q-item-label>
-										<q-item-label caption v-if="action.action_list && action.action_list[0].type !== 'other'">
+										<q-item-label caption v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other'">
 											<!-- Rolls -->
 											<span v-if="action.action_list[0].rolls">
 												<span v-for="(roll, roll_index) in action.action_list[0].rolls" :key="`roll-${action_index}-${roll_index}`">
@@ -119,7 +119,7 @@
 											</span>
 										</q-item-label>
 									</q-item-section>
-									<q-item-section avatar v-if="action.action_list && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
+									<q-item-section avatar v-if="action.action_list && action.action_list[0] && action.action_list[0].type !== 'other' && action.action_list[0].rolls">
 										<span v-if="action.versatile" class="roll-button" @click.stop>
 											<q-popup-proxy :dark="$store.getters.theme === 'dark'">
 												<div class="bg-neutral-8">

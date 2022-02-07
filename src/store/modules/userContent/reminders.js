@@ -102,6 +102,26 @@ const actions = {
 	},
 
 	/**
+   * Gets all FULL Reminders from a USER
+   */
+	async get_full_reminders({ state, rootGetters, commit, dispatch }) {
+    const uid = (rootGetters.user) ? rootGetters.user.uid : undefined;
+		let reminders = (state.cached_reminders[uid]) ? state.cached_reminders[uid] : {};
+
+    if (Object.keys(reminders).length < state.reminder_count) {
+      const services = await dispatch("get_reminder_services");
+
+      try {
+        reminders = await services.getFullReminders(uid);
+        commit("SET_CACHED_REMINDERS", { uid, reminders })
+      } catch(error) {
+				throw error;
+      }
+    }
+		return reminders;
+  },
+
+	/**
 	 * Adds a newly created REMINDER for a user
 	 * A user can only add REMINDER's for themselves so we use the uid from the store
 	 * 
@@ -197,6 +217,9 @@ const mutations = {
 	SET_REMINDER_SERVICES(state, payload) { Vue.set(state, "reminder_services", payload); },
   SET_REMINDER_COUNT(state, value) { Vue.set(state, "reminder_count", value); },
   SET_REMINDERS(state, value) { Vue.set(state, "reminders", value); },
+	SET_CACHED_REMINDERS(state, { uid, reminders }) {
+    Vue.set(state.cached_reminders, uid, reminders);
+  },
   SET_CACHED_REMINDER(state, { uid, id, reminder }) { 
     if(state.cached_reminders[uid]) {
       Vue.set(state.cached_reminders[uid], id, reminder);

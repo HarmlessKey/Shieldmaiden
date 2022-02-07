@@ -1,15 +1,15 @@
 <template>
   <div class="content-side">
-    <hk-card v-if="$route.path === '/content'" class="bg-neutral-9">
+    <hk-card v-if="$route.path === '/content'" class="bg-neutral-9 overflow-hidden">
       <hk-video />
     </hk-card>
 
     <!-- COMPENDIUM -->
-    <hk-card v-if="$route.path.split('/')[1] === 'compendium'">
+    <hk-card v-if="$route.path.split('/')[1] !== 'content'">
       <div slot="header" class="card-header">
         <h2><i class="fas fa-swords mr-1" /> D&D Combat tracker</h2>
       </div>
-      <div class="card-body pt-2">
+      <div class="card-body overflow-x-hidden">
         <hk-video />
         <p class="neutral-2 mt-3 text-center">Try the most advanced initiative tracker on the internet.</p>
 
@@ -30,6 +30,7 @@
       </div>
     </hk-card>
 
+    <!-- SOCIAL -->
     <hk-card small header="Join our community">
       <div class="card-body">
         <a class="btn btn-block bg-neutral-8 mb-3" href="https://discord.gg/fhmKBM7" target="_blank" rel="noopener">

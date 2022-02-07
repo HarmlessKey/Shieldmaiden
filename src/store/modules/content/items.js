@@ -36,8 +36,7 @@ const actions = {
    * 
    * @param {number | string} id | kebab name
    * @returns {object} item
-   */
-  
+   */ 
   async get_api_item({ commit, state, dispatch}, id) {
     const cached = state.cached_items;
     let item = undefined;
@@ -45,7 +44,7 @@ const actions = {
     // SRD Items
     if(isNaN(id)) {
       item = Object.values(cached).filter(item => {
-        return item.name && item.name.replace(/ /g, "-").toLowerCase() === id;
+        return item.url === id;
       })[0];
     } else {
       item = cached[id];
@@ -56,10 +55,9 @@ const actions = {
       const services = await dispatch("get_api_item_services");
       try {
         item = await services.getItem(id);
-        console.log("store", item)
         commit("SET_CACHED_ITEM", item);
       } catch(error) {
-        console.error(error);
+        throw error;
       }
     }
     return item;

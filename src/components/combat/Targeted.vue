@@ -249,7 +249,6 @@
 				'set_targeted',
 				'setSlide',
 				'set_save',
-				'set_dead',
 				'set_stable',
 				'set_targetReminder',
 				'set_hidden'
@@ -307,13 +306,6 @@
 					key: this.target.key,
 					check: check,
 					index
-				})
-			},
-			kill_revive(action) {
-				this.set_dead({
-					key: this.target.key,
-					action: action,
-					revive: true
 				})
 			},
 			stabilize() {

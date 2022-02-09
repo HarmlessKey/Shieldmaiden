@@ -1,24 +1,32 @@
 <template>
 	<hk-card>
-		<div slot="header" class="card-header">
-			<h1>
-				<i :class="`hki-${condition.value}`" />
-				{{ condition.name }}
-			</h1>
-		</div>
-		<div class="card-body">
-			<Condition :data="condition" />
-		</div>
+		<template v-if="!loading">
+			<div slot="header" class="card-header">
+				<h1>
+					<i :class="`hki-${condition.name.toLowerCase()}`" />
+					{{ condition.name }}
+				</h1>
+			</div>
+			<div class="card-body">
+				<template v-if="not_found">
+					<p>Could not find condition <b>{{ id }}</b></p>
+					<router-link to="/compendium/conditions" class="btn bg-neutral-5">
+						Find conditions
+					</router-link>
+				</template>
+				<Condition v-else :data="condition" />
+			</div>
+		</template>
+		<hk-loader v-else name="Loading condition" />
 	</hk-card>
 </template>
 
 <script>
-	import { conditions } from '@/mixins/conditions.js';
+	import { mapActions } from "vuex";
 	import Condition from "@/components/compendium/Condition";
 
 	export default {
 		name: 'ViewCondition',
-		mixins: [conditions],
 		components: {
 			Condition
 		},
@@ -29,18 +37,18 @@
 					{ 
 						vmid: "description", 
 						name: "description", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.condition.description}`
 					},
 					{
 						vmid: "og-title",
 						property: "og:title", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.condition.description}`
 					},
 					{ 
 						vmid: "og-description", 
 						property: "og:description",
 						name: "description", 
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.condition.description}`
 					},
 					{ 
 						vmid: "twitter-title",
@@ -50,30 +58,35 @@
 					{ 
 						vmid: "twitter-description", 
 						name: "twitter:description",
-						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.description}`
+						content: `D&D 5th Edition condition: ${ this.condition.name ? this.condition.name.capitalizeEach() : "Condition" }. ${this.condition.description}`
 					},
 				],
 			}
 		},
 		data() {
 			return {
-				id: this.$route.params.id
+				id: this.$route.params.id,
+				loading: true,
+				condition: {},
+				not_found: false
 			}
 		},
-		computed: {
-			condition() {
-				return this.conditionList.filter(item => {
-					return item.value === this.id;
-				})[0];
-			},
-			description() {
-				const maxLength = 160 - (29 + this.condition.name.length);
-				return (this.condition && this.condition.effects) ? `${this.condition.effects.join(" ").substring(0, maxLength).trim()}...` : "";
-			}
-		},
-		beforeMount() {
+		async mounted() {
+			await this.get_condition(this.id).then(condition => {
+				const maxLength = 160 - (29 + condition.name.length);
+				condition.description =  (condition.effects) ? `${condition.effects.join(" ").substring(0, maxLength).trim()}...` : "";
+
+				this.condition = condition;
+				this.loading = false;
+			}).catch(() => {
+				this.not_found = true;
+				this.loading = false;
+			});
 			// Root emit with the condition name, so it can be used in Crumble component
 			this.$root.$emit('route-name', this.condition.name);
+		},
+		methods: {
+			...mapActions("api_conditions", ["get_condition"]),
 		}
 	}
 </script>

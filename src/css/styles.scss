@@ -1366,103 +1366,112 @@ html body {
 		}
 	}
 
-	.target-item {
-		display: grid;
-		grid-template-columns: 35px 35px 1fr;
-		grid-template-rows: auto;
-		grid-gap: 0;
-		line-height: 35px;
-		user-select: none;
-	
-		&.hasInitiative {
-			grid-template-columns: 35px 35px 35px 1fr;
-		}
-		.initiative, .ac, .img {
-			text-align: center;
-			height: 35px;
-		}
-		.ac_wrapper {
-			position: relative;
-			cursor: pointer;
-	
-			i, .ac {
-				position: absolute;
-				line-height: 35px;
-				width: 100%;
-				text-align: center;
-			}
-			i {
-				font-size: 28px;
-				color: $neutral-4;
-			}
-			.ac {
-				font-weight: bold;
-				color: $neutral-1;
-				margin-top: -1px;
-			}
-		}
-		.img {
-			display: block;
-			width: 35px;
-			height: 35px;
-			background-color: $neutral-9;
-			background-position: center top;
-			background-repeat: no-repeat;
-			background-size: cover;
-			font-size: 20px;
+	.target-item-wrapper {
+		border-radius: $border-radius-small;
+		overflow: hidden;
+
+		.target-item {
+			display: grid;
+			grid-template-columns: 35px 35px 1fr;
+			grid-template-rows: auto;
+			grid-gap: 0;
 			line-height: 35px;
-			overflow: hidden;
-			border: solid 1px transparent;
-			
-			[class^="hki-"], [class*=" hki-"] {
-				font-size: 28px;
-				margin-left: -1px;
+			user-select: none;
+			border-radius: $border-radius-small;
+		
+			&.hasInitiative {
+				grid-template-columns: 35px 35px 35px 1fr;
 			}
-	
-			span {
+			.initiative, .ac, .img {
+				text-align: center;
+				height: 35px;
+			}
+			.ac_wrapper {
 				position: relative;
-			}
-		}
+				cursor: pointer;
 		
-		.q-linear-progress {
-			.health-bar { 
-				padding-left: 5px;
-				font-size: 13px;
-				display: grid;
-				grid-template-columns: 1fr max-content;
-				grid-column-gap: 5px;
-				line-height: 35px;
-				margin-right: 5px;
-				color: $neutral-1;
-		
-				.conditions {
+				i, .ac {
 					position: absolute;
-					right: 0;
-					top: 0;
-		
-					.condition {
-						display: block;
-						width: 12px;
-						height: 12px;
-						border: solid 1px $neutral-1;
-						margin-left: 1px;
-						cursor: pointer;
-					}
+					line-height: 35px;
+					width: 100%;
+					text-align: center;
+				}
+				i {
+					font-size: 28px;
+					color: $neutral-4;
+				}
+				.ac {
+					font-weight: bold;
+					color: $neutral-1;
+					margin-top: -1px;
+				}
+			}
+			.img {
+				display: block;
+				width: 35px;
+				height: 35px;
+				background-color: $neutral-9;
+				background-position: center top;
+				background-repeat: no-repeat;
+				background-size: cover;
+				font-size: 20px;
+				line-height: 35px;
+				overflow: hidden;
+				border: solid 1px transparent;
+				
+				[class^="hki-"], [class*=" hki-"] {
+					font-size: 28px;
+					margin-left: -1px;
 				}
 		
-				.hp {
-					text-align: right;
-					cursor: pointer;
-					
-					.current {
-						font-size: 18px;
-						font-weight: bold;
+				span {
+					position: relative;
+				}
+			}
+			
+			.q-linear-progress {
+				.health-bar { 
+					padding-left: 5px;
+					font-size: 13px;
+					display: grid;
+					grid-template-columns: 1fr max-content;
+					grid-column-gap: 5px;
+					line-height: 35px;
+					margin-right: 5px;
+					color: $neutral-1;
+			
+					.conditions {
+						position: absolute;
+						right: 0;
+						top: 0;
+			
+						.condition {
+							display: block;
+							width: 12px;
+							height: 12px;
+							border: solid 1px $neutral-1;
+							margin-left: 1px;
+							cursor: pointer;
+						}
 					}
-					.max, .temp {
-						opacity: .5;
-					}
-					.save {
-						margin-right: 4px;
+			
+					.hp {					
+						.health, .temp {
+							text-align: right;
+							cursor: pointer;
+							border-radius: $border-radius-small;
+							font-size: 15px;
+
+							.current {
+								font-weight: bold;
+							}
+							.max {
+								opacity: .8;
+							}
+						}
+						.save {
+							margin-right: 4px;
+						}
 					}
 				}
 			}

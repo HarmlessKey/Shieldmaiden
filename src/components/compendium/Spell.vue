@@ -48,7 +48,7 @@
 	import { mapActions } from "vuex";
 
 	export default {
-		name: 'Spell',
+		name: "Spell",
 		props: {
 			// If the spell is fetched in a parent component you can send the full spell object in de data prop
 			data: {
@@ -70,14 +70,12 @@
 				this.spell = this.data;		
 				this.loading = false;
 			} else {
-				this.spell = await this.get_spell(this.id);
+				this.spell = await this.get_api_spell(this.id);
 				this.loading = false;
 			}			
 		},
 		methods: {
-			...mapActions([
-				"get_spell"
-			]),
+			...mapActions("api_spells", ["get_api_spell"]),
 			parse_spell_str(text) {
 				// map to replace weird character with real character 
 				let rules = [

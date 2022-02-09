@@ -304,9 +304,14 @@ ul.targets {
 		border: solid 1px transparent;
 		cursor: pointer;
 		background: $neutral-8;
+		border-radius: $border-radius-small;
 
 		&.targeted {
 			border-color: $blue !important;
+		}
+		.target-item-wrapper {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
 		}
 	}
 	&.active_targets li:first-child {

@@ -1,5 +1,5 @@
 <template>
-	<div class="terget-item-wrapper">
+	<div class="target-item-wrapper">
 		<div class="target-item bg-neutral-8" :class="{ hasInitiative: initiative }">
 			<!-- INITIATIVE -->
 			<span class="initiative" v-if="initiative" @click.stop :class="targeted.includes(entity.key) ? 'blue' : ''">
@@ -195,14 +195,16 @@
 					<template v-if="entity.active">
 						<span class="hp" @click.stop>
 							<template v-if="entity.curHp > 0 || entity.entityType === 'npc'">
-								<hk-animated-integer :value="displayStats().curHp" class="current" />
-								<span class="max">
-									{{ displayStats().maxHp }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Max HP {{ entity.maxHpMod > 0 ? `+ ${entity.maxHpMod}` : `` }}
-									</q-tooltip>
+								<span class="health">
+									<hk-animated-integer :value="displayStats().curHp" class="current" />
+									<span class="mx-1">/</span>
+									<span class="max">{{ displayStats().maxHp }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Max HP {{ entity.maxHpMod > 0 ? `+ ${entity.maxHpMod}` : `` }}
+										</q-tooltip>
+									</span>
 								</span>
-								<span v-if="entity.tempHp" class="temp">
+								<span v-if="entity.tempHp" class="temp ml-1">
 									+{{ entity.tempHp }}
 									<q-tooltip anchor="top middle" self="center middle">
 										Temp HP

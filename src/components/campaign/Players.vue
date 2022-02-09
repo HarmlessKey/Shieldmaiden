@@ -109,7 +109,7 @@
 					Save DC
 				</q-tooltip>
 			</div>
-			<div class="col header text-center health">
+			<div class="col header text-center">
 				<i class="fas fa-heart"></i>
 				<q-tooltip anchor="top middle" self="center middle">
 					Health
@@ -197,37 +197,44 @@
 							</div>
 						</template>
 						<template v-else>
-							<template v-if="player.transformed">
-								<span class="current" :class="{ 
-									'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
-									'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
-									'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
-								}">{{ player.transformed.curHp }}</span>
-								<span class="neutral-2">/</span>
-								<span>
-									{{ player.transformed.maxHp }}
-								</span>
-							</template>
-							<template v-else>
-								<span class="current" :class="{ 
-									'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
-									'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 76, 
-									'green': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76
-								}">{{ player.curHp }}</span>
-								<span class="neutral-2">/</span>
-								<span :class="{ 
-										'green': player.maxHpMod > 0, 
-										'red': player.maxHpMod < 0 
-									}" 
-									v-if="player.maxHpMod">
-									{{ maxHp(players[key].maxHp, player.maxHpMod) }}
-									<q-tooltip anchor="top middle" self="center middle">
-										Max HP + {{ player.maxHpMod }}
-									</q-tooltip>
-								</span>
-								<span v-else>{{ players[key].maxHp }}</span>
-							</template>
-							<span v-if="player.tempHp > 0" class="neutral-2">+{{ player.tempHp }}</span>
+							<span class="hit-points">
+								<template v-if="player.transformed">
+									<span class="current" :class="{ 
+										'red': percentage(player.transformed.curHp, player.transformed.maxHp) <= 33, 
+										'orange': percentage(player.transformed.curHp, player.transformed.maxHp) > 33 && percentage(player.transformed.curHp, player.transformed.maxHp) <= 76, 
+										'green': percentage(player.transformed.curHp, player.transformed.maxHp) > 76
+									}">{{ player.transformed.curHp }}</span>
+									<span class="neutral-2 mx-1">/</span>
+									<span>
+										{{ player.transformed.maxHp }}
+									</span>
+								</template>
+								<template v-else>
+									<span class="current" :class="{ 
+										'red': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 33, 
+										'orange': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 33 && percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) <= 76, 
+										'green': percentage(player.curHp, maxHp(players[key].maxHp, player.maxHpMod)) > 76
+									}">{{ player.curHp }}</span>
+									<span class="neutral-2 mx-1">/</span>
+									<span :class="{ 
+											'green': player.maxHpMod > 0, 
+											'red': player.maxHpMod < 0 
+										}" 
+										v-if="player.maxHpMod">
+										{{ maxHp(players[key].maxHp, player.maxHpMod) }}
+										<q-tooltip anchor="top middle" self="center middle">
+											Max HP + {{ player.maxHpMod }}
+										</q-tooltip>
+									</span>
+									<span v-else class="neutral-2">{{ players[key].maxHp }}</span>
+								</template>
+							</span>
+							<span v-if="player.tempHp > 0" class="hit-points ml-1"> 
+								+{{ player.tempHp }}
+								<q-tooltip anchor="top middle" self="center middle">
+									Temporary HP
+								</q-tooltip>
+							</span>
 						</template>
 					</div>
 					<div class="col actions" :key="'actions-'+key" v-if="viewerIsUser">
@@ -494,6 +501,7 @@
 			min-height: 35px;
 			padding: 12px 10px;
 			background-color: $neutral-8;
+			line-height: 25px;
 
 			&.header {
 				padding: 0 12px 5px 12px;
@@ -534,6 +542,23 @@
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
+			&.health {
+				text-align: right;
+				padding: 8px 10px;
+
+				.current {
+					font-weight: bold;
+				}
+				.hit-points {
+					background-color: $neutral-5;
+					border: solid 1px $neutral-4;
+					border-radius: $border-radius-small;
+					padding: 0 5px;
+					line-height: 33px;
+					height: 33px;
+					display: inline-block;
+				}
+			}
 			.saves {
 				.save {
 					margin-left: 4px;
@@ -542,7 +567,7 @@
 			&.actions {
 				display: flex;
 				justify-content: flex-end;
-				padding: 9px 12px;
+				padding: 9px 12px 9px 0;
 			}
 		}
 		&.xp {
@@ -600,6 +625,9 @@
 					i {
 						font-size: 45px;
 					}
+				}
+				&.actions {
+					padding: 14px 15px 14px 0;
 				}
 			}
 

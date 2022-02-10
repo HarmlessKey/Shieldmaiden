@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<q-btn-toggle
-			v-if="npc_count && !customOnly"
+			v-if="(custom_content && custom_content.length) && content.length === 2"
 			class="mb-3"
 			:value="copy_resource"
 			spread
@@ -34,7 +34,7 @@
 					v-for="(result, index) in searchResults" 
 					:key="index" 
 					class="bg-neutral-8"
-					:disabled="disabledCustom.includes(result.key)"
+					:disabled="copy_resource === 'custom' ? disabledCustom.includes(result.key) : disabledSrd.includes(result._id)"
 				>
 					<q-item-section>
 						{{ result.name.capitalizeEach() }}
@@ -61,9 +61,9 @@
 				default: "monster"
 			},
 			// Only show custom options
-			customOnly: {
-				type: Boolean,
-				default: false
+			content: {
+				type: Array,
+				default: () => { return ["custom", "srd"]; }
 			},
 			button: {
 				type: String,
@@ -71,6 +71,11 @@
 			},
 			// Custom results that should be disabled
 			disabledCustom: {
+				type: Array,
+				default: () => { return []; }
+			},
+			// Custom results that should be disabled
+			disabledSrd: {
 				type: Array,
 				default: () => { return []; }
 			},
@@ -90,14 +95,15 @@
 			}
 		},
 		computed: {
-			...mapGetters("npcs", ["npcs", "npc_count"]),
-			...mapGetters("items", ["items", "item_count"]),
+			...mapGetters("npcs", ["npcs"]),
+			...mapGetters("items", ["items"]),
 			custom_content() {
 				return (this.type === "monster") ? this.npcs : (this.type === "item") ? this.items : [];
 			},
 			copy_resource: {
 				get() {
-					const resource = (this.npc_count || this.customOnly) ? "custom" : "srd";
+					const resource = (this.custom_content && this.custom_content.length && this.content.includes("custom")) 
+						? "custom" : "srd";
 					return (this.copy_resource_setter) ? this.copy_resource_setter : resource;
 				},
 				set(newVal) {
@@ -106,11 +112,14 @@
 			}
 		},
 		async mounted() {
-			if(this.type === "monster") {
-				await this.get_npcs();
-			}
-			if(this.type === "item") {
-				await this.get_items();
+			// Get custom content
+			if(this.content.includes("custom")) {
+				if(this.type === "monster") {
+					await this.get_npcs();
+				}
+				if(this.type === "item") {
+					await this.get_items();
+				}
 			}
 		},
 		methods: {
@@ -118,6 +127,7 @@
 			...mapActions("npcs", ["get_npcs", "get_npc"]),
 			...mapActions("api_items", ["get_api_items", "get_api_item"]),
 			...mapActions("items", ["get_items", "get_item"]),
+			...mapActions("api_spells", ["get_api_spells", "get_api_spell"]),
 			changeCopyResource(value) {
 				this.copy_resource = value;
 				this.query = "";
@@ -126,6 +136,7 @@
 			},
 			async search() {
 				if(this.query) {
+					// CUSTOM
 					if(this.copy_resource === "custom") {
 						const results = this.custom_content.filter(result => {
 							return result.name.toLowerCase().includes(this.query.toLowerCase());
@@ -136,14 +147,16 @@
 							this.searchResults = results;
 						} else {
 							this.searchResults = [];
-							this.noResult = 'Nothing found starting with "' + this.query + '"';
+							this.noResult = 'Nothing found for "' + this.query + '"';
 						}
-					} else {
+					} 
+					// API
+					else {
 						// Monsters
 						if(this.type === "monster") {
 							await this.get_monsters({ query: { search: this.query }}).then(results => {
 								if(results.meta.count === 0) {
-									this.noResult = 'No results for "' + this.query + '"';
+									this.noResult = 'Nothing found for "' + this.query + '"';
 								} else {
 									this.noResult = "";
 									this.searchResults = results.results;
@@ -154,7 +167,18 @@
 						if(this.type === "item") {
 							await this.get_api_items({ query: { search: this.query }}).then(results => {
 								if(results.meta.count === 0) {
-									this.noResult = 'No results for "' + this.query + '"';
+									this.noResult = 'Nothing found for "' + this.query + '"';
+								} else {
+									this.noResult = "";
+									this.searchResults = results.results;
+								}
+							});
+						}
+						// Spells
+						if(this.type === "spell") {
+							await this.get_api_spells({ query: { search: this.query }}).then(results => {
+								if(results.meta.count === 0) {
+									this.noResult = 'Nothing found for "' + this.query + '"';
 								} else {
 									this.noResult = "";
 									this.searchResults = results.results;
@@ -189,6 +213,11 @@
 						result = (this.copy_resource === "custom")
 							? await this.get_item({ uid: this.userId, id })
 							: await this.get_api_item(id);
+					}
+					if(this.type === "spell") {
+						result = (this.copy_resource === "custom")
+							? await this.get_spell({ uid: this.userId, id })
+							: await this.get_api_spell(id);
 					}
 	
 					// Remove properties not needed for custom monsters

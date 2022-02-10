@@ -76,7 +76,7 @@
 		async mounted() {
 			await this.get_api_spell(this.id).then(spell => {
 				const maxLength = 160 - (29 + spell.name.length);
-				spell.description = `${spell.desc.join(" ").substring(0, maxLength).trim()}...`;
+				spell.description = (spell.desc) ? `${spell.desc.join(" ").substring(0, maxLength).trim()}...` : "...";
 
 				this.spell = spell;
 				this.loading = false;

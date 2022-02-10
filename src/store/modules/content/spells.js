@@ -61,7 +61,7 @@ const actions = {
 };
 const mutations = {
   SET_SPELL_SERVICES(state, payload) { Vue.set(state, "spell_services", payload); },
-  SET_CACHED_SPELL(state, {id, spell}) { Vue.set(state.cached_spells, id, spell) }
+  SET_CACHED_SPELL(state, payload) { Vue.set(state.cached_spells, payload["_id"], payload) },
 };
 
 export default {

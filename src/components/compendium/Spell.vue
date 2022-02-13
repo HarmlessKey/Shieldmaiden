@@ -3,7 +3,7 @@
 		<h2 class="mb-1">{{ spell.name }}</h2>
 		<i class="mb-3 d-block">
 			<template v-if="spell.level > 0">
-				{{ spell. level | numeral("oO") }} level
+				{{ spell.level | numeral("oO") }} level
 			</template>
 			<template v-else>Cantrip</template>
 			<span v-if="spell.school"> {{ spell.school.name }}</span>

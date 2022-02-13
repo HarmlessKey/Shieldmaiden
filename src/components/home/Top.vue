@@ -9,7 +9,12 @@
 						<h3>The online tool for offline play.</h3>
 
 						<div class="button-container">
-							<router-link v-if="!$store.getters.user" to="/demo" class="btn btn-lg">Try Demo Encounter</router-link>
+							<div v-if="!$store.getters.user">
+								<q-btn to="/demo" color="primary" size="xl" no-caps push>Try demo encounter</q-btn>
+								<div><small>
+									<i class="neutral-4">No download required</i>
+								</small></div>
+							</div>
 							<router-link v-else to="/content" class="btn btn-lg bg-green">My content</router-link>
 						</div>
 						

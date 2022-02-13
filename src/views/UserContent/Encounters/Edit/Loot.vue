@@ -53,7 +53,7 @@
 											Edit
 										</q-tooltip>
 									</a>
-									<a @click="removeItem(key)" class="btn btn-sm bg-neutral-5">
+									<a @click.stop="removeItem(key)" class="btn btn-sm bg-neutral-5">
 										<i class="fas fa-trash-alt"></i>
 										<q-tooltip anchor="top middle" self="center middle">
 											Remove

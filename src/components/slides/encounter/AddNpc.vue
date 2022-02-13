@@ -154,7 +154,7 @@
 					<hr>
 					<q-btn 
 						v-if="selectedPlayers.length > 0" 
-						class="btn btn-block" 
+						color="primary"
 						type="submit" 
 						no-caps
 						:label="`Add player${selectedPlayers.length > 1 ? 's' : ''}`"

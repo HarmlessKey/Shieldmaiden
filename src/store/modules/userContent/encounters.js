@@ -676,7 +676,7 @@ const actions = {
     if(uid) {
       const services = await dispatch("get_encounter_services");
       try {
-        await services.addLoot(uid, campaignId, encounterId, id);
+        await services.deleteLoot(uid, campaignId, encounterId, id);
         commit("DELETE_LOOT", { uid, campaignId, encounterId, id });
         return;
       } catch(error) {
@@ -914,8 +914,8 @@ const mutations = {
   SET_LOOT(state, { uid, campaignId, encounterId, id, item }) {
     if(
       state.cached_encounters[uid] && 
-      state.cached_encounters[campaignId] && 
-      state.cached_encounters[campaignId][encounterId]
+      state.cached_encounters[uid][campaignId] && 
+      state.cached_encounters[uid][campaignId][encounterId]
     ) {
       if(state.cached_encounters[uid][campaignId][encounterId].loot) {
         Vue.set(state.cached_encounters[uid][campaignId][encounterId].loot, id, item);
@@ -940,9 +940,9 @@ const mutations = {
   },
   DELETE_LOOT(state, { uid, campaignId, encounterId, id }) {
     if(state.cached_encounters[uid] && 
-      state.cached_encounters[campaignId] && 
-      state.cached_encounters[campaignId][encounterId] && 
-      state.cached_encounters[campaignId][encounterId].loot
+      state.cached_encounters[uid][campaignId] && 
+      state.cached_encounters[uid][campaignId][encounterId] && 
+      state.cached_encounters[uid][campaignId][encounterId].loot
     ) {
       Vue.delete(state.cached_encounters[uid][campaignId][encounterId].loot, id);
     }
